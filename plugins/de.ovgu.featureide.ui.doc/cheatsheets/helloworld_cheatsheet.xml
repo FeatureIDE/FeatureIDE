@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?> 
 <cheatsheet title="First FeatureIDE Project">
 	<intro
-       href="/de.ovgu.featureide.ui.doc/html/Productline.htm">
+       href="/de.ovgu.featureide.ui.doc/html/fosd.html">
 		<description>
 Welcome to the FeatureIDE tutorial.<br/>
 This tutorial will help you to build your first FeatureIDE Project. After you have finished this tutorial, you will have a simple Hello World software product line.<br/><br/>
@@ -38,7 +38,7 @@ You can also click &quot;Start Wizard&quot; to start the wizard.
           serialization="org.eclipse.ui.newWizard(newWizardId=de.ovgu.featureide.ui.FeatureProjectWizard)"/>
  </item>
  <item
-         href="/de.ovgu.featureide.ui.doc/html/Model.htm"
+         href="/de.ovgu.featureide.ui.doc/html/featuremodel.html"
          title="Edit the feature model">
     <description>
        Now its time to create a feature model to describe your features.
