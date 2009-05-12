@@ -39,30 +39,6 @@
    </extension>
 
 
-   <extension
-         id="jaknature"
-         name="Jak Project Nature"
-         point="org.eclipse.core.resources.natures">
-      <builder
-            id="de.ovgu.featureide.core.jakBuilder">
-      </builder>
-      <runtime>
-         <run
-               class="featureide.core.builder.JakNature">
-         </run>
-      </runtime>
-   </extension>
-   <extension
-         id="jakBuilder"
-         name="Jak Project Builder"
-         point="org.eclipse.core.resources.builders">
-      <builder
-            hasNature="true">
-         <run
-               class="featureide.core.builder.JakBuilder">
-         </run>
-      </builder>
-   </extension>
 
     
     
@@ -91,30 +67,6 @@
       </builder>
    </extension>
    
-   <extension
-         id="featureHouseNature"
-         name="Feature House Project Nature"
-         point="org.eclipse.core.resources.natures">
-      <builder
-            id="de.ovgu.featureide.core.featureHouseBuilder">
-      </builder>
-      <runtime>
-         <run
-               class="featureide.core.builder.FeatureHouseNature">
-         </run>
-      </runtime>
-   	</extension>
-    <extension
-         id="featureHouseBuilder"
-         name="Feature House Builder"
-         point="org.eclipse.core.resources.builders">
-      <builder
-            hasNature="true">
-         <run
-               class="featureide.core.builder.FeatureHouseBuilder">
-         </run>
-      </builder>
-   </extension>
    
     <extension
           id="xmlProblem"

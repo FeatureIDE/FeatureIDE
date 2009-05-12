@@ -15,18 +15,13 @@ Require-Bundle: org.eclipse.core.runtime,
 Export-Package: 
  featureide.core,
  featureide.core.builder,
- featureide.core.builder.aheadwrapper,
  featureide.core.jakprojectmodel,
  featureide.core.launching,
  featureide.core.listeners,
  featureide.core.projectstructure.nodetypes,
- featureide.core.projectstructure.trees,
- mixin
+ featureide.core.projectstructure.trees
 Bundle-ClassPath: .,
- lib/jak2java.jar,
- lib/mixin.jar,
- lib/tools.jar,
- lib/FeatureHouse-0.2.jar
+ lib/mixin.jar
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: University of Magdeburg

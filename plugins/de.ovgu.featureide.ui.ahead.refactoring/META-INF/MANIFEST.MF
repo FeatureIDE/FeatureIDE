@@ -21,5 +21,4 @@ Bundle-ClassPath: .,
  lib/log4j-1.2.15.jar,
  lib/refactor.jar
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: mixin
 Bundle-Vendor: University of Magdeburg
