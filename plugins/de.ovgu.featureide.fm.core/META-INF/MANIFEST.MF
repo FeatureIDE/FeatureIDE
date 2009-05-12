@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: FeatureIDE - Feature Model Core Plug-in
+Bundle-Name: Feature Model Core Plug-in
 Bundle-SymbolicName: de.ovgu.featureide.fm.core;singleton:=true
-Bundle-Version: 2.2.4.qualifier
+Bundle-Version: 2.3.0.qualifier
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources
 Bundle-ActivationPolicy: lazy

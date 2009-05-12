@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Ahead UI Plug-in
 Bundle-SymbolicName: de.ovgu.featureide.ui.ahead;singleton:=true
-Bundle-Version: 2.2.4.qualifier
+Bundle-Version: 2.3.0.qualifier
 Bundle-Activator: de.ovgu.featureide.ui.ahead.AheadUIPlugin
 Bundle-Vendor: University of Magdeburg
 Require-Bundle: org.eclipse.ui,
@@ -15,9 +15,9 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.debug.ui,
  org.eclipse.ui.views,
  org.eclipse.gef,
- de.ovgu.featureide.core;bundle-version="2.2.4",
- de.ovgu.featureide.fm.core;bundle-version="2.2.4",
- de.ovgu.featureide.fm.ui;bundle-version="2.2.4"
+ de.ovgu.featureide.core,
+ de.ovgu.featureide.fm.core,
+ de.ovgu.featureide.fm.ui
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: de.ovgu.featureide.ui.ahead,

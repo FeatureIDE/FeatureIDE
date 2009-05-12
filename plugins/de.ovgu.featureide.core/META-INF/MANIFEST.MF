@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: FeatureIDE Core Plug-in
 Bundle-SymbolicName: de.ovgu.featureide.core;singleton:=true
-Bundle-Version: 2.2.4.qualifier
+Bundle-Version: 2.3.0.qualifier
 Bundle-Activator: featureide.core.CorePlugin
 Bundle-Localization: 
 Require-Bundle: org.eclipse.core.runtime,
@@ -11,7 +11,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.swt,
  org.eclipse.ui,
  org.eclipse.core.resources,
- de.ovgu.featureide.fm.core;bundle-version="2.2.4"
+ de.ovgu.featureide.fm.core
 Export-Package: 
  featureide.core,
  featureide.core.builder,
@@ -29,3 +29,4 @@ Bundle-ClassPath: .,
  lib/FeatureHouse-0.2.jar
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: University of Magdeburg

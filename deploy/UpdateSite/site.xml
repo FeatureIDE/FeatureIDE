@@ -69,7 +69,17 @@
    <feature url="features/de.ovgu.featureide.featurehouse_2.2.4.200905090213.jar" id="de.ovgu.featureide.featurehouse" version="2.2.4.200905090213">
       <category name="FeatureIDE 2.2"/>
    </feature>
+   <feature url="features/de.ovgu.featureide_2.3.0.qualifier.jar" id="de.ovgu.featureide" version="2.3.0.qualifier">
+      <category name="FeatureIDE 2.3"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurecpp_2.3.0.qualifier.jar" id="de.ovgu.featureide.featurecpp" version="2.3.0.qualifier">
+      <category name="FeatureIDE 2.3"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurehouse_2.3.0.qualifier.jar" id="de.ovgu.featureide.featurehouse" version="2.3.0.qualifier">
+      <category name="FeatureIDE 2.3"/>
+   </feature>
    <category-def name="FeatureIDE 2.0" label="FeatureIDE 2.0"/>
    <category-def name="FeatureIDE 2.1" label="FeatureIDE 2.1"/>
    <category-def name="FeatureIDE 2.2" label="FeatureIDE 2.2"/>
+   <category-def name="FeatureIDE 2.3" label="FeatureIDE 2.3"/>
 </site>
