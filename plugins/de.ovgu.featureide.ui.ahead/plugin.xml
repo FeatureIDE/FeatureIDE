@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="de.ovgu.featureide.ui.ahead.editors.JakEditor"
+            contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
+            default="true"
+            extensions="jak"
+            icon="icons/JakFileIcon.png"
+            id="featureide.ui.editors.JakEditor"
+            name="Jak Editor">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <wizard
+            category="featureideui.category"
+            class="de.ovgu.featureide.ui.ahead.wizards.NewJakFileWizard"
+            icon="icons/NewJakFileIcon.png"
+            id="featureide.ui.wizards.NewJakFileWizard"
+            name="Jak File"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            id="de.ovgu.featureide.ui.ahead.NewFiles"
+            label="NewFiles"
+            visible="false">
+         <action
+               class="de.ovgu.featureide.ui.ahead.actions.StartJakFileWizard"
+               icon="icons/NewJakFileIcon.png"
+               id="de.ovgu.featureide.ui.ahead.NewJakFile"
+               label="New Jak File"
+               style="push"
+               toolbarPath="&quot;Normal&quot;">
+         </action>
+      </actionSet>
+   </extension>
+</plugin>

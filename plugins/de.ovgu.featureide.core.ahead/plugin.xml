@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="de.ovgu.featureide.core.composers">
+      <composer
+            class="de.ovgu.featureide.ahead.AheadComposer"
+            description="Composes Jak files."
+            id="de.ovgu.featureide.composer.ahead"
+            name="AHEAD Composer">
+      </composer>
+   </extension>
+
+</plugin>

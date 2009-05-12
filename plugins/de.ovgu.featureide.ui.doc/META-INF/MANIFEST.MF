@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: FeatureIDE Documentation Plug-in
+Bundle-SymbolicName: de.ovgu.featureide.ui.doc;singleton:=true
+Bundle-Version: 2.2.4.qualifier
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.ui.cheatsheets,
+ org.eclipse.ui.intro
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: University of Magdeburg

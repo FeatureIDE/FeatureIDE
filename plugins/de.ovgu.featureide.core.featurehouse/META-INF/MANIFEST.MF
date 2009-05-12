@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: FeatureHouse Plug-in
+Bundle-SymbolicName: de.ovgu.featureide.core.featurehouse;singleton:=true
+Bundle-Version: 2.2.4.qualifier
+Bundle-Activator: de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources;bundle-version="3.4.2",
+ de.ovgu.featureide.core;bundle-version="2.2.4",
+ de.ovgu.featureide.fm.core;bundle-version="2.2.4"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ClassPath: lib/FeatureHouse-0.2.jar,
+ .

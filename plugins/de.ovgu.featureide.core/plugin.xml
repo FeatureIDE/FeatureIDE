@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension-point id="composers" name="Composers" schema="schema/composers.exsd"/>
+
+   <extension
+         id="featureIDE.launchConfiguration"
+         name="Feature IDE Launch Configurations"
+         point="org.eclipse.debug.core.launchConfigurationTypes">
+      <launchConfigurationType
+            delegate="featureide.core.launching.LayeredApplicationLaunchConfigurationDelegate"
+            id="featureide.core.launching.layeredApplication"
+            modes="run"
+            name="Layered Application"/>
+   </extension>
+
+   <extension
+         id="builderProblemMarker"
+         name="Builder Problem Marker"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+      <persistent
+            value="true">
+      </persistent>
+   </extension>
+
+   <extension
+         id="de.ovgu.featureide.core.configurationProblemMarker"
+         name="Configuration Problem Marker"
+         point="org.eclipse.core.resources.markers">
+      <persistent
+            value="true">
+      </persistent>
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+   </extension>
+
+
+   <extension
+         id="jaknature"
+         name="Jak Project Nature"
+         point="org.eclipse.core.resources.natures">
+      <builder
+            id="de.ovgu.featureide.core.jakBuilder">
+      </builder>
+      <runtime>
+         <run
+               class="featureide.core.builder.JakNature">
+         </run>
+      </runtime>
+   </extension>
+   <extension
+         id="jakBuilder"
+         name="Jak Project Builder"
+         point="org.eclipse.core.resources.builders">
+      <builder
+            hasNature="true">
+         <run
+               class="featureide.core.builder.JakBuilder">
+         </run>
+      </builder>
+   </extension>
+
+    
+    
+   <extension
+         id="featureCPPNature"
+         name="Features C++ Project Nature"
+         point="org.eclipse.core.resources.natures">
+      <builder
+            id="de.ovgu.featureide.core.featureCPPBuilder">
+      </builder>
+      <runtime>
+         <run
+               class="featureide.core.builder.FeatureCPPNature">
+         </run>
+      </runtime>
+   	</extension>
+    <extension
+         id="featureCPPBuilder"
+         name="Feature C++ Builder"
+         point="org.eclipse.core.resources.builders">
+      <builder
+            hasNature="true">
+         <run
+               class="featureide.core.builder.FeatureCPPBuilder">
+         </run>
+      </builder>
+   </extension>
+   
+   <extension
+         id="featureHouseNature"
+         name="Feature House Project Nature"
+         point="org.eclipse.core.resources.natures">
+      <builder
+            id="de.ovgu.featureide.core.featureHouseBuilder">
+      </builder>
+      <runtime>
+         <run
+               class="featureide.core.builder.FeatureHouseNature">
+         </run>
+      </runtime>
+   	</extension>
+    <extension
+         id="featureHouseBuilder"
+         name="Feature House Builder"
+         point="org.eclipse.core.resources.builders">
+      <builder
+            hasNature="true">
+         <run
+               class="featureide.core.builder.FeatureHouseBuilder">
+         </run>
+      </builder>
+   </extension>
+   
+    <extension
+          id="xmlProblem"
+          name="XML Problem"
+          point="org.eclipse.core.resources.markers">
+    </extension>
+    <extension
+          id="featureProjectNature"
+          name="Feature Project Nature"
+          point="org.eclipse.core.resources.natures">
+       <runtime>
+          <run
+                class="featureide.core.builder.FeatureProjectNature">
+          </run>
+       </runtime>
+       <builder
+             id="de.ovgu.featureide.core.extensibleFeatureProjectBuilder">
+       </builder>
+    </extension>
+    <extension
+          id="extensibleFeatureProjectBuilder"
+          name="Extensible Feature Project Builder"
+          point="org.eclipse.core.resources.builders">
+       <builder
+             hasNature="true">
+          <run
+                class="featureide.core.builder.ExtensibleFeatureProjectBuilder">
+          </run></builder>
+    </extension>
+ 
+</plugin>

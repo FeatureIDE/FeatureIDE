@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.cheatsheets.cheatSheetContent">
+         <category
+      id="de.ovgu.featureide.ui.doc.cheatsheet"
+      name="FeatureIDE"/>
+      <cheatsheet
+            category="de.ovgu.featureide.ui.doc.cheatsheet/"
+            composite="false"
+            contentFile="cheatsheets/helloworld_cheatsheet.xml"
+            id="de.ovgu.featureide.ui.doc.cheatsheet"
+            name="de.ovgu.featureide.ui.doc.cheatsheet">
+      </cheatsheet>
+   </extension>
+   <extension
+         point="org.eclipse.ui.intro.configExtension">
+      <configExtension
+            configId="org.eclipse.ui.intro.universalConfig"
+            content="Intro_Extension/featureide_intropage.xml">
+      </configExtension>
+      <configExtension
+            configId="org.eclipse.ui.intro.universalConfig"
+            content="Intro_Extension/tutorial_page.xml">
+      </configExtension>
+   </extension>
+
+</plugin>

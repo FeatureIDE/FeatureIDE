@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="de.ovgu.featureide.core.composers">
+      <composer
+            class="de.ovgu.featureide.featurecpp.FeatureCppComposer"
+            description="Composes C++ header files."
+            id="de.ovgu.featureide.composer.featurecpp"
+            name="FeatureC++">
+      </composer>
+   </extension>
+
+</plugin>

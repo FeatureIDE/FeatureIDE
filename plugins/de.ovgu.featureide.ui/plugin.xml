@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="featureide.ui.editors.ConfigurationEditor"
+            default="true"
+            extensions="equation, expression"
+            icon="icons/EquationIcon.png"
+            id="featureide.ui.editors.ConfigurationEditor"
+            name="Configuration Editor">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <wizard
+            canFinishEarly="false"
+            category="featureideui.category"
+            class="featureide.ui.wizards.NewFeatureProjectWizard"
+            hasPages="true"
+            icon="icons/NewFeatureProjectIcon.png"
+            id="de.ovgu.featureide.ui.FeatureProjectWizard"
+            name="FeatureProject"
+            project="true"/>
+      <category
+            id="featureideui.category"
+            name="FeatureIDE"/>
+      <wizard
+            category="featureideui.category"
+            class="featureide.ui.wizards.NewEquationFileWizard"
+            icon="icons/NewEquationIcon.png"
+            id="de.ovgu.featureide.ui.wizards.NewEquationFileWizard"
+            name="Equation File"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            adaptable="true"
+            id="de.ovgu.featureide.ui.equationFileContribution"
+            nameFilter="*.equation"
+            objectClass="org.eclipse.core.resources.IFile">
+         <action
+               class="featureide.ui.actions.SetEquationAction"
+               icon="icons/currentequation.gif"
+               id="de.ovgu.featureide.ui.setEquationAction"
+               label="Set as current equation"
+               menubarPath="open.ext"
+               tooltip="Only the current equation is build"/>
+      </objectContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.decorators">
+      <decorator
+            adaptable="true"
+            class="featureide.ui.decorators.ActiveEquationDecorator"
+            id="featureide.ui.decorators.ActiveEquationDecorator"
+            label="Active Equation Decorator"
+            lightweight="true"
+            state="true">
+         <enablement>
+            <objectClass name="org.eclipse.core.resources.IResource"/>
+         </enablement>
+      </decorator>
+      <decorator
+            adaptable="true"
+            class="featureide.ui.decorators.FeatureFolderDecorator"
+            id="featureide.ui.decorators.FeatureFolderDecorator"
+            label="Feature Folder Decorator"
+            lightweight="true"
+            state="true">
+         <enablement>
+            <objectClass name="org.eclipse.core.resources.IFolder"/>
+         </enablement>
+      </decorator>
+      <decorator
+            adaptable="true"
+            class="featureide.ui.decorators.FeatureProjectDecorator"
+            icon="icons/FeatureProjectDecorator.png"
+            id="featureide.ui.decorators.FeatureProjectDecorator"
+            label="Feature Project Decorator"
+            lightweight="true"
+            state="true">
+         <enablement>
+            <objectClass
+                  name="org.eclipse.core.resources.IProject">
+            </objectClass>
+         </enablement>
+      </decorator>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTypeImages">
+      <launchConfigurationTypeImage
+            configTypeID="featureide.core.launching.layeredApplication"
+            icon="icons/FeatureIconSmall.ico"
+            id="featureide.ui.launching.layeredApplicationConfigurationTypeImage"/>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+      <launchConfigurationTabGroup
+            class="featureide.ui.launching.LayeredApplicationConfigurationTabGroup"
+            description="Run a feature-oriented application"
+            id="featureide.ui.launching.layeredApplicationTabGroup"
+            type="featureide.core.launching.layeredApplication"/>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchShortcuts">
+      <shortcut
+            class="featureide.ui.launching.LayeredApplicationShortcut"
+            icon="icons/FeatureIconSmall.ico"
+            id="featureide.ui.launching.LayeredApplicationShortcut"
+            label="Layered Application"
+            modes="run">
+    </shortcut>
+   </extension>
+  
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension targetID="org.eclipse.ui.resourcePerspective">
+         <view
+               id="featureide.fm.ui.views.FeatureModelEditView"
+               ratio="0.5"
+               relationship="right"
+               relative="org.eclipse.ui.views.TaskList"/>
+      </perspectiveExtension>
+   </extension>
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            id="de.ovgu.featureide.ui.NewFiles"
+            label="NewFiles"
+            visible="false">
+         <action
+               class="featureide.ui.actions.StartEquationFileWizard"
+               icon="icons/NewEquationIcon.png"
+               id="de.ovgu.featureide.ui.NewEquationFile"
+               label="New Equation File"
+               style="push"
+               toolbarPath="&quot;Normal&quot;">
+         </action>
+      </actionSet>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="featureide.ui.perspective.PerspectiveFactory"
+            icon="icons/FeatureIconSmall.ico"
+            id="de.ovgu.featureide.ui.FeatureIDEperspective"
+            name="FeatureIDE">
+      </perspective>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            category="FeatureIDE"
+            class="featureide.ui.views.outline.OutlineView"
+            id="de.ovgu.featureide.ui.views.outline.Outline"
+            name="Feature Outline"
+            restorable="true">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            id="de.ovgu.featureide.ui.actionSet"
+            label="Show Collaboration Diagram"
+            visible="false">
+         <action
+               class="featureide.ui.actions.ShowCollaborationDiagram"
+               icon="icons/sample.gif"
+               id="de.ovgu.featureide.ui.actions.ShowCollaborationDiagram"
+               label="&amp;Collaboration Diagram"
+               toolbarPath="sampleGroup"
+               tooltip="Show collaboration diagram for a FeatureHouse project">
+         </action>
+      </actionSet>
+   </extension>
+</plugin>

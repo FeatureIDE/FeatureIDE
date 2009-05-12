@@ -1,0 +1,31 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: FeatureIDE Core Plug-in
+Bundle-SymbolicName: de.ovgu.featureide.core;singleton:=true
+Bundle-Version: 2.2.4.qualifier
+Bundle-Activator: featureide.core.CorePlugin
+Bundle-Localization: 
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.debug.core,
+ org.eclipse.jdt.launching,
+ org.eclipse.swt,
+ org.eclipse.ui,
+ org.eclipse.core.resources,
+ de.ovgu.featureide.fm.core;bundle-version="2.2.4"
+Export-Package: 
+ featureide.core,
+ featureide.core.builder,
+ featureide.core.builder.aheadwrapper,
+ featureide.core.jakprojectmodel,
+ featureide.core.launching,
+ featureide.core.listeners,
+ featureide.core.projectstructure.nodetypes,
+ featureide.core.projectstructure.trees,
+ mixin
+Bundle-ClassPath: .,
+ lib/jak2java.jar,
+ lib/mixin.jar,
+ lib/tools.jar,
+ lib/FeatureHouse-0.2.jar
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
