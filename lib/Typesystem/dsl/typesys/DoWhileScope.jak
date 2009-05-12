@@ -1,0 +1,30 @@
+layer typesys;
+
+import mixin.AstNode;
+import mixin.DoWhileStm;
+
+
+/**
+ * 
+ * @layer<typesys>
+ * @author Stephan Klapproth
+ * 
+ */
+class DoWhileScope extends AbstractBlockScope {
+
+    private DoWhileStm node;
+
+    DoWhileScope(DoWhileStm aNode) {
+        node = aNode;
+    }
+    
+    void init() {
+        super.init();
+        initStatement(node.getStatement());
+        initExpression(node.getExpression());
+    }
+
+    public AstNode getAstNode() {
+        return node;
+    }
+}

@@ -1,0 +1,10 @@
+layer refactoring_extrref;
+
+refines class LayerInfoImpl {
+
+    public void remove(ClassInfo aClass) {
+        if (classes.containsKey(aClass.getName())) {
+            classes.remove(aClass.getName());
+        }
+    }
+}

@@ -1,0 +1,13 @@
+layer deplog;
+/**
+ * @author Stephan Klapproth
+ *
+ */
+public interface Interaction {
+	
+	public LayerInfo modifiedFeature();
+	
+	public LayerInfo modifyingFeature();
+	
+	public AstElement getAstElement();
+}

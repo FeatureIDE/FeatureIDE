@@ -1,0 +1,11 @@
+layer refactoring_base;
+
+/**
+ * @layer<refactoring_base>
+ * @author Stephan Klapproth
+ * 
+ */
+interface ConflictFactory {
+
+    public Conflict[] getConflicts();
+}

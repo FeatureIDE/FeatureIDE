@@ -1,0 +1,17 @@
+layer typesys;
+
+import mixin.AstNode;
+
+/**
+ * @author Stephan Klapproth
+ * @layer<typesys>
+ */
+public interface AstElement {
+    
+    public AstNode getAstNode();
+    
+    public int startLineNum();
+    
+    public int endLineNum();
+    
+}

@@ -1,0 +1,21 @@
+layer typesys;
+
+/**
+ *
+ * @layer<typesys>
+ * @author Stephan Klapproth
+ *
+ */
+public interface Modified {
+
+    public ModifierInfo[] getModifier();
+
+    public boolean isPublic();
+    
+    public boolean isProtected();
+    
+    public boolean isPrivate();
+    
+    public boolean isPackagePrivate();
+    
+}
