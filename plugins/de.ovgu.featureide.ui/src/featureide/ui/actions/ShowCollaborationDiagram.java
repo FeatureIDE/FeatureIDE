@@ -19,6 +19,7 @@
 package featureide.ui.actions;
 
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
@@ -28,6 +29,7 @@ import org.eclipse.ui.part.FileEditorInput;
 import featureide.core.CorePlugin;
 import featureide.core.IFeatureProject;
 import featureide.core.projectstructure.nodetypes.Visitor;
+import featureide.ui.collaborationdiagram.CD_Diagram;
 import featureide.ui.collaborationdiagram.CD_Vis;
 import featureide.ui.collaborationdiagram.CollaborationVisitor;
 
@@ -41,13 +43,15 @@ import featureide.ui.collaborationdiagram.CollaborationVisitor;
  */
 public class ShowCollaborationDiagram implements IWorkbenchWindowActionDelegate {
 
-//	private IWorkbenchWindow window;
-//
-//	/**
-//	 * The constructor.
-//	 */
-//	public ShowCollaborationDiagram() {
-//	}
+	// private IWorkbenchWindow window;
+	//
+	// /**
+	// * The constructor.
+	// */
+	// public ShowCollaborationDiagram() {
+	// }
+
+	private IWorkbenchWindow window;
 
 	/**
 	 * The action has been activated. The argument of the method represents the
@@ -56,10 +60,9 @@ public class ShowCollaborationDiagram implements IWorkbenchWindowActionDelegate 
 	 * @see IWorkbenchWindowActionDelegate#run
 	 */
 	public void run(IAction action) {
-//		MemoryTestBench memUsageTest = new MemoryTestBench();
-//		memUsageTest.setMemUsageBefore(memUsageTest.memoryUsageWGarbageCol());
+		// MemoryTestBench memUsageTest = new MemoryTestBench();
+		// memUsageTest.setMemUsageBefore(memUsageTest.memoryUsageWGarbageCol());
 
-		
 		/*
 		 * Testing Execution Time
 		 */
@@ -71,8 +74,15 @@ public class ShowCollaborationDiagram implements IWorkbenchWindowActionDelegate 
 				.getFile());
 		Visitor visitor = new CollaborationVisitor();
 		visitor.visitTree(featureProject.getProjectTree());
-		// ((CollaborationVisitor)visitor).getCollaborationDiagram().print();
-		new CD_Vis(((CollaborationVisitor) visitor).getCollaborationDiagram());
+		CD_Diagram diagram = ((CollaborationVisitor) visitor)
+				.getCollaborationDiagram();
+		if (diagram == null)
+			MessageDialog.openError(window.getShell(), "Visualization Error",
+					"Data model for feature project "
+							+ featureProject.getProject().getName()
+							+ " not available.");
+		else
+			new CD_Vis(diagram);
 
 	}
 
@@ -102,7 +112,7 @@ public class ShowCollaborationDiagram implements IWorkbenchWindowActionDelegate 
 	 * @see IWorkbenchWindowActionDelegate#init
 	 */
 	public void init(IWorkbenchWindow window) {
-		//this.window = window;
+		this.window = window;
 	}
-	
+
 }

@@ -79,7 +79,8 @@ public class CollaborationVisitor implements Visitor {
 
 	// @Override
 	public void visitTree(ProjectTree projectTree) {
-		
+		if (projectTree==null||projectTree
+				.getProjectTreeNodes()==null)return;
 
 		// traverse ProjectTreeNodes
 		Iterator<ProjectTreeNode> iteratorInner = projectTree
