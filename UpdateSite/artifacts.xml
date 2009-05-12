@@ -1,0 +1,545 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<?artifactRepository class='org.eclipse.equinox.internal.p2.artifact.repository.simple.SimpleArtifactRepository' version='1.0.0'?>
+<repository name='file:/C:/Users/Thomas Thüm/ITI/workspace/FeatureIDE_UpdateSite/ - artifacts' type='org.eclipse.equinox.p2.artifact.repository.simpleRepository' version='1.0.0'>
+  <properties size='2'>
+    <property name='p2.compressed' value='false'/>
+    <property name='p2.timestamp' value='1241828045297'/>
+  </properties>
+  <mappings size='3'>
+    <rule filter='(&amp; (classifier=osgi.bundle))' output='${repoUrl}/plugins/${id}_${version}.jar'/>
+    <rule filter='(&amp; (classifier=binary))' output='${repoUrl}/binary/${id}_${version}'/>
+    <rule filter='(&amp; (classifier=org.eclipse.update.feature))' output='${repoUrl}/features/${id}_${version}.jar'/>
+  </mappings>
+  <artifacts size='78'>
+    <artifact classifier='org.eclipse.update.feature' id='de.ovgu.featureide' version='2.2.4.200905090213'>
+      <properties size='2'>
+        <property name='artifact.size' value='8282'/>
+        <property name='download.size' value='8282'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_FM_UI' version='2.1.2'>
+      <properties size='3'>
+        <property name='artifact.size' value='96252'/>
+        <property name='download.size' value='96252'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='org.eclipse.update.feature' id='FeatureIDE' version='2.1.3.200901191733'>
+      <properties size='2'>
+        <property name='artifact.size' value='1414'/>
+        <property name='download.size' value='1414'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_Core' version='2.1.3.200901191733'>
+      <properties size='3'>
+        <property name='artifact.size' value='4697290'/>
+        <property name='download.size' value='4697290'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_Refactoring' version='2.2.4.200905090213'>
+      <properties size='3'>
+        <property name='artifact.size' value='904570'/>
+        <property name='download.size' value='904570'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='de.ovgu.featureide.featurehouse' version='2.2.4.200905090213'>
+      <properties size='3'>
+        <property name='artifact.size' value='9436959'/>
+        <property name='download.size' value='9436959'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='org.eclipse.update.feature' id='de.ovgu.featureide.featurehouse' version='2.3.1.200905090142'>
+      <properties size='2'>
+        <property name='artifact.size' value='7874'/>
+        <property name='download.size' value='7874'/>
+      </properties>
+    </artifact>
+    <artifact classifier='org.eclipse.update.feature' id='FeatureIDE' version='2.1.3.200901171554'>
+      <properties size='2'>
+        <property name='artifact.size' value='1415'/>
+        <property name='download.size' value='1415'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_FM_Core' version='2.1.0'>
+      <properties size='3'>
+        <property name='artifact.size' value='651937'/>
+        <property name='download.size' value='651937'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_FM_UI' version='2.1.0'>
+      <properties size='3'>
+        <property name='artifact.size' value='84746'/>
+        <property name='download.size' value='84746'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_FM_Core' version='2.1.1'>
+      <properties size='3'>
+        <property name='artifact.size' value='651887'/>
+        <property name='download.size' value='651887'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_UI' version='2.1.3.200901171539'>
+      <properties size='3'>
+        <property name='artifact.size' value='53084'/>
+        <property name='download.size' value='53084'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_FM_Core' version='2.2.3.200901171554'>
+      <properties size='3'>
+        <property name='artifact.size' value='670480'/>
+        <property name='download.size' value='670480'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_Core' version='2.1.3.200901171556'>
+      <properties size='3'>
+        <property name='artifact.size' value='4697223'/>
+        <property name='download.size' value='4697223'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_UI' version='2.2.4.200905090209'>
+      <properties size='3'>
+        <property name='artifact.size' value='197834'/>
+        <property name='download.size' value='197834'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_Core' version='2.1.0'>
+      <properties size='3'>
+        <property name='artifact.size' value='4692216'/>
+        <property name='download.size' value='4692216'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='org.eclipse.update.feature' id='FeatureIDE' version='2.1.3.200901171512'>
+      <properties size='2'>
+        <property name='artifact.size' value='1415'/>
+        <property name='download.size' value='1415'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_Core' version='2.1.3.200904201621'>
+      <properties size='3'>
+        <property name='artifact.size' value='4697562'/>
+        <property name='download.size' value='4697562'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_Core' version='2.1.2'>
+      <properties size='3'>
+        <property name='artifact.size' value='4696536'/>
+        <property name='download.size' value='4696536'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_FM_UI' version='2.3.1.200905090142'>
+      <properties size='3'>
+        <property name='artifact.size' value='119108'/>
+        <property name='download.size' value='119108'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_UI' version='2.1.0'>
+      <properties size='3'>
+        <property name='artifact.size' value='57370'/>
+        <property name='download.size' value='57370'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_UI' version='2.1.3.200904201621'>
+      <properties size='3'>
+        <property name='artifact.size' value='54775'/>
+        <property name='download.size' value='54775'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_FM_Core' version='2.2.3.200901191733'>
+      <properties size='3'>
+        <property name='artifact.size' value='670965'/>
+        <property name='download.size' value='670965'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_UI' version='2.1.1'>
+      <properties size='3'>
+        <property name='artifact.size' value='57317'/>
+        <property name='download.size' value='57317'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='de.ovgu.featureide.featurehouse' version='2.2.4.200905090209'>
+      <properties size='3'>
+        <property name='artifact.size' value='9436959'/>
+        <property name='download.size' value='9436959'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='org.eclipse.update.feature' id='de.ovgu.featureide.featurecpp' version='2.2.4.200905090213'>
+      <properties size='2'>
+        <property name='artifact.size' value='7702'/>
+        <property name='download.size' value='7702'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_FM_UI' version='2.1.3.200901191733'>
+      <properties size='3'>
+        <property name='artifact.size' value='96382'/>
+        <property name='download.size' value='96382'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='org.eclipse.update.feature' id='de.ovgu.featureide.featurehouse' version='2.2.4.200905090209'>
+      <properties size='2'>
+        <property name='artifact.size' value='7723'/>
+        <property name='download.size' value='7723'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_FM_Core' version='2.3.1.200905090142'>
+      <properties size='3'>
+        <property name='artifact.size' value='689941'/>
+        <property name='download.size' value='689941'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_FM_Core' version='2.2.3.200901171512'>
+      <properties size='3'>
+        <property name='artifact.size' value='666981'/>
+        <property name='download.size' value='666981'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_FM_Core' version='2.2.3.200901171556'>
+      <properties size='3'>
+        <property name='artifact.size' value='670479'/>
+        <property name='download.size' value='670479'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_FM_UI' version='2.1.3.200901171512'>
+      <properties size='3'>
+        <property name='artifact.size' value='94125'/>
+        <property name='download.size' value='94125'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_UI' version='2.2.4.200905090213'>
+      <properties size='3'>
+        <property name='artifact.size' value='197834'/>
+        <property name='download.size' value='197834'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='de.ovgu.featureide.featurecpp' version='2.2.4.200905090213'>
+      <properties size='3'>
+        <property name='artifact.size' value='432402'/>
+        <property name='download.size' value='432402'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='de.ovgu.featureide.ahead' version='2.2.4.200905090213'>
+      <properties size='3'>
+        <property name='artifact.size' value='4576'/>
+        <property name='download.size' value='4576'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='org.eclipse.update.feature' id='de.ovgu.featureide' version='2.2.4.200905090209'>
+      <properties size='2'>
+        <property name='artifact.size' value='8284'/>
+        <property name='download.size' value='8284'/>
+      </properties>
+    </artifact>
+    <artifact classifier='org.eclipse.update.feature' id='FeatureIDE' version='2.1.1'>
+      <properties size='2'>
+        <property name='artifact.size' value='1398'/>
+        <property name='download.size' value='1398'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_UI' version='2.3.1.200905090142'>
+      <properties size='3'>
+        <property name='artifact.size' value='197834'/>
+        <property name='download.size' value='197834'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_UI' version='2.1.3.200901171554'>
+      <properties size='3'>
+        <property name='artifact.size' value='54413'/>
+        <property name='download.size' value='54413'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_FM_Core' version='2.2.3.200901171539'>
+      <properties size='3'>
+        <property name='artifact.size' value='666981'/>
+        <property name='download.size' value='666981'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_Refactoring' version='2.3.1.200905090142'>
+      <properties size='3'>
+        <property name='artifact.size' value='904569'/>
+        <property name='download.size' value='904569'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='org.eclipse.update.feature' id='FeatureIDE' version='2.1.0'>
+      <properties size='2'>
+        <property name='artifact.size' value='1396'/>
+        <property name='download.size' value='1396'/>
+      </properties>
+    </artifact>
+    <artifact classifier='org.eclipse.update.feature' id='FeatureIDE' version='2.1.3.200901171539'>
+      <properties size='2'>
+        <property name='artifact.size' value='1415'/>
+        <property name='download.size' value='1415'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_Refactoring' version='2.2.4.200905090209'>
+      <properties size='3'>
+        <property name='artifact.size' value='904569'/>
+        <property name='download.size' value='904569'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='org.eclipse.update.feature' id='FeatureIDE' version='2.1.3.200904201621'>
+      <properties size='2'>
+        <property name='artifact.size' value='8226'/>
+        <property name='download.size' value='8226'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_UI' version='2.1.3.200901191733'>
+      <properties size='3'>
+        <property name='artifact.size' value='54862'/>
+        <property name='download.size' value='54862'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='org.eclipse.update.feature' id='de.ovgu.featureide.featurehouse' version='2.2.4.200905090213'>
+      <properties size='2'>
+        <property name='artifact.size' value='7721'/>
+        <property name='download.size' value='7721'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='de.ovgu.featureide.ahead' version='2.3.1.200905090142'>
+      <properties size='3'>
+        <property name='artifact.size' value='4577'/>
+        <property name='download.size' value='4577'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_UI' version='2.1.2'>
+      <properties size='3'>
+        <property name='artifact.size' value='54866'/>
+        <property name='download.size' value='54866'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_Refactoring' version='2.2.3.200904201621'>
+      <properties size='3'>
+        <property name='artifact.size' value='904526'/>
+        <property name='download.size' value='904526'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_FM_UI' version='2.1.1'>
+      <properties size='3'>
+        <property name='artifact.size' value='90511'/>
+        <property name='download.size' value='90511'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_Core' version='2.1.3.200901171554'>
+      <properties size='3'>
+        <property name='artifact.size' value='4695098'/>
+        <property name='download.size' value='4695098'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_FM_UI' version='2.1.3.200901171554'>
+      <properties size='3'>
+        <property name='artifact.size' value='96396'/>
+        <property name='download.size' value='96396'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_Core' version='2.2.4.200905090213'>
+      <properties size='3'>
+        <property name='artifact.size' value='14232509'/>
+        <property name='download.size' value='14232509'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_Core' version='2.1.1'>
+      <properties size='3'>
+        <property name='artifact.size' value='4692152'/>
+        <property name='download.size' value='4692152'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='org.eclipse.update.feature' id='FeatureIDE' version='2.1.2'>
+      <properties size='2'>
+        <property name='artifact.size' value='1398'/>
+        <property name='download.size' value='1398'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='de.ovgu.featureide.ahead' version='2.2.4.200905090209'>
+      <properties size='3'>
+        <property name='artifact.size' value='4576'/>
+        <property name='download.size' value='4576'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_FM_UI' version='2.1.3.200901171539'>
+      <properties size='3'>
+        <property name='artifact.size' value='94126'/>
+        <property name='download.size' value='94126'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_FM_UI' version='2.1.3.200904201621'>
+      <properties size='3'>
+        <property name='artifact.size' value='110614'/>
+        <property name='download.size' value='110614'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_FM_UI' version='2.2.4.200905090213'>
+      <properties size='3'>
+        <property name='artifact.size' value='119108'/>
+        <property name='download.size' value='119108'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_Core' version='2.1.3.200901171512'>
+      <properties size='3'>
+        <property name='artifact.size' value='4697223'/>
+        <property name='download.size' value='4697223'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_FM_Core' version='2.1.2'>
+      <properties size='3'>
+        <property name='artifact.size' value='658149'/>
+        <property name='download.size' value='658149'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='de.ovgu.featureide.featurehouse' version='2.3.1.200905090142'>
+      <properties size='3'>
+        <property name='artifact.size' value='9436960'/>
+        <property name='download.size' value='9436960'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_FM_UI' version='2.1.3.200901171556'>
+      <properties size='3'>
+        <property name='artifact.size' value='96395'/>
+        <property name='download.size' value='96395'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_Tutorial' version='2.3.1.200905090142'>
+      <properties size='3'>
+        <property name='artifact.size' value='4030'/>
+        <property name='download.size' value='4030'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_UI' version='2.1.3.200901171556'>
+      <properties size='3'>
+        <property name='artifact.size' value='54413'/>
+        <property name='download.size' value='54413'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_Tutorial' version='2.2.4.200905090209'>
+      <properties size='3'>
+        <property name='artifact.size' value='4030'/>
+        <property name='download.size' value='4030'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_FM_UI' version='2.2.4.200905090209'>
+      <properties size='3'>
+        <property name='artifact.size' value='119108'/>
+        <property name='download.size' value='119108'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='org.eclipse.update.feature' id='FeatureIDE' version='2.1.3.200901171556'>
+      <properties size='2'>
+        <property name='artifact.size' value='1414'/>
+        <property name='download.size' value='1414'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_Core' version='2.1.3.200901171539'>
+      <properties size='3'>
+        <property name='artifact.size' value='4695095'/>
+        <property name='download.size' value='4695095'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_FM_Core' version='2.2.3.200904201621'>
+      <properties size='3'>
+        <property name='artifact.size' value='688580'/>
+        <property name='download.size' value='688580'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_UI' version='2.1.3.200901171512'>
+      <properties size='3'>
+        <property name='artifact.size' value='54413'/>
+        <property name='download.size' value='54413'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='org.eclipse.update.feature' id='de.ovgu.featureide' version='2.3.1.200905090142'>
+      <properties size='2'>
+        <property name='artifact.size' value='8283'/>
+        <property name='download.size' value='8283'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_FM_Core' version='2.2.4.200905090213'>
+      <properties size='3'>
+        <property name='artifact.size' value='689941'/>
+        <property name='download.size' value='689941'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_Core' version='2.2.4.200905090209'>
+      <properties size='3'>
+        <property name='artifact.size' value='14232508'/>
+        <property name='download.size' value='14232508'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_Tutorial' version='2.2.4.200905090213'>
+      <properties size='3'>
+        <property name='artifact.size' value='4030'/>
+        <property name='download.size' value='4030'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_Core' version='2.3.1.200905090142'>
+      <properties size='3'>
+        <property name='artifact.size' value='14232510'/>
+        <property name='download.size' value='14232510'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='FeatureIDE_FM_Core' version='2.2.4.200905090209'>
+      <properties size='3'>
+        <property name='artifact.size' value='689940'/>
+        <property name='download.size' value='689940'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+  </artifacts>
+</repository>
