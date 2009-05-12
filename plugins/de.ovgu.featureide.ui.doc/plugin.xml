@@ -11,7 +11,7 @@
             composite="false"
             contentFile="cheatsheets/helloworld_cheatsheet.xml"
             id="de.ovgu.featureide.ui.doc.cheatsheet"
-            name="de.ovgu.featureide.ui.doc.cheatsheet">
+            name="FeatureIDE Tutorial">
       </cheatsheet>
    </extension>
    <extension
