@@ -44,16 +44,23 @@ public class NewFeatureProjectPage extends WizardPage {
 		projGridLayout.numColumns = 2;
 		toolGroup.setLayout(projGridLayout);
 		
-		final Label descriptionLabel = new Label(toolGroup, SWT.NONE);
+		final Label helloLabel = new Label(toolGroup, SWT.NONE);
 		GridData gridData = new GridData(GridData.FILL_BOTH);
 		gridData.horizontalSpan = 2;
-	    descriptionLabel.setLayoutData(gridData);
+		helloLabel.setLayoutData(gridData);
+		helloLabel.setText("Please select a composer from the selection below.");
+		
 	    final Label label = new Label(toolGroup, SWT.NONE);
 	    label.setText("Composers:");
 	    final Combo toolCB = new Combo(toolGroup, SWT.READ_ONLY | SWT.DROP_DOWN);
 	    toolCB.setLayoutData(new GridData(GridData.FILL_BOTH));
 	    
-	    String descriptionString = "Please select a composer from the selection below. Possible choices are:\n\n";
+	    final Label descriptionLabel = new Label(toolGroup, SWT.NONE);
+	    GridData gridData2 = new GridData(GridData.FILL_BOTH);
+		gridData2.horizontalSpan = 2;
+	    descriptionLabel.setLayoutData(gridData2);
+	    
+	    String descriptionString = "Possible choices are:\n\n";
 	    List<IComposerExtension> composerExtensions = ComposerExtensionManager.getInstance().getComposers();
 	    extensions = new IComposerExtension[composerExtensions.size()]; 
 	    composerExtensions.toArray(extensions);
