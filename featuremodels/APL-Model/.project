@@ -13,6 +13,10 @@
 		<buildCommand>
 			<name>de.ovgu.featureide.core.extensibleFeatureProjectBuilder</name>
 			<arguments>
+				<dictionary>
+					<key>composer</key>
+					<value>de.ovgu.featureide.composer.ahead</value>
+				</dictionary>
 			</arguments>
 		</buildCommand>
 	</buildSpec>
