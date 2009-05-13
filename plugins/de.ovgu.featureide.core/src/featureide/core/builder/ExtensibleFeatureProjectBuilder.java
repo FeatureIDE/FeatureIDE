@@ -17,6 +17,7 @@ import featureide.core.listeners.ICurrentEquationListener;
 public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 
 	public static final String BUILDER_ID = CorePlugin.PLUGIN_ID + ".extensibleFeatureProjectBuilder";
+	public static final String COMPOSER_KEY = "composer";
 	
 	private IFeatureProject featureProject;
 	private IComposerExtension composerExtension;

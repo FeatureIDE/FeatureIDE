@@ -21,12 +21,15 @@ package featureide.core.internal;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.FileNotFoundException;
+import java.util.Map;
 import java.util.Vector;
 
+import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
@@ -42,6 +45,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import featureide.core.CorePlugin;
 import featureide.core.IFeatureProject;
 import featureide.core.builder.ComposerExtensionManager;
+import featureide.core.builder.ExtensibleFeatureProjectBuilder;
 import featureide.core.builder.IComposerExtension;
 import featureide.core.jakprojectmodel.IJakProject;
 import featureide.core.jakprojectmodel.internal.JakProject;
@@ -166,6 +170,9 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		// loading model data and listen to changes in the model file
 		addModelListener();
 		loadModel();
+		
+		// make the composer ID a builder argument
+		setComposerID(getComposerID());
 	}
 
 	private IFolder createFolder(String name) {
@@ -649,10 +656,8 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	 * @see featureide.core.IFeatureProject#setCompositionTool(featureide.core.builder.ICompositionTool)
 	 */
 	public void setComposer(IComposerExtension composerExtension) {
-		try {
-			this.composerExtension = composerExtension;
-			project.setPersistentProperty(composerConfigID, composerExtension.getId());
-		} catch (CoreException ex) { }
+		this.composerExtension = composerExtension;
+		setComposerID(composerExtension.getId());
 	}
 
 	/* (non-Javadoc)
@@ -660,9 +665,43 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	 */
 	public String getComposerID() {
 		try {
-			return project.getPersistentProperty(composerConfigID);
+			String id = project.getPersistentProperty(composerConfigID); 
+			if (id != null)
+				return id;
+			
+			for (ICommand command : project.getDescription().getBuildSpec()) {
+				if (command.getBuilderName().equals(ExtensibleFeatureProjectBuilder.BUILDER_ID)) {
+					id = (String) command.getArguments().get(ExtensibleFeatureProjectBuilder.COMPOSER_KEY);
+					if (id != null)
+						return id;
+				}
+			}
+			
 		} catch (CoreException e) {
 		}
 		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see featureide.core.IFeatureProject#setComposerID(java.lang.String)
+	 */
+	@SuppressWarnings("unchecked")
+	public void setComposerID(String composerID) {
+		try {
+			project.setPersistentProperty(composerConfigID, composerID);
+			IProjectDescription description = project.getDescription();
+			
+			ICommand[] commands = description.getBuildSpec();
+			for (ICommand command : commands) {
+				if (command.getBuilderName().equals(ExtensibleFeatureProjectBuilder.BUILDER_ID)) {
+					CorePlugin.getDefault().logInfo("builder found: " + composerID);
+					Map args = command.getArguments(); 
+					args.put(ExtensibleFeatureProjectBuilder.COMPOSER_KEY, composerID);
+					command.setArguments(args);
+				}
+			}
+			description.setBuildSpec(commands);
+			project.setDescription(description, null);
+		} catch (CoreException ex) { }
 	}
 }

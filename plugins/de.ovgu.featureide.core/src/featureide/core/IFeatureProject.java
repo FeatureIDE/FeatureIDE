@@ -113,6 +113,12 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	public String getComposerID();
 	
 	/**
+	 * Sets the ID of the assigned composer
+	 * 
+	 */
+	public void setComposerID(String composerID);
+	
+	/**
 	 * Gets the current composer.
 	 * 
 	 * @return The composer, specified for this project
