@@ -1,0 +1,10 @@
+Base
+Benchmark
+Prog
+UndirectedCommon
+UndirectedGenR
+WeightedCommon
+dProgdWeightedCommon
+WeightedGenR
+MSTKruskal
+dProgdMstKruskal
