@@ -1,0 +1,52 @@
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+
+import javax.swing.JMenu;
+import javax.swing.JPanel;
+
+/**
+ * @author Marcel Jaeschke
+ * @since 1.6
+ */
+public class Mail extends Modul implements ActionListener {
+	protected static final String NAME = "Mail";
+
+	/**
+	 * Default constructor.
+	 * 
+	 * @param base The base which the modul belong to.
+	 */
+	public Mail ( Devolution base ) {
+		Super(Devolution)( base );
+		this.view = new MailView( this );
+	}
+	public JPanel getContent () {
+		return new JPanel();
+	}
+	public JPanel getToolbar () {
+		return new JPanel();
+	}
+	public Component getSettingTab () {
+		return new JPanel();
+	}
+	public JMenu getMenu () {
+		JMenu menu = new JMenu( Mail.NAME );
+		menu.setMnemonic( KeyEvent.VK_E );
+		return menu;
+	}
+	public String getName () {
+		return Mail.NAME;
+	}
+	public Setting getSetting () {
+		return null;
+	}
+	public void actionPerformed ( ActionEvent e ) {}
+	/* (non-Javadoc)
+	 * @see de.rephstone.rezar.base.Modul#close()
+	 */
+	public void close () {
+		// TODO Auto-generated method stub
+	}
+}

@@ -1,0 +1,453 @@
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
+import javax.swing.JTree;
+import java.awt.event.ActionListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
+
+import java.util.Properties;
+
+
+public class AccountsEntry extends PreferencesEntry implements TreeSelectionListener, ActionListener{
+
+	protected static final long serialVersionUID = 5392201352308380222L;
+	protected final Mail modul;
+	protected DefaultMutableTreeNode listRoot = new DefaultMutableTreeNode( "Accounts", true );
+	protected final DefaultTreeModel mdTree = new DefaultTreeModel( this.listRoot );
+	//
+	protected final JLabel lbAccounts = new JLabel();
+	protected final JTree trAccounts = new JTree( this.mdTree );
+	//private final JButton btAccountsAdd = new JButton( ProgramImages.LIST_ADD );
+	protected final JButton btAccountsAdd = new JButton( "Add Account" );
+	//private final JButton btAccountsRemove = new JButton( ProgramImages.LIST_REMOVE );
+	protected final JButton btAccountsRemove = new JButton( "Remove Account" );
+	//private final JButton btAliasAdd = new JButton( ProgramImages.LIST_ADD );
+	protected final JButton btAliasAdd = new JButton( "Add Alias" );
+	//private final JButton btAliasRemove = new JButton( ProgramImages.LIST_REMOVE );
+	protected final JButton btAliasRemove = new JButton( "Remove Alias" );
+	//
+	protected final JLabel lbSettingUser = new JLabel();
+	protected final JTextField tfSettingUser = new JTextField();
+	protected final JLabel lbSettingMail = new JLabel();
+	protected final JTextField tfSettingMail = new JTextField();
+	protected final JLabel lbSettingAnswer = new JLabel();
+	protected final JTextField tfSettingAnswer = new JTextField();
+	//
+	protected final JLabel lbSend = new JLabel();
+	protected final JTextField tfSend = new JTextField();
+	protected final JLabel lbProtocolSend = new JLabel();
+	protected final JComboBox cbProtocolSend = new JComboBox();
+	protected final JLabel lbUserSend = new JLabel();
+	protected final JTextField tfUserSend = new JTextField();
+	protected final JLabel lbSslSend = new JLabel();
+	protected final JCheckBox cbSslSend = new JCheckBox( "", false );
+	protected final JLabel lbSaveSend = new JLabel();
+	protected final JCheckBox cbSaveSend = new JCheckBox( "", false );
+	//
+	protected final JLabel lbReceive = new JLabel();
+	protected final JTextField tfReceive = new JTextField();
+	protected final JLabel lbProtocolReceive = new JLabel();
+	protected final JComboBox cbProtocolReceive = new JComboBox();
+	protected final JLabel lbUserReceive = new JLabel();
+	protected final JTextField tfUserReceive = new JTextField();
+	protected final JLabel lbSslReceive = new JLabel();
+	protected final JCheckBox cbSslReceive = new JCheckBox( "", false );
+	protected final JLabel lbSaveReceive = new JLabel();
+	protected final JCheckBox cbSaveReceive = new JCheckBox( "", false );
+	protected final JLabel lbPwReceive = new JLabel();
+	protected final JPasswordField pfPwReceive = new JPasswordField();
+
+	protected boolean initialized = false;
+
+	/**
+	 * @param modul
+	 */
+	public AccountsEntry ( final Mail modul ) {
+		Super(String)( "Accounts" );
+		this.modul = modul;
+		this.cbProtocolSend.addItem( "SMTP" );
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.rephstone.rezar.miscellaneous.PreferencesEntry#initContent()
+	 */
+	protected void initContent () {
+		final JPanel pnList = new JPanel( new BorderLayout() );
+		final JTabbedPane tpSendReceive = new JTabbedPane();
+		final FormPanel pnSettings = new FormPanel();
+		final FormPanel pnSend = new FormPanel();
+		final FormPanel pnReceive = new FormPanel();
+		final JPanel pnListButtons = new JPanel( new GridLayout( 0, 1 ) );
+		pnListButtons.setBorder( BorderFactory.createEmptyBorder( 0, 10, 0, 0 ) );
+
+		this.trAccounts.setRootVisible( false );
+		this.trAccounts.addTreeSelectionListener( this );
+		insertAccounts();
+
+		pnList.add( new JScrollPane( this.trAccounts ), BorderLayout.CENTER );
+		pnList.add( pnListButtons, BorderLayout.EAST );
+		this.btAccountsAdd.addActionListener( this );
+		pnListButtons.add( this.btAccountsAdd );
+		this.btAccountsRemove.addActionListener( this );
+		pnListButtons.add( this.btAccountsRemove );
+		pnListButtons.add( Box.createGlue() );
+		this.btAliasAdd.addActionListener( this );
+		pnListButtons.add( this.btAliasAdd );
+		this.btAliasRemove.addActionListener( this );
+		pnListButtons.add( this.btAliasRemove );
+		//
+		addHeadline( this.lbAccounts );
+		addElement( pnList );
+		addSeperator();
+		addElement( tpSendReceive );
+		tpSendReceive.addTab( "Settings", pnSettings );
+		tpSendReceive.addTab( "Send", pnSend );
+		tpSendReceive.addTab( "Receive", pnReceive );
+		//
+		pnSettings.addElement( this.lbSettingUser, this.tfSettingUser );
+		pnSettings.addElement( this.lbSettingMail, this.tfSettingMail );
+		// pnSettings.addSeperator();
+		pnSettings.addElement( this.lbSettingAnswer, this.tfSettingAnswer );
+		pnSettings.addEnd();
+		//
+		pnReceive.addElement( this.lbReceive, this.tfReceive );
+		pnReceive.addElement( this.lbProtocolReceive, this.cbProtocolReceive );
+		pnReceive.addElement( this.lbUserReceive, this.tfUserReceive );
+		pnReceive.addElement( this.lbSslReceive, this.cbSslReceive );
+		pnReceive.addElement( this.lbSaveReceive, this.cbSaveReceive );
+		pnReceive.addElement( this.lbPwReceive, this.pfPwReceive );
+		pnReceive.addEnd();
+		//
+		pnSend.addElement( this.lbSend, this.tfSend );
+		pnSend.addElement( this.lbProtocolSend, this.cbProtocolSend );
+		pnSend.addElement( this.lbUserSend, this.tfUserSend );
+		pnSend.addElement( this.lbSslSend, this.cbSslSend );
+		pnSend.addElement( this.lbSaveSend, this.cbSaveSend );
+		pnSend.addEnd();
+
+		this.initialized = true;
+	}
+
+	private void insertAccounts(){
+		this.trAccounts.removeTreeSelectionListener( this );
+		listRoot = new DefaultMutableTreeNode( "Accounts", true );
+		this.mdTree.setRoot(listRoot);
+		Account[] accounts = Account.getAccounts();
+		AccountModel newAccount = null;
+
+		for (int i=0; i<accounts.length; i++){
+			newAccount = new AccountModel( accounts[i].getName() , true );
+			newAccount.setProperties(accounts[i].getProperties());
+			this.mdTree.insertNodeInto( newAccount, this.listRoot, this.listRoot.getChildCount());
+			this.trAccounts.scrollPathToVisible(new TreePath(newAccount.getPath()));
+			this.trAccounts.setSelectionPath(new TreePath(newAccount.getPath()));
+
+			String aliases = newAccount.getProperties().getProperty("aliases");
+			if (aliases!=null && aliases.length()!=0){
+				for (int j=0; j<aliases.length(); j++){
+					String aliass = "";
+				    while(j<aliases.length() && aliases.charAt(j)!=';'){
+						aliass = aliass + aliases.charAt(j);
+						j++;
+					}
+					AccountModel newAlias = new AccountModel( aliass , false );
+					this.mdTree.insertNodeInto( newAlias, newAccount, newAccount.getChildCount());
+					this.trAccounts.scrollPathToVisible(new TreePath(newAlias.getPath()));
+				}
+			}
+		}
+		if ( newAccount!= null )
+			insertProperties(newAccount.getProperties());
+		this.trAccounts.addTreeSelectionListener( this );
+	}
+
+
+	private void insertProperties(Properties props){
+		if ( props != null ){
+			tfSettingUser.setText(props.getProperty("realName"));
+			tfSettingMail.setText(props.getProperty("address"));
+			tfSettingAnswer.setText(props.getProperty("response"));
+
+			tfUserSend.setText(props.getProperty("userSend"));
+			cbSslSend.setSelected(props.getProperty("sslSend").equalsIgnoreCase("true"));
+			cbSaveSend.setSelected(props.getProperty("saveSend").equalsIgnoreCase("true"));
+			if (props.getProperty("sendProtocol").equalsIgnoreCase("smtp")){
+				tfSend.setText(props.getProperty("smtpServer"));
+				cbProtocolSend.setSelectedItem("SMTP");
+			}
+
+			tfUserReceive.setText(props.getProperty("userReceive"));
+			cbSslReceive.setSelected(props.getProperty("sslReceive").equalsIgnoreCase("true"));
+			cbSaveReceive.setSelected(props.getProperty("saveReceive").equalsIgnoreCase("true"));
+			pfPwReceive.setText(TextCoding.rot48(props.getProperty("password")));
+			if (props.getProperty("receiveProtocol").equalsIgnoreCase("pop3")){
+				tfReceive.setText(props.getProperty("pop3Server"));
+				cbProtocolReceive.setSelectedItem("POP3");
+			}
+			if (props.getProperty("receiveProtocol").equalsIgnoreCase("imap")){
+				tfReceive.setText(props.getProperty("imapServer"));
+				cbProtocolReceive.setSelectedItem("imap");
+			}				
+		}
+		else {
+			tfSettingUser.setText("");
+			tfSettingMail.setText("");
+			tfSettingAnswer.setText("");
+			tfSend.setText("");
+			tfUserSend.setText("");
+			cbSslSend.setSelected( false );
+			cbSaveSend.setSelected( false );
+			tfSend.setText("");
+			tfUserReceive.setText("");
+			cbSslReceive.setSelected( false );
+			cbSaveReceive.setSelected( false );
+			tfReceive.setText("");
+			pfPwReceive.setText("");
+			cbProtocolReceive.setSelectedIndex(0);
+			cbProtocolSend.setSelectedIndex(0);
+		}
+	}
+
+
+	public Properties getValues() {
+		Properties props = new Properties();
+
+		props.put("realName",tfSettingUser.getText());
+		props.put("address",tfSettingMail.getText());
+		props.put("response",tfSettingAnswer.getText());
+		if (((String)cbProtocolSend.getSelectedItem()).equalsIgnoreCase("smtp")){
+			props.put("sendProtocol","smtp");
+			props.put("smtpServer",tfSend.getText());
+		}
+		props.put("userSend",tfUserSend.getText());
+		props.put("sslSend",cbSslSend.isSelected()+"");
+		props.put("saveSend",cbSaveSend.isSelected()+"");
+		if (((String)cbProtocolReceive.getSelectedItem()).equalsIgnoreCase("imap")){
+			props.put("receiveProtocol","imap");
+			props.put("imapServer",tfReceive.getText());
+		}
+		if (((String)cbProtocolReceive.getSelectedItem()).equalsIgnoreCase("pop3")){
+			props.put("receiveProtocol","pop3");
+			props.put("pop3Server",tfReceive.getText());
+		}
+		props.put("userReceive",tfUserReceive.getText());
+		props.put("sslReceive",cbSslReceive.isSelected()+"");
+		props.put("saveReceive",cbSaveReceive.isSelected()+"");
+		props.put("password",TextCoding.rot48(new String(pfPwReceive.getPassword())));
+		return props;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.rephstone.rezar.miscellaneous.MultilingualListener#changeLanguage()
+	 */
+	public void changeLanguage () {
+		FormPanel.setHeadlineText( "Accounts", this.lbAccounts );
+		//
+		this.btAccountsAdd.setText( "Add Account" );
+		this.btAccountsRemove.setText( "Remove Account" );
+		this.btAliasAdd.setText( "Add Alias" );
+		this.btAliasRemove.setText( "Remove Alias" );
+		//
+		FormPanel.setLabelText( "Real Name", this.lbSettingUser );
+		FormPanel.setLabelText( "E-Mail-Address", this.lbSettingMail );
+		FormPanel.setLabelText( "Response to", this.lbSettingAnswer );
+		//
+		FormPanel.setLabelText( "Server", this.lbSend );
+		FormPanel.setLabelText( "Protocol", this.lbProtocolSend );
+		FormPanel.setLabelText( "Username", this.lbUserSend );
+		FormPanel.setLabelText( "Secure", this.lbSslSend );
+		this.lbSslSend.setName( "SSL" );
+		FormPanel.setLabelText( "Save", this.lbSaveSend );
+		//
+		FormPanel.setLabelText( "Server", this.lbReceive );
+		FormPanel.setLabelText( "Protocol", this.lbProtocolReceive );
+		FormPanel.setLabelText( "Username", this.lbUserReceive );
+		FormPanel.setLabelText( "Secure", this.lbSslReceive );
+		this.lbSslReceive.setName( "SSL" );
+		FormPanel.setLabelText( "Save", this.lbSaveReceive );
+		FormPanel.setLabelText( "Password", this.lbPwReceive );
+	}
+
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.rephstone.rezar.miscellaneous.PreferencesEntry#checkInput()
+	 */
+	public boolean checkInput () {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
+
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+	 */
+	public void actionPerformed ( final ActionEvent event ) {
+
+		final Object source = event.getSource();
+
+		if ( this.btAccountsAdd == source ) {
+			String response = JOptionPane.showInputDialog(this.modul.getBase().getView(), "Enter the name of the the new account.", "Name of the new account", JOptionPane.QUESTION_MESSAGE );
+			AccountModel newAccount = new AccountModel( response , true );
+			this.mdTree.insertNodeInto( newAccount, this.listRoot, this.listRoot.getChildCount());
+			this.trAccounts.scrollPathToVisible(new TreePath(newAccount.getPath()));
+			this.trAccounts.setSelectionPath(new TreePath(newAccount.getPath()));
+			return;
+		}
+
+		if ( this.btAccountsRemove == source ) {
+			if ( this.trAccounts.getSelectionPath() != null ){
+				AccountModel account = (AccountModel) this.trAccounts.getSelectionPath().getLastPathComponent();
+				if(account.isAccount()){
+					int response = JOptionPane.showConfirmDialog(this.modul.getBase().getView(), "Do you really want to delete this Account?.", "Delete Account", JOptionPane.YES_NO_OPTION );
+					if (response==0){
+						account.deleteAccount();
+						this.mdTree.removeNodeFromParent(account);
+					}
+				}
+			}
+			return;
+		}
+
+		if ( this.btAliasAdd == source ) {
+			if ( this.trAccounts.getSelectionPath() != null && ((AccountModel)this.trAccounts.getSelectionPath().getLastPathComponent()).isAccount() ){
+				String response = JOptionPane.showInputDialog(this.modul.getBase().getView(), "Enter the name of the the new alias.", "Name of the new alias", JOptionPane.QUESTION_MESSAGE );
+				AccountModel account = (AccountModel) this.trAccounts.getSelectionPath().getLastPathComponent();
+				AccountModel newAlias = new AccountModel( response , false );
+				this.mdTree.insertNodeInto( newAlias, account, account.getChildCount());
+				account.addAlias( newAlias );
+				this.trAccounts.scrollPathToVisible(new TreePath(newAlias.getPath()));
+			}
+			return;
+		}
+
+		if ( this.btAliasRemove == source ) {
+			if ( this.trAccounts.getSelectionPath() != null ){
+				AccountModel account = (AccountModel) this.trAccounts.getSelectionPath().getLastPathComponent();
+				if(account.isAccount()){
+					int response = JOptionPane.showConfirmDialog(this.modul.getBase().getView(), "Do you really want to delete this Account?.", "Delete Account", JOptionPane.YES_NO_OPTION );
+					if (response==0){
+						account.deleteAccount();
+						this.mdTree.removeNodeFromParent(account);
+					}
+					return;
+				}
+				if(account.isAlias()){
+					this.mdTree.removeNodeFromParent(account);
+					account.removeAlias();
+				}
+			}
+			return;
+		}
+	}
+
+	public void valueChanged(TreeSelectionEvent e){
+
+		if ( e.getOldLeadSelectionPath() == null ){
+			if ( e.getNewLeadSelectionPath() == null )
+				return;
+			AccountModel newAccount = ((AccountModel) e.getNewLeadSelectionPath().getLastPathComponent()).getAccountNode();
+			Properties props = newAccount.getProperties();
+			insertProperties(props);
+			return;
+		}
+
+		AccountModel oldAccount = ((AccountModel) e.getOldLeadSelectionPath().getLastPathComponent()).getAccountNode();
+
+		if ( e.getNewLeadSelectionPath() == null ){
+			Properties props = getValues();
+			oldAccount.setProperties(props);
+			return;
+		}
+
+		AccountModel newAccount = ((AccountModel) e.getNewLeadSelectionPath().getLastPathComponent()).getAccountNode();
+
+		if (newAccount != oldAccount){
+			Properties props = getValues();
+			oldAccount.setProperties(props);
+			props = newAccount.getProperties();
+			insertProperties(props);
+		}
+	} 
+
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see PreferencesEntry#ok()
+	 */
+	protected void ok(){
+		if (!initialized) return;
+		insertAccounts();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see PreferencesEntry#apply()
+	 */
+	protected void apply(){
+		if (!initialized) return;
+		for (int i=0; i<listRoot.getChildCount(); i++){
+			//checkInput();
+			AccountModel account = (AccountModel) listRoot.getChildAt(i);
+			Account acc = new Account(account.toString());
+			acc.setProperties(account.getProperties());
+			acc.save();
+		}
+		
+		if ( this.trAccounts.getSelectionPath() == null )
+			return;
+		//save current selected node
+		Properties props = getValues();
+		AccountModel account = (AccountModel) (AccountModel) this.trAccounts.getSelectionPath().getLastPathComponent();
+		Account acc = new Account(account.toString());
+		acc.setProperties(props);
+		acc.save();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see PreferencesEntry#cancel()
+	 */
+	protected void cancel(){
+		if (!initialized) return;
+		insertAccounts();
+	}
+}

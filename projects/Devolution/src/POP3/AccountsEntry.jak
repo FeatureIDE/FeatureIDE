@@ -1,0 +1,8 @@
+
+
+public refines class AccountsEntry{
+
+	refines AccountsEntry ( final Mail modul ) {
+		this.cbProtocolReceive.addItem( "POP3" );
+	}
+}

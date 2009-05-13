@@ -1,0 +1,199 @@
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.JToolBar;
+
+/**
+ * @author Marcel Jaeschke
+ * @param <M> Generic to allow only one type of modul.
+ * @since 1.6
+ */
+public abstract class ModelView implements ActionListener, MultilingualListener {
+	/**
+	 * The container which will display in the sidepanel if the modul has the
+	 * focus.
+	 */
+	protected JComponent coSidepanel;
+	/**
+	 * The root-node of the preference entry.
+	 */
+	protected PreferencesEntry preferences;
+	/**
+	 * The container which will display in the middle of the window if the modul
+	 * has the focus.
+	 */
+	protected final JComponent coContent = new JPanel( new BorderLayout() );
+	/**
+	 * The button in the siedbar to give the modul the focus.
+	 */
+	protected final JButton btSidepanelButton = new JButton();
+	/**
+	 * The own menu in the menubar of the modul
+	 */
+	protected final JMenu mnMenu = new JMenu();
+	/**
+	 * The toolbar which will display if the modul has the focus.
+	 */
+	protected final JToolBar tbToolbar = new JToolBar();
+	/**
+	 * The toolbar which will display if the modul has the focus.
+	 */
+	protected final JProgressBar pbStatusbar = new JProgressBar();
+	/**
+	 * The toolbar which will display if the modul has the focus.
+	 */
+	protected final JLabel lbStatusbar = new JLabel();
+	/**
+	 * The modul which use the GUI-container
+	 */
+	protected final Modul modul;
+
+	/**
+	 * Default constructor.
+	 * 
+	 * @param modul The modul which use the viewer.
+	 */
+	public ModelView ( final Modul modul ) {
+		this.modul = modul;
+	}
+	/* === METHODS === */
+	/**
+	 * Create all components of the modul.
+	 */
+	protected void initView () {
+		// initializer
+		initMainContent();
+		initMenu();
+		initPreferences();
+		initSidepanel();
+		initToolbar();
+		// manually-initializer
+		this.btSidepanelButton.setText( this.modul.getName() );
+		this.btSidepanelButton.addActionListener( this );
+		this.mnMenu.setText( this.modul.getName() );
+	}
+	/**
+	 * Check if the modul is on focus.
+	 * 
+	 * @return TRUE if the modul has the focus, else FLASE.
+	 */
+	public boolean isActive () {
+		return this.modul.base.getView().getActiveModul().equals( this.modul );
+	}
+	/* +++ INITIALIZER +++ */
+	/**
+	 * Initiated the content of the main-panel and retu // manually-initializer
+	 * this.btSidepanelButton.setText( modul.getName() );rn this one.
+	 * 
+	 * @return The content for the main-panel.
+	 */
+	public abstract JComponent initMainContent ();
+	/**
+	 * Initiated the menu of the modul and return this one.
+	 * 
+	 * @return The menu of the modul.
+	 */
+	public abstract JMenu initMenu ();
+	/**
+	 * Initiated the prefernces-element of the modul.
+	 * 
+	 * @return The prefernces-element of the modul.
+	 */
+	public abstract PreferencesEntry initPreferences ();
+	/**
+	 * Initiated the content of the sidepanel-panel and return this one.
+	 * 
+	 * @return The content for the sidepanel-panel.
+	 */
+	public abstract JComponent initSidepanel ();
+	/**
+	 * Initiated the toolbar of the modul and return this one.
+	 * 
+	 * @return The toolbar of the modul.
+	 */
+	public abstract JComponent initToolbar ();
+	/* === GETTERS === */
+	/**
+	 * Returns the content for the main-panel.
+	 * 
+	 * @return The content for the main-panel.
+	 */
+	public JComponent getMainContent () {
+		return this.coContent;
+	}
+	/**
+	 * Returns the menu of the modul for the menubar.
+	 * 
+	 * @return The menu of the modul for the menubar.
+	 */
+	public JMenu getMenu () {
+		return this.mnMenu;
+	}
+	/**
+	 * Returns the prefernces-element of the modul.
+	 * 
+	 * @return The prefernces-element of the modul.
+	 */
+	public PreferencesEntry getPreferences () {
+		return this.preferences;
+	}
+	/**
+	 * Returns the content for the sidepanel.
+	 * 
+	 * @return The content for the sidepanel.
+	 */
+	public JComponent getSidepanel () {
+		return this.coSidepanel;
+	}
+	/**
+	 * Returns the button for the sidepanel.
+	 * 
+	 * @return The button for the sidepanel.
+	 */
+	public JButton getSidepanelButton () {
+		return this.btSidepanelButton;
+	}
+	/**
+	 * Returns the label of the modul which will diplayed in the statusbar.
+	 * 
+	 * @return the label of the modul for the statusbar.
+	 */
+	public JLabel getStatusbarLabel () {
+		return this.lbStatusbar;
+	}
+	/**
+	 * Returns the progressbar of the modul which will diplayed in the statusbar.
+	 * 
+	 * @return The progressbar of the modul.
+	 */
+	public JProgressBar getStatusbarProgessBar () {
+		return this.pbStatusbar;
+	}
+	// public JStatusbar getStatusbar();
+	/**
+	 * Returns the content for the toolbar.
+	 * 
+	 * @return The content for the toolbar.
+	 */
+	public JToolBar getToolbar () {
+		return this.tbToolbar;
+	}
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+	 */
+	public void actionPerformed ( ActionEvent event ) {
+		final Object source = event.getSource();
+		if ( this.btSidepanelButton.equals( source ) ) {
+			this.modul.getBase().getView().setActiveModul( this.modul.getName() );
+			this.modul.getBase().getView().validate();
+		}
+	}
+}

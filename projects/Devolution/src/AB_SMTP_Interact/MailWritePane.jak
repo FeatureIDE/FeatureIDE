@@ -1,0 +1,79 @@
+import java.awt.event.ActionEvent;
+import java.util.List;
+import javax.swing.JComboBox;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.plaf.basic.BasicComboBoxRenderer;
+
+
+public refines class MailWritePane {
+
+    private Modul modul;
+
+    public void createGUI(){
+		Super().createGUI();
+		this.cbTo.getEditor().addActionListener( this );
+    }
+
+    public void registerModul(Modul modul){
+    	this.modul = modul;
+    }
+
+    public void actionPerformed(ActionEvent e) {
+
+		Super(ActionEvent).actionPerformed(e);
+
+		if (e.getSource() == cbTo.getEditor().getEditorComponent()){
+			Addressbook ab = (Addressbook)this.modul.getBase().getModul("Addressbook");
+		    String to = (String) this.cbTo.getEditor().getItem();
+
+		    List list = ab.getAllBuddy();
+			if ( to!=null && to.length()>0 && list != null && !list.isEmpty()){
+				this.cbTo.removeAllItems();
+				for (int i=0; i<list.size(); i++){
+					Buddy buddy = (Buddy)list.get(i);
+					String nick = buddy.getInfo(Buddy.MAIL_NICK);
+					String priv = buddy.getInfo(Buddy.MAIL_PRIVATE);
+					String busi = buddy.getInfo(Buddy.MAIL_BUSINESS);
+					String nickName = buddy.getInfo(Buddy.NICK);
+					String realName = buddy.getInfo(Buddy.NAME);
+
+					if (nick!=null && nick.length()>0 && nick.startsWith(to))
+						this.cbTo.addItem(nick);
+					if (priv!=null && priv.length()>0 && priv.startsWith(to))
+						this.cbTo.addItem(priv);
+					if (busi!=null && busi.length()>0 && busi.startsWith(to))
+						this.cbTo.addItem(busi);
+					if (nickName!=null && nickName.length()>0 && nickName.startsWith(to)){
+						if (nick!=null && nick.length()>0 && !JComboBoxContains(cbTo,nick))
+							this.cbTo.addItem(nick);
+						if (priv!=null && priv.length()>0 && !JComboBoxContains(cbTo,priv))
+							this.cbTo.addItem(priv);
+						if (busi!=null && busi.length()>0 && !JComboBoxContains(cbTo,busi))
+							this.cbTo.addItem(busi);
+					}
+					if (realName!=null && realName.length()>0 && realName.startsWith(to)){
+						if (nick!=null && nick.length()>0 && !JComboBoxContains(cbTo,nick))
+							this.cbTo.addItem(nick);
+						if (priv!=null && priv.length()>0 && !JComboBoxContains(cbTo,priv))
+							this.cbTo.addItem(priv);
+						if (busi!=null && busi.length()>0 && !JComboBoxContains(cbTo,busi))
+							this.cbTo.addItem(busi);
+					}
+				}//ENDFOR
+				this.cbTo.getEditor().setItem(to);
+				this.cbTo.setPopupVisible( true );
+				this.cbTo.showPopup();
+				((BasicComboBoxRenderer)this.cbTo.getRenderer()).validate();
+				return;
+			}//ENDIF
+		}
+    }
+
+    private boolean JComboBoxContains (JComboBox cb, Object o){
+		int size = ((DefaultComboBoxModel)cb.getModel()).getSize();
+		for (int i=0; i<size; i++)
+			if (((DefaultComboBoxModel)cb.getModel()).getElementAt(i).equals(o))
+				return true;
+		return false;
+    }
+}

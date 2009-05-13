@@ -1,0 +1,160 @@
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+/**
+ * @author Marcel Jaeschke
+ * @since 1.6
+ */
+public class BuddyDialog extends JDialog implements ActionListener, MultilingualListener, FocusListener {
+	/**
+	 * Serial number
+	 */
+	private static final long serialVersionUID = 7033517833385609168L;
+	protected final JButton btCancel = new JButton( ProgramImages.CANCEL );
+	protected final JButton btOk = new JButton();
+	private final Addressbook modul;
+	private final Buddy buddy;
+	//
+	private final JLabel lbReal = new JLabel();
+	private final JLabel lbNick = new JLabel();
+	//
+	private final JLabel lbTitle = new JLabel();
+	private final JTextField txTitle = new JTextField();
+	private final JLabel lbName = new JLabel();
+	private final JTextField txName = new JTextField();
+	private final JLabel lbLastName = new JLabel();
+	private final JTextField txLastName = new JTextField();
+	//
+	private final JLabel lbBirthday = new JLabel();
+	private final JTextField txBirthday = new JTextField();
+	private final JLabel lbMail = new JLabel();
+	private final JTextField txMail = new JTextField();
+	private final JLabel lbJabber = new JLabel();
+	private final JTextField txJabber = new JTextField();
+	//
+	private final JLabel lbNickName = new JLabel();
+	private final JTextField txNickName = new JTextField();
+	private final JLabel lbNickMail = new JLabel();
+	private final JTextField txNickMail = new JTextField();
+	//
+	public BuddyDialog ( final Addressbook addressbook ) {
+		this( addressbook.add() , addressbook );
+	}
+	public BuddyDialog ( final Buddy buddy, final Addressbook addressbook ) {
+		super( addressbook.getBase().getView(), buddy.toString(), false );
+		this.modul = addressbook;
+		this.buddy = buddy;
+		buddyToForm();
+		//
+		final FormPanel pnForm = new FormPanel();
+		final JPanel pnButtons = new JPanel( new GridLayout( 1, 0 ) );
+		//
+		pnForm.addHeadline( this.lbReal );
+		this.txTitle.addFocusListener( this );
+		pnForm.addElement( this.lbTitle, this.txTitle );
+		this.txName.addFocusListener( this );
+		pnForm.addElement( this.lbName, this.txName );
+		this.txLastName.addFocusListener( this );
+		pnForm.addElement( this.lbLastName, this.txLastName );
+		pnForm.addSeperator();
+		pnForm.addElement( this.lbBirthday, this.txBirthday );
+		pnForm.addElement( this.lbMail, this.txMail );
+		pnForm.addElement( this.lbJabber, this.txJabber );
+		pnForm.addHeadline( this.lbNick );
+		pnForm.addElement( this.lbNickName, this.txNickName );
+		pnForm.addElement( this.lbNickMail, this.txNickMail );
+		add( pnForm, BorderLayout.CENTER );
+		this.txTitle.requestFocusInWindow();
+		//
+		pnButtons.add( Box.createHorizontalGlue() );
+		pnButtons.add( Box.createHorizontalGlue() );
+		pnButtons.add( Box.createHorizontalGlue() );
+		pnButtons.add( Box.createHorizontalGlue() );
+		this.btCancel.addActionListener( this );
+		pnButtons.add( this.btCancel );
+		this.btOk.addActionListener( this );
+		pnButtons.add( this.btOk );
+		add( pnButtons, BorderLayout.SOUTH );
+		//
+		changeLanguage();
+		pack();
+		setLocationRelativeTo( addressbook.getBase().getView() );
+		//
+		setVisible( true );
+	}
+	public void buddyToForm () {
+		this.txTitle.setText( this.buddy.getInfo( Buddy.TITLE ) );
+		this.txName.setText( this.buddy.getInfo( Buddy.NAME ) );
+		this.txLastName.setText( this.buddy.getInfo( Buddy.LASTNAME ) );
+		this.txBirthday.setText( this.buddy.getInfo( Buddy.BIRTHDAY ) );
+		this.txMail.setText( this.buddy.getInfo( Buddy.MAIL_PRIVATE ) );
+		this.txJabber.setText( this.buddy.getInfo( Buddy.JABBER ) );
+		this.txNickName.setText( this.buddy.getInfo( Buddy.NICK ) );
+		this.txNickMail.setText( this.buddy.getInfo( Buddy.MAIL_NICK ) );
+	}
+	public void formToBuddy () {
+		this.buddy.setInfo( Buddy.TITLE, this.txTitle.getText() );
+		this.buddy.setInfo( Buddy.NAME, this.txName.getText() );
+		this.buddy.setInfo( Buddy.LASTNAME, this.txLastName.getText() );
+		this.buddy.setInfo( Buddy.BIRTHDAY, this.txBirthday.getText() );
+		this.buddy.setInfo( Buddy.MAIL_PRIVATE, this.txMail.getText() );
+		this.buddy.setInfo( Buddy.JABBER, this.txJabber.getText() );
+		this.buddy.setInfo( Buddy.NICK, this.txNickName.getText() );
+		this.buddy.setInfo( Buddy.MAIL_NICK, this.txNickMail.getText() );
+	}
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see miscellaneous.MultilingualListener#changeLanguage()
+	 */
+	public void changeLanguage () {
+		this.btCancel.setText( "Cancel" );
+		this.btOk.setText( "OK" );
+		//
+		FormPanel.setHeadlineText( "Real ID", this.lbReal );
+		FormPanel.setHeadlineText( "Nick ID", this.lbNick );
+		//
+		FormPanel.setLabelText( "Title", this.lbTitle );
+		FormPanel.setLabelText( "Name", this.lbName );
+		FormPanel.setLabelText( "Last Name", this.lbLastName );
+		//
+		FormPanel.setLabelText( "Birthday", this.lbBirthday );
+		FormPanel.setLabelText( "Mail", this.lbMail );
+		FormPanel.setLabelText( "Jabber", this.lbJabber );
+		//
+		FormPanel.setLabelText( "Name", this.lbNickName );
+		FormPanel.setLabelText( "Mail", this.lbNickMail );
+	}
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+	 */
+	public void actionPerformed ( final ActionEvent event ) {
+		final Object source = event.getSource();
+		if ( this.btOk.equals( source ) ) {
+			formToBuddy();
+			this.buddy.save();
+			if ( !( (AddressbookView) this.modul.getView() ).getListModel().contains( this.buddy ) ) {
+				( (AddressbookView) this.modul.getView() ).getListModel().addElement( this.buddy );
+			}
+			dispose();
+		} else if ( this.btCancel.equals( source ) ) {
+			dispose();
+		}
+	}
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.awt.event.FocusListener#focusGained(java.awt.event.FocusEvent)
+	 */
+	public void focusGained ( final FocusEvent event ) {}
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.awt.event.FocusListener#focusLost(java.awt.event.FocusEvent)
+	 */
+	public void focusLost ( final FocusEvent event ) {
+		setTitle( String.format( "%s %s %s", this.txTitle.getText(), this.txName.getText(), this.txLastName.getText()) );
+	}
+}

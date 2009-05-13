@@ -1,0 +1,8 @@
+
+public refines class Devolution {
+    
+    public void initModules() {
+        Super().initModules();
+        addModul(new InstantMessenger(this));
+    }
+}

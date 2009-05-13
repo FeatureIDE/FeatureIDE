@@ -1,0 +1,64 @@
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
+
+/**
+ * Properties Class - Used for multilingual strings.
+ * 
+ * @author Marcel Jaeschke
+ */
+public class Translator {
+	/**
+	 * The default language which will be used if an error occurs.
+	 */
+	public static final String DEFAULT_LANGUAGE = "en";
+	// private static final String PATH = Translator.class.getPackage().getName() + '.';
+	private static final String PATH = "resources.lang."; // The parent folder of "lang" needs to be in the classpath!
+	private static ResourceBundle bundle;
+	private static String language;
+
+	/**
+	 * Return the current language whis is in use.
+	 * @return The current language whis is in use.
+	 */
+	public static String getLanguage () {
+		return Translator.language;
+	}
+	/**
+	 * Reset the language to this one which was passed.
+	 * @param language The language which will be set.
+	 */
+	public static void setLanguage ( String language ) {
+		if ( language != null && Translator.isSupported( language ) ) {
+			Translator.bundle = ResourceBundle.getBundle( Translator.PATH + language );
+			Translator.language = language;
+		} else {
+			Translator.bundle = ResourceBundle.getBundle( Translator.PATH + Translator.DEFAULT_LANGUAGE );
+			Translator.language = Translator.DEFAULT_LANGUAGE;
+		}
+	}
+	/**
+	 * Check if the passed language is supported.
+	 * @param language The language which will be checked.
+	 * @return TRUE if the language is supported, else FALSE.
+	 */
+	public static boolean isSupported ( String language ) {
+		return Translator.class.getResource( language + ".properties" ) != null;
+	}
+	/**
+	 * Return a multlingual string which was requested by the key.
+	 * @param key The key to the multinlingual string.
+	 * @return The multinlingual string.
+	 */
+	public static String getString ( String key ) {
+		try {
+			return Translator.bundle.getString( key );
+		} catch ( NullPointerException e ) {
+			if ( Translator.bundle == null ) {
+				Translator.setLanguage( Translator.DEFAULT_LANGUAGE );
+			}
+			return Translator.getString( key );
+		} catch ( MissingResourceException e ) {
+			return '!' + key;
+		}
+	}
+}

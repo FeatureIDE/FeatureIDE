@@ -1,0 +1,89 @@
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.LinkedList;
+import java.util.Properties;
+
+
+public class Account {
+
+	public static String accountLocation = "eclipse-workspace/Devolution/lib/accounts";
+    private File file;
+    private String name;
+    private Properties props;
+
+    public Account(String name) {
+    	this.name = name;
+    	file = new File(accountLocation + "/" + name + ".xml");
+    	try {
+    		if (!file.exists())
+	        	file.createNewFile();
+        } catch (IOException e) {}
+    }
+
+
+    public void setProperties(Properties props){
+    	((Account) this).props = props;
+    }
+
+    public Properties getProperties(){
+    	if(props!=null) return props;
+    	props = new Properties();
+    	try{
+        	InputStream is = new BufferedInputStream(new FileInputStream(file));
+        	props.loadFromXML(is);
+        	is.close();
+    	} catch (Exception e) {}
+    	return props;
+    }
+
+    public void save(){
+    	try{
+        	OutputStream os = new BufferedOutputStream(new FileOutputStream(file));
+        	props.storeToXML(os, null);
+        	os.close();
+    	} catch (Exception e) {}
+    }
+
+    public static Account[] getAccounts(){
+    	File directory = new File(Account.accountLocation);
+		File[] files = directory.listFiles();
+		LinkedList accounts = new LinkedList();
+
+		for (int i=0; i<files.length; i++){
+		    String name = files[i].getName();
+		    if (name.endsWith(".xml")){
+				String accName = name.substring(0, name.lastIndexOf("."));
+				accounts.add(new Account(accName));
+		    }
+		}
+		
+		Account[] acc = new Account[accounts.size()];
+		for (int i=0; i<acc.length; i++)
+			acc[i] = (Account) accounts.get(i);
+
+   		return acc;
+   	}
+
+   	public static void deleteAccount(String name){
+   		File directory = new File(Account.accountLocation);
+		File[] files = directory.listFiles();
+
+		for (int i=0; i<files.length; i++){
+		    String fileName = files[i].getName();
+		    if (fileName.equalsIgnoreCase(name+".xml")){
+				files[i].delete();
+				return;
+			}
+		}
+   	}
+
+	public String getName(){
+		return this.name;
+	}
+}

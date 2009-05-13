@@ -1,0 +1,53 @@
+
+import org.jivesoftware.smack.*;
+import java.util.*;
+import javax.swing.tree.*;
+
+public class JabberConnection {
+	protected XMPPConnection connection;
+	protected JabberRoster jabRoster;
+	protected Devolution base;
+
+	public JabberConnection(Devolution base) {
+		this.base = base;
+		this.jabRoster = new JabberRoster(this);
+	}
+
+	// Verbindet mit dem angegebenen Jabber Server
+	public void connect(String username, String password, String resource, String servername, String host, int port) throws XMPPException {
+		connection = new XMPPConnection(new ConnectionConfiguration(host, port, servername));
+		login(username, password, resource);
+	}
+	
+	public void disconnect() throws XMPPException {
+		connection.disconnect();
+		//connection = null;
+	}
+	
+	// Verbindet mit einem Jabber Server, Serveradresse wird aus DNS-Record gelesen
+	public void connect(String username, String password, String servername, String resource) throws XMPPException {
+		connection = new XMPPConnection(servername);
+		login(username, password, resource);
+	}
+	
+	private void login(String username, String password, String resource) throws XMPPException {
+		this.connection.connect();
+		this.connection.login(username, password, resource);
+		
+		// Update roster and add roster listener
+		this.jabRoster.rebuildRoster();
+		this.connection.getRoster().addRosterListener(this.jabRoster);
+	}
+	
+	public JabberRoster getJabberRoster() {
+ 		return this.jabRoster;
+ 	}
+ 	
+ 	public Devolution getBase() {
+ 		return this.base;
+ 	}
+ 	
+ 	public XMPPConnection getConnection() {
+ 		return this.connection;
+ 	}
+}

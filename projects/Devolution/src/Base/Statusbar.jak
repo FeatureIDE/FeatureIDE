@@ -1,0 +1,120 @@
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.border.BevelBorder;
+
+/**
+ * @author Marcel Jaeschke
+ * @since 1.6
+ */
+public class Statusbar {
+	private final JPanel pnIcons = new JPanel( new GridLayout( 1, 0 ) );
+	private final JPanel pnStatusbar = new JPanel( new BorderLayout() ) {
+		/**
+		 * Serial number
+		 */
+		private static final long serialVersionUID = 2149187650383268846L;
+
+		public void repaint () {
+			Statusbar.this.pnIcons.setVisible( Statusbar.this.pnIcons.getComponentCount() > 0 );
+			super.repaint();
+		}
+	};
+	private JProgressBar progressBar;
+	private JLabel lbLabel;
+
+	/**
+	 * The default constructor.
+	 */
+	public Statusbar () {
+		add( this.pnIcons, BorderLayout.EAST );
+	}
+	/**
+	 * Add a component in the statusbar look.
+	 * 
+	 * @param component The component which will be added.
+	 * @param constraints The constraints which descripe the position where the
+	 *          component will be added.
+	 */
+	private void add ( JComponent component, Object constraints ) {
+		component.setBorder( new BevelBorder( BevelBorder.LOWERED ) );
+		this.pnStatusbar.add( component, constraints );
+	}
+	/**
+	 * Return the panel where the statusbar-components is painted.
+	 * 
+	 * @return The panel where the statusbar-components is painted.
+	 */
+	public JComponent getComponent () {
+		return this.pnStatusbar;
+	}
+	/**
+	 * Add a component to the icon list.
+	 * 
+	 * @param component The component which will be added to the icon list.
+	 */
+	public void addIcon ( final JComponent component ) {
+		this.pnIcons.add( component );
+	}
+	/**
+	 * Remove a component to the icon list.
+	 * 
+	 * @param component The component which will be removed to the icon list.
+	 */
+	public void removeIcon ( final JComponent component ) {
+		this.pnIcons.remove( component );
+	}
+	/**
+	 * Returns the label of the statusbar.
+	 * 
+	 * @return The label of the statusbar.
+	 */
+	public JLabel getLabel () {
+		return this.lbLabel;
+	}
+	/**
+	 * Returns the progress-bar of the statusbar.
+	 * 
+	 * @return The progress-bar of the statusbar.
+	 */
+	public JProgressBar getProgressBar () {
+		return this.progressBar;
+	}
+	/**
+	 * Set the label of the statusbar.
+	 * 
+	 * @param label The label of the statusbar.
+	 */
+	private void setLabel ( final JLabel label ) {
+		if ( this.lbLabel != null ) {
+			this.pnStatusbar.remove( this.lbLabel );
+		}
+		add( label, BorderLayout.CENTER );
+		this.lbLabel = label;
+	}
+	/**
+	 * Set the progress-bar of the statusbar.
+	 * 
+	 * @param progressBar The progress-bar of the statusbar.
+	 */
+	private void setProgressBar ( final JProgressBar progressBar ) {
+		if ( this.progressBar != null ) {
+			this.pnStatusbar.remove( this.progressBar );
+		}
+		add( progressBar, BorderLayout.WEST );
+		this.progressBar = progressBar;
+	}
+	/**
+	 * Set all allowed components from a modul to the statusbar.
+	 * 
+	 * @param modul The modul which provide the components for the statusbar.
+	 */
+	public void modulToStatusbar( final Modul modul ) {
+		setLabel( modul.getView().getStatusbarLabel() );
+		setProgressBar( modul.getView().getStatusbarProgessBar() );
+		this.pnStatusbar.repaint();
+	}
+}

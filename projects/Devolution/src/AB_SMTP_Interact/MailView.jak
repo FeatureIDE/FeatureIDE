@@ -1,0 +1,54 @@
+import java.awt.event.ActionEvent;
+
+
+public refines class MailView {
+
+	public void actionPerformed ( final ActionEvent event ) {
+		final Object source = event.getSource();
+
+		if (source == sendButton){
+			JTree tree = (JTree)this.coSidepanel;
+			if (tree.getSelectionPath() != null ){
+				DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getSelectionPath().getLastPathComponent();
+				if (!node.isRoot()){
+					MailWritePane mwp = new MailWritePane(node.toString());
+					mwp.registerModul(this.modul);
+				}
+				else{
+					MailWritePane mwp = new MailWritePane();
+					mwp.registerModul(this.modul);
+				}
+			}
+			else{
+				MailWritePane mwp = new MailWritePane();
+				mwp.registerModul(this.modul);
+			}
+			return;
+		}
+
+		if (source == refreshButton){
+			JTree tree = (JTree)this.coSidepanel;
+			if (tree.getSelectionPath() != null ){
+				DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getSelectionPath().getLastPathComponent();
+				if (!node.isRoot()){
+					this.lbStatusbar.setText( "New E-Mails loading..." );
+					this.lbStatusbar.paintImmediately(this.lbStatusbar.getVisibleRect());
+					MailContentPane mcp = (MailContentPane) this.coContent.getComponent(0);
+					refreshButton.setEnabled( false );
+					mcp.refresh();
+					refreshButton.setEnabled( true );
+					this.lbStatusbar.setText( "Click on an Account to show the E-Mails" );
+					this.pbStatusbar.setValue(0);
+				}
+			}
+			return;
+		}
+
+		if (source == miPreferences) {
+			new PreferencesDialog( this.modul.getBase(), this.modul.getBase().getView(), new TreePath( this.preferences ) );
+			return;
+		} 
+
+		super.actionPerformed( event );
+	}
+}
