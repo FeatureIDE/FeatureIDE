@@ -31,6 +31,8 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
+import de.ovgu.featureide.ahead.AheadCorePlugin;
+
 import featureide.fm.core.io.PosString;
 
 /**
@@ -108,6 +110,7 @@ public class AheadBuildErrorEvent {
 	private static Pattern jakPattern = Pattern.compile("SoUrCe[^\"]+\"([^\"]+)\";");
 	
 	private void calculateJakLine() throws CoreException, IOException {
+		AheadCorePlugin.getDefault().logInfo("Calculate jak source line for file " + file);
 		IFile composedJakFile = (IFile) this.file;
 		int composedJakLine = this.line;
 		
@@ -124,6 +127,7 @@ public class AheadBuildErrorEvent {
 				break;
 			line = newLine;
 			filename = matcher.group(1);
+			AheadCorePlugin.getDefault().logInfo(filename);
 		}
 		
 		if (filename == null) {
@@ -131,6 +135,7 @@ public class AheadBuildErrorEvent {
 		}
 		else {
 			IFile jakFile = getJakFile(filename);
+			AheadCorePlugin.getDefault().logInfo(jakFile.getFullPath().toOSString());
 			int jakLine = composedJakLine - line + 1;
 			jakLine += numberOfImportLines(jakFile);
 			jakLine += lineNumberOfLayerDeclaration(jakFile);
@@ -141,6 +146,7 @@ public class AheadBuildErrorEvent {
 	}
 
 	private void lookupImportInAllJakFiles(String composedJakContent, Matcher matcher) throws CoreException, IOException {
+		AheadCorePlugin.getDefault().logInfo("Looking for source of error on import for file " + file);
 		int a = 0;
 		int b = 0;
 		for (int i = 0; i < line; i++) {
@@ -154,27 +160,52 @@ public class AheadBuildErrorEvent {
 		
 		do {
 			IFile jakFile = getJakFile(matcher.group(1));
-			String text = getString(jakFile);
-			int pos = text.indexOf(importString);
-			if (pos >= 0) {
-				this.line = new PosString(text, pos).lineNumber();
-				this.file = jakFile;
-				return;
+			if (jakFile != null) {
+				String text = getString(jakFile);
+				int pos = text.indexOf(importString);
+				if (pos >= 0) {
+					this.line = new PosString(text, pos).lineNumber();
+					this.file = jakFile;
+					return;
+				}
 			}
 		}
 		while (matcher.find());
 	}
 
 	private IFile getJakFile(String filename) {
+		String relativeFilename = filename;
 		IProject project = file.getProject();
-		int pathLength = project.getLocation().toOSString().length();
-		while (filename.startsWith("../")) {
-			filename = filename.substring(3);
-		}
-		//remove project path from filename (except 3 characters like "c:\")
-		//TODO #27: jak file error propagation for unix
-		filename = filename.substring(pathLength - 3);
-		return project.getFile(filename);
+		relativeFilename = relativeFilename.substring(relativeFilename
+				.indexOf(project.getName())
+				+ project.getName().length() + 1);
+		IFile newFile = project.getFile(relativeFilename);
+		if (newFile.exists())
+			return newFile;
+		
+		AheadCorePlugin.getDefault().logWarning("Was not able to locate an error in the source jak file '" + filename + "'");
+		return null;
+		
+//		//check if the file name is relative
+//		newFile = project.getFile("../" + filename);
+//		AheadCorePlugin.getDefault().logInfo(newFile.getFullPath().toOSString());
+//		if (newFile.exists())
+//			return newFile;
+//
+//		//otherwise it is absolute
+//		int pathLength = project.getLocation().toOSString().length();
+//		AheadCorePlugin.getDefault().logInfo(project.getLocation().toOSString());
+//		while (filename.startsWith("../")) {
+//			filename = filename.substring(3);
+//		}
+//		AheadCorePlugin.getDefault().logInfo(filename);
+//		//remove project path from filename (except 3 characters like "c:\")
+//		//TODO #27: jak file error propagation for unix
+//		filename = filename.substring(pathLength - 3);
+//		AheadCorePlugin.getDefault().logInfo(filename);
+//		newFile = project.getFile(filename);
+//		if (newFile.exists())
+//			return newFile;
 	}
 
 	private static Pattern importPattern = Pattern.compile("(import)\\s[^;\\(\\)\\{\\}\\[\\]]+;");

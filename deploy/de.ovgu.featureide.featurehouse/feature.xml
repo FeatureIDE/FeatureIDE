@@ -2,7 +2,7 @@
 <feature
       id="de.ovgu.featureide.featurehouse"
       label="FeatureIDE extension for FeatureHouse (optional)"
-      version="2.3.0.qualifier"
+      version="2.3.1.qualifier"
       provider-name="University of Magdeburg">
 
    <description url="http://www.fosd.de/featureide/">
