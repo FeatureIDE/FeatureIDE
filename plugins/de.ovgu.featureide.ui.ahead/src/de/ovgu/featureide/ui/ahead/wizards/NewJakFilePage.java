@@ -21,6 +21,9 @@ package de.ovgu.featureide.ui.ahead.wizards;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.IDialogPage;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -28,6 +31,7 @@ import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
@@ -37,6 +41,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.dialogs.ContainerSelectionDialog;
 
 import featureide.core.CorePlugin;
 import featureide.core.IFeatureProject;
@@ -45,6 +50,7 @@ import featureide.core.IFeatureProject;
  * TODO description
  * 
  * @author Marcus Leich
+ * @author Christian Becker
  */
 public class NewJakFilePage extends WizardPage {
 
@@ -61,6 +67,8 @@ public class NewJakFilePage extends WizardPage {
 	private IContainer container;
 
 	private boolean refines = false;
+
+	private Text projectText;
 	
 	/**
 	 * Constructor for SampleNewWizardPage.
@@ -80,33 +88,87 @@ public class NewJakFilePage extends WizardPage {
 	public void createControl(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NULL);
 		GridLayout layout = new GridLayout();
-		composite.setLayout(layout);
-		layout.numColumns = 2;
+		layout.numColumns = 3;
 		layout.verticalSpacing = 9;
+		composite.setLayout(layout);
+
 		Label label = new Label(composite, SWT.NULL);
-		label.setText("&Container:");
+		label.setText("&Project:");
 
-		featureCombo = new Combo(composite, SWT.BORDER | SWT.SINGLE);
+		projectText = new Text(composite, SWT.BORDER | SWT.SINGLE);
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-		featureCombo.setLayoutData(gd);
+		projectText.setLayoutData(gd);
+		projectText.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent e) {
+				dialogChanged();
+			}
+		});
 
+		Button button = new Button(composite, SWT.PUSH);
+		button.setText("Browse...");
+		button.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				handleBrowse();
+			}
+		});
+		//	gd = new GridData(GridData.FILL_HORIZONTAL);
+		label = new Label(composite, SWT.NULL);
+		label.setText("&Container:");
+		//label.setLayoutData(gd);
+		featureCombo = new Combo(composite, SWT.BORDER | SWT.SINGLE);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		featureCombo.setLayoutData(gd);
+		new Label(composite,SWT.NULL);
 		label = new Label(composite, SWT.NULL);
 		label.setText("&Class name:");
-
+		//label.setLayoutData(gd);
 		jakName = new Text(composite, SWT.BORDER | SWT.SINGLE);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		jakName.setLayoutData(gd);
-		
+		new Label(composite,SWT.NULL);
 		label = new Label(composite, SWT.NULL);
 		label.setText("&Refines:");
 		
 		refinesbox = new Button (composite, SWT.CHECK);
-		gd = new GridData (GridData.BEGINNING);
+	//	gd = new GridData (GridData.BEGINNING);
 		refinesbox.setLayoutData(gd);
 		
 		initialize();
 		addListeners();
 		setControl(composite);
+		dialogChanged();
+	}
+
+	/**
+	 * 
+	 */
+	private void handleBrowse() {
+		IPath path;
+		IResource res;
+		ContainerSelectionDialog dialog = new ContainerSelectionDialog(
+				getShell(), ResourcesPlugin.getWorkspace().getRoot(), false,
+				"Select a Feature Project");
+		if (dialog.open() == ContainerSelectionDialog.OK) {
+			Object[] result = dialog.getResult();
+			if (result.length == 1) {
+				if(result[0] instanceof Path){
+					path=(IPath) result[0];
+					res = ResourcesPlugin.getWorkspace().getRoot().findMember(path);
+					IFeatureProject featureProject = CorePlugin.getProjectData(res);
+					projectText.setText(((Path) result[0]).toString());
+					if (featureProject != null) {
+						checkcontainer(featureProject, res);
+					}
+					else{
+						sourcefolder=null;
+						container=null;
+					}
+					dialogChanged();
+				}
+								
+			}
+		}
+		
 	}
 
 	private void addListeners() {
@@ -146,28 +208,34 @@ public class NewJakFilePage extends WizardPage {
 				IResource resource = (IResource) obj;
 				IFeatureProject featureProject = CorePlugin.getProjectData(resource);
 				if (featureProject != null) {
-					for (String feature : featureProject.getFeatureModel().getFeatureNames())
-						featureCombo.add(feature);
-					sourcefolder = featureProject.getSourceFolder();
-					if (resource.getParent().equals(sourcefolder)) {
-						for (int i = 0; i < featureCombo.getItemCount(); i++)
-							if (featureCombo.getItem(i).equals(resource.getName()))
-								featureCombo.select(i);
-						container = sourcefolder.getFolder(featureCombo.getText());
-					}
-					else {
-						String name = resource.getName();
-						int index = name.indexOf(".");
-						name = index > 0 ? name.substring(0, index) : name;
-						jakName.setText(name);
-						refinesbox.setSelection(true);
-						refines = true;
-					}
+					checkcontainer(featureProject, resource);
 				}
 			}
 		}
 	}
 
+	private void checkcontainer(IFeatureProject featureProject, IResource resource){
+
+		for (String feature : featureProject.getFeatureModel().getFeatureNames())
+			featureCombo.add(feature);
+		projectText.setText(resource.getFullPath().toString());
+		sourcefolder = featureProject.getSourceFolder();
+		if (resource.getParent().equals(sourcefolder)) {
+			for (int i = 0; i < featureCombo.getItemCount(); i++)
+				if (featureCombo.getItem(i).equals(resource.getName()))
+					featureCombo.select(i);
+			container = sourcefolder.getFolder(featureCombo.getText());
+		}
+		else {
+			String name = resource.getName();
+			int index = name.indexOf(".");
+			name = index > 0 ? name.substring(0, index) : name;
+			jakName.setText(name);
+			refinesbox.setSelection(true);
+			refines = true;
+		}
+	}
+	
 	/**
 	 * Ensures that both text fields are set.
 	 */
