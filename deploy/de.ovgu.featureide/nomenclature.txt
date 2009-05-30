@@ -1,0 +1,16 @@
+Composer = A tool to convert feature-oriented source code into object-oriented code.
+Configuration = A set of selected and deselected features.
+Configuration process = Selection and deselection of features resulting in a configuration.
+Partial configuration = A non-valid configuration is called partial if there are possible additional selections and deselection that result in a valid configuration.
+Product = A valid configuration regarding to the feature model.
+Feature model = An abstract model specifying valid feature combinations.
+Feature diagram = A visual representation of a feature model, usually an And-Or-graph.
+Feature model format = A textual representation of the feature model.
+AHEAD = 
+FeatureHouse = 
+FeatureC++ = 
+Feature = 
+
+@deprecated
+Equation = A product in AHEAD.
+Expression = A product in FeatureHouse.

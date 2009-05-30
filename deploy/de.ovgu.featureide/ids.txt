@@ -1,0 +1,11 @@
+##### PLUGIN IDS #####
+CompositionToolPlugin > de.ovgu.featureide.core.ahead
+de.ovgu.featureide.ui.ahead
+de.ovgu.featureide.featurecpp|FeatureCppComposer > de.ovgu.featureide.core.featurecpp
+de.ovgu.featureide.featurehouse|FeatureHouseCTE > de.ovgu.featureide.core.featurehouse
+FeatureIDE_Core > de.ovgu.featureide.core
+FeatureIDE_FM_Core > de.ovgu.featureide.fm.core
+FeatureIDE_FM_UI > de.ovgu.featureide.fm.ui
+FeatureIDE_Refactoring > de.ovgu.featureide.ui.ahead.refactoring
+FeatureIDE_Tutorial > de.ovgu.featureide.ui.doc
+FeatureIDE_UI > de.ovgu.featureide.ui
