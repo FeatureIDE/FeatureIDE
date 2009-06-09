@@ -59,7 +59,6 @@ import featureide.fm.core.configuration.ConfigurationReader;
 import featureide.fm.core.io.IFeatureModelReader;
 import featureide.fm.core.io.UnsupportedModelException;
 import featureide.fm.core.io.guidsl.FeatureModelReader;
-import featureide.fm.core.io.guidsl.FeatureModelWriter;
 
 /**
  * Class that encapsulates any data and method related to feature projects.
@@ -204,30 +203,16 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	 */
 	private void loadModel() {
 		try {
-//			modelFile.deleteAllModelMarkers();
 			try {
 				modelReader.readFromFile(modelFile.getResource());
 				createAndDeleteFeatureFolders();
-//				for (ModelWarning warning : modelReader.getWarnings())
-//					modelFile.createModelMarker(warning.message,
-//							IMarker.SEVERITY_WARNING, warning.line);
-//				try {
-//					if (!featureModel.isValid())
-//						modelFile.createModelMarker(
-//							"The feature model is void, i.e., it contains no products",
-//							IMarker.SEVERITY_ERROR, 0);
-//				} catch (TimeoutException e) {
-//					//do nothing, assume the model is correct
-//				}
 			} catch (FileNotFoundException e) {
-				featureModel.createDefaultValues();
-				new FeatureModelWriter(featureModel).writeToFile(modelFile.getResource());
+				modelFile.createModelMarker(e.getMessage(),	IMarker.SEVERITY_ERROR, 0);
 			} catch (UnsupportedModelException e) {
-				// it is not a correct old model
 				modelFile.createModelMarker(e.getMessage(),	IMarker.SEVERITY_ERROR, e.lineNumber);
 			}
 		} catch (CoreException e) {
-			e.printStackTrace();
+			CorePlugin.getDefault().logError("Error while loading feature model from " + modelFile.getResource(), e);
 		}
 	}
 

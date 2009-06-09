@@ -24,7 +24,6 @@ public class FeatureProjectDecorator implements ILightweightLabelDecorator {
 
 		//decorate feature projects
 		if (CorePlugin.hasProjectData(project)) {
-			UIPlugin.getDefault().logInfo("Decorating feature project");
 			decoration.addOverlay(OVERLAY, IDecoration.TOP_RIGHT);
 		}
 	}
