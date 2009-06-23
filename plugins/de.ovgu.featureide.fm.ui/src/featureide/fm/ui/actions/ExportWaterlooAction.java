@@ -49,12 +49,10 @@ public class ExportWaterlooAction implements IObjectActionDelegate {
 	
 	private ISelection selection;
 	
-	@Override
 	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
 		
 	}
 
-	@Override
 	@SuppressWarnings("unchecked")
 	public void run(IAction action) {
 		if (selection instanceof IStructuredSelection) {
@@ -94,7 +92,6 @@ public class ExportWaterlooAction implements IObjectActionDelegate {
 		}
 	}
 
-	@Override
 	public void selectionChanged(IAction action, ISelection selection) {
 		this.selection = selection;
 	}

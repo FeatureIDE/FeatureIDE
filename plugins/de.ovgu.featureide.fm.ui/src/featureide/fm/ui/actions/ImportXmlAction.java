@@ -53,13 +53,11 @@ private ISelection selection;
 	
 	private FeatureModelEditor featureModelEditor;
 	
-	@Override
 	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
 		featureModelEditor = (targetPart instanceof FeatureModelEditor) ? 
 				(FeatureModelEditor) targetPart : null;
 	}
 
-	@Override
 	@SuppressWarnings("unchecked")
 	public void run(IAction action) {
 		if (selection instanceof IStructuredSelection) {
@@ -112,7 +110,6 @@ private ISelection selection;
 		}
 	}
 
-	@Override
 	public void selectionChanged(IAction action, ISelection selection) {
 		this.selection = selection;
 	}

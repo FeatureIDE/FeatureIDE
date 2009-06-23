@@ -62,7 +62,7 @@ public abstract class AbstractFeatureModelReader implements IFeatureModelReader 
         parseInputStream(inputStream);
  	}
 	
-	@Override
+	//@Override
 	public void readFromFile(File file) throws UnsupportedModelException, FileNotFoundException {
 		warnings.clear();
 		String fileName = file.getPath();		

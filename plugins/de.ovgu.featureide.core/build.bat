@@ -1,0 +1,2 @@
+set ECLIPSE_HOME=D:\eclipse
+java -cp %ECLIPSE_HOME%\plugins\org.eclipse.equinox.launcher_1.0.101.R34x_v20081125.jar org.eclipse.core.launcher.Main -application org.eclipse.ant.core.antRunner -buildfile build.xml  -Dcomponent=de.ovgu.featureide.core -Dconfigs="*,*,*" -Dbaseos=win32 -Dbasews=win32 -Dbasearch=x86 -Djavacfailonerror=true -Dpde.build.scripts=%ECLIPSE_HOME%/plugins/org.eclipse.pde.build_3.0.1/scripts -DbaseLocation=%ECLIPSE_HOME%

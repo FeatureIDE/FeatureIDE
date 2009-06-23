@@ -84,7 +84,6 @@ public class OutlineVisitor implements Visitor {
 		}
 	}
 
-	@Override
 	public void visit(LeafTree leafTreeNode) {
 		this.currentFile = leafTreeNode.getRoot().getChildren();
 		convertToArray(currentFile);

@@ -40,19 +40,16 @@ public class StartJakFileWizard implements IWorkbenchWindowActionDelegate {
 	
 	private IWorkbenchWindow window;
 
-	@Override
 	public void dispose() {
 		
 
 	}
 
-	@Override
 	public void init(IWorkbenchWindow window) {
 		
 		this.window=window;
 	}
 
-	@Override
 	public void run(IAction action) {
 		
 		NewJakFileWizard wizard=new NewJakFileWizard();
@@ -68,9 +65,7 @@ public class StartJakFileWizard implements IWorkbenchWindowActionDelegate {
 		dialog.open();
 	}
 
-	@Override
-	public void selectionChanged(IAction action, ISelection selection) {
-	
+	public void selectionChanged(IAction action, ISelection selection) {	
 
 	}
 

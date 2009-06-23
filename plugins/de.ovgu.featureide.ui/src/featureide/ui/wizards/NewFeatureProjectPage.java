@@ -29,7 +29,6 @@ public class NewFeatureProjectPage extends WizardPage {
 		setDescription("Select a composer");
 	}
 	
-	@Override
 	public void createControl(Composite parent) {
 		Composite container = new Composite(parent, SWT.NULL);
 	    final GridLayout gridLayout = new GridLayout();
@@ -65,7 +64,6 @@ public class NewFeatureProjectPage extends WizardPage {
 	    extensions = new IComposerExtension[composerExtensions.size()]; 
 	    composerExtensions.toArray(extensions);
 	    Arrays.sort(extensions, new Comparator<IComposerExtension> () {
-			@Override
 			public int compare(IComposerExtension arg0, IComposerExtension arg1) {
 				return arg0.getName().compareTo(arg1.getName());
 			}
@@ -82,7 +80,6 @@ public class NewFeatureProjectPage extends WizardPage {
 		}
 		descriptionLabel.setText(descriptionString);
 		toolCB.addModifyListener(new ModifyListener() {
-			@Override
 			public void modifyText(ModifyEvent e) {
 				composerExtension = extensions[toolCB.getSelectionIndex()];
 			}

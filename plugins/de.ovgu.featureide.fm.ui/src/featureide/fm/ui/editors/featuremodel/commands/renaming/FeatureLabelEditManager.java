@@ -58,7 +58,7 @@ public class FeatureLabelEditManager extends DirectEditManager implements GUIDef
 		
 		cellEditor.addListener(new ICellEditorListener() {
 			private ToolTip tooltip;
-			@Override
+			
 			public void editorValueChanged(boolean oldValidState, boolean newValidState) {
 				closeTooltip();
 				String value = (String) cellEditor.getValue();
@@ -71,11 +71,11 @@ public class FeatureLabelEditManager extends DirectEditManager implements GUIDef
 						createTooltip("This name is already used for another feature.", SWT.ICON_ERROR);
 				}
 			}
-			@Override
+			
 			public void cancelEditor() {
 				closeTooltip();
 			}
-			@Override
+			
 			public void applyEditorValue() {
 				closeTooltip();
 			}

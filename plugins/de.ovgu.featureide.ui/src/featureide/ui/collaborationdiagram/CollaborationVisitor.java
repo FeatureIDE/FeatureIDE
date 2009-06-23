@@ -126,7 +126,6 @@ public class CollaborationVisitor implements Visitor {
 		return collaborationDiagram;
 	}
 
-	@Override
 	public void visit(LeafTree leafTreeNode) {
 		// TODO Auto-generated method stub
 		

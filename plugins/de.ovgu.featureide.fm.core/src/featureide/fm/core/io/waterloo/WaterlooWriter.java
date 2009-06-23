@@ -64,7 +64,7 @@ public class WaterlooWriter extends AbstractFeatureModelWriter {
 		setFeatureModel(featureModel);
 	}
 	
-	@Override
+	//@Override
 	public String writeToString() {
 		//Create Empty DOM Document
     	DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();

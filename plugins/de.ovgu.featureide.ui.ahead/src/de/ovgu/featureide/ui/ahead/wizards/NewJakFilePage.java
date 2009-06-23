@@ -184,11 +184,9 @@ public class NewJakFilePage extends WizardPage {
 			}
 		});
 		refinesbox.addSelectionListener(new SelectionListener() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				refines = refinesbox.getSelection();
 			}
-			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 		});

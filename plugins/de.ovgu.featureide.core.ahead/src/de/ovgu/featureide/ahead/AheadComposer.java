@@ -53,7 +53,6 @@ public class AheadComposer implements IComposerExtensionClass {
 	public AheadComposer() {
 	}
 
-	@Override
 	public void initialize(IFeatureProject project) {
 		assert(project != null) : "Invalid project given";
 		featureProject = project;
@@ -66,7 +65,6 @@ public class AheadComposer implements IComposerExtensionClass {
 		}
 	}
 
-	@Override
 	public void performFullBuild(IFile equation) {
 		assert(ahead != null) : "Ahead instance not initialized";
 		try {
@@ -77,7 +75,6 @@ public class AheadComposer implements IComposerExtensionClass {
 		}
 	}
 
-	@Override
 	public void clean() {
 	}
 	

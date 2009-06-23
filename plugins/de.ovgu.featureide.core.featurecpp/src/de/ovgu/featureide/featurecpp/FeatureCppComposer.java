@@ -35,18 +35,15 @@ public class FeatureCppComposer implements IComposerExtensionClass {
 
 	private final FeatureCppWrapper featureCpp = new FeatureCppWrapper("fc++.exe");
 	
-	@Override
 	public void clean() {
 
 	}
 
-	@Override
 	public void initialize(IFeatureProject project) {
 		assert(project != null) : "Invalid project given";
 		featureCpp.initialize(project.getSourceFolder(), project.getBuildFolder());
 	}
 
-	@Override
 	public void performFullBuild(IFile equation) {
 		featureCpp.compose(equation);
 	}

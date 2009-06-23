@@ -38,12 +38,10 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 	public FeatureHouseComposer() {
 	}
 
-	@Override
 	public void initialize(IFeatureProject project) {
 		featureProject = project;
 	}
 
-	@Override
 	public void performFullBuild(IFile equation) {
 		assert(featureProject != null) : "Invalid project given";
 		
@@ -70,7 +68,6 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 		featureProject.setProjectTree(fstparser.getProjectTree());
 	}
 
-	@Override
 	public void clean() {
 	}
 }

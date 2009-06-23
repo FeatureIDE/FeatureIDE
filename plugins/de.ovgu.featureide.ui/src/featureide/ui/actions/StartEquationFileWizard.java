@@ -31,19 +31,14 @@ public class StartEquationFileWizard implements IWorkbenchWindowActionDelegate {
 
 	private IWorkbenchWindow window;
 
-	@Override
 	public void dispose() {
 		
-
 	}
 
-	@Override
 	public void init(IWorkbenchWindow window) {
-		
 		this.window=window;
 	}
 
-	@Override
 	public void run(IAction action) {
 		
 		NewEquationFileWizard wizard=new NewEquationFileWizard();
@@ -60,9 +55,7 @@ public class StartEquationFileWizard implements IWorkbenchWindowActionDelegate {
 		dialog.open();
 	}
 
-	@Override
 	public void selectionChanged(IAction action, ISelection selection) {
-
 
 	}
 
