@@ -11,7 +11,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.swt,
  org.eclipse.ui,
  org.eclipse.core.resources,
- de.ovgu.featureide.fm.core
+ de.ovgu.featureide.fm.core,
+ org.eclipse.cdt.managedbuilder.ui;bundle-version="5.0.2"
 Export-Package: 
  featureide.core,
  featureide.core.builder,

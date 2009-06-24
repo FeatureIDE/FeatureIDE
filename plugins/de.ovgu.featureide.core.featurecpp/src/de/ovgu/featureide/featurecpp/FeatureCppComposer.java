@@ -32,6 +32,8 @@ import featureide.core.builder.IComposerExtensionClass;
  * @author Tom Brosch
  */
 public class FeatureCppComposer implements IComposerExtensionClass {
+	
+	public static final String COMPOSER_ID = "de.ovgu.featureide.composer.featurecpp";
 
 	private final FeatureCppWrapper featureCpp = new FeatureCppWrapper("fc++.exe");
 	

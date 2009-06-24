@@ -18,16 +18,9 @@
  */
 package featureide.ui.wizards;
 
-import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IProjectDescription;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
 
-import featureide.core.IFeatureProject;
-import featureide.core.builder.FeatureProjectNature;
-import featureide.fm.core.FeatureModel;
-import featureide.fm.core.io.guidsl.FeatureModelWriter;
+import featureide.core.CorePlugin;
 import featureide.fm.ui.editors.FeatureModelEditor;
 import featureide.ui.UIPlugin;
 
@@ -55,65 +48,11 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 	public boolean performFinish() {
 		if (!super.performFinish())
 			return false;
-		
-		createProjectStructure(getNewProject());
-		addNatureToProject(getNewProject(), FeatureProjectNature.NATURE_ID);
 		if (page.hasCompositionTool()) {
-			try {
-				getNewProject().setPersistentProperty(IFeatureProject.composerConfigID, page.getCompositionTool().getId());
-			} catch (CoreException e) {
-				UIPlugin.getDefault().logError("Could not set persistant property", e);
-			}
+			CorePlugin.setupFeatureProject(getNewProject(), page.getCompositionTool().getId());
+			UIPlugin.getDefault().openEditor(FeatureModelEditor.ID, getNewProject().getFile("model.m"));
 		}
-		
-		UIPlugin.getDefault().openEditor(FeatureModelEditor.ID, getNewProject().getFile("model.m"));
 		return true;
-	}
-
-	private void createProjectStructure(IProject project) {
-		createFolder(project, "bin");
-		createFolder(project, "build");
-		createFolder(project, "equations");
-		createFolder(project, "src");
-		FeatureModel featureModel = new FeatureModel();
-		featureModel.createDefaultValues();
-		try {
-			new FeatureModelWriter(featureModel).writeToFile(project.getFile("model.m"));
-		} catch (CoreException e) {
-			UIPlugin.getDefault().logError("Error while creating feature model", e);
-		}
-	}
-	
-	private IFolder createFolder(IProject project, String name) {
-		IFolder folder = project.getFolder(name);
-		try {
-			if (!folder.exists())
-				folder.create(false, true, null);
-		} catch (CoreException e) {
-			e.printStackTrace();
-		}
-		return folder;
-	}
-
-	public static void addNatureToProject(IProject project, String projectNature) {
-		try {
-			// check if the nature was already added
-			if (!project.isAccessible()
-					|| project.hasNature(projectNature))
-				return;
-
-			// add the jak nature
-			UIPlugin.getDefault().logInfo("Add Nature (" + projectNature + ") to " + project.getName());
-			IProjectDescription description = project.getDescription();
-			String[] natures = description.getNatureIds();
-			String[] newNatures = new String[natures.length + 1];
-			System.arraycopy(natures, 0, newNatures, 0, natures.length);
-			newNatures[natures.length] = projectNature;
-			description.setNatureIds(newNatures);
-			project.setDescription(description, null);
-		} catch (CoreException e) {
-			UIPlugin.getDefault().logError(e);
-		}
 	}
 
 }

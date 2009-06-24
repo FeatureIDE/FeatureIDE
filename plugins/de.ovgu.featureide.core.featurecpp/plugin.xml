@@ -10,5 +10,19 @@
             name="FeatureC++">
       </composer>
    </extension>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            adaptable="true"
+            id="de.ovgu.featureide.core.featurecpp.addfcppcomposer"
+            objectClass="org.eclipse.core.resources.IProject">
+         <action
+               class="de.ovgu.featureide.featurecpp.AddFeatureCppComposer"
+               id="de.ovgu.featureide.core.featurecpp.action1"
+               label="Add FeatureC++ Composer"
+               style="push">
+         </action>
+      </objectContribution>
+   </extension>
 
 </plugin>

@@ -39,6 +39,8 @@ import featureide.core.internal.ProjectChangeListener;
 import featureide.core.listeners.ICurrentEquationListener;
 import featureide.core.listeners.IFeatureFolderListener;
 import featureide.core.listeners.IProjectListener;
+import featureide.fm.core.FeatureModel;
+import featureide.fm.core.io.guidsl.FeatureModelWriter;
 
 /**
  * The activator class controls the plug-in life cycle.
@@ -197,6 +199,65 @@ public class CorePlugin extends AbstractCorePlugin {
 	}
 
 	/**
+	 * 
+	 */
+	public static void setupFeatureProject(IProject project, String compositionToolID) {
+		try {
+			project.setPersistentProperty(IFeatureProject.composerConfigID, compositionToolID);
+		} catch (CoreException e) {
+			CorePlugin.getDefault().logError("Could not set persistant property", e);
+		}
+		createProjectStructure(project);
+		addFeatureNatureToProject(project);
+	}
+
+	private static void addFeatureNatureToProject(IProject project) {
+		try {
+			// check if the nature was already added
+			if (!project.isAccessible()
+					|| project.hasNature(FeatureProjectNature.NATURE_ID))
+				return;
+	
+			// add the jak nature
+			CorePlugin.getDefault().logInfo("Add Nature (" + FeatureProjectNature.NATURE_ID + ") to " + project.getName());
+			IProjectDescription description = project.getDescription();
+			String[] natures = description.getNatureIds();
+			String[] newNatures = new String[natures.length + 1];
+			System.arraycopy(natures, 0, newNatures, 0, natures.length);
+			newNatures[natures.length] = FeatureProjectNature.NATURE_ID;
+			description.setNatureIds(newNatures);
+			project.setDescription(description, null);
+		} catch (CoreException e) {
+			CorePlugin.getDefault().logError(e);
+		}
+	}
+
+	private static IFolder createFolder(IProject project, String name) {
+		IFolder folder = project.getFolder(name);
+		try {
+			if (!folder.exists())
+				folder.create(false, true, null);
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+		return folder;
+	}
+
+	private static void createProjectStructure(IProject project) {
+		createFolder(project, "bin");
+		createFolder(project, "build");
+		createFolder(project, "equations");
+		createFolder(project, "src");
+		FeatureModel featureModel = new FeatureModel();
+		featureModel.createDefaultValues();
+		try {
+			new FeatureModelWriter(featureModel).writeToFile(project.getFile("model.m"));
+		} catch (CoreException e) {
+			CorePlugin.getDefault().logError("Error while creating feature model", e);
+		}
+	}
+
+	/**
 	 * Returns the shared instance
 	 *
 	 * @return the shared instance
@@ -236,5 +297,4 @@ public class CorePlugin extends AbstractCorePlugin {
 	public static boolean hasProjectData(IResource res) {
 		return getProjectData(res) != null;
 	}
-
 }
