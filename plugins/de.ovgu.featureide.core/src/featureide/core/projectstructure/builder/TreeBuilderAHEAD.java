@@ -69,18 +69,6 @@ public class TreeBuilderAHEAD {
 	}
 
 	public void buildTree() {
-		// System.out.println("featureModel: " +
-		// featureProject.getFeatureModel().getRoot().getName());
-		// System.out.println("featureModel: " +
-		// featureProject.getFeatureModel().getFeatures());
-		// System.out.println("featureModel: " +
-		// featureProject.getFeatureModel().getNumberOfFeatures());
-
-		// System.out.println("jakProject: " +
-		// featureProject.getProject().getLocation());
-		// System.out.println("src-Folder: " +
-		// featureProject.getSourceFolder());
-
 		// create the node that denotes the project
 		insertProjectTreeNode("language", "AHEAD", projectTree.getRoot());
 		projectName = featureProject.getJakProject().getName();
@@ -106,16 +94,6 @@ public class TreeBuilderAHEAD {
 			CorePlugin.getDefault().logError(e1);
 		}
 		projectTree.print();
-
-		// Collection<Feature> classes =
-		// featureProject.getFeatureModel().getFeatures();
-		// Iterator<Feature> iter = classes.iterator();
-		// Feature feature;
-		// while (iter.hasNext()) {
-		// feature = iter.next();
-		// System.out.println("FeatureName: " + feature.getName());
-		// }
-
 	}
 
 	private LeafTree createLeafTree(ProjectTreeNode fileParent) {

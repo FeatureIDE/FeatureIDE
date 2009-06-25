@@ -423,7 +423,6 @@ public class FeatureModel implements PropertyConstants {
 			condition = new Implies(conjunct(a), condition);
 		// FM => (A => B)
 		Implies finalFormula = new Implies(featureModel, condition);
-		// System.out.println(finalFormula.toString());
 		return !new SatSolver(new Not(finalFormula), 1000).isSatisfiable();
 	}
 
@@ -439,7 +438,6 @@ public class FeatureModel implements PropertyConstants {
 		Node featureModel = NodeCreator.createNodes(this);
 		// FM => (condition)
 		Implies finalFormula = new Implies(featureModel, condition.clone());
-		// System.out.println(finalFormula.toString());
 		try {
 			return !new SatSolver(new Not(finalFormula), 1000).isSatisfiable();
 		} catch (TimeoutException e) {

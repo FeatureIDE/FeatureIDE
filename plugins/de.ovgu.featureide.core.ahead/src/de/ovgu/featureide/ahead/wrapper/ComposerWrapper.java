@@ -240,11 +240,9 @@ public class ComposerWrapper {
 		TreeMap<String, IFile> fileMap = new TreeMap<String, IFile>();
 
 		for (String jakFile : absoluteJakFilenames.keySet()) {
-			//System.out.println(jakFile + ":");
 			LinkedList<IFile> filesVec = absoluteJakFilenames.get(jakFile);
 			String[] files = new String[filesVec.size()];
 			for (int i = 0; i < filesVec.size(); i++) {
-				//System.out.println(filesVec.get(i));
 				files[i] = filesVec.get(i).getRawLocation().toOSString();
 				fileMap.put(files[i], filesVec.get(i));
 			}

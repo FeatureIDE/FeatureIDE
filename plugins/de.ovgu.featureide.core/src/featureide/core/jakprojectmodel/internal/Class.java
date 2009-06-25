@@ -256,7 +256,6 @@ public class Class extends JakElement implements IClass {
 					}
 					
 					lineNumber = getLineNumber(c.node);
-					//System.out.printf("Method: %s (%d)\n", newMethod.getName(), lineNumber);
 					newMethod.setOwn(currentFile);
 					newMethod.setLineNumber(currentFile, lineNumber);
 					methods.put(newMethod.getIdentifier(), newMethod);

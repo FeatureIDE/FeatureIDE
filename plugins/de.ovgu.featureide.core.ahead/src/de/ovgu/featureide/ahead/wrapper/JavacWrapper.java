@@ -119,7 +119,6 @@ public class JavacWrapper {
 		for (IFile file : sources)
 			sourcePaths.put(file.getRawLocation().toOSString(), file);
 
-		//System.out.println("'"+output+"'");
 		Scanner scanner = new Scanner(output);
 		String currentLine;
 		while (scanner.hasNextLine()) {

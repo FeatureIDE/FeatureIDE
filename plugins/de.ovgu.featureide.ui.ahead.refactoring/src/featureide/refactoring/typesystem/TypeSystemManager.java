@@ -258,9 +258,8 @@ public class TypeSystemManager {
 	    return false;
 	if(con[0].getType()!=IResource.PROJECT)
 	    return false;
-	try {//TODO Tom: check this
+	try {
 	    if (((IProject)con[0]).hasNature(
-//	    		JakNature.NATURE_ID
 	    		FeatureProjectNature.NATURE_ID
 	    		)) return true;
         } catch (Exception e) {}

@@ -106,10 +106,6 @@ public class OutlineViewContentProvider extends ArrayContentProvider implements 
 	}
 
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-		
-//		System.out.println("inputChanged" + viewer.getClass());
-//		System.out.println("inputChanged" + oldInput);
-//		System.out.println("inputChanged" + newInput);
 	}
 
 	public void setInputFile(IFile inputFile) {

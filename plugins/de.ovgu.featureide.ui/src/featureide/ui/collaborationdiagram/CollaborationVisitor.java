@@ -92,7 +92,6 @@ public class CollaborationVisitor implements Visitor {
 		// traverse Leaftrees
 		Iterator<LeafTree> iteratorLeaf = projectTree.getLeafTrees().iterator();
 		while (iteratorLeaf.hasNext()) {
-			// System.out.println("type: " + iteratorLeaf.next().getParent());
 			LeafTree leafTree = iteratorLeaf.next();
 
 			col = findCollaboration((ProjectTreeNode) leafTree.getParent());

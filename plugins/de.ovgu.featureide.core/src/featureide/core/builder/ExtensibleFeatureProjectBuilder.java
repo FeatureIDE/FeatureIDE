@@ -88,9 +88,6 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		if (!featureProjectLoaded())
 			return null;
 		
-		//TODO Tom?
-		//CorePlugin.getDefault().logInfo("Debug Message");
-		
 		IFile equation = featureProject.getCurrentEquationFile();
 
 		//TODO #28: implementation for incremental build (delete only builder markers of new builded sources)

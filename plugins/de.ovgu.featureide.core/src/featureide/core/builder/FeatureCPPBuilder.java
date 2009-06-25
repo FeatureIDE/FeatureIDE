@@ -194,7 +194,6 @@ public class FeatureCPPBuilder extends IncrementalProjectBuilder {
 			// wait, until c++-compiler has terminated
 			int exitValGpp = -1;
 			exitValGpp = p.waitFor();
-			System.out.println("ExitValue g++: " + exitValGpp);
 
 			// refresh workspace
 			featureProject.getBinFolder().refreshLocal(
@@ -232,7 +231,6 @@ public class FeatureCPPBuilder extends IncrementalProjectBuilder {
 				file = file.substring(0, file.lastIndexOf(":"));
 			}
 			errMsg.setFile(file);
-			// System.out.println("cppErr: " + errMsg.getFile());
 
 			// get the line number
 			String lineNumber = cppErrorMessage.substring(0, cppErrorMessage
@@ -242,13 +240,11 @@ public class FeatureCPPBuilder extends IncrementalProjectBuilder {
 						lineNumber.lastIndexOf(":") + 1, lineNumber.length());
 				errMsg.setLine(Integer.parseInt(lineNumber));
 			}
-			// System.out.println("cppLine: " + errMsg.getLine());
 
 			// get the message
 			String msg = cppErrorMessage.substring(cppErrorMessage
 					.indexOf(": ") + 2, cppErrorMessage.length());
 			errMsg.setMessage(msg);
-			// System.out.println("cppMsg: " + errMsg.getMessage());
 			return errMsg;
 		}
 		return null;

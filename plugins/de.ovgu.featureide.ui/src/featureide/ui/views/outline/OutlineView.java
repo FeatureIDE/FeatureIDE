@@ -55,7 +55,6 @@ public class OutlineView extends ViewPart {
 			contentProvider.setInputFile(inputFile.getFile());
 			viewer.setContentProvider(contentProvider);
 
-//			System.out.println(featureProject.getProjectTree());
 			if (featureProject != null)
 				projectTree = featureProject.getProjectTree();
 			if (projectTree != null)
@@ -65,9 +64,6 @@ public class OutlineView extends ViewPart {
 		public void createPartControl(Composite parent) {
 		}
 
-//		private void showMessage (String message) {
-//			MessageDialog.openInformation(viewer.getControl().getShell(), "Favorites", message);
-//		}
 		public void setFocus() {
 			viewer.getControl().setFocus();
 		}

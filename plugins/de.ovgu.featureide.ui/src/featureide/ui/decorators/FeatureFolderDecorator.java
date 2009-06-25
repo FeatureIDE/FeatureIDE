@@ -57,23 +57,6 @@ public class FeatureFolderDecorator implements ILightweightLabelDecorator, IFeat
 		//handle only not-in-use folders
 		if (featureProject.getFeatureModel().containsLayer(folder.getName()))
 			return;
-		
-//		try {
-//			//delete empty not-in-use folders
-//			//folder.refreshLocal(IFolder.DEPTH_ONE, null);
-//			System.out.println(folder.getName());
-//			if (folder.members().length == 0) {
-//				System.out.println("\tlenght=0");
-//				//refresh to prevent the deletion of an already non-existing folder
-//				if (folder.exists()) {
-//					System.out.println("\texists");
-//					folder.delete(false, null);
-//				}
-//				return;
-//			}
-//		} catch (CoreException e) {
-//			e.printStackTrace();
-//		}
 
 		//decorate non-empty not-in-use folders
 		decoration.addOverlay(OVERLAY, IDecoration.TOP_LEFT);

@@ -56,7 +56,6 @@ public class ExecutionTimeTestBench {
 	      new FileReader(file).read();
 	    }
 	    catch ( IOException e ) {
-	      System.out.println("Fehler beim Lesen der Datei");
 	    }
 
 		FileWriter fileWriter = null;

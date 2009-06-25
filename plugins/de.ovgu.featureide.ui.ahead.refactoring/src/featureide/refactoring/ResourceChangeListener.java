@@ -37,148 +37,170 @@ import featureide.refactoring.windows.ErrorWindow;
  * 
  * @author Stephan Kauschka
  */
-public class ResourceChangeListener implements IResourceChangeListener{
+public class ResourceChangeListener implements IResourceChangeListener {
 
-    public ResourceChangeListener(){}
-
-    public void resourceChanged(IResourceChangeEvent event) {
-
-	IResourceDelta delta = event.getDelta();
-	if(delta==null) return;
-
-	URI projectTo = null;
-	URI projectFrom = null;
-
-	for (IResourceDelta child : delta.getAffectedChildren()) {
-	    IResource rsrc = child.getResource();
-
-	    //project-changes
-	    if(rsrc!=null && rsrc.getType()==IResource.PROJECT){
-		IProject project = (IProject) rsrc;
-
-		//feature-project is moved to a new location for rename
-		//[regarding renames: if the name is extended MOVED_TO occurs prior 
-		//to MOVED_FROM, if the name is shortened MOVED_FROM occurs prior 
-		//to MOVED_TO]
-		if (child.getFlags()==IResourceDelta.MOVED_TO){
-		    String newLocationWorkspaceRelative = project.getFullPath().toOSString();
-		    String workspaceLocationAbsolute = project.getWorkspace().getRoot().getLocation().toOSString();
-		    String file = workspaceLocationAbsolute+newLocationWorkspaceRelative;
-		    projectFrom = new File(file).toURI();
-		    if(projectTo!=null && TypeSystemManager.exists(projectFrom)){
-			boolean success = TypeSystemManager.replace(projectFrom, projectTo);
-			if(success)
-			    System.out.println(projectFrom + " has been replaced by " + projectTo + " in the TypeSystemManager");
-			projectTo = null;
-			projectFrom = null;
-		    }
-		}
-		else
-		//feature-project is moved from a location for rename
-		//[regarding renames: if the name is extended MOVED_TO occurs prior 
-		//to MOVED_FROM, if the name is shortened MOVED_FROM occurs prior 
-		//to MOVED_TO]
-		if ((child.getFlags()&IResourceDelta.MOVED_FROM)!=0 &&
-		    (child.getFlags()&IResourceDelta.DESCRIPTION)!=0 &&
-		    (child.getFlags()&IResourceDelta.OPEN)!=0){
-		    projectTo = project.getLocationURI();
-		    if(projectFrom!=null && hasJakNature(project)){
-			boolean success = TypeSystemManager.replace(projectFrom, projectTo);
-			if(success)
-			    System.out.println(projectFrom + " has been replaced by " + projectTo + " in the TypeSystemManager");
-			projectTo = null;
-			projectFrom = null;
-		    }
-		}
-		else
-		//feature-project is deleted
-		if ((child.getKind()&IResourceDelta.REMOVED)!=0 &&
-		    (child.getFlags()&IResourceDelta.MOVED_FROM)==0 && 
-		    (child.getFlags()&IResourceDelta.MOVED_TO)==0){
-		    String newLocationWorkspaceRelative = project.getFullPath().toOSString();
-		    String workspaceLocationAbsolute = project.getWorkspace().getRoot().getLocation().toOSString();
-		    String file = workspaceLocationAbsolute+newLocationWorkspaceRelative;
-		    URI uri = new File(file).toURI();
-		    if(TypeSystemManager.exists(uri)){
-			boolean success = TypeSystemManager.remove(uri);
-			if(success)
-			    System.out.println(uri + " has been deleted in the TypeSystemManager");
-		    }
-		}
-		else
-		//for some unknown reason when moving a project via the Eclipse-refactoring
-		//Move... no MOVED_FROM or MOVED_TO events occur
-		if (child.getFlags()==IResourceDelta.DESCRIPTION){
-		    if(hasJakNature(project)){
-			System.out.println("a FeatureIDE-project may have been moved to " + project.getLocationURI());
-		    }
-		}
-		else
-		for(IResourceDelta d : child.getAffectedChildren()){
-		    handleAffectedFiles(d);
-		}
-	    }
-	}
-    }
-
-    private void handleAffectedFiles(IResourceDelta delta){
-	if(delta==null) return;
-	IResource rsrc = delta.getResource();
-
-	if(rsrc!=null && rsrc.getType()==IResource.FILE){
-	    IFile file = (IFile) rsrc;
-	    IProject project = file.getProject();
-	    URI projectLocationURI = project.getLocationURI();
-
-	    if(file.getFileExtension().equalsIgnoreCase("jak") && 
-	       TypeSystemManager.exists(projectLocationURI)){
-
-		if((delta.getKind()&IResourceDelta.ADDED)!=0){
-		    System.out.println(file.getLocationURI() + " added to " + project.getName());
-		    TypeSystemManager.setNeedsUpdate(projectLocationURI, true);
-		}
-		else
-		if((delta.getKind()&IResourceDelta.REMOVED)!=0){
-		    System.out.println(file.getLocationURI() + " removed from " + project.getName());
-		    TypeSystemManager.setNeedsUpdate(projectLocationURI, true);
-		}
-		else
-		if((delta.getKind()&IResourceDelta.CHANGED)!=0){
-		    System.out.println(file.getLocationURI() + " changed in " + project.getName());
-		    TypeSystemManager.setNeedsUpdate(projectLocationURI, true);
-		}
-	    }
-
-	    if((file.getFileExtension().equalsIgnoreCase("equation") ||
-	        file.getFileExtension().equalsIgnoreCase("equations")) && 
-	       TypeSystemManager.exists(projectLocationURI)){
-		if((delta.getFlags()&IResourceDelta.CONTENT)!=0){
-		    IFile eqFile = TypeSystemManager.getEquationFile(projectLocationURI);
-		    if(file.equals(eqFile)){
-			System.out.println("current equation[s]-file used for the typesystem of " + project.getName() + " changed");
-			TypeSystemManager.setNeedsUpdate(projectLocationURI, true);
-		    }
-		}
-	    }
+	public ResourceChangeListener() {
 	}
 
-	for(IResourceDelta d : delta.getAffectedChildren()){
-	    handleAffectedFiles(d);
-	}
-    }
+	public void resourceChanged(IResourceChangeEvent event) {
 
-    private boolean hasJakNature(IProject project) {
-	try {
-	    return project.isAccessible() &&
-	    //TODO Tom: check this
-//	    project.hasNature(JakNature.NATURE_ID)
-	    project.hasNature(FeatureProjectNature.NATURE_ID)
-	    ;
-	} catch (Exception e) {
-	    new ErrorWindow(e.getClass().getSimpleName(),
-			"The typesystem could not be refreshed due to the following reason:\n\n"+e.getMessage());
+		IResourceDelta delta = event.getDelta();
+		if (delta == null)
+			return;
+
+		URI projectTo = null;
+		URI projectFrom = null;
+
+		for (IResourceDelta child : delta.getAffectedChildren()) {
+			IResource rsrc = child.getResource();
+
+			// project-changes
+			if (rsrc != null && rsrc.getType() == IResource.PROJECT) {
+				IProject project = (IProject) rsrc;
+
+				// feature-project is moved to a new location for rename
+				// [regarding renames: if the name is extended MOVED_TO occurs
+				// prior
+				// to MOVED_FROM, if the name is shortened MOVED_FROM occurs
+				// prior
+				// to MOVED_TO]
+				if (child.getFlags() == IResourceDelta.MOVED_TO) {
+					String newLocationWorkspaceRelative = project.getFullPath()
+							.toOSString();
+					String workspaceLocationAbsolute = project.getWorkspace()
+							.getRoot().getLocation().toOSString();
+					String file = workspaceLocationAbsolute
+							+ newLocationWorkspaceRelative;
+					projectFrom = new File(file).toURI();
+					if (projectTo != null
+							&& TypeSystemManager.exists(projectFrom)) {
+						boolean success = TypeSystemManager.replace(
+								projectFrom, projectTo);
+						if (success)
+							System.out.println(projectFrom
+									+ " has been replaced by " + projectTo
+									+ " in the TypeSystemManager");
+						projectTo = null;
+						projectFrom = null;
+					}
+				} else
+				// feature-project is moved from a location for rename
+				// [regarding renames: if the name is extended MOVED_TO occurs
+				// prior
+				// to MOVED_FROM, if the name is shortened MOVED_FROM occurs
+				// prior
+				// to MOVED_TO]
+				if ((child.getFlags() & IResourceDelta.MOVED_FROM) != 0
+						&& (child.getFlags() & IResourceDelta.DESCRIPTION) != 0
+						&& (child.getFlags() & IResourceDelta.OPEN) != 0) {
+					projectTo = project.getLocationURI();
+					if (projectFrom != null && hasJakNature(project)) {
+						boolean success = TypeSystemManager.replace(
+								projectFrom, projectTo);
+						if (success)
+							System.out.println(projectFrom
+									+ " has been replaced by " + projectTo
+									+ " in the TypeSystemManager");
+						projectTo = null;
+						projectFrom = null;
+					}
+				} else
+				// feature-project is deleted
+				if ((child.getKind() & IResourceDelta.REMOVED) != 0
+						&& (child.getFlags() & IResourceDelta.MOVED_FROM) == 0
+						&& (child.getFlags() & IResourceDelta.MOVED_TO) == 0) {
+					String newLocationWorkspaceRelative = project.getFullPath()
+							.toOSString();
+					String workspaceLocationAbsolute = project.getWorkspace()
+							.getRoot().getLocation().toOSString();
+					String file = workspaceLocationAbsolute
+							+ newLocationWorkspaceRelative;
+					URI uri = new File(file).toURI();
+					if (TypeSystemManager.exists(uri)) {
+						boolean success = TypeSystemManager.remove(uri);
+						if (success)
+							System.out
+									.println(uri
+											+ " has been deleted in the TypeSystemManager");
+					}
+				} else
+				// for some unknown reason when moving a project via the
+				// Eclipse-refactoring
+				// Move... no MOVED_FROM or MOVED_TO events occur
+				if (child.getFlags() == IResourceDelta.DESCRIPTION) {
+					if (hasJakNature(project)) {
+						System.out
+								.println("a FeatureIDE-project may have been moved to "
+										+ project.getLocationURI());
+					}
+				} else
+					for (IResourceDelta d : child.getAffectedChildren()) {
+						handleAffectedFiles(d);
+					}
+			}
+		}
 	}
-	return false;
-    }
+
+	private void handleAffectedFiles(IResourceDelta delta) {
+		if (delta == null)
+			return;
+		IResource rsrc = delta.getResource();
+
+		if (rsrc != null && rsrc.getType() == IResource.FILE) {
+			IFile file = (IFile) rsrc;
+			IProject project = file.getProject();
+			URI projectLocationURI = project.getLocationURI();
+
+			if (file.getFileExtension().equalsIgnoreCase("jak")
+					&& TypeSystemManager.exists(projectLocationURI)) {
+
+				if ((delta.getKind() & IResourceDelta.ADDED) != 0) {
+					System.out.println(file.getLocationURI() + " added to "
+							+ project.getName());
+					TypeSystemManager.setNeedsUpdate(projectLocationURI, true);
+				} else if ((delta.getKind() & IResourceDelta.REMOVED) != 0) {
+					System.out.println(file.getLocationURI() + " removed from "
+							+ project.getName());
+					TypeSystemManager.setNeedsUpdate(projectLocationURI, true);
+				} else if ((delta.getKind() & IResourceDelta.CHANGED) != 0) {
+					System.out.println(file.getLocationURI() + " changed in "
+							+ project.getName());
+					TypeSystemManager.setNeedsUpdate(projectLocationURI, true);
+				}
+			}
+
+			if ((file.getFileExtension().equalsIgnoreCase("equation") || file
+					.getFileExtension().equalsIgnoreCase("equations"))
+					&& TypeSystemManager.exists(projectLocationURI)) {
+				if ((delta.getFlags() & IResourceDelta.CONTENT) != 0) {
+					IFile eqFile = TypeSystemManager
+							.getEquationFile(projectLocationURI);
+					if (file.equals(eqFile)) {
+						System.out
+								.println("current equation[s]-file used for the typesystem of "
+										+ project.getName() + " changed");
+						TypeSystemManager.setNeedsUpdate(projectLocationURI,
+								true);
+					}
+				}
+			}
+		}
+
+		for (IResourceDelta d : delta.getAffectedChildren()) {
+			handleAffectedFiles(d);
+		}
+	}
+
+	private boolean hasJakNature(IProject project) {
+		try {
+			return project.isAccessible()
+					&& project.hasNature(FeatureProjectNature.NATURE_ID);
+		} catch (Exception e) {
+			new ErrorWindow(e.getClass().getSimpleName(),
+					"The typesystem could not be refreshed due to the following reason:\n\n"
+							+ e.getMessage());
+		}
+		return false;
+	}
 
 }

@@ -41,7 +41,7 @@ public abstract class ExtensionPointManager<T extends featureide.core.IExtension
 
 //	private void debugPrintExtensions() {
 //		for (T le : getProviders())
-//			System.out.println(le);
+//			CorePlugin.getDefault().logInfo(le);
 //	}
 
 	protected abstract T parseExtension(

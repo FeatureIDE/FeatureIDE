@@ -144,7 +144,6 @@ public class TreeBuilderFeatureHouse {
 			return "xml";
 		else if (language.equalsIgnoreCase(".xmi"))
 			return "xml";
-		// System.out.println("language: " + language);
 		return null;
 	}
 
@@ -218,7 +217,6 @@ public class TreeBuilderFeatureHouse {
 	private LeafTree fillTree(LeafTree tree, List<FSTNode> list,
 			NonTerminalNode parent) {
 		Iterator<FSTNode> iterator = list.iterator();
-		// System.out.println(list.size());
 		while (iterator.hasNext()) {
 			FSTNode node = iterator.next();
 			if (node instanceof FSTNonTerminal) {

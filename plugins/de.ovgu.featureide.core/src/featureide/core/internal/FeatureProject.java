@@ -548,7 +548,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	private void checkModelChange(IResourceDelta delta) {
 		if (delta == null || (delta.getFlags() & IResourceDelta.CONTENT) == 0)
 			return;
-		System.out.println("Model " + modelFile.getResource().getFullPath()
+		CorePlugin.getDefault().logInfo("Model " + modelFile.getResource().getFullPath()
 				+ " changed");
 		Job job = new Job("Load Model") {
 			protected IStatus run(IProgressMonitor monitor) {
@@ -570,7 +570,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		if (!(resource instanceof IFile))
 			return;
 		final IFile file = (IFile) resource;
-		System.out.println("Configuration " + file.getFullPath() + " changed");
+		CorePlugin.getDefault().logInfo("Configuration " + file.getFullPath() + " changed");
 		Job job = new Job("Read Configuration") {
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
