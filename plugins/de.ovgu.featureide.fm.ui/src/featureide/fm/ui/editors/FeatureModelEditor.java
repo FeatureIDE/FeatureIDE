@@ -108,6 +108,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 	private int graphicalViewerIndex;
 
 	private int textEditorIndex;
+	
+	private int featureOrderEditorIndex;
 
 	private boolean isPageModified;
 
@@ -155,8 +157,11 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 
 	private ScalableFreeformRootEditPart rootEditPart;
 
+	private FeatureOrderEditor featureOrderEditor;
 	@Override
 	protected void setInput(IEditorInput input) {
+		
+		
 		IFile file = (IFile) input.getAdapter(IFile.class);
 		grammarFile = new GrammarFile(file);
 		setPartName(file.getProject().getName() + " Model");
@@ -168,10 +173,12 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 		featureModelReader = new FeatureModelReader(featureModel);
 		featureModelWriter = new FeatureModelWriter(featureModel);
 		xmlFeatureModelWriter = new XmlFeatureModelWriter(featureModel);
-
+		
+		
 		originalFeatureModel = new FeatureModel();
 		try {
 			new FeatureModelReader(originalFeatureModel).readFromFile(file);
+		
 		} catch (Exception e) {
 		}
 	}
@@ -184,8 +191,25 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 	protected void createPages() {
 		createDiagramPage();
 		createSourcePage();
+		createFeatureOrderPage();
 		createActions();
 		createContextMenu();
+	}
+
+	/**
+	 * 
+	 */
+	private void createFeatureOrderPage() {
+		featureOrderEditor= new FeatureOrderEditor(getOriginalFeatureModel());
+		try {
+			featureOrderEditorIndex=addPage(featureOrderEditor, getEditorInput());
+			setPageText(featureOrderEditorIndex,"FeatureOrder");
+			featureOrderEditor.setListItems(getOriginalFeatureModel().getFeatures());
+		} catch (PartInitException e) {
+			
+			e.printStackTrace();
+		}
+		;
 	}
 
 	void createDiagramPage() {
@@ -380,7 +404,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 		if (newPageIndex == textEditorIndex) {
 			if (isPageModified)
 				updateTextEditorFromDiagram();
-		} else { // newPageIndex == graphicalViewerIndex
+		} else if (newPageIndex==graphicalViewerIndex){ // newPageIndex == graphicalViewerIndex
 			if (isDirty() || grammarFile.hasModelMarkers())
 				if (!updateDiagramFromTextEditor()) {
 					// there are errors in the file, stay at this editor page
@@ -389,7 +413,15 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 					return;
 				}
 		}
+		else if (newPageIndex==featureOrderEditorIndex){
+			//if(isPageModified)
+			
+			//featureOrderEditor.setListItems(featureModel.getFeatures());
+		}
+			
+		
 		isPageModified = false;
+
 
 		IEditorActionBarContributor contributor = getEditorSite()
 				.getActionBarContributor();
@@ -398,6 +430,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 					newPageIndex);
 
 		super.pageChange(newPageIndex);
+
 	}
 
 	@Override
@@ -465,6 +498,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 		String prop = event.getPropertyName();
 		if (prop.equals(MODEL_DATA_CHANGED)) {
 			refreshGraphicalViewer();
+		//	System.out.println("Test");
+			featureOrderEditor.setListItems(featureModel.getFeatures());
 			isPageModified = true;
 			firePropertyChange(PROP_DIRTY);
 		} else if (prop.equals(MODEL_DATA_LOADED)) {
