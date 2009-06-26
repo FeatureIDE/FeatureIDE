@@ -20,20 +20,50 @@ package featureide.fm.core.configuration;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 
+import featureide.fm.core.Feature;
+
+
+
 public class ConfigurationWriter {
 
 	private Configuration configuration;
+	
+	public static boolean userdefineorder = false;
 
 	public ConfigurationWriter(Configuration configuration) {
 		this.configuration = configuration;
 	}
 	
 	public void saveToFile(IFile file) throws CoreException {
-		InputStream source = new ByteArrayInputStream(writeIntoString().getBytes());
+		InputStream source;
+		StringBuffer buffer = new StringBuffer();
+		if(userdefineorder){
+			FeatureOrderReader reader = new FeatureOrderReader( ((IFile) file.getAdapter(IFile.class)).getProject().getLocation().toFile());
+			//source = new ByteArrayInputStream(reader.featureOrderRead().toString().getBytes());
+			ArrayList<String> list = reader.featureOrderRead();
+			Set<Feature> featureset = configuration.getSelectedFeatures();
+			for(String s:list){
+				for(Feature f: featureset){
+					if(f.isLayer()){
+						if(f.getName().equals(s))
+						buffer.append(s+"\r\n");
+					}
+				}
+			}
+			
+			source = new ByteArrayInputStream(buffer.toString().getBytes());
+		}
+			
+		else{	
+			source = new ByteArrayInputStream(writeIntoString().getBytes());
+		
+		}
 		if (file.exists()) {
 			file.setContents(source, false, true, null);
 		}
@@ -44,7 +74,7 @@ public class ConfigurationWriter {
 
 	public String writeIntoString() {
 		StringBuffer out = new StringBuffer();
-		writeSelectedFeatures(configuration.getRoot(), out);
+		writeSelectedFeatures(configuration.getRoot(), out);	
 		return out.toString();
 	}
 
