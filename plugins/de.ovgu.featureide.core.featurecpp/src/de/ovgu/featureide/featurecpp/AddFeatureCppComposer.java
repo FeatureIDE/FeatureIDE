@@ -86,8 +86,6 @@ public class AddFeatureCppComposer implements IObjectActionDelegate {
 					ICConfigurationDescription[] configs = desc.getConfigurations();
 					for (int j = 0; j < configs.length; ++j) {
 						ICConfigurationDescription config = configs[j];
-						cp.logInfo("Configname: " + config.getName());
-						//cp.logInfo("Config ID: " + config.getId());
 						
 						//ICSourceEntry[] oldEntries = config.getSourceEntries();
 						//ICSourceEntry[] entries = new ICSourceEntry[oldEntries.length+1];
@@ -98,12 +96,16 @@ public class AddFeatureCppComposer implements IObjectActionDelegate {
 						
 						// Delete all old source folders and add build as the new source folder
 						
-						ICSourceEntry[] entries = new ICSourceEntry[1];
-						IFolder newSource = project.getFolder("build");
+						ICSourceEntry[] entries = new ICSourceEntry[2];
+						IFolder newBuild = project.getFolder("build");
+						IFolder newSource = project.getFolder("src");
 						try {
 							if (!newSource.exists())
 								newSource.create(false, true, null);
-							entries[0] = new CSourceEntry(newSource, null, 0);
+							if (!newBuild.exists())
+								newBuild.create(false, true, null);
+							entries[0] = new CSourceEntry(newBuild, null, 0);
+							entries[1] = new CSourceEntry(newSource, null, 0);
 							config.setSourceEntries(entries);
 						} catch (CoreException e) {
 							cp.logError(e);

@@ -52,7 +52,7 @@ public class FeatureCppWrapper {
 		FeatureCppCorePlugin.getDefault().logInfo("Fcpp: composing");
 		assert(equation != null && equation.exists()) : "Equation file does not exist";
 		ProcessBuilder processBuilder = new ProcessBuilder(new String[] {
-				featureCppExecutableName, "-o=" + outputDirectory, "-s=" + sourceDirectory,
+				featureCppExecutableName, "-o=" + outputDirectory, "-s=" + sourceDirectory, "-gpp",
 				equation.getRawLocation().toOSString()
 		});
 		try {
