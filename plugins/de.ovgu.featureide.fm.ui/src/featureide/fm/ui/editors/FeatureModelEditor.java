@@ -95,6 +95,7 @@ import featureide.fm.ui.editors.featuremodel.layouts.LevelOrderLayout;
  * errors, markers will be created on save.
  * 
  * @author Thomas Thuem
+ * @author Christian Becker
  */
 public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaults,
 		PropertyConstants, PropertyChangeListener {
@@ -202,8 +203,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 	private void createFeatureOrderPage() {
 		featureOrderEditor= new FeatureOrderEditor(getOriginalFeatureModel());
 		try {
-			featureOrderEditorIndex=addPage(featureOrderEditor, getEditorInput());
-			setPageText(featureOrderEditorIndex,"FeatureOrder");
+			featureOrderEditorIndex = addPage(featureOrderEditor, getEditorInput());
+			setPageText(featureOrderEditorIndex,"Feature order");
 			featureOrderEditor.setListItems(getOriginalFeatureModel().getFeatures());
 		} catch (PartInitException e) {
 			
@@ -388,6 +389,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 
 	@Override
 	public boolean isDirty() {
+		
 		return isPageModified || super.isDirty();
 	}
 
@@ -435,15 +437,27 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 
 	@Override
 	public void doSave(IProgressMonitor monitor) {
+	
 		if (getActivePage() == graphicalViewerIndex && isPageModified) {
 			updateTextEditorFromDiagram();
 			setActivePage(textEditorIndex);
 			setActivePage(graphicalViewerIndex);
-		} else
+			
+		} else if (getActivePage()==textEditorIndex){
 			updateDiagramFromTextEditor();
+			
+		}
+		else if(getActivePage()== featureOrderEditorIndex){
+			
+			isPageModified = false;
+			featureOrderEditor.doSave(monitor);
+			
+			
+		}
 		isPageModified = false;
 		featureModel.performRenamings();
 		textEditor.doSave(monitor);
+		
 		try {
 			new FeatureModelReader(originalFeatureModel)
 					.readFromFile(grammarFile.getResource());
@@ -496,10 +510,12 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 
 	public void propertyChange(PropertyChangeEvent event) {
 		String prop = event.getPropertyName();
+	
 		if (prop.equals(MODEL_DATA_CHANGED)) {
 			refreshGraphicalViewer();
-		//	System.out.println("Test");
+			
 			featureOrderEditor.setListItems(featureModel.getFeatures());
+		
 			isPageModified = true;
 			firePropertyChange(PROP_DIRTY);
 		} else if (prop.equals(MODEL_DATA_LOADED)) {

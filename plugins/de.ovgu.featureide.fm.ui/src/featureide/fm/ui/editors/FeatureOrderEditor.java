@@ -20,8 +20,6 @@ package featureide.fm.ui.editors;
 
 
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -36,6 +34,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
@@ -46,7 +45,6 @@ import org.eclipse.swt.widgets.Label;
 
 import featureide.fm.core.Feature;
 import featureide.fm.core.FeatureModel;
-import featureide.fm.core.PropertyConstants;
 import featureide.fm.core.configuration.ConfigurationWriter;
 
 /**
@@ -55,7 +53,7 @@ import featureide.fm.core.configuration.ConfigurationWriter;
  * 
  * @author Christian Becker
  */
-public class FeatureOrderEditor extends EditorPart implements PropertyConstants, PropertyChangeListener {
+public class FeatureOrderEditor extends EditorPart  {
 
 	public static final String ID = "featureide.fm.ui.editors.FeatureOrderEditor"; 
 	
@@ -65,8 +63,6 @@ public class FeatureOrderEditor extends EditorPart implements PropertyConstants,
 	
 	private Button down = null;
 
-	private Button save = null;
-	
 	private Button activate = null;
 	
 	private IEditorInput input;  
@@ -75,7 +71,8 @@ public class FeatureOrderEditor extends EditorPart implements PropertyConstants,
 	
 	private Writer fw;
 	
-	//private boolean dirty=false;
+	private boolean dirty = false;
+	
 	
 	//private FeatureModel featureModel;
 	
@@ -93,7 +90,11 @@ public class FeatureOrderEditor extends EditorPart implements PropertyConstants,
 	 */
 	@Override
 	public void doSave(IProgressMonitor monitor) {
-	
+
+		featureOrderWriter();
+		dirty = false;
+		firePropertyChange(IEditorPart.PROP_DIRTY);
+		
 
 	}
 	
@@ -117,20 +118,12 @@ public class FeatureOrderEditor extends EditorPart implements PropertyConstants,
 	@Override
 	public void init(IEditorSite site, IEditorInput input)
 			throws PartInitException {
-		this.input =input;
+		this.input = input;
 		this.site = site;
-		
 
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.part.EditorPart#isDirty()
-	 */
-	@Override
-	public boolean isDirty() {
-		return false;
-		//return isDirty;
-	}
+
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.part.EditorPart#isSaveAsAllowed()
@@ -176,12 +169,12 @@ public class FeatureOrderEditor extends EditorPart implements PropertyConstants,
 		
 		featurelist = new List(comp, SWT.NONE);
 		gridData = new GridData(GridData.FILL_BOTH);
-		gridData.horizontalSpan=2;
-		gridData.verticalSpan=8;
+		gridData.horizontalSpan = 2;
+		gridData.verticalSpan = 8;
 		featurelist.setLayoutData(gridData);
 		
 		gridData = new GridData(GridData.GRAB_HORIZONTAL);
-		gridData.widthHint=70;
+		gridData.widthHint = 70;
 		up = new Button(comp, SWT.NONE);
 		up.setText("Up");
 		up.setLayoutData(gridData);	
@@ -193,6 +186,9 @@ public class FeatureOrderEditor extends EditorPart implements PropertyConstants,
 					featurelist.setItem(focus-1, featurelist.getItem(focus));
 					featurelist.setItem(focus, temp);
 					featurelist.setSelection(focus-1);
+					dirty = true;
+					firePropertyChange(EditorPart.PROP_DIRTY);
+					
 				}
 			}
 		});
@@ -208,23 +204,26 @@ public class FeatureOrderEditor extends EditorPart implements PropertyConstants,
 					featurelist.setItem(focus+1, featurelist.getItem(focus));
 					featurelist.setItem(focus, temp);
 					featurelist.setSelection(focus+1);
+					dirty = true;
+					firePropertyChange(PROP_DIRTY);
+				
 				}
 			}
 		});
-		save = new Button(comp, SWT.NONE);
-		save.setText("SaveOrder");
-		save.setLayoutData(gridData);
-		save.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
-			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
-				featureOrderWriter();
-//				try {
+//		save = new Button(comp, SWT.NONE);
+//		save.setText("SaveOrder");
+//		save.setLayoutData(gridData);
+//		save.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
+//			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
+//				featureOrderWriter();
+//			try {
 //					new ConfigurationWriter(configuration).saveToFile(((IFile) input.getAdapter(IFile.class)));
 //				} catch (CoreException e1) {
 //					// 
 //					e1.printStackTrace();
-//				}				
-			}
-		});
+//			}				
+//			}
+//		});
 		
 	}
 
@@ -274,17 +273,15 @@ public class FeatureOrderEditor extends EditorPart implements PropertyConstants,
 	}
 
 
+
+
 	/* (non-Javadoc)
-	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+	 * @see org.eclipse.ui.part.EditorPart#isDirty()
 	 */
 	@Override
-	public void propertyChange(PropertyChangeEvent event) {
-		String prop = event.getPropertyName();
-		if (prop.equals(FEATURE_NAME_CHANGED))
-		{
-	
-		}
-			
+	public boolean isDirty() {
+		return dirty;
+		
 		
 	}
 
