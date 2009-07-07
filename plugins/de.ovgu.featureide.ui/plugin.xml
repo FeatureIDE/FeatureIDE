@@ -112,6 +112,12 @@
             id="featureide.ui.launching.LayeredApplicationShortcut"
             label="Layered Application"
             modes="run">
+         <contextualLaunch>
+            <contextLabel
+                  label="Feature Project"
+                  mode="run">
+            </contextLabel>
+            <enablement></enablement></contextualLaunch>
     </shortcut>
    </extension>
   
