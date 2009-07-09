@@ -48,8 +48,7 @@ import featureide.fm.core.FeatureModel;
 import featureide.fm.core.configuration.ConfigurationWriter;
 
 /**
- * New editor page for the feature model editor. In this editor you can change the 
- * order of features
+ * New editor page for the feature model editor. In this editor the order of the features can be change
  * 
  * @author Christian Becker
  */
@@ -74,6 +73,7 @@ public class FeatureOrderEditor extends EditorPart  {
 	private boolean dirty = false;
 	
 	
+	
 	//private FeatureModel featureModel;
 	
 	//private Configuration configuration; 
@@ -81,7 +81,7 @@ public class FeatureOrderEditor extends EditorPart  {
 	public FeatureOrderEditor(FeatureModel featureModel){
 		//this.featureModel = featureModel;
 		//configuration = new Configuration(featureModel, true);
-	//	featureModel.addListener(this);
+	
 	}
 	
 	
@@ -157,76 +157,77 @@ public class FeatureOrderEditor extends EditorPart  {
 		comp.setLayout(layout);
 		
 		Label label1 = new Label(comp,SWT.NONE);
-		label1.setText("Userdefine feature order");
+		label1.setText("User-defined feature order");
 		
 							
 		activate=new Button (comp,SWT.CHECK);
 		activate.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
 			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
-				ConfigurationWriter.userdefineorder=activate.getSelection();
-			
+				boolean selection =activate.getSelection();
+				ConfigurationWriter.userdefineorder=selection;
+				featurelist.setEnabled(selection);
+				up.setEnabled(selection);
+				down.setEnabled(selection);
+				
 			}});
 		
-		featurelist = new List(comp, SWT.NONE);
+		featurelist = new List(comp, SWT.NONE | SWT.BORDER | SWT.V_SCROLL );
 		gridData = new GridData(GridData.FILL_BOTH);
 		gridData.horizontalSpan = 2;
-		gridData.verticalSpan = 8;
+		gridData.grabExcessHorizontalSpace=true;
+		gridData.verticalSpan = 3;
+		gridData.grabExcessVerticalSpace = true;
 		featurelist.setLayoutData(gridData);
+		featurelist.setEnabled(false);
 		
-		gridData = new GridData(GridData.GRAB_HORIZONTAL);
+		gridData=new GridData(GridData.HORIZONTAL_ALIGN_END);
 		gridData.widthHint = 70;
 		up = new Button(comp, SWT.NONE);
 		up.setText("Up");
 		up.setLayoutData(gridData);	
+		up.setEnabled(false);
 		up.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
 			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
-				int focus = featurelist.getFocusIndex();
-				if(focus != 0){ //First Element is selected, no change
-					String temp = featurelist.getItem(focus-1);			
-					featurelist.setItem(focus-1, featurelist.getItem(focus));
-					featurelist.setItem(focus, temp);
-					featurelist.setSelection(focus-1);
-					dirty = true;
-					firePropertyChange(EditorPart.PROP_DIRTY);
-					
-				}
+					int focus = featurelist.getFocusIndex();
+					if (focus != 0) { // First Element is selected, no change
+						String temp = featurelist.getItem(focus - 1);
+						featurelist.setItem(focus - 1, featurelist
+								.getItem(focus));
+						featurelist.setItem(focus, temp);
+						featurelist.setSelection(focus - 1);
+						dirty = true;
+						firePropertyChange(EditorPart.PROP_DIRTY);
+
+					}
 			}
 		});
 ;
 		down = new Button(comp, SWT.NONE);
 		down.setText("Down");
 		down.setLayoutData(gridData);
+		down.setEnabled(false);
 		down.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
-			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
-				int focus = featurelist.getFocusIndex();
-				if(focus != featurelist.getItemCount()-1){ //Last Element is selected, no change
-					String temp = featurelist.getItem(focus+1);
-					featurelist.setItem(focus+1, featurelist.getItem(focus));
-					featurelist.setItem(focus, temp);
-					featurelist.setSelection(focus+1);
-					dirty = true;
-					firePropertyChange(PROP_DIRTY);
-				
-				}
-			}
-		});
-//		save = new Button(comp, SWT.NONE);
-//		save.setText("SaveOrder");
-//		save.setLayoutData(gridData);
-//		save.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
-//			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
-//				featureOrderWriter();
-//			try {
-//					new ConfigurationWriter(configuration).saveToFile(((IFile) input.getAdapter(IFile.class)));
-//				} catch (CoreException e1) {
-//					// 
-//					e1.printStackTrace();
-//			}				
-//			}
-//		});
-		
+			public void widgetSelected(	org.eclipse.swt.events.SelectionEvent e) {
+						int focus = featurelist.getFocusIndex();
+						if (focus != featurelist.getItemCount() - 1) { // Last Element is selected, no  change	 
+								String temp = featurelist.getItem(focus + 1);
+								featurelist.setItem(focus + 1, featurelist
+										.getItem(focus));
+								featurelist.setItem(focus, temp);
+								featurelist.setSelection(focus + 1);
+								dirty = true;
+								firePropertyChange(PROP_DIRTY);
+
+							}
+						}
+					//}
+				});
 	}
 
+	/**
+	 * Write the order of the features in the .order file in the feature project directory
+	 */
+	
 	public void featureOrderWriter(){
 	
 		File file = ((IFile) input.getAdapter(IFile.class)).
