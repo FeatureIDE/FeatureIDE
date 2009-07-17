@@ -1,0 +1,2 @@
+emma.jar is a patched 2.0.5312 which fixes an AIOB exception on 64 bit linux
+http://lukas.zapletalovi.com/blog:emma_code_coverage_tool_fixed_version
