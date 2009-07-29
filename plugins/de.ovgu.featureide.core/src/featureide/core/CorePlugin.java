@@ -50,8 +50,6 @@ import featureide.fm.core.io.guidsl.FeatureModelWriter;
  * @author Thomas Thuem
  */
 public class CorePlugin extends AbstractCorePlugin {
-
-	this causes an error on purpose
 	
 	public static final String PLUGIN_ID = "de.ovgu.featureide.core";
 	
