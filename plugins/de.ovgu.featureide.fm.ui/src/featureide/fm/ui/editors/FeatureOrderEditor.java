@@ -31,6 +31,7 @@ import java.util.Scanner;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.SWT;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
@@ -74,12 +75,12 @@ public class FeatureOrderEditor extends EditorPart  {
 	
 	
 	
-	//private FeatureModel featureModel;
+	private FeatureModel featureModel;
 	
-	//private Configuration configuration; 
+//	private Configuration configuration; 
 	
 	public FeatureOrderEditor(FeatureModel featureModel){
-		//this.featureModel = featureModel;
+		this.featureModel = featureModel;
 		//configuration = new Configuration(featureModel, true);
 	
 	}
@@ -92,6 +93,13 @@ public class FeatureOrderEditor extends EditorPart  {
 	public void doSave(IProgressMonitor monitor) {
 
 		featureOrderWriter();
+		try {
+	//		new ConfigurationWriter(configuration).saveToFile();
+			new ConfigurationWriter().saveToFile();
+		} catch (CoreException e) {
+
+			e.printStackTrace();
+		}
 		dirty = false;
 		firePropertyChange(IEditorPart.PROP_DIRTY);
 		
@@ -163,8 +171,8 @@ public class FeatureOrderEditor extends EditorPart  {
 		activate=new Button (comp,SWT.CHECK);
 		activate.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
 			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
-				boolean selection =activate.getSelection();
-				ConfigurationWriter.userdefineorder=selection;
+				boolean selection = activate.getSelection();
+				ConfigurationWriter.setUserDefinedOrder(selection);
 				featurelist.setEnabled(selection);
 				up.setEnabled(selection);
 				down.setEnabled(selection);

@@ -32,18 +32,31 @@ import featureide.fm.core.Feature;
 
 public class ConfigurationWriter {
 
-	private Configuration configuration;
+	//private Configuration configuration;
 	
-	public static boolean userdefineorder = false;
-
+	private static boolean userdefinedorder = false;
+	
+	private static IFile defaultEquationFile;
+		
+	private static Configuration configuration; 
+	
 	public ConfigurationWriter(Configuration configuration) {
-		this.configuration = configuration;
+		ConfigurationWriter.configuration = configuration;
+	}
+	
+	public ConfigurationWriter(){
+		
+	}
+		
+	
+	public void saveToFile() throws CoreException{
+		saveToFile(defaultEquationFile);
 	}
 	
 	public void saveToFile(IFile file) throws CoreException {
 		InputStream source;
 		StringBuffer buffer = new StringBuffer();
-		if(userdefineorder){
+		if(userdefinedorder){
 			FeatureOrderReader reader = new FeatureOrderReader( ((IFile) file.getAdapter(IFile.class)).getProject().getLocation().toFile());
 			//source = new ByteArrayInputStream(reader.featureOrderRead().toString().getBytes());
 			ArrayList<String> list = reader.featureOrderRead();
@@ -84,5 +97,15 @@ public class ConfigurationWriter {
 		for (TreeElement child : feature.getChildren())
 			writeSelectedFeatures((SelectableFeature) child, out);
 	}
+	
+	public static void setDefaultSetting(IFile equationfile, Configuration config){
+		defaultEquationFile = equationfile;
+		configuration = config;
+	}
+	
+	public static void setUserDefinedOrder(boolean status){
+		userdefinedorder = status;
+	}
+	
 	
 }
