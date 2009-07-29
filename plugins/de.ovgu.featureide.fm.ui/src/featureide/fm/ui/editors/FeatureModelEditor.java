@@ -79,6 +79,7 @@ import featureide.fm.core.io.xml.XmlFeatureModelWriter;
 import featureide.fm.ui.editors.featuremodel.FeatureModelEditorContributor;
 import featureide.fm.ui.editors.featuremodel.GEFImageWriter;
 import featureide.fm.ui.editors.featuremodel.GUIDefaults;
+import featureide.fm.ui.editors.featuremodel.actions.AddConstraintAction;
 import featureide.fm.ui.editors.featuremodel.actions.AlternativeAction;
 import featureide.fm.ui.editors.featuremodel.actions.AndAction;
 import featureide.fm.ui.editors.featuremodel.actions.CreateCompoundAction;
@@ -105,7 +106,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 	private GraphicalViewerImpl graphicalViewer;
 
 	private TextEditor textEditor;
-
+	
 	private int graphicalViewerIndex;
 
 	private int textEditorIndex;
@@ -144,6 +145,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 
 	private RedoAction redoAction;
 	
+	private AddConstraintAction constraintAction;
+	
 	private ZoomInAction zoomIn;
 	
 	private ZoomOutAction zoomOut;
@@ -164,6 +167,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 		
 		
 		IFile file = (IFile) input.getAdapter(IFile.class);
+		
 		grammarFile = new GrammarFile(file);
 		setPartName(file.getProject().getName() + " Model");
 		setTitleToolTip(input.getToolTipText());
@@ -250,12 +254,14 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 		andAction = new AndAction(graphicalViewer, featureModel);
 		orAction = new OrAction(graphicalViewer, featureModel);
 		alternativeAction = new AlternativeAction(graphicalViewer, featureModel);
+		constraintAction = new AddConstraintAction(graphicalViewer, featureModel);
 		printAction = new PrintAction(this);
 		selectAllAction = new SelectAllAction(this);
 		undoAction = new UndoAction(this);
 		redoAction = new RedoAction(this);
 		zoomIn = new ZoomInAction(zoomManager);
 		zoomOut = new ZoomOutAction(zoomManager);
+	
 	}
 
 	private void createContextMenu() {
@@ -277,12 +283,15 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 			menu.add(andAction);
 			menu.add(orAction);
 			menu.add(alternativeAction);
+			
 		} else {
 			menu.add(createLayerAction);
 			menu.add(createCompoundAction);
 			menu.add(deleteAction);
 			menu.add(mandantoryAction);
+			
 		}
+		menu.add(constraintAction);
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
 
