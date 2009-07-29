@@ -113,7 +113,9 @@ public class ConfigurationEditor extends EditorPart {
 
 		IFeatureProject featureProject = CorePlugin.getProjectData(file);
 		final FeatureModel featureModel = featureProject.getFeatureModel();
-
+		
+	//	ConfigurationWriter.equationfile=featureProject.getCurrentEquationFile();
+		
 		configuration = new Configuration(featureModel, true);
 		try {
 			dirty = !new ConfigurationReader(configuration).readFromFile(file);
@@ -122,6 +124,10 @@ public class ConfigurationEditor extends EditorPart {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		//ConfigurationWriter.configuration = configuration;
+		ConfigurationWriter.setDefaultSetting(file, configuration);
+		
 		firePropertyChange(IEditorPart.PROP_DIRTY);
 	}
 
