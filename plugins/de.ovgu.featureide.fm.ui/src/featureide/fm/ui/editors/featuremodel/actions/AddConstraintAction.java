@@ -18,12 +18,8 @@
  */
 package featureide.fm.ui.editors.featuremodel.actions;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -37,9 +33,8 @@ import org.prop4j.NodeWriter;
 
 import featureide.fm.core.Feature;
 import featureide.fm.core.FeatureModel;
-import guidsl.AstNode;
-import guidsl.ParseException;
-import guidsl.Parser;
+import featureide.fm.core.io.guidsl.FeatureModelReader;
+import featureide.fm.core.io.guidsl.FeatureModelWriter;
 
 /**
  * TODO description
@@ -50,7 +45,7 @@ public class AddConstraintAction extends Action {
 
 	private GraphicalViewerImpl viewer;
 	
-	private FeatureModel featuremodel;
+	protected FeatureModel featuremodel;
 	
 	private Shell shell;
 	
@@ -66,18 +61,26 @@ public class AddConstraintAction extends Action {
 	
 	private Text constraint;
 	
+	private FeatureModelWriter writer;
+	
+	protected String featuretext;
+	
 	
 	public AddConstraintAction(GraphicalViewerImpl viewer, FeatureModel featuremodel){
 		super("Add propositional constraint");
 		this.viewer =  viewer;
 		this.featuremodel=featuremodel;
+		//new FeatureModelWriter(featuremodel).writeToString();
+		
 	
 	//	viewer.s
 	}
 	
 	public void run(){
+		writer = new FeatureModelWriter(featuremodel);
+		featuretext=writer.writeToString();
 		createEditor();
-			
+		//System.out.println("Test"+new FeatureModelWriter(featuremodel).writeToString());
 	
 	}
 	
@@ -105,11 +108,7 @@ public class AddConstraintAction extends Action {
 		add.setText("Add feature");
 		add.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
 			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {	
-				System.out.println("Klick!");
-			
-				
-				for (Node node : featuremodel.getPropositionalNodes())
-					System.out.println(node.toString(NodeWriter.textualSymbols) + " ;\r\n");
+
 				constraint.append(features.getItem( features.getSelectionIndex())+" ");
 			}
 		});
@@ -130,14 +129,25 @@ public class AddConstraintAction extends Action {
 	    gridData = new GridData(GridData.FILL_HORIZONTAL);
 	    gridData.horizontalSpan=3;
 	    constraint.setLayoutData(gridData);
-	    
 	    new Label(shell, SWT.NONE);
 		ok = new Button(shell, SWT.NONE);
 		ok.setText("Ok");
 		ok.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
 			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
-				System.out.println(constraint.getText().trim()+";");
-
+				try {	
+					//FeatureModelReader reader =	new FeatureModelReader( new FeatureModel());
+					
+					Node propNode = new FeatureModelReader ( new FeatureModel() )
+									.readPropositionalString(constraint.getText(), featuremodel);
+					//Node propNode= reader.readPropositionalString(constraint.getText(), featuremodel);
+					featuremodel.addPropositionalNode(propNode);
+					//System.out.println(propNode.toString(NodeWriter.textualSymbols));
+				} catch (Exception e1) {
+					System.out.println("Error");
+					e1.printStackTrace();
+				}
+				
+				featuremodel.handleModelDataChanged();
 				shell.dispose();
 			}
 		});

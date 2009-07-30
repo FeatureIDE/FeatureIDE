@@ -20,6 +20,7 @@ package featureide.fm.core.io.guidsl;
 
 import java.io.InputStream;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.prop4j.And;
 import org.prop4j.Choose;
@@ -290,6 +291,21 @@ public class FeatureModelReader extends AbstractFeatureModelReader {
 		//TODO #31: reading annotations not yet implemented
 	}
 
+	public Node readPropositionalString(String propString, FeatureModel featureModel) throws UnsupportedModelException{
+		//String featureString = new FeatureModelWriter(featureModel).writeToString();
+		StringBuffer featureString= new StringBuffer(
+									new FeatureModelWriter(featureModel).writeToString());		
+		if( featureModel.getConstraintCount()== 0)
+			featureString.append("%%\r\n");
+		featureString.append(propString);
+		readFromString(featureString.toString());
+		List<Node> propNodes = getFeatureModel().getPropositionalNodes();
+		
+		//FeatureModel nodeModel = getFeatureModel();
+		
+		return propNodes.get(propNodes.size()-1);
+	}
+	
 	@SuppressWarnings("unused")
 	private void print(String tab, AstNode node) {
 		if (node != null) {
