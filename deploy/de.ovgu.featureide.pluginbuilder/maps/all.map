@@ -7,5 +7,7 @@ plugin@de.ovgu.featureide.ui=COPY,/vol1/teamcity_itidb/TeamCity/buildAgent/work/
 plugin@de.ovgu.featureide.ui.ahead=COPY,/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/plugins,de.ovgu.featureide.ui.ahead
 plugin@de.ovgu.featureide.ui.ahead.refactoring=COPY,/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/plugins,de.ovgu.featureide.ui.ahead.refactoring
 plugin@de.ovgu.featureide.ui.doc=COPY,/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/plugins,de.ovgu.featureide.ui.doc
+feature@de.ovgu.featureide.featurecpp=COPY,/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/deploy,de.ovgu.featureide.featurecpp
+plugin@de.ovgu.featureide.core.featurecpp=COPY,/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/plugins,de.ovgu.featureide.core.featurecpp
 feature@de.ovgu.featureide.featurehouse=COPY,/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/deploy,de.ovgu.featureide.featurehouse
 plugin@de.ovgu.featureide.core.featurehouse=COPY,/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/plugins,de.ovgu.featureide.core.featurehouse
