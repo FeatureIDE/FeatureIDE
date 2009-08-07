@@ -18,10 +18,6 @@
 			<property name="type" value="feature" />
 			<property name="id" value="de.ovgu.featureide.featurehouse" />
 		</ant>
-		<ant antfile="${genericTargets}" target="${target}">
-			<property name="type" value="feature" />
-			<property name="id" value="de.ovgu.featureide.test" />
-		</ant>
 		
 	</target>
 
@@ -44,11 +40,6 @@
 		</ant>
 	</target>
 	<target name="assemble.de.ovgu.featureide.featurehouse">
-		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
-			<property name="zipargs" value="" />
-		</ant>
-	</target>
-	<target name="assemble.de.ovgu.featureide.test">
 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
 			<property name="zipargs" value="" />
 		</ant>
