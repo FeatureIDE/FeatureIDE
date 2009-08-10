@@ -47,5 +47,4 @@ public class FMCoreTest {
 			throw new RuntimeException("Error", e);
 		}
 	}
-
 }
