@@ -12,7 +12,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.editors,
  de.ovgu.featureide.core,
  de.ovgu.featureide.fm.ui,
- de.ovgu.featureide.ui.ahead
+ de.ovgu.featureide.ui.ahead,
+ de.ovgu.featureide.fm.core
 Bundle-ActivationPolicy: lazy
 Export-Package: featureide.refactoring
 Bundle-ClassPath: .,
