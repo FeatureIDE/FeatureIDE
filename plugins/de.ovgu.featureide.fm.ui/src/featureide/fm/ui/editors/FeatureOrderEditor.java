@@ -75,12 +75,12 @@ public class FeatureOrderEditor extends EditorPart  {
 	
 	
 	
-	private FeatureModel featureModel;
+//	private FeatureModel featureModel;
 	
 //	private Configuration configuration; 
 	
 	public FeatureOrderEditor(FeatureModel featureModel){
-		this.featureModel = featureModel;
+//		this.featureModel = featureModel;
 		//configuration = new Configuration(featureModel, true);
 	
 	}

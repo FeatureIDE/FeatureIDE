@@ -29,7 +29,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.prop4j.Node;
-import org.prop4j.NodeWriter;
 
 import featureide.fm.core.Feature;
 import featureide.fm.core.FeatureModel;

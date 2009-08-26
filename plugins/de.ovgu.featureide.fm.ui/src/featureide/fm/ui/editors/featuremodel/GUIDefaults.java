@@ -70,6 +70,7 @@ public interface GUIDefaults {
 	public static Color DECORATOR_FOREGROUND = CONNECTION_FOREGROUND;
 	public static Color DECORATOR_BACKGROUND = DIAGRAM_BACKGROUND;
 	public static int SOURCE_ANCHOR_DIAMETER = 9;
+	@SuppressWarnings("all")
 	public static int TARGET_ANCHOR_DIAMETER = HALF_ARC ? 20 : 50;
 	
 	//cross-tree constraints

@@ -568,9 +568,9 @@ public class WaterlooReader extends AbstractFeatureModelReader {
 			return indentation;
 		}
 
-		public void setIndentation(int indentation) {
-			this.indentation = indentation;
-		}
+//		public void setIndentation(int indentation) {
+//			this.indentation = indentation;
+//		}
     }
     
     private class FeatCardinality {

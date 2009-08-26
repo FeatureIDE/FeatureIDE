@@ -66,7 +66,9 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 		
 		Rectangle r = calculateRectangle();
 
+		@SuppressWarnings("all")
 		int angle1 = HALF_ARC ? 180 : calculateAngle(r.getCenter(), referencePoint);
+		@SuppressWarnings("all")
 		int angle2 = HALF_ARC ? 360 : calculateAngle(r.getCenter(), FeatureUIHelper.getSourceLocation(lastChild));
 
 		if (angle1 + 1 < angle2)
@@ -81,7 +83,9 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 		Rectangle r = calculateRectangle();
 		r.shrink(lineWidth, lineWidth);
 
+		@SuppressWarnings("all")
 		int angle1 = HALF_ARC ? 180 : calculateAngle(r.getCenter(), referencePoint);
+		@SuppressWarnings("all")
 		int angle2 = HALF_ARC ? 360 : calculateAngle(r.getCenter(), FeatureUIHelper.getSourceLocation(lastChild));
 
 		if (angle1 + 1 < angle2)
