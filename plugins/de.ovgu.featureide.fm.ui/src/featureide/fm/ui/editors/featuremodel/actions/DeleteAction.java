@@ -31,15 +31,18 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
 
+import featureide.fm.core.Constraint;
 import featureide.fm.core.Feature;
 import featureide.fm.core.FeatureModel;
+import featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 import featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
 
 /**
  * Deletes the selected features and moves their unselected children upwards.
- * 
+ * Also deletes the selected propositional constraint.
  * @author Thomas Thuem
+ * @author Christian Becker
  */
 public class DeleteAction extends Action {
 
@@ -77,6 +80,10 @@ public class DeleteAction extends Action {
 		Iterator iter = selection.iterator();
 		while (iter.hasNext()) {
 			Object editPart = iter.next();
+			if ( editPart instanceof ConstraintEditPart ){ 
+				Constraint constraint = ((ConstraintEditPart)editPart).getConstraintModel();
+				featureModel.removePropositionalNode(constraint.getNode());
+			}
 			if (!(editPart instanceof FeatureEditPart))
 				continue;
 			Feature feature = ((FeatureEditPart) editPart)
