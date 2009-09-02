@@ -16,6 +16,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
+
 package featureide.core;
 
 import java.util.Collection;
