@@ -148,6 +148,11 @@ public class FeatureModel implements PropertyConstants {
 		constraints.remove(constraints.size() - 1);
 	}
 
+	public void removePropositionalNode(Constraint constraint){
+		propNodes.remove(constraint.getNode());
+		constraints.remove(constraint);
+	}
+	
 	public void removePropositionalNode(int index) {
 		propNodes.remove(index);
 		constraints.remove(constraints.size() - 1);

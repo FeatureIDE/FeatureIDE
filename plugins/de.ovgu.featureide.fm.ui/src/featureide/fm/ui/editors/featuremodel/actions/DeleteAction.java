@@ -30,7 +30,6 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
-
 import featureide.fm.core.Constraint;
 import featureide.fm.core.Feature;
 import featureide.fm.core.FeatureModel;
@@ -81,8 +80,10 @@ public class DeleteAction extends Action {
 		while (iter.hasNext()) {
 			Object editPart = iter.next();
 			if ( editPart instanceof ConstraintEditPart ){ 
-				Constraint constraint = ((ConstraintEditPart)editPart).getConstraintModel();
-				featureModel.removePropositionalNode(constraint.getNode());
+				Constraint constraint = ((ConstraintEditPart)editPart).getConstraintModel();				
+				featureModel.removePropositionalNode(constraint);
+
+				//System.out.println("Test " + constraint.getNode().toString());
 			}
 			if (!(editPart instanceof FeatureEditPart))
 				continue;
