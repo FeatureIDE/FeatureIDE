@@ -18,9 +18,13 @@
  */
 package featureide.fm.ui.editors.featuremodel.actions;
 
+import java.util.Iterator;
+
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -29,148 +33,210 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.prop4j.Node;
+import org.prop4j.NodeWriter;
 
+import featureide.fm.core.Constraint;
 import featureide.fm.core.Feature;
 import featureide.fm.core.FeatureModel;
+import featureide.fm.core.io.UnsupportedModelException;
 import featureide.fm.core.io.guidsl.FeatureModelReader;
 import featureide.fm.core.io.guidsl.FeatureModelWriter;
+import featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 
 /**
- * TODO description
+ *  Add propositional constraint and edit existing constraints
  * 
  * @author Christian Becker
  */
 public class AddConstraintAction extends Action {
 
 	private GraphicalViewerImpl viewer;
-	
+
 	protected FeatureModel featuremodel;
-	
+
 	private Shell shell;
-	
+
 	private Button ok;
-	
+
 	private Button cancel;
-	
+
 	private Button add;
-	
+
 	private Button implies;
-	
+
 	private Combo features;
-	
-	private Text constraint;
-	
+
+	private Text constraintText;
+
+	private Label errorMessage;
+
+	private Label errorMarker;
+
 	private FeatureModelWriter writer;
-	
+
 	protected String featuretext;
-	
-	
-	public AddConstraintAction(GraphicalViewerImpl viewer, FeatureModel featuremodel){
+
+	private Image errorImage;
+
+	private Constraint oldConstraint;
+
+	public AddConstraintAction(GraphicalViewerImpl viewer,
+			FeatureModel featuremodel) {
 		super("Add propositional constraint");
-		this.viewer =  viewer;
-		this.featuremodel=featuremodel;
-		//new FeatureModelWriter(featuremodel).writeToString();
-		
-	
-	//	viewer.s
+		this.viewer = viewer;
+		this.featuremodel = featuremodel;
 	}
-	
-	public void run(){
+
+	@SuppressWarnings("unchecked")
+	public void run() {
 		writer = new FeatureModelWriter(featuremodel);
-		featuretext=writer.writeToString();
+		featuretext = writer.writeToString();
 		createEditor();
-		//System.out.println("Test"+new FeatureModelWriter(featuremodel).writeToString());
-	
+
+		oldConstraint = null;
+		IStructuredSelection selection = (IStructuredSelection) viewer
+				.getSelection();
+		Iterator iter = selection.iterator();
+		while (iter.hasNext()) {
+			Object editPart = iter.next();
+			if (editPart instanceof ConstraintEditPart) {
+				oldConstraint = ((ConstraintEditPart) editPart)
+						.getConstraintModel();
+				constraintText.setText(oldConstraint.getNode().toString(
+						NodeWriter.textualSymbols));
+			}
+		}
 	}
-	
-	private void createEditor(){
+
+	private void createEditor() {
 		shell = new Shell(viewer.getControl().getDisplay());
-		shell.setText("Add propositional constraint");
-		shell.setSize(400,130);
+		if (oldConstraint == null) {
+			shell.setText("Add propositional constraint");
+		} else {
+			shell.setText("Edit propositional constraint");
+		}
+		shell.setSize(400, 180);
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 3;
 		shell.setLayout(layout);
+
 		GridData gridData;
-				
+		errorMarker = new Label(shell, SWT.NONE);
+		errorImage = shell.getDisplay().getSystemImage(SWT.ICON_ERROR);
+		gridData = new GridData();
+
+		gridData.widthHint = 32;
+		gridData.heightHint = 32;
+		errorMarker.setLayoutData(gridData);
+
+		errorMessage = new Label(shell, SWT.SINGLE);
+		gridData = new GridData(GridData.FILL_HORIZONTAL);
+		gridData.grabExcessHorizontalSpace = true;
+
+		gridData.horizontalSpan = 2;
+		errorMessage.setLayoutData(gridData);
+
 		features = new Combo(shell, SWT.READ_ONLY);
 		features.setText("Features");
-		//features.setItems(new String[]{"First", "Second", "Third"});
-		for(Feature ft: featuremodel.getFeatures()){
-	       	features.add(ft.getName());
-		}	
+
+		for (Feature ft : featuremodel.getFeatures()) {
+			features.add(ft.getName());
+		}
 		features.select(0);
-		
-	    gridData = new GridData(GridData.FILL_HORIZONTAL);
-	    features.setLayoutData(gridData);
-	    
-		add = new Button (shell, SWT.NONE);
+
+		gridData = new GridData(GridData.FILL_HORIZONTAL);
+		features.setLayoutData(gridData);
+
+		add = new Button(shell, SWT.NONE);
 		add.setText("Add feature");
 		add.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
-			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {	
+			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
 
-				constraint.append(features.getItem( features.getSelectionIndex())+" ");
+				constraintText.append(features.getItem(features
+						.getSelectionIndex())
+						+ " ");
 			}
 		});
 		gridData = new GridData();
-	    add.setLayoutData(gridData);
-	    
-	    implies = new Button (shell, SWT.NONE);
-	    implies.setText("Implies");
-	    implies.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
-			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {	
-				constraint.append("implies ");
-			}
-		});
-	    gridData = new GridData();
-	    implies.setLayoutData(gridData);
-	    
-	    constraint = new Text(shell, SWT.SINGLE | SWT.BORDER);
-	    gridData = new GridData(GridData.FILL_HORIZONTAL);
-	    gridData.horizontalSpan=3;
-	    constraint.setLayoutData(gridData);
-	    new Label(shell, SWT.NONE);
+		add.setLayoutData(gridData);
+
+		implies = new Button(shell, SWT.NONE);
+		implies.setText("Implies");
+		implies
+				.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
+					public void widgetSelected(
+							org.eclipse.swt.events.SelectionEvent e) {
+						constraintText.append("implies ");
+					}
+				});
+		gridData = new GridData();
+		implies.setLayoutData(gridData);
+
+		constraintText = new Text(shell, SWT.SINGLE | SWT.BORDER);
+		gridData = new GridData(GridData.FILL_HORIZONTAL);
+		gridData.horizontalSpan = 3;
+		constraintText.setLayoutData(gridData);
+		new Label(shell, SWT.NONE);
 		ok = new Button(shell, SWT.NONE);
 		ok.setText("Ok");
 		ok.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
 			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
-				try {	
-					//FeatureModelReader reader =	new FeatureModelReader( new FeatureModel());
-					
-					Node propNode = new FeatureModelReader ( new FeatureModel() )
-									.readPropositionalString(constraint.getText(), featuremodel);
-					//Node propNode= reader.readPropositionalString(constraint.getText(), featuremodel);
-					featuremodel.addPropositionalNode(propNode);
-					//System.out.println(propNode.toString(NodeWriter.textualSymbols));
-				} catch (Exception e1) {
-					System.out.println("Error");
-					e1.printStackTrace();
+
+				String input = constraintText.getText().trim();
+				if (input.length() != 0) {
+
+					// Check if the constraint ends with a ';' and add a ';'
+					// when not.
+					if (!input.endsWith(";")) {
+						StringBuffer temp = new StringBuffer(input);
+						temp.append(";");
+						input = temp.toString();
+					}
+					try {
+						Node propNode = new FeatureModelReader(
+								new FeatureModel()).readPropositionalString(
+								input, featuremodel);
+						featuremodel.addPropositionalNode(propNode);
+						featuremodel.handleModelDataChanged();
+						if (oldConstraint != null) {
+							featuremodel.removePropositionalNode(oldConstraint);
+							oldConstraint = null;
+						}
+						featuremodel.handleModelDataChanged();
+						shell.dispose();
+						// System.out.println(propNode.toString(NodeWriter.textualSymbols));
+					} catch (UnsupportedModelException e1) {
+						errorMarker.setImage(errorImage);
+						errorMessage.setText(e1.getMessage());
+					}
+				} else {
+					errorMarker.setImage(errorImage);
+					errorMessage.setText("Enter a constraint");
+					// errorMarker.setImage(errorImage);
 				}
-				
-				featuremodel.handleModelDataChanged();
-				shell.dispose();
+
 			}
 		});
 		gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
 		gridData.widthHint = 70;
 		ok.setLayoutData(gridData);
-		
-		cancel = new Button (shell, SWT.NONE);
+
+		cancel = new Button(shell, SWT.NONE);
 		cancel.setText("Abort");
-		cancel.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
-			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
-		
-				shell.dispose();
-			}
-		});
+		cancel
+				.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
+					public void widgetSelected(
+							org.eclipse.swt.events.SelectionEvent e) {
+
+						shell.dispose();
+					}
+				});
 		gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
 		gridData.widthHint = 70;
 		cancel.setLayoutData(gridData);
-		
-		shell.open ();
-		
+
+		shell.open();
 
 	}
-	
-	
-	
+
 }
