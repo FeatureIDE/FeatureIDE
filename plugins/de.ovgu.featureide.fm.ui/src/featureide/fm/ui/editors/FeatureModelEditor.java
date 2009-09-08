@@ -79,12 +79,13 @@ import featureide.fm.core.io.xml.XmlFeatureModelWriter;
 import featureide.fm.ui.editors.featuremodel.FeatureModelEditorContributor;
 import featureide.fm.ui.editors.featuremodel.GEFImageWriter;
 import featureide.fm.ui.editors.featuremodel.GUIDefaults;
-import featureide.fm.ui.editors.featuremodel.actions.AddConstraintAction;
 import featureide.fm.ui.editors.featuremodel.actions.AlternativeAction;
 import featureide.fm.ui.editors.featuremodel.actions.AndAction;
 import featureide.fm.ui.editors.featuremodel.actions.CreateCompoundAction;
 import featureide.fm.ui.editors.featuremodel.actions.CreateLayerAction;
 import featureide.fm.ui.editors.featuremodel.actions.DeleteAction;
+import featureide.fm.ui.editors.featuremodel.actions.EditConstraintAction;
+import featureide.fm.ui.editors.featuremodel.actions.InsertConstraintAction;
 import featureide.fm.ui.editors.featuremodel.actions.MandantoryAction;
 import featureide.fm.ui.editors.featuremodel.actions.OrAction;
 import featureide.fm.ui.editors.featuremodel.editparts.GraphicalEditPartFactory;
@@ -145,8 +146,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 
 	private RedoAction redoAction;
 	
-	private AddConstraintAction constraintAction;
-	
 	private ZoomInAction zoomIn;
 	
 	private ZoomOutAction zoomOut;
@@ -162,6 +161,10 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 	private ScalableFreeformRootEditPart rootEditPart;
 
 	private FeatureOrderEditor featureOrderEditor;
+
+	private EditConstraintAction editConstraintAction;
+
+	private InsertConstraintAction insertConStraintAction;
 	@Override
 	protected void setInput(IEditorInput input) {
 		
@@ -254,14 +257,14 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 		andAction = new AndAction(graphicalViewer, featureModel);
 		orAction = new OrAction(graphicalViewer, featureModel);
 		alternativeAction = new AlternativeAction(graphicalViewer, featureModel);
-		constraintAction = new AddConstraintAction(graphicalViewer, featureModel);
 		printAction = new PrintAction(this);
 		selectAllAction = new SelectAllAction(this);
 		undoAction = new UndoAction(this);
 		redoAction = new RedoAction(this);
 		zoomIn = new ZoomInAction(zoomManager);
 		zoomOut = new ZoomOutAction(zoomManager);
-	
+		editConstraintAction= new EditConstraintAction(graphicalViewer,featureModel, "Edit Constraint");
+		insertConStraintAction = new InsertConstraintAction(graphicalViewer, featureModel, "Insert Constraint");
 	}
 
 	private void createContextMenu() {
@@ -291,7 +294,9 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 			menu.add(mandantoryAction);
 			
 		}
-		menu.add(constraintAction);
+		menu.add(editConstraintAction);
+		menu.add(insertConStraintAction);
+		
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
 

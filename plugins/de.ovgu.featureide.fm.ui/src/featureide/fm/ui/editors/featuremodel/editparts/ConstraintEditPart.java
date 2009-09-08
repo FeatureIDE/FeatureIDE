@@ -23,8 +23,10 @@ import java.beans.PropertyChangeListener;
 
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.geometry.Point;
+import org.eclipse.gef.EditPolicy;
+import org.eclipse.gef.Request;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
-
+import org.eclipse.gef.editpolicies.NonResizableEditPolicy;
 import featureide.fm.core.Constraint;
 import featureide.fm.core.PropertyConstants;
 import featureide.fm.ui.editors.featuremodel.figures.ConstraintFigure;
@@ -35,6 +37,8 @@ import featureide.fm.ui.editors.featuremodel.figures.ConstraintFigure;
  * @author Thomas Thuem
  */
 public class ConstraintEditPart extends AbstractGraphicalEditPart implements PropertyConstants, PropertyChangeListener {
+	
+
 	
 	public ConstraintEditPart(Constraint constraint) {
 		super();
@@ -57,8 +61,7 @@ public class ConstraintEditPart extends AbstractGraphicalEditPart implements Pro
 
 	@Override
 	protected void createEditPolicies() {
-//		FeatureModel modelData = ((ModelEditPart) getParent()).getModelData();
-//		installEditPolicy(EditPolicy.DIRECT_EDIT_ROLE, new FeatureDirectEditPolicy(modelData, getConstraintModel()));
+		installEditPolicy(EditPolicy.SELECTION_FEEDBACK_ROLE, new NonResizableEditPolicy());		
 	}
 	
 //	private DirectEditManager manager;
@@ -80,6 +83,10 @@ public class ConstraintEditPart extends AbstractGraphicalEditPart implements Pro
 //			modelData.handleModelDataChanged();
 //		}
 //	}
+	
+	public void performRequest (Request request){
+	
+	}
 
 	@Override
 	public void activate() {
