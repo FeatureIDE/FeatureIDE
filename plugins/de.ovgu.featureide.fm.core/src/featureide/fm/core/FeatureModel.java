@@ -86,6 +86,7 @@ public class FeatureModel implements PropertyConstants {
 
 	private boolean abstractFeatures;
 
+		
 	public FeatureModel() {
 		reset();
 	}
@@ -243,8 +244,8 @@ public class FeatureModel implements PropertyConstants {
 	private void fireFeatureRenamed(String oldName, String newName) {
 		PropertyChangeEvent event = new PropertyChangeEvent(this,
 				FEATURE_NAME_CHANGED, oldName, newName);
-		for (PropertyChangeListener listener : listenerList)
-			listener.propertyChange(event);
+		for (PropertyChangeListener listener : listenerList){
+			listener.propertyChange(event);}
 	}
 
 	private void renameVariables(Node node, String oldName, String newName) {
@@ -288,6 +289,7 @@ public class FeatureModel implements PropertyConstants {
 			listener.propertyChange(event);
 	}
 
+	
 	public Collection<Feature> getFeatures() {
 		return Collections.unmodifiableCollection(featureTable.values());
 	}
@@ -613,4 +615,6 @@ public class FeatureModel implements PropertyConstants {
 				number++;
 		return number;
 	}
+
+	
 }

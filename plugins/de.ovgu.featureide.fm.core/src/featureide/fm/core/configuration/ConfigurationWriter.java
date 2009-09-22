@@ -31,13 +31,7 @@ import featureide.fm.core.Feature;
 
 
 public class ConfigurationWriter {
-
-	//private Configuration configuration;
 	
-	private static boolean userdefinedorder = false;
-	
-	private static IFile defaultEquationFile;
-		
 	private static Configuration configuration; 
 	
 	public ConfigurationWriter(Configuration configuration) {
@@ -48,15 +42,29 @@ public class ConfigurationWriter {
 		
 	}
 		
-	
-	public void saveToFile() throws CoreException{
-		saveToFile(defaultEquationFile);
-	}
-	
 	public void saveToFile(IFile file) throws CoreException {
 		InputStream source;
 		StringBuffer buffer = new StringBuffer();
-		if(userdefinedorder){
+		FeatureOrderReader reader = new FeatureOrderReader( ((IFile) file.getAdapter(IFile.class)).getProject().getLocation().toFile());
+		ArrayList<String> list = reader.featureOrderRead();
+		Set<Feature> featureset = configuration.getSelectedFeatures();
+		if(new String (list.get(0)).equals("true")){
+			list.remove(0);
+			for(String s:list){
+				for(Feature f: featureset){
+					if(f.isLayer()){
+						if(f.getName().equals(s))
+						buffer.append(s+"\r\n");
+					}
+				}
+			}
+			source = new ByteArrayInputStream(buffer.toString().getBytes());
+		}else{	
+			source = new ByteArrayInputStream(writeIntoString().getBytes());
+		
+		}
+		
+		/*if(userdefinedorder){
 			FeatureOrderReader reader = new FeatureOrderReader( ((IFile) file.getAdapter(IFile.class)).getProject().getLocation().toFile());
 			//source = new ByteArrayInputStream(reader.featureOrderRead().toString().getBytes());
 			ArrayList<String> list = reader.featureOrderRead();
@@ -76,7 +84,7 @@ public class ConfigurationWriter {
 		else{	
 			source = new ByteArrayInputStream(writeIntoString().getBytes());
 		
-		}
+		}*/
 		if (file.exists()) {
 			file.setContents(source, false, true, null);
 		}
@@ -97,15 +105,5 @@ public class ConfigurationWriter {
 		for (TreeElement child : feature.getChildren())
 			writeSelectedFeatures((SelectableFeature) child, out);
 	}
-	
-	public static void setDefaultSetting(IFile equationfile, Configuration config){
-		defaultEquationFile = equationfile;
-		configuration = config;
-	}
-	
-	public static void setUserDefinedOrder(boolean status){
-		userdefinedorder = status;
-	}
-	
 	
 }

@@ -18,6 +18,8 @@
  */
 package featureide.ui.editors;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -36,6 +38,7 @@ import org.eclipse.ui.part.EditorPart;
 import featureide.core.CorePlugin;
 import featureide.core.IFeatureProject;
 import featureide.fm.core.FeatureModel;
+import featureide.fm.core.PropertyConstants;
 import featureide.fm.core.configuration.Configuration;
 import featureide.fm.core.configuration.ConfigurationReader;
 import featureide.fm.core.configuration.ConfigurationWriter;
@@ -45,7 +48,7 @@ import featureide.fm.ui.editors.configuration.ConfigurationContentProvider;
 import featureide.fm.ui.editors.configuration.ConfigurationLabelProvider;
 import featureide.ui.UIPlugin;
 
-public class ConfigurationEditor extends EditorPart {
+public class ConfigurationEditor extends EditorPart implements PropertyChangeListener, PropertyConstants{
 
 	private TreeViewer viewer;
 
@@ -110,12 +113,11 @@ public class ConfigurationEditor extends EditorPart {
 		file = (IFile) input.getAdapter(IFile.class);
 		UIPlugin.getDefault().logInfo("file: " + file);
 		setPartName(file.getName());
-
+		
 		IFeatureProject featureProject = CorePlugin.getProjectData(file);
-		final FeatureModel featureModel = featureProject.getFeatureModel();
-		
-	//	ConfigurationWriter.equationfile=featureProject.getCurrentEquationFile();
-		
+		FeatureModel featureModel = featureProject.getFeatureModel();
+		System.out.println("Config "+featureModel.toString());
+		featureModel.addListener(this);
 		configuration = new Configuration(featureModel, true);
 		try {
 			dirty = !new ConfigurationReader(configuration).readFromFile(file);
@@ -123,11 +125,7 @@ public class ConfigurationEditor extends EditorPart {
 				dirty = !configuration.validManually();
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
-		
-		//ConfigurationWriter.configuration = configuration;
-		ConfigurationWriter.setDefaultSetting(file, configuration);
-		
+		}	
 		firePropertyChange(IEditorPart.PROP_DIRTY);
 	}
 
@@ -156,6 +154,19 @@ public class ConfigurationEditor extends EditorPart {
 	@Override
 	public void setFocus() {
 		viewer.getControl().setFocus();
+	}
+
+	/* (non-Javadoc)
+	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+	 */
+	@Override
+	public void propertyChange(PropertyChangeEvent evt) {
+		try {
+			new ConfigurationWriter(configuration).saveToFile(file);
+		} catch (CoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

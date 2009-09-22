@@ -165,11 +165,15 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 	private EditConstraintAction editConstraintAction;
 
 	private InsertConstraintAction insertConStraintAction;
+	
 	@Override
+	
 	protected void setInput(IEditorInput input) {
 		
 		
+		
 		IFile file = (IFile) input.getAdapter(IFile.class);
+		
 		
 		grammarFile = new GrammarFile(file);
 		setPartName(file.getProject().getName() + " Model");
@@ -181,14 +185,14 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 		featureModelReader = new FeatureModelReader(featureModel);
 		featureModelWriter = new FeatureModelWriter(featureModel);
 		xmlFeatureModelWriter = new XmlFeatureModelWriter(featureModel);
-		
-		
+				
 		originalFeatureModel = new FeatureModel();
 		try {
+
 			new FeatureModelReader(originalFeatureModel).readFromFile(file);
 		
 		} catch (Exception e) {
-		}
+		}	
 	}
 
 	public FeatureModel getOriginalFeatureModel() {
@@ -208,11 +212,11 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 	 * 
 	 */
 	private void createFeatureOrderPage() {
-		featureOrderEditor= new FeatureOrderEditor(getOriginalFeatureModel());
+		featureOrderEditor= new FeatureOrderEditor();
 		try {
 			featureOrderEditorIndex = addPage(featureOrderEditor, getEditorInput());
 			setPageText(featureOrderEditorIndex,"Feature order");
-			featureOrderEditor.setListItems(getOriginalFeatureModel().getFeatures());
+			featureOrderEditor.updateOrderEditor(getOriginalFeatureModel().getFeatures());
 		} catch (PartInitException e) {
 			
 			e.printStackTrace();
@@ -415,8 +419,45 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 			textEditor.setFocus();
 	}
 
+	private int oldPage;
 	@Override
 	protected void pageChange(int newPageIndex) {
+		if (oldPage == graphicalViewerIndex){
+			if(newPageIndex == textEditorIndex){
+				if (isPageModified)
+					updateTextEditorFromDiagram();
+			} else if (newPageIndex == featureOrderEditorIndex){
+				featureOrderEditor.updateOrderEditor(featureModel.getFeatures());
+				if (isPageModified){
+					updateTextEditorFromDiagram();
+				}
+			}else if (oldPage == newPageIndex){
+				updateDiagramFromTextEditor();
+			}
+		}else if (oldPage == textEditorIndex){
+			if ( newPageIndex == graphicalViewerIndex){
+				if (isDirty() || grammarFile.hasModelMarkers())
+					if (!updateDiagramFromTextEditor()) {
+						// there are errors in the file, stay at this editor page
+						isPageModified = false;
+						setActivePage(textEditorIndex);
+						return;
+					}
+			}	else if (newPageIndex == featureOrderEditorIndex){	
+				if (isDirty() || grammarFile.hasModelMarkers()){
+					
+					if (!updateDiagramFromTextEditor()) {
+						// there are errors in the file, stay at this editor page
+						isPageModified = false;
+						setActivePage(textEditorIndex);
+						return;
+					}else
+						featureOrderEditor.updateOrderEditor(featureModel.getFeatures());
+					}
+			}
+		}else if (oldPage == featureOrderEditorIndex){
+		}
+		/*
 		if (newPageIndex == textEditorIndex) {
 			if (isPageModified)
 				updateTextEditorFromDiagram();
@@ -435,16 +476,15 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 			//featureOrderEditor.setListItems(featureModel.getFeatures());
 		}
 			
-		
+		*/
 		isPageModified = false;
-
 
 		IEditorActionBarContributor contributor = getEditorSite()
 				.getActionBarContributor();
 		if (contributor instanceof FeatureModelEditorContributor)
 			((FeatureModelEditorContributor) contributor).setActivePage(this,
 					newPageIndex);
-
+		oldPage = newPageIndex;
 		super.pageChange(newPageIndex);
 
 	}
@@ -465,13 +505,12 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 			
 			isPageModified = false;
 			featureOrderEditor.doSave(monitor);
-			
+			updateTextEditorFromDiagram();
 			
 		}
 		isPageModified = false;
 		featureModel.performRenamings();
 		textEditor.doSave(monitor);
-		
 		try {
 			new FeatureModelReader(originalFeatureModel)
 					.readFromFile(grammarFile.getResource());
@@ -528,7 +567,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 		if (prop.equals(MODEL_DATA_CHANGED)) {
 			refreshGraphicalViewer();
 			
-			featureOrderEditor.setListItems(featureModel.getFeatures());
+			featureOrderEditor.updateOrderEditor(featureModel.getFeatures());
 		
 			isPageModified = true;
 			firePropertyChange(PROP_DIRTY);
