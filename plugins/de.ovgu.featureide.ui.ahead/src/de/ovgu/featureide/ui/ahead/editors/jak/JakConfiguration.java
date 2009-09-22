@@ -21,8 +21,11 @@ package de.ovgu.featureide.ui.ahead.editors.jak;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jdt.ui.text.IColorManager;
 import org.eclipse.jdt.ui.text.IJavaColorConstants;
+import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.TextAttribute;
+import org.eclipse.jface.text.contentassist.ContentAssistant;
+import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.BufferedRuleBasedScanner;
@@ -30,6 +33,7 @@ import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
+
 
 /**
  * 
@@ -62,6 +66,27 @@ public class JakConfiguration extends SourceViewerConfiguration {
 		reconciler.setRepairer(dr, JakPartitionScanner.JAK_JAVADOC);
 		
 		return reconciler;
+	}
+	
+	public IContentAssistant getContentAssistant(ISourceViewer sourceViewer){
+
+		ContentAssistant assistant = new ContentAssistant();
+		assistant.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
+		assistant.setContentAssistProcessor(new JakCompletionProcessor(), IDocument.DEFAULT_CONTENT_TYPE);
+		assistant.enableAutoActivation(true);
+		assistant.setAutoActivationDelay(500);
+		assistant.setProposalPopupOrientation(IContentAssistant.PROPOSAL_OVERLAY);
+		assistant.setContextInformationPopupOrientation(IContentAssistant.CONTEXT_INFO_ABOVE);
+		//assistant.enablePrefixCompletion(true);
+		
+		return assistant;
+	}
+	
+	
+	@Override
+	public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType) {
+		IAutoEditStrategy strategy= new JakAutoIndentStrategy();// : new DefaultIndentLineAutoEditStrategy());
+		return new IAutoEditStrategy[] { strategy };
 	}
 
 }
