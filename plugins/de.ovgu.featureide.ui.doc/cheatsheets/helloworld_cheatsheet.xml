@@ -70,8 +70,8 @@ Open the file und write the following code:<br/><br/>
 public void print(){<br/>
   System.out.print(&quot;Hello&quot;);<br/>
 }<br/>
-public static void main(String[args]) {<br/>
-  new Main.print();<br/>
+public static void main(String[] args) {<br/>
+  new Main().print();<br/>
 }
     </description>
     <subitem
