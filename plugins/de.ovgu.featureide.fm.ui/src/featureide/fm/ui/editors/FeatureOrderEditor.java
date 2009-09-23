@@ -128,6 +128,8 @@ public class FeatureOrderEditor extends EditorPart {
 	public void updateOrderEditor(Collection<Feature> features) {
 		featurelist.removeAll();
 		ArrayList<String> list = readFeaturesfromOrderFile();
+		// If the list is null, there is no order file or the userdefined order is not selected
+		// In this case the method will take the features from the collection
 		if (list == null) {
 			activate.setSelection(false);
 			enableUI(false);
@@ -276,30 +278,45 @@ public class FeatureOrderEditor extends EditorPart {
 			featurelist.add(scanner.next());
 		}
 	}
-
+/**
+ * 
+ * @return Return the FeatureOrder as an ArrayList. Return null if the "userdefined-order" is deactivate or if no order file exists.
+ * In this case the method will create a new file. 
+ */
 	public ArrayList<String> readFeaturesfromOrderFile() {
 		File file = ((IFile) input.getAdapter(IFile.class)).getProject()
 				.getLocation().toFile();
-		file = new File(file.toString() + "\\.order");
-		// featurelist.removeAll();
 		ArrayList<String> list;
 		Scanner scanner = null;
-		try {
-			scanner = new Scanner(file);
-		} catch (FileNotFoundException e) {
+		file = new File(file.toString() + "\\.order");
+		if (file.exists()){
+			try {
+				scanner = new Scanner(file);
+			} catch (FileNotFoundException e) {
 
-			e.printStackTrace();
-		}
-		if (scanner.next().equals("true")) {
-			list = new ArrayList<String>();
-			while (scanner.hasNext()) {
-				list.add(scanner.next());
+				e.printStackTrace();
 			}
-		} else {
-			list = null;
+			if (scanner.hasNext() && scanner.next().equals("true")) {
+				list = new ArrayList<String>();
+				while (scanner.hasNext()) {
+					list.add(scanner.next());
+				}
+				return list;
+			} else {
+				return null;
+			}
+		}else {
+			try {
+				file.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return null;
 		}
+		
+		// featurelist.removeAll();
 
-		return list;
+		//return list;
 	}
 
 	/*
