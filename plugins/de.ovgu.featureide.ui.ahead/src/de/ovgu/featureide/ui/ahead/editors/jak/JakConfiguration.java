@@ -73,11 +73,12 @@ public class JakConfiguration extends SourceViewerConfiguration {
 		ContentAssistant assistant = new ContentAssistant();
 		assistant.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
 		assistant.setContentAssistProcessor(new JakCompletionProcessor(), IDocument.DEFAULT_CONTENT_TYPE);
+		assistant.setContentAssistProcessor(new JakCompletionProcessor(), JakPartitionScanner.JAK_JAVADOC);
 		assistant.enableAutoActivation(true);
 		assistant.setAutoActivationDelay(500);
 		assistant.setProposalPopupOrientation(IContentAssistant.PROPOSAL_OVERLAY);
 		assistant.setContextInformationPopupOrientation(IContentAssistant.CONTEXT_INFO_ABOVE);
-		//assistant.enablePrefixCompletion(true);
+		assistant.enableColoredLabels(true);
 		
 		return assistant;
 	}
