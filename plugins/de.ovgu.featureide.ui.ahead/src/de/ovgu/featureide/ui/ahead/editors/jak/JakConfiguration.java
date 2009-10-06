@@ -82,8 +82,7 @@ public class JakConfiguration extends SourceViewerConfiguration {
 		
 		return assistant;
 	}
-	
-	
+		
 	@Override
 	public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType) {
 		IAutoEditStrategy strategy= new JakAutoIndentStrategy();// : new DefaultIndentLineAutoEditStrategy());
