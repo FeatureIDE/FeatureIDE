@@ -44,7 +44,7 @@ public class LayeredApplicationConfigurationTabGroup extends
 				new JavaClasspathTab()/*, 
 				new CommonTab()*/
 		};
+		
 		setTabs(tabs);
 	}
-
 }

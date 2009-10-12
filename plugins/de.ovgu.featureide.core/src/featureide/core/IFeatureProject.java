@@ -35,6 +35,8 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	
 	public static final QualifiedName equationConfigID = new QualifiedName("featureproject.configs", "currentEquation");
 	
+	public static final QualifiedName javaClassPathID = new QualifiedName("featureproject.configs", "javaClassPath");
+	
 	public void dispose();
 
 	/**
@@ -73,6 +75,13 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	public String getSourcePath();
 	
 	public String[] getJavaClassPath();
+	
+	/**
+	 * Gets the java class path without the default paths
+	 * 
+	 * @return The java class path without default paths
+	 */
+	public String[] getAdditionalJavaClassPath();
 
 	/**
 	 * Returns the name of the feature this resource belongs to, or <code>null</code> if thr the resource
@@ -139,5 +148,12 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	 *   feature projects and should not be changed afterwards.
 	 */
 	public void setComposer(IComposerExtension composerExtension);
+	
+	/**
+	 * Sets the JAVA class path that is in order to build the project
+	 * 
+	 * @param paths An array of paths that will be added to the JAVA class path
+	 */
+	public void setAdditionalJavaClassPath(String[] paths);
 
 }

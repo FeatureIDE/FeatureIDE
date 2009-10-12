@@ -13,6 +13,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import featureide.core.CorePlugin;
 import featureide.core.IFeatureProject;
 import featureide.core.listeners.ICurrentEquationListener;
+import featureide.core.listeners.IEquationChangedListener;
 
 public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 
@@ -54,6 +55,12 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		composerExtension.initialize(featureProject);
 		CorePlugin.getDefault().addCurrentEquationListener(new ICurrentEquationListener() {
 			public void currentEquationChanged(IFeatureProject featureProject) {
+				currentEquationFileChanged(featureProject);
+			}
+		});
+		CorePlugin.getDefault().addEquationChangedListener(new IEquationChangedListener() {
+			
+			public void equationChanged(IFeatureProject featureProject) {
 				currentEquationFileChanged(featureProject);
 			}
 		});

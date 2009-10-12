@@ -38,6 +38,7 @@ import featureide.core.builder.FeatureProjectNature;
 import featureide.core.internal.FeatureProject;
 import featureide.core.internal.ProjectChangeListener;
 import featureide.core.listeners.ICurrentEquationListener;
+import featureide.core.listeners.IEquationChangedListener;
 import featureide.core.listeners.IFeatureFolderListener;
 import featureide.core.listeners.IProjectListener;
 import featureide.fm.core.FeatureModel;
@@ -68,6 +69,8 @@ public class CorePlugin extends AbstractCorePlugin {
 	
 	private LinkedList<ICurrentEquationListener> currentEquationListeners = new LinkedList<ICurrentEquationListener>();
 
+	private LinkedList<IEquationChangedListener> equationChangedListeners = new LinkedList<IEquationChangedListener>();
+	
 	private LinkedList<IFeatureFolderListener> featureFolderListeners = new LinkedList<IFeatureFolderListener>();
 	
 	/**
@@ -176,6 +179,11 @@ public class CorePlugin extends AbstractCorePlugin {
 			currentEquationListeners.add(listener);
 	}
 	
+	public void addEquationChangedListener(IEquationChangedListener listener) {
+		if (!equationChangedListeners.contains(listener))
+			equationChangedListeners.add(listener);
+	}
+	
 	public void removeCurrentEquationListener(ICurrentEquationListener listener) {
 		currentEquationListeners.remove(listener);
 	}
@@ -183,6 +191,11 @@ public class CorePlugin extends AbstractCorePlugin {
 	public void fireCurrentEquationChanged(IFeatureProject featureProject) {
 		for (ICurrentEquationListener listener: currentEquationListeners)
 			listener.currentEquationChanged(featureProject);
+	}
+	
+	public void fireEquationChanged(IFeatureProject featureProject) {
+		for (IEquationChangedListener listener : equationChangedListeners)
+			listener.equationChanged(featureProject);
 	}
 
 	public void addFeatureFolderListener(IFeatureFolderListener listener) {

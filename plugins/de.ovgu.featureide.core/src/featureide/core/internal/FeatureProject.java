@@ -525,6 +525,32 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 				e.printStackTrace();
 			}
 		}
+		
+		String[] paths = getAdditionalJavaClassPath();
+		for (String path : paths)
+			cp.add(path);
+		
+		return cp.toArray(new String[cp.size()]);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see featureide.core.IFeatureProject#getAdditionalJavaClassPath()
+	 */
+	public String[] getAdditionalJavaClassPath() {
+		Vector<String> cp = new Vector<String>();
+		String classPath = null;
+		try {
+			classPath = project.getPersistentProperty(javaClassPathID);
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+		if (classPath != null) {
+			String[] paths = classPath.split(";");
+			for (String path : paths)
+				cp.add(path);
+		}
 		return cp.toArray(new String[cp.size()]);
 	}
 
@@ -571,6 +597,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			return;
 		final IFile file = (IFile) resource;
 		CorePlugin.getDefault().logInfo("Configuration " + file.getFullPath() + " changed");
+		CorePlugin.getDefault().fireEquationChanged(this);
 		Job job = new Job("Read Configuration") {
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
@@ -688,5 +715,20 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			description.setBuildSpec(commands);
 			project.setDescription(description, null);
 		} catch (CoreException ex) { }
+	}
+	
+	
+	public void setAdditionalJavaClassPath(String[] paths) {
+		StringBuilder builder = new StringBuilder();
+		if (paths.length > 0)
+			builder.append(paths[0]);
+		for (int i = 1; i < paths.length; ++i) {
+			builder.append(';');
+			builder.append(paths[i]);
+		}
+		try {
+			project.setPersistentProperty(javaClassPathID, builder.toString());
+		} catch (CoreException ex) {
+		}
 	}
 }

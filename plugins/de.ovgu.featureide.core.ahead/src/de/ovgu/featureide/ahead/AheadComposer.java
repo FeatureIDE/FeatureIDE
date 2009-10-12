@@ -37,6 +37,8 @@ import featureide.core.builder.IComposerExtensionClass;
  * @author Tom Brosch
  */
 public class AheadComposer implements IComposerExtensionClass {
+	
+	public static final String COMPOSER_ID = "de.ovgu.featureide.composer.ahead";
 
 	private AheadWrapper ahead;
 	

@@ -72,7 +72,7 @@ public class JavacWrapper {
 	}
 
 	public void compile(IFile[] files) {
-		String sep = System.getProperty("os.name").contains("Windows") ? ";" : ":" ;
+		String sep = System.getProperty("path.separator");
 		String classpath = "";
 		for (String path : featureProject.getJavaClassPath())
 			classpath += sep + path;

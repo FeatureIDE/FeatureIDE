@@ -41,7 +41,7 @@ import featureide.core.builder.FeatureProjectNature;
 
 /**
  * 
- * TODO description
+ * The composer class for FeatureC++
  * 
  * @author Tom Brosch
  */
@@ -118,19 +118,6 @@ public class AddFeatureCppComposer implements IObjectActionDelegate {
 						cp.logError(e);
 					}
 				}
-				/*IFile file = null;
-				if (element instanceof IFile) {
-					file = (IFile) element;
-				} else if (element instanceof IAdaptable) {
-					file = (IFile) ((IAdaptable) element).getAdapter(IFile.class);
-				}
-				if (file != null) {
-					IFeatureProject project = featureide.core.CorePlugin.getProjectData(file);
-					if (project == null)
-						UIPlugin.getDefault().logWarning("Can't set equation as current equation because it does not belong to a feature project");
-					else
-						project.setCurrentEquationFile(file);
-				}*/
 			}
 		}
 	}
