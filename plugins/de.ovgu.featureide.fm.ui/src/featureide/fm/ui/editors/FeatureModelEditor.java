@@ -174,11 +174,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 	@Override
 	
 	protected void setInput(IEditorInput input) {
-		
-		
-		
 		IFile file = (IFile) input.getAdapter(IFile.class);
-		
 		
 		grammarFile = new GrammarFile(file);
 		setPartName(file.getProject().getName() + " Model");
@@ -211,6 +207,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 		createFeatureOrderPage();
 		createActions();
 		createContextMenu();
+		createKeyBindings();
 	}
 
 	/**
@@ -287,17 +284,16 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 		});
 		menu.createContextMenu(graphicalViewer.getControl());
 		graphicalViewer.setContextMenu(menu);
+		getSite().registerContextMenu(menu, graphicalViewer);
+	}
+	
+	private void createKeyBindings() {
 		KeyHandler handler = graphicalViewer.getKeyHandler();
 		handler.put(KeyStroke.getPressed(SWT.F2, 0), renameAction);
 		graphicalViewer.setKeyHandler(handler);
-		getSite().registerContextMenu(menu, graphicalViewer);
 	}
 
 	private void fillContextMenu(IMenuManager menu) {
-		
-		//getEditorSite().getActionBarContributor().
-		
-		
 		if (andAction.isEnabled() || orAction.isEnabled()
 				|| alternativeAction.isEnabled()) {
 			menu.add(andAction);
