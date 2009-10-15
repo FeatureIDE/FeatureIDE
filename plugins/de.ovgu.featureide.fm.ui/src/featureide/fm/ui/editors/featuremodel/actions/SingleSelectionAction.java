@@ -67,6 +67,19 @@ public abstract class SingleSelectionAction extends Action implements
 				&& (selection.getFirstElement() instanceof FeatureEditPart || selection
 						.getFirstElement() instanceof ConnectionEditPart);
 	}
+	
+	public FeatureEditPart getSelectedFeatureEditPart() {
+		IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
+		Object part = selection.getFirstElement();
+		connectionSelected = part instanceof ConnectionEditPart;
+		if (connectionSelected)
+			return (FeatureEditPart) ((ConnectionEditPart) part).getTarget();
+		else
+			return (FeatureEditPart) part;
+	}
+	
+	// TODO: Check if ((FeatureEditPart)connectionEditPart.getTarget()).getFeatureModel()
+	//		 equals   (FeatureEditPart) connectionEditPart.getConnectionModel().getTarget()
 
 	public Feature getSelectedFeature() {
 		IStructuredSelection selection = (IStructuredSelection) viewer

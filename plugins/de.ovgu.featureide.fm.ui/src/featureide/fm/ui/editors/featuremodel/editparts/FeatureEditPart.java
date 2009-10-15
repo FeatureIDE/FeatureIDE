@@ -75,20 +75,25 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 	protected void createEditPolicies() {
 		FeatureModel featureModel = ((ModelEditPart) getParent()).getFeatureModel();
 		installEditPolicy(EditPolicy.DIRECT_EDIT_ROLE, new FeatureDirectEditPolicy(featureModel, getFeatureModel()));
+		
 	}
 	
 	private DirectEditManager manager;
 	
+	public void showRenameManager() {
+		if (manager == null) {
+			ModelEditPart parent = (ModelEditPart) getParent();
+			FeatureModel featureModel = parent.getFeatureModel();
+			manager = new FeatureLabelEditManager(this, TextCellEditor.class,
+					new FeatureCellEditorLocator(getFeatureFigure()), featureModel);
+		}
+		manager.show();
+	}
+	
 	@Override
 	public void performRequest(Request request) {
 		if (request.getType() == RequestConstants.REQ_DIRECT_EDIT) {
-			if (manager == null) {
-				ModelEditPart parent = (ModelEditPart) getParent();
-				FeatureModel featureModel = parent.getFeatureModel();
-				manager = new FeatureLabelEditManager(this, TextCellEditor.class,
-						new FeatureCellEditorLocator(getFeatureFigure()), featureModel);
-			}
-			manager.show();
+			showRenameManager();
 		}
 		else if (request.getType() == RequestConstants.REQ_OPEN) {
 			Feature feature = getFeatureModel();

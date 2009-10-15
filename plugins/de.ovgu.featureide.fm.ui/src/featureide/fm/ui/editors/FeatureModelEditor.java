@@ -30,6 +30,8 @@ import org.eclipse.gef.DefaultEditDomain;
 import org.eclipse.gef.EditDomain;
 import org.eclipse.gef.EditPartViewer;
 import org.eclipse.gef.GraphicalViewer;
+import org.eclipse.gef.KeyHandler;
+import org.eclipse.gef.KeyStroke;
 import org.eclipse.gef.LayerConstants;
 import org.eclipse.gef.commands.CommandStack;
 import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
@@ -88,6 +90,7 @@ import featureide.fm.ui.editors.featuremodel.actions.EditConstraintAction;
 import featureide.fm.ui.editors.featuremodel.actions.InsertConstraintAction;
 import featureide.fm.ui.editors.featuremodel.actions.MandantoryAction;
 import featureide.fm.ui.editors.featuremodel.actions.OrAction;
+import featureide.fm.ui.editors.featuremodel.actions.RenameAction;
 import featureide.fm.ui.editors.featuremodel.editparts.GraphicalEditPartFactory;
 import featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutManager;
 import featureide.fm.ui.editors.featuremodel.layouts.LevelOrderLayout;
@@ -145,6 +148,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 	private UndoAction undoAction;
 
 	private RedoAction redoAction;
+	
+	private RenameAction renameAction;
 	
 	private ZoomInAction zoomIn;
 	
@@ -265,6 +270,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 		selectAllAction = new SelectAllAction(this);
 		undoAction = new UndoAction(this);
 		redoAction = new RedoAction(this);
+		renameAction = new RenameAction(graphicalViewer, featureModel);
 		zoomIn = new ZoomInAction(zoomManager);
 		zoomOut = new ZoomOutAction(zoomManager);
 		editConstraintAction= new EditConstraintAction(graphicalViewer,featureModel, "Edit Constraint");
@@ -281,10 +287,17 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 		});
 		menu.createContextMenu(graphicalViewer.getControl());
 		graphicalViewer.setContextMenu(menu);
+		KeyHandler handler = graphicalViewer.getKeyHandler();
+		handler.put(KeyStroke.getPressed(SWT.F2, 0), renameAction);
+		graphicalViewer.setKeyHandler(handler);
 		getSite().registerContextMenu(menu, graphicalViewer);
 	}
 
 	private void fillContextMenu(IMenuManager menu) {
+		
+		//getEditorSite().getActionBarContributor().
+		
+		
 		if (andAction.isEnabled() || orAction.isEnabled()
 				|| alternativeAction.isEnabled()) {
 			menu.add(andAction);
@@ -300,11 +313,13 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 		}
 		menu.add(editConstraintAction);
 		menu.add(insertConStraintAction);
+		menu.add(renameAction);
 		
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
 
 	public IAction getDiagramAction(String workbenchActionID) {
+		
 		if (CreateLayerAction.ID.equals(workbenchActionID))
 			return createLayerAction;
 		if (CreateCompoundAction.ID.equals(workbenchActionID))
@@ -327,6 +342,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 			return undoAction;
 		if (ActionFactory.REDO.getId().equals(workbenchActionID))
 			return redoAction;
+		if (RenameAction.ID.equals(workbenchActionID))
+			return renameAction;
 		if (GEFActionConstants.ZOOM_IN.equals(workbenchActionID))
 			return zoomIn;
 		if (GEFActionConstants.ZOOM_OUT.equals(workbenchActionID))
