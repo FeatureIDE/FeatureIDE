@@ -43,6 +43,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Label;
 
 import featureide.fm.core.Feature;
+import featureide.fm.core.FeatureModel;
 
 /**
  * Additional editor page for the feature model editor. In this editor the order
@@ -69,9 +70,11 @@ public class FeatureOrderEditor extends EditorPart {
 	private Writer fw;
 
 	private boolean dirty = false;
+	
+	private FeatureModel featureModel;
 
-	public FeatureOrderEditor() {
-
+	public FeatureOrderEditor(FeatureModel feature) {
+		featureModel = feature;
 	}
 
 	/*
@@ -83,7 +86,7 @@ public class FeatureOrderEditor extends EditorPart {
 	@Override
 	public void doSave(IProgressMonitor monitor) {
 
-		featureOrderWriter();
+		writeFeaturestoOrderFile();
 		dirty = false;
 		firePropertyChange(IEditorPart.PROP_DIRTY);
 	}
@@ -125,18 +128,17 @@ public class FeatureOrderEditor extends EditorPart {
 		return false;
 	}
 
-	public void updateOrderEditor(Collection<Feature> features) {
-		featurelist.removeAll();
+	public void initOrderEditor(){
 		ArrayList<String> list = readFeaturesfromOrderFile();
-		// If the list is null, there is no order file or the userdefined order is not selected
-		// In this case the method will take the features from the collection
 		if (list == null) {
 			activate.setSelection(false);
 			enableUI(false);
-			for (Feature ft : features) {
+			for (Feature ft : featureModel.getFeatures()) {
 				if (ft.isLayer())
 					featurelist.add(ft.getName());
+				
 			}
+			writeFeaturestoOrderFile();
 		} else {
 			activate.setSelection(true);
 			enableUI(true);
@@ -144,6 +146,19 @@ public class FeatureOrderEditor extends EditorPart {
 				featurelist.add(str);
 			}
 		}
+		
+		
+	}
+	
+	public void updateOrderEditor(Collection<Feature> features) {
+		featurelist.removeAll();
+		
+		for (Feature ft : features) {
+			if (ft.isLayer())
+				featurelist.add(ft.getName());
+			
+		}
+		writeFeaturestoOrderFile();
 	}
 
 	/*
@@ -240,7 +255,7 @@ public class FeatureOrderEditor extends EditorPart {
 	 * directory
 	 */
 
-	public void featureOrderWriter() {
+	public void writeFeaturestoOrderFile() {
 
 		File file = ((IFile) input.getAdapter(IFile.class)).getProject()
 				.getLocation().toFile();
@@ -261,7 +276,7 @@ public class FeatureOrderEditor extends EditorPart {
 			e.printStackTrace();
 		}
 	}
-
+/*
 	public void featureOrderReader() {
 		File file = ((IFile) input.getAdapter(IFile.class)).getProject()
 				.getLocation().toFile();
@@ -277,7 +292,7 @@ public class FeatureOrderEditor extends EditorPart {
 		while (scanner.hasNext()) {
 			featurelist.add(scanner.next());
 		}
-	}
+	}*/
 /**
  * 
  * @return Return the FeatureOrder as an ArrayList. Return null if the "userdefined-order" is deactivate or if no order file exists.
@@ -293,7 +308,7 @@ public class FeatureOrderEditor extends EditorPart {
 			try {
 				scanner = new Scanner(file);
 			} catch (FileNotFoundException e) {
-
+				System.out.println("Problem to open the order file");
 				e.printStackTrace();
 			}
 			if (scanner.hasNext() && scanner.next().equals("true")) {
@@ -313,10 +328,6 @@ public class FeatureOrderEditor extends EditorPart {
 			}
 			return null;
 		}
-		
-		// featurelist.removeAll();
-
-		//return list;
 	}
 
 	/*

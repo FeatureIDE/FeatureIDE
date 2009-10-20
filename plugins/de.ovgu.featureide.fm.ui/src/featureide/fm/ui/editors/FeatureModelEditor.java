@@ -186,8 +186,9 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 		featureModelReader = new FeatureModelReader(featureModel);
 		featureModelWriter = new FeatureModelWriter(featureModel);
 		xmlFeatureModelWriter = new XmlFeatureModelWriter(featureModel);
-				
+			
 		originalFeatureModel = new FeatureModel();
+		
 		try {
 
 			new FeatureModelReader(originalFeatureModel).readFromFile(file);
@@ -214,11 +215,12 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 	 * 
 	 */
 	private void createFeatureOrderPage() {
-		featureOrderEditor= new FeatureOrderEditor();
+		featureOrderEditor= new FeatureOrderEditor(featureModel);
 		try {
 			featureOrderEditorIndex = addPage(featureOrderEditor, getEditorInput());
 			setPageText(featureOrderEditorIndex,"Feature order");
-			featureOrderEditor.updateOrderEditor(getOriginalFeatureModel().getFeatures());
+			//featureOrderEditor.updateOrderEditor(getOriginalFeatureModel().getFeatures());
+			featureOrderEditor.initOrderEditor();
 		} catch (PartInitException e) {
 			
 			e.printStackTrace();
@@ -440,9 +442,10 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 				if (isPageModified)
 					updateTextEditorFromDiagram();
 			} else if (newPageIndex == featureOrderEditorIndex){
-				featureOrderEditor.updateOrderEditor(featureModel.getFeatures());
+				
 				if (isPageModified){
 					updateTextEditorFromDiagram();
+					featureOrderEditor.updateOrderEditor(featureModel.getFeatures());
 				}
 			}else if (oldPage == newPageIndex){
 				updateDiagramFromTextEditor();
@@ -574,15 +577,20 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 		}
 	}
 
-	public void propertyChange(PropertyChangeEvent event) {
-		String prop = event.getPropertyName();
 	
-		if (prop.equals(MODEL_DATA_CHANGED)) {
-			refreshGraphicalViewer();
-			
-			featureOrderEditor.updateOrderEditor(featureModel.getFeatures());
+	
+	
+	
+	public void propertyChange(PropertyChangeEvent event) {
 		
+		String prop = event.getPropertyName();
+		if (prop.equals(MODEL_DATA_CHANGED)) {
+			updateTextEditorFromDiagram();
+			//updateDiagramFromTextEditor();
+			refreshGraphicalViewer();
+			featureOrderEditor.updateOrderEditor(featureModel.getFeatures());
 			isPageModified = true;
+			
 			firePropertyChange(PROP_DIRTY);
 		} else if (prop.equals(MODEL_DATA_LOADED)) {
 			refreshGraphicalViewer();
@@ -595,7 +603,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 
 		// refresh size of all feature figures
 		graphicalViewer.getContents().refresh();
-
 		// layout all features
 		Point size = graphicalViewer.getControl().getSize();
 		layoutManager.setControlSize(size.x, size.y);

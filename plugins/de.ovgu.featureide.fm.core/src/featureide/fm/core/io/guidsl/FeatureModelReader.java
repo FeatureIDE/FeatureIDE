@@ -250,7 +250,9 @@ public class FeatureModelReader extends AbstractFeatureModelReader {
 			String var = token.name;
 			if (featureModel.getFeature(var) == null)
 				throw new UnsupportedModelException("The feature '" + var + "' does not occur in the grammar!", token.lineNum());
-			return new Literal(var);
+			
+			return new Literal(featureModel.getFeature(var));
+			//return new Literal(var);
 		}
 		if (expr instanceof Paren)
 			return exprToNode(((Paren) expr).getExpr());
