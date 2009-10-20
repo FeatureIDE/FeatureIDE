@@ -50,7 +50,7 @@ public class JakEditor extends TextEditor {
 
 	public JakEditor() {
 		super();
-		setSourceViewerConfiguration(new JakConfiguration());
+		setSourceViewerConfiguration(new JakConfiguration(this));
 		setDocumentProvider(new JakDocumentProvider());
 	}
 
