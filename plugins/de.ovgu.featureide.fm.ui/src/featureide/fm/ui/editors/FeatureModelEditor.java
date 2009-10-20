@@ -215,7 +215,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 	 * 
 	 */
 	private void createFeatureOrderPage() {
-		featureOrderEditor= new FeatureOrderEditor(featureModel);
+		featureOrderEditor= new FeatureOrderEditor(originalFeatureModel);
 		try {
 			featureOrderEditorIndex = addPage(featureOrderEditor, getEditorInput());
 			setPageText(featureOrderEditorIndex,"Feature order");
