@@ -34,10 +34,13 @@ import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 
+import de.ovgu.featureide.ui.ahead.editors.JakEditor;
+
 
 /**
  * 
  * @author Marcus Leich
+ * @author Constanze Adler
  *
  */
 public class JakConfiguration extends SourceViewerConfiguration {
@@ -47,7 +50,11 @@ public class JakConfiguration extends SourceViewerConfiguration {
             setDefaultReturnToken(new Token(attribute));
         }        
     }
-
+	
+	private JakEditor editor;
+	public JakConfiguration(JakEditor editor){
+		this.editor = editor;
+	}
 	public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer) {
 		PresentationReconciler reconciler = new PresentationReconciler();
 
@@ -69,11 +76,11 @@ public class JakConfiguration extends SourceViewerConfiguration {
 	}
 	
 	public IContentAssistant getContentAssistant(ISourceViewer sourceViewer){
-
+		
 		ContentAssistant assistant = new ContentAssistant();
 		assistant.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
-		assistant.setContentAssistProcessor(new JakCompletionProcessor(), IDocument.DEFAULT_CONTENT_TYPE);
-		assistant.setContentAssistProcessor(new JakCompletionProcessor(), JakPartitionScanner.JAK_JAVADOC);
+		assistant.setContentAssistProcessor(new JakCompletionProcessor(editor), IDocument.DEFAULT_CONTENT_TYPE);
+		assistant.setContentAssistProcessor(new JakCompletionProcessor(editor), JakPartitionScanner.JAK_JAVADOC);
 		assistant.enableAutoActivation(true);
 		assistant.setAutoActivationDelay(500);
 		assistant.setProposalPopupOrientation(IContentAssistant.PROPOSAL_OVERLAY);
