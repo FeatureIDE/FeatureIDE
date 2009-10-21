@@ -18,18 +18,12 @@
  */
 package de.ovgu.featureide.ui.ahead.editors.jak;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.jdt.ui.ISharedImages;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.text.BadLocationException;
@@ -49,7 +43,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
 
-import de.ovgu.featureide.ui.ahead.AheadUIPlugin;
 import de.ovgu.featureide.ui.ahead.editors.JakEditor;
 import featureide.core.CorePlugin;
 import featureide.core.IFeatureProject;
@@ -72,18 +65,15 @@ public class JakCompletionProcessor implements IContentAssistProcessor{
 
 		protected int fInstallOffset;
 		
-		@Override
 		public void install(IContextInformation info, ITextViewer viewer,
 				int offset) {
 			fInstallOffset= offset;
 		}
 
-		@Override
 		public boolean isContextInformationValid(int offset) {
 			return Math.abs(fInstallOffset - offset) < 5;
 		}
 
-		@Override
 		public boolean updatePresentation(int offset,
 				TextPresentation presentation) {
 			return false;
@@ -98,8 +88,6 @@ public class JakCompletionProcessor implements IContentAssistProcessor{
 	private ICompletionProposal[] NO_COMPLETIONS = new ICompletionProposal[0];
 	
 	
-	private static final Image JAK_IMAGE = AheadUIPlugin.getImage("NewJakFileIcon.png");
-	
 	protected IContextInformationValidator fValidator= new Validator();
 	private JakEditor editor;
 	public JakCompletionProcessor(JakEditor editor){
@@ -110,7 +98,6 @@ public class JakCompletionProcessor implements IContentAssistProcessor{
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.text.contentassist.IContentAssistProcessor#computeCompletionProposals(org.eclipse.jface.text.ITextViewer, int)
 	 */
-	@Override
 	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer,
 			int offset) {
 		List<CompletionProposal> propList = new ArrayList<CompletionProposal>();
@@ -125,7 +112,6 @@ public class JakCompletionProcessor implements IContentAssistProcessor{
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.text.contentassist.IContentAssistProcessor#computeContextInformation(org.eclipse.jface.text.ITextViewer, int)
 	 */
-	@Override
 	public IContextInformation[] computeContextInformation(ITextViewer viewer,
 			int offset) {
 		IContextInformation[] result= new IContextInformation[5];
@@ -139,7 +125,6 @@ public class JakCompletionProcessor implements IContentAssistProcessor{
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.text.contentassist.IContentAssistProcessor#getCompletionProposalAutoActivationCharacters()
 	 */
-	@Override
 	public char[] getCompletionProposalAutoActivationCharacters() {
 		return PROPOSAL_ACTIVATION_CHARS;
 	}
@@ -147,7 +132,6 @@ public class JakCompletionProcessor implements IContentAssistProcessor{
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.text.contentassist.IContentAssistProcessor#getContextInformationAutoActivationCharacters()
 	 */
-	@Override
 	public char[] getContextInformationAutoActivationCharacters() {
 		return new char[] { '#' };
 	}
@@ -155,7 +139,6 @@ public class JakCompletionProcessor implements IContentAssistProcessor{
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.text.contentassist.IContentAssistProcessor#getContextInformationValidator()
 	 */
-	@Override
 	public IContextInformationValidator getContextInformationValidator() {
 		return fValidator;
 	}
@@ -163,7 +146,6 @@ public class JakCompletionProcessor implements IContentAssistProcessor{
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.text.contentassist.IContentAssistProcessor#getErrorMessage()
 	 */
-	@Override
 	public String getErrorMessage() {
 		return null;
 	}
@@ -237,33 +219,34 @@ public class JakCompletionProcessor implements IContentAssistProcessor{
 		
 	private void/*ArrayList*/ collectCompletionProposals(ITextViewer viewer, int offset) throws BadLocationException{
 		IEditorInput input = editor.getEditorInput();
+		
 		if (input instanceof IFileEditorInput){
 			IFile file = ((IFileEditorInput) input).getFile();
 			IFeatureProject featureProject = CorePlugin.getProjectData(file);
-			if (featureProject!=null){
-				IJakProject project = featureProject.getJakProject();
-				
-				if (project!=null){
-					IClass[] classes = project.getClasses();
-					if (classes != null)
-					{
-						for (int i =0; i<classes.length; i++){
-							IField[] fields ;//= new IField[classes[i].getFieldCount()];
-							IMethod[] methods ;//= new IMethod[classes[i].getMethodCount()];
-							fields = classes[i].getFields();
-							methods = classes[i].getMethods();
-							System.out.println(methods+": " + methods.length +"\n"+fields+": " + fields.length);
-							if (fields.length > 0) System.out.println(classes[i].getName()+": fields > 0");
-							if (methods.length > 0) System.out.println(classes[i].getName()+": methods > 0");
-							
-						}
-					}
-					
-				}
-			}
-		}
+			if (featureProject==null) return;
+			
+			IJakProject project = featureProject.getJakProject();
+			if (project==null) return;
+			
+			IClass[] classes = project.getClasses();
 		
+			if (classes == null) return;
+					
+			for (IClass nextClass : classes){
+				//IField[] fields = new IField[classes[i].getFieldCount()];
+				//IMethod[] methods = new IMethod[classes[i].getMethodCount()];
+				IField[] fields = nextClass.getFields();
+				IMethod[] methods = nextClass.getMethods();
+				for (IMethod method : methods)
+					System.out.println(method.getMethodName());
+				if (fields.length > 0) System.out.println(nextClass.getName()+": fields > 0");
+				if (methods.length > 0) System.out.println(nextClass.getName()+": methods > 0");
+							
+			}
+		}		
 	}
+	
+	
 	protected class CompletionMethod{
 		private Image img;
 		private String returnValue;
@@ -385,11 +368,8 @@ public class JakCompletionProcessor implements IContentAssistProcessor{
 				privateLines = find("private");
 				methods = buildMethods();
 				fields  = buildFields();
-				classes = buildClasses();
-				
-				
-			} catch (BadLocationException e) {
-				
+				classes = buildClasses();				
+			} catch (BadLocationException e) {				
 				e.printStackTrace();
 			}
 		}
