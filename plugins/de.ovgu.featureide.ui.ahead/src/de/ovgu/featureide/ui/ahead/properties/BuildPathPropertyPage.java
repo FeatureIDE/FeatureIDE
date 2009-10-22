@@ -109,14 +109,12 @@ public class BuildPathPropertyPage extends PropertyPage {
 		addJarBtn.setLayoutData(hfill);
 		addJarBtn.addSelectionListener(new SelectionListener() {
 			
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (fd.open() != null)
 					for (String filename : fd.getFileNames())
 						list.add(fd.getFilterPath() + System.getProperty("file.separator") + filename);
 			}
 			
-			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 		});
@@ -126,15 +124,12 @@ public class BuildPathPropertyPage extends PropertyPage {
 		addFolderBtn.setText("Add External Class Folder...");
 		addFolderBtn.setLayoutData(hfill);
 		addFolderBtn.addSelectionListener(new SelectionListener() {
-			
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				String directory = dd.open();
 				if (directory != null)
 					list.add(directory);
 			}
 			
-			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 		});
@@ -149,12 +144,10 @@ public class BuildPathPropertyPage extends PropertyPage {
 		removeBtn.setLayoutData(hfill);
 		removeBtn.addSelectionListener(new SelectionListener() {
 			
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				list.remove(list.getSelectionIndices());
 			}
 			
-			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 		});
