@@ -20,7 +20,6 @@ package de.ovgu.featureide.ui.ahead.editors.jak;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -182,8 +181,7 @@ public class JakCompletionProcessor implements IContentAssistProcessor{
 			
 			
 				
-			for (Iterator iter=fields.iterator();iter.hasNext();){
-				CompletionField field = (CompletionField) iter.next();
+			for (CompletionField field : fields){
 				String prop;
 				prop = field.getFieldName() + " : " + field.getType();
 				if (behind==null){
@@ -196,8 +194,7 @@ public class JakCompletionProcessor implements IContentAssistProcessor{
 						propList.add(new CompletionProposal(field.getFieldName(), offset-behind.length(), behind.length(), field.getFieldName().length(),field.getImage(), prop, info, MessageFormat.format(JakEditorMessages.getString("CompletionProcessor.Proposal.hoverinfo.pattern"), field.getType()))); //$NON-NLS-1$
 					}
 			}
-			for (Iterator iter=methods.iterator();iter.hasNext();){
-				CompletionMethod method = (CompletionMethod)iter.next();
+			for (CompletionMethod method : methods){
 				String prop;
 				prop = ((method.getReturnValue()).equals("")) ? method.getMethodName() : method.getMethodName()+" : " + method.getReturnValue();
 				if (behind==null){				
@@ -217,7 +214,7 @@ public class JakCompletionProcessor implements IContentAssistProcessor{
 		
 	}
 		
-	private void/*ArrayList*/ collectCompletionProposals(ITextViewer viewer, int offset) throws BadLocationException{
+	private void collectCompletionProposals(ITextViewer viewer, int offset) throws BadLocationException{
 		IEditorInput input = editor.getEditorInput();
 		
 		if (input instanceof IFileEditorInput){
@@ -233,8 +230,6 @@ public class JakCompletionProcessor implements IContentAssistProcessor{
 			if (classes == null) return;
 					
 			for (IClass nextClass : classes){
-				//IField[] fields = new IField[classes[i].getFieldCount()];
-				//IMethod[] methods = new IMethod[classes[i].getMethodCount()];
 				IField[] fields = nextClass.getFields();
 				IMethod[] methods = nextClass.getMethods();
 				for (IMethod method : methods)
@@ -379,18 +374,15 @@ public class JakCompletionProcessor implements IContentAssistProcessor{
 		 */
 		private ArrayList<CompletionClass> buildClasses() {
 			ArrayList<CompletionClass> list = new ArrayList<CompletionClass>();
-			for (Iterator iter=publicLines.iterator(); iter.hasNext();){
-				String text = (String) iter.next();
+			for (String text : publicLines){
 				if (text.contains("class"))
 					list.add(extractClassName(text,"public"));
 			}
-			for (Iterator iter=protectedLines.iterator(); iter.hasNext();){
-				String text = (String) iter.next();
+			for (String text : protectedLines){
 				if (!text.contains("class")||!text.contains("(")||text.contains(" new "))
 					list.add(extractClassName(text,"protected"));
 			}
-			for (Iterator iter=privateLines.iterator(); iter.hasNext();){
-				String text = (String) iter.next();
+			for (String text : privateLines){
 				if (!text.contains("class")||!text.contains("(")||text.contains(" new "))
 					list.add(extractClassName(text,"private"));
 			}
@@ -404,8 +396,6 @@ public class JakCompletionProcessor implements IContentAssistProcessor{
 		 */
 		private CompletionClass extractClassName(String text, String identifier) {
 			CompletionClass currentClass = null;
-			boolean isFinal = false;
-			boolean isStatic = false;
 			ISharedImages javaImages = JavaUI.getSharedImages();
 			Image img = null;
 			if (text.contains(identifier)){
@@ -413,13 +403,11 @@ public class JakCompletionProcessor implements IContentAssistProcessor{
 				text = text.trim();
 				
 				if (text.contains("final")){
-					isFinal = true;
 					int index = text.indexOf("final");
 					text = text.substring(0,index) + text.substring(index+5);
 					text = text.trim();
 				}
 				if (text.contains("static")){
-					isStatic = true;
 					int index = text.indexOf("static");
 					text = text.substring(0,index) + text.substring(index+6);
 					text = text.trim();
@@ -454,18 +442,15 @@ public class JakCompletionProcessor implements IContentAssistProcessor{
 		 */
 		private ArrayList<CompletionField> buildFields() {
 			ArrayList<CompletionField> list = new ArrayList<CompletionField>();
-			for (Iterator iter=publicLines.iterator(); iter.hasNext();){
-				String text = (String) iter.next();
+			for (String text : publicLines){
 				if (!text.contains("class")&&(!text.contains("(")||text.contains(" new ")))
 					list.add(extractFieldName(text,"public"));
 			}
-			for (Iterator iter=protectedLines.iterator(); iter.hasNext();){
-				String text = (String) iter.next();
+			for (String text : protectedLines){
 				if (!text.contains("class")&&(!text.contains("(")||text.contains(" new ")))
 					list.add(extractFieldName(text,"protected"));
 			}
-			for (Iterator iter=privateLines.iterator(); iter.hasNext();){
-				String text = (String) iter.next();
+			for (String text : privateLines){
 				if (!text.contains("class")&&(!text.contains("(")||text.contains(" new ")))
 					list.add(extractFieldName(text,"private"));
 			}
@@ -479,8 +464,6 @@ public class JakCompletionProcessor implements IContentAssistProcessor{
 		 */
 		private CompletionField extractFieldName(String text, String identifier) {
 			CompletionField field = null;
-			boolean isFinal = false;
-			boolean isStatic = false;
 			ISharedImages javaImages = JavaUI.getSharedImages();
 			Image img = null;
 			if (text.contains(identifier)){
@@ -488,13 +471,11 @@ public class JakCompletionProcessor implements IContentAssistProcessor{
 				text = text.trim();
 				
 				if (text.contains("final")){
-					isFinal = true;
 					int index = text.indexOf("final");
 					text = text.substring(0,index) + text.substring(index+5);
 					text = text.trim();
 				}
 				if (text.contains("static")){
-					isStatic = true;
 					int index = text.indexOf("static");
 					text = text.substring(0,index) + text.substring(index+6);
 					text = text.trim();
@@ -542,18 +523,15 @@ public class JakCompletionProcessor implements IContentAssistProcessor{
 		}
 		private ArrayList<CompletionMethod> buildMethods(){
 			ArrayList<CompletionMethod> list = new ArrayList<CompletionMethod>();
-			for (Iterator iter=publicLines.iterator(); iter.hasNext();){
-				String text = (String) iter.next();
+			for (String text : publicLines){
 				if (text.contains("(")&&!text.contains("new"))
 					list.add(extractMethodName(text,"public"));
 			}
-			for (Iterator iter=protectedLines.iterator(); iter.hasNext();){
-				String text = (String) iter.next();
+			for (String text : protectedLines){
 				if (text.contains("(")&&!text.contains("new"))
 					list.add( extractMethodName(text,"protected"));
 			}
-			for (Iterator iter=privateLines.iterator(); iter.hasNext();){
-				String text = (String) iter.next();
+			for (String text : privateLines){
 				if (text.contains("(")&&!text.contains("new"))
 					list.add(extractMethodName(text,"private"));
 			}
@@ -583,21 +561,17 @@ public class JakCompletionProcessor implements IContentAssistProcessor{
 
 		private CompletionMethod extractMethodName(String text, String identifier){
 			CompletionMethod method = null;
-			boolean isFinal = false;
-			boolean isStatic = false;
 			ISharedImages javaImages = JavaUI.getSharedImages();
 			Image img = null;
 			if (text.contains(identifier)){
 				text = text.substring(identifier.length());
 				text = text.trim();
 				if (text.contains("final")){
-					isFinal = true;
 					int index = text.indexOf("final");
 					text = text.substring(0,index) + text.substring(index+5);
 					text = text.trim();
 				}
 				if (text.contains("static")){
-					isStatic = true;
 					int index = text.indexOf("static");
 					text = text.substring(0,index) + text.substring(index+6);
 					text = text.trim();
