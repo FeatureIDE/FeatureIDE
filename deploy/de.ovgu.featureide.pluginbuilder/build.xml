@@ -185,6 +185,12 @@
 	</target>
 	
 	<target name="main" description="Run the main target of customTargets.xml. Return status 0,1,2 for Success, Build Failure and Test Failure">
+	    <echo message="os.name:          ${os.name}"          />
+	    <echo message="basdir:           ${basedir}"          />
+	    <echo message="ant.file:         ${ant.file}"         />
+	    <echo message="ant.project.name: ${ant.project.name}" />
+	    <echo message="ant.java.version: ${ant.java.version}" />
+		
 		<property name="buildTarget" value="main"/>
 		<antcall target="-build"/>
 

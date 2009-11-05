@@ -2,7 +2,7 @@
 <feature
       id="de.ovgu.featureide.featurecpp"
       label="FeatureIDE extension for FeatureC++ (optional)"
-      version="2.3.1.qualifier"
+      version="2.3.5.qualifier"
       provider-name="University of Magdeburg">
 
    <description url="http://www.fosd.de/featureide/">
@@ -467,7 +467,7 @@ Public License instead of this License.
          id="de.ovgu.featureide.core.featurecpp"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="2.3.5.qualifier"
          unpack="false"/>
 
 </feature>

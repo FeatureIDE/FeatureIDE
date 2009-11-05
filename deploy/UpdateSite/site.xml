@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <description url="http://wwwiti.cs.uni-magdeburg.de/iti_db/research/featureide/deploy/">
+   <description name="FeatureIDE Update Site" url="http://wwwiti.cs.uni-magdeburg.de/iti_db/research/featureide/deploy/">
       FeatureIDE
    </description>
    <feature url="features/FeatureIDE_2.0.0.jar" id="FeatureIDE" version="2.0">
@@ -115,6 +115,15 @@
       <category name="FeatureIDE 2.3"/>
    </feature>
    <feature url="features/de.ovgu.featureide.featurehouse_2.3.1.200905221226.jar" id="de.ovgu.featureide.featurehouse" version="2.3.1.200905221226">
+      <category name="FeatureIDE 2.3"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide_2.3.5.200911041622.jar" id="de.ovgu.featureide" version="2.3.5.200911041622">
+      <category name="FeatureIDE 2.3"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurecpp_2.3.5.200911041622.jar" id="de.ovgu.featureide.featurecpp" version="2.3.5.200911041622">
+      <category name="FeatureIDE 2.3"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurehouse_2.3.5.200911041622.jar" id="de.ovgu.featureide.featurehouse" version="2.3.5.200911041622">
       <category name="FeatureIDE 2.3"/>
    </feature>
    <category-def name="FeatureIDE 2.0" label="FeatureIDE 2.0"/>
