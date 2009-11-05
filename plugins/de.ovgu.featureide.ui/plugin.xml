@@ -17,22 +17,23 @@
          point="org.eclipse.ui.newWizards">
       <wizard
             canFinishEarly="false"
-            category="featureideui.category"
+            category="de.ovgu.featureide.ui.category"
             class="featureide.ui.wizards.NewFeatureProjectWizard"
             hasPages="true"
             icon="icons/NewFeatureProjectIcon.png"
             id="de.ovgu.featureide.ui.FeatureProjectWizard"
             name="FeatureProject"
             project="true"/>
-      <category
-            id="featureideui.category"
-            name="FeatureIDE"/>
       <wizard
-            category="featureideui.category"
+            category="de.ovgu.featureide.ui.category"
             class="featureide.ui.wizards.NewEquationFileWizard"
             icon="icons/NewEquationIcon.png"
             id="de.ovgu.featureide.ui.wizards.NewEquationFileWizard"
             name="Equation File"/>
+      <category
+            id="de.ovgu.featureide.ui.category"
+            name="FeatureIDE">
+      </category>
    </extension>
    <extension
          point="org.eclipse.ui.popupMenus">

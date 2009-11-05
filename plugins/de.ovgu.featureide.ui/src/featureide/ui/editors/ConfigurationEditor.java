@@ -28,6 +28,8 @@ import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -48,7 +50,13 @@ import featureide.fm.ui.editors.configuration.ConfigurationContentProvider;
 import featureide.fm.ui.editors.configuration.ConfigurationLabelProvider;
 import featureide.ui.UIPlugin;
 
-public class ConfigurationEditor extends EditorPart implements PropertyChangeListener, PropertyConstants{
+/**
+ * 
+ * @author Christian Becker
+ */
+
+public class ConfigurationEditor extends EditorPart implements
+		PropertyChangeListener, PropertyConstants {
 
 	private TreeViewer viewer;
 
@@ -63,28 +71,9 @@ public class ConfigurationEditor extends EditorPart implements PropertyChangeLis
 					.getFirstElement();
 			if (object instanceof SelectableFeature) {
 				final SelectableFeature feature = (SelectableFeature) object;
-				if (feature.getAutomatic() == Selection.UNDEFINED) {
-					// set to the next value
-					if (feature.getManual() == Selection.UNDEFINED)
-						set(feature, Selection.SELECTED);
-					else if (feature.getManual() == Selection.SELECTED)
-						set(feature, Selection.UNSELECTED);
-					else
-						// case: unselected
-						set(feature, Selection.UNDEFINED);
-					if (!dirty) {
-						dirty = true;
-						firePropertyChange(IEditorPart.PROP_DIRTY);
-					}
-					viewer.refresh();
-				}
+				changeSelection(feature);
 			}
 		}
-
-		private void set(SelectableFeature feature, Selection selection) {
-			configuration.setManual(feature, selection);
-		}
-
 	};
 
 	private IFile file;
@@ -113,10 +102,9 @@ public class ConfigurationEditor extends EditorPart implements PropertyChangeLis
 		file = (IFile) input.getAdapter(IFile.class);
 		UIPlugin.getDefault().logInfo("file: " + file);
 		setPartName(file.getName());
-		
+
 		IFeatureProject featureProject = CorePlugin.getProjectData(file);
 		FeatureModel featureModel = featureProject.getFeatureModel();
-		System.out.println("Config "+featureModel.toString());
 		featureModel.addListener(this);
 		configuration = new Configuration(featureModel, true);
 		try {
@@ -125,7 +113,7 @@ public class ConfigurationEditor extends EditorPart implements PropertyChangeLis
 				dirty = !configuration.validManually();
 		} catch (Exception e) {
 			e.printStackTrace();
-		}	
+		}
 		firePropertyChange(IEditorPart.PROP_DIRTY);
 	}
 
@@ -143,12 +131,32 @@ public class ConfigurationEditor extends EditorPart implements PropertyChangeLis
 	public void createPartControl(Composite parent) {
 		viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		viewer.addDoubleClickListener(listener);
+		viewer.getTree().addKeyListener(new KeyListener() {
+			
+			public void keyPressed(KeyEvent e) {
+				if (e.character == ' ') {
+					if (viewer.getSelection() instanceof ITreeSelection) {
+						final ITreeSelection tree = (ITreeSelection) viewer
+								.getSelection();
+						Object object = tree.getFirstElement();
+						if (object instanceof SelectableFeature) {
+							final SelectableFeature feature = (SelectableFeature) object;
+							changeSelection(feature);
+						}
+					}
+				}
+			}
+
+			
+			public void keyReleased(KeyEvent e) {
+
+			}
+		});
 		viewer.setContentProvider(new ConfigurationContentProvider());
 		viewer.setLabelProvider(new ConfigurationLabelProvider());
-		
 		viewer.setInput(configuration);
 		viewer.expandAll();
-		// viewer.expandAll();
+
 	}
 
 	@Override
@@ -156,17 +164,45 @@ public class ConfigurationEditor extends EditorPart implements PropertyChangeLis
 		viewer.getControl().setFocus();
 	}
 
-	/* (non-Javadoc)
-	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seejava.beans.PropertyChangeListener#propertyChange(java.beans.
+	 * PropertyChangeEvent)
 	 */
-	@Override
+
 	public void propertyChange(PropertyChangeEvent evt) {
 		try {
 			new ConfigurationWriter(configuration).saveToFile(file);
 		} catch (CoreException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * @param The feature which change the selection status
+	 * 
+	 */
+	protected void changeSelection(SelectableFeature feature) {
+		if (feature.getAutomatic() == Selection.UNDEFINED) {
+			// set to the next value
+			if (feature.getManual() == Selection.UNDEFINED)
+				set(feature, Selection.SELECTED);
+			else if (feature.getManual() == Selection.SELECTED)
+				set(feature, Selection.UNSELECTED);
+			else
+				// case: unselected
+				set(feature, Selection.UNDEFINED);
+			if (!dirty) {
+				dirty = true;
+				firePropertyChange(IEditorPart.PROP_DIRTY);
+			}
+			viewer.refresh();
+		}
+	}
+
+	protected void set(SelectableFeature feature, Selection selection) {
+		configuration.setManual(feature, selection);
 	}
 
 }
