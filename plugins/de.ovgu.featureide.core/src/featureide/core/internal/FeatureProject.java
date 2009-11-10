@@ -47,8 +47,7 @@ import featureide.core.IFeatureProject;
 import featureide.core.builder.ComposerExtensionManager;
 import featureide.core.builder.ExtensibleFeatureProjectBuilder;
 import featureide.core.builder.IComposerExtension;
-import featureide.core.jakprojectmodel.IJakProject;
-import featureide.core.jakprojectmodel.internal.JakProject;
+import featureide.core.jakprojectmodel.IJakProjectModel;
 import featureide.core.projectstructure.trees.ProjectTree;
 import featureide.fm.core.Feature;
 import featureide.fm.core.FeatureModel;
@@ -95,7 +94,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	
 	private final IFeatureModelReader modelReader;
 
-	private IJakProject jakProject;
+	private IJakProjectModel jakProject;
 
 	/**
 	 * a folder for the generated class files
@@ -164,7 +163,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		equationFolder = createFolder("equations");
 		sourceFolder = createFolder("src");
 
-		jakProject = new JakProject(getProjectName());
+		jakProject = null;
 
 		// loading model data and listen to changes in the model file
 		addModelListener();
@@ -488,7 +487,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	 * 
 	 * @see featureide.core.IFeatureProject#getJakProject()
 	 */
-	public IJakProject getJakProject() {
+	public IJakProjectModel getJakProjectModel() {
 		return jakProject;
 	}
 
@@ -730,5 +729,12 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			project.setPersistentProperty(javaClassPathID, builder.toString());
 		} catch (CoreException ex) {
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see featureide.core.IFeatureProject#setJakProjectModel(featureide.core.jakprojectmodel.IJakProjectModel)
+	 */
+	public void setJakProjectModel(IJakProjectModel model) {
+		jakProject=model;
 	}
 }

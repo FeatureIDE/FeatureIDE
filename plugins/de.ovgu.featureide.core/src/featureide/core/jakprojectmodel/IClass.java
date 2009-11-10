@@ -20,11 +20,9 @@ package featureide.core.jakprojectmodel;
 
 import java.util.LinkedList;
 
-import mixin.AST_Program;
-
 import org.eclipse.core.resources.IFile;
 
-public interface IClass extends IJakElement {
+public interface IClass extends IJakModelElement {
 
 	/**
 	 * Returns the number of all fields
@@ -125,22 +123,7 @@ public interface IClass extends IJakElement {
 	 */
 	public IFile getJakfile();
 
-	/**
-	 * Updates the AST of this class
-	 * 
-	 * @param sources 		source files that were composed to build this class
-	 * @param composedASTs 	composed ahead ASTs during the composition step
-	 * @param ownASTs 		ahead ASTs of each source file without composing
-	 */
-	public void updateAst(LinkedList<IFile> sources, AST_Program[] composedASTs,
-			AST_Program[] ownASTs);
-
-	/**
-	 * Returns the ahead ASTs of each source file without composing
-	 * 
-	 * @return ahead ASTs of each source file without composing
-	 */
-	public AST_Program[] getASTs();
+	
 
 	/**
 	 * Returns the source files that were composed to build this class

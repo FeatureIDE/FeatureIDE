@@ -18,7 +18,7 @@
  */
 package featureide.core.jakprojectmodel;
 
-public interface IImportContainer extends IJakElement {
+public interface IImportContainer extends IJakModelElement {
 
 	public int getNumberOfImports();
 

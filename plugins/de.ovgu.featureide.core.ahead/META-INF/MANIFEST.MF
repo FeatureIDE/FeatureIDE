@@ -16,4 +16,5 @@ Bundle-ClassPath: lib/jak2java.jar,
  lib/tools.jar,
  .,
  lib/mixin.jar
-Export-Package: de.ovgu.featureide.ahead
+Export-Package: de.ovgu.featureide.ahead,
+ de.ovgu.featureide.ahead.model

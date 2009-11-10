@@ -18,13 +18,9 @@
  */
 package featureide.core.jakprojectmodel;
 
-import java.util.LinkedList;
-
-import mixin.AST_Program;
-
 import org.eclipse.core.resources.IFile;
 
-public interface IJakProject extends IJakElement {
+public interface IJakProjectModel extends IJakModelElement {
 
 	/**
 	 * Returns the number of features, that were used to build the current
@@ -34,10 +30,9 @@ public interface IJakProject extends IJakElement {
 	 */
 	public int getNumberOfSelectedFeatures();
 
-	/** 
-	 * Returns all selected features ordered by the order
-	 * in the equation file
-	 *  
+	/**
+	 * Returns all selected features ordered by the order in the equation file
+	 * 
 	 * @return Selected features
 	 */
 	public IFeature[] getSelectedFeatures();
@@ -59,22 +54,22 @@ public interface IJakProject extends IJakElement {
 	/**
 	 * Returns the feature object for the given feature name
 	 * 
-	 * @param featureName The name of the feature
+	 * @param featureName
+	 *            The name of the feature
 	 * @return The feature object
 	 */
 	public IFeature getFeature(String featureName);
 
 	/**
-	 * Returns the number of classes according to the currently
-	 * selected features
+	 * Returns the number of classes according to the currently selected
+	 * features
 	 * 
 	 * @return Number of classes
 	 */
 	public int getNumberOfClasses();
 
 	/**
-	 * Returns all classes according to the currently selected
-	 * features
+	 * Returns all classes according to the currently selected features
 	 * 
 	 * @return Array of classes
 	 */
@@ -83,20 +78,15 @@ public interface IJakProject extends IJakElement {
 	/**
 	 * Returns the class for the given jakfile
 	 * 
-	 * @param file A jakfile
+	 * @param file
+	 *            A jakfile
 	 * @return the class for the givin jakfile
 	 */
 	public IClass getClass(IFile file);
 
 	/**
-	 * Adds a class to the jak project model
-	 * 
-	 * @param className		Name of the class
-	 * @param sources		source files that were composed to build this class
-	 * @param composedASTs	composed ahead ASTs during the composition step
-	 * @param ownASTs		ahead ASTs of each source file without composing
+	 * called when this model is obsolete and replaced by a new model
 	 */
-	public void addClass(String className, LinkedList<IFile> sources,
-			AST_Program[] composedASTs, AST_Program[] ownASTs);
+	public void markObsolete();
 
 }

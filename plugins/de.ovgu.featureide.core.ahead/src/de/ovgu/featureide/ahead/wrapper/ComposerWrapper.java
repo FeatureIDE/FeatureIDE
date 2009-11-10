@@ -39,6 +39,8 @@ import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.runtime.CoreException;
 
+import de.ovgu.featureide.ahead.model.JakModelBuilder;
+
 import featureide.core.IFeatureProject;
 
 /**
@@ -261,7 +263,7 @@ public class ComposerWrapper {
 						files, aspectName, composedASTs, ownASTs);
 				
 				// Add the currently composed class to the JakProject
-				featureProject.getJakProject().addClass(jakFile, filesVec,
+				new JakModelBuilder(featureProject).addClass(jakFile, filesVec,
 						composedASTs, ownASTs);
 				composedFiles.add(newJakIFile);
 

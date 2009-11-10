@@ -16,27 +16,26 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package featureide.core.jakprojectmodel.internal;
+package de.ovgu.featureide.ahead.model;
 
-import featureide.core.jakprojectmodel.IFeature;
-import featureide.core.jakprojectmodel.IJakElement;
+import featureide.core.jakprojectmodel.IImport;
+import featureide.core.jakprojectmodel.IJakModelElement;
 
 /**
  * 
  * @author Tom Brosch
- *
+ * 
  */
-public class Feature extends JakElement implements IFeature {
+public class Import extends JakModelElement implements IImport {
 
-	public Feature() {
-		
+	public Import() {
 	}
-	
+
 	public String getName() {
 		return null;
 	}
-	
-	public IJakElement[] getChildren() {
+
+	public IJakModelElement[] getChildren() {
 		return null;
 	}
 }

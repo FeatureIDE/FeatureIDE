@@ -18,6 +18,6 @@
  */
 package featureide.core.jakprojectmodel;
 
-public interface IImport extends IJakElement {
+public interface IImport extends IJakModelElement {
 
 }

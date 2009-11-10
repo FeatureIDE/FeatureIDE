@@ -47,7 +47,7 @@ import featureide.core.CorePlugin;
 import featureide.core.IFeatureProject;
 import featureide.core.jakprojectmodel.IClass;
 import featureide.core.jakprojectmodel.IField;
-import featureide.core.jakprojectmodel.IJakProject;
+import featureide.core.jakprojectmodel.IJakProjectModel;
 import featureide.core.jakprojectmodel.IMethod;
 
 
@@ -222,7 +222,7 @@ public class JakCompletionProcessor implements IContentAssistProcessor{
 			IFeatureProject featureProject = CorePlugin.getProjectData(file);
 			if (featureProject==null) return;
 			
-			IJakProject project = featureProject.getJakProject();
+			IJakProjectModel project = featureProject.getJakProjectModel();
 			if (project==null) return;
 			
 			IClass[] classes = project.getClasses();

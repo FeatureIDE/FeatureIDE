@@ -4,7 +4,7 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.graphics.Image;
 
-import featureide.core.jakprojectmodel.IJakElement;
+import featureide.core.jakprojectmodel.IJakModelElement;
 
 /**
  * This class is part of the outline. It maps the items
@@ -21,8 +21,8 @@ public class JakLabelProvider implements ILabelProvider {
 	}
 
 	public String getText(Object element) {
-		if( element instanceof IJakElement )
-			return ((IJakElement)element).getName();
+		if( element instanceof IJakModelElement )
+			return ((IJakModelElement)element).getName();
 		
 		return element.toString();
 	}

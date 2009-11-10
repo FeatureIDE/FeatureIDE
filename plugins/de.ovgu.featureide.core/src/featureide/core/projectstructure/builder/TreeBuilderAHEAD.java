@@ -26,7 +26,7 @@ import featureide.core.CorePlugin;
 import featureide.core.IFeatureProject;
 import featureide.core.jakprojectmodel.IClass;
 import featureide.core.jakprojectmodel.IField;
-import featureide.core.jakprojectmodel.IJakProject;
+import featureide.core.jakprojectmodel.IJakProjectModel;
 import featureide.core.jakprojectmodel.IMethod;
 import featureide.core.projectstructure.nodetypes.NonTerminalNode;
 import featureide.core.projectstructure.nodetypes.ProjectTreeNode;
@@ -71,7 +71,7 @@ public class TreeBuilderAHEAD {
 	public void buildTree() {
 		// create the node that denotes the project
 		insertProjectTreeNode("language", "AHEAD", projectTree.getRoot());
-		projectName = featureProject.getJakProject().getName();
+		projectName = featureProject.getJakProjectModel().getName();
 		insertProjectTreeNode("project", projectName, projectTree.findNodeByName("AHEAD"));
 
 		IFolder srcFolder = featureProject.getSourceFolder();
@@ -99,7 +99,7 @@ public class TreeBuilderAHEAD {
 	private LeafTree createLeafTree(ProjectTreeNode fileParent) {
 		LeafTree leafTree = new LeafTree();
 		leafTree.setParent(fileParent);
-		IJakProject project = featureProject.getJakProject();
+		IJakProjectModel project = featureProject.getJakProjectModel();
 		IClass[] classes = project.getClasses();
 		for (int i = 0; i < classes.length; i++) {
 			NonTerminalNode nonTerminal = createNonTerminal(

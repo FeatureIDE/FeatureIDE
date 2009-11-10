@@ -25,7 +25,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.QualifiedName;
 
 import featureide.core.builder.IComposerExtension;
-import featureide.core.jakprojectmodel.IJakProject;
+import featureide.core.jakprojectmodel.IJakProjectModel;
 import featureide.core.projectstructure.trees.ProjectTree;
 import featureide.fm.core.FeatureModel;
 
@@ -97,7 +97,7 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 
 	public IProject getProject();
 
-	public IJakProject getJakProject();
+	public IJakProjectModel getJakProjectModel();
 
 	public FeatureModel getFeatureModel();
 	
@@ -155,5 +155,10 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	 * @param paths An array of paths that will be added to the JAVA class path
 	 */
 	public void setAdditionalJavaClassPath(String[] paths);
+
+	/**
+	 * @param model
+	 */
+	public void setJakProjectModel(IJakProjectModel model);
 
 }

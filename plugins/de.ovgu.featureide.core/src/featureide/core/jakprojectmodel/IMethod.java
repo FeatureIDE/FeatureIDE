@@ -20,7 +20,7 @@ package featureide.core.jakprojectmodel;
 
 import org.eclipse.core.resources.IFile;
 
-public interface IMethod extends IJakElement {
+public interface IMethod extends IJakModelElement {
 
 	public String getMethodName();
 

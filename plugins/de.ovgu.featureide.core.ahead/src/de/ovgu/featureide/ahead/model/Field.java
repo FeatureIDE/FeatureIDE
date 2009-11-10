@@ -16,7 +16,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package featureide.core.jakprojectmodel.internal;
+package de.ovgu.featureide.ahead.model;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,98 +24,124 @@ import java.util.HashSet;
 import org.eclipse.core.resources.IFile;
 
 import featureide.core.jakprojectmodel.IField;
-import featureide.core.jakprojectmodel.IJakElement;
+import featureide.core.jakprojectmodel.IJakModelElement;
 
 /**
  * @author Tom Brosch
  */
 @SuppressWarnings("unchecked")
-public class Field extends JakElement implements Comparable, IField {
+public class Field extends JakModelElement implements Comparable, IField {
 
-	
 	private String fieldName;
 	private String typeName;
 	private int dimension;
-	
+
 	private HashSet<IFile> ownFiles;
 	private HashSet<IFile> availibleFiles;
 	private HashMap<IFile, Integer> lineNumbers;
-	
+
 	public Field(String fieldName, String typeName, int dim) {
 		this.fieldName = fieldName;
 		this.typeName = typeName;
 		this.dimension = dim;
-		
+
 		this.ownFiles = new HashSet<IFile>();
 		this.availibleFiles = new HashSet<IFile>();
 		this.lineNumbers = new HashMap<IFile, Integer>();
 	}
-	
+
 	public String getName() {
 		String name = fieldName + " : " + typeName;
-		for( int i = 0; i < dimension; i++ )
+		for (int i = 0; i < dimension; i++)
 			name += "[]";
 		return name;
 	}
-	
-	public IJakElement[] getChildren() {
+
+	public IJakModelElement[] getChildren() {
 		return null;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see featureide.core.jakprojectmodel.IField#getIdentifier()
 	 */
 	public String getIdentifier() {
-		return (typeName!=null?typeName:"")+(fieldName!=null?fieldName:"");
+		return (typeName != null ? typeName : "")
+				+ (fieldName != null ? fieldName : "");
 	}
 
 	public int compareTo(Object arg0) {
-		IField field = (IField)arg0;
+		IField field = (IField) arg0;
 		return getIdentifier().compareTo(field.getIdentifier());
 	}
-	
-	/* (non-Javadoc)
-	 * @see featureide.core.jakprojectmodel.IField#setOwn(org.eclipse.core.resources.IFile)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * featureide.core.jakprojectmodel.IField#setOwn(org.eclipse.core.resources
+	 * .IFile)
 	 */
 	public void setOwn(IFile file) {
 		ownFiles.add(file);
 	}
-	
-	/* (non-Javadoc)
-	 * @see featureide.core.jakprojectmodel.IField#isOwn(org.eclipse.core.resources.IFile)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * featureide.core.jakprojectmodel.IField#isOwn(org.eclipse.core.resources
+	 * .IFile)
 	 */
 	public boolean isOwn(IFile file) {
 		return ownFiles.contains(file);
 	}
-	
-	/* (non-Javadoc)
-	 * @see featureide.core.jakprojectmodel.IField#setAvailible(org.eclipse.core.resources.IFile)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * featureide.core.jakprojectmodel.IField#setAvailible(org.eclipse.core.
+	 * resources.IFile)
 	 */
 	public void setAvailible(IFile file) {
 		availibleFiles.add(file);
 	}
-	
-	/* (non-Javadoc)
-	 * @see featureide.core.jakprojectmodel.IField#isAvailible(org.eclipse.core.resources.IFile)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * featureide.core.jakprojectmodel.IField#isAvailible(org.eclipse.core.resources
+	 * .IFile)
 	 */
 	public boolean isAvailible(IFile file) {
 		return availibleFiles.contains(file);
 	}
-	
-	/* (non-Javadoc)
-	 * @see featureide.core.jakprojectmodel.IField#setLineNumber(org.eclipse.core.resources.IFile, int)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * featureide.core.jakprojectmodel.IField#setLineNumber(org.eclipse.core
+	 * .resources.IFile, int)
 	 */
 	public void setLineNumber(IFile file, int lineNumber) {
-		if( lineNumbers.containsKey(file) )
+		if (lineNumbers.containsKey(file))
 			lineNumbers.remove(file);
 		lineNumbers.put(file, lineNumber);
 	}
-	
-	/* (non-Javadoc)
-	 * @see featureide.core.jakprojectmodel.IField#getLineNumber(org.eclipse.core.resources.IFile)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * featureide.core.jakprojectmodel.IField#getLineNumber(org.eclipse.core
+	 * .resources.IFile)
 	 */
 	public int getLineNumber(IFile file) {
-		if( lineNumbers.containsKey(file) )
+		if (lineNumbers.containsKey(file))
 			return lineNumbers.get(file);
 		return -1;
 	}

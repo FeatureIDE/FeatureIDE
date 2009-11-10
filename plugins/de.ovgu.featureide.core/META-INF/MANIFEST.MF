@@ -20,8 +20,7 @@ Export-Package:
  featureide.core.listeners,
  featureide.core.projectstructure.nodetypes,
  featureide.core.projectstructure.trees
-Bundle-ClassPath: .,
- lib/mixin.jar
+Bundle-ClassPath: .
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: University of Magdeburg

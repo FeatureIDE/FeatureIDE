@@ -18,6 +18,6 @@
  */
 package featureide.core.jakprojectmodel;
 
-public interface IFeature extends IJakElement {
+public interface IFeature extends IJakModelElement {
 
 }

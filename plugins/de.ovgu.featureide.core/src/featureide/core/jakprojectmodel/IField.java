@@ -20,7 +20,7 @@ package featureide.core.jakprojectmodel;
 
 import org.eclipse.core.resources.IFile;
 
-public interface IField extends IJakElement {
+public interface IField extends IJakModelElement {
 
 	public String getIdentifier();
 

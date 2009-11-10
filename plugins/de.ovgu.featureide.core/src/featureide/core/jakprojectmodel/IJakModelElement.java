@@ -16,31 +16,40 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package featureide.core.jakprojectmodel.internal;
-
-import featureide.core.jakprojectmodel.IJakElement;
+package featureide.core.jakprojectmodel;
 
 /**
  * 
  * @author Tom Brosch
  *
  */
-public class JakElement implements IJakElement {
+public interface IJakModelElement {
 
-	public IJakElement[] getChildren() {
-		return null;
-	}
-
-	public String getName() {
-		return null;
-	}
-
-	public IJakElement getParent() {
-		return null;
-	}
-
-	public boolean hasChildren() {
-		return false;
-	}
-
+	/**
+	 * Returns the name of a jak element
+	 * 
+	 * @return name of a jak element
+	 */
+	public String getName();
+	
+	/**
+	 * Returns the children of a jak element
+	 * 
+	 * @return children of a jak element
+	 */
+	public IJakModelElement[] getChildren();
+	
+	/**
+	 * Returns the parent element
+	 * 
+	 * @return parent element
+	 */
+	public IJakModelElement getParent();
+	
+	/**
+	 * Returns true of the current element has children
+	 * 
+	 * @return true if the current element has children
+	 */
+	public boolean hasChildren();
 }

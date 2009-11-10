@@ -8,8 +8,8 @@ import org.eclipse.ui.part.FileEditorInput;
 import featureide.core.CorePlugin;
 import featureide.core.IFeatureProject;
 import featureide.core.jakprojectmodel.IClass;
-import featureide.core.jakprojectmodel.IJakElement;
-import featureide.core.jakprojectmodel.IJakProject;
+import featureide.core.jakprojectmodel.IJakModelElement;
+import featureide.core.jakprojectmodel.IJakProjectModel;
 
 /**
  * This class is part of the outline. It provides the content that
@@ -25,24 +25,24 @@ public class JakTreeContentProvider implements ITreeContentProvider {
 	
 	private IFile jakfile = null;
 
-	private IJakProject jakProject = null;
+	private IJakProjectModel jakProject = null;
 
 	public Object[] getChildren(Object parentElement) {
-		if (parentElement instanceof IJakElement)
-			return ((IJakElement) parentElement).getChildren();
+		if (parentElement instanceof IJakModelElement)
+			return ((IJakModelElement) parentElement).getChildren();
 
 		return null;
 	}
 
 	public Object getParent(Object element) {
-		if (element instanceof IJakElement)
-			((IJakElement) element).getParent();
+		if (element instanceof IJakModelElement)
+			((IJakModelElement) element).getParent();
 		return null;
 	}
 
 	public boolean hasChildren(Object element) {
-		if (element instanceof IJakElement)
-			return ((IJakElement) element).hasChildren();
+		if (element instanceof IJakModelElement)
+			return ((IJakModelElement) element).hasChildren();
 		return false;
 	}
 
@@ -68,7 +68,7 @@ public class JakTreeContentProvider implements ITreeContentProvider {
 			IFeatureProject featureProject = CorePlugin.getProjectData(file);
 			if (featureProject != null) {
 				jakfile = file;
-				jakProject = featureProject.getJakProject();
+				jakProject = featureProject.getJakProjectModel();
 			}
 		}
 	}

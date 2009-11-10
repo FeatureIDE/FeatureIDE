@@ -16,40 +16,46 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package featureide.core.jakprojectmodel.internal;
+package de.ovgu.featureide.ahead.model;
 
 import featureide.core.jakprojectmodel.IImport;
 import featureide.core.jakprojectmodel.IImportContainer;
-import featureide.core.jakprojectmodel.IJakElement;
+import featureide.core.jakprojectmodel.IJakModelElement;
 
 /**
  * 
  * @author Tom Brosch
- *
+ * 
  */
-public class ImportContainer extends JakElement implements IImportContainer {
+public class ImportContainer extends JakModelElement implements
+		IImportContainer {
 	public ImportContainer() {
 	}
-	
-	/* (non-Javadoc)
-	 * @see featureide.core.jakprojectmodel.IImportContainer#getNumberOfImports()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * featureide.core.jakprojectmodel.IImportContainer#getNumberOfImports()
 	 */
 	public int getNumberOfImports() {
 		return 0;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see featureide.core.jakprojectmodel.IImportContainer#getImports()
 	 */
 	public IImport[] getImports() {
 		return null;
 	}
-	
+
 	public String getName() {
 		return "import declarations";
 	}
-	
-	public IJakElement[] getChildren() {
+
+	public IJakModelElement[] getChildren() {
 		return null;
 	}
 }
