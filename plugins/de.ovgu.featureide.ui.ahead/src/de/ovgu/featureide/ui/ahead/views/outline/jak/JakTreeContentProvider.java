@@ -18,7 +18,7 @@ import featureide.core.jakprojectmodel.IJakProjectModel;
  * interface.
  * 
  * @author Tom Brosch
- * @author Thomas Thüm
+ * @author Thomas Thï¿½m
  *
  */
 public class JakTreeContentProvider implements ITreeContentProvider {
@@ -56,7 +56,7 @@ public class JakTreeContentProvider implements ITreeContentProvider {
 				return new String[] { "No ast available" };
 		}
 
-		return null;
+		return new String[] { "No project data available" }; //ticket #99 old code: return null;
 	}
 
 	public void dispose() {
