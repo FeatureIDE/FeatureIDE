@@ -148,7 +148,6 @@ public class JakProjectModel extends JakModelElement implements IJakProjectModel
 		return getNumberOfClasses() > 0;
 	}
 
-	@Override
 	public void markObsolete() {
 		//do nothing
 	}
