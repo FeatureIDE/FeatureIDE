@@ -34,13 +34,20 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 		//layout.addNewWizardShortcut(NewJakFileWizard.ID);
 		layout.addNewWizardShortcut(NewFeatureProjectWizard.ID);
 		layout.addNewWizardShortcut(NewJakFileWizard.ID);
+		//layout.addView(IPageLayout.ID_OUTLINE, IPageLayout.RIGHT, 0.25f, editorArea);
 		
         IFolderLayout left = layout.createFolder("left", IPageLayout.LEFT, (float) 0.23, editorArea);
-		IFolderLayout down=layout.createFolder("down", IPageLayout.BOTTOM, (float)0.80, editorArea); 
+		IFolderLayout down=layout.createFolder("down", IPageLayout.BOTTOM, (float) 0.80, editorArea); 
+		IFolderLayout right=layout.createFolder("right", IPageLayout.RIGHT, (float) 0.75, editorArea); 
 		
 		down.addView("org.eclipse.ui.console.ConsoleView");
 		down.addView("featureide.fm.ui.views.FeatureModelEditView");
 		down.addView(IPageLayout.ID_PROBLEM_VIEW);
+		
+		right.addView(IPageLayout.ID_OUTLINE);
+		
+		
+		
 		
 		left.addView("org.eclipse.jdt.ui.PackageExplorer");
 	//	left.addView(IPageLayout.ID_RES_NAV);
