@@ -22,18 +22,18 @@ import featureide.core.jakprojectmodel.IFeature;
 import featureide.core.jakprojectmodel.IJakModelElement;
 
 /**
- * 
+ * @author Constanze Adler
  * @author Tom Brosch
  * 
  */
 public class Feature extends JakModelElement implements IFeature {
-
-	public Feature() {
-
+	private String name;
+	public Feature(String name) {
+		this.name = name;
 	}
 
 	public String getName() {
-		return null;
+		return name;
 	}
 
 	public IJakModelElement[] getChildren() {

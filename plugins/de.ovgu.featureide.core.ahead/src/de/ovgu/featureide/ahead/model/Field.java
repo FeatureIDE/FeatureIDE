@@ -34,16 +34,18 @@ public class Field extends JakModelElement implements Comparable, IField {
 
 	private String fieldName;
 	private String typeName;
+	private String modifiers;
 	private int dimension;
 
 	private HashSet<IFile> ownFiles;
 	private HashSet<IFile> availibleFiles;
 	private HashMap<IFile, Integer> lineNumbers;
 
-	public Field(String fieldName, String typeName, int dim) {
+	public Field(String fieldName, String typeName, int dim, String modifiers) {
 		this.fieldName = fieldName;
 		this.typeName = typeName;
 		this.dimension = dim;
+		this.modifiers = modifiers;
 
 		this.ownFiles = new HashSet<IFile>();
 		this.availibleFiles = new HashSet<IFile>();
@@ -144,5 +146,30 @@ public class Field extends JakModelElement implements Comparable, IField {
 		if (lineNumbers.containsKey(file))
 			return lineNumbers.get(file);
 		return -1;
+	}
+
+	
+	public String getFieldName() {
+		return fieldName;
+	}
+	
+	public boolean isFinal() {
+		return modifiers.contains("final");
+	}
+
+	public boolean isPrivate() {
+		return modifiers.contains("private");
+	}
+
+	public boolean isProtected() {
+		return modifiers.contains("protected");
+	}
+
+	public boolean isPublic() {
+		return modifiers.contains("public");
+	}
+
+	public boolean isStatic() {
+		return modifiers.contains("static");
 	}
 }

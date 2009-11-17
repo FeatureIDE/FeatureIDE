@@ -37,6 +37,7 @@ public class JakProjectModel extends JakModelElement implements IJakProjectModel
 
 	HashMap<IFile, Class> classesMap;
 	HashMap<String, Class> classes;
+	HashMap<String, Feature> features;
 	private String projectName;
 
 	/**
@@ -48,6 +49,7 @@ public class JakProjectModel extends JakModelElement implements IJakProjectModel
 	public JakProjectModel(String name) {
 		classesMap = new HashMap<IFile, Class>();
 		classes = new HashMap<String, Class>();
+		features = new HashMap<String, Feature>();
 		projectName = name;
 	}
 
@@ -76,7 +78,7 @@ public class JakProjectModel extends JakModelElement implements IJakProjectModel
 	 * @see featureide.core.jakprojectmodel.IJakProject#getNumberOfFeatures()
 	 */
 	public int getNumberOfFeatures() {
-		return 0;
+		return features.size();
 	}
 
 	/*
@@ -85,7 +87,12 @@ public class JakProjectModel extends JakModelElement implements IJakProjectModel
 	 * @see featureide.core.jakprojectmodel.IJakProject#getFeatures()
 	 */
 	public IFeature[] getFeatures() {
-		return null;
+		IFeature[] featureArray = new Feature[features.size()];
+		int pos = 0;
+		for (IFeature f : features.values()) {
+			featureArray[pos++] = f;
+		}
+		return featureArray;
 	}
 
 	/*
@@ -95,7 +102,9 @@ public class JakProjectModel extends JakModelElement implements IJakProjectModel
 	 * featureide.core.jakprojectmodel.IJakProject#getFeature(java.lang.String)
 	 */
 	public IFeature getFeature(String featureName) {
-		return null;
+		if (!features.containsKey(featureName))
+			return null;
+		return features.get(featureName); 
 	}
 
 	/*

@@ -36,22 +36,24 @@ public class Method extends JakModelElement implements Comparable, IMethod {
 	private String methodName;
 	private LinkedList<String> parameterTypes;
 	private String returnType;
+	private String modifiers;
 	private HashSet<IFile> ownFiles;
 	private HashSet<IFile> availableFiles;
 	private HashMap<IFile, Integer> lineNumbers;
 
 	public Method() {
-		this(null, null, null);
+		this(null, null, null,null);
 	}
 
 	public Method(String methodName, LinkedList<String> parameterTypes,
-			String returnType) {
+			String returnType, String modifiers) {
 		this.methodName = methodName;
 		this.parameterTypes = parameterTypes;
 		this.returnType = returnType;
 		this.ownFiles = new HashSet<IFile>();
 		this.availableFiles = new HashSet<IFile>();
 		this.lineNumbers = new HashMap<IFile, Integer>();
+		this.modifiers = modifiers;
 	}
 
 	public String getName() {
@@ -167,5 +169,26 @@ public class Method extends JakModelElement implements Comparable, IMethod {
 		if (lineNumbers.containsKey(file))
 			return lineNumbers.get(file);
 		return -1;
+	}
+
+	
+	public boolean isFinal() {
+		return modifiers.contains("final");
+	}
+
+	public boolean isPrivate() {
+		return modifiers.contains("private");
+	}
+
+	public boolean isProtected() {
+		return modifiers.contains("protected");
+	}
+
+	public boolean isPublic() {
+		return modifiers.contains("public");
+	}
+
+	public boolean isStatic() {
+		return modifiers.contains("static");
 	}
 }

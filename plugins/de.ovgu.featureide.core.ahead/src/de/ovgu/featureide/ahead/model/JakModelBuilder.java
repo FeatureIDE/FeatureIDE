@@ -2,9 +2,12 @@ package de.ovgu.featureide.ahead.model;
 
 import java.util.LinkedList;
 
+import mixin.AST_Modifiers;
 import mixin.AST_ParList;
 import mixin.AST_Program;
+import mixin.AST_QualifiedName;
 import mixin.AST_TypeName;
+import mixin.AspectStm;
 import mixin.AstCursor;
 import mixin.AstNode;
 import mixin.AstToken;
@@ -134,6 +137,14 @@ public class JakModelBuilder {
 					}
 					c.Sibling();
 				}
+				
+				if (c.node instanceof AspectStm){
+					Feature f = getFeature((AspectStm) c.node);
+					if (!model.features.containsKey(f.getName())) {
+						model.features.put(f.getName(), f);
+					}
+					c.Sibling();
+				}
 			}
 
 		}
@@ -152,6 +163,7 @@ public class JakModelBuilder {
 		AstCursor cur = new AstCursor();
 		String type = "";
 		String name = "";
+		String modifiers = "";
 		LinkedList<String> paramTypes = new LinkedList<String>();
 
 		// Travers the Subtree and catch the name of the method,
@@ -185,15 +197,24 @@ public class JakModelBuilder {
 				cur.Sibling(); // This subtree was complete analysed so we can
 				// skip it
 			}
+			else if (cur.node instanceof AST_Modifiers) {
+
+				// Get the modifiers of the method
+				modifiers = ((AST_Modifiers) cur.node).toString().trim();
+				cur.Sibling(); // This subtree was complete analysed so we can
+				// skip it
+				
+			}
 
 		}
 
-		return new Method(name, paramTypes, type);
+		return new Method(name, paramTypes, type, modifiers);
 	}
 
 	private LinkedList<Field> getFields(FldVarDec fieldDcl) {
 		AstCursor cur = new AstCursor();
 		String type = "";
+		String modifiers = "";
 
 		LinkedList<Field> fields = new LinkedList<Field>();
 
@@ -208,14 +229,32 @@ public class JakModelBuilder {
 				type = ((AST_TypeName) cur.node).GetName();
 				cur.Sibling(); // This subtree was complete analysed so we can
 				// skip it
-			} else if (cur.node instanceof DecNameDim) {
+			}
+			else if (cur.node instanceof AST_Modifiers) {
+
+				// Get modifiers of the field
+				modifiers = ((AST_Modifiers) cur.node).toString().trim();
+				cur.Sibling(); // This subtree was complete analysed so we can
+				// skip it
+			}
+			else if (cur.node instanceof DecNameDim) {
 				// to do: find out the dimension more correctly
 				fields.add(new Field(((DecNameDim) cur.node).getQName()
-						.GetName(), type, 0));
+						.GetName(), type, 0, modifiers));
 			}
 
 		}
 
 		return fields;
+	}
+	private Feature getFeature(AspectStm stm){
+		AstCursor cur = new AstCursor();
+		String featureName="";
+		for (cur.First(stm); cur.More(); cur.PlusPlus()){
+			if (cur.node instanceof AST_QualifiedName)
+				featureName = ((AST_QualifiedName) cur.node).GetName();
+		}
+		
+		return new Feature(featureName);
 	}
 }

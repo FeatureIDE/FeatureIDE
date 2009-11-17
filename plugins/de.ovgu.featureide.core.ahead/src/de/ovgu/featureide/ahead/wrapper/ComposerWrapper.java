@@ -71,6 +71,8 @@ public class ComposerWrapper {
 	private IFile equationFile;
 
 	private IFeatureProject featureProject;
+	
+	private JakModelBuilder jakModelBuilder;
 
 	/**
 	 * Creates a new instance of Composer
@@ -84,6 +86,7 @@ public class ComposerWrapper {
 		equationFile = null;
 		errorListeners = new LinkedList<AheadBuildErrorListener>();
 		this.featureProject = featureProject;
+		jakModelBuilder = new JakModelBuilder(this.featureProject);
 	}
 
 	public IFile[] composeAll() throws IOException {
@@ -263,7 +266,7 @@ public class ComposerWrapper {
 						files, aspectName, composedASTs, ownASTs);
 				
 				// Add the currently composed class to the JakProject
-				new JakModelBuilder(featureProject).addClass(jakFile, filesVec,
+				jakModelBuilder.addClass(jakFile, filesVec,
 						composedASTs, ownASTs);
 				composedFiles.add(newJakIFile);
 

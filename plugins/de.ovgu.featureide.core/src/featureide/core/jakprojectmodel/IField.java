@@ -36,4 +36,16 @@ public interface IField extends IJakModelElement {
 
 	public int getLineNumber(IFile file);
 
+	public String getFieldName();
+	
+	public boolean isPublic();
+	
+	public boolean isPrivate();
+	
+	public boolean isProtected();
+	
+	public boolean isStatic();
+	
+	public boolean isFinal();
+
 }

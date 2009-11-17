@@ -22,7 +22,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.jdt.ui.ISharedImages;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.text.BadLocationException;
@@ -39,10 +38,12 @@ import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationPresenter;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.part.FileEditorInput;
 
-import de.ovgu.featureide.ui.ahead.editors.JakEditor;
+import de.ovgu.featureide.ui.ahead.AheadUIPlugin;
+
 import featureide.core.CorePlugin;
 import featureide.core.IFeatureProject;
 import featureide.core.jakprojectmodel.IClass;
@@ -88,10 +89,8 @@ public class JakCompletionProcessor implements IContentAssistProcessor{
 	
 	
 	protected IContextInformationValidator fValidator= new Validator();
-	private JakEditor editor;
-	public JakCompletionProcessor(JakEditor editor){
+	public JakCompletionProcessor(){
 		super();
-		this.editor = editor;
 	}
 
 	/* (non-Javadoc)
@@ -152,12 +151,7 @@ public class JakCompletionProcessor implements IContentAssistProcessor{
 	{
 		//retrieve current document
 		IDocument doc = viewer.getDocument();
-		try {
-			collectCompletionProposals(viewer, offset);
-			DocumentParser parser = new DocumentParser(doc);
-			ArrayList<CompletionMethod> methods = parser.getMethods();
-			ArrayList<CompletionField> fields = parser.getFields();
-			
+		try {			
 			int line = doc.getLineOfOffset(offset);
 			int length = doc.getLineLength(line);
 			String text = doc.get(offset-(length-1),length-1);
@@ -179,68 +173,143 @@ public class JakCompletionProcessor implements IContentAssistProcessor{
 				behind = text;
 			}
 			
+			propList.addAll(this.getProposalsFromCurrentDocument(behind, offset, doc));
 			
-				
-			for (CompletionField field : fields){
-				String prop;
-				prop = field.getFieldName() + " : " + field.getType();
-				if (behind==null){
-					IContextInformation info= new ContextInformation(prop, field.getType()); //$NON-NLS-1$	
-					propList.add(new CompletionProposal(field.getFieldName(), offset, 0, field.getFieldName().length(),field.getImage(), prop, info, MessageFormat.format(JakEditorMessages.getString("CompletionProcessor.Proposal.hoverinfo.pattern"), field.getType()))); //$NON-NLS-1$
-				}
-				else 
-					if (field.getFieldName().startsWith(behind)){
-						IContextInformation info= new ContextInformation(prop, field.getType()); //$NON-NLS-1$	
-						propList.add(new CompletionProposal(field.getFieldName(), offset-behind.length(), behind.length(), field.getFieldName().length(),field.getImage(), prop, info, MessageFormat.format(JakEditorMessages.getString("CompletionProcessor.Proposal.hoverinfo.pattern"), field.getType()))); //$NON-NLS-1$
+			IWorkbenchWindow editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+			FileEditorInput inputFile = (FileEditorInput)editor.getActivePage().getActiveEditor().getEditorInput(); 
+			IFeatureProject featureProject = CorePlugin.getProjectData(inputFile.getFile());
+			IClass[] classes = null;
+			if (featureProject!=null){
+				IJakProjectModel project = featureProject.getJakProjectModel();
+				if (project!=null) {
+					classes = project.getClasses();
+					if (classes!=null){
+						propList.addAll(getFieldProposals(behind, classes, offset));
+						propList.addAll(getMethodProposals(behind, classes, offset));	
 					}
-			}
-			for (CompletionMethod method : methods){
-				String prop;
-				prop = ((method.getReturnValue()).equals("")) ? method.getMethodName() : method.getMethodName()+" : " + method.getReturnValue();
-				if (behind==null){				
-					IContextInformation info= new ContextInformation(prop, prop); 
-					propList.add(new CompletionProposal(method.getMethodName(), offset, 0, method.getMethodName().length(),method.getImg(), prop, info, MessageFormat.format(JakEditorMessages.getString("CompletionProcessor.Proposal.hoverinfo.pattern"), method.getParamList()))); //$NON-NLS-1$
 				}
-				else
-					if(method.getMethodName().startsWith(behind)){
-						IContextInformation info= new ContextInformation(prop, prop);
-						propList.add(new CompletionProposal(method.getMethodName(),  offset-behind.length(), behind.length(), method.getMethodName().length(),method.getImg(), prop, info, MessageFormat.format(JakEditorMessages.getString("CompletionProcessor.Proposal.hoverinfo.pattern"), method.getParamList()))); //$NON-NLS-1$
-					}
 			}
+			
+			
+			
+			
 		} catch (BadLocationException e) {
 			e.printStackTrace();
 		}
 		
 		
 	}
+	
+	private List<CompletionProposal> getFieldProposals(String behind, IClass[] iClasses, int offset){
 		
-	private void collectCompletionProposals(ITextViewer viewer, int offset) throws BadLocationException{
-		IEditorInput input = editor.getEditorInput();
-		
-		if (input instanceof IFileEditorInput){
-			IFile file = ((IFileEditorInput) input).getFile();
-			IFeatureProject featureProject = CorePlugin.getProjectData(file);
-			if (featureProject==null) return;
-			
-			IJakProjectModel project = featureProject.getJakProjectModel();
-			if (project==null) return;
-			
-			IClass[] classes = project.getClasses();
-		
-			if (classes == null) return;
-					
-			for (IClass nextClass : classes){
-				IField[] fields = nextClass.getFields();
-				IMethod[] methods = nextClass.getMethods();
-				for (IMethod method : methods)
-					System.out.println(method.getMethodName());
-				if (fields.length > 0) System.out.println(nextClass.getName()+": fields > 0");
-				if (methods.length > 0) System.out.println(nextClass.getName()+": methods > 0");
-							
+		List<CompletionProposal> propList = new ArrayList<CompletionProposal>();
+		for (IClass nextClass : iClasses){
+			String prop;
+			ISharedImages javaImages = JavaUI.getSharedImages();
+			Image img = AheadUIPlugin.getImage("JakFileSmall.png");
+			IField[] fields = nextClass.getFields();
+			if (fields!=null)
+			for (IField f : fields){
+				if (f.isPrivate())
+					img = javaImages.getImage(ISharedImages.IMG_FIELD_PRIVATE);
+				if (f.isProtected())
+					img = javaImages.getImage(ISharedImages.IMG_FIELD_PROTECTED);
+				if (f.isPublic())
+					img = javaImages.getImage(ISharedImages.IMG_FIELD_PUBLIC);
+				String fClass = nextClass.getName().split("[.]")[0];
+				prop = f.getName() + " - " + fClass;
+				IContextInformation info= new ContextInformation(prop, prop); 
+				if (behind==null){
+					propList.add(new CompletionProposal(f.getFieldName(), offset, 0, f.getFieldName().length(),img, prop, info, MessageFormat.format(JakEditorMessages.getString("CompletionProcessor.Proposal.hoverinfo.pattern"), f.getIdentifier()))); //$NON-NLS-1$
+				}
+				else if (f.getFieldName().startsWith(behind)){
+					propList.add(new CompletionProposal(f.getFieldName(), offset-behind.length(), behind.length(), f.getFieldName().length(),img, prop, info, MessageFormat.format(JakEditorMessages.getString("CompletionProcessor.Proposal.hoverinfo.pattern"), f.getIdentifier()))); //$NON-NLS-1$
+				}
 			}
-		}		
+		}
+		
+		return propList;
 	}
 	
+	
+private List<CompletionProposal> getMethodProposals(String behind, IClass[] iClasses, int offset){
+	
+	List<CompletionProposal> propList = new ArrayList<CompletionProposal>();
+	for (IClass nextClass : iClasses){
+		String prop;
+		Image img = AheadUIPlugin.getImage("JakFileSmall.png");
+		IMethod[] methods = nextClass.getMethods();
+		ISharedImages javaImages = JavaUI.getSharedImages();
+		String mClass = nextClass.getName().split("[.]")[0];
+		if (methods!=null)
+			for (IMethod m : methods){
+				if (m.isPrivate())
+					img = javaImages.getImage(ISharedImages.IMG_OBJS_PRIVATE);
+				if (m.isProtected())
+					img = javaImages.getImage(ISharedImages.IMG_OBJS_PROTECTED);
+				if (m.isPublic())
+					img = javaImages.getImage(ISharedImages.IMG_OBJS_PUBLIC);
+				prop = m.getName() + " - " + mClass;
+				IContextInformation info= new ContextInformation(prop, prop); 
+				
+				if (behind==null) {
+					propList.add(new CompletionProposal(m.getMethodName(), offset, 0, m.getMethodName().length(),img, prop, info, MessageFormat.format(JakEditorMessages.getString("CompletionProcessor.Proposal.hoverinfo.pattern"), m.getIdentifier()))); //$NON-NLS-1$
+				}
+				else
+					if(m.getMethodName().startsWith(behind)){
+						propList.add(new CompletionProposal(m.getMethodName(), offset, 0, m.getMethodName().length(),img, prop, info, MessageFormat.format(JakEditorMessages.getString("CompletionProcessor.Proposal.hoverinfo.pattern"), m.getIdentifier()))); //$NON-NLS-1$
+					}
+			}
+	}
+	
+	
+	
+	return propList;
+}
+	
+	
+private List<CompletionProposal> getProposalsFromCurrentDocument(String behind,  int offset, IDocument doc){
+	
+	List<CompletionProposal> propList = new ArrayList<CompletionProposal>();
+	
+	DocumentParser parser = new DocumentParser(doc);
+	ArrayList<CompletionMethod> cMethods = parser.getMethods();
+	ArrayList<CompletionField> cFields = parser.getFields();
+	
+	for (CompletionField field : cFields){
+		String prop;
+		prop = field.getFieldName() + " : " + field.getType() + " - this" ;
+		
+		IContextInformation info= new ContextInformation(prop, field.getType()); //$NON-NLS-1$	
+		if (behind==null){
+			propList.add(new CompletionProposal(field.getFieldName(), offset, 0, field.getFieldName().length(),field.getImage(), prop, info, MessageFormat.format(JakEditorMessages.getString("CompletionProcessor.Proposal.hoverinfo.pattern"), field.getType()))); //$NON-NLS-1$
+		}
+		else 
+			if (field.getFieldName().startsWith(behind)){
+				propList.add(new CompletionProposal(field.getFieldName(), offset-behind.length(), behind.length(), field.getFieldName().length(),field.getImage(), prop, info, MessageFormat.format(JakEditorMessages.getString("CompletionProcessor.Proposal.hoverinfo.pattern"), field.getType()))); //$NON-NLS-1$
+			}
+	}
+	
+	
+	
+	
+	for (CompletionMethod method : cMethods){
+		String prop;
+		prop = ((method.getReturnValue()).equals("")||method.getReturnValue().equals("void")) ? method.getMethodName()+" - this" : method.getMethodName()+" : " + method.getReturnValue()+" - this";
+		IContextInformation info= new ContextInformation(prop, prop); 
+		if (behind==null){				
+			propList.add(new CompletionProposal(method.getMethodName(), offset, 0, method.getMethodName().length(),method.getImg(), prop, info, MessageFormat.format(JakEditorMessages.getString("CompletionProcessor.Proposal.hoverinfo.pattern"), method.getParamList()))); //$NON-NLS-1$
+		}
+		else
+			if(method.getMethodName().startsWith(behind)){
+				propList.add(new CompletionProposal(method.getMethodName(),  offset-behind.length(), behind.length(), method.getMethodName().length(),method.getImg(), prop, info, MessageFormat.format(JakEditorMessages.getString("CompletionProcessor.Proposal.hoverinfo.pattern"), method.getParamList()))); //$NON-NLS-1$
+			}
+	}
+	
+	
+	return propList;
+}	
+
 	
 	protected class CompletionMethod{
 		private Image img;

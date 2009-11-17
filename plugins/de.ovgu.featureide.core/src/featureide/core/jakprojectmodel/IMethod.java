@@ -37,5 +37,15 @@ public interface IMethod extends IJakModelElement {
 	public void setLineNumber(IFile file, int lineNumber);
 
 	public int getLineNumber(IFile file);
+	
+	public boolean isPublic();
+	
+	public boolean isPrivate();
+	
+	public boolean isProtected();
+	
+	public boolean isStatic();
+	
+	public boolean isFinal();
 
 }
