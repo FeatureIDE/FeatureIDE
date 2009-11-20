@@ -226,6 +226,21 @@ public class Configuration {
 			findSelectedFeatures((SelectableFeature) child, result);
 	}
 
+	public Set<Feature> getUnSelectedFeatures() {
+		HashSet<Feature> result = new HashSet<Feature>();
+		findUnSelectedFeatures(getRoot(), result);
+		return result;
+	}
+
+	private void findUnSelectedFeatures(SelectableFeature sf,
+			HashSet<Feature> result) {
+		if (sf.getSelection() == Selection.UNSELECTED)
+			result.add(sf.getFeature());
+		for (TreeElement child : sf.getChildren())
+			findUnSelectedFeatures((SelectableFeature) child, result);
+	}
+	
+	
 	public FeatureModel getFeatureModel() {
 		return featureModel;
 	}
