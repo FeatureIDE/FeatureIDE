@@ -113,6 +113,16 @@ public class OpenWithGuidslAction implements IObjectActionDelegate {
 	private void execProcess(String command, File dir) throws IOException {
         System.out.println("Starting process: " + command);
         Process process = Runtime.getRuntime().exec(command, null, dir);
+        String sys = System.getProperty("os.name");
+        // #58 ,OS dependent Code for excuting commands,  Linux does not execute without a shell
+        if (sys.equals("Linux")){
+        	String[] cmd = new String[3];
+        	 cmd[0] = "/bin/bash";
+             cmd[1] = "-c";
+             cmd[2] = command;
+             process = Runtime.getRuntime().exec(cmd,null,dir);
+        }
+       
         BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
         BufferedReader error = new BufferedReader(new InputStreamReader(process.getErrorStream()));
         
