@@ -249,10 +249,9 @@ public class FeatureModelReader extends AbstractFeatureModelReader {
 			line = token.lineNum();
 			String var = token.name;
 			if (featureModel.getFeature(var) == null)
-				throw new UnsupportedModelException("The feature '" + var + "' does not occur in the grammar!", token.lineNum());
-			
-			return new Literal(featureModel.getFeature(var));
-			//return new Literal(var);
+				throw new UnsupportedModelException("The feature '" + var + "' does not occur in the grammar!", token.lineNum());	
+			//return new Literal(featureModel.getFeature(var));
+			return new Literal(var);
 		}
 		if (expr instanceof Paren)
 			return exprToNode(((Paren) expr).getExpr());
@@ -295,16 +294,18 @@ public class FeatureModelReader extends AbstractFeatureModelReader {
 
 	public Node readPropositionalString(String propString, FeatureModel featureModel) throws UnsupportedModelException{
 		//String featureString = new FeatureModelWriter(featureModel).writeToString();
+		String annotationtemp = featureModel.getAnnotations();
+		featureModel.setAnnotations("");
 		StringBuffer featureString= new StringBuffer(
 									new FeatureModelWriter(featureModel).writeToString());		
+		
 		if( featureModel.getConstraintCount()== 0)
 			featureString.append("%%\r\n");
 		featureString.append(propString);
 		readFromString(featureString.toString());
 		List<Node> propNodes = getFeatureModel().getPropositionalNodes();
 		
-		//FeatureModel nodeModel = getFeatureModel();
-		
+		featureModel.setAnnotations(annotationtemp);	
 		return propNodes.get(propNodes.size()-1);
 	}
 	
