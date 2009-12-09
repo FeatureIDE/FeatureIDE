@@ -1,0 +1,12 @@
+layer mstptestGenR;
+
+import java.util.LinkedList;
+
+SoUrCe RooT Base "../runtime-New_configuration/GPL/src/Base/NeighborIfc.jak";
+
+// *************************************************************************
+// I believe this interface is always empty?
+
+public interface NeighborIfc
+{
+}

@@ -1,0 +1,14 @@
+layer mstptestGenR;
+
+SoUrCe RooT Base "../runtime-New_configuration/GPL/src/Base/Vertex.jak";
+
+class Vertex {
+  public String name = null;
+
+  public  Vertex assignName( String name ) {
+      this.name = name;
+      return ( Vertex ) this;
+  }
+
+  public String getName( ) {  return this.name; }
+}
