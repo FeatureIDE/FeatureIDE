@@ -7,7 +7,7 @@
       id="de.ovgu.featureide.ui.doc.cheatsheet"
       name="FeatureIDE"/>
       <cheatsheet
-            category="de.ovgu.featureide.ui.doc.cheatsheet/"
+            category="de.ovgu.featureide.ui.doc.cheatsheet"
             composite="false"
             contentFile="cheatsheets/helloworld_cheatsheet.xml"
             id="de.ovgu.featureide.ui.doc.cheatsheet"
