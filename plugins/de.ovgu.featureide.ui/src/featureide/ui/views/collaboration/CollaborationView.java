@@ -57,7 +57,8 @@ public class CollaborationView extends ViewPart implements GUIDefaults, IEquatio
 	private ScalableFreeformRootEditPart rootEditPart;
 	private CollaborationModelBuilder builder;
 	private CollaborationModel model;
-	private ShowRoleImplementationAction roleAction;
+	private ShowRoleImplementationAction showRoleAction;
+	
 	/*
 	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
 	 */
@@ -99,7 +100,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, IEquatio
 	/* (non-Javadoc)
 	 * @see featureide.core.listeners.IEquationChangedListener#equationChanged(featureide.core.IFeatureProject)
 	 */
-	@Override
+
 	public void equationChanged(IFeatureProject featureProject) {
 		model = builder.buildCollaborationModel(featureProject);
 		graphicalViewer.setContents(model);
@@ -121,14 +122,18 @@ public class CollaborationView extends ViewPart implements GUIDefaults, IEquatio
 	
 	private void fillContextMenu(IMenuManager menuMgr){
 		boolean isEmpty = graphicalViewer.getSelection().isEmpty();		
-		roleAction.setEnabled(!isEmpty);
-		menuMgr.add(roleAction);
-		//menuMgr.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+		showRoleAction.setEnabled(!isEmpty);
+		
+		menuMgr.add(showRoleAction);
+		
 		
 	}
 	
+	
+	
 	private void createActions() {
-		roleAction = new ShowRoleImplementationAction("Role Implementation", graphicalViewer);
+		showRoleAction = new ShowRoleImplementationAction("Role Implementation", graphicalViewer);
+	
 	}
 	
 
