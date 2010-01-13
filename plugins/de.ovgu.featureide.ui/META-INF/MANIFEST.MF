@@ -26,4 +26,5 @@ Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: University of Magdeburg
-Import-Package: de.ovgu.featureide.ui.ahead
+Import-Package: de.ovgu.featureide.ui.ahead,
+ org.eclipse.core.filesystem
