@@ -23,14 +23,14 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 	private IFeatureProject featureProject;
 	private IComposerExtension composerExtension;
 	
-	private void currentEquationFileChanged(IFeatureProject featureProject) {
-		if (featureProjectLoaded() && featureProject == this.featureProject) {
-			IFile equationFile = featureProject.getCurrentEquationFile();
-			if (equationFile == null || !equationFile.exists())
-				return;
-			composerExtension.performFullBuild(equationFile);
-		}
-	}
+//	private void currentEquationFileChanged(IFeatureProject featureProject) {
+//		if (featureProjectLoaded() && featureProject == this.featureProject) {
+//			IFile equationFile = featureProject.getCurrentEquationFile();
+//			if (equationFile == null || !equationFile.exists())
+//				return;
+//			composerExtension.performFullBuild(equationFile);
+//		}
+//	}
 	
 	private boolean featureProjectLoaded() {
 		if (featureProject != null && composerExtension != null)
@@ -53,17 +53,18 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		}
 			
 		composerExtension.initialize(featureProject);
-		CorePlugin.getDefault().addCurrentEquationListener(new ICurrentEquationListener() {
-			public void currentEquationChanged(IFeatureProject featureProject) {
-				currentEquationFileChanged(featureProject);
-			}
-		});
-		CorePlugin.getDefault().addEquationChangedListener(new IEquationChangedListener() {
-			
-			public void equationChanged(IFeatureProject featureProject) {
-				currentEquationFileChanged(featureProject);
-			}
-		});
+		
+//		CorePlugin.getDefault().addCurrentEquationListener(new ICurrentEquationListener() {
+//			public void currentEquationChanged(IFeatureProject featureProject) {
+//				currentEquationFileChanged(featureProject);
+//			}
+//		});
+//		CorePlugin.getDefault().addEquationChangedListener(new IEquationChangedListener() {
+//			
+//			public void equationChanged(IFeatureProject featureProject) {
+//				currentEquationFileChanged(featureProject);
+//			}
+//		});
 		return true;
 	}
 	
