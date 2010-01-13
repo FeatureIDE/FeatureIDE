@@ -18,6 +18,9 @@
  */
 package de.ovgu.featureide.ahead.model;
 
+import java.util.TreeMap;
+
+import featureide.core.jakprojectmodel.IClass;
 import featureide.core.jakprojectmodel.IFeature;
 import featureide.core.jakprojectmodel.IJakModelElement;
 
@@ -28,8 +31,11 @@ import featureide.core.jakprojectmodel.IJakModelElement;
  */
 public class Feature extends JakModelElement implements IFeature {
 	private String name;
+	TreeMap<String, Class> classes;
+	
 	public Feature(String name) {
 		this.name = name;
+		classes = new TreeMap<String, Class>();
 	}
 
 	public String getName() {
@@ -37,6 +43,11 @@ public class Feature extends JakModelElement implements IFeature {
 	}
 
 	public IJakModelElement[] getChildren() {
-		return null;
+		if (classes == null) return null;
+		IClass[] elements = new IClass[classes.size()];
+		int i = 0;
+		for (IClass c : classes.values())
+			elements[i++] =  c;		
+		return elements;
 	}
 }

@@ -50,10 +50,10 @@ public class JakModelBuilder {
 	public void addClass(String className, LinkedList<IFile> sources,
 			AST_Program[] composedASTs, AST_Program[] ownASTs) {
 		Class currentClass = null;
-
 		// Parse the name and the ownASTs to know to which IFiles this class
 		// file belongs to
 
+		
 		// This class doesnt exist, than create a new class object
 		if (model.classes.containsKey(className)) {
 			currentClass = model.classes.get(className);
@@ -92,7 +92,7 @@ public class JakModelBuilder {
 
 		for (int i = 0; i < sources.size(); i++) {
 			currentFile = sources.get(i);
-
+		
 			// Parse the tree and every method that was found add it to
 			// both vectors
 
@@ -101,7 +101,7 @@ public class JakModelBuilder {
 
 					// Get the method from the Ast
 					// This method was not new in this file, than just update
-					// the own und availible flag
+					// the own and available flag
 					// Put it back to the methodsMap
 
 					newMethod = getMethod((MethodDcl) c.node);
@@ -139,9 +139,12 @@ public class JakModelBuilder {
 				}
 				
 				if (c.node instanceof AspectStm){
-					Feature f = getFeature((AspectStm) c.node);
+					Feature f = getFeature((AspectStm) c.node, currentClass, currentFile);
 					if (!model.features.containsKey(f.getName())) {
 						model.features.put(f.getName(), f);
+					}
+					else{
+						model.features.get(f.getName()).classes.put(currentClass.getName(),currentClass);
 					}
 					c.Sibling();
 				}
@@ -247,14 +250,16 @@ public class JakModelBuilder {
 
 		return fields;
 	}
-	private Feature getFeature(AspectStm stm){
+	private Feature getFeature(AspectStm stm, Class currentClass, IFile currentFile){
 		AstCursor cur = new AstCursor();
 		String featureName="";
 		for (cur.First(stm); cur.More(); cur.PlusPlus()){
 			if (cur.node instanceof AST_QualifiedName)
 				featureName = ((AST_QualifiedName) cur.node).GetName();
 		}
-		
-		return new Feature(featureName);
+		Feature f = new Feature(featureName);
+		f.classes.put(currentClass.getName(), currentClass);
+		f.classes.get(currentClass.getName()).setJakfile(currentFile);
+		return f;
 	}
 }

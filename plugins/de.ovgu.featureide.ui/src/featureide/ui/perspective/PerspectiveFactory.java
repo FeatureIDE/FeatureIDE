@@ -6,9 +6,9 @@ import org.eclipse.ui.IPerspectiveFactory;
 
 import de.ovgu.featureide.ui.ahead.actions.StartJakFileWizard;
 import de.ovgu.featureide.ui.ahead.wizards.NewJakFileWizard;
-
 import featureide.fm.ui.views.FeatureModelEditView;
 import featureide.ui.UIPlugin;
+import featureide.ui.views.collaboration.CollaborationView;
 import featureide.ui.wizards.NewEquationFileWizard;
 import featureide.ui.wizards.NewFeatureProjectWizard;
 /**
@@ -57,7 +57,8 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 	    layout.addShowViewShortcut(IPageLayout.ID_RES_NAV);
 	    //layout.addShowViewShortcut(IPageLayout.ID_PROJECT_EXPLORER);
 	    layout.addShowViewShortcut(IPageLayout.ID_OUTLINE);
-	    layout.addShowViewShortcut(IPageLayout.ID_TASK_LIST);            
+	    layout.addShowViewShortcut(IPageLayout.ID_TASK_LIST);
+	    layout.addShowViewShortcut(CollaborationView.ID);     
 	   	
 		addActions();
 	}
