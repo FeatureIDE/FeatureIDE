@@ -95,7 +95,7 @@ public class OpenWithGuidslAction implements IObjectActionDelegate {
 		        fd.setFileName(guidslJar);
 		        guidslJar = fd.open();
 			}
-			if (new File(guidslJar).exists()) {
+			if (guidslJar != null && new File(guidslJar).exists()) { //guidslJar != null -> fixed ticket #56
 				if (newLocation) {
 					BufferedWriter writer = new BufferedWriter(new FileWriter(pathfile));
 					writer.write(guidslJar + "\r\n");
