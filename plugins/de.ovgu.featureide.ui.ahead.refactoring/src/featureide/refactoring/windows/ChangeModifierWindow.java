@@ -21,11 +21,10 @@ package featureide.refactoring.windows;
 import java.io.File;
 import java.net.URI;
 import java.util.EventListener;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.swt.SWT;
@@ -56,7 +55,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.part.FileEditorInput;
 
-import de.ovgu.featureide.ui.ahead.editors.JakEditor;
 import refactor.AstElement;
 import refactor.ChangeModifier;
 import refactor.ClassInfo;
@@ -67,6 +65,7 @@ import refactor.Modified;
 import refactor.ModifierInfo;
 import refactor.Saveable;
 import refactor.TypeSystem;
+import de.ovgu.featureide.ui.ahead.editors.JakEditor;
 import featureide.refactoring.RefactoringPlugin;
 import featureide.refactoring.typesystem.TypeSystemManager;
 
@@ -367,8 +366,8 @@ public class ChangeModifierWindow implements SelectionListener,Window,Listener{
 		int index = source.getSelectionIndex();
 		Conflict conflict = this.conflicts[index];
 
-		IPath path = new Path(conflict.getFile());
-		IFile iFile = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocation(path)[0];
+		URI uri = new File(conflict.getFile()).toURI();
+		IFile iFile = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(uri)[0];
 		IFileEditorInput editorInput = new FileEditorInput(iFile);
 		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		IWorkbenchPage page = window.getActivePage();

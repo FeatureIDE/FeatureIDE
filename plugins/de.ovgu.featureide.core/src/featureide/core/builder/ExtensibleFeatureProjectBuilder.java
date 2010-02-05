@@ -12,8 +12,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 import featureide.core.CorePlugin;
 import featureide.core.IFeatureProject;
-import featureide.core.listeners.ICurrentEquationListener;
-import featureide.core.listeners.IEquationChangedListener;
 
 public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 
