@@ -18,60 +18,34 @@
  */
 package featureide.ui.views.collaboration.action;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.part.FileEditorInput;
 
-import featureide.ui.UIPlugin;
-import featureide.ui.views.collaboration.editparts.RoleEditPart;
-import featureide.ui.views.collaboration.model.Role;
+import featureide.ui.views.collaboration.editparts.CollaborationEditPart;
+import featureide.ui.views.collaboration.model.Collaboration;
 
 /**
- * This class ShowRoleImplementationAction represents the Action which is performed
- * when Role is clicked. Role implementation will be shown.
+ * TODO description
  * 
  * @author Constanze Adler
  */
-public class ShowRoleImplementationAction extends Action {
-	private GraphicalViewerImpl viewer;
-	private Role role;
-	public ShowRoleImplementationAction(String text, GraphicalViewerImpl view){
+public class DeleteFeatureAction extends Action {
+	Collaboration coll;
+	GraphicalViewerImpl viewer;
+	
+	public DeleteFeatureAction(String text, GraphicalViewerImpl view) {
 		super(text);
-		this.viewer = view;
+		viewer = view;
 	}
-
-	@Override
+	
 	public void setEnabled(boolean enable) {
 		IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
 		Object part = selection.getFirstElement();
-		enable = part instanceof RoleEditPart;
+		enable = part instanceof CollaborationEditPart;
 		if (enable)
-			role = ((RoleEditPart) part).getRoleModel();
+			coll = ((CollaborationEditPart) part).getCollaborationModel();
 		super.setEnabled(enable);
 		
 	}
-	@Override
-	public void run() {
-		 IFile file = role.getRoleFile();
-		 if (file == null) return;
-		 IWorkbenchWindow dw = UIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow();
-		 FileEditorInput fileEditorInput = new FileEditorInput(file);
-		 try {
-		 IWorkbenchPage page = dw.getActivePage();
-		 if (page != null)
-		 page.openEditor(fileEditorInput,"featureide.ui.editors.JakEditor" );
-		 } catch (PartInitException e) {
-			 e.printStackTrace();
-		 }
-		
-	}
-	
-
-	
-
 }

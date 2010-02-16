@@ -30,6 +30,8 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
@@ -39,7 +41,11 @@ import featureide.core.CorePlugin;
 import featureide.core.IFeatureProject;
 import featureide.core.listeners.IEquationChangedListener;
 import featureide.ui.UIPlugin;
-import featureide.ui.views.collaboration.action.ShowRoleImplementationAction;
+import featureide.ui.views.collaboration.action.AddClassAction;
+import featureide.ui.views.collaboration.action.AddFeatureAction;
+import featureide.ui.views.collaboration.action.DeleteClassAction;
+import featureide.ui.views.collaboration.action.DeleteFeatureAction;
+import featureide.ui.views.collaboration.action.DeleteRoleAction;
 import featureide.ui.views.collaboration.editparts.GraphicalEditPartFactory;
 import featureide.ui.views.collaboration.model.CollaborationModel;
 import featureide.ui.views.collaboration.model.CollaborationModelBuilder;
@@ -57,7 +63,12 @@ public class CollaborationView extends ViewPart implements GUIDefaults, IEquatio
 	private ScalableFreeformRootEditPart rootEditPart;
 	private CollaborationModelBuilder builder;
 	private CollaborationModel model;
-	private ShowRoleImplementationAction showRoleAction;
+	//private ShowRoleImplementationAction showRoleAction;
+	private AddClassAction addClassAction;
+	private AddFeatureAction addFeatureAction;
+	private DeleteClassAction delClassAction;
+	private DeleteFeatureAction delFeatureAction;
+	private DeleteRoleAction delRoleAction;
 	
 	/*
 	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
@@ -65,12 +76,21 @@ public class CollaborationView extends ViewPart implements GUIDefaults, IEquatio
 	@Override
 	public void createPartControl(Composite parent) {
 		IWorkbenchWindow editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		if (editor==null) return;
-		FileEditorInput inputFile = (FileEditorInput)editor.getActivePage().getActiveEditor().getEditorInput(); 
-		IFeatureProject featureProject = CorePlugin.getProjectData(inputFile.getFile());
-		if (featureProject == null) return;
-		builder = new CollaborationModelBuilder();
-		model = builder.buildCollaborationModel(featureProject);
+		IFeatureProject featureProject = null;
+		IEditorPart part=null;
+		if (editor!=null) {
+			IWorkbenchPage page = editor.getActivePage();
+			if (page!=null) {
+				part = page.getActiveEditor();
+				if (part!=null) {
+					FileEditorInput inputFile = (FileEditorInput)part.getEditorInput(); 
+					featureProject = CorePlugin.getProjectData(inputFile.getFile());
+				}
+			}
+		}
+				
+		if (featureProject == null) 
+			return;
 		
 		graphicalViewer = new ScrollingGraphicalViewer();
 		graphicalViewer.createControl(parent);
@@ -84,8 +104,11 @@ public class CollaborationView extends ViewPart implements GUIDefaults, IEquatio
 		graphicalViewer.setRootEditPart(rootEditPart);
 		graphicalViewer.setEditDomain(new EditDomain());
 		graphicalViewer.setEditPartFactory(new GraphicalEditPartFactory());
+		
+		builder = new CollaborationModelBuilder();
+		model = builder.buildCollaborationModel(featureProject);
 		graphicalViewer.setContents(model);
-		createActions();
+		createActions(part);
 		createContextMenu();
 	}
 
@@ -94,7 +117,8 @@ public class CollaborationView extends ViewPart implements GUIDefaults, IEquatio
 	 */
 	@Override
 	public void setFocus() {
-		graphicalViewer.getControl().setFocus();
+		if (graphicalViewer != null)
+			graphicalViewer.getControl().setFocus();
 	}
 
 	/* (non-Javadoc)
@@ -103,6 +127,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, IEquatio
 
 	public void equationChanged(IFeatureProject featureProject) {
 		model = builder.buildCollaborationModel(featureProject);
+		if (model == null) return;
 		graphicalViewer.setContents(model);
 		graphicalViewer.getContents().refresh();
 		System.out.println("refreshing");
@@ -122,18 +147,29 @@ public class CollaborationView extends ViewPart implements GUIDefaults, IEquatio
 	
 	private void fillContextMenu(IMenuManager menuMgr){
 		boolean isEmpty = graphicalViewer.getSelection().isEmpty();		
-		showRoleAction.setEnabled(!isEmpty);
-		
-		menuMgr.add(showRoleAction);
-		
-		
+	//	showRoleAction.setEnabled(!isEmpty);
+		addClassAction.setEnabled(!isEmpty);
+		addFeatureAction.setEnabled(!isEmpty);
+		delRoleAction.setEnabled(!isEmpty);
+		delClassAction.setEnabled(!isEmpty);
+		delFeatureAction.setEnabled(!isEmpty);
+	//	menuMgr.add(showRoleAction);
+		menuMgr.add(addClassAction);
+	//	menuMgr.add(addFeatureAction);
+		menuMgr.add(delRoleAction);
+		menuMgr.add(delClassAction);
+	//	menuMgr.add(delFeatureAction);		
 	}
 	
 	
 	
-	private void createActions() {
-		showRoleAction = new ShowRoleImplementationAction("Role Implementation", graphicalViewer);
-	
+	private void createActions(IEditorPart part) {
+	//	showRoleAction	 = new ShowRoleImplementationAction("Role Implementation", graphicalViewer);
+		addClassAction	 = new AddClassAction("Add new Class / Role", graphicalViewer);
+		addFeatureAction = new AddFeatureAction("Add new Feture", graphicalViewer);
+		delClassAction 	 = new DeleteClassAction("Delete Class", graphicalViewer,part,model);
+		delFeatureAction = new DeleteFeatureAction("Delete Feture", graphicalViewer);
+		delRoleAction 	 = new DeleteRoleAction("Delete Role", graphicalViewer,part,model);
 	}
 	
 

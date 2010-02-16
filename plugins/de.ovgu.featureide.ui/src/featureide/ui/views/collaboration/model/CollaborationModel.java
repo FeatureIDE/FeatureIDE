@@ -20,9 +20,9 @@ package featureide.ui.views.collaboration.model;
 
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.TreeMap;
 
 
 /**
@@ -32,14 +32,14 @@ import java.util.TreeMap;
  */
 public class CollaborationModel {
 	
-	TreeMap<String,Class> classes;
+	HashMap<String,Class> classes;
 	LinkedList<Collaboration> collaborations;
 	LinkedList<Role> roles;
 		
 	
 	public CollaborationModel(){
 		collaborations 	= new LinkedList<Collaboration>();
-		classes 		= new TreeMap<String,Class>();
+		classes 		= new HashMap<String,Class>();
 		roles 			= new LinkedList<Role>();
 	}
 	
@@ -82,6 +82,21 @@ public class CollaborationModel {
 			}
 			System.out.println();
 		}
+	}
+
+
+
+	/**
+	 * @param c - Class
+	 */
+	public void removeClass(Class c) {
+		classes.remove(c.getName());
+	}
+	public void removeRole(Role r) {
+		roles.remove(r);
+		List<Class> list = this.getClasses();
+		list.get(list.indexOf(r.getParentClass())).removeRole(r);
+		collaborations.get(collaborations.indexOf(r.getCollaboration())).removeRole(r);
 	}
 	
 }

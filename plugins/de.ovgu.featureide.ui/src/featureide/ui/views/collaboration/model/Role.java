@@ -103,7 +103,7 @@ public class Role {
 	/**
 	 * @return
 	 */
-	public IFile getFileToOpen() {
+	public IFile getRoleFile() {
 		if (path == null || !path.isAbsolute()) return null;
 		IFile file=ResourcesPlugin.getWorkspace().getRoot().getFile(path);
 		return file;

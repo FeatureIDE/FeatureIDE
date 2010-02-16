@@ -18,34 +18,38 @@
  */
 package featureide.ui.views.collaboration.action;
 
-import org.eclipse.core.resources.IFile;
+
+import java.util.List;
+
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.part.FileEditorInput;
+import org.eclipse.ui.IEditorPart;
 
-import featureide.ui.UIPlugin;
 import featureide.ui.views.collaboration.editparts.RoleEditPart;
+import featureide.ui.views.collaboration.model.Class;
+import featureide.ui.views.collaboration.model.Collaboration;
+import featureide.ui.views.collaboration.model.CollaborationModel;
 import featureide.ui.views.collaboration.model.Role;
 
 /**
- * This class ShowRoleImplementationAction represents the Action which is performed
- * when Role is clicked. Role implementation will be shown.
+ * TODO description
  * 
  * @author Constanze Adler
  */
-public class ShowRoleImplementationAction extends Action {
-	private GraphicalViewerImpl viewer;
-	private Role role;
-	public ShowRoleImplementationAction(String text, GraphicalViewerImpl view){
+public class DeleteRoleAction extends Action {
+	GraphicalViewerImpl viewer;
+	Role role;
+	IEditorPart part;
+	CollaborationModel model;
+	public DeleteRoleAction(String text, GraphicalViewerImpl view, IEditorPart part, CollaborationModel model) {
 		super(text);
-		this.viewer = view;
+		viewer = view;
+		this.part = part;
+		this.model = model;
 	}
-
-	@Override
+	
 	public void setEnabled(boolean enable) {
 		IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
 		Object part = selection.getFirstElement();
@@ -55,23 +59,27 @@ public class ShowRoleImplementationAction extends Action {
 		super.setEnabled(enable);
 		
 	}
-	@Override
 	public void run() {
-		 IFile file = role.getRoleFile();
-		 if (file == null) return;
-		 IWorkbenchWindow dw = UIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow();
-		 FileEditorInput fileEditorInput = new FileEditorInput(file);
-		 try {
-		 IWorkbenchPage page = dw.getActivePage();
-		 if (page != null)
-		 page.openEditor(fileEditorInput,"featureide.ui.editors.JakEditor" );
-		 } catch (PartInitException e) {
-			 e.printStackTrace();
-		 }
+		if (!model.getRoles().isEmpty() && model.getRoles().contains(role))
+			model.removeRole(role);
+		Collaboration coll = role.getCollaboration();
+		Class c = role.getParentClass();
+		c.removeRole(role);
+		List<Class> classes = model.getClasses();
+		if (classes.get(classes.indexOf(c)).getRoles().isEmpty())
+			model.removeClass(c);
+		coll.removeRole(role);
+		if (part!=null)
+			try {
+				role.getRoleFile().delete(true, part.getEditorSite().getActionBars().getStatusLineManager().getProgressMonitor() );
+			} catch (CoreException e) {
+				e.printStackTrace();
+			}
+		
+//		File f = new File(role.getPath().toOSString());
+//		f.delete();
+//	
+		
 		
 	}
-	
-
-	
-
 }

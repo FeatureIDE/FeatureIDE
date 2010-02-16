@@ -98,7 +98,7 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 
 	public void performRequest(Request request) {
 		if (REQ_OPEN.equals(request.getType())) {
-			 IFile file = this.getRoleModel().getFileToOpen();
+			 IFile file = this.getRoleModel().getRoleFile();
 			 if (file == null) return;
 			 IWorkbenchWindow dw = UIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow();
 			 FileEditorInput fileEditorInput = new FileEditorInput(file);

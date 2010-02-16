@@ -18,60 +18,50 @@
  */
 package featureide.ui.views.collaboration.action;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.part.FileEditorInput;
+import org.eclipse.jface.wizard.WizardDialog;
+
+import de.ovgu.featureide.ui.ahead.wizards.NewJakFileWizard;
 
 import featureide.ui.UIPlugin;
-import featureide.ui.views.collaboration.editparts.RoleEditPart;
-import featureide.ui.views.collaboration.model.Role;
+import featureide.ui.views.collaboration.editparts.ClassEditPart;
+import featureide.ui.views.collaboration.model.Class;
+
 
 /**
- * This class ShowRoleImplementationAction represents the Action which is performed
- * when Role is clicked. Role implementation will be shown.
+ * TODO description
  * 
  * @author Constanze Adler
  */
-public class ShowRoleImplementationAction extends Action {
-	private GraphicalViewerImpl viewer;
-	private Role role;
-	public ShowRoleImplementationAction(String text, GraphicalViewerImpl view){
-		super(text);
-		this.viewer = view;
-	}
+public class AddClassAction extends Action {
 
-	@Override
+	GraphicalViewerImpl viewer;
+	Class c;
+	IStructuredSelection selection;
+	
+	public AddClassAction(String text, GraphicalViewerImpl view) {
+		super(text);
+		viewer = view;
+	}
+	
 	public void setEnabled(boolean enable) {
-		IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
+		selection = (IStructuredSelection) viewer.getSelection();
 		Object part = selection.getFirstElement();
-		enable = part instanceof RoleEditPart;
+		enable = part instanceof ClassEditPart;
 		if (enable)
-			role = ((RoleEditPart) part).getRoleModel();
+			c = ((ClassEditPart) part).getClassModel();
 		super.setEnabled(enable);
 		
 	}
-	@Override
+	
 	public void run() {
-		 IFile file = role.getRoleFile();
-		 if (file == null) return;
-		 IWorkbenchWindow dw = UIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow();
-		 FileEditorInput fileEditorInput = new FileEditorInput(file);
-		 try {
-		 IWorkbenchPage page = dw.getActivePage();
-		 if (page != null)
-		 page.openEditor(fileEditorInput,"featureide.ui.editors.JakEditor" );
-		 } catch (PartInitException e) {
-			 e.printStackTrace();
-		 }
+		NewJakFileWizard wiz = new NewJakFileWizard();
 		
+		wiz.init(UIPlugin.getDefault().getWorkbench(), selection);
+		WizardDialog dialog = new WizardDialog(wiz.getShell(),wiz);
+		dialog.open();
 	}
 	
-
-	
-
 }

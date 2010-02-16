@@ -262,4 +262,8 @@ public class JakModelBuilder {
 		f.classes.get(currentClass.getName()).setJakfile(currentFile);
 		return f;
 	}
+
+	public void clearFeatures() {
+		model.features.clear();
+	}
 }

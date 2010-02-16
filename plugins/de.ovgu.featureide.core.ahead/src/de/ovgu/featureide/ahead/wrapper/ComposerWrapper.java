@@ -243,7 +243,7 @@ public class ComposerWrapper {
 		String aspectName = equationFile.getName();
 		aspectName = aspectName.substring(0, aspectName.lastIndexOf('.'));
 		TreeMap<String, IFile> fileMap = new TreeMap<String, IFile>();
-
+		jakModelBuilder.clearFeatures();
 		for (String jakFile : absoluteJakFilenames.keySet()) {
 			LinkedList<IFile> filesVec = absoluteJakFilenames.get(jakFile);
 			String[] files = new String[filesVec.size()];
