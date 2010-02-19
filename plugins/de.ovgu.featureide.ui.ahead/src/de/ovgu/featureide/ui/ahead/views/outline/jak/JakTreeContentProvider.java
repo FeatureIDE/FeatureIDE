@@ -1,6 +1,7 @@
 package de.ovgu.featureide.ui.ahead.views.outline.jak;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ui.part.FileEditorInput;
@@ -47,16 +48,25 @@ public class JakTreeContentProvider implements ITreeContentProvider {
 	}
 
 	public Object[] getElements(Object inputElement) {
-
+		IPath path = jakfile.getFullPath();
+		String feature = path.segment(path.segmentCount()-2);
+		
+		String [] errMessage = new String[] {
+			"No data to display available.",
+			"Please choose a configuration",
+			"where feature " +feature,
+			"is selected and build this",
+			"configuration." };
+		
 		if (jakProject != null) {
 			IClass c = jakProject.getClass(jakfile);
 			if (c != null)
 				return new IClass[] { jakProject.getClass(jakfile) };
 			else
-				return new String[] { "No ast available" };
+				return errMessage;
 		}
 
-		return new String[] { "No project data available" }; //ticket #99 old code: return null;
+		return errMessage; //ticket #99 old code: return null;
 	}
 
 	public void dispose() {
