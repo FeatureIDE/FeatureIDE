@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Jak Refactoring Plug-in
 Bundle-SymbolicName: de.ovgu.featureide.ui.ahead.refactoring;singleton:=true
-Bundle-Version: 2.3.6.qualifier
+Bundle-Version: 2.3.5.qualifier
 Bundle-Activator: featureide.refactoring.RefactoringPlugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
