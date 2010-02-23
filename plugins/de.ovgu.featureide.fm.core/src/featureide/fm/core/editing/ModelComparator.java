@@ -35,6 +35,13 @@ import featureide.fm.core.Feature;
 import featureide.fm.core.FeatureModel;
 import featureide.fm.core.configuration.Configuration;
 
+/**
+ * Compares two feature models based on a satisfiability solver. The result is
+ * a classification of the edit that transforms one model into the second
+ * model.
+ * 
+ * @author Thomas Thuem
+ */
 public class ModelComparator {
 	
 	private long timeout;

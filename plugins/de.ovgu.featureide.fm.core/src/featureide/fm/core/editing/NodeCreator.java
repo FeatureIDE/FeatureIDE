@@ -33,6 +33,12 @@ import org.prop4j.Or;
 import featureide.fm.core.Feature;
 import featureide.fm.core.FeatureModel;
 
+/**
+ * Takes a feature model as input and returns a propositional formula
+ * representing the valid feature combinations.
+ * 
+ * @author Thomas Thuem
+ */
 public class NodeCreator {
 	
 	private static final HashMap<Object, Node> EMPTY_MAP = new HashMap<Object, Node>();

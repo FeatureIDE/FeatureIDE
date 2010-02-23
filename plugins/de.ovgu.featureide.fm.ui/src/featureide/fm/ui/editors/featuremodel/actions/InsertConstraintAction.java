@@ -42,7 +42,6 @@ public class InsertConstraintAction extends AbstractConstraintEditorAction {
 	public InsertConstraintAction(GraphicalViewerImpl viewer,
 			FeatureModel featuremodel, String menuname) {
 		super(viewer, featuremodel, menuname);
-		// TODO Auto-generated constructor stub
 	}
 
 	/* (non-Javadoc)

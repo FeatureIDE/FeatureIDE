@@ -13,6 +13,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import featureide.core.CorePlugin;
 import featureide.core.IFeatureProject;
 
+/**
+ * TODO description
+ * 
+ * @author Tom Brosch
+ */
 public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 
 	public static final String BUILDER_ID = CorePlugin.PLUGIN_ID + ".extensibleFeatureProjectBuilder";
@@ -52,6 +57,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 			
 		composerExtension.initialize(featureProject);
 		
+		//TODO Thomas: Why is this code not active?
 //		CorePlugin.getDefault().addCurrentEquationListener(new ICurrentEquationListener() {
 //			public void currentEquationChanged(IFeatureProject featureProject) {
 //				currentEquationFileChanged(featureProject);

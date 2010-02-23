@@ -18,6 +18,11 @@
  */
 package featureide.fm.core.editing;
 
+/**
+ * Classification of a feature model edit or an error in calculating the edit.
+ * 
+ * @author Thomas Thuem
+ */
 public enum Comparison {
 	REFACTORING, SPECIALIZATION, GENERALIZATION, ARBITRARY, TIMEOUT, OUTOFMEMORY, ERROR
 }

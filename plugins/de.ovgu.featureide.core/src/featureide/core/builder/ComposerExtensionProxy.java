@@ -101,7 +101,6 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	 * @see featureide.core.builder.IComposerExtension#clean()
 	 */
 	public void clean() {
-		// TODO Auto-generated method stub
 		loadComposerExtension();
 		composerExtensionClass.clean();
 	}	

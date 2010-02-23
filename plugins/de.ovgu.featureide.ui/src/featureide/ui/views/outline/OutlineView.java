@@ -67,20 +67,18 @@ public class OutlineView extends ViewPart {
 		public void setFocus() {
 			viewer.getControl().setFocus();
 		}
+
 	} 
+
 	public OutlineView() {
 	}
 
 	@Override
 	public void createPartControl(Composite parent) {
-		
 		new FeatureProjectOutlinePage(parent);
-		
 	}
 
 	@Override
 	public void setFocus() {
-		// TODO Auto-generated method stub
-		
 	}
 }

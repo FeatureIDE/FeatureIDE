@@ -448,7 +448,6 @@ public class FeatureModel implements PropertyConstants {
 		try {
 			return !new SatSolver(new Not(finalFormula), 1000).isSatisfiable();
 		} catch (TimeoutException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
 		}

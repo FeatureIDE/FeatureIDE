@@ -95,6 +95,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, IEquatio
 		graphicalViewer = new ScrollingGraphicalViewer();
 		graphicalViewer.createControl(parent);
 		graphicalViewer.getControl().setBackground(DIAGRAM_BACKGROUND);
+		//TODO Thomas: replace by new listener
 		CorePlugin.getDefault().addEquationChangedListener(this);
 		
 		rootEditPart = new ScalableFreeformRootEditPart();

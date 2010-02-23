@@ -126,8 +126,6 @@ public class CollaborationVisitor implements Visitor {
 	}
 
 	public void visit(LeafTree leafTreeNode) {
-		// TODO Auto-generated method stub
-		
 	}
 
 }

@@ -32,6 +32,11 @@ import featureide.fm.core.FeatureModel;
 import featureide.fm.core.configuration.Configuration;
 import featureide.fm.core.configuration.ConfigurationReader;
 
+/**
+ * Calculates added or deleted products for a feature model edit.
+ * 
+ * @author Thomas Thuem
+ */
 public class ExampleCalculator {
 	
 	private FeatureModel fm;
@@ -84,7 +89,7 @@ public class ExampleCalculator {
 		bSatisfiable.add(bIndex);
 	}
 	
-	//TODO might return some examples multiple times
+	//might return some examples multiple times
 	public Configuration nextExample() throws TimeoutException {
 		if (exampleSolver == null) {
 			if (bSatisfiable.isEmpty() && !findSatisfiable(true))
