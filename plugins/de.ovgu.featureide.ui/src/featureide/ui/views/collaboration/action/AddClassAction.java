@@ -31,7 +31,7 @@ import featureide.ui.views.collaboration.model.Class;
 
 
 /**
- * TODO description
+ * Add a class to the CollaborationDiagramm.
  * 
  * @author Constanze Adler
  */

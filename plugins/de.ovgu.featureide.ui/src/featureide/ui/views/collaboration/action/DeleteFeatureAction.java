@@ -26,8 +26,8 @@ import featureide.ui.views.collaboration.editparts.CollaborationEditPart;
 import featureide.ui.views.collaboration.model.Collaboration;
 
 /**
- * TODO description
- * 
+ *  Deletes a feature/collaboration of the CollaborationDiagramm.
+ * TODO implementation DELETE feature
  * @author Constanze Adler
  */
 public class DeleteFeatureAction extends Action {

@@ -24,7 +24,7 @@ import org.eclipse.gef.editpolicies.XYLayoutEditPolicy;
 import org.eclipse.gef.requests.CreateRequest;
 
 /**
- * TODO description
+ * 
  * 
  * @author Constanze Adler
  */

@@ -34,7 +34,7 @@ import featureide.ui.views.collaboration.model.CollaborationModel;
 import featureide.ui.views.collaboration.model.Role;
 
 /**
- * TODO description
+ *  Deletes a role of the CollaborationDiagramm.
  * 
  * @author Constanze Adler
  */

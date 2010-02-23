@@ -26,8 +26,8 @@ import featureide.ui.views.collaboration.editparts.CollaborationEditPart;
 import featureide.ui.views.collaboration.model.Collaboration;
 
 /**
- * TODO description
- * 
+ * Add a feature to the CollaborationDiagramm.
+ * TODO implementation
  * @author Constanze Adler
  */
 public class AddFeatureAction extends Action{
