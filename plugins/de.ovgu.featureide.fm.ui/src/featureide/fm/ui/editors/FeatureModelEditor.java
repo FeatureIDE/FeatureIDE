@@ -130,7 +130,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 	private int featureOrderEditorIndex;
 
 	private boolean isPageModified;
-
+	
 	private FeatureModel featureModel;
 
 	private IFeatureModelReader featureModelReader;
@@ -187,7 +187,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 	
 	protected void setInput(IEditorInput input) {
 		IFile file = (IFile) input.getAdapter(IFile.class);
-		ResourcesPlugin.getWorkspace().addResourceChangeListener(this); 
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
 		grammarFile = new GrammarFile(file);
 		setPartName(file.getProject().getName() + " Model");
 		setTitleToolTip(input.getToolTipText());
@@ -259,6 +259,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 	}
 
 	void createSourcePage() {
+		closeEditor = false;
 		textEditor = new TextEditor();
 		try {
 			textEditorIndex = addPage(textEditor, getEditorInput());
@@ -587,7 +588,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 		} else {
 			GEFImageWriter.writeToFile(graphicalViewer, file);
 		}
-	}
+		}
 
 	
 	
@@ -657,23 +658,24 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 	public GrammarFile getGrammarFile() {
 		return grammarFile;
 	}
-
+	private boolean closeEditor;
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.resources.IResourceChangeListener#resourceChanged(org.eclipse.core.resources.IResourceChangeEvent)
 	 */
 	public void resourceChanged(IResourceChangeEvent event) {
-		 final IEditorInput input=getEditorInput();
-		 if (!( input instanceof IFileEditorInput ))
+		
+		if (event.getResource().getType() == IResource.PROJECT)
+			 closeEditor = true;
+		final IEditorInput input=getEditorInput();
+		if (!( input instanceof IFileEditorInput ))
 		           return;
-		 final IFile jmolfile=((IFileEditorInput)input).getFile();
+		final IFile jmolfile=((IFileEditorInput)input).getFile();
 		 
-		 
-	       /*
-	        * Closes editor if resource is deleted
-	        */
-	       if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
-	           
-	           IResourceDelta rootDelta = event.getDelta();
+		/*
+	     * Closes editor if resource is deleted
+	      */
+	       if ((event.getType() == IResourceChangeEvent.POST_CHANGE) && closeEditor) {
+	          IResourceDelta rootDelta = event.getDelta();
 	           //get the delta, if any, for the documentation directory
 	           
 	           final List<IResource> deletedlist = new ArrayList<IResource>();
@@ -683,7 +685,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 	               IResourceDeltaVisitor visitor = new IResourceDeltaVisitor() {
 	                   public boolean visit(IResourceDelta delta) {
 	                      //only interested in removal changes
-	                      if ((delta.getFlags() & IResourceDelta.REMOVED) == 0){
+	                      if (((delta.getFlags() & IResourceDelta.REMOVED) == 0) && closeEditor){
 	                          deletedlist.add( delta.getResource() );
 	                      }
 	                      return true;
@@ -699,7 +701,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 	           }
 	               
 	           if (deletedlist.size()>0 && deletedlist.contains( jmolfile )){
-	               Display.getDefault().asyncExec(new Runnable() {
+	        	   Display.getDefault().asyncExec(new Runnable() {
 	                   public void run() {
 	                       if (getSite()==null) 
 	                           return;
@@ -708,6 +710,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 	                       
 	                       IWorkbenchPage[] pages = getSite().getWorkbenchWindow()
 	                                                         .getPages();
+	                     
 	                       for (int i = 0; i<pages.length; i++) {
 	                               IEditorPart editorPart
 	                                 = pages[i].findEditor(input);
@@ -727,7 +730,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 
 		 
 		 final IResource res = event.getResource();
-		 if (event.getType() == IResourceChangeEvent.PRE_CLOSE) {
+		 if ((event.getType() == IResourceChangeEvent.PRE_CLOSE ) || closeEditor) {
 			 Display.getDefault().asyncExec(new Runnable() {
 				 public void run() {
 					 if (getSite()==null)
