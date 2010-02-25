@@ -20,7 +20,16 @@ package featureide.ui.editors;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.IResourceChangeListener;
+import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.IResourceDeltaVisitor;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -31,9 +40,12 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 
@@ -51,12 +63,14 @@ import featureide.fm.ui.editors.configuration.ConfigurationLabelProvider;
 import featureide.ui.UIPlugin;
 
 /**
+ * ConfiguratonEitor displays the Equation File. 
  * 
+ * @author Constanze Adler
  * @author Christian Becker
  */
 
 public class ConfigurationEditor extends EditorPart implements
-		PropertyChangeListener, PropertyConstants {
+		PropertyChangeListener, PropertyConstants, IResourceChangeListener {
 
 	private TreeViewer viewer;
 
@@ -98,6 +112,7 @@ public class ConfigurationEditor extends EditorPart implements
 			throws PartInitException {
 		setSite(site);
 		setInput(input);
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(this); 
 
 		file = (IFile) input.getAdapter(IFile.class);
 		UIPlugin.getDefault().logInfo("file: " + file);
@@ -205,4 +220,94 @@ public class ConfigurationEditor extends EditorPart implements
 		configuration.setManual(feature, selection);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.resources.IResourceChangeListener#resourceChanged(org.eclipse.core.resources.IResourceChangeEvent)
+	 */
+	public void resourceChanged(IResourceChangeEvent event) {
+		 final IEditorInput input=getEditorInput();
+		 if (!( input instanceof IFileEditorInput ))
+		           return;
+		 final IFile jmolfile=((IFileEditorInput)input).getFile();
+		 
+		 
+	       /*
+	        * Closes editor if resource is deleted
+	        */
+	       if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
+	           
+	           IResourceDelta rootDelta = event.getDelta();
+	           //get the delta, if any, for the documentation directory
+	           
+	           final List<IResource> deletedlist = new ArrayList<IResource>();
+	           
+	           IResourceDelta docDelta = rootDelta.findMember(jmolfile.getFullPath());
+	           if (docDelta != null){
+	               IResourceDeltaVisitor visitor = new IResourceDeltaVisitor() {
+	                   public boolean visit(IResourceDelta delta) {
+	                      //only interested in removal changes
+	                      if ((delta.getFlags() & IResourceDelta.REMOVED) == 0){
+	                          deletedlist.add( delta.getResource() );
+	                      }
+	                      return true;
+	                   }
+	                };
+	                
+	                try {
+						docDelta.accept(visitor);
+					} catch (CoreException e) {
+						e.printStackTrace();
+					}
+	                
+	           }
+	               
+	           if (deletedlist.size()>0 && deletedlist.contains( jmolfile )){
+	               Display.getDefault().asyncExec(new Runnable() {
+	                   public void run() {
+	                       if (getSite()==null) 
+	                           return;
+	                       if (getSite().getWorkbenchWindow()==null) 
+	                           return;
+	                       
+	                       IWorkbenchPage[] pages = getSite().getWorkbenchWindow()
+	                                                         .getPages();
+	                       for (int i = 0; i<pages.length; i++) {
+	                               IEditorPart editorPart
+	                                 = pages[i].findEditor(input);
+	                               pages[i].closeEditor(editorPart,true);
+	                       }
+	                   }
+	               });
+	           }
+	           
+
+	           
+	       }
+
+	       /*
+	        * Closes all editors with this editor input on project close.
+	        */
+
+		 
+		 final IResource res = event.getResource();
+		 if (event.getType() == IResourceChangeEvent.PRE_CLOSE) {
+			 Display.getDefault().asyncExec(new Runnable() {
+				 public void run() {
+					 if (getSite()==null)
+						 return;
+					 if (getSite().getWorkbenchWindow()==null)
+						 return;
+					 IWorkbenchPage[] pages = getSite().getWorkbenchWindow().getPages();
+					 for (int i = 0; i<pages.length; i++) {
+						 if ( jmolfile.getProject().equals( res )) {
+							 IEditorPart editorPart = pages[i].findEditor(input);
+							 pages[i].closeEditor(editorPart,true);
+		                 }
+					 }
+				 }
+			 });
+		 }
+
+	
+		
+	}
 }
