@@ -22,6 +22,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 
+import featureide.core.CorePlugin;
 import featureide.core.IFeatureProject;
 
 /**
@@ -42,25 +43,29 @@ public class ComposerExtensionProxy implements IComposerExtension {
 		id = configElement.getAttribute("id");
 		description = configElement.getAttribute("description");
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see featureide.core.builder.ICompositionTool#getName()
 	 */
 	public String getName() {
 		return name;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see featureide.core.builder.ICompositionTool#getId()
 	 */
 	public String getId() {
 		return id;
 	}
-	
+
 	public String toString() {
 		return "Name: " + name + "; ID: " + id;
 	}
-	
+
 	/**
 	 * Loads the CompositionExtension class if necessary.
 	 */
@@ -68,40 +73,54 @@ public class ComposerExtensionProxy implements IComposerExtension {
 		if (composerExtensionClass != null)
 			return;
 		try {
-			composerExtensionClass = (IComposerExtensionClass) configElement.createExecutableExtension("class");
+			composerExtensionClass = (IComposerExtensionClass) configElement
+					.createExecutableExtension("class");
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see featureide.core.builder.ICompositionTool#initialize(featureide.core.IFeatureProject)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seefeatureide.core.builder.ICompositionTool#initialize(featureide.core.
+	 * IFeatureProject)
 	 */
 	public void initialize(IFeatureProject project) {
 		loadComposerExtension();
 		composerExtensionClass.initialize(project);
 	}
 
-	/* (non-Javadoc)
-	 * @see featureide.core.builder.ICompositionTool#performFullBuild(org.eclipse.core.resources.IFile)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * featureide.core.builder.ICompositionTool#performFullBuild(org.eclipse
+	 * .core.resources.IFile)
 	 */
 	public void performFullBuild(IFile equation) {
+		CorePlugin.getDefault().logInfo(
+				"Perform a full build for equation '" + equation + "'");
 		loadComposerExtension();
 		composerExtensionClass.performFullBuild(equation);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see featureide.core.builder.ICompositionTool#getDescription()
 	 */
 	public String getDescription() {
 		return description;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see featureide.core.builder.IComposerExtension#clean()
 	 */
 	public void clean() {
 		loadComposerExtension();
 		composerExtensionClass.clean();
-	}	
+	}
 }

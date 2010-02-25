@@ -31,7 +31,6 @@ import featureide.core.IFeatureProject;
 import featureide.core.builder.IComposerExtensionClass;
 
 /**
- * 
  * TODO description
  * 
  * @author Tom Brosch
@@ -61,9 +60,9 @@ public class AheadComposer implements IComposerExtensionClass {
 		ahead = new AheadWrapper(project);
 		ahead.addBuildErrorListener(new BuilderErrorListener());
 		try {
-			ahead.setEquation(project.getCurrentEquationFile());
+			ahead.setEquation(featureProject.getCurrentEquationFile());
 		} catch(IOException e) {
-			project.createBuilderMarker(project.getProject(), e.getMessage(), 0, IMarker.SEVERITY_ERROR);
+			featureProject.createBuilderMarker(featureProject.getProject(), e.getMessage(), 0, IMarker.SEVERITY_ERROR);
 		}
 	}
 

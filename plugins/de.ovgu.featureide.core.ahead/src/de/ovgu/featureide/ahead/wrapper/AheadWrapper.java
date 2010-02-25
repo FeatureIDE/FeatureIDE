@@ -42,7 +42,6 @@ import featureide.core.IFeatureProject;
  * 
  * @author Tom Brosch
  * @author Thomas Thuem
- * 
  */
 public class AheadWrapper {
 

@@ -34,6 +34,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -66,7 +67,8 @@ import featureide.fm.core.io.guidsl.FeatureModelReader;
  * @author Thomas Thuem
  * @author Tom Brosch
  */
-public class FeatureProject extends BuilderMarkerHandler implements IFeatureProject, IResourceChangeListener {
+public class FeatureProject extends BuilderMarkerHandler implements
+		IFeatureProject, IResourceChangeListener {
 
 	public class FeatureModelChangeListner implements PropertyChangeListener {
 		/**
@@ -91,7 +93,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	private final FeatureModel featureModel;
 
 	private PropertyChangeListener featureModelChangeListner;
-	
+
 	private final IFeatureModelReader modelReader;
 
 	private IJakProjectModel jakProject;
@@ -129,9 +131,9 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	 * contains the ProjectTree for this Feature Project
 	 */
 	private ProjectTree projectTree;
-	
+
 	private IComposerExtension composerExtension = null;
-	
+
 	/**
 	 * Creating a new ProjectData includes creating folders if they don't exist,
 	 * registering workspace listeners and initialization of the AHEAD wrapper
@@ -168,7 +170,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		// loading model data and listen to changes in the model file
 		addModelListener();
 		loadModel();
-		
+
 		// make the composer ID a builder argument
 		setComposerID(getComposerID());
 	}
@@ -206,22 +208,26 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 				modelReader.readFromFile(modelFile.getResource());
 				createAndDeleteFeatureFolders();
 			} catch (FileNotFoundException e) {
-				modelFile.createModelMarker(e.getMessage(),	IMarker.SEVERITY_ERROR, 0);
+				modelFile.createModelMarker(e.getMessage(),
+						IMarker.SEVERITY_ERROR, 0);
 			} catch (UnsupportedModelException e) {
-				modelFile.createModelMarker(e.getMessage(),	IMarker.SEVERITY_ERROR, e.lineNumber);
+				modelFile.createModelMarker(e.getMessage(),
+						IMarker.SEVERITY_ERROR, e.lineNumber);
 			}
 		} catch (CoreException e) {
-			CorePlugin.getDefault().logError("Error while loading feature model from " + modelFile.getResource(), e);
+			CorePlugin.getDefault().logError(
+					"Error while loading feature model from "
+							+ modelFile.getResource(), e);
 		}
 	}
 
 	private void createAndDeleteFeatureFolders() throws CoreException {
 		sourceFolder.refreshLocal(IResource.DEPTH_ONE, null);
-		//create folders for all layers
+		// create folders for all layers
 		for (Feature feature : featureModel.getFeatures())
 			if (feature.isLayer())
 				createFeatureFolder(feature.getName());
-		//delete all empty folders which do not anymore belong to layers
+		// delete all empty folders which do not anymore belong to layers
 		for (IResource res : sourceFolder.members())
 			if (res instanceof IFolder) {
 				IFolder folder = (IFolder) res;
@@ -260,7 +266,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	 * (non-Javadoc)
 	 * 
 	 * @see featureide.core.IFeatureProject#renameFeature(java.lang.String,
-	 *      java.lang.String)
+	 * java.lang.String)
 	 */
 	public void renameFeature(String oldName, String newName) {
 		try {
@@ -312,8 +318,8 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		try {
 			for (IResource resource : getEquationFolder().members()) {
 				if (resource instanceof IFile
-						&& (resource.getName().endsWith(".equation")
-						|| resource.getName().endsWith(".expression"))) {
+						&& (resource.getName().endsWith(".equation") || resource
+								.getName().endsWith(".expression"))) {
 					equationFile = (IFile) resource;
 					setCurrentEquationFile(equationFile);
 				}
@@ -342,9 +348,14 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see featureide.core.IFeatureProject#setCurrentEquationFile(org.eclipse.core.resources.IFile)
+	 * @see
+	 * featureide.core.IFeatureProject#setCurrentEquationFile(org.eclipse.core
+	 * .resources.IFile)
 	 */
 	public void setCurrentEquationFile(IFile file) {
+		CorePlugin.getDefault().logInfo(
+				"Set current equation in project '" + project + "' to '" + file
+						+ "'");
 		int offset = getEquationFolder().getProjectRelativePath().toString()
 				.length();
 		String equationPath = file.getProjectRelativePath().toString()
@@ -352,8 +363,14 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		try {
 			project.setPersistentProperty(equationConfigID, equationPath);
 			CorePlugin.getDefault().fireCurrentEquationChanged(this);
+			// We need to call the builder here, because for the new
+			// configuration, there are possibly no resource build yet or they
+			// are not up-to-date. Eclipse calls builders, if a resource as
+			// changed, but in this case actually no resource in the file system
+			// changes.
+			project.build(IncrementalProjectBuilder.FULL_BUILD, null);
 		} catch (CoreException e) {
-			e.printStackTrace();
+			CorePlugin.getDefault().logError(e);
 		}
 	}
 
@@ -441,7 +458,9 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see featureide.core.IFeatureProject#getFeatureName(org.eclipse.core.resources.IResource)
+	 * @see
+	 * featureide.core.IFeatureProject#getFeatureName(org.eclipse.core.resources
+	 * .IResource)
 	 */
 	public String getFeatureName(IResource resource) {
 		return getFolderName(resource, sourceFolder);
@@ -450,7 +469,9 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see featureide.core.IFeatureProject#getEquationName(org.eclipse.core.resources.IResource)
+	 * @see
+	 * featureide.core.IFeatureProject#getEquationName(org.eclipse.core.resources
+	 * .IResource)
 	 */
 	public String getEquationName(IResource resource) {
 		return getFolderName(resource, buildFolder);
@@ -459,8 +480,9 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see featureide.core.IFeatureProject#getFolderName(org.eclipse.core.resources.IResource,
-	 *      org.eclipse.core.resources.IFolder)
+	 * @see
+	 * featureide.core.IFeatureProject#getFolderName(org.eclipse.core.resources
+	 * .IResource, org.eclipse.core.resources.IFolder)
 	 */
 	public String getFolderName(IResource resource, IFolder folder) {
 		// check whether resource belongs to this project
@@ -513,7 +535,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		Vector<String> cp = new Vector<String>();
 		cp.add(".");
 		cp.add(binFolder.getRawLocation().toOSString());
-		if (libFolder.exists()) { //delete lib folder implementation
+		if (libFolder.exists()) { // delete lib folder implementation
 			cp.add(libFolder.getRawLocation().toOSString());
 			try {
 				for (IResource res : libFolder.members())
@@ -524,14 +546,14 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 				e.printStackTrace();
 			}
 		}
-		
+
 		String[] paths = getAdditionalJavaClassPath();
 		for (String path : paths)
 			cp.add(path);
-		
+
 		return cp.toArray(new String[cp.size()]);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -557,7 +579,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		checkModelChange(event.getDelta().findMember(
 				modelFile.getResource().getFullPath()));
 		try {
-			if (equationFolder.isAccessible()) 
+			if (equationFolder.isAccessible())
 				for (IResource res : equationFolder.members()) {
 					IResourceDelta delta = event.getDelta().findMember(
 							res.getFullPath());
@@ -573,8 +595,8 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	private void checkModelChange(IResourceDelta delta) {
 		if (delta == null || (delta.getFlags() & IResourceDelta.CONTENT) == 0)
 			return;
-		CorePlugin.getDefault().logInfo("Model " + modelFile.getResource().getFullPath()
-				+ " changed");
+		CorePlugin.getDefault().logInfo(
+				"Model " + modelFile.getResource().getFullPath() + " changed");
 		Job job = new Job("Load Model") {
 			protected IStatus run(IProgressMonitor monitor) {
 				loadModel();
@@ -595,40 +617,43 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		if (!(resource instanceof IFile))
 			return;
 		final IFile file = (IFile) resource;
-		CorePlugin.getDefault().logInfo("Configuration " + file.getFullPath() + " changed");
+		CorePlugin.getDefault().logInfo(
+				"Configuration " + file.getFullPath() + " changed");
 		CorePlugin.getDefault().fireEquationChanged(this);
 		Job job = new Job("Read Configuration") {
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
-					deleteConfigurationMarkers(file,
-							IResource.DEPTH_ZERO);
-//					//without propagation: validity check
-//					Configuration configuration = new Configuration(
-//							featureModel, false);
-//					ConfigurationReader reader = new ConfigurationReader(configuration);
-//					reader.readFromFile(file);
-//					if (!configuration.valid())
-//						createConfigurationMarker(file,
-//								"Configuration is invalid",
-//								IMarker.SEVERITY_ERROR);
-//					//with propagation: check if all features are still available
-//					configuration = new Configuration(
-//							featureModel, true);
-//					reader = new ConfigurationReader(configuration);
-//					reader.readFromFile(file);
-//					for (String warning : reader.getWarnings())
-//						createConfigurationMarker(file, warning,
-//								IMarker.SEVERITY_WARNING);
+					deleteConfigurationMarkers(file, IResource.DEPTH_ZERO);
+					// //without propagation: validity check
+					// Configuration configuration = new Configuration(
+					// featureModel, false);
+					// ConfigurationReader reader = new
+					// ConfigurationReader(configuration);
+					// reader.readFromFile(file);
+					// if (!configuration.valid())
+					// createConfigurationMarker(file,
+					// "Configuration is invalid",
+					// IMarker.SEVERITY_ERROR);
+					// //with propagation: check if all features are still
+					// available
+					// configuration = new Configuration(
+					// featureModel, true);
+					// reader = new ConfigurationReader(configuration);
+					// reader.readFromFile(file);
+					// for (String warning : reader.getWarnings())
+					// createConfigurationMarker(file, warning,
+					// IMarker.SEVERITY_WARNING);
 					Configuration configuration = new Configuration(
 							featureModel, true);
-					ConfigurationReader reader = new ConfigurationReader(configuration);
+					ConfigurationReader reader = new ConfigurationReader(
+							configuration);
 					reader.readFromFile(file);
-					//check validity
+					// check validity
 					if (!configuration.validManually())
 						createConfigurationMarker(file,
 								"Configuration is invalid",
 								IMarker.SEVERITY_ERROR);
-					//check if all features are still available
+					// check if all features are still available
 					for (String warning : reader.getWarnings())
 						createConfigurationMarker(file, warning,
 								IMarker.SEVERITY_WARNING);
@@ -650,7 +675,9 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		this.projectTree = projectTree;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see featureide.core.IFeatureProject#getCompositionTool()
 	 */
 	public IComposerExtension getComposer() {
@@ -658,42 +685,53 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			String compositionToolID = getComposerID();
 			if (compositionToolID == null)
 				return null;
-			composerExtension = ComposerExtensionManager.getInstance().getComposerById(compositionToolID);
+			composerExtension = ComposerExtensionManager.getInstance()
+					.getComposerById(compositionToolID);
 		}
 		return composerExtension;
 	}
 
-	/* (non-Javadoc)
-	 * @see featureide.core.IFeatureProject#setCompositionTool(featureide.core.builder.ICompositionTool)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * featureide.core.IFeatureProject#setCompositionTool(featureide.core.builder
+	 * .ICompositionTool)
 	 */
 	public void setComposer(IComposerExtension composerExtension) {
 		this.composerExtension = composerExtension;
 		setComposerID(composerExtension.getId());
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see featureide.core.IFeatureProject#getComposerID()
 	 */
 	public String getComposerID() {
 		try {
-			String id = project.getPersistentProperty(composerConfigID); 
+			String id = project.getPersistentProperty(composerConfigID);
 			if (id != null)
 				return id;
-			
+
 			for (ICommand command : project.getDescription().getBuildSpec()) {
-				if (command.getBuilderName().equals(ExtensibleFeatureProjectBuilder.BUILDER_ID)) {
-					id = (String) command.getArguments().get(ExtensibleFeatureProjectBuilder.COMPOSER_KEY);
+				if (command.getBuilderName().equals(
+						ExtensibleFeatureProjectBuilder.BUILDER_ID)) {
+					id = (String) command.getArguments().get(
+							ExtensibleFeatureProjectBuilder.COMPOSER_KEY);
 					if (id != null)
 						return id;
 				}
 			}
-			
+
 		} catch (CoreException e) {
 		}
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see featureide.core.IFeatureProject#setComposerID(java.lang.String)
 	 */
 	@SuppressWarnings("unchecked")
@@ -701,22 +739,23 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		try {
 			project.setPersistentProperty(composerConfigID, composerID);
 			IProjectDescription description = project.getDescription();
-			
+
 			ICommand[] commands = description.getBuildSpec();
 			for (ICommand command : commands) {
-				if (command.getBuilderName().equals(ExtensibleFeatureProjectBuilder.BUILDER_ID)) {
-					CorePlugin.getDefault().logInfo("builder found: " + composerID);
-					Map args = command.getArguments(); 
-					args.put(ExtensibleFeatureProjectBuilder.COMPOSER_KEY, composerID);
+				if (command.getBuilderName().equals(
+						ExtensibleFeatureProjectBuilder.BUILDER_ID)) {
+					Map args = command.getArguments();
+					args.put(ExtensibleFeatureProjectBuilder.COMPOSER_KEY,
+							composerID);
 					command.setArguments(args);
 				}
 			}
 			description.setBuildSpec(commands);
 			project.setDescription(description, null);
-		} catch (CoreException ex) { }
+		} catch (CoreException ex) {
+		}
 	}
-	
-	
+
 	public void setAdditionalJavaClassPath(String[] paths) {
 		StringBuilder builder = new StringBuilder();
 		if (paths.length > 0)
@@ -731,10 +770,13 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see featureide.core.IFeatureProject#setJakProjectModel(featureide.core.jakprojectmodel.IJakProjectModel)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seefeatureide.core.IFeatureProject#setJakProjectModel(featureide.core.
+	 * jakprojectmodel.IJakProjectModel)
 	 */
 	public void setJakProjectModel(IJakProjectModel model) {
-		jakProject=model;
+		jakProject = model;
 	}
 }
