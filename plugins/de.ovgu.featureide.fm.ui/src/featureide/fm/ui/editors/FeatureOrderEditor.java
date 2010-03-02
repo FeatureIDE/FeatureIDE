@@ -299,8 +299,9 @@ public class FeatureOrderEditor extends EditorPart {
  * In this case the method will create a new file. 
  */
 	public ArrayList<String> readFeaturesfromOrderFile() {
-		File file = ((IFile) input.getAdapter(IFile.class)).getProject()
-				.getLocation().toFile();
+		if (((IFile) input.getAdapter(IFile.class)).getProject() == null)
+			return null;  //Avoids NPE when project and its contents are deleted and .order file is still open
+		File file = ((IFile) input.getAdapter(IFile.class)).getProject().getLocation().toFile();
 		ArrayList<String> list;
 		Scanner scanner = null;
 		String fileSep = System.getProperty("file.separator");
