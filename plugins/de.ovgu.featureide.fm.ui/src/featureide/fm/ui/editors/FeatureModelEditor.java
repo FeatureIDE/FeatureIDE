@@ -665,7 +665,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 	 * @see org.eclipse.core.resources.IResourceChangeListener#resourceChanged(org.eclipse.core.resources.IResourceChangeEvent)
 	 */
 	public void resourceChanged(IResourceChangeEvent event) {
-		
+		if (event.getResource() == null) return;
 		if (event.getResource().getType() == IResource.PROJECT)
 			 closeEditor = true;
 		final IEditorInput input=getEditorInput();
