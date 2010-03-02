@@ -37,7 +37,7 @@ public class FeatureOrderReader {
 	
 	public FeatureOrderReader(File file){
 		
-		this.file = new File(file.toString()+"\\.order");
+		this.file = new File(file.toString()+System.getProperty("file.separator")+".order");
 	}
 	/**
 	 * 
