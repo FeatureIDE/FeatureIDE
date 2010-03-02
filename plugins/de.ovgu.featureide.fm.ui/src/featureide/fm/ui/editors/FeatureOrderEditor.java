@@ -261,7 +261,7 @@ public class FeatureOrderEditor extends EditorPart {
 				.getLocation().toFile();
 		String newLine = System.getProperty("line.separator");
 		try {
-			fw = new FileWriter(file.toString() + "\\.order");
+			fw = new FileWriter(file.toString() + System.getProperty("file.separator") + ".order");
 			if (activate.getSelection())
 				fw.write("true" + newLine);
 			else
@@ -303,7 +303,8 @@ public class FeatureOrderEditor extends EditorPart {
 				.getLocation().toFile();
 		ArrayList<String> list;
 		Scanner scanner = null;
-		file = new File(file.toString() + "\\.order");
+		String fileSep = System.getProperty("file.separator");
+		file = new File(file.toString()+ fileSep + ".order");
 		if (file.exists()){
 			try {
 				scanner = new Scanner(file);

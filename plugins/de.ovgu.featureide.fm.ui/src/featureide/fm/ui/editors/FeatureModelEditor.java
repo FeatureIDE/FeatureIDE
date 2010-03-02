@@ -131,6 +131,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 
 	private boolean isPageModified;
 	
+	private boolean closeEditor;
+	
 	private FeatureModel featureModel;
 
 	private IFeatureModelReader featureModelReader;
@@ -658,7 +660,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 	public GrammarFile getGrammarFile() {
 		return grammarFile;
 	}
-	private boolean closeEditor;
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.resources.IResourceChangeListener#resourceChanged(org.eclipse.core.resources.IResourceChangeEvent)
 	 */
