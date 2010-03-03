@@ -113,7 +113,7 @@ public abstract class AbstractConstraintEditorAction extends Action {
 		features.setLayoutData(gridData);
 
 		addButton = new Button(shell, SWT.NONE);
-		addButton.setText("Add feature");
+		addButton.setText("Add Feature");
 		addButton
 				.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
 					public void widgetSelected(
@@ -172,7 +172,7 @@ public abstract class AbstractConstraintEditorAction extends Action {
 
 		new Label(shell, SWT.NONE);
 		okButton = new Button(shell, SWT.NONE);
-		okButton.setText("Ok");
+		okButton.setText("OK");
 		okButton
 				.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
 					public void widgetSelected(
@@ -216,7 +216,7 @@ public abstract class AbstractConstraintEditorAction extends Action {
 		okButton.setLayoutData(gridData);
 
 		cancelButton = new Button(shell, SWT.NONE);
-		cancelButton.setText("cancel");
+		cancelButton.setText("Cancel");
 		cancelButton
 				.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
 					public void widgetSelected(

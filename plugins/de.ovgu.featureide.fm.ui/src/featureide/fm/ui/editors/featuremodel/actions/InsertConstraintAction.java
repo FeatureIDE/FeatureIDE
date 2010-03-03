@@ -76,7 +76,7 @@ public class InsertConstraintAction extends AbstractConstraintEditorAction {
 	public void run() {
 		writer = new FeatureModelWriter(featuremodel);
 		featuretext = writer.writeToString();
-		createEditor("Insert propositional constraint");
+		createEditor("Insert Propositional Constraint");
 		
 	}
 

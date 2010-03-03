@@ -232,7 +232,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 		featureOrderEditor= new FeatureOrderEditor(originalFeatureModel);
 		try {
 			featureOrderEditorIndex = addPage(featureOrderEditor, getEditorInput());
-			setPageText(featureOrderEditorIndex,"Feature order");
+			setPageText(featureOrderEditorIndex,"Feature Order");
 			//featureOrderEditor.updateOrderEditor(getOriginalFeatureModel().getFeatures());
 			featureOrderEditor.initOrderEditor();
 		} catch (PartInitException e) {
