@@ -124,7 +124,7 @@ IOverwriteQuery {
 	 */
 	public ExampleNewWizardPage(String samplePath) {
 		super("Select FeatureIDE Example(s)");
-		setTitle("Select FeatureIDE Example(s) which you would like to explore");
+		setTitle("Select FeatureIDE example(s) which you would like to explore");
 		this.samplePath = samplePath;
 	}
 	
