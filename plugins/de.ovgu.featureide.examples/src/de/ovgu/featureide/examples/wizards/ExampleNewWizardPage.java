@@ -76,18 +76,12 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.eclipse.ui.dialogs.IOverwriteQuery;
-import org.eclipse.ui.wizards.datatransfer.FileSystemStructureProvider;
 import org.eclipse.ui.wizards.datatransfer.ImportOperation;
-/*
-import de.ovgu.cide.features.FeatureModelManager;
-import de.ovgu.cide.features.FeatureModelProviderProxy;
-import de.ovgu.cide.languages.LanguageExtensionManager;
-import de.ovgu.cide.languages.LanguageExtensionProxy;
-import de.ovgu.cide.samples.utils.CommentParser;
-import de.ovgu.cide.samples.utils.RequirementCategory;
-import de.ovgu.cide.samples.utils.ZipStructureProvider;
-*/
-import de.ovgu.featureide.examples.utils.*;
+
+import de.ovgu.featureide.examples.utils.CommentParser;
+import de.ovgu.featureide.examples.utils.ExampleStructureProvider;
+import de.ovgu.featureide.examples.utils.RequirementCategory;
+import de.ovgu.featureide.examples.utils.ZipStructureProvider;
 
 
 public class ExampleNewWizardPage extends WizardPage implements
@@ -698,11 +692,11 @@ IOverwriteQuery {
 
 		// import operation to import project files if copy checkbox is selected
 		if (importSource != null) {
-			List<?> filesToImport = FileSystemStructureProvider.INSTANCE
+			List<?> filesToImport = ExampleStructureProvider.INSTANCE
 					.getChildren(importSource);
 			ImportOperation operation = new ImportOperation(project
 					.getFullPath(), importSource,
-					FileSystemStructureProvider.INSTANCE, this, filesToImport);
+					ExampleStructureProvider.INSTANCE, this, filesToImport);
 			operation.setContext(getShell());
 			operation.setOverwriteResources(true); // need to overwrite
 			// .project, .classpath
