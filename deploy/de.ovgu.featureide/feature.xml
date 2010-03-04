@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="de.ovgu.featureide"
-      label="FeatureIDE (required)"
-      version="2.3.5.qualifier"
+      label="FeatureIDE"
+      version="2.4.0.qualifier"
       provider-name="University of Magdeburg">
    <install-handler library=""/>
 
@@ -476,12 +476,15 @@ Public License instead of this License.
    </url>
 
    <requires>
-      <import plugin="org.eclipse.ui"/>
+      <import feature="de.ovgu.featureide.featuremodeling" version="2.3.6.qualifier"/>
       <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="org.eclipse.core.resources"/>
       <import plugin="org.eclipse.debug.core"/>
       <import plugin="org.eclipse.jdt.launching"/>
-      <import plugin="org.eclipse.draw2d"/>
+      <import plugin="org.eclipse.swt"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="de.ovgu.featureide.fm.core"/>
+      <import plugin="de.ovgu.featureide.core"/>
       <import plugin="org.eclipse.jface.text"/>
       <import plugin="org.eclipse.ui.editors"/>
       <import plugin="org.eclipse.ui.workbench.texteditor"/>
@@ -489,64 +492,62 @@ Public License instead of this License.
       <import plugin="org.eclipse.jdt.ui"/>
       <import plugin="org.eclipse.debug.ui"/>
       <import plugin="org.eclipse.jdt.debug.ui"/>
+      <import plugin="org.eclipse.ui.cheatsheets" version="3.3.101" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.views"/>
       <import plugin="org.eclipse.gef"/>
+      <import plugin="de.ovgu.featureide.fm.ui"/>
+      <import plugin="de.ovgu.featureide.ui.ahead"/>
+      <import plugin="org.eclipse.core.filesystem"/>
+      <import plugin="org.eclipse.ui.intro"/>
    </requires>
 
    <plugin
          id="de.ovgu.featureide.core"
          download-size="0"
          install-size="0"
-         version="2.3.5.qualifier"
+         version="2.4.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="de.ovgu.featureide.core.ahead"
          download-size="0"
          install-size="0"
-         version="2.3.5.qualifier"
-         unpack="false"/>
-
-   <plugin
-         id="de.ovgu.featureide.fm.core"
-         download-size="0"
-         install-size="0"
-         version="2.3.5.qualifier"
-         unpack="false"/>
-
-   <plugin
-         id="de.ovgu.featureide.fm.ui"
-         download-size="0"
-         install-size="0"
-         version="2.3.5.qualifier"
+         version="2.4.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="de.ovgu.featureide.ui"
          download-size="0"
          install-size="0"
-         version="2.3.5.qualifier"
+         version="2.4.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="de.ovgu.featureide.ui.ahead"
          download-size="0"
          install-size="0"
-         version="2.3.5.qualifier"
+         version="2.4.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="de.ovgu.featureide.ui.ahead.refactoring"
          download-size="0"
          install-size="0"
-         version="2.3.5.qualifier"
+         version="2.4.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="de.ovgu.featureide.ui.doc"
          download-size="0"
          install-size="0"
-         version="2.3.5.qualifier"
+         version="2.4.0.qualifier"
+         unpack="false"/>
+
+   <plugin
+         id="de.ovgu.featureide.examples"
+         download-size="0"
+         install-size="0"
+         version="2.4.0.qualifier"
          unpack="false"/>
 
 </feature>

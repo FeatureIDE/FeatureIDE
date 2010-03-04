@@ -2,7 +2,7 @@
 <feature
       id="de.ovgu.featureide.featurehouse"
       label="FeatureIDE extension for FeatureHouse (optional)"
-      version="2.3.5.qualifier"
+      version="2.4.0.qualifier"
       provider-name="University of Magdeburg">
 
    <description url="http://www.fosd.de/featureide/">
@@ -460,14 +460,18 @@ Public License instead of this License.
    </url>
 
    <requires>
-      <import feature="de.ovgu.featureide" version="2.2.0.qualifier"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="de.ovgu.featureide.fm.core"/>
+      <import plugin="de.ovgu.featureide.core"/>
    </requires>
 
    <plugin
          id="de.ovgu.featureide.core.featurehouse"
          download-size="0"
          install-size="0"
-         version="2.3.5.qualifier"
+         version="2.4.0.qualifier"
          unpack="false"/>
 
 </feature>

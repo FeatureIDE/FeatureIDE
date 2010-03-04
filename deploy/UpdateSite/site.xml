@@ -126,8 +126,21 @@
    <feature url="features/de.ovgu.featureide.featurehouse_2.3.5.200911041622.jar" id="de.ovgu.featureide.featurehouse" version="2.3.5.200911041622">
       <category name="FeatureIDE 2.3"/>
    </feature>
+   <feature url="features/de.ovgu.featureide_2.4.0.201003041050.jar" id="de.ovgu.featureide" version="2.4.0.201003041050">
+      <category name="FeatureIDE 2.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurecpp_2.4.0.201003041050.jar" id="de.ovgu.featureide.featurecpp" version="2.4.0.201003041050">
+      <category name="FeatureIDE 2.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurehouse_2.4.0.201003041050.jar" id="de.ovgu.featureide.featurehouse" version="2.4.0.201003041050">
+      <category name="FeatureIDE 2.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featuremodeling_2.4.0.201003041050.jar" id="de.ovgu.featureide.featuremodeling" version="2.4.0.201003041050">
+      <category name="FeatureIDE 2.4"/>
+   </feature>
    <category-def name="FeatureIDE 2.0" label="FeatureIDE 2.0"/>
    <category-def name="FeatureIDE 2.1" label="FeatureIDE 2.1"/>
    <category-def name="FeatureIDE 2.2" label="FeatureIDE 2.2"/>
    <category-def name="FeatureIDE 2.3" label="FeatureIDE 2.3"/>
+   <category-def name="FeatureIDE 2.4" label="FeatureIDE 2.4"/>
 </site>

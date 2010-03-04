@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="de.ovgu.featureide.featurecpp"
-      label="FeatureIDE extension for FeatureC++ (optional)"
+      id="de.ovgu.featureide.featuremodeling"
+      label="Feature Modeling (required)"
       version="2.4.0.qualifier"
       provider-name="University of Magdeburg">
 
    <description url="http://www.fosd.de/featureide/">
-      FeatureC++ composes C++ header files.
+      Feature modeling is part of FeatureIDE, but it can also be used separately. The plugins give you the ability to graphically model feature diagrams, to import and export them into several formats, e.g., XML, PDF, JPG, or GUIDSL. There is also an infrastructure to perform automated analysis and reasoning using SAT4J.
    </description>
 
    <copyright>
@@ -460,16 +460,30 @@ Public License instead of this License.
    </url>
 
    <requires>
-      <import plugin="org.eclipse.ui"/>
-      <import plugin="org.eclipse.core.resources"/>
-      <import plugin="de.ovgu.featureide.fm.core"/>
-      <import plugin="de.ovgu.featureide.core"/>
-      <import plugin="org.eclipse.cdt.core" version="5.0.2" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.jface.text"/>
+      <import plugin="org.eclipse.ui.editors"/>
+      <import plugin="org.eclipse.ui.workbench.texteditor"/>
+      <import plugin="org.eclipse.ui.ide"/>
+      <import plugin="org.eclipse.jdt.ui"/>
+      <import plugin="org.eclipse.debug.ui"/>
+      <import plugin="org.eclipse.jdt.debug.ui"/>
+      <import plugin="org.eclipse.ui.views"/>
+      <import plugin="org.eclipse.gef"/>
+      <import plugin="de.ovgu.featureide.fm.core"/>
    </requires>
 
    <plugin
-         id="de.ovgu.featureide.core.featurecpp"
+         id="de.ovgu.featureide.fm.core"
+         download-size="0"
+         install-size="0"
+         version="2.4.0.qualifier"
+         unpack="false"/>
+
+   <plugin
+         id="de.ovgu.featureide.fm.ui"
          download-size="0"
          install-size="0"
          version="2.4.0.qualifier"
