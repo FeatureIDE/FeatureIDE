@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <introContent>
-  	<extensionContent id="de.ovgu.featureide.ui.doc.Extension" style="css/featureide.css" name="FeatureIDE Intro-Extension" path="tutorials/@">
-		<group style-id="content-group" id="featureide-introLink-group">
-       		<link label="FeatureIDE" url="http://wwwiti.cs.uni-magdeburg.de/iti_db/research/featureide/" id="FeatureIDE-Link" style-id="content-link">
-          		<text>FeatureIDE is an Eclipse-based IDE that supports building program families following the AHEAD architecture model. It provides tools for the feature oriented design process and the implementation of software product lines. It integrates AHEAD, FeatureC++ and FeatureHouse tools like composition tools, compilers and more. We also provide a Cheat Sheet Tutorial for your first Project</text>
+  	<extensionContent id="de.ovgu.featureide.ui.doc.Extension" style="css/featureide_tut.css" name="FeatureIDE Intro-Extension" path="tutorials/@">
+		<group label="FeatureIDE Tutorial" style-id="content-group" id="featureide-introLink-group">
+       		<link label="FeatureIDE" url="http://org.eclipse.ui.intro/showStandby?partId=org.eclipse.platform.cheatsheet&amp;input=de.ovgu.featureide.ui.doc.cheatsheet" id="FeatureIDE-TutLink" style-id="content-link">
+          		<text>Create a simple HelloWorld FeatureIDE Project.</text>
        		</link>
        	</group>
    	</extensionContent>
