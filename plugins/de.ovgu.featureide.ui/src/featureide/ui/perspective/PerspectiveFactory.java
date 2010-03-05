@@ -13,7 +13,7 @@ import featureide.ui.wizards.NewEquationFileWizard;
 import featureide.ui.wizards.NewFeatureProjectWizard;
 /**
  * 
- * TODO description
+ * The factory for the FeatureIDE-Perspective
  * 
  * @author Christian Becker
  * @author Thomas Thuem
@@ -31,7 +31,6 @@ public class PerspectiveFactory implements IPerspectiveFactory {
         
 		//TODO Chris: find a way to dynamically add wizard, let them layout somewhere
 		layout.addNewWizardShortcut(NewEquationFileWizard.ID);
-		//layout.addNewWizardShortcut(NewJakFileWizard.ID);
 		layout.addNewWizardShortcut(NewFeatureProjectWizard.ID);
 		layout.addNewWizardShortcut(NewJakFileWizard.ID);
 		//layout.addView(IPageLayout.ID_OUTLINE, IPageLayout.RIGHT, 0.25f, editorArea);
@@ -40,9 +39,11 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 		IFolderLayout down=layout.createFolder("down", IPageLayout.BOTTOM, (float) 0.80, editorArea); 
 		IFolderLayout right=layout.createFolder("right", IPageLayout.RIGHT, (float) 0.75, editorArea); 
 		
-		down.addView("org.eclipse.ui.console.ConsoleView");
-		down.addView("featureide.fm.ui.views.FeatureModelEditView");
 		down.addView(IPageLayout.ID_PROBLEM_VIEW);
+		down.addView("org.eclipse.ui.console.ConsoleView");
+		down.addView("de.ovgu.featureide.ui.views.collaboration.Collaboration");
+		down.addView("featureide.fm.ui.views.FeatureModelEditView");
+		
 		
 		right.addView(IPageLayout.ID_OUTLINE);
 		
