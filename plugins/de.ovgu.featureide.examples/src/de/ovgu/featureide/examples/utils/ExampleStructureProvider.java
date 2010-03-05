@@ -50,7 +50,6 @@ public class ExampleStructureProvider implements IImportStructureProvider {
 	 * The filter to not return SVN meta files.
 	 */
 	private final static FilenameFilter filter = new FilenameFilter() {
-		@Override
 		public boolean accept(File dir, String name) {
 			return !name.equals(".svn");
 		}
