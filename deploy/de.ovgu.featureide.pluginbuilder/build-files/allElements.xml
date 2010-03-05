@@ -8,18 +8,6 @@
 	<target name="norcpbuild" unless="build.container.feature">
 		<ant antfile="${genericTargets}" target="${target}">
 			<property name="type" value="feature" />
-			<property name="id" value="de.ovgu.featureide" />
-		</ant>
-		<ant antfile="${genericTargets}" target="${target}">
-			<property name="type" value="feature" />
-			<property name="id" value="de.ovgu.featureide.featurecpp" />
-		</ant>
-		<ant antfile="${genericTargets}" target="${target}">
-			<property name="type" value="feature" />
-			<property name="id" value="de.ovgu.featureide.featurehouse" />
-		</ant>
-		<ant antfile="${genericTargets}" target="${target}">
-			<property name="type" value="feature" />
 			<property name="id" value="de.ovgu.featureide.featuremodeling" />
 		</ant>
 		
@@ -33,49 +21,7 @@
 	</target>
 	
 	<!-- generated assemble targets -->	     
-	<target name="assemble.de.ovgu.featureide">
-		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
-			<property name="zipargs" value="" />
-		</ant>
-	</target>
-	<target name="assemble.de.ovgu.featureide.p2">
-		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
-			<property name="zipargs" value="" />
-		</ant>
-	</target>
-	<target name="assemble.de.ovgu.featureide.group.group.group">
-		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
-			<property name="zipargs" value="" />
-		</ant>
-	</target>	<target name="assemble.de.ovgu.featureide.featurecpp">
-		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
-			<property name="zipargs" value="" />
-		</ant>
-	</target>
-	<target name="assemble.de.ovgu.featureide.featurecpp.p2">
-		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
-			<property name="zipargs" value="" />
-		</ant>
-	</target>
-	<target name="assemble.de.ovgu.featureide.featurecpp.group.group.group">
-		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
-			<property name="zipargs" value="" />
-		</ant>
-	</target>	<target name="assemble.de.ovgu.featureide.featurehouse">
-		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
-			<property name="zipargs" value="" />
-		</ant>
-	</target>
-	<target name="assemble.de.ovgu.featureide.featurehouse.p2">
-		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
-			<property name="zipargs" value="" />
-		</ant>
-	</target>
-	<target name="assemble.de.ovgu.featureide.featurehouse.group.group.group">
-		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
-			<property name="zipargs" value="" />
-		</ant>
-	</target>	<target name="assemble.de.ovgu.featureide.featuremodeling">
+	<target name="assemble.de.ovgu.featureide.featuremodeling">
 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
 			<property name="zipargs" value="" />
 		</ant>
