@@ -161,14 +161,6 @@
          point="org.eclipse.ui.views">
       <view
             category="FeatureIDE"
-            class="featureide.ui.views.outline.OutlineView"
-            icon="icons/FeatureIconSmall.ico"
-            id="de.ovgu.featureide.ui.views.outline.Outline"
-            name="Feature Outline"
-            restorable="true">
-      </view>
-      <view
-            category="FeatureIDE"
             class="featureide.ui.views.collaboration.CollaborationView"
             icon="icons/FeatureIconSmall.ico"
             id="de.ovgu.featureide.ui.views.collaboration.Collaboration"
