@@ -1,5 +1,5 @@
 /* FeatureIDE - An IDE to support feature-oriented software development
- * Copyright (C) 2005-2009  FeatureIDE Team, University of Magdeburg
+ * Copyright (C) 2005-2010  FeatureIDE Team, University of Magdeburg
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,6 @@
  * See http://www.fosd.de/featureide/ for further information.
  */
 package de.ovgu.featureide.examples.wizards;
-
 
 import java.io.File;
 import java.io.IOException;
@@ -83,7 +82,11 @@ import de.ovgu.featureide.examples.utils.ExampleStructureProvider;
 import de.ovgu.featureide.examples.utils.RequirementCategory;
 import de.ovgu.featureide.examples.utils.ZipStructureProvider;
 
-
+/**
+ * TODO description
+ * 
+ * @author Christian Becker
+ */
 public class ExampleNewWizardPage extends WizardPage implements
 IOverwriteQuery {
 

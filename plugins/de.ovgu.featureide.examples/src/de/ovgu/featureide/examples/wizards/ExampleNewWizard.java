@@ -1,5 +1,5 @@
 /* FeatureIDE - An IDE to support feature-oriented software development
- * Copyright (C) 2005-2009  FeatureIDE Team, University of Magdeburg
+ * Copyright (C) 2005-2010  FeatureIDE Team, University of Magdeburg
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,6 +29,11 @@ import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 import org.osgi.framework.Bundle;
 
+/**
+ * TODO description
+ * 
+ * @author Christian Becker
+ */
 public class ExampleNewWizard extends Wizard implements INewWizard {
 
 	public static final String ID = "de.ovgu.featureide.examples";

@@ -5,7 +5,7 @@
  */</template><template autoinsert="true" context="constructorcomment_context" deleted="false" description="Comment for created constructors" enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.constructorcomment" name="constructorcomment">/**
  * ${tags}
  */</template><template autoinsert="false" context="filecomment_context" deleted="false" description="Comment for created Java files" enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.filecomment" name="filecomment">/* FeatureIDE - An IDE to support feature-oriented software development
- * Copyright (C) 2005-2009  FeatureIDE Team, University of Magdeburg
+ * Copyright (C) 2005-2010  FeatureIDE Team, University of Magdeburg
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

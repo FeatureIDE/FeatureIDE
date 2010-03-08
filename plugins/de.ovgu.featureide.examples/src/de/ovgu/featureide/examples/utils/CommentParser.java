@@ -1,5 +1,5 @@
 /* FeatureIDE - An IDE to support feature-oriented software development
- * Copyright (C) 2005-2009  FeatureIDE Team, University of Magdeburg
+ * Copyright (C) 2005-2010  FeatureIDE Team, University of Magdeburg
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-
+/**
+ * TODO description
+ * 
+ * @author Christian Becker
+ */
 public class CommentParser {
 	public static final String OPENTAG_BEGIN = "[";
 	public static final String OPENTAG_END = "[/";
