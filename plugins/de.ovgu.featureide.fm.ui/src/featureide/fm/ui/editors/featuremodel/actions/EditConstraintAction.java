@@ -22,72 +22,34 @@ import java.util.Iterator;
 
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.prop4j.NodeWriter;
 
 import featureide.fm.core.Constraint;
 import featureide.fm.core.FeatureModel;
-import featureide.fm.core.io.guidsl.FeatureModelWriter;
 import featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 import featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
 
 /**
- * TODO description
+ * An action to edit a selected propositional constraint below the feature
+ * diagram.
  * 
  * @author Christian Becker
+ * @author Thomas Thuem
  */
 public class EditConstraintAction extends AbstractConstraintEditorAction {
 
-	private Constraint oldConstraint; 
-	/**
-	 * @param viewer
-	 * @param featuremodel
-	 */
+	private Constraint constraint;
+
 	public EditConstraintAction(GraphicalViewerImpl viewer,
 			FeatureModel featuremodel, String menuname) {
 		super(viewer, featuremodel, menuname);
-		
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see featureide.fm.ui.editors.AbstractConstraintEditor#run()
-	 */
 	@Override
 	public void run() {
-		writer = new FeatureModelWriter(featuremodel);
-		featuretext = writer.writeToString();
-		oldConstraint = null;
-		createEditor("Edit propositional constraint");
-		IStructuredSelection selection = (IStructuredSelection) viewer
-				.getSelection();
-		Iterator<?> iter = selection.iterator();
-		while (iter.hasNext()) {
-			Object editPart = iter.next();
-			if (editPart instanceof ConstraintEditPart) {
-				oldConstraint = ((ConstraintEditPart) editPart)
-						.getConstraintModel();
-				constraintText.setText(oldConstraint.getNode().toString(
-						NodeWriter.textualSymbols));
-			}
-		}
-
+		super.run();
+		openEditor(constraint);
 	}
 
-	/* (non-Javadoc)
-	 * @see featureide.fm.ui.editors.AbstractConstraintEditor#editorhook()
-	 */
-	@Override
-	protected void editorhook() {
-		if (oldConstraint != null) {
-				featuremodel.removePropositionalNode(oldConstraint);
-				oldConstraint = null;
-			}
-		}
-
-	/* (non-Javadoc)
-	 * @see featureide.fm.ui.editors.AbstractConstraintEditor#isValidSelection(org.eclipse.jface.viewers.IStructuredSelection)
-	 */
 	@Override
 	protected boolean isValidSelection(IStructuredSelection selection) {
 		if (selection.size() == 1
@@ -98,16 +60,11 @@ public class EditConstraintAction extends AbstractConstraintEditorAction {
 		while (iter.hasNext()) {
 			Object editPart = iter.next();
 			if (editPart instanceof ConstraintEditPart) {
-				oldConstraint = ((ConstraintEditPart) editPart)
+				constraint = ((ConstraintEditPart) editPart)
 						.getConstraintModel();
 				return true;
 			}
 		}
 		return false;
-
 	}
 }
-	
-
-
-

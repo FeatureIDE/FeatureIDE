@@ -24,44 +24,29 @@ import java.util.LinkedList;
 
 import org.prop4j.Node;
 
+/**
+ * Represents a propositional constraint below the feature diagram.
+ * 
+ * @author Thomas Thuem
+ */
 public class Constraint implements PropertyConstants {
 
 	private FeatureModel featureModel;
 
 	private int index;
 
-	// private Dimension size;
-	//
-	// private Point location;
-
 	public Constraint(FeatureModel featureModel, int index) {
 		this.featureModel = featureModel;
 		this.index = index;
 	}
 
+	public FeatureModel getFeatureModel() {
+		return featureModel;
+	}
+
 	public Node getNode() {
 		return featureModel.getConstraint(index);
 	}
-
-	// public Dimension getSize() {
-	// return size;
-	// }
-	//
-	// public void setSize(Dimension size) {
-	// this.size = size;
-	// }
-	//
-	// public Point getLocation() {
-	// return location;
-	// }
-	//
-	// public void setLocation(Point newLocation) {
-	// if (newLocation == null || newLocation.equals(location))
-	// return;
-	// Point oldLocation = this.location;
-	// this.location = newLocation;
-	// fireLocationChanged(oldLocation, newLocation);
-	// }
 
 	private LinkedList<PropertyChangeListener> listenerList = new LinkedList<PropertyChangeListener>();
 
@@ -78,12 +63,5 @@ public class Constraint implements PropertyConstants {
 		for (PropertyChangeListener listener : listenerList)
 			listener.propertyChange(event);
 	}
-
-	// private void fireLocationChanged(Point oldLocation, Point newLocation) {
-	// PropertyChangeEvent event = new PropertyChangeEvent(this,
-	// LOCATION_CHANGED, oldLocation, newLocation);
-	// for (PropertyChangeListener listener : listenerList)
-	// listener.propertyChange(event);
-	// }
 
 }

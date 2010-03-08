@@ -18,66 +18,40 @@
  */
 package featureide.fm.ui.editors.featuremodel.actions;
 
-import java.util.Iterator;
-
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.viewers.IStructuredSelection;
 
 import featureide.fm.core.FeatureModel;
-import featureide.fm.core.io.guidsl.FeatureModelWriter;
-import featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
-import featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
 /**
- * TODO description
+ * Creates a new propositional constraint below the feature diagram.
  * 
  * @author Christian Becker
+ * @author Thomas Thuem
  */
-public class InsertConstraintAction extends AbstractConstraintEditorAction {
+public class CreateConstraintAction extends AbstractConstraintEditorAction {
 
-	/**
-	 * @param viewer
-	 * @param featuremodel
-	 */
-	public InsertConstraintAction(GraphicalViewerImpl viewer,
+	public CreateConstraintAction(GraphicalViewerImpl viewer,
 			FeatureModel featuremodel, String menuname) {
 		super(viewer, featuremodel, menuname);
 	}
 
-	/* (non-Javadoc)
-	 * @see featureide.fm.ui.editors.AbstractConstraintEditor#editorhook()
-	 */
-	
-//	protected void editorhook() {
-		
-		
-	
-
-	/* (non-Javadoc)
-	 * @see featureide.fm.ui.editors.AbstractConstraintEditor#isValidSelection(org.eclipse.jface.viewers.IStructuredSelection)
-	 */
 	@Override
 	protected boolean isValidSelection(IStructuredSelection selection) {		
-		Iterator<?> iter = selection.iterator();
-		while (iter.hasNext()) {
-			Object editPart = iter.next();
-			if ((editPart instanceof ConstraintEditPart) || (editPart instanceof FeatureEditPart) ) {
-				return false;
-			}
-		}
+//		Iterator<?> iter = selection.iterator();
+//		while (iter.hasNext()) {
+//			Object editPart = iter.next();
+//			if ((editPart instanceof ConstraintEditPart) || (editPart instanceof FeatureEditPart) ) {
+//				return false;
+//			}
+//		}
 		return true;
-		
 	}
 
-	/* (non-Javadoc)
-	 * @see featureide.fm.ui.editors.AbstractConstraintEditor#run()
-	 */
 	@Override
 	public void run() {
-		writer = new FeatureModelWriter(featuremodel);
-		featuretext = writer.writeToString();
-		createEditor("Insert Propositional Constraint");
-		
+		super.run();
+		openEditor(null);
 	}
 
 }

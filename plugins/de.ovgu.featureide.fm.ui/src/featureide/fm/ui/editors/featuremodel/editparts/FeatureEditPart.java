@@ -75,7 +75,6 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 	protected void createEditPolicies() {
 		FeatureModel featureModel = ((ModelEditPart) getParent()).getFeatureModel();
 		installEditPolicy(EditPolicy.DIRECT_EDIT_ROLE, new FeatureDirectEditPolicy(featureModel, getFeatureModel()));
-		
 	}
 	
 	private DirectEditManager manager;

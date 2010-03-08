@@ -99,7 +99,7 @@ import featureide.fm.ui.editors.featuremodel.actions.CreateCompoundAction;
 import featureide.fm.ui.editors.featuremodel.actions.CreateLayerAction;
 import featureide.fm.ui.editors.featuremodel.actions.DeleteAction;
 import featureide.fm.ui.editors.featuremodel.actions.EditConstraintAction;
-import featureide.fm.ui.editors.featuremodel.actions.InsertConstraintAction;
+import featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
 import featureide.fm.ui.editors.featuremodel.actions.MandantoryAction;
 import featureide.fm.ui.editors.featuremodel.actions.OrAction;
 import featureide.fm.ui.editors.featuremodel.actions.RenameAction;
@@ -183,7 +183,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 
 	private EditConstraintAction editConstraintAction;
 
-	private InsertConstraintAction insertConStraintAction;
+	private CreateConstraintAction createConstraintAction;
 	
 	@Override
 	
@@ -287,8 +287,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 		renameAction = new RenameAction(graphicalViewer, featureModel);
 		zoomIn = new ZoomInAction(zoomManager);
 		zoomOut = new ZoomOutAction(zoomManager);
-		editConstraintAction= new EditConstraintAction(graphicalViewer,featureModel, "Edit Constraint");
-		insertConStraintAction = new InsertConstraintAction(graphicalViewer, featureModel, "Insert Constraint");
+		createConstraintAction = new CreateConstraintAction(graphicalViewer, featureModel, "Create Constraint");
+		editConstraintAction= new EditConstraintAction(graphicalViewer, featureModel, "Edit Constraint");
 	}
 
 	private void createContextMenu() {
@@ -325,7 +325,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 			
 		}
 		menu.add(editConstraintAction);
-		menu.add(insertConStraintAction);
+		menu.add(createConstraintAction);
 		menu.add(renameAction);
 		
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
@@ -661,98 +661,90 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 		return grammarFile;
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.resources.IResourceChangeListener#resourceChanged(org.eclipse.core.resources.IResourceChangeEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.core.resources.IResourceChangeListener#resourceChanged(org
+	 * .eclipse.core.resources.IResourceChangeEvent)
 	 */
 	public void resourceChanged(IResourceChangeEvent event) {
-		if (event.getResource() == null) return;
+		if (event.getResource() == null)
+			return;
 		if (event.getResource().getType() == IResource.PROJECT)
-			 closeEditor = true;
-		final IEditorInput input=getEditorInput();
-		if (!( input instanceof IFileEditorInput ))
-		           return;
-		final IFile jmolfile=((IFileEditorInput)input).getFile();
-		 
+			closeEditor = true;
+		final IEditorInput input = getEditorInput();
+		if (!(input instanceof IFileEditorInput))
+			return;
+		final IFile jmolfile = ((IFileEditorInput) input).getFile();
+
 		/*
-	     * Closes editor if resource is deleted
-	      */
-	       if ((event.getType() == IResourceChangeEvent.POST_CHANGE) && closeEditor) {
-	          IResourceDelta rootDelta = event.getDelta();
-	           //get the delta, if any, for the documentation directory
-	           
-	           final List<IResource> deletedlist = new ArrayList<IResource>();
-	           
-	           IResourceDelta docDelta = rootDelta.findMember(jmolfile.getFullPath());
-	           if (docDelta != null){
-	               IResourceDeltaVisitor visitor = new IResourceDeltaVisitor() {
-	                   public boolean visit(IResourceDelta delta) {
-	                      //only interested in removal changes
-	                      if (((delta.getFlags() & IResourceDelta.REMOVED) == 0) && closeEditor){
-	                          deletedlist.add( delta.getResource() );
-	                      }
-	                      return true;
-	                   }
-	                };
-	                
-	                try {
-						docDelta.accept(visitor);
-					} catch (CoreException e) {
-						e.printStackTrace();
+		 * Closes editor if resource is deleted
+		 */
+		if ((event.getType() == IResourceChangeEvent.POST_CHANGE)
+				&& closeEditor) {
+			IResourceDelta rootDelta = event.getDelta();
+			// get the delta, if any, for the documentation directory
+			final List<IResource> deletedlist = new ArrayList<IResource>();
+			IResourceDelta docDelta = rootDelta.findMember(jmolfile
+					.getFullPath());
+			if (docDelta != null) {
+				IResourceDeltaVisitor visitor = new IResourceDeltaVisitor() {
+					public boolean visit(IResourceDelta delta) {
+						// only interested in removal changes
+						if (((delta.getFlags() & IResourceDelta.REMOVED) == 0)
+								&& closeEditor) {
+							deletedlist.add(delta.getResource());
+						}
+						return true;
 					}
-	                
-	           }
-	               
-	           if (deletedlist.size()>0 && deletedlist.contains( jmolfile )){
-	        	   Display.getDefault().asyncExec(new Runnable() {
-	                   public void run() {
-	                       if (getSite()==null) 
-	                           return;
-	                       if (getSite().getWorkbenchWindow()==null) 
-	                           return;
-	                       
-	                       IWorkbenchPage[] pages = getSite().getWorkbenchWindow()
-	                                                         .getPages();
-	                     
-	                       for (int i = 0; i<pages.length; i++) {
-	                               IEditorPart editorPart
-	                                 = pages[i].findEditor(input);
-	                               pages[i].closeEditor(editorPart,true);
-	                       }
-	                   }
-	               });
-	           }
-	           
+				};
+				try {
+					docDelta.accept(visitor);
+				} catch (CoreException e) {
+					e.printStackTrace();
+				}
+			}
+			if (deletedlist.size() > 0 && deletedlist.contains(jmolfile)) {
+				Display.getDefault().asyncExec(new Runnable() {
+					public void run() {
+						if (getSite() == null)
+							return;
+						if (getSite().getWorkbenchWindow() == null)
+							return;
+						IWorkbenchPage[] pages = getSite().getWorkbenchWindow()
+								.getPages();
+						for (int i = 0; i < pages.length; i++) {
+							IEditorPart editorPart = pages[i].findEditor(input);
+							pages[i].closeEditor(editorPart, true);
+						}
+					}
+				});
+			}
+		}
 
-	           
-	       }
-
-	       /*
-	        * Closes all editors with this editor input on project close.
-	        */
-
-		 
-		 final IResource res = event.getResource();
-		 if ((event.getType() == IResourceChangeEvent.PRE_CLOSE ) || closeEditor) {
-			 Display.getDefault().asyncExec(new Runnable() {
-				 public void run() {
-					 if (getSite()==null)
-						 return;
-					 if (getSite().getWorkbenchWindow()==null)
-						 return;
-					 IWorkbenchPage[] pages = getSite().getWorkbenchWindow().getPages();
-					 for (int i = 0; i<pages.length; i++) {
-						 if ( jmolfile.getProject().equals( res )) {
-							 IEditorPart editorPart = pages[i].findEditor(input);
-							 pages[i].closeEditor(editorPart,true);
-		                 }
-					 }
-				 }
-			 });
-		 }
-
-	
-		
+		/*
+		 * Closes all editors with this editor input on project close.
+		 */
+		final IResource res = event.getResource();
+		if ((event.getType() == IResourceChangeEvent.PRE_CLOSE) || closeEditor) {
+			Display.getDefault().asyncExec(new Runnable() {
+				public void run() {
+					if (getSite() == null)
+						return;
+					if (getSite().getWorkbenchWindow() == null)
+						return;
+					IWorkbenchPage[] pages = getSite().getWorkbenchWindow()
+							.getPages();
+					for (int i = 0; i < pages.length; i++) {
+						if (jmolfile.getProject().equals(res)) {
+							IEditorPart editorPart = pages[i].findEditor(input);
+							pages[i].closeEditor(editorPart, true);
+						}
+					}
+				}
+			});
+		}
 	}
-	
 
 }

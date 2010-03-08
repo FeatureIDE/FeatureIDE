@@ -27,7 +27,7 @@ import featureide.fm.core.FeatureConnection;
 import featureide.fm.core.FeatureModel;
 
 /**
- * Creates editparts for given models.
+ * Creates edit parts for given models.
  * 
  * @author Thomas Thuem
  */

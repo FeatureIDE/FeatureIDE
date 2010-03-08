@@ -34,7 +34,7 @@ public class RenameAction extends SingleSelectionAction {
 	public static String ID = "featureide.rename";
 
 	public RenameAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
-		super("Rename", viewer);
+		super("Rename (F2)", viewer);
 		this.setAccelerator(SWT.F2);
 	}
 

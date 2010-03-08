@@ -25,10 +25,13 @@ import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.Request;
+import org.eclipse.gef.RequestConstants;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.gef.editpolicies.NonResizableEditPolicy;
+
 import featureide.fm.core.Constraint;
 import featureide.fm.core.PropertyConstants;
+import featureide.fm.ui.editors.ConstraintEditor;
 import featureide.fm.ui.editors.featuremodel.figures.ConstraintFigure;
 
 /**
@@ -37,8 +40,6 @@ import featureide.fm.ui.editors.featuremodel.figures.ConstraintFigure;
  * @author Thomas Thuem
  */
 public class ConstraintEditPart extends AbstractGraphicalEditPart implements PropertyConstants, PropertyChangeListener {
-	
-
 	
 	public ConstraintEditPart(Constraint constraint) {
 		super();
@@ -64,30 +65,12 @@ public class ConstraintEditPart extends AbstractGraphicalEditPart implements Pro
 		installEditPolicy(EditPolicy.SELECTION_FEEDBACK_ROLE, new NonResizableEditPolicy());		
 	}
 	
-//	private DirectEditManager manager;
-//	
-//	@Override
-//	public void performRequest(Request request) {
-//		if (request.getType() == RequestConstants.REQ_DIRECT_EDIT) {
-//			if (manager == null)
-//				manager = new FeatureLabelEditManager(this, TextCellEditor.class,
-//						new FeatureCellEditorLocator((FeatureFigure) getFigure()));
-//			manager.show();
-//		}
-//		else if (request.getType() == RequestConstants.REQ_OPEN) {
-//			Feature feature = getConstraintModel();
-//			feature.setMandatory(!feature.isMandatory());
-//
-//			ModelEditPart parent = (ModelEditPart) getParent();
-//			FeatureModel modelData = parent.getModelData();
-//			modelData.handleModelDataChanged();
-//		}
-//	}
-	
-	public void performRequest (Request request){
-	
+	public void performRequest(Request request) {
+		if (request.getType() == RequestConstants.REQ_OPEN) {
+			new ConstraintEditor(getConstraintModel().getFeatureModel(), getConstraintModel());
+		}
 	}
-
+	
 	@Override
 	public void activate() {
 		getConstraintModel().addListener(this);
@@ -109,10 +92,6 @@ public class ConstraintEditPart extends AbstractGraphicalEditPart implements Pro
 		if (prop.equals(LOCATION_CHANGED)) {
 			getConstraintFigure().setLocation((Point) event.getNewValue());
 		}
-//		else if (prop.equals(NAME_CHANGED)) {
-//			getConstraintFigure().setName(getConstraintModel().getName());
-//			getConstraintModel().setSize(getConstraintFigure().getSize());
-//		}
 	}
 	
 }
