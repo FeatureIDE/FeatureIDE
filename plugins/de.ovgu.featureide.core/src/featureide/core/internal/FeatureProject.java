@@ -304,7 +304,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		try {
 			equation = project.getPersistentProperty(equationConfigID);
 		} catch (CoreException e) {
-			e.printStackTrace();
+			CorePlugin.getDefault().logError(e);
 		}
 
 		if (equation != null) {
@@ -322,10 +322,11 @@ public class FeatureProject extends BuilderMarkerHandler implements
 								.getName().endsWith(".expression"))) {
 					equationFile = (IFile) resource;
 					setCurrentEquationFile(equationFile);
+					return equationFile;
 				}
 			}
 		} catch (CoreException e) {
-			e.printStackTrace();
+			CorePlugin.getDefault().logError(e);
 		}
 
 		return equationFile;
