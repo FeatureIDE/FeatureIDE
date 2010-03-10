@@ -70,7 +70,7 @@ public class ShowCollaborationDiagram implements IWorkbenchWindowActionDelegate 
 				.getActiveWorkbenchWindow();
 		FileEditorInput inputFile = (FileEditorInput) editor.getActivePage()
 				.getActiveEditor().getEditorInput();
-		IFeatureProject featureProject = CorePlugin.getProjectData(inputFile
+		IFeatureProject featureProject = CorePlugin.getFeatureProject(inputFile
 				.getFile());
 		Visitor visitor = new CollaborationVisitor();
 		visitor.visitTree(featureProject.getProjectTree());

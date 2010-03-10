@@ -50,7 +50,7 @@ public class FeatureFolderDecorator implements ILightweightLabelDecorator, IFeat
 		IFolder folder = (IFolder) element;
 
 		//decorate only files in our projects
-		IFeatureProject featureProject = CorePlugin.getProjectData(folder);
+		IFeatureProject featureProject = CorePlugin.getFeatureProject(folder);
 		if (featureProject == null || !featureProject.getSourceFolder().equals(folder.getParent()))
 			return;
 		

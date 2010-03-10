@@ -93,7 +93,7 @@ public class JakTreeContentProvider implements ITreeContentProvider {
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		if (newInput != null && newInput instanceof FileEditorInput) {
 			IFile file = ((FileEditorInput) newInput).getFile();
-			IFeatureProject featureProject = CorePlugin.getProjectData(file);
+			IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
 			if (featureProject != null) {
 				jakfile = file;
 				jakProject = featureProject.getJakProjectModel();

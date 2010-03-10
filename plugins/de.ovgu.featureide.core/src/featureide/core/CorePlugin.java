@@ -287,7 +287,7 @@ public class CorePlugin extends AbstractCorePlugin {
 	 *  
 	 * @return
 	 */
-	public static Collection<IFeatureProject> getProjectData () {
+	public static Collection<IFeatureProject> getFeatureProjects () {
 		if (getDefault() == null)
 			return null;
 		return Collections.unmodifiableCollection(getDefault().featureProjectMap.values());
@@ -299,7 +299,7 @@ public class CorePlugin extends AbstractCorePlugin {
 	 * @return <code>null</code> if there is no associated project, no active instance of this plug-in or
 	 * resource is the workspace root
 	 */
-	public static IFeatureProject getProjectData(IResource res) {
+	public static IFeatureProject getFeatureProject(IResource res) {
 		if (res == null) {
 			getDefault().logWarning("No resource given while getting the project data");
 			return null;
@@ -311,6 +311,6 @@ public class CorePlugin extends AbstractCorePlugin {
 	}
 	
 	public static boolean hasProjectData(IResource res) {
-		return getProjectData(res) != null;
+		return getFeatureProject(res) != null;
 	}
 }

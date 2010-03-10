@@ -84,7 +84,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, IEquatio
 				part = page.getActiveEditor();
 				if (part!=null) {
 					FileEditorInput inputFile = (FileEditorInput)part.getEditorInput(); 
-					featureProject = CorePlugin.getProjectData(inputFile.getFile());
+					featureProject = CorePlugin.getFeatureProject(inputFile.getFile());
 				}
 			}
 		}

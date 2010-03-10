@@ -60,7 +60,7 @@ public class JakEditor extends TextEditor {
 		super.init(site, input);
 		if (input instanceof IFileEditorInput) {
 			IFile file = ((IFileEditorInput) input).getFile();
-			IFeatureProject featureProject = CorePlugin.getProjectData(file);
+			IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
 
 			// check that the project is a JakProject and registered
 			if (featureProject == null)

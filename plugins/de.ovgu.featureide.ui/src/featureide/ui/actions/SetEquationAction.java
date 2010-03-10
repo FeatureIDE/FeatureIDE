@@ -60,7 +60,7 @@ public class SetEquationAction implements IObjectActionDelegate {
 					file = (IFile) ((IAdaptable) element).getAdapter(IFile.class);
 				}
 				if (file != null) {
-					IFeatureProject project = featureide.core.CorePlugin.getProjectData(file);
+					IFeatureProject project = featureide.core.CorePlugin.getFeatureProject(file);
 					if (project == null)
 						UIPlugin.getDefault().logWarning("Can't set equation as current equation because it does not belong to a feature project");
 					else

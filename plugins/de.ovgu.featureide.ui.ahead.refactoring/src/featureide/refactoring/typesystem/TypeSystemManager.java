@@ -88,7 +88,7 @@ public class TypeSystemManager {
 
 	Path p = new Path(projectLocationURI.getPath());
 	IResource res = ResourcesPlugin.getWorkspace().getRoot().getContainerForLocation(p);
-	IFile file = CorePlugin.getProjectData(res).getCurrentEquationFile();
+	IFile file = CorePlugin.getFeatureProject(res).getCurrentEquationFile();
 	TypeSystem t = new TypeSystem();
         TYPESYSTEMS.put(projectLocationURI, new TypeSystemStatus(t,false,file));
 

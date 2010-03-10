@@ -177,7 +177,7 @@ public class JakCompletionProcessor implements IContentAssistProcessor{
 			
 			IWorkbenchWindow editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 			FileEditorInput inputFile = (FileEditorInput)editor.getActivePage().getActiveEditor().getEditorInput(); 
-			IFeatureProject featureProject = CorePlugin.getProjectData(inputFile.getFile());
+			IFeatureProject featureProject = CorePlugin.getFeatureProject(inputFile.getFile());
 			IClass[] classes = null;
 			if (featureProject!=null){
 				IJakProjectModel project = featureProject.getJakProjectModel();

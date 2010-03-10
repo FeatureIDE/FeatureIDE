@@ -120,7 +120,7 @@ public class ConfigurationEditor extends EditorPart implements
 		UIPlugin.getDefault().logInfo("file: " + file);
 		setPartName(file.getName());
 
-		IFeatureProject featureProject = CorePlugin.getProjectData(file);
+		IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
 		FeatureModel featureModel = featureProject.getFeatureModel();
 		featureModel.addListener(this);
 		configuration = new Configuration(featureModel, true);

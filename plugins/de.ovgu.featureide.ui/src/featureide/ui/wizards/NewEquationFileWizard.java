@@ -69,7 +69,7 @@ public class NewEquationFileWizard extends Wizard implements INewWizard {
 	 */
 	public boolean performFinish() {
 		final IContainer container = page.getContainerObject();
-		final String fileName = page.getFileName();
+		final String fileName = page.getFileName()+ ".equation";
 		IRunnableWithProgress op = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor) throws InvocationTargetException {
 				try {
@@ -147,7 +147,7 @@ public class NewEquationFileWizard extends Wizard implements INewWizard {
 			new Status(IStatus.ERROR, UIPlugin.PLUGIN_ID, IStatus.OK, message, null);
 		throw new CoreException(status);
 	}
-
+	
 	/**
 	 * We will accept the selection in the workbench to see if
 	 * we can initialize from it.

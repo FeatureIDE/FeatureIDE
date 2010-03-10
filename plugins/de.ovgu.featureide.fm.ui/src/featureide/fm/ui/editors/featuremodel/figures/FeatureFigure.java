@@ -62,7 +62,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		
 		setName(feature.getName());
 		setAbstract(feature.isAbstract());
-
+		
 		FeatureUIHelper.setSize(feature,getSize());
 		
 		add(label);

@@ -56,7 +56,7 @@ public class LayeredApplicationShortcut implements ILaunchShortcut {
     }
 
     protected void searchAndLaunch(IFile file, String mode) {
-		IFeatureProject featureProject = CorePlugin.getProjectData(file);
+		IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
 		if (featureProject != null && file.getName().endsWith(".jak")) {
 			String jakFileName = file.getName();
 			String className = jakFileName.substring(0, jakFileName.length() - ".jak".length());

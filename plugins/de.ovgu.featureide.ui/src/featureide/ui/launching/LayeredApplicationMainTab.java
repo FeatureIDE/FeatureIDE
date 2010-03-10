@@ -184,7 +184,7 @@ public class LayeredApplicationMainTab extends JavaLaunchTab implements ModifyLi
 	}
 
 	private IFeatureProject getProjectData() {
-		for( IFeatureProject proj : featureide.core.CorePlugin.getProjectData() )
+		for( IFeatureProject proj : featureide.core.CorePlugin.getFeatureProjects() )
 	    	if( proj.getProjectName().equals(projectEdit.getText()))
 	    		return proj;
 		return null;
@@ -194,7 +194,7 @@ public class LayeredApplicationMainTab extends JavaLaunchTab implements ModifyLi
 		ElementListSelectionDialog dialog = new ElementListSelectionDialog(
 				null, new LabelProvider());
 		Collection<IFeatureProject> featureProjectCollection = featureide.core.CorePlugin
-				.getProjectData();
+				.getFeatureProjects();
 		String[] elements = new String[featureProjectCollection.size()];
 		int pos = 0;
 		for (IFeatureProject featureProject : featureProjectCollection)

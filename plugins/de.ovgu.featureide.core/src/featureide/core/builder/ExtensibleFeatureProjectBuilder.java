@@ -56,7 +56,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 			CorePlugin.getDefault().logWarning("no project got");
 			return false;
 		}
-		featureProject = CorePlugin.getProjectData(getProject());
+		featureProject = CorePlugin.getFeatureProject(getProject());
 		if (featureProject == null) {
 			CorePlugin.getDefault().logWarning("Unable to get feature project");
 			return false;

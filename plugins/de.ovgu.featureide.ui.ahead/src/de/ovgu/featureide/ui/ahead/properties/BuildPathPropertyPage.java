@@ -69,7 +69,7 @@ public class BuildPathPropertyPage extends PropertyPage {
 		composite.setLayoutData(data);
 		
 		boolean rightComposer = false;
-		IFeatureProject project = CorePlugin.getProjectData((IResource)getElement());
+		IFeatureProject project = CorePlugin.getFeatureProject((IResource)getElement());
 		if (project != null && project.getComposerID().equals(AheadComposer.COMPOSER_ID)) {
 			rightComposer = true;
 		}
@@ -162,7 +162,7 @@ public class BuildPathPropertyPage extends PropertyPage {
 		// Populate the owner text field with the default value
 		list.removeAll();
 		
-		IFeatureProject project = CorePlugin.getProjectData((IResource)getElement());
+		IFeatureProject project = CorePlugin.getFeatureProject((IResource)getElement());
 		if (project != null) {
 			String[] classPath = project.getAdditionalJavaClassPath();
 			for (String str : classPath)
@@ -171,7 +171,7 @@ public class BuildPathPropertyPage extends PropertyPage {
 	}
 	
 	public boolean performOk() {
-		IFeatureProject project = CorePlugin.getProjectData((IResource)getElement());
+		IFeatureProject project = CorePlugin.getFeatureProject((IResource)getElement());
 		if (project != null)
 			project.setAdditionalJavaClassPath(list.getItems());
 		

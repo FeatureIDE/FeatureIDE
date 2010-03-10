@@ -157,7 +157,7 @@ public class LayeredApplicationLaunchConfigurationDelegate extends
 			return null;
 		}
 		
-		IFeatureProject featureProject = CorePlugin.getProjectData(project);
+		IFeatureProject featureProject = CorePlugin.getFeatureProject(project);
 		if (featureProject == null)
 			prompErrorMessage("The project " + projectName + " is not a FeatureProject!");
 		return featureProject;
