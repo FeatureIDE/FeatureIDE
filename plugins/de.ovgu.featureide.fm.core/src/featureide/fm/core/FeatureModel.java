@@ -86,7 +86,6 @@ public class FeatureModel implements PropertyConstants {
 
 	private boolean abstractFeatures;
 
-		
 	public FeatureModel() {
 		reset();
 	}
@@ -149,11 +148,11 @@ public class FeatureModel implements PropertyConstants {
 		constraints.remove(constraints.size() - 1);
 	}
 
-	public void removePropositionalNode(Constraint constraint){
+	public void removePropositionalNode(Constraint constraint) {
 		propNodes.remove(constraint.getNode());
 		constraints.remove(constraint);
 	}
-	
+
 	public void removePropositionalNode(int index) {
 		propNodes.remove(index);
 		constraints.remove(constraints.size() - 1);
@@ -244,8 +243,9 @@ public class FeatureModel implements PropertyConstants {
 	private void fireFeatureRenamed(String oldName, String newName) {
 		PropertyChangeEvent event = new PropertyChangeEvent(this,
 				FEATURE_NAME_CHANGED, oldName, newName);
-		for (PropertyChangeListener listener : listenerList){
-			listener.propertyChange(event);}
+		for (PropertyChangeListener listener : listenerList) {
+			listener.propertyChange(event);
+		}
 	}
 
 	private void renameVariables(Node node, String oldName, String newName) {
@@ -289,7 +289,6 @@ public class FeatureModel implements PropertyConstants {
 			listener.propertyChange(event);
 	}
 
-	
 	public Collection<Feature> getFeatures() {
 		return Collections.unmodifiableCollection(featureTable.values());
 	}
@@ -448,8 +447,8 @@ public class FeatureModel implements PropertyConstants {
 	 * @return
 	 * @throws TimeoutException
 	 */
-	public boolean checkCondition(Node condition){
-		
+	public boolean checkCondition(Node condition) {
+
 		Node featureModel = NodeCreator.createNodes(this);
 		// FM => (condition)
 		Implies finalFormula = new Implies(featureModel, condition.clone());
@@ -623,5 +622,29 @@ public class FeatureModel implements PropertyConstants {
 		return number;
 	}
 
+	/**
+	 * Returns the list of features that occur in all variants, where one of the
+	 * given features is selected. If the given list of features is empty, this
+	 * method will calculate the features that are present in all variants
+	 * specified by the feature model.
+	 * 
+	 * @param timeout
+	 *            in milliseconds
+	 * @param selectedFeatures
+	 *            a list of feature names for which
+	 * @return a list of features that is common to all variants
+	 */
+	public Collection<String> commonFeatures(long timeout,
+			Object... selectedFeatures) {
+		Node formula = NodeCreator.createNodes(this);
+		if (selectedFeatures.length > 0)
+			formula = new And(formula, new Or(selectedFeatures));
+		SatSolver solver = new SatSolver(formula, timeout);
+		List<String> common = new LinkedList<String>();
+		for (Literal literal : solver.knownValues())
+			if (literal.positive)
+				common.add(literal.var.toString());
+		return common;
+	}
 	
 }
