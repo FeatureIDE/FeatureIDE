@@ -94,10 +94,6 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 		if (feature.isAlternative()) {
 			feature.changeToAnd();
 		} else if (feature.isAnd()) {
-			// if (!feature.isRoot())
-			// feature.changeToOr();
-			// else
-			// feature.changeToAlternative();
 			feature.changeToOr();
 		} else {
 			feature.changeToAlternative();
