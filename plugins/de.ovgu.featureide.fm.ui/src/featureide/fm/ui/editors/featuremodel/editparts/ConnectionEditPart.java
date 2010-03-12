@@ -37,7 +37,6 @@ import featureide.fm.core.Feature;
 import featureide.fm.core.FeatureConnection;
 import featureide.fm.core.FeatureModel;
 import featureide.fm.core.PropertyConstants;
-import featureide.fm.ui.FMUIPlugin;
 import featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import featureide.fm.ui.editors.featuremodel.figures.CircleDecoration;
 import featureide.fm.ui.editors.featuremodel.figures.RelationDecoration;
@@ -155,14 +154,15 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 		connection.setTargetDecoration(targetDecoration);
 	}
 
+	private Label toolTipLabel = new Label("");
 	public void refreshToolTip() {
 		Feature target = ((FeatureConnection) getModel()).getTarget();
 		PolylineConnection connection = (PolylineConnection) getConnectionFigure();
 		String toolTip = (target.isAnd() ? "And" : (target.isMultiple() ? "Or"
 				: "Alternative"))
 				+ "\nDoubleclick to change connection type";
-		connection.setToolTip(new Label(toolTip));
-		//FMUIPlugin.getDefault().logInfo("");
+		toolTipLabel.setText(toolTip);
+		connection.setToolTip(toolTipLabel);
 	}
 
 	@Override

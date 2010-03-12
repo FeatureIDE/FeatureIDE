@@ -55,7 +55,7 @@ import featureide.fm.core.Feature;
 public class NewJakFilePage extends WizardPage {
 
 	private ISelection selection;
-	
+
 	private Combo featureComboProject;
 	private Combo featureComboContainer;
 
@@ -70,10 +70,12 @@ public class NewJakFilePage extends WizardPage {
 	private boolean refines = false;
 
 	private IFeatureProject featureProject = null;
-	
-	private Collection<IFeatureProject> featureProjects = CorePlugin.getFeatureProjects();
-	
+
+	private Collection<IFeatureProject> featureProjects = CorePlugin
+			.getFeatureProjects();
+
 	private String text;
+
 	/**
 	 * Constructor for SampleNewWizardPage.
 	 * 
@@ -96,31 +98,31 @@ public class NewJakFilePage extends WizardPage {
 		layout.numColumns = 3;
 		layout.verticalSpacing = 9;
 		composite.setLayout(layout);
-		
+
 		Label label = new Label(composite, SWT.NULL);
-		label.setText("&Project:");		
+		label.setText("&Project:");
 		featureComboProject = new Combo(composite, SWT.BORDER | SWT.SINGLE);
 		featureComboProject.setLayoutData(gd);
-		new Label(composite,SWT.NULL);
-			
+		new Label(composite, SWT.NULL);
+
 		label = new Label(composite, SWT.NULL);
-		label.setText("&Container:");
+		label.setText("&Feature:");
 		featureComboContainer = new Combo(composite, SWT.BORDER | SWT.SINGLE);
 		featureComboContainer.setLayoutData(gd);
-		new Label(composite,SWT.NULL);
+		new Label(composite, SWT.NULL);
 		label = new Label(composite, SWT.NULL);
-		
+
 		label.setText("&Class name:");
 		jakName = new Text(composite, SWT.BORDER | SWT.SINGLE);
 		jakName.setLayoutData(gd);
-		new Label(composite,SWT.NULL);
+		new Label(composite, SWT.NULL);
 		label = new Label(composite, SWT.NULL);
-		
+
 		label.setText("&Refines:");
-		refinesbox = new Button (composite, SWT.CHECK);
-		gd = new GridData (GridData.BEGINNING);
+		refinesbox = new Button(composite, SWT.CHECK);
+		gd = new GridData(GridData.BEGINNING);
 		refinesbox.setLayoutData(gd);
-		
+
 		initialize();
 		addListeners();
 		setControl(composite);
@@ -131,26 +133,30 @@ public class NewJakFilePage extends WizardPage {
 	private void addListeners() {
 		featureComboProject.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
-				if(!featureComboProject.getText().equalsIgnoreCase(text)){
+				if (!featureComboProject.getText().equalsIgnoreCase(text)) {
 					text = featureComboProject.getText();
 					featureProject = null;
-					for (IFeatureProject feature : featureProjects){
-						if(text.equalsIgnoreCase(feature.getProjectName())){
+					for (IFeatureProject feature : featureProjects) {
+						if (text.equalsIgnoreCase(feature.getProjectName())) {
 							featureProject = feature;
-						}	
+						}
 					}
-					if (featureProject != null){
-						IResource res = ResourcesPlugin.getWorkspace().getRoot().findMember(featureProject.getProjectName()); 
+					if (featureProject != null) {
+						IResource res = ResourcesPlugin.getWorkspace()
+								.getRoot().findMember(
+										featureProject.getProjectName());
 						checkcontainer(featureProject, res);
 						containerbool = true;
 					}
 					dialogChanged();
-				}	
+				}
 			}
 		});
 		featureComboContainer.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
-				NewJakFilePage.this.container = sourcefolder != null ? sourcefolder.getFolder(featureComboContainer.getText()) : null;
+				NewJakFilePage.this.container = sourcefolder != null ? sourcefolder
+						.getFolder(featureComboContainer.getText())
+						: null;
 				dialogChanged();
 			}
 		});
@@ -163,6 +169,7 @@ public class NewJakFilePage extends WizardPage {
 			public void widgetSelected(SelectionEvent e) {
 				refines = refinesbox.getSelection();
 			}
+
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 		});
@@ -172,9 +179,10 @@ public class NewJakFilePage extends WizardPage {
 	 * Tests if the current workbench selection is a suitable container to use.
 	 */
 	private void initialize() {
-		for (IFeatureProject feature : featureProjects)							//
+		for (IFeatureProject feature : featureProjects)
+			//
 			featureComboProject.add(feature.getProjectName());
-		
+
 		if (selection != null && selection.isEmpty() == false
 				&& selection instanceof IStructuredSelection) {
 			IStructuredSelection ssel = (IStructuredSelection) selection;
@@ -183,8 +191,9 @@ public class NewJakFilePage extends WizardPage {
 			Object obj = ssel.getFirstElement();
 			if (obj instanceof IResource) {
 				IResource resource = (IResource) obj;
-				IFeatureProject featureProject = CorePlugin.getFeatureProject(resource);
-				featureComboProject.setText(featureProject.getProjectName());					//
+				IFeatureProject featureProject = CorePlugin
+						.getFeatureProject(resource);
+				featureComboProject.setText(featureProject.getProjectName()); //
 				if (featureProject != null) {
 					checkcontainer(featureProject, resource);
 				}
@@ -193,7 +202,8 @@ public class NewJakFilePage extends WizardPage {
 		text = featureComboProject.getText();
 	}
 
-	private void checkcontainer(IFeatureProject featureProject, IResource resource){
+	private void checkcontainer(IFeatureProject featureProject,
+			IResource resource) {
 		featureComboContainer.removeAll();
 		for (Feature feature : featureProject.getFeatureModel().getLayers())
 			featureComboContainer.add(feature.getName());
@@ -203,8 +213,7 @@ public class NewJakFilePage extends WizardPage {
 				if (featureComboContainer.getItem(i).equals(resource.getName()))
 					featureComboContainer.select(i);
 			container = sourcefolder.getFolder(featureComboContainer.getText());
-		}
-		else if (resource.toString().endsWith(".jak")){
+		} else if (resource.toString().endsWith(".jak")) {
 			String name = resource.getName();
 			int index = name.indexOf(".");
 			name = index > 0 ? name.substring(0, index) : name;
@@ -213,26 +222,28 @@ public class NewJakFilePage extends WizardPage {
 			refines = true;
 		}
 	}
+
 	private boolean projectbool = false;
 	private boolean containerbool = false;
 	private boolean jakbool = false;
+
 	private void dialogChanged() {
-		if (featureComboProject.getText().length() == 0 && !projectbool){
+		if (featureComboProject.getText().length() == 0 && !projectbool) {
 			setErrorMessage(null);
 			setPageComplete(false);
 			projectbool = true;
 			return;
 		}
-		
-		if (featureComboProject.getText().length() == 0){
+
+		if (featureComboProject.getText().length() == 0) {
 			updateStatus("No Project selected");
 			return;
 		}
-		if (!isFeatureProject(featureComboProject.getText())){
+		if (!isFeatureProject(featureComboProject.getText())) {
 			updateStatus("Selected project is not a Feature Project");
 			return;
 		}
-		
+
 		if (container == null) {
 			setErrorMessage(null);
 			setPageComplete(false);
@@ -240,20 +251,22 @@ public class NewJakFilePage extends WizardPage {
 		}
 		if (featureComboContainer.getText().length() != 0)
 			containerbool = false;
-		if ((featureComboContainer.getText() == null || featureComboContainer.getText().equalsIgnoreCase(""))&&containerbool){
+		if ((featureComboContainer.getText() == null || featureComboContainer
+				.getText().equalsIgnoreCase(""))
+				&& containerbool) {
 			setErrorMessage(null);
 			setPageComplete(false);
 			return;
-		}	
+		}
 		if (!container.isAccessible()) {
 			updateStatus("Project must be writable");
 			return;
 		}
-		if (featureComboContainer.getText().length() == 0){
+		if (featureComboContainer.getText().length() == 0) {
 			updateStatus("No container selected");
 			return;
 		}
-		
+
 		if (container.equals(sourcefolder)) {
 			setPageComplete(false);
 			return;
@@ -262,12 +275,10 @@ public class NewJakFilePage extends WizardPage {
 		String jakName = getJakName();
 		if (jakName.length() != 0) {
 			jakbool = true;
-		}
-		else if(jakbool) {
+		} else if (jakbool) {
 			updateStatus("The jak name must be specified");
-			return;	
-		}
-		else{
+			return;
+		} else {
 			setErrorMessage(null);
 			setPageComplete(false);
 			return;
@@ -294,10 +305,10 @@ public class NewJakFilePage extends WizardPage {
 		setPageComplete(message == null);
 	}
 
-	public boolean isRefinement () {
-		return refines ;
+	public boolean isRefinement() {
+		return refines;
 	}
-	
+
 	public IContainer getContainerObject() {
 		return container;
 	}
@@ -305,10 +316,11 @@ public class NewJakFilePage extends WizardPage {
 	public String getJakName() {
 		return jakName.getText();
 	}
-	public boolean isFeatureProject(String text){
+
+	public boolean isFeatureProject(String text) {
 		boolean isFP = false;
-		for (IFeatureProject feature : featureProjects){
-			if(text.equalsIgnoreCase(feature.getProjectName())){
+		for (IFeatureProject feature : featureProjects) {
+			if (text.equalsIgnoreCase(feature.getProjectName())) {
 				isFP = true;
 			}
 		}

@@ -316,18 +316,18 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 			menu.add(andAction);
 			menu.add(orAction);
 			menu.add(alternativeAction);
-			
-		} else {
+		} else if (createLayerAction.isEnabled() || createCompoundAction.isEnabled()){
+			menu.add(createCompoundAction);	
 			menu.add(createLayerAction);
-			menu.add(createCompoundAction);
+			if (mandantoryAction.isEnabled())
+				menu.add(mandantoryAction);
 			menu.add(deleteAction);
-			menu.add(mandantoryAction);
-			
+			menu.add(renameAction);
+		} else {		
+			menu.add(editConstraintAction);
+			menu.add(createConstraintAction);
+			menu.add(deleteAction);
 		}
-		menu.add(editConstraintAction);
-		menu.add(createConstraintAction);
-		menu.add(renameAction);
-		
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
 
