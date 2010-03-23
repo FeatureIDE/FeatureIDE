@@ -89,4 +89,14 @@ public class JakEditor extends TextEditor {
 		return super.getAdapter(required);
 	}
 	
+	
+	/* update Outline after build process*/
+	public void setFocus(){
+		if (outlinePage!=null){
+			outlinePage.setInput(getEditorInput());
+			outlinePage.update();
+		}
+		super.setFocus();
+	}
+	
 }

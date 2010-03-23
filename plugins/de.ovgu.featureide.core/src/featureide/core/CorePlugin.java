@@ -36,6 +36,7 @@ import de.ovgu.featureide.core.plugin.AbstractCorePlugin;
 import featureide.core.builder.FeatureProjectNature;
 import featureide.core.internal.FeatureProject;
 import featureide.core.internal.ProjectChangeListener;
+import featureide.core.listeners.ICurrentBuildListener;
 import featureide.core.listeners.ICurrentEquationListener;
 import featureide.core.listeners.IEquationChangedListener;
 import featureide.core.listeners.IFeatureFolderListener;
@@ -46,6 +47,7 @@ import featureide.fm.core.io.guidsl.FeatureModelWriter;
 /**
  * The activator class controls the plug-in life cycle.
  * 
+ * @author Constanze Adler
  * @author Marcus Leich
  * @author Tom Brosch
  * @author Thomas Thuem
@@ -71,6 +73,8 @@ public class CorePlugin extends AbstractCorePlugin {
 	private LinkedList<IEquationChangedListener> equationChangedListeners = new LinkedList<IEquationChangedListener>();
 	
 	private LinkedList<IFeatureFolderListener> featureFolderListeners = new LinkedList<IFeatureFolderListener>();
+	
+	private LinkedList<ICurrentBuildListener> currentBuildListeners = new LinkedList<ICurrentBuildListener>();
 	
 	/**
 	 * add ResourceChangeListener to workspace to track project move/rename events
@@ -163,6 +167,20 @@ public class CorePlugin extends AbstractCorePlugin {
 		for (IProjectListener listener : projectListeners)
 			listener.projectRemoved(featureProject);
 	}
+	
+	public void addCurrentBuildListener(ICurrentBuildListener listener) {
+		if (!currentBuildListeners.contains(listener))
+			currentBuildListeners.add(listener);
+	}
+	
+	public void removeCurrentBuildListener(ICurrentBuildListener listener) {
+		currentBuildListeners.remove(listener);
+	}
+	
+	public void fireBuildUpdated(IFeatureProject featureProject) {
+		for (ICurrentBuildListener listener : currentBuildListeners)
+			listener.updateGuiAfterBuild(featureProject);
+	}	
 	
 	public void addProjectListener (IProjectListener listener) {
 		if (!projectListeners.contains(listener))

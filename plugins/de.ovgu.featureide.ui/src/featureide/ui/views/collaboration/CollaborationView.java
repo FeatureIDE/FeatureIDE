@@ -29,6 +29,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
@@ -39,7 +40,7 @@ import org.eclipse.ui.part.ViewPart;
 
 import featureide.core.CorePlugin;
 import featureide.core.IFeatureProject;
-import featureide.core.listeners.IEquationChangedListener;
+import featureide.core.listeners.ICurrentBuildListener;
 import featureide.ui.UIPlugin;
 import featureide.ui.views.collaboration.action.AddClassAction;
 import featureide.ui.views.collaboration.action.AddFeatureAction;
@@ -57,7 +58,7 @@ import featureide.ui.views.collaboration.model.CollaborationModelBuilder;
  * @author Constanze Adler
  */
 
-public class CollaborationView extends ViewPart implements GUIDefaults, IEquationChangedListener{
+public class CollaborationView extends ViewPart implements GUIDefaults, ICurrentBuildListener{
 	public static final String ID = UIPlugin.PLUGIN_ID + ".views.collaboration.Collaboration";
 	private GraphicalViewerImpl graphicalViewer;
 	private ScalableFreeformRootEditPart rootEditPart;
@@ -70,11 +71,12 @@ public class CollaborationView extends ViewPart implements GUIDefaults, IEquatio
 	private DeleteFeatureAction delFeatureAction;
 	private DeleteRoleAction delRoleAction;
 	
+	
 	/*
 	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
 	 */
-	@Override
 	public void createPartControl(Composite parent) {
+	
 		IWorkbenchWindow editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		IFeatureProject featureProject = null;
 		IEditorPart part=null;
@@ -91,13 +93,14 @@ public class CollaborationView extends ViewPart implements GUIDefaults, IEquatio
 				
 		if (featureProject == null) 
 			return;
-		
+		builder = new CollaborationModelBuilder();
+		model = builder.buildCollaborationModel(featureProject);
+	
+		CorePlugin.getDefault().addCurrentBuildListener(this);
 		graphicalViewer = new ScrollingGraphicalViewer();
 		graphicalViewer.createControl(parent);
 		graphicalViewer.getControl().setBackground(DIAGRAM_BACKGROUND);
-		//TODO Thomas: replace by new listener
-		CorePlugin.getDefault().addEquationChangedListener(this);
-		
+
 		rootEditPart = new ScalableFreeformRootEditPart();
 		((ConnectionLayer) rootEditPart
 				.getLayer(LayerConstants.CONNECTION_LAYER))
@@ -106,33 +109,27 @@ public class CollaborationView extends ViewPart implements GUIDefaults, IEquatio
 		graphicalViewer.setEditDomain(new EditDomain());
 		graphicalViewer.setEditPartFactory(new GraphicalEditPartFactory());
 		
-		builder = new CollaborationModelBuilder();
-		model = builder.buildCollaborationModel(featureProject);
-		graphicalViewer.setContents(model);
 		createActions(part);
 		createContextMenu();
+		if (model == null)
+			return;
+		graphicalViewer.setContents(model);
+		
 	}
+	
+
 
 	/*
 	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
 	 */
-	@Override
+
 	public void setFocus() {
 		if (graphicalViewer != null)
 			graphicalViewer.getControl().setFocus();
+	
 	}
 
-	/* (non-Javadoc)
-	 * @see featureide.core.listeners.IEquationChangedListener#equationChanged(featureide.core.IFeatureProject)
-	 */
-
-	public void equationChanged(IFeatureProject featureProject) {
-		model = builder.buildCollaborationModel(featureProject);
-		if (model == null) return;
-		graphicalViewer.setContents(model);
-		graphicalViewer.getContents().refresh();
-		System.out.println("refreshing");
-	}
+	
 	private void createContextMenu(){
 		MenuManager menuMgr = new MenuManager("#PopupMenu");
 		menuMgr.setRemoveAllWhenShown(true);
@@ -172,6 +169,24 @@ public class CollaborationView extends ViewPart implements GUIDefaults, IEquatio
 		delFeatureAction = new DeleteFeatureAction("Delete Feture", graphicalViewer);
 		delRoleAction 	 = new DeleteRoleAction("Delete Role", graphicalViewer,part,model);
 	}
+
+	/* (non-Javadoc)
+	 * @see featureide.core.listeners.ICurrentBuildListener#updateGuiAfterBuild(featureide.core.IFeatureProject)
+	 */
+	public void updateGuiAfterBuild(IFeatureProject project) {
+		model = builder.buildCollaborationModel(project);
+		if (model == null) return;
+		Display.getDefault().syncExec(new Runnable(){	
+			public void run(){
+				graphicalViewer.setContents(model);		
+				graphicalViewer.getContents().refresh();
+			}
+		});
+
+		//System.out.println("refreshing");
+	}
+	
+
 	
 
 	

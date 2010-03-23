@@ -47,9 +47,8 @@ public class CollaborationModelBuilder {
 		IFolder path = null;
 		
 		IFeature[] features = null;
-		if (jakProject != null)
-			features = jakProject.getFeatures();
-
+		if (jakProject == null) return null;
+		features = jakProject.getFeatures();
 		if (features == null) return null;
 		path = featureProject.getSourceFolder();
 		
@@ -88,5 +87,6 @@ public class CollaborationModelBuilder {
 		
 		return model;
 	}
+
 
 }

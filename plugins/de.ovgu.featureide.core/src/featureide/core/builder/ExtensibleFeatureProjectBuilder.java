@@ -146,6 +146,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 					IResource.DEPTH_INFINITE, monitor);
 			featureProject.getBinFolder().refreshLocal(
 					IResource.DEPTH_INFINITE, monitor);
+			CorePlugin.getDefault().fireBuildUpdated(featureProject);
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
