@@ -38,36 +38,6 @@
       </super>
    </extension>
 
-
-
-    
-    
-   <extension
-         id="featureCPPNature"
-         name="Features C++ Project Nature"
-         point="org.eclipse.core.resources.natures">
-      <builder
-            id="de.ovgu.featureide.core.featureCPPBuilder">
-      </builder>
-      <runtime>
-         <run
-               class="featureide.core.builder.FeatureCPPNature">
-         </run>
-      </runtime>
-   	</extension>
-    <extension
-         id="featureCPPBuilder"
-         name="Feature C++ Builder"
-         point="org.eclipse.core.resources.builders">
-      <builder
-            hasNature="true">
-         <run
-               class="featureide.core.builder.FeatureCPPBuilder">
-         </run>
-      </builder>
-   </extension>
-   
-   
     <extension
           id="xmlProblem"
           name="XML Problem"
