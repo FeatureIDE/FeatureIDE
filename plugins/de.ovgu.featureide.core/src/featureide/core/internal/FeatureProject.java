@@ -78,7 +78,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			if (evt.getPropertyName().equals(
 					PropertyConstants.FEATURE_NAME_CHANGED)) {
 				String oldName = (String) evt.getOldValue();
-				String newName = (String) evt.getOldValue();
+				String newName = (String) evt.getNewValue();
 
 				FeatureProject.this.renameFeature(oldName, newName);
 				CorePlugin.getDefault().fireFeatureFolderChanged(
