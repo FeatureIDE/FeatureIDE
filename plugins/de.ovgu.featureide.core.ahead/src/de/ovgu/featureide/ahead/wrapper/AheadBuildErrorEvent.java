@@ -185,27 +185,6 @@ public class AheadBuildErrorEvent {
 		
 		AheadCorePlugin.getDefault().logWarning("Was not able to locate an error in the source jak file '" + filename + "'");
 		return null;
-		
-//		//check if the file name is relative
-//		newFile = project.getFile("../" + filename);
-//		AheadCorePlugin.getDefault().logInfo(newFile.getFullPath().toOSString());
-//		if (newFile.exists())
-//			return newFile;
-//
-//		//otherwise it is absolute
-//		int pathLength = project.getLocation().toOSString().length();
-//		AheadCorePlugin.getDefault().logInfo(project.getLocation().toOSString());
-//		while (filename.startsWith("../")) {
-//			filename = filename.substring(3);
-//		}
-//		AheadCorePlugin.getDefault().logInfo(filename);
-//		//remove project path from filename (except 3 characters like "c:\")
-//		//TODO #27: jak file error propagation for unix
-//		filename = filename.substring(pathLength - 3);
-//		AheadCorePlugin.getDefault().logInfo(filename);
-//		newFile = project.getFile(filename);
-//		if (newFile.exists())
-//			return newFile;
 	}
 
 	private static Pattern importPattern = Pattern.compile("(import)\\s[^;\\(\\)\\{\\}\\[\\]]+;");

@@ -78,9 +78,6 @@ public abstract class SingleSelectionAction extends Action implements
 			return (FeatureEditPart) part;
 	}
 	
-	// TODO: Check if ((FeatureEditPart)connectionEditPart.getTarget()).getFeatureModel()
-	//		 equals   (FeatureEditPart) connectionEditPart.getConnectionModel().getTarget()
-
 	public Feature getSelectedFeature() {
 		IStructuredSelection selection = (IStructuredSelection) viewer
 				.getSelection();

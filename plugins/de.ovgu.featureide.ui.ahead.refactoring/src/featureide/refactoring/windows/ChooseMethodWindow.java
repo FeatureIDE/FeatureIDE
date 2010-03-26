@@ -34,88 +34,90 @@ import refactor.MethodInfo;
 import featureide.refactoring.RefactoringPlugin;
 
 /**
- * TODO description
+ * A dialog to select a method for a Jak refactoring.
  * 
  * @author Stephan Kauschka
  */
-public class ChooseMethodWindow implements SelectionListener,DisposeListener{
+public class ChooseMethodWindow implements SelectionListener, DisposeListener {
 
-    private Window window;
-    private Shell shell,parentshell;
-    private Table table;
-    private Button button;
-    private MethodInfo[] infos;
+	private Window window;
+	private Shell shell, parentshell;
+	private Table table;
+	private Button button;
+	private MethodInfo[] infos;
 
+	public ChooseMethodWindow(Shell parentShell, Window parentWindow,
+			MethodInfo[] inf) {
+		this.window = parentWindow;
+		this.parentshell = parentShell;
+		this.infos = inf;
 
-    public ChooseMethodWindow (Shell parentShell, Window parentWindow, MethodInfo[] inf){
+		this.shell = new Shell(parentShell, SWT.MIN);
+		this.shell.setText("Choose a method");
+		Image image = RefactoringPlugin.getImage("sample.gif");
+		this.shell.setImage(image);
+		this.shell.setSize(250, 200);
+		this.shell.addDisposeListener(this);
 
-	this.window = parentWindow;
-	this.parentshell = parentShell;
-	this.infos = inf;
-
-	this.shell = new Shell(parentShell,SWT.MIN);
-	this.shell.setText("Choose a method");
-	Image image = RefactoringPlugin.getImage("sample.gif");
-	this.shell.setImage(image);
-	this.shell.setSize(250, 200);
-	this.shell.addDisposeListener(this);
-
-	createGUI();
-	parentShell.setEnabled(false);
-	this.shell.open();
-    }
-
-    public void createGUI(){
-	GridLayout layout = new GridLayout();
-	layout.verticalSpacing = 5;
-	layout.marginHeight = 10;
-	layout.marginWidth = 10;
-	layout.numColumns = 1;
-	layout.makeColumnsEqualWidth = false;
-	this.shell.setLayout(layout);
-
-	this.table = new Table(this.shell,SWT.SINGLE | SWT.FULL_SELECTION | SWT.BORDER);
-	this.table.setHeaderVisible(false);
-	this.table.setLayoutData(new GridData(GridData.FILL_BOTH));
-
-	for(int i=0; i<this.infos.length; i++){
-	    TableItem item = new TableItem(this.table, SWT.NONE);
-	    String text = this.infos[i].signature();
-	    item.setText(text);
+		createGUI();
+		parentShell.setEnabled(false);
+		this.shell.open();
 	}
 
-	this.button = new Button(this.shell,SWT.CENTER);
-	GridData a = new GridData(75,25);
-	a.horizontalAlignment = SWT.CENTER;
-	this.button.setLayoutData(a);
-	this.button.setText("Ok");
-	this.button.addSelectionListener(this);
-    }
+	public void createGUI() {
+		GridLayout layout = new GridLayout();
+		layout.verticalSpacing = 5;
+		layout.marginHeight = 10;
+		layout.marginWidth = 10;
+		layout.numColumns = 1;
+		layout.makeColumnsEqualWidth = false;
+		this.shell.setLayout(layout);
 
-    public void widgetDefaultSelected(SelectionEvent e) {}
+		this.table = new Table(this.shell, SWT.SINGLE | SWT.FULL_SELECTION
+				| SWT.BORDER);
+		this.table.setHeaderVisible(false);
+		this.table.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-    public void widgetSelected(SelectionEvent e) {
-	try{
-	    if(e.getSource() == this.button){
-		String selection = (this.table.getSelection()[0]).getText();
-		int methodNumber = this.table.getSelectionIndex();
+		for (int i = 0; i < this.infos.length; i++) {
+			TableItem item = new TableItem(this.table, SWT.NONE);
+			String text = this.infos[i].signature();
+			item.setText(text);
+		}
 
-		this.window.setText(Window.METHOD_TEXT, selection);
-		((ExtractMethodWindow)this.window).setMethod(this.infos[methodNumber]);
+		this.button = new Button(this.shell, SWT.CENTER);
+		GridData a = new GridData(75, 25);
+		a.horizontalAlignment = SWT.CENTER;
+		this.button.setLayoutData(a);
+		this.button.setText("Ok");
+		this.button.addSelectionListener(this);
+	}
 
-		this.shell.setVisible(false);
-		this.shell.dispose();
+	public void widgetDefaultSelected(SelectionEvent e) {
+	}
+
+	public void widgetSelected(SelectionEvent e) {
+		try {
+			if (e.getSource() == this.button) {
+				String selection = (this.table.getSelection()[0]).getText();
+				int methodNumber = this.table.getSelectionIndex();
+
+				this.window.setText(Window.METHOD_TEXT, selection);
+				((ExtractMethodWindow) this.window)
+						.setMethod(this.infos[methodNumber]);
+
+				this.shell.setVisible(false);
+				this.shell.dispose();
+				this.parentshell.setEnabled(true);
+			}
+
+		} catch (Exception ex) {
+			this.shell.setVisible(false);
+			this.shell.dispose();
+			this.parentshell.setEnabled(true);
+		}
+	}
+
+	public void widgetDisposed(DisposeEvent e) {
 		this.parentshell.setEnabled(true);
-	    }
-
-	}catch (Exception ex){
-	    this.shell.setVisible(false);
-	    this.shell.dispose();
-	    this.parentshell.setEnabled(true);
 	}
-    }
-
-    public void widgetDisposed(DisposeEvent e) {
-	this.parentshell.setEnabled(true);
-    }
 }

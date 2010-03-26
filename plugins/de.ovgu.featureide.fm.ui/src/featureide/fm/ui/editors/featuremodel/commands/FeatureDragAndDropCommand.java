@@ -106,7 +106,6 @@ public class FeatureDragAndDropCommand extends Command {
 		Point nextLocation = FeatureUIHelper.getTargetLocation(next);
 		Dimension d = location.getDifference(nextLocation);
 		
-//		if (Math.abs(d.width) < d.height) {
 		if (d.height > 0) {
 			//insert below
 			newParent = next;

@@ -21,7 +21,7 @@ package featureide.refactoring.windows;
 import java.net.URI;
 
 /**
- * TODO description
+ * A general refactoring dialog.
  * 
  * @author Stephan Kauschka
  */

@@ -33,50 +33,58 @@ import refactor.TypeSystem;
 import featureide.refactoring.typesystem.TypeSystemManager;
 
 /**
- * TODO description
+ * Forces the creation of a type system to enable refactorings in Jak.
  * 
  * @author Stephan Kauschka
  */
 public class CreateTypesystemAction implements IObjectActionDelegate {
 
-    private ISelection selection;
+	private ISelection selection;
 
-    public CreateTypesystemAction() {
-	super();
-    }
-
-    public void setActivePart(IAction action, IWorkbenchPart targetPart) {}
-
-    public void run(IAction action) {
-	if (this.selection instanceof IStructuredSelection){
-	    for (Iterator<?> iter = ((IStructuredSelection) this.selection).iterator(); iter.hasNext();) {
-		Object element = iter.next();
-		IFile file = null;
-
-		if (element instanceof IFile)
-		    file = (IFile) element;
-		else if (element instanceof IAdaptable)
-		    file = (IFile) ((IAdaptable) element).getAdapter(IFile.class);
-
-		if (file != null) {
-		    URI projectLocationURI = file.getProject().getLocationURI();
-		    boolean succesful = false;
-		    if(TypeSystemManager.exists(projectLocationURI)){
-			TypeSystemManager.setEquationFile(projectLocationURI, file);
-			succesful = TypeSystemManager.refreshTypesystem(projectLocationURI);
-		    }
-		    else{
-			TypeSystem ts = TypeSystemManager.getTypesystem(projectLocationURI,file);
-			succesful = ts.getFirstLayer()!=null;
-		    }
-		    if(succesful) MessageDialog.openInformation(new Shell(), "TypesystemInfo", "Typesystem successfully created.");
-		}
-	    }
+	public CreateTypesystemAction() {
+		super();
 	}
-    }
 
-    public void selectionChanged(IAction action, ISelection selection) {
-	this.selection = selection;
-    }
+	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
+	}
+
+	public void run(IAction action) {
+		if (this.selection instanceof IStructuredSelection) {
+			for (Iterator<?> iter = ((IStructuredSelection) this.selection)
+					.iterator(); iter.hasNext();) {
+				Object element = iter.next();
+				IFile file = null;
+
+				if (element instanceof IFile)
+					file = (IFile) element;
+				else if (element instanceof IAdaptable)
+					file = (IFile) ((IAdaptable) element)
+							.getAdapter(IFile.class);
+
+				if (file != null) {
+					URI projectLocationURI = file.getProject().getLocationURI();
+					boolean succesful = false;
+					if (TypeSystemManager.exists(projectLocationURI)) {
+						TypeSystemManager.setEquationFile(projectLocationURI,
+								file);
+						succesful = TypeSystemManager
+								.refreshTypesystem(projectLocationURI);
+					} else {
+						TypeSystem ts = TypeSystemManager.getTypesystem(
+								projectLocationURI, file);
+						succesful = ts.getFirstLayer() != null;
+					}
+					if (succesful)
+						MessageDialog.openInformation(new Shell(),
+								"TypesystemInfo",
+								"Typesystem successfully created.");
+				}
+			}
+		}
+	}
+
+	public void selectionChanged(IAction action, ISelection selection) {
+		this.selection = selection;
+	}
 
 }

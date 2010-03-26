@@ -27,7 +27,7 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.Platform;
 
 /**
- * TODO description
+ * Handles FeatureIDE extensions.
  * 
  * @author Tom Brosch
  */
@@ -59,13 +59,7 @@ public abstract class ExtensionPointManager<T extends featureide.core.IExtension
 					cachedProviders.add(proxy);
 			}
 		}
-		//debugPrintExtensions();
 	}
-
-//	private void debugPrintExtensions() {
-//		for (T le : getProviders())
-//			CorePlugin.getDefault().logInfo(le);
-//	}
 
 	protected abstract T parseExtension(
 			IConfigurationElement configurationElement);

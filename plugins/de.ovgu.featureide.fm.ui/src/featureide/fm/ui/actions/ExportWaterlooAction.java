@@ -41,7 +41,7 @@ import featureide.fm.core.io.guidsl.FeatureModelReader;
 import featureide.fm.core.io.waterloo.WaterlooWriter;
 
 /**
- * TODO description
+ * Converts a feature model file into the Waterloo format.
  * 
  * @author Fabian Wielgorz
  */
@@ -50,7 +50,6 @@ public class ExportWaterlooAction implements IObjectActionDelegate {
 	private ISelection selection;
 	
 	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
-		
 	}
 
 	@SuppressWarnings("unchecked")

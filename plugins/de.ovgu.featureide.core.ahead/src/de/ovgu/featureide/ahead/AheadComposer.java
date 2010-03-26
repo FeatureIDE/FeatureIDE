@@ -31,7 +31,7 @@ import featureide.core.IFeatureProject;
 import featureide.core.builder.IComposerExtensionClass;
 
 /**
- * TODO description
+ * Composes source jak files into merged jak files.
  * 
  * @author Tom Brosch
  */
@@ -78,5 +78,4 @@ public class AheadComposer implements IComposerExtensionClass {
 
 	public void clean() {
 	}
-	
 }

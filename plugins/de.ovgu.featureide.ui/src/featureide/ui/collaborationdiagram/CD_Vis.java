@@ -26,7 +26,7 @@ import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
 /**
- * TODO description
+ * TODO description Constanze?
  * 
  * @author Janet Feigenspan
  */

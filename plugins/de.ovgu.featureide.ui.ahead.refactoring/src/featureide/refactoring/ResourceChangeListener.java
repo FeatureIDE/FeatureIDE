@@ -33,7 +33,7 @@ import featureide.refactoring.typesystem.TypeSystemManager;
 import featureide.refactoring.windows.ErrorWindow;
 
 /**
- * TODO description
+ * A listener on Jak files.
  * 
  * @author Stephan Kauschka
  */

@@ -21,7 +21,7 @@ package featureide.core.builder;
 import featureide.core.IExtension;
 
 /**
- * TODO description
+ * A FeatureIDE extension to compose source files.
  * 
  * @author Tom Brosch
  */

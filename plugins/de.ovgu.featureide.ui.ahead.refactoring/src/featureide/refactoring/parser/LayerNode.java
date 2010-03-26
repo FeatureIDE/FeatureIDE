@@ -19,7 +19,7 @@
 package featureide.refactoring.parser;
 
 /**
- * TODO description
+ * An AST node representing a feature.
  * 
  * @author Stephan Kauschka
  */

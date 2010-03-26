@@ -46,7 +46,7 @@ import featureide.fm.core.FeatureModel;
 import featureide.fm.core.io.AbstractFeatureModelWriter;
 
 /**
- * TODO description
+ * Prints a feature model in XML format.
  * 
  * @author Fabian Wielgorz
  */

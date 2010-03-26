@@ -19,7 +19,7 @@
 package featureide.refactoring.parser;
 
 /**
- * TODO description
+ * A Jak parser exception.
  * 
  * @author Stephan Kauschka
  */

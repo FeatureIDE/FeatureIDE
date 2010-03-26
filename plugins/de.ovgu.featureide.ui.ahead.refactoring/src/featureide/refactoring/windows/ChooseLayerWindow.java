@@ -35,82 +35,86 @@ import featureide.refactoring.RefactoringPlugin;
 import featureide.refactoring.typesystem.TypeSystemManager;
 
 /**
- * TODO description
+ * A dialog to choose a destination layer for a Jak refactoring.
  * 
  * @author Stephan Kauschka
  */
-public class ChooseLayerWindow implements SelectionListener,DisposeListener{
+public class ChooseLayerWindow implements SelectionListener, DisposeListener {
 
-    private Window window;
-    private Shell shell,parentshell;
-    private Table table;
-    private Button button;
+	private Window window;
+	private Shell shell, parentshell;
+	private Table table;
+	private Button button;
 
-    public ChooseLayerWindow (Shell parentShell, Window parentWindow){
+	public ChooseLayerWindow(Shell parentShell, Window parentWindow) {
+		this.window = parentWindow;
+		this.parentshell = parentShell;
+		this.shell = new Shell(parentShell, SWT.MIN);
+		this.shell.setText("Choose a layer");
+		Image image = RefactoringPlugin.getImage("sample.gif");
+		this.shell.setImage(image);
+		this.shell.setSize(250, 200);
+		this.shell.addDisposeListener(this);
 
-	this.window = parentWindow;
-	this.parentshell = parentShell;
-	this.shell = new Shell(parentShell,SWT.MIN);
-	this.shell.setText("Choose a layer");
-	Image image = RefactoringPlugin.getImage("sample.gif");
-	this.shell.setImage(image);
-	this.shell.setSize(250, 200);
-	this.shell.addDisposeListener(this);
-
-	createGUI();
-	parentShell.setEnabled(false);
-	this.shell.open();
-    }
-
-    public void createGUI(){
-	GridLayout layout = new GridLayout();
-	layout.verticalSpacing = 5;
-	layout.marginHeight = 10;
-	layout.marginWidth = 10;
-	layout.numColumns = 1;
-	layout.makeColumnsEqualWidth = false;
-	this.shell.setLayout(layout);
-
-	this.table = new Table(this.shell,SWT.SINGLE | SWT.FULL_SELECTION | SWT.BORDER);
-	this.table.setHeaderVisible(false);
-	this.table.setLayoutData(new GridData(GridData.FILL_BOTH));
-
-	try{
-	    LayerInfo[] infos = TypeSystemManager.getTypesystem(window.getProjectURI()).getLayer();
-
-	    for(int i=0; i<infos.length; i++){
-		TableItem item = new TableItem(this.table, SWT.NONE);
-		item.setText(infos[i].getFullName());
-	    }
-	} catch (Exception e) {this.window.setText(Window.ERROR_TEXT, e.getMessage());}
-
-	this.button = new Button(this.shell,SWT.CENTER);
-	GridData a = new GridData(75,25);
-	a.horizontalAlignment = SWT.CENTER;
-	this.button.setLayoutData(a);
-	this.button.setText("Ok");
-	this.button.addSelectionListener(this);
-    }
-
-    public void widgetDefaultSelected(SelectionEvent e) {}
-
-    public void widgetSelected(SelectionEvent e) {
-	try{
-	    if(e.getSource() == this.button){
-		String selection = (this.table.getSelection()[0]).getText();
-		this.window.setText(Window.LAYER_TEXT, selection);
-		this.shell.setVisible(false);
-		this.shell.dispose();
-		this.parentshell.setEnabled(true);
-	    }
-	}catch (Exception ex){
-	    this.shell.setVisible(false);
-	    this.shell.dispose();
-	    this.parentshell.setEnabled(true);
+		createGUI();
+		parentShell.setEnabled(false);
+		this.shell.open();
 	}
-    }
 
-    public void widgetDisposed(DisposeEvent e) {
-	this.parentshell.setEnabled(true);
-    }
+	public void createGUI() {
+		GridLayout layout = new GridLayout();
+		layout.verticalSpacing = 5;
+		layout.marginHeight = 10;
+		layout.marginWidth = 10;
+		layout.numColumns = 1;
+		layout.makeColumnsEqualWidth = false;
+		this.shell.setLayout(layout);
+
+		this.table = new Table(this.shell, SWT.SINGLE | SWT.FULL_SELECTION
+				| SWT.BORDER);
+		this.table.setHeaderVisible(false);
+		this.table.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+		try {
+			LayerInfo[] infos = TypeSystemManager.getTypesystem(
+					window.getProjectURI()).getLayer();
+
+			for (int i = 0; i < infos.length; i++) {
+				TableItem item = new TableItem(this.table, SWT.NONE);
+				item.setText(infos[i].getFullName());
+			}
+		} catch (Exception e) {
+			this.window.setText(Window.ERROR_TEXT, e.getMessage());
+		}
+
+		this.button = new Button(this.shell, SWT.CENTER);
+		GridData a = new GridData(75, 25);
+		a.horizontalAlignment = SWT.CENTER;
+		this.button.setLayoutData(a);
+		this.button.setText("Ok");
+		this.button.addSelectionListener(this);
+	}
+
+	public void widgetDefaultSelected(SelectionEvent e) {
+	}
+
+	public void widgetSelected(SelectionEvent e) {
+		try {
+			if (e.getSource() == this.button) {
+				String selection = (this.table.getSelection()[0]).getText();
+				this.window.setText(Window.LAYER_TEXT, selection);
+				this.shell.setVisible(false);
+				this.shell.dispose();
+				this.parentshell.setEnabled(true);
+			}
+		} catch (Exception ex) {
+			this.shell.setVisible(false);
+			this.shell.dispose();
+			this.parentshell.setEnabled(true);
+		}
+	}
+
+	public void widgetDisposed(DisposeEvent e) {
+		this.parentshell.setEnabled(true);
+	}
 }

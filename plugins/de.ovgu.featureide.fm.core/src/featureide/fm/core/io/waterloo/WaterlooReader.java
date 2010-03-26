@@ -48,7 +48,7 @@ import featureide.fm.core.io.AbstractFeatureModelReader;
 import featureide.fm.core.io.UnsupportedModelException;
 
 /**
- * TODO description
+ * Parses feature model files in the Waterloo format.
  * 
  * @author Fabian Wielgorz
  */

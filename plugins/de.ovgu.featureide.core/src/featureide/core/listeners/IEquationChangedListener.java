@@ -21,10 +21,12 @@ package featureide.core.listeners;
 import featureide.core.IFeatureProject;
 
 /**
- * TODO description
+ * A listener on equation files specifying particular variants.
  * 
  * @author Tom Brosch
  */
 public interface IEquationChangedListener {
+	
 	void equationChanged(IFeatureProject featureProject);
+	
 }

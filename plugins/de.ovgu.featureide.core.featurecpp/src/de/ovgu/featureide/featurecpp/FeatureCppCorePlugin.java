@@ -23,8 +23,7 @@ import org.osgi.framework.BundleContext;
 import de.ovgu.featureide.core.plugin.AbstractCorePlugin;
 
 /**
- * 
- * TODO description
+ * The activator class controls the plug-in life cycle.
  * 
  * @author Tom Brosch
  * @author Thomas Thuem

@@ -41,53 +41,52 @@ import featureide.fm.core.io.guidsl.FeatureModelReader;
 import featureide.fm.core.io.xml.XmlFeatureModelWriter;
 
 /**
- * TODO description
+ * Exports a feature model file into an XML format.
  * 
  * @author Fabian Wielgorz
  */
 public class ExportXmlAction implements IObjectActionDelegate {
 
-private ISelection selection;
-	
+	private ISelection selection;
+
 	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
-		
 	}
 
 	@SuppressWarnings("unchecked")
 	public void run(IAction action) {
 		if (selection instanceof IStructuredSelection) {
-			for (Iterator it = ((IStructuredSelection) selection).iterator(); 
-					it.hasNext();) {
+			for (Iterator it = ((IStructuredSelection) selection).iterator(); it
+					.hasNext();) {
 				Object element = it.next();
 				IFile inputFile = null;
 				if (element instanceof IFile) {
 					inputFile = (IFile) element;
 				} else if (element instanceof IAdaptable) {
-					inputFile = (IFile) ((IAdaptable) element).getAdapter(
-							IFile.class);
+					inputFile = (IFile) ((IAdaptable) element)
+							.getAdapter(IFile.class);
 				}
 				if (inputFile != null) {
 					try {
-						FileDialog fileDialog = new FileDialog(new Shell(), 
+						FileDialog fileDialog = new FileDialog(new Shell(),
 								SWT.SAVE);
 						fileDialog.setFileName("model.xml");
 						fileDialog.setOverwrite(true);
 						File outputFile = new File(fileDialog.open());
 						FeatureModel fm = new FeatureModel();
-						FeatureModelReader fmReader = new FeatureModelReader(fm);		
+						FeatureModelReader fmReader = new FeatureModelReader(fm);
 						fmReader.readFromFile(inputFile);
-						XmlFeatureModelWriter xmlWriter = 
-							new XmlFeatureModelWriter(fm);
+						XmlFeatureModelWriter xmlWriter = new XmlFeatureModelWriter(
+								fm);
 						xmlWriter.writeToFile(outputFile);
 						inputFile.getProject().refreshLocal(
-								IResource.DEPTH_INFINITE, null);  
+								IResource.DEPTH_INFINITE, null);
 					} catch (FileNotFoundException e) {
 						e.printStackTrace();
 					} catch (UnsupportedModelException e) {
 						e.printStackTrace();
 					} catch (CoreException e) {
 						e.printStackTrace();
-					}				
+					}
 				}
 			}
 		}

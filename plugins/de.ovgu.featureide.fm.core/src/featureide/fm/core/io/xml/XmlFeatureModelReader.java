@@ -43,7 +43,7 @@ import featureide.fm.core.io.AbstractFeatureModelReader;
 import featureide.fm.core.io.UnsupportedModelException;
 
 /**
- * TODO description
+ * Parses a feature model in XML format.
  * 
  * @author Fabian Wielgorz
  */

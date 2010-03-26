@@ -28,8 +28,7 @@ import org.eclipse.core.resources.IFolder;
 import de.ovgu.featureide.featurecpp.FeatureCppCorePlugin;
 
 /**
- * 
- * TODO description
+ * Composes FeatureC++ files.
  * 
  * @author Tom Brosch
  */

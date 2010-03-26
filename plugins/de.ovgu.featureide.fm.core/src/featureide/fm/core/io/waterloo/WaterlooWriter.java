@@ -45,7 +45,7 @@ import featureide.fm.core.FeatureModel;
 import featureide.fm.core.io.AbstractFeatureModelWriter;
 
 /**
- * TODO description
+ * Prints feature models in the Waterloo format.
  * 
  * @author Fabian Wielgorz
  */

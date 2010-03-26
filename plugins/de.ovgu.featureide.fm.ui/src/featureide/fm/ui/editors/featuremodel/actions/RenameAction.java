@@ -25,7 +25,7 @@ import featureide.fm.core.FeatureModel;
 import featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
 /**
- * TODO description
+ * Renames a particular feature at the feature diagram.
  * 
  * @author Tom Brosch
  */

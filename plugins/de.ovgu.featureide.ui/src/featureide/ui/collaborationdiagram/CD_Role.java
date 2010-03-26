@@ -21,7 +21,7 @@ package featureide.ui.collaborationdiagram;
 import java.util.ArrayList;
 
 /**
- * TODO description
+ * TODO description Constanze?
  * 
  * @author Janet Feigenspan
  */

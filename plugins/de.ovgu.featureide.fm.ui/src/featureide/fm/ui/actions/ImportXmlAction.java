@@ -43,7 +43,7 @@ import featureide.fm.core.io.xml.XmlFeatureModelReader;
 import featureide.fm.ui.editors.FeatureModelEditor;
 
 /**
- * TODO description
+ * Converts an XML feature model into our feature model format.
  * 
  * @author Fabian Wielgorz
  */

@@ -28,12 +28,10 @@ import featureide.core.CorePlugin;
 import featureide.ui.UIPlugin;
 
 /**
- * 
- * TODO description
+ * Adds a small overlay to projects belonging to FeatureIDE.
  * 
  * @author Tom Brosch
  */
-
 public class FeatureProjectDecorator implements ILightweightLabelDecorator {
 
 	private static final ImageDescriptor OVERLAY = UIPlugin.getDefault().getImageDescriptor("icons/FeatureProjectDecorator.png");

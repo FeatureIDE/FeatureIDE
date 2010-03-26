@@ -31,7 +31,7 @@ import org.eclipse.ui.editors.text.TextEditor;
 import featureide.refactoring.windows.ExtractMethodWindow;
 
 /**
- * TODO description
+ * A Jak refactoring to extract a method.
  * 
  * @author Stephan Kauschka
  */

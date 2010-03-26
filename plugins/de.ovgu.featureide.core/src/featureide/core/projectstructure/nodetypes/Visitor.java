@@ -22,15 +22,18 @@ import featureide.core.projectstructure.trees.LeafTree;
 import featureide.core.projectstructure.trees.ProjectTree;
 
 /**
- * TODO description
+ * A visitor for FeatureIDE ASTs.
  * 
  * @author Janet Feigenspan
  */
 public interface Visitor {
 
 	public void visit(ProjectTreeNode projectTreeNode);
+	
 	public void visit(TerminalNode terminalNode);
+	
 	public void visit(NonTerminalNode nonTerminalNode);
+	
 	public void visit(LeafTree leafTreeNode);
 	
 	public void visitTree(ProjectTree projectTree);

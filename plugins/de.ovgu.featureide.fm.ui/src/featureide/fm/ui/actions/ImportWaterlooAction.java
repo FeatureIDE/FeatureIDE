@@ -43,7 +43,7 @@ import featureide.fm.core.io.waterloo.WaterlooReader;
 import featureide.fm.ui.editors.FeatureModelEditor;
 
 /**
- * TODO description
+ * Converts a Waterloo feature model into our feature model format.
  * 
  * @author Fabian Wielgorz
  */

@@ -21,7 +21,7 @@ package featureide.core.projectstructure.nodetypes;
 import java.util.ArrayList;
 
 /**
- * TODO description
+ * A node with children.
  * 
  * @author Janet Feigenspan
  */

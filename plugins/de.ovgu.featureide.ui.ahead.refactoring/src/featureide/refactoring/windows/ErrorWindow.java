@@ -33,99 +33,97 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
 /**
- * TODO description
+ * Displays errors occurred while refactoring Jak files.
  * 
  * @author Stephan Kauschka
  */
 public class ErrorWindow {
 
-    private Display display;
-    private Shell shell;
-    private String msg, type;
-    private Image errorImage = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJS_ERROR_TSK);
+	private Display display;
+	private Shell shell;
+	private String msg, type;
+	private Image errorImage = PlatformUI.getWorkbench().getSharedImages()
+			.getImage(ISharedImages.IMG_OBJS_ERROR_TSK);
 
+	public ErrorWindow(String errorType, String errorMessage) {
+		this.msg = errorMessage;
+		this.type = errorType;
 
-    public ErrorWindow (String errorType, String errorMessage){
+		createGUI();
+		while (!this.shell.isDisposed())
+			if (!this.display.readAndDispatch())
+				this.display.sleep();
+	}
 
-	this.msg = errorMessage;
-	this.type = errorType;
+	public ErrorWindow(String errorType, String errorMessage,
+			StackTraceElement[] stackTrace) {
+		String trace = "";
+		for (int i = 0; i < stackTrace.length; i++)
+			trace = trace + stackTrace[i].toString() + "\n";
 
-	createGUI();
-	while (!this.shell.isDisposed())
-	    if (!this.display.readAndDispatch())
-		this.display.sleep();
-    }
+		this.msg = errorMessage + "\n\n" + trace;
+		this.type = errorType;
 
-    public ErrorWindow (String errorType, String errorMessage, StackTraceElement[] stackTrace){
+		createGUI();
+		while (!this.shell.isDisposed())
+			if (!this.display.readAndDispatch())
+				this.display.sleep();
+	}
 
-	String trace = "";
-	for(int i=0;i<stackTrace.length;i++)
-	    trace = trace + stackTrace[i].toString()+"\n";
+	private void createGUI() {
+		this.display = Display.getCurrent();
+		if (this.display == null)
+			this.display = new Display();
 
-	this.msg = errorMessage + "\n\n" + trace;
-	this.type = errorType;
+		this.shell = new Shell(this.display, SWT.MIN);
+		this.shell.setText("A(n) " + this.type + " occured ...");
+		this.shell.setImage(errorImage);
+		this.shell.setSize(500, 190);
 
-	createGUI();
-	while (!this.shell.isDisposed())
-	    if (!this.display.readAndDispatch())
-		this.display.sleep();
-    }
+		GridLayout layout = new GridLayout();
+		layout.verticalSpacing = 5;
+		layout.marginHeight = 5;
+		layout.marginWidth = 5;
+		layout.numColumns = 1;
+		layout.makeColumnsEqualWidth = false;
+		this.shell.setLayout(layout);
 
-    private void createGUI(){
+		Group group1 = new Group(this.shell, SWT.NONE);
+		GridData g = new GridData(GridData.FILL_HORIZONTAL);
+		g.heightHint = 105;
+		group1.setLayoutData(g);
+		group1.setLayout(new GridLayout());
 
-	this.display = Display.getCurrent();
-	if(this.display==null)
-	    this.display = new Display();
+		Text text = new Text(group1, SWT.WRAP | SWT.V_SCROLL);
+		text.setBackground(this.shell.getBackground());
+		text.setText(this.msg);
+		text.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-	this.shell = new Shell(this.display,SWT.MIN);
-	this.shell.setText("A(n) " + this.type + " occured ...");
-	this.shell.setImage(errorImage);
-	this.shell.setSize(500, 190);
+		Button ok = new Button(this.shell, SWT.CENTER);
+		ok.setText("Ok");
+		ok.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+				exit();
+			}
 
-	GridLayout layout = new GridLayout();
-	layout.verticalSpacing = 5;
-	layout.marginHeight = 5;
-	layout.marginWidth = 5;
-	layout.numColumns = 1;
-	layout.makeColumnsEqualWidth = false;
-	this.shell.setLayout(layout);
+			public void widgetSelected(SelectionEvent e) {
+				exit();
+			}
+		});
+		GridData g2 = new GridData();
+		g2.horizontalAlignment = SWT.CENTER;
+		g2.heightHint = 25;
+		g2.widthHint = 75;
+		ok.setLayoutData(g2);
 
-	Group group1 = new Group(this.shell,SWT.NONE);
-	GridData g = new GridData(GridData.FILL_HORIZONTAL);
-	g.heightHint = 105;
-	group1.setLayoutData(g);
-	group1.setLayout(new GridLayout());
+		this.shell.open();
+		if (text.getLineCount() < 7)
+			text.getVerticalBar().setVisible(false);
+	}
 
-	Text text = new Text(group1,SWT.WRAP | SWT.V_SCROLL);
-	text.setBackground(this.shell.getBackground());
-	text.setText(this.msg);	
-	text.setLayoutData(new GridData(GridData.FILL_BOTH));
-
-	Button ok = new Button(this.shell, SWT.CENTER);
-	ok.setText("Ok");
-	ok.addSelectionListener(new SelectionListener(){
-	    public void widgetDefaultSelected(SelectionEvent e) {
-		exit();
-	    }
-
-	    public void widgetSelected(SelectionEvent e) {
-	        exit();
-            }
-	});
-	GridData g2 = new GridData();
-	g2.horizontalAlignment = SWT.CENTER;
-	g2.heightHint = 25;
-	g2.widthHint = 75;
-	ok.setLayoutData(g2);
-
-	this.shell.open();
-	if(text.getLineCount()<7)
-	    text.getVerticalBar().setVisible(false);
-    }
-
-    private void exit(){
-	this.shell.setVisible(false);
-	this.shell.dispose();
-    }
+	private void exit() {
+		this.shell.setVisible(false);
+		this.shell.dispose();
+	}
 
 }

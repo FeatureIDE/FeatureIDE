@@ -21,7 +21,7 @@ package featureide.refactoring.parser;
 import java.util.LinkedList;
 
 /**
- * TODO description
+ * A tree structure representing a feature.
  * 
  * @author Stephan Kauschka
  */

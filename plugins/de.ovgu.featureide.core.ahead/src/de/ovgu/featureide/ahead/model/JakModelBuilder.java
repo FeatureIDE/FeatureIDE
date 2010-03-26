@@ -39,7 +39,7 @@ import featureide.core.jakprojectmodel.IField;
 import featureide.core.jakprojectmodel.IJakProjectModel;
 
 /**
- * TODO description
+ * TODO description Constanze
  * 
  * @author Tom Brosch
  * @author Constanze Adler

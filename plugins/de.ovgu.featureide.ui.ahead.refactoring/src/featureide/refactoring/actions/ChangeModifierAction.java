@@ -31,51 +31,54 @@ import org.eclipse.ui.editors.text.TextEditor;
 import featureide.refactoring.windows.ChangeModifierWindow;
 
 /**
- * TODO description
+ * An action to refactor a modifier in a Jak file.
  * 
  * @author Stephan Kauschka
  */
 public class ChangeModifierAction implements IObjectActionDelegate {
 
-    private ISelection selection;
-    private IWorkbenchPart workbenchPart;
+	private ISelection selection;
+	private IWorkbenchPart workbenchPart;
 
-    public ChangeModifierAction() {
-	super();
-    }
-
-    public void setActivePart(IAction action, IWorkbenchPart targetPart) {
-	this.workbenchPart = targetPart;
-    }
-
-    public void run(IAction action) {
-
-	if (this.selection instanceof IStructuredSelection){
-	    for (Iterator<?> iter = ((IStructuredSelection) this.selection).iterator(); iter.hasNext();) {
-		Object element = iter.next();
-		IFile file = null;
-
-		if (element instanceof IFile)
-		    file = (IFile) element;
-		else if (element instanceof IAdaptable)
-		    file = (IFile) ((IAdaptable) element).getAdapter(IFile.class);
-
-		if (file != null){
-		    //if workbenchPart is instance of TextEditor determine the click-target
-		    if(this.workbenchPart instanceof TextEditor){
-			ITextSelection sel = (ITextSelection) ((TextEditor) this.workbenchPart).getSelectionProvider().getSelection();
-			new ChangeModifierWindow(file,sel);
-		    }
-		    //else the modifier to be changed is a classmodifier
-		    else{
-			new ChangeModifierWindow(file,null);
-		    }
-		}
-	    }
+	public ChangeModifierAction() {
+		super();
 	}
-    }
 
-    public void selectionChanged(IAction action, ISelection selection) {
-	this.selection = selection;
-    }
+	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
+		this.workbenchPart = targetPart;
+	}
+
+	public void run(IAction action) {
+		if (this.selection instanceof IStructuredSelection) {
+			for (Iterator<?> iter = ((IStructuredSelection) this.selection)
+					.iterator(); iter.hasNext();) {
+				Object element = iter.next();
+				IFile file = null;
+
+				if (element instanceof IFile)
+					file = (IFile) element;
+				else if (element instanceof IAdaptable)
+					file = (IFile) ((IAdaptable) element)
+							.getAdapter(IFile.class);
+
+				if (file != null) {
+					// if workbenchPart is instance of TextEditor determine the
+					// click-target
+					if (this.workbenchPart instanceof TextEditor) {
+						ITextSelection sel = (ITextSelection) ((TextEditor) this.workbenchPart)
+								.getSelectionProvider().getSelection();
+						new ChangeModifierWindow(file, sel);
+					}
+					// else the modifier to be changed is a classmodifier
+					else {
+						new ChangeModifierWindow(file, null);
+					}
+				}
+			}
+		}
+	}
+
+	public void selectionChanged(IAction action, ISelection selection) {
+		this.selection = selection;
+	}
 }

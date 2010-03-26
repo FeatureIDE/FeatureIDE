@@ -19,10 +19,12 @@
 package featureide.core;
 
 /**
- * TODO description
+ * A FeatureIDE extension with its ID.
  * 
  * @author Tom Brosch
  */
 public interface IExtension {
+	
 	public abstract String getId();
+	
 }

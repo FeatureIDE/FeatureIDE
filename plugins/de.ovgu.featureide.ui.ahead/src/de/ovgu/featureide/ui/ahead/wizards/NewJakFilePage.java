@@ -46,7 +46,7 @@ import featureide.core.IFeatureProject;
 import featureide.fm.core.Feature;
 
 /**
- * TODO description
+ * A dialog page to create new Jak files.
  * 
  * @author Marcus Leich
  * @author Christian Becker

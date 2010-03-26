@@ -26,11 +26,12 @@ import featureide.core.CorePlugin;
 import featureide.core.IFeatureProject;
 
 /**
- * TODO description
+ * Handles a composer extension.
  * 
  * @author Tom Brosch
  */
 public class ComposerExtensionProxy implements IComposerExtension {
+	
 	private final IConfigurationElement configElement;
 	private final String name;
 	private final String id;

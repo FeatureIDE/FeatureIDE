@@ -110,36 +110,19 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 
 		IFile equation = featureProject.getCurrentEquationFile();
 
-		// TODO #28: implementation for incremental build (delete only builder
-		// markers of new builded sources)
 		featureProject.deleteBuilderMarkers(getProject(),
 				IResource.DEPTH_INFINITE);
 		try {
-			// TODO #28: replace by change listener, that removes derived
-			// resources when their non-derived encounter part is deleted
 			clean(monitor);
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
 
 		if (equation == null) {
-			// featureProject.createBuilderMarker(getProject(),
-			// "No equation file found", 0, IMarker.SEVERITY_WARNING);
 			return null;
 		}
 
 		composerExtension.performFullBuild(equation);
-		/*
-		 * if (kind == FULL_BUILD) { //fullBuild(equation);
-		 * composer.performFullBuild(equation); } else { IResourceDelta delta =
-		 * getDelta(getProject()); if (delta == null) {
-		 * composer.performFullBuild(equation); } else { if
-		 * (delta.findMember(equation.getProjectRelativePath()) != null) { //
-		 * Perform a full build, because the equation file has changed
-		 * composer.performFullBuild(equation); } else { //TODO #28: rebuild
-		 * classes that reference builded classes //incrementalBuild(delta);
-		 * composer.performFullBuild(equation); } } }
-		 */
 
 		try {
 			featureProject.getBuildFolder().refreshLocal(

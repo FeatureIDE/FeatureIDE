@@ -26,24 +26,24 @@ import featureide.core.IFeatureProject;
 import featureide.core.builder.IComposerExtensionClass;
 
 /**
- * 
- * TODO description
+ * A FeatureIDE extension to compose FeatureC++ files.
  * 
  * @author Tom Brosch
  */
 public class FeatureCppComposer implements IComposerExtensionClass {
-	
+
 	public static final String COMPOSER_ID = "de.ovgu.featureide.composer.featurecpp";
 
-	private final FeatureCppWrapper featureCpp = new FeatureCppWrapper("fc++.exe");
-	
-	public void clean() {
+	private final FeatureCppWrapper featureCpp = new FeatureCppWrapper(
+			"fc++.exe");
 
+	public void clean() {
 	}
 
 	public void initialize(IFeatureProject project) {
-		assert(project != null) : "Invalid project given";
-		featureCpp.initialize(project.getSourceFolder(), project.getBuildFolder());
+		assert (project != null) : "Invalid project given";
+		featureCpp.initialize(project.getSourceFolder(), project
+				.getBuildFolder());
 	}
 
 	public void performFullBuild(IFile equation) {

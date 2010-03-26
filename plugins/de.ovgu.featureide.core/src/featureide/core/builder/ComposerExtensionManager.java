@@ -26,7 +26,7 @@ import featureide.core.CorePlugin;
 import featureide.core.ExtensionPointManager;
 
 /**
- * TODO description
+ * Manages the FeatureIDE extensions to compose features.
  * 
  * @author Tom Brosch
  */

@@ -29,43 +29,41 @@ import de.ovgu.featureide.ui.ahead.AheadUIPlugin;
 import de.ovgu.featureide.ui.ahead.wizards.NewJakFileWizard;
 
 /**
- * 
- * TODO description
+ * TODO description Chris
  * 
  * @author Christian Becker
  */
 public class StartJakFileWizard implements IWorkbenchWindowActionDelegate {
-	
+
 	public static final String ID = AheadUIPlugin.PLUGIN_ID + ".NewJakFile";
-	
+
 	private IWorkbenchWindow window;
 
 	public void dispose() {
-		
-
 	}
 
 	public void init(IWorkbenchWindow window) {
-		
-		this.window=window;
+
+		this.window = window;
 	}
 
 	public void run(IAction action) {
-		
-		NewJakFileWizard wizard=new NewJakFileWizard();
-		ISelection selection= window.getSelectionService().getSelection();
-		if(selection instanceof IStructuredSelection){
-			wizard.init(window.getWorkbench(), (IStructuredSelection) selection);	
-			
-		}
-		else{
+
+		NewJakFileWizard wizard = new NewJakFileWizard();
+		ISelection selection = window.getSelectionService().getSelection();
+		if (selection instanceof IStructuredSelection) {
+			wizard
+					.init(window.getWorkbench(),
+							(IStructuredSelection) selection);
+
+		} else {
 			wizard.init(window.getWorkbench(), null);
 		}
 		WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
 		dialog.open();
 	}
 
-	public void selectionChanged(IAction action, ISelection selection) {	
+	public void selectionChanged(IAction action, ISelection selection) {
 
 	}
 

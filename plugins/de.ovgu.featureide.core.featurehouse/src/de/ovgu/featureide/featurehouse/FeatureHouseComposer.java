@@ -26,8 +26,7 @@ import featureide.core.IFeatureProject;
 import featureide.core.builder.IComposerExtensionClass;
 
 /**
- * 
- * TODO description
+ * Composes files using FeatureHouse.
  * 
  * @author Tom Brosch
  */

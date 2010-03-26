@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
- * TODO description
+ * TODO description Constanze?
  * 
  * @author Janet Feigenspan
  */

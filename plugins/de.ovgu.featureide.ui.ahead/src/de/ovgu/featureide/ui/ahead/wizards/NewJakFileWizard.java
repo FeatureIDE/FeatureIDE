@@ -34,7 +34,7 @@ import org.eclipse.ui.*;
 import org.eclipse.ui.ide.IDE;
 
 /**
- * TODO description
+ * A wizard to create a new Jak file.
  * 
  * @author Marcus Leich
  */

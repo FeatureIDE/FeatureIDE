@@ -37,7 +37,7 @@ import featureide.core.builder.ComposerExtensionManager;
 import featureide.core.builder.IComposerExtension;
 
 /**
- * TODO description
+ * A dialog page for creating FeatureIDE projects.
  * 
  * @author Marcus Leich
  */

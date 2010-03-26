@@ -25,7 +25,7 @@ import java.util.LinkedList;
 import org.eclipse.core.resources.IFile;
 
 /**
- * TODO description
+ * A parser for Jak files.
  * 
  * @author Stephan Kauschka
  */
