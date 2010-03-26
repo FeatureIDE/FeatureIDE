@@ -125,8 +125,6 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 		RotatableDecoration sourceDecoration = null;
 		if (target.isAnd() || OR_CIRCLES)
 			sourceDecoration = new CircleDecoration(source.isMandatory());
-		// sourceDecoration = new CircleDecoration(source.isMandatory() &&
-		// !source.getName().equals("D"));
 
 		PolylineConnection connection = (PolylineConnection) getConnectionFigure();
 		connection.setSourceDecoration(sourceDecoration);
@@ -141,10 +139,6 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 			if (!target.isAnd() && target.isFirstChild(source))
 				targetDecoration = new RelationDecoration(target.isMultiple(),
 						target.getLastChild());
-		// if (!target.isAND() && target.getChildren().get(1).equals(source))
-		// targetDecoration = new RelationDecoration(target.isMultiple(),
-		// target.getChildren().get(Math.max(0, target.getChildren().size() -
-		// 2)));
 
 		PolylineConnection connection = (PolylineConnection) getConnectionFigure();
 		connection.setTargetDecoration(targetDecoration);
