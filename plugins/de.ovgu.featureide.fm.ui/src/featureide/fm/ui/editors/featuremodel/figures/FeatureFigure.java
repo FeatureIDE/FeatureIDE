@@ -76,7 +76,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		setBorder(compound ? COMPOUND_BORDER : LAYER_BORDER);
 		setBackgroundColor(compound ? COMPOUND_BACKGROUND : LAYER_BACKGROUND);
 		
-		String toolTip = compound ? "Compound Feature" : "Feature";
+		String toolTip = compound ? " Compound Feature " : " Feature ";
 		setToolTip(new Label(toolTip));
 	}
 

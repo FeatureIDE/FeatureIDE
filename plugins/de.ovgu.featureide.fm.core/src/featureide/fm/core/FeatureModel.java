@@ -300,6 +300,14 @@ public class FeatureModel implements PropertyConstants {
 				layers.add(feature);
 		return Collections.unmodifiableCollection(layers);
 	}
+	
+	public Collection<String> getLayerNames(){
+		LinkedList<String> layerNames = new LinkedList<String>();
+		for (Feature layer : getLayers()){
+			layerNames.add(layer.getName());
+		}
+		return layerNames;
+	}
 
 	public void createDefaultValues() {
 		Feature root = getFeature("Root");

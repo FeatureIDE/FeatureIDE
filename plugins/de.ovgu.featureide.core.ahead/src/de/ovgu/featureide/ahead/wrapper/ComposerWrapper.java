@@ -45,17 +45,17 @@ import featureide.core.IFeatureProject;
 
 /**
  * 
- * The class encapsulates everything that has to do with the composing step.
- * It composes several given jak files. for each jak file all corresponding
- * jak files according to one equation file were searched to compose them with
- * the help of the Mixin class
+ * The class encapsulates everything that has to do with the composing step. It
+ * composes several given jak files. for each jak file all corresponding jak
+ * files according to one equation file were searched to compose them with the
+ * help of the Mixin class
  * 
  * @author Tom Brosch
  * @author Thomas Thuem
  * 
  */
 public class ComposerWrapper {
-	
+
 	private LinkedList<AheadBuildErrorListener> errorListeners;
 
 	private TreeMap<String, LinkedList<IFile>> absoluteJakFilenames;
@@ -71,12 +71,13 @@ public class ComposerWrapper {
 	private IFile equationFile;
 
 	private IFeatureProject featureProject;
-	
+
 	private JakModelBuilder jakModelBuilder;
 
 	/**
 	 * Creates a new instance of Composer
-	 * @param featureProject 
+	 * 
+	 * @param featureProject
 	 */
 	public ComposerWrapper(IFeatureProject featureProject) {
 		absoluteJakFilenames = new TreeMap<String, LinkedList<IFile>>();
@@ -92,27 +93,28 @@ public class ComposerWrapper {
 	public IFile[] composeAll() throws IOException {
 		return composeAll(equationFile);
 	}
-	
+
 	private class FeatureVisitor implements IResourceVisitor {
 		private ComposerWrapper composer;
-		
+
 		public FeatureVisitor(ComposerWrapper composer) {
 			this.composer = composer;
 		}
-		
+
 		public boolean visit(IResource resource) throws CoreException {
-			if( resource instanceof IFile && "jak".equals(resource.getFileExtension()) ) {
-				composer.addJakfileToCompose((IFile)resource);
+			if (resource instanceof IFile
+					&& "jak".equals(resource.getFileExtension())) {
+				composer.addJakfileToCompose((IFile) resource);
 			}
 			return true;
-		}	
+		}
 	}
 
 	/**
 	 * Composes all jakfiles for a given equation file
 	 * 
 	 * @param equationFile
-	 * @return	Array of composed jakfiles
+	 * @return Array of composed jakfiles
 	 */
 	public IFile[] composeAll(IFile equationFile) throws IOException {
 		// Set the given equation file as the current one
@@ -125,8 +127,12 @@ public class ComposerWrapper {
 			try {
 				if (featureFolder.exists())
 					featureFolder.accept(new FeatureVisitor(this));
-				else
-					featureProject.createBuilderMarker(featureProject.getProject(), "Feature folder " + featureFolder.getName() + " does not exist", 0, IMarker.SEVERITY_WARNING);
+				else if (featureProject.getFeatureModel().getLayerNames()
+						.contains(featureFolder.getName()))
+					featureProject.createBuilderMarker(featureProject
+							.getProject(), "Feature folder "
+							+ featureFolder.getName() + " does not exist", 0,
+							IMarker.SEVERITY_WARNING);
 			} catch (CoreException e) {
 				e.printStackTrace();
 			}
@@ -141,9 +147,9 @@ public class ComposerWrapper {
 	 */
 	void setEquation(IFile equationFile) throws IOException {
 		this.equationFile = equationFile;
-		if(equationFile == null)
+		if (equationFile == null)
 			return;
-		
+
 		// Get feature folders
 		// Get composition folder
 
@@ -156,13 +162,15 @@ public class ComposerWrapper {
 		while ((line = reader.readLine()) != null) {
 			if (line.startsWith("#"))
 				continue;
-			featureFolders.add(featureProject.getSourceFolder().getFolder(line));
+			featureFolders
+					.add(featureProject.getSourceFolder().getFolder(line));
 		}
 		reader.close();
 
 		String compositionName = equationFile.getName().substring(0,
 				equationFile.getName().lastIndexOf("."));
-		compositionFolder = featureProject.getBuildFolder().getFolder(compositionName);
+		compositionFolder = featureProject.getBuildFolder().getFolder(
+				compositionName);
 	}
 
 	/**
@@ -180,7 +188,7 @@ public class ComposerWrapper {
 	 * specified feature folders
 	 * 
 	 * @param newJakFile
-	 * @throws ComposerException 
+	 * @throws ComposerException
 	 */
 	void addJakfileToCompose(IFile newJakFile) {
 		// Find out the feature this file belongs to
@@ -189,11 +197,14 @@ public class ComposerWrapper {
 		// Store all corresponding file in Vector<IFile> with
 		// the relative filename as the key
 
-		String srcFolderPath = featureProject.getSourceFolder().getRawLocation().toOSString();
+		String srcFolderPath = featureProject.getSourceFolder()
+				.getRawLocation().toOSString();
 		String jakFilePath = newJakFile.getRawLocation().toOSString();
 
 		if (!jakFilePath.startsWith(srcFolderPath)) {
-			System.err.println("Source path not contained in the Jak file path '" + jakFilePath + "'. File skipped.");
+			System.err
+					.println("Source path not contained in the Jak file path '"
+							+ jakFilePath + "'. File skipped.");
 			return;
 		}
 
@@ -204,12 +215,13 @@ public class ComposerWrapper {
 		int pos = jakFilePath.indexOf(java.io.File.separator);
 
 		if (pos < 0) {
-			System.err.println("No feature folder found in the Jak file path '" + jakFilePath + "'. File skipped.");
+			System.err.println("No feature folder found in the Jak file path '"
+					+ jakFilePath + "'. File skipped.");
 			return;
 		}
 		jakFilePath = jakFilePath.substring(pos + 1);
 
-		//don't add files twice
+		// don't add files twice
 		if (absoluteJakFilenames.containsKey(jakFilePath))
 			return;
 
@@ -220,7 +232,8 @@ public class ComposerWrapper {
 				fileVector.add(jakFile);
 		}
 		if (fileVector.size() == 0) {
-			// this is the case if you try to add a jak file that lies in a folder
+			// this is the case if you try to add a jak file that lies in a
+			// folder
 			// that isn't contained in the equation file
 		} else
 			absoluteJakFilenames.put(jakFilePath, fileVector);
@@ -238,7 +251,7 @@ public class ComposerWrapper {
 
 	private void composeJakFiles(IFolder compositionDir) {
 		composedFiles.clear();
-		if( equationFile == null )
+		if (equationFile == null)
 			return;
 		String aspectName = equationFile.getName();
 		aspectName = aspectName.substring(0, aspectName.lastIndexOf('.'));
@@ -264,25 +277,28 @@ public class ComposerWrapper {
 				mixin.compose(newJakFile.getAbsolutePath(), featureProject
 						.getSourceFolder().getRawLocation().toOSString(),
 						files, aspectName, composedASTs, ownASTs);
-				
+
 				// Add the currently composed class to the JakProject
-				jakModelBuilder.addClass(jakFile, filesVec,
-						composedASTs, ownASTs);
+				jakModelBuilder.addClass(jakFile, filesVec, composedASTs,
+						ownASTs);
 				composedFiles.add(newJakIFile);
 
-				//debugTheAST(ownASTs[ownASTs.length - 1]);
+				// debugTheAST(ownASTs[ownASTs.length - 1]);
 
 			} catch (ExtendedParseException e) {
 				handleErrorMessage(e, fileMap);
 			} catch (Exception e) {
-				handleErrorMessage(featureProject.getSourceFolder(), "Unexpected error while parsing " + newJakFile.getName(), 0);
+				handleErrorMessage(featureProject.getSourceFolder(),
+						"Unexpected error while parsing "
+								+ newJakFile.getName(), 0);
 			}
 
 			try {
 				newJakIFile.refreshLocal(IResource.DEPTH_ZERO, null);
 				if (newJakIFile.exists()) {
 					newJakIFile.setDerived(true);
-					ResourceAttributes attr = newJakIFile.getResourceAttributes();
+					ResourceAttributes attr = newJakIFile
+							.getResourceAttributes();
 					if (attr != null) {
 						attr.setReadOnly(true);
 						newJakIFile.setResourceAttributes(attr);
@@ -294,15 +310,18 @@ public class ComposerWrapper {
 		}
 	}
 
-	private void handleErrorMessage(ExtendedParseException e, TreeMap<String, IFile> fileMap) {
+	private void handleErrorMessage(ExtendedParseException e,
+			TreeMap<String, IFile> fileMap) {
 		IFile source = null;
 		if (fileMap.containsKey(e.getFilename()))
 			source = fileMap.get(e.getFilename());
-		String message = source != null ? e.getShortMessage() : e.getFullMessage();
+		String message = source != null ? e.getShortMessage() : e
+				.getFullMessage();
 		handleErrorMessage(source, message, e.getLineNumber());
 	}
 
-	private void handleErrorMessage(IResource source, String message, int lineNumber) {
+	private void handleErrorMessage(IResource source, String message,
+			int lineNumber) {
 		AheadBuildErrorEvent evt = new AheadBuildErrorEvent(source, message,
 				COMPOSER_ERROR, lineNumber);
 		for (AheadBuildErrorListener listener : errorListeners)

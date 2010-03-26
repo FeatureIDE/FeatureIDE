@@ -659,7 +659,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 						createConfigurationMarker(file, warning,
 								IMarker.SEVERITY_WARNING);
 				} catch (Exception e) {
-					e.printStackTrace();
+					CorePlugin.getDefault().logError(e);
 				}
 				return Status.OK_STATUS;
 			}

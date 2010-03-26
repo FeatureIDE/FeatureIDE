@@ -145,12 +145,13 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 	}
 
 	private Label toolTipLabel = new Label("");
+
 	public void refreshToolTip() {
 		Feature target = ((FeatureConnection) getModel()).getTarget();
 		PolylineConnection connection = (PolylineConnection) getConnectionFigure();
-		String toolTip = (target.isAnd() ? "And" : (target.isMultiple() ? "Or"
-				: "Alternative"))
-				+ "\nDoubleclick to change connection type";
+		String toolTip = " Connection type: \n"
+				+ (target.isAnd() ? " And" : (target.isMultiple() ? " Or"
+						: " Alternative"));
 		toolTipLabel.setText(toolTip);
 		connection.setToolTip(toolTipLabel);
 	}

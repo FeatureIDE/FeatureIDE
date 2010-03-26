@@ -32,6 +32,9 @@ import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ITreeSelection;
@@ -48,9 +51,11 @@ import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
+import org.eclipse.ui.progress.UIJob;
 
 import featureide.core.CorePlugin;
 import featureide.core.IFeatureProject;
+import featureide.fm.core.FMCorePlugin;
 import featureide.fm.core.FeatureModel;
 import featureide.fm.core.PropertyConstants;
 import featureide.fm.core.configuration.Configuration;
@@ -67,6 +72,7 @@ import featureide.ui.UIPlugin;
  * 
  * @author Constanze Adler
  * @author Christian Becker
+ * @author Jens Meinicke
  */
 
 public class ConfigurationEditor extends EditorPart implements
@@ -79,6 +85,10 @@ public class ConfigurationEditor extends EditorPart implements
 	private boolean dirty = false;
 	
 	private boolean closeEditor;
+	
+	private IFile file;
+	
+	private FeatureModel featureModel;
 
 	private IDoubleClickListener listener = new IDoubleClickListener() {
 
@@ -91,8 +101,6 @@ public class ConfigurationEditor extends EditorPart implements
 			}
 		}
 	};
-
-	private IFile file;
 
 	@Override
 	public void doSave(IProgressMonitor monitor) {
@@ -108,29 +116,27 @@ public class ConfigurationEditor extends EditorPart implements
 	@Override
 	public void doSaveAs() {
 	}
-
+	
 	@Override
 	public void init(IEditorSite site, IEditorInput input)
 			throws PartInitException {
 		setSite(site);
 		setInput(input);
-		ResourcesPlugin.getWorkspace().addResourceChangeListener(this); 
-
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
 		file = (IFile) input.getAdapter(IFile.class);
-		UIPlugin.getDefault().logInfo("file: " + file);
-		setPartName(file.getName());
-
 		IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
-		FeatureModel featureModel = featureProject.getFeatureModel();
-		featureModel.addListener(this);
-		configuration = new Configuration(featureModel, true);
+		featureModel = featureProject.getFeatureModel();
+		configuration = new Configuration(featureModel,true);
 		try {
 			dirty = !new ConfigurationReader(configuration).readFromFile(file);
 			if (!dirty)
 				dirty = !configuration.validManually();
 		} catch (Exception e) {
-			e.printStackTrace();
+			FMCorePlugin.getDefault().logError(e);
 		}
+		UIPlugin.getDefault().logInfo("file: " + file);
+		setPartName(file.getName());		
+		featureModel.addListener(this);
 		firePropertyChange(IEditorPart.PROP_DIRTY);
 	}
 
@@ -173,7 +179,6 @@ public class ConfigurationEditor extends EditorPart implements
 		viewer.setLabelProvider(new ConfigurationLabelProvider());
 		viewer.setInput(configuration);
 		viewer.expandAll();
-
 	}
 
 	@Override
@@ -189,13 +194,41 @@ public class ConfigurationEditor extends EditorPart implements
 	 */
 
 	public void propertyChange(PropertyChangeEvent evt) {
-		try {
-			new ConfigurationWriter(configuration).saveToFile(file);
-		} catch (CoreException e) {
-			e.printStackTrace();
-		}
+		UIJob job = new UIJob("refresh tree") {
+				@Override
+				public IStatus runInUIThread(IProgressMonitor monitor) {
+					refreshTree();
+					return Status.OK_STATUS;
+				}
+			};
+			job.setPriority(Job.SHORT);
+			job.schedule();
+	}
+ 
+	private void refreshTree(){
+		setConfiguration();
+		viewer.setContentProvider(new ConfigurationContentProvider());
+		viewer.setLabelProvider(new ConfigurationLabelProvider());
+		viewer.setInput(configuration);
+		viewer.expandAll();
+		viewer.refresh();
 	}
 
+	private void setConfiguration(){
+		IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
+		featureModel = featureProject.getFeatureModel();
+		String text = new ConfigurationWriter(configuration).writeIntoString();
+		configuration = new Configuration(featureModel,true);
+		boolean wasDirty = dirty;
+		try {
+			dirty = !new ConfigurationReader(configuration).readFromString(text);
+			if (!dirty)
+				dirty = !configuration.validManually();
+		} catch (Exception e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+		dirty = wasDirty;
+	}
 	/**
 	 * @param The feature which change the selection status
 	 * 
@@ -221,7 +254,6 @@ public class ConfigurationEditor extends EditorPart implements
 	protected void set(SelectableFeature feature, Selection selection) {
 		configuration.setManual(feature, selection);
 	}
-
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.resources.IResourceChangeListener#resourceChanged(org.eclipse.core.resources.IResourceChangeEvent)
