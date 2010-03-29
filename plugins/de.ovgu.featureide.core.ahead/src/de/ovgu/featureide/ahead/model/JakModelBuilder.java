@@ -39,7 +39,8 @@ import featureide.core.jakprojectmodel.IField;
 import featureide.core.jakprojectmodel.IJakProjectModel;
 
 /**
- * TODO description Constanze
+ * This builder builds the JakProjectModel, by extracting features, 
+ * methods and fields from classes to build. 
  * 
  * @author Tom Brosch
  * @author Constanze Adler
