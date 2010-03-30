@@ -43,9 +43,7 @@ import featureide.core.IFeatureProject;
 import featureide.core.listeners.ICurrentBuildListener;
 import featureide.ui.UIPlugin;
 import featureide.ui.views.collaboration.action.AddClassAction;
-import featureide.ui.views.collaboration.action.AddFeatureAction;
 import featureide.ui.views.collaboration.action.DeleteClassAction;
-import featureide.ui.views.collaboration.action.DeleteFeatureAction;
 import featureide.ui.views.collaboration.action.DeleteRoleAction;
 import featureide.ui.views.collaboration.editparts.GraphicalEditPartFactory;
 import featureide.ui.views.collaboration.model.CollaborationModel;
@@ -66,9 +64,9 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	private CollaborationModel model;
 	//private ShowRoleImplementationAction showRoleAction;
 	private AddClassAction addClassAction;
-	private AddFeatureAction addFeatureAction;
+
 	private DeleteClassAction delClassAction;
-	private DeleteFeatureAction delFeatureAction;
+
 	private DeleteRoleAction delRoleAction;
 	
 	
@@ -147,10 +145,10 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		boolean isEmpty = graphicalViewer.getSelection().isEmpty();		
 	//	showRoleAction.setEnabled(!isEmpty);
 		addClassAction.setEnabled(!isEmpty);
-		addFeatureAction.setEnabled(!isEmpty);
+	
 		delRoleAction.setEnabled(!isEmpty);
 		delClassAction.setEnabled(!isEmpty);
-		delFeatureAction.setEnabled(!isEmpty);
+	
 	//	menuMgr.add(showRoleAction);
 		menuMgr.add(addClassAction);
 	//	menuMgr.add(addFeatureAction);
@@ -164,9 +162,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	private void createActions(IEditorPart part) {
 	//	showRoleAction	 = new ShowRoleImplementationAction("Role Implementation", graphicalViewer);
 		addClassAction	 = new AddClassAction("Add new Class / Role", graphicalViewer);
-		addFeatureAction = new AddFeatureAction("Add new Feture", graphicalViewer);
 		delClassAction 	 = new DeleteClassAction("Delete Class", graphicalViewer,part,model);
-		delFeatureAction = new DeleteFeatureAction("Delete Feture", graphicalViewer);
 		delRoleAction 	 = new DeleteRoleAction("Delete Role", graphicalViewer,part,model);
 	}
 
