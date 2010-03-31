@@ -30,7 +30,7 @@ import org.eclipse.ui.IWorkbench;
 import org.osgi.framework.Bundle;
 
 /**
- * TODO description Chris
+ * Class implements the Wizard for the examples.
  * 
  * @author Christian Becker
  */

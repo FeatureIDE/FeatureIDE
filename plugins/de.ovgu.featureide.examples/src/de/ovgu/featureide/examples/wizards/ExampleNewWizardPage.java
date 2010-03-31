@@ -83,7 +83,7 @@ import de.ovgu.featureide.examples.utils.RequirementCategory;
 import de.ovgu.featureide.examples.utils.ZipStructureProvider;
 
 /**
- * TODO description Chris
+ * This class represents one page of the Example Wizard.
  * 
  * @author Christian Becker
  */

@@ -23,9 +23,10 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * TODO description Chris
+ * This class holds information about categrory and requirements. 
+ * Is required for CommentParser.
  * 
- * @author Christian Becker
+ * @author Alexander Dreiling
  */
 public class RequirementCategory
 {

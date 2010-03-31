@@ -25,10 +25,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * TODO description Chris
+ * Choosing example description must be loaded through xml file and to be parsed. (@author Constanze Adler)
  * 
- * @author Christian Becker
- */
+ * @author Alexander Dreiling
+ *
+ */ 
 public class CommentParser {
 	
 	public static final String OPENTAG_BEGIN = "[";
