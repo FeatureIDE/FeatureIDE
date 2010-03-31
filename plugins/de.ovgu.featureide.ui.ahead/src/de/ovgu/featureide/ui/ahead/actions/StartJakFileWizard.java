@@ -29,7 +29,7 @@ import de.ovgu.featureide.ui.ahead.AheadUIPlugin;
 import de.ovgu.featureide.ui.ahead.wizards.NewJakFileWizard;
 
 /**
- * TODO description Chris
+ * Class starts JakFileWizard for Button in the icon bar.
  * 
  * @author Christian Becker
  */
