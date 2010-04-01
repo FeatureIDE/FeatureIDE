@@ -34,6 +34,8 @@ import mixin.MthDector;
 
 import org.eclipse.core.resources.IFile;
 
+import de.ovgu.featureide.ahead.AheadCorePlugin;
+
 import featureide.core.IFeatureProject;
 import featureide.core.jakprojectmodel.IField;
 import featureide.core.jakprojectmodel.IJakProjectModel;
@@ -92,7 +94,7 @@ public class JakModelBuilder {
 		try {
 			updateAst(currentClass, sources, composedASTs, ownASTs);
 		} catch (Throwable e) {
-			e.printStackTrace();
+			AheadCorePlugin.getDefault().logError(e);
 		}
 	}
 

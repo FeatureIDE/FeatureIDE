@@ -50,6 +50,7 @@ import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 
 import featureide.core.IFeatureProject;
 import featureide.core.launching.LayeredApplicationLaunchConfigurationDelegate;
+import featureide.ui.UIPlugin;
 
 /**
  * This class is part of the launching package. It creates the
@@ -138,7 +139,7 @@ public class LayeredApplicationMainTab extends JavaLaunchTab implements ModifyLi
 			else
 				mainClassButton.setEnabled(true);
 		} catch (CoreException e) {
-			e.printStackTrace();
+			UIPlugin.getDefault().logError(e);
 		}
 	}
 
@@ -226,7 +227,7 @@ public class LayeredApplicationMainTab extends JavaLaunchTab implements ModifyLi
 		try {
 			featureProject.getSourceFolder().accept(new MainClassVisitor(classes));
 		} catch(CoreException e) {
-			e.printStackTrace();
+			UIPlugin.getDefault().logError(e);
 		}
 		return classes;
 	}
@@ -260,7 +261,7 @@ public class LayeredApplicationMainTab extends JavaLaunchTab implements ModifyLi
 				Matcher matcher = pattern.matcher(text);
 				return matcher.find();
 			} catch (Exception e) {
-				e.printStackTrace();
+				UIPlugin.getDefault().logError(e);
 			}
 			//in case of an error better return true
 			return true;

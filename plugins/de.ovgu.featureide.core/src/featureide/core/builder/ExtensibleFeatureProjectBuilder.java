@@ -115,7 +115,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		try {
 			clean(monitor);
 		} catch (CoreException e) {
-			e.printStackTrace();
+			CorePlugin.getDefault().logError(e);
 		}
 
 		if (equation == null) {
@@ -131,7 +131,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 					IResource.DEPTH_INFINITE, monitor);
 			CorePlugin.getDefault().fireBuildUpdated(featureProject);
 		} catch (CoreException e) {
-			e.printStackTrace();
+			CorePlugin.getDefault().logError(e);
 		}
 		return null;
 	}

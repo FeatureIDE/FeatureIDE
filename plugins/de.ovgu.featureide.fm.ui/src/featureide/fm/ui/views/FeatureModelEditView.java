@@ -176,7 +176,7 @@ public class FeatureModelEditView extends ViewPart {
 						try {
 							convertModelToBitmapTest(featureModelEditor.getGrammarFile().getResource().getProject().getFolder("models"));
 						} catch (Exception e) {
-							e.printStackTrace();
+							FMUIPlugin.getDefault().logError(e);
 						}
 						return Status.OK_STATUS;
 					}
@@ -194,9 +194,9 @@ public class FeatureModelEditView extends ViewPart {
 									imageName = imageName.substring(0, imageName.length()-".m".length()) + ".png";
 									createBitmap(fm, new File(imageName));
 								} catch (FileNotFoundException e) {
-									e.printStackTrace();
+									FMUIPlugin.getDefault().logError(e);
 								} catch (UnsupportedModelException e) {
-									e.printStackTrace();
+									FMUIPlugin.getDefault().logError(e);
 								}
 							}
 						folder.refreshLocal(IResource.DEPTH_ONE, null);

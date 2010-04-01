@@ -194,7 +194,7 @@ public class JakCompletionProcessor implements IContentAssistProcessor{
 			
 			
 		} catch (BadLocationException e) {
-			e.printStackTrace();
+			AheadUIPlugin.getDefault().logError(e);
 		}
 		
 		
@@ -434,7 +434,7 @@ private List<CompletionProposal> getProposalsFromCurrentDocument(String behind, 
 				fields  = buildFields();
 				classes = buildClasses();				
 			} catch (BadLocationException e) {				
-				e.printStackTrace();
+				AheadUIPlugin.getDefault().logError(e);
 			}
 		}
 		

@@ -66,7 +66,7 @@ public class ShowRoleImplementationAction extends Action {
 		 if (page != null)
 		 page.openEditor(fileEditorInput,"featureide.ui.editors.JakEditor" );
 		 } catch (PartInitException e) {
-			 e.printStackTrace();
+			 UIPlugin.getDefault().logError(e);
 		 }
 		
 	}

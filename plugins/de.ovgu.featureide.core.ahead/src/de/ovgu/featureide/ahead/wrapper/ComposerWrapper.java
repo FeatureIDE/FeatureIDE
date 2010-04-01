@@ -39,6 +39,7 @@ import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.runtime.CoreException;
 
+import de.ovgu.featureide.ahead.AheadCorePlugin;
 import de.ovgu.featureide.ahead.model.JakModelBuilder;
 
 import featureide.core.IFeatureProject;
@@ -134,7 +135,7 @@ public class ComposerWrapper {
 							+ featureFolder.getName() + " does not exist", 0,
 							IMarker.SEVERITY_WARNING);
 			} catch (CoreException e) {
-				e.printStackTrace();
+				AheadCorePlugin.getDefault().logError(e);
 			}
 		}
 
@@ -305,7 +306,7 @@ public class ComposerWrapper {
 					}
 				}
 			} catch (CoreException e) {
-				e.printStackTrace();
+				AheadCorePlugin.getDefault().logError(e);
 			}
 		}
 	}

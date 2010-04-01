@@ -59,7 +59,7 @@ public class ModelMarkerHandler implements IModelMarkerHandler {
 				marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
 			}
 		} catch (CoreException e) {
-			e.printStackTrace();
+			FMCorePlugin.getDefault().logError(e);
 		}
 	}
 
@@ -78,7 +78,7 @@ public class ModelMarkerHandler implements IModelMarkerHandler {
 				modelFile.deleteMarkers(MODEL_MARKER, false,
 						IResource.DEPTH_ZERO);
 		} catch (CoreException e) {
-			e.printStackTrace();
+			FMCorePlugin.getDefault().logError(e);
 		}
 	}
 
@@ -96,7 +96,7 @@ public class ModelMarkerHandler implements IModelMarkerHandler {
 			return resource.findMarkers(MODEL_MARKER, false,
 					IResource.DEPTH_ZERO).length > 0;
 		} catch (CoreException e) {
-			e.printStackTrace();
+			FMCorePlugin.getDefault().logError(e);
 		}
 		return true;
 	}

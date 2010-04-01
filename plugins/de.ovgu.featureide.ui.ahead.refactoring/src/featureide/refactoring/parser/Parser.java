@@ -24,6 +24,8 @@ import java.io.RandomAccessFile;
 import java.util.LinkedList;
 import org.eclipse.core.resources.IFile;
 
+import de.ovgu.featureide.ui.ahead.AheadUIPlugin;
+
 /**
  * A parser for Jak files.
  * 
@@ -504,7 +506,7 @@ public class Parser {
 	try {
 	    raFile.close();
         } catch (IOException e) {
-	    e.printStackTrace();
+	    AheadUIPlugin.getDefault().logError(e);
         }
     }
 

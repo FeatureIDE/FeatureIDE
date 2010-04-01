@@ -39,6 +39,7 @@ import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 
 import featureide.fm.core.FMCorePlugin;
+import featureide.fm.ui.FMUIPlugin;
 
 /**
  * Opens the currently selected feature model with GUIDSL.
@@ -104,7 +105,7 @@ public class OpenWithGuidslAction implements IObjectActionDelegate {
 				execProcess("java -jar \"" + guidslJar + "\" \"" + modelfile.getLocation().toOSString() + "\"", modelfile.getParent().getLocation().toFile());
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			FMUIPlugin.getDefault().logError(e);
 		}
 	}
 	

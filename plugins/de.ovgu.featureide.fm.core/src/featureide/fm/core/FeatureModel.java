@@ -292,13 +292,27 @@ public class FeatureModel implements PropertyConstants {
 	public Collection<Feature> getFeatures() {
 		return Collections.unmodifiableCollection(featureTable.values());
 	}
-
+/*
 	public Collection<Feature> getLayers() {
 		LinkedList<Feature> layers = new LinkedList<Feature>();
 		for (Feature feature : featureTable.values())
 			if (feature.isConcrete())
 				layers.add(feature);
 		return Collections.unmodifiableCollection(layers);
+	}*/
+	private LinkedList<Feature> layers = new LinkedList<Feature>();
+	
+	public Collection<Feature> getLayers(){
+		layers.clear();
+		initFeatures(root);
+		return Collections.unmodifiableCollection(layers);
+	}
+		
+	private void initFeatures(Feature feature) {
+		if (feature.isConcrete())
+			layers.add(feature);
+		for (Feature child : feature.getChildren())
+			initFeatures(child);
 	}
 	
 	public Collection<String> getLayerNames(){
@@ -463,7 +477,7 @@ public class FeatureModel implements PropertyConstants {
 		try {
 			return !new SatSolver(new Not(finalFormula), 1000).isSatisfiable();
 		} catch (TimeoutException e) {
-			e.printStackTrace();
+			FMCorePlugin.getDefault().logError(e);
 			return false;
 		}
 	}

@@ -27,6 +27,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IEditorPart;
 
+import featureide.ui.UIPlugin;
 import featureide.ui.views.collaboration.editparts.RoleEditPart;
 import featureide.ui.views.collaboration.model.Class;
 import featureide.ui.views.collaboration.model.Collaboration;
@@ -73,7 +74,7 @@ public class DeleteRoleAction extends Action {
 			try {
 				role.getRoleFile().delete(true, part.getEditorSite().getActionBars().getStatusLineManager().getProgressMonitor() );
 			} catch (CoreException e) {
-				e.printStackTrace();
+				UIPlugin.getDefault().logError(e);
 			}
 		
 //		File f = new File(role.getPath().toOSString());

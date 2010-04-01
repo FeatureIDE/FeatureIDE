@@ -28,6 +28,8 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.runtime.CoreException;
 
+import de.ovgu.featureide.ahead.AheadCorePlugin;
+
 import featureide.core.IFeatureProject;
 
 /**
@@ -109,7 +111,7 @@ public class AheadWrapper {
 						javaFiles[i].setResourceAttributes(attr);
 					}
 				} catch (CoreException e) {
-					e.printStackTrace();
+					AheadCorePlugin.getDefault().logError(e);
 				}
 			}
 		return javaFiles;

@@ -77,7 +77,7 @@ public class ComposerExtensionProxy implements IComposerExtension {
 			composerExtensionClass = (IComposerExtensionClass) configElement
 					.createExecutableExtension("class");
 		} catch (CoreException e) {
-			e.printStackTrace();
+			CorePlugin.getDefault().logError(e);
 		}
 	}
 

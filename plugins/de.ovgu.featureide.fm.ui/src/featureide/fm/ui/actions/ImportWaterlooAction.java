@@ -40,6 +40,7 @@ import featureide.fm.core.FeatureModel;
 import featureide.fm.core.io.UnsupportedModelException;
 import featureide.fm.core.io.guidsl.FeatureModelWriter;
 import featureide.fm.core.io.waterloo.WaterlooReader;
+import featureide.fm.ui.FMUIPlugin;
 import featureide.fm.ui.editors.FeatureModelEditor;
 
 /**
@@ -100,11 +101,11 @@ public class ImportWaterlooAction implements IObjectActionDelegate {
 							featureModelEditor.updateDiagramFromTextEditor();
 						}
 					} catch (FileNotFoundException e) {
-						e.printStackTrace();
+						FMUIPlugin.getDefault().logError(e);
 					} catch (UnsupportedModelException e) {
-						e.printStackTrace();
+						FMUIPlugin.getDefault().logError(e);
 					} catch (CoreException e) {
-						e.printStackTrace();
+						FMUIPlugin.getDefault().logError(e);
 					}			
 				}
 			}

@@ -35,6 +35,8 @@ import org.eclipse.core.runtime.CoreException;
 
 import com.sun.tools.javac.Main;
 
+import de.ovgu.featureide.ahead.AheadCorePlugin;
+
 import featureide.core.IFeatureProject;
 
 /**
@@ -106,7 +108,7 @@ public class JavacWrapper {
 				if (classFile.exists())
 					classFile.setDerived(true);
 			} catch (CoreException e) {
-				e.printStackTrace();
+				AheadCorePlugin.getDefault().logError(e);
 			}
 		}
 	}

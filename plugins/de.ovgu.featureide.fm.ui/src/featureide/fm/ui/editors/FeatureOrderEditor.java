@@ -23,27 +23,28 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Collection;
-import java.util.Scanner;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Scanner;
 
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.SWT;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.List;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
-import org.eclipse.swt.widgets.List;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Label;
 
-import featureide.fm.core.Feature;
 import featureide.fm.core.FeatureModel;
+import featureide.fm.ui.FMUIPlugin;
 
 /**
  * Additional editor page for the feature model editor. In this editor the order
@@ -60,6 +61,8 @@ public class FeatureOrderEditor extends EditorPart {
 	private Button up = null;
 
 	private Button down = null;
+	
+	private Button defaultButton = null;
 
 	private Button activate = null;
 
@@ -85,12 +88,11 @@ public class FeatureOrderEditor extends EditorPart {
 	 */
 	@Override
 	public void doSave(IProgressMonitor monitor) {
-
 		writeFeaturestoOrderFile();
 		dirty = false;
 		firePropertyChange(IEditorPart.PROP_DIRTY);
 	}
-
+	
 	public IEditorSite getSite() {
 		return site;
 	}
@@ -133,11 +135,7 @@ public class FeatureOrderEditor extends EditorPart {
 		if (list == null) {
 			activate.setSelection(false);
 			enableUI(false);
-			for (Feature ft : featureModel.getFeatures()) {
-				if (ft.isLayer())
-					featurelist.add(ft.getName());
-				
-			}
+			defaultFeatureList();
 			writeFeaturestoOrderFile();
 		} else {
 			activate.setSelection(true);
@@ -146,19 +144,38 @@ public class FeatureOrderEditor extends EditorPart {
 				featurelist.add(str);
 			}
 		}
-		
-		
 	}
-	
-	public void updateOrderEditor(Collection<Feature> features) {
-		featurelist.removeAll();
+
+	public void updateOrderEditor(boolean save) {
+		boolean changed = false;
+		Collection<String> newFeatureNames = featureModel.getLayerNames();
+		LinkedList<String> oldFeatureNames =  new LinkedList<String>();
 		
-		for (Feature ft : features) {
-			if (ft.isLayer())
-				featurelist.add(ft.getName());
-			
+		for (int i = 0;i < featurelist.getItemCount();i++)
+			oldFeatureNames.add(featurelist.getItem(i));
+		
+		//Layer removed
+		for (String oldFeature : oldFeatureNames)
+			if(!(newFeatureNames.contains(oldFeature))){
+				featurelist.remove(oldFeature);
+				changed = true;
+			}
+		//Layer added
+		for (String newFeature : newFeatureNames)
+			if(!(oldFeatureNames.contains(newFeature))){
+				featurelist.add(newFeature);
+				changed = true;
+			}
+		
+		if (activate.getSelection() && changed && !save){
+			dirty = true;
+			firePropertyChange(IEditorPart.PROP_DIRTY);
 		}
-		writeFeaturestoOrderFile();
+		if(save){
+			writeFeaturestoOrderFile();
+			dirty = false;
+			this.firePropertyChange(IEditorPart.PROP_DIRTY);
+		}	
 	}
 
 	/*
@@ -180,22 +197,20 @@ public class FeatureOrderEditor extends EditorPart {
 		label1.setText("User-defined feature order");
 
 		activate = new Button(comp, SWT.CHECK);
-		activate
-				.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
-					public void widgetSelected(
-							org.eclipse.swt.events.SelectionEvent e) {
-						boolean selection = activate.getSelection();
-						enableUI(selection);
-						dirty = true;
-						firePropertyChange(EditorPart.PROP_DIRTY);
-					}
-				});
+		activate.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
+			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
+				boolean selection = activate.getSelection();
+				enableUI(selection);
+				dirty = true;
+				firePropertyChange(EditorPart.PROP_DIRTY);
+			}
+		});
 
 		featurelist = new List(comp, SWT.NONE | SWT.BORDER | SWT.V_SCROLL);
 		gridData = new GridData(GridData.FILL_BOTH);
 		gridData.horizontalSpan = 2;
 		gridData.grabExcessHorizontalSpace = true;
-		gridData.verticalSpan = 3;
+		gridData.verticalSpan = 4;
 		gridData.grabExcessVerticalSpace = true;
 		featurelist.setLayoutData(gridData);
 		featurelist.setEnabled(false);
@@ -216,46 +231,53 @@ public class FeatureOrderEditor extends EditorPart {
 					featurelist.setSelection(focus - 1);
 					dirty = true;
 					firePropertyChange(EditorPart.PROP_DIRTY);
-
 				}
 			}
 		});
-		;
+		
 		down = new Button(comp, SWT.NONE);
 		down.setText("Down");
 		down.setLayoutData(gridData);
 		down.setEnabled(false);
-		down
-				.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
-					public void widgetSelected(
-							org.eclipse.swt.events.SelectionEvent e) {
-						int focus = featurelist.getFocusIndex();
-						if (focus != featurelist.getItemCount() - 1) { // Last
-																		// Element
-																		// is
-																		// selected,
-																		// no
-																		// change
-							String temp = featurelist.getItem(focus + 1);
-							featurelist.setItem(focus + 1, featurelist
-									.getItem(focus));
-							featurelist.setItem(focus, temp);
-							featurelist.setSelection(focus + 1);
-							dirty = true;
-							firePropertyChange(PROP_DIRTY);
-
-						}
-					}
-					// }
-				});
+		down.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
+			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
+				int focus = featurelist.getFocusIndex();
+				if (focus != featurelist.getItemCount() - 1) {
+					String temp = featurelist.getItem(focus + 1);
+					featurelist.setItem(focus + 1, featurelist
+							.getItem(focus));
+					featurelist.setItem(focus, temp);
+					featurelist.setSelection(focus + 1);
+					dirty = true;
+					firePropertyChange(PROP_DIRTY);
+				}
+			}
+		});
+		
+		defaultButton = new Button(comp, SWT.NONE);
+		defaultButton.setText("default");
+		defaultButton.setLayoutData(gridData);
+		defaultButton.setEnabled(false);
+		defaultButton.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
+			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
+				defaultFeatureList();
+				dirty = true;
+				firePropertyChange(PROP_DIRTY);
+			}
+		});
 	}
 
+	private void defaultFeatureList(){
+		featurelist.removeAll();
+		for (String featureName :featureModel.getLayerNames())
+			featurelist.add(featureName);
+	}	
+	
 	/**
 	 * Write the order of the features in the .order file in the feature project
 	 * directory
 	 */
-
-	public void writeFeaturestoOrderFile() {
+		public void writeFeaturestoOrderFile() {
 
 		File file = ((IFile) input.getAdapter(IFile.class)).getProject()
 				.getLocation().toFile();
@@ -273,7 +295,7 @@ public class FeatureOrderEditor extends EditorPart {
 			fw.close();
 		} catch (IOException e) {
 
-			e.printStackTrace();
+			FMUIPlugin.getDefault().logError(e);
 		}
 	}
 /*
@@ -287,7 +309,7 @@ public class FeatureOrderEditor extends EditorPart {
 			scanner = new Scanner(file);
 		} catch (FileNotFoundException e) {
 
-			e.printStackTrace();
+			FMUIPlugin.getDefault().logError(e);
 		}
 		while (scanner.hasNext()) {
 			featurelist.add(scanner.next());
@@ -311,7 +333,7 @@ public class FeatureOrderEditor extends EditorPart {
 				scanner = new Scanner(file);
 			} catch (FileNotFoundException e) {
 				System.out.println("Problem to open the order file");
-				e.printStackTrace();
+				FMUIPlugin.getDefault().logError(e);
 			}
 			if (scanner.hasNext() && scanner.next().equals("true")) {
 				list = new ArrayList<String>();
@@ -326,7 +348,7 @@ public class FeatureOrderEditor extends EditorPart {
 			try {
 				file.createNewFile();
 			} catch (IOException e) {
-				e.printStackTrace();
+				FMUIPlugin.getDefault().logError(e);
 			}
 			return null;
 		}
@@ -360,6 +382,7 @@ public class FeatureOrderEditor extends EditorPart {
 		featurelist.setEnabled(selection);
 		up.setEnabled(selection);
 		down.setEnabled(selection);
+		defaultButton.setEnabled(selection);
 	}
 
 }

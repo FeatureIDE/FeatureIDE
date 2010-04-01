@@ -76,7 +76,7 @@ public class AheadBuildErrorEvent {
 			calculateJakLine();
 		} catch (Exception e) {
 			//if calculation failes the error will be at the old position
-			e.printStackTrace();
+			AheadCorePlugin.getDefault().logError(e);
 		}
 	}
 

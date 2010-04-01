@@ -39,6 +39,7 @@ import featureide.fm.core.FeatureModel;
 import featureide.fm.core.io.UnsupportedModelException;
 import featureide.fm.core.io.guidsl.FeatureModelReader;
 import featureide.fm.core.io.waterloo.WaterlooWriter;
+import featureide.fm.ui.FMUIPlugin;
 
 /**
  * Converts a feature model file into the Waterloo format.
@@ -80,11 +81,11 @@ public class ExportWaterlooAction implements IObjectActionDelegate {
 						inputFile.getProject().refreshLocal(
 								IResource.DEPTH_INFINITE, null);  
 					} catch (FileNotFoundException e) {
-						e.printStackTrace();
+						FMUIPlugin.getDefault().logError(e);
 					} catch (UnsupportedModelException e) {
-						e.printStackTrace();
+						FMUIPlugin.getDefault().logError(e);
 					} catch (CoreException e) {
-						e.printStackTrace();
+						FMUIPlugin.getDefault().logError(e);
 					}				
 				}
 			}

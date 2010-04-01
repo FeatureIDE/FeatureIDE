@@ -42,6 +42,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import featureide.fm.core.FMCorePlugin;
 import featureide.fm.core.Feature;
 import featureide.fm.core.FeatureModel;
 import featureide.fm.core.io.AbstractFeatureModelReader;
@@ -291,7 +292,7 @@ public class WaterlooReader extends AbstractFeatureModelReader {
     		
     		handleArbitrayCardinality(arbCardGroupFeats);
 		} catch (IOException e) {
-			e.printStackTrace();
+			FMCorePlugin.getDefault().logError(e);
 		}
     }
     
@@ -452,7 +453,7 @@ public class WaterlooReader extends AbstractFeatureModelReader {
     			line++;
     		}
     	} catch (IOException e) {
-			e.printStackTrace();
+    		FMCorePlugin.getDefault().logError(e);
 		}
     }
     

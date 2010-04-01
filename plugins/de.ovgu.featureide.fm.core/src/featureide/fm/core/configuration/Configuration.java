@@ -31,6 +31,7 @@ import org.prop4j.Node;
 import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
+import featureide.fm.core.FMCorePlugin;
 import featureide.fm.core.Feature;
 import featureide.fm.core.FeatureModel;
 import featureide.fm.core.editing.NodeCreator;
@@ -166,7 +167,7 @@ public class Configuration {
 					feature.setAutomatic(feature.getManual());
 				}
 			} catch (TimeoutException e) {
-				e.printStackTrace();
+				FMCorePlugin.getDefault().logError(e);
 			}
 			literal.positive = !literal.positive;
 		}

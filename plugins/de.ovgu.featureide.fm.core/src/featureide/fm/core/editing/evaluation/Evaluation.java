@@ -28,6 +28,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.sat4j.specs.TimeoutException;
 
+import featureide.fm.core.FMCorePlugin;
 import featureide.fm.core.FeatureModel;
 import featureide.fm.core.editing.Comparison;
 import featureide.fm.core.editing.ModelComparator;
@@ -75,7 +76,7 @@ public class Evaluation {
 			System.out.println("########## Evaluation End (" + Generator.getTimeString(dur) + ")");
 			out.close();
 		} catch (Exception e) {
-			e.printStackTrace();
+			FMCorePlugin.getDefault().logError(e);
 		}
 	}
 
@@ -171,12 +172,12 @@ public class Evaluation {
 									out.println();
 									out.flush();
 								} catch (Exception e) {
-									e.printStackTrace();
+									FMCorePlugin.getDefault().logError(e);
 								}
 							}
 						}
 					} catch (Exception e) {
-						e.printStackTrace();
+						FMCorePlugin.getDefault().logError(e);
 					}
 				}
 			}
@@ -206,7 +207,7 @@ public class Evaluation {
 						reader.readFromFile(file);
 						valid = fmout.isValid();
 					} catch (Exception e) {
-						e.printStackTrace();
+						FMCorePlugin.getDefault().logError(e);
 					}
 					if (!valid) {
 						out.println(file + " deleted");
@@ -237,7 +238,7 @@ public class Evaluation {
 						valid = fm.isValid();
 						output = "" + valid;
 					} catch (Exception e) {
-						e.printStackTrace();
+						FMCorePlugin.getDefault().logError(e);
 						output = e.toString();
 					}
 					output = size + "\t" + id + "\t" + output;
@@ -251,13 +252,13 @@ public class Evaluation {
 						try {
 							System.out.println(fm.isValid());
 						} catch (TimeoutException e) {
-							e.printStackTrace();
+							FMCorePlugin.getDefault().logError(e);
 						}
 						IFeatureModelWriter writer = new FeatureModelWriter(fm);
 						try {
 							writer.writeToFile(file);
 						} catch (CoreException e) {
-							e.printStackTrace();
+							FMCorePlugin.getDefault().logError(e);
 						}
 					}
 				} while (!valid);

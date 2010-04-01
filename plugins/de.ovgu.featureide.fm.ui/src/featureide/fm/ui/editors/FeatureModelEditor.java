@@ -90,6 +90,7 @@ import featureide.fm.core.io.UnsupportedModelException;
 import featureide.fm.core.io.guidsl.FeatureModelReader;
 import featureide.fm.core.io.guidsl.FeatureModelWriter;
 import featureide.fm.core.io.xml.XmlFeatureModelWriter;
+import featureide.fm.ui.FMUIPlugin;
 import featureide.fm.ui.editors.featuremodel.FeatureModelEditorContributor;
 import featureide.fm.ui.editors.featuremodel.GEFImageWriter;
 import featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -237,7 +238,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 			featureOrderEditor.initOrderEditor();
 		} catch (PartInitException e) {
 			
-			e.printStackTrace();
+			FMUIPlugin.getDefault().logError(e);
 		}
 		;
 	}
@@ -267,7 +268,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 			textEditorIndex = addPage(textEditor, getEditorInput());
 			setPageText(textEditorIndex, "Source");
 		} catch (PartInitException e) {
-			e.printStackTrace();
+			FMUIPlugin.getDefault().logError(e);
 		}
 	}
 
@@ -459,7 +460,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 				
 				if (isPageModified){
 					updateTextEditorFromDiagram();
-					featureOrderEditor.updateOrderEditor(featureModel.getFeatures());
+					featureOrderEditor.updateOrderEditor(false);
 				}
 			}else if (oldPage == newPageIndex){
 				updateDiagramFromTextEditor();
@@ -482,7 +483,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 						setActivePage(textEditorIndex);
 						return;
 					}else
-						featureOrderEditor.updateOrderEditor(featureModel.getFeatures());
+						featureOrderEditor.updateOrderEditor(false);
 					}
 			}
 		}else if (oldPage == featureOrderEditorIndex){
@@ -521,7 +522,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 
 	@Override
 	public void doSave(IProgressMonitor monitor) {
-	
+		featureOrderEditor.updateOrderEditor(true);
 		if (getActivePage() == graphicalViewerIndex && isPageModified) {
 			updateTextEditorFromDiagram();
 			setActivePage(textEditorIndex);
@@ -545,8 +546,9 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 			new FeatureModelReader(originalFeatureModel)
 					.readFromFile(grammarFile.getResource());
 		} catch (Exception e) {
-			e.printStackTrace();
+			FMUIPlugin.getDefault().logError(e);
 		}
+		featureOrderEditor.updateOrderEditor(true);
 	}
 
 	@Override
@@ -602,7 +604,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 			updateTextEditorFromDiagram();
 			//updateDiagramFromTextEditor();
 			refreshGraphicalViewer();
-			featureOrderEditor.updateOrderEditor(featureModel.getFeatures());
+			featureOrderEditor.updateOrderEditor(false);
 			isPageModified = true;
 			
 			firePropertyChange(PROP_DIRTY);
@@ -701,7 +703,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 				try {
 					docDelta.accept(visitor);
 				} catch (CoreException e) {
-					e.printStackTrace();
+					FMUIPlugin.getDefault().logError(e);
 				}
 			}
 			if (deletedlist.size() > 0 && deletedlist.contains(jmolfile)) {

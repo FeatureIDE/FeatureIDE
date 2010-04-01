@@ -48,7 +48,9 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.progress.UIJob;
@@ -68,7 +70,7 @@ import featureide.fm.ui.editors.configuration.ConfigurationLabelProvider;
 import featureide.ui.UIPlugin;
 
 /**
- * ConfiguratonEitor displays the Equation File. 
+ * ConfiguratonEitor displays the Equation File.
  * 
  * @author Constanze Adler
  * @author Christian Becker
@@ -83,11 +85,11 @@ public class ConfigurationEditor extends EditorPart implements
 	private Configuration configuration;
 
 	private boolean dirty = false;
-	
+
 	private boolean closeEditor;
-	
+
 	private IFile file;
-	
+
 	private FeatureModel featureModel;
 
 	private IDoubleClickListener listener = new IDoubleClickListener() {
@@ -102,6 +104,25 @@ public class ConfigurationEditor extends EditorPart implements
 		}
 	};
 
+	private IPartListener iPartListener = new IPartListener() {
+		@Override
+		public void partBroughtToTop(IWorkbenchPart part) {
+		}
+		@Override
+		public void partClosed(IWorkbenchPart part) {
+			featureModel.removeListener(ConfigurationEditor.this);
+		}
+		@Override
+		public void partDeactivated(IWorkbenchPart part) {
+		}
+		@Override
+		public void partOpened(IWorkbenchPart part) {
+		}
+		@Override
+		public void partActivated(IWorkbenchPart part) {
+		}
+	};
+
 	@Override
 	public void doSave(IProgressMonitor monitor) {
 		try {
@@ -109,14 +130,15 @@ public class ConfigurationEditor extends EditorPart implements
 			dirty = false;
 			firePropertyChange(IEditorPart.PROP_DIRTY);
 		} catch (CoreException e) {
-			e.printStackTrace();
+			UIPlugin.getDefault().logError(e);
 		}
+		UIPlugin.getDefault().logInfo("Configuration " + file.getFullPath() + " changed");
 	}
 
 	@Override
 	public void doSaveAs() {
 	}
-	
+
 	@Override
 	public void init(IEditorSite site, IEditorInput input)
 			throws PartInitException {
@@ -126,7 +148,7 @@ public class ConfigurationEditor extends EditorPart implements
 		file = (IFile) input.getAdapter(IFile.class);
 		IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
 		featureModel = featureProject.getFeatureModel();
-		configuration = new Configuration(featureModel,true);
+		configuration = new Configuration(featureModel, true);
 		try {
 			dirty = !new ConfigurationReader(configuration).readFromFile(file);
 			if (!dirty)
@@ -134,8 +156,10 @@ public class ConfigurationEditor extends EditorPart implements
 		} catch (Exception e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
+		getSite().getPage().addPartListener(iPartListener);
+
 		UIPlugin.getDefault().logInfo("file: " + file);
-		setPartName(file.getName());		
+		setPartName(file.getName());
 		featureModel.addListener(this);
 		firePropertyChange(IEditorPart.PROP_DIRTY);
 	}
@@ -155,7 +179,7 @@ public class ConfigurationEditor extends EditorPart implements
 		viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		viewer.addDoubleClickListener(listener);
 		viewer.getTree().addKeyListener(new KeyListener() {
-			
+
 			public void keyPressed(KeyEvent e) {
 				if (e.character == ' ') {
 					if (viewer.getSelection() instanceof ITreeSelection) {
@@ -170,7 +194,6 @@ public class ConfigurationEditor extends EditorPart implements
 				}
 			}
 
-			
 			public void keyReleased(KeyEvent e) {
 
 			}
@@ -194,7 +217,7 @@ public class ConfigurationEditor extends EditorPart implements
 	 */
 
 	public void propertyChange(PropertyChangeEvent evt) {
-		UIJob job = new UIJob("refresh tree") {
+			UIJob job = new UIJob("refresh tree") {
 				@Override
 				public IStatus runInUIThread(IProgressMonitor monitor) {
 					refreshTree();
@@ -204,8 +227,8 @@ public class ConfigurationEditor extends EditorPart implements
 			job.setPriority(Job.SHORT);
 			job.schedule();
 	}
- 
-	private void refreshTree(){
+
+	private void refreshTree() {
 		setConfiguration();
 		viewer.setContentProvider(new ConfigurationContentProvider());
 		viewer.setLabelProvider(new ConfigurationLabelProvider());
@@ -214,24 +237,26 @@ public class ConfigurationEditor extends EditorPart implements
 		viewer.refresh();
 	}
 
-	private void setConfiguration(){
+	private void setConfiguration() {
 		IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
 		featureModel = featureProject.getFeatureModel();
 		String text = new ConfigurationWriter(configuration).writeIntoString();
-		configuration = new Configuration(featureModel,true);
-		boolean wasDirty = dirty;
+		configuration = new Configuration(featureModel, true);
 		try {
-			dirty = !new ConfigurationReader(configuration).readFromString(text);
+			dirty = !new ConfigurationReader(configuration)
+					.readFromString(text);
 			if (!dirty)
 				dirty = !configuration.validManually();
 		} catch (Exception e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
-		dirty = wasDirty;
+		dirty = true;
+		firePropertyChange(IEditorPart.PROP_DIRTY);
 	}
+
 	/**
 	 * @param The feature which change the selection status
-	 * 
+	 *            
 	 */
 	protected void changeSelection(SelectableFeature feature) {
 		if (feature.getAutomatic() == Selection.UNDEFINED) {
@@ -254,97 +279,101 @@ public class ConfigurationEditor extends EditorPart implements
 	protected void set(SelectableFeature feature, Selection selection) {
 		configuration.setManual(feature, selection);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.resources.IResourceChangeListener#resourceChanged(org.eclipse.core.resources.IResourceChangeEvent)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.core.resources.IResourceChangeListener#resourceChanged(org
+	 * .eclipse.core.resources.IResourceChangeEvent)
 	 */
 	public void resourceChanged(IResourceChangeEvent event) {
-		if (event.getResource() == null) return;
+		if (event.getResource() == null)
+			return;
 		if (event.getResource().getType() == IResource.PROJECT)
-			 closeEditor = true;
-		final IEditorInput input=getEditorInput();
-		if (!( input instanceof IFileEditorInput ))
-		           return;
-		final IFile jmolfile=((IFileEditorInput)input).getFile();
-		 
+			closeEditor = true;
+		final IEditorInput input = getEditorInput();
+		if (!(input instanceof IFileEditorInput))
+			return;
+		final IFile jmolfile = ((IFileEditorInput) input).getFile();
+
 		/*
-	     * Closes editor if resource is deleted
-	      */
-	       if ((event.getType() == IResourceChangeEvent.POST_CHANGE) && closeEditor) {
-	          IResourceDelta rootDelta = event.getDelta();
-	           //get the delta, if any, for the documentation directory
-	           
-	           final List<IResource> deletedlist = new ArrayList<IResource>();
-	           
-	           IResourceDelta docDelta = rootDelta.findMember(jmolfile.getFullPath());
-	           if (docDelta != null){
-	               IResourceDeltaVisitor visitor = new IResourceDeltaVisitor() {
-	                   public boolean visit(IResourceDelta delta) {
-	                      //only interested in removal changes
-	                      if (((delta.getFlags() & IResourceDelta.REMOVED) == 0) && closeEditor){
-	                          deletedlist.add( delta.getResource() );
-	                      }
-	                      return true;
-	                   }
-	                };
-	                
-	                try {
-						docDelta.accept(visitor);
-					} catch (CoreException e) {
-						e.printStackTrace();
+		 * Closes editor if resource is deleted
+		 */
+		if ((event.getType() == IResourceChangeEvent.POST_CHANGE)
+				&& closeEditor) {
+			IResourceDelta rootDelta = event.getDelta();
+			// get the delta, if any, for the documentation directory
+
+			final List<IResource> deletedlist = new ArrayList<IResource>();
+
+			IResourceDelta docDelta = rootDelta.findMember(jmolfile
+					.getFullPath());
+			if (docDelta != null) {
+				IResourceDeltaVisitor visitor = new IResourceDeltaVisitor() {
+					public boolean visit(IResourceDelta delta) {
+						// only interested in removal changes
+						if (((delta.getFlags() & IResourceDelta.REMOVED) == 0)
+								&& closeEditor) {
+							deletedlist.add(delta.getResource());
+						}
+						return true;
 					}
-	                
-	           }
-	               
-	           if (deletedlist.size()>0 && deletedlist.contains( jmolfile )){
-	        	   Display.getDefault().asyncExec(new Runnable() {
-	                   public void run() {
-	                       if (getSite()==null) 
-	                           return;
-	                       if (getSite().getWorkbenchWindow()==null) 
-	                           return;
-	                       
-	                       IWorkbenchPage[] pages = getSite().getWorkbenchWindow()
-	                                                         .getPages();
-	                     
-	                       for (int i = 0; i<pages.length; i++) {
-	                               IEditorPart editorPart
-	                                 = pages[i].findEditor(input);
-	                               pages[i].closeEditor(editorPart,true);
-	                       }
-	                   }
-	               });
-	           }
-	           
+				};
 
-	           
-	       }
+				try {
+					docDelta.accept(visitor);
+				} catch (CoreException e) {
+					UIPlugin.getDefault().logError(e);
+				}
 
-	       /*
-	        * Closes all editors with this editor input on project close.
-	        */
+			}
 
-		 
-		 final IResource res = event.getResource();
-		 if ((event.getType() == IResourceChangeEvent.PRE_CLOSE ) || closeEditor) {
-			 Display.getDefault().asyncExec(new Runnable() {
-				 public void run() {
-					 if (getSite()==null)
-						 return;
-					 if (getSite().getWorkbenchWindow()==null)
-						 return;
-					 IWorkbenchPage[] pages = getSite().getWorkbenchWindow().getPages();
-					 for (int i = 0; i<pages.length; i++) {
-						 if ( jmolfile.getProject().equals( res )) {
-							 IEditorPart editorPart = pages[i].findEditor(input);
-							 pages[i].closeEditor(editorPart,true);
-		                 }
-					 }
-				 }
-			 });
-		 }
+			if (deletedlist.size() > 0 && deletedlist.contains(jmolfile)) {
+				Display.getDefault().asyncExec(new Runnable() {
+					public void run() {
+						if (getSite() == null)
+							return;
+						if (getSite().getWorkbenchWindow() == null)
+							return;
 
-	
-		
+						IWorkbenchPage[] pages = getSite().getWorkbenchWindow()
+								.getPages();
+
+						for (int i = 0; i < pages.length; i++) {
+							IEditorPart editorPart = pages[i].findEditor(input);
+							pages[i].closeEditor(editorPart, true);
+						}
+					}
+				});
+			}
+
+		}
+
+		/*
+		 * Closes all editors with this editor input on project close.
+		 */
+
+		final IResource res = event.getResource();
+		if ((event.getType() == IResourceChangeEvent.PRE_CLOSE) || closeEditor) {
+
+			Display.getDefault().asyncExec(new Runnable() {
+				public void run() {
+					if (getSite() == null)
+						return;
+					if (getSite().getWorkbenchWindow() == null)
+						return;
+					IWorkbenchPage[] pages = getSite().getWorkbenchWindow()
+							.getPages();
+					for (int i = 0; i < pages.length; i++) {
+						if (jmolfile.getProject().equals(res)) {
+							IEditorPart editorPart = pages[i].findEditor(input);
+							pages[i].closeEditor(editorPart, true);
+						}
+					}
+				}
+			});
+		}
+
 	}
 }

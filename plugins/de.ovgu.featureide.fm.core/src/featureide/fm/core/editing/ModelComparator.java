@@ -31,6 +31,7 @@ import org.prop4j.Or;
 import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
+import featureide.fm.core.FMCorePlugin;
 import featureide.fm.core.Feature;
 import featureide.fm.core.FeatureModel;
 import featureide.fm.core.configuration.Configuration;
@@ -130,7 +131,7 @@ public class ModelComparator {
 		} catch (TimeoutException e) {
 			result = Comparison.TIMEOUT;
 		} catch (Exception e) {
-			e.printStackTrace();
+			FMCorePlugin.getDefault().logError(e);
 			result = Comparison.ERROR;
 		}
 		return result;

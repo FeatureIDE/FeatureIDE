@@ -32,6 +32,7 @@ import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 import featureide.core.CorePlugin;
 import featureide.core.IFeatureProject;
 import featureide.core.listeners.ICurrentEquationListener;
+import featureide.ui.UIPlugin;
 
 /**
  * A decorator that marks the equation files that is selected for building.
@@ -91,7 +92,7 @@ public class ActiveEquationDecorator implements ILightweightLabelDecorator, ICur
 		try {
 			refresh(data.getEquationFolder().members());
 		} catch (CoreException e) {
-			e.printStackTrace();
+			UIPlugin.getDefault().logError(e);
 		}
 	}
 

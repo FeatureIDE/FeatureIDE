@@ -37,6 +37,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import featureide.fm.core.FMCorePlugin;
 import featureide.fm.core.Feature;
 import featureide.fm.core.FeatureModel;
 import featureide.fm.core.io.AbstractFeatureModelReader;
@@ -220,7 +221,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
     				org.prop4j.Node propNode = buildPropNode(elements);
     				featureModel.addPropositionalNode(propNode);
 				} catch (UnsupportedModelException e) {
-					e.printStackTrace();
+					FMCorePlugin.getDefault().logError(e);
 				}
     		}
     	}

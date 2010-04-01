@@ -36,6 +36,7 @@ import org.eclipse.ui.IFileEditorInput;
 
 import featureide.core.CorePlugin;
 import featureide.core.IFeatureProject;
+import featureide.ui.UIPlugin;
 
 public class LayeredApplicationShortcut implements ILaunchShortcut {
 
@@ -69,7 +70,7 @@ public class LayeredApplicationShortcut implements ILaunchShortcut {
 		try {
 			config.launch(mode, null);
 		} catch (CoreException e) {
-			e.printStackTrace();
+			UIPlugin.getDefault().logError(e);
 		}
 	}
 
@@ -83,7 +84,7 @@ public class LayeredApplicationShortcut implements ILaunchShortcut {
 			wc.setMappedResources(new IResource[] {project});
 			config = wc.doSave();		
 		} catch (CoreException e) {
-			e.printStackTrace();			
+			UIPlugin.getDefault().logError(e);			
 		}
 		return config;
 	}
@@ -103,7 +104,7 @@ public class LayeredApplicationShortcut implements ILaunchShortcut {
 //            	config.launch(mode, null);
 //            }
 //        } catch (CoreException e) {
-//            e.printStackTrace();
+//            UIPlugin.getDefault().logError(e);
 //        }
 //    }
 

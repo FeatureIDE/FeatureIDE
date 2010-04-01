@@ -27,6 +27,7 @@ import java.io.InputStream;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 
+import featureide.fm.core.FMCorePlugin;
 import featureide.fm.core.FeatureModel;
 
 /**
@@ -67,7 +68,7 @@ public abstract class AbstractFeatureModelWriter implements IFeatureModelWriter 
 			output.flush();
 			output.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			FMCorePlugin.getDefault().logError(e);
 		}
 	}
 	

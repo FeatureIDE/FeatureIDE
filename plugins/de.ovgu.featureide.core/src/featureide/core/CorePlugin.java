@@ -111,7 +111,7 @@ public class CorePlugin extends AbstractCorePlugin {
 						addProject(project);
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
+				CorePlugin.getDefault().logError(e);
 			}
 		}
 		listener = new ProjectChangeListener();
@@ -272,7 +272,7 @@ public class CorePlugin extends AbstractCorePlugin {
 			if (!folder.exists())
 				folder.create(false, true, null);
 		} catch (CoreException e) {
-			e.printStackTrace();
+			CorePlugin.getDefault().logError(e);
 		}
 		return folder;
 	}

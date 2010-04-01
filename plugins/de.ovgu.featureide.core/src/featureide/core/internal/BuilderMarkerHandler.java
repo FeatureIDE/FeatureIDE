@@ -58,7 +58,7 @@ public class BuilderMarkerHandler implements IBuilderMarkerHandler {
 			try {
 				resource.refreshLocal(IResource.DEPTH_ZERO, null);
 			} catch (CoreException e) {
-				e.printStackTrace();
+				CorePlugin.getDefault().logError(e);
 			}
 		} else
 			resource = project;
@@ -73,7 +73,7 @@ public class BuilderMarkerHandler implements IBuilderMarkerHandler {
 			marker.setAttribute(IMarker.SEVERITY, severity);
 			marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
 		} catch (CoreException e) {
-			e.printStackTrace();
+			CorePlugin.getDefault().logError(e);
 		}
 	}
 
@@ -92,7 +92,7 @@ public class BuilderMarkerHandler implements IBuilderMarkerHandler {
 				}
 			}
 		} catch (CoreException e) {
-			e.printStackTrace();
+			CorePlugin.getDefault().logError(e);
 		}
 	}
 
@@ -106,7 +106,7 @@ public class BuilderMarkerHandler implements IBuilderMarkerHandler {
 		try {
 			resource.deleteMarkers(BUILDER_MARKER, false, depth);
 		} catch (CoreException e) {
-			e.printStackTrace();
+			CorePlugin.getDefault().logError(e);
 		}
 	}
 
@@ -116,7 +116,7 @@ public class BuilderMarkerHandler implements IBuilderMarkerHandler {
 		try {
 			resource.refreshLocal(IResource.DEPTH_ZERO, null);
 		} catch (CoreException e) {
-			e.printStackTrace();
+			CorePlugin.getDefault().logError(e);
 		}
 
 		try {
@@ -124,7 +124,7 @@ public class BuilderMarkerHandler implements IBuilderMarkerHandler {
 			marker.setAttribute(IMarker.MESSAGE, message);
 			marker.setAttribute(IMarker.SEVERITY, severity);
 		} catch (CoreException e) {
-			e.printStackTrace();
+			CorePlugin.getDefault().logError(e);
 		}
 	}
 
@@ -132,7 +132,7 @@ public class BuilderMarkerHandler implements IBuilderMarkerHandler {
 		try {
 			resource.deleteMarkers(CONFIGURATION_MARKER, false, depth);
 		} catch (CoreException e) {
-			e.printStackTrace();
+			CorePlugin.getDefault().logError(e);
 		}
 	}
 }

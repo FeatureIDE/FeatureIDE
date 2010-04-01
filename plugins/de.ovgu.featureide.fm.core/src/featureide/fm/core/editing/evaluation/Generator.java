@@ -32,6 +32,7 @@ import org.prop4j.Not;
 import org.prop4j.Or;
 import org.sat4j.specs.TimeoutException;
 
+import featureide.fm.core.FMCorePlugin;
 import featureide.fm.core.Feature;
 import featureide.fm.core.FeatureModel;
 
@@ -88,7 +89,7 @@ public abstract class Generator {
 			if (!valid)
 				System.err.println("Feature model not valid!");
 		} catch (TimeoutException e) {
-			e.printStackTrace();
+			FMCorePlugin.getDefault().logError(e);
 		}
 		Object[] names = fm.getOldFeatureNames().toArray();
 		int k = 0;
@@ -303,7 +304,7 @@ public abstract class Generator {
 		try {
 			valid = originalFM.isValid();
 		} catch (TimeoutException e) {
-			e.printStackTrace();
+			FMCorePlugin.getDefault().logError(e);
 		}
 		FeatureModel fm = (FeatureModel) originalFM.clone();
 		Random random = new Random(id);
@@ -403,7 +404,7 @@ public abstract class Generator {
 					i--;
 				}
 			} catch (TimeoutException e) {
-				e.printStackTrace();
+				FMCorePlugin.getDefault().logError(e);
 			}
 		}
 		return fm;

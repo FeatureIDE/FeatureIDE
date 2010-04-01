@@ -40,6 +40,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import featureide.fm.core.FMCorePlugin;
 import featureide.fm.core.Feature;
 import featureide.fm.core.FeatureModel;
 import featureide.fm.core.io.AbstractFeatureModelWriter;
@@ -89,9 +90,9 @@ public class WaterlooWriter extends AbstractFeatureModelWriter {
 		try {
 			transfo = TransformerFactory.newInstance().newTransformer();
 		} catch (TransformerConfigurationException e) {
-			e.printStackTrace();
+			FMCorePlugin.getDefault().logError(e);
 		} catch (TransformerFactoryConfigurationError e) {
-			e.printStackTrace();
+			FMCorePlugin.getDefault().logError(e);
 		}
 		transfo.setOutputProperty(OutputKeys.METHOD, "xml");
 		transfo.setOutputProperty(OutputKeys.INDENT, "yes");
@@ -101,7 +102,7 @@ public class WaterlooWriter extends AbstractFeatureModelWriter {
 		try {
 			transfo.transform(source, result);
 		} catch (TransformerException e) {
-			e.printStackTrace();
+			FMCorePlugin.getDefault().logError(e);
 		}
 		return result.getWriter().toString();
 	}

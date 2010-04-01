@@ -39,6 +39,7 @@ import featureide.fm.core.FeatureModel;
 import featureide.fm.core.io.UnsupportedModelException;
 import featureide.fm.core.io.guidsl.FeatureModelReader;
 import featureide.fm.core.io.xml.XmlFeatureModelWriter;
+import featureide.fm.ui.FMUIPlugin;
 
 /**
  * Exports a feature model file into an XML format.
@@ -81,11 +82,11 @@ public class ExportXmlAction implements IObjectActionDelegate {
 						inputFile.getProject().refreshLocal(
 								IResource.DEPTH_INFINITE, null);
 					} catch (FileNotFoundException e) {
-						e.printStackTrace();
+						FMUIPlugin.getDefault().logError(e);
 					} catch (UnsupportedModelException e) {
-						e.printStackTrace();
+						FMUIPlugin.getDefault().logError(e);
 					} catch (CoreException e) {
-						e.printStackTrace();
+						FMUIPlugin.getDefault().logError(e);
 					}
 				}
 			}

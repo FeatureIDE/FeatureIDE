@@ -156,7 +156,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			// workaround needed for project imports
 			project.refreshLocal(IResource.DEPTH_ONE, null);
 		} catch (CoreException e) {
-			e.printStackTrace();
+			CorePlugin.getDefault().logError(e);
 		}
 		modelFile = new GrammarFile(project.getFile("model.m"));
 		binFolder = createFolder("bin");
@@ -181,7 +181,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			if (!folder.exists())
 				folder.create(false, true, null);
 		} catch (CoreException e) {
-			e.printStackTrace();
+			CorePlugin.getDefault().logError(e);
 		}
 		return folder;
 	}
@@ -544,7 +544,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 							&& ((IFile) res).getName().endsWith(".jar"))
 						cp.add(res.getRawLocation().toOSString());
 			} catch (CoreException e) {
-				e.printStackTrace();
+				CorePlugin.getDefault().logError(e);
 			}
 		}
 
@@ -566,7 +566,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		try {
 			classPath = project.getPersistentProperty(javaClassPathID);
 		} catch (CoreException e) {
-			e.printStackTrace();
+			CorePlugin.getDefault().logError(e);
 		}
 		if (classPath != null) {
 			String[] paths = classPath.split(";");
@@ -589,7 +589,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 						checkConfigurationChange(res);
 				}
 		} catch (CoreException e) {
-			e.printStackTrace();
+			CorePlugin.getDefault().logError(e);
 		}
 	}
 
@@ -602,10 +602,14 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			protected IStatus run(IProgressMonitor monitor) {
 				loadModel();
 				try {
-					for (IResource res : equationFolder.members())
-						checkConfigurationChange(res);
+					for (IResource res : equationFolder.members()){
+						/*if (res.equals(getCurrentEquationFile()))
+							changeConfiguration(res);
+						else*/
+							checkConfigurationChange(res);
+					}	
 				} catch (CoreException e) {
-					e.printStackTrace();
+					CorePlugin.getDefault().logError(e);
 				}
 				return Status.OK_STATUS;
 			}
@@ -613,37 +617,18 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		job.setPriority(Job.SHORT);
 		job.schedule();
 	}
-
+	
 	private void checkConfigurationChange(IResource resource) {
 		if (!(resource instanceof IFile))
 			return;
 		final IFile file = (IFile) resource;
-		CorePlugin.getDefault().logInfo(
-				"Configuration " + file.getFullPath() + " changed");
 		CorePlugin.getDefault().fireEquationChanged(this);
+		CorePlugin.getDefault().logInfo(
+				"Configuration " + file.getFullPath() + " checked");
 		Job job = new Job("Read Configuration") {
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
 					deleteConfigurationMarkers(file, IResource.DEPTH_ZERO);
-					// //without propagation: validity check
-					// Configuration configuration = new Configuration(
-					// featureModel, false);
-					// ConfigurationReader reader = new
-					// ConfigurationReader(configuration);
-					// reader.readFromFile(file);
-					// if (!configuration.valid())
-					// createConfigurationMarker(file,
-					// "Configuration is invalid",
-					// IMarker.SEVERITY_ERROR);
-					// //with propagation: check if all features are still
-					// available
-					// configuration = new Configuration(
-					// featureModel, true);
-					// reader = new ConfigurationReader(configuration);
-					// reader.readFromFile(file);
-					// for (String warning : reader.getWarnings())
-					// createConfigurationMarker(file, warning,
-					// IMarker.SEVERITY_WARNING);
 					Configuration configuration = new Configuration(
 							featureModel, true);
 					ConfigurationReader reader = new ConfigurationReader(
