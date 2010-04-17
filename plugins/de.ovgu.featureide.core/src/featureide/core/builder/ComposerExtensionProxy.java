@@ -101,7 +101,7 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	 */
 	public void performFullBuild(IFile equation) {
 		CorePlugin.getDefault().logInfo(
-				"Perform a full build for equation '" + equation + "'");
+				"Perform a full build for configuration '" + equation + "'");
 		loadComposerExtension();
 		composerExtensionClass.performFullBuild(equation);
 	}

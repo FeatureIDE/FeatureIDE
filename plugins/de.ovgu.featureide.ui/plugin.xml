@@ -46,7 +46,7 @@
                class="featureide.ui.actions.SetEquationAction"
                icon="icons/currentequation.gif"
                id="de.ovgu.featureide.ui.setEquationAction"
-               label="Set as current equation"
+               label="Set as current configuration"
                menubarPath="open.ext"
                tooltip="Only the current equation is build"/>
       </objectContribution>

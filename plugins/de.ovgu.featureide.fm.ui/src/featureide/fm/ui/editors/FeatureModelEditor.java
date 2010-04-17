@@ -460,7 +460,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 				
 				if (isPageModified){
 					updateTextEditorFromDiagram();
-					featureOrderEditor.updateOrderEditor(false);
+					featureOrderEditor.updateOrderEditor(false,getFeatureModel());
 				}
 			}else if (oldPage == newPageIndex){
 				updateDiagramFromTextEditor();
@@ -483,7 +483,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 						setActivePage(textEditorIndex);
 						return;
 					}else
-						featureOrderEditor.updateOrderEditor(false);
+						featureOrderEditor.updateOrderEditor(false,getFeatureModel());
 					}
 			}
 		}else if (oldPage == featureOrderEditorIndex){
@@ -522,7 +522,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 
 	@Override
 	public void doSave(IProgressMonitor monitor) {
-		featureOrderEditor.updateOrderEditor(true);
+		featureOrderEditor.updateOrderEditor(true,getFeatureModel());
 		if (getActivePage() == graphicalViewerIndex && isPageModified) {
 			updateTextEditorFromDiagram();
 			setActivePage(textEditorIndex);
@@ -548,7 +548,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 		} catch (Exception e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
-		featureOrderEditor.updateOrderEditor(true);
+		featureOrderEditor.updateOrderEditor(true,getFeatureModel());
 	}
 
 	@Override
@@ -604,7 +604,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 			updateTextEditorFromDiagram();
 			//updateDiagramFromTextEditor();
 			refreshGraphicalViewer();
-			featureOrderEditor.updateOrderEditor(false);
+			featureOrderEditor.updateOrderEditor(false,getFeatureModel());
 			isPageModified = true;
 			
 			firePropertyChange(PROP_DIRTY);

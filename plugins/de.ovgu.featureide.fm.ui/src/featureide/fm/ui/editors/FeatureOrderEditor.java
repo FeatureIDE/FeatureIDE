@@ -138,16 +138,17 @@ public class FeatureOrderEditor extends EditorPart {
 			defaultFeatureList();
 			writeFeaturestoOrderFile();
 		} else {
-			activate.setSelection(true);
-			enableUI(true);
+			//activate.setSelection(true);
+			//enableUI(true);
 			for (String str : list) {
 				featurelist.add(str);
 			}
 		}
 	}
 
-	public void updateOrderEditor(boolean save) {
+	public void updateOrderEditor(boolean save,FeatureModel feature) {
 		boolean changed = false;
+		featureModel = feature;
 		Collection<String> newFeatureNames = featureModel.getLayerNames();
 		LinkedList<String> oldFeatureNames =  new LinkedList<String>();
 		
@@ -335,7 +336,15 @@ public class FeatureOrderEditor extends EditorPart {
 				System.out.println("Problem to open the order file");
 				FMUIPlugin.getDefault().logError(e);
 			}
-			if (scanner.hasNext() && scanner.next().equals("true")) {
+			if (scanner.hasNext() ){//&& scanner.next().equals("true")) {
+				String selection = scanner.next();
+				if (selection.equalsIgnoreCase("true")){
+					activate.setSelection(true);
+					enableUI(true);
+				}else{ 
+					activate.setSelection(false);
+					enableUI(false);
+				}	
 				list = new ArrayList<String>();
 				while (scanner.hasNext()) {
 					list.add(scanner.next());

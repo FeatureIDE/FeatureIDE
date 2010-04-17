@@ -623,8 +623,8 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			return;
 		final IFile file = (IFile) resource;
 		CorePlugin.getDefault().fireEquationChanged(this);
-		CorePlugin.getDefault().logInfo(
-				"Configuration " + file.getFullPath() + " checked");
+		//CorePlugin.getDefault().logInfo(
+		//		"Configuration " + file.getFullPath() + " checked");
 		Job job = new Job("Read Configuration") {
 			protected IStatus run(IProgressMonitor monitor) {
 				try {

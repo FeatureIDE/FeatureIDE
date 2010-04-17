@@ -44,7 +44,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 	public static final String BUILDER_ID = CorePlugin.PLUGIN_ID
 			+ ".extensibleFeatureProjectBuilder";
 	public static final String COMPOSER_KEY = "composer";
-
+	
 	private IFeatureProject featureProject;
 	private IComposerExtension composerExtension;
 
@@ -74,32 +74,43 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		composerExtension.initialize(featureProject);
 		return true;
 	}
+	
+	private Boolean cleanBuild = false;
 
 	protected void clean(IProgressMonitor monitor) throws CoreException {
 		if (!featureProjectLoaded())
 			return;
-/*
-		IFile equationFile = featureProject.getCurrentEquationFile();
-		if (equationFile == null)
-			return;
-
-		String equation = equationFile.getName();
-		if (equation.contains(".")) {
-			equation = equation.substring(0, equation.indexOf('.'));
-		}
-*/
+		String equation = "";
+		if(cleanBuild){
+			IFile equationFile = featureProject.getCurrentEquationFile();
+			if (equationFile == null)
+				return;
+	
+			equation = equationFile.getName();
+			if (equation.contains(".")) {
+				equation = equation.substring(0, equation.indexOf('.'));
+			}
+		}	
 		featureProject.deleteBuilderMarkers(featureProject.getSourceFolder(),
 				IResource.DEPTH_INFINITE);
-
-		for (IResource member : featureProject.getBinFolder().members())
-			member.delete(true, monitor);
-		for (IResource member : featureProject.getBuildFolder().members())
-			member.delete(true, monitor);
-					
+		if(cleanBuild){
+			for (IResource member : featureProject.getBinFolder().members())
+				if (member.getName().equals(equation))
+					member.delete(true, monitor);
+			for (IResource member : featureProject.getBuildFolder().members())
+				if (member.getName().equals(equation))
+					member.delete(true, monitor);
+		}else{
+			for (IResource member : featureProject.getBinFolder().members())
+				member.delete(true, monitor);
+			for (IResource member : featureProject.getBuildFolder().members())
+				member.delete(true, monitor);
+		}			
 		featureProject.getBuildFolder().refreshLocal(IResource.DEPTH_INFINITE,
 				monitor);
 		featureProject.getBinFolder().refreshLocal(IResource.DEPTH_INFINITE,
 				monitor);
+		cleanBuild = false;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -113,6 +124,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		featureProject.deleteBuilderMarkers(getProject(),
 				IResource.DEPTH_INFINITE);
 		try {
+			cleanBuild = true; 
 			clean(monitor);
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
