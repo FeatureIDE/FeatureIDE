@@ -29,6 +29,8 @@ import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 import org.osgi.framework.Bundle;
 
+import featureide.examples.ExamplePlugin;
+
 /**
  * Class implements the Wizard for the examples.
  * 
@@ -80,7 +82,7 @@ public class ExampleNewWizard extends Wizard implements INewWizard {
 			}
 
 		} catch (IOException e) {
-			e.printStackTrace();
+			ExamplePlugin.getDefault().logError(e);
 		}
 	}
 

@@ -81,6 +81,7 @@ import de.ovgu.featureide.examples.utils.CommentParser;
 import de.ovgu.featureide.examples.utils.ExampleStructureProvider;
 import de.ovgu.featureide.examples.utils.RequirementCategory;
 import de.ovgu.featureide.examples.utils.ZipStructureProvider;
+import featureide.examples.ExamplePlugin;
 
 /**
  * This class represents one page of the Example Wizard.
@@ -379,9 +380,9 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 
 			});
 		} catch (InvocationTargetException e) {
-			e.printStackTrace();
+			ExamplePlugin.getDefault().logError(e);
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			ExamplePlugin.getDefault().logError(e);
 		}
 
 		projectsList.refresh(true);
@@ -580,7 +581,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 						message, t);
 			}
 			ErrorDialog.openError(getShell(), message, null, status);
-			e.printStackTrace();
+			ExamplePlugin.getDefault().logError(e);
 			return false;
 		}
 		closeZipStructureProvider(structureProvider, getShell());
@@ -759,7 +760,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 				try {
 					zipFile.close();
 				} catch (IOException e) {
-					e.printStackTrace();
+					ExamplePlugin.getDefault().logError(e);
 				}
 			}
 		}
@@ -784,7 +785,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		try {
 			structureProvider.getZipFile().close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			ExamplePlugin.getDefault().logError(e);
 		}
 	}
 
@@ -897,10 +898,10 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 				}
 			} catch (CoreException e) {
 				// no good couldn't get the name
-				e.printStackTrace();
+				ExamplePlugin.getDefault().logError(e);
 			} catch (IOException e) {
 				// no good couldn't get the name
-				e.printStackTrace();
+				ExamplePlugin.getDefault().logError(e);
 			}
 		}
 

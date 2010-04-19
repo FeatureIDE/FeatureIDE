@@ -78,29 +78,30 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 	private Boolean cleanBuild = false;
 
 	protected void clean(IProgressMonitor monitor) throws CoreException {
+
 		if (!featureProjectLoaded())
 			return;
-		String equation = "";
+		
 		if(cleanBuild){
 			IFile equationFile = featureProject.getCurrentEquationFile();
 			if (equationFile == null)
 				return;
 	
-			equation = equationFile.getName();
+			String equation = equationFile.getName();
 			if (equation.contains(".")) {
 				equation = equation.substring(0, equation.indexOf('.'));
 			}
-		}	
-		featureProject.deleteBuilderMarkers(featureProject.getSourceFolder(),
+			featureProject.deleteBuilderMarkers(featureProject.getSourceFolder(),
 				IResource.DEPTH_INFINITE);
-		if(cleanBuild){
-			for (IResource member : featureProject.getBinFolder().members())
-				if (member.getName().equals(equation))
-					member.delete(true, monitor);
-			for (IResource member : featureProject.getBuildFolder().members())
-				if (member.getName().equals(equation))
-					member.delete(true, monitor);
+		
+			featureProject.getBinFolder().getFolder(equation).delete(true, monitor);
+			featureProject.getBuildFolder().getFolder(equation).delete(true,
+				monitor);		
+		
 		}else{
+			featureProject.deleteBuilderMarkers(featureProject.getSourceFolder(),
+				IResource.DEPTH_INFINITE);
+				
 			for (IResource member : featureProject.getBinFolder().members())
 				member.delete(true, monitor);
 			for (IResource member : featureProject.getBuildFolder().members())
@@ -118,9 +119,8 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 	protected IProject[] build(int kind, Map args, IProgressMonitor monitor) {
 		if (!featureProjectLoaded())
 			return null;
-
+		
 		IFile equation = featureProject.getCurrentEquationFile();
-
 		featureProject.deleteBuilderMarkers(getProject(),
 				IResource.DEPTH_INFINITE);
 		try {
@@ -133,9 +133,8 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		if (equation == null) {
 			return null;
 		}
-
+		
 		composerExtension.performFullBuild(equation);
-
 		try {
 			featureProject.getBuildFolder().refreshLocal(
 					IResource.DEPTH_INFINITE, monitor);
