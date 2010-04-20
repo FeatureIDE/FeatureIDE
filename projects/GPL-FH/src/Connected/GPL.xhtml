@@ -1,0 +1,32 @@
+<!-- ++ Refinements needed to add feature CONNECTED -->
+<xr:refine xmlns:xr="http://www.atarix.org/xmlRefinement" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.atarix.org/xmlRefinement">
+	<xr:at select="//ul[@id='mListAlgo']">
+		<xr:append>
+			<li>
+				<span class="GPL_TEXT">
+					<a href="#Connected Graphs (Connected)">Connected Graphs (Connected)</a>
+				</span>
+			</li>
+		</xr:append>
+	</xr:at>
+	<xr:at select="//table[@id='mAlgoDesc']">
+		<xr:append>
+			<tr>
+				<td>
+					<div class="GPL_TEXT">
+						<a name="Connected Graphs (Connected)"><b>Connected Graphs (Connected)</b></a> -- Computes equivalence classes in 
+undirected graph of nodes under the reachability relationship. Each vertex is 
+assigned a component number (starting with number 0).
+								</div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<blockquote>
+						<div class="GPL_CODE">G.ConnectedComponents(); // finds components <br/>V.ComponentNumber        // number of component</div>
+					</blockquote>
+				</td>
+			</tr>
+		</xr:append>
+	</xr:at>
+</xr:refine>
