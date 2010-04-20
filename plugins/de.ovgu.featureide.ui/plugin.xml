@@ -168,20 +168,4 @@
             restorable="true">
       </view>
    </extension>
-   <extension
-         point="org.eclipse.ui.actionSets">
-      <actionSet
-            id="de.ovgu.featureide.ui.actionSet"
-            label="Show Collaboration Diagram"
-            visible="false">
-         <action
-               class="featureide.ui.actions.ShowCollaborationDiagram"
-               icon="icons/sample.gif"
-               id="de.ovgu.featureide.ui.actions.ShowCollaborationDiagram"
-               label="&amp;Collaboration Diagram"
-               toolbarPath="sampleGroup"
-               tooltip="Show collaboration diagram for a FeatureHouse project">
-         </action>
-      </actionSet>
-   </extension>
 </plugin>
