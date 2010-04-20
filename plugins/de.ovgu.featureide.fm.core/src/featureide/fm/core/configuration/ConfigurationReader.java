@@ -27,6 +27,7 @@ import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -66,15 +67,20 @@ public class ConfigurationReader {
 		while ((line = reader.readLine()) != null) {
 			if (line.startsWith("#"))
 				continue;
-			String name = line.trim();
-			try {
-				configuration.setManual(name, Selection.SELECTED);
-			} catch (FeatureNotFoundException e) {
-				successful = false;
-				warnings.add("Feature " + name + " does not exist anymore");
-			} catch (SelectionNotPossibleException e) {
-				successful = false;
-				warnings.add("Feature " + name + " cannot be selected anymore");
+			
+			//the string tokenizer is used to also support the expression format used by FeatureHouse
+			StringTokenizer tokenizer = new StringTokenizer(line);
+			while (tokenizer.hasMoreTokens()) {
+				String name = tokenizer.nextToken();
+				try {
+					configuration.setManual(name, Selection.SELECTED);
+				} catch (FeatureNotFoundException e) {
+					successful = false;
+					warnings.add("Feature " + name + " does not exist anymore");
+				} catch (SelectionNotPossibleException e) {
+					successful = false;
+					warnings.add("Feature " + name + " cannot be selected anymore");
+				}
 			}
 		}
 		reader.close();
