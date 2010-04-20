@@ -16,7 +16,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package featureide.examples;
+package de.ovgu.featureide.examples;
 
 import org.osgi.framework.BundleContext;
 

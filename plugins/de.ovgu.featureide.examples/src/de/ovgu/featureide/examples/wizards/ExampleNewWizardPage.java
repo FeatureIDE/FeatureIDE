@@ -77,11 +77,11 @@ import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.eclipse.ui.dialogs.IOverwriteQuery;
 import org.eclipse.ui.wizards.datatransfer.ImportOperation;
 
+import de.ovgu.featureide.examples.ExamplePlugin;
 import de.ovgu.featureide.examples.utils.CommentParser;
 import de.ovgu.featureide.examples.utils.ExampleStructureProvider;
 import de.ovgu.featureide.examples.utils.RequirementCategory;
 import de.ovgu.featureide.examples.utils.ZipStructureProvider;
-import featureide.examples.ExamplePlugin;
 
 /**
  * This class represents one page of the Example Wizard.

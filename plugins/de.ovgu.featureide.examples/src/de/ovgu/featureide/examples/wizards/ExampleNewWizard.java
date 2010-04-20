@@ -29,7 +29,8 @@ import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 import org.osgi.framework.Bundle;
 
-import featureide.examples.ExamplePlugin;
+import de.ovgu.featureide.examples.ExamplePlugin;
+
 
 /**
  * Class implements the Wizard for the examples.
