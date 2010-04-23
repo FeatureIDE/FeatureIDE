@@ -257,7 +257,7 @@ private List<CompletionProposal> getMethodProposals(String behind, IClass[] iCla
 				}
 				else
 					if(m.getMethodName().startsWith(behind)){
-						propList.add(new CompletionProposal(m.getMethodName(), offset, 0, m.getMethodName().length(),img, prop, info, MessageFormat.format(JakEditorMessages.getString("CompletionProcessor.Proposal.hoverinfo.pattern"), m.getIdentifier()))); //$NON-NLS-1$
+						propList.add(new CompletionProposal(m.getMethodName(), offset-behind.length(), behind.length(), m.getMethodName().length(),img, prop, info, MessageFormat.format(JakEditorMessages.getString("CompletionProcessor.Proposal.hoverinfo.pattern"), m.getIdentifier()))); //$NON-NLS-1$
 					}
 			}
 	}
