@@ -1,0 +1,8 @@
+layer NP;
+
+public refines class Neg {
+	public String toString() {  
+		return  " -(" + x + ") "; 
+	}
+
+}
