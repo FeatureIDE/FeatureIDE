@@ -354,9 +354,6 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	 * .resources.IFile)
 	 */
 	public void setCurrentEquationFile(IFile file) {
-		CorePlugin.getDefault().logInfo(
-				"Set current equation in project '" + project + "' to '" + file
-						+ "'");
 		int offset = getEquationFolder().getProjectRelativePath().toString()
 				.length();
 		String equationPath = file.getProjectRelativePath().toString()
@@ -579,18 +576,18 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	public void resourceChanged(IResourceChangeEvent event) {
 		checkModelChange(event.getDelta().findMember(
 				modelFile.getResource().getFullPath()));
-		try {
-			if (equationFolder.isAccessible())
-				for (IResource res : equationFolder.members()) {
-					IResourceDelta delta = event.getDelta().findMember(
-							res.getFullPath());
-					if (delta != null
-							&& (delta.getFlags() & IResourceDelta.CONTENT) != 0)
-						checkConfigurationChange(res);
-				}
-		} catch (CoreException e) {
-			CorePlugin.getDefault().logError(e);
-		}
+//		try {
+//			if (equationFolder.isAccessible())
+//				for (IResource res : equationFolder.members()) {
+//					IResourceDelta delta = event.getDelta().findMember(
+//							res.getFullPath());
+//					if (delta != null
+//							&& (delta.getFlags() & IResourceDelta.CONTENT) != 0)
+//						checkConfigurationChange(res);
+//				}
+//		} catch (CoreException e) {
+//			CorePlugin.getDefault().logError(e);
+//		}
 	}
 
 	private void checkModelChange(IResourceDelta delta) {
@@ -602,30 +599,26 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			protected IStatus run(IProgressMonitor monitor) {
 				loadModel();
 				try {
-					for (IResource res : equationFolder.members()){
-						/*if (res.equals(getCurrentEquationFile()))
-							changeConfiguration(res);
-						else*/
+					for (IResource res : equationFolder.members())
 							checkConfigurationChange(res);
-					}	
 				} catch (CoreException e) {
 					CorePlugin.getDefault().logError(e);
 				}
 				return Status.OK_STATUS;
 			}
 		};
-		job.setPriority(Job.SHORT);
+		job.setPriority(Job.DECORATE);
 		job.schedule();
 	}
 	
 	private void checkConfigurationChange(IResource resource) {
 		if (!(resource instanceof IFile))
 			return;
+		
 		final IFile file = (IFile) resource;
 		CorePlugin.getDefault().fireEquationChanged(this);
-		//CorePlugin.getDefault().logInfo(
-		//		"Configuration " + file.getFullPath() + " checked");
-		Job job = new Job("Read Configuration") {
+
+		Job job = new Job("Check Configuration") {
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
 					deleteConfigurationMarkers(file, IResource.DEPTH_ZERO);
@@ -649,7 +642,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 				return Status.OK_STATUS;
 			}
 		};
-		job.setPriority(Job.SHORT);
+		job.setPriority(Job.DECORATE);
 		job.schedule();
 	}
 

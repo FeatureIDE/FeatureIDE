@@ -123,7 +123,11 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		IFile equation = featureProject.getCurrentEquationFile();
 		featureProject.deleteBuilderMarkers(getProject(),
 				IResource.DEPTH_INFINITE);
+		
 		try {
+			for (IResource res : featureProject.getEquationFolder().members())
+				res.refreshLocal(IResource.DEPTH_ZERO, null);
+			featureProject.getProject().refreshLocal(IResource.DEPTH_ONE, null);
 			cleanBuild = true; 
 			clean(monitor);
 		} catch (CoreException e) {
