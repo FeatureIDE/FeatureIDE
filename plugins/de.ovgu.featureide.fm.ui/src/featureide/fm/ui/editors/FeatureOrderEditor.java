@@ -396,6 +396,8 @@ public class FeatureOrderEditor extends EditorPart {
 
 	public void writeFeaturestoConfigurationFile(File file,
 			LinkedList<String> newConfiguration) {
+		// TODO #147: Use the configuration writer to ensure consistency, e.g.,
+		// with the line separator
 		try {
 			FileWriter fw = new FileWriter(file);
 			for (String layer : newConfiguration) {
