@@ -402,7 +402,7 @@ public class FeatureOrderEditor extends EditorPart {
 			FileWriter fw = new FileWriter(file);
 			for (String layer : newConfiguration) {
 				fw.write(layer);
-				fw.append("\n");
+				fw.append("\r\n");
 			}
 			fw.close();
 		} catch (IOException e) {
