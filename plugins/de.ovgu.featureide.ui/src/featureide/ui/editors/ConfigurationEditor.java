@@ -91,7 +91,7 @@ public class ConfigurationEditor extends EditorPart implements
 	private IFile file;
 
 	private FeatureModel featureModel;
-
+	
 	private IDoubleClickListener listener = new IDoubleClickListener() {
 
 		public void doubleClick(DoubleClickEvent event) {

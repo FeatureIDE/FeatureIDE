@@ -572,43 +572,48 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		}
 		return cp.toArray(new String[cp.size()]);
 	}
-
+//	private boolean modelChange = false;
 	public void resourceChanged(IResourceChangeEvent event) {
-		checkModelChange(event.getDelta().findMember(
-				modelFile.getResource().getFullPath()));
-//		try {
-//			if (equationFolder.isAccessible())
-//				for (IResource res : equationFolder.members()) {
-//					IResourceDelta delta = event.getDelta().findMember(
-//							res.getFullPath());
-//					if (delta != null
-//							&& (delta.getFlags() & IResourceDelta.CONTENT) != 0)
-//						checkConfigurationChange(res);
-//				}
-//		} catch (CoreException e) {
-//			CorePlugin.getDefault().logError(e);
-//		}
+
+		if(!checkModelChange(event.getDelta().findMember(
+				modelFile.getResource().getFullPath())))
+		{
+			try {
+				if (equationFolder.isAccessible())
+					for (IResource res : equationFolder.members()) {
+						IResourceDelta delta = event.getDelta().findMember(
+								res.getFullPath());
+						if (delta != null
+								&& (delta.getFlags() & IResourceDelta.CONTENT) != 0)
+							checkConfigurationChange(res);
+					}
+			} catch (CoreException e) {
+				CorePlugin.getDefault().logError(e);
+			}
+		}	
 	}
 
-	private void checkModelChange(IResourceDelta delta) {
+	private boolean checkModelChange(IResourceDelta delta) {
 		if (delta == null || (delta.getFlags() & IResourceDelta.CONTENT) == 0)
-			return;
+			return false;
+
 		CorePlugin.getDefault().logInfo(
 				"Model " + modelFile.getResource().getFullPath() + " changed");
 		Job job = new Job("Load Model") {
 			protected IStatus run(IProgressMonitor monitor) {
 				loadModel();
-				try {
-					for (IResource res : equationFolder.members())
-							checkConfigurationChange(res);
-				} catch (CoreException e) {
-					CorePlugin.getDefault().logError(e);
-				}
+//				try {
+//					for (IResource res : equationFolder.members())
+//							checkConfigurationChange(res);
+//				} catch (CoreException e) {
+//					CorePlugin.getDefault().logError(e);
+//				}
 				return Status.OK_STATUS;
 			}
 		};
 		job.setPriority(Job.DECORATE);
 		job.schedule();
+		return true;
 	}
 	
 	private void checkConfigurationChange(IResource resource) {
