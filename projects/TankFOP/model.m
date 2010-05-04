@@ -35,12 +35,11 @@ Tanks : USA_M1Abrams
 
 AI : Easy
 	| Hard ;
-	
+
 %%
 
-not (fuer_PC and not PC) ;
-not (Re_fuer_PC and not PC) ;
-not (Sound_fuer_pc and not PC) ;
-not (fuer_Handy and not Handy) ;
-not (Re_fuer_Handy and not Handy) ;
-not (Sound_fuer_Handy and not Handy) ;
+fuer_PC or Re_fuer_PC or Sound_fuer_pc implies PC ;
+fuer_Handy or Re_fuer_Handy or Sound_fuer_Handy implies Handy ;
+IMG_tool iff Tools ;
+IMG_tool implies fuer_Handy or fuer_PC ;
+
