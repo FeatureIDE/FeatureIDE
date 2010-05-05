@@ -271,7 +271,7 @@ public class FeatureOrderEditor extends EditorPart {
 				});
 
 		defaultButton = new Button(comp, SWT.NONE);
-		defaultButton.setText("default");
+		defaultButton.setText("Default");
 		defaultButton.setLayoutData(gridData);
 		defaultButton.setEnabled(false);
 		defaultButton
