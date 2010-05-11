@@ -25,7 +25,7 @@
    <extension
          point="org.eclipse.ui.actionSets">
       <actionSet
-            id="de.ovgu.featureide.ui.ahead.NewFiles"
+            id="de.ovgu.featureide.ui.NewFiles"
             label="NewFiles"
             visible="false">
          <action
