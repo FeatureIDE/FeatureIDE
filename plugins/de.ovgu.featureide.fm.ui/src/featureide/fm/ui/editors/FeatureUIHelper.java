@@ -92,12 +92,12 @@ public class FeatureUIHelper {
 	}
 
 	private static Point getSourceLocation(Rectangle bounds) {
-		return new Point(bounds.getCenter().x, bounds.y - 1);
+		return new Point(bounds.getCenter().x, bounds.y);
 	}
 
 	public static Point getTargetLocation(Feature feature) {
 		Rectangle bounds = getBounds(feature);
-		return new Point(bounds.getCenter().x, bounds.bottom());
+		return new Point(bounds.getCenter().x, bounds.bottom() - 1);
 	}
 
 	public static Dimension getSize(Constraint constraint) {
