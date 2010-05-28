@@ -18,9 +18,9 @@
  */
 package de.ovgu.featureide.ahead.model;
 
-import featureide.core.jakprojectmodel.IImport;
-import featureide.core.jakprojectmodel.IImportContainer;
-import featureide.core.jakprojectmodel.IJakModelElement;
+import de.ovgu.featureide.core.jakprojectmodel.IImport;
+import de.ovgu.featureide.core.jakprojectmodel.IImportContainer;
+import de.ovgu.featureide.core.jakprojectmodel.IJakModelElement;
 
 /**
  * 
@@ -36,7 +36,7 @@ public class ImportContainer extends JakModelElement implements
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * featureide.core.jakprojectmodel.IImportContainer#getNumberOfImports()
+	 * de.ovgu.featureide.core.jakprojectmodel.IImportContainer#getNumberOfImports()
 	 */
 	public int getNumberOfImports() {
 		return 0;
@@ -45,7 +45,7 @@ public class ImportContainer extends JakModelElement implements
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see featureide.core.jakprojectmodel.IImportContainer#getImports()
+	 * @see de.ovgu.featureide.core.jakprojectmodel.IImportContainer#getImports()
 	 */
 	public IImport[] getImports() {
 		return null;

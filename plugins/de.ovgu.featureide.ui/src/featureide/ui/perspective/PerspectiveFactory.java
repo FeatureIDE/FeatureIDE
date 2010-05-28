@@ -22,9 +22,9 @@ import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
 
+import de.ovgu.featureide.fm.ui.views.FeatureModelEditView;
 import de.ovgu.featureide.ui.ahead.actions.StartJakFileWizard;
 import de.ovgu.featureide.ui.ahead.wizards.NewJakFileWizard;
-import featureide.fm.ui.views.FeatureModelEditView;
 import featureide.ui.UIPlugin;
 import featureide.ui.views.collaboration.CollaborationView;
 import featureide.ui.wizards.NewEquationFileWizard;
@@ -64,7 +64,7 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 		down.addView(IPageLayout.ID_PROBLEM_VIEW);
 		down.addView("org.eclipse.ui.console.ConsoleView");
 		down.addView("de.ovgu.featureide.ui.views.collaboration.Collaboration");
-		down.addView("featureide.fm.ui.views.FeatureModelEditView");
+		down.addView("de.ovgu.featureide.fm.ui.views.FeatureModelEditView");
 
 		right.addView(IPageLayout.ID_OUTLINE);
 

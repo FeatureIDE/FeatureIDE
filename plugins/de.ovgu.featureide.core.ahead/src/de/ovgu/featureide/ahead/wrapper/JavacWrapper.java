@@ -36,8 +36,8 @@ import org.eclipse.core.runtime.CoreException;
 import com.sun.tools.javac.Main;
 
 import de.ovgu.featureide.ahead.AheadCorePlugin;
+import de.ovgu.featureide.core.IFeatureProject;
 
-import featureide.core.IFeatureProject;
 
 /**
  * The class encapsulates everything that has to do with the

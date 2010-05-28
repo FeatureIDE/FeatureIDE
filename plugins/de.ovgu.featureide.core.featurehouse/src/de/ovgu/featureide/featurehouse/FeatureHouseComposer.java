@@ -21,9 +21,9 @@ package de.ovgu.featureide.featurehouse;
 import org.eclipse.core.resources.IFile;
 
 import composer.FSTGenComposer;
+import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 
-import featureide.core.IFeatureProject;
-import featureide.core.builder.IComposerExtensionClass;
 
 /**
  * Composes files using FeatureHouse.

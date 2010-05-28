@@ -34,13 +34,14 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
 
-import featureide.core.CorePlugin;
-import featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.IFeatureProject;
+
 import featureide.ui.UIPlugin;
 
 public class LayeredApplicationShortcut implements ILaunchShortcut {
 
-    public static final String ID_LAYERED_APPLICATION = "featureide.core.launching.layeredApplication";
+    public static final String ID_LAYERED_APPLICATION = "de.ovgu.featureide.core.launching.layeredApplication";
 
 	public void launch(IEditorPart editor, String mode) {
         IEditorInput input = editor.getEditorInput();

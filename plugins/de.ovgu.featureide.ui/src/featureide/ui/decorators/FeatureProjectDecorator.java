@@ -24,7 +24,8 @@ import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ILightweightLabelDecorator;
 
-import featureide.core.CorePlugin;
+import de.ovgu.featureide.core.CorePlugin;
+
 import featureide.ui.UIPlugin;
 
 /**

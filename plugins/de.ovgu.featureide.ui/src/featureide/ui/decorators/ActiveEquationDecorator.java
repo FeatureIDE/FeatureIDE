@@ -29,9 +29,10 @@ import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ILightweightLabelDecorator;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 
-import featureide.core.CorePlugin;
-import featureide.core.IFeatureProject;
-import featureide.core.listeners.ICurrentEquationListener;
+import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.listeners.ICurrentEquationListener;
+
 import featureide.ui.UIPlugin;
 
 /**
@@ -52,7 +53,7 @@ public class ActiveEquationDecorator implements ILightweightLabelDecorator, ICur
 	    listeners = new LinkedList<ILabelProviderListener> ();
 	    
 	    // add Listener to Activator
-	    featureide.core.CorePlugin.getDefault().addCurrentEquationListener(this); 
+	    de.ovgu.featureide.core.CorePlugin.getDefault().addCurrentEquationListener(this); 
 	}
 
 	public void decorate(Object element, IDecoration decoration) {
@@ -69,7 +70,7 @@ public class ActiveEquationDecorator implements ILightweightLabelDecorator, ICur
 	}
 
 	public void dispose() {
-		featureide.core.CorePlugin.getDefault().removeCurrentEquationListener(this);
+		de.ovgu.featureide.core.CorePlugin.getDefault().removeCurrentEquationListener(this);
 	}
 	
 	private void refresh (IResource[] res) {

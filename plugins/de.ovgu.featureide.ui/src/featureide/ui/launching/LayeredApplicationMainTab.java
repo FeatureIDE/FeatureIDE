@@ -48,8 +48,9 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 
-import featureide.core.IFeatureProject;
-import featureide.core.launching.LayeredApplicationLaunchConfigurationDelegate;
+import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.launching.LayeredApplicationLaunchConfigurationDelegate;
+
 import featureide.ui.UIPlugin;
 
 /**
@@ -185,7 +186,7 @@ public class LayeredApplicationMainTab extends JavaLaunchTab implements ModifyLi
 	}
 
 	private IFeatureProject getProjectData() {
-		for( IFeatureProject proj : featureide.core.CorePlugin.getFeatureProjects() )
+		for( IFeatureProject proj : de.ovgu.featureide.core.CorePlugin.getFeatureProjects() )
 	    	if( proj.getProjectName().equals(projectEdit.getText()))
 	    		return proj;
 		return null;
@@ -194,7 +195,7 @@ public class LayeredApplicationMainTab extends JavaLaunchTab implements ModifyLi
 	private void browseProjects() {
 		ElementListSelectionDialog dialog = new ElementListSelectionDialog(
 				null, new LabelProvider());
-		Collection<IFeatureProject> featureProjectCollection = featureide.core.CorePlugin
+		Collection<IFeatureProject> featureProjectCollection = de.ovgu.featureide.core.CorePlugin
 				.getFeatureProjects();
 		String[] elements = new String[featureProjectCollection.size()];
 		int pos = 0;

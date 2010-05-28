@@ -20,7 +20,7 @@ package de.ovgu.featureide.examples;
 
 import org.osgi.framework.BundleContext;
 
-import de.ovgu.featureide.examples.plugin.AbstractUIPlugin;
+import de.ovgu.featureide.fm.ui.AbstractUIPlugin;
 
 /**
  * The activator class controls the plug-in life cycle.
@@ -30,7 +30,7 @@ import de.ovgu.featureide.examples.plugin.AbstractUIPlugin;
  */
 public class ExamplePlugin extends AbstractUIPlugin {
 
-	public static final String PLUGIN_ID = "de.ovgu.featureide.fm.core";
+	public static final String PLUGIN_ID = "de.ovgu.featureide.examples";
 	
 	private static ExamplePlugin plugin;
 

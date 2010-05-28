@@ -41,8 +41,8 @@ import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.ahead.AheadCorePlugin;
 import de.ovgu.featureide.ahead.model.JakModelBuilder;
+import de.ovgu.featureide.core.IFeatureProject;
 
-import featureide.core.IFeatureProject;
 
 /**
  * 

@@ -33,8 +33,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 
-import featureide.core.builder.ComposerExtensionManager;
-import featureide.core.builder.IComposerExtension;
+import de.ovgu.featureide.core.builder.ComposerExtensionManager;
+import de.ovgu.featureide.core.builder.IComposerExtension;
+
 
 /**
  * A dialog page for creating FeatureIDE projects.

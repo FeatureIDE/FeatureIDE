@@ -20,7 +20,7 @@ package de.ovgu.featureide.ahead;
 
 import org.osgi.framework.BundleContext;
 
-import de.ovgu.featureide.core.plugin.AbstractCorePlugin;
+import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 
 /**
  * The activator class controls the plug-in life cycle.

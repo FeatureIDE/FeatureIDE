@@ -35,9 +35,10 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 
+import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.builder.FeatureProjectNature;
 
-import featureide.core.CorePlugin;
-import featureide.core.builder.FeatureProjectNature;
+
 
 /**
  * 

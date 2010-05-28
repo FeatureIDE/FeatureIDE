@@ -38,9 +38,10 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.ViewPart;
 
-import featureide.core.CorePlugin;
-import featureide.core.IFeatureProject;
-import featureide.core.listeners.ICurrentBuildListener;
+import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.listeners.ICurrentBuildListener;
+
 import featureide.ui.UIPlugin;
 import featureide.ui.views.collaboration.action.AddClassAction;
 import featureide.ui.views.collaboration.action.DeleteClassAction;
@@ -167,7 +168,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	}
 
 	/* (non-Javadoc)
-	 * @see featureide.core.listeners.ICurrentBuildListener#updateGuiAfterBuild(featureide.core.IFeatureProject)
+	 * @see de.ovgu.featureide.core.listeners.ICurrentBuildListener#updateGuiAfterBuild(de.ovgu.featureide.core.IFeatureProject)
 	 */
 	public void updateGuiAfterBuild(IFeatureProject project) {
 		model = builder.buildCollaborationModel(project);

@@ -21,7 +21,7 @@ package de.ovgu.featureide.ui.ahead;
 import org.eclipse.swt.graphics.Image;
 import org.osgi.framework.BundleContext;
 
-import de.ovgu.featureide.ui.plugin.AbstractUIPlugin;
+import de.ovgu.featureide.fm.ui.AbstractUIPlugin;
 
 /**
  * The activator class controls the plug-in life cycle.

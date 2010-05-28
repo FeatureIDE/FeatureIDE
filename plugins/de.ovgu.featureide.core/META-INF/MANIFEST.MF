@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: FeatureIDE Core Plug-in
 Bundle-SymbolicName: de.ovgu.featureide.core;singleton:=true
 Bundle-Version: 2.4.1.qualifier
-Bundle-Activator: featureide.core.CorePlugin
+Bundle-Activator: de.ovgu.featureide.core.CorePlugin
 Bundle-Localization: 
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.debug.core,
@@ -13,13 +13,13 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
  de.ovgu.featureide.fm.core
 Export-Package: 
- featureide.core,
- featureide.core.builder,
- featureide.core.jakprojectmodel,
- featureide.core.launching,
- featureide.core.listeners,
- featureide.core.projectstructure.nodetypes,
- featureide.core.projectstructure.trees
+ de.ovgu.featureide.core,
+ de.ovgu.featureide.core.builder,
+ de.ovgu.featureide.core.jakprojectmodel,
+ de.ovgu.featureide.core.launching,
+ de.ovgu.featureide.core.listeners,
+ de.ovgu.featureide.core.projectstructure.nodetypes,
+ de.ovgu.featureide.core.projectstructure.trees
 Bundle-ClassPath: .
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

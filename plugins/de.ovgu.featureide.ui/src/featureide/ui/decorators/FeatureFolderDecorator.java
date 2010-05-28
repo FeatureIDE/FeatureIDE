@@ -27,9 +27,10 @@ import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ILightweightLabelDecorator;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 
-import featureide.core.CorePlugin;
-import featureide.core.IFeatureProject;
-import featureide.core.listeners.IFeatureFolderListener;
+import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.listeners.IFeatureFolderListener;
+
 import featureide.ui.UIPlugin;
 
 public class FeatureFolderDecorator implements ILightweightLabelDecorator, IFeatureFolderListener {
@@ -39,11 +40,11 @@ public class FeatureFolderDecorator implements ILightweightLabelDecorator, IFeat
 	private final LinkedList<ILabelProviderListener> listenerList = new LinkedList<ILabelProviderListener>();
 	
 	public FeatureFolderDecorator() {
-		featureide.core.CorePlugin.getDefault().addFeatureFolderListener(this);
+		de.ovgu.featureide.core.CorePlugin.getDefault().addFeatureFolderListener(this);
 	}
 	
 	public void dispose() {
-		featureide.core.CorePlugin.getDefault().removeFeatureFolderListener(this);
+		de.ovgu.featureide.core.CorePlugin.getDefault().removeFeatureFolderListener(this);
 	}
 
 	public void decorate(Object element, IDecoration decoration) {
@@ -77,7 +78,7 @@ public class FeatureFolderDecorator implements ILightweightLabelDecorator, IFeat
 
 	/*
 	 * (non-Javadoc)
-	 * @see featureide.core.listeners.IFeatureFolderListener#featureFolderChanged(org.eclipse.core.resources.IFolder)
+	 * @see de.ovgu.featureide.core.listeners.IFeatureFolderListener#featureFolderChanged(org.eclipse.core.resources.IFolder)
 	 */
 	public void featureFolderChanged(IFolder folder) {
 		LabelProviderChangedEvent event = new LabelProviderChangedEvent(this, folder);

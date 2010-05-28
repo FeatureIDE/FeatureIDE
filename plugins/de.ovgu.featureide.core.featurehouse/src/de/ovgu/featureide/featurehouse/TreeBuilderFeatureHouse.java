@@ -26,12 +26,12 @@ import java.util.regex.Pattern;
 import de.ovgu.cide.fstgen.ast.FSTNode;
 import de.ovgu.cide.fstgen.ast.FSTNonTerminal;
 import de.ovgu.cide.fstgen.ast.FSTTerminal;
-import featureide.core.CorePlugin;
-import featureide.core.projectstructure.nodetypes.NonTerminalNode;
-import featureide.core.projectstructure.nodetypes.ProjectTreeNode;
-import featureide.core.projectstructure.nodetypes.TerminalNode;
-import featureide.core.projectstructure.trees.LeafTree;
-import featureide.core.projectstructure.trees.ProjectTree;
+import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.projectstructure.nodetypes.NonTerminalNode;
+import de.ovgu.featureide.core.projectstructure.nodetypes.ProjectTreeNode;
+import de.ovgu.featureide.core.projectstructure.nodetypes.TerminalNode;
+import de.ovgu.featureide.core.projectstructure.trees.LeafTree;
+import de.ovgu.featureide.core.projectstructure.trees.ProjectTree;
 
 /**
  * parses an FST to a file.trees.ProjectTree

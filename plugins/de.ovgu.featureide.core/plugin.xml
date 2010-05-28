@@ -8,7 +8,7 @@
          name="Feature IDE Launch Configurations"
          point="org.eclipse.debug.core.launchConfigurationTypes">
       <launchConfigurationType
-            delegate="featureide.core.launching.LayeredApplicationLaunchConfigurationDelegate"
+            delegate="de.ovgu.featureide.core.launching.LayeredApplicationLaunchConfigurationDelegate"
             id="featureide.core.launching.layeredApplication"
             modes="run"
             name="Layered Application"/>
@@ -49,7 +49,7 @@
           point="org.eclipse.core.resources.natures">
        <runtime>
           <run
-                class="featureide.core.builder.FeatureProjectNature">
+                class="de.ovgu.featureide.core.builder.FeatureProjectNature">
           </run>
        </runtime>
        <builder
@@ -63,7 +63,7 @@
        <builder
              hasNature="true">
           <run
-                class="featureide.core.builder.ExtensibleFeatureProjectBuilder">
+                class="de.ovgu.featureide.core.builder.ExtensibleFeatureProjectBuilder">
           </run></builder>
     </extension>
  

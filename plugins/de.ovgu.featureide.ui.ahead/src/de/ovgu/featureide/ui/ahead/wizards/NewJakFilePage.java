@@ -41,9 +41,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import featureide.core.CorePlugin;
-import featureide.core.IFeatureProject;
-import featureide.fm.core.Feature;
+import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.core.Feature;
+
 
 /**
  * A dialog page to create new Jak files.

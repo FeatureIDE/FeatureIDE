@@ -4,8 +4,8 @@
    <extension
          point="org.eclipse.ui.editors">
       <editor
-            class="featureide.fm.ui.editors.FeatureModelEditor"
-            contributorClass="featureide.fm.ui.editors.featuremodel.FeatureModelEditorContributor"
+            class="de.ovgu.featureide.fm.ui.editors.FeatureModelEditor"
+            contributorClass="de.ovgu.featureide.fm.ui.editors.featuremodel.FeatureModelEditorContributor"
             default="true"
             filenames="model.m"
             icon="icons/featuretree.ico"
@@ -21,7 +21,7 @@
             name="FeatureIDE"/>
       <view
             category="FeatureIDE"
-            class="featureide.fm.ui.views.FeatureModelEditView"
+            class="de.ovgu.featureide.fm.ui.views.FeatureModelEditView"
             icon="icons/FeatureIconSmall.ico"
             id="featureide.fm.ui.views.FeatureModelEditView"
             name="Feature Model Edits"/>
@@ -42,7 +42,7 @@
                <separator name="slot3"/>
          </menu>     
          <action
-               class="featureide.fm.ui.actions.OpenWithGuidslAction"
+               class="de.ovgu.featureide.fm.ui.actions.OpenWithGuidslAction"
                icon="icons/guidsl.gif"
                id="de.ovgu.featureide.fm.ui.openWithGuidsl"
                label="Open with GUIDSL"
@@ -50,28 +50,28 @@
                tooltip="GUIDSL is a configuration tool written by Don Batory">
          </action>
          <action
-               class="featureide.fm.ui.actions.ExportWaterlooAction"
+               class="de.ovgu.featureide.fm.ui.actions.ExportWaterlooAction"
                icon="icons/export_wiz.gif"
                id="de.ovgu.featureide.fm.ui.ExportWaterloo"
                label="Export model to Waterloo format"
                menubarPath="de.ovgu.featureide.fm.ui_menue/slot2">
          </action>
          <action
-               class="featureide.fm.ui.actions.ImportWaterlooAction"
+               class="de.ovgu.featureide.fm.ui.actions.ImportWaterlooAction"
                icon="icons/import_wiz.gif"
                id="de.ovgu.featureide.fm.ui.ImportWaterloo"
                label="Import model from Waterloo format"
                menubarPath="de.ovgu.featureide.fm.ui_menue/slot2">
          </action>
          <action
-               class="featureide.fm.ui.actions.ExportXmlAction"
+               class="de.ovgu.featureide.fm.ui.actions.ExportXmlAction"
                icon="icons/export_wiz.gif"
                id="de.ovgu.featureide.fm.ui.ExportXml"
                label="Export model to xml format"
                menubarPath="de.ovgu.featureide.fm.ui_menue/slot3">
          </action>
          <action
-               class="featureide.fm.ui.actions.ImportXmlAction"
+               class="de.ovgu.featureide.fm.ui.actions.ImportXmlAction"
                icon="icons/import_wiz.gif"
                id="de.ovgu.featureide.fm.ui.ImportXml"
                label="Import model from xml format"

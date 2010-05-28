@@ -55,18 +55,19 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.progress.UIJob;
 
-import featureide.core.CorePlugin;
-import featureide.core.IFeatureProject;
-import featureide.fm.core.FMCorePlugin;
-import featureide.fm.core.FeatureModel;
-import featureide.fm.core.PropertyConstants;
-import featureide.fm.core.configuration.Configuration;
-import featureide.fm.core.configuration.ConfigurationReader;
-import featureide.fm.core.configuration.ConfigurationWriter;
-import featureide.fm.core.configuration.SelectableFeature;
-import featureide.fm.core.configuration.Selection;
-import featureide.fm.ui.editors.configuration.ConfigurationContentProvider;
-import featureide.fm.ui.editors.configuration.ConfigurationLabelProvider;
+import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
+import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
+import de.ovgu.featureide.fm.core.configuration.Selection;
+import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationContentProvider;
+import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationLabelProvider;
+
 import featureide.ui.UIPlugin;
 
 /**

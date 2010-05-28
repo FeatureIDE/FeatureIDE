@@ -20,8 +20,9 @@ package featureide.ui.wizards;
 
 import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
 
-import featureide.core.CorePlugin;
-import featureide.fm.ui.editors.FeatureModelEditor;
+import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
+
 import featureide.ui.UIPlugin;
 
 /**

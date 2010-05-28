@@ -12,28 +12,28 @@
             nameFilter="*.jak"
             objectClass="org.eclipse.core.resources.IFile">
          <action
-               class="featureide.refactoring.actions.ExtractStatementsAction"
+               class="de.ovgu.featureide.refactoring.actions.ExtractStatementsAction"
                id="de.ovgu.featureide.ui.ahead.refactoring.RefactorFileAction2"
                label="Extract Method Statements"
                menubarPath="menu1/group1"
                style="push">
          </action>
          <action
-               class="featureide.refactoring.actions.ExtractMethodAction"
+               class="de.ovgu.featureide.refactoring.actions.ExtractMethodAction"
                id="de.ovgu.featureide.ui.ahead.refactoring.RefactorFileAction"
                label="Move Refining Method"
                menubarPath="menu1/group1"
                style="push">
          </action>
          <action
-               class="featureide.refactoring.actions.ExtractRefinementAction"
+               class="de.ovgu.featureide.refactoring.actions.ExtractRefinementAction"
                id="de.ovgu.featureide.ui.ahead.refactoring.RefactorFileAction3"
                label="Move Refinement"
                menubarPath="menu1/group1"
                style="push">
          </action>
          <action
-               class="featureide.refactoring.actions.ChangeModifierAction"
+               class="de.ovgu.featureide.refactoring.actions.ChangeModifierAction"
                id="de.ovgu.featureide.ui.ahead.refactoring.RefactorFileAction4"
                label="Change Modifier"
                menubarPath="menu1/group2"
@@ -60,7 +60,7 @@
             nameFilter="*.equation*"
             objectClass="org.eclipse.core.resources.IFile">
          <action
-               class="featureide.refactoring.actions.CreateTypesystemAction"
+               class="de.ovgu.featureide.refactoring.actions.CreateTypesystemAction"
                enablesFor="1"
                id="de.ovgu.featureide.ui.ahead.refactoring.CreateTypesystem"
                label="Create Typesystem"

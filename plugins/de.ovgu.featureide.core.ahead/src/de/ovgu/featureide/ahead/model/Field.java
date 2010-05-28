@@ -23,8 +23,9 @@ import java.util.HashSet;
 
 import org.eclipse.core.resources.IFile;
 
-import featureide.core.jakprojectmodel.IField;
-import featureide.core.jakprojectmodel.IJakModelElement;
+import de.ovgu.featureide.core.jakprojectmodel.IField;
+import de.ovgu.featureide.core.jakprojectmodel.IJakModelElement;
+
 
 /**
  * @author Tom Brosch
@@ -66,7 +67,7 @@ public class Field extends JakModelElement implements Comparable, IField {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see featureide.core.jakprojectmodel.IField#getIdentifier()
+	 * @see de.ovgu.featureide.core.jakprojectmodel.IField#getIdentifier()
 	 */
 	public String getIdentifier() {
 		return (typeName != null ? typeName : "")
@@ -82,7 +83,7 @@ public class Field extends JakModelElement implements Comparable, IField {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * featureide.core.jakprojectmodel.IField#setOwn(org.eclipse.core.resources
+	 * de.ovgu.featureide.core.jakprojectmodel.IField#setOwn(org.eclipse.core.resources
 	 * .IFile)
 	 */
 	public void setOwn(IFile file) {
@@ -93,7 +94,7 @@ public class Field extends JakModelElement implements Comparable, IField {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * featureide.core.jakprojectmodel.IField#isOwn(org.eclipse.core.resources
+	 * de.ovgu.featureide.core.jakprojectmodel.IField#isOwn(org.eclipse.core.resources
 	 * .IFile)
 	 */
 	public boolean isOwn(IFile file) {
@@ -104,7 +105,7 @@ public class Field extends JakModelElement implements Comparable, IField {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * featureide.core.jakprojectmodel.IField#setAvailible(org.eclipse.core.
+	 * de.ovgu.featureide.core.jakprojectmodel.IField#setAvailible(org.eclipse.core.
 	 * resources.IFile)
 	 */
 	public void setAvailible(IFile file) {
@@ -115,7 +116,7 @@ public class Field extends JakModelElement implements Comparable, IField {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * featureide.core.jakprojectmodel.IField#isAvailible(org.eclipse.core.resources
+	 * de.ovgu.featureide.core.jakprojectmodel.IField#isAvailible(org.eclipse.core.resources
 	 * .IFile)
 	 */
 	public boolean isAvailible(IFile file) {
@@ -126,7 +127,7 @@ public class Field extends JakModelElement implements Comparable, IField {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * featureide.core.jakprojectmodel.IField#setLineNumber(org.eclipse.core
+	 * de.ovgu.featureide.core.jakprojectmodel.IField#setLineNumber(org.eclipse.core
 	 * .resources.IFile, int)
 	 */
 	public void setLineNumber(IFile file, int lineNumber) {
@@ -139,7 +140,7 @@ public class Field extends JakModelElement implements Comparable, IField {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * featureide.core.jakprojectmodel.IField#getLineNumber(org.eclipse.core
+	 * de.ovgu.featureide.core.jakprojectmodel.IField#getLineNumber(org.eclipse.core
 	 * .resources.IFile)
 	 */
 	public int getLineNumber(IFile file) {

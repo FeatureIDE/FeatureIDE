@@ -42,14 +42,14 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 
+import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.jakprojectmodel.IClass;
+import de.ovgu.featureide.core.jakprojectmodel.IField;
+import de.ovgu.featureide.core.jakprojectmodel.IJakProjectModel;
+import de.ovgu.featureide.core.jakprojectmodel.IMethod;
 import de.ovgu.featureide.ui.ahead.AheadUIPlugin;
 
-import featureide.core.CorePlugin;
-import featureide.core.IFeatureProject;
-import featureide.core.jakprojectmodel.IClass;
-import featureide.core.jakprojectmodel.IField;
-import featureide.core.jakprojectmodel.IJakProjectModel;
-import featureide.core.jakprojectmodel.IMethod;
 
 
 

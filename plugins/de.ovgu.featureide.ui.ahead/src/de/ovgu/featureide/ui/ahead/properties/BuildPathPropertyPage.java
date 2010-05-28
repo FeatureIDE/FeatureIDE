@@ -34,8 +34,8 @@ import org.eclipse.swt.widgets.List;
 import org.eclipse.ui.dialogs.PropertyPage;
 
 import de.ovgu.featureide.ahead.AheadComposer;
-import featureide.core.CorePlugin;
-import featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.IFeatureProject;
 
 /**
  * The BuildPathPropertyPage class offers an interface to edit the class path which is used by the

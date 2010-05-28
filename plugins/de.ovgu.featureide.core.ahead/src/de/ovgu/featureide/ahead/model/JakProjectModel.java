@@ -22,10 +22,11 @@ import java.util.HashMap;
 
 import org.eclipse.core.resources.IFile;
 
-import featureide.core.jakprojectmodel.IClass;
-import featureide.core.jakprojectmodel.IFeature;
-import featureide.core.jakprojectmodel.IJakModelElement;
-import featureide.core.jakprojectmodel.IJakProjectModel;
+import de.ovgu.featureide.core.jakprojectmodel.IClass;
+import de.ovgu.featureide.core.jakprojectmodel.IFeature;
+import de.ovgu.featureide.core.jakprojectmodel.IJakModelElement;
+import de.ovgu.featureide.core.jakprojectmodel.IJakProjectModel;
+
 
 /**
  * The model of a jak project
@@ -57,7 +58,7 @@ public class JakProjectModel extends JakModelElement implements IJakProjectModel
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * featureide.core.jakprojectmodel.IJakProject#getNumberOfSelectedFeatures()
+	 * de.ovgu.featureide.core.jakprojectmodel.IJakProject#getNumberOfSelectedFeatures()
 	 */
 	public int getNumberOfSelectedFeatures() {
 		return 0;
@@ -66,7 +67,7 @@ public class JakProjectModel extends JakModelElement implements IJakProjectModel
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see featureide.core.jakprojectmodel.IJakProject#getSelectedFeatures()
+	 * @see de.ovgu.featureide.core.jakprojectmodel.IJakProject#getSelectedFeatures()
 	 */
 	public IFeature[] getSelectedFeatures() {
 		return null;
@@ -75,7 +76,7 @@ public class JakProjectModel extends JakModelElement implements IJakProjectModel
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see featureide.core.jakprojectmodel.IJakProject#getNumberOfFeatures()
+	 * @see de.ovgu.featureide.core.jakprojectmodel.IJakProject#getNumberOfFeatures()
 	 */
 	public int getNumberOfFeatures() {
 		return features.size();
@@ -84,7 +85,7 @@ public class JakProjectModel extends JakModelElement implements IJakProjectModel
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see featureide.core.jakprojectmodel.IJakProject#getFeatures()
+	 * @see de.ovgu.featureide.core.jakprojectmodel.IJakProject#getFeatures()
 	 */
 	public IFeature[] getFeatures() {
 		IFeature[] featureArray = new Feature[features.size()];
@@ -99,7 +100,7 @@ public class JakProjectModel extends JakModelElement implements IJakProjectModel
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * featureide.core.jakprojectmodel.IJakProject#getFeature(java.lang.String)
+	 * de.ovgu.featureide.core.jakprojectmodel.IJakProject#getFeature(java.lang.String)
 	 */
 	public IFeature getFeature(String featureName) {
 		if (!features.containsKey(featureName))
@@ -110,7 +111,7 @@ public class JakProjectModel extends JakModelElement implements IJakProjectModel
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see featureide.core.jakprojectmodel.IJakProject#getNumberOfClasses()
+	 * @see de.ovgu.featureide.core.jakprojectmodel.IJakProject#getNumberOfClasses()
 	 */
 	public int getNumberOfClasses() {
 		return classesMap.size();
@@ -119,7 +120,7 @@ public class JakProjectModel extends JakModelElement implements IJakProjectModel
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see featureide.core.jakprojectmodel.IJakProject#getClasses()
+	 * @see de.ovgu.featureide.core.jakprojectmodel.IJakProject#getClasses()
 	 */
 	public IClass[] getClasses() {
 		IClass[] classArray = new Class[classes.size()];
@@ -134,7 +135,7 @@ public class JakProjectModel extends JakModelElement implements IJakProjectModel
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * featureide.core.jakprojectmodel.IJakProject#getClass(org.eclipse.core
+	 * de.ovgu.featureide.core.jakprojectmodel.IJakProject#getClass(org.eclipse.core
 	 * .resources.IFile)
 	 */
 	public IClass getClass(IFile file) {

@@ -23,10 +23,11 @@ import java.util.TreeMap;
 
 import org.eclipse.core.resources.IFile;
 
-import featureide.core.jakprojectmodel.IClass;
-import featureide.core.jakprojectmodel.IField;
-import featureide.core.jakprojectmodel.IJakModelElement;
-import featureide.core.jakprojectmodel.IMethod;
+import de.ovgu.featureide.core.jakprojectmodel.IClass;
+import de.ovgu.featureide.core.jakprojectmodel.IField;
+import de.ovgu.featureide.core.jakprojectmodel.IJakModelElement;
+import de.ovgu.featureide.core.jakprojectmodel.IMethod;
+
 
 /**
  * Describes a class of a jak project according to a selected equation
@@ -68,7 +69,7 @@ public class Class extends JakModelElement implements IClass {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see featureide.core.jakprojectmodel.IClass#getNumberOfFields()
+	 * @see de.ovgu.featureide.core.jakprojectmodel.IClass#getNumberOfFields()
 	 */
 	public int getFieldCount() {
 		return fields.size();
@@ -77,7 +78,7 @@ public class Class extends JakModelElement implements IClass {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see featureide.core.jakprojectmodel.IClass#getFields()
+	 * @see de.ovgu.featureide.core.jakprojectmodel.IClass#getFields()
 	 */
 	public IField[] getFields() {
 		return fields.values().toArray(new Field[fields.values().size()]);
@@ -86,7 +87,7 @@ public class Class extends JakModelElement implements IClass {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see featureide.core.jakprojectmodel.IClass#getNumberOfMethods()
+	 * @see de.ovgu.featureide.core.jakprojectmodel.IClass#getNumberOfMethods()
 	 */
 	public int getMethodCount() {
 		return methods.size();
@@ -95,7 +96,7 @@ public class Class extends JakModelElement implements IClass {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see featureide.core.jakprojectmodel.IClass#getMethods()
+	 * @see de.ovgu.featureide.core.jakprojectmodel.IClass#getMethods()
 	 */
 	public IMethod[] getMethods() {
 		IMethod[] methodArray = new IMethod[methods.size()];
@@ -108,7 +109,7 @@ public class Class extends JakModelElement implements IClass {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see featureide.core.jakprojectmodel.IClass#getNumberOfAvailibleFields()
+	 * @see de.ovgu.featureide.core.jakprojectmodel.IClass#getNumberOfAvailibleFields()
 	 */
 	public int getAvailableFieldCount() {
 		return 0;
@@ -117,7 +118,7 @@ public class Class extends JakModelElement implements IClass {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see featureide.core.jakprojectmodel.IClass#getAvailibleFields()
+	 * @see de.ovgu.featureide.core.jakprojectmodel.IClass#getAvailibleFields()
 	 */
 	public IField[] getAvailableFields() {
 		return null;
@@ -126,7 +127,7 @@ public class Class extends JakModelElement implements IClass {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see featureide.core.jakprojectmodel.IClass#getNumberOfAvailibleMethods()
+	 * @see de.ovgu.featureide.core.jakprojectmodel.IClass#getNumberOfAvailibleMethods()
 	 */
 	public int getAvailableMethodCount() {
 		return 0;
@@ -135,7 +136,7 @@ public class Class extends JakModelElement implements IClass {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see featureide.core.jakprojectmodel.IClass#getAvailibleMethods()
+	 * @see de.ovgu.featureide.core.jakprojectmodel.IClass#getAvailibleMethods()
 	 */
 	public IMethod[] getAvailableMethods() {
 		return null;
@@ -144,7 +145,7 @@ public class Class extends JakModelElement implements IClass {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see featureide.core.jakprojectmodel.IClass#getNumberOfOwnFields()
+	 * @see de.ovgu.featureide.core.jakprojectmodel.IClass#getNumberOfOwnFields()
 	 */
 	public int getOwnFieldCount() {
 		int i = 0;
@@ -157,7 +158,7 @@ public class Class extends JakModelElement implements IClass {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see featureide.core.jakprojectmodel.IClass#getOwnFields()
+	 * @see de.ovgu.featureide.core.jakprojectmodel.IClass#getOwnFields()
 	 */
 	public IField[] getOwnFields() {
 		IField[] fieldArray = new Field[getOwnFieldCount()];
@@ -171,7 +172,7 @@ public class Class extends JakModelElement implements IClass {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see featureide.core.jakprojectmodel.IClass#getNumberOfOwnMethods()
+	 * @see de.ovgu.featureide.core.jakprojectmodel.IClass#getNumberOfOwnMethods()
 	 */
 	public int getOwnMethodCount() {
 		int i = 0;
@@ -184,7 +185,7 @@ public class Class extends JakModelElement implements IClass {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see featureide.core.jakprojectmodel.IClass#getOwnMethods()
+	 * @see de.ovgu.featureide.core.jakprojectmodel.IClass#getOwnMethods()
 	 */
 	public IMethod[] getOwnMethods() {
 		IMethod[] methodArray = new Method[getOwnMethodCount()];
@@ -200,7 +201,7 @@ public class Class extends JakModelElement implements IClass {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * featureide.core.jakprojectmodel.IClass#setJakfile(org.eclipse.core.resources
+	 * de.ovgu.featureide.core.jakprojectmodel.IClass#setJakfile(org.eclipse.core.resources
 	 * .IFile)
 	 */
 	public void setJakfile(IFile jakfile) {
@@ -210,7 +211,7 @@ public class Class extends JakModelElement implements IClass {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see featureide.core.jakprojectmodel.IClass#getJakfile()
+	 * @see de.ovgu.featureide.core.jakprojectmodel.IClass#getJakfile()
 	 */
 	public IFile getJakfile() {
 		return currentJakfile;
@@ -240,7 +241,7 @@ public class Class extends JakModelElement implements IClass {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see featureide.core.jakprojectmodel.IClass#getSources()
+	 * @see de.ovgu.featureide.core.jakprojectmodel.IClass#getSources()
 	 */
 	public LinkedList<IFile> getSources() {
 		return sources;

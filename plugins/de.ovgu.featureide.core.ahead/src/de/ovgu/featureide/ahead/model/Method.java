@@ -24,8 +24,9 @@ import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
 
-import featureide.core.jakprojectmodel.IJakModelElement;
-import featureide.core.jakprojectmodel.IMethod;
+import de.ovgu.featureide.core.jakprojectmodel.IJakModelElement;
+import de.ovgu.featureide.core.jakprojectmodel.IMethod;
+
 
 /**
  * @author Tom Brosch
@@ -72,7 +73,7 @@ public class Method extends JakModelElement implements Comparable, IMethod {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see featureide.core.jakprojectmodel.IMethode#getMethodName()
+	 * @see de.ovgu.featureide.core.jakprojectmodel.IMethode#getMethodName()
 	 */
 	public String getMethodName() {
 		return methodName;
@@ -85,7 +86,7 @@ public class Method extends JakModelElement implements Comparable, IMethod {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see featureide.core.jakprojectmodel.IMethode#getIdentifier()
+	 * @see de.ovgu.featureide.core.jakprojectmodel.IMethode#getIdentifier()
 	 */
 	public String getIdentifier() {
 		String id = (returnType != null ? returnType : "")
@@ -105,7 +106,7 @@ public class Method extends JakModelElement implements Comparable, IMethod {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * featureide.core.jakprojectmodel.IMethode#setOwn(org.eclipse.core.resources
+	 * de.ovgu.featureide.core.jakprojectmodel.IMethode#setOwn(org.eclipse.core.resources
 	 * .IFile)
 	 */
 	public void setOwn(IFile file) {
@@ -116,7 +117,7 @@ public class Method extends JakModelElement implements Comparable, IMethod {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * featureide.core.jakprojectmodel.IMethode#isOwn(org.eclipse.core.resources
+	 * de.ovgu.featureide.core.jakprojectmodel.IMethode#isOwn(org.eclipse.core.resources
 	 * .IFile)
 	 */
 	public boolean isOwn(IFile file) {
@@ -127,7 +128,7 @@ public class Method extends JakModelElement implements Comparable, IMethod {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * featureide.core.jakprojectmodel.IMethode#setAvailible(org.eclipse.core
+	 * de.ovgu.featureide.core.jakprojectmodel.IMethode#setAvailible(org.eclipse.core
 	 * .resources.IFile)
 	 */
 	public void setAvailable(IFile file) {
@@ -138,7 +139,7 @@ public class Method extends JakModelElement implements Comparable, IMethod {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * featureide.core.jakprojectmodel.IMethode#isAvailible(org.eclipse.core
+	 * de.ovgu.featureide.core.jakprojectmodel.IMethode#isAvailible(org.eclipse.core
 	 * .resources.IFile)
 	 */
 	public boolean isAvailable(IFile file) {
@@ -149,7 +150,7 @@ public class Method extends JakModelElement implements Comparable, IMethod {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * featureide.core.jakprojectmodel.IMethode#setLineNumber(org.eclipse.core
+	 * de.ovgu.featureide.core.jakprojectmodel.IMethode#setLineNumber(org.eclipse.core
 	 * .resources.IFile, int)
 	 */
 	public void setLineNumber(IFile file, int lineNumber) {
@@ -162,7 +163,7 @@ public class Method extends JakModelElement implements Comparable, IMethod {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * featureide.core.jakprojectmodel.IMethode#getLineNumber(org.eclipse.core
+	 * de.ovgu.featureide.core.jakprojectmodel.IMethode#getLineNumber(org.eclipse.core
 	 * .resources.IFile)
 	 */
 	public int getLineNumber(IFile file) {

@@ -18,8 +18,8 @@
  */
 package de.ovgu.featureide.ahead.model;
 
-import featureide.core.jakprojectmodel.IImport;
-import featureide.core.jakprojectmodel.IJakModelElement;
+import de.ovgu.featureide.core.jakprojectmodel.IImport;
+import de.ovgu.featureide.core.jakprojectmodel.IJakModelElement;
 
 /**
  * 

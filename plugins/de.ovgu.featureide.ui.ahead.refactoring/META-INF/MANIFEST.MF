@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Jak Refactoring Plug-in
 Bundle-SymbolicName: de.ovgu.featureide.ui.ahead.refactoring;singleton:=true
 Bundle-Version: 2.4.1.qualifier
-Bundle-Activator: featureide.refactoring.RefactoringPlugin
+Bundle-Activator: de.ovgu.featureide.refactoring.RefactoringPlugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,
@@ -15,7 +15,7 @@ Require-Bundle: org.eclipse.ui,
  de.ovgu.featureide.ui.ahead,
  de.ovgu.featureide.fm.core
 Bundle-ActivationPolicy: lazy
-Export-Package: featureide.refactoring
+Export-Package: de.ovgu.featureide.refactoring
 Bundle-ClassPath: .,
  lib/commons-logging-1.1.jar,
  lib/jakarta.jar,

@@ -21,11 +21,12 @@ package featureide.ui.views.collaboration.model;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.IPath;
 
-import featureide.core.IFeatureProject;
-import featureide.core.jakprojectmodel.IClass;
-import featureide.core.jakprojectmodel.IFeature;
-import featureide.core.jakprojectmodel.IJakModelElement;
-import featureide.core.jakprojectmodel.IJakProjectModel;
+import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.jakprojectmodel.IClass;
+import de.ovgu.featureide.core.jakprojectmodel.IFeature;
+import de.ovgu.featureide.core.jakprojectmodel.IJakModelElement;
+import de.ovgu.featureide.core.jakprojectmodel.IJakProjectModel;
+
 
 /**
  * This CollaborationModelBuilder builds the CollaborationModel with the help of JakProjectModel.

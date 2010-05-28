@@ -26,9 +26,9 @@ import org.eclipse.core.resources.IMarker;
 import de.ovgu.featureide.ahead.wrapper.AheadBuildErrorEvent;
 import de.ovgu.featureide.ahead.wrapper.AheadBuildErrorListener;
 import de.ovgu.featureide.ahead.wrapper.AheadWrapper;
+import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 
-import featureide.core.IFeatureProject;
-import featureide.core.builder.IComposerExtensionClass;
 
 /**
  * Composes source jak files into merged jak files.

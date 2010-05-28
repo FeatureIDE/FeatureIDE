@@ -29,8 +29,8 @@ import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.ahead.AheadCorePlugin;
+import de.ovgu.featureide.core.IFeatureProject;
 
-import featureide.core.IFeatureProject;
 
 /**
  * The AheadWrapper class encapsulates all functionality that has to do

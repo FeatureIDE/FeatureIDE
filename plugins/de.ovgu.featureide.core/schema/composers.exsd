@@ -69,7 +69,7 @@
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn=":featureide.core.builder.IComposerExtension"/>
+                  <meta.attribute kind="java" basedOn=":de.ovgu.featureide.core.builder.IComposerExtension"/>
                </appInfo>
             </annotation>
          </attribute>

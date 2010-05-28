@@ -27,12 +27,12 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
+import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.ui.ahead.AheadUIPlugin;
 import de.ovgu.featureide.ui.ahead.editors.jak.JakConfiguration;
 import de.ovgu.featureide.ui.ahead.editors.jak.JakDocumentProvider;
 import de.ovgu.featureide.ui.ahead.views.outline.JakOutlinePage;
-import featureide.core.CorePlugin;
-import featureide.core.IFeatureProject;
 
 /**
  * An editor for Jak files that supports the Jak-specific keywords.

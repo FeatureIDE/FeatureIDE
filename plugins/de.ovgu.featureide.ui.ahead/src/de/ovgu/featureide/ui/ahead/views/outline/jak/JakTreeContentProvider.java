@@ -24,11 +24,12 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ui.part.FileEditorInput;
 
-import featureide.core.CorePlugin;
-import featureide.core.IFeatureProject;
-import featureide.core.jakprojectmodel.IClass;
-import featureide.core.jakprojectmodel.IJakModelElement;
-import featureide.core.jakprojectmodel.IJakProjectModel;
+import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.jakprojectmodel.IClass;
+import de.ovgu.featureide.core.jakprojectmodel.IJakModelElement;
+import de.ovgu.featureide.core.jakprojectmodel.IJakProjectModel;
+
 
 /**
  * This class is part of the outline. It provides the content that

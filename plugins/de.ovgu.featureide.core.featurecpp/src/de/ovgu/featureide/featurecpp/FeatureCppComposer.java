@@ -20,10 +20,10 @@ package de.ovgu.featureide.featurecpp;
 
 import org.eclipse.core.resources.IFile;
 
+import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.featurecpp.wrapper.FeatureCppWrapper;
 
-import featureide.core.IFeatureProject;
-import featureide.core.builder.IComposerExtensionClass;
 
 /**
  * A FeatureIDE extension to compose FeatureC++ files.

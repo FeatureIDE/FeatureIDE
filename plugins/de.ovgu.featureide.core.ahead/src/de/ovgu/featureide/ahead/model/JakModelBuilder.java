@@ -35,10 +35,10 @@ import mixin.MthDector;
 import org.eclipse.core.resources.IFile;
 
 import de.ovgu.featureide.ahead.AheadCorePlugin;
+import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.jakprojectmodel.IField;
+import de.ovgu.featureide.core.jakprojectmodel.IJakProjectModel;
 
-import featureide.core.IFeatureProject;
-import featureide.core.jakprojectmodel.IField;
-import featureide.core.jakprojectmodel.IJakProjectModel;
 
 /**
  * This builder builds the JakProjectModel, by extracting features, 
@@ -101,7 +101,7 @@ public class JakModelBuilder {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see featureide.core.jakprojectmodel.IClass#updateAst(java.util.Vector,
+	 * @see de.ovgu.featureide.core.jakprojectmodel.IClass#updateAst(java.util.Vector,
 	 * mixin.AST_Program[], mixin.AST_Program[])
 	 */
 	public void updateAst(Class currentClass, LinkedList<IFile> sources,

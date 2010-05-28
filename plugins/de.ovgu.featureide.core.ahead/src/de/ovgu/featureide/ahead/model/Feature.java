@@ -20,9 +20,10 @@ package de.ovgu.featureide.ahead.model;
 
 import java.util.TreeMap;
 
-import featureide.core.jakprojectmodel.IClass;
-import featureide.core.jakprojectmodel.IFeature;
-import featureide.core.jakprojectmodel.IJakModelElement;
+import de.ovgu.featureide.core.jakprojectmodel.IClass;
+import de.ovgu.featureide.core.jakprojectmodel.IFeature;
+import de.ovgu.featureide.core.jakprojectmodel.IJakModelElement;
+
 
 /**
  * @author Constanze Adler
