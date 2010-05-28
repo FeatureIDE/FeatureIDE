@@ -151,8 +151,11 @@ public class ConfigurationEditor extends EditorPart implements
 		configuration = new Configuration(featureModel, true);
 		try {
 			dirty = !new ConfigurationReader(configuration).readFromFile(file);
-			if (!dirty)
-				dirty = !configuration.validManually();
+			if (!dirty) {
+				Configuration c = new Configuration(featureModel);
+				new ConfigurationReader(c).readFromFile(file);
+				dirty = !c.valid();
+			}
 		} catch (Exception e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
@@ -243,10 +246,7 @@ public class ConfigurationEditor extends EditorPart implements
 		String text = new ConfigurationWriter(configuration).writeIntoString();
 		configuration = new Configuration(featureModel, true);
 		try {
-			dirty = !new ConfigurationReader(configuration)
-					.readFromString(text);
-			if (!dirty)
-				dirty = !configuration.validManually();
+			new ConfigurationReader(configuration).readFromString(text);
 		} catch (Exception e) {
 			FMCorePlugin.getDefault().logError(e);
 		}

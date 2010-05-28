@@ -71,33 +71,33 @@ public class TConfiguration extends TestCase {
 		assertTrue(c.valid());
 	}
 
-	@Test
-	public void testValid5() throws TimeoutException, UnsupportedModelException {
-		Configuration c = createConfiguration(fm, false);
-		c.setManual("C", Selection.SELECTED);
-		assertTrue(c.validManually());
-	}
-
-	@Test
-	public void testValid6() throws TimeoutException, UnsupportedModelException {
-		Configuration c = createConfiguration(fm, true);
-		assertTrue(!c.validManually());
-	}
-
-	@Test
-	public void testValid7() throws TimeoutException, UnsupportedModelException {
-		Configuration c = createConfiguration(fm, false);
-		c.setManual("A", Selection.SELECTED);
-		c.setManual("C", Selection.SELECTED);
-		assertTrue(c.validManually());
-	}
-
-	@Test
-	public void testValid8() throws TimeoutException, UnsupportedModelException {
-		Configuration c = createConfiguration(fm, true);
-		c.setManual("A", Selection.SELECTED);
-		assertTrue(!c.validManually());
-	}
+//	@Test
+//	public void testValid5() throws TimeoutException, UnsupportedModelException {
+//		Configuration c = createConfiguration(fm, false);
+//		c.setManual("C", Selection.SELECTED);
+//		assertTrue(c.validManually());
+//	}
+//
+//	@Test
+//	public void testValid6() throws TimeoutException, UnsupportedModelException {
+//		Configuration c = createConfiguration(fm, true);
+//		assertTrue(!c.validManually());
+//	}
+//
+//	@Test
+//	public void testValid7() throws TimeoutException, UnsupportedModelException {
+//		Configuration c = createConfiguration(fm, false);
+//		c.setManual("A", Selection.SELECTED);
+//		c.setManual("C", Selection.SELECTED);
+//		assertTrue(c.validManually());
+//	}
+//
+//	@Test
+//	public void testValid8() throws TimeoutException, UnsupportedModelException {
+//		Configuration c = createConfiguration(fm, true);
+//		c.setManual("A", Selection.SELECTED);
+//		assertTrue(!c.validManually());
+//	}
 
 	@Test
 	public void testValid9() throws TimeoutException, UnsupportedModelException {

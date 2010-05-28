@@ -46,9 +46,9 @@ public class SelectableFeature extends TreeElement {
 	}
 
 	protected void setManual(Selection manual) {
-		if (manual == Selection.UNDEFINED || automatic == Selection.UNDEFINED || automatic == manual)
+		if (manual == Selection.UNDEFINED || automatic == Selection.UNDEFINED)
 			this.manual = manual;
-		else
+		else if (manual != automatic)
 			throw new SelectionNotPossibleException(feature.getName(), manual);
 	}
 

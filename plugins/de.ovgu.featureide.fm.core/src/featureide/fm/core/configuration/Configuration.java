@@ -80,40 +80,16 @@ public class Configuration {
 	}
 
 	/**
-	 * Checks that all manual and automatical selections are valid.
+	 * Checks that all manual and automatic selections are valid.
 	 * 
 	 * @return
 	 */
 	public boolean valid() {
 		LinkedList<Node> children = new LinkedList<Node>();
-		for (SelectableFeature feature : features) {
-			Literal literal = new Literal(feature.getName());
-			literal.positive = feature.getSelection() == Selection.SELECTED;
-			children.add(literal);
-		}
-		try {
-			return new SatSolver(rootNode, TIMEOUT).isSatisfiable(children);
-		} catch (TimeoutException e) {
-		}
-		return false;
-	}
-
-	/**
-	 * Checks that all manual selections are valid. This method returns the same
-	 * result as <code>valid()</code> in non-propagate mode except the case when
-	 * a feature is to be selected/deselected that is not possible due to an
-	 * automatically determined selection in propagate mode. In this case you
-	 * get an exception on calling <code>setManuall()</code> and this method
-	 * returns <code>true</code> since the selection/deselection is ignored.
-	 * 
-	 * @return
-	 */
-	public boolean validManually() {
-		LinkedList<Node> children = new LinkedList<Node>();
 		for (SelectableFeature feature : features)
-			if (feature.getFeature().isLayer()) {
+		    if (feature.getFeature().isConcrete()) {
 				Literal literal = new Literal(feature.getName());
-				literal.positive = feature.getManual() == Selection.SELECTED;
+				literal.positive = feature.getSelection() == Selection.SELECTED;
 				children.add(literal);
 			}
 		try {

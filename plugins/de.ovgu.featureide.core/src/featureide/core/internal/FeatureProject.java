@@ -572,12 +572,11 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		}
 		return cp.toArray(new String[cp.size()]);
 	}
-//	private boolean modelChange = false;
+
 	public void resourceChanged(IResourceChangeEvent event) {
 
-		if(!checkModelChange(event.getDelta().findMember(
-				modelFile.getResource().getFullPath())))
-		{
+		if (!checkModelChange(event.getDelta().findMember(
+				modelFile.getResource().getFullPath()))) {
 			try {
 				if (equationFolder.isAccessible())
 					for (IResource res : equationFolder.members()) {
@@ -590,7 +589,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			} catch (CoreException e) {
 				CorePlugin.getDefault().logError(e);
 			}
-		}	
+		}
 	}
 
 	private boolean checkModelChange(IResourceDelta delta) {
@@ -602,12 +601,12 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		Job job = new Job("Load Model") {
 			protected IStatus run(IProgressMonitor monitor) {
 				loadModel();
-//				try {
-//					for (IResource res : equationFolder.members())
-//							checkConfigurationChange(res);
-//				} catch (CoreException e) {
-//					CorePlugin.getDefault().logError(e);
-//				}
+				try {
+					for (IResource res : equationFolder.members())
+						checkConfigurationChange(res);
+				} catch (CoreException e) {
+					CorePlugin.getDefault().logError(e);
+				}
 				return Status.OK_STATUS;
 			}
 		};
@@ -615,11 +614,11 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		job.schedule();
 		return true;
 	}
-	
+
 	private void checkConfigurationChange(IResource resource) {
 		if (!(resource instanceof IFile))
 			return;
-		
+
 		final IFile file = (IFile) resource;
 		CorePlugin.getDefault().fireEquationChanged(this);
 
@@ -627,17 +626,20 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
 					deleteConfigurationMarkers(file, IResource.DEPTH_ZERO);
+					// check validity
 					Configuration configuration = new Configuration(
-							featureModel, true);
+							featureModel, false);
 					ConfigurationReader reader = new ConfigurationReader(
 							configuration);
 					reader.readFromFile(file);
-					// check validity
-					if (!configuration.validManually())
+					if (!configuration.valid())
 						createConfigurationMarker(file,
 								"Configuration is invalid",
 								IMarker.SEVERITY_ERROR);
 					// check if all features are still available
+					configuration = new Configuration(featureModel, true);
+					reader = new ConfigurationReader(configuration);
+					reader.readFromFile(file);
 					for (String warning : reader.getWarnings())
 						createConfigurationMarker(file, warning,
 								IMarker.SEVERITY_WARNING);
