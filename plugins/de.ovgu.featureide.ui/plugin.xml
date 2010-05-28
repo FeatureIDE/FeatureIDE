@@ -5,7 +5,7 @@
    <extension
          point="org.eclipse.ui.editors">
       <editor
-            class="featureide.ui.editors.ConfigurationEditor"
+            class="de.ovgu.featureide.ui.editors.ConfigurationEditor"
             default="true"
             extensions="equation, expression"
             icon="icons/EquationIcon.png"
@@ -18,7 +18,7 @@
       <wizard
             canFinishEarly="false"
             category="de.ovgu.featureide.ui.category"
-            class="featureide.ui.wizards.NewFeatureProjectWizard"
+            class="de.ovgu.featureide.ui.wizards.NewFeatureProjectWizard"
             hasPages="true"
             icon="icons/NewFeatureProjectIcon.png"
             id="de.ovgu.featureide.ui.FeatureProjectWizard"
@@ -26,7 +26,7 @@
             project="true"/>
       <wizard
             category="de.ovgu.featureide.ui.category"
-            class="featureide.ui.wizards.NewEquationFileWizard"
+            class="de.ovgu.featureide.ui.wizards.NewEquationFileWizard"
             icon="icons/NewEquationIcon.png"
             id="de.ovgu.featureide.ui.wizards.NewEquationFileWizard"
             name="Equation File"/>
@@ -43,7 +43,7 @@
             nameFilter="*.equation"
             objectClass="org.eclipse.core.resources.IFile">
          <action
-               class="featureide.ui.actions.SetEquationAction"
+               class="de.ovgu.featureide.ui.actions.SetEquationAction"
                icon="icons/currentequation.gif"
                id="de.ovgu.featureide.ui.setEquationAction"
                label="Set as current configuration"
@@ -55,7 +55,7 @@
          point="org.eclipse.ui.decorators">
       <decorator
             adaptable="true"
-            class="featureide.ui.decorators.ActiveEquationDecorator"
+            class="de.ovgu.featureide.ui.decorators.ActiveEquationDecorator"
             id="featureide.ui.decorators.ActiveEquationDecorator"
             label="Active Equation Decorator"
             lightweight="true"
@@ -66,7 +66,7 @@
       </decorator>
       <decorator
             adaptable="true"
-            class="featureide.ui.decorators.FeatureFolderDecorator"
+            class="de.ovgu.featureide.ui.decorators.FeatureFolderDecorator"
             id="featureide.ui.decorators.FeatureFolderDecorator"
             label="Feature Folder Decorator"
             lightweight="true"
@@ -77,7 +77,7 @@
       </decorator>
       <decorator
             adaptable="true"
-            class="featureide.ui.decorators.FeatureProjectDecorator"
+            class="de.ovgu.featureide.ui.decorators.FeatureProjectDecorator"
             icon="icons/FeatureProjectDecorator.png"
             id="featureide.ui.decorators.FeatureProjectDecorator"
             label="Feature Project Decorator"
@@ -100,7 +100,7 @@
    <extension
          point="org.eclipse.debug.ui.launchConfigurationTabGroups">
       <launchConfigurationTabGroup
-            class="featureide.ui.launching.LayeredApplicationConfigurationTabGroup"
+            class="de.ovgu.featureide.ui.launching.LayeredApplicationConfigurationTabGroup"
             description="Run a feature-oriented application"
             id="featureide.ui.launching.layeredApplicationTabGroup"
             type="featureide.core.launching.layeredApplication"/>
@@ -108,7 +108,7 @@
    <extension
          point="org.eclipse.debug.ui.launchShortcuts">
       <shortcut
-            class="featureide.ui.launching.LayeredApplicationShortcut"
+            class="de.ovgu.featureide.ui.launching.LayeredApplicationShortcut"
             icon="icons/FeatureIconSmall.ico"
             id="featureide.ui.launching.LayeredApplicationShortcut"
             label="Layered Application"
@@ -139,7 +139,7 @@
             label="NewFiles"
             visible="false">
          <action
-               class="featureide.ui.actions.StartEquationFileWizard"
+               class="de.ovgu.featureide.ui.actions.StartEquationFileWizard"
                icon="icons/NewEquationIcon.png"
                id="de.ovgu.featureide.ui.NewEquationFile"
                label="New Equation File"
@@ -151,7 +151,7 @@
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
-            class="featureide.ui.perspective.PerspectiveFactory"
+            class="de.ovgu.featureide.ui.perspective.PerspectiveFactory"
             icon="icons/FeatureIconSmall.ico"
             id="de.ovgu.featureide.ui.FeatureIDEperspective"
             name="FeatureIDE">
@@ -161,7 +161,7 @@
          point="org.eclipse.ui.views">
       <view
             category="FeatureIDE"
-            class="featureide.ui.views.collaboration.CollaborationView"
+            class="de.ovgu.featureide.ui.views.collaboration.CollaborationView"
             icon="icons/FeatureIconSmall.ico"
             id="de.ovgu.featureide.ui.views.collaboration.Collaboration"
             name="Collaboration Diagram"
