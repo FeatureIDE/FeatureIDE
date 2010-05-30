@@ -83,6 +83,14 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		if (!featureProjectLoaded())
 			return;
 		
+		featureProject.deleteBuilderMarkers(featureProject.getSourceFolder(),
+				IResource.DEPTH_INFINITE);
+		
+		featureProject.getBuildFolder().refreshLocal(IResource.DEPTH_INFINITE,
+				monitor);
+		featureProject.getBinFolder().refreshLocal(IResource.DEPTH_INFINITE,
+				monitor);
+		
 		if(cleanBuild){
 			IFile equationFile = featureProject.getCurrentEquationFile();
 			if (equationFile == null)
@@ -92,22 +100,17 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 			if (equation.contains(".")) {
 				equation = equation.substring(0, equation.indexOf('.'));
 			}
-			featureProject.deleteBuilderMarkers(featureProject.getSourceFolder(),
-				IResource.DEPTH_INFINITE);
-		
 			featureProject.getBinFolder().getFolder(equation).delete(true, monitor);
 			featureProject.getBuildFolder().getFolder(equation).delete(true,
 				monitor);		
 		
 		}else{
-			featureProject.deleteBuilderMarkers(featureProject.getSourceFolder(),
-				IResource.DEPTH_INFINITE);
-				
 			for (IResource member : featureProject.getBinFolder().members())
 				member.delete(true, monitor);
 			for (IResource member : featureProject.getBuildFolder().members())
 				member.delete(true, monitor);
-		}			
+		}	
+		
 		featureProject.getBuildFolder().refreshLocal(IResource.DEPTH_INFINITE,
 				monitor);
 		featureProject.getBinFolder().refreshLocal(IResource.DEPTH_INFINITE,

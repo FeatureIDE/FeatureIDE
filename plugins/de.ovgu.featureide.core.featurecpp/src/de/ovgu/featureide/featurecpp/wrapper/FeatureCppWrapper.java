@@ -18,54 +18,168 @@
  */
 package de.ovgu.featureide.featurecpp.wrapper;
 
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 
+import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.featurecpp.FeatureCppCorePlugin;
 
 /**
- * Composes FeatureC++ files.
+ * Composes FeatureC++ files. Compiles C++ Files.
  * 
  * @author Tom Brosch
+ * @author Jens Meinicke
  */
 public class FeatureCppWrapper {
-	
+
 	final String featureCppExecutableName;
-	String sourceDirectory = null;
-	String outputDirectory = null;
-	
+
+	private String sourceFolder = null;
+
+	private String buildFolder = null;
+
+	private String binFolder = null;
+
+	private String projectName = "";
+
+	private IFolder binDirectory = null;
+
+	private IFolder buildDirectory = null;
+
 	public FeatureCppWrapper(String featureCppExecutablePath) {
 		this.featureCppExecutableName = featureCppExecutablePath;
 	}
-	
-	public void initialize(IFolder sourceFolder, IFolder outputFolder) {
-		this.sourceDirectory = sourceFolder.getRawLocation().toOSString();
-		this.outputDirectory = outputFolder.getRawLocation().toOSString();
+
+	public void initialize(IFolder source, IFolder build, IFolder bin,
+			String project) {
+		sourceFolder = source.getRawLocation().toOSString();
+		buildFolder = build.getRawLocation().toOSString();
+		binFolder = bin.getRawLocation().toOSString();
+		projectName = project;
+		binDirectory = bin;
+		buildDirectory = build;
 	}
-	
+
 	public void compose(IFile equation) {
-		FeatureCppCorePlugin.getDefault().logInfo("Fcpp: composing");
-		assert(equation != null && equation.exists()) : "Equation file does not exist";
-		ProcessBuilder processBuilder = new ProcessBuilder(new String[] {
-				featureCppExecutableName, "-o=" + outputDirectory, "-s=" + sourceDirectory, "-gpp",
-				equation.getRawLocation().toOSString()
-		});
+		assert (equation != null && equation.exists()) : "Equation file does not exist";
+		String equationName = equation.getName();
+		if (equationName.contains(".")) {
+			equationName = equationName.substring(0, equationName.indexOf('.'));
+		}
+
+		IFolder folder = binDirectory.getFolder(equationName);
 		try {
-			Process process = processBuilder.start();
-			process.waitFor();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-			String line = null;
-			while((line=reader.readLine()) != null) {
-				FeatureCppCorePlugin.getDefault().logInfo(line);
-			}
-			
+			if (!folder.exists())
+				folder.create(false, true, null);
+		} catch (CoreException e) {
+			CorePlugin.getDefault().logError(e);
+		}
+		IFolder folder2 = buildDirectory.getFolder(equationName);
+		try {
+			if (!folder2.exists())
+				folder2.create(false, true, null);
+		} catch (CoreException e) {
+			CorePlugin.getDefault().logError(e);
+		}
+		LinkedList<String> command = new LinkedList<String>();
+		command.add(featureCppExecutableName);
+		command.add("-o=" + buildFolder + "\\" + equationName);
+		command.add("-s=" + sourceFolder);
+		command.add("-gpp");
+		command.add(equation.getRawLocation().toOSString());
+		try {
+			process(command);
+			compile(equation);
 		} catch (IOException e) {
 			FeatureCppCorePlugin.getDefault().logError(e);
-		} catch (InterruptedException e) {
+		}
+	}
+
+	private void process(LinkedList<String> command) throws IOException {
+		ProcessBuilder processBuilder = new ProcessBuilder(command);
+		try {
+			Process process = processBuilder.start();
+			BufferedReader input = new BufferedReader(new InputStreamReader(
+					process.getInputStream()));
+			BufferedReader error = new BufferedReader(new InputStreamReader(
+					process.getErrorStream()));
+			boolean x = true;
+			while (x) {
+				try {
+					String line;
+					while ((line = input.readLine()) != null) {}
+					while ((line = error.readLine()) != null)
+						FeatureCppCorePlugin.getDefault().logInfo(line);
+					int exitValue = process.exitValue();
+					if (exitValue != 0) {
+						throw new IOException(
+								"The process doesn't finish normally (exit="
+										+ exitValue + ")!");
+					}
+					x = false;
+				} catch (IllegalThreadStateException e) {
+				}
+			}
+		} catch (IOException e) {
+			FeatureCppCorePlugin.getDefault().logError(e);
+		}	
+	}
+
+	public void compile(IFile equation) throws IOException {
+		String equationName = equation.getName();
+		if (equationName.contains(".")) {
+			equationName = equationName.substring(0, equationName.indexOf('.'));
+		}
+
+		try {
+			buildDirectory.refreshLocal(IResource.DEPTH_INFINITE, null);
+		} catch (CoreException e) {
+			FeatureCppCorePlugin.getDefault().logError(e);
+		}
+
+		LinkedList<String> command2 = new LinkedList<String>();
+		command2.add("g++");
+		command2.add("-o" + binFolder + "\\" + equationName + "\\"
+				+ projectName + "-" + equationName + ".exe");
+
+		try {
+			for (IResource res : buildDirectory.getFolder(equationName)
+					.members()) {
+				String fileName = res.getName();
+				if (fileName.endsWith(".cpp")) {
+					LinkedList<String> command = new LinkedList<String>();
+					command.add("g++");
+					command.add("-O3");
+					command.add("-Wall");
+					command.add("-c");
+					command.add("-fmessage-length=0");
+					String file = binFolder
+							+ "\\"
+							+ equationName
+							+ "\\"
+							+ res.getName().substring(0,
+									res.getName().length() - 4) + ".o";
+					command.add("-o" + file);
+					command2.add(file);
+					command.add(res.getLocation().toOSString());
+					process(command);
+				}
+			}
+		} catch (CoreException e) {
+			FeatureCppCorePlugin.getDefault().logError(e);
+		}
+		process(command2);
+		try {
+			binDirectory.refreshLocal(IResource.DEPTH_INFINITE, null);
+		} catch (CoreException e) {
 			FeatureCppCorePlugin.getDefault().logError(e);
 		}
 	}

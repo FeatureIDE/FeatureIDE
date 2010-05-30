@@ -24,18 +24,19 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.featurecpp.wrapper.FeatureCppWrapper;
 
-
 /**
  * A FeatureIDE extension to compose FeatureC++ files.
  * 
  * @author Tom Brosch
+ * @author Jens Meinicke
  */
 public class FeatureCppComposer implements IComposerExtensionClass {
 
 	public static final String COMPOSER_ID = "de.ovgu.featureide.composer.featurecpp";
-
+	
 	private final FeatureCppWrapper featureCpp = new FeatureCppWrapper(
-			"fc++.exe");
+		(FeatureCppCorePlugin.getDefault().getBundle().getLocation() + "lib/fc++.exe")
+					.substring(16));
 
 	public void clean() {
 	}
@@ -43,9 +44,10 @@ public class FeatureCppComposer implements IComposerExtensionClass {
 	public void initialize(IFeatureProject project) {
 		assert (project != null) : "Invalid project given";
 		featureCpp.initialize(project.getSourceFolder(), project
-				.getBuildFolder());
+				.getBuildFolder(), project.getBinFolder(),project.getProjectName());
 	}
-
+	
+	
 	public void performFullBuild(IFile equation) {
 		featureCpp.compose(equation);
 	}
