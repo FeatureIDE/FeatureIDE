@@ -9,4 +9,5 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.intro
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: University of Magdeburg
-Import-Package: org.eclipse.ui.forms.widgets
+Import-Package: org.eclipse.platform.internal,
+ org.eclipse.ui.forms.widgets
