@@ -23,6 +23,8 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import de.ovgu.featureide.fm.core.FMCorePlugin;
+
 /**
  * Read the .order file from the project directory. 
  * The constructor need the location of the project as parameter
@@ -49,7 +51,7 @@ public class FeatureOrderReader {
 		try {
 			scanner = new Scanner(file);
 		} catch (FileNotFoundException e) {
-			System.out.println("Can not read .order file");		
+			FMCorePlugin.getDefault().logInfo("Can not read .order file");		
 		}
 		while(scanner.hasNext()){
 			

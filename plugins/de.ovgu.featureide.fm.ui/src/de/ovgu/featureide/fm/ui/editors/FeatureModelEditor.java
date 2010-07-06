@@ -80,6 +80,7 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.sat4j.specs.TimeoutException;
 
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.GrammarFile;
 import de.ovgu.featureide.fm.core.PropertyConstants;
@@ -362,7 +363,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 			return zoomIn;
 		if (GEFActionConstants.ZOOM_OUT.equals(workbenchActionID))
 			return zoomOut;
-		System.out.println("The following workbench action is not registered at the feature diagram editor: " + workbenchActionID);
+		FMCorePlugin.getDefault().logInfo("The following workbench action is not registered at the feature diagram editor: " + workbenchActionID);
 		return null;
 	}
 

@@ -106,7 +106,7 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
     		nnod = doc.createElement("Or");
     	} else if (feat.isAlternative()) {
     		nnod = doc.createElement("Alternative");
-    	} else System.out.println("creatXMlDockRec: Unexpected error!");
+    	} else FMCorePlugin.getDefault().logInfo("creatXMlDockRec: Unexpected error!");
     	fnod.appendChild(nnod);
     	Iterator<Feature> i = children.iterator();
     	while (i.hasNext()) {
