@@ -57,7 +57,6 @@ public class AddFeatureCppComposer implements IObjectActionDelegate {
 	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
 	}
 
-	@SuppressWarnings("unchecked")
 	public void run(IAction action) {
 		CorePlugin cp = CorePlugin.getDefault();
 		cp.logInfo("Try to convert");

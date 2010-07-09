@@ -72,7 +72,6 @@ public class DeleteAction extends Action {
 		viewer.addSelectionChangedListener(listener);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void run() {
 		IStructuredSelection selection = (IStructuredSelection) viewer
@@ -98,7 +97,6 @@ public class DeleteAction extends Action {
 		featureModel.handleModelDataChanged();
 	}
 
-	@SuppressWarnings("unchecked")
 	private boolean isValidSelection(IStructuredSelection selection) {
 		// check empty selection (i.e. ModelEditPart is selected)
 		if (selection.size() == 1

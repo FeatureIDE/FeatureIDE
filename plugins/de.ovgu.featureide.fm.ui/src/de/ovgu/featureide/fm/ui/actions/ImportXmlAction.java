@@ -60,7 +60,6 @@ private ISelection selection;
 				(FeatureModelEditor) targetPart : null;
 	}
 
-	@SuppressWarnings("unchecked")
 	public void run(IAction action) {
 		if (selection instanceof IStructuredSelection) {
 			for (Iterator it = ((IStructuredSelection) selection).iterator(); 
@@ -82,12 +81,14 @@ private ISelection selection;
 								SWT.OPEN);
 						fileDialog.setOverwrite(false);
 						File inputFile = new File(fileDialog.open());
-						if (inputFile == null) return;
+						if (fileDialog.open() == null) return;
+//						if (inputFile == null) return;
 						while (!inputFile.exists()) {
 							MessageDialog.openInformation(new Shell(), "File " +
 									"not Found", "Specified file wasn't found");
 							inputFile = new File(fileDialog.open());
-							if (inputFile == null) return;
+							if (fileDialog.open() == null) return;
+//							if (inputFile == null) return;
 						}							
 						FeatureModel fm = new FeatureModel();
 						XmlFeatureModelReader xmlReader = 

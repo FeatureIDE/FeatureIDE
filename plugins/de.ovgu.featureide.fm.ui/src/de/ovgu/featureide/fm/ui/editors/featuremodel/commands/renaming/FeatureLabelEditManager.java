@@ -41,7 +41,6 @@ public class FeatureLabelEditManager extends DirectEditManager implements GUIDef
 
 	private FeatureModel featureModel;
 
-	@SuppressWarnings("unchecked")
 	public FeatureLabelEditManager(FeatureEditPart editpart, Class editorType, 
 			FeatureCellEditorLocator locator, FeatureModel featureModel) {
 		super(editpart, editorType, locator);

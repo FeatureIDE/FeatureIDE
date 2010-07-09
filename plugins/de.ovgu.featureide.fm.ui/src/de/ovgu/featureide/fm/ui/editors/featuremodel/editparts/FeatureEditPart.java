@@ -147,7 +147,6 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 	 * (non-Javadoc)
 	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
 	 */
-	@SuppressWarnings("unchecked")
 	public void propertyChange(PropertyChangeEvent event) {
 		String prop = event.getPropertyName();
 		if (prop.equals(LOCATION_CHANGED)) {

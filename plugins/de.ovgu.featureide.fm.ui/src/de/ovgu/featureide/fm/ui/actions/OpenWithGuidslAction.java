@@ -61,7 +61,6 @@ public class OpenWithGuidslAction implements IObjectActionDelegate {
 		this.selection = selection;
 	}
 
-	@SuppressWarnings("unchecked")
 	public void run(IAction action) {
 		if (selection instanceof IStructuredSelection) {
 			for (Iterator it = ((IStructuredSelection) selection).iterator(); it.hasNext();) {

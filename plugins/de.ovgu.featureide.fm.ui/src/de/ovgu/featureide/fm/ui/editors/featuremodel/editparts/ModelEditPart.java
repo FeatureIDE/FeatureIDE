@@ -67,7 +67,6 @@ public class ModelEditPart extends AbstractGraphicalEditPart implements GUIDefau
 		installEditPolicy(EditPolicy.LAYOUT_ROLE, new ModelLayoutEditPolicy(getFeatureModel()));
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	protected List getModelChildren() {
 		LinkedList<Object> list = new LinkedList<Object>();

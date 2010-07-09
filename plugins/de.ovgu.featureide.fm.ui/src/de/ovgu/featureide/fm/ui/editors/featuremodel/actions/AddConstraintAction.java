@@ -88,7 +88,6 @@ public class AddConstraintAction extends Action {
 		this.featuremodel = featuremodel;
 	}
 
-	@SuppressWarnings("unchecked")
 	public void run() {
 		writer = new FeatureModelWriter(featuremodel);
 		featuretext = writer.writeToString();

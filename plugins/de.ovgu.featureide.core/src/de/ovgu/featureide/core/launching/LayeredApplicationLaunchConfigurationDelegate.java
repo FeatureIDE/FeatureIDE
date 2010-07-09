@@ -58,7 +58,6 @@ public class LayeredApplicationLaunchConfigurationDelegate extends
 
 	public static final String MAIN_CLASS = "MAIN_CLASS";
 
-	@SuppressWarnings("unchecked")
 	public void launch(ILaunchConfiguration configuration, String mode,
 			ILaunch launch, IProgressMonitor monitor) throws CoreException {
 

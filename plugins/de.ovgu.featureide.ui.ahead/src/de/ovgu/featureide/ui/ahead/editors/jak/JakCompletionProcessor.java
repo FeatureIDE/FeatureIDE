@@ -99,11 +99,11 @@ public class JakCompletionProcessor implements IContentAssistProcessor{
 	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer,
 			int offset) {
 		List<CompletionProposal> propList = new ArrayList<CompletionProposal>();
-		computeProposals(propList, viewer,offset);
+		propList = computeProposals(propList, viewer,offset);
 		if (propList==null) return NO_COMPLETIONS;
 		ICompletionProposal[] result= new ICompletionProposal[propList.size()];
 		propList.toArray(result);
-	
+		
 		return result;
 	}
 
@@ -147,7 +147,7 @@ public class JakCompletionProcessor implements IContentAssistProcessor{
 	public String getErrorMessage() {
 		return null;
 	}
-	private void computeProposals(List<CompletionProposal> propList, ITextViewer viewer, int offset)
+	private List<CompletionProposal> computeProposals(List<CompletionProposal> propList, ITextViewer viewer, int offset)
 	{
 		//retrieve current document
 		IDocument doc = viewer.getDocument();
@@ -159,8 +159,7 @@ public class JakCompletionProcessor implements IContentAssistProcessor{
 			text = text.trim();
 			for (int i = 0; i<PROPOSAL_ACTIVATION_CHARS.length; i++)
 			if (text.startsWith(".") || text.contains(";")){
-				propList = null;
-				return;
+				return null;
 			}
 			
 			if (text.contains(".")){
@@ -196,7 +195,7 @@ public class JakCompletionProcessor implements IContentAssistProcessor{
 		} catch (BadLocationException e) {
 			AheadUIPlugin.getDefault().logError(e);
 		}
-		
+		return propList;
 		
 	}
 	

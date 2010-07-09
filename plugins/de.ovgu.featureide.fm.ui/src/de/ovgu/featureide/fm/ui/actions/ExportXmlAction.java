@@ -54,7 +54,6 @@ public class ExportXmlAction implements IObjectActionDelegate {
 	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
 	}
 
-	@SuppressWarnings("unchecked")
 	public void run(IAction action) {
 		if (selection instanceof IStructuredSelection) {
 			for (Iterator it = ((IStructuredSelection) selection).iterator(); it

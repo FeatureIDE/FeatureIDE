@@ -31,7 +31,6 @@ import de.ovgu.featureide.core.jakprojectmodel.IMethod;
 /**
  * @author Tom Brosch
  */
-@SuppressWarnings("unchecked")
 public class Method extends JakModelElement implements Comparable, IMethod {
 
 	private String methodName;

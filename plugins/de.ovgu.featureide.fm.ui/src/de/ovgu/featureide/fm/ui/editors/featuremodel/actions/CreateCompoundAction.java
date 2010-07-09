@@ -121,7 +121,6 @@ public class CreateCompoundAction extends Action {
 		manager.show();
 	}
 	
-	@SuppressWarnings("unchecked")
 	private boolean isValidSelection(IStructuredSelection selection) {
 		// check empty selection (i.e. ModelEditPart is selected)
 		if (selection.size() == 1

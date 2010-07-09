@@ -30,7 +30,6 @@ import de.ovgu.featureide.core.jakprojectmodel.IJakModelElement;
 /**
  * @author Tom Brosch
  */
-@SuppressWarnings("unchecked")
 public class Field extends JakModelElement implements Comparable, IField {
 
 	private String fieldName;

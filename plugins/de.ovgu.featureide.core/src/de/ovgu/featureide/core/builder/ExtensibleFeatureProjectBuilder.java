@@ -118,7 +118,6 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		cleanBuild = false;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected IProject[] build(int kind, Map args, IProgressMonitor monitor) {
 		if (!featureProjectLoaded())
