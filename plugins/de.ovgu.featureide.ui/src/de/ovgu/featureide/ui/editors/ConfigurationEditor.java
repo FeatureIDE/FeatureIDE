@@ -133,7 +133,7 @@ public class ConfigurationEditor extends EditorPart implements
 		} catch (CoreException e) {
 			UIPlugin.getDefault().logError(e);
 		}
-		UIPlugin.getDefault().logInfo("Configuration " + file.getFullPath() + " changed");
+//		UIPlugin.getDefault().logInfo("Configuration " + file.getFullPath() + " changed");
 	}
 
 	@Override
@@ -162,7 +162,7 @@ public class ConfigurationEditor extends EditorPart implements
 		}
 		getSite().getPage().addPartListener(iPartListener);
 
-		UIPlugin.getDefault().logInfo("file: " + file);
+//		UIPlugin.getDefault().logInfo("file: " + file);
 		setPartName(file.getName());
 		featureModel.addListener(this);
 		firePropertyChange(IEditorPart.PROP_DIRTY);

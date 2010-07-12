@@ -161,5 +161,10 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	 * @param model
 	 */
 	public void setJakProjectModel(IJakProjectModel model);
+	
+	/**
+	 * @return True if the model, a sourcefile or the current equation was changed.
+	 */
+	public boolean buildRelavantChanges();
 
 }

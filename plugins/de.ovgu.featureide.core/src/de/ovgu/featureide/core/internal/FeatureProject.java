@@ -134,6 +134,8 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	private ProjectTree projectTree;
 
 	private IComposerExtension composerExtension = null;
+	
+	private boolean buildRelevantChanges = true;
 
 	/**
 	 * Creating a new ProjectData includes creating folders if they don't exist,
@@ -367,6 +369,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			// are not up-to-date. Eclipse calls builders, if a resource as
 			// changed, but in this case actually no resource in the file system
 			// changes.
+			buildRelevantChanges = true;
 			project.build(IncrementalProjectBuilder.FULL_BUILD, null);
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
@@ -575,7 +578,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	}
 
 	public void resourceChanged(IResourceChangeEvent event) {
-
+		buildRelevantChanges = false;
 		if (!checkModelChange(event.getDelta().findMember(
 				modelFile.getResource().getFullPath()))) {
 			try {
@@ -584,9 +587,18 @@ public class FeatureProject extends BuilderMarkerHandler implements
 						IResourceDelta delta = event.getDelta().findMember(
 								res.getFullPath());
 						if (delta != null
-								&& (delta.getFlags() & IResourceDelta.CONTENT) != 0)
+								&& (delta.getFlags() & IResourceDelta.CONTENT) != 0){
+							if (res.toString().equals(getCurrentEquationFile().toString()))
+								buildRelevantChanges = true;
 							checkConfigurationChange(res);
+						}
 					}
+				for (IResource res : sourceFolder.members()) {
+					IResourceDelta delta = event.getDelta().findMember(
+							res.getFullPath());
+					if (delta != null)//&& (delta.getFlags() & IResourceDelta.CONTENT) != 0){
+						buildRelevantChanges = true;
+				}
 			} catch (CoreException e) {
 				CorePlugin.getDefault().logError(e);
 			}
@@ -596,9 +608,10 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	private boolean checkModelChange(IResourceDelta delta) {
 		if (delta == null || (delta.getFlags() & IResourceDelta.CONTENT) == 0)
 			return false;
-
-		CorePlugin.getDefault().logInfo(
-				"Model " + modelFile.getResource().getFullPath() + " changed");
+		
+		buildRelevantChanges = true;
+//		CorePlugin.getDefault().logInfo(
+//				"Model " + modelFile.getResource().getFullPath() + " changed");
 		Job job = new Job("Load Model") {
 			protected IStatus run(IProgressMonitor monitor) {
 				loadModel();
@@ -765,5 +778,12 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	 */
 	public void setJakProjectModel(IJakProjectModel model) {
 		jakProject = model;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.IFeatureProject#relavantChanges()
+	 */
+	public boolean buildRelavantChanges() {
+			return buildRelevantChanges;
 	}
 }

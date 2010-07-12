@@ -77,7 +77,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 	}
 	
 	private Boolean cleanBuild = false;
-
+	private boolean cleaned = false;
 	protected void clean(IProgressMonitor monitor) throws CoreException {
 
 		if (!featureProjectLoaded())
@@ -109,6 +109,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 				member.delete(true, monitor);
 			for (IResource member : featureProject.getBuildFolder().members())
 				member.delete(true, monitor);
+			cleaned = true;
 		}	
 		
 		featureProject.getBuildFolder().refreshLocal(IResource.DEPTH_INFINITE,
@@ -123,6 +124,10 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		if (!featureProjectLoaded())
 			return null;
 		
+		if ((!featureProject.buildRelavantChanges() && !cleaned))
+			return null;
+		
+		cleaned = false;
 		IFile equation = featureProject.getCurrentEquationFile();
 		featureProject.deleteBuilderMarkers(getProject(),
 				IResource.DEPTH_INFINITE);
@@ -131,7 +136,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 			for (IResource res : featureProject.getEquationFolder().members())
 				res.refreshLocal(IResource.DEPTH_ZERO, null);
 			featureProject.getProject().refreshLocal(IResource.DEPTH_ONE, null);
-			cleanBuild = true; 
+			cleanBuild = true;
 			clean(monitor);
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
