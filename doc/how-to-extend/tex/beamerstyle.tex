@@ -1,0 +1,63 @@
+% Einstellung von Standardthemes
+%\usepackage{beamerthemesplit}
+%\usepackage{beamerthemeshadow}
+\useinnertheme{default}
+% default, circles, rectangels, rounded, inmargin
+\useoutertheme{default}
+% default, infolines, miniframe, smoothbars, sidebar, split, shadow, tree, smoothtree
+\usecolortheme{dove}
+% gut: beaver default dolphin dove seagull seahorse
+% schlecht: albatross beetle crane fly sidebartab structure whale wolverine
+
+% Eigener Hintergrund
+\newcommand{\slidebackground}[2]{
+	\tikz[remember picture,overlay] \node[text height=#1,text width=\paperwidth,below,top color=blue!25,bottom color=white] at (current page.north) {};
+	\tikz[remember picture,overlay] \node[text height=#2,text width=\paperwidth,above,fill=blue!25,path fading=north,yshift=-.1mm] at (current page.south) {};
+}
+\newcommand{\ottokopf}{\includegraphics[width=5.5cm,trim=1.5cm 1.5cm 1.5cm 1.5cm]{ovgu_logo}
+}
+\newcommand{\setslidebackground}{
+	\usebackgroundtemplate{
+		\parbox[b][\paperheight+1.25cm]{\paperwidth+1.25cm}{
+			\hfill\tikz 
+			\node {\ottokopf}
+				node[fill=white,path fading=south,fading angle=45] {\phantom{\ottokopf}}
+				node[fill=white,opacity=0.66] {\phantom{\ottokopf}}
+			;
+		}
+	}
+}
+
+% Anpassung von Kopfzeile und Hintergrund
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{frametitle}{
+  \slidebackground{10ex}{5ex}
+  \usebeamercolor[fg]{frametitle}
+  \leavevmode
+  \color{black}{\hrule}
+  \hbox{
+    \begin{beamercolorbox}[wd=.98\textwidth,ht=2.5ex,dp=1.125ex,leftskip=-.5cm,rightskip=-.5cm]{author in head/foot_}%
+			%\includegraphics[height=0.8cm]{logo-iti}
+	  	\hfill
+      \insertframetitle
+	  	\hfill ~
+			%\includegraphics[height=1cm]{ovgu}
+    \end{beamercolorbox}
+  }
+  \color{black}{\hrule}
+}
+
+% Anpassung der Fuﬂzeile
+\setbeamertemplate{footline}{
+  \normalfont 
+  \leavevmode
+  \hbox{
+		\begin{beamercolorbox}[wd=.98\paperwidth,ht=2.5ex,dp=2.125ex,leftskip=.3cm,rightskip=.3cm]{title in head/foot_}
+			\insertauthor
+			\hfill 
+			\insertshorttitle
+			\hfill
+			\insertframenumber
+    \end{beamercolorbox}
+	}
+}
