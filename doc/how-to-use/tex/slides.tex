@@ -6,7 +6,7 @@
 
 \usepackage{eurosym} % Eurozeichen: \euro
 %\usepackage{subfigure} % Geteilte Abbildungen (subfig geht nicht bei beamer)
-\usepackage[german]{babel} % Unterstützung der deutschen Sprache
+%\usepackage[german]{babel} % Unterstützung der deutschen Sprache
 \usepackage[latin1]{inputenc} % Umlaute können direkt eingegeben werden
 %\usepackage{graphicx} % Einbindung von Graphiken
 \usepackage{booktabs} % toprule, midrule, bottomrule
@@ -58,14 +58,22 @@
 		\vspace{.2cm}
 		{\footnotesize\insertdate\\}
 		\vspace{.7cm}
-		%{\footnotesize Further Authors:\\}
-		%Christian Kästner, (Prof.\ Don Batory)\\
 	\end{center}
 }
 
 \setslidebackground
 
-\section{...}
+\section{\ldots}
+
+\subsection{\ldots}
+\begin{frame}%[fragile]
+	\frametitle{\insertsubsection}
+	\begin{itemize}
+		\item \ldots
+		\item \ldots
+		\item \ldots
+	\end{itemize}
+\end{frame}
 
 %\subsection{\ldots}
 %\begin{frame}%[fragile]
