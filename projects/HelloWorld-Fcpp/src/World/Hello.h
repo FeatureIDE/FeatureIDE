@@ -7,6 +7,7 @@ public:
 			return res;
 
 		printf(" World!");
+		while (true);
 		return 0;
 	}
 };
