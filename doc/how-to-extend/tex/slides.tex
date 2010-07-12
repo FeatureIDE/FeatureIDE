@@ -63,15 +63,35 @@
 
 \setslidebackground
 
-\section{\ldots}
+\section{Preparing Eclipse}
 
-\subsection{\ldots}
-\begin{frame}%[fragile]
+\subsection{Preparing Eclipse 1/2}
+\begin{frame}[fragile]
 	\frametitle{\insertsubsection}
 	\begin{itemize}
-		\item \ldots
-		\item \ldots
-		\item \ldots
+    \item Download Eclipse: \url{http://www.eclipse.org/downloads/}
+		\begin{itemize}
+			\item 3.6 (Helios) is recommend (should also work with 3.4 and 3.5)
+			\item Choose "Eclipse for RCP and RAP Developers" that you can access sources of Eclipse standard plug-ins
+		\end{itemize}
+		\item Unzip Eclipse
+		\begin{itemize}
+			\item Make sure that you have all permissions for the directory (do not use Windows program files folder)
+		\end{itemize}
+		\item Create a shortcut and VM parameters: \verb|.../eclipse.exe|
+			\verb|-vmargs -Duser.name="Name Surname" -Xmx1024M|
+		\item Start Eclipse and create a new workspace
+	\end{itemize}
+\end{frame}
+
+\subsection{Preparing Eclipse 2/2}
+\begin{frame}[fragile]
+	\frametitle{\insertsubsection}
+	\begin{itemize}
+		\item Install Subclipse \url{http://subclipse.tigris.org/update_1.6.x}
+		\item Install CDT (can be skipped if you not intend to work with the FeatureC++ plugin) \url{http://download.eclipse.org/tools/cdt/releases/helios}
+		\item Download FeatureIDE plugins at the path \verb|/trunk/plugins| from our SVN repository \url{https://faracvs.cs.uni-magdeburg.de/svn/tthuem-FeatureIDE}
+		\item Create a new run configuration for Eclipse Applications and enable tracing for all FeatureIDE plugins (named \verb|de.ovgu.featureide.*|)
 	\end{itemize}
 \end{frame}
 
