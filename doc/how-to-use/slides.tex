@@ -14,9 +14,262 @@
 
 \tttitlepage
 
-\section{\ldots}
+\subsection{Content}
+\begin{frame}%[fragile]
+	\frametitle{\insertsubsection}
+	\begin{itemize}
+		\item What is Feature-Oriented Software Development?\\[5mm]
+		\item What functionality does FeatureIDE provide?\\[5mm]
+		\item How to start working with FeatureIDE?
+	\end{itemize}
+\end{frame}
 
-\subsection{\ldots}
+\section{FOSD Background}
+
+\subsection{Feature-Oriented Programming (FOP)}
+\begin{frame}%[fragile]
+	\frametitle{\insertsubsection}
+	\begin{itemize}
+	  \item Introduced 1997 by Christian Prehofer
+		\item Based on Object-Oriented Programming
+		\item Features realize functionalities
+		\item Features are cross-cutting to objects
+		\item Features modularize fragments from certain classes
+		\item Fragment contains some methods/fields of a class belonging to one functionality
+		\item Goals: code traceability, software customization
+	\end{itemize}
+\end{frame}
+
+\subsection{FOP Example}
+\begin{frame}%[fragile]
+	\frametitle{\insertsubsection}
+	\begin{center}
+		\includegraphics[width=\textwidth]{FOPexample}\\
+		\tiny\url{http://wwwiti.cs.uni-magdeburg.de/iti_db/lehre/epmd/2009/slides/06_FOP.pdf}
+	\end{center}
+\end{frame}
+
+\subsection{Configuration}
+\begin{frame}%[fragile]
+	\frametitle{\insertsubsection}
+	\begin{itemize}
+		\item Selection of features for a program variant
+		\item Not all combinations are useful
+	\end{itemize}
+\end{frame}
+
+\subsection{Feature Model}
+\begin{frame}%[fragile]
+	\frametitle{\insertsubsection}
+	\begin{itemize}
+		\item Specifies valid combinations of features
+		\item Graphically represented by a feature diagram
+		\item Created for a particular domain
+		\item Describes a software product line (SPL)
+	\end{itemize}
+	\begin{center}
+    \begin{tikzpicture}
+      \node at (0,0) {\includegraphics[scale=0.75]{tinygpl1}};
+      \node[overlay,inner sep=.5mm,shape=rectangle,draw] at (4.5,-0.9) {
+				\begin{minipage}{21mm}
+					\tiny
+					\begin{flushleft}
+						\includegraphics[trim=12.5mm 10mm 14mm 5.5mm,clip,scale=0.6]{fm_and}\ And-group\\[.5mm]
+						\includegraphics[trim=12.5mm 10mm 14mm 5.5mm,clip,scale=0.6]{fm_or}\ Or-group\\[.5mm]
+						\includegraphics[trim=12.5mm 10mm 14mm 5.5mm,clip,scale=0.6]{fm_alt}\ Alternative-group\\[.5mm]
+						\includegraphics[trim=6mm 4.5mm 21mm 11mm,clip,scale=0.6]{fm_and}\ Mandatory\\[.5mm]
+						\includegraphics[trim=19.5mm 4.5mm 7.5mm 11mm,clip,scale=0.6]{fm_and}\ Optional
+					\end{flushleft}
+				\end{minipage}
+			};
+      \uncover<2>{
+	      \node[overlay] (label) at (-2.0,1.2) {\color{red}\footnotesize And-group};
+	      \draw[red,thick,-latex,overlay] (label) -- (-0.2,0.8);
+			}      
+      \uncover<3>{
+	      \node[overlay] (label) at (-2.9,0.6) {\color{red}\footnotesize Mandatory};
+	      \draw[red,thick,-latex,overlay] (label) -- (-1.1,0.45);
+			}      
+      \uncover<4>{
+	      \node[overlay] (label) at (2.9,1.0) {\color{red}\footnotesize Optional};
+	      \draw[red,thick,-latex,overlay] (label) -- (1.4,0.45);
+			}      
+      \uncover<5>{
+	      \node[overlay] (label) at (-3.4,-0.4) {\color{red}\footnotesize Alternative-group};
+	      \draw[red,thick,-latex,overlay] (label) -- (-1.2,-0.1);
+			}      
+      \uncover<6>{
+	      \node[overlay] (label) at (3,0.1) {\color{red}\footnotesize Or-group};
+	      \draw[red,thick,-latex,overlay] (label) -- (1.4,-0.1);
+			}      
+      \uncover<7>{
+	      \node[overlay] (label) at (-3.1,-1.4) {\color{red}\footnotesize Cross-tree constraints};
+	      \draw[red,thick,-latex,overlay] (label) -- (-0.6,-1.3);
+			}
+			\only<8>{}
+    \end{tikzpicture}
+	\end{center}
+\end{frame}
+
+\subsection{Composition Engines}
+\begin{frame}%[fragile]
+	\frametitle{\insertsubsection}
+	Command-line tools used to compose files within FeatureIDE:\\[5mm]
+	\begin{itemize}
+		\item AHEAD (jampack): .jak (Java 1.4)\\
+		  \url{http://userweb.cs.utexas.edu/~schwartz/ATS.html}\\[5mm]
+		\item FeatureC++: .cpp (C++)\\
+		  \url{http://www.fosd.de/fcpp}\\[5mm]
+		\item FeatureHouse: .java (Java 1.5), .cs (C#), .c/.h (C), .hs (Haskell), .jj (JavaCC), .als (Alloy), .xmi (UML)\\
+		  \url{http://www.fosd.de/fh}		
+	\end{itemize}
+\end{frame}
+
+\subsection{Feature-Oriented Software Development}
+\begin{frame}%[fragile]
+	\frametitle{\insertsubsection}
+	\begin{itemize}
+		\item \ldots
+		\item \ldots
+		\item \ldots
+	\end{itemize}
+\end{frame}
+
+\section{Functionality of FeatureIDE}
+
+\subsection{Feature Model Editor 1/4}
+\begin{frame}%[fragile]
+	\frametitle{\insertsubsection}
+	\begin{itemize}
+		\item \ldots
+		\item \ldots
+		\item \ldots
+	\end{itemize}
+\end{frame}
+
+\subsection{Feature Model Editor 2/4}
+\begin{frame}%[fragile]
+	\frametitle{\insertsubsection}
+	\begin{itemize}
+		\item \ldots
+		\item \ldots
+		\item \ldots
+	\end{itemize}
+\end{frame}
+
+\subsection{Feature Model Editor 3/4}
+\begin{frame}%[fragile]
+	\frametitle{\insertsubsection}
+	\begin{itemize}
+		\item \ldots
+		\item \ldots
+		\item \ldots
+	\end{itemize}
+\end{frame}
+
+\subsection{Feature Model Editor 4/4}
+\begin{frame}%[fragile]
+	\frametitle{\insertsubsection}
+	\begin{itemize}
+		\item \ldots
+		\item \ldots
+		\item \ldots
+	\end{itemize}
+\end{frame}
+
+\subsection{Feature Model Edit View}
+\begin{frame}%[fragile]
+	\frametitle{\insertsubsection}
+	\begin{itemize}
+		\item \ldots
+		\item \ldots
+		\item \ldots
+	\end{itemize}
+\end{frame}
+
+\subsection{Configuration Editor}
+\begin{frame}%[fragile]
+	\frametitle{\insertsubsection}
+	\begin{itemize}
+		\item \ldots
+		\item \ldots
+		\item \ldots
+	\end{itemize}
+\end{frame}
+
+\subsection{Jak Editor}
+\begin{frame}%[fragile]
+	\frametitle{\insertsubsection}
+	\begin{itemize}
+		\item \ldots
+		\item \ldots
+		\item \ldots
+	\end{itemize}
+\end{frame}
+
+\subsection{Collaboration Diagram}
+\begin{frame}%[fragile]
+	\frametitle{\insertsubsection}
+	\begin{itemize}
+		\item \ldots
+		\item \ldots
+		\item \ldots
+	\end{itemize}
+\end{frame}
+
+\subsection{Feature Project Structure}
+\begin{frame}%[fragile]
+	\frametitle{\insertsubsection}
+	\begin{itemize}
+		\item \ldots
+		\item \ldots
+		\item \ldots
+	\end{itemize}
+\end{frame}
+
+\subsection{Feature Project Builder}
+\begin{frame}%[fragile]
+	\frametitle{\insertsubsection}
+	\begin{itemize}
+		\item \ldots
+		\item \ldots
+		\item \ldots
+	\end{itemize}
+\end{frame}
+
+\subsection{Run Configurations}
+\begin{frame}%[fragile]
+	\frametitle{\insertsubsection}
+	\begin{itemize}
+		\item \ldots
+		\item \ldots
+		\item \ldots
+	\end{itemize}
+\end{frame}
+
+\subsection{Creation Wizards}
+\begin{frame}%[fragile]
+	\frametitle{\insertsubsection}
+	\begin{itemize}
+		\item \ldots
+		\item \ldots
+		\item \ldots
+	\end{itemize}
+\end{frame}
+
+\section{How to Start}
+
+\subsection{Installation of FeatureIDE}
+\begin{frame}%[fragile]
+	\frametitle{\insertsubsection}
+	\begin{itemize}
+		\item \ldots
+		\item \ldots
+		\item \ldots
+	\end{itemize}
+\end{frame}
+
+\subsection{Cheat Sheet}
 \begin{frame}%[fragile]
 	\frametitle{\insertsubsection}
 	\begin{itemize}
