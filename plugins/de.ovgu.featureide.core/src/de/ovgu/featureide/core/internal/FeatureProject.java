@@ -578,7 +578,6 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	}
 
 	public void resourceChanged(IResourceChangeEvent event) {
-		buildRelevantChanges = false;
 		if (!checkModelChange(event.getDelta().findMember(
 				modelFile.getResource().getFullPath()))) {
 			try {
@@ -610,8 +609,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			return false;
 		
 		buildRelevantChanges = true;
-//		CorePlugin.getDefault().logInfo(
-//				"Model " + modelFile.getResource().getFullPath() + " changed");
+
 		Job job = new Job("Load Model") {
 			protected IStatus run(IProgressMonitor monitor) {
 				loadModel();
@@ -786,4 +784,13 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	public boolean buildRelavantChanges() {
 			return buildRelevantChanges;
 	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.IFeatureProject#builded()
+	 */
+	public void builded() {
+		buildRelevantChanges = false;
+	}
+	
+
 }

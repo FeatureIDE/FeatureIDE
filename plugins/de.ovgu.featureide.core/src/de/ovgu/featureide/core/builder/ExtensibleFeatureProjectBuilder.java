@@ -124,7 +124,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		if (!featureProjectLoaded())
 			return null;
 		
-		if ((!featureProject.buildRelavantChanges() && !cleaned))
+		if (!featureProject.buildRelavantChanges() && !cleaned && kind == AUTO_BUILD)
 			return null;
 		
 		cleaned = false;
@@ -147,6 +147,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		}
 		
 		composerExtension.performFullBuild(equation);
+		featureProject.builded();
 		try {
 			featureProject.getBuildFolder().refreshLocal(
 					IResource.DEPTH_INFINITE, monitor);

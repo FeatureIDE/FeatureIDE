@@ -102,8 +102,10 @@ public class FeatureOrderEditor extends EditorPart {
 		orderList = readFeaturesfromOrderFile();
 		try {
 			for (IResource res : ((IFile) input.getAdapter(IFile.class))
-					.getProject().getFolder("equations").members())
+					.getProject().getFolder("equations").members()){
 				changeConfigurationOrder(res);
+				res.refreshLocal(IResource.DEPTH_ZERO, null);
+			}	
 		} catch (CoreException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
@@ -409,6 +411,7 @@ public class FeatureOrderEditor extends EditorPart {
 		} catch (IOException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
+		
 	}
 
 	private void changeConfigurationOrder(IResource resource) {

@@ -166,5 +166,7 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	 * @return True if the model, a sourcefile or the current equation was changed.
 	 */
 	public boolean buildRelavantChanges();
+	
+	public void builded();
 
 }
