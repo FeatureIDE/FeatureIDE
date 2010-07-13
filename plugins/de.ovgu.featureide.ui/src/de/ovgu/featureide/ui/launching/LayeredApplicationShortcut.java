@@ -41,7 +41,7 @@ import de.ovgu.featureide.ui.UIPlugin;
 
 public class LayeredApplicationShortcut implements ILaunchShortcut {
 
-    public static final String ID_LAYERED_APPLICATION = "de.ovgu.featureide.core.launching.layeredApplication";
+    public static final String ID_LAYERED_APPLICATION = "featureide.core.launching.layeredApplication";//"de.ovgu.featureide.core.launching.layeredApplication";
 
 	public void launch(IEditorPart editor, String mode) {
         IEditorInput input = editor.getEditorInput();
@@ -79,7 +79,13 @@ public class LayeredApplicationShortcut implements ILaunchShortcut {
 		ILaunchConfiguration config = null;
 		try {
 			ILaunchConfigurationType configType = getConfigurationType();
-			ILaunchConfigurationWorkingCopy wc = configType.newInstance(null, DebugPlugin.getDefault().getLaunchManager().generateUniqueLaunchConfigurationNameFrom(className)); 
+			for (ILaunchConfiguration conf : DebugPlugin.getDefault().getLaunchManager().getLaunchConfigurations()){
+				if (conf.getAttribute(LayeredApplicationMainTab.PROJECT_NAME, "").equals(project.getName())){
+					if (conf.getAttribute(LayeredApplicationMainTab.MAIN_CLASS, "").equals(className))
+						return conf;
+				}
+			}
+			ILaunchConfigurationWorkingCopy wc = configType.newInstance(null, DebugPlugin.getDefault().getLaunchManager().generateLaunchConfigurationName(project.getName()+"."+className)); 
 			wc.setAttribute(LayeredApplicationMainTab.PROJECT_NAME, project.getName());
 			wc.setAttribute(LayeredApplicationMainTab.MAIN_CLASS, className);
 			wc.setMappedResources(new IResource[] {project});
