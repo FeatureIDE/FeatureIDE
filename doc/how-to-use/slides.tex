@@ -18,7 +18,16 @@
 \begin{frame}%[fragile]
 	\frametitle{\insertsubsection}
 	\begin{itemize}
-		\item What is Feature-Oriented Software Development?\\[5mm]
+		\item What is Feature-Oriented Software Development?\only<1>{\\[5mm]}
+		\only<2>{
+			\begin{itemize}
+				\item Feature-Oriented Programming + Example
+				\item Configurations
+				\item Feature Model
+				\item Composition Engines\\[5mm]
+			\end{itemize}
+			\color{grayed}
+		}
 		\item What functionality does FeatureIDE provide?\\[5mm]
 		\item How to start working with FeatureIDE?
 	\end{itemize}
@@ -52,8 +61,12 @@
 \subsection{Configuration}
 \begin{frame}%[fragile]
 	\frametitle{\insertsubsection}
+	\begin{center}
+		\includegraphics[scale=.75]{conf}
+	\end{center}
 	\begin{itemize}
-		\item Selection of features for a program variant
+		\item Selection of features
+		\item Composition of features results in a program variant
 		\item Not all combinations are useful
 	\end{itemize}
 \end{frame}
@@ -120,18 +133,56 @@
 		  \url{http://userweb.cs.utexas.edu/~schwartz/ATS.html}\\[5mm]
 		\item FeatureC++: .cpp (C++)\\
 		  \url{http://www.fosd.de/fcpp}\\[5mm]
-		\item FeatureHouse: .java (Java 1.5), .cs (C#), .c/.h (C), .hs (Haskell), .jj (JavaCC), .als (Alloy), .xmi (UML)\\
+		\item FeatureHouse: .java (Java 1.5), .cs (C\#), .c/.h (C), .hs (Haskell), .jj (JavaCC), .als (Alloy), .xmi (UML)\\
 		  \url{http://www.fosd.de/fh}		
 	\end{itemize}
 \end{frame}
 
+\newcommand{\picfontsize}{\footnotesize}
+\newcommand{\picfm}{\picfontsize\includegraphics[width=.8\textwidth]{tinygpl1}\\Feature Model}
+\newcommand{\piccodebase}{\picfontsize\includegraphics[width=.5\textwidth]{codebase1}\includegraphics[width=.5\textwidth]{codebase2}\\Feature Modules}
+\newcommand{\picconf}{\picfontsize\includegraphics[width=.85\textwidth]{conf}\\Configurations}
+\newcommand{\picgen}{\picfontsize\includegraphics[width=.5\textwidth]{blackbox}\\Composer}
+\newcommand{\picvariant}{\picfontsize\includegraphics[width=.75\textwidth]{programvariant}\\Program Variants}
+\newcommand{\mnode}[3]{
+	\node[xshift=.3em, yshift=.3em, #1] (#2x) {};
+	\node[#1] {};
+	\node[xshift=-.3em, yshift=-.3em, #1] (#2) {#3}
+}
 \subsection{Feature-Oriented Software Development}
 \begin{frame}%[fragile]
 	\frametitle{\insertsubsection}
+	\begin{center}
+		\begin{tikzpicture}[node distance=8mm]
+			\node[node1s] (fm) {\picfm};
+			\node[node1s, right=of fm]	(codebase) {\piccodebase};
+			\mnode{node1s, below=of fm}{configuration}{\picconf};
+			\node[node1s, below=of codebase] (generator) {\picgen};
+			\mnode{node1s, right=of generator}{variants}{\picvariant};
+			\draw[edge2] (fm) -- (configurationx);
+			%\draw[edge2] (fm) -- (codebase);
+			\draw[edge1] (configurationx) -- (generator);
+			\draw[edge1] (codebase) -- (generator);
+			\draw[edge1] (generator) -- (variants);
+		\end{tikzpicture}
+	\end{center}
+\end{frame}
+
+\begin{frame}%[fragile]
+	\frametitle{Content}
 	\begin{itemize}
-		\item \ldots
-		\item \ldots
-		\item \ldots
+		\item {\color{grayed}What is Feature-Oriented Software Development?}\\[5mm]
+		\item What functionality does FeatureIDE provide?
+			\begin{itemize}
+				\item Feature Model Editor + Edit View
+				\item Configuration Editor
+				\item Jak Editor
+				\item Collaboration Diagram
+				\item Feature Project Builder
+				\item Run Configurations
+				\item Creation Wizards\\[5mm]
+			\end{itemize}
+		\item {\color{grayed}How to start working with FeatureIDE?}
 	\end{itemize}
 \end{frame}
 
@@ -217,16 +268,6 @@
 	\end{itemize}
 \end{frame}
 
-\subsection{Feature Project Structure}
-\begin{frame}%[fragile]
-	\frametitle{\insertsubsection}
-	\begin{itemize}
-		\item \ldots
-		\item \ldots
-		\item \ldots
-	\end{itemize}
-\end{frame}
-
 \subsection{Feature Project Builder}
 \begin{frame}%[fragile]
 	\frametitle{\insertsubsection}
@@ -257,9 +298,33 @@
 	\end{itemize}
 \end{frame}
 
+\begin{frame}%[fragile]
+	\frametitle{Content}
+	\begin{itemize}
+		\item {\color{grayed}What is Feature-Oriented Software Development?\\[5mm]
+		\item What functionality does FeatureIDE provide?}\\[5mm]
+		\item How to start working with FeatureIDE?
+		\begin{itemize}
+			\item FeatureIDE Installation
+			\item Feature Project Structure
+			\item Cheat Sheet
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
 \section{How to Start}
 
 \subsection{Installation of FeatureIDE}
+\begin{frame}%[fragile]
+	\frametitle{\insertsubsection}
+	\begin{itemize}
+		\item \ldots
+		\item \ldots
+		\item \ldots
+	\end{itemize}
+\end{frame}
+
+\subsection{Feature Project Structure}
 \begin{frame}%[fragile]
 	\frametitle{\insertsubsection}
 	\begin{itemize}

@@ -3,3 +3,67 @@
 	\usetikzlibrary{arrows,positioning,backgrounds,fit,trees} 
 	\usetikzlibrary{fadings,shapes.geometric}%spy,
 	\usetikzlibrary{decorations,scopes,calc,decorations.pathreplacing}
+	\tikzset{
+		%Define standard arrow tip
+		>=stealth',
+		%Define style for boxes
+		node1/.style={
+		  rectangle,
+		  rounded corners,
+		  draw=black, very thick,
+		  text width=9em,
+		  minimum height=7em,
+		  fill=background,
+		  text centered,
+		},
+		node1s/.style={
+		  rectangle,
+		  rounded corners,
+		  draw=black, very thick,
+		  text width=7em,
+		  minimum height=6em,
+		  fill=background,
+		  text centered,
+		},
+		node2/.style={
+		  circle,
+			dashed,
+		  draw=black, very thick,
+		  text width=6em,
+		  minimum height=7em,
+		  fill=background,
+		  text centered,
+		},
+		node2s/.style={
+		  circle,
+			dashed,
+		  draw=black, very thick,
+		  text width=5em,
+		  minimum height=6em,
+		  fill=background,
+		  text centered,
+		},
+		node3/.style={
+		  rectangle,
+		  rounded corners,
+		  draw=black,
+			inner xsep=0.5em,
+			inner ysep=0.5em,
+		},
+		% Define arrow style
+		edge1/.style={
+			->,
+			thick,
+			overlay,
+			shorten <=2pt,
+			shorten >=2pt,
+		},
+		edge2/.style={
+			->,
+			thick,
+			dashed,
+			overlay,
+			shorten <=2pt,
+			shorten >=2pt,
+		},
+	}
