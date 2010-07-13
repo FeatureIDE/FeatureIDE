@@ -13,7 +13,6 @@
 \begin{document}
 
 \newcounter{saveenum}
-\newcounter{saveslide}
 
 \tttitlepage
 
@@ -39,7 +38,6 @@
 			\item Avoids OutOfMemoryException
 		\end{itemize}
 		\item Start Eclipse and create a new workspace
-    \setcounter{saveenum}{\value{enumi}}
 	\end{enumerate}
 \end{frame}
 
@@ -47,15 +45,15 @@
 \begin{frame}[fragile]
 	\frametitle{\insertsubsection}
 	\begin{enumerate}
-    \setcounter{enumi}{\value{saveenum}}
+    \setcounter{enumi}{4}
 		\item Install Subclipse using Eclipse update mechanism \url{http://subclipse.tigris.org/update_1.6.x}
 		\item Install CDT (can be skipped if you not intend to work with the FeatureC++ plugin) \url{http://download.eclipse.org/tools/cdt/releases/helios}
-    \setcounter{saveenum}{\value{enumi}}
 	\end{enumerate}
 	\begin{center}
 	  \tikz{
 		  \node at (0,0) {\includegraphics[scale=0.2]{install-new-software}};
-		  \node at (4,-1) {\includegraphics[scale=0.2]{install-new-software-dialog}};
+		  \uncover<2->{\node at (4,-1) {\includegraphics[scale=0.2]{install-new-software-dialog}};}
+			\only<2>{}
 		}
 	\end{center}
 \end{frame}
@@ -64,18 +62,18 @@
 \begin{frame}[fragile]
 	\frametitle{\insertsubsection}
 	\begin{enumerate}
-    \setcounter{enumi}{\value{saveenum}}
+    \setcounter{enumi}{6}
 		\item Download FeatureIDE plugins from our SVN repository \url{https://faracvs.cs.uni-magdeburg.de/svn/tthuem-FeatureIDE}
 		\begin{itemize}
 			\item login: \verb|anonymous|, no password, path: \verb|/trunk/plugins|
 		\end{itemize}
-    \setcounter{saveenum}{\value{enumi}}
 	\end{enumerate}
 	\begin{center}
 	  \tikz{
 		  \node at (0,0) {\includegraphics[scale=0.2]{import-svn-projects-1}};
-		  \node at (2.5,-1) {\includegraphics[scale=0.2]{import-svn-projects-2}};
-		  \node at (5.5,-.5) {\includegraphics[scale=0.2]{import-svn-projects-3}};
+		  \uncover<2->{\node at (2.5,-1) {\includegraphics[scale=0.2]{import-svn-projects-2}};}
+		  \uncover<3->{\node at (5.5,-.5) {\includegraphics[scale=0.2]{import-svn-projects-3}};}
+			\only<3>{}
 		}
 	\end{center}
 \end{frame}
@@ -84,13 +82,14 @@
 \begin{frame}[fragile]
 	\frametitle{\insertsubsection}
 	\begin{enumerate}
-    \setcounter{enumi}{\value{saveenum}}
+    \setcounter{enumi}{7}
 		\item Create a new run configuration for Eclipse Applications and enable debug tracing for all FeatureIDE plugins (named \verb|de.ovgu.featureide.*|)
 	\end{enumerate}
 	\begin{center}
 	  \tikz{
 		  \node at (0,0) {\includegraphics[scale=0.2]{run-configuration-1}};
-		  \node at (4,-1) {\includegraphics[scale=0.2]{run-configuration-2}};
+		  \uncover<2->{\node at (4,-1) {\includegraphics[scale=0.2]{run-configuration-2}};}
+			\only<2>{}
 		}
 	\end{center}
 \end{frame}
