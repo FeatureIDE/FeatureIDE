@@ -21,7 +21,6 @@ package de.ovgu.featureide.core.projectstructure.trees;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.projectstructure.nodetypes.Node;
 import de.ovgu.featureide.core.projectstructure.nodetypes.NonTerminalNode;
 import de.ovgu.featureide.core.projectstructure.nodetypes.TerminalNode;
@@ -291,10 +290,10 @@ public class LeafTree extends Node{
 		if (iterator != null) {
 			while (iterator.hasNext()) {
 				Node node = iterator.next();
-				if (node instanceof TerminalNode)
-					CorePlugin.getDefault().logInfo(space + node.toString());
+				if (node instanceof TerminalNode);
+//					CorePlugin.getDefault().logInfo(space + node.toString());
 				else {
-					CorePlugin.getDefault().logInfo(space + node.toString());
+//					CorePlugin.getDefault().logInfo(space + node.toString());
 					print(((NonTerminalNode) node).getChildren().iterator(),
 							space + "    ");
 				}

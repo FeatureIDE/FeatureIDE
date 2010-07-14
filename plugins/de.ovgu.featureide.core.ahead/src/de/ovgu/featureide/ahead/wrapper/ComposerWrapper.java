@@ -171,7 +171,7 @@ public class ComposerWrapper {
 		String compositionName = equationFile.getName().substring(0,
 				equationFile.getName().lastIndexOf("."));
 		compositionFolder = featureProject.getBuildFolder().getFolder(
-				compositionName);
+				compositionName).getFolder(compositionName);
 	}
 
 	/**

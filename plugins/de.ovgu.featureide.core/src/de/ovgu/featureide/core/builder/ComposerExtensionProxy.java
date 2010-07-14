@@ -18,6 +18,8 @@
  */
 package de.ovgu.featureide.core.builder;
 
+import java.util.ArrayList;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -124,5 +126,12 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	public void clean() {
 		loadComposerExtension();
 		composerExtensionClass.clean();
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#extensions()
+	 */
+	public ArrayList<String> extensions() {
+		return composerExtensionClass.extensions();
 	}
 }

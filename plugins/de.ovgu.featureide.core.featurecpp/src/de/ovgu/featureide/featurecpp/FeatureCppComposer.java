@@ -18,6 +18,8 @@
  */
 package de.ovgu.featureide.featurecpp;
 
+import java.util.ArrayList;
+
 import org.eclipse.core.resources.IFile;
 
 import de.ovgu.featureide.core.IFeatureProject;
@@ -50,5 +52,12 @@ public class FeatureCppComposer implements IComposerExtensionClass {
 	
 	public void performFullBuild(IFile equation) {
 		featureCpp.compose(equation);
+	}
+
+	@Override
+	public ArrayList<String> extensions() {
+		ArrayList<String> extensions = new ArrayList<String>();
+		extensions.add(".h");
+		return extensions;
 	}
 }

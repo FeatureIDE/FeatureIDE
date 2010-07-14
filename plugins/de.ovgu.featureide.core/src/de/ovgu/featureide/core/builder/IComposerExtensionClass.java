@@ -18,6 +18,8 @@
  */
 package de.ovgu.featureide.core.builder;
 
+import java.util.ArrayList;
+
 import org.eclipse.core.resources.IFile;
 
 import de.ovgu.featureide.core.IFeatureProject;
@@ -38,6 +40,8 @@ import de.ovgu.featureide.core.IFeatureProject;
  * @author Tom Brosch
  */
 public interface IComposerExtensionClass {
+	
+	ArrayList<String> extensions();
 	
 	void initialize(IFeatureProject project);
 	

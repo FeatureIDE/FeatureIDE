@@ -86,7 +86,7 @@ public class LayeredApplicationLaunchConfigurationDelegate extends
 			IVMRunner runner = getVMRunner(configuration, mode);
 	
 //			File workingDir = verifyWorkingDirectory(configuration);
-			File workingDir = featureProject.getBinFolder().getRawLocation().toFile();
+			File workingDir = featureProject.getBinFolder().getFolder(packageName).getRawLocation().toFile();
 			String workingDirName = null;
 			if (workingDir != null) {
 				workingDirName = workingDir.getAbsolutePath();

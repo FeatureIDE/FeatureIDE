@@ -26,7 +26,6 @@ import java.util.regex.Pattern;
 import de.ovgu.cide.fstgen.ast.FSTNode;
 import de.ovgu.cide.fstgen.ast.FSTNonTerminal;
 import de.ovgu.cide.fstgen.ast.FSTTerminal;
-import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.projectstructure.nodetypes.NonTerminalNode;
 import de.ovgu.featureide.core.projectstructure.nodetypes.ProjectTreeNode;
 import de.ovgu.featureide.core.projectstructure.nodetypes.TerminalNode;
@@ -88,7 +87,7 @@ public class TreeBuilderFeatureHouse {
 	public void createProjectTree(ArrayList<FSTNode> fstNodes) {
 		String language = getLanguage(fstNodes);
 		startNode = StartNode.determineStartNode(language);
-		CorePlugin.getDefault().logInfo("start: " + startNode);
+//		CorePlugin.getDefault().logInfo("start: " + startNode);
 
 		Iterator<FSTNode> iterator = fstNodes.iterator();
 		FSTNode node;

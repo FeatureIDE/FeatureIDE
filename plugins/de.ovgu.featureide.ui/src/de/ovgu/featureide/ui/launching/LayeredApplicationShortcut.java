@@ -41,7 +41,7 @@ import de.ovgu.featureide.ui.UIPlugin;
 
 public class LayeredApplicationShortcut implements ILaunchShortcut {
 
-    public static final String ID_LAYERED_APPLICATION = "featureide.core.launching.layeredApplication";//"de.ovgu.featureide.core.launching.layeredApplication";
+    public static final String ID_LAYERED_APPLICATION = "featureide.core.launching.layeredApplication";
 
 	public void launch(IEditorPart editor, String mode) {
         IEditorInput input = editor.getEditorInput();
@@ -62,12 +62,12 @@ public class LayeredApplicationShortcut implements ILaunchShortcut {
 		if (featureProject != null && file.getName().endsWith(".jak")) {
 			String jakFileName = file.getName();
 			String className = jakFileName.substring(0, jakFileName.length() - ".jak".length());
-			findLaunchConfiguration(file.getProject(), featureProject.getBinPath(), className, mode);
+			findLaunchConfiguration(file.getProject(), className, mode);
 		}
     }
 
-	private void findLaunchConfiguration(IProject project, String binPath, String className, String mode) {
-		ILaunchConfiguration config = createLaunchConfiguration(project, binPath, className);
+	private void findLaunchConfiguration(IProject project , String className, String mode) {
+		ILaunchConfiguration config = createLaunchConfiguration(project, className);
 		try {
 			config.launch(mode, null);
 		} catch (CoreException e) {
@@ -75,17 +75,16 @@ public class LayeredApplicationShortcut implements ILaunchShortcut {
 		}
 	}
 
-	private ILaunchConfiguration createLaunchConfiguration(IProject project, String binPath, String className) {
+	@SuppressWarnings("deprecation")
+	private ILaunchConfiguration createLaunchConfiguration(IProject project, String className) {
 		ILaunchConfiguration config = null;
 		try {
+			for (ILaunchConfiguration conf : DebugPlugin.getDefault().getLaunchManager().getLaunchConfigurations())
+				if (conf.getName().equals(project.getName()+"."+className))
+					return conf;
+
 			ILaunchConfigurationType configType = getConfigurationType();
-			for (ILaunchConfiguration conf : DebugPlugin.getDefault().getLaunchManager().getLaunchConfigurations()){
-				if (conf.getAttribute(LayeredApplicationMainTab.PROJECT_NAME, "").equals(project.getName())){
-					if (conf.getAttribute(LayeredApplicationMainTab.MAIN_CLASS, "").equals(className))
-						return conf;
-				}
-			}
-			ILaunchConfigurationWorkingCopy wc = configType.newInstance(null, DebugPlugin.getDefault().getLaunchManager().generateLaunchConfigurationName(project.getName()+"."+className)); 
+			ILaunchConfigurationWorkingCopy wc = configType.newInstance(null, DebugPlugin.getDefault().getLaunchManager().generateUniqueLaunchConfigurationNameFrom(project.getName()+"."+className)); 
 			wc.setAttribute(LayeredApplicationMainTab.PROJECT_NAME, project.getName());
 			wc.setAttribute(LayeredApplicationMainTab.MAIN_CLASS, className);
 			wc.setMappedResources(new IResource[] {project});
@@ -103,16 +102,4 @@ public class LayeredApplicationShortcut implements ILaunchShortcut {
 		ILaunchManager lm = DebugPlugin.getDefault().getLaunchManager();
 		return lm.getLaunchConfigurationType(ID_LAYERED_APPLICATION);		
 	}
-
-//    protected void launch(IType type, String mode) {
-//        try {
-//            ILaunchConfiguration config = findLaunchConfiguration(type, mode);
-//            if (config != null) {
-//            	config.launch(mode, null);
-//            }
-//        } catch (CoreException e) {
-//            UIPlugin.getDefault().logError(e);
-//        }
-//    }
-
 }

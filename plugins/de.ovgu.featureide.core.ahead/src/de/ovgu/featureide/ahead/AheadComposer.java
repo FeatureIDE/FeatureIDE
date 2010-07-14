@@ -19,6 +19,7 @@
 package de.ovgu.featureide.ahead;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -77,5 +78,12 @@ public class AheadComposer implements IComposerExtensionClass {
 	}
 
 	public void clean() {
+	}
+
+	@Override
+	public ArrayList<String> extensions() {
+		ArrayList<String> extensions = new ArrayList<String>();
+		extensions.add(".jak");
+		return extensions;
 	}
 }

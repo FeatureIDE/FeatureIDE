@@ -18,6 +18,8 @@
  */
 package de.ovgu.featureide.featurehouse;
 
+import java.util.ArrayList;
+
 import org.eclipse.core.resources.IFile;
 
 import composer.FSTGenComposer;
@@ -51,10 +53,10 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 		if (equationPath == null || basePath == null || outputPath == null)
 			return;
 		
-		FeatureHouseCorePlugin.getDefault().logInfo("Start composition");
-		FeatureHouseCorePlugin.getDefault().logInfo("Equation: " + equationPath);
-		FeatureHouseCorePlugin.getDefault().logInfo("Base folder: " + basePath);
-		FeatureHouseCorePlugin.getDefault().logInfo("Output: " + outputPath);
+//		FeatureHouseCorePlugin.getDefault().logInfo("Start composition");
+//		FeatureHouseCorePlugin.getDefault().logInfo("Equation: " + equationPath);
+//		FeatureHouseCorePlugin.getDefault().logInfo("Base folder: " + basePath);
+//		FeatureHouseCorePlugin.getDefault().logInfo("Output: " + outputPath);
 		
 		// A new FSTGenComposer instance is created every time, because this class
 		// seems to remember the FST from a previous build.
@@ -68,5 +70,19 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 	}
 
 	public void clean() {
+	}
+
+	@Override
+	public ArrayList<String> extensions() {
+		ArrayList<String> extensions = new ArrayList<String>();
+		extensions.add(".java");
+		extensions.add(".cs");
+		extensions.add(".c");
+		extensions.add(".h");
+		extensions.add(".hs");
+		extensions.add(".jj");
+		extensions.add(".als");
+		extensions.add(".xmi");
+		return extensions;
 	}
 }

@@ -36,6 +36,7 @@ import org.eclipse.core.runtime.CoreException;
 import com.sun.tools.javac.Main;
 
 import de.ovgu.featureide.ahead.AheadCorePlugin;
+import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 
 
@@ -79,11 +80,17 @@ public class JavacWrapper {
 		for (String path : featureProject.getJavaClassPath())
 			classpath += sep + path;
 		classpath = classpath.substring(1);
-
+		IFolder folder = featureProject.getBinFolder().getFolder(files[0].getParent().getName());
+		try {
+			if (!folder.exists())
+				folder.create(false, true, null);
+		} catch (CoreException e) {
+			CorePlugin.getDefault().logError(e);
+		}
 		String[] options = new String[4 + files.length];
 		int pos = 0;
 		options[pos++] = "-d";
-		options[pos++] = featureProject.getBinFolder().getRawLocation().toOSString();
+		options[pos++] = featureProject.getBinFolder().getFolder(files[0].getParent().getName()).getRawLocation().toOSString();
 		options[pos++] = "-classpath";
 		options[pos++] = classpath;
 		for (IFile file : files)

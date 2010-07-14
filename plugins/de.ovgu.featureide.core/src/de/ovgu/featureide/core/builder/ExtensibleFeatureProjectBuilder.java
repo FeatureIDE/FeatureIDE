@@ -18,7 +18,11 @@
  */
 package de.ovgu.featureide.core.builder;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.Scanner;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -27,6 +31,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
@@ -121,10 +126,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 
 	@Override
 	protected IProject[] build(int kind, Map args, IProgressMonitor monitor) {
-		if (!featureProjectLoaded())
-			return null;
-		
-		if (!featureProject.buildRelavantChanges() && !cleaned && kind == AUTO_BUILD)
+		if (!featureProjectLoaded() || (!featureProject.buildRelavantChanges() && !cleaned && kind == AUTO_BUILD))
 			return null;
 		
 		cleaned = false;
@@ -147,6 +149,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		}
 		
 		composerExtension.performFullBuild(equation);
+		
 		featureProject.builded();
 		try {
 			featureProject.getBuildFolder().refreshLocal(
@@ -157,6 +160,58 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
+		try {
+			copy(featureProject.getComposerID(),equation);
+		} catch (CoreException e1) {
+			CorePlugin.getDefault().logError(e1);
+		}
 		return null;
+		
+	}
+	// copies all not composed Files from selected Features of src to bin and build
+	private void copy(String composerID, IFile equation) throws CoreException{
+		String equationName = equation.getName();
+		equationName = equationName.substring(0, equationName.indexOf('.'));
+			ArrayList<String> selectedFeatures = getSelectedFeatures(equation);
+			copyNotComposedFiles(featureProject.getComposer().extensions(), selectedFeatures, equationName);
+	}
+	
+	private void copyNotComposedFiles(ArrayList<String> extensions, ArrayList<String> selectedFeatures, String equationName) throws CoreException{
+		boolean binFolderExists = (featureProject.getBinFolder().getFolder(equationName).exists());
+		boolean notComposed;
+		for (String feature : selectedFeatures)
+			for(IResource res : featureProject.getSourceFolder().getFolder(feature).members()){
+				notComposed = true;
+				for (String extension : extensions)
+					if (res.getName().endsWith(extension))
+						notComposed = false;
+				if (notComposed){
+					res.copy(new Path (featureProject.getBuildFolder().getFolder(equationName).getFullPath().toString()+"/"+res.getName()), true, null);
+					if (binFolderExists)
+						res.copy(new Path (featureProject.getBinFolder().getFolder(equationName).getFullPath().toString()+"/"+res.getName()), true, null);
+				}
+			}
+	}
+	
+	private ArrayList<String> getSelectedFeatures(IFile file) {
+		File equation = file.getRawLocation().toFile();
+		ArrayList<String> list;
+		Scanner scanner = null;
+
+		try {
+			scanner = new Scanner(equation);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		if (scanner.hasNext()) {
+			list = new ArrayList<String>();
+			while (scanner.hasNext()) {
+				list.add(scanner.next());
+			}
+			return list;
+		} else {
+			return null;
+		}
 	}
 }
