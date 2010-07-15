@@ -117,16 +117,16 @@ public class ViewContentProvider implements IStructuredContentProvider,
 		String message = null;
 		Image image = null;
 		if (comparison == Comparison.REFACTORING) {
-			message = "Software Product Line has not changed: f <=> f'";
+			message = "Refactoring: SPL unchanged";
 			image = FMUIPlugin.getImage("zero.gif");
 		} else if (comparison == Comparison.GENERALIZATION) {
-			message = "Software Product Line has got some new products: f => f'";
+			message = "Generalization: Products added";
 			image = FMUIPlugin.getImage("plus.gif");
 		} else if (comparison == Comparison.SPECIALIZATION) {
-			message = "Software Product Line has lost some products: f <= f'";
+			message = "Specialization: Products removed";
 			image = FMUIPlugin.getImage("minus.gif");
 		} else if (comparison == Comparison.ARBITRARY) {
-			message = "Software Product Line has lost some products and has got some new: f, f' incomparable";
+			message = "Arbitrary edit: Products added and removed";
 			image = FMUIPlugin.getImage("plusminus.gif");
 		} else if (comparison == Comparison.OUTOFMEMORY) {
 			message = "Out of memory error!";
@@ -172,16 +172,16 @@ public class ViewContentProvider implements IStructuredContentProvider,
 				int concrete = model.countConcreteFeatures();
 				int terminal = model.countTerminalFeatures();
 
-				addChild("Number of features: " + features);
-				addChild("Number of concrete features: " + concrete);
-				addChild("Number of abstract features: " + (features - concrete));
-				addChild("Number of terminal features: " + terminal);
-				addChild("Number of non-terminal features: " + (features - terminal));
 				try {
 					addChild("Featur model is valid (not void): " + model.isValid());
 				} catch (TimeoutException e) {
 					addChild("Featur model is valid (not void): timeout");
 				}
+				addChild("Number of features: " + features);
+				addChild("Number of concrete features: " + concrete);
+				addChild("Number of abstract features: " + (features - concrete));
+				addChild("Number of terminal features: " + terminal);
+				addChild("Number of non-terminal features: " + (features - terminal));
 			}
 		};
 		statistics.addChild(parent);
