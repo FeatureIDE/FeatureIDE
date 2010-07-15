@@ -262,11 +262,20 @@
 \subsection{Feature Model Edit View}
 \begin{frame}%[fragile]
 	\frametitle{\insertsubsection}
-	\begin{itemize}
-		\item \ldots
-		\item \ldots
-		\item \ldots
-	\end{itemize}
+	\begin{columns}
+		\column{.5\textwidth}
+			\only<1>{\includegraphics[scale=.5]{hw_fmev_gen}}
+			\only<2>{\includegraphics[scale=.5]{hw_fmev_spe}}
+			\only<3>{\includegraphics[scale=.5]{hw_fmev_arb}}
+			\only<4>{\includegraphics[scale=.5]{hw_fmev_ref}}
+		\column{.5\textwidth}
+			\begin{itemize}
+				\item Compares current edited feature model with last saved version
+				\item Result: variants were {\color<1>{red}added}, {\color<2>{red}removed}, {\color<3>{red}both}, or {\color<4>{red}none}
+				\item Provides examples for {\color<1,3>{red}added}/{\color<2,3>{red}removed} variants
+				\item Statistical data for both versions of the feature model
+			\end{itemize}
+	\end{columns}
 \end{frame}
 
 \subsection{Configuration Editor}
@@ -338,7 +347,7 @@
 		\begin{itemize}
 			\item FeatureIDE installation
 			\item FeatureIDE project structure
-			\item Cheat Sheet
+			\item Cheat sheet
 		\end{itemize}
 	\end{itemize}
 \end{frame}
