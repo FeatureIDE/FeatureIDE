@@ -188,44 +188,75 @@
 
 \section{Functionality of FeatureIDE}
 
-\subsection{Feature Model Editor 1/4}
+\subsection{Feature Model Editor: Feature Diagram}
 \begin{frame}%[fragile]
 	\frametitle{\insertsubsection}
 	\begin{itemize}
-		\item \ldots
-		\item \ldots
-		\item \ldots
+		\item<1-> Double click to change connections and mandatory property
+		\item<2-> Single click to rename features
+		\item<3-> Right click to open context menu for features/connections
+		\item<4-> Drag \uncover<5->{and drop features}
+		\item<6-> Context menu \uncover<7->{to open Constraint Editor}
 	\end{itemize}
+	\begin{center}
+		\only<1>{\includegraphics[scale=.5]{hw_fme_fd}}
+		\only<2>{\includegraphics[scale=.5]{hw_fme_fd_rename}}
+		\only<3>{\includegraphics[scale=.5]{hw_fme_fd_menu}}
+		\only<4>{\includegraphics[scale=.5]{hw_fme_fd_drag}}
+		\only<5>{\includegraphics[scale=.5]{hw_fme_fd_drop}}
+		\only<6>{\includegraphics[scale=.5]{hw_fme_fd_menu2}}
+		\only<7>{\includegraphics[scale=.5]{hw_fme_fd_ce}}
+	\end{center}
 \end{frame}
 
-\subsection{Feature Model Editor 2/4}
-\begin{frame}%[fragile]
+\subsection{Feature Model Editor - Grammar}
+\begin{frame}[fragile]
 	\frametitle{\insertsubsection}
 	\begin{itemize}
-		\item \ldots
-		\item \ldots
-		\item \ldots
+		\item Source tab contains the GUIDSL grammar representation
+		\item \verb![]! - optional feature
+		\item \verb!|! - Or-group -or- Alternative-group depending on parent
+		\item \verb!+! - mandatory feature and Or-group below
+		\item \verb!*! - optional feature and Or-group below
 	\end{itemize}
+	\begin{center}
+		\includegraphics[scale=.5]{hw_fme_src}
+	\end{center}
 \end{frame}
 
-\subsection{Feature Model Editor 3/4}
+\subsection{Feature Model Editor - Feature Order}
 \begin{frame}%[fragile]
 	\frametitle{\insertsubsection}
 	\begin{itemize}
-		\item \ldots
-		\item \ldots
-		\item \ldots
+		\item Order of features matters: can influence program behavior
+		\item Default order: pre-order traversal of the feature diagram
+		\item User-defined order possible
+		\item Applies to all configurations
 	\end{itemize}
+	\begin{center}
+		\includegraphics[scale=.5]{hw_fme_order}
+	\end{center}
 \end{frame}
 
-\subsection{Feature Model Editor 4/4}
+\subsection{Feature Model Editor - Synchronization}
 \begin{frame}%[fragile]
 	\frametitle{\insertsubsection}
+	Before saving:
 	\begin{itemize}
-		\item \ldots
-		\item \ldots
-		\item \ldots
+		\item When switching tab, changes are propagated\\[5mm]
 	\end{itemize}
+	When saving:
+	\begin{itemize}
+		\item Feature folders are created, removed, and renamed
+		\item Updating order of features in configurations
+		\item Checking which configurations are valid/invalid
+		\item Current content of Configuration Editor updated
+	\end{itemize}
+	\begin{center}
+		\includegraphics[scale=.2]{hw_fme_fd}~
+		\includegraphics[scale=.2]{hw_fme_src}~
+		\includegraphics[scale=.2]{hw_fme_order}
+	\end{center}
 \end{frame}
 
 \subsection{Feature Model Edit View}
@@ -305,8 +336,8 @@
 		\item What functionality does FeatureIDE provide?}\\[5mm]
 		\item How to start working with FeatureIDE?
 		\begin{itemize}
-			\item FeatureIDE Installation
-			\item Feature Project Structure
+			\item FeatureIDE installation
+			\item FeatureIDE project structure
 			\item Cheat Sheet
 		\end{itemize}
 	\end{itemize}
@@ -324,14 +355,25 @@
 	\end{itemize}
 \end{frame}
 
-\subsection{Feature Project Structure}
+\subsection{FeatureIDE Project Structure}
 \begin{frame}%[fragile]
 	\frametitle{\insertsubsection}
-	\begin{itemize}
-		\item \ldots
-		\item \ldots
-		\item \ldots
-	\end{itemize}
+		\begin{columns}
+		\column{.4\textwidth}
+			\only<1>{\includegraphics[scale=0.55]{hw_pe_model}}
+			\only<2>{\includegraphics[scale=0.55]{hw_pe_src}}
+			\only<3>{\includegraphics[scale=0.55]{hw_pe_conf}}
+			\only<4>{\includegraphics[scale=0.55]{hw_pe_build}}
+			\only<5>{\includegraphics[scale=0.55]{hw_pe_bin}}
+		\column{.6\textwidth}
+			\begin{itemize}[<+->]
+				\item Feature model file in the GUIDSL-format
+				\item Source folder containing a folder for every feature including files to compose
+				\item Configurations containing selected features from the feature model
+				\item Composed source files for several configurations (might be helpful when debugging)
+				\item Binary files for several configurations
+			\end{itemize}
+	\end{columns}
 \end{frame}
 
 \subsection{Cheat Sheet}
