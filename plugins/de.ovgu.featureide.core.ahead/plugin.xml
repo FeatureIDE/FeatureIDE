@@ -7,7 +7,7 @@
             class="de.ovgu.featureide.ahead.AheadComposer"
             description="Composes Jak files."
             id="de.ovgu.featureide.composer.ahead"
-            name="AHEAD Composer">
+            name="AHEAD">
       </composer>
    </extension>
 

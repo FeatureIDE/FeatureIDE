@@ -370,6 +370,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			// changed, but in this case actually no resource in the file system
 			// changes.
 			buildRelevantChanges = true;
+			
 			project.build(IncrementalProjectBuilder.FULL_BUILD, null);
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
@@ -592,12 +593,13 @@ public class FeatureProject extends BuilderMarkerHandler implements
 							checkConfigurationChange(res);
 						}
 					}
-				for (IResource res : sourceFolder.members()) {
-					IResourceDelta delta = event.getDelta().findMember(
-							res.getFullPath());
-					if (delta != null)//&& (delta.getFlags() & IResourceDelta.CONTENT) != 0){
-						buildRelevantChanges = true;
-				}
+				if (sourceFolder.isAccessible())
+					for (IResource res : sourceFolder.members()) {
+						IResourceDelta delta = event.getDelta().findMember(
+								res.getFullPath());
+						if (delta != null)//&& (delta.getFlags() & IResourceDelta.CONTENT) != 0){
+							buildRelevantChanges = true;
+					}
 			} catch (CoreException e) {
 				CorePlugin.getDefault().logError(e);
 			}

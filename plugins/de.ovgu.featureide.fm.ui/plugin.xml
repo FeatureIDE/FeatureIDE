@@ -9,7 +9,7 @@
             default="true"
             filenames="model.m"
             icon="icons/featuretree.ico"
-            id="featureide.fm.ui.editors.GrammarEditor"
+            id="de.ovgu.featureide.fm.ui.editors.GrammarEditor"
             name="Grammar Editor">
       </editor>
    </extension> 

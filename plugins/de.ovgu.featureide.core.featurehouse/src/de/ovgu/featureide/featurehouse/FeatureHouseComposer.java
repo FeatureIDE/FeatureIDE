@@ -21,6 +21,8 @@ package de.ovgu.featureide.featurehouse;
 import java.util.ArrayList;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 
 import composer.FSTGenComposer;
 import de.ovgu.featureide.core.IFeatureProject;
@@ -63,7 +65,11 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 		FSTGenComposer composer = new FSTGenComposer();
 		composer.run(new String[]{"--expression", equationPath, "--base-directory", basePath,
 				  "--output-directory", outputPath + "/", "--ahead"});
-		
+		try {
+			featureProject.getBuildFolder().refreshLocal(IResource.DEPTH_INFINITE, null);
+		} catch (CoreException e) {
+			FeatureHouseCorePlugin.getDefault().logError(e);
+		}
 		TreeBuilderFeatureHouse fstparser = new TreeBuilderFeatureHouse(featureProject.getProjectName());
 		fstparser.createProjectTree(composer.getFstnodes());
 		featureProject.setProjectTree(fstparser.getProjectTree());

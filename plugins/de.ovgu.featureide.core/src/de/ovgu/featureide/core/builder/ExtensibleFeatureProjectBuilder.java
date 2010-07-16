@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Scanner;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -81,10 +82,11 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		return true;
 	}
 	
-	private Boolean cleanBuild = false;
+	private boolean cleanBuild = false;
+	
 	private boolean cleaned = false;
+	
 	protected void clean(IProgressMonitor monitor) throws CoreException {
-
 		if (!featureProjectLoaded())
 			return;
 		
@@ -105,10 +107,13 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 			if (equation.contains(".")) {
 				equation = equation.substring(0, equation.indexOf('.'));
 			}
-			featureProject.getBinFolder().getFolder(equation).delete(true, monitor);
-			featureProject.getBuildFolder().getFolder(equation).delete(true,
-				monitor);		
-		
+			if (featureProject.getBuildFolder().getFolder(equation).exists())
+				for (IResource res : featureProject.getBuildFolder().getFolder(equation).members())
+					res.delete(true, monitor);
+			if (featureProject.getBinFolder().getFolder(equation).exists())
+				for (IResource res : featureProject.getBinFolder().getFolder(equation).members())
+						res.delete(true, monitor);
+			
 		}else{
 			for (IResource member : featureProject.getBinFolder().members())
 				member.delete(true, monitor);
@@ -127,9 +132,12 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 	@SuppressWarnings("rawtypes")
 	@Override
 	protected IProject[] build(int kind, Map args, IProgressMonitor monitor) {
-		if (!featureProjectLoaded() || (!featureProject.buildRelavantChanges() && !cleaned && kind == AUTO_BUILD))
+		if (!featureProjectLoaded())
 			return null;
-		
+
+		if (!featureProject.buildRelavantChanges() && !cleaned && kind == AUTO_BUILD)
+			return null;
+
 		cleaned = false;
 		IFile equation = featureProject.getCurrentEquationFile();
 		featureProject.deleteBuilderMarkers(getProject(),
@@ -166,6 +174,14 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		} catch (CoreException e1) {
 			CorePlugin.getDefault().logError(e1);
 		}
+		try {
+			featureProject.getBuildFolder().refreshLocal(
+					IResource.DEPTH_INFINITE, monitor);
+			featureProject.getBinFolder().refreshLocal(
+					IResource.DEPTH_INFINITE, monitor);
+		} catch (CoreException e) {
+			CorePlugin.getDefault().logError(e);
+		}
 		return null;
 		
 	}
@@ -187,13 +203,44 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 					if (res.getName().endsWith(extension))
 						notComposed = false;
 				if (notComposed){
-					res.copy(new Path (featureProject.getBuildFolder().getFolder(equationName).getFullPath().toString()+"/"+res.getName()), true, null);
-					if (binFolderExists)
-						res.copy(new Path (featureProject.getBinFolder().getFolder(equationName).getFullPath().toString()+"/"+res.getName()), true, null);
+					if (res instanceof IFile){
+						res.copy(new Path (featureProject.getBuildFolder().getFolder(equationName).getFullPath().toString()+"/"+res.getName()), true, null);
+						if (binFolderExists)
+							res.copy(new Path (featureProject.getBinFolder().getFolder(equationName).getFullPath().toString()+"/"+res.getName()), true, null);
+					}
+					if (res instanceof IFolder){
+						createFolder("build/"+equationName+"/"+res.getName());
+						if (binFolderExists)
+							createFolder("bin/"+equationName+"/"+res.getName());
+						for (IResource res2 : ((IFolder) res).members())
+							copyNotComposedFiles(extensions, equationName+"/"+res.getName(), res2, binFolderExists);
+					}
 				}
 			}
 	}
 	
+	private void copyNotComposedFiles(ArrayList<String> extensions,String folderName, IResource res, boolean binFolderExists) throws CoreException {
+		boolean notComposed = true;
+		for (String extension : extensions)
+			if (res.getName().endsWith(extension))
+				notComposed = false;
+		if (notComposed){
+			if (res instanceof IFile){
+				res.copy(new Path (featureProject.getBuildFolder().getFolder(folderName).getFullPath().toString()+"/"+res.getName()), true, null);
+				if (binFolderExists)
+					res.copy(new Path (featureProject.getBinFolder().getFolder(folderName).getFullPath().toString()+"/"+res.getName()), true, null);
+			}
+			if (res instanceof IFolder){
+				createFolder("build/"+folderName+"/"+res.getName());
+				if (binFolderExists)
+					createFolder("bin/"+folderName+"/"+res.getName());
+				for (IResource res2 : ((IFolder) res).members())
+					copyNotComposedFiles(extensions, folderName, res2, binFolderExists);
+			}
+		}
+		
+	}
+
 	private ArrayList<String> getSelectedFeatures(IFile file) {
 		File equation = file.getRawLocation().toFile();
 		ArrayList<String> list;
@@ -213,6 +260,15 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 			return list;
 		} else {
 			return null;
+		}
+	}
+	private void createFolder(String name) {
+		IFolder folder = featureProject.getProject().getFolder(name);
+		try {
+			if (!folder.exists())
+				folder.create(false, true, null);
+		} catch (CoreException e) {
+			CorePlugin.getDefault().logError(e);
 		}
 	}
 }

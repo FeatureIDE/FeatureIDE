@@ -1,4 +1,4 @@
-Root : Hello [Feature] World :: _Root ;
+HelloWorld : Hello [Feature] World :: _HelloWorld ;
 
 Feature : Beautiful
 	| Wonderful ;
