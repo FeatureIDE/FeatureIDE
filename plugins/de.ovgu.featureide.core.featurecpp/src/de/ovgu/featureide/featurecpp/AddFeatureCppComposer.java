@@ -61,7 +61,7 @@ public class AddFeatureCppComposer implements IObjectActionDelegate {
 		CorePlugin cp = CorePlugin.getDefault();
 		cp.logInfo("Try to convert");
 		if (selection instanceof IStructuredSelection) {
-			for (Iterator it = ((IStructuredSelection) selection).iterator(); it.hasNext();) {
+			for (Iterator<?> it = ((IStructuredSelection) selection).iterator(); it.hasNext();) {
 				Object element = it.next();
 				if (element instanceof IProject) {
 					IProject project = (IProject)element;

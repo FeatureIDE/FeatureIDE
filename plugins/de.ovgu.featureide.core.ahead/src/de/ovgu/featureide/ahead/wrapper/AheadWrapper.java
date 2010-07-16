@@ -104,7 +104,7 @@ public class AheadWrapper {
 				
 				try {
 					javaFiles[i].refreshLocal(IResource.DEPTH_ZERO, null);
-					javaFiles[i].setDerived(true);
+					javaFiles[i].setDerived(true, null);
 					ResourceAttributes attr = javaFiles[i].getResourceAttributes();
 					if (attr != null) {
 						attr.setReadOnly(true);

@@ -31,7 +31,7 @@ import de.ovgu.featureide.core.jakprojectmodel.IMethod;
 /**
  * @author Tom Brosch
  */
-public class Method extends JakModelElement implements Comparable, IMethod {
+public class Method extends JakModelElement implements Comparable<Object>, IMethod {
 
 	private String methodName;
 	private LinkedList<String> parameterTypes;

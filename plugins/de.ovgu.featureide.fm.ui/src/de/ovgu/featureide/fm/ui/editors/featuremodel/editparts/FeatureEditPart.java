@@ -155,7 +155,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 		else if (prop.equals(CHILDREN_CHANGED)) {
 			getFeatureFigure().setAbstract(getFeatureModel().isAbstract());
 			for (FeatureConnection connection : getFeatureModel().getTargetConnections()) {
-				Map registry = getViewer().getEditPartRegistry();
+				Map<?, ?> registry = getViewer().getEditPartRegistry();
 				ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(connection);
 				if (connectionEditPart != null) {
 					connectionEditPart.refreshSourceDecoration();

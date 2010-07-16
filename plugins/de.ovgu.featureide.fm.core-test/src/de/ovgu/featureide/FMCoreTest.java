@@ -37,10 +37,9 @@ public class FMCoreTest {
 		return suite;
 	}
 
-	@SuppressWarnings("unchecked")
 	private static Test getTest(String suiteClassName) {
 		try {
-			Class clazz = Class.forName(suiteClassName);
+			Class<?> clazz = Class.forName(suiteClassName);
 			Method suiteMethod = clazz.getMethod("suite", new Class[0]);
 			return (Test) suiteMethod.invoke(null, new Object[0]);
 		} catch (Exception e) {

@@ -68,7 +68,7 @@ public class ModelEditPart extends AbstractGraphicalEditPart implements GUIDefau
 	}
 	
 	@Override
-	protected List getModelChildren() {
+	protected List<Object> getModelChildren() {
 		LinkedList<Object> list = new LinkedList<Object>();
 		addFeatures(getFeatureModel().getRoot(), list);
 		addConstraints(getFeatureModel().getConstraints(), list);

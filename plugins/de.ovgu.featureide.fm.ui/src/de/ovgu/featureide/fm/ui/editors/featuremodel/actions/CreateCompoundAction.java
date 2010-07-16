@@ -129,7 +129,7 @@ public class CreateCompoundAction extends Action {
 
 		// check that selected features have the same parent
 		selectedFeatures.clear();
-		Iterator iter = selection.iterator();
+		Iterator<?> iter = selection.iterator();
 		while (iter.hasNext()) {
 			Object editPart = iter.next();
 			if (!(editPart instanceof FeatureEditPart))

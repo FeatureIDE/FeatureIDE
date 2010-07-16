@@ -76,7 +76,7 @@ public class DeleteAction extends Action {
 	public void run() {
 		IStructuredSelection selection = (IStructuredSelection) viewer
 				.getSelection();
-		Iterator iter = selection.iterator();
+		Iterator<?> iter = selection.iterator();
 		while (iter.hasNext()) {
 			Object editPart = iter.next();
 			if ( editPart instanceof ConstraintEditPart ){ 
@@ -107,7 +107,7 @@ public class DeleteAction extends Action {
 		Feature root = featureModel.getRoot();
 		Feature newRoot = root;
 		LinkedList<Feature> features = new LinkedList<Feature>(featureModel.getFeatures());
-		Iterator iter = selection.iterator();
+		Iterator<?> iter = selection.iterator();
 		while (iter.hasNext()) {
 			Object editPart = iter.next();
 			if (!(editPart instanceof FeatureEditPart))

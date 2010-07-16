@@ -77,6 +77,7 @@ public class JakEditor extends TextEditor {
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class required) {
 		if (IContentOutlinePage.class.equals(required)) {
 			if (outlinePage == null) {

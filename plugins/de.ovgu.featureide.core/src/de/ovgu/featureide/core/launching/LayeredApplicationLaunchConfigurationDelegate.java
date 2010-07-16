@@ -101,7 +101,7 @@ public class LayeredApplicationLaunchConfigurationDelegate extends
 			ExecutionArguments execArgs = new ExecutionArguments(vmArgs, pgmArgs);
 			
 			// VM-specific attributes
-			Map vmAttributesMap = getVMSpecificAttributesMap(configuration);
+			Map<?, ?> vmAttributesMap = getVMSpecificAttributesMap(configuration);
 			
 			// Classpath
 			String[] classpath = getClasspath(configuration);//featureProject.getJavaClassPath();

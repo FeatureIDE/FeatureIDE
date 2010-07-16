@@ -124,6 +124,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		cleanBuild = false;
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	protected IProject[] build(int kind, Map args, IProgressMonitor monitor) {
 		if (!featureProjectLoaded() || (!featureProject.buildRelavantChanges() && !cleaned && kind == AUTO_BUILD))

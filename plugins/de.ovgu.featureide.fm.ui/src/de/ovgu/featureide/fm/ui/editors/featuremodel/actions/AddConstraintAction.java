@@ -96,7 +96,7 @@ public class AddConstraintAction extends Action {
 		oldConstraint = null;
 		IStructuredSelection selection = (IStructuredSelection) viewer
 				.getSelection();
-		Iterator iter = selection.iterator();
+		Iterator<?> iter = selection.iterator();
 		while (iter.hasNext()) {
 			Object editPart = iter.next();
 			if (editPart instanceof ConstraintEditPart) {

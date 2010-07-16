@@ -30,7 +30,7 @@ import de.ovgu.featureide.core.jakprojectmodel.IJakModelElement;
 /**
  * @author Tom Brosch
  */
-public class Field extends JakModelElement implements Comparable, IField {
+public class Field extends JakModelElement implements Comparable<Object>, IField {
 
 	private String fieldName;
 	private String typeName;

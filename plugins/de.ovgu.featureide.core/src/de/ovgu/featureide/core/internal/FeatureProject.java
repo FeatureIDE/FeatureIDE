@@ -742,7 +742,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			for (ICommand command : commands) {
 				if (command.getBuilderName().equals(
 						ExtensibleFeatureProjectBuilder.BUILDER_ID)) {
-					Map args = command.getArguments();
+					Map<String, String> args = command.getArguments();
 					args.put(ExtensibleFeatureProjectBuilder.COMPOSER_KEY,
 							composerID);
 					command.setArguments(args);

@@ -628,6 +628,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 		graphicalViewer.getContents().refresh();
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Object getAdapter(Class adapter) {
 		if (GraphicalViewer.class.equals(adapter) || EditPartViewer.class.equals(adapter))

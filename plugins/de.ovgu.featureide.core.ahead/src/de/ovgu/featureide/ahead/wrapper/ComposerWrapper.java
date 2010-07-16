@@ -297,7 +297,7 @@ public class ComposerWrapper {
 			try {
 				newJakIFile.refreshLocal(IResource.DEPTH_ZERO, null);
 				if (newJakIFile.exists()) {
-					newJakIFile.setDerived(true);
+					newJakIFile.setDerived(true, null);
 					ResourceAttributes attr = newJakIFile
 							.getResourceAttributes();
 					if (attr != null) {

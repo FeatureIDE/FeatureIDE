@@ -113,7 +113,7 @@ public class JavacWrapper {
 			try {
 				classFile.refreshLocal(IResource.DEPTH_ZERO, null);
 				if (classFile.exists())
-					classFile.setDerived(true);
+					classFile.setDerived(true, null);
 			} catch (CoreException e) {
 				AheadCorePlugin.getDefault().logError(e);
 			}
