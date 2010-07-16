@@ -35,7 +35,7 @@ import org.eclipse.swt.graphics.FontData;
  */
 public interface GUIDefaults {
 	
-	public static boolean HALF_ARC = true;
+	public static boolean HALF_ARC = false;
 	
 	public static boolean OR_CIRCLES = false;
 	
@@ -53,11 +53,11 @@ public interface GUIDefaults {
 	public static Color FEATURE_FOREGROUND = GUIBasics.createColor(0.0, 0.0, 0.0);
 	public static Insets FEATURE_INSETS = new Insets(3, 6, 3, 6);//4, 8, 4, 8
 
-	public static Color LAYER_BACKGROUND = GUIBasics.createColor(0.7, 0.7, 1.0);
+	public static Color LAYER_BACKGROUND = GUIBasics.createColor(0.8, 0.8, 1.0);
 	public static Color LAYER_BORDER_COLOR = GUIBasics.createBorderColor(LAYER_BACKGROUND);
 	public static Border LAYER_BORDER = new LineBorder(LAYER_BORDER_COLOR, 1);
 
-	public static Color COMPOUND_BACKGROUND = GUIBasics.createColor(0.9, 0.9, 1.0);
+	public static Color COMPOUND_BACKGROUND = GUIBasics.createColor(0.95, 0.95, 1.0);
 	public static Color COMPOUND_BORDER_COLOR = GUIBasics.createBorderColor(COMPOUND_BACKGROUND);
 	public static Border COMPOUND_BORDER = new LineBorder(COMPOUND_BORDER_COLOR, 1);
 
@@ -71,7 +71,7 @@ public interface GUIDefaults {
 	public static Color DECORATOR_BACKGROUND = DIAGRAM_BACKGROUND;
 	public static int SOURCE_ANCHOR_DIAMETER = 9;
 	@SuppressWarnings("all")
-	public static int TARGET_ANCHOR_DIAMETER = HALF_ARC ? 20 : 50;
+	public static int TARGET_ANCHOR_DIAMETER = HALF_ARC ? 20 : 40;
 	
 	//cross-tree constraints
 	

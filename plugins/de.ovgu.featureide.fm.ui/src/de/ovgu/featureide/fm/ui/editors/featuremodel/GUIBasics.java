@@ -29,6 +29,10 @@ import org.eclipse.swt.graphics.FontData;
  */
 public class GUIBasics {
 
+	public static Color createColor(int r, int g, int b) {
+		return new Color(null, r, g, b);
+	}
+
 	public static Color createColor(double r, double g, double b) {
 		return new Color(null, (int) (r*255), (int) (g*255), (int) (b*255));
 	}
