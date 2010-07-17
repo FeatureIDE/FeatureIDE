@@ -11,6 +11,6 @@ Require-Bundle: org.eclipse.ui,
  de.ovgu.featureide.fm.core
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Bundle-ClassPath: lib/FeatureHouse-0.2.jar,
+Bundle-ClassPath: lib/FeatureHouse-2010-04-27.jar,
  .
 Bundle-Vendor: University of Magdeburg

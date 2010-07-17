@@ -1,6 +1,6 @@
 class Hello{
 	
-	HelloWorld(){
+	public Hello(){
 			System.out.print(" wonderful");
 	}
 }

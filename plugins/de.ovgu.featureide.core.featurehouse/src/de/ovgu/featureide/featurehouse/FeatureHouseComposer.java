@@ -65,14 +65,15 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 		FSTGenComposer composer = new FSTGenComposer();
 		composer.run(new String[]{"--expression", equationPath, "--base-directory", basePath,
 				  "--output-directory", outputPath + "/", "--ahead"});
+		
+		TreeBuilderFeatureHouse fstparser = new TreeBuilderFeatureHouse(featureProject.getProjectName());
+		fstparser.createProjectTree(composer.getFstnodes());
+		featureProject.setProjectTree(fstparser.getProjectTree());
 		try {
 			featureProject.getBuildFolder().refreshLocal(IResource.DEPTH_INFINITE, null);
 		} catch (CoreException e) {
 			FeatureHouseCorePlugin.getDefault().logError(e);
 		}
-		TreeBuilderFeatureHouse fstparser = new TreeBuilderFeatureHouse(featureProject.getProjectName());
-		fstparser.createProjectTree(composer.getFstnodes());
-		featureProject.setProjectTree(fstparser.getProjectTree());
 	}
 
 	public void clean() {

@@ -37,7 +37,7 @@ public class FeatureCppComposer implements IComposerExtensionClass {
 	public static final String COMPOSER_ID = "de.ovgu.featureide.composer.featurecpp";
 	
 	private final FeatureCppWrapper featureCpp = new FeatureCppWrapper(
-		(FeatureCppCorePlugin.getDefault().getBundle().getLocation() + "lib/fc++.exe")
+		(FeatureCppCorePlugin.getDefault().getBundle().getLocation() + "lib/fc++v0.7.exe")
 					.substring(16));
 
 	public void clean() {
