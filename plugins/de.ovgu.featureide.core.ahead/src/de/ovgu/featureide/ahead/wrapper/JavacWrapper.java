@@ -74,6 +74,7 @@ public class JavacWrapper {
 		errorListeners.remove(listener);
 	}
 
+	@SuppressWarnings("deprecation")
 	public void compile(IFile[] files) {
 		String sep = System.getProperty("path.separator");
 		String classpath = "";
@@ -113,7 +114,7 @@ public class JavacWrapper {
 			try {
 				classFile.refreshLocal(IResource.DEPTH_ZERO, null);
 				if (classFile.exists())
-					classFile.setDerived(true, null);
+					classFile.setDerived(true);
 			} catch (CoreException e) {
 				AheadCorePlugin.getDefault().logError(e);
 			}

@@ -250,6 +250,7 @@ public class ComposerWrapper {
 		return composedFilesArray;
 	}
 
+	@SuppressWarnings("deprecation")
 	private void composeJakFiles(IFolder compositionDir) {
 		composedFiles.clear();
 		if (equationFile == null)
@@ -297,7 +298,7 @@ public class ComposerWrapper {
 			try {
 				newJakIFile.refreshLocal(IResource.DEPTH_ZERO, null);
 				if (newJakIFile.exists()) {
-					newJakIFile.setDerived(true, null);
+					newJakIFile.setDerived(true);
 					ResourceAttributes attr = newJakIFile
 							.getResourceAttributes();
 					if (attr != null) {

@@ -88,6 +88,7 @@ public class AheadWrapper {
 		compileJavafiles(javafiles);
 	}
 
+	@SuppressWarnings("deprecation")
 	private IFile[] reduceJak2Java(IFile[] jakFiles) {
 		
 		IFile[] javaFiles = new IFile[jakFiles.length];
@@ -104,7 +105,7 @@ public class AheadWrapper {
 				
 				try {
 					javaFiles[i].refreshLocal(IResource.DEPTH_ZERO, null);
-					javaFiles[i].setDerived(true, null);
+					javaFiles[i].setDerived(true);
 					ResourceAttributes attr = javaFiles[i].getResourceAttributes();
 					if (attr != null) {
 						attr.setReadOnly(true);
