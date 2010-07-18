@@ -235,7 +235,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 				if (binFolderExists)
 					createFolder("bin/"+folderName+"/"+res.getName());
 				for (IResource res2 : ((IFolder) res).members())
-					copyNotComposedFiles(extensions, folderName, res2, binFolderExists);
+					copyNotComposedFiles(extensions, folderName+"/"+res.getName(), res2, binFolderExists);
 			}
 		}
 		

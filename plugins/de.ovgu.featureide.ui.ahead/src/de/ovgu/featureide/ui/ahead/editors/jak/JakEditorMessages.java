@@ -30,7 +30,7 @@ import de.ovgu.featureide.ui.ahead.AheadUIPlugin;
  */
 public class JakEditorMessages {
 	
-	public static final String ID = "featureide.ui.ahead.editors.jak.JakEditorMessages";
+	public static final String ID = AheadUIPlugin.PLUGIN_ID + ".editors.jak.JakEditorMessages";
 
 	private static final String RESOURCE_BUNDLE= AheadUIPlugin.PLUGIN_ID+".editors.jak.JakEditorMessages";//$NON-NLS-1$
 

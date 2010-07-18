@@ -173,7 +173,7 @@ public class NewEquationFilePage extends WizardPage {
 		}
 		
 		if (!isFeatureProject(featureComboProject.getText())){
-			updateStatus("Selected project is not a Feature Project");
+			updateStatus("Selected project is not a FeatureIDE Project");
 			return;
 		}
 

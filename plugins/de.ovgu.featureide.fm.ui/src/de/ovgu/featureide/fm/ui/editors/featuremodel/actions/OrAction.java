@@ -30,7 +30,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  */
 public class OrAction extends SingleSelectionAction {
 
-	public static String ID = "featureide.or";
+	public static String ID = "de.ovgu.featureide.or";
 
 	private final FeatureModel featureModel;
 

@@ -9,7 +9,7 @@
          point="org.eclipse.debug.core.launchConfigurationTypes">
       <launchConfigurationType
             delegate="de.ovgu.featureide.core.launching.LayeredApplicationLaunchConfigurationDelegate"
-            id="featureide.core.launching.layeredApplication"
+            id="de.ovgu.featureide.core.launching.layeredApplication"
             modes="run"
             name="Layered Application"/>
    </extension>
@@ -45,7 +45,7 @@
     </extension>
     <extension
           id="featureProjectNature"
-          name="Feature Project Nature"
+          name="FeatureIDE Project Nature"
           point="org.eclipse.core.resources.natures">
        <runtime>
           <run

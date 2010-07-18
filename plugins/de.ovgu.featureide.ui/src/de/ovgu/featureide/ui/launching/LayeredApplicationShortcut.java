@@ -41,7 +41,7 @@ import de.ovgu.featureide.ui.UIPlugin;
 
 public class LayeredApplicationShortcut implements ILaunchShortcut {
 
-    public static final String ID_LAYERED_APPLICATION = "featureide.core.launching.layeredApplication";
+    public static final String ID_LAYERED_APPLICATION = CorePlugin.PLUGIN_ID + ".launching.layeredApplication";
 
 	public void launch(IEditorPart editor, String mode) {
         IEditorInput input = editor.getEditorInput();

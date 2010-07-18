@@ -33,6 +33,8 @@ import java.io.*;
 import org.eclipse.ui.*;
 import org.eclipse.ui.ide.IDE;
 
+import de.ovgu.featureide.ui.ahead.AheadUIPlugin;
+
 /**
  * A wizard to create a new Jak file.
  * 
@@ -40,7 +42,7 @@ import org.eclipse.ui.ide.IDE;
  */
 public class NewJakFileWizard extends Wizard implements INewWizard {
 	
-	public static final String ID = "featureide.ui.wizards.NewJakFileWizard";
+	public static final String ID = AheadUIPlugin.PLUGIN_ID + ".wizards.NewJakFileWizard";
 	
 	private NewJakFilePage page;
 	

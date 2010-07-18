@@ -48,7 +48,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
  */
 public class CreateCompoundAction extends Action {
 
-	public static String ID = "featureide.createcompound";
+	public static String ID = "de.ovgu.featureide.createcompound";
 
 	private final FeatureModel featureModel;
 

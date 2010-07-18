@@ -32,7 +32,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
  */
 public class RenameAction extends SingleSelectionAction {
 
-	public static String ID = "featureide.rename";
+	public static String ID = "de.ovgu.featureide.rename";
 
 	public RenameAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
 		super("Rename (F2)", viewer);

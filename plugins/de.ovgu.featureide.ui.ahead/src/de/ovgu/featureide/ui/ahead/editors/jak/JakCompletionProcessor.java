@@ -59,7 +59,7 @@ import de.ovgu.featureide.ui.ahead.AheadUIPlugin;
  * @author Constanze Adler
  */
 public class JakCompletionProcessor implements IContentAssistProcessor{
-	public static final String ID = "featureide.ui.ahead.editors.jak.JakCompletionProcessor";
+	public static final String ID = AheadUIPlugin.PLUGIN_ID + ".editors.jak.JakCompletionProcessor";
 	
 	protected static class Validator implements IContextInformationValidator, IContextInformationPresenter {
 

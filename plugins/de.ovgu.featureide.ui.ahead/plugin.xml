@@ -9,7 +9,7 @@
             default="true"
             extensions="jak"
             icon="icons/JakFileIcon.png"
-            id="featureide.ui.editors.JakEditor"
+            id="de.ovgu.featureide.ui.editors.JakEditor"
             name="Jak Editor">
       </editor>
    </extension>
@@ -19,7 +19,7 @@
             category="featureideui.category"
             class="de.ovgu.featureide.ui.ahead.wizards.NewJakFileWizard"
             icon="icons/NewJakFileIcon.png"
-            id="featureide.ui.wizards.NewJakFileWizard"
+            id="de.ovgu.featureide.ui.wizards.NewJakFileWizard"
             name="Jak File"/>
    </extension>
    <extension

@@ -120,7 +120,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.LevelOrderLayout;
 public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaults,
 		PropertyConstants, PropertyChangeListener, IResourceChangeListener {
 
-	public static final String ID = "de.ovgu.featureide.fm.ui.editors.GrammarEditor";
+	public static final String ID = FMUIPlugin.PLUGIN_ID + ".editors.GrammarEditor";
 
 	private GraphicalViewerImpl graphicalViewer;
 
@@ -276,8 +276,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 
 	private void createActions() {
 		createLayerAction = new CreateLayerAction(graphicalViewer, featureModel);
-		createCompoundAction = new CreateCompoundAction(graphicalViewer,
-				featureModel);
+		createCompoundAction = new CreateCompoundAction(graphicalViewer,featureModel);
 		deleteAction = new DeleteAction(graphicalViewer, featureModel);
 		mandantoryAction = new MandantoryAction(graphicalViewer, featureModel);
 		andAction = new AndAction(graphicalViewer, featureModel);
@@ -320,6 +319,10 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 			menu.add(orAction);
 			menu.add(alternativeAction);
 		} else if (createLayerAction.isEnabled() || createCompoundAction.isEnabled()){
+			if (featureModel.hasAbstractFeatures())
+				createCompoundAction.setText("Create Compound (above)");
+			else
+				createCompoundAction.setText("Create Feature (above)");
 			menu.add(createCompoundAction);	
 			menu.add(createLayerAction);
 			menu.add(mandantoryAction);

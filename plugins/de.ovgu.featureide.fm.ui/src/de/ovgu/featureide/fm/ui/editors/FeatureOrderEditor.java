@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -46,6 +45,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.configuration.FeatureOrderReader;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 
@@ -58,7 +58,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  */
 public class FeatureOrderEditor extends EditorPart {
 
-	public static final String ID = "de.ovgu.featureide.fm.ui.editors.FeatureOrderEditor";
+	public static final String ID = FMUIPlugin.PLUGIN_ID + ".editors.FeatureOrderEditor";
 
 	private List featurelist = null;
 
@@ -74,7 +74,7 @@ public class FeatureOrderEditor extends EditorPart {
 
 	private IEditorSite site;
 
-	private Writer fw;
+//	private Writer fw;
 
 	private boolean dirty = false;
 
@@ -313,7 +313,7 @@ public class FeatureOrderEditor extends EditorPart {
 				.getLocation().toFile();
 		String newLine = System.getProperty("line.separator");
 		try {
-			fw = new FileWriter(file.toString()
+			FileWriter fw = new FileWriter(file.toString()
 					+ System.getProperty("file.separator") + ".order");
 			if (activate.getSelection())
 				fw.write("true" + newLine);
@@ -337,43 +337,30 @@ public class FeatureOrderEditor extends EditorPart {
 	 */
 	public ArrayList<String> readFeaturesfromOrderFile() {
 		if (((IFile) input.getAdapter(IFile.class)).getProject() == null)
-			return null; // Avoids NPE when project and its contents are deleted
+			return null;
+		// Avoids NPE when project and its contents are deleted
 		// and .order file is still open
-
+		
 		File file = ((IFile) input.getAdapter(IFile.class)).getProject()
 				.getLocation().toFile();
-		ArrayList<String> list;
-		Scanner scanner = null;
 		String fileSep = System.getProperty("file.separator");
 		file = new File(file.toString() + fileSep + ".order");
-		if (file.exists()) {
-			try {
-				scanner = new Scanner(file);
-			} catch (FileNotFoundException e) {
-				FMUIPlugin.getDefault().logInfo(
-						"Problem to open the order file");
-				FMUIPlugin.getDefault().logError(e);
-			}
-			if (scanner.hasNext()) {
-				String selection = scanner.next();
-				if (selection.equalsIgnoreCase("true")) {
-					activate.setSelection(true);
-					enableUI(true);
-				} else {
-					activate.setSelection(false);
-					enableUI(false);
-				}
-				list = new ArrayList<String>();
-				while (scanner.hasNext()) {
-					list.add(scanner.next());
-				}
-				return list;
+		ArrayList<String> list = null;
+		if (file.exists()){
+			FeatureOrderReader reader = new FeatureOrderReader(
+					((IFile) input.getAdapter(IFile.class)).getProject()
+					.getLocation().toFile());
+			list = reader.featureOrderRead();
+			if (list.get(0).equalsIgnoreCase("true")){
+				activate.setSelection(true);
+				enableUI(true);
 			} else {
-				return null;
+				activate.setSelection(false);
+				enableUI(false);
 			}
-		} else {
-			return null;
+			list.remove(0);
 		}
+		return list;
 	}
 
 	public ArrayList<String> readFeaturesfromConfigurationFile(File file) {
@@ -399,8 +386,6 @@ public class FeatureOrderEditor extends EditorPart {
 
 	public void writeFeaturestoConfigurationFile(File file,
 			LinkedList<String> newConfiguration) {
-		// TODO #147: Use the configuration writer to ensure consistency, e.g.,
-		// with the line separator
 		try {
 			FileWriter fw = new FileWriter(file);
 			for (String layer : newConfiguration) {

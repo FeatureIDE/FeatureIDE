@@ -63,21 +63,22 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 
 		down.addView(IPageLayout.ID_PROBLEM_VIEW);
 		down.addView("org.eclipse.ui.console.ConsoleView");
-		down.addView("de.ovgu.featureide.ui.views.collaboration.Collaboration");
-		down.addView("de.ovgu.featureide.fm.ui.views.FeatureModelEditView");
-
+		down.addView(CollaborationView.ID);
+		down.addView(FeatureModelEditView.ID);
+		
 		right.addView(IPageLayout.ID_OUTLINE);
 
 		left.addView("org.eclipse.jdt.ui.PackageExplorer");
 		// left.addView(IPageLayout.ID_RES_NAV);
 
 		layout.addShowViewShortcut(FeatureModelEditView.ID);
+		layout.addShowViewShortcut(CollaborationView.ID);
 		layout.addShowViewShortcut(IPageLayout.ID_RES_NAV);
 		// layout.addShowViewShortcut(IPageLayout.ID_PROJECT_EXPLORER);
 		layout.addShowViewShortcut(IPageLayout.ID_OUTLINE);
 		layout.addShowViewShortcut(IPageLayout.ID_TASK_LIST);
-		layout.addShowViewShortcut(CollaborationView.ID);
-
+		
+		
 		addActions();
 	}
 

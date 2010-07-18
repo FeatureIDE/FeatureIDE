@@ -41,7 +41,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
  */
 public class CreateLayerAction extends SingleSelectionAction {
 
-	public static String ID = "featureide.createlayer";
+	public static String ID = "de.ovgu.featureide.createlayer";
 
 	private static ImageDescriptor createImage = PlatformUI.getWorkbench()
 			.getSharedImages().getImageDescriptor(

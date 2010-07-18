@@ -9,7 +9,7 @@
             default="true"
             extensions="equation, expression"
             icon="icons/EquationIcon.png"
-            id="featureide.ui.editors.ConfigurationEditor"
+            id="de.ovgu.featureide.ui.editors.ConfigurationEditor"
             name="Configuration Editor">
       </editor>
    </extension>
@@ -22,7 +22,7 @@
             hasPages="true"
             icon="icons/NewFeatureProjectIcon.png"
             id="de.ovgu.featureide.ui.FeatureProjectWizard"
-            name="FeatureProject"
+            name="FeatureIDEProject"
             project="true"/>
       <wizard
             category="de.ovgu.featureide.ui.category"
@@ -56,7 +56,7 @@
       <decorator
             adaptable="true"
             class="de.ovgu.featureide.ui.decorators.ActiveEquationDecorator"
-            id="featureide.ui.decorators.ActiveEquationDecorator"
+            id="de.ovgu.featureide.ui.decorators.ActiveEquationDecorator"
             label="Active Equation Decorator"
             lightweight="true"
             state="true">
@@ -67,7 +67,7 @@
       <decorator
             adaptable="true"
             class="de.ovgu.featureide.ui.decorators.FeatureFolderDecorator"
-            id="featureide.ui.decorators.FeatureFolderDecorator"
+            id="de.ovgu.featureide.ui.decorators.FeatureFolderDecorator"
             label="Feature Folder Decorator"
             lightweight="true"
             state="true">
@@ -79,7 +79,7 @@
             adaptable="true"
             class="de.ovgu.featureide.ui.decorators.FeatureProjectDecorator"
             icon="icons/FeatureProjectDecorator.png"
-            id="featureide.ui.decorators.FeatureProjectDecorator"
+            id="de.ovgu.featureide.ui.decorators.FeatureProjectDecorator"
             label="Feature Project Decorator"
             lightweight="true"
             state="true">
@@ -93,29 +93,29 @@
    <extension
          point="org.eclipse.debug.ui.launchConfigurationTypeImages">
       <launchConfigurationTypeImage
-            configTypeID="featureide.core.launching.layeredApplication"
+            configTypeID="de.ovgu.featureide.core.launching.layeredApplication"
             icon="icons/FeatureIconSmall.ico"
-            id="featureide.ui.launching.layeredApplicationConfigurationTypeImage"/>
+            id="de.ovgu.featureide.ui.launching.layeredApplicationConfigurationTypeImage"/>
    </extension>
    <extension
          point="org.eclipse.debug.ui.launchConfigurationTabGroups">
       <launchConfigurationTabGroup
             class="de.ovgu.featureide.ui.launching.LayeredApplicationConfigurationTabGroup"
             description="Run a feature-oriented application"
-            id="featureide.ui.launching.layeredApplicationTabGroup"
-            type="featureide.core.launching.layeredApplication"/>
+            id="de.ovgu.featureide.ui.launching.layeredApplicationTabGroup"
+            type="de.ovgu.featureide.core.launching.layeredApplication"/>
    </extension>
    <extension
          point="org.eclipse.debug.ui.launchShortcuts">
       <shortcut
             class="de.ovgu.featureide.ui.launching.LayeredApplicationShortcut"
             icon="icons/FeatureIconSmall.ico"
-            id="featureide.ui.launching.LayeredApplicationShortcut"
+            id="de.ovgu.featureide.ui.launching.LayeredApplicationShortcut"
             label="Layered Application"
             modes="run">
          <contextualLaunch>
             <contextLabel
-                  label="Feature Project"
+                  label="FeatureIDE Project"
                   mode="run">
             </contextLabel>
             <enablement></enablement></contextualLaunch>
@@ -126,7 +126,7 @@
          point="org.eclipse.ui.perspectiveExtensions">
       <perspectiveExtension targetID="org.eclipse.ui.resourcePerspective">
          <view
-               id="featureide.fm.ui.views.FeatureModelEditView"
+               id="de.ovgu.featureide.fm.ui.views.FeatureModelEditView"
                ratio="0.5"
                relationship="right"
                relative="org.eclipse.ui.views.TaskList"/>

@@ -39,7 +39,7 @@ import de.ovgu.featureide.examples.ExamplePlugin;
  */
 public class ExampleNewWizard extends Wizard implements INewWizard {
 
-	public static final String ID = "de.ovgu.featureide.examples";
+	public static final String ID = ExamplePlugin.PLUGIN_ID;//"de.ovgu.featureide.examples";
 	private static final String FeatureIDE_EXAMPLE_DIR = "featureide_examples";//$NON-NLS-1$
 
 	private ExampleNewWizardPage mainPage;

@@ -241,7 +241,7 @@ public class NewJakFilePage extends WizardPage {
 			return;
 		}
 		if (!isFeatureProject(featureComboProject.getText())) {
-			updateStatus("Selected project is not a Feature Project");
+			updateStatus("Selected project is not a FeatureIDE Project");
 			return;
 		}
 

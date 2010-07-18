@@ -24,6 +24,8 @@ import org.eclipse.jface.text.DocumentCommand;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.TextUtilities;
 
+import de.ovgu.featureide.ui.ahead.AheadUIPlugin;
+
 
 
 /**
@@ -32,7 +34,7 @@ import org.eclipse.jface.text.TextUtilities;
  * @author Constanze Adler
  */
 public class JakAutoIndentStrategy extends DefaultIndentLineAutoEditStrategy {
-	public static final String ID = "featureide.ui.ahead.editors.jak.AutoIndentStrategy"; 
+	public static final String ID = AheadUIPlugin.PLUGIN_ID + ".editors.jak.AutoIndentStrategy"; 
 	public JakAutoIndentStrategy() {
 		super();
 	}

@@ -30,7 +30,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  */
 public class MandantoryAction extends SingleSelectionAction {
 
-	public static String ID = "featureide.mandantory";
+	public static String ID = "de.ovgu.featureide.mandantory";
 
 	private final FeatureModel featureModel;
 

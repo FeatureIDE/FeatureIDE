@@ -206,9 +206,9 @@ public class CorePlugin extends AbstractCorePlugin {
 	}
 
 	public void fireCurrentEquationChanged(IFeatureProject featureProject) {
-		CorePlugin.getDefault().logInfo(
-				"Current equation file changed in project '"
-						+ featureProject.getProjectName() + "'");
+//		CorePlugin.getDefault().logInfo(
+//				"Current equation file changed in project '"
+//						+ featureProject.getProjectName() + "'");
 		for (ICurrentEquationListener listener: currentEquationListeners)
 			listener.currentEquationChanged(featureProject);
 	}
