@@ -1,6 +1,0 @@
-//created on: Sat Dec 04 12:51:45 CST 2004
-
-refines class Graph {
-    // method is extended later
-    public void run( Vertex v ) { }
-}

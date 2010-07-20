@@ -1,7 +1,0 @@
-# this equation defines the absolute most primitive
-# graph application program and test.  It has no functionality
-# except providing a shell that can be extended
-
-Base
-Benchmark
-Prog
