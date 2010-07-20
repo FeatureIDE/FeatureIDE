@@ -19,24 +19,24 @@
 package de.ovgu.featureide.fm.ui.actions;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.Iterator;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.internal.util.BundleUtility;
+import org.osgi.framework.Bundle;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -47,6 +47,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * 
  * @author Thomas Thuem
  */
+@SuppressWarnings("restriction")
 public class OpenWithGuidslAction implements IObjectActionDelegate {
 
 	private ISelection selection;
@@ -78,35 +79,62 @@ public class OpenWithGuidslAction implements IObjectActionDelegate {
 		}
 	}
 	
-	private void openWithGuidsl(IFile modelfile) {
-		try {
-			File pathfile = FMCorePlugin.getDefault().getStateLocation().append("guidslpath.txt").toFile();
-			String guidslJar = "";
-			boolean newLocation = false;
-			if (pathfile.exists()) {
-		        BufferedReader reader = new BufferedReader(new FileReader(pathfile));
-		        guidslJar = reader.readLine();
-		        reader.close();
-			}
-			while (guidslJar != null && !new File(guidslJar).exists()) {
-				newLocation = true;
-				FileDialog fd = new FileDialog(Display.getDefault().getActiveShell(), SWT.OPEN);
-		        fd.setText("Locate the guidsl.jar file");
-		        fd.setFilterExtensions(new String[] { "*.jar" });
-		        fd.setFileName(guidslJar);
-		        guidslJar = fd.open();
-			}
-			if (guidslJar != null && new File(guidslJar).exists()) { //guidslJar != null -> fixed ticket #56
-				if (newLocation) {
-					BufferedWriter writer = new BufferedWriter(new FileWriter(pathfile));
-					writer.write(guidslJar + "\r\n");
-					writer.close();
-				}
-				execProcess("java -jar \"" + guidslJar + "\" \"" + modelfile.getLocation().toOSString() + "\"", modelfile.getParent().getLocation().toFile());
-			}
-		} catch (IOException e) {
-			FMUIPlugin.getDefault().logError(e);
+	public static String getFileFromPlugin(String pluginId, String localPath) throws IOException {
+        if (pluginId == null || localPath == null) {
+            throw new IllegalArgumentException();
+        }
+
+        // if the bundle is not ready then there is no file
+        Bundle bundle = Platform.getBundle(pluginId);
+        if (!BundleUtility.isReady(bundle)) {
+			return null;
 		}
+
+        // look for the file
+        URL url = BundleUtility.find(bundle, localPath);
+        url = FileLocator.toFileURL(url);
+		return new Path(url.getPath()).toOSString();
+    }
+
+    private void openWithGuidsl(IFile modelfile) {
+		try {
+			String jakarta = getFileFromPlugin(FMCorePlugin.PLUGIN_ID, "lib/jakarta.jar");
+			String guidsl = getFileFromPlugin(FMCorePlugin.PLUGIN_ID, "lib/guidsl.jar");
+			String command = "java -cp \"" + jakarta + "\"";
+			command += " -jar \"" + guidsl + "\"";
+			command += " \"" + modelfile.getLocation().toOSString() + "\"";
+			execProcess(command, modelfile.getParent().getLocation().toFile());
+		} catch (Exception e) {
+			FMUIPlugin.getDefault().logError("Unable to start GUIDSL", e);
+		}
+//		try {
+//			File pathfile = FMCorePlugin.getDefault().getStateLocation().append("guidslpath.txt").toFile();
+//			String guidslJar = "";
+//			boolean newLocation = false;
+//			if (pathfile.exists()) {
+//		        BufferedReader reader = new BufferedReader(new FileReader(pathfile));
+//		        guidslJar = reader.readLine();
+//		        reader.close();
+//			}
+//			while (guidslJar != null && !new File(guidslJar).exists()) {
+//				newLocation = true;
+//				FileDialog fd = new FileDialog(Display.getDefault().getActiveShell(), SWT.OPEN);
+//		        fd.setText("Locate the guidsl.jar file");
+//		        fd.setFilterExtensions(new String[] { "*.jar" });
+//		        fd.setFileName(guidslJar);
+//		        guidslJar = fd.open();
+//			}
+//			if (guidslJar != null && new File(guidslJar).exists()) { //guidslJar != null -> fixed ticket #56
+//				if (newLocation) {
+//					BufferedWriter writer = new BufferedWriter(new FileWriter(pathfile));
+//					writer.write(guidslJar + "\r\n");
+//					writer.close();
+//				}
+//				execProcess("java -jar \"" + guidslJar + "\" \"" + modelfile.getLocation().toOSString() + "\"", modelfile.getParent().getLocation().toFile());
+//			}
+//		} catch (IOException e) {
+//			FMUIPlugin.getDefault().logError(e);
+//		}
 	}
 	
 	private final boolean showOutputs = true;
