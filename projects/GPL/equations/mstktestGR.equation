@@ -1,0 +1,13 @@
+Base
+Benchmark
+Prog
+Undirected
+UndirectedCommon
+UndirectedGR
+Weighted
+WeightedCommon
+dProgdWeightedCommon
+WeightedGR
+MSTKruskalPrepGR
+MSTKruskal
+dProgdMSTKruskal
