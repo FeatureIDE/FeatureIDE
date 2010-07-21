@@ -14,6 +14,14 @@
 
 \tttitlepage
 
+\AtBeginSection[]
+{
+  \begin{frame}<beamer>
+    \frametitle{Content}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
 \subsection{Content}
 \begin{frame}%[fragile]
 	\frametitle{\insertsubsection}
@@ -168,17 +176,20 @@
 	\end{center}
 \end{frame}
 
+
+
 \begin{frame}%[fragile]
 	\frametitle{Content}
 	\begin{itemize}
 		\item {\color{grayed}What is Feature-Oriented Software Development?}\\[5mm]
 		\item What functionality does FeatureIDE provide?
 			\begin{itemize}
+				\item FeatureIDE project structure
 				\item Feature Model Editor + Edit View
 				\item Configuration Editor
+				\item FeatureIDE Project Builder
 				\item Jak Editor
 				\item Collaboration Diagram
-				\item Feature Project Builder
 				\item Run Configurations
 				\item Creation Wizards\\[5mm]
 			\end{itemize}
@@ -187,6 +198,27 @@
 \end{frame}
 
 \section{Functionality of FeatureIDE}
+
+\subsection{FeatureIDE Project Structure}
+\begin{frame}%[fragile]
+	\frametitle{\insertsubsection}
+		\begin{columns}
+		\column{.4\textwidth}
+			\only<1>{\includegraphics[scale=0.55]{hw_pe_model}}
+			\only<2>{\includegraphics[scale=0.55]{hw_pe_src}}
+			\only<3>{\includegraphics[scale=0.55]{hw_pe_conf}}
+			\only<4>{\includegraphics[scale=0.55]{hw_pe_build}}
+			\only<5>{\includegraphics[scale=0.55]{hw_pe_bin}}
+		\column{.6\textwidth}
+			\begin{itemize}[<+->]
+				\item Feature model file in the GUIDSL-format
+				\item Source folder containing a folder for every feature including files to compose
+				\item Configurations containing selected features from the feature model
+				\item Composed source files for several configurations (might be helpful when debugging)
+				\item Binary files for several configurations
+			\end{itemize}
+	\end{columns}
+\end{frame}
 
 \subsection{Feature Model Editor: Feature Diagram}
 \begin{frame}%[fragile]
@@ -282,57 +314,24 @@
 \begin{frame}%[fragile]
 	\frametitle{\insertsubsection}
 	\begin{columns}
-		\column{.5\textwidth}
-			%\only<1>{\includegraphics[scale=.5]{hw_ce}}
-			%\only<2>{\includegraphics[scale=.5]{hw_ce}}
-			%\only<3>{\includegraphics[scale=.5]{hw_ce}}
-			%\only<4>{\includegraphics[scale=.5]{hw_ce}}
-		\column{.5\textwidth}
+		\column{.4\textwidth}
+			\tikz{
+				\node at (0,0) {\includegraphics[scale=.5]{hw_ce}};
+				\uncover<2->{\node at (.2,-2.3) {\includegraphics[scale=.5]{hw_ce_sel}};}
+				\uncover<3->{\node at (.4,-4.6) {\includegraphics[scale=.5]{hw_ce_elim}};}
+				\only<3>{}
+			}
+		\column{.6\textwidth}
 			\begin{itemize}
-				\item Manual selection and elimination of features
-				\item Automatic selection and elimination of features (based on current manual decisions)
-				\item Determining if current configuration is valid (assumption: unspecified features are eliminated)
-				\item Counting number of possible configurations
+				\item Manual decisions using double click: selection and elimination of features
+				\item Automatic decisions based on current manual decisions
+				\item Is current configuration valid? assumption: unspecified features are eliminated
+				\item Counting possible configurations
 			\end{itemize}
 			On save:
 			\begin{itemize}
 				\item Error marker if invalid
-				\item Build process started (if current configuration)
-			\end{itemize}
-	\end{columns}
-\end{frame}
-
-\subsection{Jak Editor}
-\begin{frame}%[fragile]
-	\frametitle{\insertsubsection}
-	\begin{columns}
-		\column{.5\textwidth}
-			%\only<>{\includegraphics[scale=.5]{hw_}}
-		\column{.5\textwidth}
-			\begin{itemize}
-				\item Syntax-Highlighting for Jak files
-				\item Content assist (simple version)
-				\item Outline view
-			\end{itemize}
-			On save:
-			\begin{itemize}
-				\item Build process started
-			\end{itemize}
-	\end{columns}
-\end{frame}
-
-\subsection{Collaboration Diagram}
-\begin{frame}%[fragile]
-	\frametitle{\insertsubsection}
-	\begin{columns}
-		\column{.5\textwidth}
-			%\only<>{\includegraphics[scale=.5]{hw_}}
-		\column{.5\textwidth}
-			\begin{itemize}
-				\item Visualizes roles that features add to classes
-				\item Adding, removing, and opening Jak files
-				\item Refreshed with every build
-				\item Based on the current configuration
+				\item Build process started if current configuration
 			\end{itemize}
 	\end{columns}
 \end{frame}
@@ -345,7 +344,47 @@
 			%\only<>{\includegraphics[scale=.5]{hw_}}
 		\column{.5\textwidth}
 			\begin{itemize}
-				\item 
+				\item Specific to composition engine (AHEAD, FeatureHouse, FeatureC++)
+				\item Build: compose features contained in current configuration
+				\item Clean: removing all resources in bin/build folder
+				\item Build automatically: based on changes in source folder or current configuration
+			\end{itemize}
+	\end{columns}
+\end{frame}
+
+\subsection{Jak Editor}
+\begin{frame}%[fragile]
+	\frametitle{\insertsubsection}
+	\begin{columns}
+		\column{.6\textwidth}
+			%\only<>{\includegraphics[scale=.5]{hw_}}
+		\column{.4\textwidth}
+			\begin{itemize}
+				\item Syntax highlighting
+				\item Error markers
+				\item Content assist
+				\item Outline view
+			\end{itemize}
+			On save:
+			\begin{itemize}
+				\item Build process started
+				\item Error markers, content assist, and outline view updated
+			\end{itemize}
+	\end{columns}
+\end{frame}
+
+\subsection{Collaboration Diagram}
+\begin{frame}%[fragile]
+	\frametitle{\insertsubsection}
+	\begin{columns}
+		\column{.5\textwidth}
+			%\only<>{\includegraphics[scale=.5]{hw_}}
+		\column{.5\textwidth}
+			\begin{itemize}
+				\item Visualizes roles that features add to classes/files
+				\item Adding, removing, and opening Jak files
+				\item Refreshed with every build
+				\item Based on the current configuration
 			\end{itemize}
 	\end{columns}
 \end{frame}
@@ -384,8 +423,9 @@
 		\item How to start working with FeatureIDE?
 		\begin{itemize}
 			\item FeatureIDE installation
-			\item FeatureIDE project structure
 			\item Cheat sheet
+			\item FeatureIDE example projects
+			\item Open source FeatureIDE projects
 		\end{itemize}
 	\end{itemize}
 \end{frame}
@@ -402,28 +442,27 @@
 	\end{itemize}
 \end{frame}
 
-\subsection{FeatureIDE Project Structure}
+\subsection{Cheat Sheet}
 \begin{frame}%[fragile]
 	\frametitle{\insertsubsection}
-		\begin{columns}
-		\column{.4\textwidth}
-			\only<1>{\includegraphics[scale=0.55]{hw_pe_model}}
-			\only<2>{\includegraphics[scale=0.55]{hw_pe_src}}
-			\only<3>{\includegraphics[scale=0.55]{hw_pe_conf}}
-			\only<4>{\includegraphics[scale=0.55]{hw_pe_build}}
-			\only<5>{\includegraphics[scale=0.55]{hw_pe_bin}}
-		\column{.6\textwidth}
-			\begin{itemize}[<+->]
-				\item Feature model file in the GUIDSL-format
-				\item Source folder containing a folder for every feature including files to compose
-				\item Configurations containing selected features from the feature model
-				\item Composed source files for several configurations (might be helpful when debugging)
-				\item Binary files for several configurations
-			\end{itemize}
-	\end{columns}
+	\begin{itemize}
+		\item \ldots
+		\item \ldots
+		\item \ldots
+	\end{itemize}
 \end{frame}
 
-\subsection{Cheat Sheet}
+\subsection{FeatureIDE Example Projects}
+\begin{frame}%[fragile]
+	\frametitle{\insertsubsection}
+	\begin{itemize}
+		\item \ldots
+		\item \ldots
+		\item \ldots
+	\end{itemize}
+\end{frame}
+
+\subsection{Open Source FeatureIDE Projects}
 \begin{frame}%[fragile]
 	\frametitle{\insertsubsection}
 	\begin{itemize}
