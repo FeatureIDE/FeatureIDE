@@ -19,24 +19,8 @@
             category="featureideui.category"
             class="de.ovgu.featureide.ui.ahead.wizards.NewJakFileWizard"
             icon="icons/NewJakFileIcon.png"
-            id="de.ovgu.featureide.ui.wizards.NewJakFileWizard"
+            id="de.ovgu.featureide.ui.ahead.wizards.NewJakFileWizard"
             name="Jak File"/>
-   </extension>
-   <extension
-         point="org.eclipse.ui.actionSets">
-      <actionSet
-            id="de.ovgu.featureide.ui.NewFiles"
-            label="NewFiles"
-            visible="false">
-         <action
-               class="de.ovgu.featureide.ui.ahead.actions.StartJakFileWizard"
-               icon="icons/NewJakFileIcon.png"
-               id="de.ovgu.featureide.ui.ahead.NewJakFile"
-               label="New Jak File"
-               style="push"
-               toolbarPath="&quot;Normal&quot;">
-         </action>
-      </actionSet>
    </extension>
    <extension
          point="org.eclipse.ui.propertyPages">

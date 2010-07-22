@@ -22,7 +22,7 @@
             hasPages="true"
             icon="icons/NewFeatureProjectIcon.png"
             id="de.ovgu.featureide.ui.FeatureProjectWizard"
-            name="FeatureIDEProject"
+            name="FeatureIDE Project"
             project="true"/>
       <wizard
             category="de.ovgu.featureide.ui.category"
@@ -143,6 +143,14 @@
                icon="icons/NewEquationIcon.png"
                id="de.ovgu.featureide.ui.NewEquationFile"
                label="New Equation File"
+               style="push"
+               toolbarPath="&quot;Normal&quot;">
+         </action>
+         <action
+               class="de.ovgu.featureide.ui.ahead.actions.StartJakFileWizard"
+               icon="icons/NewJakFileIcon.png"
+               id="de.ovgu.featureide.ui.ahead.NewJakFile"
+               label="New Jak File"
                style="push"
                toolbarPath="&quot;Normal&quot;">
          </action>

@@ -24,7 +24,6 @@ import org.eclipse.ui.IPerspectiveFactory;
 
 import de.ovgu.featureide.fm.ui.views.FeatureModelEditView;
 import de.ovgu.featureide.ui.UIPlugin;
-import de.ovgu.featureide.ui.ahead.actions.StartJakFileWizard;
 import de.ovgu.featureide.ui.ahead.wizards.NewJakFileWizard;
 import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
 import de.ovgu.featureide.ui.wizards.NewEquationFileWizard;
@@ -78,12 +77,11 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 		layout.addShowViewShortcut(IPageLayout.ID_OUTLINE);
 		layout.addShowViewShortcut(IPageLayout.ID_TASK_LIST);
 		
-		
 		addActions();
 	}
 
 	private void addActions() {
-		layout.addActionSet(StartJakFileWizard.ID);
+		//layout.addActionSet(StartJakFileWizard.ID);
 		layout.addActionSet(UIPlugin.PLUGIN_ID + ".NewFiles");
 		layout.addActionSet("org.eclipse.debug.ui.launchActionSet");
 	}
