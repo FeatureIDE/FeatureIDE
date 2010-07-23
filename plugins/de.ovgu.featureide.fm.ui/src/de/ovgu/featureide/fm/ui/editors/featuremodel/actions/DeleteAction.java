@@ -65,7 +65,7 @@ public class DeleteAction extends Action {
 	};
 
 	public DeleteAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
-		super("Delete", deleteImage);
+		super("Delete (Del)", deleteImage);
 		this.viewer = viewer;
 		this.featureModel = featureModel;
 		setEnabled(false);

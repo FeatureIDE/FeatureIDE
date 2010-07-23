@@ -42,7 +42,8 @@
          <menu
                id="menu1"
                label="Refactor"
-               path="open.ext">
+               icon="icons/FeatureIconSmall.ico"
+               path="group.open">
             <groupMarker
                   name="group1">
             </groupMarker>

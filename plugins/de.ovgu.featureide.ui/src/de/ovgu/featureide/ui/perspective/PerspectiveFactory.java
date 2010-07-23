@@ -40,16 +40,15 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 	public static final String ID = UIPlugin.PLUGIN_ID
 			+ ".FeatureIDEperspective";
 
-	private IPageLayout layout;
-
 	@SuppressWarnings("deprecation")
 	public void createInitialLayout(IPageLayout layout) {
-		this.layout = layout;
 		String editorArea = layout.getEditorArea();
 
-		layout.addNewWizardShortcut(NewEquationFileWizard.ID);
 		layout.addNewWizardShortcut(NewFeatureProjectWizard.ID);
+		layout.addNewWizardShortcut(NewEquationFileWizard.ID);
 		layout.addNewWizardShortcut(NewJakFileWizard.ID);
+		
+		layout.addNewWizardShortcut("org.eclipse.ui.wizards.new.file");
 		// layout.addView(IPageLayout.ID_OUTLINE, IPageLayout.RIGHT, 0.25f,
 		// editorArea);
 
@@ -61,9 +60,9 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 				(float) 0.75, editorArea);
 
 		down.addView(IPageLayout.ID_PROBLEM_VIEW);
-		down.addView("org.eclipse.ui.console.ConsoleView");
 		down.addView(CollaborationView.ID);
 		down.addView(FeatureModelEditView.ID);
+		down.addView("org.eclipse.ui.console.ConsoleView");
 		
 		right.addView(IPageLayout.ID_OUTLINE);
 
@@ -77,12 +76,9 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 		layout.addShowViewShortcut(IPageLayout.ID_OUTLINE);
 		layout.addShowViewShortcut(IPageLayout.ID_TASK_LIST);
 		
-		addActions();
-	}
-
-	private void addActions() {
-		//layout.addActionSet(StartJakFileWizard.ID);
 		layout.addActionSet(UIPlugin.PLUGIN_ID + ".NewFiles");
 		layout.addActionSet("org.eclipse.debug.ui.launchActionSet");
+		//layout.addActionSet(StartJakFileWizard.ID);
+		
 	}
 }

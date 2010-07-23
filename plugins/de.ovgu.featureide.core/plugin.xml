@@ -5,7 +5,7 @@
 
    <extension
          id="featureIDE.launchConfiguration"
-         name="Feature IDE Launch Configurations"
+         name="FeatureIDE Launch Configurations"
          point="org.eclipse.debug.core.launchConfigurationTypes">
       <launchConfigurationType
             delegate="de.ovgu.featureide.core.launching.LayeredApplicationLaunchConfigurationDelegate"

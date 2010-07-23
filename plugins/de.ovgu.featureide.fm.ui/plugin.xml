@@ -35,8 +35,9 @@
             nameFilter="*.m"
             objectClass="org.eclipse.core.resources.IFile">
          <menu id="de.ovgu.featureide.fm.ui_menue"
-               label="Feature IDE"
-               path="featureide"> 
+               label="FeatureIDE"
+               icon="icons/FeatureIconSmall.ico"
+               path="group.open"> 
                <separator name="slot1"/>
                <separator name="slot2"/>
                <separator name="slot3"/>

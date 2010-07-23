@@ -313,16 +313,24 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 	}
 
 	private void fillContextMenu(IMenuManager menu) {
-		if (andAction.isEnabled() || orAction.isEnabled()
-				|| alternativeAction.isEnabled()) {
+		if (andAction.isEnabled() || orAction.isEnabled()){
+			if (andAction.isChecked()) {
+				andAction.setText("AND");
+				orAction.setText("OR (Double Click)");
+				alternativeAction.setText("ALTERNATIVE");
+			} else if (orAction.isChecked()) {
+				andAction.setText("AND");
+				orAction.setText("OR");
+				alternativeAction.setText("ALTERNATIVE (Double Click)");
+			} else if (alternativeAction.isChecked()) {
+				andAction.setText("AND (Double Click)");
+				orAction.setText("OR");
+				alternativeAction.setText("ALTERNATIVE");
+			}
 			menu.add(andAction);
 			menu.add(orAction);
 			menu.add(alternativeAction);
 		} else if (createLayerAction.isEnabled() || createCompoundAction.isEnabled()){
-			if (featureModel.hasAbstractFeatures())
-				createCompoundAction.setText("Create Compound (above)");
-			else
-				createCompoundAction.setText("Create Feature (above)");
 			menu.add(createCompoundAction);	
 			menu.add(createLayerAction);
 			menu.add(mandantoryAction);

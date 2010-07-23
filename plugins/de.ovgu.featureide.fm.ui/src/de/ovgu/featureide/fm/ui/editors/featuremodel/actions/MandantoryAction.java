@@ -35,7 +35,7 @@ public class MandantoryAction extends SingleSelectionAction {
 	private final FeatureModel featureModel;
 
 	public MandantoryAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
-		super("Mandantory", viewer);
+		super("Mandantory (Double Click)", viewer);
 		this.featureModel = featureModel;
 	}
 

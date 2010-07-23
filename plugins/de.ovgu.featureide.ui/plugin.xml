@@ -47,7 +47,7 @@
                icon="icons/currentequation.gif"
                id="de.ovgu.featureide.ui.setEquationAction"
                label="Set as current configuration"
-               menubarPath="open.ext"
+               menubarPath="group.open"
                tooltip="Only the current equation is build"/>
       </objectContribution>
    </extension>
@@ -136,7 +136,7 @@
          point="org.eclipse.ui.actionSets">
       <actionSet
             id="de.ovgu.featureide.ui.NewFiles"
-            label="NewFiles"
+            label="FeatureIDE"
             visible="false">
          <action
                class="de.ovgu.featureide.ui.actions.StartEquationFileWizard"
