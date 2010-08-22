@@ -65,7 +65,8 @@
                enablesFor="1"
                id="de.ovgu.featureide.ui.ahead.refactoring.CreateTypesystem"
                label="Create Typesystem"
-               menubarPath="open.ext"
+               icon="icons/FeatureIconSmall.ico"
+               menubarPath="group.open"
                style="push">
          </action>
       </objectContribution>

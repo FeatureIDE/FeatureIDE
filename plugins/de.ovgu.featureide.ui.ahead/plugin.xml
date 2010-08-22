@@ -16,7 +16,7 @@
    <extension
          point="org.eclipse.ui.newWizards">
       <wizard
-            category="featureideui.category"
+            category="de.ovgu.featureide.ui.category"
             class="de.ovgu.featureide.ui.ahead.wizards.NewJakFileWizard"
             icon="icons/NewJakFileIcon.png"
             id="de.ovgu.featureide.ui.ahead.wizards.NewJakFileWizard"
