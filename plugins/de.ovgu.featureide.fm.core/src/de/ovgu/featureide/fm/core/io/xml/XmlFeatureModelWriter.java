@@ -37,25 +37,28 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.prop4j.NodeWriter;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
+import org.w3c.dom.Element;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
 
+import org.w3c.dom.*;
+
 
 /**
  * Prints a feature model in XML format.
  * 
- * @author Fabian Wielgorz
+ * @author Fabian Wielgorz -> OLD
+ * @author Dariusz Krolikowski
+ * @author Maik Lampe
+ * 
  */
 public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
 		
 	public XmlFeatureModelWriter() {
-		
 	}
 	
 	/**
@@ -67,91 +70,119 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
 		setFeatureModel(featureModel);
 	}
 	
-    /**
-     * Creates the DOM Document Representation from the feature model fmodel
-     * by using createXmlDocRec
-     * @param doc Document where the feature model is put
-     */
     private void createXmlDoc(Document doc) {
-        Node elem = doc.createElement("FeatureModel");
-    	doc.appendChild(elem);
-    	createXmlDocRec(doc, elem, featureModel.getRoot());
-    	createPropositionalConstraints(doc, elem);
-    	createAnnotations(doc, elem);
-    }
-    
-    /**
-     * Creates the DOM Document Representation from the feature model fmodel
-     * by recursively building the Nodes
-     * @param doc Document where the feature model is put
-     * @param nod Current Node in the Document Tree
-     * @param feat Current Feature in the feature model Tree
-     */
-    private void createXmlDocRec(Document doc, Node nod, Feature feat) {
-    	Node nnod, fnod, tnod;
-    	LinkedList<Feature> children;
-    	if (feat == null) return;
-    	fnod = (feat.isMandatory())? doc.createElement("MFeature") 
-    							   : doc.createElement("Feature");
-    	nod.appendChild(fnod);
-    	nnod = doc.createElement("Name");
-    	fnod.appendChild(nnod);
-    	tnod = doc.createTextNode(feat.getName());
-    	nnod.appendChild(tnod);
-    	children = feat.getChildren();
-    	if (children.isEmpty()) return;
-    	if (feat.isAnd()) {
-    		nnod = doc.createElement("And");
-    	} else if (feat.isOr()) {
-    		nnod = doc.createElement("Or");
-    	} else if (feat.isAlternative()) {
-    		nnod = doc.createElement("Alternative");
-    	} else FMCorePlugin.getDefault().logInfo("creatXMlDockRec: Unexpected error!");
-    	fnod.appendChild(nnod);
-    	Iterator<Feature> i = children.iterator();
-    	while (i.hasNext()) {
-    		createXmlDocRec(doc, nnod ,i.next());
+        Element root = doc.createElement("featureModel");
+    	Element struct = doc.createElement("struct");
+    	Element constraints = doc.createElement("constraints");
+    	
+    	doc.appendChild(root);
+    	root.appendChild(struct);
+    	createXmlDocRec(doc, struct, featureModel.getRoot());
+    	
+    	root.appendChild(constraints);
+    	for(int i=0; i<featureModel.getPropositionalNodes().size(); i++){
+        	Element rule;
+        	rule = doc.createElement("rule");
+        	constraints.appendChild(rule);
+    		createPropositionalConstraints(doc, rule, featureModel.getPropositionalNodes().get(i));	
     	}
     }
     
+    private void createXmlDocRec(Document doc, Element node, Feature feat) {
+
+    	if (feat == null) return;
+    	
+    	Element fnod;
+    	LinkedList<Feature> children;
+    	
+    	children = feat.getChildren();
+    	if (children.isEmpty()) {
+    		fnod = doc.createElement("feature");
+    		fnod.setAttribute("name", feat.getName());
+        	if(feat.isMandatory())	fnod.setAttribute("mandatory", "true");
+        	node.appendChild(fnod);
+    	}
+    	else{
+    		if (feat.isAnd()) {
+    			fnod = doc.createElement("and");
+    		} else if (feat.isOr()) {
+    			fnod = doc.createElement("or");
+    		} else if (feat.isAlternative()) {
+    			fnod = doc.createElement("alt");
+	    	} else fnod = doc.createElement("unknown");//FMCorePlugin.getDefault().logInfo("creatXMlDockRec: Unexpected error!");
+	    	
+	    	fnod.setAttribute("name", feat.getName());
+	    	
+	    	if(feat.isMandatory())	fnod.setAttribute("mandatory", "true");
+		    if(feat.isAbstract())	fnod.setAttribute("abstract", "true");
+	     	   	
+	    	node.appendChild(fnod);
+	    	
+	    	Iterator<Feature> i = children.iterator();
+	    	while (i.hasNext()) {
+	    		createXmlDocRec(doc, fnod ,i.next());
+	    	}
+    	}
+    }
+  
     /**
      * Inserts the tags concerning propositional constraints into the DOM 
      * document representation
      * @param doc
      * @param FeatMod Parent node for the propositonal nodes
      */
-    private void createPropositionalConstraints(Document doc, Node FeatMod) {
-    	if (featureModel.getPropositionalNodes().isEmpty())
-			return;
-    	Node propConstr = doc.createElement("PropositionalConstraints");
-    	Node newNode, pConstr; 
-		FeatMod.appendChild(propConstr);
-		newNode = doc.createTextNode("\n");
-		propConstr.appendChild(newNode);
-		for (org.prop4j.Node node : featureModel.getPropositionalNodes()) {
-			pConstr = doc.createElement("PConstraint");
-			propConstr.appendChild(pConstr);
-			String nodeString = NodeWriter.nodeToString(node, 
-					NodeWriter.textualSymbols, true);
-			if ((nodeString.startsWith("(")) && (nodeString.endsWith(")"))) {
-				nodeString = nodeString.substring(1, nodeString.length() - 1);
-			}
-			newNode = doc.createTextNode(nodeString);
-			pConstr.appendChild(newNode);
-		}
+    private void createPropositionalConstraints(Document doc, Element xmlNode, org.prop4j.Node node ) {
+
+    	if (node == null) return;
+
+    	String clss = node.getClass().getName();
+    	Element op; 
+    	
+    	if (clss.equals("org.prop4j.Literal")){
+    		op = doc.createElement("var");
+    		xmlNode.appendChild(op);
+    		Text text = doc.createTextNode(node.toString());
+    		op.appendChild(text);
+    		return;
+    	}
+    	
+    	if (clss.equals("org.prop4j.And")){
+    		op = doc.createElement("conj");
+    		xmlNode.appendChild(op);
+    	}
+    	else if (clss.equals("org.prop4j.Or")){
+    		op = doc.createElement("disj");
+    		xmlNode.appendChild(op);
+    	}
+    	else if (clss.equals("org.prop4j.Not")){
+    		op = doc.createElement("not");
+    		xmlNode.appendChild(op);
+    	}
+    	else if (clss.equals("org.prop4j.Equals")){
+    		op = doc.createElement("eq");
+    		xmlNode.appendChild(op);
+    	}
+
+    	else if (clss.equals("org.prop4j.Implies")){
+    		op = doc.createElement("imp");
+    		xmlNode.appendChild(op);
+    	}
+    	else if (clss.equals("org.prop4j.AtMost")){
+    		op = doc.createElement("atmost1");
+    		xmlNode.appendChild(op);
+    	}
+    	else{
+    		op = doc.createElement("unknown");
+    		xmlNode.appendChild(op);
+    	}
+    	
+    	org.prop4j.Node[] children = node.getChildren();
+    	
+    	for(int i=0; i<children.length; i++){
+    		createPropositionalConstraints(doc, op, children[i]);
+    	}
 	}
-    
-    private void createAnnotations(Document doc, Node FeatMod) {
-    	String annotationText = featureModel.getAnnotations();
-    	if (annotationText == null)
-			return;
-    	Node annotations = doc.createElement("Annotations");
-    	Node newNode; 
-		FeatMod.appendChild(annotations);
-		newNode = doc.createTextNode("\n" + annotationText + "\n");
-		annotations.appendChild(newNode);
-	}
-    
+ 
     /**
      * Inserts indentations into the text
      * @param text
@@ -228,6 +259,6 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
 		} catch (TransformerException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
-		return prettyPrint(result.getWriter().toString());
+		return result.getWriter().toString(); //prettyPrint(result.getWriter().toString());
 	}    
 }
