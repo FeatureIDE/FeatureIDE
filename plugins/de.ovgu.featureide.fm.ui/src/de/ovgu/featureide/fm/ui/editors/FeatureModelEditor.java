@@ -651,7 +651,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 		if (EditDomain.class.equals(adapter))
 			return graphicalViewer.getEditDomain();
 		if (IGotoMarker.class.equals(adapter))
-			if (getActivePage() == graphicalViewerIndex)
+			if (getActivePage() != textEditorIndex)
 				setActivePage(textEditorIndex);
 		return super.getAdapter(adapter);
 	}

@@ -111,23 +111,26 @@ public class BuilderMarkerHandler implements IBuilderMarkerHandler {
 		}
 	}
 
-	public void createConfigurationMarker(IResource resource, String message,
-			int severity) {
-		// for creating and deleting markers a synchronized file is neccessary
+public void createConfigurationMarker(IResource resource, String message, int lineNumber, int severity) {
+        
 		try {
 			resource.refreshLocal(IResource.DEPTH_ZERO, null);
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
-
+		
 		try {
-			IMarker marker = resource.createMarker(CONFIGURATION_MARKER);
-			marker.setAttribute(IMarker.MESSAGE, message);
-			marker.setAttribute(IMarker.SEVERITY, severity);
-		} catch (CoreException e) {
-			CorePlugin.getDefault().logError(e);
-		}
-	}
+                  IMarker marker = resource.createMarker(CorePlugin.PLUGIN_ID + ".configurationProblemMarker");
+                  marker.setAttribute(IMarker.MESSAGE, message);
+                  marker.setAttribute(IMarker.SEVERITY, severity);
+                  if (lineNumber == -1) {
+                            lineNumber = 1;
+                  }
+                  marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
+        } catch (CoreException e) {
+        	CorePlugin.getDefault().logError(e);
+        }
+}
 
 	public void deleteConfigurationMarkers(IResource resource, int depth) {
 		try {

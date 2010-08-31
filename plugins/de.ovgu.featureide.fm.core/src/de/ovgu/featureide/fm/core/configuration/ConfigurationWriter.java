@@ -83,6 +83,33 @@ public class ConfigurationWriter {
 		writeSelectedFeatures(configuration.getRoot(), out);
 		return out.toString();
 	}
+	
+	// TODO (Task 2.1) make a method for same parts of writeIntoString and safeToFile 
+	public String writeIntoString2(IFile file){
+		StringBuffer buffer = new StringBuffer();
+		File project = ((IFile) file.getAdapter(IFile.class)).getProject()
+			.getLocation().toFile();
+		FeatureOrderReader reader = new FeatureOrderReader(project);
+		Set<Feature> featureset = configuration.getSelectedFeatures();
+		String fileSep = System.getProperty("file.separator");
+		File orderFile = new File(project.toString() + fileSep + ".order");
+		if (orderFile.exists()){
+			ArrayList<String> list = reader.featureOrderRead();
+			if (new String(list.get(0)).equals("true")) {
+				list.remove(0);
+				for (String s : list) {
+					for (Feature f : featureset) {
+						if (f.isLayer()) {
+							if (f.getName().equals(s))
+								buffer.append(s + "\r\n");
+						}
+					}
+				}
+				return buffer.toString();
+			}
+		}
+		return writeIntoString();
+	}
 
 	private void writeSelectedFeatures(SelectableFeature feature,
 			StringBuffer out) {

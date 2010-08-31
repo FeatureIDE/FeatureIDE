@@ -35,25 +35,19 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.ITreeSelection;
-import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.widgets.Composite;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.part.EditorPart;
+import org.eclipse.ui.editors.text.TextEditor;
+import org.eclipse.ui.part.MultiPageEditorPart;
 import org.eclipse.ui.progress.UIJob;
+import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
@@ -63,12 +57,9 @@ import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
-import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
-import de.ovgu.featureide.fm.core.configuration.Selection;
-import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationContentProvider;
-import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationLabelProvider;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.ui.UIPlugin;
-
 
 /**
  * ConfiguratonEitor displays the Equation File.
@@ -76,36 +67,43 @@ import de.ovgu.featureide.ui.UIPlugin;
  * @author Constanze Adler
  * @author Christian Becker
  * @author Jens Meinicke
+ * @author Hannes Smurawsky
  */
+public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefaults,
+PropertyConstants, PropertyChangeListener, IResourceChangeListener {
 
-public class ConfigurationEditor extends EditorPart implements
-		PropertyChangeListener, PropertyConstants, IResourceChangeListener {
-
-	private TreeViewer viewer;
-
-	private Configuration configuration;
-
-	private boolean dirty = false;
-
-	private boolean closeEditor;
-
-	private IFile file;
-
-	private FeatureModel featureModel;
+	public ConfigurationPage configurationPage;
 	
-	private IDoubleClickListener listener = new IDoubleClickListener() {
+	private int configurationPageIndex;
+	
+	public AdvancedConfigurationPage advancedConfigurationPage;
+	
+	private int advancedConfigurationPageIndex;
+	
+	private TextEditor sourceEditor;
+	
+	private int sourceEditorIndex;
+	
+	private IFile file;
+	
+	public FeatureModel featureModel;
+	
+	public Configuration configuration;
 
-		public void doubleClick(DoubleClickEvent event) {
-			Object object = ((ITreeSelection) event.getSelection())
-					.getFirstElement();
-			if (object instanceof SelectableFeature) {
-				final SelectableFeature feature = (SelectableFeature) object;
-				changeSelection(feature);
-			}
-		}
-	};
+	private int oldPageIndex = -1;
+	
+	private boolean closeEditor;
+	
+	private boolean isPageModified = false;
+	
+	private String source;
 
+	private boolean advancedConfigurationPageUsed = false;
+	
+	private boolean configurationPageUsed = true;
+	
 	private IPartListener iPartListener = new IPartListener() {
+
 		@Override
 		public void partBroughtToTop(IWorkbenchPart part) {
 		}
@@ -123,122 +121,60 @@ public class ConfigurationEditor extends EditorPart implements
 		public void partActivated(IWorkbenchPart part) {
 		}
 	};
-
+	
 	@Override
-	public void doSave(IProgressMonitor monitor) {
-		try {
-			new ConfigurationWriter(configuration).saveToFile(file);
-			dirty = false;
-			firePropertyChange(IEditorPart.PROP_DIRTY);
-		} catch (CoreException e) {
-			UIPlugin.getDefault().logError(e);
-		}
-//		UIPlugin.getDefault().logInfo("Configuration " + file.getFullPath() + " changed");
-	}
-
-	@Override
-	public void doSaveAs() {
-	}
-
-	@Override
-	public void init(IEditorSite site, IEditorInput input)
-			throws PartInitException {
-		setSite(site);
-		setInput(input);
-		ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
+	protected void setInput(IEditorInput input) {
 		file = (IFile) input.getAdapter(IFile.class);
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
+		super.setInput(input);
+		getSite().getPage().addPartListener(iPartListener);
 		IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
 		featureModel = featureProject.getFeatureModel();
 		configuration = new Configuration(featureModel, true);
 		try {
-			dirty = !new ConfigurationReader(configuration).readFromFile(file);
-			if (!dirty) {
-				Configuration c = new Configuration(featureModel);
-				new ConfigurationReader(c).readFromFile(file);
-				dirty = !c.valid();
-			}
+			new ConfigurationReader(configuration).readFromFile(file);
 		} catch (Exception e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
-		getSite().getPage().addPartListener(iPartListener);
-
-//		UIPlugin.getDefault().logInfo("file: " + file);
 		setPartName(file.getName());
 		featureModel.addListener(this);
 		firePropertyChange(IEditorPart.PROP_DIRTY);
 	}
-
-	@Override
-	public boolean isDirty() {
-		return dirty;
-	}
-
-	@Override
-	public boolean isSaveAsAllowed() {
-		return false;
-	}
-
-	@Override
-	public void createPartControl(Composite parent) {
-		viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
-		viewer.addDoubleClickListener(listener);
-		viewer.getTree().addKeyListener(new KeyListener() {
-
-			public void keyPressed(KeyEvent e) {
-				if (e.character == ' ') {
-					if (viewer.getSelection() instanceof ITreeSelection) {
-						final ITreeSelection tree = (ITreeSelection) viewer
-								.getSelection();
-						Object object = tree.getFirstElement();
-						if (object instanceof SelectableFeature) {
-							final SelectableFeature feature = (SelectableFeature) object;
-							changeSelection(feature);
-						}
-					}
-				}
-			}
-
-			public void keyReleased(KeyEvent e) {
-
-			}
-		});
-		viewer.setContentProvider(new ConfigurationContentProvider());
-		viewer.setLabelProvider(new ConfigurationLabelProvider());
-		viewer.setInput(configuration);
-		viewer.expandAll();
-	}
-
-	@Override
-	public void setFocus() {
-		viewer.getControl().setFocus();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @seejava.beans.PropertyChangeListener#propertyChange(java.beans.
-	 * PropertyChangeEvent)
+	
+	/* (non-Javadoc)
+	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
 	 */
-
+	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
-			UIJob job = new UIJob("refresh tree") {
+		setConfiguration();
+		//Reinitialize the actual pages 
+		if (oldPageIndex == advancedConfigurationPageIndex){
+			advancedConfigurationPage.propertyChange(null);
+			configurationPageUsed = false;
+		}
+		else if (oldPageIndex == configurationPageIndex){
+			configurationPage.propertyChange(null);
+			advancedConfigurationPageUsed = false;
+		} else {
+			advancedConfigurationPageUsed = false;
+			configurationPageUsed = false;
+		}
+		if (oldPageIndex == sourceEditorIndex) {
+			UIJob job = new UIJob("refresh source page") {
 				@Override
 				public IStatus runInUIThread(IProgressMonitor monitor) {
-					refreshTree();
+					updateSourcePage();
 					return Status.OK_STATUS;
 				}
 			};
 			job.setPriority(Job.SHORT);
 			job.schedule();
+		}
 	}
-
-	private void refreshTree() {
-		setConfiguration();
-		viewer.setContentProvider(new ConfigurationContentProvider());
-		viewer.setLabelProvider(new ConfigurationLabelProvider());
-		viewer.setInput(configuration);
-		viewer.expandAll();
-		viewer.refresh();
+	
+	@Override
+	public boolean isDirty() {
+		return isPageModified  || super.isDirty();
 	}
 
 	private void setConfiguration() {
@@ -251,36 +187,130 @@ public class ConfigurationEditor extends EditorPart implements
 		} catch (Exception e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
-		dirty = true;
-		firePropertyChange(IEditorPart.PROP_DIRTY);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.MultiPageEditorPart#createPages()
+	 */
+	@Override
+	protected void createPages() {
+		createConfigurationPage();
+		createAdvancedConfigurationPage();
+		createSourcePage();
+	}
+	
+	private void createConfigurationPage() {
+		configurationPage = new ConfigurationPage();
+		configurationPage.setConfigurationEditor(ConfigurationEditor.this);
+		try {
+			configurationPageIndex = addPage(configurationPage, getEditorInput());
+			setPageText(configurationPageIndex, "Configuration");
+		} catch (PartInitException e) {
+			UIPlugin.getDefault().logError(e);
+		}
+		configurationPage.propertyChange(null);
 	}
 
-	/**
-	 * @param The feature which change the selection status
-	 *            
-	 */
-	protected void changeSelection(SelectableFeature feature) {
-		if (feature.getAutomatic() == Selection.UNDEFINED) {
-			// set to the next value
-			if (feature.getManual() == Selection.UNDEFINED)
-				set(feature, Selection.SELECTED);
-			else if (feature.getManual() == Selection.SELECTED)
-				set(feature, Selection.UNSELECTED);
-			else
-				// case: unselected
-				set(feature, Selection.UNDEFINED);
-			if (!dirty) {
-				dirty = true;
-				firePropertyChange(IEditorPart.PROP_DIRTY);
-			}
-			viewer.refresh();
+	
+	private void createAdvancedConfigurationPage() {
+		advancedConfigurationPage = new AdvancedConfigurationPage();
+		advancedConfigurationPage.setConfigurationEditor(ConfigurationEditor.this);
+		try {
+			advancedConfigurationPageIndex = addPage(advancedConfigurationPage, getEditorInput());
+			setPageText(advancedConfigurationPageIndex, "Advanced Configuration");
+		} catch (PartInitException e) {
+			UIPlugin.getDefault().logError(e);
+		}
+		//advancedConfigurationPage.propertyChange(null);
+	}
+	
+	private void createSourcePage() {
+		sourceEditor = new TextEditor();
+		try {
+			sourceEditorIndex = addPage(sourceEditor, getEditorInput());
+			setPageText(sourceEditorIndex, "Source");
+		} catch (PartInitException e) {
+			FMUIPlugin.getDefault().logError(e);
 		}
 	}
 
-	protected void set(SelectableFeature feature, Selection selection) {
-		configuration.setManual(feature, selection);
+	public void updateSourcePage(){
+		source = new ConfigurationWriter(configuration).writeIntoString2(file);
+		IDocumentProvider provider = sourceEditor.getDocumentProvider();
+		IDocument document = provider.getDocument(sourceEditor.getEditorInput());
+		if (!source.equals(document.get()))
+				document.set(source);
+	}
+	
+	@Override
+	protected void pageChange(int newPageIndex) {
+		if (oldPageIndex == sourceEditorIndex){
+			IDocumentProvider provider = sourceEditor.getDocumentProvider();
+			IDocument document = provider.getDocument(sourceEditor.getEditorInput());
+			if (!new ConfigurationWriter(configuration).writeIntoString2(file).equals(document.get())){
+				configuration = new Configuration(featureModel, true);
+				try {
+					new ConfigurationReader(configuration).readFromString(document.get());
+				} catch (Exception e) {
+					FMCorePlugin.getDefault().logError(e);
+				}
+				advancedConfigurationPage.propertyChange(null);
+			}
+		}
+		if (oldPageIndex != -1){
+			if (newPageIndex == configurationPageIndex)
+				if (configurationPageUsed)
+					configurationPage.updateTree();
+				else{ 
+					configurationPage.propertyChange(null);
+					configurationPageUsed = true;
+				}
+			if (newPageIndex == advancedConfigurationPageIndex)
+				if (advancedConfigurationPageUsed)
+					advancedConfigurationPage.updateTree();
+				else {
+					advancedConfigurationPage.propertyChange(null);
+					advancedConfigurationPageUsed = true;
+				}
+			if (newPageIndex == sourceEditorIndex)
+				updateSourcePage();
+		}
+		oldPageIndex = newPageIndex;
+		super.pageChange(newPageIndex);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.EditorPart#doSave(org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	@Override
+	public void doSave(IProgressMonitor monitor) {
+		try {
+			new ConfigurationWriter(configuration).saveToFile(file);
+			firePropertyChange(IEditorPart.PROP_DIRTY);
+			isPageModified = false;
+		} catch (CoreException e) {
+			UIPlugin.getDefault().logError(e);
+		}
+		advancedConfigurationPage.doSave(null);
+		configurationPage.doSave(null);
+		sourceEditor.doSave(monitor);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.EditorPart#doSaveAs()
+	 */
+	@Override
+	public void doSaveAs() {
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.EditorPart#isSaveAsAllowed()
+	 */
+	@Override
+	public boolean isSaveAsAllowed() {
+		return false;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -305,9 +335,7 @@ public class ConfigurationEditor extends EditorPart implements
 				&& closeEditor) {
 			IResourceDelta rootDelta = event.getDelta();
 			// get the delta, if any, for the documentation directory
-
 			final List<IResource> deletedlist = new ArrayList<IResource>();
-
 			IResourceDelta docDelta = rootDelta.findMember(jmolfile
 					.getFullPath());
 			if (docDelta != null) {
@@ -321,15 +349,12 @@ public class ConfigurationEditor extends EditorPart implements
 						return true;
 					}
 				};
-
 				try {
 					docDelta.accept(visitor);
 				} catch (CoreException e) {
-					UIPlugin.getDefault().logError(e);
+					FMUIPlugin.getDefault().logError(e);
 				}
-
 			}
-
 			if (deletedlist.size() > 0 && deletedlist.contains(jmolfile)) {
 				Display.getDefault().asyncExec(new Runnable() {
 					public void run() {
@@ -337,10 +362,8 @@ public class ConfigurationEditor extends EditorPart implements
 							return;
 						if (getSite().getWorkbenchWindow() == null)
 							return;
-
 						IWorkbenchPage[] pages = getSite().getWorkbenchWindow()
 								.getPages();
-
 						for (int i = 0; i < pages.length; i++) {
 							IEditorPart editorPart = pages[i].findEditor(input);
 							pages[i].closeEditor(editorPart, true);
@@ -348,16 +371,13 @@ public class ConfigurationEditor extends EditorPart implements
 					}
 				});
 			}
-
 		}
 
 		/*
 		 * Closes all editors with this editor input on project close.
 		 */
-
 		final IResource res = event.getResource();
 		if ((event.getType() == IResourceChangeEvent.PRE_CLOSE) || closeEditor) {
-
 			Display.getDefault().asyncExec(new Runnable() {
 				public void run() {
 					if (getSite() == null)
@@ -375,6 +395,5 @@ public class ConfigurationEditor extends EditorPart implements
 				}
 			});
 		}
-
 	}
 }

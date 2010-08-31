@@ -125,7 +125,20 @@ public class Configuration {
 		for (SelectableFeature feature : features)
 			feature.setAutomatic(Selection.UNDEFINED);
 	}
-
+	
+	public boolean leadToValidConfiguration(SelectableFeature feature, Selection testSelection, Selection actualSelection){
+		feature.setManual(testSelection);
+		updateAutomaticValues();
+		if (valid()) {
+			feature.setManual(actualSelection);
+			updateAutomaticValues();
+			return true;
+		}
+		feature.setManual(actualSelection);
+		updateAutomaticValues();
+		return false;
+	}
+	
 	private void updateManualDefinedValues() {
 		List<Node> literals = new LinkedList<Node>();
 		for (SelectableFeature feature : features)
@@ -173,6 +186,13 @@ public class Configuration {
 		updateAutomaticValues();
 	}
 
+	public SelectableFeature getSelectablefeature(String name){
+		SelectableFeature feature = table.get(name);
+		if (feature == null)
+			return null;
+		return feature;
+	}
+	
 	public void setManual(String name, Selection selection) {
 		SelectableFeature feature = table.get(name);
 		if (feature == null)

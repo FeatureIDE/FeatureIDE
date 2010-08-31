@@ -46,7 +46,7 @@ import de.ovgu.featureide.fm.core.io.guidsl.FeatureModelWriter;
 
 /**
  * The activator class controls the plug-in life cycle.
- * 
+ *  
  * @author Constanze Adler
  * @author Marcus Leich
  * @author Tom Brosch

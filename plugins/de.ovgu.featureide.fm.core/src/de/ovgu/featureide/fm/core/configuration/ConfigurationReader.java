@@ -37,6 +37,7 @@ public class ConfigurationReader {
 	private Configuration configuration;
 	
 	private LinkedList<String> warnings = new LinkedList<String>();
+	private LinkedList<Integer> positions = new LinkedList<Integer>();
 
 	public ConfigurationReader(Configuration configuration) {
 		this.configuration = configuration;
@@ -62,12 +63,13 @@ public class ConfigurationReader {
 		
 		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 		String line = null;
+		Integer lineNumber = 1;
 		boolean successful = true;
-		//TODO #30: add line numbers to warnings in configuration files
 		while ((line = reader.readLine()) != null) {
-			if (line.startsWith("#"))
+			if (line.startsWith("#") || line.isEmpty()){
+				lineNumber++;
 				continue;
-			
+			}
 			//the string tokenizer is used to also support the expression format used by FeatureHouse
 			StringTokenizer tokenizer = new StringTokenizer(line);
 			while (tokenizer.hasMoreTokens()) {
@@ -77,10 +79,13 @@ public class ConfigurationReader {
 				} catch (FeatureNotFoundException e) {
 					successful = false;
 					warnings.add("Feature " + name + " does not exist anymore");
+					positions.add(lineNumber);
 				} catch (SelectionNotPossibleException e) {
 					successful = false;
 					warnings.add("Feature " + name + " cannot be selected anymore");
+					positions.add(lineNumber);
 				}
+			lineNumber++;
 			}
 		}
 		reader.close();
@@ -90,6 +95,10 @@ public class ConfigurationReader {
 
 	public List<String> getWarnings() {
 		return Collections.unmodifiableList(warnings);
+	}
+	
+	public List<Integer> getPositions() {
+		return Collections.unmodifiableList(positions);
 	}
 
 }

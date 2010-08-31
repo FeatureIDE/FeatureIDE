@@ -74,8 +74,6 @@ public class FeatureOrderEditor extends EditorPart {
 
 	private IEditorSite site;
 
-//	private Writer fw;
-
 	private boolean dirty = false;
 
 	private FeatureModel featureModel;

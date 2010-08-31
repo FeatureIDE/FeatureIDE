@@ -648,15 +648,19 @@ public class FeatureProject extends BuilderMarkerHandler implements
 					reader.readFromFile(file);
 					if (!configuration.valid())
 						createConfigurationMarker(file,
-								"Configuration is invalid",
+								"Configuration is invalid",0,
 								IMarker.SEVERITY_ERROR);
 					// check if all features are still available
 					configuration = new Configuration(featureModel, true);
 					reader = new ConfigurationReader(configuration);
 					reader.readFromFile(file);
-					for (String warning : reader.getWarnings())
-						createConfigurationMarker(file, warning,
+					
+					for (int i=0; i<reader.getWarnings().size(); i++){
+						createConfigurationMarker(file, reader.getWarnings().get(i), reader.getPositions().get(i),
 								IMarker.SEVERITY_WARNING);
+						
+					}
+					
 				} catch (Exception e) {
 					CorePlugin.getDefault().logError(e);
 				}
@@ -667,6 +671,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		job.schedule();
 	}
 
+	
 	public ProjectTree getProjectTree() {
 		return projectTree;
 	}

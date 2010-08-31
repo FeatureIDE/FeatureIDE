@@ -34,13 +34,14 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * Provides labels and images for the configuration tree view.
  * 
  * @author Thomas Thuem
+ * TODO (Task 2.1) move this class to package .ui
  */
-public class ConfigurationLabelProvider extends LabelProvider {
+public class AdvancedConfigurationLabelProvider extends LabelProvider {
 
 	public final Image IMAGE_UNDEFINED, IMAGE_SELECTED, IMAGE_DESELECTED,
 	IMAGE_ASELECTED, IMAGE_ADESELECTED;
 
-	public ConfigurationLabelProvider() {
+	public AdvancedConfigurationLabelProvider() {
 		IMAGE_UNDEFINED = FMUIPlugin.getImage("undefined.ico");
 		IMAGE_SELECTED = FMUIPlugin.getImage("selected.ico");
 		IMAGE_DESELECTED = FMUIPlugin.getImage("deselected.ico");
