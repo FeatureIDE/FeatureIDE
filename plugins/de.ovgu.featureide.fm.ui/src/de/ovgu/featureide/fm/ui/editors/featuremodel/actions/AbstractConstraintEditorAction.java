@@ -27,7 +27,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.guidsl.FeatureModelWriter;
-import de.ovgu.featureide.fm.ui.editors.ConstraintEditor;
+import de.ovgu.featureide.fm.ui.editors.ConstraintDialog;
 
 
 /**
@@ -69,7 +69,7 @@ public abstract class AbstractConstraintEditorAction extends Action {
 	}
 
 	protected void openEditor(Constraint constraint) {
-		new ConstraintEditor(featuremodel, constraint);
+		new ConstraintDialog(featuremodel, constraint);
 	}
 
 	protected abstract boolean isValidSelection(IStructuredSelection selection);

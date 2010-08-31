@@ -31,7 +31,7 @@ import org.eclipse.gef.editpolicies.NonResizableEditPolicy;
 
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.PropertyConstants;
-import de.ovgu.featureide.fm.ui.editors.ConstraintEditor;
+import de.ovgu.featureide.fm.ui.editors.ConstraintDialog;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.ConstraintFigure;
 
 
@@ -68,7 +68,7 @@ public class ConstraintEditPart extends AbstractGraphicalEditPart implements Pro
 	
 	public void performRequest(Request request) {
 		if (request.getType() == RequestConstants.REQ_OPEN) {
-			new ConstraintEditor(getConstraintModel().getFeatureModel(), getConstraintModel());
+			new ConstraintDialog(getConstraintModel().getFeatureModel(), getConstraintModel());
 		}
 	}
 	
