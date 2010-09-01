@@ -33,6 +33,7 @@ import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -46,6 +47,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
@@ -54,6 +56,7 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.prop4j.Node;
 import org.prop4j.NodeWriter;
+//import org.prop4j.NodeReader;
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -80,8 +83,8 @@ public class ConstraintDialog {
 
 	// TODO: AtMost1 implementieren!!
 
-	private static final String[] OPERATOR_NAMES = { "Not", "And", "Or",
-			"Implies", "Iff", "(", ")" /* "At most 1" */};
+	private static final String[] OPERATOR_NAMES = { " Not ", " And ", " Or ",
+			" Implies ", " Iff ", "(", ")" /* "At most 1" */};
 	private static final String FILTERTEXT = "type filter text";
 	private Shell shell;
 
@@ -153,6 +156,13 @@ public class ConstraintDialog {
 		shellLayout.marginWidth = 0;
 		shellLayout.marginHeight = 0;
 		shell.setLayout(shellLayout);
+		
+		  Monitor primary = shell.getDisplay().getPrimaryMonitor();
+		    Rectangle bounds = primary.getBounds();
+		    Rectangle rect = shell.getBounds();
+		    int x = bounds.x + (bounds.width - rect.width) / 2;
+		    int y = bounds.y + (bounds.height - rect.height) / 2;
+		    shell.setLocation(x, y);
 	}
 
 	/**
@@ -221,8 +231,8 @@ public class ConstraintDialog {
 								new FeatureModel()).readPropositionalString(
 								input, featuremodel);
 
-						featuremodel.addPropositionalNode(propNode);
-						featuremodel.handleModelDataChanged();
+					featuremodel.addPropositionalNode(propNode);
+					featuremodel.handleModelDataChanged();
 						shell.dispose();
 					} catch (UnsupportedModelException e1) {
 						errorMarker.setImage(errorImage);
@@ -313,17 +323,17 @@ public class ConstraintDialog {
 		FormLayout constraintTextLayout = new FormLayout();
 		constraintTextComposite.setLayout(constraintTextLayout);
 
-		Button validateButton = new Button(constraintTextComposite, SWT.NONE);
-		validateButton.setText("Validate");
-		FormData formDataValidateButton = new FormData();
-		formDataValidateButton.width = 70;
-		formDataValidateButton.right = new FormAttachment(100, -5);
-		validateButton.setLayoutData(formDataValidateButton);
+//		Button validateButton = new Button(constraintTextComposite, SWT.NONE);
+//		validateButton.setText("Validate");
+//		FormData formDataValidateButton = new FormData();
+//		formDataValidateButton.width = 70;
+//		formDataValidateButton.right = new FormAttachment(100, -5);
+//		validateButton.setLayoutData(formDataValidateButton);
 
 		constraintText = new Text(constraintTextComposite, SWT.SINGLE
 				| SWT.BORDER);
 		FormData formDataConstraintText = new FormData();
-		formDataConstraintText.right = new FormAttachment(validateButton, -5);
+		formDataConstraintText.right = new FormAttachment(100/*validateButton*/, -5);
 		formDataConstraintText.left = new FormAttachment(0, 5);
 		constraintText.setLayoutData(formDataConstraintText);
 		constraintText.setText(initialConstraint);
@@ -366,10 +376,10 @@ public class ConstraintDialog {
 					StringBuffer temp = new StringBuffer(constraintText
 							.getText());
 					temp.delete(x, y);
-					temp.insert(x > y ? y : x, " "
-							+ button.getText().toLowerCase()
-									.replaceAll(" ", "") + " ");
-					constraintText.setText(temp.toString());
+					temp.insert(x > y ? y : x, /*" "
+							+ */button.getText().toLowerCase()
+									/*.replaceAll(" ", "") + " "*/);
+					constraintText.setText(reduceWhiteSpaces(temp.toString()));
 					constraintText.setFocus();
 					constraintText.setSelection(constraintText.getCharCount());
 				}
@@ -499,8 +509,9 @@ public class ConstraintDialog {
 				temp.delete(x, y);
 				temp.insert(x > y ? y : x, " " + selectedItem[0].getText()
 						+ " ");
-				constraintText.setText(temp.toString());
-
+				
+				constraintText.setText(reduceWhiteSpaces(temp.toString()));
+				
 				constraintText.setSelection(constraintText.getCharCount());
 				searchFeatureText.setText(FILTERTEXT);
 				searchFeatureText.setForeground(shell.getDisplay()
@@ -509,7 +520,23 @@ public class ConstraintDialog {
 				featureTableViewer.resetFilters();
 			}
 		});
-
+		
 	}
-
+	/**
+	 * reduces  
+	 * @param str
+	 * @return
+	 */
+	private static String reduceWhiteSpaces(String str){
+		if(str.length()<2)return str;
+		StringBuffer strBuf = new StringBuffer();
+		strBuf.append(str.charAt(0));
+		for(int i=1;i<str.length();i++){
+			if(!(Character.isWhitespace(str.charAt(i-1))&&Character.isWhitespace(str.charAt(i)))){
+				strBuf.append(str.charAt(i));
+			}
+		}
+		return strBuf.toString();
+	}
+	
 }
