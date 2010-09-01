@@ -151,15 +151,18 @@ PropertyConstants, PropertyChangeListener, IResourceChangeListener {
 		if (oldPageIndex == advancedConfigurationPageIndex){
 			advancedConfigurationPage.propertyChange(null);
 			configurationPageUsed = false;
-		}
-		else if (oldPageIndex == configurationPageIndex){
+			UIPlugin.getDefault().logInfo("adv page");
+		} else if (oldPageIndex == configurationPageIndex){
 			configurationPage.propertyChange(null);
 			advancedConfigurationPageUsed = false;
+			UIPlugin.getDefault().logInfo("conf page");
 		} else {
 			advancedConfigurationPageUsed = false;
 			configurationPageUsed = false;
-		}
+			UIPlugin.getDefault().logInfo("source page a");
+		} 
 		if (oldPageIndex == sourceEditorIndex) {
+			UIPlugin.getDefault().logInfo("source page b");
 			UIJob job = new UIJob("refresh source page") {
 				@Override
 				public IStatus runInUIThread(IProgressMonitor monitor) {
@@ -221,7 +224,6 @@ PropertyConstants, PropertyChangeListener, IResourceChangeListener {
 		} catch (PartInitException e) {
 			UIPlugin.getDefault().logError(e);
 		}
-		//advancedConfigurationPage.propertyChange(null);
 	}
 	
 	private void createSourcePage() {

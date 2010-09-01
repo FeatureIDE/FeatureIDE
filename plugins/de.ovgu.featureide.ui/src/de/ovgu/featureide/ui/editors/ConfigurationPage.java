@@ -64,13 +64,10 @@ public class ConfigurationPage extends EditorPart {
 	private LinkedList<String> selectedFeatures;
 	
 	private Color gray = new Color(null,140,140,140);
-	
 	private Color green = new Color(null,1,140,2);
-	
-	private Color yellow = new Color(null,200,200,0);
+	private Color blue = new Color(null,0,0,200);
 	
 	private Font treeItemStandardFont = new Font(null, "Arial", 8, SWT.NORMAL);
-	
 	private Font treeItemSpecialFont = new Font(null,"Arial", 8, SWT.BOLD);
 
 	public void updateTree(){
@@ -147,7 +144,13 @@ public class ConfigurationPage extends EditorPart {
 	public void setFocus() {
 	}
 	
+	private boolean initialized = false;
+	
 	public void propertyChange(PropertyChangeEvent evt) {
+		if (initialized)
+			dirty = true;
+		else
+			initialized = true;
 		UIJob job = new UIJob("refresh tree") {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
@@ -197,7 +200,7 @@ public class ConfigurationPage extends EditorPart {
 				child.setChecked(true);
 				if(!configurationEditor.configuration.valid())
 					if (configurationEditor.configuration.leadToValidConfiguration(feature, Selection.UNDEFINED, Selection.SELECTED )){
-						child.setForeground(yellow);
+						child.setForeground(blue);
 						child.setFont(treeItemSpecialFont);
 					}
 				}
@@ -231,11 +234,9 @@ public class ConfigurationPage extends EditorPart {
 	}
 	
 	private void add(TreeItem parent,TreeElement[] children){
-		int i = 0;
 		for (TreeElement child : children){
-			TreeItem item = new TreeItem(parent, i);
+			TreeItem item = new TreeItem(parent,0);
 			item.setText(child.toString());
-			i++;
 			add(item,child.getChildren());
 			item.setExpanded(true);
 		}

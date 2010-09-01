@@ -62,7 +62,7 @@ public class AdvancedConfigurationPage extends EditorPart {
 	private ConfigurationEditor configurationEditor;
 	
 	private Color green = new Color(null,0,140,0);
-	private Color yellow = new Color(null,200,200,0);
+	private Color blue = new Color(null,0,1,140);
 	
 	private Font treeItemStandardFont = new Font(null, "Arial", 8, SWT.NORMAL);
 	private Font treeItemSpecialFont = new Font(null,"Arial", 8, SWT.BOLD);
@@ -152,8 +152,13 @@ public class AdvancedConfigurationPage extends EditorPart {
 	public void setFocus() {
 		viewer.getControl().setFocus();
 	}
+	private boolean initialized = false;
 	
 	public void propertyChange(PropertyChangeEvent evt) {
+		if (initialized)
+			dirty = true;
+		else
+			initialized = true;
 		UIJob job = new UIJob("refresh tree") {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
@@ -236,7 +241,7 @@ public class AdvancedConfigurationPage extends EditorPart {
 						}
 					} else if (feature.getManual() == Selection.SELECTED) {
 						if (configurationEditor.configuration.leadToValidConfiguration(feature, Selection.UNSELECTED, Selection.SELECTED)){
-							child.setForeground(yellow);
+							child.setForeground(blue);
 							child.setFont(treeItemSpecialFont);
 						}
 						// case: unselected
