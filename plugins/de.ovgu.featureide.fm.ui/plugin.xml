@@ -68,15 +68,29 @@
                class="de.ovgu.featureide.fm.ui.actions.ExportXmlAction"
                icon="icons/export_wiz.gif"
                id="de.ovgu.featureide.fm.ui.ExportXml"
-               label="Export model to xml format"
+               label="Export model to XML formatt"
                menubarPath="de.ovgu.featureide.fm.ui_menue/slot3">
          </action>
          <action
                class="de.ovgu.featureide.fm.ui.actions.ImportXmlAction"
                icon="icons/import_wiz.gif"
                id="de.ovgu.featureide.fm.ui.ImportXml"
-               label="Import model from xml format"
+               label="Import model from XML format"
                menubarPath="de.ovgu.featureide.fm.ui_menue/slot3">
+         </action>
+         <action
+               class="de.ovgu.featureide.fm.ui.actions.ExportGuidslAction"
+               icon="icons/export_wiz.gif"
+               id="de.ovgu.featureide.fm.ui.ExportGuidsl"
+               label="Export model to GUIDSL format"
+               menubarPath="de.ovgu.featureide.fm.ui_menue/slot4">
+         </action>
+         <action
+               class="de.ovgu.featureide.fm.ui.actions.ImportGuidslAction"
+               icon="icons/import_wiz.gif"
+               id="de.ovgu.featureide.fm.ui.ImportGuidsl"
+               label="Import model from GUIDSL format"
+               menubarPath="de.ovgu.featureide.fm.ui_menue/slot4">
          </action>
       </objectContribution>
    </extension>

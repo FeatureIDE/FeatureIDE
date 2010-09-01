@@ -27,7 +27,6 @@ import org.eclipse.swt.widgets.ToolTip;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.FeatureRenamingCommand;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
 
@@ -65,7 +64,7 @@ public class FeatureLabelEditManager extends DirectEditManager implements GUIDef
 				if (!value.equals(oldValue)) {
 					if (value.equalsIgnoreCase(oldValue))
 						createTooltip("It is not recommended to change upper and lower case. You currently try to rename " + oldValue + " to " + value + ".", SWT.ICON_WARNING);
-					else if (!FeatureRenamingCommand.isValidJavaIdentifier(value))
+					else if (!FeatureModel.isValidJavaIdentifier(value))
 						createTooltip("The name need to be a valid Java identifier.", SWT.ICON_ERROR);
 					else if (featureModel.getFeatureNames().contains(value))
 						createTooltip("This name is already used for another feature.", SWT.ICON_ERROR);

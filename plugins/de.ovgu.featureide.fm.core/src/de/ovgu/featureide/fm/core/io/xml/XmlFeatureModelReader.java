@@ -18,393 +18,367 @@
  */
 package de.ovgu.featureide.fm.core.io.xml;
 
-import java.io.IOException;
 import java.io.InputStream;
+import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Scanner;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import java.util.Stack;
+
+import javax.swing.JOptionPane;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.EndElement;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
 
 import org.prop4j.And;
+import org.prop4j.AtMost;
 import org.prop4j.Equals;
 import org.prop4j.Implies;
 import org.prop4j.Literal;
 import org.prop4j.Not;
 import org.prop4j.Or;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
+import org.prop4j.Node;
+import org.prop4j.SatSolver;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.*;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
-
 /**
- * Parses a feature model in XML format.
+ * Parses a FeatureModel from XML to the Editor
  * 
- * @author Fabian Wielgorz
+ * @author Fabian Wielgorz first version
+ * @author Maik Lampe & Dariusz Krolikowski optimized XML
  */
 public class XmlFeatureModelReader extends AbstractFeatureModelReader {
-	
-	/**
-	 * Creates a new reader and sets the feature model to store the data.
-	 * 
-	 * @param featureModel the structure to fill
-	 */
+
 	public XmlFeatureModelReader(FeatureModel featureModel) {
 		setFeatureModel(featureModel);
 	}
-	
+
+	Fallback fallback = new Fallback();
 	/**
-	 * Searches the Document tree for the first ancestor that is either the
-	 * Xml-Tag MFeature or Feature
-	 * @param n Startnode
-	 * @return Node containing parent feature or null if there isn't one
-	 * @throws UnsupportedModelException
+	 * Set this true to see some information about the parseprocess while
+	 * developing!
 	 */
-    private Node findParentFeature(Node n) throws UnsupportedModelException {
-    	Node wNode = n.getParentNode();
-    	while (wNode != null) {
-    		if (wNode.getNodeType() == Node.ELEMENT_NODE) {
-    			String tag = wNode.getNodeName();
-    	    	if (tag.equals("MFeature") || tag.equals("Feature")) {
-    	    		return wNode;
-    	    	} else if (tag.equals("FeatureModel")) return null;
-    		}
-    		wNode = wNode.getParentNode();
-    	}
-    	return null;
-    }
-    
-    /**
-     * Finds the Name, contained in a Name-Tag for a given Feature
-     * @param n Node that is either the Xml-Tag MFeature or Feature
-     * @return Name string
-     * @throws UnsupportedModelException
-     */
-    private String getFeatureName(Node n) throws UnsupportedModelException {
-    	String result = null;
-    	Node wNode;
-    	NodeList children = n.getChildNodes();
-    	NodeList grandchildren;
-    	for (int i=0; i < children.getLength(); i++) {
-    		wNode = children.item(i);
-    		if ((wNode.getNodeType() == Node.ELEMENT_NODE) 
-    				&& wNode.getNodeName().equals("Name")) {
-    			grandchildren = wNode.getChildNodes();
-        		for (int j=0; j < grandchildren.getLength(); j++) {
-        			result = grandchildren.item(j).getNodeValue();
-            		if (result != null) return result;
-        		}
-    		}
-    	}
-    	throw new UnsupportedModelException("No Name-Tag found" +
-    										" for this Feature", 0);
-	}
-                
-    @Override
-    protected void parseInputStream(InputStream inputStream)
-							throws UnsupportedModelException {
-    	warnings.clear();
-        //Parse the XML-File to a DOM-Document
-    	boolean ignoreWhitespace = true;
-        boolean ignoreComments = true;
-        boolean putCDATAIntoText = true;
-        boolean createEntityRefs = false;
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        dbf.setIgnoringComments(ignoreComments);
-        dbf.setIgnoringElementContentWhitespace(ignoreWhitespace);
-        dbf.setCoalescing(putCDATAIntoText);
-        dbf.setExpandEntityReferences(!createEntityRefs);
-        DocumentBuilder db = null;
-        try {
-            db = dbf.newDocumentBuilder();
-        } catch (ParserConfigurationException pce) {
-            System.err.println(pce);
-            System.exit(1);
-        }
-        Document doc = null;
-        try {
-            doc = db.parse(inputStream);
-        } catch (SAXException se) {
-            System.err.println(se.getMessage());
-            System.exit(1);
-        } catch (IOException ioe) {
-            System.err.println(ioe);
-            System.exit(1);
-        }
-        // Create the Feature Model from the DOM-Document
-		buildFeatureModel(doc);
-    }
-    
-    /**
-     * Handles the Xml-Tags concerning the type of connection between Features
-     * @param n
-     * @throws UnsupportedModelException
-     */
-    private void handleConnectionTags(Node n) throws UnsupportedModelException {
-    	String tag = n.getNodeName();
-    	Feature feat;
-    	Node wNode;
-    	if (tag.equals("And")) {
-			wNode = findParentFeature(n);
-			feat = featureModel.getFeature(getFeatureName(wNode));
-			if (feat == null) throw new UnsupportedModelException("Connection" +
-					" does not have a parent", 0);
-			feat.changeToAnd();
-    	} else if (tag.equals("Or")) {
-			wNode = findParentFeature(n);
-			feat = featureModel.getFeature(getFeatureName(wNode));
-			if (feat == null) throw new UnsupportedModelException("Connection" +
-					" does not have a parent", 0);
-			feat.changeToOr();
-    	} else if (tag.equals("Alternative")) {
-			wNode = findParentFeature(n);
-			feat = featureModel.getFeature(getFeatureName(wNode));
-			if (feat == null) throw new UnsupportedModelException("Connection" +
-					" does not have a parent", 0);
-			feat.changeToAlternative();
-    	} else if (tag.equals("PropositionalConstraints")) {
-    		
-    	} else if (tag.equals("PConstraint")) {
-    		handlePropConst(n);
-    	} else if (tag.equals("Annotations")) {
-    		handleAnnotations(n);
-    	} else if (tag.equals("Name")) {
-    		return;
-    	} else if (tag.equals("FeatureModel")) {
-    		return;
-    	} else {
-    		throw new UnsupportedModelException("Unknown Xml-Tag found", 0);
-    	}
-    }
-    
-    /**
-     * Handles the Propositional Constraint found in a PConstraint xml-tag
-     * @param n
-     */
-    private void handlePropConst(Node n) {
-    	NodeList nodelist = n.getChildNodes();
-    	for (int i=0; i<nodelist.getLength();i++) {
-    		Node node = nodelist.item(i);
-    		if (node.getNodeType() == Node.TEXT_NODE) {
-    			Scanner scan = new Scanner(node.getNodeValue());
-    			String str;
-    			LinkedList<String> elements = new LinkedList<String>();
-    			while (scan.hasNext()) {
-    				str = scan.next();
-    				if (str.startsWith("(")) {
-	    				while (str.startsWith("(")) {
-	    					elements.addLast("(");
-	    					str = str.substring(1);
-	    				} 
-	    				elements.addLast(str);
-    				} else if (str.contains(")")) {
-        				elements.addLast(str.substring(0, str.indexOf(")")));
-        				str = str.substring(str.indexOf(")"));
-        				while (str.contains(")")) {
-        					elements.addLast(")");
-        					str = str.substring(1);
-        				}
-    				} else {
-    					elements.addLast(str);
-    				}   				
-    			}
-    			// Shouldn't be needed
-     			//elements = insertBrackets(elements);  
-    			try {
-    				org.prop4j.Node propNode = buildPropNode(elements);
-    				featureModel.addPropositionalNode(propNode);
-				} catch (UnsupportedModelException e) {
-					FMCorePlugin.getDefault().logError(e);
+	Boolean DEBUG_XML = true;
+
+	/**
+	 * A kind of mind for the hirachy of the xml model
+	 */
+	Stack<String[]> parentStack = new Stack<String[]>();
+
+	/**
+	 * A kind of mind for the hirachy of the xml contraint model
+	 */
+	LinkedList<LinkedList<Node>> ruleTemp = new LinkedList<LinkedList<Node>>();
+
+	/**
+	 * If occoured an error while reading, set to false and use for fallback
+	 */
+	boolean isValidWhileReading = true;
+
+	/**
+	 * This is a copy ofthe featureModel before import
+	 */
+	FeatureModel backup = null;
+
+	/**
+	 * BufferModel for the parser
+	 */
+	FeatureModel newFeatureModel = null;
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader#parseInputStream
+	 * (java.io.InputStream)
+	 */
+	@Override
+	protected void parseInputStream(InputStream inputStream)
+			throws UnsupportedModelException {
+		newFeatureModel = new FeatureModel();
+
+		try {
+
+			XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+			XMLEventReader eventReader = inputFactory
+					.createXMLEventReader(inputStream);
+
+			boolean isInStruct = false;
+			boolean isInConstraints = false;
+			ruleTemp.add(new LinkedList<Node>());
+
+			while (eventReader.hasNext()) {
+				XMLEvent event = eventReader.nextEvent();
+
+				if (event.isStartElement()) {
+					StartElement currentStartTag = event.asStartElement();
+					String currentTag = currentStartTag.getName()
+							.getLocalPart();
+
+					if (isInStruct) {
+						// BEGIN XML-reader is reading information about the
+						// features
+						Boolean isMandatory = false;
+						Boolean isAbstract = false;
+						String attrName = "noname";
+						String parent = parentStack.peek()[1];
+
+						Iterator<Attribute> attributes = currentStartTag
+								.getAttributes();
+
+						// BEGIN read attributes from XML tag
+						while (attributes.hasNext()) {
+							Attribute attribute = attributes.next();
+							String curName = attribute.getName().getLocalPart();
+							String curValue = attribute.getValue();
+
+							if (curName == "name") {
+								attrName = curValue;
+							}
+							if (curName == "mandatory") {
+								if (curValue.equals("true")) {
+									isMandatory = true;
+								} else {
+									isMandatory = false;
+								}
+							}
+							if (curName == "abstract") {
+								if (curValue.equals("true")) {
+									isAbstract = true;
+								} else {
+									isAbstract = false;
+								}
+							}
+						}
+						// END read attributes from XML tag
+
+						//if (!featureNames.contains(attrName)
+						//		&& attrName != "noname") {
+						if(!newFeatureModel.getFeatureNames().contains(attrName) && FeatureModel.isValidJavaIdentifier(attrName)) {
+							addFeature(attrName, isMandatory, isAbstract,
+									parent);
+						} else {
+							isValidWhileReading = false;
+							if(!FeatureModel.isValidJavaIdentifier(attrName)) {
+								fallback.addError("'" + attrName + "' is not a valid feature name", event.getLocation().getLineNumber());
+							}
+							if (newFeatureModel.getFeatureNames().contains(attrName)) {
+								fallback.addError("Cannot redefine '" + attrName + "'", event.getLocation().getLineNumber());								
+							}	
+						}
+
+						if (currentTag != "feature") {
+							parentStack.push(new String[] { currentTag,
+									attrName });
+						}
+						// END XML-reader is reading information about the
+						// features
+					} else if (isInConstraints) {
+						if (currentTag.equals("rule")
+								|| currentTag.equals("constraints")) {
+						} else if (currentTag.equals("var")) {
+							String literalName = eventReader.getElementText();
+
+							if (newFeatureModel.getFeatureNames().contains(literalName)) {
+								ruleTemp.getLast()
+										.add(new Literal(literalName));
+							} else {
+								isValidWhileReading = false;
+								fallback.addError("Feature '" + literalName
+										+ "' does not exists ", event
+										.getLocation().getLineNumber());
+							}
+						} else {
+							ruleTemp.add(new LinkedList<Node>());
+						}
+
+					} else {
+						if (currentTag.equals("featureModel")) {
+						}
+						if (currentTag.equals("struct")) {
+							parentStack
+									.push(new String[] { currentTag, "root" });
+							isInStruct = true;
+							isInConstraints = false;
+						}
+						if (currentTag.equals("constraints")) {
+							isInStruct = false;
+							isInConstraints = true;
+						}
+					}
 				}
-    		}
-    	}
-    	
-    }
-    
-    private void handleAnnotations(Node n) {
-    	String result = "";
-    	Node wNode;
-    	NodeList children = n.getChildNodes();
-    	for (int i=0; i < children.getLength(); i++) {
-    		wNode = children.item(i);
-    		if (wNode.getNodeType() == Node.TEXT_NODE) {
-    			result = result + wNode.getNodeValue();
-    		}
-    	}
-    	featureModel.setAnnotations(result);
-    }
-    
-    /**
-     * Inserts missing brackets in left-associative way
-     * @param list Boolean expression
-     * @return Boolean expression with the full set of brackets
-     */
-    @SuppressWarnings("unused")
-	private LinkedList<String> insertBrackets(LinkedList<String> list) {
-    	LinkedList<String> result = new LinkedList<String>();
-    	LinkedList<Integer> bracketList = new LinkedList<Integer>();
-    	bracketList.addFirst(0);
-    	int indexCount = 0;
-    	int countBoolOps = 0;
-    	String element;
-    	while (!list.isEmpty()) {
-    		element = list.remove();
-    		result.add(element);
-    		if (element.equals("(")) {
-    			countBoolOps = 0;
-    			bracketList.addFirst(indexCount);
-    		}
-    		if (element.equals(")")) {
-    			countBoolOps = 0;
-    			bracketList.removeFirst();
-    		}
-    		if ((element.equals("and")) || (element.equals("or")) || 
-    				(element.equals("implies")) || (element.equals("iff"))) {
-    			if (countBoolOps == 0) {
-    				countBoolOps++;
-    			} else {
-    				if ((!list.isEmpty()) && (!list.getFirst().equals(")"))) {
-    					result.add(bracketList.getFirst(), "(");
-    					result.add(result.size() - 1, ")");
-    				}
-    			}
-    		}
-    		indexCount++;
-    	}
-    	return result;
-    }
-    
-    /**
-     * Builds a Propositional Node from a propositional formula
-     * @param list
-     * @return
-     * @throws UnsupportedModelException
-     */
-    private org.prop4j.Node buildPropNode(LinkedList<String> list) 
-    		throws UnsupportedModelException {
-    	LinkedList<String> left = new LinkedList<String>();
-    	org.prop4j.Node leftResult, rightResult;
-    	int bracketCount = 0;
-    	String element;
-    	while (!list.isEmpty()) {
-    		element = list.removeFirst();
-    		if (element.equals("(")) bracketCount++;
-    		if (element.equals(")")) bracketCount--;
-    		if ((element.equals("not")) && (list.getFirst().equals("(")) 
-    									&& (list.getLast().equals(")"))) {
-    			list.removeFirst();
-				list.removeLast();
-				return new Not(buildPropNode(list));
-    		}
-    		if ((element.equals("and")) || (element.equals("or")) || 
-    				(element.equals("implies")) || (element.equals("iff")) ) {
-    			if (bracketCount == 0) {
-    				if ((left.getFirst().equals("(")) && 
-    						(left.getLast().equals(")"))) {
-    					left.removeFirst();
-    					left.removeLast();
-    				}
-    				leftResult = buildPropNode(left);
-    				if ((list.getFirst().equals("(")) && 
-    						(list.getLast().equals(")"))) {
-    					list.removeFirst();
-    					list.removeLast();
-    				}
-    				rightResult = buildPropNode(list);
-    				if (element.equals("and")) 
-    					return new And(leftResult, rightResult);
-    				if (element.equals("or")) 
-    					return new Or(leftResult, rightResult);
-    				if (element.equals("implies")) 
-    					return new Implies(leftResult, rightResult);
-    				if (element.equals("iff")) 
-    					return new Equals(leftResult, rightResult);
-    			}
-    		}
-    		left.add(element);    		
-    	}
-    	return buildLeafNodes(left);
-    }
-    
-    private org.prop4j.Node buildLeafNodes(LinkedList<String> list) 
-    		throws UnsupportedModelException {
-    	String element;
-    	if (list.isEmpty()) 
-    		throw new UnsupportedModelException("Fehlendes Element", 0);
-		element = list.removeFirst();
-		if (element.equals("not")) {
-			return new Not(buildPropNode(list));
-		} else {
-			if (featureModel.getFeature(element) == null)
-				throw new UnsupportedModelException("The feature '" + element + 
-						"' does not occur in the grammar!", 0);			
-			return new Literal(element);
+				if (event.isEndElement()) {
+					EndElement endElement = event.asEndElement();
+
+					String currentTag = endElement.getName().getLocalPart();
+					if (isInStruct) {
+						if (currentTag != "feature") {
+							if (parentStack.peek()[0] == currentTag) {
+								parentStack.pop();
+							}
+						}
+						if (currentTag == "struct") {
+							isInStruct = false;
+							isInConstraints = false;
+						}
+					} else if (isInConstraints) {
+						if (currentTag.equals("rule")) {
+							Node node = ruleTemp.getFirst().getFirst();
+							boolean addIt = true;
+							try {
+								if (!new SatSolver(node.clone(), 250)
+										.isSatisfiable()) {
+									// JOptionPane.showMessageDialog(null,
+									// "Constraint will not be added - not satisfiable: \n"+
+									// node.toString(), "Warning",
+									// JOptionPane.WARNING_MESSAGE );
+									// TODO other form of warning
+									addIt = false;
+								}
+								if (!new SatSolver(new Not(node.clone()), 250)
+										.isSatisfiable()) {
+									// JOptionPane.showMessageDialog(null,
+									// "Constraint will not be added - tautology: \n"+
+									// node.toString(), "Warning",
+									// JOptionPane.WARNING_MESSAGE );
+									// TODO other form of warning
+									addIt = false;
+								}
+							} catch (Exception e) {
+							}
+
+							if (addIt)
+								newFeatureModel.addPropositionalNode(node);
+							ruleTemp.clear();
+							ruleTemp.add(new LinkedList<Node>());
+						} else if (currentTag.equals("conj")) {
+							And node = new And();
+							node.setChildren(ruleTemp.getLast());
+							ruleTemp.removeLast();
+							ruleTemp.getLast().addLast(node);
+						} else if (currentTag.equals("atmost1")) {
+							AtMost node = new AtMost(1);
+							node.setChildren(ruleTemp.getLast());
+							ruleTemp.removeLast();
+							ruleTemp.getLast().addLast(node);
+						} else if (currentTag.equals("disj")) {
+							Or node = new Or();
+							node.setChildren(ruleTemp.getLast());
+							ruleTemp.removeLast();
+							ruleTemp.getLast().addLast(node);
+						} else if (currentTag.equals("imp")) {
+							Implies node = new Implies(ruleTemp.getLast()
+									.getFirst(), ruleTemp.getLast().getLast());
+							ruleTemp.removeLast();
+							ruleTemp.getLast().add(node);
+						} else if (currentTag.equals("eq")) {
+							Equals node = new Equals(ruleTemp.getLast()
+									.getFirst(), ruleTemp.getLast().getLast());
+							ruleTemp.removeLast();
+							ruleTemp.getLast().add(node);
+						} else if (currentTag.equals("not")) {
+							Not node = new Not(ruleTemp.getLast().getFirst());
+							ruleTemp.removeLast();
+							ruleTemp.getLast().add(node);
+						}
+					}
+				}
+			}
+			eventReader.close();
+			appendFeatureModel();
+		} catch (XMLStreamException e) {
+			fallback.addError("Abort parsing - XML is not well formed!", e
+					.getLocation().getLineNumber());
 		}
-    }
-    
-    
-    /**
-     * Processes a single Xml-Tag.
-     * @param n
-     * @throws UnsupportedModelException
-     */
-    private void buildFModelStep(Node n) throws UnsupportedModelException {
-    	Feature feat;
-    	if (n.getNodeType() != Node.ELEMENT_NODE) return;
-    	String tag = n.getNodeName();
-    	if (tag.equals("MFeature")) {
-    		feat = new Feature(featureModel);
-    		feat.setMandatory(true);
-    	} else if (tag.equals("Feature")) {
-    		feat = new Feature(featureModel);
-    		feat.setMandatory(false);
-    	} else {
-    		handleConnectionTags(n);
-    		return;
-    	}
-    	feat.setName(getFeatureName(n));
-		Node wNode = findParentFeature(n);
-		if (wNode != null) {
-			Feature tmpFeat = featureModel.getFeature(getFeatureName(wNode));
-    		feat.setParent(tmpFeat);
-    		tmpFeat.addChild(feat);
-		} else featureModel.setRoot(feat);
-		featureModel.addFeature(feat);
-    }
-    
-    /**
-     * Initialize the build process.
-     * @param doc Document from which the Feature Model is build
-     * @throws UnsupportedModelException
-     */
-    private void buildFeatureModel(Document doc) 
-    			throws UnsupportedModelException {
-    	featureModel.reset();
-    	featureModel.hasAbstractFeatures(false);
-    	buildFModelRec(doc);   	 	
-    }
-    
-    /**
-     * Recursively traverses the Document structure
-     * @param n
-     * @throws UnsupportedModelException
-     */
-    private void buildFModelRec(Node n) throws UnsupportedModelException {
-    	buildFModelStep(n);
-    	for (Node child = n.getFirstChild(); child != null;
-					child = child.getNextSibling()) {
-    		buildFModelRec(child);
-    	}
-    }
-    
-    
-    
+		// Update the FeatureModel in Editor
+
+		featureModel.handleModelDataChanged();
+		fallback.showErrorLog();
+	}
+
+	private void appendFeatureModel() {
+		if (isValidWhileReading == true) {
+			// TODO apply featureModel data to the given FeatureModel
+			//JOptionPane.showMessageDialog(null,
+			//		"No Error occoured, now we would apply the Model...", "Well done!",
+			//		JOptionPane.WARNING_MESSAGE);
+			featureModel.replaceModel(newFeatureModel);
+		}
+	}
+	
+	class Fallback {
+		LinkedList<String[]> errors = new LinkedList<String[]>();
+
+		public void addError(String message, Integer line) {
+			errors.add(new String[] { "" + line, message });
+		}
+
+		public boolean hasErrors() {
+			if (errors.size() > 0) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+		public void showErrorLog() {
+			if (this.hasErrors()) {
+				String errormsg = "";
+				System.out.println(errors.size());
+				for (int i = 0; i < errors.size(); i++) {
+					String line = errors.get(i)[0];
+					String message = errors.get(i)[1];
+					// errormsg.concat("Line " + line + ": " + message + "\n" );
+					errormsg = errormsg + "Line " + line + ": " + message
+							+ "\n";
+				}
+				JOptionPane.showMessageDialog(null,
+						"The imported Model will not be apllied to the editor.:\n"
+								+ errormsg, "Parsing Error",
+						JOptionPane.WARNING_MESSAGE);
+			}
+		}
+	}
+
+	/**
+	 * Create a new feature and add it to the featureModel.
+	 * 
+	 * @param featureName
+	 *            Srting with the name of the featue
+	 * @param isMandatory
+	 *            boolean, true it the feature is mandatory
+	 * @param isAbstract
+	 *            boolean, true if the feature is abstract
+	 * @param parent
+	 *            String with the name of the parent feature
+	 */
+	private void addFeature(String featureName, boolean isMandatory,
+			boolean isAbstract, String parent) {
+		/*
+		 * HOWTO: add a child to the FeaturModel
+		 * 
+		 * first: create an Feature second: set flags like mandatory and
+		 * abstract third: add the Feature to the FeatureModel last: get the
+		 * parent of the current Feature and add the current Feature as a child
+		 * of this parent (Feature)
+		 * 
+		 * Note: addChild DOESN'T ADD THE FEATURE!
+		 */
+		Feature feat = null;
+		if (parent.equals("root")) {
+			feat = newFeatureModel.getFeature(featureName);
+			feat.setMandatory(true);
+		} else {
+			feat = new Feature(newFeatureModel, featureName);
+			feat.setMandatory(isMandatory);
+			feat.setAbstract(isAbstract);
+			newFeatureModel.addFeature(feat);
+			newFeatureModel.getFeature(parent).addChild(feat);
+		}
+	}
 }

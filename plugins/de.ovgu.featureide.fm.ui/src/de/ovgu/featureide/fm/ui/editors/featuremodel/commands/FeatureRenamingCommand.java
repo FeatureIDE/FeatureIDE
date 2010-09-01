@@ -49,7 +49,7 @@ public class FeatureRenamingCommand extends Command {
 			return false;
 		if (featureModel.getFeatureNames().contains(newName))
 			return false;
-		return isValidJavaIdentifier(newName);
+		return FeatureModel.isValidJavaIdentifier(newName);
 	}
 	
 	@Override
@@ -62,19 +62,6 @@ public class FeatureRenamingCommand extends Command {
 	public void undo() {
 		featureModel.renameFeature(newName, oldName);
 		featureModel.handleModelDataChanged();
-	}
-	
-	public static boolean isValidJavaIdentifier(String s) {
-		if (s == null)
-			return false;
-		final int len = s.length();
-		if (len == 0 || !Character.isJavaIdentifierStart(s.charAt(0)))
-			return false;
-		for (int i = 1; i < len; i++) {
-			if (!Character.isJavaIdentifierPart(s.charAt(i)))
-				return false;
-		}
-		return true;
 	}
 
 }

@@ -18,10 +18,14 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
+import java.util.Iterator;
+
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.viewers.IStructuredSelection;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
 
 /**
@@ -39,13 +43,13 @@ public class CreateConstraintAction extends AbstractConstraintEditorAction {
 
 	@Override
 	protected boolean isValidSelection(IStructuredSelection selection) {		
-//		Iterator<?> iter = selection.iterator();
-//		while (iter.hasNext()) {
-//			Object editPart = iter.next();
-//			if ((editPart instanceof ConstraintEditPart) || (editPart instanceof FeatureEditPart) ) {
-//				return false;
-//			}
-//		}
+		Iterator<?> iter = selection.iterator();
+		while (iter.hasNext()) {
+			Object editPart = iter.next();
+			if ((editPart instanceof ConstraintEditPart) || (editPart instanceof FeatureEditPart) ) {
+				return false;
+			}
+		}
 		return true;
 	}
 

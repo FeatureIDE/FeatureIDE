@@ -43,6 +43,7 @@ public class EditConstraintAction extends AbstractConstraintEditorAction {
 	public EditConstraintAction(GraphicalViewerImpl viewer,
 			FeatureModel featuremodel, String menuname) {
 		super(viewer, featuremodel, menuname);
+		setEnabled(false);
 	}
 
 	@Override

@@ -107,6 +107,7 @@ public class FeatureModelReader extends AbstractFeatureModelReader {
                 Model root = (Model) myParser.parseAll();
                 readModelData(root);
 			}
+    		featureModel.handleModelDataChanged();
         }
         catch (ParseException e) {
         	int line = e.currentToken.next.beginLine;
@@ -135,6 +136,7 @@ public class FeatureModelReader extends AbstractFeatureModelReader {
 			readVarStmt((VarStmt) varOptNode.arg[0]);
 		
 		featureModel.handleModelDataLoaded();
+
 	}
 
 	private void readGProduction(GProduction gProduction) throws UnsupportedModelException {

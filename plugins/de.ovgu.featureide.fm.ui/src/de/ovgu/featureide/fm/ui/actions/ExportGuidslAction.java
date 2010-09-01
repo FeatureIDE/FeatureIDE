@@ -27,7 +27,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
@@ -38,75 +37,56 @@ import org.eclipse.ui.IWorkbenchPart;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.io.guidsl.FeatureModelReader;
 import de.ovgu.featureide.fm.core.io.guidsl.FeatureModelWriter;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 
 
 /**
- * Converts an XML feature model into our feature model format.
+ * Exports a feature model file into an XML format.
  * 
  * @author Fabian Wielgorz
  */
-public class ImportXmlAction implements IObjectActionDelegate {
+public class ExportGuidslAction implements IObjectActionDelegate {
 
-private ISelection selection;
-	
-	private FeatureModelEditor featureModelEditor;
-	
+	private ISelection selection;
+
 	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
-		featureModelEditor = (targetPart instanceof FeatureModelEditor) ? 
-				(FeatureModelEditor) targetPart : null;
 	}
 
 	public void run(IAction action) {
 		if (selection instanceof IStructuredSelection) {
-			for (Iterator<?> it = ((IStructuredSelection) selection).iterator(); 
-					it.hasNext();) {
+			for (Iterator<?> it = ((IStructuredSelection) selection).iterator(); it
+					.hasNext();) {
 				Object element = it.next();
-				IFile outputFile = null;
+				IFile inputFile = null;
 				if (element instanceof IFile) {
-					outputFile = (IFile) element;
+					inputFile = (IFile) element;
 				} else if (element instanceof IAdaptable) {
-					outputFile = (IFile) ((IAdaptable) element).getAdapter(
-							IFile.class);
+					inputFile = (IFile) ((IAdaptable) element)
+							.getAdapter(IFile.class);
 				}
-				if (outputFile != null) {
+				if (inputFile != null) {
 					try {
-						MessageDialog.openWarning(new Shell(), "Warning!",
-								"This will overide the current model! " +
-								"Can't be undone!");
-						FileDialog fileDialog = new FileDialog(new Shell(), 
-								SWT.OPEN);
-						fileDialog.setOverwrite(false);
-						File inputFile = new File(fileDialog.open());
-						while (!inputFile.exists()) {
-							MessageDialog.openInformation(new Shell(), "File " +
-									"not Found", "Specified file wasn't found");
-							inputFile = new File(fileDialog.open());
-							//if (fileDialog.open() == null) return;
-							//if (inputFile == null) return;
-						}							
-
-						FeatureModel fm = featureModelEditor.getFeatureModel();
-						XmlFeatureModelReader xmlReader = new XmlFeatureModelReader(fm);		
-
-						xmlReader.readFromFile(inputFile);
+						FileDialog fileDialog = new FileDialog(new Shell(),
+								SWT.SAVE);
+						fileDialog.setFileName("model.m");
+						fileDialog.setOverwrite(true);
+						File outputFile = new File(fileDialog.open());
+						FeatureModel fm = new FeatureModel();
+						FeatureModelReader fmReader = new FeatureModelReader(fm);
+						fmReader.readFromFile(inputFile);
 						FeatureModelWriter fmWriter = new FeatureModelWriter(fm);
 						fmWriter.writeToFile(outputFile);
-						outputFile.getProject().refreshLocal(
+						inputFile.getProject().refreshLocal(
 								IResource.DEPTH_INFINITE, null);
-						if (featureModelEditor != null) {
-							featureModelEditor.updateDiagramFromTextEditor();
-						}
 					} catch (FileNotFoundException e) {
 						FMUIPlugin.getDefault().logError(e);
 					} catch (UnsupportedModelException e) {
 						FMUIPlugin.getDefault().logError(e);
 					} catch (CoreException e) {
 						FMUIPlugin.getDefault().logError(e);
-					}		
+					}
 				}
 			}
 		}
@@ -115,4 +95,5 @@ private ISelection selection;
 	public void selectionChanged(IAction action, ISelection selection) {
 		this.selection = selection;
 	}
+
 }

@@ -34,7 +34,9 @@ public class Feature implements PropertyConstants {
 
 	private String name;
 
-	private boolean mandatory = true;
+	private boolean mandatory = false;
+	
+	private boolean concret = true;
 
 	private boolean and = false;
 
@@ -362,6 +364,7 @@ public class Feature implements PropertyConstants {
 
 	public boolean isAbstract() {
 		return hasChildren() && featureModel.hasAbstractFeatures();
+		// TODO When set XML to satndard format -> return !this.concret;
 	}
 
 	public boolean isConcrete() {
@@ -411,6 +414,28 @@ public class Feature implements PropertyConstants {
 		feature.mandatory = mandatory;
 		feature.multiple = multiple;
 		return feature;
+	}
+	
+	public void setAbstract(Boolean value) {
+		this.concret = false;
+	}
+	
+	public void setAnd() {
+		this.and = true;
+	}
+	
+	public void setOr() {
+		this.and = false;
+		this.multiple = true;
+	}
+	
+	public void setAlternative() {
+		this.and = false;
+		this.multiple = false;
+	}
+	
+	public void setOptional() {
+		this.setMandatory(false);
 	}
 
 	/**

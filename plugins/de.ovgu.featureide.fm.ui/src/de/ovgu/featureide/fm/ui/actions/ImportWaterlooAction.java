@@ -82,16 +82,16 @@ public class ImportWaterlooAction implements IObjectActionDelegate {
 								SWT.OPEN);
 						fileDialog.setOverwrite(false);
 						File inputFile = new File(fileDialog.open());
-						if (fileDialog.open() == null) return;
-//						if (inputFile == null) return;
+						//if (fileDialog.open() == null) return;
+						//if (inputFile == null) return;
 						while (!inputFile.exists()) {
 							MessageDialog.openInformation(new Shell(), "File " +
 									"not Found", "Specified file wasn't found");
 							inputFile = new File(fileDialog.open());
-							if (fileDialog.open() == null) return;
-//							if (inputFile == null) return;
+							//if (fileDialog.open() == null) return;
+							//if (inputFile == null) return;
 						}							
-						FeatureModel fm = new FeatureModel();
+						FeatureModel fm = featureModelEditor.getFeatureModel();
 						WaterlooReader waterlooReader = new WaterlooReader(fm);		
 						waterlooReader.readFromFile(inputFile);
 						FeatureModelWriter fmWriter = new FeatureModelWriter(fm);

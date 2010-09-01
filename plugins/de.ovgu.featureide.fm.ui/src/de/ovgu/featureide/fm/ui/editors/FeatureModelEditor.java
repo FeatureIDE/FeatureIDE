@@ -337,6 +337,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 			menu.add(deleteAction);
 			menu.add(renameAction);
 		} else {
+		
 			menu.add(createConstraintAction);
 			menu.add(editConstraintAction);
 			menu.add(deleteAction);

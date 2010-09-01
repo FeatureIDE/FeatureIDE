@@ -59,7 +59,6 @@ public abstract class AbstractConstraintEditorAction extends Action {
 		super(menuname);
 		this.viewer = viewer;
 		this.featuremodel = featuremodel;
-		setEnabled(false);
 		viewer.addSelectionChangedListener(listener);
 	}
 

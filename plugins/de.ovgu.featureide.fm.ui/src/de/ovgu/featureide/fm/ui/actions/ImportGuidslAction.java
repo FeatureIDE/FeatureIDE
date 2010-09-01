@@ -38,8 +38,8 @@ import org.eclipse.ui.IWorkbenchPart;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.io.guidsl.FeatureModelReader;
 import de.ovgu.featureide.fm.core.io.guidsl.FeatureModelWriter;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 
@@ -49,7 +49,7 @@ import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
  * 
  * @author Fabian Wielgorz
  */
-public class ImportXmlAction implements IObjectActionDelegate {
+public class ImportGuidslAction implements IObjectActionDelegate {
 
 private ISelection selection;
 	
@@ -88,11 +88,9 @@ private ISelection selection;
 							//if (fileDialog.open() == null) return;
 							//if (inputFile == null) return;
 						}							
-
 						FeatureModel fm = featureModelEditor.getFeatureModel();
-						XmlFeatureModelReader xmlReader = new XmlFeatureModelReader(fm);		
-
-						xmlReader.readFromFile(inputFile);
+						FeatureModelReader fmReader = new FeatureModelReader(fm);		
+						fmReader.readFromFile(inputFile);
 						FeatureModelWriter fmWriter = new FeatureModelWriter(fm);
 						fmWriter.writeToFile(outputFile);
 						outputFile.getProject().refreshLocal(

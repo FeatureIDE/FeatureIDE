@@ -70,6 +70,10 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
 		setFeatureModel(featureModel);
 	}
 	
+	/**
+	 * Creates XML-Document
+	 * @param doc document to write
+	 */
     private void createXmlDoc(Document doc) {
         Element root = doc.createElement("featureModel");
     	Element struct = doc.createElement("struct");
@@ -88,6 +92,12 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
     	}
     }
     
+    /**
+     * Creates document based on feature model step by step
+     * @param doc document to write
+     * @param node parent node
+     * @param feat current feature
+     */
     private void createXmlDocRec(Document doc, Element node, Feature feat) {
 
     	if (feat == null) return;
@@ -196,24 +206,29 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
     	try {
 			line = reader.readLine();
 			while (line != null) {	
-				if (line.startsWith("</")) {
+				if (line.startsWith("</") ) {
 					indentLevel--;
 					for (int i=0; i < indentLevel; i++) {
-						result.append("   ");
+						result.append("\t");
 					}
-				} else if (line.startsWith("<")) {
+				} 
+
+				else if (line.startsWith("<")) {
 					for (int i=0; i < indentLevel; i++) {
-						result.append("   ");
+						result.append("\t");
 					}
-					if (!line.contains("</")) {
+					if (!line.contains("</") ) {
 						indentLevel++;
 					}	
 				} else {
 					for (int i=0; i < indentLevel; i++) {
-						result.append("   ");
+						result.append("\t");
 					}
 				}
 				result.append(line + "\n");
+				if (line.contains("/>")) {
+					indentLevel--;				
+				}
 				line = reader.readLine();
 			}
     	} catch (IOException e) {
@@ -250,6 +265,7 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
 		} catch (TransformerFactoryConfigurationError e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
+		
 		transfo.setOutputProperty(OutputKeys.METHOD, "xml");
 		transfo.setOutputProperty(OutputKeys.INDENT, "yes");
 		StreamResult result = new StreamResult(new StringWriter());
@@ -259,6 +275,6 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
 		} catch (TransformerException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
-		return result.getWriter().toString(); //prettyPrint(result.getWriter().toString());
+		return prettyPrint(result.getWriter().toString()); 
 	}    
 }
