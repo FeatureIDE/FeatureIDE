@@ -43,7 +43,6 @@ public class AbstractAction extends SingleSelectionAction {
 	public void run() {
 		feature.setAbstract(!feature.isAbstract());
 		setChecked(feature.isAbstract());
-		// TODO: update new state (box color) does not work
 		featureModel.handleModelDataChanged();
 	}
 
