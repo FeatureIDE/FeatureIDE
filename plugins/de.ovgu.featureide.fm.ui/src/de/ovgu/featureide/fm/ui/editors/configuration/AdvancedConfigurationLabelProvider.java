@@ -34,7 +34,6 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * Provides labels and images for the configuration tree view.
  * 
  * @author Thomas Thuem
- * TODO (Task 2.1) move this class to package .ui
  */
 public class AdvancedConfigurationLabelProvider extends LabelProvider {
 

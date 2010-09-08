@@ -66,7 +66,7 @@ public class CollaborationModelBuilder {
 		model.classes.clear();
 		model.roles.clear();
 		model.collaborations.clear();
-		//FIXME welche (return null;) sind notwendig?
+		
 		if (featureProject == null)
 			return null;
 
@@ -136,7 +136,7 @@ public class CollaborationModelBuilder {
 								model.roles.add(role);
 							}
 						}
-					}//TODO 2. ifeature schleife
+					}
 					IResource[] members = null;
 					try {
 						members = featureProject.getSourceFolder().getFolder(feature.getName()).members();
@@ -183,8 +183,6 @@ public class CollaborationModelBuilder {
 			}
 		} else {
 			ArrayList<String> extensions = new ArrayList<String>();
-			//FIXME nullpointer ?? warum kann ich composer.extensions() nicht nutzen?
-			//		ArrayList<String> extensions = composer.extensions();
 			if (composer.getName().equals("FeatureHouse")) {
 				extensions = extensions();
 			} else if (composer.getName().equals("FeatureC++")) {
@@ -302,8 +300,6 @@ public class CollaborationModelBuilder {
 		this.featureFilter = featureFilter;
 	}
 
-	
-	//TODO gehören nicht in diese Klasse!
 	public ArrayList<Feature> getSelectedFeatures(IFeatureProject featureProject) {
 
 		if (featureProject == null)

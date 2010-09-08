@@ -35,7 +35,7 @@ import de.ovgu.featureide.ui.ahead.wizards.NewJakFileWizard;
 public class AddClassAction extends Action {
 
 	private GraphicalViewerImpl viewer;
-	//private Class c; XXX: not needed
+	
 	private IStructuredSelection selection;
 	
 	public AddClassAction(String text, GraphicalViewerImpl view) {

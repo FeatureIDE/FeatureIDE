@@ -84,7 +84,7 @@ public class ConfigurationWriter {
 		return out.toString();
 	}
 	
-	// TODO (Task 2.1) make a method for same parts of writeIntoString and safeToFile 
+	// TODO make a method for same parts of writeIntoString and safeToFile 
 	public String writeIntoString2(IFile file){
 		StringBuffer buffer = new StringBuffer();
 		File project = ((IFile) file.getAdapter(IFile.class)).getProject()

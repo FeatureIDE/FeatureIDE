@@ -30,7 +30,6 @@ import de.ovgu.featureide.fm.core.configuration.TreeElement;
  * Converts a given configuration into elements of an tree viewer.
  * 
  * @author Thomas Thuem
- * TODO (Task 2.1) move this class to package .ui
  */
 public class ConfigurationContentProvider implements
 		IStructuredContentProvider, ITreeContentProvider {

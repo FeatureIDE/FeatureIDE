@@ -180,8 +180,7 @@ public class AdvancedConfigurationPage extends EditorPart {
 			updateForeground(viewer.getTree().getItem(0));
 	}
 
-	private boolean errorMassage() {
-		//TODO (Task 2.1) create a one-element-tree for invalid configurations at the contentProvider 
+	private boolean errorMassage() { 
 		if (!configurationEditor.configuration.valid() && configurationEditor.configuration.number() == 0){
 			for (TreeElement feature : configurationEditor.configuration.getRoot().getChildren())
 				remove(feature);
