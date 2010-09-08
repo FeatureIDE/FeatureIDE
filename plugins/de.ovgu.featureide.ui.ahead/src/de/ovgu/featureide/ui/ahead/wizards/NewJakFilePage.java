@@ -40,10 +40,20 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.part.FileEditorInput;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.ui.ahead.AheadUIPlugin;
+import de.ovgu.featureide.ui.ahead.views.collaboration.editparts.ClassEditPart;
+import de.ovgu.featureide.ui.ahead.views.collaboration.editparts.CollaborationEditPart;
+import de.ovgu.featureide.ui.ahead.views.collaboration.model.Class;
+import de.ovgu.featureide.ui.ahead.views.collaboration.model.Collaboration;
 
 
 /**
@@ -71,6 +81,10 @@ public class NewJakFilePage extends WizardPage {
 	private boolean refines = false;
 
 	private IFeatureProject featureProject = null;
+	
+	public void setFeatureProjekt(IFeatureProject featureProject){
+		this.featureProject = featureProject;
+	}
 
 	private Collection<IFeatureProject> featureProjects = CorePlugin
 			.getFeatureProjects();
@@ -181,7 +195,6 @@ public class NewJakFilePage extends WizardPage {
 	 */
 	private void initialize() {
 		for (IFeatureProject feature : featureProjects)
-			//
 			featureComboProject.add(feature.getProjectName());
 
 		if (selection != null && selection.isEmpty() == false
@@ -199,8 +212,44 @@ public class NewJakFilePage extends WizardPage {
 					checkcontainer(featureProject, resource);
 				}
 			}
-		}
+			else {
+				IWorkbenchWindow editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+				IFeatureProject featureProject = null;
+				IEditorPart part = null;
+				if (editor != null) {
+					IWorkbenchPage page = editor.getActivePage();
+					if (page != null) {
+						part = page.getActiveEditor();
+						if (part != null) {
+							FileEditorInput inputFile = (FileEditorInput)part.getEditorInput();
+							featureProject = CorePlugin.getFeatureProject(inputFile.getFile());
+						}
+					}
+				}
+
+				featureComboProject.setText(featureProject.getProjectName());
+
+				for (String s : featureProject.getFeatureModel().getFeatureNames())
+					featureComboContainer.add(s);
+				
+				if (obj instanceof ClassEditPart){ 
+					ClassEditPart edit = (ClassEditPart)obj;
+					Class c = edit.getClassModel();
+					this.jakName.setText(c.getName().split("[.]")[0]);
+					this.refinesbox.setSelection(true);
+					this.refines = true;
+				}
+				else if (obj instanceof CollaborationEditPart){
+					AheadUIPlugin.getDefault().logInfo("collaboration ok");
+					CollaborationEditPart edit = (CollaborationEditPart)obj;
+					Collaboration c = edit.getCollaborationModel();
+					this.featureComboContainer.setText(c.getName());
+					this.refinesbox.setSelection(true);
+					this.refines = true;
+				}				
+			}
 		text = featureComboProject.getText();
+		}
 	}
 
 	private void checkcontainer(IFeatureProject featureProject,
@@ -228,7 +277,7 @@ public class NewJakFilePage extends WizardPage {
 	private boolean containerbool = false;
 	private boolean jakbool = false;
 
-	private void dialogChanged() {
+	public void dialogChanged() {
 		if (featureComboProject.getText().length() == 0 && !projectbool) {
 			setErrorMessage(null);
 			setPageComplete(false);

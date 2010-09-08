@@ -2,17 +2,7 @@
 <?eclipse version="3.2"?>
 <plugin>
 
-   <extension
-         point="org.eclipse.ui.editors">
-      <editor
-            class="de.ovgu.featureide.ui.editors.ConfigurationEditor"
-            default="true"
-            extensions="equation, expression"
-            icon="icons/EquationIcon.png"
-            id="de.ovgu.featureide.ui.editors.ConfigurationEditor"
-            name="Configuration Editor">
-      </editor>
-   </extension>
+   
    <extension
          point="org.eclipse.ui.newWizards">
       <wizard
@@ -131,49 +121,5 @@
                relationship="right"
                relative="org.eclipse.ui.views.TaskList"/>
       </perspectiveExtension>
-   </extension>
-   <extension
-         point="org.eclipse.ui.actionSets">
-      <actionSet
-            id="de.ovgu.featureide.ui.NewFiles"
-            label="FeatureIDE"
-            visible="false">
-         <action
-               class="de.ovgu.featureide.ui.actions.StartEquationFileWizard"
-               icon="icons/NewEquationIcon.png"
-               id="de.ovgu.featureide.ui.NewEquationFile"
-               label="New Equation File"
-               style="push"
-               toolbarPath="&quot;Normal&quot;">
-         </action>
-         <action
-               class="de.ovgu.featureide.ui.ahead.actions.StartJakFileWizard"
-               icon="icons/NewJakFileIcon.png"
-               id="de.ovgu.featureide.ui.ahead.NewJakFile"
-               label="New Jak File"
-               style="push"
-               toolbarPath="&quot;Normal&quot;">
-         </action>
-      </actionSet>
-   </extension>
-   <extension
-         point="org.eclipse.ui.perspectives">
-      <perspective
-            class="de.ovgu.featureide.ui.perspective.PerspectiveFactory"
-            icon="icons/FeatureIconSmall.ico"
-            id="de.ovgu.featureide.ui.FeatureIDEperspective"
-            name="FeatureIDE">
-      </perspective>
-   </extension>
-   <extension
-         point="org.eclipse.ui.views">
-      <view
-            category="FeatureIDE"
-            class="de.ovgu.featureide.ui.views.collaboration.CollaborationView"
-            icon="icons/FeatureIconSmall.ico"
-            id="de.ovgu.featureide.ui.views.collaboration.Collaboration"
-            name="Collaboration Diagram"
-            restorable="true">
-      </view>
    </extension>
 </plugin>

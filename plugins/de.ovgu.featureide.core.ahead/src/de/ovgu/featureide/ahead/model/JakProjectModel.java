@@ -18,10 +18,18 @@
  */
 package de.ovgu.featureide.ahead.model;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Scanner;
 
 import org.eclipse.core.resources.IFile;
 
+import de.ovgu.featureide.ahead.AheadCorePlugin;
+import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.jakprojectmodel.IClass;
 import de.ovgu.featureide.core.jakprojectmodel.IFeature;
 import de.ovgu.featureide.core.jakprojectmodel.IJakModelElement;
@@ -69,8 +77,49 @@ public class JakProjectModel extends JakModelElement implements IJakProjectModel
 	 * 
 	 * @see de.ovgu.featureide.core.jakprojectmodel.IJakProject#getSelectedFeatures()
 	 */
-	public IFeature[] getSelectedFeatures() {
-		return null;
+	public ArrayList<IFeature> getSelectedFeatures() {
+		Collection <IFeatureProject> featureProjects = CorePlugin.getFeatureProjects();
+		IFeatureProject featureProject = null;
+		for (IFeatureProject project : featureProjects)
+			if (project.getProjectName().equals(projectName))
+				featureProject = project;
+		if (featureProject == null)
+			return null;
+		
+		ArrayList<IFeature>list = new ArrayList<IFeature>();
+		final IFile iFile = featureProject.getCurrentEquationFile();
+		File file = iFile.getRawLocation().toFile();
+		ArrayList<String> configurationFeatures = readFeaturesfromConfigurationFile(file);
+		IFeature[] features =  getFeatures();
+		for (String feature : configurationFeatures) {
+			for (IFeature iFeature : features) {
+				if (iFeature.getName().equals(feature)){
+					list.add(iFeature);
+				}
+			}
+		}
+		return list;	
+	}
+	
+	private ArrayList<String> readFeaturesfromConfigurationFile(File file) {
+		ArrayList<String> list;
+		Scanner scanner = null;
+
+		try {
+			scanner = new Scanner(file);
+		} catch (FileNotFoundException e) {
+			AheadCorePlugin.getDefault().logError(e);
+		}
+
+		if (scanner.hasNext()) {
+			list = new ArrayList<String>();
+			while (scanner.hasNext()) {
+				list.add(scanner.next());
+			}
+			return list;
+		} else {
+			return null;
+		}
 	}
 
 	/*

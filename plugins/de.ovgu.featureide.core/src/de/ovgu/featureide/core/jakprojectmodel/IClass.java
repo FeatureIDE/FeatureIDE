@@ -51,19 +51,131 @@ public interface IClass extends IJakModelElement {
 	 * @return methods of a class
 	 */
 	public IMethod[] getMethods();
+	
+	/**
+	 * Returns the number of public fields of a class
+	 * 
+	 * @return public fields of a class
+	 */
+	public int getPublicFieldCount();
+	
+	/**  
+	 * Returns public fields of a class
+	 * 
+	 * @return public fields of a class
+	 */
+	public IField[] getPublicFields();
+	
+	/**
+	 * Returns the number of public methods of a class
+	 * 
+	 * @return public methods of a class
+	 */
+	public int getPublicMethodCount();
+	
+	/**  
+	 * Returns public methods of a class
+	 * 
+	 * @return public methods of a class
+	 */
+	public IMethod[] getPublicMethods();
+	
+	/**
+	 * Returns the number of protected fields of a class
+	 * 
+	 * @return protected fields of a class
+	 */
+	public int getProtectedFieldCount();
+	
+	/**  
+	 * Returns protected fields of a class
+	 * 
+	 * @return protected fields of a class
+	 */
+	public IField[] getProtectedFields();
+	
+	/**
+	 * Returns the number of protected methods of a class
+	 * 
+	 * @return protected methods of a class
+	 */
+	public int getProtectedMethodCount();
+	
+	/**  
+	 * Returns protected methods of a class
+	 * 
+	 * @return protected methods of a class
+	 */
+	public IMethod[] getProtectedMethods();
+	
+	/**
+	 * Returns the number of private fields of a class
+	 * 
+	 * @return private fields of a class
+	 */
+	public int getPrivateFieldCount();
+	
+	/**  
+	 * Returns private fields of a class
+	 * 
+	 * @return private fields of a class
+	 */
+	public IField[] getPrivateFields();
+	
+	/**
+	 * Returns the number of private methods of a class
+	 * 
+	 * @return private methods of a class
+	 */
+	public int getPrivateMethodCount();
+	
+	/**  
+	 * Returns private methods of a class
+	 * 
+	 * @return private methods of a class
+	 */
+	public IMethod[] getPrivateMethods();
+	
+	/**
+	 * Returns the number of package private fields of a class
+	 * 
+	 * @return package private fields of a class
+	 */
+	public int getPackagePrivateFieldCount();
+	
+	/**  
+	 * Returns package private fields of a class
+	 * 
+	 * @return package private fields of a class
+	 */
+	public IField[] getPackagePrivateFields();
+	
+	/**
+	 * Returns the number of package private methods of a class
+	 * 
+	 * @return package private methods of a class
+	 */
+	public int getPackagePrivateMethodCount();
+	
+	/**  
+	 * Returns package private methods of a class
+	 * 
+	 * @return package private methods of a class
+	 */
+	public IMethod[] getPackagePrivateMethods();
 
 	/**
-	 * Returns the number of fields that are availible according
+	 * Returns the number of fields that are available according
 	 * to the current jakfile
 	 * 
-	 * @return availible number of fields according to the current jakfile
+	 * @return available number of fields according to the current jakfile
 	 */
 	public int getAvailableFieldCount();
 
 	/**
-	 * Returns the availible fields according to the current jakfile
+	 * Returns the available fields according to the current jakfile
 	 * 
-	 * @return availible fields according to the current jakfile
+	 * @return available fields according to the current jakfile
 	 */
 	public IField[] getAvailableFields();
 
@@ -75,37 +187,37 @@ public interface IClass extends IJakModelElement {
 	public int getAvailableMethodCount();
 
 	/**
-	 * Returns the availible methods according to the current jakfile
+	 * Returns the available methods according to the current jakfile
 	 * 
-	 * @return availible methods according to the current jakfile
+	 * @return available methods according to the current jakfile
 	 */
 	public IMethod[] getAvailableMethods();
 
 	/**
-	 * Returns the number of fields that were declarated inside the current jakfile
+	 * Returns the number of fields that were declared inside the current jakfile
 	 * 
-	 * @return number of fields that were declarated inside the current jakfile 
+	 * @return number of fields that were declared inside the current jakfile 
 	 */
 	public int getOwnFieldCount();
 
 	/**
-	 * Returns the fields that were declarated inside the current jakfile
+	 * Returns the fields that were declared inside the current jakfile
 	 * 
-	 * @return fields that were declarated inside the current jakfile
+	 * @return fields that were declared inside the current jakfile
 	 */
 	public IField[] getOwnFields();
 
 	/**
-	 * Returns the number of methods that were declarated inside the current jakfile
+	 * Returns the number of methods that were declared inside the current jakfile
 	 * 
-	 * @return number of methods that were declarated inside the current jakfile
+	 * @return number of methods that were declared inside the current jakfile
 	 */
 	public int getOwnMethodCount();
 
 	/**
-	 * Returns the methods that were declarated inside the current jakfile
+	 * Returns the methods that were declared inside the current jakfile
 	 * 
-	 * @return methods that were declarated inside the current jakfile
+	 * @return methods that were declared inside the current jakfile
 	 */
 	public IMethod[] getOwnMethods();
 

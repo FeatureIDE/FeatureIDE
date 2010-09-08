@@ -28,9 +28,9 @@ public interface IField extends IJakModelElement {
 
 	public boolean isOwn(IFile file);
 
-	public void setAvailible(IFile file);
+	public void setAvailable(IFile file);
 
-	public boolean isAvailible(IFile file);
+	public boolean isAvailable(IFile file);
 
 	public void setLineNumber(IFile file, int lineNumber);
 

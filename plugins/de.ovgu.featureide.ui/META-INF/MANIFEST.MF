@@ -7,24 +7,15 @@ Bundle-Activator: de.ovgu.featureide.ui.UIPlugin
 Bundle-Localization: 
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.eclipse.jface.text,
- org.eclipse.ui.editors,
- org.eclipse.ui.workbench.texteditor,
  org.eclipse.ui.ide,
- org.eclipse.jdt.ui,
  org.eclipse.debug.ui,
  org.eclipse.jdt.debug.ui,
- org.eclipse.ui.cheatsheets;bundle-version="3.3.101",
- org.eclipse.ui.views,
  org.eclipse.gef,
  de.ovgu.featureide.fm.core,
  de.ovgu.featureide.core,
- de.ovgu.featureide.fm.ui,
- de.ovgu.featureide.ui.ahead,
- org.eclipse.core.resources
+ de.ovgu.featureide.fm.ui
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: University of Magdeburg
-Import-Package: de.ovgu.featureide.ui.ahead,
- org.eclipse.core.filesystem
+Export-Package: de.ovgu.featureide.ui.wizards

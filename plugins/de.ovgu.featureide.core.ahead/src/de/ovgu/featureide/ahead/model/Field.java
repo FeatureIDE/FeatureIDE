@@ -38,7 +38,7 @@ public class Field extends JakModelElement implements Comparable<Object>, IField
 	private int dimension;
 
 	private HashSet<IFile> ownFiles;
-	private HashSet<IFile> availibleFiles;
+	private HashSet<IFile> availableFiles;
 	private HashMap<IFile, Integer> lineNumbers;
 
 	public Field(String fieldName, String typeName, int dim, String modifiers) {
@@ -48,7 +48,7 @@ public class Field extends JakModelElement implements Comparable<Object>, IField
 		this.modifiers = modifiers;
 
 		this.ownFiles = new HashSet<IFile>();
-		this.availibleFiles = new HashSet<IFile>();
+		this.availableFiles = new HashSet<IFile>();
 		this.lineNumbers = new HashMap<IFile, Integer>();
 	}
 
@@ -107,8 +107,8 @@ public class Field extends JakModelElement implements Comparable<Object>, IField
 	 * de.ovgu.featureide.core.jakprojectmodel.IField#setAvailible(org.eclipse.core.
 	 * resources.IFile)
 	 */
-	public void setAvailible(IFile file) {
-		availibleFiles.add(file);
+	public void setAvailable(IFile file) {
+		availableFiles.add(file);
 	}
 
 	/*
@@ -118,8 +118,8 @@ public class Field extends JakModelElement implements Comparable<Object>, IField
 	 * de.ovgu.featureide.core.jakprojectmodel.IField#isAvailible(org.eclipse.core.resources
 	 * .IFile)
 	 */
-	public boolean isAvailible(IFile file) {
-		return availibleFiles.contains(file);
+	public boolean isAvailable(IFile file) {
+		return availableFiles.contains(file);
 	}
 
 	/*

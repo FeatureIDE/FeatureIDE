@@ -44,10 +44,10 @@ public class NewJakFileWizard extends Wizard implements INewWizard {
 	
 	public static final String ID = AheadUIPlugin.PLUGIN_ID + ".wizards.NewJakFileWizard";
 	
-	private NewJakFilePage page;
+	public NewJakFilePage page;
 	
 	private ISelection selection;
-
+	
 	/**
 	 * Constructor for NewJakFileWizard.
 	 */
@@ -56,10 +56,10 @@ public class NewJakFileWizard extends Wizard implements INewWizard {
 		setNeedsProgressMonitor(true);
 	}
 	
+	
 	/**
 	 * Adding the page to the wizard.
 	 */
-
 	public void addPages() {
 		page = new NewJakFilePage(selection);
 		addPage(page);

@@ -106,13 +106,158 @@ public class Class extends JakModelElement implements IClass {
 		return methodArray;
 	}
 
+	
+	public int getPublicFieldCount() {
+		int i = 0;
+		for (IField field : fields.values())
+			if (field.isPublic())
+				i++;
+		return i;
+	}
+	
+	public IField[] getPublicFields() {
+		IField[] fieldArray = new Field[getPublicFieldCount()];
+		int i = 0;
+		for (IField field : fields.values())
+			if (field.isPublic())
+				fieldArray[i++] = field;
+		return fieldArray;
+	}
+	
+	public int getPublicMethodCount() {
+		int i = 0;
+		for (IMethod meth : methods.values())
+			if (meth.isPublic())
+				i++;
+		return i;
+	}
+	
+	public IMethod[] getPublicMethods() {
+		IMethod[] methodArray = new Method[getPublicMethodCount()];
+		int i = 0;
+		for (IMethod meth : methods.values()) {
+			if (meth.isPublic())
+				methodArray[i++] = meth;
+		}
+		return methodArray;
+	}
+	
+	public int getProtectedFieldCount() {
+		int i = 0;
+		for (IField field : fields.values())
+			if (field.isProtected())
+				i++;
+		return i;
+	}
+	
+	public IField[] getProtectedFields() {
+		IField[] fieldArray = new Field[getProtectedFieldCount()];
+		int i = 0;
+		for (IField field : fields.values())
+			if (field.isProtected())
+				fieldArray[i++] = field;
+		return fieldArray;
+	}
+	
+	public int getProtectedMethodCount() {
+		int i = 0;
+		for (IMethod meth : methods.values())
+			if (meth.isProtected())
+				i++;
+		return i;
+	}
+	
+	public IMethod[] getProtectedMethods() {
+		IMethod[] methodArray = new Method[getProtectedMethodCount()];
+		int i = 0;
+		for (IMethod meth : methods.values()) {
+			if (meth.isProtected())
+				methodArray[i++] = meth;
+		}
+		return methodArray;
+	}
+	
+	public int getPrivateFieldCount() {
+		int i = 0;
+		for (IField field : fields.values())
+			if (field.isPrivate())
+				i++;
+		return i;
+	}
+	
+	public IField[] getPrivateFields() {
+		IField[] fieldArray = new Field[getPrivateFieldCount()];
+		int i = 0;
+		for (IField field : fields.values())
+			if (field.isPrivate())
+				fieldArray[i++] = field;
+		return fieldArray;
+	}
+	
+	public int getPrivateMethodCount() {
+		int i = 0;
+		for (IMethod meth : methods.values())
+			if (meth.isPrivate())
+				i++;
+		return i;
+	}
+	
+	public IMethod[] getPrivateMethods() {
+		IMethod[] methodArray = new Method[getPrivateMethodCount()];
+		int i = 0;
+		for (IMethod meth : methods.values()) {
+			if (meth.isPrivate())
+				methodArray[i++] = meth;
+		}
+		return methodArray;
+	}
+	
+	public int getPackagePrivateFieldCount() {
+		int i = 0;
+		for (IField field : fields.values())
+			if (!field.isPrivate() && !field.isProtected() && !field.isPublic())
+				i++;
+		return i;
+	}
+	
+	public IField[] getPackagePrivateFields() {
+		IField[] fieldArray = new Field[getPackagePrivateFieldCount()];
+		int i = 0;
+		for (IField field : fields.values())
+			if (!field.isPrivate() && !field.isProtected() && !field.isPublic())
+				fieldArray[i++] = field;
+		return fieldArray;
+	}
+	
+	public int getPackagePrivateMethodCount() {
+		int i = 0;
+		for (IMethod meth : methods.values())
+			if (!meth.isPrivate() && !meth.isProtected() && !meth.isPublic())
+				i++;
+		return i;
+	}
+	
+	public IMethod[] getPackagePrivateMethods() {
+		IMethod[] methodArray = new Method[getPrivateMethodCount()];
+		int i = 0;
+		for (IMethod meth : methods.values()) {
+			if (!meth.isPrivate() && !meth.isProtected() && !meth.isPublic())
+				methodArray[i++] = meth;
+		}
+		return methodArray;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see de.ovgu.featureide.core.jakprojectmodel.IClass#getNumberOfAvailibleFields()
 	 */
 	public int getAvailableFieldCount() {
-		return 0;
+		int i = 0;
+		for (IField field : fields.values())
+			if (field.isAvailable(currentJakfile))
+				i++;
+		return i;
 	}
 
 	/*
@@ -121,7 +266,12 @@ public class Class extends JakModelElement implements IClass {
 	 * @see de.ovgu.featureide.core.jakprojectmodel.IClass#getAvailibleFields()
 	 */
 	public IField[] getAvailableFields() {
-		return null;
+		IField[] fieldArray = new Field[getAvailableFieldCount()];
+		int i = 0;
+		for (IField field : fields.values())
+			if (field.isAvailable(currentJakfile))
+				fieldArray[i++] = field;
+		return fieldArray;
 	}
 
 	/*
@@ -130,7 +280,11 @@ public class Class extends JakModelElement implements IClass {
 	 * @see de.ovgu.featureide.core.jakprojectmodel.IClass#getNumberOfAvailibleMethods()
 	 */
 	public int getAvailableMethodCount() {
-		return 0;
+		int i = 0;
+		for (IMethod meth : methods.values())
+			if (meth.isAvailable(currentJakfile))
+				i++;
+		return i;
 	}
 
 	/*
@@ -139,7 +293,13 @@ public class Class extends JakModelElement implements IClass {
 	 * @see de.ovgu.featureide.core.jakprojectmodel.IClass#getAvailibleMethods()
 	 */
 	public IMethod[] getAvailableMethods() {
-		return null;
+		IMethod[] methodArray = new Method[getAvailableMethodCount()];
+		int i = 0;
+		for (IMethod meth : methods.values()) {
+			if (meth.isAvailable(currentJakfile))
+				methodArray[i++] = meth;
+		}
+		return methodArray;
 	}
 
 	/*

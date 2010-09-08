@@ -18,6 +18,8 @@
  */
 package de.ovgu.featureide.core.jakprojectmodel;
 
+import java.util.ArrayList;
+
 import org.eclipse.core.resources.IFile;
 
 public interface IJakProjectModel extends IJakModelElement {
@@ -35,7 +37,7 @@ public interface IJakProjectModel extends IJakModelElement {
 	 * 
 	 * @return Selected features
 	 */
-	public IFeature[] getSelectedFeatures();
+	public ArrayList<IFeature> getSelectedFeatures();
 
 	/**
 	 * Returns the total number of features of the jak project

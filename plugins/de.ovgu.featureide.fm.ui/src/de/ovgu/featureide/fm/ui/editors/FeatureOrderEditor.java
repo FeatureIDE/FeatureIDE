@@ -368,7 +368,7 @@ public class FeatureOrderEditor extends EditorPart {
 		try {
 			scanner = new Scanner(file);
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			FMUIPlugin.getDefault().logError(e);
 		}
 
 		if (scanner.hasNext()) {

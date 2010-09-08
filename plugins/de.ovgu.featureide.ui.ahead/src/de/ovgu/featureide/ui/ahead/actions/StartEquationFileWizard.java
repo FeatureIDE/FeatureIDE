@@ -25,17 +25,10 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 
-import de.ovgu.featureide.ui.ahead.AheadUIPlugin;
-import de.ovgu.featureide.ui.ahead.wizards.NewJakFileWizard;
+import de.ovgu.featureide.ui.wizards.NewEquationFileWizard;
 
-/**
- * Class starts JakFileWizard for Button in the icon bar.
- * 
- * @author Christian Becker
- */
-public class StartJakFileWizard implements IWorkbenchWindowActionDelegate {
 
-	public static final String ID = AheadUIPlugin.PLUGIN_ID + ".NewJakFile";
+public class StartEquationFileWizard implements IWorkbenchWindowActionDelegate {
 
 	private IWorkbenchWindow window;
 
@@ -43,27 +36,26 @@ public class StartJakFileWizard implements IWorkbenchWindowActionDelegate {
 	}
 
 	public void init(IWorkbenchWindow window) {
-
-		this.window = window;
+		this.window=window;
 	}
 
 	public void run(IAction action) {
-
-		NewJakFileWizard wizard = new NewJakFileWizard();
+		
+		NewEquationFileWizard wizard=new NewEquationFileWizard();
 		ISelection selection = window.getSelectionService().getSelection();
-		if (selection instanceof IStructuredSelection) {
-			wizard.init(window.getWorkbench(),
-							(IStructuredSelection) selection);
-
-		} else {
+		
+		if(selection instanceof IStructuredSelection){
+			wizard.init(window.getWorkbench(), (IStructuredSelection) selection);	
+		}
+		else{
 			wizard.init(window.getWorkbench(), null);
 		}
+		
 		WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
 		dialog.open();
 	}
 
 	public void selectionChanged(IAction action, ISelection selection) {
-
 	}
 
 }
