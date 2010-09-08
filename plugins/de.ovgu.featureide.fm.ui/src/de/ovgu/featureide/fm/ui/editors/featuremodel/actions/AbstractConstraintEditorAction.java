@@ -26,7 +26,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.io.guidsl.FeatureModelWriter;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 import de.ovgu.featureide.fm.ui.editors.ConstraintDialog;
 
 
@@ -42,7 +42,7 @@ public abstract class AbstractConstraintEditorAction extends Action {
 
 	protected FeatureModel featuremodel;
 	
-	protected FeatureModelWriter writer;
+	protected XmlFeatureModelWriter writer;
 	
 	protected String featuretext;
 
@@ -63,7 +63,7 @@ public abstract class AbstractConstraintEditorAction extends Action {
 	}
 
 	public void run() {
-		writer = new FeatureModelWriter(featuremodel);
+		writer = new XmlFeatureModelWriter(featuremodel);
 		featuretext = writer.writeToString();
 	}
 

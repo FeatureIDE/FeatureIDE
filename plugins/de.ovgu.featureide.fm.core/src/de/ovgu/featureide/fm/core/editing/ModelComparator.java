@@ -167,7 +167,6 @@ public class ModelComparator {
 
 	private void addReplaceFeatures(FeatureModel oldModel,
 			FeatureModel newModel, Set<String> replaceFeatures) {
-		if (oldModel.hasAbstractFeatures())
 			for (Feature feature : oldModel.getFeatures()) {
 				String name = oldModel.getOldName(feature.getName());
 				Feature otherFeature = newModel.getFeature(newModel.getNewName(name));
@@ -180,6 +179,7 @@ public class ModelComparator {
 						if (!a.equals(b))
 							replaceFeatures.add(name);
 					}
+
 				}
 			}
 	}

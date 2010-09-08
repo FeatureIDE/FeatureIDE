@@ -40,7 +40,7 @@ import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.guidsl.FeatureModelReader;
-import de.ovgu.featureide.fm.core.io.guidsl.FeatureModelWriter;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 
 
@@ -73,7 +73,7 @@ public class AddConstraintAction extends Action {
 
 	private Label errorMarker;
 
-	private FeatureModelWriter writer;
+	private XmlFeatureModelWriter writer;
 
 	protected String featuretext;
 
@@ -89,7 +89,7 @@ public class AddConstraintAction extends Action {
 	}
 
 	public void run() {
-		writer = new FeatureModelWriter(featuremodel);
+		writer = new XmlFeatureModelWriter(featuremodel);
 		featuretext = writer.writeToString();
 		createEditor();
 

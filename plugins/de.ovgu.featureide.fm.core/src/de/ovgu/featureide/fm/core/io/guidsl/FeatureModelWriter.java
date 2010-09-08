@@ -35,7 +35,7 @@ import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
  *
  */
 public class FeatureModelWriter extends AbstractFeatureModelWriter {
-	
+
 	/**
 	 * Creates a new writer and sets the feature model to write out.
 	 * 
@@ -56,8 +56,6 @@ public class FeatureModelWriter extends AbstractFeatureModelWriter {
 //		out.append("\r\n\r\n");
 		
 		//write comments
-		if (!featureModel.hasAbstractFeatures())
-			out.append("//NoAbstractFeatures\r\n\r\n");
 		writeComments(out);
 
 		//write featureModel
@@ -105,6 +103,10 @@ public class FeatureModelWriter extends AbstractFeatureModelWriter {
 	}
 
 	private void writeRule(Feature mainFeature, StringBuffer out) {
+		
+//		if (mainFeature.isAbstract())
+//			this.hasAbstract = true;
+
 		//check if there is a rule to write
 		if (!mainFeature.hasChildren())
 			return;
@@ -189,4 +191,42 @@ public class FeatureModelWriter extends AbstractFeatureModelWriter {
 		}
 	}
 
+	/**
+	 * @return true, if the feature model has at least one abstract feature
+	 */
+	public boolean hasAbstractFeatures() {
+		return hasAbstractFeaturesRec(featureModel.getRoot());
+	}
+	
+	private boolean hasAbstractFeaturesRec(Feature mainFeature){
+		LinkedList<Feature> mainChildren = mainFeature.getChildren();
+		for (int i = 0; i < mainChildren.size(); i++) {
+			Feature feature = mainChildren.get(i);
+			if (feature.isAbstract())
+				return true;
+			else if(feature.hasChildren()){
+				return hasAbstractFeaturesRec(feature);
+			}
+		}
+		return false;
+	}
+	
+	public boolean hasConcreteCompounds() {
+		return hasConcreteCompoundsRec(featureModel.getRoot());
+	}
+	
+	private boolean hasConcreteCompoundsRec(Feature mainFeature){
+		if (!mainFeature.isAbstract() && mainFeature.hasChildren())
+			return true;
+		LinkedList<Feature> mainChildren = mainFeature.getChildren();
+		for (int i = 0; i < mainChildren.size(); i++) {
+			Feature feature = mainChildren.get(i);
+			if (!feature.isAbstract() && feature.hasChildren())
+				return true;
+			else if(feature.hasChildren()){
+				return hasConcreteCompoundsRec(feature);
+			}
+		}
+		return false;
+	}
 }

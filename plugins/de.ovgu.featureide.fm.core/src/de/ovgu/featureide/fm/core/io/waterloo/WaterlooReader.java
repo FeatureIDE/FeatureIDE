@@ -102,11 +102,11 @@ public class WaterlooReader extends AbstractFeatureModelReader {
             System.exit(1);
         }       
         featureModel.reset();
-        featureModel.hasAbstractFeatures(false);
     	line = 0;
     	idTable = new Hashtable<String, Feature>();
     	// Create the Feature Model from the DOM-Document
-    	buildFModelRec(doc);  
+    	buildFModelRec(doc); 
+    	featureModel.handleModelDataLoaded();
     }
     
     /**

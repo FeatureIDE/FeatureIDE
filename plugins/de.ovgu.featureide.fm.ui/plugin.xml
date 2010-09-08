@@ -7,7 +7,7 @@
             class="de.ovgu.featureide.fm.ui.editors.FeatureModelEditor"
             contributorClass="de.ovgu.featureide.fm.ui.editors.featuremodel.FeatureModelEditorContributor"
             default="true"
-            filenames="model.m"
+            filenames="model.xml"
             icon="icons/featuretree.ico"
             id="de.ovgu.featureide.fm.ui.editors.GrammarEditor"
             name="Grammar Editor">
@@ -32,7 +32,7 @@
       <objectContribution
             adaptable="true"
             id="de.ovgu.featureide.fm.ui.featureModelContribution"
-            nameFilter="*.m"
+            nameFilter="*.xml"
             objectClass="org.eclipse.core.resources.IFile">
          <menu id="de.ovgu.featureide.fm.ui_menue"
                label="FeatureIDE"
@@ -44,6 +44,7 @@
          </menu>     
          <action
                class="de.ovgu.featureide.fm.ui.actions.OpenWithGuidslAction"
+               enablesFor="!"
                icon="icons/guidsl.gif"
                id="de.ovgu.featureide.fm.ui.openWithGuidsl"
                label="Open with GUIDSL"
@@ -63,20 +64,6 @@
                id="de.ovgu.featureide.fm.ui.ImportWaterloo"
                label="Import model from Waterloo format"
                menubarPath="de.ovgu.featureide.fm.ui_menue/slot2">
-         </action>
-         <action
-               class="de.ovgu.featureide.fm.ui.actions.ExportXmlAction"
-               icon="icons/export_wiz.gif"
-               id="de.ovgu.featureide.fm.ui.ExportXml"
-               label="Export model to XML formatt"
-               menubarPath="de.ovgu.featureide.fm.ui_menue/slot3">
-         </action>
-         <action
-               class="de.ovgu.featureide.fm.ui.actions.ImportXmlAction"
-               icon="icons/import_wiz.gif"
-               id="de.ovgu.featureide.fm.ui.ImportXml"
-               label="Import model from XML format"
-               menubarPath="de.ovgu.featureide.fm.ui_menue/slot3">
          </action>
          <action
                class="de.ovgu.featureide.fm.ui.actions.ExportGuidslAction"

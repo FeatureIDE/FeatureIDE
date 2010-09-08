@@ -81,10 +81,8 @@ public class ConstraintDialog {
 	private static final Image BANNER_IMAGE = FMUIPlugin
 			.getImage("title_banner.gif");
 
-	// TODO: AtMost1 implementieren!!
-
 	private static final String[] OPERATOR_NAMES = { " Not ", " And ", " Or ",
-			" Implies ", " Iff ", "(", ")" /* "At most 1" */};
+			" Implies ", " Iff ", "(", ")"};
 	private static final String FILTERTEXT = "type filter text";
 	private Shell shell;
 

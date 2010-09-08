@@ -76,12 +76,12 @@ public class CreateLayerAction extends SingleSelectionAction {
 	
 	@Override
 	protected boolean isValidSelection(IStructuredSelection selection) {
-		return super.isValidSelection(selection) && getSelectedFeature().canHaveChildren();
+		return super.isValidSelection(selection);
 	}
 
 	@Override
 	protected void updateProperties() {
-		setEnabled(!connectionSelected);
+		setEnabled(true);
 		setChecked(false);
 	}
 

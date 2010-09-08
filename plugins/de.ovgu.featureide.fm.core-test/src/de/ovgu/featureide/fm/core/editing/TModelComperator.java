@@ -28,7 +28,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.editing.Comparison;
 import de.ovgu.featureide.fm.core.editing.ModelComparator;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.guidsl.FeatureModelReader;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 
 
 /**
@@ -229,10 +229,10 @@ public class TModelComperator extends TestCase {
 	private Comparison compare(String fm1, String fm2) throws UnsupportedModelException {
 		ModelComparator comperator = new ModelComparator(TIMEOUT);
 		FeatureModel oldModel = new FeatureModel();
-		FeatureModelReader reader = new FeatureModelReader(oldModel);
+		XmlFeatureModelReader reader = new XmlFeatureModelReader(oldModel);
 		reader.readFromString(fm1);
 		FeatureModel newModel = new FeatureModel();
-		reader = new FeatureModelReader(newModel);
+		reader = new XmlFeatureModelReader(newModel);
 		reader.readFromString(fm2);
 		return comperator.compare(oldModel, newModel);
 	}

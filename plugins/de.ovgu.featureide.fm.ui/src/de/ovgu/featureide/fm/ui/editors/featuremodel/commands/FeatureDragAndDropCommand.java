@@ -74,11 +74,7 @@ public class FeatureDragAndDropCommand extends Command {
 		//not accept the same position
 		if (oldParent == newParent && oldIndex == newIndex)
 			return false;
-		
-		//not accept leaves as parent
-		if (!newParent.canHaveChildren())
-			return false;
-		
+			
 		//not accept moves to children positions
 		return feature != newParent && !feature.isAncestorOf(newParent);
 	}

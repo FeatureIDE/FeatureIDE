@@ -85,7 +85,7 @@ public class CreateCompoundAction extends Action {
 		Feature newCompound = new Feature(featureModel, "NewCompound" + number);
 		
 		if (parent != null) {
-			newCompound.setAND(parent.isAnd());
+			newCompound.setAND(true);
 			newCompound.setMultiple(parent.isMultiple());
 			
 			LinkedList<Feature> newChildren = new LinkedList<Feature>();
@@ -93,6 +93,7 @@ public class CreateCompoundAction extends Action {
 				if (selectedFeatures.contains(feature)) {
 					if (!newCompound.hasChildren()) 
 						newChildren.add(newCompound);
+					feature.setMandatory(false);
 					newCompound.addChild(feature);
 				}
 				else

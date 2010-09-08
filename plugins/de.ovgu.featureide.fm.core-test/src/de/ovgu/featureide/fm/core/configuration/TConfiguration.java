@@ -29,7 +29,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.configuration.SelectionNotPossibleException;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.guidsl.FeatureModelReader;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 
 
 /**
@@ -119,7 +119,7 @@ public class TConfiguration extends TestCase {
 
 	private FeatureModel readModel(String grammar) throws UnsupportedModelException {
 		FeatureModel fm = new FeatureModel();
-		FeatureModelReader reader = new FeatureModelReader(fm);
+		XmlFeatureModelReader reader = new XmlFeatureModelReader(fm);
 		reader.readFromString(grammar);
 		return fm;
 	}

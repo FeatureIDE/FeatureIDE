@@ -38,11 +38,10 @@ import org.eclipse.ui.IWorkbenchPart;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.guidsl.FeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.waterloo.WaterlooReader;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
-
 
 /**
  * Converts a Waterloo feature model into our feature model format.
@@ -52,63 +51,67 @@ import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 public class ImportWaterlooAction implements IObjectActionDelegate {
 
 	private ISelection selection;
-	
+
 	private FeatureModelEditor featureModelEditor;
-	
+
 	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
-		featureModelEditor = (targetPart instanceof FeatureModelEditor) ? 
-				(FeatureModelEditor) targetPart : null;
+		featureModelEditor = (targetPart instanceof FeatureModelEditor) ? (FeatureModelEditor) targetPart
+				: null;
 	}
 
 	public void run(IAction action) {
 		if (selection instanceof IStructuredSelection) {
-			for (Iterator<?> it = ((IStructuredSelection) selection).iterator(); 
-					it.hasNext();) {
+			for (Iterator<?> it = ((IStructuredSelection) selection).iterator(); it
+					.hasNext();) {
 				Object element = it.next();
 				IFile outputFile = null;
 				if (element instanceof IFile) {
 					outputFile = (IFile) element;
 				} else if (element instanceof IAdaptable) {
-					outputFile = (IFile) ((IAdaptable) element).getAdapter(
-							IFile.class);
+					outputFile = (IFile) ((IAdaptable) element)
+							.getAdapter(IFile.class);
 				}
 				if (outputFile != null) {
 					try {
-						//TODO #52: please change to a question whether the user really wants to overwrite the current model
-						MessageDialog.openWarning(new Shell(), "Warning!",
-								"This will overide the current model! " +
-								"Can't be undone!");
-						FileDialog fileDialog = new FileDialog(new Shell(), 
-								SWT.OPEN);
-						fileDialog.setOverwrite(false);
-						File inputFile = new File(fileDialog.open());
-						//if (fileDialog.open() == null) return;
-						//if (inputFile == null) return;
-						while (!inputFile.exists()) {
-							MessageDialog.openInformation(new Shell(), "File " +
-									"not Found", "Specified file wasn't found");
-							inputFile = new File(fileDialog.open());
-							//if (fileDialog.open() == null) return;
-							//if (inputFile == null) return;
-						}							
-						FeatureModel fm = featureModelEditor.getFeatureModel();
-						WaterlooReader waterlooReader = new WaterlooReader(fm);		
-						waterlooReader.readFromFile(inputFile);
-						FeatureModelWriter fmWriter = new FeatureModelWriter(fm);
-						fmWriter.writeToFile(outputFile);
-						//TODO #52: why do you refresh the hole project?
-						outputFile.getProject().refreshLocal(
-								IResource.DEPTH_INFINITE, null);
-						if (featureModelEditor != null) {
-							featureModelEditor.updateDiagramFromTextEditor();
+
+						boolean proceed = MessageDialog
+								.openQuestion(new Shell(), "Warning!",
+										"This will override the current model irrepealable! Proceed?");
+						if (proceed) {
+
+							FileDialog fileDialog = new FileDialog(new Shell(),
+									SWT.OPEN);
+							fileDialog.setOverwrite(false);
+							
+							String filepath = fileDialog.open();
+							if (filepath == null) return;
+							File inputFile = new File(filepath);
+							
+							while (!inputFile.exists()) {
+								MessageDialog.openInformation(new Shell(),
+										"File " + "not Found",
+										"Specified file wasn't found");
+								inputFile = new File(fileDialog.open());
+							}
+							FeatureModel fm = featureModelEditor
+									.getFeatureModel();
+							WaterlooReader waterlooReader = new WaterlooReader(
+									fm);
+							waterlooReader.readFromFile(inputFile);
+							XmlFeatureModelWriter fmWriter = new XmlFeatureModelWriter(
+									fm);
+							fmWriter.writeToFile(outputFile);
+							outputFile.refreshLocal(IResource.DEPTH_ZERO, null);
 						}
 					} catch (FileNotFoundException e) {
 						FMUIPlugin.getDefault().logError(e);
 					} catch (UnsupportedModelException e) {
+						String errStr = e.getMessage();
+						MessageDialog.openWarning(new Shell(), "Warning!", "Error while loading file: \n " + errStr);
 						FMUIPlugin.getDefault().logError(e);
 					} catch (CoreException e) {
 						FMUIPlugin.getDefault().logError(e);
-					}			
+					}
 				}
 			}
 		}

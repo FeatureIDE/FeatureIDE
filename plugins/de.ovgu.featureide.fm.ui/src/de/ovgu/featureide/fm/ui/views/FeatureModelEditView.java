@@ -49,7 +49,7 @@ import org.eclipse.ui.progress.UIJob;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.editing.evaluation.Evaluation;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.guidsl.FeatureModelReader;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GEFImageWriter;
@@ -188,7 +188,7 @@ public class FeatureModelEditView extends ViewPart {
 								IFile fmFile = (IFile) res;
 								try {
 									FeatureModel fm = new FeatureModel();
-									FeatureModelReader reader = new FeatureModelReader(fm);
+									XmlFeatureModelReader reader = new XmlFeatureModelReader(fm);
 									reader.readFromFile(fmFile);
 
 									String imageName = fmFile.getRawLocation().toOSString();

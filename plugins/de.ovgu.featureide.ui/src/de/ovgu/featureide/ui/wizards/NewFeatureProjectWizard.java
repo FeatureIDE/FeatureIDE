@@ -51,7 +51,7 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 			return false;
 		if (page.hasCompositionTool()) {
 			CorePlugin.setupFeatureProject(getNewProject(), page.getCompositionTool().getId());
-			UIPlugin.getDefault().openEditor(FeatureModelEditor.ID, getNewProject().getFile("model.m"));
+			UIPlugin.getDefault().openEditor(FeatureModelEditor.ID, getNewProject().getFile("model.xml"));
 		}
 		return true;
 	}

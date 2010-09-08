@@ -42,7 +42,7 @@ import de.ovgu.featureide.core.listeners.IFeatureFolderListener;
 import de.ovgu.featureide.core.listeners.IProjectListener;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.io.guidsl.FeatureModelWriter;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 
 /**
  * The activator class controls the plug-in life cycle.
@@ -284,8 +284,8 @@ public class CorePlugin extends AbstractCorePlugin {
 		createFolder(project, "src");
 		FeatureModel featureModel = new FeatureModel();
 		featureModel.createDefaultValues();
-		try {
-			new FeatureModelWriter(featureModel).writeToFile(project.getFile("model.m"));
+		try {		
+			new XmlFeatureModelWriter(featureModel).writeToFile(project.getFile("model.xml"));
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError("Error while creating feature model", e);
 		}

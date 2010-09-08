@@ -88,6 +88,7 @@ public class FeatureModelReader extends AbstractFeatureModelReader {
 	 */
 	private static Object lock = new Object();
 	
+	private boolean noAbstractFeatures = false;
 	/**
 	 * Creates a new reader and sets the feature model to store the data.
 	 * 
@@ -107,7 +108,7 @@ public class FeatureModelReader extends AbstractFeatureModelReader {
                 Model root = (Model) myParser.parseAll();
                 readModelData(root);
 			}
-    		featureModel.handleModelDataChanged();
+        	featureModel.handleModelDataLoaded();
         }
         catch (ParseException e) {
         	int line = e.currentToken.next.beginLine;
@@ -116,10 +117,11 @@ public class FeatureModelReader extends AbstractFeatureModelReader {
 	}
 
 	private void readModelData(Model root) throws UnsupportedModelException {
-		//print("", root);
+
 		featureModel.reset();
-		featureModel.hasAbstractFeatures(!root.toString().startsWith("//NoAbstractFeatures"));
 		
+		noAbstractFeatures = (root.toString().startsWith("//NoAbstractFeatures"));
+
 		Prods prods = ((MainModel) root).getProds();
 		AstListNode astListNode = (AstListNode) prods.arg[0];
 		do {
@@ -136,7 +138,7 @@ public class FeatureModelReader extends AbstractFeatureModelReader {
 			readVarStmt((VarStmt) varOptNode.arg[0]);
 		
 		featureModel.handleModelDataLoaded();
-
+		
 	}
 
 	private void readGProduction(GProduction gProduction) throws UnsupportedModelException {
@@ -150,6 +152,7 @@ public class FeatureModelReader extends AbstractFeatureModelReader {
 		do {
 			Feature child = readPat((Pat) astListNode.arg[0]);
 			feature.addChild(child);
+			feature.setAbstract(!noAbstractFeatures);
 			astListNode = (AstListNode) astListNode.right;
 		} while (astListNode != null);
 		simplify(feature);

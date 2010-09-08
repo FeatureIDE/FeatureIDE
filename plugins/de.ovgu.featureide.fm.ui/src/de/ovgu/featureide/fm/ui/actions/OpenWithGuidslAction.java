@@ -102,6 +102,8 @@ public class OpenWithGuidslAction implements IObjectActionDelegate {
 			String guidsl = getFileFromPlugin(FMCorePlugin.PLUGIN_ID, "lib/guidsl.jar");
 			String command = "java -cp \"" + jakarta + "\"";
 			command += " -jar \"" + guidsl + "\"";
+			
+			// TODO: parse to guidsl
 			command += " \"" + modelfile.getLocation().toOSString() + "\"";
 			execProcess(command, modelfile.getParent().getLocation().toFile());
 		} catch (Exception e) {

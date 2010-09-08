@@ -23,7 +23,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Stack;
 
-import javax.swing.JOptionPane;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -58,12 +57,11 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 		setFeatureModel(featureModel);
 	}
 
-	Fallback fallback = new Fallback();
 	/**
 	 * Set this true to see some information about the parseprocess while
 	 * developing!
 	 */
-	Boolean DEBUG_XML = true;
+	boolean DEBUG_XML = true;
 
 	/**
 	 * A kind of mind for the hirachy of the xml model
@@ -80,15 +78,9 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 	 */
 	boolean isValidWhileReading = true;
 
-	/**
-	 * This is a copy ofthe featureModel before import
-	 */
-	FeatureModel backup = null;
+	String[] validTagsStruct = {"and", "or", "alt", "feature", "direct-alt", "direct-or"};
 
-	/**
-	 * BufferModel for the parser
-	 */
-	FeatureModel newFeatureModel = null;
+	String[] validTagsConst = {"var", "conj", "disj", "imp", "eq", "not", "atmost1", "rule"};
 
 	/*
 	 * (non-Javadoc)
@@ -97,19 +89,30 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 	 * de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader#parseInputStream
 	 * (java.io.InputStream)
 	 */
+	
+	protected boolean isInArray(String str, String[] arr){
+		for(int i=0; i<arr.length; i++){
+			if (arr[i].equals(str))
+				return true;
+		}
+		return false;
+	}
+	
 	@Override
 	protected void parseInputStream(InputStream inputStream)
 			throws UnsupportedModelException {
-		newFeatureModel = new FeatureModel();
+		
+
+		featureModel.reset();
 
 		try {
-
 			XMLInputFactory inputFactory = XMLInputFactory.newInstance();
 			XMLEventReader eventReader = inputFactory
 					.createXMLEventReader(inputStream);
 
 			boolean isInStruct = false;
 			boolean isInConstraints = false;
+			ruleTemp.clear();
 			ruleTemp.add(new LinkedList<Node>());
 
 			while (eventReader.hasNext()) {
@@ -121,13 +124,19 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 							.getLocalPart();
 
 					if (isInStruct) {
+						if (!isInArray(currentTag,validTagsStruct)){
+							throw new UnsupportedModelException("'"
+									+ currentTag + "' is not a valid tag in struct-section.",
+									event.getLocation().getLineNumber());	
+						}
 						// BEGIN XML-reader is reading information about the
 						// features
-						Boolean isMandatory = false;
-						Boolean isAbstract = false;
+						boolean isMandatory = false;
+						boolean isAbstract = false;
 						String attrName = "noname";
 						String parent = parentStack.peek()[1];
 
+						@SuppressWarnings("unchecked")
 						Iterator<Attribute> attributes = currentStartTag
 								.getAttributes();
 
@@ -140,58 +149,75 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 							if (curName == "name") {
 								attrName = curValue;
 							}
-							if (curName == "mandatory") {
+							else if (curName == "mandatory") {
 								if (curValue.equals("true")) {
 									isMandatory = true;
 								} else {
 									isMandatory = false;
 								}
 							}
-							if (curName == "abstract") {
+							else if (currentTag != "feature" && curName == "abstract") {
 								if (curValue.equals("true")) {
 									isAbstract = true;
 								} else {
 									isAbstract = false;
 								}
 							}
+							else{
+								throw new UnsupportedModelException("'"
+										+ curName
+										+ "' is not a valid attribute.",
+										event.getLocation().getLineNumber());
+							}
 						}
 						// END read attributes from XML tag
 
-						//if (!featureNames.contains(attrName)
-						//		&& attrName != "noname") {
-						if(!newFeatureModel.getFeatureNames().contains(attrName) && FeatureModel.isValidJavaIdentifier(attrName)) {
+						if (!featureModel.getFeatureNames().contains(attrName)
+								&& FeatureModel.isValidJavaIdentifier(attrName)) {
 							addFeature(attrName, isMandatory, isAbstract,
 									parent);
 						} else {
-							isValidWhileReading = false;
-							if(!FeatureModel.isValidJavaIdentifier(attrName)) {
-								fallback.addError("'" + attrName + "' is not a valid feature name", event.getLocation().getLineNumber());
+							if (!FeatureModel.isValidJavaIdentifier(attrName)) {
+								throw new UnsupportedModelException("'"
+										+ attrName
+										+ "' is not a valid feature name",
+										event.getLocation().getLineNumber());
 							}
-							if (newFeatureModel.getFeatureNames().contains(attrName)) {
-								fallback.addError("Cannot redefine '" + attrName + "'", event.getLocation().getLineNumber());								
-							}	
+							if (featureModel.getFeatureNames().contains(
+									attrName)) {
+								throw new UnsupportedModelException(
+										"Cannot redefine '" + attrName + "'",
+										event.getLocation().getLineNumber());
+							}
 						}
 
 						if (currentTag != "feature") {
 							parentStack.push(new String[] { currentTag,
 									attrName });
-						}
 						// END XML-reader is reading information about the
 						// features
+						}
+
 					} else if (isInConstraints) {
+						if (!isInArray(currentTag,validTagsConst)){
+							throw new UnsupportedModelException("'"
+									+ currentTag + "' is not a valid tag in constraints-section.",
+									event.getLocation().getLineNumber());	
+						}
 						if (currentTag.equals("rule")
 								|| currentTag.equals("constraints")) {
 						} else if (currentTag.equals("var")) {
 							String literalName = eventReader.getElementText();
 
-							if (newFeatureModel.getFeatureNames().contains(literalName)) {
+							if (featureModel.getFeatureNames().contains(
+									literalName)) {
 								ruleTemp.getLast()
 										.add(new Literal(literalName));
 							} else {
-								isValidWhileReading = false;
-								fallback.addError("Feature '" + literalName
-										+ "' does not exists ", event
-										.getLocation().getLineNumber());
+								// isValidWhileReading = false;
+								throw new UnsupportedModelException("Feature '"
+										+ literalName + "' does not exist.",
+										event.getLocation().getLineNumber());
 							}
 						} else {
 							ruleTemp.add(new LinkedList<Node>());
@@ -227,35 +253,42 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 							isInConstraints = false;
 						}
 					} else if (isInConstraints) {
+						if (currentTag.equals("constraints")) {
+							isInConstraints = false;
+							isInStruct = false;
+						}
 						if (currentTag.equals("rule")) {
-							Node node = ruleTemp.getFirst().getFirst();
-							boolean addIt = true;
-							try {
-								if (!new SatSolver(node.clone(), 250)
-										.isSatisfiable()) {
-									// JOptionPane.showMessageDialog(null,
-									// "Constraint will not be added - not satisfiable: \n"+
-									// node.toString(), "Warning",
-									// JOptionPane.WARNING_MESSAGE );
-									// TODO other form of warning
-									addIt = false;
+							if (!ruleTemp.isEmpty()) {
+								if (!ruleTemp.getFirst().isEmpty()) {
+									Node node = ruleTemp.getFirst().getFirst();
+									try {
+										if (! new SatSolver(node.clone(), 250)
+												.isSatisfiable()) {
+											System.out.println(" => First Exception");
+											throw new UnsupportedModelException(
+													"Constraint is not satisfiable.",
+													event.getLocation()
+															.getLineNumber());
+										}
+										if (!new SatSolver(
+												new Not(node.clone()), 250)
+												.isSatisfiable()) {
+											System.out.println(" => Second Exception");
+											throw new UnsupportedModelException(
+													"Constraint is a tautology.",
+													event.getLocation()
+															.getLineNumber());
+										}
+									} catch (Exception e) {
+										throw new UnsupportedModelException(e.getMessage(),event.getLocation().getLineNumber());
+									}
+
+									featureModel.addPropositionalNode(node);
+									ruleTemp.clear();
+									ruleTemp.add(new LinkedList<Node>());
 								}
-								if (!new SatSolver(new Not(node.clone()), 250)
-										.isSatisfiable()) {
-									// JOptionPane.showMessageDialog(null,
-									// "Constraint will not be added - tautology: \n"+
-									// node.toString(), "Warning",
-									// JOptionPane.WARNING_MESSAGE );
-									// TODO other form of warning
-									addIt = false;
-								}
-							} catch (Exception e) {
 							}
 
-							if (addIt)
-								newFeatureModel.addPropositionalNode(node);
-							ruleTemp.clear();
-							ruleTemp.add(new LinkedList<Node>());
 						} else if (currentTag.equals("conj")) {
 							And node = new And();
 							node.setChildren(ruleTemp.getLast());
@@ -290,59 +323,14 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 				}
 			}
 			eventReader.close();
-			appendFeatureModel();
+
 		} catch (XMLStreamException e) {
-			fallback.addError("Abort parsing - XML is not well formed!", e
-					.getLocation().getLineNumber());
+			throw new UnsupportedModelException(e.getMessage(), e.getLocation()
+					.getLineNumber());
 		}
 		// Update the FeatureModel in Editor
-
-		featureModel.handleModelDataChanged();
-		fallback.showErrorLog();
-	}
-
-	private void appendFeatureModel() {
-		if (isValidWhileReading == true) {
-			// TODO apply featureModel data to the given FeatureModel
-			//JOptionPane.showMessageDialog(null,
-			//		"No Error occoured, now we would apply the Model...", "Well done!",
-			//		JOptionPane.WARNING_MESSAGE);
-			featureModel.replaceModel(newFeatureModel);
-		}
-	}
-	
-	class Fallback {
-		LinkedList<String[]> errors = new LinkedList<String[]>();
-
-		public void addError(String message, Integer line) {
-			errors.add(new String[] { "" + line, message });
-		}
-
-		public boolean hasErrors() {
-			if (errors.size() > 0) {
-				return true;
-			} else {
-				return false;
-			}
-		}
-
-		public void showErrorLog() {
-			if (this.hasErrors()) {
-				String errormsg = "";
-				System.out.println(errors.size());
-				for (int i = 0; i < errors.size(); i++) {
-					String line = errors.get(i)[0];
-					String message = errors.get(i)[1];
-					// errormsg.concat("Line " + line + ": " + message + "\n" );
-					errormsg = errormsg + "Line " + line + ": " + message
-							+ "\n";
-				}
-				JOptionPane.showMessageDialog(null,
-						"The imported Model will not be apllied to the editor.:\n"
-								+ errormsg, "Parsing Error",
-						JOptionPane.WARNING_MESSAGE);
-			}
-		}
+		featureModel.handleModelDataLoaded();
+		//featureModel.handleModelDataChanged();
 	}
 
 	/**
@@ -371,14 +359,23 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 		 */
 		Feature feat = null;
 		if (parent.equals("root")) {
-			feat = newFeatureModel.getFeature(featureName);
+			feat = featureModel.getFeature(featureName);
 			feat.setMandatory(true);
+			feat.setAbstract(isAbstract);
 		} else {
-			feat = new Feature(newFeatureModel, featureName);
+			feat = new Feature(featureModel, featureName);
 			feat.setMandatory(isMandatory);
 			feat.setAbstract(isAbstract);
-			newFeatureModel.addFeature(feat);
-			newFeatureModel.getFeature(parent).addChild(feat);
+			featureModel.addFeature(feat);
+
+			if (parentStack.peek()[0].equals("and")) {
+				featureModel.getFeature(parent).setAnd();
+			} else if (parentStack.peek()[0].equals("or")) {
+				featureModel.getFeature(parent).setOr();
+			} else {
+				featureModel.getFeature(parent).setAlternative();
+			}
+			featureModel.getFeature(parent).addChild(feat);
 		}
 	}
 }

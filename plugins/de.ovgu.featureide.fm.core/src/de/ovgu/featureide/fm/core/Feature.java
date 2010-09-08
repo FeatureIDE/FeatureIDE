@@ -363,25 +363,16 @@ public class Feature implements PropertyConstants {
 	}
 
 	public boolean isAbstract() {
-		return hasChildren() && featureModel.hasAbstractFeatures();
-		// TODO When set XML to satndard format -> return !this.concret;
+		return (!this.concret);
 	}
 
 	public boolean isConcrete() {
-		return !isAbstract();
+		return this.concret;
 	}
 
 	public boolean isLayer() {
 		return !isAbstract();
 	}
-
-	public boolean canHaveChildren() {
-		return !featureModel.hasAbstractFeatures() || hasChildren();
-	}
-
-	// public boolean isCompound() {
-	// return hasChildren();
-	// }
 
 	public boolean isANDPossible() {
 		if (parent == null || parent.isAnd())
@@ -417,7 +408,8 @@ public class Feature implements PropertyConstants {
 	}
 	
 	public void setAbstract(Boolean value) {
-		this.concret = false;
+		this.concret = !value;
+		fireChildrenChanged();
 	}
 	
 	public void setAnd() {
@@ -432,10 +424,6 @@ public class Feature implements PropertyConstants {
 	public void setAlternative() {
 		this.and = false;
 		this.multiple = false;
-	}
-	
-	public void setOptional() {
-		this.setMandatory(false);
 	}
 
 	/**

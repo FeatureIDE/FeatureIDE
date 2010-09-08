@@ -59,6 +59,8 @@ import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.guidsl.FeatureModelReader;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 
 
 /**
@@ -67,6 +69,7 @@ import de.ovgu.featureide.fm.core.io.guidsl.FeatureModelReader;
  * @author Marcus Leich
  * @author Thomas Thuem
  * @author Tom Brosch
+ * 
  */
 public class FeatureProject extends BuilderMarkerHandler implements
 		IFeatureProject, IResourceChangeListener {
@@ -152,7 +155,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		featureModel = new FeatureModel();
 		featureModelChangeListner = new FeatureModelChangeListner();
 		featureModel.addListener(featureModelChangeListner);
-		modelReader = new FeatureModelReader(featureModel);
+		modelReader = new XmlFeatureModelReader(featureModel);
 
 		// initialize project structure
 		try {
@@ -161,7 +164,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
-		modelFile = new GrammarFile(project.getFile("model.m"));
+		modelFile = new GrammarFile(project.getFile("model.xml"));
 		binFolder = createFolder("bin");
 		libFolder = project.getFolder("lib");
 		buildFolder = createFolder("build");
@@ -206,6 +209,31 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	 * might be created if some errors occur.
 	 */
 	private void loadModel() {
+
+		// Create model.xml automatically, if only model.m exists
+		// @author Dariusz Krolikowski
+		if (project.getFile("model.m").exists() && !project.getFile("model.xml").exists()){
+			try {
+			IFile file = project.getFile("model.xml");
+			
+			FeatureModel fm = new FeatureModel();
+			FeatureModelReader fmReader = new FeatureModelReader(fm);		
+
+			fmReader.readFromFile(project.getFile("model.m"));
+			XmlFeatureModelWriter fmWriter = new XmlFeatureModelWriter(fm);
+			fmWriter.writeToFile(file);
+			
+			// delete model.m automatically - default: false
+			//project.getFile("model.m").delete(true, null);
+			
+			} catch (FileNotFoundException e1) {
+				e1.printStackTrace();
+			} catch (CoreException e1) {
+				e1.printStackTrace();
+			} catch (UnsupportedModelException e1) {
+				e1.printStackTrace();
+			}
+		}
 		try {
 			try {
 				modelReader.readFromFile(modelFile.getResource());
@@ -225,6 +253,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	}
 
 	private void createAndDeleteFeatureFolders() throws CoreException {
+
 		sourceFolder.refreshLocal(IResource.DEPTH_ONE, null);
 		// create folders for all layers
 		for (Feature feature : featureModel.getFeatures())

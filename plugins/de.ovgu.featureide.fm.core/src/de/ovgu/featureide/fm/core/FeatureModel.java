@@ -85,8 +85,6 @@ public class FeatureModel implements PropertyConstants {
 	 */
 	private LinkedList<Renaming> renamings = new LinkedList<Renaming>();
 
-	private boolean abstractFeatures;
-
 	public FeatureModel() {
 		reset();
 	}
@@ -107,7 +105,6 @@ public class FeatureModel implements PropertyConstants {
 		constraints.clear();
 		comments = null;
 		annotations = null;
-		abstractFeatures = true;
 	}
 
 	private void deleteChildFeatures(Feature feature) {
@@ -422,14 +419,6 @@ public class FeatureModel implements PropertyConstants {
 		return new SatSolver(root, 1000).isSatisfiable();
 	}
 
-	public void hasAbstractFeatures(boolean abstractFeatures) {
-		this.abstractFeatures = abstractFeatures;
-	}
-
-	public boolean hasAbstractFeatures() {
-		return abstractFeatures;
-	}
-
 	/**
 	 * checks whether A implies B for the current feature model.
 	 * 
@@ -670,21 +659,6 @@ public class FeatureModel implements PropertyConstants {
 		return common;
 	}
 	
-	/**
-	 * This function will replace the complete FeatureModel with a other on.
-	 * @param newFeatureModel a new, valid FeatureModel
-	 */
-	public void replaceModel(FeatureModel newFeatureModel) {
-		this.abstractFeatures	= newFeatureModel.abstractFeatures;
-		this.annotations		= newFeatureModel.annotations;
-		this.comments			= newFeatureModel.comments;
-		this.constraints		= newFeatureModel.constraints;
-		this.featureTable		= newFeatureModel.featureTable;
-		this.layers				= newFeatureModel.layers;
-		this.propNodes			= newFeatureModel.propNodes;
-		this.root				= newFeatureModel.root;
-	}
-
 	/**
 	 * Checks a string to be a valid featurename.
 	 * @param s Possible featurename to be checked

@@ -27,6 +27,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
@@ -37,15 +38,17 @@ import org.eclipse.ui.IWorkbenchPart;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.guidsl.FeatureModelReader;
 import de.ovgu.featureide.fm.core.io.guidsl.FeatureModelWriter;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 
 /**
- * Exports a feature model file into an XML format.
+ * Exports a feature model file into a GUIDSL format.
  * 
- * @author Fabian Wielgorz
+ * @author Dariusz Krolikowski
+ * @author Maik Lampe
+ * 
  */
 public class ExportGuidslAction implements IObjectActionDelegate {
 
@@ -68,16 +71,31 @@ public class ExportGuidslAction implements IObjectActionDelegate {
 				}
 				if (inputFile != null) {
 					try {
+						
+						FeatureModel fm = new FeatureModel();
+						XmlFeatureModelReader fmReader = new XmlFeatureModelReader(fm);
+						fmReader.readFromFile(inputFile);
+						FeatureModelWriter fmWriter = new FeatureModelWriter(fm);
+						
+						if (fmWriter.hasConcreteCompounds()){
+							boolean proceed = MessageDialog
+							.openQuestion(new Shell(), "Warning!",
+									"The current feature model cannot be transformed due to concrete compounds! Proceed? (all compound features will be set as abstract)");
+							if (!proceed) {
+								return;
+							}
+						}
+ 
 						FileDialog fileDialog = new FileDialog(new Shell(),
 								SWT.SAVE);
 						fileDialog.setFileName("model.m");
 						fileDialog.setOverwrite(true);
-						File outputFile = new File(fileDialog.open());
-						FeatureModel fm = new FeatureModel();
-						FeatureModelReader fmReader = new FeatureModelReader(fm);
-						fmReader.readFromFile(inputFile);
-						FeatureModelWriter fmWriter = new FeatureModelWriter(fm);
+						String filepath = fileDialog.open();
+						if (filepath == null) return;
+						File outputFile = new File(filepath);
+										
 						fmWriter.writeToFile(outputFile);
+						
 						inputFile.getProject().refreshLocal(
 								IResource.DEPTH_INFINITE, null);
 					} catch (FileNotFoundException e) {
@@ -95,5 +113,4 @@ public class ExportGuidslAction implements IObjectActionDelegate {
 	public void selectionChanged(IAction action, ISelection selection) {
 		this.selection = selection;
 	}
-
 }

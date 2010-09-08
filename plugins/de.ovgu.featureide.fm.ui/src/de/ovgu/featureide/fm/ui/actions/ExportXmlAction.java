@@ -37,7 +37,7 @@ import org.eclipse.ui.IWorkbenchPart;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.guidsl.FeatureModelReader;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
@@ -72,9 +72,11 @@ public class ExportXmlAction implements IObjectActionDelegate {
 								SWT.SAVE);
 						fileDialog.setFileName("model.xml");
 						fileDialog.setOverwrite(true);
-						File outputFile = new File(fileDialog.open());
+						String filepath = fileDialog.open();
+						if (filepath == null) return;
+						File outputFile = new File(filepath);
 						FeatureModel fm = new FeatureModel();
-						FeatureModelReader fmReader = new FeatureModelReader(fm);
+						XmlFeatureModelReader fmReader = new XmlFeatureModelReader(fm);
 						fmReader.readFromFile(inputFile);
 						XmlFeatureModelWriter xmlWriter = new XmlFeatureModelWriter(
 								fm);

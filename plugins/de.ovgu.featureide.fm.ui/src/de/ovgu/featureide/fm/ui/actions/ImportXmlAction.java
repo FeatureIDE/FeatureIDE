@@ -38,8 +38,8 @@ import org.eclipse.ui.IWorkbenchPart;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.guidsl.FeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 
@@ -52,7 +52,6 @@ import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 public class ImportXmlAction implements IObjectActionDelegate {
 
 private ISelection selection;
-	
 	private FeatureModelEditor featureModelEditor;
 	
 	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
@@ -74,35 +73,35 @@ private ISelection selection;
 				}
 				if (outputFile != null) {
 					try {
-						MessageDialog.openWarning(new Shell(), "Warning!",
-								"This will overide the current model! " +
-								"Can't be undone!");
+						boolean proceed = MessageDialog
+						.openQuestion(new Shell(), "Warning!",
+								"This will override the current model irrepealable! Proceed?");
+						if (proceed) {
 						FileDialog fileDialog = new FileDialog(new Shell(), 
 								SWT.OPEN);
 						fileDialog.setOverwrite(false);
-						File inputFile = new File(fileDialog.open());
+						String filepath = fileDialog.open();
+						if (filepath == null) return;
+						File inputFile = new File(filepath);
 						while (!inputFile.exists()) {
 							MessageDialog.openInformation(new Shell(), "File " +
 									"not Found", "Specified file wasn't found");
 							inputFile = new File(fileDialog.open());
-							//if (fileDialog.open() == null) return;
-							//if (inputFile == null) return;
 						}							
 
 						FeatureModel fm = featureModelEditor.getFeatureModel();
 						XmlFeatureModelReader xmlReader = new XmlFeatureModelReader(fm);		
 
 						xmlReader.readFromFile(inputFile);
-						FeatureModelWriter fmWriter = new FeatureModelWriter(fm);
+						XmlFeatureModelWriter fmWriter = new XmlFeatureModelWriter(fm);
 						fmWriter.writeToFile(outputFile);
-						outputFile.getProject().refreshLocal(
-								IResource.DEPTH_INFINITE, null);
-						if (featureModelEditor != null) {
-							featureModelEditor.updateDiagramFromTextEditor();
+						outputFile.refreshLocal(IResource.DEPTH_ZERO, null);
 						}
 					} catch (FileNotFoundException e) {
 						FMUIPlugin.getDefault().logError(e);
 					} catch (UnsupportedModelException e) {
+						String errStr = e.getMessage();
+						MessageDialog.openWarning(new Shell(), "Warning!", "Error while loading file: \n " + errStr);
 						FMUIPlugin.getDefault().logError(e);
 					} catch (CoreException e) {
 						FMUIPlugin.getDefault().logError(e);
