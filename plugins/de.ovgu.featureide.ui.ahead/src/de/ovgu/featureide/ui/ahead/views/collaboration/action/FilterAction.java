@@ -73,15 +73,13 @@ public class FilterAction extends Action {
 		}
 		if (checked) 
 			super.setEnabled(true);
-//			setChecked(true);
-//		} else {
-//			setChecked(false);
-//		}
 	}
 	
 	public void run() {
-		if (classFilter.size() != 0 || featureFilter.size() != 0) {
-			super.setChecked(true);
+		if (((classFilter.size() != 0 || featureFilter.size() != 0) && !checked) &&
+				collaborationView.builder.classFilter.size() == 0 &&
+				collaborationView.builder.featureFilter.size() == 0) {
+			setChecked(true);
 			checked = true;
 			collaborationView.builder.setClassFilter(classFilter);
 			collaborationView.builder.setFeatureFilter(featureFilter);
@@ -96,9 +94,8 @@ public class FilterAction extends Action {
 					viewer.getContents().refresh();
 				}
 			});	
-		} else {//if (isChecked()) {
-			
-			super.setChecked(false);
+		} else {
+			setChecked(false);
 			checked = false;
 			classFilter = new LinkedList<String>();
 			featureFilter = new LinkedList<String>();

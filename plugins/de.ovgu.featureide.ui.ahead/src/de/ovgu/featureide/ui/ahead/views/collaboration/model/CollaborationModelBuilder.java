@@ -54,8 +54,8 @@ import de.ovgu.featureide.ui.ahead.AheadUIPlugin;
 public class CollaborationModelBuilder {
 	private CollaborationModel model;
 
-	private LinkedList<String> classFilter = new LinkedList<String>();
-	private LinkedList<String> featureFilter = new LinkedList<String>();
+	public LinkedList<String> classFilter = new LinkedList<String>();
+	public LinkedList<String> featureFilter = new LinkedList<String>();
 
 	public CollaborationModelBuilder() {
 		model = new CollaborationModel();
@@ -215,8 +215,8 @@ public class CollaborationModelBuilder {
 									role = new Role(res.getName());
 									name = res.getName();
 								} else {
-									role = new Role(name);
 									name = "*" + name;
+									role = new Role(name);
 								}
 								for (Role modelRole : model.roles) {
 									if (modelRole.featureName.equals(feature.getName()) && modelRole.getName().equals(name)) {
@@ -247,12 +247,21 @@ public class CollaborationModelBuilder {
 							for (IResource file : member) {
 								if (!(file instanceof IFolder)) {
 									if (classFilter.size() == 0 
-											|| classFilter.contains("*." + (file.getName().split("[.]"))[1])) {
+											|| classFilter.contains("*." + (file.getName().split("[.]"))[1])
+											|| classFilter.contains(file.getName())) {
 										if (collaboration == null)
 											collaboration = new Collaboration(feature.getName());
-								
-										String name = "*." + (file.getName().split("[.]"))[1];
-										Role role = new Role(name);
+										
+										String name = "." + (file.getName().split("[.]"))[1];
+										
+										Role role;
+										if (extensions.contains(name)) {
+											role = new Role(file.getName());
+											name = file.getName();
+										} else {
+											name = "*" + name;
+											role = new Role(name);
+										}
 										for (Role modelRole : model.roles) {
 											if (modelRole.featureName.equals(feature.getName()) && modelRole.getName().equals(name)) {
 												role = modelRole;
