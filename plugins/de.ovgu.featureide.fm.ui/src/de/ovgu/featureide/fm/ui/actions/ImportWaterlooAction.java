@@ -82,11 +82,12 @@ public class ImportWaterlooAction implements IObjectActionDelegate {
 							FileDialog fileDialog = new FileDialog(new Shell(),
 									SWT.OPEN);
 							fileDialog.setOverwrite(false);
-							
+
 							String filepath = fileDialog.open();
-							if (filepath == null) return;
+							if (filepath == null)
+								return;
 							File inputFile = new File(filepath);
-							
+
 							while (!inputFile.exists()) {
 								MessageDialog.openInformation(new Shell(),
 										"File " + "not Found",
@@ -107,7 +108,8 @@ public class ImportWaterlooAction implements IObjectActionDelegate {
 						FMUIPlugin.getDefault().logError(e);
 					} catch (UnsupportedModelException e) {
 						String errStr = e.getMessage();
-						MessageDialog.openWarning(new Shell(), "Warning!", "Error while loading file: \n " + errStr);
+						MessageDialog.openWarning(new Shell(), "Warning!",
+								"Error while loading file: \n " + errStr);
 						FMUIPlugin.getDefault().logError(e);
 					} catch (CoreException e) {
 						FMUIPlugin.getDefault().logError(e);

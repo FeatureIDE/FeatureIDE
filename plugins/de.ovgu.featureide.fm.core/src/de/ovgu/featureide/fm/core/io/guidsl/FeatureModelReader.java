@@ -175,6 +175,7 @@ public class FeatureModelReader extends AbstractFeatureModelReader {
 		do {
 			Feature child = readGTerm((GTerm) astListNode.arg[0]);
 			feature.addChild(child);
+			feature.setAbstract(!noAbstractFeatures);
 			astListNode = (AstListNode) astListNode.right;
 		} while (astListNode != null);
 		return simplify(feature);
