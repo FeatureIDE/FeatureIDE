@@ -33,6 +33,7 @@ import de.ovgu.featureide.core.jakprojectmodel.IMethod;
  * It is necessary because every figure in GEF needs an associated model.
  * 
  * @author Constanze Adler
+ * @author Stephan Besecke
  */
 public class Role {
 	private String name;

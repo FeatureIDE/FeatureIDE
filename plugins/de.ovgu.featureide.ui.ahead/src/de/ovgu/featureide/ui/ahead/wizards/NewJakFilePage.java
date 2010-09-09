@@ -226,7 +226,7 @@ public class NewJakFilePage extends WizardPage {
 						}
 					}
 				}
-
+				// UGLY!!!! hack
 				featureComboProject.setText(featureProject.getProjectName());
 
 				for (String s : featureProject.getFeatureModel().getFeatureNames())

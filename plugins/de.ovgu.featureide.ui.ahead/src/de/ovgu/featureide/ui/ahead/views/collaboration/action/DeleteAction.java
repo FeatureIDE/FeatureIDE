@@ -39,6 +39,7 @@ import de.ovgu.featureide.ui.ahead.views.collaboration.model.Class;
  *  Deletes a Object of the CollaborationDiagramm.
  * 
  * @author Constanze Adler
+ * @author Stephan Besecke
  */
 public class DeleteAction extends Action {
 	

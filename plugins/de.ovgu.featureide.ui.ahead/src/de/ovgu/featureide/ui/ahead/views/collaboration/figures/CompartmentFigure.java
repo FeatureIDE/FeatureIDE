@@ -24,6 +24,7 @@ import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.ToolbarLayout;
 import org.eclipse.draw2d.geometry.Insets;
+import org.eclipse.draw2d.geometry.Point;
 
 /**
  * Describes a box with own borders etc; required for the tooltip of roles
@@ -46,8 +47,11 @@ public class CompartmentFigure extends Figure {
 	      return new Insets(1,0,0,0);
 	    }
 	    public void paint(IFigure figure, Graphics graphics, Insets insets) {
-	      graphics.drawLine(getPaintRectangle(figure, insets).getTopLeft(),
-	                        tempRect.getTopRight());
+	    	Point left = getPaintRectangle(figure, insets).getTopLeft();
+	    	Point rigth = tempRect.getTopRight();
+	    	left.y = left.y + 17; // ugly hack
+	    	rigth.y = rigth.y + 17; // should use the font size
+	    	graphics.drawLine(left, rigth);
 	    }
 	  }
 	

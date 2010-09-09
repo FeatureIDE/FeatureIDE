@@ -70,7 +70,7 @@ import de.ovgu.featureide.ui.ahead.views.collaboration.model.CollaborationModelB
  * 
  * @author Constanze Adler
  * @author Jens Meinicke
- * 
+ * @author Stephan Besecke
  */
 public class CollaborationView extends ViewPart implements GUIDefaults, ICurrentBuildListener{
 	

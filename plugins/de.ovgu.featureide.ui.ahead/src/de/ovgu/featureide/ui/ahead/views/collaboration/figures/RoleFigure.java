@@ -19,9 +19,9 @@
 package de.ovgu.featureide.ui.ahead.views.collaboration.figures;
 
 import org.eclipse.draw2d.Figure;
+import org.eclipse.draw2d.FlowLayout;
 import org.eclipse.draw2d.FreeformLayout;
 import org.eclipse.draw2d.Label;
-import org.eclipse.draw2d.ToolbarLayout;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
@@ -39,6 +39,7 @@ import de.ovgu.featureide.ui.ahead.views.collaboration.model.Role;
  * role in the collaboration diagram.
  * 
  * @author Constanze Adler
+ * @author Stephan Besecke
  */
 public class RoleFigure extends Figure implements GUIDefaults{
 	
@@ -71,19 +72,19 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		this.setOpaque(true);
 		
 		// next lines defines the tooltipcontent
-		Figure tooltipContent = new Figure();
-		ToolbarLayout contentsLayout = new ToolbarLayout();
+		Figure tooltipContent = new Figure();		
+		FlowLayout contentsLayout = new FlowLayout();
 		tooltipContent.setLayoutManager(contentsLayout);
 
 		String name = label.getText();
 		name = (name.split("[.]"))[0];
 		if (role.files.size() == 0) {
-			tooltipContent.add(new Label(name + " ", classImage));
-			
-			tooltipContent.add(new Label(role.featureName + " ", featureIcon));
 			
 			CompartmentFigure fieldFigure = new CompartmentFigure();
 			CompartmentFigure methodFigure = new CompartmentFigure();
+			
+			fieldFigure.add(new Label(name + " ", classImage));
+			methodFigure.add(new Label(role.featureName + " ", featureIcon));
 			
 			int fieldCount = 0;
 			int methodCount = 0;
@@ -102,7 +103,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 				if (f.isOwn(role.jakFile)) {
 					fieldFigure.add(fieldLabel);
 					fieldCount++;
-					// TODO: show also constructors and types and returntype of methods!!!
+					// TODO: show also constructors and types and returntypes of methods!!!
 				}
 			}
 			
@@ -129,8 +130,8 @@ public class RoleFigure extends Figure implements GUIDefaults{
 			tooltipContent.add(fieldFigure);
 			tooltipContent.add(methodFigure);
 		} else if (role.getName().startsWith("*.")) {
-			tooltipContent.add(new Label(role.featureName + " ", featureIcon));
 			CompartmentFigure fileFigure = new CompartmentFigure();
+			fileFigure.add(new Label(role.featureName + " ", featureIcon));
 			int fileCount = 0;
 			for (String file : role.files) {
 				Label fieldLabel = new Label(file);

@@ -31,6 +31,7 @@ import de.ovgu.featureide.ui.ahead.wizards.NewJakFileWizard;
  * Add a class to the CollaborationDiagramm.
  * 
  * @author Constanze Adler
+ * @author Stephan Besecke
  */
 public class AddClassAction extends Action {
 
