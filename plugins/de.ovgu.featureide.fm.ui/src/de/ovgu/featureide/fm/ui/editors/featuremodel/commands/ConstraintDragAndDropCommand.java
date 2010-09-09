@@ -29,7 +29,8 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 
 /**
- * TODO description
+ * executed command when dragging and dropping constraints 
+ *
  * @author Fabian Benduhn
  * @author David Broneske
  */

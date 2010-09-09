@@ -26,8 +26,9 @@ import org.eclipse.swt.graphics.Image;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
- * TODO description
- * 
+ * provides the pictures of constraints or operators in the content assist window
+ *  
+ * @author David Broneske
  * @author Fabian Benduhn
  */
 public class ConstraintProposalLabelProvider extends LabelProvider   {

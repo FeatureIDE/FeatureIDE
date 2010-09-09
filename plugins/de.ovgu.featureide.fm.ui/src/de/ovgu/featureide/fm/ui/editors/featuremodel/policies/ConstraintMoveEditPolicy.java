@@ -39,8 +39,9 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.ConstraintDragAndD
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 
 /**
- * TODO description
+ * editPart for constraint movements
  * 
+ * @author David Broneske
  * @author Fabian Benduhn
  */
 public class ConstraintMoveEditPolicy extends NonResizableEditPolicy implements GUIDefaults{

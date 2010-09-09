@@ -453,11 +453,12 @@ public class ConstraintDialog {
 		});
 
 		searchFeatureText.addModifyListener(new ModifyListener() {
-
+			
 			@Override
+			
 			public void modifyText(ModifyEvent e) {
 				ViewerFilter searchFilter = new ViewerFilter() {
-
+					
 					@Override
 					public boolean select(Viewer viewer, Object parentElement,
 							Object element) {
@@ -470,10 +471,10 @@ public class ConstraintDialog {
 					}
 
 				};
-
+				if(!searchFeatureText.getText().equalsIgnoreCase(FILTERTEXT)){
 				featureTableViewer.addFilter(searchFilter);
 
-			}
+			}}
 
 		});
 

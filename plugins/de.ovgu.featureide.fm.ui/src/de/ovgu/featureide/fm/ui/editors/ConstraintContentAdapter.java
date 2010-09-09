@@ -24,7 +24,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * TODO description
+ * contentAdapter for content assist while typing constraints 
+ * 
  * @author David Broneske
  * @author Fabian Benduhn
  */

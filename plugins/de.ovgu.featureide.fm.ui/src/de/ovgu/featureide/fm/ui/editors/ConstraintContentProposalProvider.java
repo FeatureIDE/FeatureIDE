@@ -28,7 +28,7 @@ import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.jface.fieldassist.IContentProposalProvider;
 
 /**
- * TODO description
+ * provides proposals for content assist while typing constraints
  * 
  * @author David Broneske
  * @author Fabian Benduhn
