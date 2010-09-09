@@ -31,7 +31,6 @@ import de.ovgu.featureide.ui.ahead.views.collaboration.editparts.ClassEditPart;
 import de.ovgu.featureide.ui.ahead.views.collaboration.editparts.CollaborationEditPart;
 import de.ovgu.featureide.ui.ahead.views.collaboration.editparts.RoleEditPart;
 import de.ovgu.featureide.ui.ahead.views.collaboration.model.CollaborationModel;
-import de.ovgu.featureide.ui.ahead.views.collaboration.model.CollaborationModelBuilder;
 
 /**
  * Filters the collaboration model
@@ -43,7 +42,6 @@ public class FilterAction extends Action {
 	private GraphicalViewerImpl viewer;
 	private LinkedList<String> classFilter ,featureFilter;
 	private CollaborationModel model;
-	private CollaborationModelBuilder builder = new CollaborationModelBuilder();
 	private CollaborationView collaborationView;
 	
 	public boolean checked = false;
@@ -73,30 +71,21 @@ public class FilterAction extends Action {
 				super.setEnabled(true);
 			}
 		}
-		if (checked) {
+		if (checked) 
 			super.setEnabled(true);
-			setChecked(true);
-		} else {
-			setChecked(false);
-		}
+//			setChecked(true);
+//		} else {
+//			setChecked(false);
+//		}
 	}
 	
 	public void run() {
-		if (checked) {
-			
-			setChecked(false);
-			checked = false;
-			classFilter = new LinkedList<String>();
-			featureFilter = new LinkedList<String>();
-			builder.setClassFilter(classFilter);
-			builder.setFeatureFilter(featureFilter);
-			collaborationView.updateGuiAfterBuild(collaborationView.getFeatureProject());
-		} else if (classFilter.size() != 0 || featureFilter.size() != 0) {
-			setChecked(true);
+		if (classFilter.size() != 0 || featureFilter.size() != 0) {
+			super.setChecked(true);
 			checked = true;
-			builder.setClassFilter(classFilter);
-			builder.setFeatureFilter(featureFilter);
-			model = builder.buildCollaborationModel(collaborationView.getFeatureProject());
+			collaborationView.builder.setClassFilter(classFilter);
+			collaborationView.builder.setFeatureFilter(featureFilter);
+			model = collaborationView.builder.buildCollaborationModel(collaborationView.getFeatureProject());
 			if (model == null) {
 				AheadUIPlugin.getDefault().logInfo("model loading error");
 				return;
@@ -107,6 +96,15 @@ public class FilterAction extends Action {
 					viewer.getContents().refresh();
 				}
 			});	
-		}	
+		} else {//if (isChecked()) {
+			
+			super.setChecked(false);
+			checked = false;
+			classFilter = new LinkedList<String>();
+			featureFilter = new LinkedList<String>();
+			collaborationView.builder.setClassFilter(classFilter);
+			collaborationView.builder.setFeatureFilter(featureFilter);
+			collaborationView.updateGuiAfterBuild(collaborationView.getFeatureProject());
+		}
 	}
 }

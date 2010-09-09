@@ -18,6 +18,8 @@
  */
 package de.ovgu.featureide.ui.ahead.views.collaboration;
 
+import java.util.LinkedList;
+
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -76,7 +78,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	
 	public static final String ID = AheadUIPlugin.PLUGIN_ID + ".views.collaboration.Collaboration";
 	private GraphicalViewerImpl viewer;
-	private CollaborationModelBuilder builder = new CollaborationModelBuilder();
+	public CollaborationModelBuilder builder = new CollaborationModelBuilder();
 	private CollaborationModel model = new CollaborationModel();
 	
 	private AddClassAction addClassAction;
@@ -277,6 +279,9 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 					protected IStatus run(IProgressMonitor monitor) {
 						if (!toolbarAction.isEnabled())
 							return Status.OK_STATUS;
+						builder.setClassFilter(new LinkedList<String>());
+						builder.setFeatureFilter(new LinkedList<String>());
+						filterAction.setChecked(false);
 						toolbarAction.setEnabled(false);
 						buildProject(featureProject);
 						return Status.OK_STATUS;
