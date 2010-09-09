@@ -34,27 +34,27 @@ import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.ui.editors.ConstraintDialog;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.ConstraintFigure;
 
-
 /**
  * An editpart to display cross-tree constraints below the feature diagram.
  * 
  * @author Thomas Thuem
  */
-public class ConstraintEditPart extends AbstractGraphicalEditPart implements PropertyConstants, PropertyChangeListener {
-	
+public class ConstraintEditPart extends AbstractGraphicalEditPart implements
+		PropertyConstants, PropertyChangeListener {
+
 	public ConstraintEditPart(Constraint constraint) {
 		super();
 		setModel(constraint);
 	}
-	
+
 	public Constraint getConstraintModel() {
 		return (Constraint) getModel();
 	}
-	
+
 	public ConstraintFigure getConstraintFigure() {
 		return (ConstraintFigure) getFigure();
 	}
-	
+
 	@Override
 	protected IFigure createFigure() {
 		ConstraintFigure figure = new ConstraintFigure(getConstraintModel());
@@ -63,21 +63,24 @@ public class ConstraintEditPart extends AbstractGraphicalEditPart implements Pro
 
 	@Override
 	protected void createEditPolicies() {
-		installEditPolicy(EditPolicy.SELECTION_FEEDBACK_ROLE, new NonResizableEditPolicy());		
+		installEditPolicy(EditPolicy.SELECTION_FEEDBACK_ROLE,
+				new NonResizableEditPolicy());
+
 	}
-	
+
 	public void performRequest(Request request) {
 		if (request.getType() == RequestConstants.REQ_OPEN) {
-			new ConstraintDialog(getConstraintModel().getFeatureModel(), getConstraintModel());
+			new ConstraintDialog(getConstraintModel().getFeatureModel(),
+					getConstraintModel());
 		}
 	}
-	
+
 	@Override
 	public void activate() {
 		getConstraintModel().addListener(this);
 		super.activate();
 	}
-	
+
 	@Override
 	public void deactivate() {
 		super.deactivate();
@@ -86,7 +89,9 @@ public class ConstraintEditPart extends AbstractGraphicalEditPart implements Pro
 
 	/*
 	 * (non-Javadoc)
-	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+	 * 
+	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.
+	 * PropertyChangeEvent)
 	 */
 	public void propertyChange(PropertyChangeEvent event) {
 		String prop = event.getPropertyName();
@@ -94,5 +99,5 @@ public class ConstraintEditPart extends AbstractGraphicalEditPart implements Pro
 			getConstraintFigure().setLocation((Point) event.getNewValue());
 		}
 	}
-	
+
 }

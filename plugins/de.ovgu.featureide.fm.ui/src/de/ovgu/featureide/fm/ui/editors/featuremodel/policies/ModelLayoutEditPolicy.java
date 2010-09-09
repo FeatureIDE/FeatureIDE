@@ -18,6 +18,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.policies;
 
+import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPolicy;
@@ -27,12 +28,14 @@ import org.eclipse.gef.editpolicies.LayoutEditPolicy;
 import org.eclipse.gef.requests.ChangeBoundsRequest;
 import org.eclipse.gef.requests.CreateRequest;
 
+import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.ConstraintDragAndDropCommand;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.FeatureDragAndDropCommand;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
-
 
 /**
  * Allows features to be moved onto the feature model diagram.
@@ -43,8 +46,8 @@ public class ModelLayoutEditPolicy extends LayoutEditPolicy {
 
 	private final FeatureModel featureModel;
 
-	private FeatureDragAndDropCommand cmd;
-	
+	private Command cmd;
+
 	public ModelLayoutEditPolicy(FeatureModel featureModel) {
 		super();
 		this.featureModel = featureModel;
@@ -52,11 +55,14 @@ public class ModelLayoutEditPolicy extends LayoutEditPolicy {
 
 	@Override
 	protected EditPolicy createChildEditPolicy(EditPart child) {
+		if (child instanceof ConstraintEditPart)
+			return new ConstraintMoveEditPolicy((ConstraintEditPart) child, this);
 		if (child instanceof FeatureEditPart)
 			return new FeatureMoveEditPolicy((FeatureEditPart) child, this);
+		
 		return null;
 	}
-	
+
 	@Override
 	protected Command getMoveChildrenCommand(Request request) {
 		cmd = null;
@@ -64,22 +70,33 @@ public class ModelLayoutEditPolicy extends LayoutEditPolicy {
 			ChangeBoundsRequest r = (ChangeBoundsRequest) request;
 			if (r.getEditParts().size() != 1)
 				return null;
-			FeatureEditPart editPart = (FeatureEditPart) r.getEditParts().get(0);
-			Feature feature = editPart.getFeatureModel();
-			Rectangle bounds = FeatureUIHelper.getBounds(feature);
-			bounds = r.getTransformedRectangle(bounds);
-			cmd = new FeatureDragAndDropCommand(featureModel, feature, bounds.getLocation());
+			if(r.getEditParts().get(0) instanceof FeatureEditPart){
+				FeatureEditPart editPart = (FeatureEditPart) r.getEditParts().get(0);
+				Feature feature = editPart.getFeatureModel();
+				Rectangle bounds = FeatureUIHelper.getBounds(feature);
+				bounds = r.getTransformedRectangle(bounds);
+				cmd = new FeatureDragAndDropCommand(featureModel, feature, bounds.getLocation());
+			}
+			if (r.getEditParts().get(0)instanceof ConstraintEditPart){
+				ConstraintEditPart editPart = (ConstraintEditPart) r.getEditParts().get(0);
+				Constraint constraint = editPart.getConstraintModel();
+				
+				Point point = r.getLocation().getCopy();
+				getHostFigure().translateToRelative(point);
+
+				cmd = new ConstraintDragAndDropCommand(featureModel, constraint,point);
+			}
 		}
 		return cmd;
 	}
 
-	public FeatureDragAndDropCommand getConstraintCommand() {
+	public Command getConstraintCommand() {
 		return cmd;
 	}
 
 	@Override
 	protected Command getCreateCommand(CreateRequest request) {
-		//no creation supported
+		// no creation supported
 		return null;
 	}
 

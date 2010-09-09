@@ -18,6 +18,10 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.jface.fieldassist.ContentProposalAdapter;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellLabelProvider;
@@ -30,9 +34,12 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -54,14 +61,17 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
+import org.prop4j.Literal;
 import org.prop4j.Node;
+import org.prop4j.NodeReader;
 import org.prop4j.NodeWriter;
-//import org.prop4j.NodeReader;
+import org.prop4j.Not;
+import org.prop4j.SatSolver;
+import org.sat4j.specs.TimeoutException;
+
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.guidsl.FeatureModelReader;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
@@ -73,6 +83,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * @author David Broneske
  * @author Fabian Benduhn
  */
+
 public class ConstraintDialog {
 
 	private static final Image HELP_IMAGE = FMUIPlugin.getImage("help.gif");
@@ -80,9 +91,11 @@ public class ConstraintDialog {
 			.getImage("icon_error.gif");
 	private static final Image BANNER_IMAGE = FMUIPlugin
 			.getImage("title_banner.gif");
+	private static final Image WARNING_IMAGE = FMUIPlugin
+			.getImage("message_warning.gif");
 
 	private static final String[] OPERATOR_NAMES = { " Not ", " And ", " Or ",
-			" Implies ", " Iff ", "(", ")"};
+			" Implies ", " Iff ", "(", ")" /* "At most 1" */};
 	private static final String FILTERTEXT = "type filter text";
 	private Shell shell;
 
@@ -90,10 +103,9 @@ public class ConstraintDialog {
 	private String initialConstraint;
 
 	private Composite headComposite;
-	private Image errorImage;
 	private Label imageLabel;
 	private Label errorMarker;
-	private Label errorMessage;
+	private Text errorMessage;
 	private String titleText;
 	private String headerText;
 	private Group featureGroup;
@@ -104,13 +116,13 @@ public class ConstraintDialog {
 
 	private Text constraintText;
 	private Composite lastComposite;
-
 	private ToolBar helpButtonBar;
 	private ToolItem helpButton;
-
+	private FeatureModel featuremodel;
 	private Button cancelButton;
 	private int x, y;
 	private Button okButton;
+	private Constraint constraint;
 
 	/**
 	 * 
@@ -119,7 +131,8 @@ public class ConstraintDialog {
 	 */
 	public ConstraintDialog(final FeatureModel featuremodel,
 			final Constraint constraint) {
-
+		this.constraint = constraint;
+		this.featuremodel = featuremodel;
 		if (constraint == null) {
 			titleText = "Create Propositional Constraint";
 			headerText = "Create new Constraint";
@@ -131,20 +144,21 @@ public class ConstraintDialog {
 			initialConstraint = constraint.getNode().toString(
 					NodeWriter.textualSymbols);
 		}
-	
+
 		initShell();
 		initHead();
 		initFeatureGroup(featuremodel);
 		initButtonGroup();
 		initConstraintText();
 		initBottom(featuremodel, constraint);
+		printHeaderText(headerText);
 		constraintText.setFocus();
 		constraintText.setSelection(constraintText.getCharCount());
 		shell.open();
 	}
 
 	/**
-	 * 
+	 * initializes the shell
 	 */
 	private void initShell() {
 		shell = new Shell(Display.getCurrent());
@@ -154,16 +168,18 @@ public class ConstraintDialog {
 		shellLayout.marginWidth = 0;
 		shellLayout.marginHeight = 0;
 		shell.setLayout(shellLayout);
-		
-		  Monitor primary = shell.getDisplay().getPrimaryMonitor();
-		    Rectangle bounds = primary.getBounds();
-		    Rectangle rect = shell.getBounds();
-		    int x = bounds.x + (bounds.width - rect.width) / 2;
-		    int y = bounds.y + (bounds.height - rect.height) / 2;
-		    shell.setLocation(x, y);
+
+		Monitor primary = shell.getDisplay().getPrimaryMonitor();
+		Rectangle bounds = primary.getBounds();
+		Rectangle rect = shell.getBounds();
+		int x = bounds.x + (bounds.width - rect.width) / 2;
+		int y = bounds.y + (bounds.height - rect.height) / 2;
+		shell.setLocation(x, y);
 	}
 
 	/**
+	 * initializes the bottom part of the dialog
+	 * 
 	 * @param featuremodel
 	 * @param constraint
 	 */
@@ -211,37 +227,10 @@ public class ConstraintDialog {
 		okButton.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
 			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
 
-				String input = constraintText.getText().trim();
-				if (input.length() != 0) {
-
-					// Check if the constraint ends with a ';' and
-					// add a ';' when not.
-					if (!input.endsWith(";")) {
-						StringBuffer temp = new StringBuffer(input);
-						temp.append(";");
-						input = temp.toString();
-					}
-					try {
-						if (constraint != null)
-							featuremodel.removePropositionalNode(constraint);
-
-						Node propNode = new FeatureModelReader(
-								new FeatureModel()).readPropositionalString(
-								input, featuremodel);
-
-					featuremodel.addPropositionalNode(propNode);
-					featuremodel.handleModelDataChanged();
-						shell.dispose();
-					} catch (UnsupportedModelException e1) {
-						errorMarker.setImage(errorImage);
-						errorMessage.setText(e1.getMessage());
-					}
-				} else {
-					errorMarker.setImage(errorImage);
-					errorMessage.setText("Enter a constraint");
-				}
+				closeShell();
 
 			}
+
 		});
 		cancelButton
 				.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
@@ -251,10 +240,11 @@ public class ConstraintDialog {
 						shell.dispose();
 					}
 				});
+
 	}
 
 	/**
-	 * 
+	 * initializes the upper part of the dialog
 	 */
 	private void initHead() {
 
@@ -280,16 +270,13 @@ public class ConstraintDialog {
 		gridData = new GridData();
 		gridData.horizontalSpan = 2;
 		capture.setLayoutData(gridData);
-
-		errorImage = ERROR_IMAGE;
-
 		imageLabel = new Label(headComposite, SWT.RIGHT | SWT.DOWN);
 		imageLabel.setImage(BANNER_IMAGE);
 		imageLabel.setBackground(shell.getDisplay().getSystemColor(
 				SWT.COLOR_WHITE));
 		gridData = new GridData(GridData.FILL_VERTICAL | GridData.END
 				| GridData.HORIZONTAL_ALIGN_END | GridData.VERTICAL_ALIGN_END);
-		gridData.widthHint = 120;
+		gridData.widthHint = 90;
 		gridData.verticalSpan = 3;
 		imageLabel.setLayoutData(gridData);
 
@@ -297,22 +284,24 @@ public class ConstraintDialog {
 		gridData = new GridData(GridData.BEGINNING);
 		gridData.widthHint = 20;
 		gridData.heightHint = 20;
+		gridData.verticalSpan = 2;
 		errorMarker.setBackground(shell.getDisplay().getSystemColor(
 				SWT.COLOR_WHITE));
 		errorMarker.setLayoutData(gridData);
 
-		errorMessage = new Label(headComposite, SWT.SINGLE);
+		errorMessage = new Text(headComposite, SWT.MULTI);
 		errorMessage.setBackground(shell.getDisplay().getSystemColor(
 				SWT.COLOR_WHITE));
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.grabExcessHorizontalSpace = true;
+		gridData.grabExcessVerticalSpace = true;
+		gridData.verticalSpan = 2;
 
-		errorMessage.setText(headerText);
 		errorMessage.setLayoutData(gridData);
 	}
 
 	/**
-	 * 
+	 * initializes the Text containing the constraint
 	 */
 	private void initConstraintText() {
 		Composite constraintTextComposite = new Composite(shell, SWT.NONE);
@@ -320,18 +309,19 @@ public class ConstraintDialog {
 		constraintTextComposite.setLayoutData(gridData);
 		FormLayout constraintTextLayout = new FormLayout();
 		constraintTextComposite.setLayout(constraintTextLayout);
-
-//		Button validateButton = new Button(constraintTextComposite, SWT.NONE);
-//		validateButton.setText("Validate");
-//		FormData formDataValidateButton = new FormData();
-//		formDataValidateButton.width = 70;
-//		formDataValidateButton.right = new FormAttachment(100, -5);
-//		validateButton.setLayoutData(formDataValidateButton);
-
 		constraintText = new Text(constraintTextComposite, SWT.SINGLE
 				| SWT.BORDER);
+
+		ContentProposalAdapter adapter = new ContentProposalAdapter(
+				constraintText, new ConstraintContentAdapter(),
+				new ConstraintContentProposalProvider(
+						featuremodel.getFeatureNames()), null, null);
+
+		adapter.setAutoActivationDelay(500);
+		adapter.setPopupSize(new Point(250, 125));
+		adapter.setLabelProvider(new ConstraintProposalLabelProvider());
 		FormData formDataConstraintText = new FormData();
-		formDataConstraintText.right = new FormAttachment(100/*validateButton*/, -5);
+		formDataConstraintText.right = new FormAttachment(100, -5);
 		formDataConstraintText.left = new FormAttachment(0, 5);
 		constraintText.setLayoutData(formDataConstraintText);
 		constraintText.setText(initialConstraint);
@@ -347,11 +337,21 @@ public class ConstraintDialog {
 
 		});
 
+		constraintText.addModifyListener(new ModifyListener() {
+
+			@Override
+			public void modifyText(ModifyEvent e) {
+				validate();
+
+			}
+
+		});
+
 	}
 
 	/**
- * 
- */
+	 * initializes the Group containing the operator buttons
+	 */
 	private void initButtonGroup() {
 		buttonGroup = new Group(shell, SWT.NONE);
 		buttonGroup.setText("Operators");
@@ -374,12 +374,17 @@ public class ConstraintDialog {
 					StringBuffer temp = new StringBuffer(constraintText
 							.getText());
 					temp.delete(x, y);
-					temp.insert(x > y ? y : x, /*" "
-							+ */button.getText().toLowerCase()
-									/*.replaceAll(" ", "") + " "*/);
-					constraintText.setText(reduceWhiteSpaces(temp.toString()));
+					temp.insert(x > y ? y : x, /*
+												 * " " +
+												 */button.getText()
+							.toLowerCase()
+					/* .replaceAll(" ", "") + " " */);
+					constraintText.setText(NodeReader.reduceWhiteSpaces(temp
+							.toString()));
 					constraintText.setFocus();
 					constraintText.setSelection(constraintText.getCharCount());
+
+					validate();
 				}
 			});
 
@@ -387,6 +392,11 @@ public class ConstraintDialog {
 
 	}
 
+	/**
+	 * initializes the group containing the searchText and featureTable
+	 * 
+	 * @param featuremodel
+	 */
 	private void initFeatureGroup(final FeatureModel featuremodel) {
 		featureGroup = new Group(shell, SWT.NONE);
 		featureGroup.setText("Features");
@@ -415,8 +425,7 @@ public class ConstraintDialog {
 		final TableViewer featureTableViewer = new TableViewer(tableComposite,
 				SWT.BORDER | SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL);
 		featureTable = featureTableViewer.getTable();
-		featureTableViewer.setContentProvider(ArrayContentProvider
-				.getInstance());
+		featureTableViewer.setContentProvider(new ArrayContentProvider());
 		TableViewerColumn viewerNameColumn = new TableViewerColumn(
 				featureTableViewer, SWT.NONE);
 		TableColumnLayout tableColumnLayout = new TableColumnLayout();
@@ -443,10 +452,10 @@ public class ConstraintDialog {
 			}
 		});
 
-		searchFeatureText.addListener(SWT.CHANGED, new Listener() {
+		searchFeatureText.addModifyListener(new ModifyListener() {
 
 			@Override
-			public void handleEvent(Event event) {
+			public void modifyText(ModifyEvent e) {
 				ViewerFilter searchFilter = new ViewerFilter() {
 
 					@Override
@@ -467,6 +476,7 @@ public class ConstraintDialog {
 			}
 
 		});
+
 		searchFeatureText.addListener(SWT.FocusOut, new Listener() {
 
 			@Override
@@ -505,36 +515,305 @@ public class ConstraintDialog {
 				StringBuffer temp = new StringBuffer(constraintText.getText());
 
 				temp.delete(x, y);
-				temp.insert(x > y ? y : x, " " + selectedItem[0].getText()
-						+ " ");
-				
-				constraintText.setText(reduceWhiteSpaces(temp.toString()));
-				
+				if (selectedItem.length > 0) {
+					temp.insert(x > y ? y : x, " " + selectedItem[0].getText()
+							+ " ");
+				}
+				constraintText.setText(NodeReader.reduceWhiteSpaces(temp
+						.toString()));
+
 				constraintText.setSelection(constraintText.getCharCount());
 				searchFeatureText.setText(FILTERTEXT);
 				searchFeatureText.setForeground(shell.getDisplay()
 						.getSystemColor(SWT.COLOR_GRAY));
 				constraintText.setFocus();
 				featureTableViewer.resetFilters();
+
+				validate();
 			}
 		});
-		
+
 	}
+
 	/**
-	 * reduces  
-	 * @param str
-	 * @return
+	 * returns true if constraint is satisfiable otherwise false
+	 * 
+	 * @param constraint
+	 *            the constraint to be evaluated
+	 * @param timeout
+	 *            timeout in ms
 	 */
-	private static String reduceWhiteSpaces(String str){
-		if(str.length()<2)return str;
-		StringBuffer strBuf = new StringBuffer();
-		strBuf.append(str.charAt(0));
-		for(int i=1;i<str.length();i++){
-			if(!(Character.isWhitespace(str.charAt(i-1))&&Character.isWhitespace(str.charAt(i)))){
-				strBuf.append(str.charAt(i));
+	public boolean isSatisfiable(String constraint, int timeout) {
+		NodeReader nodeReader = new NodeReader();
+		SatSolver satsolver = new SatSolver(nodeReader.stringToNode(constraint)
+				.clone(), timeout);
+		try {
+			return satsolver.isSatisfiable();
+		} catch (TimeoutException e) {
+			return true;
+		}
+
+	}
+
+	/**
+	 * returns true if the constraint is always true
+	 * 
+	 * @param constraint
+	 *            the constraint to be evaluated
+	 * @param timeout
+	 *            timeout in ms
+	 * 
+	 */
+	public boolean isTautology(String constraint, int timeout) {
+		NodeReader nodeReader = new NodeReader();
+		Node node = nodeReader.stringToNode(constraint);
+
+		SatSolver satsolver = new SatSolver(new Not(node.clone()), timeout);
+
+		try {
+			return !satsolver.isSatisfiable();
+		} catch (TimeoutException e) {
+
+			return true;
+		}
+
+	}
+
+	/**
+	 * returns true if the constraint causes the feature model to be void
+	 * otherwise false
+	 * 
+	 * @param input
+	 *            constraint to be evaluated
+	 * @param model
+	 *            the feature model
+	 * 
+	 *            * @throws TimeoutException
+	 */
+	public boolean voidsModel(String input, FeatureModel model)
+			throws TimeoutException {
+
+		if (!model.isValid()) {
+
+			return false;
+		}
+		if (input.length() == 0) {
+
+			return false;
+		}
+		FeatureModel clonedModel = model.clone();
+		NodeReader nodeReader = new NodeReader();
+
+		List<String> featureList = new ArrayList<String>(
+				clonedModel.getFeatureNames());
+		Node propNode = nodeReader.stringToNode(input, featureList);
+		if (propNode != null) {
+			if (constraint != null) {
+				clonedModel.removePropositionalNode(constraint);
+			}
+			clonedModel.addPropositionalNode(propNode);
+			clonedModel.handleModelDataChanged();
+		}
+
+		return (!clonedModel.isValid());
+
+	}
+
+	/**
+	 * returns a List of all features that are caused to be dead by the
+	 * constraint input
+	 * 
+	 * @param input
+	 *            constraint to be evaluated
+	 * @param model
+	 *            the feature model
+	 * @return List of all dead Features, empty if no feature is caused to be
+	 *         dead
+	 */
+	public List<Literal> getDeadFeatures(String input, FeatureModel model) {
+
+		FeatureModel clonedModel = model.clone();
+		List<Literal> deadFeaturesBefore = model.getDeadFeatures();
+		NodeReader nodeReader = new NodeReader();
+
+		List<String> featureList = new ArrayList<String>(
+				clonedModel.getFeatureNames());
+		Node propNode = nodeReader.stringToNode(input, featureList);
+		if (propNode != null) {
+			if (constraint != null) {
+				clonedModel.removePropositionalNode(constraint);
+			}
+			clonedModel.addPropositionalNode(propNode);
+			clonedModel.handleModelDataChanged();
+		}
+
+		List<Literal> deadFeaturesAfter = new ArrayList<Literal>();
+
+		for (Literal l : clonedModel.getDeadFeatures()) {
+			if (!deadFeaturesBefore.contains(l)) {
+				deadFeaturesAfter.add(l);
+
 			}
 		}
-		return strBuf.toString();
+		return deadFeaturesAfter;
 	}
-	
+
+	/**
+	 * validates the current constraint in constraintText
+	 * 
+	 */
+	private boolean validate() {
+		NodeReader nodereader = new NodeReader();
+		String con = constraintText.getText().trim();
+		boolean isWellformed = nodereader.isWellFormed(con,
+				new ArrayList<String>(featuremodel.getFeatureNames()));
+
+		if (!isWellformed) {
+			printHeaderError(nodereader.getErrorMessage());
+			return false;
+		}
+
+		if (isTautology(con, 1000)) {
+
+			printHeaderWarning("contraint is a tautology");
+			return false;
+		}
+		if (!isSatisfiable(con, 1000)) {
+
+			printHeaderError("contraint is unsatisfiable");
+			return false;
+		}
+		try {
+			if (featuremodel.isValid() && voidsModel(con, featuremodel)) {
+
+				printHeaderWarning("constraint makes model void");
+				return false;
+			}
+		} catch (TimeoutException e) {
+
+			e.printStackTrace();
+		}
+		List<Literal> deadFeatures = getDeadFeatures(con, featuremodel);
+		if (!deadFeatures.isEmpty()) {
+			printHeaderWarning(getDeadFeatureString(deadFeatures));
+			return false;
+		}
+		printHeaderText(headerText);
+
+		return true;
+	}
+
+	/**
+	 * returns a String to be displayed in the dialog header contains the list
+	 * of dead features
+	 * 
+	 * @param deadFeatures
+	 *            List of dead Features
+	 * */
+	private String getDeadFeatureString(List<Literal> deadFeatures) {
+		StringBuffer featureString = new StringBuffer();
+		featureString.append("constraint causes features to be dead: ");
+		int count = 0;
+		int featureCount = 0;
+		boolean isNewLine = false;
+		for (Literal l : deadFeatures) {
+			count = count + l.toString().length() + 2;
+
+			if (isNewLine == false && count > 35) {
+				featureString.append("\n");
+				isNewLine = true;
+			}
+			if (count < 90) {
+				featureString.append(l.toString().substring(1));
+				if (featureCount < deadFeatures.size() - 1)
+					featureString.append(", ");
+				featureCount++;
+
+			}
+			if (deadFeatures.indexOf(l) == deadFeatures.size() - 1) {
+
+			}
+
+		}
+		if (featureCount < deadFeatures.size()) {
+			featureString.append("...");
+		}
+		return featureString.toString();
+	}
+
+	/**
+	 * displays a warning in the header
+	 * 
+	 * @param message
+	 *            message to be displayed
+	 */
+	private void printHeaderWarning(String message) {
+		okButton.setEnabled(true);
+		errorMarker.setImage(WARNING_IMAGE);
+		errorMarker.setVisible(true);
+		errorMessage.setText(message);
+		errorMessage.pack();
+	}
+
+	/**
+	 * displays an error in the header
+	 * 
+	 * @param message
+	 *            message to be displayed
+	 */
+	private void printHeaderError(String message) {
+		okButton.setEnabled(false);
+		errorMarker.setImage(ERROR_IMAGE);
+		errorMarker.setVisible(true);
+		errorMessage.setText(message);
+	}
+
+	/**
+	 * displays a Text in the header
+	 * 
+	 * @param message
+	 *            message to be displayed
+	 */
+	private void printHeaderText(String message) {
+		okButton.setEnabled(true);
+		errorMarker.setVisible(false);
+		errorMessage.setText(message);
+
+	}
+
+	/**
+	 * closes the shell and adds new constraint to the feature model if possible
+	 * 
+	 * @param featuremodel
+	 * @param constraint
+	 */
+	private void closeShell() {
+		NodeReader nodeReader = new NodeReader();
+		String input = constraintText.getText().trim();
+
+		if (input.length() == 0) {
+			printHeaderError("constraint is empty");
+			return;
+		}
+
+		List<String> featureList = new ArrayList<String>(
+				featuremodel.getFeatureNames());
+		Node propNode = nodeReader.stringToNode(input, featureList);
+
+		if (propNode == null) {
+			printHeaderError(nodeReader.getErrorMessage());
+			return;
+		}
+		if (!isSatisfiable(input, 1000)) {
+			printHeaderError("constraint is unsatisfiable");
+			return;
+		}
+		if (constraint != null) {
+			featuremodel.removePropositionalNode(constraint);
+		}
+		featuremodel.addPropositionalNode(propNode);
+		featuremodel.handleModelDataChanged();
+		shell.dispose();
+
+	}
 }

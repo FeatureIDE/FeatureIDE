@@ -48,6 +48,8 @@ public class FeatureMoveEditPolicy extends NonResizableEditPolicy implements GUI
 	private FeatureEditPart editPart;
 
 	private ModelLayoutEditPolicy superPolicy;
+	
+	private FeatureDragAndDropCommand cmd;
 
 	public FeatureMoveEditPolicy(FeatureEditPart editPart, ModelLayoutEditPolicy superPolicy) {
 		this.editPart = editPart;
@@ -87,6 +89,7 @@ public class FeatureMoveEditPolicy extends NonResizableEditPolicy implements GUI
 	
 	@Override
 	protected void showChangeBoundsFeedback(ChangeBoundsRequest request) {
+
 		//call createDragSourceFeedbackFigure on start of the move
 		getDragSourceFeedbackFigure();
 		
@@ -102,18 +105,20 @@ public class FeatureMoveEditPolicy extends NonResizableEditPolicy implements GUI
 		s2.translate(request.getMoveDelta());
 		c.setSourceAnchor(new XYAnchor(s2));
 
-		FeatureDragAndDropCommand cmd = superPolicy.getConstraintCommand();
-		Point location;
-		if (cmd != null && cmd.getNewParent() != null) {
-			location = FeatureUIHelper.getTargetLocation(cmd.getNewParent());
-			getHostFigure().translateToAbsolute(location);
-			c.setForegroundColor(cmd.canExecute() ? NEW_CONNECTION_FOREGROUND : VOID_CONNECTION_FOREGROUND);			
-		}
-		else
-			location = s2;
-		c.setTargetAnchor(new XYAnchor(location));
+		if(superPolicy.getConstraintCommand() instanceof FeatureDragAndDropCommand){
+		cmd = (FeatureDragAndDropCommand)superPolicy.getConstraintCommand();
+			Point location;
+			if (cmd != null && cmd.getNewParent() != null) {
+				location = FeatureUIHelper.getTargetLocation(cmd.getNewParent());
+				getHostFigure().translateToAbsolute(location);
+				c.setForegroundColor(cmd.canExecute() ? NEW_CONNECTION_FOREGROUND : VOID_CONNECTION_FOREGROUND);			
+			}
+			else
+				location = s2;
+			c.setTargetAnchor(new XYAnchor(location));
+		
 	}
-	
+	}
 	@Override
 	protected void eraseChangeBoundsFeedback(ChangeBoundsRequest request) {
 		super.eraseChangeBoundsFeedback(request);
