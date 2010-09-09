@@ -41,7 +41,6 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
-
 /**
  * The model representation of the feature tree that notifies listeners of
  * changes in the tree.
@@ -290,32 +289,31 @@ public class FeatureModel implements PropertyConstants {
 	public Collection<Feature> getFeatures() {
 		return Collections.unmodifiableCollection(featureTable.values());
 	}
-/*
-	public Collection<Feature> getLayers() {
-		LinkedList<Feature> layers = new LinkedList<Feature>();
-		for (Feature feature : featureTable.values())
-			if (feature.isConcrete())
-				layers.add(feature);
-		return Collections.unmodifiableCollection(layers);
-	}*/
+
+	/*
+	 * public Collection<Feature> getLayers() { LinkedList<Feature> layers = new
+	 * LinkedList<Feature>(); for (Feature feature : featureTable.values()) if
+	 * (feature.isConcrete()) layers.add(feature); return
+	 * Collections.unmodifiableCollection(layers); }
+	 */
 	private LinkedList<Feature> layers = new LinkedList<Feature>();
-	
-	public Collection<Feature> getLayers(){
+
+	public Collection<Feature> getLayers() {
 		layers.clear();
 		initFeatures(root);
 		return Collections.unmodifiableCollection(layers);
 	}
-		
+
 	private void initFeatures(Feature feature) {
 		if (feature.isConcrete())
 			layers.add(feature);
 		for (Feature child : feature.getChildren())
 			initFeatures(child);
 	}
-	
-	public Collection<String> getLayerNames(){
+
+	public Collection<String> getLayerNames() {
 		LinkedList<String> layerNames = new LinkedList<String>();
-		for (Feature layer : getLayers()){
+		for (Feature layer : getLayers()) {
 			layerNames.add(layer.getName());
 		}
 		return layerNames;
@@ -609,8 +607,8 @@ public class FeatureModel implements PropertyConstants {
 
 	private Node conjunct(Set<Feature> b) {
 		Iterator<Feature> iterator = b.iterator();
-		Node result = new Literal(NodeCreator
-				.getVariable(iterator.next(), this));
+		Node result = new Literal(
+				NodeCreator.getVariable(iterator.next(), this));
 		while (iterator.hasNext())
 			result = new And(result, new Literal(NodeCreator.getVariable(
 					iterator.next(), this)));
@@ -658,7 +656,18 @@ public class FeatureModel implements PropertyConstants {
 				common.add(literal.var.toString());
 		return common;
 	}
-	
+
+	public List<Literal> getDeadFeatures() {
+		Node root = NodeCreator.createNodes(this);
+		List<Literal> set = new ArrayList<Literal>();
+		for (Literal e : new SatSolver(root, 1000).knownValues()) {
+			if (!e.positive) {
+				set.add(e);
+			}
+		}
+		return set;
+
+	}
 	/**
 	 * Checks a string to be a valid featurename.
 	 * @param s Possible featurename to be checked
