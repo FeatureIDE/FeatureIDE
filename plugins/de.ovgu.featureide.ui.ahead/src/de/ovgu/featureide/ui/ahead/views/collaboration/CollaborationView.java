@@ -255,7 +255,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		filterAction.setEnabled(!isEmpty);
 		delAction.setEnabled(!isEmpty);
 		
-		menuMgr.add(addClassAction);
+	//	menuMgr.add(addClassAction); FIXME: doesn't work
 		menuMgr.add(filterAction);
 		menuMgr.add(delAction);
 	}

@@ -141,9 +141,11 @@ public class RoleFigure extends Figure implements GUIDefaults{
 			setName("Files: "+ fileCount);
 			tooltipContent.add(fileFigure);
 		} else {
-			tooltipContent.add(new Label(name + " ", null));
+			CompartmentFigure fileFigure = new CompartmentFigure(); 
+			fileFigure.add(new Label(role.featureName + " ", featureIcon));
+			fileFigure.add(new Label(label.getText() + " ", null));
 			
-			tooltipContent.add(new Label(role.featureName + " ", featureIcon));
+			tooltipContent.add(fileFigure);
 		}
 		
 		contentsLayout.setConstraint(this, new Rectangle(0,0,-1,-1));
