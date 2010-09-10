@@ -73,11 +73,11 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.actions.ActionFactory;
+import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.ide.IGotoMarker;
 import org.eclipse.ui.part.MultiPageEditorPart;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
-import org.eclipse.wst.sse.ui.StructuredTextEditor;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
@@ -124,7 +124,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 
 	private GraphicalViewerImpl graphicalViewer;
 
-	private StructuredTextEditor textEditor;
+	private TextEditor textEditor;
 	
 	private int graphicalViewerIndex;
 
@@ -268,7 +268,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 
 	void createSourcePage() {
 		closeEditor = false;
-		textEditor = new StructuredTextEditor();
+		textEditor = new TextEditor();
 		try {
 			textEditorIndex = addPage(textEditor, getEditorInput());
 			setPageText(textEditorIndex, "Source");
