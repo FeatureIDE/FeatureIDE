@@ -19,7 +19,7 @@
 package de.ovgu.featureide.fm.ui.editors;
 
 
-import org.eclipse.jface.fieldassist.ContentProposal;
+
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 
