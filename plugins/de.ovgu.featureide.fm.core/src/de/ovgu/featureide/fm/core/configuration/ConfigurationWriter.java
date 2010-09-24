@@ -43,59 +43,26 @@ public class ConfigurationWriter {
 	}
 
 	public void saveToFile(IFile file) throws CoreException {
-		InputStream source;
-		StringBuffer buffer = new StringBuffer();
-		File project = ((IFile) file.getAdapter(IFile.class)).getProject()
-				.getLocation().toFile();
-		String fileSep = System.getProperty("file.separator");
-		File orderFile = new File(project.toString() + fileSep + ".order");
-		if (orderFile.exists()) {
-			FeatureOrderReader reader = new FeatureOrderReader(project);
-			ArrayList<String> list = reader.featureOrderRead();
-			Set<Feature> featureset = configuration.getSelectedFeatures();
-			if (new String(list.get(0)).equals("true")) {
-				list.remove(0);
-				for (String s : list) {
-					for (Feature f : featureset) {
-						if (f.isLayer()) {
-							if (f.getName().equals(s))
-								buffer.append(s + "\r\n");
-						}
-					}
-				}
-				source = new ByteArrayInputStream(buffer.toString().getBytes());
-			} else {
-				source = new ByteArrayInputStream(writeIntoString().getBytes());
-			}
-		} else {
-			source = new ByteArrayInputStream(writeIntoString().getBytes());
-		}
-
+		InputStream source = new ByteArrayInputStream(writeIntoString(file).getBytes()); 
+		
 		if (file.exists()) {
 			file.setContents(source, false, true, null);
 		} else {
 			file.create(source, false, null);
 		}
 	}
-
-	public String writeIntoString() {
-		StringBuffer out = new StringBuffer();
-		writeSelectedFeatures(configuration.getRoot(), out);
-		return out.toString();
-	}
 	
-	// TODO make a method for same parts of writeIntoString and safeToFile 
-	public String writeIntoString2(IFile file){
+	public String writeIntoString(IFile file){
 		StringBuffer buffer = new StringBuffer();
 		File project = ((IFile) file.getAdapter(IFile.class)).getProject()
 			.getLocation().toFile();
 		FeatureOrderReader reader = new FeatureOrderReader(project);
-		Set<Feature> featureset = configuration.getSelectedFeatures();
 		String fileSep = System.getProperty("file.separator");
 		File orderFile = new File(project.toString() + fileSep + ".order");
 		if (orderFile.exists()){
 			ArrayList<String> list = reader.featureOrderRead();
 			if (new String(list.get(0)).equals("true")) {
+				Set<Feature> featureset = configuration.getSelectedFeatures();
 				list.remove(0);
 				for (String s : list) {
 					for (Feature f : featureset) {
@@ -108,16 +75,17 @@ public class ConfigurationWriter {
 				return buffer.toString();
 			}
 		}
-		return writeIntoString();
+		writeSelectedFeatures(configuration.getRoot(), buffer);
+		return buffer.toString();
 	}
 
 	private void writeSelectedFeatures(SelectableFeature feature,
-			StringBuffer out) {
+			StringBuffer buffer) {
 		if (feature.getFeature().isLayer()
 				&& feature.getSelection() == Selection.SELECTED)
-			out.append(feature.getName() + "\r\n");
+			buffer.append(feature.getName() + "\r\n");
 		for (TreeElement child : feature.getChildren())
-			writeSelectedFeatures((SelectableFeature) child, out);
+			writeSelectedFeatures((SelectableFeature) child, buffer);
 	}
 
 }

@@ -197,26 +197,27 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		boolean binFolderExists = (featureProject.getBinFolder().getFolder(equationName).exists());
 		boolean notComposed;
 		for (String feature : selectedFeatures)
-			for(IResource res : featureProject.getSourceFolder().getFolder(feature).members()){
-				notComposed = true;
-				for (String extension : extensions)
-					if (res.getName().endsWith(extension))
-						notComposed = false;
-				if (notComposed){
-					if (res instanceof IFile){
-						res.copy(new Path (featureProject.getBuildFolder().getFolder(equationName).getFullPath().toString()+"/"+res.getName()), true, null);
-						if (binFolderExists)
-							res.copy(new Path (featureProject.getBinFolder().getFolder(equationName).getFullPath().toString()+"/"+res.getName()), true, null);
-					}
-					if (res instanceof IFolder){
-						createFolder("build/"+equationName+"/"+res.getName());
-						if (binFolderExists)
-							createFolder("bin/"+equationName+"/"+res.getName());
-						for (IResource res2 : ((IFolder) res).members())
-							copyNotComposedFiles(extensions, equationName+"/"+res.getName(), res2, binFolderExists);
+			if (featureProject.getSourceFolder().getFolder(feature).exists())
+				for(IResource res : featureProject.getSourceFolder().getFolder(feature).members()){
+					notComposed = true;
+					for (String extension : extensions)
+						if (res.getName().endsWith(extension))
+							notComposed = false;
+					if (notComposed){
+						if (res instanceof IFile){
+							res.copy(new Path (featureProject.getBuildFolder().getFolder(equationName).getFullPath().toString()+"/"+res.getName()), true, null);
+							if (binFolderExists)
+								res.copy(new Path (featureProject.getBinFolder().getFolder(equationName).getFullPath().toString()+"/"+res.getName()), true, null);
+						}
+						if (res instanceof IFolder){
+							createFolder("build/"+equationName+"/"+res.getName());
+							if (binFolderExists)
+								createFolder("bin/"+equationName+"/"+res.getName());
+							for (IResource res2 : ((IFolder) res).members())
+								copyNotComposedFiles(extensions, equationName+"/"+res.getName(), res2, binFolderExists);
+						}
 					}
 				}
-			}
 	}
 	
 	private void copyNotComposedFiles(ArrayList<String> extensions,String folderName, IResource res, boolean binFolderExists) throws CoreException {

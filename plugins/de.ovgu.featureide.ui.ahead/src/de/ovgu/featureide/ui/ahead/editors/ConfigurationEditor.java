@@ -179,7 +179,7 @@ PropertyConstants, PropertyChangeListener, IResourceChangeListener {
 	private void setConfiguration() {
 		IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
 		featureModel = featureProject.getFeatureModel();
-		String text = new ConfigurationWriter(configuration).writeIntoString();
+		String text = new ConfigurationWriter(configuration).writeIntoString(file);
 		configuration = new Configuration(featureModel, true);
 		try {
 			new ConfigurationReader(configuration).readFromString(text);
@@ -233,7 +233,7 @@ PropertyConstants, PropertyChangeListener, IResourceChangeListener {
 	}
 
 	public void updateSourcePage(){
-		source = new ConfigurationWriter(configuration).writeIntoString2(file);
+		source = new ConfigurationWriter(configuration).writeIntoString(file);
 		IDocumentProvider provider = sourceEditor.getDocumentProvider();
 		IDocument document = provider.getDocument(sourceEditor.getEditorInput());
 		if (!source.equals(document.get()))
@@ -245,7 +245,7 @@ PropertyConstants, PropertyChangeListener, IResourceChangeListener {
 		if (oldPageIndex == sourceEditorIndex){
 			IDocumentProvider provider = sourceEditor.getDocumentProvider();
 			IDocument document = provider.getDocument(sourceEditor.getEditorInput());
-			if (!new ConfigurationWriter(configuration).writeIntoString2(file).equals(document.get())){
+			if (!new ConfigurationWriter(configuration).writeIntoString(file).equals(document.get())){
 				configuration = new Configuration(featureModel, true);
 				try {
 					new ConfigurationReader(configuration).readFromString(document.get());

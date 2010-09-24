@@ -50,6 +50,7 @@ import de.ovgu.featureide.ui.ahead.AheadUIPlugin;
  * @author Constanze Adler
  * @author Jens Meinicke
  * @author Stephan Besecke
+ * //TODO Jens: refactor
  */
 public class CollaborationModelBuilder {
 	private CollaborationModel model;
