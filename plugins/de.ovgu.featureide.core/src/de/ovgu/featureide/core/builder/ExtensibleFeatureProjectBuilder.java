@@ -103,10 +103,8 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 			if (equationFile == null)
 				return;
 	
-			String equation = equationFile.getName();
-			if (equation.contains(".")) {
-				equation = equation.substring(0, equation.indexOf('.'));
-			}
+			String equation = equationFile.getName().split("[.]")[0];
+			
 			if (featureProject.getBuildFolder().getFolder(equation).exists())
 				for (IResource res : featureProject.getBuildFolder().getFolder(equation).members())
 					res.delete(true, monitor);
@@ -170,7 +168,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 			CorePlugin.getDefault().logError(e);
 		}
 		try {
-			copy(featureProject.getComposerID(),equation);
+			copy(equation);
 		} catch (CoreException e1) {
 			CorePlugin.getDefault().logError(e1);
 		}
@@ -185,44 +183,20 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		return null;
 		
 	}
-	// copies all not composed Files from selected Features of src to bin and build
-	private void copy(String composerID, IFile equation) throws CoreException{
-		String equationName = equation.getName();
-		equationName = equationName.substring(0, equationName.indexOf('.'));
-			ArrayList<String> selectedFeatures = getSelectedFeatures(equation);
-			copyNotComposedFiles(featureProject.getComposer().extensions(), selectedFeatures, equationName);
-	}
 	
-	private void copyNotComposedFiles(ArrayList<String> extensions, ArrayList<String> selectedFeatures, String equationName) throws CoreException{
+	// copies all not composed Files of selected Features from src to bin and build
+	private void copy(IFile equation) throws CoreException{
+		String equationName = equation.getName().split("[.]")[0];
 		boolean binFolderExists = (featureProject.getBinFolder().getFolder(equationName).exists());
-		boolean notComposed;
-		for (String feature : selectedFeatures)
+		for (String feature : getSelectedFeatures(equation))
 			if (featureProject.getSourceFolder().getFolder(feature).exists())
-				for(IResource res : featureProject.getSourceFolder().getFolder(feature).members()){
-					notComposed = true;
-					for (String extension : extensions)
-						if (res.getName().endsWith(extension))
-							notComposed = false;
-					if (notComposed){
-						if (res instanceof IFile){
-							res.copy(new Path (featureProject.getBuildFolder().getFolder(equationName).getFullPath().toString()+"/"+res.getName()), true, null);
-							if (binFolderExists)
-								res.copy(new Path (featureProject.getBinFolder().getFolder(equationName).getFullPath().toString()+"/"+res.getName()), true, null);
-						}
-						if (res instanceof IFolder){
-							createFolder("build/"+equationName+"/"+res.getName());
-							if (binFolderExists)
-								createFolder("bin/"+equationName+"/"+res.getName());
-							for (IResource res2 : ((IFolder) res).members())
-								copyNotComposedFiles(extensions, equationName+"/"+res.getName(), res2, binFolderExists);
-						}
-					}
-				}
+				for(IResource res : featureProject.getSourceFolder().getFolder(feature).members())
+					copyNotComposedFiles(equationName, res, binFolderExists);
 	}
 	
-	private void copyNotComposedFiles(ArrayList<String> extensions,String folderName, IResource res, boolean binFolderExists) throws CoreException {
+	private void copyNotComposedFiles(String folderName, IResource res, boolean binFolderExists) throws CoreException {
 		boolean notComposed = true;
-		for (String extension : extensions)
+		for (String extension : featureProject.getComposer().extensions())
 			if (res.getName().endsWith(extension))
 				notComposed = false;
 		if (notComposed){
@@ -236,7 +210,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 				if (binFolderExists)
 					createFolder("bin/"+folderName+"/"+res.getName());
 				for (IResource res2 : ((IFolder) res).members())
-					copyNotComposedFiles(extensions, folderName+"/"+res.getName(), res2, binFolderExists);
+					copyNotComposedFiles(folderName+"/"+res.getName(), res2, binFolderExists);
 			}
 		}
 		
