@@ -15,49 +15,49 @@ public class SoundPlayer {
 	}
 
 	public void playBgSound() throws IOException {
-		inputStream = Tank.class.getClassLoader().getResourceAsStream("bg.wav");
+		inputStream = Tank.class.getClassLoader().getResourceAsStream("sounds/" + "bg.wav");
 		AudioPlayer.player.start(inputStream);
 	}
 
 	public void playFireSound() throws IOException {
 		inputStream = Tank.class.getClassLoader().getResourceAsStream(
-				"fire.wav");
+				"sounds/" + "fire.wav");
 		AudioPlayer.player.start(inputStream);
 	}
 
 	public void playExplodeSound() throws IOException {
 		inputStream = Tank.class.getClassLoader().getResourceAsStream(
-				"explode.wav");
+				"sounds/" + "explode.wav");
 		AudioPlayer.player.start(inputStream);
 	}
 
 	public void playMoveSound() throws IOException {
 		inputStream = Tank.class.getClassLoader().getResourceAsStream(
-				"move.wav");
+				"sounds/" + "move.wav");
 		AudioPlayer.player.start(inputStream);
 	}
 
 	public void playRogerSound() throws IOException {
 		inputStream = Tank.class.getClassLoader().getResourceAsStream(
-				"roger.wav");
+				"sounds/" + "roger.wav");
 		AudioPlayer.player.start(inputStream);
 	}
 
 	public void playYessirSound() throws IOException {
 		inputStream = Tank.class.getClassLoader().getResourceAsStream(
-				"yessir.wav");
+				"sounds/" + "yessir.wav");
 		AudioPlayer.player.start(inputStream);
 	}
 
 	public void playYeahSound() throws IOException {
 		inputStream = Tank.class.getClassLoader().getResourceAsStream(
-				"yeah.wav");
+				"sounds/" + "yeah.wav");
 		AudioPlayer.player.start(inputStream);
 	}
 
 	public void playEatSound() throws IOException {
 		inputStream = Tank.class.getClassLoader()
-				.getResourceAsStream("eat.wav");
+				.getResourceAsStream("sounds/" + "eat.wav");
 		AudioPlayer.player.start(inputStream);
 	}
 

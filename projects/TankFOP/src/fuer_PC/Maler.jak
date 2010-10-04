@@ -344,7 +344,7 @@ public refines class Maler {
 
 	public void loadimage(String id, String imagename, int a, int b) {
 		Image image = tk.getImage(Tank.class.getClassLoader().getResource(
-				imagename));
+				"images/" + imagename));
 		images.put(id, image.getScaledInstance(a, b, Image.SCALE_FAST));
 	}
 	

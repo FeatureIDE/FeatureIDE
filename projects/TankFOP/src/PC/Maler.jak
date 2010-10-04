@@ -124,7 +124,7 @@ public class Maler extends Canvas {
 	
 	public Image loadImage(String str, int a, int b) {
 		Image tempimage = tk.getImage(Tank.class.getClassLoader().getResource(
-				str));
+				"images/" + str));
 		if (a == 0 && b == 0) {
 			return tempimage;
 		}

@@ -97,7 +97,7 @@ class SoundPlayer {
     private Player createPlayer(String filename, String format) {
 
         try {
-            InputStream is = getClass().getResourceAsStream(filename);
+            InputStream is = getClass().getResourceAsStream("sounds/" + filename);
             p = Manager.createPlayer(is, format);
             p.prefetch();
         } catch (IOException ioe) {

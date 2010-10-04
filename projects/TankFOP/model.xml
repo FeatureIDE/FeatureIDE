@@ -90,5 +90,14 @@
 					</disj>
 				</imp>
 			</rule>
+			<rule>
+				<eq>
+					<var>Image</var>
+					<disj>
+						<var>fuer_PC</var>
+						<var>fuer_Handy</var>
+					</disj>
+				</eq>
+			</rule>
 		</constraints>
 	</featureModel>
