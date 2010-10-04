@@ -70,12 +70,11 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		this.setName(role.getName());
 		this.add(label);
 		this.setOpaque(true);
-		
 		// next lines defines the tooltipcontent
 		Figure tooltipContent = new Figure();		
 		FlowLayout contentsLayout = new FlowLayout();
 		tooltipContent.setLayoutManager(contentsLayout);
-
+		
 		String name = label.getText();
 		name = (name.split("[.]"))[0];
 		if (role.files.size() == 0) {
@@ -90,8 +89,8 @@ public class RoleFigure extends Figure implements GUIDefaults{
 			int methodCount = 0;
 			for(IField f : role.fields){
 				
-				Label fieldLabel = new Label(f.getFieldName() + " ");
-				if (f.isPrivate()) 
+				Label fieldLabel = new Label(f.getName() + " ");
+				if (f.isPrivate())
 					fieldLabel.setIcon(fieldPrivate);
 				else if (f.isProtected())
 					fieldLabel.setIcon(fieldProtected);
@@ -103,13 +102,19 @@ public class RoleFigure extends Figure implements GUIDefaults{
 				if (f.isOwn(role.jakFile)) {
 					fieldFigure.add(fieldLabel);
 					fieldCount++;
-					// TODO: show also constructors and types and returntypes of methods!!!
+					if (fieldCount % 25 == 0) {
+						tooltipContent.add(fieldFigure);
+						fieldFigure = new CompartmentFigure();
+						fieldFigure.add(new Label(""));
+					}
 				}
 			}
+			if (fieldCount % 25 != 0)
+				tooltipContent.add(fieldFigure);
 			
 			for(IMethod m : role.methods){
 				
-				Label methodLabel = new Label(m.getMethodName() + "() ");
+				Label methodLabel = new Label(m.getName() + " ");
 				if (m.isPrivate())			
 					methodLabel.setIcon(methodPrivate);
 				else if (m.isProtected())
@@ -122,13 +127,18 @@ public class RoleFigure extends Figure implements GUIDefaults{
 				if (m.isOwn(role.jakFile)) {
 					methodFigure.add(methodLabel);
 					methodCount++;
-					
+					if (methodCount % 25 == 0) {
+						tooltipContent.add(methodFigure);
+						methodFigure = new CompartmentFigure();
+						methodFigure.add(new Label(""));
+					}
 				}
 			}
+			if (methodCount % 25 != 0)
+				tooltipContent.add(methodFigure);
+			
 			setName("Fields: " + fieldCount + " Methods: " + methodCount);
 			
-			tooltipContent.add(fieldFigure);
-			tooltipContent.add(methodFigure);
 		} else if (role.getName().startsWith("*.")) {
 			CompartmentFigure fileFigure = new CompartmentFigure();
 			fileFigure.add(new Label(role.featureName + " ", featureIcon));
@@ -137,9 +147,15 @@ public class RoleFigure extends Figure implements GUIDefaults{
 				Label fieldLabel = new Label(file);
 				fileFigure.add(fieldLabel);
 				fileCount++;
+				if (fileCount % 25 == 0) {
+					tooltipContent.add(fileFigure);
+					fileFigure = new CompartmentFigure();
+					fileFigure.add(new Label(""));
+				}
 			}
 			setName("Files: "+ fileCount);
-			tooltipContent.add(fileFigure);
+			if (fileCount % 25 != 0)
+				tooltipContent.add(fileFigure);
 		} else {
 			CompartmentFigure fileFigure = new CompartmentFigure(); 
 			fileFigure.add(new Label(role.featureName + " ", featureIcon));

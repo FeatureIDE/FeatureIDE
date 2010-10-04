@@ -31,6 +31,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 
+import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtension;
 import de.ovgu.featureide.core.jakprojectmodel.IClass;
@@ -56,7 +57,11 @@ public class CollaborationModelBuilder {
 
 	public LinkedList<String> classFilter = new LinkedList<String>();
 	public LinkedList<String> featureFilter = new LinkedList<String>();
-
+	
+	private Collaboration collaboration;
+	private ArrayList<String> extensions;
+	private IJakProjectModel jakProject;
+	
 	public CollaborationModelBuilder() {
 		model = new CollaborationModel();
 	}
@@ -74,7 +79,7 @@ public class CollaborationModelBuilder {
 		if (composer == null)
 			return null;
 
-		IJakProjectModel jakProject = featureProject.getJakProjectModel();
+		jakProject = featureProject.getJakProjectModel();
 
 		ArrayList<IFeature> iFeatures = null;
 		ArrayList<Feature> features = null;
@@ -90,13 +95,10 @@ public class CollaborationModelBuilder {
 		IFolder path = null;
 		path = featureProject.getSourceFolder();
 		
-		if (composer.getName().equals("AHEAD")) {
-			if (iFeatures == null || iFeatures.size() == 0)
-				return null;
-			
+		if (composer.getName().equals("AHEAD") && jakProject != null) {
 			for (IFeature feature : iFeatures) {
 				if (featureFilter.size() == 0 || featureFilter.contains(feature.getName())) {
-					Collaboration collaboration = null;
+					collaboration = null;
 					IJakModelElement[] element = feature.getChildren();
 					if (element instanceof IClass[]) {
 						for (IClass iClass : (IClass[]) element) {
@@ -144,49 +146,22 @@ public class CollaborationModelBuilder {
 						UIPlugin.getDefault().logError(e);
 					}
 					for (IResource res : members) {
-						if (!(res instanceof IFolder)) {
-							if (classFilter.size() == 0 || classFilter.contains("*." + (res.getName().split("[.]"))[1])) {
-								if (!res.getName().endsWith(".jak")) {
-									if (collaboration == null)
-										collaboration = new Collaboration(
-												feature.getName());
-									String name = "*."
-											+ (res.getName().split("[.]"))[1];
-									Role role = new Role(name);
-									for (Role modelRole : model.roles) {
-										if (modelRole.featureName.equals(feature
-												.getName())
-												&& modelRole.getName().equals(name)) {
-											role = modelRole;
-											break;
-										}
-									}
-									role.featureName = feature.getName();
-									role.files.add(res.getName());
-									Class cl = new Class(name);
-									if (model.classes.containsKey(cl.getName())) {
-										role.setParentClass(model.classes.get(cl
-												.getName()));
-									} else {
-										role.setParentClass(cl);
-										model.classes.put(cl.getName(), cl);
-									}
-									role.setCollaboration(collaboration);
-									model.roles.add(role);
-								}
-							}
-						}
+						extensions = new ArrayList<String>();
+						extensions.add(".jak");
+						addArbitraryFiles(res, feature.getName());
 					}
 					if (collaboration != null)
 						model.collaborations.add(collaboration);
 				}
 			}
 		} else {
-			ArrayList<String> extensions = new ArrayList<String>();
+			extensions = new ArrayList<String>();
 			if (composer.getName().equals("FeatureHouse")) {
 				extensions = extensions();
 			} else if (composer.getName().equals("FeatureC++")) {
 				extensions.add(".h");
+			} else if (composer.getName().equals("AHEAD")) {
+				extensions.add(".jak");
 			}
 			
 			if (extensions == null)
@@ -194,7 +169,7 @@ public class CollaborationModelBuilder {
 			
 			for (Feature feature : features) {
 				if (featureFilter.size() == 0 || featureFilter.contains(feature.getName())) {
-					Collaboration collaboration = null;
+					collaboration = null;
 					IResource[] members = null;
 					try {
 						members = featureProject.getSourceFolder().getFolder(feature.getName()).members();
@@ -202,88 +177,7 @@ public class CollaborationModelBuilder {
 						UIPlugin.getDefault().logError(e);
 					}
 					for (IResource res : members) {
-						if (!(res instanceof IFolder)) {
-							if (classFilter.size() == 0 
-									|| classFilter.contains("*." + (res.getName().split("[.]"))[1])
-									|| classFilter.contains(res.getName())) {
-								if (collaboration == null)
-									collaboration = new Collaboration(feature.getName());
-								
-								String name = "." + (res.getName().split("[.]"))[1];
-								Role role;
-								if (extensions.contains(name)) {
-									role = new Role(res.getName());
-									name = res.getName();
-								} else {
-									name = "*" + name;
-									role = new Role(name);
-								}
-								for (Role modelRole : model.roles) {
-									if (modelRole.featureName.equals(feature.getName()) && modelRole.getName().equals(name)) {
-										role = modelRole;
-										break;
-									}
-								}
-								role.featureName = feature.getName();
-								role.files.add(res.getName());
-								Class cl = new Class(name);
-								if (model.classes.containsKey(cl.getName())) {
-									role.setParentClass(model.classes
-											.get(cl.getName()));
-								} else {
-									role.setParentClass(cl);
-									model.classes.put(cl.getName(), cl);
-								}
-								role.setCollaboration(collaboration);
-								model.roles.add(role);
-							}
-						} else {
-							IResource[] member = null;
-							try {
-								member = ((IFolder)res).members();
-							} catch (CoreException e) {
-								UIPlugin.getDefault().logError(e);
-							}
-							for (IResource file : member) {
-								if (!(file instanceof IFolder)) {
-									if (classFilter.size() == 0 
-											|| classFilter.contains("*." + (file.getName().split("[.]"))[1])
-											|| classFilter.contains(file.getName())) {
-										if (collaboration == null)
-											collaboration = new Collaboration(feature.getName());
-										
-										String name = "." + (file.getName().split("[.]"))[1];
-										
-										Role role;
-										if (extensions.contains(name)) {
-											role = new Role(file.getName());
-											name = file.getName();
-										} else {
-											name = "*" + name;
-											role = new Role(name);
-										}
-										for (Role modelRole : model.roles) {
-											if (modelRole.featureName.equals(feature.getName()) && modelRole.getName().equals(name)) {
-												role = modelRole;
-												break;
-											}
-										}
-										role.featureName = feature.getName();
-										role.files.add(file.getName());
-										Class cl = new Class(name);
-										if (model.classes.containsKey(cl.getName())) {
-											role.setParentClass(model.classes
-													.get(cl.getName()));
-										} else {
-											role.setParentClass(cl);
-											model.classes.put(cl.getName(), cl);
-										}
-										role.setCollaboration(collaboration);
-										model.roles.add(role);
-									}
-								}
-							}
-						}
+						addArbitraryFiles(res, feature.getName());
 					}
 					if (collaboration != null)
 						model.collaborations.add(collaboration);
@@ -291,6 +185,56 @@ public class CollaborationModelBuilder {
 			}
 		}
 		return model;
+	}
+	
+	private void addArbitraryFiles(IResource res, String featureName) {
+		if (!(res instanceof IFolder)) {
+			if (classFilter.size() == 0 
+					|| classFilter.contains("*." + (res.getName().split("[.]"))[1])
+					|| classFilter.contains(res.getName())) {
+				if (!(res.getName().endsWith(".jak")) || jakProject == null) {
+					if (collaboration == null)
+						collaboration = new Collaboration(featureName);
+					
+					String name = "." + (res.getName().split("[.]"))[1];
+					Role role;
+					if (extensions.contains(name)) {
+						role = new Role(res.getName());
+						name = res.getName();
+					} else {
+						name = "*" + name;
+						role = new Role(name);
+					}
+					
+					for (Role modelRole : model.roles) {
+						if (modelRole.featureName.equals(featureName)
+								&& modelRole.getName().equals(name)) {
+							role = modelRole;
+							break;
+						}
+					}
+					role.featureName = featureName;
+					role.files.add(res.getName());
+					Class cl = new Class(name);
+					if (model.classes.containsKey(cl.getName())) {
+						role.setParentClass(model.classes.get(cl
+								.getName()));
+					} else {
+						role.setParentClass(cl);
+						model.classes.put(cl.getName(), cl);
+					}
+					role.setCollaboration(collaboration);
+					model.roles.add(role);
+				}
+			}
+		} else {
+			try {
+				for (IResource member : ((IFolder)res).members())
+					addArbitraryFiles(member, featureName);
+			} catch (CoreException e) {
+				CorePlugin.getDefault().logError(e);
+			}
+		}
 	}
 
 	private ArrayList<Feature> getSelectedFeatures(IFeatureProject featureProject) {

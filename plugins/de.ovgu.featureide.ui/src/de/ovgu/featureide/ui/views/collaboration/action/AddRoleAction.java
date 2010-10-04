@@ -29,7 +29,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
-import de.ovgu.featureide.ui.views.collaboration.editparts.RoleEditPart;
 
 /**
  * Add a role to the CollaborationDiagramm.
@@ -53,9 +52,9 @@ public class AddRoleAction extends Action {
 	
 	public void setEnabled(boolean enable) {
 		selection = (IStructuredSelection)viewer.getSelection();
-		Object part = selection.getFirstElement();
-		enable = !(part instanceof RoleEditPart);
-		super.setEnabled(enable);
+//		Object part = selection.getFirstElement();
+//		enable = !(part instanceof RoleEditPart);
+		super.setEnabled(true);
 	}
 	
 	public void run() {
