@@ -49,11 +49,6 @@ import org.eclipse.ui.part.FileEditorInput;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.ui.ahead.AheadUIPlugin;
-import de.ovgu.featureide.ui.ahead.views.collaboration.editparts.ClassEditPart;
-import de.ovgu.featureide.ui.ahead.views.collaboration.editparts.CollaborationEditPart;
-import de.ovgu.featureide.ui.ahead.views.collaboration.model.Class;
-import de.ovgu.featureide.ui.ahead.views.collaboration.model.Collaboration;
 
 
 /**
@@ -231,22 +226,6 @@ public class NewJakFilePage extends WizardPage {
 
 				for (String s : featureProject.getFeatureModel().getFeatureNames())
 					featureComboContainer.add(s);
-				
-				if (obj instanceof ClassEditPart){ 
-					ClassEditPart edit = (ClassEditPart)obj;
-					Class c = edit.getClassModel();
-					this.jakName.setText(c.getName().split("[.]")[0]);
-					this.refinesbox.setSelection(true);
-					this.refines = true;
-				}
-				else if (obj instanceof CollaborationEditPart){
-					AheadUIPlugin.getDefault().logInfo("collaboration ok");
-					CollaborationEditPart edit = (CollaborationEditPart)obj;
-					Collaboration c = edit.getCollaborationModel();
-					this.featureComboContainer.setText(c.getName());
-					this.refinesbox.setSelection(true);
-					this.refines = true;
-				}				
 			}
 		text = featureComboProject.getText();
 		}

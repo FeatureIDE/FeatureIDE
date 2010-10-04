@@ -1,17 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
-	<extension
-         point="org.eclipse.ui.editors">
-      <editor
-            class="de.ovgu.featureide.ui.ahead.editors.ConfigurationEditor"
-            default="true"
-            extensions="equation, expression"
-            icon="icons/EquationIcon.png"
-            id="de.ovgu.featureide.ui.editors.ConfigurationEditor"
-            name="Configuration Editor">
-      </editor>
-   </extension>
    <extension
          point="org.eclipse.ui.editors">
       <editor
@@ -47,47 +36,10 @@
       </page>
    </extension>
    <extension
-         point="org.eclipse.ui.views">
-      <view
-            category="FeatureIDE"
-            class="de.ovgu.featureide.ui.ahead.views.collaboration.CollaborationView"
-            icon="icons/FeatureIconSmall.ico"
-            id="de.ovgu.featureide.ui.ahead.views.collaboration.Collaboration"
-            name="Collaboration Diagram"
-            restorable="true">
-      </view>
-   </extension>
-   <extension
-         point="org.eclipse.ui.perspectives">
-      <perspective
-            class="de.ovgu.featureide.ui.ahead.perspective.PerspectiveFactory"
-            icon="icons/FeatureIconSmall.ico"
-            id="de.ovgu.featureide.ui.FeatureIDEperspective"
-            name="FeatureIDE">
-      </perspective>
-   </extension>
-   <extension
-         point="org.eclipse.ui.actionSets">
-      <actionSet
-            id="de.ovgu.featureide.ui.ahead.NewFiles"
-            label="FeatureIDE"
-            visible="false">
-         <action
-               class="de.ovgu.featureide.ui.ahead.actions.StartEquationFileWizard"
-               icon="icons/NewEquationIcon.png"
-               id="de.ovgu.featureide.ui.NewEquationFile"
-               label="New Equation File"
-               style="push"
-               toolbarPath="&quot;Normal&quot;">
-         </action>
-         <action
-               class="de.ovgu.featureide.ui.ahead.actions.StartJakFileWizard"
-               icon="icons/NewJakFileIcon.png"
-               id="de.ovgu.featureide.ui.ahead.NewJakFile"
-               label="New Jak File"
-               style="push"
-               toolbarPath="&quot;Normal&quot;">
-         </action>
-      </actionSet>
+         point="de.ovgu.featureide.ui.RunAddRoleAction">
+      <RunAddRoleAction
+            class="de.ovgu.featureide.ui.ahead.views.collaboration.action.RunAddRoleActionAHEAD"
+            composer="AHEAD">
+      </RunAddRoleAction>
    </extension>
 </plugin>

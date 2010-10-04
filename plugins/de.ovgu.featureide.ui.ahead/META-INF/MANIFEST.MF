@@ -33,12 +33,6 @@ Export-Package: de.ovgu.featureide.ui.ahead;uses:="org.eclipse.swt.graphics,de.o
    org.eclipse.jface.text.rules,
    org.eclipse.jface.text.contentassist,
    org.eclipse.ui.editors.text",
- de.ovgu.featureide.ui.ahead.views.collaboration,
- de.ovgu.featureide.ui.ahead.views.collaboration.action,
- de.ovgu.featureide.ui.ahead.views.collaboration.editparts,
- de.ovgu.featureide.ui.ahead.views.collaboration.figures,
- de.ovgu.featureide.ui.ahead.views.collaboration.model,
- de.ovgu.featureide.ui.ahead.views.collaboration.policy,
  de.ovgu.featureide.ui.ahead.views.outline;
   uses:="org.eclipse.ui.texteditor,
    org.eclipse.ui.views.contentoutline,

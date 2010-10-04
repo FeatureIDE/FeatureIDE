@@ -18,4 +18,8 @@ Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: University of Magdeburg
-Export-Package: de.ovgu.featureide.ui.wizards
+Export-Package: de.ovgu.featureide.ui.views.collaboration.action,
+ de.ovgu.featureide.ui.wizards
+Import-Package: org.eclipse.jface.text,
+ org.eclipse.ui.editors.text,
+ org.eclipse.ui.texteditor
