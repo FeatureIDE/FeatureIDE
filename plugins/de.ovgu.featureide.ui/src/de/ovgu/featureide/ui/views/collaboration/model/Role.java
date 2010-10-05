@@ -45,6 +45,7 @@ public class Role {
 	public LinkedList<String> files = new LinkedList<String>();
 	public IFile jakFile;
 	public String featureName = "";
+	public Boolean selected;
 	
 	/**
 	 * @return the path

@@ -38,15 +38,16 @@ public interface GUIDefaults {
 	
 	public static Color DIAGRAM_BACKGROUND 		 = ColorConstants.white;
 	public static Color CLASS_BACKGROUND   		 = new Color(null,247, 245, 255);
+	public static Color UNSELECTED				 = CLASS_BACKGROUND;
 	//public static Color COLL_BACKGROUND_ODD 	 = new Color(null,233, 229, 255);
 	//public static Color COLL_BACKGROUND_EVEN 	 = new Color(null,168, 154, 255);
 	public static Color COLL_BACKGROUND_ODD 	 = GUIBasics.createColor(0.8, 0.8, 1.0);
 	public static Color COLL_BACKGROUND_EVEN 	 = GUIBasics.createColor(0.8, 0.8, 1.0);
 	public static Color FOREGROUND    		  	 = ColorConstants.black;
-	public static Font DEFAULT_FONT = new Font(null, new FontData("Arial Unicode MS", 8, SWT.NORMAL));
+	public static Font DEFAULT_FONT 			 = new Font(null, new FontData("Arial Unicode MS", 8, SWT.NORMAL));
 	
-	public static Insets ROLE_INSETS = new Insets(3, 6, 3, 6);
-	public static Insets COLLABORATION_INSETS = new Insets(4, 6, 4, 6);
-	public static Insets CLASS_INSETS = new Insets(10, 20, 10, 20);
-	public static Border ROLE_BORDER = new LineBorder(ColorConstants.black,1);
+	public static Insets ROLE_INSETS 			 = new Insets(3, 6, 3, 6);
+	public static Insets COLLABORATION_INSETS 	 = new Insets(4, 6, 4, 6);
+	public static Insets CLASS_INSETS 		     = new Insets(10, 20, 10, 20);
+	public static Border ROLE_BORDER 			 = new LineBorder(ColorConstants.black,1);
 }

@@ -54,11 +54,11 @@ public class RoleFigure extends Figure implements GUIDefaults{
 	private static Image methodDefault =  UIPlugin.getImage("default_co.gif");
 	private static Image classImage = UIPlugin.getImage("class_obj.gif");
 	private static Image featureIcon = UIPlugin.getImage("FeatureIconSmall.ico");
-	
+	public Boolean selected = false;
 	public RoleFigure(Role role) {
 		
 		super();
-		
+		selected = role.selected;
 		this.setLayoutManager(new FreeformLayout());
 		
 		setBorder(ROLE_BORDER);
@@ -66,7 +66,6 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		label.setFont(DEFAULT_FONT);
 		label.setLocation(new Point(ROLE_INSETS.left, ROLE_INSETS.top));
 		label.setOpaque(true);
-		
 		this.setName(role.getName());
 		this.add(label);
 		this.setOpaque(true);

@@ -38,11 +38,12 @@ import de.ovgu.featureide.ui.views.collaboration.model.Collaboration;
 public class CollaborationFigure extends Figure implements GUIDefaults{
 
 	private final Label label = new Label();
+	public Boolean selected = true;
 	
 	public CollaborationFigure(Collaboration coll) {
 		
 		super();
-		
+		selected = coll.selescted;
 		this.setLayoutManager(new FreeformLayout());
 		
 		setBackgroundColor(COLL_BACKGROUND_EVEN);

@@ -18,10 +18,10 @@
  */
 package de.ovgu.featureide.ui.views.collaboration;
 
-//import java.util.LinkedList;
+import java.util.LinkedList;
 
-//import org.eclipse.core.resources.IncrementalProjectBuilder;
-//import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -32,17 +32,16 @@ import org.eclipse.gef.LayerConstants;
 import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.gef.ui.parts.ScrollingGraphicalViewer;
-//import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
-//import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
-//import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
-//import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IViewPart;
@@ -62,6 +61,7 @@ import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.action.AddRoleAction;
 import de.ovgu.featureide.ui.views.collaboration.action.DeleteAction;
 import de.ovgu.featureide.ui.views.collaboration.action.FilterAction;
+import de.ovgu.featureide.ui.views.collaboration.action.ShowUnselectedAction;
 import de.ovgu.featureide.ui.views.collaboration.editparts.GraphicalEditPartFactory;
 import de.ovgu.featureide.ui.views.collaboration.model.Collaboration;
 import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModel;
@@ -83,8 +83,9 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	
 	private AddRoleAction addRoleAction;
 	private DeleteAction delAction;
-//	private Action toolbarAction;
-	private IAction filterAction;
+	private Action toolbarAction;
+	private FilterAction filterAction;
+	private ShowUnselectedAction showUnselectedAction; 
 	
 	private IFeatureProject featureProject;
 	
@@ -147,14 +148,14 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		
 		createContextMenu();
 		createActions(part);
-//		makeActions();
-//		contributeToActionBars();
+		makeActions();
+		contributeToActionBars();
 	}
 
-//	 private void contributeToActionBars() {
-//		 IActionBars bars = getViewSite().getActionBars();
-//		 fillLocalToolBar(bars.getToolBarManager());
-//	 }
+	 private void contributeToActionBars() {
+		 IActionBars bars = getViewSite().getActionBars();
+		 fillLocalToolBar(bars.getToolBarManager());
+	 }
 	
 	/*
 	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
@@ -193,45 +194,45 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				
 			updateGuiAfterBuild(featureProject);
 			
-//			if (model == null){
-//				model = new CollaborationModel();
-//				model.collaborations.add(new Collaboration("Please build the Project with the button on the top right of this view"));
-//				viewer.setContents(model);
-//			}
+			if (model == null){
+				model = new CollaborationModel();
+				model.collaborations.add(new Collaboration("Please build the Project with the button on the top right of this view"));
+				viewer.setContents(model);
+			}
 		}
 		
 	}
 	
-//	private void buildProject(IFeatureProject featureProject){
-//		if (featureProject == null) {
-//			toolbarAction.setEnabled(true);
-//			return;
-//		}
-//		
-//		updateGuiAfterBuild(featureProject);
-//		
-//		if (model == null){
-//			final IFeatureProject iFeatureProject = featureProject;
-//			Job job = new Job("buildProject") {
-//				public IStatus run(IProgressMonitor monitor) {
-//					try {
-//						iFeatureProject.getProject().build(IncrementalProjectBuilder.FULL_BUILD, monitor);
-//					} catch (CoreException e) {
-//						model = new CollaborationModel();
-//						model.collaborations.add(new Collaboration("the project couldn't build, please change this"));
-//						viewer.setContents(model);
-//						UIPlugin.getDefault().logError(e);
-//					}
-//					toolbarAction.setEnabled(true);
-//					return Status.OK_STATUS;
-//				}
-//			};
-//			job.setPriority(Job.BUILD);
-//			job.schedule();
+	private void buildProject(IFeatureProject featureProject){
+		if (featureProject == null) {
+			toolbarAction.setEnabled(true);
+			return;
+		}
+		
+		//updateGuiAfterBuild(featureProject);
+		
+		//if (model == null){
+			final IFeatureProject iFeatureProject = featureProject;
+			Job job = new Job("buildProject") {
+				public IStatus run(IProgressMonitor monitor) {
+					try {
+						iFeatureProject.getProject().build(IncrementalProjectBuilder.FULL_BUILD, monitor);
+					} catch (CoreException e) {
+						model = new CollaborationModel();
+						model.collaborations.add(new Collaboration("the project couldn't build, please change this"));
+						viewer.setContents(model);
+						UIPlugin.getDefault().logError(e);
+					}
+					toolbarAction.setEnabled(true);
+					return Status.OK_STATUS;
+				}
+			};
+			job.setPriority(Job.BUILD);
+			job.schedule();
 //		} else {
 //			toolbarAction.setEnabled(true);
 //		}
-//	}
+	}
 
 	private void createContextMenu() {
 		
@@ -254,10 +255,12 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		addRoleAction.setEnabled(!isEmpty);
 		filterAction.setEnabled(!isEmpty);
 		delAction.setEnabled(!isEmpty);
+		showUnselectedAction.setEnabled(!isEmpty);
 		
 		if (featureProject.getComposer().getName().equals("AHEAD"))
 			menuMgr.add(addRoleAction);
 		menuMgr.add(filterAction);
+		menuMgr.add(showUnselectedAction);
 		menuMgr.add(delAction);
 	}
 	
@@ -265,43 +268,47 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		addRoleAction	= new AddRoleAction("Add new Class / Role", viewer, this);
 		delAction		= new DeleteAction("Delete", viewer);
 		filterAction	= new FilterAction("Filter",viewer,this,model);
+		showUnselectedAction = new ShowUnselectedAction("Show unselected features",viewer,this,model);
 	}
 	
-//	private void fillLocalToolBar(IToolBarManager manager) {
-//		manager.add(toolbarAction);
-//		toolbarAction.setToolTipText("Build the Project");
-//		toolbarAction.setImageDescriptor(ImageDescriptor.createFromImage(UIPlugin.getImage("refresh_tab.gif")));
-//	}
-//	
-//	private void makeActions() {
-//		toolbarAction = new Action() {
-//			public void run() {
-//				Job job = new Job("toolbarAction") {
-//					protected IStatus run(IProgressMonitor monitor) {
-//						if (!toolbarAction.isEnabled())
-//							return Status.OK_STATUS;
-//						builder.classFilter = new LinkedList<String>();
-//						builder.featureFilter = new LinkedList<String>();
-//						filterAction.setChecked(false);
-//						toolbarAction.setEnabled(false);
-//						buildProject(featureProject);
-//						return Status.OK_STATUS;
-//					}
-//				};
-//				job.setPriority(Job.SHORT);
-//				job.schedule();
-//			}
-//		};
-//	}
+	private void fillLocalToolBar(IToolBarManager manager) {
+		manager.add(toolbarAction);
+		toolbarAction.setToolTipText("Build the Project");
+		toolbarAction.setImageDescriptor(ImageDescriptor.createFromImage(UIPlugin.getImage("refresh_tab.gif")));
+	}
+	
+	private void makeActions() {
+		toolbarAction = new Action() {
+			public void run() {
+				Job job = new Job("toolbarAction") {
+					protected IStatus run(IProgressMonitor monitor) {
+						if (!toolbarAction.isEnabled())
+							return Status.OK_STATUS;
+						builder.classFilter = new LinkedList<String>();
+						builder.featureFilter = new LinkedList<String>();
+						filterAction.setChecked(false);
+						toolbarAction.setEnabled(false);
+						buildProject(featureProject);
+						return Status.OK_STATUS;
+					}
+				};
+				job.setPriority(Job.SHORT);
+				job.schedule();
+			}
+		};
+	}
 	
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.core.listeners.ICurrentBuildListener#updateGuiAfterBuild(de.ovgu.featureide.core.IFeatureProject)
 	 */
 	public void updateGuiAfterBuild(IFeatureProject project) {
-		model = builder.buildCollaborationModel(project);
-		if (model == null) {
+		if (!project.equals(featureProject))
 			return;
-		}
+		
+		model = builder.buildCollaborationModel(project);
+		if (model == null)
+			return;
+		
 		UIJob job = new UIJob("updateCollaborationView") {
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				viewer.setContents(model);		
