@@ -13,3 +13,5 @@ feature@de.ovgu.featureide.featurecpp=COPY,/vol1/teamcity_itidb/TeamCity/buildAg
 plugin@de.ovgu.featureide.core.featurecpp=COPY,/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/plugins,de.ovgu.featureide.core.featurecpp
 feature@de.ovgu.featureide.featurehouse=COPY,/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/deploy,de.ovgu.featureide.featurehouse
 plugin@de.ovgu.featureide.core.featurehouse=COPY,/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/plugins,de.ovgu.featureide.core.featurehouse
+feature@de.ovgu.featureide.test=COPY,/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/deploy,de.ovgu.featureide.test
+plugin@de.ovgu.featureide.fm.core-test=COPY,/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/plugins,de.ovgu.featureide.fm.core-test
