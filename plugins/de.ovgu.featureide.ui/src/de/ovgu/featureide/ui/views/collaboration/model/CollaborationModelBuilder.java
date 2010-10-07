@@ -57,7 +57,7 @@ public class CollaborationModelBuilder {
 
 	public LinkedList<String> classFilter = new LinkedList<String>();
 	public LinkedList<String> featureFilter = new LinkedList<String>();
-	public Boolean showUnselectedFeatures = true;
+	public Boolean showUnselectedFeatures = false;
 	
 	private Collaboration collaboration;
 	private ArrayList<String> extensions;
@@ -69,6 +69,7 @@ public class CollaborationModelBuilder {
 
 	public CollaborationModel buildCollaborationModel(
 			IFeatureProject featureProject) {
+		UIPlugin.getDefault().logInfo("buildCollaborationModel");
 		model.classes.clear();
 		model.roles.clear();
 		model.collaborations.clear();

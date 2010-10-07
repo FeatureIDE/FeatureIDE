@@ -21,6 +21,7 @@ package de.ovgu.featureide.core.internal;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Vector;
 
@@ -606,7 +607,8 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		}
 		return cp.toArray(new String[cp.size()]);
 	}
-
+	private ArrayList<IResource> resList = new ArrayList<IResource>();
+	
 	public void resourceChanged(IResourceChangeEvent event) {
 		if (!checkModelChange(event.getDelta().findMember(
 				modelFile.getResource().getFullPath()))) {
@@ -619,7 +621,11 @@ public class FeatureProject extends BuilderMarkerHandler implements
 								&& (delta.getFlags() & IResourceDelta.CONTENT) != 0){
 							if (res.toString().equals(getCurrentEquationFile().toString()))
 								buildRelevantChanges = true;
-							checkConfigurationChange(res);
+							if (resList.size() == 0) {
+								checkConfigurationChange();
+							}
+							if (!resList.contains(res))
+								resList.add(res);
 						}
 					}
 				if (sourceFolder.isAccessible())
@@ -634,7 +640,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			}
 		}
 	}
-
+	
 	private boolean checkModelChange(IResourceDelta delta) {
 		if (delta == null || (delta.getFlags() & IResourceDelta.CONTENT) == 0)
 			return false;
@@ -644,9 +650,14 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		Job job = new Job("Load Model") {
 			protected IStatus run(IProgressMonitor monitor) {
 				loadModel();
+				resList = new ArrayList<IResource>();
 				try {
-					for (IResource res : equationFolder.members())
-						checkConfigurationChange(res);
+					for (IResource res : equationFolder.members()) {
+						if (resList.size() == 0)
+							checkConfigurationChange();
+						if (!resList.contains(res))
+							resList.add(res);
+					}
 				} catch (CoreException e) {
 					CorePlugin.getDefault().logError(e);
 				}
@@ -658,41 +669,44 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		return true;
 	}
 
-	private void checkConfigurationChange(IResource resource) {
-		if (!(resource instanceof IFile))
-			return;
-
-		final IFile file = (IFile) resource;
+	private void checkConfigurationChange() {
 		CorePlugin.getDefault().fireEquationChanged(this);
-
+		
 		Job job = new Job("Check Configuration") {
 			protected IStatus run(IProgressMonitor monitor) {
-				try {
-					deleteConfigurationMarkers(file, IResource.DEPTH_ZERO);
-					// check validity
-					Configuration configuration = new Configuration(
-							featureModel, false);
-					ConfigurationReader reader = new ConfigurationReader(
-							configuration);
-					reader.readFromFile(file);
-					if (!configuration.valid())
-						createConfigurationMarker(file,
-								"Configuration is invalid",0,
-								IMarker.SEVERITY_ERROR);
-					// check if all features are still available
-					configuration = new Configuration(featureModel, true);
-					reader = new ConfigurationReader(configuration);
-					reader.readFromFile(file);
-					
-					for (int i=0; i<reader.getWarnings().size(); i++){
-						createConfigurationMarker(file, reader.getWarnings().get(i), reader.getPositions().get(i),
-								IMarker.SEVERITY_WARNING);
-						
+				if (resList.size() != 0)
+					for (IResource res : resList) {	
+						if (res instanceof IFile) {
+							IFile file = (IFile) res;
+							try {
+								deleteConfigurationMarkers(file, IResource.DEPTH_ZERO);
+								// check validity
+								Configuration configuration = new Configuration(
+										featureModel, false);
+								ConfigurationReader reader = new ConfigurationReader(
+										configuration);
+								reader.readFromFile(file);
+								if (!configuration.valid())
+									createConfigurationMarker(file,
+											"Configuration is invalid",0,
+											IMarker.SEVERITY_ERROR);
+								// check if all features are still available
+								configuration = new Configuration(featureModel, true);
+								reader = new ConfigurationReader(configuration);
+								reader.readFromFile(file);
+								
+								for (int i=0; i<reader.getWarnings().size(); i++){
+									createConfigurationMarker(file, reader.getWarnings().get(i), reader.getPositions().get(i),
+											IMarker.SEVERITY_WARNING);
+									
+								}
+								
+							} catch (Exception e) {
+								CorePlugin.getDefault().logError(e);
+							}
+						}
 					}
-					
-				} catch (Exception e) {
-					CorePlugin.getDefault().logError(e);
-				}
+				resList = new ArrayList<IResource>();
 				return Status.OK_STATUS;
 			}
 		};

@@ -18,8 +18,6 @@
  */
 package de.ovgu.featureide.ui.views.collaboration;
 
-import java.util.LinkedList;
-
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -173,34 +171,26 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				part = page.getActiveEditor();
 				if (part != null) {
 					inputFile = (FileEditorInput)part.getEditorInput();
-					featureProject = CorePlugin.getFeatureProject(inputFile.getFile());
+					if (featureProject == null || !featureProject.equals(CorePlugin.getFeatureProject(inputFile.getFile())))
+							featureProject = CorePlugin.getFeatureProject(inputFile.getFile());
+					else
+						return;
 				}
 			}
-		}		
+		}
 		
 		if (featureProject == null) {
 			model = new CollaborationModel();
 			model.collaborations.add(new Collaboration("Open a file from a FeatureIDE Project"));
 			viewer.setContents(model);
-		}
-		else
-		{
+		} else {
 			if (featureProject.getCurrentEquationFile() == null){
 				model = new CollaborationModel();
 				model.collaborations.add(new Collaboration("Please create a new equation file"));
 				viewer.setContents(model);
-			}
-			else
-				
-			updateGuiAfterBuild(featureProject);
-			
-			if (model == null){
-				model = new CollaborationModel();
-				model.collaborations.add(new Collaboration("Please build the Project with the button on the top right of this view"));
-				viewer.setContents(model);
-			}
+			} else
+				updateGuiAfterBuild(featureProject);
 		}
-		
 	}
 	
 	private void buildProject(IFeatureProject featureProject){
@@ -212,23 +202,23 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		//updateGuiAfterBuild(featureProject);
 		
 		//if (model == null){
-			final IFeatureProject iFeatureProject = featureProject;
-			Job job = new Job("buildProject") {
-				public IStatus run(IProgressMonitor monitor) {
-					try {
-						iFeatureProject.getProject().build(IncrementalProjectBuilder.FULL_BUILD, monitor);
-					} catch (CoreException e) {
-						model = new CollaborationModel();
-						model.collaborations.add(new Collaboration("the project couldn't build, please change this"));
-						viewer.setContents(model);
-						UIPlugin.getDefault().logError(e);
-					}
-					toolbarAction.setEnabled(true);
-					return Status.OK_STATUS;
+		final IFeatureProject iFeatureProject = featureProject;
+		Job job = new Job("buildProject") {
+			public IStatus run(IProgressMonitor monitor) {
+				try {
+					iFeatureProject.getProject().build(IncrementalProjectBuilder.FULL_BUILD, monitor);
+				} catch (CoreException e) {
+					model = new CollaborationModel();
+					model.collaborations.add(new Collaboration("the project couldn't build, please change this"));
+					viewer.setContents(model);
+					UIPlugin.getDefault().logError(e);
 				}
-			};
-			job.setPriority(Job.BUILD);
-			job.schedule();
+				toolbarAction.setEnabled(true);
+				return Status.OK_STATUS;
+			}
+		};
+		job.setPriority(Job.BUILD);
+		job.schedule();
 //		} else {
 //			toolbarAction.setEnabled(true);
 //		}
@@ -284,9 +274,9 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 					protected IStatus run(IProgressMonitor monitor) {
 						if (!toolbarAction.isEnabled())
 							return Status.OK_STATUS;
-						builder.classFilter = new LinkedList<String>();
-						builder.featureFilter = new LinkedList<String>();
-						filterAction.setChecked(false);
+//						builder.classFilter = new LinkedList<String>();
+//						builder.featureFilter = new LinkedList<String>();
+						//filterAction.setChecked(false);
 						toolbarAction.setEnabled(false);
 						buildProject(featureProject);
 						return Status.OK_STATUS;

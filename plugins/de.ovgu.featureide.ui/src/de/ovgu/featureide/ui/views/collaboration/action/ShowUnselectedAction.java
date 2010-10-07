@@ -45,12 +45,12 @@ public class ShowUnselectedAction extends Action {
 	}
 
 	public void setEnabled(boolean enabled) {
+		super.setChecked(collaborationView.builder.showUnselectedFeatures);
 		super.setEnabled(true);
 	}
 	
 	public void run() {
-		super.setChecked(isChecked());
-		collaborationView.builder.showUnselectedFeatures = super.isChecked();
+		collaborationView.builder.showUnselectedFeatures = !collaborationView.builder.showUnselectedFeatures;
 		model = collaborationView.builder.buildCollaborationModel(collaborationView.getFeatureProject());
 		if (model == null) {
 			UIPlugin.getDefault().logInfo("model loading error");
