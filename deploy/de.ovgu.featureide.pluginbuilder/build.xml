@@ -246,4 +246,15 @@ version.full: ${version.full}
 version.qualifier: ${version.qualifier}</echo>
 	</target>
 
+	<target name="externalTests" description="External Tests" depends="postBuild">
+				<junit>
+					<classpath refid="junit.class.path" />
+					<formatter type="xml" />
+					<batchtest todir="${test.report.dir}">
+						<fileset dir="${buildHome}">
+							<include name="**/*Test*.java" />
+						</fileset>
+					</batchtest>
+				</junit>
+			</target>
 </project>
