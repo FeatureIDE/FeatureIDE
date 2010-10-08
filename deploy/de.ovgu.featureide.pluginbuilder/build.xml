@@ -250,8 +250,8 @@ version.qualifier: ${version.qualifier}</echo>
 				<junit>
 					<classpath refid="junit.class.path" />
 					<formatter type="xml" />
-					<batchtest todir="${test.report.dir}">
-						<fileset dir="${buildHome}">
+					<batchtest>
+						<fileset dir="/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide">
 							<include name="**/*Test*.java" />
 						</fileset>
 					</batchtest>
