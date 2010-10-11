@@ -109,9 +109,11 @@ public class CollaborationModelBuilder {
 		if (equation.equals("") || equation.equals(featureProject.getCurrentEquationFile().getName())) {
 			collaboration = new Collaboration(featureProject.getCurrentEquationFile().getName().split("[.]")[0]);
 			collaboration.selected = true;
+			collaboration.isEquation = true;
 		} else {
 			collaboration = new Collaboration(equation.split("[.]")[0]);
 			collaboration.selected = false;
+			collaboration.isEquation = true;
 		}
 		model.collaborations.add(collaboration);
 		

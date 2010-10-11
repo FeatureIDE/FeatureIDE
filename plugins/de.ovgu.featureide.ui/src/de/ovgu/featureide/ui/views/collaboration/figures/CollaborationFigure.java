@@ -24,7 +24,9 @@ import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
+import org.eclipse.swt.graphics.Image;
 
+import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 import de.ovgu.featureide.ui.views.collaboration.model.Collaboration;
 
@@ -37,13 +39,18 @@ import de.ovgu.featureide.ui.views.collaboration.model.Collaboration;
  */
 public class CollaborationFigure extends Figure implements GUIDefaults{
 
+	private static Image IMAGE_CURRENEQUATION = UIPlugin.getImage("currentequation.gif");
+	private static Image IMAGE_EQUATION = UIPlugin.getImage("EquationIcon.png");
+	
 	private final Label label = new Label();
 	public Boolean selected = true;
+	public Boolean isEquation = false;
 	
 	public CollaborationFigure(Collaboration coll) {
 		
 		super();
 		selected = coll.selected;
+		isEquation = coll.isEquation;
 		this.setLayoutManager(new FreeformLayout());
 		
 		if (selected) {
@@ -53,6 +60,12 @@ public class CollaborationFigure extends Figure implements GUIDefaults{
 			setBackgroundColor(COLL_BACKGROUND_UNSELECTED);
 			setBorder(COLL_BORDER_UNSELECTED);
 		}
+		if (isEquation)
+			if (selected)
+				label.setIcon(IMAGE_CURRENEQUATION);
+			else
+				label.setIcon(IMAGE_EQUATION);
+		
 		label.setForegroundColor(FOREGROUND);
 		label.setFont(DEFAULT_FONT);
 		label.setLocation(new Point(COLLABORATION_INSETS.left, COLLABORATION_INSETS.top));

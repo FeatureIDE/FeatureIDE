@@ -117,16 +117,17 @@ public class CollaborationEditPart extends AbstractGraphicalEditPart {
 					FlowLayout contentsLayout = new FlowLayout();
 					tooltipContent.setLayoutManager(contentsLayout);
 					CompartmentFigure tooltipFigure = new CompartmentFigure();
-					if (i == 0)
-						if (collaborationFigure.selected)
+					if (collaborationFigure.isEquation)
+						if (collaborationFigure.selected) {
 							tooltipFigure.add(new Label(" Current configuration ", IMAGE_CURRENEQUATION));
-						else
+						} else
 							tooltipFigure.add(new Label(" Configuration ", IMAGE_EQUATION));
 					else if (collaborationFigure.selected)
 						tooltipFigure.add(new Label(" Selected feature ", IMAGE_FEATURE));
 					else
 						tooltipFigure.add(new Label(" Unselected feature ", IMAGE_FEATURE));
-					collaborationFigure.setToolTip(tooltipFigure);
+					if (children.size() > 1)
+						collaborationFigure.setToolTip(tooltipFigure);
 				}
 			}
 		}
