@@ -43,11 +43,16 @@ public class CollaborationFigure extends Figure implements GUIDefaults{
 	public CollaborationFigure(Collaboration coll) {
 		
 		super();
-		selected = coll.selescted;
+		selected = coll.selected;
 		this.setLayoutManager(new FreeformLayout());
 		
-		setBackgroundColor(COLL_BACKGROUND_EVEN);
-		setBorder(ROLE_BORDER);
+		if (selected) {
+			setBackgroundColor(COLL_BACKGROUND_SELECTED);
+			setBorder(COLL_BORDER_SELECTED);
+		} else {
+			setBackgroundColor(COLL_BACKGROUND_UNSELECTED);
+			setBorder(COLL_BORDER_UNSELECTED);
+		}
 		label.setForegroundColor(FOREGROUND);
 		label.setFont(DEFAULT_FONT);
 		label.setLocation(new Point(COLLABORATION_INSETS.left, COLLABORATION_INSETS.top));
@@ -56,7 +61,6 @@ public class CollaborationFigure extends Figure implements GUIDefaults{
 		
 		this.add(label);
 		this.setOpaque(true);
-		
 	}
 	
 	private void setName(String name){

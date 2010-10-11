@@ -20,15 +20,20 @@ package de.ovgu.featureide.ui.views.collaboration.editparts;
 
 import java.util.List;
 
+import org.eclipse.draw2d.Figure;
+import org.eclipse.draw2d.FlowLayout;
 import org.eclipse.draw2d.IFigure;
+import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
+import org.eclipse.swt.graphics.Image;
 
+import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.figures.CollaborationFigure;
-import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
+import de.ovgu.featureide.ui.views.collaboration.figures.CompartmentFigure;
 import de.ovgu.featureide.ui.views.collaboration.model.Collaboration;
 
 /**
@@ -37,6 +42,9 @@ import de.ovgu.featureide.ui.views.collaboration.model.Collaboration;
  * @author Constanze Adler
  */
 public class CollaborationEditPart extends AbstractGraphicalEditPart {
+	private static Image IMAGE_CURRENEQUATION = UIPlugin.getImage("currentequation.gif");
+	private static Image IMAGE_EQUATION = UIPlugin.getImage("EquationIcon.png");
+	private static Image IMAGE_FEATURE = UIPlugin.getImage("FeatureIconSmall.ico");
 	
 	public CollaborationEditPart(Collaboration coll){
 		super();
@@ -76,33 +84,49 @@ public class CollaborationEditPart extends AbstractGraphicalEditPart {
 		}
 		
 		collFigure.setSize(width,size.height);
-		
+
 		// Sets the size of all collaborations to the longest width
 		if (children.size() == children.indexOf(this)+1) {
 			for (Object o : children) {
 				if (o instanceof CollaborationEditPart) {
 					CollaborationFigure collaborationFigure = (CollaborationFigure) ((CollaborationEditPart)o).getFigure();
-					Point location2 = collaborationFigure.getBounds().getLocation();
+					Point location = collaborationFigure.getBounds().getLocation();
 					Dimension size2 = collFigure.getSize();
-					Rectangle constraint2 = new Rectangle(location2, size2);
-					int i = children.indexOf((CollaborationEditPart)o)+1;
-					if (collaborationFigure.selected)
-						collaborationFigure.setBackgroundColor(((i%2)==0)?GUIDefaults.COLL_BACKGROUND_EVEN:GUIDefaults.COLL_BACKGROUND_ODD);
-					else
-						collaborationFigure.setBackgroundColor(GUIDefaults.UNSELECTED);
-					int xValue = location2.x;
-					int yValue = location2.y + i * (size2.height+8);
-					constraint2 = new Rectangle(new Point(xValue,yValue), size2);
-					if (i>1){
+					Rectangle constraint = new Rectangle(location, size2);
+					int i = children.indexOf((CollaborationEditPart)o);
+//					if (collaborationFigure.selected)
+//						collaborationFigure.setBackgroundColor(GUIDefaults.COLL_BACKGROUND_SELECTED);
+//					else
+//						collaborationFigure.setBackgroundColor(GUIDefaults.COLL_BACKGROUND_UNSELECTED);
+					
+					int xValue = location.x;
+					int yValue = location.y + i * (size2.height+8) + 8;
+					constraint = new Rectangle(new Point(xValue,yValue), size2);
+					if (i>0){
 						EditPart part = (EditPart) children.get(i-1);
 						if (part instanceof CollaborationEditPart){
 							Dimension size3 = ((CollaborationEditPart) part).getFigure().getBounds().getSize();
 							Point location3 = ((CollaborationEditPart) part).getFigure().getBounds().getLocation();
-							Point newLocation = new Point(location3.x ,location3.y + i * (size3.height+8));
-							constraint2 = new Rectangle(newLocation, size2);
+							Point newLocation = new Point(location3.x ,location3.y + i * (size3.height+8) + 8);
+							constraint = new Rectangle(newLocation, size2);
 						}
 					}
-					modelEditPart.setLayoutConstraint(((CollaborationEditPart)o), collaborationFigure, constraint2);
+					modelEditPart.setLayoutConstraint(((CollaborationEditPart)o), collaborationFigure, constraint);
+					
+					Figure tooltipContent = new Figure();		
+					FlowLayout contentsLayout = new FlowLayout();
+					tooltipContent.setLayoutManager(contentsLayout);
+					CompartmentFigure tooltipFigure = new CompartmentFigure();
+					if (i == 0)
+						if (collaborationFigure.selected)
+							tooltipFigure.add(new Label(" Current configuration ", IMAGE_CURRENEQUATION));
+						else
+							tooltipFigure.add(new Label(" Configuration ", IMAGE_EQUATION));
+					else if (collaborationFigure.selected)
+						tooltipFigure.add(new Label(" Selected feature ", IMAGE_FEATURE));
+					else
+						tooltipFigure.add(new Label(" Unselected feature ", IMAGE_FEATURE));
+					collaborationFigure.setToolTip(tooltipFigure);
 				}
 			}
 		}

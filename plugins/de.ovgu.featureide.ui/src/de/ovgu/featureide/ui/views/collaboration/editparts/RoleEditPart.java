@@ -84,12 +84,12 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 			if (o instanceof Collaboration)
 				listOfColls.add((Collaboration) o);
 		}
-		int index = listOfColls.indexOf(this.getRoleModel().getCollaboration())+1;
+		int index = listOfColls.indexOf(this.getRoleModel().getCollaboration());
 		if (roleFigure.selected)
-			roleFigure.setBackgroundColor(((index%2)==0)?GUIDefaults.COLL_BACKGROUND_EVEN:GUIDefaults.COLL_BACKGROUND_ODD);
+			roleFigure.setBackgroundColor(GUIDefaults.ROLE_BACKGROUND_SELECTED);
 		else 
-			roleFigure.setBackgroundColor(GUIDefaults.UNSELECTED);
-		int yValue = location.y + index * (size.height+10);		
+			roleFigure.setBackgroundColor(GUIDefaults.ROLE_BACKGROUND_UNSELECTED);
+		int yValue = location.y + index * (size.height+10) + 8;		
 		Point newLocation = new Point(xValue,yValue);		
 		Rectangle constraint = new Rectangle(newLocation, size);
 		classEditPart.setLayoutConstraint(this, roleFigure, constraint);

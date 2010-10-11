@@ -43,25 +43,31 @@ import de.ovgu.featureide.ui.views.collaboration.model.Role;
  */
 public class RoleFigure extends Figure implements GUIDefaults{
 	
+	private static Image IMAGE_FIELD_PRIVATE = UIPlugin.getImage("field_private_obj.gif");
+	private static Image IMAGE_FIELD_PROTECTED = UIPlugin.getImage("field_protected_obj.gif");
+	private static Image IMAGE_FIELD_PUBLIC = UIPlugin.getImage("field_public_obj.gif");
+	private static Image IMAGE_FIELD_DEFAULT = UIPlugin.getImage("field_default_obj.gif");
+	private static Image IMAGE_METHODE_PRIVATE = UIPlugin.getImage("private_co.gif");
+	private static Image IMAGE_METHODE_PROTECTED = UIPlugin.getImage("/protected_co.gif");
+	private static Image IMAGE_METHODE_PUBLIC = UIPlugin.getImage("public_co.gif");
+	private static Image IMAGE_METHODE_DEFAULT =  UIPlugin.getImage("default_co.gif");
+	private static Image IMAGE_CLASS = UIPlugin.getImage("class_obj.gif");
+	private static Image IMAGE_FEATURE = UIPlugin.getImage("FeatureIconSmall.ico");
+	
 	private final Label label = new Label();
-	private static Image fieldPrivate = UIPlugin.getImage("field_private_obj.gif");
-	private static Image fieldProtected = UIPlugin.getImage("field_protected_obj.gif");
-	private static Image fieldPublic = UIPlugin.getImage("field_public_obj.gif");
-	private static Image fieldDefault = UIPlugin.getImage("field_default_obj.gif");
-	private static Image methodPrivate = UIPlugin.getImage("private_co.gif");
-	private static Image methodProtected = UIPlugin.getImage("/protected_co.gif");
-	private static Image methodPublic = UIPlugin.getImage("public_co.gif");
-	private static Image methodDefault =  UIPlugin.getImage("default_co.gif");
-	private static Image classImage = UIPlugin.getImage("class_obj.gif");
-	private static Image featureIcon = UIPlugin.getImage("FeatureIconSmall.ico");
 	public Boolean selected = false;
+	
 	public RoleFigure(Role role) {
 		
 		super();
 		selected = role.selected;
 		this.setLayoutManager(new FreeformLayout());
 		
-		setBorder(ROLE_BORDER);
+		if (selected)
+			setBorder(ROLE_BORDER_SELECTED);
+		else 
+			setBorder(ROLE_BORDER_UNSELECTED);
+		
 		label.setForegroundColor(FOREGROUND);
 		label.setFont(DEFAULT_FONT);
 		label.setLocation(new Point(ROLE_INSETS.left, ROLE_INSETS.top));
@@ -69,7 +75,8 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		this.setName(role.getName());
 		this.add(label);
 		this.setOpaque(true);
-		// next lines defines the tooltipcontent
+		
+		// defines the tooltipcontent
 		Figure tooltipContent = new Figure();		
 		FlowLayout contentsLayout = new FlowLayout();
 		tooltipContent.setLayoutManager(contentsLayout);
@@ -81,8 +88,8 @@ public class RoleFigure extends Figure implements GUIDefaults{
 			CompartmentFigure fieldFigure = new CompartmentFigure();
 			CompartmentFigure methodFigure = new CompartmentFigure();
 			
-			fieldFigure.add(new Label(name + " ", classImage));
-			methodFigure.add(new Label(role.featureName + " ", featureIcon));
+			fieldFigure.add(new Label(name + " ", IMAGE_CLASS));
+			methodFigure.add(new Label(role.featureName + " ", IMAGE_FEATURE));
 			
 			int fieldCount = 0;
 			int methodCount = 0;
@@ -90,13 +97,13 @@ public class RoleFigure extends Figure implements GUIDefaults{
 				
 				Label fieldLabel = new Label(f.getName() + " ");
 				if (f.isPrivate())
-					fieldLabel.setIcon(fieldPrivate);
+					fieldLabel.setIcon(IMAGE_FIELD_PRIVATE);
 				else if (f.isProtected())
-					fieldLabel.setIcon(fieldProtected);
+					fieldLabel.setIcon(IMAGE_FIELD_PROTECTED);
 				else if (f.isPublic())
-					fieldLabel.setIcon(fieldPublic);
+					fieldLabel.setIcon(IMAGE_FIELD_PUBLIC);
 				else 
-					fieldLabel.setIcon(fieldDefault);
+					fieldLabel.setIcon(IMAGE_FIELD_DEFAULT);
 				
 				if (f.isOwn(role.jakFile)) {
 					fieldFigure.add(fieldLabel);
@@ -108,6 +115,10 @@ public class RoleFigure extends Figure implements GUIDefaults{
 					}
 				}
 			}
+			if (fieldCount == 0) {
+				fieldFigure.add(new Label(""));
+				tooltipContent.add(fieldFigure);
+			}
 			if (fieldCount % 25 != 0)
 				tooltipContent.add(fieldFigure);
 			
@@ -115,13 +126,13 @@ public class RoleFigure extends Figure implements GUIDefaults{
 				
 				Label methodLabel = new Label(m.getName() + " ");
 				if (m.isPrivate())			
-					methodLabel.setIcon(methodPrivate);
+					methodLabel.setIcon(IMAGE_METHODE_PRIVATE);
 				else if (m.isProtected())
-					methodLabel.setIcon(methodProtected);
+					methodLabel.setIcon(IMAGE_METHODE_PROTECTED);
 				else if (m.isPublic())
-					methodLabel.setIcon(methodPublic);
+					methodLabel.setIcon(IMAGE_METHODE_PUBLIC);
 				else 
-					methodLabel.setIcon(methodDefault);
+					methodLabel.setIcon(IMAGE_METHODE_DEFAULT);
 			
 				if (m.isOwn(role.jakFile)) {
 					methodFigure.add(methodLabel);
@@ -133,6 +144,10 @@ public class RoleFigure extends Figure implements GUIDefaults{
 					}
 				}
 			}
+			if (methodCount == 0) {
+				methodFigure.add(new Label(""));
+				tooltipContent.add(methodFigure);
+			}
 			if (methodCount % 25 != 0)
 				tooltipContent.add(methodFigure);
 			
@@ -140,10 +155,10 @@ public class RoleFigure extends Figure implements GUIDefaults{
 			
 		} else if (role.getName().startsWith("*.")) {
 			CompartmentFigure fileFigure = new CompartmentFigure();
-			fileFigure.add(new Label(role.featureName + " ", featureIcon));
+			fileFigure.add(new Label(role.featureName + " ", IMAGE_FEATURE));
 			int fileCount = 0;
 			for (String file : role.files) {
-				Label fieldLabel = new Label(file);
+				Label fieldLabel = new Label(" " + file + " ");
 				fileFigure.add(fieldLabel);
 				fileCount++;
 				if (fileCount % 25 == 0) {
@@ -156,9 +171,10 @@ public class RoleFigure extends Figure implements GUIDefaults{
 			if (fileCount % 25 != 0)
 				tooltipContent.add(fileFigure);
 		} else {
+			this.setName("   ...   ");
 			CompartmentFigure fileFigure = new CompartmentFigure(); 
-			fileFigure.add(new Label(role.featureName + " ", featureIcon));
-			fileFigure.add(new Label(label.getText() + " ", null));
+			fileFigure.add(new Label(role.featureName + " ", IMAGE_FEATURE));
+			fileFigure.add(new Label(role.getName().split("[.]")[0] + " ", IMAGE_CLASS));
 			
 			tooltipContent.add(fileFigure);
 		}

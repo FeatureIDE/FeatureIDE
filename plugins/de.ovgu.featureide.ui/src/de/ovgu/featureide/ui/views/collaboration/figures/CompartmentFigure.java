@@ -49,8 +49,8 @@ public class CompartmentFigure extends Figure {
 	    public void paint(IFigure figure, Graphics graphics, Insets insets) {
 	    	Point left = getPaintRectangle(figure, insets).getTopLeft();
 	    	Point rigth = tempRect.getTopRight();
-	    	left.y = left.y + 17; // ugly hack
-	    	rigth.y = rigth.y + 17; // should use the font size
+	    	left.y = left.y + 17;
+	    	rigth.y = rigth.y + 17;
 	    	graphics.drawLine(left, rigth);
 	    }
 	  }

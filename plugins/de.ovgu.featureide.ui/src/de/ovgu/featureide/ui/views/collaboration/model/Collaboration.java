@@ -28,7 +28,7 @@ import java.util.LinkedList;
  * @author Constanze Adler
  */
 public class Collaboration {
-	public Boolean selescted = true;
+	public Boolean selected = true;
 	private String name;
 	private LinkedList<Role> roles;
 	

@@ -163,7 +163,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	}
 	
 	private void setEditorActions(IWorkbenchPart activeEditor) {
-
+		
 		IEditorPart part = null;
 		if (activeEditor != null) {
 			IWorkbenchPage page = activeEditor.getSite().getPage();
@@ -171,17 +171,22 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				part = page.getActiveEditor();
 				if (part != null) {
 					inputFile = (FileEditorInput)part.getEditorInput();
+					if (inputFile.getName().endsWith(".equation"))
+						builder.equation = inputFile.getName();
+					else 
+						builder.equation = "";
+					
 					if (featureProject == null || !featureProject.equals(CorePlugin.getFeatureProject(inputFile.getFile())))
 							featureProject = CorePlugin.getFeatureProject(inputFile.getFile());
-					else
-						return;
+//					else
+//						return;
 				}
 			}
 		}
 		
 		if (featureProject == null) {
 			model = new CollaborationModel();
-			model.collaborations.add(new Collaboration("Open a file from a FeatureIDE Project"));
+			model.collaborations.add(new Collaboration("Open a file from a FeatureIDE project"));
 			viewer.setContents(model);
 		} else {
 			if (featureProject.getCurrentEquationFile() == null){
@@ -263,8 +268,8 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	
 	private void fillLocalToolBar(IToolBarManager manager) {
 		manager.add(toolbarAction);
-		toolbarAction.setToolTipText("Build the Project");
-		toolbarAction.setImageDescriptor(ImageDescriptor.createFromImage(UIPlugin.getImage("refresh_tab.gif")));
+		toolbarAction.setToolTipText("Build Project");
+		toolbarAction.setImageDescriptor(ImageDescriptor.createFromImage(UIPlugin.getImage("buildicon.gif")));
 	}
 	
 	private void makeActions() {

@@ -64,7 +64,7 @@ public class ClassEditPart extends AbstractGraphicalEditPart {
 				height = ((CollaborationEditPart)o).getFigure().getSize().height+8;
 			}
 		}
-		Figure fig = new ClassFigure(getClassModel(),height * (count+1));
+		Figure fig = new ClassFigure(getClassModel(),height * (count) - 8);
 		return fig;
 	}
 
