@@ -52,14 +52,14 @@ version=3.1.0</echo>
 	</target>
 
 	<!-- Example target which demonstrates how to run a test suite with the Eclipse test fwk.
-		Note that it is not needed if you use the autotestsuite-->
+		Note that it is not needed if you use the autotestsuite
 
 	<target name="-runTestSuite" description="Should be called from allTests.xml only">
 		<ant target="core-test" antfile="${test.library.xml}" dir="${test.eclipse.host.eclipse}">
-			<!-- inject additional properties for Eclipse startup with data-dir property -->
+			--><!-- inject additional properties for Eclipse startup with data-dir property --><!--
 			<property name="data-dir" value="${test.workspace} -clean -dev ${basedir}/emma.jar" />
-    		<property name="plugin-name" value="de.ovgu.featureide.fm.core-test" />
-    		<property name="classname" value="de.ovgu.featureide.fm.core-test.src.de.ovgu.featureide.FMCoreTest" />
+    		<property name="plugin-name" value="org.rssowl.core.tests" />
+    		<property name="classname" value="org.rssowl.core.tests.AllTests" />
 			<property name="eclipse-home" value="${test.eclipse.host.eclipse}" />
 			<property name="extraVMargs" value="-Demma.coverage.out.file=${emma.coverage.output}" />
 		</ant>
@@ -69,7 +69,7 @@ version=3.1.0</echo>
 		<antcall target="umRemoveSite" />
 		<delete dir="${test.result.dir}" />
 		<mkdir dir="${test.result.dir}/xml" />
-		<!-- collect creates an aggregated report file in ${test.eclipse.host} -->
+		--><!-- collect creates an aggregated report file in ${test.eclipse.host} --><!--
 		<ant target="collect" antfile="${test.library.xml}" dir="${test.eclipse.host.eclipse}">
 			<property name="includes" value="*.xml" />
 			<property name="output-file" value="${test.aggregated.report}" />
@@ -80,10 +80,9 @@ version=3.1.0</echo>
 		<style style="${junit.xsl.file}" basedir="${test.result.dir}/xml" destdir="${test.result.dir}/html" />
 
 		<antcall target="-checkTestResultFileForErrors"/>
-		<echo> "alternative" run task started</echo>
 	</target>
+	-->
 	
-	<!--
 	<target name="run" depends="-init,-runAutoTests,-emmaReport" description="Run all tests using the autotestsuite and create xml and html reports.">
 		<antcall target="umRemoveSite" />
 		<junitreport todir="${test.result.dir}/xml" tofile="${test.aggregated.report}">
@@ -96,7 +95,7 @@ version=3.1.0</echo>
 
 		<style style="${junit.xsl.file}" basedir="${test.result.dir}/xml" includes="${test.aggregated.report}" destdir="${test.result.dir}/html" />
 	</target>
-	-->
+	
 	<target name="-markErrorOrFailure" if="isErrorOrFailure">
 		<!-- Write Message to stderr and continue the build. Do not let the build fail so that 
 		     other tasks which come afterwards can be completed. E.g. packaging might take place
