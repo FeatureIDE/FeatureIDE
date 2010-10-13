@@ -1,0 +1,12 @@
+<project name ="build with tests" default ="test">
+<target name = "runBuild">
+<ant></ant>
+</target>
+
+
+	  <target name="test" depends="runBuild">
+	 
+	 <echo>running tests here</echo>
+	  </target>
+
+</project>
