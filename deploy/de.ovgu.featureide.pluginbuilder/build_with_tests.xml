@@ -1,12 +1,14 @@
-<project name ="build with tests" default ="test">
-<target name = "runBuild">
-<ant></ant>
-</target>
+<project name="build with tests" default="test">
+	<target name="runBuild">
+		<ant></ant>
+	</target>
 
 
-	  <target name="test" depends="runBuild">
-	 
-	 <echo>running tests here</echo>
-	  </target>
+	<target name="test" depends="runBuild">
+		<ant
+			dir="K:\eclipse-workspaces\eclipse-RCP\de.ovgu.featureide.fm.core-test"
+			antfile="runtests.xml"></ant>
+		<echo>running tests here</echo>
+	</target>
 
 </project>

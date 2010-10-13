@@ -16,12 +16,13 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide;
+
 
 import java.lang.reflect.Method;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.junit.Test;
+
+
 
 /**
  * The FeatureIDE test suite that should contain all available JUnit tests.
@@ -30,20 +31,8 @@ import junit.framework.TestSuite;
  */
 public class FMCoreTest {
 	
-	public static Test suite() throws ClassNotFoundException {
-		TestSuite suite = new TestSuite("FeatureIDE test suite.");
-		suite.addTest(getTest("de.ovgu.featureide.fm.core.configuration.TConfiguration"));
-		suite.addTest(getTest("de.ovgu.featureide.fm.core.editing.TModelComperator"));
-		return suite;
-	}
-
-	private static Test getTest(String suiteClassName) {
-		try {
-			Class<?> clazz = Class.forName(suiteClassName);
-			Method suiteMethod = clazz.getMethod("suite", new Class[0]);
-			return (Test) suiteMethod.invoke(null, new Object[0]);
-		} catch (Exception e) {
-			throw new RuntimeException("Error", e);
-		}
+	@Test
+	public void test(){
+		System.out.println("it works");
 	}
 }
