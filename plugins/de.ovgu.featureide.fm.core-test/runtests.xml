@@ -9,8 +9,8 @@
 		<junit>
 			<formatter type="brief" usefile="false" />
 			<classpath>
-				<pathelement location="bin" />
-	<pathelement location="src" />
+				<pathelement location="/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/artifacts" />
+	
 
 			</classpath>
 			<test name="FMCoreTest">
