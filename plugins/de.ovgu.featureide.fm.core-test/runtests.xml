@@ -10,7 +10,7 @@
 			<formatter type="brief" usefile="false" />
 			<classpath>
 				<pathelement location="bin" />
-
+	<pathelement location="src" />
 
 			</classpath>
 			<test name="FMCoreTest">
