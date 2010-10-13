@@ -1,4 +1,4 @@
-<project name="Run automated Tests" default="run" basedir=".">
+<project name="Run automated Tests" default="extTest" basedir=".">
 	<taskdef resource="org/pluginbuilder/anttasks/pluginbuildertasks.properties" classpath="../pluginbuilder-anttasks.jar" />
 	<typedef resource="org/pluginbuilder/anttasks/pluginbuildertypes.properties" classpath="../pluginbuilder-anttasks.jar" />
 
@@ -13,7 +13,12 @@
 	<condition property="is.emma">
 		<equals arg1="${pluginbuilder.is.runcoverage}" arg2="true"/>
 	</condition>
-	
+	<target name="extTest" >
+			<ant
+				dir="/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/plugins/de.ovgu.featureide.fm.core-test"
+				antfile="runtests.xml"></ant>
+			<echo>running tests here</echo>
+		</target>
 	<target name="-init" depends="-emmaInit">
 		<antcall target="-unpackEclipse"/>
 		<antcall target="-installEclipseExtensionLocation"/>
