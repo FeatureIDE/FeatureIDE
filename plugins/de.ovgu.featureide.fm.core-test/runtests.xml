@@ -10,7 +10,7 @@
 			<formatter type="brief" usefile="false" />
 			<classpath>
 				<pathelement location="/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/artifacts/plugins/de.ovgu.featureide.fm.core-test" />
-			<pathelement location="/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/artifacts/plugins/de.ovgu.featureide.fm.core-test" />
+			<pathelement location="/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/artifacts/plugins/de.ovgu.featureide.fm.core-test/src" />
 
 			</classpath>
 			<test name="FMCoreTest">
