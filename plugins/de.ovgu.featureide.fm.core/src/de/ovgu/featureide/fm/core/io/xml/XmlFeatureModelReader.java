@@ -61,7 +61,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 	 * Set this true to see some information about the parseprocess while
 	 * developing!
 	 */
-	boolean DEBUG_XML = true;
+	boolean DEBUG_XML = false;
 
 	/**
 	 * A kind of mind for the hirachy of the xml model
@@ -81,7 +81,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 	String[] validTagsStruct = {"and", "or", "alt", "feature", "direct-alt", "direct-or"};
 
 	String[] validTagsConst = {"var", "conj", "disj", "imp", "eq", "not", "atmost1", "rule"};
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -110,8 +110,9 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 			XMLEventReader eventReader = inputFactory
 					.createXMLEventReader(inputStream);
 
-			boolean isInStruct = false;
-			boolean isInConstraints = false;
+			// mode: 0 = start; 1 = struct; 2 = constraints; 3 = comments
+			int mode = 0;
+			
 			ruleTemp.clear();
 			ruleTemp.add(new LinkedList<Node>());
 
@@ -123,7 +124,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 					String currentTag = currentStartTag.getName()
 							.getLocalPart();
 
-					if (isInStruct) {
+					if (mode == 1) {
 						if (!isInArray(currentTag,validTagsStruct)){
 							throw new UnsupportedModelException("'"
 									+ currentTag + "' is not a valid tag in struct-section.",
@@ -198,7 +199,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 						// features
 						}
 
-					} else if (isInConstraints) {
+					} else if (mode == 2) {
 						if (!isInArray(currentTag,validTagsConst)){
 							throw new UnsupportedModelException("'"
 									+ currentTag + "' is not a valid tag in constraints-section.",
@@ -223,18 +224,30 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 							ruleTemp.add(new LinkedList<Node>());
 						}
 
-					} else {
+					} 
+					else if (mode == 3) {
+						if (currentTag.equals("c")){
+							featureModel.addComment(eventReader.getElementText());
+						}
+						else{
+							throw new UnsupportedModelException("'"
+										+ currentTag + "' is not a valid tag in comment-section.",
+										event.getLocation().getLineNumber());	
+						}
+					}
+					else {
 						if (currentTag.equals("featureModel")) {
 						}
-						if (currentTag.equals("struct")) {
+						else if (currentTag.equals("struct")) {
 							parentStack
 									.push(new String[] { currentTag, "root" });
-							isInStruct = true;
-							isInConstraints = false;
+							mode = 1;
 						}
-						if (currentTag.equals("constraints")) {
-							isInStruct = false;
-							isInConstraints = true;
+						else if (currentTag.equals("constraints")) {
+							mode = 2;
+						}
+						else if (currentTag.equals("comments")) {
+							mode = 3;
 						}
 					}
 				}
@@ -242,20 +255,18 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 					EndElement endElement = event.asEndElement();
 
 					String currentTag = endElement.getName().getLocalPart();
-					if (isInStruct) {
+					if (mode == 1) {
 						if (currentTag != "feature") {
 							if (parentStack.peek()[0] == currentTag) {
 								parentStack.pop();
 							}
 						}
 						if (currentTag == "struct") {
-							isInStruct = false;
-							isInConstraints = false;
+							mode = 0;
 						}
-					} else if (isInConstraints) {
+					} else if (mode == 2) {
 						if (currentTag.equals("constraints")) {
-							isInConstraints = false;
-							isInStruct = false;
+							mode = 0;
 						}
 						if (currentTag.equals("rule")) {
 							if (!ruleTemp.isEmpty()) {
@@ -319,6 +330,10 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 							ruleTemp.removeLast();
 							ruleTemp.getLast().add(node);
 						}
+					}
+					else if (mode == 3){
+						if (currentTag.equals("comments"))
+							mode = 0;
 					}
 				}
 			}

@@ -72,6 +72,7 @@ private ISelection selection;
 							IFile.class);
 				}
 				if (outputFile != null) {
+				
 					try {
 						boolean proceed = MessageDialog
 						.openQuestion(new Shell(), "Warning!",

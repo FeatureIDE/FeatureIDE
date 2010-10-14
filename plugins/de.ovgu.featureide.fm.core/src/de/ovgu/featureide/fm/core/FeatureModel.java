@@ -64,7 +64,8 @@ public class FeatureModel implements PropertyConstants {
 	 * all comment lines from the model file without line number at which they
 	 * occur
 	 */
-	private String comments;
+	
+	private List<String> comments = new LinkedList<String>();
 
 	/**
 	 * 
@@ -102,7 +103,7 @@ public class FeatureModel implements PropertyConstants {
 		renamings.clear();
 		propNodes.clear();
 		constraints.clear();
-		comments = null;
+		comments.clear();
 		annotations = null;
 	}
 
@@ -123,12 +124,12 @@ public class FeatureModel implements PropertyConstants {
 		this.annotations = annotations;
 	}
 
-	public String getComments() {
-		return comments;
+	public List<String> getComments() {
+		return Collections.unmodifiableList(comments);
 	}
-
-	public void setComments(String comments) {
-		this.comments = comments;
+	
+	public void addComment(String comment) {
+		comments.add(comment);
 	}
 
 	public List<Node> getPropositionalNodes() {
@@ -408,7 +409,8 @@ public class FeatureModel implements PropertyConstants {
 		for (int i = 0; i < propNodes.size(); i++)
 			fm.constraints.add(new Constraint(fm, fm.constraints.size()));
 		fm.annotations = annotations;
-		fm.comments = comments;
+		for (int i = 0; i < comments.size(); i++)
+			fm.comments.add(comments.get(i));
 		return fm;
 	}
 

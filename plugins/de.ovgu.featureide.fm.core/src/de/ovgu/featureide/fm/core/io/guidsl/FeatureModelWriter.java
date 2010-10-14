@@ -67,8 +67,8 @@ public class FeatureModelWriter extends AbstractFeatureModelWriter {
 	}
 	
 	private void writeComments(StringBuffer out) {
-		if (featureModel.getComments() != null)
-			out.append(featureModel.getComments() + "\r\n");
+		for (int i = 0; i<featureModel.getComments().size(); i++)
+			out.append("//" + featureModel.getComments().get(i) + "\n");
 	}
 
 	private void writeGrammarDefinition(StringBuffer out) {
@@ -78,7 +78,7 @@ public class FeatureModelWriter extends AbstractFeatureModelWriter {
 				out.append(root.getName());
 				out.append("_ : ");
 				out.append(root.getName());
-				out.append("+ :: _");
+				out.append("+ :: _" );
 				out.append(root.getName());
 				out.append(" ;\r\n\r\n");
 			}

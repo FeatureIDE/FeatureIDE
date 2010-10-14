@@ -78,6 +78,7 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
         Element root = doc.createElement("featureModel");
     	Element struct = doc.createElement("struct");
     	Element constraints = doc.createElement("constraints");
+    	Element comments = doc.createElement("comments");
     	
     	doc.appendChild(root);
     	root.appendChild(struct);
@@ -90,6 +91,16 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
         	constraints.appendChild(rule);
     		createPropositionalConstraints(doc, rule, featureModel.getPropositionalNodes().get(i));	
     	}
+    	
+    	root.appendChild(comments);
+    	for(int i=0; i<featureModel.getComments().size(); i++){
+        	Element c;
+        	c = doc.createElement("c");
+        	comments.appendChild(c);	
+        	
+        	Text text = doc.createTextNode(featureModel.getComments().get(i));
+        	c.appendChild(text);
+       }
     }
     
     /**

@@ -97,7 +97,7 @@ public class FeatureModelReader extends AbstractFeatureModelReader {
 	public FeatureModelReader(FeatureModel featureModel) {
 		setFeatureModel(featureModel);
 	}
-
+	
 	@Override
 	protected void parseInputStream(InputStream inputStream)
 			throws UnsupportedModelException {
@@ -117,10 +117,28 @@ public class FeatureModelReader extends AbstractFeatureModelReader {
 	}
 
 	private void readModelData(Model root) throws UnsupportedModelException {
-
-		featureModel.reset();
 		
-		noAbstractFeatures = (root.toString().startsWith("//NoAbstractFeatures"));
+		featureModel.reset();
+		String guidsl =  root.toString();
+		noAbstractFeatures = (guidsl.startsWith("//NoAbstractFeatures"));
+		
+		if (noAbstractFeatures)
+			guidsl = guidsl.substring(20);
+		
+		List<String> comments = new LinkedList<String>();
+		while (guidsl.contains("//"))
+		{
+			guidsl = guidsl.substring(guidsl.indexOf("//"));
+			int index = guidsl.indexOf("\n");
+			if (index > 0)
+				comments.add(guidsl.substring(2,index));
+			else comments.add(guidsl.substring(2,guidsl.length()-1));
+			guidsl = guidsl.substring(guidsl.indexOf("//") + 2);
+		}
+		
+		for(int i=0; i<comments.size(); i++)
+			featureModel.addComment(comments.get(i));
+		
 
 		Prods prods = ((MainModel) root).getProds();
 		AstListNode astListNode = (AstListNode) prods.arg[0];
