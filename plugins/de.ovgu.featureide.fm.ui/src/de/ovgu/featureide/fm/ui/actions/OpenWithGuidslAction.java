@@ -20,26 +20,19 @@ package de.ovgu.featureide.fm.ui.actions;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Iterator;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.internal.util.BundleUtility;
@@ -47,12 +40,9 @@ import org.osgi.framework.Bundle;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.io.guidsl.FeatureModelReader;
 import de.ovgu.featureide.fm.core.io.guidsl.FeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-
 
 /**
  * Opens the currently selected feature model with GUIDSL.
@@ -121,43 +111,6 @@ public class OpenWithGuidslAction implements IObjectActionDelegate {
 				XmlFeatureModelReader fmReader = new XmlFeatureModelReader(fm);
 				fmReader.readFromFile(modelfile);
 				FeatureModelWriter fmWriter = new FeatureModelWriter(fm);
-//				
-//				if (fmWriter.hasConcreteCompounds()){
-//					boolean proceed = MessageDialog
-//					.openQuestion(new Shell(), "Warning!",
-//							"The current feature model cannot be transformed due to concrete compounds! Proceed? (all compound features will be set as abstract)");
-//					if (!proceed) {
-//						return;
-//					}
-//				}
-
-				//FileDialog fileDialog = new FileDialog(new Shell(),
-						//SWT.SAVE);
-				//fileDialog.setFileName("model.m");
-				//fileDialog.setOverwrite(true);
-				//String filepath = fileDialog.open();
-				//if (filepath == null) return;
-				
-		
-				//IFile outputFile = modelfile.getFullPath();
-								
-				//fmWriter.writeToFile(outputFile);
-				
-				//System.out.println("getLocation().toOsString [-3]: " +);
-
-				//IWorkspace workspace= ResourcesPlugin.getWorkspace();
-				//IPath location= Path.fromOSString(file.getAbsolutePath());
-				
-				//IFile file= modelfile.getParent().toString(); //getFilesForLocation(modelfile.getLocation().toOSString().substring(0, modelfile.getLocation().toOSString().length()-4));
-				
-				//modelfile.getLocation().toOSString().substring(0, modelfile.getLocation().toOSString().length()-4);
-
-
-				
-				
-				//modelfile.getProject()
-				
-				
 				
 				// Parse XML to GUIDSL and save file as model.m
 				String loc = modelfile.getLocation().toOSString();
