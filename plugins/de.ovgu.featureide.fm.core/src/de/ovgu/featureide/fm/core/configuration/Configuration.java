@@ -75,7 +75,8 @@ public class Configuration {
 		table.put(sFeature.getName(), sFeature);
 		for (Feature child : feature.getChildren()) {
 			SelectableFeature sChild = new SelectableFeature(this, child);
-			sFeature.addChild(sChild);
+			if(!child.isHidden())
+				sFeature.addChild(sChild);
 			initFeatures(sChild, child);
 		}
 	}
