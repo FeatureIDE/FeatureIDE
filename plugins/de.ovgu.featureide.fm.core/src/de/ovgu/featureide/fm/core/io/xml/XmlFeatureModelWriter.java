@@ -120,6 +120,7 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
     	if (children.isEmpty()) {
     		fnod = doc.createElement("feature");
     		fnod.setAttribute("name", feat.getName());
+    		if(feat.isHidden())		fnod.setAttribute("hidden", "true");
         	if(feat.isMandatory())	fnod.setAttribute("mandatory", "true");
         	node.appendChild(fnod);
     	}
@@ -136,6 +137,7 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
 	    	
 	    	if(feat.isMandatory())	fnod.setAttribute("mandatory", "true");
 		    if(feat.isAbstract())	fnod.setAttribute("abstract", "true");
+		    if(feat.isHidden())		fnod.setAttribute("hidden", "true");
 	     	   	
 	    	node.appendChild(fnod);
 	    	
@@ -286,6 +288,8 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
 		} catch (TransformerException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
+
 		return prettyPrint(result.getWriter().toString()); 
+		
 	}    
 }

@@ -41,6 +41,8 @@ public class Feature implements PropertyConstants {
 	private boolean and = false;
 
 	private boolean multiple = false;
+	
+	private boolean hidden = false;
 
 	private FeatureModel featureModel;
 
@@ -102,6 +104,19 @@ public class Feature implements PropertyConstants {
 	public void setMandatory(boolean mandatory) {
 		this.mandatory = mandatory;
 		fireMandantoryChanged();
+	}
+	
+	public boolean isHidden() {
+		return hidden;
+	}
+
+	public void setHidden(boolean hid) {
+		this.hidden = hid;
+	}
+	
+	public void setAbstract(Boolean value) {
+		this.concret = !value;
+		fireChildrenChanged();
 	}
 
 	public boolean isMultiple() {
@@ -404,13 +419,11 @@ public class Feature implements PropertyConstants {
 		feature.and = and;
 		feature.mandatory = mandatory;
 		feature.multiple = multiple;
+		feature.hidden = hidden;
+		feature.concret = concret;
 		return feature;
 	}
 	
-	public void setAbstract(Boolean value) {
-		this.concret = !value;
-		fireChildrenChanged();
-	}
 	
 	public void setAnd() {
 		this.and = true;

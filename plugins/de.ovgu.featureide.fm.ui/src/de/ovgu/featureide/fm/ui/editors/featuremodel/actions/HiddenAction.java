@@ -22,28 +22,28 @@ import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
 
-public class AbstractAction extends SingleSelectionAction {
+public class HiddenAction extends SingleSelectionAction {
 
-	public static String ID = "de.ovgu.featureide.abstract";
+	public static String ID = "de.ovgu.featureide.hidden";
 
 	private final FeatureModel featureModel;
 
-	public AbstractAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
-		super("Abstract", viewer);
+	public HiddenAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
+		super("Hidden", viewer);
 		this.featureModel = featureModel;
 	}
 
 	@Override
 	public void run() {
-		feature.setAbstract(!feature.isAbstract());
-		setChecked(feature.isAbstract());
+		feature.setHidden(!feature.isHidden());
+		setChecked(feature.isHidden());
 		featureModel.handleModelDataChanged();
 	}
 
 	@Override
 	protected void updateProperties() {
-		setEnabled(feature.hasChildren());
-		setChecked(feature.isAbstract());
+		setEnabled(true);
+		setChecked(feature.isHidden());
 	}
 
 }

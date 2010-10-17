@@ -102,6 +102,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAct
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateLayerAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.EditConstraintAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.HiddenAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.MandantoryAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.RenameAction;
@@ -153,6 +154,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 	private MandantoryAction mandantoryAction;
 	
 	private AbstractAction abstractAction;
+	
+	private HiddenAction hiddenAction;
 
 	private AndAction andAction;
 
@@ -282,6 +285,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 		createCompoundAction = new CreateCompoundAction(graphicalViewer,featureModel);
 		deleteAction = new DeleteAction(graphicalViewer, featureModel);
 		mandantoryAction = new MandantoryAction(graphicalViewer, featureModel);
+		hiddenAction = new HiddenAction(graphicalViewer, featureModel);
 		abstractAction = new AbstractAction(graphicalViewer, featureModel);
 		andAction = new AndAction(graphicalViewer, featureModel);
 		orAction = new OrAction(graphicalViewer, featureModel);
@@ -339,6 +343,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 			menu.add(createLayerAction);
 			menu.add(mandantoryAction);
 			menu.add(abstractAction);
+			menu.add(hiddenAction);
 			menu.add(deleteAction);
 			menu.add(renameAction);
 		} else {
@@ -362,6 +367,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 			return mandantoryAction;
 		if (AbstractAction.ID.equals(workbenchActionID))
 			return abstractAction;		
+		if (HiddenAction.ID.equals(workbenchActionID))
+			return hiddenAction;	
 		if (AndAction.ID.equals(workbenchActionID))
 			return andAction;
 		if (OrAction.ID.equals(workbenchActionID))

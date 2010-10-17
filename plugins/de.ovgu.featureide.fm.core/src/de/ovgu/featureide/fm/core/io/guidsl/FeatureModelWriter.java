@@ -45,6 +45,12 @@ public class FeatureModelWriter extends AbstractFeatureModelWriter {
 		setFeatureModel(featureModel);
 	}
 	
+	private boolean hasHiddenFeatures(){
+		for(Feature feat : featureModel.getFeatures())
+			if (feat.isHidden()) return true;
+		return false;
+	}
+	
 	public String writeToString() {
 		//open a string buffer for writing
 		StringBuffer out = new StringBuffer();// = new BufferedWriter(new FileWriter(file));
@@ -61,7 +67,13 @@ public class FeatureModelWriter extends AbstractFeatureModelWriter {
 		//write featureModel
 		writeGrammarDefinition(out);
 		writePropositionalConstraints(out);
-		writeAnnotations(out);
+		
+		// write hidden features
+		if(hasHiddenFeatures()){
+			out.append("##\r\n\r\n");
+			for (Feature feat : featureModel.getFeatures())
+				if (feat.isHidden()) out.append(feat.toString() +  " { hidden } \r\n");
+		}
 
 		return out.toString();
 	}
@@ -97,10 +109,10 @@ public class FeatureModelWriter extends AbstractFeatureModelWriter {
 		out.append("\r\n");
 	}
 
-	private void writeAnnotations(StringBuffer out) {
-		if (featureModel.getAnnotations() != null)
-			out.append(featureModel.getAnnotations() + "\r\n\r\n");
-	}
+//	private void writeAnnotations(StringBuffer out) {
+//		if (featureModel.getAnnotations() != null)
+//			out.append(featureModel.getAnnotations() + "\r\n\r\n");
+//	}
 
 	private void writeRule(Feature mainFeature, StringBuffer out) {
 		

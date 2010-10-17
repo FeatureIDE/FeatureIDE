@@ -134,6 +134,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 						// features
 						boolean isMandatory = false;
 						boolean isAbstract = false;
+						boolean isHidden = false;
 						String attrName = "noname";
 						String parent = parentStack.peek()[1];
 
@@ -164,6 +165,12 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 									isAbstract = false;
 								}
 							}
+							else if (curName == "hidden") {
+								if (curValue.equals("true")) 
+									isHidden = true;
+								 else 
+									isHidden = false;
+							}
 							else{
 								throw new UnsupportedModelException("'"
 										+ curName
@@ -175,7 +182,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 
 						if (!featureModel.getFeatureNames().contains(attrName)
 								&& FeatureModel.isValidJavaIdentifier(attrName)) {
-							addFeature(attrName, isMandatory, isAbstract,
+							addFeature(attrName, isMandatory, isAbstract, isHidden,
 									parent);
 						} else {
 							if (!FeatureModel.isValidJavaIdentifier(attrName)) {
@@ -361,7 +368,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 	 *            String with the name of the parent feature
 	 */
 	private void addFeature(String featureName, boolean isMandatory,
-			boolean isAbstract, String parent) {
+			boolean isAbstract, boolean isHidden, String parent) {
 		/*
 		 * HOWTO: add a child to the FeaturModel
 		 * 
@@ -381,6 +388,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 			feat = new Feature(featureModel, featureName);
 			feat.setMandatory(isMandatory);
 			feat.setAbstract(isAbstract);
+			feat.setHidden(isHidden);
 			featureModel.addFeature(feat);
 
 			if (parentStack.peek()[0].equals("and")) {

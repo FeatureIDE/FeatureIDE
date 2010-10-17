@@ -164,6 +164,19 @@ public class WaterlooReader extends AbstractFeatureModelReader {
     	buildFeatureTree(reader);
     }
     
+    private String removeWhitespaces(String str){
+    	str = str.trim();
+    	if (str.contains(" ")){
+	    	String temp = str.substring(0,str.indexOf(" ")+1);
+	    	str = str.substring(str.indexOf(" ") + 1);
+	    	while(str.contains(" ")){
+	    		str = str.substring(0,str.indexOf(" ")) + str.substring(str.indexOf(" ")+1,str.length()); 
+	    	}
+	    	str = temp + str;
+    	}
+    	return str;
+    }
+    
     /**
      * Reads one line of the input Text and builds the corresponding feature
      * @param reader
@@ -178,7 +191,7 @@ public class WaterlooReader extends AbstractFeatureModelReader {
     		String lineText = reader.readLine();
     		line++;
     		FeatureIndent feat;
-			String featId;   
+			String featId = "";   
     		while (lineText != null) {				
 	    		int countIndent = 0;
 				 						
@@ -193,26 +206,39 @@ public class WaterlooReader extends AbstractFeatureModelReader {
 	    		}
 				int relativeIndent = countIndent - lastFeat.getIndentation();
 				while (relativeIndent < 1) {
-					if (lastFeat.isRoot()) throw new UnsupportedModelException(
-							"Indentation error, feature has no parent", line);
-					lastFeat = (FeatureIndent) lastFeat.getParent();
-					relativeIndent = countIndent - lastFeat.getIndentation();
+//					if (lastFeat.isRoot()) throw new UnsupportedModelException(
+//							"Indentation error, feature has no parent", line);
+//					lastFeat = (FeatureIndent) lastFeat.getParent();
+//					relativeIndent = countIndent - lastFeat.getIndentation();
+					
+					if (!lastFeat.isRoot()){
+						lastFeat = (FeatureIndent) lastFeat.getParent();
+						relativeIndent = countIndent - lastFeat.getIndentation();
+					}
 				}
 				// Remove special characters and whitespaces from names
+				lineText = removeWhitespaces(lineText);
+				//System.out.println("MUH = " + lineText);
+				
 				char[] lineTextChars = lineText.toCharArray();
 				for (int i = 0; i < lineTextChars.length; i++) {
 					Character c = lineTextChars[i];
+					
 					if (!(Character.isLetterOrDigit(c) || c.equals(':') 
 							|| c.equals('[') || c.equals(']') || c.equals(',')
 							|| c.equals('*') || c.equals('(') || c.equals(')'))) {
 						lineTextChars[i] = '_';
 					}
 				}
+				
 				lineText = new String(lineTextChars);
+				
 				if (lineText.startsWith(":r")) {
 					feat = new FeatureIndent(featureModel, 0);
 		    		feat.setMandatory(true);
 		    		featId = setNameGetID(feat, lineText);
+		    		if (feat.getName().trim().toLowerCase().equals("root"))
+		    			feat.setName("root_");
 		    		featureModel.setRoot(feat);	
 		    		feat.changeToAnd();
 		    		countIndent = 0;
@@ -231,44 +257,33 @@ public class WaterlooReader extends AbstractFeatureModelReader {
 		    		lastFeat.addChild(feat);
 		    		feat.changeToAnd();
 				} else if (lineText.startsWith(":g")) {
-					if (lineText.contains("(")) {
-						feat = new FeatureIndent(featureModel, countIndent);
-			    		feat.setMandatory(false);
-			    		featId = setNameGetID(feat, lineText);
-			    		feat.setParent(lastFeat);
-			    		lastFeat.addChild(feat);
-			    		feat.changeToAnd();
-					} else {
-						feat = new FeatureIndent(featureModel, countIndent);
-			    		feat.setMandatory(true);
-			    		featId = "sg_" + lastFeat.getName() + line;
-			    		feat.setName(featId);
-			    		feat.setParent(lastFeat);
-			    		lastFeat.addChild(feat);
-			    		feat.changeToAnd();
-					}
 					if (lineText.contains("[1,1]")) {
-						feat.changeToAlternative();
+						lastFeat.changeToAlternative();
 					} else if (lineText.contains("[1,*]")) {
-						feat.changeToOr();
+						lastFeat.changeToOr();
 					} else if ((lineText.contains("[")) && (lineText.contains("]")))  {
 						int index = lineText.indexOf('[');
 						int start = Character.getNumericValue(lineText.charAt(index + 1));
 						int end = Character.getNumericValue(lineText.charAt(index + 3));
-						FeatCardinality featCard = new FeatCardinality(feat, start, end);
+						FeatCardinality featCard = new FeatCardinality(lastFeat, start, end);
 						arbCardGroupFeats.add(featCard);
 					} else throw new UnsupportedModelException("Couldn't " +
 							"determine group cardinality", line);
+					//lastFeat = feat;
+					//featId = featId + "_ ";
+					lineText = reader.readLine();
+					line++;
+					continue;
 				} else if (lineText.startsWith(":")) {
 					feat = new FeatureIndent(featureModel, countIndent);
 		    		feat.setMandatory(true);
 		    		String name;
 		    		if (lineText.contains("(")) {
-		    			name = lineText.substring(2, lineText.indexOf('(') - 1);
+		    			name = lineText.substring(2, lineText.indexOf('('));
 		        		featId = lineText.substring(lineText.indexOf('(') + 1, 
 		        				lineText.indexOf(')'));
 		        	} else {
-		        		name = lineText.substring(2, lineText.length()) + line;
+		        		name = lineText.substring(2, lineText.length()); // + line;
 		        		featId = name;
 		        	}
 	    			if (Character.isDigit(name.charAt(0))) name = "a" + name;
@@ -282,10 +297,13 @@ public class WaterlooReader extends AbstractFeatureModelReader {
 					feat.setName(featId);
 					featureModel.addFeature(feat);
 				}
+				System.out.println("(before) FEAT ID = " + featId);
 				if (idTable.containsKey(featId)) throw 
 					new UnsupportedModelException("Id: " + featId + " occured" +
 					" second time, but may only occur once", line);
 				idTable.put(featId, feat);
+				System.out.println("(after) FEAT ID = " + featId);
+				
 				lastFeat = feat;
 				lineText = reader.readLine();
 				line++;
@@ -300,11 +318,11 @@ public class WaterlooReader extends AbstractFeatureModelReader {
     private String setNameGetID (Feature feat, String lineText) {
     	String featId, name;    	
     	if (lineText.contains("(")) {
-    		name = lineText.substring(3, lineText.indexOf('(') - 1);
+    		name = lineText.substring(3, lineText.indexOf('(') );
     		featId = lineText.substring(lineText.indexOf('(') + 1, 
     				lineText.indexOf(')'));
     	} else {
-    		name = lineText.substring(3, lineText.length()) + line;
+    		name = lineText.substring(3, lineText.length()); // + line;
     		featId = name;
     	}
     	if (Character.isDigit(name.charAt(0))) name = "a" + name;

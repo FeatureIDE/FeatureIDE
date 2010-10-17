@@ -116,12 +116,28 @@ public class FeatureModelReader extends AbstractFeatureModelReader {
         }
 	}
 
+	// converts a string with "\n" to a list of lines
+	private List<String> stringToList(String str){
+		List<String> result = new LinkedList<String>();
+		while(str.contains("\n")){
+			int ind = str.indexOf("\n");
+			if (ind>0)
+				result.add(str.substring(0,ind-1));
+			str = str.substring(ind + 1);
+		}
+		if (str.length()>0)
+			result.add(str);
+		return result;
+	}
+	
 	private void readModelData(Model root) throws UnsupportedModelException {
 		
 		featureModel.reset();
 		String guidsl =  root.toString();
+
 		noAbstractFeatures = (guidsl.startsWith("//NoAbstractFeatures"));
 		
+		// Reading comments
 		if (noAbstractFeatures)
 			guidsl = guidsl.substring(20);
 		
@@ -155,8 +171,29 @@ public class FeatureModelReader extends AbstractFeatureModelReader {
 		if (varOptNode.arg.length > 0 && varOptNode.arg[0] != null)
 			readVarStmt((VarStmt) varOptNode.arg[0]);
 		
-		featureModel.handleModelDataLoaded();
+
+		// Reading hidden features
+		int ind = root.toString().indexOf("##");
+		if (ind >= 0){	
+			String annotations = root.toString().substring(ind+3);
+			
+			List<String> list = stringToList(annotations);
+			for(int i=0; i<list.size(); i++){
+				String line = list.get(i);
+				if(line.indexOf("{") > 0){
+					if(line.substring(line.indexOf("{")).toLowerCase().contains("hidden")){
+						String featName = line.substring(0,line.indexOf("{")-1);
+						if (featureModel.getFeature(featName) != null)
+							featureModel.getFeature(featName).setHidden(true);
+						else 
+							throw new UnsupportedModelException("The feature '" + featName + "' does not occur in the feature model!", 0);
+					}
+				}
+			}
+		}
 		
+		featureModel.handleModelDataLoaded();
+
 	}
 
 	private void readGProduction(GProduction gProduction) throws UnsupportedModelException {
