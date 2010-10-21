@@ -181,12 +181,17 @@ public class FeatureModelReader extends AbstractFeatureModelReader {
 			for(int i=0; i<list.size(); i++){
 				String line = list.get(i);
 				if(line.indexOf("{") > 0){
-					if(line.substring(line.indexOf("{")).toLowerCase().contains("hidden")){
+					String tempLine = line.substring(line.indexOf("{")).toLowerCase();
+					if(tempLine.contains("hidden")){
+						int ix = tempLine.indexOf("hidden");
+						String ch = tempLine.substring(ix-1,ix);
+						if (ch.equals(" ") || ch.equals("{")){
 						String featName = line.substring(0,line.indexOf("{")-1);
 						if (featureModel.getFeature(featName) != null)
 							featureModel.getFeature(featName).setHidden(true);
 						else 
 							throw new UnsupportedModelException("The feature '" + featName + "' does not occur in the feature model!", 0);
+						}
 					}
 				}
 			}
