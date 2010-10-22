@@ -182,18 +182,21 @@ public class CollaborationModelBuilder {
 						Boolean selected = false;
 						if (!equation.equals("") && featureNames.contains(layerName))
 							selected = true;
-						collaboration = null;
-						IResource[] members = null;
-						try {
-							members = featureProject.getSourceFolder().getFolder(layerName).members();
-						} catch (CoreException e) {
-							UIPlugin.getDefault().logError(e);
+						IFolder folder = featureProject.getSourceFolder().getFolder(layerName);
+						if (folder.exists()) {
+							collaboration = null;
+							IResource[] members = null;
+								try {
+									members = folder.members();
+								} catch (CoreException e) {
+									UIPlugin.getDefault().logError(e);
+								}
+								for (IResource res : members) {
+									addArbitraryFiles(res, layerName, selected);
+							}
+							if (collaboration != null)
+								model.collaborations.add(collaboration);
 						}
-						for (IResource res : members) {
-							addArbitraryFiles(res, layerName, selected);
-						}
-						if (collaboration != null)
-							model.collaborations.add(collaboration);
 					}
 				}
 			}
@@ -214,16 +217,19 @@ public class CollaborationModelBuilder {
 					if (featureFilter.size() == 0 || featureFilter.contains(layerName)) {
 						collaboration = null;
 						IResource[] members = null;
-						try {
-							members = featureProject.getSourceFolder().getFolder(layerName).members();
-						} catch (CoreException e) {
-							UIPlugin.getDefault().logError(e);
+						IFolder folder = featureProject.getSourceFolder().getFolder(layerName);
+						if (folder.exists()) {
+							try {
+								members = folder.members();
+							} catch (CoreException e) {
+								UIPlugin.getDefault().logError(e);
+							}
+							for (IResource res : members) {
+								addArbitraryFiles(res, layerName, true);
+							}
+							if (collaboration != null)
+								model.collaborations.add(collaboration);
 						}
-						for (IResource res : members) {
-							addArbitraryFiles(res, layerName, true);
-						}
-						if (collaboration != null)
-							model.collaborations.add(collaboration);
 					}
 				} else {
 					if (featureFilter.size() == 0 || featureFilter.contains(layerName)) {

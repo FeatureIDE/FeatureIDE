@@ -30,6 +30,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.prop4j.And;
 import org.prop4j.Implies;
 import org.prop4j.Literal;
@@ -100,7 +105,7 @@ public class FeatureModel implements PropertyConstants {
 			root = null;
 		}
 		featureTable.clear();
-		renamings.clear();
+//		renamings.clear();
 		propNodes.clear();
 		constraints.clear();
 		comments.clear();
@@ -214,7 +219,7 @@ public class FeatureModel implements PropertyConstants {
 		}
 		return featureTable.get(name);
 	}
-
+	
 	public boolean renameFeature(String oldName, String newName) {
 		if (!featureTable.containsKey(oldName)
 				|| featureTable.containsKey(newName))
@@ -226,25 +231,93 @@ public class FeatureModel implements PropertyConstants {
 		return true;
 	}
 
+	private IFolder sourceFolder;
+
+	public boolean isRenamed() {
+		return (renamings.size() != 0);
+	}
+
 	public void performRenamings() {
 		for (Renaming renaming : renamings) {
 			for (Node node : propNodes)
 				renameVariables(node, renaming.oldName, renaming.newName);
-			fireFeatureRenamed(renaming.oldName, renaming.newName);
 		}
 		renamings.clear();
-	}
-
-	/**
-	 * informs listners that a feature has been renamed
-	 */
-	private void fireFeatureRenamed(String oldName, String newName) {
-		PropertyChangeEvent event = new PropertyChangeEvent(this,
-				FEATURE_NAME_CHANGED, oldName, newName);
-		for (PropertyChangeListener listener : listenerList) {
-			listener.propertyChange(event);
+	};
+	
+	public void performRenamings(IFile file) {
+		sourceFolder = ((IResource) file.getAdapter(IFile.class)).getProject().getFolder("src");
+		for (Renaming renaming : renamings) {
+			for (Node node : propNodes)
+				renameVariables(node, renaming.oldName, renaming.newName);
+			moveFolder(renaming.oldName, renaming.newName);
+		}
+		renamings.clear();
+	}	
+	
+	public void moveFolder(String oldName, String newName) {
+		try {
+			IFolder folder = sourceFolder.getFolder(oldName);
+			if (!folder.exists()) {
+				IFolder newFolder = sourceFolder.getFolder(newName);
+				newFolder.create(false, true, null);
+			} else {
+				IPath newPath = sourceFolder.getFolder(newName).getFullPath();
+				folder.move(newPath, true, null);
+				//renameJakLayer(sourceFolder.getFolder(newName),oldName,newName);
+			}
+		} catch (CoreException e) {
+			FMCorePlugin.getDefault().logError(e);
 		}
 	}
+	
+//	private void renameJakLayer(IFolder folder, String oldName, String newName) throws CoreException {
+//		for (IResource res : folder.members()) {
+//			if (res instanceof IFolder)
+//				renameJakLayer((IFolder)res, oldName, newName);
+//			
+//			if (res instanceof IFile) {
+//				IFile file = (IFile)res;
+//				if (file.getName().endsWith(".jak"))
+//					renameJakLayer(file, oldName, newName);
+//			}
+//		}
+//	}
+//	
+//	private void renameJakLayer(final IFile file, String oldName, String newName) {
+//		File jakFile = file.getRawLocation().toFile();
+//		Scanner scanner = null;
+//		try {
+//			scanner = new Scanner(jakFile);
+//		} catch (FileNotFoundException e) {
+//			FMCorePlugin.getDefault().logError(e);
+//		}
+//		String text = "";
+//		while (scanner.hasNextLine())
+//			text += scanner.nextLine() + "\r\n";
+//		
+//		text = text.replaceFirst("layer\\s" + oldName, "layer " + newName);
+//		
+//		try {
+//			FileWriter fw = new FileWriter(jakFile);
+//			fw.write(text);
+//			fw.close();
+//		} catch (IOException e) {
+//			FMCorePlugin.getDefault().logError(e);
+//		}
+//		
+//	}
+	
+//	/**
+//	 * informs listners that a feature has been renamed
+//	 */
+//	private void fireFeatureRenamed(String oldName, String newName) {
+//		PropertyChangeEvent event = new PropertyChangeEvent(this,
+//				FEATURE_NAME_CHANGED, oldName, newName);
+//		for (PropertyChangeListener listener : listenerList) {
+//			listener.propertyChange(event);
+//		}
+//	}
 
 	private void renameVariables(Node node, String oldName, String newName) {
 		if (node instanceof Literal) {

@@ -146,7 +146,10 @@ PropertyConstants, PropertyChangeListener, IResourceChangeListener {
 	 */
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
-		setConfiguration();
+		if (isDirty())
+			setConfiguration();
+		else 
+			setConfigurationFromFile();
 		//Reinitialize the actual pages 
 		if (oldPageIndex == advancedConfigurationPageIndex){
 			advancedConfigurationPage.propertyChange(null);
@@ -175,7 +178,18 @@ PropertyConstants, PropertyChangeListener, IResourceChangeListener {
 	public boolean isDirty() {
 		return isPageModified  || super.isDirty();
 	}
-
+	
+	private void setConfigurationFromFile() {
+		IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
+		featureModel = featureProject.getFeatureModel();
+		configuration = new Configuration(featureModel, true);
+		try {
+			new ConfigurationReader(configuration).readFromFile(file);
+		} catch (Exception e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+	}
+	
 	private void setConfiguration() {
 		IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
 		featureModel = featureProject.getFeatureModel();

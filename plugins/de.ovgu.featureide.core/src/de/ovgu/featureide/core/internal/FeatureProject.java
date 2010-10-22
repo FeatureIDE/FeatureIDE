@@ -254,7 +254,6 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	}
 
 	private void createAndDeleteFeatureFolders() throws CoreException {
-
 		sourceFolder.refreshLocal(IResource.DEPTH_ONE, null);
 		// create folders for all layers
 		for (Feature feature : featureModel.getFeatures())
@@ -608,6 +607,8 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		return cp.toArray(new String[cp.size()]);
 	}
 	private ArrayList<IResource> resList = new ArrayList<IResource>();
+
+	private boolean modelChanged = false;
 	
 	public void resourceChanged(IResourceChangeEvent event) {
 		if (!checkModelChange(event.getDelta().findMember(
@@ -632,8 +633,10 @@ public class FeatureProject extends BuilderMarkerHandler implements
 					for (IResource res : sourceFolder.members()) {
 						IResourceDelta delta = event.getDelta().findMember(
 								res.getFullPath());
-						if (delta != null)//&& (delta.getFlags() & IResourceDelta.CONTENT) != 0){
+						if (delta != null && !modelChanged) {//&& (delta.getFlags() & IResourceDelta.CONTENT) != 0){
 							buildRelevantChanges = true;
+							modelChanged = false;
+						}
 					}
 			} catch (CoreException e) {
 				CorePlugin.getDefault().logError(e);
@@ -645,8 +648,8 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		if (delta == null || (delta.getFlags() & IResourceDelta.CONTENT) == 0)
 			return false;
 		
-		buildRelevantChanges = true;
-
+		//buildRelevantChanges = false;
+		modelChanged = true;
 		Job job = new Job("Load Model") {
 			protected IStatus run(IProgressMonitor monitor) {
 				loadModel();
@@ -840,6 +843,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	 */
 	public void builded() {
 		buildRelevantChanges = false;
+		modelChanged = false;
 	}
 	
 

@@ -167,8 +167,10 @@ public class FeatureOrderEditor extends EditorPart {
 		Collection<String> newFeatureNames = featureModel.getLayerNames();
 		LinkedList<String> oldFeatureNames = new LinkedList<String>();
 
-		for (int i = 0; i < featurelist.getItemCount(); i++)
+		for (int i = 0; i < featurelist.getItemCount(); i++) {
+			featurelist.setItem(i, featureModel.getNewName(featurelist.getItem(i)));
 			oldFeatureNames.add(featurelist.getItem(i));
+		}
 
 		// Layer removed
 		for (String oldFeature : oldFeatureNames)
@@ -177,12 +179,12 @@ public class FeatureOrderEditor extends EditorPart {
 				changed = true;
 			}
 		// Layer added
-		for (String newFeature : newFeatureNames)
+		for (String newFeature : newFeatureNames) {
 			if (!(oldFeatureNames.contains(newFeature))) {
 				featurelist.add(newFeature);
 				changed = true;
 			}
-
+		}
 		if (activate.getSelection() && changed) {
 			dirty = true;
 			firePropertyChange(IEditorPart.PROP_DIRTY);
@@ -374,7 +376,7 @@ public class FeatureOrderEditor extends EditorPart {
 		if (scanner.hasNext()) {
 			list = new ArrayList<String>();
 			while (scanner.hasNext()) {
-				list.add(scanner.next());
+				list.add(featureModel.getNewName(scanner.next()));
 			}
 			return list;
 		} else {
