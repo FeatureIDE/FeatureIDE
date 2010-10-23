@@ -32,12 +32,12 @@ import org.prop4j.Node;
 public class Constraint implements PropertyConstants {
 
 	private FeatureModel featureModel;
+	private Node propNode;
+	
 
-	private int index;
-
-	public Constraint(FeatureModel featureModel, int index) {
+	public Constraint(FeatureModel featureModel, Node propNode) {
 		this.featureModel = featureModel;
-		this.index = index;
+		this.propNode = propNode;
 	}
 
 	public FeatureModel getFeatureModel() {
@@ -45,7 +45,7 @@ public class Constraint implements PropertyConstants {
 	}
 
 	public Node getNode() {
-		return featureModel.getConstraint(index);
+		return propNode;
 	}
 
 	private LinkedList<PropertyChangeListener> listenerList = new LinkedList<PropertyChangeListener>();

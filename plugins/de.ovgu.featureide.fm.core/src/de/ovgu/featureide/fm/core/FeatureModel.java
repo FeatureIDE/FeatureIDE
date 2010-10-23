@@ -39,6 +39,7 @@ import org.prop4j.And;
 import org.prop4j.Implies;
 import org.prop4j.Literal;
 import org.prop4j.Node;
+
 import org.prop4j.Not;
 import org.prop4j.Or;
 import org.prop4j.SatSolver;
@@ -143,7 +144,7 @@ public class FeatureModel implements PropertyConstants {
 
 	public void addPropositionalNode(Node node) {
 		propNodes.add(node);
-		constraints.add(new Constraint(this, constraints.size()));
+		constraints.add(new Constraint(this, node));
 	}
 
 	public void removePropositionalNode(Node node) {
@@ -152,8 +153,11 @@ public class FeatureModel implements PropertyConstants {
 	}
 
 	public void removePropositionalNode(Constraint constraint) {
+	
+		
 		propNodes.remove(constraint.getNode());
 		constraints.remove(constraint);
+	
 	}
 
 	public void removePropositionalNode(int index) {
@@ -477,10 +481,10 @@ public class FeatureModel implements PropertyConstants {
 				list.add(child);
 		}
 		fm.propNodes = new LinkedList<Node>();
-		for (Node node : propNodes)
+		for (Node node : propNodes){
 			fm.propNodes.add(node);
-		for (int i = 0; i < propNodes.size(); i++)
-			fm.constraints.add(new Constraint(fm, fm.constraints.size()));
+	
+			fm.constraints.add(new Constraint(fm, node));}
 		fm.annotations = annotations;
 		for (int i = 0; i < comments.size(); i++)
 			fm.comments.add(comments.get(i));
