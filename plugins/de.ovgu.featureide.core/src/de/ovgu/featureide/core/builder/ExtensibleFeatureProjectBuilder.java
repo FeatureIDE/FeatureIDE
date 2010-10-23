@@ -188,10 +188,12 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 	private void copy(IFile equation) throws CoreException{
 		String equationName = equation.getName().split("[.]")[0];
 		boolean binFolderExists = (featureProject.getBinFolder().getFolder(equationName).exists());
-		for (String feature : getSelectedFeatures(equation))
-			if (featureProject.getSourceFolder().getFolder(feature).exists())
-				for(IResource res : featureProject.getSourceFolder().getFolder(feature).members())
-					copyNotComposedFiles(equationName, res, binFolderExists);
+		ArrayList<String > selectedFeatures = getSelectedFeatures(equation);
+		if (selectedFeatures != null)
+			for (String feature : selectedFeatures)
+				if (featureProject.getSourceFolder().getFolder(feature).exists())
+					for(IResource res : featureProject.getSourceFolder().getFolder(feature).members())
+						copyNotComposedFiles(equationName, res, binFolderExists);
 	}
 	
 	private void copyNotComposedFiles(String folderName, IResource res, boolean binFolderExists) throws CoreException {

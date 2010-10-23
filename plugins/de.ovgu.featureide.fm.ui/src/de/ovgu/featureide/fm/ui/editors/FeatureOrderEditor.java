@@ -407,6 +407,8 @@ public class FeatureOrderEditor extends EditorPart {
 		final IFile res = (IFile) resource;
 		File file = res.getRawLocation().toFile();
 		ArrayList<String> oldConfiguration = readFeaturesfromConfigurationFile(file);
+		if (oldConfiguration == null)
+			return;
 		LinkedList<String> newConfiguration = new LinkedList<String>();
 
 		if (!activate.getSelection()) {
