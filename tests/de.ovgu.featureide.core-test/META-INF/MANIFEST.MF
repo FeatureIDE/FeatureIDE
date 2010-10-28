@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Core Test Fragment
+Bundle-SymbolicName: de.ovgu.featureide.core-test
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: University of Magdeburg
+Fragment-Host: de.ovgu.featureide.core
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
