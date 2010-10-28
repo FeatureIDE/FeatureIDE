@@ -17,17 +17,13 @@
  * See http://www.fosd.de/featureide/ for further information.
  */
 
-
-import java.lang.reflect.Method;
-
 import org.junit.Test;
-
-
 
 /**
  * The FeatureIDE test suite that should contain all available JUnit tests.
  * 
  * @author Thomas Thuem
+ * @author Fabian Benduhn
  */
 public class FMCoreTest {
 	
