@@ -84,7 +84,7 @@ public class FeatureModel implements PropertyConstants {
 	 * This string saves the annotations from the model file as they were read,
 	 * because they were not yet used.
 	 */
-	private String annotations;
+	private List<String> annotations = new LinkedList<String>();
 
 	/**
 	 * a list containing all renamings since the last save
@@ -110,7 +110,7 @@ public class FeatureModel implements PropertyConstants {
 		propNodes.clear();
 		constraints.clear();
 		comments.clear();
-		annotations = null;
+		annotations.clear();
 	}
 
 	private void deleteChildFeatures(Feature feature) {
@@ -122,12 +122,12 @@ public class FeatureModel implements PropertyConstants {
 		}
 	}
 
-	public String getAnnotations() {
-		return annotations;
+	public List<String> getAnnotations() {
+		return  Collections.unmodifiableList(annotations);
 	}
 
-	public void setAnnotations(String annotations) {
-		this.annotations = annotations;
+	public void addAnnotation(String annotation) {
+		annotations.add(annotation);
 	}
 
 	public List<String> getComments() {
@@ -449,7 +449,8 @@ public class FeatureModel implements PropertyConstants {
 			fm.propNodes.add(node);
 	
 			fm.constraints.add(new Constraint(fm, node));}
-		fm.annotations = annotations;
+		for (int i = 0; i < annotations.size(); i++)
+			fm.annotations.add(annotations.get(i));
 		for (int i = 0; i < comments.size(); i++)
 			fm.comments.add(comments.get(i));
 		return fm;

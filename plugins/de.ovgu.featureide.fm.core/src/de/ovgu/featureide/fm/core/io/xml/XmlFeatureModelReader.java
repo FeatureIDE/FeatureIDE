@@ -352,7 +352,6 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 		}
 		// Update the FeatureModel in Editor
 		featureModel.handleModelDataLoaded();
-		//featureModel.handleModelDataChanged();
 	}
 
 	/**

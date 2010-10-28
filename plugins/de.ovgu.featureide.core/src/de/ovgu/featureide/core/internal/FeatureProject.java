@@ -219,10 +219,16 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			
 			FeatureModel fm = new FeatureModel();
 			FeatureModelReader fmReader = new FeatureModelReader(fm);		
-
 			fmReader.readFromFile(project.getFile("model.m"));
 			XmlFeatureModelWriter fmWriter = new XmlFeatureModelWriter(fm);
 			fmWriter.writeToFile(file);
+			
+			if (!fmReader.getAnnLine().isEmpty()){
+				GrammarFile gFile = new GrammarFile(project.getFile("model.m"));
+				for(int i=0;i<fmReader.getAnnLine().size();i++)
+					gFile.createModelMarker("This annotation is not supported yet - moved to the comment section.",	IMarker.SEVERITY_WARNING, fmReader.getAnnLine().get(i));
+			}
+				
 			
 			// delete model.m automatically - default: false
 			//project.getFile("model.m").delete(true, null);
@@ -250,7 +256,9 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			CorePlugin.getDefault().logError(
 					"Error while loading feature model from "
 							+ modelFile.getResource(), e);
-		}
+		
+		}	
+		
 	}
 
 	private void createAndDeleteFeatureFolders() throws CoreException {

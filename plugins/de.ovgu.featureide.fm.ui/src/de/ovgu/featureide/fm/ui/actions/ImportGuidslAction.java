@@ -99,6 +99,9 @@ private ISelection selection;
 						}
 						FeatureModelReader fmReader = new FeatureModelReader(fm);		
 						fmReader.readFromFile(inputFile);
+						if (!fmReader.getAnnLine().isEmpty())
+							MessageDialog.openInformation(new Shell(),"Warning!", "This grammar file contains annotations, which are not supported yet: moved to the comment section.");
+							
 						XmlFeatureModelWriter fmWriter = new XmlFeatureModelWriter(fm);
 						fmWriter.writeToFile(outputFile);
 						outputFile.refreshLocal(IResource.DEPTH_ZERO, null);				

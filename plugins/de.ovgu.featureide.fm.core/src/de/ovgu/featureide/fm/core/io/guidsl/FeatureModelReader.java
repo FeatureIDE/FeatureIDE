@@ -19,6 +19,7 @@
 package de.ovgu.featureide.fm.core.io.guidsl;
 
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -81,14 +82,22 @@ import guidsl.VarStmt;
  * @author Thomas Thuem
  */
 public class FeatureModelReader extends AbstractFeatureModelReader {
-	
+
 	/**
 	 * Needed because the GUIDSL parser uses static variables and should not
 	 * be used by different threads at the same time.
 	 */
 	private static Object lock = new Object();
+
+	private List<Integer> annLine = new LinkedList<Integer>();
 	
 	private boolean noAbstractFeatures = false;
+	
+	public List<Integer> getAnnLine(){
+		return Collections.unmodifiableList(annLine);
+	}
+		
+	
 	/**
 	 * Creates a new reader and sets the feature model to store the data.
 	 * 
@@ -97,23 +106,24 @@ public class FeatureModelReader extends AbstractFeatureModelReader {
 	public FeatureModelReader(FeatureModel featureModel) {
 		setFeatureModel(featureModel);
 	}
-	
+
 	@Override
 	protected void parseInputStream(InputStream inputStream)
-			throws UnsupportedModelException {
+	throws UnsupportedModelException {
+
 		warnings.clear();
-        try {
-        	synchronized (lock) {
-        		Parser myParser = Parser.getInstance(inputStream);
-                Model root = (Model) myParser.parseAll();
-                readModelData(root);
+		try {
+			synchronized (lock) {
+				Parser myParser = Parser.getInstance(inputStream);
+				Model root = (Model) myParser.parseAll();
+				readModelData(root);
 			}
-        	featureModel.handleModelDataLoaded();
-        }
-        catch (ParseException e) {
-        	int line = e.currentToken.next.beginLine;
-        	throw new UnsupportedModelException(e.getMessage(), line);
-        }
+			featureModel.handleModelDataLoaded();
+		}
+		catch (ParseException e) {
+			int line = e.currentToken.next.beginLine;
+			throw new UnsupportedModelException(e.getMessage(), line);
+		}
 	}
 
 	// converts a string with "\n" to a list of lines
@@ -129,32 +139,32 @@ public class FeatureModelReader extends AbstractFeatureModelReader {
 			result.add(str);
 		return result;
 	}
-	
+
 	private void readModelData(Model root) throws UnsupportedModelException {
-		
+
 		featureModel.reset();
 		String guidsl =  root.toString();
 
 		noAbstractFeatures = (guidsl.startsWith("//NoAbstractFeatures"));
-		
+
 		// Reading comments
 		if (noAbstractFeatures)
 			guidsl = guidsl.substring(20);
-		
+
 		List<String> comments = new LinkedList<String>();
 		while (guidsl.contains("//"))
 		{
 			guidsl = guidsl.substring(guidsl.indexOf("//"));
 			int index = guidsl.indexOf("\n");
 			if (index > 0)
-				comments.add(guidsl.substring(2,index));
+				comments.add(guidsl.substring(2,index-1));
 			else comments.add(guidsl.substring(2,guidsl.length()-1));
 			guidsl = guidsl.substring(guidsl.indexOf("//") + 2);
 		}
-		
+
 		for(int i=0; i<comments.size(); i++)
 			featureModel.addComment(comments.get(i));
-		
+
 
 		Prods prods = ((MainModel) root).getProds();
 		AstListNode astListNode = (AstListNode) prods.arg[0];
@@ -162,7 +172,7 @@ public class FeatureModelReader extends AbstractFeatureModelReader {
 			readGProduction((GProduction) astListNode.arg[0]);
 			astListNode = (AstListNode) astListNode.right;
 		} while (astListNode != null);
-		
+
 		AstOptNode consOptNode = (AstOptNode) prods.right;
 		if (consOptNode.arg.length > 0 && consOptNode.arg[0] != null)
 			readConsStmt((ConsStmt) consOptNode.arg[0]);
@@ -170,13 +180,14 @@ public class FeatureModelReader extends AbstractFeatureModelReader {
 		AstOptNode varOptNode = (AstOptNode) consOptNode.right;
 		if (varOptNode.arg.length > 0 && varOptNode.arg[0] != null)
 			readVarStmt((VarStmt) varOptNode.arg[0]);
-		
 
-		// Reading hidden features
+
+		// Reading hidden features and other annotations
 		int ind = root.toString().indexOf("##");
 		if (ind >= 0){	
 			String annotations = root.toString().substring(ind+3);
-			
+			int counter = root.toString().substring(0,root.toString().indexOf("##")).split("\n").length+2;
+			System.out.print(root.toString());
 			List<String> list = stringToList(annotations);
 			for(int i=0; i<list.size(); i++){
 				String line = list.get(i);
@@ -186,19 +197,29 @@ public class FeatureModelReader extends AbstractFeatureModelReader {
 						int ix = tempLine.indexOf("hidden");
 						String ch = tempLine.substring(ix-1,ix);
 						if (ch.equals(" ") || ch.equals("{")){
-						String featName = line.substring(0,line.indexOf("{")-1);
-						if (featureModel.getFeature(featName) != null)
-							featureModel.getFeature(featName).setHidden(true);
-						else 
-							throw new UnsupportedModelException("The feature '" + featName + "' does not occur in the feature model!", 0);
+							String featName = line.substring(0,line.indexOf("{")-1);
+							if (featureModel.getFeature(featName) != null)
+								featureModel.getFeature(featName).setHidden(true);
+							else 
+								throw new UnsupportedModelException("The feature '" + featName + "' does not occur in the feature model!", 0);
 						}
+						else{
+							// SAVE OTHER ANNOTATIONS - Write to the comment session
+							annLine.add(counter+i);
+							featureModel.addComment(line);							
+						}
+					}
+					else{
+						// SAVE OTHER ANNOTATIONS - Write to the comment session
+						annLine.add(counter+i);
+						featureModel.addComment(line);
+
 					}
 				}
 			}
 		}
-		
-		featureModel.handleModelDataLoaded();
 
+		featureModel.handleModelDataLoaded();
 	}
 
 	private void readGProduction(GProduction gProduction) throws UnsupportedModelException {
@@ -289,7 +310,7 @@ public class FeatureModelReader extends AbstractFeatureModelReader {
 		}
 		return feature;
 	}
-	
+
 	private int line;
 
 	private void readConsStmt(ConsStmt consStmt) throws UnsupportedModelException {
@@ -346,7 +367,6 @@ public class FeatureModelReader extends AbstractFeatureModelReader {
 	}
 
 	private void readVarStmt(VarStmt varStmt) {
-		featureModel.setAnnotations(varStmt.toString().trim());
 		AvarList avarList = varStmt.getAvarList();
 		AstListNode astListNode = (AstListNode) avarList.arg[0];
 		do {
@@ -361,21 +381,18 @@ public class FeatureModelReader extends AbstractFeatureModelReader {
 
 	public Node readPropositionalString(String propString, FeatureModel featureModel) throws UnsupportedModelException{
 		//String featureString = new FeatureModelWriter(featureModel).writeToString();
-		String annotationtemp = featureModel.getAnnotations();
-		featureModel.setAnnotations("");
 		StringBuffer featureString= new StringBuffer(
-									new FeatureModelWriter(featureModel).writeToString());		
-		
+				new FeatureModelWriter(featureModel).writeToString());		
+
 		if( featureModel.getConstraintCount()== 0)
 			featureString.append("%%\r\n");
 		featureString.append(propString);
 		readFromString(featureString.toString());
 		List<Node> propNodes = getFeatureModel().getPropositionalNodes();
-		
-		featureModel.setAnnotations(annotationtemp);	
+
 		return propNodes.get(propNodes.size()-1);
 	}
-	
+
 	@SuppressWarnings("unused")
 	private void print(String tab, AstNode node) {
 		if (node != null) {
