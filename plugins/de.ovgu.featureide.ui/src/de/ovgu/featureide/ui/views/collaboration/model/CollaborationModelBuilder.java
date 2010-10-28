@@ -50,7 +50,6 @@ import de.ovgu.featureide.ui.UIPlugin;
  * @author Constanze Adler
  * @author Jens Meinicke
  * @author Stephan Besecke
- * //TODO Jens: refactor
  */
 public class CollaborationModelBuilder {
 	private CollaborationModel model;
@@ -116,9 +115,9 @@ public class CollaborationModelBuilder {
 			collaboration.isEquation = true;
 		}
 		model.collaborations.add(collaboration);
-		
-		if (composer.getName().equals("AHEAD") && jakProject != null) {
-			for (String layerName : featureProject.getFeatureModel().getLayerNames()) {
+		Collection<String> layerNames = featureProject.getFeatureModel().getLayerNames();
+		if (composer.getName().equals("AHEAD") && jakProject != null && layerNames != null) {
+			for (String layerName : layerNames) {
 				if (featureFilter.size() == 0 || featureFilter.contains(layerName)) {
 					if (iFeatureNames.contains(layerName)) {
 						Boolean selected = true;
@@ -235,16 +234,19 @@ public class CollaborationModelBuilder {
 					if (featureFilter.size() == 0 || featureFilter.contains(layerName)) {
 						collaboration = null;
 						IResource[] members = null;
-						try {
-							members = featureProject.getSourceFolder().getFolder(layerName).members();
-						} catch (CoreException e) {
-							UIPlugin.getDefault().logError(e);
+						IFolder folder = featureProject.getSourceFolder().getFolder(layerName);
+						if (folder.exists()) {
+							try {
+								members = featureProject.getSourceFolder().getFolder(layerName).members();
+							} catch (CoreException e) {
+								UIPlugin.getDefault().logError(e);
+							}
+							for (IResource res : members) {
+								addArbitraryFiles(res, layerName, false);
+							}
+							if (collaboration != null)
+								model.collaborations.add(collaboration);
 						}
-						for (IResource res : members) {
-							addArbitraryFiles(res, layerName, false);
-						}
-						if (collaboration != null)
-							model.collaborations.add(collaboration);
 					}
 				}
 			}
@@ -319,6 +321,8 @@ public class CollaborationModelBuilder {
 		
 		File file = iFile.getRawLocation().toFile();
 		ArrayList<String> configurationFeatures = readFeaturesfromConfigurationFile(file);
+		if (configurationFeatures == null)
+			return null;
 		Collection<Feature> features = featureProject.getFeatureModel()
 				.getFeatures();
 		for (String confFeature : configurationFeatures) {

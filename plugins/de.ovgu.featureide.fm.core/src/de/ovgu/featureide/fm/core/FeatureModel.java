@@ -268,49 +268,11 @@ public class FeatureModel implements PropertyConstants {
 			} else {
 				IPath newPath = sourceFolder.getFolder(newName).getFullPath();
 				folder.move(newPath, true, null);
-				//renameJakLayer(sourceFolder.getFolder(newName),oldName,newName);
 			}
 		} catch (CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 	}
-	
-//	private void renameJakLayer(IFolder folder, String oldName, String newName) throws CoreException {
-//		for (IResource res : folder.members()) {
-//			if (res instanceof IFolder)
-//				renameJakLayer((IFolder)res, oldName, newName);
-//			
-//			if (res instanceof IFile) {
-//				IFile file = (IFile)res;
-//				if (file.getName().endsWith(".jak"))
-//					renameJakLayer(file, oldName, newName);
-//			}
-//		}
-//	}
-//	
-//	private void renameJakLayer(final IFile file, String oldName, String newName) {
-//		File jakFile = file.getRawLocation().toFile();
-//		Scanner scanner = null;
-//		try {
-//			scanner = new Scanner(jakFile);
-//		} catch (FileNotFoundException e) {
-//			FMCorePlugin.getDefault().logError(e);
-//		}
-//		String text = "";
-//		while (scanner.hasNextLine())
-//			text += scanner.nextLine() + "\r\n";
-//		
-//		text = text.replaceFirst("layer\\s" + oldName, "layer " + newName);
-//		
-//		try {
-//			FileWriter fw = new FileWriter(jakFile);
-//			fw.write(text);
-//			fw.close();
-//		} catch (IOException e) {
-//			FMCorePlugin.getDefault().logError(e);
-//		}
-//		
-//	}
 	
 //	/**
 //	 * informs listners that a feature has been renamed
@@ -391,6 +353,8 @@ public class FeatureModel implements PropertyConstants {
 
 	public Collection<String> getLayerNames() {
 		LinkedList<String> layerNames = new LinkedList<String>();
+		if (root == null)
+			return null;
 		for (Feature layer : getLayers()) {
 			layerNames.add(layer.getName());
 		}

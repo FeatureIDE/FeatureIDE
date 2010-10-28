@@ -109,7 +109,8 @@ PropertyConstants, PropertyChangeListener, IResourceChangeListener {
 		}
 		@Override
 		public void partClosed(IWorkbenchPart part) {
-			featureModel.removeListener(ConfigurationEditor.this);
+			if (featureModel != null)
+				featureModel.removeListener(ConfigurationEditor.this);
 		}
 		@Override
 		public void partDeactivated(IWorkbenchPart part) {

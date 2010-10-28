@@ -90,6 +90,8 @@ public class JakProjectModel extends JakModelElement implements IJakProjectModel
 		final IFile iFile = featureProject.getCurrentEquationFile();
 		File file = iFile.getRawLocation().toFile();
 		ArrayList<String> configurationFeatures = readFeaturesfromConfigurationFile(file);
+		if (configurationFeatures == null)
+			return null;
 		IFeature[] features =  getFeatures();
 		for (String feature : configurationFeatures) {
 			for (IFeature iFeature : features) {

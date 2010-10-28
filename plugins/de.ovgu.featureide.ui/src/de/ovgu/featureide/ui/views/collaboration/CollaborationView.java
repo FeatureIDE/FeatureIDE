@@ -18,6 +18,7 @@
  */
 package de.ovgu.featureide.ui.views.collaboration;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -90,8 +91,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	public IFeatureProject getFeatureProject() {
 		return featureProject;
 	}
-
-	private FileEditorInput inputFile;
 	
 	private IPartListener editorListener = new IPartListener() {
 
@@ -163,23 +162,41 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	}
 	
 	private void setEditorActions(IWorkbenchPart activeEditor) {
-		
 		IEditorPart part = null;
 		if (activeEditor != null) {
 			IWorkbenchPage page = activeEditor.getSite().getPage();
 			if (page != null) {
 				part = page.getActiveEditor();
 				if (part != null) {
-					inputFile = (FileEditorInput)part.getEditorInput();
-					if (inputFile.getName().endsWith(".equation"))
-						builder.equation = inputFile.getName();
-					else 
-						builder.equation = "";
-					
-					if (featureProject == null || !featureProject.equals(CorePlugin.getFeatureProject(inputFile.getFile())))
-							featureProject = CorePlugin.getFeatureProject(inputFile.getFile());
-//					else
-//						return;
+					//case: open editor
+					FileEditorInput inputFile = (FileEditorInput)part.getEditorInput();
+					featureProject = CorePlugin.getFeatureProject(inputFile.getFile());
+					if (featureProject != null) {
+						//case: its a featureIDE project
+						if (inputFile.getName().endsWith(".equation")) {
+							//case: open configuration editor
+							if (builder.equation.equals(inputFile.getName())) {
+								return;
+							} else {
+								builder.equation = inputFile.getName();
+							}
+							
+						} else if (featureProject != null){
+							//case: open editor is no configuration editor
+							IFile file = featureProject.getCurrentEquationFile();
+							if (file != null) {
+								if (builder.equation.equals(file.getName())) {
+									return;
+								} else {
+									builder.equation = file.getName();
+								}
+							} else {
+								builder.equation = "";
+							}
+						} else {
+							return;
+						}
+					}
 				}
 			}
 		}
@@ -203,10 +220,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 			toolbarAction.setEnabled(true);
 			return;
 		}
-		
-		//updateGuiAfterBuild(featureProject);
-		
-		//if (model == null){
 		final IFeatureProject iFeatureProject = featureProject;
 		Job job = new Job("buildProject") {
 			public IStatus run(IProgressMonitor monitor) {
@@ -224,9 +237,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		};
 		job.setPriority(Job.BUILD);
 		job.schedule();
-//		} else {
-//			toolbarAction.setEnabled(true);
-//		}
 	}
 
 	private void createContextMenu() {
@@ -279,9 +289,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 					protected IStatus run(IProgressMonitor monitor) {
 						if (!toolbarAction.isEnabled())
 							return Status.OK_STATUS;
-//						builder.classFilter = new LinkedList<String>();
-//						builder.featureFilter = new LinkedList<String>();
-						//filterAction.setChecked(false);
 						toolbarAction.setEnabled(false);
 						buildProject(featureProject);
 						return Status.OK_STATUS;
@@ -296,18 +303,25 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.core.listeners.ICurrentBuildListener#updateGuiAfterBuild(de.ovgu.featureide.core.IFeatureProject)
 	 */
-	public void updateGuiAfterBuild(IFeatureProject project) {
+	public void updateGuiAfterBuild(final IFeatureProject project) {
 		if (!project.equals(featureProject))
 			return;
 		
-		model = builder.buildCollaborationModel(project);
-		if (model == null)
-			return;
-		
-		UIJob job = new UIJob("updateCollaborationView") {
-			public IStatus runInUIThread(IProgressMonitor monitor) {
-				viewer.setContents(model);		
-				viewer.getContents().refresh();
+		Job job = new Job("buildCollaborationModel") {
+			public IStatus run(IProgressMonitor monitor) {
+				model = builder.buildCollaborationModel(project);
+				if (model == null)
+					return Status.OK_STATUS;
+				
+				UIJob uiJob = new UIJob("updateCollaborationView") {
+					public IStatus runInUIThread(IProgressMonitor monitor) {
+						viewer.setContents(model);		
+						viewer.getContents().refresh();
+						return Status.OK_STATUS;
+					}
+				};
+				uiJob.setPriority(Job.DECORATE);
+				uiJob.schedule();
 				return Status.OK_STATUS;
 			}
 		};
