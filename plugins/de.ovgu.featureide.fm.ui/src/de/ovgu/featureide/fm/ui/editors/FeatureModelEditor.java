@@ -624,24 +624,20 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 	public void doSaveAs() {
 		FileDialog fileDialog = new FileDialog(getEditorSite().getShell(), SWT.SAVE);
 		String[] extensions = {
+				"*.png",
+				"*.jpg",
 				"*.bmp",
-//				"*.gif", 
-//				"*.ico", 
-				"*.jpg", 
 				"*.m",
-				"*.png", 
-//				"*.tif", 
-				"*.xml" };
+				"*.xml"
+		};
 		fileDialog.setFilterExtensions(extensions);
 		String[] filterNames = {
-				"Windows Bitmap *.bmp",
-//				"CompuServe GIF *.gif",
-//				"Windows Icon *.ico",
-				"JPEG *.jpg",
-				"GUIDSL Grammar *.m",
 				"Portable Network Graphics *.png",
-//				"TIFF *.tif",
-				"XML Export *.xml"};
+				"JPEG *.jpg",
+				"Windows Bitmap *.bmp",
+				"GUIDSL Grammar *.m",
+				"XML Export *.xml"
+		};
 		fileDialog.setFilterNames(filterNames);
 		fileDialog.setOverwrite(true);
 		String filePath = fileDialog.open();
