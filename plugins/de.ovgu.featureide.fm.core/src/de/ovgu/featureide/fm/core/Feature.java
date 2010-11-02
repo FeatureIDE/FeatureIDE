@@ -38,7 +38,7 @@ public class Feature implements PropertyConstants {
 	
 	private boolean concret = true;
 
-	private boolean and = false;
+	private boolean and = true;
 
 	private boolean multiple = false;
 	
