@@ -1,24 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-
-
 <feature
       id="de.ovgu.featureide.test"
       label="Unit-Tests for FeatureIDE"
       version="1.0.0.qualifier"
       provider-name="University of Magdeburg">
 
-     <description url="http://www.fosd.de/featureide/">
-     Unit-Tests for FeatureIDE
+   <description url="http://www.fosd.de/featureide/">
+      Unit-Tests for FeatureIDE
    </description>
 
-
-  <copyright>
+   <copyright>
       Copyrights reserved.
    </copyright>
 
-
-  <license url="http://www.gnu.org/licenses/gpl-2.0.html">
+   <license url="http://www.gnu.org/licenses/gpl-2.0.html">
       GNU GENERAL PUBLIC LICENSE
 Version 2, June 1991
 Copyright (C) 1989, 1991 Free Software Foundation, Inc.,
@@ -466,6 +461,14 @@ Public License instead of this License.
 
    <plugin
          id="de.ovgu.featureide.fm.core-test"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="de.ovgu.featureide.core-test"
          download-size="0"
          install-size="0"
          version="0.0.0"
