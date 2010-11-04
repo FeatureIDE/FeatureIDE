@@ -459,6 +459,11 @@ Public License instead of this License.
       <update label="FeatureIDE Update Site" url="http://wwwiti.cs.uni-magdeburg.de/iti_db/research/featureide/deploy"/>
    </url>
 
+   <requires>
+      <import plugin="org.junit4" version="4.3.1" match="greaterOrEqual"/>
+      <import plugin="de.ovgu.featureide.core"/>
+   </requires>
+
    <plugin
          id="de.ovgu.featureide.fm.core-test"
          download-size="0"
