@@ -325,7 +325,12 @@ public class FeatureModel implements PropertyConstants {
 		for (PropertyChangeListener listener : listenerList)
 			listener.propertyChange(event);
 	}
-
+	public void redrawDiagram() {
+		PropertyChangeEvent event = new PropertyChangeEvent(this,
+				REDRAW_DIAGRAM, false, true);
+		for (PropertyChangeListener listener : listenerList)
+			listener.propertyChange(event);
+	}
 	public Collection<Feature> getFeatures() {
 		return Collections.unmodifiableCollection(featureTable.values());
 	}

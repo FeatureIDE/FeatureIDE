@@ -106,6 +106,7 @@ public class CreateCompoundAction extends Action {
 			newCompound.addChild(selectedFeatures.getFirst());
 			featureModel.addFeature(newCompound);
 			featureModel.setRoot(newCompound);
+			featureModel.redrawDiagram();
 		}
 		
 		//needed when the user creates a compound feature again on the same selection
@@ -114,12 +115,13 @@ public class CreateCompoundAction extends Action {
 		
 		//select the new feature
 		FeatureEditPart part = (FeatureEditPart) viewer.getEditPartRegistry().get(newCompound);
+		if(part!=null){
 		viewer.setSelection(new StructuredSelection(part));
 
 		//open the renaming command
 		DirectEditManager manager = new FeatureLabelEditManager(part, TextCellEditor.class,
 				new FeatureCellEditorLocator(part.getFeatureFigure()), featureModel);
-		manager.show();
+		manager.show();}
 	}
 	
 	private boolean isValidSelection(IStructuredSelection selection) {

@@ -115,7 +115,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.GraphicalEditPart
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.LevelOrderLayout;
 
-
 /**
  * A multi page editor to edit feature models. If the model file contains
  * errors, markers will be created on save.
@@ -123,31 +122,33 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.LevelOrderLayout;
  * @author Thomas Thuem
  * @author Christian Becker
  */
-public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaults,
-		PropertyConstants, PropertyChangeListener, IResourceChangeListener {
+public class FeatureModelEditor extends MultiPageEditorPart implements
+		GUIDefaults, PropertyConstants, PropertyChangeListener,
+		IResourceChangeListener {
 
-	public static final String ID = FMUIPlugin.PLUGIN_ID + ".editors.GrammarEditor";
+	public static final String ID = FMUIPlugin.PLUGIN_ID
+			+ ".editors.GrammarEditor";
 
 	private GraphicalViewerImpl graphicalViewer;
 
 	private TextEditor textEditor;
-	
+
 	private int graphicalViewerIndex;
 
 	private int textEditorIndex;
-	
+
 	private int featureOrderEditorIndex;
 
 	private boolean isPageModified;
-	
+
 	private boolean closeEditor;
-	
+
 	private FeatureModel featureModel;
 
 	private IFeatureModelReader featureModelReader;
 
 	private IFeatureModelWriter featureModelWriter;
-	
+
 	private IFeatureModelWriter xmlFeatureModelWriter;
 
 	private CreateLayerAction createLayerAction;
@@ -157,9 +158,9 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 	private DeleteAction deleteAction;
 
 	private MandantoryAction mandantoryAction;
-	
+
 	private AbstractAction abstractAction;
-	
+
 	private HiddenAction hiddenAction;
 
 	private AndAction andAction;
@@ -167,7 +168,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 	private OrAction orAction;
 
 	private AlternativeAction alternativeAction;
-	
+
 	private PrintAction printAction;
 
 	private SelectAllAction selectAllAction;
@@ -175,11 +176,11 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 	private UndoAction undoAction;
 
 	private RedoAction redoAction;
-	
+
 	private RenameAction renameAction;
-	
+
 	private ZoomInAction zoomIn;
-	
+
 	private ZoomOutAction zoomOut;
 
 	private FeatureDiagramLayoutManager layoutManager = new LevelOrderLayout();
@@ -197,10 +198,10 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 	private EditConstraintAction editConstraintAction;
 
 	private CreateConstraintAction createConstraintAction;
-	
+
 	private IFile file;
+
 	@Override
-	
 	protected void setInput(IEditorInput input) {
 		file = (IFile) input.getAdapter(IFile.class);
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
@@ -214,15 +215,15 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 		featureModelReader = new XmlFeatureModelReader(featureModel);
 		featureModelWriter = new XmlFeatureModelWriter(featureModel);
 		xmlFeatureModelWriter = new XmlFeatureModelWriter(featureModel);
-			
+
 		originalFeatureModel = new FeatureModel();
-		
+
 		try {
 
 			new XmlFeatureModelReader(originalFeatureModel).readFromFile(file);
-		
+
 		} catch (Exception e) {
-		}	
+		}
 	}
 
 	public FeatureModel getOriginalFeatureModel() {
@@ -231,7 +232,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 
 	@Override
 	protected void createPages() {
-		
+
 		createDiagramPage();
 		createSourcePage();
 		createFeatureOrderPage();
@@ -244,14 +245,15 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 	 * 
 	 */
 	private void createFeatureOrderPage() {
-		featureOrderEditor= new FeatureOrderEditor(originalFeatureModel);
+		featureOrderEditor = new FeatureOrderEditor(originalFeatureModel);
 		try {
-			featureOrderEditorIndex = addPage(featureOrderEditor, getEditorInput());
-			setPageText(featureOrderEditorIndex,"Feature Order");
-			//featureOrderEditor.updateOrderEditor(getOriginalFeatureModel().getFeatures());
+			featureOrderEditorIndex = addPage(featureOrderEditor,
+					getEditorInput());
+			setPageText(featureOrderEditorIndex, "Feature Order");
+			// featureOrderEditor.updateOrderEditor(getOriginalFeatureModel().getFeatures());
 			featureOrderEditor.initOrderEditor();
 		} catch (PartInitException e) {
-			
+
 			FMUIPlugin.getDefault().logError(e);
 		}
 		;
@@ -272,7 +274,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 		graphicalViewerIndex = addPage(graphicalViewer.getControl());
 		setPageText(graphicalViewerIndex, "Feature Diagram");
 		zoomManager = rootEditPart.getZoomManager();
-		zoomManager.setZoomLevels(new double[] {0.05, 0.10, 0.25, 0.50, 0.75, 0.90, 1.00, 1.10, 1.25, 1.50, 2.00, 2.50, 3.00, 4.00});
+		zoomManager.setZoomLevels(new double[] { 0.05, 0.10, 0.25, 0.50, 0.75,
+				0.90, 1.00, 1.10, 1.25, 1.50, 2.00, 2.50, 3.00, 4.00 });
 	}
 
 	void createSourcePage() {
@@ -288,7 +291,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 
 	private void createActions() {
 		createLayerAction = new CreateLayerAction(graphicalViewer, featureModel);
-		createCompoundAction = new CreateCompoundAction(graphicalViewer,featureModel);
+		createCompoundAction = new CreateCompoundAction(graphicalViewer,
+				featureModel);
 		deleteAction = new DeleteAction(graphicalViewer, featureModel);
 		mandantoryAction = new MandantoryAction(graphicalViewer, featureModel);
 		hiddenAction = new HiddenAction(graphicalViewer, featureModel);
@@ -303,8 +307,10 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 		renameAction = new RenameAction(graphicalViewer, featureModel);
 		zoomIn = new ZoomInAction(zoomManager);
 		zoomOut = new ZoomOutAction(zoomManager);
-		createConstraintAction = new CreateConstraintAction(graphicalViewer, featureModel, "Create Constraint");
-		editConstraintAction= new EditConstraintAction(graphicalViewer, featureModel, "Edit Constraint");
+		createConstraintAction = new CreateConstraintAction(graphicalViewer,
+				featureModel, "Create Constraint");
+		editConstraintAction = new EditConstraintAction(graphicalViewer,
+				featureModel, "Edit Constraint");
 	}
 
 	private void createContextMenu() {
@@ -319,7 +325,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 		graphicalViewer.setContextMenu(menu);
 		getSite().registerContextMenu(menu, graphicalViewer);
 	}
-	
+
 	private void createKeyBindings() {
 		KeyHandler handler = graphicalViewer.getKeyHandler();
 		handler.put(KeyStroke.getPressed(SWT.F2, 0), renameAction);
@@ -327,7 +333,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 	}
 
 	private void fillContextMenu(IMenuManager menu) {
-		if (andAction.isEnabled() || orAction.isEnabled()){
+		if (andAction.isEnabled() || orAction.isEnabled()) {
 			if (andAction.isChecked()) {
 				andAction.setText("AND");
 				orAction.setText("OR (Double Click)");
@@ -344,8 +350,9 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 			menu.add(andAction);
 			menu.add(orAction);
 			menu.add(alternativeAction);
-		} else if (createLayerAction.isEnabled() || createCompoundAction.isEnabled()){
-			menu.add(createCompoundAction);	
+		} else if (createLayerAction.isEnabled()
+				|| createCompoundAction.isEnabled()) {
+			menu.add(createCompoundAction);
 			menu.add(createLayerAction);
 			menu.add(mandantoryAction);
 			menu.add(abstractAction);
@@ -353,7 +360,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 			menu.add(deleteAction);
 			menu.add(renameAction);
 		} else {
-		
+
 			menu.add(createConstraintAction);
 			menu.add(editConstraintAction);
 			menu.add(deleteAction);
@@ -362,7 +369,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 	}
 
 	public IAction getDiagramAction(String workbenchActionID) {
-		
+
 		if (CreateLayerAction.ID.equals(workbenchActionID))
 			return createLayerAction;
 		if (CreateCompoundAction.ID.equals(workbenchActionID))
@@ -372,9 +379,9 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 		if (MandantoryAction.ID.equals(workbenchActionID))
 			return mandantoryAction;
 		if (AbstractAction.ID.equals(workbenchActionID))
-			return abstractAction;		
+			return abstractAction;
 		if (HiddenAction.ID.equals(workbenchActionID))
-			return hiddenAction;	
+			return hiddenAction;
 		if (AndAction.ID.equals(workbenchActionID))
 			return andAction;
 		if (OrAction.ID.equals(workbenchActionID))
@@ -395,7 +402,11 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 			return zoomIn;
 		if (GEFActionConstants.ZOOM_OUT.equals(workbenchActionID))
 			return zoomOut;
-		FMCorePlugin.getDefault().logInfo("The following workbench action is not registered at the feature diagram editor: " + workbenchActionID);
+		FMCorePlugin
+				.getDefault()
+				.logInfo(
+						"The following workbench action is not registered at the feature diagram editor: "
+								+ workbenchActionID);
 		return null;
 	}
 
@@ -422,11 +433,12 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 						IMarker.SEVERITY_WARNING, warning.line);
 			try {
 				if (!featureModel.isValid())
-					grammarFile.createModelMarker(
-						"The feature model is void, i.e., it contains no products",
-						IMarker.SEVERITY_ERROR, 0);
+					grammarFile
+							.createModelMarker(
+									"The feature model is void, i.e., it contains no products",
+									IMarker.SEVERITY_ERROR, 0);
 			} catch (TimeoutException e) {
-				//do nothing, assume the model is correct
+				// do nothing, assume the model is correct
 			}
 		} catch (UnsupportedModelException e) {
 			grammarFile.createModelMarker(e.getMessage(),
@@ -483,42 +495,44 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 	}
 
 	private int oldPage;
+
 	@Override
 	protected void pageChange(int newPageIndex) {
-		if (oldPage == graphicalViewerIndex){
-			if(newPageIndex == textEditorIndex){
+		if (oldPage == graphicalViewerIndex) {
+			if (newPageIndex == textEditorIndex) {
 				if (isPageModified)
 					updateTextEditorFromDiagram();
-			} else if (newPageIndex == featureOrderEditorIndex){
-				
-				if (isPageModified){
+			} else if (newPageIndex == featureOrderEditorIndex) {
+
+				if (isPageModified) {
 					updateTextEditorFromDiagram();
 					featureOrderEditor.updateOrderEditor(featureModel);
 				}
-			}else if (oldPage == newPageIndex){
+			} else if (oldPage == newPageIndex) {
 				updateDiagramFromTextEditor();
 			}
-		}else if (oldPage == textEditorIndex){
-			if ( newPageIndex == graphicalViewerIndex){
+		} else if (oldPage == textEditorIndex) {
+			if (newPageIndex == graphicalViewerIndex) {
 				// delete this line, so the import in the source view is correct
 				// if (isDirty() || grammarFile.hasModelMarkers())
+				if (!updateDiagramFromTextEditor()) {
+					// there are errors in the file, stay at this editor page
+					isPageModified = false;
+					setActivePage(textEditorIndex);
+					return;
+				}
+			} else if (newPageIndex == featureOrderEditorIndex) {
+				if (isDirty() || grammarFile.hasModelMarkers()) {
+
 					if (!updateDiagramFromTextEditor()) {
-						// there are errors in the file, stay at this editor page
+						// there are errors in the file, stay at this editor
+						// page
 						isPageModified = false;
 						setActivePage(textEditorIndex);
 						return;
-					}
-			}	else if (newPageIndex == featureOrderEditorIndex){	
-				if (isDirty() || grammarFile.hasModelMarkers()){
-					
-					if (!updateDiagramFromTextEditor()) {
-						// there are errors in the file, stay at this editor page
-						isPageModified = false;
-						setActivePage(textEditorIndex);
-						return;
-					}else
+					} else
 						featureOrderEditor.updateOrderEditor(featureModel);
-					}
+				}
 			}
 		}
 		isPageModified = false;
@@ -537,33 +551,33 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 	public void doSave(IProgressMonitor monitor) {
 		if (!saveEditors())
 			return;
-		
+
 		featureOrderEditor.updateOrderEditor(featureModel);
 		featureOrderEditor.doSave(monitor);
 		featureModel.performRenamings(file);
-		
+
 		if (getActivePage() == graphicalViewerIndex && isPageModified) {
 			updateTextEditorFromDiagram();
 			setActivePage(textEditorIndex);
 			setActivePage(graphicalViewerIndex);
-			
-		} else if (getActivePage()==textEditorIndex){
+
+		} else if (getActivePage() == textEditorIndex) {
 			updateDiagramFromTextEditor();
-			
-		}else if(getActivePage()== featureOrderEditorIndex){
-			//isPageModified = false;
+
+		} else if (getActivePage() == featureOrderEditorIndex) {
+			// isPageModified = false;
 			updateTextEditorFromDiagram();
 		}
-		
+
 		isPageModified = false;
-		
+
 		textEditor.doSave(monitor);
 		try {
 			new XmlFeatureModelReader(originalFeatureModel)
 					.readFromFile(grammarFile.getResource());
 		} catch (Exception e) {
 			FMUIPlugin.getDefault().logError(e);
-		}	
+		}
 	}
 
 	/**
@@ -575,12 +589,14 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 			IProject project = file.getProject();
 			ArrayList<String> dirtyEditors = new ArrayList<String>();
 			ArrayList<IEditorPart> dirtyEditors2 = new ArrayList<IEditorPart>();
-			for (IWorkbenchWindow window : getSite().getWorkbenchWindow().getWorkbench().getWorkbenchWindows()) {
+			for (IWorkbenchWindow window : getSite().getWorkbenchWindow()
+					.getWorkbench().getWorkbenchWindows()) {
 				for (IWorkbenchPage page : window.getPages()) {
-					for (IEditorPart editor :page.getEditors()) {
+					for (IEditorPart editor : page.getEditors()) {
 						if (editor.isDirty()) {
 							IEditorInput editorInput = editor.getEditorInput();
-							IFile editorFile = (IFile) editorInput.getAdapter(IFile.class);
+							IFile editorFile = (IFile) editorInput
+									.getAdapter(IFile.class);
 							if (editorFile.getProject().equals(project)
 									&& !editorFile.getName().endsWith(".xml")) {
 								dirtyEditors.add(editorFile.getName());
@@ -591,7 +607,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 				}
 			}
 			if (dirtyEditors.size() != 0) {
-				ListDialog dialog = new ListDialog(getSite().getWorkbenchWindow().getShell());
+				ListDialog dialog = new ListDialog(getSite()
+						.getWorkbenchWindow().getShell());
 				dialog.setAddCancelButton(true);
 				dialog.setContentProvider(new ArrayContentProvider());
 				dialog.setLabelProvider(new LabelProvider());
@@ -601,13 +618,13 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 				dialog.setHelpAvailable(false);
 				dialog.setMessage("Some modified resources must be saved before saving the featuremodel.");
 				dialog.open();
-				
+
 				if (dialog.getResult() != null) {
 					for (IEditorPart editor : dirtyEditors2) {
 						editor.doSave(null);
 					}
 				} else {
-					//case: cancel pressed
+					// case: cancel pressed
 					return false;
 				}
 			}
@@ -622,22 +639,13 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 
 	@Override
 	public void doSaveAs() {
-		FileDialog fileDialog = new FileDialog(getEditorSite().getShell(), SWT.SAVE);
-		String[] extensions = {
-				"*.png",
-				"*.jpg",
-				"*.bmp",
-				"*.m",
-				"*.xml"
-		};
+		FileDialog fileDialog = new FileDialog(getEditorSite().getShell(),
+				SWT.SAVE);
+		String[] extensions = { "*.png", "*.jpg", "*.bmp", "*.m", "*.xml" };
 		fileDialog.setFilterExtensions(extensions);
-		String[] filterNames = {
-				"Portable Network Graphics *.png",
-				"JPEG *.jpg",
-				"Windows Bitmap *.bmp",
-				"GUIDSL Grammar *.m",
-				"XML Export *.xml"
-		};
+		String[] filterNames = { "Portable Network Graphics *.png",
+				"JPEG *.jpg", "Windows Bitmap *.bmp", "GUIDSL Grammar *.m",
+				"XML Export *.xml" };
 		fileDialog.setFilterNames(filterNames);
 		fileDialog.setOverwrite(true);
 		String filePath = fileDialog.open();
@@ -652,9 +660,9 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 			GEFImageWriter.writeToFile(graphicalViewer, file);
 		}
 	}
-	
+
 	public void propertyChange(PropertyChangeEvent event) {
-		
+
 		String prop = event.getPropertyName();
 		if (prop.equals(MODEL_DATA_CHANGED)) {
 			refreshGraphicalViewer();
@@ -662,9 +670,11 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 			firePropertyChange(PROP_DIRTY);
 		} else if (prop.equals(MODEL_DATA_LOADED)) {
 			refreshGraphicalViewer();
+		} else if (prop.equals(REDRAW_DIAGRAM)) {
+
+			updateTextEditorFromDiagram();
+			updateDiagramFromTextEditor();
 		}
-//		updateTextEditorFromDiagram();
-//		updateDiagramFromTextEditor();
 	}
 
 	private void refreshGraphicalViewer() {
@@ -685,7 +695,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 	@SuppressWarnings("rawtypes")
 	@Override
 	public Object getAdapter(Class adapter) {
-		if (GraphicalViewer.class.equals(adapter) || EditPartViewer.class.equals(adapter))
+		if (GraphicalViewer.class.equals(adapter)
+				|| EditPartViewer.class.equals(adapter))
 			return graphicalViewer;
 		if (ZoomManager.class.equals(adapter))
 			return zoomManager;
@@ -715,7 +726,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 	public GrammarFile getGrammarFile() {
 		return grammarFile;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
