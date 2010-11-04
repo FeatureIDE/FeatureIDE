@@ -657,18 +657,14 @@ public class FeatureModelEditor extends MultiPageEditorPart implements GUIDefaul
 		
 		String prop = event.getPropertyName();
 		if (prop.equals(MODEL_DATA_CHANGED)) {
-			updateTextEditorFromDiagram();
-			//updateDiagramFromTextEditor();
 			refreshGraphicalViewer();
-			featureOrderEditor.updateOrderEditor(featureModel);
 			isPageModified = true;
 			firePropertyChange(PROP_DIRTY);
 		} else if (prop.equals(MODEL_DATA_LOADED)) {
 			refreshGraphicalViewer();
-//			textEditor.doSave(null);
-//			isPageModified = false;
-//			firePropertyChange(PROP_DIRTY);
 		}
+//		updateTextEditorFromDiagram();
+//		updateDiagramFromTextEditor();
 	}
 
 	private void refreshGraphicalViewer() {
