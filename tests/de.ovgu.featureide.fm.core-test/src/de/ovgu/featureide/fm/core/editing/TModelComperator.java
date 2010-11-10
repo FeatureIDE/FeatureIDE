@@ -21,7 +21,6 @@ package de.ovgu.featureide.fm.core.editing;
 import static org.junit.Assert.assertEquals;
 import junit.framework.JUnit4TestAdapter;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.sat4j.specs.TimeoutException;
 
@@ -39,11 +38,6 @@ import de.ovgu.featureide.fm.core.io.guidsl.FeatureModelReader;
  * @author Fabian Benduhn
  */
 public class TModelComperator {
-	
-	@Test
-	public void test1(){
-		Assert.assertTrue(true);
-	}
 	
 	private static final long TIMEOUT = 1000;
 

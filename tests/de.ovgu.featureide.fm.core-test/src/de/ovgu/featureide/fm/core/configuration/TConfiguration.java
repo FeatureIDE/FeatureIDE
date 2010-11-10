@@ -18,10 +18,9 @@
  */
 package de.ovgu.featureide.fm.core.configuration;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 import junit.framework.JUnit4TestAdapter;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.sat4j.specs.TimeoutException;
 
@@ -36,11 +35,6 @@ import de.ovgu.featureide.fm.core.io.guidsl.FeatureModelReader;
  * @author Fabian Benduhn
  */
 public class TConfiguration {
-	
-	@Test
-	public void test1(){
-		Assert.assertTrue(true);
-	}
 	
 	public static junit.framework.Test suite() {
 		return new JUnit4TestAdapter(TConfiguration.class);

@@ -21,6 +21,9 @@ import org.junit.Test;
 
 /**
  * The FeatureIDE test suite that should contain all available JUnit tests.
+ *
+ * TODO @Fabian please avoid the default package (Thomas)
+ * TODO @Fabian do we need this class? (Thomas)
  * 
  * @author Thomas Thuem
  * @author Fabian Benduhn
@@ -31,4 +34,5 @@ public class FMCoreTest {
 	public void test(){
 		System.out.println("it works");
 	}
+	
 }
