@@ -17,10 +17,7 @@
  * See http://www.fosd.de/featureide/ for further information.
  */
 
-import junit.framework.JUnit4TestAdapter;
-
 import org.junit.Test;
-import org.prop4j.Prop4JTest;
 
 /**
  * The FeatureIDE test suite that should contain all available JUnit tests.
@@ -38,8 +35,4 @@ public class FMCoreTest {
 		System.out.println("it works");
 	}
 	
-	public static junit.framework.Test suite() {
-		return new JUnit4TestAdapter(Prop4JTest.class);
-	}
-
 }

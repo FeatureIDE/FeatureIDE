@@ -19,7 +19,6 @@
 package de.ovgu.featureide.fm.core.configuration;
 
 import static org.junit.Assert.assertTrue;
-import junit.framework.JUnit4TestAdapter;
 
 import org.junit.Test;
 import org.sat4j.specs.TimeoutException;
@@ -35,10 +34,6 @@ import de.ovgu.featureide.fm.core.io.guidsl.FeatureModelReader;
  * @author Fabian Benduhn
  */
 public class TConfiguration {
-	
-	public static junit.framework.Test suite() {
-		return new JUnit4TestAdapter(TConfiguration.class);
-	}
 	
 	String fm = "S : [A] [B] C :: _S; %% not B;";
 

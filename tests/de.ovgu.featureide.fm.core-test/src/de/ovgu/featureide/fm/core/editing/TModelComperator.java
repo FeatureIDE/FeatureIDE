@@ -19,7 +19,6 @@
 package de.ovgu.featureide.fm.core.editing;
 
 import static org.junit.Assert.assertEquals;
-import junit.framework.JUnit4TestAdapter;
 
 import org.junit.Test;
 import org.sat4j.specs.TimeoutException;
@@ -40,10 +39,6 @@ import de.ovgu.featureide.fm.core.io.guidsl.FeatureModelReader;
 public class TModelComperator {
 	
 	private static final long TIMEOUT = 1000;
-
-	public static junit.framework.Test suite() {
-		return new JUnit4TestAdapter(TModelComperator.class);
-	}
 
 	/**
 	 * Refactoring: OR => OPTIONAL AND (where S is abstract)
