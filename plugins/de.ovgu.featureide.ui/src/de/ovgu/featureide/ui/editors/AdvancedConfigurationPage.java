@@ -20,6 +20,7 @@ package de.ovgu.featureide.ui.editors;
 
 
 import java.beans.PropertyChangeEvent;
+import java.util.LinkedList;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -44,6 +45,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.progress.UIJob;
 
+import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.configuration.TreeElement;
@@ -75,6 +77,7 @@ public class AdvancedConfigurationPage extends EditorPart {
 		viewer.refresh();
 		if (!errorMassage());
 			updateForeground(viewer.getTree().getItem(0));
+		removeHiddenFeatures();
 	}
 	
 	public void setConfigurationEditor(ConfigurationEditor configurationEditor) {
@@ -153,6 +156,8 @@ public class AdvancedConfigurationPage extends EditorPart {
 		viewer.getControl().setFocus();
 	}
 	private boolean initialized = false;
+
+	private LinkedList<String> hiddenFeatures;
 	
 	public void propertyChange(PropertyChangeEvent evt) {
 		if (initialized)
@@ -174,12 +179,39 @@ public class AdvancedConfigurationPage extends EditorPart {
 		viewer.setContentProvider(new ConfigurationContentProvider());
 		viewer.setLabelProvider(new AdvancedConfigurationLabelProvider());
 		viewer.setInput(configurationEditor.configuration);
+		
 		viewer.expandAll();
 		viewer.refresh();
 		if (!errorMassage())
 			updateForeground(viewer.getTree().getItem(0));
+		removeHiddenFeatures();
 	}
 
+	/**
+	 * 
+	 */
+	private void removeHiddenFeatures() {
+		hiddenFeatures = new LinkedList<String>();
+		for (Feature feature : configurationEditor.configuration.getFeatureModel().getFeatures()) {
+			if (feature.isHidden())
+				hiddenFeatures.add(feature.getName());
+		}
+		for (TreeElement feature : configurationEditor.configuration.getRoot().getChildren())
+			removeHiddenElement(feature);
+	}
+	
+	private void removeHiddenElement(TreeElement element) {
+		if (hiddenFeatures.contains(element.toString())) {
+			for (TreeElement feature : element.getChildren())
+				remove(feature);
+			viewer.remove(element);
+		} else {
+			for (TreeElement feature : element.getChildren())
+				removeHiddenElement(feature);
+		}	
+	}
+	
+	
 	private boolean errorMassage() { 
 		if (!configurationEditor.configuration.valid() && configurationEditor.configuration.number() == 0){
 			for (TreeElement feature : configurationEditor.configuration.getRoot().getChildren())

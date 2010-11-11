@@ -61,7 +61,7 @@ public class ConfigurationPage extends EditorPart {
 	
 	private Tree tree;
 	
-	private LinkedList<String> selectedFeatures;
+	private LinkedList<String> hiddenFeatures;
 	
 	private Color gray = new Color(null,140,140,140);
 	private Color green = new Color(null,1,140,2);
@@ -164,9 +164,11 @@ public class ConfigurationPage extends EditorPart {
 	}
 
 	private void refreshTree() {
-		selectedFeatures = new LinkedList<String>();
-		for (Feature feature : configurationEditor.configuration.getSelectedFeatures())
-			selectedFeatures.add(feature.getName());
+		hiddenFeatures = new LinkedList<String>();
+		for (Feature feature : configurationEditor.configuration.getFeatureModel().getFeatures()) {
+			if (feature.isHidden())
+				hiddenFeatures.add(feature.getName());
+		}
 		TreeItem root = tree.getItem(0);
 		root.setText(getRootlabel());
 		setCheckbox(root);
@@ -220,9 +222,11 @@ public class ConfigurationPage extends EditorPart {
 	}
 	
 	private void setInput(Configuration configuration){
-		selectedFeatures = new LinkedList<String>();
-		for (Feature feature : configuration.getSelectedFeatures())
-			selectedFeatures.add(feature.getName());
+		hiddenFeatures = new LinkedList<String>();
+		for (Feature feature : configuration.getFeatureModel().getFeatures()) {
+			if (feature.isHidden())
+				hiddenFeatures.add(feature.getName());
+		}
 		tree.removeAll();
 		TreeItem item = new TreeItem(tree, 0);
 		item.setText(getRootlabel());
@@ -235,10 +239,12 @@ public class ConfigurationPage extends EditorPart {
 	
 	private void add(TreeItem parent,TreeElement[] children){
 		for (TreeElement child : children){
-			TreeItem item = new TreeItem(parent,0);
-			item.setText(child.toString());
-			add(item,child.getChildren());
-			item.setExpanded(true);
+			if (!hiddenFeatures.contains(child.toString())) {
+				TreeItem item = new TreeItem(parent,0);
+				item.setText(child.toString());
+				add(item,child.getChildren());
+				item.setExpanded(true);
+			}
 		}
 	}
 	
