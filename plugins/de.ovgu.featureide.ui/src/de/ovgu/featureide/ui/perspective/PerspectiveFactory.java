@@ -45,6 +45,7 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 
 		layout.addNewWizardShortcut(NewFeatureProjectWizard.ID);
 		layout.addNewWizardShortcut(NewEquationFileWizard.ID);
+
 		layout.addNewWizardShortcut("de.ovgu.featureide.ui.ahead.wizards.NewJakFileWizard");
 		layout.addNewWizardShortcut("org.eclipse.ui.wizards.new.file");
 		

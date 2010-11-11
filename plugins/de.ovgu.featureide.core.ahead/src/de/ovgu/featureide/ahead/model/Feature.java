@@ -20,9 +20,9 @@ package de.ovgu.featureide.ahead.model;
 
 import java.util.TreeMap;
 
-import de.ovgu.featureide.core.jakprojectmodel.IClass;
-import de.ovgu.featureide.core.jakprojectmodel.IFeature;
-import de.ovgu.featureide.core.jakprojectmodel.IJakModelElement;
+import de.ovgu.featureide.core.fstmodel.IClass;
+import de.ovgu.featureide.core.fstmodel.IFeature;
+import de.ovgu.featureide.core.fstmodel.IFSTModelElement;
 
 
 /**
@@ -43,7 +43,7 @@ public class Feature extends JakModelElement implements IFeature {
 		return name;
 	}
 
-	public IJakModelElement[] getChildren() {
+	public IFSTModelElement[] getChildren() {
 		if (classes == null) return null;
 		IClass[] elements = new IClass[classes.size()];
 		int i = 0;

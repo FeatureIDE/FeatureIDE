@@ -16,36 +16,40 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.core.jakprojectmodel;
+package de.ovgu.featureide.core.fstmodel;
 
-import org.eclipse.core.resources.IFile;
+/**
+ * 
+ * @author Tom Brosch
+ * 
+ */
+public interface IFSTModelElement {
 
-public interface IField extends IJakModelElement {
-
-	public String getIdentifier();
-
-	public void setOwn(IFile file);
-
-	public boolean isOwn(IFile file);
-
-	public void setAvailable(IFile file);
-
-	public boolean isAvailable(IFile file);
-
-	public void setLineNumber(IFile file, int lineNumber);
-
-	public int getLineNumber(IFile file);
-
-	public String getFieldName();
+	/**
+	 * Returns the name of the element
+	 * 
+	 * @return name of the element
+	 */
+	public String getName();
 	
-	public boolean isPublic();
+	/**
+	 * Returns the children of the element
+	 * 
+	 * @return children of the element
+	 */
+	public IFSTModelElement[] getChildren();
 	
-	public boolean isPrivate();
+	/**
+	 * Returns the parent element
+	 * 
+	 * @return parent element
+	 */
+	public IFSTModelElement getParent();
 	
-	public boolean isProtected();
-	
-	public boolean isStatic();
-	
-	public boolean isFinal();
-
+	/**
+	 * Returns true of the current element has children
+	 * 
+	 * @return true if the current element has children
+	 */
+	public boolean hasChildren();
 }

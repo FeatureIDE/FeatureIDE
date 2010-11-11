@@ -16,8 +16,12 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.core.jakprojectmodel;
+package de.ovgu.featureide.core.fstmodel;
 
-public interface IImport extends IJakModelElement {
+public interface IImportContainer extends IFSTModelElement {
+
+	public int getNumberOfImports();
+
+	public IImport[] getImports();
 
 }

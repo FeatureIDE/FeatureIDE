@@ -31,7 +31,7 @@ public class Collaboration {
 	public Boolean selected = true;
 	private String name;
 	private LinkedList<Role> roles;
-	public Boolean isEquation = false;
+	public Boolean isConfiguration = false;
 	
 	public Collaboration(String name) {
 		this.name = name;

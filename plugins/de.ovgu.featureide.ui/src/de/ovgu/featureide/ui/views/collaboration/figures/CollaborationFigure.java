@@ -50,7 +50,7 @@ public class CollaborationFigure extends Figure implements GUIDefaults{
 		
 		super();
 		selected = coll.selected;
-		isEquation = coll.isEquation;
+		isEquation = coll.isConfiguration;
 		this.setLayoutManager(new FreeformLayout());
 		
 		if (selected) {

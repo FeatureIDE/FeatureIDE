@@ -23,8 +23,8 @@ import java.util.HashSet;
 
 import org.eclipse.core.resources.IFile;
 
-import de.ovgu.featureide.core.jakprojectmodel.IField;
-import de.ovgu.featureide.core.jakprojectmodel.IJakModelElement;
+import de.ovgu.featureide.core.fstmodel.IFSTModelElement;
+import de.ovgu.featureide.core.fstmodel.IField;
 
 
 /**
@@ -59,7 +59,7 @@ public class Field extends JakModelElement implements Comparable<Object>, IField
 		return name;
 	}
 
-	public IJakModelElement[] getChildren() {
+	public IFSTModelElement[] getChildren() {
 		return null;
 	}
 

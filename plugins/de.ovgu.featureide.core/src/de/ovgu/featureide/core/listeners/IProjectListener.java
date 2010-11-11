@@ -21,7 +21,7 @@ package de.ovgu.featureide.core.listeners;
 import de.ovgu.featureide.core.IFeatureProject;
 
 /**
- * Notifies listeners of new created or deleted Jak projects.
+ * Notifies listeners of new created or deleted FeatureIDE projects.
  * 
  * @author Marcus Leich
  *

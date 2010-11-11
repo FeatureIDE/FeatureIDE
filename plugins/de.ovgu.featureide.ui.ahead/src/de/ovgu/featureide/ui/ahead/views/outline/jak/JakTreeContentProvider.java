@@ -26,9 +26,9 @@ import org.eclipse.ui.part.FileEditorInput;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.jakprojectmodel.IClass;
-import de.ovgu.featureide.core.jakprojectmodel.IJakModelElement;
-import de.ovgu.featureide.core.jakprojectmodel.IJakProjectModel;
+import de.ovgu.featureide.core.fstmodel.IClass;
+import de.ovgu.featureide.core.fstmodel.IFSTModel;
+import de.ovgu.featureide.core.fstmodel.IFSTModelElement;
 
 
 /**
@@ -45,38 +45,51 @@ public class JakTreeContentProvider implements ITreeContentProvider {
 	
 	private IFile jakfile = null;
 
-	private IJakProjectModel jakProject = null;
+	private IFSTModel jakProject = null;
 
 	public Object[] getChildren(Object parentElement) {
-		if (parentElement instanceof IJakModelElement)
-			return ((IJakModelElement) parentElement).getChildren();
+		if (parentElement instanceof IFSTModelElement)
+			return ((IFSTModelElement) parentElement).getChildren();
 
 		return null;
 	}
 
 	public Object getParent(Object element) {
-		if (element instanceof IJakModelElement)
-			((IJakModelElement) element).getParent();
+		if (element instanceof IFSTModelElement)
+			((IFSTModelElement) element).getParent();
 		return null;
 	}
 
 	public boolean hasChildren(Object element) {
-		if (element instanceof IJakModelElement)
-			return ((IJakModelElement) element).hasChildren();
+		if (element instanceof IFSTModelElement)
+			return ((IFSTModelElement) element).hasChildren();
 		return false;
 	}
 
 	public Object[] getElements(Object inputElement) {
 		IPath path = jakfile.getFullPath();
-		String feature = path.segment(path.segmentCount()-2);
+		IFeatureProject featureProject = CorePlugin.getFeatureProject(jakfile);
+		if (featureProject == null)
+			return null;
 		
-		String [] errMessage = new String[] {
-			"No data to display available.",
-			"Please choose a configuration",
-			"where feature " +feature,
-			"is selected and build this",
-			"configuration." };
-		
+		String [] errMessage;
+		String feature = featureProject.getFeatureName(jakfile);
+		if (feature == null) {
+			errMessage = new String[] {
+					"No data to display available.",
+					"Jakfile is no sourcefile"
+			};
+		} else {	
+			feature = path.segment(path.segmentCount()-2);
+			
+			errMessage = new String[] {
+				"No data to display available.",
+				"Please choose a configuration",
+				"where feature " +feature,
+				"is selected and build this",
+				"configuration." 
+			};
+		}
 		if (jakProject != null) {
 			IClass c = jakProject.getClass(jakfile);
 			if (c != null)
@@ -97,7 +110,7 @@ public class JakTreeContentProvider implements ITreeContentProvider {
 			IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
 			if (featureProject != null) {
 				jakfile = file;
-				jakProject = featureProject.getJakProjectModel();
+				jakProject = featureProject.getFSTModel();
 			}
 		}
 	}

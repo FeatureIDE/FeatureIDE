@@ -16,17 +16,17 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.core.jakprojectmodel;
+package de.ovgu.featureide.core.fstmodel;
 
 import java.util.ArrayList;
 
 import org.eclipse.core.resources.IFile;
 
-public interface IJakProjectModel extends IJakModelElement {
+public interface IFSTModel extends IFSTModelElement {
 
 	/**
 	 * Returns the number of features, that were used to build the current
-	 * version of the jak project according to the current equation file
+	 * version of the FeatureIDE project according to the current equation file
 	 * 
 	 * @return Number of selected features
 	 */
@@ -40,16 +40,16 @@ public interface IJakProjectModel extends IJakModelElement {
 	public ArrayList<IFeature> getSelectedFeatures();
 
 	/**
-	 * Returns the total number of features of the jak project
+	 * Returns the total number of features of the FeatureIDE project
 	 * 
-	 * @return Number of availible features
+	 * @return Number of available features
 	 */
 	public int getNumberOfFeatures();
 
 	/**
-	 * Returns all availible features of the jak project
+	 * Returns all available features of the FeatureIDE project
 	 * 
-	 * @return Array of availible features
+	 * @return Array of available features
 	 */
 	public IFeature[] getFeatures();
 
@@ -78,11 +78,11 @@ public interface IJakProjectModel extends IJakModelElement {
 	public IClass[] getClasses();
 
 	/**
-	 * Returns the class for the given jakfile
+	 * Returns the class for the given file
 	 * 
 	 * @param file
-	 *            A jakfile
-	 * @return the class for the givin jakfile
+	 *            A file
+	 * @return the class for the given file
 	 */
 	public IClass getClass(IFile file);
 

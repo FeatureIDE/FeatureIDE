@@ -44,7 +44,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 /**
  * The "New" wizard page allows setting the container for the new file as well
  * as the file name. The page will only accept file name without the extension
- * OR with the extension that matches the expected one (jak).
+ * OR with the extension that matches the expected one (.equation).
  * 
  * @author Christian Becker
  * @author Jens Meinicke
@@ -74,7 +74,7 @@ public class NewEquationFilePage extends WizardPage {
 		super("wizardPage");
 		setTitle("New Equation File");
 		setDescription("Enter the name of the equation file. It will be placed in the equations directory of the " +
-				"selected Jak project");
+				"selected FeatureIDE project");
 		this.selection = selection;
 	}
 

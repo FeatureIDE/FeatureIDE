@@ -44,10 +44,10 @@ import org.eclipse.ui.part.FileEditorInput;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.jakprojectmodel.IClass;
-import de.ovgu.featureide.core.jakprojectmodel.IField;
-import de.ovgu.featureide.core.jakprojectmodel.IJakProjectModel;
-import de.ovgu.featureide.core.jakprojectmodel.IMethod;
+import de.ovgu.featureide.core.fstmodel.IClass;
+import de.ovgu.featureide.core.fstmodel.IFSTModel;
+import de.ovgu.featureide.core.fstmodel.IField;
+import de.ovgu.featureide.core.fstmodel.IMethod;
 import de.ovgu.featureide.ui.ahead.AheadUIPlugin;
 
 
@@ -179,7 +179,7 @@ public class JakCompletionProcessor implements IContentAssistProcessor{
 			IFeatureProject featureProject = CorePlugin.getFeatureProject(inputFile.getFile());
 			IClass[] classes = null;
 			if (featureProject!=null){
-				IJakProjectModel project = featureProject.getJakProjectModel();
+				IFSTModel project = featureProject.getFSTModel();
 				if (project!=null) {
 					classes = project.getClasses();
 					if (classes!=null){

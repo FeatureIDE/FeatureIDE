@@ -16,13 +16,11 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.core.jakprojectmodel;
+package de.ovgu.featureide.core.fstmodel;
 
 import org.eclipse.core.resources.IFile;
 
-public interface IMethod extends IJakModelElement {
-
-	public String getMethodName();
+public interface IField extends IFSTModelElement {
 
 	public String getIdentifier();
 
@@ -37,6 +35,8 @@ public interface IMethod extends IJakModelElement {
 	public void setLineNumber(IFile file, int lineNumber);
 
 	public int getLineNumber(IFile file);
+
+	public String getFieldName();
 	
 	public boolean isPublic();
 	

@@ -25,7 +25,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.QualifiedName;
 
 import de.ovgu.featureide.core.builder.IComposerExtension;
-import de.ovgu.featureide.core.jakprojectmodel.IJakProjectModel;
+import de.ovgu.featureide.core.fstmodel.IFSTModel;
 import de.ovgu.featureide.core.projectstructure.trees.ProjectTree;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
@@ -98,20 +98,20 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 
 	public IProject getProject();
 
-	public IJakProjectModel getJakProjectModel();
+	public IFSTModel getFSTModel();
 
 	public FeatureModel getFeatureModel();
 	
 	public IFile getModelFile();
 	
 	/**
-	 * Gets the Project Tree for this Feature Project
+	 * Gets the Project Tree for this FeatureIDE Project
 	 * @return the Project Tree representing this Feature Project
 	 */
 	public ProjectTree getProjectTree();
 	
 	/**
-	 * Sets the Project Tree for this Feature Project
+	 * Sets the Project Tree for this FeatureIDE Project
 	 */
 	public void setProjectTree(ProjectTree projectTree);
 	
@@ -157,10 +157,10 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	 */
 	public void setAdditionalJavaClassPath(String[] paths);
 
-	/**
+	/** 
 	 * @param model
 	 */
-	public void setJakProjectModel(IJakProjectModel model);
+	public void setFSTModel(IFSTModel model);
 	
 	/**
 	 * @return True if the model, a sourcefile or the current equation was changed.

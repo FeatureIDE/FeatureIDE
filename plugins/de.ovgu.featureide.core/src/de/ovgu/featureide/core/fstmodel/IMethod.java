@@ -16,8 +16,36 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.core.jakprojectmodel;
+package de.ovgu.featureide.core.fstmodel;
 
-public interface IFeature extends IJakModelElement {
+import org.eclipse.core.resources.IFile;
+
+public interface IMethod extends IFSTModelElement {
+
+	public String getMethodName();
+
+	public String getIdentifier();
+
+	public void setOwn(IFile file);
+
+	public boolean isOwn(IFile file);
+
+	public void setAvailable(IFile file);
+
+	public boolean isAvailable(IFile file);
+
+	public void setLineNumber(IFile file, int lineNumber);
+
+	public int getLineNumber(IFile file);
+	
+	public boolean isPublic();
+	
+	public boolean isPrivate();
+	
+	public boolean isProtected();
+	
+	public boolean isStatic();
+	
+	public boolean isFinal();
 
 }

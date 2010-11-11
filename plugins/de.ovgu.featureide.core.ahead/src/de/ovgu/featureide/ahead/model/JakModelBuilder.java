@@ -36,8 +36,8 @@ import org.eclipse.core.resources.IFile;
 
 import de.ovgu.featureide.ahead.AheadCorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.jakprojectmodel.IField;
-import de.ovgu.featureide.core.jakprojectmodel.IJakProjectModel;
+import de.ovgu.featureide.core.fstmodel.IFSTModel;
+import de.ovgu.featureide.core.fstmodel.IField;
 
 
 /**
@@ -49,15 +49,15 @@ import de.ovgu.featureide.core.jakprojectmodel.IJakProjectModel;
  */
 public class JakModelBuilder {
 
-	private JakProjectModel model;
+	private JakModel model;
 
 	public JakModelBuilder(IFeatureProject featureProject) {
-		IJakProjectModel oldModel = featureProject.getJakProjectModel();
+		IFSTModel oldModel = featureProject.getFSTModel();
 		if (oldModel != null)
 			oldModel.markObsolete();
 
-		model = new JakProjectModel(featureProject.getProjectName());
-		featureProject.setJakProjectModel(model);
+		model = new JakModel(featureProject.getProjectName());
+		featureProject.setFSTModel(model);
 	}
 
 	/**

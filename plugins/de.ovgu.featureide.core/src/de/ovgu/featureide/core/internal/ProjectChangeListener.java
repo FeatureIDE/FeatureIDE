@@ -33,7 +33,7 @@ import de.ovgu.featureide.core.builder.FeatureProjectNature;
 
 
 /**
- * Listener for projects owning the Jak Nature. Synchronizes the project data
+ * Listener for projects owning a FeatureIDE project Nature. Synchronizes the project data
  * map of CorePlugin if projects have been created, opened, closed, deleted or
  * imported.
  * 
@@ -52,14 +52,14 @@ public class ProjectChangeListener implements IResourceChangeListener {
 
 			final IProject project = (IProject) child.getResource();
 			if (hasNature(project)) {
-				//Jak project created
+				//FeatureIDE project created
 				if ((child.getFlags() & IResourceDelta.DESCRIPTION) > 0)
 					addProject(project);
-				//Jak project opened or imported
+				//FeatureIDE project opened or imported
 				else if((child.getFlags() & IResourceDelta.OPEN) > 0)
 					addProject(project);
 			} else {
-				//Jak project closed or deleted
+				//FeatureIDE project closed or deleted
 				if (!project.isOpen())
 					removeProject(project);
 			}

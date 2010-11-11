@@ -49,7 +49,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionManager;
 import de.ovgu.featureide.core.builder.ExtensibleFeatureProjectBuilder;
 import de.ovgu.featureide.core.builder.IComposerExtension;
-import de.ovgu.featureide.core.jakprojectmodel.IJakProjectModel;
+import de.ovgu.featureide.core.fstmodel.IFSTModel;
 import de.ovgu.featureide.core.projectstructure.trees.ProjectTree;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -65,7 +65,7 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 
 
 /**
- * Class that encapsulates any data and method related to feature projects.
+ * Class that encapsulates any data and method related to FeatureIDE projects.
  * 
  * @author Marcus Leich
  * @author Thomas Thuem
@@ -101,10 +101,10 @@ public class FeatureProject extends BuilderMarkerHandler implements
 
 	private final IFeatureModelReader modelReader;
 
-	private IJakProjectModel jakProject;
+	private IFSTModel featureIDEProjectModel;
 
 	/**
-	 * a folder for the generated class files
+	 * a folder for the generated files
 	 */
 	private final IFolder binFolder;
 
@@ -114,7 +114,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	private final IFolder libFolder;
 
 	/**
-	 * a folder for temporary files; generated jak and java files
+	 * a folder for temporary generated files
 	 */
 	private final IFolder buildFolder;
 
@@ -124,7 +124,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	private final IFolder equationFolder;
 
 	/**
-	 * a folder for non-generated jak files
+	 * a folder for source files
 	 */
 	private final IFolder sourceFolder;
 
@@ -143,11 +143,11 @@ public class FeatureProject extends BuilderMarkerHandler implements
 
 	/**
 	 * Creating a new ProjectData includes creating folders if they don't exist,
-	 * registering workspace listeners and initialization of the AHEAD wrapper
+	 * registering workspace listeners and initialization of the wrapper
 	 * object.
 	 * 
 	 * @param aProject
-	 *            the Jak project
+	 *            the FeatureIDE project
 	 */
 	public FeatureProject(IProject aProject) {
 		super(aProject);
@@ -172,7 +172,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		equationFolder = createFolder("equations");
 		sourceFolder = createFolder("src");
 
-		jakProject = null;
+		featureIDEProjectModel = null;
 
 		// loading model data and listen to changes in the model file
 		addModelListener();
@@ -215,13 +215,13 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		// @author Dariusz Krolikowski
 		if (project.getFile("model.m").exists() && !project.getFile("model.xml").exists()){
 			try {
-			IFile file = project.getFile("model.xml");
-			
-			FeatureModel fm = new FeatureModel();
-			FeatureModelReader fmReader = new FeatureModelReader(fm);		
-			fmReader.readFromFile(project.getFile("model.m"));
-			XmlFeatureModelWriter fmWriter = new XmlFeatureModelWriter(fm);
-			fmWriter.writeToFile(file);
+				IFile file = project.getFile("model.xml");
+				
+				FeatureModel fm = new FeatureModel();
+				FeatureModelReader fmReader = new FeatureModelReader(fm);		
+				fmReader.readFromFile(project.getFile("model.m"));
+				XmlFeatureModelWriter fmWriter = new XmlFeatureModelWriter(fm);
+				fmWriter.writeToFile(file);
 			
 			if (!fmReader.getAnnLine().isEmpty()){
 				GrammarFile gFile = new GrammarFile(project.getFile("model.m"));
@@ -233,25 +233,23 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			// delete model.m automatically - default: false
 			//project.getFile("model.m").delete(true, null);
 			
-			} catch (FileNotFoundException e1) {
-				e1.printStackTrace();
-			} catch (CoreException e1) {
-				e1.printStackTrace();
-			} catch (UnsupportedModelException e1) {
-				e1.printStackTrace();
+			} catch (FileNotFoundException e) {
+				CorePlugin.getDefault().logError(e);
+			} catch (CoreException e) {
+				CorePlugin.getDefault().logError(e);
+			} catch (UnsupportedModelException e) {
+				CorePlugin.getDefault().logError(e);
 			}
 		}
 		try {
-			try {
-				modelReader.readFromFile(modelFile.getResource());
-				createAndDeleteFeatureFolders();
-			} catch (FileNotFoundException e) {
-				modelFile.createModelMarker(e.getMessage(),
-						IMarker.SEVERITY_ERROR, 0);
-			} catch (UnsupportedModelException e) {
-				modelFile.createModelMarker(e.getMessage(),
-						IMarker.SEVERITY_ERROR, e.lineNumber);
-			}
+			modelReader.readFromFile(modelFile.getResource());
+			createAndDeleteFeatureFolders();
+		} catch (FileNotFoundException e) {
+			modelFile.createModelMarker(e.getMessage(),
+					IMarker.SEVERITY_ERROR, 0);
+		} catch (UnsupportedModelException e) {
+			modelFile.createModelMarker(e.getMessage(),
+					IMarker.SEVERITY_ERROR, e.lineNumber);
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(
 					"Error while loading feature model from "
@@ -274,7 +272,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 				Feature feature = featureModel.getFeature(folder.getName());
 				if (feature == null || !feature.isLayer()) {
 					folder.refreshLocal(IResource.DEPTH_ONE, null);
-					if (folder.members().length == 0)
+					if (folder.members() == null)
 						folder.delete(false, null);
 				}
 			}
@@ -549,8 +547,8 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	 * 
 	 * @see de.ovgu.featureide.core.IFeatureProject#getJakProject()
 	 */
-	public IJakProjectModel getJakProjectModel() {
-		return jakProject;
+	public IFSTModel getFSTModel() {
+		return featureIDEProjectModel;
 	}
 
 	/*
@@ -835,8 +833,8 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	 * @seefeatureide.core.IFeatureProject#setJakProjectModel(de.ovgu.featureide.core.
 	 * jakprojectmodel.IJakProjectModel)
 	 */
-	public void setJakProjectModel(IJakProjectModel model) {
-		jakProject = model;
+	public void setFSTModel(IFSTModel model) {
+		featureIDEProjectModel = model;
 	}
 
 	/* (non-Javadoc)

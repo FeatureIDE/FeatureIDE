@@ -27,8 +27,8 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.graphics.Image;
 
-import de.ovgu.featureide.core.jakprojectmodel.IField;
-import de.ovgu.featureide.core.jakprojectmodel.IMethod;
+import de.ovgu.featureide.core.fstmodel.IField;
+import de.ovgu.featureide.core.fstmodel.IMethod;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 import de.ovgu.featureide.ui.views.collaboration.model.Role;
@@ -105,7 +105,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 				else 
 					fieldLabel.setIcon(IMAGE_FIELD_DEFAULT);
 				
-				if (f.isOwn(role.jakFile)) {
+				if (f.isOwn(role.file)) {
 					fieldFigure.add(fieldLabel);
 					fieldCount++;
 					if (fieldCount % 25 == 0) {
@@ -134,7 +134,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 				else 
 					methodLabel.setIcon(IMAGE_METHODE_DEFAULT);
 			
-				if (m.isOwn(role.jakFile)) {
+				if (m.isOwn(role.file)) {
 					methodFigure.add(methodLabel);
 					methodCount++;
 					if (methodCount % 25 == 0) {

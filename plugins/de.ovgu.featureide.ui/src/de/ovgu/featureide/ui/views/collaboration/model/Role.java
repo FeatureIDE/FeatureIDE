@@ -24,8 +24,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 
-import de.ovgu.featureide.core.jakprojectmodel.IField;
-import de.ovgu.featureide.core.jakprojectmodel.IMethod;
+import de.ovgu.featureide.core.fstmodel.IField;
+import de.ovgu.featureide.core.fstmodel.IMethod;
 
 
 /**
@@ -43,7 +43,7 @@ public class Role {
 	public LinkedList<IField> fields = new LinkedList<IField>();
 	public LinkedList<IMethod> methods = new LinkedList<IMethod>();	
 	public LinkedList<String> files = new LinkedList<String>();
-	public IFile jakFile;
+	public IFile file;
 	public String featureName = "";
 	public Boolean selected;
 	

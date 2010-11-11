@@ -10,11 +10,6 @@
 	</projects>
 	<buildSpec>
 		<buildCommand>
-			<name>FeatureIDE_Core.jakBuilder</name>
-			<arguments>
-			</arguments>
-		</buildCommand>
-		<buildCommand>
 			<name>de.ovgu.featureide.core.extensibleFeatureProjectBuilder</name>
 			<arguments>
 				<dictionary>

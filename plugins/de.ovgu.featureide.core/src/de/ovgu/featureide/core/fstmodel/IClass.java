@@ -16,13 +16,13 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.core.jakprojectmodel;
+package de.ovgu.featureide.core.fstmodel;
 
 import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
 
-public interface IClass extends IJakModelElement {
+public interface IClass extends IFSTModelElement {
 
 	/**
 	 * Returns the number of all fields
@@ -166,76 +166,74 @@ public interface IClass extends IJakModelElement {
 
 	/**
 	 * Returns the number of fields that are available according
-	 * to the current jakfile
+	 * to the current file
 	 * 
-	 * @return available number of fields according to the current jakfile
+	 * @return available number of fields according to the current file
 	 */
 	public int getAvailableFieldCount();
 
 	/**
-	 * Returns the available fields according to the current jakfile
+	 * Returns the available fields according to the current file
 	 * 
-	 * @return available fields according to the current jakfile
+	 * @return available fields according to the current file
 	 */
 	public IField[] getAvailableFields();
 
 	/**
-	 * Returns the number of availible methods according to the current jakfile
+	 * Returns the number of available methods according to the current file
 	 * 
-	 * @return number of methods according to the current jakfile
+	 * @return number of methods according to the current file
 	 */
 	public int getAvailableMethodCount();
 
 	/**
-	 * Returns the available methods according to the current jakfile
+	 * Returns the available methods according to the current file
 	 * 
-	 * @return available methods according to the current jakfile
+	 * @return available methods according to the current file
 	 */
 	public IMethod[] getAvailableMethods();
 
 	/**
-	 * Returns the number of fields that were declared inside the current jakfile
+	 * Returns the number of fields that were declared inside the current file
 	 * 
-	 * @return number of fields that were declared inside the current jakfile 
+	 * @return number of fields that were declared inside the current file 
 	 */
 	public int getOwnFieldCount();
 
 	/**
-	 * Returns the fields that were declared inside the current jakfile
+	 * Returns the fields that were declared inside the current file
 	 * 
-	 * @return fields that were declared inside the current jakfile
+	 * @return fields that were declared inside the current file
 	 */
 	public IField[] getOwnFields();
 
 	/**
-	 * Returns the number of methods that were declared inside the current jakfile
+	 * Returns the number of methods that were declared inside the current file
 	 * 
-	 * @return number of methods that were declared inside the current jakfile
+	 * @return number of methods that were declared inside the current file
 	 */
 	public int getOwnMethodCount();
 
 	/**
-	 * Returns the methods that were declared inside the current jakfile
+	 * Returns the methods that were declared inside the current file
 	 * 
-	 * @return methods that were declared inside the current jakfile
+	 * @return methods that were declared inside the current file
 	 */
 	public IMethod[] getOwnMethods();
 
 	/**
-	 * Sets the current jakfile
+	 * Sets the current file
 	 * 
-	 * @param jakfile the current jakfile
+	 * @param jakfile the current file
 	 */
 	public void setJakfile(IFile jakfile);
 
 	/**
-	 * Returns the current jakfile
+	 * Returns the current file
 	 * 
-	 * @return current jakfile
+	 * @return current file
 	 */
 	public IFile getJakfile();
-
-	
 
 	/**
 	 * Returns the source files that were composed to build this class

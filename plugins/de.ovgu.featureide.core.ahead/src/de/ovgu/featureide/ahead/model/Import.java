@@ -18,8 +18,8 @@
  */
 package de.ovgu.featureide.ahead.model;
 
-import de.ovgu.featureide.core.jakprojectmodel.IImport;
-import de.ovgu.featureide.core.jakprojectmodel.IJakModelElement;
+import de.ovgu.featureide.core.fstmodel.IFSTModelElement;
+import de.ovgu.featureide.core.fstmodel.IImport;
 
 /**
  * 
@@ -35,7 +35,7 @@ public class Import extends JakModelElement implements IImport {
 		return null;
 	}
 
-	public IJakModelElement[] getChildren() {
+	public IFSTModelElement[] getChildren() {
 		return null;
 	}
 }

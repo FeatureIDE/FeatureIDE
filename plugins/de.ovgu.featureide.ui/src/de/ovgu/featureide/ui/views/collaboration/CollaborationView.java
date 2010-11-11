@@ -175,23 +175,23 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 						//case: its a featureIDE project
 						if (inputFile.getName().endsWith(".equation")) {
 							//case: open configuration editor
-							if (builder.equation.equals(inputFile.getName())) {
+							if (builder.configuration.equals(inputFile.getName())) {
 								return;
 							} else {
-								builder.equation = inputFile.getName();
+								builder.configuration = inputFile.getName();
 							}
 							
 						} else if (featureProject != null){
 							//case: open editor is no configuration editor
 							IFile file = featureProject.getCurrentEquationFile();
 							if (file != null) {
-								if (builder.equation.equals(file.getName())) {
+								if (builder.configuration.equals(file.getName())) {
 									return;
 								} else {
-									builder.equation = file.getName();
+									builder.configuration = file.getName();
 								}
 							} else {
-								builder.equation = "";
+								builder.configuration = "";
 							}
 						} else {
 							return;

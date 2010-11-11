@@ -137,7 +137,7 @@ public class NewJakFileWizard extends Wizard implements INewWizard {
 
 	private InputStream openContentStream(String layername, String classname, boolean refines) {
 		String contents = "";
-		contents += "layer " + layername + ";\n\n";
+		//contents += "layer " + layername + ";\n\n";
 		contents += "public " + (refines ? "refines " : "") + "class " + classname + " {\n\n}";
 		return new ByteArrayInputStream(contents.getBytes());
 	}

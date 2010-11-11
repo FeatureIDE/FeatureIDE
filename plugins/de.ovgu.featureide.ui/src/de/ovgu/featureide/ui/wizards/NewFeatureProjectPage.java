@@ -48,9 +48,9 @@ public class NewFeatureProjectPage extends WizardPage {
 	private IComposerExtension[] extensions = null;
 	
 	protected NewFeatureProjectPage() {
-		super("New Jak");
-		setTitle("Project");
-		setDescription("Select a composer");
+		super("");
+		setTitle("Select a composer");
+		setDescription("Creates a FeatureIDE project");
 	}
 	
 	public void createControl(Composite parent) {

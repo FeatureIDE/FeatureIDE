@@ -41,6 +41,7 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 	
 	@Override
 	public void addPages() {
+		setWindowTitle("New FeatureIDE Project");
 		page = new NewFeatureProjectPage();
 		addPage(page);
 		super.addPages();

@@ -30,6 +30,8 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.Platform;
 import org.osgi.framework.BundleContext;
 
 import de.ovgu.featureide.core.builder.FeatureProjectNature;
@@ -56,12 +58,6 @@ public class CorePlugin extends AbstractCorePlugin {
 	
 	public static final String PLUGIN_ID = "de.ovgu.featureide.core";
 	
-	public static final String AHEAD_ID = "de.ovgu.featureide.composer.ahead";
-
-	public static final String FEATURE_HOUSE_ID = "de.ovgu.featureide.composer.featurehouse";
-	
-	public static final String FEATURE_CPP_ID = "de.ovgu.featureide.composer.featurecpp";
-
 	private static CorePlugin plugin;
 	
 	private HashMap<IProject, IFeatureProject> featureProjectMap;
@@ -100,13 +96,13 @@ public class CorePlugin extends AbstractCorePlugin {
 			try {
 				if (project.isOpen()) {
 					//conversion for old projects
-					if (project.hasNature("FeatureIDE_Core.jaknature"))
-						changeOldNature(project, AHEAD_ID);
-					else if (project.hasNature("FeatureIDE_Core.featureHouseNature"))
-						changeOldNature(project, FEATURE_HOUSE_ID);
-					else if (project.hasNature("FeatureIDE_Core.featureCPPNature"))
-						changeOldNature(project, FEATURE_CPP_ID);
-
+					IConfigurationElement[] config = Platform.getExtensionRegistry()
+						.getConfigurationElementsFor(PLUGIN_ID + ".Composers");
+					for (IConfigurationElement e : config) {
+						if (project.hasNature(e.getAttribute("nature"))) {
+							changeOldNature(project, e.getAttribute("ID"));
+						}
+					}
 					if (project.hasNature(FeatureProjectNature.NATURE_ID))
 						addProject(project);
 				}

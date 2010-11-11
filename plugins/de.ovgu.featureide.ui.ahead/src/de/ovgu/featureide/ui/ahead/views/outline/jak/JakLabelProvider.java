@@ -22,7 +22,11 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.graphics.Image;
 
-import de.ovgu.featureide.core.jakprojectmodel.IJakModelElement;
+import de.ovgu.featureide.core.fstmodel.IClass;
+import de.ovgu.featureide.core.fstmodel.IFSTModelElement;
+import de.ovgu.featureide.core.fstmodel.IField;
+import de.ovgu.featureide.core.fstmodel.IMethod;
+import de.ovgu.featureide.ui.ahead.AheadUIPlugin;
 
 
 /**
@@ -34,13 +38,49 @@ import de.ovgu.featureide.core.jakprojectmodel.IJakModelElement;
  */
 public class JakLabelProvider implements ILabelProvider {
 	
+	private static Image IMAGE_FIELD_PRIVATE = AheadUIPlugin.getImage("field_private_obj.gif");
+	private static Image IMAGE_FIELD_PROTECTED = AheadUIPlugin.getImage("field_protected_obj.gif");
+	private static Image IMAGE_FIELD_PUBLIC = AheadUIPlugin.getImage("field_public_obj.gif");
+	private static Image IMAGE_FIELD_DEFAULT = AheadUIPlugin.getImage("field_default_obj.gif");
+	private static Image IMAGE_METHODE_PRIVATE = AheadUIPlugin.getImage("private_co.gif");
+	private static Image IMAGE_METHODE_PROTECTED = AheadUIPlugin.getImage("/protected_co.gif");
+	private static Image IMAGE_METHODE_PUBLIC = AheadUIPlugin.getImage("public_co.gif");
+	private static Image IMAGE_METHODE_DEFAULT =  AheadUIPlugin.getImage("default_co.gif");
+	private static Image IMAGE_CLASS = AheadUIPlugin.getImage("class_obj.gif");
+	
 	public Image getImage(Object element) {
+		if (element instanceof IFSTModelElement) {
+			IFSTModelElement jakModelElement = (IFSTModelElement)element;
+			if (jakModelElement instanceof IField) {
+				IField field = (IField)jakModelElement;
+				if (field.isPrivate())
+					return IMAGE_FIELD_PRIVATE;
+				else if (field.isProtected())
+					return IMAGE_FIELD_PROTECTED;
+				else if (field.isPublic())
+					return IMAGE_FIELD_PUBLIC;
+				else 
+					return IMAGE_FIELD_DEFAULT;
+			} else if (jakModelElement instanceof IMethod) {
+				IMethod method = (IMethod)jakModelElement;
+				if (method.isPrivate())			
+					return IMAGE_METHODE_PRIVATE;
+				else if (method.isProtected())
+					return IMAGE_METHODE_PROTECTED;
+				else if (method.isPublic())
+					return IMAGE_METHODE_PUBLIC;
+				else 
+					return IMAGE_METHODE_DEFAULT;
+			} else if (jakModelElement instanceof IClass) {
+				return IMAGE_CLASS;
+			}
+		}
 		return null;
 	}
 
 	public String getText(Object element) {
-		if( element instanceof IJakModelElement )
-			return ((IJakModelElement)element).getName();
+		if( element instanceof IFSTModelElement )
+			return ((IFSTModelElement)element).getName();
 		
 		return element.toString();
 	}

@@ -52,8 +52,6 @@ public class AddRoleAction extends Action {
 	
 	public void setEnabled(boolean enable) {
 		selection = (IStructuredSelection)viewer.getSelection();
-//		Object part = selection.getFirstElement();
-//		enable = !(part instanceof RoleEditPart);
 		super.setEnabled(true);
 	}
 	

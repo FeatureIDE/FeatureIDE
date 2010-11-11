@@ -18,16 +18,16 @@
  */
 package de.ovgu.featureide.ahead.model;
 
-import de.ovgu.featureide.core.jakprojectmodel.IJakModelElement;
+import de.ovgu.featureide.core.fstmodel.IFSTModelElement;
 
 /**
  * 
  * @author Tom Brosch
  * 
  */
-public class JakModelElement implements IJakModelElement {
+public class JakModelElement implements IFSTModelElement {
 
-	public IJakModelElement[] getChildren() {
+	public IFSTModelElement[] getChildren() {
 		return null;
 	}
 
@@ -35,7 +35,7 @@ public class JakModelElement implements IJakModelElement {
 		return null;
 	}
 
-	public IJakModelElement getParent() {
+	public IFSTModelElement getParent() {
 		return null;
 	}
 

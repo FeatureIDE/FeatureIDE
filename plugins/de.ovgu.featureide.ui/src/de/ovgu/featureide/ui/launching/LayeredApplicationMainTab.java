@@ -239,7 +239,7 @@ public class LayeredApplicationMainTab extends JavaLaunchTab implements ModifyLi
 		public MainClassVisitor(LinkedList<String> classes) {
 			this.classes = classes;
 		}
-		
+
 		public boolean visit(IResource resource) throws CoreException {
 			if( resource instanceof IFile && resource.getFileExtension().equals("jak") ) {
 				if (!containsMainMethod((IFile) resource))

@@ -23,10 +23,10 @@ import java.util.TreeMap;
 
 import org.eclipse.core.resources.IFile;
 
-import de.ovgu.featureide.core.jakprojectmodel.IClass;
-import de.ovgu.featureide.core.jakprojectmodel.IField;
-import de.ovgu.featureide.core.jakprojectmodel.IJakModelElement;
-import de.ovgu.featureide.core.jakprojectmodel.IMethod;
+import de.ovgu.featureide.core.fstmodel.IClass;
+import de.ovgu.featureide.core.fstmodel.IFSTModelElement;
+import de.ovgu.featureide.core.fstmodel.IField;
+import de.ovgu.featureide.core.fstmodel.IMethod;
 
 
 /**
@@ -381,8 +381,8 @@ public class Class extends JakModelElement implements IClass {
 		return className;
 	}
 
-	public IJakModelElement[] getChildren() {
-		IJakModelElement[] elements = new IJakModelElement[getOwnFieldCount()
+	public IFSTModelElement[] getChildren() {
+		IFSTModelElement[] elements = new IFSTModelElement[getOwnFieldCount()
 				+ getOwnMethodCount()];
 		IField[] fieldArray = getOwnFields();
 		IMethod[] methodArray = getOwnMethods();

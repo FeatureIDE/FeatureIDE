@@ -62,7 +62,7 @@ public class JakEditor extends TextEditor {
 			IFile file = ((IFileEditorInput) input).getFile();
 			IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
 
-			// check that the project is a JakProject and registered
+			// check that the project is a FeatureIDE project and registered
 			if (featureProject == null)
 				return;
 			String feature = featureProject.getFeatureName(file);

@@ -30,10 +30,10 @@ import org.eclipse.core.resources.IFile;
 import de.ovgu.featureide.ahead.AheadCorePlugin;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.jakprojectmodel.IClass;
-import de.ovgu.featureide.core.jakprojectmodel.IFeature;
-import de.ovgu.featureide.core.jakprojectmodel.IJakModelElement;
-import de.ovgu.featureide.core.jakprojectmodel.IJakProjectModel;
+import de.ovgu.featureide.core.fstmodel.IClass;
+import de.ovgu.featureide.core.fstmodel.IFeature;
+import de.ovgu.featureide.core.fstmodel.IFSTModel;
+import de.ovgu.featureide.core.fstmodel.IFSTModelElement;
 
 
 /**
@@ -42,7 +42,7 @@ import de.ovgu.featureide.core.jakprojectmodel.IJakProjectModel;
  * @author Tom Brosch
  * 
  */
-public class JakProjectModel extends JakModelElement implements IJakProjectModel {
+public class JakModel extends JakModelElement implements IFSTModel {
 
 	HashMap<IFile, Class> classesMap;
 	HashMap<String, Class> classes;
@@ -55,7 +55,7 @@ public class JakProjectModel extends JakModelElement implements IJakProjectModel
 	 * @param name
 	 *            Name of the project
 	 */
-	public JakProjectModel(String name) {
+	public JakModel(String name) {
 		classesMap = new HashMap<IFile, Class>();
 		classes = new HashMap<String, Class>();
 		features = new HashMap<String, Feature>();
@@ -201,7 +201,7 @@ public class JakProjectModel extends JakModelElement implements IJakProjectModel
 		return projectName;
 	}
 
-	public IJakModelElement[] getChildren() {
+	public IFSTModelElement[] getChildren() {
 		return getClasses();
 	}
 

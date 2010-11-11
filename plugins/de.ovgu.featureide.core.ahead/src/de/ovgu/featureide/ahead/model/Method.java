@@ -24,8 +24,8 @@ import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
 
-import de.ovgu.featureide.core.jakprojectmodel.IJakModelElement;
-import de.ovgu.featureide.core.jakprojectmodel.IMethod;
+import de.ovgu.featureide.core.fstmodel.IFSTModelElement;
+import de.ovgu.featureide.core.fstmodel.IMethod;
 
 
 /**
@@ -78,7 +78,7 @@ public class Method extends JakModelElement implements Comparable<Object>, IMeth
 		return methodName;
 	}
 
-	public IJakModelElement[] getChildren() {
+	public IFSTModelElement[] getChildren() {
 		return null;
 	}
 

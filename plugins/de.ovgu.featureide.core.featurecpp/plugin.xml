@@ -7,7 +7,8 @@
             class="de.ovgu.featureide.featurecpp.FeatureCppComposer"
             description="Composes C++ header files."
             id="de.ovgu.featureide.composer.featurecpp"
-            name="FeatureC++">
+            name="FeatureC++"
+            nature="FeatureIDE_Core.featureCPPNature">
       </composer>
    </extension>
    <extension
