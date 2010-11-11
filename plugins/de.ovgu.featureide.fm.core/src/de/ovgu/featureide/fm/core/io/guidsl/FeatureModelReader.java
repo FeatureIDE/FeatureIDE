@@ -187,7 +187,6 @@ public class FeatureModelReader extends AbstractFeatureModelReader {
 		if (ind >= 0){	
 			String annotations = root.toString().substring(ind+3);
 			int counter = root.toString().substring(0,root.toString().indexOf("##")).split("\n").length+2;
-			System.out.print(root.toString());
 			List<String> list = stringToList(annotations);
 			for(int i=0; i<list.size(); i++){
 				String line = list.get(i);
