@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<struct>
+			<and mandatory="true" name="FM_Core">
+				<and name="FM_UI">
+					<and name="UI">
+						<and mandatory="true" name="AheadUI">
+							<feature name="JakRefactoring"/>
+						</and>
+					</and>
+				</and>
+				<and name="Core">
+					<feature name="AheadCore"/>
+					<feature name="FeatureCppCore"/>
+					<feature name="FeatureHouseCore"/>
+				</and>
+			</and>
+		</struct>
+		<constraints>
+			<rule>
+				<imp>
+					<var>UI</var>
+					<var>Core</var>
+				</imp>
+			</rule>
+		</constraints>
+		<comments/>
+	</featureModel>
