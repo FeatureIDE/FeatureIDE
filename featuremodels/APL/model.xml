@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<struct>
+			<and abstract="true" mandatory="true" name="APL">
+				<and abstract="true" mandatory="true" name="mainAPL">
+					<and abstract="true" mandatory="true" name="Java">
+						<and abstract="true" mandatory="true" name="mainJava">
+							<feature name="reform"/>
+							<feature name="jedi"/>
+							<feature mandatory="true" name="jak2java"/>
+							<feature mandatory="true" name="bali"/>
+						</and>
+					</and>
+					<alt abstract="true" name="Xml">
+						<feature mandatory="true" name="xc"/>
+						<feature mandatory="true" name="xak"/>
+					</alt>
+					<feature name="cpp"/>
+					<and abstract="true" name="Gui">
+						<and abstract="true" mandatory="true" name="mainGUI">
+							<feature name="me"/>
+							<feature name="mmatrix"/>
+							<feature name="guidsl"/>
+							<feature name="web"/>
+						</and>
+					</and>
+					<feature name="drc"/>
+					<and abstract="true" name="bc">
+						<feature mandatory="true" name="bcjak2java"/>
+					</and>
+					<and abstract="true" name="aj">
+						<feature mandatory="true" name="jak2aj"/>
+					</and>
+				</and>
+			</and>
+		</struct>
+		<constraints>
+			<rule>
+				<imp>
+					<var>bc</var>
+					<var>mmatrix</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>me</var>
+					<var>mmatrix</var>
+				</imp>
+			</rule>
+		</constraints>
+		<comments/>
+	</featureModel>
