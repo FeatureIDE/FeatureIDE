@@ -18,7 +18,6 @@ Bundle-ActivationPolicy: lazy
 Export-Package: de.ovgu.featureide.refactoring
 Bundle-ClassPath: .,
  lib/commons-logging-1.1.jar,
- lib/jakarta.jar,
  lib/log4j-1.2.15.jar,
  lib/refactor.jar
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

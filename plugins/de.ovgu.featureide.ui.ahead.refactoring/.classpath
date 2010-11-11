@@ -4,7 +4,6 @@
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-logging-1.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jakarta.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/log4j-1.2.15.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/refactor.jar"/>
 	<classpathentry exported="true" kind="lib" path="/de.ovgu.featureide.core.ahead/lib/mixin.jar"/>
