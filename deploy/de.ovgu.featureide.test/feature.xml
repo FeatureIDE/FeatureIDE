@@ -465,7 +465,7 @@ Public License instead of this License.
    </requires>
 
    <plugin
-         id="de.ovgu.featureide.fm.core-test"
+         id="de.ovgu.featureide.fm.core_test"
          download-size="0"
          install-size="0"
          version="0.0.0"
