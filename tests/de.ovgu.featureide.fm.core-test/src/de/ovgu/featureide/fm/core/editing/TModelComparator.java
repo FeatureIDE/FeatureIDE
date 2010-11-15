@@ -36,7 +36,7 @@ import de.ovgu.featureide.fm.core.io.guidsl.FeatureModelReader;
  * @author Thomas Thuem
  * @author Fabian Benduhn
  */
-public class TModelComperator {
+public class TModelComparator {
 	
 	private static final long TIMEOUT = 1000;
 
