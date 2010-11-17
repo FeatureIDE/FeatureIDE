@@ -16,7 +16,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.fm.core.io;
+package de.ovgu.featureide.ahead.wrapper;
 
 /**
  * Provides support for parsing strings. This class capsulates a substring of
