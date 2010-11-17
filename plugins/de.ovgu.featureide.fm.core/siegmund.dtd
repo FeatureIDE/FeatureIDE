@@ -1,0 +1,34 @@
+<!ELEMENT plm ((element)+,crossTreeConstraints)>
+<!ELEMENT element (path_absolut,path_relativ,constraints,childElements,order)>
+<!ELEMENT crossTreeConstraints (ctconstraint)*>
+
+<!ELEMENT path_absolut (#PCDATA)*>
+<!ELEMENT path_relativ (#PCDATA)*>
+<!ELEMENT constraints (constraint,constraint,constraint,constraint)>
+<!ELEMENT childElements (child)*>
+<!ELEMENT order (previous_element)*>
+
+<!ELEMENT child (id)>
+<!ELEMENT id (#PCDATA)>
+
+<!ELEMENT constraint (constraint_element)*>
+<!ELEMENT constraint_element (id,name)>
+<!ELEMENT name (#PCDATA)>
+
+<!ELEMENT ctconstraint (rule)+>
+
+<!ATTLIST plm
+  name CDATA ''
+  canReuseInstance (true | false) 'false'>
+<!ATTLIST element
+  id CDATA ''
+  name CDATA ''
+  type (feature | derivative | codeunit) 'feature'
+  optional (true | false) 'false'
+  dynamic (true | false) 'false'>
+
+<!ATTLIST constraint
+  type (alternative | commulative | requires | excludes) 'alternative'>
+
+<!ATTLIST child
+  optional (true | false) 'false'>

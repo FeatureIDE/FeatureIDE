@@ -1,0 +1,471 @@
+<plm name="LinkedList" canReuseInstance="true">
+  <element id="18" name="Base" type="feature" optional="false" dynamic="true">
+    <path_absolut />
+    <path_relativ />
+    <constraints>
+      <constraint type="alternative" />
+      <constraint type="commulative" />
+      <constraint type="requires" />
+      <constraint type="excludes" />
+    </constraints>
+    <childElements />
+    <order />
+    <classes />
+    <NF_Prop>
+      <binarysize>0</binarysize>
+    </NF_Prop>
+  </element>
+  <element id="1" name="AbstractElement" type="feature" optional="false" dynamic="true">
+    <path_absolut />
+    <path_relativ />
+    <constraints>
+      <constraint type="alternative" />
+      <constraint type="commulative" />
+      <constraint type="requires" />
+      <constraint type="excludes" />
+    </constraints>
+    <childElements>
+      <child optional="false">
+        <id>2</id>
+      </child>
+      <child optional="false">
+        <id>3</id>
+      </child>
+      <child optional="false">
+        <id>4</id>
+      </child>
+    </childElements>
+    <order />
+    <classes />
+    <NF_Prop>
+      <binarysize>0</binarysize>
+    </NF_Prop>
+  </element>
+  <element id="2" name="ElementA" type="feature" optional="false" dynamic="true">
+    <path_absolut />
+    <path_relativ />
+    <parentElement>
+      <id>1</id>
+    </parentElement>
+    <constraints>
+      <constraint type="alternative">
+        <constraint_element>
+          <id>3</id>
+          <name>ElementB</name>
+        </constraint_element>
+        <constraint_element>
+          <id>4</id>
+          <name>ElementC</name>
+        </constraint_element>
+      </constraint>
+      <constraint type="commulative" />
+      <constraint type="requires" />
+      <constraint type="excludes" />
+    </constraints>
+    <childElements />
+    <order />
+    <classes />
+    <NF_Prop>
+      <binarysize>0</binarysize>
+    </NF_Prop>
+  </element>
+  <element id="3" name="ElementB" type="feature" optional="false" dynamic="true">
+    <path_absolut />
+    <path_relativ />
+    <parentElement>
+      <id>1</id>
+    </parentElement>
+    <constraints>
+      <constraint type="alternative">
+        <constraint_element>
+          <id>2</id>
+          <name>ElementA</name>
+        </constraint_element>
+        <constraint_element>
+          <id>4</id>
+          <name>ElementC</name>
+        </constraint_element>
+      </constraint>
+      <constraint type="commulative" />
+      <constraint type="requires" />
+      <constraint type="excludes" />
+    </constraints>
+    <childElements />
+    <order />
+    <classes />
+    <NF_Prop>
+      <binarysize>0</binarysize>
+    </NF_Prop>
+  </element>
+  <element id="4" name="ElementC" type="feature" optional="false" dynamic="true">
+    <path_absolut />
+    <path_relativ />
+    <parentElement>
+      <id>1</id>
+    </parentElement>
+    <constraints>
+      <constraint type="alternative">
+        <constraint_element>
+          <id>2</id>
+          <name>ElementA</name>
+        </constraint_element>
+        <constraint_element>
+          <id>3</id>
+          <name>ElementB</name>
+        </constraint_element>
+      </constraint>
+      <constraint type="commulative" />
+      <constraint type="requires" />
+      <constraint type="excludes" />
+    </constraints>
+    <childElements />
+    <order />
+    <classes />
+    <NF_Prop>
+      <binarysize>0</binarysize>
+    </NF_Prop>
+  </element>
+  <element id="5" name="AbstractIterator" type="feature" optional="false" dynamic="true">
+    <path_absolut />
+    <path_relativ />
+    <constraints>
+      <constraint type="alternative" />
+      <constraint type="commulative" />
+      <constraint type="requires" />
+      <constraint type="excludes" />
+    </constraints>
+    <childElements>
+      <child optional="false">
+        <id>6</id>
+      </child>
+      <child optional="false">
+        <id>7</id>
+      </child>
+    </childElements>
+    <order />
+    <classes />
+    <NF_Prop>
+      <binarysize>0</binarysize>
+    </NF_Prop>
+  </element>
+  <element id="6" name="ForwardIterator" type="feature" optional="false" dynamic="true">
+    <path_absolut />
+    <path_relativ />
+    <parentElement>
+      <id>5</id>
+    </parentElement>
+    <constraints>
+      <constraint type="alternative">
+        <constraint_element>
+          <id>7</id>
+          <name>BackwardIterator</name>
+        </constraint_element>
+      </constraint>
+      <constraint type="commulative" />
+      <constraint type="requires" />
+      <constraint type="excludes" />
+    </constraints>
+    <childElements />
+    <order />
+    <classes />
+    <NF_Prop>
+      <binarysize>0</binarysize>
+    </NF_Prop>
+  </element>
+  <element id="7" name="BackwardIterator" type="feature" optional="false" dynamic="true">
+    <path_absolut />
+    <path_relativ />
+    <parentElement>
+      <id>5</id>
+    </parentElement>
+    <constraints>
+      <constraint type="alternative">
+        <constraint_element>
+          <id>6</id>
+          <name>ForwardIterator</name>
+        </constraint_element>
+      </constraint>
+      <constraint type="commulative" />
+      <constraint type="requires" />
+      <constraint type="excludes" />
+    </constraints>
+    <childElements />
+    <order />
+    <classes />
+    <NF_Prop>
+      <binarysize>0</binarysize>
+    </NF_Prop>
+  </element>
+  <element id="8" name="AbstractSort" type="feature" optional="true" dynamic="true">
+    <path_absolut />
+    <path_relativ />
+    <constraints>
+      <constraint type="alternative" />
+      <constraint type="commulative" />
+      <constraint type="requires" />
+      <constraint type="excludes" />
+    </constraints>
+    <childElements>
+      <child optional="false">
+        <id>9</id>
+      </child>
+      <child optional="false">
+        <id>10</id>
+      </child>
+      <child optional="false">
+        <id>11</id>
+      </child>
+      <child optional="false">
+        <id>12</id>
+      </child>
+    </childElements>
+    <order />
+    <classes />
+    <NF_Prop>
+      <binarysize>0</binarysize>
+    </NF_Prop>
+  </element>
+  <element id="9" name="BubbleSort" type="feature" optional="false" dynamic="true">
+    <path_absolut />
+    <path_relativ />
+    <parentElement>
+      <id>8</id>
+    </parentElement>
+    <constraints>
+      <constraint type="alternative">
+        <constraint_element>
+          <id>11</id>
+          <name>InsertionSort</name>
+        </constraint_element>
+        <constraint_element>
+          <id>12</id>
+          <name>QuickSort</name>
+        </constraint_element>
+        <constraint_element>
+          <id>10</id>
+          <name>MergeSort</name>
+        </constraint_element>
+      </constraint>
+      <constraint type="commulative" />
+      <constraint type="requires" />
+      <constraint type="excludes" />
+    </constraints>
+    <childElements />
+    <order />
+    <classes />
+    <NF_Prop>
+      <binarysize>0</binarysize>
+    </NF_Prop>
+  </element>
+  <element id="10" name="MergeSort" type="feature" optional="false" dynamic="true">
+    <path_absolut />
+    <path_relativ />
+    <parentElement>
+      <id>8</id>
+    </parentElement>
+    <constraints>
+      <constraint type="alternative">
+        <constraint_element>
+          <id>9</id>
+          <name>BubbleSort</name>
+        </constraint_element>
+        <constraint_element>
+          <id>11</id>
+          <name>InsertionSort</name>
+        </constraint_element>
+        <constraint_element>
+          <id>12</id>
+          <name>QuickSort</name>
+        </constraint_element>
+      </constraint>
+      <constraint type="commulative" />
+      <constraint type="requires" />
+      <constraint type="excludes" />
+    </constraints>
+    <childElements />
+    <order />
+    <classes />
+    <NF_Prop>
+      <binarysize>0</binarysize>
+    </NF_Prop>
+  </element>
+  <element id="11" name="InsertionSort" type="feature" optional="false" dynamic="true">
+    <path_absolut />
+    <path_relativ />
+    <parentElement>
+      <id>8</id>
+    </parentElement>
+    <constraints>
+      <constraint type="alternative">
+        <constraint_element>
+          <id>9</id>
+          <name>BubbleSort</name>
+        </constraint_element>
+        <constraint_element>
+          <id>10</id>
+          <name>MergeSort</name>
+        </constraint_element>
+        <constraint_element>
+          <id>12</id>
+          <name>QuickSort</name>
+        </constraint_element>
+      </constraint>
+      <constraint type="commulative" />
+      <constraint type="requires" />
+      <constraint type="excludes" />
+    </constraints>
+    <childElements />
+    <order />
+    <classes />
+    <NF_Prop>
+      <binarysize>0</binarysize>
+    </NF_Prop>
+  </element>
+  <element id="12" name="QuickSort" type="feature" optional="false" dynamic="true">
+    <path_absolut />
+    <path_relativ />
+    <parentElement>
+      <id>8</id>
+    </parentElement>
+    <constraints>
+      <constraint type="alternative">
+        <constraint_element>
+          <id>9</id>
+          <name>BubbleSort</name>
+        </constraint_element>
+        <constraint_element>
+          <id>10</id>
+          <name>MergeSort</name>
+        </constraint_element>
+        <constraint_element>
+          <id>11</id>
+          <name>InsertionSort</name>
+        </constraint_element>
+      </constraint>
+      <constraint type="commulative" />
+      <constraint type="requires" />
+      <constraint type="excludes" />
+    </constraints>
+    <childElements />
+    <order />
+    <classes />
+    <NF_Prop>
+      <binarysize>0</binarysize>
+    </NF_Prop>
+  </element>
+  <element id="13" name="print" type="feature" optional="true" dynamic="true">
+    <path_absolut />
+    <path_relativ />
+    <constraints>
+      <constraint type="alternative" />
+      <constraint type="commulative" />
+      <constraint type="requires" />
+      <constraint type="excludes" />
+    </constraints>
+    <childElements />
+    <order />
+    <classes />
+    <NF_Prop>
+      <binarysize>0</binarysize>
+    </NF_Prop>
+  </element>
+  <element id="14" name="Measurement" type="feature" optional="true" dynamic="true">
+    <path_absolut />
+    <path_relativ />
+    <constraints>
+      <constraint type="alternative" />
+      <constraint type="commulative" />
+      <constraint type="requires">
+        <constraint_element>
+          <id>8</id>
+          <name>AbstractSort</name>
+        </constraint_element>
+      </constraint>
+      <constraint type="excludes" />
+    </constraints>
+    <childElements>
+      <child optional="false">
+        <id>15</id>
+      </child>
+      <child optional="false">
+        <id>16</id>
+      </child>
+      <child optional="false">
+        <id>17</id>
+      </child>
+    </childElements>
+    <order />
+    <classes />
+    <NF_Prop>
+      <binarysize>0</binarysize>
+    </NF_Prop>
+  </element>
+  <element id="15" name="TCP_IP" type="feature" optional="false" dynamic="true">
+    <path_absolut />
+    <path_relativ />
+    <parentElement>
+      <id>14</id>
+    </parentElement>
+    <constraints>
+      <constraint type="alternative" />
+      <constraint type="commulative" />
+      <constraint type="requires" />
+      <constraint type="excludes" />
+    </constraints>
+    <childElements />
+    <order />
+    <classes />
+    <NF_Prop>
+      <binarysize>0</binarysize>
+    </NF_Prop>
+  </element>
+  <element id="16" name="Performance" type="feature" optional="false" dynamic="true">
+    <path_absolut />
+    <path_relativ />
+    <parentElement>
+      <id>14</id>
+    </parentElement>
+    <constraints>
+      <constraint type="alternative" />
+      <constraint type="commulative">
+        <constraint_element>
+          <id>17</id>
+          <name>MemorySize</name>
+        </constraint_element>
+      </constraint>
+      <constraint type="requires" />
+      <constraint type="excludes" />
+    </constraints>
+    <childElements />
+    <order />
+    <classes />
+    <NF_Prop>
+      <binarysize>0</binarysize>
+    </NF_Prop>
+  </element>
+  <element id="17" name="MemorySize" type="feature" optional="false" dynamic="true">
+    <path_absolut />
+    <path_relativ />
+    <parentElement>
+      <id>14</id>
+    </parentElement>
+    <constraints>
+      <constraint type="alternative" />
+      <constraint type="commulative">
+        <constraint_element>
+          <id>16</id>
+          <name>Performance</name>
+        </constraint_element>
+      </constraint>
+      <constraint type="requires" />
+      <constraint type="excludes" />
+    </constraints>
+    <childElements />
+    <order />
+    <classes />
+    <NF_Prop>
+      <binarysize>0</binarysize>
+    </NF_Prop>
+  </element>
+  <properties />
+</plm>
