@@ -40,7 +40,7 @@ import org.osgi.framework.Bundle;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.io.guidsl.FeatureModelWriter;
+import de.ovgu.featureide.fm.core.io.guidsl.GuidslWriter;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
@@ -110,7 +110,7 @@ public class OpenWithGuidslAction implements IObjectActionDelegate {
 				FeatureModel fm = new FeatureModel();
 				XmlFeatureModelReader fmReader = new XmlFeatureModelReader(fm);
 				fmReader.readFromFile(modelfile);
-				FeatureModelWriter fmWriter = new FeatureModelWriter(fm);
+				GuidslWriter fmWriter = new GuidslWriter(fm);
 				
 				// Parse XML to GUIDSL and save file as model.m
 				String loc = modelfile.getLocation().toOSString();

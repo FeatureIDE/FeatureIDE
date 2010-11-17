@@ -38,7 +38,7 @@ import org.eclipse.ui.IWorkbenchPart;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.guidsl.FeatureModelReader;
+import de.ovgu.featureide.fm.core.io.guidsl.GuidslReader;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
@@ -97,7 +97,7 @@ private ISelection selection;
 						else{
 							fm = featureModelEditor.getFeatureModel();
 						}
-						FeatureModelReader fmReader = new FeatureModelReader(fm);		
+						GuidslReader fmReader = new GuidslReader(fm);		
 						fmReader.readFromFile(inputFile);
 						if (!fmReader.getAnnLine().isEmpty())
 							MessageDialog.openInformation(new Shell(),"Warning!", "This grammar file contains annotations, which are not supported yet: moved to the comment section.");

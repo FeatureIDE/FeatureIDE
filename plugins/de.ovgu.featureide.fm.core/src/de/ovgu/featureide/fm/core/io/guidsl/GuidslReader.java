@@ -81,7 +81,7 @@ import guidsl.VarStmt;
  * 
  * @author Thomas Thuem
  */
-public class FeatureModelReader extends AbstractFeatureModelReader {
+public class GuidslReader extends AbstractFeatureModelReader {
 
 	/**
 	 * Needed because the GUIDSL parser uses static variables and should not
@@ -103,7 +103,7 @@ public class FeatureModelReader extends AbstractFeatureModelReader {
 	 * 
 	 * @param featureModel the structure to fill
 	 */
-	public FeatureModelReader(FeatureModel featureModel) {
+	public GuidslReader(FeatureModel featureModel) {
 		setFeatureModel(featureModel);
 	}
 
@@ -381,7 +381,7 @@ public class FeatureModelReader extends AbstractFeatureModelReader {
 	public Node readPropositionalString(String propString, FeatureModel featureModel) throws UnsupportedModelException{
 		//String featureString = new FeatureModelWriter(featureModel).writeToString();
 		StringBuffer featureString= new StringBuffer(
-				new FeatureModelWriter(featureModel).writeToString());		
+				new GuidslWriter(featureModel).writeToString());		
 
 		if( featureModel.getConstraintCount()== 0)
 			featureString.append("%%\r\n");

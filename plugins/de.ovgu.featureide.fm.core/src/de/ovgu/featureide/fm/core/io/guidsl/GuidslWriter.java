@@ -34,14 +34,14 @@ import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
  * @author Thomas Thuem
  *
  */
-public class FeatureModelWriter extends AbstractFeatureModelWriter {
+public class GuidslWriter extends AbstractFeatureModelWriter {
 
 	/**
 	 * Creates a new writer and sets the feature model to write out.
 	 * 
 	 * @param featureModel the structure to write
 	 */
-	public FeatureModelWriter(FeatureModel featureModel) {
+	public GuidslWriter(FeatureModel featureModel) {
 		setFeatureModel(featureModel);
 	}
 	

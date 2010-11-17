@@ -39,7 +39,7 @@ import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.guidsl.FeatureModelReader;
+import de.ovgu.featureide.fm.core.io.guidsl.GuidslReader;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 
@@ -193,7 +193,7 @@ public class AddConstraintAction extends Action {
 						input = temp.toString();
 					}
 					try {
-						Node propNode = new FeatureModelReader(
+						Node propNode = new GuidslReader(
 								new FeatureModel()).readPropositionalString(
 								input, featuremodel);
 						featuremodel.addPropositionalNode(propNode);

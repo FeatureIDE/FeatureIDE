@@ -38,7 +38,7 @@ import org.eclipse.ui.IWorkbenchPart;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.guidsl.FeatureModelWriter;
+import de.ovgu.featureide.fm.core.io.guidsl.GuidslWriter;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
@@ -75,7 +75,7 @@ public class ExportGuidslAction implements IObjectActionDelegate {
 						FeatureModel fm = new FeatureModel();
 						XmlFeatureModelReader fmReader = new XmlFeatureModelReader(fm);
 						fmReader.readFromFile(inputFile);
-						FeatureModelWriter fmWriter = new FeatureModelWriter(fm);
+						GuidslWriter fmWriter = new GuidslWriter(fm);
 						
 						if (fmWriter.hasConcreteCompounds()){
 							boolean proceed = MessageDialog

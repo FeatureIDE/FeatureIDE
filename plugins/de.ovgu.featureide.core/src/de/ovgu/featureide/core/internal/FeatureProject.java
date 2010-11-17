@@ -59,7 +59,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.guidsl.FeatureModelReader;
+import de.ovgu.featureide.fm.core.io.guidsl.GuidslReader;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 
@@ -218,7 +218,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 				IFile file = project.getFile("model.xml");
 				
 				FeatureModel fm = new FeatureModel();
-				FeatureModelReader fmReader = new FeatureModelReader(fm);		
+				GuidslReader fmReader = new GuidslReader(fm);		
 				fmReader.readFromFile(project.getFile("model.m"));
 				XmlFeatureModelWriter fmWriter = new XmlFeatureModelWriter(fm);
 				fmWriter.writeToFile(file);
