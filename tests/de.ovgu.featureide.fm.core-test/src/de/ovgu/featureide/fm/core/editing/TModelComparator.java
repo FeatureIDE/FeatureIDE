@@ -26,7 +26,7 @@ import org.sat4j.specs.TimeoutException;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.guidsl.FeatureModelReader;
+import de.ovgu.featureide.fm.core.io.guidsl.GuidslReader;
 
 /**
  * Checks that the calculation of edit categories works properly. A couple of
@@ -223,10 +223,10 @@ public class TModelComparator {
 	private Comparison compare(String fm1, String fm2) throws UnsupportedModelException {
 		ModelComparator comperator = new ModelComparator(TIMEOUT);
 		FeatureModel oldModel = new FeatureModel();
-		IFeatureModelReader reader = new FeatureModelReader(oldModel);
+		IFeatureModelReader reader = new GuidslReader(oldModel);
 		reader.readFromString(fm1);
 		FeatureModel newModel = new FeatureModel();
-		reader = new FeatureModelReader(newModel);
+		reader = new GuidslReader(newModel);
 		reader.readFromString(fm2);
 		return comperator.compare(oldModel, newModel);
 	}

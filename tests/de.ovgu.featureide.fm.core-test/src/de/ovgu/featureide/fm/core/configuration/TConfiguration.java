@@ -24,8 +24,9 @@ import org.junit.Test;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.guidsl.FeatureModelReader;
+import de.ovgu.featureide.fm.core.io.guidsl.GuidslReader;
 
 /**
  * Tests belonging to feature selections called configurations.
@@ -111,7 +112,7 @@ public class TConfiguration {
 
 	private FeatureModel readModel(String grammar) throws UnsupportedModelException {
 		FeatureModel fm = new FeatureModel();
-		FeatureModelReader reader = new FeatureModelReader(fm);
+		IFeatureModelReader reader = new GuidslReader(fm);
 		reader.readFromString(grammar);
 		return fm;
 	}
