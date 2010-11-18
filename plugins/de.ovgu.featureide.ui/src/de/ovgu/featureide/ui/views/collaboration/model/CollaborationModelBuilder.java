@@ -62,7 +62,7 @@ public class CollaborationModelBuilder {
 	private ArrayList<String> iFeatureNames = new ArrayList<String>();
 	private Collaboration collaboration;
 	private ArrayList<String> extensions;
-	private IFSTModel projectModel;
+	private IFSTModel fSTModel;
 	
 	public CollaborationModelBuilder() {
 		model = new CollaborationModel();
@@ -83,7 +83,7 @@ public class CollaborationModelBuilder {
 		if (composer == null)
 			return null;
 		
-		projectModel = featureProject.getFSTModel();
+		fSTModel = featureProject.getFSTModel();
 		iFeatureNames = new ArrayList<String>();
 		ArrayList<Feature> features = getSelectedFeatures(featureProject);
 		if (features == null)
@@ -104,8 +104,8 @@ public class CollaborationModelBuilder {
 		}
 		model.collaborations.add(collaboration);
 		
-		if (projectModel == null) {
-			//case: FeatureIDEProjectModel not builded
+		if (fSTModel == null) {
+			//case: FSTModel not builded
 			composer.initialize(featureProject);
 			extensions = composer.extensions();
 			if (extensions == null)
@@ -153,18 +153,20 @@ public class CollaborationModelBuilder {
 				}
 			}
 		} else {
-			//case: FeatureIDEProjectModel builded
-			ArrayList<IFeature> iFeatures = projectModel.getSelectedFeatures();
-			if (iFeatures == null)
+			//case: FSTModel builded
+			ArrayList<IFeature> iFeatures = fSTModel.getSelectedFeatures();
+			
+			if (iFeatures == null) {
 				return null;
+			}
 			
 			for (IFeature feature : iFeatures)
 				iFeatureNames.add(feature.getName());
 			
 			Collection<String> layerNames = featureProject.getFeatureModel().getLayerNames();
-			if (layerNames == null)
+			if (layerNames == null) {
 				return null;
-
+			}
 			IFolder path = featureProject.getSourceFolder();
 			extensions = composer.extensions();
 			for (String layerName : layerNames) {
@@ -172,7 +174,7 @@ public class CollaborationModelBuilder {
 					if (iFeatureNames.contains(layerName)) {
 						//case: add class files
 						Boolean selected = true;
-						IFeature feature = projectModel.getFeature(layerName);
+						IFeature feature = fSTModel.getFeature(layerName);
 						collaboration = null;
 						if (!configuration.equals("") && !featureNames.contains(layerName))
 							selected = false;
@@ -180,7 +182,7 @@ public class CollaborationModelBuilder {
 							IFSTModelElement[] element = feature.getChildren();
 							if (element instanceof IClass[]) {
 								for (IClass iClass : (IClass[]) element) {
-									if (classFilter.size() == 0	|| classFilter.contains(iClass.getName())) {
+									if (classFilter.size() == 0 || classFilter.contains(iClass.getName())) {
 										if (collaboration == null)
 											collaboration = new Collaboration(feature.getName());
 										IPath pathToFile = path.getFullPath();
@@ -222,9 +224,10 @@ public class CollaborationModelBuilder {
 							for (IResource res : members)
 								addArbitraryFiles(res, feature.getName(), selected);
 							
-							if (collaboration != null)
+							if (collaboration != null) {
 								collaboration.selected = selected;
 								model.collaborations.add(collaboration);
+							}
 						}
 					} else {
 						//case: add arbitrary files
@@ -261,7 +264,7 @@ public class CollaborationModelBuilder {
 			if (classFilter.size() == 0 
 					|| classFilter.contains("*." + (res.getName().split("[.]"))[1])
 					|| classFilter.contains(res.getName())) {
-				if (!(projectModel != null && extensions.contains("." + (res.getName().split("[.]"))[1])) 
+				if (!(fSTModel != null && extensions.contains("." + (res.getName().split("[.]"))[1])) 
 						|| !iFeatureNames.contains(featureName)) {
 					if (collaboration == null) {
 						collaboration = new Collaboration(featureName);
@@ -277,6 +280,7 @@ public class CollaborationModelBuilder {
 						role = new Role(name);
 					}
 					
+					role.setPath(res.getFullPath());
 					for (Role modelRole : model.roles) {
 						if (modelRole.featureName.equals(featureName)
 								&& modelRole.getName().equals(name)) {
