@@ -152,7 +152,7 @@ public class SiegmundWriter extends AbstractFeatureModelWriter {
     private void createXmlDocRec(Document doc, Element node, Feature feature, Set<String> require, Set<String> exclude) {
     	Element element = doc.createElement("element");
     	node.appendChild(element);
-		element.setAttribute("id", feature.getName());
+		element.setAttribute("id", getID(feature.getName()));
 		element.setAttribute("name", feature.getName());
 		element.setAttribute("type", "feature");
 		element.setAttribute("optional", feature.isMandatory() ? "false" : "true");
@@ -166,7 +166,7 @@ public class SiegmundWriter extends AbstractFeatureModelWriter {
         	element.appendChild(parentElement);
         	Element id = doc.createElement("id");
         	parentElement.appendChild(id);
-        	id.appendChild(doc.createTextNode(feature.getParent().getName()));
+        	id.appendChild(doc.createTextNode(getID(feature.getParent().getName())));
     	}
     	
     	Element constraints = doc.createElement("constraints");
@@ -182,7 +182,7 @@ public class SiegmundWriter extends AbstractFeatureModelWriter {
 	            	alternative.appendChild(constraint_element);
 	            	Element id = doc.createElement("id");
 	            	constraint_element.appendChild(id);
-	            	id.appendChild(doc.createTextNode(childFeature.getName()));
+	            	id.appendChild(doc.createTextNode(getID(childFeature.getName())));
 	            	Element name = doc.createElement("name");
 	            	constraint_element.appendChild(name);
 	            	name.appendChild(doc.createTextNode(childFeature.getName()));
@@ -199,7 +199,7 @@ public class SiegmundWriter extends AbstractFeatureModelWriter {
 	            	commulative.appendChild(constraint_element);
 	            	Element id = doc.createElement("id");
 	            	constraint_element.appendChild(id);
-	            	id.appendChild(doc.createTextNode(childFeature.getName()));
+	            	id.appendChild(doc.createTextNode(getID(childFeature.getName())));
 	            	Element name = doc.createElement("name");
 	            	constraint_element.appendChild(name);
 	            	name.appendChild(doc.createTextNode(childFeature.getName()));
@@ -215,7 +215,7 @@ public class SiegmundWriter extends AbstractFeatureModelWriter {
 	        	requires.appendChild(constraint_element);
 	        	Element id = doc.createElement("id");
 	        	constraint_element.appendChild(id);
-	        	id.appendChild(doc.createTextNode(childFeature));
+	        	id.appendChild(doc.createTextNode(getID(childFeature)));
 	        	Element name = doc.createElement("name");
 	        	constraint_element.appendChild(name);
 	        	name.appendChild(doc.createTextNode(childFeature));
@@ -230,7 +230,7 @@ public class SiegmundWriter extends AbstractFeatureModelWriter {
 	        	excludes.appendChild(constraint_element);
 	        	Element id = doc.createElement("id");
 	        	constraint_element.appendChild(id);
-	        	id.appendChild(doc.createTextNode(childFeature));
+	        	id.appendChild(doc.createTextNode(getID(childFeature)));
 	        	Element name = doc.createElement("name");
 	        	constraint_element.appendChild(name);
 	        	name.appendChild(doc.createTextNode(childFeature));
@@ -244,7 +244,7 @@ public class SiegmundWriter extends AbstractFeatureModelWriter {
     		child.setAttribute("optional", childFeature.isMandatory() ? "false" : "true");
         	Element id = doc.createElement("id");
         	child.appendChild(id);
-        	id.appendChild(doc.createTextNode(childFeature.getName()));
+        	id.appendChild(doc.createTextNode(getID(childFeature.getName())));
 		}
     	
     	element.appendChild(doc.createElement("order"));
@@ -335,5 +335,17 @@ public class SiegmundWriter extends AbstractFeatureModelWriter {
 		}
 		
 		return prettyPrint(result.getWriter().toString()); 
-	}    
+	}
+    
+    private HashMap<String,Integer> ids = new HashMap<String, Integer>();
+    
+    private String getID(String feature) {
+    	Integer id = ids.get(feature);
+    	if (id != null)
+    		return id.toString();
+    	id = ids.size() + 1;
+    	ids.put(feature, id);
+    	return id.toString();
+    }
+    
 }
