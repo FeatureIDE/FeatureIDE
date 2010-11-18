@@ -89,17 +89,17 @@ public class WaterlooReader extends AbstractFeatureModelReader {
             db = dbf.newDocumentBuilder();
         } catch (ParserConfigurationException pce) {
             System.err.println(pce);
-            System.exit(1);
+            FMCorePlugin.getDefault().logError(pce);
         }
         Document doc = null;
         try {
             doc = db.parse(inputStream);
         } catch (SAXException se) {
             System.err.println(se.getMessage());
-            System.exit(1);
+            FMCorePlugin.getDefault().logError(se);
         } catch (IOException ioe) {
             System.err.println(ioe);
-            System.exit(1);
+            FMCorePlugin.getDefault().logError(ioe);
         }       
         featureModel.reset();
     	line = 0;

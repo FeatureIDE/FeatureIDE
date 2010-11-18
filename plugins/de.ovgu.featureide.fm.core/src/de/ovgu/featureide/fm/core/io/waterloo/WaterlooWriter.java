@@ -80,7 +80,7 @@ public class WaterlooWriter extends AbstractFeatureModelWriter {
 		    db = dbf.newDocumentBuilder();
 		} catch (ParserConfigurationException pce) {
 		    System.err.println(pce);
-		    System.exit(1);
+		    FMCorePlugin.getDefault().logError(pce);
 		}
 		Document doc = db.newDocument();
 		//Create the Xml Representation
