@@ -27,7 +27,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
@@ -37,76 +36,61 @@ import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
+import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.io.siegmund.SiegmundWriter;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
-
 
 /**
- * Converts an XML feature model into our feature model format.
+ * Exports a feature model file into an XML format.
  * 
  * @author Fabian Wielgorz
+ * @author Thomas Thuem
  */
-public class ImportXmlAction implements IObjectActionDelegate {
+public class ExportSiegmundAction implements IObjectActionDelegate {
 
-private ISelection selection;
-	private FeatureModelEditor featureModelEditor;
-	
+	private ISelection selection;
+
 	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
-		featureModelEditor = (targetPart instanceof FeatureModelEditor) ? 
-				(FeatureModelEditor) targetPart : null;
 	}
 
 	public void run(IAction action) {
 		if (selection instanceof IStructuredSelection) {
-			for (Iterator<?> it = ((IStructuredSelection) selection).iterator(); 
-					it.hasNext();) {
+			for (Iterator<?> it = ((IStructuredSelection) selection).iterator(); it
+					.hasNext();) {
 				Object element = it.next();
-				IFile outputFile = null;
+				IFile inputFile = null;
 				if (element instanceof IFile) {
-					outputFile = (IFile) element;
+					inputFile = (IFile) element;
 				} else if (element instanceof IAdaptable) {
-					outputFile = (IFile) ((IAdaptable) element).getAdapter(
-							IFile.class);
+					inputFile = (IFile) ((IAdaptable) element)
+							.getAdapter(IFile.class);
 				}
-				if (outputFile != null) {
-				
+				if (inputFile != null) {
 					try {
-						boolean proceed = MessageDialog
-						.openQuestion(new Shell(), "Warning!",
-								"This will override the current model irrepealable! Proceed?");
-						if (proceed) {
-						FileDialog fileDialog = new FileDialog(new Shell(), 
-								SWT.OPEN);
-						fileDialog.setOverwrite(false);
+						FileDialog fileDialog = new FileDialog(new Shell(),
+								SWT.SAVE);
+						fileDialog.setFileName("model.xml");
+						fileDialog.setOverwrite(true);
 						String filepath = fileDialog.open();
 						if (filepath == null) return;
-						File inputFile = new File(filepath);
-						while (!inputFile.exists()) {
-							MessageDialog.openInformation(new Shell(), "File " +
-									"not Found", "Specified file wasn't found");
-							inputFile = new File(fileDialog.open());
-						}							
-
-						FeatureModel fm = featureModelEditor.getFeatureModel();
-						XmlFeatureModelReader xmlReader = new XmlFeatureModelReader(fm);		
-
-						xmlReader.readFromFile(inputFile);
-						XmlFeatureModelWriter fmWriter = new XmlFeatureModelWriter(fm);
-						fmWriter.writeToFile(outputFile);
-						outputFile.refreshLocal(IResource.DEPTH_ZERO, null);
-						}
+						File outputFile = new File(filepath);
+						FeatureModel fm = new FeatureModel();
+						IFeatureModelReader reader = new XmlFeatureModelReader(fm);
+						reader.readFromFile(inputFile);
+						IFeatureModelWriter writer = new SiegmundWriter(fm);
+						writer.writeToFile(outputFile);
+						inputFile.getProject().refreshLocal(
+								IResource.DEPTH_INFINITE, null);
 					} catch (FileNotFoundException e) {
 						FMUIPlugin.getDefault().logError(e);
 					} catch (UnsupportedModelException e) {
-						String errStr = e.getMessage();
-						MessageDialog.openWarning(new Shell(), "Warning!", "Error while loading file: \n " + errStr);
 						FMUIPlugin.getDefault().logError(e);
 					} catch (CoreException e) {
 						FMUIPlugin.getDefault().logError(e);
-					}		
+					}
 				}
 			}
 		}
@@ -115,4 +99,5 @@ private ISelection selection;
 	public void selectionChanged(IAction action, ISelection selection) {
 		this.selection = selection;
 	}
+
 }

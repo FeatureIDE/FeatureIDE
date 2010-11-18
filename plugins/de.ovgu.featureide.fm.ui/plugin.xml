@@ -41,6 +41,9 @@
                <separator name="slot1"/>
                <separator name="slot2"/>
                <separator name="slot3"/>
+               <separator
+                     name="slot4">
+               </separator>
          </menu>     
          <action
                class="de.ovgu.featureide.fm.ui.actions.OpenWithGuidslAction"
@@ -69,13 +72,20 @@
                icon="icons/export_wiz.gif"
                id="de.ovgu.featureide.fm.ui.ExportGuidsl"
                label="Export model to GUIDSL format"
-               menubarPath="de.ovgu.featureide.fm.ui_menue/slot4">
+               menubarPath="de.ovgu.featureide.fm.ui_menue/slot3">
          </action>
          <action
                class="de.ovgu.featureide.fm.ui.actions.ImportGuidslAction"
                icon="icons/import_wiz.gif"
                id="de.ovgu.featureide.fm.ui.ImportGuidsl"
                label="Import model from GUIDSL format"
+               menubarPath="de.ovgu.featureide.fm.ui_menue/slot3">
+         </action>
+         <action
+               class="de.ovgu.featureide.fm.ui.actions.ExportSiegmundAction"
+               icon="icons/export_wiz.gif"
+               id="de.ovgu.featureide.fm.ui.ExportSiegmund"
+               label="Export model to Siegmund&apos;s format"
                menubarPath="de.ovgu.featureide.fm.ui_menue/slot4">
          </action>
       </objectContribution>
