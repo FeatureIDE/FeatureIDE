@@ -162,7 +162,7 @@ public class ConquererFMWriter extends AbstractFeatureModelWriter {
     	element.appendChild(doc.createElement("path_absolut"));
     	element.appendChild(doc.createElement("path_relativ"));
 
-    	if (!feature.isRoot()) {
+    	if (!feature.getParent().isRoot()) {
         	Element parentElement = doc.createElement("parentElement");
         	element.appendChild(parentElement);
         	Element id = doc.createElement("id");
