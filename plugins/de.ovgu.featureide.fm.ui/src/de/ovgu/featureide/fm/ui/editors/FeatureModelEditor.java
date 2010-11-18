@@ -111,6 +111,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.HiddenAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.MandantoryAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.RenameAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ReverseOrderAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.GraphicalEditPartFactory;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.LevelOrderLayout;
@@ -198,6 +199,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 	private EditConstraintAction editConstraintAction;
 
 	private CreateConstraintAction createConstraintAction;
+
+	private ReverseOrderAction reverseOrderAction;
 
 	private IFile file;
 
@@ -311,6 +314,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 				featureModel, "Create Constraint");
 		editConstraintAction = new EditConstraintAction(graphicalViewer,
 				featureModel, "Edit Constraint");
+		reverseOrderAction = new ReverseOrderAction(graphicalViewer, featureModel);
 	}
 
 	private void createContextMenu() {
@@ -364,6 +368,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 			menu.add(createConstraintAction);
 			menu.add(editConstraintAction);
 			menu.add(deleteAction);
+			menu.add(reverseOrderAction);
 		}
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
