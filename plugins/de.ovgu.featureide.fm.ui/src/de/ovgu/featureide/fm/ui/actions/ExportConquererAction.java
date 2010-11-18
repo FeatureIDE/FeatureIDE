@@ -39,7 +39,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.siegmund.SiegmundWriter;
+import de.ovgu.featureide.fm.core.io.splconquerer.ConquererFMWriter;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
@@ -49,7 +49,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * @author Fabian Wielgorz
  * @author Thomas Thuem
  */
-public class ExportSiegmundAction implements IObjectActionDelegate {
+public class ExportConquererAction implements IObjectActionDelegate {
 
 	private ISelection selection;
 
@@ -80,7 +80,7 @@ public class ExportSiegmundAction implements IObjectActionDelegate {
 						FeatureModel fm = new FeatureModel();
 						IFeatureModelReader reader = new XmlFeatureModelReader(fm);
 						reader.readFromFile(inputFile);
-						IFeatureModelWriter writer = new SiegmundWriter(fm);
+						IFeatureModelWriter writer = new ConquererFMWriter(fm);
 						writer.writeToFile(outputFile);
 						inputFile.getProject().refreshLocal(
 								IResource.DEPTH_INFINITE, null);

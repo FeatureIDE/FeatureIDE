@@ -16,7 +16,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.fm.core.io.siegmund;
+package de.ovgu.featureide.fm.core.io.splconquerer;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -60,9 +60,9 @@ import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
  * @author Maik Lampe
  * @author Thomas Thuem
  */
-public class SiegmundWriter extends AbstractFeatureModelWriter {
+public class ConquererFMWriter extends AbstractFeatureModelWriter {
 		
-	public SiegmundWriter() {
+	public ConquererFMWriter() {
 	}
 	
 	/**
@@ -70,9 +70,11 @@ public class SiegmundWriter extends AbstractFeatureModelWriter {
 	 * 
 	 * @param featureModel the structure to write
 	 */
-	public SiegmundWriter(FeatureModel featureModel) {
+	public ConquererFMWriter(FeatureModel featureModel) {
 		setFeatureModel(featureModel);
 	}
+	
+	private Map<String,Set<String>> require, exclude;
 	
 	/**
 	 * Creates XML-Document
@@ -84,8 +86,7 @@ public class SiegmundWriter extends AbstractFeatureModelWriter {
 		plm.setAttribute("name", featureModel.getRoot().getName());
 		plm.setAttribute("canReuseInstance", "true");
 		
-		Map<String,Set<String>> requires = new HashMap<String, Set<String>>();
-		Map<String,Set<String>> excludes = new HashMap<String, Set<String>>();
+		require = exclude = new HashMap<String, Set<String>>();
     	List<Node> furtherNodes = new LinkedList<Node>();
     	Node node = new And(featureModel.getPropositionalNodes());
     	if (node.getChildren().length > 0) {
@@ -103,18 +104,18 @@ public class SiegmundWriter extends AbstractFeatureModelWriter {
         					literalB = temp;
         				}
         				if (literalB.positive) {
-        					Set<String> set = requires.get(literalA.var);
+        					Set<String> set = require.get(literalA.var);
         					if (set == null) {
         						set = new HashSet<String>();
-        						requires.put(literalA.var.toString(), set);
+        						require.put(literalA.var.toString(), set);
         					}
         					set.add(literalB.var.toString());
         				}
         				else {
-        					Set<String> set = excludes.get(literalA.var);
+        					Set<String> set = exclude.get(literalA.var);
         					if (set == null) {
         						set = new HashSet<String>();
-        						excludes.put(literalA.var.toString(), set);
+        						exclude.put(literalA.var.toString(), set);
         					}
         					set.add(literalB.var.toString());
         				}
@@ -127,8 +128,8 @@ public class SiegmundWriter extends AbstractFeatureModelWriter {
         	}
     	}
 
-    	for (Feature feature : featureModel.getFeatures())
-        	createXmlDocRec(doc, plm, feature, requires.get(feature.getName()), excludes.get(feature.getName()));
+    	initializeIDs();
+       	generateSubtree(doc, plm, featureModel.getRoot());
     	
     	plm.appendChild(doc.createElement("properties"));
 
@@ -141,15 +142,15 @@ public class SiegmundWriter extends AbstractFeatureModelWriter {
 		}
     }
     
-    /**
-     * Creates document based on feature model step by step
-     * @param doc document to write
-     * @param node parent node
-     * @param feature current feature
-     * @param exclude 
-     * @param require 
-     */
-    private void createXmlDocRec(Document doc, Element node, Feature feature, Set<String> require, Set<String> exclude) {
+    private void generateSubtree(Document doc, Element node, Feature feature) {
+    	if (!feature.isRoot())
+    		generateElement(doc, node, feature);
+    	
+    	for (Feature child : feature.getChildren())
+    		generateSubtree(doc, node, child);
+    }
+  
+	private void generateElement(Document doc, Element node, Feature feature) {
     	Element element = doc.createElement("element");
     	node.appendChild(element);
 		element.setAttribute("id", getID(feature.getName()));
@@ -209,8 +210,9 @@ public class SiegmundWriter extends AbstractFeatureModelWriter {
     	Element requires = doc.createElement("constraint");
     	constraints.appendChild(requires);
     	requires.setAttribute("type", "requires");
-    	if (require != null)
-	    	for (String childFeature : require) {
+    	Set<String> requireFeature = require.get(feature.getName());
+    	if (requireFeature != null)
+	    	for (String childFeature : requireFeature) {
 	        	Element constraint_element = doc.createElement("constraint_element");
 	        	requires.appendChild(constraint_element);
 	        	Element id = doc.createElement("id");
@@ -224,8 +226,9 @@ public class SiegmundWriter extends AbstractFeatureModelWriter {
     	Element excludes = doc.createElement("constraint");
     	constraints.appendChild(excludes);
     	excludes.setAttribute("type", "excludes");
-    	if (exclude != null)
-	    	for (String childFeature : exclude) {
+    	Set<String> excludeFeature = exclude.get(feature.getName());
+    	if (excludeFeature != null)
+	    	for (String childFeature : excludeFeature) {
 	        	Element constraint_element = doc.createElement("constraint_element");
 	        	excludes.appendChild(constraint_element);
 	        	Element id = doc.createElement("id");
@@ -249,9 +252,9 @@ public class SiegmundWriter extends AbstractFeatureModelWriter {
     	
     	element.appendChild(doc.createElement("order"));
     	element.appendChild(doc.createElement("classes"));
-    }
-  
-    /**
+	}
+
+	/**
      * Inserts indentations into the text
      * @param text
      * @return
@@ -337,7 +340,18 @@ public class SiegmundWriter extends AbstractFeatureModelWriter {
 		return prettyPrint(result.getWriter().toString()); 
 	}
     
-    private HashMap<String,Integer> ids = new HashMap<String, Integer>();
+    private HashMap<String,Integer> ids;
+    
+    private void initializeIDs() {
+    	ids = new HashMap<String, Integer>();
+    	initializeIDs(featureModel.getRoot());
+    }
+    
+    private void initializeIDs(Feature feature) {
+    	getID(feature.getName());
+    	for (Feature child : feature.getChildren())
+    		initializeIDs(child);
+    }
     
     private String getID(String feature) {
     	Integer id = ids.get(feature);

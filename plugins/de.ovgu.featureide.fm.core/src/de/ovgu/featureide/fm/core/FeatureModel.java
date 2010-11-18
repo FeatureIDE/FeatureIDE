@@ -106,7 +106,7 @@ public class FeatureModel implements PropertyConstants {
 			root = null;
 		}
 		featureTable.clear();
-//		renamings.clear();
+		renamings.clear();
 		propNodes.clear();
 		constraints.clear();
 		comments.clear();
@@ -368,6 +368,7 @@ public class FeatureModel implements PropertyConstants {
 
 	public void createDefaultValues() {
 		Feature root = getFeature("Root");
+		root.setAbstract(true);
 		Feature feature = new Feature(this, "Base");
 		root.addChild(feature);
 		addFeature(feature);

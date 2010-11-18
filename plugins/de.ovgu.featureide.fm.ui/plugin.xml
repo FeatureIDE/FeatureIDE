@@ -82,10 +82,10 @@
                menubarPath="de.ovgu.featureide.fm.ui_menue/slot3">
          </action>
          <action
-               class="de.ovgu.featureide.fm.ui.actions.ExportSiegmundAction"
+               class="de.ovgu.featureide.fm.ui.actions.ExportConquererAction"
                icon="icons/export_wiz.gif"
-               id="de.ovgu.featureide.fm.ui.ExportSiegmund"
-               label="Export model to Siegmund&apos;s format"
+               id="de.ovgu.featureide.fm.ui.ExportSPLConquerer"
+               label="Export model to SPL Conquerer format"
                menubarPath="de.ovgu.featureide.fm.ui_menue/slot4">
          </action>
       </objectContribution>
