@@ -34,9 +34,10 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.FileEditorInput;
 
+import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.ui.UIPlugin;
-import de.ovgu.featureide.ui.views.collaboration.figures.RoleFigure;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
+import de.ovgu.featureide.ui.views.collaboration.figures.RoleFigure;
 import de.ovgu.featureide.ui.views.collaboration.model.Collaboration;
 import de.ovgu.featureide.ui.views.collaboration.model.Role;
 
@@ -102,12 +103,18 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 			 IFile file = this.getRoleModel().getRoleFile();
 			 if (file == null) 
 				 return;
+			
 			 IWorkbenchWindow dw = UIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow();
 			 FileEditorInput fileEditorInput = new FileEditorInput(file);
 			 try {
-			 IWorkbenchPage page = dw.getActivePage();
-			 if (page != null)
-				 page.openEditor(fileEditorInput,"de.ovgu.featureide.ui.editors.JakEditor" );
+				 IWorkbenchPage page = dw.getActivePage();
+				 if (page != null) { 
+					 //TODO how to open a file with default editor
+					 String editorID = CorePlugin.getFeatureProject(file).getComposer().getEditorID(file.getFileExtension());
+					 if (editorID.equals(""))
+						 editorID = "org.eclipse.ui.DefaultTextEditor";
+					 page.openEditor(fileEditorInput,editorID);
+				 }
 			 } catch (PartInitException e) {
 				 UIPlugin.getDefault().logError(e);
 			 }

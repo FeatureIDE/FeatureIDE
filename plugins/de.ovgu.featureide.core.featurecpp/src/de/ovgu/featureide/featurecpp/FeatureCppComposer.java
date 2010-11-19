@@ -60,4 +60,11 @@ public class FeatureCppComposer implements IComposerExtensionClass {
 		extensions.add(".h");
 		return extensions;
 	}
+
+	@Override
+	public String getEditorID(String extension) {
+		if (extension.equals("h"))
+			return "org.eclipse.cdt.ui.editor.CEditor";
+		return "";
+	}
 }

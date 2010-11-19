@@ -43,6 +43,8 @@ public interface IComposerExtensionClass {
 	
 	ArrayList<String> extensions();
 	
+	String getEditorID(String extension);
+	
 	void initialize(IFeatureProject project);
 	
 	void performFullBuild(IFile equation);

@@ -86,4 +86,12 @@ public class AheadComposer implements IComposerExtensionClass {
 		extensions.add(".jak");
 		return extensions;
 	}
+
+	@Override
+	public String getEditorID(String extension) {
+		if (extension.equals("jak")) {
+			return "de.ovgu.featureide.ui.editors.JakEditor";
+		}
+		return "";
+	}
 }

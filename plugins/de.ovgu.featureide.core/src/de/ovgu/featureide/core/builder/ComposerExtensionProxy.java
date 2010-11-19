@@ -134,4 +134,11 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	public ArrayList<String> extensions() {
 		return composerExtensionClass.extensions();
 	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#getEditorID(java.lang.String)
+	 */
+	public String getEditorID(String extension) {
+		return composerExtensionClass.getEditorID(extension);
+	}
 }
