@@ -25,6 +25,15 @@
             name="FeatureIDE Project"
             project="true"/>
       <wizard
+            canFinishEarly="false"
+            category="de.ovgu.featureide.ui.category"
+            class="de.ovgu.featureide.ui.wizards.NewFeatureIDEFileWizard"
+            hasPages="true"
+            icon="icons/NewFeatureProjectIcon.png"
+            id="de.ovgu.featureide.ui.FeatureIDEFileWizard"
+            name="FeatureIDE File">
+      </wizard>
+      <wizard
             category="de.ovgu.featureide.ui.category"
             class="de.ovgu.featureide.ui.wizards.NewEquationFileWizard"
             icon="icons/NewEquationIcon.png"
