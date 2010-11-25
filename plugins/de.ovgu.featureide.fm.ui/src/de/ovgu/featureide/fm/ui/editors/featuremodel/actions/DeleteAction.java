@@ -89,8 +89,9 @@ public class DeleteAction extends Action {
 				continue;
 			Feature feature = ((FeatureEditPart) editPart)
 					.getFeatureModel();
-			if (feature == featureModel.getRoot())
+			if (feature == featureModel.getRoot()){
 				featureModel.replaceRoot(featureModel.getRoot().removeLastChild());
+				featureModel.redrawDiagram();}
 			else
 				featureModel.deleteFeature(feature);
 		}
