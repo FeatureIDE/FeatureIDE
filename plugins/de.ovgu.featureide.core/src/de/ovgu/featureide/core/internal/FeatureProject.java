@@ -179,7 +179,6 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		// make the composer ID a builder argument
 		setComposerID(getComposerID());
 
-	
 	}
 
 	private IFolder createFolder(String name) {
@@ -634,69 +633,55 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	 * abstract features, folders without corresponding feature.
 	 * 
 	 * @param featureModel
-	 * @param sourcefolder
+	 * @param sourceFolder
 	 * @throws CoreException
 	 */
 	private void setFolderMarkers(final FeatureModel featureModel,
-			final IFolder sourcefolder) throws CoreException {
-		Job job = new Job("Check Configuration") {
+			final IFolder sourceFolder) throws CoreException {
+		//TODO throws CoreException?
+		Job job = new Job("Synchronize feature model and feature modules") {
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
-
-					for (IResource res : sourcefolder.members()) {
+					//prevent warnings, if the user has just created a project without any source files
+					if (allFeatureModulesEmpty(sourceFolder)) {
+						sourceFolder.deleteMarkers(IMarker.PROBLEM, true, IResource.DEPTH_ONE);
+						return Status.OK_STATUS;
+					}
+					for (IResource res : sourceFolder.members()) {
 						if (res instanceof IFolder) {
-
+							//TODO create new method for this block?
 							IFolder folder = (IFolder) res;
-							Feature feature = featureModel.getFeature(folder
-									.getName());
+							Feature feature = featureModel.getFeature(folder.getName());
 
-							folder.deleteMarkers(
-									org.eclipse.core.resources.IMarker.PROBLEM,
-									true, IResource.DEPTH_INFINITE);
+							//TODO use an own marker type to ensure that we do not remove markers created by other plug-ins
+							folder.deleteMarkers(IMarker.PROBLEM, true, IResource.DEPTH_ZERO);
 
+							String message = null;
 							if (feature == null) {
+								message = "This feature module has no corresponding feature at the feature model.";
+							} else {
+								if (feature.isConcrete()
+										&& folder.members().length == 0) {
+									message = "The feature module is empty.";
+									if (feature.canBeAbstract())
+										message += "You either should implement it or mark the feature as abstract.";
+									else
+										message += "You either should implement it or remove the feature from the feature model.";
 
-								IMarker marker = folder
-										.createMarker(org.eclipse.core.resources.IMarker.PROBLEM);
-
-								marker.setAttribute("message",
-										"no feature existing for this folder");
-								marker.setAttribute("severity",
-										IMarker.SEVERITY_WARNING);
-
+								} else if (feature.isAbstract()
+										&& folder.members().length > 0) {
+									message = "This feature module is ignored as the feature is marked as abstract.";
+								}
 							}
-							if (feature != null && feature.isConcrete()
-									&& folder.members().length == 0) {
-								folder.deleteMarkers(
-										org.eclipse.core.resources.IMarker.PROBLEM,
-										true, IResource.DEPTH_INFINITE);
-
-								IMarker marker = folder
-										.createMarker(org.eclipse.core.resources.IMarker.PROBLEM);
-
-								marker.setAttribute("message",
-										"folder for concrete feature is empty");
-								marker.setAttribute("severity",
-										IMarker.SEVERITY_WARNING);
-
-							}
-							if (feature != null && feature.isAbstract()
-									&& folder.members().length > 0) {
-
-								IMarker marker = folder
-										.createMarker(org.eclipse.core.resources.IMarker.PROBLEM);
-
-								marker.setAttribute("message",
-										"folder for abstract feature is not empty");
-								marker.setAttribute("severity",
-										IMarker.SEVERITY_WARNING);
-
+							if (message != null) {
+								IMarker marker = folder.createMarker(IMarker.PROBLEM);
+								marker.setAttribute("message", message);
+								marker.setAttribute("severity",	IMarker.SEVERITY_WARNING);
 							}
 						}
 					}
 				} catch (CoreException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					CorePlugin.getDefault().logError(e);
 				}
 				return Status.OK_STATUS;
 			}
@@ -705,9 +690,16 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		job.schedule();
 	}
 
+	protected boolean allFeatureModulesEmpty(IFolder sourceFolder) throws CoreException {
+		for (IResource res : sourceFolder.members())
+			if (res instanceof IFolder && ((IFolder) res).members().length > 0)
+				return false;
+		return true;
+	}
+
 	public void resourceChanged(IResourceChangeEvent event) {
 
-		// if something in sourcefolder  changed
+		// if something in sourcefolder changed
 		if (event.getDelta().findMember(sourceFolder.getFullPath()) != null) {
 
 			try {
@@ -743,12 +735,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 					for (IResource res : sourceFolder.members()) {
 						IResourceDelta delta = event.getDelta().findMember(
 								res.getFullPath());
-						if (delta != null && !modelChanged) {// &&
-							// (delta.getFlags()
-
-							// &
-							// IResourceDelta.CONTENT)
-							// != 0){
+						if (delta != null && !modelChanged) {
 							buildRelevantChanges = true;
 							modelChanged = false;
 						}

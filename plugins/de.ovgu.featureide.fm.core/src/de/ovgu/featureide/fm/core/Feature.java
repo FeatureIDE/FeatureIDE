@@ -447,4 +447,8 @@ public class Feature implements PropertyConstants {
 		return name;
 	}
 
+	public boolean canBeAbstract() {
+		return !children.isEmpty();
+	}
+
 }
