@@ -281,7 +281,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			}
 		// setting Problem markers on feature folders
 		try {
-			setFolderMarkers(featureModel, sourceFolder);
+			setAllFeatureModuleMarkers(featureModel, sourceFolder);
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
@@ -628,57 +628,31 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	private boolean modelChanged = false;
 
 	/**
-	 * refreshes Problem markers for folders in the sourcefolder includes
-	 * markers for: empty folders for concrete features, non-empty folders for
-	 * abstract features, folders without corresponding feature.
+	 * refreshes Feature Module Markers for all folders in the source folder
 	 * 
 	 * @param featureModel
 	 * @param sourceFolder
 	 * @throws CoreException
 	 */
-	private void setFolderMarkers(final FeatureModel featureModel,
+	private void setAllFeatureModuleMarkers(final FeatureModel featureModel,
 			final IFolder sourceFolder) throws CoreException {
-		//TODO throws CoreException?
+		// TODO throws CoreException?
 		Job job = new Job("Synchronize feature model and feature modules") {
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
-					//prevent warnings, if the user has just created a project without any source files
+					// prevent warnings, if the user has just created a project
+					// without any source files
 					if (allFeatureModulesEmpty(sourceFolder)) {
-						sourceFolder.deleteMarkers(IMarker.PROBLEM, true, IResource.DEPTH_ONE);
+						System.out.println("allempty");
+						sourceFolder.deleteMarkers(
+								"de.ovgu.featureide.core.featureModuleMarker",
+								true, IResource.DEPTH_ONE);
 						return Status.OK_STATUS;
 					}
+					// set marker for each folder
 					for (IResource res : sourceFolder.members()) {
-						if (res instanceof IFolder) {
-							//TODO create new method for this block?
-							IFolder folder = (IFolder) res;
-							Feature feature = featureModel.getFeature(folder.getName());
-
-							//TODO use an own marker type to ensure that we do not remove markers created by other plug-ins
-							folder.deleteMarkers(IMarker.PROBLEM, true, IResource.DEPTH_ZERO);
-
-							String message = null;
-							if (feature == null) {
-								message = "This feature module has no corresponding feature at the feature model.";
-							} else {
-								if (feature.isConcrete()
-										&& folder.members().length == 0) {
-									message = "The feature module is empty.";
-									if (feature.canBeAbstract())
-										message += "You either should implement it or mark the feature as abstract.";
-									else
-										message += "You either should implement it or remove the feature from the feature model.";
-
-								} else if (feature.isAbstract()
-										&& folder.members().length > 0) {
-									message = "This feature module is ignored as the feature is marked as abstract.";
-								}
-							}
-							if (message != null) {
-								IMarker marker = folder.createMarker(IMarker.PROBLEM);
-								marker.setAttribute("message", message);
-								marker.setAttribute("severity",	IMarker.SEVERITY_WARNING);
-							}
-						}
+						if (res instanceof IFolder)
+							setFeatureModuleMarker(featureModel, (IFolder) res);
 					}
 				} catch (CoreException e) {
 					CorePlugin.getDefault().logError(e);
@@ -690,7 +664,50 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		job.schedule();
 	}
 
-	protected boolean allFeatureModulesEmpty(IFolder sourceFolder) throws CoreException {
+	/**
+	 * creates (or deletes) Feature Module Marker for the specified folder
+	 * representing a feature module includes markers for: empty folders for
+	 * concrete features, non-empty folders for abstract features, folders
+	 * without corresponding feature.
+	 * 
+	 * @param featureModel
+	 * @param folder
+	 *            the folder
+	 * @throws CoreException
+	 */
+	private void setFeatureModuleMarker(final FeatureModel featureModel,
+			IFolder folder) throws CoreException {
+
+		Feature feature = featureModel.getFeature(folder.getName());
+
+		folder.deleteMarkers("de.ovgu.featureide.core.featureModuleMarker",
+				true, IResource.DEPTH_ZERO);
+
+		String message = null;
+		if (feature == null) {
+			message = "This feature module has no corresponding feature at the feature model.";
+		} else {
+			if (feature.isConcrete() && folder.members().length == 0) {
+				message = "The feature module is empty.";
+				if (feature.canBeAbstract())
+					message += "You either should implement it or mark the feature as abstract.";
+				else
+					message += "You either should implement it or remove the feature from the feature model.";
+
+			} else if (feature.isAbstract() && folder.members().length > 0) {
+				message = "This feature module is ignored as the feature is marked as abstract.";
+			}
+		}
+		if (message != null) {
+			IMarker marker = folder
+					.createMarker("de.ovgu.featureide.core.featureModuleMarker");
+			marker.setAttribute("message", message);
+			marker.setAttribute("severity", IMarker.SEVERITY_WARNING);
+		}
+	}
+
+	protected boolean allFeatureModulesEmpty(IFolder sourceFolder)
+			throws CoreException {
 		for (IResource res : sourceFolder.members())
 			if (res instanceof IFolder && ((IFolder) res).members().length > 0)
 				return false;
@@ -706,8 +723,8 @@ public class FeatureProject extends BuilderMarkerHandler implements
 				// set markers, only if event is not fired from changes to
 				// markers
 				if (event.findMarkerDeltas(
-						org.eclipse.core.resources.IMarker.PROBLEM, false).length == 0)
-					setFolderMarkers(featureModel, sourceFolder);
+						"de.ovgu.featureide.core.featureModuleMarker", false).length == 0)
+					setAllFeatureModuleMarkers(featureModel, sourceFolder);
 			} catch (CoreException e) {
 				CorePlugin.getDefault().logError(e);
 			}
