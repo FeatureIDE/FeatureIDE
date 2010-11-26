@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="de.ovgu.featureide.core.composers">
+      <composer
+            class="de.ovgu.featureide.munge.MungePreprocessor"
+            description="Preprocessor for Java files"
+            id="de.ovgu.featureide.preprocessor.munge"
+            name="Munge"
+            nature="FeatureIDE_Core.mungeNature">
+      </composer>
+   </extension>
+
+</plugin>
