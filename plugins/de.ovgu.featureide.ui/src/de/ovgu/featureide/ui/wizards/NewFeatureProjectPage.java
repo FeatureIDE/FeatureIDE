@@ -32,6 +32,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 
 import de.ovgu.featureide.core.builder.ComposerExtensionManager;
 import de.ovgu.featureide.core.builder.IComposerExtension;
@@ -47,6 +48,13 @@ public class NewFeatureProjectPage extends WizardPage {
 	private IComposerExtension composerExtension = null;
 	private IComposerExtension[] extensions = null;
 	
+	private Text sourcePath,equationsPath,buildPath;
+	
+	private Composite container;
+	protected GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+	private GridLayout layout = new GridLayout();
+	protected Group pathGroup;
+	
 	protected NewFeatureProjectPage() {
 		super("");
 		setTitle("Select a composer");
@@ -54,7 +62,7 @@ public class NewFeatureProjectPage extends WizardPage {
 	}
 	
 	public void createControl(Composite parent) {
-		Composite container = new Composite(parent, SWT.NULL);
+		container = new Composite(parent, SWT.NULL);
 	    final GridLayout gridLayout = new GridLayout();
 	    gridLayout.numColumns = 1;
 	    container.setLayout(gridLayout);
@@ -73,7 +81,7 @@ public class NewFeatureProjectPage extends WizardPage {
 		helloLabel.setLayoutData(gridData);
 		helloLabel.setText("Please select a composer from the selection below.");
 		
-	    final Label label = new Label(toolGroup, SWT.NONE);
+	    Label label = new Label(toolGroup, SWT.NONE);
 	    label.setText("Composers:");
 	    final Combo toolCB = new Combo(toolGroup, SWT.READ_ONLY | SWT.DROP_DOWN);
 	    toolCB.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -109,6 +117,43 @@ public class NewFeatureProjectPage extends WizardPage {
 			}
 		});
 		toolCB.select(0);
+		
+		//Path Group
+		pathGroup = new Group(container, SWT.NONE);
+		layout.numColumns = 2;
+		layout.verticalSpacing = 9;
+		pathGroup.setText("Path Specification:");
+		pathGroup.setLayoutData(gd);
+		pathGroup.setLayout(layout);
+		
+		String tooltip = "Sets the path of featurefolders.";
+		label = new Label(pathGroup, SWT.NULL);
+		label.setText("&Source Path:");
+		label.setToolTipText(tooltip);
+		sourcePath = new Text(pathGroup, SWT.BORDER | SWT.SINGLE);
+		sourcePath.setLayoutData(gd);
+		sourcePath.setText("src");
+		sourcePath.setToolTipText(tooltip);
+		
+		tooltip = "Sets the path of composed files.";
+		label = new Label(pathGroup, SWT.NULL);
+		label.setText("&Build Path:");
+		label.setToolTipText(tooltip);
+		buildPath = new Text(pathGroup, SWT.BORDER | SWT.SINGLE);
+		buildPath.setLayoutData(gd);
+		buildPath.setText("build");
+		buildPath.setToolTipText(tooltip);
+		
+		tooltip = "Sets the path of equationfiles.";
+		label = new Label(pathGroup, SWT.NULL);
+		label.setText("&Equations Path:");
+		label.setToolTipText(tooltip);
+		equationsPath = new Text(pathGroup, SWT.BORDER | SWT.SINGLE);
+		equationsPath.setLayoutData(gd);
+		equationsPath.setText("equations");
+		equationsPath.setToolTipText(tooltip);
+		
+		addListeners();
 	}	
 	
 	public IComposerExtension getCompositionTool() {
@@ -118,4 +163,102 @@ public class NewFeatureProjectPage extends WizardPage {
 	public boolean hasCompositionTool() {
 		return composerExtension != null;
 	}
+	
+	private void addListeners() {
+		sourcePath.addModifyListener(new ModifyListener() {
+			
+			@Override
+			public void modifyText(ModifyEvent e) {
+				dialogChanged();
+			}
+		});
+		
+		buildPath.addModifyListener(new ModifyListener() {
+			
+			@Override
+			public void modifyText(ModifyEvent e) {
+				dialogChanged();
+			}
+		});
+		
+		equationsPath.addModifyListener(new ModifyListener() {
+	
+			@Override
+			public void modifyText(ModifyEvent e) {
+				dialogChanged();
+			}
+		});
+	}
+	
+	/**
+	 * 
+	 */
+	protected void dialogChanged() {
+		if (getSourcePath().equals(getEquationsPath())) {
+			updateStatus("Source Path equals Equations Path.");
+			return;
+		}
+		if (getSourcePath().equals(getBuildPath())) {
+			updateStatus("Source Path equals Build Path.");
+			return;
+		}
+		if (getBuildPath().equals(getEquationsPath())) {
+			updateStatus("Build Path equals Equations Path.");
+			return;
+		}
+		if (isPathEmpty(getSourcePath(), "Source"))return;
+		if (isPathEmpty(getBuildPath(), "Build"))return;
+		if (isPathEmpty(getEquationsPath(), "Equations"))return;
+		
+		if (isInvalidPath(getSourcePath(), "Source"))return;
+		if (isInvalidPath(getBuildPath(), "Build"))return;
+		if (isInvalidPath(getEquationsPath(), "Equations"))return;
+		
+		updateStatus(null);
+	}
+
+	protected boolean isPathEmpty(String path, String name) {
+		if (path.length() == 0) {
+			updateStatus(name + " Path must be specified.");
+			return true;
+		}
+		return false;
+	}
+	protected boolean isInvalidPath(String path, String name) {
+		if (path.contains("*")
+				|| path.contains("?")
+				|| path.startsWith(".")
+				|| path.endsWith(".")
+				|| path.contains("//")
+				|| path.endsWith("/")
+				|| path.endsWith("/")
+				|| path.contains("/.")
+				|| path.contains("./")
+				|| path.contains("<")
+				|| path.contains(">")
+				|| path.contains("|")
+				|| path.contains(""+'"')) {
+			updateStatus(name + " Path must be valid");
+			return true;
+		}
+		return false;
+	}
+	
+	protected void updateStatus(String message) {
+		setErrorMessage(message);
+		setPageComplete(message == null);
+	}
+	
+	public String getSourcePath() {
+		return sourcePath.getText();
+	}
+	
+	public String getEquationsPath() {
+		return equationsPath.getText();
+	}
+	
+	public String getBuildPath() {
+		return buildPath.getText();
+	}
+
 }

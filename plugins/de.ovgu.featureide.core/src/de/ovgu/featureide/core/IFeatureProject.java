@@ -34,6 +34,18 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 
 	public static final QualifiedName composerConfigID = new QualifiedName("featureproject.configs", "composer");
 	
+	public static final QualifiedName buildFolderConfigID = new QualifiedName("featureproject.configs", "build");
+	public static final QualifiedName equationFolderConfigID = new QualifiedName("featureproject.configs", "equations");
+	public static final QualifiedName sourceFolderConfigID = new QualifiedName("featureproject.configs", "source");
+	
+	public static final String SOURCE_ARGUMENT = "source";
+	public static final String EQUATIONS_ARGUMENT = "equations";
+	public static final String BUILD_ARGUMENT = "build";
+	
+	public static final String DEFAULT_SOURCE_PATH = "src";
+	public static final String DEFAULT_EQUATIONS_PATH = "equations";
+	public static final String DEFAULT_BUILD_PATH = "build";
+	
 	public static final QualifiedName equationConfigID = new QualifiedName("featureproject.configs", "currentEquation");
 	
 	public static final QualifiedName javaClassPathID = new QualifiedName("featureproject.configs", "javaClassPath");
@@ -169,4 +181,11 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	
 	public void builded();
 
+	public String getProjectConfigurationPath();
+	
+	public String getProjectBuildPath();
+	
+	public String getProjectSourcePath();
+	
+	public void setPaths(String feature, String src, String configuration);
 }

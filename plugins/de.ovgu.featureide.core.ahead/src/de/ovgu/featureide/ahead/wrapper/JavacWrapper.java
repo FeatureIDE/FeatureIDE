@@ -81,7 +81,7 @@ public class JavacWrapper {
 		for (String path : featureProject.getJavaClassPath())
 			classpath += sep + path;
 		classpath = classpath.substring(1);
-		IFolder folder = featureProject.getBinFolder().getFolder(files[0].getParent().getName());
+		IFolder folder = featureProject.getBinFolder();
 		try {
 			if (!folder.exists())
 				folder.create(false, true, null);
@@ -91,14 +91,11 @@ public class JavacWrapper {
 		String[] options = new String[4 + files.length];
 		int pos = 0;
 		options[pos++] = "-d";
-		options[pos++] = featureProject.getBinFolder().getFolder(files[0].getParent().getName()).getRawLocation().toOSString();
+		options[pos++] = featureProject.getBinFolder().getRawLocation().toOSString();
 		options[pos++] = "-classpath";
 		options[pos++] = classpath;
 		for (IFile file : files)
 			options[pos++] = file.getRawLocation().toOSString();
-//		for (String string : options)
-//			System.err.print(string + "\" \"");
-//		System.err.println();
 
 		CharArrayWriter charWriter = new CharArrayWriter();
 		PrintWriter pwriter = new PrintWriter(charWriter);

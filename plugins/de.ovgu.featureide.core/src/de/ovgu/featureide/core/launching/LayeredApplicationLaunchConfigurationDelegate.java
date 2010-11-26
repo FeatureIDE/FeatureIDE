@@ -22,7 +22,6 @@ import java.io.File;
 import java.text.MessageFormat;
 import java.util.Map;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -78,15 +77,14 @@ public class LayeredApplicationLaunchConfigurationDelegate extends
 			if (featureProject == null)
 				return;
 			
-			String packageName = getPackageName(featureProject);
+			String packageName = featureProject.getProjectName().split("[-]")[0];
 			if (packageName == null)
 				return;
 
 			String fullClassName = packageName + "." + configuration.getAttribute(MAIN_CLASS, "default class");
 			IVMRunner runner = getVMRunner(configuration, mode);
-	
-//			File workingDir = verifyWorkingDirectory(configuration);
-			File workingDir = featureProject.getBinFolder().getFolder(packageName).getRawLocation().toFile();
+			
+			File workingDir = featureProject.getBinFolder().getRawLocation().toFile();
 			String workingDirName = null;
 			if (workingDir != null) {
 				workingDirName = workingDir.getAbsolutePath();
@@ -162,7 +160,7 @@ public class LayeredApplicationLaunchConfigurationDelegate extends
 			prompErrorMessage("The project " + projectName + " is not a FeatureProject!");
 		return featureProject;
 	}
-
+/*
 	private String getPackageName(IFeatureProject featureProject) {
 		IFile equationFile = featureProject.getCurrentEquationFile();
 		if (equationFile == null) {
@@ -173,7 +171,7 @@ public class LayeredApplicationLaunchConfigurationDelegate extends
 		String equationFileName = equationFile.getName();
 		return equationFileName.substring(0, equationFileName.lastIndexOf("."));
 	}
-
+*/
 	private void prompErrorMessage(final String message) {
 		Display.getDefault().syncExec(new Runnable() {
 			public void run() {

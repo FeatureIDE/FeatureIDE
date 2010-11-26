@@ -168,10 +168,8 @@ public class ComposerWrapper {
 		}
 		reader.close();
 
-		String compositionName = equationFile.getName().substring(0,
-				equationFile.getName().lastIndexOf("."));
 		compositionFolder = featureProject.getBuildFolder().getFolder(
-				compositionName).getFolder(compositionName);
+				featureProject.getProjectName().split("[-]")[0]);
 	}
 
 	/**
@@ -255,8 +253,8 @@ public class ComposerWrapper {
 		composedFiles.clear();
 		if (equationFile == null)
 			return;
-		String aspectName = equationFile.getName();
-		aspectName = aspectName.substring(0, aspectName.lastIndexOf('.'));
+		//aspectName must not contain '-'
+		String aspectName = featureProject.getProjectName().split("[-]")[0];
 		TreeMap<String, IFile> fileMap = new TreeMap<String, IFile>();
 		jakModelBuilder.clearFeatures();
 		for (String jakFile : absoluteJakFilenames.keySet()) {
@@ -298,11 +296,11 @@ public class ComposerWrapper {
 			try {
 				newJakIFile.refreshLocal(IResource.DEPTH_ZERO, null);
 				if (newJakIFile.exists()) {
-					newJakIFile.setDerived(true);
+					newJakIFile.setDerived(false);
 					ResourceAttributes attr = newJakIFile
 							.getResourceAttributes();
 					if (attr != null) {
-						attr.setReadOnly(true);
+						attr.setReadOnly(false);
 						newJakIFile.setResourceAttributes(attr);
 					}
 				}

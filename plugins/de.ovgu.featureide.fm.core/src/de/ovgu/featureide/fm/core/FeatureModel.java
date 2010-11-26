@@ -30,16 +30,18 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.QualifiedName;
 import org.prop4j.And;
 import org.prop4j.Implies;
 import org.prop4j.Literal;
 import org.prop4j.Node;
-
 import org.prop4j.Not;
 import org.prop4j.Or;
 import org.prop4j.SatSolver;
@@ -56,6 +58,12 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
  */
 public class FeatureModel implements PropertyConstants {
 
+	public static final QualifiedName sourceFolderConfigID = new QualifiedName("featureproject.configs", "source");
+	public static final String SOURCE_ARGUMENT = "source";
+	public static final String DEFAULT_SOURCE_PATH = "src";
+	
+	public static final String BUILDER_ID = "de.ovgu.featureide.core"
+		+ ".extensibleFeatureProjectBuilder";
 	/**
 	 * the root feature
 	 */
@@ -91,6 +99,8 @@ public class FeatureModel implements PropertyConstants {
 	 */
 	private LinkedList<Renaming> renamings = new LinkedList<Renaming>();
 
+	private IFolder sourceFolder;
+	
 	public FeatureModel() {
 		reset();
 	}
@@ -235,8 +245,6 @@ public class FeatureModel implements PropertyConstants {
 		return true;
 	}
 
-	private IFolder sourceFolder;
-
 	public boolean isRenamed() {
 		return (renamings.size() != 0);
 	}
@@ -250,7 +258,8 @@ public class FeatureModel implements PropertyConstants {
 	};
 	
 	public void performRenamings(IFile file) {
-		sourceFolder = ((IResource) file.getAdapter(IFile.class)).getProject().getFolder("src");
+		IProject project = ((IResource) file.getAdapter(IFile.class)).getProject();
+		sourceFolder = project.getFolder(getProjectConfigurationPath(project));
 		for (Renaming renaming : renamings) {
 			for (Node node : propNodes)
 				renameVariables(node, renaming.oldName, renaming.newName);
@@ -273,17 +282,6 @@ public class FeatureModel implements PropertyConstants {
 			FMCorePlugin.getDefault().logError(e);
 		}
 	}
-	
-//	/**
-//	 * informs listners that a feature has been renamed
-//	 */
-//	private void fireFeatureRenamed(String oldName, String newName) {
-//		PropertyChangeEvent event = new PropertyChangeEvent(this,
-//				FEATURE_NAME_CHANGED, oldName, newName);
-//		for (PropertyChangeListener listener : listenerList) {
-//			listener.propertyChange(event);
-//		}
-//	}
 
 	private void renameVariables(Node node, String oldName, String newName) {
 		if (node instanceof Literal) {
@@ -734,6 +732,36 @@ public class FeatureModel implements PropertyConstants {
 				return false;
 		}
 		return true;
+	}
+	
+	public String getProjectConfigurationPath(IProject project) {
+		try {
+			String path = project.getPersistentProperty(sourceFolderConfigID);
+			if (path != null)
+				return path;
+			
+			path = getPath(project, SOURCE_ARGUMENT);
+			if (path == null)
+				return DEFAULT_SOURCE_PATH;
+			return path;
+		} catch (Exception e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+		return DEFAULT_SOURCE_PATH;
+	}
+	
+	private String getPath(IProject project, String argument) {
+		try {
+			for (ICommand command : project.getDescription().getBuildSpec()) {
+				if (command.getBuilderName().equals(BUILDER_ID)) {
+					String path = (String) command.getArguments().get(argument);
+					return path;
+				}
+			}
+		} catch (CoreException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+		return null;
 	}
 	
 }

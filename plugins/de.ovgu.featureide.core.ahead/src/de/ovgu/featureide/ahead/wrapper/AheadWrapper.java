@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.ahead.AheadCorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.builder.FeatureProjectNature;
 
 
 /**
@@ -105,10 +106,10 @@ public class AheadWrapper {
 				
 				try {
 					javaFiles[i].refreshLocal(IResource.DEPTH_ZERO, null);
-					javaFiles[i].setDerived(true);
+					javaFiles[i].setDerived(false);
 					ResourceAttributes attr = javaFiles[i].getResourceAttributes();
 					if (attr != null) {
-						attr.setReadOnly(true);
+						attr.setReadOnly(false);
 						javaFiles[i].setResourceAttributes(attr);
 					}
 				} catch (CoreException e) {
@@ -119,8 +120,17 @@ public class AheadWrapper {
 	}
 
 	private void compileJavafiles(IFile[] javaFiles) {
-		if (javaFiles != null && javaFiles.length > 0)
-			javac.compile(javaFiles);
+		
+		if (javaFiles != null && javaFiles.length > 0) {
+			try {
+				//just compile if project has no other compiler
+				if (javaFiles[0].getProject().getDescription().getNatureIds().length == 1
+						&& javaFiles[0].getProject().hasNature(FeatureProjectNature.NATURE_ID))
+					javac.compile(javaFiles);
+			} catch (CoreException e) {
+				AheadCorePlugin.getDefault().logError(e);
+			}
+		}
 	}
 	
 	public void addBuildErrorListener(AheadBuildErrorListener listener) {

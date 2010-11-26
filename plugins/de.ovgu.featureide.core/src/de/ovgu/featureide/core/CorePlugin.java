@@ -202,9 +202,6 @@ public class CorePlugin extends AbstractCorePlugin {
 	}
 
 	public void fireCurrentEquationChanged(IFeatureProject featureProject) {
-//		CorePlugin.getDefault().logInfo(
-//				"Current equation file changed in project '"
-//						+ featureProject.getProjectName() + "'");
 		for (ICurrentEquationListener listener: currentEquationListeners)
 			listener.currentEquationChanged(featureProject);
 	}
@@ -228,17 +225,36 @@ public class CorePlugin extends AbstractCorePlugin {
 			listener.featureFolderChanged(folder);
 	}
 
-	/**
-	 * 
-	 */
-	public static void setupFeatureProject(IProject project, String compositionToolID) {
+	public static void setupFeatureProject(IProject project, String compositionToolID,
+			String sourcePath,String equationPath, String buildPath, String backupPath) {
+		setupFeatureProject(project, compositionToolID, sourcePath, equationPath, buildPath);
+		//createFolder(project, backupPath);
+		try {
+			//for (IResource res : project.getFolder(buildPath).members()) {
+				//copy old source files into feature "Base"
+			
+			project.getFolder(buildPath).copy(project.getFolder(sourcePath).getFolder("Base").getFullPath(), true, null);
+			//move old source files into the backup folder
+			project.getFolder(buildPath).move(project.getFolder(backupPath).getFullPath(), true, null);
+		} catch (CoreException e) {
+			CorePlugin.getDefault().logError(e);
+		}
+		
+	}
+	
+	public static void setupFeatureProject(IProject project, String compositionToolID,
+			String sourcePath,String equationPath, String buildPath) {
 		try {
 			project.setPersistentProperty(IFeatureProject.composerConfigID, compositionToolID);
+			project.setPersistentProperty(IFeatureProject.buildFolderConfigID, buildPath);
+			project.setPersistentProperty(IFeatureProject.equationFolderConfigID, equationPath);
+			project.setPersistentProperty(IFeatureProject.sourceFolderConfigID, sourcePath);
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError("Could not set persistant property", e);
 		}
-		createProjectStructure(project);
+		createProjectStructure(project, sourcePath, equationPath, buildPath);
 		addFeatureNatureToProject(project);
+		
 	}
 
 	private static void addFeatureNatureToProject(IProject project) {
@@ -248,7 +264,7 @@ public class CorePlugin extends AbstractCorePlugin {
 					|| project.hasNature(FeatureProjectNature.NATURE_ID))
 				return;
 	
-			// add the jak nature
+			// add the FeatureIDE nature
 			CorePlugin.getDefault().logInfo("Add Nature (" + FeatureProjectNature.NATURE_ID + ") to " + project.getName());
 			IProjectDescription description = project.getDescription();
 			String[] natures = description.getNatureIds();
@@ -261,23 +277,39 @@ public class CorePlugin extends AbstractCorePlugin {
 			CorePlugin.getDefault().logError(e);
 		}
 	}
-
-	private static IFolder createFolder(IProject project, String name) {
-		IFolder folder = project.getFolder(name);
-		try {
-			if (!folder.exists())
-				folder.create(false, true, null);
-		} catch (CoreException e) {
-			CorePlugin.getDefault().logError(e);
+	
+	public static IFolder createFolder(IProject project, String name) {
+		String[] names = name.split("[/]");
+		IFolder folder = null;
+		for (String folderName : names) {
+			if (folder == null) {
+				folder = project.getFolder(folderName);
+			} else {
+				folder = folder.getFolder(folderName);
+			}
+			try {
+				if (!folder.exists())
+					folder.create(false, true, null);
+			} catch (CoreException e) {
+				CorePlugin.getDefault().logError(e);
+			}
 		}
 		return folder;
 	}
 
-	private static void createProjectStructure(IProject project) {
-		createFolder(project, "bin");
-		createFolder(project, "build");
-		createFolder(project, "equations");
-		createFolder(project, "src");
+	private static void createProjectStructure(IProject project,
+			String sourcePath,String equationPath, String buildPath) {
+		try {
+			//just create the bin folder if project hat only the FeatureIDE Nature
+			if (project.getDescription().getNatureIds().length == 1
+					&& project.hasNature(FeatureProjectNature.NATURE_ID))
+				createFolder(project, "bin");
+		} catch (CoreException e) {
+			getDefault().logError(e);
+		}
+		createFolder(project, sourcePath);
+		createFolder(project, equationPath);
+		createFolder(project, buildPath);
 		FeatureModel featureModel = new FeatureModel();
 		featureModel.createDefaultValues();
 		try {		
@@ -285,6 +317,7 @@ public class CorePlugin extends AbstractCorePlugin {
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError("Error while creating feature model", e);
 		}
+		
 	}
 
 	/**
@@ -327,4 +360,5 @@ public class CorePlugin extends AbstractCorePlugin {
 	public static boolean hasProjectData(IResource res) {
 		return getFeatureProject(res) != null;
 	}
+
 }

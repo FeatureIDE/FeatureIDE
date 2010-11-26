@@ -59,6 +59,19 @@
                menubarPath="group.open"
                tooltip="Only the current equation is build"/>
       </objectContribution>
+      <objectContribution
+            adaptable="true"
+            id="de.ovgu.featureide.ui.actions.conversionaction"
+            objectClass="org.eclipse.core.resources.IProject">
+         <action
+               class="de.ovgu.featureide.ui.actions.ConversionAction"
+               id="de.ovgu.featureide.ui.actions.conversionaction1"
+               icon="icons/FeatureIconSmall.ico"
+               label="Add FeatureIDE Nature"
+               menubarPath="group.open"
+               style="push">
+         </action>
+      </objectContribution>
    </extension>
    <extension
          point="org.eclipse.ui.decorators">

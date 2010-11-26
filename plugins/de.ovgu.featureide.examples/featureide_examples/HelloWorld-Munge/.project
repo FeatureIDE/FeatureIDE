@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>HelloWorld-FH</name>
+	<name>HelloWorld-Munge</name>
 	<comment>
 	[description]
-	This is a simple hello world application for FeatureHouse(java).
+	This is a simple hello world application for Munge.
 	[/description]
 	</comment>
 	<projects>
@@ -18,7 +18,7 @@
 				</dictionary>
 				<dictionary>
 					<key>composer</key>
-					<value>de.ovgu.featureide.composer.featurehouse</value>
+					<value>de.ovgu.featureide.preprocessor.munge</value>
 				</dictionary>
 				<dictionary>
 					<key>equations</key>
@@ -26,7 +26,7 @@
 				</dictionary>
 				<dictionary>
 					<key>source</key>
-					<value>feature</value>
+					<value>source</value>
 				</dictionary>
 			</arguments>
 		</buildCommand>

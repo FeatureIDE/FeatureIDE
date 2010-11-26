@@ -90,31 +90,44 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		if (!featureProjectLoaded())
 			return;
 		
+		boolean hasOtherNature = true;
+		if (featureProject.getProject().getDescription().getNatureIds().length == 1
+				&& featureProject.getProject().hasNature(FeatureProjectNature.NATURE_ID)) {
+			hasOtherNature = false;
+		}
+		
 		featureProject.deleteBuilderMarkers(featureProject.getSourceFolder(),
 				IResource.DEPTH_INFINITE);
 		
 		featureProject.getBuildFolder().refreshLocal(IResource.DEPTH_INFINITE,
 				monitor);
-		featureProject.getBinFolder().refreshLocal(IResource.DEPTH_INFINITE,
-				monitor);
+		if (!hasOtherNature) {
+			featureProject.getBinFolder().refreshLocal(IResource.DEPTH_INFINITE,
+					monitor);
+		}
 		
 		if(cleanBuild){
 			IFile equationFile = featureProject.getCurrentEquationFile();
 			if (equationFile == null)
 				return;
 	
-			String equation = equationFile.getName().split("[.]")[0];
+			//String equation = equationFile.getName().split("[.]")[0];
 			
-			if (featureProject.getBuildFolder().getFolder(equation).exists())
-				for (IResource res : featureProject.getBuildFolder().getFolder(equation).members())
-					res.delete(true, monitor);
-			if (featureProject.getBinFolder().getFolder(equation).exists())
-				for (IResource res : featureProject.getBinFolder().getFolder(equation).members())
+			//if (featureProject.getBuildFolder().getFolder(equation).exists())
+				for (IResource res : featureProject.getBuildFolder().members()) {//.getFolder(equation).members()) {
 						res.delete(true, monitor);
+				}
+			if (!hasOtherNature) {
+				//if (featureProject.getBinFolder().getFolder(equation).exists())
+					for (IResource res : featureProject.getBinFolder().members())//.getFolder(equation).members())
+							res.delete(true, monitor);
+			}
 			
 		}else{
-			for (IResource member : featureProject.getBinFolder().members())
-				member.delete(true, monitor);
+			if (!hasOtherNature) {
+				for (IResource member : featureProject.getBinFolder().members())
+					member.delete(true, monitor);
+			}
 			for (IResource member : featureProject.getBuildFolder().members())
 				member.delete(true, monitor);
 			cleaned = true;
@@ -122,8 +135,10 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		
 		featureProject.getBuildFolder().refreshLocal(IResource.DEPTH_INFINITE,
 				monitor);
-		featureProject.getBinFolder().refreshLocal(IResource.DEPTH_INFINITE,
+		if (!hasOtherNature) {
+			featureProject.getBinFolder().refreshLocal(IResource.DEPTH_INFINITE,
 				monitor);
+		}
 		cleanBuild = false;
 	}
 
@@ -161,8 +176,10 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		try {
 			featureProject.getBuildFolder().refreshLocal(
 					IResource.DEPTH_INFINITE, monitor);
-			featureProject.getBinFolder().refreshLocal(
-					IResource.DEPTH_INFINITE, monitor);
+			if (featureProject.getBinFolder() != null) {
+				featureProject.getBinFolder().refreshLocal(
+						IResource.DEPTH_INFINITE, monitor);
+			}
 			CorePlugin.getDefault().fireBuildUpdated(featureProject);
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
@@ -175,8 +192,9 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		try {
 			featureProject.getBuildFolder().refreshLocal(
 					IResource.DEPTH_INFINITE, monitor);
-			featureProject.getBinFolder().refreshLocal(
-					IResource.DEPTH_INFINITE, monitor);
+			if (featureProject.getBinFolder() != null)
+				featureProject.getBinFolder().refreshLocal(
+						IResource.DEPTH_INFINITE, monitor);
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
@@ -187,7 +205,9 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 	// copies all not composed Files of selected Features from src to bin and build
 	private void copy(IFile equation) throws CoreException{
 		String equationName = equation.getName().split("[.]")[0];
-		boolean binFolderExists = (featureProject.getBinFolder().getFolder(equationName).exists());
+		boolean binFolderExists = false;
+		if (featureProject.getBinFolder() != null)
+			binFolderExists = (featureProject.getBinFolder().getFolder(equationName).exists());
 		ArrayList<String > selectedFeatures = getSelectedFeatures(equation);
 		if (selectedFeatures != null)
 			for (String feature : selectedFeatures)
@@ -203,14 +223,16 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 				notComposed = false;
 		if (notComposed){
 			if (res instanceof IFile){
-				res.copy(new Path (featureProject.getBuildFolder().getFolder(folderName).getFullPath().toString()+"/"+res.getName()), true, null);
+				if (!featureProject.getBuildFolder().getFolder(folderName).getFile(res.getName()).exists())
+					res.copy(new Path (featureProject.getBuildFolder().getFolder(folderName).getFullPath().toString()+"/"+res.getName()), true, null);
 				if (binFolderExists)
-					res.copy(new Path (featureProject.getBinFolder().getFolder(folderName).getFullPath().toString()+"/"+res.getName()), true, null);
+					if (!featureProject.getBuildFolder().getFolder(folderName).getFile(res.getName()).exists())
+						res.copy(new Path (featureProject.getBinFolder().getFolder(folderName).getFullPath().toString()+"/"+res.getName()), true, null);
 			}
 			if (res instanceof IFolder){
-				createFolder("build/"+folderName+"/"+res.getName());
+				createFolder(featureProject.getBuildFolder().getName()+"/"+folderName+"/"+res.getName());
 				if (binFolderExists)
-					createFolder("bin/"+folderName+"/"+res.getName());
+					createFolder(featureProject.getBinFolder().getName()+"/"+folderName+"/"+res.getName());
 				for (IResource res2 : ((IFolder) res).members())
 					copyNotComposedFiles(folderName+"/"+res.getName(), res2, binFolderExists);
 			}

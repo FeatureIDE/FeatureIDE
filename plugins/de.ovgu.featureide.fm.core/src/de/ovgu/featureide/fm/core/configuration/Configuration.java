@@ -96,6 +96,7 @@ public class Configuration {
 		try {
 			return new SatSolver(rootNode, TIMEOUT).isSatisfiable(children);
 		} catch (TimeoutException e) {
+			FMCorePlugin.getDefault().logError(e);
 		}
 		return false;
 	}

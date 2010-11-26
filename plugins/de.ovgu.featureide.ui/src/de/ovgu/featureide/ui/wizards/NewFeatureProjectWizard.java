@@ -46,12 +46,13 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 		addPage(page);
 		super.addPages();
 	}
-
+	
 	public boolean performFinish() {
 		if (!super.performFinish())
 			return false;
 		if (page.hasCompositionTool()) {
-			CorePlugin.setupFeatureProject(getNewProject(), page.getCompositionTool().getId());
+			CorePlugin.setupFeatureProject(getNewProject(), page.getCompositionTool().getId()
+					,page.getSourcePath(),page.getEquationsPath(),page.getBuildPath());
 			UIPlugin.getDefault().openEditor(FeatureModelEditor.ID, getNewProject().getFile("model.xml"));
 		}
 		return true;

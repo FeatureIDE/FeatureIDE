@@ -22,42 +22,49 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.IWorkbenchWindowActionDelegate;
+import org.eclipse.ui.IObjectActionDelegate;
+import org.eclipse.ui.IWorkbenchPart;
 
-import de.ovgu.featureide.ui.wizards.NewEquationFileWizard;
+import de.ovgu.featureide.ui.wizards.ConversionWizard;
 
 /**
- * TODO description 
+ * TODO description
+ * 
+ * @author Jens Meinicke
  */
-public class StartEquationFileWizard implements IWorkbenchWindowActionDelegate {
+public class ConversionAction implements IObjectActionDelegate {
 
-	private IWorkbenchWindow window;
-
-	public void dispose() {
+	private ISelection selection;
+	
+	public ConversionAction() {
 	}
-
-	public void init(IWorkbenchWindow window) {
-		this.window=window;
-	}
-
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
+	 */
+	@Override
 	public void run(IAction action) {
-		
-		NewEquationFileWizard wizard=new NewEquationFileWizard();
-		ISelection selection = window.getSelectionService().getSelection();
-		
-		if(selection instanceof IStructuredSelection){
-			wizard.init(window.getWorkbench(), (IStructuredSelection) selection);	
-		}
-		else{
-			wizard.init(window.getWorkbench(), null);
-		}
-		
-		WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
+		ConversionWizard wizard = new ConversionWizard();
+		wizard.init(null, (IStructuredSelection) selection);
+		WizardDialog dialog = new WizardDialog(null, wizard);
 		dialog.open();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction, org.eclipse.jface.viewers.ISelection)
+	 */
+	@Override
 	public void selectionChanged(IAction action, ISelection selection) {
+		this.selection = selection; 
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface.action.IAction, org.eclipse.ui.IWorkbenchPart)
+	 */
+	@Override
+	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
+
+	}
+
 
 }

@@ -55,15 +55,10 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 		if (equationPath == null || basePath == null || outputPath == null)
 			return;
 		
-//		FeatureHouseCorePlugin.getDefault().logInfo("Start composition");
-//		FeatureHouseCorePlugin.getDefault().logInfo("Equation: " + equationPath);
-//		FeatureHouseCorePlugin.getDefault().logInfo("Base folder: " + basePath);
-//		FeatureHouseCorePlugin.getDefault().logInfo("Output: " + outputPath);
-		
 		// A new FSTGenComposer instance is created every time, because this class
 		// seems to remember the FST from a previous build.
 		FSTGenComposer composer = new FSTGenComposer();
-		composer.run(new String[]{"--expression", equationPath, "--base-directory", basePath,
+		composer.run(new String[]{"--expression",equationPath, "--base-directory", basePath,
 				  "--output-directory", outputPath + "/", "--ahead"});
 		
 		TreeBuilderFeatureHouse fstparser = new TreeBuilderFeatureHouse(featureProject.getProjectName());

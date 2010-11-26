@@ -27,10 +27,14 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Scanner;
 
+import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -60,6 +64,13 @@ public class FeatureOrderEditor extends EditorPart {
 
 	public static final String ID = FMUIPlugin.PLUGIN_ID + ".editors.FeatureOrderEditor";
 
+	public static final QualifiedName equationFolderConfigID = new QualifiedName("featureproject.configs", "equations");
+	public static final String EQUATIONS_ARGUMENT = "equations";
+	public static final String DEFAULT_EQUATIONS_PATH = "equations";
+	
+	public static final String BUILDER_ID = "de.ovgu.featureide.core"
+		+ ".extensibleFeatureProjectBuilder";
+	
 	private List featurelist = null;
 
 	private Button up = null;
@@ -82,6 +93,8 @@ public class FeatureOrderEditor extends EditorPart {
 
 	private boolean used = false;
 
+	private IFolder equationFolder;
+	
 	public FeatureOrderEditor(FeatureModel feature) {
 		featureModel = feature;
 	}
@@ -99,8 +112,7 @@ public class FeatureOrderEditor extends EditorPart {
 		used = false;
 		orderList = readFeaturesfromOrderFile();
 		try {
-			for (IResource res : ((IFile) input.getAdapter(IFile.class))
-					.getProject().getFolder("equations").members()){
+			for (IResource res : equationFolder.members()){
 				changeConfigurationOrder(res);
 				res.refreshLocal(IResource.DEPTH_ZERO, null);
 			}	
@@ -133,8 +145,9 @@ public class FeatureOrderEditor extends EditorPart {
 	public void init(IEditorSite site, IEditorInput input)
 			throws PartInitException {
 		this.input = input;
-		this.site = site;
-
+		this.site = site; 
+		IProject project = ((IFile) input.getAdapter(IFile.class)).getProject();
+		equationFolder = project.getFolder(getProjectConfigurationPath(project));
 	}
 
 	/*
@@ -468,6 +481,36 @@ public class FeatureOrderEditor extends EditorPart {
 		up.setEnabled(selection);
 		down.setEnabled(selection);
 		defaultButton.setEnabled(selection);
+	}
+
+	public String getProjectConfigurationPath(IProject project) {
+		try {
+			String path = project.getPersistentProperty(equationFolderConfigID);
+			if (path != null)
+				return path;
+			
+			path = getPath(project, EQUATIONS_ARGUMENT);
+			if (path == null)
+				return DEFAULT_EQUATIONS_PATH;
+			return path;
+		} catch (Exception e) {
+			FMUIPlugin.getDefault().logError(e);
+		}
+		return DEFAULT_EQUATIONS_PATH;
+	}
+	
+	private String getPath(IProject project, String argument) {
+		try {
+			for (ICommand command : project.getDescription().getBuildSpec()) {
+				if (command.getBuilderName().equals(BUILDER_ID)) {
+					String path = (String) command.getArguments().get(argument);
+					return path;
+				}
+			}
+		} catch (CoreException e) {
+			FMUIPlugin.getDefault().logError(e);
+		}
+		return null;
 	}
 
 }

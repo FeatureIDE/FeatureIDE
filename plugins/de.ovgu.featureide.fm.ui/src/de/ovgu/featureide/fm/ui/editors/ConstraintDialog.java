@@ -551,6 +551,7 @@ public class ConstraintDialog {
 		try {
 			return satsolver.isSatisfiable();
 		} catch (TimeoutException e) {
+			FMUIPlugin.getDefault().logError(e);
 			return true;
 		}
 
@@ -691,8 +692,7 @@ public class ConstraintDialog {
 				return false;
 			}
 		} catch (TimeoutException e) {
-
-			e.printStackTrace();
+			FMUIPlugin.getDefault().logError(e);
 		}
 		List<Literal> deadFeatures = getDeadFeatures(con, featuremodel);
 		if (!deadFeatures.isEmpty()) {

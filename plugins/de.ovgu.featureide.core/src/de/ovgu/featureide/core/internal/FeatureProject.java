@@ -48,6 +48,7 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionManager;
 import de.ovgu.featureide.core.builder.ExtensibleFeatureProjectBuilder;
+import de.ovgu.featureide.core.builder.FeatureProjectNature;
 import de.ovgu.featureide.core.builder.IComposerExtension;
 import de.ovgu.featureide.core.fstmodel.IFSTModel;
 import de.ovgu.featureide.core.projectstructure.trees.ProjectTree;
@@ -104,8 +105,9 @@ public class FeatureProject extends BuilderMarkerHandler implements
 
 	/**
 	 * a folder for the generated files
+	 * (only needed if the Prject has only the FeatureIDE Nature)
 	 */
-	private final IFolder binFolder;
+	private IFolder binFolder;
 
 	/**
 	 * a folder for jar files
@@ -163,13 +165,20 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
+		
 		modelFile = new GrammarFile(project.getFile("model.xml"));
-		binFolder = createFolder("bin");
+		try {
+			//just create the bin folder if project hat only the FeatureIDE Nature
+			if (project.getDescription().getNatureIds().length == 1
+					&& project.hasNature(FeatureProjectNature.NATURE_ID))
+				binFolder = CorePlugin.createFolder(project, "bin");
+		} catch (CoreException e) {
+			CorePlugin.getDefault().logError(e);
+		}
 		libFolder = project.getFolder("lib");
-		buildFolder = createFolder("build");
-		equationFolder = createFolder("equations");
-		sourceFolder = createFolder("src");
-
+		buildFolder = CorePlugin.createFolder(project, getProjectBuildPath());
+		equationFolder = CorePlugin.createFolder(project, getProjectConfigurationPath());
+		sourceFolder = CorePlugin.createFolder(project, getProjectSourcePath());
 		featureIDEProjectModel = null;
 
 		// loading model data and listen to changes in the model file
@@ -178,18 +187,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 
 		// make the composer ID a builder argument
 		setComposerID(getComposerID());
-
-	}
-
-	private IFolder createFolder(String name) {
-		IFolder folder = project.getFolder(name);
-		try {
-			if (!folder.exists())
-				folder.create(false, true, null);
-		} catch (CoreException e) {
-			CorePlugin.getDefault().logError(e);
-		}
-		return folder;
+		setPaths(getProjectSourcePath(), getProjectBuildPath(), getProjectConfigurationPath());
 	}
 
 	/*
@@ -878,6 +876,71 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		setComposerID(composerExtension.getId());
 	}
 
+	public String getProjectConfigurationPath() {
+		try {
+			String path = project.getPersistentProperty(equationFolderConfigID);
+			if (path != null)
+				return path;
+			
+			path = getPath(EQUATIONS_ARGUMENT);
+			if (path == null)
+				return DEFAULT_EQUATIONS_PATH;
+			return path;
+		} catch (Exception e) {
+			CorePlugin.getDefault().logError(e);
+		}
+		return DEFAULT_EQUATIONS_PATH;
+	}
+	
+	public String getProjectBuildPath() {
+		try {
+			String path = project.getPersistentProperty(buildFolderConfigID);
+			if (path != null)
+				return path;
+
+			path = getPath(BUILD_ARGUMENT);
+			if (path == null)
+				return DEFAULT_BUILD_PATH;
+			return path;
+		} catch (Exception e) {
+			CorePlugin.getDefault().logError(e);
+		}
+		return DEFAULT_BUILD_PATH;
+	}
+	
+	public String getProjectSourcePath() {
+		try {
+			String path = project.getPersistentProperty(sourceFolderConfigID);
+			if (path != null)
+				return path;
+			
+			path = getPath(SOURCE_ARGUMENT);
+			if (path == null)
+				return DEFAULT_SOURCE_PATH;
+			return path;
+		} catch (Exception e) {
+			CorePlugin.getDefault().logError(e);
+		}
+		return DEFAULT_SOURCE_PATH;
+	}
+	
+	private String getPath(String argument) {
+		try {
+			for (ICommand command : project.getDescription().getBuildSpec()) {
+				if (command.getBuilderName().equals(
+						ExtensibleFeatureProjectBuilder.BUILDER_ID)) {
+					String path = (String) command.getArguments().get(argument);
+					return path;
+				}
+			}
+		} catch (CoreException e) {
+			CorePlugin.getDefault().logError(e);
+		}
+		return null;
+	}
+
+	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -900,10 +963,34 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			}
 
 		} catch (CoreException e) {
+			CorePlugin.getDefault().logError(e);
 		}
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
+	public void setPaths(String feature, String src, String configuration) {
+		try {
+			IProjectDescription description = project.getDescription();
+
+			ICommand[] commands = description.getBuildSpec();
+			for (ICommand command : commands) {
+				if (command.getBuilderName().equals(
+						ExtensibleFeatureProjectBuilder.BUILDER_ID)) {
+					Map<String, String> args = command.getArguments();
+					args.put(SOURCE_ARGUMENT, feature);
+					args.put(BUILD_ARGUMENT, src);
+					args.put(EQUATIONS_ARGUMENT, configuration);
+					command.setArguments(args);
+				}
+			}
+			description.setBuildSpec(commands);
+			project.setDescription(description, null);
+		} catch (CoreException e) {
+			CorePlugin.getDefault().logError(e);
+		}
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -917,16 +1004,22 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			IProjectDescription description = project.getDescription();
 
 			ICommand[] commands = description.getBuildSpec();
+			ICommand[] newCommands = description.getBuildSpec();
 			for (ICommand command : commands) {
+				int i = 1;
 				if (command.getBuilderName().equals(
 						ExtensibleFeatureProjectBuilder.BUILDER_ID)) {
 					Map<String, String> args = command.getArguments();
-					args.put(ExtensibleFeatureProjectBuilder.COMPOSER_KEY,
-							composerID);
+					args.put(ExtensibleFeatureProjectBuilder.COMPOSER_KEY,composerID);
 					command.setArguments(args);
+					//Composer must be the first command
+					newCommands[0] = command;
+				} else {
+					newCommands[i] = command;
+					i++;
 				}
 			}
-			description.setBuildSpec(commands);
+			description.setBuildSpec(newCommands);
 			project.setDescription(description, null);
 		} catch (CoreException ex) {
 		}

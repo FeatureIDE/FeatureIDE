@@ -123,6 +123,7 @@ public abstract class Generator {
 					System.err.println("F\t" + ++k + "\t" + node);
 				}
 			} catch (TimeoutException e) {
+				FMCorePlugin.getDefault().logError(e);
 				fm.removePropositionalNode(node);
 			}
 		}		
