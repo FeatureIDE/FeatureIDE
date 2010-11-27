@@ -20,6 +20,8 @@ package de.ovgu.featureide.ui.views.collaboration.model;
 
 import java.util.LinkedList;
 
+import de.ovgu.featureide.core.IFeatureProject;
+
 /**
  * An instance of this class represents a class. 
  * It is necessary because every figure in GEF needs an associated model.
@@ -30,6 +32,7 @@ public class Class {
 	
 	private String name;
 	private LinkedList<Role> roles;
+	public IFeatureProject project;
 	
 	public Class (String name){
 		this.name = name;

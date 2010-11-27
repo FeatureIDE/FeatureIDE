@@ -20,6 +20,10 @@ package de.ovgu.featureide.ui.views.collaboration.editparts;
 
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.geometry.Dimension;
@@ -27,8 +31,15 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPolicy;
+import org.eclipse.gef.Request;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.part.FileEditorInput;
 
+import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.figures.ClassFigure;
 import de.ovgu.featureide.ui.views.collaboration.policy.ClassXYLayoutPolicy;
 import de.ovgu.featureide.ui.views.collaboration.model.Class;
@@ -119,5 +130,58 @@ public class ClassEditPart extends AbstractGraphicalEditPart {
 		modelEditPart.setLayoutConstraint(this, classFigure, constraint);
 		classFigure.setBounds(constraint);
 	}	
-
+	
+	/**
+	 * Opens the composed file for this class.
+	 */
+	public void performRequest(Request request) {
+		if (REQ_OPEN.equals(request.getType())) {
+			 String fileName = this.getClassModel().getName();
+			 if (fileName.contains("*"))
+				 return;
+			
+			 IFile file = null;
+			 try {
+				 file = getBuildFile(fileName, this.getClassModel().project.getBuildFolder());
+			 } catch (CoreException e) {
+				 UIPlugin.getDefault().logError(e);
+			 }
+			 if (file == null)
+				 return;
+			 
+			 IWorkbenchWindow dw = UIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow();
+			 
+			 
+			 FileEditorInput fileEditorInput = new FileEditorInput(file);
+			 try {
+				 IWorkbenchPage page = dw.getActivePage();
+				 if (page != null) { 
+					 String editorID = CorePlugin.getFeatureProject(file).getComposer().getEditorID(file.getFileExtension());
+					 if (editorID.equals(""))
+						 editorID = "org.eclipse.ui.DefaultTextEditor";
+					 page.openEditor(fileEditorInput,editorID);
+				 }
+			 } catch (PartInitException e) {
+				 UIPlugin.getDefault().logError(e);
+			 }
+	
+		}
+		super.performRequest(request);
+	}
+	
+	public IFile getBuildFile(String fileName ,IFolder buildFoloder) throws CoreException {
+		IFile file;
+		for (IResource res : buildFoloder.members()) {
+			if (res instanceof IFolder) {
+				file = getBuildFile(fileName, (IFolder)res);
+				if (file != null)
+					return file;
+			}
+			if (res instanceof IFile) {
+				if (res.getName().equals(fileName))
+					return (IFile)res;
+			}
+		}
+		return  null;
+	}
 }

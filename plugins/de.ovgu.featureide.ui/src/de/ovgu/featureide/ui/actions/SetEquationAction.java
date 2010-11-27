@@ -28,6 +28,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 
+import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.ui.UIPlugin;
 
@@ -60,7 +61,7 @@ public class SetEquationAction implements IObjectActionDelegate {
 					file = (IFile) ((IAdaptable) element).getAdapter(IFile.class);
 				}
 				if (file != null) {
-					IFeatureProject project = de.ovgu.featureide.core.CorePlugin.getFeatureProject(file);
+					IFeatureProject project = CorePlugin.getFeatureProject(file);
 					if (project == null)
 						UIPlugin.getDefault().logWarning("Can't set equation as current equation because it does not belong to a feature project");
 					else

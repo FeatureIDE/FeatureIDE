@@ -63,6 +63,7 @@ public class CollaborationModelBuilder {
 	private Collaboration collaboration;
 	private ArrayList<String> extensions;
 	private IFSTModel fSTModel;
+	private IFeatureProject project;
 	
 	public CollaborationModelBuilder() {
 		model = new CollaborationModel();
@@ -92,6 +93,8 @@ public class CollaborationModelBuilder {
 		for (Feature feature : features)
 			featureNames.add(feature.getName());
 		
+		project = featureProject;
+		
 		//Add the name of the configuration to the model  
 		if (configuration.equals("") || configuration.equals(featureProject.getCurrentEquationFile().getName())) {
 			collaboration = new Collaboration(featureProject.getCurrentEquationFile().getName().split("[.]")[0]);
@@ -102,6 +105,7 @@ public class CollaborationModelBuilder {
 			collaboration.selected = false;
 			collaboration.isConfiguration = true;
 		}
+		collaboration.configurationFile = featureProject.getEquationFolder().getFile(configuration);
 		model.collaborations.add(collaboration);
 		
 		if (fSTModel == null) {
@@ -206,6 +210,7 @@ public class CollaborationModelBuilder {
 											role.setParentClass(model.classes.get(cl.getName()));
 										} else {
 											role.setParentClass(cl);
+											cl.project = featureProject;
 											model.classes.put(cl.getName(), cl);
 										}
 										role.selected = selected;
@@ -296,6 +301,7 @@ public class CollaborationModelBuilder {
 								.getName()));
 					} else {
 						role.setParentClass(cl);
+						cl.project = project;
 						model.classes.put(cl.getName(), cl);
 					}
 					role.selected = selected;

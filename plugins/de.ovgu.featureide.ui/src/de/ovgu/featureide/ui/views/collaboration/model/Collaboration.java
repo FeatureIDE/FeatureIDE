@@ -20,6 +20,8 @@ package de.ovgu.featureide.ui.views.collaboration.model;
 
 import java.util.LinkedList;
 
+import org.eclipse.core.resources.IFile;
+
 
 /**
  * An instance of this class represents a collaboration. 
@@ -32,6 +34,7 @@ public class Collaboration {
 	private String name;
 	private LinkedList<Role> roles;
 	public Boolean isConfiguration = false;
+	public IFile configurationFile = null;
 	
 	public Collaboration(String name) {
 		this.name = name;

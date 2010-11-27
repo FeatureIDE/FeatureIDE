@@ -74,12 +74,14 @@ public class ProjectTree {
 	 */
 	public void insertProjectTreeNode(ProjectTreeNode node,
 			ProjectTreeNode parent) {
-		if (parent != null) {
-			node.setParent(parent);
-			parent.setChild(node);
-			projectTreeNodes.add(node);
-		} else
-			insertProjectTreeNode(node);
+		if (node != null) {
+			if (parent != null) {
+				node.setParent(parent);
+				parent.setChild(node);
+				projectTreeNodes.add(node);
+			} else
+				insertProjectTreeNode(node);
+		}
 	}
 
 	/**

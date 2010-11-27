@@ -20,6 +20,7 @@ package de.ovgu.featureide.ui.views.collaboration.editparts;
 
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.FlowLayout;
 import org.eclipse.draw2d.IFigure;
@@ -28,8 +29,13 @@ import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.EditPart;
+import org.eclipse.gef.Request;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.part.FileEditorInput;
 
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.figures.CollaborationFigure;
@@ -131,5 +137,32 @@ public class CollaborationEditPart extends AbstractGraphicalEditPart {
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Opens the configuration editor if the element is a configuration.
+	 */
+	public void performRequest(Request request) {
+		if (REQ_OPEN.equals(request.getType())) {
+			 if (!this.getCollaborationModel().isConfiguration)
+				 return;
+			 
+			 IFile file = this.getCollaborationModel().configurationFile;
+			 if (file == null)
+				 return;
+			 
+			 IWorkbenchWindow dw = UIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow();	 
+			 FileEditorInput fileEditorInput = new FileEditorInput(file);
+			 try {
+				 IWorkbenchPage page = dw.getActivePage();
+				 if (page != null) {
+					 page.openEditor(fileEditorInput,"de.ovgu.featureide.ui.editors.ConfigurationEditor");
+				 }
+			 } catch (PartInitException e) {
+				 UIPlugin.getDefault().logError(e);
+			 }
+	
+		}
+		super.performRequest(request);
 	}
 }

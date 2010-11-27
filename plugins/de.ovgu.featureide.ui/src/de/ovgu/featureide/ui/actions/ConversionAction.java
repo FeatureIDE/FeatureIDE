@@ -28,7 +28,8 @@ import org.eclipse.ui.IWorkbenchPart;
 import de.ovgu.featureide.ui.wizards.ConversionWizard;
 
 /**
- * TODO description
+ * Starts the conversion wizard for the selected project with the context menu
+ * to add the FeatureIDE nature.
  * 
  * @author Jens Meinicke
  */
