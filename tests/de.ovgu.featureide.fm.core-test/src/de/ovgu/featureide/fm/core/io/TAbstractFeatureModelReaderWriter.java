@@ -22,10 +22,16 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.editing.Comparison;
@@ -40,45 +46,34 @@ import de.ovgu.featureide.fm.core.io.guidsl.GuidslReader;
  * To add additional readers/writers extend this class and override abstract
  * methods
  * 
+ * Add model.m files into folder testFeatureModels to add test cases
+ * 
  * @author Fabian Benduhn
  */
+@RunWith(Parameterized.class)
 public abstract class TAbstractFeatureModelReaderWriter {
 
 	// featuremodels are created by using GuidslWriter, so for each test case
 	// there should be an corresponding test case for the
 	// GuidslReader which tests the resulting FeatureModel directly
-	// TODO: add Strings for additional test cases
-	protected static String AND_GROUP_ALL_OPTIONAL = "Root : [Base] :: _Root ; Base : [A] [B] [C] :: _Base ;";
-	protected static String AND_GROUP_A_MANDATORY = "Root : [Base] :: _Root ; Base : A [B] [C] :: _Base ;";
-	protected static String OR_GROUP = "Root : Base* :: _Root ;Base : A	| B	| C ;";
-	protected static String ALTERNATIVE_GROUP = "Root : Base ;Base : A| B	| C ;";
 
-	protected static String SIMPLE_MANDATORY = "Root : A :: _Root ;";
-	protected static String SINGLE_OR = "Root_ : Root+ :: _Root ;Root : A ;";
-	protected static String AND_ALTERNATIVE = "Root : A B :: _Root ;B : C| D ;";
-	protected static String AND_OR = "Root : A B+ :: _Root ;B : C	| D ;";
-	protected static String CHILD_AND_MANDATORY = "Root : A B :: _Root ;B : C D :: _B ;";
-	protected static String CHILD_AND_OPTIONAL = "Root : A B :: _Root ;B : C [D] :: _B ;";
+	// TODO replace MODEL_FILE_PATH by something that works on both: build-server and offline in
+	// workspace
+	// For now: uncomment this to run tests in workspace:
+//	protected static String sep = System.getProperty("file.separator");
+//	protected static File MODEL_FILE_PATH = new File("src" + sep
+//			+ "testFeatureModels" + sep);
+	 protected static File MODEL_FILE_PATH = new
+	 File("/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/testFeatureModels/");
 
-	protected static String HIDDEN_FEATURE = "Root : [B] [A] :: _Root ;%%not (B or A) ;";
-
-	protected static String CONSTRAINT_A_IMPLIES_B = "Root : A B :: _Root ;%%A implies B ;";
-	protected static String CONSTRAINT_A_AND_B = "Root : A B :: _Root ;%%A and B ;";
-	protected static String CONSTRAINT_A_OR_B = "Root : A B :: _Root ;%%A or B ;";
-	protected static String CONSTRAINT_A_IFF_B = "Root : A B :: _Root ;%%A iff B ;";
-	protected static String CONSTRAINT_NOT_A = "Root : A B :: _Root ;%%not A ;";
-	protected static String MULTIPLE_CONSTRAINTS = "Root : [A] [B] :: _Root ;%%A and B ;B or A ;A implies B ;";
-	protected static String CONSTRAINT_PARANTHESIS = "Root : [B] [A] :: _Root ;%%not (B or A) ;";
-	protected static String sep = System.getProperty("file.separator");
-	//TODO replace by something that works on both: build-server and offline in workspace
-	//protected static File APL_MODEL_FILE = new File("src" + sep
-	//		+ "testFeatureModels" + sep + "APL-MODEL.m");
-	
-	protected static File APL_MODEL_FILE = new File("/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/testFeatureModels/APL-MODEL.m");
-	
 	IFeatureModelWriter writer;
 	IFeatureModelReader reader;
 	FeatureModel fm;
+	File file;
+
+	public TAbstractFeatureModelReaderWriter(File file) {
+		this.file = file;
+	}
 
 	@Before
 	public void setUpEachTest() {
@@ -89,114 +84,46 @@ public abstract class TAbstractFeatureModelReaderWriter {
 		writer = getWriter(fm);
 		reader = getReader(fm);
 	}
+	
 
-	@Test
-	public void testAlternativeGroup() {
-		assertTrue(testFromString(ALTERNATIVE_GROUP));
+	@Parameters
+	public static Collection<File[]> getFiles() {
+		Collection<File[]> params = new ArrayList<File[]>();
+		for (File f : MODEL_FILE_PATH.listFiles(getFileFilter(".m"))) {
+			File[] file = new File[1];
+			file[0] = f;
+			params.add(file);
+		}
+		System.out.println(params);
+		return params;
 	}
 
 	@Test
-	public void testOrGroup() {
-		assertTrue(testFromString(OR_GROUP));
-	}
-
-	@Test
-	public void testAndGroupAMandatory() {
-		assertTrue(testFromString(AND_GROUP_A_MANDATORY));
-	}
-
-	@Test
-	public void testAndGroupAllOptional() {
-		assertTrue(testFromString(AND_GROUP_ALL_OPTIONAL));
-	}
-
-	@Test
-	public void testSimpleMandatory() {
-		assertTrue(testFromString(SIMPLE_MANDATORY));
-	}
-
-	@Test
-	public void testSingleOr() {
-		assertTrue(testFromString(SINGLE_OR));
-	}
-
-	@Test
-	public void testAndAlternative() {
-		assertTrue(testFromString(AND_ALTERNATIVE));
-	}
-
-	@Test
-	public void testAndOr() {
-		assertTrue(testFromString(AND_OR));
-	}
-
-	@Test
-	public void testAndAndMandatory() {
-		assertTrue(testFromString(CHILD_AND_MANDATORY));
-	}
-
-	@Test
-	public void testAndAndOptional() {
-		assertTrue(testFromString(CHILD_AND_OPTIONAL));
-	}
-
-	@Test
-	public void testConstraintAImpliesB() {
-		assertTrue(testFromString(CONSTRAINT_A_IMPLIES_B));
-	}
-
-	@Test
-	public void testConstraintAAndB() {
-		assertTrue(testFromString(CONSTRAINT_A_AND_B));
-	}
-
-	@Test
-	public void testConstraintAOrB() {
-		assertTrue(testFromString(CONSTRAINT_A_OR_B));
-	}
-
-	@Test
-	public void testConstraintAIffB() {
-		assertTrue(testFromString(CONSTRAINT_A_IFF_B));
-	}
-
-	@Test
-	public void testConstraintNotA() {
-		assertTrue(testFromString(CONSTRAINT_NOT_A));
-	}
-
-	@Test
-	public void testMultipleConstraints() {
-		assertTrue(testFromString(MULTIPLE_CONSTRAINTS));
-	}
-
-	@Test
-	public void testConstraintParanthesis() {
-		assertTrue(testFromString(CONSTRAINT_PARANTHESIS));
-	}
-
-	@Test
-	public void testAplModel() throws FileNotFoundException,
+	public void testModel() throws FileNotFoundException,
 			UnsupportedModelException {
 
-		assertTrue(testFromFile(APL_MODEL_FILE));
+		assertTrue("Test for following model failed: " + file.getName()+"\n", testFromFile(file));
 	}
 
 	/**
-	 * @param guidslReader
-	 *            *
-	 * */
-	private boolean testFromString(String s) {
-		FeatureModel fmOld = fm;
-		GuidslReader guidslReader = new GuidslReader(fm);
-		try {
-			guidslReader.readFromString(s);
+	 * returns a FileFilter which accepts filenames ending with s;
+	 */
+	private final static FileFilter getFileFilter(final String s) {
+		FileFilter filter = new FileFilter() {
 
-			writeAndReadModel();
-		} catch (UnsupportedModelException e) {
-			assertFalse(e.getMessage(), true);
-		}
-		return compareModels(fmOld, fm);
+			@Override
+			public boolean accept(File pathname) {
+				System.out.println("accept" + pathname);
+				if (pathname.getName().endsWith(s)) {
+					System.out.println("true");
+					return true;
+				} else {
+					System.out.println("false");
+					return false;
+				}
+			}
+		};
+		return filter;
 	}
 
 	/**
@@ -204,7 +131,7 @@ public abstract class TAbstractFeatureModelReaderWriter {
 	 *            *
 	 * @throws FileNotFoundException
 	 * */
-	private boolean testFromFile(File file) throws FileNotFoundException {
+	private final boolean testFromFile(File file) throws FileNotFoundException {
 		FeatureModel fmOld = fm;
 		GuidslReader guidslReader = new GuidslReader(fm);
 		try {
@@ -226,7 +153,7 @@ public abstract class TAbstractFeatureModelReaderWriter {
 		return (mc.compare(oldfm, newfm).equals(Comparison.REFACTORING));
 	}
 
-	public void writeAndReadModel() throws UnsupportedModelException {
+	public final void writeAndReadModel() throws UnsupportedModelException {
 
 		String s = writer.writeToString();
 

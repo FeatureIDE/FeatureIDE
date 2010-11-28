@@ -297,12 +297,12 @@ public class WaterlooReader extends AbstractFeatureModelReader {
 					feat.setName(featId);
 					featureModel.addFeature(feat);
 				}
-				System.out.println("(before) FEAT ID = " + featId);
+		//		System.out.println("(before) FEAT ID = " + featId);
 				if (idTable.containsKey(featId)) throw 
 					new UnsupportedModelException("Id: " + featId + " occured" +
 					" second time, but may only occur once", line);
 				idTable.put(featId, feat);
-				System.out.println("(after) FEAT ID = " + featId);
+		//		System.out.println("(after) FEAT ID = " + featId);
 				
 				lastFeat = feat;
 				lineText = reader.readLine();

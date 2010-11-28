@@ -18,14 +18,12 @@
  */
 package de.ovgu.featureide.fm.core.io.guidsl;
 
-import static org.junit.Assert.*;
-import org.junit.Test;
-import de.ovgu.featureide.fm.core.Feature;
+import java.io.File;
+
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter;
-import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
 /**
  * Test class for GuidslReader
@@ -33,6 +31,14 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
  * @author Fabian Benduhn
  */
 public class TGuidslReaderWriter extends TAbstractFeatureModelReaderWriter{
+	/**
+	 * @param file
+	 */
+	public TGuidslReaderWriter(File file) {
+		super(file);
+		// TODO Auto-generated constructor stub
+	}
+
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter#getWriter()
 	 */
@@ -51,55 +57,7 @@ public class TGuidslReaderWriter extends TAbstractFeatureModelReaderWriter{
 	}
 
 
-	@Test
-	public void testReaderAndGroupAllOptional() throws UnsupportedModelException {
-		FeatureModel model = new FeatureModel();
-		GuidslReader reader = new GuidslReader(model);
-
-		reader.readFromString(AND_GROUP_ALL_OPTIONAL);
-		Feature a = model.getFeature("A");
-		Feature base = model.getFeature("Base");
-		assertTrue(base.isAnd());
-		assertFalse(a.isMandatory());
-
-	}
-
-	@Test
-	public void testReaderAndGroupAMandatory() throws UnsupportedModelException {
-		FeatureModel model = new FeatureModel();
-		GuidslReader reader = new GuidslReader(model);
-
-		reader.readFromString(AND_GROUP_A_MANDATORY);
-
-		Feature base = model.getFeature("Base");
-		Feature a = model.getFeature("A");
-		assertTrue(base.isAnd());
-		assertTrue(a.isMandatory());
-	}
-
-	@Test
-	public void testReaderOrGroup() throws UnsupportedModelException {
-		FeatureModel model = new FeatureModel();
-		GuidslReader reader = new GuidslReader(model);
-
-		reader.readFromString(OR_GROUP);
-
-		Feature base = model.getFeature("Base");
-		assertTrue(base.isOr());
-
-	}
-
-	@Test
-	public void testReaderAlternativeGroup() throws UnsupportedModelException {
-		FeatureModel model = new FeatureModel();
-		GuidslReader reader = new GuidslReader(model);
-
-		reader.readFromString(ALTERNATIVE_GROUP);
-
-		Feature base = model.getFeature("Base");
-		assertTrue(base.isAlternative());
-
-	}
+	
 
 	
 }

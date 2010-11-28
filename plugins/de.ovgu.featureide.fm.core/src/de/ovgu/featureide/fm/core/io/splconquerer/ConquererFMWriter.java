@@ -61,7 +61,7 @@ import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
  * @author Thomas Thuem
  */
 public class ConquererFMWriter extends AbstractFeatureModelWriter {
-		
+	//TODO is this constructor needed?	
 	public ConquererFMWriter() {
 	}
 	

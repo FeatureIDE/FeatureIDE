@@ -52,7 +52,7 @@ import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
  * @author Fabian Wielgorz
  */
 public class WaterlooWriter extends AbstractFeatureModelWriter {
-	
+	//TODO is this constructor needed?
 	public WaterlooWriter() {
 		
 	}

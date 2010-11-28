@@ -18,6 +18,8 @@
  */
 package de.ovgu.featureide.fm.core.io.xml;
 
+import java.io.File;
+
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
@@ -29,6 +31,16 @@ import de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter;
  * @author Fabian Benduhn
  */
 public class TXmlReaderWriter extends TAbstractFeatureModelReaderWriter {
+
+	
+
+	/**
+	 * @param file
+	 */
+	public TXmlReaderWriter(File file) {
+		super(file);
+		// TODO Auto-generated constructor stub
+	}
 
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter#getWriter(de.ovgu.featureide.fm.core.FeatureModel)

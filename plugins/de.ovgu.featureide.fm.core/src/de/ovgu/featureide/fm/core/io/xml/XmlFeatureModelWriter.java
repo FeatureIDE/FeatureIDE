@@ -57,7 +57,8 @@ import org.w3c.dom.*;
  * 
  */
 public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
-		
+	
+	//TODO is this constructor needed?
 	public XmlFeatureModelWriter() {
 	}
 	
