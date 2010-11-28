@@ -24,7 +24,7 @@ import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter;
 
 /**
- * TODO test class for XmlReader/Writer
+ * test class for XmlReader/Writer
  * 
  * @author Fabian Benduhn
  */

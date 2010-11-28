@@ -70,9 +70,12 @@ public abstract class TAbstractFeatureModelReaderWriter {
 	protected static String MULTIPLE_CONSTRAINTS = "Root : [A] [B] :: _Root ;%%A and B ;B or A ;A implies B ;";
 	protected static String CONSTRAINT_PARANTHESIS = "Root : [B] [A] :: _Root ;%%not (B or A) ;";
 	protected static String sep = System.getProperty("file.separator");
-
-	protected static File APL_MODEL_FILE = new File("src" + sep
-			+ "testFeatureModels" + sep + "APL-MODEL.m");
+	//TODO replace by something that works on both: build-server and offline in workspace
+	//protected static File APL_MODEL_FILE = new File("src" + sep
+	//		+ "testFeatureModels" + sep + "APL-MODEL.m");
+	
+	protected static File APL_MODEL_FILE = new File("/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/testFeatureModels/APL-MODEL.m");
+	
 	IFeatureModelWriter writer;
 	IFeatureModelReader reader;
 	FeatureModel fm;
