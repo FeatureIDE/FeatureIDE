@@ -22,6 +22,9 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
+import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
+import de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
 /**
@@ -29,15 +32,27 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
  * 
  * @author Fabian Benduhn
  */
-public class TGuidslReader {
+public class TGuidslReaderWriter extends TAbstractFeatureModelReaderWriter{
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter#getWriter()
+	 */
+	@Override
+	protected IFeatureModelWriter getWriter(FeatureModel fm) {
+		return new GuidslWriter(fm);
+	}
 
-	static String AND_GROUP_ALL_OPTIONAL = "Root : [Base] :: _Root ; Base : [A] [B] [C] :: _Base ;";
-	static String AND_GROUP_A_MANDATORY = "Root : [Base] :: _Root ; Base : A [B] [C] :: _Base ;";
-	static String OR_GROUP = "Root : Base* :: _Root ;Base : A	| B	| C ;";
-	static String ALTERNATIVE_GROUP = "Root : Base ;Base : A| B	| C ;";
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter#getReader()
+	 */
+	@Override
+	protected IFeatureModelReader getReader(FeatureModel fm) {
+		
+		return new GuidslReader(fm);
+	}
+
 
 	@Test
-	public void testAndGroupAllOptional() throws UnsupportedModelException {
+	public void testReaderAndGroupAllOptional() throws UnsupportedModelException {
 		FeatureModel model = new FeatureModel();
 		GuidslReader reader = new GuidslReader(model);
 
@@ -50,7 +65,7 @@ public class TGuidslReader {
 	}
 
 	@Test
-	public void testAndGroupAMandatory() throws UnsupportedModelException {
+	public void testReaderAndGroupAMandatory() throws UnsupportedModelException {
 		FeatureModel model = new FeatureModel();
 		GuidslReader reader = new GuidslReader(model);
 
@@ -63,7 +78,7 @@ public class TGuidslReader {
 	}
 
 	@Test
-	public void testOrGroup() throws UnsupportedModelException {
+	public void testReaderOrGroup() throws UnsupportedModelException {
 		FeatureModel model = new FeatureModel();
 		GuidslReader reader = new GuidslReader(model);
 
@@ -75,7 +90,7 @@ public class TGuidslReader {
 	}
 
 	@Test
-	public void testAlternativeGroup() throws UnsupportedModelException {
+	public void testReaderAlternativeGroup() throws UnsupportedModelException {
 		FeatureModel model = new FeatureModel();
 		GuidslReader reader = new GuidslReader(model);
 
@@ -85,4 +100,6 @@ public class TGuidslReader {
 		assertTrue(base.isAlternative());
 
 	}
+
+	
 }
