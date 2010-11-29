@@ -20,7 +20,6 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 
-import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
 
@@ -42,14 +41,13 @@ public class OrAction extends SingleSelectionAction {
 
 	@Override
 	public void run() {
-		
-		feature.setGroupType(Feature.GroupType.OR);
+		feature.changeToOr();
 		featureModel.handleModelDataChanged();
 	}
 
 	@Override
 	protected void updateProperties() {
-		boolean or = feature.hasGroupType(Feature.GroupType.OR);
+		boolean or = feature.isOr();
 //		setEnabled(connectionSelected && !feature.isRoot() && !or);
 		setEnabled(connectionSelected && !or);
 		setChecked(connectionSelected && or);

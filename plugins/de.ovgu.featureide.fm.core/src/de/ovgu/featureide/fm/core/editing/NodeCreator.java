@@ -31,7 +31,6 @@ import org.prop4j.Not;
 import org.prop4j.Or;
 
 import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.Feature.GroupType;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
 
@@ -92,7 +91,7 @@ public class NodeCreator {
 		}
 		Node definition = children.length == 1 ? children[0] : new Or(children);
 
-		if (rootFeature.hasGroupType(GroupType.AND)) {// && (!replacings.containsKey(featureModel.getOldName(rootFeature.getName())) || !rootFeature.isPossibleEmpty())) {
+		if (rootFeature.isAnd()) {// && (!replacings.containsKey(featureModel.getOldName(rootFeature.getName())) || !rootFeature.isPossibleEmpty())) {
 			LinkedList<Node> manChildren = new LinkedList<Node>();
 			for (Feature feature : rootFeature.getChildren())
 				if (feature.isMandatory()) {
@@ -120,7 +119,7 @@ public class NodeCreator {
 				nodes.add(new Equals(new Literal(s), definition));
 			}
 			
-			if (rootFeature.hasGroupType(GroupType.ALTERNATIVE)) {
+			if (rootFeature.isAlternative()) {
 				//add constraint atmost1(A, B, C)
 				if (children.length > 1)
 					nodes.add(new AtMost(1, Node.clone(children)));

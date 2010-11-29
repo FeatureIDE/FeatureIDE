@@ -240,7 +240,7 @@ public class WaterlooReader extends AbstractFeatureModelReader {
 		    		if (feat.getName().trim().toLowerCase().equals("root"))
 		    			feat.setName("root_");
 		    		featureModel.setRoot(feat);	
-		    		feat.setGroupType(Feature.GroupType.AND);
+		    		feat.changeToAnd();
 		    		countIndent = 0;
 				} else if (lineText.startsWith(":m")) {
 					feat = new FeatureIndent(featureModel, countIndent);
@@ -248,19 +248,19 @@ public class WaterlooReader extends AbstractFeatureModelReader {
 		    		featId = setNameGetID(feat, lineText);
 		    		feat.setParent(lastFeat);
 		    		lastFeat.addChild(feat);
-		    		feat.setGroupType(Feature.GroupType.AND);
+		    		feat.changeToAnd();
 				} else if (lineText.startsWith(":o")) {
 					feat = new FeatureIndent(featureModel, countIndent);
 		    		feat.setMandatory(false);
 		    		featId = setNameGetID(feat, lineText);
 		    		feat.setParent(lastFeat);
 		    		lastFeat.addChild(feat);
-		    		feat.setGroupType(Feature.GroupType.AND);
+		    		feat.changeToAnd();
 				} else if (lineText.startsWith(":g")) {
 					if (lineText.contains("[1,1]")) {
-						lastFeat.setGroupType(Feature.GroupType.ALTERNATIVE);
+						lastFeat.changeToAlternative();
 					} else if (lineText.contains("[1,*]")) {
-						lastFeat.setGroupType(Feature.GroupType.OR);
+						lastFeat.changeToOr();
 					} else if ((lineText.contains("[")) && (lineText.contains("]")))  {
 						int index = lineText.indexOf('[');
 						int start = Character.getNumericValue(lineText.charAt(index + 1));
@@ -290,7 +290,7 @@ public class WaterlooReader extends AbstractFeatureModelReader {
 	        		feat.setName(name);
 		    		feat.setParent(lastFeat);
 		    		lastFeat.addChild(feat);
-		    		feat.setGroupType(Feature.GroupType.AND);
+		    		feat.changeToAnd();
 				} else throw new UnsupportedModelException("Couldn't match with " +
 						"known Types: :r, :m, :o, :g, :", line);
 				if (!featureModel.addFeature(feat)) {

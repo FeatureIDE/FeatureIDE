@@ -20,7 +20,6 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 
-import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
 
@@ -49,8 +48,7 @@ public class MandantoryAction extends SingleSelectionAction {
 
 	@Override
 	protected void updateProperties() {
-		
-		setEnabled(!feature.isRoot() && feature.getParent().hasGroupType(Feature.GroupType.AND));
+		setEnabled(!feature.isRoot() && feature.getParent().isAnd());
 		setChecked(feature.isMandatory());
 	}
 

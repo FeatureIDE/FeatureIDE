@@ -77,8 +77,7 @@ public class CreateCompoundAction extends Action {
 		setEnabled(false);
 		viewer.addSelectionChangedListener(listener);
 	}
-	//TODO replace setAND by new method setGroupType
-	//	is setMultiple(parent.isMultiple() needed?
+
 	@Override
 	public void run() {
 		int number = 0;
@@ -86,10 +85,9 @@ public class CreateCompoundAction extends Action {
 		Feature newCompound = new Feature(featureModel, "NewCompound" + number);
 		
 		if (parent != null) {
+			newCompound.setAND(true);
+			newCompound.setMultiple(parent.isMultiple());
 			
-			//newCompound.setAND(true);
-			//newCompound.setMultiple(parent.isMultiple());
-			newCompound.setGroupType(Feature.GroupType.AND);
 			LinkedList<Feature> newChildren = new LinkedList<Feature>();
 			for (Feature feature : parent.getChildren())
 				if (selectedFeatures.contains(feature)) {

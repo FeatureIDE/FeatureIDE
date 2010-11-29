@@ -391,11 +391,11 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 			featureModel.addFeature(feat);
 
 			if (parentStack.peek()[0].equals("and")) {
-				featureModel.getFeature(parent).setGroupType(Feature.GroupType.AND);
+				featureModel.getFeature(parent).setAnd();
 			} else if (parentStack.peek()[0].equals("or")) {
-				featureModel.getFeature(parent).setGroupType(Feature.GroupType.OR);
+				featureModel.getFeature(parent).setOr();
 			} else {
-				featureModel.getFeature(parent).setGroupType(Feature.GroupType.ALTERNATIVE);
+				featureModel.getFeature(parent).setAlternative();
 			}
 			featureModel.getFeature(parent).addChild(feat);
 		}

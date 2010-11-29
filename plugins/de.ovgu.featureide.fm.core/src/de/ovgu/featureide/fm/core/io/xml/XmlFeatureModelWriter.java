@@ -126,11 +126,11 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
         	node.appendChild(fnod);
     	}
     	else{
-    		if (feat.hasGroupType(Feature.GroupType.AND)) {
+    		if (feat.isAnd()) {
     			fnod = doc.createElement("and");
-    		} else if (feat.hasGroupType(Feature.GroupType.OR)) {
+    		} else if (feat.isOr()) {
     			fnod = doc.createElement("or");
-    		} else if (feat.hasGroupType(Feature.GroupType.ALTERNATIVE)) {
+    		} else if (feat.isAlternative()) {
     			fnod = doc.createElement("alt");
 	    	} else fnod = doc.createElement("unknown");//FMCorePlugin.getDefault().logInfo("creatXMlDockRec: Unexpected error!");
 	    	

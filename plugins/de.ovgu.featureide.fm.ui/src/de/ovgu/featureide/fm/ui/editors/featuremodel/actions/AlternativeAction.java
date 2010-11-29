@@ -20,7 +20,6 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 
-import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
 
@@ -42,14 +41,13 @@ public class AlternativeAction extends SingleSelectionAction {
 
 	@Override
 	public void run() {
-		
-		feature.setGroupType(Feature.GroupType.ALTERNATIVE);
+		feature.changeToAlternative();
 		featureModel.handleModelDataChanged();
 	}
 
 	@Override
 	protected void updateProperties() {
-		boolean alt = feature.hasGroupType(Feature.GroupType.ALTERNATIVE);
+		boolean alt = feature.isAlternative();
 		setEnabled(connectionSelected && !alt);
 		setChecked(connectionSelected && alt);
 	}

@@ -30,34 +30,26 @@ import de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter;
  * 
  * @author Fabian Benduhn
  */
-public class TWaterlooReaderWriter extends TAbstractFeatureModelReaderWriter {
+public class TWaterlooReaderWriter extends TAbstractFeatureModelReaderWriter{
 
 	/**
 	 * @param file
 	 */
 	public TWaterlooReaderWriter(File file) {
 		super(file);
-
+		// TODO Auto-generated constructor stub
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter#getWriter
-	 * (de.ovgu.featureide.fm.core.FeatureModel)
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter#getWriter(de.ovgu.featureide.fm.core.FeatureModel)
 	 */
 	@Override
 	protected IFeatureModelWriter getWriter(FeatureModel fm) {
 		return new WaterlooWriter(fm);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter#getReader
-	 * (de.ovgu.featureide.fm.core.FeatureModel)
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter#getReader(de.ovgu.featureide.fm.core.FeatureModel)
 	 */
 	@Override
 	protected IFeatureModelReader getReader(FeatureModel fm) {

@@ -37,7 +37,6 @@ import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureConnection;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.PropertyConstants;
-import de.ovgu.featureide.fm.core.Feature.GroupType;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.CircleDecoration;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.RelationDecoration;
@@ -93,12 +92,12 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 	private void changeConnectionType() {
 		Feature feature = getConnectionModel().getTarget();
 
-		if (feature.hasGroupType(GroupType.ALTERNATIVE)) {
-			feature.setGroupType(GroupType.AND);
-		} else if (feature.hasGroupType(GroupType.AND)) {
-			feature.setGroupType(GroupType.OR);
+		if (feature.isAlternative()) {
+			feature.changeToAnd();
+		} else if (feature.isAnd()) {
+			feature.changeToOr();
 		} else {
-			feature.setGroupType(GroupType.ALTERNATIVE);
+			feature.changeToAlternative();
 		}
 		ModelEditPart parent = (ModelEditPart) getSource().getParent();
 		FeatureModel featureModel = parent.getFeatureModel();
@@ -125,7 +124,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 		Feature target = ((FeatureConnection) getModel()).getTarget();
 
 		RotatableDecoration sourceDecoration = null;
-		if (target.hasGroupType(GroupType.AND) || OR_CIRCLES)
+		if (target.isAnd() || OR_CIRCLES)
 			sourceDecoration = new CircleDecoration(source.isMandatory());
 
 		PolylineConnection connection = (PolylineConnection) getConnectionFigure();
@@ -138,8 +137,8 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 
 		RotatableDecoration targetDecoration = null;
 		if (target.getChildrenCount() > 1 || HALF_ARC)
-			if (!target.hasGroupType(GroupType.AND) && target.isFirstChild(source))
-				targetDecoration = new RelationDecoration(target.hasGroupType(GroupType.OR),
+			if (!target.isAnd() && target.isFirstChild(source))
+				targetDecoration = new RelationDecoration(target.isMultiple(),
 						target.getLastChild());
 
 		PolylineConnection connection = (PolylineConnection) getConnectionFigure();
@@ -151,9 +150,9 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 	public void refreshToolTip() {
 		Feature target = ((FeatureConnection) getModel()).getTarget();
 		PolylineConnection connection = (PolylineConnection) getConnectionFigure();
-		
 		String toolTip = " Connection type: \n"
-				+ (target.getGroupType());
+				+ (target.isAnd() ? " And" : (target.isMultiple() ? " Or"
+						: " Alternative"));
 		toolTipLabel.setText(toolTip);
 		connection.setToolTip(toolTipLabel);
 	}

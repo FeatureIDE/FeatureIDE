@@ -34,7 +34,6 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.Feature.GroupType;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
 
@@ -72,12 +71,12 @@ public abstract class Generator {
 				leaves.add(child);
 			}
 			if (random.nextBoolean()) {
-				parent.setGroupType(GroupType.AND);
+				parent.changeToAnd();
 				for (Feature child : parent.getChildren())
 					child.setMandatory(random.nextBoolean());
 			}
 			else if (random.nextBoolean())
-					parent.setGroupType(GroupType.OR);
+				parent.changeToOr();
 			count += childrenCount;
 		}
 		fm.performRenamings();
@@ -143,8 +142,8 @@ public abstract class Generator {
 			if (r == 0) {
 				//Alternative to Or+Constraint
 				for (Feature feature : randomizedList)
-					if (feature.getChildrenCount() > 1 && feature.hasGroupType(GroupType.ALTERNATIVE)) {
-						feature.setGroupType(GroupType.OR);
+					if (feature.getChildrenCount() > 1 && feature.isAlternative()) {
+						feature.changeToOr();
 						LinkedList<Node> nodes = new LinkedList<Node>();
 						for (Feature child : feature.getChildren())
 							nodes.add(new Literal(child.getName()));
@@ -156,7 +155,7 @@ public abstract class Generator {
 				//Mandatory to Optional+Constraint
 				for (Feature feature : randomizedList) {
 					Feature parent = feature.getParent();
-					if (parent != null && parent.hasGroupType(GroupType.AND) && !parent.isFirstChild(feature) && feature.isMandatory()) {
+					if (parent != null && parent.isAnd() && !parent.isFirstChild(feature) && feature.isMandatory()) {
 						feature.setMandatory(false);
 						fm.addPropositionalNode(new Implies(new Literal(parent.getName()),new Literal(feature.getName())));
 						break;
@@ -167,9 +166,9 @@ public abstract class Generator {
 				//move feature to parent's parent
 				for (Feature child : randomizedList) {
 					Feature feature = child.getParent();
-					if (feature != null && feature.isMandatory() && feature.hasGroupType(GroupType.AND) && !feature.isFirstChild(child)) {
+					if (feature != null && feature.isMandatory() && feature.isAnd() && !feature.isFirstChild(child)) {
 						Feature parent = feature.getParent();
-						if (parent != null && parent.hasGroupType(GroupType.AND)) {
+						if (parent != null && parent.isAnd()) {
 							feature.removeChild(child);
 							parent.addChild(child);
 							break;
@@ -194,8 +193,8 @@ public abstract class Generator {
 			if (r == 1) {
 				//Alternative to Or
 				for (Feature feature : randomizedList)
-					if (feature.getChildrenCount() > 1 && feature.hasGroupType(GroupType.ALTERNATIVE)) {
-						feature.setGroupType(GroupType.OR);
+					if (feature.getChildrenCount() > 1 && feature.isAlternative()) {
+						feature.changeToOr();
 						break;
 					}
 			}
@@ -204,7 +203,7 @@ public abstract class Generator {
 				r2:
 				for (Feature feature : randomizedList) {
 					Feature parent = feature.getParent();
-					if (parent != null && parent.hasGroupType(GroupType.AND) && feature.isMandatory() && feature.hasGroupType(GroupType.OR)) {
+					if (parent != null && parent.isAnd() && feature.isMandatory() && feature.isOr()) {
 						for (Feature child : parent.getChildren()) 
 							if (!child.isMandatory()) {
 								parent.removeChild(child);
@@ -217,15 +216,15 @@ public abstract class Generator {
 			else if (r == 3) {
 				//And to Or
 				for (Feature feature : randomizedList)
-					if (feature.getChildrenCount() > 1 && feature.hasGroupType(GroupType.AND)) {
-						feature.setGroupType(GroupType.OR);
+					if (feature.getChildrenCount() > 1 && feature.isAnd()) {
+						feature.changeToOr();
 						break;
 					}
 			}
 			else if (r == 4) {
 				//new feature in Alternative
 				for (Feature feature : randomizedList)
-					if (feature.hasChildren() && feature.hasGroupType(GroupType.ALTERNATIVE)) {
+					if (feature.hasChildren() && feature.isAlternative()) {
 						int j = 1;
 						Feature child;
 						do {
@@ -238,9 +237,9 @@ public abstract class Generator {
 			else if (r == 5) {
 				//Or to And
 				for (Feature feature : randomizedList)
-					if (feature.getChildrenCount() > 1 && feature.hasGroupType(GroupType.OR)) {
+					if (feature.getChildrenCount() > 1 && feature.isOr()) {
 						Feature parent = feature.getParent();
-						if (parent != null && !parent.isFirstChild(feature) && parent.hasGroupType(GroupType.AND)) {
+						if (parent != null && !parent.isFirstChild(feature) && parent.isAnd()) {
 							parent.removeChild(feature);
 							for (Feature child : feature.getChildren()) {
 								parent.addChild(child);
@@ -254,7 +253,7 @@ public abstract class Generator {
 				//Mandatory to Optional
 				for (Feature feature : randomizedList) {
 					Feature parent = feature.getParent();
-					if (parent != null && parent.hasGroupType(GroupType.AND) && !parent.isFirstChild(feature) && feature.isMandatory()) {
+					if (parent != null && parent.isAnd() && !parent.isFirstChild(feature) && feature.isMandatory()) {
 						feature.setMandatory(false);
 						fm.addPropositionalNode(new Implies(new Literal(parent.getName()),new Literal(feature.getName())));
 						break;
@@ -264,9 +263,9 @@ public abstract class Generator {
 			else if (r == 7) {
 				//Alternative to And
 				for (Feature feature : randomizedList)
-					if (feature.getChildrenCount() > 1 && feature.hasGroupType(GroupType.ALTERNATIVE)) {
+					if (feature.getChildrenCount() > 1 && feature.isAlternative()) {
 						Feature parent = feature.getParent();
-						if (parent != null && !parent.isFirstChild(feature) && parent.hasGroupType(GroupType.AND)) {
+						if (parent != null && !parent.isFirstChild(feature) && parent.isAnd()) {
 							parent.removeChild(feature);
 							for (Feature child : feature.getChildren()) {
 								parent.addChild(child);
@@ -279,7 +278,7 @@ public abstract class Generator {
 			else if (r == 8) {
 				//new Optional in And
 				for (Feature feature : randomizedList)
-					if (feature.hasChildren() && feature.hasGroupType(GroupType.AND)) {
+					if (feature.hasChildren() && feature.isAnd()) {
 						int j = 1;
 						Feature child;
 						do {
@@ -346,21 +345,21 @@ public abstract class Generator {
 				//alter group type
 				for (Feature feature : randomizedList) {
 					if (feature.hasChildren()) {
-						if (feature.hasGroupType(GroupType.ALTERNATIVE))
+						if (feature.isAlternative())
 							if (random.nextBoolean())
-								feature.setGroupType(GroupType.AND);
+								feature.changeToAnd();
 							else
-								feature.setGroupType(GroupType.OR);
-						else if (feature.hasGroupType(GroupType.AND))
+								feature.changeToOr();
+						else if (feature.isAnd())
 							if (random.nextBoolean())
-								feature.setGroupType(GroupType.ALTERNATIVE);
+								feature.changeToAlternative();
 							else
-								feature.setGroupType(GroupType.OR);
+								feature.changeToOr();
 						else
 							if (random.nextBoolean())
-								feature.setGroupType(GroupType.AND);
+								feature.changeToAnd();
 							else
-								feature.setGroupType(GroupType.ALTERNATIVE);
+								feature.changeToAlternative();
 						break;
 					}
 				}
@@ -369,7 +368,7 @@ public abstract class Generator {
 				//change mandatory/optional
 				for (Feature feature : randomizedList) {
 					Feature parent = feature.getParent();
-					if (parent != null && parent.hasGroupType(GroupType.AND) && !parent.isFirstChild(feature)) {
+					if (parent != null && parent.isAnd() && !parent.isFirstChild(feature)) {
 						feature.setMandatory(!feature.isMandatory());
 						break;
 					}
