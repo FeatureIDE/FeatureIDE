@@ -51,6 +51,7 @@ import org.w3c.dom.Element;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.Feature.GroupType;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
 
 /**
@@ -177,7 +178,7 @@ public class ConquererFMWriter extends AbstractFeatureModelWriter {
     	Element alternative = doc.createElement("constraint");
     	constraints.appendChild(alternative);
 		alternative.setAttribute("type", "alternative");
-    	if (!feature.isRoot() && feature.getParent().isAlternative()) {
+    	if (!feature.isRoot() && feature.getParent().hasGroupType(GroupType.ALTERNATIVE)) {
         	for (Feature childFeature : feature.getParent().getChildren())
         		if (childFeature != feature) {
 	            	Element constraint_element = doc.createElement("constraint_element");
@@ -194,7 +195,7 @@ public class ConquererFMWriter extends AbstractFeatureModelWriter {
     	Element commulative = doc.createElement("constraint");
     	constraints.appendChild(commulative);
     	commulative.setAttribute("type", "commulative");
-    	if (!feature.isRoot() && feature.getParent().isOr()) {
+    	if (!feature.isRoot() && feature.getParent().hasGroupType(GroupType.OR)) {
         	for (Feature childFeature : feature.getParent().getChildren())
         		if (childFeature != feature) {
 	            	Element constraint_element = doc.createElement("constraint_element");

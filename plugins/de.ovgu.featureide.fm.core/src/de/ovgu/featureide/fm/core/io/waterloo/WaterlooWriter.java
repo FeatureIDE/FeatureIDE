@@ -161,15 +161,15 @@ public class WaterlooWriter extends AbstractFeatureModelWriter {
     	nod.appendChild(textNode);
     	children = feat.getChildren();
     	if (children.isEmpty()) return;
-    	if (feat.isAnd()) {
+    	if (feat.hasGroupType(Feature.GroupType.AND)) {
     		nextAndMode = true;
     		newIndent = indent + "\t";
-    	} else if (feat.isOr()) {
+    	} else if (feat.hasGroupType(Feature.GroupType.OR)) {
     		textNode = doc.createTextNode(indent + "\t:g [1,*]\n");
     		nod.appendChild(textNode);
     		newIndent = indent + "\t\t";
     		nextAndMode = false;
-    	} else if (feat.isAlternative()) {
+    	} else if (feat.hasGroupType(Feature.GroupType.ALTERNATIVE)) {
     		textNode = doc.createTextNode(indent + "\t:g [1,1]\n");
     		nod.appendChild(textNode);
     		newIndent = indent + "\t\t";

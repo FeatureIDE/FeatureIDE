@@ -20,6 +20,7 @@ package de.ovgu.featureide.fm.core.io.guidsl;
 
 import java.io.InputStream;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -34,6 +35,7 @@ import org.prop4j.Or;
 import org.prop4j.SatSolver;
 
 import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.Feature.GroupType;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.ModelWarning;
@@ -84,24 +86,25 @@ import guidsl.VarStmt;
 public class GuidslReader extends AbstractFeatureModelReader {
 
 	/**
-	 * Needed because the GUIDSL parser uses static variables and should not
-	 * be used by different threads at the same time.
+	 * Needed because the GUIDSL parser uses static variables and should not be
+	 * used by different threads at the same time.
 	 */
 	private static Object lock = new Object();
 
 	private List<Integer> annLine = new LinkedList<Integer>();
-	
+	private HashMap<String, Boolean> map = new HashMap<String, Boolean>();
 	private boolean noAbstractFeatures = false;
 	
-	public List<Integer> getAnnLine(){
+	
+	public List<Integer> getAnnLine() {
 		return Collections.unmodifiableList(annLine);
 	}
-		
-	
+
 	/**
 	 * Creates a new reader and sets the feature model to store the data.
 	 * 
-	 * @param featureModel the structure to fill
+	 * @param featureModel
+	 *            the structure to fill
 	 */
 	public GuidslReader(FeatureModel featureModel) {
 		setFeatureModel(featureModel);
@@ -109,7 +112,7 @@ public class GuidslReader extends AbstractFeatureModelReader {
 
 	@Override
 	protected void parseInputStream(InputStream inputStream)
-	throws UnsupportedModelException {
+			throws UnsupportedModelException {
 
 		warnings.clear();
 		try {
@@ -119,23 +122,22 @@ public class GuidslReader extends AbstractFeatureModelReader {
 				readModelData(root);
 			}
 			featureModel.handleModelDataLoaded();
-		}
-		catch (ParseException e) {
+		} catch (ParseException e) {
 			int line = e.currentToken.next.beginLine;
 			throw new UnsupportedModelException(e.getMessage(), line);
 		}
 	}
 
 	// converts a string with "\n" to a list of lines
-	private List<String> stringToList(String str){
+	private List<String> stringToList(String str) {
 		List<String> result = new LinkedList<String>();
-		while(str.contains("\n")){
+		while (str.contains("\n")) {
 			int ind = str.indexOf("\n");
-			if (ind>0)
-				result.add(str.substring(0,ind-1));
+			if (ind > 0)
+				result.add(str.substring(0, ind - 1));
 			str = str.substring(ind + 1);
 		}
-		if (str.length()>0)
+		if (str.length() > 0)
 			result.add(str);
 		return result;
 	}
@@ -143,7 +145,7 @@ public class GuidslReader extends AbstractFeatureModelReader {
 	private void readModelData(Model root) throws UnsupportedModelException {
 
 		featureModel.reset();
-		String guidsl =  root.toString();
+		String guidsl = root.toString();
 
 		noAbstractFeatures = (guidsl.startsWith("//NoAbstractFeatures"));
 
@@ -152,22 +154,22 @@ public class GuidslReader extends AbstractFeatureModelReader {
 			guidsl = guidsl.substring(20);
 
 		List<String> comments = new LinkedList<String>();
-		while (guidsl.contains("//"))
-		{
+		while (guidsl.contains("//")) {
 			guidsl = guidsl.substring(guidsl.indexOf("//"));
 			int index = guidsl.indexOf("\n");
 			if (index > 0)
-				comments.add(guidsl.substring(2,index-1));
-			else comments.add(guidsl.substring(2,guidsl.length()-1));
+				comments.add(guidsl.substring(2, index - 1));
+			else
+				comments.add(guidsl.substring(2, guidsl.length() - 1));
 			guidsl = guidsl.substring(guidsl.indexOf("//") + 2);
 		}
 
-		for(int i=0; i<comments.size(); i++)
+		for (int i = 0; i < comments.size(); i++)
 			featureModel.addComment(comments.get(i));
-
 
 		Prods prods = ((MainModel) root).getProds();
 		AstListNode astListNode = (AstListNode) prods.arg[0];
+		
 		do {
 			readGProduction((GProduction) astListNode.arg[0]);
 			astListNode = (AstListNode) astListNode.right;
@@ -181,36 +183,42 @@ public class GuidslReader extends AbstractFeatureModelReader {
 		if (varOptNode.arg.length > 0 && varOptNode.arg[0] != null)
 			readVarStmt((VarStmt) varOptNode.arg[0]);
 
-
 		// Reading hidden features and other annotations
 		int ind = root.toString().indexOf("##");
-		if (ind >= 0){	
-			String annotations = root.toString().substring(ind+3);
-			int counter = root.toString().substring(0,root.toString().indexOf("##")).split("\n").length+2;
+		if (ind >= 0) {
+			String annotations = root.toString().substring(ind + 3);
+			int counter = root.toString()
+					.substring(0, root.toString().indexOf("##")).split("\n").length + 2;
 			List<String> list = stringToList(annotations);
-			for(int i=0; i<list.size(); i++){
+			for (int i = 0; i < list.size(); i++) {
 				String line = list.get(i);
-				if(line.indexOf("{") > 0){
-					String tempLine = line.substring(line.indexOf("{")).toLowerCase();
-					if(tempLine.contains("hidden")){
+				if (line.indexOf("{") > 0) {
+					String tempLine = line.substring(line.indexOf("{"))
+							.toLowerCase();
+					if (tempLine.contains("hidden")) {
 						int ix = tempLine.indexOf("hidden");
-						String ch = tempLine.substring(ix-1,ix);
-						if (ch.equals(" ") || ch.equals("{")){
-							String featName = line.substring(0,line.indexOf("{")-1);
+						String ch = tempLine.substring(ix - 1, ix);
+						if (ch.equals(" ") || ch.equals("{")) {
+							String featName = line.substring(0,
+									line.indexOf("{") - 1);
 							if (featureModel.getFeature(featName) != null)
-								featureModel.getFeature(featName).setHidden(true);
-							else 
-								throw new UnsupportedModelException("The feature '" + featName + "' does not occur in the feature model!", 0);
+								featureModel.getFeature(featName).setHidden(
+										true);
+							else
+								throw new UnsupportedModelException(
+										"The feature '"
+												+ featName
+												+ "' does not occur in the feature model!",
+										0);
+						} else {
+							// SAVE OTHER ANNOTATIONS - Write to the comment
+							// session
+							annLine.add(counter + i);
+							featureModel.addComment(line);
 						}
-						else{
-							// SAVE OTHER ANNOTATIONS - Write to the comment session
-							annLine.add(counter+i);
-							featureModel.addComment(line);							
-						}
-					}
-					else{
+					} else {
 						// SAVE OTHER ANNOTATIONS - Write to the comment session
-						annLine.add(counter+i);
+						annLine.add(counter + i);
 						featureModel.addComment(line);
 
 					}
@@ -221,16 +229,33 @@ public class GuidslReader extends AbstractFeatureModelReader {
 		featureModel.handleModelDataLoaded();
 	}
 
-	private void readGProduction(GProduction gProduction) throws UnsupportedModelException {
+	private void readGProduction(GProduction gProduction)
+			throws UnsupportedModelException {
 		String name = gProduction.getIDENTIFIER().name;
 		Feature feature = featureModel.getFeature(name);
-		if (feature == null) 
-			throw new UnsupportedModelException("The compound feature '" + name + "' have to occur on a right side of a rule before using it on a left side!", gProduction.getIDENTIFIER().lineNum());
-		feature.setAND(false);
+		
+		if (feature == null)
+			throw new UnsupportedModelException(
+					"The compound feature '"
+							+ name
+							+ "' have to occur on a right side of a rule before using it on a left side!",
+					gProduction.getIDENTIFIER().lineNum());
+		// feature.setAND(false);
+		
+		if (map.containsKey(feature.getName())){
+			
+			feature.setGroupType(GroupType.OR);}
+		else{
+		
+			feature.setGroupType(GroupType.ALTERNATIVE);}
+		
+			
+		
 		Pats pats = gProduction.getPats();
 		AstListNode astListNode = (AstListNode) pats.arg[0];
 		do {
 			Feature child = readPat((Pat) astListNode.arg[0]);
+		
 			feature.addChild(child);
 			feature.setAbstract(!noAbstractFeatures);
 			astListNode = (AstListNode) astListNode.right;
@@ -246,10 +271,11 @@ public class GuidslReader extends AbstractFeatureModelReader {
 		return createFeature(token);
 	}
 
-	private Feature readGPattern(GPattern gPattern) throws UnsupportedModelException {
+	private Feature readGPattern(GPattern gPattern)
+			throws UnsupportedModelException {
 		AstToken token = gPattern.getIDENTIFIER();
 		Feature feature = createFeature(token);
-		feature.setAND(true);
+		feature.setGroupType(GroupType.AND);
 		TermList termList = gPattern.getTermList();
 		AstListNode astListNode = (AstListNode) termList.arg[0];
 		do {
@@ -263,24 +289,52 @@ public class GuidslReader extends AbstractFeatureModelReader {
 
 	private Feature readGTerm(GTerm term) throws UnsupportedModelException {
 		AstToken token;
-		if (term instanceof PlusTerm)
+		Feature feature;
+		if (term instanceof PlusTerm) {
+			
 			token = ((PlusTerm) term).getIDENTIFIER();
-		else if (term instanceof StarTerm)
+			map.put(token.getTokenName(), true);
+			feature = createFeature(token);
+			feature.setMandatory(term instanceof PlusTerm
+					|| term instanceof TermName);
+		} else if (term instanceof StarTerm) {
+				
+				
+			
 			token = ((StarTerm) term).getIDENTIFIER();
-		else if (term instanceof TermName)
+			map.put(token.getTokenName(), true);
+			feature = createFeature(token);
+			feature.setMandatory(term instanceof PlusTerm
+					|| term instanceof TermName);
+		} else if (term instanceof TermName) {
+		
 			token = ((TermName) term).getIDENTIFIER();
-		else
+		
+		
+			feature = createFeature(token);
+			feature.setMandatory(term instanceof PlusTerm
+					|| term instanceof TermName);
+		} else {
+		
 			token = ((OptTerm) term).getIDENTIFIER();
-		Feature feature = createFeature(token);
-		feature.setMandatory(term instanceof PlusTerm || term instanceof TermName);
-		feature.setMultiple(term instanceof PlusTerm || term instanceof StarTerm);
+			feature = createFeature(token);
+			feature.setMandatory(term instanceof PlusTerm
+					|| term instanceof TermName);
+		}
+
+	
 		return feature;
 	}
 
-	private Feature createFeature(AstToken token) throws UnsupportedModelException {
+	private Feature createFeature(AstToken token)
+			throws UnsupportedModelException {
 		Feature feature = new Feature(featureModel, token.name);
 		if (!featureModel.addFeature(feature))
-			throw new UnsupportedModelException("The feature '" + feature.getName() + "' occurs again on a right side of a rule and that's not allowed!", token.lineNum());
+			throw new UnsupportedModelException(
+					"The feature '"
+							+ feature.getName()
+							+ "' occurs again on a right side of a rule and that's not allowed!",
+					token.lineNum());
 		return feature;
 	}
 
@@ -290,18 +344,18 @@ public class GuidslReader extends AbstractFeatureModelReader {
 			if (child.getName().equals("_" + feature.getName())) {
 				feature.removeChild(child);
 				feature.setChildren(child.getChildren());
-				feature.setAND(child.isAnd());
+			
+				feature.setGroupType(child.getGroupType());
 				featureModel.deleteFeatureFromTable(child);
-			}
-			else if (feature.getName().equals(child.getName() + "_")) {
+			} else if (feature.getName().equals(child.getName() + "_")) {
 				feature.removeChild(child);
 				if (feature == featureModel.getRoot())
 					featureModel.replaceRoot(child);
 				else
 					featureModel.deleteFeatureFromTable(feature);
 				feature = child;
-			}
-			else if (feature != featureModel.getRoot() && feature.getName().equals("_" + child.getName())) {
+			} else if (feature != featureModel.getRoot()
+					&& feature.getName().equals("_" + child.getName())) {
 				feature.removeChild(child);
 				featureModel.deleteFeatureFromTable(feature);
 				feature = child;
@@ -312,7 +366,8 @@ public class GuidslReader extends AbstractFeatureModelReader {
 
 	private int line;
 
-	private void readConsStmt(ConsStmt consStmt) throws UnsupportedModelException {
+	private void readConsStmt(ConsStmt consStmt)
+			throws UnsupportedModelException {
 		ESList eSList = consStmt.getESList();
 		AstListNode astListNode = (AstListNode) eSList.arg[0];
 		do {
@@ -320,9 +375,11 @@ public class GuidslReader extends AbstractFeatureModelReader {
 			Node node = exprToNode(((EStmt) astListNode.arg[0]).getExpr());
 			try {
 				if (!new SatSolver(new Not(node.clone()), 250).isSatisfiable())
-					warnings.add(new ModelWarning("Constraint is a tautology.", line));
+					warnings.add(new ModelWarning("Constraint is a tautology.",
+							line));
 				if (!new SatSolver(node.clone(), 250).isSatisfiable())
-					warnings.add(new ModelWarning("Constraint is not satisfiable.", line));
+					warnings.add(new ModelWarning(
+							"Constraint is not satisfiable.", line));
 			} catch (Exception e) {
 			}
 			featureModel.addPropositionalNode(node);
@@ -336,8 +393,9 @@ public class GuidslReader extends AbstractFeatureModelReader {
 			line = token.lineNum();
 			String var = token.name;
 			if (featureModel.getFeature(var) == null)
-				throw new UnsupportedModelException("The feature '" + var + "' does not occur in the grammar!", token.lineNum());	
-			//return new Literal(featureModel.getFeature(var));
+				throw new UnsupportedModelException("The feature '" + var
+						+ "' does not occur in the grammar!", token.lineNum());
+			// return new Literal(featureModel.getFeature(var));
 			return new Literal(var);
 		}
 		if (expr instanceof Paren)
@@ -345,13 +403,17 @@ public class GuidslReader extends AbstractFeatureModelReader {
 		if (expr instanceof BNot)
 			return new Not(exprToNode(((BNot) expr).getNExpr()));
 		if (expr instanceof BAnd)
-			return new And(exprToNode(((BAnd) expr).getNExpr()), exprToNode(((BAnd) expr).getAExpr()));
+			return new And(exprToNode(((BAnd) expr).getNExpr()),
+					exprToNode(((BAnd) expr).getAExpr()));
 		if (expr instanceof BOr)
-			return new Or(exprToNode(((BOr) expr).getAExpr()), exprToNode(((BOr) expr).getOExpr()));
+			return new Or(exprToNode(((BOr) expr).getAExpr()),
+					exprToNode(((BOr) expr).getOExpr()));
 		if (expr instanceof BImplies)
-			return new Implies(exprToNode(((BImplies) expr).getOExpr()), exprToNode(((BImplies) expr).getIExpr()));
+			return new Implies(exprToNode(((BImplies) expr).getOExpr()),
+					exprToNode(((BImplies) expr).getIExpr()));
 		if (expr instanceof BIff)
-			return new Equals(exprToNode(((BIff) expr).getIExpr()), exprToNode(((BIff) expr).getEExpr()));
+			return new Equals(exprToNode(((BIff) expr).getIExpr()),
+					exprToNode(((BIff) expr).getEExpr()));
 		if (expr instanceof BChoose1) {
 			ExprList exprList = ((BChoose1) expr).getExprList();
 			AstListNode astListNode = (AstListNode) exprList.arg[0];
@@ -375,21 +437,23 @@ public class GuidslReader extends AbstractFeatureModelReader {
 	}
 
 	private void readVar(Var var) {
-		//TODO #31: reading annotations not yet implemented
+		// TODO #31: reading annotations not yet implemented
 	}
 
-	public Node readPropositionalString(String propString, FeatureModel featureModel) throws UnsupportedModelException{
-		//String featureString = new FeatureModelWriter(featureModel).writeToString();
-		StringBuffer featureString= new StringBuffer(
-				new GuidslWriter(featureModel).writeToString());		
+	public Node readPropositionalString(String propString,
+			FeatureModel featureModel) throws UnsupportedModelException {
+		// String featureString = new
+		// FeatureModelWriter(featureModel).writeToString();
+		StringBuffer featureString = new StringBuffer(new GuidslWriter(
+				featureModel).writeToString());
 
-		if( featureModel.getConstraintCount()== 0)
+		if (featureModel.getConstraintCount() == 0)
 			featureString.append("%%\r\n");
 		featureString.append(propString);
 		readFromString(featureString.toString());
 		List<Node> propNodes = getFeatureModel().getPropositionalNodes();
 
-		return propNodes.get(propNodes.size()-1);
+		return propNodes.get(propNodes.size() - 1);
 	}
 
 	@SuppressWarnings("unused")
@@ -398,7 +462,8 @@ public class GuidslReader extends AbstractFeatureModelReader {
 			if (node instanceof AstListNode)
 				System.out.println(tab + "AstListNode");
 			else
-				System.out.println(tab + node.className() + ": " + node.toString().trim().replaceAll("\\s+", " "));
+				System.out.println(tab + node.className() + ": "
+						+ node.toString().trim().replaceAll("\\s+", " "));
 			if (node.arg.length > 0)
 				print(tab + "\t", node.arg[0]);
 			print(tab, node.right);

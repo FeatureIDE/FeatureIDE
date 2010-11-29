@@ -60,11 +60,11 @@ public abstract class TAbstractFeatureModelReaderWriter {
 	// TODO replace MODEL_FILE_PATH by something that works on both: build-server and offline in
 	// workspace
 	// For now: uncomment this to run tests in workspace:
-//	protected static String sep = System.getProperty("file.separator");
-//	protected static File MODEL_FILE_PATH = new File("src" + sep
-//			+ "testFeatureModels" + sep);
-	 protected static File MODEL_FILE_PATH = new
-	 File("/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/testFeatureModels/");
+	protected static String sep = System.getProperty("file.separator");
+	protected static File MODEL_FILE_PATH = new File("src" + sep
+			+ "testFeatureModels" + sep);
+//	 protected static File MODEL_FILE_PATH = new
+//	 File("/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/testFeatureModels/");
 
 	IFeatureModelWriter writer;
 	IFeatureModelReader reader;
@@ -94,7 +94,7 @@ public abstract class TAbstractFeatureModelReaderWriter {
 			file[0] = f;
 			params.add(file);
 		}
-		System.out.println(params);
+	
 		return params;
 	}
 
@@ -113,12 +113,12 @@ public abstract class TAbstractFeatureModelReaderWriter {
 
 			@Override
 			public boolean accept(File pathname) {
-				System.out.println("accept" + pathname);
+			
 				if (pathname.getName().endsWith(s)) {
-					System.out.println("true");
+				
 					return true;
 				} else {
-					System.out.println("false");
+				
 					return false;
 				}
 			}
@@ -156,7 +156,7 @@ public abstract class TAbstractFeatureModelReaderWriter {
 	public final void writeAndReadModel() throws UnsupportedModelException {
 
 		String s = writer.writeToString();
-
+	
 		reader.readFromString(s);
 
 	}

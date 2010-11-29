@@ -20,6 +20,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 
+import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
 
@@ -41,13 +42,13 @@ public class AndAction extends SingleSelectionAction {
 
 	@Override
 	public void run() {
-		feature.changeToAnd();
+		feature.setGroupType(Feature.GroupType.AND);
 		featureModel.handleModelDataChanged();
 	}
 
 	@Override
 	protected void updateProperties() {
-		boolean and = feature.isAnd();
+		boolean and = feature.hasGroupType(Feature.GroupType.AND);
 		setEnabled(connectionSelected && !and);
 		setChecked(connectionSelected && and);
 	}

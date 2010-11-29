@@ -38,67 +38,41 @@ public class Feature implements PropertyConstants {
 	
 	private boolean concret = true;
 
-	private boolean and = true;
-
-	private boolean multiple = false;
+	
 	
 	private boolean hidden = false;
 
 	private FeatureModel featureModel;
 
+	private GroupType groupType;
 	public Feature(FeatureModel featureModel) {
 		this.featureModel = featureModel;
 		name = "Unknown";
 		sourceConnections.add(parentConnection);
+		this.groupType = GroupType.AND;
 	}
 
 	public Feature(FeatureModel featureModel, String name) {
 		this.featureModel = featureModel;
 		this.name = name;
 		sourceConnections.add(parentConnection);
+		this.groupType = GroupType.AND;
 	}
 
-	public boolean isAnd() {
-		return and;
-	}
+	
 
-	public boolean isOr() {
-		return !and && multiple;
-	}
+	
 
-	public boolean isAlternative() {
-		return !and && !multiple;
-	}
+	
 
-	public void changeToAnd() {
-		and = true;
-		multiple = false;
-		fireChildrenChanged();
-	}
-
-	public void changeToOr() {
-		and = false;
-		multiple = true;
-		fireChildrenChanged();
-	}
-
-	public void changeToAlternative() {
-		and = false;
-		multiple = false;
-		fireChildrenChanged();
-	}
-
-	public void setAND(boolean and) {
-		this.and = and;
-		fireChildrenChanged();
-	}
+	
 
 	public boolean isMandatorySet() {
 		return mandatory;
 	}
 
 	public boolean isMandatory() {
-		return parent == null || !parent.isAnd() || mandatory;
+		return parent == null || !parent.hasGroupType(GroupType.AND) || mandatory;
 	}
 
 	public void setMandatory(boolean mandatory) {
@@ -119,14 +93,7 @@ public class Feature implements PropertyConstants {
 		fireChildrenChanged();
 	}
 
-	public boolean isMultiple() {
-		return multiple;
-	}
 
-	public void setMultiple(boolean multiple) {
-		this.multiple = multiple;
-		fireChildrenChanged();
-	}
 
 	public String getName() {
 		return name;
@@ -137,12 +104,13 @@ public class Feature implements PropertyConstants {
 		fireNameChanged();
 	}
 
-	/**
-	 * Returns true if the rule can be writen in a format like 'Ab [Cd] Ef ::
+	/**TODO: can we replace it like this?
+	 * Returns true if the rule can be written in a format like 'Ab [Cd] Ef ::
 	 * Gh'.
 	 */
 	public boolean hasInlineRule() {
-		return getChildrenCount() > 1 && and && isMandatory() && !multiple;
+		//return getChildrenCount() > 1 && and && isMandatory() && !multiple;
+		return getChildrenCount() > 1 && hasGroupType(GroupType.AND) && isMandatory();
 	}
 
 	private Feature parent;
@@ -390,10 +358,10 @@ public class Feature implements PropertyConstants {
 	}
 
 	public boolean isANDPossible() {
-		if (parent == null || parent.isAnd())
+		if (parent == null || parent.hasGroupType(GroupType.AND))
 			return false;
 		for (Feature child : children) {
-			if (child.isAnd())
+			if (child.hasGroupType(GroupType.AND))
 				return false;
 		}
 		return true;
@@ -416,29 +384,45 @@ public class Feature implements PropertyConstants {
 		for (Feature child : children) {
 			feature.addChild(child.clone());
 		}
-		feature.and = and;
+		feature.setGroupType(this.getGroupType());
 		feature.mandatory = mandatory;
-		feature.multiple = multiple;
+		
 		feature.hidden = hidden;
 		feature.concret = concret;
 		return feature;
 	}
 	
 	
-	public void setAnd() {
-		this.and = true;
+	public enum GroupType {
+	    AND, OR, ALTERNATIVE, ERR, A,B,C,D,E,F,G
 	}
 	
-	public void setOr() {
-		this.and = false;
-		this.multiple = true;
+	/**
+	 * returns true if the GroupType of this feature equals type
+	 * @param type - possible values: AND, OR, ALTERNATIVE
+	 * @return
+	 */
+	public boolean hasGroupType(GroupType type){
+		return this.groupType.equals(type);
 	}
 	
-	public void setAlternative() {
-		this.and = false;
-		this.multiple = false;
+	/**
+	 * returns the GroupType of this feature
+	 * @return
+	 */
+	public GroupType getGroupType(){
+		return this.groupType;
 	}
 
+	/**
+	 * sets the GroupType of this feature to type
+	 * @param type - possible values: AND, OR, ALTERNATIVE
+	 * @param propagate fires a childrenChangedEvent if true, to 
+	 */
+	public void setGroupType(GroupType type){
+		this.groupType=type;
+		fireChildrenChanged();
+	}
 	/**
 	 * debug only
 	 */

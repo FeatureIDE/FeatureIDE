@@ -18,43 +18,40 @@
  */
 package de.ovgu.featureide.fm.core.io.guidsl;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
+import static org.junit.Assert.*;
 import org.junit.Test;
-
 import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.Feature.GroupType;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
 /**
- * TODO description
+ * Test class for GuidslReader
  * 
- * @author Fabian
+ * @author Fabian Benduhn
  */
 public class TGuidslReader {
-	protected static String AND_GROUP_ALL_OPTIONAL = "Root : [Base] :: _Root ; Base : [A] [B] [C] :: _Base ;";
-	protected static String AND_GROUP_A_MANDATORY = "Root : [Base] :: _Root ; Base : A [B] [C] :: _Base ;";
-	protected static String OR_GROUP = "Root : Base* :: _Root ;Base : A	| B	| C ;";
-	protected static String ALTERNATIVE_GROUP = "Root : Base ;Base : A| B	| C ;";
 
-	protected static String sep = System.getProperty("file.separator");
-	
+	static String AND_GROUP_ALL_OPTIONAL = "Root : [Base] :: _Root ; Base : [A] [B] [C] :: _Base ;";
+	static String AND_GROUP_A_MANDATORY = "Root : [Base] :: _Root ; Base : A [B] [C] :: _Base ;";
+	static String OR_GROUP = "Root : Base* :: _Root ; Base : A	| B	| C ;";
+	static String ALTERNATIVE_GROUP = "Root : Base :: _Root; Base : A | B| C ;";
+
 	@Test
-	public void testReaderAndGroupAllOptional() throws UnsupportedModelException {
+	public void testAndGroupAllOptional() throws UnsupportedModelException {
 		FeatureModel model = new FeatureModel();
 		GuidslReader reader = new GuidslReader(model);
 
 		reader.readFromString(AND_GROUP_ALL_OPTIONAL);
 		Feature a = model.getFeature("A");
 		Feature base = model.getFeature("Base");
-		assertTrue(base.isAnd());
+		assertTrue(base.hasGroupType(GroupType.AND));
 		assertFalse(a.isMandatory());
 
 	}
 
 	@Test
-	public void testReaderAndGroupAMandatory() throws UnsupportedModelException {
+	public void testAndGroupAMandatory() throws UnsupportedModelException {
 		FeatureModel model = new FeatureModel();
 		GuidslReader reader = new GuidslReader(model);
 
@@ -62,31 +59,31 @@ public class TGuidslReader {
 
 		Feature base = model.getFeature("Base");
 		Feature a = model.getFeature("A");
-		assertTrue(base.isAnd());
+		assertTrue(base.hasGroupType(GroupType.AND));
 		assertTrue(a.isMandatory());
 	}
 
-	@Test
-	public void testReaderOrGroup() throws UnsupportedModelException {
+@Test
+	public void testOrGroup() throws UnsupportedModelException {
 		FeatureModel model = new FeatureModel();
 		GuidslReader reader = new GuidslReader(model);
 
 		reader.readFromString(OR_GROUP);
 
 		Feature base = model.getFeature("Base");
-		assertTrue(base.isOr());
+		assertTrue(base.hasGroupType(GroupType.OR));
 
 	}
-
 	@Test
-	public void testReaderAlternativeGroup() throws UnsupportedModelException {
+	public void testAlternativeGroup() throws UnsupportedModelException {
 		FeatureModel model = new FeatureModel();
 		GuidslReader reader = new GuidslReader(model);
 
 		reader.readFromString(ALTERNATIVE_GROUP);
 
 		Feature base = model.getFeature("Base");
-		assertTrue(base.isAlternative());
-
+		
+		assertTrue(base.hasGroupType(GroupType.ALTERNATIVE));
+		
 	}
 }

@@ -86,7 +86,7 @@ public class GuidslWriter extends AbstractFeatureModelWriter {
 	private void writeGrammarDefinition(StringBuffer out) {
 		Feature root = featureModel.getRoot();
 		if (root != null) {
-			if (root.isOr()) {
+			if (root.hasGroupType(Feature.GroupType.OR)) {
 				out.append(root.getName());
 				out.append("_ : ");
 				out.append(root.getName());
@@ -130,7 +130,7 @@ public class GuidslWriter extends AbstractFeatureModelWriter {
 		
 		//check if a output over more than one line is possible
 		boolean moreThanOneLine = isMoreThanOneLinePossible(mainFeature, mainChildren);
-		//moreThanOneLine = !mainFeature.isAND();
+		//moreThanOneLine = !mainFeature.hasGroupType(Feature.GroupType.AND);
 		
 		//write out the line(s)
 		for (int i = 0; i < mainChildren.size(); i++) {
@@ -138,10 +138,10 @@ public class GuidslWriter extends AbstractFeatureModelWriter {
 			if (moreThanOneLine && i > 0) {
 				out.append("\r\n\t|");
 			}
-			else if (!mainFeature.isAnd() && i > 0) {
+			else if (!mainFeature.hasGroupType(Feature.GroupType.AND) && i > 0) {
 				out.append("\r\n\t|");
 			}
-			if (!mainFeature.isAnd() && feature.hasInlineRule()) {
+			if (!mainFeature.hasGroupType(Feature.GroupType.AND) && feature.hasInlineRule()) {
 				LinkedList<Feature> children = feature.getChildren();
 				for (int j = 0; j < children.size(); j++) {
 					out.append(" ");
@@ -153,13 +153,13 @@ public class GuidslWriter extends AbstractFeatureModelWriter {
 			else {
 				out.append(" ");
 				out.append(getRightGrammarToken(feature));
-				if (!mainFeature.isAnd() && (!feature.isMandatory() || feature.isMultiple())) {
+				if (!mainFeature.hasGroupType(Feature.GroupType.AND) && (!feature.isMandatory() || feature.hasGroupType(Feature.GroupType.OR))) {
 					out.append(" :: ");
 					out.append(feature.getName() + "_");
 				}
 			}
 		}
-		if (mainFeature.isAnd()) {// && mainChildren.size() > 1) {
+		if (mainFeature.hasGroupType(Feature.GroupType.AND)) {// && mainChildren.size() > 1) {
 			out.append(" :: _");
 			out.append(mainFeature.getName());
 		}
@@ -170,7 +170,7 @@ public class GuidslWriter extends AbstractFeatureModelWriter {
 	}
 
 	private boolean isMoreThanOneLinePossible(Feature feature, LinkedList<Feature> children) {
-		if (!feature.isAnd()) {
+		if (!feature.hasGroupType(Feature.GroupType.AND)) {
 			for (int i = 0; i < children.size(); i++) {
 				Feature child = children.get(i);
 				if (child.hasInlineRule()) {
@@ -182,7 +182,7 @@ public class GuidslWriter extends AbstractFeatureModelWriter {
 	}
 
 	public static String getRightGrammarToken(Feature feature) {
-		if (feature.isMultiple()) {
+		if (feature.hasGroupType(Feature.GroupType.OR)) {
 			return feature.getName() + (feature.isMandatory() ? "+" : "*");
 		}
 		return feature.isMandatory() ? feature.getName() : "[" + feature.getName() + "]";
@@ -191,7 +191,7 @@ public class GuidslWriter extends AbstractFeatureModelWriter {
 	private void writeChildRules(Feature mainFeature, LinkedList<Feature> mainChildren, StringBuffer out) {
 		for (int i = 0; i < mainChildren.size(); i++) {
 			Feature feature = mainChildren.get(i);
-			if (!mainFeature.isAnd() && feature.hasInlineRule()) {
+			if (!mainFeature.hasGroupType(Feature.GroupType.AND) && feature.hasInlineRule()) {
 				LinkedList<Feature> children = feature.getChildren();
 				for (int j = 0; j < children.size(); j++) {
 					writeRule(children.get(j), out);
