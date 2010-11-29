@@ -18,12 +18,11 @@
  */
 package de.ovgu.featureide.fm.core.io.guidsl;
 
-import java.io.File;
-
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter;
+import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
 /**
  * Test class for GuidslReader
@@ -33,9 +32,10 @@ import de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter;
 public class TGuidslReaderWriter extends TAbstractFeatureModelReaderWriter{
 	/**
 	 * @param file
+	 * @throws UnsupportedModelException 
 	 */
-	public TGuidslReaderWriter(File file) {
-		super(file);
+	public TGuidslReaderWriter(FeatureModel fm, String s) throws UnsupportedModelException {
+		super(fm, s);
 		// TODO Auto-generated constructor stub
 	}
 

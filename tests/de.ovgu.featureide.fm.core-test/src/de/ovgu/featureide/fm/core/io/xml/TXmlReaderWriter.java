@@ -18,12 +18,11 @@
  */
 package de.ovgu.featureide.fm.core.io.xml;
 
-import java.io.File;
-
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter;
+import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
 /**
  * test class for XmlReader/Writer
@@ -36,9 +35,10 @@ public class TXmlReaderWriter extends TAbstractFeatureModelReaderWriter {
 
 	/**
 	 * @param file
+	 * @throws UnsupportedModelException 
 	 */
-	public TXmlReaderWriter(File file) {
-		super(file);
+	public TXmlReaderWriter(FeatureModel fm,String s) throws UnsupportedModelException {
+		super(fm,s);
 		// TODO Auto-generated constructor stub
 	}
 

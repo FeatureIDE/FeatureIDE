@@ -132,7 +132,8 @@ public class ModelComparator {
 		} catch (TimeoutException e) {
 			result = Comparison.TIMEOUT;
 		} catch (Exception e) {
-			FMCorePlugin.getDefault().logError(e);
+		
+		if(FMCorePlugin.getDefault()!=null)	FMCorePlugin.getDefault().logError(e);
 			result = Comparison.ERROR;
 		}
 		return result;

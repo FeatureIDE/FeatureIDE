@@ -18,12 +18,11 @@
  */
 package de.ovgu.featureide.fm.core.io.waterloo;
 
-import java.io.File;
-
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter;
+import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
 /**
  * Test class for WaterlooReader/Writer
@@ -34,9 +33,10 @@ public class TWaterlooReaderWriter extends TAbstractFeatureModelReaderWriter{
 
 	/**
 	 * @param file
+	 * @throws UnsupportedModelException 
 	 */
-	public TWaterlooReaderWriter(File file) {
-		super(file);
+	public TWaterlooReaderWriter(FeatureModel fm, String s) throws UnsupportedModelException {
+		super(fm,s);
 		// TODO Auto-generated constructor stub
 	}
 

@@ -63,5 +63,20 @@ public class Constraint implements PropertyConstants {
 		for (PropertyChangeListener listener : listenerList)
 			listener.propertyChange(event);
 	}
+	
+	@Override
+	public boolean equals(Object obj){
+		
+		
+			if (this == obj)
+				return true;
+			if (!(obj instanceof Constraint))
+				return false;
 
+			Constraint other = (Constraint) obj;
+
+		
+		return propNode.equals(other.propNode);
+		
+	}
 }
