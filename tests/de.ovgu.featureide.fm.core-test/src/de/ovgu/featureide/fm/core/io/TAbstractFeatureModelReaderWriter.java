@@ -18,8 +18,8 @@
  */
 package de.ovgu.featureide.fm.core.io;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -113,12 +113,12 @@ public abstract class TAbstractFeatureModelReaderWriter {
 
 			@Override
 			public boolean accept(File pathname) {
-			
+				
 				if (pathname.getName().endsWith(s)) {
 				
 					return true;
 				} else {
-				
+					
 					return false;
 				}
 			}
@@ -130,18 +130,18 @@ public abstract class TAbstractFeatureModelReaderWriter {
 	 * @param guidslReader
 	 *            *
 	 * @throws FileNotFoundException
+	 * @throws UnsupportedModelException 
 	 * */
-	private final boolean testFromFile(File file) throws FileNotFoundException {
-		FeatureModel fmOld = fm;
+	private final boolean testFromFile(File file) throws FileNotFoundException, UnsupportedModelException {
+		
 		GuidslReader guidslReader = new GuidslReader(fm);
-		try {
+		
 			guidslReader.readFromFile(file);
-
+			FeatureModel fmOld = fm.clone();
 			writeAndReadModel();
-		} catch (UnsupportedModelException e) {
-			assertFalse(e.getMessage(), true);
-		}
-		return compareModels(fmOld, fm);
+			return compareModels(fmOld, fm);
+		
+		
 	}
 
 	/**
@@ -156,7 +156,7 @@ public abstract class TAbstractFeatureModelReaderWriter {
 	public final void writeAndReadModel() throws UnsupportedModelException {
 
 		String s = writer.writeToString();
-	
+
 		reader.readFromString(s);
 
 	}

@@ -58,12 +58,13 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
  */
 public class FeatureModel implements PropertyConstants {
 
-	public static final QualifiedName sourceFolderConfigID = new QualifiedName("featureproject.configs", "source");
+	public static final QualifiedName sourceFolderConfigID = new QualifiedName(
+			"featureproject.configs", "source");
 	public static final String SOURCE_ARGUMENT = "source";
 	public static final String DEFAULT_SOURCE_PATH = "src";
-	
+
 	public static final String BUILDER_ID = "de.ovgu.featureide.core"
-		+ ".extensibleFeatureProjectBuilder";
+			+ ".extensibleFeatureProjectBuilder";
 	/**
 	 * the root feature
 	 */
@@ -78,7 +79,7 @@ public class FeatureModel implements PropertyConstants {
 	 * all comment lines from the model file without line number at which they
 	 * occur
 	 */
-	
+
 	private List<String> comments = new LinkedList<String>();
 
 	/**
@@ -100,7 +101,7 @@ public class FeatureModel implements PropertyConstants {
 	private LinkedList<Renaming> renamings = new LinkedList<Renaming>();
 
 	private IFolder sourceFolder;
-	
+
 	public FeatureModel() {
 		reset();
 	}
@@ -133,7 +134,7 @@ public class FeatureModel implements PropertyConstants {
 	}
 
 	public List<String> getAnnotations() {
-		return  Collections.unmodifiableList(annotations);
+		return Collections.unmodifiableList(annotations);
 	}
 
 	public void addAnnotation(String annotation) {
@@ -143,7 +144,7 @@ public class FeatureModel implements PropertyConstants {
 	public List<String> getComments() {
 		return Collections.unmodifiableList(comments);
 	}
-	
+
 	public void addComment(String comment) {
 		comments.add(comment);
 	}
@@ -163,11 +164,10 @@ public class FeatureModel implements PropertyConstants {
 	}
 
 	public void removePropositionalNode(Constraint constraint) {
-	
-		
+
 		propNodes.remove(constraint.getNode());
 		constraints.remove(constraint);
-	
+
 	}
 
 	public void removePropositionalNode(int index) {
@@ -233,7 +233,7 @@ public class FeatureModel implements PropertyConstants {
 		}
 		return featureTable.get(name);
 	}
-	
+
 	public boolean renameFeature(String oldName, String newName) {
 		if (!featureTable.containsKey(oldName)
 				|| featureTable.containsKey(newName))
@@ -256,9 +256,10 @@ public class FeatureModel implements PropertyConstants {
 		}
 		renamings.clear();
 	};
-	
+
 	public void performRenamings(IFile file) {
-		IProject project = ((IResource) file.getAdapter(IFile.class)).getProject();
+		IProject project = ((IResource) file.getAdapter(IFile.class))
+				.getProject();
 		sourceFolder = project.getFolder(getProjectConfigurationPath(project));
 		for (Renaming renaming : renamings) {
 			for (Node node : propNodes)
@@ -266,8 +267,8 @@ public class FeatureModel implements PropertyConstants {
 			moveFolder(renaming.oldName, renaming.newName);
 		}
 		renamings.clear();
-	}	
-	
+	}
+
 	public void moveFolder(String oldName, String newName) {
 		try {
 			IFolder folder = sourceFolder.getFolder(oldName);
@@ -323,12 +324,14 @@ public class FeatureModel implements PropertyConstants {
 		for (PropertyChangeListener listener : listenerList)
 			listener.propertyChange(event);
 	}
+
 	public void redrawDiagram() {
 		PropertyChangeEvent event = new PropertyChangeEvent(this,
 				REDRAW_DIAGRAM, false, true);
 		for (PropertyChangeListener listener : listenerList)
 			listener.propertyChange(event);
 	}
+
 	public Collection<Feature> getFeatures() {
 		return Collections.unmodifiableCollection(featureTable.values());
 	}
@@ -449,10 +452,11 @@ public class FeatureModel implements PropertyConstants {
 				list.add(child);
 		}
 		fm.propNodes = new LinkedList<Node>();
-		for (Node node : propNodes){
+		for (Node node : propNodes) {
 			fm.propNodes.add(node);
-	
-			fm.constraints.add(new Constraint(fm, node));}
+
+			fm.constraints.add(new Constraint(fm, node));
+		}
 		for (int i = 0; i < annotations.size(); i++)
 			fm.annotations.add(annotations.get(i));
 		for (int i = 0; i < comments.size(); i++)
@@ -716,10 +720,13 @@ public class FeatureModel implements PropertyConstants {
 		return set;
 
 	}
+
 	/**
 	 * Checks a string to be a valid featurename.
-	 * @param s Possible featurename to be checked
-	 * @return boolean 
+	 * 
+	 * @param s
+	 *            Possible featurename to be checked
+	 * @return boolean
 	 */
 	public static boolean isValidJavaIdentifier(String s) {
 		if (s == null)
@@ -733,13 +740,13 @@ public class FeatureModel implements PropertyConstants {
 		}
 		return true;
 	}
-	
+
 	public String getProjectConfigurationPath(IProject project) {
 		try {
 			String path = project.getPersistentProperty(sourceFolderConfigID);
 			if (path != null)
 				return path;
-			
+
 			path = getPath(project, SOURCE_ARGUMENT);
 			if (path == null)
 				return DEFAULT_SOURCE_PATH;
@@ -749,7 +756,7 @@ public class FeatureModel implements PropertyConstants {
 		}
 		return DEFAULT_SOURCE_PATH;
 	}
-	
+
 	private String getPath(IProject project, String argument) {
 		try {
 			for (ICommand command : project.getDescription().getBuildSpec()) {
@@ -763,5 +770,28 @@ public class FeatureModel implements PropertyConstants {
 		}
 		return null;
 	}
-	
+
+	@Override
+	public boolean equals(Object obj) {
+System.out.println("hallo");
+		if (this == obj)
+			return true;
+		if (!(obj instanceof FeatureModel))
+			return false;
+
+		FeatureModel other = (FeatureModel) obj;
+		System.out.println("this.root:"+this.root);
+		System.out.println("other.root:"+other.root);
+		return this.root.equals(other.root) 
+			//	&& this.featureTable.equals(other.featureTable)
+			//	&& this.comments.equals(other.comments)
+				//&& this.propNodes.equals(other.propNodes)
+			//	&& this.constraints.equals(other.constraints)
+			//	&& this.annotations.equals(other.annotations)
+				//&& this.renamings.equals(other.renamings)
+			//	&& this.sourceFolder.equals(other.sourceFolder)
+				;
+
+	}
+
 }
