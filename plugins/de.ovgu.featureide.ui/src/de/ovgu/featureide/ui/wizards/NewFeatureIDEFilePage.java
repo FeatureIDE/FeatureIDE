@@ -71,6 +71,8 @@ public class NewFeatureIDEFilePage extends WizardPage {
 	private Text className;
 
 	private Button refinesbox;
+	
+	private Label refineslabel;
 
 	private IFolder sourcefolder;
 
@@ -136,8 +138,8 @@ public class NewFeatureIDEFilePage extends WizardPage {
 		className.setLayoutData(gd);
 		new Label(composite, SWT.NULL);
 
-		label = new Label(composite, SWT.NULL);
-		label.setText("&Refines:");
+		refineslabel = new Label(composite, SWT.NULL);
+		refineslabel.setText("&Refines:");
 		refinesbox = new Button(composite, SWT.CHECK);
 		gd = new GridData(GridData.BEGINNING);
 		refinesbox.setLayoutData(gd);
@@ -191,6 +193,16 @@ public class NewFeatureIDEFilePage extends WizardPage {
 		});
 		languageCombo.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
+				
+				if(languageCombo.getText().equals("Jak")){
+					refinesbox.setEnabled(true);
+					refineslabel.setEnabled(true);
+				}
+				else{
+					refinesbox.setEnabled(false);
+					refineslabel.setEnabled(false);
+				}
+				
 				dialogChanged();
 			}
 		});
@@ -280,7 +292,6 @@ public class NewFeatureIDEFilePage extends WizardPage {
 					featureComboContainer.select(i);
 			container = sourcefolder.getFolder(featureComboContainer.getText());
 		} else if (resource.toString().endsWith(".jak")) {
-			// TODO
 			String name = resource.getName();
 			int index = name.indexOf(".");
 			name = index > 0 ? name.substring(0, index) : name;
