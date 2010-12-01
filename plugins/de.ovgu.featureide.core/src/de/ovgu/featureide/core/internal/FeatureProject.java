@@ -22,6 +22,9 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
@@ -73,7 +76,7 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
  * 
  */
 public class FeatureProject extends BuilderMarkerHandler implements
-		IFeatureProject, IResourceChangeListener {
+IFeatureProject, IResourceChangeListener {
 
 	public class FeatureModelChangeListner implements PropertyChangeListener {
 		/**
@@ -165,7 +168,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
-		
+
 		modelFile = new GrammarFile(project.getFile("model.xml"));
 		try {
 			//just create the bin folder if project hat only the FeatureIDE Nature
@@ -228,7 +231,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 						gFile.createModelMarker(
 								"This annotation is not supported yet - moved to the comment section.",
 								IMarker.SEVERITY_WARNING, fmReader.getAnnLine()
-										.get(i));
+								.get(i));
 				}
 
 				// delete model.m automatically - default: false
@@ -254,7 +257,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(
 					"Error while loading feature model from "
-							+ modelFile.getResource(), e);
+					+ modelFile.getResource(), e);
 
 		}
 
@@ -401,9 +404,9 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	 */
 	public void setCurrentEquationFile(IFile file) {
 		int offset = getEquationFolder().getProjectRelativePath().toString()
-				.length();
+		.length();
 		String equationPath = file.getProjectRelativePath().toString()
-				.substring(offset);
+		.substring(offset);
 		try {
 			project.setPersistentProperty(equationConfigID, equationPath);
 			CorePlugin.getDefault().fireCurrentEquationChanged(this);
@@ -698,14 +701,14 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		}
 		if (message != null) {
 			IMarker marker = folder
-					.createMarker("de.ovgu.featureide.core.featureModuleMarker");
+			.createMarker("de.ovgu.featureide.core.featureModuleMarker");
 			marker.setAttribute("message", message);
 			marker.setAttribute("severity", IMarker.SEVERITY_WARNING);
 		}
 	}
 
 	protected boolean allFeatureModulesEmpty(IFolder sourceFolder)
-			throws CoreException {
+	throws CoreException {
 		for (IResource res : sourceFolder.members())
 			if (res instanceof IFolder && ((IFolder) res).members().length > 0)
 				return false;
@@ -859,7 +862,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			if (compositionToolID == null)
 				return null;
 			composerExtension = ComposerExtensionManager.getInstance()
-					.getComposerById(compositionToolID);
+			.getComposerById(compositionToolID);
 		}
 		return composerExtension;
 	}
@@ -881,7 +884,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			String path = project.getPersistentProperty(equationFolderConfigID);
 			if (path != null)
 				return path;
-			
+
 			path = getPath(EQUATIONS_ARGUMENT);
 			if (path == null)
 				return DEFAULT_EQUATIONS_PATH;
@@ -891,7 +894,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		}
 		return DEFAULT_EQUATIONS_PATH;
 	}
-	
+
 	public String getProjectBuildPath() {
 		try {
 			String path = project.getPersistentProperty(buildFolderConfigID);
@@ -907,13 +910,13 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		}
 		return DEFAULT_BUILD_PATH;
 	}
-	
+
 	public String getProjectSourcePath() {
 		try {
 			String path = project.getPersistentProperty(sourceFolderConfigID);
 			if (path != null)
 				return path;
-			
+
 			path = getPath(SOURCE_ARGUMENT);
 			if (path == null)
 				return DEFAULT_SOURCE_PATH;
@@ -923,7 +926,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		}
 		return DEFAULT_SOURCE_PATH;
 	}
-	
+
 	private String getPath(String argument) {
 		try {
 			for (ICommand command : project.getDescription().getBuildSpec()) {
@@ -939,7 +942,66 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		return null;
 	}
 
-	
+	public List<String[]> getTemplates(){
+
+		List<String[]> formats = new LinkedList<String[]>();
+
+		// define all supported languages (Name, Extension, Template)
+		String[] alloy = {"Alloy", "als", "module #classname#"};
+		String[] cs = {"C#", "cs", "public class #classname# {\n\n}"};
+		String[] haskell= {"Haskell File", "hs", "module #classname# where \n{\n\n}"};
+		String[] jak = {"Jak", "jak", "public #refines# class #classname# {\n\n}"};
+		String[] java = {"Java", "java", "public class #classname# {\n\n}"};
+		String[] javacc= {"JavaCC", "jj", "PARSER_BEGIN([classname]) \n \n PARSER_END([classname])"};
+		String[] uml = {"UML File (xmi)", "xmi", "<?xml version = '1.0' encoding = 'UTF-8' ?> \n	<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML'>\n\n</XMI>"};
+
+		// Ahead Composer
+		if (getComposerID().equals("de.ovgu.featureide.composer.ahead")){
+			formats.add(jak);
+		}
+		// Other Composer
+		else{
+			formats.add(alloy);
+			formats.add(cs);
+			formats.add(haskell);
+			formats.add(java);
+			formats.add(javacc);
+			formats.add(uml);	
+		}
+		
+		return Collections.unmodifiableList(formats);
+		
+		/*
+		if (language.equals("alloy"))
+			return "module #classname#";
+
+		else if (language.equals("c"))
+			return "";
+
+		else if (language.equals("c#"))
+			return "public class #classname# {\n\n}";
+
+		else if (language.equals("haskell"))
+			return "module #classname# where \n{\n\n}";
+
+		else if (language.equals("jak"))
+			return "public #refines# class #classname# {\n\n}";
+
+		else if (language.equals("java"))
+			return "public class #classname# {\n\n}";
+
+		else if (language.equals("javacc"))
+			return "PARSER_BEGIN([classname]) \n \n PARSER_END([classname])";
+
+		else if (language.equals("uml"))
+			return "<?xml version = '1.0' encoding = 'UTF-8' ?> \n	<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML'>\n\n</XMI>";
+
+		else return "";	
+		*/
+		
+		
+		
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -990,7 +1052,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			CorePlugin.getDefault().logError(e);
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 

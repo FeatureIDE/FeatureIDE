@@ -58,10 +58,6 @@ import org.w3c.dom.*;
  */
 public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
 	
-	//TODO is this constructor needed?
-	public XmlFeatureModelWriter() {
-	}
-	
 	/**
 	 * Creates a new writer and sets the feature model to write out.
 	 * 

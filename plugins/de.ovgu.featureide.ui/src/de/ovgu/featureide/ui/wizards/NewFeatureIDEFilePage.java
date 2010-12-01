@@ -20,6 +20,7 @@ package de.ovgu.featureide.ui.wizards;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
@@ -48,7 +49,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 
 import de.ovgu.featureide.core.CorePlugin;
-import de.ovgu.featureide.core.FeatureFormat;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.Feature;
 
@@ -60,8 +60,8 @@ import de.ovgu.featureide.fm.core.Feature;
  */
 public class NewFeatureIDEFilePage extends WizardPage {
 
-	private LinkedList<FeatureFormat> formats = new LinkedList<FeatureFormat>();
-	
+	private List<String[]> formats = new LinkedList<String[]>();
+
 	private ISelection selection;
 
 	private Combo featureComboProject;
@@ -79,13 +79,13 @@ public class NewFeatureIDEFilePage extends WizardPage {
 	private boolean refines = false;
 
 	private IFeatureProject featureProject = null;
-	
+
 	public void setFeatureProjekt(IFeatureProject featureProject){
 		this.featureProject = featureProject;
 	}
 
 	private Collection<IFeatureProject> featureProjects = CorePlugin
-			.getFeatureProjects();
+	.getFeatureProjects();
 
 	private String text;
 
@@ -117,7 +117,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 		languageCombo = new Combo(composite, SWT.BORDER | SWT.SINGLE);
 		languageCombo.setLayoutData(gd);
 		new Label(composite, SWT.NULL);
-		
+
 		label = new Label(composite, SWT.NULL);
 		label.setText("&Project:");
 		featureComboProject = new Combo(composite, SWT.BORDER | SWT.SINGLE);
@@ -129,7 +129,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 		featureComboContainer = new Combo(composite, SWT.BORDER | SWT.SINGLE);
 		featureComboContainer.setLayoutData(gd);
 		new Label(composite, SWT.NULL);
-		
+
 		label = new Label(composite, SWT.NULL);
 		label.setText("&Class name:");
 		className = new Text(composite, SWT.BORDER | SWT.SINGLE);
@@ -162,11 +162,21 @@ public class NewFeatureIDEFilePage extends WizardPage {
 					}
 					if (featureProject != null) {
 						IResource res = ResourcesPlugin.getWorkspace()
-								.getRoot().findMember(
-										featureProject.getProjectName());
+						.getRoot().findMember(
+								featureProject.getProjectName());
 						checkcontainer(featureProject, res);
 						containerbool = true;
 					}
+
+					// reload all formats for the changed Project
+					if(featureProject != null){
+						formats = featureProject.getTemplates();
+						languageCombo.removeAll();
+						for (String[] format : formats)
+							languageCombo.add(format[0]);
+						languageCombo.select(0);
+					}
+					
 					dialogChanged();
 				}
 			}
@@ -176,7 +186,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 				NewFeatureIDEFilePage.this.container = sourcefolder != null ? sourcefolder
 						.getFolder(featureComboContainer.getText())
 						: null;
-				dialogChanged();
+						dialogChanged();
 			}
 		});
 		languageCombo.addModifyListener(new ModifyListener() {
@@ -203,21 +213,9 @@ public class NewFeatureIDEFilePage extends WizardPage {
 	 * Tests if the current workbench selection is a suitable container to use.
 	 */
 	private void initialize() {
-		
-		formats.add(new FeatureFormat("Alloy", "als", "module #classname#"));
-		formats.add(new FeatureFormat("C#", "cs", "public class #classname# {\n\n}"));
-		formats.add(new FeatureFormat("Haskell File", "hs", "module #classname# where \n{\n\n}"));
-		formats.add(new FeatureFormat("Jak File", "jak", "public #refines# class #classname# {\n\n}"));
-		formats.add(new FeatureFormat("Java File", "java", "public class #classname# {\n\n}"));
-		formats.add(new FeatureFormat("JavaCC", "jj", "PARSER_BEGIN([classname]) \n \n PARSER_END([classname])"));
-		formats.add(new FeatureFormat("UML File (xmi)", "xmi", "<?xml version = '1.0' encoding = 'UTF-8' ?> \n	<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML'>\n\n</XMI>"));
-		
-		for (FeatureFormat format : formats)
-			languageCombo.add(format.getName());
-		
-		languageCombo.select(3);
-		
-		
+
+		IFeatureProject featureProject = null;
+
 		for (IFeatureProject feature : featureProjects)
 			featureComboProject.add(feature.getProjectName());
 
@@ -229,8 +227,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 			Object obj = ssel.getFirstElement();
 			if (obj instanceof IResource) {
 				IResource resource = (IResource) obj;
-				IFeatureProject featureProject = CorePlugin
-						.getFeatureProject(resource);
+				featureProject = CorePlugin.getFeatureProject(resource);
 				featureComboProject.setText(featureProject.getProjectName()); //
 				if (featureProject != null) {
 					checkcontainer(featureProject, resource);
@@ -238,7 +235,6 @@ public class NewFeatureIDEFilePage extends WizardPage {
 			}
 			else {
 				IWorkbenchWindow editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-				IFeatureProject featureProject = null;
 				IEditorPart part = null;
 				if (editor != null) {
 					IWorkbenchPage page = editor.getActivePage();
@@ -251,15 +247,25 @@ public class NewFeatureIDEFilePage extends WizardPage {
 					}
 				}
 
-				
 				//featureComboProject.select(0);
 				featureComboProject.setText(featureProject.getProjectName());
 
 				for (String s : featureProject.getFeatureModel().getFeatureNames())
 					featureComboContainer.add(s);
 			}
-		text = featureComboProject.getText();
+			text = featureComboProject.getText();
+
+			if(featureProject != null){
+				formats = featureProject.getTemplates();
+
+				for (String[] format : formats)
+					languageCombo.add(format[0]);
+
+				languageCombo.select(0);
+			}
 		}
+
+
 	}
 
 	private void checkcontainer(IFeatureProject featureProject,
@@ -289,13 +295,12 @@ public class NewFeatureIDEFilePage extends WizardPage {
 	private boolean filebool = false;
 
 	private boolean isValidFormat(String text){
-		for(FeatureFormat format : formats)
-			if (format.getName().equals(text))
+		for(String[] format : formats)
+			if (format[0].equals(text))
 				return true;
-		
 		return false;
 	}
-	
+
 	public void dialogChanged() {
 		if (featureComboProject.getText().length() == 0 && !projectbool) {
 			setErrorMessage(null);
@@ -308,13 +313,13 @@ public class NewFeatureIDEFilePage extends WizardPage {
 			updateStatus("No Project selected");
 			return;
 		}
-		
+
 		if (!isFeatureProject(featureComboProject.getText())) {
 			updateStatus("Selected project is not a FeatureIDE Project");
 			return;
 		}
-		
-		
+
+
 		if (!isValidFormat(languageCombo.getText())) {
 			updateStatus("Selected file format is not supported");
 			return;
@@ -368,9 +373,8 @@ public class NewFeatureIDEFilePage extends WizardPage {
 			updateStatus("File name must not contain \".\"");
 			return;
 		}
-		if (container.findMember(className + ".jak") != null) {
-			// TODO
-			updateStatus("Jak file already exists");
+		if (container.findMember(className + "." + getExtension()) != null) {
+			updateStatus("File already exists");
 			return;
 		}
 
@@ -393,13 +397,13 @@ public class NewFeatureIDEFilePage extends WizardPage {
 	public String getClassName() {
 		return className.getText();
 	}
-	
+
 	public String getExtension() {
-		return formats.get(languageCombo.getSelectionIndex()).getExtension();
+		return formats.get(languageCombo.getSelectionIndex())[1];
 	}
-	
+
 	public String getTemplate() {
-		return formats.get(languageCombo.getSelectionIndex()).getTemplate();
+		return formats.get(languageCombo.getSelectionIndex())[2];
 	}
 
 	public boolean isFeatureProject(String text) {
@@ -411,6 +415,4 @@ public class NewFeatureIDEFilePage extends WizardPage {
 		}
 		return isFP;
 	}
-	
-
 }

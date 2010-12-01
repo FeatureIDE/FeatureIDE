@@ -126,26 +126,6 @@ public class OpenWithGuidslAction implements IObjectActionDelegate {
 				
 				execProcess(command, new File(dirpath));
 				
-				//modelfile.getFullPath()
-				//IFile file = modelfile.getFullPath().removeLastSegments(1).append("model.m");
-				//IFile file = modelfile.getParent().getFile(Path.fromOSString(filepath));
-//				
-//				
-//				IFile file = model
-//				IFile file= workspace.getRoot().getFilesForLocation(location);
-//				
-//				System.out.print(test );
-//			
-
-			
-			// TODO: parse to guidsl
-			//command += " \"" + modelfile.getLocation().toOSString() + "\"";
-			//execProcess(command, modelfile.getParent().getLocation().toFile());
-//			System.out.println(file.getFullPath());
-//			command += " \"" + file.getFullPath() + "\"";
-//			System.out.print(command);
-//			//execProcess(command, file.getParent().getLocation().toFile());
-
 		} catch (Exception e) {
 			FMUIPlugin.getDefault().logError("Unable to start GUIDSL", e);
 		}
