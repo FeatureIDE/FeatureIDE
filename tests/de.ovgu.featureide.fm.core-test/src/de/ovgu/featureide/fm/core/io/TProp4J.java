@@ -19,11 +19,10 @@
 package de.ovgu.featureide.fm.core.io;
 import static org.junit.Assert.*;
 
-import org.prop4j.Prop4JTest; 
+
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
+import org.prop4j.Prop4JTest;
+
 
 /**
  *
@@ -33,14 +32,13 @@ import org.junit.runners.Suite.SuiteClasses;
 
 
 
-	@RunWith(Suite.class)
-	@SuiteClasses( { Prop4JTest.class })
-	public class TProp4J{
 	
+	public class TProp4J extends Prop4JTest{
+	@Test 
+	public void test(){
+		assertTrue(true);
+	}
 
-		@Test
-		public void test(){
-			assertTrue(true);
-		}
+		
 	}
 
