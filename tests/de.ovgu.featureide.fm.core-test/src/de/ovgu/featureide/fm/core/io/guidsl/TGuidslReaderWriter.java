@@ -18,6 +18,8 @@
  */
 package de.ovgu.featureide.fm.core.io.guidsl;
 
+import static org.junit.Assert.assertTrue;
+import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
@@ -57,7 +59,22 @@ public class TGuidslReaderWriter extends TAbstractFeatureModelReaderWriter{
 	}
 
 
-	
+	//guidsl does not save concrete compound features
+	@Override
+	public void testFeatureConcrete(){
+		for (Feature origF : origFm.getFeatures()) {
+			
+			if (!origF.isLayer()&&origF.isConcrete()) {
+				Feature newF = newFm.getFeature(origF.getName());
+				if (newF == null){
+					//fail("Feature " + origF.getName() + " cannot be found");
+				}	else {
+					assertTrue(failureMessage+origF, newFm
+							.getFeature(origF.getName()).isConcrete());
+				}
+			}
+		}
+	}
 
 	
 }

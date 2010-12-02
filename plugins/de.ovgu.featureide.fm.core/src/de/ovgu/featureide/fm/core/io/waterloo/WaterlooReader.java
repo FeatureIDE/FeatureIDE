@@ -237,8 +237,8 @@ public class WaterlooReader extends AbstractFeatureModelReader {
 					feat = new FeatureIndent(featureModel, 0);
 		    		feat.setMandatory(true);
 		    		featId = setNameGetID(feat, lineText);
-		    		if (feat.getName().trim().toLowerCase().equals("root"))
-		    			feat.setName("root_");
+//		    		if (feat.getName().trim().toLowerCase().equals("root"))
+//		    			feat.setName("root_");
 		    		featureModel.setRoot(feat);	
 		    		feat.changeToAnd();
 		    		countIndent = 0;

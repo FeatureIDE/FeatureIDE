@@ -56,4 +56,10 @@ public class TWaterlooReaderWriter extends TAbstractFeatureModelReaderWriter{
 		return new WaterlooReader(fm);
 	}
 
+	
+	@Override
+	public void testFeatureHidden(){
+		
+	}
+
 }
