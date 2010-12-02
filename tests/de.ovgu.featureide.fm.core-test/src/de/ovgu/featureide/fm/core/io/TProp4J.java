@@ -18,6 +18,7 @@
  */
 package de.ovgu.featureide.fm.core.io;
 import org.prop4j.Prop4JTest; 
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -34,5 +35,9 @@ import org.junit.runners.Suite.SuiteClasses;
 	@SuiteClasses( { Prop4JTest.class })
 	public class TProp4J{
 	    
+		@Test
+		public void test(){
+			
+		}
 	}
 
