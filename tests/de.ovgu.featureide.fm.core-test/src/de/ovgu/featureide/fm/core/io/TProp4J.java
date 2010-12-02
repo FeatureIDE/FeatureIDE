@@ -17,6 +17,8 @@
  * See http://www.fosd.de/featureide/ for further information.
  */
 package de.ovgu.featureide.fm.core.io;
+import static org.junit.Assert.*;
+
 import org.prop4j.Prop4JTest; 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,10 +36,11 @@ import org.junit.runners.Suite.SuiteClasses;
 	@RunWith(Suite.class)
 	@SuiteClasses( { Prop4JTest.class })
 	public class TProp4J{
-	    
+	
+
 		@Test
 		public void test(){
-			
+			assertTrue(true);
 		}
 	}
 
