@@ -60,8 +60,9 @@ public abstract class TAbstractFeatureModelReaderWriter {
 	// there should be an corresponding test case for the
 	// GuidslReader which tests the resulting FeatureModel directly
 
-	static File MODEL_FILE_PATH = new File(ClassLoader.getSystemResource(
-			"testFeatureModels").getPath());
+	 protected static File MODEL_FILE_PATH = new
+	 File("/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/testFeatureModels/");
+
 
 	static boolean online = false;
 	protected FeatureModel origFm;
