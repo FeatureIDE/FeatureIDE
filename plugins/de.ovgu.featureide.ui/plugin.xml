@@ -30,7 +30,7 @@
             class="de.ovgu.featureide.ui.wizards.NewFeatureIDEFileWizard"
             hasPages="true"
             icon="icons/NewFeatureProjectIcon.png"
-            id="de.ovgu.featureide.ui.FeatureIDEFileWizard"
+            id="de.ovgu.featureide.ui.wizards.NewFeatureIDEFileWizard"
             name="FeatureIDE File">
       </wizard>
       <wizard

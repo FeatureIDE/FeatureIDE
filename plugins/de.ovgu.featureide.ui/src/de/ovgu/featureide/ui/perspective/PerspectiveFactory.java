@@ -26,6 +26,7 @@ import de.ovgu.featureide.fm.ui.views.FeatureModelEditView;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
 import de.ovgu.featureide.ui.wizards.NewEquationFileWizard;
+import de.ovgu.featureide.ui.wizards.NewFeatureIDEFileWizard;
 import de.ovgu.featureide.ui.wizards.NewFeatureProjectWizard;
 
 /**
@@ -44,6 +45,8 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 		String editorArea = layout.getEditorArea();
 
 		layout.addNewWizardShortcut(NewFeatureProjectWizard.ID);
+		
+		layout.addNewWizardShortcut(NewFeatureIDEFileWizard.ID);
 		layout.addNewWizardShortcut(NewEquationFileWizard.ID);
 
 		layout.addNewWizardShortcut("de.ovgu.featureide.ui.ahead.wizards.NewJakFileWizard");

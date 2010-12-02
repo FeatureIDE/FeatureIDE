@@ -43,8 +43,8 @@ import de.ovgu.featureide.ui.UIPlugin;
  */
 public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 	
-	public static final String ID = UIPlugin.PLUGIN_ID + ".wizards.NewFeatureIDEFileWizard";
-	
+	public static final String ID = UIPlugin.PLUGIN_ID + ".wizards.NewFeatureIDEFileWizard"; // .wizards.NewFeatureIDEFileWizard
+
 	public NewFeatureIDEFilePage page;
 	
 	private ISelection selection;

@@ -275,6 +275,17 @@ public class NewFeatureIDEFilePage extends WizardPage {
 
 				languageCombo.select(0);
 			}
+			
+			if(languageCombo.getText().equals("Jak")){
+				refinesbox.setEnabled(true);
+				refineslabel.setEnabled(true);
+			}
+			else{
+				refinesbox.setEnabled(false);
+				refineslabel.setEnabled(false);
+			}
+			
+			
 		}
 
 
@@ -313,6 +324,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 	}
 
 	public void dialogChanged() {
+		
 		if (featureComboProject.getText().length() == 0 && !projectbool) {
 			setErrorMessage(null);
 			setPageComplete(false);

@@ -952,7 +952,7 @@ IFeatureProject, IResourceChangeListener {
 		String[] haskell= {"Haskell File", "hs", "module #classname# where \n{\n\n}"};
 		String[] jak = {"Jak", "jak", "public #refines# class #classname# {\n\n}"};
 		String[] java = {"Java", "java", "public class #classname# {\n\n}"};
-		String[] javacc= {"JavaCC", "jj", "PARSER_BEGIN([classname]) \n \n PARSER_END([classname])"};
+		String[] javacc= {"JavaCC", "jj", "PARSER_BEGIN(#classname#) \n \n PARSER_END(#classname#)"};
 		String[] uml = {"UML File (xmi)", "xmi", "<?xml version = '1.0' encoding = 'UTF-8' ?> \n	<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML'>\n\n</XMI>"};
 
 		// Ahead Composer
