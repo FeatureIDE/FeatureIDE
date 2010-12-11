@@ -25,6 +25,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
 import composer.FSTGenComposer;
+
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 
@@ -61,6 +62,18 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 		composer.run(new String[]{"--expression",equationPath, "--base-directory", basePath,
 				  "--output-directory", outputPath + "/", "--ahead"});
 		
+		/*
+		 * 
+		 TODO: view ticket
+		System.out.println("MUH" + AbstractFSTParser.fstnodes);
+		System.out.println("MUH" + composer.getFstnodes());
+		
+		
+		for (FSTNode node : AbstractFSTParser.fstnodes) {
+			node.printFST(0);
+		}
+		
+		*/
 		TreeBuilderFeatureHouse fstparser = new TreeBuilderFeatureHouse(featureProject.getProjectName());
 		fstparser.createProjectTree(composer.getFstnodes());
 		featureProject.setProjectTree(fstparser.getProjectTree());
@@ -108,4 +121,28 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 			return "org.eclipse.wst.xml.ui.internal.tabletree.XMLMultiPageEditorPart";
 		return "";
 	}
+	
+	@Override
+	public ArrayList<String[]> getTemplates(){
+
+		ArrayList<String[]> list = new ArrayList<String[]>();
+			
+		String[] alloy = {"Alloy File", "als", "module #classname#"};
+		String[] c = {"C File", "c", ""};
+		String[] cs = {"C# File", "cs", "public class #classname# {\n\n}"};
+		String[] haskell= {"Haskell File", "hs", "module #classname# where \n{\n\n}"};
+		String[] java = {"Java File", "java", "public class #classname# {\n\n}"};
+		String[] javacc= {"JavaCC File", "jj", "PARSER_BEGIN(#classname#) \n \n PARSER_END(#classname#)"};
+		String[] uml = {"UML File (xmi)", "xmi", "<?xml version = '1.0' encoding = 'UTF-8' ?> \n	<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML'>\n\n</XMI>"};
+	
+		list.add(alloy);
+		list.add(c);
+		list.add(cs);
+		list.add(haskell);
+		list.add(java);
+		list.add(javacc);
+		list.add(uml);	
+
+		return list;
+	}	
 }

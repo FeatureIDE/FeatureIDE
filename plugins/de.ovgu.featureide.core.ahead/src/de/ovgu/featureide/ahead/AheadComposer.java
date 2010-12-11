@@ -94,4 +94,12 @@ public class AheadComposer implements IComposerExtensionClass {
 		}
 		return "";
 	}
+	
+	@Override
+	public ArrayList<String[]> getTemplates(){
+		ArrayList<String[]> list = new ArrayList<String[]>();
+		String[] jak = {"Jak File", "jak", "public #refines# class #classname# {\n\n}"};
+		list.add(jak);
+		return list;
+	}	
 }

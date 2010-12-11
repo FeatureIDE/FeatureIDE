@@ -51,4 +51,6 @@ public interface IComposerExtensionClass {
 	
 	void clean();
 	
+	ArrayList<String[]> getTemplates();
+	
 }

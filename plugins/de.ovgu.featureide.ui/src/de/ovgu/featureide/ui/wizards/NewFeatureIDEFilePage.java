@@ -18,9 +18,8 @@
  */
 package de.ovgu.featureide.ui.wizards;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
@@ -50,6 +49,7 @@ import org.eclipse.ui.part.FileEditorInput;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.builder.IComposerExtension;
 import de.ovgu.featureide.fm.core.Feature;
 
 
@@ -60,7 +60,7 @@ import de.ovgu.featureide.fm.core.Feature;
  */
 public class NewFeatureIDEFilePage extends WizardPage {
 
-	private List<String[]> formats = new LinkedList<String[]>();
+	private ArrayList<String[]> formats = new ArrayList<String[]>();
 
 	private ISelection selection;
 
@@ -172,7 +172,11 @@ public class NewFeatureIDEFilePage extends WizardPage {
 
 					// reload all formats for the changed Project
 					if(featureProject != null){
-						formats = featureProject.getTemplates();
+
+						IComposerExtension composer = featureProject.getComposer();
+						composer.initialize(featureProject);
+						formats = composer.getTemplates();
+
 						languageCombo.removeAll();
 						for (String[] format : formats)
 							languageCombo.add(format[0]);
@@ -268,7 +272,10 @@ public class NewFeatureIDEFilePage extends WizardPage {
 			text = featureComboProject.getText();
 
 			if(featureProject != null){
-				formats = featureProject.getTemplates();
+				
+				IComposerExtension composer = featureProject.getComposer();
+				composer.initialize(featureProject);
+				formats = composer.getTemplates();
 
 				for (String[] format : formats)
 					languageCombo.add(format[0]);
@@ -276,7 +283,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 				languageCombo.select(0);
 			}
 			
-			if(languageCombo.getText().equals("Jak")){
+			if(languageCombo.getText().equals("Jak File")){
 				refinesbox.setEnabled(true);
 				refineslabel.setEnabled(true);
 			}
@@ -341,7 +348,6 @@ public class NewFeatureIDEFilePage extends WizardPage {
 			updateStatus("Selected project is not a FeatureIDE Project");
 			return;
 		}
-
 
 		if (!isValidFormat(languageCombo.getText())) {
 			updateStatus("Selected file format is not supported");

@@ -18,8 +18,6 @@
  */
 package de.ovgu.featureide.core;
 
-import java.util.List;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -135,14 +133,6 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	 * @return The ID of the assigned composer or @code null if no composer has been assigned.
 	 */
 	public String getComposerID();
-	
-
-	/**
-	 * Returns all templates for the current composer as List of Arrays (Name, Extension, Template)
-	 * 
-	 * @return template for a given language
-	 */
-	public List<String[]> getTemplates();
 	
 	/**
 	 * Sets the ID of the assigned composer

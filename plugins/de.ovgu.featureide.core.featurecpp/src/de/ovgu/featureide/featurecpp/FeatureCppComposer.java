@@ -19,7 +19,6 @@
 package de.ovgu.featureide.featurecpp;
 
 import java.util.ArrayList;
-
 import org.eclipse.core.resources.IFile;
 
 import de.ovgu.featureide.core.IFeatureProject;
@@ -35,10 +34,10 @@ import de.ovgu.featureide.featurecpp.wrapper.FeatureCppWrapper;
 public class FeatureCppComposer implements IComposerExtensionClass {
 
 	public static final String COMPOSER_ID = "de.ovgu.featureide.composer.featurecpp";
-	
+
 	private final FeatureCppWrapper featureCpp = new FeatureCppWrapper(
-		(FeatureCppCorePlugin.getDefault().getBundle().getLocation() + "lib/fc++v0.7.exe")
-					.substring(16));
+			(FeatureCppCorePlugin.getDefault().getBundle().getLocation() + "lib/fc++v0.7.exe")
+			.substring(16));
 
 	public void clean() {
 	}
@@ -48,8 +47,8 @@ public class FeatureCppComposer implements IComposerExtensionClass {
 		featureCpp.initialize(project.getSourceFolder(), project
 				.getBuildFolder(), project.getBinFolder(),project.getProjectName());
 	}
-	
-	
+
+
 	public void performFullBuild(IFile equation) {
 		featureCpp.compose(equation);
 	}
@@ -67,4 +66,13 @@ public class FeatureCppComposer implements IComposerExtensionClass {
 			return "org.eclipse.cdt.ui.editor.CEditor";
 		return "";
 	}
+
+	@Override
+	public ArrayList<String[]> getTemplates(){
+		
+		ArrayList<String[]> list = new ArrayList<String[]>();
+		String[] c = {"Cpp Header File", "h", ""};
+		list.add(c);
+		return list;
+	}	
 }

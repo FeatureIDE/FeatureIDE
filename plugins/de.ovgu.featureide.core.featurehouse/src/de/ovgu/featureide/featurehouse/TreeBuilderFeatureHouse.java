@@ -87,7 +87,7 @@ public class TreeBuilderFeatureHouse {
 	public void createProjectTree(ArrayList<FSTNode> fstNodes) {
 		String language = getLanguage(fstNodes);
 		startNode = StartNode.determineStartNode(language);
-//		CorePlugin.getDefault().logInfo("start: " + startNode);
+		//		CorePlugin.getDefault().logInfo("start: " + startNode);
 
 		Iterator<FSTNode> iterator = fstNodes.iterator();
 		FSTNode node;
@@ -115,7 +115,7 @@ public class TreeBuilderFeatureHouse {
 
 				String name = node.getName();
 				name = name
-						.substring(name.lastIndexOf("\\") + 1, name.length());
+				.substring(name.lastIndexOf("\\") + 1, name.length());
 				ProjectTreeNode fileNode = insertProjectTreeNode("file", name,
 						projectTree.findNodeByName(featureName));
 
@@ -128,22 +128,26 @@ public class TreeBuilderFeatureHouse {
 	}
 
 	private String getLanguage(ArrayList<FSTNode> fstNodes) {
-		String language = fstNodes.get(0).getName();
-		if (language.equalsIgnoreCase(".java"))
-			return "java";
-		else if (language.equalsIgnoreCase(".cs"))
-			return "c#";
-		else if (language.equalsIgnoreCase(".hs"))
-			return "haskell";
-		else if (language.equalsIgnoreCase(".c"))
-			return "c";
-		else if (language.equalsIgnoreCase(".h"))
-			return "c";
-		else if (language.equalsIgnoreCase(".xml"))
-			return "xml";
-		else if (language.equalsIgnoreCase(".xmi"))
-			return "xml";
-		return null;
+		if (fstNodes.size() > 0){
+			String language = fstNodes.get(0).getName();
+			if (language.equalsIgnoreCase(".java"))
+				return "java";
+			else if (language.equalsIgnoreCase(".cs"))
+				return "c#";
+			else if (language.equalsIgnoreCase(".hs"))
+				return "haskell";
+			else if (language.equalsIgnoreCase(".c"))
+				return "c";
+			else if (language.equalsIgnoreCase(".h"))
+				return "c";
+			else if (language.equalsIgnoreCase(".xml"))
+				return "xml";
+			else if (language.equalsIgnoreCase(".xmi"))
+				return "xml";
+			return null;
+		}
+		else
+			return null;
 	}
 
 	/**

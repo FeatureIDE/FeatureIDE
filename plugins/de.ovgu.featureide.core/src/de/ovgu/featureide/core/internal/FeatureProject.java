@@ -22,9 +22,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
@@ -941,68 +938,7 @@ IFeatureProject, IResourceChangeListener {
 		}
 		return null;
 	}
-
-	public List<String[]> getTemplates(){
-
-		List<String[]> formats = new LinkedList<String[]>();
-
-		// define all supported languages (Name, Extension, Template)
-		String[] alloy = {"Alloy", "als", "module #classname#"};
-		String[] cs = {"C#", "cs", "public class #classname# {\n\n}"};
-		String[] haskell= {"Haskell File", "hs", "module #classname# where \n{\n\n}"};
-		String[] jak = {"Jak", "jak", "public #refines# class #classname# {\n\n}"};
-		String[] java = {"Java", "java", "public class #classname# {\n\n}"};
-		String[] javacc= {"JavaCC", "jj", "PARSER_BEGIN(#classname#) \n \n PARSER_END(#classname#)"};
-		String[] uml = {"UML File (xmi)", "xmi", "<?xml version = '1.0' encoding = 'UTF-8' ?> \n	<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML'>\n\n</XMI>"};
-
-		// Ahead Composer
-		if (getComposerID().equals("de.ovgu.featureide.composer.ahead")){
-			formats.add(jak);
-		}
-		// Other Composer
-		else{
-			formats.add(alloy);
-			formats.add(cs);
-			formats.add(haskell);
-			formats.add(java);
-			formats.add(javacc);
-			formats.add(uml);	
-		}
-		
-		return Collections.unmodifiableList(formats);
-		
-		/*
-		if (language.equals("alloy"))
-			return "module #classname#";
-
-		else if (language.equals("c"))
-			return "";
-
-		else if (language.equals("c#"))
-			return "public class #classname# {\n\n}";
-
-		else if (language.equals("haskell"))
-			return "module #classname# where \n{\n\n}";
-
-		else if (language.equals("jak"))
-			return "public #refines# class #classname# {\n\n}";
-
-		else if (language.equals("java"))
-			return "public class #classname# {\n\n}";
-
-		else if (language.equals("javacc"))
-			return "PARSER_BEGIN([classname]) \n \n PARSER_END([classname])";
-
-		else if (language.equals("uml"))
-			return "<?xml version = '1.0' encoding = 'UTF-8' ?> \n	<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML'>\n\n</XMI>";
-
-		else return "";	
-		*/
-		
-		
-		
-	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
