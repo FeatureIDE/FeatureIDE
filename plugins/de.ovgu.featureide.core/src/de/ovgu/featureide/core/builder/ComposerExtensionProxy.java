@@ -21,6 +21,7 @@ package de.ovgu.featureide.core.builder;
 import java.util.ArrayList;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 
@@ -141,6 +142,27 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	public String getEditorID(String extension) {
 		return composerExtensionClass.getEditorID(extension);
 	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#copyNotComposedFiles()
+	 */
+	public boolean copyNotComposedFiles() {
+		return composerExtensionClass.copyNotComposedFiles();
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#composerSpecficMove(org.eclipse.core.resources.IFolder, org.eclipse.core.runtime.IPath)
+	 */
+	public boolean composerSpecficMove(IFolder source, IFolder destination) {
+		return composerExtensionClass.composerSpecficMove(source, destination);
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#buildFSTModel()
+	 */
+	public void buildFSTModel() {
+		composerExtensionClass.buildFSTModel();
+	}
 	
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#getTemplates()
@@ -148,6 +170,5 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	public ArrayList<String[]> getTemplates(){
 			return composerExtensionClass.getTemplates();
 	}
-	
-	
+
 }

@@ -140,9 +140,10 @@ public class ClassEditPart extends AbstractGraphicalEditPart {
 			 if (fileName.contains("*"))
 				 return;
 			
-			 IFile file = null;
+			 IFile file = this.getClassModel().project.getBuildFolder().getFile(fileName);
 			 try {
-				 file = getBuildFile(fileName, this.getClassModel().project.getBuildFolder());
+				 if (!file.exists())
+					 file = getBuildFile(fileName, this.getClassModel().project.getBuildFolder());
 			 } catch (CoreException e) {
 				 UIPlugin.getDefault().logError(e);
 			 }

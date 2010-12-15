@@ -2,9 +2,9 @@
 	<featureModel>
 		<struct>
 			<alt abstract="true" mandatory="true" name="Gpl">
-				<and mandatory="true" name="MainGpl">
+				<and abstract="true" mandatory="true" name="MainGpl">
 					<alt abstract="true" mandatory="true" name="Test">
-						<and mandatory="true" name="StartHere">
+						<and abstract="true" mandatory="true" name="StartHere">
 							<feature mandatory="true" name="Base"/>
 							<feature name="Benchmark"/>
 							<feature name="Prog"/>
@@ -20,7 +20,7 @@
 						<feature mandatory="true" name="Undirected"/>
 					</alt>
 					<alt abstract="true" name="GraphTypeReal">
-						<and mandatory="true" name="DirType">
+						<and abstract="true" mandatory="true" name="DirType">
 							<feature mandatory="true" name="DirectedCommon"/>
 							<alt abstract="true" mandatory="true" name="Dir">
 								<feature mandatory="true" name="DirectedGR"/>
@@ -28,7 +28,7 @@
 								<feature mandatory="true" name="DirectedGenR"/>
 							</alt>
 						</and>
-						<and mandatory="true" name="UndirType">
+						<and abstract="true" mandatory="true" name="UndirType">
 							<feature mandatory="true" name="UndirectedCommon"/>
 							<alt abstract="true" mandatory="true" name="Undir">
 								<feature mandatory="true" name="UndirectedGR"/>
@@ -38,14 +38,14 @@
 						</and>
 					</alt>
 					<alt abstract="true" name="Weight">
-						<and mandatory="true" name="Wgt">
+						<and abstract="true" mandatory="true" name="Wgt">
 							<feature mandatory="true" name="Weighted"/>
 							<feature name="WeightedCommon"/>
 							<feature name="dProgdWeightedCommon"/>
 						</and>
 						<feature mandatory="true" name="UnWeighted"/>
 					</alt>
-					<alt abstract="true" mandatory="true" name="WeightReal">
+					<alt abstract="true" name="WeightReal">
 						<feature mandatory="true" name="WeightedGR"/>
 						<feature mandatory="true" name="WeightedGnR"/>
 						<feature mandatory="true" name="WeightedGenR"/>
@@ -56,30 +56,30 @@
 						<feature mandatory="true" name="BFS"/>
 					</alt>
 					<or abstract="true" name="Alg">
-						<and mandatory="true" name="Num">
+						<and abstract="true" mandatory="true" name="Num">
 							<feature mandatory="true" name="Number"/>
 							<feature name="dProgdNumber"/>
 						</and>
-						<and mandatory="true" name="Conn">
+						<and abstract="true" mandatory="true" name="Conn">
 							<feature mandatory="true" name="Connected"/>
 							<feature name="dProgdConnected"/>
 						</and>
-						<and mandatory="true" name="StrongC">
+						<and abstract="true" mandatory="true" name="StrongC">
 							<feature name="Transpose"/>
 							<feature mandatory="true" name="StronglyConnected"/>
 							<feature name="dProgdStronglyConnected"/>
 						</and>
-						<and mandatory="true" name="Cyc">
+						<and abstract="true" mandatory="true" name="Cyc">
 							<feature mandatory="true" name="Cycle"/>
 							<feature name="dProgdCycle"/>
 						</and>
-						<and mandatory="true" name="MPrim">
+						<and abstract="true" mandatory="true" name="MPrim">
 							<feature name="MSTPrimPrepGnR"/>
 							<feature name="MSTPrimPrepGR"/>
 							<feature mandatory="true" name="MSTPrim"/>
 							<feature name="dProgdMSTPrim"/>
 						</and>
-						<and mandatory="true" name="MKrus">
+						<and abstract="true" mandatory="true" name="MKrus">
 							<feature name="MSTKruskalPrepGnR"/>
 							<feature name="MSTKruskalPrepGR"/>
 							<feature mandatory="true" name="MSTKruskal"/>
@@ -379,4 +379,5 @@
 				</imp>
 			</rule>
 		</constraints>
+		<comments/>
 	</featureModel>

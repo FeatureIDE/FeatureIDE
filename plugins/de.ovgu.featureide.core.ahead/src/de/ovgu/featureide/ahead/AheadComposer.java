@@ -18,15 +18,23 @@
  */
 package de.ovgu.featureide.ahead;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.ahead.wrapper.AheadBuildErrorEvent;
 import de.ovgu.featureide.ahead.wrapper.AheadBuildErrorListener;
 import de.ovgu.featureide.ahead.wrapper.AheadWrapper;
+import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 
@@ -93,6 +101,77 @@ public class AheadComposer implements IComposerExtensionClass {
 			return "de.ovgu.featureide.ui.editors.JakEditor";
 		}
 		return "";
+	}
+
+	@Override
+	public boolean copyNotComposedFiles() {
+		return false;
+	}
+
+	/**
+	 *  Renames all java-files into jak-files and replaces "package" by "layer" 
+	 */
+	@Override
+	public boolean composerSpecficMove(IFolder source, IFolder destination) {
+		try {
+			for (IResource res : source.members()) {
+				if (res instanceof IFolder) {
+					performRenamings(source);
+				} else {
+					if (res instanceof IFile) {
+						IFile file = (IFile)res;
+						if (file.getName().endsWith(".java")) {
+							res.move(source.getFile(file.getName().replaceFirst(".java", ".jak")).getFullPath(), true, null);
+						}
+					}
+				}
+			}
+			
+		} catch (CoreException e) {
+			CorePlugin.getDefault().logError(e);
+		}
+		return false;
+	}
+
+	private void performRenamings(IFolder folder) throws CoreException {
+		for (IResource res : folder.members()) {
+			if (res instanceof IFolder) {
+				performRenamings((IFolder)res);
+			} else if (res instanceof IFile) {
+				IFile file = (IFile)res;
+				if (file.getName().endsWith(".java")) {
+					performRenamings(file);
+					res.move(folder.getFile(file.getName().replaceFirst(".java", ".jak")).getFullPath(), true, null);
+				}
+			}
+			
+		}
+	}
+	
+	private void performRenamings(IFile iFile) {
+		try {
+			File file = iFile.getRawLocation().toFile();
+			String fileText = "";
+			Scanner scanner = new Scanner(file);
+			while (scanner.hasNext()) {
+				fileText += scanner.nextLine() + "\r\n";
+			}
+			scanner.close();
+			
+			fileText = fileText.replaceFirst("package", "layer");
+			FileWriter fw = new FileWriter(file);
+			fw.write(fileText);
+			fw.close();	
+		} catch (FileNotFoundException e) {
+			AheadCorePlugin.getDefault().logError(e);
+		} catch (IOException e) {
+			AheadCorePlugin.getDefault().logError(e);
+		}
+	}
+
+	@Override
+	public void buildFSTModel() {
+		performFullBuild(null);
 	}
 	
 	@Override

@@ -18,22 +18,22 @@
  */
 package de.ovgu.featureide.ahead.model;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Scanner;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.ahead.AheadCorePlugin;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.IClass;
-import de.ovgu.featureide.core.fstmodel.IFeature;
 import de.ovgu.featureide.core.fstmodel.IFSTModel;
 import de.ovgu.featureide.core.fstmodel.IFSTModelElement;
+import de.ovgu.featureide.core.fstmodel.IFeature;
 
 
 /**
@@ -87,13 +87,20 @@ public class JakModel extends JakModelElement implements IFSTModel {
 			return null;
 		
 		ArrayList<IFeature>list = new ArrayList<IFeature>();
-		final IFile iFile = featureProject.getCurrentEquationFile();
-		File file = iFile.getRawLocation().toFile();
-		ArrayList<String> configurationFeatures = readFeaturesfromConfigurationFile(file);
-		if (configurationFeatures == null)
+		ArrayList<String> allFeatures = new ArrayList<String>();//(file);
+		try {
+			for (IResource res : featureProject.getSourceFolder().members()) {
+				if (res instanceof IFolder) {
+					allFeatures.add(res.getName());
+				}
+			}
+		} catch (CoreException e) {
+			AheadCorePlugin.getDefault().logError(e);
+		}
+		if (allFeatures.size() == 0)
 			return null;
 		IFeature[] features =  getFeatures();
-		for (String feature : configurationFeatures) {
+		for (String feature : allFeatures) {
 			for (IFeature iFeature : features) {
 				if (iFeature.getName().equals(feature)){
 					list.add(iFeature);
@@ -101,27 +108,6 @@ public class JakModel extends JakModelElement implements IFSTModel {
 			}
 		}
 		return list;	
-	}
-	
-	private ArrayList<String> readFeaturesfromConfigurationFile(File file) {
-		ArrayList<String> list;
-		Scanner scanner = null;
-
-		try {
-			scanner = new Scanner(file);
-		} catch (FileNotFoundException e) {
-			AheadCorePlugin.getDefault().logError(e);
-		}
-
-		if (scanner.hasNext()) {
-			list = new ArrayList<String>();
-			while (scanner.hasNext()) {
-				list.add(scanner.next());
-			}
-			return list;
-		} else {
-			return null;
-		}
 	}
 
 	/*

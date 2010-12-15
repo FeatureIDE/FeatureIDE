@@ -75,7 +75,6 @@ public class WaterlooWriter extends AbstractFeatureModelWriter {
 		try {
 		    db = dbf.newDocumentBuilder();
 		} catch (ParserConfigurationException pce) {
-		    System.err.println(pce);
 		    FMCorePlugin.getDefault().logError(pce);
 		}
 		Document doc = db.newDocument();
@@ -235,6 +234,7 @@ public class WaterlooWriter extends AbstractFeatureModelWriter {
 			}
 			result.append(" ");
 		}
+		scan.close();
     	return result.toString();
     }
     

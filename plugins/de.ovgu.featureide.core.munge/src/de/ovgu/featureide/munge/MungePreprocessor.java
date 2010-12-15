@@ -41,11 +41,10 @@ import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 public class MungePreprocessor implements IComposerExtensionClass{
 
 	private IFeatureProject featureProject = null;
-	
-	private ArrayList<String> args = new ArrayList<String>();
+
 	private LinkedList<String> selectedFeatures = new LinkedList<String>();
 	
-	private Boolean sourceFilesAdded;
+	private Configuration configuration;
 	
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#extensions()
@@ -89,7 +88,7 @@ public class MungePreprocessor implements IComposerExtensionClass{
 		//	–DFEATURE1 –DFEATURE2 ... File1.java File2.java ... outputDirectory
 		
 		// add symbol definitions
-		Configuration configuration = new Configuration(featureProject.getFeatureModel());
+		configuration = new Configuration(featureProject.getFeatureModel());
 		ConfigurationReader reader = new ConfigurationReader(configuration);
 		try {
 			reader.readFromFile(equation);
@@ -99,29 +98,82 @@ public class MungePreprocessor implements IComposerExtensionClass{
 			MungeCorePlugin.getDefault().logError(e);
 		}
 		
-		args = new ArrayList<String>();
 		for (Feature feature : configuration.getSelectedFeatures()) {
-			args.add("-D" + feature.getName());
 			selectedFeatures.add(feature.getName());
 		}
 		
 		//add source files
-		sourceFilesAdded = false;
 		try {
 			for (IResource res : featureProject.getSourceFolder().members()) {
 				if (res instanceof IFolder && selectedFeatures.contains(res.getName())) {
-					addSourceFiles((IFolder)res);
+					addDefaultSourceFiles((IFolder)res);
 				}
 			}
 		} catch (CoreException e) {
 			MungeCorePlugin.getDefault().logError(e);
 		}
-		if (!sourceFilesAdded)
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#clean()
+	 */
+	public void clean() {
+	}
+
+	private void addDefaultSourceFiles(IFolder sourceFolder) throws CoreException {
+		ArrayList<String> args = new ArrayList<String>();
+		for (Feature feature : configuration.getSelectedFeatures()) {
+			args.add("-D" + feature.getName());
+		}
+		
+		boolean filesAdded = false;
+		for (IResource res : sourceFolder.members()) {
+			if (res instanceof IFolder) {
+				addSourceFiles((IFolder)res, featureProject.getBuildFolder().getFolder(res.getName()));
+			} else if (res instanceof IFile){
+				if (res.getName().endsWith(".java")) {
+					args.add(res.getRawLocation().toOSString());
+					filesAdded = true;
+				}
+			}
+		}
+
+		if (!filesAdded)
 			return;
 		
 		//add output directory
 		args.add(featureProject.getBuildFolder().getRawLocation().toOSString());
+		runMunge(args);
+	}
+
+	private void addSourceFiles(IFolder sourceFolder, IFolder buildFolder) throws CoreException {
+		ArrayList<String> args = new ArrayList<String>();
+		for (Feature feature : configuration.getSelectedFeatures()) {
+			args.add("-D" + feature.getName());
+		}
+		createBuildFolder(buildFolder);
+		boolean filesAdded = false;
+		for (IResource res : sourceFolder.members()) {
+			if (res instanceof IFolder) {
+				addSourceFiles((IFolder)res, buildFolder.getFolder(res.getName()));
+			} else 
+			if (res instanceof IFile){
+				if (res.getName().endsWith(".java")) {
+					args.add(res.getRawLocation().toOSString());
+					filesAdded = true;
+				}
+			}
+		}
+
+		if (!filesAdded)
+			return;
 		
+		//add output directory
+		args.add(buildFolder.getRawLocation().toOSString());
+		runMunge(args);
+	}
+	
+	private void runMunge(ArrayList<String> args) {
 		//convert into an Array
 		String[] argArray = new String[args.size()];
 		for (int i = 0;i < args.size();i++) {
@@ -130,25 +182,32 @@ public class MungePreprocessor implements IComposerExtensionClass{
 		
 		//run Munge
 		Munge.main(argArray);
-		
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#clean()
-	 */
-	public void clean() {
-	}
-	
-	private void addSourceFiles(IFolder folder) throws CoreException {
-		for (IResource res : folder.members()) {
-			if (res instanceof IFolder) {
-				addSourceFiles((IFolder)res);
-			} else if (res instanceof IFile){
-				if (res.getName().endsWith(".java")) {
-					args.add(res.getRawLocation().toOSString());
-					sourceFilesAdded = true;
-				}
-			}
+	private void createBuildFolder(IFolder buildFolder) throws CoreException {
+		MungeCorePlugin.getDefault().logInfo(buildFolder.getRawLocation().toOSString());
+		if (!buildFolder.exists()) {
+			buildFolder.create(true, true, null);
 		}
+		buildFolder.refreshLocal(IResource.DEPTH_ZERO, null);
+	}
+
+	@Override
+	public boolean copyNotComposedFiles() {
+		return false;
+	}
+
+	@Override
+	public boolean composerSpecficMove(IFolder source, IFolder destination) {
+		return false;
+	}
+
+	@Override
+	public void buildFSTModel() {
+	}
+
+	@Override
+	public ArrayList<String[]> getTemplates() {
+		return null;
 	}
 }

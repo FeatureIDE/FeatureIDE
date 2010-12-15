@@ -26,15 +26,13 @@ import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.CorePlugin;
-import de.ovgu.featureide.core.builder.FeatureProjectNature;
 import de.ovgu.featureide.featurecpp.FeatureCppCorePlugin;
 
 /**
- * Composes FeatureC++ files. Compiles C++ Files.
+ * Composes FeatureC++ files.
  * 
  * @author Tom Brosch
  * @author Jens Meinicke
@@ -47,27 +45,15 @@ public class FeatureCppWrapper {
 
 	private String buildFolder = null;
 
-	private String binFolder = null;
-
-	private String projectName = "";
-
-	private IFolder binDirectory = null;
-
 	private IFolder buildDirectory = null;
 
 	public FeatureCppWrapper(String featureCppExecutablePath) {
 		this.featureCppExecutableName = featureCppExecutablePath;
 	}
 
-	public void initialize(IFolder source, IFolder build, IFolder bin,
-			String project) {
+	public void initialize(IFolder source, IFolder build) {
 		sourceFolder = source.getRawLocation().toOSString();
 		buildFolder = build.getRawLocation().toOSString();
-		if (bin != null && bin.exists()) {
-			binFolder = bin.getRawLocation().toOSString();
-			binDirectory = bin;
-		}
-		projectName = project;
 		buildDirectory = build;
 	}
 
@@ -76,15 +62,6 @@ public class FeatureCppWrapper {
 		String equationName = equation.getName();
 		if (equationName.contains(".")) {
 			equationName = equationName.substring(0, equationName.indexOf('.'));
-		}
-		if (binDirectory != null) {
-			IFolder folder = binDirectory.getFolder(equationName);
-			try {
-				if (!folder.exists())
-					folder.create(false, true, null);
-			} catch (CoreException e) {
-				CorePlugin.getDefault().logError(e);
-			}
 		}
 		IFolder folder2 = buildDirectory;
 		try {
@@ -101,13 +78,7 @@ public class FeatureCppWrapper {
 		command.add(equation.getRawLocation().toOSString());
 		try {
 			process(command);
-			//just compile if project has no other compiler
-			if (equation.getProject().getDescription().getNatureIds().length == 1
-					&& equation.getProject().hasNature(FeatureProjectNature.NATURE_ID))
-				compile(equation);
 		} catch (IOException e) {
-			FeatureCppCorePlugin.getDefault().logError(e);
-		} catch (CoreException e) {
 			FeatureCppCorePlugin.getDefault().logError(e);
 		}
 	}
@@ -142,52 +113,4 @@ public class FeatureCppWrapper {
 		}	
 	}
 
-	public void compile(IFile equation) throws IOException {
-		String equationName = equation.getName();
-		if (equationName.contains(".")) {
-			equationName = equationName.substring(0, equationName.indexOf('.'));
-		}
-
-		try {
-			buildDirectory.refreshLocal(IResource.DEPTH_INFINITE, null);
-		} catch (CoreException e) {
-			FeatureCppCorePlugin.getDefault().logError(e);
-		}
-
-		LinkedList<String> command2 = new LinkedList<String>();
-		command2.add("g++");
-		command2.add("-o" + binFolder + "\\"
-				+ projectName + "-" + equationName + ".exe");
-
-		try {
-			for (IResource res : buildDirectory
-					.members()) {
-				String fileName = res.getName();
-				if (fileName.endsWith(".cpp")) {
-					LinkedList<String> command = new LinkedList<String>();
-					command.add("g++");
-					command.add("-O3");
-					command.add("-Wall");
-					command.add("-c");
-					command.add("-fmessage-length=0");
-					String file = binFolder
-							+ "\\"
-							+ res.getName().substring(0,
-									res.getName().length() - 4) + ".o";
-					command.add("-o" + file);
-					command2.add(file);
-					command.add(res.getLocation().toOSString());
-					process(command);
-				}
-			}
-		} catch (CoreException e) {
-			FeatureCppCorePlugin.getDefault().logError(e);
-		}
-		process(command2);
-		try {
-			binDirectory.refreshLocal(IResource.DEPTH_INFINITE, null);
-		} catch (CoreException e) {
-			FeatureCppCorePlugin.getDefault().logError(e);
-		}
-	}
 }

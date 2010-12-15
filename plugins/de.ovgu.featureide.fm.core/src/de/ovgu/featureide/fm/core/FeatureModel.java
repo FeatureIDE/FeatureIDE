@@ -36,8 +36,12 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.ISafeRunnable;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.core.runtime.SafeRunner;
 import org.prop4j.And;
 import org.prop4j.Implies;
 import org.prop4j.Literal;
@@ -58,6 +62,8 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
  */
 public class FeatureModel implements PropertyConstants {
 
+	public static final String COMPOSER_KEY = "composer";
+	public static final QualifiedName composerConfigID = new QualifiedName("featureproject.configs", "composer");
 	public static final QualifiedName sourceFolderConfigID = new QualifiedName("featureproject.configs", "source");
 	public static final String SOURCE_ARGUMENT = "source";
 	public static final String DEFAULT_SOURCE_PATH = "src";
@@ -259,14 +265,50 @@ public class FeatureModel implements PropertyConstants {
 	
 	public void performRenamings(IFile file) {
 		IProject project = ((IResource) file.getAdapter(IFile.class)).getProject();
+		setComposerID(project);
 		sourceFolder = project.getFolder(getProjectConfigurationPath(project));
 		for (Renaming renaming : renamings) {
 			for (Node node : propNodes)
 				renameVariables(node, renaming.oldName, renaming.newName);
+			performComposerRenamings(renaming.oldName, renaming.newName, project);
 			moveFolder(renaming.oldName, renaming.newName);
 		}
 		renamings.clear();
 	}	
+	
+	public void performComposerRenamings(final String oldName, final String newName, final IProject project) {
+		if (composer == null)
+			return;
+
+		IConfigurationElement[] config = Platform.getExtensionRegistry()
+			.getConfigurationElementsFor(FMCorePlugin.PLUGIN_ID + ".RenameAction");
+		try {
+			for (IConfigurationElement e : config) {
+				if (e.getAttribute("composer").equals(composer)) {
+					final Object o = e.createExecutableExtension("class");
+					if (o instanceof IRenameAction) {
+						
+						ISafeRunnable runnable = new ISafeRunnable() {
+							@Override
+							public void handleException(Throwable e) {
+								FMCorePlugin.getDefault().logError(e);
+							}
+		
+							@Override
+							public void run() throws Exception {
+								((IRenameAction) o).performRenaming(oldName, newName, project);
+							}
+						};
+						SafeRunner.run(runnable);
+					}
+					break;
+				}
+			}
+		} catch (CoreException ex) {
+			FMCorePlugin.getDefault().logError(ex);
+		}
+		return;
+	}
 	
 	public void moveFolder(String oldName, String newName) {
 		try {
@@ -282,7 +324,7 @@ public class FeatureModel implements PropertyConstants {
 			FMCorePlugin.getDefault().logError(e);
 		}
 	}
-
+	
 	private void renameVariables(Node node, String oldName, String newName) {
 		if (node instanceof Literal) {
 			if (oldName.equals(((Literal) node).var))
@@ -355,7 +397,7 @@ public class FeatureModel implements PropertyConstants {
 	}
 
 	public Collection<String> getLayerNames() {
-		LinkedList<String> layerNames = new LinkedList<String>();
+		ArrayList<String> layerNames = new ArrayList<String>();
 		if (root == null)
 			return null;
 		for (Feature layer : getLayers()) {
@@ -762,6 +804,32 @@ public class FeatureModel implements PropertyConstants {
 			FMCorePlugin.getDefault().logError(e);
 		}
 		return null;
+	}
+	
+	private String composer;
+	
+	public void setComposerID(IProject project) {
+		try {
+			String id = project.getPersistentProperty(composerConfigID);
+			if (id != null) {
+				composer = id;
+				return;
+			}
+
+			for (ICommand command : project.getDescription().getBuildSpec()) {
+				if (command.getBuilderName().equals(BUILDER_ID)) {
+					id = (String) command.getArguments().get(COMPOSER_KEY);
+					if (id != null) {
+						composer = id;
+						return;
+					}
+				}
+			}
+
+		} catch (CoreException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+		composer = null;
 	}
 	
 }

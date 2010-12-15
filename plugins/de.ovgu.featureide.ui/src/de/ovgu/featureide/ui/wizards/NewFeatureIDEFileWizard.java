@@ -143,6 +143,7 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 		String contents = template;
 
 		// replace all template markers with data
+		//TODO Dariusz: reference to composer 
 		contents = contents.replace("#classname#", classname);
 		if (refines)
 			contents = contents.replace("#refines#", "refines");

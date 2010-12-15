@@ -20,6 +20,7 @@ package de.ovgu.featureide.featurecpp;
 
 import java.util.ArrayList;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
@@ -45,7 +46,7 @@ public class FeatureCppComposer implements IComposerExtensionClass {
 	public void initialize(IFeatureProject project) {
 		assert (project != null) : "Invalid project given";
 		featureCpp.initialize(project.getSourceFolder(), project
-				.getBuildFolder(), project.getBinFolder(),project.getProjectName());
+				.getBuildFolder());
 	}
 
 
@@ -68,11 +69,25 @@ public class FeatureCppComposer implements IComposerExtensionClass {
 	}
 
 	@Override
+	public boolean copyNotComposedFiles() {
+		return false;
+	}
+
+	@Override
+	public boolean composerSpecficMove(IFolder source, IFolder destination) {
+		return false;
+	}
+
+	@Override
+	public void buildFSTModel() {
+	}
+
+	@Override
 	public ArrayList<String[]> getTemplates(){
 		
 		ArrayList<String[]> list = new ArrayList<String[]>();
 		String[] c = {"Cpp Header File", "h", ""};
 		list.add(c);
 		return list;
-	}	
+	}
 }

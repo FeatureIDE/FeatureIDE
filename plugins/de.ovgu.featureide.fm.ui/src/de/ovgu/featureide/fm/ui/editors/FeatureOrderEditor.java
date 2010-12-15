@@ -377,24 +377,25 @@ public class FeatureOrderEditor extends EditorPart {
 	}
 
 	public ArrayList<String> readFeaturesfromConfigurationFile(File file) {
-		ArrayList<String> list;
-		Scanner scanner = null;
-
 		try {
-			scanner = new Scanner(file);
+			ArrayList<String> list;
+			Scanner scanner = new Scanner(file);
+			if (scanner.hasNext()) {
+				list = new ArrayList<String>();
+				while (scanner.hasNext()) {
+					list.add(featureModel.getNewName(scanner.next()));
+				}
+				scanner.close();
+				return list;
+			} else {
+				scanner.close();
+				return null;
+			}
 		} catch (FileNotFoundException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
-
-		if (scanner.hasNext()) {
-			list = new ArrayList<String>();
-			while (scanner.hasNext()) {
-				list.add(featureModel.getNewName(scanner.next()));
-			}
-			return list;
-		} else {
-			return null;
-		}
+		return null;
+		
 	}
 
 	public void writeFeaturestoConfigurationFile(File file,

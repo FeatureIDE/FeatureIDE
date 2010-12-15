@@ -142,8 +142,6 @@
 			<pathelement path="${build.result.folder}/../de.ovgu.featureide.fm.core_2.3.0.200906161918/lib/org.sat4j.core.jar"/>
 			<pathelement path="lib/jak2java.jar"/>
 			<pathelement path="${build.result.folder}/../de.ovgu.featureide.core.ahead_2.3.0.200906161918/lib/jak2java.jar"/>
-			<pathelement path="lib/tools.jar"/>
-			<pathelement path="${build.result.folder}/../de.ovgu.featureide.core.ahead_2.3.0.200906161918/lib/tools.jar"/>
 			<pathelement path="lib/mixin.jar"/>
 			<pathelement path="${build.result.folder}/../de.ovgu.featureide.core.ahead_2.3.0.200906161918/lib/mixin.jar"/>
 		</path>

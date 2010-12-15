@@ -185,7 +185,9 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 			CorePlugin.getDefault().logError(e);
 		}
 		try {
-			copy(equation);
+			if (!composerExtension.copyNotComposedFiles()) {
+				copy(equation);
+			}
 		} catch (CoreException e1) {
 			CorePlugin.getDefault().logError(e1);
 		}
@@ -204,16 +206,15 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 	
 	// copies all not composed Files of selected Features from src to bin and build
 	private void copy(IFile equation) throws CoreException{
-		String equationName = equation.getName().split("[.]")[0];
 		boolean binFolderExists = false;
 		if (featureProject.getBinFolder() != null)
-			binFolderExists = (featureProject.getBinFolder().getFolder(equationName).exists());
+			binFolderExists = (featureProject.getBinFolder().exists());
 		ArrayList<String > selectedFeatures = getSelectedFeatures(equation);
 		if (selectedFeatures != null)
 			for (String feature : selectedFeatures)
 				if (featureProject.getSourceFolder().getFolder(feature).exists())
 					for(IResource res : featureProject.getSourceFolder().getFolder(feature).members())
-						copyNotComposedFiles(equationName, res, binFolderExists);
+						copyNotComposedFiles(null, res, binFolderExists);
 	}
 	
 	private void copyNotComposedFiles(String folderName, IResource res, boolean binFolderExists) throws CoreException {
@@ -223,18 +224,34 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 				notComposed = false;
 		if (notComposed){
 			if (res instanceof IFile){
-				if (!featureProject.getBuildFolder().getFolder(folderName).getFile(res.getName()).exists())
-					res.copy(new Path (featureProject.getBuildFolder().getFolder(folderName).getFullPath().toString()+"/"+res.getName()), true, null);
-				if (binFolderExists)
+				if (folderName == null) {
+					if (!featureProject.getBuildFolder().getFile(res.getName()).exists())
+						res.copy(new Path (featureProject.getBuildFolder().getFullPath().toString()+"/"+res.getName()), true, null);
+					if (binFolderExists)
+						if (!featureProject.getBuildFolder().getFile(res.getName()).exists())
+							res.copy(new Path (featureProject.getBinFolder().getFullPath().toString()+"/"+res.getName()), true, null);
+				} else {
 					if (!featureProject.getBuildFolder().getFolder(folderName).getFile(res.getName()).exists())
-						res.copy(new Path (featureProject.getBinFolder().getFolder(folderName).getFullPath().toString()+"/"+res.getName()), true, null);
+						res.copy(new Path (featureProject.getBuildFolder().getFolder(folderName).getFullPath().toString()+"/"+res.getName()), true, null);
+					if (binFolderExists)
+						if (!featureProject.getBuildFolder().getFolder(folderName).getFile(res.getName()).exists())
+							res.copy(new Path (featureProject.getBinFolder().getFolder(folderName).getFullPath().toString()+"/"+res.getName()), true, null);
+				}
 			}
 			if (res instanceof IFolder){
-				createFolder(featureProject.getBuildFolder().getName()+"/"+folderName+"/"+res.getName());
-				if (binFolderExists)
-					createFolder(featureProject.getBinFolder().getName()+"/"+folderName+"/"+res.getName());
-				for (IResource res2 : ((IFolder) res).members())
-					copyNotComposedFiles(folderName+"/"+res.getName(), res2, binFolderExists);
+				if (folderName == null) {
+					createFolder(featureProject.getBuildFolder().getName()+"/"+res.getName());
+					if (binFolderExists)
+						createFolder(featureProject.getBinFolder().getName()+"/"+res.getName());
+					for (IResource res2 : ((IFolder) res).members())
+						copyNotComposedFiles(res.getName(), res2, binFolderExists);
+				} else {
+					createFolder(featureProject.getBuildFolder().getName()+"/"+folderName+"/"+res.getName());
+					if (binFolderExists)
+						createFolder(featureProject.getBinFolder().getName()+"/"+folderName+"/"+res.getName());
+					for (IResource res2 : ((IFolder) res).members())
+						copyNotComposedFiles(folderName+"/"+res.getName(), res2, binFolderExists);
+				}
 			}
 		}
 		
@@ -256,8 +273,10 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 			while (scanner.hasNext()) {
 				list.add(scanner.next());
 			}
+			scanner.close();
 			return list;
 		} else {
+			scanner.close();
 			return null;
 		}
 	}

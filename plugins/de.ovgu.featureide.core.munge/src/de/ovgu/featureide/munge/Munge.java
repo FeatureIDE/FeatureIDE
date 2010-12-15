@@ -157,13 +157,13 @@ public class Munge {
     }
 
     public void error(String text) {
-	System.err.println("File " + inName + " line " + line + ": " + text);
+	MungeCorePlugin.getDefault().logWarning("File " + inName + " line " + line + ": " + text);
 	errors++;
     }
 
     public void printErrorCount() {
 	if (errors > 0) {
-	    System.err.println(Integer.toString(errors) + 
+		MungeCorePlugin.getDefault().logWarning(Integer.toString(errors) + 
 		(errors > 1 ? " errors" : " error"));
 	}
     }
@@ -180,7 +180,7 @@ public class Munge {
             try {
                 in = new BufferedReader( new FileReader(inName) );
             } catch (FileNotFoundException fnf) {
-                System.err.println("Cannot find input file " + inName);
+            	MungeCorePlugin.getDefault().logWarning("Cannot find input file " + inName);
                 errors++;
                 return;
             }
@@ -192,7 +192,7 @@ public class Munge {
             try {
                 out = new PrintWriter( new FileWriter(outName) );
             } catch (IOException ioe) {
-                System.err.println("Cannot write to file " + outName);
+            	MungeCorePlugin.getDefault().logError("Cannot write to file " + outName, ioe);
                 errors++;
             }
         }
@@ -400,7 +400,7 @@ public class Munge {
      * Report how this utility is used and exit.
      */
     public static void usage() {
-	System.err.println("usage:" +
+    	MungeCorePlugin.getDefault().logWarning("usage:" +
                            "\n    java Munge [-D<symbol> ...] " +
                            "[-s <old>=<new> ...] " + 
 	                   "[<in file>] [<out file>]" +
@@ -411,7 +411,7 @@ public class Munge {
 //	System.exit(1);
     }
     public static void usage(String msg) {
-        System.err.println(msg);
+    	MungeCorePlugin.getDefault().logWarning(msg);
         usage();
     }
 
@@ -419,7 +419,6 @@ public class Munge {
      * Munge's main entry point.
      */
     public static void main(String[] args) {
-    	MungeCorePlugin.getDefault().logInfo("munge");
 	// Use a dummy object as the hash entry value.
 	Object obj = new Object();
 
@@ -427,7 +426,7 @@ public class Munge {
         try {
             args = CommandLine.parse( args );
         } catch( IOException e ) {
-            usage("Unable to read @file argument.");
+        	MungeCorePlugin.getDefault().logError("Unable to read @file argument.", e);
         }
         
 	// Load symbol definitions
@@ -506,12 +505,12 @@ public class Munge {
                 munge.process();
                 munge.close();
             } catch (IOException e) {
-                munge.error(e.toString());
+            	MungeCorePlugin.getDefault().logError(e);
             }
 
             if (munge.hasErrors()) {
                 munge.printErrorCount();
-                System.exit(munge.errors);
+//                System.exit(munge.errors);
             }
         }
         

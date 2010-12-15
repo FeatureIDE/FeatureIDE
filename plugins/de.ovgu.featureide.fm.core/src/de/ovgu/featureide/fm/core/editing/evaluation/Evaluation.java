@@ -54,7 +54,7 @@ public class Evaluation {
 	static int count = 100;
 
 	public static void evaluate(IProject project) {
-		System.err.println("Evaluation.evaluate(" + project + ")");
+		FMCorePlugin.getDefault().logInfo("Evaluation.evaluate(" + project + ")");
 		try {
 			long start = System.nanoTime();
 //			File outFile = new File(project.getLocation().toOSString() + "\\generation " + id + " " + new Date().toString().replace(':', '.') + ".txt");

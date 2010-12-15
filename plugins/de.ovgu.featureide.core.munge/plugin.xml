@@ -11,5 +11,14 @@
             nature="FeatureIDE_Core.mungeNature">
       </composer>
    </extension>
+   <extension
+         point="de.ovgu.featureide.fm.core.RenameAction">
+      <renameAction
+            class="de.ovgu.featureide.munge.MungeRenameAction"
+            composer="de.ovgu.featureide.preprocessor.munge"
+            id="de.ovgu.featureide.core.munge.renameAction1"
+            name="MungRenameAction">
+      </renameAction>
+   </extension>
 
 </plugin>

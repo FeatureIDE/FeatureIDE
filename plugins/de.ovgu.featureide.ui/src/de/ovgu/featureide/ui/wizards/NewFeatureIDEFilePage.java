@@ -198,6 +198,8 @@ public class NewFeatureIDEFilePage extends WizardPage {
 		languageCombo.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 				
+				//TODO Dariusz: reference to composer
+				//     FeatureC++ has also "refines"
 				if(languageCombo.getText().equals("Jak")){
 					refinesbox.setEnabled(true);
 					refineslabel.setEnabled(true);
@@ -283,6 +285,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 				languageCombo.select(0);
 			}
 			
+			//TODO Dariusz: reference to composer
 			if(languageCombo.getText().equals("Jak File")){
 				refinesbox.setEnabled(true);
 				refineslabel.setEnabled(true);
@@ -309,6 +312,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 				if (featureComboContainer.getItem(i).equals(resource.getName()))
 					featureComboContainer.select(i);
 			container = sourcefolder.getFolder(featureComboContainer.getText());
+		//TODO Dariusz: reference to composer
 		} else if (resource.toString().endsWith(".jak")) {
 			String name = resource.getName();
 			int index = name.indexOf(".");
@@ -331,7 +335,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 	}
 
 	public void dialogChanged() {
-		
+		//TODO Dariusz: refinesbox must be checked
 		if (featureComboProject.getText().length() == 0 && !projectbool) {
 			setErrorMessage(null);
 			setPageComplete(false);

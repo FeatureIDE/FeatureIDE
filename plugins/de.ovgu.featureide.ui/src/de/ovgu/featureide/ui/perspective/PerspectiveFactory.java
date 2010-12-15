@@ -52,9 +52,6 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 		layout.addNewWizardShortcut("de.ovgu.featureide.ui.ahead.wizards.NewJakFileWizard");
 		layout.addNewWizardShortcut("org.eclipse.ui.wizards.new.file");
 		
-		// layout.addView(IPageLayout.ID_OUTLINE, IPageLayout.RIGHT, 0.25f,
-		// editorArea);
-
 		IFolderLayout left = layout.createFolder("left", IPageLayout.LEFT,
 				(float) 0.23, editorArea);
 		IFolderLayout down = layout.createFolder("down", IPageLayout.BOTTOM,
@@ -70,18 +67,11 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 		right.addView(IPageLayout.ID_OUTLINE);
 
 		left.addView("org.eclipse.jdt.ui.PackageExplorer");
-		// left.addView(IPageLayout.ID_RES_NAV);
 
 		layout.addShowViewShortcut(FeatureModelEditView.ID);
 		layout.addShowViewShortcut(CollaborationView.ID);
 		layout.addShowViewShortcut(IPageLayout.ID_RES_NAV);
-		// layout.addShowViewShortcut(IPageLayout.ID_PROJECT_EXPLORER);
 		layout.addShowViewShortcut(IPageLayout.ID_OUTLINE);
-		layout.addShowViewShortcut(IPageLayout.ID_TASK_LIST);
-		
-		//layout.addActionSet(UIPlugin.PLUGIN_ID + ".NewFiles");
-		layout.addActionSet("org.eclipse.debug.ui.launchActionSet");
-		//layout.addActionSet(StartJakFileWizard.ID);
-		
+		layout.addShowViewShortcut(IPageLayout.ID_TASK_LIST);		
 	}
 }

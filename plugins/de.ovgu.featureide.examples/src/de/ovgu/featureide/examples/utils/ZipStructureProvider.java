@@ -32,6 +32,8 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ui.wizards.datatransfer.IImportStructureProvider;
 
+import de.ovgu.featureide.examples.ExamplePlugin;
+
 /**
  * This class provides information regarding the context structure and content
  * of specified zip file entry objects.
@@ -127,7 +129,7 @@ public class ZipStructureProvider implements IImportStructureProvider  {
 		try {
 			return zipFile.getInputStream((ZipEntry) element);
 		} catch (IOException e) {
-			System.err.println(e.getStackTrace());
+			ExamplePlugin.getDefault().logError(e);
 			return null;
 		}
 	}
@@ -200,7 +202,7 @@ public class ZipStructureProvider implements IImportStructureProvider  {
 		try {
 			getZipFile().close();
 		} catch (IOException e) {
-			System.err.println("Could not Close Archieve: " + e.getStackTrace());
+			ExamplePlugin.getDefault().logError("Could not Close Archieve: ",e);
 			return false;
 		}
 		return true;

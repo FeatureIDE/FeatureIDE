@@ -1,0 +1,18 @@
+
+// *************************************************************************
+
+public class Edge extends Neighbor implements EdgeIfc {
+    public  Vertex start;
+
+    public Edge( Vertex the_start,  Vertex the_end, int the_weight )
+      {
+        neighbor = the_end;
+        setWeight( the_weight );
+        start = the_start;
+    } // Edge constructor
+
+    public Vertex getStart( )
+    {
+        return start;
+    }
+}

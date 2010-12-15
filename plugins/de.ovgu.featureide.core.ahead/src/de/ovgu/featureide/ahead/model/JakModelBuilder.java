@@ -33,8 +33,10 @@ import mixin.MethodDcl;
 import mixin.MthDector;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 
 import de.ovgu.featureide.ahead.AheadCorePlugin;
+import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.IFSTModel;
 import de.ovgu.featureide.core.fstmodel.IField;
@@ -277,12 +279,20 @@ public class JakModelBuilder {
 		return fields;
 	}
 	
+	private IFolder sourceFolder;
 	private Feature getFeature(Class currentClass, IFile currentFile){
-		String featureName = currentFile.getFullPath().segment(currentFile.getFullPath().segmentCount()-2);
+		sourceFolder = CorePlugin.getFeatureProject(currentFile).getSourceFolder();
+		String featureName = getFeature((IFolder)currentFile.getParent());
 		Feature f = new Feature(featureName);
 		f.classes.put(currentClass.getName(), currentClass);
 		f.classes.get(currentClass.getName()).setJakfile(currentFile);
 		return f;
+	}
+	
+	private String getFeature(IFolder folder) {
+		if (((IFolder)folder.getParent()).equals(sourceFolder))
+			return folder.getName();
+		return getFeature((IFolder)folder.getParent());
 	}
 
 	public void clearFeatures() {

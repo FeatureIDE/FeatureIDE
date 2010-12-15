@@ -126,23 +126,23 @@ public class NewFeatureProjectPage extends WizardPage {
 		pathGroup.setLayoutData(gd);
 		pathGroup.setLayout(layout);
 		
-		String tooltip = "Sets the path of featurefolders.";
+		String tooltip = "Sets the path of composed files.";
 		label = new Label(pathGroup, SWT.NULL);
 		label.setText("&Source Path:");
 		label.setToolTipText(tooltip);
-		sourcePath = new Text(pathGroup, SWT.BORDER | SWT.SINGLE);
-		sourcePath.setLayoutData(gd);
-		sourcePath.setText("src");
-		sourcePath.setToolTipText(tooltip);
-		
-		tooltip = "Sets the path of composed files.";
-		label = new Label(pathGroup, SWT.NULL);
-		label.setText("&Build Path:");
-		label.setToolTipText(tooltip);
 		buildPath = new Text(pathGroup, SWT.BORDER | SWT.SINGLE);
 		buildPath.setLayoutData(gd);
-		buildPath.setText("build");
+		buildPath.setText("src");
 		buildPath.setToolTipText(tooltip);
+		
+		tooltip = "Sets the path of featurefolders.";
+		label = new Label(pathGroup, SWT.NULL);
+		label.setText("&Feature Path:");
+		label.setToolTipText(tooltip);
+		sourcePath = new Text(pathGroup, SWT.BORDER | SWT.SINGLE);
+		sourcePath.setLayoutData(gd);
+		sourcePath.setText("feature");
+		sourcePath.setToolTipText(tooltip);
 		
 		tooltip = "Sets the path of equationfiles.";
 		label = new Label(pathGroup, SWT.NULL);

@@ -18,11 +18,13 @@
  */
 package de.ovgu.featureide.core;
 
+import java.io.FileWriter;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
@@ -31,10 +33,13 @@ import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.SafeRunner;
 import org.osgi.framework.BundleContext;
 
 import de.ovgu.featureide.core.builder.FeatureProjectNature;
+import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.internal.FeatureProject;
 import de.ovgu.featureide.core.internal.ProjectChangeListener;
 import de.ovgu.featureide.core.listeners.ICurrentBuildListener;
@@ -225,19 +230,50 @@ public class CorePlugin extends AbstractCorePlugin {
 			listener.featureFolderChanged(folder);
 	}
 
-	public static void setupFeatureProject(IProject project, String compositionToolID,
-			String sourcePath,String equationPath, String buildPath, String backupPath) {
+	public static void setupProject(final IProject project, String compositionToolID,
+			final String sourcePath,final String equationPath, final String buildPath) {
 		setupFeatureProject(project, compositionToolID, sourcePath, equationPath, buildPath);
-		//createFolder(project, backupPath);
+		//move old source files into feature "Base"
+		IConfigurationElement[] config = Platform.getExtensionRegistry()
+			.getConfigurationElementsFor(PLUGIN_ID + ".composers");
 		try {
-			//for (IResource res : project.getFolder(buildPath).members()) {
-				//copy old source files into feature "Base"
-			
-			project.getFolder(buildPath).copy(project.getFolder(sourcePath).getFolder("Base").getFullPath(), true, null);
-			//move old source files into the backup folder
-			project.getFolder(buildPath).move(project.getFolder(backupPath).getFullPath(), true, null);
-		} catch (CoreException e) {
-			CorePlugin.getDefault().logError(e);
+			for (IConfigurationElement e : config) {
+				if (e.getAttribute("id").equals(compositionToolID)) {
+					final Object o = e.createExecutableExtension("class");
+					if (o instanceof IComposerExtensionClass) {
+						
+						ISafeRunnable runnable = new ISafeRunnable() {
+							public void handleException(Throwable e) {
+								getDefault().logError(e);
+							}
+
+							public void run() throws Exception {
+								project.getFolder(buildPath).deleteMarkers(null, true, IResource.DEPTH_INFINITE);
+								if (!((IComposerExtensionClass) o).composerSpecficMove(project.getFolder(buildPath), project.getFolder(sourcePath).getFolder("Base"))) {
+									if (project.getFolder(sourcePath).getFolder("Base").exists()) {
+										for (IResource res : project.getFolder(buildPath).members()) {
+											res.move(project.getFolder(sourcePath).getFolder("Base").getFile(res.getName()).getFullPath(), true, null);
+										}
+									} else {
+										project.getFolder(buildPath).move(project.getFolder(sourcePath).getFolder("Base").getFullPath(), true, null);
+									}
+								}
+								//create a configuration to automaticly build the project after adding the FeatureIDE nature 
+								IFile equationFile = project.getFolder(equationPath).getFile(project.getName().split("[-]")[0] + ".equation");
+								FileWriter fw = new FileWriter(equationFile.getRawLocation().toFile());
+								fw.write("Base");
+								fw.close();
+								equationFile.create(null, true, null);
+
+							}
+						};
+						SafeRunner.run(runnable);
+					}
+					break;
+				}
+			}
+		} catch (CoreException ex) {
+			getDefault().logError(ex);
 		}
 		
 	}

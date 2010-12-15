@@ -35,8 +35,6 @@ public class FeatureOrderReader {
 
 	private File file;
 	
-	private	Scanner scanner = null;
-	
 	public FeatureOrderReader(File file){
 		
 		this.file = new File(file.toString()+System.getProperty("file.separator")+".order");
@@ -49,14 +47,15 @@ public class FeatureOrderReader {
 	public ArrayList<String> featureOrderRead(){	
 		ArrayList<String> list = new ArrayList<String>();
 		try {
-			scanner = new Scanner(file);
+			Scanner scanner = new Scanner(file);
+			while(scanner.hasNext()){
+				list.add(scanner.next());
+			}
+			scanner.close();
 		} catch (FileNotFoundException e) {
 			FMCorePlugin.getDefault().logInfo("Can not read .order file");		
 		}
-		while(scanner.hasNext()){
-			
-			list.add(scanner.next());
-		}
+		
 		
 		return list;
 	}

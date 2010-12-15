@@ -111,39 +111,7 @@
             </objectClass>
          </enablement>
       </decorator>
-   </extension>
-   <extension
-         point="org.eclipse.debug.ui.launchConfigurationTypeImages">
-      <launchConfigurationTypeImage
-            configTypeID="de.ovgu.featureide.core.launching.layeredApplication"
-            icon="icons/FeatureIconSmall.ico"
-            id="de.ovgu.featureide.ui.launching.layeredApplicationConfigurationTypeImage"/>
-   </extension>
-   <extension
-         point="org.eclipse.debug.ui.launchConfigurationTabGroups">
-      <launchConfigurationTabGroup
-            class="de.ovgu.featureide.ui.launching.LayeredApplicationConfigurationTabGroup"
-            description="Run a feature-oriented application"
-            id="de.ovgu.featureide.ui.launching.layeredApplicationTabGroup"
-            type="de.ovgu.featureide.core.launching.layeredApplication"/>
-   </extension>
-   <extension
-         point="org.eclipse.debug.ui.launchShortcuts">
-      <shortcut
-            class="de.ovgu.featureide.ui.launching.LayeredApplicationShortcut"
-            icon="icons/FeatureIconSmall.ico"
-            id="de.ovgu.featureide.ui.launching.LayeredApplicationShortcut"
-            label="Layered Application"
-            modes="run">
-         <contextualLaunch>
-            <contextLabel
-                  label="FeatureIDE Project"
-                  mode="run">
-            </contextLabel>
-            <enablement></enablement></contextualLaunch>
-    </shortcut>
-   </extension>
-  
+   </extension>  
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
       <perspectiveExtension targetID="org.eclipse.ui.resourcePerspective">

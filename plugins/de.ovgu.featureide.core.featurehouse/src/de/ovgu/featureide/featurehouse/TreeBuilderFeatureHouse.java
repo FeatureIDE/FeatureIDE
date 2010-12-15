@@ -121,33 +121,34 @@ public class TreeBuilderFeatureHouse {
 
 				LeafTree leafTree = createLeafTree(iterator, fileNode);
 				projectTree.insertLeafTreeNode(leafTree, fileNode);
-				leafTree.setIdentifier(fileNode.getIdentifier());
+				if (fileNode != null && leafTree != null) {
+					leafTree.setIdentifier(fileNode.getIdentifier());
+				}
 			}
 		}
 		projectTree.print();
 	}
 
 	private String getLanguage(ArrayList<FSTNode> fstNodes) {
-		if (fstNodes.size() > 0){
-			String language = fstNodes.get(0).getName();
-			if (language.equalsIgnoreCase(".java"))
-				return "java";
-			else if (language.equalsIgnoreCase(".cs"))
-				return "c#";
-			else if (language.equalsIgnoreCase(".hs"))
-				return "haskell";
-			else if (language.equalsIgnoreCase(".c"))
-				return "c";
-			else if (language.equalsIgnoreCase(".h"))
-				return "c";
-			else if (language.equalsIgnoreCase(".xml"))
-				return "xml";
-			else if (language.equalsIgnoreCase(".xmi"))
-				return "xml";
+		if (fstNodes == null || fstNodes.size() == 0)
 			return null;
-		}
-		else
-			return null;
+		
+		String language = fstNodes.get(0).getName();
+		if (language.equalsIgnoreCase(".java"))
+			return "java";
+		else if (language.equalsIgnoreCase(".cs"))
+			return "c#";
+		else if (language.equalsIgnoreCase(".hs"))
+			return "haskell";
+		else if (language.equalsIgnoreCase(".c"))
+			return "c";
+		else if (language.equalsIgnoreCase(".h"))
+			return "c";
+		else if (language.equalsIgnoreCase(".xml"))
+			return "xml";
+		else if (language.equalsIgnoreCase(".xmi"))
+			return "xml";
+		return null;
 	}
 
 	/**

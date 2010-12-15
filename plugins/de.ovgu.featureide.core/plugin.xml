@@ -2,18 +2,6 @@
 <?eclipse version="3.2"?>
 <plugin>
    <extension-point id="composers" name="Composers" schema="schema/composers.exsd"/>
-
-   <extension
-         id="featureIDE.launchConfiguration"
-         name="FeatureIDE Launch Configurations"
-         point="org.eclipse.debug.core.launchConfigurationTypes">
-      <launchConfigurationType
-            delegate="de.ovgu.featureide.core.launching.LayeredApplicationLaunchConfigurationDelegate"
-            id="de.ovgu.featureide.core.launching.layeredApplication"
-            modes="run"
-            name="Layered Application"/>
-   </extension>
-
    <extension
          id="builderProblemMarker"
          name="Builder Problem Marker"

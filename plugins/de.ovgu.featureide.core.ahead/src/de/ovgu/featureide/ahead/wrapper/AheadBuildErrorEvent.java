@@ -109,7 +109,6 @@ public class AheadBuildErrorEvent {
 	private static Pattern jakPattern = Pattern.compile("SoUrCe[^\"]+\"([^\"]+)\";");
 	
 	private void calculateJakLine() throws CoreException, IOException {
-		AheadCorePlugin.getDefault().logInfo("Calculate jak source line for file " + file);
 		IFile composedJakFile = (IFile) this.file;
 		int composedJakLine = this.line;
 		
@@ -126,7 +125,6 @@ public class AheadBuildErrorEvent {
 				break;
 			line = newLine;
 			filename = matcher.group(1);
-			AheadCorePlugin.getDefault().logInfo(filename);
 		}
 		
 		if (filename == null) {
@@ -134,7 +132,6 @@ public class AheadBuildErrorEvent {
 		}
 		else {
 			IFile jakFile = getJakFile(filename);
-			AheadCorePlugin.getDefault().logInfo(jakFile.getFullPath().toOSString());
 			int jakLine = composedJakLine - line + 1;
 			jakLine += numberOfImportLines(jakFile);
 			jakLine += lineNumberOfLayerDeclaration(jakFile);
@@ -145,7 +142,6 @@ public class AheadBuildErrorEvent {
 	}
 
 	private void lookupImportInAllJakFiles(String composedJakContent, Matcher matcher) throws CoreException, IOException {
-		AheadCorePlugin.getDefault().logInfo("Looking for source of error on import for file " + file);
 		int a = 0;
 		int b = 0;
 		for (int i = 0; i < line; i++) {
@@ -175,10 +171,7 @@ public class AheadBuildErrorEvent {
 	private IFile getJakFile(String filename) {
 		String relativeFilename = filename;
 		IProject project = file.getProject();
-		relativeFilename = relativeFilename.substring(relativeFilename
-				.indexOf(project.getName())
-				+ project.getName().length() + 1);
-		IFile newFile = project.getFile(relativeFilename);
+		IFile newFile = project.getFile(relativeFilename.substring(2));
 		if (newFile.exists())
 			return newFile;
 		

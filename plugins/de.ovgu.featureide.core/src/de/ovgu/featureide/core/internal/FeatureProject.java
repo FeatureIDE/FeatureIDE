@@ -278,11 +278,7 @@ IFeatureProject, IResourceChangeListener {
 				}
 			}
 		// setting Problem markers on feature folders
-		try {
-			setAllFeatureModuleMarkers(featureModel, sourceFolder);
-		} catch (CoreException e) {
-			CorePlugin.getDefault().logError(e);
-		}
+		setAllFeatureModuleMarkers(featureModel, sourceFolder);
 	}
 
 	private void addModelListener() {
@@ -345,10 +341,14 @@ IFeatureProject, IResourceChangeListener {
 	 * @see de.ovgu.featureide.core.IFeatureProject#getCurrentEquationFile()
 	 */
 	public IFile getCurrentEquationFile() {
-
+		if (getEquationFolder() == null)
+			return null;
+		
 		String equation = null;
 		try {
-			equation = project.getPersistentProperty(equationConfigID);
+			if (project.exists()) {
+				equation = project.getPersistentProperty(equationConfigID);
+			}
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
@@ -361,6 +361,9 @@ IFeatureProject, IResourceChangeListener {
 
 		// No valid equation found
 		IFile equationFile = null;
+		if (!getEquationFolder().exists()) {
+			return null;
+		}
 		try {
 			for (IResource resource : getEquationFolder().members()) {
 				if (resource instanceof IFile
@@ -401,9 +404,9 @@ IFeatureProject, IResourceChangeListener {
 	 */
 	public void setCurrentEquationFile(IFile file) {
 		int offset = getEquationFolder().getProjectRelativePath().toString()
-		.length();
+			.length();
 		String equationPath = file.getProjectRelativePath().toString()
-		.substring(offset);
+			.substring(offset);
 		try {
 			project.setPersistentProperty(equationConfigID, equationPath);
 			CorePlugin.getDefault().fireCurrentEquationChanged(this);
@@ -633,24 +636,24 @@ IFeatureProject, IResourceChangeListener {
 	 * @throws CoreException
 	 */
 	private void setAllFeatureModuleMarkers(final FeatureModel featureModel,
-			final IFolder sourceFolder) throws CoreException {
-		// TODO throws CoreException?
+			final IFolder sourceFolder) {
 		Job job = new Job("Synchronize feature model and feature modules") {
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
 					// prevent warnings, if the user has just created a project
 					// without any source files
 					if (allFeatureModulesEmpty(sourceFolder)) {
-						System.out.println("allempty");
 						sourceFolder.deleteMarkers(
 								"de.ovgu.featureide.core.featureModuleMarker",
 								true, IResource.DEPTH_ONE);
 						return Status.OK_STATUS;
 					}
 					// set marker for each folder
-					for (IResource res : sourceFolder.members()) {
-						if (res instanceof IFolder)
-							setFeatureModuleMarker(featureModel, (IFolder) res);
+					if (sourceFolder.exists()) {
+						for (IResource res : sourceFolder.members()) {
+							if (res instanceof IFolder)
+								setFeatureModuleMarker(featureModel, (IFolder) res);
+						}
 					}
 				} catch (CoreException e) {
 					CorePlugin.getDefault().logError(e);
@@ -698,7 +701,7 @@ IFeatureProject, IResourceChangeListener {
 		}
 		if (message != null) {
 			IMarker marker = folder
-			.createMarker("de.ovgu.featureide.core.featureModuleMarker");
+				.createMarker("de.ovgu.featureide.core.featureModuleMarker");
 			marker.setAttribute("message", message);
 			marker.setAttribute("severity", IMarker.SEVERITY_WARNING);
 		}
@@ -706,6 +709,9 @@ IFeatureProject, IResourceChangeListener {
 
 	protected boolean allFeatureModulesEmpty(IFolder sourceFolder)
 	throws CoreException {
+		if (!sourceFolder.exists()) {
+			return false;
+		}
 		for (IResource res : sourceFolder.members())
 			if (res instanceof IFolder && ((IFolder) res).members().length > 0)
 				return false;
@@ -717,15 +723,11 @@ IFeatureProject, IResourceChangeListener {
 		// if something in sourcefolder changed
 		if (event.getDelta().findMember(sourceFolder.getFullPath()) != null) {
 
-			try {
-				// set markers, only if event is not fired from changes to
-				// markers
-				if (event.findMarkerDeltas(
-						"de.ovgu.featureide.core.featureModuleMarker", false).length == 0)
+			// set markers, only if event is not fired from changes to
+			// markers
+			if (event.findMarkerDeltas(
+					"de.ovgu.featureide.core.featureModuleMarker", false).length == 0)
 					setAllFeatureModuleMarkers(featureModel, sourceFolder);
-			} catch (CoreException e) {
-				CorePlugin.getDefault().logError(e);
-			}
 		}
 		if (!checkModelChange(event.getDelta().findMember(
 				modelFile.getResource().getFullPath()))) {
@@ -1002,22 +1004,20 @@ IFeatureProject, IResourceChangeListener {
 			IProjectDescription description = project.getDescription();
 
 			ICommand[] commands = description.getBuildSpec();
-			ICommand[] newCommands = description.getBuildSpec();
+		//	ICommand[] newCommands = description.getBuildSpec();
 			for (ICommand command : commands) {
-				int i = 1;
+				int i = 0;
 				if (command.getBuilderName().equals(
 						ExtensibleFeatureProjectBuilder.BUILDER_ID)) {
 					Map<String, String> args = command.getArguments();
 					args.put(ExtensibleFeatureProjectBuilder.COMPOSER_KEY,composerID);
 					command.setArguments(args);
 					//Composer must be the first command
-					newCommands[0] = command;
-				} else {
-					newCommands[i] = command;
-					i++;
+					commands[i] = command;
 				}
+				i++;
 			}
-			description.setBuildSpec(newCommands);
+			description.setBuildSpec(commands);
 			project.setDescription(description, null);
 		} catch (CoreException ex) {
 		}

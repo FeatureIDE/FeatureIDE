@@ -18,10 +18,7 @@
  */
 package de.ovgu.featureide.ui.wizards;
 
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 
 
 
@@ -32,12 +29,12 @@ import org.eclipse.swt.widgets.Text;
  */
 public class ConversionPage extends NewFeatureProjectPage {
 	
-	public ConversionPage() {
+	public ConversionPage(String project) {
 		super();
-		setDescription("Adds the FeatureIDE nature to the project.");
+		setDescription("Adds the FeatureIDE nature to the project" + project + ".");
 	}
 
-	private Text backupPath;
+//	private Text backupPath;
 	
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.ui.wizards.NewFeatureProjectPage#createControl(org.eclipse.swt.widgets.Composite)
@@ -45,19 +42,19 @@ public class ConversionPage extends NewFeatureProjectPage {
 	@Override
 	public void createControl(Composite parent) {
 		super.createControl(parent);
-		String tooltip = "Sets the path of the backupfolder.";
-		Label label = new Label(pathGroup, SWT.NULL);
-		label.setText("&Backup Path:");
-		label.setToolTipText(tooltip);
-		backupPath = new Text(pathGroup, SWT.BORDER | SWT.SINGLE);
-		backupPath.setLayoutData(gd);
-		backupPath.setText("backup");
-		backupPath.setToolTipText(tooltip);
+//		String tooltip = "Sets the path of the backupfolder.";
+//		Label label = new Label(pathGroup, SWT.NULL);
+//		label.setText("&Backup Path:");
+//		label.setToolTipText(tooltip);
+//		backupPath = new Text(pathGroup, SWT.BORDER | SWT.SINGLE);
+//		backupPath.setLayoutData(gd);
+//		backupPath.setText("backup");
+//		backupPath.setToolTipText(tooltip);
 	}
 	
-	public String getBackupPath() {
-		return backupPath.getText();
-	}
+//	public String getBackupPath() {
+//		return backupPath.getText();
+//	}
 	
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.ui.wizards.NewFeatureProjectPage#dialogChanged()
@@ -65,20 +62,20 @@ public class ConversionPage extends NewFeatureProjectPage {
 	@Override
 	protected void dialogChanged() {
 		super.dialogChanged();
-		if (getBackupPath().equals(getSourcePath())) {
-			updateStatus("Source Path equals Backup Path.");
-			return;
-		}
-		if (getBackupPath().equals(getBuildPath())) {
-			updateStatus("Build Path equals Backup Path.");
-			return;
-		}
-		if (getBackupPath().equals(getSourcePath())) {
-			updateStatus("Equations Path equals Backup Path.");
-			return;
-		}
-		if (isPathEmpty(getBackupPath(), "Backup"))return;
-		
-		if (isInvalidPath(getBackupPath(), "Backup"))return;
+//		if (getBackupPath().equals(getSourcePath())) {
+//			updateStatus("Source Path equals Backup Path.");
+//			return;
+//		}
+//		if (getBackupPath().equals(getBuildPath())) {
+//			updateStatus("Build Path equals Backup Path.");
+//			return;
+//		}
+//		if (getBackupPath().equals(getSourcePath())) {
+//			updateStatus("Equations Path equals Backup Path.");
+//			return;
+//		}
+//		if (isPathEmpty(getBackupPath(), "Backup"))return;
+//		
+//		if (isInvalidPath(getBackupPath(), "Backup"))return;
 	}
 }

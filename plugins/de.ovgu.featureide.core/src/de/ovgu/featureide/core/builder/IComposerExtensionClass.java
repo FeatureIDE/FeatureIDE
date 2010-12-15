@@ -21,6 +21,7 @@ package de.ovgu.featureide.core.builder;
 import java.util.ArrayList;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 
 import de.ovgu.featureide.core.IFeatureProject;
 
@@ -41,8 +42,17 @@ import de.ovgu.featureide.core.IFeatureProject;
  */
 public interface IComposerExtensionClass {
 	
+	/**
+	 * 
+	 * @return a list of file extensions witch can be composed 
+	 */
 	ArrayList<String> extensions();
 	
+	/**
+	 * 
+	 * @param extension
+	 * @return ID of the file specific editor for the composer extension
+	 */
 	String getEditorID(String extension);
 	
 	void initialize(IFeatureProject project);
@@ -51,6 +61,23 @@ public interface IComposerExtensionClass {
 	
 	void clean();
 	
+	/**
+	 * Copys the not composed files to the source folder
+	 * @return false if not composed files should be moved in a common way
+	 */
+	boolean copyNotComposedFiles();
+	
+	/**
+	 * Make some changes(e.g. renaming) after adding the FeatureIDE nature
+	 * @return true if the source files not have to be moved to the feature folder anymore
+	 */
+	boolean composerSpecficMove(IFolder source, IFolder destination);
+	
+	/**
+	 * Creates the FSTModel
+	 */
+	void buildFSTModel();
+
 	ArrayList<String[]> getTemplates();
 	
 }

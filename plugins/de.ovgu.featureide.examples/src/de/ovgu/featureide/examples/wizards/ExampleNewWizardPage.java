@@ -415,12 +415,10 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		try {
 			return new ZipFile(fileName);
 		} catch (ZipException e) {
-			System.err.println("Source file is not a valid Zip file."
-					+ e.getStackTrace());
+			ExamplePlugin.getDefault().logError("Source file is not a valid Zip file.", e);
 
 		} catch (IOException e) {
-			System.err.println("Source file could not be read."
-					+ e.getStackTrace());
+			ExamplePlugin.getDefault().logError("Source file could not be read.", e);
 		}
 
 		return null;

@@ -16,7 +16,6 @@ Export-Package:
  de.ovgu.featureide.core,
  de.ovgu.featureide.core.builder,
  de.ovgu.featureide.core.fstmodel,
- de.ovgu.featureide.core.launching,
  de.ovgu.featureide.core.listeners,
  de.ovgu.featureide.core.projectstructure.nodetypes,
  de.ovgu.featureide.core.projectstructure.trees

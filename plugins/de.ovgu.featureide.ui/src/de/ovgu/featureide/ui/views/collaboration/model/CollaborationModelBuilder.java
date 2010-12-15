@@ -35,12 +35,13 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtension;
 import de.ovgu.featureide.core.fstmodel.IClass;
-import de.ovgu.featureide.core.fstmodel.IFeature;
 import de.ovgu.featureide.core.fstmodel.IFSTModel;
 import de.ovgu.featureide.core.fstmodel.IFSTModelElement;
+import de.ovgu.featureide.core.fstmodel.IFeature;
 import de.ovgu.featureide.core.fstmodel.IField;
 import de.ovgu.featureide.core.fstmodel.IMethod;
 import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.configuration.FeatureOrderReader;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /** 
@@ -85,17 +86,28 @@ public class CollaborationModelBuilder {
 			return null;
 		
 		fSTModel = featureProject.getFSTModel();
-		iFeatureNames = new ArrayList<String>();
+		if (fSTModel == null) {
+			composer.initialize(featureProject);
+			composer.buildFSTModel();
+			fSTModel = featureProject.getFSTModel();
+		}
+		
+		extensions = composer.extensions();
+		if (extensions == null)
+			return  null;
+		
 		ArrayList<Feature> features = getSelectedFeatures(featureProject);
 		if (features == null)
 			return null;
+		
+		iFeatureNames = new ArrayList<String>();
 		ArrayList<String> featureNames = new ArrayList<String>();
 		for (Feature feature : features)
 			featureNames.add(feature.getName());
 		
 		project = featureProject;
 		
-		//Add the name of the configuration to the model  
+		//Add the configuration to the model  
 		if (configuration.equals("") || configuration.equals(featureProject.getCurrentEquationFile().getName())) {
 			collaboration = new Collaboration(featureProject.getCurrentEquationFile().getName().split("[.]")[0]);
 			collaboration.selected = true;
@@ -108,14 +120,28 @@ public class CollaborationModelBuilder {
 		collaboration.configurationFile = featureProject.getEquationFolder().getFile(configuration);
 		model.collaborations.add(collaboration);
 		
+		//get ordered list of layers from feature model or order file
+		File file = featureProject.getProject().getLocation().toFile();
+		String fileSep = System.getProperty("file.separator");
+		file = new File(file.toString() + fileSep + ".order");
+		ArrayList<String> layerNames = null;
+		if (file.exists()){
+			FeatureOrderReader reader2 = new FeatureOrderReader(
+					featureProject.getProject().getLocation().toFile());
+			layerNames = reader2.featureOrderRead();
+			if (layerNames.get(0).equals("false")) {
+				layerNames = (ArrayList<String>) featureProject.getFeatureModel().getLayerNames();
+			}
+		} else {
+			layerNames = (ArrayList<String>) featureProject.getFeatureModel().getLayerNames();
+		}
+		if (layerNames == null)
+			return null;
+		
+		//start building the model
 		if (fSTModel == null) {
-			//case: FSTModel not builded
-			composer.initialize(featureProject);
-			extensions = composer.extensions();
-			if (extensions == null)
-				return  null;
-			
-			for (String layerName : featureProject.getFeatureModel().getLayerNames()) {
+			//case: FSTModel not builded			
+			for (String layerName : layerNames) {
 				if (featureNames.contains(layerName)) {
 					//case: selected
 					if (featureFilter.size() == 0 || featureFilter.contains(layerName)) {
@@ -159,7 +185,6 @@ public class CollaborationModelBuilder {
 		} else {
 			//case: FSTModel builded
 			ArrayList<IFeature> iFeatures = fSTModel.getSelectedFeatures();
-			
 			if (iFeatures == null) {
 				return null;
 			}
@@ -167,12 +192,7 @@ public class CollaborationModelBuilder {
 			for (IFeature feature : iFeatures)
 				iFeatureNames.add(feature.getName());
 			
-			Collection<String> layerNames = featureProject.getFeatureModel().getLayerNames();
-			if (layerNames == null) {
-				return null;
-			}
 			IFolder path = featureProject.getSourceFolder();
-			extensions = composer.extensions();
 			for (String layerName : layerNames) {
 				if (featureFilter.size() == 0 || featureFilter.contains(layerName)) {
 					if (iFeatureNames.contains(layerName)) {
@@ -363,8 +383,10 @@ public class CollaborationModelBuilder {
 			while (scanner.hasNext()) {
 				list.add(scanner.next());
 			}
+			scanner.close();
 			return list;
 		} else {
+			scanner.close();
 			return null;
 		}
 	}

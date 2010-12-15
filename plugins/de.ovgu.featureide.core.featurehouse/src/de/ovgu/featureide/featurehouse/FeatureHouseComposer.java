@@ -21,6 +21,7 @@ package de.ovgu.featureide.featurehouse;
 import java.util.ArrayList;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
@@ -59,16 +60,15 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 		// A new FSTGenComposer instance is created every time, because this class
 		// seems to remember the FST from a previous build.
 		FSTGenComposer composer = new FSTGenComposer();
-		composer.run(new String[]{"--expression",equationPath, "--base-directory", basePath,
-				  "--output-directory", outputPath + "/", "--ahead"});
+		//TODO output should be generated directly at outputPath not at outputPath/equation
+		composer.run(new String[]{			
+				"--expression", equationPath, 
+				"--base-directory", basePath,
+				"--output-directory", outputPath + "/", 
+				"--ahead"
+		});
 		
 		/*
-		 * 
-		 TODO: view ticket
-		System.out.println("MUH" + AbstractFSTParser.fstnodes);
-		System.out.println("MUH" + composer.getFstnodes());
-		
-		
 		for (FSTNode node : AbstractFSTParser.fstnodes) {
 			node.printFST(0);
 		}
@@ -121,6 +121,20 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 			return "org.eclipse.wst.xml.ui.internal.tabletree.XMLMultiPageEditorPart";
 		return "";
 	}
+
+	@Override
+	public boolean copyNotComposedFiles() {
+		return true;
+	}
+
+	@Override
+	public boolean composerSpecficMove(IFolder source, IFolder destination) {
+		return false;
+	}
+
+	@Override
+	public void buildFSTModel() {
+	}
 	
 	@Override
 	public ArrayList<String[]> getTemplates(){
@@ -144,5 +158,5 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 		list.add(uml);	
 
 		return list;
-	}	
+	}
 }

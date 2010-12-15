@@ -30,7 +30,6 @@ import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.ahead.AheadCorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.builder.FeatureProjectNature;
 
 
 /**
@@ -52,12 +51,9 @@ public class AheadWrapper {
 
 	private ComposerWrapper composer;
 
-	private JavacWrapper javac;
-
 	public AheadWrapper(IFeatureProject featureProject) {
 		jak2java = new Jak2JavaWrapper();
 		composer = new ComposerWrapper(featureProject);
-		javac = new JavacWrapper(featureProject);
 	}
 
 	public void setEquation(IFile equation) throws IOException {
@@ -70,26 +66,21 @@ public class AheadWrapper {
 
 	public void buildAll() {
 		IFile[] jakfiles = null;
-		IFile[] javafiles = null;
 		
 		try {
 			jakfiles = composer.composeAll();
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
-		javafiles = reduceJak2Java(jakfiles);
-		compileJavafiles(javafiles);
+		reduceJak2Java(jakfiles);
 	}
 
 	public void build() {
 		IFile[] jakfiles = null;
-		IFile[] javafiles = null;
 		jakfiles = composer.compose();
-		javafiles = reduceJak2Java(jakfiles);
-		compileJavafiles(javafiles);
+		reduceJak2Java(jakfiles);
 	}
 
-	@SuppressWarnings("deprecation")
 	private IFile[] reduceJak2Java(IFile[] jakFiles) {
 		
 		IFile[] javaFiles = new IFile[jakFiles.length];
@@ -97,44 +88,32 @@ public class AheadWrapper {
 		if (jakFiles != null)
 			for (int i = 0; i < jakFiles.length; i++) {
 				IFile jakFile = jakFiles[i];
-				jak2java.reduce2Java(jakFile.getRawLocation().toFile());
-
-				filename = jakFile.getName();
-				filename = filename.substring(0, filename.lastIndexOf('.'));
-				javaFiles[i] = ((IFolder)jakFile.getParent()).getFile(filename
-						+ ".java");
-				
-				try {
-					javaFiles[i].refreshLocal(IResource.DEPTH_ZERO, null);
-					javaFiles[i].setDerived(false);
-					ResourceAttributes attr = javaFiles[i].getResourceAttributes();
-					if (attr != null) {
-						attr.setReadOnly(false);
-						javaFiles[i].setResourceAttributes(attr);
+				if (jakFile.exists()) {
+					jak2java.reduce2Java(jakFile.getRawLocation().toFile());
+	
+					filename = jakFile.getName();
+					filename = filename.substring(0, filename.lastIndexOf('.'));
+					javaFiles[i] = ((IFolder)jakFile.getParent()).getFile(filename
+							+ ".java");
+					
+					try {
+						javaFiles[i].refreshLocal(IResource.DEPTH_ZERO, null);
+						ResourceAttributes attr = javaFiles[i].getResourceAttributes();
+						if (attr != null) {
+							attr.setReadOnly(false);
+							javaFiles[i].setResourceAttributes(attr);
+						}
+					} catch (CoreException e) {
+						AheadCorePlugin.getDefault().logError(e);
 					}
-				} catch (CoreException e) {
-					AheadCorePlugin.getDefault().logError(e);
 				}
 			}
 		return javaFiles;
 	}
-
-	private void compileJavafiles(IFile[] javaFiles) {
-		
-		if (javaFiles != null && javaFiles.length > 0) {
-			try {
-				//just compile if project has no other compiler
-				if (javaFiles[0].getProject().getDescription().getNatureIds().length == 1
-						&& javaFiles[0].getProject().hasNature(FeatureProjectNature.NATURE_ID))
-					javac.compile(javaFiles);
-			} catch (CoreException e) {
-				AheadCorePlugin.getDefault().logError(e);
-			}
-		}
-	}
 	
 	public void addBuildErrorListener(AheadBuildErrorListener listener) {
-		javac.addBuildErrorListener(listener);
+		//TODO some build errors are not chatched without javac
+//		javac.addBuildErrorListener(listener);
 		composer.addBuildErrorListener(listener);
 	}
 

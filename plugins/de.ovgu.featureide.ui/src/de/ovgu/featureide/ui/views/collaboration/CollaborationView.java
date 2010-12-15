@@ -19,8 +19,6 @@
 package de.ovgu.featureide.ui.views.collaboration;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IncrementalProjectBuilder;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -215,30 +213,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		}
 	}
 	
-	private void buildProject(IFeatureProject featureProject){
-		if (featureProject == null) {
-			toolbarAction.setEnabled(true);
-			return;
-		}
-		final IFeatureProject iFeatureProject = featureProject;
-		Job job = new Job("buildProject") {
-			public IStatus run(IProgressMonitor monitor) {
-				try {
-					iFeatureProject.getProject().build(IncrementalProjectBuilder.FULL_BUILD, monitor);
-				} catch (CoreException e) {
-					model = new CollaborationModel();
-					model.collaborations.add(new Collaboration("the project couldn't build, please change this"));
-					viewer.setContents(model);
-					UIPlugin.getDefault().logError(e);
-				}
-				toolbarAction.setEnabled(true);
-				return Status.OK_STATUS;
-			}
-		};
-		job.setPriority(Job.BUILD);
-		job.schedule();
-	}
-
 	private void createContextMenu() {
 		
 		MenuManager menuMgr = new MenuManager("#PopupMenu");
@@ -278,8 +252,8 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	
 	private void fillLocalToolBar(IToolBarManager manager) {
 		manager.add(toolbarAction);
-		toolbarAction.setToolTipText("Build Project");
-		toolbarAction.setImageDescriptor(ImageDescriptor.createFromImage(UIPlugin.getImage("buildicon.gif")));
+		toolbarAction.setToolTipText("Build collaborationmodel");
+		toolbarAction.setImageDescriptor(ImageDescriptor.createFromImage(UIPlugin.getImage("refresh_tab.gif")));
 	}
 	
 	private void makeActions() {
@@ -290,7 +264,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 						if (!toolbarAction.isEnabled())
 							return Status.OK_STATUS;
 						toolbarAction.setEnabled(false);
-						buildProject(featureProject);
+						updateGuiAfterBuild(featureProject);
 						return Status.OK_STATUS;
 					}
 				};
@@ -304,19 +278,24 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	 * @see de.ovgu.featureide.core.listeners.ICurrentBuildListener#updateGuiAfterBuild(de.ovgu.featureide.core.IFeatureProject)
 	 */
 	public void updateGuiAfterBuild(final IFeatureProject project) {
-		if (!project.equals(featureProject))
-			return;
+//		if (!project.equals(featureProject)) {
+//			toolbarAction.setEnabled(true);
+//			return;
+//		}
 		
 		Job job = new Job("buildCollaborationModel") {
 			public IStatus run(IProgressMonitor monitor) {
 				model = builder.buildCollaborationModel(project);
-				if (model == null)
+				if (model == null) {
+					toolbarAction.setEnabled(true);
 					return Status.OK_STATUS;
+				}
 				
 				UIJob uiJob = new UIJob("updateCollaborationView") {
 					public IStatus runInUIThread(IProgressMonitor monitor) {
 						viewer.setContents(model);		
 						viewer.getContents().refresh();
+						toolbarAction.setEnabled(true);
 						return Status.OK_STATUS;
 					}
 				};
@@ -327,6 +306,5 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		};
 		job.setPriority(Job.DECORATE);
 		job.schedule();
-		
 	}
 }

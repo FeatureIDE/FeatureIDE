@@ -95,10 +95,8 @@ public class WaterlooReader extends AbstractFeatureModelReader {
         try {
             doc = db.parse(inputStream);
         } catch (SAXException se) {
-            System.err.println(se.getMessage());
             FMCorePlugin.getDefault().logError(se);
         } catch (IOException ioe) {
-            System.err.println(ioe);
             FMCorePlugin.getDefault().logError(ioe);
         }       
         featureModel.reset();
@@ -492,6 +490,7 @@ public class WaterlooReader extends AbstractFeatureModelReader {
 		while (scan.hasNext()) {
 			elements.add(scan.next());
 		}
+		scan .close();
 		org.prop4j.Node propNode = buildPropNode(elements);
 		featureModel.addPropositionalNode(propNode);
     }

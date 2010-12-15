@@ -259,7 +259,6 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
 		try {
 		    db = dbf.newDocumentBuilder();
 		} catch (ParserConfigurationException pce) {
-		    System.err.println(pce);
 		    FMCorePlugin.getDefault().logError(pce);
 		}
 		Document doc = db.newDocument();

@@ -109,6 +109,9 @@ public class ProjectTree {
 	 *            the node that should be the parent of the inserted node
 	 */
 	public void insertLeafTreeNode(LeafTree node, ProjectTreeNode parent) {
+		if (node == null || parent ==  null) {
+			return;
+		}
 		node.setParent(parent);
 		parent.setChild(node);
 		leafTrees.add(node);
@@ -127,6 +130,9 @@ public class ProjectTree {
 		Iterator<ProjectTreeNode> iterator = projectTreeNodes.iterator();
 		while (iterator.hasNext()) {
 			ProjectTreeNode node = iterator.next();
+			if (node == null || name == null || node.getName() == null) {
+				return null;
+			}
 			if (node.getName().equals(name)) {
 				return node;
 			}

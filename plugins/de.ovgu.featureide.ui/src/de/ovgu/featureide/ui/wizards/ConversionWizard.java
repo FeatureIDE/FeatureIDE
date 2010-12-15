@@ -40,7 +40,7 @@ public class ConversionWizard  extends Wizard implements INewWizard {
 	
 	private ISelection selection;
 	
-	private ConversionPage page = new ConversionPage();
+	private ConversionPage page;
 
 	private IStructuredSelection iSSelection;
 	
@@ -51,8 +51,8 @@ public class ConversionWizard  extends Wizard implements INewWizard {
 			if (obj instanceof IResource) {
 				IResource res = (IResource)obj;
 				if (page.hasCompositionTool()) {
-					CorePlugin.setupFeatureProject(res.getProject(), page.getCompositionTool().getId()
-							,page.getSourcePath(),page.getEquationsPath(),page.getBuildPath(), page.getBackupPath());
+					CorePlugin.setupProject(res.getProject(), page.getCompositionTool().getId()
+							,page.getSourcePath(),page.getEquationsPath(),page.getBuildPath());
 					UIPlugin.getDefault().openEditor(FeatureModelEditor.ID, (res.getProject()).getFile("model.xml"));
 				}
 				return true;
@@ -76,6 +76,16 @@ public class ConversionWizard  extends Wizard implements INewWizard {
 	 */
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
+		String project = ""; 
+		if (selection instanceof IStructuredSelection) {
+			iSSelection = (IStructuredSelection)selection;
+			Object obj = iSSelection.getFirstElement();
+			if (obj instanceof IResource) {
+				IResource res = (IResource)obj;
+				project = res.getProject().getName();
+			}
+		}
+		page = new ConversionPage(" " + project);
 		this.selection = selection;
 	}
 }

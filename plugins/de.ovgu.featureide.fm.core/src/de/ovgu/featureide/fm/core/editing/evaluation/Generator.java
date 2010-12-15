@@ -88,7 +88,7 @@ public abstract class Generator {
 		try {
 			valid = fm.isValid();
 			if (!valid)
-				System.err.println("Feature model not valid!");
+				FMCorePlugin.getDefault().logInfo("Feature model not valid!");
 		} catch (TimeoutException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
@@ -120,7 +120,7 @@ public abstract class Generator {
 				}
 				else {
 					fm.removePropositionalNode(node);
-					System.err.println("F\t" + ++k + "\t" + node);
+					FMCorePlugin.getDefault().logInfo("F\t" + ++k + "\t" + node);
 				}
 			} catch (TimeoutException e) {
 				FMCorePlugin.getDefault().logError(e);

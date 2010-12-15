@@ -95,7 +95,7 @@ public class ResourceChangeListener implements IResourceChangeListener {
 						&& (child.getFlags() & IResourceDelta.DESCRIPTION) != 0
 						&& (child.getFlags() & IResourceDelta.OPEN) != 0) {
 					projectTo = project.getLocationURI();
-					if (projectFrom != null && hasJakNature(project)) {
+					if (projectFrom != null && hasFeatureIDENature(project)) {
 						boolean success = TypeSystemManager.replace(
 								projectFrom, projectTo);
 						if (success)
@@ -129,7 +129,7 @@ public class ResourceChangeListener implements IResourceChangeListener {
 				// Eclipse-refactoring
 				// Move... no MOVED_FROM or MOVED_TO events occur
 				if (child.getFlags() == IResourceDelta.DESCRIPTION) {
-					if (hasJakNature(project)) {
+					if (hasFeatureIDENature(project)) {
 						System.out
 								.println("a FeatureIDE-project may have been moved to "
 										+ project.getLocationURI());
@@ -192,7 +192,7 @@ public class ResourceChangeListener implements IResourceChangeListener {
 		}
 	}
 
-	private boolean hasJakNature(IProject project) {
+	private boolean hasFeatureIDENature(IProject project) {
 		try {
 			return project.isAccessible()
 					&& project.hasNature(FeatureProjectNature.NATURE_ID);
