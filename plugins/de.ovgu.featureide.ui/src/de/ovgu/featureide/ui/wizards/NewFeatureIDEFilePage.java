@@ -71,7 +71,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 	private Text className;
 
 	private Button refinesbox;
-	
+
 	private Label refineslabel;
 
 	private IFolder sourcefolder;
@@ -168,10 +168,8 @@ public class NewFeatureIDEFilePage extends WizardPage {
 								featureProject.getProjectName());
 						checkcontainer(featureProject, res);
 						containerbool = true;
-					}
 
-					// reload all formats for the changed Project
-					if(featureProject != null){
+						// reload all formats for the changed Project
 
 						IComposerExtension composer = featureProject.getComposer();
 						composer.initialize(featureProject);
@@ -182,7 +180,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 							languageCombo.add(format[0]);
 						languageCombo.select(0);
 					}
-					
+
 					dialogChanged();
 				}
 			}
@@ -197,18 +195,20 @@ public class NewFeatureIDEFilePage extends WizardPage {
 		});
 		languageCombo.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
-				
-				//TODO Dariusz: reference to composer
-				//     FeatureC++ has also "refines"
-				if(languageCombo.getText().equals("Jak")){
-					refinesbox.setEnabled(true);
-					refineslabel.setEnabled(true);
+
+				if(featureProject != null){
+					String composer = featureProject.getComposerID();
+					if(composer.equals("de.ovgu.featureide.composer.featurecpp") 
+							|| composer.equals("de.ovgu.featureide.composer.ahead")){
+						refinesbox.setEnabled(true);
+						refineslabel.setEnabled(true);
+					}
+					else{
+						refinesbox.setEnabled(false);
+						refineslabel.setEnabled(false);
+					}
 				}
-				else{
-					refinesbox.setEnabled(false);
-					refineslabel.setEnabled(false);
-				}
-				
+
 				dialogChanged();
 			}
 		});
@@ -246,7 +246,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 			if (obj instanceof IResource) {
 				IResource resource = (IResource) obj;
 				featureProject = CorePlugin.getFeatureProject(resource);
-				featureComboProject.setText(featureProject.getProjectName()); //
+				featureComboProject.setText(featureProject.getProjectName());
 				if (featureProject != null) {
 					checkcontainer(featureProject, resource);
 				}
@@ -261,6 +261,15 @@ public class NewFeatureIDEFilePage extends WizardPage {
 						if (part != null) {
 							FileEditorInput inputFile = (FileEditorInput)part.getEditorInput();
 							featureProject = CorePlugin.getFeatureProject(inputFile.getFile());
+
+							if (featureProject != null) {
+								IResource res = ResourcesPlugin.getWorkspace()
+								.getRoot().findMember(
+										featureProject.getProjectName());
+								checkcontainer(featureProject, res);
+								containerbool = true;
+							}
+
 						}
 					}
 				}
@@ -274,7 +283,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 			text = featureComboProject.getText();
 
 			if(featureProject != null){
-				
+
 				IComposerExtension composer = featureProject.getComposer();
 				composer.initialize(featureProject);
 				formats = composer.getTemplates();
@@ -283,26 +292,24 @@ public class NewFeatureIDEFilePage extends WizardPage {
 					languageCombo.add(format[0]);
 
 				languageCombo.select(0);
+
+				String composerID = composer.getId();
+				if(composerID.equals("de.ovgu.featureide.composer.featurecpp") 
+						|| composerID.equals("de.ovgu.featureide.composer.ahead")){
+					refinesbox.setEnabled(true);
+					refineslabel.setEnabled(true);
+				}
+				else{
+					refinesbox.setEnabled(false);
+					refineslabel.setEnabled(false);
+				}
 			}
-			
-			//TODO Dariusz: reference to composer
-			if(languageCombo.getText().equals("Jak File")){
-				refinesbox.setEnabled(true);
-				refineslabel.setEnabled(true);
-			}
-			else{
-				refinesbox.setEnabled(false);
-				refineslabel.setEnabled(false);
-			}
-			
-			
 		}
-
-
 	}
 
 	private void checkcontainer(IFeatureProject featureProject,
 			IResource resource) {
+
 		featureComboContainer.removeAll();
 		for (Feature feature : featureProject.getFeatureModel().getLayers())
 			featureComboContainer.add(feature.getName());
@@ -312,15 +319,18 @@ public class NewFeatureIDEFilePage extends WizardPage {
 				if (featureComboContainer.getItem(i).equals(resource.getName()))
 					featureComboContainer.select(i);
 			container = sourcefolder.getFolder(featureComboContainer.getText());
-		//TODO Dariusz: reference to composer
-		} else if (resource.toString().endsWith(".jak")) {
-			String name = resource.getName();
-			int index = name.indexOf(".");
-			name = index > 0 ? name.substring(0, index) : name;
-			className.setText(name);
-			refinesbox.setSelection(true);
-			refines = true;
-		}
+			//}
+			//else if(){
+
+		} else 
+			if(featureProject != null){
+				String composer = featureProject.getComposerID();
+				if(composer.equals("de.ovgu.featureide.composer.featurecpp") 
+						|| composer.equals("de.ovgu.featureide.composer.ahead")){
+					refinesbox.setSelection(true);
+					refines = true;
+				}
+			}
 	}
 
 	private boolean projectbool = false;
@@ -337,6 +347,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 	public void dialogChanged() {
 		//TODO Dariusz: refinesbox must be checked
 		if (featureComboProject.getText().length() == 0 && !projectbool) {
+			System.out.println("1");
 			setErrorMessage(null);
 			setPageComplete(false);
 			projectbool = true;
@@ -344,21 +355,25 @@ public class NewFeatureIDEFilePage extends WizardPage {
 		}
 
 		if (featureComboProject.getText().length() == 0) {
+			System.out.println("2");
 			updateStatus("No Project selected");
 			return;
 		}
 
 		if (!isFeatureProject(featureComboProject.getText())) {
+			System.out.println("3");
 			updateStatus("Selected project is not a FeatureIDE Project");
 			return;
 		}
 
 		if (!isValidFormat(languageCombo.getText())) {
+			System.out.println("4");
 			updateStatus("Selected file format is not supported");
 			return;
 		}
 
 		if (container == null) {
+			System.out.println("5");
 			setErrorMessage(null);
 			setPageComplete(false);
 			return;
@@ -368,20 +383,24 @@ public class NewFeatureIDEFilePage extends WizardPage {
 		if ((featureComboContainer.getText() == null || featureComboContainer
 				.getText().equalsIgnoreCase(""))
 				&& containerbool) {
+			System.out.println("6.5");
 			setErrorMessage(null);
 			setPageComplete(false);
 			return;
 		}
 		if (!container.isAccessible()) {
+			System.out.println("7");
 			updateStatus("Project must be writable");
 			return;
 		}
 		if (featureComboContainer.getText().length() == 0) {
+			System.out.println("8");
 			updateStatus("No container selected");
 			return;
 		}
 
 		if (container.equals(sourcefolder)) {
+			System.out.println("9");
 			setPageComplete(false);
 			return;
 		}

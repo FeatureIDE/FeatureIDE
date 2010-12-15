@@ -282,7 +282,6 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 									try {
 										if (! new SatSolver(node.clone(), 250)
 												.isSatisfiable()) {
-											System.out.println(" => First Exception");
 											throw new UnsupportedModelException(
 													"Constraint is not satisfiable.",
 													event.getLocation()
@@ -291,7 +290,6 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 										if (!new SatSolver(
 												new Not(node.clone()), 250)
 												.isSatisfiable()) {
-											System.out.println(" => Second Exception");
 											throw new UnsupportedModelException(
 													"Constraint is a tautology.",
 													event.getLocation()

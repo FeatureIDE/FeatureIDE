@@ -82,8 +82,6 @@ public class DeleteAction extends Action {
 			if ( editPart instanceof ConstraintEditPart ){ 
 				Constraint constraint = ((ConstraintEditPart)editPart).getConstraintModel();				
 				featureModel.removePropositionalNode(constraint);
-
-				//System.out.println("Test " + constraint.getNode().toString());
 			}
 			if (!(editPart instanceof FeatureEditPart))
 				continue;

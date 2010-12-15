@@ -43,7 +43,7 @@ import de.ovgu.featureide.ui.UIPlugin;
  */
 public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 	
-	public static final String ID = UIPlugin.PLUGIN_ID + ".wizards.NewFeatureIDEFileWizard"; // .wizards.NewFeatureIDEFileWizard
+	public static final String ID = UIPlugin.PLUGIN_ID + ".wizards.NewFeatureIDEFileWizard"; 
 
 	public NewFeatureIDEFilePage page;
 	
@@ -146,7 +146,7 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 		//TODO Dariusz: reference to composer 
 		contents = contents.replace("#classname#", classname);
 		if (refines)
-			contents = contents.replace("#refines#", "refines");
+			contents = contents.replace("#refines# ", "refines ");
 		else
 			contents = contents.replace("#refines#", "");
 		
