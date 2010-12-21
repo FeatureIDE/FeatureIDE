@@ -93,6 +93,7 @@ import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.ModelWarning;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.io.guidsl.GuidslWriter;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -149,8 +150,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 	private IFeatureModelReader featureModelReader;
 
 	private IFeatureModelWriter featureModelWriter;
-
-	private IFeatureModelWriter xmlFeatureModelWriter;
 
 	private CreateLayerAction createLayerAction;
 
@@ -217,7 +216,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		featureModel.addListener(this);
 		featureModelReader = new XmlFeatureModelReader(featureModel);
 		featureModelWriter = new XmlFeatureModelWriter(featureModel);
-		xmlFeatureModelWriter = new XmlFeatureModelWriter(featureModel);
 
 		originalFeatureModel = new FeatureModel();
 
@@ -658,9 +656,9 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 			return;
 		File file = new File(filePath);
 		if (filePath.endsWith(".m")) {
-			featureModelWriter.writeToFile(file);
+			new GuidslWriter(featureModel).writeToFile(file);
 		} else if (filePath.endsWith(".xml")) {
-			xmlFeatureModelWriter.writeToFile(file);
+			featureModelWriter.writeToFile(file);
 		} else {
 			GEFImageWriter.writeToFile(graphicalViewer, file);
 		}
