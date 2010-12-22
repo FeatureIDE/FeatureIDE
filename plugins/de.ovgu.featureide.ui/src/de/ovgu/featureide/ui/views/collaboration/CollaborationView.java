@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.draw2d.ConnectionLayer;
 import org.eclipse.gef.EditDomain;
+import org.eclipse.gef.EditPart;
 import org.eclipse.gef.LayerConstants;
 import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
@@ -277,12 +278,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.core.listeners.ICurrentBuildListener#updateGuiAfterBuild(de.ovgu.featureide.core.IFeatureProject)
 	 */
-	public void updateGuiAfterBuild(final IFeatureProject project) {
-//		if (!project.equals(featureProject)) {
-//			toolbarAction.setEnabled(true);
-//			return;
-//		}
-		
+	public void updateGuiAfterBuild(final IFeatureProject project) {		
 		Job job = new Job("buildCollaborationModel") {
 			public IStatus run(IProgressMonitor monitor) {
 				model = builder.buildCollaborationModel(project);
@@ -294,7 +290,10 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				UIJob uiJob = new UIJob("updateCollaborationView") {
 					public IStatus runInUIThread(IProgressMonitor monitor) {
 						viewer.setContents(model);		
-						viewer.getContents().refresh();
+						EditPart part = viewer.getContents();
+						if (part != null) {
+							part.refresh();
+						}
 						toolbarAction.setEnabled(true);
 						return Status.OK_STATUS;
 					}

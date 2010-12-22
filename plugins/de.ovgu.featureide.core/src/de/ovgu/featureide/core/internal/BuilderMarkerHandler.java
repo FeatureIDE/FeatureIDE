@@ -111,8 +111,7 @@ public class BuilderMarkerHandler implements IBuilderMarkerHandler {
 		}
 	}
 
-public void createConfigurationMarker(IResource resource, String message, int lineNumber, int severity) {
-        
+	public void createConfigurationMarker(IResource resource, String message, int lineNumber, int severity) {    
 		try {
 			resource.refreshLocal(IResource.DEPTH_ZERO, null);
 		} catch (CoreException e) {
@@ -130,7 +129,7 @@ public void createConfigurationMarker(IResource resource, String message, int li
         } catch (CoreException e) {
         	CorePlugin.getDefault().logError(e);
         }
-}
+	}
 
 	public void deleteConfigurationMarkers(IResource resource, int depth) {
 		try {

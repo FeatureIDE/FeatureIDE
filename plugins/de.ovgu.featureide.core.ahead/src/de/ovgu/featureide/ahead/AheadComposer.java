@@ -180,5 +180,12 @@ public class AheadComposer implements IComposerExtensionClass {
 		String[] jak = {"Jak File", "jak", "public #refines# class #classname# {\n\n}"};
 		list.add(jak);
 		return list;
-	}	
+	}
+
+	@Override
+	public void preCompile(IFile file) {
+		if (file.getName().endsWith(".java")) {
+			ahead.preCompile(file);
+		}
+	}
 }

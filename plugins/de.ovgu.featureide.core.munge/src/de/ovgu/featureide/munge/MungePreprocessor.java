@@ -24,9 +24,15 @@ import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 
+import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.fm.core.Feature;
@@ -208,6 +214,48 @@ public class MungePreprocessor implements IComposerExtensionClass{
 
 	@Override
 	public ArrayList<String[]> getTemplates() {
+		return null;
+	}
+
+	@Override
+	public void preCompile(final IFile file) {
+		Job job = new Job("marker") {
+			@Override
+			public IStatus run(IProgressMonitor monitor) {
+				try {
+					IMarker[] marker = file.findMarkers(null, false, IResource.DEPTH_ZERO);
+					if (marker.length != 0) {
+						for (IMarker m : marker) {
+							IFile sourceFile = findSourceFile(file, featureProject.getSourceFolder());
+							sourceFile.setDerived(false, null);
+							IMarker newMarker = sourceFile.createMarker(CorePlugin.PLUGIN_ID + ".builderProblemMarker");
+							newMarker.setAttribute(IMarker.LINE_NUMBER, m.getAttribute(IMarker.LINE_NUMBER));
+							newMarker.setAttribute(IMarker.MESSAGE, m.getAttribute(IMarker.MESSAGE));
+							newMarker.setAttribute(IMarker.SEVERITY, m.getAttribute(IMarker.SEVERITY));
+						}
+					}
+				} catch (CoreException e) {
+					MungeCorePlugin.getDefault().logError(e);
+				}
+				return Status.OK_STATUS;
+			}
+		};
+		job.setPriority(Job.DECORATE);
+		job.schedule();
+	}
+	
+	private IFile findSourceFile(IFile file, IFolder folder) throws CoreException {
+		for (IResource res: folder.members()) {
+			if (res instanceof IFolder) {
+				IFile sourceFile = findSourceFile(file, (IFolder)res);
+				if (sourceFile != null) {
+					return sourceFile;
+				}
+			} else if (res instanceof IFile) {
+				if (res.getName().equals(file.getName()))
+					return (IFile)res;
+			}
+		}
 		return null;
 	}
 }

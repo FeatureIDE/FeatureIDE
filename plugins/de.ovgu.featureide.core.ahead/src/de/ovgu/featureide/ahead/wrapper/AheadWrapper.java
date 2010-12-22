@@ -24,11 +24,17 @@ import java.io.IOException;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 
 import de.ovgu.featureide.ahead.AheadCorePlugin;
+import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 
 
@@ -66,11 +72,10 @@ public class AheadWrapper {
 
 	public void buildAll() {
 		IFile[] jakfiles = null;
-		
 		try {
 			jakfiles = composer.composeAll();
 		} catch (IOException ex) {
-			ex.printStackTrace();
+			CorePlugin.getDefault().logError(ex);
 		}
 		reduceJak2Java(jakfiles);
 	}
@@ -112,9 +117,36 @@ public class AheadWrapper {
 	}
 	
 	public void addBuildErrorListener(AheadBuildErrorListener listener) {
-		//TODO some build errors are not chatched without javac
-//		javac.addBuildErrorListener(listener);
 		composer.addBuildErrorListener(listener);
+	}
+
+	public void preCompile(final IFile file) {
+		Job job = new Job("marker") {
+			@Override
+			public IStatus run(IProgressMonitor monitor) {
+				try {
+					if (file.exists()) {
+						IMarker[] markers = file.findMarkers(null, false, IResource.DEPTH_ZERO);
+						if (markers != null) {
+							for (IMarker marker : markers) {
+								if (marker.exists()) {
+									AheadBuildErrorEvent buildError = new AheadBuildErrorEvent(file, marker.getAttribute(IMarker.MESSAGE).toString(), AheadBuildErrorType.JAVAC_ERROR, (Integer)marker.getAttribute(IMarker.LINE_NUMBER));
+									IMarker newMarker = buildError.getResource().createMarker(CorePlugin.PLUGIN_ID + ".builderProblemMarker");
+									newMarker.setAttribute(IMarker.LINE_NUMBER, buildError.getLine());
+									newMarker.setAttribute(IMarker.MESSAGE, buildError.getMessage());
+									newMarker.setAttribute(IMarker.SEVERITY, marker.getAttribute(IMarker.SEVERITY));
+								}
+							}
+						}
+					}
+				} catch (CoreException e) {
+					AheadCorePlugin.getDefault().logError(e);
+				}
+			return Status.OK_STATUS;
+			}
+		};
+	job.setPriority(Job.DECORATE);
+	job.schedule();
 	}
 
 }

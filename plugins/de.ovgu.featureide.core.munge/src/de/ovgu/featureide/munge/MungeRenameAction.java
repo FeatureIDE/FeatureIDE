@@ -67,8 +67,8 @@ public class MungeRenameAction implements IRenameAction {
 			if (!fileText.contains(oldName)) {
 				return;
 			}
-			//XXX regular expression for "[oldName]*/" ?
-			fileText = fileText.replaceAll(oldName,newName);
+			
+			fileText = fileText.replaceAll("\\["+oldName+"\\]\\*\\/","[" + newName + "*/");
 			FileWriter fw = new FileWriter(file);
 			fw.write(fileText);
 			fw.close();	

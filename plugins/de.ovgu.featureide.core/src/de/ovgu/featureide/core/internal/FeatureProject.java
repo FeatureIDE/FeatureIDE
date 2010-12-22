@@ -707,8 +707,7 @@ IFeatureProject, IResourceChangeListener {
 		}
 	}
 
-	protected boolean allFeatureModulesEmpty(IFolder sourceFolder)
-	throws CoreException {
+	protected boolean allFeatureModulesEmpty(IFolder sourceFolder) throws CoreException {
 		if (!sourceFolder.exists()) {
 			return false;
 		}
@@ -719,20 +718,20 @@ IFeatureProject, IResourceChangeListener {
 	}
 
 	public void resourceChanged(IResourceChangeEvent event) {
-
 		// if something in sourcefolder changed
 		if (event.getDelta().findMember(sourceFolder.getFullPath()) != null) {
-
+			
 			// set markers, only if event is not fired from changes to
 			// markers
 			if (event.findMarkerDeltas(
 					"de.ovgu.featureide.core.featureModuleMarker", false).length == 0)
 					setAllFeatureModuleMarkers(featureModel, sourceFolder);
 		}
+		
 		if (!checkModelChange(event.getDelta().findMember(
 				modelFile.getResource().getFullPath()))) {
 			try {
-				if (equationFolder.isAccessible())
+				if (equationFolder.isAccessible()) {
 					for (IResource res : equationFolder.members()) {
 						IResourceDelta delta = event.getDelta().findMember(
 								res.getFullPath());
@@ -748,27 +747,57 @@ IFeatureProject, IResourceChangeListener {
 								resList.add(res);
 						}
 					}
-				if (sourceFolder.isAccessible())
-					for (IResource res : sourceFolder.members()) {
-						IResourceDelta delta = event.getDelta().findMember(
-								res.getFullPath());
-						if (delta != null && !modelChanged) {
-							buildRelevantChanges = true;
-							modelChanged = false;
-						}
-					}
+				}
+				
+				if (sourceFolder.isAccessible()) {
+					checkSourceFolder(sourceFolder, event);
+				}
+				
+				if (buildFolder.isAccessible()) {
+					checkBuildFolder(buildFolder, event);
+				}
+				
 			} catch (CoreException e) {
 				CorePlugin.getDefault().logError(e);
 			}
 		}
 	}
-
+	
+	private void checkSourceFolder(IFolder folder, IResourceChangeEvent event) throws CoreException {
+		for (IResource res : folder.members()) {
+			if (res instanceof IFolder) {
+				checkSourceFolder((IFolder)res, event);
+			} else {
+				IResourceDelta delta = event.getDelta().findMember(
+						res.getFullPath());
+				if (delta != null && !modelChanged
+						&& (delta.getFlags() & IResourceDelta.CONTENT) != 0) {
+					buildRelevantChanges = true;
+					modelChanged = false;
+				}
+			}
+		}
+	}
+	
+	private void checkBuildFolder(IFolder folder, IResourceChangeEvent event) throws CoreException {
+		for (IResource res : folder.members()) {
+			if (res instanceof IFolder) {
+				checkBuildFolder((IFolder)res, event);
+			} else if(res instanceof IFile) {
+				IResourceDelta delta = event.getDelta().findMember(
+						res.getFullPath());
+				if (delta != null) {
+					composerExtension.preCompile((IFile)res);
+				}
+			}
+		}
+	}
+	
 	private boolean checkModelChange(IResourceDelta delta) {
 
 		if (delta == null || (delta.getFlags() & IResourceDelta.CONTENT) == 0)
 			return false;
 
-		// buildRelevantChanges = false;
 		modelChanged = true;
 		Job job = new Job("Load Model") {
 			protected IStatus run(IProgressMonitor monitor) {
@@ -1004,7 +1033,6 @@ IFeatureProject, IResourceChangeListener {
 			IProjectDescription description = project.getDescription();
 
 			ICommand[] commands = description.getBuildSpec();
-		//	ICommand[] newCommands = description.getBuildSpec();
 			for (ICommand command : commands) {
 				int i = 0;
 				if (command.getBuilderName().equals(

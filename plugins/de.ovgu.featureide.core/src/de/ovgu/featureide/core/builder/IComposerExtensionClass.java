@@ -80,4 +80,6 @@ public interface IComposerExtensionClass {
 
 	ArrayList<String[]> getTemplates();
 	
+	void preCompile(IFile file);
+	
 }

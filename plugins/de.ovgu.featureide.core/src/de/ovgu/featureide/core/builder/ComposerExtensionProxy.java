@@ -171,4 +171,11 @@ public class ComposerExtensionProxy implements IComposerExtension {
 			return composerExtensionClass.getTemplates();
 	}
 
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#prebuild()
+	 */
+	public void preCompile(IFile file) {
+		composerExtensionClass.preCompile(file);
+	}
+
 }

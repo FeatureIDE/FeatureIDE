@@ -90,4 +90,8 @@ public class FeatureCppComposer implements IComposerExtensionClass {
 		list.add(c);
 		return list;
 	}
+
+	@Override
+	public void preCompile(IFile file) {
+	}
 }

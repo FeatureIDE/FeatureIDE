@@ -159,4 +159,8 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 
 		return list;
 	}
+
+	@Override
+	public void preCompile(IFile file) {
+	}
 }
