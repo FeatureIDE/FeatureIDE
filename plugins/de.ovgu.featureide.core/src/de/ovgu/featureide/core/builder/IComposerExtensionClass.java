@@ -22,6 +22,7 @@ import java.util.ArrayList;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 
 import de.ovgu.featureide.core.IFeatureProject;
 
@@ -72,6 +73,11 @@ public interface IComposerExtensionClass {
 	 * @return true if the source files not have to be moved to the feature folder anymore
 	 */
 	boolean composerSpecficMove(IFolder source, IFolder destination);
+	
+	/**
+	 * Adds the compiler to the project.
+	 */
+	void addCompiler(IProject project, String sourcePath, String equationPath, String buildPath);
 	
 	/**
 	 * Creates the FSTModel

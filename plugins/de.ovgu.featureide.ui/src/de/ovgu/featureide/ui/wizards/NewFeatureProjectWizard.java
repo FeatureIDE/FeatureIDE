@@ -52,7 +52,7 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 			return false;
 		if (page.hasCompositionTool()) {
 			CorePlugin.setupFeatureProject(getNewProject(), page.getCompositionTool().getId()
-					,page.getSourcePath(),page.getEquationsPath(),page.getBuildPath());
+					,page.getSourcePath(),page.getEquationsPath(),page.getBuildPath(), true);
 			UIPlugin.getDefault().openEditor(FeatureModelEditor.ID, getNewProject().getFile("model.xml"));
 		}
 		return true;

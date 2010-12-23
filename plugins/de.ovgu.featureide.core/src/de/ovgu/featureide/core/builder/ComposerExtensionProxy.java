@@ -22,6 +22,7 @@ import java.util.ArrayList;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 
@@ -176,6 +177,14 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	 */
 	public void preCompile(IFile file) {
 		composerExtensionClass.preCompile(file);
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#addProjectNature()
+	 */
+	public void addCompiler(IProject project, String sourcePath,String equationPath, String buildPath) {
+		composerExtensionClass.addCompiler(project, sourcePath, equationPath, buildPath);
+		
 	}
 
 }

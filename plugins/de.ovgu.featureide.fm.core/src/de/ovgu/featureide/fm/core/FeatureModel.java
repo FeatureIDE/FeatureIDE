@@ -317,14 +317,41 @@ public class FeatureModel implements PropertyConstants {
 				IFolder newFolder = sourceFolder.getFolder(newName);
 				newFolder.create(false, true, null);
 			} else {
-				IPath newPath = sourceFolder.getFolder(newName).getFullPath();
-				folder.move(newPath, true, null);
+				if (!sourceFolder.getFolder(newName).exists()) {
+					IPath newPath = sourceFolder.getFolder(newName).getFullPath();
+					folder.move(newPath, true, null);
+				} else {
+					move(folder, oldName, newName);
+				}
 			}
 		} catch (CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 	}
 	
+	/**
+	 * @param folder
+	 * @param oldName
+	 * @param newName
+	 * @throws CoreException 
+	 */
+	private void move(IFolder folder, String oldName, String newName) throws CoreException {
+		for (IResource res : folder.members()) {
+			if (res instanceof IFile) {
+				IFile newfile = sourceFolder.getFolder(newName).getFile(res.getName());
+				if (!newfile.exists()) {
+					res.move(newfile.getRawLocation(), true, null);
+				}
+			}
+			if (res instanceof IFolder) {
+				IFolder newfile = sourceFolder.getFolder(newName).getFolder(res.getName());
+				if (!newfile.exists()) {
+					res.move(newfile.getRawLocation(), true, null);
+				}
+			}
+		}
+	}
+
 	private void renameVariables(Node node, String oldName, String newName) {
 		if (node instanceof Literal) {
 			if (oldName.equals(((Literal) node).var))

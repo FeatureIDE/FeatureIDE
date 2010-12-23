@@ -19,8 +19,10 @@
 package de.ovgu.featureide.featurecpp;
 
 import java.util.ArrayList;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
@@ -93,5 +95,9 @@ public class FeatureCppComposer implements IComposerExtensionClass {
 
 	@Override
 	public void preCompile(IFile file) {
+	}
+
+	@Override
+	public void addCompiler(IProject project , String sourcePath,String equationPath, String buildPath) {
 	}
 }

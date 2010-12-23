@@ -787,7 +787,9 @@ IFeatureProject, IResourceChangeListener {
 				IResourceDelta delta = event.getDelta().findMember(
 						res.getFullPath());
 				if (delta != null) {
-					composerExtension.preCompile((IFile)res);
+					if (composerExtension != null) {
+						composerExtension.preCompile((IFile)res);
+					}
 				}
 			}
 		}

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
@@ -162,5 +163,9 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 
 	@Override
 	public void preCompile(IFile file) {
+	}
+
+	@Override
+	public void addCompiler(IProject project, String sourcePath,String equationPath, String buildPath) {
 	}
 }

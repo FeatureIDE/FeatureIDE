@@ -232,7 +232,7 @@ public class CorePlugin extends AbstractCorePlugin {
 
 	public static void setupProject(final IProject project, String compositionToolID,
 			final String sourcePath,final String equationPath, final String buildPath) {
-		setupFeatureProject(project, compositionToolID, sourcePath, equationPath, buildPath);
+		setupFeatureProject(project, compositionToolID, sourcePath, equationPath, buildPath, false);
 		//move old source files into feature "Base"
 		IConfigurationElement[] config = Platform.getExtensionRegistry()
 			.getConfigurationElementsFor(PLUGIN_ID + ".composers");
@@ -278,8 +278,34 @@ public class CorePlugin extends AbstractCorePlugin {
 		
 	}
 	
-	public static void setupFeatureProject(IProject project, String compositionToolID,
-			String sourcePath,String equationPath, String buildPath) {
+	public static void setupFeatureProject(final IProject project, String compositionToolID,
+			final String sourcePath,final String equationPath, final String buildPath, boolean addNature) {
+		IConfigurationElement[] config = Platform.getExtensionRegistry()
+				.getConfigurationElementsFor(PLUGIN_ID + ".composers");
+		if (addNature) {
+			try {
+				for (IConfigurationElement e : config) {
+					if (e.getAttribute("id").equals(compositionToolID)) {
+						final Object o = e.createExecutableExtension("class");
+						if (o instanceof IComposerExtensionClass) {
+							
+							ISafeRunnable runnable = new ISafeRunnable() {
+								public void handleException(Throwable e) {
+									getDefault().logError(e);
+								}
+
+								public void run() throws Exception {
+									((IComposerExtensionClass) o).addCompiler(project,sourcePath,equationPath,buildPath);								}
+							};
+							SafeRunner.run(runnable);
+						}
+						break;
+					}
+				}
+			} catch (CoreException ex) {
+				getDefault().logError(ex);
+			}
+		}
 		try {
 			project.setPersistentProperty(IFeatureProject.composerConfigID, compositionToolID);
 			project.setPersistentProperty(IFeatureProject.buildFolderConfigID, buildPath);
