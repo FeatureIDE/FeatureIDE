@@ -28,9 +28,9 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
 /**
- * TODO description
  * 
- * @author Fabian
+ *  
+ * @author Fabian Benduhn
  */
 public class TGuidslReader {
 	protected static String AND_GROUP_ALL_OPTIONAL = "Root : [Base] :: _Root ; Base : [A] [B] [C] :: _Base ;";

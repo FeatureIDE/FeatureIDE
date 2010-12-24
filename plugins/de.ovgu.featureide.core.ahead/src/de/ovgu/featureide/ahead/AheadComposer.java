@@ -49,40 +49,42 @@ import de.ovgu.featureide.core.builder.IComposerExtensionClass;
  * @author Tom Brosch
  */
 public class AheadComposer implements IComposerExtensionClass {
-	
+
 	public static final String JAVA_NATURE = "org.eclipse.jdt.core.javanature";
-	
+
 	public static final String COMPOSER_ID = "de.ovgu.featureide.composer.ahead";
 
 	private AheadWrapper ahead;
-	
+
 	private IFeatureProject featureProject = null;
-	
+
 	private class BuilderErrorListener implements AheadBuildErrorListener {
 		public void parseErrorFound(AheadBuildErrorEvent event) {
 			if (featureProject != null)
-				featureProject.createBuilderMarker(event.getResource(), event
-					.getMessage(), event.getLine(), IMarker.SEVERITY_ERROR);
+				featureProject.createBuilderMarker(event.getResource(),
+						event.getMessage(), event.getLine(),
+						IMarker.SEVERITY_ERROR);
 		}
 	}
-	
+
 	public AheadComposer() {
 	}
 
 	public void initialize(IFeatureProject project) {
-		assert(project != null) : "Invalid project given";
+		assert (project != null) : "Invalid project given";
 		featureProject = project;
 		ahead = new AheadWrapper(project);
 		ahead.addBuildErrorListener(new BuilderErrorListener());
 		try {
 			ahead.setEquation(featureProject.getCurrentEquationFile());
-		} catch(IOException e) {
-			featureProject.createBuilderMarker(featureProject.getProject(), e.getMessage(), 0, IMarker.SEVERITY_ERROR);
+		} catch (IOException e) {
+			featureProject.createBuilderMarker(featureProject.getProject(),
+					e.getMessage(), 0, IMarker.SEVERITY_ERROR);
 		}
 	}
 
 	public void performFullBuild(IFile equation) {
-		assert(ahead != null) : "Ahead instance not initialized";
+		assert (ahead != null) : "Ahead instance not initialized";
 		try {
 			ahead.setEquation(equation);
 			ahead.buildAll();
@@ -115,7 +117,7 @@ public class AheadComposer implements IComposerExtensionClass {
 	}
 
 	/**
-	 *  Renames all java-files into jak-files and replaces "package" by "layer" 
+	 * Renames all java-files into jak-files and replaces "package" by "layer"
 	 */
 	@Override
 	public boolean composerSpecficMove(IFolder source, IFolder destination) {
@@ -125,14 +127,18 @@ public class AheadComposer implements IComposerExtensionClass {
 					performRenamings(source);
 				} else {
 					if (res instanceof IFile) {
-						IFile file = (IFile)res;
+						IFile file = (IFile) res;
 						if (file.getName().endsWith(".java")) {
-							res.move(source.getFile(file.getName().replaceFirst(".java", ".jak")).getFullPath(), true, null);
+							res.move(
+									source.getFile(
+											file.getName().replaceFirst(
+													".java", ".jak"))
+											.getFullPath(), true, null);
 						}
 					}
 				}
 			}
-			
+
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
@@ -142,18 +148,22 @@ public class AheadComposer implements IComposerExtensionClass {
 	private void performRenamings(IFolder folder) throws CoreException {
 		for (IResource res : folder.members()) {
 			if (res instanceof IFolder) {
-				performRenamings((IFolder)res);
+				performRenamings((IFolder) res);
 			} else if (res instanceof IFile) {
-				IFile file = (IFile)res;
+				IFile file = (IFile) res;
 				if (file.getName().endsWith(".java")) {
 					performRenamings(file);
-					res.move(folder.getFile(file.getName().replaceFirst(".java", ".jak")).getFullPath(), true, null);
+					res.move(
+							folder.getFile(
+									file.getName()
+											.replaceFirst(".java", ".jak"))
+									.getFullPath(), true, null);
 				}
 			}
-			
+
 		}
 	}
-	
+
 	private void performRenamings(IFile iFile) {
 		try {
 			File file = iFile.getRawLocation().toFile();
@@ -163,11 +173,11 @@ public class AheadComposer implements IComposerExtensionClass {
 				fileText += scanner.nextLine() + "\r\n";
 			}
 			scanner.close();
-			
+
 			fileText = fileText.replaceFirst("package", "layer");
 			FileWriter fw = new FileWriter(file);
 			fw.write(fileText);
-			fw.close();	
+			fw.close();
 		} catch (FileNotFoundException e) {
 			AheadCorePlugin.getDefault().logError(e);
 		} catch (IOException e) {
@@ -179,11 +189,12 @@ public class AheadComposer implements IComposerExtensionClass {
 	public void buildFSTModel() {
 		performFullBuild(null);
 	}
-	
+
 	@Override
-	public ArrayList<String[]> getTemplates(){
+	public ArrayList<String[]> getTemplates() {
 		ArrayList<String[]> list = new ArrayList<String[]>();
-		String[] jak = {"Jak File", "jak", "public #refines# class #classname# {\n\n}"};
+		String[] jak = { "Jak File", "jak",
+				"public #refines# class #classname# {\n\n}" };
 		list.add(jak);
 		return list;
 	}
@@ -196,43 +207,48 @@ public class AheadComposer implements IComposerExtensionClass {
 	}
 
 	@Override
-	public void addCompiler(IProject project, String sourcePath,String equationPath, String buildPath) {
+	public void addCompiler(IProject project, String sourcePath,
+			String equationPath, String buildPath) {
 		addNature(project);
-		addClasspathFile(project , sourcePath, equationPath, buildPath);	
+		addClasspathFile(project, sourcePath, equationPath, buildPath);
 	}
 
-	private void addClasspathFile(IProject project, String sourcePath,String equationPath, String buildPath) {
+	private void addClasspathFile(IProject project, String sourcePath,
+			String equationPath, String buildPath) {
 		IFile iClasspathFile = project.getFile(".classpath");
 		if (!iClasspathFile.exists()) {
 			String bin = "bin";
-			if (sourcePath.equals(bin) || equationPath.equals(bin) || buildPath.equals(bin)) {
+			if (sourcePath.equals(bin) || equationPath.equals(bin)
+					|| buildPath.equals(bin)) {
 				bin = "bin2";
 			}
-			if (sourcePath.equals(bin) || equationPath.equals(bin) || buildPath.equals(bin)) {
+			if (sourcePath.equals(bin) || equationPath.equals(bin)
+					|| buildPath.equals(bin)) {
 				bin = "bin3";
 			}
 			try {
-				String text = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-							"<classpath>\n" + 
-							"<classpathentry kind=\"src\" path=\"" + buildPath + "\"/>\n" +
-							"<classpathentry kind=\"con\" path=\"org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6\"/>\n" +
-							"<classpathentry kind=\"output\" path=\"" + bin + "\"/>\n" +
-							"</classpath>";
+				String text = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+						+ "<classpath>\n"
+						+ "<classpathentry kind=\"src\" path=\""
+						+ buildPath
+						+ "\"/>\n"
+						+ "<classpathentry kind=\"con\" path=\"org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6\"/>\n"
+						+ "<classpathentry kind=\"output\" path=\"" + bin
+						+ "\"/>\n" + "</classpath>";
 				InputStream source = new ByteArrayInputStream(text.getBytes());
 				iClasspathFile.create(source, true, null);
 			} catch (CoreException e) {
 				AheadCorePlugin.getDefault().logError(e);
 			}
-		
+
 		}
 	}
 
 	private void addNature(IProject project) {
 		try {
-			if (!project.isAccessible()
-					|| project.hasNature(JAVA_NATURE))
+			if (!project.isAccessible() || project.hasNature(JAVA_NATURE))
 				return;
-	
+
 			IProjectDescription description = project.getDescription();
 			String[] natures = description.getNatureIds();
 			String[] newNatures = new String[natures.length + 1];
@@ -243,5 +259,11 @@ public class AheadComposer implements IComposerExtensionClass {
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
+	}
+
+	@Override
+	public boolean hasFeatureFolders() {
+
+		return true;
 	}
 }

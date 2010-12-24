@@ -160,7 +160,8 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	 * - The composer for a project is set only once during the creation of new
 	 *   feature projects and should not be changed afterwards.
 	 */
-	public void setComposer(IComposerExtension composerExtension);
+	//TODO: check if this method is useful 
+	//public void setComposer(IComposerExtension composerExtension);
 	
 	/**
 	 * Sets the JAVA class path that is in order to build the project

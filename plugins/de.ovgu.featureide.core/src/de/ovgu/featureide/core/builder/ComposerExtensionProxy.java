@@ -186,5 +186,8 @@ public class ComposerExtensionProxy implements IComposerExtension {
 		composerExtensionClass.addCompiler(project, sourcePath, equationPath, buildPath);
 		
 	}
-
+	public boolean hasFeatureFolders(){
+		loadComposerExtension();
+		return composerExtensionClass.hasFeatureFolders();
+	}
 }

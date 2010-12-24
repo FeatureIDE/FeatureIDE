@@ -168,4 +168,10 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 	@Override
 	public void addCompiler(IProject project, String sourcePath,String equationPath, String buildPath) {
 	}
+
+	@Override
+	public boolean hasFeatureFolders() {
+		
+		return true;
+	}
 }

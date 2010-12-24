@@ -180,7 +180,6 @@ IFeatureProject, IResourceChangeListener {
 		equationFolder = CorePlugin.createFolder(project, getProjectConfigurationPath());
 		sourceFolder = CorePlugin.createFolder(project, getProjectSourcePath());
 		featureIDEProjectModel = null;
-
 		// loading model data and listen to changes in the model file
 		addModelListener();
 		loadModel();
@@ -188,6 +187,8 @@ IFeatureProject, IResourceChangeListener {
 		// make the composer ID a builder argument
 		setComposerID(getComposerID());
 		setPaths(getProjectSourcePath(), getProjectBuildPath(), getProjectConfigurationPath());
+	
+	
 	}
 
 	/*
@@ -244,7 +245,12 @@ IFeatureProject, IResourceChangeListener {
 		}
 		try {
 			modelReader.readFromFile(modelFile.getResource());
+			getComposer();
+			if(composerExtension.hasFeatureFolders()){
+			
 			createAndDeleteFeatureFolders();
+			setAllFeatureModuleMarkers(featureModel, sourceFolder);
+			}
 		} catch (FileNotFoundException e) {
 			modelFile.createModelMarker(e.getMessage(), IMarker.SEVERITY_ERROR,
 					0);
@@ -261,6 +267,7 @@ IFeatureProject, IResourceChangeListener {
 	}
 
 	private void createAndDeleteFeatureFolders() throws CoreException {
+	
 		sourceFolder.refreshLocal(IResource.DEPTH_ONE, null);
 		// create folders for all layers
 		for (Feature feature : featureModel.getFeatures())
@@ -277,8 +284,7 @@ IFeatureProject, IResourceChangeListener {
 						folder.delete(false, null);
 				}
 			}
-		// setting Problem markers on feature folders
-		setAllFeatureModuleMarkers(featureModel, sourceFolder);
+		
 	}
 
 	private void addModelListener() {
@@ -293,7 +299,7 @@ IFeatureProject, IResourceChangeListener {
 	private void createFeatureFolder(String name) {
 		try {
 			IFolder folder = sourceFolder.getFolder(name);
-			if (!folder.exists()) {
+			if (!folder.exists()&&composerExtension.hasFeatureFolders()) {
 				folder.create(false, true, null);
 				CorePlugin.getDefault().fireFeatureFolderChanged(folder);
 			}

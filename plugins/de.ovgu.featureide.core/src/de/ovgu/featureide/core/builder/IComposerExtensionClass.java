@@ -88,4 +88,9 @@ public interface IComposerExtensionClass {
 	
 	void preCompile(IFile file);
 	
+	/**
+	 * folders for each feature will be created if true
+	 */
+	boolean hasFeatureFolders();
+	
 }

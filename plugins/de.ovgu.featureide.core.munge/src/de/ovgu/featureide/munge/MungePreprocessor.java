@@ -225,7 +225,7 @@ public class MungePreprocessor implements IComposerExtensionClass{
 
 	@Override
 	public void preCompile(final IFile file) {
-		Job job = new Job("marker") {
+			Job job = new Job("marker") {
 			@Override
 			public IStatus run(IProgressMonitor monitor) {
 				try {
@@ -313,5 +313,11 @@ public class MungePreprocessor implements IComposerExtensionClass{
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
+	}
+
+	@Override
+	public boolean hasFeatureFolders() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }
