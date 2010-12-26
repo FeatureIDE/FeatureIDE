@@ -175,8 +175,8 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#prebuild()
 	 */
-	public void preCompile(IFile file) {
-		composerExtensionClass.preCompile(file);
+	public void postCompile(IFile file) {
+		composerExtensionClass.postCompile(file);
 	}
 
 	/* (non-Javadoc)

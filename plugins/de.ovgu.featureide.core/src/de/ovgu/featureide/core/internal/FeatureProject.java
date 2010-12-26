@@ -352,7 +352,7 @@ IFeatureProject, IResourceChangeListener {
 		
 		String equation = null;
 		try {
-			if (project.exists()) {
+			if (project.exists() && project.isOpen()) {
 				equation = project.getPersistentProperty(equationConfigID);
 			}
 		} catch (CoreException e) {
@@ -794,7 +794,7 @@ IFeatureProject, IResourceChangeListener {
 						res.getFullPath());
 				if (delta != null) {
 					if (composerExtension != null) {
-						composerExtension.preCompile((IFile)res);
+						composerExtension.postCompile((IFile)res);
 					}
 				}
 			}

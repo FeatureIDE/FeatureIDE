@@ -162,7 +162,7 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 	}
 
 	@Override
-	public void preCompile(IFile file) {
+	public void postCompile(IFile file) {
 	}
 
 	@Override

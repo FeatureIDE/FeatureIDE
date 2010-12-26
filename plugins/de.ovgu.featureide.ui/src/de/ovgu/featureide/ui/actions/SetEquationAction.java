@@ -22,6 +22,10 @@ import java.util.Iterator;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -61,11 +65,20 @@ public class SetEquationAction implements IObjectActionDelegate {
 					file = (IFile) ((IAdaptable) element).getAdapter(IFile.class);
 				}
 				if (file != null) {
-					IFeatureProject project = CorePlugin.getFeatureProject(file);
-					if (project == null)
+					final IFeatureProject project = CorePlugin.getFeatureProject(file);
+					if (project == null) {
 						UIPlugin.getDefault().logWarning("Can't set equation as current equation because it does not belong to a feature project");
-					else
-						project.setCurrentEquationFile(file);
+					} else {
+						final IFile equationFile = file;
+						Job job = new Job("Perform full build") {
+							protected IStatus run(IProgressMonitor monitor) {
+								project.setCurrentEquationFile(equationFile);
+								return Status.OK_STATUS;
+							}
+						};
+						job.setPriority(Job.SHORT);
+						job.schedule();
+					}			
 				}
 			}
 		}

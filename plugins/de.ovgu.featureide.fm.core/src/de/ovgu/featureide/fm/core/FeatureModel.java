@@ -63,15 +63,12 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
 public class FeatureModel implements PropertyConstants {
 
 	public static final String COMPOSER_KEY = "composer";
-	public static final QualifiedName composerConfigID = new QualifiedName(
-			"featureproject.configs", "composer");
-	public static final QualifiedName sourceFolderConfigID = new QualifiedName(
-			"featureproject.configs", "source");
+	public static final QualifiedName composerConfigID = new QualifiedName("featureproject.configs", "composer");
+	public static final QualifiedName sourceFolderConfigID = new QualifiedName("featureproject.configs", "source");
 	public static final String SOURCE_ARGUMENT = "source";
 	public static final String DEFAULT_SOURCE_PATH = "src";
-
-	public static final String BUILDER_ID = "de.ovgu.featureide.core"
-			+ ".extensibleFeatureProjectBuilder";
+	public static final String BUILDER_ID = "de.ovgu.featureide.core" + ".extensibleFeatureProjectBuilder";
+	
 	/**
 	 * the root feature
 	 */
@@ -265,8 +262,7 @@ public class FeatureModel implements PropertyConstants {
 	};
 
 	public void performRenamings(IFile file) {
-		IProject project = ((IResource) file.getAdapter(IFile.class))
-				.getProject();
+		IProject project = ((IResource) file.getAdapter(IFile.class)).getProject();
 		setComposerID(project);
 		sourceFolder = project.getFolder(getProjectConfigurationPath(project));
 		for (Renaming renaming : renamings) {

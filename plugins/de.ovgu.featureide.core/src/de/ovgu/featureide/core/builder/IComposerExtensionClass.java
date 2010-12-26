@@ -86,7 +86,7 @@ public interface IComposerExtensionClass {
 
 	ArrayList<String[]> getTemplates();
 	
-	void preCompile(IFile file);
+	void postCompile(IFile file);
 	
 	/**
 	 * folders for each feature will be created if true

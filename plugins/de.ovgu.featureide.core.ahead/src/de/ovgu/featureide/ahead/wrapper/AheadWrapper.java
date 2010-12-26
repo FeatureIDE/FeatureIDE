@@ -120,7 +120,7 @@ public class AheadWrapper {
 		composer.addBuildErrorListener(listener);
 	}
 
-	public void preCompile(final IFile file) {
+	public void postCompile(final IFile file) {
 		Job job = new Job("marker") {
 			@Override
 			public IStatus run(IProgressMonitor monitor) {

@@ -224,7 +224,7 @@ public class MungePreprocessor implements IComposerExtensionClass{
 	}
 
 	@Override
-	public void preCompile(final IFile file) {
+	public void postCompile(final IFile file) {
 			Job job = new Job("marker") {
 			@Override
 			public IStatus run(IProgressMonitor monitor) {
@@ -283,11 +283,11 @@ public class MungePreprocessor implements IComposerExtensionClass{
 			}
 			try {
 				String text = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-							"<classpath>\n" + 
-							"<classpathentry kind=\"src\" path=\"" + buildPath + "\"/>\n" +
-							"<classpathentry kind=\"con\" path=\"org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6\"/>\n" +
-							"<classpathentry kind=\"output\" path=\"" + bin + "\"/>\n" +
-							"</classpath>";
+							  "<classpath>\n" + 
+							  "<classpathentry kind=\"src\" path=\"" + buildPath + "\"/>\n" +
+							  "<classpathentry kind=\"con\" path=\"org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6\"/>\n" +
+							  "<classpathentry kind=\"output\" path=\"" + bin + "\"/>\n" +
+							  "</classpath>";
 				InputStream source = new ByteArrayInputStream(text.getBytes());
 				iClasspathFile.create(source, true, null);
 			} catch (CoreException e) {
@@ -317,7 +317,6 @@ public class MungePreprocessor implements IComposerExtensionClass{
 
 	@Override
 	public boolean hasFeatureFolders() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 }
