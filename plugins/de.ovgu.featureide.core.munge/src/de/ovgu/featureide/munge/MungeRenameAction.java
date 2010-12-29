@@ -58,6 +58,7 @@ public class MungeRenameAction implements IRenameAction {
 	private void performRenamings(String oldName, String newName, IFile iFile) {
 		try {
 			File file = iFile.getRawLocation().toFile();
+			//TODO consider using StringBuffer instead of String
 			String fileText = "";
 			Scanner scanner = new Scanner(file);
 			while (scanner.hasNext()) {
@@ -71,6 +72,7 @@ public class MungeRenameAction implements IRenameAction {
 			fileText = fileText.replaceAll("\\["+oldName+"\\]\\*\\/","[" + newName + "*/");
 			FileWriter fw = new FileWriter(file);
 			fw.write(fileText);
+			//TODO FileWriter should be closed using finally block
 			fw.close();	
 		} catch (FileNotFoundException e) {
 			MungeCorePlugin.getDefault().logError(e);

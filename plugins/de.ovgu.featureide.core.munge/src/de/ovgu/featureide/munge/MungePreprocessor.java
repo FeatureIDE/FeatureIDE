@@ -54,7 +54,7 @@ public class MungePreprocessor implements IComposerExtensionClass{
 
 	private IFeatureProject featureProject = null;
 
-	private LinkedList<String> selectedFeatures = new LinkedList<String>();
+	private LinkedList<String> selectedFeatures;
 	
 	private Configuration configuration;
 	
@@ -109,7 +109,7 @@ public class MungePreprocessor implements IComposerExtensionClass{
 		} catch (IOException e) {
 			MungeCorePlugin.getDefault().logError(e);
 		}
-		
+		selectedFeatures = new LinkedList<String>();
 		for (Feature feature : configuration.getSelectedFeatures()) {
 			selectedFeatures.add(feature.getName());
 		}
