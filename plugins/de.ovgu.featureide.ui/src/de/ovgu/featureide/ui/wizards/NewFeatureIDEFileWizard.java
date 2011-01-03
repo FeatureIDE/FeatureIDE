@@ -49,6 +49,8 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 	
 	private ISelection selection;
 	
+	private String feature;
+	
 	/**
 	 * Constructor for NewFeatureIDEFileWizard.
 	 */
@@ -57,12 +59,15 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 		setNeedsProgressMonitor(true);
 	}
 	
-	
 	/**
 	 * Adding the page to the wizard.
 	 */
 	public void addPages() {
-		page = new NewFeatureIDEFilePage(selection);
+		if (feature != null && feature != "")
+			page = new NewFeatureIDEFilePage(selection, feature);
+		else
+			page = new NewFeatureIDEFilePage(selection);
+		
 		addPage(page);
 	}
 
@@ -145,6 +150,7 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 		// replace all template markers with data
 		//TODO Dariusz: reference to composer 
 		contents = contents.replace("#classname#", classname);
+		
 		if (refines)
 			contents = contents.replace("#refines# ", "refines ");
 		else
@@ -160,5 +166,14 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 	 */
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
 		this.selection = selection;
+	}
+	
+	/**
+	 * Extended for passing selected feature.
+	 * @see IWorkbenchWizard#init(IWorkbench, IStructuredSelection)
+	 */
+	public void init(IWorkbench workbench, IStructuredSelection selection, String feature) {
+		this.selection = selection;
+		this.feature = feature;
 	}
 }

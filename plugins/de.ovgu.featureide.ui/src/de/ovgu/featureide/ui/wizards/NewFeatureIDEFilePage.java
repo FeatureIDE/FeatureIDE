@@ -80,6 +80,8 @@ public class NewFeatureIDEFilePage extends WizardPage {
 
 	private boolean refines = false;
 
+	private String feature;
+
 	private IFeatureProject featureProject = null;
 
 	public void setFeatureProjekt(IFeatureProject featureProject){
@@ -92,15 +94,29 @@ public class NewFeatureIDEFilePage extends WizardPage {
 	private String text;
 
 	/**
-	 * Constructor for SampleNewWizardPage.
+	 * Constructor for NewFeatureIDEFilePage.
 	 * 
-	 * @param pageName
+	 * @param selection
 	 */
 	public NewFeatureIDEFilePage(ISelection selection) {
 		super("wizardPage");
 		setTitle("New FeatureIDE File");
 		setDescription("Creates a new language specific FeatureIDE File.");
 		this.selection = selection;
+	}
+
+	/**
+	 * Constructor for NewFeatureIDEFilePage.
+	 * 
+	 * @param selection 
+	 * @param feature
+	 */
+	public NewFeatureIDEFilePage(ISelection selection, String feature) {
+		super("wizardPage");
+		setTitle("New FeatureIDE File");
+		setDescription("Creates a new language specific FeatureIDE File.");
+		this.selection = selection;
+		this.feature = feature;
 	}
 
 	/**
@@ -246,8 +262,8 @@ public class NewFeatureIDEFilePage extends WizardPage {
 			if (obj instanceof IResource) {
 				IResource resource = (IResource) obj;
 				featureProject = CorePlugin.getFeatureProject(resource);
-				featureComboProject.setText(featureProject.getProjectName());
 				if (featureProject != null) {
+					featureComboProject.setText(featureProject.getProjectName());
 					checkcontainer(featureProject, resource);
 				}
 			}
@@ -274,11 +290,12 @@ public class NewFeatureIDEFilePage extends WizardPage {
 					}
 				}
 
-				//featureComboProject.select(0);
-				featureComboProject.setText(featureProject.getProjectName());
+				if (featureProject != null) {
+					featureComboProject.setText(featureProject.getProjectName());
 
-				for (String s : featureProject.getFeatureModel().getFeatureNames())
-					featureComboContainer.add(s);
+					for (String s : featureProject.getFeatureModel().getFeatureNames())
+						featureComboContainer.add(s);
+				}
 			}
 			text = featureComboProject.getText();
 
@@ -304,6 +321,10 @@ public class NewFeatureIDEFilePage extends WizardPage {
 					refineslabel.setEnabled(false);
 				}
 			}
+		}
+
+		if (feature != null){
+			featureComboContainer.setText(feature);
 		}
 	}
 
@@ -345,7 +366,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 	}
 
 	public void dialogChanged() {
-		//TODO Dariusz: refinesbox must be checked
+		
 		if (featureComboProject.getText().length() == 0 && !projectbool) {
 			System.out.println("1");
 			setErrorMessage(null);

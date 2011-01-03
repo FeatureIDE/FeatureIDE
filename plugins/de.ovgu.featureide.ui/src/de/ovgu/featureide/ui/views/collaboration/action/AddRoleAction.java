@@ -18,20 +18,14 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.action;
 
-//import org.eclipse.core.runtime.CoreException;
-//import org.eclipse.core.runtime.IConfigurationElement;
-//import org.eclipse.core.runtime.ISafeRunnable;
-//import org.eclipse.core.runtime.Platform;
-//import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.PlatformUI;
 
-//import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
-//import de.ovgu.featureide.ui.views.collaboration.figures.CompartmentFigure;
+import de.ovgu.featureide.ui.views.collaboration.editparts.CollaborationEditPart;
 import de.ovgu.featureide.ui.wizards.NewFeatureIDEFileWizard;
 
 /**
@@ -44,14 +38,11 @@ import de.ovgu.featureide.ui.wizards.NewFeatureIDEFileWizard;
 public class AddRoleAction extends Action {
 	private GraphicalViewerImpl viewer;
 
-	//private CollaborationView collaborationView;
-
 	protected IStructuredSelection selection;
 
 	public AddRoleAction(String text, GraphicalViewerImpl view, CollaborationView collaborationView) {
 		super(text);
 		viewer = view;
-		//this.collaborationView = collaborationView;
 	}
 
 	public void setEnabled(boolean enable) {
@@ -60,46 +51,23 @@ public class AddRoleAction extends Action {
 	}
 
 	public void run() {
-		//runExtension();
+		IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
+		String feature = "";
+		
+		Object selectedItem = selection.getFirstElement();
+		
+		if (selectedItem != null){
+			if (selectedItem instanceof CollaborationEditPart) {
+				feature = ((CollaborationEditPart) selectedItem).getCollaborationModel().getName();
+			}
+		}
 		
 		NewFeatureIDEFileWizard wizard = new NewFeatureIDEFileWizard();
-		wizard.init(PlatformUI.getWorkbench(), (IStructuredSelection)selection);
+		wizard.init(PlatformUI.getWorkbench(), (IStructuredSelection)selection, feature);
 
 		WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
 		dialog.create();
 		dialog.open();
 		
 	}
-/*
-	private void runExtension() {
-
-		IConfigurationElement[] config = Platform.getExtensionRegistry()
-			.getConfigurationElementsFor(UIPlugin.PLUGIN_ID + ".RunAddRoleAction");
-		try {
-			for (IConfigurationElement e : config) {
-				if (e.getAttribute("composer").equals(collaborationView.getFeatureProject().getComposer().getName())) {
-					final Object o = e.createExecutableExtension("class");
-					if (o instanceof IRunAddRoleAction) {
-
-						ISafeRunnable runnable = new ISafeRunnable() {
-							@Override
-							public void handleException(Throwable e) {
-								UIPlugin.getDefault().logError(e);
-							}
-
-							@Override
-							public void run() throws Exception {
-								((IRunAddRoleAction) o).run(viewer, selection);
-							}
-						};
-						SafeRunner.run(runnable);
-					}
-					break;
-				}
-			}
-		} catch (CoreException ex) {
-			UIPlugin.getDefault().logError(ex);
-		}
-	}
-	*/
 }
