@@ -259,7 +259,7 @@ public class CorePlugin extends AbstractCorePlugin {
 									}
 								}
 								//create a configuration to automaticly build the project after adding the FeatureIDE nature 
-								IFile equationFile = project.getFolder(equationPath).getFile(project.getName().split("[-]")[0] + ".equation");
+								IFile equationFile = project.getFolder(equationPath).getFile(project.getName().split("[-]")[0] + ".config");
 								FileWriter fw = new FileWriter(equationFile.getRawLocation().toFile());
 								fw.write("Base");
 								fw.close();

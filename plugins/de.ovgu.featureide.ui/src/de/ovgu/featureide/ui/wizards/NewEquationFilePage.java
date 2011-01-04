@@ -44,7 +44,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 /**
  * The "New" wizard page allows setting the container for the new file as well
  * as the file name. The page will only accept file name without the extension
- * OR with the extension that matches the expected one (.equation).
+ * OR with the extension that matches the expected one (.config).
  * 
  * @author Christian Becker
  * @author Jens Meinicke

@@ -7,7 +7,7 @@
       <editor
             class="de.ovgu.featureide.ui.editors.ConfigurationEditor"
             default="true"
-            extensions="equation, expression"
+            extensions="equation, expression, config"
             icon="icons/EquationIcon.png"
             id="de.ovgu.featureide.ui.editors.ConfigurationEditor"
             name="Configuration Editor">
@@ -48,19 +48,6 @@
          point="org.eclipse.ui.popupMenus">
       <objectContribution
             adaptable="true"
-            id="de.ovgu.featureide.ui.equationFileContribution"
-            nameFilter="*.equation"
-            objectClass="org.eclipse.core.resources.IFile">
-         <action
-               class="de.ovgu.featureide.ui.actions.SetEquationAction"
-               icon="icons/currentequation.gif"
-               id="de.ovgu.featureide.ui.setEquationAction"
-               label="Set as current configuration"
-               menubarPath="group.open"
-               tooltip="Only the current equation is build"/>
-      </objectContribution>
-      <objectContribution
-            adaptable="true"
             id="de.ovgu.featureide.ui.actions.conversionaction"
             objectClass="org.eclipse.core.resources.IProject">
          <action
@@ -70,6 +57,34 @@
                label="Add FeatureIDE Nature"
                menubarPath="group.open"
                style="push">
+         </action>
+      </objectContribution>
+      <objectContribution
+            adaptable="true"
+            id="de.ovgu.featureide.ui.equationFileContribution"
+            nameFilter="*.config"
+            objectClass="org.eclipse.core.resources.IFile">
+         <action
+               class="de.ovgu.featureide.ui.actions.SetEquationAction"
+               icon="icons/currentequation.gif"
+               id="de.ovgu.featureide.ui.setEquationAction"
+               label="Set as current configuration"
+               menubarPath="group.open"
+               tooltip="Only the current equation is build">
+         </action>
+      </objectContribution>
+      <objectContribution
+            adaptable="true"
+            id="de.ovgu.featureide.ui.configFileContribution"
+            nameFilter="*.equation"
+            objectClass="org.eclipse.core.resources.IFile">
+         <action
+               class="de.ovgu.featureide.ui.actions.SetEquationAction"
+               icon="icons/currentequation.gif"
+               id="de.ovgu.featureide.ui.setEquationAction"
+               label="Set as current configuration"
+               menubarPath="group.open"
+               tooltip="Only the current equation is build">
          </action>
       </objectContribution>
    </extension>

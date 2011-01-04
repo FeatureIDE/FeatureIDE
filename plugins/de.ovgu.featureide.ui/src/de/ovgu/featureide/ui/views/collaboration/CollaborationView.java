@@ -172,7 +172,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 					featureProject = CorePlugin.getFeatureProject(inputFile.getFile());
 					if (featureProject != null) {
 						//case: its a featureIDE project
-						if (inputFile.getName().endsWith(".equation")) {
+						if (inputFile.getName().endsWith(".equation") || inputFile.getName().endsWith(".config")) {
 							//case: open configuration editor
 							if (builder.configuration.equals(inputFile.getName())) {
 								return;

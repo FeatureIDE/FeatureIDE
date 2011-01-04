@@ -373,8 +373,9 @@ IFeatureProject, IResourceChangeListener {
 		try {
 			for (IResource resource : getEquationFolder().members()) {
 				if (resource instanceof IFile
-						&& (resource.getName().endsWith(".equation") || resource
-								.getName().endsWith(".expression"))) {
+						&& (resource.getName().endsWith(".equation") ||
+							resource.getName().endsWith(".expression") || 
+							resource.getName().endsWith(".config"))) {
 					equationFile = (IFile) resource;
 					setCurrentEquationFile(equationFile);
 					return equationFile;

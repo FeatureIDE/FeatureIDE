@@ -70,7 +70,7 @@ public class NewEquationFileWizard extends Wizard implements INewWizard {
 	 */
 	public boolean performFinish() {
 		final IContainer container = page.getContainerObject();
-		final String fileName = page.getFileName()+ ".equation";
+		final String fileName = page.getFileName()+ ".config";
 		IRunnableWithProgress op = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor) throws InvocationTargetException {
 				try {
