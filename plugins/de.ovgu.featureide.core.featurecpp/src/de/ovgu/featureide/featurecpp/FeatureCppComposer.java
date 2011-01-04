@@ -19,6 +19,7 @@
 package de.ovgu.featureide.featurecpp;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -93,6 +94,12 @@ public class FeatureCppComposer implements IComposerExtensionClass {
 		return list;
 	}
 
+	@Override
+	public String replaceMarker(String text, List<String> list) {
+		// no composer specific markers yet 
+		return text;
+	}
+	
 	@Override
 	public void postCompile(IFile file) {
 	}

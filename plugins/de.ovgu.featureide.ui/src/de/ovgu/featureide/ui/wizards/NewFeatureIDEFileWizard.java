@@ -25,6 +25,9 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.core.runtime.*;
 import org.eclipse.jface.operation.*;
 import java.lang.reflect.InvocationTargetException;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.core.resources.*;
@@ -33,6 +36,7 @@ import java.io.*;
 import org.eclipse.ui.*;
 import org.eclipse.ui.ide.IDE;
 
+import de.ovgu.featureide.core.builder.IComposerExtension;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
@@ -81,11 +85,12 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 		final String fileName = page.getClassName();
 		final String fileExtension = page.getExtension();
 		final String fileTemplate = page.getTemplate();
+		final IComposerExtension composer = page.getComposer();
 		
 		IRunnableWithProgress op = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor) throws InvocationTargetException {
 				try {
-					doFinish(container, fileName, fileExtension, fileTemplate , page.isRefinement (), monitor);
+					doFinish(container, fileName, fileExtension, fileTemplate , composer, page.isRefinement (), monitor);
 				} catch (CoreException e) {
 					throw new InvocationTargetException(e);
 				} finally {
@@ -111,12 +116,12 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 	 * the editor on the newly created file.
 	 */
 	private void doFinish(IContainer container, String fileName, String extension, String template, 
-			boolean refines, IProgressMonitor monitor) throws CoreException {
+			IComposerExtension composer, boolean refines, IProgressMonitor monitor) throws CoreException {
 		// create a sample file
 		monitor.beginTask("Creating " + fileName, 2);
 		final IFile file = container.getFile(new Path(fileName + "." + extension));
 		try {
-			InputStream stream = openContentStream(container.getName(), fileName, template, refines);
+			InputStream stream = openContentStream(container.getName(), fileName, template, composer, refines);
 			if (file.exists()) {
 				file.setContents(stream, true, true, monitor);
 			} else {
@@ -144,17 +149,15 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 	 * We will initialize file contents with a sample text.
 	 */
 
-	private InputStream openContentStream(String layername, String classname, String template, boolean refines) {
+	private InputStream openContentStream(String layername, String classname, String template, IComposerExtension composer, boolean refines) {
 		String contents = template;
-
-		// replace all template markers with data
-		//TODO Dariusz: reference to composer 
-		contents = contents.replace("#classname#", classname);
+		List<String> list = new LinkedList<String>();
 		
 		if (refines)
-			contents = contents.replace("#refines# ", "refines ");
-		else
-			contents = contents.replace("#refines#", "");
+			list.add("refines");
+		 
+		contents = composer.replaceMarker(contents, list);
+		contents = contents.replace("#classname#", classname);
 		
 		return new ByteArrayInputStream(contents.getBytes());
 	}

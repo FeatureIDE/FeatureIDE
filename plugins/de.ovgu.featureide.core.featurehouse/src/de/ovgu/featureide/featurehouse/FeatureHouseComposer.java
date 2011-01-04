@@ -19,6 +19,7 @@
 package de.ovgu.featureide.featurehouse;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -100,6 +101,12 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 		extensions.add(".als");
 		extensions.add(".xmi");
 		return extensions;
+	}
+	
+	@Override
+	public String replaceMarker(String text, List<String> list) {
+		// no composer specific markers yet 
+		return text;
 	}
 
 	@Override

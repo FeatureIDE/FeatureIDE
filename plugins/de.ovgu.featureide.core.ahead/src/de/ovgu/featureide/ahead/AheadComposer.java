@@ -25,6 +25,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import org.eclipse.core.resources.IFile;
@@ -193,6 +194,16 @@ public class AheadComposer implements IComposerExtensionClass {
 				"public #refines# class #classname# {\n\n}" };
 		list.add(jak);
 		return list;
+	}
+	
+	@Override
+	public String replaceMarker(String text, List<String> list) {
+		if (list != null && list.contains("refines"))
+			text = text.replace("#refines#", "refines ");
+		else
+			text = text.replace("#refines#", "");
+		
+		return text;
 	}
 
 	@Override

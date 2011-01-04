@@ -83,6 +83,8 @@ public class NewFeatureIDEFilePage extends WizardPage {
 	private String feature;
 
 	private IFeatureProject featureProject = null;
+	
+	private IComposerExtension composerExt;
 
 	public void setFeatureProjekt(IFeatureProject featureProject){
 		this.featureProject = featureProject;
@@ -187,9 +189,9 @@ public class NewFeatureIDEFilePage extends WizardPage {
 
 						// reload all formats for the changed Project
 
-						IComposerExtension composer = featureProject.getComposer();
-						composer.initialize(featureProject);
-						formats = composer.getTemplates();
+						composerExt = featureProject.getComposer();
+						composerExt.initialize(featureProject);
+						formats = composerExt.getTemplates();
 
 						languageCombo.removeAll();
 						for (String[] format : formats)
@@ -301,16 +303,16 @@ public class NewFeatureIDEFilePage extends WizardPage {
 
 			if(featureProject != null){
 
-				IComposerExtension composer = featureProject.getComposer();
-				composer.initialize(featureProject);
-				formats = composer.getTemplates();
+				composerExt = featureProject.getComposer();
+				composerExt.initialize(featureProject);
+				formats = composerExt.getTemplates();
 
 				for (String[] format : formats)
 					languageCombo.add(format[0]);
 
 				languageCombo.select(0);
 
-				String composerID = composer.getId();
+				String composerID = composerExt.getId();
 				if(composerID.equals("de.ovgu.featureide.composer.featurecpp") 
 						|| composerID.equals("de.ovgu.featureide.composer.ahead")){
 					refinesbox.setEnabled(true);
@@ -477,6 +479,10 @@ public class NewFeatureIDEFilePage extends WizardPage {
 
 	public String getTemplate() {
 		return formats.get(languageCombo.getSelectionIndex())[2];
+	}
+	
+	public IComposerExtension getComposer() {
+		return composerExt;
 	}
 
 	public boolean isFeatureProject(String text) {

@@ -19,6 +19,7 @@
 package de.ovgu.featureide.core.builder;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -84,7 +85,21 @@ public interface IComposerExtensionClass {
 	 */
 	void buildFSTModel();
 
+	/**
+	 * Returns the list of templates for the current composer. <br>
+	 * Format: {"File format name", "extension", "template"}
+	 * 
+	 * @return list of templates for the current composer
+	 */
 	ArrayList<String[]> getTemplates();
+	
+	/**
+	 * Replaces all markers in the template.
+	 * @param text - String, where markers shall be replaced
+	 * @param list - List of markers, which depend on user input
+	 * @return template with replaced markers
+	 */
+	public String replaceMarker(String text, List<String> list);
 	
 	void postCompile(IFile file);
 	

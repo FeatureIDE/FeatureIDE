@@ -19,6 +19,7 @@
 package de.ovgu.featureide.core.builder;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -169,9 +170,16 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#getTemplates()
 	 */
 	public ArrayList<String[]> getTemplates(){
-			return composerExtensionClass.getTemplates();
+		return composerExtensionClass.getTemplates();
 	}
 
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#replaceMarker(String text, List<String> list)
+	 */
+	public String replaceMarker(String text, List<String> list) {
+		return composerExtensionClass.replaceMarker(text, list);
+	}
+	
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#prebuild()
 	 */
