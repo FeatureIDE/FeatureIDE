@@ -154,8 +154,10 @@ public class ConfigurationPage extends EditorPart {
 		UIJob job = new UIJob("refresh tree") {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
-				if (errorMassage())
+				if (errorMassage()) {
 					setInput(configurationEditor.configuration);
+					
+				}
 				return Status.OK_STATUS;
 			}
 		};

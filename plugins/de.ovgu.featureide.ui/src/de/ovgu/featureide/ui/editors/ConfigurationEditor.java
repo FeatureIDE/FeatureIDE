@@ -20,8 +20,13 @@ package de.ovgu.featureide.ui.editors;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Scanner;
+import java.util.StringTokenizer;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -52,6 +57,7 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
@@ -134,6 +140,7 @@ PropertyConstants, PropertyChangeListener, IResourceChangeListener {
 		configuration = new Configuration(featureModel, true);
 		try {
 			new ConfigurationReader(configuration).readFromFile(file);
+			isPageModified = isModified(file);
 		} catch (Exception e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
@@ -142,6 +149,47 @@ PropertyConstants, PropertyChangeListener, IResourceChangeListener {
 		firePropertyChange(IEditorPart.PROP_DIRTY);
 	}
 	
+	/**
+	 * @param configuration file
+	 * @return true if configuration of the tree do not equal the configuration of the file
+	 */
+	private boolean isModified(IFile iFile) {
+		LinkedList<String> treeFeatures = new LinkedList<String>();
+		for (Feature feature : configuration.getSelectedFeatures()) {
+			if (feature.isLayer()) {
+				treeFeatures.add(feature.getName());
+			}
+		}
+		File file = iFile.getRawLocation().toFile();
+		try {
+			Scanner scanner = new Scanner(file);
+			String line = null;
+			while (scanner.hasNext()) {
+				line = scanner.next();
+				if (line.startsWith("#") || line.isEmpty()){
+					continue;
+				}
+				StringTokenizer tokenizer = new StringTokenizer(line);
+				while (tokenizer.hasMoreTokens()) {
+					String name = tokenizer.nextToken();
+					if (treeFeatures.contains(name)) {
+						treeFeatures.remove(name);
+					} else {
+						scanner.close();
+						return true;
+					}
+				}
+			}
+			scanner.close();
+			if (treeFeatures.size() != 0) {
+				return true;
+			}
+		} catch (FileNotFoundException e) {
+			UIPlugin.getDefault().logError(e);
+		}
+		return false;
+	}
+
 	/* (non-Javadoc)
 	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
 	 */

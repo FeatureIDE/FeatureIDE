@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -318,5 +319,10 @@ public class MungePreprocessor implements IComposerExtensionClass{
 	@Override
 	public boolean hasFeatureFolders() {
 		return false;
+	}
+
+	@Override
+	public String replaceMarker(String text, List<String> list) {
+		return text;
 	}
 }

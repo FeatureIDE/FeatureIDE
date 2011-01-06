@@ -19,10 +19,13 @@
 package de.ovgu.featureide.ui.wizards;
 
 import java.util.Collection;
+import java.util.LinkedList;
 
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.IDialogPage;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -39,6 +42,7 @@ import org.eclipse.swt.widgets.Text;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.ui.UIPlugin;
 
 
 /**
@@ -121,6 +125,15 @@ public class NewEquationFilePage extends WizardPage {
 					}	
 				}
 				if (featureProject != null){
+					try {
+						for (IResource equationFile : featureProject.getEquationFolder().members()) {
+							if (equationFile instanceof IFile) {
+								equationNames.add(equationFile.getName());//.split("[.]")[0]);
+							}
+						}
+					} catch (CoreException e2) {
+						UIPlugin.getDefault().logError(e2);
+					}
 					IResource res = ResourcesPlugin.getWorkspace().getRoot().findMember(featureProject.getProjectName()); 
 					IFeatureProject data = CorePlugin.getFeatureProject(res);
 					container = data.getEquationFolder();
@@ -150,12 +163,14 @@ public class NewEquationFilePage extends WizardPage {
 					else {
 						container = data.getEquationFolder();
 					}
-				
-				featureComboProject.setText(container.getProject().getName());
+				if (container != null) {
+					featureComboProject.setText(container.getProject().getName());
+				}
 			}
 		}
 	}
-
+	
+	private LinkedList<String> equationNames = new LinkedList<String>();
 	private boolean projectbool = false;
 	private boolean equationbool = false;
 	private void dialogChanged() {
@@ -176,11 +191,14 @@ public class NewEquationFilePage extends WizardPage {
 			updateStatus("Selected project is not a FeatureIDE Project");
 			return;
 		}
-
+		
 		if (fileName.length() != 0) {
 			equationbool = true;
-		}
-		else if(equationbool) {
+			if (equationNames.contains(fileName)) {
+				updateStatus("File " + fileName + ".equation already exists.");
+				return;
+			}
+		} else if(equationbool) {
 			updateStatus("File name must be specified");
 			return;
 		}else{
@@ -218,6 +236,17 @@ public class NewEquationFilePage extends WizardPage {
 		for (IFeatureProject feature : featureProjects){
 			if(text.equalsIgnoreCase(feature.getProjectName())){
 				isFP = true;
+				featureProject = feature;
+				try {
+					equationNames = new LinkedList<String>();
+					for (IResource equationFile : featureProject.getEquationFolder().members()) {
+						if (equationFile instanceof IFile) {
+							equationNames.add(equationFile.getName().split("[.]")[0]);
+						}
+					}
+				} catch (CoreException e2) {
+					UIPlugin.getDefault().logError(e2);
+				}
 			}
 		}
 		return isFP;
