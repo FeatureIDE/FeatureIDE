@@ -257,29 +257,42 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		
 	}
 
-	private ArrayList<String> getSelectedFeatures(IFile file) {
-		File equation = file.getRawLocation().toFile();
-		ArrayList<String> list;
+
+	private static ArrayList<String> getSelectedFeatures(IFile equation) {
+		File equationFile = equation.getRawLocation().toFile();
+		return getTokenListFromFile(equationFile);
+	}
+
+	/**
+	 * returns a List of the tokens in file+
+	 * this method is public for testing purposes 
+	 * 
+	 * @param file
+	 * @return List of tokens
+	 */
+	public static ArrayList<String> getTokenListFromFile(File file) {
+		ArrayList<String> list = null;
 		Scanner scanner = null;
 
 		try {
-			scanner = new Scanner(equation);
+			scanner = new Scanner(file);
+
+			if (scanner.hasNext()) {
+				list = new ArrayList<String>();
+				while (scanner.hasNext()) {
+					list.add(scanner.next());
+				}
+
+			}
+
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
+		} finally {
+			if(scanner!=null)scanner.close();
 		}
-
-		if (scanner.hasNext()) {
-			list = new ArrayList<String>();
-			while (scanner.hasNext()) {
-				list.add(scanner.next());
-			}
-			scanner.close();
-			return list;
-		} else {
-			scanner.close();
-			return null;
-		}
+		return list;
 	}
+
 	private void createFolder(String name) {
 		IFolder folder = featureProject.getProject().getFolder(name);
 		try {
