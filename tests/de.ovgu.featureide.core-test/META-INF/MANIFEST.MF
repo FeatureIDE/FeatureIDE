@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Core Test Fragment
+Bundle-Name: Core-Test Fragment
 Bundle-SymbolicName: de.ovgu.featureide.core_test
 Bundle-Version: 2.2.4.qualifier
 Bundle-Vendor: University of Magdeburg
