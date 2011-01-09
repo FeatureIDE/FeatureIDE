@@ -6,5 +6,4 @@ Bundle-Version: 2.2.4.qualifier
 Bundle-Vendor: University of Magdeburg
 Fragment-Host: de.ovgu.featureide.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: org.junit,
- org.junit.rules
+Require-Bundle: org.junit4;bundle-version="4.8.1"
