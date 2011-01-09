@@ -56,28 +56,39 @@ public class MungeRenameAction implements IRenameAction {
 	}
 	
 	private void performRenamings(String oldName, String newName, IFile iFile) {
+		Scanner scanner = null;
+		FileWriter fw = null;
 		try {
 			File file = iFile.getRawLocation().toFile();
-			//TODO consider using StringBuffer instead of String
-			String fileText = "";
-			Scanner scanner = new Scanner(file);
+			StringBuffer fileText = new StringBuffer();
+			scanner = new Scanner(file);
 			while (scanner.hasNext()) {
-				fileText += scanner.nextLine() + "\r\n";
+				fileText.append(scanner.nextLine());
+				fileText.append("\r\n");
 			}
-			scanner.close();
-			if (!fileText.contains(oldName)) {
+			
+			if (!fileText.toString().contains(oldName)) {
 				return;
 			}
 			
-			fileText = fileText.replaceAll("\\["+oldName+"\\]\\*\\/","[" + newName + "*/");
-			FileWriter fw = new FileWriter(file);
-			fw.write(fileText);
-			//TODO FileWriter should be closed using finally block
-			fw.close();	
+			String fileTextString = fileText.toString().replaceAll("\\["+oldName+"\\]\\*\\/","[" + newName + "]*/");
+			fw = new FileWriter(file);
+			fw.write(fileTextString);
+			
 		} catch (FileNotFoundException e) {
 			MungeCorePlugin.getDefault().logError(e);
 		} catch (IOException e) {
 			MungeCorePlugin.getDefault().logError(e);
+		}
+		finally{
+			if(scanner!=null)
+			scanner.close();
+			if(fw!=null)
+				try {
+					fw.close();
+				} catch (IOException e) {
+					MungeCorePlugin.getDefault().logError(e);
+				}	
 		}
 	}
 }
