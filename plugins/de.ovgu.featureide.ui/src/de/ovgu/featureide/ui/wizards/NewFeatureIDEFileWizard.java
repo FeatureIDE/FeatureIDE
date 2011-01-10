@@ -55,6 +55,8 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 	
 	private String feature;
 	
+	private String clss;
+	
 	/**
 	 * Constructor for NewFeatureIDEFileWizard.
 	 */
@@ -67,11 +69,7 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 	 * Adding the page to the wizard.
 	 */
 	public void addPages() {
-		if (feature != null && feature != "")
-			page = new NewFeatureIDEFilePage(selection, feature);
-		else
-			page = new NewFeatureIDEFilePage(selection);
-		
+		page = new NewFeatureIDEFilePage(selection, feature, clss);
 		addPage(page);
 	}
 
@@ -175,8 +173,9 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 	 * Extended for passing selected feature.
 	 * @see IWorkbenchWizard#init(IWorkbench, IStructuredSelection)
 	 */
-	public void init(IWorkbench workbench, IStructuredSelection selection, String feature) {
+	public void init(IWorkbench workbench, IStructuredSelection selection, String feature, String clss) {
 		this.selection = selection;
 		this.feature = feature;
+		this.clss = clss;
 	}
 }

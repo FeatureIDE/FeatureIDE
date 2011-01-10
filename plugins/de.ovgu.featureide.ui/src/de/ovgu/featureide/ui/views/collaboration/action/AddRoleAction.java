@@ -25,6 +25,7 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
+import de.ovgu.featureide.ui.views.collaboration.editparts.ClassEditPart;
 import de.ovgu.featureide.ui.views.collaboration.editparts.CollaborationEditPart;
 import de.ovgu.featureide.ui.wizards.NewFeatureIDEFileWizard;
 
@@ -53,21 +54,27 @@ public class AddRoleAction extends Action {
 	public void run() {
 		IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
 		String feature = "";
-		
+		String clss = "";
 		Object selectedItem = selection.getFirstElement();
-		
+
 		if (selectedItem != null){
 			if (selectedItem instanceof CollaborationEditPart) {
 				feature = ((CollaborationEditPart) selectedItem).getCollaborationModel().getName();
 			}
+
+			else if (selectedItem instanceof ClassEditPart) {
+				clss = ((ClassEditPart) selectedItem).getClassModel().getName();
+				if (clss.contains("."))
+					clss = clss.substring(0,clss.lastIndexOf("."));
+			}
 		}
 		
 		NewFeatureIDEFileWizard wizard = new NewFeatureIDEFileWizard();
-		wizard.init(PlatformUI.getWorkbench(), (IStructuredSelection)selection, feature);
+		wizard.init(PlatformUI.getWorkbench(), (IStructuredSelection)selection, feature, clss);
 
 		WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
 		dialog.create();
 		dialog.open();
-		
+
 	}
 }

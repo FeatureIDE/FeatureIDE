@@ -81,6 +81,8 @@ public class NewFeatureIDEFilePage extends WizardPage {
 	private boolean refines = false;
 
 	private String feature;
+	
+	private String clss;
 
 	private IFeatureProject featureProject = null;
 	
@@ -113,12 +115,13 @@ public class NewFeatureIDEFilePage extends WizardPage {
 	 * @param selection 
 	 * @param feature
 	 */
-	public NewFeatureIDEFilePage(ISelection selection, String feature) {
+	public NewFeatureIDEFilePage(ISelection selection, String feature, String clss) {
 		super("wizardPage");
 		setTitle("New FeatureIDE File");
 		setDescription("Creates a new language specific FeatureIDE File.");
 		this.selection = selection;
 		this.feature = feature;
+		this.clss = clss;
 	}
 
 	/**
@@ -327,6 +330,10 @@ public class NewFeatureIDEFilePage extends WizardPage {
 
 		if (feature != null){
 			featureComboContainer.setText(feature);
+		}
+		
+		if (clss != null){
+			className.setText(clss);
 		}
 	}
 
