@@ -28,6 +28,7 @@ import org.eclipse.ui.PlatformUI;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.TreeElement;
 import de.ovgu.featureide.fm.core.editing.Comparison;
 import de.ovgu.featureide.fm.core.editing.ModelComparator;
@@ -182,6 +183,21 @@ public class ViewContentProvider implements IStructuredContentProvider,
 				addChild("Number of abstract features: " + (features - concrete));
 				addChild("Number of terminal features: " + terminal);
 				addChild("Number of non-terminal features: " + (features - terminal));
+				addChild(new TreeParent("Number of program variants (calculation may take some time)", null, true) {
+					/* (non-Javadoc)
+					 * @see de.ovgu.featureide.fm.ui.views.featuremodeleditview.TreeParent#initChildren()
+					 */
+					@Override
+					public void initChildren() {
+						long number = new Configuration(model).number(60*1000);
+						String s = "";
+						if (number < 0)
+							s += "more than " + (-1 - number) + " variants";
+						else
+							s += number + " variants";
+						addChild(s);
+					}
+				});
 			}
 		};
 		statistics.addChild(parent);

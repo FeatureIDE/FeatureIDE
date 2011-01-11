@@ -102,6 +102,10 @@ public class Configuration {
 	}
 
 	public long number() {
+		return number(250);
+	}
+	
+	public long number(long timeout) {
 		LinkedList<Node> children = new LinkedList<Node>();
 		for (SelectableFeature feature : features)
 			if (!feature.hasChildren()) {
@@ -111,7 +115,7 @@ public class Configuration {
 					children.add(new Literal(feature.getName(), false));
 			}
 		Node node = new And(rootNode.clone(), new And(children));
-		return new SatSolver(node, 250).countSolutions();
+		return new SatSolver(node, timeout).countSolutions();
 	}
 	
 	private void updateAutomaticValues() {
