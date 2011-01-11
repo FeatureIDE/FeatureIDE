@@ -5,7 +5,7 @@
          point="de.ovgu.featureide.core.composers">
       <composer
             class="de.ovgu.featureide.featurehouse.FeatureHouseComposer"
-            description="Composes several types of structured files."
+            description="Feature-oriented programming for several structured file types (e.g. Java 1.5)."
             id="de.ovgu.featureide.composer.featurehouse"
             name="FeatureHouse"
             nature="FeatureIDE_Core.featureHouseNature">

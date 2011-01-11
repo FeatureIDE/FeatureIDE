@@ -5,7 +5,7 @@
          point="de.ovgu.featureide.core.composers">
       <composer
             class="de.ovgu.featureide.ahead.AheadComposer"
-            description="Composes Jak files(Java 1.4)."
+            description="Feature-oriented programming with Jak files (Java 1.4)."
             id="de.ovgu.featureide.composer.ahead"
             name="AHEAD"
             nature="FeatureIDE_Core.jaknature">

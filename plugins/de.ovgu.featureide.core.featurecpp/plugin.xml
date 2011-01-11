@@ -5,7 +5,7 @@
          point="de.ovgu.featureide.core.composers">
       <composer
             class="de.ovgu.featureide.featurecpp.FeatureCppComposer"
-            description="Composes C++ header files."
+            description="Feature-oriented programming for C++ header files."
             id="de.ovgu.featureide.composer.featurecpp"
             name="FeatureC++"
             nature="FeatureIDE_Core.featureCPPNature">
