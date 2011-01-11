@@ -1,0 +1,29 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: org.xtext.example.dj.ui
+Bundle-Vendor: Dipartimento di Informatica, Univ. di Torino
+Bundle-Version: 1.0.0
+Bundle-SymbolicName: org.xtext.example.dj.ui; singleton:=true
+Bundle-ActivationPolicy: lazy
+Require-Bundle: org.xtext.example.dj;visibility:=reexport,
+ org.eclipse.xtext.ui,
+ org.eclipse.ui.editors;bundle-version="3.5.0",
+ org.eclipse.ui.ide;bundle-version="3.5.0",
+ org.eclipse.xtext.ui.shared,
+ org.eclipse.ui,
+ org.antlr.runtime,
+ org.eclipse.xtext.builder,
+ org.eclipse.core.resources,
+ org.eclipse.xtend,
+ org.eclipse.xpand,
+ org.eclipse.core.runtime,
+ org.eclipse.xtend.typesystem.emf;visibility:=reexport
+Import-Package: djtemplates,
+ org.apache.log4j,
+ org.eclipse.emf.common.util,
+ org.eclipse.emf.ecore,
+ org.eclipse.xtend.typesystem.emf
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Export-Package: org.xtext.example.dj.ui.popup.actions,
+ org.xtext.example.ui.contentassist.antlr
+Bundle-Activator: org.xtext.example.ui.internal.DJActivator

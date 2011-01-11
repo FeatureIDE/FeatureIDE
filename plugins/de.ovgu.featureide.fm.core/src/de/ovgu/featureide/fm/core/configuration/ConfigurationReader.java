@@ -31,7 +31,7 @@ import java.util.StringTokenizer;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
-
+//TODO: streams should be closed in finally blocks
 public class ConfigurationReader {
 	
 	private Configuration configuration;

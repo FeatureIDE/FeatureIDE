@@ -1,0 +1,24 @@
+import "FeaturesArticle2005SimplexCore.dj"
+import "DAddArticle2005SimplexCore.dj"
+import "DNegArticle2005SimplexCore.dj"
+import "DAddEvalArticle2005SimplexCore.dj"
+import "DNegEvalArticle2005SimplexCore.dj"
+
+delta DEval when Eval{
+	
+    modifies class Lit {
+
+        adds int eval() {
+            return this.value;
+        }
+    }
+
+    modifies class Test {
+
+        modifies void run() {
+            original();
+            new SystemOutWrapper().println(this.a.eval());
+        }
+    }
+
+}

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>ExpressionProductLine-DeltaJ</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>de.ovgu.featureide.core.extensibleFeatureProjectBuilder</name>
+			<arguments>
+				<dictionary>
+					<key>build</key>
+					<value>src</value>
+				</dictionary>
+				<dictionary>
+					<key>composer</key>
+					<value>de.ovgu.featureide.core.deltaj.deltajcomposer</value>
+				</dictionary>
+				<dictionary>
+					<key>equations</key>
+					<value>equations</value>
+				</dictionary>
+				<dictionary>
+					<key>source</key>
+					<value>feature</value>
+				</dictionary>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>org.eclipse.xtext.ui.shared.xtextBuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>de.ovgu.featureide.core.featureProjectNature</nature>
+		<nature>org.eclipse.xtext.ui.shared.xtextNature</nature>
+	</natures>
+</projectDescription>

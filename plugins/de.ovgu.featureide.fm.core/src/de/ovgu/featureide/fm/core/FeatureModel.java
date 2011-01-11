@@ -268,6 +268,7 @@ public class FeatureModel implements PropertyConstants {
 		for (Renaming renaming : renamings) {
 			for (Node node : propNodes)
 				renameVariables(node, renaming.oldName, renaming.newName);
+			//only call moveFolder(..) if composer has no specific renamings
 			if (!performComposerRenamings(renaming.oldName, renaming.newName,
 				project)) {
 				moveFolder(renaming.oldName, renaming.newName);

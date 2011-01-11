@@ -1,0 +1,33 @@
+import "DEvalArticle2005SimplexCore.dj"
+import "DAddArticle2005SimplexCore.dj"
+import "DNegArticle2005SimplexCore.dj"
+import "DAddEvalArticle2005SimplexCore.dj"
+import "DNegEvalArticle2005SimplexCore.dj"
+
+features Eval, Add, Data, Neg, Print, Operations, Lit, ExpressionProductLine
+configurations
+ Data, ExpressionProductLine, Lit, Operations, Print;
+core Print, Lit {
+	class Lit{
+
+		int value;
+
+		Lit(int n) {
+			this.value=n;
+		}
+		void print() {
+			new SystemOutWrapper().println(this.value);
+		}
+	}
+
+	class Test {
+
+		Lit a;
+
+		void run() {
+			this.a=new Lit(0);
+			this.a.print();
+			new SystemOutWrapper().println(this.a.value);
+		}
+	}
+}

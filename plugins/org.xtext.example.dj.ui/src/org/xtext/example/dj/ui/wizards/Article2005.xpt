@@ -1,0 +1,207 @@
+«IMPORT ProjectGeneration»
+
+«DEFINE main FOR ProjectSettings»
+«FILE "src/DAddArticle2005SimplexCore.dj"-»
+import "FeaturesArticle2005SimplexCore.dj"
+import "DNegArticle2005SimplexCore.dj"
+import "DEvalArticle2005SimplexCore.dj"
+import "DNegEvalArticle2005SimplexCore.dj"
+import "DAddEvalArticle2005SimplexCore.dj"
+
+delta DAdd after DEval when Add && Print { 
+
+	adds class Add extends Lit {
+
+		Lit expr1;
+		Lit expr2;
+
+		Add(Lit a, Lit b, int c) {
+			super( c);
+        	this.expr1=a;
+        	this.expr2=b;
+		}
+
+		void print() {
+			this.expr1.print();
+			new SystemOutWrapper().print(" + ");
+ 			this.expr2.print();
+ 			new Integer(1).toString();
+		}
+	}
+
+	modifies class Test {
+
+		adds Lit e;
+ 		modifies void run() {
+
+		original();
+			this.e=new Add(this.a, this.a, 0);
+			this.e.print();
+			new SystemOutWrapper().println("");
+		}
+	}
+}
+«ENDFILE-»
+
+«FILE "src/DAddEvalArticle2005SimplexCore.dj"-»
+import "FeaturesArticle2005SimplexCore.dj"
+import "DNegArticle2005SimplexCore.dj"
+import "DAddArticle2005SimplexCore.dj"
+import "DEvalArticle2005SimplexCore.dj"
+import "DNegEvalArticle2005SimplexCore.dj"
+
+delta DAddEval after DNeg when Add && Eval {
+
+	modifies class Add {
+
+		adds int eval() {
+			return new MyMath().add(this.expr1.eval() , this.expr2.eval());
+		}
+	}
+
+	modifies class Test {
+		modifies void run() {
+			original();
+ 			new SystemOutWrapper().println(this.e.eval());
+		}
+	}
+}
+«ENDFILE-»
+
+«FILE "src/DEvalArticle2005SimplexCore.dj"-»
+import "FeaturesArticle2005SimplexCore.dj"
+import "DAddArticle2005SimplexCore.dj"
+import "DNegArticle2005SimplexCore.dj"
+import "DAddEvalArticle2005SimplexCore.dj"
+import "DNegEvalArticle2005SimplexCore.dj"
+
+delta DEval when Eval{
+
+
+	modifies class Lit {
+
+		adds int eval() {
+			return this.value;
+		}
+	}
+
+	modifies class Test {
+
+		modifies void run() {
+			original();
+			new SystemOutWrapper().println(this.a.eval());
+		}
+	}
+
+}
+«ENDFILE-»
+
+«FILE "src/DNegArticle2005SimplexCore.dj"-»
+import "FeaturesArticle2005SimplexCore.dj"
+import "DAddArticle2005SimplexCore.dj"
+import "DEvalArticle2005SimplexCore.dj"
+import "DNegEvalArticle2005SimplexCore.dj"
+import "DAddEvalArticle2005SimplexCore.dj"
+
+delta DNeg after DAdd when Neg && Print {
+
+	adds class Neg extends Lit{
+
+ 		Lit expr;
+
+ 		Neg(Lit a, int c) {
+ 			super(c);
+ 			this.expr=a;
+		}
+
+		void print() {
+			new SystemOutWrapper().print("-(");
+ 			this.expr.print();
+			new SystemOutWrapper().print(")");
+		}
+	}
+
+	modifies class Test {
+
+		adds Lit f;
+
+		modifies void run() {
+			original();
+			this.f=new Neg(this.a, 0);
+			this.f.print();
+			new SystemOutWrapper().println("");
+		}
+	}
+}
+«ENDFILE-»
+
+«FILE "src/DNegEvalArticle2005SimplexCore.dj"-»
+import "FeaturesArticle2005SimplexCore.dj"
+import "DAddArticle2005SimplexCore.dj"
+import "DEvalArticle2005SimplexCore.dj"
+import "DAddEvalArticle2005SimplexCore.dj"
+import "DNegArticle2005SimplexCore.dj"
+
+delta DNegEval after DAddEval when Neg && Eval {
+
+	modifies class Neg {
+
+		adds int eval() {
+			return new MyMath().not(this.expr.eval());
+		}
+	}
+
+	modifies class Test {
+
+		modifies void run() {
+			original();
+			new SystemOutWrapper().println(this.f.eval());
+		}
+	}
+}
+«ENDFILE-»
+
+«FILE "src/FeaturesArticle2005SimplexCore.dj"-»
+import "DEvalArticle2005SimplexCore.dj"
+import "DAddArticle2005SimplexCore.dj"
+import "DNegArticle2005SimplexCore.dj"
+import "DAddEvalArticle2005SimplexCore.dj"
+import "DNegEvalArticle2005SimplexCore.dj"
+
+features Lit, Add, Neg, Print, Eval
+configurations
+Lit, Print;
+Lit, Print, Add;
+Lit, Print, Neg;
+Lit, Print, Eval;
+Lit, Print, Add, Neg;
+Lit, Print, Add, Eval;
+Lit, Print, Neg, Eval;
+Lit, Print, Add, Neg, Eval;
+
+core Print, Lit {
+	class Lit {
+
+		int value;
+
+		Lit(int n) {
+			this.value=n;
+		}
+		void print() {
+			new SystemOutWrapper().println(this.value);
+		}
+	}
+
+	class Test {
+
+		Lit a;
+
+		void run() {
+			this.a=new Lit(0);
+			this.a.print();
+			new SystemOutWrapper().println(this.a.value);
+		}
+	}
+}
+«ENDFILE-»
+«ENDDEFINE»

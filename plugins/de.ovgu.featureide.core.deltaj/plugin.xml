@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="de.ovgu.featureide.core.composers">
+      <composer
+            class="de.ovgu.featureide.deltaj.DeltajComposer"
+            description="Composer for DeltaJava files"
+            id="de.ovgu.featureide.core.deltaj.deltajcomposer"
+            name="DeltaJava"
+            nature="FeatureIDE_Core.deltajNature">
+      </composer>
+   </extension>
+   <extension
+         point="de.ovgu.featureide.fm.core.RenameAction">
+      <renameAction
+            class="de.ovgu.featureide.deltaj.DeltajRenameAction"
+            composer="de.ovgu.featureide.core.deltaj.deltajcomposer"
+            id="de.ovgu.featureide.core.deltaj.renameAction1"
+            name="DeltaJRenameAction">
+      </renameAction>
+   </extension>
+
+</plugin>

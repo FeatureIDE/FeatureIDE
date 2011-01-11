@@ -1,0 +1,144 @@
+«IMPORT ProjectGeneration»
+
+«DEFINE main FOR ProjectSettings»
+«FILE "src/Core.dj"-»
+import "DInvestment.dj"
+import "DRetirement.dj"
+import "DUnSyncUpdate.dj"
+import "DSyncBonus.dj"
+import "DWithHolder.dj" 
+
+features Base, Sync, Retirement, Investment, WithHolder
+
+configurations
+Base;
+Base, Investment;
+Base, Retirement;
+Base, Sync;
+Base, Investment, Sync;
+Base, Retirement, Sync;
+Base, Investment, WithHolder;
+Base, Retirement, WithHolder;
+Base, Investment, Sync, WithHolder;
+Base, Retirement, Sync, WithHolder;
+
+core Base, Sync {
+
+    class Account {
+    
+        int balance;
+        Lock lock;
+    
+        void unsyncUpdate(int x) {
+            this.balance = new MyMath().add(this.balance, x);
+        }
+    
+        void update(int x) {
+            this.lock.lock();
+            this.unsyncUpdate(x);
+            this.lock.unlock();
+        }
+    }
+}
+«ENDFILE»
+
+«FILE "src/DInvestment.dj"-»
+import "Core.dj"
+
+delta DInvestment when Investment {
+
+    modifies class Account {
+    
+        adds int balance401;
+        
+        modifies void unsyncUpdate(int x) {
+            x=new MyMath().divide(x, 2);
+            original(x);
+            this.addBonus(x);
+        }
+        
+        adds void addBonus(int x) {
+        
+            this.balance401 = new MyMath().add(this.balance401, x);
+        }
+    }
+}
+«ENDFILE»
+
+«FILE "src/DRetirement.dj"-»
+import "Core.dj"
+
+delta DRetirement when Retirement {
+
+    modifies class Account {
+    
+        remove balance;
+        adds int balance401;
+        
+        modifies void unsyncUpdate(int x) {
+            this.addBonus(x);
+        }
+        
+        adds void addBonus(int x) {
+        
+            this.balance401=new MyMath().add(this.balance401, x);
+        }
+    }
+}
+«ENDFILE»
+
+«FILE "src/DSyncBonus.dj"-»
+import "DInvestment.dj"
+import "DRetirement.dj"
+import "Core.dj"
+
+delta DsyncBonus after DRetirement, DInvestment when Sync && (Retirement || Investment) {
+
+    modifies class Account {
+    
+        modifies void addBonus(int x) {
+            this.lock.lock();
+            original(x);
+            this.lock.unlock();
+        }
+    }
+}
+«ENDFILE»
+
+«FILE "src/DUnSyncUpdate.dj"-»
+import "DInvestment.dj"
+import "DRetirement.dj"
+import "Core.dj"
+
+delta DUnSyncUpdate after DRetirement, DInvestment when !Sync {
+
+    modifies class Account {
+    
+        remove lock;
+        
+        modifies void update(int x) {
+            this.unsyncUpdate(x);
+        }
+    }
+}
+«ENDFILE»
+
+«FILE "src/DWithHolder.dj"-»
+import "Core.dj"
+import "DInvestment.dj"
+import "DRetirement.dj"
+
+delta DwithHolder when WithHolder {
+
+    adds class Client {
+    
+        Account a;
+        
+        void payday(int x, int bonus) {
+            this.a.addBonus(bonus);
+            this.a.update(x);
+        }
+    }
+}
+«ENDFILE»
+«ENDDEFINE»

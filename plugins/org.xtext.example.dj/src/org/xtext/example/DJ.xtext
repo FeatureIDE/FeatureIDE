@@ -1,0 +1,139 @@
+grammar org.xtext.example.DJ with org.eclipse.xtext.common.Terminals
+
+generate dJ "http://www.xtext.org/example/DJ"
+
+Program: (imports+=Import)*
+		 (features=Features)?
+		 (modulesList += Module)*;
+		
+Import : 'import' importURI=STRING;
+
+Features: 'features' (featuresList+=Feature (',' featuresList+=Feature)* )
+		  'configurations' configuration = Configuration;
+		  
+Feature: name=ID;
+Module: {Module} ((ntype ='core') core=Core )| ((ntype = 'delta') delta=Delta);
+
+Core: name+=[Feature](',' name+=[Feature])* '{'
+	(classesList += Class)*
+'}';
+
+Class: 'class' name=ID ('extends' extends = [Class])? '{'
+	(field+=Field)* 
+	(constructor += Constructor)? 
+	(method+=Method)*
+'}';
+
+Constructor: name = [Class] '(' (params+=Parameter (',' params+=Parameter)*)? ')''{'
+	(constructorSuperExpression = ConstructorSuperExpression)?
+	(constructorFieldExpression += ConstructorFieldExpression)*
+'}';
+
+ConstructorSuperExpression: {ConstructorSuperExpression}('super''(' (parS+=[Parameter](',' parS+=[Parameter])*)? ')'';');
+
+ConstructorFieldExpression: ('this' '.' field =[FieldRef] '=' parT =[Parameter]';');
+Field:
+	type=Type reference=FieldRef ';'
+;
+
+//FieldRef returns Variable : {FieldRef} name = ID;
+FieldRef: name = ID;
+
+//Parameter returns Variable : {Parameter} type=Type name=ID;
+Parameter: type=Type name=ID ;
+
+Method:
+	returntype=Type reference=MethodRef '(' (params+=Parameter (',' params+=Parameter)*)?')' '{'
+		body=MethodBody
+	'}'
+;
+
+MethodRef: name = ID;
+
+MethodBody: {MethodBody}((insertJava += InsertJava) | (expressions += Expression ';'))*
+			(return='return' (expressionReturn=Expression)? ';')?;
+
+
+Delta: name=ID ('after' after += [Delta] (',' after += [Delta])*)? 
+	'when' condition+=(Condition) ('&&' condition+=Condition)*'{'
+	(classesList += Classm)*
+'}';
+	
+
+Configuration: (featureList += Config ';')+;
+Config: feature+=[Feature] (',' feature+=[Feature])*;
+Operation: ( '&&' | '||' | '->' | '<->');
+Condition: (complement = '!')? ('(' condition1 = Condition operation = Operation condition2 = Condition ')' | feature=[Feature]); 
+
+Classm: action='modifies' modifies=ModifiesClass | 
+		action='adds' adds=AddsClass | 
+		action='remove' remove=RemoveClass;
+
+ModifiesClass: 'class' class=[Class] ('extending' extends = [Class])? '{'
+	(field = Fieldm)
+	(constructor = Constructor)? (method = Methodm) 
+'}';
+
+AddsClass: class = Class;
+
+RemoveClass: class=[Class];
+
+Methodm: {Methodm}('remove' removeList+=RemovesMethod)*
+	//('renames' renamesList+=RenamesMethod)*
+	('modifies' modifiesList+=ModifiesMethod)*
+	('adds' addsList+=AddsMethod)*;
+
+AddsMethod: method=Method;
+//RenamesMethod:  (methodRef=[MethodRef])'('')' 'to' newMethodRef=MethodRef'('')'';';
+ModifiesMethod: {ModifiesMethod} returntype=Type methodRef = [MethodRef] '(' (params+=Parameter (',' params+=Parameter)*)? ')' '{'
+	 body = MethodBody
+	 '}';
+RemovesMethod:  (methodRef=[MethodRef]) '('')'';';
+
+Fieldm: {Fieldm}('remove' removeList+=RemovesField)*
+	//('renames' renamesList+=RenamesField)*
+	('adds' addsList+=AddsField)*;
+
+AddsField: field=Field;
+RenamesField:  (fieldRef=[FieldRef]) 'to' newFieldRef=FieldRef';';
+RemovesField:  (fieldRef=[FieldRef]) ';';
+
+Type: basic=('void'|'int' | 'boolean' ) | // 'String') | 
+	classref=[Class];
+	
+	
+	
+Expression:
+	terminalExpression = TerminalExpression ({Expression.receiver=current} '.' message=Message)* ('=' value=Expression)?;
+
+Message:
+    methodCall = MethodCall | fieldAccess = FieldAccess
+;
+
+MethodCall: name=[MethodRef] '(' (args+=Argument (',' args+=Argument)*)? ')';
+FieldAccess: name=[FieldRef]; 
+
+TerminalExpression:
+   this = This |
+   variable = Variable |
+   new = New |
+   cast = Cast |
+   original = Original |
+   int = Intero |
+   string = Stringa |
+   null = Nullo 
+;
+
+InsertJava: {InsertJava}'<' String = ALL '>';
+
+This: variable='this';
+Variable: (parameter=[Parameter]) | (fieldRef = [FieldRef]);
+New: 'new' type=[Class] '(' (args+=Argument (',' args+=Argument)*)? ')';
+Cast: ('(' '(' type=[Class] ')' expression=Expression) ')'; // | ('(''(' type=[Class] ')' expression=TerminalExpression ')');
+Original: {Original} 'original' '('(par+=[Parameter] (',' par+=[Parameter])*)? ')';
+Intero: value = INT;
+Stringa: value = STRING;
+Nullo: value = 'null';
+Argument: expression = Expression;
+
+terminal ALL: '**Java:' -> ':Java**';

@@ -49,6 +49,7 @@ public class ComposerExtensionProxy implements IComposerExtension {
 		name = configElement.getAttribute("name");
 		id = configElement.getAttribute("id");
 		description = configElement.getAttribute("description");
+	
 	}
 
 	/*
@@ -95,6 +96,7 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	 */
 	public void initialize(IFeatureProject project) {
 		loadComposerExtension();
+		
 		composerExtensionClass.initialize(project);
 	}
 

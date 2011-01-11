@@ -1,0 +1,60 @@
+«IMPORT dJ»
+
+«EXTENSION djtemplates::Prova»
+
+«DEFINE main FOR Program-»
+«EXPAND Template::template FOR this»
+«FOREACH this.getAllConfig() AS configuration-»
+«FOREACH this.getAllClass(configuration) AS class-»
+«LET this.getPackageName(configuration) AS name»
+«FILE  name + "/" + class.name + ".java"-»
+package «name»;
+
+import java.math.*;
+import java.util.concurrent.locks.Lock;
+import java.util.*;
+
+public class «class.name» «IF class.getParentClass(configuration) != null-»extends «class.getParentClass(configuration)» «ENDIF»{
+«EXPAND field FOREACH class.getAllFields(configuration)»
+«EXPAND constructor FOR class.getConstructor(configuration)»
+«EXPAND modifiesMethod FOREACH class.getAllModifiesMethod(configuration) SEPARATOR "\n"»
+«EXPAND method FOREACH class.getAllMethod(configuration) SEPARATOR "\n"»
+}
+«ENDFILE»
+«ENDLET»
+«ENDFOREACH»
+«ENDFOREACH»
+«ENDDEFINE»
+
+«DEFINE field FOR Field»
+	public «IF this.type.basic != null»«this.type.basic» «ENDIF»«IF this.type.basic == null»«this.type.classref.name» «ENDIF»«this.reference.name»;
+«ENDDEFINE»
+
+«DEFINE constructor FOR Constructor-»
+	«this.name.name»(«EXPAND parameterDeclaration FOREACH this.params SEPARATOR ", "») { «IF this.constructorFieldExpression.isEmpty && this.constructorSuperExpression == null» } «ELSE»
+«IF this.constructorSuperExpression != null»		super(«EXPAND parameterCall FOREACH this.constructorSuperExpression.parS SEPARATOR ", "»);«"\n"»«ENDIF-»
+«FOREACH this.constructorFieldExpression AS exprF SEPARATOR "\n"»		this.«exprF.field.name» = «exprF.parT.name»;«ENDFOREACH»
+	}«ENDIF»
+«ENDDEFINE»
+
+«DEFINE parameterCall FOR Parameter»«this.name»«ENDDEFINE»
+
+«DEFINE parameterDeclaration FOR Parameter» «IF this.type.basic != null»«this.type.basic»«ELSE»«this.type.classref.name»«ENDIF» «this.name» «ENDDEFINE»
+
+«DEFINE method FOR Method»	«LET this.getNameMethod() AS name»«IF name.length >= 3 && name.subString(0,2) == "___"»private«ELSE»public«ENDIF» «IF this.returntype.basic != null»«this.returntype.basic»«ELSE»«this.returntype.classref.name»«ENDIF» «name»(«EXPAND parameterDeclaration FOREACH this.params SEPARATOR ", "») {
+«EXPAND body FOR this.body»
+	}
+«ENDLET-»
+«ENDDEFINE»
+
+«DEFINE modifiesMethod FOR ModifiesMethod»	«LET this.getNameModifiesMethod() AS name»«IF name.subString(0,2).compareTo("___") == 0»private«ELSE»public«ENDIF» «IF this.returntype.basic != null»«this.returntype.basic»«ELSE»«this.returntype.classref.name»«ENDIF» «name»(«EXPAND parameterDeclaration FOREACH this.params SEPARATOR ", "») {
+«EXPAND body FOR this.body»
+	}
+«ENDLET-»
+«ENDDEFINE»
+
+«DEFINE body FOR MethodBody»		«EXPAND expression FOREACH this.expressions SEPARATOR "\n\t\t"»«IF !this.expressions.isEmpty && this.expressionReturn != null»«"\n"»«ENDIF-»
+		«this.return» «EXPAND expression FOR this.expressionReturn-»
+«ENDDEFINE»
+
+«DEFINE expression FOR Expression»«this.printExpression()»;«ENDDEFINE»

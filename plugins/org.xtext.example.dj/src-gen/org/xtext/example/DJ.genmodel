@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/org.xtext.example.dj/src-gen"
+    editDirectory="/org.xtext.example.dj.edit/src" editorDirectory="/org.xtext.example.dj.editor/src"
+    modelPluginID="org.xtext.example.dj" forceOverwrite="true" modelName="DJ" updateClasspath="false"
+    rootExtendsClass="org.eclipse.emf.ecore.impl.MinimalEObjectImpl$Container" complianceLevel="5.0"
+    copyrightFields="false" editPluginID="org.xtext.example.dj.edit" editorPluginID="org.xtext.example.dj.editor">
+  <genPackages prefix="DJ" basePackage="org.xtext.example" disposableProviderFactory="true"
+      ecorePackage="DJ.ecore#/">
+    <genClasses ecoreClass="DJ.ecore#//Program">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Program/imports"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Program/features"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Program/modulesList"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//Import">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DJ.ecore#//Import/importURI"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//Features">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Features/featuresList"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Features/configuration"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//Feature">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DJ.ecore#//Feature/name"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//Module">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DJ.ecore#//Module/ntype"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Module/core"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Module/delta"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//Core">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference DJ.ecore#//Core/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Core/classesList"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//Class">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DJ.ecore#//Class/name"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference DJ.ecore#//Class/extends"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Class/field"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Class/constructor"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Class/method"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//Constructor">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference DJ.ecore#//Constructor/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Constructor/params"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Constructor/constructorSuperExpression"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Constructor/constructorFieldExpression"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//ConstructorSuperExpression">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference DJ.ecore#//ConstructorSuperExpression/parS"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//ConstructorFieldExpression">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference DJ.ecore#//ConstructorFieldExpression/field"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference DJ.ecore#//ConstructorFieldExpression/parT"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//Field">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Field/type"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Field/reference"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//FieldRef">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DJ.ecore#//FieldRef/name"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//Parameter">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Parameter/type"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DJ.ecore#//Parameter/name"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//Method">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Method/returntype"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Method/reference"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Method/params"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Method/body"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//MethodRef">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DJ.ecore#//MethodRef/name"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//MethodBody">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//MethodBody/insertJava"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//MethodBody/expressions"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DJ.ecore#//MethodBody/return"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//MethodBody/expressionReturn"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//Delta">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DJ.ecore#//Delta/name"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference DJ.ecore#//Delta/after"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Delta/condition"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Delta/classesList"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//Configuration">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Configuration/featureList"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//Config">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference DJ.ecore#//Config/feature"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//Condition">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DJ.ecore#//Condition/complement"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Condition/condition1"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DJ.ecore#//Condition/operation"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Condition/condition2"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference DJ.ecore#//Condition/feature"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//Classm">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DJ.ecore#//Classm/action"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Classm/modifies"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Classm/adds"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Classm/remove"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//ModifiesClass">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference DJ.ecore#//ModifiesClass/class"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference DJ.ecore#//ModifiesClass/extends"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//ModifiesClass/field"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//ModifiesClass/constructor"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//ModifiesClass/method"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//AddsClass">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//AddsClass/class"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//RemoveClass">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference DJ.ecore#//RemoveClass/class"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//Methodm">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Methodm/removeList"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Methodm/modifiesList"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Methodm/addsList"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//AddsMethod">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//AddsMethod/method"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//ModifiesMethod">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//ModifiesMethod/returntype"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference DJ.ecore#//ModifiesMethod/methodRef"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//ModifiesMethod/params"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//ModifiesMethod/body"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//RemovesMethod">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference DJ.ecore#//RemovesMethod/methodRef"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//Fieldm">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Fieldm/removeList"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Fieldm/addsList"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//AddsField">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//AddsField/field"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//RenamesField">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference DJ.ecore#//RenamesField/fieldRef"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//RenamesField/newFieldRef"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//RemovesField">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference DJ.ecore#//RemovesField/fieldRef"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//Type">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DJ.ecore#//Type/basic"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference DJ.ecore#//Type/classref"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//Expression">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Expression/terminalExpression"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Expression/receiver"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Expression/message"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Expression/value"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//Message">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Message/methodCall"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Message/fieldAccess"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//MethodCall">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference DJ.ecore#//MethodCall/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//MethodCall/args"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//FieldAccess">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference DJ.ecore#//FieldAccess/name"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//TerminalExpression">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//TerminalExpression/this"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//TerminalExpression/variable"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//TerminalExpression/new"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//TerminalExpression/cast"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//TerminalExpression/original"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//TerminalExpression/int"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//TerminalExpression/string"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//TerminalExpression/null"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//InsertJava">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DJ.ecore#//InsertJava/String"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//This">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DJ.ecore#//This/variable"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//Variable">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference DJ.ecore#//Variable/parameter"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference DJ.ecore#//Variable/fieldRef"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//New">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference DJ.ecore#//New/type"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//New/args"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//Cast">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference DJ.ecore#//Cast/type"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Cast/expression"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//Original">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference DJ.ecore#//Original/par"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//Intero">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DJ.ecore#//Intero/value"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//Stringa">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DJ.ecore#//Stringa/value"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//Nullo">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DJ.ecore#//Nullo/value"/>
+    </genClasses>
+    <genClasses ecoreClass="DJ.ecore#//Argument">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DJ.ecore#//Argument/expression"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?NLS TYPE="org.eclipse.help.toc"?>
+
+<toc label="Concepts" link_to="toc.xml#concepts"> 
+	<topic label="User Interface">
+		<topic href="html/concepts/project.html" label="DeltaJ Project structure">
+  </topic>
+  <topic href="html/concepts/SyntaxHighlything.html" label="Syntax highlything">
+  </topic>
+  <topic href="html/concepts/Outline.html" label="Outline">
+  </topic>
+  <topic href="html/concepts/CodeCompletion.html" label="Code completion">
+  </topic>
+  <topic href="html/concepts/Validation.html" label="Validation">
+  </topic> 
+	</topic> 
+</toc>
