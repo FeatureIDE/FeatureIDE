@@ -19,13 +19,8 @@
 package de.ovgu.featureide.ui.views.collaboration.model;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-
-import de.ovgu.featureide.ui.views.collaboration.model.Class;
-import de.ovgu.featureide.ui.views.collaboration.model.Collaboration;
-import de.ovgu.featureide.ui.views.collaboration.model.Role;
 
 
 /**
@@ -35,19 +30,56 @@ import de.ovgu.featureide.ui.views.collaboration.model.Role;
  */
 public class CollaborationModel {
 	
-	protected HashMap<String,Class> classes;
+	protected LinkedList<Class> classes;
 	public LinkedList<Collaboration> collaborations;
 	protected LinkedList<Role> roles;
 
+	public boolean containsClass(Class c) {
+		for (Class cl : classes) {
+			if (cl.getName().equals(c.getName())) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public Class getClass(String name) {
+		for (Class cl : classes) {
+			if (cl.getName().equals(name)) {
+				return cl;
+			}
+		}
+		return null;
+	}
+	
+	public void addClass(Class c) {
+		if (!containsClass(c)) {
+			for (Class cl : classes) {
+				if (c.getName().startsWith("*.")) {
+					if (cl.getName().startsWith("*.")) {
+						if (cl.getName().compareTo(c.getName()) > 0) {
+							classes.add(classes.indexOf(cl), c);
+							return;
+						}
+					}
+				}else if (cl.getName().compareTo(c.getName()) > 0) {
+					classes.add(classes.indexOf(cl), c);
+					return;
+				}
+			}
+			classes.add(c);
+		}
+	}
+	
 	public CollaborationModel(){
 		collaborations 	= new LinkedList<Collaboration>();
-		classes 		= new HashMap<String,Class>();
+		classes 		= new LinkedList<Class>();
 		roles 			= new LinkedList<Role>();
 	}
 	
 	public List<Class> getClasses(){
 		LinkedList<Class> list = new LinkedList<Class>();
-		Collection<Class> coll = classes.values();		
+		Collection<Class> coll = classes;		
 		for (Class c : coll)
 			list.add(c);
 		return list;
@@ -62,7 +94,7 @@ public class CollaborationModel {
 	}
 
 	public void removeClass(Class c) {
-		classes.remove(c.getName());
+		classes.remove(c);
 	}
 	
 	public void removeRole(Role r) {

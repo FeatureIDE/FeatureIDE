@@ -5,7 +5,7 @@
          point="de.ovgu.featureide.core.composers">
       <composer
             class="de.ovgu.featureide.munge.MungePreprocessor"
-            description="Preprocessor for Java files"
+            description="a purposely-simple preprocessor"
             id="de.ovgu.featureide.preprocessor.munge"
             name="Munge"
             nature="FeatureIDE_Core.mungeNature">

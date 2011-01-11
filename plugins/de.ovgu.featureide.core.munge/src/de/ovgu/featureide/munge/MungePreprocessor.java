@@ -18,9 +18,7 @@
  */
 package de.ovgu.featureide.munge;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,7 +27,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -63,9 +60,7 @@ public class MungePreprocessor implements IComposerExtensionClass{
 	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#extensions()
 	 */
 	public ArrayList<String> extensions() {
-		ArrayList<String> extensions = new ArrayList<String>();
-		extensions.add(".java");
-		return extensions;
+		return new ArrayList<String>();
 	}
 
 	/* (non-Javadoc)
@@ -74,6 +69,12 @@ public class MungePreprocessor implements IComposerExtensionClass{
 	public String getEditorID(String extension) {
 		if (extension.equals("java"))
 			return "org.eclipse.jdt.ui.CompilationUnitEditor";
+		if (extension.equals("c"))
+			return "org.eclipse.cdt.ui.editor.CEditor";
+		if (extension.equals("h"))
+			return "org.eclipse.cdt.ui.editor.CEditor";
+		if (extension.equals("xmi"))
+			return "org.eclipse.wst.xml.ui.internal.tabletree.XMLMultiPageEditorPart";
 		return "";
 	}
 
@@ -117,11 +118,7 @@ public class MungePreprocessor implements IComposerExtensionClass{
 		
 		//add source files
 		try {
-			for (IResource res : featureProject.getSourceFolder().members()) {
-				if (res instanceof IFolder && selectedFeatures.contains(res.getName())) {
-					addDefaultSourceFiles((IFolder)res);
-				}
-			}
+			addDefaultSourceFiles(featureProject.getSourceFolder());
 		} catch (CoreException e) {
 			MungeCorePlugin.getDefault().logError(e);
 		}
@@ -144,10 +141,8 @@ public class MungePreprocessor implements IComposerExtensionClass{
 			if (res instanceof IFolder) {
 				addSourceFiles((IFolder)res, featureProject.getBuildFolder().getFolder(res.getName()));
 			} else if (res instanceof IFile){
-				if (res.getName().endsWith(".java")) {
-					args.add(res.getRawLocation().toOSString());
-					filesAdded = true;
-				}
+				args.add(res.getRawLocation().toOSString());
+				filesAdded = true;
 			}
 		}
 
@@ -198,7 +193,6 @@ public class MungePreprocessor implements IComposerExtensionClass{
 	}
 
 	private void createBuildFolder(IFolder buildFolder) throws CoreException {
-		MungeCorePlugin.getDefault().logInfo(buildFolder.getRawLocation().toOSString());
 		if (!buildFolder.exists()) {
 			buildFolder.create(true, true, null);
 		}
@@ -268,52 +262,6 @@ public class MungePreprocessor implements IComposerExtensionClass{
 
 	@Override
 	public void addCompiler(IProject project, String sourcePath,String equationPath, String buildPath) {
-		addNature(project);
-		addClasspathFile(project , sourcePath, equationPath, buildPath);
-	}
-
-	private void addClasspathFile(IProject project, String sourcePath,String equationPath, String buildPath) {
-		IFile iClasspathFile = project.getFile(".classpath");
-		if (!iClasspathFile.exists()) {
-			String bin = "bin";
-			if (sourcePath.equals(bin) || equationPath.equals(bin) || buildPath.equals(bin)) {
-				bin = "bin2";
-			}
-			if (sourcePath.equals(bin) || equationPath.equals(bin) || buildPath.equals(bin)) {
-				bin = "bin3";
-			}
-			try {
-				String text = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-							  "<classpath>\n" + 
-							  "<classpathentry kind=\"src\" path=\"" + buildPath + "\"/>\n" +
-							  "<classpathentry kind=\"con\" path=\"org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6\"/>\n" +
-							  "<classpathentry kind=\"output\" path=\"" + bin + "\"/>\n" +
-							  "</classpath>";
-				InputStream source = new ByteArrayInputStream(text.getBytes());
-				iClasspathFile.create(source, true, null);
-			} catch (CoreException e) {
-				MungeCorePlugin.getDefault().logError(e);
-			}
-		
-		}
-	}
-
-	private void addNature(IProject project) {
-		try {
-			if (!project.isAccessible()
-					|| project.hasNature(JAVA_NATURE))
-				return;
-	
-			IProjectDescription description = project.getDescription();
-			String[] natures = description.getNatureIds();
-			String[] newNatures = new String[natures.length + 1];
-			System.arraycopy(natures, 0, newNatures, 0, natures.length);
-			newNatures[natures.length] = JAVA_NATURE;
-			description.setNatureIds(newNatures);
-			project.setDescription(description, null);
-		} catch (CoreException e) {
-			CorePlugin.getDefault().logError(e);
-		}
 	}
 
 	@Override

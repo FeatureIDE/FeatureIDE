@@ -226,12 +226,12 @@ public class CollaborationModelBuilder {
 										}
 										role.setPath(pathToFile);
 										Class cl = new Class(name);
-										if (model.classes.containsKey(cl.getName())) {
-											role.setParentClass(model.classes.get(cl.getName()));
+										if (model.containsClass(cl)) {
+											role.setParentClass(model.getClass(cl.getName()));
 										} else {
 											role.setParentClass(cl);
 											cl.project = featureProject;
-											model.classes.put(cl.getName(), cl);
+											model.addClass(cl);
 										}
 										role.selected = selected;
 										role.setCollaboration(collaboration);
@@ -316,13 +316,12 @@ public class CollaborationModelBuilder {
 					role.featureName = featureName;
 					role.files.add(res.getName());
 					Class cl = new Class(name);
-					if (model.classes.containsKey(cl.getName())) {
-						role.setParentClass(model.classes.get(cl
-								.getName()));
+					if (model.containsClass(cl)) {
+						role.setParentClass(model.getClass(cl.getName()));
 					} else {
 						role.setParentClass(cl);
 						cl.project = project;
-						model.classes.put(cl.getName(), cl);
+						model.addClass(cl);
 					}
 					role.selected = selected;
 					role.setCollaboration(collaboration);

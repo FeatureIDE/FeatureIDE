@@ -111,16 +111,12 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 			if (equationFile == null)
 				return;
 	
-			//String equation = equationFile.getName().split("[.]")[0];
-			
-			//if (featureProject.getBuildFolder().getFolder(equation).exists())
-				for (IResource res : featureProject.getBuildFolder().members()) {//.getFolder(equation).members()) {
+			for (IResource res : featureProject.getBuildFolder().members()) {//.getFolder(equation).members()) {
 						res.delete(true, monitor);
 				}
 			if (!hasOtherNature) {
-				//if (featureProject.getBinFolder().getFolder(equation).exists())
-					for (IResource res : featureProject.getBinFolder().members())//.getFolder(equation).members())
-							res.delete(true, monitor);
+				for (IResource res : featureProject.getBinFolder().members())//.getFolder(equation).members())
+						res.delete(true, monitor);
 			}
 			
 		}else{
