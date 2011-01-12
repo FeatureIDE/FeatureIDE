@@ -1,4 +1,4 @@
-package de.ovgu.featureide.munge;
+package org.sonatype.plugins.munge;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -17,6 +17,8 @@ import java.util.NoSuchElementException;
 import java.util.Stack;
 import java.util.StringTokenizer;
 import java.util.Vector;
+
+import de.ovgu.featureide.munge.MungeCorePlugin;
 
 /*
  * The contents of this file are subject to the terms of the Common Development
