@@ -1,0 +1,5 @@
+layer TankWar;
+
+public class ExplodierenEffekt extends GameObject {
+	
+}

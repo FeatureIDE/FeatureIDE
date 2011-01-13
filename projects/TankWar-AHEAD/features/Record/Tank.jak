@@ -1,0 +1,10 @@
+layer Record;
+
+public refines class Tank {
+
+	protected void explodieren() {
+		tankManager.addScore(beschId, objectType);
+		Super().explodieren();
+	}
+
+}

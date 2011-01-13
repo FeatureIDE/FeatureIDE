@@ -1,0 +1,7 @@
+layer Handy;
+
+public refines interface GameManager {
+	
+	public void exit();
+
+}

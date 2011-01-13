@@ -1,0 +1,7 @@
+layer Record;
+
+public refines interface GameManager {
+	
+	public void writeScore();
+
+}
