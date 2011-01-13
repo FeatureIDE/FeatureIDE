@@ -1,7 +1,0 @@
-layer BE;
-
-public refines class Num {
-	public int eval() { 
-		return value; 
-	}
-}
