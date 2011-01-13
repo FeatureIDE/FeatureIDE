@@ -1,0 +1,7 @@
+layer NE;
+
+public refines class Neg {
+	public int eval() { 
+		return - x.eval(); 
+	}
+}
