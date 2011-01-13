@@ -1,5 +1,3 @@
-layer World;
-
 public refines class Main {
 
 	public void print() {

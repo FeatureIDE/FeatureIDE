@@ -1,5 +1,3 @@
-layer Wonderful;
-
 public refines class Main {
 
 	public void print() {

@@ -1,5 +1,3 @@
-layer Beautiful;
-
 public refines class Main {
 
 	public void print() {

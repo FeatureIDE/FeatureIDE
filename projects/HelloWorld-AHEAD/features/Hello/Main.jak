@@ -1,5 +1,3 @@
-layer Hello;
-
 public class Main {
 
 	public void print() {
