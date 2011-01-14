@@ -224,16 +224,16 @@ public interface IClass extends IFSTModelElement {
 	/**
 	 * Sets the current file
 	 * 
-	 * @param jakfile the current file
+	 * @param file the current file
 	 */
-	public void setJakfile(IFile jakfile);
+	public void setFile(IFile file);
 
 	/**
 	 * Returns the current file
 	 * 
 	 * @return current file
 	 */
-	public IFile getJakfile();
+	public IFile getFile();
 
 	/**
 	 * Returns the source files that were composed to build this class

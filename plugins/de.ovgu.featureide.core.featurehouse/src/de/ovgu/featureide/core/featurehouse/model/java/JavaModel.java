@@ -16,7 +16,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.ahead.model;
+package de.ovgu.featureide.core.featurehouse.model.java;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,22 +27,22 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
-import de.ovgu.featureide.ahead.AheadCorePlugin;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.IClass;
 import de.ovgu.featureide.core.fstmodel.IFSTModel;
 import de.ovgu.featureide.core.fstmodel.IFSTModelElement;
 import de.ovgu.featureide.core.fstmodel.IFeature;
+import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
 
 
 /**
- * The model of a jak project
+ * The model of a java project
  * 
  * @author Tom Brosch
  * 
  */
-public class JakModel extends JakModelElement implements IFSTModel {
+public class JavaModel extends JavaModelElement implements IFSTModel {
 
 	HashMap<IFile, Class> classesMap;
 	HashMap<String, Class> classes;
@@ -50,12 +50,12 @@ public class JakModel extends JakModelElement implements IFSTModel {
 	private String projectName;
 
 	/**
-	 * Creates a new instance of a jak project
+	 * Creates a new instance of a java project
 	 * 
 	 * @param name
 	 *            Name of the project
 	 */
-	public JakModel(String name) {
+	public JavaModel(String name) {
 		classesMap = new HashMap<IFile, Class>();
 		classes = new HashMap<String, Class>();
 		features = new HashMap<String, Feature>();
@@ -66,7 +66,7 @@ public class JakModel extends JakModelElement implements IFSTModel {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * de.ovgu.featureide.core.jakprojectmodel.IJakProject#getNumberOfSelectedFeatures()
+	 * de.ovgu.featureide.core.javaprojectmodel.IjavaProject#getNumberOfSelectedFeatures()
 	 */
 	public int getNumberOfSelectedFeatures() {
 		return 0;
@@ -75,7 +75,7 @@ public class JakModel extends JakModelElement implements IFSTModel {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see de.ovgu.featureide.core.jakprojectmodel.IJakProject#getSelectedFeatures()
+	 * @see de.ovgu.featureide.core.javaprojectmodel.IjavaProject#getSelectedFeatures()
 	 */
 	public ArrayList<IFeature> getSelectedFeatures() {
 		Collection <IFeatureProject> featureProjects = CorePlugin.getFeatureProjects();
@@ -95,7 +95,7 @@ public class JakModel extends JakModelElement implements IFSTModel {
 				}
 			}
 		} catch (CoreException e) {
-			AheadCorePlugin.getDefault().logError(e);
+			FeatureHouseCorePlugin.getDefault().logError(e);
 		}
 		if (allFeatures.size() == 0)
 			return null;
@@ -113,7 +113,7 @@ public class JakModel extends JakModelElement implements IFSTModel {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see de.ovgu.featureide.core.jakprojectmodel.IJakProject#getNumberOfFeatures()
+	 * @see de.ovgu.featureide.core.javaprojectmodel.IjavaProject#getNumberOfFeatures()
 	 */
 	public int getNumberOfFeatures() {
 		return features.size();
@@ -122,7 +122,7 @@ public class JakModel extends JakModelElement implements IFSTModel {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see de.ovgu.featureide.core.jakprojectmodel.IJakProject#getFeatures()
+	 * @see de.ovgu.featureide.core.javaprojectmodel.IjavaProject#getFeatures()
 	 */
 	public IFeature[] getFeatures() {
 		IFeature[] featureArray = new Feature[features.size()];
@@ -137,7 +137,7 @@ public class JakModel extends JakModelElement implements IFSTModel {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * de.ovgu.featureide.core.jakprojectmodel.IJakProject#getFeature(java.lang.String)
+	 * de.ovgu.featureide.core.javaprojectmodel.IjavaProject#getFeature(java.lang.String)
 	 */
 	public IFeature getFeature(String featureName) {
 		if (!features.containsKey(featureName))
@@ -148,7 +148,7 @@ public class JakModel extends JakModelElement implements IFSTModel {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see de.ovgu.featureide.core.jakprojectmodel.IJakProject#getNumberOfClasses()
+	 * @see de.ovgu.featureide.core.javaprojectmodel.IjavaProject#getNumberOfClasses()
 	 */
 	public int getNumberOfClasses() {
 		return classesMap.size();
@@ -157,7 +157,7 @@ public class JakModel extends JakModelElement implements IFSTModel {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see de.ovgu.featureide.core.jakprojectmodel.IJakProject#getClasses()
+	 * @see de.ovgu.featureide.core.javaprojectmodel.IjavaProject#getClasses()
 	 */
 	public IClass[] getClasses() {
 		IClass[] classArray = new Class[classes.size()];
@@ -172,7 +172,7 @@ public class JakModel extends JakModelElement implements IFSTModel {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * de.ovgu.featureide.core.jakprojectmodel.IJakProject#getClass(org.eclipse.core
+	 * de.ovgu.featureide.core.javaprojectmodel.IjavaProject#getClass(org.eclipse.core
 	 * .resources.IFile)
 	 */
 	public IClass getClass(IFile file) {

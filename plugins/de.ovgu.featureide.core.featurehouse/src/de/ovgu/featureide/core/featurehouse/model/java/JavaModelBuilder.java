@@ -16,7 +16,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.ahead.model;
+package de.ovgu.featureide.core.featurehouse.model.java;
 
 import java.util.LinkedList;
 
@@ -35,35 +35,35 @@ import mixin.MthDector;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 
-import de.ovgu.featureide.ahead.AheadCorePlugin;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.IFSTModel;
 import de.ovgu.featureide.core.fstmodel.IField;
+import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
 
 
 /**
- * This builder builds the JakProjectModel, by extracting features, 
+ * This builder builds the JavaProjectModel, by extracting features, 
  * methods and fields from classes to build. 
  * 
  * @author Tom Brosch
  * @author Constanze Adler
  */
-public class JakModelBuilder {
+public class JavaModelBuilder {
 
-	private JakModel model;
+	private JavaModel model;
 
-	public JakModelBuilder(IFeatureProject featureProject) {
+	public JavaModelBuilder(IFeatureProject featureProject) {
 		IFSTModel oldModel = featureProject.getFSTModel();
 		if (oldModel != null)
 			oldModel.markObsolete();
 
-		model = new JakModel(featureProject.getProjectName());
+		model = new JavaModel(featureProject.getProjectName());
 		featureProject.setFSTModel(model);
 	}
 
 	/**
-	 * Adds a class to the jak project model
+	 * Adds a class to the java project model
 	 * 
 	 * @param className
 	 *            Name of the class
@@ -96,14 +96,14 @@ public class JakModelBuilder {
 		try {
 			updateAst(currentClass, sources, composedASTs, ownASTs);
 		} catch (Throwable e) {
-			AheadCorePlugin.getDefault().logError(e);
+			FeatureHouseCorePlugin.getDefault().logError(e);
 		}
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see de.ovgu.featureide.core.jakprojectmodel.IClass#updateAst(java.util.Vector,
+	 * @see de.ovgu.featureide.core.javaprojectmodel.IClass#updateAst(java.util.Vector,
 	 * mixin.AST_Program[], mixin.AST_Program[])
 	 */
 	public void updateAst(Class currentClass, LinkedList<IFile> sources,

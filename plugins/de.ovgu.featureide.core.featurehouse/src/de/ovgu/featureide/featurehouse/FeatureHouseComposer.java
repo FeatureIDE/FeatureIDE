@@ -19,7 +19,9 @@
 package de.ovgu.featureide.featurehouse;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.TreeMap;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -29,8 +31,13 @@ import org.eclipse.core.runtime.CoreException;
 
 import composer.FSTGenComposer;
 
+import de.ovgu.cide.fstgen.ast.AbstractFSTParser;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
+import de.ovgu.featureide.core.featurehouse.FSTParser.FSTParser;
+import de.ovgu.featureide.core.featurehouse.FSTParser.JavaToken;
+import de.ovgu.featureide.core.featurehouse.model.java.Method;
+import de.ovgu.featureide.core.fstmodel.IField;
 
 
 /**
@@ -41,7 +48,7 @@ import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 public class FeatureHouseComposer implements IComposerExtensionClass {
 
 	private IFeatureProject featureProject = null;
-	
+
 	public FeatureHouseComposer() {
 	}
 
@@ -51,14 +58,14 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 
 	public void performFullBuild(IFile equation) {
 		assert(featureProject != null) : "Invalid project given";
-		
+
 		final String equationPath =  equation.getRawLocation().toOSString();
 		final String basePath = featureProject.getSourcePath();
 		final String outputPath = featureProject.getBuildPath();
-		
+
 		if (equationPath == null || basePath == null || outputPath == null)
 			return;
-		
+
 		// A new FSTGenComposer instance is created every time, because this class
 		// seems to remember the FST from a previous build.
 		FSTGenComposer composer = new FSTGenComposer();
@@ -69,13 +76,30 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 				"--output-directory", outputPath + "/", 
 				"--ahead"
 		});
-		
-		/*
-		for (FSTNode node : AbstractFSTParser.fstnodes) {
-			node.printFST(0);
+
+
+		// ***************************************
+		// TODO: Dariusz
+		// Baustelle...
+
+
+		FSTParser parser = new FSTParser(AbstractFSTParser.fstnodes);
+
+		HashMap<String, List<JavaToken>> map = parser.getFileList();
+
+
+		// output parsed tree
+		for (String key : map.keySet()){
+			List<JavaToken> list = map.get(key);
+			System.out.println("=> File: " + key.toString() );
+			for (JavaToken token : list)
+				System.out.println("=> Token: \n" + token.toString());
+
+
 		}
-		
-		*/
+
+
+
 		TreeBuilderFeatureHouse fstparser = new TreeBuilderFeatureHouse(featureProject.getProjectName());
 		fstparser.createProjectTree(composer.getFstnodes());
 		featureProject.setProjectTree(fstparser.getProjectTree());
@@ -102,7 +126,7 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 		extensions.add(".xmi");
 		return extensions;
 	}
-	
+
 	@Override
 	public String replaceMarker(String text, List<String> list) {
 		// no composer specific markers yet 
@@ -143,12 +167,12 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 	@Override
 	public void buildFSTModel() {
 	}
-	
+
 	@Override
 	public ArrayList<String[]> getTemplates(){
 
 		ArrayList<String[]> list = new ArrayList<String[]>();
-			
+
 		String[] alloy = {"Alloy File", "als", "module #classname#"};
 		String[] c = {"C File", "c", ""};
 		String[] cs = {"C# File", "cs", "public class #classname# {\n\n}"};
@@ -156,7 +180,7 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 		String[] java = {"Java File", "java", "public class #classname# {\n\n}"};
 		String[] javacc= {"JavaCC File", "jj", "PARSER_BEGIN(#classname#) \n \n PARSER_END(#classname#)"};
 		String[] uml = {"UML File (xmi)", "xmi", "<?xml version = '1.0' encoding = 'UTF-8' ?> \n	<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML'>\n\n</XMI>"};
-	
+
 		list.add(alloy);
 		list.add(c);
 		list.add(cs);
@@ -178,7 +202,7 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 
 	@Override
 	public boolean hasFeatureFolders() {
-		
+
 		return true;
 	}
 }
