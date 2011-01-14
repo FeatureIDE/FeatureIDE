@@ -353,8 +353,11 @@ public class NewFeatureIDEFilePage extends WizardPage {
 			for (int i = 0; i < comboFeature.getItemCount(); i++)
 				if (comboFeature.getItem(i).equals(resource.getName()))
 					comboFeature.select(i);
-			container = sourcefolder.getFolder(comboFeature.getText());
 
+		
+			container = sourcefolder.getFolder(comboFeature.getText());
+				
+			
 		} else if (featureProject != null) {
 			String composer = featureProject.getComposerID();
 			if (composer.equals("de.ovgu.featureide.composer.featurecpp")
@@ -363,6 +366,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 				refines = true;
 			}
 		}
+	
 	}
 
 	private boolean isValidFormat(String text) {
@@ -398,7 +402,9 @@ public class NewFeatureIDEFilePage extends WizardPage {
 	String getClassName() {
 		return textClass.getText();
 	}
-
+	String getFeatureName(){
+		return comboFeature.getText();
+	}
 	String getExtension() {
 		if (comboLanguage.getSelectionIndex() == -1)
 			return null;
@@ -471,6 +477,9 @@ public class NewFeatureIDEFilePage extends WizardPage {
 	private boolean validateFeature(String feature) {
 		String errorMessage = null;
 		boolean valid = true;
+		if (!composerExt.hasFeatureFolders()) {
+			container = sourcefolder;
+		}
 		if (container == null) {
 
 			return false;
@@ -485,7 +494,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 			valid = false;
 		}
 
-		if (container.equals(sourcefolder)) {
+		if (composerExt.hasFeatureFolders()&&container.equals(sourcefolder)) {
 
 			valid = false;
 		}

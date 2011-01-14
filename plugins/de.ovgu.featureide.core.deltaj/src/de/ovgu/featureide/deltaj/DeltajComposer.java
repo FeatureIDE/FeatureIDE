@@ -1,10 +1,12 @@
 package de.ovgu.featureide.deltaj;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -15,12 +17,18 @@ import java.util.regex.Pattern;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.xtext.example.util.DJIdeProperties;
 import org.xtext.example.util.ValidationStatus;
 
+import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.fm.core.Feature;
@@ -34,6 +42,7 @@ import djtemplates.DJStandaloneCompiler;
  * @author Fabian Benduhn
  */
 public class DeltajComposer implements IComposerExtensionClass {
+	public static final String JAVA_NATURE = "org.eclipse.jdt.core.javanature";
 	private String equationPath;
 	private String basePath;
 	private String outputPath;
@@ -45,7 +54,7 @@ public class DeltajComposer implements IComposerExtensionClass {
 	private Set<String> featureNames;
 
 	public void run() {
-		
+
 		DJIdeProperties.changeValidationStatus(ValidationStatus.VALIDATE_ALL);
 		DJStandaloneCompiler compiler = new DJStandaloneCompiler(filename);
 		String uriPrefix = getUriPrefix();
@@ -53,10 +62,10 @@ public class DeltajComposer implements IComposerExtensionClass {
 		try {
 			error = compiler.compile(basePath, outputPath, uriPrefix);
 		} catch (Exception e) {
-			
+
 			error = true;
 		}
-		if(error)
+		if (error)
 			System.out.println("error: " + compiler.getErrorReport());
 		try {
 			ResourcesPlugin.getWorkspace().getRoot()
@@ -86,8 +95,8 @@ public class DeltajComposer implements IComposerExtensionClass {
 		if (equationPath == null || basePath == null || outputPath == null)
 			return;
 
-		Configuration configuration =
-				new Configuration(featureProject.getFeatureModel());
+		Configuration configuration = new Configuration(
+				featureProject.getFeatureModel());
 		ConfigurationReader reader = new ConfigurationReader(configuration);
 		try {
 			reader.readFromFile(equation);
@@ -96,12 +105,7 @@ public class DeltajComposer implements IComposerExtensionClass {
 		} catch (IOException e) {
 			DeltajCorePlugin.getDefault().logError(e);
 		}
-		selectedFeatures = new TreeSet<String>();
-
-		for (Feature feature : configuration.getSelectedFeatures()) {
-
-			selectedFeatures.add(feature.getName());
-		}
+		updateSelectedFeatures(configuration);
 
 		featureNames = configuration.getFeatureModel().getFeatureNames();
 		sourceFilesAdded = false;
@@ -118,6 +122,15 @@ public class DeltajComposer implements IComposerExtensionClass {
 		}
 
 		run();
+	}
+
+	private void updateSelectedFeatures(Configuration configuration) {
+		selectedFeatures = new TreeSet<String>();
+
+		for (Feature feature : configuration.getSelectedFeatures()) {
+
+			selectedFeatures.add(feature.getName());
+		}
 	}
 
 	@Override
@@ -160,13 +173,18 @@ public class DeltajComposer implements IComposerExtensionClass {
 	@Override
 	public ArrayList<String[]> getTemplates() {
 
-		return null;
+		String[] core = { "DeltaJ Core Module", "dj",
+				"features #featurename#\nconfigurations\n#featurename#;\n\n\ncore #featurename# {\n\tclass #classname#{\n\n\t}\n}" };
+		String[] delta = { "DeltaJ Delta Module", "dj", "delta #featurename# when #featurename#{\n\tmodifies class #classname#{\n\n\t}\n}"  };
+		ArrayList<String[]> list = new ArrayList<String[]>();
+		list.add(core);
+		list.add(delta);
+		return list;
 	}
 
 	@Override
 	public void addCompiler(IProject project, String sourcePath,
 			String equationPath, String buildPath) {
-
 	}
 
 	@Override
@@ -177,17 +195,16 @@ public class DeltajComposer implements IComposerExtensionClass {
 
 	static Matcher getMatcherFromFileText(String fileText) {
 
-		String patternString =
-				"^(.*)features(.*)configurations(.*)core(.*?)\\{(.*)\\}.*$";
+		String patternString = "^(.*)features(.*)configurations(.*)core(.*?)\\{(.*)\\}.*$";
 		Pattern pattern = Pattern.compile(patternString, Pattern.DOTALL);
 		return pattern.matcher(fileText);
 
 	}
 
 	private String getUriPrefix() {
-		String uriPrefix =
-				"platform:/resource/" + featureProject.getProjectName() + "/"
-						+ featureProject.getProjectSourcePath() + "/";
+		String uriPrefix = "platform:/resource/"
+				+ featureProject.getProjectName() + "/"
+				+ featureProject.getProjectSourcePath() + "/";
 		return uriPrefix;
 	}
 
@@ -208,12 +225,21 @@ public class DeltajComposer implements IComposerExtensionClass {
 		}
 	}
 
-	private void updateConfiguration(File file) {
-		if (isCoreFile(file)) {
-			String newFileText = getNewFileString(file);
+	private void updateConfiguration(final File file) {
+		Job job = new Job("update Configuration") {
+			@Override
+			public IStatus run(IProgressMonitor monitor) {
+				if (isCoreFile(file)) {
+					String newFileText = getNewFileString(file);
 
-			SaveStringToFile(newFileText, file);
-		}
+					SaveStringToFile(newFileText, file);
+				}
+				return Status.OK_STATUS;
+			}
+		};
+		job.setPriority(Job.DECORATE);
+		job.schedule();
+		
 
 	}
 
@@ -261,9 +287,13 @@ public class DeltajComposer implements IComposerExtensionClass {
 
 	}
 
-	private String getFeatureString(Set<String> selectedFeatures2) {
+	private String getFeatureString(Set<String> selectedFeatures) {
+		Configuration configuration = new Configuration(
+				featureProject.getFeatureModel());
+		updateSelectedFeatures(configuration);
 		StringBuffer features = new StringBuffer();
-		for (String s : selectedFeatures2) {
+
+		for (String s : selectedFeatures) {
 			features.append(" " + s + ",");
 		}
 
@@ -316,5 +346,5 @@ public class DeltajComposer implements IComposerExtensionClass {
 
 		return text;
 	}
-
+	
 }

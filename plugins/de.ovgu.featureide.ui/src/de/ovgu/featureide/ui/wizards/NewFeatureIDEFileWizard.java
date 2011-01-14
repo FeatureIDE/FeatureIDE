@@ -84,11 +84,11 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 		final String fileExtension = page.getExtension();
 		final String fileTemplate = page.getTemplate();
 		final IComposerExtension composer = page.getComposer();
-		
+		final String featureName = page.getFeatureName();
 		IRunnableWithProgress op = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor) throws InvocationTargetException {
 				try {
-					doFinish(container, fileName, fileExtension, fileTemplate , composer, page.isRefinement (), monitor);
+					doFinish(featureName,container, fileName, fileExtension, fileTemplate , composer, page.isRefinement (), monitor);
 				} catch (CoreException e) {
 					throw new InvocationTargetException(e);
 				} finally {
@@ -113,13 +113,13 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 	 * file if missing or just replace its contents, and open
 	 * the editor on the newly created file.
 	 */
-	private void doFinish(IContainer container, String fileName, String extension, String template, 
+	private void doFinish(String featureName,IContainer container, String fileName, String extension, String template, 
 			IComposerExtension composer, boolean refines, IProgressMonitor monitor) throws CoreException {
 		// create a sample file
 		monitor.beginTask("Creating " + fileName, 2);
 		final IFile file = container.getFile(new Path(fileName + "." + extension));
 		try {
-			InputStream stream = openContentStream(container.getName(), fileName, template, composer, refines);
+			InputStream stream = openContentStream(featureName,container, fileName, template, composer, refines);
 			if (file.exists()) {
 				file.setContents(stream, true, true, monitor);
 			} else {
@@ -147,15 +147,17 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 	 * We will initialize file contents with a sample text.
 	 */
 
-	private InputStream openContentStream(String layername, String classname, String template, IComposerExtension composer, boolean refines) {
+	private InputStream openContentStream(String featurename,IContainer container, String classname, String template, IComposerExtension composer, boolean refines) {
 		String contents = template;
 		List<String> list = new LinkedList<String>();
 		
 		if (refines)
 			list.add("refines");
-		 
+		
 		contents = composer.replaceMarker(contents, list);
 		contents = contents.replace("#classname#", classname);
+		contents = contents.replace("#featurename#", featurename);
+		
 		
 		return new ByteArrayInputStream(contents.getBytes());
 	}
