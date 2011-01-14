@@ -50,8 +50,6 @@ import org.eclipse.ui.part.FileEditorInput;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtension;
-import de.ovgu.featureide.fm.core.Feature;
-
 
 /**
  * A dialog page to create new language specific featureIDE files.
@@ -62,17 +60,17 @@ public class NewFeatureIDEFilePage extends WizardPage {
 
 	private ArrayList<String[]> formats = new ArrayList<String[]>();
 
-	private ISelection selection;
+	private IStructuredSelection selection;
 
-	private Combo featureComboProject;
-	private Combo featureComboContainer;
-	private Combo languageCombo;
+	private Combo comboProject;
+	private Combo comboFeature;
+	private Combo comboLanguage;
 
-	private Text className;
+	private Text textClass;
 
-	private Button refinesbox;
+	private Button buttonRefines;
 
-	private Label refineslabel;
+	private Label labelRefines;
 
 	private IFolder sourcefolder;
 
@@ -81,45 +79,39 @@ public class NewFeatureIDEFilePage extends WizardPage {
 	private boolean refines = false;
 
 	private String feature;
-	
+
 	private String clss;
 
 	private IFeatureProject featureProject = null;
-	
+
 	private IComposerExtension composerExt;
 
-	public void setFeatureProjekt(IFeatureProject featureProject){
-		this.featureProject = featureProject;
-	}
+	private boolean classDirty = false;
+	private boolean languageDirty = false;
+	private boolean projectDirty = false;
+	private boolean featureDirty = false;
 
 	private Collection<IFeatureProject> featureProjects = CorePlugin
-	.getFeatureProjects();
+			.getFeatureProjects();
 
-	private String text;
+	private String comboProjectText;
 
 	/**
 	 * Constructor for NewFeatureIDEFilePage.
 	 * 
 	 * @param selection
-	 */
-	public NewFeatureIDEFilePage(ISelection selection) {
-		super("wizardPage");
-		setTitle("New FeatureIDE File");
-		setDescription("Creates a new language specific FeatureIDE File.");
-		this.selection = selection;
-	}
-
-	/**
-	 * Constructor for NewFeatureIDEFilePage.
-	 * 
-	 * @param selection 
 	 * @param feature
 	 */
-	public NewFeatureIDEFilePage(ISelection selection, String feature, String clss) {
+	public NewFeatureIDEFilePage(ISelection selection, String feature,
+			String clss) {
 		super("wizardPage");
 		setTitle("New FeatureIDE File");
 		setDescription("Creates a new language specific FeatureIDE File.");
-		this.selection = selection;
+		if (selection instanceof IStructuredSelection) {
+			this.selection = (IStructuredSelection) selection;
+		} else
+			this.selection = null;
+
 		this.feature = feature;
 		this.clss = clss;
 	}
@@ -136,59 +128,60 @@ public class NewFeatureIDEFilePage extends WizardPage {
 		composite.setLayout(layout);
 
 		Label label = new Label(composite, SWT.NULL);
-		label.setText("&Language:");
-		languageCombo = new Combo(composite, SWT.BORDER | SWT.SINGLE);
-		languageCombo.setLayoutData(gd);
+		label.setText("&Project:");
+		comboProject = new Combo(composite, SWT.BORDER | SWT.SINGLE);
+		comboProject.setLayoutData(gd);
 		new Label(composite, SWT.NULL);
 
 		label = new Label(composite, SWT.NULL);
-		label.setText("&Project:");
-		featureComboProject = new Combo(composite, SWT.BORDER | SWT.SINGLE);
-		featureComboProject.setLayoutData(gd);
+		label.setText("&Language:");
+		comboLanguage = new Combo(composite, SWT.BORDER | SWT.SINGLE);
+		comboLanguage.setLayoutData(gd);
 		new Label(composite, SWT.NULL);
 
 		label = new Label(composite, SWT.NULL);
 		label.setText("&Feature:");
-		featureComboContainer = new Combo(composite, SWT.BORDER | SWT.SINGLE);
-		featureComboContainer.setLayoutData(gd);
+		comboFeature = new Combo(composite, SWT.BORDER | SWT.SINGLE);
+		comboFeature.setLayoutData(gd);
 		new Label(composite, SWT.NULL);
 
 		label = new Label(composite, SWT.NULL);
 		label.setText("&Class name:");
-		className = new Text(composite, SWT.BORDER | SWT.SINGLE);
-		className.setLayoutData(gd);
+		textClass = new Text(composite, SWT.BORDER | SWT.SINGLE);
+		textClass.setLayoutData(gd);
 		new Label(composite, SWT.NULL);
 
-		refineslabel = new Label(composite, SWT.NULL);
-		refineslabel.setText("&Refines:");
-		refinesbox = new Button(composite, SWT.CHECK);
+		labelRefines = new Label(composite, SWT.NULL);
+		labelRefines.setText("&Refines:");
+		buttonRefines = new Button(composite, SWT.CHECK);
 		gd = new GridData(GridData.BEGINNING);
-		refinesbox.setLayoutData(gd);
+		buttonRefines.setLayoutData(gd);
 
 		initialize();
 		addListeners();
 		setControl(composite);
 		dialogChanged();
-		projectbool = true;
+
 	}
 
 	private void addListeners() {
-		featureComboProject.addModifyListener(new ModifyListener() {
+		comboProject.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
-				if (!featureComboProject.getText().equalsIgnoreCase(text)) {
-					text = featureComboProject.getText();
+				projectDirty = true;
+				if (!comboProject.getText().equalsIgnoreCase(comboProjectText)) {
+					comboProjectText = comboProject.getText();
 					featureProject = null;
 					for (IFeatureProject feature : featureProjects) {
-						if (text.equalsIgnoreCase(feature.getProjectName())) {
+						if (comboProjectText.equalsIgnoreCase(feature
+								.getProjectName())) {
 							featureProject = feature;
 						}
 					}
 					if (featureProject != null) {
 						IResource res = ResourcesPlugin.getWorkspace()
-						.getRoot().findMember(
-								featureProject.getProjectName());
+								.getRoot()
+								.findMember(featureProject.getProjectName());
 						checkcontainer(featureProject, res);
-						containerbool = true;
 
 						// reload all formats for the changed Project
 
@@ -196,51 +189,46 @@ public class NewFeatureIDEFilePage extends WizardPage {
 						composerExt.initialize(featureProject);
 						formats = composerExt.getTemplates();
 
-						languageCombo.removeAll();
+						comboLanguage.removeAll();
 						for (String[] format : formats)
-							languageCombo.add(format[0]);
-						languageCombo.select(0);
+							comboLanguage.add(format[0]);
+						comboLanguage.select(0);
 					}
 
 					dialogChanged();
 				}
-			}
-		});
-		featureComboContainer.addModifyListener(new ModifyListener() {
-			public void modifyText(ModifyEvent e) {
-				NewFeatureIDEFilePage.this.container = sourcefolder != null ? sourcefolder
-						.getFolder(featureComboContainer.getText())
-						: null;
-						dialogChanged();
-			}
-		});
-		languageCombo.addModifyListener(new ModifyListener() {
-			public void modifyText(ModifyEvent e) {
 
-				if(featureProject != null){
-					String composer = featureProject.getComposerID();
-					if(composer.equals("de.ovgu.featureide.composer.featurecpp") 
-							|| composer.equals("de.ovgu.featureide.composer.ahead")){
-						refinesbox.setEnabled(true);
-						refineslabel.setEnabled(true);
-					}
-					else{
-						refinesbox.setEnabled(false);
-						refineslabel.setEnabled(false);
-					}
+			}
+		});
+		comboFeature.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent e) {
+				featureDirty = true;
+				NewFeatureIDEFilePage.this.container = sourcefolder != null ? sourcefolder
+						.getFolder(comboFeature.getText()) : null;
+				dialogChanged();
+			}
+		});
+		comboLanguage.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent e) {
+				languageDirty = true;
+				if (featureProject != null) {
+
+					initRefinesButton();
 				}
 
 				dialogChanged();
+
 			}
 		});
-		className.addModifyListener(new ModifyListener() {
+		textClass.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
+				classDirty = true;
 				dialogChanged();
 			}
 		});
-		refinesbox.addSelectionListener(new SelectionListener() {
+		buttonRefines.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent e) {
-				refines = refinesbox.getSelection();
+				refines = buttonRefines.getSelection();
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e) {
@@ -253,246 +241,179 @@ public class NewFeatureIDEFilePage extends WizardPage {
 	 */
 	private void initialize() {
 
-		IFeatureProject featureProject = null;
+		if (clss != null) {
+			textClass.setText(clss);
+		}
 
 		for (IFeatureProject feature : featureProjects)
-			featureComboProject.add(feature.getProjectName());
+			comboProject.add(feature.getProjectName());
 
-		if (selection != null && selection.isEmpty() == false
-				&& selection instanceof IStructuredSelection) {
-			IStructuredSelection ssel = (IStructuredSelection) selection;
-			if (ssel.size() > 1)
-				return;
-			Object obj = ssel.getFirstElement();
-			if (obj instanceof IResource) {
-				IResource resource = (IResource) obj;
-				featureProject = CorePlugin.getFeatureProject(resource);
-				if (featureProject != null) {
-					featureComboProject.setText(featureProject.getProjectName());
-					checkcontainer(featureProject, resource);
-				}
+		if (selection == null || selection.isEmpty())
+			return;
+
+		if (selection.size() > 1)
+			return;
+
+		initComboProject();
+
+		if (featureProject != null) {
+			initComboFeature();
+			initComboLanguage();
+			initRefinesButton();
+		}
+
+	}
+
+	private void initComboProject() {
+		Object obj = selection.getFirstElement();
+		if (obj instanceof IResource) {
+			IResource resource = (IResource) obj;
+			featureProject = CorePlugin.getFeatureProject(resource);
+			if (featureProject != null) {
+				comboProject.setText(featureProject.getProjectName());
+				checkcontainer(featureProject, resource);
 			}
-			else {
-				IWorkbenchWindow editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-				IEditorPart part = null;
-				if (editor != null) {
-					IWorkbenchPage page = editor.getActivePage();
-					if (page != null) {
-						part = page.getActiveEditor();
-						if (part != null) {
-							FileEditorInput inputFile = (FileEditorInput)part.getEditorInput();
-							featureProject = CorePlugin.getFeatureProject(inputFile.getFile());
+		} else {
+			IWorkbenchWindow editor = PlatformUI.getWorkbench()
+					.getActiveWorkbenchWindow();
+			IEditorPart part = null;
+			if (editor != null) {
+				IWorkbenchPage page = editor.getActivePage();
+				if (page != null) {
+					part = page.getActiveEditor();
+					if (part != null) {
+						FileEditorInput inputFile = (FileEditorInput) part
+								.getEditorInput();
+						featureProject = CorePlugin.getFeatureProject(inputFile
+								.getFile());
 
-							if (featureProject != null) {
-								IResource res = ResourcesPlugin.getWorkspace()
-								.getRoot().findMember(
-										featureProject.getProjectName());
-								checkcontainer(featureProject, res);
-								containerbool = true;
-							}
+						if (featureProject != null) {
+							IResource res = ResourcesPlugin
+									.getWorkspace()
+									.getRoot()
+									.findMember(featureProject.getProjectName());
+							checkcontainer(featureProject, res);
 
 						}
+
 					}
 				}
-
-				if (featureProject != null) {
-					featureComboProject.setText(featureProject.getProjectName());
-
-					for (String s : featureProject.getFeatureModel().getFeatureNames())
-						featureComboContainer.add(s);
-				}
 			}
-			text = featureComboProject.getText();
 
-			if(featureProject != null){
+			if (featureProject != null) {
+				comboProject.setText(featureProject.getProjectName());
 
-				composerExt = featureProject.getComposer();
-				composerExt.initialize(featureProject);
-				formats = composerExt.getTemplates();
-
-				for (String[] format : formats)
-					languageCombo.add(format[0]);
-
-				languageCombo.select(0);
-
-				String composerID = composerExt.getId();
-				if(composerID.equals("de.ovgu.featureide.composer.featurecpp") 
-						|| composerID.equals("de.ovgu.featureide.composer.ahead")){
-					refinesbox.setEnabled(true);
-					refineslabel.setEnabled(true);
-				}
-				else{
-					refinesbox.setEnabled(false);
-					refineslabel.setEnabled(false);
-				}
 			}
 		}
+		comboProjectText = comboProject.getText();
 
-		if (feature != null){
-			featureComboContainer.setText(feature);
+	}
+
+	private void initComboLanguage() {
+		composerExt = featureProject.getComposer();
+		composerExt.initialize(featureProject);
+		formats = composerExt.getTemplates();
+
+		for (String[] format : formats)
+			comboLanguage.add(format[0]);
+
+		comboLanguage.select(0);
+	}
+
+	private void initRefinesButton() {
+		String composerID = composerExt.getId();
+		if (composerID.equals("de.ovgu.featureide.composer.featurecpp")
+				|| composerID.equals("de.ovgu.featureide.composer.ahead")) {
+			buttonRefines.setVisible(true);
+			labelRefines.setVisible(true);
+		} else {
+			buttonRefines.setVisible(false);
+			labelRefines.setVisible(false);
 		}
-		
-		if (clss != null){
-			className.setText(clss);
+	}
+
+	private void initComboFeature() {
+		if (feature != null) {
+			comboFeature.setText(feature);
 		}
+		if (featureProject == null) {
+			return;
+		}
+		comboFeature.removeAll();
+		for (String s : featureProject.getFeatureModel().getLayerNames())
+			comboFeature.add(s);
+
 	}
 
 	private void checkcontainer(IFeatureProject featureProject,
 			IResource resource) {
 
-		featureComboContainer.removeAll();
-		for (Feature feature : featureProject.getFeatureModel().getLayers())
-			featureComboContainer.add(feature.getName());
 		sourcefolder = featureProject.getSourceFolder();
 		if (resource.getParent().equals(sourcefolder)) {
-			for (int i = 0; i < featureComboContainer.getItemCount(); i++)
-				if (featureComboContainer.getItem(i).equals(resource.getName()))
-					featureComboContainer.select(i);
-			container = sourcefolder.getFolder(featureComboContainer.getText());
-			//}
-			//else if(){
+			for (int i = 0; i < comboFeature.getItemCount(); i++)
+				if (comboFeature.getItem(i).equals(resource.getName()))
+					comboFeature.select(i);
+			container = sourcefolder.getFolder(comboFeature.getText());
 
-		} else 
-			if(featureProject != null){
-				String composer = featureProject.getComposerID();
-				if(composer.equals("de.ovgu.featureide.composer.featurecpp") 
-						|| composer.equals("de.ovgu.featureide.composer.ahead")){
-					refinesbox.setSelection(true);
-					refines = true;
-				}
+		} else if (featureProject != null) {
+			String composer = featureProject.getComposerID();
+			if (composer.equals("de.ovgu.featureide.composer.featurecpp")
+					|| composer.equals("de.ovgu.featureide.composer.ahead")) {
+				buttonRefines.setSelection(true);
+				refines = true;
 			}
+		}
 	}
 
-	private boolean projectbool = false;
-	private boolean containerbool = false;
-	private boolean filebool = false;
-
-	private boolean isValidFormat(String text){
-		for(String[] format : formats)
+	private boolean isValidFormat(String text) {
+		for (String[] format : formats)
 			if (format[0].equals(text))
 				return true;
 		return false;
 	}
 
-	public void dialogChanged() {
-		
-		if (featureComboProject.getText().length() == 0 && !projectbool) {
-			System.out.println("1");
-			setErrorMessage(null);
-			setPageComplete(false);
-			projectbool = true;
-			return;
-		}
+	private void dialogChanged() {
 
-		if (featureComboProject.getText().length() == 0) {
-			System.out.println("2");
-			updateStatus("No Project selected");
+		setPageComplete(false);
+		if (!validateLanguage(comboLanguage.getText()))
 			return;
-		}
+		if (!validateProject(comboProject.getText()))
+			return;
+		if (!validateFeature(comboFeature.getText()))
+			return;
+		if (!validateClass(textClass.getText()))
+			return;
+		setPageComplete(true);
 
-		if (!isFeatureProject(featureComboProject.getText())) {
-			System.out.println("3");
-			updateStatus("Selected project is not a FeatureIDE Project");
-			return;
-		}
-
-		if (!isValidFormat(languageCombo.getText())) {
-			System.out.println("4");
-			updateStatus("Selected file format is not supported");
-			return;
-		}
-
-		if (container == null) {
-			System.out.println("5");
-			setErrorMessage(null);
-			setPageComplete(false);
-			return;
-		}
-		if (featureComboContainer.getText().length() != 0)
-			containerbool = false;
-		if ((featureComboContainer.getText() == null || featureComboContainer
-				.getText().equalsIgnoreCase(""))
-				&& containerbool) {
-			System.out.println("6.5");
-			setErrorMessage(null);
-			setPageComplete(false);
-			return;
-		}
-		if (!container.isAccessible()) {
-			System.out.println("7");
-			updateStatus("Project must be writable");
-			return;
-		}
-		if (featureComboContainer.getText().length() == 0) {
-			System.out.println("8");
-			updateStatus("No container selected");
-			return;
-		}
-
-		if (container.equals(sourcefolder)) {
-			System.out.println("9");
-			setPageComplete(false);
-			return;
-		}
-
-		String className = getClassName();
-		if (className.length() != 0) {
-			filebool = true;
-		} else if (filebool) {
-			updateStatus("The file name must be specified");
-			return;
-		} else {
-			setErrorMessage(null);
-			setPageComplete(false);
-			return;
-		}
-		if (className.replace('\\', '/').indexOf('/', 1) > 0) {
-			updateStatus("File name must be valid");
-			return;
-		}
-		int dotLoc = className.indexOf('.');
-		if (dotLoc != -1) {
-			updateStatus("File name must not contain \".\"");
-			return;
-		}
-		if (container.findMember(className + "." + getExtension()) != null) {
-			updateStatus("File already exists");
-			return;
-		}
-
-		updateStatus(null);
 	}
 
-	private void updateStatus(String message) {
-		setErrorMessage(message);
-		setPageComplete(message == null);
-	}
-
-	public boolean isRefinement() {
+	boolean isRefinement() {
 		return refines;
 	}
 
-	public IContainer getContainerObject() {
+	IContainer getContainerObject() {
 		return container;
 	}
 
-	public String getClassName() {
-		return className.getText();
+	String getClassName() {
+		return textClass.getText();
 	}
 
-	public String getExtension() {
-		return formats.get(languageCombo.getSelectionIndex())[1];
+	String getExtension() {
+		if (comboLanguage.getSelectionIndex() == -1)
+			return null;
+		return formats.get(comboLanguage.getSelectionIndex())[1];
 	}
 
-	public String getTemplate() {
-		return formats.get(languageCombo.getSelectionIndex())[2];
+	String getTemplate() {
+		return formats.get(comboLanguage.getSelectionIndex())[2];
 	}
-	
-	public IComposerExtension getComposer() {
+
+	IComposerExtension getComposer() {
 		return composerExt;
 	}
 
-	public boolean isFeatureProject(String text) {
+	private boolean isFeatureProject(String text) {
 		boolean isFP = false;
 		for (IFeatureProject feature : featureProjects) {
 			if (text.equalsIgnoreCase(feature.getProjectName())) {
@@ -500,5 +421,88 @@ public class NewFeatureIDEFilePage extends WizardPage {
 			}
 		}
 		return isFP;
+	}
+
+	private boolean validateClass(String className) {
+		String errorMessage = null;
+		boolean valid = true;
+		if (className.length() == 0) {
+			errorMessage = "The file name must be specified";
+			valid = false;
+		}
+		if (className.replace('\\', '/').indexOf('/', 1) > 0) {
+			errorMessage = "File name must be valid";
+			valid = false;
+		}
+		int dotLoc = className.indexOf('.');
+		if (dotLoc != -1) {
+			errorMessage = "File name must not contain \".\"";
+			valid = false;
+		}
+		if (container.findMember(className + "." + getExtension()) != null) {
+			errorMessage = "File already exists";
+			valid = false;
+		}
+		if (classDirty)
+			setErrorMessage(errorMessage);
+
+		return valid;
+	}
+
+	private boolean validateProject(String project) {
+		String errorMessage = null;
+		boolean valid = true;
+
+		if (project.length() == 0) {
+			errorMessage = "No Project selected";
+			valid = false;
+		}
+
+		if (!isFeatureProject(project)) {
+			errorMessage = "Selected project is not a FeatureIDE Project";
+			valid = false;
+		}
+
+		if (projectDirty)
+			setErrorMessage(errorMessage);
+		return valid;
+	}
+
+	private boolean validateFeature(String feature) {
+		String errorMessage = null;
+		boolean valid = true;
+		if (container == null) {
+
+			return false;
+		}
+
+		if (feature.length() == 0) {
+			errorMessage = "No Feature selected";
+			valid = false;
+		}
+		if (!container.isAccessible()) {
+			errorMessage = "Project must be writable";
+			valid = false;
+		}
+
+		if (container.equals(sourcefolder)) {
+
+			valid = false;
+		}
+		if (featureDirty)
+			setErrorMessage(errorMessage);
+		return valid;
+	}
+
+	private boolean validateLanguage(String language) {
+		String errorMessage = null;
+		boolean valid = true;
+		if (!isValidFormat(language)) {
+			errorMessage = "Selected file format is not supported";
+			valid = false;
+		}
+		if (languageDirty)
+			setErrorMessage(errorMessage);
+		return valid;
 	}
 }
