@@ -229,7 +229,7 @@ public class MungePreprocessor implements IComposerExtensionClass{
 					if (marker.length != 0) {
 						for (IMarker m : marker) {
 							IFile sourceFile = findSourceFile(file, featureProject.getSourceFolder());
-							sourceFile.setDerived(false, null);
+							sourceFile.setDerived(false);
 							IMarker newMarker = sourceFile.createMarker(CorePlugin.PLUGIN_ID + ".builderProblemMarker");
 							newMarker.setAttribute(IMarker.LINE_NUMBER, m.getAttribute(IMarker.LINE_NUMBER));
 							newMarker.setAttribute(IMarker.MESSAGE, m.getAttribute(IMarker.MESSAGE));
