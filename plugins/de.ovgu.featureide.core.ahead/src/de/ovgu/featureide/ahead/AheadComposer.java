@@ -296,4 +296,10 @@ public class AheadComposer implements IComposerExtensionClass {
 		
 	}
 
+	@Override
+	public boolean hasCustomFilename() {
+	
+		return false;
+	}
+
 }

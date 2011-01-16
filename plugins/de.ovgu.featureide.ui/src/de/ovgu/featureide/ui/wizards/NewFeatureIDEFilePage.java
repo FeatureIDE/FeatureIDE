@@ -67,9 +67,9 @@ public class NewFeatureIDEFilePage extends WizardPage {
 	private Combo comboLanguage;
 
 	private Text textClass;
-
+	private Text textModulename;
 	private Button buttonRefines;
-
+	private Label labelModulename;
 	private Label labelRefines;
 
 	private IFolder sourcefolder;
@@ -85,12 +85,12 @@ public class NewFeatureIDEFilePage extends WizardPage {
 	private IFeatureProject featureProject = null;
 
 	private IComposerExtension composerExt;
-
+	
 	private boolean classDirty = false;
 	private boolean languageDirty = false;
 	private boolean projectDirty = false;
 	private boolean featureDirty = false;
-
+	private boolean modulenameDirty = false;
 	private Collection<IFeatureProject> featureProjects = CorePlugin
 			.getFeatureProjects();
 
@@ -154,6 +154,12 @@ public class NewFeatureIDEFilePage extends WizardPage {
 		textClass.setLayoutData(gd);
 		new Label(composite, SWT.NULL);
 
+		labelModulename = new Label(composite, SWT.NULL);
+		labelModulename.setText("&Module name:");
+		textModulename = new Text(composite, SWT.BORDER | SWT.SINGLE);
+		textModulename.setLayoutData(gd);
+		new Label(composite, SWT.NULL);
+		
 		labelRefines = new Label(composite, SWT.NULL);
 		labelRefines.setText("&Refines:");
 		buttonRefines = new Button(composite, SWT.CHECK);
@@ -210,7 +216,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 			public void modifyText(ModifyEvent e) {
 				languageDirty = true;
 				if (featureProject != null) {
-
+					initTextModulename();
 					initRefinesButton();
 				}
 
@@ -223,6 +229,13 @@ public class NewFeatureIDEFilePage extends WizardPage {
 				classDirty = true;
 				dialogChanged();
 			}
+		});
+		textModulename.addModifyListener(new ModifyListener(){
+			public void modifyText(ModifyEvent e) {
+				modulenameDirty=true;
+				dialogChanged();
+			}
+			
 		});
 		buttonRefines.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent e) {
@@ -257,9 +270,26 @@ public class NewFeatureIDEFilePage extends WizardPage {
 		if (featureProject != null) {
 			initComboFeature();
 			initComboLanguage();
+			
+			initTextModulename();
 			initRefinesButton();
 		}
 
+	}
+
+	/**
+	 * 
+	 */
+	private void initTextModulename() {
+		if(composerExt.hasCustomFilename()){
+			textModulename.setVisible(true);
+			labelModulename.setVisible(true);
+		}else{
+			textModulename.setVisible(false);
+			labelModulename.setVisible(false);
+		}
+		
+		
 	}
 
 	private void initComboProject() {
@@ -397,6 +427,8 @@ public class NewFeatureIDEFilePage extends WizardPage {
 			return;
 		if (!validateClass(textClass.getText()))
 			return;
+		if(!validateModulename(textModulename.getText()))
+				return;
 		setPageComplete(true);
 
 	}
@@ -445,20 +477,20 @@ public class NewFeatureIDEFilePage extends WizardPage {
 		String errorMessage = null;
 		boolean valid = true;
 		if (className.length() == 0) {
-			errorMessage = "The file name must be specified";
+			errorMessage = "The class name must be specified";
 			valid = false;
 		}
 		if (className.replace('\\', '/').indexOf('/', 1) > 0) {
-			errorMessage = "File name must be valid";
+			errorMessage = "Class name must be valid";
 			valid = false;
 		}
 		int dotLoc = className.indexOf('.');
 		if (dotLoc != -1) {
-			errorMessage = "File name must not contain \".\"";
+			errorMessage = "Class name must not contain \".\"";
 			valid = false;
 		}
 		if (container.findMember(className + "." + getExtension()) != null) {
-			errorMessage = "File already exists";
+			errorMessage = "File with this class name already exists";
 			valid = false;
 		}
 		if (classDirty)
@@ -503,7 +535,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 			valid = false;
 		}
 		if (!container.isAccessible()) {
-			errorMessage = "Project must be writable";
+			errorMessage = "Feature name must correspond to an existing Folder";
 			valid = false;
 		}
 
@@ -529,19 +561,48 @@ public class NewFeatureIDEFilePage extends WizardPage {
 	}
 
 	/**
+	 * @param text
+	 * @return
+	 */
+	private boolean validateModulename(String name) {
+		if(!composerExt.hasCustomFilename())return true;
+		String errorMessage = null;
+		boolean valid = true;
+		if(!isValidModulename(name)){
+			errorMessage = "Module name is invalid";
+			valid = false;
+		}
+		if(modulenameDirty)
+			setErrorMessage(errorMessage);
+		return valid;
+	}
+
+	/**
+	 * @param name
+	 * @return
+	 */
+	private boolean isValidModulename(String name) {
+		if(name==null)return false;
+		if(name.length()==0)return false;
+		for (int i = 1; i < name.length(); i++) {
+			if (!Character.isLetterOrDigit(name.charAt(i)))
+				return false;
+		}
+		return true;
+	}
+
+	/**
 	 * @return name of the file 
 	 */
 	public String getFileName() {
-	if(composerExt.getId().equals("de.ovgu.featureide.core.deltaj.deltajcomposer")){
-		if(comboLanguage.getText().equals("DeltaJ (Delta Module)")){
-			return "D"+getFeatureName();
-		}
-		else{
-			return "core";
-		}
+	if(composerExt.hasCustomFilename()){
+		return textModulename.getText();}
+	else{
+		return getClassName();
+	}
 			
 	
-	}
-	return getClassName();
+	
+	
 	}
 }

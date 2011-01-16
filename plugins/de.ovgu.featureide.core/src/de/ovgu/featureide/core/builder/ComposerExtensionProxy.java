@@ -228,4 +228,11 @@ public class ComposerExtensionProxy implements IComposerExtension {
 				buildPath);
 	}
 
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#hasCustomFilename()
+	 */
+	public boolean hasCustomFilename() {
+		return composerExtensionClass.hasCustomFilename();
+	}
+
 }

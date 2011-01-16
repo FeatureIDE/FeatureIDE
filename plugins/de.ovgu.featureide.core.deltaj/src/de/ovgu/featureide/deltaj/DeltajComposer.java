@@ -426,4 +426,9 @@ public class DeltajComposer implements IComposerExtensionClass {
 
 	}
 
+	@Override
+	public boolean hasCustomFilename() {
+		return true;
+	}
+
 }

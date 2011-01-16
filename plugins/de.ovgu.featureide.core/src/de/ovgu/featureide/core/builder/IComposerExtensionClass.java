@@ -133,4 +133,10 @@ public interface IComposerExtensionClass {
 	 */
 	void editProjectWizard(Text sourcePath, Text equationsPath, Text buildPath);
 
+	/**
+	 * @return returns false if filenames equal the corresponding feature name
+	 * otherwise false
+	 */
+	boolean hasCustomFilename();
+
 }

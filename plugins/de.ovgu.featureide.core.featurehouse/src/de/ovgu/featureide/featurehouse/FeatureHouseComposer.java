@@ -332,4 +332,10 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 	
 	}
 
+	@Override
+	public boolean hasCustomFilename() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

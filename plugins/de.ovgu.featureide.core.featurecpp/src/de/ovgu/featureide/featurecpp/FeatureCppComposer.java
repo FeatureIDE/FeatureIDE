@@ -133,4 +133,10 @@ public class FeatureCppComposer implements IComposerExtensionClass {
 		
 		return 0;
 	}
+
+	@Override
+	public boolean hasCustomFilename() {
+
+		return false;
+	}
 }

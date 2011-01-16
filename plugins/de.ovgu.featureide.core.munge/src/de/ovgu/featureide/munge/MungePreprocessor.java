@@ -294,4 +294,10 @@ public class MungePreprocessor implements IComposerExtensionClass{
 	
 		return 0;
 	}
+
+	@Override
+	public boolean hasCustomFilename() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }
