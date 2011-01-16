@@ -26,6 +26,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.swt.widgets.Text;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
@@ -128,9 +129,9 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	 * 
 	 * @see de.ovgu.featureide.core.builder.IComposerExtension#clean()
 	 */
-	public void clean() {
+	public boolean clean() {
 		loadComposerExtension();
-		composerExtensionClass.clean();
+		return composerExtensionClass.clean();
 	}
 
 	/* (non-Javadoc)
@@ -157,8 +158,8 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#composerSpecficMove(org.eclipse.core.resources.IFolder, org.eclipse.core.runtime.IPath)
 	 */
-	public boolean composerSpecficMove(IFolder source, IFolder destination) {
-		return composerExtensionClass.composerSpecficMove(source, destination);
+	public boolean postAddNature(IFolder source, IFolder destination) {
+		return composerExtensionClass.postAddNature(source, destination);
 	}
 
 	/* (non-Javadoc)
@@ -199,5 +200,21 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	public boolean hasFeatureFolders(){
 		loadComposerExtension();
 		return composerExtensionClass.hasFeatureFolders();
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#postModelChanged()
+	 */
+	public void postModelChanged() {
+		composerExtensionClass.postModelChanged();
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtension#editProjectWizard(org.eclipse.swt.widgets.Text, org.eclipse.swt.widgets.Text, org.eclipse.swt.widgets.Text, org.eclipse.swt.widgets.Group)
+	 */
+	public void editProjectWizard(Text sourcePath, Text equationsPath,
+			Text buildPath) {
+		composerExtensionClass.editProjectWizard(sourcePath, equationsPath,
+				buildPath);
 	}
 }

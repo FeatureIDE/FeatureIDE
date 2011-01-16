@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.swt.widgets.Text;
 import org.sonatype.plugins.munge.Munge;
 
 import de.ovgu.featureide.core.CorePlugin;
@@ -128,7 +129,8 @@ public class MungePreprocessor implements IComposerExtensionClass{
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#clean()
 	 */
-	public void clean() {
+	public boolean clean() {
+		return true;
 	}
 
 	private void addDefaultSourceFiles(IFolder sourceFolder) throws CoreException {
@@ -206,7 +208,7 @@ public class MungePreprocessor implements IComposerExtensionClass{
 	}
 
 	@Override
-	public boolean composerSpecficMove(IFolder source, IFolder destination) {
+	public boolean postAddNature(IFolder source, IFolder destination) {
 		return false;
 	}
 
@@ -221,7 +223,8 @@ public class MungePreprocessor implements IComposerExtensionClass{
 
 	@Override
 	public void postCompile(final IFile file) {
-			Job job = new Job("marker") {
+			Job job = new Job("create marker") {
+			@SuppressWarnings("deprecation")
 			@Override
 			public IStatus run(IProgressMonitor monitor) {
 				try {
@@ -273,5 +276,16 @@ public class MungePreprocessor implements IComposerExtensionClass{
 	@Override
 	public String replaceMarker(String text, List<String> list) {
 		return text;
+	}
+
+	@Override
+	public void postModelChanged() {
+		
+	}
+
+	@Override
+	public void editProjectWizard(Text sourcePath, Text equationsPath,
+			Text buildPath) {
+	
 	}
 }

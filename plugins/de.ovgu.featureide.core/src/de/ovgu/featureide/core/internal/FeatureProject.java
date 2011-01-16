@@ -75,6 +75,8 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 public class FeatureProject extends BuilderMarkerHandler implements
 IFeatureProject, IResourceChangeListener {
 
+	private  static final String FEATURE_MODULE_MARKER = "de.ovgu.featureide.core.featureModuleMarker";
+	
 	public class FeatureModelChangeListner implements PropertyChangeListener {
 		/**
 		 * listens to changed feature names
@@ -170,8 +172,9 @@ IFeatureProject, IResourceChangeListener {
 		try {
 			//just create the bin folder if project hat only the FeatureIDE Nature
 			if (project.getDescription().getNatureIds().length == 1
-					&& project.hasNature(FeatureProjectNature.NATURE_ID))
+					&& project.hasNature(FeatureProjectNature.NATURE_ID)) {
 				binFolder = CorePlugin.createFolder(project, "bin");
+			}
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
@@ -246,10 +249,9 @@ IFeatureProject, IResourceChangeListener {
 		try {
 			modelReader.readFromFile(modelFile.getResource());
 			getComposer();
-			if(composerExtension.hasFeatureFolders()){
-			
-			createAndDeleteFeatureFolders();
-			setAllFeatureModuleMarkers(featureModel, sourceFolder);
+			if(composerExtension != null && composerExtension.hasFeatureFolders()){
+				createAndDeleteFeatureFolders();
+				setAllFeatureModuleMarkers(featureModel, sourceFolder);
 			}
 		} catch (FileNotFoundException e) {
 			modelFile.createModelMarker(e.getMessage(), IMarker.SEVERITY_ERROR,
@@ -508,7 +510,7 @@ IFeatureProject, IResourceChangeListener {
 	 * @see de.ovgu.featureide.core.IFeatureProject#getSourcePath()
 	 */
 	public String getSourcePath() {
-		return sourceFolder.getRawLocation().toOSString();
+		return sourceFolder == null ? null : sourceFolder.getRawLocation().toOSString();
 	}
 
 	/*
@@ -640,7 +642,6 @@ IFeatureProject, IResourceChangeListener {
 	 * 
 	 * @param featureModel
 	 * @param sourceFolder
-	 * @throws CoreException
 	 */
 	private void setAllFeatureModuleMarkers(final FeatureModel featureModel,
 			final IFolder sourceFolder) {
@@ -707,10 +708,12 @@ IFeatureProject, IResourceChangeListener {
 			}
 		}
 		if (message != null) {
-			IMarker marker = folder
-				.createMarker("de.ovgu.featureide.core.featureModuleMarker");
-			marker.setAttribute("message", message);
-			marker.setAttribute("severity", IMarker.SEVERITY_WARNING);
+			if (folder.findMarkers(FEATURE_MODULE_MARKER, false, IResource.DEPTH_ZERO).length == 0 
+					&& folder.exists()) {
+				IMarker marker = folder.createMarker(FEATURE_MODULE_MARKER);
+				marker.setAttribute(IMarker.MESSAGE, message);
+				marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
+			}
 		}
 	}
 
@@ -726,13 +729,15 @@ IFeatureProject, IResourceChangeListener {
 
 	public void resourceChanged(IResourceChangeEvent event) {
 		// if something in sourcefolder changed
-		if (event.getDelta().findMember(sourceFolder.getFullPath()) != null) {
+		if (sourceFolder != null &&
+				event.getDelta().findMember(sourceFolder.getFullPath()) != null) {
 			
 			// set markers, only if event is not fired from changes to
 			// markers
-			if (event.findMarkerDeltas(
-					"de.ovgu.featureide.core.featureModuleMarker", false).length == 0)
-					setAllFeatureModuleMarkers(featureModel, sourceFolder);
+			if (event.findMarkerDeltas(FEATURE_MODULE_MARKER, false).length == 0) {
+				//TODO id this needed, causes MarkerNotFoun exception
+//					setAllFeatureModuleMarkers(featureModel, sourceFolder);
+			}
 		}
 		
 		if (!checkModelChange(event.getDelta().findMember(
@@ -756,7 +761,7 @@ IFeatureProject, IResourceChangeListener {
 					}
 				}
 				
-				if (sourceFolder.isAccessible()) {
+				if (sourceFolder != null && sourceFolder.isAccessible()) {
 					checkSourceFolder(sourceFolder, event);
 				}
 				
@@ -812,6 +817,7 @@ IFeatureProject, IResourceChangeListener {
 			protected IStatus run(IProgressMonitor monitor) {
 
 				loadModel();
+				composerExtension.postModelChanged();
 				resList = new ArrayList<IResource>();
 				try {
 					for (IResource res : equationFolder.members()) {
@@ -836,7 +842,7 @@ IFeatureProject, IResourceChangeListener {
 
 		Job job = new Job("Check Configuration") {
 			protected IStatus run(IProgressMonitor monitor) {
-				if (resList.size() != 0)
+				if (resList.size() != 0 && !resList.isEmpty())
 					for (IResource res : resList) {
 						if (res instanceof IFile) {
 							IFile file = (IFile) res;

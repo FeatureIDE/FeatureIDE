@@ -65,7 +65,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		}
 		featureProject = CorePlugin.getFeatureProject(getProject());
 		if (featureProject == null) {
-			CorePlugin.getDefault().logWarning("Unable to get feature project");
+		//	CorePlugin.getDefault().logWarning("Unable to get feature project");
 			return false;
 		}
 
@@ -89,7 +89,15 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 	protected void clean(IProgressMonitor monitor) throws CoreException {
 		if (!featureProjectLoaded())
 			return;
-		
+		if (!composerExtension.clean()) {
+			cleaned = false;
+			featureProject.deleteBuilderMarkers(featureProject.getSourceFolder(),
+					IResource.DEPTH_INFINITE);
+			
+			featureProject.getProject().refreshLocal(IResource.DEPTH_INFINITE,
+					monitor);
+			return;
+		}
 		boolean hasOtherNature = true;
 		if (featureProject.getProject().getDescription().getNatureIds().length == 1
 				&& featureProject.getProject().hasNature(FeatureProjectNature.NATURE_ID)) {
@@ -106,7 +114,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 					monitor);
 		}
 		
-		if(cleanBuild){
+		if (cleanBuild) {
 			IFile equationFile = featureProject.getCurrentEquationFile();
 			if (equationFile == null)
 				return;

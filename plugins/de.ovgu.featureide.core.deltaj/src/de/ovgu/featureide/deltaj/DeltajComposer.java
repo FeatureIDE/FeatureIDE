@@ -1,12 +1,10 @@
 package de.ovgu.featureide.deltaj;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -17,7 +15,6 @@ import java.util.regex.Pattern;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -25,10 +22,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.swt.widgets.Text;
 import org.xtext.example.util.DJIdeProperties;
 import org.xtext.example.util.ValidationStatus;
 
-import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.fm.core.Feature;
@@ -149,20 +146,14 @@ public class DeltajComposer implements IComposerExtensionClass {
 	}
 
 	@Override
-	public void clean() {
-
+	public boolean clean() {
+		return false;
 	}
 
 	@Override
 	public boolean copyNotComposedFiles() {
 
 		return true;
-	}
-
-	@Override
-	public boolean composerSpecficMove(IFolder source, IFolder destination) {
-
-		return false;
 	}
 
 	@Override
@@ -347,4 +338,20 @@ public class DeltajComposer implements IComposerExtensionClass {
 		return text;
 	}
 	
+	@Override
+	public boolean postAddNature(IFolder source, IFolder destination) {
+		return false;
+	}
+
+	@Override
+	public void postModelChanged() {
+		
+	}
+
+	@Override
+	public void editProjectWizard(Text sourcePath, Text equationsPath,
+			Text buildPath) {
+
+	}
+
 }

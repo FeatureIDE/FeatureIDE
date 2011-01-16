@@ -35,6 +35,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.swt.widgets.Text;
 
 import de.ovgu.featureide.ahead.wrapper.AheadBuildErrorEvent;
 import de.ovgu.featureide.ahead.wrapper.AheadBuildErrorListener;
@@ -72,6 +73,9 @@ public class AheadComposer implements IComposerExtensionClass {
 	}
 
 	public void initialize(IFeatureProject project) {
+		if (project == null) {
+			return;
+		}
 		assert (project != null) : "Invalid project given";
 		featureProject = project;
 		ahead = new AheadWrapper(project);
@@ -94,7 +98,8 @@ public class AheadComposer implements IComposerExtensionClass {
 		}
 	}
 
-	public void clean() {
+	public boolean clean() {
+		return true;
 	}
 
 	@Override
@@ -121,7 +126,7 @@ public class AheadComposer implements IComposerExtensionClass {
 	 * Renames all java-files into jak-files and replaces "package" by "layer"
 	 */
 	@Override
-	public boolean composerSpecficMove(IFolder source, IFolder destination) {
+	public boolean postAddNature(IFolder source, IFolder destination) {
 		try {
 			for (IResource res : source.members()) {
 				if (res instanceof IFolder) {
@@ -270,5 +275,16 @@ public class AheadComposer implements IComposerExtensionClass {
 	public boolean hasFeatureFolders() {
 
 		return true;
+	}
+
+	@Override
+	public void postModelChanged() {
+
+	}
+
+	@Override
+	public void editProjectWizard(Text sourcePath, Text equationsPath,
+			Text buildPath) {
+		
 	}
 }

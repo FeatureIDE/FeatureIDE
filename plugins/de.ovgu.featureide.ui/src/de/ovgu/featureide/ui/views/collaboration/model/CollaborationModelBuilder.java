@@ -140,44 +140,46 @@ public class CollaborationModelBuilder {
 		
 		//start building the model
 		if (fSTModel == null) {
-			//case: FSTModel not builded			
-			for (String layerName : layerNames) {
-				if (featureNames.contains(layerName)) {
-					//case: selected
-					if (featureFilter.size() == 0 || featureFilter.contains(layerName)) {
-						collaboration = null;
-						IResource[] members = null;
-						IFolder folder = featureProject.getSourceFolder().getFolder(layerName);
-						if (folder.exists()) {
-							try {
-								members = folder.members();
-							} catch (CoreException e) {
-								UIPlugin.getDefault().logError(e);
+			if(featureProject.getSourceFolder() != null) {
+				//case: FSTModel not builded			
+				for (String layerName : layerNames) {
+					if (featureNames.contains(layerName)) {
+						//case: selected
+						if (featureFilter.size() == 0 || featureFilter.contains(layerName)) {
+							collaboration = null;
+							IResource[] members = null;
+							IFolder folder = featureProject.getSourceFolder().getFolder(layerName);
+							if (folder.exists()) {
+								try {
+									members = folder.members();
+								} catch (CoreException e) {
+									UIPlugin.getDefault().logError(e);
+								}
+								for (IResource res : members) {
+									addArbitraryFiles(res, layerName, true);
+								}
+								if (collaboration != null)
+									model.collaborations.add(collaboration);
 							}
-							for (IResource res : members) {
-								addArbitraryFiles(res, layerName, true);
-							}
-							if (collaboration != null)
-								model.collaborations.add(collaboration);
 						}
-					}
-				} else {
-					//case: not selected
-					if (featureFilter.size() == 0 || featureFilter.contains(layerName)) {
-						collaboration = null;
-						IResource[] members = null;
-						IFolder folder = featureProject.getSourceFolder().getFolder(layerName);
-						if (folder.exists()) {
-							try {
-								members = featureProject.getSourceFolder().getFolder(layerName).members();
-							} catch (CoreException e) {
-								UIPlugin.getDefault().logError(e);
+					} else {
+						//case: not selected
+						if (featureFilter.size() == 0 || featureFilter.contains(layerName)) {
+							collaboration = null;
+							IResource[] members = null;
+							IFolder folder = featureProject.getSourceFolder().getFolder(layerName);
+							if (folder.exists()) {
+								try {
+									members = featureProject.getSourceFolder().getFolder(layerName).members();
+								} catch (CoreException e) {
+									UIPlugin.getDefault().logError(e);
+								}
+								for (IResource res : members) {
+									addArbitraryFiles(res, layerName, false);
+								}
+								if (collaboration != null)
+									model.collaborations.add(collaboration);
 							}
-							for (IResource res : members) {
-								addArbitraryFiles(res, layerName, false);
-							}
-							if (collaboration != null)
-								model.collaborations.add(collaboration);
 						}
 					}
 				}

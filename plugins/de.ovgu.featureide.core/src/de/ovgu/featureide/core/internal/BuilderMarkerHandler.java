@@ -104,10 +104,12 @@ public class BuilderMarkerHandler implements IBuilderMarkerHandler {
 	 *      int)
 	 */
 	public void deleteBuilderMarkers(IResource resource, int depth) {
-		try {
-			resource.deleteMarkers(BUILDER_MARKER, false, depth);
-		} catch (CoreException e) {
-			CorePlugin.getDefault().logError(e);
+		if (resource != null && resource.exists()) {
+			try {
+				resource.deleteMarkers(BUILDER_MARKER, false, depth);
+			} catch (CoreException e) {
+				CorePlugin.getDefault().logError(e);
+			}
 		}
 	}
 

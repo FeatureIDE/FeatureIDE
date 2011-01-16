@@ -57,12 +57,12 @@ public class CollaborationModel {
 			for (Class cl : classes) {
 				if (c.getName().startsWith("*.")) {
 					if (cl.getName().startsWith("*.")) {
-						if (cl.getName().compareTo(c.getName()) > 0) {
+						if (cl.getName().compareToIgnoreCase(c.getName()) > 0) {
 							classes.add(classes.indexOf(cl), c);
 							return;
 						}
 					}
-				}else if (cl.getName().compareTo(c.getName()) > 0) {
+				} else if (cl.getName().compareToIgnoreCase(c.getName()) > 0) {
 					classes.add(classes.indexOf(cl), c);
 					return;
 				}

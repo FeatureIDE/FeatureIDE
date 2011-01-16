@@ -51,6 +51,7 @@ public class NewFeatureProjectPage extends WizardPage {
 	private Text sourcePath,equationsPath,buildPath;
 	
 	private Composite container;
+	private Combo toolCB;
 	protected GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 	private GridLayout layout = new GridLayout();
 	protected Group pathGroup;
@@ -83,7 +84,7 @@ public class NewFeatureProjectPage extends WizardPage {
 		
 	    Label label = new Label(toolGroup, SWT.NONE);
 	    label.setText("Composers:");
-	    final Combo toolCB = new Combo(toolGroup, SWT.READ_ONLY | SWT.DROP_DOWN);
+	    toolCB = new Combo(toolGroup, SWT.READ_ONLY | SWT.DROP_DOWN);
 	    toolCB.setLayoutData(new GridData(GridData.FILL_BOTH));
 	    
 	    final Label descriptionLabel = new Label(toolGroup, SWT.NONE);
@@ -165,6 +166,14 @@ public class NewFeatureProjectPage extends WizardPage {
 	}
 	
 	private void addListeners() {
+		toolCB.addModifyListener(new ModifyListener() {
+			
+			@Override
+			public void modifyText(ModifyEvent e) {
+				dialogChanged();
+			}
+		});
+		
 		sourcePath.addModifyListener(new ModifyListener() {
 			
 			@Override
@@ -190,31 +199,47 @@ public class NewFeatureProjectPage extends WizardPage {
 		});
 	}
 	
-	/**
-	 * 
-	 */
 	protected void dialogChanged() {
-		if (getSourcePath().equals(getEquationsPath())) {
+		resetPathGroup();
+		getCompositionTool().initialize(null);
+		getCompositionTool().editProjectWizard(sourcePath, equationsPath, buildPath);
+		
+		if (isEnabled(sourcePath) && isEnabled(equationsPath) &&
+				getSourcePath().equals(getEquationsPath())) {
 			updateStatus("Source Path equals Equations Path.");
 			return;
 		}
-		if (getSourcePath().equals(getBuildPath())) {
+		if (isEnabled(sourcePath) && isEnabled(buildPath) &&
+				getSourcePath().equals(getBuildPath())) {
 			updateStatus("Source Path equals Build Path.");
 			return;
 		}
-		if (getBuildPath().equals(getEquationsPath())) {
+		if (isEnabled(buildPath) && isEnabled(equationsPath) && 
+				getBuildPath().equals(getEquationsPath())) {
 			updateStatus("Build Path equals Equations Path.");
 			return;
 		}
-		if (isPathEmpty(getSourcePath(), "Source"))return;
-		if (isPathEmpty(getBuildPath(), "Build"))return;
-		if (isPathEmpty(getEquationsPath(), "Equations"))return;
+		if (isEnabled(sourcePath) && isPathEmpty(getSourcePath(), "Source"))return;
+		if (isEnabled(buildPath) && isPathEmpty(getBuildPath(), "Build"))return;
+		if (isEnabled(equationsPath) && isPathEmpty(getEquationsPath(), "Equations"))return;
 		
-		if (isInvalidPath(getSourcePath(), "Source"))return;
-		if (isInvalidPath(getBuildPath(), "Build"))return;
-		if (isInvalidPath(getEquationsPath(), "Equations"))return;
+		if (isEnabled(sourcePath) && isInvalidPath(getSourcePath(), "Source"))return;
+		if (isEnabled(buildPath) && isInvalidPath(getBuildPath(), "Build"))return;
+		if (isEnabled(equationsPath) && isInvalidPath(getEquationsPath(), "Equations"))return;
 		
 		updateStatus(null);
+	}
+
+	private boolean isEnabled(Text text) {
+		if (text.isEnabled() && text.isVisible()) {
+			return true;
+		}
+		return false;
+	}
+	private void resetPathGroup() {
+		sourcePath.setEnabled(true);
+		equationsPath.setEnabled(true);
+		buildPath.setEnabled(true);
 	}
 
 	protected boolean isPathEmpty(String path, String name) {
@@ -250,15 +275,15 @@ public class NewFeatureProjectPage extends WizardPage {
 	}
 	
 	public String getSourcePath() {
-		return sourcePath.getText();
+		return sourcePath.isEnabled() ? sourcePath.getText() : "";
 	}
 	
 	public String getEquationsPath() {
-		return equationsPath.getText();
+		return equationsPath.isEnabled() ? equationsPath.getText() : "";
 	}
 	
 	public String getBuildPath() {
-		return buildPath.getText();
+		return buildPath.isEnabled() ? buildPath.getText() : "";
 	}
 
 }

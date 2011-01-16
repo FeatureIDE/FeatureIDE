@@ -269,43 +269,43 @@ public class CorePlugin extends AbstractCorePlugin {
 								project.getFolder(buildPath).deleteMarkers(
 										null, true, IResource.DEPTH_INFINITE);
 								if (!((IComposerExtensionClass) o)
-										.composerSpecficMove(project
-												.getFolder(buildPath), project
-												.getFolder(sourcePath)
-												.getFolder("Base"))) {
-									if (project.getFolder(sourcePath)
-											.getFolder("Base").exists()) {
-										for (IResource res : project.getFolder(
-												buildPath).members()) {
-											res.move(
-													project.getFolder(
-															sourcePath)
-															.getFolder("Base")
-															.getFile(
-																	res.getName())
-															.getFullPath(),
-													true, null);
-										}
-									} else {
-										// if project does not have feature
-										// folders, use the source path directly
-										if (!((IComposerExtensionClass) o)
-												.hasFeatureFolders()) {
-											project.getFolder(sourcePath)
-													.delete(true, null);
-											project.getFolder(buildPath).move(
-													project.getFolder(
-															sourcePath)
-															.getFullPath(),
-													true, null);
+										.postAddNature(project.getFolder(buildPath), 
+												!sourcePath.equals("") ? project.getFolder(sourcePath).getFolder("Base"): null)) {
+									if (!sourcePath.equals("")) {
+										if (project.getFolder(sourcePath)
+												.getFolder("Base").exists()) {
+											for (IResource res : project.getFolder(
+													buildPath).members()) {
+												res.move(
+														project.getFolder(
+																sourcePath)
+																.getFolder("Base")
+																.getFile(
+																		res.getName())
+																.getFullPath(),
+														true, null);
+											}
 										} else {
-											project.getFolder(buildPath).move(
-													project.getFolder(
-															sourcePath)
-															.getFolder("Base")
-
-															.getFullPath(),
-													true, null);
+											// if project does not have feature
+											// folders, use the source path directly
+											if (!((IComposerExtensionClass) o)
+													.hasFeatureFolders()) {
+												project.getFolder(sourcePath)
+														.delete(true, null);
+												project.getFolder(buildPath).move(
+														project.getFolder(
+																sourcePath)
+																.getFullPath(),
+														true, null);
+											} else {
+												project.getFolder(buildPath).move(
+														project.getFolder(
+																sourcePath)
+																.getFolder("Base")
+	
+																.getFullPath(),
+														true, null);
+											}
 										}
 									}
 								}
@@ -409,6 +409,9 @@ public class CorePlugin extends AbstractCorePlugin {
 	}
 
 	public static IFolder createFolder(IProject project, String name) {
+		if (name.equals("")) {
+			return null;
+		}
 		String[] names = name.split("[/]");
 		IFolder folder = null;
 		for (String folderName : names) {
@@ -418,8 +421,9 @@ public class CorePlugin extends AbstractCorePlugin {
 				folder = folder.getFolder(folderName);
 			}
 			try {
-				if (!folder.exists())
+				if (!folder.exists()) {
 					folder.create(false, true, null);
+				}
 			} catch (CoreException e) {
 				CorePlugin.getDefault().logError(e);
 			}
@@ -433,8 +437,9 @@ public class CorePlugin extends AbstractCorePlugin {
 			// just create the bin folder if project hat only the FeatureIDE
 			// Nature
 			if (project.getDescription().getNatureIds().length == 1
-					&& project.hasNature(FeatureProjectNature.NATURE_ID))
+					&& project.hasNature(FeatureProjectNature.NATURE_ID)) {
 				createFolder(project, "bin");
+			}
 		} catch (CoreException e) {
 			getDefault().logError(e);
 		}

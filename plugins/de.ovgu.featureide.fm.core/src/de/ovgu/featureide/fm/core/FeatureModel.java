@@ -264,7 +264,10 @@ public class FeatureModel implements PropertyConstants {
 	public void performRenamings(IFile file) {
 		IProject project = ((IResource) file.getAdapter(IFile.class)).getProject();
 		setComposerID(project);
-		sourceFolder = project.getFolder(getProjectConfigurationPath(project));
+		String sourceName = getProjectConfigurationPath(project);
+		if (sourceName != null && !sourceName.equals("")) {
+			sourceFolder = project.getFolder(sourceName);
+		}
 		for (Renaming renaming : renamings) {
 			for (Node node : propNodes)
 				renameVariables(node, renaming.oldName, renaming.newName);
@@ -423,7 +426,9 @@ public class FeatureModel implements PropertyConstants {
 
 	public Collection<Feature> getLayers() {
 		layers.clear();
-		initFeatures(root);
+		if (root != null) {
+			initFeatures(root);
+		}
 		return Collections.unmodifiableCollection(layers);
 	}
 

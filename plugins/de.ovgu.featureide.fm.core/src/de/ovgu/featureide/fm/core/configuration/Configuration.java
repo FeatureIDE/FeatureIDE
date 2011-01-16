@@ -72,11 +72,13 @@ public class Configuration {
 
 	private void initFeatures(SelectableFeature sFeature, Feature feature) {
 		features.add(sFeature);
-		table.put(sFeature.getName(), sFeature);
-		for (Feature child : feature.getChildren()) {
-			SelectableFeature sChild = new SelectableFeature(this, child);
-			sFeature.addChild(sChild);
-			initFeatures(sChild, child);
+		if (sFeature != null && sFeature.getName() != null) {
+			table.put(sFeature.getName(), sFeature);
+			for (Feature child : feature.getChildren()) {
+				SelectableFeature sChild = new SelectableFeature(this, child);
+				sFeature.addChild(sChild);
+				initFeatures(sChild, child);
+			}
 		}
 	}
 
@@ -88,7 +90,7 @@ public class Configuration {
 	public boolean valid() {
 		LinkedList<Node> children = new LinkedList<Node>();
 		for (SelectableFeature feature : features)
-		    if (feature.getFeature().isConcrete()) {
+		    if (feature.getFeature() != null && feature.getFeature().isConcrete()) {
 				Literal literal = new Literal(feature.getName());
 				literal.positive = feature.getSelection() == Selection.SELECTED;
 				children.add(literal);

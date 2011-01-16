@@ -66,7 +66,7 @@ public class SelectableFeature extends TreeElement {
 	public String getName() {
 		if (name != null)
 			return name;
-		return feature.getName();
+		return feature == null ? null : feature.getName();
 	}
 
 	public Feature getFeature() {

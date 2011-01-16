@@ -24,6 +24,7 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.swt.widgets.Text;
 
 import de.ovgu.featureide.core.IFeatureProject;
 
@@ -61,19 +62,23 @@ public interface IComposerExtensionClass {
 	
 	void performFullBuild(IFile equation);
 	
-	void clean();
+	/**
+	 * 
+	 * @return true if project has not to be cleaned anymore
+	 */
+	boolean clean();
 	
 	/**
-	 * Copys the not composed files to the source folder
+	 * Copys not composed files to the source folder
 	 * @return false if not composed files should be moved in a common way
 	 */
 	boolean copyNotComposedFiles();
 	
 	/**
-	 * Make some changes(e.g. renaming) after adding the FeatureIDE nature
+	 * Make some changes after adding the FeatureIDE nature
 	 * @return true if the source files not have to be moved to the feature folder anymore
 	 */
-	boolean composerSpecficMove(IFolder source, IFolder destination);
+	boolean postAddNature(IFolder source, IFolder destination);
 	
 	/**
 	 * Adds the compiler to the project.
@@ -101,11 +106,25 @@ public interface IComposerExtensionClass {
 	 */
 	public String replaceMarker(String text, List<String> list);
 	
-	void postCompile(IFile file);
+	/**
+	 * This method is called after changes at a file of the buildfolder.
+	 * @param buildFile 
+	 */
+	void postCompile(IFile buildFile);
 	
 	/**
 	 * folders for each feature will be created if true
 	 */
 	boolean hasFeatureFolders();
 	
+	void postModelChanged();
+	
+	/**
+	 * Text fields at NewFeatureIDProject wizard can be set disabled.  
+	 * @param sourcePath
+	 * @param equationsPath
+	 * @param buildPath
+	 */
+	void editProjectWizard(Text sourcePath, Text equationsPath, Text buildPath);
+
 }

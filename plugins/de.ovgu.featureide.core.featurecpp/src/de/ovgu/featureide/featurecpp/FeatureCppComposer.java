@@ -24,6 +24,7 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.swt.widgets.Text;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
@@ -43,10 +44,14 @@ public class FeatureCppComposer implements IComposerExtensionClass {
 			(FeatureCppCorePlugin.getDefault().getBundle().getLocation() + "lib/fc++v0.7.exe")
 			.substring(16));
 
-	public void clean() {
+	public boolean clean() {
+		return true;
 	}
 
 	public void initialize(IFeatureProject project) {
+		if (project == null) {
+			return;
+		}
 		assert (project != null) : "Invalid project given";
 		featureCpp.initialize(project.getSourceFolder(), project
 				.getBuildFolder());
@@ -77,7 +82,7 @@ public class FeatureCppComposer implements IComposerExtensionClass {
 	}
 
 	@Override
-	public boolean composerSpecficMove(IFolder source, IFolder destination) {
+	public boolean postAddNature(IFolder source, IFolder destination) {
 		return false;
 	}
 
@@ -110,5 +115,16 @@ public class FeatureCppComposer implements IComposerExtensionClass {
 	public boolean hasFeatureFolders() {
 		
 		return true;
+	}
+
+	@Override
+	public void postModelChanged() {
+		
+	}
+
+	@Override
+	public void editProjectWizard(Text sourcePath, Text equationsPath,
+			Text buildPath) {
+	
 	}
 }

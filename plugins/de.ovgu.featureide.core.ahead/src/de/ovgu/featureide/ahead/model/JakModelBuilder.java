@@ -54,12 +54,14 @@ public class JakModelBuilder {
 	private JakModel model;
 
 	public JakModelBuilder(IFeatureProject featureProject) {
-		IFSTModel oldModel = featureProject.getFSTModel();
-		if (oldModel != null)
-			oldModel.markObsolete();
-
-		model = new JakModel(featureProject.getProjectName());
-		featureProject.setFSTModel(model);
+		if (featureProject != null) {
+			IFSTModel oldModel = featureProject.getFSTModel();
+			if (oldModel != null)
+				oldModel.markObsolete();
+	
+			model = new JakModel(featureProject.getProjectName());
+			featureProject.setFSTModel(model);
+		}
 	}
 
 	/**

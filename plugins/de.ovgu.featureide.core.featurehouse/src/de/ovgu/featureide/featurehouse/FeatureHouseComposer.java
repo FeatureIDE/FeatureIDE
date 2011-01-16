@@ -21,13 +21,13 @@ package de.ovgu.featureide.featurehouse;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.TreeMap;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.swt.widgets.Text;
 
 import composer.FSTGenComposer;
 
@@ -36,8 +36,6 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.featurehouse.FSTParser.FSTParser;
 import de.ovgu.featureide.core.featurehouse.FSTParser.JavaToken;
-import de.ovgu.featureide.core.featurehouse.model.java.Method;
-import de.ovgu.featureide.core.fstmodel.IField;
 
 
 /**
@@ -110,7 +108,8 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 		}
 	}
 
-	public void clean() {
+	public boolean clean() {
+		return true;
 	}
 
 	@Override
@@ -160,7 +159,7 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 	}
 
 	@Override
-	public boolean composerSpecficMove(IFolder source, IFolder destination) {
+	public boolean postAddNature(IFolder source, IFolder destination) {
 		return false;
 	}
 
@@ -204,5 +203,16 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 	public boolean hasFeatureFolders() {
 
 		return true;
+	}
+
+	@Override
+	public void postModelChanged() {
+		
+	}
+
+	@Override
+	public void editProjectWizard(Text sourcePath, Text equationsPath,
+			Text buildPath) {
+	
 	}
 }

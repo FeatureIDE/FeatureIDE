@@ -34,5 +34,5 @@ public interface IComposerExtension extends IComposerExtensionClass, IExtension 
 	public abstract String getName();
 	
 	public abstract String getDescription();
-	
+
 }

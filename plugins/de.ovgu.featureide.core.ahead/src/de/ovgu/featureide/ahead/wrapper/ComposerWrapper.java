@@ -351,8 +351,11 @@ public class ComposerWrapper {
 		String layer = setLayer((IFolder)files[0].getParent());
 		
 		int i = 4;
-		if (layer == null)
+		if (layer == null) {
 			i = 2;
+		} else {
+			AheadCorePlugin.getDefault().logInfo("package :" + layer);
+		}
 		String[] args = new String[files.length + i];
 		IFolder outputfolder = setOutputFolder(layer);
 		args[0] = "-f";
