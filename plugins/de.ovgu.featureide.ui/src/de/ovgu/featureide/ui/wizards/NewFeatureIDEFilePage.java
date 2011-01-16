@@ -336,7 +336,8 @@ public class NewFeatureIDEFilePage extends WizardPage {
 	}
 
 	private void initComboFeature() {
-
+		NewFeatureIDEFilePage.this.container = sourcefolder != null ? sourcefolder
+				.getFolder(comboFeature.getText()) : null;
 		if (featureProject == null) {
 			return;
 		}
@@ -491,6 +492,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 		if (!composerExt.hasFeatureFolders()) {
 			container = sourcefolder;
 		}
+		if(comboFeature.getItemCount()==1)return true;
 		if (container == null) {
 
 			return false;
@@ -524,5 +526,22 @@ public class NewFeatureIDEFilePage extends WizardPage {
 		if (languageDirty)
 			setErrorMessage(errorMessage);
 		return valid;
+	}
+
+	/**
+	 * @return name of the file 
+	 */
+	public String getFileName() {
+	if(composerExt.getId().equals("de.ovgu.featureide.core.deltaj.deltajcomposer")){
+		if(comboLanguage.getText().equals("DeltaJ (Delta Module)")){
+			return "D"+getFeatureName();
+		}
+		else{
+			return "core";
+		}
+			
+	
+	}
+	return getClassName();
 	}
 }

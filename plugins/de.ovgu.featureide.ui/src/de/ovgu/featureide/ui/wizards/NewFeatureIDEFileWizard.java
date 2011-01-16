@@ -81,15 +81,16 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 	 */
 	public boolean performFinish() {
 		final IContainer container = page.getContainerObject();
-		final String fileName = page.getClassName();
+		final String fileName = page.getFileName();
 		final String fileExtension = page.getExtension();
 		final String fileTemplate = page.getTemplate();
 		final IComposerExtension composer = page.getComposer();
 		final String featureName = page.getFeatureName();
+		final String className = page.getClassName();
 		IRunnableWithProgress op = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor) throws InvocationTargetException {
 				try {
-					doFinish(featureName,container, fileName, fileExtension, fileTemplate , composer, page.isRefinement (), monitor);
+					doFinish(featureName,container, fileName,className, fileExtension, fileTemplate , composer, page.isRefinement (), monitor);
 				} catch (CoreException e) {
 					throw new InvocationTargetException(e);
 				} finally {
@@ -114,13 +115,13 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 	 * file if missing or just replace its contents, and open
 	 * the editor on the newly created file.
 	 */
-	private void doFinish(String featureName,IContainer container, String fileName, String extension, String template, 
+	private void doFinish(String featureName,IContainer container, String fileName,String classname, String extension, String template, 
 			IComposerExtension composer, boolean refines, IProgressMonitor monitor) throws CoreException {
 		// create a sample file
 		monitor.beginTask("Creating " + fileName, 2);
 		final IFile file = container.getFile(new Path(fileName + "." + extension));
 		try {
-			InputStream stream = openContentStream(featureName,container, fileName, template, composer, refines);
+			InputStream stream = openContentStream(featureName,container, classname, template, composer, refines);
 			if (file.exists()) {
 				file.setContents(stream, true, true, monitor);
 			} else {
