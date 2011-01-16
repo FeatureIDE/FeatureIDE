@@ -514,4 +514,9 @@ public class AspectJComposer implements IComposerExtensionClass {
 		return 0;
 	}
 
+	@Override
+	public boolean hasCustomFilename() {
+		return false;
+	}
+
 }
