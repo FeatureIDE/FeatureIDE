@@ -52,6 +52,7 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 	public NewConfigurationFileWizard() {
 		super();
 		setNeedsProgressMonitor(true);
+		
 	}
 	
 	/**
@@ -61,6 +62,7 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 	public void addPages() {
 		page = new NewConfigurationFilePage(selection);
 		addPage(page);
+		this.setWindowTitle("New Configuration");
 	}
 
 	/**

@@ -76,7 +76,7 @@ public class NewConfigurationFilePage extends WizardPage {
 	 */
 	public NewConfigurationFilePage(ISelection selection) {
 		super("wizardPage");
-		setTitle("New Configuration File");
+		setTitle("New Configuration");
 		setDescription("Enter the name of the configuration file. It will be placed in the configurations directory of the " +
 				"selected FeatureIDE project");
 		this.selection = selection;
