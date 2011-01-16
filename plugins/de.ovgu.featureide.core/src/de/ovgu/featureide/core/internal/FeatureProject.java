@@ -782,10 +782,9 @@ IFeatureProject, IResourceChangeListener {
 			} else {
 				IResourceDelta delta = event.getDelta().findMember(
 						res.getFullPath());
-				if (delta != null && !modelChanged
-						&& (delta.getFlags() & IResourceDelta.CONTENT) != 0) {
+				if (delta != null && (delta.getKind() == IResourceDelta.ADDED || 
+						!modelChanged && (delta.getFlags() & IResourceDelta.CONTENT) != 0)) {
 					buildRelevantChanges = true;
-					modelChanged = false;
 				}
 			}
 		}
