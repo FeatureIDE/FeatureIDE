@@ -48,7 +48,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 	private static Image IMAGE_FIELD_PUBLIC = UIPlugin.getImage("field_public_obj.gif");
 	private static Image IMAGE_FIELD_DEFAULT = UIPlugin.getImage("field_default_obj.gif");
 	private static Image IMAGE_METHODE_PRIVATE = UIPlugin.getImage("private_co.gif");
-	private static Image IMAGE_METHODE_PROTECTED = UIPlugin.getImage("/protected_co.gif");
+	private static Image IMAGE_METHODE_PROTECTED = UIPlugin.getImage("protected_co.gif");
 	private static Image IMAGE_METHODE_PUBLIC = UIPlugin.getImage("public_co.gif");
 	private static Image IMAGE_METHODE_DEFAULT =  UIPlugin.getImage("default_co.gif");
 	private static Image IMAGE_CLASS = UIPlugin.getImage("class_obj.gif");

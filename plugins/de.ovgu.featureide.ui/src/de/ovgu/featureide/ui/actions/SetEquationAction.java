@@ -67,7 +67,7 @@ public class SetEquationAction implements IObjectActionDelegate {
 				if (file != null) {
 					final IFeatureProject project = CorePlugin.getFeatureProject(file);
 					if (project == null) {
-						UIPlugin.getDefault().logWarning("Can't set equation as current equation because it does not belong to a feature project");
+						UIPlugin.getDefault().logWarning("Can't set configuration as current configuration because it does not belong to a feature project");
 					} else {
 						final IFile equationFile = file;
 						Job job = new Job("Perform full build") {

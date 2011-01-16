@@ -145,7 +145,7 @@ public class NewFeatureProjectPage extends WizardPage {
 		sourcePath.setText("features");
 		sourcePath.setToolTipText(tooltip);
 		
-		tooltip = "Sets the path of equationfiles.";
+		tooltip = "Sets the path of configurationfiles.";
 		label = new Label(pathGroup, SWT.NULL);
 		label.setText("&Configurations Path:");
 		label.setToolTipText(tooltip);
@@ -206,7 +206,7 @@ public class NewFeatureProjectPage extends WizardPage {
 		
 		if (isEnabled(sourcePath) && isEnabled(configsPath) &&
 				getSourcePath().equals(getEquationsPath())) {
-			updateStatus("Source Path equals Equations Path.");
+			updateStatus("Source Path equals Configurations Path.");
 			return;
 		}
 		if (isEnabled(sourcePath) && isEnabled(buildPath) &&
@@ -216,7 +216,7 @@ public class NewFeatureProjectPage extends WizardPage {
 		}
 		if (isEnabled(buildPath) && isEnabled(configsPath) && 
 				getBuildPath().equals(getEquationsPath())) {
-			updateStatus("Build Path equals Equations Path.");
+			updateStatus("Build Path equals Configurations Path.");
 			return;
 		}
 		if (isEnabled(sourcePath) && isPathEmpty(getSourcePath(), "Source"))return;

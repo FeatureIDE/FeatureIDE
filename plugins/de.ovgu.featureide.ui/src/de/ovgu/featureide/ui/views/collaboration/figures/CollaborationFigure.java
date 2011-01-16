@@ -39,8 +39,8 @@ import de.ovgu.featureide.ui.views.collaboration.model.Collaboration;
  */
 public class CollaborationFigure extends Figure implements GUIDefaults{
 
-	private static Image IMAGE_CURRENEQUATION = UIPlugin.getImage("currentequation.gif");
-	private static Image IMAGE_EQUATION = UIPlugin.getImage("EquationIcon.png");
+	private static Image IMAGE_CURRENT_CONFIGURATION = UIPlugin.getImage("currentconfiguration.gif");
+	private static Image IMAGE_CONFIGURATION = UIPlugin.getImage("ConfigurationIcon.png");
 	
 	private final Label label = new Label();
 	public Boolean selected = true;
@@ -62,9 +62,9 @@ public class CollaborationFigure extends Figure implements GUIDefaults{
 		}
 		if (isEquation)
 			if (selected)
-				label.setIcon(IMAGE_CURRENEQUATION);
+				label.setIcon(IMAGE_CURRENT_CONFIGURATION);
 			else
-				label.setIcon(IMAGE_EQUATION);
+				label.setIcon(IMAGE_CONFIGURATION);
 		
 		label.setForegroundColor(FOREGROUND);
 		label.setFont(DEFAULT_FONT);

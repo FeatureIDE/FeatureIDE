@@ -48,8 +48,8 @@ import de.ovgu.featureide.ui.views.collaboration.model.Collaboration;
  * @author Constanze Adler
  */
 public class CollaborationEditPart extends AbstractGraphicalEditPart {
-	private static Image IMAGE_CURRENEQUATION = UIPlugin.getImage("currentequation.gif");
-	private static Image IMAGE_EQUATION = UIPlugin.getImage("EquationIcon.png");
+	private static Image IMAGE_CURRENT_CONFIGURATION = UIPlugin.getImage("currentconfiguration.gif");
+	private static Image IMAGE_CONFIGURATION = UIPlugin.getImage("ConfigurationIcon.png");
 	private static Image IMAGE_FEATURE = UIPlugin.getImage("FeatureIconSmall.ico");
 	
 	public CollaborationEditPart(Collaboration coll){
@@ -125,9 +125,9 @@ public class CollaborationEditPart extends AbstractGraphicalEditPart {
 					CompartmentFigure tooltipFigure = new CompartmentFigure();
 					if (collaborationFigure.isEquation)
 						if (collaborationFigure.selected) {
-							tooltipFigure.add(new Label(" Current configuration ", IMAGE_CURRENEQUATION));
+							tooltipFigure.add(new Label(" Current configuration ", IMAGE_CURRENT_CONFIGURATION));
 						} else
-							tooltipFigure.add(new Label(" Configuration ", IMAGE_EQUATION));
+							tooltipFigure.add(new Label(" Configuration ", IMAGE_CONFIGURATION));
 					else if (collaborationFigure.selected)
 						tooltipFigure.add(new Label(" Selected feature ", IMAGE_FEATURE));
 					else

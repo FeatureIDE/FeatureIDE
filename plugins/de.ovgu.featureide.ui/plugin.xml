@@ -66,11 +66,11 @@
             objectClass="org.eclipse.core.resources.IFile">
          <action
                class="de.ovgu.featureide.ui.actions.SetEquationAction"
-               icon="icons/currentequation.gif"
+               icon="icons/currentconfiguration.gif"
                id="de.ovgu.featureide.ui.setEquationAction"
                label="Set as current configuration"
                menubarPath="group.open"
-               tooltip="Only the current equation is build">
+               tooltip="Only the current configuration is build">
          </action>
       </objectContribution>
       <objectContribution
@@ -80,7 +80,7 @@
             objectClass="org.eclipse.core.resources.IFile">
          <action
                class="de.ovgu.featureide.ui.actions.SetEquationAction"
-               icon="icons/currentequation.gif"
+               icon="icons/currentconfiguration.gif"
                id="de.ovgu.featureide.ui.setEquationAction"
                label="Set as current configuration"
                menubarPath="group.open"

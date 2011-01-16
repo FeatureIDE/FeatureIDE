@@ -37,7 +37,7 @@ import de.ovgu.featureide.ui.UIPlugin;
 
 
 /**
- * This is a wizard for equation files.
+ * This is a wizard for configuration files.
  * 
  * @author Marcus Leich
  */

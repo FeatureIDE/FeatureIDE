@@ -47,7 +47,7 @@ public class ActiveEquationDecorator implements ILightweightLabelDecorator, ICur
 	private LinkedList<ILabelProviderListener> listeners;
 	
 	public ActiveEquationDecorator() {
-		URL url = de.ovgu.featureide.ui.UIPlugin.getDefault().getBundle().getEntry("/icons/currentequation.gif");
+		URL url = de.ovgu.featureide.ui.UIPlugin.getDefault().getBundle().getEntry("/icons/currentconfiguration.gif");
 		icon = ImageDescriptor.createFromURL(url);
 	    listeners = new LinkedList<ILabelProviderListener> ();
 	    

@@ -76,8 +76,8 @@ public class NewConfigurationFilePage extends WizardPage {
 	 */
 	public NewConfigurationFilePage(ISelection selection) {
 		super("wizardPage");
-		setTitle("New Equation File");
-		setDescription("Enter the name of the equation file. It will be placed in the equations directory of the " +
+		setTitle("New Configuration File");
+		setDescription("Enter the name of the configuration file. It will be placed in the configurations directory of the " +
 				"selected FeatureIDE project");
 		this.selection = selection;
 	}
@@ -195,6 +195,7 @@ public class NewConfigurationFilePage extends WizardPage {
 		if (fileName.length() != 0) {
 			equationbool = true;
 			if (equationNames.contains(fileName)) {
+				// TODO replace equation
 				updateStatus("File " + fileName + ".equation already exists.");
 				return;
 			}
@@ -212,7 +213,7 @@ public class NewConfigurationFilePage extends WizardPage {
 		
 		int dotLoc = fileName.lastIndexOf('.');
 		if (dotLoc != -1) {
-			updateStatus("Equation name must not contain \".\"");
+			updateStatus("Configuration name must not contain \".\"");
 			return;
 		}
 		updateStatus(null);
