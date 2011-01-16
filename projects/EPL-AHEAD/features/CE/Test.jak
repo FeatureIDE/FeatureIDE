@@ -1,5 +1,3 @@
-layer CE;
-
 public refines class Test {
 	public static void main(String args[]) {
      Super(String[]).main(args);

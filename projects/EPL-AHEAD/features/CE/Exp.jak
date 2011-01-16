@@ -1,5 +1,3 @@
-layer CE;
-
 public refines interface Exp {
 	
 	int eval();

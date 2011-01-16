@@ -1,5 +1,3 @@
-layer PP;
-
 public refines class Test {
 	public static void printtest() {
       Super().printtest();

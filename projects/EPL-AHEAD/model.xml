@@ -1,41 +1,33 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 	<featureModel>
 		<struct>
-			<alt abstract="true" mandatory="true" name="Root">
-				<and abstract="true" mandatory="true" name="top">
-					<or abstract="true" mandatory="true" name="Ops">
-						<and abstract="true" mandatory="true" name="Str">
-							<feature mandatory="true" name="Kore"/>
-							<feature name="Print"/>
-							<feature name="Eval"/>
-						</and>
-					</or>
-					<alt abstract="true" mandatory="true" name="Structs">
-						<and abstract="true" mandatory="true" name="Op">
-							<feature mandatory="true" name="Core"/>
-							<feature mandatory="true" name="Num"/>
-							<feature name="Neg"/>
-							<feature name="Plus"/>
-						</and>
-					</alt>
-					<alt abstract="true" hidden="true" mandatory="true" name="Flattened">
-						<and abstract="true" mandatory="true" name="All">
-							<feature mandatory="true" name="CK"/>
-							<feature name="CE"/>
-							<feature name="CP"/>
-							<feature mandatory="true" name="BK"/>
-							<feature name="BE"/>
-							<feature name="BP"/>
-							<feature name="NK"/>
-							<feature name="NE"/>
-							<feature name="NP"/>
-							<feature name="PK"/>
-							<feature name="PE"/>
-							<feature name="PP"/>
-						</and>
-					</alt>
+			<and abstract="true" mandatory="true" name="ExpressionProductLine">
+				<and abstract="true" mandatory="true" name="Operations">
+					<feature mandatory="true" name="Kore"/>
+					<feature name="Print"/>
+					<feature name="Eval"/>
 				</and>
-			</alt>
+				<and abstract="true" mandatory="true" name="Structs">
+					<feature mandatory="true" name="Core"/>
+					<feature mandatory="true" name="Num"/>
+					<feature name="Neg"/>
+					<feature name="Plus"/>
+				</and>
+				<and abstract="true" hidden="true" mandatory="true" name="Derivatives">
+					<feature mandatory="true" name="CK"/>
+					<feature name="CE"/>
+					<feature name="CP"/>
+					<feature mandatory="true" name="BK"/>
+					<feature name="BE"/>
+					<feature name="BP"/>
+					<feature name="NK"/>
+					<feature name="NE"/>
+					<feature name="NP"/>
+					<feature name="PK"/>
+					<feature name="PE"/>
+					<feature name="PP"/>
+				</and>
+			</and>
 		</struct>
 		<constraints>
 			<rule>

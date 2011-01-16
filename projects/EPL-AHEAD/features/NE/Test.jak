@@ -1,5 +1,3 @@
-layer NE;
-
 public refines class Test {
 	public static void evaltest() {
 		Super().evaltest();      

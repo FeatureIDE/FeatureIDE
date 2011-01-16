@@ -1,5 +1,3 @@
-layer BP;
-
 public refines class Num {
 	
 	public String toString() { 

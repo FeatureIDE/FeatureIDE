@@ -1,5 +1,3 @@
-layer PK;
-
 public class Plus implements Exp {   
 	Exp x;   
 	Exp y;   
