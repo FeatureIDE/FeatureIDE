@@ -7,5 +7,6 @@ public:
 			return res;
 
 		printf(" World!");
+		return 0;
 	}
 };
