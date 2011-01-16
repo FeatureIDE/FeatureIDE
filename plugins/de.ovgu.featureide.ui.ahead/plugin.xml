@@ -14,15 +14,6 @@
       </editor>
    </extension>
    <extension
-         point="org.eclipse.ui.newWizards">
-      <wizard
-            category="de.ovgu.featureide.ui.category"
-            class="de.ovgu.featureide.ui.ahead.wizards.NewJakFileWizard"
-            icon="icons/NewJakFileIcon.png"
-            id="de.ovgu.featureide.ui.ahead.wizards.NewJakFileWizard"
-            name="Jak File"/>
-   </extension>
-   <extension
          point="org.eclipse.ui.propertyPages">
       <page
             class="de.ovgu.featureide.ui.ahead.properties.BuildPathPropertyPage"
@@ -34,12 +25,5 @@
             </instanceof>
          </enabledWhen>
       </page>
-   </extension>
-   <extension
-         point="de.ovgu.featureide.ui.RunAddRoleAction">
-      <RunAddRoleAction
-            class="de.ovgu.featureide.ui.ahead.views.collaboration.action.RunAddRoleActionAHEAD"
-            composer="AHEAD">
-      </RunAddRoleAction>
    </extension>
 </plugin>

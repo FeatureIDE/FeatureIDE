@@ -23,7 +23,6 @@ Require-Bundle: org.eclipse.ui,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: de.ovgu.featureide.ui.ahead;uses:="org.eclipse.swt.graphics,de.ovgu.featureide.fm.ui,org.osgi.framework",
- de.ovgu.featureide.ui.ahead.actions;uses:="org.eclipse.jface.action,org.eclipse.ui,org.eclipse.jface.viewers",
  de.ovgu.featureide.ui.ahead.editors;uses:="org.eclipse.ui,org.eclipse.ui.editors.text",
  de.ovgu.featureide.ui.ahead.editors.jak;
   uses:="org.eclipse.jface.text,
@@ -38,10 +37,4 @@ Export-Package: de.ovgu.featureide.ui.ahead;uses:="org.eclipse.swt.graphics,de.o
    org.eclipse.ui.views.contentoutline,
    org.eclipse.swt.widgets,
    de.ovgu.featureide.ui.ahead.editors",
- de.ovgu.featureide.ui.ahead.views.outline.jak;uses:="org.eclipse.swt.graphics,org.eclipse.jface.viewers",
- de.ovgu.featureide.ui.ahead.wizards;
-  uses:="org.eclipse.jface.wizard,
-   org.eclipse.ui,
-   org.eclipse.core.resources,
-   org.eclipse.jface.viewers,
-   org.eclipse.swt.widgets"
+ de.ovgu.featureide.ui.ahead.views.outline.jak;uses:="org.eclipse.swt.graphics,org.eclipse.jface.viewers"

@@ -121,8 +121,7 @@ public class AheadWrapper {
 	}
 
 	public void postCompile(final IFile file) {
-		// TODO rename
-		Job job = new Job("marker") {
+		Job job = new Job("create builder problem marker") {
 			@Override
 			public IStatus run(IProgressMonitor monitor) {
 				try {
@@ -131,13 +130,16 @@ public class AheadWrapper {
 						if (markers != null) {
 							for (IMarker marker : markers) {
 								if (marker.exists()) {
-									// TODO todos nicht übernemen
-									// 		es werden manche fehler 2x generiert
 									AheadBuildErrorEvent buildError = new AheadBuildErrorEvent(file, marker.getAttribute(IMarker.MESSAGE).toString(), AheadBuildErrorType.JAVAC_ERROR, (Integer)marker.getAttribute(IMarker.LINE_NUMBER));
-									IMarker newMarker = buildError.getResource().createMarker(CorePlugin.PLUGIN_ID + ".builderProblemMarker");
-									newMarker.setAttribute(IMarker.LINE_NUMBER, buildError.getLine());
-									newMarker.setAttribute(IMarker.MESSAGE, buildError.getMessage());
-									newMarker.setAttribute(IMarker.SEVERITY, marker.getAttribute(IMarker.SEVERITY));
+									if (!buildError.getMessage().contains("is a raw type") && 
+											!buildError.getMessage().contains("generic type")) {
+										IMarker newMarker = buildError.getResource().createMarker(CorePlugin.PLUGIN_ID + ".builderProblemMarker");
+										newMarker.setAttribute(IMarker.LINE_NUMBER, buildError.getLine());
+										newMarker.setAttribute(IMarker.MESSAGE, buildError.getMessage());
+										newMarker.setAttribute(IMarker.SEVERITY, marker.getAttribute(IMarker.SEVERITY));
+									} else {
+										marker.delete();
+									}
 								}
 							}
 						}
