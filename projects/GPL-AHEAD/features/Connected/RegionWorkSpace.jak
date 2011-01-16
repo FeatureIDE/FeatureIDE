@@ -1,7 +1,3 @@
-layer Connected;
-
-// *****************************************************************
-   
 public class RegionWorkSpace extends  WorkSpace 
 {
     int counter;

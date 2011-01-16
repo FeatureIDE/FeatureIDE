@@ -1,7 +1,3 @@
-layer Number;
-
-// ***********************************************************************
-  
 public refines class Vertex 
 {
     public int VertexNumber;

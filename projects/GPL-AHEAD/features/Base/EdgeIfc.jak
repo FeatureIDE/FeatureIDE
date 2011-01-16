@@ -1,7 +1,3 @@
-//created on: Sun Jul 13 23:04:15 CDT 2003
-
-layer Base;
-
 public interface EdgeIfc
 {
     public Vertex getStart( );

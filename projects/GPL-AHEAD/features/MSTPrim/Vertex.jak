@@ -1,5 +1,3 @@
-layer MSTPrim;
-
 import java.lang.Integer;
 import java.util.LinkedList;
 import java.util.Collections;

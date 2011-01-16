@@ -1,5 +1,3 @@
-layer Benchmark;
-
 import java.io.*;
 
 // adds utilities for reading files

@@ -1,5 +1,3 @@
-layer StronglyConnected;
-
 import java.util.LinkedList;
 
 // Cormen's Textbook 23.5

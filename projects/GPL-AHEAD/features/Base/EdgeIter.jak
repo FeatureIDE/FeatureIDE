@@ -1,5 +1,3 @@
-layer Base;
-
 public class EdgeIter
 {
     // methods whose bodies will be overridden by subsequent layers

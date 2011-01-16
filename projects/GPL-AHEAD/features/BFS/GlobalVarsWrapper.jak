@@ -1,5 +1,3 @@
-layer BFS;
-
 import java.util.LinkedList;
 
 // Class to wrap global variables

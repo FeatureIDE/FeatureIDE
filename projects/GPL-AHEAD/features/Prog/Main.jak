@@ -1,5 +1,3 @@
-layer Prog;
-
 import java.io.*;
 
 public class Main {

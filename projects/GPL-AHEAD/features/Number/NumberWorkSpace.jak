@@ -1,7 +1,3 @@
-layer Number;
-
-// **********************************************************************
-   
 public class NumberWorkSpace extends  WorkSpace 
 {
     int vertexCounter;

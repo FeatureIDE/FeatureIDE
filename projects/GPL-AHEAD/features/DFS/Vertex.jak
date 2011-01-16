@@ -1,7 +1,3 @@
-layer DFS;
-
-  // *************************************************************************
-
 public refines class Vertex
 {
     public void nodeSearch( WorkSpace w )

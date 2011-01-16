@@ -1,5 +1,3 @@
-layer Base;
-
 class Vertex {
   public String name = null;
 

@@ -1,5 +1,3 @@
-layer Base;
-
 import java.util.Iterator;
 
 public class VertexIter
