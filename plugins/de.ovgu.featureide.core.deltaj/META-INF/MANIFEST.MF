@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Deltaj
+Bundle-Name: DeltaJ Core Plug-in
 Bundle-SymbolicName: de.ovgu.featureide.core.deltaj;singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 2.4.4.qualifier
 Bundle-Activator: de.ovgu.featureide.deltaj.DeltajCorePlugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
@@ -20,3 +20,4 @@ Import-Package: de.ovgu.featureide.core,
  de.ovgu.featureide.fm.core,
  djtemplates,
  org.eclipse.core.resources
+Bundle-Vendor: University of Magdeburg
