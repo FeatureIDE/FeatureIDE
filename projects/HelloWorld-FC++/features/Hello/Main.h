@@ -10,7 +10,7 @@ public:
 
 int main() {
 
-	//create instance of "test"
+	//create instance of "Main"
 	Main myHello;
 
 	//run Main::run as entry-point of the app
