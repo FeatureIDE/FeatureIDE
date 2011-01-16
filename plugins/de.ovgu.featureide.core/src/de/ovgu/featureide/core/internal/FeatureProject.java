@@ -282,11 +282,11 @@ IFeatureProject, IResourceChangeListener {
 				Feature feature = featureModel.getFeature(folder.getName());
 				if (feature == null || !feature.isLayer()) {
 					folder.refreshLocal(IResource.DEPTH_ONE, null);
-					if (folder.members() == null)
+					if (folder.members().length==0)
 						folder.delete(false, null);
 				}
 			}
-		
+		 
 	}
 
 	private void addModelListener() {
