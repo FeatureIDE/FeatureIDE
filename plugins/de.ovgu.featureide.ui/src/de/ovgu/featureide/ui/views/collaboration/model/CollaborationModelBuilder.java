@@ -297,7 +297,8 @@ public class CollaborationModelBuilder {
 						collaboration = new Collaboration(featureName);
 						collaboration.selected = selected;
 					}
-					String name = "." + (res.getName().split("[.]"))[1];
+					String name = res.getName().contains(".") ? "." + (res.getName().split("[.]"))[1] : 
+					              ".";
 					Role role;
 					if (extensions.contains(name)) {
 						role = new Role(res.getName());

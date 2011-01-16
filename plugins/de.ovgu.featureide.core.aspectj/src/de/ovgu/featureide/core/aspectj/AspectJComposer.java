@@ -509,4 +509,9 @@ public class AspectJComposer implements IComposerExtensionClass {
 		sourcePath.setEnabled(false);
 	}
 
+	@Override
+	public int getDefaultTemplateIndex() {
+		return 0;
+	}
+
 }

@@ -242,9 +242,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		createKeyBindings();
 	}
 
-	/**
-	 * 
-	 */
 	private void createFeatureOrderPage() {
 		featureOrderEditor = new FeatureOrderEditor(originalFeatureModel);
 		try {

@@ -321,10 +321,7 @@ public class FeatureModel implements PropertyConstants {
 	public void moveFolder(String oldName, String newName) {
 		try {
 			IFolder folder = sourceFolder.getFolder(oldName);
-//			if (!folder.exists()) {
-//				IFolder newFolder = sourceFolder.getFolder(newName);
-//				newFolder.create(false, true, null);
-//			} else {
+			if (folder.exists()) {
 				if (!sourceFolder.getFolder(newName).exists()) {
 					IPath newPath = sourceFolder.getFolder(newName)
 							.getFullPath();
@@ -332,7 +329,7 @@ public class FeatureModel implements PropertyConstants {
 				} else {
 					move(folder, oldName, newName);
 				}
-//			}
+			}
 		} catch (CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
