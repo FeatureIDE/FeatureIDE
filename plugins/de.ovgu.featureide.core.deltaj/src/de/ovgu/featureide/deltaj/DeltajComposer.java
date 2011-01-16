@@ -34,7 +34,7 @@ import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import djtemplates.DJStandaloneCompiler;
 
 /**
- * DeltaJava Composer
+ * DeltaJ Composer
  * 
  * @author Fabian Benduhn
  */
@@ -175,7 +175,7 @@ public class DeltajComposer implements IComposerExtensionClass {
 	
 	@Override 
 	public int getDefaultTemplateIndex(){
-	return 0;	
+		return 1;	
 	}
 	
 	
