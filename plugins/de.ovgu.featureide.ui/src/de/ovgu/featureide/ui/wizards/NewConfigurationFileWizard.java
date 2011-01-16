@@ -41,15 +41,15 @@ import de.ovgu.featureide.ui.UIPlugin;
  * 
  * @author Marcus Leich
  */
-public class NewEquationFileWizard extends Wizard implements INewWizard {
+public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 	
-	public static final String ID = UIPlugin.PLUGIN_ID + ".wizards.NewEquationFileWizard";
+	public static final String ID = UIPlugin.PLUGIN_ID + ".wizards.NewConfigurationFileWizard";
 	
-	private NewEquationFilePage page;
+	private NewConfigurationFilePage page;
 	
 	private ISelection selection;
 
-	public NewEquationFileWizard() {
+	public NewConfigurationFileWizard() {
 		super();
 		setNeedsProgressMonitor(true);
 	}
@@ -59,7 +59,7 @@ public class NewEquationFileWizard extends Wizard implements INewWizard {
 	 */
 
 	public void addPages() {
-		page = new NewEquationFilePage(selection);
+		page = new NewConfigurationFilePage(selection);
 		addPage(page);
 	}
 

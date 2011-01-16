@@ -25,7 +25,7 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 
-import de.ovgu.featureide.ui.wizards.NewEquationFileWizard;
+import de.ovgu.featureide.ui.wizards.NewConfigurationFileWizard;
 
 /**
  * Starts the equation file wizard for the selected configuration file
@@ -44,7 +44,7 @@ public class StartEquationFileWizard implements IWorkbenchWindowActionDelegate {
 
 	public void run(IAction action) {
 		
-		NewEquationFileWizard wizard=new NewEquationFileWizard();
+		NewConfigurationFileWizard wizard=new NewConfigurationFileWizard();
 		ISelection selection = window.getSelectionService().getSelection();
 		
 		if(selection instanceof IStructuredSelection){

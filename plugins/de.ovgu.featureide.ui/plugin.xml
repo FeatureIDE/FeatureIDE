@@ -8,7 +8,7 @@
             class="de.ovgu.featureide.ui.editors.ConfigurationEditor"
             default="true"
             extensions="equation, expression, config"
-            icon="icons/EquationIcon.png"
+            icon="icons/ConfigurationIcon.png"
             id="de.ovgu.featureide.ui.editors.ConfigurationEditor"
             name="Configuration Editor">
       </editor>
@@ -35,10 +35,10 @@
       </wizard>
       <wizard
             category="de.ovgu.featureide.ui.category"
-            class="de.ovgu.featureide.ui.wizards.NewEquationFileWizard"
-            icon="icons/NewEquationIcon.png"
-            id="de.ovgu.featureide.ui.wizards.NewEquationFileWizard"
-            name="Equation File"/>
+            class="de.ovgu.featureide.ui.wizards.NewConfigurationFileWizard"
+            icon="icons/NewConfigurationIcon.png"
+            id="de.ovgu.featureide.ui.wizards.NewConfigurationFileWizard"
+            name="Configuration File"/>
       <category
             id="de.ovgu.featureide.ui.category"
             name="FeatureIDE">

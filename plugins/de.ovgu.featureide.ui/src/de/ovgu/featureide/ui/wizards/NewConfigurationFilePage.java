@@ -54,7 +54,7 @@ import de.ovgu.featureide.ui.UIPlugin;
  * @author Jens Meinicke
  */
 
-public class NewEquationFilePage extends WizardPage {
+public class NewConfigurationFilePage extends WizardPage {
 
 	private Combo featureComboProject;
 	
@@ -74,7 +74,7 @@ public class NewEquationFilePage extends WizardPage {
 	 * 
 	 * @param pageName
 	 */
-	public NewEquationFilePage(ISelection selection) {
+	public NewConfigurationFilePage(ISelection selection) {
 		super("wizardPage");
 		setTitle("New Equation File");
 		setDescription("Enter the name of the equation file. It will be placed in the equations directory of the " +
