@@ -1,5 +1,3 @@
-layer Re_fuer_Handy;
-
 import javax.microedition.rms.*;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

@@ -1,6 +1,5 @@
-layer Sound_fuer_pc;
-
 import java.io.IOException;
+
 public refines class Missile {
 	protected void init(TankManager tankManager, int x_Koordinate, int y_Koordinate, int width,
 			int height, int missileRichtung, int missileType, boolean feindlich,int tankId) {

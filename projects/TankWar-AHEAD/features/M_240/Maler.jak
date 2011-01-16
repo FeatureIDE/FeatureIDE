@@ -1,5 +1,3 @@
-layer M_240;
-
 public refines class Maler {
 	
 	protected void gamesize(){

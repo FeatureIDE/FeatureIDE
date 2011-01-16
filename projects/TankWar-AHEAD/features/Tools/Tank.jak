@@ -1,5 +1,3 @@
-layer Tools;
-
 public refines class Tank {
 
 	protected void malen() {

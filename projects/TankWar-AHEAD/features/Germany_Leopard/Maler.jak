@@ -1,5 +1,3 @@
-layer Germany_Leopard;
-
 public refines class Maler {
 
 	protected void tankErstellen(){

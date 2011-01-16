@@ -1,5 +1,3 @@
-layer Beschleunigung;
-
 public refines class Tank {
 
 	protected long beschleunigungTimer;

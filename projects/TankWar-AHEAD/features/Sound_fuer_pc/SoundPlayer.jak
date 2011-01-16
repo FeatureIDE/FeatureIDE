@@ -1,5 +1,3 @@
-layer Sound_fuer_pc;
-
 import java.io.*;
 import sun.audio.AudioPlayer;
 

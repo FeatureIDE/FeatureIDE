@@ -1,5 +1,3 @@
-layer Easy;
-
 public refines class Tank {
 
 	protected void tankFeindKI() {

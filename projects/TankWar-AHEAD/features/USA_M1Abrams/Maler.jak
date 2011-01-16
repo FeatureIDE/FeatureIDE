@@ -1,5 +1,3 @@
-layer USA_M1Abrams;
-
 public refines class Maler {
 	
 	protected void tankErstellen(){

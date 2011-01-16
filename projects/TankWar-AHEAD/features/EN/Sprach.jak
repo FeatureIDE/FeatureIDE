@@ -1,5 +1,3 @@
-layer EN;
-
 public class Sprach {
 	public static String START = "Start";
 	public static String HELP = "Help";

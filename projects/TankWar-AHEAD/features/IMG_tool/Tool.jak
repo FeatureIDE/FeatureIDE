@@ -1,5 +1,3 @@
-layer IMG_tool;
-
 public refines class Tool {
 	
 	protected void toolMalen(){

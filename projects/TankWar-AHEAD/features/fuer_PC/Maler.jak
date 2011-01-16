@@ -1,5 +1,3 @@
-layer fuer_PC;
-
 public refines class Maler {
 	protected Map images = new HashMap();
 	public void drawImage(String imageFileName, int x, int y) {

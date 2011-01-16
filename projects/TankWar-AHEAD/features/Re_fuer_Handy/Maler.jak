@@ -1,6 +1,5 @@
-layer Re_fuer_Handy;
-
 import java.util.Vector;
+
 public refines class Maler {
 
 	protected NameTextField textField;

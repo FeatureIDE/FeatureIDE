@@ -1,5 +1,3 @@
-layer TankWar;
-
 public class Missile extends GameObject {
 
 	protected float geschwindigkeit, xf_Koordinate, yf_Koordinate;

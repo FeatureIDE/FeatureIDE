@@ -1,5 +1,3 @@
-layer Beschleunigung;
-
 public refines class TankManager {
 
 	public void toolsLaden() {

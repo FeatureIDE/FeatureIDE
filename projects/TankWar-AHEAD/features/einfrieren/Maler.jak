@@ -1,5 +1,3 @@
-layer einfrieren;
-
 public refines class Maler {
 
 	public void helpItemErstellen() {

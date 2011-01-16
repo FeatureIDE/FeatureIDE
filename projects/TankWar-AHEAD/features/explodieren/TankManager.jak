@@ -1,5 +1,3 @@
-layer explodieren;
-
 public refines class TankManager {
 	
 	public Vector expEffekt = new Vector(2, 1);

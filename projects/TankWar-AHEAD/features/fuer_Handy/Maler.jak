@@ -1,5 +1,3 @@
-layer fuer_Handy;
-
 import java.io.IOException;
 public refines class Maler {
 	

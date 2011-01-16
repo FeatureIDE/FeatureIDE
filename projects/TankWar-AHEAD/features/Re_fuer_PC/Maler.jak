@@ -1,5 +1,3 @@
-layer Re_fuer_PC;
-
 import java.awt.TextField;
 
 public refines class Maler {

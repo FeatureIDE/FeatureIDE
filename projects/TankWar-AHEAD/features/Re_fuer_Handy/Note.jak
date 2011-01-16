@@ -1,5 +1,3 @@
-layer Re_fuer_Handy;
-
 public class Note{
 	public String name;
 	public int note;

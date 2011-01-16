@@ -1,5 +1,3 @@
-layer Image;
-
 public refines class ExplodierenEffekt {
 	private static boolean init = false;
 	protected boolean live = true; 

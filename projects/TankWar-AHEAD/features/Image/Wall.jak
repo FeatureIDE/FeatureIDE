@@ -1,5 +1,3 @@
-layer Image;
-
 public refines class Wall {
 
 	protected void malen() {

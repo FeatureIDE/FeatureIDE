@@ -1,5 +1,3 @@
-layer Handy;
-
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.midlet.MIDletStateChangeException;
 

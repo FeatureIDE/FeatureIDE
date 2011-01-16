@@ -1,5 +1,3 @@
-layer Record;
-
 public refines class Tank {
 
 	protected void explodieren() {

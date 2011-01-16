@@ -1,5 +1,3 @@
-layer Bombe;
-
 public refines class Tool {
 	
 	protected void init(TankManager tankManager, int x_Koordinate, int y_Koordinate, int toolType) {

@@ -1,5 +1,3 @@
-layer Tools;
-
 public class Tool extends GameObject {
 	protected long time;
 	protected long currTime;

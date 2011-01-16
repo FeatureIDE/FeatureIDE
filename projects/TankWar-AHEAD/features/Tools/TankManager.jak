@@ -1,5 +1,3 @@
-layer Tools;
-
 public refines class TankManager {
 
 	protected Vector toolMenge = new Vector();

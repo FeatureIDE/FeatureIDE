@@ -1,5 +1,3 @@
-layer Re_fuer_Handy;
-
 public class NameChar {
 	int charvalue;
 

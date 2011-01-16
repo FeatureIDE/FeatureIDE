@@ -1,5 +1,3 @@
-layer TankWar;
-
 import java.util.Vector;
 
 public class GameObject {

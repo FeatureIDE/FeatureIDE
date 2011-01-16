@@ -1,5 +1,3 @@
-layer Image;
-
 public refines class Missile {
 
 	public void malen() {

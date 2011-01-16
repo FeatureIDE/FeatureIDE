@@ -1,5 +1,3 @@
-layer Record;
-
 public refines class TankManager {
 	protected Record record;
 	protected int tank1Score = 0;

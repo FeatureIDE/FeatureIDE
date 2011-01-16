@@ -1,5 +1,3 @@
-layer Feuerkraft;
-
 public refines class Tank {
 
 	protected long feuerkraftTimer;
