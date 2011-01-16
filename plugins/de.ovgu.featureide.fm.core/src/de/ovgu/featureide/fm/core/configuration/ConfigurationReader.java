@@ -31,6 +31,8 @@ import java.util.StringTokenizer;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
+
+import de.ovgu.featureide.fm.core.Feature;
 //TODO: streams should be closed in finally blocks
 public class ConfigurationReader {
 	
@@ -72,8 +74,28 @@ public class ConfigurationReader {
 			}
 			//the string tokenizer is used to also support the expression format used by FeatureHouse
 			StringTokenizer tokenizer = new StringTokenizer(line);
+			LinkedList<String> hiddenFeatures = new LinkedList<String>();
 			while (tokenizer.hasMoreTokens()) {
 				String name = tokenizer.nextToken();
+				Feature feature = configuration.getFeatureModel().getFeature(name);
+				if (feature != null && feature.isHidden()) {
+					hiddenFeatures.add(name);
+				} else {
+					try {
+						configuration.setManual(name, Selection.SELECTED);
+					} catch (FeatureNotFoundException e) {
+						successful = false;
+						warnings.add("Feature " + name + " does not exist anymore");
+						positions.add(lineNumber);
+					} catch (SelectionNotPossibleException e) {
+						successful = false;
+						warnings.add("Feature " + name + " cannot be selected anymore");
+						positions.add(lineNumber);
+					}
+				}
+				lineNumber++;
+			}
+			for (String name : hiddenFeatures) {
 				try {
 					configuration.setManual(name, Selection.SELECTED);
 				} catch (FeatureNotFoundException e) {
@@ -85,7 +107,7 @@ public class ConfigurationReader {
 					warnings.add("Feature " + name + " cannot be selected anymore");
 					positions.add(lineNumber);
 				}
-			lineNumber++;
+				lineNumber++;
 			}
 		}
 		reader.close();
