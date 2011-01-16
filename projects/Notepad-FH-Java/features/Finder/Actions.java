@@ -1,4 +1,4 @@
-
+package notepad;
 
 class Actions{
     private String findword; //for searching & finding the word

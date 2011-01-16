@@ -1,4 +1,4 @@
-
+package notepad;
 
 import java.awt.event.*;
 import javax.swing.*;

@@ -1,3 +1,5 @@
+package notepad;
+
 // indicate "base" layer
 
 /**

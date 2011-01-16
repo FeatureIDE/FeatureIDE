@@ -1,4 +1,4 @@
-
+package notepad;
 
 class Actions {
 	//to cut the selected text

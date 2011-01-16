@@ -1,4 +1,4 @@
-
+package notepad;
 
 //import the packages for using the classes in them into this class
 

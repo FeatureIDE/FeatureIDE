@@ -1,6 +1,7 @@
 
 
 import javax.swing.undo.*;
+import javax.swing.event.*;
 
 class Notepad {
     //for using undo & redo
