@@ -195,7 +195,7 @@ public class AheadComposer implements IComposerExtensionClass {
 	@Override
 	public ArrayList<String[]> getTemplates() {
 		ArrayList<String[]> list = new ArrayList<String[]>();
-		String[] jak = { "Jak File", "jak",
+		String[] jak = { "Jak", "jak",
 				"public #refines# class #classname# {\n\n}" };
 		list.add(jak);
 		return list;
@@ -277,6 +277,14 @@ public class AheadComposer implements IComposerExtensionClass {
 		return true;
 	}
 
+
+	@Override
+	public int getDefaultTemplateIndex() {
+	
+		return 0;
+	}
+
+
 	@Override
 	public void postModelChanged() {
 
@@ -287,4 +295,5 @@ public class AheadComposer implements IComposerExtensionClass {
 			Text buildPath) {
 		
 	}
+
 }

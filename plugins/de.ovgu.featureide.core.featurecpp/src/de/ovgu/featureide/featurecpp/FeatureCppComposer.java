@@ -94,7 +94,7 @@ public class FeatureCppComposer implements IComposerExtensionClass {
 	public ArrayList<String[]> getTemplates(){
 		
 		ArrayList<String[]> list = new ArrayList<String[]>();
-		String[] c = {"Cpp Header File", "h", ""};
+		String[] c = {"C++", "h", ""};
 		list.add(c);
 		return list;
 	}
@@ -126,5 +126,11 @@ public class FeatureCppComposer implements IComposerExtensionClass {
 	public void editProjectWizard(Text sourcePath, Text equationsPath,
 			Text buildPath) {
 	
+	}
+
+	@Override
+	public int getDefaultTemplateIndex() {
+		
+		return 0;
 	}
 }

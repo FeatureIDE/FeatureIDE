@@ -202,6 +202,16 @@ public class ComposerExtensionProxy implements IComposerExtension {
 		return composerExtensionClass.hasFeatureFolders();
 	}
 
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#getDefaultTemplateIndex()
+	 */
+	public int getDefaultTemplateIndex() {
+		
+		return composerExtensionClass.getDefaultTemplateIndex();
+	}
+
+
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#postModelChanged()
 	 */
@@ -217,4 +227,5 @@ public class ComposerExtensionProxy implements IComposerExtension {
 		composerExtensionClass.editProjectWizard(sourcePath, equationsPath,
 				buildPath);
 	}
+
 }

@@ -48,7 +48,7 @@ public class NewFeatureProjectPage extends WizardPage {
 	private IComposerExtension composerExtension = null;
 	private IComposerExtension[] extensions = null;
 	
-	private Text sourcePath,equationsPath,buildPath;
+	private Text sourcePath,configsPath,buildPath;
 	
 	private Composite container;
 	private Combo toolCB;
@@ -142,17 +142,17 @@ public class NewFeatureProjectPage extends WizardPage {
 		label.setToolTipText(tooltip);
 		sourcePath = new Text(pathGroup, SWT.BORDER | SWT.SINGLE);
 		sourcePath.setLayoutData(gd);
-		sourcePath.setText("feature");
+		sourcePath.setText("features");
 		sourcePath.setToolTipText(tooltip);
 		
 		tooltip = "Sets the path of equationfiles.";
 		label = new Label(pathGroup, SWT.NULL);
-		label.setText("&Equations Path:");
+		label.setText("&Configurations Path:");
 		label.setToolTipText(tooltip);
-		equationsPath = new Text(pathGroup, SWT.BORDER | SWT.SINGLE);
-		equationsPath.setLayoutData(gd);
-		equationsPath.setText("equations");
-		equationsPath.setToolTipText(tooltip);
+		configsPath = new Text(pathGroup, SWT.BORDER | SWT.SINGLE);
+		configsPath.setLayoutData(gd);
+		configsPath.setText("configs");
+		configsPath.setToolTipText(tooltip);
 		
 		addListeners();
 	}	
@@ -190,7 +190,7 @@ public class NewFeatureProjectPage extends WizardPage {
 			}
 		});
 		
-		equationsPath.addModifyListener(new ModifyListener() {
+		configsPath.addModifyListener(new ModifyListener() {
 	
 			@Override
 			public void modifyText(ModifyEvent e) {
@@ -202,9 +202,9 @@ public class NewFeatureProjectPage extends WizardPage {
 	protected void dialogChanged() {
 		resetPathGroup();
 		getCompositionTool().initialize(null);
-		getCompositionTool().editProjectWizard(sourcePath, equationsPath, buildPath);
+		getCompositionTool().editProjectWizard(sourcePath, configsPath, buildPath);
 		
-		if (isEnabled(sourcePath) && isEnabled(equationsPath) &&
+		if (isEnabled(sourcePath) && isEnabled(configsPath) &&
 				getSourcePath().equals(getEquationsPath())) {
 			updateStatus("Source Path equals Equations Path.");
 			return;
@@ -214,18 +214,18 @@ public class NewFeatureProjectPage extends WizardPage {
 			updateStatus("Source Path equals Build Path.");
 			return;
 		}
-		if (isEnabled(buildPath) && isEnabled(equationsPath) && 
+		if (isEnabled(buildPath) && isEnabled(configsPath) && 
 				getBuildPath().equals(getEquationsPath())) {
 			updateStatus("Build Path equals Equations Path.");
 			return;
 		}
 		if (isEnabled(sourcePath) && isPathEmpty(getSourcePath(), "Source"))return;
 		if (isEnabled(buildPath) && isPathEmpty(getBuildPath(), "Build"))return;
-		if (isEnabled(equationsPath) && isPathEmpty(getEquationsPath(), "Equations"))return;
+		if (isEnabled(configsPath) && isPathEmpty(getEquationsPath(), "Equations"))return;
 		
 		if (isEnabled(sourcePath) && isInvalidPath(getSourcePath(), "Source"))return;
 		if (isEnabled(buildPath) && isInvalidPath(getBuildPath(), "Build"))return;
-		if (isEnabled(equationsPath) && isInvalidPath(getEquationsPath(), "Equations"))return;
+		if (isEnabled(configsPath) && isInvalidPath(getEquationsPath(), "Equations"))return;
 		
 		updateStatus(null);
 	}
@@ -238,7 +238,7 @@ public class NewFeatureProjectPage extends WizardPage {
 	}
 	private void resetPathGroup() {
 		sourcePath.setEnabled(true);
-		equationsPath.setEnabled(true);
+		configsPath.setEnabled(true);
 		buildPath.setEnabled(true);
 	}
 
@@ -279,7 +279,9 @@ public class NewFeatureProjectPage extends WizardPage {
 	}
 	
 	public String getEquationsPath() {
-		return equationsPath.isEnabled() ? equationsPath.getText() : "";
+
+		return configsPath.isEnabled() ? configsPath.getText() : "";
+
 	}
 	
 	public String getBuildPath() {

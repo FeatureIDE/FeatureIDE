@@ -116,6 +116,12 @@ public interface IComposerExtensionClass {
 	 * folders for each feature will be created if true
 	 */
 	boolean hasFeatureFolders();
+
+	/**
+	 * 
+	 * @return the index of the default template
+	 */
+	int getDefaultTemplateIndex();
 	
 	void postModelChanged();
 	

@@ -172,13 +172,13 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 
 		ArrayList<String[]> list = new ArrayList<String[]>();
 
-		String[] alloy = {"Alloy File", "als", "module #classname#"};
-		String[] c = {"C File", "c", ""};
-		String[] cs = {"C# File", "cs", "public class #classname# {\n\n}"};
-		String[] haskell= {"Haskell File", "hs", "module #classname# where \n{\n\n}"};
-		String[] java = {"Java File", "java", "public class #classname# {\n\n}"};
-		String[] javacc= {"JavaCC File", "jj", "PARSER_BEGIN(#classname#) \n \n PARSER_END(#classname#)"};
-		String[] uml = {"UML File (xmi)", "xmi", "<?xml version = '1.0' encoding = 'UTF-8' ?> \n	<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML'>\n\n</XMI>"};
+		String[] alloy = {"Alloy", "als", "module #classname#"};
+		String[] c = {"C", "c", ""};
+		String[] cs = {"C#", "cs", "public class #classname# {\n\n}"};
+		String[] haskell= {"Haskell", "hs", "module #classname# where \n{\n\n}"};
+		String[] java = {"Java", "java", "public class #classname# {\n\n}"};
+		String[] javacc= {"JavaCC", "jj", "PARSER_BEGIN(#classname#) \n \n PARSER_END(#classname#)"};
+		String[] uml = {"UML", "xmi", "<?xml version = '1.0' encoding = 'UTF-8' ?> \n	<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML'>\n\n</XMI>"};
 
 		list.add(alloy);
 		list.add(c);
@@ -205,6 +205,14 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 		return true;
 	}
 
+
+	@Override
+	public int getDefaultTemplateIndex() {
+	
+		return 4;
+	}
+
+
 	@Override
 	public void postModelChanged() {
 		
@@ -215,4 +223,5 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 			Text buildPath) {
 	
 	}
+
 }

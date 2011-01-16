@@ -140,7 +140,7 @@ public class DeltajComposer implements IComposerExtensionClass {
 	public String getEditorID(String extension) {
 		if (extension.equals("dj")) {
 
-			return "org.eclipse.jdt.ui.CompilationUnitEditor";
+			return "org.xtext.example.DJ";
 		}
 		return "";
 	}
@@ -172,7 +172,13 @@ public class DeltajComposer implements IComposerExtensionClass {
 		list.add(delta);
 		return list;
 	}
-
+	
+	@Override 
+	public int getDefaultTemplateIndex(){
+	return 0;	
+	}
+	
+	
 	@Override
 	public void addCompiler(IProject project, String sourcePath,
 			String equationPath, String buildPath) {

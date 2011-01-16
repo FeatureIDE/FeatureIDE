@@ -288,4 +288,10 @@ public class MungePreprocessor implements IComposerExtensionClass{
 			Text buildPath) {
 	
 	}
+
+	@Override
+	public int getDefaultTemplateIndex() {
+	
+		return 0;
+	}
 }
