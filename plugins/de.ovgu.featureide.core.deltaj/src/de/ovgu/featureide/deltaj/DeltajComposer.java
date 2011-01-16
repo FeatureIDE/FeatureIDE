@@ -166,7 +166,7 @@ public class DeltajComposer implements IComposerExtensionClass {
 
 		String[] core = { "DeltaJ (Core Module)", "dj",
 				"features #featurename#\nconfigurations\n#featurename#;\n\n\ncore #featurename# {\n\tclass #classname#{\n\n\t}\n}" };
-		String[] delta = { "DeltaJ (Delta Module)", "dj", "delta #featurename# when #featurename#{\n\tmodifies class #classname#{\n\n\t}\n}"  };
+		String[] delta = { "DeltaJ (Delta Module)", "dj", "delta #featurename# when #featurename# {\n\tmodifies class #classname#{\n\n\t}\n}"  };
 		ArrayList<String[]> list = new ArrayList<String[]>();
 		list.add(core);
 		list.add(delta);
@@ -282,6 +282,7 @@ public class DeltajComposer implements IComposerExtensionClass {
 				
 				}
 			}
+			strBuf.append("\n");
 		} catch (CoreException e) {
 			DeltajCorePlugin.getDefault().logError(e);
 		}
@@ -341,8 +342,7 @@ public class DeltajComposer implements IComposerExtensionClass {
 		buf.replace(matcher.start(2), matcher.end(2), features + "\n");
 		Matcher matcher2 = getMatcherFromFileText(buf.toString());
 		matcher2.matches();
-		buf.replace(matcher2.start(3), matcher2.end(3), "\n"
-				+ configurationString + "\n");
+		buf.replace(matcher2.start(3), matcher2.end(3), configurationString + "\n");
 	
 		buf.replace(0, buf.indexOf("features"), getImportsString(file));
 		
