@@ -1,0 +1,11 @@
+.GPL_TITLE
+ {background-color: #00FFFF ; font-family: Verdana ; font-size: 1.3em ; color: #0000FF ; width: 100% ; letter-spacing: 1pt; font-weight:bold}
+
+.GPL_TITLE2
+ {background-color: #FFFF00 ; font-family: Verdana ; font-size: 1.2em ; color: #000000 ; width: 100% ; letter-spacing: 1pt; font-weight:bold}
+
+.GPL_TEXT
+ {font-family: Arial}
+
+.GPL_CODE
+ {font-family: Courier}

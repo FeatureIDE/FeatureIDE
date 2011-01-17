@@ -1,0 +1,37 @@
+<html>	
+	<body>
+		<table fstname="mainlayout">
+            <tr fstname="mainlayout1">
+                <td fstname="mainlayout2">
+                    <table fstname="mIntroduction">
+                        <tr fstname="mIntroduction1">
+                            <td fstname="mIntroduction2">
+                                <ul fstname="mListAlgo">
+									<li fstname="MSTKruskal">
+										<span class="GPL_TEXT">	<a href="#Kruskals Minimum Spanning Tree (MSTKruskal)"> Kruskal's Minimum Spanning Tree (MSTKruskal)</a> </span>
+									</li>
+								</ul>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+			<tr fstname="mainlayout3">
+                <td fstname="mainlayout4">
+					<table fstname="mAlgoDesc">
+						<tr fstname="MSTKruskal">
+							<td fstname="MSTKruskal">
+								<div class="GPL_TEXT"> <b><a name="Kruskals Minimum Spanning Tree (MSTKruskal)"> Kruskal's Minimum Spanning Tree (MSTKruskal)</a></b>-- Contains all vertices such that sum of the  weights of edges is minimal. Returns a weighted graph.</div>
+							</td>
+						</tr>
+						<tr fstname="MSTKruskal2">
+							<td>
+								<blockquote><div class="GPL_CODE">Graph g = G.Kruskal(); // finds min spanning tree.</div></blockquote>
+							</td>
+						</tr>
+					</table>
+                </td>
+			</tr>
+		</table>
+	</body>
+</html>				

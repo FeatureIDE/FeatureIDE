@@ -1,0 +1,29 @@
+<!-- ++ Refinements needed to add feature VERTEX -->
+<xr:refine xmlns:xr="http://www.atarix.org/xmlRefinement" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.atarix.org/xmlRefinement">
+    <xr:at select="//ul[@id='mListAlgo']">
+        <xr:append>
+            <li>
+                <span class="GPL_TEXT">
+                    <a href="#Vertex Numbering (Number)">Vertex Numbering (Number)</a>
+                </span>
+            </li>
+        </xr:append>
+    </xr:at>
+    <xr:at select="//table[@id='mAlgoDesc']">
+        <xr:append>
+            <tr>
+                <td>
+                    <div class="GPL_TEXT">
+                        <a name="Vertex Numbering (Number)"><b>Vertex Numbering (Number)</b> </a> -- Assigns a unique number to each vertex.</div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <blockquote>
+                        <div class="GPL_CODE">G.NumberVertices(); // numbers vertices <br/>V.VertexNumber      // number of vertex</div>
+                    </blockquote>
+                </td>
+            </tr>
+        </xr:append>
+    </xr:at>
+</xr:refine>

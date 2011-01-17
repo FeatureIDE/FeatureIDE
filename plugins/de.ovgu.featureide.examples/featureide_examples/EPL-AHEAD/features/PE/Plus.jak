@@ -1,0 +1,6 @@
+public refines class Plus {
+	public int eval() { 
+		return x.eval() + y.eval(); 
+	}
+
+}

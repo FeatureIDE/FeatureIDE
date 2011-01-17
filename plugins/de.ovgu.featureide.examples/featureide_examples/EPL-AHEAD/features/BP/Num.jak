@@ -1,0 +1,7 @@
+public refines class Num {
+	
+	public String toString() { 
+		return ""+ value; 
+	}
+
+}

@@ -1,0 +1,10 @@
+import java.util.LinkedList;
+
+SoUrCe RooT Base "../features/Base/NeighborIfc.jak";
+
+// *************************************************************************
+// I believe this interface is always empty?
+
+public interface NeighborIfc
+{
+}
