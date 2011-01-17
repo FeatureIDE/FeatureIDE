@@ -5,9 +5,9 @@
          point="de.ovgu.featureide.core.composers">
       <composer
             class="de.ovgu.featureide.deltaj.DeltajComposer"
-            description="Delta-oriented Programming with DeltaJava."
+            description="Delta-oriented Programming with DeltaJ."
             id="de.ovgu.featureide.core.deltaj.deltajcomposer"
-            name="DeltaJava"
+            name="DeltaJ"
             nature="FeatureIDE_Core.deltajNature">
       </composer>
    </extension>
