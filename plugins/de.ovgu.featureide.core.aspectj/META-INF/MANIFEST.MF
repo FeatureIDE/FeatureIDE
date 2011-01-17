@@ -6,9 +6,9 @@ Bundle-Version: 2.5.0.qualifier
 Bundle-Activator: de.ovgu.featureide.core.aspectj.AspectJCorePlugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.eclipse.core.resources;bundle-version="3.6.0",
- de.ovgu.featureide.core;bundle-version="2.4.2",
- de.ovgu.featureide.fm.core;bundle-version="2.4.2"
+ org.eclipse.core.resources,
+ de.ovgu.featureide.core,
+ de.ovgu.featureide.fm.core
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: University of Magdeburg
