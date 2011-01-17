@@ -214,7 +214,7 @@ public class DeltajComposer implements IComposerExtensionClass {
 			} else if (res instanceof IFile) {
 				if (res.getName().endsWith(".dj")) {
 					updateConfiguration(((IFile) res).getRawLocation().toFile());
-
+					res.refreshLocal(IResource.DEPTH_ZERO, null);
 				}
 				filename = res.getName();
 				sourceFilesAdded = true;
@@ -223,9 +223,9 @@ public class DeltajComposer implements IComposerExtensionClass {
 	}
 
 	private void updateConfiguration(final File file) {
-		Job job = new Job("update Configuration") {
-			@Override
-			public IStatus run(IProgressMonitor monitor) {
+//		Job job = new Job("update Configuration") {
+//			@Override
+//			public IStatus run(IProgressMonitor monitor) {
 				String newFileText = null;
 				if (isCoreFile(file)) {
 					newFileText = getNewFileString(file);
@@ -236,16 +236,16 @@ public class DeltajComposer implements IComposerExtensionClass {
 				}
 				
 				SaveStringToFile(newFileText, file);
-				return Status.OK_STATUS;
-			}
-
-		
-
-			
-		};
-		job.setPriority(Job.DECORATE);
-		job.schedule();
-		
+//				return Status.OK_STATUS;
+//			}
+//
+//		
+//
+//			
+//		};
+//		job.setPriority(Job.DECORATE);
+//		job.schedule();
+//		
 
 	}
 //	private boolean isDeltaFile(File file) {

@@ -142,7 +142,7 @@ IFeatureProject, IResourceChangeListener {
 
 	private IComposerExtension composerExtension = null;
 
-	private boolean buildRelevantChanges = true;
+	private boolean buildRelevantChanges = false;
 
 	/**
 	 * Creating a new ProjectData includes creating folders if they don't exist,
@@ -782,8 +782,7 @@ IFeatureProject, IResourceChangeListener {
 			} else {
 				IResourceDelta delta = event.getDelta().findMember(
 						res.getFullPath());
-				if (delta != null && (delta.getKind() == IResourceDelta.ADDED || 
-						!modelChanged && (delta.getFlags() & IResourceDelta.CONTENT) != 0)) {
+				if (delta != null && (delta.getFlags() & IResourceDelta.MARKERS) == 0) {
 					buildRelevantChanges = true;
 				}
 			}
@@ -799,6 +798,7 @@ IFeatureProject, IResourceChangeListener {
 						res.getFullPath());
 				if (delta != null) {
 					if (composerExtension != null) {
+						//TODO check if necessary
 						composerExtension.postCompile((IFile)res);
 					}
 				}
