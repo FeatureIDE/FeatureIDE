@@ -440,6 +440,11 @@ public class NewFeatureIDEFilePage extends WizardPage {
 	}
 
 	IContainer getContainerObject() {
+		//TODO set container earlier
+		if(container.equals(sourcefolder)&&composerExt.hasFeatureFolders()){
+			container=sourcefolder
+			.getFolder(comboFeature.getText());
+		}
 		return container;
 	}
 
@@ -553,6 +558,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 	private boolean validateLanguage(String language) {
 		String errorMessage = null;
 		boolean valid = true;
+		if(comboLanguage.getItemCount()==1)return true;
 		if (!isValidFormat(language)) {
 			errorMessage = "Selected file format is not supported";
 			valid = false;

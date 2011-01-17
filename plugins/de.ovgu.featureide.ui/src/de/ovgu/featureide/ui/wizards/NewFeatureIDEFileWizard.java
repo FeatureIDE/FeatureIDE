@@ -120,6 +120,7 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 		// create a sample file
 		monitor.beginTask("Creating " + fileName, 2);
 		final IFile file = container.getFile(new Path(fileName + "." + extension));
+		System.out.println("FILE "+file.getLocation());
 		try {
 			InputStream stream = openContentStream(featureName,container, classname, template, composer, refines);
 			if (file.exists()) {

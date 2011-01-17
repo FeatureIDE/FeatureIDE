@@ -288,9 +288,11 @@ public class CollaborationModelBuilder {
 			return;
 		
 		if (!(res instanceof IFolder)) {
+			//TODO fix error if filename does not contain "."
 			if (classFilter.size() == 0 
 					|| classFilter.contains("*." + (res.getName().split("[.]"))[1])
 					|| classFilter.contains(res.getName())) {
+				
 				if (!(fSTModel != null && extensions.contains("." + (res.getName().split("[.]"))[1])) 
 						|| !iFeatureNames.contains(featureName)) {
 					if (collaboration == null) {

@@ -207,7 +207,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		} else {
 			if (featureProject.getCurrentEquationFile() == null){
 				model = new CollaborationModel();
-				model.collaborations.add(new Collaboration("Please create a new equation file"));
+				model.collaborations.add(new Collaboration("Please create a new configuration file"));
 				viewer.setContents(model);
 			} else
 				updateGuiAfterBuild(featureProject);
