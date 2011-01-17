@@ -41,29 +41,32 @@ On the next page, choose a project name. For example &quot;HelloWorld&quot;.
        Now its time to create a feature model specifying the features and their valid combinations.
     </description>
     <subitem
-          label="Open the model.m file. You will see a graphical editor where you can edit the feature model of your software product line.">
+          label="After creation of the project, FeatureIDE opens the model.xml file. You will see a graphical editor where you can edit the feature model of your software product line.">
     </subitem>
       <subitem
             label="First, create two additional layers under your root feature. Right click on the root feature and select &quot;Create Feature (below)&quot; twice. Rename the first new feature to &quot;Hello&quot;, and the second to &quot;World&quot;. You can rename features using F2, a single click on a selected feature, or using a right click with the option at the context menu."
             skip="false">
       </subitem>
       <subitem
-            label="Right click on the unnamed feature (Base) and select &quot;Create Compound (above)&quot;. You will get a new non-terminal feature above with a different color. Note that in FeatureIDE only terminal features are mapped to an implementation later (as in GUIDSL). Now select the new feature and rename it to &quot;Feature&quot;. Afterward, create an additional feature below. Rename the child features to &quot;Wonderfull&quot; and &quot;Beautiful&quot;.">
+            label="Rename the feature (Base) to &gt;Beautiful&gt; and move it between the features (Hello) and (World). Now, create a feature (Wonderful) and move it between the features (Beautiful) and (World).">
+      </subitem>
+      <subitem
+            label="Now, we want to make the features (Beautiful) and (Wonderful) exclusive to each other. Select both features, create a new compound above using right click menu, and name it (Feature). As this feature has no according implementation mark it as abstract using the context menu.">
       </subitem>
       <subitem
             label="Connections between feature and its group of children are distinguished as And- (no arc), Or- (filled ar) amd Alternative-groups (unfilled arc). The children of And-groups can either be mandatory (filled circle) or optional (unfilled circle)."
             skip="true">
       </subitem>
       <subitem
-            label="Double click on the connection below the root feature to change it to an And-group. Then double click on the &quot;Feature&quot; to uncheck the mandatory option. Click on the help button, to see how your feature model should look like.">
+            label="Double click on the connection below the feature (Feature) to change it to an Or-group and again to change it to an Alternative-group. Then double click on the features (Hello) and (World) to mark them as mandatory. Click on the help button, to see how your feature model should look like.">
       </subitem>
  </item>
  <item
        title="Create new Jak files">
     <description>
 After you have saved your feature model, FeatureIDE will create directories for each feature. In these directories you can create Jak-Files.<br/><br/>
-Start with creating a new Jak-file in the directory Hello: Right click on the directory and use the context-item New-&gt;Jak File. Choose the container &quot;Hello&quot; and use &quot;Main&quot; for the class name.<br/><br/>
-Open the file und write the following code:<br/><br/>
+Start with creating a new Jak-file in the directory Hello: Right click on the directory and use the context-item New-&gt;FeatureIDE File. Choose the identifier &quot;Main&quot; for the class name and press (Finish).<br/><br/>
+FeatureIDE opens the file and you can write the following code:<br/><br/>
 public void print(){<br/>
   System.out.print(&quot;Hello&quot;);<br/>
 }<br/>
@@ -72,13 +75,13 @@ public static void main(String[] args) {<br/>
 }
     </description>
     <subitem
-          label="Now create more Jak files. Create one in each of the directories &quot;Beautiful&quot;, &quot;Wonderful&quot; and &quot;World&quot;. In these cases,  activate the option &quot;Refines&quot; in the Wizard. Furthermore, all the Jak files must have the same name.">
+          label="Now create more Jak files. Create one in each of the directories &quot;Beautiful&quot;, &quot;Wonderful&quot; and &quot;World&quot;. In these cases,  activate the option &quot;Refines&quot; in the Wizard. Furthermore, all the Jak files must have the same name Main.">
     </subitem>
  </item>
  <item
        title="Source code for the Jak files">
     <description>
-       Now edit the remaining jak-Files. Every feature will refine the method print() in the Main class.<br/><br/> Now insert the following code in your world feature: <br/> <br/>
+       Now edit the remaining jak-Files. Every feature will refine the method print() in the class Main.<br/><br/> Now insert the following code in your world feature: <br/> <br/>
 	public void print() {<br/>
 		Super().print();<br/>
 		System.out.print(&quot; world!&quot;);<br/>
@@ -89,19 +92,19 @@ System.out.print(&quot; wonderful&quot;); in the &quot;wonderful&quot; feature.<
     </description>
  </item>
  <item
-       title="Equation File">
+       title="Configuration File">
     <description>
-       After you design your feature model, you want to generate a variant (a product of your product line). To specify a variant, you have to provide a feature selection in an &quot;equation&quot; file. <br/><br/>
-Create a new equation file with the according wizard.
+       After you designed your feature model, and source code, you want to generate a variant (a product of your product line). To specify a variant, you have to provide a feature selection in a &quot;configuration&quot; file. <br/><br/>
+Create a new configuration file with the according wizard.
     </description>
     <subitem
-          label="Open the equation file and select the features you want to activate for your variant. Doubleclick on the features to select or deselect. After you have selected some items, FeatureIDE will compose your features and compile the generated Java code.">
+          label="Open the configuration file and select the features you want to activate for your variant. After you have saved the file, FeatureIDE will compose your features and compile the generated Java code.">
     </subitem>
  </item>
  <item
        title="Start your application">
     <description>
-       Now it&apos;s time to start your application. Choose &quot;run configuration&quot; from your toolbar. In the next window create a new <b>Layered Application</b>.<br/><br/> Browse to your project and your main class. Now you can click on the run button and enjoy your very nice Hello Beautiful Wonderful Word application!
+       Now it&apos;s time to start your application. Open the folder &quot;src&quot;, right click on the file Main.java, and choose &quot;Run As&gt;Java Application&quot;. Enjoy your very nice Hello Beautiful Wonderful Word application!
     </description>
  </item>
 </cheatsheet>
