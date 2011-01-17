@@ -430,7 +430,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 		if (!validateClass(textClass.getText()))
 			return;
 		if(!validateModulename(textModulename.getText()))
-				return;
+			return;
 		setPageComplete(true);
 
 	}
@@ -546,10 +546,10 @@ public class NewFeatureIDEFilePage extends WizardPage {
 			valid = false;
 		}
 
-		if (composerExt.hasFeatureFolders() && container.equals(sourcefolder)) {
-
-			valid = false;
-		}
+//		if (composerExt.hasFeatureFolders() && container.equals(sourcefolder)) {
+//
+//			valid = false;
+//		}
 		if (featureDirty)
 			setErrorMessage(errorMessage);
 		return valid;
