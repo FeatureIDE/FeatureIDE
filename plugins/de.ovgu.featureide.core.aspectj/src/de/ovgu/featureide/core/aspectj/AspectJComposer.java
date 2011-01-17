@@ -18,7 +18,6 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.swt.widgets.Text;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
@@ -60,7 +59,9 @@ public class AspectJComposer implements IComposerExtensionClass {
 	
 	@Override
 	public ArrayList<String> extensions() {
-		return new ArrayList<String>();
+		ArrayList<String> extensions = new ArrayList<String>();
+		extensions.add(".java");
+		return extensions;
 	}
 
 	@Override
@@ -399,7 +400,10 @@ public class AspectJComposer implements IComposerExtensionClass {
 
 	@Override
 	public ArrayList<String[]> getTemplates() {
-		return null;
+		ArrayList<String[]> list = new ArrayList<String[]>();
+		String[] java = {"Java", "java", "public class #classname# {\n\n}"};
+		list.add(java);
+		return list;
 	}
 
 	@Override
@@ -504,18 +508,17 @@ public class AspectJComposer implements IComposerExtensionClass {
 	}
 
 	@Override
-	public void editProjectWizard(Text sourcePath, Text equationsPath,
-			Text buildPath) {
-		sourcePath.setEnabled(false);
-	}
-
-	@Override
 	public int getDefaultTemplateIndex() {
 		return 0;
 	}
 
 	@Override
 	public boolean hasCustomFilename() {
+		return false;
+	}
+
+	@Override
+	public boolean hasFeatureFolder() {
 		return false;
 	}
 

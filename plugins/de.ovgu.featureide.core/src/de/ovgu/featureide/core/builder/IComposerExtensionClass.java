@@ -24,7 +24,6 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.swt.widgets.Text;
 
 import de.ovgu.featureide.core.IFeatureProject;
 
@@ -126,12 +125,9 @@ public interface IComposerExtensionClass {
 	void postModelChanged();
 	
 	/**
-	 * Text fields at NewFeatureIDProject wizard can be set disabled.  
-	 * @param sourcePath
-	 * @param equationsPath
-	 * @param buildPath
+	 * @return true if the composer has a folder for features.
 	 */
-	void editProjectWizard(Text sourcePath, Text equationsPath, Text buildPath);
+	boolean hasFeatureFolder();
 
 	/**
 	 * @return returns false if filenames equal the corresponding feature name

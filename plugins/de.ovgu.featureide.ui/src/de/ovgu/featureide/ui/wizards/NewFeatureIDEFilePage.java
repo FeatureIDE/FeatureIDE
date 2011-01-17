@@ -288,8 +288,6 @@ public class NewFeatureIDEFilePage extends WizardPage {
 			textModulename.setVisible(false);
 			labelModulename.setVisible(false);
 		}
-		
-		
 	}
 
 	private void initComboProject() {
@@ -389,8 +387,12 @@ public class NewFeatureIDEFilePage extends WizardPage {
 
 	private void checkcontainer(IFeatureProject featureProject,
 			IResource resource) {
-
-		sourcefolder = featureProject.getSourceFolder();
+		if (featureProject.getComposer().hasFeatureFolder()) {
+			sourcefolder = featureProject.getSourceFolder();
+		} else {
+			sourcefolder = featureProject.getBuildFolder();
+		}
+		
 		if (resource.getParent().equals(sourcefolder)) {
 			for (int i = 0; i < comboFeature.getItemCount(); i++)
 				if (comboFeature.getItem(i).equals(resource.getName()))

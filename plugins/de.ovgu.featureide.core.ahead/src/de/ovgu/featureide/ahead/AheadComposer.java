@@ -35,7 +35,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.swt.widgets.Text;
 
 import de.ovgu.featureide.ahead.wrapper.AheadBuildErrorEvent;
 import de.ovgu.featureide.ahead.wrapper.AheadBuildErrorListener;
@@ -53,7 +52,6 @@ import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 public class AheadComposer implements IComposerExtensionClass {
 
 	public static final String JAVA_NATURE = "org.eclipse.jdt.core.javanature";
-
 	public static final String COMPOSER_ID = "de.ovgu.featureide.composer.ahead";
 
 	private AheadWrapper ahead;
@@ -267,7 +265,7 @@ public class AheadComposer implements IComposerExtensionClass {
 			description.setNatureIds(newNatures);
 			project.setDescription(description, null);
 		} catch (CoreException e) {
-			CorePlugin.getDefault().logError(e);
+			AheadCorePlugin.getDefault().logError(e);
 		}
 	}
 
@@ -291,15 +289,14 @@ public class AheadComposer implements IComposerExtensionClass {
 	}
 
 	@Override
-	public void editProjectWizard(Text sourcePath, Text equationsPath,
-			Text buildPath) {
-		
-	}
-
-	@Override
 	public boolean hasCustomFilename() {
 	
 		return false;
+	}
+
+	@Override
+	public boolean hasFeatureFolder() {
+		return true;
 	}
 
 }

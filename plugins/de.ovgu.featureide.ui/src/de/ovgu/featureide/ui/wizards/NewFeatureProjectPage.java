@@ -200,9 +200,8 @@ public class NewFeatureProjectPage extends WizardPage {
 	}
 	
 	protected void dialogChanged() {
-		resetPathGroup();
 		getCompositionTool().initialize(null);
-		getCompositionTool().editProjectWizard(sourcePath, configsPath, buildPath);
+		sourcePath.setEnabled(getCompositionTool().hasFeatureFolder());
 		
 		if (isEnabled(sourcePath) && isEnabled(configsPath) &&
 				getSourcePath().equals(getEquationsPath())) {
@@ -235,11 +234,6 @@ public class NewFeatureProjectPage extends WizardPage {
 			return true;
 		}
 		return false;
-	}
-	private void resetPathGroup() {
-		sourcePath.setEnabled(true);
-		configsPath.setEnabled(true);
-		buildPath.setEnabled(true);
 	}
 
 	protected boolean isPathEmpty(String path, String name) {

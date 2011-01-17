@@ -635,7 +635,7 @@ IFeatureProject, IResourceChangeListener {
 
 	private ArrayList<IResource> resList = new ArrayList<IResource>();
 
-	private boolean modelChanged = false;
+//	private boolean modelChanged = false;
 
 	/**
 	 * refreshes Feature Module Markers for all folders in the source folder
@@ -811,7 +811,7 @@ IFeatureProject, IResourceChangeListener {
 		if (delta == null || (delta.getFlags() & IResourceDelta.CONTENT) == 0)
 			return false;
 
-		modelChanged = true;
+	//	modelChanged = true;
 		Job job = new Job("Load Model") {
 			protected IStatus run(IProgressMonitor monitor) {
 
@@ -1105,7 +1105,7 @@ IFeatureProject, IResourceChangeListener {
 	 */
 	public void builded() {
 		buildRelevantChanges = false;
-		modelChanged = false;
+//		modelChanged = false;
 	}
 
 }

@@ -18,7 +18,9 @@
  */
 package de.ovgu.featureide.munge;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,13 +29,13 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.swt.widgets.Text;
 import org.sonatype.plugins.munge.Munge;
 
 import de.ovgu.featureide.core.CorePlugin;
@@ -218,7 +220,10 @@ public class MungePreprocessor implements IComposerExtensionClass{
 
 	@Override
 	public ArrayList<String[]> getTemplates() {
-		return null;
+		ArrayList<String[]> list = new ArrayList<String[]>();
+		String[] java = {"Java", "java", "public class #classname# {\n\n}"};
+		list.add(java);
+		return list;
 	}
 
 	@Override
@@ -265,7 +270,56 @@ public class MungePreprocessor implements IComposerExtensionClass{
 	}
 
 	@Override
-	public void addCompiler(IProject project, String sourcePath,String equationPath, String buildPath) {
+	public void addCompiler(IProject project, String sourcePath,
+			String equationPath, String buildPath) {
+		addNature(project);
+		addClasspathFile(project, sourcePath, equationPath, buildPath);
+	}
+
+	private void addClasspathFile(IProject project, String sourcePath,
+			String equationPath, String buildPath) {
+		IFile iClasspathFile = project.getFile(".classpath");
+		if (!iClasspathFile.exists()) {
+			String bin = "bin";
+			if (sourcePath.equals(bin) || equationPath.equals(bin)
+					|| buildPath.equals(bin)) {
+				bin = "bin2";
+			}
+			if (sourcePath.equals(bin) || equationPath.equals(bin)
+					|| buildPath.equals(bin)) {
+				bin = "bin3";
+			}
+			try {
+				String text = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + 
+			 				  "<classpath>\n" +  
+			 				  "<classpathentry kind=\"src\" path=\"" + buildPath + "\"/>\n" + 
+			 				  "<classpathentry kind=\"con\" path=\"org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6\"/>\n" + 
+			 				  "<classpathentry kind=\"output\" path=\"" + bin + "\"/>\n" + 
+			 				  "</classpath>"; 
+				InputStream source = new ByteArrayInputStream(text.getBytes());
+				iClasspathFile.create(source, true, null);
+			} catch (CoreException e) {
+				MungeCorePlugin.getDefault().logError(e);
+			}
+
+		}
+	}
+
+	private void addNature(IProject project) {
+		try {
+			if (!project.isAccessible() || project.hasNature(JAVA_NATURE))
+				return;
+
+			IProjectDescription description = project.getDescription();
+			String[] natures = description.getNatureIds();
+			String[] newNatures = new String[natures.length + 1];
+			System.arraycopy(natures, 0, newNatures, 0, natures.length);
+			newNatures[natures.length] = JAVA_NATURE;
+			description.setNatureIds(newNatures);
+			project.setDescription(description, null);
+		} catch (CoreException e) {
+			MungeCorePlugin.getDefault().logError(e);
+		}
 	}
 
 	@Override
@@ -284,12 +338,6 @@ public class MungePreprocessor implements IComposerExtensionClass{
 	}
 
 	@Override
-	public void editProjectWizard(Text sourcePath, Text equationsPath,
-			Text buildPath) {
-	
-	}
-
-	@Override
 	public int getDefaultTemplateIndex() {
 	
 		return 0;
@@ -297,7 +345,11 @@ public class MungePreprocessor implements IComposerExtensionClass{
 
 	@Override
 	public boolean hasCustomFilename() {
-		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public boolean hasFeatureFolder() {
+		return true;
 	}
 }

@@ -26,7 +26,6 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.swt.widgets.Text;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
@@ -220,19 +219,17 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	}
 
 	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtension#editProjectWizard(org.eclipse.swt.widgets.Text, org.eclipse.swt.widgets.Text, org.eclipse.swt.widgets.Text, org.eclipse.swt.widgets.Group)
-	 */
-	public void editProjectWizard(Text sourcePath, Text equationsPath,
-			Text buildPath) {
-		composerExtensionClass.editProjectWizard(sourcePath, equationsPath,
-				buildPath);
-	}
-
-	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#hasCustomFilename()
 	 */
 	public boolean hasCustomFilename() {
 		return composerExtensionClass.hasCustomFilename();
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#hasFeatureFolder()
+	 */
+	public boolean hasFeatureFolder() {
+		return composerExtensionClass.hasFeatureFolder();
 	}
 
 }

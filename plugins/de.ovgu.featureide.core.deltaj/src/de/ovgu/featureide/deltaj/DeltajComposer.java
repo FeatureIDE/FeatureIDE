@@ -19,7 +19,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.swt.widgets.Text;
 import org.xtext.example.util.DJIdeProperties;
 import org.xtext.example.util.ValidationStatus;
 
@@ -414,13 +413,12 @@ public class DeltajComposer implements IComposerExtensionClass {
 	}
 
 	@Override
-	public void editProjectWizard(Text sourcePath, Text equationsPath,
-			Text buildPath) {
-
+	public boolean hasCustomFilename() {
+		return true;
 	}
 
 	@Override
-	public boolean hasCustomFilename() {
+	public boolean hasFeatureFolder() {
 		return true;
 	}
 

@@ -313,7 +313,7 @@ public class CorePlugin extends AbstractCorePlugin {
 								// the project after adding the FeatureIDE
 								// nature
 								IFile equationFile = project.getFolder(
-										equationPath).getFile("default.config");
+										equationPath).getFile(project.getName().split("[-]")[0]+".config");
 								FileWriter fw = new FileWriter(equationFile
 										.getRawLocation().toFile());
 								fw.write("Base");

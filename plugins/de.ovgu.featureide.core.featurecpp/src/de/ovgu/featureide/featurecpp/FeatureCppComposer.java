@@ -24,7 +24,6 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.swt.widgets.Text;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
@@ -123,12 +122,6 @@ public class FeatureCppComposer implements IComposerExtensionClass {
 	}
 
 	@Override
-	public void editProjectWizard(Text sourcePath, Text equationsPath,
-			Text buildPath) {
-	
-	}
-
-	@Override
 	public int getDefaultTemplateIndex() {
 		
 		return 0;
@@ -138,5 +131,10 @@ public class FeatureCppComposer implements IComposerExtensionClass {
 	public boolean hasCustomFilename() {
 
 		return false;
+	}
+
+	@Override
+	public boolean hasFeatureFolder() {
+		return true;
 	}
 }
