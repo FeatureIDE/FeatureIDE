@@ -1,7 +1,0 @@
-//created on: Sat Dec 04 11:42:44 CST 2004
-
-public refines interface EdgeIfc
-{
-    public void setWeight( int weight );
-    public int getWeight();
-}
