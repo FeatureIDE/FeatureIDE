@@ -35,7 +35,6 @@ import djtemplates.DJStandaloneCompiler;
  * @author Fabian Benduhn
  */
 public class DeltajComposer implements IComposerExtensionClass {
-	public static final String JAVA_NATURE = "org.eclipse.jdt.core.javanature";
 	private String equationPath;
 	private String basePath;
 	private String outputPath;
@@ -47,7 +46,6 @@ public class DeltajComposer implements IComposerExtensionClass {
 	private Set<String> featureNames;
 
 	public void run() {
-
 		DJIdeProperties.changeValidationStatus(ValidationStatus.VALIDATE_ALL);
 		DJStandaloneCompiler compiler = new DJStandaloneCompiler(filename);
 		String uriPrefix = getUriPrefix();
@@ -148,21 +146,26 @@ public class DeltajComposer implements IComposerExtensionClass {
 
 	@Override
 	public boolean copyNotComposedFiles() {
-		try {
-			for (IResource res : featureProject.getSourceFolder().members()) {
-				if ((res.getFileExtension() == null || !res.getFileExtension()
+	copyFolderMembers(featureProject.getSourceFolder());
+		return false;
+	}
+	private void copyFolderMembers(IFolder folder){
+			try {
+			for (IResource res : folder.members()) {
+							if ((res.getFileExtension() == null || !res.getFileExtension()
 						.equals("dj")))
-
+					
 					res.copy(new Path(featureProject.getBuildFolder()
 							.getFullPath().toString()
 							+ "/" + res.getName()), true, null);
+				if(res instanceof IFolder){
+					copyFolderMembers((IFolder)res);
+				}
 			}
 		} catch (CoreException e) {
 			DeltajCorePlugin.getDefault().logError(e);
 		}
-		return true;
 	}
-
 	@Override
 	public void buildFSTModel() {
 
@@ -190,10 +193,8 @@ public class DeltajComposer implements IComposerExtensionClass {
 		return 1;
 	}
 
-	@Override
-	public void addCompiler(IProject project, String sourcePath,
-			String equationPath, String buildPath) {
-	}
+	
+	
 
 	@Override
 	public boolean hasFeatureFolders() {
@@ -212,33 +213,36 @@ public class DeltajComposer implements IComposerExtensionClass {
 
 		for (IResource res : folder.members()) {
 
-			if (res instanceof IFolder) {
-				handleSourceFiles((IFolder) res);
-			} else if (res instanceof IFile) {
+			
+		 if (res instanceof IFile) {
 				if (res.getName().endsWith(".dj")) {
 					updateFile(((IFile) res).getRawLocation().toFile());
 					res.refreshLocal(IResource.DEPTH_ZERO, null);
+					filename = res.getName();
+					sourceFilesAdded = true;
 				}
-				filename = res.getName();
-				sourceFilesAdded = true;
+				
 			}
 		}
 	}
 
 	private void updateFile(final File file) {
-
+	
 		String newFileText = null;
-		if (isCoreFile(file)) {
-			newFileText = getNewFileStringCore(file);
+		String oldFileText = fileToString(file.getAbsolutePath());
+		if (isCoreFile(oldFileText)) {
+			
+			newFileText = getNewFileStringCore(oldFileText,file.getName());
 
-		} else if (isDeltaFile(file)) {
-			newFileText = getNewFileStringDelta(file);
+		} else if (isDeltaFile(oldFileText)) {
+			
+			newFileText = getNewFileStringDelta(oldFileText,file.getName());
 		}
-
+		if(!newFileText.equals(oldFileText))
 		SaveStringToFile(newFileText, file);
 	}
 
-	private String getImportsString(File file) {
+	private String getImportsString(String fileName) {
 		IFolder folder = featureProject.getSourceFolder();
 		StringBuffer strBuf = new StringBuffer();
 
@@ -247,7 +251,7 @@ public class DeltajComposer implements IComposerExtensionClass {
 
 				if (res instanceof IFile) {
 					if (res.getName().endsWith(".dj")
-							&& !res.getName().equals(file.getName())) {
+							&& !res.getName().equals(fileName)) {
 
 						strBuf.append("import \"" + res.getName() + "\"\n");
 
@@ -303,31 +307,30 @@ public class DeltajComposer implements IComposerExtensionClass {
 
 	}
 
-	private boolean isCoreFile(File file) {
-		Matcher matcher = getMatcherFromFileTextCore(fileToString(file.getAbsolutePath()));
+	private boolean isCoreFile(String fileText) {
+		Matcher matcher = getMatcherFromFileTextCore(fileText);
 		return matcher.matches();
 	}
 
-	private boolean isDeltaFile(File file) {
-		Matcher matcher = getMatcherFromFileTextDelta(fileToString(file
-				.getAbsolutePath()));
+	private boolean isDeltaFile(String fileText) {
+		Matcher matcher = getMatcherFromFileTextDelta(fileText);
 		return matcher.matches();
 	}
 
-	private String getNewFileStringDelta(File file) {
-		String fileString = fileToString(file.getAbsolutePath());
+	private String getNewFileStringDelta(String fileText,String fileName) {
+		String fileString = fileToString(fileText);
 	
 		Matcher matcher = getMatcherFromFileTextDelta(fileString);
 	
 		StringBuffer buf = new StringBuffer(fileString);
 		if(matcher.matches())
-		buf.replace(matcher.start(1), matcher.end(1), getImportsString(file));
+		buf.replace(matcher.start(1), matcher.end(1), getImportsString(fileName));
 	
 		return buf.toString();
 	}
 
-	private String getNewFileStringCore(File file) {
-		Matcher matcher = getMatcherFromFileTextCore(fileToString(file.getAbsolutePath()));
+	private String getNewFileStringCore(String fileText,String fileName) {
+		Matcher matcher = getMatcherFromFileTextCore(fileText);
 		matcher.matches();
 		StringBuffer buf = new StringBuffer(matcher.group(0));
 		String configurationString = getConfigurationString(selectedFeatures);
@@ -339,7 +342,7 @@ public class DeltajComposer implements IComposerExtensionClass {
 		buf.replace(matcher2.start(3), matcher2.end(3), configurationString
 				+ "\n");
 
-		buf.replace(0, buf.indexOf("features"), getImportsString(file));
+		buf.replace(0, buf.indexOf("features"), getImportsString(fileName));
 
 		return buf.toString();
 
@@ -420,6 +423,12 @@ public class DeltajComposer implements IComposerExtensionClass {
 	@Override
 	public boolean hasFeatureFolder() {
 		return true;
+	}
+	//TODO add java and xtext nature
+	@Override
+	public void addCompiler(IProject project, String sourcePath,
+			String equationPath, String buildPath) {
+			
 	}
 
 }
