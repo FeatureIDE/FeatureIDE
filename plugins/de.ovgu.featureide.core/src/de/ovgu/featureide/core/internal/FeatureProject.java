@@ -635,7 +635,7 @@ IFeatureProject, IResourceChangeListener {
 
 	private ArrayList<IResource> resList = new ArrayList<IResource>();
 
-//	private boolean modelChanged = false;
+	private boolean modelChanged = false;
 
 	/**
 	 * refreshes Feature Module Markers for all folders in the source folder
@@ -782,8 +782,12 @@ IFeatureProject, IResourceChangeListener {
 			} else {
 				IResourceDelta delta = event.getDelta().findMember(
 						res.getFullPath());
-				if (delta != null && (delta.getFlags() & IResourceDelta.MARKERS) == 0) {
-					buildRelevantChanges = true;
+				if (delta != null) {
+					if (!modelChanged && 
+							(delta.getKind() == IResourceDelta.ADDED || 
+							(delta.getFlags() & IResourceDelta.CONTENT) != 0)) {
+						buildRelevantChanges = true;
+					}
 				}
 			}
 		}
@@ -798,7 +802,6 @@ IFeatureProject, IResourceChangeListener {
 						res.getFullPath());
 				if (delta != null) {
 					if (composerExtension != null) {
-						//TODO check if necessary
 						composerExtension.postCompile((IFile)res);
 					}
 				}
@@ -811,7 +814,7 @@ IFeatureProject, IResourceChangeListener {
 		if (delta == null || (delta.getFlags() & IResourceDelta.CONTENT) == 0)
 			return false;
 
-	//	modelChanged = true;
+		modelChanged = true;
 		Job job = new Job("Load Model") {
 			protected IStatus run(IProgressMonitor monitor) {
 
@@ -1105,7 +1108,7 @@ IFeatureProject, IResourceChangeListener {
 	 */
 	public void builded() {
 		buildRelevantChanges = false;
-//		modelChanged = false;
+		modelChanged = false;
 	}
 
 }

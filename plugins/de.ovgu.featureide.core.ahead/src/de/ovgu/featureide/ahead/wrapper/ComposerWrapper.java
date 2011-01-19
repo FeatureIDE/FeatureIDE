@@ -176,8 +176,7 @@ public class ComposerWrapper {
 		while ((line = reader.readLine()) != null) {
 			if (line.startsWith("#"))
 				continue;
-			featureFolders
-					.add(featureProject.getSourceFolder().getFolder(line));
+			featureFolders.add(featureProject.getSourceFolder().getFolder(line));
 		}
 		reader.close();
 		File file = featureProject.getProject().getLocation().toFile();
@@ -189,13 +188,22 @@ public class ComposerWrapper {
 					featureProject.getProject().getLocation().toFile());
 			list = reader2.featureOrderRead();
 		}
+		for (IFolder folder : featureFolders) {
+			allFeatureFolders.add(folder);
+		}
 		if (list == null || list.size() == 0) {	
 			for (String feature : featureProject.getFeatureModel().getLayerNames()) {
-				allFeatureFolders.add(featureProject.getSourceFolder().getFolder(feature));
+				IFolder folder = featureProject.getSourceFolder().getFolder(feature);
+				if (!allFeatureFolders.contains(folder)) {
+					allFeatureFolders.add(folder);
+				}
 			}
 		} else {
 			for (String feature : list) {
-				allFeatureFolders.add(featureProject.getSourceFolder().getFolder(feature));
+				IFolder folder = featureProject.getSourceFolder().getFolder(feature);
+				if (!allFeatureFolders.contains(folder)) {
+					allFeatureFolders.add(folder);
+				}
 			}
 		}
 		
@@ -349,12 +357,9 @@ public class ComposerWrapper {
 			return;
 		}
 		String layer = setLayer((IFolder)files[0].getParent());
-		
 		int i = 4;
 		if (layer == null) {
 			i = 2;
-		} else {
-			AheadCorePlugin.getDefault().logInfo("package :" + layer);
 		}
 		String[] args = new String[files.length + i];
 		IFolder outputfolder = setOutputFolder(layer);
