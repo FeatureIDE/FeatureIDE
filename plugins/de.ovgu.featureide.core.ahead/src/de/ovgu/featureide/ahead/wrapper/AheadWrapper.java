@@ -121,20 +121,24 @@ public class AheadWrapper {
 	}
 
 	public void postCompile(final IFile file) {
+		final IFile jakFile = ((IFolder)file.getParent()).getFile(file.getName().replace(".java",".jak"));
+		CorePlugin.getDefault();
+		final IFolder buildFolder = CorePlugin.getFeatureProject(jakFile).getBuildFolder();
+		if (!jakFile.exists())
+			return;
 		Job job = new Job("create builder problem marker") {
 			@Override
 			public IStatus run(IProgressMonitor monitor) {
 				try {
 					if (file.exists()) {
-						IFile jakFile = ((IFolder)file.getParent()).getFile(file.getName().replace(".java",".jak"));
 						if (jakFile.exists()) {
 							IMarker[] markers = file.findMarkers(null, false, IResource.DEPTH_ZERO);
 							if (markers != null) {
 								for (IMarker marker : markers) {
 									if (marker.exists()) {
-										AheadBuildErrorEvent buildError = new AheadBuildErrorEvent(file, marker.getAttribute(IMarker.MESSAGE).toString(), AheadBuildErrorType.JAVAC_ERROR, (Integer)marker.getAttribute(IMarker.LINE_NUMBER));
-										if (!buildError.getMessage().contains("is a raw type") && 
-												!buildError.getMessage().contains("generic type")) {
+										String content = marker.getAttribute(IMarker.MESSAGE, null);
+										if (!content.contains("is a raw type") && !content.contains("generic type")) {
+											AheadBuildErrorEvent buildError = new AheadBuildErrorEvent(file, marker.getAttribute(IMarker.MESSAGE).toString(), AheadBuildErrorType.JAVAC_ERROR, (Integer)marker.getAttribute(IMarker.LINE_NUMBER));
 											IMarker newMarker = buildError.getResource().createMarker(CorePlugin.PLUGIN_ID + ".builderProblemMarker");
 											newMarker.setAttribute(IMarker.LINE_NUMBER, buildError.getLine());
 											newMarker.setAttribute(IMarker.MESSAGE, buildError.getMessage());
@@ -145,10 +149,11 @@ public class AheadWrapper {
 									}
 								}
 							}
-							// Remove the composed Jak file after error propagation
 							jakFile.delete(true, null);
 						}
 					}
+					// Remove composed Jak files after error propagation
+					deleteJakFiles(buildFolder);
 				} catch (CoreException e) {
 					AheadCorePlugin.getDefault().logError(e);
 				}
@@ -157,6 +162,20 @@ public class AheadWrapper {
 		};
 	job.setPriority(Job.DECORATE);
 	job.schedule();
+	}
+
+	protected void deleteJakFiles(IFolder folder) throws CoreException {
+		for (IResource res : folder.members()) {
+			if (res instanceof IFile) {
+				if (res.getName().endsWith(".jak")) {
+					if (((IFolder)res.getParent()).getFile(res.getName().replace(".jak", ".java")).findMarkers(null, false, IResource.DEPTH_ZERO).length == 0) {
+						res.delete(true, null);
+					}
+				}
+			} else if (res instanceof IFolder) {
+				deleteJakFiles((IFolder)res);
+			}
+		}
 	}
 
 }

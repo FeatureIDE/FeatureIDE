@@ -21,6 +21,8 @@ package de.ovgu.featureide.featurehouse;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,12 +35,10 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.Path;
 
 import composer.FSTGenComposer;
 
 import de.ovgu.cide.fstgen.ast.AbstractFSTParser;
-import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.featurehouse.FSTParser.FSTParser;
@@ -53,9 +53,11 @@ import de.ovgu.featureide.core.featurehouse.FSTParser.JavaToken;
 public class FeatureHouseComposer implements IComposerExtensionClass {
 
 	public static final String JAVA_NATURE = "org.eclipse.jdt.core.javanature";
+	private static final String SOURCE_ENTRY = "\t<classpathentry kind=\"src\" path=\"";
+	private static final String EXCLUDE_ENTRY = "\t<classpathentry excluding=\"";
+	private static final String EXCLUDE_SOURCE_ENTRY = "\" kind=\"src\" path=\"";
 	
 	private IFeatureProject featureProject = null;
-	private String equation;
 
 	public FeatureHouseComposer() {
 	}
@@ -76,6 +78,17 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 
 		// A new FSTGenComposer instance is created every time, because this class
 		// seems to remember the FST from a previous build.
+		IFolder buildFolder = featureProject.getBuildFolder().getFolder(equation.getName().split("[.]")[0]);
+		if (!buildFolder.exists()) {
+			try {
+				buildFolder.create(true, true, null);
+			} catch (CoreException e) {
+				FeatureHouseCorePlugin.getDefault().logError(e);
+			}
+		}
+		
+		setJaveBuildPath(equation.getName().split("[.]")[0]);
+		
 		FSTGenComposer composer = new FSTGenComposer();
 		//TODO output should be generated directly at outputPath not at outputPath/equation
 		composer.run(new String[]{			
@@ -115,6 +128,52 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 			featureProject.getBuildFolder().refreshLocal(IResource.DEPTH_INFINITE, null);
 		} catch (CoreException e) {
 			FeatureHouseCorePlugin.getDefault().logError(e);
+		}
+	}
+
+	private void setJaveBuildPath(String buildPath) {
+		Scanner scanner = null;
+		FileWriter fw = null;
+		IFile iClasspathFile = featureProject.getProject().getFile(".classpath");
+		try {
+			File file = iClasspathFile.getRawLocation().toFile();
+			StringBuffer fileText = new StringBuffer();
+			scanner = new Scanner(file);
+			while (scanner.hasNext()) {
+				String line = scanner.nextLine();
+				if (line.contains(SOURCE_ENTRY)) {
+					fileText.append(SOURCE_ENTRY + featureProject.getBuildFolder().getName() + "/" + buildPath + "\"/>");
+					fileText.append("\r\n");
+				} else if (line.contains(EXCLUDE_ENTRY)) {
+					fileText.append(line.substring(0, line.indexOf(EXCLUDE_SOURCE_ENTRY) + EXCLUDE_SOURCE_ENTRY.length()) + 
+							featureProject.getBuildFolder().getName() + "/" + buildPath + "\"/>");
+					fileText.append("\r\n");
+				} else {
+					fileText.append(line);
+					fileText.append("\r\n");
+				}
+			}
+			String fileTextString = fileText.toString();			
+			fw = new FileWriter(file);
+			fw.write(fileTextString);
+			iClasspathFile.refreshLocal(IResource.DEPTH_ZERO, null);
+		} catch (FileNotFoundException e) {
+			FeatureHouseCorePlugin.getDefault().logError(e);
+		} catch (IOException e) {
+			FeatureHouseCorePlugin.getDefault().logError(e);
+		} catch (CoreException e) {
+			FeatureHouseCorePlugin.getDefault().logError(e);
+		} finally {
+			if(scanner!=null) {
+				scanner.close();
+				if(fw!=null) {
+					try {
+						fw.close();
+					} catch (IOException e) {
+						FeatureHouseCorePlugin.getDefault().logError(e);
+					}	
+				}
+			}
 		}
 	}
 
@@ -169,7 +228,6 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 	@Override
 	public boolean copyNotComposedFiles() {
 		try {
-			equation = featureProject.getCurrentEquationFile().getName().split("[.]")[0];
 			copy(featureProject.getCurrentEquationFile());
 		} catch (CoreException e) {
 			FeatureHouseCorePlugin.getDefault().logError(e);
@@ -178,58 +236,37 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 	}
 	
 	// copies all not composed Files of selected Features from src to bin and build
-	private void copy(IFile equation) throws CoreException{
-		boolean binFolderExists = false;
-		if (featureProject.getBinFolder() != null)
-			binFolderExists = (featureProject.getBinFolder().exists());
+	private void copy(IFile equation) throws CoreException {
 		ArrayList<String > selectedFeatures = getSelectedFeatures(equation);
 		if (selectedFeatures != null)
-			for (String feature : selectedFeatures)
-				if (featureProject.getSourceFolder().getFolder(feature).exists())
-					for(IResource res : featureProject.getSourceFolder().getFolder(feature).members())
-						copyNotComposedFiles(null, res, binFolderExists);
-	}
-	
-	private void copyNotComposedFiles(String folderName, IResource res, boolean binFolderExists) throws CoreException {
-		boolean notComposed = true;
-		for (String extension : featureProject.getComposer().extensions())
-			if (res.getName().endsWith(extension))
-				notComposed = false;
-		if (notComposed){
-			if (res instanceof IFile){
-				if (folderName == null) {
-					if (!featureProject.getBuildFolder().getFolder(equation).getFile(res.getName()).exists())
-						res.copy(new Path (featureProject.getBuildFolder().getFolder(equation).getFullPath().toString()+"/"+res.getName()), true, null);
-					if (binFolderExists)
-						if (!featureProject.getBuildFolder().getFolder(equation).getFile(res.getName()).exists())
-							res.copy(new Path (featureProject.getBinFolder().getFolder(equation).getFullPath().toString()+"/"+res.getName()), true, null);
-				} else {
-					if (!featureProject.getBuildFolder().getFolder(equation).getFolder(folderName).getFile(res.getName()).exists())
-						res.copy(new Path (featureProject.getBuildFolder().getFolder(equation).getFolder(folderName).getFullPath().toString()+"/"+res.getName()), true, null);
-					if (binFolderExists)
-						if (!featureProject.getBuildFolder().getFolder(equation).getFolder(folderName).getFile(res.getName()).exists())
-							res.copy(new Path (featureProject.getBinFolder().getFolder(equation).getFolder(folderName).getFullPath().toString()+"/"+res.getName()), true, null);
-				}
+			for (String feature : selectedFeatures) {
+				IFolder folder = featureProject.getSourceFolder().getFolder(feature);
+				copy(folder, featureProject.getBuildFolder().getFolder(equation.getName().split("[.]")[0]));
 			}
-			if (res instanceof IFolder){
-				if (folderName == null) {
-					createFolder(featureProject.getBuildFolder().getName()+"/"+equation+"/"+res.getName());
-					if (binFolderExists)
-						createFolder(featureProject.getBinFolder().getName()+"/"+equation+"/"+res.getName());
-					for (IResource res2 : ((IFolder) res).members())
-						copyNotComposedFiles(res.getName(), res2, binFolderExists);
-				} else {
-					createFolder(featureProject.getBuildFolder().getName()+"/"+equation+"/"+folderName+"/"+res.getName());
-					if (binFolderExists)
-						createFolder(featureProject.getBinFolder().getName()+"/"+equation+"/"+folderName+"/"+res.getName());
-					for (IResource res2 : ((IFolder) res).members())
-						copyNotComposedFiles(folderName+"/"+res.getName(), res2, binFolderExists);
+	}
+
+	private void copy(IFolder featureFolder, IFolder buildFolder) throws CoreException {
+		if (!featureFolder.exists()) {
+			return;
+		}
+		
+		for (IResource res : featureFolder.members()) {
+			if (res instanceof IFolder) {
+				IFolder folder = buildFolder.getFolder(res.getName());
+				if (!folder.exists()) {
+					folder.create(false, true, null);
+				}
+				copy((IFolder)res, folder);
+			} else if (res instanceof IFile) {
+				if (!extensions().contains(res.getName().split("[.]")[1])) {
+					IFile file = buildFolder.getFile(res.getName());
+					if (!file.exists()) {
+						res.copy(file.getFullPath(), true, null);
+					}
 				}
 			}
 		}
-		
 	}
-
 
 	private static ArrayList<String> getSelectedFeatures(IFile equation) {
 		File equationFile = equation.getRawLocation().toFile();
@@ -258,17 +295,6 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 		}
 		return list;
 	}
-
-	private void createFolder(String name) {
-		IFolder folder = featureProject.getProject().getFolder(name);
-		try {
-			if (!folder.exists())
-				folder.create(false, true, null);
-		} catch (CoreException e) {
-			CorePlugin.getDefault().logError(e);
-		}
-	}
-	
 
 	@Override
 	public boolean postAddNature(IFolder source, IFolder destination) {

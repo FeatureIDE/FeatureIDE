@@ -32,7 +32,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
@@ -209,58 +208,37 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 	}
 	
 	// copies all not composed Files of selected Features from src to bin and build
-	private void copy(IFile equation) throws CoreException{
-		boolean binFolderExists = false;
-		if (featureProject.getBinFolder() != null)
-			binFolderExists = (featureProject.getBinFolder().exists());
+	private void copy(IFile equation) throws CoreException {
 		ArrayList<String > selectedFeatures = getSelectedFeatures(equation);
 		if (selectedFeatures != null)
-			for (String feature : selectedFeatures)
-				if (featureProject.getSourceFolder().getFolder(feature).exists())
-					for(IResource res : featureProject.getSourceFolder().getFolder(feature).members())
-						copyNotComposedFiles(null, res, binFolderExists);
+			for (String feature : selectedFeatures) {
+				IFolder folder = featureProject.getSourceFolder().getFolder(feature);
+				copy(folder, featureProject.getBuildFolder());
+			}
 	}
 	
-	private void copyNotComposedFiles(String folderName, IResource res, boolean binFolderExists) throws CoreException {
-		boolean notComposed = true;
-		for (String extension : featureProject.getComposer().extensions())
-			if (res.getName().endsWith(extension))
-				notComposed = false;
-		if (notComposed){
-			if (res instanceof IFile){
-				if (folderName == null) {
-					if (!featureProject.getBuildFolder().getFile(res.getName()).exists())
-						res.copy(new Path (featureProject.getBuildFolder().getFullPath().toString()+"/"+res.getName()), true, null);
-					if (binFolderExists)
-						if (!featureProject.getBuildFolder().getFile(res.getName()).exists())
-							res.copy(new Path (featureProject.getBinFolder().getFullPath().toString()+"/"+res.getName()), true, null);
-				} else {
-					if (!featureProject.getBuildFolder().getFolder(folderName).getFile(res.getName()).exists())
-						res.copy(new Path (featureProject.getBuildFolder().getFolder(folderName).getFullPath().toString()+"/"+res.getName()), true, null);
-					if (binFolderExists)
-						if (!featureProject.getBuildFolder().getFolder(folderName).getFile(res.getName()).exists())
-							res.copy(new Path (featureProject.getBinFolder().getFolder(folderName).getFullPath().toString()+"/"+res.getName()), true, null);
+	private void copy(IFolder featureFolder, IFolder buildFolder) throws CoreException {
+		if (!featureFolder.exists()) {
+			return;
+		}
+		
+		for (IResource res : featureFolder.members()) {
+			if (res instanceof IFolder) {
+				IFolder folder = buildFolder.getFolder(res.getName());
+				if (!folder.exists()) {
+					folder.create(false, true, null);
 				}
-			}
-			if (res instanceof IFolder){
-				if (folderName == null) {
-					createFolder(featureProject.getBuildFolder().getName()+"/"+res.getName());
-					if (binFolderExists)
-						createFolder(featureProject.getBinFolder().getName()+"/"+res.getName());
-					for (IResource res2 : ((IFolder) res).members())
-						copyNotComposedFiles(res.getName(), res2, binFolderExists);
-				} else {
-					createFolder(featureProject.getBuildFolder().getName()+"/"+folderName+"/"+res.getName());
-					if (binFolderExists)
-						createFolder(featureProject.getBinFolder().getName()+"/"+folderName+"/"+res.getName());
-					for (IResource res2 : ((IFolder) res).members())
-						copyNotComposedFiles(folderName+"/"+res.getName(), res2, binFolderExists);
+				copy((IFolder)res, folder);
+			} else if (res instanceof IFile) {
+				if (!composerExtension.extensions().contains(res.getName().split("[.]")[1])) {
+					IFile file = buildFolder.getFile(res.getName());
+					if (!file.exists()) {
+						res.copy(file.getFullPath(), true, null);
+					}
 				}
 			}
 		}
-		
 	}
-
 
 	private static ArrayList<String> getSelectedFeatures(IFile equation) {
 		File equationFile = equation.getRawLocation().toFile();
@@ -297,13 +275,4 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		return list;
 	}
 
-	private void createFolder(String name) {
-		IFolder folder = featureProject.getProject().getFolder(name);
-		try {
-			if (!folder.exists())
-				folder.create(false, true, null);
-		} catch (CoreException e) {
-			CorePlugin.getDefault().logError(e);
-		}
-	}
 }

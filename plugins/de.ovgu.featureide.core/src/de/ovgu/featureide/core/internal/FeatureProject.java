@@ -801,8 +801,10 @@ IFeatureProject, IResourceChangeListener {
 				IResourceDelta delta = event.getDelta().findMember(
 						res.getFullPath());
 				if (delta != null) {
-					if (composerExtension != null) {
-						composerExtension.postCompile((IFile)res);
+					if (composerExtension != null){
+						if (delta.getKind() != IResourceDelta.ADDED) {//&& ((delta.getFlags()& IResourceDelta.MARKERS) != 0)) {
+							composerExtension.postCompile((IFile)res);
+						}
 					}
 				}
 			}
