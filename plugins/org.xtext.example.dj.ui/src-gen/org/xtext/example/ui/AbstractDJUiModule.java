@@ -105,7 +105,7 @@ public abstract class AbstractDJUiModule extends DefaultUiModule {
 
 	// contributed by org.eclipse.xtext.generator.builder.BuilderIntegrationFragment
 	public Class<? extends org.eclipse.xtext.ui.editor.IXtextEditorCallback> bindIXtextEditorCallback() {
-		return org.eclipse.xtext.ui.editor.IXtextEditorCallback.NullImpl.class;
+		return org.eclipse.xtext.builder.nature.NatureAddingEditorCallback.class;
 	}
 
 	// contributed by org.eclipse.xtext.ui.generator.quickfix.QuickfixProviderFragment

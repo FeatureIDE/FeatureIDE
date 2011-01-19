@@ -25,7 +25,10 @@ public class DJUiModule extends org.xtext.example.ui.AbstractDJUiModule {
 		binder.bind(String.class).annotatedWith(Names.named(XtextContentAssistProcessor.
 				                                COMPLETION_AUTO_ACTIVATION_CHARS)).toInstance( ".+");
 	}
-	
+	@Override
+	public Class<? extends org.eclipse.xtext.ui.editor.IXtextEditorCallback> bindIXtextEditorCallback() {
+		return org.eclipse.xtext.ui.editor.IXtextEditorCallback.NullImpl.class;
+	}
 	/* (non-Javadoc)
 	 * @see org.xtext.example.ui.AbstractDJUiModule#bindISemanticModelTransformer()
 	 */
