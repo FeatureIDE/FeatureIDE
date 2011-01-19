@@ -16,6 +16,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 
@@ -412,7 +413,7 @@ public class AspectJComposer implements IComposerExtensionClass {
 	}
 
 	@Override
-	public void postCompile(IFile file) {
+	public void postCompile(IResourceDelta delta, IFile file) {
 	}
 
 	@Override

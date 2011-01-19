@@ -34,6 +34,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.ahead.wrapper.AheadBuildErrorEvent;
@@ -210,9 +211,11 @@ public class AheadComposer implements IComposerExtensionClass {
 	}
 
 	@Override
-	public void postCompile(IFile file) {
-		if (file.getName().endsWith(".java")) {
-			ahead.postCompile(file);
+	public void postCompile(IResourceDelta delta, IFile file) {
+		if (delta.getKind() != IResourceDelta.ADDED) {
+			if (file.getName().endsWith(".java")) {
+				ahead.postCompile(file);
+			}
 		}
 	}
 

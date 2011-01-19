@@ -20,6 +20,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -464,7 +465,7 @@ public class DeltajComposer implements IComposerExtensionClass {
 	}
 
 	@Override
-	public void postCompile(final IFile file) {
+	public void postCompile(IResourceDelta delta, final IFile file) {
 		Job job = new Job("create builder problem marker") {
 			@Override
 			public IStatus run(IProgressMonitor monitor) {

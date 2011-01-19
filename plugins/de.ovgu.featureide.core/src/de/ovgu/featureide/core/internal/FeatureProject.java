@@ -802,9 +802,8 @@ IFeatureProject, IResourceChangeListener {
 						res.getFullPath());
 				if (delta != null) {
 					if (composerExtension != null){
-						if (delta.getKind() != IResourceDelta.ADDED) {//&& ((delta.getFlags()& IResourceDelta.MARKERS) != 0)) {
-							composerExtension.postCompile((IFile)res);
-						}
+					//&& ((delta.getFlags()& IResourceDelta.MARKERS) != 0)) {
+							composerExtension.postCompile(delta, (IFile)res);
 					}
 				}
 			}

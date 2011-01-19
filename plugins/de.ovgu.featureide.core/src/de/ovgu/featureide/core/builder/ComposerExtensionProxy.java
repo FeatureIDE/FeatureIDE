@@ -24,6 +24,7 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 
@@ -185,8 +186,8 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#prebuild()
 	 */
-	public void postCompile(IFile file) {
-		composerExtensionClass.postCompile(file);
+	public void postCompile(IResourceDelta delta, IFile file) {
+		composerExtensionClass.postCompile(delta, file);
 	}
 
 	/* (non-Javadoc)

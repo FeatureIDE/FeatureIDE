@@ -24,6 +24,7 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResourceDelta;
 
 import de.ovgu.featureide.core.IFeatureProject;
 
@@ -107,9 +108,10 @@ public interface IComposerExtensionClass {
 	
 	/**
 	 * This method is called after changes at a file of the buildfolder.
+	 * @param delta 
 	 * @param buildFile 
 	 */
-	void postCompile(IFile buildFile);
+	void postCompile(IResourceDelta delta, IFile buildFile);
 	
 	/**
 	 * folders for each feature will be created if true

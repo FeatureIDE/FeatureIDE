@@ -24,6 +24,7 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResourceDelta;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
@@ -105,7 +106,7 @@ public class FeatureCppComposer implements IComposerExtensionClass {
 	}
 	
 	@Override
-	public void postCompile(IFile file) {
+	public void postCompile(IResourceDelta delta, IFile file) {
 	}
 
 	@Override

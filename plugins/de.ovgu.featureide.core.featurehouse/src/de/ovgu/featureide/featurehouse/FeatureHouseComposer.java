@@ -34,6 +34,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 
 import composer.FSTGenComposer;
@@ -329,8 +330,17 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 		return list;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
-	public void postCompile(IFile file) {
+	public void postCompile(IResourceDelta delta, IFile file) {
+		try {	
+			file.setDerived(true);
+			if (delta.getKind() == IResourceDelta.ADDED) {
+				file.refreshLocal(IResource.DEPTH_ZERO, null);
+			}
+		} catch (CoreException e) {
+			FeatureHouseCorePlugin.getDefault().logError(e);
+		}
 	}
 
 	@Override
