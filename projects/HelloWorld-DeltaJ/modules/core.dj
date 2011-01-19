@@ -3,7 +3,7 @@ import "DWonderful.dj"
 import "DWorld.dj"
 
 features World, Feature, Wonderful, HelloWorld, Beautiful, Hello
-configurations Beautiful, Feature, Hello, HelloWorld, World;
+configurations Hello, HelloWorld, World;
 core Hello {
 	class Main {
 		void print() {

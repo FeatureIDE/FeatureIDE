@@ -34,7 +34,6 @@
 	</buildSpec>
 	<natures>
 		<nature>de.ovgu.featureide.core.featureProjectNature</nature>
-		<nature>org.eclipse.xtext.ui.shared.xtextNature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
 </projectDescription>
