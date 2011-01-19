@@ -168,6 +168,7 @@ public class CorePlugin extends AbstractCorePlugin {
 
 		IFeatureProject data = new FeatureProject(project);
 		featureProjectMap.put(project, data);
+		logInfo(project.getName() + " added");
 
 		for (IProjectListener listener : projectListeners)
 			listener.projectAdded(data);
