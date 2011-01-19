@@ -44,7 +44,6 @@ import djtemplates.DJStandaloneCompiler;
  */
 public class DeltajComposer implements IComposerExtensionClass {
 	public static final String JAVA_NATURE = "org.eclipse.jdt.core.javanature";
-	private static final String XTEXT_NATURE = "org.eclipse.xtext.ui.shared.xtextNature";
 	private String equationPath;
 	private String basePath;
 	private String outputPath;
@@ -212,9 +211,8 @@ public class DeltajComposer implements IComposerExtensionClass {
 	public void addCompiler(IProject project, String sourcePath,
 			String equationPath, String buildPath) {
 		addNature(project, JAVA_NATURE);
-
 		addClasspathFile(project, sourcePath, equationPath, buildPath);
-		addNature(project, XTEXT_NATURE);
+
 	}
 
 	private void addClasspathFile(IProject project, String sourcePath,
