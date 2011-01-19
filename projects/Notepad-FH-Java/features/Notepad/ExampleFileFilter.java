@@ -1,5 +1,3 @@
-package notepad;
-
 /*
  * Copyright (c) 2002 Sun Microsystems, Inc. All  Rights Reserved.
  *

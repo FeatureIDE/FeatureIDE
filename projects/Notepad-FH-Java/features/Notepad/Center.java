@@ -1,6 +1,3 @@
-package notepad;
-
-//import the packages for using the classes in them into this class
 import java.awt.*;
 /**
  *A PUBLIC CLASS FOR CENTER.JAVA

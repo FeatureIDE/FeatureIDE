@@ -1,5 +1,3 @@
-package notepad;
-
 class Actions{
     private String findword; //for searching & finding the word
     //this is a method for searching the input text from the text area

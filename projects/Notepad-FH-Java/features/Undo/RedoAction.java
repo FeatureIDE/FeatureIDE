@@ -1,6 +1,3 @@
-package notepad;
-
-//import the packages for using the classes in them into the program
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.undo.*;

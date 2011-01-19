@@ -1,15 +1,3 @@
-package notepad;
-
-// indicate "base" layer
-
-/**
- *This is a JAVA� program for writing, opening, saving, editing the documents,
- *has the ability to copy, cut, paste & select all text in the JTextArea,
- *has @see ExampleFileFilter class (From SUN� -http://java.sun.com-) for filter the file
- *has a print class (from AarbTeam2000� -http://wwww.arabteam2000.com-) for printing the documents
- */
-
-//import the packages for using the classes in them into the program
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;

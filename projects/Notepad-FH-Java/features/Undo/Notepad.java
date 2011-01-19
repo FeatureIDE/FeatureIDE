@@ -1,5 +1,3 @@
-
-
 import javax.swing.undo.*;
 import javax.swing.event.*;
 
