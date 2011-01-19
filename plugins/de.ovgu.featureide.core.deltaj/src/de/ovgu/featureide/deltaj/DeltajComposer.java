@@ -16,15 +16,20 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.xtext.example.util.DJIdeProperties;
 import org.xtext.example.util.ValidationStatus;
-
+import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.fm.core.Feature;
@@ -51,7 +56,7 @@ public class DeltajComposer implements IComposerExtensionClass {
 	private Set<String> featureNames;
 
 	public void run() {
-	
+
 		DJIdeProperties.changeValidationStatus(ValidationStatus.VALIDATE_ALL);
 		DJStandaloneCompiler compiler = new DJStandaloneCompiler(filename);
 		String uriPrefix = getUriPrefix();
@@ -152,28 +157,30 @@ public class DeltajComposer implements IComposerExtensionClass {
 
 	@Override
 	public boolean copyNotComposedFiles() {
-	copyFolderMembers(featureProject.getSourceFolder());
+		copyFolderMembers(featureProject.getSourceFolder());
 		return false;
 	}
-	private void copyFolderMembers(IFolder folder){
-	
+
+	private void copyFolderMembers(IFolder folder) {
+
 		try {
 			for (IResource res : folder.members()) {
-		
+
 				if ((res.getFileExtension() == null || !res.getFileExtension()
 						.equals("dj")))
-					
+
 					res.copy(new Path(featureProject.getBuildFolder()
 							.getFullPath().toString()
 							+ "/" + res.getName()), true, null);
-				if(res instanceof IFolder){
-					copyFolderMembers((IFolder)res);
+				if (res instanceof IFolder) {
+					copyFolderMembers((IFolder) res);
 				}
 			}
 		} catch (CoreException e) {
 			DeltajCorePlugin.getDefault().logError(e);
 		}
 	}
+
 	@Override
 	public void buildFSTModel() {
 
@@ -204,13 +211,12 @@ public class DeltajComposer implements IComposerExtensionClass {
 	@Override
 	public void addCompiler(IProject project, String sourcePath,
 			String equationPath, String buildPath) {
-		addNature(project,JAVA_NATURE);
-	
+		addNature(project, JAVA_NATURE);
+
 		addClasspathFile(project, sourcePath, equationPath, buildPath);
-	addNature(project,XTEXT_NATURE);
+		addNature(project, XTEXT_NATURE);
 	}
-	
-	
+
 	private void addClasspathFile(IProject project, String sourcePath,
 			String equationPath, String buildPath) {
 		IFile iClasspathFile = project.getFile(".classpath");
@@ -225,12 +231,14 @@ public class DeltajComposer implements IComposerExtensionClass {
 				bin = "bin3";
 			}
 			try {
-				String text = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + 
-			 				  "<classpath>\n" +  
-			 				  "<classpathentry kind=\"src\" path=\"" + buildPath + "\"/>\n" + 
-			 				  "<classpathentry kind=\"con\" path=\"org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6\"/>\n" + 
-			 				  "<classpathentry kind=\"output\" path=\"" + bin + "\"/>\n" + 
-			 				  "</classpath>"; 
+				String text = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+						+ "<classpath>\n"
+						+ "<classpathentry kind=\"src\" path=\""
+						+ buildPath
+						+ "\"/>\n"
+						+ "<classpathentry kind=\"con\" path=\"org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6\"/>\n"
+						+ "<classpathentry kind=\"output\" path=\"" + bin
+						+ "\"/>\n" + "</classpath>";
 				InputStream source = new ByteArrayInputStream(text.getBytes());
 				iClasspathFile.create(source, true, null);
 			} catch (CoreException e) {
@@ -239,9 +247,10 @@ public class DeltajComposer implements IComposerExtensionClass {
 
 		}
 	}
-	private void addNature(IProject project,String nature) {
+
+	private void addNature(IProject project, String nature) {
 		try {
-	
+
 			if (!project.isAccessible() || project.hasNature(nature))
 				return;
 
@@ -251,13 +260,13 @@ public class DeltajComposer implements IComposerExtensionClass {
 			System.arraycopy(natures, 0, newNatures, 0, natures.length);
 			newNatures[natures.length] = nature;
 			description.setNatureIds(newNatures);
-		
-			
+
 			project.setDescription(description, null);
 		} catch (CoreException e) {
 			DeltajCorePlugin.getDefault().logError(e);
 		}
 	}
+
 	@Override
 	public boolean hasFeatureFolders() {
 
@@ -275,33 +284,32 @@ public class DeltajComposer implements IComposerExtensionClass {
 
 		for (IResource res : folder.members()) {
 
-			
-		 if (res instanceof IFile) {
+			if (res instanceof IFile) {
 				if (res.getName().endsWith(".dj")) {
 					updateFile(((IFile) res).getRawLocation().toFile());
 					res.refreshLocal(IResource.DEPTH_ZERO, null);
 					filename = res.getName();
 					sourceFilesAdded = true;
 				}
-				
+
 			}
 		}
 	}
 
 	private void updateFile(final File file) {
-	
+
 		String newFileText = null;
 		String oldFileText = fileToString(file.getAbsolutePath());
 		if (isCoreFile(oldFileText)) {
-			
+
 			newFileText = getNewFileStringCore(file);
 
 		} else if (isDeltaFile(oldFileText)) {
-			
+
 			newFileText = getNewFileStringDelta(file);
 		}
-		if(!newFileText.equals(oldFileText))
-		SaveStringToFile(newFileText, file);
+		if (!newFileText.equals(oldFileText))
+			SaveStringToFile(newFileText, file);
 	}
 
 	private String getImportsString(String fileName) {
@@ -330,11 +338,11 @@ public class DeltajComposer implements IComposerExtensionClass {
 	}
 
 	private static Matcher getMatcherFromFileTextCore(String fileText) {
-	
+
 		String patternString = "^(.*)features(.*)configurations(.*)core(.*?)\\{(.*)\\}.*$";
 		Pattern pattern = Pattern.compile(patternString, Pattern.DOTALL);
 		return pattern.matcher(fileText);
-	
+
 	}
 
 	private Matcher getMatcherFromFileTextDelta(String fileText) {
@@ -381,13 +389,14 @@ public class DeltajComposer implements IComposerExtensionClass {
 
 	private String getNewFileStringDelta(File file) {
 		String fileString = fileToString(file.getAbsolutePath());
-	
+
 		Matcher matcher = getMatcherFromFileTextDelta(fileString);
-	
+
 		StringBuffer buf = new StringBuffer(fileString);
-		if(matcher.matches())
-		buf.replace(matcher.start(1), matcher.end(1), getImportsString(file.getName()));
-	
+		if (matcher.matches())
+			buf.replace(matcher.start(1), matcher.end(1),
+					getImportsString(file.getName()));
+
 		return buf.toString();
 	}
 
@@ -405,7 +414,8 @@ public class DeltajComposer implements IComposerExtensionClass {
 		buf.replace(matcher2.start(3), matcher2.end(3), configurationString
 				+ "\n");
 
-		buf.replace(0, buf.indexOf("features"), getImportsString(file.getName()));
+		buf.replace(0, buf.indexOf("features"),
+				getImportsString(file.getName()));
 
 		return buf.toString();
 
@@ -430,8 +440,6 @@ public class DeltajComposer implements IComposerExtensionClass {
 
 		return getFeatureString(selectedFeatures).concat(";");
 	}
-
-
 
 	private static String fileToString(String filePath) {
 		byte[] buffer = new byte[(int) new File(filePath).length()];
@@ -458,8 +466,44 @@ public class DeltajComposer implements IComposerExtensionClass {
 	}
 
 	@Override
-	public void postCompile(IFile file) {
+	public void postCompile(final IFile file) {
+		Job job = new Job("create builder problem marker") {
+			@Override
+			public IStatus run(IProgressMonitor monitor) {
+				try {
+					if (file.exists() && !file.getFileExtension().equals("dj")) {
+						IMarker[] markers = file.findMarkers(null, false,
+								IResource.DEPTH_ZERO);
+						if (markers.length!=0) {
+							for (IMarker marker : markers) {
+								if (marker.exists()) {
 
+									IResource res = featureProject
+											.getSourceFolder().findMember(
+													file.getName());
+									if (res != null) {
+										IMarker newMarker = res
+												.createMarker(CorePlugin.PLUGIN_ID
+														+ ".builderProblemMarker");
+										newMarker.setAttributes(marker
+												.getAttributes());
+									}
+
+								} else {
+									marker.delete();
+								}
+							}
+						}
+					}
+
+				} catch (CoreException e) {
+					DeltajCorePlugin.getDefault().logError(e);
+				}
+				return Status.OK_STATUS;
+			}
+		};
+		job.setPriority(Job.DECORATE);
+		job.schedule();
 	}
 
 	@Override

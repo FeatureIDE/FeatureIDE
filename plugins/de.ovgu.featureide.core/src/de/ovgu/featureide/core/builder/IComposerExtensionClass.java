@@ -63,7 +63,7 @@ public interface IComposerExtensionClass {
 	
 	/**
 	 * 
-	 * @return true if project has not to be cleaned anymore
+	 * @return  true if clean should be performed before every build
 	 */
 	boolean clean();
 	
