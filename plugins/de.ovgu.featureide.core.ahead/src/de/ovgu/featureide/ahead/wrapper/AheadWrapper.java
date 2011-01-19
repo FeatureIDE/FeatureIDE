@@ -126,22 +126,27 @@ public class AheadWrapper {
 			public IStatus run(IProgressMonitor monitor) {
 				try {
 					if (file.exists()) {
-						IMarker[] markers = file.findMarkers(null, false, IResource.DEPTH_ZERO);
-						if (markers != null) {
-							for (IMarker marker : markers) {
-								if (marker.exists()) {
-									AheadBuildErrorEvent buildError = new AheadBuildErrorEvent(file, marker.getAttribute(IMarker.MESSAGE).toString(), AheadBuildErrorType.JAVAC_ERROR, (Integer)marker.getAttribute(IMarker.LINE_NUMBER));
-									if (!buildError.getMessage().contains("is a raw type") && 
-											!buildError.getMessage().contains("generic type")) {
-										IMarker newMarker = buildError.getResource().createMarker(CorePlugin.PLUGIN_ID + ".builderProblemMarker");
-										newMarker.setAttribute(IMarker.LINE_NUMBER, buildError.getLine());
-										newMarker.setAttribute(IMarker.MESSAGE, buildError.getMessage());
-										newMarker.setAttribute(IMarker.SEVERITY, marker.getAttribute(IMarker.SEVERITY));
-									} else {
-										marker.delete();
+						IFile jakFile = ((IFolder)file.getParent()).getFile(file.getName().replace(".java",".jak"));
+						if (jakFile.exists()) {
+							IMarker[] markers = file.findMarkers(null, false, IResource.DEPTH_ZERO);
+							if (markers != null) {
+								for (IMarker marker : markers) {
+									if (marker.exists()) {
+										AheadBuildErrorEvent buildError = new AheadBuildErrorEvent(file, marker.getAttribute(IMarker.MESSAGE).toString(), AheadBuildErrorType.JAVAC_ERROR, (Integer)marker.getAttribute(IMarker.LINE_NUMBER));
+										if (!buildError.getMessage().contains("is a raw type") && 
+												!buildError.getMessage().contains("generic type")) {
+											IMarker newMarker = buildError.getResource().createMarker(CorePlugin.PLUGIN_ID + ".builderProblemMarker");
+											newMarker.setAttribute(IMarker.LINE_NUMBER, buildError.getLine());
+											newMarker.setAttribute(IMarker.MESSAGE, buildError.getMessage());
+											newMarker.setAttribute(IMarker.SEVERITY, marker.getAttribute(IMarker.SEVERITY));
+										} else {
+											marker.delete();
+										}
 									}
 								}
 							}
+							// Remove the composed Jak file after error propagation
+							jakFile.delete(true, null);
 						}
 					}
 				} catch (CoreException e) {

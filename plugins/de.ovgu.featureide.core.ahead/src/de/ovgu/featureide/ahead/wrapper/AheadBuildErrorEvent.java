@@ -72,7 +72,9 @@ public class AheadBuildErrorEvent {
 	private void initJavacErrorEvent() {
 		try {
 			convertToComposedJak();
-			calculateJakLine();
+			if (file.exists()) {
+				calculateJakLine();
+			}
 		} catch (Exception e) {
 			//if calculation failes the error will be at the old position
 			AheadCorePlugin.getDefault().logError(e);
