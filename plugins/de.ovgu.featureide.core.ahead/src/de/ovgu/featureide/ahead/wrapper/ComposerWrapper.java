@@ -163,7 +163,7 @@ public class ComposerWrapper {
 		featureFolders.clear();
 		IFile equation;
 		if (equationFile == null) {
-			equation = featureProject.getCurrentEquationFile();
+			equation = featureProject.getCurrentConfiguration();
 		} else {
 			equation = equationFile;
 		}
@@ -285,7 +285,6 @@ public class ComposerWrapper {
 		return composedFilesArray;
 	}
 
-	@SuppressWarnings("deprecation")
 	private void composeJakFiles(IFolder compositionDir) {
 		composedFiles.clear();
 			
@@ -337,7 +336,7 @@ public class ComposerWrapper {
 			try {
 				newJakIFile.refreshLocal(IResource.DEPTH_ZERO, null);
 				if (newJakIFile.exists()) {
-					newJakIFile.setDerived(true);
+					newJakIFile.setDerived(true, null);
 					ResourceAttributes attr = newJakIFile
 							.getResourceAttributes();
 					if (attr != null) {

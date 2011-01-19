@@ -182,7 +182,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 							
 						} else if (featureProject != null){
 							//case: open editor is no configuration editor
-							IFile file = featureProject.getCurrentEquationFile();
+							IFile file = featureProject.getCurrentConfiguration();
 							if (file != null) {
 								if (builder.configuration.equals(file.getName())) {
 									return;
@@ -205,7 +205,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 			model.collaborations.add(new Collaboration("Open a file from a FeatureIDE project"));
 			viewer.setContents(model);
 		} else {
-			if (featureProject.getCurrentEquationFile() == null){
+			if (featureProject.getCurrentConfiguration() == null){
 				model = new CollaborationModel();
 				model.collaborations.add(new Collaboration("Please create a new configuration file"));
 				viewer.setContents(model);

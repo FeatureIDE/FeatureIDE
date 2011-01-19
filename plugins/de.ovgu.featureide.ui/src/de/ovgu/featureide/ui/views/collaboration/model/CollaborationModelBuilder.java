@@ -108,8 +108,8 @@ public class CollaborationModelBuilder {
 		project = featureProject;
 		
 		//Add the configuration to the model  
-		if (configuration.equals("") || configuration.equals(featureProject.getCurrentEquationFile().getName())) {
-			collaboration = new Collaboration(featureProject.getCurrentEquationFile().getName().split("[.]")[0]);
+		if (configuration.equals("") || configuration.equals(featureProject.getCurrentConfiguration().getName())) {
+			collaboration = new Collaboration(featureProject.getCurrentConfiguration().getName().split("[.]")[0]);
 			collaboration.selected = true;
 			collaboration.isConfiguration = true;
 		} else {
@@ -350,7 +350,7 @@ public class CollaborationModelBuilder {
 		final IFile iFile;
 		ArrayList<Feature> list = new ArrayList<Feature>();
 		if (configuration.equals(""))
-			iFile = featureProject.getCurrentEquationFile();
+			iFile = featureProject.getCurrentConfiguration();
 		else 
 			iFile = featureProject.getEquationFolder().getFile(configuration);
 		

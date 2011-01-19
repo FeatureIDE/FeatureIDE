@@ -22,6 +22,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
@@ -52,6 +53,7 @@ import de.ovgu.featureide.core.builder.FeatureProjectNature;
 import de.ovgu.featureide.core.builder.IComposerExtension;
 import de.ovgu.featureide.core.fstmodel.IFSTModel;
 import de.ovgu.featureide.core.projectstructure.trees.ProjectTree;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.GrammarFile;
@@ -73,10 +75,10 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
  * 
  */
 public class FeatureProject extends BuilderMarkerHandler implements
-IFeatureProject, IResourceChangeListener {
+		IFeatureProject, IResourceChangeListener {
 
-	private  static final String FEATURE_MODULE_MARKER = "de.ovgu.featureide.core.featureModuleMarker";
-	
+	private static final String FEATURE_MODULE_MARKER = "de.ovgu.featureide.core.featureModuleMarker";
+
 	public class FeatureModelChangeListner implements PropertyChangeListener {
 		/**
 		 * listens to changed feature names
@@ -106,8 +108,8 @@ IFeatureProject, IResourceChangeListener {
 	private IFSTModel featureIDEProjectModel;
 
 	/**
-	 * a folder for the generated files
-	 * (only needed if the Prject has only the FeatureIDE Nature)
+	 * a folder for the generated files (only needed if the Prject has only the
+	 * FeatureIDE Nature)
 	 */
 	private IFolder binFolder;
 
@@ -144,6 +146,8 @@ IFeatureProject, IResourceChangeListener {
 
 	private boolean buildRelevantChanges = false;
 
+	private IFile currentConfiguration = null;
+
 	/**
 	 * Creating a new ProjectData includes creating folders if they don't exist,
 	 * registering workspace listeners and initialization of the wrapper object.
@@ -170,7 +174,8 @@ IFeatureProject, IResourceChangeListener {
 
 		modelFile = new GrammarFile(project.getFile("model.xml"));
 		try {
-			//just create the bin folder if project hat only the FeatureIDE Nature
+			// just create the bin folder if project hat only the FeatureIDE
+			// Nature
 			if (project.getDescription().getNatureIds().length == 1
 					&& project.hasNature(FeatureProjectNature.NATURE_ID)) {
 				binFolder = CorePlugin.createFolder(project, "bin");
@@ -180,7 +185,8 @@ IFeatureProject, IResourceChangeListener {
 		}
 		libFolder = project.getFolder("lib");
 		buildFolder = CorePlugin.createFolder(project, getProjectBuildPath());
-		equationFolder = CorePlugin.createFolder(project, getProjectConfigurationPath());
+		equationFolder = CorePlugin.createFolder(project,
+				getProjectConfigurationPath());
 		sourceFolder = CorePlugin.createFolder(project, getProjectSourcePath());
 		featureIDEProjectModel = null;
 		// loading model data and listen to changes in the model file
@@ -189,9 +195,8 @@ IFeatureProject, IResourceChangeListener {
 
 		// make the composer ID a builder argument
 		setComposerID(getComposerID());
-		setPaths(getProjectSourcePath(), getProjectBuildPath(), getProjectConfigurationPath());
-	
-	
+		setPaths(getProjectSourcePath(), getProjectBuildPath(),
+				getProjectConfigurationPath());
 	}
 
 	/*
@@ -211,7 +216,6 @@ IFeatureProject, IResourceChangeListener {
 	 * might be created if some errors occur.
 	 */
 	private void loadModel() {
-
 		// Create model.xml automatically, if only model.m exists
 		// @author Dariusz Krolikowski
 		if (project.getFile("model.m").exists()
@@ -232,7 +236,7 @@ IFeatureProject, IResourceChangeListener {
 						gFile.createModelMarker(
 								"This annotation is not supported yet - moved to the comment section.",
 								IMarker.SEVERITY_WARNING, fmReader.getAnnLine()
-								.get(i));
+										.get(i));
 				}
 
 				// delete model.m automatically - default: false
@@ -249,7 +253,8 @@ IFeatureProject, IResourceChangeListener {
 		try {
 			modelReader.readFromFile(modelFile.getResource());
 			getComposer();
-			if(composerExtension != null && composerExtension.hasFeatureFolders()){
+			if (composerExtension != null
+					&& composerExtension.hasFeatureFolders()) {
 				createAndDeleteFeatureFolders();
 				setAllFeatureModuleMarkers(featureModel, sourceFolder);
 			}
@@ -262,14 +267,12 @@ IFeatureProject, IResourceChangeListener {
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(
 					"Error while loading feature model from "
-					+ modelFile.getResource(), e);
-
+							+ modelFile.getResource(), e);
 		}
-
 	}
 
 	private void createAndDeleteFeatureFolders() throws CoreException {
-	
+
 		sourceFolder.refreshLocal(IResource.DEPTH_ONE, null);
 		// create folders for all layers
 		for (Feature feature : featureModel.getFeatures())
@@ -282,11 +285,11 @@ IFeatureProject, IResourceChangeListener {
 				Feature feature = featureModel.getFeature(folder.getName());
 				if (feature == null || !feature.isLayer()) {
 					folder.refreshLocal(IResource.DEPTH_ONE, null);
-					if (folder.members().length==0)
+					if (folder.members().length == 0)
 						folder.delete(false, null);
 				}
 			}
-		 
+
 	}
 
 	private void addModelListener() {
@@ -301,7 +304,7 @@ IFeatureProject, IResourceChangeListener {
 	private void createFeatureFolder(String name) {
 		try {
 			IFolder folder = sourceFolder.getFolder(name);
-			if (!folder.exists()&&composerExtension.hasFeatureFolders()) {
+			if (!folder.exists() && composerExtension.hasFeatureFolders()) {
 				folder.create(false, true, null);
 				CorePlugin.getDefault().fireFeatureFolderChanged(folder);
 			}
@@ -348,10 +351,13 @@ IFeatureProject, IResourceChangeListener {
 	 * 
 	 * @see de.ovgu.featureide.core.IFeatureProject#getCurrentEquationFile()
 	 */
-	public IFile getCurrentEquationFile() {
+	public IFile getCurrentConfiguration() {
+		if (currentConfiguration != null && currentConfiguration.exists())
+			return currentConfiguration;
+		
 		if (getEquationFolder() == null)
 			return null;
-		
+
 		String equation = null;
 		try {
 			if (project.exists() && project.isOpen()) {
@@ -368,40 +374,17 @@ IFeatureProject, IResourceChangeListener {
 		}
 
 		// No valid equation found
-		IFile equationFile = null;
-		if (!getEquationFolder().exists()) {
+		if (!getEquationFolder().exists())
 			return null;
-		}
-		try {
-			for (IResource resource : getEquationFolder().members()) {
-				if (resource instanceof IFile
-						&& (resource.getName().endsWith(".equation") ||
-							resource.getName().endsWith(".expression") || 
-							resource.getName().endsWith(".config"))) {
-					equationFile = (IFile) resource;
-					setCurrentEquationFile(equationFile);
-					return equationFile;
-				}
-			}
-		} catch (CoreException e) {
-			CorePlugin.getDefault().logError(e);
-		}
-
-		return equationFile;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.IFeatureProject#getCurrentEquationPath()
-	 */
-	public String getCurrentEquationPath() {
-		IFile file = getCurrentEquationFile();
-
-		if (file != null)
-			return file.getRawLocation().toOSString();
-		else
+		
+		List<IFile> configs = getAllConfigurations();
+		if (configs == null || configs.isEmpty())
 			return null;
+		
+		// select the first configuration
+		IFile config = configs.get(0);
+		setCurrentConfiguration(config);
+		return config;
 	}
 
 	/*
@@ -411,25 +394,37 @@ IFeatureProject, IResourceChangeListener {
 	 * de.ovgu.featureide.core.IFeatureProject#setCurrentEquationFile(org.eclipse
 	 * .core .resources.IFile)
 	 */
-	public void setCurrentEquationFile(IFile file) {
+	public void setCurrentConfiguration(IFile file) {
+		currentConfiguration = file;
+		
 		int offset = getEquationFolder().getProjectRelativePath().toString()
-			.length();
+				.length();
 		String equationPath = file.getProjectRelativePath().toString()
-			.substring(offset);
+				.substring(offset);
 		try {
 			project.setPersistentProperty(equationConfigID, equationPath);
 			CorePlugin.getDefault().fireCurrentEquationChanged(this);
-			// We need to call the builder here, because for the new
-			// configuration, there are possibly no resource build yet or they
-			// are not up-to-date. Eclipse calls builders, if a resource as
-			// changed, but in this case actually no resource in the file system
-			// changes.
-			buildRelevantChanges = true;
-
-			project.build(IncrementalProjectBuilder.FULL_BUILD, null);
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
+
+		// We need to call the builder here, because for the new configuration,
+		// there are possibly no resource build yet or they are not up-to-date.
+		// Eclipse calls builders, if a resource as changed, but in this case
+		// actually no resource in the file system changes.
+		Job job = new Job("Performing full build") {
+			protected IStatus run(IProgressMonitor monitor) {
+				buildRelevantChanges = true;
+				try {
+					project.build(IncrementalProjectBuilder.FULL_BUILD, null);
+				} catch (CoreException e) {
+					CorePlugin.getDefault().logError(e);
+				}
+				return Status.OK_STATUS;
+			}
+		};
+		job.setPriority(Job.SHORT);
+		job.schedule();
 	}
 
 	/*
@@ -510,7 +505,8 @@ IFeatureProject, IResourceChangeListener {
 	 * @see de.ovgu.featureide.core.IFeatureProject#getSourcePath()
 	 */
 	public String getSourcePath() {
-		return sourceFolder == null ? null : sourceFolder.getRawLocation().toOSString();
+		return sourceFolder == null ? null : sourceFolder.getRawLocation()
+				.toOSString();
 	}
 
 	/*
@@ -633,8 +629,6 @@ IFeatureProject, IResourceChangeListener {
 		return cp.toArray(new String[cp.size()]);
 	}
 
-	private ArrayList<IResource> resList = new ArrayList<IResource>();
-
 	private boolean modelChanged = false;
 
 	/**
@@ -660,7 +654,8 @@ IFeatureProject, IResourceChangeListener {
 					if (sourceFolder.exists()) {
 						for (IResource res : sourceFolder.members()) {
 							if (res instanceof IFolder)
-								setFeatureModuleMarker(featureModel, (IFolder) res);
+								setFeatureModuleMarker(featureModel,
+										(IFolder) res);
 						}
 					}
 				} catch (CoreException e) {
@@ -708,8 +703,8 @@ IFeatureProject, IResourceChangeListener {
 			}
 		}
 		if (message != null) {
-			if (folder.findMarkers(FEATURE_MODULE_MARKER, false, IResource.DEPTH_ZERO).length == 0 
-					&& folder.exists()) {
+			if (folder.findMarkers(FEATURE_MODULE_MARKER, false,
+					IResource.DEPTH_ZERO).length == 0 && folder.exists()) {
 				IMarker marker = folder.createMarker(FEATURE_MODULE_MARKER);
 				marker.setAttribute(IMarker.MESSAGE, message);
 				marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
@@ -717,7 +712,8 @@ IFeatureProject, IResourceChangeListener {
 		}
 	}
 
-	protected boolean allFeatureModulesEmpty(IFolder sourceFolder) throws CoreException {
+	protected boolean allFeatureModulesEmpty(IFolder sourceFolder)
+			throws CoreException {
 		if (!sourceFolder.exists()) {
 			return false;
 		}
@@ -728,110 +724,119 @@ IFeatureProject, IResourceChangeListener {
 	}
 
 	public void resourceChanged(IResourceChangeEvent event) {
-		// if something in sourcefolder changed
-		if (sourceFolder != null &&
-				event.getDelta().findMember(sourceFolder.getFullPath()) != null) {
-			
+		// if something in source folder changed
+		if (sourceFolder != null
+				&& event.getDelta().findMember(sourceFolder.getFullPath()) != null) {
+
 			// set markers, only if event is not fired from changes to
 			// markers
 			if (event.findMarkerDeltas(FEATURE_MODULE_MARKER, false).length == 0) {
-				//TODO id this needed, causes MarkerNotFoun exception
-//					setAllFeatureModuleMarkers(featureModel, sourceFolder);
+				// TODO id this needed, causes MarkerNotFoun exception
+				// setAllFeatureModuleMarkers(featureModel, sourceFolder);
 			}
 		}
-		
-		if (!checkModelChange(event.getDelta().findMember(
-				modelFile.getResource().getFullPath()))) {
-			try {
-				if (equationFolder.isAccessible()) {
-					for (IResource res : equationFolder.members()) {
-						IResourceDelta delta = event.getDelta().findMember(
-								res.getFullPath());
-						if (delta != null
-								&& (delta.getFlags() & IResourceDelta.CONTENT) != 0) {
-							if (res.toString().equals(
-									getCurrentEquationFile().toString()))
-								buildRelevantChanges = true;
-							if (resList.size() == 0) {
-								checkConfigurationChange();
-							}
-							if (!resList.contains(res))
-								resList.add(res);
-						}
-					}
+
+		IPath modelPath = modelFile.getResource().getFullPath();
+		if (checkModelChange(event.getDelta().findMember(modelPath)))
+			return;
+
+		try {
+			List<IFile> configs = getAllConfigurations();
+			List<IFile> changedConfigs = new ArrayList<IFile>();
+			IFile currentConfig = getCurrentConfiguration();
+			for (IFile config : configs) {
+				IResourceDelta delta = event.getDelta().findMember(
+						config.getFullPath());
+				if (delta != null
+						&& (delta.getFlags() & IResourceDelta.CONTENT) != 0) {
+					changedConfigs.add(config);
+					if (config.equals(currentConfig))
+						buildRelevantChanges = true;
 				}
-				
-				if (sourceFolder != null && sourceFolder.isAccessible()) {
-					checkSourceFolder(sourceFolder, event);
-				}
-				
-				if (buildFolder.isAccessible()) {
-					checkBuildFolder(buildFolder, event);
-				}
-				
-			} catch (CoreException e) {
-				CorePlugin.getDefault().logError(e);
 			}
+			if (!changedConfigs.isEmpty()) {
+				CorePlugin.getDefault().fireEquationChanged(this);
+				checkConfigurations(changedConfigs);
+			}
+
+			if (sourceFolder != null && sourceFolder.isAccessible())
+				checkSourceFolder(sourceFolder, event);
+
+			if (buildFolder.isAccessible())
+				checkBuildFolder(buildFolder, event);
+		} catch (CoreException e) {
+			CorePlugin.getDefault().logError(e);
 		}
 	}
-	
-	private void checkSourceFolder(IFolder folder, IResourceChangeEvent event) throws CoreException {
+
+	private void checkSourceFolder(IFolder folder, IResourceChangeEvent event)
+			throws CoreException {
 		for (IResource res : folder.members()) {
 			if (res instanceof IFolder) {
-				checkSourceFolder((IFolder)res, event);
+				checkSourceFolder((IFolder) res, event);
 			} else {
 				IResourceDelta delta = event.getDelta().findMember(
 						res.getFullPath());
 				if (delta != null) {
-					if (!modelChanged && 
-							(delta.getKind() == IResourceDelta.ADDED || 
-							(delta.getFlags() & IResourceDelta.CONTENT) != 0)) {
+					if (!modelChanged
+							&& (delta.getKind() == IResourceDelta.ADDED || (delta
+									.getFlags() & IResourceDelta.CONTENT) != 0)) {
 						buildRelevantChanges = true;
 					}
 				}
 			}
 		}
 	}
-	
-	private void checkBuildFolder(IFolder folder, IResourceChangeEvent event) throws CoreException {
+
+	private void checkBuildFolder(IFolder folder, IResourceChangeEvent event)
+			throws CoreException {
 		for (IResource res : folder.members()) {
 			if (res instanceof IFolder) {
-				checkBuildFolder((IFolder)res, event);
-			} else if(res instanceof IFile) {
+				checkBuildFolder((IFolder) res, event);
+			} else if (res instanceof IFile) {
 				IResourceDelta delta = event.getDelta().findMember(
 						res.getFullPath());
 				if (delta != null) {
-					if (composerExtension != null){
-					//&& ((delta.getFlags()& IResourceDelta.MARKERS) != 0)) {
-							composerExtension.postCompile(delta, (IFile)res);
+					if (composerExtension != null) {
+						// && ((delta.getFlags()& IResourceDelta.MARKERS) != 0))
+						// {
+						composerExtension.postCompile(delta, (IFile) res);
 					}
 				}
 			}
 		}
 	}
-	
-	private boolean checkModelChange(IResourceDelta delta) {
 
+	private List<IFile> getAllConfigurations() {
+		List<IFile> configs = new ArrayList<IFile>();
+		if (!equationFolder.isAccessible())
+			return configs;
+		try {
+			for (IResource res : equationFolder.members()) {
+				if (!(res instanceof IFile))
+					continue;
+				IFile config = (IFile) res;
+				String name = config.getName();
+				if (name.endsWith(".equation") || name.endsWith(".expression")
+						|| name.endsWith(".config"))
+					configs.add(config);
+			}
+		} catch (CoreException e) {
+			CorePlugin.getDefault().logError(e);
+		}
+		return configs;
+	}
+
+	private boolean checkModelChange(IResourceDelta delta) {
 		if (delta == null || (delta.getFlags() & IResourceDelta.CONTENT) == 0)
 			return false;
 
 		modelChanged = true;
 		Job job = new Job("Load Model") {
 			protected IStatus run(IProgressMonitor monitor) {
-
 				loadModel();
 				composerExtension.postModelChanged();
-				resList = new ArrayList<IResource>();
-				try {
-					for (IResource res : equationFolder.members()) {
-						if (resList.size() == 0)
-							checkConfigurationChange();
-						if (!resList.contains(res))
-							resList.add(res);
-					}
-				} catch (CoreException e) {
-					CorePlugin.getDefault().logError(e);
-				}
+				checkConfigurations(getAllConfigurations());
 				return Status.OK_STATUS;
 			}
 		};
@@ -840,48 +845,47 @@ IFeatureProject, IResourceChangeListener {
 		return true;
 	}
 
-	private void checkConfigurationChange() {
-		CorePlugin.getDefault().fireEquationChanged(this);
+	private void checkConfigurations(final List<IFile> files) {
+		if (files == null || files.isEmpty())
+			return;
 
-		Job job = new Job("Check Configuration") {
+		Job job = new Job("Checking Configurations") {
 			protected IStatus run(IProgressMonitor monitor) {
-				if (resList.size() != 0 && !resList.isEmpty())
-					for (IResource res : resList) {
-						if (res instanceof IFile) {
-							IFile file = (IFile) res;
-							try {
-								deleteConfigurationMarkers(file,
-										IResource.DEPTH_ZERO);
-								// check validity
-								Configuration configuration = new Configuration(
-										featureModel, false);
-								ConfigurationReader reader = new ConfigurationReader(
-										configuration);
-								reader.readFromFile(file);
-								if (!configuration.valid())
-									createConfigurationMarker(file,
-											"Configuration is invalid", 0,
-											IMarker.SEVERITY_ERROR);
-								// check if all features are still available
-								configuration = new Configuration(featureModel,
-										true);
-								reader = new ConfigurationReader(configuration);
-								reader.readFromFile(file);
-
-								for (int i = 0; i < reader.getWarnings().size(); i++) {
-									createConfigurationMarker(file, reader
-											.getWarnings().get(i), reader
-											.getPositions().get(i),
-											IMarker.SEVERITY_WARNING);
-
-								}
-
-							} catch (Exception e) {
-								CorePlugin.getDefault().logError(e);
-							}
+				Configuration config = new Configuration(featureModel, false);
+//				Configuration autoConfig = new Configuration(featureModel, true);
+				ConfigurationReader reader = new ConfigurationReader(config);
+//				ConfigurationReader autoReader = new ConfigurationReader(
+//						autoConfig);
+				try {
+					for (IFile file : files)
+						deleteConfigurationMarkers(file, IResource.DEPTH_ZERO);
+					// check validity
+					for (IFile file : files) {
+						reader.readFromFile(file);
+						if (!config.valid()) {
+							String name = file.getName();
+							name = name.substring(0,name.lastIndexOf('.'));
+							String message = "Configuration '" + name + "' is invalid";
+							createConfigurationMarker(file, message, 0,
+									IMarker.SEVERITY_ERROR);
 						}
 					}
-				resList = new ArrayList<IResource>();
+					//TODO check why we get an error with the following code
+//					// create warnings (e.g., for features that are not available anymore)
+//					for (IFile file : files) {
+//						autoReader.readFromFile(file);
+//						for (int i = 0; i < reader.getWarnings().size(); i++) {
+//							String message = autoReader.getWarnings().get(i);
+//							int line = autoReader.getPositions().get(i);
+//							createConfigurationMarker(file, message, line,
+//									IMarker.SEVERITY_WARNING);
+//						}
+//					}
+				} catch (OutOfMemoryError e) {
+					FMCorePlugin.getDefault().logError(e);
+				} catch (Exception e) {
+					CorePlugin.getDefault().logError(e);
+				}
 				return Status.OK_STATUS;
 			}
 		};
@@ -908,7 +912,7 @@ IFeatureProject, IResourceChangeListener {
 			if (compositionToolID == null)
 				return null;
 			composerExtension = ComposerExtensionManager.getInstance()
-			.getComposerById(compositionToolID);
+					.getComposerById(compositionToolID);
 		}
 		return composerExtension;
 	}
@@ -987,7 +991,7 @@ IFeatureProject, IResourceChangeListener {
 		}
 		return null;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -1056,9 +1060,10 @@ IFeatureProject, IResourceChangeListener {
 				if (command.getBuilderName().equals(
 						ExtensibleFeatureProjectBuilder.BUILDER_ID)) {
 					Map<String, String> args = command.getArguments();
-					args.put(ExtensibleFeatureProjectBuilder.COMPOSER_KEY,composerID);
+					args.put(ExtensibleFeatureProjectBuilder.COMPOSER_KEY,
+							composerID);
 					command.setArguments(args);
-					//Composer must be the first command
+					// Composer must be the first command
 					commands[i] = command;
 				}
 				i++;

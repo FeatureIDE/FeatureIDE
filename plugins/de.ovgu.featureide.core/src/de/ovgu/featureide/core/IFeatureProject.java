@@ -63,11 +63,9 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 
 	public String getProjectName();
 
-	public IFile getCurrentEquationFile();
+	public IFile getCurrentConfiguration();
 
-	public String getCurrentEquationPath();
-
-	public void setCurrentEquationFile(IFile file);
+	public void setCurrentConfiguration(IFile file);
 
 	public String getBuildPath();
 

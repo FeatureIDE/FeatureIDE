@@ -229,7 +229,7 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 	@Override
 	public boolean copyNotComposedFiles() {
 		try {
-			copy(featureProject.getCurrentEquationFile());
+			copy(featureProject.getCurrentConfiguration());
 		} catch (CoreException e) {
 			FeatureHouseCorePlugin.getDefault().logError(e);
 		}

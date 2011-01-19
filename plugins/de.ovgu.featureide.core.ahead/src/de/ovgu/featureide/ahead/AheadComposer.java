@@ -80,7 +80,7 @@ public class AheadComposer implements IComposerExtensionClass {
 		ahead = new AheadWrapper(project);
 		ahead.addBuildErrorListener(new BuilderErrorListener());
 		try {
-			ahead.setEquation(featureProject.getCurrentEquationFile());
+			ahead.setEquation(featureProject.getCurrentConfiguration());
 		} catch (IOException e) {
 			featureProject.createBuilderMarker(featureProject.getProject(),
 					e.getMessage(), 0, IMarker.SEVERITY_ERROR);

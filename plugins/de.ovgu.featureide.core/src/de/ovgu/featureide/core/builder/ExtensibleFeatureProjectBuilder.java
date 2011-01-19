@@ -114,7 +114,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		}
 		
 		if (cleanBuild) {
-			IFile equationFile = featureProject.getCurrentEquationFile();
+			IFile equationFile = featureProject.getCurrentConfiguration();
 			if (equationFile == null)
 				return;
 	
@@ -155,7 +155,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 			return null;
 
 		cleaned = false;
-		IFile equation = featureProject.getCurrentEquationFile();
+		IFile equation = featureProject.getCurrentConfiguration();
 		featureProject.deleteBuilderMarkers(getProject(),
 				IResource.DEPTH_INFINITE);
 		

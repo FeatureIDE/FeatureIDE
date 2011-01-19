@@ -112,10 +112,9 @@ public class FeatureOrderEditor extends EditorPart {
 		used = false;
 		orderList = readFeaturesfromOrderFile();
 		try {
-			for (IResource res : equationFolder.members()){
+			for (IResource res : equationFolder.members())
 				changeConfigurationOrder(res);
-				res.refreshLocal(IResource.DEPTH_ZERO, null);
-			}	
+			equationFolder.refreshLocal(IResource.DEPTH_ONE, null);
 		} catch (CoreException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
@@ -399,7 +398,7 @@ public class FeatureOrderEditor extends EditorPart {
 	}
 
 	public void writeFeaturestoConfigurationFile(File file,
-			LinkedList<String> newConfiguration) {
+			ArrayList<String> newConfiguration) {
 		try {
 			FileWriter fw = new FileWriter(file);
 			for (String layer : newConfiguration) {
@@ -423,26 +422,31 @@ public class FeatureOrderEditor extends EditorPart {
 		ArrayList<String> oldConfiguration = readFeaturesfromConfigurationFile(file);
 		if (oldConfiguration == null)
 			return;
-		LinkedList<String> newConfiguration = new LinkedList<String>();
-
-		if (!activate.getSelection()) {
+		ArrayList<String> newConfiguration = new ArrayList<String>();
+		Collection<String> layers;
+		if (!activate.getSelection())
 			// Default order
-			Collection<String> layers = featureModel.getLayerNames();
-			for (String layer : layers) {
-				if (oldConfiguration.contains(layer)) {
-					newConfiguration.add(layer);
-					oldConfiguration.remove(layer);
-				}
-			}
-		} else {
+			layers = featureModel.getLayerNames();
+		else
 			// User specified order
-			for (String layer : orderList) {
-				if (oldConfiguration.contains(layer)) {
-					newConfiguration.add(layer);
-					oldConfiguration.remove(layer);
-				}
-			}
+			layers = orderList;
+		
+		// check whether the new configuration is equal to the old one
+		if (oldConfiguration.size() == layers.size()) {
+			int i = 0;
+			boolean equal = true;
+			for (String layer : layers)
+				if (!oldConfiguration.get(i++).equals(layer))
+					equal = false;
+			if (equal)
+				return;
 		}
+
+		for (String layer : layers)
+			if (oldConfiguration.contains(layer)) {
+				newConfiguration.add(layer);
+				oldConfiguration.remove(layer);
+			}
 
 		// Feature removed
 		if (!oldConfiguration.isEmpty())

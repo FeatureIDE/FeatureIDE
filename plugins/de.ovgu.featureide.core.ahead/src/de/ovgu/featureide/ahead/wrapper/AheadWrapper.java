@@ -126,42 +126,42 @@ public class AheadWrapper {
 		final IFolder buildFolder = CorePlugin.getFeatureProject(jakFile).getBuildFolder();
 		if (!jakFile.exists())
 			return;
-		Job job = new Job("create builder problem marker") {
+		Job job = new Job("Propagate problem markers") {
 			@Override
 			public IStatus run(IProgressMonitor monitor) {
 				try {
-					if (file.exists()) {
-						if (jakFile.exists()) {
-							IMarker[] markers = file.findMarkers(null, false, IResource.DEPTH_ZERO);
-							if (markers != null) {
-								for (IMarker marker : markers) {
-									if (marker.exists()) {
-										String content = marker.getAttribute(IMarker.MESSAGE, null);
-										if (!content.contains("is a raw type") && !content.contains("generic type")) {
-											AheadBuildErrorEvent buildError = new AheadBuildErrorEvent(file, marker.getAttribute(IMarker.MESSAGE).toString(), AheadBuildErrorType.JAVAC_ERROR, (Integer)marker.getAttribute(IMarker.LINE_NUMBER));
-											IMarker newMarker = buildError.getResource().createMarker(CorePlugin.PLUGIN_ID + ".builderProblemMarker");
-											newMarker.setAttribute(IMarker.LINE_NUMBER, buildError.getLine());
-											newMarker.setAttribute(IMarker.MESSAGE, buildError.getMessage());
-											newMarker.setAttribute(IMarker.SEVERITY, marker.getAttribute(IMarker.SEVERITY));
-										} else {
-											marker.delete();
-										}
+					if (file.exists() && jakFile.exists()) {
+						IMarker[] markers = file.findMarkers(null, false, IResource.DEPTH_ZERO);
+						if (markers != null) {
+							for (IMarker marker : markers) {
+								if (marker.exists()) {
+									String content = marker.getAttribute(IMarker.MESSAGE, null);
+									if (content.contains("raw type") || content.contains("generic type") || 
+											content.contains("Type safety")) {
+										marker.delete();
+									} else {
+										AheadBuildErrorEvent buildError = new AheadBuildErrorEvent(file, marker.getAttribute(IMarker.MESSAGE).toString(), AheadBuildErrorType.JAVAC_ERROR, (Integer)marker.getAttribute(IMarker.LINE_NUMBER));
+										IMarker newMarker = buildError.getResource().createMarker(CorePlugin.PLUGIN_ID + ".builderProblemMarker");
+										newMarker.setAttribute(IMarker.LINE_NUMBER, buildError.getLine());
+										newMarker.setAttribute(IMarker.MESSAGE, buildError.getMessage());
+										newMarker.setAttribute(IMarker.SEVERITY, marker.getAttribute(IMarker.SEVERITY));
 									}
 								}
 							}
-							jakFile.delete(true, null);
 						}
+						jakFile.delete(true, monitor);
 					}
 					// Remove composed Jak files after error propagation
+					// TODO why do delete Jak files here and above and why is the method called for every file?
 					deleteJakFiles(buildFolder);
 				} catch (CoreException e) {
 					AheadCorePlugin.getDefault().logError(e);
 				}
-			return Status.OK_STATUS;
+				return Status.OK_STATUS;
 			}
 		};
-	job.setPriority(Job.DECORATE);
-	job.schedule();
+		job.setPriority(Job.DECORATE);
+		job.schedule();
 	}
 
 	protected void deleteJakFiles(IFolder folder) throws CoreException {

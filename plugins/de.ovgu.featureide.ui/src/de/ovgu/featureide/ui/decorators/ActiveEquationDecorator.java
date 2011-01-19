@@ -57,7 +57,7 @@ public class ActiveEquationDecorator implements ILightweightLabelDecorator, ICur
 
 	public void decorate(Object element, IDecoration decoration) {
 		IFeatureProject pd = CorePlugin.getFeatureProject ((IResource)element);
-		if (pd != null && ((IResource)element).equals(pd.getCurrentEquationFile())) {
+		if (pd != null && ((IResource)element).equals(pd.getCurrentConfiguration())) {
 			decoration.addOverlay(icon, IDecoration.TOP_LEFT);
 		}
 	}
