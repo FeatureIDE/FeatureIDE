@@ -123,7 +123,7 @@ public class CollaborationEditPart extends AbstractGraphicalEditPart {
 					FlowLayout contentsLayout = new FlowLayout();
 					tooltipContent.setLayoutManager(contentsLayout);
 					CompartmentFigure tooltipFigure = new CompartmentFigure();
-					if (collaborationFigure.isEquation)
+					if (collaborationFigure.isConfiguration)
 						if (collaborationFigure.selected) {
 							tooltipFigure.add(new Label(" Current configuration ", IMAGE_CURRENT_CONFIGURATION));
 						} else

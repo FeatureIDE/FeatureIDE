@@ -76,23 +76,23 @@ public class AspectJComposer implements IComposerExtensionClass {
 	}
 
 	@Override
-	public void performFullBuild(IFile equation) {
-		if (equation == null) {
+	public void performFullBuild(IFile config) {
+		if (config == null) {
 			return;
 		}
 		assert(featureProject != null) : "Invalid project given";
 		
-		final String equationPath =  equation.getRawLocation().toOSString();
+		final String configPath =  config.getRawLocation().toOSString();
 		final String outputPath = featureProject.getBuildPath();
 		
-		if (equationPath == null || outputPath == null)
+		if (configPath == null || outputPath == null)
 			return;
 		
 		Configuration configuration = new Configuration(featureProject.getFeatureModel());
 		ConfigurationReader reader = new ConfigurationReader(configuration);
 		
 		try {
-			reader.readFromFile(equation);
+			reader.readFromFile(config);
 		} catch (CoreException e) {
 			AspectJCorePlugin.getDefault().logError(e);
 		} catch (IOException e) {
@@ -109,9 +109,9 @@ public class AspectJComposer implements IComposerExtensionClass {
 			}
 		}
 		
-		setBuildpaths(equation.getProject());
+		setBuildpaths(config.getProject());
 		try {
-			equation.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
+			config.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
 			featureProject.getProject().build(IncrementalProjectBuilder.FULL_BUILD,	null);
 		} catch (CoreException e) {
 			AspectJCorePlugin.getDefault().logError(e);
@@ -326,7 +326,7 @@ public class AspectJComposer implements IComposerExtensionClass {
 
 	@Override
 	public void addCompiler(IProject project, String sourcePath,
-			String equationPath, String buildPath) {
+			String configPath, String buildPath) {
 		addNatures(project);
 		addClasspathFile(project, buildPath);
 	}

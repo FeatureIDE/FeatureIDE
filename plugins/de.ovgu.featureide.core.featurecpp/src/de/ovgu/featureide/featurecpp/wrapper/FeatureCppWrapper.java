@@ -57,11 +57,11 @@ public class FeatureCppWrapper {
 		buildDirectory = build;
 	}
 
-	public void compose(IFile equation) {
-		assert (equation != null && equation.exists()) : "Equation file does not exist";
-		String equationName = equation.getName();
-		if (equationName.contains(".")) {
-			equationName = equationName.substring(0, equationName.indexOf('.'));
+	public void compose(IFile config) {
+		assert (config != null && config.exists()) : "Configuration file does not exist";
+		String configName = config.getName();
+		if (configName.contains(".")) {
+			configName = configName.substring(0, configName.indexOf('.'));
 		}
 		IFolder folder2 = buildDirectory;
 		try {
@@ -75,7 +75,7 @@ public class FeatureCppWrapper {
 		command.add("-o=" + buildFolder);
 		command.add("-s=" + sourceFolder);
 		command.add("-gpp");
-		command.add(equation.getRawLocation().toOSString());
+		command.add(config.getRawLocation().toOSString());
 		// TODO configuration extension must be .equation
 		try {
 			process(command);

@@ -108,11 +108,11 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	 * de.ovgu.featureide.core.builder.ICompositionTool#performFullBuild(org.eclipse
 	 * .core.resources.IFile)
 	 */
-	public void performFullBuild(IFile equation) {
+	public void performFullBuild(IFile config) {
 		CorePlugin.getDefault().logInfo(
-				"Perform a full build for configuration '" + equation + "'");
-		initialize(CorePlugin.getFeatureProject(equation));
-		composerExtensionClass.performFullBuild(equation);
+				"Perform a full build for configuration '" + config + "'");
+		initialize(CorePlugin.getFeatureProject(config));
+		composerExtensionClass.performFullBuild(config);
 	}
 
 	/*
@@ -193,8 +193,8 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#addProjectNature()
 	 */
-	public void addCompiler(IProject project, String sourcePath,String equationPath, String buildPath) {
-		composerExtensionClass.addCompiler(project, sourcePath, equationPath, buildPath);
+	public void addCompiler(IProject project, String sourcePath,String configPath, String buildPath) {
+		composerExtensionClass.addCompiler(project, sourcePath, configPath, buildPath);
 		
 	}
 	public boolean hasFeatureFolders(){

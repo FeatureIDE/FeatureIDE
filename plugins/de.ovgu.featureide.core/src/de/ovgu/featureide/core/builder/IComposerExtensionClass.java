@@ -38,8 +38,8 @@ import de.ovgu.featureide.core.IFeatureProject;
  * @c ExtensibleFeatureProjectBuilder. This requirements are:
  * - Specifying a path for the composed files (usually "./build")
  * - Specifying a path for the source files (usually "./src")
- * - Specifying a path to the current configuration file (former equation file)
- * - Performing a full build for the current project with a given equation file 
+ * - Specifying a path to the current configuration file
+ * - Performing a full build for the current project with a given configuration file 
  * 
  * @author Tom Brosch
  */
@@ -60,7 +60,7 @@ public interface IComposerExtensionClass {
 	
 	void initialize(IFeatureProject project);
 	
-	void performFullBuild(IFile equation);
+	void performFullBuild(IFile config);
 	
 	/**
 	 * 
@@ -83,7 +83,7 @@ public interface IComposerExtensionClass {
 	/**
 	 * Adds the compiler to the project.
 	 */
-	void addCompiler(IProject project, String sourcePath, String equationPath, String buildPath);
+	void addCompiler(IProject project, String sourcePath, String configPath, String buildPath);
 	
 	/**
 	 * Creates the FSTModel

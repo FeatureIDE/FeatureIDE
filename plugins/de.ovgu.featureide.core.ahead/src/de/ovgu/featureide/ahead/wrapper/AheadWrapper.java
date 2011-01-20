@@ -41,7 +41,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 /**
  * The AheadWrapper class encapsulates all functionality that has to do
  * with the ahead tool suite. It provides methods to set the current
- * equation file, to add jak files that should be recompiled due to an
+ * configuration file, to add jak files that should be recompiled due to an
  * inkremental or full build. The build methods are capable of composing
  * jak files to java files as well as reduce jak files to java files and
  * compile java files to class files.
@@ -62,8 +62,8 @@ public class AheadWrapper {
 		composer = new ComposerWrapper(featureProject);
 	}
 
-	public void setEquation(IFile equation) throws IOException {
-		composer.setEquation(equation);
+	public void setConfiguration(IFile config) throws IOException {
+		composer.setConfiguration(config);
 	}
 
 	public void addJakfile(IFile jakfile) {

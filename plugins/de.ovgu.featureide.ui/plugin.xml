@@ -65,7 +65,7 @@
             nameFilter="*.config"
             objectClass="org.eclipse.core.resources.IFile">
          <action
-               class="de.ovgu.featureide.ui.actions.SetEquationAction"
+               class="de.ovgu.featureide.ui.actions.SetConfigurationAction"
                icon="icons/currentconfiguration.gif"
                id="de.ovgu.featureide.ui.setEquationAction"
                label="Set as current configuration"
@@ -79,7 +79,7 @@
             nameFilter="*.equation"
             objectClass="org.eclipse.core.resources.IFile">
          <action
-               class="de.ovgu.featureide.ui.actions.SetEquationAction"
+               class="de.ovgu.featureide.ui.actions.SetConfigurationAction"
                icon="icons/currentconfiguration.gif"
                id="de.ovgu.featureide.ui.setEquationAction"
                label="Set as current configuration"
@@ -92,7 +92,7 @@
          point="org.eclipse.ui.decorators">
       <decorator
             adaptable="true"
-            class="de.ovgu.featureide.ui.decorators.ActiveEquationDecorator"
+            class="de.ovgu.featureide.ui.decorators.ActiveConfigurationDecorator"
             id="de.ovgu.featureide.ui.decorators.ActiveEquationDecorator"
             label="Active Equation Decorator"
             lightweight="true"

@@ -43,8 +43,8 @@ import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.internal.FeatureProject;
 import de.ovgu.featureide.core.internal.ProjectChangeListener;
 import de.ovgu.featureide.core.listeners.ICurrentBuildListener;
-import de.ovgu.featureide.core.listeners.ICurrentEquationListener;
-import de.ovgu.featureide.core.listeners.IEquationChangedListener;
+import de.ovgu.featureide.core.listeners.ICurrentConfigurationListener;
+import de.ovgu.featureide.core.listeners.IConfigurationChangedListener;
 import de.ovgu.featureide.core.listeners.IFeatureFolderListener;
 import de.ovgu.featureide.core.listeners.IProjectListener;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
@@ -69,9 +69,9 @@ public class CorePlugin extends AbstractCorePlugin {
 
 	private LinkedList<IProjectListener> projectListeners = new LinkedList<IProjectListener>();
 
-	private LinkedList<ICurrentEquationListener> currentEquationListeners = new LinkedList<ICurrentEquationListener>();
+	private LinkedList<ICurrentConfigurationListener> currentConfigurationListeners = new LinkedList<ICurrentConfigurationListener>();
 
-	private LinkedList<IEquationChangedListener> equationChangedListeners = new LinkedList<IEquationChangedListener>();
+	private LinkedList<IConfigurationChangedListener> configurationChangedListeners = new LinkedList<IConfigurationChangedListener>();
 
 	private LinkedList<IFeatureFolderListener> featureFolderListeners = new LinkedList<IFeatureFolderListener>();
 
@@ -208,28 +208,28 @@ public class CorePlugin extends AbstractCorePlugin {
 		projectListeners.remove(listener);
 	}
 
-	public void addCurrentEquationListener(ICurrentEquationListener listener) {
-		if (!currentEquationListeners.contains(listener))
-			currentEquationListeners.add(listener);
+	public void addCurrentConfigurationListener(ICurrentConfigurationListener listener) {
+		if (!currentConfigurationListeners.contains(listener))
+			currentConfigurationListeners.add(listener);
 	}
 
-	public void addEquationChangedListener(IEquationChangedListener listener) {
-		if (!equationChangedListeners.contains(listener))
-			equationChangedListeners.add(listener);
+	public void addConfigurationChangedListener(IConfigurationChangedListener listener) {
+		if (!configurationChangedListeners.contains(listener))
+			configurationChangedListeners.add(listener);
 	}
 
-	public void removeCurrentEquationListener(ICurrentEquationListener listener) {
-		currentEquationListeners.remove(listener);
+	public void removeCurrentConfigurationListener(ICurrentConfigurationListener listener) {
+		currentConfigurationListeners.remove(listener);
 	}
 
-	public void fireCurrentEquationChanged(IFeatureProject featureProject) {
-		for (ICurrentEquationListener listener : currentEquationListeners)
-			listener.currentEquationChanged(featureProject);
+	public void fireCurrentConfigurationChanged(IFeatureProject featureProject) {
+		for (ICurrentConfigurationListener listener : currentConfigurationListeners)
+			listener.currentConfigurationChanged(featureProject);
 	}
 
-	public void fireEquationChanged(IFeatureProject featureProject) {
-		for (IEquationChangedListener listener : equationChangedListeners)
-			listener.equationChanged(featureProject);
+	public void fireConfigurationChanged(IFeatureProject featureProject) {
+		for (IConfigurationChangedListener listener : configurationChangedListeners)
+			listener.configurationChanged(featureProject);
 	}
 
 	public void addFeatureFolderListener(IFeatureFolderListener listener) {
@@ -248,9 +248,9 @@ public class CorePlugin extends AbstractCorePlugin {
 
 	public static void setupProject(final IProject project,
 			String compositionToolID, final String sourcePath,
-			final String equationPath, final String buildPath) {
+			final String configPath, final String buildPath) {
 		setupFeatureProject(project, compositionToolID, sourcePath,
-				equationPath, buildPath, false);
+				configPath, buildPath, false);
 		// move old source files into feature "Base"
 
 		IConfigurationElement[] config = Platform.getExtensionRegistry()
@@ -313,13 +313,14 @@ public class CorePlugin extends AbstractCorePlugin {
 								// create a configuration to automaticly build
 								// the project after adding the FeatureIDE
 								// nature
-								IFile equationFile = project.getFolder(
-										equationPath).getFile(project.getName().split("[-]")[0]+".config");
-								FileWriter fw = new FileWriter(equationFile
+								// TODO do not use strings wherever needed, define them only once!
+								IFile configFile = project.getFolder(
+										configPath).getFile(project.getName().split("[-]")[0]+".config");
+								FileWriter fw = new FileWriter(configFile
 										.getRawLocation().toFile());
 								fw.write("Base");
 								fw.close();
-								equationFile.create(null, true, null);
+								configFile.create(null, true, null);
 
 							}
 						};
@@ -336,7 +337,7 @@ public class CorePlugin extends AbstractCorePlugin {
 
 	public static void setupFeatureProject(final IProject project,
 			String compositionToolID, final String sourcePath,
-			final String equationPath, final String buildPath, boolean addNature) {
+			final String configPath, final String buildPath, boolean addNature) {
 		IConfigurationElement[] config = Platform.getExtensionRegistry()
 				.getConfigurationElementsFor(PLUGIN_ID + ".composers");
 		if (addNature) {
@@ -353,7 +354,7 @@ public class CorePlugin extends AbstractCorePlugin {
 
 								public void run() throws Exception {
 									((IComposerExtensionClass) o).addCompiler(
-											project, sourcePath, equationPath,
+											project, sourcePath, configPath,
 											buildPath);
 								}
 							};
@@ -372,14 +373,14 @@ public class CorePlugin extends AbstractCorePlugin {
 			project.setPersistentProperty(IFeatureProject.buildFolderConfigID,
 					buildPath);
 			project.setPersistentProperty(
-					IFeatureProject.equationFolderConfigID, equationPath);
+					IFeatureProject.configFolderConfigID, configPath);
 			project.setPersistentProperty(IFeatureProject.sourceFolderConfigID,
 					sourcePath);
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(
 					"Could not set persistant property", e);
 		}
-		createProjectStructure(project, sourcePath, equationPath, buildPath);
+		createProjectStructure(project, sourcePath, configPath, buildPath);
 		addFeatureNatureToProject(project);
 
 	}
@@ -431,7 +432,7 @@ public class CorePlugin extends AbstractCorePlugin {
 	}
 
 	private static void createProjectStructure(IProject project,
-			String sourcePath, String equationPath, String buildPath) {
+			String sourcePath, String configPath, String buildPath) {
 		try {
 			// just create the bin folder if project hat only the FeatureIDE
 			// Nature
@@ -443,7 +444,7 @@ public class CorePlugin extends AbstractCorePlugin {
 			getDefault().logError(e);
 		}
 		createFolder(project, sourcePath);
-		createFolder(project, equationPath);
+		createFolder(project, configPath);
 		createFolder(project, buildPath);
 		FeatureModel featureModel = new FeatureModel();
 		featureModel.createDefaultValues();

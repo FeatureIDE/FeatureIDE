@@ -39,16 +39,16 @@ import de.ovgu.featureide.ui.UIPlugin;
 
 /**
  * This class handles the event that is triggered when you
- * select an equation file with the context menu.
+ * select a configuration file with the context menu.
  * 
  * @author Tom Brosch
  *
  */
-public class SetEquationAction implements IObjectActionDelegate {
+public class SetConfigurationAction implements IObjectActionDelegate {
 	
 	private ISelection selection;
 
-	public SetEquationAction() {
+	public SetConfigurationAction() {
 	}
 
 	public void setActivePart(IAction action, IWorkbenchPart targetPart) {

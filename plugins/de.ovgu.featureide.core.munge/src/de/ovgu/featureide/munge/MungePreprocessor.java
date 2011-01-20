@@ -93,14 +93,14 @@ public class MungePreprocessor implements IComposerExtensionClass{
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#performFullBuild(org.eclipse.core.resources.IFile)
 	 */
-	public void performFullBuild(IFile equation) {
+	public void performFullBuild(IFile config) {
 		assert(featureProject != null) : "Invalid project given";
 		
-		final String equationPath =  equation.getRawLocation().toOSString();
+		final String configPath =  config.getRawLocation().toOSString();
 		final String basePath = featureProject.getSourcePath();
 		final String outputPath = featureProject.getBuildPath();
 		
-		if (equationPath == null || basePath == null || outputPath == null)
+		if (configPath == null || basePath == null || outputPath == null)
 			return;
 		
 		//CommandLine syntax:
@@ -110,7 +110,7 @@ public class MungePreprocessor implements IComposerExtensionClass{
 		configuration = new Configuration(featureProject.getFeatureModel());
 		ConfigurationReader reader = new ConfigurationReader(configuration);
 		try {
-			reader.readFromFile(equation);
+			reader.readFromFile(config);
 		} catch (CoreException e) {
 			MungeCorePlugin.getDefault().logError(e);
 		} catch (IOException e) {
@@ -272,21 +272,21 @@ public class MungePreprocessor implements IComposerExtensionClass{
 
 	@Override
 	public void addCompiler(IProject project, String sourcePath,
-			String equationPath, String buildPath) {
+			String configPath, String buildPath) {
 		addNature(project);
-		addClasspathFile(project, sourcePath, equationPath, buildPath);
+		addClasspathFile(project, sourcePath, configPath, buildPath);
 	}
 
 	private void addClasspathFile(IProject project, String sourcePath,
-			String equationPath, String buildPath) {
+			String configPath, String buildPath) {
 		IFile iClasspathFile = project.getFile(".classpath");
 		if (!iClasspathFile.exists()) {
 			String bin = "bin";
-			if (sourcePath.equals(bin) || equationPath.equals(bin)
+			if (sourcePath.equals(bin) || configPath.equals(bin)
 					|| buildPath.equals(bin)) {
 				bin = "bin2";
 			}
-			if (sourcePath.equals(bin) || equationPath.equals(bin)
+			if (sourcePath.equals(bin) || configPath.equals(bin)
 					|| buildPath.equals(bin)) {
 				bin = "bin3";
 			}

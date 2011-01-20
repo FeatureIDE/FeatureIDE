@@ -68,7 +68,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
- * ConfiguratonEitor displays the Equation File.
+ * Displays a configuration file.
  * 
  * @author Constanze Adler
  * @author Christian Becker

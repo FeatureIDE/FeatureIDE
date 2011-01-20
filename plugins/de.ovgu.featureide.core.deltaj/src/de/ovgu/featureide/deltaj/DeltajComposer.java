@@ -45,7 +45,7 @@ import djtemplates.DJStandaloneCompiler;
  */
 public class DeltajComposer implements IComposerExtensionClass {
 	public static final String JAVA_NATURE = "org.eclipse.jdt.core.javanature";
-	private String equationPath;
+	private String configPath;
 	private String basePath;
 	private String outputPath;
 	private String filename;
@@ -86,22 +86,22 @@ public class DeltajComposer implements IComposerExtensionClass {
 	}
 
 	@Override
-	public void performFullBuild(IFile equation) {
+	public void performFullBuild(IFile config) {
 
 		assert (featureProject != null) : "Invalid project given";
 
-		equationPath = equation.getRawLocation().toOSString();
+		configPath = config.getRawLocation().toOSString();
 		basePath = featureProject.getSourcePath().replace('\\', '/') + "/";
 		outputPath = featureProject.getBuildPath().replace('\\', '/') + "/";
 
-		if (equationPath == null || basePath == null || outputPath == null)
+		if (configPath == null || basePath == null || outputPath == null)
 			return;
 
 		Configuration configuration = new Configuration(
 				featureProject.getFeatureModel());
 		ConfigurationReader reader = new ConfigurationReader(configuration);
 		try {
-			reader.readFromFile(equation);
+			reader.readFromFile(config);
 		} catch (CoreException e) {
 			DeltajCorePlugin.getDefault().logError(e);
 		} catch (IOException e) {
@@ -210,22 +210,22 @@ public class DeltajComposer implements IComposerExtensionClass {
 
 	@Override
 	public void addCompiler(IProject project, String sourcePath,
-			String equationPath, String buildPath) {
+			String configPath, String buildPath) {
 		addNature(project, JAVA_NATURE);
-		addClasspathFile(project, sourcePath, equationPath, buildPath);
+		addClasspathFile(project, sourcePath, configPath, buildPath);
 
 	}
 
 	private void addClasspathFile(IProject project, String sourcePath,
-			String equationPath, String buildPath) {
+			String configPath, String buildPath) {
 		IFile iClasspathFile = project.getFile(".classpath");
 		if (!iClasspathFile.exists()) {
 			String bin = "bin";
-			if (sourcePath.equals(bin) || equationPath.equals(bin)
+			if (sourcePath.equals(bin) || configPath.equals(bin)
 					|| buildPath.equals(bin)) {
 				bin = "bin2";
 			}
-			if (sourcePath.equals(bin) || equationPath.equals(bin)
+			if (sourcePath.equals(bin) || configPath.equals(bin)
 					|| buildPath.equals(bin)) {
 				bin = "bin3";
 			}

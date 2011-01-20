@@ -204,27 +204,27 @@ public class NewFeatureProjectPage extends WizardPage {
 		sourcePath.setEnabled(getCompositionTool().hasFeatureFolder());
 		
 		if (isEnabled(sourcePath) && isEnabled(configsPath) &&
-				getSourcePath().equals(getEquationsPath())) {
-			updateStatus("Source Path equals Configurations Path.");
+				getSourcePath().equals(getConfigPath())) {
+			updateStatus("Source path equals configurations path.");
 			return;
 		}
 		if (isEnabled(sourcePath) && isEnabled(buildPath) &&
 				getSourcePath().equals(getBuildPath())) {
-			updateStatus("Source Path equals Build Path.");
+			updateStatus("Source path equals build path.");
 			return;
 		}
 		if (isEnabled(buildPath) && isEnabled(configsPath) && 
-				getBuildPath().equals(getEquationsPath())) {
-			updateStatus("Build Path equals Configurations Path.");
+				getBuildPath().equals(getConfigPath())) {
+			updateStatus("Build path equals configurations path.");
 			return;
 		}
 		if (isEnabled(sourcePath) && isPathEmpty(getSourcePath(), "Source"))return;
 		if (isEnabled(buildPath) && isPathEmpty(getBuildPath(), "Build"))return;
-		if (isEnabled(configsPath) && isPathEmpty(getEquationsPath(), "Equations"))return;
+		if (isEnabled(configsPath) && isPathEmpty(getConfigPath(), "Equations"))return;
 		
 		if (isEnabled(sourcePath) && isInvalidPath(getSourcePath(), "Source"))return;
 		if (isEnabled(buildPath) && isInvalidPath(getBuildPath(), "Build"))return;
-		if (isEnabled(configsPath) && isInvalidPath(getEquationsPath(), "Equations"))return;
+		if (isEnabled(configsPath) && isInvalidPath(getConfigPath(), "Equations"))return;
 		
 		updateStatus(null);
 	}
@@ -272,7 +272,7 @@ public class NewFeatureProjectPage extends WizardPage {
 		return sourcePath.isEnabled() ? sourcePath.getText() : "";
 	}
 	
-	public String getEquationsPath() {
+	public String getConfigPath() {
 
 		return configsPath.isEnabled() ? configsPath.getText() : "";
 

@@ -30,7 +30,7 @@ import de.ovgu.featureide.core.fstmodel.IMethod;
 
 
 /**
- * Describes a class of a jak project according to a selected equation
+ * Describes a class of a jak project according to a selected configuration
  * 
  * @author Tom Brosch
  * @author Thomas Thuem

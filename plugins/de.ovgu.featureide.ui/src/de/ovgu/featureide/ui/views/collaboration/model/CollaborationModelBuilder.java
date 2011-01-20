@@ -117,7 +117,7 @@ public class CollaborationModelBuilder {
 			collaboration.selected = false;
 			collaboration.isConfiguration = true;
 		}
-		collaboration.configurationFile = featureProject.getEquationFolder().getFile(configuration);
+		collaboration.configurationFile = featureProject.getConfigFolder().getFile(configuration);
 		model.collaborations.add(collaboration);
 		
 		//get ordered list of layers from feature model or order file
@@ -352,7 +352,7 @@ public class CollaborationModelBuilder {
 		if (configuration.equals(""))
 			iFile = featureProject.getCurrentConfiguration();
 		else 
-			iFile = featureProject.getEquationFolder().getFile(configuration);
+			iFile = featureProject.getConfigFolder().getFile(configuration);
 		
 		File file = iFile.getRawLocation().toFile();
 		ArrayList<String> configurationFeatures = readFeaturesfromConfigurationFile(file);

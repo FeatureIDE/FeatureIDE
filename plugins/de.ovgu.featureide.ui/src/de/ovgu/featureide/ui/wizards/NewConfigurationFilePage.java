@@ -126,9 +126,9 @@ public class NewConfigurationFilePage extends WizardPage {
 				}
 				if (featureProject != null){
 					try {
-						for (IResource equationFile : featureProject.getEquationFolder().members()) {
-							if (equationFile instanceof IFile) {
-								equationNames.add(equationFile.getName());//.split("[.]")[0]);
+						for (IResource configFile : featureProject.getConfigFolder().members()) {
+							if (configFile instanceof IFile) {
+								configNames.add(configFile.getName());//.split("[.]")[0]);
 							}
 						}
 					} catch (CoreException e2) {
@@ -136,7 +136,7 @@ public class NewConfigurationFilePage extends WizardPage {
 					}
 					IResource res = ResourcesPlugin.getWorkspace().getRoot().findMember(featureProject.getProjectName()); 
 					IFeatureProject data = CorePlugin.getFeatureProject(res);
-					container = data.getEquationFolder();
+					container = data.getConfigFolder();
 				}	
 				dialogChanged();	
 			}
@@ -161,7 +161,7 @@ public class NewConfigurationFilePage extends WizardPage {
 					IFeatureProject data = CorePlugin.getFeatureProject((IResource) obj);
 					if (data == null) container = null;
 					else {
-						container = data.getEquationFolder();
+						container = data.getConfigFolder();
 					}
 				if (container != null) {
 					featureComboProject.setText(container.getProject().getName());
@@ -170,9 +170,9 @@ public class NewConfigurationFilePage extends WizardPage {
 		}
 	}
 	
-	private LinkedList<String> equationNames = new LinkedList<String>();
+	private LinkedList<String> configNames = new LinkedList<String>();
 	private boolean projectbool = false;
-	private boolean equationbool = false;
+	private boolean configbool = false;
 	private void dialogChanged() {
 		String fileName = getFileName();
 		if (featureComboProject.getText().length() == 0 && !projectbool){
@@ -193,13 +193,13 @@ public class NewConfigurationFilePage extends WizardPage {
 		}
 		
 		if (fileName.length() != 0) {
-			equationbool = true;
-			if (equationNames.contains(fileName)) {
+			configbool = true;
+			if (configNames.contains(fileName)) {
 				// TODO replace equation
 				updateStatus("File " + fileName + ".equation already exists.");
 				return;
 			}
-		} else if(equationbool) {
+		} else if(configbool) {
 			updateStatus("File name must be specified");
 			return;
 		}else{
@@ -239,10 +239,10 @@ public class NewConfigurationFilePage extends WizardPage {
 				isFP = true;
 				featureProject = feature;
 				try {
-					equationNames = new LinkedList<String>();
-					for (IResource equationFile : featureProject.getEquationFolder().members()) {
-						if (equationFile instanceof IFile) {
-							equationNames.add(equationFile.getName().split("[.]")[0]);
+					configNames = new LinkedList<String>();
+					for (IResource configurationFile : featureProject.getConfigFolder().members()) {
+						if (configurationFile instanceof IFile) {
+							configNames.add(configurationFile.getName().split("[.]")[0]);
 						}
 					}
 				} catch (CoreException e2) {

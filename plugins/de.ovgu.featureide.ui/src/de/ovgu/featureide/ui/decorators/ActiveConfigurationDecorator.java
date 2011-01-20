@@ -31,28 +31,28 @@ import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.listeners.ICurrentEquationListener;
+import de.ovgu.featureide.core.listeners.ICurrentConfigurationListener;
 import de.ovgu.featureide.ui.UIPlugin;
 
 
 /**
- * A decorator that marks the equation files that is selected for building.
+ * A decorator that marks the configuration files that is selected for building.
  * 
  * @author Marcus Leich
  *
  */
-public class ActiveEquationDecorator implements ILightweightLabelDecorator, ICurrentEquationListener {
+public class ActiveConfigurationDecorator implements ILightweightLabelDecorator, ICurrentConfigurationListener {
 	
 	private ImageDescriptor icon;
 	private LinkedList<ILabelProviderListener> listeners;
 	
-	public ActiveEquationDecorator() {
+	public ActiveConfigurationDecorator() {
 		URL url = de.ovgu.featureide.ui.UIPlugin.getDefault().getBundle().getEntry("/icons/currentconfiguration.gif");
 		icon = ImageDescriptor.createFromURL(url);
 	    listeners = new LinkedList<ILabelProviderListener> ();
 	    
 	    // add Listener to Activator
-	    de.ovgu.featureide.core.CorePlugin.getDefault().addCurrentEquationListener(this); 
+	    de.ovgu.featureide.core.CorePlugin.getDefault().addCurrentConfigurationListener(this); 
 	}
 
 	public void decorate(Object element, IDecoration decoration) {
@@ -69,7 +69,7 @@ public class ActiveEquationDecorator implements ILightweightLabelDecorator, ICur
 	}
 
 	public void dispose() {
-		de.ovgu.featureide.core.CorePlugin.getDefault().removeCurrentEquationListener(this);
+		de.ovgu.featureide.core.CorePlugin.getDefault().removeCurrentConfigurationListener(this);
 	}
 	
 	private void refresh (IResource[] res) {
@@ -88,9 +88,9 @@ public class ActiveEquationDecorator implements ILightweightLabelDecorator, ICur
 		listeners.remove(listener);
 	}
 
-	public void currentEquationChanged(IFeatureProject data) {
+	public void currentConfigurationChanged(IFeatureProject data) {
 		try {
-			refresh(data.getEquationFolder().members());
+			refresh(data.getConfigFolder().members());
 		} catch (CoreException e) {
 			UIPlugin.getDefault().logError(e);
 		}

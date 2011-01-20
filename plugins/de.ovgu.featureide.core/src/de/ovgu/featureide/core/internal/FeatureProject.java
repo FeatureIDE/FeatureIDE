@@ -124,9 +124,9 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	private final IFolder buildFolder;
 
 	/**
-	 * a folder containing all equation files
+	 * a folder containing all configuration files
 	 */
-	private final IFolder equationFolder;
+	private final IFolder configFolder;
 
 	/**
 	 * a folder for source files
@@ -185,7 +185,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		}
 		libFolder = project.getFolder("lib");
 		buildFolder = CorePlugin.createFolder(project, getProjectBuildPath());
-		equationFolder = CorePlugin.createFolder(project,
+		configFolder = CorePlugin.createFolder(project,
 				getProjectConfigurationPath());
 		sourceFolder = CorePlugin.createFolder(project, getProjectSourcePath());
 		featureIDEProjectModel = null;
@@ -349,32 +349,32 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see de.ovgu.featureide.core.IFeatureProject#getCurrentEquationFile()
+	 * @see de.ovgu.featureide.core.IFeatureProject#getCurrentConfiguration()
 	 */
 	public IFile getCurrentConfiguration() {
 		if (currentConfiguration != null && currentConfiguration.exists())
 			return currentConfiguration;
 		
-		if (getEquationFolder() == null)
+		if (getConfigFolder() == null)
 			return null;
 
-		String equation = null;
+		String configuration = null;
 		try {
 			if (project.exists() && project.isOpen()) {
-				equation = project.getPersistentProperty(equationConfigID);
+				configuration = project.getPersistentProperty(configConfigID);
 			}
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
 
-		if (equation != null) {
-			IFile file = equationFolder.getFile(equation);
+		if (configuration != null) {
+			IFile file = configFolder.getFile(configuration);
 			if (file.exists())
 				return file;
 		}
 
-		// No valid equation found
-		if (!getEquationFolder().exists())
+		// no valid configuration found
+		if (!getConfigFolder().exists())
 			return null;
 		
 		List<IFile> configs = getAllConfigurations();
@@ -391,19 +391,19 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * de.ovgu.featureide.core.IFeatureProject#setCurrentEquationFile(org.eclipse
+	 * de.ovgu.featureide.core.IFeatureProject#setCurrentConfiguration(org.eclipse
 	 * .core .resources.IFile)
 	 */
 	public void setCurrentConfiguration(IFile file) {
 		currentConfiguration = file;
 		
-		int offset = getEquationFolder().getProjectRelativePath().toString()
+		int offset = getConfigFolder().getProjectRelativePath().toString()
 				.length();
-		String equationPath = file.getProjectRelativePath().toString()
+		String configPath = file.getProjectRelativePath().toString()
 				.substring(offset);
 		try {
-			project.setPersistentProperty(equationConfigID, equationPath);
-			CorePlugin.getDefault().fireCurrentEquationChanged(this);
+			project.setPersistentProperty(configConfigID, configPath);
+			CorePlugin.getDefault().fireCurrentConfigurationChanged(this);
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
@@ -466,10 +466,10 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see de.ovgu.featureide.core.IFeatureProject#getEquationFolder()
+	 * @see de.ovgu.featureide.core.IFeatureProject#getConfigFolder()
 	 */
-	public IFolder getEquationFolder() {
-		return equationFolder;
+	public IFolder getConfigFolder() {
+		return configFolder;
 	}
 
 	/*
@@ -493,10 +493,10 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see de.ovgu.featureide.core.IFeatureProject#getEquationsPath()
+	 * @see de.ovgu.featureide.core.IFeatureProject#getConfigPath()
 	 */
-	public String getEquationsPath() {
-		return equationFolder.getRawLocation().toOSString();
+	public String getConfigPath() {
+		return configFolder.getRawLocation().toOSString();
 	}
 
 	/*
@@ -524,10 +524,10 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * de.ovgu.featureide.core.IFeatureProject#getEquationName(org.eclipse.core
+	 * de.ovgu.featureide.core.IFeatureProject#getConfigName(org.eclipse.core
 	 * .resources .IResource)
 	 */
-	public String getEquationName(IResource resource) {
+	public String getConfigName(IResource resource) {
 		return getFolderName(resource, buildFolder);
 	}
 
@@ -755,7 +755,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 				}
 			}
 			if (!changedConfigs.isEmpty()) {
-				CorePlugin.getDefault().fireEquationChanged(this);
+				CorePlugin.getDefault().fireConfigurationChanged(this);
 				checkConfigurations(changedConfigs);
 			}
 
@@ -809,10 +809,10 @@ public class FeatureProject extends BuilderMarkerHandler implements
 
 	private List<IFile> getAllConfigurations() {
 		List<IFile> configs = new ArrayList<IFile>();
-		if (!equationFolder.isAccessible())
+		if (!configFolder.isAccessible())
 			return configs;
 		try {
-			for (IResource res : equationFolder.members()) {
+			for (IResource res : configFolder.members()) {
 				if (!(res instanceof IFile))
 					continue;
 				IFile config = (IFile) res;
@@ -931,18 +931,18 @@ public class FeatureProject extends BuilderMarkerHandler implements
 
 	public String getProjectConfigurationPath() {
 		try {
-			String path = project.getPersistentProperty(equationFolderConfigID);
+			String path = project.getPersistentProperty(configFolderConfigID);
 			if (path != null)
 				return path;
 
-			path = getPath(EQUATIONS_ARGUMENT);
+			path = getPath(CONFIGS_ARGUMENT);
 			if (path == null)
-				return DEFAULT_EQUATIONS_PATH;
+				return DEFAULT_CONFIGS_PATH;
 			return path;
 		} catch (Exception e) {
 			CorePlugin.getDefault().logError(e);
 		}
-		return DEFAULT_EQUATIONS_PATH;
+		return DEFAULT_CONFIGS_PATH;
 	}
 
 	public String getProjectBuildPath() {
@@ -1031,7 +1031,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 					Map<String, String> args = command.getArguments();
 					args.put(SOURCE_ARGUMENT, feature);
 					args.put(BUILD_ARGUMENT, src);
-					args.put(EQUATIONS_ARGUMENT, configuration);
+					args.put(CONFIGS_ARGUMENT, configuration);
 					command.setArguments(args);
 				}
 			}

@@ -67,19 +67,19 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 		featureProject = project;
 	}
 
-	public void performFullBuild(IFile equation) {
+	public void performFullBuild(IFile config) {
 		assert(featureProject != null) : "Invalid project given";
 
-		final String equationPath =  equation.getRawLocation().toOSString();
+		final String configPath =  config.getRawLocation().toOSString();
 		final String basePath = featureProject.getSourcePath();
 		final String outputPath = featureProject.getBuildPath();
 
-		if (equationPath == null || basePath == null || outputPath == null)
+		if (configPath == null || basePath == null || outputPath == null)
 			return;
 
 		// A new FSTGenComposer instance is created every time, because this class
 		// seems to remember the FST from a previous build.
-		IFolder buildFolder = featureProject.getBuildFolder().getFolder(equation.getName().split("[.]")[0]);
+		IFolder buildFolder = featureProject.getBuildFolder().getFolder(config.getName().split("[.]")[0]);
 		if (!buildFolder.exists()) {
 			try {
 				buildFolder.create(true, true, null);
@@ -88,12 +88,12 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 			}
 		}
 		
-		setJaveBuildPath(equation.getName().split("[.]")[0]);
+		setJaveBuildPath(config.getName().split("[.]")[0]);
 		
 		FSTGenComposer composer = new FSTGenComposer();
-		//TODO output should be generated directly at outputPath not at outputPath/equation
+		//TODO output should be generated directly at outputPath not at outputPath/configuration
 		composer.run(new String[]{			
-				"--expression", equationPath, 
+				"--expression", configPath, 
 				"--base-directory", basePath,
 				"--output-directory", outputPath + "/", 
 				"--ahead"
@@ -237,12 +237,12 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 	}
 	
 	// copies all not composed Files of selected Features from src to bin and build
-	private void copy(IFile equation) throws CoreException {
-		ArrayList<String > selectedFeatures = getSelectedFeatures(equation);
+	private void copy(IFile config) throws CoreException {
+		ArrayList<String > selectedFeatures = getSelectedFeatures(config);
 		if (selectedFeatures != null)
 			for (String feature : selectedFeatures) {
 				IFolder folder = featureProject.getSourceFolder().getFolder(feature);
-				copy(folder, featureProject.getBuildFolder().getFolder(equation.getName().split("[.]")[0]));
+				copy(folder, featureProject.getBuildFolder().getFolder(config.getName().split("[.]")[0]));
 			}
 	}
 
@@ -269,9 +269,9 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 		}
 	}
 
-	private static ArrayList<String> getSelectedFeatures(IFile equation) {
-		File equationFile = equation.getRawLocation().toFile();
-		return getTokenListFromFile(equationFile);
+	private static ArrayList<String> getSelectedFeatures(IFile config) {
+		File configFile = config.getRawLocation().toFile();
+		return getTokenListFromFile(configFile);
 	}
 	
 	private static ArrayList<String> getTokenListFromFile(File file) {
@@ -345,21 +345,21 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 
 	@Override
 	public void addCompiler(IProject project, String sourcePath,
-			String equationPath, String buildPath) {
+			String configPath, String buildPath) {
 		addNature(project);
-		addClasspathFile(project, sourcePath, equationPath, buildPath);
+		addClasspathFile(project, sourcePath, configPath, buildPath);
 	}
 
 	private void addClasspathFile(IProject project, String sourcePath,
-			String equationPath, String buildPath) {
+			String configPath, String buildPath) {
 		IFile iClasspathFile = project.getFile(".classpath");
 		if (!iClasspathFile.exists()) {
 			String bin = "bin";
-			if (sourcePath.equals(bin) || equationPath.equals(bin)
+			if (sourcePath.equals(bin) || configPath.equals(bin)
 					|| buildPath.equals(bin)) {
 				bin = "bin2";
 			}
-			if (sourcePath.equals(bin) || equationPath.equals(bin)
+			if (sourcePath.equals(bin) || configPath.equals(bin)
 					|| buildPath.equals(bin)) {
 				bin = "bin3";
 			}

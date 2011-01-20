@@ -28,10 +28,10 @@ import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import de.ovgu.featureide.ui.wizards.NewConfigurationFileWizard;
 
 /**
- * Starts the equation file wizard for the selected configuration file
+ * Starts the configuration file wizard for the selected configuration file
  * at the context menu. 
  */
-public class StartEquationFileWizard implements IWorkbenchWindowActionDelegate {
+public class StartConfigurationFileWizard implements IWorkbenchWindowActionDelegate {
 
 	private IWorkbenchWindow window;
 

@@ -69,9 +69,9 @@ public class JakEditor extends TextEditor {
 			if (feature != null)
 				setPartName(file.getName() + "[" + feature + "]");
 			else {
-				String equation = featureProject.getEquationName(file);
-				if (equation != null)
-					setPartName(file.getName() + "<" + equation + ">");
+				String config = featureProject.getConfigName(file);
+				if (config != null)
+					setPartName(file.getName() + "<" + config + ">");
 				setTitleImage(DERIVED_IMAGE);
 			}
 		}

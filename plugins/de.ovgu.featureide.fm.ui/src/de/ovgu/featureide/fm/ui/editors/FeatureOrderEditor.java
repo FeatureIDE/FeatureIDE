@@ -64,9 +64,9 @@ public class FeatureOrderEditor extends EditorPart {
 
 	public static final String ID = FMUIPlugin.PLUGIN_ID + ".editors.FeatureOrderEditor";
 
-	public static final QualifiedName equationFolderConfigID = new QualifiedName("featureproject.configs", "equations");
-	public static final String EQUATIONS_ARGUMENT = "equations";
-	public static final String DEFAULT_EQUATIONS_PATH = "equations";
+	public static final QualifiedName configFolderConfigID = new QualifiedName("featureproject.configs", "equations");
+	public static final String CONFIGS_ARGUMENT = "equations";
+	public static final String DEFAULT_CONFIGS_PATH = "equations";
 	
 	public static final String BUILDER_ID = "de.ovgu.featureide.core"
 		+ ".extensibleFeatureProjectBuilder";
@@ -93,7 +93,7 @@ public class FeatureOrderEditor extends EditorPart {
 
 	private boolean used = false;
 
-	private IFolder equationFolder;
+	private IFolder configFolder;
 	
 	public FeatureOrderEditor(FeatureModel feature) {
 		featureModel = feature;
@@ -112,9 +112,9 @@ public class FeatureOrderEditor extends EditorPart {
 		used = false;
 		orderList = readFeaturesfromOrderFile();
 		try {
-			for (IResource res : equationFolder.members())
+			for (IResource res : configFolder.members())
 				changeConfigurationOrder(res);
-			equationFolder.refreshLocal(IResource.DEPTH_ONE, null);
+			configFolder.refreshLocal(IResource.DEPTH_ONE, null);
 		} catch (CoreException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
@@ -146,7 +146,7 @@ public class FeatureOrderEditor extends EditorPart {
 		this.input = input;
 		this.site = site; 
 		IProject project = ((IFile) input.getAdapter(IFile.class)).getProject();
-		equationFolder = project.getFolder(getProjectConfigurationPath(project));
+		configFolder = project.getFolder(getProjectConfigurationPath(project));
 	}
 
 	/*
@@ -490,18 +490,18 @@ public class FeatureOrderEditor extends EditorPart {
 
 	public String getProjectConfigurationPath(IProject project) {
 		try {
-			String path = project.getPersistentProperty(equationFolderConfigID);
+			String path = project.getPersistentProperty(configFolderConfigID);
 			if (path != null)
 				return path;
 			
-			path = getPath(project, EQUATIONS_ARGUMENT);
+			path = getPath(project, CONFIGS_ARGUMENT);
 			if (path == null)
-				return DEFAULT_EQUATIONS_PATH;
+				return DEFAULT_CONFIGS_PATH;
 			return path;
 		} catch (Exception e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
-		return DEFAULT_EQUATIONS_PATH;
+		return DEFAULT_CONFIGS_PATH;
 	}
 	
 	private String getPath(IProject project, String argument) {

@@ -35,18 +35,18 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	public static final QualifiedName composerConfigID = new QualifiedName("featureproject.configs", "composer");
 	
 	public static final QualifiedName buildFolderConfigID = new QualifiedName("featureproject.configs", "build");
-	public static final QualifiedName equationFolderConfigID = new QualifiedName("featureproject.configs", "equations");
+	public static final QualifiedName configFolderConfigID = new QualifiedName("featureproject.configs", "equations");
 	public static final QualifiedName sourceFolderConfigID = new QualifiedName("featureproject.configs", "source");
 	
 	public static final String SOURCE_ARGUMENT = "source";
-	public static final String EQUATIONS_ARGUMENT = "equations";
+	public static final String CONFIGS_ARGUMENT = "equations";
 	public static final String BUILD_ARGUMENT = "build";
 	
 	public static final String DEFAULT_SOURCE_PATH = "src";
-	public static final String DEFAULT_EQUATIONS_PATH = "equations";
+	public static final String DEFAULT_CONFIGS_PATH = "equations";
 	public static final String DEFAULT_BUILD_PATH = "build";
 	
-	public static final QualifiedName equationConfigID = new QualifiedName("featureproject.configs", "currentEquation");
+	public static final QualifiedName configConfigID = new QualifiedName("featureproject.configs", "currentEquation");
 	
 	public static final QualifiedName javaClassPathID = new QualifiedName("featureproject.configs", "javaClassPath");
 	
@@ -75,13 +75,13 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 
 	public IFolder getBuildFolder();
 
-	public IFolder getEquationFolder();
+	public IFolder getConfigFolder();
 
 	public IFolder getSourceFolder();
 
 	public String getBinPath();
 
-	public String getEquationsPath();
+	public String getConfigPath();
 
 	public String getSourcePath();
 	
@@ -102,7 +102,7 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	 */
 	public String getFeatureName(IResource resource);
 
-	public String getEquationName(IResource resource);
+	public String getConfigName(IResource resource);
 
 	public String getFolderName(IResource resource, IFolder folder);
 
@@ -173,8 +173,9 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	 */
 	public void setFSTModel(IFSTModel model);
 	
+	// TODO why do we build whenever the feature model changes?
 	/**
-	 * @return True if the model, a sourcefile or the current equation was changed.
+	 * @return True if the model, a source file, or the current configuration was changed.
 	 */
 	public boolean buildRelavantChanges();
 	

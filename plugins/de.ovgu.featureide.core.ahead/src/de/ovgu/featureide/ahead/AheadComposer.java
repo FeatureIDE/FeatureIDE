@@ -80,17 +80,17 @@ public class AheadComposer implements IComposerExtensionClass {
 		ahead = new AheadWrapper(project);
 		ahead.addBuildErrorListener(new BuilderErrorListener());
 		try {
-			ahead.setEquation(featureProject.getCurrentConfiguration());
+			ahead.setConfiguration(featureProject.getCurrentConfiguration());
 		} catch (IOException e) {
 			featureProject.createBuilderMarker(featureProject.getProject(),
 					e.getMessage(), 0, IMarker.SEVERITY_ERROR);
 		}
 	}
 
-	public void performFullBuild(IFile equation) {
+	public void performFullBuild(IFile config) {
 		assert (ahead != null) : "Ahead instance not initialized";
 		try {
-			ahead.setEquation(equation);
+			ahead.setConfiguration(config);
 			ahead.buildAll();
 		} catch (Exception e) {
 			AheadCorePlugin.getDefault().logError(e);
@@ -221,21 +221,21 @@ public class AheadComposer implements IComposerExtensionClass {
 
 	@Override
 	public void addCompiler(IProject project, String sourcePath,
-			String equationPath, String buildPath) {
+			String configPath, String buildPath) {
 		addNature(project);
-		addClasspathFile(project, sourcePath, equationPath, buildPath);
+		addClasspathFile(project, sourcePath, configPath, buildPath);
 	}
 
 	private void addClasspathFile(IProject project, String sourcePath,
-			String equationPath, String buildPath) {
+			String configPath, String buildPath) {
 		IFile iClasspathFile = project.getFile(".classpath");
 		if (!iClasspathFile.exists()) {
 			String bin = "bin";
-			if (sourcePath.equals(bin) || equationPath.equals(bin)
+			if (sourcePath.equals(bin) || configPath.equals(bin)
 					|| buildPath.equals(bin)) {
 				bin = "bin2";
 			}
-			if (sourcePath.equals(bin) || equationPath.equals(bin)
+			if (sourcePath.equals(bin) || configPath.equals(bin)
 					|| buildPath.equals(bin)) {
 				bin = "bin3";
 			}

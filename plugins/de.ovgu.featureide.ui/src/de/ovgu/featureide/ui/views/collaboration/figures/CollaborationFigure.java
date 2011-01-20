@@ -44,13 +44,13 @@ public class CollaborationFigure extends Figure implements GUIDefaults{
 	
 	private final Label label = new Label();
 	public Boolean selected = true;
-	public Boolean isEquation = false;
+	public Boolean isConfiguration = false;
 	
 	public CollaborationFigure(Collaboration coll) {
 		
 		super();
 		selected = coll.selected;
-		isEquation = coll.isConfiguration;
+		isConfiguration = coll.isConfiguration;
 		this.setLayoutManager(new FreeformLayout());
 		
 		if (selected) {
@@ -60,7 +60,7 @@ public class CollaborationFigure extends Figure implements GUIDefaults{
 			setBackgroundColor(COLL_BACKGROUND_UNSELECTED);
 			setBorder(COLL_BORDER_UNSELECTED);
 		}
-		if (isEquation)
+		if (isConfiguration)
 			if (selected)
 				label.setIcon(IMAGE_CURRENT_CONFIGURATION);
 			else

@@ -20,10 +20,9 @@ package de.ovgu.featureide.ui.wizards;
 
 import org.eclipse.swt.widgets.Composite;
 
-
-
 /**
  * A dialog page for adding the FeatureIDE Nature.
+ * TODO Jens, please revise this class
  * 
  * @author Jens Meinicke
  */
@@ -71,7 +70,7 @@ public class ConversionPage extends NewFeatureProjectPage {
 //			return;
 //		}
 //		if (getBackupPath().equals(getSourcePath())) {
-//			updateStatus("Equations Path equals Backup Path.");
+//			updateStatus("Configurations Path equals Backup Path.");
 //			return;
 //		}
 //		if (isPathEmpty(getBackupPath(), "Backup"))return;

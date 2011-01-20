@@ -50,7 +50,7 @@ import de.ovgu.featureide.fm.core.configuration.FeatureOrderReader;
  * 
  * The class encapsulates everything that has to do with the composing step. It
  * composes several given jak files. for each jak file all corresponding jak
- * files according to one equation file were searched to compose them with the
+ * files according to one configuration file were searched to compose them with the
  * help of the Mixin class
  * 
  * @author Tom Brosch
@@ -72,7 +72,7 @@ public class ComposerWrapper {
 
 	private IFolder compositionFolder;
 
-	private IFile equationFile;
+	private IFile configFile;
 
 	private IFeatureProject featureProject;
 
@@ -89,14 +89,14 @@ public class ComposerWrapper {
 		allFeatureFolders = new LinkedList<IFolder>();
 		featureFolders = new LinkedList<IFolder>();
 		compositionFolder = null;
-		equationFile = null;
+		configFile = null;
 		errorListeners = new LinkedList<AheadBuildErrorListener>();
 		this.featureProject = featureProject;
 		jakModelBuilder = new JakModelBuilder(this.featureProject);
 	}
 
 	public IFile[] composeAll() throws IOException {
-		return composeAll(equationFile);
+		return composeAll(configFile);
 	}
 
 	private class FeatureVisitor implements IResourceVisitor {
@@ -116,18 +116,18 @@ public class ComposerWrapper {
 	}
 
 	/**
-	 * Composes all jakfiles for a given equation file
+	 * Composes all jak files for a given configuration file
 	 * 
-	 * @param equationFile
+	 * @param configFile
 	 * @return Array of composed jakfiles
 	 */
-	public IFile[] composeAll(IFile equationFile) throws IOException {
-		// Set the given equation file as the current one
+	public IFile[] composeAll(IFile configFile) throws IOException {
+		// Set the given configuration file as the current one
 		// Search in all feature directories for jakfiles and add
 		// them to the composition list
 		// Compose all and return the array of composed jakfiles
 
-		setEquation(equationFile);
+		setConfiguration(configFile);
 		for (IFolder featureFolder : allFeatureFolders) {
 			try {
 				if (featureFolder.exists())
@@ -147,13 +147,11 @@ public class ComposerWrapper {
 	}
 
 	/**
-	 * Sets the current equation file <br>
+	 * Sets the current configuration file <br>
 	 * This method has to be called before addJakfileToCompose
 	 */
-	void setEquation(IFile equationFile) throws IOException {
-		this.equationFile = equationFile;
-//		if (equationFile == null)
-//			return;
+	void setConfiguration(IFile configFile) throws IOException {
+		this.configFile = configFile;
 
 		// Get feature folders
 		// Get composition folder
@@ -161,16 +159,16 @@ public class ComposerWrapper {
 		BufferedReader reader = null;
 		allFeatureFolders.clear();
 		featureFolders.clear();
-		IFile equation;
-		if (equationFile == null) {
-			equation = featureProject.getCurrentConfiguration();
+		IFile config;
+		if (configFile == null) {
+			config = featureProject.getCurrentConfiguration();
 		} else {
-			equation = equationFile;
+			config = configFile;
 		}
-		if (equation == null) {
+		if (config == null) {
 			return;
 		}
-		reader = new BufferedReader(new FileReader(equation
+		reader = new BufferedReader(new FileReader(config
 				.getRawLocation().toFile()));
 		String line = null;
 		while ((line = reader.readLine()) != null) {
@@ -211,12 +209,12 @@ public class ComposerWrapper {
 	}
 
 	/**
-	 * Returns the current equation file
+	 * Returns the current configuration file
 	 * 
-	 * @return the current equation file
+	 * @return the current configuration file
 	 */
-	public IFile getEquation() {
-		return equationFile;
+	public IFile getConfiguration() {
+		return configFile;
 	}
 
 	/**
@@ -270,7 +268,7 @@ public class ComposerWrapper {
 		//if (fileVector.size() == 0) {
 			// this is the case if you try to add a jak file that lies in a
 			// folder
-			// that isn't contained in the equation file
+			// that isn't contained in the configuration file
 	//	} else
 			absoluteJakFilenames.put(jakFilePath, fileVector);
 	}
@@ -319,7 +317,7 @@ public class ComposerWrapper {
 						ownASTs);
 				composedFiles.add(newJakIFile);
 				try {
-					if (equationFile != null) {
+					if (configFile != null) {
 						runMixin(files2);
 					}
 				} catch (CoreException e) {

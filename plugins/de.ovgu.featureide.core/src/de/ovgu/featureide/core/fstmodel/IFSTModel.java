@@ -26,14 +26,14 @@ public interface IFSTModel extends IFSTModelElement {
 
 	/**
 	 * Returns the number of features, that were used to build the current
-	 * version of the FeatureIDE project according to the current equation file
+	 * version of the FeatureIDE project according to the current configuration file
 	 * 
 	 * @return Number of selected features
 	 */
 	public int getNumberOfSelectedFeatures();
 
 	/**
-	 * Returns all selected features ordered by the order in the equation file
+	 * Returns all selected features ordered by the order in the configuration file
 	 * 
 	 * @return Selected features
 	 */

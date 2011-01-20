@@ -52,7 +52,7 @@ public class ConversionWizard  extends Wizard implements INewWizard {
 				IResource res = (IResource)obj;
 				if (page.hasCompositionTool()) {
 					CorePlugin.setupProject(res.getProject(), page.getCompositionTool().getId()
-							,page.getSourcePath(),page.getEquationsPath(),page.getBuildPath());
+							,page.getSourcePath(),page.getConfigPath(),page.getBuildPath());
 					UIPlugin.getDefault().openEditor(FeatureModelEditor.ID, (res.getProject()).getFile("model.xml"));
 				}
 				return true;

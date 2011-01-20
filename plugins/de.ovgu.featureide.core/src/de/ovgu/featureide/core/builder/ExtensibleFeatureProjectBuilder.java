@@ -114,15 +114,15 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		}
 		
 		if (cleanBuild) {
-			IFile equationFile = featureProject.getCurrentConfiguration();
-			if (equationFile == null)
+			IFile configFile = featureProject.getCurrentConfiguration();
+			if (configFile == null)
 				return;
 	
-			for (IResource res : featureProject.getBuildFolder().members()) {//.getFolder(equation).members()) {
+			for (IResource res : featureProject.getBuildFolder().members()) {
 						res.delete(true, monitor);
 				}
 			if (!hasOtherNature) {
-				for (IResource res : featureProject.getBinFolder().members())//.getFolder(equation).members())
+				for (IResource res : featureProject.getBinFolder().members())
 						res.delete(true, monitor);
 			}
 			
@@ -155,12 +155,12 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 			return null;
 
 		cleaned = false;
-		IFile equation = featureProject.getCurrentConfiguration();
+		IFile config = featureProject.getCurrentConfiguration();
 		featureProject.deleteBuilderMarkers(getProject(),
 				IResource.DEPTH_INFINITE);
 		
 		try {
-			for (IResource res : featureProject.getEquationFolder().members())
+			for (IResource res : featureProject.getConfigFolder().members())
 				res.refreshLocal(IResource.DEPTH_ZERO, null);
 			featureProject.getProject().refreshLocal(IResource.DEPTH_ONE, null);
 			cleanBuild = true;
@@ -169,11 +169,11 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 			CorePlugin.getDefault().logError(e);
 		}
 
-		if (equation == null) {
+		if (config == null) {
 			return null;
 		}
 		
-		composerExtension.performFullBuild(equation);
+		composerExtension.performFullBuild(config);
 		
 		featureProject.builded();
 		try {
@@ -189,7 +189,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		}
 		try {
 			if (!composerExtension.copyNotComposedFiles()) {
-				copy(equation);
+				copy(config);
 			}
 		} catch (CoreException e1) {
 			CorePlugin.getDefault().logError(e1);
@@ -208,8 +208,8 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 	}
 	
 	// copies all not composed Files of selected Features from src to bin and build
-	private void copy(IFile equation) throws CoreException {
-		ArrayList<String > selectedFeatures = getSelectedFeatures(equation);
+	private void copy(IFile config) throws CoreException {
+		ArrayList<String > selectedFeatures = getSelectedFeatures(config);
 		if (selectedFeatures != null)
 			for (String feature : selectedFeatures) {
 				IFolder folder = featureProject.getSourceFolder().getFolder(feature);
@@ -240,9 +240,9 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		}
 	}
 
-	private static ArrayList<String> getSelectedFeatures(IFile equation) {
-		File equationFile = equation.getRawLocation().toFile();
-		return getTokenListFromFile(equationFile);
+	private static ArrayList<String> getSelectedFeatures(IFile config) {
+		File configFile = config.getRawLocation().toFile();
+		return getTokenListFromFile(configFile);
 	}
 
 	/**

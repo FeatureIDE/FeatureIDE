@@ -20,8 +20,13 @@ package de.ovgu.featureide.core.listeners;
 
 import de.ovgu.featureide.core.IFeatureProject;
 
-public interface ICurrentEquationListener {
+/**
+ * A listener on configuration files specifying particular variants.
+ * 
+ * @author Tom Brosch
+ */
+public interface IConfigurationChangedListener {
 	
-	void currentEquationChanged(IFeatureProject featureProject);
-
+	void configurationChanged(IFeatureProject featureProject);
+	
 }
