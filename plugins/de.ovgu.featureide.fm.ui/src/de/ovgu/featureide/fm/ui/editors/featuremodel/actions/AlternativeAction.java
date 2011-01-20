@@ -35,7 +35,7 @@ public class AlternativeAction extends SingleSelectionAction {
 	private final FeatureModel featureModel;
 
 	public AlternativeAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
-		super("ALTERNATIVE", viewer);
+		super("Alternative", viewer);
 		this.featureModel = featureModel;
 	}
 

@@ -38,7 +38,7 @@ public class ReverseOrderAction extends Action {
 	private final FeatureModel featureModel;
 	
 	public ReverseOrderAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
-		super("Reverse Order");
+		super("Reverse Feature Order");
 		this.featureModel = featureModel;
 	}
 

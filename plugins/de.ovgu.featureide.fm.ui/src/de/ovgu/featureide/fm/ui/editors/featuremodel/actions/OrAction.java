@@ -35,7 +35,7 @@ public class OrAction extends SingleSelectionAction {
 	private final FeatureModel featureModel;
 
 	public OrAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
-		super("OR", viewer);
+		super("Or", viewer);
 		this.featureModel = featureModel;
 	}
 

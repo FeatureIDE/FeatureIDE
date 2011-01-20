@@ -18,14 +18,13 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
-import java.util.Iterator;
-
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
 
 /**
@@ -36,20 +35,18 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
  */
 public class CreateConstraintAction extends AbstractConstraintEditorAction {
 
+	private static ImageDescriptor createImage = PlatformUI.getWorkbench()
+	.getSharedImages().getImageDescriptor(
+			ISharedImages.IMG_TOOL_NEW_WIZARD);
+
 	public CreateConstraintAction(GraphicalViewerImpl viewer,
 			FeatureModel featuremodel, String menuname) {
 		super(viewer, featuremodel, menuname);
+		setImageDescriptor(createImage);
 	}
 
 	@Override
 	protected boolean isValidSelection(IStructuredSelection selection) {		
-		Iterator<?> iter = selection.iterator();
-		while (iter.hasNext()) {
-			Object editPart = iter.next();
-			if ((editPart instanceof ConstraintEditPart) || (editPart instanceof FeatureEditPart) ) {
-				return false;
-			}
-		}
 		return true;
 	}
 

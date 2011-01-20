@@ -28,13 +28,13 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  * 
  * @author Thomas Thuem
  */
-public class MandantoryAction extends SingleSelectionAction {
+public class MandatoryAction extends SingleSelectionAction {
 
 	public static String ID = "de.ovgu.featureide.mandantory";
 
 	private final FeatureModel featureModel;
 
-	public MandantoryAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
+	public MandatoryAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
 		super("Mandantory (Double Click)", viewer);
 		this.featureModel = featureModel;
 	}

@@ -71,7 +71,7 @@ public class CreateCompoundAction extends Action {
 	};
 
 	public CreateCompoundAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
-		super("Create Compound (above)", createImage);
+		super("Create Feature Above", createImage);
 		this.viewer = viewer;
 		this.featureModel = featureModel;
 		setEnabled(false);

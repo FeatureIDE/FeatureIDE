@@ -50,7 +50,7 @@ public class CreateLayerAction extends SingleSelectionAction {
 	private final FeatureModel featureModel;
 
 	public CreateLayerAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
-		super("Create Feature (below)", viewer);
+		super("Create Feature Below (Ins)", viewer);
 		setImageDescriptor(createImage);
 		this.featureModel = featureModel;
 	}

@@ -109,7 +109,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateLayerAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.EditConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.HiddenAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.MandantoryAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.MandatoryAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.RenameAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ReverseOrderAction;
@@ -157,7 +157,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 
 	private DeleteAction deleteAction;
 
-	private MandantoryAction mandantoryAction;
+	private MandatoryAction mandatoryAction;
 
 	private AbstractAction abstractAction;
 
@@ -292,7 +292,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		createCompoundAction = new CreateCompoundAction(graphicalViewer,
 				featureModel);
 		deleteAction = new DeleteAction(graphicalViewer, featureModel);
-		mandantoryAction = new MandantoryAction(graphicalViewer, featureModel);
+		mandatoryAction = new MandatoryAction(graphicalViewer, featureModel);
 		hiddenAction = new HiddenAction(graphicalViewer, featureModel);
 		abstractAction = new AbstractAction(graphicalViewer, featureModel);
 		andAction = new AndAction(graphicalViewer, featureModel);
@@ -322,29 +322,31 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		});
 		menu.createContextMenu(graphicalViewer.getControl());
 		graphicalViewer.setContextMenu(menu);
-		getSite().registerContextMenu(menu, graphicalViewer);
+		//the following line adds package explorer entries into our context menu
+		//getSite().registerContextMenu(menu, graphicalViewer);
 	}
 
 	private void createKeyBindings() {
 		KeyHandler handler = graphicalViewer.getKeyHandler();
 		handler.put(KeyStroke.getPressed(SWT.F2, 0), renameAction);
+		handler.put(KeyStroke.getPressed(SWT.INSERT, 0), createLayerAction);
 		graphicalViewer.setKeyHandler(handler);
 	}
 
 	private void fillContextMenu(IMenuManager menu) {
 		if (andAction.isEnabled() || orAction.isEnabled()) {
 			if (andAction.isChecked()) {
-				andAction.setText("AND");
-				orAction.setText("OR (Double Click)");
-				alternativeAction.setText("ALTERNATIVE");
+				andAction.setText("And");
+				orAction.setText("Or (Double Click)");
+				alternativeAction.setText("Alternative");
 			} else if (orAction.isChecked()) {
-				andAction.setText("AND");
-				orAction.setText("OR");
-				alternativeAction.setText("ALTERNATIVE (Double Click)");
+				andAction.setText("And");
+				orAction.setText("Or");
+				alternativeAction.setText("Alternative (Double Click)");
 			} else if (alternativeAction.isChecked()) {
-				andAction.setText("AND (Double Click)");
-				orAction.setText("OR");
-				alternativeAction.setText("ALTERNATIVE");
+				andAction.setText("And (Double Click)");
+				orAction.setText("Or");
+				alternativeAction.setText("Alternative");
 			}
 			menu.add(andAction);
 			menu.add(orAction);
@@ -353,16 +355,21 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 				|| createCompoundAction.isEnabled()) {
 			menu.add(createCompoundAction);
 			menu.add(createLayerAction);
-			menu.add(mandantoryAction);
+			menu.add(renameAction);
+			menu.add(deleteAction);
+			menu.add(new Separator());
+			menu.add(mandatoryAction);
 			menu.add(abstractAction);
 			menu.add(hiddenAction);
-			menu.add(deleteAction);
-			menu.add(renameAction);
-		} else {
-
+			menu.add(new Separator());
+			menu.add(reverseOrderAction);
+		} else if (editConstraintAction.isEnabled()) {
 			menu.add(createConstraintAction);
 			menu.add(editConstraintAction);
 			menu.add(deleteAction);
+		} else {
+			menu.add(createConstraintAction);
+			menu.add(new Separator());
 			menu.add(reverseOrderAction);
 		}
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
@@ -376,8 +383,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 			return createCompoundAction;
 		if (DeleteAction.ID.equals(workbenchActionID))
 			return deleteAction;
-		if (MandantoryAction.ID.equals(workbenchActionID))
-			return mandantoryAction;
+		if (MandatoryAction.ID.equals(workbenchActionID))
+			return mandatoryAction;
 		if (AbstractAction.ID.equals(workbenchActionID))
 			return abstractAction;
 		if (HiddenAction.ID.equals(workbenchActionID))

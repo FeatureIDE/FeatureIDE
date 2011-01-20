@@ -35,7 +35,7 @@ public class AndAction extends SingleSelectionAction {
 	private final FeatureModel featureModel;
 	
 	public AndAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
-		super("AND", viewer);
+		super("And", viewer);
 		this.featureModel = featureModel;
 	}
 

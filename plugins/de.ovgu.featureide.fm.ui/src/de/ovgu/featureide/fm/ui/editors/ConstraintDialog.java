@@ -713,7 +713,7 @@ public class ConstraintDialog {
 	 * */
 	private String getDeadFeatureString(List<Literal> deadFeatures) {
 		StringBuffer featureString = new StringBuffer();
-		featureString.append("constraint causes features to be dead: ");
+		featureString.append("Constraint causes the following features to be dead: ");
 		int count = 0;
 		int featureCount = 0;
 		boolean isNewLine = false;
