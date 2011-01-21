@@ -238,24 +238,14 @@ public class DeltajComposer implements IComposerExtensionClass {
 			String configPath, String buildPath) {
 		IFile iClasspathFile = project.getFile(".classpath");
 		if (!iClasspathFile.exists()) {
-			String bin = "bin";
-			if (sourcePath.equals(bin) || configPath.equals(bin)
-					|| buildPath.equals(bin)) {
-				bin = "bin2";
-			}
-			if (sourcePath.equals(bin) || configPath.equals(bin)
-					|| buildPath.equals(bin)) {
-				bin = "bin3";
-			}
 			try {
-				String text = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-						+ "<classpath>\n"
-						+ "<classpathentry kind=\"src\" path=\""
+				String text = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n"
+						+ "<classpath>\r\n"
+						+ "\t<classpathentry kind=\"src\" path=\""
 						+ buildPath
-						+ "\"/>\n"
-						+ "<classpathentry kind=\"con\" path=\"org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6\"/>\n"
-						+ "<classpathentry kind=\"output\" path=\"" + bin
-						+ "\"/>\n" + "</classpath>";
+						+ "\"/>\r\n"
+						+ "\t<classpathentry kind=\"con\" path=\"org.eclipse.jdt.launching.JRE_CONTAINER\"/>\r\n"
+						+ "\t<classpathentry kind=\"output\" path=\"bin\"/>\r\n" + "</classpath>";
 				InputStream source = new ByteArrayInputStream(text.getBytes());
 				iClasspathFile.create(source, true, null);
 			} catch (CoreException e) {

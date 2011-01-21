@@ -129,7 +129,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		IResourceChangeListener {
 
 	public static final String ID = FMUIPlugin.PLUGIN_ID
-			+ ".editors.GrammarEditor";
+			+ ".editors.FeatureModelEditor";
 
 	private GraphicalViewerImpl graphicalViewer;
 

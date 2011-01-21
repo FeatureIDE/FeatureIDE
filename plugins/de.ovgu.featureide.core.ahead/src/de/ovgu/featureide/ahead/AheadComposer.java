@@ -210,12 +210,16 @@ public class AheadComposer implements IComposerExtensionClass {
 		return text;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void postCompile(IResourceDelta delta, IFile file) {
-		if (delta.getKind() != IResourceDelta.ADDED) {
-			if (file.getName().endsWith(".java")) {
-				ahead.postCompile(file);
-			}
+		try {
+			file.setDerived(true);
+		} catch (CoreException e) {
+			AheadCorePlugin.getDefault().logError(e);
+		}
+		if (file.getName().endsWith(".java")) {
+			ahead.postCompile(file);
 		}
 	}
 
@@ -224,27 +228,51 @@ public class AheadComposer implements IComposerExtensionClass {
 			String configPath, String buildPath) {
 		addNature(project);
 		addClasspathFile(project, sourcePath, configPath, buildPath);
+//		addJava14Settings(project);
 	}
+
+/*	private void addJava14Settings(IProject project) {
+		IFolder settingsFolder = project.getFolder(".settings");
+		if (!settingsFolder.exists()) {
+			try {
+				settingsFolder.create(true, true, null);
+			} catch (CoreException e) {
+				AheadCorePlugin.getDefault().logError(e);
+			}
+		}
+		IFile settingsFile = settingsFolder.getFile("org.eclipse.jdt.core.prefs");
+		if (!settingsFile.exists()) {
+			String text = 
+				"eclipse.preferences.version=1\r\n" +
+				"org.eclipse.jdt.core.compiler.codegen.inlineJsrBytecode=enabled\r\n" +
+				"org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.2\r\n" +
+				"org.eclipse.jdt.core.compiler.codegen.unusedLocal=preserve\r\n" +
+				"org.eclipse.jdt.core.compiler.compliance=1.4\r\n" +
+				"org.eclipse.jdt.core.compiler.debug.lineNumber=generate\r\n" +
+				"org.eclipse.jdt.core.compiler.debug.localVariable=generate\r\n" +
+				"org.eclipse.jdt.core.compiler.debug.sourceFile=generate\r\n" +
+				"org.eclipse.jdt.core.compiler.problem.assertIdentifier=warning\r\n" +
+				"org.eclipse.jdt.core.compiler.problem.enumIdentifier=warning\r\n" +
+				"org.eclipse.jdt.core.compiler.source=1.3";
+			InputStream source = new ByteArrayInputStream(text.getBytes());
+			try {
+				settingsFile.create(source, true, null);
+			} catch (CoreException e) {
+				AheadCorePlugin.getDefault().logError(e);
+			}
+		}		
+	}*/
 
 	private void addClasspathFile(IProject project, String sourcePath,
 			String configPath, String buildPath) {
 		IFile iClasspathFile = project.getFile(".classpath");
 		if (!iClasspathFile.exists()) {
-			String bin = "bin";
-			if (sourcePath.equals(bin) || configPath.equals(bin)
-					|| buildPath.equals(bin)) {
-				bin = "bin2";
-			}
-			if (sourcePath.equals(bin) || configPath.equals(bin)
-					|| buildPath.equals(bin)) {
-				bin = "bin3";
-			}
 			try {
 				String text = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + 
 			 				  "<classpath>\n" +  
-			 				  "<classpathentry kind=\"src\" path=\"" + buildPath + "\"/>\n" + 
-			 				  "<classpathentry kind=\"con\" path=\"org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6\"/>\n" + 
-			 				  "<classpathentry kind=\"output\" path=\"" + bin + "\"/>\n" + 
+			 				  "\t<classpathentry kind=\"src\" path=\"" + buildPath + "\"/>\n" + 
+			 				  "\t<classpathentry kind=\"con\" path=\"org.eclipse.jdt.launching.JRE_CONTAINER\"/>\r\n" + 
+			 				  "\t<classpathentry kind=\"output\" path=\"bin\"/>\n" + 
 			 				  "</classpath>"; 
 				InputStream source = new ByteArrayInputStream(text.getBytes());
 				iClasspathFile.create(source, true, null);

@@ -54,9 +54,16 @@ import de.ovgu.featureide.core.IFeatureProject;
 public class AheadWrapper {
 
 	private Jak2JavaWrapper jak2java;
-
+	
 	private ComposerWrapper composer;
-
+	
+	private static final String BUILDER_PROBLEM_MARKER = CorePlugin.PLUGIN_ID + ".builderProblemMarker";
+	
+	// Java 1.4 exclusions
+	private static final String RAW_TYPE = "raw type";
+	private static final String GENERIC_TYPE = "generic type";
+	private static final String TYPE_SAFETY = "Type safety";
+	
 	public AheadWrapper(IFeatureProject featureProject) {
 		jak2java = new Jak2JavaWrapper();
 		composer = new ComposerWrapper(featureProject);
@@ -122,8 +129,6 @@ public class AheadWrapper {
 
 	public void postCompile(final IFile file) {
 		final IFile jakFile = ((IFolder)file.getParent()).getFile(file.getName().replace(".java",".jak"));
-		CorePlugin.getDefault();
-		final IFolder buildFolder = CorePlugin.getFeatureProject(jakFile).getBuildFolder();
 		if (!jakFile.exists())
 			return;
 		Job job = new Job("Propagate problem markers") {
@@ -136,46 +141,49 @@ public class AheadWrapper {
 							for (IMarker marker : markers) {
 								if (marker.exists()) {
 									String content = marker.getAttribute(IMarker.MESSAGE, null);
-									if (content.contains("raw type") || content.contains("generic type") || 
-											content.contains("Type safety")) {
+									if (content.contains(RAW_TYPE) || content.contains(GENERIC_TYPE) || 
+											content.contains(TYPE_SAFETY)) {
 										marker.delete();
 									} else {
 										AheadBuildErrorEvent buildError = new AheadBuildErrorEvent(file, marker.getAttribute(IMarker.MESSAGE).toString(), AheadBuildErrorType.JAVAC_ERROR, (Integer)marker.getAttribute(IMarker.LINE_NUMBER));
-										IMarker newMarker = buildError.getResource().createMarker(CorePlugin.PLUGIN_ID + ".builderProblemMarker");
-										newMarker.setAttribute(IMarker.LINE_NUMBER, buildError.getLine());
-										newMarker.setAttribute(IMarker.MESSAGE, buildError.getMessage());
-										newMarker.setAttribute(IMarker.SEVERITY, marker.getAttribute(IMarker.SEVERITY));
+										if (!hasMarker(buildError)) {
+											IMarker newMarker = buildError.getResource().createMarker(BUILDER_PROBLEM_MARKER);
+											newMarker.setAttribute(IMarker.LINE_NUMBER, buildError.getLine());
+											newMarker.setAttribute(IMarker.MESSAGE, buildError.getMessage());
+											newMarker.setAttribute(IMarker.SEVERITY, marker.getAttribute(IMarker.SEVERITY));
+										}
 									}
 								}
 							}
 						}
-						jakFile.delete(true, monitor);
 					}
-					// Remove composed Jak files after error propagation
-					// TODO why do delete Jak files here and above and why is the method called for every file?
-					deleteJakFiles(buildFolder);
 				} catch (CoreException e) {
 					AheadCorePlugin.getDefault().logError(e);
 				}
 				return Status.OK_STATUS;
 			}
+
+			private boolean hasMarker(AheadBuildErrorEvent buildError) {
+				try {
+					int LineNumber = buildError.getLine();
+					String Message = buildError.getMessage();
+					IMarker[] marker = buildError.getResource().findMarkers(BUILDER_PROBLEM_MARKER, false, IResource.DEPTH_ZERO);
+					if (marker.length > 0) {
+						for (IMarker m : marker) {
+							if (LineNumber == m.getAttribute(IMarker.LINE_NUMBER, -1)) {
+								if (Message.equals(m.getAttribute(IMarker.MESSAGE, null))) {
+									return true;
+								}
+							}
+						}
+					}
+				} catch (CoreException e) {
+					AheadCorePlugin.getDefault().logError(e);
+				}
+				return false;
+			}
 		};
 		job.setPriority(Job.DECORATE);
 		job.schedule();
 	}
-
-	protected void deleteJakFiles(IFolder folder) throws CoreException {
-		for (IResource res : folder.members()) {
-			if (res instanceof IFile) {
-				if (res.getName().endsWith(".jak")) {
-					if (((IFolder)res.getParent()).getFile(res.getName().replace(".jak", ".java")).findMarkers(null, false, IResource.DEPTH_ZERO).length == 0) {
-						res.delete(true, null);
-					}
-				}
-			} else if (res instanceof IFolder) {
-				deleteJakFiles((IFolder)res);
-			}
-		}
-	}
-
 }

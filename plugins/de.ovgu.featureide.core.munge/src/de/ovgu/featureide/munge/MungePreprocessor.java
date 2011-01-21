@@ -227,10 +227,15 @@ public class MungePreprocessor implements IComposerExtensionClass{
 		return list;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void postCompile(IResourceDelta delta, final IFile file) {
-			Job job = new Job("create marker") {
-			@SuppressWarnings("deprecation")
+		try {
+			file.setDerived(true);
+		} catch (CoreException e) {
+			MungeCorePlugin.getDefault().logError(e);
+		}
+		Job job = new Job("create marker") {
 			@Override
 			public IStatus run(IProgressMonitor monitor) {
 				try {
@@ -238,17 +243,38 @@ public class MungePreprocessor implements IComposerExtensionClass{
 					if (marker.length != 0) {
 						for (IMarker m : marker) {
 							IFile sourceFile = findSourceFile(file, featureProject.getSourceFolder());
-							sourceFile.setDerived(true);
-							IMarker newMarker = sourceFile.createMarker(CorePlugin.PLUGIN_ID + ".builderProblemMarker");
-							newMarker.setAttribute(IMarker.LINE_NUMBER, m.getAttribute(IMarker.LINE_NUMBER));
-							newMarker.setAttribute(IMarker.MESSAGE, m.getAttribute(IMarker.MESSAGE));
-							newMarker.setAttribute(IMarker.SEVERITY, m.getAttribute(IMarker.SEVERITY));
+							if (!hasMarker(m, sourceFile)) {
+								IMarker newMarker = sourceFile.createMarker(CorePlugin.PLUGIN_ID + ".builderProblemMarker");
+								newMarker.setAttribute(IMarker.LINE_NUMBER, m.getAttribute(IMarker.LINE_NUMBER));
+								newMarker.setAttribute(IMarker.MESSAGE, m.getAttribute(IMarker.MESSAGE));
+								newMarker.setAttribute(IMarker.SEVERITY, m.getAttribute(IMarker.SEVERITY));
+							}
 						}
 					}
 				} catch (CoreException e) {
 					MungeCorePlugin.getDefault().logError(e);
 				}
 				return Status.OK_STATUS;
+			}
+			
+			private boolean hasMarker(IMarker buildMarker, IFile sourceFile) {
+				try {
+					IMarker[] marker = sourceFile.findMarkers(null, true, IResource.DEPTH_ZERO);
+					int LineNumber = buildMarker.getAttribute(IMarker.LINE_NUMBER, -1);
+					String Message = buildMarker.getAttribute(IMarker.MESSAGE, null);
+					if (marker.length > 0) {
+						for (IMarker m : marker) {
+							if (LineNumber == m.getAttribute(IMarker.LINE_NUMBER, -1)) {
+								if (Message.equals(m.getAttribute(IMarker.MESSAGE, null))) {
+									return true;
+								}
+							}
+						}
+					}
+				} catch (CoreException e) {
+					MungeCorePlugin.getDefault().logError(e);
+				}
+				return false;
 			}
 		};
 		job.setPriority(Job.DECORATE);

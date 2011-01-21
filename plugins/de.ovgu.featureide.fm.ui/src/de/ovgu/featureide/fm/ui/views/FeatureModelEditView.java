@@ -87,12 +87,12 @@ public class FeatureModelEditView extends ViewPart {
 
 		public void partClosed(IWorkbenchPart part) {
 			if (part == featureModelEditor)
-				setGrammarEditor(null);
+				setFeatureModelEditor(null);
 		}
 
 		public void partBroughtToTop(IWorkbenchPart part) {
 			if (part instanceof IEditorPart)
-				setGrammarEditor(part);
+				setFeatureModelEditor(part);
 		}
 
 		public void partActivated(IWorkbenchPart part) {
@@ -116,7 +116,7 @@ public class FeatureModelEditView extends ViewPart {
 
 		getSite().getPage().addPartListener(editorListener);
 		IWorkbenchPage page = getSite().getPage();
-		setGrammarEditor(page.getActiveEditor());
+		setFeatureModelEditor(page.getActiveEditor());
 	}
 
 	@Override
@@ -145,7 +145,7 @@ public class FeatureModelEditView extends ViewPart {
 
 	private Job evaluation;
 
-	private void setGrammarEditor(IWorkbenchPart activeEditor) {
+	private void setFeatureModelEditor(IWorkbenchPart activeEditor) {
 		if (featureModelEditor == activeEditor)
 			return;
 

@@ -387,9 +387,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 
 		projectsList.refresh(true);
 
-		selectAllElementsWithoutWarnings();
-
-		setPageComplete(projectsList.getCheckedElements().length > 0);
+	//	setPageComplete(projectsList.getCheckedElements().length > 0);
 	}
 
 	private void selectAllElementsWithoutWarnings() {

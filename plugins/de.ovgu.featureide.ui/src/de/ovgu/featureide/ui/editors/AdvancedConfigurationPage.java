@@ -263,25 +263,27 @@ public class AdvancedConfigurationPage extends EditorPart {
 			SelectableFeature feature = configurationEditor.configuration.getSelectablefeature(child.getText());
 			child.setForeground(null);
 			child.setFont(treeItemStandardFont);
-			if (!configurationEditor.configuration.valid())
-				if (feature.getAutomatic() == Selection.UNDEFINED) {
-					if (feature.getManual() == Selection.UNDEFINED) {
-						if (configurationEditor.configuration.leadToValidConfiguration(feature, Selection.SELECTED, Selection.UNDEFINED)){
-							child.setForeground(green);
-							child.setFont(treeItemSpecialFont);	
+			if (feature != null) {
+				if (!configurationEditor.configuration.valid())
+					if (feature.getAutomatic() == Selection.UNDEFINED) {
+						if (feature.getManual() == Selection.UNDEFINED) {
+							if (configurationEditor.configuration.leadToValidConfiguration(feature, Selection.SELECTED, Selection.UNDEFINED)){
+								child.setForeground(green);
+								child.setFont(treeItemSpecialFont);	
+							}
+						} else if (feature.getManual() == Selection.SELECTED) {
+							if (configurationEditor.configuration.leadToValidConfiguration(feature, Selection.UNSELECTED, Selection.SELECTED)){
+								child.setForeground(blue);
+								child.setFont(treeItemSpecialFont);
+							}
+							// case: unselected
+						} else if (configurationEditor.configuration.leadToValidConfiguration(feature, Selection.SELECTED, Selection.UNSELECTED)){
+								child.setForeground(green);
+								child.setFont(treeItemSpecialFont);	
 						}
-					} else if (feature.getManual() == Selection.SELECTED) {
-						if (configurationEditor.configuration.leadToValidConfiguration(feature, Selection.UNSELECTED, Selection.SELECTED)){
-							child.setForeground(blue);
-							child.setFont(treeItemSpecialFont);
-						}
-						// case: unselected
-					} else if (configurationEditor.configuration.leadToValidConfiguration(feature, Selection.SELECTED, Selection.UNSELECTED)){
-							child.setForeground(green);
-							child.setFont(treeItemSpecialFont);	
 					}
-				}
-			updateForeground(child);	
+				updateForeground(child);
+			}
 		}
 	}
 }
