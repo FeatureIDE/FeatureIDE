@@ -104,7 +104,13 @@ Create a new configuration file with the according wizard.
  <item
        title="Start your application">
     <description>
-       Now it&apos;s time to start your application. Open the folder &quot;src&quot;, right click on the file Main.java, and choose &quot;Run As&gt;Java Application&quot;. Enjoy your very nice Hello Beautiful Wonderful Word application!
+       Now it&apos;s time to start your application. Right click on the project in package explorer and choose &quot;Run As&gt;Java Application&quot;. Choose a class name without &quot;$$&quot; in the name and enjoy your Hello Beautiful Wonderful Word application! The next time you want to start your application simply use the run button in the eclipse tool bar.
+    </description>
+ </item>
+ <item
+       title="Checkout our examples">
+    <description>
+      You can access our examples using &quot;New&gt;Examples...&quot; in package explorer. We provide an HelloWorld example for every FeatureIDE extension, which may help to create projects in other languages and with other composition mechanisms.
     </description>
  </item>
 </cheatsheet>
