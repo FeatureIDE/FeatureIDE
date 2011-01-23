@@ -464,8 +464,8 @@ Public License instead of this License.
       <import plugin="org.eclipse.core.resources"/>
       <import plugin="de.ovgu.featureide.fm.core"/>
       <import plugin="de.ovgu.featureide.core"/>
-      <import plugin="org.eclipse.cdt.core" version="5.0.2" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.runtime"/>
+      <import feature="org.eclipse.cdt" version="1.0.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
