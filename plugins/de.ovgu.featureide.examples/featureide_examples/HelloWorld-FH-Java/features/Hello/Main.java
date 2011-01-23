@@ -1,5 +1,3 @@
-package HelloWorld;
-
 public class Main {
 
 	protected void print() {
