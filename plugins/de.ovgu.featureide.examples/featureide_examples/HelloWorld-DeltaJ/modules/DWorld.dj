@@ -6,7 +6,7 @@ delta World after Wonderful when World {
 	modifies class Main{
 		modifies void print() {
 			original();
-			new SystemOutWrapper().print(" World!");
+			new SystemOutWrapper().print(" world!");
 		}
 	}
 }

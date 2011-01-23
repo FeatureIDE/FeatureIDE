@@ -11,7 +11,7 @@ public class Main {
 		System.out.print(" wonderful");	
 		/*end[Wonderful]*/
 		/*if[World]*/		
-		System.out.print(" World!");
+		System.out.print(" world!");
 		/*end[World]*/
 	}
 }
