@@ -1,5 +1,3 @@
-package HelloWorld;
-
 public aspect World {
 
 	after(): execution(void Main.print()) {
