@@ -26,7 +26,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -97,7 +96,7 @@ public class AheadWrapper {
 		
 		IFile[] javaFiles = new IFile[jakFiles.length];
 		String filename = null;
-		if (jakFiles != null)
+		if (jakFiles != null) {
 			for (int i = 0; i < jakFiles.length; i++) {
 				IFile jakFile = jakFiles[i];
 				if (jakFile.exists()) {
@@ -107,19 +106,9 @@ public class AheadWrapper {
 					filename = filename.substring(0, filename.lastIndexOf('.'));
 					javaFiles[i] = ((IFolder)jakFile.getParent()).getFile(filename
 							+ ".java");
-					
-					try {
-						javaFiles[i].refreshLocal(IResource.DEPTH_ZERO, null);
-						ResourceAttributes attr = javaFiles[i].getResourceAttributes();
-						if (attr != null) {
-							attr.setReadOnly(false);
-							javaFiles[i].setResourceAttributes(attr);
-						}
-					} catch (CoreException e) {
-						AheadCorePlugin.getDefault().logError(e);
-					}
 				}
 			}
+		}
 		return javaFiles;
 	}
 	

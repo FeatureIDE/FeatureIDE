@@ -42,7 +42,7 @@ public class Role {
 	private IPath path;
 	public LinkedList<IField> fields = new LinkedList<IField>();
 	public LinkedList<IMethod> methods = new LinkedList<IMethod>();	
-	public LinkedList<String> files = new LinkedList<String>();
+	public LinkedList<IFile> files = new LinkedList<IFile>();
 	public IFile file;
 	public String featureName = "";
 	public Boolean selected;

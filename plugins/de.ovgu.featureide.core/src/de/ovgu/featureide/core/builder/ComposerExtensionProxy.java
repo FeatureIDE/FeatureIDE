@@ -142,13 +142,6 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	}
 
 	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#getEditorID(java.lang.String)
-	 */
-	public String getEditorID(String extension) {
-		return composerExtensionClass.getEditorID(extension);
-	}
-
-	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#copyNotComposedFiles()
 	 */
 	public boolean copyNotComposedFiles() {

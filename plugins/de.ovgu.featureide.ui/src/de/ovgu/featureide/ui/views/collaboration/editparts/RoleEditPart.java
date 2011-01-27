@@ -29,12 +29,13 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.Request;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
+import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 
-import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 import de.ovgu.featureide.ui.views.collaboration.figures.RoleFigure;
@@ -97,7 +98,9 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 		roleFigure.setBounds(constraint);
 	}
 	
-
+	/**
+	 * opens the file of the role with its default editor.
+	 */
 	public void performRequest(Request request) {
 		if (REQ_OPEN.equals(request.getType())) {
 			 IFile file = this.getRoleModel().getRoleFile();
@@ -105,15 +108,17 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 				 return;
 			
 			 IWorkbenchWindow dw = UIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow();
-			 FileEditorInput fileEditorInput = new FileEditorInput(file);
 			 try {
 				 IWorkbenchPage page = dw.getActivePage();
-				 if (page != null) { 
-					 //TODO how to open a file with default editor
-					 String editorID = CorePlugin.getFeatureProject(file).getComposer().getEditorID(file.getFileExtension());
-					 if (editorID.equals(""))
-						 editorID = "org.eclipse.ui.DefaultTextEditor";
-					 page.openEditor(fileEditorInput,editorID);
+				 if (page != null) {
+					 IEditorDescriptor desc = PlatformUI.getWorkbench().
+				        	getEditorRegistry().getDefaultEditor(file.getName());
+					 if (desc != null) {
+						 page.openEditor(new FileEditorInput(file), desc.getId());
+					 } else {
+						 // case: there is no default editor for the file
+						 page.openEditor(new FileEditorInput(file),"org.eclipse.ui.DefaultTextEditor"); 
+					 }
 				 }
 			 } catch (PartInitException e) {
 				 UIPlugin.getDefault().logError(e);

@@ -18,6 +18,7 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.figures;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.FlowLayout;
 import org.eclipse.draw2d.FreeformLayout;
@@ -157,8 +158,9 @@ public class RoleFigure extends Figure implements GUIDefaults{
 			CompartmentFigure fileFigure = new CompartmentFigure();
 			fileFigure.add(new Label(role.featureName + " ", IMAGE_FEATURE));
 			int fileCount = 0;
-			for (String file : role.files) {
-				Label fieldLabel = new Label(" " + file + " ");
+			long size = 0;
+			for (IFile file : role.files) {
+				Label fieldLabel = new Label(" " + file.getName() + " ");
 				fileFigure.add(fieldLabel);
 				fileCount++;
 				if (fileCount % 25 == 0) {
@@ -166,8 +168,14 @@ public class RoleFigure extends Figure implements GUIDefaults{
 					fileFigure = new CompartmentFigure();
 					fileFigure.add(new Label(""));
 				}
+				size += (file.getRawLocation().toFile()).length();
 			}
-			setName("Files: "+ fileCount);
+			if (size <= 1000000) {
+				setName("Files: " + fileCount + " Size: " + size/1000 + "." + size%1000 + "kB");
+			} else {
+				setName("Files: " + fileCount + " Size: " + size/1000000 + "." + size/1000 + "MB");
+			}
+			
 			if (fileCount % 25 != 0)
 				tooltipContent.add(fileFigure);
 		} else {

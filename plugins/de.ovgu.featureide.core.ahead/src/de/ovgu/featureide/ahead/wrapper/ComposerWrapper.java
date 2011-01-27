@@ -298,14 +298,8 @@ public class ComposerWrapper {
 				files2[i] = filesVec.get(i);
 				fileMap.put(files[i], filesVec.get(i));
 			}
-			
-			// Checks whether the directory exists, where the composed
-			// jakfiles will be written to
 
 			IFile newJakIFile = compositionDir.getFile(jakFile);
-			File newJakFile = newJakIFile.getRawLocation().toFile();
-			if (!newJakFile.getParentFile().isDirectory())
-				newJakFile.getParentFile().mkdirs();
 			try {
 				AST_Program[] composedASTs = new AST_Program[files.length];
 				AST_Program[] ownASTs = new AST_Program[files.length];
@@ -313,9 +307,9 @@ public class ComposerWrapper {
 						files, "x", composedASTs, ownASTs);
 
 				// Add the currently composed class to the JakProject
-				jakModelBuilder.addClass(jakFile, filesVec, composedASTs,
-						ownASTs);
+				jakModelBuilder.addClass(jakFile, filesVec, composedASTs, ownASTs);
 				composedFiles.add(newJakIFile);
+
 				try {
 					if (configFile != null) {
 						runMixin(files2);
@@ -328,7 +322,7 @@ public class ComposerWrapper {
 			} catch (Exception e) {
 				handleErrorMessage(featureProject.getSourceFolder(),
 						"Unexpected error while parsing "
-								+ newJakFile.getName(), 0);
+								+ newJakIFile.getName(), 0);
 			}
 
 			try {

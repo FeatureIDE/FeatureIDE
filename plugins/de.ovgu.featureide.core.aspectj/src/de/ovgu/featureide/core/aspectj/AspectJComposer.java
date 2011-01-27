@@ -84,11 +84,6 @@ public class AspectJComposer implements IComposerExtensionClass {
 	}
 
 	@Override
-	public String getEditorID(String extension) {
-		return "";
-	}
-
-	@Override
 	public void initialize(IFeatureProject project) {
 		featureProject = project;
 	}

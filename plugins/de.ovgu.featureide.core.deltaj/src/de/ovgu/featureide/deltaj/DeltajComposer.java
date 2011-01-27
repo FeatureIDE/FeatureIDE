@@ -160,14 +160,6 @@ public class DeltajComposer implements IComposerExtensionClass {
 		return extensions;
 	}
 
-	public String getEditorID(String extension) {
-		if (extension.equals("dj")) {
-
-			return "org.xtext.example.DJ";
-		}
-		return "";
-	}
-
 	@Override
 	public boolean clean() {
 		return true;

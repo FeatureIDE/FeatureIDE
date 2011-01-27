@@ -203,30 +203,6 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 	}
 
 	@Override
-	public String getEditorID(String extension) {
-		if (extension == null) {
-			return "";
-		}
-		if (extension.equals("java"))
-			return "org.eclipse.jdt.ui.CompilationUnitEditor";
-		if (extension.equals("cs"))
-			return "";
-		if (extension.equals("c"))
-			return "org.eclipse.cdt.ui.editor.CEditor";
-		if (extension.equals("h"))
-			return "org.eclipse.cdt.ui.editor.CEditor";
-		if (extension.equals("hs"))
-			return "";
-		if (extension.equals("jj"))
-			return "";
-		if (extension.equals("als"))
-			return "";
-		if (extension.equals("xmi"))
-			return "org.eclipse.wst.xml.ui.internal.tabletree.XMLMultiPageEditorPart";
-		return "";
-	}
-
-	@Override
 	public boolean copyNotComposedFiles() {
 		try {
 			copy(featureProject.getCurrentConfiguration());

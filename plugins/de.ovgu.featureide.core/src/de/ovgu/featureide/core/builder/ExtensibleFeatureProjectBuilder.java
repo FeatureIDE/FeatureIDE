@@ -207,7 +207,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		
 	}
 	
-	// copies all not composed Files of selected Features from src to bin and build
+	// copies all not composed Files of selected Features from src to build
 	private void copy(IFile config) throws CoreException {
 		ArrayList<String > selectedFeatures = getSelectedFeatures(config);
 		if (selectedFeatures != null)

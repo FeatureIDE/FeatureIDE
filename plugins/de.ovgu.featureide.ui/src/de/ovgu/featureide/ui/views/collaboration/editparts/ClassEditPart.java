@@ -33,16 +33,17 @@ import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.Request;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
+import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 
-import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.figures.ClassFigure;
-import de.ovgu.featureide.ui.views.collaboration.policy.ClassXYLayoutPolicy;
 import de.ovgu.featureide.ui.views.collaboration.model.Class;
+import de.ovgu.featureide.ui.views.collaboration.policy.ClassXYLayoutPolicy;
 
 /**
  * EditPart for Classes
@@ -151,16 +152,17 @@ public class ClassEditPart extends AbstractGraphicalEditPart {
 				 return;
 			 
 			 IWorkbenchWindow dw = UIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow();
-			 
-			 
-			 FileEditorInput fileEditorInput = new FileEditorInput(file);
 			 try {
 				 IWorkbenchPage page = dw.getActivePage();
-				 if (page != null) { 
-					 String editorID = CorePlugin.getFeatureProject(file).getComposer().getEditorID(file.getFileExtension());
-					 if (editorID.equals(""))
-						 editorID = "org.eclipse.ui.DefaultTextEditor";
-					 page.openEditor(fileEditorInput,editorID);
+				 if (page != null) {
+					 IEditorDescriptor desc = PlatformUI.getWorkbench().
+				        	getEditorRegistry().getDefaultEditor(file.getName());
+					 if (desc != null) {
+						 page.openEditor(new FileEditorInput(file), desc.getId());
+					 } else {
+						 // case: there is no default editor for the file
+						 page.openEditor(new FileEditorInput(file),"org.eclipse.ui.DefaultTextEditor"); 
+					 }
 				 }
 			 } catch (PartInitException e) {
 				 UIPlugin.getDefault().logError(e);

@@ -47,16 +47,9 @@ public interface IComposerExtensionClass {
 	
 	/**
 	 * 
-	 * @return a list of file extensions witch can be composed 
+	 * @return a list of file extensions witch will be composed 
 	 */
 	ArrayList<String> extensions();
-	
-	/**
-	 * 
-	 * @param extension
-	 * @return ID of the file specific editor for the composer extension
-	 */
-	String getEditorID(String extension);
 	
 	void initialize(IFeatureProject project);
 	
@@ -124,6 +117,9 @@ public interface IComposerExtensionClass {
 	 */
 	int getDefaultTemplateIndex();
 	
+	/**
+	 * TODO @description
+	 */
 	void postModelChanged();
 	
 	/**

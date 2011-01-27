@@ -24,7 +24,9 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
@@ -70,13 +72,6 @@ public class FeatureCppComposer implements IComposerExtensionClass {
 	}
 
 	@Override
-	public String getEditorID(String extension) {
-		if (extension.equals("h"))
-			return "org.eclipse.cdt.ui.editor.CEditor";
-		return "";
-	}
-
-	@Override
 	public boolean copyNotComposedFiles() {
 		return false;
 	}
@@ -107,6 +102,11 @@ public class FeatureCppComposer implements IComposerExtensionClass {
 	
 	@Override
 	public void postCompile(IResourceDelta delta, IFile file) {
+		try {
+			file.refreshLocal(IResource.DEPTH_ZERO, null);
+		} catch (CoreException e) {
+			FeatureCppCorePlugin.getDefault().logError(e);
+		}
 	}
 
 	@Override

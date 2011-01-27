@@ -86,7 +86,7 @@ public class CollaborationModelBuilder {
 			return null;
 		
 		fSTModel = featureProject.getFSTModel();
-		if (fSTModel == null) {
+		if (fSTModel == null ) {
 			composer.initialize(featureProject);
 			composer.buildFSTModel();
 			fSTModel = featureProject.getFSTModel();
@@ -191,8 +191,9 @@ public class CollaborationModelBuilder {
 				return null;
 			}
 			
-			for (IFeature feature : iFeatures)
+			for (IFeature feature : iFeatures) {
 				iFeatureNames.add(feature.getName());
+			}
 			
 			IFolder path = featureProject.getSourceFolder();
 			for (String layerName : layerNames) {
@@ -319,7 +320,7 @@ public class CollaborationModelBuilder {
 						}
 					}
 					role.featureName = featureName;
-					role.files.add(res.getName());
+					role.files.add((IFile)res);
 					Class cl = new Class(name);
 					if (model.containsClass(cl)) {
 						role.setParentClass(model.getClass(cl.getName()));

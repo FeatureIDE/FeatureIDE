@@ -19,7 +19,6 @@
 package de.ovgu.featureide.ui.ahead.editors;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IFileEditorInput;
@@ -44,7 +43,7 @@ public class JakEditor extends TextEditor {
 	
 	public static final String ID = AheadUIPlugin.PLUGIN_ID + ".editors.JakEditor";
 
-	private static final Image DERIVED_IMAGE = AheadUIPlugin.getImage("sample.gif");
+//	private static final Image DERIVED_IMAGE = AheadUIPlugin.getImage("sample.gif");
 	
 	private JakOutlinePage outlinePage;
 
@@ -72,7 +71,7 @@ public class JakEditor extends TextEditor {
 				String config = featureProject.getConfigName(file);
 				if (config != null)
 					setPartName(file.getName() + "<" + config + ">");
-				setTitleImage(DERIVED_IMAGE);
+//				setTitleImage(DERIVED_IMAGE);
 			}
 		}
 	}

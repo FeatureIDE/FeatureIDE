@@ -90,11 +90,96 @@ public class AheadComposer implements IComposerExtensionClass {
 	public void performFullBuild(IFile config) {
 		assert (ahead != null) : "Ahead instance not initialized";
 		try {
+			checkSourceFiles(featureProject.getSourceFolder());
 			ahead.setConfiguration(config);
 			ahead.buildAll();
 		} catch (Exception e) {
 			AheadCorePlugin.getDefault().logError(e);
 		}
+	}
+	
+	/**
+	 * The first line of a jak file must not start with imports else the 
+	 * imports will be written in the same line at the composed file. 
+	 * 
+	 * @param folder
+	 * @throws CoreException
+	 */
+	private void checkSourceFiles(IFolder folder) throws CoreException {
+		for (IResource res : folder.members()) {
+			if (res instanceof IFolder) {
+				checkSourceFiles((IFolder)res);
+			} else if(res instanceof IFile){
+				if (res.getName().endsWith(".jak")) {
+					checkSourceFile((IFile)res);
+				}
+			}
+		}
+	}
+	
+	private void checkSourceFile(IFile file) {
+		String text = getFileText(file);
+		if (text != null) {
+			if (text.startsWith("import ")) {
+				text = "\r\n" + text;
+				setFileText(file, text);
+				try {
+					file.refreshLocal(IResource.DEPTH_ZERO, null);
+				} catch (CoreException e) {
+					AheadCorePlugin.getDefault().logError(e);
+				}
+			}
+		}
+	}
+
+	/**
+	 * @param file
+	 * @return the file text
+	 */
+	private String getFileText(IFile iFile) {
+		Scanner scanner = null;
+		try {
+			File file = iFile.getRawLocation().toFile();
+			StringBuffer fileText = new StringBuffer();
+			scanner = new Scanner(file);
+			
+			while (scanner.hasNext()) {
+				fileText.append(scanner.nextLine());
+				fileText.append("\r\n");
+			}
+			
+			return fileText.toString();
+		} catch (FileNotFoundException e) {
+			AheadCorePlugin.getDefault().logError(e);
+		}  finally {
+			if(scanner!=null) {
+				scanner.close();
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * @param file
+	 * @param text
+	 */
+	private void setFileText(IFile file, String text) {
+		FileWriter fw = null;
+		try {
+			fw = new FileWriter(file.getRawLocation().toFile());
+			fw.write(text);
+		} catch (IOException e) {
+			AheadCorePlugin.getDefault().logError(e);
+		} finally {
+			if (fw != null) {
+				try {
+					fw.close();
+				} catch (IOException e) {
+					AheadCorePlugin.getDefault().logError(e);
+				}
+			}
+		}
+		
 	}
 
 	public boolean clean() {
@@ -106,14 +191,6 @@ public class AheadComposer implements IComposerExtensionClass {
 		ArrayList<String> extensions = new ArrayList<String>();
 		extensions.add(".jak");
 		return extensions;
-	}
-
-	@Override
-	public String getEditorID(String extension) {
-		if (extension.equals("jak")) {
-			return "de.ovgu.featureide.ui.editors.JakEditor";
-		}
-		return "";
 	}
 
 	@Override
