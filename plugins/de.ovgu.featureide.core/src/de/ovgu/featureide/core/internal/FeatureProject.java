@@ -761,7 +761,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			}
 
 			if (!buildRelevantChanges && sourceFolder != null && sourceFolder.isAccessible()) {
-				if (composerExtension.hasFeatureFolders()) {
+				if (currentConfig != null && composerExtension != null && composerExtension.hasFeatureFolders()) {
 					// ignore changes in unselected feature folders
 					ArrayList<String> selectedFeatures = 
 						readFeaturesfromConfigurationFile(currentConfig.getRawLocation().toFile());
@@ -1132,6 +1132,9 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	}
 	
 	public ArrayList<String> readFeaturesfromConfigurationFile(File file) {
+		if (!file.exists()) {
+			return null;
+		}
 		Scanner scanner = null;
 		try {
 			ArrayList<String> list;

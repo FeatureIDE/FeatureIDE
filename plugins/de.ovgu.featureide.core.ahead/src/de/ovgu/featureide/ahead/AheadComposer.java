@@ -310,10 +310,10 @@ public class AheadComposer implements IComposerExtensionClass {
 			String configPath, String buildPath) {
 		addNature(project);
 		addClasspathFile(project, sourcePath, configPath, buildPath);
-//		addJava14Settings(project);
+		addSettings(project);
 	}
 
-/*	private void addJava14Settings(IProject project) {
+	private void addSettings(IProject project) {
 		IFolder settingsFolder = project.getFolder(".settings");
 		if (!settingsFolder.exists()) {
 			try {
@@ -327,15 +327,16 @@ public class AheadComposer implements IComposerExtensionClass {
 			String text = 
 				"eclipse.preferences.version=1\r\n" +
 				"org.eclipse.jdt.core.compiler.codegen.inlineJsrBytecode=enabled\r\n" +
-				"org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.2\r\n" +
+				"org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.6\r\n" +
 				"org.eclipse.jdt.core.compiler.codegen.unusedLocal=preserve\r\n" +
-				"org.eclipse.jdt.core.compiler.compliance=1.4\r\n" +
+				"org.eclipse.jdt.core.compiler.compliance=1.6\r\n" +
 				"org.eclipse.jdt.core.compiler.debug.lineNumber=generate\r\n" +
 				"org.eclipse.jdt.core.compiler.debug.localVariable=generate\r\n" +
 				"org.eclipse.jdt.core.compiler.debug.sourceFile=generate\r\n" +
-				"org.eclipse.jdt.core.compiler.problem.assertIdentifier=warning\r\n" +
-				"org.eclipse.jdt.core.compiler.problem.enumIdentifier=warning\r\n" +
-				"org.eclipse.jdt.core.compiler.source=1.3";
+				"org.eclipse.jdt.core.compiler.problem.assertIdentifier=error\r\n" +
+				"org.eclipse.jdt.core.compiler.problem.enumIdentifier=error\r\n" +
+				"org.eclipse.jdt.core.compiler.source=1.6\r\n" +
+				"org.eclipse.jdt.core.builder.resourceCopyExclusionFilter=*.jak";
 			InputStream source = new ByteArrayInputStream(text.getBytes());
 			try {
 				settingsFile.create(source, true, null);
@@ -343,7 +344,7 @@ public class AheadComposer implements IComposerExtensionClass {
 				AheadCorePlugin.getDefault().logError(e);
 			}
 		}		
-	}*/
+	}
 
 	private void addClasspathFile(IProject project, String sourcePath,
 			String configPath, String buildPath) {
