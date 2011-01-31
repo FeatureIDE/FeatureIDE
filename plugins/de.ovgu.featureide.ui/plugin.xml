@@ -86,6 +86,20 @@
                tooltip="Only the current equation is build">
          </action>
       </objectContribution>
+      <objectContribution
+            adaptable="true"
+            id="de.ovgu.featureide.ui.configFileContribution"
+            nameFilter="*.expression"
+            objectClass="org.eclipse.core.resources.IFile">
+         <action
+               class="de.ovgu.featureide.ui.actions.SetConfigurationAction"
+               icon="icons/currentconfiguration.gif"
+               id="de.ovgu.featureide.ui.setEquationAction"
+               label="Set as current configuration"
+               menubarPath="group.open"
+               tooltip="Only the current equation is build">
+         </action>
+      </objectContribution>
    </extension>
    <extension
          point="org.eclipse.ui.decorators">

@@ -76,7 +76,6 @@ public class FeatureCppWrapper {
 		command.add("-s=" + sourceFolder);
 		command.add("-gpp");
 		command.add(config.getRawLocation().toOSString());
-		// TODO configuration extension must be .equation
 		try {
 			process(command);
 		} catch (IOException e) {

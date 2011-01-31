@@ -64,7 +64,7 @@ public class NewConfigurationFilePage extends WizardPage {
 	
 	private IContainer container;
 	
-	private IFeatureProject featureProject = null;
+	IFeatureProject featureProject = null;
 	
 	private Collection<IFeatureProject> featureProjects = CorePlugin.getFeatureProjects();
 	
@@ -196,7 +196,7 @@ public class NewConfigurationFilePage extends WizardPage {
 			configbool = true;
 			if (configNames.contains(fileName)) {
 				// TODO replace equation
-				updateStatus("File " + fileName + ".equation already exists.");
+				updateStatus("File " + fileName + " already exists.");
 				return;
 			}
 		} else if(configbool) {

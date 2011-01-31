@@ -373,4 +373,12 @@ public class MungePreprocessor implements IComposerExtensionClass{
 	public boolean hasFeatureFolder() {
 		return true;
 	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#getComfigurationExtension()
+	 */
+	@Override
+	public String getConfigurationExtension() {
+		return null;
+	}
 }

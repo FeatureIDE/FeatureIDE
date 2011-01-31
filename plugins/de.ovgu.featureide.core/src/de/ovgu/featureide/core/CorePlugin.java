@@ -315,7 +315,8 @@ public class CorePlugin extends AbstractCorePlugin {
 								// nature
 								// TODO do not use strings wherever needed, define them only once!
 								IFile configFile = project.getFolder(
-										configPath).getFile(project.getName().split("[-]")[0]+".config");
+										configPath).getFile(project.getName().split("[-]")[0] + 
+										getDefault().getConfigurationExtensions().getFirst());
 								FileWriter fw = new FileWriter(configFile
 										.getRawLocation().toFile());
 								fw.write("Base");
@@ -503,4 +504,11 @@ public class CorePlugin extends AbstractCorePlugin {
 		return getFeatureProject(res) != null;
 	}
 
+	public LinkedList<String> getConfigurationExtensions() {
+		LinkedList<String> extensions = new LinkedList<String>();
+		extensions.add(".config");
+		extensions.add(".equation");
+		extensions.add(".expression");
+		return extensions;
+	}
 }

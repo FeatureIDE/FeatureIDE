@@ -226,4 +226,11 @@ public class ComposerExtensionProxy implements IComposerExtension {
 		return composerExtensionClass.hasFeatureFolder();
 	}
 
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#getComfigurationExtension()
+	 */
+	public String getConfigurationExtension() {
+		return composerExtensionClass.getConfigurationExtension();
+	}
+
 }

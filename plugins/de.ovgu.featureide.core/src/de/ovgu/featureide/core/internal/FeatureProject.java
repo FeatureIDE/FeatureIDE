@@ -833,8 +833,8 @@ public class FeatureProject extends BuilderMarkerHandler implements
 					continue;
 				IFile config = (IFile) res;
 				String name = config.getName();
-				if (name.endsWith(".equation") || name.endsWith(".expression")
-						|| name.endsWith(".config"))
+				if (CorePlugin.getDefault().getConfigurationExtensions()
+						.contains(name.substring(name.lastIndexOf("."))))
 					configs.add(config);
 			}
 		} catch (CoreException e) {

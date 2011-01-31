@@ -33,6 +33,8 @@ import java.io.*;
 import org.eclipse.ui.*;
 import org.eclipse.ui.ide.IDE;
 
+import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.builder.IComposerExtension;
 import de.ovgu.featureide.ui.UIPlugin;
 
 
@@ -72,7 +74,12 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 	 */
 	public boolean performFinish() {
 		final IContainer container = page.getContainerObject();
-		final String fileName = page.getFileName()+ ".config";
+		IComposerExtension composer = page.featureProject.getComposer();
+		String configurationExtension = CorePlugin.getDefault().getConfigurationExtensions().getFirst();
+		if (composer != null && composer.getConfigurationExtension() != null) {
+			configurationExtension = composer.getConfigurationExtension();
+		}
+		final String fileName = page.getFileName()+ configurationExtension;
 		IRunnableWithProgress op = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor) throws InvocationTargetException {
 				try {

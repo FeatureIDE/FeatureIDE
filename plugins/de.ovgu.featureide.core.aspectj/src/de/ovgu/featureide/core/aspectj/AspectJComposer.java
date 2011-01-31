@@ -536,4 +536,12 @@ public class AspectJComposer implements IComposerExtensionClass {
 		return false;
 	}
 
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#getComfigurationExtension()
+	 */
+	@Override
+	public String getConfigurationExtension() {
+		return null;
+	}
+
 }

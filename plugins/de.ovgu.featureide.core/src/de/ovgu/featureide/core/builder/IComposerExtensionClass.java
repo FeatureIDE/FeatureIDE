@@ -132,5 +132,12 @@ public interface IComposerExtensionClass {
 	 * otherwise false
 	 */
 	boolean hasCustomFilename();
+	
+	/**
+	 * 
+	 * @return returns the file extension for configuration files or null if 
+	 * default value should be used.
+	 */
+	String getConfigurationExtension();
 
 }

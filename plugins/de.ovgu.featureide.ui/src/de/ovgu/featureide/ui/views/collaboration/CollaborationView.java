@@ -173,7 +173,8 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 					if (featureProject != null) {
 						//case: its a featureIDE project
 						//TODO String defined else where, create one method for this check
-						if (inputFile.getName().endsWith(".equation") || inputFile.getName().endsWith(".config")) {
+						if (CorePlugin.getDefault().getConfigurationExtensions()
+								.contains(inputFile.getName().substring(inputFile.getName().lastIndexOf(".")))) {
 							//case: open configuration editor
 							if (builder.configuration.equals(inputFile.getName())) {
 								return;
