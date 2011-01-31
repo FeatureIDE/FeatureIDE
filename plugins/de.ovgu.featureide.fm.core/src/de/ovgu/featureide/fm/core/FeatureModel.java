@@ -271,16 +271,16 @@ public class FeatureModel implements PropertyConstants {
 		for (Renaming renaming : renamings) {
 			for (Node node : propNodes)
 				renameVariables(node, renaming.oldName, renaming.newName);
-//			//only call moveFolder(..) if composer has no specific renamings
-//			if (!performComposerRenamings(renaming.oldName, renaming.newName,
-//				project)) {
+			//only call moveFolder(..) if composer has no specific renamings
+			if (!performComposerRenamings(renaming.oldName, renaming.newName,
+				project)) {
 				moveFolder(renaming.oldName, renaming.newName);
-//			}
+			}
 		}
 		renamings.clear();
 	}
 
-	public boolean performComposerRenamings(final String oldName,
+	private boolean performComposerRenamings(final String oldName,
 			final String newName, final IProject project) {
 		if (composer == null)
 			return false;

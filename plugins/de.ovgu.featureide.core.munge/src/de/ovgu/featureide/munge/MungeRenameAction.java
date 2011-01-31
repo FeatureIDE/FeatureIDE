@@ -65,9 +65,7 @@ public class MungeRenameAction implements IRenameAction {
 				performRenamings(oldName, newName, (IFolder)res);
 			} else if (res instanceof IFile) {
 				IFile file = (IFile)res;
-				if (file.getName().endsWith(".java")) {
-					performRenamings(oldName, newName, file);
-				}
+				performRenamings(oldName, newName, file);
 			}
 			
 		}
@@ -97,8 +95,7 @@ public class MungeRenameAction implements IRenameAction {
 			MungeCorePlugin.getDefault().logError(e);
 		} catch (IOException e) {
 			MungeCorePlugin.getDefault().logError(e);
-		}
-		finally{
+		} finally{
 			if(scanner!=null)
 			scanner.close();
 			if(fw!=null)

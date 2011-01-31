@@ -11,15 +11,6 @@
             nature="FeatureIDE_Core.deltajNature">
       </composer>
    </extension>
-   <extension
-         point="de.ovgu.featureide.fm.core.RenameAction">
-      <renameAction
-            class="de.ovgu.featureide.deltaj.DeltajRenameAction"
-            composer="de.ovgu.featureide.core.deltaj.deltajcomposer"
-            id="de.ovgu.featureide.core.deltaj.renameAction1"
-            name="DeltaJRenameAction">
-      </renameAction>
-   </extension>
 
 </plugin>
 

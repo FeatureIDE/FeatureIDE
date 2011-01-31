@@ -120,21 +120,19 @@ public class AheadComposer implements IComposerExtensionClass {
 	private void checkSourceFile(IFile file) {
 		String text = getFileText(file);
 		if (text != null) {
-			if (text.startsWith("import ")) {
-				text = "\r\n" + text;
-				setFileText(file, text);
-				try {
-					file.refreshLocal(IResource.DEPTH_ZERO, null);
-				} catch (CoreException e) {
-					AheadCorePlugin.getDefault().logError(e);
-				}
+			text = "\r\n" + text;
+			setFileText(file, text);
+			try {
+				file.refreshLocal(IResource.DEPTH_ZERO, null);
+			} catch (CoreException e) {
+				AheadCorePlugin.getDefault().logError(e);
 			}
 		}
 	}
 
 	/**
 	 * @param file
-	 * @return the file text
+	 * @return the file text or null if file not starts with "import"
 	 */
 	private String getFileText(IFile iFile) {
 		Scanner scanner = null;
@@ -142,7 +140,14 @@ public class AheadComposer implements IComposerExtensionClass {
 			File file = iFile.getRawLocation().toFile();
 			StringBuffer fileText = new StringBuffer();
 			scanner = new Scanner(file);
-			
+			if (scanner.hasNext()) {
+				String firstLine = scanner.nextLine();
+				if (!firstLine.startsWith("import ")) {
+					return null;
+				}
+				fileText.append(firstLine);
+				fileText.append("\r\n");
+			}
 			while (scanner.hasNext()) {
 				fileText.append(scanner.nextLine());
 				fileText.append("\r\n");

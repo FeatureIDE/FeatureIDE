@@ -20,10 +20,12 @@ package de.ovgu.featureide.core.internal;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.Vector;
 
 import org.eclipse.core.resources.ICommand;
@@ -629,8 +631,6 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		return cp.toArray(new String[cp.size()]);
 	}
 
-	private boolean modelChanged = false;
-
 	/**
 	 * refreshes Feature Module Markers for all folders in the source folder
 	 * 
@@ -684,7 +684,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 
 		Feature feature = featureModel.getFeature(folder.getName());
 
-		folder.deleteMarkers("de.ovgu.featureide.core.featureModuleMarker",
+		folder.deleteMarkers(FEATURE_MODULE_MARKER,
 				true, IResource.DEPTH_ZERO);
 
 		String message = null;
@@ -725,16 +725,16 @@ public class FeatureProject extends BuilderMarkerHandler implements
 
 	public void resourceChanged(IResourceChangeEvent event) {
 		// if something in source folder changed
-		if (sourceFolder != null
-				&& event.getDelta().findMember(sourceFolder.getFullPath()) != null) {
-
-			// set markers, only if event is not fired from changes to
-			// markers
-			if (event.findMarkerDeltas(FEATURE_MODULE_MARKER, false).length == 0) {
-				// TODO id this needed, causes MarkerNotFoun exception
-				// setAllFeatureModuleMarkers(featureModel, sourceFolder);
-			}
-		}
+//		if (sourceFolder != null
+//				&& event.getDelta().findMember(sourceFolder.getFullPath()) != null) {
+//
+//			// set markers, only if event is not fired from changes to
+//			// markers
+//			if (event.findMarkerDeltas(FEATURE_MODULE_MARKER, false).length == 0) {
+//				// TODO id this needed, causes MarkerNotFoun exception
+//				// setAllFeatureModuleMarkers(featureModel, sourceFolder);
+//			}
+//		}
 
 		IPath modelPath = modelFile.getResource().getFullPath();
 		if (checkModelChange(event.getDelta().findMember(modelPath)))
@@ -750,8 +750,9 @@ public class FeatureProject extends BuilderMarkerHandler implements
 				if (delta != null
 						&& (delta.getFlags() & IResourceDelta.CONTENT) != 0) {
 					changedConfigs.add(config);
-					if (config.equals(currentConfig))
+					if (config.equals(currentConfig)) {
 						buildRelevantChanges = true;
+					}
 				}
 			}
 			if (!changedConfigs.isEmpty()) {
@@ -759,33 +760,52 @@ public class FeatureProject extends BuilderMarkerHandler implements
 				checkConfigurations(changedConfigs);
 			}
 
-			if (sourceFolder != null && sourceFolder.isAccessible())
-				checkSourceFolder(sourceFolder, event);
-
-			if (buildFolder.isAccessible())
+			if (!buildRelevantChanges && sourceFolder != null && sourceFolder.isAccessible()) {
+				if (composerExtension.hasFeatureFolders()) {
+					// ignore changes in unselected feature folders
+					ArrayList<String> selectedFeatures = 
+						readFeaturesfromConfigurationFile(currentConfig.getRawLocation().toFile());
+					for (IResource res : sourceFolder.members()) {
+						if (res instanceof IFolder) {
+							if (selectedFeatures.contains(res.getName())) {
+								checkSourceFolder((IFolder)res, event);
+							}
+						}
+					}
+				} else {
+					checkSourceFolder(sourceFolder, event);
+				}
+			}
+			
+			if (composerExtension != null && buildFolder.isAccessible()) {
 				checkBuildFolder(buildFolder, event);
+			}
+			
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
 	}
 
-	private void checkSourceFolder(IFolder folder, IResourceChangeEvent event)
+	private boolean checkSourceFolder(IFolder folder, IResourceChangeEvent event)
 			throws CoreException {
 		for (IResource res : folder.members()) {
 			if (res instanceof IFolder) {
-				checkSourceFolder((IFolder) res, event);
+				if (checkSourceFolder((IFolder) res, event)) {
+					return true;
+				}
 			} else {
 				IResourceDelta delta = event.getDelta().findMember(
 						res.getFullPath());
 				if (delta != null) {
-					if (!modelChanged
-							&& (delta.getKind() == IResourceDelta.ADDED || (delta
-									.getFlags() & IResourceDelta.CONTENT) != 0)) {
+					if (delta.getKind() == IResourceDelta.ADDED || 
+							(delta.getFlags() & IResourceDelta.CONTENT) != 0) {
 						buildRelevantChanges = true;
+						return true;
 					}
 				}
 			}
 		}
+		return false;
 	}
 
 	private void checkBuildFolder(IFolder folder, IResourceChangeEvent event)
@@ -797,11 +817,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 				IResourceDelta delta = event.getDelta().findMember(
 						res.getFullPath());
 				if (delta != null) {
-					if (composerExtension != null) {
-						// && ((delta.getFlags()& IResourceDelta.MARKERS) != 0))
-						// {
-						composerExtension.postCompile(delta, (IFile) res);
-					}
+					composerExtension.postCompile(delta, (IFile) res);
 				}
 			}
 		}
@@ -831,7 +847,6 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		if (delta == null || (delta.getFlags() & IResourceDelta.CONTENT) == 0)
 			return false;
 
-		modelChanged = true;
 		Job job = new Job("Load Model") {
 			protected IStatus run(IProgressMonitor monitor) {
 				loadModel();
@@ -1114,7 +1129,30 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	 */
 	public void builded() {
 		buildRelevantChanges = false;
-		modelChanged = false;
+	}
+	
+	public ArrayList<String> readFeaturesfromConfigurationFile(File file) {
+		Scanner scanner = null;
+		try {
+			ArrayList<String> list;
+			scanner = new Scanner(file);
+			if (scanner.hasNext()) {
+				list = new ArrayList<String>();
+				while (scanner.hasNext()) {
+					list.add(scanner.next());
+				}
+				return list;
+			} else {
+				return null;
+			}
+		} catch (FileNotFoundException e) {
+			CorePlugin.getDefault().logError(e);
+		} finally {
+			if (scanner != null) {
+				scanner.close();
+			}
+		}
+		return null;	
 	}
 
 }

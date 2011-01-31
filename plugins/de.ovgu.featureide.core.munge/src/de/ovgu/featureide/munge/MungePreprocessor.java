@@ -19,11 +19,13 @@
 package de.ovgu.featureide.munge;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Scanner;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -42,9 +44,6 @@ import org.sonatype.plugins.munge.Munge;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 
 /**
  * Munge: a purposely-simple Java preprocessor.
@@ -59,28 +58,13 @@ public class MungePreprocessor implements IComposerExtensionClass{
 
 	private LinkedList<String> selectedFeatures;
 	
-	private Configuration configuration;
+	private ArrayList<String> features;
 	
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#extensions()
 	 */
 	public ArrayList<String> extensions() {
 		return new ArrayList<String>();
-	}
-
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#getEditorID(java.lang.String)
-	 */
-	public String getEditorID(String extension) {
-		if (extension.equals("java"))
-			return "org.eclipse.jdt.ui.CompilationUnitEditor";
-		if (extension.equals("c"))
-			return "org.eclipse.cdt.ui.editor.CEditor";
-		if (extension.equals("h"))
-			return "org.eclipse.cdt.ui.editor.CEditor";
-		if (extension.equals("xmi"))
-			return "org.eclipse.wst.xml.ui.internal.tabletree.XMLMultiPageEditorPart";
-		return "";
 	}
 
 	/* (non-Javadoc)
@@ -107,18 +91,13 @@ public class MungePreprocessor implements IComposerExtensionClass{
 		//	–DFEATURE1 –DFEATURE2 ... File1.java File2.java ... outputDirectory
 		
 		// add symbol definitions
-		configuration = new Configuration(featureProject.getFeatureModel());
-		ConfigurationReader reader = new ConfigurationReader(configuration);
-		try {
-			reader.readFromFile(config);
-		} catch (CoreException e) {
-			MungeCorePlugin.getDefault().logError(e);
-		} catch (IOException e) {
-			MungeCorePlugin.getDefault().logError(e);
+		features = readFeaturesfromConfigurationFile(config.getRawLocation().toFile()); 
+		if (features == null) {
+			return;
 		}
 		selectedFeatures = new LinkedList<String>();
-		for (Feature feature : configuration.getSelectedFeatures()) {
-			selectedFeatures.add(feature.getName());
+		for (String feature : features) {
+			selectedFeatures.add(feature);
 		}
 		
 		//add source files
@@ -127,6 +106,30 @@ public class MungePreprocessor implements IComposerExtensionClass{
 		} catch (CoreException e) {
 			MungeCorePlugin.getDefault().logError(e);
 		}
+	}
+	
+	public ArrayList<String> readFeaturesfromConfigurationFile(File file) {
+		Scanner scanner = null;
+		try {
+			ArrayList<String> list;
+			scanner = new Scanner(file);
+			if (scanner.hasNext()) {
+				list = new ArrayList<String>();
+				while (scanner.hasNext()) {
+					list.add(scanner.next());
+				}
+				return list;
+			} else {
+				return null;
+			}
+		} catch (FileNotFoundException e) {
+			MungeCorePlugin.getDefault().logError(e);
+		} finally {
+			if (scanner != null) {
+				scanner.close();
+			}
+		}
+		return null;
 	}
 
 	/* (non-Javadoc)
@@ -138,8 +141,8 @@ public class MungePreprocessor implements IComposerExtensionClass{
 
 	private void addDefaultSourceFiles(IFolder sourceFolder) throws CoreException {
 		ArrayList<String> args = new ArrayList<String>();
-		for (Feature feature : configuration.getSelectedFeatures()) {
-			args.add("-D" + feature.getName());
+		for (String feature : features) {
+			args.add("-D" + feature);
 		}
 		
 		boolean filesAdded = false;
@@ -162,8 +165,8 @@ public class MungePreprocessor implements IComposerExtensionClass{
 
 	private void addSourceFiles(IFolder sourceFolder, IFolder buildFolder) throws CoreException {
 		ArrayList<String> args = new ArrayList<String>();
-		for (Feature feature : configuration.getSelectedFeatures()) {
-			args.add("-D" + feature.getName());
+		for (String feature : features) {
+			args.add("-D" + feature);
 		}
 		createBuildFolder(buildFolder);
 		boolean filesAdded = false;
@@ -307,21 +310,12 @@ public class MungePreprocessor implements IComposerExtensionClass{
 			String configPath, String buildPath) {
 		IFile iClasspathFile = project.getFile(".classpath");
 		if (!iClasspathFile.exists()) {
-			String bin = "bin";
-			if (sourcePath.equals(bin) || configPath.equals(bin)
-					|| buildPath.equals(bin)) {
-				bin = "bin2";
-			}
-			if (sourcePath.equals(bin) || configPath.equals(bin)
-					|| buildPath.equals(bin)) {
-				bin = "bin3";
-			}
 			try {
 				String text = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + 
 			 				  "<classpath>\n" +  
 			 				  "<classpathentry kind=\"src\" path=\"" + buildPath + "\"/>\n" + 
 			 				  "<classpathentry kind=\"con\" path=\"org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6\"/>\n" + 
-			 				  "<classpathentry kind=\"output\" path=\"" + bin + "\"/>\n" + 
+			 				  "<classpathentry kind=\"output\" path=\"bin\"/>\n" + 
 			 				  "</classpath>"; 
 				InputStream source = new ByteArrayInputStream(text.getBytes());
 				iClasspathFile.create(source, true, null);

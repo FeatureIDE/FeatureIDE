@@ -376,22 +376,25 @@ public class FeatureOrderEditor extends EditorPart {
 	}
 
 	public ArrayList<String> readFeaturesfromConfigurationFile(File file) {
+		Scanner scanner = null;
 		try {
 			ArrayList<String> list;
-			Scanner scanner = new Scanner(file);
+			scanner = new Scanner(file);
 			if (scanner.hasNext()) {
 				list = new ArrayList<String>();
 				while (scanner.hasNext()) {
 					list.add(featureModel.getNewName(scanner.next()));
 				}
-				scanner.close();
 				return list;
 			} else {
-				scanner.close();
 				return null;
 			}
 		} catch (FileNotFoundException e) {
 			FMUIPlugin.getDefault().logError(e);
+		} finally {
+			if (scanner != null) {
+				scanner.close();
+			}
 		}
 		return null;
 		
@@ -399,15 +402,23 @@ public class FeatureOrderEditor extends EditorPart {
 
 	public void writeFeaturestoConfigurationFile(File file,
 			ArrayList<String> newConfiguration) {
+		FileWriter fw = null;
 		try {
-			FileWriter fw = new FileWriter(file);
+			fw = new FileWriter(file);
 			for (String layer : newConfiguration) {
 				fw.write(layer);
 				fw.append("\r\n");
 			}
-			fw.close();
 		} catch (IOException e) {
 			FMUIPlugin.getDefault().logError(e);
+		} finally {
+			if (fw != null) {
+				try {
+					fw.close();
+				} catch (IOException e) {
+					FMUIPlugin.getDefault().logError(e);
+				}
+			}
 		}
 		
 	}
@@ -430,18 +441,13 @@ public class FeatureOrderEditor extends EditorPart {
 		else
 			// User specified order
 			layers = orderList;
-		
-		// check whether the new configuration is equal to the old one
-		if (oldConfiguration.size() == layers.size()) {
-			int i = 0;
-			boolean equal = true;
-			for (String layer : layers)
-				if (!oldConfiguration.get(i++).equals(layer))
-					equal = false;
-			if (equal)
-				return;
-		}
 
+		// a copy of the old configuration
+		ArrayList<String> configuration = new ArrayList<String>();
+		for (String layer : oldConfiguration) {
+			configuration.add(layer);
+		}
+		
 		for (String layer : layers)
 			if (oldConfiguration.contains(layer)) {
 				newConfiguration.add(layer);
@@ -452,7 +458,20 @@ public class FeatureOrderEditor extends EditorPart {
 		if (!oldConfiguration.isEmpty())
 			for (String layer : oldConfiguration)
 				newConfiguration.add(layer);
-
+		
+		// check whether the new configuration is equal to the old one
+		if (newConfiguration.size() == configuration.size()) {
+			int i = 0;
+			boolean equal = true;
+			for (String layer : configuration)
+				if (!featureModel.getOldName(newConfiguration.get(i++)).equals(layer)) {
+					equal = false;
+					break;
+				}
+			if (equal)
+				return;
+		}
+		
 		// Write Configuration
 		writeFeaturestoConfigurationFile(file, newConfiguration);
 	}
