@@ -307,7 +307,7 @@ public class DeltajComposer implements IComposerExtensionClass {
 
 			newFileText = getNewFileStringDelta(file);
 		}
-		if (!newFileText.equals(oldFileText))
+		if (newFileText!=null&&!newFileText.equals(oldFileText))
 			SaveStringToFile(newFileText, file);
 	}
 

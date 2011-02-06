@@ -19,7 +19,6 @@
 package de.ovgu.featureide.ui.wizards;
 
 import org.eclipse.core.resources.IResource;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
@@ -34,57 +33,62 @@ import de.ovgu.featureide.ui.UIPlugin;
  * 
  * @author Jens Meinicke
  */
-public class ConversionWizard  extends Wizard implements INewWizard {
+public class ConversionWizard extends Wizard implements INewWizard {
 
-	public static final String ID = UIPlugin.PLUGIN_ID + ".wizzard.ConversionWizzard";
-	
-	private ISelection selection;
-	
+	public static final String ID = UIPlugin.PLUGIN_ID
+			+ ".wizzard.ConversionWizzard";
+
 	private ConversionPage page;
 
-	private IStructuredSelection iSSelection;
-	
+	private IStructuredSelection selection;
+
 	public boolean performFinish() {
-		if (selection instanceof IStructuredSelection) {
-			iSSelection = (IStructuredSelection)selection;
-			Object obj = iSSelection.getFirstElement();
-			if (obj instanceof IResource) {
-				IResource res = (IResource)obj;
-				if (page.hasCompositionTool()) {
-					CorePlugin.setupProject(res.getProject(), page.getCompositionTool().getId()
-							,page.getSourcePath(),page.getConfigPath(),page.getBuildPath());
-					UIPlugin.getDefault().openEditor(FeatureModelEditor.ID, (res.getProject()).getFile("model.xml"));
-				}
-				return true;
+
+		Object obj = selection.getFirstElement();
+		if (obj instanceof IResource) {
+			IResource res = (IResource) obj;
+			if (page.hasCompositionTool()) {
+				CorePlugin.setupProject(res.getProject(), page
+						.getCompositionTool().getId(), page.getSourcePath(),
+						page.getConfigPath(), page.getBuildPath());
+				UIPlugin.getDefault().openEditor(FeatureModelEditor.ID,
+						(res.getProject()).getFile("model.xml"));
 			}
+			return true;
 		}
+
 		return false;
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.jface.wizard.Wizard#addPages()
 	 */
 	@Override
 	public void addPages() {
-		//addPage(new ConversionPage(selection));
+		// addPage(new ConversionPage(selection));
 		setWindowTitle("Add FeatureIDE Nature");
 		addPage(page);
 		super.addPages();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IWorkbenchWizard#init(org.eclipse.ui.IWorkbench, org.eclipse.jface.viewers.IStructuredSelection)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchWizard#init(org.eclipse.ui.IWorkbench,
+	 * org.eclipse.jface.viewers.IStructuredSelection)
 	 */
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
-		String project = ""; 
-		if (selection instanceof IStructuredSelection) {
-			iSSelection = (IStructuredSelection)selection;
-			Object obj = iSSelection.getFirstElement();
-			if (obj instanceof IResource) {
-				IResource res = (IResource)obj;
-				project = res.getProject().getName();
-			}
+		String project = "";
+
+		Object obj = selection.getFirstElement();
+		if (obj instanceof IResource) {
+			IResource res = (IResource) obj;
+			project = res.getProject().getName();
 		}
+
 		page = new ConversionPage(" " + project);
 		this.selection = selection;
 	}

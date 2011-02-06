@@ -250,14 +250,14 @@ public class AheadComposer implements IComposerExtensionClass {
 	private void performRenamings(IFile iFile) {
 		try {
 			File file = iFile.getRawLocation().toFile();
-			String fileText = "";
+			StringBuffer fileTextBuffer = new StringBuffer();
 			Scanner scanner = new Scanner(file);
 			while (scanner.hasNext()) {
-				fileText += scanner.nextLine() + "\r\n";
+				fileTextBuffer.append(scanner.nextLine() + "\r\n");
 			}
 			scanner.close();
 
-			fileText = fileText.replaceFirst("package", "layer");
+			String fileText = fileTextBuffer.toString().replaceFirst("package", "layer");
 			FileWriter fw = new FileWriter(file);
 			fw.write(fileText);
 			fw.close();

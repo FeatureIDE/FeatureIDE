@@ -54,8 +54,8 @@ public class ConstraintContentProposalProvider implements
 	 *         given its current content.
 	 */
 	public IContentProposal[] getProposals(String contents, int position) {
-		String currentWord = new String();
-		String wordBefore = new String();
+		String currentWord = "";
+		String wordBefore = "";
 		int posMarker = position - 1;
 		if (position != 0) {
 			while (posMarker > 0 && contents.charAt(posMarker) != ' ') {

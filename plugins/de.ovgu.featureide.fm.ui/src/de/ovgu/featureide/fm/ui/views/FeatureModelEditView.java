@@ -161,7 +161,7 @@ public class FeatureModelEditView extends ViewPart {
 			featureModelEditor.getOriginalFeatureModel().addListener(modelListener);
 			featureModelEditor.getFeatureModel().addListener(modelListener);
 
-			if (evaluation == null && featureModelEditor != null && featureModelEditor.getGrammarFile().getResource().getProject().getName().startsWith("EvaluationTest")) {
+			if (evaluation == null && featureModelEditor.getGrammarFile().getResource().getProject().getName().startsWith("EvaluationTest")) {
 				evaluation = new Job("Evaluation Test") {
 					@Override
 					protected IStatus run(IProgressMonitor monitor) {

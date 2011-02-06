@@ -54,7 +54,6 @@ public class FeatureCppComposer implements IComposerExtensionClass {
 		if (project == null) {
 			return;
 		}
-		assert (project != null) : "Invalid project given";
 		featureCpp.initialize(project.getSourceFolder(), project
 				.getBuildFolder());
 	}

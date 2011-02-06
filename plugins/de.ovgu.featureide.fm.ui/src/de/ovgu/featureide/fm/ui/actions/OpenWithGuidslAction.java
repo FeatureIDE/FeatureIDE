@@ -204,6 +204,10 @@ public class OpenWithGuidslAction implements IObjectActionDelegate {
             }
             catch (IllegalThreadStateException e) {
             }
+            finally{
+            	if(input!=null)input.close();
+            	if(error!=null)error.close();
+            }
         }
     }
 

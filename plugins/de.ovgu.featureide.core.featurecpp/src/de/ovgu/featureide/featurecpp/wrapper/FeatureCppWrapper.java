@@ -59,10 +59,6 @@ public class FeatureCppWrapper {
 
 	public void compose(IFile config) {
 		assert (config != null && config.exists()) : "Configuration file does not exist";
-		String configName = config.getName();
-		if (configName.contains(".")) {
-			configName = configName.substring(0, configName.indexOf('.'));
-		}
 		IFolder folder2 = buildDirectory;
 		try {
 			if (!folder2.exists())
@@ -85,11 +81,13 @@ public class FeatureCppWrapper {
 
 	private void process(LinkedList<String> command) throws IOException {
 		ProcessBuilder processBuilder = new ProcessBuilder(command);
+		BufferedReader input = null;
+		BufferedReader error = null;
 		try {
 			Process process = processBuilder.start();
-			BufferedReader input = new BufferedReader(new InputStreamReader(
+			 input = new BufferedReader(new InputStreamReader(
 					process.getInputStream()));
-			BufferedReader error = new BufferedReader(new InputStreamReader(
+			 error = new BufferedReader(new InputStreamReader(
 					process.getErrorStream()));
 			boolean x = true;
 			while (x) {
@@ -110,7 +108,10 @@ public class FeatureCppWrapper {
 			}
 		} catch (IOException e) {
 			FeatureCppCorePlugin.getDefault().logError(e);
-		}	
+		}finally{
+		if(input!=null)input.close();
+		if(error!=null)error.close();
+		}
 	}
 
 }

@@ -242,7 +242,7 @@ public class AheadBuildErrorEvent {
             n = in.read(readBuffer);
         }
 
-        contentStream.close();
+        in.close();
         return buffer.toString();
     }
 

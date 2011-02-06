@@ -45,7 +45,6 @@ import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.featurehouse.FSTParser.FSTParser;
 import de.ovgu.featureide.core.featurehouse.FSTParser.JavaToken;
 
-
 /**
  * Composes files using FeatureHouse.
  * 
@@ -57,7 +56,7 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 	private static final String SOURCE_ENTRY = "\t<classpathentry kind=\"src\" path=\"";
 	private static final String EXCLUDE_ENTRY = "\t<classpathentry excluding=\"";
 	private static final String EXCLUDE_SOURCE_ENTRY = "\" kind=\"src\" path=\"";
-	
+
 	private IFeatureProject featureProject = null;
 
 	public FeatureHouseComposer() {
@@ -68,18 +67,20 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 	}
 
 	public void performFullBuild(IFile config) {
-		assert(featureProject != null) : "Invalid project given";
+		assert (featureProject != null) : "Invalid project given";
 
-		final String configPath =  config.getRawLocation().toOSString();
+		final String configPath = config.getRawLocation().toOSString();
 		final String basePath = featureProject.getSourcePath();
 		final String outputPath = featureProject.getBuildPath();
 
 		if (configPath == null || basePath == null || outputPath == null)
 			return;
 
-		// A new FSTGenComposer instance is created every time, because this class
+		// A new FSTGenComposer instance is created every time, because this
+		// class
 		// seems to remember the FST from a previous build.
-		IFolder buildFolder = featureProject.getBuildFolder().getFolder(config.getName().split("[.]")[0]);
+		IFolder buildFolder = featureProject.getBuildFolder().getFolder(
+				config.getName().split("[.]")[0]);
 		if (!buildFolder.exists()) {
 			try {
 				buildFolder.create(true, true, null);
@@ -87,46 +88,40 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 				FeatureHouseCorePlugin.getDefault().logError(e);
 			}
 		}
-		
-		setJaveBuildPath(config.getName().split("[.]")[0]);
-		
-		FSTGenComposer composer = new FSTGenComposer();
-		//TODO output should be generated directly at outputPath not at outputPath/configuration
-		composer.run(new String[]{			
-				"--expression", configPath, 
-				"--base-directory", basePath,
-				"--output-directory", outputPath + "/", 
-				"--ahead"
-		});
 
+		setJaveBuildPath(config.getName().split("[.]")[0]);
+
+		FSTGenComposer composer = new FSTGenComposer();
+		// TODO output should be generated directly at outputPath not at
+		// outputPath/configuration
+		composer.run(new String[] { "--expression", configPath,
+				"--base-directory", basePath, "--output-directory",
+				outputPath + "/", "--ahead" });
 
 		// ***************************************
 		// TODO: Dariusz
 		// Baustelle...
 
-
 		FSTParser parser = new FSTParser(AbstractFSTParser.fstnodes);
 
 		HashMap<String, List<JavaToken>> map = parser.getFileList();
 
-
 		// output parsed tree
-		for (String key : map.keySet()){
+		for (String key : map.keySet()) {
 			List<JavaToken> list = map.get(key);
-			System.out.println("=> File: " + key.toString() );
+			System.out.println("=> File: " + key.toString());
 			for (JavaToken token : list)
 				System.out.println("=> Token: \n" + token.toString());
 
-
 		}
 
-
-
-		TreeBuilderFeatureHouse fstparser = new TreeBuilderFeatureHouse(featureProject.getProjectName());
+		TreeBuilderFeatureHouse fstparser = new TreeBuilderFeatureHouse(
+				featureProject.getProjectName());
 		fstparser.createProjectTree(composer.getFstnodes());
 		featureProject.setProjectTree(fstparser.getProjectTree());
 		try {
-			featureProject.getBuildFolder().refreshLocal(IResource.DEPTH_INFINITE, null);
+			featureProject.getBuildFolder().refreshLocal(
+					IResource.DEPTH_INFINITE, null);
 		} catch (CoreException e) {
 			FeatureHouseCorePlugin.getDefault().logError(e);
 		}
@@ -135,7 +130,8 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 	private void setJaveBuildPath(String buildPath) {
 		Scanner scanner = null;
 		FileWriter fw = null;
-		IFile iClasspathFile = featureProject.getProject().getFile(".classpath");
+		IFile iClasspathFile = featureProject.getProject()
+				.getFile(".classpath");
 		try {
 			File file = iClasspathFile.getRawLocation().toFile();
 			StringBuffer fileText = new StringBuffer();
@@ -143,18 +139,24 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 			while (scanner.hasNext()) {
 				String line = scanner.nextLine();
 				if (line.contains(SOURCE_ENTRY)) {
-					fileText.append(SOURCE_ENTRY + featureProject.getBuildFolder().getName() + "/" + buildPath + "\"/>");
+					fileText.append(SOURCE_ENTRY
+							+ featureProject.getBuildFolder().getName() + "/"
+							+ buildPath + "\"/>");
 					fileText.append("\r\n");
 				} else if (line.contains(EXCLUDE_ENTRY)) {
-					fileText.append(line.substring(0, line.indexOf(EXCLUDE_SOURCE_ENTRY) + EXCLUDE_SOURCE_ENTRY.length()) + 
-							featureProject.getBuildFolder().getName() + "/" + buildPath + "\"/>");
+					fileText.append(line.substring(0,
+							line.indexOf(EXCLUDE_SOURCE_ENTRY)
+									+ EXCLUDE_SOURCE_ENTRY.length())
+							+ featureProject.getBuildFolder().getName()
+							+ "/"
+							+ buildPath + "\"/>");
 					fileText.append("\r\n");
 				} else {
 					fileText.append(line);
 					fileText.append("\r\n");
 				}
 			}
-			String fileTextString = fileText.toString();			
+			String fileTextString = fileText.toString();
 			fw = new FileWriter(file);
 			fw.write(fileTextString);
 			iClasspathFile.refreshLocal(IResource.DEPTH_ZERO, null);
@@ -165,15 +167,16 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 		} catch (CoreException e) {
 			FeatureHouseCorePlugin.getDefault().logError(e);
 		} finally {
-			if(scanner!=null) {
+			if (scanner != null) {
 				scanner.close();
-				if(fw!=null) {
-					try {
-						fw.close();
-					} catch (IOException e) {
-						FeatureHouseCorePlugin.getDefault().logError(e);
-					}	
+			}
+			if (fw != null) {
+				try {
+					fw.close();
+				} catch (IOException e) {
+					FeatureHouseCorePlugin.getDefault().logError(e);
 				}
+
 			}
 		}
 	}
@@ -198,7 +201,7 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 
 	@Override
 	public String replaceMarker(String text, List<String> list) {
-		// no composer specific markers yet 
+		// no composer specific markers yet
 		return text;
 	}
 
@@ -211,29 +214,34 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 		}
 		return true;
 	}
-	
-	// copies all not composed Files of selected Features from src to bin and build
+
+	// copies all not composed Files of selected Features from src to bin and
+	// build
 	private void copy(IFile config) throws CoreException {
-		ArrayList<String > selectedFeatures = getSelectedFeatures(config);
+		ArrayList<String> selectedFeatures = getSelectedFeatures(config);
 		if (selectedFeatures != null)
 			for (String feature : selectedFeatures) {
-				IFolder folder = featureProject.getSourceFolder().getFolder(feature);
-				copy(folder, featureProject.getBuildFolder().getFolder(config.getName().split("[.]")[0]));
+				IFolder folder = featureProject.getSourceFolder().getFolder(
+						feature);
+				copy(folder,
+						featureProject.getBuildFolder().getFolder(
+								config.getName().split("[.]")[0]));
 			}
 	}
 
-	private void copy(IFolder featureFolder, IFolder buildFolder) throws CoreException {
+	private void copy(IFolder featureFolder, IFolder buildFolder)
+			throws CoreException {
 		if (!featureFolder.exists()) {
 			return;
 		}
-		
+
 		for (IResource res : featureFolder.members()) {
 			if (res instanceof IFolder) {
 				IFolder folder = buildFolder.getFolder(res.getName());
 				if (!folder.exists()) {
 					folder.create(false, true, null);
 				}
-				copy((IFolder)res, folder);
+				copy((IFolder) res, folder);
 			} else if (res instanceof IFile) {
 				if (!extensions().contains(res.getName().split("[.]")[1])) {
 					IFile file = buildFolder.getFile(res.getName());
@@ -249,7 +257,7 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 		File configFile = config.getRawLocation().toFile();
 		return getTokenListFromFile(configFile);
 	}
-	
+
 	private static ArrayList<String> getTokenListFromFile(File file) {
 		ArrayList<String> list = null;
 		Scanner scanner = null;
@@ -268,7 +276,8 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} finally {
-			if(scanner!=null)scanner.close();
+			if (scanner != null)
+				scanner.close();
 		}
 		return list;
 	}
@@ -283,17 +292,22 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 	}
 
 	@Override
-	public ArrayList<String[]> getTemplates(){
+	public ArrayList<String[]> getTemplates() {
 
 		ArrayList<String[]> list = new ArrayList<String[]>();
 
-		String[] alloy = {"Alloy", "als", "module #classname#"};
-		String[] c = {"C", "c", ""};
-		String[] cs = {"C#", "cs", "public class #classname# {\n\n}"};
-		String[] haskell= {"Haskell", "hs", "module #classname# where \n{\n\n}"};
-		String[] java = {"Java", "java", "public class #classname# {\n\n}"};
-		String[] javacc= {"JavaCC", "jj", "PARSER_BEGIN(#classname#) \n \n PARSER_END(#classname#)"};
-		String[] uml = {"UML", "xmi", "<?xml version = '1.0' encoding = 'UTF-8' ?> \n	<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML'>\n\n</XMI>"};
+		String[] alloy = { "Alloy", "als", "module #classname#" };
+		String[] c = { "C", "c", "" };
+		String[] cs = { "C#", "cs", "public class #classname# {\n\n}" };
+		String[] haskell = { "Haskell", "hs",
+				"module #classname# where \n{\n\n}" };
+		String[] java = { "Java", "java", "public class #classname# {\n\n}" };
+		String[] javacc = { "JavaCC", "jj",
+				"PARSER_BEGIN(#classname#) \n \n PARSER_END(#classname#)" };
+		String[] uml = {
+				"UML",
+				"xmi",
+				"<?xml version = '1.0' encoding = 'UTF-8' ?> \n	<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML'>\n\n</XMI>" };
 
 		list.add(alloy);
 		list.add(c);
@@ -301,7 +315,7 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 		list.add(haskell);
 		list.add(java);
 		list.add(javacc);
-		list.add(uml);	
+		list.add(uml);
 
 		return list;
 	}
@@ -309,7 +323,7 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 	@SuppressWarnings("deprecation")
 	@Override
 	public void postCompile(IResourceDelta delta, IFile file) {
-		try {	
+		try {
 			file.setDerived(true);
 			if (delta.getKind() == IResourceDelta.ADDED) {
 				file.refreshLocal(IResource.DEPTH_ZERO, null);
@@ -331,12 +345,14 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 		IFile iClasspathFile = project.getFile(".classpath");
 		if (!iClasspathFile.exists()) {
 			try {
-				String text = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + 
-			 				  "<classpath>\n" +  
-			 				  "\t<classpathentry kind=\"src\" path=\"" + buildPath + "\"/>\n" + 
-			 				  "\t<classpathentry kind=\"con\" path=\"org.eclipse.jdt.launching.JRE_CONTAINER\"/>\r\n" +
-			 				  "\t<classpathentry kind=\"output\" path=\"bin\"/>\n" + 
-			 				  "</classpath>"; 
+				String text = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+						+ "<classpath>\n"
+						+ "\t<classpathentry kind=\"src\" path=\""
+						+ buildPath
+						+ "\"/>\n"
+						+ "\t<classpathentry kind=\"con\" path=\"org.eclipse.jdt.launching.JRE_CONTAINER\"/>\r\n"
+						+ "\t<classpathentry kind=\"output\" path=\"bin\"/>\n"
+						+ "</classpath>";
 				InputStream source = new ByteArrayInputStream(text.getBytes());
 				iClasspathFile.create(source, true, null);
 			} catch (CoreException e) {
@@ -369,17 +385,15 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 		return true;
 	}
 
-
 	@Override
 	public int getDefaultTemplateIndex() {
-	
+
 		return 4;
 	}
 
-
 	@Override
 	public void postModelChanged() {
-		
+
 	}
 
 	@Override
@@ -392,8 +406,11 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#getComfigurationExtension()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#
+	 * getComfigurationExtension()
 	 */
 	@Override
 	public String getConfigurationExtension() {
