@@ -513,7 +513,15 @@ public class FeatureModel implements PropertyConstants {
 	public List<Constraint> getConstraints() {
 		return Collections.unmodifiableList(constraints);
 	}
-
+	
+	public void replacePropNode(int index, Node node){
+		assert(index<constraints.size());
+		constraints.set(index, new Constraint(this, node));
+		propNodes.set(index, node);
+		
+	}
+	
+	
 	public int getNumberOfFeatures() {
 		return featureTable.size();
 	}

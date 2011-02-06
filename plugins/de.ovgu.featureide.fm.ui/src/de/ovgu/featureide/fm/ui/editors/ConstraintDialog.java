@@ -453,12 +453,11 @@ public class ConstraintDialog {
 		});
 
 		searchFeatureText.addModifyListener(new ModifyListener() {
-			
+
 			@Override
-			
 			public void modifyText(ModifyEvent e) {
 				ViewerFilter searchFilter = new ViewerFilter() {
-					
+
 					@Override
 					public boolean select(Viewer viewer, Object parentElement,
 							Object element) {
@@ -471,10 +470,11 @@ public class ConstraintDialog {
 					}
 
 				};
-				if(!searchFeatureText.getText().equalsIgnoreCase(FILTERTEXT)){
-				featureTableViewer.addFilter(searchFilter);
+				if (!searchFeatureText.getText().equalsIgnoreCase(FILTERTEXT)) {
+					featureTableViewer.addFilter(searchFilter);
 
-			}}
+				}
+			}
 
 		});
 
@@ -713,7 +713,8 @@ public class ConstraintDialog {
 	 * */
 	private String getDeadFeatureString(List<Literal> deadFeatures) {
 		StringBuffer featureString = new StringBuffer();
-		featureString.append("Constraint causes the following features to be dead: ");
+		featureString
+				.append("Constraint causes the following features to be dead: ");
 		int count = 0;
 		int featureCount = 0;
 		boolean isNewLine = false;
@@ -809,10 +810,15 @@ public class ConstraintDialog {
 			printHeaderError("constraint is unsatisfiable");
 			return;
 		}
-		if (constraint != null) {
-			featuremodel.removePropositionalNode(constraint);
+		int index = 0;
+		
+		if (constraint != null
+				&& (index = featuremodel.getConstraints().indexOf(constraint)) != -1) {
+
+			featuremodel.replacePropNode(index, propNode);
+		} else {
+			featuremodel.addPropositionalNode(propNode);
 		}
-		featuremodel.addPropositionalNode(propNode);
 		featuremodel.handleModelDataChanged();
 		shell.dispose();
 
