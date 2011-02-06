@@ -155,6 +155,7 @@ public class ConstraintDialog {
 		constraintText.setFocus();
 		constraintText.setSelection(constraintText.getCharCount());
 		shell.open();
+		if(constraint!=null)validate();
 	}
 
 	/**
@@ -633,22 +634,24 @@ public class ConstraintDialog {
 	 *         dead
 	 */
 	public List<Literal> getDeadFeatures(String input, FeatureModel model) {
-
+		List<Literal> deadFeaturesBefore = null;
 		FeatureModel clonedModel = model.clone();
-		List<Literal> deadFeaturesBefore = model.getDeadFeatures();
+		
 		NodeReader nodeReader = new NodeReader();
-
+		
 		List<String> featureList = new ArrayList<String>(
 				clonedModel.getFeatureNames());
 		Node propNode = nodeReader.stringToNode(input, featureList);
+	
 		if (propNode != null) {
 			if (constraint != null) {
 				clonedModel.removePropositionalNode(constraint);
 			}
+			deadFeaturesBefore = clonedModel.getDeadFeatures();
 			clonedModel.addPropositionalNode(propNode);
 			clonedModel.handleModelDataChanged();
 		}
-
+		
 		List<Literal> deadFeaturesAfter = new ArrayList<Literal>();
 
 		for (Literal l : clonedModel.getDeadFeatures()) {
