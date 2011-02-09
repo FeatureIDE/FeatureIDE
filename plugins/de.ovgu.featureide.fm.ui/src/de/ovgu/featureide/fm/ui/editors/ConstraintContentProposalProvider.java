@@ -33,9 +33,9 @@ import org.eclipse.jface.fieldassist.IContentProposalProvider;
  */
 public class ConstraintContentProposalProvider implements
 		IContentProposalProvider {
-	
+	static final int CURRENT = 0;
+	static final int LAST = 1;
 	private Set<String> features;
-
 
 	public ConstraintContentProposalProvider(Set<String> featureNames) {
 		super();
@@ -47,21 +47,69 @@ public class ConstraintContentProposalProvider implements
 	 * a field.
 	 * 
 	 * @param contents
-	 *            the current contents of the field  
+	 *            the current contents of the field
 	 * @param position
-	 *            the current cursor position within the field 
+	 *            the current cursor position within the field
 	 * @return the array of Objects that represent valid proposals for the field
 	 *         given its current content.
 	 */
 	public IContentProposal[] getProposals(String contents, int position) {
-		String currentWord = "";
-		String wordBefore = "";
+
+		String[] words = getWords(contents, position);
+
+		List<ContentProposal> proposalList = getProposalList(words);
+
+		return (IContentProposal[]) proposalList
+				.toArray(new IContentProposal[proposalList.size()]);
+
+	}
+
+	private List<ContentProposal> getProposalList(String[] words) {
+		List<ContentProposal> proposalList = new ArrayList<ContentProposal>();
+		
+		if (words[CURRENT].equals("(") || words[CURRENT].equals(" ")
+				|| words[CURRENT].equals("")) {
+			proposalList = getProposalList(words[LAST], features);
+		} else {
+			for (ContentProposal proposal : getProposalList(words[LAST],
+					features)) {
+
+				if (proposal.getContent().length() > words[CURRENT].trim().length()
+						&& proposal.getContent()
+								.substring(0, words[CURRENT].trim().length())
+								.equalsIgnoreCase(words[CURRENT].trim())) {
+
+					proposalList.add(proposal);
+				}
+			}
+		}
+		return proposalList;
+	}
+
+	/**
+	 * Returns the word that is being written and the word before it, given the
+	 * current content and cursor position
+	 * 
+	 * @param contents
+	 *            the content,i.e. the string which contains the text
+	 * @param position
+	 *            current position of the cursor, first position is 0
+	 * @return Array with two elements: current word and the word before, words
+	 *         can be empty String, index: CURRENT, LAST
+	 */
+	static String[] getWords(String contents, int position) {
+
+		String[] words = new String[2];
+
 		int posMarker = position - 1;
-		if (position != 0) {
+		if (position == 0) {
+			words[CURRENT] = "";
+			words[LAST] = "";
+		} else {
 			while (posMarker > 0 && contents.charAt(posMarker) != ' ') {
 				posMarker--;
 			}
-			currentWord = contents.substring(posMarker, position);
+			words[CURRENT] = contents.substring(posMarker, position);
 
 			while (posMarker > 0 && contents.charAt(posMarker) == ' ') {
 				posMarker--;
@@ -70,64 +118,57 @@ public class ConstraintContentProposalProvider implements
 			while (startBefore > 0 && contents.charAt(startBefore) != ' ') {
 				startBefore--;
 			}
-			wordBefore = contents.substring(startBefore, posMarker + 1);
+			if (posMarker == 0) {
+				if (contents.charAt(0) == '(')
+					words[LAST] = "(";
+				else
+					words[LAST] = "";
+			} else
+				words[LAST] = contents.substring(startBefore, posMarker + 1);
 
 		}
-
-		wordBefore = wordBefore.trim();
-		currentWord = currentWord.trim();
-		if (wordBefore.startsWith("(")) {
-			wordBefore = wordBefore.substring(1);
-
-		}
-		if (currentWord.startsWith("(")) {
-			currentWord = currentWord.substring(1);
-			wordBefore = "(";
-		}
-		if (wordBefore.endsWith(")")) {
-			wordBefore = ")";
+	//	words[LAST] = words[LAST].trim();
+	//	words[CURRENT] = words[CURRENT].trim();
+		if (words[LAST].startsWith("(") && words[LAST].length() > 1) {
+			words[LAST] = words[LAST].substring(1);
 
 		}
-		if (currentWord.endsWith(")")) {
-			wordBefore = ")";
-			currentWord = "";
-
+		if (words[CURRENT].trim().startsWith("(")) {
+			words[CURRENT]=words[CURRENT].trim();
+			words[CURRENT] = words[CURRENT].substring(1);
+			words[LAST] = "(";
 		}
-
-		List<ContentProposal> proposalList = new ArrayList<ContentProposal>();
-		if (currentWord.equals("(") || currentWord.equals(")")
-				|| currentWord.equals(" ") || currentWord.equals("")) {
-			proposalList = getProposalList(wordBefore);
-		} else {
-			for (ContentProposal proposal : getProposalList(wordBefore)) {
-
-				if (proposal.getContent().length() >= currentWord.length()
-						&& proposal.getContent()
-								.substring(0, currentWord.length())
-								.equalsIgnoreCase(currentWord)) {
-
-					proposalList.add(proposal);
-				}
+		if (words[LAST].endsWith(")")) {
+			words[LAST] = ")";
+			if(contents.charAt(posMarker)==')'){
+				words[LAST] = ") ";
 			}
+
+
 		}
+		if (words[CURRENT].endsWith(")")) {
+			words[LAST] = ")";
+			words[CURRENT] = "";
 
-		return (IContentProposal[]) proposalList
-				.toArray(new IContentProposal[proposalList.size()]);
-
+		}
+		System.out.println("words[CURRENT]="+words[CURRENT]);
+		System.out.println("words[LAST]="+words[LAST]);
+		return words;
 	}
 
-	private List<ContentProposal> getProposalList(String wordBefore) {
+	private static List<ContentProposal> getProposalList(String wordBefore,
+			Set<String> features) {
 
 		ArrayList<ContentProposal> proposals = new ArrayList<ContentProposal>();
 		ArrayList<String> featureList = new ArrayList<String>(features);
 		Collections.sort(featureList, String.CASE_INSENSITIVE_ORDER);
-		if (wordBefore.equals(")") || features.contains(wordBefore.trim())) {
+		if (wordBefore.equals(") ")||features.contains(wordBefore.trim())) {
 			proposals.add(new ContentProposal("and"));
 			proposals.add(new ContentProposal("iff"));
 			proposals.add(new ContentProposal("implies"));
 			proposals.add(new ContentProposal("or"));
 
-		} else {
+		} else if(!wordBefore.equals(")")){
 			proposals.add(new ContentProposal("not"));
 
 			for (String s : featureList) {
@@ -138,7 +179,5 @@ public class ConstraintContentProposalProvider implements
 
 		return proposals;
 	}
-
-
 
 }

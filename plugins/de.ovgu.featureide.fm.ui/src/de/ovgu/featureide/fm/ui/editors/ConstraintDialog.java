@@ -164,12 +164,12 @@ public class ConstraintDialog {
 	private void initShell() {
 		shell = new Shell(Display.getCurrent());
 		shell.setText(titleText);
-		shell.setSize(500, 500);
+		shell.setSize(500, 585);
 		GridLayout shellLayout = new GridLayout();
 		shellLayout.marginWidth = 0;
 		shellLayout.marginHeight = 0;
 		shell.setLayout(shellLayout);
-
+		
 		Monitor primary = shell.getDisplay().getPrimaryMonitor();
 		Rectangle bounds = primary.getBounds();
 		Rectangle rect = shell.getBounds();
@@ -193,6 +193,7 @@ public class ConstraintDialog {
 
 		FormLayout lastCompositeLayout = new FormLayout();
 		lastCompositeLayout.marginHeight = 5;
+		lastCompositeLayout.marginTop = 85;
 		lastCompositeLayout.marginWidth = 5;
 		lastComposite.setLayout(lastCompositeLayout);
 		helpButtonBar = new ToolBar(lastComposite, SWT.FLAT);
@@ -307,6 +308,7 @@ public class ConstraintDialog {
 	private void initConstraintText() {
 		Composite constraintTextComposite = new Composite(shell, SWT.NONE);
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
+
 		constraintTextComposite.setLayoutData(gridData);
 		FormLayout constraintTextLayout = new FormLayout();
 		constraintTextComposite.setLayout(constraintTextLayout);
@@ -319,7 +321,7 @@ public class ConstraintDialog {
 						featuremodel.getFeatureNames()), null, null);
 
 		adapter.setAutoActivationDelay(500);
-		adapter.setPopupSize(new Point(250, 125));
+		adapter.setPopupSize(new Point(250, 85));
 		adapter.setLabelProvider(new ConstraintProposalLabelProvider());
 		FormData formDataConstraintText = new FormData();
 		formDataConstraintText.right = new FormAttachment(100, -5);
