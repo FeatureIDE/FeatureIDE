@@ -208,9 +208,19 @@ public class FeatureModel implements PropertyConstants {
 		String name = feature.getName();
 		if (!featureTable.containsKey(name))
 			return false;
+		
+		// use the group type of the feature to delete
+		Feature parent = feature.getParent();
+		if (parent.getChildrenCount() == 1) {
+			if (feature.isAnd())
+				parent.setAnd();
+			else if (feature.isAlternative())
+				parent.setAlternative();
+			else
+				parent.setOr();
+		}
 
 		// add children to parent
-		Feature parent = feature.getParent();
 		int index = parent.getChildIndex(feature);
 		while (feature.hasChildren())
 			parent.addChildAtPosition(index, feature.removeLastChild());
