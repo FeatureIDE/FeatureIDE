@@ -294,6 +294,7 @@ public class ExtractMethodWindow implements Window, SelectionListener, Listener 
 		// if the destination-layer does not exist create it and the
 		// destination-class
 		if (layer == null) {
+			//TODO make use of File.pathSeparator
 			String fileRoot = this.file.getProject().getLocation().toOSString()
 					+ "\\" + Parser.FILESRC + "\\" + destLayer + "\\";
 			destFile = fileRoot + srcClass + ".jak";

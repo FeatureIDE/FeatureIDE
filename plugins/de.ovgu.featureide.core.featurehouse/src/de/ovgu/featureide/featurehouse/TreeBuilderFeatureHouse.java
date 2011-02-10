@@ -18,6 +18,7 @@
  */
 package de.ovgu.featureide.featurehouse;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -115,7 +116,7 @@ public class TreeBuilderFeatureHouse {
 
 				String name = node.getName();
 				name = name
-				.substring(name.lastIndexOf("\\") + 1, name.length());
+				.substring(name.lastIndexOf(File.pathSeparator) + 1, name.length());
 				ProjectTreeNode fileNode = insertProjectTreeNode("file", name,
 						projectTree.findNodeByName(featureName));
 
