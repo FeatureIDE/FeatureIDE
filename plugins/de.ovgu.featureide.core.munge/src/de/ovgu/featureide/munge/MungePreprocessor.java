@@ -18,20 +18,15 @@
  */
 package de.ovgu.featureide.munge;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Scanner;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
@@ -42,41 +37,26 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.sonatype.plugins.munge.Munge;
 
 import de.ovgu.featureide.core.CorePlugin;
-import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.builder.IComposerExtensionClass;
+import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 
 /**
  * Munge: a purposely-simple Java preprocessor.
  * 
  * @author Jens Meinicke
  */
-public class MungePreprocessor implements IComposerExtensionClass{
+public class MungePreprocessor extends ComposerExtensionClass{
 	
-	public static final String JAVA_NATURE = "org.eclipse.jdt.core.javanature";
-
-	private IFeatureProject featureProject = null;
-
 	private LinkedList<String> selectedFeatures;
 	
 	private ArrayList<String> features;
 	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#extensions()
-	 */
+	@Override
 	public ArrayList<String> extensions() {
-		return new ArrayList<String>();
+		ArrayList<String> extensions = new ArrayList<String>();
+		extensions.add(".java");
+		return extensions;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#initialize(de.ovgu.featureide.core.IFeatureProject)
-	 */
-	public void initialize(IFeatureProject project) {
-		featureProject = project;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#performFullBuild(org.eclipse.core.resources.IFile)
-	 */
 	public void performFullBuild(IFile config) {
 		assert(featureProject != null) : "Invalid project given";
 		
@@ -130,13 +110,6 @@ public class MungePreprocessor implements IComposerExtensionClass{
 			}
 		}
 		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#clean()
-	 */
-	public boolean clean() {
-		return true;
 	}
 
 	private void addDefaultSourceFiles(IFolder sourceFolder) throws CoreException {
@@ -209,20 +182,6 @@ public class MungePreprocessor implements IComposerExtensionClass{
 	}
 
 	@Override
-	public boolean copyNotComposedFiles() {
-		return false;
-	}
-
-	@Override
-	public boolean postAddNature(IFolder source, IFolder destination) {
-		return false;
-	}
-
-	@Override
-	public void buildFSTModel() {
-	}
-
-	@Override
 	public ArrayList<String[]> getTemplates() {
 		ArrayList<String[]> list = new ArrayList<String[]>();
 		String[] java = {"Java", "java", "public class #classname# {\n\n}"};
@@ -230,15 +189,10 @@ public class MungePreprocessor implements IComposerExtensionClass{
 		return list;
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public void postCompile(IResourceDelta delta, final IFile file) {
-		try {
-			file.setDerived(true);
-		} catch (CoreException e) {
-			MungeCorePlugin.getDefault().logError(e);
-		}
-		Job job = new Job("create marker") {
+		super.postCompile(delta, file);
+		Job job = new Job("Propagate problem markers") {
 			@Override
 			public IStatus run(IProgressMonitor monitor) {
 				try {
@@ -300,85 +254,7 @@ public class MungePreprocessor implements IComposerExtensionClass{
 	}
 
 	@Override
-	public void addCompiler(IProject project, String sourcePath,
-			String configPath, String buildPath) {
-		addNature(project);
-		addClasspathFile(project, sourcePath, configPath, buildPath);
-	}
-
-	private void addClasspathFile(IProject project, String sourcePath,
-			String configPath, String buildPath) {
-		IFile iClasspathFile = project.getFile(".classpath");
-		if (!iClasspathFile.exists()) {
-			try {
-				String text = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + 
-			 				  "<classpath>\n" +  
-			 				  "<classpathentry kind=\"src\" path=\"" + buildPath + "\"/>\n" + 
-			 				  "<classpathentry kind=\"con\" path=\"org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6\"/>\n" + 
-			 				  "<classpathentry kind=\"output\" path=\"bin\"/>\n" + 
-			 				  "</classpath>"; 
-				InputStream source = new ByteArrayInputStream(text.getBytes());
-				iClasspathFile.create(source, true, null);
-			} catch (CoreException e) {
-				MungeCorePlugin.getDefault().logError(e);
-			}
-
-		}
-	}
-
-	private void addNature(IProject project) {
-		try {
-			if (!project.isAccessible() || project.hasNature(JAVA_NATURE))
-				return;
-
-			IProjectDescription description = project.getDescription();
-			String[] natures = description.getNatureIds();
-			String[] newNatures = new String[natures.length + 1];
-			System.arraycopy(natures, 0, newNatures, 0, natures.length);
-			newNatures[natures.length] = JAVA_NATURE;
-			description.setNatureIds(newNatures);
-			project.setDescription(description, null);
-		} catch (CoreException e) {
-			MungeCorePlugin.getDefault().logError(e);
-		}
-	}
-
-	@Override
 	public boolean hasFeatureFolders() {
 		return false;
-	}
-
-	@Override
-	public String replaceMarker(String text, List<String> list) {
-		return text;
-	}
-
-	@Override
-	public void postModelChanged() {
-		
-	}
-
-	@Override
-	public int getDefaultTemplateIndex() {
-	
-		return 0;
-	}
-
-	@Override
-	public boolean hasCustomFilename() {
-		return false;
-	}
-
-	@Override
-	public boolean hasFeatureFolder() {
-		return true;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#getComfigurationExtension()
-	 */
-	@Override
-	public String getConfigurationExtension() {
-		return null;
 	}
 }

@@ -75,10 +75,7 @@ public class ComposerExtensionProxy implements IComposerExtension {
 		return "Name: " + name + "; ID: " + id;
 	}
 
-	/**
-	 * Loads the CompositionExtension class if necessary.
-	 */
-	private void loadComposerExtension() {
+	public void loadComposerExtension() {
 		if (composerExtensionClass != null)
 			return;
 		try {
@@ -97,7 +94,6 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	 */
 	public void initialize(IFeatureProject project) {
 		loadComposerExtension();
-		
 		composerExtensionClass.initialize(project);
 	}
 

@@ -338,7 +338,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 	private void initComboLanguage() {
 		
 		composerExt = featureProject.getComposer();
-		composerExt.initialize(featureProject);
+		composerExt.loadComposerExtension();
 		formats = composerExt.getTemplates();
 		comboLanguage.removeAll();
 		for (String[] format : formats)

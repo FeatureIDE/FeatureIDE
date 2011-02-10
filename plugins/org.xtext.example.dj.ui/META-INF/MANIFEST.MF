@@ -23,7 +23,7 @@ Import-Package: djtemplates,
  org.eclipse.emf.common.util,
  org.eclipse.emf.ecore,
  org.eclipse.xtend.typesystem.emf
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: org.xtext.example.dj.ui.popup.actions,
  org.xtext.example.ui.contentassist.antlr
 Bundle-Activator: org.xtext.example.ui.internal.DJActivator
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6

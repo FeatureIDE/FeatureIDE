@@ -2,13 +2,16 @@ package org.xtext.example.util;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+
 import org.xtext.example.dJ.Class;
-import org.xtext.example.dJ.*;
+import org.xtext.example.dJ.Constructor;
+import org.xtext.example.dJ.Expression;
+import org.xtext.example.dJ.Field;
+import org.xtext.example.dJ.Method;
+import org.xtext.example.dJ.ModifiesMethod;
 
 public class CST
 {

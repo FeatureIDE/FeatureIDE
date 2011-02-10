@@ -1,17 +1,15 @@
 package org.xtext.example.lookup;
 
-import java.awt.Frame;
 import java.math.BigInteger;
-import java.util.*;
-
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.xtext.EcoreUtil2;
-import org.xtext.example.linking.DjResourceFactory;
-import org.xtext.example.mydsl.dJ.*;
 import org.xtext.example.dJ.AddsField;
 import org.xtext.example.dJ.AddsMethod;
 import org.xtext.example.dJ.Class;
@@ -31,10 +29,12 @@ import org.xtext.example.dJ.MethodBody;
 import org.xtext.example.dJ.MethodRef;
 import org.xtext.example.dJ.ModifiesClass;
 import org.xtext.example.dJ.Module;
-import org.xtext.example.dJ.*;
-import org.xtext.example.type.ClassType;
-import org.xtext.example.util.*;
-import org.xtext.example.validation.DJJavaValidator;
+import org.xtext.example.dJ.Program;
+import org.xtext.example.linking.DjResourceFactory;
+import org.xtext.example.util.ACST;
+import org.xtext.example.util.CST;
+import org.xtext.example.util.ContainingModuleFinded;
+import org.xtext.example.util.ContainingProgramFinded;
 
 public class AuxiliaryFunctions
 {

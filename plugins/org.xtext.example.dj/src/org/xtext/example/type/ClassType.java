@@ -8,6 +8,7 @@ import org.xtext.example.dJ.Class;
 import org.xtext.example.util.CST;
 
 public class ClassType {
+	@SuppressWarnings("unused")
 	private final String OBJECT = "Object";
 	private final String NULL = "null";
 	private String basic;
@@ -42,10 +43,10 @@ public class ClassType {
 	
 	
 	/*
-	 * Ritorna true se la classe passata come parametro è una parent class o la medesima classe 
-	 * di quella su cui il metodo è stato chiamato.
+	 * Ritorna true se la classe passata come parametro ÔøΩ una parent class o la medesima classe 
+	 * di quella su cui il metodo ÔøΩ stato chiamato.
 	 * O ancora se hanno lo stesso basic type.
-	 * AllObject è stato usato per scopi specifici riguardati la SystemOutWrapped
+	 * AllObject ÔøΩ stato usato per scopi specifici riguardati la SystemOutWrapped
 	 */
 	public boolean equals(ClassType type, Map<String, CST> classMapApply){
 		if(type != null)

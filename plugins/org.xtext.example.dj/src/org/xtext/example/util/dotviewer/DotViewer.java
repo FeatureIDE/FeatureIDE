@@ -9,8 +9,9 @@
 /*     */ import javax.swing.JMenu;
 /*     */ import javax.swing.JMenuBar;
 /*     */ import javax.swing.JMenuItem;
-/*     */ import javax.swing.JPanel;
+import javax.swing.JPanel;
 /*     */ 
+/*     */ @SuppressWarnings("serial")
 /*     */ public class DotViewer extends JFrame
 /*     */ {
 /*  15 */   private static int DISP = 60;

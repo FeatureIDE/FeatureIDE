@@ -33,14 +33,12 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  */
 public class ViewLabelProvider extends LabelProvider {
 
-	public final Image IMAGE_ASELECTED, IMAGE_ADESELECTED;
-
+	public static final Image IMAGE_ASELECTED = FMUIPlugin.getImage("aselected.ico");
+	public static final Image IMAGE_ADESELECTED = FMUIPlugin.getImage("adeselected.ico");
+	
 	public ViewLabelProvider() {
-		IMAGE_ASELECTED = FMUIPlugin.getImage("aselected.ico");
-		IMAGE_ADESELECTED = FMUIPlugin.getImage("adeselected.ico");
 	}
 	
-
 	public String getText(Object o) {
 		return o.toString();
 	}

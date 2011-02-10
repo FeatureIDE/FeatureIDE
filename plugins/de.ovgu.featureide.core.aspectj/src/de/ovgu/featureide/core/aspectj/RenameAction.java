@@ -110,7 +110,7 @@ public class RenameAction implements IRenameAction {
 			if (!fileText.toString().contains(getAspect(oldName))) {
 				return;
 			}
-			// TODO revise replacement \w oder \W für word char
+			// TODO revise replacement \w or \W for word char
 			String fileTextString = fileText.toString().replaceAll(getAspect(oldName), getAspect(newName));
 			
 			if (packageName != null && !fileTextString.contains("package " + packageName + ";")) {

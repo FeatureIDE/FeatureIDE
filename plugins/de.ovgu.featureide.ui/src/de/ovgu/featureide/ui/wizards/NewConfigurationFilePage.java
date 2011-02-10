@@ -194,9 +194,9 @@ public class NewConfigurationFilePage extends WizardPage {
 		
 		if (fileName.length() != 0) {
 			configbool = true;
-			if (configNames.contains(fileName)) {
-				// TODO replace equation
-				updateStatus("File " + fileName + " already exists.");
+			String fullFileName = fileName + featureProject.getComposer().getConfigurationExtension();
+			if (featureProject.getConfigFolder().getFile(fullFileName).exists()) {
+				updateStatus("File " + fullFileName + " already exists.");
 				return;
 			}
 		} else if(configbool) {

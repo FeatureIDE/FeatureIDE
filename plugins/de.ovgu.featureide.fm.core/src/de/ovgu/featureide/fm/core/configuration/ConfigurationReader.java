@@ -32,93 +32,119 @@ import java.util.StringTokenizer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
-//TODO: streams should be closed in finally blocks
+
 public class ConfigurationReader {
-	
+
 	private Configuration configuration;
-	
+
 	private LinkedList<String> warnings = new LinkedList<String>();
 	private LinkedList<Integer> positions = new LinkedList<Integer>();
 
 	public ConfigurationReader(Configuration configuration) {
 		this.configuration = configuration;
 	}
-	
+
 	public boolean readFromFile(IFile file) throws CoreException, IOException {
-		String fileName = file.getRawLocation().toOSString();		
-        InputStream inputStream = new FileInputStream(fileName);
-        return readFromInputStream(inputStream);
- 	}
+		String fileName = file.getRawLocation().toOSString();
+		InputStream inputStream = new FileInputStream(fileName);
+		try {
+			return readFromInputStream(inputStream);
+		} finally {
+			inputStream.close();
+		}
+	}
 
 	public boolean readFromString(String text) {
-        InputStream inputStream = new ByteArrayInputStream(text.getBytes());
-        try {
+		InputStream inputStream = null;
+		try {
+			inputStream = new ByteArrayInputStream(text.getBytes());
 			return readFromInputStream(inputStream);
 		} catch (IOException e) {
+			FMCorePlugin.getDefault().logError(e);
+		} finally {
+			if (inputStream != null) {
+				try {
+					inputStream.close();
+				} catch (IOException e) {
+					FMCorePlugin.getDefault().logError(e);
+				}
+			}
 		}
 		return false;
- 	}
-	
-	private boolean readFromInputStream(InputStream inputStream) throws IOException {
+	}
+
+	private boolean readFromInputStream(InputStream inputStream)
+			throws IOException {
 		configuration.resetValues();
-		
-		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+		BufferedReader reader = null;
 		String line = null;
 		Integer lineNumber = 1;
 		boolean successful = true;
-		while ((line = reader.readLine()) != null) {
-			if (line.startsWith("#") || line.isEmpty()){
-				lineNumber++;
-				continue;
-			}
-			//the string tokenizer is used to also support the expression format used by FeatureHouse
-			StringTokenizer tokenizer = new StringTokenizer(line);
-			LinkedList<String> hiddenFeatures = new LinkedList<String>();
-			while (tokenizer.hasMoreTokens()) {
-				String name = tokenizer.nextToken();
-				Feature feature = configuration.getFeatureModel().getFeature(name);
-				if (feature != null && feature.isHidden()) {
-					hiddenFeatures.add(name);
-				} else {
+		try {
+			reader = new BufferedReader(new InputStreamReader(inputStream));
+			while ((line = reader.readLine()) != null) {
+				if (line.startsWith("#") || line.isEmpty()) {
+					lineNumber++;
+					continue;
+				}
+				// the string tokenizer is used to also support the expression
+				// format used by FeatureHouse
+				StringTokenizer tokenizer = new StringTokenizer(line);
+				LinkedList<String> hiddenFeatures = new LinkedList<String>();
+				while (tokenizer.hasMoreTokens()) {
+					String name = tokenizer.nextToken();
+					Feature feature = configuration.getFeatureModel()
+							.getFeature(name);
+					if (feature != null && feature.isHidden()) {
+						hiddenFeatures.add(name);
+					} else {
+						try {
+							configuration.setManual(name, Selection.SELECTED);
+						} catch (FeatureNotFoundException e) {
+							successful = false;
+							warnings.add("Feature " + name
+									+ " does not exist anymore");
+							positions.add(lineNumber);
+						} catch (SelectionNotPossibleException e) {
+							successful = false;
+							warnings.add("Feature " + name
+									+ " cannot be selected anymore");
+							positions.add(lineNumber);
+						}
+					}
+					lineNumber++;
+				}
+				for (String name : hiddenFeatures) {
 					try {
 						configuration.setManual(name, Selection.SELECTED);
 					} catch (FeatureNotFoundException e) {
 						successful = false;
-						warnings.add("Feature " + name + " does not exist anymore");
+						warnings.add("Feature " + name
+								+ " does not exist anymore");
 						positions.add(lineNumber);
 					} catch (SelectionNotPossibleException e) {
 						successful = false;
-						warnings.add("Feature " + name + " cannot be selected anymore");
+						warnings.add("Feature " + name
+								+ " cannot be selected anymore");
 						positions.add(lineNumber);
 					}
+					lineNumber++;
 				}
-				lineNumber++;
 			}
-			for (String name : hiddenFeatures) {
-				try {
-					configuration.setManual(name, Selection.SELECTED);
-				} catch (FeatureNotFoundException e) {
-					successful = false;
-					warnings.add("Feature " + name + " does not exist anymore");
-					positions.add(lineNumber);
-				} catch (SelectionNotPossibleException e) {
-					successful = false;
-					warnings.add("Feature " + name + " cannot be selected anymore");
-					positions.add(lineNumber);
-				}
-				lineNumber++;
+		} finally {
+			if (reader != null) {
+				reader.close();
 			}
 		}
-		reader.close();
-		
 		return successful;
 	}
 
 	public List<String> getWarnings() {
 		return Collections.unmodifiableList(warnings);
 	}
-	
+
 	public List<Integer> getPositions() {
 		return Collections.unmodifiableList(positions);
 	}

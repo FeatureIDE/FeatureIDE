@@ -45,7 +45,6 @@ public class ViewContentProvider implements IStructuredContentProvider,
 		ITreeContentProvider {
 	
 	private static final String DEFAULT_MESSAGE = "Open a feature model.";
-
 	private static final String CALCULATING_MESSAGE = "Calculating...";
 
 	private static final Image DEFAULT_IMAGE = PlatformUI.getWorkbench()
@@ -54,6 +53,11 @@ public class ViewContentProvider implements IStructuredContentProvider,
 	private static final Image ERROR_IMAGE = PlatformUI.getWorkbench()
 			.getSharedImages().getImage(ISharedImages.IMG_OBJS_ERROR_TSK);
 
+	private static final Image ZERO_IMAGE = FMUIPlugin.getImage("zero.gif");
+	private static final Image PLUS_IMAGE = FMUIPlugin.getImage("plus.gif");
+	private static final Image MINUS_IMAGE = FMUIPlugin.getImage("minus.gif");
+	private static final Image PLUS_MINUS_IMAGE = FMUIPlugin.getImage("plusminus.gif");
+	
 	/**
 	 * time in seconds after the calculation is aborted by the SAT solver
 	 */
@@ -119,16 +123,16 @@ public class ViewContentProvider implements IStructuredContentProvider,
 		Image image = null;
 		if (comparison == Comparison.REFACTORING) {
 			message = "Refactoring: SPL unchanged";
-			image = FMUIPlugin.getImage("zero.gif");
+			image = ZERO_IMAGE;
 		} else if (comparison == Comparison.GENERALIZATION) {
 			message = "Generalization: Products added";
-			image = FMUIPlugin.getImage("plus.gif");
+			image = PLUS_IMAGE;
 		} else if (comparison == Comparison.SPECIALIZATION) {
 			message = "Specialization: Products removed";
-			image = FMUIPlugin.getImage("minus.gif");
+			image = MINUS_IMAGE;
 		} else if (comparison == Comparison.ARBITRARY) {
 			message = "Arbitrary edit: Products added and removed";
-			image = FMUIPlugin.getImage("plusminus.gif");
+			image = PLUS_MINUS_IMAGE;
 		} else if (comparison == Comparison.OUTOFMEMORY) {
 			message = "Out of memory error!";
 			image = ERROR_IMAGE; 

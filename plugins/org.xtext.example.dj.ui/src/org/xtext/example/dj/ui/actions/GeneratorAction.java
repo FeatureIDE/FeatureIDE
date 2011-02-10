@@ -1,14 +1,10 @@
 package org.xtext.example.dj.ui.actions;
 
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.xtext.example.dj.ui.popup.actions.JavaGenerator;
-import org.xtext.example.util.DJIdeProperties;
 
 /**
  * Our sample action implements workbench action delegate.
@@ -19,6 +15,7 @@ import org.xtext.example.util.DJIdeProperties;
  * @see IWorkbenchWindowActionDelegate
  */
 public class GeneratorAction implements IWorkbenchWindowActionDelegate {
+	@SuppressWarnings("unused")
 	private IWorkbenchWindow window;
 	private JavaGenerator generator = new JavaGenerator();
 	

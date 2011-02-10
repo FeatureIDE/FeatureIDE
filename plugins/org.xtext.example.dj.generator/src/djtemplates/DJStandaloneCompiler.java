@@ -1,7 +1,6 @@
 package djtemplates;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -27,7 +26,6 @@ import org.eclipse.xtext.validation.Issue;
 import org.xtext.example.DJStandaloneSetup;
 import org.xtext.example.dJ.DJPackage;
 import org.xtext.example.dJ.Program;
-import org.xtext.example.mydsl.dJ.*;
 import org.xtext.example.util.JavaProva;
 
 import com.google.inject.Injector;
@@ -189,6 +187,7 @@ public class DJStandaloneCompiler {
 			new DJStandaloneCompiler(args).compile();
 	}  
 	
+	@SuppressWarnings("unused")
 	private String inputStreamToString(InputStream in) throws IOException {
 	    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
 	    StringBuilder stringBuilder = new StringBuilder();

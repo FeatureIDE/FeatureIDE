@@ -79,6 +79,7 @@ public class CollaborationModelBuilder {
 		
 		if (featureProject == null)
 			return null;
+		project = featureProject;
 		
 		//initialize builder
 		IComposerExtension composer = featureProject.getComposer();
@@ -87,7 +88,7 @@ public class CollaborationModelBuilder {
 		
 		fSTModel = featureProject.getFSTModel();
 		if (fSTModel == null ) {
-			composer.initialize(featureProject);
+			composer.initialize(project);
 			composer.buildFSTModel();
 			fSTModel = featureProject.getFSTModel();
 		}
@@ -104,9 +105,7 @@ public class CollaborationModelBuilder {
 		ArrayList<String> featureNames = new ArrayList<String>();
 		for (Feature feature : features)
 			featureNames.add(feature.getName());
-		
-		project = featureProject;
-		
+
 		//Add the configuration to the model  
 		if (configuration.equals("") || configuration.equals(featureProject.getCurrentConfiguration().getName())) {
 			collaboration = new Collaboration(featureProject.getCurrentConfiguration().getName().split("[.]")[0]);

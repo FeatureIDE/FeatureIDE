@@ -1,6 +1,5 @@
 package org.xtext.example.linking;
 import java.lang.reflect.Modifier;
-import java.math.BigInteger;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,7 +12,6 @@ import org.xtext.example.dJ.Method;
 import org.xtext.example.dJ.MethodRef;
 import org.xtext.example.dJ.Parameter;
 import org.xtext.example.dJ.Type;
-import org.xtext.example.mydsl.dJ.*;
 
 public class ElementFactory {
 	private Map<String, Class> classes;
@@ -125,6 +123,7 @@ public class ElementFactory {
 	
 	/*Service methods*/
 	
+	@SuppressWarnings("unused")
 	private void createClass(String djName, String javaName) throws ClassNotFoundException {
 		map(djName, javaName);
 		Class result = classes.get(djName);

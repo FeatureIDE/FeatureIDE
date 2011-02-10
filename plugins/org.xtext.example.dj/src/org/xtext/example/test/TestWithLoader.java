@@ -7,7 +7,7 @@
 /*     */ import org.eclipse.emf.ecore.EObject;
 /*     */ import org.eclipse.emf.ecore.resource.Resource;
 /*     */ import org.xtext.example.dJ.Program;
-/*     */ import org.xtext.example.util.ErrorMessage;
+import org.xtext.example.util.ErrorMessage;
 /*     */ 
 /*     */ public class TestWithLoader extends TestCase
 /*     */ {
@@ -39,6 +39,7 @@
 /*  63 */     return this.loader;
 /*     */   }
 /*     */ 
+/*     */   @SuppressWarnings("rawtypes")
 /*     */   protected Program getProgramFromString(String prog, String name)
 /*     */     throws IOException
 /*     */   {

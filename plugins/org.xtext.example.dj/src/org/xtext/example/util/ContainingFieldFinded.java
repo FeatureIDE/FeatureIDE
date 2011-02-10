@@ -3,9 +3,7 @@ package org.xtext.example.util;
 import org.eclipse.emf.ecore.EObject;
 import org.xtext.example.dJ.Field;
 import org.xtext.example.dJ.FieldRef;
-import org.xtext.example.dJ.Method;
 import org.xtext.example.dJ.Module;
-import org.xtext.example.dJ.Original;
 import org.xtext.example.dJ.util.DJSwitch;
 
 public class ContainingFieldFinded extends DJSwitch<Field> {

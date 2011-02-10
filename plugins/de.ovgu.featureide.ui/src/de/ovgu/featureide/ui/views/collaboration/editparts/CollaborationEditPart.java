@@ -100,11 +100,6 @@ public class CollaborationEditPart extends AbstractGraphicalEditPart {
 					Dimension size2 = collFigure.getSize();
 					Rectangle constraint = new Rectangle(location, size2);
 					int i = children.indexOf((CollaborationEditPart)o);
-//					if (collaborationFigure.selected)
-//						collaborationFigure.setBackgroundColor(GUIDefaults.COLL_BACKGROUND_SELECTED);
-//					else
-//						collaborationFigure.setBackgroundColor(GUIDefaults.COLL_BACKGROUND_UNSELECTED);
-					
 					int xValue = location.x;
 					int yValue = location.y + i * (size2.height+8) + 8;
 					constraint = new Rectangle(new Point(xValue,yValue), size2);

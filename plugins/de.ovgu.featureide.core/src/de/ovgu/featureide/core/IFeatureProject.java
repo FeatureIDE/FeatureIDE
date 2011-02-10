@@ -173,9 +173,8 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	 */
 	public void setFSTModel(IFSTModel model);
 	
-	// TODO why do we build whenever the feature model changes?
 	/**
-	 * @return True if the model, a source file, or the current configuration was changed.
+	 * @return True if a source file, or the current configuration changed.
 	 */
 	public boolean buildRelavantChanges();
 	

@@ -3,18 +3,30 @@
 */
 package org.xtext.example.ui.labeling;
 
-import java.io.InputStream;
 import java.util.ListIterator;
 
-import org.eclipse.core.internal.utils.FileUtil;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.xtext.ui.label.DefaultEObjectLabelProvider;
+import org.xtext.example.dJ.AddsField;
+import org.xtext.example.dJ.AddsMethod;
 import org.xtext.example.dJ.Class;
-import org.xtext.example.dJ.*;
-import org.xtext.example.util.*;
+import org.xtext.example.dJ.Classm;
+import org.xtext.example.dJ.Constructor;
+import org.xtext.example.dJ.Feature;
+import org.xtext.example.dJ.Field;
+import org.xtext.example.dJ.FieldRef;
+import org.xtext.example.dJ.Import;
+import org.xtext.example.dJ.Method;
+import org.xtext.example.dJ.MethodRef;
+import org.xtext.example.dJ.ModifiesMethod;
+import org.xtext.example.dJ.Module;
+import org.xtext.example.dJ.Parameter;
+import org.xtext.example.dJ.Program;
+import org.xtext.example.dJ.RemovesField;
+import org.xtext.example.dJ.RemovesMethod;
+import org.xtext.example.dJ.Type;
+import org.xtext.example.util.ContainingClassmFinded;
+import org.xtext.example.util.ContainingMethodFinded;
 
 /**
  * Provides labels for a EObjects.

@@ -1,18 +1,18 @@
 /*     */ package org.xtext.example.test;
 /*     */ 
-/*     */ import com.google.inject.Injector;
 /*     */ import java.io.ByteArrayInputStream;
-/*     */ import java.io.IOException;
-/*     */ import java.io.InputStream;
-/*     */ import java.io.PrintStream;
-/*     */ import org.eclipse.emf.common.util.EList;
-/*     */ import org.eclipse.emf.common.util.URI;
-/*     */ import org.eclipse.emf.ecore.resource.Resource;
-/*     */ import org.eclipse.emf.mwe.utils.StandaloneSetup;
-/*     */ import org.eclipse.xtext.resource.XtextResource;
-/*     */ import org.eclipse.xtext.resource.XtextResourceSet;
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.mwe.utils.StandaloneSetup;
+import org.eclipse.xtext.resource.XtextResource;
+import org.eclipse.xtext.resource.XtextResourceSet;
 import org.xtext.example.DJStandaloneSetup;
 import org.xtext.example.dJ.Program;
+
+import com.google.inject.Injector;
 /*     */ 
 /*     */ public class TestLoader
 /*     */ {

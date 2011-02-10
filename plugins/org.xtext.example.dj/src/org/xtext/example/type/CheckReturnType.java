@@ -1,15 +1,30 @@
 package org.xtext.example.type;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList;
 
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.xtext.EcoreUtil2;
-import org.xtext.example.linking.DjResourceFactory;
-import org.xtext.example.lookup.AuxiliaryFunctions;
+import org.xtext.example.dJ.AddsField;
+import org.xtext.example.dJ.AddsMethod;
 import org.xtext.example.dJ.Class;
-import org.xtext.example.dJ.*;
-import org.xtext.example.util.*;
+import org.xtext.example.dJ.Classm;
+import org.xtext.example.dJ.Expression;
+import org.xtext.example.dJ.Field;
+import org.xtext.example.dJ.Import;
+import org.xtext.example.dJ.Method;
+import org.xtext.example.dJ.ModifiesMethod;
+import org.xtext.example.dJ.Module;
+import org.xtext.example.dJ.Program;
+import org.xtext.example.dJ.TerminalExpression;
+import org.xtext.example.dJ.Type;
+import org.xtext.example.linking.DjResourceFactory;
+import org.xtext.example.util.ContainingClassFinded;
+import org.xtext.example.util.ContainingClassmFinded;
+import org.xtext.example.util.ContainingModifiesMethodFinded;
+import org.xtext.example.util.ContainingModuleFinded;
+import org.xtext.example.util.ContainingProgramFinded;
 
 public class CheckReturnType {
 	

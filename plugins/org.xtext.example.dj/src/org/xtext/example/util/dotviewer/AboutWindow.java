@@ -3,8 +3,9 @@
 /*    */ import java.awt.Color;
 /*    */ import javax.swing.ImageIcon;
 /*    */ import javax.swing.JFrame;
-/*    */ import javax.swing.JLabel;
+import javax.swing.JLabel;
 /*    */ 
+/*    */ @SuppressWarnings("serial")
 /*    */ public class AboutWindow extends JFrame
 /*    */ {
 /*    */   private JLabel imageLbl;

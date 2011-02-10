@@ -2,9 +2,6 @@
 package org.xtext.example.mydsl.ui.quickfix;
 
 import org.eclipse.xtext.ui.editor.quickfix.DefaultQuickfixProvider;
-import org.eclipse.xtext.ui.editor.quickfix.Fix;
-import org.eclipse.xtext.ui.editor.quickfix.IssueResolutionAcceptor;
-import org.eclipse.xtext.validation.Issue;
 
 public class DJQuickfixProvider extends DefaultQuickfixProvider {
 

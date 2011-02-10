@@ -37,20 +37,14 @@ import de.ovgu.featureide.core.IFeatureProject;
  * composition tool meets the requirements for composition tools, which are used by the
  * @c ExtensibleFeatureProjectBuilder. This requirements are:
  * - Specifying a path for the composed files (usually "./build")
- * - Specifying a path for the source files (usually "./src")
+ * - Specifying a path for the source files (usually "./src") if hasFeatureFolder()
  * - Specifying a path to the current configuration file
  * - Performing a full build for the current project with a given configuration file 
  * 
  * @author Tom Brosch
  */
 public interface IComposerExtensionClass {
-	
-	/**
-	 * 
-	 * @return a list of file extensions witch will be composed 
-	 */
-	ArrayList<String> extensions();
-	
+		
 	void initialize(IFeatureProject project);
 	
 	void performFullBuild(IFile config);
@@ -68,6 +62,12 @@ public interface IComposerExtensionClass {
 	boolean copyNotComposedFiles();
 	
 	/**
+	 * 
+	 * @return a list of file extensions witch will be composed 
+	 */
+	ArrayList<String> extensions();
+	
+	/**
 	 * Make some changes after adding the FeatureIDE nature
 	 * @return true if the source files not have to be moved to the feature folder anymore
 	 */
@@ -79,7 +79,7 @@ public interface IComposerExtensionClass {
 	void addCompiler(IProject project, String sourcePath, String configPath, String buildPath);
 	
 	/**
-	 * Creates the FSTModel
+	 * Creates the FSTModel without building the project.
 	 */
 	void buildFSTModel();
 
@@ -97,46 +97,45 @@ public interface IComposerExtensionClass {
 	 * @param list - List of markers, which depend on user input
 	 * @return template with replaced markers
 	 */
-	public String replaceMarker(String text, List<String> list);
+	String replaceMarker(String text, List<String> list);
 	
 	/**
-	 * This method is called after changes at a file of the buildfolder.
+	 * Is called after changes at composition folder.
 	 * @param delta 
 	 * @param buildFile 
 	 */
 	void postCompile(IResourceDelta delta, IFile buildFile);
 	
 	/**
-	 * folders for each feature will be created if true
+	 * Folders for each feature will be created if true.
 	 */
 	boolean hasFeatureFolders();
 
 	/**
 	 * 
-	 * @return the index of the default template
+	 * @return the index of the default template.
 	 */
 	int getDefaultTemplateIndex();
 	
 	/**
-	 * TODO @description
+	 * Is called after changes at the feature model.
 	 */
 	void postModelChanged();
 	
 	/**
-	 * @return true if the composer has a folder for features.
+	 * @return true if the composer has a folder for each features.
 	 */
 	boolean hasFeatureFolder();
 
 	/**
 	 * @return returns false if filenames equal the corresponding feature name
-	 * otherwise false
+	 * otherwise true.
 	 */
 	boolean hasCustomFilename();
 	
 	/**
 	 * 
-	 * @return returns the file extension for configuration files or null if 
-	 * default value should be used.
+	 * @return returns the default configuration extension.
 	 */
 	String getConfigurationExtension();
 

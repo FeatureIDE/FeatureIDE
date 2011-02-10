@@ -1,12 +1,9 @@
 package org.xtext.example.dj.ui.actions;
 
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.xtext.example.util.DJIdeProperties;
 import org.xtext.example.util.ValidationStatus;
 
@@ -19,6 +16,7 @@ import org.xtext.example.util.ValidationStatus;
  * @see IWorkbenchWindowActionDelegate
  */
 public class ValidationAction implements IWorkbenchWindowActionDelegate {
+	@SuppressWarnings("unused")
 	private IWorkbenchWindow window;
 	
 	private static final String VALIDATE_ALL_ID = "org.xtext.example.dj.ui.actions.ValidateAll";

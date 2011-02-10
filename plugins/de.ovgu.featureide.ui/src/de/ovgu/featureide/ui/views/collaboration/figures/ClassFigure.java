@@ -38,7 +38,7 @@ import de.ovgu.featureide.ui.views.collaboration.model.Class;
 public class ClassFigure extends Figure implements GUIDefaults{
 	
 	private final Label label = new Label();
-	
+	private static int DEFAULT_WIDTH = 100;
 	private int height;
 
 	
@@ -65,8 +65,8 @@ public class ClassFigure extends Figure implements GUIDefaults{
 		label.setText(name);
 		Dimension labelSize = label.getPreferredSize();
 		
-		if (labelSize.width < 100)
-			labelSize.width = 100;
+		if (labelSize.width < DEFAULT_WIDTH)
+			labelSize.width = DEFAULT_WIDTH;
 		
 		if (labelSize.equals(label.getSize()))
 			return;

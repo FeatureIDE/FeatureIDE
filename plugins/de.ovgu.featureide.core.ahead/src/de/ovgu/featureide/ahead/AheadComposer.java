@@ -32,7 +32,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
@@ -42,7 +41,7 @@ import de.ovgu.featureide.ahead.wrapper.AheadBuildErrorListener;
 import de.ovgu.featureide.ahead.wrapper.AheadWrapper;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.builder.IComposerExtensionClass;
+import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 
 
 /**
@@ -50,14 +49,11 @@ import de.ovgu.featureide.core.builder.IComposerExtensionClass;
  * 
  * @author Tom Brosch
  */
-public class AheadComposer implements IComposerExtensionClass {
+public class AheadComposer extends ComposerExtensionClass {
 
-	public static final String JAVA_NATURE = "org.eclipse.jdt.core.javanature";
 	public static final String COMPOSER_ID = "de.ovgu.featureide.composer.ahead";
 
 	private AheadWrapper ahead;
-
-	private IFeatureProject featureProject = null;
 
 	private class BuilderErrorListener implements AheadBuildErrorListener {
 		public void parseErrorFound(AheadBuildErrorEvent event) {
@@ -68,15 +64,11 @@ public class AheadComposer implements IComposerExtensionClass {
 		}
 	}
 
-	public AheadComposer() {
-	}
-
 	public void initialize(IFeatureProject project) {
+		super.initialize(project);
 		if (project == null) {
 			return;
 		}
-		assert (project != null) : "Invalid project given";
-		featureProject = project;
 		ahead = new AheadWrapper(project);
 		ahead.addBuildErrorListener(new BuilderErrorListener());
 		try {
@@ -187,20 +179,11 @@ public class AheadComposer implements IComposerExtensionClass {
 		
 	}
 
-	public boolean clean() {
-		return true;
-	}
-
 	@Override
 	public ArrayList<String> extensions() {
 		ArrayList<String> extensions = new ArrayList<String>();
 		extensions.add(".jak");
 		return extensions;
-	}
-
-	@Override
-	public boolean copyNotComposedFiles() {
-		return false;
 	}
 
 	/**
@@ -292,14 +275,9 @@ public class AheadComposer implements IComposerExtensionClass {
 		return text;
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public void postCompile(IResourceDelta delta, IFile file) {
-		try {
-			file.setDerived(true);
-		} catch (CoreException e) {
-			AheadCorePlugin.getDefault().logError(e);
-		}
+		super.postCompile(delta, file);
 		if (file.getName().endsWith(".java")) {
 			ahead.postCompile(file);
 		}
@@ -308,8 +286,7 @@ public class AheadComposer implements IComposerExtensionClass {
 	@Override
 	public void addCompiler(IProject project, String sourcePath,
 			String configPath, String buildPath) {
-		addNature(project);
-		addClasspathFile(project, sourcePath, configPath, buildPath);
+		super.addCompiler(project, sourcePath, configPath, buildPath);
 		addSettings(project);
 	}
 
@@ -345,80 +322,4 @@ public class AheadComposer implements IComposerExtensionClass {
 			}
 		}		
 	}
-
-	private void addClasspathFile(IProject project, String sourcePath,
-			String configPath, String buildPath) {
-		IFile iClasspathFile = project.getFile(".classpath");
-		if (!iClasspathFile.exists()) {
-			try {
-				String text = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + 
-			 				  "<classpath>\n" +  
-			 				  "\t<classpathentry kind=\"src\" path=\"" + buildPath + "\"/>\n" + 
-			 				  "\t<classpathentry kind=\"con\" path=\"org.eclipse.jdt.launching.JRE_CONTAINER\"/>\r\n" + 
-			 				  "\t<classpathentry kind=\"output\" path=\"bin\"/>\n" + 
-			 				  "</classpath>"; 
-				InputStream source = new ByteArrayInputStream(text.getBytes());
-				iClasspathFile.create(source, true, null);
-			} catch (CoreException e) {
-				AheadCorePlugin.getDefault().logError(e);
-			}
-
-		}
-	}
-
-	private void addNature(IProject project) {
-		try {
-			if (!project.isAccessible() || project.hasNature(JAVA_NATURE))
-				return;
-
-			IProjectDescription description = project.getDescription();
-			String[] natures = description.getNatureIds();
-			String[] newNatures = new String[natures.length + 1];
-			System.arraycopy(natures, 0, newNatures, 0, natures.length);
-			newNatures[natures.length] = JAVA_NATURE;
-			description.setNatureIds(newNatures);
-			project.setDescription(description, null);
-		} catch (CoreException e) {
-			AheadCorePlugin.getDefault().logError(e);
-		}
-	}
-
-	@Override
-	public boolean hasFeatureFolders() {
-
-		return true;
-	}
-
-
-	@Override
-	public int getDefaultTemplateIndex() {
-	
-		return 0;
-	}
-
-
-	@Override
-	public void postModelChanged() {
-
-	}
-
-	@Override
-	public boolean hasCustomFilename() {
-	
-		return false;
-	}
-
-	@Override
-	public boolean hasFeatureFolder() {
-		return true;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#getComfigurationExtension()
-	 */
-	@Override
-	public String getConfigurationExtension() {
-		return null;
-	}
-
 }

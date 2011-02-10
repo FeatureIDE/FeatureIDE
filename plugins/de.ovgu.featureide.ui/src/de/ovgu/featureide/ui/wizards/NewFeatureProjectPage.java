@@ -200,7 +200,7 @@ public class NewFeatureProjectPage extends WizardPage {
 	}
 	
 	protected void dialogChanged() {
-		getCompositionTool().initialize(null);
+		getCompositionTool().loadComposerExtension();
 		sourcePath.setEnabled(getCompositionTool().hasFeatureFolder());
 		
 		if (isEnabled(sourcePath) && isEnabled(configsPath) &&

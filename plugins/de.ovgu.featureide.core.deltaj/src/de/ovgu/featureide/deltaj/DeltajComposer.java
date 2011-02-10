@@ -18,15 +18,12 @@
  */
 package de.ovgu.featureide.deltaj;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
@@ -35,8 +32,6 @@ import java.util.regex.Pattern;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -48,9 +43,9 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.xtext.example.util.DJIdeProperties;
 import org.xtext.example.util.ValidationStatus;
+
 import de.ovgu.featureide.core.CorePlugin;
-import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.builder.IComposerExtensionClass;
+import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
@@ -61,13 +56,12 @@ import djtemplates.DJStandaloneCompiler;
  * 
  * @author Fabian Benduhn
  */
-public class DeltajComposer implements IComposerExtensionClass {
+public class DeltajComposer extends ComposerExtensionClass {
 	public static final String JAVA_NATURE = "org.eclipse.jdt.core.javanature";
 	private String configPath;
 	private String basePath;
 	private String outputPath;
 	private String filename;
-	private IFeatureProject featureProject = null;
 
 	private Set<String> selectedFeatures;
 	private Boolean sourceFilesAdded;
@@ -93,13 +87,6 @@ public class DeltajComposer implements IComposerExtensionClass {
 		} catch (CoreException e) {
 			DeltajCorePlugin.getDefault().logError(e);
 		}
-
-	}
-
-	@Override
-	public void initialize(IFeatureProject project) {
-
-		featureProject = project;
 
 	}
 
@@ -161,11 +148,6 @@ public class DeltajComposer implements IComposerExtensionClass {
 	}
 
 	@Override
-	public boolean clean() {
-		return true;
-	}
-
-	@Override
 	public boolean copyNotComposedFiles() {
 		copyFolderMembers(featureProject.getSourceFolder());
 		return false;
@@ -192,11 +174,6 @@ public class DeltajComposer implements IComposerExtensionClass {
 	}
 
 	@Override
-	public void buildFSTModel() {
-
-	}
-
-	@Override
 	public ArrayList<String[]> getTemplates() {
 
 		String[] core = {
@@ -219,56 +196,7 @@ public class DeltajComposer implements IComposerExtensionClass {
 	}
 
 	@Override
-	public void addCompiler(IProject project, String sourcePath,
-			String configPath, String buildPath) {
-		addNature(project, JAVA_NATURE);
-		addClasspathFile(project, sourcePath, configPath, buildPath);
-
-	}
-
-	private void addClasspathFile(IProject project, String sourcePath,
-			String configPath, String buildPath) {
-		IFile iClasspathFile = project.getFile(".classpath");
-		if (!iClasspathFile.exists()) {
-			try {
-				String text = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n"
-						+ "<classpath>\r\n"
-						+ "\t<classpathentry kind=\"src\" path=\""
-						+ buildPath
-						+ "\"/>\r\n"
-						+ "\t<classpathentry kind=\"con\" path=\"org.eclipse.jdt.launching.JRE_CONTAINER\"/>\r\n"
-						+ "\t<classpathentry kind=\"output\" path=\"bin\"/>\r\n" + "</classpath>";
-				InputStream source = new ByteArrayInputStream(text.getBytes());
-				iClasspathFile.create(source, true, null);
-			} catch (CoreException e) {
-				DeltajCorePlugin.getDefault().logError(e);
-			}
-
-		}
-	}
-
-	private void addNature(IProject project, String nature) {
-		try {
-
-			if (!project.isAccessible() || project.hasNature(nature))
-				return;
-
-			IProjectDescription description = project.getDescription();
-			String[] natures = description.getNatureIds();
-			String[] newNatures = new String[natures.length + 1];
-			System.arraycopy(natures, 0, newNatures, 0, natures.length);
-			newNatures[natures.length] = nature;
-			description.setNatureIds(newNatures);
-
-			project.setDescription(description, null);
-		} catch (CoreException e) {
-			DeltajCorePlugin.getDefault().logError(e);
-		}
-	}
-
-	@Override
 	public boolean hasFeatureFolders() {
-
 		return false;
 	}
 
@@ -466,7 +394,7 @@ public class DeltajComposer implements IComposerExtensionClass {
 
 	@Override
 	public void postCompile(IResourceDelta delta, final IFile file) {
-		Job job = new Job("create builder problem marker") {
+		Job job = new Job("Propagate problem markers") {
 			@Override
 			public IStatus run(IProgressMonitor monitor) {
 				try {
@@ -506,37 +434,8 @@ public class DeltajComposer implements IComposerExtensionClass {
 	}
 
 	@Override
-	public String replaceMarker(String text, List<String> list) {
-
-		return text;
-	}
-
-	@Override
-	public boolean postAddNature(IFolder source, IFolder destination) {
-		return false;
-	}
-
-	@Override
-	public void postModelChanged() {
-
-	}
-
-	@Override
 	public boolean hasCustomFilename() {
 		return true;
-	}
-
-	@Override
-	public boolean hasFeatureFolder() {
-		return true;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#getComfigurationExtension()
-	 */
-	@Override
-	public String getConfigurationExtension() {
-		return null;
 	}
 
 }

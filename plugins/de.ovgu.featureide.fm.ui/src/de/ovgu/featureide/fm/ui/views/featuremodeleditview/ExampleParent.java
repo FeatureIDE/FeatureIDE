@@ -18,6 +18,7 @@
  */
 package de.ovgu.featureide.fm.ui.views.featuremodeleditview;
 
+import org.eclipse.swt.graphics.Image;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.configuration.Configuration;
@@ -33,6 +34,11 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  */
 public class ExampleParent extends TreeParent {
 
+	private static final Image UNDEFINED_IMAGE = FMUIPlugin.getImage("undefined.ico");
+	private static final Image PLUS_IMAGE = FMUIPlugin.getImage("plus.gif");
+	private static final Image MINUS_IMAGE = FMUIPlugin.getImage("minus.gif");
+	private static final Image ZERO_IMAGE = FMUIPlugin.getImage("zero.gif");
+	
 	private ModelComparator c;
 	
 	private boolean added;
@@ -50,9 +56,10 @@ public class ExampleParent extends TreeParent {
 				&& !c.isImplies() ? "minus" : "zero";
 		lazy = !imageName.equals("zero");
 		if (number > 1)
-	 		image = FMUIPlugin.getImage("undefined.ico");
+	 		image = UNDEFINED_IMAGE;
 		else
-			image = FMUIPlugin.getImage(imageName + ".gif");
+			image = imageName.equals("plus") ? PLUS_IMAGE : 
+				imageName.equals("minus") ? MINUS_IMAGE : ZERO_IMAGE;
 	}
 
 	@Override

@@ -101,6 +101,7 @@ public class DJProjectWizardPage extends WizardPage {
 	/**
 	 * Tests if the current workbench selection is a suitable container to use.
 	 */
+	@SuppressWarnings("unused")
 	private void initialize() {
 		if(sampleSetChoice) {
 			int index = 0;

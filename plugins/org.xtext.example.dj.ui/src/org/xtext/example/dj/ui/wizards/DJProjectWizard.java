@@ -2,18 +2,14 @@ package org.xtext.example.dj.ui.wizards;
 
 import static org.xtext.example.util.ValidationStatus.SYNTAX_ONLY;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -31,14 +27,11 @@ import org.eclipse.xpand2.XpandFacade;
 import org.eclipse.xpand2.output.Outlet;
 import org.eclipse.xpand2.output.OutputImpl;
 import org.eclipse.xtend.typesystem.emf.EmfMetaModel;
-import org.xtext.example.dJ.DJPackage;
 import org.xtext.example.util.DJIdeProperties;
 import org.xtext.example.util.ValidationStatus;
 
-import ProjectGeneration.ProjectGenerationFactory;
 import ProjectGeneration.ProjectGenerationPackage;
 import ProjectGeneration.ProjectSettings;
-import ProjectGeneration.SampleSet;
 
 /**
  * This is a sample new wizard. Its role is to create a new file resource in the

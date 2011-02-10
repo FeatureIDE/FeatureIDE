@@ -7,7 +7,6 @@ Bundle-SymbolicName: org.xtext.example.dj; singleton:=true
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.xtext,
  org.eclipse.xtext.generator;resolution:=optional,
- de.itemis.xtext.antlr;resolution:=optional,
  org.apache.commons.logging;resolution:=optional,
  org.eclipse.emf.codegen.ecore;resolution:=optional,
  org.eclipse.emf.mwe.utils;resolution:=optional,
@@ -21,7 +20,6 @@ Require-Bundle: org.eclipse.xtext,
 Import-Package: junit.framework,
  org.apache.log4j,
  org.xtext.example.dJ.util
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: org.xtext.example,
  org.xtext.example.lookup,
  org.xtext.example.dJ,
@@ -33,3 +31,4 @@ Export-Package: org.xtext.example,
  org.xtext.example.services,
  org.xtext.example.util,
  org.xtext.example.validation
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6

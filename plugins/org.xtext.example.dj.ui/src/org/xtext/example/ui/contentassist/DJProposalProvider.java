@@ -9,16 +9,12 @@ import java.util.ListIterator;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.Assignment;
-import org.eclipse.xtext.EcoreUtil2;
-import org.eclipse.xtext.RuleCall;
 import org.eclipse.xtext.ui.editor.contentassist.ContentAssistContext;
 import org.eclipse.xtext.ui.editor.contentassist.ICompletionProposalAcceptor;
 import org.xtext.example.dJ.Constructor;
 import org.xtext.example.dJ.MethodBody;
 import org.xtext.example.dJ.Parameter;
-import org.xtext.example.dJ.Type;
-import org.xtext.example.ui.contentassist.AbstractDJProposalProvider;
-import org.xtext.example.lookup.*;
+import org.xtext.example.lookup.AuxiliaryFunctions;
 /**
  * see http://www.eclipse.org/Xtext/documentation/latest/xtext.html#contentAssist on how to customize content assistant
  */

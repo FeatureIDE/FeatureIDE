@@ -87,12 +87,9 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 public class ConstraintDialog {
 
 	private static final Image HELP_IMAGE = FMUIPlugin.getImage("help.gif");
-	private static final Image ERROR_IMAGE = FMUIPlugin
-			.getImage("icon_error.gif");
-	private static final Image BANNER_IMAGE = FMUIPlugin
-			.getImage("title_banner.gif");
-	private static final Image WARNING_IMAGE = FMUIPlugin
-			.getImage("message_warning.gif");
+	private static final Image ERROR_IMAGE = FMUIPlugin.getImage("icon_error.gif");
+	private static final Image BANNER_IMAGE = FMUIPlugin.getImage("title_banner.gif");
+	private static final Image WARNING_IMAGE = FMUIPlugin.getImage("message_warning.gif");
 
 	private static final String[] OPERATOR_NAMES = { " Not ", " And ", " Or ",
 			" Implies ", " Iff ", "(", ")" /* "At most 1" */};

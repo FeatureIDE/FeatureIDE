@@ -19,17 +19,14 @@
 package de.ovgu.featureide.featurecpp;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.builder.IComposerExtensionClass;
+import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.featurecpp.wrapper.FeatureCppWrapper;
 
 /**
@@ -38,17 +35,13 @@ import de.ovgu.featureide.featurecpp.wrapper.FeatureCppWrapper;
  * @author Tom Brosch
  * @author Jens Meinicke
  */
-public class FeatureCppComposer implements IComposerExtensionClass {
+public class FeatureCppComposer extends ComposerExtensionClass {
 
 	public static final String COMPOSER_ID = "de.ovgu.featureide.composer.featurecpp";
 
 	private final FeatureCppWrapper featureCpp = new FeatureCppWrapper(
 			(FeatureCppCorePlugin.getDefault().getBundle().getLocation() + "lib/fc++v0.7.exe")
 			.substring(16));
-
-	public boolean clean() {
-		return true;
-	}
 
 	public void initialize(IFeatureProject project) {
 		if (project == null) {
@@ -71,20 +64,6 @@ public class FeatureCppComposer implements IComposerExtensionClass {
 	}
 
 	@Override
-	public boolean copyNotComposedFiles() {
-		return false;
-	}
-
-	@Override
-	public boolean postAddNature(IFolder source, IFolder destination) {
-		return false;
-	}
-
-	@Override
-	public void buildFSTModel() {
-	}
-
-	@Override
 	public ArrayList<String[]> getTemplates(){
 		
 		ArrayList<String[]> list = new ArrayList<String[]>();
@@ -94,12 +73,6 @@ public class FeatureCppComposer implements IComposerExtensionClass {
 	}
 
 	@Override
-	public String replaceMarker(String text, List<String> list) {
-		// no composer specific markers yet 
-		return text;
-	}
-	
-	@Override
 	public void postCompile(IResourceDelta delta, IFile file) {
 		try {
 			file.refreshLocal(IResource.DEPTH_ZERO, null);
@@ -108,40 +81,6 @@ public class FeatureCppComposer implements IComposerExtensionClass {
 		}
 	}
 
-	@Override
-	public void addCompiler(IProject project, String sourcePath, String configPath, String buildPath) {
-	}
-	
-	@Override
-	public boolean hasFeatureFolders() {
-		return true;
-	}
-
-	@Override
-	public void postModelChanged() {
-		
-	}
-
-	@Override
-	public int getDefaultTemplateIndex() {
-		
-		return 0;
-	}
-
-	@Override
-	public boolean hasCustomFilename() {
-
-		return false;
-	}
-
-	@Override
-	public boolean hasFeatureFolder() {
-		return true;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#getComfigurationExtension()
-	 */
 	@Override
 	public String getConfigurationExtension() {
 		return ".equation";

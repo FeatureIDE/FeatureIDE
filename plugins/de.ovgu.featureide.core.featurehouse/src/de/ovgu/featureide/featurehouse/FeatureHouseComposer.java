@@ -18,12 +18,10 @@
  */
 package de.ovgu.featureide.featurehouse;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,8 +29,6 @@ import java.util.Scanner;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
@@ -40,8 +36,7 @@ import org.eclipse.core.runtime.CoreException;
 import composer.FSTGenComposer;
 
 import de.ovgu.cide.fstgen.ast.AbstractFSTParser;
-import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.builder.IComposerExtensionClass;
+import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.core.featurehouse.FSTParser.FSTParser;
 import de.ovgu.featureide.core.featurehouse.FSTParser.JavaToken;
 
@@ -50,21 +45,11 @@ import de.ovgu.featureide.core.featurehouse.FSTParser.JavaToken;
  * 
  * @author Tom Brosch
  */
-public class FeatureHouseComposer implements IComposerExtensionClass {
+public class FeatureHouseComposer extends ComposerExtensionClass {
 
-	public static final String JAVA_NATURE = "org.eclipse.jdt.core.javanature";
 	private static final String SOURCE_ENTRY = "\t<classpathentry kind=\"src\" path=\"";
 	private static final String EXCLUDE_ENTRY = "\t<classpathentry excluding=\"";
 	private static final String EXCLUDE_SOURCE_ENTRY = "\" kind=\"src\" path=\"";
-
-	private IFeatureProject featureProject = null;
-
-	public FeatureHouseComposer() {
-	}
-
-	public void initialize(IFeatureProject project) {
-		featureProject = project;
-	}
 
 	public void performFullBuild(IFile config) {
 		assert (featureProject != null) : "Invalid project given";
@@ -92,15 +77,15 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 		setJaveBuildPath(config.getName().split("[.]")[0]);
 
 		FSTGenComposer composer = new FSTGenComposer();
-		// TODO output should be generated directly at outputPath not at
-		// outputPath/configuration
-		composer.run(new String[] { "--expression", configPath,
-				"--base-directory", basePath, "--output-directory",
-				outputPath + "/", "--ahead" });
+		composer.run(new String[]{			
+				"--expression", configPath, 
+				"--base-directory", basePath,
+				"--output-directory", outputPath + "/", 
+				"--ahead"
+		});
 
 		// ***************************************
 		// TODO: Dariusz
-		// Baustelle...
 
 		FSTParser parser = new FSTParser(AbstractFSTParser.fstnodes);
 
@@ -181,10 +166,6 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 		}
 	}
 
-	public boolean clean() {
-		return true;
-	}
-
 	@Override
 	public ArrayList<String> extensions() {
 		ArrayList<String> extensions = new ArrayList<String>();
@@ -197,12 +178,6 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 		extensions.add(".als");
 		extensions.add(".xmi");
 		return extensions;
-	}
-
-	@Override
-	public String replaceMarker(String text, List<String> list) {
-		// no composer specific markers yet
-		return text;
 	}
 
 	@Override
@@ -283,15 +258,6 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 	}
 
 	@Override
-	public boolean postAddNature(IFolder source, IFolder destination) {
-		return false;
-	}
-
-	@Override
-	public void buildFSTModel() {
-	}
-
-	@Override
 	public ArrayList<String[]> getTemplates() {
 
 		ArrayList<String[]> list = new ArrayList<String[]>();
@@ -320,12 +286,11 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 		return list;
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public void postCompile(IResourceDelta delta, IFile file) {
+		super.postCompile(delta, file);
 		try {
-			file.setDerived(true);
-			if (delta.getKind() == IResourceDelta.ADDED) {
+			if (!file.getWorkspace().isTreeLocked()) {
 				file.refreshLocal(IResource.DEPTH_ZERO, null);
 			}
 		} catch (CoreException e) {
@@ -334,87 +299,7 @@ public class FeatureHouseComposer implements IComposerExtensionClass {
 	}
 
 	@Override
-	public void addCompiler(IProject project, String sourcePath,
-			String configPath, String buildPath) {
-		addNature(project);
-		addClasspathFile(project, sourcePath, configPath, buildPath);
-	}
-
-	private void addClasspathFile(IProject project, String sourcePath,
-			String configPath, String buildPath) {
-		IFile iClasspathFile = project.getFile(".classpath");
-		if (!iClasspathFile.exists()) {
-			try {
-				String text = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-						+ "<classpath>\n"
-						+ "\t<classpathentry kind=\"src\" path=\""
-						+ buildPath
-						+ "\"/>\n"
-						+ "\t<classpathentry kind=\"con\" path=\"org.eclipse.jdt.launching.JRE_CONTAINER\"/>\r\n"
-						+ "\t<classpathentry kind=\"output\" path=\"bin\"/>\n"
-						+ "</classpath>";
-				InputStream source = new ByteArrayInputStream(text.getBytes());
-				iClasspathFile.create(source, true, null);
-			} catch (CoreException e) {
-				FeatureHouseCorePlugin.getDefault().logError(e);
-			}
-
-		}
-	}
-
-	private void addNature(IProject project) {
-		try {
-			if (!project.isAccessible() || project.hasNature(JAVA_NATURE))
-				return;
-
-			IProjectDescription description = project.getDescription();
-			String[] natures = description.getNatureIds();
-			String[] newNatures = new String[natures.length + 1];
-			System.arraycopy(natures, 0, newNatures, 0, natures.length);
-			newNatures[natures.length] = JAVA_NATURE;
-			description.setNatureIds(newNatures);
-			project.setDescription(description, null);
-		} catch (CoreException e) {
-			FeatureHouseCorePlugin.getDefault().logError(e);
-		}
-	}
-
-	@Override
-	public boolean hasFeatureFolders() {
-
-		return true;
-	}
-
-	@Override
 	public int getDefaultTemplateIndex() {
-
 		return 4;
 	}
-
-	@Override
-	public void postModelChanged() {
-
-	}
-
-	@Override
-	public boolean hasCustomFilename() {
-		return false;
-	}
-
-	@Override
-	public boolean hasFeatureFolder() {
-		return true;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#
-	 * getComfigurationExtension()
-	 */
-	@Override
-	public String getConfigurationExtension() {
-		return null;
-	}
-
 }

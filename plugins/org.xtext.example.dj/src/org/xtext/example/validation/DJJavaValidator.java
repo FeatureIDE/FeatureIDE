@@ -1,28 +1,63 @@
 package org.xtext.example.validation;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import org.eclipse.emf.common.util.DiagnosticChain;
-import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.EDataType;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.xtext.EcoreUtil2;
 import org.eclipse.xtext.validation.Check;
+import org.xtext.example.dJ.AddsField;
+import org.xtext.example.dJ.AddsMethod;
+import org.xtext.example.dJ.Argument;
+import org.xtext.example.dJ.Class;
+import org.xtext.example.dJ.Classm;
+import org.xtext.example.dJ.Condition;
+import org.xtext.example.dJ.Config;
+import org.xtext.example.dJ.Constructor;
+import org.xtext.example.dJ.ConstructorFieldExpression;
+import org.xtext.example.dJ.Core;
+import org.xtext.example.dJ.DJPackage;
+import org.xtext.example.dJ.Delta;
+import org.xtext.example.dJ.Expression;
+import org.xtext.example.dJ.Field;
+import org.xtext.example.dJ.Import;
+import org.xtext.example.dJ.Method;
+import org.xtext.example.dJ.MethodBody;
+import org.xtext.example.dJ.Methodm;
+import org.xtext.example.dJ.ModifiesClass;
+import org.xtext.example.dJ.ModifiesMethod;
+import org.xtext.example.dJ.Module;
+import org.xtext.example.dJ.New;
+import org.xtext.example.dJ.Parameter;
+import org.xtext.example.dJ.Program;
+import org.xtext.example.dJ.RemovesField;
+import org.xtext.example.dJ.RemovesMethod;
+import org.xtext.example.dJ.TerminalExpression;
+import org.xtext.example.dJ.Type;
 import org.xtext.example.linking.DjResourceFactory;
 import org.xtext.example.lookup.AuxiliaryFunctions;
-import org.xtext.example.dJ.Class;
-import org.xtext.example.dJ.*;
-import org.xtext.example.validation.AbstractDJJavaValidator;
-import org.xtext.example.util.*;
-import org.xtext.example.type.*;
+import org.xtext.example.type.CheckReturnType;
+import org.xtext.example.type.ClassType;
+import org.xtext.example.util.ACST;
+import org.xtext.example.util.CST;
+import org.xtext.example.util.ContainingModifiesMethodFinded;
+import org.xtext.example.util.ContainingModuleFinded;
+import org.xtext.example.util.ContainingProgramFinded;
+import org.xtext.example.util.DJIdeProperties;
+import org.xtext.example.util.ValidationStatus;
 
 public class DJJavaValidator extends AbstractDJJavaValidator{
 	AuxiliaryFunctions auxiliary = new AuxiliaryFunctions();
 	Set<String> classNotConstructor = new HashSet<String>();
 	/*
-	 * Segnala errori di ereditarietà ciclica tra classi di un modulo core. 
+	 * Segnala errori di ereditarietÀÜ ciclica tra classi di un modulo core. 
 	 */
 	@Check
 	public void checkInheritanceCore(Core core){
@@ -47,7 +82,7 @@ public class DJJavaValidator extends AbstractDJJavaValidator{
 	}
 
 	/*
-	 * Segnala errori di ereditarietà ciclica tra classi di delta moduli (senza applicare delta effettivamente i delta moduli)
+	 * Segnala errori di ereditarietÀÜ ciclica tra classi di delta moduli (senza applicare delta effettivamente i delta moduli)
 	 * Segnala errori di tipo dei metodi di una classe rispetto alle sue "parent-class" nel tipo di ritorno con metodi che hanno lo stesso nome
 	 * Segnala errori di tipo dei campi di una classe rispetto alle sue "parent-class" con campi che hanno lo stesso nome 
 	 * Segnala errori di type uniform
@@ -278,7 +313,7 @@ public class DJJavaValidator extends AbstractDJJavaValidator{
 		return classMapApply;
 	}
 
-	/*Questo metodo è usato dal metodo checkGeneral per avere per ogni classe la lista delle proprie "parent-class"*/
+	/*Questo metodo ÔøΩ usato dal metodo checkGeneral per avere per ogni classe la lista delle proprie "parent-class"*/
 	private Set<Set<String>> checkInheritance(String name, Map<String, ACST> map) {
 		if(deactivateValidator()) return null;
 		Set<Set<String>> inheritance = new HashSet<Set<String>>();
@@ -291,7 +326,7 @@ public class DJJavaValidator extends AbstractDJJavaValidator{
 		return inheritance;
 	}
 
-	/*Questo metodo è usato dal metodo checkInheritance e segnala errori di tipo con le classi parent*/
+	/*Questo metodo ÔøΩ usato dal metodo checkInheritance e segnala errori di tipo con le classi parent*/
 	private Set<Set<String>> inheritance(Set<String> originalName, String name, Map<String, ACST> map){
 		if(deactivateValidator()) return null;
 		Set<String> tempName = new HashSet<String>();
@@ -415,7 +450,7 @@ public class DJJavaValidator extends AbstractDJJavaValidator{
 	}
 
 	/*
-	 * Questo metodo segnala eventuali errori di ciclicità delle clausule after dei delta moduli.
+	 * Questo metodo segnala eventuali errori di ciclicitÀÜ delle clausule after dei delta moduli.
 	 */
 	@Check
 	public void checkAfterCondition(Delta d) {
@@ -460,8 +495,8 @@ public class DJJavaValidator extends AbstractDJJavaValidator{
 	}
 	
 	/*
-	 * Questo metodo controlla che non vi sia più di un'operazione su ciascuna classe in uno stesso delta modulo.
-	 * Controlla anche che non vi siano più operazioni (a parte un'eliminazione ed un'aggiunta) sullo stesso campo o metodo in ogni classe.
+	 * Questo metodo controlla che non vi sia piÔøΩ di un'operazione su ciascuna classe in uno stesso delta modulo.
+	 * Controlla anche che non vi siano piÔøΩ operazioni (a parte un'eliminazione ed un'aggiunta) sullo stesso campo o metodo in ogni classe.
 	 * Se necessario segnala l'errore
 	 */
 	private void checkDeltaClass(Module m){
@@ -512,8 +547,8 @@ public class DJJavaValidator extends AbstractDJJavaValidator{
 	}
 
 	/*
-	 * Questo metodo segnala se un metodo viene rimosso più di una volta in una classe
-	 * Qeusto metodo segnala se un metodo che si vuole modificare è già stato modificato o rimosso
+	 * Questo metodo segnala se un metodo viene rimosso piÔøΩ di una volta in una classe
+	 * Qeusto metodo segnala se un metodo che si vuole modificare ÔøΩ giÀÜ stato modificato o rimosso
 	 * nella classe stessa. 
 	 */
 	private void checkMethodModification(Classm c) {
@@ -532,7 +567,7 @@ public class DJJavaValidator extends AbstractDJJavaValidator{
 	}
 	
 	/*
-	 * Questo metodo segnala se un campo viene eliminato più di una volta in una stessa classe. 
+	 * Questo metodo segnala se un campo viene eliminato piÔøΩ di una volta in una stessa classe. 
 	 */
 	private void checkFieldRemove(Classm c) {
 		if(deactivateValidator()) return;
@@ -545,9 +580,9 @@ public class DJJavaValidator extends AbstractDJJavaValidator{
 	}
 	
 	/*
-	 * Questo metodo segnala errori di conflitto tra delta moduli quando due o più delta moduli
+	 * Questo metodo segnala errori di conflitto tra delta moduli quando due o piÔøΩ delta moduli
 	 * su di uno stesso livello dell'after-DAG applicano operazioni sulla stessa classe.
-	 * Nel caso ci siano più modifiche ad una classe cmq il controllo e lasciato ai metodi sotto
+	 * Nel caso ci siano piÔøΩ modifiche ad una classe cmq il controllo e lasciato ai metodi sotto
 	 * checkMethodConflict e checkFieldConflict.
 	 */
 	@Check
@@ -669,7 +704,7 @@ public class DJJavaValidator extends AbstractDJJavaValidator{
 
 	/*
 	 * Segnala errori sulle operazioni dei delta moduli sulle classi per ogni configurazione, indicando
-	 * anche in quale configurazione è stato rilevato l'errore.
+	 * anche in quale configurazione ÔøΩ stato rilevato l'errore.
 	 * Richiama i metodi sottostanti per ulteriori controlli.
 	 */
 	@Check
@@ -781,7 +816,7 @@ public class DJJavaValidator extends AbstractDJJavaValidator{
 	/*
 	 * Questo metodo controlla le operazioni svolte sulle classi modificate 
 	 * (in una determinata configuarione) ed eventualmente ne segnala gli errori se vengono applicate 
-	 * remove e/o modifies a metodi o campi che non esistono, ed add a metodi o campi già esistenti 
+	 * remove e/o modifies a metodi o campi che non esistono, ed add a metodi o campi giÀÜ esistenti 
 	 */
 	private void applyModifies(Map<String, CST> classMapApply, ModifiesClass mod, Program p, Config conf) {
 		if(deactivateValidator()) return;

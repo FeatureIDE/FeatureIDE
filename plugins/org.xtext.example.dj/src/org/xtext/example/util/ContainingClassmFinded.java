@@ -53,7 +53,8 @@ public class ContainingClassmFinded extends DJSwitch<Classm>
 
     return (Classm)owner;
   }
-  public Classm lookup(TerminalExpression e) {
+  @SuppressWarnings("unused")
+public Classm lookup(TerminalExpression e) {
 	EObject current = e;
     EObject owner = null;
     int a = 0;

@@ -14,5 +14,5 @@ Require-Bundle: org.xtext.example.dj;visibility:=reexport,
  org.eclipse.xtend.typesystem.emf;visibility:=reexport,
  org.eclipse.core.resources
 Import-Package: org.apache.log4j
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: djtemplates
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6

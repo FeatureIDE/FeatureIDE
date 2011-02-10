@@ -37,6 +37,7 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IActionBars;
@@ -75,6 +76,18 @@ import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModelBuilder
 public class CollaborationView extends ViewPart implements GUIDefaults, ICurrentBuildListener{
 	
 	public static final String ID = UIPlugin.PLUGIN_ID + ".views.collaboration.Collaboration";
+	
+	private static final String OPEN_MESSAGE = "Open a file from a FeatureIDE project";
+	private static final String CONFIGURATION_MESSAGE = "Please create a new configuration file";
+	
+	private static final String ADD_LABEL = "Add new Class / Role";
+	private static final String DELETE_LABEL = "Delete";
+	private static final String FILTER_LABEL = "Filter";
+	private static final String UNSELECTED_LABEL = "Show unselected features";
+	private static final String TOOL_TIP_LABEL = "Build collaborationmodel";
+	
+	private static final Image REFESH_TAB_IMAGE = UIPlugin.getImage("refresh_tab.gif");
+	
 	private GraphicalViewerImpl viewer;
 	public CollaborationModelBuilder builder = new CollaborationModelBuilder();
 	private CollaborationModel model = new CollaborationModel();
@@ -172,7 +185,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 					featureProject = CorePlugin.getFeatureProject(inputFile.getFile());
 					if (featureProject != null) {
 						//case: its a featureIDE project
-						//TODO String defined else where, create one method for this check
 						if (CorePlugin.getDefault().getConfigurationExtensions()
 								.contains(inputFile.getName().substring(inputFile.getName().lastIndexOf(".")))) {
 							//case: open configuration editor
@@ -204,12 +216,12 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		
 		if (featureProject == null) {
 			model = new CollaborationModel();
-			model.collaborations.add(new Collaboration("Open a file from a FeatureIDE project"));
+			model.collaborations.add(new Collaboration(OPEN_MESSAGE));
 			viewer.setContents(model);
 		} else {
 			if (featureProject.getCurrentConfiguration() == null){
 				model = new CollaborationModel();
-				model.collaborations.add(new Collaboration("Please create a new configuration file"));
+				model.collaborations.add(new Collaboration(CONFIGURATION_MESSAGE));
 				viewer.setContents(model);
 			} else
 				updateGuiAfterBuild(featureProject);
@@ -239,24 +251,23 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		delAction.setEnabled(!isEmpty);
 		showUnselectedAction.setEnabled(!isEmpty);
 		
-		if (featureProject.getComposer().getName().equals("AHEAD"))
-			menuMgr.add(addRoleAction);
+		menuMgr.add(addRoleAction);
 		menuMgr.add(filterAction);
 		menuMgr.add(showUnselectedAction);
 		menuMgr.add(delAction);
 	}
-	
+
 	private void createActions(IEditorPart part) {
-		addRoleAction	= new AddRoleAction("Add new Class / Role", viewer, this);
-		delAction		= new DeleteAction("Delete", viewer);
-		filterAction	= new FilterAction("Filter",viewer,this,model);
-		showUnselectedAction = new ShowUnselectedAction("Show unselected features",viewer,this,model);
+		addRoleAction	= new AddRoleAction(ADD_LABEL, viewer, this);
+		delAction		= new DeleteAction(DELETE_LABEL, viewer);
+		filterAction	= new FilterAction(FILTER_LABEL,viewer,this,model);
+		showUnselectedAction = new ShowUnselectedAction(UNSELECTED_LABEL,viewer,this,model);
 	}
 	
 	private void fillLocalToolBar(IToolBarManager manager) {
 		manager.add(toolbarAction);
-		toolbarAction.setToolTipText("Build collaborationmodel");
-		toolbarAction.setImageDescriptor(ImageDescriptor.createFromImage(UIPlugin.getImage("refresh_tab.gif")));
+		toolbarAction.setToolTipText(TOOL_TIP_LABEL);
+		toolbarAction.setImageDescriptor(ImageDescriptor.createFromImage(REFESH_TAB_IMAGE));
 	}
 	
 	private void makeActions() {
@@ -280,32 +291,34 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.core.listeners.ICurrentBuildListener#updateGuiAfterBuild(de.ovgu.featureide.core.IFeatureProject)
 	 */
-	public void updateGuiAfterBuild(final IFeatureProject project) {		
-		Job job = new Job("buildCollaborationModel") {
-			public IStatus run(IProgressMonitor monitor) {
-				model = builder.buildCollaborationModel(project);
-				if (model == null) {
-					toolbarAction.setEnabled(true);
-					return Status.OK_STATUS;
-				}
-				
-				UIJob uiJob = new UIJob("updateCollaborationView") {
-					public IStatus runInUIThread(IProgressMonitor monitor) {
-						viewer.setContents(model);		
-						EditPart part = viewer.getContents();
-						if (part != null) {
-							part.refresh();
-						}
+	public void updateGuiAfterBuild(final IFeatureProject project) {
+		if (featureProject != null && featureProject.equals(project)) {
+			Job job = new Job("buildCollaborationModel") {
+				public IStatus run(IProgressMonitor monitor) {
+					model = builder.buildCollaborationModel(project);
+					if (model == null) {
 						toolbarAction.setEnabled(true);
 						return Status.OK_STATUS;
 					}
-				};
-				uiJob.setPriority(Job.DECORATE);
-				uiJob.schedule();
-				return Status.OK_STATUS;
-			}
-		};
-		job.setPriority(Job.DECORATE);
-		job.schedule();
+					
+					UIJob uiJob = new UIJob("updateCollaborationView") {
+						public IStatus runInUIThread(IProgressMonitor monitor) {
+							viewer.setContents(model);		
+							EditPart part = viewer.getContents();
+							if (part != null) {
+								part.refresh();
+							}
+							toolbarAction.setEnabled(true);
+							return Status.OK_STATUS;
+						}
+					};
+					uiJob.setPriority(Job.DECORATE);
+					uiJob.schedule();
+					return Status.OK_STATUS;
+				}
+			};
+			job.setPriority(Job.DECORATE);
+			job.schedule();
+		}
 	}
 }

@@ -160,7 +160,14 @@ public class RoleFigure extends Figure implements GUIDefaults{
 			int fileCount = 0;
 			long size = 0;
 			for (IFile file : role.files) {
-				Label fieldLabel = new Label(" " + file.getName() + " ");
+				long currentSize = file.getRawLocation().toFile().length();
+				size += currentSize;
+				Label fieldLabel;
+				if (currentSize <= 1000000) {
+					fieldLabel = new Label(" " + file.getName() + " (" + currentSize/1000 + "." + currentSize%1000 + "bytes) ");
+				} else {
+					fieldLabel = new Label(" " + file.getName() + " (" + currentSize/1000000 + "." + currentSize/1000 + "kb) ");
+				}
 				fileFigure.add(fieldLabel);
 				fileCount++;
 				if (fileCount % 25 == 0) {
@@ -168,12 +175,12 @@ public class RoleFigure extends Figure implements GUIDefaults{
 					fileFigure = new CompartmentFigure();
 					fileFigure.add(new Label(""));
 				}
-				size += (file.getRawLocation().toFile()).length();
+				
 			}
 			if (size <= 1000000) {
-				setName("Files: " + fileCount + " Size: " + size/1000 + "." + size%1000 + "kB");
+				setName("Files: " + fileCount + " (" + size/1000 + "." + size%1000 + "bytes) ");
 			} else {
-				setName("Files: " + fileCount + " Size: " + size/1000000 + "." + size/1000 + "MB");
+				setName("Files: " + fileCount + " (" + size/1000000 + "." + size/1000 + "kb) ");
 			}
 			
 			if (fileCount % 25 != 0)

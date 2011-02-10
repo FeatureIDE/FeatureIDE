@@ -3,16 +3,10 @@
  */
 package org.xtext.example;
 
-import java.io.InputStream;
-import java.util.ResourceBundle;
-
-import org.eclipse.xtext.conversion.IValueConverterService;
 import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.resource.XtextResourceFactory;
 import org.xtext.example.linking.DjLinkingResource;
 import org.xtext.example.linking.DjResourceFactory;
-
-import com.sun.xml.internal.ws.api.ResourceLoader;
 
 /**
  * Use this class to register components to be used within the IDE.

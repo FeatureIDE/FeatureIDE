@@ -77,7 +77,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 			return false;
 		}
 
-		composerExtension.initialize(featureProject);
+		composerExtension.loadComposerExtension();
 		return true;
 	}
 	

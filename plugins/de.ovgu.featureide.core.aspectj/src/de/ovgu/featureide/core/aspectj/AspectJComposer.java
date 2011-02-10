@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Scanner;
 
 import org.eclipse.core.resources.IFile;
@@ -34,13 +33,12 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.builder.IComposerExtensionClass;
+import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
@@ -52,9 +50,8 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
  * 
  * @author Jens Meinicke
  */
-public class AspectJComposer implements IComposerExtensionClass {
+public class AspectJComposer extends ComposerExtensionClass {
 
-	private static final String JAVA_NATURE = "org.eclipse.jdt.core.javanature";
 	private static final String ASPECTJ_NATURE = "org.eclipse.ajdt.ui.ajnature";
 	
 	private static final String NEW_ASPECT = "\t// TODO Auto-generated aspect\r\n";
@@ -70,7 +67,6 @@ public class AspectJComposer implements IComposerExtensionClass {
 	private static final String OUTPUT_ENTRY = "\t<classpathentry kind=\"output\" path=\"";
 	private static final String END_ENTRY = "</classpath>";
 	
-	private IFeatureProject featureProject;
 	private LinkedList<String> selectedFeatures;
 	private LinkedList<String> unSelectedFeatures;
 	private FeatureModel featureModel;
@@ -81,11 +77,6 @@ public class AspectJComposer implements IComposerExtensionClass {
 		ArrayList<String> extensions = new ArrayList<String>();
 		extensions.add(".java");
 		return extensions;
-	}
-
-	@Override
-	public void initialize(IFeatureProject project) {
-		featureProject = project;
 	}
 
 	@Override
@@ -409,24 +400,11 @@ public class AspectJComposer implements IComposerExtensionClass {
 	}
 
 	@Override
-	public void buildFSTModel() {
-	}
-
-	@Override
 	public ArrayList<String[]> getTemplates() {
 		ArrayList<String[]> list = new ArrayList<String[]>();
 		String[] java = {"Java", "java", "public class #classname# {\n\n}"};
 		list.add(java);
 		return list;
-	}
-
-	@Override
-	public String replaceMarker(String text, List<String> list) {
-		return null;
-	}
-
-	@Override
-	public void postCompile(IResourceDelta delta, IFile file) {
 	}
 
 	@Override
@@ -522,26 +500,7 @@ public class AspectJComposer implements IComposerExtensionClass {
 	}
 
 	@Override
-	public int getDefaultTemplateIndex() {
-		return 0;
-	}
-
-	@Override
-	public boolean hasCustomFilename() {
-		return false;
-	}
-
-	@Override
 	public boolean hasFeatureFolder() {
 		return false;
 	}
-
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#getComfigurationExtension()
-	 */
-	@Override
-	public String getConfigurationExtension() {
-		return null;
-	}
-
 }

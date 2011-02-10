@@ -2,12 +2,21 @@ package org.xtext.example.test;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.*;
-import org.xtext.example.lookup.AuxiliaryFunctions;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Set;
+
 import org.xtext.example.dJ.Class;
-import org.xtext.example.dJ.*;
+import org.xtext.example.dJ.Classm;
+import org.xtext.example.dJ.Delta;
+import org.xtext.example.dJ.ModifiesClass;
+import org.xtext.example.dJ.Module;
+import org.xtext.example.dJ.Program;
+import org.xtext.example.lookup.AuxiliaryFunctions;
 import org.xtext.example.util.ACST;
-import org.xtext.example.util.CST;
 
 public class AuxiliaryFunctionsTest extends TestWithLoader{
 	private AuxiliaryFunctions fixture;
