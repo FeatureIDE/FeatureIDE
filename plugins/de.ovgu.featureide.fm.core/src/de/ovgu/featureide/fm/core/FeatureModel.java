@@ -256,6 +256,9 @@ public class FeatureModel implements PropertyConstants {
 		feature.setName(newName);
 		featureTable.put(newName, feature);
 		renamings.add(new Renaming(oldName, newName));
+		for (Node node : propNodes) {
+			renameVariables(node, oldName, newName);
+		}
 		return true;
 	}
 
@@ -279,8 +282,6 @@ public class FeatureModel implements PropertyConstants {
 			sourceFolder = project.getFolder(sourceName);
 		}
 		for (Renaming renaming : renamings) {
-			for (Node node : propNodes)
-				renameVariables(node, renaming.oldName, renaming.newName);
 			//only call moveFolder(..) if composer has no specific renamings
 			if (!performComposerRenamings(renaming.oldName, renaming.newName,
 				project)) {

@@ -235,8 +235,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 	protected void createPages() {
 
 		createDiagramPage();
-		createSourcePage();
 		createFeatureOrderPage();
+		createSourcePage();
 		createActions();
 		createContextMenu();
 		createKeyBindings();
@@ -431,7 +431,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		IDocumentProvider provider = textEditor.getDocumentProvider();
 		IDocument document = provider.getDocument(textEditor.getEditorInput());
 		String text = document.get();
-
 		grammarFile.deleteAllModelMarkers();
 		try {
 			featureModelReader.readFromString(text);
@@ -507,8 +506,12 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 	protected void pageChange(int newPageIndex) {
 		if (oldPage == graphicalViewerIndex) {
 			if (newPageIndex == textEditorIndex) {
-				if (isPageModified)
+				if (isPageModified) {
 					updateTextEditorFromDiagram();
+					if (featureModel.isRenamed()) {
+						saveModel();
+					}
+				}
 			} else if (newPageIndex == featureOrderEditorIndex) {
 
 				if (isPageModified) {
@@ -541,6 +544,12 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 						featureOrderEditor.updateOrderEditor(featureModel);
 				}
 			}
+		} else {
+			if (newPageIndex == textEditorIndex) {
+				if (isPageModified && featureModel.isRenamed()) {
+					saveModel();
+				}
+			}
 		}
 		isPageModified = false;
 
@@ -552,6 +561,33 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		oldPage = newPageIndex;
 		super.pageChange(newPageIndex);
 
+	}
+
+	/**
+	 * Open a dialog to save the model.
+	 */
+	private void saveModel() {
+		ArrayList<String> editor = new ArrayList<String>();
+		editor.add(grammarFile.getResource().getName());
+		
+		ArrayList<IEditorPart> editorspart = new ArrayList<IEditorPart>();
+		editorspart.add(this.getEditor(graphicalViewerIndex));
+		
+		ListDialog dialog = new ListDialog(getSite()
+				.getWorkbenchWindow().getShell());
+		dialog.setAddCancelButton(true);
+		dialog.setContentProvider(new ArrayContentProvider());
+		dialog.setLabelProvider(new LabelProvider());
+		dialog.setInput(editor);
+		dialog.setInitialElementSelections(editor);
+		dialog.setTitle("Save feature model");
+		dialog.setHelpAvailable(false);
+		dialog.setMessage("Model should be saved after renamings.");
+		dialog.open();
+		
+		if (dialog.getResult() != null) {
+			doSave(null);
+		}
 	}
 
 	@Override
@@ -585,11 +621,9 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		} catch (Exception e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
+		firePropertyChange(PROP_DIRTY);
 	}
 
-	/**
-	 *  
-	 */
 	@SuppressWarnings("deprecation")
 	private boolean saveEditors() {
 		if (featureModel.isRenamed()) {
@@ -672,13 +706,13 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 
 		String prop = event.getPropertyName();
 		if (prop.equals(MODEL_DATA_CHANGED)) {
+			graphicalViewer.setContents(featureModel);
 			refreshGraphicalViewer();
 			isPageModified = true;
 			firePropertyChange(PROP_DIRTY);
 		} else if (prop.equals(MODEL_DATA_LOADED)) {
 			refreshGraphicalViewer();
 		} else if (prop.equals(REDRAW_DIAGRAM)) {
-
 			updateTextEditorFromDiagram();
 			updateDiagramFromTextEditor();
 		}
