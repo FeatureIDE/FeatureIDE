@@ -688,7 +688,9 @@ public class FeatureProject extends BuilderMarkerHandler implements
 				true, IResource.DEPTH_ZERO);
 
 		String message = null;
+		int severity = IMarker.SEVERITY_WARNING;
 		if (feature == null) {
+			severity = IMarker.SEVERITY_ERROR;
 			message = "This feature module has no corresponding feature at the feature model.";
 		} else {
 			if (feature.isConcrete() && folder.members().length == 0) {
@@ -707,7 +709,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 					IResource.DEPTH_ZERO).length == 0 && folder.exists()) {
 				IMarker marker = folder.createMarker(FEATURE_MODULE_MARKER);
 				marker.setAttribute(IMarker.MESSAGE, message);
-				marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
+				marker.setAttribute(IMarker.SEVERITY, severity);
 			}
 		}
 	}
