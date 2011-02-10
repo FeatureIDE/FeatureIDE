@@ -355,7 +355,7 @@ public class ComposerWrapper {
 		String[] args = new String[files.length + i];
 		IFolder outputfolder = setOutputFolder(layer);
 		args[0] = "-f";
-		args[1] = outputfolder.getRawLocation().toOSString() + File.pathSeparator + files[0].getName(); 
+		args[1] = outputfolder.getRawLocation().toOSString() + File.separator + files[0].getName(); 
 		if (layer != null) {
 			args[2] = "-a";
 			args[3] = layer;

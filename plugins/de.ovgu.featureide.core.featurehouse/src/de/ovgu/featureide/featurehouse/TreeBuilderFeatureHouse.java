@@ -116,7 +116,7 @@ public class TreeBuilderFeatureHouse {
 
 				String name = node.getName();
 				name = name
-				.substring(name.lastIndexOf(File.pathSeparator) + 1, name.length());
+				.substring(name.lastIndexOf(File.separator) + 1, name.length());
 				ProjectTreeNode fileNode = insertProjectTreeNode("file", name,
 						projectTree.findNodeByName(featureName));
 
