@@ -43,6 +43,10 @@
        <builder
              id="de.ovgu.featureide.core.extensibleFeatureProjectBuilder">
        </builder>
+       <content-type
+      		 id="de.ovgu.featureide.contenttype.conf">
+       </content-type>
+       
     </extension>
     <extension
           id="extensibleFeatureProjectBuilder"
