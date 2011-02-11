@@ -105,8 +105,12 @@ public class ModelComparator {
 			oldRoot = createNodes(oldModel, replaceFeatures);
 			newRoot = createNodes(newModel, replaceFeatures);
 			
+			//TODO remove debugging
+			System.err.println("newRoot: " + newRoot);
 			oldRoot = createFalseStatementForConcreteVariables(addedFeatures, oldRoot);
 			newRoot = createFalseStatementForConcreteVariables(deletedFeatures, newRoot);
+			System.err.println("newRoot with false statements: " + newRoot);
+			System.err.flush();
 
 			oldRootUpdated = removeIdenticalNodes(oldRoot, newRoot);
 			newRootUpdated = removeIdenticalNodes(newRoot, oldRoot);
@@ -186,6 +190,8 @@ public class ModelComparator {
 	}
 
 	private Node createFalseStatementForConcreteVariables(Set<String> addedFeatures, Node node) {
+		if (addedFeatures.isEmpty())
+			return node;
 		LinkedList<Node> children = new LinkedList<Node>();
 		for (Object var : addedFeatures)
 			children.add(new Literal((String) var, false));
