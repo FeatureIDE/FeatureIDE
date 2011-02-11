@@ -11,6 +11,15 @@
             nature="FeatureIDE_Core.deltajNature">
       </composer>
    </extension>
+   <extension
+         point="de.ovgu.featureide.fm.core.FMComposer">
+      <fmComposer
+            class="de.ovgu.featureide.deltaj.DeltajFMComposer"
+            composer="de.ovgu.featureide.core.deltaj.deltajcomposer"
+            id="de.ovgu.featureide.core.deltaj.fmcomposer"
+            name="DeltaJFMComposer">
+      </fmComposer>
+   </extension>
 
 </plugin>
 

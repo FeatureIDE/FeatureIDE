@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
-   <extension-point id="RenameAction" name="renameAction" schema="schema/renameAction.exsd"/>
+   <extension-point id="FMComposer" name="fmComposer" schema="schema/fmComposer.exsd"/>
    <extension
          id="modelProblemMarker"
          name="Model Problem Marker"

@@ -38,10 +38,8 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.QualifiedName;
-import org.eclipse.core.runtime.SafeRunner;
 import org.prop4j.And;
 import org.prop4j.Implies;
 import org.prop4j.Literal;
@@ -105,6 +103,18 @@ public class FeatureModel implements PropertyConstants {
 	private LinkedList<Renaming> renamings = new LinkedList<Renaming>();
 
 	private IFolder sourceFolder;
+	
+	private IFMComposerExtension fmComposerExtension = new FMComposerExtension();
+	private String COMPOSER_ID;
+
+	/**
+	 * @return the fMComposerExtension
+	 */
+	public IFMComposerExtension getFMComposerExtension(IProject project) {
+		setComposerID(project);
+		setComposer();
+		return fmComposerExtension;
+	}
 
 	public FeatureModel() {
 		reset();
@@ -276,13 +286,11 @@ public class FeatureModel implements PropertyConstants {
 
 	public void performRenamings(IFile file) {
 		IProject project = ((IResource) file.getAdapter(IFile.class)).getProject();
-		setComposerID(project);
 		String sourceName = getProjectConfigurationPath(project);
 		if (sourceName != null && !sourceName.equals("")) {
 			sourceFolder = project.getFolder(sourceName);
 		}
 		for (Renaming renaming : renamings) {
-			//only call moveFolder(..) if composer has no specific renamings
 			if (!performComposerRenamings(renaming.oldName, renaming.newName,
 				project)) {
 				moveFolder(renaming.oldName, renaming.newName);
@@ -290,43 +298,10 @@ public class FeatureModel implements PropertyConstants {
 		}
 		renamings.clear();
 	}
-
+	
 	private boolean performComposerRenamings(final String oldName,
 			final String newName, final IProject project) {
-		if (composer == null)
-			return false;
-		boolean renameFolders = false;
-		IConfigurationElement[] config = Platform.getExtensionRegistry()
-				.getConfigurationElementsFor(
-						FMCorePlugin.PLUGIN_ID + ".RenameAction");
-		try {
-			for (IConfigurationElement e : config) {
-				if (e.getAttribute("composer").equals(composer)) {
-					final Object o = e.createExecutableExtension("class");
-					if (o instanceof IRenameAction) {
-
-						ISafeRunnable runnable = new ISafeRunnable() {
-							@Override
-							public void handleException(Throwable e) {
-								FMCorePlugin.getDefault().logError(e);
-							}
-
-							@Override
-							public void run() throws Exception {
-								((IRenameAction) o).performRenaming(oldName,
-										newName, project);
-							}
-						};
-						SafeRunner.run(runnable);
-						renameFolders = true;
-					}
-					break;
-				}
-			}
-		} catch (CoreException ex) {
-			FMCorePlugin.getDefault().logError(ex);
-		}
-		return renameFolders;
+		return getFMComposerExtension(project).performRenaming(oldName,newName, project);
 	}
 
 	public void moveFolder(String oldName, String newName) {
@@ -868,13 +843,11 @@ public class FeatureModel implements PropertyConstants {
 		return null;
 	}
 
-	private String composer;
-
-	public void setComposerID(IProject project) {
+	private void setComposerID(IProject project) {
 		try {
 			String id = project.getPersistentProperty(composerConfigID);
 			if (id != null) {
-				composer = id;
+				COMPOSER_ID = id;
 				return;
 			}
 
@@ -882,7 +855,7 @@ public class FeatureModel implements PropertyConstants {
 				if (command.getBuilderName().equals(BUILDER_ID)) {
 					id = (String) command.getArguments().get(COMPOSER_KEY);
 					if (id != null) {
-						composer = id;
+						COMPOSER_ID = id;
 						return;
 					}
 				}
@@ -891,7 +864,28 @@ public class FeatureModel implements PropertyConstants {
 		} catch (CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
-		composer = null;
+		COMPOSER_ID = null;
+	}
+	
+	private void setComposer() {
+		if (COMPOSER_ID == null) {
+			return;
+		}
+		
+		IConfigurationElement[] config = Platform.getExtensionRegistry()
+				.getConfigurationElementsFor(FMCorePlugin.PLUGIN_ID + ".FMComposer");
+		try {
+			for (IConfigurationElement e : config) {
+				if (e.getAttribute("composer").equals(COMPOSER_ID)) {
+					final Object o = e.createExecutableExtension("class");
+					if (o instanceof IFMComposerExtension) {
+						fmComposerExtension = (IFMComposerExtension)o;
+					}
+				}
+			}
+		} catch (Exception e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
 	}
 
 }

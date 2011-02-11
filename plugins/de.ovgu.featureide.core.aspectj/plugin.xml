@@ -4,7 +4,7 @@
    <extension
          point="de.ovgu.featureide.core.composers">
       <composer
-            class="de.ovgu.featureide.core.aspectj.AspectJComposer"
+            class="de.ovgu.featureide.aspectj.AspectJComposer"
             description="Aspect-oriented programming."
             id="de.ovgu.featureide.core.composer.aspectj"
             name="AspectJ"
@@ -12,13 +12,13 @@
       </composer>
    </extension>
    <extension
-         point="de.ovgu.featureide.fm.core.RenameAction">
-      <renameAction
-            class="de.ovgu.featureide.core.aspectj.RenameAction"
+         point="de.ovgu.featureide.fm.core.FMComposer">
+      <fmComposer
+            class="de.ovgu.featureide.aspectj.AspectJFMCompserExtension"
             composer="de.ovgu.featureide.core.composer.aspectj"
-            id="de.ovgu.featureide.core.aspectj.renameAction"
-            name="AspectJRenameAction">
-      </renameAction>
+            id="de.ovgu.featureide.core.aspectj.fmcomposer"
+            name="AspectJFMComposer">
+      </fmComposer>
    </extension>
 
 </plugin>

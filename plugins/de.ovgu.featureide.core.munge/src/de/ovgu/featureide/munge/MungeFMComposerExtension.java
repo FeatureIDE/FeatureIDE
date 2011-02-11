@@ -32,8 +32,8 @@ import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.core.FMComposerExtension;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.IRenameAction;
 
 /**
  * Updates the preprocessor features of any java file after renaming at the
@@ -41,14 +41,24 @@ import de.ovgu.featureide.fm.core.IRenameAction;
  *  
  * @author Jens Meinicke
 */
-public class MungeRenameAction implements IRenameAction {
+public class MungeFMComposerExtension extends FMComposerExtension {
 
+	private static String COMPOSER = "Munge";
+	
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.IFMComposerExtension#getComposer()
+	 */
 	@Override
-	public void performRenaming(String oldName, String newName, IProject project) {
+	public String getComposerName() {
+		return COMPOSER;
+	}
+	
+	@Override
+	public boolean performRenaming(String oldName, String newName, IProject project) {
 		IFeatureProject featureProject = CorePlugin.getFeatureProject(project);
 		IFolder sourceFolder = featureProject.getSourceFolder();
 		if (!sourceFolder.exists())
-			return;
+			return true;
 		
 		try {
 			performRenamings(oldName, newName, sourceFolder);
@@ -56,7 +66,7 @@ public class MungeRenameAction implements IRenameAction {
 		} catch (CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
-		return;
+		return true;
 	}
 
 	private void performRenamings(String oldName, String newName, IFolder folder) throws CoreException {
@@ -105,5 +115,13 @@ public class MungeRenameAction implements IRenameAction {
 					MungeCorePlugin.getDefault().logError(e);
 				}	
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.IFMComposerExtension#hasFeaureOrder()
+	 */
+	@Override
+	public boolean hasFeaureOrder() {
+		return false;
 	}
 }

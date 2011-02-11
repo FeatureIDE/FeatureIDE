@@ -12,13 +12,13 @@
       </composer>
    </extension>
    <extension
-         point="de.ovgu.featureide.fm.core.RenameAction">
-      <renameAction
-            class="de.ovgu.featureide.munge.MungeRenameAction"
+         point="de.ovgu.featureide.fm.core.FMComposer">
+      <fmComposer
+            class="de.ovgu.featureide.munge.MungeFMComposerExtension"
             composer="de.ovgu.featureide.preprocessor.munge"
-            id="de.ovgu.featureide.core.munge.renameAction1"
-            name="MungRenameAction">
-      </renameAction>
+            id="de.ovgu.featureide.core.munge.fmcomposer"
+            name="MungFMComposer">
+      </fmComposer>
    </extension>
 
 </plugin>

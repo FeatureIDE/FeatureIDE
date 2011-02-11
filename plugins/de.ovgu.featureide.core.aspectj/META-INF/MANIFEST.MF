@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Aspectj Plug-in
 Bundle-SymbolicName: de.ovgu.featureide.core.aspectj;singleton:=true
 Bundle-Version: 2.5.0.qualifier
-Bundle-Activator: de.ovgu.featureide.core.aspectj.AspectJCorePlugin
+Bundle-Activator: de.ovgu.featureide.aspectj.AspectJCorePlugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,

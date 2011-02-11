@@ -51,10 +51,6 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		featureProject = project;
 	}
 
-	public void performFullBuild(IFile config) {
-
-	}
-
 	public boolean clean() {
 		return true;
 	}
@@ -64,7 +60,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	}
 
 	public ArrayList<String> extensions() {
-		return null;
+		return new ArrayList<String>();
 	}
 
 	public boolean postAddNature(IFolder source, IFolder destination) {

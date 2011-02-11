@@ -16,7 +16,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.core.aspectj;
+package de.ovgu.featureide.aspectj;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -31,7 +31,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.CorePlugin;
-import de.ovgu.featureide.fm.core.IRenameAction;
+import de.ovgu.featureide.fm.core.FMComposerExtension;
 
 /**
  * Moves aspectfiles after renamings at featuremodel and updates all entrys 
@@ -39,16 +39,22 @@ import de.ovgu.featureide.fm.core.IRenameAction;
  * 
  * @author Jens Meinicke
  */
-public class RenameAction implements IRenameAction {
+public class AspectJFMCompserExtension extends FMComposerExtension {
 
 	private IFile aspectFile;
-
-	public RenameAction() {
-
+	
+	private static String COMPOSER = "AspectJ";
+	
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.IFMComposerExtension#getComposer()
+	 */
+	@Override
+	public String getComposerName() {
+		return COMPOSER;
 	}
 
 	@Override
-	public void performRenaming(String oldName, String newName, IProject project) {
+	public boolean performRenaming(String oldName, String newName, IProject project) {
 		IFolder buildFolder = CorePlugin.getFeatureProject(project).getBuildFolder();
 		try {
 			aspectFile = AspectJComposer.getAspectFile(oldName, null, buildFolder);
@@ -60,6 +66,7 @@ public class RenameAction implements IRenameAction {
 		} catch (CoreException e) {
 			AspectJCorePlugin.getDefault().logError(e);
 		}
+		return true;
 	}
 
 	public void renameAspect(IFolder folder, String oldName, String newName) throws CoreException {
@@ -134,6 +141,14 @@ public class RenameAction implements IRenameAction {
 					AspectJCorePlugin.getDefault().logError(e);
 				}	
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.IFMComposerExtension#hasFeaureOrder()
+	 */
+	@Override
+	public boolean hasFeaureOrder() {
+		return false;
 	}
 
 }

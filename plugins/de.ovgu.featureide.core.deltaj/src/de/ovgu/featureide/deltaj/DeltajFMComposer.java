@@ -16,23 +16,44 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.fm.core;
+package de.ovgu.featureide.deltaj;
 
 import org.eclipse.core.resources.IProject;
 
+import de.ovgu.featureide.fm.core.FMComposerExtension;
+
 /**
- * 
- * ExtensionPoint for composer specific renamings
+ * TODO description
  * 
  * @author Jens Meinicke
  */
-public interface IRenameAction {
+public class DeltajFMComposer extends FMComposerExtension{
+
+	private static String COMPOSER = "DeltaJ";
 	
-	/**
-	 * Perform renaming after rename some features at feature model
-	 * @param oldName
-	 * @param newName
-	 * @param project
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.IFMComposerExtension#getComposerName()
 	 */
-	public void performRenaming(String oldName, String newName, IProject project);
+	@Override
+	public String getComposerName() {
+		return COMPOSER;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.IFMComposerExtension#performRenaming(java.lang.String, java.lang.String, org.eclipse.core.resources.IProject)
+	 */
+	@Override
+	public boolean performRenaming(String oldName, String newName,
+			IProject project) {
+		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.IFMComposerExtension#hasFeaureOrder()
+	 */
+	@Override
+	public boolean hasFeaureOrder() {
+		return false;
+	}
+
 }

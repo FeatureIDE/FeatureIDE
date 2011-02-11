@@ -16,7 +16,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.core.aspectj;
+package de.ovgu.featureide.aspectj;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
