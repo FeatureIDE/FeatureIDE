@@ -43,14 +43,16 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 */
 public class MungeFMComposerExtension extends FMComposerExtension {
 
-	private static String COMPOSER = "Munge";
+	private static String ORDER_PAGE_MESSAGE = 
+			"FeatureIDE projects based on preprocessors such as Munge do not\n" +
+			"need an order, as the order is given directly at the source code.";
 	
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.fm.core.IFMComposerExtension#getComposer()
 	 */
 	@Override
-	public String getComposerName() {
-		return COMPOSER;
+	public String getOrderPageMessage() {
+		return ORDER_PAGE_MESSAGE;
 	}
 	
 	@Override

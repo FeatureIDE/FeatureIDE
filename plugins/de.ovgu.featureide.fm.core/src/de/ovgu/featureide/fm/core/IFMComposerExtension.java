@@ -28,7 +28,7 @@ import org.eclipse.core.resources.IProject;
  */
 public interface IFMComposerExtension {
 	
-	String getComposerName();
+	String getOrderPageMessage();
 	
 	/**
 	 * Perform renaming after rename some features at feature model

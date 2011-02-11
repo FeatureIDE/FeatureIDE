@@ -230,10 +230,9 @@ public class FeatureOrderEditor extends EditorPart {
 			comp.setLayout(layout);
 	
 			Label label1 = new Label(comp, SWT.NONE);
-			String composerName = featureModel.getFMComposerExtension(
+			label1.setText(featureModel.getFMComposerExtension(
 					((IFile) input.getAdapter(IFile.class)).getProject())
-					.getComposerName();
-			label1.setText(composerName + " does not support a feature order.");
+					.getOrderPageMessage());
 	
 		} else {
 			GridData gridData;

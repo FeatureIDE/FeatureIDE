@@ -27,20 +27,29 @@ import de.ovgu.featureide.fm.core.FMComposerExtension;
  * 
  * @author Jens Meinicke
  */
-public class DeltajFMComposer extends FMComposerExtension{
+public class DeltajFMComposer extends FMComposerExtension {
 
-	private static String COMPOSER = "DeltaJ";
-	
-	/* (non-Javadoc)
+	private static String ORDER_PAGE_MESSAGE = 
+			"FeatureIDE projects based on DeltaJ do not need a total order\n" +
+			"as a partial order can be given directly in the delta modules\n" +
+			"using the keyword 'after'.";
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.ovgu.featureide.fm.core.IFMComposerExtension#getComposerName()
 	 */
 	@Override
-	public String getComposerName() {
-		return COMPOSER;
+	public String getOrderPageMessage() {
+		return ORDER_PAGE_MESSAGE;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.IFMComposerExtension#performRenaming(java.lang.String, java.lang.String, org.eclipse.core.resources.IProject)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.ovgu.featureide.fm.core.IFMComposerExtension#performRenaming(java.
+	 * lang.String, java.lang.String, org.eclipse.core.resources.IProject)
 	 */
 	@Override
 	public boolean performRenaming(String oldName, String newName,
@@ -48,7 +57,9 @@ public class DeltajFMComposer extends FMComposerExtension{
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.ovgu.featureide.fm.core.IFMComposerExtension#hasFeaureOrder()
 	 */
 	@Override

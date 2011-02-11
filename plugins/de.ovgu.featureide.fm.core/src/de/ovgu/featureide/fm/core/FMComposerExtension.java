@@ -31,7 +31,7 @@ public class FMComposerExtension implements IFMComposerExtension {
 	 * @see de.ovgu.featureide.fm.core.IFMComposerExtension#getComposer()
 	 */
 	@Override
-	public String getComposerName() {
+	public String getOrderPageMessage() {
 		return "";
 	}
 	

@@ -34,33 +34,43 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.fm.core.FMComposerExtension;
 
 /**
- * Moves aspectfiles after renamings at featuremodel and updates all entrys 
- * of those aspect of all sourcefiles.
+ * Moves aspectfiles after renamings at featuremodel and updates all entrys of
+ * those aspect of all sourcefiles.
  * 
  * @author Jens Meinicke
  */
 public class AspectJFMCompserExtension extends FMComposerExtension {
 
 	private IFile aspectFile;
-	
-	private static String COMPOSER = "AspectJ";
-	
-	/* (non-Javadoc)
+
+	private static String ORDER_PAGE_MESSAGE = 
+			"FeatureIDE projects based on AspectJ do not need a total order as\n" +
+			"a partial order can be defined in every aspect using the keywords\n" +
+			"'before' and 'after'.";
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.ovgu.featureide.fm.core.IFMComposerExtension#getComposer()
 	 */
 	@Override
-	public String getComposerName() {
-		return COMPOSER;
+	public String getOrderPageMessage() {
+		return ORDER_PAGE_MESSAGE;
 	}
 
 	@Override
-	public boolean performRenaming(String oldName, String newName, IProject project) {
-		IFolder buildFolder = CorePlugin.getFeatureProject(project).getBuildFolder();
+	public boolean performRenaming(String oldName, String newName,
+			IProject project) {
+		IFolder buildFolder = CorePlugin.getFeatureProject(project)
+				.getBuildFolder();
 		try {
-			aspectFile = AspectJComposer.getAspectFile(oldName, null, buildFolder);
+			aspectFile = AspectJComposer.getAspectFile(oldName, null,
+					buildFolder);
 			if (aspectFile.exists()) {
 				renameAspect(buildFolder, oldName, newName);
-				aspectFile.move(AspectJComposer.getAspectFile(newName, null, buildFolder).getFullPath(), true, null);
+				aspectFile.move(
+						AspectJComposer.getAspectFile(newName, null,
+								buildFolder).getFullPath(), true, null);
 				buildFolder.refreshLocal(IResource.DEPTH_INFINITE, null);
 			}
 		} catch (CoreException e) {
@@ -69,26 +79,29 @@ public class AspectJFMCompserExtension extends FMComposerExtension {
 		return true;
 	}
 
-	public void renameAspect(IFolder folder, String oldName, String newName) throws CoreException {
+	public void renameAspect(IFolder folder, String oldName, String newName)
+			throws CoreException {
 		for (IResource res : folder.members()) {
 			if (res instanceof IFolder) {
-				renameAspect((IFolder)res , oldName, newName);
+				renameAspect((IFolder) res, oldName, newName);
 			} else if (res instanceof IFile) {
-				setFileText((IFile)res, oldName, newName);
+				setFileText((IFile) res, oldName, newName);
 			}
 		}
 	}
-	
+
 	private String getPackege(String aspectName) {
 		if (aspectName.contains("_")) {
-			return aspectName.replaceAll("_", ".").substring(0, aspectName.lastIndexOf("_"));
+			return aspectName.replaceAll("_", ".").substring(0,
+					aspectName.lastIndexOf("_"));
 		}
 		return null;
 	}
-	
+
 	private String getAspect(String aspectName) {
 		if (aspectName.contains("_")) {
-			return aspectName.substring(aspectName.lastIndexOf("_") + 1, aspectName.length());
+			return aspectName.substring(aspectName.lastIndexOf("_") + 1,
+					aspectName.length());
 		}
 		return aspectName;
 	}
@@ -113,37 +126,41 @@ public class AspectJFMCompserExtension extends FMComposerExtension {
 					fileText.append("\r\n");
 				}
 			}
-			
+
 			if (!fileText.toString().contains(getAspect(oldName))) {
 				return;
 			}
 			// TODO revise replacement \w or \W for word char
-			String fileTextString = fileText.toString().replaceAll(getAspect(oldName), getAspect(newName));
-			
-			if (packageName != null && !fileTextString.contains("package " + packageName + ";")) {
-				fileTextString = "package " + packageName + ";\r\n" + fileTextString;
+			String fileTextString = fileText.toString().replaceAll(
+					getAspect(oldName), getAspect(newName));
+
+			if (packageName != null
+					&& !fileTextString.contains("package " + packageName + ";")) {
+				fileTextString = "package " + packageName + ";\r\n"
+						+ fileTextString;
 			}
 			fw = new FileWriter(file);
 			fw.write(fileTextString);
-			
+
 		} catch (FileNotFoundException e) {
 			AspectJCorePlugin.getDefault().logError(e);
 		} catch (IOException e) {
 			AspectJCorePlugin.getDefault().logError(e);
-		}
-		finally{
-			if(scanner!=null)
-			scanner.close();
-			if(fw!=null)
+		} finally {
+			if (scanner != null)
+				scanner.close();
+			if (fw != null)
 				try {
 					fw.close();
 				} catch (IOException e) {
 					AspectJCorePlugin.getDefault().logError(e);
-				}	
+				}
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.ovgu.featureide.fm.core.IFMComposerExtension#hasFeaureOrder()
 	 */
 	@Override
