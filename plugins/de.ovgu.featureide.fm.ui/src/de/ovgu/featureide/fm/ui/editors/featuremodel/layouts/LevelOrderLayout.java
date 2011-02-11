@@ -21,6 +21,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 import java.util.Vector;
 
 import org.eclipse.draw2d.geometry.Point;
+import org.eclipse.draw2d.geometry.Rectangle;
 
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -43,64 +44,97 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 	
 	private void layout(Feature root) {
 		Vector<Vector<Feature>> levels = calculateLevels(root);
+		
+		//TODO remove initialization, used for debugging only
+		for (Vector<Feature> level : levels)
+			for (Feature feature : level)
+				FeatureUIHelper.setLocation(feature,new Point(0, 0));
 
 		for (int i = levels.size() - 1; i >= 0; i--) {
-			int y = LAYOUT_MARGIN_Y + FEATURE_SPACE_Y * i;
-			for (Feature feature : levels.get(i))
-				FeatureUIHelper.setLocation(feature,new Point(0, y));
-
-			for (Feature feature : levels.get(i))
-				if (feature.hasChildren()) {
-					centerAboveChildren(feature);
-				}
-
-			Feature lastFeature = null;
-			int moveWidth = 0;
-			for (int j = 0; j < levels.get(i).size(); j++) {
-				Feature feature = levels.get(i).get(j);
-				if (!feature.hasChildren())
-					nextToSibling(feature, lastFeature);
-				else {
-					if (lastFeature != null)
-						moveWidth = Math.max(moveWidth, FeatureUIHelper.getBounds(lastFeature).right() + FEATURE_SPACE_X - FeatureUIHelper.getLocation(feature).x);
-					if (moveWidth > 0)
-						moveTree(feature, moveWidth);
-					int width = FEATURE_SPACE_X;
-					int l = 0;
-					int space = 0;
-					boolean right = true;
-					for (int k = j - 1; k >= 0; k--) {
-						Feature sibling = levels.get(i).get(k);
-						if (sibling.getParent() != feature.getParent()) {
-							l = k + 1;
-							break;
-						}
-						if (sibling.hasChildren()) {
-							l = k + 1;
-							right = false;
-							space = FeatureUIHelper.getBounds(feature).x - FeatureUIHelper.getBounds(sibling).right() - width;
-							break;
-						}
-						width += FeatureUIHelper.getSize(sibling).width + FEATURE_SPACE_X;
-					}
-					if (right)
-						space = FeatureUIHelper.getBounds(feature).x - (FeatureUIHelper.getBounds(levels.get(i).get(l)).x - FEATURE_SPACE_X) - width;
-					for (int k = l; k < j; k++) {
-						Feature sibling = levels.get(i).get(k);
-						if (right)
-							moveTree(sibling, space);
-						else
-							moveTree(sibling, space * (k - l + 1) / (j - l + 1));
-					}
-				}
-				lastFeature = feature;
-			}
+			Vector<Feature> level = levels.get(i);
+			layoutLevelInY(level, i);
+			layoutLevelInX(level);
 		}
-		
-		int newX = (controlWidth - FeatureUIHelper.getBounds(root).width) / 2;
-		moveTree(root, newX - FeatureUIHelper.getLocation(root).x);
+
+		centerTheRoot(root);
 		
 		featureDiagramBottom = LAYOUT_MARGIN_Y + FEATURE_SPACE_Y * (levels.size() - 1);
+	}
+
+	private void layoutLevelInY(Vector<Feature> level, int i) {
+		int y = LAYOUT_MARGIN_Y + FEATURE_SPACE_Y * i;
+		for (Feature feature : level)
+			FeatureUIHelper.setLocation(feature,new Point(0, y));
+	}
+
+	private void layoutLevelInX(Vector<Feature> level) {
+		for (Feature feature : level)
+			if (feature.hasChildren())
+				centerAboveChildren(feature);
+
+		Feature lastFeature = null;
+		int moveWidth = 0;
+		for (int j = 0; j < level.size(); j++) {
+			moveWidth = layoutFeatureInX(level, j, moveWidth, lastFeature);
+			lastFeature = level.get(j);
+		}
+	}
+
+	private int layoutFeatureInX(Vector<Feature> level, int j,
+			int moveWidth, Feature lastFeature) {
+		Feature feature = level.get(j);
+		boolean firstCompound = true;
+		if (!feature.hasChildren())
+			nextToLeftSibling(feature, lastFeature);
+		else {
+			if (lastFeature != null)
+				moveWidth = Math.max(moveWidth, FeatureUIHelper.getBounds(lastFeature).right() + FEATURE_SPACE_X - FeatureUIHelper.getLocation(feature).x);
+			if (moveWidth > 0)
+				moveTree(feature, moveWidth);
+			layoutSiblingsEquidistant(level, j, feature);
+			if (firstCompound) {
+				firstCompound = false;
+				boolean compoundSibling = false;
+				for (int k = j - 1; k >= 0; k--)
+					if (level.get(k).hasChildren())
+						compoundSibling = true;
+				if (!compoundSibling)
+					for (int k = j - 1; k >= 0; k--)
+						nextToRightSibling(level.get(k), level.get(k + 1));
+			}
+		}
+		return moveWidth;
+	}
+
+	private void layoutSiblingsEquidistant(Vector<Feature> level, int j,
+			Feature feature) {
+		int width = FEATURE_SPACE_X;
+		int l = 0;
+		int space = 0;
+		boolean right = true;
+		for (int k = j - 1; k >= 0; k--) {
+			Feature sibling = level.get(k);
+			if (sibling.getParent() != feature.getParent()) {
+				l = k + 1;
+				break;
+			}
+			if (sibling.hasChildren()) {
+				l = k + 1;
+				right = false;
+				space = FeatureUIHelper.getBounds(feature).x - FeatureUIHelper.getBounds(sibling).right() - width;
+				break;
+			}
+			width += FeatureUIHelper.getSize(sibling).width + FEATURE_SPACE_X;
+		}
+		if (right)
+			space = FeatureUIHelper.getBounds(feature).x - (FeatureUIHelper.getBounds(level.get(l)).x - FEATURE_SPACE_X) - width;
+		for (int k = l; k < j; k++) {
+			Feature sibling = level.get(k);
+			if (right)
+				moveTree(sibling, space);
+			else
+				moveTree(sibling, space * (k - l + 1) / (j - l + 1));
+		}
 	}
 
 	private Vector<Vector<Feature>> calculateLevels(Feature root) {
@@ -129,10 +163,16 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 		FeatureUIHelper.setLocation(feature,new Point(x, location.y));
 	}
 
-	private void nextToSibling(Feature feature, Feature lastFeature) {
+	private void nextToLeftSibling(Feature feature, Feature leftSibling) {
 		Point location = FeatureUIHelper.getLocation(feature);
-		int x = lastFeature != null ? FeatureUIHelper.getBounds(lastFeature).right() + FEATURE_SPACE_X : 0;
+		int x = leftSibling != null ? FeatureUIHelper.getBounds(leftSibling).right() + FEATURE_SPACE_X : 0;
 		FeatureUIHelper.setLocation(feature,new Point(x, location.y));
+	}
+
+	private void nextToRightSibling(Feature feature, Feature rightSibling) {
+		Rectangle bounds = FeatureUIHelper.getBounds(feature);
+		int x = rightSibling != null ? FeatureUIHelper.getBounds(rightSibling).x - FEATURE_SPACE_X - bounds.width : 0;
+		FeatureUIHelper.setLocation(feature,new Point(x, bounds.y));
 	}
 
 	private void moveTree(Feature feature, int deltaX) {
@@ -140,6 +180,11 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 		FeatureUIHelper.setLocation(feature,new Point(location.x + deltaX, location.y));
 		for (Feature child : feature.getChildren())
 			moveTree(child, deltaX);
+	}
+
+	private void centerTheRoot(Feature root) {
+		int newX = (controlWidth - FeatureUIHelper.getBounds(root).width) / 2;
+		moveTree(root, newX - FeatureUIHelper.getLocation(root).x);
 	}
 
 }
