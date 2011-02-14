@@ -21,7 +21,7 @@ package de.ovgu.featureide.fm.core;
 import org.eclipse.core.resources.IProject;
 
 /**
- * TODO description
+ * Default feature model extension. 
  * 
  * @author Jens Meinicke
  */

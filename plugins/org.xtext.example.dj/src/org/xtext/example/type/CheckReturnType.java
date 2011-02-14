@@ -184,7 +184,7 @@ public class CheckReturnType {
 	            	  parentClasses.add(cm.getAdds().getClass_().getExtends());
 	             }
 	          } else {
-	        	  //FIXME null-checks added
+	        	  //FIXME XTEXT null-checks added
 	        	  if ((cm != null && cm.getAction() != null && cm.getAction().equals("modifies")) &&
 	        			  (cm.getModifies() != null && cm.getModifies().getClass_() != null &&
 	        			   cm.getModifies().getClass_().getName() != null && cm.getModifies().getClass_().getName().equals(cl.getName()))){
@@ -219,7 +219,7 @@ public class CheckReturnType {
 			importList = p.getImports();
 			moduleList.addAll(p.getModulesList());
 			Program current;
-			//FIXME 
+			//FIXME XTEXT
 			for (Import imp : importList) {
 				if(p.eResource() == null) continue; // NEW
 				Resource resource = EcoreUtil2.getResource(p.eResource(), imp.getImportURI());

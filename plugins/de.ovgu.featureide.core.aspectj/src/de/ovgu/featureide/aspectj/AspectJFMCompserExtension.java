@@ -34,8 +34,7 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.fm.core.FMComposerExtension;
 
 /**
- * Moves aspectfiles after renamings at featuremodel and updates all entrys of
- * those aspect of all sourcefiles.
+ * AspectJ specific feature model extensions.
  * 
  * @author Jens Meinicke
  */

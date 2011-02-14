@@ -36,8 +36,7 @@ import de.ovgu.featureide.fm.core.FMComposerExtension;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 
 /**
- * Updates the preprocessor features of any java file after renaming at the
- * feature model.
+ * Munge specific feature model extensions.
  *  
  * @author Jens Meinicke
 */

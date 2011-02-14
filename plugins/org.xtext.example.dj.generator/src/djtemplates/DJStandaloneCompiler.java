@@ -117,14 +117,12 @@ public class DJStandaloneCompiler {
 		try {
 			in = new FileInputStream(inputWorkingPath + fileName);
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	
 		try {
 			resource.load(in, resourceSet.getLoadOptions());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

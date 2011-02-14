@@ -362,7 +362,7 @@ public class AuxiliaryFunctions
               (cm.getAdds().getClass_().getName().equals(cl.getAdds().getClass_().getName()))) {
               for (Field field : cm.getAdds().getClass_().getField())
                 fieldRefList.add(field.getReference()); 
-              //FIXME null-checks added
+              //FIXME XTEXT null-checks added
             } else if ((cm.getAction().equals("modifies"))){
             	if(cm != null && cm.getModifies() != null &&
             	   cm.getModifies().getClass_() != null &&

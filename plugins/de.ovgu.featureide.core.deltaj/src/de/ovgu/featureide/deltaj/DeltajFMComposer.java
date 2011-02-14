@@ -23,7 +23,7 @@ import org.eclipse.core.resources.IProject;
 import de.ovgu.featureide.fm.core.FMComposerExtension;
 
 /**
- * TODO description
+ * DeltaJ specific feature model extensions.
  * 
  * @author Jens Meinicke
  */

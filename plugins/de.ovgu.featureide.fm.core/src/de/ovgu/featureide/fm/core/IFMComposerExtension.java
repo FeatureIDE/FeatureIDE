@@ -22,7 +22,7 @@ import org.eclipse.core.resources.IProject;
 
 /**
  * 
- * TODO: description
+ * Defines feature model specific extensions.
  * 
  * @author Jens Meinicke
  */

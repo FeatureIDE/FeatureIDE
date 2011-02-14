@@ -75,8 +75,7 @@ public class AdvancedConfigurationPage extends EditorPart {
 
 	public void updateTree() {
 		viewer.refresh();
-		//TODO: Check if this if-statement can be deleted or whether this is a bug
-		if (!errorMassage());
+		if (!errorMassage())
 			updateForeground(viewer.getTree().getItem(0));
 		removeHiddenFeatures();
 	}
