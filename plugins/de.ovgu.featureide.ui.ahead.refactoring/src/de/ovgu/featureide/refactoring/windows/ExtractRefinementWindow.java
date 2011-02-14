@@ -241,7 +241,7 @@ public class ExtractRefinementWindow implements Window, SelectionListener,
 
 		LayerInfo l = ts.getLayer(destLayer);
 		if (l == null)
-			//TODO make use of File.pathSeparator
+			//TODO make use of File.separator
 			destFile = this.file.getProject().getLocation().toOSString() + "\\"
 					+ Parser.FILESRC + "\\" + destLayer + "\\" + srcRefinement
 					+ ".jak";

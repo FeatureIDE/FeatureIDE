@@ -105,12 +105,8 @@ public class ModelComparator {
 			oldRoot = createNodes(oldModel, replaceFeatures);
 			newRoot = createNodes(newModel, replaceFeatures);
 			
-			//TODO remove debugging
-			System.err.println("newRoot: " + newRoot);
 			oldRoot = createFalseStatementForConcreteVariables(addedFeatures, oldRoot);
 			newRoot = createFalseStatementForConcreteVariables(deletedFeatures, newRoot);
-			System.err.println("newRoot with false statements: " + newRoot);
-			System.err.flush();
 
 			oldRootUpdated = removeIdenticalNodes(oldRoot, newRoot);
 			newRootUpdated = removeIdenticalNodes(newRoot, oldRoot);
@@ -242,7 +238,7 @@ public class ModelComparator {
 		HashMap<Object, Node> map = new HashMap<Object, Node>();
 		for (Object var : replaceFeatures) {
 			Feature feature = getFeature(var, featureModel);
-			if (feature != null) {
+			if (feature != null && feature.isAbstract()) {
 				Node replacing = calculateReplacing(var, featureModel);
 				replacing = NodeCreator.eliminateAbstractVariables(replacing, map);
 				updateMap(map, var, replacing);
