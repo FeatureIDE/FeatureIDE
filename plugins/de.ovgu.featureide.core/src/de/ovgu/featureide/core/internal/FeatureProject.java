@@ -356,7 +356,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	public IFile getCurrentConfiguration() {
 		if (currentConfiguration != null && currentConfiguration.exists())
 			return currentConfiguration;
-		
+
 		if (getConfigFolder() == null)
 			return null;
 
@@ -378,11 +378,11 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		// no valid configuration found
 		if (!getConfigFolder().exists())
 			return null;
-		
+
 		List<IFile> configs = getAllConfigurations();
 		if (configs == null || configs.isEmpty())
 			return null;
-		
+
 		// select the first configuration
 		IFile config = configs.get(0);
 		setCurrentConfiguration(config);
@@ -398,7 +398,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	 */
 	public void setCurrentConfiguration(IFile file) {
 		currentConfiguration = file;
-		
+
 		int offset = getConfigFolder().getProjectRelativePath().toString()
 				.length();
 		String configPath = file.getProjectRelativePath().toString()
@@ -684,8 +684,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 
 		Feature feature = featureModel.getFeature(folder.getName());
 
-		folder.deleteMarkers(FEATURE_MODULE_MARKER,
-				true, IResource.DEPTH_ZERO);
+		folder.deleteMarkers(FEATURE_MODULE_MARKER, true, IResource.DEPTH_ZERO);
 
 		String message = null;
 		int severity = IMarker.SEVERITY_WARNING;
@@ -727,16 +726,16 @@ public class FeatureProject extends BuilderMarkerHandler implements
 
 	public void resourceChanged(IResourceChangeEvent event) {
 		// if something in source folder changed
-//		if (sourceFolder != null
-//				&& event.getDelta().findMember(sourceFolder.getFullPath()) != null) {
-//
-//			// set markers, only if event is not fired from changes to
-//			// markers
-//			if (event.findMarkerDeltas(FEATURE_MODULE_MARKER, false).length == 0) {
-//				// TODO is this needed, causes MarkerNotFoun exception
-//				// setAllFeatureModuleMarkers(featureModel, sourceFolder);
-//			}
-//		}
+		if (sourceFolder != null
+				&& event.getDelta().findMember(sourceFolder.getFullPath()) != null) {
+
+			// set markers, only if event is not fired from changes to
+			// markers
+			if (event.findMarkerDeltas(FEATURE_MODULE_MARKER, false).length == 0) {
+				// TODO is this needed, causes MarkerNotFoun exception
+			 setAllFeatureModuleMarkers(featureModel, sourceFolder);
+			}
+		}
 
 		IPath modelPath = modelFile.getResource().getFullPath();
 		if (checkModelChange(event.getDelta().findMember(modelPath)))
@@ -762,15 +761,17 @@ public class FeatureProject extends BuilderMarkerHandler implements
 				checkConfigurations(changedConfigs);
 			}
 
-			if (!buildRelevantChanges && sourceFolder != null && sourceFolder.isAccessible()) {
-				if (currentConfig != null && composerExtension != null && composerExtension.hasFeatureFolders()) {
+			if (!buildRelevantChanges && sourceFolder != null
+					&& sourceFolder.isAccessible()) {
+				if (currentConfig != null && composerExtension != null
+						&& composerExtension.hasFeatureFolders()) {
 					// ignore changes in unselected feature folders
-					ArrayList<String> selectedFeatures = 
-						readFeaturesfromConfigurationFile(currentConfig.getRawLocation().toFile());
+					ArrayList<String> selectedFeatures = readFeaturesfromConfigurationFile(currentConfig
+							.getRawLocation().toFile());
 					for (IResource res : sourceFolder.members()) {
 						if (res instanceof IFolder) {
 							if (selectedFeatures.contains(res.getName())) {
-								checkSourceFolder((IFolder)res, event);
+								checkSourceFolder((IFolder) res, event);
 							}
 						}
 					}
@@ -778,11 +779,11 @@ public class FeatureProject extends BuilderMarkerHandler implements
 					checkSourceFolder(sourceFolder, event);
 				}
 			}
-			
+
 			if (composerExtension != null && buildFolder.isAccessible()) {
 				checkBuildFolder(buildFolder, event);
 			}
-			
+
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
@@ -799,8 +800,8 @@ public class FeatureProject extends BuilderMarkerHandler implements
 				IResourceDelta delta = event.getDelta().findMember(
 						res.getFullPath());
 				if (delta != null) {
-					if (delta.getKind() == IResourceDelta.ADDED || 
-							(delta.getFlags() & IResourceDelta.CONTENT) != 0) {
+					if (delta.getKind() == IResourceDelta.ADDED
+							|| (delta.getFlags() & IResourceDelta.CONTENT) != 0) {
 						buildRelevantChanges = true;
 						return true;
 					}
@@ -869,10 +870,11 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		Job job = new Job("Checking Configurations") {
 			protected IStatus run(IProgressMonitor monitor) {
 				Configuration config = new Configuration(featureModel, false);
-//				Configuration autoConfig = new Configuration(featureModel, true);
+				// Configuration autoConfig = new Configuration(featureModel,
+				// true);
 				ConfigurationReader reader = new ConfigurationReader(config);
-//				ConfigurationReader autoReader = new ConfigurationReader(
-//						autoConfig);
+				// ConfigurationReader autoReader = new ConfigurationReader(
+				// autoConfig);
 				try {
 					for (IFile file : files)
 						deleteConfigurationMarkers(file, IResource.DEPTH_ZERO);
@@ -881,23 +883,25 @@ public class FeatureProject extends BuilderMarkerHandler implements
 						reader.readFromFile(file);
 						if (!config.valid()) {
 							String name = file.getName();
-							name = name.substring(0,name.lastIndexOf('.'));
-							String message = "Configuration '" + name + "' is invalid";
+							name = name.substring(0, name.lastIndexOf('.'));
+							String message = "Configuration '" + name
+									+ "' is invalid";
 							createConfigurationMarker(file, message, 0,
 									IMarker.SEVERITY_ERROR);
 						}
 					}
-					//TODO check why we get an error with the following code
-//					// create warnings (e.g., for features that are not available anymore)
-//					for (IFile file : files) {
-//						autoReader.readFromFile(file);
-//						for (int i = 0; i < reader.getWarnings().size(); i++) {
-//							String message = autoReader.getWarnings().get(i);
-//							int line = autoReader.getPositions().get(i);
-//							createConfigurationMarker(file, message, line,
-//									IMarker.SEVERITY_WARNING);
-//						}
-//					}
+					// TODO check why we get an error with the following code
+					// // create warnings (e.g., for features that are not
+					// available anymore)
+					// for (IFile file : files) {
+					// autoReader.readFromFile(file);
+					// for (int i = 0; i < reader.getWarnings().size(); i++) {
+					// String message = autoReader.getWarnings().get(i);
+					// int line = autoReader.getPositions().get(i);
+					// createConfigurationMarker(file, message, line,
+					// IMarker.SEVERITY_WARNING);
+					// }
+					// }
 				} catch (OutOfMemoryError e) {
 					FMCorePlugin.getDefault().logError(e);
 				} catch (Exception e) {
@@ -1132,7 +1136,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	public void builded() {
 		buildRelevantChanges = false;
 	}
-	
+
 	public ArrayList<String> readFeaturesfromConfigurationFile(File file) {
 		if (!file.exists()) {
 			return null;
@@ -1157,7 +1161,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 				scanner.close();
 			}
 		}
-		return null;	
+		return null;
 	}
 
 }
