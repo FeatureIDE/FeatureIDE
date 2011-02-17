@@ -42,7 +42,6 @@ Export-Package: Jakarta.DRAttributes,
  org.sat4j.tools;uses:="org.sat4j.specs"
 Bundle-ClassPath: .,
  lib/guidsl.jar,
- lib/prop4j.jar,
  lib/jakarta.jar,
  lib/org.sat4j.core.jar
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

@@ -47,8 +47,9 @@ public class TModelComparator {
 	public void testRefactoring1() throws TimeoutException, UnsupportedModelException {
 		assertEquals(Comparison.REFACTORING, compare(
 				"S_ : S+ :: _S; S : A | B;",
-				"S : [A] [B] :: _S;"));
+				"S : [A] [B] :: _S; %% A or B;"));
 	}
+	//TODO warn the user when the feature model contains the empty product in an FOP project
 
 	/**
 	 * Refactoring: ALTERNATIVE => OR and constraint
@@ -88,6 +89,16 @@ public class TModelComparator {
 		assertEquals(Comparison.REFACTORING, compare(
 				"S : A | B;",
 				"S : T; T : A | B;"));
+	}
+
+	/**
+	 * Refactoring: move feature
+	 */
+	@Test
+	public void testRefactoring6() throws TimeoutException, UnsupportedModelException {
+		assertEquals(Comparison.REFACTORING, compare(
+				"S : [T] C :: _S; T : [A] B :: _T;",
+				"S : [T] [B] C :: _S; T : [A] :: _T; %% T iff B;"));
 	}
 
 	/**

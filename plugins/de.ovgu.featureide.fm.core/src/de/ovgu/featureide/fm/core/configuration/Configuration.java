@@ -182,7 +182,7 @@ public class Configuration {
 		SatSolver solver = new SatSolver(node, TIMEOUT);
 		for (Literal literal : solver.knownValues()) {
 			SelectableFeature feature = table.get(literal.var);
-			if (feature.getManual() == Selection.UNDEFINED)
+			if (feature != null && feature.getManual() == Selection.UNDEFINED)
 				feature.setAutomatic(literal.positive ? Selection.SELECTED
 						: Selection.UNSELECTED);
 		}
