@@ -42,7 +42,7 @@ public class AbstractAction extends SingleSelectionAction {
 
 	@Override
 	protected void updateProperties() {
-		setEnabled(feature.hasChildren());
+		setEnabled(true);
 		setChecked(feature.isAbstract());
 	}
 

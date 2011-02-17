@@ -22,7 +22,8 @@
 
 <!ATTLIST	feature 
 			name	CDATA ''
-			mandatory	(true | false)	'false'>
+			mandatory	(true | false)	'false'
+			abstract	(true | false)	'false'>
 			  
 <!ATTLIST	and 
 			name	CDATA ''

@@ -694,11 +694,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		} else {
 			if (feature.isConcrete() && folder.members().length == 0) {
 				message = "The feature module is empty.";
-				if (feature.canBeAbstract())
-					message += "You either should implement it or mark the feature as abstract.";
-				else
-					message += "You either should implement it or remove the feature from the feature model.";
-
+				message += "You either should implement it, mark the feature as abstract, or remove the feature from the feature model.";
 			} else if (feature.isAbstract() && folder.members().length > 0) {
 				message = "This feature module is ignored as the feature is marked as abstract.";
 			}

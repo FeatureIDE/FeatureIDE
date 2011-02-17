@@ -119,6 +119,7 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
     		fnod.setAttribute("name", feat.getName());
     		if(feat.isHidden())		fnod.setAttribute("hidden", "true");
         	if(feat.isMandatory())	fnod.setAttribute("mandatory", "true");
+        	if(feat.isAbstract())	fnod.setAttribute("abstract", "true");
         	node.appendChild(fnod);
     	}
     	else{

@@ -236,15 +236,8 @@ public class FeatureModel implements PropertyConstants {
 			parent.addChildAtPosition(index, feature.removeLastChild());
 
 		// delete feature
-		boolean deleteParent = parent.isAbstract()
-				&& parent.getChildrenCount() == 1;
 		parent.removeChild(feature);
 		featureTable.remove(name);
-
-		// delete parent if it has no children
-		if (deleteParent)
-			return deleteFeature(parent);
-
 		return true;
 	}
 

@@ -158,7 +158,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 									isMandatory = false;
 								}
 							}
-							else if (currentTag != "feature" && curName == "abstract") {
+							else if (curName == "abstract") {
 								if (curValue.equals("true")) {
 									isAbstract = true;
 								} else {

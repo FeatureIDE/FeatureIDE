@@ -81,18 +81,14 @@ public class FeatureDragAndDropCommand extends Command {
 
 	@Override
 	public void execute() {
-		boolean deleteParent = oldParent.isAbstract() && oldParent.getChildrenCount() == 1;
 		oldParent.removeChild(feature);
 		newParent.addChildAtPosition(newIndex, feature);
-		if (deleteParent)
-			featureModel.deleteFeature(oldParent);
 		featureModel.handleModelDataChanged();
 	}
 
 	@Override
 	public void undo() {
 		newParent.removeChild(feature);
-		//TODO #46: implement undo for deleted compound features 
 		if (oldParent != null) 
 			oldParent.addChildAtPosition(oldIndex, feature);
 		featureModel.handleModelDataChanged();

@@ -439,16 +439,9 @@ public class Feature implements PropertyConstants {
 		this.multiple = false;
 	}
 
-	/**
-	 * debug only
-	 */
 	@Override
 	public String toString() {
 		return name;
-	}
-
-	public boolean canBeAbstract() {
-		return !children.isEmpty();
 	}
 
 }

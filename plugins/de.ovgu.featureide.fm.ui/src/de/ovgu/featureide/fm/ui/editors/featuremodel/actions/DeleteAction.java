@@ -126,7 +126,6 @@ public class DeleteAction extends Action {
 		if (root != newRoot && !features.contains(newRoot))
 			return false;
 		
-		//check that the root has at least one child
-		return features.size() > 1;
+		return true;
 	}
 }
