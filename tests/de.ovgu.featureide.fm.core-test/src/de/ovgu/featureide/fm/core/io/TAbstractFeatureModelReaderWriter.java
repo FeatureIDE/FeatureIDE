@@ -60,7 +60,7 @@ public abstract class TAbstractFeatureModelReaderWriter {
 	// there should be an corresponding test case for the
 	// GuidslReader which tests the resulting FeatureModel directly
 
-	 protected static File MODEL_FILE_PATH = new
+	 protected static File MODEL_FILE_FOLDER = new
 	 File("/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/testFeatureModels/");
 
 
@@ -81,9 +81,13 @@ public abstract class TAbstractFeatureModelReaderWriter {
 	@Parameters
 	public static Collection<Object[]> getModels()
 			throws FileNotFoundException, UnsupportedModelException {
-
+		//first tries the location on build server, if this fails tries to use local location
+		if (!MODEL_FILE_FOLDER.canRead()){
+			MODEL_FILE_FOLDER = new File(ClassLoader.getSystemResource(
+			"testFeatureModels").getPath());;
+		}
 		Collection<Object[]> params = new ArrayList<Object[]>();
-		for (File f : MODEL_FILE_PATH.listFiles(getFileFilter(".xml"))) {
+		for (File f : MODEL_FILE_FOLDER.listFiles(getFileFilter(".xml"))) {
 			Object[] models = new Object[2];
 
 			FeatureModel fm = new FeatureModel();
