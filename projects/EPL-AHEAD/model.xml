@@ -3,15 +3,15 @@
 		<struct>
 			<and abstract="true" mandatory="true" name="ExpressionProductLine">
 				<and abstract="true" mandatory="true" name="Operations">
-					<feature mandatory="true" name="Kore"/>
-					<feature name="Print"/>
-					<feature name="Eval"/>
+					<feature abstract="true" mandatory="true" name="Kore"/>
+					<feature abstract="true" name="Print"/>
+					<feature abstract="true" name="Eval"/>
 				</and>
 				<and abstract="true" mandatory="true" name="Structs">
-					<feature mandatory="true" name="Core"/>
-					<feature mandatory="true" name="Num"/>
-					<feature name="Neg"/>
-					<feature name="Plus"/>
+					<feature abstract="true" mandatory="true" name="Core"/>
+					<feature abstract="true" mandatory="true" name="Num"/>
+					<feature abstract="true" name="Neg"/>
+					<feature abstract="true" name="Plus"/>
 				</and>
 				<and abstract="true" hidden="true" mandatory="true" name="Derivatives">
 					<feature mandatory="true" name="CK"/>
