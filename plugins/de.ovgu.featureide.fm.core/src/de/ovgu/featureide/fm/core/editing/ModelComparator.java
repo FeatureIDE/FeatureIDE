@@ -21,13 +21,14 @@ package de.ovgu.featureide.fm.core.editing;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Not;
-import org.prop4j.Or;
 import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
@@ -36,26 +37,26 @@ import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 
-
 /**
- * Compares two feature models based on a satisfiability solver. The result is
- * a classification of the edit that transforms one model into the second
- * model.
+ * Compares two feature models based on a satisfiability solver. The result is a
+ * classification of the edit that transforms one model into the second model.
  * 
  * @author Thomas Thuem
  */
 public class ModelComparator {
-	
+
 	private long timeout;
-	
-	private enum Strategy {WithoutIdenticalRules, SingleTesting, SingleTestingAborted};
-	
+
+	private enum Strategy {
+		WithoutIdenticalRules, SingleTesting, SingleTestingAborted
+	};
+
 	private Set<Strategy> strategy = new HashSet<Strategy>();
-	
+
 	private FeatureModel oldModel;
 
 	private FeatureModel newModel;
-	
+
 	private Set<String> addedFeatures;
 
 	private Set<String> deletedFeatures;
@@ -73,13 +74,13 @@ public class ModelComparator {
 	private Boolean implies;
 
 	private Boolean isImplied;
-	
+
 	private Comparison result;
-	
+
 	private ExampleCalculator addedProducts;
-	
+
 	private ExampleCalculator removedProducts;
-	
+
 	public ModelComparator(long timeout) {
 		this(timeout, 3);
 	}
@@ -100,13 +101,20 @@ public class ModelComparator {
 		try {
 			addedFeatures = calculateAddedFeatures(oldModel, newModel);
 			deletedFeatures = calculateAddedFeatures(newModel, oldModel);
-			replaceFeatures = calculateReplaceFeatures(oldModel, deletedFeatures, newModel, addedFeatures);
-
-			oldRoot = createNodes(oldModel, replaceFeatures);
-			newRoot = createNodes(newModel, replaceFeatures);
 			
-			oldRoot = createFalseStatementForConcreteVariables(addedFeatures, oldRoot);
-			newRoot = createFalseStatementForConcreteVariables(deletedFeatures, newRoot);
+			HashMap<Object, Node> oldMap = NodeCreator
+					.calculateReplacingMap(oldModel);
+			HashMap<Object, Node> newMap = NodeCreator
+					.calculateReplacingMap(newModel);
+			optimizeReplacingMaps(oldMap, newMap);
+
+			oldRoot = NodeCreator.createNodes(oldModel, oldMap);
+			newRoot = NodeCreator.createNodes(newModel, newMap);
+
+			oldRoot = createFalseStatementForConcreteVariables(addedFeatures,
+					oldRoot);
+			newRoot = createFalseStatementForConcreteVariables(deletedFeatures,
+					newRoot);
 
 			oldRootUpdated = removeIdenticalNodes(oldRoot, newRoot);
 			newRootUpdated = removeIdenticalNodes(newRoot, oldRoot);
@@ -118,21 +126,20 @@ public class ModelComparator {
 			isImplied = implies(newRoot, oldRootUpdated, addedProducts);
 
 			if (implies)
-				if (isImplied) 
+				if (isImplied)
 					result = Comparison.REFACTORING;
-				else 
+				else
 					result = Comparison.GENERALIZATION;
+			else if (isImplied)
+				result = Comparison.SPECIALIZATION;
 			else
-				if (isImplied) 
-					result = Comparison.SPECIALIZATION;
-				else 
-					result = Comparison.ARBITRARY;
+				result = Comparison.ARBITRARY;
 		} catch (OutOfMemoryError e) {
 			result = Comparison.OUTOFMEMORY;
 		} catch (TimeoutException e) {
 			result = Comparison.TIMEOUT;
 		} catch (Exception e) {
-			if(FMCorePlugin.getDefault() != null)
+			if (FMCorePlugin.getDefault() != null)
 				FMCorePlugin.getDefault().logError(e);
 			else
 				e.printStackTrace();
@@ -141,53 +148,38 @@ public class ModelComparator {
 		return result;
 	}
 
-	private Node createNodes(FeatureModel featureModel, Set<String> replaceFeatures) {
-		HashMap<Object, Node> replacingMap = calculateReplacingMap(replaceFeatures, featureModel);
-		return NodeCreator.createNodes(featureModel, replacingMap);
-	}
-
 	private Set<String> calculateAddedFeatures(FeatureModel oldModel,
 			FeatureModel newModel) {
 		Set<String> addedFeatures = new HashSet<String>();
 		for (Feature feature : newModel.getFeatures())
-		    if (feature.isConcrete()) {
+			if (feature.isConcrete()) {
 				String name = newModel.getOldName(feature.getName());
-				Feature associatedFeature = oldModel.getFeature(oldModel.getNewName(name));
+				Feature associatedFeature = oldModel.getFeature(oldModel
+						.getNewName(name));
 				if (associatedFeature == null || associatedFeature.isAbstract())
 					addedFeatures.add(name);
 			}
 		return addedFeatures;
 	}
 
-	private Set<String> calculateReplaceFeatures(FeatureModel oldModel,
-			Set<String> deletedFeatures, FeatureModel newModel,
-			Set<String> addedFeatures) {
-		Set<String> replaceFeatures = new HashSet<String>();
-		addReplaceFeatures(oldModel, newModel, replaceFeatures);
-		addReplaceFeatures(newModel, oldModel, replaceFeatures);
-		return replaceFeatures;
-	}
-
-	private void addReplaceFeatures(FeatureModel oldModel,
-			FeatureModel newModel, Set<String> replaceFeatures) {
-			for (Feature feature : oldModel.getFeatures()) {
-				String name = oldModel.getOldName(feature.getName());
-				Feature otherFeature = newModel.getFeature(newModel.getNewName(name));
-				if (feature.isAbstract() && !replaceFeatures.contains(name)) {
-					if (otherFeature == null || otherFeature.isLayer())
-						replaceFeatures.add(name);
-					else {
-						Node a = calculateReplacing(name, oldModel);
-						Node b = calculateReplacing(name, newModel);
-						if (!a.equals(b))
-							replaceFeatures.add(name);
-					}
-
-				}
+	private void optimizeReplacingMaps(HashMap<Object, Node> oldMap, HashMap<Object, Node> newMap) {
+		List<Object> toBeRemoved = new LinkedList<Object>();
+		for (Entry<Object, Node> entry : oldMap.entrySet())
+			if (newMap.containsKey(entry.getKey())) {
+				Object var = entry.getKey();
+				Node oldRepl = entry.getValue();
+				Node newRepl = newMap.get(entry.getKey());
+				if (oldRepl != null && oldRepl.equals(newRepl))
+					toBeRemoved.add(var);
 			}
+		for (Object var : toBeRemoved) {
+			oldMap.remove(var);
+			newMap.remove(var);
+		}
 	}
 
-	private Node createFalseStatementForConcreteVariables(Set<String> addedFeatures, Node node) {
+	private Node createFalseStatementForConcreteVariables(
+			Set<String> addedFeatures, Node node) {
 		if (addedFeatures.isEmpty())
 			return node;
 		LinkedList<Node> children = new LinkedList<Node>();
@@ -199,8 +191,10 @@ public class ModelComparator {
 	/**
 	 * Removes all child nodes that are contained in the reference node.
 	 * 
-	 * @param  node  the node to copy and remove from
-	 * @param  referenceNode  node that specifies what do remove
+	 * @param node
+	 *            the node to copy and remove from
+	 * @param referenceNode
+	 *            node that specifies what do remove
 	 * @return a copy of the node where some child nodes are not existent
 	 */
 	private Node removeIdenticalNodes(Node node, Node referenceNode) {
@@ -213,20 +207,22 @@ public class ModelComparator {
 		return updatedNodes.isEmpty() ? null : new And(updatedNodes);
 	}
 
-	private boolean implies(Node a, Node b, ExampleCalculator example) throws TimeoutException {
+	private boolean implies(Node a, Node b, ExampleCalculator example)
+			throws TimeoutException {
 		if (b == null)
 			return true;
-		
+
 		if (!strategy.contains(Strategy.SingleTesting)) {
 			Node node = new And(a.clone(), new Not(b.clone()));
 			SatSolver solver = new SatSolver(node, timeout);
 			boolean valid = !solver.isSatisfiable();
 			return valid;
 		}
-		
+
 		example.setLeft(a);
 		example.setRight(b);
-		return !example.findSatisfiable(strategy.contains(Strategy.SingleTestingAborted));
+		return !example.findSatisfiable(strategy
+				.contains(Strategy.SingleTestingAborted));
 	}
 
 	private boolean containedIn(Node node, Node[] nodes) {
@@ -235,60 +231,13 @@ public class ModelComparator {
 				return true;
 		return false;
 	}
-	
-	private HashMap<Object, Node> calculateReplacingMap(Set<String> replaceFeatures, FeatureModel featureModel) {
-		HashMap<Object, Node> map = new HashMap<Object, Node>();
-		for (Object var : replaceFeatures) {
-			Feature feature = getFeature(var, featureModel);
-			if (feature != null && feature.isAbstract()) {
-				Node replacing = calculateReplacing(var, featureModel);
-				replacing = NodeCreator.eliminateAbstractVariables(replacing, map);
-				updateMap(map, var, replacing);
-			}
-		}
-		return map;
+
+	public Configuration calculateExample(boolean added)
+			throws TimeoutException {
+		return added ? addedProducts.nextExample() : removedProducts
+				.nextExample();
 	}
 
-	/**
-	 * Replaces all occurrences of the given variable in values of the map. 
-	 */
-	private static void updateMap(HashMap<Object, Node> map, Object var, Node replacing) {
-		for (Object key : map.keySet()) {
-			Node value = map.get(key);
-			HashMap<Object, Node> tempMap = new HashMap<Object, Node>();
-			tempMap.put(var, replacing);
-			value = NodeCreator.eliminateAbstractVariables(value, tempMap);
-			map.put(key, value);
-		}
-		map.put(var, replacing);
-	}
-
-	public static Node calculateReplacing(Object var, FeatureModel featureModel) {
-		Feature feature = getFeature(var, featureModel);
-		return calculateReplacing(featureModel, feature);
-	}
-
-	private static Node calculateReplacing(FeatureModel featureModel,
-			Feature feature) {
-		LinkedList<Node> children = new LinkedList<Node>();
-		for (Feature child : feature.getChildren()) {
-			String var2 = featureModel.getOldName(child.getName());
-			children.add(new Literal(var2));
-		}
-		if (children.size() == 1)
-			return children.getFirst();
-		return new Or(children);
-	}
-
-	private static Feature getFeature(Object var, FeatureModel featureModel) {
-		String currentName = featureModel.getNewName((String) var);
-		return featureModel.getFeature(currentName);
-	}
-	
-	public Configuration calculateExample(boolean added) throws TimeoutException {
-		return added ? addedProducts.nextExample() : removedProducts.nextExample();
-	}
-	
 	public Set<Strategy> getStrategy() {
 		return strategy;
 	}

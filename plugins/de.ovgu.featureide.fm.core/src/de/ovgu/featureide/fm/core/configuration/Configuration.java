@@ -49,22 +49,26 @@ public class Configuration {
 
 	private Node rootNode;
 
-	private boolean propagate;
-
 	private FeatureModel featureModel;
 
+	private boolean propagate;
+
 	public Configuration(FeatureModel featureModel) {
-		this(featureModel, true);
+		this(featureModel, true, false);
 	}
 
 	public Configuration(FeatureModel featureModel, boolean propagate) {
+		this(featureModel, propagate, false);
+	}
+
+	public Configuration(FeatureModel featureModel, boolean propagate, boolean ignoreAbstractFeatures) {
 		this.featureModel = featureModel;
 		this.propagate = propagate;
 
 		root = new SelectableFeature(this, featureModel.getRoot());
 		initFeatures(root, featureModel.getRoot());
 
-		rootNode = NodeCreator.createNodes(featureModel);
+		rootNode = NodeCreator.createNodes(featureModel, ignoreAbstractFeatures);
 		rootNode = rootNode.toCNF();
 
 		updateAutomaticValues();

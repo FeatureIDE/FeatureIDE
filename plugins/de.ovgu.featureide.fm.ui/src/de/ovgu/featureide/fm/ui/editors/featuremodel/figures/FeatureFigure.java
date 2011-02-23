@@ -73,11 +73,11 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 			setLocation(FeatureUIHelper.getLocation(feature));
 	}
 	
-	public void setAbstract(boolean compound) {
-		setBorder(compound ? COMPOUND_BORDER : LAYER_BORDER);
-		setBackgroundColor(compound ? COMPOUND_BACKGROUND : LAYER_BACKGROUND);
+	public void setAbstract(boolean isAbstract) {
+		setBorder(isAbstract ? ABSTRACT_BORDER : CONCRETE_BORDER);
+		setBackgroundColor(isAbstract ? ABSTRACT_BACKGROUND : CONCRETE_BACKGROUND);
 		
-		String toolTip = compound ? " Compound Feature " : " Feature ";
+		String toolTip = isAbstract ? " Abstract Feature " : " Concrete Feature ";
 		setToolTip(new Label(toolTip));
 	}
 

@@ -48,18 +48,18 @@ public interface GUIDefaults {
 	
 	public static Color DIAGRAM_BACKGROUND = ColorConstants.white;
 
-	//features (layer and compound features)
+	//concrete and abstract features
 	
 	public static Color FEATURE_FOREGROUND = GUIBasics.createColor(0.0, 0.0, 0.0);
 	public static Insets FEATURE_INSETS = new Insets(3, 6, 3, 6);//4, 8, 4, 8
 
-	public static Color LAYER_BACKGROUND = GUIBasics.createColor(0.8, 0.8, 1.0);
-	public static Color LAYER_BORDER_COLOR = GUIBasics.createBorderColor(LAYER_BACKGROUND);
-	public static Border LAYER_BORDER = new LineBorder(LAYER_BORDER_COLOR, 1);
+	public static Color CONCRETE_BACKGROUND = GUIBasics.createColor(0.8, 0.8, 1.0);
+	public static Color CONCRETE_BORDER_COLOR = GUIBasics.createBorderColor(CONCRETE_BACKGROUND);
+	public static Border CONCRETE_BORDER = new LineBorder(CONCRETE_BORDER_COLOR, 1);
 
-	public static Color COMPOUND_BACKGROUND = GUIBasics.createColor(0.95, 0.95, 1.0);
-	public static Color COMPOUND_BORDER_COLOR = GUIBasics.createBorderColor(COMPOUND_BACKGROUND);
-	public static Border COMPOUND_BORDER = new LineBorder(COMPOUND_BORDER_COLOR, 1);
+	public static Color ABSTRACT_BACKGROUND = GUIBasics.createColor(0.95, 0.95, 1.0);
+	public static Color ABSTRACT_BORDER_COLOR = GUIBasics.createBorderColor(ABSTRACT_BACKGROUND);
+	public static Border ABSTRACT_BORDER = new LineBorder(ABSTRACT_BORDER_COLOR, 1);
 
 	//connections and decorators
 	

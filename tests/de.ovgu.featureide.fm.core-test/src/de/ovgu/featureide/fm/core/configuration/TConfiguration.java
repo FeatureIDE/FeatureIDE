@@ -18,15 +18,16 @@
  */
 package de.ovgu.featureide.fm.core.configuration;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslReader;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 
 /**
  * Tests belonging to feature selections called configurations.
@@ -35,85 +36,125 @@ import de.ovgu.featureide.fm.core.io.guidsl.GuidslReader;
  * @author Fabian Benduhn
  */
 public class TConfiguration {
-	
-	String fm = "S : [A] [B] C :: _S; %% not B;";
+
+	public static FeatureModel fm = loadGUIDSL("S : [A] [B] C :: _S; %% not B;");
 
 	@Test
-	public void testValid1() throws TimeoutException, UnsupportedModelException {
-		Configuration c = createConfiguration(fm, false);
-		c.setManual("S", Selection.SELECTED);
+	public void testSelection1() {
+		Configuration c = new Configuration(fm, false);
 		c.setManual("C", Selection.SELECTED);
 		assertTrue(c.valid());
+		assertEquals(2, c.number());
 	}
 
 	@Test
-	public void testValid2() throws TimeoutException, UnsupportedModelException {
-		Configuration c = createConfiguration(fm, true);
+	public void testSelection2() {
+		Configuration c = new Configuration(fm, true);
 		assertTrue(c.valid());
+		assertEquals(2, c.number());
 	}
 
 	@Test
-	public void testValid3() throws TimeoutException, UnsupportedModelException {
-		Configuration c = createConfiguration(fm, false);
-		c.setManual("S", Selection.SELECTED);
+	public void testSelection3() {
+		Configuration c = new Configuration(fm, false);
 		c.setManual("A", Selection.SELECTED);
 		c.setManual("C", Selection.SELECTED);
 		assertTrue(c.valid());
+		assertEquals(1, c.number());
 	}
 
 	@Test
-	public void testValid4() throws TimeoutException, UnsupportedModelException {
-		Configuration c = createConfiguration(fm, true);
+	public void testSelection4() {
+		Configuration c = new Configuration(fm, true);
 		c.setManual("A", Selection.SELECTED);
 		assertTrue(c.valid());
+		assertEquals(1, c.number());
 	}
 
-//	@Test
-//	public void testValid5() throws TimeoutException, UnsupportedModelException {
-//		Configuration c = createConfiguration(fm, false);
-//		c.setManual("C", Selection.SELECTED);
-//		assertTrue(c.validManually());
-//	}
-//
-//	@Test
-//	public void testValid6() throws TimeoutException, UnsupportedModelException {
-//		Configuration c = createConfiguration(fm, true);
-//		assertTrue(!c.validManually());
-//	}
-//
-//	@Test
-//	public void testValid7() throws TimeoutException, UnsupportedModelException {
-//		Configuration c = createConfiguration(fm, false);
-//		c.setManual("A", Selection.SELECTED);
-//		c.setManual("C", Selection.SELECTED);
-//		assertTrue(c.validManually());
-//	}
-//
-//	@Test
-//	public void testValid8() throws TimeoutException, UnsupportedModelException {
-//		Configuration c = createConfiguration(fm, true);
-//		c.setManual("A", Selection.SELECTED);
-//		assertTrue(!c.validManually());
-//	}
-
 	@Test
-	public void testValid9() throws TimeoutException, UnsupportedModelException {
-		Configuration c = createConfiguration(fm, true);
+	public void testSelection5() {
+		Configuration c = new Configuration(fm, true);
 		try {
 			c.setManual("B", Selection.SELECTED);
+			assertTrue(false);
 		} catch (SelectionNotPossibleException e) {
 			assertTrue(true);
 		}
 	}
 
-	private Configuration createConfiguration(String fm, boolean propagate) throws UnsupportedModelException {
-		return new Configuration(readModel(fm), propagate);
+	@Test
+	public void testNumber1() {
+		FeatureModel fm = loadXML("<and name=\"S\">" + "<feature name=\"A\"/>"
+				+ "<feature mandatory=\"true\" name=\"B\"/>"
+				+ "<feature name=\"C\"/>" + "</and>");
+		Configuration c = new Configuration(fm);
+		assertEquals(4, c.number());
 	}
 
-	private FeatureModel readModel(String grammar) throws UnsupportedModelException {
+	@Test
+	public void testNumber2() {
+		FeatureModel fm = loadXML("<or name=\"S\">" + "<feature name=\"A\"/>"
+				+ "<feature name=\"B\"/>" + "<feature name=\"C\"/>" + "</or>");
+		Configuration c = new Configuration(fm);
+		assertEquals(7, c.number());
+	}
+
+	@Test
+	public void testNumber3() {
+		FeatureModel fm = loadXML("<alt name=\"S\">" + "<feature name=\"A\"/>"
+				+ "<feature name=\"B\"/>" + "<feature name=\"C\"/>" + "</alt>");
+		Configuration c = new Configuration(fm);
+		assertEquals(3, c.number());
+	}
+
+	@Test
+	public void testNumber4() {
+		FeatureModel fm = loadXML("<and name=\"S\">" + "<feature name=\"A\"/>"
+				+ "<feature mandatory=\"true\" name=\"B\"/>"
+				+ "<feature abstract=\"true\" name=\"C\"/>" + "</and>");
+		Configuration c = new Configuration(fm);
+		assertEquals(2, c.number());
+	}
+
+	@Test
+	public void testNumber5() {
+		FeatureModel fm = loadXML("<or name=\"S\">" + "<feature name=\"A\"/>"
+				+ "<feature name=\"B\"/>"
+				+ "<feature abstract=\"true\" name=\"C\"/>" + "</or>");
+		Configuration c = new Configuration(fm);
+		assertEquals(4, c.number());
+	}
+
+	@Test
+	public void testNumber6() {
+		FeatureModel fm = loadXML("<alt name=\"S\">" + "<feature name=\"A\"/>"
+				+ "<feature name=\"B\"/>"
+				+ "<feature abstract=\"true\" name=\"C\"/>" + "</alt>");
+		Configuration c = new Configuration(fm);
+		assertEquals(3, c.number());
+	}
+
+	private static FeatureModel loadGUIDSL(String grammar) {
 		FeatureModel fm = new FeatureModel();
 		IFeatureModelReader reader = new GuidslReader(fm);
-		reader.readFromString(grammar);
+		try {
+			reader.readFromString(grammar);
+		} catch (UnsupportedModelException e) {
+			assertTrue(false);
+		}
+		return fm;
+	}
+
+	private static FeatureModel loadXML(String xml) {
+		xml = "<featureModel><struct>" + xml;
+		xml += "</struct></featureModel>";
+		FeatureModel fm = new FeatureModel();
+		IFeatureModelReader reader = new XmlFeatureModelReader(fm);
+		try {
+			reader.readFromString(xml);
+		} catch (UnsupportedModelException e) {
+			assertTrue(false);
+		}
 		return fm;
 	}
 

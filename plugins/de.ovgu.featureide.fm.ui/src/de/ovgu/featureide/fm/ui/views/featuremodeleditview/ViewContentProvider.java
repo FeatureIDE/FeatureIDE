@@ -153,20 +153,10 @@ public class ViewContentProvider implements IStructuredContentProvider,
 		invisibleRoot.addChild(new ExampleParent(false, comparator, 1));
 
 		invisibleRoot.addChild("");
-		addStatistics(oldModel, newModel);
+		addStatistics(invisibleRoot, "Statistics on before edit version", oldModel);
+		addStatistics(invisibleRoot, "Statistics on after edit version", newModel);
 		
 		refresh();
-	}
-
-	private void addStatistics(final FeatureModel oldModel, final FeatureModel newModel) {
-		TreeParent statistics = new TreeParent("Statistics", null, true) {
-			@Override
-			public void initChildren() {
-				addStatistics(this, "Before edit version", oldModel);
-				addStatistics(this, "After edit version", newModel);
-			}
-		};
-		invisibleRoot.addChild(statistics);
 	}
 
 	private void addStatistics(TreeParent statistics, String text, final FeatureModel model) {
@@ -185,20 +175,37 @@ public class ViewContentProvider implements IStructuredContentProvider,
 				addChild("Number of features: " + features);
 				addChild("Number of concrete features: " + concrete);
 				addChild("Number of abstract features: " + (features - concrete));
-				addChild("Number of terminal features: " + terminal);
-				addChild("Number of non-terminal features: " + (features - terminal));
+				addChild("Number of primitive features: " + terminal);
+				addChild("Number of compound features: " + (features - terminal));
+				addChild(new TreeParent("Number of configurations (calculation may take some time)", null, true) {
+					/* (non-Javadoc)
+					 * @see de.ovgu.featureide.fm.ui.views.featuremodeleditview.TreeParent#initChildren()
+					 */
+					@Override
+					public void initChildren() {
+						long number = new Configuration(model, false, true).number(60*1000);
+						String s = "";
+						if (number < 0)
+							s += "more than " + (-1 - number);
+						else
+							s += number;
+						s += " configurations";
+						addChild(s);
+					}
+				});
 				addChild(new TreeParent("Number of program variants (calculation may take some time)", null, true) {
 					/* (non-Javadoc)
 					 * @see de.ovgu.featureide.fm.ui.views.featuremodeleditview.TreeParent#initChildren()
 					 */
 					@Override
 					public void initChildren() {
-						long number = new Configuration(model).number(60*1000);
+						long number = new Configuration(model, false, false).number(60*1000);
 						String s = "";
 						if (number < 0)
-							s += "more than " + (-1 - number) + " variants";
+							s += "more than " + (-1 - number);
 						else
-							s += number + " variants";
+							s += number;
+						s += " program variants";
 						addChild(s);
 					}
 				});
