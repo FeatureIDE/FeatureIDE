@@ -31,70 +31,76 @@
 		</struct>
 		<constraints>
 			<rule>
-				<imp>
+				<eq>
 					<var>Neg</var>
 					<var>NK</var>
-				</imp>
+				</eq>
 			</rule>
 			<rule>
-				<imp>
+				<eq>
 					<var>Plus</var>
 					<var>PK</var>
-				</imp>
+				</eq>
 			</rule>
 			<rule>
-				<imp>
-					<var>Eval</var>
-					<conj>
+				<conj>
+					<eq>
+						<var>Eval</var>
 						<var>CE</var>
+					</eq>
+					<eq>
+						<var>Eval</var>
 						<var>BE</var>
-					</conj>
-				</imp>
+					</eq>
+				</conj>
 			</rule>
 			<rule>
-				<imp>
-					<var>Print</var>
-					<conj>
+				<conj>
+					<eq>
+						<var>Print</var>
 						<var>CP</var>
+					</eq>
+					<eq>
+						<var>Print</var>
 						<var>BP</var>
-					</conj>
-				</imp>
+					</eq>
+				</conj>
 			</rule>
 			<rule>
-				<imp>
+				<eq>
 					<conj>
 						<var>Neg</var>
 						<var>Eval</var>
 					</conj>
 					<var>NE</var>
-				</imp>
+				</eq>
 			</rule>
 			<rule>
-				<imp>
-					<conj>
-						<var>Plus</var>
-						<var>Eval</var>
-					</conj>
-					<var>PE</var>
-				</imp>
-			</rule>
-			<rule>
-				<imp>
+				<eq>
 					<conj>
 						<var>Neg</var>
 						<var>Print</var>
 					</conj>
 					<var>NP</var>
-				</imp>
+				</eq>
 			</rule>
 			<rule>
-				<imp>
+				<eq>
+					<conj>
+						<var>Plus</var>
+						<var>Eval</var>
+					</conj>
+					<var>PE</var>
+				</eq>
+			</rule>
+			<rule>
+				<eq>
 					<conj>
 						<var>Plus</var>
 						<var>Print</var>
 					</conj>
 					<var>PP</var>
-				</imp>
+				</eq>
 			</rule>
 		</constraints>
 		<comments>
