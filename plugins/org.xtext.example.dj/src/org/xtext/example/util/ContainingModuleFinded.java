@@ -35,7 +35,7 @@ public class ContainingModuleFinded extends DJSwitch<Module>
 	  	if (c == null) return null;
 	    EObject current = c;
 	    EObject owner = null;
-	    //FIXME XTEXT
+	    //FIX ME XTEXT
 	    while (owner == null) {
 	      current = current.eContainer();
 	      if(current == null) return null; //NEW
@@ -48,7 +48,7 @@ public class ContainingModuleFinded extends DJSwitch<Module>
   public Module lookup(Parameter c) {
 	    EObject current = c;
 	    EObject owner = null;
-	    //FIXME XTEXT
+	    //FIX ME XTEXT
 	    while (owner == null) {
 	      current = current.eContainer();
 	      if(current == null) return null; //NEW
@@ -61,7 +61,7 @@ public class ContainingModuleFinded extends DJSwitch<Module>
   public Module lookup(AddsClass c) {
     EObject current = c;
     EObject owner = null;
-    //FIXME XTEXT
+    //FIX ME XTEXT
     while (owner == null) {
       current = current.eContainer();
       if(current == null) return null; //NEW
@@ -74,7 +74,7 @@ public class ContainingModuleFinded extends DJSwitch<Module>
   public Module lookup(RemoveClass c) {
     EObject current = c;
     EObject owner = null;
-    //FIXME XTEXT
+    //FIX ME XTEXT
     while (owner == null) {
       current = current.eContainer();
       if(current == null) return null; //NEW
@@ -87,7 +87,7 @@ public class ContainingModuleFinded extends DJSwitch<Module>
   public Module lookup(Classm c) {
     EObject current = c;
     EObject owner = null;
-    //FIXME XTEXT
+    //FIX ME XTEXT
     while (owner == null) {
       current = current.eContainer();
       if(current == null) return null; //NEW

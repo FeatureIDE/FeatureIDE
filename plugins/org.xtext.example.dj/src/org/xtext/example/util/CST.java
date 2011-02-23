@@ -23,7 +23,7 @@ public class CST
   private List<Constructor> constructor = new LinkedList<Constructor>();
   private String extending = new String();
 
-  //FIXME XTEXT null-checks added
+  //FIX ME XTEXT null-checks added
   public CST(Class c) {
 	  this.c = c;
     for (Method m : c.getMethod())

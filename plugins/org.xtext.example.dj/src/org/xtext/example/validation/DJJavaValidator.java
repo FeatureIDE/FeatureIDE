@@ -773,7 +773,7 @@ public class DJJavaValidator extends AbstractDJJavaValidator{
 									classMapApply.remove(c.getName());
 								}
 							}
-							//FIXME XTEXT null-cheks added
+							//FIX ME XTEXT null-cheks added
 							else if (cm != null && cm.getModifies() != null && cm.getAction() != null && cm.getAction().equals("modifies")) {
 								Class c = cm.getModifies().getClass_();
 								if (c != null && classMapApply != null && !classMapApply.containsKey(c.getName())){
@@ -1135,7 +1135,7 @@ public class DJJavaValidator extends AbstractDJJavaValidator{
 							if (type.getClassType() != null)
 								if (classMapApply.get(type.getClassType().getName()) == null && pTemp.equals(p)) 
 									error("This class doesn't exists in this configuration", expression, Integer.valueOf(31));
-								//FIXME XTEXT null-checks added
+								//FIX ME XTEXT null-checks added
 								else if (expression != null && expression.getMessage() != null && expression.getMessage().getMethodCall() != null &&
 										 expression.getMessage().getMethodCall() != null && pTemp.equals(p)) {
 									if (!classMapApply.get(type.getClassType().getName()).containsMethod(expression.getMessage().getMethodCall().getName().getName()) && pTemp.equals(p))
