@@ -18,7 +18,6 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.editparts;
 
-
 import java.util.LinkedList;
 import java.util.List;
 
@@ -36,23 +35,24 @@ import de.ovgu.featureide.ui.views.collaboration.model.Class;
 import de.ovgu.featureide.ui.views.collaboration.model.Collaboration;
 import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModel;
 
-
 /**
  * 
  * 
  * @author Constanze Adler
  */
 public class ModelEditPart extends AbstractGraphicalEditPart {
-	
-	public ModelEditPart(CollaborationModel model){
+
+	public ModelEditPart(CollaborationModel model) {
 		setModel(model);
 	}
-	
-	public CollaborationModel getCollaborationModel(){
+
+	public CollaborationModel getCollaborationModel() {
 		return (CollaborationModel) getModel();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.gef.editparts.AbstractGraphicalEditPart#createFigure()
 	 */
 	@Override
@@ -64,34 +64,33 @@ public class ModelEditPart extends AbstractGraphicalEditPart {
 		return fig;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.gef.editparts.AbstractEditPart#createEditPolicies()
 	 */
 	@Override
 	protected void createEditPolicies() {
-		//TODO get other editPolicy()
 		installEditPolicy(EditPolicy.LAYOUT_ROLE, new ClassXYLayoutPolicy());
 	}
 
 	@Override
-	protected List<?> getModelChildren(){
-		CollaborationModel model= getCollaborationModel();
+	protected List<?> getModelChildren() {
+		CollaborationModel model = getCollaborationModel();
 		List<Object> list = new LinkedList<Object>();
 		addCollaboration(model.getCollaborations(), list);
-		addClass(model.getClasses(),list);
-		return list;		
+		addClass(model.getClasses(), list);
+		return list;
 	}
-	
-	private void addCollaboration(List<Collaboration> cols, List<Object> list){
-		for (Collaboration c : cols){
+
+	private void addCollaboration(List<Collaboration> cols, List<Object> list) {
+		for (Collaboration c : cols)
 			list.add(c);
-		}
 	}
-	
-	private void addClass(List<Class> classes, List<Object> list){
-		for (Class c: classes){
+
+	private void addClass(List<Class> classes, List<Object> list) {
+		for (Class c : classes)
 			list.add(c);
-		}
 	}
 
 }

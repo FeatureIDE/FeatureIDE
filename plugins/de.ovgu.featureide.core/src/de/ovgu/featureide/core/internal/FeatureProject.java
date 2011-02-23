@@ -74,7 +74,6 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
  * @author Marcus Leich
  * @author Thomas Thuem
  * @author Tom Brosch
- * 
  */
 public class FeatureProject extends BuilderMarkerHandler implements
 		IFeatureProject, IResourceChangeListener {
@@ -729,7 +728,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			// markers
 			if (event.findMarkerDeltas(FEATURE_MODULE_MARKER, false).length == 0) {
 				// TODO is this needed, causes MarkerNotFoun exception
-			 setAllFeatureModuleMarkers(featureModel, sourceFolder);
+				setAllFeatureModuleMarkers(featureModel, sourceFolder);
 			}
 		}
 

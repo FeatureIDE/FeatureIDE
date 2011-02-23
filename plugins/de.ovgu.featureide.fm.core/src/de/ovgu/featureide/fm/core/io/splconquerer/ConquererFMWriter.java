@@ -54,16 +54,13 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
 
 /**
- * Prints a feature model in XML format.
+ * Prints a feature model in SPLConqueror format.
  * 
  * @author Dariusz Krolikowski
  * @author Maik Lampe
  * @author Thomas Thuem
  */
 public class ConquererFMWriter extends AbstractFeatureModelWriter {
-	//TODO is this constructor needed?	
-	public ConquererFMWriter() {
-	}
 	
 	/**
 	 * Creates a new writer and sets the feature model to write out.
