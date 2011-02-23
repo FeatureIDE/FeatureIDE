@@ -11,13 +11,13 @@
 						</and>
 					</alt>
 					<alt abstract="true" name="Implementation">
-						<feature mandatory="true" name="NoEdges"/>
-						<feature mandatory="true" name="OnlyNeighbors"/>
-						<feature mandatory="true" name="Edges"/>
+						<feature abstract="true" mandatory="true" name="NoEdges"/>
+						<feature abstract="true" mandatory="true" name="OnlyNeighbors"/>
+						<feature abstract="true" mandatory="true" name="Edges"/>
 					</alt>
 					<alt abstract="true" name="GraphType">
-						<feature mandatory="true" name="Directed"/>
-						<feature mandatory="true" name="Undirected"/>
+						<feature abstract="true" mandatory="true" name="Directed"/>
+						<feature abstract="true" mandatory="true" name="Undirected"/>
 					</alt>
 					<alt abstract="true" hidden="true" name="GraphTypeReal">
 						<and abstract="true" mandatory="true" name="DirType">
@@ -39,11 +39,11 @@
 					</alt>
 					<alt abstract="true" name="Weight">
 						<and abstract="true" mandatory="true" name="Wgt">
-							<feature mandatory="true" name="Weighted"/>
+							<feature abstract="true" mandatory="true" name="Weighted"/>
 							<feature hidden="true" name="WeightedCommon"/>
 							<feature hidden="true" name="dProgdWeightedCommon"/>
 						</and>
-						<feature mandatory="true" name="UnWeighted"/>
+						<feature abstract="true" mandatory="true" name="UnWeighted"/>
 					</alt>
 					<alt abstract="true" hidden="true" name="WeightReal">
 						<feature mandatory="true" name="WeightedGR"/>
@@ -85,7 +85,7 @@
 							<feature mandatory="true" name="MSTKruskal"/>
 							<feature hidden="true" name="dProgdMSTKruskal"/>
 						</and>
-						<feature mandatory="true" name="Shortest"/>
+						<feature abstract="true" mandatory="true" name="Shortest"/>
 					</or>
 				</and>
 			</alt>
