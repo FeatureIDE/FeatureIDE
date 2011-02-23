@@ -35,7 +35,6 @@ import de.ovgu.featureide.fm.core.editing.ModelComparator;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.views.FeatureModelEditView;
 
-
 /**
  * Calculates the edit category and provides as a content to the view.
  * 
@@ -43,7 +42,7 @@ import de.ovgu.featureide.fm.ui.views.FeatureModelEditView;
  */
 public class ViewContentProvider implements IStructuredContentProvider,
 		ITreeContentProvider {
-	
+
 	private static final String DEFAULT_MESSAGE = "Open a feature model.";
 	private static final String CALCULATING_MESSAGE = "Calculating...";
 
@@ -56,8 +55,9 @@ public class ViewContentProvider implements IStructuredContentProvider,
 	private static final Image ZERO_IMAGE = FMUIPlugin.getImage("zero.gif");
 	private static final Image PLUS_IMAGE = FMUIPlugin.getImage("plus.gif");
 	private static final Image MINUS_IMAGE = FMUIPlugin.getImage("minus.gif");
-	private static final Image PLUS_MINUS_IMAGE = FMUIPlugin.getImage("plusminus.gif");
-	
+	private static final Image PLUS_MINUS_IMAGE = FMUIPlugin
+			.getImage("plusminus.gif");
+
 	/**
 	 * time in seconds after the calculation is aborted by the SAT solver
 	 */
@@ -111,7 +111,8 @@ public class ViewContentProvider implements IStructuredContentProvider,
 		if (oldModel.getRoot() == null || newModel.getRoot() == null)
 			return;
 
-		invisibleRoot.setChild(new TreeObject(CALCULATING_MESSAGE, DEFAULT_IMAGE));
+		invisibleRoot.setChild(new TreeObject(CALCULATING_MESSAGE,
+				DEFAULT_IMAGE));
 		refresh();
 
 		long start = System.nanoTime();
@@ -135,7 +136,7 @@ public class ViewContentProvider implements IStructuredContentProvider,
 			image = PLUS_MINUS_IMAGE;
 		} else if (comparison == Comparison.OUTOFMEMORY) {
 			message = "Out of memory error!";
-			image = ERROR_IMAGE; 
+			image = ERROR_IMAGE;
 		} else if (comparison == Comparison.TIMEOUT) {
 			message = "SAT4J time out!";
 			image = ERROR_IMAGE;
@@ -144,22 +145,25 @@ public class ViewContentProvider implements IStructuredContentProvider,
 			image = ERROR_IMAGE;
 		}
 
-		message += " (" + (System.nanoTime() - start)/1000000 + "msec)";
+		message += " (" + (System.nanoTime() - start) / 1000000 + "msec)";
 		TreeObject result = new TreeObject(message, image);
 		invisibleRoot.setChild(result);
-		
+
 		invisibleRoot.addChild("");
 		invisibleRoot.addChild(new ExampleParent(true, comparator, 1));
 		invisibleRoot.addChild(new ExampleParent(false, comparator, 1));
 
 		invisibleRoot.addChild("");
-		addStatistics(invisibleRoot, "Statistics on before edit version", oldModel);
-		addStatistics(invisibleRoot, "Statistics on after edit version", newModel);
-		
+		addStatistics(invisibleRoot, "Statistics on before edit version",
+				oldModel);
+		addStatistics(invisibleRoot, "Statistics on after edit version",
+				newModel);
+
 		refresh();
 	}
 
-	private void addStatistics(TreeParent statistics, String text, final FeatureModel model) {
+	private void addStatistics(TreeParent statistics, String text,
+			final FeatureModel model) {
 		TreeParent parent = new TreeParent(text, null, true) {
 			@Override
 			public void initChildren() {
@@ -168,50 +172,45 @@ public class ViewContentProvider implements IStructuredContentProvider,
 				int terminal = model.countTerminalFeatures();
 
 				try {
-					addChild("Featur model is valid (not void): " + model.isValid());
+					addChild("Featur model is valid (not void): "
+							+ model.isValid());
 				} catch (TimeoutException e) {
 					addChild("Featur model is valid (not void): timeout");
 				}
 				addChild("Number of features: " + features);
 				addChild("Number of concrete features: " + concrete);
-				addChild("Number of abstract features: " + (features - concrete));
+				addChild("Number of abstract features: "
+						+ (features - concrete));
 				addChild("Number of primitive features: " + terminal);
-				addChild("Number of compound features: " + (features - terminal));
-				addChild(new TreeParent("Number of configurations (calculation may take some time)", null, true) {
-					/* (non-Javadoc)
-					 * @see de.ovgu.featureide.fm.ui.views.featuremodeleditview.TreeParent#initChildren()
-					 */
-					@Override
-					public void initChildren() {
-						long number = new Configuration(model, false, true).number(60*1000);
-						String s = "";
-						if (number < 0)
-							s += "more than " + (-1 - number);
-						else
-							s += number;
-						s += " configurations";
-						addChild(s);
-					}
-				});
-				addChild(new TreeParent("Number of program variants (calculation may take some time)", null, true) {
-					/* (non-Javadoc)
-					 * @see de.ovgu.featureide.fm.ui.views.featuremodeleditview.TreeParent#initChildren()
-					 */
-					@Override
-					public void initChildren() {
-						long number = new Configuration(model, false, false).number(60*1000);
-						String s = "";
-						if (number < 0)
-							s += "more than " + (-1 - number);
-						else
-							s += number;
-						s += " program variants";
-						addChild(s);
-					}
-				});
+				addChild("Number of compound features: "
+						+ (features - terminal));
+				addChild(calculateNumberOfVariants(model, true));
+				addChild(calculateNumberOfVariants(model, false));
 			}
+
 		};
 		statistics.addChild(parent);
+	}
+
+	private TreeParent calculateNumberOfVariants(
+			final FeatureModel model,
+			final boolean ignoreAbstractFeatures) {
+		final String variants = ignoreAbstractFeatures ? "configurations"
+				: "program variants";
+		return new TreeParent("Number of " + variants, null, true) {
+			@Override
+			public void initChildren() {
+				long number = new Configuration(model, false,
+						ignoreAbstractFeatures).number(5 * 1000);
+				String s = "";
+				if (number < 0)
+					s += "more than " + (-1 - number);
+				else
+					s += number;
+				s += " " + variants;
+				addChild(s);
+			}
+		};
 	}
 
 	private void refresh() {
