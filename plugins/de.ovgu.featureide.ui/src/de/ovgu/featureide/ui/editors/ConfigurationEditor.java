@@ -137,7 +137,7 @@ PropertyConstants, PropertyChangeListener, IResourceChangeListener {
 		getSite().getPage().addPartListener(iPartListener);
 		IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
 		featureModel = featureProject.getFeatureModel();
-		configuration = new Configuration(featureModel, true);
+		configuration = new Configuration(featureModel, true, true);
 		try {
 			new ConfigurationReader(configuration).readFromFile(file);
 			isPageModified = isModified(file);

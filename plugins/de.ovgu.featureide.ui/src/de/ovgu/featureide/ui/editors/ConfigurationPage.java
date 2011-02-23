@@ -213,13 +213,15 @@ public class ConfigurationPage extends EditorPart {
 	}
 	
 	private String getRootlabel(){
+		//TODO @Jens remove duplicate code
 		String s = configurationEditor.configuration.valid() ? "valid" : "invalid";
 		s += ", ";
 		long number = configurationEditor.configuration.number();
 		if (number < 0)
-			s += "more than " + (-1 - number) + " solutions";
+			s += "more than " + (-1 - number);
 		else
-			s += number + " solutions";
+			s += number;
+		s += " possible configurations";
 		return configurationEditor.configuration.getRoot().getName() + " (" + s + ")";
 	}
 	

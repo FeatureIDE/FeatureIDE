@@ -51,15 +51,17 @@ public class AdvancedConfigurationLabelProvider extends LabelProvider {
 	public String getText(Object o) {
 		if (o instanceof SelectableFeature) {
 			SelectableFeature feature = (SelectableFeature) o;
+			//TODO @Jens remove duplicate code
 			if (feature.getParent() == null) {
 				Configuration configuration = feature.getConfiguration();
 				String s = configuration.valid() ? "valid" : "invalid";
 				s += ", ";
 				long number = configuration.number();
 				if (number < 0)
-					s += "more than " + (-1 - number) + " solutions";
+					s += "more than " + (-1 - number);
 				else
-					s += number + " solutions";
+					s += number;
+				s += " possible configurations";
 				return feature.getName() + " (" + s + ")";
 			}
 			return feature.getName();
