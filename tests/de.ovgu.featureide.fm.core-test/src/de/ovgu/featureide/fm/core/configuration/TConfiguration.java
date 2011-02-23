@@ -74,12 +74,13 @@ public class TConfiguration {
 	@Test
 	public void testSelection5() {
 		Configuration c = new Configuration(fm, true);
+		boolean exception = false;
 		try {
 			c.setManual("B", Selection.SELECTED);
-			assertTrue(false);
 		} catch (SelectionNotPossibleException e) {
-			assertTrue(true);
+			exception = true;
 		}
+		assertTrue(exception);
 	}
 
 	@Test

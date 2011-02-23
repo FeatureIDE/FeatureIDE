@@ -230,7 +230,7 @@ public abstract class TAbstractFeatureModelReaderWriter {
 		}
 	}
 
-	// @Test
+	//TODO @Test
 	public void testPropNodes() throws FileNotFoundException,
 			UnsupportedModelException {
 
@@ -263,7 +263,7 @@ public abstract class TAbstractFeatureModelReaderWriter {
 				origFm.getAnnotations());
 	}
 
-	// @Test
+	//TODO @Test
 	public void testIsRefactoring() throws FileNotFoundException,
 			UnsupportedModelException {
 
@@ -285,17 +285,9 @@ public abstract class TAbstractFeatureModelReaderWriter {
 
 	private final static FileFilter getFileFilter(final String s) {
 		FileFilter filter = new FileFilter() {
-
 			@Override
 			public boolean accept(File pathname) {
-
-				if (pathname.getName().endsWith(s)) {
-
-					return true;
-				} else {
-
-					return false;
-				}
+				return pathname.getName().endsWith(s);
 			}
 		};
 		return filter;

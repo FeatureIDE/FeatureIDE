@@ -186,11 +186,7 @@ public class Prop4JTest {
 		solver.addClause(new VecInt(new int[] { 1, -2 }));
 		solver.addClause(new VecInt(new int[] { -3 }));
 		solver.newVar(1);
-		try {
-			solver.isSatisfiable(new VecInt(new int[] { -4 }));
-		} catch (ArrayIndexOutOfBoundsException e) {
-			assertTrue(false);
-		}
+		solver.isSatisfiable(new VecInt(new int[] { -4 }));
 	}
 
 	@Test
@@ -209,13 +205,6 @@ public class Prop4JTest {
 
 	@Test
 	public void testBinom() {
-		// show pascal
-		// for (int i = 0; i <= 10; i++) {
-		// for (int k = 0; k <= i; k++) {
-		// System.out.print(Node.binom(i, k) + "   ");
-		// }
-		// System.out.println();
-		// }
 		for (int n = 1; n < 10; n++) {
 			assertEquals(1, Node.binom(n, 0));
 			assertEquals(n, Node.binom(n, 1));
@@ -241,36 +230,7 @@ public class Prop4JTest {
 		solutions(0, new Choose(5, "p1", "p2", "p3", "p4"));
 	}
 
-	// @Test
-	// public void testUsage() {
-	// Object[] var = new Object[] {"p1", 2, 3.0, "d"};
-	// Node node1 = new Or(var[0], new Equals(var[1], var[2]));
-	// Node node2 = new Implies(var[3], new AtLeast(2, var[1], var[2], var[3]));
-	// Node node = new And(node1, node2, var[3]);
-	// SatSolver solver = new SatSolver(node, 500);
-	// try {
-	// if (solver.isSatisfiable())
-	// System.out.println(solver.getSolutions(5));
-	// else
-	// System.out.println("No solutions.");
-	// } catch (TimeoutException e) {
-	// System.out.println("Timeout!");
-	// }
-	// }
-
-	// @Test
-	// public void testExplosion() {
-	// LinkedList<Node> children = new LinkedList<Node>();
-	// for (int i = 1; i <= 10; i++)
-	// children.add(new Literal(i));
-	// Node node = new AtMost(1, children);
-	// node = node.toCNFprintln();
-	// node = new Not(node).toCNFprintln();
-	// }
-
 	private void testReaderByObject(String constraint, Node cNode) {
-
-
 		Node node = new NodeReader().stringToNode(constraint);
 
 		assertEquals(node, cNode);
@@ -283,6 +243,7 @@ public class Prop4JTest {
 		testReaderByObject(testString, a);
 	}
 
+	@Test
 	public void testReaderLiteralWithBrackets() {
 		String testString = "((a))";
 

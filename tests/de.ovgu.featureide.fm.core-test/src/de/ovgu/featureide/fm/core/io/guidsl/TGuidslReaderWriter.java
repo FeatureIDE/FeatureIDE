@@ -38,7 +38,6 @@ public class TGuidslReaderWriter extends TAbstractFeatureModelReaderWriter{
 	 */
 	public TGuidslReaderWriter(FeatureModel fm, String s) throws UnsupportedModelException {
 		super(fm, s);
-		// TODO Auto-generated constructor stub
 	}
 
 	/* (non-Javadoc)
@@ -54,16 +53,14 @@ public class TGuidslReaderWriter extends TAbstractFeatureModelReaderWriter{
 	 */
 	@Override
 	protected IFeatureModelReader getReader(FeatureModel fm) {
-		
 		return new GuidslReader(fm);
 	}
-
 
 	//guidsl does not save concrete compound features
 	@Override
 	public void testFeatureConcrete(){
 		for (Feature origF : origFm.getFeatures()) {
-			
+			//TODO check code coverage
 			if (!origF.isLayer()&&origF.isConcrete()) {
 				Feature newF = newFm.getFeature(origF.getName());
 				if (newF == null){
