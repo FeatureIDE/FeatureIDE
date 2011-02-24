@@ -127,10 +127,9 @@ public class ConstraintContentProposalProvider implements
 				words[LAST] = contents.substring(startBefore, posMarker + 1);
 
 		}
-	//	words[LAST] = words[LAST].trim();
-	//	words[CURRENT] = words[CURRENT].trim();
-		if (words[LAST].startsWith("(") && words[LAST].length() > 1) {
-			words[LAST] = words[LAST].substring(1);
+
+		if (words[LAST].trim().startsWith("(") && words[LAST].length() > 1) {
+			words[LAST] = words[LAST].substring(words[LAST].indexOf("(")+1);
 
 		}
 		if (words[CURRENT].trim().startsWith("(")) {
@@ -151,8 +150,7 @@ public class ConstraintContentProposalProvider implements
 			words[CURRENT] = "";
 
 		}
-		System.out.println("words[CURRENT]="+words[CURRENT]);
-		System.out.println("words[LAST]="+words[LAST]);
+
 		return words;
 	}
 

@@ -29,7 +29,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * test class for ConstraintContentProposalProvider
+ * TODO test class for ConstraintContentProposalProvider
  * 
  * @author Fabian Benduhn
  */
@@ -45,7 +45,7 @@ public class ConstraintContentProposalProviderTest {
 	static Set<String> features = new HashSet<String>();
 	
 
-	
+		
 	
 	
 	@Test
@@ -139,6 +139,15 @@ public class ConstraintContentProposalProviderTest {
 		String expectedLastWord = "(";
 		testGetWords(content,expectedCurrentWord, expectedLastWord);
 	}
+	
+	@Test
+	public void getWordsWithParantheses5(){
+		String content = "(abcdef) (word |";
+		String expectedCurrentWord = "";
+		String expectedLastWord = "word";
+		testGetWords(content,expectedCurrentWord, expectedLastWord);
+	}
+	
 	private void testGetWords(String content, String current, String last) {
 		String[] words = ConstraintContentProposalProvider.getWords(removeCursorFromString(content),getCursorPos(content));
 		assertEquals(current,words[CURRENT].trim());
@@ -151,21 +160,21 @@ public class ConstraintContentProposalProviderTest {
 		features.add("FeatureC");
 	}
 	@Test 
-	public void getProposals1(){
+	public void getProposalsEmptyString(){
 		String content = "|";
 		String[] expectedProps = PROPS_FEATURES;
 		testGetProposals(content,expectedProps );
 				
 	}
 	@Test 
-	public void getProposals2(){
+	public void getProposalsEmptyStringWithWhitespaces(){
 		String content = "   |";
 		String[] expectedProps = PROPS_FEATURES;
 		testGetProposals(content,expectedProps );
 				
 	}
 	@Test 
-	public void getProposals3(){
+	public void getProposalsCursorAfterFeature(){
 		String content = "FeatureA |";
 		String[] expectedProps = PROPS_OPERATORS;
 		testGetProposals(content,expectedProps );
@@ -173,66 +182,73 @@ public class ConstraintContentProposalProviderTest {
 	}
 	
 	@Test 
-	public void getProposals4(){
+	public void getProposalsCursorAfterFeature2(){
 		String content = "FeatureA  | ";
 		String[] expectedProps = PROPS_OPERATORS;
 		testGetProposals(content,expectedProps );
 				
 	}
 	@Test 
-	public void getProposals5(){
-		String content = "FeatureA and| ";
-		String[] expectedProps = PROPS_NONE;
-		testGetProposals(content,expectedProps );
-				
-	}
-	@Test 
-	public void getProposals6(){
-		String content = "FeatureA and |";
-		String[] expectedProps = PROPS_FEATURES;
-		testGetProposals(content,expectedProps );
-				
-	}
-	
-	@Test 
-	public void getProposals7(){
+	public void getProposalsCursorAfterFeature3(){
 		String content = "FeatureA and FeatureB|";
 		String[] expectedProps = PROPS_NONE;
 		testGetProposals(content,expectedProps );
 				
 	}
 	@Test 
-	public void getProposals8(){
+	public void getProposalsCursorAfterFeature4(){
 		String content = "FeatureA and FeatureB |";
 		String[] expectedProps = PROPS_OPERATORS;
 		testGetProposals(content,expectedProps );
 				
 	}
+	
 	@Test 
-	public void getProposals9(){
+	public void getProposalsCursorAfterFeatureWithParantheses(){
 		String content = "(FeatureA and FeatureB) |  ";
 		String[] expectedProps = PROPS_OPERATORS;
 		testGetProposals(content,expectedProps );
 				
 	}
+
 	@Test 
-	public void getProposals10(){
+	public void getProposalsCursorAfterFeatureWithParantheses2(){
 		String content = "(FeatureA and FeatureB)|  ";
 		String[] expectedProps = PROPS_NONE;
 		testGetProposals(content,expectedProps );
 				
 	}
-	
 	@Test 
-	public void getProposals11(){
+	public void getProposalsCursorAfterFeatureWithParantheses3(){
 		String content = "(FeatureA and FeatureB )|  ";
+		String[] expectedProps = PROPS_NONE;
+		testGetProposals(content,expectedProps );
+				
+	}
+	@Test 
+	public void getProposalsCursorAfterAnd(){
+		String content = "FeatureA and| ";
 		String[] expectedProps = PROPS_NONE;
 		testGetProposals(content,expectedProps );
 				
 	}
 	
 	@Test 
-	public void getProposals12(){
+	public void getProposalsCursorAfterAnd2(){
+		String content = "FeatureA and |";
+		String[] expectedProps = PROPS_FEATURES;
+		testGetProposals(content,expectedProps );
+				
+	}
+	
+	
+	
+
+	
+	
+	
+	@Test 
+	public void getProposalsPrefixOfFeature(){
 		String content = "Fea|  ";
 		String[] expectedProps = {"FeatureA","FeatureB","FeatureC"};
 		testGetProposals(content,expectedProps );
@@ -240,35 +256,29 @@ public class ConstraintContentProposalProviderTest {
 	}
 	
 	@Test 
-	public void getProposals14(){
+	public void getProposalsCursorAfterNot(){
 		String content = "not|";
 		String[] expectedProps = PROPS_NONE;
 		testGetProposals(content,expectedProps );
 				
 	}
 	@Test 
-	public void getProposals15(){
+	public void getProposalsPrefixOfFeatureAfterNot(){
 		String content = "not Fea|";
 		String[] expectedProps = {"FeatureA","FeatureB","FeatureC"};
 		testGetProposals(content,expectedProps );
 				
 	}
 	@Test 
-	public void getProposals16(){
+	public void getProposalsPrefixOfAnd(){
 		String content = "FeatureA a|";
 		String[] expectedProps = {"and"};
 		testGetProposals(content,expectedProps );
 				
 	}
+
 	@Test 
-	public void getProposals17(){
-		String content = "FeatureA and|";
-		String[] expectedProps = PROPS_NONE;
-		testGetProposals(content,expectedProps );
-				
-	}
-	@Test 
-	public void getProposals18(){
+	public void getProposalsPrefixOfOr(){
 		String content = "FeatureA o|";
 		String[] expectedProps = {"or"};
 		testGetProposals(content,expectedProps );
@@ -276,9 +286,17 @@ public class ConstraintContentProposalProviderTest {
 	}
 	
 	@Test 
-	public void getProposals19(){
+	public void getProposalsPrefixOfIff(){
 		String content = "FeatureA i|";
 		String[] expectedProps = {"iff","implies"};
+		testGetProposals(content,expectedProps );
+				
+	}
+	
+	@Test 
+	public void getProposalsLastWordStartsWithParantheses(){
+		String content = "(FeatureA iff FeatureB) and (FeatureA |";
+		String[] expectedProps = PROPS_OPERATORS;
 		testGetProposals(content,expectedProps );
 				
 	}
@@ -301,7 +319,7 @@ public class ConstraintContentProposalProviderTest {
 	}
 	
 	private String removeCursorFromString(String s){
-		assertTrue(s.contains("|"));
+		assertTrue("String must contain cursor symbol",s.contains("|"));
 		return s.replace("|","");
 	}
 	
