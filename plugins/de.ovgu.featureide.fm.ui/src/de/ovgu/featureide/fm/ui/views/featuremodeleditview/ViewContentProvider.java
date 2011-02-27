@@ -201,7 +201,7 @@ public class ViewContentProvider implements IStructuredContentProvider,
 			@Override
 			public void initChildren() {
 				long number = new Configuration(model, false,
-						ignoreAbstractFeatures).number(5 * 1000);
+						ignoreAbstractFeatures).number(60 * 1000);
 				String s = "";
 				if (number < 0)
 					s += "more than " + (-1 - number);
