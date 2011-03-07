@@ -49,6 +49,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
@@ -87,9 +88,12 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 public class ConstraintDialog {
 
 	private static final Image HELP_IMAGE = FMUIPlugin.getImage("help.gif");
-	private static final Image ERROR_IMAGE = FMUIPlugin.getImage("icon_error.gif");
-	private static final Image BANNER_IMAGE = FMUIPlugin.getImage("title_banner.gif");
-	private static final Image WARNING_IMAGE = FMUIPlugin.getImage("message_warning.gif");
+	private static final Image ERROR_IMAGE = FMUIPlugin
+			.getImage("icon_error.gif");
+	private static final Image BANNER_IMAGE = FMUIPlugin
+			.getImage("title_banner.gif");
+	private static final Image WARNING_IMAGE = FMUIPlugin
+			.getImage("message_warning.gif");
 
 	private static final String[] OPERATOR_NAMES = { " Not ", " And ", " Or ",
 			" Implies ", " Iff ", "(", ")" /* "At most 1" */};
@@ -110,7 +114,7 @@ public class ConstraintDialog {
 	private Table featureTable;
 
 	private Group buttonGroup;
-
+	private Composite constraintTextComposite;
 	private Text constraintText;
 	private Composite lastComposite;
 	private ToolBar helpButtonBar;
@@ -130,6 +134,7 @@ public class ConstraintDialog {
 			final Constraint constraint) {
 		this.constraint = constraint;
 		this.featuremodel = featuremodel;
+
 		if (constraint == null) {
 			titleText = "Create Propositional Constraint";
 			headerText = "Create new Constraint";
@@ -152,7 +157,8 @@ public class ConstraintDialog {
 		constraintText.setFocus();
 		constraintText.setSelection(constraintText.getCharCount());
 		shell.open();
-		if(constraint!=null)validate();
+		if (constraint != null)
+			validate();
 	}
 
 	/**
@@ -166,7 +172,7 @@ public class ConstraintDialog {
 		shellLayout.marginWidth = 0;
 		shellLayout.marginHeight = 0;
 		shell.setLayout(shellLayout);
-		
+
 		Monitor primary = shell.getDisplay().getPrimaryMonitor();
 		Rectangle bounds = primary.getBounds();
 		Rectangle rect = shell.getBounds();
@@ -222,7 +228,10 @@ public class ConstraintDialog {
 		formDataOk.right = new FormAttachment(cancelButton, -5);
 		formDataOk.bottom = new FormAttachment(100, -5);
 		okButton.setLayoutData(formDataOk);
+		shell.setTabList(new Control[] { featureGroup,	buttonGroup, constraintTextComposite,
+			 lastComposite });
 
+		lastComposite.setTabList(new Control[] { okButton, cancelButton });
 		okButton.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
 			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
 
@@ -289,6 +298,7 @@ public class ConstraintDialog {
 		errorMarker.setLayoutData(gridData);
 
 		errorMessage = new Text(headComposite, SWT.MULTI);
+		errorMessage.setEditable(false);
 		errorMessage.setBackground(shell.getDisplay().getSystemColor(
 				SWT.COLOR_WHITE));
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
@@ -303,7 +313,7 @@ public class ConstraintDialog {
 	 * initializes the Text containing the constraint
 	 */
 	private void initConstraintText() {
-		Composite constraintTextComposite = new Composite(shell, SWT.NONE);
+		constraintTextComposite = new Composite(shell, SWT.NONE);
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 
 		constraintTextComposite.setLayoutData(gridData);
@@ -635,13 +645,13 @@ public class ConstraintDialog {
 	public List<Literal> getDeadFeatures(String input, FeatureModel model) {
 		List<Literal> deadFeaturesBefore = null;
 		FeatureModel clonedModel = model.clone();
-		
+
 		NodeReader nodeReader = new NodeReader();
-		
+
 		List<String> featureList = new ArrayList<String>(
 				clonedModel.getFeatureNames());
 		Node propNode = nodeReader.stringToNode(input, featureList);
-	
+
 		if (propNode != null) {
 			if (constraint != null) {
 				clonedModel.removePropositionalNode(constraint);
@@ -650,7 +660,7 @@ public class ConstraintDialog {
 			clonedModel.addPropositionalNode(propNode);
 			clonedModel.handleModelDataChanged();
 		}
-		
+
 		List<Literal> deadFeaturesAfter = new ArrayList<Literal>();
 
 		for (Literal l : clonedModel.getDeadFeatures()) {
@@ -813,7 +823,7 @@ public class ConstraintDialog {
 			return;
 		}
 		int index = 0;
-		
+
 		if (constraint != null
 				&& (index = featuremodel.getConstraints().indexOf(constraint)) != -1) {
 
