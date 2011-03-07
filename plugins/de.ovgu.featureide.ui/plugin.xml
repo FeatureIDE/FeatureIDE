@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
+
+
+
 	<extension point="org.eclipse.core.contenttype.contentTypes">
 	   <content-type base-type="org.eclipse.core.runtime.xml"
 	                 file-extensions="config,equation,expression"
@@ -48,7 +51,7 @@
             icon="icons/ConfigurationIcon.png"
             id="de.ovgu.featureide.ui.editors.ConfigurationEditor"
             name="Configuration Editor">
-                  <contentTypeBinding
+      <contentTypeBinding
          contentTypeId="de.ovgu.featureide.contenttype.conf">
       </contentTypeBinding>
       </editor>
