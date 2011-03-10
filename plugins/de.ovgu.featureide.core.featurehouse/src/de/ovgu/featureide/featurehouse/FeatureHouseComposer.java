@@ -23,8 +23,6 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Scanner;
 
 import org.eclipse.core.resources.IFile;
@@ -36,9 +34,9 @@ import org.eclipse.core.runtime.CoreException;
 import composer.FSTGenComposer;
 
 import de.ovgu.cide.fstgen.ast.AbstractFSTParser;
+import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
-import de.ovgu.featureide.core.featurehouse.FSTParser.FSTParser;
-import de.ovgu.featureide.core.featurehouse.FSTParser.JavaToken;
+import de.ovgu.featureide.core.featurehouse.model.java.FeatureHouseModelBuilder;
 
 /**
  * Composes files using FeatureHouse.
@@ -51,6 +49,17 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	private static final String EXCLUDE_ENTRY = "\t<classpathentry excluding=\"";
 	private static final String EXCLUDE_SOURCE_ENTRY = "\" kind=\"src\" path=\"";
 
+	public FeatureHouseModelBuilder fhModelBuilder;
+	
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.ComposerExtensionClass#initialize(de.ovgu.featureide.core.IFeatureProject)
+	 */
+	@Override
+	public void initialize(IFeatureProject project) {
+		super.initialize(project);
+		fhModelBuilder = new FeatureHouseModelBuilder(project);
+	}
+	
 	public void performFullBuild(IFile config) {
 		assert (featureProject != null) : "Invalid project given";
 
@@ -83,22 +92,8 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 				"--output-directory", outputPath + "/", 
 				"--ahead"
 		});
-
-		// ***************************************
-		// TODO: Dariusz
-
-		FSTParser parser = new FSTParser(AbstractFSTParser.fstnodes);
-
-		HashMap<String, List<JavaToken>> map = parser.getFileList();
-
-		// output parsed tree
-		for (String key : map.keySet()) {
-			List<JavaToken> list = map.get(key);
-			System.out.println("=> File: " + key.toString());
-			for (JavaToken token : list)
-				System.out.println("=> Token: \n" + token.toString());
-
-		}
+		
+		fhModelBuilder.buildModel(AbstractFSTParser.fstnodes);
 
 		TreeBuilderFeatureHouse fstparser = new TreeBuilderFeatureHouse(
 				featureProject.getProjectName());
@@ -301,5 +296,10 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	@Override
 	public int getDefaultTemplateIndex() {
 		return 4;
+	}
+	
+	@Override
+	public void buildFSTModel() {
+		performFullBuild(featureProject.getCurrentConfiguration());
 	}
 }

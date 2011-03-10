@@ -16,7 +16,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.core.featurehouse.model.java;
+package de.ovgu.featureide.core.fstmodel.oomodel;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,50 +33,38 @@ import de.ovgu.featureide.core.fstmodel.IClass;
 import de.ovgu.featureide.core.fstmodel.IFSTModel;
 import de.ovgu.featureide.core.fstmodel.IFSTModelElement;
 import de.ovgu.featureide.core.fstmodel.IFeature;
-import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
 
 
 /**
- * The model of a java project
+ * The model of a featureproject
  * 
  * @author Tom Brosch
  * 
  */
-public class JavaModel extends JavaModelElement implements IFSTModel {
+public class OOModel extends OOModelElement implements IFSTModel {
 
-	HashMap<IFile, Class> classesMap;
-	HashMap<String, Class> classes;
-	HashMap<String, Feature> features;
+	public HashMap<IFile, Class> classesMap;
+	public HashMap<String, Class> classes;
+	public HashMap<String, Feature> features;
 	private String projectName;
 
 	/**
-	 * Creates a new instance of a java project
+	 * Creates a new instance of a FSTModel
 	 * 
 	 * @param name
 	 *            Name of the project
 	 */
-	public JavaModel(String name) {
+	public OOModel(String name) {
 		classesMap = new HashMap<IFile, Class>();
 		classes = new HashMap<String, Class>();
 		features = new HashMap<String, Feature>();
 		projectName = name;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ovgu.featureide.core.javaprojectmodel.IjavaProject#getNumberOfSelectedFeatures()
-	 */
 	public int getNumberOfSelectedFeatures() {
 		return 0;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.javaprojectmodel.IjavaProject#getSelectedFeatures()
-	 */
 	public ArrayList<IFeature> getSelectedFeatures() {
 		Collection <IFeatureProject> featureProjects = CorePlugin.getFeatureProjects();
 		IFeatureProject featureProject = null;
@@ -95,7 +83,7 @@ public class JavaModel extends JavaModelElement implements IFSTModel {
 				}
 			}
 		} catch (CoreException e) {
-			FeatureHouseCorePlugin.getDefault().logError(e);
+			CorePlugin.getDefault().logError(e);
 		}
 		if (allFeatures.size() == 0)
 			return null;
@@ -110,20 +98,10 @@ public class JavaModel extends JavaModelElement implements IFSTModel {
 		return list;	
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.javaprojectmodel.IjavaProject#getNumberOfFeatures()
-	 */
 	public int getNumberOfFeatures() {
 		return features.size();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.javaprojectmodel.IjavaProject#getFeatures()
-	 */
 	public IFeature[] getFeatures() {
 		IFeature[] featureArray = new Feature[features.size()];
 		int pos = 0;
@@ -133,32 +111,16 @@ public class JavaModel extends JavaModelElement implements IFSTModel {
 		return featureArray;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ovgu.featureide.core.javaprojectmodel.IjavaProject#getFeature(java.lang.String)
-	 */
 	public IFeature getFeature(String featureName) {
 		if (!features.containsKey(featureName))
 			return null;
 		return features.get(featureName); 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.javaprojectmodel.IjavaProject#getNumberOfClasses()
-	 */
 	public int getNumberOfClasses() {
 		return classesMap.size();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.javaprojectmodel.IjavaProject#getClasses()
-	 */
 	public IClass[] getClasses() {
 		IClass[] classArray = new Class[classes.size()];
 		int pos = 0;
@@ -168,13 +130,6 @@ public class JavaModel extends JavaModelElement implements IFSTModel {
 		return classArray;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ovgu.featureide.core.javaprojectmodel.IjavaProject#getClass(org.eclipse.core
-	 * .resources.IFile)
-	 */
 	public IClass getClass(IFile file) {
 		if (!classesMap.containsKey(file))
 			return null;

@@ -16,39 +16,32 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.ahead.model;
+package de.ovgu.featureide.core.fstmodel.oomodel;
 
-import java.util.TreeMap;
-
-import de.ovgu.featureide.core.fstmodel.IClass;
-import de.ovgu.featureide.core.fstmodel.IFeature;
 import de.ovgu.featureide.core.fstmodel.IFSTModelElement;
 
 
 /**
- * @author Constanze Adler
+ * 
  * @author Tom Brosch
  * 
  */
-public class Feature extends JakModelElement implements IFeature {
-	private String name;
-	TreeMap<String, Class> classes;
-	
-	public Feature(String name) {
-		this.name = name;
-		classes = new TreeMap<String, Class>();
+public class OOModelElement implements IFSTModelElement {
+
+	public IFSTModelElement[] getChildren() {
+		return null;
 	}
 
 	public String getName() {
-		return name;
+		return null;
 	}
 
-	public IFSTModelElement[] getChildren() {
-		if (classes == null) return null;
-		IClass[] elements = new IClass[classes.size()];
-		int i = 0;
-		for (IClass c : classes.values())
-			elements[i++] =  c;		
-		return elements;
+	public IFSTModelElement getParent() {
+		return null;
 	}
+
+	public boolean hasChildren() {
+		return false;
+	}
+
 }

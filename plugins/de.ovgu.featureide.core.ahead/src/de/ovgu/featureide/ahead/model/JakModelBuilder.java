@@ -40,6 +40,11 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.IFSTModel;
 import de.ovgu.featureide.core.fstmodel.IField;
+import de.ovgu.featureide.core.fstmodel.oomodel.Class;
+import de.ovgu.featureide.core.fstmodel.oomodel.Feature;
+import de.ovgu.featureide.core.fstmodel.oomodel.Field;
+import de.ovgu.featureide.core.fstmodel.oomodel.OOModel;
+import de.ovgu.featureide.core.fstmodel.oomodel.Method;
 
 
 /**
@@ -51,7 +56,9 @@ import de.ovgu.featureide.core.fstmodel.IField;
  */
 public class JakModelBuilder {
 
-	private JakModel model;
+	private OOModel model;
+	
+	private IFolder sourceFolder;
 
 	public JakModelBuilder(IFeatureProject featureProject) {
 		if (featureProject != null) {
@@ -59,7 +66,7 @@ public class JakModelBuilder {
 			if (oldModel != null)
 				oldModel.markObsolete();
 	
-			model = new JakModel(featureProject.getProjectName());
+			model = new OOModel(featureProject.getProjectName());
 			featureProject.setFSTModel(model);
 		}
 	}
@@ -281,7 +288,6 @@ public class JakModelBuilder {
 		return fields;
 	}
 	
-	private IFolder sourceFolder;
 	private Feature getFeature(Class currentClass, IFile currentFile){
 		sourceFolder = CorePlugin.getFeatureProject(currentFile).getSourceFolder();
 		String featureName = getFeature((IFolder)currentFile.getParent());

@@ -16,161 +16,94 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.ahead.model;
+package de.ovgu.featureide.core.fstmodel.oomodel;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
 
 import de.ovgu.featureide.core.fstmodel.IFSTModelElement;
-import de.ovgu.featureide.core.fstmodel.IMethod;
-
+import de.ovgu.featureide.core.fstmodel.IField;
 
 /**
  * @author Tom Brosch
  */
-public class Method extends JakModelElement implements Comparable<Object>, IMethod {
+public class Field extends OOModelElement implements Comparable<Object>, IField {
 
-	private String methodName;
-	private LinkedList<String> parameterTypes;
-	private String returnType;
+	private String fieldName;
+	private String typeName;
 	private String modifiers;
+	private int dimension;
+
 	private HashSet<IFile> ownFiles;
 	private HashSet<IFile> availableFiles;
 	private HashMap<IFile, Integer> lineNumbers;
 
-	public Method() {
-		this(null, null, null,null);
-	}
+	public Field(String fieldName, String typeName, int dim, String modifiers) {
+		this.fieldName = fieldName;
+		this.typeName = typeName;
+		this.dimension = dim;
+		this.modifiers = modifiers;
 
-	public Method(String methodName, LinkedList<String> parameterTypes,
-			String returnType, String modifiers) {
-		this.methodName = methodName;
-		this.parameterTypes = parameterTypes;
-		this.returnType = returnType;
 		this.ownFiles = new HashSet<IFile>();
 		this.availableFiles = new HashSet<IFile>();
 		this.lineNumbers = new HashMap<IFile, Integer>();
-		this.modifiers = modifiers;
 	}
 
 	public String getName() {
-		String name = methodName + "(";
-		for (int i = 0; i < parameterTypes.size(); i++) {
-			if (i > 0)
-				name += ", ";
-			name += parameterTypes.get(i);
-		}
-		name += ")";
-		if (!returnType.equals("void"))
-			name += " : " + returnType;
+		String name = fieldName + " : " + typeName;
+		for (int i = 0; i < dimension; i++)
+			name += "[]";
 		return name;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.jakprojectmodel.IMethode#getMethodName()
-	 */
-	public String getMethodName() {
-		return methodName;
 	}
 
 	public IFSTModelElement[] getChildren() {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.jakprojectmodel.IMethode#getIdentifier()
-	 */
 	public String getIdentifier() {
-		String id = (returnType != null ? returnType : "")
-				+ (methodName != null ? methodName : "");
-		if (parameterTypes != null)
-			for (String type : parameterTypes)
-				id += type;
-		return id;
+		return (typeName != null ? typeName : "")
+				+ (fieldName != null ? fieldName : "");
 	}
 
 	public int compareTo(Object arg0) {
-		IMethod meth = (IMethod) arg0;
-		return getIdentifier().compareTo(meth.getIdentifier());
+		IField field = (IField) arg0;
+		return getIdentifier().compareTo(field.getIdentifier());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ovgu.featureide.core.jakprojectmodel.IMethode#setOwn(org.eclipse.core.resources
-	 * .IFile)
-	 */
 	public void setOwn(IFile file) {
 		ownFiles.add(file);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ovgu.featureide.core.jakprojectmodel.IMethode#isOwn(org.eclipse.core.resources
-	 * .IFile)
-	 */
 	public boolean isOwn(IFile file) {
 		return ownFiles.contains(file);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ovgu.featureide.core.jakprojectmodel.IMethode#setAvailible(org.eclipse.core
-	 * .resources.IFile)
-	 */
 	public void setAvailable(IFile file) {
 		availableFiles.add(file);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ovgu.featureide.core.jakprojectmodel.IMethode#isAvailible(org.eclipse.core
-	 * .resources.IFile)
-	 */
 	public boolean isAvailable(IFile file) {
 		return availableFiles.contains(file);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ovgu.featureide.core.jakprojectmodel.IMethode#setLineNumber(org.eclipse.core
-	 * .resources.IFile, int)
-	 */
 	public void setLineNumber(IFile file, int lineNumber) {
 		if (lineNumbers.containsKey(file))
 			lineNumbers.remove(file);
 		lineNumbers.put(file, lineNumber);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ovgu.featureide.core.jakprojectmodel.IMethode#getLineNumber(org.eclipse.core
-	 * .resources.IFile)
-	 */
 	public int getLineNumber(IFile file) {
 		if (lineNumbers.containsKey(file))
 			return lineNumbers.get(file);
 		return -1;
 	}
 
+	
+	public String getFieldName() {
+		return fieldName;
+	}
 	
 	public boolean isFinal() {
 		return modifiers.contains("final");

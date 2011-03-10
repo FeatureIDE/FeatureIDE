@@ -16,7 +16,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.ahead.model;
+package de.ovgu.featureide.core.fstmodel.oomodel;
 
 import java.util.LinkedList;
 import java.util.TreeMap;
@@ -30,21 +30,21 @@ import de.ovgu.featureide.core.fstmodel.IMethod;
 
 
 /**
- * Describes a class of a jak project according to a selected configuration
+ * Describes a class of a featureproject according to a selected configuration
  * 
  * @author Tom Brosch
  * @author Thomas Thuem
  * 
  */
-public class Class extends JakModelElement implements IClass {
+public class Class extends OOModelElement implements IClass {
 
 	// Only the own AST methods are implemented
 
-	private IFile currentJakfile;
+	private IFile currentFile;
 
-	TreeMap<String, Method> methods;
+	public TreeMap<String, Method> methods;
 
-	TreeMap<String, IField> fields;
+	public TreeMap<String, IField> fields;
 
 	private String className;
 
@@ -66,38 +66,18 @@ public class Class extends JakModelElement implements IClass {
 		fields = new TreeMap<String, IField>();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.jakprojectmodel.IClass#getNumberOfFields()
-	 */
 	public int getFieldCount() {
 		return fields.size();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.jakprojectmodel.IClass#getFields()
-	 */
 	public IField[] getFields() {
 		return fields.values().toArray(new Field[fields.values().size()]);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.jakprojectmodel.IClass#getNumberOfMethods()
-	 */
 	public int getMethodCount() {
 		return methods.size();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.jakprojectmodel.IClass#getMethods()
-	 */
 	public IMethod[] getMethods() {
 		IMethod[] methodArray = new IMethod[methods.size()];
 		int i = 0;
@@ -247,134 +227,82 @@ public class Class extends JakModelElement implements IClass {
 		return methodArray;
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.jakprojectmodel.IClass#getNumberOfAvailibleFields()
-	 */
 	public int getAvailableFieldCount() {
 		int i = 0;
 		for (IField field : fields.values())
-			if (field.isAvailable(currentJakfile))
+			if (field.isAvailable(currentFile))
 				i++;
 		return i;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.jakprojectmodel.IClass#getAvailibleFields()
-	 */
 	public IField[] getAvailableFields() {
 		IField[] fieldArray = new Field[getAvailableFieldCount()];
 		int i = 0;
 		for (IField field : fields.values())
-			if (field.isAvailable(currentJakfile))
+			if (field.isAvailable(currentFile))
 				fieldArray[i++] = field;
 		return fieldArray;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.jakprojectmodel.IClass#getNumberOfAvailibleMethods()
-	 */
 	public int getAvailableMethodCount() {
 		int i = 0;
 		for (IMethod meth : methods.values())
-			if (meth.isAvailable(currentJakfile))
+			if (meth.isAvailable(currentFile))
 				i++;
 		return i;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.jakprojectmodel.IClass#getAvailibleMethods()
-	 */
 	public IMethod[] getAvailableMethods() {
 		IMethod[] methodArray = new Method[getAvailableMethodCount()];
 		int i = 0;
 		for (IMethod meth : methods.values()) {
-			if (meth.isAvailable(currentJakfile))
+			if (meth.isAvailable(currentFile))
 				methodArray[i++] = meth;
 		}
 		return methodArray;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.jakprojectmodel.IClass#getNumberOfOwnFields()
-	 */
 	public int getOwnFieldCount() {
 		int i = 0;
 		for (IField field : fields.values())
-			if (field.isOwn(currentJakfile))
+			if (field.isOwn(currentFile))
 				i++;
 		return i;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.jakprojectmodel.IClass#getOwnFields()
-	 */
 	public IField[] getOwnFields() {
 		IField[] fieldArray = new Field[getOwnFieldCount()];
 		int i = 0;
 		for (IField field : fields.values())
-			if (field.isOwn(currentJakfile))
+			if (field.isOwn(currentFile))
 				fieldArray[i++] = field;
 		return fieldArray;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.jakprojectmodel.IClass#getNumberOfOwnMethods()
-	 */
 	public int getOwnMethodCount() {
 		int i = 0;
 		for (IMethod meth : methods.values())
-			if (meth.isOwn(currentJakfile))
+			if (meth.isOwn(currentFile))
 				i++;
 		return i;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.jakprojectmodel.IClass#getOwnMethods()
-	 */
 	public IMethod[] getOwnMethods() {
 		IMethod[] methodArray = new Method[getOwnMethodCount()];
 		int i = 0;
 		for (IMethod meth : methods.values()) {
-			if (meth.isOwn(currentJakfile))
+			if (meth.isOwn(currentFile))
 				methodArray[i++] = meth;
 		}
 		return methodArray;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ovgu.featureide.core.jakprojectmodel.IClass#setJakfile(org.eclipse.core.resources
-	 * .IFile)
-	 */
-	public void setFile(IFile jakfile) {
-		currentJakfile = jakfile;
+	public void setFile(IFile file) {
+		currentFile = file;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.jakprojectmodel.IClass#getJakfile()
-	 */
 	public IFile getFile() {
-		return currentJakfile;
+		return currentFile;
 	}
 
 	public String getName() {
@@ -398,12 +326,14 @@ public class Class extends JakModelElement implements IClass {
 		return getOwnMethodCount() + getOwnFieldCount() > 0;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.jakprojectmodel.IClass#getSources()
-	 */
 	public LinkedList<IFile> getSources() {
 		return sources;
+	}
+
+	/**
+	 * @param file
+	 */
+	public void setName(String name) {
+		className = name;
 	}
 }

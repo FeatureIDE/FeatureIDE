@@ -220,8 +220,8 @@ public class CollaborationModelBuilder {
 												.getFolder(feature.getName())
 												.getFile(name);
 										role.featureName = feature.getName();
-										for (IField m : iClass.getFields()) {
-											role.fields.add(m);
+										for (IField f : iClass.getFields()) {
+											role.fields.add(f);
 										}
 										for (IMethod m : iClass.getMethods()) {
 											role.methods.add(m);

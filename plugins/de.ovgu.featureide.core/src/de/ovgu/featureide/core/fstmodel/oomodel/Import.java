@@ -16,43 +16,24 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.ahead.model;
+package de.ovgu.featureide.core.fstmodel.oomodel;
 
 import de.ovgu.featureide.core.fstmodel.IFSTModelElement;
 import de.ovgu.featureide.core.fstmodel.IImport;
-import de.ovgu.featureide.core.fstmodel.IImportContainer;
+
 
 /**
  * 
  * @author Tom Brosch
  * 
  */
-public class ImportContainer extends JakModelElement implements
-		IImportContainer {
-	public ImportContainer() {
-	}
+public class Import extends OOModelElement implements IImport {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ovgu.featureide.core.jakprojectmodel.IImportContainer#getNumberOfImports()
-	 */
-	public int getNumberOfImports() {
-		return 0;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.jakprojectmodel.IImportContainer#getImports()
-	 */
-	public IImport[] getImports() {
-		return null;
+	public Import() {
 	}
 
 	public String getName() {
-		return "import declarations";
+		return null;
 	}
 
 	public IFSTModelElement[] getChildren() {
