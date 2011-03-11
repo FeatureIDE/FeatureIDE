@@ -67,7 +67,9 @@ public class FeatureUIHelper {
 	public static Rectangle getBounds(Feature feature) {
 		return new Rectangle(getLocation(feature), getSize(feature));
 	}
-
+	public static Rectangle getBounds(Constraint constraint) {
+		return new Rectangle(getLocation(constraint), getSize(constraint));
+	}
 	private static void fireLocationChanged(Feature feature, Point oldLocation,
 			Point newLocation) {
 		PropertyChangeEvent event = new PropertyChangeEvent(feature,

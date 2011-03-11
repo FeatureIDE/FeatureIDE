@@ -33,6 +33,7 @@ import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.Legend;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.policies.ModelLayoutEditPolicy;
 
 
@@ -71,6 +72,7 @@ public class ModelEditPart extends AbstractGraphicalEditPart implements GUIDefau
 	protected List<Object> getModelChildren() {
 		LinkedList<Object> list = new LinkedList<Object>();
 		addFeatures(getFeatureModel().getRoot(), list);
+		if(getFeatureModel().hasLegend())list.add(new Legend((FeatureModel)getModel()));
 		addConstraints(getFeatureModel().getConstraints(), list);
 		return list;
 	}

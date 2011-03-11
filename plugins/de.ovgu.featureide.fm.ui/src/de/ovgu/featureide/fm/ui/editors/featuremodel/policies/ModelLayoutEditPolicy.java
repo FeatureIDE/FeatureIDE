@@ -34,8 +34,11 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.ConstraintDragAndDropCommand;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.FeatureDragAndDropCommand;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.LegendDragAndDropCommand;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
 
 /**
  * Allows features to be moved onto the feature model diagram.
@@ -56,10 +59,12 @@ public class ModelLayoutEditPolicy extends LayoutEditPolicy {
 	@Override
 	protected EditPolicy createChildEditPolicy(EditPart child) {
 		if (child instanceof ConstraintEditPart)
-			return new ConstraintMoveEditPolicy((ConstraintEditPart) child, this);
+			return new ConstraintMoveEditPolicy((ConstraintEditPart) child,
+					this);
 		if (child instanceof FeatureEditPart)
 			return new FeatureMoveEditPolicy((FeatureEditPart) child, this);
-		
+		if (child instanceof LegendEditPart)
+			return new LegendMoveEditPolicy((LegendEditPart) child, this);
 		return null;
 	}
 
@@ -70,21 +75,34 @@ public class ModelLayoutEditPolicy extends LayoutEditPolicy {
 			ChangeBoundsRequest r = (ChangeBoundsRequest) request;
 			if (r.getEditParts().size() != 1)
 				return null;
-			if(r.getEditParts().get(0) instanceof FeatureEditPart){
-				FeatureEditPart editPart = (FeatureEditPart) r.getEditParts().get(0);
+			if (r.getEditParts().get(0) instanceof FeatureEditPart) {
+				FeatureEditPart editPart = (FeatureEditPart) r.getEditParts()
+						.get(0);
 				Feature feature = editPart.getFeatureModel();
 				Rectangle bounds = FeatureUIHelper.getBounds(feature);
 				bounds = r.getTransformedRectangle(bounds);
-				cmd = new FeatureDragAndDropCommand(featureModel, feature, bounds.getLocation());
+				cmd = new FeatureDragAndDropCommand(featureModel, feature,
+						bounds.getLocation());
 			}
-			if (r.getEditParts().get(0)instanceof ConstraintEditPart){
-				ConstraintEditPart editPart = (ConstraintEditPart) r.getEditParts().get(0);
+			if (r.getEditParts().get(0) instanceof ConstraintEditPart) {
+				ConstraintEditPart editPart = (ConstraintEditPart) r
+						.getEditParts().get(0);
 				Constraint constraint = editPart.getConstraintModel();
-				
+
 				Point point = r.getLocation().getCopy();
 				getHostFigure().translateToRelative(point);
 
-				cmd = new ConstraintDragAndDropCommand(featureModel, constraint,point);
+				cmd = new ConstraintDragAndDropCommand(featureModel,
+						constraint, point);
+
+			}
+			if (r.getEditParts().get(0) instanceof LegendEditPart) {
+				LegendEditPart editPart = (LegendEditPart) r.getEditParts()
+						.get(0);
+
+				cmd = new LegendDragAndDropCommand(featureModel,
+						(LegendFigure) editPart.getFigure());
+
 			}
 		}
 		return cmd;

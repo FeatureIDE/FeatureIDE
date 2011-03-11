@@ -48,12 +48,11 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 		this.lastChild = lastChild;
 		setForegroundColor(DECORATOR_FOREGROUND);
 		setBackgroundColor(DECORATOR_FOREGROUND);
-		setSize(TARGET_ANCHOR_DIAMETER, TARGET_ANCHOR_DIAMETER/2);
+		setSize(getTargetAnchorDiameter(), getTargetAnchorDiameter()/2);
 	}
-	
 	@Override
 	public void setLocation(Point p) {
-		super.setLocation(p.translate(-TARGET_ANCHOR_DIAMETER/2, 0));
+		super.setLocation(p.translate(-getTargetAnchorDiameter()/2, 0));
 	}
 	
 	public void setReferencePoint(Point p) {
@@ -70,7 +69,7 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 		@SuppressWarnings("all")
 		int angle1 = HALF_ARC ? 180 : calculateAngle(r.getCenter(), referencePoint);
 		@SuppressWarnings("all")
-		int angle2 = HALF_ARC ? 360 : calculateAngle(r.getCenter(), FeatureUIHelper.getSourceLocation(lastChild));
+		int angle2 = HALF_ARC ? 360 : calculateAngle(r.getCenter(), getFeatureLocation());
 
 		if (angle1 + 1 < angle2)
 			graphics.fillArc(r, angle1, angle2 - angle1);
@@ -87,17 +86,25 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 		@SuppressWarnings("all")
 		int angle1 = HALF_ARC ? 180 : calculateAngle(r.getCenter(), referencePoint);
 		@SuppressWarnings("all")
-		int angle2 = HALF_ARC ? 360 : calculateAngle(r.getCenter(), FeatureUIHelper.getSourceLocation(lastChild));
+		int angle2 = HALF_ARC ? 360 : calculateAngle(r.getCenter(), getFeatureLocation());
 
 		if (angle1 + 1 < angle2)
 			graphics.drawArc(r, angle1, angle2 - angle1);
 	}
+
+
+	 protected Point getFeatureLocation() {
+		return FeatureUIHelper.getSourceLocation(lastChild);
+	}
 	
+	protected int getTargetAnchorDiameter(){
+		return TARGET_ANCHOR_DIAMETER;
+	}
 	private Rectangle calculateRectangle() {
 		Rectangle r = Rectangle.SINGLETON;
 		r.setBounds(getBounds());
-		r.y -= TARGET_ANCHOR_DIAMETER/2;
-		r.height = TARGET_ANCHOR_DIAMETER;
+		r.y -= getTargetAnchorDiameter()/2;
+		r.height = getTargetAnchorDiameter();
 		r.shrink(lineWidth + 1, lineWidth + 1);
 		return r;
 	}

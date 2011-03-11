@@ -25,7 +25,7 @@ import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureConnection;
 import de.ovgu.featureide.fm.core.FeatureModel;
-
+import de.ovgu.featureide.fm.ui.editors.featuremodel.Legend;
 
 /**
  * Creates edit parts for given models.
@@ -37,17 +37,18 @@ public class GraphicalEditPartFactory implements EditPartFactory {
 	public EditPart createEditPart(EditPart context, Object model) {
 		if (model instanceof FeatureModel)
 			return new ModelEditPart((FeatureModel) model);
-		
+
 		if (model instanceof Feature)
 			return new FeatureEditPart((Feature) model);
-		
+
 		if (model instanceof FeatureConnection)
 			return new ConnectionEditPart((FeatureConnection) model);
 
 		if (model instanceof Constraint)
 			return new ConstraintEditPart((Constraint) model);
-
-        return null;
+		if (model instanceof Legend)
+			return new LegendEditPart((Legend) model);
+		return null;
 	}
 
 }
