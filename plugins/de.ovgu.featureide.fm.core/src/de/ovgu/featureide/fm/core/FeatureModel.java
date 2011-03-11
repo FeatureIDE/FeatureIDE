@@ -18,6 +18,7 @@
  */
 package de.ovgu.featureide.fm.core;
 
+import java.awt.Point;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -71,7 +72,9 @@ public class FeatureModel implements PropertyConstants {
 	 * the root feature
 	 */
 	private Feature root;
+	private boolean legend=false;
 
+	private Point legendPos= new Point(0,0);
 	/**
 	 * a hashtable containing all features
 	 */
@@ -880,5 +883,25 @@ public class FeatureModel implements PropertyConstants {
 			FMCorePlugin.getDefault().logError(e);
 		}
 	}
+	/**
+	 * @return
+	 */
+	public boolean hasLegend() {
+		// TODO Auto-generated method stub
+		return this.legend;
+	}
 
+	public void setLegend(boolean b) {
+		// TODO Auto-generated method stub
+		this.legend = b;
+	}
+
+
+	public Point getLegendPos() {
+		
+		return legendPos;
+	}
+	public void setLegendPos(int x, int y){
+		this.legendPos = new Point(x,y);
+	}
 }
