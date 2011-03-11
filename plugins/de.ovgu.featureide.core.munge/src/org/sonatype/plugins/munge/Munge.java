@@ -18,6 +18,18 @@ import java.util.Stack;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
+
+import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.munge.MungeCorePlugin;
 
 /*
@@ -149,6 +161,8 @@ public class Munge {
     final int COMMENT = 1;     // text surrounded by /* */ delimiters
     final int CODE = 2;        // can just be whitespace
 
+	private IFeatureProject featureProject;
+
     int getCommand(String s) {
         for (int i = 0; i < numCommands; i++) {
             if (s.equals(commands[i])) {
@@ -159,22 +173,78 @@ public class Munge {
     }
 
     public void error(String text) {
-	MungeCorePlugin.getDefault().logWarning("File " + inName + " line " + line + ": " + text);
-	errors++;
+    	addMarker(text, getFile(inName), line);
+    	errors++;
     }
+    
+    /**
+	 * @param inName2
+	 * @return
+	 */
+	private IFile getFile(String inName) {
+		inName = inName.substring(inName.indexOf(featureProject.getProjectName() + "\\")
+				+ featureProject.getProjectName().length() + 1);
+		inName = inName.substring(inName.indexOf(featureProject.getSourceFolder().getName() + "\\")
+				+ featureProject.getSourceFolder().getName().length() + 1);
+		
+		IFolder folder = featureProject.getSourceFolder();
+		while (inName.contains("\\")) {
+			folder = folder.getFolder(inName.substring(0, inName.indexOf("\\")));
+		}
+		
+		return folder.getFile(inName);
+	}
+
+	public void addMarker(final String text, final IFile file, final int line) {
+		Job job = new Job("Propagate syntax markers") {
+			@Override
+			public IStatus run(IProgressMonitor monitor) {
+				try {
+					
+					if (!hasMarker()) {
+						IMarker newMarker = file.createMarker(CorePlugin.PLUGIN_ID + ".builderProblemMarker");
+						newMarker.setAttribute(IMarker.LINE_NUMBER, line);
+						newMarker.setAttribute(IMarker.MESSAGE, text);
+						newMarker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
+					}
+				} catch (CoreException e) {
+					MungeCorePlugin.getDefault().logError(e);
+				}
+				return Status.OK_STATUS;
+			}
+			
+			private boolean hasMarker() {
+				try {
+					IMarker[] marker = file.findMarkers(CorePlugin.PLUGIN_ID + ".builderProblemMarker"
+							, false, IResource.DEPTH_ZERO);
+					if (marker.length > 0) {
+						for (IMarker m : marker) {
+							if (line == m.getAttribute(IMarker.LINE_NUMBER, -1)) {
+								if (text.equals(m.getAttribute(IMarker.MESSAGE, null))) {
+									return true;
+								}
+							}
+						}
+					}
+				} catch (CoreException e) {
+					MungeCorePlugin.getDefault().logError(e);
+				}
+				return false;
+			}
+		};
+		job.setPriority(Job.DECORATE);
+		job.schedule();
+	}
 
     public void printErrorCount() {
-	if (errors > 0) {
-		MungeCorePlugin.getDefault().logWarning(Integer.toString(errors) + 
-		(errors > 1 ? " errors" : " error"));
-	}
     }
 
     public boolean hasErrors() {
 	return (errors > 0);
     }
 
-    public Munge(String inName, String outName) {
+    public Munge(String inName, String outName, IFeatureProject featureProject) {
+    	this.featureProject = featureProject;
         this.inName = inName;
         if( inName == null ) {
             in = new BufferedReader( new InputStreamReader(System.in) );
@@ -200,7 +270,11 @@ public class Munge {
         }
     }
 
-    public void close() throws IOException {
+	public Munge() {
+		
+	}
+
+	public void close() throws IOException {
 	in.close();
 	out.flush();
 	out.close();
@@ -420,7 +494,8 @@ public class Munge {
     /**
      * Munge's main entry point.
      */
-    public static void main(String[] args) {
+    public void main(String[] args, IFeatureProject featureProject) {
+    this.featureProject = featureProject;
 	// Use a dummy object as the hash entry value.
 	Object obj = new Object();
 
@@ -496,7 +571,7 @@ public class Munge {
         // Now do the munging.
         for( int i=0; i<inFiles.length; i++ ) {
 
-            Munge munge = new Munge(inFiles[i], outFiles[i]);
+            Munge munge = new Munge(inFiles[i], outFiles[i], featureProject);
             if (munge.hasErrors()) {
                 munge.printErrorCount();
                 

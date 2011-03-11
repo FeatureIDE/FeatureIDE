@@ -727,7 +727,6 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			// set markers, only if event is not fired from changes to
 			// markers
 			if (event.findMarkerDeltas(FEATURE_MODULE_MARKER, false).length == 0) {
-				// TODO is this needed, causes MarkerNotFoun exception
 				setAllFeatureModuleMarkers(featureModel, sourceFolder);
 			}
 		}

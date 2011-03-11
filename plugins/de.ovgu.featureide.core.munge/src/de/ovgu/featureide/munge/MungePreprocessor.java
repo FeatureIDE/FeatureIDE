@@ -37,7 +37,9 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.sonatype.plugins.munge.Munge;
 
 import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
+import de.ovgu.featureide.munge.model.MungeModelBuilder;
 
 /**
  * Munge: a purposely-simple Java preprocessor.
@@ -49,6 +51,14 @@ public class MungePreprocessor extends ComposerExtensionClass{
 	private LinkedList<String> selectedFeatures;
 	
 	private ArrayList<String> features;
+	
+	private MungeModelBuilder mungeModelBuilder;
+
+	@Override
+	public void initialize(IFeatureProject project) {
+		super.initialize(project);
+		mungeModelBuilder = new MungeModelBuilder(project);
+	}
 	
 	@Override
 	public ArrayList<String> extensions() {
@@ -86,6 +96,8 @@ public class MungePreprocessor extends ComposerExtensionClass{
 		} catch (CoreException e) {
 			MungeCorePlugin.getDefault().logError(e);
 		}
+		
+		mungeModelBuilder.buildModel();
 	}
 	
 	public ArrayList<String> readFeaturesfromConfigurationFile(File file) {
@@ -168,10 +180,11 @@ public class MungePreprocessor extends ComposerExtensionClass{
 		String[] argArray = new String[args.size()];
 		for (int i = 0;i < args.size();i++) {
 			argArray[i] = args.get(i);
+			System.out.println(args.get(i));
 		}
-		
 		//run Munge
-		Munge.main(argArray);
+		Munge m = new Munge();
+		m.main(argArray, featureProject);
 	}
 
 	private void createBuildFolder(IFolder buildFolder) throws CoreException {
@@ -256,5 +269,10 @@ public class MungePreprocessor extends ComposerExtensionClass{
 	@Override
 	public boolean hasFeatureFolders() {
 		return false;
+	}
+	
+	@Override
+	public void buildFSTModel() {
+		mungeModelBuilder.buildModel();
 	}
 }

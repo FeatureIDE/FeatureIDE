@@ -36,7 +36,7 @@ import composer.FSTGenComposer;
 import de.ovgu.cide.fstgen.ast.AbstractFSTParser;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
-import de.ovgu.featureide.core.featurehouse.model.java.FeatureHouseModelBuilder;
+import de.ovgu.featureide.featurehouse.model.FeatureHouseModelBuilder;
 
 /**
  * Composes files using FeatureHouse.

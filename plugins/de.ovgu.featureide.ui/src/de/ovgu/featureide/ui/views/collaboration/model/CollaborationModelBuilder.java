@@ -212,19 +212,31 @@ public class CollaborationModelBuilder {
 										if (collaboration == null)
 											collaboration = new Collaboration(feature.getName());
 										IPath pathToFile = path.getFullPath();
-										pathToFile = pathToFile.append(feature.getName());
+										if (composer.hasFeatureFolders()) {
+											pathToFile = pathToFile.append(feature.getName());
+										}
 										pathToFile = pathToFile.append(iClass.getName());
 										String name = iClass.getName();
 										Role role = new Role(name);
-										role.file = featureProject.getSourceFolder()
+										if (composer.hasFeatureFolders()) {
+											role.file = featureProject.getSourceFolder()
 												.getFolder(feature.getName())
 												.getFile(name);
-										role.featureName = feature.getName();
-										for (IField f : iClass.getFields()) {
-											role.fields.add(f);
+										} else {
+											role.file = featureProject.getSourceFolder()
+												.getFile(name);
+											role.files.add(role.file);
 										}
-										for (IMethod m : iClass.getMethods()) {
-											role.methods.add(m);
+										role.featureName = feature.getName();
+										if (iClass.getFields() != null) {
+											for (IField f : iClass.getFields()) {
+												role.fields.add(f);
+											}
+										}
+										if (iClass.getMethods() != null) {
+											for (IMethod m : iClass.getMethods()) {
+												role.methods.add(m);
+											}
 										}
 										role.setPath(pathToFile);
 										Class cl = new Class(name);
@@ -241,16 +253,17 @@ public class CollaborationModelBuilder {
 									}
 								}
 							}
-							IResource[] members = null;
-							try {
-								members = featureProject.getSourceFolder().getFolder(feature.getName()).members();
-							} catch (CoreException e) {
-								UIPlugin.getDefault().logError(e);
+							if (composer.hasFeatureFolders()) {
+								IResource[] members = null;
+								try {
+									members = featureProject.getSourceFolder().getFolder(feature.getName()).members();
+								} catch (CoreException e) {
+									UIPlugin.getDefault().logError(e);
+								}
+								
+								for (IResource res : members)
+									addArbitraryFiles(res, feature.getName(), selected);
 							}
-							
-							for (IResource res : members)
-								addArbitraryFiles(res, feature.getName(), selected);
-							
 							if (collaboration != null) {
 								collaboration.selected = selected;
 								model.collaborations.add(collaboration);

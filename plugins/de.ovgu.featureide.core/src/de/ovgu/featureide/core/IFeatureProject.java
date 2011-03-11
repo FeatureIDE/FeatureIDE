@@ -150,18 +150,6 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	public IComposerExtension getComposer();
 	
 	/**
-	 * Sets the current composer
-	 * 
-	 * @param composerExtension The composer used to compose files of the current project
-	 * 
-	 * @remarks
-	 * - The composer for a project is set only once during the creation of new
-	 *   feature projects and should not be changed afterwards.
-	 */
-	//TODO: check if this method is useful 
-	//public void setComposer(IComposerExtension composerExtension);
-	
-	/**
 	 * Sets the JAVA class path that is in order to build the project
 	 * 
 	 * @param paths An array of paths that will be added to the JAVA class path

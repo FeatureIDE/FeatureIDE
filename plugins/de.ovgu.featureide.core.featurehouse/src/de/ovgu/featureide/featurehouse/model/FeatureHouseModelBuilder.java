@@ -16,7 +16,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.core.featurehouse.model.java;
+package de.ovgu.featureide.featurehouse.model;
 
 import java.io.File;
 import java.util.HashMap;
@@ -70,6 +70,7 @@ public class FeatureHouseModelBuilder {
 		model.classesMap = new HashMap<IFile, Class>();
 		model.classes = new HashMap<String, Class>();
 		model.features = new HashMap<String, Feature>();
+		
 		Feature currentFeature = null;
 		Class currentClass = null;
 		IFile currentFile = null;
