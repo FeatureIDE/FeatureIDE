@@ -21,16 +21,15 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 
-import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 
 /**
  * TODO shows/hides the legend when executed
  * 
  * @author Fabian Benduhn
  */
-public class LegendAction extends Action {
+public class LegendAction extends Action implements GUIDefaults{
 
 	private final FeatureModel featureModel;
 
@@ -45,8 +44,7 @@ public class LegendAction extends Action {
 		if (this.getText().equals("Show Legend")) {
 			featureModel.setLegend(true);
 			setText("Hide Legend");
-			layoutLegend();
-
+		
 		} else {
 			featureModel.setLegend(false);
 			setText("Show Legend");
@@ -54,27 +52,5 @@ public class LegendAction extends Action {
 		featureModel.handleModelDataChanged();
 	}
 
-	/**
-	 * sets the position of the legend to the right-bottom of the features
-	 */
-	private void layoutLegend() {
-		int maxX = 0;
-		int maxY = 0;
-		int maxWidth = 0;
-		for (Feature c : featureModel.getFeatures()) {
-			System.out.println(c);
-			int nextX = FeatureUIHelper.getLocation(c).x;
-			if (nextX > maxX)
-				maxX = nextX;
-			int nextY = FeatureUIHelper.getLocation(c).y;
-			if (nextY > maxY)
-				maxY = nextY;
-			int nextWidth = FeatureUIHelper.getSize(c).width;
-			if (nextWidth > maxWidth)
-				maxWidth = nextWidth;
-		}
-
-		featureModel.setLegendPos(maxX + maxWidth / 2, maxY);
-	}
 
 }

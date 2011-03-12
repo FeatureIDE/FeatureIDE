@@ -109,6 +109,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateLayerAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.EditConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.HiddenAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LegendLayoutAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LegendAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.MandatoryAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
@@ -185,6 +186,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 	private ZoomOutAction zoomOut;
 
 	private LegendAction legendAction;
+	
+	private LegendLayoutAction legendLayoutAction;
 
 	private FeatureDiagramLayoutManager layoutManager = new LevelOrderLayout();
 
@@ -314,6 +317,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 				featureModel, "Edit Constraint");
 		reverseOrderAction = new ReverseOrderAction(graphicalViewer, featureModel);
 		legendAction = new LegendAction(graphicalViewer, featureModel);
+		legendLayoutAction = new LegendLayoutAction(graphicalViewer,featureModel);
 	}
 
 	private void createContextMenu() {
@@ -376,7 +380,9 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 			menu.add(new Separator());
 			menu.add(reverseOrderAction);
 		}
+		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 		menu.add(legendAction);
+		if(legendLayoutAction.isEnabled())menu.add(legendLayoutAction);
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
 

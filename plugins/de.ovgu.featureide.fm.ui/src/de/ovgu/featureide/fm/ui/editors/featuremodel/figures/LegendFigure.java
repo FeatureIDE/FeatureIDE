@@ -35,14 +35,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
  */
 public class LegendFigure extends Figure implements GUIDefaults {
 	
-	/**
-	 * Height of the legend
-	 */
-	private static final int HEIGHT = 105;
-	/**
-	 * Width of the legend
-	 */
-	private static final int WIDTH = 120;
+
 	/**
 	 * Height of each Row (should not be smaller than height of symbols)
 	 */
@@ -80,7 +73,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		setLocation(pos);
 		setLayoutManager(layout);
 		setBorder(new LineBorder(1));
-		setSize(WIDTH,HEIGHT);
+		setSize(LEGEND_WIDTH,LEGEND_HEIGHT);
 		createRows();
 			
 		
@@ -99,7 +92,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		Label labelTitle = new Label();
 		labelTitle.setText("Legend:");
 		labelTitle.setLabelAlignment(Label.LEFT);
-		layout.setConstraint(labelTitle, new Rectangle(3, 0, WIDTH,ROW_HEIGHT));
+		layout.setConstraint(labelTitle, new Rectangle(3, 0, LEGEND_WIDTH,ROW_HEIGHT));
 		add(labelTitle);
 	}
 
@@ -111,7 +104,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		layout.setConstraint(symbolAnd, new Rectangle(this.getLocation().x, this.getLocation().y+ROW_HEIGHT*6, symbolAnd.getPreferredSize().width, symbolAnd.getPreferredSize().height));
 		Label labelAnd = new Label("And-Group");
 		labelAnd.setLabelAlignment(Label.LEFT);
-		layout.setConstraint(labelAnd, new Rectangle(LABEL_PADDING, ROW_HEIGHT*6-LIFT ,WIDTH-LABEL_PADDING, ROW_HEIGHT));
+		layout.setConstraint(labelAnd, new Rectangle(LABEL_PADDING, ROW_HEIGHT*6-LIFT ,LEGEND_WIDTH-LABEL_PADDING, ROW_HEIGHT));
 		add(symbolAnd);
 		add(labelAnd);
 	}
@@ -123,7 +116,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		layout.setConstraint(symbolAlternative, new Rectangle(this.getLocation().x,this.getLocation().y+ROW_HEIGHT*5, symbolAlternative.getPreferredSize().width, symbolAlternative.getPreferredSize().height));
 		Label labelAlternative = new Label("Alternative-Group");
 		labelAlternative.setLabelAlignment(Label.LEFT);
-		layout.setConstraint(labelAlternative, new Rectangle(LABEL_PADDING, ROW_HEIGHT*5-10, WIDTH-LABEL_PADDING, ROW_HEIGHT));
+		layout.setConstraint(labelAlternative, new Rectangle(LABEL_PADDING, ROW_HEIGHT*5-10, LEGEND_WIDTH-LABEL_PADDING, ROW_HEIGHT));
 		add(symbolAlternative);
 		add(labelAlternative);
 	}
@@ -135,7 +128,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		layout.setConstraint(symbolOr, new Rectangle(this.getLocation().x,this.getLocation().y+ ROW_HEIGHT*4, symbolOr.getPreferredSize().width, symbolOr.getPreferredSize().height));
 		Label labelOr = new Label("Or-Group");
 		labelOr.setLabelAlignment(Label.LEFT);
-		layout.setConstraint(labelOr, new Rectangle(LABEL_PADDING, ROW_HEIGHT*4-LIFT, WIDTH-LABEL_PADDING, ROW_HEIGHT));
+		layout.setConstraint(labelOr, new Rectangle(LABEL_PADDING, ROW_HEIGHT*4-LIFT, LEGEND_WIDTH-LABEL_PADDING, ROW_HEIGHT));
 		add(symbolOr);
 		add(labelOr);
 	}
@@ -146,7 +139,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 				new Point(this.getLocation().x+MANDATORY_PADDING, this.getLocation().y+ROW_HEIGHT*MANDATORY_LIFT-LIFT-MANDATORY_LIFT));
 		Label labelOptional = new Label("Optional");
 		labelOptional.setLabelAlignment(Label.LEFT);
-		layout.setConstraint(labelOptional, new Rectangle(LABEL_PADDING, ROW_HEIGHT*MANDATORY_LIFT-LIFT-MANDATORY_LIFT, WIDTH-LABEL_PADDING, ROW_HEIGHT));
+		layout.setConstraint(labelOptional, new Rectangle(LABEL_PADDING, ROW_HEIGHT*MANDATORY_LIFT-LIFT-MANDATORY_LIFT, LEGEND_WIDTH-LABEL_PADDING, ROW_HEIGHT));
 		add(optionalSymbol);
 		add(labelOptional);
 	}
@@ -156,7 +149,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		LegendConnectionTypeSymbol symbolMandatory = new LegendConnectionTypeSymbol(true, new Point(this.getLocation().x+MANDATORY_PADDING,this.getLocation().y+ ROW_HEIGHT*2-LIFT-MANDATORY_LIFT));
 		Label labelMandatory = new Label("Mandatory");
 		labelMandatory.setLabelAlignment(Label.LEFT);
-		layout.setConstraint(labelMandatory, new Rectangle(LABEL_PADDING, ROW_HEIGHT*2-LIFT-MANDATORY_LIFT, WIDTH-LABEL_PADDING, ROW_HEIGHT));
+		layout.setConstraint(labelMandatory, new Rectangle(LABEL_PADDING, ROW_HEIGHT*2-LIFT-MANDATORY_LIFT, LEGEND_WIDTH-LABEL_PADDING, ROW_HEIGHT));
 		add(symbolMandatory);
 		add(labelMandatory);
 	}

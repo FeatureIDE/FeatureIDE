@@ -36,7 +36,8 @@ public class BreadthFirstLayout extends FeatureDiagramLayoutManager {
 	
 	int yoffset;
 
-	public void layout(FeatureModel featureModel) {
+	@Override
+	public void layoutFeatureModel(FeatureModel featureModel) {
 		yoffset = 0;
 		layout(featureModel.getRoot());
 		layout(yoffset, featureModel.getConstraints());

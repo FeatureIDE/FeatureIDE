@@ -48,6 +48,7 @@ public class LegendDragAndDropCommand extends Command {
 
 	
 	public boolean canExecute() {
+		if(model.hasLegendAutoLayout())return false;
 		//newRect is the rectangle containing the legend while dragging 
 		Rectangle newRect = new Rectangle(legendFigure.newPos,legendFigure.getSize());
 		//check if legend intersects with a feature

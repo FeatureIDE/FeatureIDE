@@ -32,7 +32,8 @@ import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
  */
 public class DepthFirstLayout extends FeatureDiagramLayoutManager {
 	
-	public void layout(FeatureModel featureModel) {
+	@Override
+	public void layoutFeatureModel(FeatureModel featureModel) {
 		depthFirstLayout(featureModel.getRoot(), 0, LAYOUT_MARGIN_X);
 	}
 

@@ -73,7 +73,7 @@ public class FeatureModel implements PropertyConstants {
 	 */
 	private Feature root;
 	private boolean legend=false;
-
+	private boolean autoLayoutLegend=true;
 	private Point legendPos= new Point(0,0);
 	/**
 	 * a hashtable containing all features
@@ -903,5 +903,14 @@ public class FeatureModel implements PropertyConstants {
 	}
 	public void setLegendPos(int x, int y){
 		this.legendPos = new Point(x,y);
+	}
+	
+	public void setLegendAutoLayout(boolean b){
+		autoLayoutLegend=b;
+	}
+
+	public boolean hasLegendAutoLayout() {
+	
+		return autoLayoutLegend;
 	}
 }
