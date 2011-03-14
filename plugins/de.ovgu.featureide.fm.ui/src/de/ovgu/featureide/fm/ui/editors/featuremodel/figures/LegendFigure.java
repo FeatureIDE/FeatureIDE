@@ -75,7 +75,8 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		setBorder(new LineBorder(1));
 		setSize(LEGEND_WIDTH,LEGEND_HEIGHT);
 		createRows();
-			
+		setForegroundColor(CONNECTION_FOREGROUND);
+		setBackgroundColor(DIAGRAM_BACKGROUND);
 		
 	}
 
@@ -102,7 +103,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		LegendGroupTypeSymbol symbolAnd = new LegendGroupTypeSymbol(false, false,
 				point,this.getLocation());
 		layout.setConstraint(symbolAnd, new Rectangle(this.getLocation().x, this.getLocation().y+ROW_HEIGHT*6, symbolAnd.getPreferredSize().width, symbolAnd.getPreferredSize().height));
-		Label labelAnd = new Label("And-Group");
+		Label labelAnd = new Label("And");
 		labelAnd.setLabelAlignment(Label.LEFT);
 		layout.setConstraint(labelAnd, new Rectangle(LABEL_PADDING, ROW_HEIGHT*6-LIFT ,LEGEND_WIDTH-LABEL_PADDING, ROW_HEIGHT));
 		add(symbolAnd);
@@ -114,7 +115,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		LegendGroupTypeSymbol symbolAlternative = new LegendGroupTypeSymbol(true, false,
 				new Point(GROUPTYPE_PADDING,ROW_HEIGHT*5-LIFT),this.getLocation());
 		layout.setConstraint(symbolAlternative, new Rectangle(this.getLocation().x,this.getLocation().y+ROW_HEIGHT*5, symbolAlternative.getPreferredSize().width, symbolAlternative.getPreferredSize().height));
-		Label labelAlternative = new Label("Alternative-Group");
+		Label labelAlternative = new Label("Alternative");
 		labelAlternative.setLabelAlignment(Label.LEFT);
 		layout.setConstraint(labelAlternative, new Rectangle(LABEL_PADDING, ROW_HEIGHT*5-10, LEGEND_WIDTH-LABEL_PADDING, ROW_HEIGHT));
 		add(symbolAlternative);
@@ -126,7 +127,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		LegendGroupTypeSymbol symbolOr = new LegendGroupTypeSymbol(true, true,
 				new Point(GROUPTYPE_PADDING,ROW_HEIGHT*4-LIFT),this.getLocation());
 		layout.setConstraint(symbolOr, new Rectangle(this.getLocation().x,this.getLocation().y+ ROW_HEIGHT*4, symbolOr.getPreferredSize().width, symbolOr.getPreferredSize().height));
-		Label labelOr = new Label("Or-Group");
+		Label labelOr = new Label("Or");
 		labelOr.setLabelAlignment(Label.LEFT);
 		layout.setConstraint(labelOr, new Rectangle(LABEL_PADDING, ROW_HEIGHT*4-LIFT, LEGEND_WIDTH-LABEL_PADDING, ROW_HEIGHT));
 		add(symbolOr);
