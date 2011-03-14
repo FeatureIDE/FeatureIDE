@@ -268,7 +268,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 			}
 
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			CorePlugin.getDefault().logError(e);
 		} finally {
 			if(scanner!=null)scanner.close();
 		}

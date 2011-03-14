@@ -180,7 +180,6 @@ public class MungePreprocessor extends ComposerExtensionClass{
 		String[] argArray = new String[args.size()];
 		for (int i = 0;i < args.size();i++) {
 			argArray[i] = args.get(i);
-			System.out.println(args.get(i));
 		}
 		//run Munge
 		Munge m = new Munge();

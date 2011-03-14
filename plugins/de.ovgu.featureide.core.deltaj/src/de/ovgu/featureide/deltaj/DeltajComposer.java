@@ -80,7 +80,7 @@ public class DeltajComposer extends ComposerExtensionClass {
 			error = true;
 		}
 		if (error)
-			System.out.println("error: " + compiler.getErrorReport());
+			DeltajCorePlugin.getDefault().logWarning("error: " + compiler.getErrorReport());
 		try {
 			ResourcesPlugin.getWorkspace().getRoot()
 					.refreshLocal(IResource.DEPTH_INFINITE, null);

@@ -40,7 +40,7 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 	public static final String COMPOSER_ID = "de.ovgu.featureide.composer.featurecpp";
 
 	private final FeatureCppWrapper featureCpp = new FeatureCppWrapper(
-			(FeatureCppCorePlugin.getDefault().getBundle().getLocation() + "lib/fc++v0.7.exe")
+			(FeatureCppCorePlugin.getDefault().getBundle().getLocation() + "lib/fc++v0.8.exe")
 			.substring(16));
 
 	public void initialize(IFeatureProject project) {

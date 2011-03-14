@@ -34,6 +34,6 @@ public class MungeModelBuilder extends PPModelBuilder{
 
 	@Override
 	protected boolean containsFeature(String text, String feature) {
-		return text.contains("[" + feature + "]*/");
+		return text.contains("end[" + feature + "]");
 	}
 }
