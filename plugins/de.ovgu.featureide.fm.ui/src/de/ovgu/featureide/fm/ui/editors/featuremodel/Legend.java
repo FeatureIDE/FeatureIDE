@@ -37,6 +37,9 @@ public class Legend {
 		this.pos = new Point(model.getLegendPos().x, model.getLegendPos().y);
 	}
 
+	public FeatureModel getModel(){
+		return model;
+	}
 	public void update() {
 		model.redrawDiagram();
 
@@ -50,6 +53,14 @@ public class Legend {
 		this.pos = pos;
 		model.setLegendPos(pos.x, pos.y);
 
+	}
+
+	/**
+	 * 
+	 */
+	public void changeVisibility() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

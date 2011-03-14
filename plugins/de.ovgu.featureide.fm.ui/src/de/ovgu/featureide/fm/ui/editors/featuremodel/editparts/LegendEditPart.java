@@ -23,6 +23,7 @@ import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.gef.editpolicies.NonResizableEditPolicy;
 
+import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.Legend;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
 
@@ -45,9 +46,13 @@ public class LegendEditPart extends AbstractGraphicalEditPart {
 	 */
 	@Override
 	protected IFigure createFigure() {
-
-		LegendFigure figure = new LegendFigure(this,
-				((Legend) getModel()).getPos());
+		FeatureModel fm = ((Legend)this.getModel()).getModel();
+		boolean hasMandatory = fm.hasMandatoryFeatures();
+		boolean hasOptional = fm.hasOptionalFeatures();
+		boolean hasAnd = fm.hasAndGroup();
+		boolean hasAlternative = fm.hasAlternativeGroup();
+		boolean hasOr = fm.hasOrGroup();
+		LegendFigure figure = new LegendFigure(((Legend) getModel()).getPos(),hasMandatory,hasOptional,hasOr,hasAlternative,hasAnd);
 
 		return figure;
 	}

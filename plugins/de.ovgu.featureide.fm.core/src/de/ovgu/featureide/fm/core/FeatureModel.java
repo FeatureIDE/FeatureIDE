@@ -62,19 +62,22 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
 public class FeatureModel implements PropertyConstants {
 
 	public static final String COMPOSER_KEY = "composer";
-	public static final QualifiedName composerConfigID = new QualifiedName("featureproject.configs", "composer");
-	public static final QualifiedName sourceFolderConfigID = new QualifiedName("featureproject.configs", "source");
+	public static final QualifiedName composerConfigID = new QualifiedName(
+			"featureproject.configs", "composer");
+	public static final QualifiedName sourceFolderConfigID = new QualifiedName(
+			"featureproject.configs", "source");
 	public static final String SOURCE_ARGUMENT = "source";
 	public static final String DEFAULT_SOURCE_PATH = "src";
-	public static final String BUILDER_ID = "de.ovgu.featureide.core" + ".extensibleFeatureProjectBuilder";
-	
+	public static final String BUILDER_ID = "de.ovgu.featureide.core"
+			+ ".extensibleFeatureProjectBuilder";
+
 	/**
 	 * the root feature
 	 */
 	private Feature root;
-	private boolean legend=true;
-	private boolean autoLayoutLegend=true;
-	private Point legendPos= new Point(0,0);
+	private boolean legend = true;
+	private boolean autoLayoutLegend = true;
+	private Point legendPos = new Point(0, 0);
 	/**
 	 * a hashtable containing all features
 	 */
@@ -106,7 +109,7 @@ public class FeatureModel implements PropertyConstants {
 	private LinkedList<Renaming> renamings = new LinkedList<Renaming>();
 
 	private IFolder sourceFolder;
-	
+
 	private IFMComposerExtension fmComposerExtension = new FMComposerExtension();
 	private String COMPOSER_ID;
 
@@ -221,7 +224,7 @@ public class FeatureModel implements PropertyConstants {
 		String name = feature.getName();
 		if (!featureTable.containsKey(name))
 			return false;
-		
+
 		// use the group type of the feature to delete
 		Feature parent = feature.getParent();
 		if (parent.getChildrenCount() == 1) {
@@ -281,23 +284,25 @@ public class FeatureModel implements PropertyConstants {
 	};
 
 	public void performRenamings(IFile file) {
-		IProject project = ((IResource) file.getAdapter(IFile.class)).getProject();
+		IProject project = ((IResource) file.getAdapter(IFile.class))
+				.getProject();
 		String sourceName = getProjectConfigurationPath(project);
 		if (sourceName != null && !sourceName.equals("")) {
 			sourceFolder = project.getFolder(sourceName);
 		}
 		for (Renaming renaming : renamings) {
 			if (!performComposerRenamings(renaming.oldName, renaming.newName,
-				project)) {
+					project)) {
 				moveFolder(renaming.oldName, renaming.newName);
 			}
 		}
 		renamings.clear();
 	}
-	
+
 	private boolean performComposerRenamings(final String oldName,
 			final String newName, final IProject project) {
-		return getFMComposerExtension(project).performRenaming(oldName,newName, project);
+		return getFMComposerExtension(project).performRenaming(oldName,
+				newName, project);
 	}
 
 	public void moveFolder(String oldName, String newName) {
@@ -383,7 +388,14 @@ public class FeatureModel implements PropertyConstants {
 		for (PropertyChangeListener listener : listenerList)
 			listener.propertyChange(event);
 	}
-
+	
+	public void refreshContextMenu(){
+		PropertyChangeEvent event = new PropertyChangeEvent(this,
+				REFRESH_ACTIONS, false, true);
+		for (PropertyChangeListener listener : listenerList)
+			listener.propertyChange(event);
+	}
+	
 	public void redrawDiagram() {
 		PropertyChangeEvent event = new PropertyChangeEvent(this,
 				REDRAW_DIAGRAM, false, true);
@@ -495,15 +507,14 @@ public class FeatureModel implements PropertyConstants {
 	public List<Constraint> getConstraints() {
 		return Collections.unmodifiableList(constraints);
 	}
-	
-	public void replacePropNode(int index, Node node){
-		assert(index<constraints.size());
+
+	public void replacePropNode(int index, Node node) {
+		assert (index < constraints.size());
 		constraints.set(index, new Constraint(this, node));
 		propNodes.set(index, node);
-		
+
 	}
-	
-	
+
 	public int getNumberOfFeatures() {
 		return featureTable.size();
 	}
@@ -793,7 +804,8 @@ public class FeatureModel implements PropertyConstants {
 	/**
 	 * Checks a string to be a valid featurename.
 	 * 
-	 * @param s  Possible featurename to be checked
+	 * @param s
+	 *            Possible featurename to be checked
 	 * @return boolean
 	 */
 	public static boolean isValidJavaIdentifier(String s) {
@@ -862,20 +874,21 @@ public class FeatureModel implements PropertyConstants {
 		}
 		COMPOSER_ID = null;
 	}
-	
+
 	private void setComposer() {
 		if (COMPOSER_ID == null) {
 			return;
 		}
-		
+
 		IConfigurationElement[] config = Platform.getExtensionRegistry()
-				.getConfigurationElementsFor(FMCorePlugin.PLUGIN_ID + ".FMComposer");
+				.getConfigurationElementsFor(
+						FMCorePlugin.PLUGIN_ID + ".FMComposer");
 		try {
 			for (IConfigurationElement e : config) {
 				if (e.getAttribute("composer").equals(COMPOSER_ID)) {
 					final Object o = e.createExecutableExtension("class");
 					if (o instanceof IFMComposerExtension) {
-						fmComposerExtension = (IFMComposerExtension)o;
+						fmComposerExtension = (IFMComposerExtension) o;
 					}
 				}
 			}
@@ -883,34 +896,92 @@ public class FeatureModel implements PropertyConstants {
 			FMCorePlugin.getDefault().logError(e);
 		}
 	}
+
 	/**
 	 * @return
 	 */
 	public boolean hasLegend() {
-		// TODO Auto-generated method stub
+
 		return this.legend;
 	}
 
 	public void setLegend(boolean b) {
-		// TODO Auto-generated method stub
+
 		this.legend = b;
 	}
 
-
 	public Point getLegendPos() {
-		
+
 		return legendPos;
 	}
-	public void setLegendPos(int x, int y){
-		this.legendPos = new Point(x,y);
+
+	public void setLegendPos(int x, int y) {
+		this.legendPos = new Point(x, y);
 	}
-	
-	public void setLegendAutoLayout(boolean b){
-		autoLayoutLegend=b;
+
+	public void setLegendAutoLayout(boolean b) {
+		autoLayoutLegend = b;
 	}
 
 	public boolean hasLegendAutoLayout() {
-	
+
 		return autoLayoutLegend;
+	}
+
+	/**
+	 * @return true if feature model contains mandatory features otherwise false
+	 */
+	public boolean hasMandatoryFeatures() {
+		for (Feature f : this.featureTable.values()) {
+			if (!f.equals(this.root) && f.getParent().isAnd()
+					&& f.isMandatory())
+				return true;
+		}
+		return false;
+	}
+
+	/**
+	 * @return true if feature model contains optional features otherwise false
+	 */
+	public boolean hasOptionalFeatures() {
+		for (Feature f : this.featureTable.values()) {
+			if (!f.equals(this.root) && f.getParent().isAnd()
+					&& !f.isMandatory())
+				return true;
+		}
+		return false;
+	}
+
+	/**
+	 * @return true if feature model contains and group otherwise false
+	 */
+	public boolean hasAndGroup() {
+		for (Feature f : this.featureTable.values()) {
+			if (f.getChildrenCount()>1  && f.isAnd())
+				return true;
+		}
+		return false;
+	}
+
+	/**
+	 * @return true if feature model contains alternative group otherwise false
+	 */
+	public boolean hasAlternativeGroup() {
+		for (Feature f : this.featureTable.values()) {
+			if (f.getChildrenCount()>1 && f.isAlternative())
+				return true;
+		}
+		return false;
+	}
+
+	/**
+	 * @return true if feature model contains or group otherwise false
+	 */
+	public boolean hasOrGroup() {
+		for (Feature f : this.featureTable.values()) {
+			if (f.getChildrenCount()>1 && f.isOr())
+				return true;
+		}
+		return false;
 	}
 }

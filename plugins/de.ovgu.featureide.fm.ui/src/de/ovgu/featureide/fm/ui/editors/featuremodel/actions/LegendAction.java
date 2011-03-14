@@ -41,11 +41,12 @@ public class LegendAction extends Action implements GUIDefaults {
 		} else {
 			this.setText("Show Legend");
 		}
+	
 	}
-
+	
 	@Override
 	public void run() {
-
+		
 		if (featureModel.hasLegend()) {
 			featureModel.setLegend(false);
 			setText("Show Legend");
@@ -56,5 +57,13 @@ public class LegendAction extends Action implements GUIDefaults {
 		}
 		featureModel.handleModelDataChanged();
 	}
-
+	
+	public void refresh() {
+		if (featureModel.hasLegend()) {
+			this.setText("Hide Legend");
+		} else {
+			this.setText("Show Legend");
+		}
+		
+	}
 }

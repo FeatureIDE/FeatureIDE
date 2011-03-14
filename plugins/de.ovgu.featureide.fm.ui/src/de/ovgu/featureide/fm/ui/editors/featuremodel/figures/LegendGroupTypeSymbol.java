@@ -78,5 +78,5 @@ public class LegendGroupTypeSymbol extends PolylineConnection implements
 		this.add(p);
 		this.setValid(true);
 		setForegroundColor(CONNECTION_FOREGROUND);
-	}
+		}
 }

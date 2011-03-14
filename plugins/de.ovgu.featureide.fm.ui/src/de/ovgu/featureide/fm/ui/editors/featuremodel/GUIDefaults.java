@@ -95,6 +95,6 @@ public interface GUIDefaults {
 	public static int CONSTRAINT_SPACE_Y = 5 + 20;
 	
 	//Legend
-	public static int LEGEND_HEIGHT =  100;
+//	public static int LEGEND_HEIGHT =  100;
 	public static int LEGEND_WIDTH = 95;
 }

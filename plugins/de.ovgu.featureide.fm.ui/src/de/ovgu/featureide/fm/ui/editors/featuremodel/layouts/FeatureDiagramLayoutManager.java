@@ -82,7 +82,7 @@ abstract public class FeatureDiagramLayoutManager implements GUIDefaults {
 		}
 		Feature root = featureModel.getRoot();
 		int rootY = FeatureUIHelper.getLocation(root).y;
-		if (maxY < rootY + LEGEND_HEIGHT) {
+		if (maxY < rootY + FeatureUIHelper.getLegendSize().height) {
 			for (Constraint c : featureModel.getConstraints()) {
 				int nextX = FeatureUIHelper.getLocation(c).x
 						+ FeatureUIHelper.getSize(c).width;

@@ -43,7 +43,14 @@ public class FeatureUIHelper {
 	private static final WeakHashMap<Feature, Dimension> featureSize = new WeakHashMap<Feature, Dimension>();
 	private static final WeakHashMap<Constraint, Point> constraintLocation = new WeakHashMap<Constraint, Point>();
 	private static final WeakHashMap<Constraint, Dimension> constraintSize = new WeakHashMap<Constraint, Dimension>();
-
+	private static Dimension legendSize= new Dimension();
+	public static Dimension getLegendSize(){
+		return legendSize;
+	}
+	
+	public static void setLegendSize(Dimension dim){
+		legendSize = dim;
+	}
 	public static Point getLocation(Feature feature) {
 		return featureLocation.get(feature);
 	}

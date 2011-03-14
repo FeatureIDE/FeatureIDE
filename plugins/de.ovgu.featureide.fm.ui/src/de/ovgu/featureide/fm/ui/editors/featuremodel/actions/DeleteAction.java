@@ -36,6 +36,7 @@ import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
 
 /**
@@ -83,6 +84,10 @@ public class DeleteAction extends Action {
 				Constraint constraint = ((ConstraintEditPart)editPart).getConstraintModel();				
 				featureModel.removePropositionalNode(constraint);
 			}
+			if( editPart instanceof LegendEditPart){
+				featureModel.setLegend(false);
+				featureModel.refreshContextMenu();
+			}
 			if (!(editPart instanceof FeatureEditPart))
 				continue;
 			Feature feature = ((FeatureEditPart) editPart)
@@ -94,6 +99,7 @@ public class DeleteAction extends Action {
 				featureModel.deleteFeature(feature);
 		}
 		featureModel.handleModelDataChanged();
+		
 	}
 
 	private boolean isValidSelection(IStructuredSelection selection) {
