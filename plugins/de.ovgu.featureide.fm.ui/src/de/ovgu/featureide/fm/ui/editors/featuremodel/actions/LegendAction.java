@@ -29,28 +29,32 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  * 
  * @author Fabian Benduhn
  */
-public class LegendAction extends Action implements GUIDefaults{
+public class LegendAction extends Action implements GUIDefaults {
 
 	private final FeatureModel featureModel;
 
 	public LegendAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
-		super("Show Legend");
+		super();
 		this.featureModel = featureModel;
+		if (featureModel.hasLegend()) {
+			this.setText("Hide Legend");
+		} else {
+			this.setText("Show Legend");
+		}
 	}
 
 	@Override
 	public void run() {
 
-		if (this.getText().equals("Show Legend")) {
-			featureModel.setLegend(true);
-			setText("Hide Legend");
-		
-		} else {
+		if (featureModel.hasLegend()) {
 			featureModel.setLegend(false);
 			setText("Show Legend");
+
+		} else {
+			featureModel.setLegend(true);
+			setText("Hide Legend");
 		}
 		featureModel.handleModelDataChanged();
 	}
-
 
 }

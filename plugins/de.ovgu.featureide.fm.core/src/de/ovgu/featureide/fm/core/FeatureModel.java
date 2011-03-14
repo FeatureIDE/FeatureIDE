@@ -72,7 +72,7 @@ public class FeatureModel implements PropertyConstants {
 	 * the root feature
 	 */
 	private Feature root;
-	private boolean legend=false;
+	private boolean legend=true;
 	private boolean autoLayoutLegend=true;
 	private Point legendPos= new Point(0,0);
 	/**
