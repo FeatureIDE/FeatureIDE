@@ -96,5 +96,5 @@ public interface GUIDefaults {
 	
 	//Legend
 	public static int LEGEND_HEIGHT =  100;
-	public static int LEGEND_WIDTH = 120;
+	public static int LEGEND_WIDTH = 95;
 }

@@ -91,6 +91,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 	private void createRowTitle() {
 		Label labelTitle = new Label();
+		labelTitle.setForegroundColor(FEATURE_FOREGROUND);
 		labelTitle.setText("Legend:");
 		labelTitle.setLabelAlignment(Label.LEFT);
 		layout.setConstraint(labelTitle, new Rectangle(3, 0, LEGEND_WIDTH,ROW_HEIGHT));
@@ -108,6 +109,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		layout.setConstraint(labelAnd, new Rectangle(LABEL_PADDING, ROW_HEIGHT*6-LIFT ,LEGEND_WIDTH-LABEL_PADDING, ROW_HEIGHT));
 		add(symbolAnd);
 		add(labelAnd);
+		labelAnd.setForegroundColor(FEATURE_FOREGROUND);
 	}
 
 
@@ -120,6 +122,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		layout.setConstraint(labelAlternative, new Rectangle(LABEL_PADDING, ROW_HEIGHT*5-10, LEGEND_WIDTH-LABEL_PADDING, ROW_HEIGHT));
 		add(symbolAlternative);
 		add(labelAlternative);
+		labelAlternative.setForegroundColor(FEATURE_FOREGROUND);
 	}
 
 
@@ -132,6 +135,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		layout.setConstraint(labelOr, new Rectangle(LABEL_PADDING, ROW_HEIGHT*4-LIFT, LEGEND_WIDTH-LABEL_PADDING, ROW_HEIGHT));
 		add(symbolOr);
 		add(labelOr);
+		labelOr.setForegroundColor(FEATURE_FOREGROUND);
 	}
 
 
@@ -143,6 +147,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		layout.setConstraint(labelOptional, new Rectangle(LABEL_PADDING, ROW_HEIGHT*MANDATORY_LIFT-LIFT-MANDATORY_LIFT, LEGEND_WIDTH-LABEL_PADDING, ROW_HEIGHT));
 		add(optionalSymbol);
 		add(labelOptional);
+		labelOptional.setForegroundColor(FEATURE_FOREGROUND);
 	}
 
 
@@ -153,5 +158,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		layout.setConstraint(labelMandatory, new Rectangle(LABEL_PADDING, ROW_HEIGHT*2-LIFT-MANDATORY_LIFT, LEGEND_WIDTH-LABEL_PADDING, ROW_HEIGHT));
 		add(symbolMandatory);
 		add(labelMandatory);
+		labelMandatory.setForegroundColor(FEATURE_FOREGROUND);
 	}
 }
