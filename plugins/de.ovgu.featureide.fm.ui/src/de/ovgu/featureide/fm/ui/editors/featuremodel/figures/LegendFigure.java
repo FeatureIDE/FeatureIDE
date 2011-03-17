@@ -21,6 +21,8 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.LineBorder;
+import org.eclipse.draw2d.PolylineConnection;
+import org.eclipse.draw2d.RotatableDecoration;
 import org.eclipse.draw2d.XYLayout;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
@@ -51,16 +53,14 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	/**
 	 * Specific left-padding for Grouptype rows
 	 */
-	private static final int GROUPTYPE_PADDING = 8;
+	private static final int GROUPTYPE_PADDING = 5;
 	/**
 	 * Additional lift for every row except title (to adjust the space between
 	 * title and second row)
 	 */
 	private static final int LIFT = 10;
-	/**
-	 * Additional lift for Mandatory and Optional rows
-	 */
-	private static final int MANDATORY_LIFT = 0;
+
+	private static final int SYMBOL_SIZE = ROW_HEIGHT;
 
 	private final XYLayout layout = new XYLayout();
 	public Point newPos;
@@ -107,12 +107,11 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			height = height + ROW_HEIGHT;
 
 		int width = LEGEND_WIDTH;
-		if(!mandatory&&!alternative){
-			if(!optional){
-				width=50;
-			}
-			else{
-				width=80;
+		if (!mandatory && !alternative) {
+			if (!optional) {
+				width = 50;
+			} else {
+				width = 80;
 			}
 		}
 		this.setSize(width, height);
@@ -146,86 +145,97 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	}
 
 	private void createRowAnd(int row) {
-		Point point = new Point(GROUPTYPE_PADDING, ROW_HEIGHT * row - LIFT);
-		LegendGroupTypeSymbol symbolAnd = new LegendGroupTypeSymbol(false,
-				false, point, this.getLocation());
-		layout.setConstraint(symbolAnd,
-				new Rectangle(this.getLocation().x, this.getLocation().y
-						+ ROW_HEIGHT * row, symbolAnd.getPreferredSize().width,
-						symbolAnd.getPreferredSize().height));
-		Label labelAnd = new Label("And");
-		labelAnd.setLabelAlignment(Label.LEFT);
-		layout.setConstraint(labelAnd, new Rectangle(LABEL_PADDING, ROW_HEIGHT
-				* row - LIFT, LEGEND_WIDTH - LABEL_PADDING, ROW_HEIGHT));
-		add(symbolAnd);
-		add(labelAnd);
-		labelAnd.setForegroundColor(FEATURE_FOREGROUND);
+		createGroupTypeSymbol(row, false, false);
+		Label labelOr = createLabel(row, "And");
+		add(labelOr);
+		labelOr.setForegroundColor(FEATURE_FOREGROUND);
 	}
 
 	private void createRowAlternative(int row) {
-		LegendGroupTypeSymbol symbolAlternative = new LegendGroupTypeSymbol(
-				true, false, new Point(GROUPTYPE_PADDING, ROW_HEIGHT * row
-						- LIFT), this.getLocation());
-		layout.setConstraint(
-				symbolAlternative,
-				new Rectangle(this.getLocation().x, this.getLocation().y
-						+ ROW_HEIGHT * row, symbolAlternative
-						.getPreferredSize().width, symbolAlternative
-						.getPreferredSize().height));
-		Label labelAlternative = new Label("Alternative");
-		labelAlternative.setLabelAlignment(Label.LEFT);
-		layout.setConstraint(labelAlternative,
-				new Rectangle(LABEL_PADDING, ROW_HEIGHT * row - 10,
-						LEGEND_WIDTH - LABEL_PADDING, ROW_HEIGHT));
-		add(symbolAlternative);
-		add(labelAlternative);
-		labelAlternative.setForegroundColor(FEATURE_FOREGROUND);
+		createGroupTypeSymbol(row, false, true);
+		Label labelOr = createLabel(row, "Alternative");
+		add(labelOr);
+		labelOr.setForegroundColor(FEATURE_FOREGROUND);
 	}
 
 	private void createRowOr(int row) {
-		LegendGroupTypeSymbol symbolOr = new LegendGroupTypeSymbol(true, true,
-				new Point(GROUPTYPE_PADDING, ROW_HEIGHT * row - LIFT),
-				this.getLocation());
-		layout.setConstraint(symbolOr,
-				new Rectangle(this.getLocation().x, this.getLocation().y
-						+ ROW_HEIGHT * row, symbolOr.getPreferredSize().width,
-						symbolOr.getPreferredSize().height));
-		Label labelOr = new Label("Or");
-		labelOr.setLabelAlignment(Label.LEFT);
-		layout.setConstraint(labelOr, new Rectangle(LABEL_PADDING, ROW_HEIGHT
-				* row - LIFT, LEGEND_WIDTH - LABEL_PADDING, ROW_HEIGHT));
-		add(symbolOr);
+		createGroupTypeSymbol(row, true, true);
+		Label labelOr = createLabel(row, "Or");
 		add(labelOr);
 		labelOr.setForegroundColor(FEATURE_FOREGROUND);
 	}
 
 	private void createRowOptional(int row) {
-		LegendConnectionTypeSymbol optionalSymbol = new LegendConnectionTypeSymbol(
-				false, new Point(this.getLocation().x + MANDATORY_PADDING,
-						this.getLocation().y + ROW_HEIGHT * row - LIFT
-								- MANDATORY_LIFT));
-		Label labelOptional = new Label("Optional");
-		labelOptional.setLabelAlignment(Label.LEFT);
-		layout.setConstraint(labelOptional, new Rectangle(LABEL_PADDING,
-				ROW_HEIGHT * row - LIFT - MANDATORY_LIFT, LEGEND_WIDTH
-						- LABEL_PADDING, ROW_HEIGHT));
-		add(optionalSymbol);
-		add(labelOptional);
-		labelOptional.setForegroundColor(FEATURE_FOREGROUND);
+		PolylineConnection p = createConnectionTypeSymbol(row, false);
+		add(p);
+		Label labelMandatory = createLabel(row, "Optional");
+		add(labelMandatory);
 	}
 
 	private void createRowMandatory(int row) {
-		LegendConnectionTypeSymbol symbolMandatory = new LegendConnectionTypeSymbol(
-				true, new Point(this.getLocation().x + MANDATORY_PADDING,
-						this.getLocation().y + ROW_HEIGHT * row - LIFT
-								- MANDATORY_LIFT));
-		Label labelMandatory = new Label("Mandatory");
-		labelMandatory.setLabelAlignment(Label.LEFT);
-		layout.setConstraint(labelMandatory, new Rectangle(LABEL_PADDING,
-				ROW_HEIGHT * row - LIFT - MANDATORY_LIFT, LEGEND_WIDTH
-						- LABEL_PADDING, ROW_HEIGHT));
-		add(symbolMandatory);
+
+		PolylineConnection p = createConnectionTypeSymbol(row, true);
+		add(p);
+		Label labelMandatory = createLabel(row, "Mandatory");
 		add(labelMandatory);
-		labelMandatory.setForegroundColor(FEATURE_FOREGROUND);
+
+	}
+
+	private Label createLabel(int row, String text) {
+		Label label = new Label(text);
+		label.setLabelAlignment(Label.LEFT);
+		layout.setConstraint(label, new Rectangle(LABEL_PADDING, ROW_HEIGHT
+				* row - LIFT, LEGEND_WIDTH - LABEL_PADDING, ROW_HEIGHT));
+		label.setForegroundColor(FEATURE_FOREGROUND);
+		return label;
+	}
+
+	/**
+	 * @param decoration
+	 *            if false, symbol will be of type: And
+	 * @param fill
+	 *            if decoration is true, symbol will be of type: Or. Otherwise
+	 *            Alternative. Ignored if decoration is false;
+	 */
+	private void createGroupTypeSymbol(int row, boolean fill, boolean decoration) {
+
+		Point p1 = new Point(GROUPTYPE_PADDING + SYMBOL_SIZE, ROW_HEIGHT * row
+				+ SYMBOL_SIZE - LIFT);
+		Point p2 = new Point((GROUPTYPE_PADDING + SYMBOL_SIZE / 2), ROW_HEIGHT
+				* row - LIFT);
+		Point p3 = new Point(GROUPTYPE_PADDING, ROW_HEIGHT * row + SYMBOL_SIZE
+				- LIFT);
+
+		RotatableDecoration sourceDecoration = new LegendRelationDecoration(
+				fill, p1);
+		PolylineConnection line = new PolylineConnection();
+
+		line.setEndpoints(p2, p3);
+
+		if (decoration)
+			line.setSourceDecoration(sourceDecoration);
+		PolylineConnection line2 = new PolylineConnection();
+
+		line2.setEndpoints(p2, p1);
+		this.add(line);
+		this.add(line2);
+
+		setForegroundColor(CONNECTION_FOREGROUND);
+
+	}
+
+	private PolylineConnection createConnectionTypeSymbol(int row,
+			boolean mandatory) {
+		PolylineConnection p = new PolylineConnection();
+		p.setForegroundColor(CONNECTION_FOREGROUND);
+		p.setSourceDecoration(new CircleDecoration(mandatory));
+		Point source = new Point(MANDATORY_PADDING, ROW_HEIGHT * row - LIFT
+				+ SYMBOL_SIZE / 2);
+
+		Point target = new Point(MANDATORY_PADDING + SYMBOL_SIZE / 2, row
+				* ROW_HEIGHT - LIFT);
+
+		p.setEndpoints(source, target);
+		return p;
 	}
 }

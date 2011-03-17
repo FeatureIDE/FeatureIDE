@@ -75,5 +75,13 @@ public class LegendLayoutAction extends Action {
 		
 	
 	}
-
+	public void refresh() {
+		if(featureModel.hasLegendAutoLayout()){
+			this.setChecked(true);
+		}
+		else{
+			this.setChecked(false);
+			
+		}
+	}
 }

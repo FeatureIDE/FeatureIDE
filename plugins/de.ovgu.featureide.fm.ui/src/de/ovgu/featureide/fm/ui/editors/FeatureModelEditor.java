@@ -729,6 +729,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		}else if(prop.equals(REFRESH_ACTIONS)){
 			//additional actions can be refreshed here
 			legendAction.refresh();
+			legendLayoutAction.refresh();
 		}
 	}
 

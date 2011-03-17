@@ -18,6 +18,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.commands;
 
+import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.commands.Command;
 
@@ -48,12 +49,18 @@ public class LegendDragAndDropCommand extends Command {
 
 	
 	public boolean canExecute() {
-		if(model.hasLegendAutoLayout())return false;
+	
+		
+	
 		//newRect is the rectangle containing the legend while dragging 
 		Rectangle newRect = new Rectangle(legendFigure.newPos,legendFigure.getSize());
+
+		legendFigure.translateToRelative(newRect);
 		//check if legend intersects with a feature
 		for(Feature f:model.getFeatures()){
-			if (newRect.intersects(FeatureUIHelper.getBounds(f))){
+			Rectangle bounds = FeatureUIHelper.getBounds(f);
+			
+			if (newRect.intersects(bounds)){
 				return false;
 			}
 		}
@@ -63,13 +70,18 @@ public class LegendDragAndDropCommand extends Command {
 				return false;
 			}
 		}
-		
+
 			return true;
 	}
 
 	public void execute() {
-		legendFigure.setLocation(legendFigure.newPos);
-		model.setLegendPos(legendFigure.newPos.x, legendFigure.newPos.y);
+		
+		Point p = legendFigure.newPos.getCopy();
+		legendFigure.translateToRelative(p);
+		legendFigure.setLocation(p);
+		model.setLegendPos(p.x, p.y);
+		model.setLegendAutoLayout(false);
+		model.refreshContextMenu();
 	}
 
 }
