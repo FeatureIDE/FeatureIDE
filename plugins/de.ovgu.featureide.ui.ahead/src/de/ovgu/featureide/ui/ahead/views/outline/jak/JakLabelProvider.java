@@ -22,10 +22,10 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.graphics.Image;
 
-import de.ovgu.featureide.core.fstmodel.IClass;
-import de.ovgu.featureide.core.fstmodel.IFSTModelElement;
-import de.ovgu.featureide.core.fstmodel.IField;
-import de.ovgu.featureide.core.fstmodel.IMethod;
+import de.ovgu.featureide.core.fstmodel.FSTClass;
+import de.ovgu.featureide.core.fstmodel.FSTModelElement;
+import de.ovgu.featureide.core.fstmodel.FSTField;
+import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.ui.ahead.AheadUIPlugin;
 
 
@@ -49,10 +49,10 @@ public class JakLabelProvider implements ILabelProvider {
 	private static Image IMAGE_CLASS = AheadUIPlugin.getImage("class_obj.gif");
 	
 	public Image getImage(Object element) {
-		if (element instanceof IFSTModelElement) {
-			IFSTModelElement jakModelElement = (IFSTModelElement)element;
-			if (jakModelElement instanceof IField) {
-				IField field = (IField)jakModelElement;
+		if (element instanceof FSTModelElement) {
+			FSTModelElement jakModelElement = (FSTModelElement)element;
+			if (jakModelElement instanceof FSTField) {
+				FSTField field = (FSTField)jakModelElement;
 				if (field.isPrivate())
 					return IMAGE_FIELD_PRIVATE;
 				else if (field.isProtected())
@@ -61,8 +61,8 @@ public class JakLabelProvider implements ILabelProvider {
 					return IMAGE_FIELD_PUBLIC;
 				else 
 					return IMAGE_FIELD_DEFAULT;
-			} else if (jakModelElement instanceof IMethod) {
-				IMethod method = (IMethod)jakModelElement;
+			} else if (jakModelElement instanceof FSTMethod) {
+				FSTMethod method = (FSTMethod)jakModelElement;
 				if (method.isPrivate())			
 					return IMAGE_METHODE_PRIVATE;
 				else if (method.isProtected())
@@ -71,7 +71,7 @@ public class JakLabelProvider implements ILabelProvider {
 					return IMAGE_METHODE_PUBLIC;
 				else 
 					return IMAGE_METHODE_DEFAULT;
-			} else if (jakModelElement instanceof IClass) {
+			} else if (jakModelElement instanceof FSTClass) {
 				return IMAGE_CLASS;
 			}
 		}
@@ -79,8 +79,8 @@ public class JakLabelProvider implements ILabelProvider {
 	}
 
 	public String getText(Object element) {
-		if( element instanceof IFSTModelElement )
-			return ((IFSTModelElement)element).getName();
+		if( element instanceof FSTModelElement )
+			return ((FSTModelElement)element).getName();
 		
 		return element.toString();
 	}

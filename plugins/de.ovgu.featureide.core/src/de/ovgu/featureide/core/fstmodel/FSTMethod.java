@@ -16,7 +16,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.core.fstmodel.oomodel;
+package de.ovgu.featureide.core.fstmodel;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,15 +24,12 @@ import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
 
-import de.ovgu.featureide.core.fstmodel.IFSTModelElement;
-import de.ovgu.featureide.core.fstmodel.IMethod;
-
 
 
 /**
  * @author Tom Brosch
  */
-public class Method extends OOModelElement implements Comparable<Object>, IMethod {
+public class FSTMethod extends FSTModelElement implements Comparable<Object> {
 
 	private String methodName;
 	private LinkedList<String> parameterTypes;
@@ -42,11 +39,11 @@ public class Method extends OOModelElement implements Comparable<Object>, IMetho
 	private HashSet<IFile> availableFiles;
 	private HashMap<IFile, Integer> lineNumbers;
 
-	public Method() {
+	public FSTMethod() {
 		this(null, null, null,null);
 	}
 
-	public Method(String methodName, LinkedList<String> parameterTypes,
+	public FSTMethod(String methodName, LinkedList<String> parameterTypes,
 			String returnType, String modifiers) {
 		this.methodName = methodName;
 		this.parameterTypes = parameterTypes;
@@ -74,7 +71,7 @@ public class Method extends OOModelElement implements Comparable<Object>, IMetho
 		return methodName;
 	}
 
-	public IFSTModelElement[] getChildren() {
+	public FSTModelElement[] getChildren() {
 		return null;
 	}
 
@@ -88,7 +85,7 @@ public class Method extends OOModelElement implements Comparable<Object>, IMetho
 	}
 
 	public int compareTo(Object arg0) {
-		IMethod meth = (IMethod) arg0;
+		FSTMethod meth = (FSTMethod) arg0;
 		return getIdentifier().compareTo(meth.getIdentifier());
 	}
 

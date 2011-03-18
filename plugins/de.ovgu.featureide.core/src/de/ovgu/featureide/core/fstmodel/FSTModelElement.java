@@ -18,34 +18,29 @@
  */
 package de.ovgu.featureide.core.fstmodel;
 
-import org.eclipse.core.resources.IFile;
 
-public interface IField extends IFSTModelElement {
 
-	public String getIdentifier();
+/**
+ * 
+ * @author Tom Brosch
+ * 
+ */
+public class FSTModelElement {
 
-	public void setOwn(IFile file);
+	public FSTModelElement[] getChildren() {
+		return null;
+	}
 
-	public boolean isOwn(IFile file);
+	public String getName() {
+		return null;
+	}
 
-	public void setAvailable(IFile file);
+	public FSTModelElement getParent() {
+		return null;
+	}
 
-	public boolean isAvailable(IFile file);
-
-	public void setLineNumber(IFile file, int lineNumber);
-
-	public int getLineNumber(IFile file);
-
-	public String getFieldName();
-	
-	public boolean isPublic();
-	
-	public boolean isPrivate();
-	
-	public boolean isProtected();
-	
-	public boolean isStatic();
-	
-	public boolean isFinal();
+	public boolean hasChildren() {
+		return false;
+	}
 
 }

@@ -26,9 +26,9 @@ import org.eclipse.ui.part.FileEditorInput;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.fstmodel.IClass;
-import de.ovgu.featureide.core.fstmodel.IFSTModel;
-import de.ovgu.featureide.core.fstmodel.IFSTModelElement;
+import de.ovgu.featureide.core.fstmodel.FSTClass;
+import de.ovgu.featureide.core.fstmodel.FSTModel;
+import de.ovgu.featureide.core.fstmodel.FSTModelElement;
 
 
 /**
@@ -45,24 +45,24 @@ public class JakTreeContentProvider implements ITreeContentProvider {
 	
 	private IFile jakfile = null;
 
-	private IFSTModel jakProject = null;
+	private FSTModel jakProject = null;
 
 	public Object[] getChildren(Object parentElement) {
-		if (parentElement instanceof IFSTModelElement)
-			return ((IFSTModelElement) parentElement).getChildren();
+		if (parentElement instanceof FSTModelElement)
+			return ((FSTModelElement) parentElement).getChildren();
 
 		return null;
 	}
 
 	public Object getParent(Object element) {
-		if (element instanceof IFSTModelElement)
-			((IFSTModelElement) element).getParent();
+		if (element instanceof FSTModelElement)
+			((FSTModelElement) element).getParent();
 		return null;
 	}
 
 	public boolean hasChildren(Object element) {
-		if (element instanceof IFSTModelElement)
-			return ((IFSTModelElement) element).hasChildren();
+		if (element instanceof FSTModelElement)
+			return ((FSTModelElement) element).hasChildren();
 		return false;
 	}
 
@@ -91,9 +91,9 @@ public class JakTreeContentProvider implements ITreeContentProvider {
 			};
 		}
 		if (jakProject != null) {
-			IClass c = jakProject.getClass(jakfile);
+			FSTClass c = jakProject.getClass(jakfile);
 			if (c != null)
-				return new IClass[] { jakProject.getClass(jakfile) };
+				return new FSTClass[] { jakProject.getClass(jakfile) };
 			else
 				return errMessage;
 		}

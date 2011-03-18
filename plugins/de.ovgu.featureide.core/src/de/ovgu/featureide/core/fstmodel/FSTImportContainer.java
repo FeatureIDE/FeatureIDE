@@ -18,34 +18,30 @@
  */
 package de.ovgu.featureide.core.fstmodel;
 
-import org.eclipse.core.resources.IFile;
 
-public interface IMethod extends IFSTModelElement {
 
-	public String getMethodName();
+/**
+ * 
+ * @author Tom Brosch
+ * 
+ */
+public class FSTImportContainer extends FSTModelElement {
+	public FSTImportContainer() {
+	}
 
-	public String getIdentifier();
+	public int getNumberOfImports() {
+		return 0;
+	}
 
-	public void setOwn(IFile file);
+	public FSTImport[] getImports() {
+		return null;
+	}
 
-	public boolean isOwn(IFile file);
+	public String getName() {
+		return "import declarations";
+	}
 
-	public void setAvailable(IFile file);
-
-	public boolean isAvailable(IFile file);
-
-	public void setLineNumber(IFile file, int lineNumber);
-
-	public int getLineNumber(IFile file);
-	
-	public boolean isPublic();
-	
-	public boolean isPrivate();
-	
-	public boolean isProtected();
-	
-	public boolean isStatic();
-	
-	public boolean isFinal();
-
+	public FSTModelElement[] getChildren() {
+		return null;
+	}
 }

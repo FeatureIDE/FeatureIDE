@@ -16,11 +16,8 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.core.fstmodel.oomodel;
+package de.ovgu.featureide.core.fstmodel;
 
-import de.ovgu.featureide.core.fstmodel.IFSTModelElement;
-import de.ovgu.featureide.core.fstmodel.IImport;
-import de.ovgu.featureide.core.fstmodel.IImportContainer;
 
 
 /**
@@ -28,24 +25,16 @@ import de.ovgu.featureide.core.fstmodel.IImportContainer;
  * @author Tom Brosch
  * 
  */
-public class ImportContainer extends OOModelElement implements
-		IImportContainer {
-	public ImportContainer() {
-	}
+public class FSTImport extends FSTModelElement {
 
-	public int getNumberOfImports() {
-		return 0;
-	}
-
-	public IImport[] getImports() {
-		return null;
+	public FSTImport() {
 	}
 
 	public String getName() {
-		return "import declarations";
+		return null;
 	}
 
-	public IFSTModelElement[] getChildren() {
+	public FSTModelElement[] getChildren() {
 		return null;
 	}
 }

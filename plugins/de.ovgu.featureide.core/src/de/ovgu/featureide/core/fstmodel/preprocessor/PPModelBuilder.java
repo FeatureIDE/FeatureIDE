@@ -31,7 +31,9 @@ import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.fstmodel.IFSTModel;
+import de.ovgu.featureide.core.fstmodel.FSTModel;
+import de.ovgu.featureide.core.fstmodel.FSTFeature;
+import de.ovgu.featureide.core.fstmodel.FSTClass;
 
 /**
  * Build the FSTModel for preprocessor projects.
@@ -40,28 +42,28 @@ import de.ovgu.featureide.core.fstmodel.IFSTModel;
  */
 public class PPModelBuilder {
 
-	private PPModel model;
+	private FSTModel model;
 	private IFeatureProject featureProject;
 	private Collection<String> features;
 	
 	public PPModelBuilder(IFeatureProject featureProject) {
-		IFSTModel oldModel = featureProject.getFSTModel();
+		FSTModel oldModel = featureProject.getFSTModel();
 		if (oldModel != null)
 			oldModel.markObsolete();
 
-		model = new PPModel(featureProject.getProjectName());
+		model = new FSTModel(featureProject.getProjectName());
 		featureProject.setFSTModel(model);
 		this.featureProject = featureProject;
 	}
 	
 	public void buildModel() {
-		model.classesMap = new HashMap<IFile, Class>();
-		model.classes = new HashMap<String, Class>();
-		model.features = new HashMap<String, Feature>();
+		model.classesMap = new HashMap<IFile, FSTClass>();
+		model.classes = new HashMap<String, FSTClass>();
+		model.features = new HashMap<String, FSTFeature>();
 		
 		features = featureProject.getFeatureModel().getLayerNames();
 		for (String feature : features) {
-			Feature f = new Feature(feature);
+			FSTFeature f = new FSTFeature(feature);
 			model.features.put(feature, f);
 		}
 		try {
@@ -81,12 +83,12 @@ public class PPModelBuilder {
 				buildModel((IFolder)res);
 			} else if (res instanceof IFile) {
 				String text = getText((IFile)res);
-				Class currentClass = new Class(res.getName());
+				FSTClass currentClass = new FSTClass(res.getName());
 				addClass(res.getName(), res.getFullPath().toOSString());
 				model.classes.put(res.getName(), currentClass);
 				for (String feature : features) {
 					if (containsFeature(text, feature)) {
-						Feature currentFeature = model.features.get(feature);
+						FSTFeature currentFeature = model.features.get(feature);
 						currentFeature.classes.put(res.getName(), currentClass);
 					}
 				}
@@ -134,12 +136,12 @@ public class PPModelBuilder {
 	 * 
 	 */
 	private void addClass(String className, String source) {
-		Class currentClass = null;
+		FSTClass currentClass = null;
 		
 		if (model.classes.containsKey(className)) {
 			currentClass = model.classes.get(className);
 		} else {
-			currentClass = new Class(className);
+			currentClass = new FSTClass(className);
 			model.classes.put(className, currentClass);
 		}
 		if (!model.classesMap.containsKey(source)) {

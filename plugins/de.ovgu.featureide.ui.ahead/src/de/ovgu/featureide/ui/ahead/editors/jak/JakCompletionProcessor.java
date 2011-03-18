@@ -44,10 +44,10 @@ import org.eclipse.ui.part.FileEditorInput;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.fstmodel.IClass;
-import de.ovgu.featureide.core.fstmodel.IFSTModel;
-import de.ovgu.featureide.core.fstmodel.IField;
-import de.ovgu.featureide.core.fstmodel.IMethod;
+import de.ovgu.featureide.core.fstmodel.FSTClass;
+import de.ovgu.featureide.core.fstmodel.FSTModel;
+import de.ovgu.featureide.core.fstmodel.FSTField;
+import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.ui.ahead.AheadUIPlugin;
 
 
@@ -177,9 +177,9 @@ public class JakCompletionProcessor implements IContentAssistProcessor{
 			IWorkbenchWindow editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 			FileEditorInput inputFile = (FileEditorInput)editor.getActivePage().getActiveEditor().getEditorInput(); 
 			IFeatureProject featureProject = CorePlugin.getFeatureProject(inputFile.getFile());
-			IClass[] classes = null;
+			FSTClass[] classes = null;
 			if (featureProject!=null){
-				IFSTModel project = featureProject.getFSTModel();
+				FSTModel project = featureProject.getFSTModel();
 				if (project!=null) {
 					classes = project.getClasses();
 					if (classes!=null){
@@ -199,16 +199,16 @@ public class JakCompletionProcessor implements IContentAssistProcessor{
 		
 	}
 	
-	private List<CompletionProposal> getFieldProposals(String behind, IClass[] iClasses, int offset){
+	private List<CompletionProposal> getFieldProposals(String behind, FSTClass[] FSTClasses, int offset){
 		
 		List<CompletionProposal> propList = new ArrayList<CompletionProposal>();
-		for (IClass nextClass : iClasses){
+		for (FSTClass nextClass : FSTClasses){
 			String prop;
 			ISharedImages javaImages = JavaUI.getSharedImages();
 			Image img = AheadUIPlugin.getImage("JakFileSmall.png");
-			IField[] fields = nextClass.getFields();
+			FSTField[] fields = nextClass.getFields();
 			if (fields!=null)
-			for (IField f : fields){
+			for (FSTField f : fields){
 				if (f.isPrivate())
 					img = javaImages.getImage(ISharedImages.IMG_FIELD_PRIVATE);
 				if (f.isProtected())
@@ -231,17 +231,17 @@ public class JakCompletionProcessor implements IContentAssistProcessor{
 	}
 	
 	
-private List<CompletionProposal> getMethodProposals(String behind, IClass[] iClasses, int offset){
+private List<CompletionProposal> getMethodProposals(String behind, FSTClass[] FSTClasses, int offset){
 	
 	List<CompletionProposal> propList = new ArrayList<CompletionProposal>();
-	for (IClass nextClass : iClasses){
+	for (FSTClass nextClass : FSTClasses){
 		String prop;
 		Image img = AheadUIPlugin.getImage("JakFileSmall.png");
-		IMethod[] methods = nextClass.getMethods();
+		FSTMethod[] methods = nextClass.getMethods();
 		ISharedImages javaImages = JavaUI.getSharedImages();
 		String mClass = nextClass.getName().split("[.]")[0];
 		if (methods!=null)
-			for (IMethod m : methods){
+			for (FSTMethod m : methods){
 				if (m.isPrivate())
 					img = javaImages.getImage(ISharedImages.IMG_OBJS_PRIVATE);
 				if (m.isProtected())

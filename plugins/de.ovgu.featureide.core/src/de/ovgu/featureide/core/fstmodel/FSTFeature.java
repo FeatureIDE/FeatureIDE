@@ -16,27 +16,38 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.core.fstmodel.oomodel;
+package de.ovgu.featureide.core.fstmodel;
 
-import de.ovgu.featureide.core.fstmodel.IFSTModelElement;
-import de.ovgu.featureide.core.fstmodel.IImport;
+import java.util.TreeMap;
+
 
 
 /**
- * 
+ * @author Constanze Adler
  * @author Tom Brosch
  * 
  */
-public class Import extends OOModelElement implements IImport {
-
-	public Import() {
+public class FSTFeature extends FSTModelElement {
+	
+	private String name;
+	
+	public TreeMap<String, FSTClass> classes;
+	
+	public FSTFeature(String name) {
+		this.name = name;
+		classes = new TreeMap<String, FSTClass>();
 	}
 
 	public String getName() {
-		return null;
+		return name;
 	}
 
-	public IFSTModelElement[] getChildren() {
-		return null;
+	public FSTModelElement[] getChildren() {
+		if (classes == null) return null;
+		FSTClass[] elements = new FSTClass[classes.size()];
+		int i = 0;
+		for (FSTClass c : classes.values())
+			elements[i++] =  c;		
+		return elements;
 	}
 }

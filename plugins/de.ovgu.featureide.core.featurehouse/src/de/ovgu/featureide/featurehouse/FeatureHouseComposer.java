@@ -100,7 +100,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		fstparser.createProjectTree(composer.getFstnodes());
 		featureProject.setProjectTree(fstparser.getProjectTree());
 		try {
-			featureProject.getBuildFolder().refreshLocal(
+			featureProject.getProject().refreshLocal(
 					IResource.DEPTH_INFINITE, null);
 		} catch (CoreException e) {
 			FeatureHouseCorePlugin.getDefault().logError(e);

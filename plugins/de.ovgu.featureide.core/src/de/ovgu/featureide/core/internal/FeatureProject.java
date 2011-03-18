@@ -53,7 +53,7 @@ import de.ovgu.featureide.core.builder.ComposerExtensionManager;
 import de.ovgu.featureide.core.builder.ExtensibleFeatureProjectBuilder;
 import de.ovgu.featureide.core.builder.FeatureProjectNature;
 import de.ovgu.featureide.core.builder.IComposerExtension;
-import de.ovgu.featureide.core.fstmodel.IFSTModel;
+import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.projectstructure.trees.ProjectTree;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
@@ -106,7 +106,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 
 	private final IFeatureModelReader modelReader;
 
-	private IFSTModel featureIDEProjectModel;
+	private FSTModel featureIDEProjectModel;
 
 	/**
 	 * a folder for the generated files (only needed if the Prject has only the
@@ -564,7 +564,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	 * 
 	 * @see de.ovgu.featureide.core.IFeatureProject#getJakProject()
 	 */
-	public IFSTModel getFSTModel() {
+	public FSTModel getFSTModel() {
 		return featureIDEProjectModel;
 	}
 
@@ -1109,7 +1109,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	 * @seefeatureide.core.IFeatureProject#setJakProjectModel(de.ovgu.featureide.
 	 * core. jakprojectmodel.IJakProjectModel)
 	 */
-	public void setFSTModel(IFSTModel model) {
+	public void setFSTModel(FSTModel model) {
 		featureIDEProjectModel = model;
 	}
 

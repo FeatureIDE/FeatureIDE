@@ -16,22 +16,19 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.core.fstmodel.preprocessor;
+package de.ovgu.featureide.core.fstmodel;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.fstmodel.IClass;
-import de.ovgu.featureide.core.fstmodel.IFSTModel;
-import de.ovgu.featureide.core.fstmodel.IFSTModelElement;
-import de.ovgu.featureide.core.fstmodel.IFeature;
-import de.ovgu.featureide.core.fstmodel.preprocessor.Class;
-import de.ovgu.featureide.core.fstmodel.preprocessor.Feature;
 
 
 /**
@@ -40,11 +37,11 @@ import de.ovgu.featureide.core.fstmodel.preprocessor.Feature;
  * @author Tom Brosch
  * 
  */
-public class PPModel extends PPModelElement implements IFSTModel {
+public class FSTModel extends FSTModelElement {
 
-	public HashMap<IFile, Class> classesMap;
-	public HashMap<String, Class> classes;
-	public HashMap<String, Feature> features;
+	public HashMap<IFile, FSTClass> classesMap;
+	public HashMap<String, FSTClass> classes;
+	public HashMap<String, FSTFeature> features;
 	private String projectName;
 
 	/**
@@ -53,10 +50,10 @@ public class PPModel extends PPModelElement implements IFSTModel {
 	 * @param name
 	 *            Name of the project
 	 */
-	public PPModel(String name) {
-		classesMap = new HashMap<IFile, Class>();
-		classes = new HashMap<String, Class>();
-		features = new HashMap<String, Feature>();
+	public FSTModel(String name) {
+		classesMap = new HashMap<IFile, FSTClass>();
+		classes = new HashMap<String, FSTClass>();
+		features = new HashMap<String, FSTFeature>();
 		projectName = name;
 	}
 
@@ -64,47 +61,61 @@ public class PPModel extends PPModelElement implements IFSTModel {
 		return 0;
 	}
 
-	public ArrayList<IFeature> getSelectedFeatures() {
+	public ArrayList<FSTFeature> getSelectedFeatures() {
 		Collection <IFeatureProject> featureProjects = CorePlugin.getFeatureProjects();
 		IFeatureProject featureProject = null;
-		for (IFeatureProject project : featureProjects)
-			if (project.getProjectName().equals(projectName))
+		for (IFeatureProject project : featureProjects) { 
+			if (project.getProjectName().equals(projectName)) {
 				featureProject = project;
+				break;
+			}
+		}
 		if (featureProject == null)
 			return null;
 		
-		ArrayList<IFeature> list = new ArrayList<IFeature>();
-		ArrayList<String> allFeatures = new ArrayList<String>();
-		for (String f : featureProject.getFeatureModel().getLayerNames()) {
-			allFeatures.add(f);
-		}
-		if (allFeatures.size() == 0)
-			return null;
-		IFeature[] features =  getFeatures();
-		for (String feature : allFeatures) {
-			for (IFeature iFeature : features) {
-				if (iFeature.getName().equals(feature)){
-					list.add(iFeature);
+		ArrayList<FSTFeature>list = new ArrayList<FSTFeature>();
+		if (featureProject.getComposer().hasFeatureFolders()) {
+			ArrayList<String> allFeatures = new ArrayList<String>();//(file);
+			try {
+				for (IResource res : featureProject.getSourceFolder().members()) {
+					if (res instanceof IFolder) {
+						allFeatures.add(res.getName());
+					}
+				}
+			} catch (CoreException e) {
+				CorePlugin.getDefault().logError(e);
+			}
+			if (allFeatures.size() == 0)
+				return null;
+			for (String feature : allFeatures) {
+				for (FSTFeature iFeature : getFeatures()) {
+					if (iFeature.getName().equals(feature)){
+						list.add(iFeature);
+					}
 				}
 			}
+		} else {
+			for (FSTFeature iFeature : getFeatures()) {
+				list.add(iFeature);
+			}
 		}
-		return list;	
+		return list;
 	}
 
 	public int getNumberOfFeatures() {
 		return features.size();
 	}
 
-	public IFeature[] getFeatures() {
-		IFeature[] featureArray = new Feature[features.size()];
+	public FSTFeature[] getFeatures() {
+		FSTFeature[] featureArray = new FSTFeature[features.size()];
 		int pos = 0;
-		for (IFeature f : features.values()) {
+		for (FSTFeature f : features.values()) {
 			featureArray[pos++] = f;
 		}
 		return featureArray;
 	}
 
-	public IFeature getFeature(String featureName) {
+	public FSTFeature getFeature(String featureName) {
 		if (!features.containsKey(featureName))
 			return null;
 		return features.get(featureName); 
@@ -114,19 +125,19 @@ public class PPModel extends PPModelElement implements IFSTModel {
 		return classesMap.size();
 	}
 
-	public IClass[] getClasses() {
-		IClass[] classArray = new Class[classes.size()];
+	public FSTClass[] getClasses() {
+		FSTClass[] classArray = new FSTClass[classes.size()];
 		int pos = 0;
-		for (IClass c : classes.values()) {
+		for (FSTClass c : classes.values()) {
 			classArray[pos++] = c;
 		}
 		return classArray;
 	}
 
-	public IClass getClass(IFile file) {
+	public FSTClass getClass(IFile file) {
 		if (!classesMap.containsKey(file))
 			return null;
-		IClass c = classesMap.get(file);
+		FSTClass c = classesMap.get(file);
 		c.setFile(file);
 		return c;
 	}
@@ -135,7 +146,7 @@ public class PPModel extends PPModelElement implements IFSTModel {
 		return projectName;
 	}
 
-	public IFSTModelElement[] getChildren() {
+	public FSTModelElement[] getChildren() {
 		return getClasses();
 	}
 

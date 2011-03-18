@@ -16,8 +16,25 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.core.fstmodel;
+package de.ovgu.featureide.featurehouse.model;
 
-public interface IImport extends IFSTModelElement {
+import de.ovgu.cide.fstgen.ast.FSTTerminal;
 
+/**
+ * 
+ * @author Jens Meinicke
+ */
+public abstract class AClassBuilder {
+	
+	FeatureHouseModelBuilder modelBuilder;
+	
+	public AClassBuilder(FeatureHouseModelBuilder modelBuilder) {
+		this.modelBuilder = modelBuilder;
+	}
+
+	void caseFieldDeclaration(FSTTerminal terminal) {}
+	
+	void caseMethodDeclaration(FSTTerminal terminal) {}
+	
+	void caseConstructorDeclaration(FSTTerminal terminal) {}
 }

@@ -25,7 +25,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.QualifiedName;
 
 import de.ovgu.featureide.core.builder.IComposerExtension;
-import de.ovgu.featureide.core.fstmodel.IFSTModel;
+import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.projectstructure.trees.ProjectTree;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
@@ -108,7 +108,7 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 
 	public IProject getProject();
 
-	public IFSTModel getFSTModel();
+	public FSTModel getFSTModel();
 
 	public FeatureModel getFeatureModel();
 	
@@ -159,7 +159,7 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	/** 
 	 * @param model
 	 */
-	public void setFSTModel(IFSTModel model);
+	public void setFSTModel(FSTModel model);
 	
 	/**
 	 * @return True if a source file, or the current configuration changed.

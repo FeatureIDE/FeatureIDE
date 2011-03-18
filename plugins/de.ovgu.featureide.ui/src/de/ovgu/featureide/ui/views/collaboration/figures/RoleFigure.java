@@ -28,8 +28,8 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.graphics.Image;
 
-import de.ovgu.featureide.core.fstmodel.IField;
-import de.ovgu.featureide.core.fstmodel.IMethod;
+import de.ovgu.featureide.core.fstmodel.FSTField;
+import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 import de.ovgu.featureide.ui.views.collaboration.model.Role;
@@ -94,7 +94,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 			
 			int fieldCount = 0;
 			int methodCount = 0;
-			for(IField f : role.fields){
+			for(FSTField f : role.fields){
 				
 				Label fieldLabel = new Label(f.getName() + " ");
 				if (f.isPrivate())
@@ -123,7 +123,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 			if (fieldCount % 25 != 0)
 				tooltipContent.add(fieldFigure);
 			
-			for(IMethod m : role.methods){
+			for(FSTMethod m : role.methods){
 				
 				Label methodLabel = new Label(m.getName() + " ");
 				if (m.isPrivate())			

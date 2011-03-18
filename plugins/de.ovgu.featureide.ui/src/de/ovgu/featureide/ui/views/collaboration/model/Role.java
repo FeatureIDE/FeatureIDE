@@ -24,8 +24,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 
-import de.ovgu.featureide.core.fstmodel.IField;
-import de.ovgu.featureide.core.fstmodel.IMethod;
+import de.ovgu.featureide.core.fstmodel.FSTField;
+import de.ovgu.featureide.core.fstmodel.FSTMethod;
 
 
 /**
@@ -40,8 +40,8 @@ public class Role {
 	private Class parentClass;
 	private Collaboration collaboration;
 	private IPath path;
-	public LinkedList<IField> fields = new LinkedList<IField>();
-	public LinkedList<IMethod> methods = new LinkedList<IMethod>();	
+	public LinkedList<FSTField> fields = new LinkedList<FSTField>();
+	public LinkedList<FSTMethod> methods = new LinkedList<FSTMethod>();	
 	public LinkedList<IFile> files = new LinkedList<IFile>();
 	public IFile file;
 	public String featureName = "";

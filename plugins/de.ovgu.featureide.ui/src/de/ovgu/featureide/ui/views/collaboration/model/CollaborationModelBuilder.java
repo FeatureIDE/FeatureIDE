@@ -34,12 +34,12 @@ import org.eclipse.core.runtime.IPath;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtension;
-import de.ovgu.featureide.core.fstmodel.IClass;
-import de.ovgu.featureide.core.fstmodel.IFSTModel;
-import de.ovgu.featureide.core.fstmodel.IFSTModelElement;
-import de.ovgu.featureide.core.fstmodel.IFeature;
-import de.ovgu.featureide.core.fstmodel.IField;
-import de.ovgu.featureide.core.fstmodel.IMethod;
+import de.ovgu.featureide.core.fstmodel.FSTModel;
+import de.ovgu.featureide.core.fstmodel.FSTModelElement;
+import de.ovgu.featureide.core.fstmodel.FSTFeature;
+import de.ovgu.featureide.core.fstmodel.FSTClass;
+import de.ovgu.featureide.core.fstmodel.FSTField;
+import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.configuration.FeatureOrderReader;
 import de.ovgu.featureide.ui.UIPlugin;
@@ -63,7 +63,7 @@ public class CollaborationModelBuilder {
 	private ArrayList<String> iFeatureNames = new ArrayList<String>();
 	private Collaboration collaboration;
 	private ArrayList<String> extensions;
-	private IFSTModel fSTModel;
+	private FSTModel fSTModel;
 	private IFeatureProject project;
 	
 	public CollaborationModelBuilder() {
@@ -185,12 +185,12 @@ public class CollaborationModelBuilder {
 			}
 		} else {
 			//case: FSTModel builded
-			ArrayList<IFeature> iFeatures = fSTModel.getSelectedFeatures();
+			ArrayList<FSTFeature> iFeatures = fSTModel.getSelectedFeatures();
 			if (iFeatures == null) {
 				return null;
 			}
 			
-			for (IFeature feature : iFeatures) {
+			for (FSTFeature feature : iFeatures) {
 				iFeatureNames.add(feature.getName());
 			}
 			
@@ -200,23 +200,23 @@ public class CollaborationModelBuilder {
 					if (iFeatureNames.contains(layerName)) {
 						//case: add class files
 						Boolean selected = true;
-						IFeature feature = fSTModel.getFeature(layerName);
+						FSTFeature feature = fSTModel.getFeature(layerName);
 						collaboration = null;
 						if (!configuration.equals("") && !featureNames.contains(layerName))
 							selected = false;
 						if (selected || showUnselectedFeatures) {
-							IFSTModelElement[] element = feature.getChildren();
-							if (element instanceof IClass[]) {
-								for (IClass iClass : (IClass[]) element) {
-									if (classFilter.size() == 0 || classFilter.contains(iClass.getName())) {
+							FSTModelElement[] element = feature.getChildren();
+							if (element instanceof FSTClass[]) {
+								for (FSTClass Class : (FSTClass[]) element) {
+									if (classFilter.size() == 0 || classFilter.contains(Class.getName())) {
 										if (collaboration == null)
 											collaboration = new Collaboration(feature.getName());
 										IPath pathToFile = path.getFullPath();
 										if (composer.hasFeatureFolders()) {
 											pathToFile = pathToFile.append(feature.getName());
 										}
-										pathToFile = pathToFile.append(iClass.getName());
-										String name = iClass.getName();
+										pathToFile = pathToFile.append(Class.getName());
+										String name = Class.getName();
 										Role role = new Role(name);
 										if (composer.hasFeatureFolders()) {
 											role.file = featureProject.getSourceFolder()
@@ -228,13 +228,13 @@ public class CollaborationModelBuilder {
 											role.files.add(role.file);
 										}
 										role.featureName = feature.getName();
-										if (iClass.getFields() != null) {
-											for (IField f : iClass.getFields()) {
+										if (Class.getFields() != null) {
+											for (FSTField f : Class.getFields()) {
 												role.fields.add(f);
 											}
 										}
-										if (iClass.getMethods() != null) {
-											for (IMethod m : iClass.getMethods()) {
+										if (Class.getMethods() != null) {
+											for (FSTMethod m : Class.getMethods()) {
 												role.methods.add(m);
 											}
 										}

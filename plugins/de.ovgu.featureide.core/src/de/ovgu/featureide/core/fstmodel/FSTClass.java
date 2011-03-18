@@ -16,18 +16,12 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.core.fstmodel.oomodel;
+package de.ovgu.featureide.core.fstmodel;
 
 import java.util.LinkedList;
 import java.util.TreeMap;
 
 import org.eclipse.core.resources.IFile;
-
-import de.ovgu.featureide.core.fstmodel.IClass;
-import de.ovgu.featureide.core.fstmodel.IFSTModelElement;
-import de.ovgu.featureide.core.fstmodel.IField;
-import de.ovgu.featureide.core.fstmodel.IMethod;
-
 
 /**
  * Describes a class of a featureproject according to a selected configuration
@@ -36,21 +30,21 @@ import de.ovgu.featureide.core.fstmodel.IMethod;
  * @author Thomas Thuem
  * 
  */
-public class Class extends OOModelElement implements IClass {
+public class FSTClass extends FSTModelElement {
 
 	// Only the own AST methods are implemented
 
 	private IFile currentFile;
 
-	public TreeMap<String, Method> methods;
+	public TreeMap<String, FSTMethod> methods;
 
-	public TreeMap<String, IField> fields;
+	public TreeMap<String, FSTField> fields;
 
 	private String className;
 
 	private LinkedList<IFile> sources;
 
-	public Class() {
+	public FSTClass() {
 		this("");
 	}
 
@@ -60,185 +54,184 @@ public class Class extends OOModelElement implements IClass {
 	 * @param className
 	 *            The name of the class
 	 */
-	public Class(String className) {
+	public FSTClass(String className) {
 		this.className = className;
-		methods = new TreeMap<String, Method>();
-		fields = new TreeMap<String, IField>();
+		methods = new TreeMap<String, FSTMethod>();
+		fields = new TreeMap<String, FSTField>();
 	}
 
 	public int getFieldCount() {
 		return fields.size();
 	}
 
-	public IField[] getFields() {
-		return fields.values().toArray(new Field[fields.values().size()]);
+	public FSTField[] getFields() {
+		return fields.values().toArray(new FSTField[fields.values().size()]);
 	}
 
 	public int getMethodCount() {
 		return methods.size();
 	}
 
-	public IMethod[] getMethods() {
-		IMethod[] methodArray = new IMethod[methods.size()];
+	public FSTMethod[] getMethods() {
+		FSTMethod[] methodArray = new FSTMethod[methods.size()];
 		int i = 0;
-		for (IMethod meth : methods.values())
+		for (FSTMethod meth : methods.values())
 			methodArray[i++] = meth;
 		return methodArray;
 	}
 
-	
 	public int getPublicFieldCount() {
 		int i = 0;
-		for (IField field : fields.values())
+		for (FSTField field : fields.values())
 			if (field.isPublic())
 				i++;
 		return i;
 	}
-	
-	public IField[] getPublicFields() {
-		IField[] fieldArray = new Field[getPublicFieldCount()];
+
+	public FSTField[] getPublicFields() {
+		FSTField[] fieldArray = new FSTField[getPublicFieldCount()];
 		int i = 0;
-		for (IField field : fields.values())
+		for (FSTField field : fields.values())
 			if (field.isPublic())
 				fieldArray[i++] = field;
 		return fieldArray;
 	}
-	
+
 	public int getPublicMethodCount() {
 		int i = 0;
-		for (IMethod meth : methods.values())
+		for (FSTMethod meth : methods.values())
 			if (meth.isPublic())
 				i++;
 		return i;
 	}
-	
-	public IMethod[] getPublicMethods() {
-		IMethod[] methodArray = new Method[getPublicMethodCount()];
+
+	public FSTMethod[] getPublicMethods() {
+		FSTMethod[] methodArray = new FSTMethod[getPublicMethodCount()];
 		int i = 0;
-		for (IMethod meth : methods.values()) {
+		for (FSTMethod meth : methods.values()) {
 			if (meth.isPublic())
 				methodArray[i++] = meth;
 		}
 		return methodArray;
 	}
-	
+
 	public int getProtectedFieldCount() {
 		int i = 0;
-		for (IField field : fields.values())
+		for (FSTField field : fields.values())
 			if (field.isProtected())
 				i++;
 		return i;
 	}
-	
-	public IField[] getProtectedFields() {
-		IField[] fieldArray = new Field[getProtectedFieldCount()];
+
+	public FSTField[] getProtectedFields() {
+		FSTField[] fieldArray = new FSTField[getProtectedFieldCount()];
 		int i = 0;
-		for (IField field : fields.values())
+		for (FSTField field : fields.values())
 			if (field.isProtected())
 				fieldArray[i++] = field;
 		return fieldArray;
 	}
-	
+
 	public int getProtectedMethodCount() {
 		int i = 0;
-		for (IMethod meth : methods.values())
+		for (FSTMethod meth : methods.values())
 			if (meth.isProtected())
 				i++;
 		return i;
 	}
-	
-	public IMethod[] getProtectedMethods() {
-		IMethod[] methodArray = new Method[getProtectedMethodCount()];
+
+	public FSTMethod[] getProtectedMethods() {
+		FSTMethod[] methodArray = new FSTMethod[getProtectedMethodCount()];
 		int i = 0;
-		for (IMethod meth : methods.values()) {
+		for (FSTMethod meth : methods.values()) {
 			if (meth.isProtected())
 				methodArray[i++] = meth;
 		}
 		return methodArray;
 	}
-	
+
 	public int getPrivateFieldCount() {
 		int i = 0;
-		for (IField field : fields.values())
+		for (FSTField field : fields.values())
 			if (field.isPrivate())
 				i++;
 		return i;
 	}
-	
-	public IField[] getPrivateFields() {
-		IField[] fieldArray = new Field[getPrivateFieldCount()];
+
+	public FSTField[] getPrivateFields() {
+		FSTField[] fieldArray = new FSTField[getPrivateFieldCount()];
 		int i = 0;
-		for (IField field : fields.values())
+		for (FSTField field : fields.values())
 			if (field.isPrivate())
 				fieldArray[i++] = field;
 		return fieldArray;
 	}
-	
+
 	public int getPrivateMethodCount() {
 		int i = 0;
-		for (IMethod meth : methods.values())
+		for (FSTMethod meth : methods.values())
 			if (meth.isPrivate())
 				i++;
 		return i;
 	}
-	
-	public IMethod[] getPrivateMethods() {
-		IMethod[] methodArray = new Method[getPrivateMethodCount()];
+
+	public FSTMethod[] getPrivateMethods() {
+		FSTMethod[] methodArray = new FSTMethod[getPrivateMethodCount()];
 		int i = 0;
-		for (IMethod meth : methods.values()) {
+		for (FSTMethod meth : methods.values()) {
 			if (meth.isPrivate())
 				methodArray[i++] = meth;
 		}
 		return methodArray;
 	}
-	
+
 	public int getPackagePrivateFieldCount() {
 		int i = 0;
-		for (IField field : fields.values())
+		for (FSTField field : fields.values())
 			if (!field.isPrivate() && !field.isProtected() && !field.isPublic())
 				i++;
 		return i;
 	}
-	
-	public IField[] getPackagePrivateFields() {
-		IField[] fieldArray = new Field[getPackagePrivateFieldCount()];
+
+	public FSTField[] getPackagePrivateFields() {
+		FSTField[] fieldArray = new FSTField[getPackagePrivateFieldCount()];
 		int i = 0;
-		for (IField field : fields.values())
+		for (FSTField field : fields.values())
 			if (!field.isPrivate() && !field.isProtected() && !field.isPublic())
 				fieldArray[i++] = field;
 		return fieldArray;
 	}
-	
+
 	public int getPackagePrivateMethodCount() {
 		int i = 0;
-		for (IMethod meth : methods.values())
+		for (FSTMethod meth : methods.values())
 			if (!meth.isPrivate() && !meth.isProtected() && !meth.isPublic())
 				i++;
 		return i;
 	}
-	
-	public IMethod[] getPackagePrivateMethods() {
-		IMethod[] methodArray = new Method[getPrivateMethodCount()];
+
+	public FSTMethod[] getPackagePrivateMethods() {
+		FSTMethod[] methodArray = new FSTMethod[getPrivateMethodCount()];
 		int i = 0;
-		for (IMethod meth : methods.values()) {
+		for (FSTMethod meth : methods.values()) {
 			if (!meth.isPrivate() && !meth.isProtected() && !meth.isPublic())
 				methodArray[i++] = meth;
 		}
 		return methodArray;
 	}
-	
+
 	public int getAvailableFieldCount() {
 		int i = 0;
-		for (IField field : fields.values())
+		for (FSTField field : fields.values())
 			if (field.isAvailable(currentFile))
 				i++;
 		return i;
 	}
 
-	public IField[] getAvailableFields() {
-		IField[] fieldArray = new Field[getAvailableFieldCount()];
+	public FSTField[] getAvailableFields() {
+		FSTField[] fieldArray = new FSTField[getAvailableFieldCount()];
 		int i = 0;
-		for (IField field : fields.values())
+		for (FSTField field : fields.values())
 			if (field.isAvailable(currentFile))
 				fieldArray[i++] = field;
 		return fieldArray;
@@ -246,16 +239,16 @@ public class Class extends OOModelElement implements IClass {
 
 	public int getAvailableMethodCount() {
 		int i = 0;
-		for (IMethod meth : methods.values())
+		for (FSTMethod meth : methods.values())
 			if (meth.isAvailable(currentFile))
 				i++;
 		return i;
 	}
 
-	public IMethod[] getAvailableMethods() {
-		IMethod[] methodArray = new Method[getAvailableMethodCount()];
+	public FSTMethod[] getAvailableMethods() {
+		FSTMethod[] methodArray = new FSTMethod[getAvailableMethodCount()];
 		int i = 0;
-		for (IMethod meth : methods.values()) {
+		for (FSTMethod meth : methods.values()) {
 			if (meth.isAvailable(currentFile))
 				methodArray[i++] = meth;
 		}
@@ -264,16 +257,16 @@ public class Class extends OOModelElement implements IClass {
 
 	public int getOwnFieldCount() {
 		int i = 0;
-		for (IField field : fields.values())
+		for (FSTField field : fields.values())
 			if (field.isOwn(currentFile))
 				i++;
 		return i;
 	}
 
-	public IField[] getOwnFields() {
-		IField[] fieldArray = new Field[getOwnFieldCount()];
+	public FSTField[] getOwnFields() {
+		FSTField[] fieldArray = new FSTField[getOwnFieldCount()];
 		int i = 0;
-		for (IField field : fields.values())
+		for (FSTField field : fields.values())
 			if (field.isOwn(currentFile))
 				fieldArray[i++] = field;
 		return fieldArray;
@@ -281,16 +274,16 @@ public class Class extends OOModelElement implements IClass {
 
 	public int getOwnMethodCount() {
 		int i = 0;
-		for (IMethod meth : methods.values())
+		for (FSTMethod meth : methods.values())
 			if (meth.isOwn(currentFile))
 				i++;
 		return i;
 	}
 
-	public IMethod[] getOwnMethods() {
-		IMethod[] methodArray = new Method[getOwnMethodCount()];
+	public FSTMethod[] getOwnMethods() {
+		FSTMethod[] methodArray = new FSTMethod[getOwnMethodCount()];
 		int i = 0;
-		for (IMethod meth : methods.values()) {
+		for (FSTMethod meth : methods.values()) {
 			if (meth.isOwn(currentFile))
 				methodArray[i++] = meth;
 		}
@@ -309,11 +302,11 @@ public class Class extends OOModelElement implements IClass {
 		return className;
 	}
 
-	public IFSTModelElement[] getChildren() {
-		IFSTModelElement[] elements = new IFSTModelElement[getOwnFieldCount()
+	public FSTModelElement[] getChildren() {
+		FSTModelElement[] elements = new FSTModelElement[getOwnFieldCount()
 				+ getOwnMethodCount()];
-		IField[] fieldArray = getOwnFields();
-		IMethod[] methodArray = getOwnMethods();
+		FSTField[] fieldArray = getOwnFields();
+		FSTMethod[] methodArray = getOwnMethods();
 		int pos = 0;
 		for (int i = 0; i < fieldArray.length; i++, pos++)
 			elements[pos] = fieldArray[i];

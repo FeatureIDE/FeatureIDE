@@ -38,14 +38,11 @@ import org.eclipse.core.resources.IFolder;
 import de.ovgu.featureide.ahead.AheadCorePlugin;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.fstmodel.IFSTModel;
-import de.ovgu.featureide.core.fstmodel.IField;
-import de.ovgu.featureide.core.fstmodel.oomodel.Class;
-import de.ovgu.featureide.core.fstmodel.oomodel.Feature;
-import de.ovgu.featureide.core.fstmodel.oomodel.Field;
-import de.ovgu.featureide.core.fstmodel.oomodel.OOModel;
-import de.ovgu.featureide.core.fstmodel.oomodel.Method;
-
+import de.ovgu.featureide.core.fstmodel.FSTModel;
+import de.ovgu.featureide.core.fstmodel.FSTFeature;
+import de.ovgu.featureide.core.fstmodel.FSTField;
+import de.ovgu.featureide.core.fstmodel.FSTMethod;
+import de.ovgu.featureide.core.fstmodel.FSTClass;
 
 /**
  * This builder builds the JakProjectModel, by extracting features, 
@@ -56,17 +53,17 @@ import de.ovgu.featureide.core.fstmodel.oomodel.Method;
  */
 public class JakModelBuilder {
 
-	private OOModel model;
+	private FSTModel model;
 	
 	private IFolder sourceFolder;
 
 	public JakModelBuilder(IFeatureProject featureProject) {
 		if (featureProject != null) {
-			IFSTModel oldModel = featureProject.getFSTModel();
+			FSTModel oldModel = featureProject.getFSTModel();
 			if (oldModel != null)
 				oldModel.markObsolete();
 	
-			model = new OOModel(featureProject.getProjectName());
+			model = new FSTModel(featureProject.getProjectName());
 			featureProject.setFSTModel(model);
 		}
 	}
@@ -85,7 +82,7 @@ public class JakModelBuilder {
 	 */
 	public void addClass(String className, LinkedList<IFile> sources,
 			AST_Program[] composedASTs, AST_Program[] ownASTs) {
-		Class currentClass = null;
+		FSTClass currentClass = null;
 		// Parse the name and the ownASTs to know to which IFiles this class
 		// file belongs to
 
@@ -94,7 +91,7 @@ public class JakModelBuilder {
 		if (model.classes.containsKey(className)) {
 			currentClass = model.classes.get(className);
 		} else {
-			currentClass = new Class(className);
+			currentClass = new FSTClass(className);
 			model.classes.put(className, currentClass);
 		}
 
@@ -115,15 +112,15 @@ public class JakModelBuilder {
 	 * @see de.ovgu.featureide.core.jakprojectmodel.IClass#updateAst(java.util.Vector,
 	 * mixin.AST_Program[], mixin.AST_Program[])
 	 */
-	public void updateAst(Class currentClass, LinkedList<IFile> sources,
+	public void updateAst(FSTClass currentClass, LinkedList<IFile> sources,
 			AST_Program[] composedASTs, AST_Program[] ownASTs) {
 		IFile currentFile = null;
 		AstCursor c = new AstCursor();
 
 		
 		
-		Method newMethod = null;
-		LinkedList<Field> newFields = null;
+		FSTMethod newMethod = null;
+		LinkedList<FSTField> newFields = null;
 		int lineNumber = -1;
 		currentClass.methods.clear();
 		currentClass.fields.clear();
@@ -161,7 +158,7 @@ public class JakModelBuilder {
 				}
 				if (c.node instanceof FldVarDec) {
 					newFields = getFields((FldVarDec) c.node);
-					for (IField field : newFields) {
+					for (FSTField field : newFields) {
 
 						if (currentClass.fields.containsKey(field
 								.getIdentifier())) {
@@ -179,7 +176,7 @@ public class JakModelBuilder {
 				
 		
 			}
-			Feature f = getFeature(currentClass, currentFile);
+			FSTFeature f = getFeature(currentClass, currentFile);
 			if (!model.features.containsKey(f.getName())) {
 				model.features.put(f.getName(), f);
 			}
@@ -199,7 +196,7 @@ public class JakModelBuilder {
 		return -1;
 	}
 
-	private Method getMethod(MethodDcl methDcl) {
+	private FSTMethod getMethod(MethodDcl methDcl) {
 		AstCursor cur = new AstCursor();
 		String type = "";
 		String name = "";
@@ -248,15 +245,15 @@ public class JakModelBuilder {
 
 		}
 
-		return new Method(name, paramTypes, type, modifiers);
+		return new FSTMethod(name, paramTypes, type, modifiers);
 	}
 
-	private LinkedList<Field> getFields(FldVarDec fieldDcl) {
+	private LinkedList<FSTField> getFields(FldVarDec fieldDcl) {
 		AstCursor cur = new AstCursor();
 		String type = "";
 		String modifiers = "";
 
-		LinkedList<Field> fields = new LinkedList<Field>();
+		LinkedList<FSTField> fields = new LinkedList<FSTField>();
 
 		// Travers the Subtree and get the type and
 		// all variable qualifiers
@@ -279,7 +276,7 @@ public class JakModelBuilder {
 			}
 			else if (cur.node instanceof DecNameDim) {
 				// to do: find out the dimension more correctly
-				fields.add(new Field(((DecNameDim) cur.node).getQName()
+				fields.add(new FSTField(((DecNameDim) cur.node).getQName()
 						.GetName(), type, 0, modifiers));
 			}
 
@@ -288,10 +285,10 @@ public class JakModelBuilder {
 		return fields;
 	}
 	
-	private Feature getFeature(Class currentClass, IFile currentFile){
+	private FSTFeature getFeature(FSTClass currentClass, IFile currentFile){
 		sourceFolder = CorePlugin.getFeatureProject(currentFile).getSourceFolder();
 		String featureName = getFeature((IFolder)currentFile.getParent());
-		Feature f = new Feature(featureName);
+		FSTFeature f = new FSTFeature(featureName);
 		f.classes.put(currentClass.getName(), currentClass);
 		f.classes.get(currentClass.getName()).setFile(currentFile);
 		return f;

@@ -16,20 +16,17 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.core.fstmodel.oomodel;
+package de.ovgu.featureide.core.fstmodel;
 
 import java.util.HashMap;
 import java.util.HashSet;
 
 import org.eclipse.core.resources.IFile;
 
-import de.ovgu.featureide.core.fstmodel.IFSTModelElement;
-import de.ovgu.featureide.core.fstmodel.IField;
-
 /**
  * @author Tom Brosch
  */
-public class Field extends OOModelElement implements Comparable<Object>, IField {
+public class FSTField extends FSTModelElement implements Comparable<Object> {
 
 	private String fieldName;
 	private String typeName;
@@ -40,7 +37,7 @@ public class Field extends OOModelElement implements Comparable<Object>, IField 
 	private HashSet<IFile> availableFiles;
 	private HashMap<IFile, Integer> lineNumbers;
 
-	public Field(String fieldName, String typeName, int dim, String modifiers) {
+	public FSTField(String fieldName, String typeName, int dim, String modifiers) {
 		this.fieldName = fieldName;
 		this.typeName = typeName;
 		this.dimension = dim;
@@ -58,7 +55,7 @@ public class Field extends OOModelElement implements Comparable<Object>, IField 
 		return name;
 	}
 
-	public IFSTModelElement[] getChildren() {
+	public FSTModelElement[] getChildren() {
 		return null;
 	}
 
@@ -68,7 +65,7 @@ public class Field extends OOModelElement implements Comparable<Object>, IField 
 	}
 
 	public int compareTo(Object arg0) {
-		IField field = (IField) arg0;
+		FSTField field = (FSTField) arg0;
 		return getIdentifier().compareTo(field.getIdentifier());
 	}
 
