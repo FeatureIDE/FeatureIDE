@@ -179,6 +179,15 @@ public class ConstraintDialog {
 		int x = bounds.x + (bounds.width - rect.width) / 2;
 		int y = bounds.y + (bounds.height - rect.height) / 2;
 		shell.setLocation(x, y);
+		 shell.addListener(SWT.Traverse, new Listener() {
+		      public void handleEvent(Event event) {
+		        if (event.detail==SWT.TRAVERSE_ESCAPE) {
+		       
+		          shell.close();
+		          
+		        }
+		      }
+		    });
 	}
 
 	/**
