@@ -1,0 +1,55 @@
+public refines class MrPinkMain {
+
+	UI userInterface;
+
+
+	public void searchInIndex(String query,int maxResults,int searchMode) throws Exception{
+		if(index == null){
+			userInterface.printErrorMessage("Bisher wurde noch kein Pfad indexiert");
+			return;
+		}
+			
+		TopDocs hits = null;
+		if (searchMode == OptionStorage.SEARCHLASTMODIFIED) {
+			// Suche nach den X juengsten Dokumenten
+			
+			System.out.print("Getting the " + maxResults + " newest documents...");
+			hits = index.getMostRecentDocuments(maxResults);
+
+			if (hits != null) {
+				System.out.println(" found " + hits.totalHits + " documents.");
+//				MrPinkMain.printHits(hits.scoreDocs, index, "lastModify");
+				userInterface.printSearch_SearchPanel(hits.scoreDocs, index, null);
+			} else {
+				System.out.println(" no documents found.");
+			}
+		} else if (searchMode == OptionStorage.SEARCHLARGEST) {
+			// Suche nach den X groessten Dokumente
+			
+			System.out.print("Getting the " + maxResults + " largest documents...");
+			hits = index.getLargestDocuments(maxResults);
+
+			if (hits != null) {
+				System.out.println(" found " + hits.totalHits + " documents.");
+				userInterface.printSearch_SearchPanel(hits.scoreDocs, index, null);
+			} else {
+				System.out.println(" no documents found.");
+			}
+		} else if(searchMode == OptionStorage.SEARCHNORMAL) {
+			// Suche nach Suchbegriff
+			
+			System.out.print("Searching for '" + query + "'...");
+			hits = index.search(query, maxResults);
+			
+			if (hits != null) {
+				System.out.println(" found " + hits.totalHits + " matching documents.");
+				userInterface.printSearch_SearchPanel(hits.scoreDocs, index, query);
+			} else {
+				System.out.println(" no matching documents found.");
+			}
+		} else {
+			throw new IndexerException("Unknown search mode.");
+		}
+	}
+
+}

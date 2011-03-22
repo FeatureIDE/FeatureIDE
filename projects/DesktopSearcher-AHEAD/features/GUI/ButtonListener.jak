@@ -1,0 +1,55 @@
+
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+
+/**
+	 * Event-Listener
+	 * 
+	 * Die Klasse Listener behandelt alle Events die durch Buttons ausgeloest
+	 * werden
+	 * 
+	 */
+	public class ButtonListener implements ActionListener {
+		Component parents;// = null;
+		MainFrame frame;
+
+		public ButtonListener(Component parents) {
+			this.parents = parents;
+			frame = (MainFrame) parents;
+		}
+
+		
+		public void actionPerformed(ActionEvent e) {
+			
+			/**
+			 * Der startButton startet die Suche. Hierbei kann je nach
+			 * Einstellung nach der angegebenen Query gesucht werden, wie auch
+			 * nach den groesssten Dateien oder auch nach dem Zeitpunkt der
+			 * letzten Aenderung.
+			 */
+			if (e.getSource().equals(frame.startButton)) {
+				frame.searchResultContainer.removeAll();
+				frame.searchResultContainer.repaint();
+				
+				// setzt die Groesse des Panels wieder zum Standard
+				frame.searchResultContainer.setPreferredSize(new Dimension(0, 0));
+
+				frame.scrollPane.repaint();
+
+				if (frame.queryTextFieldJComboBox.getSelectedItem()!= null) {
+					try {
+						frame.mrPinkMain.searchInIndex(((String)frame.queryTextFieldJComboBox.getSelectedItem()), frame.optionStorage.getMaxResults(), frame.optionStorage.getSearchMode());
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					}
+				}else{
+					System.out.println("bitte Querry eingeben");
+				}	
+			}
+		}
+	}

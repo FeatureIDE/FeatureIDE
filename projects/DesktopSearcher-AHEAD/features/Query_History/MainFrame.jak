@@ -1,0 +1,19 @@
+
+import javax.swing.JComboBox;
+
+public refines class MainFrame {
+
+
+
+   public void initComponents(){
+   
+      Super().initComponents();
+      
+      History_Query hq= new History_Query();
+            
+      queryTextFieldJComboBox.addActionListener(hq);
+   
+   }
+
+
+}
