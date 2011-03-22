@@ -97,7 +97,7 @@ public class ConfigurationReader {
 					String name = tokenizer.nextToken();
 					Feature feature = configuration.getFeatureModel()
 							.getFeature(name);
-					if (feature != null && feature.isHidden()) {
+					if (feature != null && feature.hasHiddenParent()) {
 						hiddenFeatures.add(name);
 					} else {
 						try {
@@ -118,7 +118,7 @@ public class ConfigurationReader {
 				}
 				for (String name : hiddenFeatures) {
 					try {
-						configuration.setManual(name, Selection.SELECTED);
+						configuration.setManual(name, Selection.UNDEFINED);
 					} catch (FeatureNotFoundException e) {
 						successful = false;
 						warnings.add("Feature " + name

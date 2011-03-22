@@ -35,13 +35,13 @@ public class Feature implements PropertyConstants {
 	private String name;
 
 	private boolean mandatory = false;
-	
+
 	private boolean concret = true;
 
 	private boolean and = true;
 
 	private boolean multiple = false;
-	
+
 	private boolean hidden = false;
 
 	private FeatureModel featureModel;
@@ -105,7 +105,7 @@ public class Feature implements PropertyConstants {
 		this.mandatory = mandatory;
 		fireMandantoryChanged();
 	}
-	
+
 	public boolean isHidden() {
 		return hidden;
 	}
@@ -113,7 +113,7 @@ public class Feature implements PropertyConstants {
 	public void setHidden(boolean hid) {
 		this.hidden = hid;
 	}
-	
+
 	public void setAbstract(Boolean value) {
 		this.concret = !value;
 		fireChildrenChanged();
@@ -250,9 +250,9 @@ public class Feature implements PropertyConstants {
 		return targetConnections.remove(connection);
 	}
 
-	//	
+	//
 	// private Point location;
-	//	
+	//
 	// private Dimension size;
 	//
 	// public Point getLocation() {
@@ -274,7 +274,7 @@ public class Feature implements PropertyConstants {
 	// public void setSize(Dimension size) {
 	// this.size = size;
 	// }
-	//	
+	//
 	// public Rectangle getBounds() {
 	// return new Rectangle(location, size);
 	// }
@@ -359,7 +359,7 @@ public class Feature implements PropertyConstants {
 	// public Point getSourceLocation() {
 	// return getSourceLocation(getBounds());
 	// }
-	//	
+	//
 	// public Point getSourceLocation(Point newLocation) {
 	// return getSourceLocation(new Rectangle(newLocation, getSize()));
 	// }
@@ -423,20 +423,39 @@ public class Feature implements PropertyConstants {
 		feature.concret = concret;
 		return feature;
 	}
-	
-	
+
 	public void setAnd() {
 		this.and = true;
 	}
-	
+
 	public void setOr() {
 		this.and = false;
 		this.multiple = true;
 	}
-	
+
 	public void setAlternative() {
 		this.and = false;
 		this.multiple = false;
+	}
+
+	public boolean hasHiddenParent() {
+
+		if (isHidden())
+			return true;
+		if (isRoot()) {
+
+			return false;
+		}
+		Feature p = getParent();
+
+		while (!p.isRoot()) {
+			if (p.isHidden())
+				return true;
+			p = p.getParent();
+
+		}
+
+		return false;
 	}
 
 	@Override
