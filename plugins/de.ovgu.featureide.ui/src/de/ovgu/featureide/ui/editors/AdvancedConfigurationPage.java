@@ -74,12 +74,10 @@ public class AdvancedConfigurationPage extends EditorPart {
 	private boolean dirty = false;
 
 	public void updateTree() {
-		removeHiddenFeatures();
 		viewer.refresh();
-	
 		if (!errorMassage())
 			updateForeground(viewer.getTree().getItem(0));
-		
+		removeHiddenFeatures();
 	}
 	
 	public void setConfigurationEditor(ConfigurationEditor configurationEditor) {
@@ -183,11 +181,10 @@ public class AdvancedConfigurationPage extends EditorPart {
 		viewer.setInput(configurationEditor.configuration);
 		
 		viewer.expandAll();
-		removeHiddenFeatures();
 		viewer.refresh();
 		if (!errorMassage())
 			updateForeground(viewer.getTree().getItem(0));
-	
+		removeHiddenFeatures();
 	}
 
 	/**
@@ -252,9 +249,8 @@ public class AdvancedConfigurationPage extends EditorPart {
 				dirty = true;
 				firePropertyChange(IEditorPart.PROP_DIRTY);
 			}
-			removeHiddenFeatures();
 			viewer.refresh();
-			
+			removeHiddenFeatures();
 		}
 	}
 	
