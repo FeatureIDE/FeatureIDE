@@ -176,6 +176,7 @@ public class AdvancedConfigurationPage extends EditorPart {
 	}
 
 	private void refreshTree() {
+		viewer.getTree().setRedraw(false);
 		viewer.setContentProvider(new ConfigurationContentProvider());
 		viewer.setLabelProvider(new AdvancedConfigurationLabelProvider());
 		viewer.setInput(configurationEditor.configuration);
@@ -185,6 +186,7 @@ public class AdvancedConfigurationPage extends EditorPart {
 		if (!errorMassage())
 			updateForeground(viewer.getTree().getItem(0));
 		removeHiddenFeatures();
+		viewer.getTree().setRedraw(true);
 	}
 
 	/**
@@ -236,6 +238,7 @@ public class AdvancedConfigurationPage extends EditorPart {
 	}
 	
 	protected void changeSelection(SelectableFeature feature) {
+		viewer.getTree().setRedraw(false);
 		if (feature.getAutomatic() == Selection.UNDEFINED) {
 			// set to the next value
 			if (feature.getManual() == Selection.UNDEFINED)
@@ -251,6 +254,7 @@ public class AdvancedConfigurationPage extends EditorPart {
 			}
 			viewer.refresh();
 			removeHiddenFeatures();
+			viewer.getTree().setRedraw(true);
 		}
 	}
 	
@@ -259,7 +263,8 @@ public class AdvancedConfigurationPage extends EditorPart {
 		updateForeground(viewer.getTree().getItem(0));
 	}
 	
-	private void updateForeground(TreeItem item) {		
+	private void updateForeground(TreeItem item) {	
+
 		for (TreeItem child : item.getItems()) {
 			SelectableFeature feature = configurationEditor.configuration.getSelectablefeature(child.getText());
 			child.setForeground(null);
