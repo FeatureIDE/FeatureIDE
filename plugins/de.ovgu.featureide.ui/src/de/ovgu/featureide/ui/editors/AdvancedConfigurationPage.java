@@ -180,7 +180,6 @@ public class AdvancedConfigurationPage extends EditorPart {
 		viewer.setContentProvider(new ConfigurationContentProvider());
 		viewer.setLabelProvider(new AdvancedConfigurationLabelProvider());
 		viewer.setInput(configurationEditor.configuration);
-		
 		viewer.expandAll();
 		viewer.refresh();
 		if (!errorMassage())
@@ -254,9 +253,10 @@ public class AdvancedConfigurationPage extends EditorPart {
 			}
 			viewer.refresh();
 			removeHiddenFeatures();
-			viewer.getTree().setRedraw(true);
+		
 		}
-	}
+		viewer.getTree().setRedraw(true);
+		}
 	
 	protected void set(SelectableFeature feature, Selection selection) {
 		configurationEditor.configuration.setManual(feature, selection);
