@@ -68,9 +68,10 @@ public class FeatureCppWrapper {
 		}
 		LinkedList<String> command = new LinkedList<String>();
 		command.add(featureCppExecutableName);
+		command.add("--classinfo");
 		command.add("-o=" + buildFolder);
 		command.add("-s=" + sourceFolder);
-		command.add("-gpp");
+		command.add("--gpp");
 		command.add(config.getRawLocation().toOSString());
 		try {
 			process(command);

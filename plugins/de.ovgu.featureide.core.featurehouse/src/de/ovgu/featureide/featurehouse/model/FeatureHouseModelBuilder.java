@@ -49,13 +49,6 @@ public class FeatureHouseModelBuilder {
 	private static final String NODE_TYPE_METHOD = "MethodDecl";
 	private static final String NODE_TYPE_CONSTRUCTOR = "ConstructorDecl";
 
-	
-//	node.getType().equals("MethodDecl") ||
-//	node.getType().equals("InnerEnumDecl") ||
-//	node.getType().equals("InnerClassDecl") ||
-//	node.getType().equals("FieldDecl") ||
-//	node.getType().equals("ConstructorDecl")) {
-	
 	private FSTModel model;
 
 	private IFeatureProject featureProject;

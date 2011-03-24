@@ -1133,7 +1133,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 
 	public ArrayList<String> readFeaturesfromConfigurationFile(File file) {
 		if (!file.exists()) {
-			return null;
+			return new ArrayList<String>();
 		}
 		Scanner scanner = null;
 		try {
@@ -1146,7 +1146,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 				}
 				return list;
 			} else {
-				return null;
+				return new ArrayList<String>();
 			}
 		} catch (FileNotFoundException e) {
 			CorePlugin.getDefault().logError(e);
@@ -1155,7 +1155,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 				scanner.close();
 			}
 		}
-		return null;
+		return new ArrayList<String>();
 	}
 
 }

@@ -21,12 +21,16 @@ package de.ovgu.featureide.featurecpp;
 import java.util.ArrayList;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 
+import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
+import de.ovgu.featureide.featurecpp.model.FeatureCppModelBuilder;
 import de.ovgu.featureide.featurecpp.wrapper.FeatureCppWrapper;
 
 /**
@@ -38,10 +42,14 @@ import de.ovgu.featureide.featurecpp.wrapper.FeatureCppWrapper;
 public class FeatureCppComposer extends ComposerExtensionClass {
 
 	public static final String COMPOSER_ID = "de.ovgu.featureide.composer.featurecpp";
+	public static final String C_NATURE = "org.eclipse.cdt.core.cnature";
+	public static final String CC_NATURE = "org.eclipse.cdt.core.ccnature";
 
 	private final FeatureCppWrapper featureCpp = new FeatureCppWrapper(
-			(FeatureCppCorePlugin.getDefault().getBundle().getLocation() + "lib/fc++v0.8.exe")
+			(FeatureCppCorePlugin.getDefault().getBundle().getLocation() + "lib/fc++.exe")
 			.substring(16));
+
+	private FeatureCppModelBuilder featureCppModelBuilder;
 
 	public void initialize(IFeatureProject project) {
 		if (project == null) {
@@ -49,10 +57,13 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 		}
 		featureCpp.initialize(project.getSourceFolder(), project
 				.getBuildFolder());
+		
+		featureCppModelBuilder = new FeatureCppModelBuilder(project);
 	}
 
 
 	public void performFullBuild(IFile config) {
+		featureCppModelBuilder.resetModel();
 		featureCpp.compose(config);
 	}
 
@@ -61,6 +72,46 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 		ArrayList<String> extensions = new ArrayList<String>();
 		extensions.add(".h");
 		return extensions;
+	}
+
+	@Override
+	public void addCompiler(IProject project, String sourcePath,
+			String configPath, String buildPath) {
+		addNature(project);
+	}
+	
+	private void addNature(IProject project) {
+		try {
+			if (!project.isAccessible())
+				return;
+			
+			int i = 2;
+			if (project.hasNature(C_NATURE)) {
+				i--;
+			}
+			if (project.hasNature(CC_NATURE)) {
+				i--;
+			}
+			if (i == 0) {
+				return;
+			}
+			IProjectDescription description = project.getDescription();
+			String[] natures = description.getNatureIds();
+			String[] newNatures = new String[natures.length + i];
+			System.arraycopy(natures, 0, newNatures, 0, natures.length);
+			if (project.hasNature(C_NATURE)) {
+				newNatures[natures.length] = CC_NATURE;
+			} else if (project.hasNature(CC_NATURE)) {
+				newNatures[natures.length] = C_NATURE;
+			} else {
+				newNatures[natures.length] = C_NATURE;
+				newNatures[natures.length + 1] = CC_NATURE;
+			}
+			description.setNatureIds(newNatures);
+			project.setDescription(description, null);
+		} catch (CoreException e) {
+			CorePlugin.getDefault().logError(e);
+		}
 	}
 
 	@Override
@@ -76,6 +127,9 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 	public void postCompile(IResourceDelta delta, IFile file) {
 		try {
 			file.refreshLocal(IResource.DEPTH_ZERO, null);
+			if (file.getName().endsWith(".info")) {
+				featureCppModelBuilder.buildModel(file);
+			}
 		} catch (CoreException e) {
 			FeatureCppCorePlugin.getDefault().logError(e);
 		}
@@ -84,5 +138,11 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 	@Override
 	public String getConfigurationExtension() {
 		return ".equation";
+	}
+
+	@Override
+	public void buildFSTModel() {
+		featureCppModelBuilder.resetModel();
+		featureCppModelBuilder.buildModel();
 	}
 }
