@@ -21,25 +21,23 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import org.eclipse.gef.tools.DirectEditManager;
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCellEditorLocator;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLabelEditManager;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
-
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureCreateCompoundOperation;
 
 /**
  * Creates a new feature with the currently selected features as children.
@@ -55,12 +53,12 @@ public class CreateCompoundAction extends Action {
 	private GraphicalViewerImpl viewer;
 
 	private Feature parent = null;
-	
+
 	private LinkedList<Feature> selectedFeatures = new LinkedList<Feature>();
-	
+
 	private static ImageDescriptor createImage = PlatformUI.getWorkbench()
-	.getSharedImages().getImageDescriptor(
-			ISharedImages.IMG_TOOL_NEW_WIZARD);
+			.getSharedImages()
+			.getImageDescriptor(ISharedImages.IMG_TOOL_NEW_WIZARD);
 
 	private ISelectionChangedListener listener = new ISelectionChangedListener() {
 		public void selectionChanged(SelectionChangedEvent event) {
@@ -70,60 +68,31 @@ public class CreateCompoundAction extends Action {
 		}
 	};
 
-	public CreateCompoundAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
+	public CreateCompoundAction(GraphicalViewerImpl viewer,
+			FeatureModel featureModel) {
 		super("Create Feature Above", createImage);
 		this.viewer = viewer;
 		this.featureModel = featureModel;
+
 		setEnabled(false);
 		viewer.addSelectionChangedListener(listener);
 	}
 
 	@Override
 	public void run() {
-		int number = 0;
-		while (featureModel.getFeatureNames().contains("NewCompound" + ++number));
-		Feature newCompound = new Feature(featureModel, "NewCompound" + number);
-		
-		if (parent != null) {
-			newCompound.setAND(true);
-			newCompound.setMultiple(parent.isMultiple());
-			
-			LinkedList<Feature> newChildren = new LinkedList<Feature>();
-			for (Feature feature : parent.getChildren())
-				if (selectedFeatures.contains(feature)) {
-					if (!newCompound.hasChildren()) 
-						newChildren.add(newCompound);
-					feature.setMandatory(false);
-					newCompound.addChild(feature);
-				}
-				else
-					newChildren.add(feature);
-			parent.setChildren(newChildren);
+		FeatureCreateCompoundOperation op = new FeatureCreateCompoundOperation(
+				viewer, parent, featureModel, selectedFeatures);
+		op.addContext((IUndoContext) featureModel.getUndoContext());
 
-			featureModel.addFeature(newCompound);
-		}
-		else {
-			newCompound.addChild(selectedFeatures.getFirst());
-			featureModel.addFeature(newCompound);
-			featureModel.setRoot(newCompound);
-			featureModel.redrawDiagram();
-		}
-		
-		//needed when the user creates a compound feature again on the same selection
-		parent = newCompound;
-		featureModel.handleModelDataChanged();
-		
-		//select the new feature
-		FeatureEditPart part = (FeatureEditPart) viewer.getEditPartRegistry().get(newCompound);
-		if(part!=null){
-		viewer.setSelection(new StructuredSelection(part));
+		try {
+			PlatformUI.getWorkbench().getOperationSupport()
+					.getOperationHistory().execute(op, null, null);
+		} catch (ExecutionException e) {
+			FMUIPlugin.getDefault().logError(e);
 
-		//open the renaming command
-		DirectEditManager manager = new FeatureLabelEditManager(part, TextCellEditor.class,
-				new FeatureCellEditorLocator(part.getFeatureFigure()), featureModel);
-		manager.show();}
+		}
 	}
-	
+
 	private boolean isValidSelection(IStructuredSelection selection) {
 		// check empty selection (i.e. ModelEditPart is selected)
 		if (selection.size() == 1
@@ -141,10 +110,10 @@ public class CreateCompoundAction extends Action {
 			if (selectedFeatures.isEmpty())
 				parent = feature.getParent();
 			else if (parent != feature.getParent())
-					return false;
+				return false;
 			selectedFeatures.add(feature);
 		}
 		return !selectedFeatures.isEmpty();
 	}
-	
+
 }

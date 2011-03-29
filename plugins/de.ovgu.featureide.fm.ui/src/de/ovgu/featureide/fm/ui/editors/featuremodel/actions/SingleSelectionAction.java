@@ -32,7 +32,6 @@ import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
-
 /**
  * A default implementation for actions that only allow one feature to be
  * selected.
@@ -44,7 +43,8 @@ public abstract class SingleSelectionAction extends Action implements
 
 	private ISelectionChangedListener listener = new ISelectionChangedListener() {
 		public void selectionChanged(SelectionChangedEvent event) {
-			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+			IStructuredSelection selection = (IStructuredSelection) event
+					.getSelection();
 			SingleSelectionAction.this
 					.selectionChanged(isValidSelection(selection));
 		}
@@ -53,7 +53,7 @@ public abstract class SingleSelectionAction extends Action implements
 	GraphicalViewerImpl viewer;
 
 	protected Feature feature;
-	
+
 	protected boolean connectionSelected;
 
 	public SingleSelectionAction(String text, GraphicalViewerImpl viewer) {
@@ -68,9 +68,10 @@ public abstract class SingleSelectionAction extends Action implements
 				&& (selection.getFirstElement() instanceof FeatureEditPart || selection
 						.getFirstElement() instanceof ConnectionEditPart);
 	}
-	
+
 	public FeatureEditPart getSelectedFeatureEditPart() {
-		IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
+		IStructuredSelection selection = (IStructuredSelection) viewer
+				.getSelection();
 		Object part = selection.getFirstElement();
 		connectionSelected = part instanceof ConnectionEditPart;
 		if (connectionSelected)
@@ -78,7 +79,7 @@ public abstract class SingleSelectionAction extends Action implements
 		else
 			return (FeatureEditPart) part;
 	}
-	
+
 	public Feature getSelectedFeature() {
 		IStructuredSelection selection = (IStructuredSelection) viewer
 				.getSelection();

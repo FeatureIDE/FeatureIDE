@@ -18,14 +18,19 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.commands;
 
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.operations.ObjectUndoContext;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.commands.Command;
+import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
-
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureMoveOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureOperationData;
 
 /**
  * This command allows the user to move features at the feature diagram using
@@ -40,84 +45,90 @@ public class FeatureDragAndDropCommand extends Command {
 	private final Feature feature;
 
 	private final Point newLocation;
-	
+
 	private final Feature oldParent;
-	
+
 	private final int oldIndex;
-	
+
 	private Feature newParent;
-	
+
 	private int newIndex;
 
-	public FeatureDragAndDropCommand(FeatureModel featureModel, Feature feature, Point newLocation) {
+	public FeatureDragAndDropCommand(FeatureModel featureModel,
+			Feature feature, Point newLocation) {
 		super("Moving " + feature.getName());
 		this.featureModel = featureModel;
 		this.feature = feature;
 		this.newLocation = newLocation;
+	
 		oldParent = feature.getParent();
 		oldIndex = oldParent != null ? oldParent.getChildIndex(feature) : 0;
 	}
 
 	@Override
 	public boolean canExecute() {
-		Point referencePoint = FeatureUIHelper.getSourceLocation(feature,newLocation);
+	
+		Point referencePoint = FeatureUIHelper.getSourceLocation(feature,
+				newLocation);
 		Feature next = calculateNext(featureModel.getRoot(), referencePoint);
-		
-		//calculate new parent (if exists)
+
+		// calculate new parent (if exists)
 		if (!calculateNewParentAndIndex(next))
 			return false;
-	
-		//no new positions possible next to same feature
-		if (next == feature) 
+
+		// no new positions possible next to same feature
+		if (next == feature)
 			return false;
-		
-		//not accept the same position
+
+		// not accept the same position
 		if (oldParent == newParent && oldIndex == newIndex)
 			return false;
-			
-		//not accept moves to children positions
+
+		// not accept moves to children positions
 		return feature != newParent && !feature.isAncestorOf(newParent);
 	}
 
 	@Override
 	public void execute() {
-		oldParent.removeChild(feature);
-		newParent.addChildAtPosition(newIndex, feature);
-		featureModel.handleModelDataChanged();
+		FeatureOperationData data = new FeatureOperationData(feature,
+				oldParent, newParent, newIndex, oldIndex);
+		FeatureMoveOperation op = new FeatureMoveOperation(data, featureModel);
+		op.addContext((ObjectUndoContext) featureModel.getUndoContext());
+
+		try {
+			PlatformUI.getWorkbench().getOperationSupport()
+					.getOperationHistory().execute(op, null, null);
+		} catch (ExecutionException e) {
+			FMUIPlugin.getDefault().logError(e);
+
+		}
 	}
 
-	@Override
-	public void undo() {
-		newParent.removeChild(feature);
-		if (oldParent != null) 
-			oldParent.addChildAtPosition(oldIndex, feature);
-		featureModel.handleModelDataChanged();
-	}
-	
 	private boolean calculateNewParentAndIndex(Feature next) {
-		Point location = FeatureUIHelper.getSourceLocation(feature,newLocation);
+		Point location = FeatureUIHelper
+				.getSourceLocation(feature, newLocation);
 		Point nextLocation = FeatureUIHelper.getTargetLocation(next);
 		Dimension d = location.getDifference(nextLocation);
-		
+
 		if (d.height > 0) {
-			//insert below
+			// insert below
 			newParent = next;
 			newIndex = 0;
 			for (Feature child : next.getChildren()) {
-				Dimension cd = FeatureUIHelper.getSourceLocation(child).getDifference(nextLocation);
-				if (d.width / (double) d.height <= cd.width / (double) cd.height)
+				Dimension cd = FeatureUIHelper.getSourceLocation(child)
+						.getDifference(nextLocation);
+				if (d.width / (double) d.height <= cd.width
+						/ (double) cd.height)
 					break;
 				else
 					newIndex++;
 			}
-		}
-		else {
-			//insert left or right
+		} else {
+			// insert left or right
 			if (next.isRoot()) {
-				//do not accept because root has no parent
+				// do not accept because root has no parent
 				return false;
-			}
-			else {
+			} else {
 				newParent = next.getParent();
 				if (d.width < 0)
 					newIndex = newParent.getChildIndex(next);
@@ -125,10 +136,11 @@ public class FeatureDragAndDropCommand extends Command {
 					newIndex = newParent.getChildIndex(next) + 1;
 			}
 		}
-		
-		if (newParent == oldParent && oldParent.getChildIndex(feature) < newIndex)
+
+		if (newParent == oldParent
+				&& oldParent.getChildIndex(feature) < newIndex)
 			newIndex--;
-		
+
 		return true;
 	}
 
@@ -136,10 +148,12 @@ public class FeatureDragAndDropCommand extends Command {
 		if (feature == null)
 			return null;
 		Feature next = feature;
-		double distance = FeatureUIHelper.getTargetLocation(next).getDistance(referencePoint);
+		double distance = FeatureUIHelper.getTargetLocation(next).getDistance(
+				referencePoint);
 		for (Feature child : feature.getChildren()) {
 			Feature childsNext = calculateNext(child, referencePoint);
-			double newDistance = FeatureUIHelper.getTargetLocation(childsNext).getDistance(referencePoint);
+			double newDistance = FeatureUIHelper.getTargetLocation(childsNext)
+					.getDistance(referencePoint);
 			if (newDistance > 0 && newDistance < distance) {
 				next = childsNext;
 				distance = newDistance;
@@ -153,6 +167,7 @@ public class FeatureDragAndDropCommand extends Command {
 	}
 
 	public Feature getNewParent() {
+	
 		return newParent;
 	}
 

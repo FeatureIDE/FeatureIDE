@@ -18,13 +18,15 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
-import java.util.LinkedList;
-
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
+import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ModelReverseOrderOperation;
 
 /**
  * Changes the order of children for every feature.
@@ -36,24 +38,27 @@ public class ReverseOrderAction extends Action {
 	public static String ID = "de.ovgu.featureide.reverseorder";
 
 	private final FeatureModel featureModel;
-	
-	public ReverseOrderAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
+
+	public ReverseOrderAction(GraphicalViewerImpl viewer,
+			FeatureModel featureModel) {
 		super("Reverse Feature Order");
 		this.featureModel = featureModel;
 	}
 
 	@Override
 	public void run() {
-		reverse(featureModel.getRoot());
-		featureModel.handleModelDataChanged();
-	}
 
-	private void reverse(Feature feature) {
-		LinkedList<Feature> children = feature.getChildren();
-		for (int i = 0; i < children.size() - 1; i++)
-			children.add(i,children.removeLast());
-		for (Feature child : feature.getChildren())
-			reverse(child);
+		ModelReverseOrderOperation op = new ModelReverseOrderOperation(
+				featureModel);
+		op.addContext((IUndoContext) featureModel.getUndoContext());
+
+		try {
+			PlatformUI.getWorkbench().getOperationSupport()
+					.getOperationHistory().execute(op, null, null);
+		} catch (ExecutionException e) {
+			FMUIPlugin.getDefault().logError(e);
+
+		}
 	}
 
 }

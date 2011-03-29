@@ -61,6 +61,21 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
  */
 public class FeatureModel implements PropertyConstants {
 
+	/**
+	 * @return the featureTable
+	 */
+	public Hashtable<String, Feature> getFeatureTable() {
+		return featureTable;
+	}
+
+	/**
+	 * @param featureTable
+	 *            the featureTable to set
+	 */
+	public void setFeatureTable(Hashtable<String, Feature> featureTable) {
+		this.featureTable = featureTable;
+	}
+
 	public static final String COMPOSER_KEY = "composer";
 	public static final QualifiedName composerConfigID = new QualifiedName(
 			"featureproject.configs", "composer");
@@ -216,6 +231,7 @@ public class FeatureModel implements PropertyConstants {
 	}
 
 	public boolean deleteFeature(Feature feature) {
+
 		// the root can not be deleted
 		if (feature == root)
 			return false;
@@ -227,7 +243,8 @@ public class FeatureModel implements PropertyConstants {
 
 		// use the group type of the feature to delete
 		Feature parent = feature.getParent();
-		if (parent.getChildrenCount() == 1) {
+
+		if (parent != null && parent.getChildrenCount() == 1) {
 			if (feature.isAnd())
 				parent.setAnd();
 			else if (feature.isAlternative())
@@ -237,6 +254,7 @@ public class FeatureModel implements PropertyConstants {
 		}
 
 		// add children to parent
+		
 		int index = parent.getChildIndex(feature);
 		while (feature.hasChildren())
 			parent.addChildAtPosition(index, feature.removeLastChild());
@@ -388,14 +406,14 @@ public class FeatureModel implements PropertyConstants {
 		for (PropertyChangeListener listener : listenerList)
 			listener.propertyChange(event);
 	}
-	
-	public void refreshContextMenu(){
+
+	public void refreshContextMenu() {
 		PropertyChangeEvent event = new PropertyChangeEvent(this,
 				REFRESH_ACTIONS, false, true);
 		for (PropertyChangeListener listener : listenerList)
 			listener.propertyChange(event);
 	}
-	
+
 	public void redrawDiagram() {
 		PropertyChangeEvent event = new PropertyChangeEvent(this,
 				REDRAW_DIAGRAM, false, true);
@@ -414,6 +432,7 @@ public class FeatureModel implements PropertyConstants {
 	 * Collections.unmodifiableCollection(layers); }
 	 */
 	private LinkedList<Feature> layers = new LinkedList<Feature>();
+	private Object undoContext;
 
 	public Collection<Feature> getLayers() {
 		layers.clear();
@@ -933,7 +952,7 @@ public class FeatureModel implements PropertyConstants {
 	 */
 	public boolean hasMandatoryFeatures() {
 		for (Feature f : this.featureTable.values()) {
-			if (!f.equals(this.root) && f.getParent().isAnd()
+			if ((f.getParent() != null) && f.getParent().isAnd()
 					&& f.isMandatory())
 				return true;
 		}
@@ -957,7 +976,7 @@ public class FeatureModel implements PropertyConstants {
 	 */
 	public boolean hasAndGroup() {
 		for (Feature f : this.featureTable.values()) {
-			if (f.getChildrenCount()>1  && f.isAnd())
+			if (f.getChildrenCount() > 1 && f.isAnd())
 				return true;
 		}
 		return false;
@@ -968,7 +987,7 @@ public class FeatureModel implements PropertyConstants {
 	 */
 	public boolean hasAlternativeGroup() {
 		for (Feature f : this.featureTable.values()) {
-			if (f.getChildrenCount()>1 && f.isAlternative())
+			if (f.getChildrenCount() > 1 && f.isAlternative())
 				return true;
 		}
 		return false;
@@ -979,9 +998,47 @@ public class FeatureModel implements PropertyConstants {
 	 */
 	public boolean hasOrGroup() {
 		for (Feature f : this.featureTable.values()) {
-			if (f.getChildrenCount()>1 && f.isOr())
+			if (f.getChildrenCount() > 1 && f.isOr())
 				return true;
 		}
 		return false;
+	}
+
+	public void setUndoContext(Object undoContext) {
+		this.undoContext = undoContext;
+	}
+
+	/**
+	 * @return
+	 */
+	public Object getUndoContext() {
+		return undoContext;
+	}
+
+	
+	public void setConstraints(List<Constraint> constraints) {
+		this.constraints = constraints;
+		this.propNodes = new LinkedList<Node>();
+		for (Constraint c : constraints) {
+			propNodes.add(c.getNode());
+		}
+	}
+
+	/**
+	 * @param constraint
+	 */
+	public int getConstraintIndex(Constraint constraint) {
+		return constraints.indexOf(constraint);
+
+	}
+
+	/**
+	 * @param node
+	 * @param constraintIndex
+	 */
+	public void addPropositionalNode(Node node, int index) {
+		constraints.add(index, new Constraint(this, node));
+		propNodes.add(index, node);
+		
 	}
 }

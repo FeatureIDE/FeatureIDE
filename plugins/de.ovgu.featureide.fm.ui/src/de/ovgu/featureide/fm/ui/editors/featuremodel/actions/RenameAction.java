@@ -24,7 +24,6 @@ import org.eclipse.swt.SWT;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
-
 /**
  * Renames a particular feature at the feature diagram.
  * 
@@ -44,9 +43,13 @@ public class RenameAction extends SingleSelectionAction {
 		FeatureEditPart part = getSelectedFeatureEditPart();
 		part.showRenameManager();
 	}
-	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.featuremodel.actions.SingleSelectionAction#updateProperties()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.ovgu.featureide.fm.ui.editors.featuremodel.actions.SingleSelectionAction
+	 * #updateProperties()
 	 */
 	@Override
 	protected void updateProperties() {

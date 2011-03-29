@@ -18,21 +18,17 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
-import org.eclipse.gef.tools.DirectEditManager;
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCellEditorLocator;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLabelEditManager;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
-
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureCreateLayerOperation;
 
 /**
  * Creates a new feature as a child of the currently selected feature.
@@ -44,12 +40,13 @@ public class CreateLayerAction extends SingleSelectionAction {
 	public static String ID = "de.ovgu.featureide.createlayer";
 
 	private static ImageDescriptor createImage = PlatformUI.getWorkbench()
-			.getSharedImages().getImageDescriptor(
-					ISharedImages.IMG_TOOL_NEW_WIZARD);
+			.getSharedImages()
+			.getImageDescriptor(ISharedImages.IMG_TOOL_NEW_WIZARD);
 
 	private final FeatureModel featureModel;
 
-	public CreateLayerAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
+	public CreateLayerAction(GraphicalViewerImpl viewer,
+			FeatureModel featureModel) {
 		super("Create Feature Below (Ins)", viewer);
 		setImageDescriptor(createImage);
 		this.featureModel = featureModel;
@@ -57,23 +54,19 @@ public class CreateLayerAction extends SingleSelectionAction {
 
 	@Override
 	public void run() {
-		int number = 0;
-		while (featureModel.getFeatureNames().contains("NewLayer" + ++number));
-		Feature newFeature = new Feature(featureModel, "NewLayer" + number);
-		featureModel.addFeature(newFeature);
-		feature.addChild(newFeature);
-		featureModel.handleModelDataChanged();
+		FeatureCreateLayerOperation op = new FeatureCreateLayerOperation(
+				feature, viewer, featureModel);
+		op.addContext((IUndoContext) featureModel.getUndoContext());
 
-		//select the new feature
-		FeatureEditPart part = (FeatureEditPart) viewer.getEditPartRegistry().get(newFeature);
-		viewer.setSelection(new StructuredSelection(part));
+		try {
+			PlatformUI.getWorkbench().getOperationSupport()
+					.getOperationHistory().execute(op, null, null);
+		} catch (ExecutionException e) {
+			FMUIPlugin.getDefault().logError(e);
 
-		//open the renaming command
-		DirectEditManager manager = new FeatureLabelEditManager(part, TextCellEditor.class,
-				new FeatureCellEditorLocator(part.getFeatureFigure()), featureModel);
-		manager.show();
+		}
 	}
-	
+
 	@Override
 	protected boolean isValidSelection(IStructuredSelection selection) {
 		return super.isValidSelection(selection);

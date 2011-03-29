@@ -26,7 +26,6 @@ import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
 
-
 /**
  * Creates a new propositional constraint below the feature diagram.
  * 
@@ -36,8 +35,8 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 public class CreateConstraintAction extends AbstractConstraintEditorAction {
 
 	private static ImageDescriptor createImage = PlatformUI.getWorkbench()
-	.getSharedImages().getImageDescriptor(
-			ISharedImages.IMG_TOOL_NEW_WIZARD);
+			.getSharedImages()
+			.getImageDescriptor(ISharedImages.IMG_TOOL_NEW_WIZARD);
 
 	public CreateConstraintAction(GraphicalViewerImpl viewer,
 			FeatureModel featuremodel, String menuname) {
@@ -46,7 +45,7 @@ public class CreateConstraintAction extends AbstractConstraintEditorAction {
 	}
 
 	@Override
-	protected boolean isValidSelection(IStructuredSelection selection) {		
+	protected boolean isValidSelection(IStructuredSelection selection) {
 		return true;
 	}
 

@@ -28,6 +28,7 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
 
 
 /**
@@ -44,6 +45,7 @@ public class FeatureUIHelper {
 	private static final WeakHashMap<Constraint, Point> constraintLocation = new WeakHashMap<Constraint, Point>();
 	private static final WeakHashMap<Constraint, Dimension> constraintSize = new WeakHashMap<Constraint, Dimension>();
 	private static Dimension legendSize= new Dimension();
+	private static LegendFigure legendFigure;
 	public static Dimension getLegendSize(){
 		return legendSize;
 	}
@@ -136,6 +138,13 @@ public class FeatureUIHelper {
 				PropertyConstants.LOCATION_CHANGED, oldLocation, newLocation);
 		constraint.fire(event);
 
+	}
+
+	public static void setLegendFigure(LegendFigure figure){
+		legendFigure=figure;
+	}
+	public static LegendFigure getLegendFigure() {
+		return legendFigure;
 	}
 
 }

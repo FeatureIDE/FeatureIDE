@@ -24,6 +24,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.commands.operations.ObjectUndoContext;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
@@ -48,9 +49,7 @@ import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.gef.editparts.ZoomManager;
 import org.eclipse.gef.ui.actions.GEFActionConstants;
 import org.eclipse.gef.ui.actions.PrintAction;
-import org.eclipse.gef.ui.actions.RedoAction;
 import org.eclipse.gef.ui.actions.SelectAllAction;
-import org.eclipse.gef.ui.actions.UndoAction;
 import org.eclipse.gef.ui.actions.ZoomInAction;
 import org.eclipse.gef.ui.actions.ZoomOutAction;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
@@ -80,6 +79,8 @@ import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.dialogs.ListDialog;
 import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.ide.IGotoMarker;
+import org.eclipse.ui.operations.RedoActionHandler;
+import org.eclipse.ui.operations.UndoActionHandler;
 import org.eclipse.ui.part.MultiPageEditorPart;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
@@ -109,8 +110,8 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateLayerAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.EditConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.HiddenAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LegendLayoutAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LegendAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LegendLayoutAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.MandatoryAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.RenameAction;
@@ -175,9 +176,9 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 
 	private SelectAllAction selectAllAction;
 
-	private UndoAction undoAction;
+	private UndoActionHandler undoAction;
 
-	private RedoAction redoAction;
+	private RedoActionHandler redoAction;
 
 	private RenameAction renameAction;
 
@@ -186,7 +187,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 	private ZoomOutAction zoomOut;
 
 	private LegendAction legendAction;
-	
+
 	private LegendLayoutAction legendLayoutAction;
 
 	private FeatureDiagramLayoutManager layoutManager = new LevelOrderLayout();
@@ -274,12 +275,14 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		graphicalViewer.setEditDomain(new DefaultEditDomain(this));
 
 		initDiagramContent();
-
+		
+		
 		graphicalViewerIndex = addPage(graphicalViewer.getControl());
 		setPageText(graphicalViewerIndex, "Feature Diagram");
 		zoomManager = rootEditPart.getZoomManager();
 		zoomManager.setZoomLevels(new double[] { 0.05, 0.10, 0.25, 0.50, 0.75,
 				0.90, 1.00, 1.10, 1.25, 1.50, 2.00, 2.50, 3.00, 4.00 });
+
 	}
 
 	void createSourcePage() {
@@ -294,20 +297,24 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 	}
 
 	private void createActions() {
+		ObjectUndoContext undoContext = new ObjectUndoContext(this);
+		featureModel.setUndoContext(undoContext);
 		createLayerAction = new CreateLayerAction(graphicalViewer, featureModel);
 		createCompoundAction = new CreateCompoundAction(graphicalViewer,
 				featureModel);
 		deleteAction = new DeleteAction(graphicalViewer, featureModel);
 		mandatoryAction = new MandatoryAction(graphicalViewer, featureModel);
 		hiddenAction = new HiddenAction(graphicalViewer, featureModel);
-		abstractAction = new AbstractAction(graphicalViewer, featureModel);
+		abstractAction = new AbstractAction(graphicalViewer, featureModel,
+				undoContext);
 		andAction = new AndAction(graphicalViewer, featureModel);
 		orAction = new OrAction(graphicalViewer, featureModel);
 		alternativeAction = new AlternativeAction(graphicalViewer, featureModel);
 		printAction = new PrintAction(this);
 		selectAllAction = new SelectAllAction(this);
-		undoAction = new UndoAction(this);
-		redoAction = new RedoAction(this);
+
+		undoAction = new UndoActionHandler(this.getSite(), undoContext);
+		redoAction = new RedoActionHandler(this.getSite(), undoContext);
 		renameAction = new RenameAction(graphicalViewer, featureModel);
 		zoomIn = new ZoomInAction(zoomManager);
 		zoomOut = new ZoomOutAction(zoomManager);
@@ -315,9 +322,11 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 				featureModel, "Create Constraint");
 		editConstraintAction = new EditConstraintAction(graphicalViewer,
 				featureModel, "Edit Constraint");
-		reverseOrderAction = new ReverseOrderAction(graphicalViewer, featureModel);
+		reverseOrderAction = new ReverseOrderAction(graphicalViewer,
+				featureModel);
 		legendAction = new LegendAction(graphicalViewer, featureModel);
-		legendLayoutAction = new LegendLayoutAction(graphicalViewer,featureModel);
+		legendLayoutAction = new LegendLayoutAction(graphicalViewer,
+				featureModel);
 	}
 
 	private void createContextMenu() {
@@ -330,8 +339,9 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		});
 		menu.createContextMenu(graphicalViewer.getControl());
 		graphicalViewer.setContextMenu(menu);
-		//the following line adds package explorer entries into our context menu
-		//getSite().registerContextMenu(menu, graphicalViewer);
+		// the following line adds package explorer entries into our context
+		// menu
+		// getSite().registerContextMenu(menu, graphicalViewer);
 	}
 
 	private void createKeyBindings() {
@@ -382,7 +392,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		}
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 		menu.add(legendAction);
-		if(legendLayoutAction.isEnabled())menu.add(legendLayoutAction);
+		if (legendLayoutAction.isEnabled())
+			menu.add(legendLayoutAction);
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
 
@@ -435,7 +446,9 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 				isPageModified = true;
 				pageChange(graphicalViewerIndex);
 			}
+
 		});
+
 	}
 
 	public boolean updateDiagramFromTextEditor() {
@@ -580,12 +593,12 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 	private void saveModel() {
 		ArrayList<String> editor = new ArrayList<String>();
 		editor.add(grammarFile.getResource().getName());
-		
+
 		ArrayList<IEditorPart> editorspart = new ArrayList<IEditorPart>();
 		editorspart.add(this.getEditor(graphicalViewerIndex));
-		
-		ListDialog dialog = new ListDialog(getSite()
-				.getWorkbenchWindow().getShell());
+
+		ListDialog dialog = new ListDialog(getSite().getWorkbenchWindow()
+				.getShell());
 		dialog.setAddCancelButton(true);
 		dialog.setContentProvider(new ArrayContentProvider());
 		dialog.setLabelProvider(new LabelProvider());
@@ -595,7 +608,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		dialog.setHelpAvailable(false);
 		dialog.setMessage("Model should be saved after renamings.");
 		dialog.open();
-		
+
 		if (dialog.getResult() != null) {
 			doSave(null);
 		}
@@ -726,8 +739,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		} else if (prop.equals(REDRAW_DIAGRAM)) {
 			updateTextEditorFromDiagram();
 			updateDiagramFromTextEditor();
-		}else if(prop.equals(REFRESH_ACTIONS)){
-			//additional actions can be refreshed here
+		} else if (prop.equals(REFRESH_ACTIONS)) {
+			// additional actions can be refreshed here
 			legendAction.refresh();
 			legendLayoutAction.refresh();
 		}

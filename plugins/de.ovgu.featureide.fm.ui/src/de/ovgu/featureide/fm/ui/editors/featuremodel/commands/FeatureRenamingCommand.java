@@ -18,9 +18,14 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.commands;
 
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.gef.commands.Command;
+import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureRenamingOperation;
 
 
 /**
@@ -54,14 +59,18 @@ public class FeatureRenamingCommand extends Command {
 	
 	@Override
 	public void execute() {
-		featureModel.renameFeature(oldName, newName);
-		featureModel.handleModelDataChanged();
+		FeatureRenamingOperation op = new FeatureRenamingOperation(featureModel, oldName, newName);
+		op.addContext((IUndoContext) featureModel.getUndoContext());
+		
+		try {
+			PlatformUI.getWorkbench().getOperationSupport()
+					.getOperationHistory().execute(op, null, null);
+		} catch (ExecutionException e) {
+		FMUIPlugin.getDefault().logError(e);
+			
+		}
 	}
 	
-	@Override
-	public void undo() {
-		featureModel.renameFeature(newName, oldName);
-		featureModel.handleModelDataChanged();
-	}
+
 
 }

@@ -18,26 +18,43 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.operations.ObjectUndoContext;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
+import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureSetAbstractOperation;
 
 public class AbstractAction extends SingleSelectionAction {
 
 	public static String ID = "de.ovgu.featureide.abstract";
 
-	private final FeatureModel featureModel;
+	private ObjectUndoContext undoContext;
 
-	public AbstractAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
+	public AbstractAction(GraphicalViewerImpl viewer,
+			FeatureModel featureModel, ObjectUndoContext undoContext) {
 		super("Abstract", viewer);
-		this.featureModel = featureModel;
+		this.undoContext = undoContext;
 	}
 
 	@Override
 	public void run() {
-		feature.setAbstract(!feature.isAbstract());
+
 		setChecked(feature.isAbstract());
-		featureModel.handleModelDataChanged();
+		FeatureSetAbstractOperation op = new FeatureSetAbstractOperation(
+				feature);
+		op.addContext(undoContext);
+
+		try {
+			PlatformUI.getWorkbench().getOperationSupport()
+					.getOperationHistory().execute(op, null, null);
+		} catch (ExecutionException e) {
+			FMUIPlugin.getDefault().logError(e);
+
+		}
+
 	}
 
 	@Override

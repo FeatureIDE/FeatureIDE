@@ -21,6 +21,8 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -31,17 +33,17 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
 
-import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteOperation;
 
 /**
  * Deletes the selected features and moves their unselected children upwards.
  * Also deletes the selected propositional constraint.
+ * 
  * @author Thomas Thuem
  * @author Christian Becker
  */
@@ -75,31 +77,17 @@ public class DeleteAction extends Action {
 
 	@Override
 	public void run() {
-		IStructuredSelection selection = (IStructuredSelection) viewer
-				.getSelection();
-		Iterator<?> iter = selection.iterator();
-		while (iter.hasNext()) {
-			Object editPart = iter.next();
-			if ( editPart instanceof ConstraintEditPart ){ 
-				Constraint constraint = ((ConstraintEditPart)editPart).getConstraintModel();				
-				featureModel.removePropositionalNode(constraint);
-			}
-			if( editPart instanceof LegendEditPart){
-				featureModel.setLegend(false);
-				featureModel.refreshContextMenu();
-			}
-			if (!(editPart instanceof FeatureEditPart))
-				continue;
-			Feature feature = ((FeatureEditPart) editPart)
-					.getFeatureModel();
-			if (feature == featureModel.getRoot()){
-				featureModel.replaceRoot(featureModel.getRoot().removeLastChild());
-				featureModel.redrawDiagram();}
-			else
-				featureModel.deleteFeature(feature);
+		DeleteOperation op = new DeleteOperation(viewer, featureModel);
+		op.addContext((IUndoContext) featureModel.getUndoContext());
+
+		try {
+			PlatformUI.getWorkbench().getOperationSupport()
+					.getOperationHistory().execute(op, null, null);
+		} catch (ExecutionException e) {
+			FMUIPlugin.getDefault().logError(e);
+
 		}
-		featureModel.handleModelDataChanged();
-		
+
 	}
 
 	private boolean isValidSelection(IStructuredSelection selection) {
@@ -108,10 +96,11 @@ public class DeleteAction extends Action {
 				&& selection.getFirstElement() instanceof ModelEditPart)
 			return false;
 
-		//check that a possibly new root can be determined unique
+		// check that a possibly new root can be determined unique
 		Feature root = featureModel.getRoot();
 		Feature newRoot = root;
-		LinkedList<Feature> features = new LinkedList<Feature>(featureModel.getFeatures());
+		LinkedList<Feature> features = new LinkedList<Feature>(
+				featureModel.getFeatures());
 		Iterator<?> iter = selection.iterator();
 		while (iter.hasNext()) {
 			Object editPart = iter.next();
@@ -127,11 +116,11 @@ public class DeleteAction extends Action {
 			}
 			features.remove(feature);
 		}
-		
-		//check that the only child of a deleted root is not deleted too
+
+		// check that the only child of a deleted root is not deleted too
 		if (root != newRoot && !features.contains(newRoot))
 			return false;
-		
+
 		return true;
 	}
 }

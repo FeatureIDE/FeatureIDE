@@ -18,10 +18,14 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
+import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
-
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureChangeGroupTypeOperation;
 
 /**
  * Turns a group type into an Or-group.
@@ -41,14 +45,23 @@ public class OrAction extends SingleSelectionAction {
 
 	@Override
 	public void run() {
-		feature.changeToOr();
-		featureModel.handleModelDataChanged();
+		FeatureChangeGroupTypeOperation op = new FeatureChangeGroupTypeOperation(
+				FeatureChangeGroupTypeOperation.OR, feature, featureModel);
+		op.addContext((IUndoContext) featureModel.getUndoContext());
+
+		try {
+			PlatformUI.getWorkbench().getOperationSupport()
+					.getOperationHistory().execute(op, null, null);
+		} catch (ExecutionException e) {
+			FMUIPlugin.getDefault().logError(e);
+
+		}
 	}
 
 	@Override
 	protected void updateProperties() {
 		boolean or = feature.isOr();
-//		setEnabled(connectionSelected && !feature.isRoot() && !or);
+		// setEnabled(connectionSelected && !feature.isRoot() && !or);
 		setEnabled(connectionSelected && !or);
 		setChecked(connectionSelected && or);
 	}

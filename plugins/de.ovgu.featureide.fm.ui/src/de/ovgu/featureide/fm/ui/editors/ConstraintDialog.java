@@ -21,6 +21,9 @@ package de.ovgu.featureide.fm.ui.editors;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.operations.AbstractOperation;
+import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -62,6 +65,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.ui.PlatformUI;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.NodeReader;
@@ -74,6 +78,8 @@ import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ConstraintCreateOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ConstraintEditOperation;
 
 /**
  * A simple editor for propositional constraints written below the feature
@@ -179,15 +185,15 @@ public class ConstraintDialog {
 		int x = bounds.x + (bounds.width - rect.width) / 2;
 		int y = bounds.y + (bounds.height - rect.height) / 2;
 		shell.setLocation(x, y);
-		 shell.addListener(SWT.Traverse, new Listener() {
-		      public void handleEvent(Event event) {
-		        if (event.detail==SWT.TRAVERSE_ESCAPE) {
-		       
-		          shell.close();
-		          
-		        }
-		      }
-		    });
+		shell.addListener(SWT.Traverse, new Listener() {
+			public void handleEvent(Event event) {
+				if (event.detail == SWT.TRAVERSE_ESCAPE) {
+
+					shell.close();
+
+				}
+			}
+		});
 	}
 
 	/**
@@ -237,8 +243,8 @@ public class ConstraintDialog {
 		formDataOk.right = new FormAttachment(cancelButton, -5);
 		formDataOk.bottom = new FormAttachment(100, -5);
 		okButton.setLayoutData(formDataOk);
-		shell.setTabList(new Control[] { featureGroup,	buttonGroup, constraintTextComposite,
-			 lastComposite });
+		shell.setTabList(new Control[] { featureGroup, buttonGroup,
+				constraintTextComposite, lastComposite });
 
 		lastComposite.setTabList(new Control[] { okButton, cancelButton });
 		okButton.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
@@ -832,15 +838,24 @@ public class ConstraintDialog {
 			return;
 		}
 		int index = 0;
-
+		AbstractOperation op;
 		if (constraint != null
 				&& (index = featuremodel.getConstraints().indexOf(constraint)) != -1) {
 
-			featuremodel.replacePropNode(index, propNode);
+			op = new ConstraintEditOperation(propNode, featuremodel, index);
 		} else {
-			featuremodel.addPropositionalNode(propNode);
+			op = new ConstraintCreateOperation(propNode, featuremodel);
+
 		}
-		featuremodel.handleModelDataChanged();
+		op.addContext((IUndoContext) featuremodel.getUndoContext());
+		try {
+			PlatformUI.getWorkbench().getOperationSupport()
+					.getOperationHistory().execute(op, null, null);
+		} catch (ExecutionException e) {
+			FMUIPlugin.getDefault().logError(e);
+
+		}
+
 		shell.dispose();
 
 	}

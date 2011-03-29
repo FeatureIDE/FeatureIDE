@@ -18,11 +18,16 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
+import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.LegendHideOperation;
 
 /**
  * TODO shows/hides the legend when executed
@@ -41,29 +46,31 @@ public class LegendAction extends Action implements GUIDefaults {
 		} else {
 			this.setText("Show Legend");
 		}
-	
+
 	}
-	
+
 	@Override
 	public void run() {
-		
-		if (featureModel.hasLegend()) {
-			featureModel.setLegend(false);
-			setText("Show Legend");
 
-		} else {
-			featureModel.setLegend(true);
-			setText("Hide Legend");
+		LegendHideOperation op = new LegendHideOperation(featureModel);
+		op.addContext((IUndoContext) featureModel.getUndoContext());
+
+		try {
+			PlatformUI.getWorkbench().getOperationSupport()
+					.getOperationHistory().execute(op, null, null);
+		} catch (ExecutionException e) {
+			FMUIPlugin.getDefault().logError(e);
+
 		}
-		featureModel.handleModelDataChanged();
+
 	}
-	
+
 	public void refresh() {
 		if (featureModel.hasLegend()) {
 			this.setText("Hide Legend");
 		} else {
 			this.setText("Show Legend");
 		}
-		
+
 	}
 }

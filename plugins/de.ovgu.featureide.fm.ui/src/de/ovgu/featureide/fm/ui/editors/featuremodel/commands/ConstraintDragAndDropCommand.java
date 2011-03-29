@@ -18,19 +18,21 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.commands;
 
-import java.util.LinkedList;
-
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.commands.Command;
-import org.prop4j.Node;
+import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ConstraintMoveOperation;
 
 /**
- * executed command when dragging and dropping constraints 
- *
+ * executed command when dragging and dropping constraints
+ * 
  * @author Fabian Benduhn
  * @author David Broneske
  */
@@ -43,95 +45,88 @@ public class ConstraintDragAndDropCommand extends Command {
 	private Constraint constraint;
 	private Point newLocation;
 	boolean isLastPos;
-	
-	public ConstraintDragAndDropCommand(FeatureModel featureModel, Constraint constraint, Point newLocation) {
-		//super("Moving " + constraint.getNode().toString());
+
+	public ConstraintDragAndDropCommand(FeatureModel featureModel,
+			Constraint constraint, Point newLocation) {
+		// super("Moving " + constraint.getNode().toString());
 		this.featureModel = featureModel;
 		this.constraint = constraint;
 		this.newLocation = newLocation;
-		isLastPos=false;
-		
-	}
+		isLastPos = false;
+		}
 
-	public boolean canExecute(){
+	public boolean canExecute() {
 		setMaxValues();
-		if(newLocation.y > (maxDown+30) || newLocation.y < (maxUp-10) || newLocation.x>(maxRight+5)||newLocation.x<(maxLeft-5)){
+		if (newLocation.y > (maxDown + 30) || newLocation.y < (maxUp - 10)
+				|| newLocation.x > (maxRight + 5)
+				|| newLocation.x < (maxLeft - 5)) {
 			return false;
 		}
 		return true;
 	}
-	
-	public void execute(){
-		LinkedList<Node> insertConstraints = new LinkedList<Node>();
-		for(Constraint c: featureModel.getConstraints()){
-			if(!c.equals(constraint)){
-				insertConstraints.add(c.getNode());
-				
-			}
-		}
-		
-	//	insertConstraints.remove(constraint);
+
+	public void execute() {
+
 		int index = calculateNewIndex();
 		int oldIndex = featureModel.getConstraints().indexOf(constraint);
-	
-		if(index>oldIndex&&!isLastPos)index--;
-		
-		
-		if(insertConstraints.size()<featureModel.getConstraintCount())
-		insertConstraints.add(index, constraint.getNode());
-	
-	
-	
-		
-	
-		for(Node c: insertConstraints){
-			featureModel.removePropositionalNode(c);
+		if (index > oldIndex && !isLastPos)
+			index--;
+		if (index == oldIndex)
+			return;
+		ConstraintMoveOperation op = new ConstraintMoveOperation(constraint,
+				featureModel, index, oldIndex, isLastPos);
+		op.addContext((IUndoContext) featureModel.getUndoContext());
+
+		try {
+			PlatformUI.getWorkbench().getOperationSupport()
+					.getOperationHistory().execute(op, null, null);
+		} catch (ExecutionException e) {
+			FMUIPlugin.getDefault().logError(e);
+
 		}
-		
-		for(Node c : insertConstraints){
-			featureModel.addPropositionalNode(c);
-		}
-		featureModel.handleModelDataChanged();
-		}
+
+	}
 
 	/**
 	 * 
 	 */
 	private int calculateNewIndex() {
-		
-		for(Constraint c :featureModel.getConstraints()){
-		if((FeatureUIHelper.getLocation(c).y+17) > newLocation.y){
-			isLastPos=false;
-			
-			
-			return featureModel.getConstraints().indexOf(c);
-		
-			}
-			 
-		}
-		isLastPos=true;
-		return featureModel.getConstraints().size()-1;
-	}
-	
-	public void setMaxValues(){
-		maxLeft= FeatureUIHelper.getLocation(constraint).x;
-		maxUp= FeatureUIHelper.getLocation(constraint).y;
-		for(Constraint c: featureModel.getConstraints()){
 
-			if(FeatureUIHelper.getLocation(c).x < maxLeft){
-				maxLeft=FeatureUIHelper.getLocation(c).x;
+		for (Constraint c : featureModel.getConstraints()) {
+			if ((FeatureUIHelper.getLocation(c).y + 17) > newLocation.y) {
+				isLastPos = false;
+
+				return featureModel.getConstraints().indexOf(c);
+
 			}
-			if(FeatureUIHelper.getLocation(c).y < maxUp){
-				maxUp= FeatureUIHelper.getLocation(c).y;
-				
+
+		}
+		isLastPos = true;
+		return featureModel.getConstraints().size() - 1;
+	}
+
+	public void setMaxValues() {
+		maxLeft = FeatureUIHelper.getLocation(constraint).x;
+		maxUp = FeatureUIHelper.getLocation(constraint).y;
+		for (Constraint c : featureModel.getConstraints()) {
+
+			if (FeatureUIHelper.getLocation(c).x < maxLeft) {
+				maxLeft = FeatureUIHelper.getLocation(c).x;
 			}
-			if(FeatureUIHelper.getLocation(c).x+FeatureUIHelper.getSize(c).width > maxRight){
-				maxRight=FeatureUIHelper.getLocation(c).x+FeatureUIHelper.getSize(c).width;
+			if (FeatureUIHelper.getLocation(c).y < maxUp) {
+				maxUp = FeatureUIHelper.getLocation(c).y;
+
 			}
-			if((FeatureUIHelper.getLocation(c).y+FeatureUIHelper.getSize(c).height) > maxDown){
-				maxDown=FeatureUIHelper.getLocation(c).y+FeatureUIHelper.getSize(c).height;
+			if (FeatureUIHelper.getLocation(c).x
+					+ FeatureUIHelper.getSize(c).width > maxRight) {
+				maxRight = FeatureUIHelper.getLocation(c).x
+						+ FeatureUIHelper.getSize(c).width;
 			}
-			
+			if ((FeatureUIHelper.getLocation(c).y + FeatureUIHelper.getSize(c).height) > maxDown) {
+				maxDown = FeatureUIHelper.getLocation(c).y
+						+ FeatureUIHelper.getSize(c).height;
+			}
+
 		}
 
 	}
@@ -141,25 +136,28 @@ public class ConstraintDragAndDropCommand extends Command {
 	 */
 	public Point getLeftPoint() {
 		int index = calculateNewIndex();
-		
-		Point p = new Point (FeatureUIHelper.getLocation(constraint).x-5,FeatureUIHelper.getLocation(featureModel.getConstraints().get(index)).y);
-		if(isLastPos){
-			p.y = p.y+17;
-			
+
+		Point p = new Point(FeatureUIHelper.getLocation(constraint).x - 5,
+				FeatureUIHelper.getLocation(featureModel.getConstraints().get(
+						index)).y);
+		if (isLastPos) {
+			p.y = p.y + 17;
+
 		}
 		return p;
-		
+
 	}
+
 	public Point getRightPoint() {
-	
-		Point p = new Point (FeatureUIHelper.getLocation(constraint).x+FeatureUIHelper.getSize(constraint).width+5,FeatureUIHelper.getLocation(featureModel.getConstraints().get(calculateNewIndex())).y);
-		if(isLastPos){
-			p.y = p.y+17;
-			
+
+		Point p = new Point(FeatureUIHelper.getLocation(constraint).x
+				+ FeatureUIHelper.getSize(constraint).width + 5,
+				FeatureUIHelper.getLocation(featureModel.getConstraints().get(
+						calculateNewIndex())).y);
+		if (isLastPos) {
+			p.y = p.y + 17;
+
 		}
 		return p;
 	}
 }
-	
-	
-

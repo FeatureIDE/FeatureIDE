@@ -27,8 +27,6 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
 
-
-
 /**
  * TODO description
  * 
@@ -44,7 +42,9 @@ public class LegendLayoutAction extends Action {
 			setEnabled(isValidSelection(selection));
 		}
 	};
-	public LegendLayoutAction(GraphicalViewerImpl viewer,FeatureModel featuremodel) {
+
+	public LegendLayoutAction(GraphicalViewerImpl viewer,
+			FeatureModel featuremodel) {
 		super("Auto-Layout Legend");
 		this.featureModel = featuremodel;
 		this.setEnabled(false);
@@ -52,36 +52,36 @@ public class LegendLayoutAction extends Action {
 		viewer.addSelectionChangedListener(listener);
 	}
 
-	
-	protected boolean isValidSelection(IStructuredSelection selection) {	
-		if(selection.size()!=1)return false;
-		if(selection.getFirstElement() instanceof LegendEditPart)return true;
-		
-		else return false;
+	protected boolean isValidSelection(IStructuredSelection selection) {
+		if (selection.size() != 1)
+			return false;
+		if (selection.getFirstElement() instanceof LegendEditPart)
+			return true;
+
+		else
+			return false;
 	}
 
 	@Override
 	public void run() {
 		super.run();
-		if(featureModel.hasLegendAutoLayout()){
+		if (featureModel.hasLegendAutoLayout()) {
 			featureModel.setLegendAutoLayout(false);
 			this.setChecked(false);
-		}
-		else{
+		} else {
 			featureModel.setLegendAutoLayout(true);
 			this.setChecked(true);
 			featureModel.handleModelDataChanged();
 		}
-		
-	
+
 	}
+
 	public void refresh() {
-		if(featureModel.hasLegendAutoLayout()){
+		if (featureModel.hasLegendAutoLayout()) {
 			this.setChecked(true);
-		}
-		else{
+		} else {
 			this.setChecked(false);
-			
+
 		}
 	}
 }

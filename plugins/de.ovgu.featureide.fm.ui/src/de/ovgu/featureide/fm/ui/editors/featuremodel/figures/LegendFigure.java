@@ -78,6 +78,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		setBorder(new LineBorder(1));
 		setLegendSize(mandatory, optional, or, alternative, and);
 		FeatureUIHelper.setLegendSize(this.getSize());
+		FeatureUIHelper.setLegendFigure(this);
 		createRows(mandatory, optional, or, alternative, and);
 		setForegroundColor(CONNECTION_FOREGROUND);
 		setBackgroundColor(DIAGRAM_BACKGROUND);

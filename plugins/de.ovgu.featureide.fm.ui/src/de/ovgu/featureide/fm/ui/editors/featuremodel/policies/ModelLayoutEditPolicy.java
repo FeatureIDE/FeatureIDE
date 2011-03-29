@@ -111,10 +111,11 @@ public class ModelLayoutEditPolicy extends LayoutEditPolicy {
 	public Command getConstraintCommand() {
 		return cmd;
 	}
-
+	
 	@Override
 	protected Command getCreateCommand(CreateRequest request) {
 		// no creation supported
+		
 		return null;
 	}
 

@@ -18,9 +18,14 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
+import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureSetHiddenOperation;
 
 public class HiddenAction extends SingleSelectionAction {
 
@@ -35,9 +40,20 @@ public class HiddenAction extends SingleSelectionAction {
 
 	@Override
 	public void run() {
-		feature.setHidden(!feature.isHidden());
+
 		setChecked(feature.isHidden());
-		featureModel.handleModelDataChanged();
+
+		FeatureSetHiddenOperation op = new FeatureSetHiddenOperation(feature,
+				featureModel);
+		op.addContext((IUndoContext) featureModel.getUndoContext());
+
+		try {
+			PlatformUI.getWorkbench().getOperationSupport()
+					.getOperationHistory().execute(op, null, null);
+		} catch (ExecutionException e) {
+			FMUIPlugin.getDefault().logError(e);
+
+		}
 	}
 
 	@Override

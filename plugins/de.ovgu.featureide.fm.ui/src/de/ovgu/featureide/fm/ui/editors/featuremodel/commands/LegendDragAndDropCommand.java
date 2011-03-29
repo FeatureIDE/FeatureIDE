@@ -18,15 +18,19 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.commands;
 
+import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.commands.Command;
+import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.LegendMoveOperation;
 
 /**
  * TODO Command to move the feature model legend using drag and drop
@@ -47,41 +51,48 @@ public class LegendDragAndDropCommand extends Command {
 
 	}
 
-	
 	public boolean canExecute() {
-	
-		
-	
-		//newRect is the rectangle containing the legend while dragging 
-		Rectangle newRect = new Rectangle(legendFigure.newPos,legendFigure.getSize());
+
+		// newRect is the rectangle containing the legend while dragging
+		Rectangle newRect = new Rectangle(legendFigure.newPos,
+				legendFigure.getSize());
 
 		legendFigure.translateToRelative(newRect);
-		//check if legend intersects with a feature
-		for(Feature f:model.getFeatures()){
+		// check if legend intersects with a feature
+		for (Feature f : model.getFeatures()) {
 			Rectangle bounds = FeatureUIHelper.getBounds(f);
-			
-			if (newRect.intersects(bounds)){
+
+			if (newRect.intersects(bounds)) {
 				return false;
 			}
 		}
-		//check if legend intersects with a constraint
-		for(Constraint c:model.getConstraints()){
-			if (newRect.intersects(FeatureUIHelper.getBounds(c))){
+		// check if legend intersects with a constraint
+		for (Constraint c : model.getConstraints()) {
+			if (newRect.intersects(FeatureUIHelper.getBounds(c))) {
 				return false;
 			}
 		}
 
-			return true;
+		return true;
 	}
 
 	public void execute() {
-		
 		Point p = legendFigure.newPos.getCopy();
 		legendFigure.translateToRelative(p);
-		legendFigure.setLocation(p);
-		model.setLegendPos(p.x, p.y);
-		model.setLegendAutoLayout(false);
-		model.refreshContextMenu();
+		if (model.getLegendPos().x == p.x && model.getLegendPos().y == p.y) {
+			return;
+		}
+		LegendMoveOperation op = new LegendMoveOperation(model, p,legendFigure.newPos, legendFigure);
+		op.addContext((IUndoContext) model.getUndoContext());
+
+		try {
+			PlatformUI.getWorkbench().getOperationSupport()
+					.getOperationHistory().execute(op, null, null);
+		} catch (Exception e) {
+			FMUIPlugin.getDefault().logError(e);
+
+		}
+
 	}
 
 }

@@ -66,7 +66,7 @@ abstract public class FeatureDiagramLayoutManager implements GUIDefaults {
 	/**
 	 * sets the position of the legend to the right-bottom of the features
 	 */
-	private void layoutLegend(FeatureModel featureModel) {
+	private static void layoutLegend(FeatureModel featureModel) {
 		int maxX = 0;
 		int maxY = 0;
 

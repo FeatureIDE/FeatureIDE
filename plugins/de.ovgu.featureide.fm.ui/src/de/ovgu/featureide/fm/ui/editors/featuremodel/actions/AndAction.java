@@ -18,10 +18,14 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
+import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
-
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureChangeGroupTypeOperation;
 
 /**
  * Turns a group type into an And-group.
@@ -33,7 +37,7 @@ public class AndAction extends SingleSelectionAction {
 	public static String ID = "de.ovgu.featureide.and";
 
 	private final FeatureModel featureModel;
-	
+
 	public AndAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
 		super("And", viewer);
 		this.featureModel = featureModel;
@@ -41,8 +45,17 @@ public class AndAction extends SingleSelectionAction {
 
 	@Override
 	public void run() {
-		feature.changeToAnd();
-		featureModel.handleModelDataChanged();
+		FeatureChangeGroupTypeOperation op = new FeatureChangeGroupTypeOperation(
+				FeatureChangeGroupTypeOperation.AND, feature, featureModel);
+		op.addContext((IUndoContext) featureModel.getUndoContext());
+
+		try {
+			PlatformUI.getWorkbench().getOperationSupport()
+					.getOperationHistory().execute(op, null, null);
+		} catch (ExecutionException e) {
+			FMUIPlugin.getDefault().logError(e);
+
+		}
 	}
 
 	@Override

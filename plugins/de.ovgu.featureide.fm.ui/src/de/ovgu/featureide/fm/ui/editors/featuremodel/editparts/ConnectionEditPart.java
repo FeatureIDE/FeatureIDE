@@ -21,6 +21,8 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.editparts;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.PolylineConnection;
@@ -32,14 +34,17 @@ import org.eclipse.gef.commands.Command;
 import org.eclipse.gef.editparts.AbstractConnectionEditPart;
 import org.eclipse.gef.editpolicies.DirectEditPolicy;
 import org.eclipse.gef.requests.DirectEditRequest;
+import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureConnection;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.CircleDecoration;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.RelationDecoration;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureChangeGroupTypeOperation;
 
 
 /**
@@ -91,16 +96,33 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 
 	private void changeConnectionType() {
 		Feature feature = getConnectionModel().getTarget();
-
-		if (feature.isAlternative()) {
-			feature.changeToAnd();
-		} else if (feature.isAnd()) {
-			feature.changeToOr();
-		} else {
-			feature.changeToAlternative();
-		}
 		ModelEditPart parent = (ModelEditPart) getSource().getParent();
+		
 		FeatureModel featureModel = parent.getFeatureModel();
+			
+	
+		int groupType;	
+		
+		if (feature.isAlternative()) {
+			groupType=FeatureChangeGroupTypeOperation.AND;
+		} else if (feature.isAnd()) {
+			groupType=FeatureChangeGroupTypeOperation.OR;
+		} else {
+			groupType=FeatureChangeGroupTypeOperation.ALTERNATIVE;
+		}
+		
+		FeatureChangeGroupTypeOperation op = new FeatureChangeGroupTypeOperation(groupType,
+				 feature,featureModel);
+		op.addContext((IUndoContext) featureModel.getUndoContext());
+		
+		try {
+			PlatformUI.getWorkbench().getOperationSupport()
+					.getOperationHistory().execute(op, null, null);
+		} catch (ExecutionException e) {
+		FMUIPlugin.getDefault().logError(e);
+		}
+		
+		
 		featureModel.handleModelDataChanged();
 	}
 

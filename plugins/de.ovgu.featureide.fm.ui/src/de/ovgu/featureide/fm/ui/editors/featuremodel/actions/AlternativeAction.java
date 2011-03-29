@@ -18,10 +18,14 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
+import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
-
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureChangeGroupTypeOperation;
 
 /**
  * Turns a group type into an Alternative-group.
@@ -34,15 +38,27 @@ public class AlternativeAction extends SingleSelectionAction {
 
 	private final FeatureModel featureModel;
 
-	public AlternativeAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
+	public AlternativeAction(GraphicalViewerImpl viewer,
+			FeatureModel featureModel) {
 		super("Alternative", viewer);
 		this.featureModel = featureModel;
 	}
 
 	@Override
 	public void run() {
-		feature.changeToAlternative();
-		featureModel.handleModelDataChanged();
+		FeatureChangeGroupTypeOperation op = new FeatureChangeGroupTypeOperation(
+				FeatureChangeGroupTypeOperation.ALTERNATIVE, feature,
+				featureModel);
+		op.addContext((IUndoContext) featureModel.getUndoContext());
+
+		try {
+			PlatformUI.getWorkbench().getOperationSupport()
+					.getOperationHistory().execute(op, null, null);
+		} catch (ExecutionException e) {
+			FMUIPlugin.getDefault().logError(e);
+
+		}
+
 	}
 
 	@Override
