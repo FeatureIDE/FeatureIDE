@@ -18,6 +18,9 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import org.eclipse.core.commands.operations.ObjectUndoContext;
 import org.eclipse.draw2d.ConnectionLayer;
 import org.eclipse.gef.DefaultEditDomain;
@@ -48,6 +51,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbenchActionConstants;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AlternativeAction;
@@ -74,11 +78,12 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.LevelOrderLayout;
  * 
  * @author Thomas Thuem
  */
-public class FeatureDiagramEditor implements GUIDefaults {
-	
+public class FeatureDiagramEditor implements GUIDefaults, PropertyConstants,
+		PropertyChangeListener {
+
 	private FeatureModelEditor featureModelEditor;
 
-	//TODO extends ???
+	// TODO extends ???
 	private GraphicalViewerImpl graphicalViewer;
 
 	private ZoomManager zoomManager;
@@ -86,8 +91,6 @@ public class FeatureDiagramEditor implements GUIDefaults {
 	private ScalableFreeformRootEditPart rootEditPart;
 
 	private FeatureDiagramLayoutManager layoutManager = new LevelOrderLayout();
-
-//TODO	private boolean dirty = false;
 
 	private CreateLayerAction createLayerAction;
 
@@ -123,9 +126,10 @@ public class FeatureDiagramEditor implements GUIDefaults {
 
 	private ReverseOrderAction reverseOrderAction;
 
-	public FeatureDiagramEditor(FeatureModelEditor featureModelEditor, Composite container) {
+	public FeatureDiagramEditor(FeatureModelEditor featureModelEditor,
+			Composite container) {
 		this.featureModelEditor = featureModelEditor;
-		
+
 		graphicalViewer = new ScrollingGraphicalViewer();
 		graphicalViewer.setKeyHandler(new GraphicalViewerKeyHandler(
 				graphicalViewer));
@@ -133,7 +137,8 @@ public class FeatureDiagramEditor implements GUIDefaults {
 		graphicalViewer.createControl(container);
 		initializeGraphicalViewer();
 
-		graphicalViewer.setEditDomain(new DefaultEditDomain(featureModelEditor));
+		graphicalViewer
+				.setEditDomain(new DefaultEditDomain(featureModelEditor));
 
 		zoomManager = rootEditPart.getZoomManager();
 		zoomManager.setZoomLevels(new double[] { 0.05, 0.10, 0.25, 0.50, 0.75,
@@ -160,7 +165,7 @@ public class FeatureDiagramEditor implements GUIDefaults {
 
 	public void createActions() {
 		FeatureModel featureModel = getFeatureModel();
-		
+
 		createLayerAction = new CreateLayerAction(graphicalViewer, featureModel);
 		createCompoundAction = new CreateCompoundAction(graphicalViewer,
 				featureModel);
@@ -173,7 +178,7 @@ public class FeatureDiagramEditor implements GUIDefaults {
 		orAction = new OrAction(graphicalViewer, featureModel);
 		alternativeAction = new AlternativeAction(graphicalViewer, featureModel);
 		renameAction = new RenameAction(graphicalViewer, featureModel);
-		
+
 		createConstraintAction = new CreateConstraintAction(graphicalViewer,
 				featureModel, "Create Constraint");
 		editConstraintAction = new EditConstraintAction(graphicalViewer,
@@ -298,11 +303,6 @@ public class FeatureDiagramEditor implements GUIDefaults {
 		graphicalViewer.getContents().refresh();
 	}
 
-	public void refreshLegend() {
-		legendAction.refresh();
-		legendLayoutAction.refresh();
-	}
-
 	public GraphicalViewerImpl getGraphicalViewer() {
 		return graphicalViewer;
 	}
@@ -319,6 +319,25 @@ public class FeatureDiagramEditor implements GUIDefaults {
 		if (EditDomain.class.equals(adapter))
 			return graphicalViewer.getEditDomain();
 		return null;
+	}
+
+	public void propertyChange(PropertyChangeEvent event) {
+		String prop = event.getPropertyName();
+		if (prop.equals(MODEL_DATA_CHANGED)) {
+			graphicalViewer.setContents(getFeatureModel());
+			refresh();
+			featureModelEditor.setPageModified(true);
+		} else if (prop.equals(MODEL_DATA_LOADED)) {
+			refresh();
+		} else if (prop.equals(REDRAW_DIAGRAM)) {
+			// TODO new extension point
+			featureModelEditor.updateTextEditorFromDiagram();
+			featureModelEditor.updateDiagramFromTextEditor();
+		} else if (prop.equals(REFRESH_ACTIONS)) {
+			// additional actions can be refreshed here
+			legendAction.refresh();
+			legendLayoutAction.refresh();
+		}
 	}
 
 }

@@ -66,7 +66,7 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.GrammarFile;
+import de.ovgu.featureide.fm.core.FeatureModelFile;
 import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
@@ -87,7 +87,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GEFImageWriter;
  * @author Christian Becker
  */
 public class FeatureModelEditor extends MultiPageEditorPart implements
-		PropertyConstants, PropertyChangeListener,
 		IResourceChangeListener {
 
 	public static final String ID = FMUIPlugin.PLUGIN_ID
@@ -118,7 +117,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 
 	private IFeatureModelWriter featureModelWriter;
 
-	private GrammarFile grammarFile;
+	private FeatureModelFile fmFile;
 
 	private FeatureModel originalFeatureModel;
 
@@ -139,23 +138,21 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 	protected void setInput(IEditorInput input) {
 		file = (IFile) input.getAdapter(IFile.class);
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
-		grammarFile = new GrammarFile(file);
+		fmFile = new FeatureModelFile(file);
 		setPartName(file.getProject().getName() + " Model");
 		setTitleToolTip(input.getToolTipText());
 		super.setInput(input);
 
 		featureModel = new FeatureModel();
-		featureModel.addListener(this);
 		featureModelReader = new XmlFeatureModelReader(featureModel);
 		featureModelWriter = new XmlFeatureModelWriter(featureModel);
 
 		originalFeatureModel = new FeatureModel();
 
 		try {
-
 			new XmlFeatureModelReader(originalFeatureModel).readFromFile(file);
-
 		} catch (Exception e) {
+			FMUIPlugin.getDefault().logError(e);
 		}
 	}
 
@@ -184,18 +181,17 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 			// featureOrderEditor.updateOrderEditor(getOriginalFeatureModel().getFeatures());
 			featureOrderEditor.initOrderEditor();
 		} catch (PartInitException e) {
-
 			FMUIPlugin.getDefault().logError(e);
 		}
-		;
 	}
 
 	// TODO new extension point
 	void createDiagramPage() {
 		diagramEditor = new FeatureDiagramEditor(this, getContainer());
+		featureModel.addListener(diagramEditor);
 		diagramEditor.getPage().getDisplay().asyncExec(new Runnable() {
 			public void run() {
-				diagramEditor.getGraphicalViewer().setContents(getFeatureModel());
+				diagramEditor.getGraphicalViewer().setContents(featureModel);
 				isPageModified = true;
 				pageChange(graphicalViewerIndex);
 			}
@@ -264,15 +260,15 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		IDocumentProvider provider = textEditor.getDocumentProvider();
 		IDocument document = provider.getDocument(textEditor.getEditorInput());
 		String text = document.get();
-		grammarFile.deleteAllModelMarkers();
+		fmFile.deleteAllModelMarkers();
 		try {
 			featureModelReader.readFromString(text);
 			for (ModelWarning warning : featureModelReader.getWarnings())
-				grammarFile.createModelMarker(warning.message,
+				fmFile.createModelMarker(warning.message,
 						IMarker.SEVERITY_WARNING, warning.line);
 			try {
 				if (!featureModel.isValid())
-					grammarFile
+					fmFile
 							.createModelMarker(
 									"The feature model is void, i.e., it contains no products",
 									IMarker.SEVERITY_ERROR, 0);
@@ -280,7 +276,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 				// do nothing, assume the model is correct
 			}
 		} catch (UnsupportedModelException e) {
-			grammarFile.createModelMarker(e.getMessage(),
+			fmFile.createModelMarker(e.getMessage(),
 					IMarker.SEVERITY_ERROR, e.lineNumber);
 			return false;
 		}
@@ -358,7 +354,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 					return;
 				}
 			} else if (newPageIndex == featureOrderEditorIndex) {
-				if (isDirty() || grammarFile.hasModelMarkers()) {
+				if (isDirty() || fmFile.hasModelMarkers()) {
 
 					if (!updateDiagramFromTextEditor()) {
 						// there are errors in the file, stay at this editor
@@ -394,7 +390,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 	 */
 	private void saveModelForConsistentRenamings() {
 		ArrayList<String> editor = new ArrayList<String>();
-		editor.add(grammarFile.getResource().getName());
+		editor.add(fmFile.getResource().getName());
 
 		ArrayList<IEditorPart> editorspart = new ArrayList<IEditorPart>();
 		editorspart.add(this.getEditor(graphicalViewerIndex));
@@ -428,27 +424,24 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 
 		if (getActivePage() == graphicalViewerIndex && isPageModified) {
 			updateTextEditorFromDiagram();
+			// TODO why do we need these two lines?
 			setActivePage(textEditorIndex);
 			setActivePage(graphicalViewerIndex);
-
 		} else if (getActivePage() == textEditorIndex) {
+			// TODO why to update the diagram here?
 			updateDiagramFromTextEditor();
-
 		} else if (getActivePage() == featureOrderEditorIndex) {
-			// isPageModified = false;
 			updateTextEditorFromDiagram();
 		}
-
-		isPageModified = false;
 
 		textEditor.doSave(monitor);
 		try {
 			new XmlFeatureModelReader(originalFeatureModel)
-					.readFromFile(grammarFile.getResource());
+					.readFromFile(fmFile.getResource());
 		} catch (Exception e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
-		firePropertyChange(PROP_DIRTY);
+		setPageModified(false);
 	}
 
 	@SuppressWarnings("deprecation")
@@ -529,26 +522,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		}
 	}
 
-	public void propertyChange(PropertyChangeEvent event) {
-
-		String prop = event.getPropertyName();
-		if (prop.equals(MODEL_DATA_CHANGED)) {
-			diagramEditor.getGraphicalViewer().setContents(featureModel);
-			diagramEditor.refresh();
-			isPageModified = true;
-			firePropertyChange(PROP_DIRTY);
-		} else if (prop.equals(MODEL_DATA_LOADED)) {
-			diagramEditor.refresh();
-		} else if (prop.equals(REDRAW_DIAGRAM)) {
-			// TODO new extension point
-			updateTextEditorFromDiagram();
-			updateDiagramFromTextEditor();
-		} else if (prop.equals(REFRESH_ACTIONS)) {
-			// additional actions can be refreshed here
-			diagramEditor.refreshLegend();
-		}
-	}
-
 	@SuppressWarnings("rawtypes")
 	@Override
 	public Object getAdapter(Class adapter) {
@@ -561,12 +534,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		return super.getAdapter(adapter);
 	}
 
-	// TODO remove?
-	@Override
-	public int getActivePage() {
-		return super.getActivePage();
-	}
-
 	// TODO new extension point
 	public ITextEditor getSourceEditor() {
 		return textEditor;
@@ -576,8 +543,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		return featureModel;
 	}
 
-	public GrammarFile getGrammarFile() {
-		return grammarFile;
+	public FeatureModelFile getGrammarFile() {
+		return fmFile;
 	}
 
 	/*
@@ -664,6 +631,11 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 				}
 			});
 		}
+	}
+
+	public void setPageModified(boolean modified) {
+		isPageModified = modified;
+		firePropertyChange(PROP_DIRTY);
 	}
 
 }

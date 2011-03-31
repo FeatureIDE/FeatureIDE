@@ -27,11 +27,11 @@ import org.eclipse.core.resources.IFile;
  * 
  * @author Christian Kaestner
  */
-public class GrammarFile extends ModelMarkerHandler {
+public class FeatureModelFile extends ModelMarkerHandler {
 
 	private IFile file;
 
-	public GrammarFile(IFile file) {
+	public FeatureModelFile(IFile file) {
 		super(file);
 		this.file=file;
 	}

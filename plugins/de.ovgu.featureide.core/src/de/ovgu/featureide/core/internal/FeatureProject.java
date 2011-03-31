@@ -58,7 +58,7 @@ import de.ovgu.featureide.core.projectstructure.trees.ProjectTree;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.GrammarFile;
+import de.ovgu.featureide.fm.core.FeatureModelFile;
 import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
@@ -136,7 +136,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 
 	private final IProject project;
 
-	private final GrammarFile modelFile;
+	private final FeatureModelFile modelFile;
 
 	/**
 	 * contains the ProjectTree for this Feature Project
@@ -173,7 +173,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			CorePlugin.getDefault().logError(e);
 		}
 
-		modelFile = new GrammarFile(project.getFile("model.xml"));
+		modelFile = new FeatureModelFile(project.getFile("model.xml"));
 		try {
 			// just create the bin folder if project hat only the FeatureIDE
 			// Nature
@@ -231,7 +231,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 				fmWriter.writeToFile(file);
 
 				if (!fmReader.getAnnLine().isEmpty()) {
-					GrammarFile gFile = new GrammarFile(
+					FeatureModelFile gFile = new FeatureModelFile(
 							project.getFile("model.m"));
 					for (int i = 0; i < fmReader.getAnnLine().size(); i++)
 						gFile.createModelMarker(
