@@ -36,7 +36,6 @@ import org.eclipse.gef.editparts.ZoomManager;
 import org.eclipse.gef.ui.actions.GEFActionConstants;
 import org.eclipse.gef.ui.actions.ZoomInAction;
 import org.eclipse.gef.ui.actions.ZoomOutAction;
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.gef.ui.parts.GraphicalViewerKeyHandler;
 import org.eclipse.gef.ui.parts.ScrollingGraphicalViewer;
 import org.eclipse.jface.action.IAction;
@@ -47,7 +46,6 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbenchActionConstants;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -78,13 +76,10 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.LevelOrderLayout;
  * 
  * @author Thomas Thuem
  */
-public class FeatureDiagramEditor implements GUIDefaults, PropertyConstants,
-		PropertyChangeListener {
+public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
+		GUIDefaults, PropertyConstants, PropertyChangeListener {
 
 	private FeatureModelEditor featureModelEditor;
-
-	// TODO extends ???
-	private GraphicalViewerImpl graphicalViewer;
 
 	private ZoomManager zoomManager;
 
@@ -93,52 +88,38 @@ public class FeatureDiagramEditor implements GUIDefaults, PropertyConstants,
 	private FeatureDiagramLayoutManager layoutManager = new LevelOrderLayout();
 
 	private CreateLayerAction createLayerAction;
-
 	private CreateCompoundAction createCompoundAction;
-
 	private DeleteAction deleteAction;
-
 	private MandatoryAction mandatoryAction;
-
 	private AbstractAction abstractAction;
-
 	private HiddenAction hiddenAction;
-
 	private AndAction andAction;
-
 	private OrAction orAction;
-
 	private AlternativeAction alternativeAction;
-
 	private RenameAction renameAction;
 
 	private ZoomInAction zoomIn;
-
 	private ZoomOutAction zoomOut;
 
 	private LegendAction legendAction;
-
 	private LegendLayoutAction legendLayoutAction;
 
 	private EditConstraintAction editConstraintAction;
-
 	private CreateConstraintAction createConstraintAction;
 
 	private ReverseOrderAction reverseOrderAction;
 
 	public FeatureDiagramEditor(FeatureModelEditor featureModelEditor,
 			Composite container) {
+		super();
 		this.featureModelEditor = featureModelEditor;
 
-		graphicalViewer = new ScrollingGraphicalViewer();
-		graphicalViewer.setKeyHandler(new GraphicalViewerKeyHandler(
-				graphicalViewer));
+		setKeyHandler(new GraphicalViewerKeyHandler(this));
 
-		graphicalViewer.createControl(container);
+		createControl(container);
 		initializeGraphicalViewer();
 
-		graphicalViewer
-				.setEditDomain(new DefaultEditDomain(featureModelEditor));
+		setEditDomain(new DefaultEditDomain(featureModelEditor));
 
 		zoomManager = rootEditPart.getZoomManager();
 		zoomManager.setZoomLevels(new double[] { 0.05, 0.10, 0.25, 0.50, 0.75,
@@ -146,49 +127,42 @@ public class FeatureDiagramEditor implements GUIDefaults, PropertyConstants,
 	}
 
 	void initializeGraphicalViewer() {
-		graphicalViewer.getControl().setBackground(DIAGRAM_BACKGROUND);
-		graphicalViewer.setEditPartFactory(new GraphicalEditPartFactory());
+		getControl().setBackground(DIAGRAM_BACKGROUND);
+		setEditPartFactory(new GraphicalEditPartFactory());
 		rootEditPart = new ScalableFreeformRootEditPart();
 		((ConnectionLayer) rootEditPart
 				.getLayer(LayerConstants.CONNECTION_LAYER))
 				.setAntialias(SWT.ON);
-		graphicalViewer.setRootEditPart(rootEditPart);
+		setRootEditPart(rootEditPart);
 	}
 
 	private FeatureModel getFeatureModel() {
 		return featureModelEditor.getFeatureModel();
 	}
 
-	public Control getPage() {
-		return graphicalViewer.getControl();
-	}
-
 	public void createActions() {
 		FeatureModel featureModel = getFeatureModel();
 
-		createLayerAction = new CreateLayerAction(graphicalViewer, featureModel);
-		createCompoundAction = new CreateCompoundAction(graphicalViewer,
-				featureModel);
-		deleteAction = new DeleteAction(graphicalViewer, featureModel);
-		mandatoryAction = new MandatoryAction(graphicalViewer, featureModel);
-		hiddenAction = new HiddenAction(graphicalViewer, featureModel);
-		abstractAction = new AbstractAction(graphicalViewer, featureModel,
+		createLayerAction = new CreateLayerAction(this, featureModel);
+		createCompoundAction = new CreateCompoundAction(this, featureModel);
+		deleteAction = new DeleteAction(this, featureModel);
+		mandatoryAction = new MandatoryAction(this, featureModel);
+		hiddenAction = new HiddenAction(this, featureModel);
+		abstractAction = new AbstractAction(this, featureModel,
 				(ObjectUndoContext) featureModel.getUndoContext());
-		andAction = new AndAction(graphicalViewer, featureModel);
-		orAction = new OrAction(graphicalViewer, featureModel);
-		alternativeAction = new AlternativeAction(graphicalViewer, featureModel);
-		renameAction = new RenameAction(graphicalViewer, featureModel);
+		andAction = new AndAction(this, featureModel);
+		orAction = new OrAction(this, featureModel);
+		alternativeAction = new AlternativeAction(this, featureModel);
+		renameAction = new RenameAction(this, featureModel);
 
-		createConstraintAction = new CreateConstraintAction(graphicalViewer,
-				featureModel, "Create Constraint");
-		editConstraintAction = new EditConstraintAction(graphicalViewer,
-				featureModel, "Edit Constraint");
-		reverseOrderAction = new ReverseOrderAction(graphicalViewer,
-				featureModel);
+		createConstraintAction = new CreateConstraintAction(this, featureModel,
+				"Create Constraint");
+		editConstraintAction = new EditConstraintAction(this, featureModel,
+				"Edit Constraint");
+		reverseOrderAction = new ReverseOrderAction(this, featureModel);
 
-		legendAction = new LegendAction(graphicalViewer, featureModel);
-		legendLayoutAction = new LegendLayoutAction(graphicalViewer,
-				featureModel);
+		legendAction = new LegendAction(this, featureModel);
+		legendLayoutAction = new LegendLayoutAction(this, featureModel);
 
 		zoomIn = new ZoomInAction(zoomManager);
 		zoomOut = new ZoomOutAction(zoomManager);
@@ -200,18 +174,18 @@ public class FeatureDiagramEditor implements GUIDefaults, PropertyConstants,
 				FeatureDiagramEditor.this.fillContextMenu(manager);
 			}
 		});
-		menu.createContextMenu(graphicalViewer.getControl());
-		graphicalViewer.setContextMenu(menu);
+		menu.createContextMenu(getControl());
+		setContextMenu(menu);
 		// the following line adds package explorer entries into our context
 		// menu
 		// getSite().registerContextMenu(menu, graphicalViewer);
 	}
 
 	public void createKeyBindings() {
-		KeyHandler handler = graphicalViewer.getKeyHandler();
+		KeyHandler handler = getKeyHandler();
 		handler.put(KeyStroke.getPressed(SWT.F2, 0), renameAction);
 		handler.put(KeyStroke.getPressed(SWT.INSERT, 0), createLayerAction);
-		graphicalViewer.setKeyHandler(handler);
+		setKeyHandler(handler);
 	}
 
 	private void fillContextMenu(IMenuManager menu) {
@@ -289,42 +263,38 @@ public class FeatureDiagramEditor implements GUIDefaults, PropertyConstants,
 	}
 
 	public void refresh() {
-		if (graphicalViewer.getContents() == null)
+		if (getContents() == null)
 			return;
 
 		// refresh size of all feature figures
-		graphicalViewer.getContents().refresh();
+		getContents().refresh();
 		// layout all features
-		Point size = graphicalViewer.getControl().getSize();
+		Point size = getControl().getSize();
 		layoutManager.setControlSize(size.x, size.y);
 		layoutManager.layout(getFeatureModel());
 
 		// refresh position of all feature figures
-		graphicalViewer.getContents().refresh();
-	}
-
-	public GraphicalViewerImpl getGraphicalViewer() {
-		return graphicalViewer;
+		getContents().refresh();
 	}
 
 	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter) {
 		if (GraphicalViewer.class.equals(adapter)
 				|| EditPartViewer.class.equals(adapter))
-			return graphicalViewer;
+			return this;
 		if (ZoomManager.class.equals(adapter))
 			return zoomManager;
 		if (CommandStack.class.equals(adapter))
-			return graphicalViewer.getEditDomain().getCommandStack();
+			return getEditDomain().getCommandStack();
 		if (EditDomain.class.equals(adapter))
-			return graphicalViewer.getEditDomain();
+			return getEditDomain();
 		return null;
 	}
 
 	public void propertyChange(PropertyChangeEvent event) {
 		String prop = event.getPropertyName();
 		if (prop.equals(MODEL_DATA_CHANGED)) {
-			graphicalViewer.setContents(getFeatureModel());
+			setContents(getFeatureModel());
 			refresh();
 			featureModelEditor.setPageModified(true);
 		} else if (prop.equals(MODEL_DATA_LOADED)) {

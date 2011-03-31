@@ -18,8 +18,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +65,6 @@ import org.sat4j.specs.TimeoutException;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelFile;
-import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.ModelWarning;
@@ -189,14 +186,14 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 	void createDiagramPage() {
 		diagramEditor = new FeatureDiagramEditor(this, getContainer());
 		featureModel.addListener(diagramEditor);
-		diagramEditor.getPage().getDisplay().asyncExec(new Runnable() {
+		diagramEditor.getControl().getDisplay().asyncExec(new Runnable() {
 			public void run() {
-				diagramEditor.getGraphicalViewer().setContents(featureModel);
+				diagramEditor.setContents(featureModel);
 				isPageModified = true;
 				pageChange(graphicalViewerIndex);
 			}
 		});
-		graphicalViewerIndex = addPage(diagramEditor.getPage());
+		graphicalViewerIndex = addPage(diagramEditor.getControl());
 		setPageText(graphicalViewerIndex, "Feature Diagram");
 	}
 
@@ -217,7 +214,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		ObjectUndoContext undoContext = new ObjectUndoContext(this);
 		featureModel.setUndoContext(undoContext);
 		diagramEditor.createActions();
-		
+
 		printAction = new PrintAction(this);
 		selectAllAction = new SelectAllAction(this);
 
@@ -268,16 +265,15 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 						IMarker.SEVERITY_WARNING, warning.line);
 			try {
 				if (!featureModel.isValid())
-					fmFile
-							.createModelMarker(
-									"The feature model is void, i.e., it contains no products",
-									IMarker.SEVERITY_ERROR, 0);
+					fmFile.createModelMarker(
+							"The feature model is void, i.e., it contains no products",
+							IMarker.SEVERITY_ERROR, 0);
 			} catch (TimeoutException e) {
 				// do nothing, assume the model is correct
 			}
 		} catch (UnsupportedModelException e) {
-			fmFile.createModelMarker(e.getMessage(),
-					IMarker.SEVERITY_ERROR, e.lineNumber);
+			fmFile.createModelMarker(e.getMessage(), IMarker.SEVERITY_ERROR,
+					e.lineNumber);
 			return false;
 		}
 		return true;
@@ -316,7 +312,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 	public void setFocus() {
 		// TODO new extension point
 		if (getActivePage() == graphicalViewerIndex)
-			diagramEditor.getPage().setFocus();
+			diagramEditor.getControl().setFocus();
 		else
 			textEditor.setFocus();
 	}
@@ -436,8 +432,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 
 		textEditor.doSave(monitor);
 		try {
-			new XmlFeatureModelReader(originalFeatureModel)
-					.readFromFile(fmFile.getResource());
+			new XmlFeatureModelReader(originalFeatureModel).readFromFile(fmFile
+					.getResource());
 		} catch (Exception e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
@@ -518,7 +514,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		} else if (filePath.endsWith(".xml")) {
 			featureModelWriter.writeToFile(file);
 		} else {
-			GEFImageWriter.writeToFile(diagramEditor.getGraphicalViewer(), file);
+			GEFImageWriter.writeToFile(diagramEditor, file);
 		}
 	}
 
