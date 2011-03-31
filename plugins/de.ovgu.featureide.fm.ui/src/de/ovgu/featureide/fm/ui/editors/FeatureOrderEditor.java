@@ -128,6 +128,7 @@ public class FeatureOrderEditor extends EditorPart {
 	}
 
 	/*
+	// TODO remove?
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ui.part.EditorPart#doSaveAs()
@@ -210,6 +211,7 @@ public class FeatureOrderEditor extends EditorPart {
 		}
 	}
 
+	// TODO split method
 	/*
 	 * (non-Javadoc)
 	 * 

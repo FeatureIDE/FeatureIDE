@@ -136,12 +136,16 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 
 	private GraphicalViewerImpl graphicalViewer;
 
+	// TODO new extension point
 	private TextEditor textEditor;
 
+	// TODO new extension point
 	private int graphicalViewerIndex;
 
+	// TODO new extension point
 	private int textEditorIndex;
 
+	// TODO new extension point
 	private int featureOrderEditorIndex;
 
 	private boolean isPageModified;
@@ -189,6 +193,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 	private LegendAction legendAction;
 
 	private LegendLayoutAction legendLayoutAction;
+	// TODO extract feature diagram editor into separate class
 
 	private FeatureDiagramLayoutManager layoutManager = new LevelOrderLayout();
 
@@ -200,6 +205,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 
 	private ScalableFreeformRootEditPart rootEditPart;
 
+	// TODO new extension point
 	private FeatureOrderEditor featureOrderEditor;
 
 	private EditConstraintAction editConstraintAction;
@@ -240,7 +246,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 
 	@Override
 	protected void createPages() {
-
+		// TODO new extension point
 		createDiagramPage();
 		createFeatureOrderPage();
 		createSourcePage();
@@ -249,6 +255,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		createKeyBindings();
 	}
 
+	// TODO new extension point
 	private void createFeatureOrderPage() {
 		featureOrderEditor = new FeatureOrderEditor(originalFeatureModel);
 		try {
@@ -264,6 +271,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		;
 	}
 
+	// TODO new extension point
 	void createDiagramPage() {
 		graphicalViewer = new ScrollingGraphicalViewer();
 		graphicalViewer.setKeyHandler(new GraphicalViewerKeyHandler(
@@ -285,6 +293,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 
 	}
 
+	// TODO new extension point
 	void createSourcePage() {
 		closeEditor = false;
 		textEditor = new TextEditor();
@@ -297,6 +306,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 	}
 
 	private void createActions() {
+		// TODO new extension point
 		ObjectUndoContext undoContext = new ObjectUndoContext(this);
 		featureModel.setUndoContext(undoContext);
 		createLayerAction = new CreateLayerAction(graphicalViewer, featureModel);
@@ -451,6 +461,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 
 	}
 
+	// TODO new extension point
 	public boolean updateDiagramFromTextEditor() {
 		IDocumentProvider provider = textEditor.getDocumentProvider();
 		IDocument document = provider.getDocument(textEditor.getEditorInput());
@@ -488,6 +499,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		graphicalViewer.setRootEditPart(rootEditPart);
 	}
 
+	// TODO new extension point
 	void updateTextEditorFromDiagram() {
 		String text = featureModelWriter.writeToString();
 		IDocumentProvider provider = textEditor.getDocumentProvider();
@@ -518,6 +530,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 
 	@Override
 	public void setFocus() {
+		// TODO new extension point
 		if (getActivePage() == graphicalViewerIndex)
 			graphicalViewer.getControl().setFocus();
 		else
@@ -526,6 +539,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 
 	private int oldPage;
 
+	// TODO new extension point
 	@Override
 	protected void pageChange(int newPageIndex) {
 		if (oldPage == graphicalViewerIndex) {
@@ -614,6 +628,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		}
 	}
 
+	// TODO new extension point
 	@Override
 	public void doSave(IProgressMonitor monitor) {
 		if (!saveEditors())
@@ -737,6 +752,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		} else if (prop.equals(MODEL_DATA_LOADED)) {
 			refreshGraphicalViewer();
 		} else if (prop.equals(REDRAW_DIAGRAM)) {
+			// TODO new extension point
 			updateTextEditorFromDiagram();
 			updateDiagramFromTextEditor();
 		} else if (prop.equals(REFRESH_ACTIONS)) {
@@ -779,11 +795,13 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		return super.getAdapter(adapter);
 	}
 
+	// TODO remove?
 	@Override
 	public int getActivePage() {
 		return super.getActivePage();
 	}
 
+	// TODO new extension point
 	public ITextEditor getSourceEditor() {
 		return textEditor;
 	}
