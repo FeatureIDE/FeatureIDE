@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Extended Feature Model UI Plug-in
+Bundle-SymbolicName: de.ovgu.featureide.fm.extended.ui
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: de.ovgu.featureide.fm.extended.ui.EFMUIPlugin
+Bundle-Vendor: University of Passau
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ de.ovgu.featureide.fm.core;bundle-version="2.5.1",
+ de.ovgu.featureide.fm.ui;bundle-version="2.5.1"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
