@@ -36,42 +36,20 @@ import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.draw2d.ConnectionLayer;
-import org.eclipse.gef.DefaultEditDomain;
-import org.eclipse.gef.EditDomain;
-import org.eclipse.gef.EditPartViewer;
-import org.eclipse.gef.GraphicalViewer;
-import org.eclipse.gef.KeyHandler;
-import org.eclipse.gef.KeyStroke;
-import org.eclipse.gef.LayerConstants;
-import org.eclipse.gef.commands.CommandStack;
-import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
-import org.eclipse.gef.editparts.ZoomManager;
-import org.eclipse.gef.ui.actions.GEFActionConstants;
 import org.eclipse.gef.ui.actions.PrintAction;
 import org.eclipse.gef.ui.actions.SelectAllAction;
-import org.eclipse.gef.ui.actions.ZoomInAction;
-import org.eclipse.gef.ui.actions.ZoomOutAction;
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
-import org.eclipse.gef.ui.parts.GraphicalViewerKeyHandler;
-import org.eclipse.gef.ui.parts.ScrollingGraphicalViewer;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.action.IMenuListener;
-import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.ui.IEditorActionBarContributor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
-import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
@@ -100,25 +78,6 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.FeatureModelEditorContributor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GEFImageWriter;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AlternativeAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AndAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateCompoundAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateLayerAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.EditConstraintAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.HiddenAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LegendAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LegendLayoutAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.MandatoryAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.RenameAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ReverseOrderAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.GraphicalEditPartFactory;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutManager;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.LevelOrderLayout;
 
 /**
  * A multi page editor to edit feature models. If the model file contains
@@ -128,13 +87,14 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.LevelOrderLayout;
  * @author Christian Becker
  */
 public class FeatureModelEditor extends MultiPageEditorPart implements
-		GUIDefaults, PropertyConstants, PropertyChangeListener,
+		PropertyConstants, PropertyChangeListener,
 		IResourceChangeListener {
 
 	public static final String ID = FMUIPlugin.PLUGIN_ID
 			+ ".editors.FeatureModelEditor";
 
-	private GraphicalViewerImpl graphicalViewer;
+	// TODO new extension point
+	private FeatureDiagramEditor diagramEditor;
 
 	// TODO new extension point
 	private TextEditor textEditor;
@@ -158,23 +118,14 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 
 	private IFeatureModelWriter featureModelWriter;
 
-	private CreateLayerAction createLayerAction;
+	private GrammarFile grammarFile;
 
-	private CreateCompoundAction createCompoundAction;
+	private FeatureModel originalFeatureModel;
 
-	private DeleteAction deleteAction;
+	// TODO new extension point
+	private FeatureOrderEditor featureOrderEditor;
 
-	private MandatoryAction mandatoryAction;
-
-	private AbstractAction abstractAction;
-
-	private HiddenAction hiddenAction;
-
-	private AndAction andAction;
-
-	private OrAction orAction;
-
-	private AlternativeAction alternativeAction;
+	private IFile file;
 
 	private PrintAction printAction;
 
@@ -183,38 +134,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 	private UndoActionHandler undoAction;
 
 	private RedoActionHandler redoAction;
-
-	private RenameAction renameAction;
-
-	private ZoomInAction zoomIn;
-
-	private ZoomOutAction zoomOut;
-
-	private LegendAction legendAction;
-
-	private LegendLayoutAction legendLayoutAction;
-	// TODO extract feature diagram editor into separate class
-
-	private FeatureDiagramLayoutManager layoutManager = new LevelOrderLayout();
-
-	private GrammarFile grammarFile;
-
-	private FeatureModel originalFeatureModel;
-
-	private ZoomManager zoomManager;
-
-	private ScalableFreeformRootEditPart rootEditPart;
-
-	// TODO new extension point
-	private FeatureOrderEditor featureOrderEditor;
-
-	private EditConstraintAction editConstraintAction;
-
-	private CreateConstraintAction createConstraintAction;
-
-	private ReverseOrderAction reverseOrderAction;
-
-	private IFile file;
 
 	@Override
 	protected void setInput(IEditorInput input) {
@@ -273,24 +192,16 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 
 	// TODO new extension point
 	void createDiagramPage() {
-		graphicalViewer = new ScrollingGraphicalViewer();
-		graphicalViewer.setKeyHandler(new GraphicalViewerKeyHandler(
-				graphicalViewer));
-
-		graphicalViewer.createControl(getContainer());
-		initializeGraphicalViewer();
-
-		graphicalViewer.setEditDomain(new DefaultEditDomain(this));
-
-		initDiagramContent();
-		
-		
-		graphicalViewerIndex = addPage(graphicalViewer.getControl());
+		diagramEditor = new FeatureDiagramEditor(this, getContainer());
+		diagramEditor.getPage().getDisplay().asyncExec(new Runnable() {
+			public void run() {
+				diagramEditor.getGraphicalViewer().setContents(getFeatureModel());
+				isPageModified = true;
+				pageChange(graphicalViewerIndex);
+			}
+		});
+		graphicalViewerIndex = addPage(diagramEditor.getPage());
 		setPageText(graphicalViewerIndex, "Feature Diagram");
-		zoomManager = rootEditPart.getZoomManager();
-		zoomManager.setZoomLevels(new double[] { 0.05, 0.10, 0.25, 0.50, 0.75,
-				0.90, 1.00, 1.10, 1.25, 1.50, 2.00, 2.50, 3.00, 4.00 });
-
 	}
 
 	// TODO new extension point
@@ -309,124 +220,26 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		// TODO new extension point
 		ObjectUndoContext undoContext = new ObjectUndoContext(this);
 		featureModel.setUndoContext(undoContext);
-		createLayerAction = new CreateLayerAction(graphicalViewer, featureModel);
-		createCompoundAction = new CreateCompoundAction(graphicalViewer,
-				featureModel);
-		deleteAction = new DeleteAction(graphicalViewer, featureModel);
-		mandatoryAction = new MandatoryAction(graphicalViewer, featureModel);
-		hiddenAction = new HiddenAction(graphicalViewer, featureModel);
-		abstractAction = new AbstractAction(graphicalViewer, featureModel,
-				undoContext);
-		andAction = new AndAction(graphicalViewer, featureModel);
-		orAction = new OrAction(graphicalViewer, featureModel);
-		alternativeAction = new AlternativeAction(graphicalViewer, featureModel);
+		diagramEditor.createActions();
+		
 		printAction = new PrintAction(this);
 		selectAllAction = new SelectAllAction(this);
 
 		undoAction = new UndoActionHandler(this.getSite(), undoContext);
 		redoAction = new RedoActionHandler(this.getSite(), undoContext);
-		renameAction = new RenameAction(graphicalViewer, featureModel);
-		zoomIn = new ZoomInAction(zoomManager);
-		zoomOut = new ZoomOutAction(zoomManager);
-		createConstraintAction = new CreateConstraintAction(graphicalViewer,
-				featureModel, "Create Constraint");
-		editConstraintAction = new EditConstraintAction(graphicalViewer,
-				featureModel, "Edit Constraint");
-		reverseOrderAction = new ReverseOrderAction(graphicalViewer,
-				featureModel);
-		legendAction = new LegendAction(graphicalViewer, featureModel);
-		legendLayoutAction = new LegendLayoutAction(graphicalViewer,
-				featureModel);
 	}
 
 	private void createContextMenu() {
 		MenuManager menu = new MenuManager("#PopupMenu");
 		menu.setRemoveAllWhenShown(true);
-		menu.addMenuListener(new IMenuListener() {
-			public void menuAboutToShow(IMenuManager manager) {
-				FeatureModelEditor.this.fillContextMenu(manager);
-			}
-		});
-		menu.createContextMenu(graphicalViewer.getControl());
-		graphicalViewer.setContextMenu(menu);
-		// the following line adds package explorer entries into our context
-		// menu
-		// getSite().registerContextMenu(menu, graphicalViewer);
+		diagramEditor.createContextMenu(menu);
 	}
 
 	private void createKeyBindings() {
-		KeyHandler handler = graphicalViewer.getKeyHandler();
-		handler.put(KeyStroke.getPressed(SWT.F2, 0), renameAction);
-		handler.put(KeyStroke.getPressed(SWT.INSERT, 0), createLayerAction);
-		graphicalViewer.setKeyHandler(handler);
-	}
-
-	private void fillContextMenu(IMenuManager menu) {
-		if (andAction.isEnabled() || orAction.isEnabled()) {
-			if (andAction.isChecked()) {
-				andAction.setText("And");
-				orAction.setText("Or (Double Click)");
-				alternativeAction.setText("Alternative");
-			} else if (orAction.isChecked()) {
-				andAction.setText("And");
-				orAction.setText("Or");
-				alternativeAction.setText("Alternative (Double Click)");
-			} else if (alternativeAction.isChecked()) {
-				andAction.setText("And (Double Click)");
-				orAction.setText("Or");
-				alternativeAction.setText("Alternative");
-			}
-			menu.add(andAction);
-			menu.add(orAction);
-			menu.add(alternativeAction);
-		} else if (createLayerAction.isEnabled()
-				|| createCompoundAction.isEnabled()) {
-			menu.add(createCompoundAction);
-			menu.add(createLayerAction);
-			menu.add(renameAction);
-			menu.add(deleteAction);
-			menu.add(new Separator());
-			menu.add(mandatoryAction);
-			menu.add(abstractAction);
-			menu.add(hiddenAction);
-			menu.add(new Separator());
-			menu.add(reverseOrderAction);
-		} else if (editConstraintAction.isEnabled()) {
-			menu.add(createConstraintAction);
-			menu.add(editConstraintAction);
-			menu.add(deleteAction);
-		} else {
-			menu.add(createConstraintAction);
-			menu.add(new Separator());
-			menu.add(reverseOrderAction);
-		}
-		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-		menu.add(legendAction);
-		if (legendLayoutAction.isEnabled())
-			menu.add(legendLayoutAction);
-		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+		diagramEditor.createKeyBindings();
 	}
 
 	public IAction getDiagramAction(String workbenchActionID) {
-
-		if (CreateLayerAction.ID.equals(workbenchActionID))
-			return createLayerAction;
-		if (CreateCompoundAction.ID.equals(workbenchActionID))
-			return createCompoundAction;
-		if (DeleteAction.ID.equals(workbenchActionID))
-			return deleteAction;
-		if (MandatoryAction.ID.equals(workbenchActionID))
-			return mandatoryAction;
-		if (AbstractAction.ID.equals(workbenchActionID))
-			return abstractAction;
-		if (HiddenAction.ID.equals(workbenchActionID))
-			return hiddenAction;
-		if (AndAction.ID.equals(workbenchActionID))
-			return andAction;
-		if (OrAction.ID.equals(workbenchActionID))
-			return orAction;
-		if (AlternativeAction.ID.equals(workbenchActionID))
-			return alternativeAction;
 		if (ActionFactory.PRINT.getId().equals(workbenchActionID))
 			return printAction;
 		if (ActionFactory.SELECT_ALL.getId().equals(workbenchActionID))
@@ -435,30 +248,15 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 			return undoAction;
 		if (ActionFactory.REDO.getId().equals(workbenchActionID))
 			return redoAction;
-		if (RenameAction.ID.equals(workbenchActionID))
-			return renameAction;
-		if (GEFActionConstants.ZOOM_IN.equals(workbenchActionID))
-			return zoomIn;
-		if (GEFActionConstants.ZOOM_OUT.equals(workbenchActionID))
-			return zoomOut;
+		IAction action = diagramEditor.getDiagramAction(workbenchActionID);
+		if (action != null)
+			return action;
 		FMCorePlugin
 				.getDefault()
 				.logInfo(
 						"The following workbench action is not registered at the feature diagram editor: "
 								+ workbenchActionID);
 		return null;
-	}
-
-	void initDiagramContent() {
-		graphicalViewer.getControl().getDisplay().asyncExec(new Runnable() {
-			public void run() {
-				graphicalViewer.setContents(featureModel);
-				isPageModified = true;
-				pageChange(graphicalViewerIndex);
-			}
-
-		});
-
 	}
 
 	// TODO new extension point
@@ -487,16 +285,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 			return false;
 		}
 		return true;
-	}
-
-	void initializeGraphicalViewer() {
-		graphicalViewer.getControl().setBackground(DIAGRAM_BACKGROUND);
-		graphicalViewer.setEditPartFactory(new GraphicalEditPartFactory());
-		rootEditPart = new ScalableFreeformRootEditPart();
-		((ConnectionLayer) rootEditPart
-				.getLayer(LayerConstants.CONNECTION_LAYER))
-				.setAntialias(SWT.ON);
-		graphicalViewer.setRootEditPart(rootEditPart);
 	}
 
 	// TODO new extension point
@@ -532,7 +320,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 	public void setFocus() {
 		// TODO new extension point
 		if (getActivePage() == graphicalViewerIndex)
-			graphicalViewer.getControl().setFocus();
+			diagramEditor.getPage().setFocus();
 		else
 			textEditor.setFocus();
 	}
@@ -547,7 +335,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 				if (isPageModified) {
 					updateTextEditorFromDiagram();
 					if (featureModel.isRenamed()) {
-						saveModel();
+						saveModelForConsistentRenamings();
 					}
 				}
 			} else if (newPageIndex == featureOrderEditorIndex) {
@@ -585,7 +373,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		} else {
 			if (newPageIndex == textEditorIndex) {
 				if (isPageModified && featureModel.isRenamed()) {
-					saveModel();
+					saveModelForConsistentRenamings();
 				}
 			}
 		}
@@ -604,7 +392,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 	/**
 	 * Open a dialog to save the model.
 	 */
-	private void saveModel() {
+	private void saveModelForConsistentRenamings() {
 		ArrayList<String> editor = new ArrayList<String>();
 		editor.add(grammarFile.getResource().getName());
 
@@ -737,7 +525,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		} else if (filePath.endsWith(".xml")) {
 			featureModelWriter.writeToFile(file);
 		} else {
-			GEFImageWriter.writeToFile(graphicalViewer, file);
+			GEFImageWriter.writeToFile(diagramEditor.getGraphicalViewer(), file);
 		}
 	}
 
@@ -745,53 +533,31 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 
 		String prop = event.getPropertyName();
 		if (prop.equals(MODEL_DATA_CHANGED)) {
-			graphicalViewer.setContents(featureModel);
-			refreshGraphicalViewer();
+			diagramEditor.getGraphicalViewer().setContents(featureModel);
+			diagramEditor.refresh();
 			isPageModified = true;
 			firePropertyChange(PROP_DIRTY);
 		} else if (prop.equals(MODEL_DATA_LOADED)) {
-			refreshGraphicalViewer();
+			diagramEditor.refresh();
 		} else if (prop.equals(REDRAW_DIAGRAM)) {
 			// TODO new extension point
 			updateTextEditorFromDiagram();
 			updateDiagramFromTextEditor();
 		} else if (prop.equals(REFRESH_ACTIONS)) {
 			// additional actions can be refreshed here
-			legendAction.refresh();
-			legendLayoutAction.refresh();
+			diagramEditor.refreshLegend();
 		}
-	}
-
-	private void refreshGraphicalViewer() {
-		if (graphicalViewer.getContents() == null)
-			return;
-
-		// refresh size of all feature figures
-		graphicalViewer.getContents().refresh();
-		// layout all features
-		Point size = graphicalViewer.getControl().getSize();
-		layoutManager.setControlSize(size.x, size.y);
-		layoutManager.layout(featureModel);
-
-		// refresh position of all feature figures
-		graphicalViewer.getContents().refresh();
 	}
 
 	@SuppressWarnings("rawtypes")
 	@Override
 	public Object getAdapter(Class adapter) {
-		if (GraphicalViewer.class.equals(adapter)
-				|| EditPartViewer.class.equals(adapter))
-			return graphicalViewer;
-		if (ZoomManager.class.equals(adapter))
-			return zoomManager;
-		if (CommandStack.class.equals(adapter))
-			return graphicalViewer.getEditDomain().getCommandStack();
-		if (EditDomain.class.equals(adapter))
-			return graphicalViewer.getEditDomain();
 		if (IGotoMarker.class.equals(adapter))
 			if (getActivePage() != textEditorIndex)
 				setActivePage(textEditorIndex);
+		Object o = diagramEditor.getAdapter(adapter);
+		if (o != null)
+			return o;
 		return super.getAdapter(adapter);
 	}
 
