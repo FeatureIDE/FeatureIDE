@@ -85,13 +85,13 @@ public class CollaborationModelBuilder {
 		IComposerExtension composer = featureProject.getComposer();
 		if (composer == null)
 			return null;
-		
-		fSTModel = featureProject.getFSTModel();
-		if (fSTModel == null ) {
+	//TODO Jens 	
+	//	fSTModel = featureProject.getFSTModel();
+	//	if (fSTModel == null ) {
 			composer.initialize(project);
 			composer.buildFSTModel();
 			fSTModel = featureProject.getFSTModel();
-		}
+	//	}
 		
 		extensions = composer.extensions();
 		if (extensions == null)

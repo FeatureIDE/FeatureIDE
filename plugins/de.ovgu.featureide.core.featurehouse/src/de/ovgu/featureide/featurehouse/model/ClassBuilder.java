@@ -18,17 +18,19 @@
  */
 package de.ovgu.featureide.featurehouse.model;
 
+import org.eclipse.core.resources.IFile;
+
 import de.ovgu.cide.fstgen.ast.FSTTerminal;
 
 /**
  * 
  * @author Jens Meinicke
  */
-public abstract class AClassBuilder {
+public class ClassBuilder {
 	
 	FeatureHouseModelBuilder modelBuilder;
 	
-	public AClassBuilder(FeatureHouseModelBuilder modelBuilder) {
+	public ClassBuilder(FeatureHouseModelBuilder modelBuilder) {
 		this.modelBuilder = modelBuilder;
 	}
 
@@ -37,4 +39,15 @@ public abstract class AClassBuilder {
 	void caseMethodDeclaration(FSTTerminal terminal) {}
 	
 	void caseConstructorDeclaration(FSTTerminal terminal) {}
+	
+	/**
+	 * @return class builder for the current file
+	 */
+	public static ClassBuilder getClassBuilder(IFile file, FeatureHouseModelBuilder builder) {
+		if (file.getFileExtension().equals("java")) {
+			return new JavaClassBuilder(builder);
+		}
+		// TODO#271 implement class builder for all FeatureHouse languages
+		return new ClassBuilder(builder);
+	}
 }

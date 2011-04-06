@@ -94,9 +94,13 @@ public class FeatureCppWrapper {
 			while (x) {
 				try {
 					String line;
-					while ((line = input.readLine()) != null) {}
-					while ((line = error.readLine()) != null)
+					while ((line = input.readLine()) != null) {
+						if (!line.endsWith("LoC") && !line.endsWith("LOC)")) {
 						FeatureCppCorePlugin.getDefault().logInfo(line);
+						}
+					}
+					while ((line = error.readLine()) != null)
+						FeatureCppCorePlugin.getDefault().logWarning(line);
 					int exitValue = process.exitValue();
 					if (exitValue != 0) {
 						throw new IOException(
@@ -110,8 +114,8 @@ public class FeatureCppWrapper {
 		} catch (IOException e) {
 			FeatureCppCorePlugin.getDefault().logError(e);
 		}finally{
-		if(input!=null)input.close();
-		if(error!=null)error.close();
+			if(input!=null)input.close();
+			if(error!=null)error.close();
 		}
 	}
 

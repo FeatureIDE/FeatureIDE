@@ -108,7 +108,7 @@ public class Configuration {
 	}
 
 	public long number() {
-		return number(250);
+		return 1;//number(250);
 	}
 	
 	public long number(long timeout) {
@@ -137,16 +137,17 @@ public class Configuration {
 			feature.setAutomatic(Selection.UNDEFINED);
 	}
 	
+	//TODO @Jens 
 	public boolean leadToValidConfiguration(SelectableFeature feature, Selection testSelection, Selection actualSelection){
-		feature.setManual(testSelection);
-		updateAutomaticValues();
-		if (valid()) {
-			feature.setManual(actualSelection);
-			updateAutomaticValues();
-			return true;
-		}
-		feature.setManual(actualSelection);
-		updateAutomaticValues();
+//		feature.setManual(testSelection);
+//		updateAutomaticValues();
+//		if (valid()) {
+//			feature.setManual(actualSelection);
+//			updateAutomaticValues();
+//			return true;
+//		}
+//		feature.setManual(actualSelection);
+//		updateAutomaticValues();
 		return false;
 	}
 	

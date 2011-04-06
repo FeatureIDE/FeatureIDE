@@ -27,7 +27,7 @@ import de.ovgu.featureide.core.fstmodel.FSTMethod;
 /**
  * @author Jens Meinicke
  */
-public class JavaClassBuilder extends AClassBuilder{
+public class JavaClassBuilder extends ClassBuilder{
 
 	public JavaClassBuilder(FeatureHouseModelBuilder builder) {
 		super(builder);

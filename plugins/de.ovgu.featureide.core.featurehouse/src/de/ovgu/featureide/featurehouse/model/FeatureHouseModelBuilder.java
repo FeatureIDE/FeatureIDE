@@ -120,26 +120,18 @@ public class FeatureHouseModelBuilder {
 				if (child instanceof FSTTerminal) {
 					FSTTerminal terminal = (FSTTerminal) child;
 					if (terminal.getType().equals(FeatureHouseModelBuilder.NODE_TYPE_FIELD)) {
-						getClassBuilder().caseFieldDeclaration(terminal);
+						ClassBuilder.getClassBuilder(currentFile, this)
+								.caseFieldDeclaration(terminal);
 					} else if (terminal.getType().equals(FeatureHouseModelBuilder.NODE_TYPE_METHOD)) {
-						getClassBuilder().caseMethodDeclaration(terminal);
+						ClassBuilder.getClassBuilder(currentFile, this)
+								.caseMethodDeclaration(terminal);
 					} else if (terminal.getType().equals(FeatureHouseModelBuilder.NODE_TYPE_CONSTRUCTOR)) {
-						getClassBuilder().caseConstructorDeclaration(terminal);
+						ClassBuilder.getClassBuilder(currentFile, this)
+								.caseConstructorDeclaration(terminal);
 					}
 				}
 			}
 		}
-	}
-
-	/**
-	 * @return class builder for the current file
-	 */
-	private AClassBuilder getClassBuilder() {
-		if (currentFile.getFileExtension().equals("java")) {
-			return new JavaClassBuilder(this);
-		}
-		// TODO implement other class builder
-		return null;
 	}
 
 	/**
