@@ -26,7 +26,13 @@ import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.featurecpp.FeatureCppCorePlugin;
@@ -42,6 +48,8 @@ public class FeatureCppWrapper {
 	final String featureCppExecutableName;
 
 	private String sourceFolder = null;
+	
+	private IFolder source = null;
 
 	private String buildFolder = null;
 
@@ -52,6 +60,7 @@ public class FeatureCppWrapper {
 	}
 
 	public void initialize(IFolder source, IFolder build) {
+		this.source = source;
 		sourceFolder = source.getRawLocation().toOSString();
 		buildFolder = build.getRawLocation().toOSString();
 		buildDirectory = build;
@@ -95,8 +104,8 @@ public class FeatureCppWrapper {
 				try {
 					String line;
 					while ((line = input.readLine()) != null) {
-						if (!line.endsWith("LoC") && !line.endsWith("LOC)")) {
-						FeatureCppCorePlugin.getDefault().logInfo(line);
+						if (line.contains(" : warning: ")) {
+							addMarker(getFile(line), getMessage(line), getLineNumber(line));
 						}
 					}
 					while ((line = error.readLine()) != null)
@@ -117,6 +126,79 @@ public class FeatureCppWrapper {
 			if(input!=null)input.close();
 			if(error!=null)error.close();
 		}
+	}
+
+	private IFile getFile(String line) {
+		String fileName = line.substring(0, line.indexOf(" : warning:"));
+		if (fileName.contains("(")) {
+			fileName = fileName.substring(0,fileName.indexOf("("));
+		}
+		fileName = fileName.substring(sourceFolder.length() +1);
+		IFolder folder = source;
+		while (fileName != "") {
+			if (!fileName.contains("\\")) {
+				if (fileName.endsWith(".h")) {
+					return folder.getFile(fileName);
+				} else {
+					return null;
+				}
+			} else {
+				String folderName = fileName.substring(0, fileName.indexOf("\\"));
+				fileName = fileName.substring(fileName.indexOf("\\") + 1);
+				folder = folder.getFolder(folderName);
+			}
+		}
+		return null;
+	}
+	
+	private String getMessage(String line) {
+		return line.substring(line.indexOf(" : warning: ") + 12);
+	}
+
+	private int getLineNumber(String line) {
+		if (line.contains(") : warning: ")) {
+			line = line.substring(0, line.indexOf(") : warning: "));
+			line = line.substring(line.indexOf("(") + 1);
+			return Integer.parseInt(line);
+		}
+		return 0;
+	}
+
+	private void addMarker(final IFile file, final String message, final int line) {
+		Job job = new Job("Propagate problem markers") {
+			@Override
+			public IStatus run(IProgressMonitor monitor) {
+				try {
+					if (!hasMarker(message, file)) {
+						IMarker newMarker = file.createMarker(CorePlugin.PLUGIN_ID + ".builderProblemMarker");
+						newMarker.setAttribute(IMarker.MESSAGE, message);
+						newMarker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
+						newMarker.setAttribute(IMarker.LINE_NUMBER, line);
+					}
+				} catch (CoreException e) {
+					FeatureCppCorePlugin.getDefault().logError(e);
+				}
+				return Status.OK_STATUS;
+			}
+			
+			private boolean hasMarker(String message, IFile sourceFile) {
+				try {
+					IMarker[] marker = sourceFile.findMarkers(null, true, IResource.DEPTH_ZERO);
+					if (marker.length > 0) {
+						for (IMarker m : marker) {
+							if (message.equals(m.getAttribute(IMarker.MESSAGE, null))) {
+								return true;
+							}
+						}
+					}
+				} catch (CoreException e) {
+					FeatureCppCorePlugin.getDefault().logError(e);
+				}
+				return false;
+			}
+		};
+		job.setPriority(Job.DECORATE);
+		job.schedule();
 	}
 
 }
