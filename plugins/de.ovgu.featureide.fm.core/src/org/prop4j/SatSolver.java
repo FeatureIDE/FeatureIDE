@@ -132,10 +132,28 @@ public class SatSolver {
 		return list;
 	}
 	
+	/**
+	 * Checks whether the formula currently feed into the solver is satisfiable.
+	 * 
+	 * @return true if the formula is satisfiable
+	 * @throws TimeoutException
+	 */
 	public boolean isSatisfiable() throws TimeoutException {
 		return !contradiction && solver.isSatisfiable();
 	}
 
+	/**
+	 * Checks whether the formula the following formula is satisfiable.
+	 * 
+	 * f and l1 and l2 and ... and ln
+	 * 
+	 * Where f is the formula currently feed into the solver and l1,...,ln are
+	 * the elements in the given array <code>literals</code>.
+	 * 
+	 * @param  literals  an array of literals for which the value is assumed
+	 * @return true if the formula with all assumed values is satisfiable
+	 * @throws TimeoutException
+	 */
 	public boolean isSatisfiable(Node[] literals) throws TimeoutException {
 		if (contradiction)
 			return false;
@@ -146,6 +164,18 @@ public class SatSolver {
 		return solver.isSatisfiable(new VecInt(unitClauses));
 	}
 	
+	/**
+	 * Checks whether the formula the following formula is satisfiable.
+	 * 
+	 * f and l1 and l2 and ... and ln
+	 * 
+	 * Where f is the formula currently feed into the solver and l1,...,ln are
+	 * the elements in the given list <code>literals</code>.
+	 * 
+	 * @param  literals  a list of literals for which the value is assumed
+	 * @return true if the formula with all assumed values is satisfiable
+	 * @throws TimeoutException
+	 */
 	public boolean isSatisfiable(List<Node> literals) throws TimeoutException {
 		if (contradiction)
 			return false;
@@ -156,6 +186,18 @@ public class SatSolver {
 		return solver.isSatisfiable(new VecInt(unitClauses));
 	}
 	
+	/**
+	 * Checks whether the formula the following formula is satisfiable.
+	 * 
+	 * f and g
+	 * 
+	 * Where f is the formula currently feed into the solver and g is the
+	 * formula given in the parameter <code>node</code>.
+	 * 
+	 * @param  node  a propositional formula
+	 * @return true if adding the given formula results in a satisfiable formula
+	 * @throws TimeoutException
+	 */
 	public boolean isSatisfiable(Node node) throws TimeoutException {
 		if (contradiction)
 			return false;
