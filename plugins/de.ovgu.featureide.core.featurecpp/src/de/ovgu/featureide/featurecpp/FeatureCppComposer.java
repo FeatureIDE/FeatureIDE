@@ -125,6 +125,7 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 
 	@Override
 	public void postCompile(IResourceDelta delta, IFile file) {
+		super.postCompile(delta, file);
 		try {
 			file.refreshLocal(IResource.DEPTH_ZERO, null);
 			if (file.getName().endsWith(".info")) {
