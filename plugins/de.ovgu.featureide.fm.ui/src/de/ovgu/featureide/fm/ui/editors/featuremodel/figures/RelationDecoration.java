@@ -81,7 +81,7 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 			return;
 		
 		Rectangle r = calculateRectangle();
-		r.shrink(lineWidth, lineWidth);
+		r.shrink(getLineWidth(), getLineWidth());
 
 		@SuppressWarnings("all")
 		int angle1 = HALF_ARC ? 180 : calculateAngle(r.getCenter(), referencePoint);
@@ -105,7 +105,7 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 		r.setBounds(getBounds());
 		r.y -= getTargetAnchorDiameter()/2;
 		r.height = getTargetAnchorDiameter();
-		r.shrink(lineWidth + 1, lineWidth + 1);
+		r.shrink(getLineWidth() + 1, getLineWidth() + 1);
 		return r;
 	}
 
