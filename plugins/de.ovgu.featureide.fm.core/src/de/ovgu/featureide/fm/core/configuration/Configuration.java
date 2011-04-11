@@ -108,7 +108,7 @@ public class Configuration {
 	}
 
 	public long number() {
-		return 1;//number(250);
+		return number(250);
 	}
 	
 	public long number(long timeout) {
