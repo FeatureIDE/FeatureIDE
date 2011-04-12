@@ -113,7 +113,7 @@ public class TConfiguration {
 		FeatureModel fm = loadXML("<and name=\"S\">" + "<feature name=\"A\"/>"
 				+ "<feature mandatory=\"true\" name=\"B\"/>"
 				+ "<feature abstract=\"true\" name=\"C\"/>" + "</and>");
-		Configuration c = new Configuration(fm);
+		Configuration c = new Configuration(fm, true, false);
 		assertEquals(2, c.number());
 	}
 
@@ -122,7 +122,7 @@ public class TConfiguration {
 		FeatureModel fm = loadXML("<or name=\"S\">" + "<feature name=\"A\"/>"
 				+ "<feature name=\"B\"/>"
 				+ "<feature abstract=\"true\" name=\"C\"/>" + "</or>");
-		Configuration c = new Configuration(fm);
+		Configuration c = new Configuration(fm, true, false);
 		assertEquals(4, c.number());
 	}
 
