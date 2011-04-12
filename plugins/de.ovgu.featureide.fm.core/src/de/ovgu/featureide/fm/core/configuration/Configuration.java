@@ -54,11 +54,11 @@ public class Configuration {
 	private boolean propagate;
 
 	public Configuration(FeatureModel featureModel) {
-		this(featureModel, true, false);
+		this(featureModel, true);
 	}
 
 	public Configuration(FeatureModel featureModel, boolean propagate) {
-		this(featureModel, propagate, false);
+		this(featureModel, propagate, true);
 	}
 
 	public Configuration(FeatureModel featureModel, boolean propagate, boolean ignoreAbstractFeatures) {
@@ -137,17 +137,13 @@ public class Configuration {
 			feature.setAutomatic(Selection.UNDEFINED);
 	}
 	
-	//TODO @Jens 
 	public boolean leadToValidConfiguration(SelectableFeature feature, Selection testSelection, Selection actualSelection){
 //		feature.setManual(testSelection);
 //		updateAutomaticValues();
-//		if (valid()) {
-//			feature.setManual(actualSelection);
-//			updateAutomaticValues();
-//			return true;
-//		}
+//		boolean valid = valid();
 //		feature.setManual(actualSelection);
 //		updateAutomaticValues();
+//		return valid;
 		return false;
 	}
 	

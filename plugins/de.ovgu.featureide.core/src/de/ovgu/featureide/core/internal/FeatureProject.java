@@ -861,7 +861,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		if (files == null || files.isEmpty())
 			return;
 
-		Job job = new Job("Checking Configurations") {
+		Job job = new Job("Checking configurations") {
 			protected IStatus run(IProgressMonitor monitor) {
 				Configuration config = new Configuration(featureModel, false);
 				// Configuration autoConfig = new Configuration(featureModel,

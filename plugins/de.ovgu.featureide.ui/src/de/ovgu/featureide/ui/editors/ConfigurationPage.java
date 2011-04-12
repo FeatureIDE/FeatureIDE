@@ -175,7 +175,8 @@ public class ConfigurationPage extends EditorPart {
 		root.setText(getRootlabel());
 		setCheckbox(root);
 	}
-	
+
+	//TODO move in core job
 	private void setCheckbox(TreeItem item){
 		for (TreeItem child : item.getItems()) {
 			child.setGrayed(false);
@@ -191,7 +192,6 @@ public class ConfigurationPage extends EditorPart {
 					child.setChecked(false);
 					child.setForeground(gray);
 				}
-			
 			else if (feature.getManual() == Selection.UNDEFINED || 
 					feature.getManual() == Selection.UNSELECTED){
 				child.setChecked(false);
