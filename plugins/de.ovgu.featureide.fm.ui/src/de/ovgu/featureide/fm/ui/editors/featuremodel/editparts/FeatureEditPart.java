@@ -74,7 +74,8 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements
 
 	@Override
 	protected IFigure createFigure() {
-		FeatureFigure figure = new FeatureFigure(getFeatureModel());
+		FeatureFigure figure = new FeatureFigure(getFeatureModel(), ((ModelEditPart) getParent())
+				.getFeatureModel());
 		return figure;
 	}
 

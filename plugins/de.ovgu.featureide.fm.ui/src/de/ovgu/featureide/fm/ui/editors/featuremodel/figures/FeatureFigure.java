@@ -25,8 +25,11 @@ import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
+import org.prop4j.NodeWriter;
 
+import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.anchors.SourceAnchor;
@@ -48,8 +51,14 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 	
 	private final ConnectionAnchor targetAnchor;
 
-	public FeatureFigure(Feature feature) {
+	private Feature feature;
+
+	private FeatureModel featureModel;
+
+	public FeatureFigure(Feature feature, FeatureModel featureModel) {
 		super();
+		this.feature = feature;
+		this.featureModel = featureModel;
 		
 		sourceAnchor = new SourceAnchor(this, feature);
 		targetAnchor = new TargetAnchor(this, feature);
@@ -78,7 +87,20 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		setBackgroundColor(isAbstract ? ABSTRACT_BACKGROUND : CONCRETE_BACKGROUND);
 		
 		String toolTip = isAbstract ? " Abstract Feature " : " Concrete Feature ";
+		toolTip += getRelevantConstraints();
 		setToolTip(new Label(toolTip));
+	}
+
+	private String getRelevantConstraints() {
+		String relevant = "";
+		for (Constraint constraint : featureModel.getConstraints()) {
+			String node = constraint.getNode().toString(NodeWriter.logicalSymbols);
+			if (node.contains(feature.getName()))
+				relevant += "\n " + node + " ";
+		}
+		if (!relevant.isEmpty())
+			return "\n" + relevant;
+		return "";
 	}
 
 	public ConnectionAnchor getSourceAnchor() {
