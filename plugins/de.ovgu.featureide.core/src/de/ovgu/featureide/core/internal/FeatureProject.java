@@ -863,7 +863,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 
 		Job job = new Job("Checking configurations") {
 			protected IStatus run(IProgressMonitor monitor) {
-				Configuration config = new Configuration(featureModel, false);
+				Configuration config = new Configuration(featureModel, true);
 				// Configuration autoConfig = new Configuration(featureModel,
 				// true);
 				ConfigurationReader reader = new ConfigurationReader(config);
@@ -882,20 +882,18 @@ public class FeatureProject extends BuilderMarkerHandler implements
 									+ "' is invalid";
 							createConfigurationMarker(file, message, 0,
 									IMarker.SEVERITY_ERROR);
+
+						}
+						// TODO check if we still get an error with the following code
+						// create warnings (e.g., for features that are not
+						// available anymore)
+						for (int i = 0; i < reader.getWarnings().size(); i++) {
+							String message = reader.getWarnings().get(i);
+							int line = reader.getPositions().get(i);
+							createConfigurationMarker(file, message, line,
+									IMarker.SEVERITY_WARNING);
 						}
 					}
-					// TODO check why we get an error with the following code
-					// // create warnings (e.g., for features that are not
-					// available anymore)
-					// for (IFile file : files) {
-					// autoReader.readFromFile(file);
-					// for (int i = 0; i < reader.getWarnings().size(); i++) {
-					// String message = autoReader.getWarnings().get(i);
-					// int line = autoReader.getPositions().get(i);
-					// createConfigurationMarker(file, message, line,
-					// IMarker.SEVERITY_WARNING);
-					// }
-					// }
 				} catch (OutOfMemoryError e) {
 					FMCorePlugin.getDefault().logError(e);
 				} catch (Exception e) {

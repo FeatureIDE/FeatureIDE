@@ -26,7 +26,6 @@ import org.eclipse.core.runtime.CoreException;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IBuilderMarkerHandler;
 
-
 /**
  * The MarkerHandler encapsulates creating and removing markers.
  * 
@@ -35,9 +34,11 @@ import de.ovgu.featureide.core.IBuilderMarkerHandler;
  */
 public class BuilderMarkerHandler implements IBuilderMarkerHandler {
 
-	private static final String BUILDER_MARKER = CorePlugin.PLUGIN_ID + ".builderProblemMarker";
+	private static final String BUILDER_MARKER = CorePlugin.PLUGIN_ID
+			+ ".builderProblemMarker";
 
-	private static final String CONFIGURATION_MARKER = CorePlugin.PLUGIN_ID + ".configurationProblemMarker";
+	private static final String CONFIGURATION_MARKER = CorePlugin.PLUGIN_ID
+			+ ".configurationProblemMarker";
 
 	public BuilderMarkerHandler(IProject project) {
 		this.project = project;
@@ -48,8 +49,9 @@ public class BuilderMarkerHandler implements IBuilderMarkerHandler {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see de.ovgu.featureide.core.internal.IMarkerHandler#createBuilderMarker(org.eclipse.core.resources.IResource,
-	 *      java.lang.String, int, int)
+	 * @see
+	 * de.ovgu.featureide.core.internal.IMarkerHandler#createBuilderMarker(org
+	 * .eclipse.core.resources.IResource, java.lang.String, int, int)
 	 */
 	public void createBuilderMarker(IResource resource, String message,
 			int lineNumber, int severity) {
@@ -100,8 +102,9 @@ public class BuilderMarkerHandler implements IBuilderMarkerHandler {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see de.ovgu.featureide.core.internal.IMarkerHandler#deleteBuilderMarkers(org.eclipse.core.resources.IResource,
-	 *      int)
+	 * @see
+	 * de.ovgu.featureide.core.internal.IMarkerHandler#deleteBuilderMarkers(
+	 * org.eclipse.core.resources.IResource, int)
 	 */
 	public void deleteBuilderMarkers(IResource resource, int depth) {
 		if (resource != null && resource.exists()) {
@@ -113,24 +116,51 @@ public class BuilderMarkerHandler implements IBuilderMarkerHandler {
 		}
 	}
 
-	public void createConfigurationMarker(IResource resource, String message, int lineNumber, int severity) {    
+	public void createConfigurationMarker(IResource resource, String message,
+			int lineNumber, int severity) {
 		try {
 			resource.refreshLocal(IResource.DEPTH_ZERO, null);
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
-		
+		if (hasMarker(resource, message, lineNumber)) {
+			return;
+		}
 		try {
-                  IMarker marker = resource.createMarker(CorePlugin.PLUGIN_ID + ".configurationProblemMarker");
-                  marker.setAttribute(IMarker.MESSAGE, message);
-                  marker.setAttribute(IMarker.SEVERITY, severity);
-                  if (lineNumber == -1) {
-                            lineNumber = 1;
-                  }
-                  marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
-        } catch (CoreException e) {
-        	CorePlugin.getDefault().logError(e);
-        }
+			IMarker marker = resource.createMarker(CONFIGURATION_MARKER);
+			marker.setAttribute(IMarker.MESSAGE, message);
+			marker.setAttribute(IMarker.SEVERITY, severity);
+			if (lineNumber == -1) {
+				lineNumber = 1;
+			}
+			marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
+		} catch (CoreException e) {
+			CorePlugin.getDefault().logError(e);
+		}
+	}
+
+	/**
+	 * @param resource
+	 * @param message
+	 * @param lineNumber
+	 * @return
+	 */
+	private boolean hasMarker(IResource resource, String message, int lineNumber) {
+		IMarker[] marker = null;
+		try {
+			marker = resource.findMarkers(CONFIGURATION_MARKER, false, IResource.DEPTH_ZERO);
+			if (marker != null) {
+				for (IMarker m : marker) {
+					if (m.getAttribute(IMarker.MESSAGE).equals(message) &&
+							m.getAttribute(IMarker.LINE_NUMBER).equals(lineNumber)) {
+						return true;
+					}
+				}
+			}
+		} catch (CoreException e) {
+			CorePlugin.getDefault().logError(e);
+		}
+		return false;
 	}
 
 	public void deleteConfigurationMarkers(IResource resource, int depth) {
