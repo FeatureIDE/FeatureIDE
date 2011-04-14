@@ -20,6 +20,7 @@ package de.ovgu.featureide.featurecpp.wrapper;
 
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.LinkedList;
@@ -55,8 +56,17 @@ public class FeatureCppWrapper {
 
 	private IFolder buildDirectory = null;
 
-	public FeatureCppWrapper(String featureCppExecutablePath) {
-		this.featureCppExecutableName = featureCppExecutablePath;
+	public FeatureCppWrapper() {
+//		String path = FeatureCppCorePlugin.getDefault().getBundle().getLocation();
+//		path += File.separatorChar + "lib" + File.separatorChar + "fc++.exe";
+//		path = path.substring(path.indexOf("/") + 1);
+		String path = FeatureCppCorePlugin.getDefault().getBundle().getLocation();
+		FeatureCppCorePlugin.getDefault().logInfo("Path to FeatureC++ plugin: " + path);
+		path += "lib" + File.separatorChar + "fc++.exe";
+		path = path.substring(path.indexOf("/") + 1);
+		path = path.replace('/', File.separatorChar);
+		FeatureCppCorePlugin.getDefault().logInfo("Path to FeatureC++ binaries: " + path);
+		featureCppExecutableName = path;
 	}
 
 	public void initialize(IFolder source, IFolder build) {
@@ -107,6 +117,8 @@ public class FeatureCppWrapper {
 						if (line.contains(" : warning: ")) {
 							addMarker(getFile(line), getMessage(line), getLineNumber(line));
 						}
+						else
+							FeatureCppCorePlugin.getDefault().logInfo("FeatureC++: " + line);
 					}
 					while ((line = error.readLine()) != null)
 						FeatureCppCorePlugin.getDefault().logWarning(line);

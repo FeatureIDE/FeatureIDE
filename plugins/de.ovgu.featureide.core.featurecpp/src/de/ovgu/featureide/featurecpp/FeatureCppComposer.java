@@ -45,9 +45,10 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 	public static final String C_NATURE = "org.eclipse.cdt.core.cnature";
 	public static final String CC_NATURE = "org.eclipse.cdt.core.ccnature";
 
-	private final FeatureCppWrapper featureCpp = new FeatureCppWrapper(
-			(FeatureCppCorePlugin.getDefault().getBundle().getLocation() + "lib/fc++.exe")
-			.substring(16));
+//	private final FeatureCppWrapper featureCpp = new FeatureCppWrapper(
+//			(FeatureCppCorePlugin.getDefault().getBundle().getLocation() + "lib/fc++.exe")
+//			.substring(16));
+	private final FeatureCppWrapper featureCpp = new FeatureCppWrapper();
 
 	private FeatureCppModelBuilder featureCppModelBuilder;
 
