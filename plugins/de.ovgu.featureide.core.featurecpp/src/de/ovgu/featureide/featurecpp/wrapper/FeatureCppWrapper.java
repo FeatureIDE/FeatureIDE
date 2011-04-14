@@ -118,6 +118,7 @@ public class FeatureCppWrapper {
 					}
 					x = false;
 				} catch (IllegalThreadStateException e) {
+					FeatureCppCorePlugin.getDefault().logError(e);
 				}
 			}
 		} catch (IOException e) {
