@@ -19,6 +19,7 @@
 package de.ovgu.featureide.ui.editors;
 
 import java.beans.PropertyChangeEvent;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -47,6 +48,8 @@ import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.configuration.TreeElement;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.configuration.AdvancedConfigurationLabelProvider;
+import de.ovgu.featureide.ui.UIPlugin;
 
 /**
  * Displays the tree for common configuration selection at the configurationeditor
@@ -61,15 +64,33 @@ public class ConfigurationPage extends EditorPart {
 	
 	private Tree tree;
 	
-	private LinkedList<String> hiddenFeatures;
-	
 	private Color gray = new Color(null,140,140,140);
-	private Color green = new Color(null,1,140,2);
+	private Color green = new Color(null,0,140,0);
 	private Color blue = new Color(null,0,0,200);
 	
 	private Font treeItemStandardFont = new Font(null, "Arial", 8, SWT.NORMAL);
 	private Font treeItemSpecialFont = new Font(null,"Arial", 8, SWT.BOLD);
 
+	/**
+	 * Contains the TreeItems for coloring.
+	 */
+	private HashMap<SelectableFeature, TreeItem> items = new HashMap<SelectableFeature, TreeItem>();	
+	/**
+	 * Contains the features to be checked at coloring thread.
+	 */
+	private LinkedList<SelectableFeature> features = new LinkedList<SelectableFeature>();
+	/**
+	 * Stops the coloring thread if true.
+	 */
+	private boolean returnFormThread = false;
+	private Job job_color;
+	
+	private boolean selectionChanged = true;
+	
+	private boolean initialized = false;
+	
+	private LinkedList<String> hiddenFeatures;
+	
 	public void updateTree(){
 		if (errorMassage())
 			refreshTree();
@@ -110,7 +131,7 @@ public class ConfigurationPage extends EditorPart {
 	public void createPartControl(Composite parent) {		
 		tree = new Tree(parent, SWT.BORDER | SWT.CHECK);
 		tree.addSelectionListener(new SelectionListener() {
-			
+
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				if (event.detail == SWT.CHECK) {
@@ -121,15 +142,23 @@ public class ConfigurationPage extends EditorPart {
 					} else if (((TreeItem)event.item).getGrayed()) {
 						// case: grayed and selected
 						((TreeItem)event.item).setChecked(true);
-						//((TreeItem)event.item).setGrayed(true);
 					} else if (((TreeItem)event.item).getForeground().equals(gray)) {
 						// case: grayed and unselected
 						((TreeItem)event.item).setChecked(false);
 					} else {
 						// case: selectable
-						changeSelection(configurationEditor.configuration.getSelectablefeature(
-							((TreeItem)event.item).getText()));		
-						refreshTree();
+						if (!selectionChanged) {
+							// do nothing if selection changed to fast
+							if (((TreeItem)event.item).getChecked()) {
+								((TreeItem)event.item).setChecked(true);
+							} else {
+								((TreeItem)event.item).setChecked(false);
+							}
+						} else {
+							changeSelection(configurationEditor.configuration.getSelectablefeature(
+								((TreeItem)event.item).getText()));		
+							refreshTree();
+						}
 					}
 				}
 			}
@@ -143,9 +172,7 @@ public class ConfigurationPage extends EditorPart {
 	@Override
 	public void setFocus() {
 	}
-	
-	private boolean initialized = false;
-	
+
 	public void propertyChange(PropertyChangeEvent evt) {
 		if (initialized)
 			dirty = true;
@@ -155,8 +182,7 @@ public class ConfigurationPage extends EditorPart {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				if (errorMassage()) {
-					setInput(configurationEditor.configuration);
-					
+					setInput(configurationEditor.configuration);			
 				}
 				return Status.OK_STATUS;
 			}
@@ -172,19 +198,41 @@ public class ConfigurationPage extends EditorPart {
 				hiddenFeatures.add(feature.getName());
 		}
 		TreeItem root = tree.getItem(0);
-		root.setText(getRootlabel());
+		root.setText(AdvancedConfigurationLabelProvider.getRootlabel(configurationEditor.configuration));
 		setCheckbox(root);
 	}
 
-	//TODO move in core job
-	private void setCheckbox(TreeItem item){
+	private void setCheckbox(TreeItem root) {
+		resetColor();
+		setCheckbox(root, configurationEditor.configuration.valid());
+		selectionChanged = true;
+		setColor();
+	}
+	
+	/**
+	 * Stops the coloring job.
+	 */
+	protected void resetColor() {
+		returnFormThread = true;
+		try {
+			if (job_color != null) {
+				job_color.join();
+			}
+		} catch (InterruptedException e) {
+			UIPlugin.getDefault().logError(e);
+		}
+		items = new HashMap<SelectableFeature, TreeItem>();
+		features = new LinkedList<SelectableFeature>();
+	}
+	
+	private void setCheckbox(TreeItem item, boolean configuration_valid){
 		for (TreeItem child : item.getItems()) {
 			child.setGrayed(false);
 			child.setForeground(null);
 			child.setBackground(null);
 			child.setFont(treeItemStandardFont);
 			SelectableFeature feature = configurationEditor.configuration.getSelectablefeature(child.getText());
-			if (feature.getAutomatic() != Selection.UNDEFINED)
+			if (feature.getAutomatic() != Selection.UNDEFINED) {
 				if (feature.getAutomatic() == Selection.SELECTED){
 					child.setChecked(true);
 					child.setGrayed(true);
@@ -192,39 +240,73 @@ public class ConfigurationPage extends EditorPart {
 					child.setChecked(false);
 					child.setForeground(gray);
 				}
-			else if (feature.getManual() == Selection.UNDEFINED || 
+			} else if (feature.getManual() == Selection.UNDEFINED || 
 					feature.getManual() == Selection.UNSELECTED){
 				child.setChecked(false);
-				if(!configurationEditor.configuration.valid())
-					if (configurationEditor.configuration.leadToValidConfiguration(feature, Selection.SELECTED, Selection.UNDEFINED)) {
-						child.setForeground(green);
-						child.setFont(treeItemSpecialFont);
-					}
+				if(!configuration_valid) {
+					features.add(feature);
+					items.put(feature, child);
+				}
 			} else if (feature.getManual() == Selection.SELECTED) {
 				child.setChecked(true);
-				if(!configurationEditor.configuration.valid())
-					if (configurationEditor.configuration.leadToValidConfiguration(feature, Selection.UNDEFINED, Selection.SELECTED )){
-						child.setForeground(blue);
-						child.setFont(treeItemSpecialFont);
+				if(!configuration_valid) {
+					features.add(feature);
+					items.put(feature, child);
+				}
+			}
+			setCheckbox(child, configuration_valid);
+		} 
+	}
+	
+	/**
+	 * Colors all features if they lead to a valid configuration 
+	 * if current configuration is invalid. 
+	 * deselect:blue, select:green 
+	 */
+	private void setColor() {
+		returnFormThread = false;
+		job_color = new Job("set color"/*TODO add thread name*/) {
+			public IStatus run(IProgressMonitor monitor) {
+				if (features != null && features.size() != 0 && !features.isEmpty()) {
+					for (SelectableFeature feature : features) {
+						if (returnFormThread) {
+							return Status.OK_STATUS;
+						}
+						if (feature.getManual() == Selection.SELECTED) {
+							if (configurationEditor.configuration.leadToValidConfiguration(feature, Selection.UNDEFINED, Selection.SELECTED )) {
+								if (!returnFormThread) {
+									setColor(items.get(feature), blue);
+								}
+							}
+						} else {
+							if (configurationEditor.configuration.leadToValidConfiguration(feature, Selection.SELECTED, Selection.UNDEFINED)) {
+								if (!returnFormThread) {
+									setColor(items.get(feature), green);
+								}
+							}
+						}
 					}
 				}
-			setCheckbox(child);
-		}
+				return Status.OK_STATUS;
+			}
+		};
+		job_color.setPriority(Job.DECORATE);
+		job_color.schedule();
 	}
-	
-	private String getRootlabel(){
-		//TODO @Jens remove duplicate code
-		String s = configurationEditor.configuration.valid() ? "valid" : "invalid";
-		s += ", ";
-		long number = configurationEditor.configuration.number();
-		if (number < 0)
-			s += "more than " + (-1 - number);
-		else
-			s += number;
-		s += " possible configurations";
-		return configurationEditor.configuration.getRoot().getName() + " (" + s + ")";
+
+	protected void setColor(final TreeItem item, final Color color) {
+		UIJob job_setColor = new UIJob("") {
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				item.setForeground(color);
+				item.setFont(treeItemSpecialFont);
+				return Status.OK_STATUS;
+			}
+		};
+		job_setColor.setPriority(Job.SHORT);
+		job_setColor.schedule();
 	}
-	
+
 	private void setInput(Configuration configuration){
 		hiddenFeatures = new LinkedList<String>();
 		for (Feature feature : configuration.getFeatureModel().getFeatures()) {
@@ -233,7 +315,7 @@ public class ConfigurationPage extends EditorPart {
 		}
 		tree.removeAll();
 		TreeItem item = new TreeItem(tree, 0);
-		item.setText(getRootlabel());
+		item.setText(AdvancedConfigurationLabelProvider.getRootlabel(configuration));
 		add(item,configuration.getRoot().getChildren());
 		setCheckbox(item);
 		item.setGrayed(true);
@@ -271,6 +353,8 @@ public class ConfigurationPage extends EditorPart {
 	}
 	
 	protected void changeSelection(SelectableFeature feature) {
+		selectionChanged = false;
+		resetColor();
 		if (feature.getAutomatic() == Selection.UNDEFINED) {
 			// set to the next value
 			if (feature.getManual() == Selection.UNDEFINED ||

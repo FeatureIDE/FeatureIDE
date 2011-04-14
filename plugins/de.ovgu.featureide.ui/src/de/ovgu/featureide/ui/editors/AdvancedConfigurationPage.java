@@ -33,8 +33,6 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IEditorInput;
@@ -62,13 +60,7 @@ import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationContentProvid
 public class AdvancedConfigurationPage extends EditorPart {
 	
 	private ConfigurationEditor configurationEditor;
-	
-	private Color green = new Color(null,0,140,0);
-	private Color blue = new Color(null,0,1,140);
-	
-	private Font treeItemStandardFont = new Font(null, "Arial", 8, SWT.NORMAL);
-	private Font treeItemSpecialFont = new Font(null,"Arial", 8, SWT.BOLD);
-	
+
 	private TreeViewer viewer;
 
 	private boolean dirty = false;
@@ -265,31 +257,31 @@ public class AdvancedConfigurationPage extends EditorPart {
 	
 	private void updateForeground(TreeItem item) {	
 
-		for (TreeItem child : item.getItems()) {
-			SelectableFeature feature = configurationEditor.configuration.getSelectablefeature(child.getText());
-			child.setForeground(null);
-			child.setFont(treeItemStandardFont);
-			if (feature != null) {
-				if (!configurationEditor.configuration.valid())
-					if (feature.getAutomatic() == Selection.UNDEFINED) {
-						if (feature.getManual() == Selection.UNDEFINED) {
-							if (configurationEditor.configuration.leadToValidConfiguration(feature, Selection.SELECTED, Selection.UNDEFINED)){
-								child.setForeground(green);
-								child.setFont(treeItemSpecialFont);	
-							}
-						} else if (feature.getManual() == Selection.SELECTED) {
-							if (configurationEditor.configuration.leadToValidConfiguration(feature, Selection.UNSELECTED, Selection.SELECTED)){
-								child.setForeground(blue);
-								child.setFont(treeItemSpecialFont);
-							}
-							// case: unselected
-						} else if (configurationEditor.configuration.leadToValidConfiguration(feature, Selection.SELECTED, Selection.UNSELECTED)){
-								child.setForeground(green);
-								child.setFont(treeItemSpecialFont);	
-						}
-					}
-				updateForeground(child);
-			}
-		}
+//		for (TreeItem child : item.getItems()) {
+//			SelectableFeature feature = configurationEditor.configuration.getSelectablefeature(child.getText());
+//			child.setForeground(null);
+//			child.setFont(treeItemStandardFont);
+//			if (feature != null) {
+//				if (!configurationEditor.configuration.valid())
+//					if (feature.getAutomatic() == Selection.UNDEFINED) {
+//						if (feature.getManual() == Selection.UNDEFINED) {
+//							if (configurationEditor.configuration.leadToValidConfiguration(feature, Selection.SELECTED, Selection.UNDEFINED)){
+//								child.setForeground(green);
+//								child.setFont(treeItemSpecialFont);	
+//							}
+//						} else if (feature.getManual() == Selection.SELECTED) {
+//							if (configurationEditor.configuration.leadToValidConfiguration(feature, Selection.UNSELECTED, Selection.SELECTED)){
+//								child.setForeground(blue);
+//								child.setFont(treeItemSpecialFont);
+//							}
+//							// case: unselected
+//						} else if (configurationEditor.configuration.leadToValidConfiguration(feature, Selection.SELECTED, Selection.UNSELECTED)){
+//								child.setForeground(green);
+//								child.setFont(treeItemSpecialFont);	
+//						}
+//					}
+//				updateForeground(child);
+//			}
+//		}
 	}
 }

@@ -317,12 +317,15 @@ PropertyConstants, PropertyChangeListener, IResourceChangeListener {
 				}
 				advancedConfigurationPage.propertyChange(null);
 			}
+		} else if (oldPageIndex == configurationPageIndex) {
+			configurationPage.resetColor();
 		}
+		
 		if (oldPageIndex != -1){
 			if (newPageIndex == configurationPageIndex)
 				if (configurationPageUsed)
 					configurationPage.updateTree();
-				else{ 
+				else { 
 					configurationPage.propertyChange(null);
 					configurationPageUsed = true;
 				}

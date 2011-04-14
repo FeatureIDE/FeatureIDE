@@ -138,12 +138,15 @@ public class Configuration {
 	}
 	
 	public boolean leadToValidConfiguration(SelectableFeature feature, Selection testSelection, Selection actualSelection){
-//		feature.setManual(testSelection);
-//		updateAutomaticValues();
-//		boolean valid = valid();
-//		feature.setManual(actualSelection);
-//		updateAutomaticValues();
-//		return valid;
+		feature.setManual(testSelection);
+		updateAutomaticValues();
+		if (valid()) {
+			feature.setManual(actualSelection);
+			updateAutomaticValues();
+			return true;
+		}
+		feature.setManual(actualSelection);
+		updateAutomaticValues();
 		return false;
 	}
 	

@@ -51,23 +51,26 @@ public class AdvancedConfigurationLabelProvider extends LabelProvider {
 	public String getText(Object o) {
 		if (o instanceof SelectableFeature) {
 			SelectableFeature feature = (SelectableFeature) o;
-			//TODO @Jens remove duplicate code
 			if (feature.getParent() == null) {
-				Configuration configuration = feature.getConfiguration();
-				String s = configuration.valid() ? "valid" : "invalid";
-				s += ", ";
-				long number = configuration.number();
-				if (number < 0)
-					s += "more than " + (-1 - number);
-				else
-					s += number;
-				s += " possible configurations";
-				return feature.getName() + " (" + s + ")";
+				return getRootlabel(feature.getConfiguration());
 			}
 			return feature.getName();
 		}
 		return o.toString();
 	}
+	
+	public static String getRootlabel(Configuration configuration){
+		String s = configuration.valid() ? "valid" : "invalid";
+		s += ", ";
+		long number = configuration.number();
+		if (number < 0)
+			s += "more than " + (-1 - number);
+		else
+			s += number;
+		s += " possible configurations";
+		return configuration.getRoot().getName() + " (" + s + ")";
+	}
+	
 
 	public Image getImage(Object o) {
 		if (!(o instanceof SelectableFeature))
