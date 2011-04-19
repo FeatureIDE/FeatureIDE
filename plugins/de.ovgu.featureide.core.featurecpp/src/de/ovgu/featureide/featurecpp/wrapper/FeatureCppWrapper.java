@@ -20,9 +20,9 @@ package de.ovgu.featureide.featurecpp.wrapper;
 
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
@@ -30,10 +30,13 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.ui.internal.util.BundleUtility;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.featurecpp.FeatureCppCorePlugin;
@@ -44,6 +47,7 @@ import de.ovgu.featureide.featurecpp.FeatureCppCorePlugin;
  * @author Tom Brosch
  * @author Jens Meinicke
  */
+@SuppressWarnings("restriction")
 public class FeatureCppWrapper {
 
 	final String featureCppExecutableName;
@@ -55,18 +59,52 @@ public class FeatureCppWrapper {
 	private String buildFolder = null;
 
 	private IFolder buildDirectory = null;
+	
+	private String featureCppExecutable = "fc++.exe";
 
 	public FeatureCppWrapper() {
-//		String path = FeatureCppCorePlugin.getDefault().getBundle().getLocation();
-//		path += File.separatorChar + "lib" + File.separatorChar + "fc++.exe";
-//		path = path.substring(path.indexOf("/") + 1);
-		String path = FeatureCppCorePlugin.getDefault().getBundle().getLocation();
-		FeatureCppCorePlugin.getDefault().logInfo("Path to FeatureC++ plugin: " + path);
-		path += "lib" + File.separatorChar + "fc++.exe";
-		path = path.substring(path.indexOf("/") + 1);
-		path = path.replace('/', File.separatorChar);
-		FeatureCppCorePlugin.getDefault().logInfo("Path to FeatureC++ binaries: " + path);
-		featureCppExecutableName = path;
+		String sys = System.getProperty("os.name");
+        if (sys.equals("Linux")){
+        	featureCppExecutable = "fc++Linux";
+        }
+		URL url = BundleUtility.find(FeatureCppCorePlugin.getDefault().getBundle(), "lib/" + featureCppExecutable);
+		try {
+			url = FileLocator.toFileURL(url);
+		} catch (IOException e) {
+			FeatureCppCorePlugin.getDefault().logError(e);
+		}
+		Path path = new Path(url.getFile());
+		String pathName = path.toOSString();
+		if (!path.isAbsolute()) {
+			FeatureCppCorePlugin.getDefault().logWarning(pathName + " is not an absolute path. " +
+					"fc++.exe can not be found.");
+		}
+		if (!path.isValidPath(pathName)) {
+			FeatureCppCorePlugin.getDefault().logWarning(pathName + " is no valid path. " +
+					"fc++.exe can not be found.");
+		}
+//		if (path1.isAbsolute() && path1.isValidPath(pathName1)) {
+			featureCppExecutableName = pathName;
+//		} else {
+//			String location = FeatureCppCorePlugin.getDefault().getBundle().getLocation();
+//			String head = "reference:file:/";
+//			location = location.substring(head.length());
+//			IPath path1 = Path.fromOSString(location);
+//			path1 = path1.append("lib");
+//			path1 = path1.append("fc++");
+//			path1 = path1.addFileExtension("exe");
+//			String pathName1 = path1.toOSString();
+//			if (!path1.isAbsolute()) {
+//				FeatureCppCorePlugin.getDefault().logWarning(pathName1 + " is not an absolute path. " +
+//						"fc++.exe can not be found.");
+//			}
+//			if (!path.isValidPath(pathName)) {
+//				FeatureCppCorePlugin.getDefault().logWarning(pathName1 + " is no valid path. " +
+//						"fc++.exe can not be found.");
+//			}
+//			featureCppExecutableName = pathName1;
+			
+//		}
 	}
 
 	public void initialize(IFolder source, IFolder build) {
