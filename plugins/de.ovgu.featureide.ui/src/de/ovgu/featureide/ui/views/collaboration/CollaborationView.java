@@ -184,21 +184,23 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 					FileEditorInput inputFile = (FileEditorInput)part.getEditorInput();
 					featureProject = CorePlugin.getFeatureProject(inputFile.getFile());
 					if (featureProject != null) {
-						//case: its a featureIDE project
+						//case: it's a featureIDE project
 						if (CorePlugin.getDefault().getConfigurationExtensions()
 								.contains(inputFile.getName().substring(inputFile.getName().lastIndexOf(".")))) {
 							//case: open configuration editor
-							if (builder.configuration.equals(inputFile.getName())) {
+							if (builder.configuration.equals(inputFile.getName()) &&
+									featureProject.equals(builder.project)) {
 								return;
 							} else {
 								builder.configuration = inputFile.getName();
 							}
 							
-						} else if (featureProject != null){
+						} else if (featureProject != null) {
 							//case: open editor is no configuration editor
 							IFile file = featureProject.getCurrentConfiguration();
 							if (file != null) {
-								if (builder.configuration.equals(file.getName())) {
+								if (builder.configuration.equals(file.getName()) &&
+										featureProject.equals(builder.project)) {
 									return;
 								} else {
 									builder.configuration = file.getName();

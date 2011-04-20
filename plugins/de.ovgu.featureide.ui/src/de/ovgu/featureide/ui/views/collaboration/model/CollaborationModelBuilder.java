@@ -64,7 +64,7 @@ public class CollaborationModelBuilder {
 	private Collaboration collaboration;
 	private ArrayList<String> extensions;
 	private FSTModel fSTModel;
-	private IFeatureProject project;
+	public IFeatureProject project;
 	
 	public CollaborationModelBuilder() {
 		model = new CollaborationModel();
@@ -84,14 +84,13 @@ public class CollaborationModelBuilder {
 		//initialize builder
 		IComposerExtension composer = featureProject.getComposer();
 		if (composer == null)
-			return null;
-	//TODO Jens 	
-	//	fSTModel = featureProject.getFSTModel();
-	//	if (fSTModel == null ) {
+			return null; 	
+		fSTModel = featureProject.getFSTModel();
+		if (fSTModel == null ) {
 			composer.initialize(project);
 			composer.buildFSTModel();
 			fSTModel = featureProject.getFSTModel();
-	//	}
+		}
 		
 		extensions = composer.extensions();
 		if (extensions == null)
