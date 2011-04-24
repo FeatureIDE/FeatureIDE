@@ -384,6 +384,27 @@
    <feature url="features/de.ovgu.featureide.munge_2.5.1.201104151221.jar" id="de.ovgu.featureide.munge" version="2.5.1.201104151221">
       <category name="FeatureIDE 2.5"/>
    </feature>
+   <feature url="features/de.ovgu.featureide_2.5.1.201104240712.jar" id="de.ovgu.featureide" version="2.5.1.201104240712">
+      <category name="FeatureIDE 2.5"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.aspectj_2.5.1.201104240712.jar" id="de.ovgu.featureide.aspectj" version="2.5.1.201104240712">
+      <category name="FeatureIDE 2.5"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.deltaj_2.5.1.201104240712.jar" id="de.ovgu.featureide.deltaj" version="2.5.1.201104240712">
+      <category name="FeatureIDE 2.5"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurecpp_2.5.1.201104240712.jar" id="de.ovgu.featureide.featurecpp" version="2.5.1.201104240712">
+      <category name="FeatureIDE 2.5"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurehouse_2.5.1.201104240712.jar" id="de.ovgu.featureide.featurehouse" version="2.5.1.201104240712">
+      <category name="FeatureIDE 2.5"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featuremodeling_2.5.1.201104240712.jar" id="de.ovgu.featureide.featuremodeling" version="2.5.1.201104240712">
+      <category name="FeatureIDE 2.5"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.munge_2.5.1.201104240712.jar" id="de.ovgu.featureide.munge" version="2.5.1.201104240712">
+      <category name="FeatureIDE 2.5"/>
+   </feature>
    <category-def name="FeatureIDE 2.0" label="FeatureIDE 2.0"/>
    <category-def name="FeatureIDE 2.1" label="FeatureIDE 2.1"/>
    <category-def name="FeatureIDE 2.2" label="FeatureIDE 2.2"/>
