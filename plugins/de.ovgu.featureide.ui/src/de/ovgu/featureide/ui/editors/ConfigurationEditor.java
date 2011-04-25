@@ -29,6 +29,7 @@ import java.util.Scanner;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
@@ -136,6 +137,12 @@ PropertyConstants, PropertyChangeListener, IResourceChangeListener {
 		super.setInput(input);
 		getSite().getPage().addPartListener(iPartListener);
 		IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
+		if (featureProject == null) {
+			IProject project = file.getProject(); 
+			UIPlugin.getDefault().logWarning(
+					"Project " + project.getName() + " is no featureproject.");
+			return;
+		}
 		featureModel = featureProject.getFeatureModel();
 		configuration = new Configuration(featureModel, true);
 		try {

@@ -31,7 +31,10 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 
+import cide.gparser.ParseException;
+
 import composer.FSTGenComposer;
+import composer.IParseErrorListener;
 
 import de.ovgu.cide.fstgen.ast.AbstractFSTParser;
 import de.ovgu.featureide.core.IFeatureProject;
@@ -50,6 +53,15 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	private static final String EXCLUDE_SOURCE_ENTRY = "\" kind=\"src\" path=\"";
 
 	public FeatureHouseModelBuilder fhModelBuilder;
+	
+	private IParseErrorListener listener = new IParseErrorListener() {
+		
+		@Override
+		public void parseErrorOccured(ParseException arg) {
+			FeatureHouseCorePlugin.getDefault().logError("FeatureHouse composer error: " + arg.getMessage(), null);
+			// TODO #287 add composer errors to source files
+		}
+	};
 	
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.core.builder.ComposerExtensionClass#initialize(de.ovgu.featureide.core.IFeatureProject)
@@ -86,6 +98,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		setJaveBuildPath(config.getName().split("[.]")[0]);
 
 		FSTGenComposer composer = new FSTGenComposer();
+		composer.addParseErrorListener(listener);
 		composer.run(new String[]{			
 				"--expression", configPath, 
 				"--base-directory", basePath,

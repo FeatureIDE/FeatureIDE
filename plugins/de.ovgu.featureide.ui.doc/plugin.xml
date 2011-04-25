@@ -24,6 +24,10 @@
             configId="org.eclipse.ui.intro.universalConfig"
             content="Intro_Extension/tutorial_page.xml">
       </configExtension>
-   </extension>
+      <standbyContentPart
+            id="org.eclipse.platform.cheatsheet"
+            class="org.eclipse.platform.internal.CheatSheetStandbyContent"
+            pluginId="org.eclipse.platform"/>
+     </extension>
 
 </plugin>
