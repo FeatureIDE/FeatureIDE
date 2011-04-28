@@ -35,12 +35,8 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TreeItem;
-import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.ISharedImages;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.progress.UIJob;
 
 import de.ovgu.featureide.fm.core.Feature;
@@ -57,23 +53,15 @@ import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationContentProvid
  * @author Jens Meinicke
  * @author Hannes Smurawsky
  */
-public class AdvancedConfigurationPage extends EditorPart {
+public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 	
-	private ConfigurationEditor configurationEditor;
-
 	private TreeViewer viewer;
-
-	private boolean dirty = false;
 
 	public void updateTree() {
 		viewer.refresh();
 		if (!errorMassage())
 			updateForeground(viewer.getTree().getItem(0));
 		removeHiddenFeatures();
-	}
-	
-	public void setConfigurationEditor(ConfigurationEditor configurationEditor) {
-		this.configurationEditor = configurationEditor;
 	}
 	
 	private IDoubleClickListener listener = new IDoubleClickListener() {
@@ -86,33 +74,6 @@ public class AdvancedConfigurationPage extends EditorPart {
 			}
 		}
 	};
-	
-	@Override
-	public void doSave(IProgressMonitor monitor) {
-		dirty = false;
-		firePropertyChange(IEditorPart.PROP_DIRTY);
-	}
-
-	@Override
-	public void doSaveAs() {
-	}
-
-	@Override
-	public void init(IEditorSite site, IEditorInput input)
-			throws PartInitException {
-		setSite(site);
-		setInput(input);
-	}
-	
-	@Override
-	public boolean isDirty() {
-		return dirty;
-	}
-
-	@Override
-	public boolean isSaveAsAllowed() {
-		return false;
-	}
 
 	@Override
 	public void createPartControl(Composite parent) {

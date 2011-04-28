@@ -36,7 +36,10 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.internal.util.BundleUtility;
+import org.eclipse.ui.progress.UIJob;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.featurecpp.FeatureCppCorePlugin;
@@ -65,7 +68,10 @@ public class FeatureCppWrapper {
 	public FeatureCppWrapper() {
 		String sys = System.getProperty("os.name");
         if (sys.equals("Linux")){
-        	featureCppExecutable = "fc++Linux";
+        	featureCppExecutableName = "fc++";
+        	return;
+        	// TODO use lib/fc++Linux
+        	// featureCppExecutable = "fc++Linux";
         }
 		URL url = BundleUtility.find(FeatureCppCorePlugin.getDefault().getBundle(), "lib/" + featureCppExecutable);
 		try {
@@ -83,28 +89,7 @@ public class FeatureCppWrapper {
 			FeatureCppCorePlugin.getDefault().logWarning(pathName + " is no valid path. " +
 					"fc++.exe can not be found.");
 		}
-//		if (path1.isAbsolute() && path1.isValidPath(pathName1)) {
-			featureCppExecutableName = pathName;
-//		} else {
-//			String location = FeatureCppCorePlugin.getDefault().getBundle().getLocation();
-//			String head = "reference:file:/";
-//			location = location.substring(head.length());
-//			IPath path1 = Path.fromOSString(location);
-//			path1 = path1.append("lib");
-//			path1 = path1.append("fc++");
-//			path1 = path1.addFileExtension("exe");
-//			String pathName1 = path1.toOSString();
-//			if (!path1.isAbsolute()) {
-//				FeatureCppCorePlugin.getDefault().logWarning(pathName1 + " is not an absolute path. " +
-//						"fc++.exe can not be found.");
-//			}
-//			if (!path.isValidPath(pathName)) {
-//				FeatureCppCorePlugin.getDefault().logWarning(pathName1 + " is no valid path. " +
-//						"fc++.exe can not be found.");
-//			}
-//			featureCppExecutableName = pathName1;
-			
-//		}
+		featureCppExecutableName = pathName;
 	}
 
 	public void initialize(IFolder source, IFolder build) {
@@ -130,14 +115,11 @@ public class FeatureCppWrapper {
 		command.add("-s=" + sourceFolder);
 		command.add("--gpp");
 		command.add(config.getRawLocation().toOSString());
-		try {
-			process(command);
-		} catch (IOException e) {
-			FeatureCppCorePlugin.getDefault().logError(e);
-		}
+		process(command);
+
 	}
 
-	private void process(LinkedList<String> command) throws IOException {
+	private void process(LinkedList<String> command) {
 		ProcessBuilder processBuilder = new ProcessBuilder(command);
 		BufferedReader input = null;
 		BufferedReader error = null;
@@ -172,10 +154,34 @@ public class FeatureCppWrapper {
 				}
 			}
 		} catch (IOException e) {
+			String os = System.getProperty("os.name");
+			if (os.equals("Linux")) {
+				if (e.getLocalizedMessage().equals(
+						"Cannot run program \"fc++\": java.io.IOException: error=2, No such file or directory")) {
+					UIJob uiJob = new UIJob("") {
+						public IStatus runInUIThread(IProgressMonitor monitor) {
+							Shell parentShell = new Shell();
+							MessageBox d =  new MessageBox(parentShell);
+							d.setMessage("fc++ could not be found. Please install fc++.\n" +
+									"See:\n" +
+									"    http://wwwiti.cs.uni-magdeburg.de/iti_db/fcc/.");
+							d.setText("fc++ not found");
+							d.open();
+							return Status.OK_STATUS;
+						}
+					};
+					uiJob.setPriority(Job.SHORT);
+					uiJob.schedule();
+				}
+			}
 			FeatureCppCorePlugin.getDefault().logError(e);
 		}finally{
-			if(input!=null)input.close();
-			if(error!=null)error.close();
+			try {
+				if(input!=null)input.close();
+				if(error!=null)error.close();
+			} catch (IOException e) {
+				FeatureCppCorePlugin.getDefault().logError(e);
+			}
 		}
 	}
 

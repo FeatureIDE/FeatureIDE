@@ -37,8 +37,10 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.text.IDocument;
@@ -76,60 +78,67 @@ import de.ovgu.featureide.ui.UIPlugin;
  * @author Jens Meinicke
  * @author Hannes Smurawsky
  */
-public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefaults,
-PropertyConstants, PropertyChangeListener, IResourceChangeListener {
+public class ConfigurationEditor extends MultiPageEditorPart implements
+		GUIDefaults, PropertyConstants, PropertyChangeListener,
+		IResourceChangeListener {
 
 	public ConfigurationPage configurationPage;
-	
+
 	private int configurationPageIndex;
-	
+
 	public AdvancedConfigurationPage advancedConfigurationPage;
-	
+
 	private int advancedConfigurationPageIndex;
-	
+
 	private TextEditor sourceEditor;
-	
+
 	private int sourceEditorIndex;
-	
+
 	private IFile file;
-	
+
 	public FeatureModel featureModel;
-	
+
 	public Configuration configuration;
 
 	private int oldPageIndex = -1;
-	
+
 	private boolean closeEditor;
-	
+
 	private boolean isPageModified = false;
-	
+
 	private String source;
 
 	private boolean advancedConfigurationPageUsed = false;
-	
+
 	private boolean configurationPageUsed = true;
+	
+	private LinkedList<ConfigurationEditorPage> extensionPages = new LinkedList<ConfigurationEditorPage>();
 	
 	private IPartListener iPartListener = new IPartListener() {
 
 		@Override
 		public void partBroughtToTop(IWorkbenchPart part) {
 		}
+
 		@Override
 		public void partClosed(IWorkbenchPart part) {
 			if (featureModel != null)
 				featureModel.removeListener(ConfigurationEditor.this);
 		}
+
 		@Override
 		public void partDeactivated(IWorkbenchPart part) {
 		}
+
 		@Override
 		public void partOpened(IWorkbenchPart part) {
 		}
+
 		@Override
 		public void partActivated(IWorkbenchPart part) {
 		}
 	};
-	
+
 	@Override
 	protected void setInput(IEditorInput input) {
 		file = (IFile) input.getAdapter(IFile.class);
@@ -138,7 +147,7 @@ PropertyConstants, PropertyChangeListener, IResourceChangeListener {
 		getSite().getPage().addPartListener(iPartListener);
 		IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
 		if (featureProject == null) {
-			IProject project = file.getProject(); 
+			IProject project = file.getProject();
 			UIPlugin.getDefault().logWarning(
 					"Project " + project.getName() + " is no featureproject.");
 			return;
@@ -154,11 +163,33 @@ PropertyConstants, PropertyChangeListener, IResourceChangeListener {
 		setPartName(file.getName());
 		featureModel.addListener(this);
 		firePropertyChange(IEditorPart.PROP_DIRTY);
+		getExtensions();
+	}
+
+	/**
+	 * Gets all extensions for this extension point.
+	 */
+	private void getExtensions() {
+		IConfigurationElement[] config = Platform.getExtensionRegistry()
+			.getConfigurationElementsFor(
+			UIPlugin.PLUGIN_ID + ".ConfigurationEditor");
+		try {
+			for (IConfigurationElement e : config) {
+				final Object o = e.createExecutableExtension("class");
+				if (o instanceof ConfigurationEditorPage) {
+					extensionPages.add(((ConfigurationEditorPage) o));
+				}
+			}
+		} catch (Exception e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
 	}
 	
 	/**
-	 * @param configuration file
-	 * @return true if configuration of the tree do not equal the configuration of the file
+	 * @param configurationEditor
+	 *            file
+	 * @return true if configuration of the tree do not equal the configuration
+	 *         of the file
 	 */
 	private boolean isModified(IFile iFile) {
 		LinkedList<String> treeFeatures = new LinkedList<String>();
@@ -173,7 +204,7 @@ PropertyConstants, PropertyChangeListener, IResourceChangeListener {
 			String line = null;
 			while (scanner.hasNext()) {
 				line = scanner.next();
-				if (line.startsWith("#") || line.isEmpty()){
+				if (line.startsWith("#") || line.isEmpty()) {
 					continue;
 				}
 				StringTokenizer tokenizer = new StringTokenizer(line);
@@ -197,26 +228,34 @@ PropertyConstants, PropertyChangeListener, IResourceChangeListener {
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.
+	 * PropertyChangeEvent)
 	 */
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
 		if (isDirty())
 			setConfiguration();
-		else 
+		else
 			setConfigurationFromFile();
-		//Reinitialize the actual pages 
-		if (oldPageIndex == advancedConfigurationPageIndex){
+		// Reinitialize the actual pages
+		if (oldPageIndex == advancedConfigurationPageIndex) {
 			advancedConfigurationPage.propertyChange(null);
 			configurationPageUsed = false;
-		} else if (oldPageIndex == configurationPageIndex){
+		} else if (oldPageIndex == configurationPageIndex) {
 			configurationPage.propertyChange(null);
 			advancedConfigurationPageUsed = false;
 		} else {
 			advancedConfigurationPageUsed = false;
 			configurationPageUsed = false;
-		} 
+		}
+		for (ConfigurationEditorPage page : extensionPages) {
+			if (oldPageIndex == page.getIndex()) {
+				page.propertyChange(evt);
+			}
+		}
 		if (oldPageIndex == sourceEditorIndex) {
 			UIJob job = new UIJob("refresh source page") {
 				@Override
@@ -229,12 +268,12 @@ PropertyConstants, PropertyChangeListener, IResourceChangeListener {
 			job.schedule();
 		}
 	}
-	
+
 	@Override
 	public boolean isDirty() {
-		return isPageModified  || super.isDirty();
+		return isPageModified || super.isDirty();
 	}
-	
+
 	private void setConfigurationFromFile() {
 		IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
 		featureModel = featureProject.getFeatureModel();
@@ -245,11 +284,12 @@ PropertyConstants, PropertyChangeListener, IResourceChangeListener {
 			FMCorePlugin.getDefault().logError(e);
 		}
 	}
-	
+
 	private void setConfiguration() {
 		IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
 		featureModel = featureProject.getFeatureModel();
-		String text = new ConfigurationWriter(configuration).writeIntoString(file);
+		String text = new ConfigurationWriter(configuration)
+				.writeIntoString(file);
 		configuration = new Configuration(featureModel, true);
 		try {
 			new ConfigurationReader(configuration).readFromString(text);
@@ -257,22 +297,26 @@ PropertyConstants, PropertyChangeListener, IResourceChangeListener {
 			FMCorePlugin.getDefault().logError(e);
 		}
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.part.MultiPageEditorPart#createPages()
 	 */
 	@Override
 	protected void createPages() {
 		createConfigurationPage();
 		createAdvancedConfigurationPage();
+		createExtensionPages();
 		createSourcePage();
 	}
-	
+
 	private void createConfigurationPage() {
 		configurationPage = new ConfigurationPage();
-		configurationPage.setConfigurationEditor(ConfigurationEditor.this);
+		configurationPage.setConfigurationEditor(this);
 		try {
-			configurationPageIndex = addPage(configurationPage, getEditorInput());
+			configurationPageIndex = addPage(configurationPage,
+					getEditorInput());
 			setPageText(configurationPageIndex, "Configuration");
 		} catch (PartInitException e) {
 			UIPlugin.getDefault().logError(e);
@@ -280,18 +324,32 @@ PropertyConstants, PropertyChangeListener, IResourceChangeListener {
 		configurationPage.propertyChange(null);
 	}
 
-	
 	private void createAdvancedConfigurationPage() {
 		advancedConfigurationPage = new AdvancedConfigurationPage();
-		advancedConfigurationPage.setConfigurationEditor(ConfigurationEditor.this);
+		advancedConfigurationPage.setConfigurationEditor(this);
 		try {
-			advancedConfigurationPageIndex = addPage(advancedConfigurationPage, getEditorInput());
-			setPageText(advancedConfigurationPageIndex, "Advanced Configuration");
+			advancedConfigurationPageIndex = addPage(advancedConfigurationPage,
+					getEditorInput());
+			setPageText(advancedConfigurationPageIndex,
+					"Advanced Configuration");
 		} catch (PartInitException e) {
 			UIPlugin.getDefault().logError(e);
 		}
 	}
-	
+
+	private void createExtensionPages() {
+		for (ConfigurationEditorPage page : extensionPages) {
+			try {
+				page.setConfigurationEditor(this);
+				page.setIndex(addPage(page, getEditorInput()));
+				setPageText(page.getIndex(), page.getPageText());
+			} catch (PartInitException e) {
+				UIPlugin.getDefault().logError(e);
+			}
+			page.propertyChange(null);
+		}
+	}
+
 	private void createSourcePage() {
 		sourceEditor = new TextEditor();
 		try {
@@ -302,23 +360,27 @@ PropertyConstants, PropertyChangeListener, IResourceChangeListener {
 		}
 	}
 
-	public void updateSourcePage(){
+	public void updateSourcePage() {
 		source = new ConfigurationWriter(configuration).writeIntoString(file);
 		IDocumentProvider provider = sourceEditor.getDocumentProvider();
-		IDocument document = provider.getDocument(sourceEditor.getEditorInput());
+		IDocument document = provider
+				.getDocument(sourceEditor.getEditorInput());
 		if (!source.equals(document.get()))
-				document.set(source);
+			document.set(source);
 	}
-	
+
 	@Override
 	protected void pageChange(int newPageIndex) {
-		if (oldPageIndex == sourceEditorIndex){
+		if (oldPageIndex == sourceEditorIndex) {
 			IDocumentProvider provider = sourceEditor.getDocumentProvider();
-			IDocument document = provider.getDocument(sourceEditor.getEditorInput());
-			if (!new ConfigurationWriter(configuration).writeIntoString(file).equals(document.get())){
+			IDocument document = provider.getDocument(sourceEditor
+					.getEditorInput());
+			if (!new ConfigurationWriter(configuration).writeIntoString(file)
+					.equals(document.get())) {
 				configuration = new Configuration(featureModel, true);
 				try {
-					new ConfigurationReader(configuration).readFromString(document.get());
+					new ConfigurationReader(configuration)
+							.readFromString(document.get());
 				} catch (Exception e) {
 					FMCorePlugin.getDefault().logError(e);
 				}
@@ -326,32 +388,52 @@ PropertyConstants, PropertyChangeListener, IResourceChangeListener {
 			}
 		} else if (oldPageIndex == configurationPageIndex) {
 			configurationPage.resetColor();
+		} else {
+			for (ConfigurationEditorPage page : extensionPages) {
+				if (page.getIndex() == oldPageIndex) {
+					page.pageChangeFrom();
+					break;
+				}
+			}
 		}
 		
-		if (oldPageIndex != -1){
-			if (newPageIndex == configurationPageIndex)
+		
+
+		if (oldPageIndex != -1) {
+			if (newPageIndex == configurationPageIndex){
 				if (configurationPageUsed)
 					configurationPage.updateTree();
-				else { 
+				else {
 					configurationPage.propertyChange(null);
 					configurationPageUsed = true;
 				}
-			if (newPageIndex == advancedConfigurationPageIndex)
+			} else if (newPageIndex == advancedConfigurationPageIndex) {
 				if (advancedConfigurationPageUsed)
 					advancedConfigurationPage.updateTree();
 				else {
 					advancedConfigurationPage.propertyChange(null);
 					advancedConfigurationPageUsed = true;
 				}
-			if (newPageIndex == sourceEditorIndex)
+			} else if (newPageIndex == sourceEditorIndex) {
 				updateSourcePage();
+			} else {
+				for (ConfigurationEditorPage page : extensionPages) {
+					if (page.getIndex() == newPageIndex) {
+						page.pageChangeTo();
+						break;
+					}
+				}
+			}
 		}
 		oldPageIndex = newPageIndex;
 		super.pageChange(newPageIndex);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.part.EditorPart#doSave(org.eclipse.core.runtime.IProgressMonitor)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.part.EditorPart#doSave(org.eclipse.core.runtime.
+	 * IProgressMonitor)
 	 */
 	@Override
 	public void doSave(IProgressMonitor monitor) {
@@ -362,26 +444,33 @@ PropertyConstants, PropertyChangeListener, IResourceChangeListener {
 		} catch (CoreException e) {
 			UIPlugin.getDefault().logError(e);
 		}
-		advancedConfigurationPage.doSave(null);
-		configurationPage.doSave(null);
+		advancedConfigurationPage.doSave(monitor);
+		configurationPage.doSave(monitor);
+		for (ConfigurationEditorPage page : extensionPages) {
+			page.doSave(monitor);
+		}
 		sourceEditor.doSave(monitor);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.part.EditorPart#doSaveAs()
 	 */
 	@Override
 	public void doSaveAs() {
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.part.EditorPart#isSaveAsAllowed()
 	 */
 	@Override
 	public boolean isSaveAsAllowed() {
 		return false;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 

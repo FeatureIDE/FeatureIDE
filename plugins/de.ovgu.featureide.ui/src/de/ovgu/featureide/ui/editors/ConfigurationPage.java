@@ -34,12 +34,8 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
-import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.ISharedImages;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.progress.UIJob;
 
 import de.ovgu.featureide.fm.core.Feature;
@@ -57,11 +53,7 @@ import de.ovgu.featureide.ui.UIPlugin;
  * @author Jens Meinicke
  * @author Hannes Smurawsky
  */
-public class ConfigurationPage extends EditorPart {
-	private ConfigurationEditor configurationEditor;
-	
-	private boolean dirty = false;
-	
+public class ConfigurationPage extends ConfigurationEditorPage {
 	private Tree tree;
 	
 	private Color gray = new Color(null,140,140,140);
@@ -94,37 +86,6 @@ public class ConfigurationPage extends EditorPart {
 	public void updateTree(){
 		if (errorMassage())
 			refreshTree();
-	}
-	
-	public void setConfigurationEditor(ConfigurationEditor configurationEditor){
-		this.configurationEditor = configurationEditor;
-	}
-
-	@Override
-	public void doSave(IProgressMonitor monitor) {
-		dirty = false;
-		firePropertyChange(IEditorPart.PROP_DIRTY);
-	}
-
-	@Override
-	public void doSaveAs() {
-	}
-
-	@Override
-	public void init(IEditorSite site, IEditorInput input)
-			throws PartInitException {
-		setSite(site);
-		setInput(input);
-	}
-	
-	@Override
-	public boolean isDirty() {
-		return dirty;
-	}
-
-	@Override
-	public boolean isSaveAsAllowed() {
-		return false;
 	}
 
 	@Override
@@ -170,9 +131,6 @@ public class ConfigurationPage extends EditorPart {
 	}
 
 	@Override
-	public void setFocus() {
-	}
-
 	public void propertyChange(PropertyChangeEvent evt) {
 		if (initialized)
 			dirty = true;

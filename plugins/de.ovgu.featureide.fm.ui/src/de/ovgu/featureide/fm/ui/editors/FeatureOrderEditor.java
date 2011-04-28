@@ -127,12 +127,6 @@ public class FeatureOrderEditor extends EditorPart {
 		return site;
 	}
 
-	/*
-	// TODO remove?
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.part.EditorPart#doSaveAs()
-	 */
 	@Override
 	public void doSaveAs() {
 	}
