@@ -37,7 +37,6 @@ public class TWaterlooReaderWriter extends TAbstractFeatureModelReaderWriter{
 	 */
 	public TWaterlooReaderWriter(FeatureModel fm, String s) throws UnsupportedModelException {
 		super(fm,s);
-		// TODO Auto-generated constructor stub
 	}
 
 	/* (non-Javadoc)

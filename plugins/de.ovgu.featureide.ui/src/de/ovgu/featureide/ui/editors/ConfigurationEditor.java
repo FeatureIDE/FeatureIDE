@@ -52,7 +52,6 @@ import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.part.MultiPageEditorPart;
 import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.texteditor.IDocumentProvider;
@@ -83,18 +82,14 @@ public class ConfigurationEditor extends MultiPageEditorPart implements
 		IResourceChangeListener {
 
 	public ConfigurationPage configurationPage;
-
-	private int configurationPageIndex;
-
+	private boolean configurationPageUsed = true;
+	
 	public AdvancedConfigurationPage advancedConfigurationPage;
+	private boolean advancedConfigurationPageUsed = false;
 
-	private int advancedConfigurationPageIndex;
+	private TextEditorPage sourceEditor;
 
-	private TextEditor sourceEditor;
-
-	private int sourceEditorIndex;
-
-	private IFile file;
+	IFile file;
 
 	public FeatureModel featureModel;
 
@@ -105,14 +100,15 @@ public class ConfigurationEditor extends MultiPageEditorPart implements
 	private boolean closeEditor;
 
 	private boolean isPageModified = false;
-
-	private String source;
-
-	private boolean advancedConfigurationPageUsed = false;
-
-	private boolean configurationPageUsed = true;
 	
-	private LinkedList<ConfigurationEditorPage> extensionPages = new LinkedList<ConfigurationEditorPage>();
+	private LinkedList<IConfigurationEditorPage> extensionPages = new LinkedList<IConfigurationEditorPage>();
+	
+	/**
+	 * @return the extensionPages
+	 */
+	public LinkedList<IConfigurationEditorPage> getExtensionPages() {
+		return extensionPages;
+	}
 	
 	private IPartListener iPartListener = new IPartListener() {
 
@@ -176,8 +172,8 @@ public class ConfigurationEditor extends MultiPageEditorPart implements
 		try {
 			for (IConfigurationElement e : config) {
 				final Object o = e.createExecutableExtension("class");
-				if (o instanceof ConfigurationEditorPage) {
-					extensionPages.add(((ConfigurationEditorPage) o));
+				if (o instanceof IConfigurationEditorPage) {
+					extensionPages.add(((IConfigurationEditorPage) o));
 				}
 			}
 		} catch (Exception e) {
@@ -241,26 +237,26 @@ public class ConfigurationEditor extends MultiPageEditorPart implements
 		else
 			setConfigurationFromFile();
 		// Reinitialize the actual pages
-		if (oldPageIndex == advancedConfigurationPageIndex) {
+		if (oldPageIndex == advancedConfigurationPage.getIndex()) {
 			advancedConfigurationPage.propertyChange(null);
 			configurationPageUsed = false;
-		} else if (oldPageIndex == configurationPageIndex) {
+		} else if (oldPageIndex == configurationPage.getIndex()) {
 			configurationPage.propertyChange(null);
 			advancedConfigurationPageUsed = false;
 		} else {
 			advancedConfigurationPageUsed = false;
 			configurationPageUsed = false;
 		}
-		for (ConfigurationEditorPage page : extensionPages) {
+		for (IConfigurationEditorPage page : extensionPages) {
 			if (oldPageIndex == page.getIndex()) {
 				page.propertyChange(evt);
 			}
 		}
-		if (oldPageIndex == sourceEditorIndex) {
+		if (oldPageIndex == sourceEditor.getIndex()) {
 			UIJob job = new UIJob("refresh source page") {
 				@Override
 				public IStatus runInUIThread(IProgressMonitor monitor) {
-					updateSourcePage();
+					sourceEditor.propertyChange(null);
 					return Status.OK_STATUS;
 				}
 			};
@@ -315,9 +311,9 @@ public class ConfigurationEditor extends MultiPageEditorPart implements
 		configurationPage = new ConfigurationPage();
 		configurationPage.setConfigurationEditor(this);
 		try {
-			configurationPageIndex = addPage(configurationPage,
-					getEditorInput());
-			setPageText(configurationPageIndex, "Configuration");
+			configurationPage.setIndex(addPage(configurationPage,
+					getEditorInput()));
+			setPageText(configurationPage.getIndex(), configurationPage.getPageText());
 		} catch (PartInitException e) {
 			UIPlugin.getDefault().logError(e);
 		}
@@ -328,19 +324,20 @@ public class ConfigurationEditor extends MultiPageEditorPart implements
 		advancedConfigurationPage = new AdvancedConfigurationPage();
 		advancedConfigurationPage.setConfigurationEditor(this);
 		try {
-			advancedConfigurationPageIndex = addPage(advancedConfigurationPage,
-					getEditorInput());
-			setPageText(advancedConfigurationPageIndex,
-					"Advanced Configuration");
+			advancedConfigurationPage.setIndex(addPage(advancedConfigurationPage,
+					getEditorInput()));
+			setPageText(advancedConfigurationPage.getIndex(),
+					advancedConfigurationPage.getPageText());
 		} catch (PartInitException e) {
 			UIPlugin.getDefault().logError(e);
 		}
 	}
 
 	private void createExtensionPages() {
-		for (ConfigurationEditorPage page : extensionPages) {
+		for (IConfigurationEditorPage page : extensionPages) {
 			try {
 				page.setConfigurationEditor(this);
+				page = page.getPage();
 				page.setIndex(addPage(page, getEditorInput()));
 				setPageText(page.getIndex(), page.getPageText());
 			} catch (PartInitException e) {
@@ -351,27 +348,19 @@ public class ConfigurationEditor extends MultiPageEditorPart implements
 	}
 
 	private void createSourcePage() {
-		sourceEditor = new TextEditor();
+		sourceEditor = new TextEditorPage();
+		sourceEditor.setConfigurationEditor(this);
 		try {
-			sourceEditorIndex = addPage(sourceEditor, getEditorInput());
-			setPageText(sourceEditorIndex, "Source");
+			sourceEditor.setIndex(addPage(sourceEditor, getEditorInput()));
+			setPageText(sourceEditor.getIndex(), sourceEditor.getPageText());
 		} catch (PartInitException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
 	}
 
-	public void updateSourcePage() {
-		source = new ConfigurationWriter(configuration).writeIntoString(file);
-		IDocumentProvider provider = sourceEditor.getDocumentProvider();
-		IDocument document = provider
-				.getDocument(sourceEditor.getEditorInput());
-		if (!source.equals(document.get()))
-			document.set(source);
-	}
-
 	@Override
 	protected void pageChange(int newPageIndex) {
-		if (oldPageIndex == sourceEditorIndex) {
+		if (oldPageIndex == sourceEditor.getIndex()) {
 			IDocumentProvider provider = sourceEditor.getDocumentProvider();
 			IDocument document = provider.getDocument(sourceEditor
 					.getEditorInput());
@@ -386,40 +375,38 @@ public class ConfigurationEditor extends MultiPageEditorPart implements
 				}
 				advancedConfigurationPage.propertyChange(null);
 			}
-		} else if (oldPageIndex == configurationPageIndex) {
+		} else if (oldPageIndex == configurationPage.getIndex()) {
 			configurationPage.resetColor();
 		} else {
-			for (ConfigurationEditorPage page : extensionPages) {
+			for (IConfigurationEditorPage page : extensionPages) {
 				if (page.getIndex() == oldPageIndex) {
-					page.pageChangeFrom();
+					page.pageChangeFrom(newPageIndex);
 					break;
 				}
 			}
 		}
-		
-		
 
 		if (oldPageIndex != -1) {
-			if (newPageIndex == configurationPageIndex){
+			if (newPageIndex == configurationPage.getIndex()){
 				if (configurationPageUsed)
 					configurationPage.updateTree();
 				else {
 					configurationPage.propertyChange(null);
 					configurationPageUsed = true;
 				}
-			} else if (newPageIndex == advancedConfigurationPageIndex) {
+			} else if (newPageIndex == advancedConfigurationPage.getIndex()) {
 				if (advancedConfigurationPageUsed)
 					advancedConfigurationPage.updateTree();
 				else {
 					advancedConfigurationPage.propertyChange(null);
 					advancedConfigurationPageUsed = true;
 				}
-			} else if (newPageIndex == sourceEditorIndex) {
-				updateSourcePage();
+			} else if (newPageIndex == sourceEditor.getIndex()) {
+				sourceEditor.propertyChange(null);
 			} else {
-				for (ConfigurationEditorPage page : extensionPages) {
+				for (IConfigurationEditorPage page : extensionPages) {
 					if (page.getIndex() == newPageIndex) {
-						page.pageChangeTo();
+						page.pageChangeTo(oldPageIndex);
 						break;
 					}
 				}
@@ -446,7 +433,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements
 		}
 		advancedConfigurationPage.doSave(monitor);
 		configurationPage.doSave(monitor);
-		for (ConfigurationEditorPage page : extensionPages) {
+		for (IConfigurationEditorPage page : extensionPages) {
 			page.doSave(monitor);
 		}
 		sourceEditor.doSave(monitor);

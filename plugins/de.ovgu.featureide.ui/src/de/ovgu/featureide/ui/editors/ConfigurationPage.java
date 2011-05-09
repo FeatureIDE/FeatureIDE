@@ -48,12 +48,15 @@ import de.ovgu.featureide.fm.ui.editors.configuration.AdvancedConfigurationLabel
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
- * Displays the tree for common configuration selection at the configurationeditor
+ * Displays the tree for common configuration selection at the configuration editor
  * 
  * @author Jens Meinicke
  * @author Hannes Smurawsky
  */
 public class ConfigurationPage extends ConfigurationEditorPage {
+	private static final String PAGE_TEXT = "Configuration";
+	private static final String ID = UIPlugin.PLUGIN_ID + "ConfigurationPage";
+	
 	private Tree tree;
 	
 	private Color gray = new Color(null,140,140,140);
@@ -223,7 +226,7 @@ public class ConfigurationPage extends ConfigurationEditorPage {
 	 */
 	private void setColor() {
 		returnFormThread = false;
-		job_color = new Job("set color"/*TODO add thread name*/) {
+		job_color = new Job("Feature coloring.") {
 			public IStatus run(IProgressMonitor monitor) {
 				if (features != null && features.size() != 0 && !features.isEmpty()) {
 					for (SelectableFeature feature : features) {
@@ -330,6 +333,22 @@ public class ConfigurationPage extends ConfigurationEditorPage {
 
 	protected void set(SelectableFeature feature, Selection selection) {
 		configurationEditor.configuration.setManual(feature, selection);
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.ui.editors.IConfigurationEditorPage#getPageText()
+	 */
+	@Override
+	public String getPageText() {
+		return PAGE_TEXT;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.ui.editors.IConfigurationEditorPage#getID()
+	 */
+	@Override
+	public String getID() {
+		return ID;
 	}
 
 }

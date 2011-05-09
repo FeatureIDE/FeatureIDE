@@ -39,7 +39,6 @@ public class TXmlReaderWriter extends TAbstractFeatureModelReaderWriter {
 	 */
 	public TXmlReaderWriter(FeatureModel fm,String s) throws UnsupportedModelException {
 		super(fm,s);
-		// TODO Auto-generated constructor stub
 	}
 
 	/* (non-Javadoc)

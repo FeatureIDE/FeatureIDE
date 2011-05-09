@@ -46,16 +46,29 @@ import de.ovgu.featureide.fm.core.configuration.TreeElement;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.configuration.AdvancedConfigurationLabelProvider;
 import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationContentProvider;
+import de.ovgu.featureide.ui.UIPlugin;
 
 /**
- * Displays the tree for advanced configuration selection at the configurationeditor
+ * Displays the tree for advanced configuration selection at the configuration editor.
  * 
  * @author Jens Meinicke
  * @author Hannes Smurawsky
  */
 public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 	
+	private static final String PAGE_TEXT = "Advanced Configuration";
+
+	private static final String ID = UIPlugin.PLUGIN_ID + "AdvancedConfigurationPage";
+
 	private TreeViewer viewer;
+	
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.ui.editors.IConfigurationEditorPage#getPageText()
+	 */
+	@Override
+	public String getPageText() {
+		return PAGE_TEXT;
+	}
 
 	public void updateTree() {
 		viewer.refresh();
@@ -112,6 +125,7 @@ public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 
 	private LinkedList<String> hiddenFeatures;
 	
+	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
 		if (initialized)
 			dirty = true;
@@ -141,9 +155,6 @@ public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 		viewer.getTree().setRedraw(true);
 	}
 
-	/**
-	 * 
-	 */
 	private void removeHiddenFeatures() {
 		hiddenFeatures = new LinkedList<String>();
 		for (Feature feature : configurationEditor.configuration.getFeatureModel().getFeatures()) {
@@ -164,8 +175,7 @@ public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 				removeHiddenElement(feature);
 		}	
 	}
-	
-	
+
 	private boolean errorMassage() { 
 		if (!configurationEditor.configuration.valid() && configurationEditor.configuration.number() == 0){
 			for (TreeElement feature : configurationEditor.configuration.getRoot().getChildren())
@@ -217,7 +227,7 @@ public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 	}
 	
 	private void updateForeground(TreeItem item) {	
-
+		// TODO implement coloring
 //		for (TreeItem child : item.getItems()) {
 //			SelectableFeature feature = configurationEditor.configuration.getSelectablefeature(child.getText());
 //			child.setForeground(null);
@@ -244,5 +254,13 @@ public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 //				updateForeground(child);
 //			}
 //		}
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.ui.editors.IConfigurationEditorPage#getID()
+	 */
+	@Override
+	public String getID() {
+		return ID;
 	}
 }

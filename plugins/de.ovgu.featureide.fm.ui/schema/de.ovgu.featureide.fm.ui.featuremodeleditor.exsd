@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="de.ovgu.featureide.ui" xmlns="http://www.w3.org/2001/XMLSchema">
+<schema targetNamespace="de.ovgu.featureide.fm.ui" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appInfo>
-         <meta.schema plugin="de.ovgu.featureide.ui" id="de.ovgu.featureide.ui.ConfigurationPage" name="ConfigurationPageExtension"/>
+         <meta.schema plugin="de.ovgu.featureide.fm.ui" id="de.ovgu.featureide.fm.ui.featuremodeleditor" name="featuremodeleditor"/>
       </appInfo>
       <documentation>
          [Enter description of this extension point.]
@@ -18,7 +18,7 @@
       </annotation>
       <complexType>
          <sequence minOccurs="1" maxOccurs="unbounded">
-            <element ref="configurationPageExtension" minOccurs="1" maxOccurs="unbounded"/>
+            <element ref="featureModelEditorExtension"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -47,7 +47,7 @@
       </complexType>
    </element>
 
-   <element name="configurationPageExtension">
+   <element name="featureModelEditorExtension">
       <complexType>
          <attribute name="id" type="string">
             <annotation>
@@ -76,7 +76,7 @@
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn=":de.ovgu.featureide.ui.editors.IConfigurationEditorPage"/>
+                  <meta.attribute kind="java" basedOn=":de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage"/>
                </appInfo>
             </annotation>
          </attribute>

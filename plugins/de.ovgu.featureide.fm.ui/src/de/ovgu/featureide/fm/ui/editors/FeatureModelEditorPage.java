@@ -16,77 +16,41 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.ui.editors;
+package de.ovgu.featureide.fm.ui.editors;
 
 import java.beans.PropertyChangeEvent;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 
-
 /**
- * Basic class with some default methods for configuration editor pages.
+ * Basic class with some default methods for feature model editor pages.
  * 
  * @author Jens Meinicke
  */
-public abstract class ConfigurationEditorPage extends EditorPart implements IConfigurationEditorPage {
+public abstract class FeatureModelEditorPage extends EditorPart implements IFeatureModelEditorPage{
 
-	protected ConfigurationEditor configurationEditor = null;
-	
 	private int index;
 	
-	protected boolean dirty;
+	protected FeatureModelEditor featureModelEditor;
 	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.editors.IConfigurationEditorPage#setIndex(int)
-	 */
-	@Override
-	public void setIndex(int index) {
-		this.index = index;
-	}
+	protected boolean dirty = false;
 	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.editors.IConfigurationEditorPage#getIndex()
-	 */
-	@Override
-	public int getIndex() {
-		return index;
-	}
-	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.editors.IConfigurationEditorPage#setConfigurationEditor(de.ovgu.featureide.ui.editors.ConfigurationEditor)
-	 */
-	@Override
-	public void setConfigurationEditor(ConfigurationEditor configurationEditor) {
-		this.configurationEditor = configurationEditor;
-	}
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.editors.IConfigurationEditorPage#propertyChange(java.beans.PropertyChangeEvent)
-	 */
-	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-	
-	}
-	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.editors.IConfigurationEditorPage#pageChangeFrom(int)
-	 */
-	@Override
-	public void pageChangeFrom(int index) {
-	
-	}
-	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.editors.IConfigurationEditorPage#pageChangeTo(int)
-	 */
-	@Override
-	public void pageChangeTo(int index) {
+	protected IEditorInput input;
 
+	protected IEditorSite site;
+	
+	/**
+	 * @param featureModelEditor the featureModelEditor to set
+	 */
+	public void setFeatureModelEditor(FeatureModelEditor featureModelEditor) {
+		this.featureModelEditor = featureModelEditor;
 	}
 	
 	/* (non-Javadoc)
@@ -112,8 +76,8 @@ public abstract class ConfigurationEditorPage extends EditorPart implements ICon
 	@Override
 	public void init(IEditorSite site, IEditorInput input)
 			throws PartInitException {
-		setSite(site);
-		setInput(input);
+		this.input = input;
+		this.site = site; 
 	}
 
 	/* (non-Javadoc)
@@ -137,6 +101,7 @@ public abstract class ConfigurationEditorPage extends EditorPart implements ICon
 	 */
 	@Override
 	public void createPartControl(Composite parent) {
+		
 	}
 
 	/* (non-Javadoc)
@@ -144,13 +109,73 @@ public abstract class ConfigurationEditorPage extends EditorPart implements ICon
 	 */
 	@Override
 	public void setFocus() {
+		
 	}
 
 	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.editors.IConfigurationEditorPage#getPage()
+	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#getIndex()
 	 */
 	@Override
-	public IConfigurationEditorPage getPage() {
+	public int getIndex() {
+		return index;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#setIndex(int)
+	 */
+	@Override
+	public void setIndex(int index) {
+		this.index = index;
+	}
+	
+	public IEditorSite getSite() {
+		return site;
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#initEditor()
+	 */
+	@Override
+	public void initEditor() {
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#getPage()
+	 */
+	@Override
+	public IFeatureModelEditorPage getPage(Composite container) {
 		return this;
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#getControl1()
+	 */
+	@Override
+	public Control getControl() {
+		return null;
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#propertyChange(java.beans.PropertyChangeEvent)
+	 */
+	@Override
+	public void propertyChange(PropertyChangeEvent event) {
+		
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#pageChangeFrom(int)
+	 */
+	@Override
+	public void pageChangeFrom(int newPage) {
+
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#pageChangeTo(int)
+	 */
+	@Override
+	public void pageChangeTo(int oldPage) {
+	
 	}
 }

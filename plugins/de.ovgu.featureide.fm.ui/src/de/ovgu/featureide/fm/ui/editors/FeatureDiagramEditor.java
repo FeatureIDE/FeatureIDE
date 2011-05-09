@@ -22,6 +22,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import org.eclipse.core.commands.operations.ObjectUndoContext;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.draw2d.ConnectionLayer;
 import org.eclipse.gef.DefaultEditDomain;
 import org.eclipse.gef.EditDomain;
@@ -50,6 +51,7 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AlternativeAction;
@@ -77,7 +79,10 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.LevelOrderLayout;
  * @author Thomas Thuem
  */
 public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
-		GUIDefaults, PropertyConstants, PropertyChangeListener {
+		GUIDefaults, PropertyConstants, PropertyChangeListener, IFeatureModelEditorPage {
+
+	private static final String PAGE_TEXT = "Feature Diagram";
+	private static final String ID = FMUIPlugin.PLUGIN_ID + ".editors.FeatureDiagramEditor";
 
 	private FeatureModelEditor featureModelEditor;
 
@@ -108,6 +113,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	private CreateConstraintAction createConstraintAction;
 
 	private ReverseOrderAction reverseOrderAction;
+
+	private int index;
 
 	public FeatureDiagramEditor(FeatureModelEditor featureModelEditor,
 			Composite container) {
@@ -300,14 +307,93 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		} else if (prop.equals(MODEL_DATA_LOADED)) {
 			refresh();
 		} else if (prop.equals(REDRAW_DIAGRAM)) {
-			// TODO new extension point
-			featureModelEditor.updateTextEditorFromDiagram();
-			featureModelEditor.updateDiagramFromTextEditor();
+			featureModelEditor.textEditor.updateTextEditor();
+			featureModelEditor.textEditor.updateDiagram();
 		} else if (prop.equals(REFRESH_ACTIONS)) {
 			// additional actions can be refreshed here
 			legendAction.refresh();
 			legendLayoutAction.refresh();
 		}
+		
+		for (IFeatureModelEditorPage page : featureModelEditor.extensionPages) {
+			page.propertyChange(event);
+		}
+	}
+
+	public void setIndex(int index) {
+		this.index = index;
+	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	public String getPageText() {
+		return PAGE_TEXT;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#initEditor()
+	 */
+	@Override
+	public void initEditor() {
+		createContextMenu();
+		createActions();
+		createKeyBindings();
+	}
+	
+	private void createContextMenu() {
+		MenuManager menu = new MenuManager("#PopupMenu");
+		menu.setRemoveAllWhenShown(true);
+		createContextMenu(menu);
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#setFeatureModelEditor(de.ovgu.featureide.fm.ui.editors.FeatureModelEditor)
+	 */
+	@Override
+	public void setFeatureModelEditor(FeatureModelEditor featureModelEditor) {
+		this.featureModelEditor = featureModelEditor;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#getPage()
+	 */
+	@Override
+	public IFeatureModelEditorPage getPage(Composite container) {
+		return new FeatureDiagramEditor(featureModelEditor, container);
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#doSave(org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	@Override
+	public void doSave(IProgressMonitor monitor) {
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#pageChangeFrom(int)
+	 */
+	@Override
+	public void pageChangeFrom(int newPage) {
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#pageChangeTo(int)
+	 */
+	@Override
+	public void pageChangeTo(int oldPage) {
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#getID()
+	 */
+	@Override
+	public String getID() {
+		return ID;
 	}
 
 }
