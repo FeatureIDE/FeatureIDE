@@ -164,12 +164,11 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 
 	@Override
 	protected void createPages() {
+		createActions();
 		createDiagramPage();
 		createFeatureOrderPage();
 		createExtensionPages();
 		createSourcePage();
-
-		createActions();
 	}
 
 	void createDiagramPage() {

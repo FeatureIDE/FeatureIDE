@@ -33,10 +33,13 @@ public class AbstractAction extends SingleSelectionAction {
 
 	private ObjectUndoContext undoContext;
 
+	private FeatureModel featureModel;
+
 	public AbstractAction(GraphicalViewerImpl viewer,
 			FeatureModel featureModel, ObjectUndoContext undoContext) {
 		super("Abstract", viewer);
 		this.undoContext = undoContext;
+		this.featureModel = featureModel;
 	}
 
 	@Override
@@ -44,7 +47,7 @@ public class AbstractAction extends SingleSelectionAction {
 
 		setChecked(feature.isAbstract());
 		FeatureSetAbstractOperation op = new FeatureSetAbstractOperation(
-				feature);
+				feature, featureModel);
 		op.addContext(undoContext);
 
 		try {

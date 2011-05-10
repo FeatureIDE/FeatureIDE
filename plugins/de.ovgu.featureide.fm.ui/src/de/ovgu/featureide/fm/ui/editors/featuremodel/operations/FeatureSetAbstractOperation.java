@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
 import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.FeatureModel;
 
 /**
  * Operation with functionality to set a Feature abstract/concrete. Enables
@@ -39,6 +40,7 @@ public class FeatureSetAbstractOperation extends AbstractOperation {
 	private static final String LABEL_CONCRETE = "Set Feature Concrete";
 
 	private Feature feature;
+	private FeatureModel featureModel;
 
 	/**
 	 * @param label
@@ -47,9 +49,10 @@ public class FeatureSetAbstractOperation extends AbstractOperation {
 	 *            feature on which this operation will be executed
 	 * 
 	 */
-	public FeatureSetAbstractOperation(Feature feature) {
+	public FeatureSetAbstractOperation(Feature feature, FeatureModel featureModel) {
 		super(getLabel(feature));
 		this.feature = feature;
+		this.featureModel = featureModel;
 	}
 
 	/*
@@ -79,7 +82,7 @@ public class FeatureSetAbstractOperation extends AbstractOperation {
 			throws ExecutionException {
 
 		feature.setAbstract(!feature.isAbstract());
-
+		featureModel.handleModelDataChanged();
 		return Status.OK_STATUS;
 	}
 
@@ -93,7 +96,7 @@ public class FeatureSetAbstractOperation extends AbstractOperation {
 	@Override
 	public IStatus undo(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
-
+		featureModel.handleModelDataChanged();
 		return redo(monitor, info);
 	}
 
