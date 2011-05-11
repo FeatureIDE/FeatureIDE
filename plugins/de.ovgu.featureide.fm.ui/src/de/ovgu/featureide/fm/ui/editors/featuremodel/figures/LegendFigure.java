@@ -20,7 +20,6 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.Label;
-import org.eclipse.draw2d.LineBorder;
 import org.eclipse.draw2d.PolylineConnection;
 import org.eclipse.draw2d.RotatableDecoration;
 import org.eclipse.draw2d.XYLayout;
@@ -75,14 +74,13 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			boolean or, boolean alternative, boolean and) {
 		setLocation(pos);
 		setLayoutManager(layout);
-		setBorder(new LineBorder(1));
+		setBorder(LEGEND_BORDER);
 		setLegendSize(mandatory, optional, or, alternative, and);
 		FeatureUIHelper.setLegendSize(this.getSize());
 		FeatureUIHelper.setLegendFigure(this);
 		createRows(mandatory, optional, or, alternative, and);
-		setForegroundColor(CONNECTION_FOREGROUND);
-		setBackgroundColor(DIAGRAM_BACKGROUND);
-
+		setForegroundColor(LEGEND_FOREGROUND);
+		setBackgroundColor(LEGEND_BACKGROUND);
 	}
 
 	/**
@@ -104,8 +102,8 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			height = height + ROW_HEIGHT;
 		if (alternative)
 			height = height + ROW_HEIGHT;
-		if (and)
-			height = height + ROW_HEIGHT;
+//		if (and)
+//			height = height + ROW_HEIGHT;
 
 		int width = LEGEND_WIDTH;
 		if (!mandatory && !alternative) {
@@ -131,13 +129,14 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			createRowOr(row++);
 		if (alternative)
 			createRowAlternative(row++);
-		if (and)
-			createRowAnd(row);
+//		if (and)
+//			createRowAnd(row);
 	}
 
 	private void createRowTitle() {
 		Label labelTitle = new Label();
 		labelTitle.setForegroundColor(FEATURE_FOREGROUND);
+		labelTitle.setFont(DEFAULT_FONT);
 		labelTitle.setText("Legend:");
 		labelTitle.setLabelAlignment(Label.LEFT);
 		layout.setConstraint(labelTitle, new Rectangle(3, 0, LEGEND_WIDTH,
@@ -145,12 +144,12 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		add(labelTitle);
 	}
 
-	private void createRowAnd(int row) {
-		createGroupTypeSymbol(row, false, false);
-		Label labelOr = createLabel(row, "And");
-		add(labelOr);
-		labelOr.setForegroundColor(FEATURE_FOREGROUND);
-	}
+//	private void createRowAnd(int row) {
+//		createGroupTypeSymbol(row, false, false);
+//		Label labelOr = createLabel(row, "And");
+//		add(labelOr);
+//		labelOr.setForegroundColor(FEATURE_FOREGROUND);
+//	}
 
 	private void createRowAlternative(int row) {
 		createGroupTypeSymbol(row, false, true);
@@ -188,6 +187,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		layout.setConstraint(label, new Rectangle(LABEL_PADDING, ROW_HEIGHT
 				* row - LIFT, LEGEND_WIDTH - LABEL_PADDING, ROW_HEIGHT));
 		label.setForegroundColor(FEATURE_FOREGROUND);
+		label.setFont(DEFAULT_FONT);
 		return label;
 	}
 

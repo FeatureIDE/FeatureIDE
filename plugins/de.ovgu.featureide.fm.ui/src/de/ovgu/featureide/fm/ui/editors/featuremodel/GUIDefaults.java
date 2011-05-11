@@ -75,7 +75,7 @@ public interface GUIDefaults {
 	
 	//cross-tree constraints
 	
-	public static Color CONSTRAINT_FOREGROUND = GUIBasics.createColor(0.0, 0.0, 0.0);
+	public static Color CONSTRAINT_FOREGROUND = FEATURE_FOREGROUND;
 	public static Insets CONSTRAINT_INSETS = new Insets(2, 8, 2, 8);
 	public static Color CONSTRAINT_BACKGROUND = GUIBasics.createColor(1.0, 1.0, 1.0);
 	public static Color CONSTRAINT_BORDER_COLOR = CONSTRAINT_BACKGROUND;
@@ -94,7 +94,11 @@ public interface GUIDefaults {
 	public static int FEATURE_SPACE_Y = 30 + 20;
 	public static int CONSTRAINT_SPACE_Y = 5 + 20;
 	
-	//Legend
-//	public static int LEGEND_HEIGHT =  100;
+	//legend
 	public static int LEGEND_WIDTH = 95;
+	public static Color LEGEND_FOREGROUND = FEATURE_FOREGROUND;
+	public static Color LEGEND_BACKGROUND = DIAGRAM_BACKGROUND;
+	public static Color LEGEND_BORDER_COLOR = LEGEND_FOREGROUND;
+	public static Border LEGEND_BORDER = new LineBorder(LEGEND_BORDER_COLOR, 1);
+
 }
