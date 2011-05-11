@@ -295,6 +295,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 	protected void pageChange(int newPageIndex) {
 		if (newPageIndex == getTextEditorIndex()) {
 			if (isPageModified && featureModel.isRenamed()) {
+				textEditor.updateTextEditor();
 				saveModelForConsistentRenamings();
 			}
 		}
