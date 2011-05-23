@@ -226,7 +226,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 				}
 				copy((IFolder) res, folder);
 			} else if (res instanceof IFile) {
-				if (!extensions().contains(res.getName().split("[.]")[1])) {
+				if (!res.getName().contains(".") || !extensions().contains("." + res.getName().split("[.]")[1])) {
 					IFile file = buildFolder.getFile(res.getName());
 					if (!file.exists()) {
 						res.copy(file.getFullPath(), true, null);

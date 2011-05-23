@@ -19,6 +19,8 @@
 package de.ovgu.featureide.ui.views.collaboration.figures;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.FlowLayout;
 import org.eclipse.draw2d.FreeformLayout;
@@ -28,6 +30,7 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.graphics.Image;
 
+import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.ui.UIPlugin;
@@ -57,6 +60,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 	
 	private final Label label = new Label();
 	public Boolean selected = false;
+	private IFolder featureFolder;
 	
 	public RoleFigure(Role role) {
 		
@@ -155,6 +159,8 @@ public class RoleFigure extends Figure implements GUIDefaults{
 			setName("Fields: " + fieldCount + " Methods: " + methodCount);
 			
 		} else if (role.getName().startsWith("*.")) {
+			featureFolder = CorePlugin.getFeatureProject(role.files.getFirst())
+					.getSourceFolder().getFolder(role.getCollaboration().getName());
 			CompartmentFigure fileFigure = new CompartmentFigure();
 			fileFigure.add(new Label(role.featureName + " ", IMAGE_FEATURE));
 			int fileCount = 0;
@@ -164,9 +170,9 @@ public class RoleFigure extends Figure implements GUIDefaults{
 				size += currentSize;
 				Label fieldLabel;
 				if (currentSize <= 1000000) {
-					fieldLabel = new Label(" " + file.getName() + " (" + currentSize/1000 + "." + currentSize%1000 + "bytes) ");
+					fieldLabel = new Label(" " + getParentNames(file) + file.getName() + " (" + currentSize/1000 + "." + currentSize%1000 + "bytes) ");
 				} else {
-					fieldLabel = new Label(" " + file.getName() + " (" + currentSize/1000000 + "." + currentSize/1000 + "kb) ");
+					fieldLabel = new Label(" " + getParentNames(file) + file.getName() + " (" + currentSize/1000000 + "." + currentSize/1000 + "kb) ");
 				}
 				fileFigure.add(fieldLabel);
 				fileCount++;
@@ -199,6 +205,17 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		this.setToolTip(tooltipContent);
 	}
 	
+	/**
+	 * @param file
+	 * @return
+	 */
+	private String getParentNames(IResource file) {
+		if (file.getParent().equals(featureFolder)) {
+			return "";
+		}
+		return getParentNames(file.getParent()) + file.getParent().getName() + "/";
+	}
+
 	private void setName(String name) {
 		
 		label.setText(name);

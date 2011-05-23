@@ -108,14 +108,25 @@ public class FeatureHouseModelBuilder {
 				node.getName().lastIndexOf(File.separator) + 1);
 		currentClass = new FSTClass(className);
 		currentFile = getFile(node.getName());
+		if (!canCompose()) {
+			return;
+		}
 		currentClass.setFile(currentFile);
 		model.classes.put(className, currentClass);
 		addClass(className, node.getName());
 		currentFeature.classes.put(className, currentClass);
 	}
 
+	/**
+	 * @return
+	 */
+	private boolean canCompose() {
+		return featureProject.getComposer().extensions()
+				.contains("." + currentFile.getFileExtension());
+	}
+
 	private void caseClassDeclaration(FSTNode node) {
-		if (node instanceof FSTNonTerminal) {
+		if (node instanceof FSTNonTerminal && canCompose()) {
 			for (FSTNode child : ((FSTNonTerminal) node).getChildren()) {
 				if (child instanceof FSTTerminal) {
 					FSTTerminal terminal = (FSTTerminal) child;

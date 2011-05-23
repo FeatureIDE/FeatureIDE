@@ -300,18 +300,18 @@ public class CollaborationModelBuilder {
 			return;
 		
 		if (!(res instanceof IFolder)) {
-			//TODO fix error if filename does not contain "."
+			String fileExtension = res.getName().contains(".") ? (res.getName().split("[.]"))[1] : " ";
 			if (classFilter.size() == 0 
-					|| classFilter.contains("*." + (res.getName().split("[.]"))[1])
+					|| classFilter.contains("*." + fileExtension)
 					|| classFilter.contains(res.getName())) {
 				
-				if (!(fSTModel != null && extensions.contains("." + (res.getName().split("[.]"))[1])) 
+				if (!(fSTModel != null && extensions.contains("." + fileExtension)) 
 						|| !iFeatureNames.contains(featureName)) {
 					if (collaboration == null) {
 						collaboration = new Collaboration(featureName);
 						collaboration.selected = selected;
 					}
-					String name = res.getName().contains(".") ? "." + (res.getName().split("[.]"))[1] : 
+					String name = res.getName().contains(".") ? "." + fileExtension : 
 					              ".";
 					Role role;
 					if (extensions.contains(name)) {

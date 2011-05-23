@@ -230,7 +230,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 				}
 				copy((IFolder)res, folder);
 			} else if (res instanceof IFile) {
-				if (!composerExtension.extensions().contains(res.getName().split("[.]")[1])) {
+				if (!composerExtension.extensions().contains("." + res.getName().split("[.]")[1])) {
 					IFile file = buildFolder.getFile(res.getName());
 					if (!file.exists()) {
 						res.copy(file.getFullPath(), true, null);

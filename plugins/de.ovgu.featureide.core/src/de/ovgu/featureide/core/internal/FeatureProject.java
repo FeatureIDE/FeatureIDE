@@ -770,7 +770,8 @@ public class FeatureProject extends BuilderMarkerHandler implements
 						}
 					}
 				} else {
-					checkSourceFolder(sourceFolder, event);
+					// XXX
+					// checkSourceFolder(sourceFolder, event, true);
 				}
 			}
 
@@ -783,26 +784,60 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		}
 	}
 
-	private boolean checkSourceFolder(IFolder folder, IResourceChangeEvent event)
+	/**
+	 * checks if something at source folder has been changed, except of marker
+	 * changes
+	 * 
+	 */
+	private void checkSourceFolder(IFolder folder, IResourceChangeEvent event)
 			throws CoreException {
+		IResourceDelta delta = event.getDelta().findMember(folder.getFullPath());
+		if (delta != null) {
+			if (delta.getKind() == IResourceDelta.CHANGED) {
+				if (checkAdded(folder, event) || checkMarkerChanges(folder, event)) {
+					buildRelevantChanges = true;
+				}
+			}
+		}
+	}
+
+	private boolean checkAdded(IFolder folder, IResourceChangeEvent event) throws CoreException {
 		for (IResource res : folder.members()) {
 			if (res instanceof IFolder) {
-				if (checkSourceFolder((IFolder) res, event)) {
+				if (checkAdded((IFolder) res, event)) {
 					return true;
 				}
 			} else {
 				IResourceDelta delta = event.getDelta().findMember(
 						res.getFullPath());
 				if (delta != null) {
-					if (delta.getKind() == IResourceDelta.ADDED
-							|| (delta.getFlags() & IResourceDelta.CONTENT) != 0) {
-						buildRelevantChanges = true;
+					if (delta.getKind() == IResourceDelta.ADDED) {
 						return true;
 					}
 				}
 			}
 		}
 		return false;
+	}
+
+	private boolean checkMarkerChanges(IFolder folder, IResourceChangeEvent event)
+			throws CoreException {
+		for (IResource res : folder.members()) {
+			if (res instanceof IFolder) {
+				if (!checkMarkerChanges((IFolder) res, event)) {
+					return false;
+				}
+			} else {
+				IResourceDelta delta = event.getDelta().findMember(
+						res.getFullPath());
+				if (delta != null) {
+					if ((delta.getFlags() & IResourceDelta.CONTENT) == 0) {
+						return false;
+					}
+				}
+			}
+		}
+		return true;
 	}
 
 	private void checkBuildFolder(IFolder folder, IResourceChangeEvent event)
@@ -884,7 +919,8 @@ public class FeatureProject extends BuilderMarkerHandler implements
 									IMarker.SEVERITY_ERROR);
 
 						}
-						// TODO check if we still get an error with the following code
+						// TODO check if we still get an error with the
+						// following code
 						// create warnings (e.g., for features that are not
 						// available anymore)
 						for (int i = 0; i < reader.getWarnings().size(); i++) {
