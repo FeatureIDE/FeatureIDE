@@ -33,7 +33,7 @@ public class JavaClassBuilder extends ClassBuilder{
 		super(builder);
 	}
 
-	private String[] modifier = {"static","final","private","public","potected"};
+	private String[] modifier = {"static","final","private","public","protected"};
 	
 	public void caseFieldDeclaration(FSTTerminal terminal) {
 		LinkedList<String> fields = getFields(terminal.getBody());
@@ -59,6 +59,17 @@ public class JavaClassBuilder extends ClassBuilder{
 		boolean mod = false;
 		boolean t1 = false;
 		boolean t2 = false;
+		
+		// removing comments
+		while (body.contains("/*") && body.contains("*/")) {
+			body = body.substring(0, body.indexOf("/*")) 
+					+ " " + body.substring(body.indexOf("*/") + 2);
+		}
+		
+		while (body.contains("  ")) {
+			body = body.replace("  ", " ");
+		}
+		
 		for (String s : body.split(" ")) {
 			if (s.contains("=")) {
 				if (!s.startsWith("=")) {

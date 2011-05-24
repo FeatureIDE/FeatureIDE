@@ -43,6 +43,8 @@ public class FSTClass extends FSTModelElement {
 	private String className;
 
 	private LinkedList<IFile> sources;
+	
+	private boolean isClassFile = false;
 
 	public FSTClass() {
 		this("");
@@ -328,5 +330,13 @@ public class FSTClass extends FSTModelElement {
 	 */
 	public void setName(String name) {
 		className = name;
+	}
+
+	public void setClassFile() {
+		this.isClassFile = true;
+	}
+
+	public boolean isClassfile() {
+		return isClassFile;
 	}
 }

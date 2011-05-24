@@ -21,7 +21,6 @@ package de.ovgu.featureide.ui.views.collaboration.model;
 import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 
 import de.ovgu.featureide.core.fstmodel.FSTField;
@@ -112,7 +111,7 @@ public class Role {
 	public IFile getRoleFile() {
 		if (path == null || !path.isAbsolute()) 
 			return null;
-		IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
+//		return ResourcesPlugin.getWorkspace().getRoot().getFile(path);
 		return file;
 	}
 

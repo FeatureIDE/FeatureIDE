@@ -218,9 +218,13 @@ public class CollaborationModelBuilder {
 										String name = Class.getName();
 										Role role = new Role(name);
 										if (composer.hasFeatureFolders()) {
-											role.file = featureProject.getSourceFolder()
-												.getFolder(feature.getName())
-												.getFile(name);
+											if (Class.isClassfile()) {
+												role.file = Class.getFile();
+											} else {
+												role.file = featureProject.getSourceFolder()
+													.getFolder(feature.getName())
+													.getFile(name);
+											}
 										} else {
 											role.file = featureProject.getSourceFolder()
 												.getFile(name);

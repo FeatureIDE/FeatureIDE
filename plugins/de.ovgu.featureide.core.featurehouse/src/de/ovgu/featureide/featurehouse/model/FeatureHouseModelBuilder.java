@@ -19,7 +19,6 @@
 package de.ovgu.featureide.featurehouse.model;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -79,9 +78,9 @@ public class FeatureHouseModelBuilder {
 	}
 
 	public void buildModel(List<FSTNode> nodes) {
-		model.classesMap = new HashMap<IFile, FSTClass>();
-		model.classes = new HashMap<String, FSTClass>();
-		model.features = new HashMap<String, FSTFeature>();
+		model.classesMap.clear();
+		model.classes.clear();
+		model.features.clear();
 
 		for (FSTNode node : nodes) {
 			if (node.getType().equals(NODE_TYPE_FEATURE)) {
@@ -92,6 +91,7 @@ public class FeatureHouseModelBuilder {
 				caseClassDeclaration(node);
 			}
 		}
+		System.out.println();
 	}
 	
 	private void caseAddFeature(FSTNode node) {
@@ -107,6 +107,7 @@ public class FeatureHouseModelBuilder {
 		String className = node.getName().substring(
 				node.getName().lastIndexOf(File.separator) + 1);
 		currentClass = new FSTClass(className);
+		currentClass.setClassFile();
 		currentFile = getFile(node.getName());
 		if (!canCompose()) {
 			return;

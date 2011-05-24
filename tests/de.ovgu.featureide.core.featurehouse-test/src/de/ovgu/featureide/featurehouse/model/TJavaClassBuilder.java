@@ -43,12 +43,25 @@ public class TJavaClassBuilder {
 	private String TEST_FIELD_3 = "int int;";
 	private String EXPECTED_MODIFIER_FIELD_3 = ""; 
 	private String EXPECTED_TYPE_FIELD_3 = "int";
-	private String EXPECTED_NAME_FIELD_3 = "int";
+	private String EXPECTED_NAME_FIELD_3 = "int";	
 	
 	@Test
 	public void FieldTestModifiers3() {
 		assertEquals(EXPECTED_MODIFIER_FIELD_3, builder.getFields(TEST_FIELD_3).get(0));
 		assertEquals(EXPECTED_TYPE_FIELD_3, builder.getFields(TEST_FIELD_3).get(1));
 		assertEquals(EXPECTED_NAME_FIELD_3, builder.getFields(TEST_FIELD_3).get(2));
+	}
+	
+	// Test 4
+	private String TEST_FIELD_4 = "protected /*@ spec_public @*/ HashSet nodeSet;";
+	private String EXPECTED_MODIFIER_FIELD_4 = "protected"; 
+	private String EXPECTED_TYPE_FIELD_4 = "HashSet";
+	private String EXPECTED_NAME_FIELD_4 = "nodeSet";
+
+	@Test
+	public void FieldTestModifiers4() {
+		assertEquals(EXPECTED_MODIFIER_FIELD_4, builder.getFields(TEST_FIELD_4).get(0));
+		assertEquals(EXPECTED_TYPE_FIELD_4, builder.getFields(TEST_FIELD_4).get(1));
+		assertEquals(EXPECTED_NAME_FIELD_4, builder.getFields(TEST_FIELD_4).get(2));
 	}
 }

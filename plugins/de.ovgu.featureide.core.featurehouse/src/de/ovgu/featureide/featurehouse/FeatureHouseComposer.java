@@ -103,7 +103,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 				"--expression", configPath, 
 				"--base-directory", basePath,
 				"--output-directory", outputPath + "/", 
-				"--ahead"
+				"--expression"
 		});
 		
 		fhModelBuilder.buildModel(AbstractFSTParser.fstnodes);
