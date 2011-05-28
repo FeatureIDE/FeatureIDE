@@ -770,8 +770,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 						}
 					}
 				} else {
-					// XXX
-					// checkSourceFolder(sourceFolder, event, true);
+					checkSourceFolder(sourceFolder, event);
 				}
 			}
 
@@ -791,53 +790,43 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	 */
 	private void checkSourceFolder(IFolder folder, IResourceChangeEvent event)
 			throws CoreException {
-		IResourceDelta delta = event.getDelta().findMember(folder.getFullPath());
-		if (delta != null && (delta.getFlags() & IResourceDelta.CONTENT) != 0) {
-			if (delta.getKind() == IResourceDelta.CHANGED) {
-				if (checkAdded(folder, event) || checkMarkerChanges(folder, event)) {
-					buildRelevantChanges = true;
-				}
-			}
-		}
-	}
-
-	private boolean checkAdded(IFolder folder, IResourceChangeEvent event) throws CoreException {
-		for (IResource res : folder.members()) {
-			if (res instanceof IFolder) {
-				if (checkAdded((IFolder) res, event)) {
-					return true;
-				}
-			} else {
-				IResourceDelta delta = event.getDelta().findMember(
-						res.getFullPath());
-				if (delta != null) {
-					if (delta.getKind() == IResourceDelta.ADDED) {
-						return true;
+		if (!buildRelevantChanges) {
+			IResourceDelta delta = event.getDelta()
+					.findMember(folder.getFullPath());
+			if (delta != null) {
+				if (delta.getKind() != IResourceDelta.NO_CHANGE) {
+					if (checkSourceFolderChanges(folder, event)) {
+						buildRelevantChanges = true;
 					}
 				}
 			}
 		}
-		return false;
 	}
 
-	private boolean checkMarkerChanges(IFolder folder, IResourceChangeEvent event)
-			throws CoreException {
-		IResourceDelta d = event.getDelta().findMember(
-				folder.getFullPath());
-		if ((d.getFlags() & IResourceDelta.CONTENT) == 0) {
+	private boolean checkSourceFolderChanges(IFolder folder,
+			IResourceChangeEvent event) throws CoreException {
+		IResourceDelta d = event.getDelta().findMember(folder.getFullPath());
+		if (d != null && (d.getFlags() & IResourceDelta.MARKERS) != 0) {
 			return false;
 		}
-		
+
 		for (IResource res : folder.members()) {
 			if (res instanceof IFolder) {
-				if (!checkMarkerChanges((IFolder) res, event)) {
-					return false;
+				IResourceDelta d2 = event.getDelta().findMember(
+						res.getFullPath());
+				if (d2 != null) {
+					if (d2.getKind() != IResourceDelta.NO_CHANGE) {
+						return checkSourceFolderChanges((IFolder) res, event);
+					}
 				}
 			} else {
 				IResourceDelta delta = event.getDelta().findMember(
 						res.getFullPath());
 				if (delta != null) {
-					if ((delta.getFlags() & IResourceDelta.CONTENT) == 0) {
+					if ((delta.getFlags() & IResourceDelta.CONTENT) != 0
+							|| delta.getKind() == IResourceDelta.ADDED) {
+						return true;
+					} else {
 						return false;
 					}
 				}

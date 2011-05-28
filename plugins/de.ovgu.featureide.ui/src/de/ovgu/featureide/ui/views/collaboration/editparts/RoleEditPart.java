@@ -115,21 +115,20 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 			if (page != null) {
 				IContentType contentType = null;
 				try {
-					IContentDescription description = file.getContentDescription();
+					IContentDescription description = file
+							.getContentDescription();
 					if (description != null) {
 						contentType = description.getContentType();
 					}
 					IEditorDescriptor desc = null;
 					if (contentType != null) {
-						desc = PlatformUI.getWorkbench()
-								.getEditorRegistry()
+						desc = PlatformUI.getWorkbench().getEditorRegistry()
 								.getDefaultEditor(file.getName(), contentType);
 					} else {
-						PlatformUI.getWorkbench()
-						.getEditorRegistry()
-						.getDefaultEditor(file.getName());
+						desc = PlatformUI.getWorkbench().getEditorRegistry()
+								.getDefaultEditor(file.getName());
 					}
-					
+
 					if (desc != null) {
 						page.openEditor(new FileEditorInput(file), desc.getId());
 					} else {

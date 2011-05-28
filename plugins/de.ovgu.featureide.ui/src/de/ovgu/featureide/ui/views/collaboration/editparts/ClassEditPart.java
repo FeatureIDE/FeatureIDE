@@ -24,6 +24,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.content.IContentDescription;
+import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.geometry.Dimension;
@@ -36,7 +38,6 @@ import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 
@@ -151,22 +152,37 @@ public class ClassEditPart extends AbstractGraphicalEditPart {
 			 if (file == null)
 				 return;
 			 
-			 IWorkbenchWindow dw = UIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow();
-			 try {
-				 IWorkbenchPage page = dw.getActivePage();
-				 if (page != null) {
-					 IEditorDescriptor desc = PlatformUI.getWorkbench().
-				        	getEditorRegistry().getDefaultEditor(file.getName());
-					 if (desc != null) {
-						 page.openEditor(new FileEditorInput(file), desc.getId());
-					 } else {
-						 // case: there is no default editor for the file
-						 page.openEditor(new FileEditorInput(file),"org.eclipse.ui.DefaultTextEditor"); 
-					 }
-				 }
-			 } catch (PartInitException e) {
-				 UIPlugin.getDefault().logError(e);
-			 }
+			 IWorkbenchWindow dw = UIPlugin.getDefault().getWorkbench()
+				.getActiveWorkbenchWindow();
+		IWorkbenchPage page = dw.getActivePage();
+		if (page != null) {
+			IContentType contentType = null;
+			try {
+				IContentDescription description = file
+						.getContentDescription();
+				if (description != null) {
+					contentType = description.getContentType();
+				}
+				IEditorDescriptor desc = null;
+				if (contentType != null) {
+					desc = PlatformUI.getWorkbench().getEditorRegistry()
+							.getDefaultEditor(file.getName(), contentType);
+				} else {
+					desc = PlatformUI.getWorkbench().getEditorRegistry()
+							.getDefaultEditor(file.getName());
+				}
+
+				if (desc != null) {
+					page.openEditor(new FileEditorInput(file), desc.getId());
+				} else {
+					// case: there is no default editor for the file
+					page.openEditor(new FileEditorInput(file),
+							"org.eclipse.ui.DefaultTextEditor");
+				}
+			} catch (CoreException e) {
+				UIPlugin.getDefault().logError(e);
+			}
+		}
 	
 		}
 		super.performRequest(request);

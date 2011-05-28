@@ -123,7 +123,8 @@ public class FeatureHouseModelBuilder {
 	 */
 	private boolean canCompose() {
 		return featureProject.getComposer().extensions()
-				.contains("." + currentFile.getFileExtension());
+				.contains("." + currentFile.getFileExtension()) &&
+				currentFile.exists();
 	}
 
 	private void caseClassDeclaration(FSTNode node) {
