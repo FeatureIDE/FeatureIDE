@@ -53,51 +53,55 @@ import de.ovgu.featureide.ui.views.collaboration.policy.ClassXYLayoutPolicy;
  */
 public class ClassEditPart extends AbstractGraphicalEditPart {
 
-	public ClassEditPart(Class c){
+	public ClassEditPart(Class c) {
 		super();
 		setModel(c);
 	}
-	
-	public Class getClassModel(){
+
+	public Class getClassModel() {
 		return (Class) getModel();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.gef.editparts.AbstractGraphicalEditPart#createFigure()
 	 */
 	@Override
 	protected IFigure createFigure() {
-		
+
 		List<?> children = ((ModelEditPart) getParent()).getChildren();
 		int count = 0;
-		int height=0;
-		for (Object o : children){
-			if (o instanceof CollaborationEditPart){
+		int height = 0;
+		for (Object o : children) {
+			if (o instanceof CollaborationEditPart) {
 				count++;
-				height = ((CollaborationEditPart)o).getFigure().getSize().height+8;
+				height = ((CollaborationEditPart) o).getFigure().getSize().height + 8;
 			}
 		}
-		Figure fig = new ClassFigure(getClassModel(),height * (count) - 8);
+		Figure fig = new ClassFigure(getClassModel(), height * (count) - 8);
 		return fig;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.gef.editparts.AbstractEditPart#createEditPolicies()
 	 */
 	@Override
 	protected void createEditPolicies() {
 		installEditPolicy(EditPolicy.LAYOUT_ROLE, new ClassXYLayoutPolicy());
 	}
-	
+
 	@Override
-	protected List<?> getModelChildren(){		
-		
+	protected List<?> getModelChildren() {
+
 		Class c = getClassModel();
 		List<?> list = c.getRoles();
 		return list;
-		
+
 	}
-	
+
 	protected void refreshVisuals() {
 		ClassFigure classFigure = (ClassFigure) getFigure();
 		Point location = classFigure.getBounds().getLocation();
@@ -106,101 +110,114 @@ public class ClassEditPart extends AbstractGraphicalEditPart {
 		ModelEditPart modelEditPart = (ModelEditPart) getParent();
 		List<?> children = modelEditPart.getChildren();
 		int width = 0;
-		for (Object o : children){
-			if (o instanceof CollaborationEditPart){
-				int newWidth = ((CollaborationEditPart) o).getFigure().getSize().width;
-				width = (width> newWidth)? width : newWidth; 
+		for (Object o : children) {
+			if (o instanceof CollaborationEditPart) {
+				int newWidth = ((CollaborationEditPart) o).getFigure()
+						.getSize().width;
+				width = (width > newWidth) ? width : newWidth;
 			}
 		}
-		if (children.contains(this)){
+		if (children.contains(this)) {
 			int i = children.indexOf(this);
-			EditPart part = (EditPart) children.get(i-1);
-			if (part instanceof CollaborationEditPart){
-				Point location2 = ((CollaborationEditPart) part).getFigure().getBounds().getLocation();
-				Point newLocation = new Point(location2.x + width + 10,location.y);
+			EditPart part = (EditPart) children.get(i - 1);
+			if (part instanceof CollaborationEditPart) {
+				Point location2 = ((CollaborationEditPart) part).getFigure()
+						.getBounds().getLocation();
+				Point newLocation = new Point(location2.x + width + 10,
+						location.y);
 				constraint = new Rectangle(newLocation, size);
 			}
-			if (part instanceof ClassEditPart){
-				Dimension size2 = ((ClassEditPart) part).getFigure().getBounds().getSize();
-				Point location2 = ((ClassEditPart) part).getFigure().getBounds().getLocation();
-				Point newLocation = new Point(location2.x + size2.width + 5,location2.y);
+			if (part instanceof ClassEditPart) {
+				Dimension size2 = ((ClassEditPart) part).getFigure()
+						.getBounds().getSize();
+				Point location2 = ((ClassEditPart) part).getFigure()
+						.getBounds().getLocation();
+				Point newLocation = new Point(location2.x + size2.width + 5,
+						location2.y);
 				constraint = new Rectangle(newLocation, size);
 			}
-		
+
 		}
-	
+
 		modelEditPart.setLayoutConstraint(this, classFigure, constraint);
 		classFigure.setBounds(constraint);
-	}	
-	
+	}
+
 	/**
 	 * Opens the composed file for this class.
 	 */
 	public void performRequest(Request request) {
 		if (REQ_OPEN.equals(request.getType())) {
-			 String fileName = this.getClassModel().getName();
-			 if (fileName.contains("*"))
-				 return;
-			
-			 IFile file = this.getClassModel().project.getBuildFolder().getFile(fileName);
-			 try {
-				 if (!file.exists())
-					 file = getBuildFile(fileName, this.getClassModel().project.getBuildFolder());
-			 } catch (CoreException e) {
-				 UIPlugin.getDefault().logError(e);
-			 }
-			 if (file == null)
-				 return;
-			 
-			 IWorkbenchWindow dw = UIPlugin.getDefault().getWorkbench()
-				.getActiveWorkbenchWindow();
-		IWorkbenchPage page = dw.getActivePage();
-		if (page != null) {
-			IContentType contentType = null;
-			try {
-				IContentDescription description = file
-						.getContentDescription();
-				if (description != null) {
-					contentType = description.getContentType();
-				}
-				IEditorDescriptor desc = null;
-				if (contentType != null) {
-					desc = PlatformUI.getWorkbench().getEditorRegistry()
-							.getDefaultEditor(file.getName(), contentType);
-				} else {
-					desc = PlatformUI.getWorkbench().getEditorRegistry()
-							.getDefaultEditor(file.getName());
-				}
+			String fileName = this.getClassModel().getName();
+			if (fileName.contains("*"))
+				return;
 
-				if (desc != null) {
-					page.openEditor(new FileEditorInput(file), desc.getId());
-				} else {
-					// case: there is no default editor for the file
-					page.openEditor(new FileEditorInput(file),
-							"org.eclipse.ui.DefaultTextEditor");
-				}
+			IFile file = this.getClassModel().project.getBuildFolder().getFile(
+					fileName);
+			try {
+				if (!file.exists())
+					file = getBuildFile(fileName,
+							this.getClassModel().project.getBuildFolder());
 			} catch (CoreException e) {
 				UIPlugin.getDefault().logError(e);
 			}
-		}
-	
+			if (file == null)
+				return;
+			try {
+				file.refreshLocal(IResource.DEPTH_ZERO, null);
+			} catch (CoreException e) {
+				UIPlugin.getDefault().logError(e);
+			}
+			IWorkbenchWindow dw = UIPlugin.getDefault().getWorkbench()
+					.getActiveWorkbenchWindow();
+			IWorkbenchPage page = dw.getActivePage();
+			if (page != null) {
+				IContentType contentType = null;
+				try {
+					IContentDescription description = file
+							.getContentDescription();
+					if (description != null) {
+						contentType = description.getContentType();
+					}
+					IEditorDescriptor desc = null;
+					if (contentType != null) {
+						desc = PlatformUI.getWorkbench().getEditorRegistry()
+								.getDefaultEditor(file.getName(), contentType);
+					} else {
+						desc = PlatformUI.getWorkbench().getEditorRegistry()
+								.getDefaultEditor(file.getName());
+					}
+
+					if (desc != null) {
+						page.openEditor(new FileEditorInput(file), desc.getId());
+					} else {
+						// case: there is no default editor for the file
+						page.openEditor(new FileEditorInput(file),
+								"org.eclipse.ui.DefaultTextEditor");
+					}
+				} catch (CoreException e) {
+					UIPlugin.getDefault().logError(e);
+				}
+			}
+
 		}
 		super.performRequest(request);
 	}
-	
-	public IFile getBuildFile(String fileName ,IFolder buildFoloder) throws CoreException {
+
+	public IFile getBuildFile(String fileName, IFolder buildFoloder)
+			throws CoreException {
 		IFile file;
 		for (IResource res : buildFoloder.members()) {
 			if (res instanceof IFolder) {
-				file = getBuildFile(fileName, (IFolder)res);
+				file = getBuildFile(fileName, (IFolder) res);
 				if (file != null)
 					return file;
 			}
 			if (res instanceof IFile) {
 				if (res.getName().equals(fileName))
-					return (IFile)res;
+					return (IFile) res;
 			}
 		}
-		return  null;
+		return null;
 	}
 }

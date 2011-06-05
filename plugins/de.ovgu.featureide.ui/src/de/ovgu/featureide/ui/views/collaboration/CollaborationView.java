@@ -281,6 +281,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 						if (!toolbarAction.isEnabled())
 							return Status.OK_STATUS;
 						toolbarAction.setEnabled(false);
+						builded = true;
 						updateGuiAfterBuild(featureProject);
 						return Status.OK_STATUS;
 					}
@@ -291,6 +292,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		};
 	}
 	
+	private boolean builded = true; 
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.core.listeners.ICurrentBuildListener#updateGuiAfterBuild(de.ovgu.featureide.core.IFeatureProject)
 	 */
@@ -298,25 +300,29 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		if (featureProject != null && featureProject.equals(project)) {
 			Job job = new Job("buildCollaborationModel") {
 				public IStatus run(IProgressMonitor monitor) {
-					model = builder.buildCollaborationModel(project);
-					if (model == null) {
-						toolbarAction.setEnabled(true);
-						return Status.OK_STATUS;
-					}
-					
-					UIJob uiJob = new UIJob("updateCollaborationView") {
-						public IStatus runInUIThread(IProgressMonitor monitor) {
-							viewer.setContents(model);		
-							EditPart part = viewer.getContents();
-							if (part != null) {
-								part.refresh();
-							}
+					if (builded) {
+						builded = false;
+						model = builder.buildCollaborationModel(project);
+						builded = true;
+						if (model == null) {
 							toolbarAction.setEnabled(true);
-							return Status.OK_STATUS;
+						return Status.OK_STATUS;
 						}
-					};
-					uiJob.setPriority(Job.DECORATE);
-					uiJob.schedule();
+					
+						UIJob uiJob = new UIJob("updateCollaborationView") {
+							public IStatus runInUIThread(IProgressMonitor monitor) {
+								viewer.setContents(model);		
+								EditPart part = viewer.getContents();
+								if (part != null) {
+									part.refresh();
+								}
+								toolbarAction.setEnabled(true);
+								return Status.OK_STATUS;
+							}
+						};
+						uiJob.setPriority(Job.DECORATE);
+						uiJob.schedule();
+					}
 					return Status.OK_STATUS;
 				}
 			};

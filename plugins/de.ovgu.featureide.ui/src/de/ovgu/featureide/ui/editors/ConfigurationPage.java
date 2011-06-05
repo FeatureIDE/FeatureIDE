@@ -79,6 +79,9 @@ public class ConfigurationPage extends ConfigurationEditorPage {
 	 */
 	private boolean returnFormThread = false;
 	private Job job_color;
+	public void cancelColorJob() {
+		returnFormThread = true;
+	}
 	
 	private boolean selectionChanged = true;
 	
@@ -226,11 +229,14 @@ public class ConfigurationPage extends ConfigurationEditorPage {
 	 */
 	private void setColor() {
 		returnFormThread = false;
-		job_color = new Job("Feature coloring.") {
+		job_color = new Job("Feature coloring.(" + configurationEditor.file.getName() + ")") {
 			public IStatus run(IProgressMonitor monitor) {
 				if (features != null && features.size() != 0 && !features.isEmpty()) {
+					monitor.beginTask("", features.size());
 					for (SelectableFeature feature : features) {
-						if (returnFormThread) {
+						monitor.subTask("Check feature " + feature.getName());
+						if (returnFormThread || monitor.isCanceled()) {
+							monitor.done();
 							return Status.OK_STATUS;
 						}
 						if (feature.getManual() == Selection.SELECTED) {
@@ -246,8 +252,10 @@ public class ConfigurationPage extends ConfigurationEditorPage {
 								}
 							}
 						}
+						monitor.worked(1);
 					}
 				}
+				monitor.done();
 				return Status.OK_STATUS;
 			}
 		};

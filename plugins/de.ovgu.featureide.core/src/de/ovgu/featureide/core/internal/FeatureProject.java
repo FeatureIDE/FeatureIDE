@@ -893,6 +893,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 
 		Job job = new Job("Checking configurations") {
 			protected IStatus run(IProgressMonitor monitor) {
+				monitor.beginTask("", files.size());
 				Configuration config = new Configuration(featureModel, true);
 				// Configuration autoConfig = new Configuration(featureModel,
 				// true);
@@ -900,10 +901,13 @@ public class FeatureProject extends BuilderMarkerHandler implements
 				// ConfigurationReader autoReader = new ConfigurationReader(
 				// autoConfig);
 				try {
-					for (IFile file : files)
+					monitor.subTask("Delete Configuration Markers");
+					for (IFile file : files) {
 						deleteConfigurationMarkers(file, IResource.DEPTH_ZERO);
+					}
 					// check validity
 					for (IFile file : files) {
+						monitor.subTask("Check validity of " + file.getName());
 						reader.readFromFile(file);
 						if (!config.valid()) {
 							String name = file.getName();
@@ -924,12 +928,14 @@ public class FeatureProject extends BuilderMarkerHandler implements
 							createConfigurationMarker(file, message, line,
 									IMarker.SEVERITY_WARNING);
 						}
+						monitor.worked(1);
 					}
 				} catch (OutOfMemoryError e) {
 					FMCorePlugin.getDefault().logError(e);
 				} catch (Exception e) {
 					CorePlugin.getDefault().logError(e);
 				}
+				monitor.done();
 				return Status.OK_STATUS;
 			}
 		};

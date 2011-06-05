@@ -118,6 +118,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements
 
 		@Override
 		public void partClosed(IWorkbenchPart part) {
+			configurationPage.cancelColorJob();
 			if (featureModel != null)
 				featureModel.removeListener(ConfigurationEditor.this);
 		}
