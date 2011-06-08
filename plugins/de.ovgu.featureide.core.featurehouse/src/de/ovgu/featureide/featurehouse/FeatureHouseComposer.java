@@ -29,6 +29,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 
 import cide.gparser.ParseException;
@@ -313,6 +314,10 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	
 	@Override
 	public void buildFSTModel() {
-		performFullBuild(featureProject.getCurrentConfiguration());
+		try {
+			featureProject.getProject().build(IncrementalProjectBuilder.FULL_BUILD, null);
+		} catch (CoreException e) {
+			FeatureHouseCorePlugin.getDefault().logError(e);
+		}
 	}
 }

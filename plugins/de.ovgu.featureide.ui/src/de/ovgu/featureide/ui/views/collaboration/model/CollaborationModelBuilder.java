@@ -325,7 +325,7 @@ public class CollaborationModelBuilder {
 						name = "*" + name;
 						role = new Role(name);
 					}
-					
+					role.file = (IFile)res;
 					role.setPath(res.getFullPath());
 					for (Role modelRole : model.roles) {
 						if (modelRole.featureName.equals(featureName)

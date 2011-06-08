@@ -25,6 +25,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.CorePlugin;
@@ -144,7 +145,17 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 
 	@Override
 	public void buildFSTModel() {
-		featureCppModelBuilder.resetModel();
-		featureCppModelBuilder.buildModel();
+		try {
+			if (featureProject != null && featureProject.getProject() != null) {
+				featureProject.getProject().build(IncrementalProjectBuilder.FULL_BUILD, null);
+			} else {
+				featureCppModelBuilder.resetModel();
+				featureCppModelBuilder.buildModel();
+			}
+			
+		} catch (CoreException e) {
+			FeatureCppCorePlugin.getDefault().logError(e);
+		}
+		
 	}
 }

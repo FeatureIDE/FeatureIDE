@@ -62,11 +62,6 @@ public class FeatureDeleteOperation extends AbstractOperation {
 	@Override
 	public IStatus execute(IProgressMonitor arg0, IAdaptable arg1)
 			throws ExecutionException {
-		oldParent = feature.getParent();
-		if (oldParent != null)
-			oldIndex = oldParent.getChildIndex(feature);
-		oldChildren = new LinkedList<Feature>();
-		oldChildren.addAll(feature.getChildren());
 		return redo(arg0, arg1);
 	}
 
@@ -80,30 +75,35 @@ public class FeatureDeleteOperation extends AbstractOperation {
 	@Override
 	public IStatus redo(IProgressMonitor arg0, IAdaptable arg1)
 			throws ExecutionException {
-
 		feature = featureModel.getFeature(feature.getName());
-		oldParent = featureModel.getFeature(oldParent.getName());
+		oldParent = feature.getParent();
+		if (oldParent != null) {
+			oldIndex = oldParent.getChildIndex(feature);
+		}
+		oldChildren = new LinkedList<Feature>();
+		oldChildren.addAll(feature.getChildren());
+
+		if (oldParent != null) {
+			oldParent = featureModel.getFeature(oldParent.getName());
+		}
 		LinkedList<Feature> oldChildrenCopy = new LinkedList<Feature>();
 
 		for (Feature f : oldChildren) {
 			if (!f.getName().equals(feature.getName())) {
-				Feature oldch = featureModel.getFeature(f.getName());
-
-				oldChildrenCopy.add(oldch);
+				Feature oldChild = featureModel.getFeature(f.getName());
+				oldChildrenCopy.add(oldChild);
 			}
 		}
+		
 		oldChildren = oldChildrenCopy;
 		feature = featureModel.getFeature(feature.getName());
 		if (feature == featureModel.getRoot()) {
 			featureModel.replaceRoot(featureModel.getRoot().removeLastChild());
 			deleted = true;
-
 		} else {
-
 			deleted = featureModel.deleteFeature(feature);
 		}
 		featureModel.handleModelDataLoaded();
-
 		return Status.OK_STATUS;
 	}
 
@@ -117,36 +117,47 @@ public class FeatureDeleteOperation extends AbstractOperation {
 	@Override
 	public IStatus undo(IProgressMonitor arg0, IAdaptable arg1)
 			throws ExecutionException {
-		try{
-		if (!deleted)
-			return Status.OK_STATUS;
-		oldParent = featureModel.getFeature(oldParent.getName());
-		LinkedList<Feature> oldChildrenCopy = new LinkedList<Feature>();
-
-		for (Feature f : oldChildren) {
-			if (!f.getName().equals(feature.getName())) {
-				Feature child = featureModel.getFeature(f.getName());
-				child.getParent().removeChild(child);
-				oldChildrenCopy.add(child);
+		try {
+			if (!deleted)
+				return Status.OK_STATUS;
+			if (oldParent != null) {
+				oldParent = featureModel.getFeature(oldParent.getName());
 			}
-		}
-		oldChildren = oldChildrenCopy;
+			LinkedList<Feature> oldChildrenCopy = new LinkedList<Feature>();
 
-		feature.setChildren(oldChildren);
-		oldParent.addChildAtPosition(oldIndex, feature);
-		featureModel.addFeature(feature);
-		featureModel.handleModelDataLoaded();
-		}catch(Exception e){
+			for (Feature f : oldChildren) {
+				if (!f.getName().equals(feature.getName())) {
+					Feature child = featureModel.getFeature(f.getName());
+					if (child != null && child.getParent() != null) {
+						child.getParent().removeChild(child);
+					}
+					oldChildrenCopy.add(child);
+				}
+			}
+			
+			oldChildren = oldChildrenCopy;
+
+			feature.setChildren(oldChildren);
+			if (oldParent != null) {
+				oldParent.addChildAtPosition(oldIndex, feature);
+			} else {
+				featureModel.setRoot(feature);
+			}
+			featureModel.addFeature(feature);
+			featureModel.handleModelDataLoaded();
+			featureModel.redrawDiagram();
+		} catch (Exception e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
-	
+
 		return Status.OK_STATUS;
-		
+
 	}
 
 	@Override
 	public boolean canUndo() {
-		if (featureModel.getFeature(oldParent.getName()) != null) {
+		if (oldParent == null
+				|| featureModel.getFeature(oldParent.getName()) != null) {
 			return true;
 		}
 		return false;

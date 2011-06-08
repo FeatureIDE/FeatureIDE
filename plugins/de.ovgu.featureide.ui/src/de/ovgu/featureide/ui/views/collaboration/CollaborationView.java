@@ -276,12 +276,13 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	private void makeActions() {
 		toolbarAction = new Action() {
 			public void run() {
-				Job job = new Job("toolbarAction") {
+				Job job = new Job("Refresh Collaboration View") {
 					protected IStatus run(IProgressMonitor monitor) {
 						if (!toolbarAction.isEnabled())
 							return Status.OK_STATUS;
 						toolbarAction.setEnabled(false);
 						builded = true;
+						featureProject.getComposer().buildFSTModel();
 						updateGuiAfterBuild(featureProject);
 						return Status.OK_STATUS;
 					}
@@ -298,7 +299,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	 */
 	public void updateGuiAfterBuild(final IFeatureProject project) {
 		if (featureProject != null && featureProject.equals(project)) {
-			Job job = new Job("buildCollaborationModel") {
+			Job job = new Job("Build Collaboration Model") {
 				public IStatus run(IProgressMonitor monitor) {
 					if (builded) {
 						builded = false;
@@ -309,7 +310,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 						return Status.OK_STATUS;
 						}
 					
-						UIJob uiJob = new UIJob("updateCollaborationView") {
+						UIJob uiJob = new UIJob("Update Collaboration View") {
 							public IStatus runInUIThread(IProgressMonitor monitor) {
 								viewer.setContents(model);		
 								EditPart part = viewer.getContents();

@@ -379,7 +379,6 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 		Feature feat = null;
 		if (parent.equals("root")) {
 			feat = featureModel.getFeature(featureName);
-			feat.setMandatory(true);
 			feat.setAbstract(isAbstract);
 		} else {
 			feat = new Feature(featureModel, featureName);
