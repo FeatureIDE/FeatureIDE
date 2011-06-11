@@ -210,12 +210,14 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		RotatableDecoration sourceDecoration = new LegendRelationDecoration(
 				fill, p1);
 		PolylineConnection line = new PolylineConnection();
+		line.setForegroundColor(CONNECTION_FOREGROUND);
 
 		line.setEndpoints(p2, p3);
 
 		if (decoration)
 			line.setSourceDecoration(sourceDecoration);
 		PolylineConnection line2 = new PolylineConnection();
+		line2.setForegroundColor(CONNECTION_FOREGROUND);
 
 		line2.setEndpoints(p2, p1);
 		this.add(line);
