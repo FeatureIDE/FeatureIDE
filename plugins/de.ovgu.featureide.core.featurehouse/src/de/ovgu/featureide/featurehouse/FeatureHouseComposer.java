@@ -27,6 +27,7 @@ import java.util.Scanner;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
@@ -38,6 +39,7 @@ import composer.FSTGenComposer;
 import composer.IParseErrorListener;
 
 import de.ovgu.cide.fstgen.ast.AbstractFSTParser;
+import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.featurehouse.model.FeatureHouseModelBuilder;
@@ -53,15 +55,29 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	private static final String EXCLUDE_ENTRY = "\t<classpathentry excluding=\"";
 	private static final String EXCLUDE_SOURCE_ENTRY = "\" kind=\"src\" path=\"";
 
+	private FSTGenComposer composer;
+	
 	public FeatureHouseModelBuilder fhModelBuilder;
 	
+	private static final String BUILDER_PROBLEM_MARKER = CorePlugin.PLUGIN_ID
+			+ ".builderProblemMarker";
+	
 	private IParseErrorListener listener = new IParseErrorListener() {
-		
+
 		@Override
 		public void parseErrorOccured(ParseException arg) {
-			FeatureHouseCorePlugin.getDefault().logError("FeatureHouse composer error: " + arg.getMessage(), null);
-			// TODO #287 add composer errors to source files
+			try {
+				IFile iFile = featureProject.getProject().getWorkspace()
+						.getRoot().findFilesForLocationURI(composer.getErrorFiles().getLast().toURI())[0];
+				IMarker marker = iFile.createMarker(BUILDER_PROBLEM_MARKER);
+				marker.setAttribute(IMarker.LINE_NUMBER, arg.currentToken.next.endLine);
+				marker.setAttribute(IMarker.MESSAGE, arg.getMessage());
+				marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
+			} catch (CoreException e) {
+				FeatureHouseCorePlugin.getDefault().logError(e);
+			}
 		}
+		
 	};
 	
 	/* (non-Javadoc)
@@ -98,7 +114,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 		setJaveBuildPath(config.getName().split("[.]")[0]);
 
-		FSTGenComposer composer = new FSTGenComposer();
+		composer = new FSTGenComposer();
 		composer.addParseErrorListener(listener);
 		composer.run(new String[]{			
 				"--expression", configPath, 
