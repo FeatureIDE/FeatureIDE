@@ -313,7 +313,6 @@ public class CorePlugin extends AbstractCorePlugin {
 								// create a configuration to automaticly build
 								// the project after adding the FeatureIDE
 								// nature
-								// TODO do not use strings wherever needed, define them only once!
 								IFile configFile = project.getFolder(
 										configPath).getFile(project.getName().split("[-]")[0] + 
 										getDefault().getConfigurationExtensions().getFirst());
@@ -448,7 +447,7 @@ public class CorePlugin extends AbstractCorePlugin {
 		createFolder(project, configPath);
 		createFolder(project, buildPath);
 		FeatureModel featureModel = new FeatureModel();
-		featureModel.createDefaultValues();
+		featureModel.createDefaultValues(project.getName());
 		try {
 			new XmlFeatureModelWriter(featureModel).writeToFile(project
 					.getFile("model.xml"));

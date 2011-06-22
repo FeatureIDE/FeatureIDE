@@ -459,8 +459,8 @@ public class FeatureModel implements PropertyConstants {
 		return layerNames;
 	}
 
-	public void createDefaultValues() {
-		Feature root = getFeature("Root");
+	public void createDefaultValues(String projectName) {
+		Feature root = getFeature(projectName);
 		root.setAbstract(true);
 		Feature feature = new Feature(this, "Base");
 		root.addChild(feature);
