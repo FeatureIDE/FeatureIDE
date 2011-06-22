@@ -282,7 +282,10 @@ public class ModelComparator {
 		return implies;
 	}
 
-	public boolean isImplied() {
+	public boolean isImplied() {		
+		if (isImplied == null) {
+			FMCorePlugin.getDefault().reportBug(278);
+		}
 		return isImplied;
 	}
 

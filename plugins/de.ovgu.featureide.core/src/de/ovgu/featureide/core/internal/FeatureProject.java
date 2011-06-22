@@ -918,8 +918,6 @@ public class FeatureProject extends BuilderMarkerHandler implements
 									IMarker.SEVERITY_ERROR);
 
 						}
-						// TODO check if we still get an error with the
-						// following code
 						// create warnings (e.g., for features that are not
 						// available anymore)
 						for (int i = 0; i < reader.getWarnings().size(); i++) {

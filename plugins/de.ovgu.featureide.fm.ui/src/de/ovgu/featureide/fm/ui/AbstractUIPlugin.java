@@ -156,5 +156,9 @@ abstract public class AbstractUIPlugin extends org.eclipse.ui.plugin.AbstractUIP
 		if (isDebugging())
 			getLog().log(new Status(severity, getID(), message, exception));
 	}
+	
+	public void reportBug(int ticket) {
+		logWarning("This is a bug. Please report it. See Ticket #" + ticket + ".");
+	}
 
 }

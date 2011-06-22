@@ -96,7 +96,7 @@ public class ExampleCalculator {
 			if (bSatisfiable.isEmpty() && !findSatisfiable(true))
 				return null;
 			Node child = bChildren[bSatisfiable.removeFirst()];
-			exampleSolver = new SatSolver(new And(a, new Not(child.clone())), 1000);
+			exampleSolver = new SatSolver(new And(a, new Not(child.clone())), timeout);
 		}
 		String solution = exampleSolver.getSolution();
 		if (solution.equals(lastSolution)) {
