@@ -48,7 +48,7 @@ public class JakConfiguration extends SourceViewerConfiguration {
 	class SingleTokenScanner extends BufferedRuleBasedScanner {
         public SingleTokenScanner(TextAttribute attribute) {
             setDefaultReturnToken(new Token(attribute));
-        }        
+        }
     }
 	
 	

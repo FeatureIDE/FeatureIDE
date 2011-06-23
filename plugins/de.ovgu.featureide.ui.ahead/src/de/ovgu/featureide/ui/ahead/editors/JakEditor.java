@@ -19,6 +19,7 @@
 package de.ovgu.featureide.ui.ahead.editors;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IFileEditorInput;
@@ -47,6 +48,8 @@ public class JakEditor extends TextEditor {
 	
 	private JakOutlinePage outlinePage;
 
+private IFeatureProject featureProject;
+
 	public JakEditor() {
 		super();
 		setSourceViewerConfiguration(new JakConfiguration());
@@ -59,8 +62,7 @@ public class JakEditor extends TextEditor {
 		super.init(site, input);
 		if (input instanceof IFileEditorInput) {
 			IFile file = ((IFileEditorInput) input).getFile();
-			IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
-
+			featureProject = CorePlugin.getFeatureProject(file);
 			// check that the project is a FeatureIDE project and registered
 			if (featureProject == null)
 				return;
@@ -93,9 +95,19 @@ public class JakEditor extends TextEditor {
 	public void setFocus(){
 		if (outlinePage!=null){
 			outlinePage.setInput(getEditorInput());
-			outlinePage.update();
 		}
 		super.setFocus();
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#doSave(org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	@Override
+	public void doSave(IProgressMonitor progressMonitor) {
+		super.doSave(progressMonitor);
+		featureProject.getComposer().initialize(featureProject);
+		featureProject.getComposer().buildFSTModel();
+		setFocus();
 	}
 	
 }

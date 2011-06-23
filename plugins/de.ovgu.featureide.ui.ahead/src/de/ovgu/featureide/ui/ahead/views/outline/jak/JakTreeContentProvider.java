@@ -83,12 +83,15 @@ public class JakTreeContentProvider implements ITreeContentProvider {
 			feature = path.segment(path.segmentCount()-2);
 			
 			errMessage = new String[] {
-				"No data to display available.",
-				"Please choose a configuration",
-				"where feature " +feature,
-				"is selected and build this",
-				"configuration." 
+				"No data to display available."
 			};
+		}
+
+		jakProject = featureProject.getFSTModel();
+		if (jakProject == null) {
+			featureProject.getComposer().initialize(featureProject);
+			featureProject.getComposer().buildFSTModel();
+			jakProject = featureProject.getFSTModel();
 		}
 		if (jakProject != null) {
 			FSTClass c = jakProject.getClass(jakfile);

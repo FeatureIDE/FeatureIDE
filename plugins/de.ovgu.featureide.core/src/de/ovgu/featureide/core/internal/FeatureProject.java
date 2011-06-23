@@ -651,10 +651,12 @@ public class FeatureProject extends BuilderMarkerHandler implements
 					}
 					// set marker for each folder
 					if (sourceFolder.exists()) {
+						monitor.beginTask("", sourceFolder.members().length);
 						for (IResource res : sourceFolder.members()) {
 							if (res instanceof IFolder)
 								setFeatureModuleMarker(featureModel,
 										(IFolder) res);
+							monitor.worked(1);
 						}
 					}
 				} catch (CoreException e) {
