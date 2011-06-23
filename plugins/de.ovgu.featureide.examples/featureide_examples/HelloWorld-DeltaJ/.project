@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
 	<name>HelloWorld-DeltaJ</name>
-	<comment></comment>
+	<comment>
+	[description]
+	This is a simple hello world application for DeltaJ.
+	[/description]
+	</comment>
 	<projects>
 	</projects>
 	<buildSpec>

@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
 	<name>HelloWorld-FH-AspectJ</name>
-	<comment></comment>
+	<comment>
+	[description]
+	This is a simple hello world application for AspectJ.
+	[/description]	
+	</comment>
 	<projects>
 	</projects>
 	<buildSpec>

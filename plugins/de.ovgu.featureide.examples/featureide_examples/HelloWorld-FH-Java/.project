@@ -3,6 +3,9 @@
 	<name>HelloWorld-FH-Java</name>
 	<comment></comment>
 	<projects>
+	[description]
+	This is a simple hello world application for FeatureHouse(Java).
+	[/description]
 	</projects>
 	<buildSpec>
 		<buildCommand>

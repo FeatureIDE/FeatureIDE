@@ -47,6 +47,10 @@ public class ClassBuilder {
 		if (file.getFileExtension().equals("java")) {
 			return new JavaClassBuilder(builder);
 		}
+		if (file.getFileExtension().equals("h") || 
+				file.getFileExtension().equals("c")) {
+			return new CClassBuilder(builder);
+		}
 		// TODO#271 implement class builder for all FeatureHouse languages
 		return new ClassBuilder(builder);
 	}

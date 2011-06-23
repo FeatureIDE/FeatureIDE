@@ -43,10 +43,21 @@ public class FeatureHouseModelBuilder {
 
 	private static final String NODE_TYPE_FEATURE = "Feature";
 	private static final String NODE_TYPE_CLASS = "EOF Marker";
+
+	// Java specific node types
 	private static final String NODE_TYPE_CLASS_DECLARATION = "ClassDeclaration";
 	private static final String NODE_TYPE_FIELD = "FieldDecl";
 	private static final String NODE_TYPE_METHOD = "MethodDecl";
 	private static final String NODE_TYPE_CONSTRUCTOR = "ConstructorDecl";
+	
+	// C specific node types
+	private static final String NODE_TYPE_SEQUENCE_CODEUNIT_TOPLEVEL = "Sequence_CodeUnit_TopLevel";
+	private static final String NODE_TYPE_FUNC = "Func";
+//	private static final String NODE_TYPE_ID = "Id";
+	private static final String NODE_TYPE_STATEMENT = "Statement";
+	private static final String NODE_TYPE_STRUCTDEC = "StructDec";
+//	private static final Object NODE_TYPE_TYPEDEF = "TypeDef_";
+	private static final String NODE_TYPE_STMTL = "StmtTL";
 
 	private FSTModel model;
 
@@ -89,9 +100,10 @@ public class FeatureHouseModelBuilder {
 				caseAddClass(node);
 			} else if (node.getType().equals(NODE_TYPE_CLASS_DECLARATION)) {
 				caseClassDeclaration(node);
+			} else if (node.getType().equals(NODE_TYPE_SEQUENCE_CODEUNIT_TOPLEVEL)) {
+				caseClassDeclaration(node);
 			}
 		}
-		System.out.println();
 	}
 	
 	private void caseAddFeature(FSTNode node) {
@@ -118,9 +130,6 @@ public class FeatureHouseModelBuilder {
 		currentFeature.classes.put(className, currentClass);
 	}
 
-	/**
-	 * @return
-	 */
 	private boolean canCompose() {
 		return featureProject.getComposer().extensions()
 				.contains("." + currentFile.getFileExtension()) &&
@@ -132,25 +141,34 @@ public class FeatureHouseModelBuilder {
 			for (FSTNode child : ((FSTNonTerminal) node).getChildren()) {
 				if (child instanceof FSTTerminal) {
 					FSTTerminal terminal = (FSTTerminal) child;
-					if (terminal.getType().equals(FeatureHouseModelBuilder.NODE_TYPE_FIELD)) {
+					if (terminal.getType().equals(NODE_TYPE_FIELD)) {
 						ClassBuilder.getClassBuilder(currentFile, this)
 								.caseFieldDeclaration(terminal);
-					} else if (terminal.getType().equals(FeatureHouseModelBuilder.NODE_TYPE_METHOD)) {
+					} else if (terminal.getType().equals(NODE_TYPE_METHOD)) {
 						ClassBuilder.getClassBuilder(currentFile, this)
 								.caseMethodDeclaration(terminal);
-					} else if (terminal.getType().equals(FeatureHouseModelBuilder.NODE_TYPE_CONSTRUCTOR)) {
+					} else if (terminal.getType().equals(NODE_TYPE_CONSTRUCTOR)) {
 						ClassBuilder.getClassBuilder(currentFile, this)
 								.caseConstructorDeclaration(terminal);
+					} else if (terminal.getType().equals(NODE_TYPE_FUNC)) {
+						ClassBuilder.getClassBuilder(currentFile, this)
+							.caseMethodDeclaration(terminal);
+					} else if (terminal.getType().equals(NODE_TYPE_STATEMENT)) {
+						ClassBuilder.getClassBuilder(currentFile, this)
+							.caseFieldDeclaration(terminal);
+					} else if (terminal.getType().equals(NODE_TYPE_STMTL)) {
+						ClassBuilder.getClassBuilder(currentFile, this)
+							.caseFieldDeclaration(terminal);
+					}
+				} else if (child instanceof FSTNonTerminal) {
+					 if (child.getType().equals(NODE_TYPE_STRUCTDEC)) {
+						 caseClassDeclaration(child);
 					}
 				}
 			}
 		}
 	}
 
-	/**
-	 * @param name
-	 * @return
-	 */
 	private IFile getFile(String name) {
 		String projectName = featureProject.getProjectName();
 		name = name.substring(name.indexOf(projectName) + projectName.length() + 1);
