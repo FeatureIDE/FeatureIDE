@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+
 public class TCClassBuilder {
 	private CClassBuilder builder = new CClassBuilder(null);
 	

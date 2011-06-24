@@ -51,6 +51,9 @@ public class ClassBuilder {
 				file.getFileExtension().equals("c")) {
 			return new CClassBuilder(builder);
 		}
+		if (file.getFileExtension().equals("cs")) {
+			return new CSClassBuilder(builder);
+		}
 		// TODO#271 implement class builder for all FeatureHouse languages
 		return new ClassBuilder(builder);
 	}

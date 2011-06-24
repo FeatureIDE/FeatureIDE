@@ -58,6 +58,13 @@ public class FeatureHouseModelBuilder {
 	private static final String NODE_TYPE_STRUCTDEC = "StructDec";
 //	private static final Object NODE_TYPE_TYPEDEF = "TypeDef_";
 	private static final String NODE_TYPE_STMTL = "StmtTL";
+	
+	// C# specific node types
+	private static final String NODE_TYPE_CLASS_MEMBER_DECLARATION = "class_member_declaration";
+	private static final String NODE_TYPE_CLAASS_MEMBER_DECLARATION_END6 = "class_member_declarationEnd6";
+	private static final String COMPOSITON_METHOD = "CSharpMethodOverriding";
+	private static final String COMPOSITION_FIELD = "FieldOverriding";
+	private static final Object COMPOSITION_CONSTRUCTOR = "ConstructorConcatenation";
 
 	private FSTModel model;
 
@@ -101,6 +108,8 @@ public class FeatureHouseModelBuilder {
 			} else if (node.getType().equals(NODE_TYPE_CLASS_DECLARATION)) {
 				caseClassDeclaration(node);
 			} else if (node.getType().equals(NODE_TYPE_SEQUENCE_CODEUNIT_TOPLEVEL)) {
+				caseClassDeclaration(node);
+			} else if (node.getType().equals(NODE_TYPE_CLASS_MEMBER_DECLARATION)) {
 				caseClassDeclaration(node);
 			}
 		}
@@ -159,6 +168,17 @@ public class FeatureHouseModelBuilder {
 					} else if (terminal.getType().equals(NODE_TYPE_STMTL)) {
 						ClassBuilder.getClassBuilder(currentFile, this)
 							.caseFieldDeclaration(terminal);
+					} else if (terminal.getType().equals(NODE_TYPE_CLAASS_MEMBER_DECLARATION_END6)) {
+						if (terminal.getCompositionMechanism().equals(COMPOSITON_METHOD)) {
+							ClassBuilder.getClassBuilder(currentFile, this)
+								.caseMethodDeclaration(terminal);
+						} else if (terminal.getCompositionMechanism().equals(COMPOSITION_FIELD)){
+							ClassBuilder.getClassBuilder(currentFile, this)
+								.caseFieldDeclaration(terminal);
+						} else if (terminal.getCompositionMechanism().equals(COMPOSITION_CONSTRUCTOR)){
+							ClassBuilder.getClassBuilder(currentFile, this)
+								.caseConstructorDeclaration(terminal);
+						}						
 					}
 				} else if (child instanceof FSTNonTerminal) {
 					 if (child.getType().equals(NODE_TYPE_STRUCTDEC)) {
