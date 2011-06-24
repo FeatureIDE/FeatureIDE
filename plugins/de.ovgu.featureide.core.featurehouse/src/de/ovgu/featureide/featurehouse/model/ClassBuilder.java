@@ -54,6 +54,9 @@ public class ClassBuilder {
 		if (file.getFileExtension().equals("cs")) {
 			return new CSClassBuilder(builder);
 		}
+		if (file.getFileExtension().equals("hs")) {
+			return new HaskellClassBuilder(builder);
+		}
 		// TODO#271 implement class builder for all FeatureHouse languages
 		return new ClassBuilder(builder);
 	}
