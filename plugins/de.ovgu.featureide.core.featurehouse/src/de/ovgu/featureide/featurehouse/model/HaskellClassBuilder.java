@@ -46,15 +46,33 @@ public class HaskellClassBuilder extends ClassBuilder {
 		if (!terminal.getBody().contains("::")) {
 			return;
 		}
-		String name = terminal.getBody().substring(0, terminal.getBody().indexOf("::")); 
+		LinkedList<String> method = getMethod(terminal.getBody());
+		if (method == null) {
+			return;
+		}
+		LinkedList<String> parameter = new LinkedList<String>();
+		parameter.add(method.get(1));
+		addMethod(method.get(0), parameter, "void", "");
+	}
+	
+	/**
+	 * 
+	 * @param terminal body
+	 * @return list(0) method name
+	 * 		   list(1) method type
+	 */
+	public LinkedList<String> getMethod(String body) {
+		LinkedList<String> method = new LinkedList<String>();
+		String name = body.substring(0, body.indexOf("::")); 
 		while (name.endsWith(" ")) {
 			name = name.substring(0, name.length() - 1);
 		}
 		if (name.contains(" ")) {
-			return;
+			return null;
 		}
-		LinkedList<String> parameterTypes = new LinkedList<String>();
-		String parameter = terminal.getBody().substring(terminal.getBody().indexOf("::") + 2);
+		method.add(name);
+		
+		String parameter = body.substring(body.indexOf("::") + 2);
 		parameter = parameter.replaceAll("\n", " ");
 		while (parameter.startsWith(" ")) {
 			parameter = parameter.substring(1);
@@ -65,8 +83,8 @@ public class HaskellClassBuilder extends ClassBuilder {
 		while (parameter.contains("  ")) {
 			parameter = parameter.replaceAll("  ", " ");
 		}
-		parameterTypes.add(parameter);
-		addMethod(name, parameterTypes, "void", "");
+		method.add(parameter);
+		return method;
 	}
 
 	private void addMethod(String name, LinkedList<String> parameterTypes, 

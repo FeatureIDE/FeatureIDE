@@ -35,10 +35,10 @@ import org.eclipse.core.runtime.CoreException;
 
 import cide.gparser.ParseException;
 
+import composer.CmdLineInterpreter;
 import composer.FSTGenComposer;
 import composer.IParseErrorListener;
 
-import de.ovgu.cide.fstgen.ast.AbstractFSTParser;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
@@ -99,9 +99,6 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		if (configPath == null || basePath == null || outputPath == null)
 			return;
 
-		// A new FSTGenComposer instance is created every time, because this
-		// class
-		// seems to remember the FST from a previous build.
 		IFolder buildFolder = featureProject.getBuildFolder().getFolder(
 				config.getName().split("[.]")[0]);
 		if (!buildFolder.exists()) {
@@ -114,16 +111,17 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 		setJaveBuildPath(config.getName().split("[.]")[0]);
 
+		// A new FSTGenComposer instance is created every time, because this
+		// class seems to remember the FST from a previous build.
 		composer = new FSTGenComposer();
 		composer.addParseErrorListener(listener);
-		composer.run(new String[]{			
-				"--expression", configPath, 
-				"--base-directory", basePath,
-				"--output-directory", outputPath + "/", 
-				"--expression"
+		composer.run(new String[]{
+				CmdLineInterpreter.INPUT_OPTION_EQUATIONFILE, configPath, 
+				CmdLineInterpreter.INPUT_OPTION_BASE_DIRECTORY, basePath,
+				CmdLineInterpreter.INPUT_OPTION_OUTPUT_DIRECTORY, outputPath + "/"
 		});
-		
-		fhModelBuilder.buildModel(AbstractFSTParser.fstnodes);
+
+		fhModelBuilder.buildModel(composer.getFstnodes());
 
 		TreeBuilderFeatureHouse fstparser = new TreeBuilderFeatureHouse(
 				featureProject.getProjectName());
@@ -142,6 +140,9 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		FileWriter fw = null;
 		IFile iClasspathFile = featureProject.getProject()
 				.getFile(".classpath");
+		if (!iClasspathFile.exists()) {
+			return;
+		}
 		try {
 			File file = iClasspathFile.getRawLocation().toFile();
 			StringBuffer fileText = new StringBuffer();

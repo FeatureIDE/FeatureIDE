@@ -109,8 +109,11 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		featureProject.getBuildFolder().refreshLocal(IResource.DEPTH_INFINITE,
 				monitor);
 		if (!hasOtherNature) {
-			featureProject.getBinFolder().refreshLocal(IResource.DEPTH_INFINITE,
-					monitor);
+			if (featureProject.getBinFolder() != null && 
+					featureProject.getBinFolder().exists()) {
+				featureProject.getBinFolder().refreshLocal(IResource.DEPTH_INFINITE,
+						monitor);
+			}
 		}
 		
 		if (cleanBuild) {
@@ -120,7 +123,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 	
 			for (IResource res : featureProject.getBuildFolder().members()) {
 						res.delete(true, monitor);
-				}
+			}
 			if (!hasOtherNature) {
 				for (IResource res : featureProject.getBinFolder().members())
 						res.delete(true, monitor);
@@ -131,8 +134,9 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 				for (IResource member : featureProject.getBinFolder().members())
 					member.delete(true, monitor);
 			}
-			for (IResource member : featureProject.getBuildFolder().members())
+			for (IResource member : featureProject.getBuildFolder().members()) {
 				member.delete(true, monitor);
+			}
 			cleaned = true;
 		}	
 		
@@ -207,7 +211,10 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		
 	}
 	
-	// copies all not composed Files of selected Features from src to build
+	/**
+	 *  copies all not composed Files of selected Features from src to build
+	 * @throws CoreException
+	 */
 	private void copy(IFile config) throws CoreException {
 		ArrayList<String > selectedFeatures = getSelectedFeatures(config);
 		if (selectedFeatures != null)

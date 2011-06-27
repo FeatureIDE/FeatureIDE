@@ -460,7 +460,7 @@ public class FeatureModel implements PropertyConstants {
 	}
 
 	public void createDefaultValues(String projectName) {
-		Feature root = getFeature(projectName);
+		Feature root = getFeature(projectName.split("[-]")[0]);
 		root.setAbstract(true);
 		Feature feature = new Feature(this, "Base");
 		root.addChild(feature);
