@@ -1,0 +1,84 @@
+CHANGES (FGL/HASKELL, Version: June 2006)
+--------------------------------------------
+
+June 2006
+---------
+* fixed a bug in findP (thanks to lnagy@fit.edu)
+* added function delLEdge in Graph.hs (thanks to Jose Labra)
+* changed implementation of updFM and mkGraph (thanks to Don Stewart)
+
+
+February 2005
+-------------
+* fixed an import error in Basic.hs 
+* removed Eq instance of gr because it caused overlapping instance problems.
+  Instead the function equal defined in Graph.hs can be used
+* added some more functions to the export list of DFS.hs
+* changed the definition of LPath into a newtype to avoid
+  overlapping instances with lists
+* fixed the Makefile (for GHC and GHCi)
+
+
+January 2004
+------------
+* bug fix for nearestNode (src/Data/Graph/Inductive/Query/GVD.hs)
+Update contributed by Aetion Technologies LLC (www.aetion.com)
+* Refactor into hierarchical namespace
+* Build changes:
+  - build a standard haskell library (libHSfgl.a, HSfgl.o)
+  - install as ghc package (fgl), uses Auto so no -package is needed
+* Automatic Node generation for labels: Data.Graph.Inductive.NodeMap
+* Graphviz output: Data.Graph.Inductive.Graphviz
+
+
+September 2002
+--------------
+* Introduction of graph classes
+* Monadic graphs and graph computation monad
+* Graph implementation based on balanced (AVL) trees  
+* Fast graph implementation based on IO arrays
+* New algorithms:
+  - Maximum flow
+  - Articulation points
+  - biconnected components
+  - dominators
+  - transitive closure
+* minor changes in utility functions
+  - changed signatures (swapped order of arguments) of 
+    functions context and lab to be consistent with other graph functions
+  - changed function first in RootPath: not existing path is now reported 
+    as an empty list and will not produce an error
+  - esp version that returns a list of labeled edges
+    (to find minimum label in maxflow algorithm)
+  - BFS uses amortized O(1) queue
+  - Heap stores key and value separately
+  - ...
+
+
+March 2001
+----------
+* Changes to User Guide
+* a couple of new functions
+* some internal changes
+
+
+April 2000
+----------
+* User Guide
+* Systematic structure for all depth-first search functions
+* Graph Voronoi diagram
+* Several small changes and additions in utility functions
+
+
+February 2000
+-------------
+* Representation for inward-directed trees
+* Breadth-first search
+* Dijkstra's algorithm
+* Minimum-spanning-tree algorithm
+
+
+August 1999
+-----------
+* First Haskell version
+
