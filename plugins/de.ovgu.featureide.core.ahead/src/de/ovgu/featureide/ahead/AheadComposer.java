@@ -42,6 +42,7 @@ import de.ovgu.featureide.ahead.wrapper.AheadWrapper;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
 
 
 /**
@@ -321,5 +322,16 @@ public class AheadComposer extends ComposerExtensionClass {
 				AheadCorePlugin.getDefault().logError(e);
 			}
 		}		
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.ComposerExtensionClass#buildConfiguration(org.eclipse.core.resources.IFolder, de.ovgu.featureide.fm.core.configuration.Configuration)
+	 */
+	@Override
+	public void buildConfiguration(IFolder folder, Configuration configuration) {
+		super.buildConfiguration(folder, configuration);
+		ahead.setCompositionFolder(folder);
+		performFullBuild(folder.getFile(folder.getName() + getConfigurationExtension()));
+		ahead.setCompositionFolder(featureProject.getBuildFolder());
 	}
 }

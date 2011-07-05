@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
 
 
 /**
@@ -227,6 +228,13 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	 */
 	public String getConfigurationExtension() {
 		return composerExtensionClass.getConfigurationExtension();
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#buildConfiguration(org.eclipse.core.resources.IFolder, de.ovgu.featureide.fm.core.configuration.Configuration)
+	 */
+	public void buildConfiguration(IFolder folder, Configuration configuration) {
+		composerExtensionClass.buildConfiguration(folder, configuration);
 	}
 
 }

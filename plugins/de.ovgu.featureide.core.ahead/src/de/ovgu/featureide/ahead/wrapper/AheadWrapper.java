@@ -91,6 +91,10 @@ public class AheadWrapper {
 		jakfiles = composer.compose();
 		reduceJak2Java(jakfiles);
 	}
+	
+	public void setCompositionFolder(IFolder folder) {
+		composer.setCompositionFolder(folder);
+	}
 
 	private IFile[] reduceJak2Java(IFile[] jakFiles) {
 		

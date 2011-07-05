@@ -32,6 +32,8 @@ import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
 
 /**
  * Abstract class for FeatureIDE composer extensions with default values.
@@ -154,5 +156,23 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	public String getConfigurationExtension() {
 		return CorePlugin.getDefault().getConfigurationExtensions().getFirst();
 	}
-
+	
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#buildConfiguration(org.eclipse.core.resources.IFolder, de.ovgu.featureide.fm.core.configuration.Configuration)
+	 */
+	/*
+	 * Creates a configuration file at the given folder
+	 */
+	public void buildConfiguration(IFolder folder, Configuration configuration) {
+		try {
+			if (!folder.exists()) {
+				folder.create(true, false, null);
+			}
+			IFile configurationFile = folder.getFile(folder.getName() + getConfigurationExtension());
+			ConfigurationWriter writer = new ConfigurationWriter(configuration);
+			writer.saveToFile(configurationFile);
+		} catch (CoreException e) {
+			CorePlugin.getDefault().logError(e);
+		}
+	}
 }

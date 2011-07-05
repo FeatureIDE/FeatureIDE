@@ -37,7 +37,6 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
-import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.ahead.AheadCorePlugin;
@@ -93,6 +92,10 @@ public class ComposerWrapper {
 		errorListeners = new LinkedList<AheadBuildErrorListener>();
 		this.featureProject = featureProject;
 		jakModelBuilder = new JakModelBuilder(this.featureProject);
+	}
+	
+	void setCompositionFolder(IFolder folder) {
+		compositionFolder = folder;
 	}
 
 	public IFile[] composeAll() throws IOException {
@@ -204,8 +207,9 @@ public class ComposerWrapper {
 				}
 			}
 		}
-		
-		compositionFolder = featureProject.getBuildFolder();
+		if (compositionFolder == null) {
+			compositionFolder = featureProject.getBuildFolder();
+		}
 	}
 
 	/**
@@ -276,14 +280,19 @@ public class ComposerWrapper {
 	public IFile[] compose() {
 		composeJakFiles(compositionFolder);
 		IFile[] composedFilesArray = new IFile[composedFiles.size()];
-		for (int i = 0; i < composedFilesArray.length; i++)
+		for (int i = 0; i < composedFilesArray.length; i++) {
 			composedFilesArray[i] = composedFiles.get(i);
-
+			try {
+				composedFiles.get(i).refreshLocal(IResource.DEPTH_ZERO, null);
+			} catch (CoreException e) {
+				AheadCorePlugin.getDefault().logError(e);
+			}
+		}
 		absoluteJakFilenames.clear();
 		return composedFilesArray;
 	}
 
-	@SuppressWarnings("deprecation")
+//	@SuppressWarnings("deprecation")
 	private void composeJakFiles(IFolder compositionDir) {
 		composedFiles.clear();
 			
@@ -326,20 +335,20 @@ public class ComposerWrapper {
 								+ newJakIFile.getName(), 0);
 			}
 
-			try {
-				newJakIFile.refreshLocal(IResource.DEPTH_ZERO, null);
-				if (newJakIFile.exists()) {
-					newJakIFile.setDerived(true);
-					ResourceAttributes attr = newJakIFile
-							.getResourceAttributes();
-					if (attr != null) {
-						attr.setReadOnly(false);
-						newJakIFile.setResourceAttributes(attr);
-					}
-				}
-			} catch (CoreException e) {
-				AheadCorePlugin.getDefault().logError(e);
-			}
+//			try {
+//				newJakIFile.refreshLocal(IResource.DEPTH_ZERO, null);
+//				if (newJakIFile.exists()) {
+//					newJakIFile.setDerived(true);
+//					ResourceAttributes attr = newJakIFile
+//							.getResourceAttributes();
+//					if (attr != null) {
+//						attr.setReadOnly(false);
+//						newJakIFile.setResourceAttributes(attr);
+//					}
+//				}
+//			} catch (CoreException e) {
+//				AheadCorePlugin.getDefault().logError(e);
+//			}
 		}
 	}
 
@@ -400,7 +409,7 @@ public class ComposerWrapper {
 	}
 
 	private IFolder setOutputFolder(String layer) throws CoreException {
-		IFolder outputFolder = featureProject.getBuildFolder(); 
+		IFolder outputFolder = compositionFolder;//XXXfeatureProject.getBuildFolder(); 
 		if (layer == null)
 			return outputFolder;
 		

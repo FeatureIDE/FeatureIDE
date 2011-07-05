@@ -113,6 +113,25 @@
       </objectContribution>
       <objectContribution
             adaptable="true"
+            id="de.ovgu.featureide.ui.actions.buildallvalidconfigurationsaction"
+            objectClass="org.eclipse.core.resources.IProject">
+         <visibility>
+         	<objectState
+         		name="nature"
+         		value="de.ovgu.featureide.core.featureProjectNature">
+         	</objectState>
+         </visibility>
+         <action
+               class="de.ovgu.featureide.ui.actions.BuildAllValidConfigurationsAction"
+               id="de.ovgu.featureide.ui.actions.buildallvalidconfigurationsaction"
+               icon="icons/FeatureIconSmall.ico"
+               label="Build All Valid Configurations"
+               menubarPath="group.open"
+               style="push">
+         </action>
+      </objectContribution>
+      <objectContribution
+            adaptable="true"
             id="de.ovgu.featureide.ui.equationFileContribution"
             nameFilter="*.config"
             objectClass="org.eclipse.core.resources.IFile">

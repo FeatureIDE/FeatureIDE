@@ -43,6 +43,7 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.featurehouse.model.FeatureHouseModelBuilder;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
 
 /**
  * Composes files using FeatureHouse.
@@ -336,5 +337,20 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		} catch (CoreException e) {
 			FeatureHouseCorePlugin.getDefault().logError(e);
 		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.ComposerExtensionClass#buildConfiguration(org.eclipse.core.resources.IFolder, de.ovgu.featureide.fm.core.configuration.Configuration)
+	 */
+	@Override
+	public void buildConfiguration(IFolder folder, Configuration configuration) {
+		super.buildConfiguration(folder, configuration);	
+		composer = new FSTGenComposer();
+		composer.addParseErrorListener(listener);
+		composer.run(new String[]{
+				CmdLineInterpreter.INPUT_OPTION_EQUATIONFILE, folder.getFile(folder.getName() + getConfigurationExtension()).getRawLocation().toOSString(),
+				CmdLineInterpreter.INPUT_OPTION_BASE_DIRECTORY, featureProject.getSourcePath(),
+				CmdLineInterpreter.INPUT_OPTION_OUTPUT_DIRECTORY, folder.getParent().getRawLocation().toOSString() + "/"
+		});
 	}
 }

@@ -58,7 +58,7 @@ public class CollaborationModelBuilder {
 	public LinkedList<String> classFilter = new LinkedList<String>();
 	public LinkedList<String> featureFilter = new LinkedList<String>();
 	public Boolean showUnselectedFeatures = false;
-	public String configuration = "";
+	public IFile configuration = null;
 	
 	private ArrayList<String> iFeatureNames = new ArrayList<String>();
 	private Collaboration collaboration;
@@ -106,16 +106,16 @@ public class CollaborationModelBuilder {
 			featureNames.add(feature.getName());
 
 		//Add the configuration to the model  
-		if (configuration.equals("") || configuration.equals(featureProject.getCurrentConfiguration().getName())) {
+		if (configuration == null || configuration.equals(featureProject.getCurrentConfiguration())) {
 			collaboration = new Collaboration(featureProject.getCurrentConfiguration().getName().split("[.]")[0]);
 			collaboration.selected = true;
 			collaboration.isConfiguration = true;
 		} else {
-			collaboration = new Collaboration(configuration.split("[.]")[0]);
+			collaboration = new Collaboration(configuration.getName().split("[.]")[0]);
 			collaboration.selected = false;
 			collaboration.isConfiguration = true;
 		}
-		collaboration.configurationFile = featureProject.getConfigFolder().getFile(configuration);
+		collaboration.configurationFile = configuration;
 		model.collaborations.add(collaboration);
 		
 		//get ordered list of layers from feature model or order file
@@ -201,7 +201,7 @@ public class CollaborationModelBuilder {
 						Boolean selected = true;
 						FSTFeature feature = fSTModel.getFeature(layerName);
 						collaboration = null;
-						if (!configuration.equals("") && !featureNames.contains(layerName))
+						if (configuration != null && !featureNames.contains(layerName))
 							selected = false;
 						if (selected || showUnselectedFeatures) {
 							FSTModelElement[] element = feature.getChildren();
@@ -275,7 +275,7 @@ public class CollaborationModelBuilder {
 					} else {
 						//case: add arbitrary files
 						Boolean selected = false;
-						if (!configuration.equals("") && featureNames.contains(layerName))
+						if (configuration != null && featureNames.contains(layerName))
 							selected = true;
 						IFolder folder = featureProject.getSourceFolder().getFolder(layerName);
 						if (folder.exists()) {
@@ -365,10 +365,10 @@ public class CollaborationModelBuilder {
 
 		final IFile iFile;
 		ArrayList<Feature> list = new ArrayList<Feature>();
-		if (configuration.equals(""))
+		if (configuration == null)
 			iFile = featureProject.getCurrentConfiguration();
 		else 
-			iFile = featureProject.getConfigFolder().getFile(configuration);
+			iFile = configuration;
 		
 		File file = iFile.getRawLocation().toFile();
 		ArrayList<String> configurationFeatures = readFeaturesfromConfigurationFile(file);

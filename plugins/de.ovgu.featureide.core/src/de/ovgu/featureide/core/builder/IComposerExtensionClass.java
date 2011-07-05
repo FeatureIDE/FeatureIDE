@@ -27,6 +27,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceDelta;
 
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
 
 
 /**
@@ -48,6 +49,13 @@ public interface IComposerExtensionClass {
 	void initialize(IFeatureProject project);
 	
 	void performFullBuild(IFile config);
+	
+	/**
+	 * Builds a configuration at the given folder
+	 * @param folder
+	 * @param configuration
+	 */
+	void buildConfiguration(IFolder folder, Configuration configuration);
 	
 	/**
 	 * 
