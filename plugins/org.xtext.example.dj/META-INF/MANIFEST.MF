@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: org.xtext.example.dj
 Bundle-Vendor: Dipartimento di Informatica, Univ. di Torino
-Bundle-Version: 2.5.1.qualifier
+Bundle-Version: 2.5.2.qualifier
 Bundle-SymbolicName: org.xtext.example.dj; singleton:=true
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.xtext,
