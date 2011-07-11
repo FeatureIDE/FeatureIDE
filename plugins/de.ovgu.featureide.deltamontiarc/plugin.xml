@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+      point="de.ovgu.featureide.core.composers">
+      <composer
+            class="de.ovgu.featureide.deltamontiarc.DeltaMontiArcComposer"
+            description="Product-line development of software architectures with deltas."
+            id="de.ovgu.featureide.deltamontiarc.composer.delta"
+            name="Delta-MontiArc"
+            nature="FeatureIDE_Core.deltaNature">
+      </composer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.popupMenus">      
+      <objectContribution
+            adaptable="true"
+            id="de.ovgu.featureide.deltamontiarc.associateDelta"
+            objectClass="de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart">
+            <action
+               class="de.ovgu.featureide.deltamontiarc.actions.AnnotateDeltaAction"
+               id="de.ovgu.featureide.fm.ui.associateDelta"
+               label="Annotate Delta ..."
+               menubarPath="additions"
+               tooltip="Test">
+         </action>
+      </objectContribution>
+      <objectContribution
+            adaptable="true"
+            id="de.ovgu.featureide.deltamontiarc.openDeltas"
+            objectClass="de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart">
+            <action
+               class="de.ovgu.featureide.deltamontiarc.actions.OpenAnnotatedDeltasAction"
+               id="de.ovgu.featureide.fm.ui.openDeltas"
+               label="Open Annotated Deltas"
+               menubarPath="additions"
+               tooltip="Test">
+            </action>
+      </objectContribution>
+   </extension>
+</plugin>
