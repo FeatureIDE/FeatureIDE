@@ -33,7 +33,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.LegendMoveOperation;
 
 /**
- * TODO Command to move the feature model legend using drag and drop
+ * Command to move the feature model legend using drag and drop
  * 
  * @author Fabian Benduhn
  */

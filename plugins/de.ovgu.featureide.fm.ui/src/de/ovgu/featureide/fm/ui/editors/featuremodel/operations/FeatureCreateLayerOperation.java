@@ -36,7 +36,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLa
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
 /**
- * TODO Operation with functionality to create a layer feature. Enables
+ * Operation with functionality to create a layer feature. Enables
  * undo/redo functionality.
  * 
  * @author Fabian Benduhn

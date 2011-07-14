@@ -133,9 +133,7 @@ public class FeatureChangeGroupTypeOperation extends AbstractOperation {
 
 	}
 
-	// TODO Introducing simpler methods in class Feature for handling GroupTypes
-	// (i.e getGroupType/setGroupType) would have been handy here
-	private static int getGroupType(Feature feature) {
+		private static int getGroupType(Feature feature) {
 		if (feature.isAlternative()) {
 			return ALTERNATIVE;
 		} else if (feature.isAnd()) {

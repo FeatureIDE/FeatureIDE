@@ -29,7 +29,7 @@ import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
 /**
- * TODO Operation with functionality to move Constraints. Provides undo/redo
+ * Operation with functionality to move Constraints. Provides undo/redo
  * functionality.
  * 
  * @author Fabian Benduhn

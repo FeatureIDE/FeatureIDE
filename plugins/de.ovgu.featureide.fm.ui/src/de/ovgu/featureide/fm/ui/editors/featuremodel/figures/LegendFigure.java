@@ -30,7 +30,7 @@ import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 
 /**
- * TODO represents a legend for the feature model
+ * represents a legend for the feature model
  * 
  * @author Fabian Benduhn
  */

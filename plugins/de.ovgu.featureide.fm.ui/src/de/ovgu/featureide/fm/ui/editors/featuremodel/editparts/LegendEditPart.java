@@ -28,7 +28,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.Legend;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
 
 /**
- * TODO EditPart for feature model legend
+ * EditPart for feature model legend
  * 
  * @author Fabian Benduhn
  */

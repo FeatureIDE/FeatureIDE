@@ -23,7 +23,7 @@ import org.eclipse.draw2d.geometry.Point;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
 /**
- * TODO Represents the legend in the FeatureModel
+ * Represents the legend in the FeatureModel
  * 
  * @author Fabian Benduhn
  */
@@ -55,12 +55,5 @@ public class Legend {
 
 	}
 
-	/**
-	 * 
-	 */
-	public void changeVisibility() {
-		// TODO Auto-generated method stub
-		
-	}
 
 }

@@ -31,7 +31,7 @@ import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
 /**
- * TODO Operation with functionality to reverse the feature model layout order.
+ * Operation with functionality to reverse the feature model layout order.
  * Enables undo/redo functionality.
  * 
  * @author Fabian Benduhn

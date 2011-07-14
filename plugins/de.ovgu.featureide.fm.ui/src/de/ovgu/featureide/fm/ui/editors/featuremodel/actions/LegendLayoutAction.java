@@ -28,8 +28,8 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
 
 /**
- * TODO description
  * 
+ *   
  * @author Fabian Benduhn
  */
 public class LegendLayoutAction extends Action {

@@ -56,7 +56,7 @@ import de.ovgu.featureide.core.builder.IComposerExtension;
  * 
  * @author Dariusz Krolikowski
  */
-//TODO refactor?
+
 public class NewFeatureIDEFilePage extends WizardPage {
 
 	private ArrayList<String[]> formats = new ArrayList<String[]>();

@@ -32,7 +32,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
- * TODO description
+ *
  * 
  * @author Fabian Benduhn
  */

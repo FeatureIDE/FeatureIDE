@@ -21,7 +21,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 import org.eclipse.draw2d.geometry.Point;
 
 /**
- * TODO Adjusted RelationDecoration that can be used with Coordinates instead of
+ * Adjusted RelationDecoration that can be used with Coordinates instead of
  * Features
  * 
  * @author Fabian Benduhn

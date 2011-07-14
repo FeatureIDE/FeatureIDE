@@ -30,7 +30,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.LegendHideOperation;
 
 /**
- * TODO shows/hides the legend when executed
+ * shows/hides the legend when executed
  * 
  * @author Fabian Benduhn
  */
