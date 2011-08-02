@@ -17,7 +17,7 @@
  * See http://www.fosd.de/featureide/ for further information.
  */
 package de.ovgu.featureide.fm.core;
-
+ 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
