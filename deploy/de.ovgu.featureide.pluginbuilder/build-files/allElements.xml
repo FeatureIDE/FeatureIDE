@@ -14,6 +14,30 @@
 			<property name="type" value="feature" />
 			<property name="id" value="de.ovgu.featureide" />
 		</ant>
+		<ant antfile="${genericTargets}" target="${target}">
+			<property name="type" value="feature" />
+			<property name="id" value="de.ovgu.featureide.featurecpp" />
+		</ant>
+		<ant antfile="${genericTargets}" target="${target}">
+			<property name="type" value="feature" />
+			<property name="id" value="de.ovgu.featureide.featurehouse" />
+		</ant>
+		<ant antfile="${genericTargets}" target="${target}">
+			<property name="type" value="feature" />
+			<property name="id" value="de.ovgu.featureide.deltaj" />
+		</ant>
+		<ant antfile="${genericTargets}" target="${target}">
+			<property name="type" value="feature" />
+			<property name="id" value="de.ovgu.featureide.aspectj" />
+		</ant>
+		<ant antfile="${genericTargets}" target="${target}">
+			<property name="type" value="feature" />
+			<property name="id" value="de.ovgu.featureide.munge" />
+		</ant>
+		<ant antfile="${genericTargets}" target="${target}">
+			<property name="type" value="feature" />
+			<property name="id" value="de.ovgu.featureide.test" />
+		</ant>
 		
 	</target>
 
