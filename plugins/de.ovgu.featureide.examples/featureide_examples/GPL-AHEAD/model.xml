@@ -93,15 +93,6 @@
 		<constraints>
 			<rule>
 				<imp>
-					<var>Number</var>
-					<conj>
-						<var>GraphType</var>
-						<var>Search</var>
-					</conj>
-				</imp>
-			</rule>
-			<rule>
-				<imp>
 					<var>Connected</var>
 					<conj>
 						<var>Undirected</var>
@@ -163,6 +154,15 @@
 							<var>MSTPrim</var>
 						</conj>
 					</not>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>Number</var>
+					<conj>
+						<var>GraphType</var>
+						<var>Search</var>
+					</conj>
 				</imp>
 			</rule>
 			<rule>
