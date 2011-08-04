@@ -1,0 +1,20 @@
+public refines class ButtonListener {
+
+	public void pathAdded(String path){
+		if(!frame.index_History.contains(path)){
+			frame.index_History.add(path);	
+		}
+	}
+
+	public void addingPath(){
+		Index_History_Selector selector = new Index_History_Selector(frame, null);
+		
+		String path = selector.selectedPath;
+		
+		addPathToGui(path);
+		pathAdded(path);
+		System.out.println("der Path "+selector.selectedPath);	
+		
+	}	
+
+}

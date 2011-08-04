@@ -1,0 +1,24 @@
+public refines class MrPinkMain {
+
+	protected void init(){
+		
+		Commandline cmd = new Commandline(this);//MainFrame(this);	
+		userInterface = cmd;
+		Super().init();
+		cmd.startCommandline();
+	
+	}
+	
+	public void createIndex(String dataDir){
+		try {
+			index = new Indexer("./index");
+			index.createIndex(dataDir);
+		} catch (Exception e) {
+			System.out.println(" failed.");
+			System.err.println(e.getMessage());
+			System.err.println("Aborting.");
+			System.exit(1);
+		}
+	}
+
+}

@@ -1,0 +1,11 @@
+public refines class MrPinkMain {
+	
+	//MainFrame mainFrame = null;
+
+	protected void init(){
+		userInterface = new MainFrame(this);	
+		Super().init();
+	}
+
+
+}

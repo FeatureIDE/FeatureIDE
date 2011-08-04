@@ -1,0 +1,146 @@
+
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Point;
+import java.util.ArrayList;
+
+import javax.swing.JPanel;
+
+/**
+ * Panel zur Anzeige eines gefundenen Dokuments. 
+ * 
+ * Diese Klasse erzeugt ein Textfeld fuer die Darstellung von genau einem Treffer.
+ * Fuer die Ergebnisliste muessen entsprechend viele Objekte diser Klasse erzeugt werden.
+ * 
+ * @author Mr. Pink
+ */
+public class HitDocument extends JPanel{
+	private static final long serialVersionUID = 1L;
+	private Point size;
+	
+	/**
+	 * Konstruktor
+	 * 
+	 * Der Konstruktor dieser Klasse erzeugt ein JLabel auf dem der Text, der sich im Datensatz befindet,
+	 * dargestellt wird. Der Datensatz braucht eine Mindestlaenge von 6 Eintraegen. 
+	 * <p>
+	 * Beispiel-Datensatz:
+	 * 
+	 * <pre>
+	 * {@code
+	 * //Datensatz erzeugen
+	 * ArrayList<String> daten = new ArrayList<String>();
+	 * //rankingPos
+	 * daten.add("1");
+	 * //ID
+	 * daten.add("42");
+	 * //name
+	 * daten.add("Name der Daten");
+	 * //location
+	 * daten.add("C://...");
+	 * //size
+	 * daten.add("1234");
+	 * //age
+	 * daten.add("heute");
+	 * //Woerter
+	 * daten.add("Wort1");
+	 * daten.add("3");
+	 * daten.add("Wort2");
+	 * daten.add("1");
+	 * // ...
+	 * }
+	 * </pre>
+	 * 
+	 * @param parent   Das JPanel, auf dem dieses Objekt dargestellt werden soll.
+	 * @param position Die Position des Objektes.
+	 * @param daten    Die Daten, die dargestellt werden sollen.
+	 */
+	public HitDocument(JPanel parents, Point position, ArrayList daten){
+		this.setLayout(null);
+		int offset = 3;
+		Point current = new Point(offset,offset);
+		
+		this.setBackground(new Color((int)(255-Math.random()*70),(int)(255-Math.random()*70),(int)(255-Math.random()*70)));
+		
+		size = new Point();
+		
+		int fontSize = 15;
+		Font fontNormal  = new Font("", Font.LAYOUT_LEFT_TO_RIGHT, fontSize);
+		Font fontFat     = new Font("", Font.LAYOUT_LEFT_TO_RIGHT | Font.BOLD, fontSize);
+		Font fontCursive = new Font("", Font.LAYOUT_LEFT_TO_RIGHT | Font.ITALIC, fontSize);
+		
+		Point end = null;
+		
+		//Position im Ranking
+		HitComponentLabel dokRanking = new HitComponentLabel();
+		end = dokRanking.setText(this, current, "---ranking position " + daten.get(0) + " ---", fontFat);
+		current.x +=  end.x;
+		size.y += fontSize+3;
+		if(size.x < current.x){
+			size.x = current.x;
+		}
+		current.y += fontSize;
+		current.x = offset;
+		
+		
+		// dokID, Name, Location
+		HitComponentLabel dokID = new HitComponentLabel();
+		end = dokID.setText(this,current,"DokID "+daten.get(1),fontFat);
+		current.x +=  end.x;
+		HitComponentLabel dokName = new HitComponentLabel();
+		end = dokName.setText(this, current,(String) daten.get(2), fontNormal);
+		current.x += end.x;
+		HitComponentLabel dokLocation = new HitComponentLabel();
+		end = dokLocation.setText(this, current, "Location: "+daten.get(3), fontCursive);
+		current.x += end.x;
+		
+		size.y +=fontSize+3;
+		if(size.x < current.x){
+			size.x = current.x;
+		}
+		current.y += fontSize;
+		current.x = offset;
+		
+		// size, age
+		HitComponentLabel dokSize = new HitComponentLabel();
+		end = dokSize.setText(this, current, "Size: ", fontFat);
+		current.x += end.x;
+		HitComponentLabel dokSize1 = new HitComponentLabel();
+		end = dokSize1.setText(this, current, (String) daten.get(4), fontCursive);
+		current.x += end.x;
+		HitComponentLabel dokAge = new HitComponentLabel();
+		end = dokAge.setText(this, current, "Date: ", fontFat);
+		current.x += end.x;
+		HitComponentLabel dokAge1 = new HitComponentLabel();
+		end = dokAge1.setText(this, current, (String) daten.get(5), fontCursive);
+		current.x += end.x;
+		
+		int dataPos = 6;
+		
+		
+		if(size.x < current.x){
+			size.x = current.x;
+		}
+		current.x = offset;
+		current.y += fontSize;
+		size.y +=fontSize+3;
+		
+		//Woerter	
+		while(daten.size()>dataPos){
+			HitComponentLabel dokWord = new HitComponentLabel();
+			end = dokWord.setText(this, current, (String) daten.get(dataPos), fontFat);
+			dataPos++;
+			current.x += end.x;
+			HitComponentLabel dokCount = new HitComponentLabel();
+			end = dokCount.setText(this, current, daten.get(dataPos)+" times", fontCursive);	
+			dataPos++;
+			current.x += end.x;
+		}
+		size.y +=fontSize+3;
+		if(size.x < current.x){
+			size.x = current.x;
+		}
+		
+		parents.add(this).setBounds(position.x, position.y, size.x, size.y);
+	}
+}

@@ -1,0 +1,23 @@
+public refines class MainFrame {
+
+	public JButton optionButton;
+
+	public void createOptionsButton(){
+		optionButton = new JButton("Options");
+		optionButton.addActionListener(new ButtonListener(this));
+		optionButton.setFont(new Font("", Font.ITALIC, 15));
+		xAxis1.add(optionButton);
+	}
+	
+	/**
+	 * Such-Box (de)aktivieren.
+	 * 
+	 * @param b True zum aktivieren, ansonsten False.
+	 */
+	public void enableSearchGroupBox(boolean b) {
+		this.optionButton.setEnabled(b);
+		
+		Super().enableSearchGroupBox(b);
+	}
+
+}

@@ -1,0 +1,109 @@
+public refines class Indexer {
+
+	protected String[]  rootDirectories;    
+
+	protected ArrayList	alreadyIndexedDirectories;	
+
+
+	/**
+	 * Index erzeugen.
+	 * 
+	 * Schreibt den Index fuer das gegebene Verzeichnis. Dabei werden alle Dateien
+	 * in allen (Unter-)verzeichnissen betrachtet und falls ein Content Handler
+	 * fuer sie verfuegbar ist, auch indexiert.
+	 * 
+	 * @throws IndexerException  das angegebene Datenverzeichnis ist ungueltig
+	 * @param  dataDir           der absolute Pfad des Verzeichnisses
+	 * @return                   True, wenn der Index erzeugt wurde, ansonsten False
+	 */
+	public void createIndex(String[] dataDir) throws Exception {
+		// Verzeichnis testen
+		
+		rootDirectories = dataDir;
+		
+		alreadyIndexedDirectories = new ArrayList();
+		
+		// Als naechstes holen wir uns einen IndexWriter von Lucene 
+		IndexWriter writer = new IndexWriter(luceneIndex, new SimpleAnalyzer(), true, IndexWriter.MaxFieldLength.UNLIMITED);
+		
+		for(int i = 0; i < dataDir.length;i++){
+		 
+			File testDir  = new File(rootDirectories[i]);
+		
+			if (!testDir.isDirectory() || !testDir.exists()) {
+				throw new IndexerException("The data directory does not exist: ");
+			}
+		
+			
+		
+			// Und auf geht die wilde Reise!
+		
+			indexDirectory(rootDirectories[i], writer);
+		
+			// Index commiten
+		
+			writer.commit();
+		
+		}
+		
+		writer.close();
+		
+		// Kurze Statistik am Ende ausgeben
+		
+		IndexReader reader = IndexReader.open(luceneIndex, true);
+		JOptionPane.showMessageDialog(null,(Object)(reader.numDocs()+" documents have been indexed."), "Done indexing.", JOptionPane.INFORMATION_MESSAGE);
+		reader.close();
+	}
+	
+	/**
+	 * Verzeichnis scannen und indexieren.
+	 * 
+	 * Jede in dem Verzeichnis gefundene Datei wird auf den passenden ContentHandler vermittelt.
+	 * Nur der erste Content Handler, der sie behandeln will, kommt dabei zum Zuge. Sollte
+	 * kein CH gefunden werden, wird die Datei still ignoriert.
+	 * 
+	 * @param sourceDir  das zu indexierende Verzeichnis
+	 * @param writer     der Dateiindizierer
+	 */
+	protected void indexDirectory(String sourceDir, IndexWriter writer) {
+		File dir = new File(sourceDir);
+		
+		// Fehlerhafter Rekursionsaufruf?
+		
+		if (!dir.exists() || !dir.isDirectory()) {
+			return;
+		}
+		
+		// mehrfaches Indexieren verhindern 
+		if (alreadyIndexedDirectories.contains(dir)){
+			return;
+		}	
+		alreadyIndexedDirectories.add(dir);
+		
+		
+		// Alle Dateien durchwandern...
+		File[]  files = dir.listFiles();
+		for (int i = 0 ; i < files.length ;  i++ ) {
+			File file = files[i];
+			if (file.isDirectory()) {
+				indexDirectory(file.getAbsolutePath(), writer);
+			} else {
+				String filename = file.getAbsolutePath();
+				String basename = file.getName();
+				
+				ContentHandler contentHandler = getClassForFilename(basename);
+										
+				if (contentHandler != null) {
+					
+					try {
+						boolean ok    = contentHandler.index(filename, writer);
+						
+						System.out.println(ok ? "ok." : "failed.");
+					} catch (Exception e) {
+						System.out.println("failed.");
+					}
+				}
+			}
+		}
+	}
+}
