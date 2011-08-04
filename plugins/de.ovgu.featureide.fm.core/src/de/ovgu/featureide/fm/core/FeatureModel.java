@@ -51,7 +51,7 @@ import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
-
+ 
 /**
  * The model representation of the feature tree that notifies listeners of
  * changes in the tree.
@@ -92,6 +92,7 @@ public class FeatureModel implements PropertyConstants {
 	private Feature root;
 	private boolean legend = true;
 	private boolean autoLayoutLegend = true;
+	private boolean autoLayoutModel = true;
 	private Point legendPos = new Point(0, 0);
 	/**
 	 * a hashtable containing all features
@@ -102,7 +103,9 @@ public class FeatureModel implements PropertyConstants {
 	 * all comment lines from the model file without line number at which they
 	 * occur
 	 */
-
+	
+	private int selectedLayoutAlgorithm = 0;
+	
 	private List<String> comments = new LinkedList<String>();
 
 	/**
@@ -141,6 +144,14 @@ public class FeatureModel implements PropertyConstants {
 		reset();
 	}
 
+	public void setLayout(int newLayoutAlgorithm){	
+		selectedLayoutAlgorithm = newLayoutAlgorithm;
+	}
+	
+	public int getLayoutAlgorithm(){
+		return selectedLayoutAlgorithm;
+	}
+	
 	public void reset() {
 		if (root != null) {
 			while (root.hasChildren()) {
@@ -945,6 +956,14 @@ public class FeatureModel implements PropertyConstants {
 	public boolean hasLegendAutoLayout() {
 
 		return autoLayoutLegend;
+	}
+	
+	public void setModelAutoLayout(boolean b) {
+		autoLayoutModel = b;
+	}
+
+	public boolean hasModelAutoLayout() {
+		return autoLayoutModel;
 	}
 
 	/**
