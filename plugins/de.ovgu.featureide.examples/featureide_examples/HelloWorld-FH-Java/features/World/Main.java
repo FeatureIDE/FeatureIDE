@@ -2,6 +2,6 @@ public class Main {
 	
 	protected void print() {
 		original();
-		System.out.print(" world!");
+		System.out.print(" World!");
 	}
 }

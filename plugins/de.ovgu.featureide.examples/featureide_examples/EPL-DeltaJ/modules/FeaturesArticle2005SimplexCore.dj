@@ -5,7 +5,7 @@ import "DNegArticle2005SimplexCore.dj"
 import "DNegEvalArticle2005SimplexCore.dj"
 
 features Eval, Add, Data, Neg, Print, Operations, Lit, ExpressionProductLine
-configurations Add, Data, Eval, ExpressionProductLine, Lit, Neg, Operations, Print;
+configurations Add, Eval, Lit, Neg, Print;
 core Print, Lit {
 	class Lit {
 

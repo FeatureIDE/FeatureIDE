@@ -31,7 +31,7 @@
 					<feature mandatory="true" name="Re_fuer_PC"/>
 					<feature mandatory="true" name="Re_fuer_Handy"/>
 				</alt>
-				<alt name="Soundeffekt">
+				<alt abstract="true" name="Soundeffekt">
 					<feature mandatory="true" name="Sound_fuer_pc"/>
 					<feature mandatory="true" name="Sound_fuer_Handy"/>
 				</alt>
