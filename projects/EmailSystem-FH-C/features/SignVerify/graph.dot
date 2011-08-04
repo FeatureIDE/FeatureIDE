@@ -1,9 +1,0 @@
-digraph G {
-//  rankdir=LR;
-  edge [fontname="Monospace", fontsize=10];
-  init;
-  state1;
-  inconsistent;
-  init -> state1 [label="call(mail(client, msg)):\l  if (isSigned(msg))\l  {msgId = msg.id;}\l"];
-  state1 -> inconsistent [label="call(verify(client, msg)):\l  if (list_find (client->userPublicKeyPairs,\l    findUserPublicKeyPair, msg->from)\l    && !isKeyPairValid(client->publicKey, msg->signKey)\l    && msgId == msg.id)\l"];
-}

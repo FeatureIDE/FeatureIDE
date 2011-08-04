@@ -1,9 +1,0 @@
-public refines class Tank {
-
-	protected void explodieren(){
-		Super().explodieren();
-		tankManager.expEffekt.addElement(new ExplodierenEffekt(tankManager, x_Koordinate,
-				y_Koordinate));
-	}
-
-}

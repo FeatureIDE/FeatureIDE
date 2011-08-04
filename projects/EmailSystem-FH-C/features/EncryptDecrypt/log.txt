@@ -1,2 +1,0 @@
-graph not assignable to a certain feature but to the feature-set of Encrypt-Decrypt (and Key)
-no modularity

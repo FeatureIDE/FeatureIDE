@@ -1,2 +1,0 @@
-graph belongs to feature Verify: message has to be readable in order to be verified
-modularity
