@@ -213,7 +213,7 @@ public abstract class Node {
 		return newNodes;
 	}
 
-	protected static int binom(int n, int k) {
+	public static int binom(int n, int k) {
 		if (k > n / 2)
 			k = n - k;
 		if (k < 0 || n < 0)
