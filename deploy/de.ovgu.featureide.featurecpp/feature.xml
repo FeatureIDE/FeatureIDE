@@ -2,8 +2,9 @@
 <feature
       id="de.ovgu.featureide.featurecpp"
       label="FeatureIDE extension for FeatureC++ (optional)"
-      version="2.5.2.qualifier"
-      provider-name="University of Magdeburg">
+      version="2.6.0.qualifier"
+      provider-name="University of Magdeburg"
+      os="linux,win32">
 
    <description url="http://www.fosd.de/featureide/">
       FeatureC++ composes C++ header files.
@@ -472,7 +473,7 @@ Public License instead of this License.
          id="de.ovgu.featureide.core.featurecpp"
          download-size="0"
          install-size="0"
-         version="2.5.2.qualifier"
+         version="2.6.0.qualifier"
          unpack="false"/>
 
 </feature>
