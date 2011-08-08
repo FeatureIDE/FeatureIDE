@@ -58,6 +58,7 @@ import org.eclipse.ui.operations.RedoActionHandler;
 import org.eclipse.ui.operations.UndoActionHandler;
 import org.eclipse.ui.part.MultiPageEditorPart;
 import org.eclipse.ui.texteditor.ITextEditor;
+import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -70,6 +71,7 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.FeatureModelEditorContributor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GEFImageWriter;
+import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePage;
 
 /**
  * A multi page editor to edit feature models. If the model file contains
@@ -105,6 +107,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 	private SelectAllAction selectAllAction;
 	private UndoActionHandler undoAction;
 	private RedoActionHandler redoAction;
+	
+	private FmOutlinePage outlinePage;
 
 	public LinkedList<IFeatureModelEditorPage> extensionPages = new LinkedList<IFeatureModelEditorPage>();
 
@@ -349,6 +353,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 			((FeatureModelEditorContributor) contributor).setActivePage(this,
 					newPageIndex);
 		oldPage = newPageIndex;
+		
 		super.pageChange(newPageIndex);
 
 	}
@@ -507,6 +512,13 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 	@SuppressWarnings("rawtypes")
 	@Override
 	public Object getAdapter(Class adapter) {
+		if (IContentOutlinePage.class.equals(adapter)) {
+			if (getOutlinePage() == null) {
+				setOutlinePage(new FmOutlinePage(null, this));
+				getOutlinePage().setInput(getFeatureModel());
+			}
+			return getOutlinePage();
+		}
 		if (IGotoMarker.class.equals(adapter))
 			if (getActivePage() != getTextEditorIndex())
 				setActivePage(getTextEditorIndex());
@@ -617,6 +629,14 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 	public void setPageModified(boolean modified) {
 		isPageModified = modified;
 		firePropertyChange(PROP_DIRTY);
+	}
+
+	public FmOutlinePage getOutlinePage() {
+		return outlinePage;
+	}
+	
+	private void setOutlinePage(FmOutlinePage fmOutlinePage) {
+		outlinePage = fmOutlinePage;
 	}
 
 }

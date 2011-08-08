@@ -29,6 +29,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
@@ -50,11 +51,13 @@ public class CreateCompoundAction extends Action {
 
 	private final FeatureModel featureModel;
 
-	private GraphicalViewerImpl viewer;
+	private Object viewer;
 
 	private Feature parent = null;
-
+	
 	private LinkedList<Feature> selectedFeatures = new LinkedList<Feature>();
+	
+	private Object diagramEditor;
 
 	private static ImageDescriptor createImage = PlatformUI.getWorkbench()
 			.getSharedImages()
@@ -68,20 +71,27 @@ public class CreateCompoundAction extends Action {
 		}
 	};
 
-	public CreateCompoundAction(GraphicalViewerImpl viewer,
-			FeatureModel featureModel) {
+	
+
+	public CreateCompoundAction(Object viewer,
+			FeatureModel featureModel, Object diagramEditor) {
 		super("Create Feature Above", createImage);
 		this.viewer = viewer;
 		this.featureModel = featureModel;
+		this.diagramEditor = diagramEditor;
 
 		setEnabled(false);
-		viewer.addSelectionChangedListener(listener);
+		if (viewer instanceof GraphicalViewerImpl) {
+			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);
+		} else {
+			((TreeViewer) viewer).addSelectionChangedListener(listener);
+		}
 	}
 
 	@Override
 	public void run() {
 		FeatureCreateCompoundOperation op = new FeatureCreateCompoundOperation(
-				viewer, parent, featureModel, selectedFeatures);
+				viewer, parent, featureModel, selectedFeatures, diagramEditor);
 		op.addContext((IUndoContext) featureModel.getUndoContext());
 
 		try {
@@ -96,7 +106,8 @@ public class CreateCompoundAction extends Action {
 	private boolean isValidSelection(IStructuredSelection selection) {
 		// check empty selection (i.e. ModelEditPart is selected)
 		if (selection.size() == 1
-				&& selection.getFirstElement() instanceof ModelEditPart)
+				&& (selection.getFirstElement() instanceof ModelEditPart 
+						))
 			return false;
 
 		// check that selected features have the same parent
@@ -104,9 +115,15 @@ public class CreateCompoundAction extends Action {
 		Iterator<?> iter = selection.iterator();
 		while (iter.hasNext()) {
 			Object editPart = iter.next();
-			if (!(editPart instanceof FeatureEditPart))
+			if (!(editPart instanceof FeatureEditPart) && !(editPart instanceof Feature))
 				continue;
-			Feature feature = ((FeatureEditPart) editPart).getFeatureModel();
+			Feature feature;
+			
+			if (editPart instanceof FeatureEditPart)
+				feature = ((FeatureEditPart) editPart).getFeatureModel();
+			else
+				feature = (Feature) editPart;
+			
 			if (selectedFeatures.isEmpty())
 				parent = feature.getParent();
 			else if (parent != feature.getParent())

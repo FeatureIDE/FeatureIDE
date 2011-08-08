@@ -21,16 +21,19 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import org.eclipse.gef.ui.parts.AbstractEditPartViewer;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.TreeViewer;
 
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
+import de.ovgu.featureide.fm.ui.views.outline.FmOutlineGroupStateStorage;
 
 /**
  * A default implementation for actions that only allow one feature to be
@@ -50,30 +53,44 @@ public abstract class SingleSelectionAction extends Action implements
 		}
 	};
 
-	GraphicalViewerImpl viewer;
+	Object viewer;
 
 	protected Feature feature;
 
 	protected boolean connectionSelected;
 
-	public SingleSelectionAction(String text, GraphicalViewerImpl viewer) {
+	public SingleSelectionAction(String text, Object viewer2) {
 		super(text);
-		this.viewer = viewer;
+		this.viewer = viewer2;
 		setEnabled(false);
-		viewer.addSelectionChangedListener(listener);
+		if (viewer2 instanceof GraphicalViewerImpl)
+			((GraphicalViewerImpl) viewer2).addSelectionChangedListener(listener);
+		else
+			((TreeViewer) viewer2).addSelectionChangedListener(listener);
 	}
 
 	private boolean isOneFeatureSelected(IStructuredSelection selection) {
 		return selection.size() == 1
 				&& (selection.getFirstElement() instanceof FeatureEditPart || selection
-						.getFirstElement() instanceof ConnectionEditPart);
+						.getFirstElement() instanceof ConnectionEditPart || selection
+						.getFirstElement() instanceof FmOutlineGroupStateStorage|| selection
+						.getFirstElement() instanceof Feature);
 	}
 
-	public FeatureEditPart getSelectedFeatureEditPart() {
-		IStructuredSelection selection = (IStructuredSelection) viewer
-				.getSelection();
-		Object part = selection.getFirstElement();
+	public FeatureEditPart getSelectedFeatureEditPart(Object diagramEditor) {
+		Object part;
+		if (diagramEditor == null) {
+			IStructuredSelection selection = (IStructuredSelection) ((AbstractEditPartViewer) viewer)
+					.getSelection();
+			part = selection.getFirstElement(); 
+		} else {
+			Feature selection = (Feature) ((IStructuredSelection) ((TreeViewer) viewer)
+					.getSelection()).getFirstElement();
+			part = ((GraphicalViewerImpl) diagramEditor).getEditPartRegistry().get(selection);
+		}
+		
 		connectionSelected = part instanceof ConnectionEditPart;
+		
 		if (connectionSelected)
 			return (FeatureEditPart) ((ConnectionEditPart) part).getTarget();
 		else
@@ -81,8 +98,18 @@ public abstract class SingleSelectionAction extends Action implements
 	}
 
 	public Feature getSelectedFeature() {
-		IStructuredSelection selection = (IStructuredSelection) viewer
+		IStructuredSelection selection;
+		if (viewer instanceof TreeViewer) {
+			selection = (IStructuredSelection) ((TreeViewer) viewer).getSelection();
+			if (selection.getFirstElement() instanceof FmOutlineGroupStateStorage)
+				return ((FmOutlineGroupStateStorage) selection.getFirstElement()).getFeature();
+			else
+				return (Feature) selection.getFirstElement();
+		} else {
+			selection = (IStructuredSelection) ((AbstractEditPartViewer) viewer)
 				.getSelection();
+		}
+		
 		Object part = selection.getFirstElement();
 		connectionSelected = part instanceof ConnectionEditPart;
 		if (connectionSelected)
@@ -113,9 +140,13 @@ public abstract class SingleSelectionAction extends Action implements
 	public void propertyChange(PropertyChangeEvent event) {
 		String prop = event.getPropertyName();
 		if (prop.equals(CHILDREN_CHANGED) || prop.equals(MANDANTORY_CHANGED)
-				|| prop.equals(PARENT_CHANGED)) {
+				|| prop.equals(PARENT_CHANGED) || prop.equals(HIDDEN_CHANGED)) {
 			updateProperties();
 		}
+	}
+	
+	public boolean isConnectionSelected() {
+		return connectionSelected;
 	}
 
 }

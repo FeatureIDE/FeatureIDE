@@ -18,7 +18,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.swt.SWT;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -32,15 +31,17 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 public class RenameAction extends SingleSelectionAction {
 
 	public static String ID = "de.ovgu.featureide.rename";
+	private Object diagramEditor;
 
-	public RenameAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
+	public RenameAction(Object viewer, FeatureModel featureModel, Object graphicalViewer) {
 		super("Rename (F2)", viewer);
 		this.setAccelerator(SWT.F2);
+		this.diagramEditor = graphicalViewer;
 	}
 
 	@Override
 	public void run() {
-		FeatureEditPart part = getSelectedFeatureEditPart();
+		FeatureEditPart part = getSelectedFeatureEditPart(diagramEditor);
 		part.showRenameManager();
 	}
 
@@ -53,6 +54,7 @@ public class RenameAction extends SingleSelectionAction {
 	 */
 	@Override
 	protected void updateProperties() {
+		setChecked(false);
 		setEnabled(true);
 	}
 

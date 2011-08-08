@@ -20,7 +20,6 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.IUndoContext;
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.PlatformUI;
 
@@ -39,7 +38,7 @@ public class ReverseOrderAction extends Action {
 
 	private final FeatureModel featureModel;
 
-	public ReverseOrderAction(GraphicalViewerImpl viewer,
+	public ReverseOrderAction(Object viewer,
 			FeatureModel featureModel) {
 		super("Reverse Feature Order");
 		this.featureModel = featureModel;

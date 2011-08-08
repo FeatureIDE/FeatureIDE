@@ -20,7 +20,6 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.IUndoContext;
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -38,7 +37,7 @@ public class AlternativeAction extends SingleSelectionAction {
 
 	private final FeatureModel featureModel;
 
-	public AlternativeAction(GraphicalViewerImpl viewer,
+	public AlternativeAction(Object viewer,
 			FeatureModel featureModel) {
 		super("Alternative", viewer);
 		this.featureModel = featureModel;
@@ -64,8 +63,8 @@ public class AlternativeAction extends SingleSelectionAction {
 	@Override
 	protected void updateProperties() {
 		boolean alt = feature.isAlternative();
-		setEnabled(connectionSelected && !alt);
-		setChecked(connectionSelected && alt);
+		setEnabled(!alt && feature.hasChildren());
+		setChecked(alt);
 	}
 
 }

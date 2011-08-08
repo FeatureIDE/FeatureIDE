@@ -20,7 +20,6 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.IUndoContext;
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -38,7 +37,7 @@ public class AndAction extends SingleSelectionAction {
 
 	private final FeatureModel featureModel;
 
-	public AndAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
+	public AndAction(Object viewer, FeatureModel featureModel) {
 		super("And", viewer);
 		this.featureModel = featureModel;
 	}
@@ -61,8 +60,8 @@ public class AndAction extends SingleSelectionAction {
 	@Override
 	protected void updateProperties() {
 		boolean and = feature.isAnd();
-		setEnabled(connectionSelected && !and);
-		setChecked(connectionSelected && and);
+		setEnabled(!and  && feature.hasChildren());
+		setChecked(and);
 	}
 
 }

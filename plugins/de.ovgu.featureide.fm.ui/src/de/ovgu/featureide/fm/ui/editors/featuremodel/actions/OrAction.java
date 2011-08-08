@@ -20,7 +20,6 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.IUndoContext;
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -38,7 +37,7 @@ public class OrAction extends SingleSelectionAction {
 
 	private final FeatureModel featureModel;
 
-	public OrAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
+	public OrAction(Object viewer, FeatureModel featureModel) {
 		super("Or", viewer);
 		this.featureModel = featureModel;
 	}
@@ -61,9 +60,9 @@ public class OrAction extends SingleSelectionAction {
 	@Override
 	protected void updateProperties() {
 		boolean or = feature.isOr();
-		// setEnabled(connectionSelected && !feature.isRoot() && !or);
-		setEnabled(connectionSelected && !or);
-		setChecked(connectionSelected && or);
+		// setEnabled(connectionSelected && !feature.isRoot() && !or)
+		setEnabled(!or && feature.hasChildren());
+		setChecked(or);
 	}
 
 }

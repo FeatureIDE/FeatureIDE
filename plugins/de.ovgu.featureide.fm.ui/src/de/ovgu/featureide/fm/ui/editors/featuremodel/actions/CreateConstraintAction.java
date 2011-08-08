@@ -18,7 +18,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.ISharedImages;
@@ -38,9 +37,9 @@ public class CreateConstraintAction extends AbstractConstraintEditorAction {
 			.getSharedImages()
 			.getImageDescriptor(ISharedImages.IMG_TOOL_NEW_WIZARD);
 
-	public CreateConstraintAction(GraphicalViewerImpl viewer,
-			FeatureModel featuremodel, String menuname) {
-		super(viewer, featuremodel, menuname);
+	public CreateConstraintAction(Object viewer,
+			FeatureModel featuremodel) {
+		super(viewer, featuremodel, "Create Constraint");
 		setImageDescriptor(createImage);
 	}
 

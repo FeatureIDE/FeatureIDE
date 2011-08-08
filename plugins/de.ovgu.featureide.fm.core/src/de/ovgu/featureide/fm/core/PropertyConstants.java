@@ -31,6 +31,7 @@ public interface PropertyConstants {
 	public final static String MODEL_DATA_CHANGED = "MODEL_DATA_CHANGED";
 	public final static String REFRESH_ACTIONS = "REFRESH_ACTIONS";
 	public final static String NAME_CHANGED = "NAME_CHANGED";
+	
 
 	public final static String LOCATION_CHANGED = "LOCATION_CHANGED";// should
 																		// not
@@ -40,6 +41,8 @@ public interface PropertyConstants {
 																		// feature.
 
 	public final static String MANDANTORY_CHANGED = "MANDANTORY_CHANGED";
+	
+	public final static String HIDDEN_CHANGED = "HIDDEN_CHANGED";
 
 	public final static String PARENT_CHANGED = "PARENT_CHANGED";
 

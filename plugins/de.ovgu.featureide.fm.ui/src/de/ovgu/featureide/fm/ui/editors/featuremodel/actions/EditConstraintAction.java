@@ -20,7 +20,6 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import java.util.Iterator;
 
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.viewers.IStructuredSelection;
 
 import de.ovgu.featureide.fm.core.Constraint;
@@ -39,9 +38,9 @@ public class EditConstraintAction extends AbstractConstraintEditorAction {
 
 	private Constraint constraint;
 
-	public EditConstraintAction(GraphicalViewerImpl viewer,
-			FeatureModel featuremodel, String menuname) {
-		super(viewer, featuremodel, menuname);
+	public EditConstraintAction(Object viewer,
+			FeatureModel featuremodel) {
+		super(viewer, featuremodel, "Edit Constraint");
 		setEnabled(false);
 	}
 
@@ -63,6 +62,10 @@ public class EditConstraintAction extends AbstractConstraintEditorAction {
 			if (editPart instanceof ConstraintEditPart) {
 				constraint = ((ConstraintEditPart) editPart)
 						.getConstraintModel();
+				return true;
+			}
+			if (editPart instanceof Constraint){
+				constraint = (Constraint) editPart;
 				return true;
 			}
 		}

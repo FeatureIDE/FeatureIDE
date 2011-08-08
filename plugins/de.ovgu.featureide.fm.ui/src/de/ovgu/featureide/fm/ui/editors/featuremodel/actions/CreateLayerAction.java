@@ -20,7 +20,6 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.IUndoContext;
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.ISharedImages;
@@ -45,17 +44,20 @@ public class CreateLayerAction extends SingleSelectionAction {
 
 	private final FeatureModel featureModel;
 
-	public CreateLayerAction(GraphicalViewerImpl viewer,
-			FeatureModel featureModel) {
+	private Object diagramEditor;
+
+	public CreateLayerAction(Object viewer,
+			FeatureModel featureModel, Object diagramEditor) {
 		super("Create Feature Below (Ins)", viewer);
 		setImageDescriptor(createImage);
 		this.featureModel = featureModel;
+		this.diagramEditor = diagramEditor;
 	}
 
 	@Override
 	public void run() {
 		FeatureCreateLayerOperation op = new FeatureCreateLayerOperation(
-				feature, viewer, featureModel);
+				feature, viewer, featureModel, diagramEditor);
 		op.addContext((IUndoContext) featureModel.getUndoContext());
 
 		try {

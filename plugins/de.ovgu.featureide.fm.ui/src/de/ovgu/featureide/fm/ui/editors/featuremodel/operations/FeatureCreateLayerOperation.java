@@ -45,17 +45,19 @@ public class FeatureCreateLayerOperation extends AbstractOperation {
 
 	private static final String LABEL = "Create Layer";
 	private Feature feature;
-	private GraphicalViewerImpl viewer;
+	private Object viewer;
 	FeatureModel featureModel;
 	private Feature newFeature;
+	private Object diagramEditor;
 
 	public FeatureCreateLayerOperation(Feature feature,
-			GraphicalViewerImpl viewer, FeatureModel featureModel) {
+			Object viewer, FeatureModel featureModel, Object diagramEditor) {
 		super(LABEL);
 		this.feature = feature;
 
 		this.viewer = viewer;
 		this.featureModel = featureModel;
+		this.diagramEditor = diagramEditor;
 	}
 
 	/*
@@ -91,9 +93,17 @@ public class FeatureCreateLayerOperation extends AbstractOperation {
 		featureModel.handleModelDataChanged();
 
 		// select the new feature
-		FeatureEditPart part = (FeatureEditPart) viewer.getEditPartRegistry()
-				.get(newFeature);
-		viewer.setSelection(new StructuredSelection(part));
+		FeatureEditPart part;
+		if (viewer instanceof GraphicalViewerImpl) {
+			part = (FeatureEditPart) ((GraphicalViewerImpl) viewer).getEditPartRegistry()
+					.get(newFeature);
+			((GraphicalViewerImpl) viewer).setSelection(new StructuredSelection(part));
+		} else {
+			part = (FeatureEditPart) ((GraphicalViewerImpl) diagramEditor).getEditPartRegistry().get(newFeature);
+			((GraphicalViewerImpl) diagramEditor).setSelection(new StructuredSelection(part));
+		}
+		
+		part.getViewer().reveal(part);
 
 		// open the renaming command
 		DirectEditManager manager = new FeatureLabelEditManager(part,

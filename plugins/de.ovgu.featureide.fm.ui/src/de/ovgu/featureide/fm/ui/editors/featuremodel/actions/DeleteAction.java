@@ -29,6 +29,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
@@ -55,7 +56,7 @@ public class DeleteAction extends Action {
 			.getSharedImages()
 			.getImageDescriptor(ISharedImages.IMG_TOOL_DELETE);
 
-	private final GraphicalViewerImpl viewer;
+	private final Object viewer;
 
 	private final FeatureModel featureModel;
 
@@ -67,12 +68,16 @@ public class DeleteAction extends Action {
 		}
 	};
 
-	public DeleteAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
+	public DeleteAction(Object viewer, FeatureModel featureModel) {
 		super("Delete (Del)", deleteImage);
 		this.viewer = viewer;
 		this.featureModel = featureModel;
 		setEnabled(false);
-		viewer.addSelectionChangedListener(listener);
+		if (viewer instanceof GraphicalViewerImpl)
+			((GraphicalViewerImpl) viewer)
+					.addSelectionChangedListener(listener);
+		else
+			((TreeViewer) viewer).addSelectionChangedListener(listener);
 	}
 
 	@Override
@@ -104,9 +109,11 @@ public class DeleteAction extends Action {
 		Iterator<?> iter = selection.iterator();
 		while (iter.hasNext()) {
 			Object editPart = iter.next();
-			if (!(editPart instanceof FeatureEditPart))
+			if (!(editPart instanceof FeatureEditPart)
+					&& !(editPart instanceof Feature))
 				continue;
-			Feature feature = ((FeatureEditPart) editPart).getFeatureModel();
+			Feature feature = editPart instanceof FeatureEditPart ? ((FeatureEditPart) editPart)
+					.getFeatureModel() : (Feature) editPart;
 			if (feature == root) {
 				if (root.getChildrenCount() != 1)
 					return false;

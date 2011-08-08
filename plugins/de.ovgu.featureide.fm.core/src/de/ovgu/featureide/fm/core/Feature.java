@@ -112,6 +112,7 @@ public class Feature implements PropertyConstants {
 
 	public void setHidden(boolean hid) {
 		this.hidden = hid;
+		fireHiddenChanged();
 	}
 
 	public void setAbstract(Boolean value) {
@@ -303,6 +304,13 @@ public class Feature implements PropertyConstants {
 		for (PropertyChangeListener listener : listenerList)
 			listener.propertyChange(event);
 	}
+	
+	private void fireHiddenChanged() {
+		PropertyChangeEvent event = new PropertyChangeEvent(this, HIDDEN_CHANGED,
+				false, true);
+		for (PropertyChangeListener listener : listenerList)
+			listener.propertyChange(event);
+	}
 
 	private void fireChildrenChanged() {
 		PropertyChangeEvent event = new PropertyChangeEvent(this,
@@ -462,5 +470,67 @@ public class Feature implements PropertyConstants {
 	public String toString() {
 		return name;
 	}
+	
+	/* auto-generated methods
+	 * cause the diagram to be shown incorrectly
+	 */
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (and ? 1231 : 1237);
+		result = prime * result
+				+ ((children == null) ? 0 : children.hashCode());
+		result = prime * result + (concret ? 1231 : 1237);
+		result = prime * result + (hidden ? 1231 : 1237);
+		result = prime * result + (mandatory ? 1231 : 1237);
+		result = prime * result + (multiple ? 1231 : 1237);
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((parent == null) ? 0 : parent.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Feature other = (Feature) obj;
+		if (and != other.and)
+			return false;
+		if (children == null) {
+			if (other.children != null)
+				return false;
+		} else if (!children.equals(other.children))
+			return false;
+		if (concret != other.concret)
+			return false;
+		if (hidden != other.hidden)
+			return false;
+		if (mandatory != other.mandatory)
+			return false;
+		if (multiple != other.multiple)
+			return false;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		if (parent == null) {
+			if (other.parent != null)
+				return false;
+		} else if (!parent.equals(other.parent))
+			return false;
+		return true;
+	}*/
 
 }

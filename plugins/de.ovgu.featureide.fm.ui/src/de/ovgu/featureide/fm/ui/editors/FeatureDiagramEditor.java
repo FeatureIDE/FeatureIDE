@@ -157,8 +157,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	public void createActions() {
 		FeatureModel featureModel = getFeatureModel();
 
-		createLayerAction = new CreateLayerAction(this, featureModel);
-		createCompoundAction = new CreateCompoundAction(this, featureModel);
+		createLayerAction = new CreateLayerAction(this, featureModel, null);
+		createCompoundAction = new CreateCompoundAction(this, featureModel, null);
 		deleteAction = new DeleteAction(this, featureModel);
 		mandatoryAction = new MandatoryAction(this, featureModel);
 		hiddenAction = new HiddenAction(this, featureModel);
@@ -167,12 +167,10 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		andAction = new AndAction(this, featureModel);
 		orAction = new OrAction(this, featureModel);
 		alternativeAction = new AlternativeAction(this, featureModel);
-		renameAction = new RenameAction(this, featureModel);
+		renameAction = new RenameAction(this, featureModel, null);
 
-		createConstraintAction = new CreateConstraintAction(this, featureModel,
-				"Create Constraint");
-		editConstraintAction = new EditConstraintAction(this, featureModel,
-				"Edit Constraint");
+		createConstraintAction = new CreateConstraintAction(this, featureModel);
+		editConstraintAction = new EditConstraintAction(this, featureModel);
 		reverseOrderAction = new ReverseOrderAction(this, featureModel);
 
 		legendAction = new LegendAction(this, featureModel);
@@ -219,7 +217,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	}
 	
 	private void fillContextMenu(IMenuManager menu) {
-			
 		/*
 		 * Menu Management for Feature Diagram Layout entries
 		 */
@@ -249,25 +246,39 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 			setDepthFirstLayoutAction.setChecked(false);
 		}
 		
-		if (andAction.isEnabled() || orAction.isEnabled()) {
+		boolean connectionSelected = alternativeAction.isConnectionSelected();
+		if (andAction.isEnabled() || orAction.isEnabled()  || alternativeAction.isEnabled()) {
 			if (andAction.isChecked()) {
 				andAction.setText("And");
-				orAction.setText("Or (Double Click)");
+				if (connectionSelected)
+					orAction.setText("Or (Double Click)"); 
+				else 
+					orAction.setText("Or");
 				alternativeAction.setText("Alternative");
 			} else if (orAction.isChecked()) {
 				andAction.setText("And");
 				orAction.setText("Or");
-				alternativeAction.setText("Alternative (Double Click)");
+				if (connectionSelected)
+					alternativeAction.setText("Alternative (Double Click)");
+				else
+					alternativeAction.setText("Alternative");
 			} else if (alternativeAction.isChecked()) {
-				andAction.setText("And (Double Click)");
+				if (connectionSelected)
+					andAction.setText("And (Double Click)");
+				else
+					andAction.setText("And");
 				orAction.setText("Or");
 				alternativeAction.setText("Alternative");
 			}
 			menu.add(andAction);
 			menu.add(orAction);
 			menu.add(alternativeAction);
-		} else if (createLayerAction.isEnabled()
-				|| createCompoundAction.isEnabled()) {
+			menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+		}
+		
+		//don't show menu to change group type of a feature in case a connection line is selected
+		if ((createLayerAction.isEnabled()
+				|| createCompoundAction.isEnabled()) && !connectionSelected) {
 			menu.add(createCompoundAction);
 			menu.add(createLayerAction);
 			menu.add(createConstraintAction);
@@ -284,13 +295,13 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 			menu.add(setDepthFirstLayoutAction);
 			menu.add(new Separator());
 			menu.add(reverseOrderAction);
-		} else if (editConstraintAction.isEnabled()) {
+		} else if (editConstraintAction.isEnabled() && !connectionSelected) {
 			menu.add(createConstraintAction);
 			menu.add(editConstraintAction);
 			menu.add(deleteAction);
 		} else if (legendLayoutAction.isEnabled()){
 			menu.add(legendLayoutAction);
-		} else {
+		} else if (!connectionSelected){
 			menu.add(createConstraintAction);
 			menu.add(new Separator());
 			//menu.add(manualLayoutSelectionAction);
@@ -300,6 +311,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 			menu.add(new Separator());
 			menu.add(reverseOrderAction);	
 		}
+		
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 		menu.add(legendAction);
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
@@ -336,7 +348,11 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	public void refresh() {
 		if (getContents() == null)
 			return;
-
+		
+		if (featureModelEditor.getOutlinePage() != null ) {
+			featureModelEditor.getOutlinePage().setInput(getFeatureModel());
+		}
+		
 		// refresh size of all feature figures
 		getContents().refresh();
 		// layout all features if autoLayout is enabled

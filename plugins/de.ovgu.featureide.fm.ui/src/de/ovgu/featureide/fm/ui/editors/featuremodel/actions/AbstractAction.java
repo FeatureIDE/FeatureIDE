@@ -20,7 +20,6 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.ObjectUndoContext;
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -35,7 +34,7 @@ public class AbstractAction extends SingleSelectionAction {
 
 	private FeatureModel featureModel;
 
-	public AbstractAction(GraphicalViewerImpl viewer,
+	public AbstractAction(Object viewer,
 			FeatureModel featureModel, ObjectUndoContext undoContext) {
 		super("Abstract", viewer);
 		this.undoContext = undoContext;

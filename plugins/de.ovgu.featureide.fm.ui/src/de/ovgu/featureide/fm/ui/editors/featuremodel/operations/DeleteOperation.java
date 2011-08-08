@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.Constraint;
@@ -50,14 +51,14 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
 public class DeleteOperation extends AbstractOperation {
 
 	private static final String LABEL = "Delete";
-	private GraphicalViewerImpl viewer;
+	private Object viewer;
 	private FeatureModel featureModel;
 	private List<AbstractOperation> operations;
 
 	/**
 	 * 
 	 */
-	public DeleteOperation(GraphicalViewerImpl viewer, FeatureModel featureModel) {
+	public DeleteOperation(Object viewer, FeatureModel featureModel) {
 		super(LABEL);
 		this.viewer = viewer;
 		this.featureModel = featureModel;
@@ -76,8 +77,14 @@ public class DeleteOperation extends AbstractOperation {
 			throws ExecutionException {
 
 		AbstractOperation op = null;
-		IStructuredSelection selection = (IStructuredSelection) viewer
+		
+		IStructuredSelection selection;
+		if (viewer instanceof GraphicalViewerImpl)
+		selection = (IStructuredSelection) ((GraphicalViewerImpl) viewer)
 				.getSelection();
+		else 
+			selection = (IStructuredSelection) ((TreeViewer) viewer)
+			.getSelection();
 
 		Iterator<?> iter = selection.iterator();
 		while (iter.hasNext()) {
@@ -96,6 +103,18 @@ public class DeleteOperation extends AbstractOperation {
 
 				executeOperation(op);
 
+			}
+			if (editPart instanceof Feature){
+				Feature feature = ((Feature) editPart);
+				op = new FeatureDeleteOperation(featureModel, feature);
+
+				executeOperation(op);
+			}
+			if (editPart instanceof Constraint){
+				Constraint constraint = ((Constraint) editPart);
+				op = new ConstraintDeleteOperation(constraint, featureModel);
+
+				executeOperation(op);
 			}
 			if (editPart instanceof FeatureEditPart) {
 				Feature feature = ((FeatureEditPart) editPart)

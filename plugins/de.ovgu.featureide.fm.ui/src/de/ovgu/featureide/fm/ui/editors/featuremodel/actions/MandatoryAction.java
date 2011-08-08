@@ -20,7 +20,6 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.IUndoContext;
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -38,7 +37,7 @@ public class MandatoryAction extends SingleSelectionAction {
 
 	private final FeatureModel featureModel;
 
-	public MandatoryAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
+	public MandatoryAction(Object viewer, FeatureModel featureModel) {
 		super("Mandantory (Double Click)", viewer);
 		this.featureModel = featureModel;
 	}

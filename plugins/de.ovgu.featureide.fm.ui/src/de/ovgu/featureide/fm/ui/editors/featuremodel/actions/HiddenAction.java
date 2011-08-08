@@ -20,7 +20,6 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.IUndoContext;
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -33,7 +32,7 @@ public class HiddenAction extends SingleSelectionAction {
 
 	private final FeatureModel featureModel;
 
-	public HiddenAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
+	public HiddenAction(Object viewer, FeatureModel featureModel) {
 		super("Hidden", viewer);
 		this.featureModel = featureModel;
 	}

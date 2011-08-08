@@ -23,6 +23,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.TreeViewer;
 
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -38,7 +39,7 @@ import de.ovgu.featureide.fm.ui.editors.ConstraintDialog;
  */
 public abstract class AbstractConstraintEditorAction extends Action {
 
-	protected GraphicalViewerImpl viewer;
+	protected Object viewer;
 
 	protected FeatureModel featuremodel;
 	
@@ -54,12 +55,14 @@ public abstract class AbstractConstraintEditorAction extends Action {
 		}
 	};
 
-	public AbstractConstraintEditorAction(GraphicalViewerImpl viewer,
+	public AbstractConstraintEditorAction(Object viewer,
 			FeatureModel featuremodel, String menuname) {
 		super(menuname);
 		this.viewer = viewer;
 		this.featuremodel = featuremodel;
-		viewer.addSelectionChangedListener(listener);
+		if (viewer instanceof TreeViewer)	
+			((TreeViewer)viewer).addSelectionChangedListener(listener);
+		else ((GraphicalViewerImpl)viewer).addSelectionChangedListener(listener);
 	}
 
 	public void run() {

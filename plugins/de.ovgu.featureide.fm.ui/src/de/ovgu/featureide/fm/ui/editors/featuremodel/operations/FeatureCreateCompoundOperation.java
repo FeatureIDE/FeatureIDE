@@ -49,21 +49,23 @@ public class FeatureCreateCompoundOperation extends AbstractOperation {
 	private FeatureModel featureModel;
 	Feature newCompound;
 	private Feature parent;
-	private GraphicalViewerImpl viewer;
+	private Object viewer;
 	private LinkedList<Feature> selectedFeatures;
+	private Object diagramEditor;
 
 	/**
 	 * @param label
 	 */
-	public FeatureCreateCompoundOperation(GraphicalViewerImpl viewer,
+	public FeatureCreateCompoundOperation(Object viewer,
 			Feature parent, FeatureModel featureModel,
-			LinkedList<Feature> selectedFeatures) {
+			LinkedList<Feature> selectedFeatures, Object diagramEditor) {
 		super(LABEL);
 		this.viewer = viewer;
 		this.featureModel = featureModel;
 		this.parent = parent;
 		this.selectedFeatures = new LinkedList<Feature>();
 		this.selectedFeatures.addAll(selectedFeatures);
+		this.diagramEditor = diagramEditor;
 	}
 
 	/*
@@ -109,10 +111,21 @@ public class FeatureCreateCompoundOperation extends AbstractOperation {
 		featureModel.handleModelDataChanged();
 
 		// select the new feature
-		FeatureEditPart part = (FeatureEditPart) viewer.getEditPartRegistry()
-				.get(newCompound);
+		FeatureEditPart part;
+		if (viewer instanceof GraphicalViewerImpl) {
+			part = (FeatureEditPart) ((GraphicalViewerImpl) viewer).getEditPartRegistry().get(newCompound);
+		} else {
+			part =  (FeatureEditPart) ((GraphicalViewerImpl) diagramEditor).getEditPartRegistry().get(newCompound);
+		}
+				
 		if (part != null) {
-			viewer.setSelection(new StructuredSelection(part));
+			if (viewer instanceof GraphicalViewerImpl) {
+				((GraphicalViewerImpl) viewer).setSelection(new StructuredSelection(part));
+			} else {
+				((GraphicalViewerImpl) diagramEditor).setSelection(new StructuredSelection(part));
+			}
+			
+			part.getViewer().reveal(part);
 
 			// open the renaming command
 			DirectEditManager manager = new FeatureLabelEditManager(part,
