@@ -269,7 +269,13 @@ public class NewFeatureProjectPage extends WizardPage {
 	}
 	
 	public String getSourcePath() {
-		return sourcePath.isEnabled() ? sourcePath.getText() : "";
+		if (sourcePath.isEnabled()) {
+			return sourcePath.getText();
+		} else if (buildPath.isEnabled()) {
+			return buildPath.getText();
+		} else {
+			return "";
+		}
 	}
 	
 	public String getConfigPath() {
