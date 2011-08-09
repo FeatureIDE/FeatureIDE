@@ -43,6 +43,7 @@ import org.prop4j.SatSolver;
 
 import de.ovgu.featureide.fm.core.*;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
+import de.ovgu.featureide.fm.core.io.ModelWarning;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
 /**
@@ -234,7 +235,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 					} 
 					else if (mode == 3) {
 						if (currentTag.equals("c")){
-							featureModel.addComment(eventReader.getElementText());
+							featureModel.addComment(eventReader.getElementText()); 
 						}
 						else{
 							throw new UnsupportedModelException("'"
@@ -282,18 +283,12 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 									try {
 										if (! new SatSolver(node.clone(), 250)
 												.isSatisfiable()) {
-											throw new UnsupportedModelException(
-													"Constraint is not satisfiable.",
-													event.getLocation()
-															.getLineNumber());
+											warnings.add(new ModelWarning("Constraint is unsatisfiable.", event.getLocation().getLineNumber()));
 										}
 										if (!new SatSolver(
 												new Not(node.clone()), 250)
 												.isSatisfiable()) {
-											throw new UnsupportedModelException(
-													"Constraint is a tautology.",
-													event.getLocation()
-															.getLineNumber());
+											warnings.add(new ModelWarning("Constraint is tautology.", event.getLocation().getLineNumber()));
 										}
 									} catch (Exception e) {
 										throw new UnsupportedModelException(e.getMessage(),event.getLocation().getLineNumber());

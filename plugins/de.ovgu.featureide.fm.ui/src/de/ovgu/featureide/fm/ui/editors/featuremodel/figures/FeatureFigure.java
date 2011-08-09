@@ -26,10 +26,12 @@ import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.prop4j.NodeWriter;
+import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.FeatureStatus;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.anchors.SourceAnchor;
@@ -71,8 +73,10 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		label.setLocation(new Point(FEATURE_INSETS.left, FEATURE_INSETS.top));
 		
 		setName(feature.getName());
-		setAbstract(feature.isAbstract());
 
+		setProperties();
+		
+		
 		FeatureUIHelper.setSize(feature,getSize());
 		
 		add(label);
@@ -82,11 +86,51 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 			setLocation(FeatureUIHelper.getLocation(feature));
 	}
 	
-	public void setAbstract(boolean isAbstract) {
-		setBorder(isAbstract ? ABSTRACT_BORDER : CONCRETE_BORDER);
-		setBackgroundColor(isAbstract ? ABSTRACT_BACKGROUND : CONCRETE_BACKGROUND);
+	public void setProperties() {
+	
+		String toolTip = "";
 		
-		String toolTip = isAbstract ? " Abstract Feature " : " Concrete Feature ";
+		setBackgroundColor(CONCRETE_BACKGROUND);
+		setBorder(CONCRETE_BORDER);
+		
+		if (feature.isConcrete()) toolTip += " Concrete";
+		
+		if (feature.isAbstract()){
+			setBackgroundColor(ABSTRACT_BACKGROUND);
+			setBorder(ABSTRACT_BORDER);
+			toolTip += " Abstract";
+		}
+		
+		if (feature.isHidden()){
+			setBorder(HIDDEN_BORDER);
+			label.setForegroundColor(HIDDEN_FOREGROUND);
+			toolTip += " Hidden";
+		}
+		
+		if (feature.getFeatureStatus() == FeatureStatus.DEAD){
+			label.setForegroundColor(DEAD_COLOR);
+			setBorder(DEAD_BORDER);
+			toolTip += " Dead";			
+		}
+		
+		if (feature.getFeatureStatus() == FeatureStatus.FALSE_OPTIONAL){
+			label.setForegroundColor(DEAD_COLOR);
+			setBorder(DEAD_BORDER);
+			toolTip += " False Optional";
+		}
+		
+		try {
+			if (feature.isRoot() && !featureModel.isValid()){
+				label.setForegroundColor(DEAD_COLOR);
+				setBorder(DEAD_BORDER);
+				toolTip = " Void Model ";
+			}
+		} catch (TimeoutException e) {
+			e.printStackTrace();
+		}
+		
+		if (!feature.isRoot()) toolTip += " Feature ";
+		
 		toolTip += getRelevantConstraints();
 		setToolTip(new Label(toolTip));
 	}

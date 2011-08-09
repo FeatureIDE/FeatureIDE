@@ -48,7 +48,7 @@ public interface GUIDefaults {
 	
 	public static Color DIAGRAM_BACKGROUND = ColorConstants.white;
 
-	//concrete and abstract features
+	//concrete, hidden, dead and abstract features
 	
 	public static Color FEATURE_FOREGROUND = GUIBasics.createColor(0.0, 0.0, 0.0);
 	public static Insets FEATURE_INSETS = new Insets(3, 6, 3, 6);//4, 8, 4, 8
@@ -60,7 +60,15 @@ public interface GUIDefaults {
 	public static Color ABSTRACT_BACKGROUND = GUIBasics.createColor(0.95, 0.95, 1.0);
 	public static Color ABSTRACT_BORDER_COLOR = GUIBasics.createBorderColor(ABSTRACT_BACKGROUND);
 	public static Border ABSTRACT_BORDER = new LineBorder(ABSTRACT_BORDER_COLOR, 1);
-
+	
+	public static Color HIDDEN_BACKGROUND = GUIBasics.createColor(0.8, 0.8, 1.0);
+	public static Color HIDDEN_FOREGROUND = GUIBasics.createColor(0.4, 0.4, 0.4);
+	public static Color HIDDEN_BORDER_COLOR = GUIBasics.createBorderColor(HIDDEN_BACKGROUND);
+	public static Border HIDDEN_BORDER = new LineBorder(HIDDEN_BORDER_COLOR, 2, 2);
+	
+	public static Color DEAD_COLOR = GUIBasics.createColor(0.55, 0.15, 0.15);	
+	public static Border DEAD_BORDER = new LineBorder(DEAD_COLOR, 1);
+	
 	//connections and decorators
 	
 	public static Color CONNECTION_FOREGROUND = GUIBasics.createColor(0.4, 0.4, 0.4);
@@ -80,7 +88,12 @@ public interface GUIDefaults {
 	public static Color CONSTRAINT_BACKGROUND = GUIBasics.createColor(1.0, 1.0, 1.0);
 	public static Color CONSTRAINT_BORDER_COLOR = CONSTRAINT_BACKGROUND;
 	public static Border CONSTRAINT_BORDER = new LineBorder(CONSTRAINT_BORDER_COLOR, 0);
-
+		
+	//false constraints
+	
+	public static Color WARNING_BACKGROUND = GUIBasics.createColor(238, 238, 0);	
+	public static Color VOID_MODEL_BACKGROUND = GUIBasics.createColor(1.0, 0.6, 0.6);	
+	
 	//cell editor for renaming features / editing constraints
 	
 	public static Insets CELL_EDITOR_INSETS = new Insets(0, 4, 0, 4);	

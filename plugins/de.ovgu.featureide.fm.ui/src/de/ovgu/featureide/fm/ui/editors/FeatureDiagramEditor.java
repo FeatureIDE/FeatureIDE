@@ -352,7 +352,9 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		if (featureModelEditor.getOutlinePage() != null ) {
 			featureModelEditor.getOutlinePage().setInput(getFeatureModel());
 		}
-		
+
+		getFeatureModel().updateFeatureModel();		
+
 		// refresh size of all feature figures
 		getContents().refresh();
 		// layout all features if autoLayout is enabled

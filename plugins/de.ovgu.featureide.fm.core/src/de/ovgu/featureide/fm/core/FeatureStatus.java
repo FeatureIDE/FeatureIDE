@@ -16,25 +16,13 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
-
-import org.eclipse.draw2d.PolylineConnection;
-
-import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
-
+package de.ovgu.featureide.fm.core;
 
 /**
- * A figure to visualize connections between features.
+ * Classification of the Status of a feature in dead or false optional.
  * 
- * TODO remove?
- * 
- * @author Thomas Thuem
+ * @author Cyrill Meyer
  */
-public class ConnectionFigure extends PolylineConnection implements GUIDefaults {
-	
-	public ConnectionFigure() {
-		super();
-		setForegroundColor(CONNECTION_FOREGROUND);
-	}
-	
+public enum FeatureStatus {
+	NORMAL, DEAD, FALSE_OPTIONAL
 }

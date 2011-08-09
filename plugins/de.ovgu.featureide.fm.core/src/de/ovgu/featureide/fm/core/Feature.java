@@ -43,6 +43,8 @@ public class Feature implements PropertyConstants {
 	private boolean multiple = false;
 
 	private boolean hidden = false;
+	
+	private FeatureStatus status = FeatureStatus.NORMAL;
 
 	private FeatureModel featureModel;
 
@@ -115,9 +117,18 @@ public class Feature implements PropertyConstants {
 		fireHiddenChanged();
 	}
 
-	public void setAbstract(Boolean value) {
+	public void setAbstract(boolean value) {
 		this.concret = !value;
 		fireChildrenChanged();
+	}
+	
+	public FeatureStatus getFeatureStatus(){		
+		return status;
+	}
+	
+	public void setFeatureStatus(FeatureStatus stat){
+		this.status = stat;
+		fire(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, false, true));
 	}
 
 	public boolean isMultiple() {

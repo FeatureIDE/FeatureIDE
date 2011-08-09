@@ -20,8 +20,11 @@ package de.ovgu.featureide.fm.core;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
+import org.prop4j.Literal;
 import org.prop4j.Node;
 
 /**
@@ -34,6 +37,9 @@ public class Constraint implements PropertyConstants {
 	private FeatureModel featureModel;
 	private Node propNode;
 	
+	private List<Feature> containedFeatureList;	
+	private ConstraintAttribute attribute = ConstraintAttribute.NORMAL;
+		
 
 	public Constraint(FeatureModel featureModel, Node propNode) {
 		this.featureModel = featureModel;
@@ -43,11 +49,60 @@ public class Constraint implements PropertyConstants {
 	public FeatureModel getFeatureModel() {
 		return featureModel;
 	}
+	
+	public List<Literal> getDeadFeatures(FeatureModel model) {
+		List<Literal> deadFeaturesBefore = null;
+		FeatureModel clonedModel = model.clone();
+		
+		Node propNode = this.getNode();
 
+		if (propNode != null) {
+			if (this != null) {
+				clonedModel.removePropositionalNode(this);
+			}
+			deadFeaturesBefore = clonedModel.getDeadFeatures();
+			clonedModel.addPropositionalNode(propNode);
+			clonedModel.handleModelDataChanged();
+		}
+
+		List<Literal> deadFeaturesAfter = new ArrayList<Literal>();
+
+		for (Literal l : clonedModel.getDeadFeatures()) {
+			if (!deadFeaturesBefore.contains(l)) {
+				deadFeaturesAfter.add(l);
+
+			}
+		}
+		return deadFeaturesAfter;
+	}
+	
+	public void setConstraintAttribute(ConstraintAttribute attri){
+		this.attribute = attri;
+		fire(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, false, true));
+	}
+	
+	public ConstraintAttribute getConstraintAttribute(){
+		return attribute;
+	}
+	
 	public Node getNode() {
 		return propNode;
 	}
+	
+	public void setContainedFeatures(){
+		List<Feature> containedFeatures = new ArrayList<Feature>();
+		
+		for (String featureName : featureModel.getFeatureNames()){
+			if (propNode.toString().contains(featureName)) containedFeatures.add(featureModel.getFeature(featureName));
+		}
+	
+		this.containedFeatureList = containedFeatures;
+	}
 
+	public List<Feature> getContainedFeatures(){
+		return containedFeatureList;
+	}
+	
 	private LinkedList<PropertyChangeListener> listenerList = new LinkedList<PropertyChangeListener>();
 
 	public void addListener(PropertyChangeListener listener) {

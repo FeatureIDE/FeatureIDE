@@ -50,6 +50,8 @@ import org.prop4j.Or;
 import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
+import de.ovgu.featureide.fm.core.editing.Comparison;
+import de.ovgu.featureide.fm.core.editing.ModelComparator;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
  
 /**
@@ -431,7 +433,74 @@ public class FeatureModel implements PropertyConstants {
 		for (PropertyChangeListener listener : listenerList)
 			listener.propertyChange(event);
 	}
-
+	
+	public void updateFeatureModel(){
+		// update features
+		
+		for(Feature bone : getFeatures()) bone.setFeatureStatus(FeatureStatus.NORMAL);
+		
+		try {
+			for(Literal deadFeature : getDeadFeatures()){
+				getFeature(deadFeature.var.toString()).setFeatureStatus(FeatureStatus.DEAD);
+			}
+						
+			for(Feature bone : getFeatures()) {
+				SatSolver satsolver = new SatSolver(new And(NodeCreator.createNodes(this.clone()), new Not(bone.getName())), 1000);				
+				try {
+					if (!satsolver.isSatisfiable() 
+							&& !bone.isMandatory() 
+							&& !bone.isRoot()
+							&& this.isValid()) bone.setFeatureStatus(FeatureStatus.FALSE_OPTIONAL);
+				} catch (TimeoutException e) {
+					e.printStackTrace();
+				}				
+			}
+			
+		} catch (Exception e){
+			e.printStackTrace();
+		}		
+		
+		// update constraints
+		for(Constraint constraint : getConstraints()){
+			constraint.setContainedFeatures();
+			
+			constraint.setConstraintAttribute(ConstraintAttribute.NORMAL);
+			
+			//Redundant
+			FeatureModel newModel = this.clone();
+			FeatureModel dirtyModel = this.clone();
+			dirtyModel.removePropositionalNode(constraint.getNode());
+			ModelComparator comparator = new ModelComparator(20000);
+			Comparison comparison = comparator.compare(newModel, dirtyModel);
+			if (comparison == Comparison.REFACTORING) constraint.setConstraintAttribute(ConstraintAttribute.REDUNDANT); 
+			
+			//Tautology
+			SatSolver satsolverTAU = new SatSolver(new Not(constraint.getNode().clone()), 1000);
+			try {
+				if (!satsolverTAU.isSatisfiable()) constraint.setConstraintAttribute(ConstraintAttribute.TAUTOLOGY);
+			} catch (TimeoutException e) {
+				e.printStackTrace();
+			}
+			
+			//makes void Model
+			FeatureModel clonedModel = this.clone();
+			clonedModel.removePropositionalNode(constraint);
+			try {
+				if (clonedModel.isValid() ^ this.isValid()) constraint.setConstraintAttribute(ConstraintAttribute.VOID_MODEL);
+			} catch (TimeoutException e) {
+				e.printStackTrace();
+			}
+			
+			//Contradiction
+			SatSolver satsolverUS = new SatSolver(constraint.getNode().clone(), 1000);
+			try {
+				 if (!satsolverUS.isSatisfiable()) constraint.setConstraintAttribute(ConstraintAttribute.UNSATISFIABLE);
+			} catch (TimeoutException e) {
+				e.printStackTrace();
+			}			
+		}
+	}
+	
 	public Collection<Feature> getFeatures() {
 		return Collections.unmodifiableCollection(featureTable.values());
 	}
@@ -824,7 +893,8 @@ public class FeatureModel implements PropertyConstants {
 		List<Literal> set = new ArrayList<Literal>();
 		for (Literal e : new SatSolver(root, 1000).knownValues()) {
 			if (!e.positive) {
-				set.add(e);
+				
+				if (!e.var.toString().equals("False") && !e.var.toString().equals("True")) set.add(e);
 			}
 		}
 		return set;

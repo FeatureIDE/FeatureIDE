@@ -175,7 +175,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements
 		if (prop.equals(LOCATION_CHANGED)) {
 			getFeatureFigure().setLocation((Point) event.getNewValue());
 		} else if (prop.equals(CHILDREN_CHANGED)) {
-			getFeatureFigure().setAbstract(getFeatureModel().isAbstract());
+			getFeatureFigure().setProperties();			
 			for (FeatureConnection connection : getFeatureModel()
 					.getTargetConnections()) {
 				Map<?, ?> registry = getViewer().getEditPartRegistry();
@@ -191,6 +191,8 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements
 			getFeatureFigure().setName(getFeatureModel().getName());
 			FeatureUIHelper.setSize(getFeatureModel(), getFeatureFigure()
 					.getSize());
+		} else if (prop.equals(ATTRIBUTE_CHANGED)) {
+			getFeatureFigure().setProperties();
 		}
 	}
 

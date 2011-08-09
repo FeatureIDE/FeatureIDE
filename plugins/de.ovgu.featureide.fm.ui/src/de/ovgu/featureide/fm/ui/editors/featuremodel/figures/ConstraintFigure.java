@@ -24,9 +24,12 @@ import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
+import org.prop4j.Literal;
 import org.prop4j.NodeWriter;
+import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.Constraint;
+import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIBasics;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -43,8 +46,11 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 
 	private final Label label = new Label();
 	
+	private Constraint constraint;
+	
 	public ConstraintFigure(Constraint constraint) {
 		super();
+		this.constraint = constraint;
 		
 		setLayoutManager(new FreeformLayout());
 
@@ -54,8 +60,7 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 		label.setLocation(new Point(CONSTRAINT_INSETS.left, CONSTRAINT_INSETS.top));
 		
 		setText(getConstraintText(constraint));
-		setBorder(CONSTRAINT_BORDER);
-		setBackgroundColor(CONSTRAINT_BACKGROUND);
+		setBorder(CONSTRAINT_BORDER);		
 		
 		FeatureUIHelper.setSize(constraint,getSize());
 		
@@ -64,6 +69,67 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 
 		if (FeatureUIHelper.getLocation(constraint) != null)
 			setLocation(FeatureUIHelper.getLocation(constraint));
+		
+		setConstraintProperties();
+	}
+	
+	public void setConstraintProperties(){
+		try {
+			if (!constraint.getFeatureModel().isValid()){
+				setConstraintError();
+			} else {
+				setConstraintWarning();
+			}
+		} catch (TimeoutException e) {}
+	}
+	
+	private void setConstraintError(){
+		String toolTip;								
+		
+		if (constraint.getConstraintAttribute() == ConstraintAttribute.VOID_MODEL){
+			setBackgroundColor(VOID_MODEL_BACKGROUND);
+			toolTip = " Constraint makes model void! " + '\n';
+			toolTip += '\n' + " " + constraint.getNode().toString(NodeWriter.textualSymbols);
+			setToolTip(new Label(toolTip));
+			
+		} else if (constraint.getConstraintAttribute() == ConstraintAttribute.UNSATISFIABLE) {
+			setBackgroundColor(VOID_MODEL_BACKGROUND);
+			toolTip = " Constraint is unsatisfiable! " + '\n';
+			toolTip += '\n' + " " + constraint.getNode().toString(NodeWriter.textualSymbols);
+			setToolTip(new Label(toolTip));
+		}
+	}
+	
+	private void setConstraintWarning(){	
+		
+		String toolTip;
+			
+		if (constraint.getConstraintAttribute() == ConstraintAttribute.TAUTOLOGY){
+			setBackgroundColor(WARNING_BACKGROUND);
+			toolTip = " Constraint is Tautology! " + '\n';
+			toolTip += '\n' + " " + constraint.getNode().toString(NodeWriter.textualSymbols);
+			setToolTip(new Label(toolTip));	
+			return;
+		}
+		
+		if (!constraint.getDeadFeatures(constraint.getFeatureModel()).isEmpty()){
+			setBackgroundColor(WARNING_BACKGROUND);
+			toolTip = " Constraint makes following features dead: " + '\n';
+			for (Literal dead : constraint.getDeadFeatures(constraint.getFeatureModel())){
+				toolTip += " " + dead.var.toString() + '\n';
+			}
+			toolTip += '\n' + " " + constraint.getNode().toString(NodeWriter.textualSymbols);
+			setToolTip(new Label(toolTip));	
+			return;
+		}
+		
+		if (constraint.getConstraintAttribute() == ConstraintAttribute.REDUNDANT){
+			setBackgroundColor(WARNING_BACKGROUND);
+			toolTip = " Model contains redundant constrains! " + '\n';
+			toolTip += '\n' + " " + constraint.getNode().toString(NodeWriter.textualSymbols);
+			setToolTip(new Label(toolTip));	
+			return;
+		}
 	}
 	
 	private String getConstraintText(Constraint constraint) {

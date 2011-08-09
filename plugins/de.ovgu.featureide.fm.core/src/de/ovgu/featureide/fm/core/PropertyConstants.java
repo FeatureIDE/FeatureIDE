@@ -49,5 +49,7 @@ public interface PropertyConstants {
 	public final static String CHILDREN_CHANGED = "CHILDREN_CHANGED";
 
 	public final static String FEATURE_NAME_CHANGED = "NAME_CHANGED";// oldname->newname
+	
+	public final static String ATTRIBUTE_CHANGED = "ATTRIBUTE_CHANGED"; //changed Color Settings
 
 }

@@ -704,12 +704,12 @@ public class ConstraintDialog {
 
 		if (isTautology(con, 1000)) {
 
-			printHeaderWarning("contraint is a tautology");
+			printHeaderWarning("constraint is a tautology");
 			return false;
 		}
 		if (!isSatisfiable(con, 1000)) {
 
-			printHeaderError("contraint is unsatisfiable");
+			printHeaderWarning("constraint is unsatisfiable");
 			return false;
 		}
 		try {
@@ -834,8 +834,7 @@ public class ConstraintDialog {
 			return;
 		}
 		if (!isSatisfiable(input, 1000)) {
-			printHeaderError("constraint is unsatisfiable");
-			return;
+			printHeaderWarning("constraint is unsatisfiable");			
 		}
 		int index = 0;
 		AbstractOperation op;
