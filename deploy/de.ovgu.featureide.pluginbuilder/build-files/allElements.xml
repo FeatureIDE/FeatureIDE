@@ -32,10 +32,6 @@
 		</ant>
 		<ant antfile="${genericTargets}" target="${target}">
 			<property name="type" value="feature" />
-			<property name="id" value="de.ovgu.featureide.aspectj" />
-		</ant>
-		<ant antfile="${genericTargets}" target="${target}">
-			<property name="type" value="feature" />
 			<property name="id" value="de.ovgu.featureide.munge" />
 		</ant>
 		
@@ -75,11 +71,6 @@
 		</ant>
 	</target>
 	<target name="assemble.de.ovgu.featureide.antenna">
-		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
-			<property name="zipargs" value="" />
-		</ant>
-	</target>
-	<target name="assemble.de.ovgu.featureide.aspectj">
 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
 			<property name="zipargs" value="" />
 		</ant>
