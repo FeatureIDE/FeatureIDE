@@ -15,7 +15,3 @@ feature@de.ovgu.featureide.featurehouse=COPY,/vol1/teamcity_itidb/TeamCity/build
 plugin@de.ovgu.featureide.core.featurehouse=COPY,/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/plugins,de.ovgu.featureide.core.featurehouse
 feature@de.ovgu.featureide.test=COPY,/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/plugins,de.ovgu.featureide.test
 fragment@de.ovgu.featureide.fm.core_test=COPY,/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/plugins,de.ovgu.featureide.fm.core-test
-feature@de.ovgu.featureide.antenna=COPY,/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/plugins,de.ovgu.featureide.antenna
-plugin@de.ovgu.featureide.core.antenna=COPY,/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/plugins,de.ovgu.featureide.core.antenna
-feature@de.ovgu.featureide.munge=COPY,/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/plugins,de.ovgu.featureide.munge
-plugin@de.ovgu.featureide.core.munge=COPY,/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/plugins,de.ovgu.featureide.core.munge
