@@ -437,7 +437,10 @@ public class FeatureModel implements PropertyConstants {
 	public void updateFeatureModel(){
 		// update features
 		
-		for(Feature bone : getFeatures()) bone.setFeatureStatus(FeatureStatus.NORMAL);
+		for(Feature bone : getFeatures()) {
+			bone.setFeatureStatus(FeatureStatus.NORMAL);
+			bone.setRelevantConstraints();
+		}
 		
 		try {
 			for(Literal deadFeature : getDeadFeatures()){

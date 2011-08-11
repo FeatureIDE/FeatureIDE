@@ -37,6 +37,7 @@ public class Constraint implements PropertyConstants {
 	private FeatureModel featureModel;
 	private Node propNode;
 	
+	private boolean featureSelected = false;
 	private List<Feature> containedFeatureList;	
 	private ConstraintAttribute attribute = ConstraintAttribute.NORMAL;
 		
@@ -83,6 +84,15 @@ public class Constraint implements PropertyConstants {
 	
 	public ConstraintAttribute getConstraintAttribute(){
 		return attribute;
+	}
+	
+	public void setFeatureSelected (boolean selected){
+		this.featureSelected = selected;
+		fire(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, false, true));
+	}
+	
+	public boolean isFeatureSelected(){
+		return featureSelected;
 	}
 	
 	public Node getNode() {

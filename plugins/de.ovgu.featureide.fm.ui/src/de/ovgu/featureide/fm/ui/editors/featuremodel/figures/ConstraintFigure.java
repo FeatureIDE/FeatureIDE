@@ -59,8 +59,7 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 
 		label.setLocation(new Point(CONSTRAINT_INSETS.left, CONSTRAINT_INSETS.top));
 		
-		setText(getConstraintText(constraint));
-		setBorder(CONSTRAINT_BORDER);		
+		setText(getConstraintText(constraint));		
 		
 		FeatureUIHelper.setSize(constraint,getSize());
 		
@@ -74,13 +73,16 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 	}
 	
 	public void setConstraintProperties(){
+		
+		setBorder(constraint.isFeatureSelected() ? CONSTRAINT_SELECTED_BORDER : CONSTRAINT_BORDER);
+		
 		try {
 			if (!constraint.getFeatureModel().isValid()){
 				setConstraintError();
 			} else {
 				setConstraintWarning();
 			}
-		} catch (TimeoutException e) {}
+		} catch (TimeoutException e) {}		
 	}
 	
 	private void setConstraintError(){

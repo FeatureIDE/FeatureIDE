@@ -30,8 +30,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.Constraint;
@@ -88,6 +90,9 @@ public class DeleteOperation extends AbstractOperation {
 
 		Iterator<?> iter = selection.iterator();
 		while (iter.hasNext()) {
+			
+			
+			
 			Object editPart = iter.next();
 
 			if (editPart instanceof ConstraintEditPart) {
@@ -106,7 +111,15 @@ public class DeleteOperation extends AbstractOperation {
 			}
 			if (editPart instanceof Feature){
 				Feature feature = ((Feature) editPart);
-				op = new FeatureDeleteOperation(featureModel, feature);
+				if (feature.getRelevantConstraints().isEmpty()) {
+					op = new FeatureDeleteOperation(featureModel, feature);
+				} else {
+					MessageDialog.openWarning(new Shell(), 
+							" Delete Warning ", 
+							" \"" + feature.getName() + "\" is containted in constraints! "
+							+ '\n' + '\n' + 
+							" Unable to delete this feature until all relevant constraints are removed. ");
+				}
 
 				executeOperation(op);
 			}
@@ -119,8 +132,15 @@ public class DeleteOperation extends AbstractOperation {
 			if (editPart instanceof FeatureEditPart) {
 				Feature feature = ((FeatureEditPart) editPart)
 						.getFeatureModel();
-				op = new FeatureDeleteOperation(featureModel, feature);
-
+				if (feature.getRelevantConstraints().isEmpty()) {
+					op = new FeatureDeleteOperation(featureModel, feature);
+				} else {
+					MessageDialog.openWarning(new Shell(), 
+							" Delete Warning ", 
+							" \"" + feature.getName() + "\" is containted in constraints! "
+							+ '\n' + '\n' + 
+							" Unable to delete this feature until all relevant constraints are removed. ");
+				}
 				executeOperation(op);
 
 			}

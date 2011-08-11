@@ -20,8 +20,11 @@ package de.ovgu.featureide.fm.core;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.prop4j.NodeWriter;
 
 /**
  * Provides all properties of a feature. This includes its connections to parent
@@ -43,6 +46,10 @@ public class Feature implements PropertyConstants {
 	private boolean multiple = false;
 
 	private boolean hidden = false;
+	
+	private boolean constraintSelected = false;
+	
+	private List<Constraint> partOfConstraints = new ArrayList<Constraint>();
 	
 	private FeatureStatus status = FeatureStatus.NORMAL;
 
@@ -116,14 +123,42 @@ public class Feature implements PropertyConstants {
 		this.hidden = hid;
 		fireHiddenChanged();
 	}
+	
+	public boolean isConstraintSelected() {
+		return constraintSelected;
+	}
+	
+	public void setConstraintSelected(boolean selection) {
+		this.constraintSelected = selection;
+		fire(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, false, true));
+	}
 
 	public void setAbstract(boolean value) {
 		this.concret = !value;
 		fireChildrenChanged();
 	}
 	
+	public List<Constraint> getRelevantConstraints(){
+		return partOfConstraints;
+	}
+	
+	public void setRelevantConstraints(){	
+		List<Constraint> constraintList = new ArrayList<Constraint>();		
+		
+		for (Constraint constraint : featureModel.getConstraints()) {
+			String node = constraint.getNode().toString(NodeWriter.logicalSymbols);
+			if (node.contains(this.getName())) constraintList.add(constraint);				
+		}
+		
+		this.partOfConstraints = constraintList;
+	}
+	
 	public FeatureStatus getFeatureStatus(){		
 		return status;
+	}
+	
+	public FeatureModel getFeatureModel(){
+		return featureModel;
 	}
 	
 	public void setFeatureStatus(FeatureStatus stat){

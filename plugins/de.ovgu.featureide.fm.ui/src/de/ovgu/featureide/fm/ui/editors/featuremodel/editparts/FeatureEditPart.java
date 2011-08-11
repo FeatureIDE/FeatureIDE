@@ -37,6 +37,7 @@ import org.eclipse.gef.tools.DirectEditManager;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.ui.PlatformUI;
 
+import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureConnection;
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -102,6 +103,11 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements
 
 	@Override
 	public void performRequest(Request request) {
+		
+		for (Constraint constraint : getFeatureModel().getFeatureModel().getConstraints()){
+			constraint.setFeatureSelected(false);
+		}
+		
 		if (request.getType() == RequestConstants.REQ_DIRECT_EDIT) {
 			showRenameManager();
 		} else if (request.getType() == RequestConstants.REQ_OPEN) {
@@ -109,9 +115,8 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements
 			FeatureModel featureModel = ((ModelEditPart) this.getParent())
 			.getFeatureModel();
 			FeatureSetMandatoryOperation op = new FeatureSetMandatoryOperation(feature,featureModel);
-		
+			
 			op.addContext((IUndoContext) featureModel.getUndoContext());
-
 			try {
 				PlatformUI.getWorkbench().getOperationSupport()
 						.getOperationHistory().execute(op, null, null);
@@ -121,6 +126,13 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements
 			}
 
 			featureModel.handleModelDataChanged();
+		} else if (request.getType() == RequestConstants.REQ_SELECTION) {
+			List<Constraint> relevantConstraints = getFeatureModel().getRelevantConstraints();
+			if (!relevantConstraints.isEmpty()){
+				for (Constraint partOf : relevantConstraints){
+					partOf.setFeatureSelected(true);
+				}
+			}
 		}
 	}
 

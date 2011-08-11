@@ -23,6 +23,9 @@ import java.beans.PropertyChangeListener;
 
 import org.eclipse.core.commands.operations.ObjectUndoContext;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.draw2d.ConnectionLayer;
 import org.eclipse.gef.DefaultEditDomain;
 import org.eclipse.gef.EditDomain;
@@ -48,6 +51,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.progress.UIJob;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.PropertyConstants;
@@ -70,6 +74,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ManualLayoutSelecti
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.RenameAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ReverseOrderAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.SelectionAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.GraphicalEditPartFactory;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.BreadthFirstLayout;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.DepthFirstLayout;
@@ -104,6 +109,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	private OrAction orAction;
 	private AlternativeAction alternativeAction;
 	private RenameAction renameAction;
+	@SuppressWarnings("unused")
+	private SelectionAction selectionAction;
 
 	private ZoomInAction zoomIn;
 	private ZoomOutAction zoomOut;
@@ -120,8 +127,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	private LayoutSelectionAction setBreadthFirstLayoutAction;
 	private LayoutSelectionAction setDepthFirstLayoutAction;
 	
-	private ManualLayoutSelectionAction manualLayoutSelectionAction;
-
 	private int index;
 
 	public FeatureDiagramEditor(FeatureModelEditor featureModelEditor,
@@ -168,6 +173,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		orAction = new OrAction(this, featureModel);
 		alternativeAction = new AlternativeAction(this, featureModel);
 		renameAction = new RenameAction(this, featureModel, null);
+		selectionAction = new SelectionAction(this, featureModel);
 
 		createConstraintAction = new CreateConstraintAction(this, featureModel);
 		editConstraintAction = new EditConstraintAction(this, featureModel);
@@ -183,7 +189,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		setBreadthFirstLayoutAction = new LayoutSelectionAction(this, featureModel,1,0);
 		setDepthFirstLayoutAction = new LayoutSelectionAction(this, featureModel,2,0);
 		
-		manualLayoutSelectionAction = new ManualLayoutSelectionAction(this, featureModel);
+		new ManualLayoutSelectionAction(this, featureModel);
 	}
 
 	public void createContextMenu(MenuManager menu) {
@@ -345,15 +351,13 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		return null;
 	}
 
-	public void refresh() {
+	public void internRefresh() {
 		if (getContents() == null)
 			return;
 		
 		if (featureModelEditor.getOutlinePage() != null ) {
 			featureModelEditor.getOutlinePage().setInput(getFeatureModel());
-		}
-
-		getFeatureModel().updateFeatureModel();		
+		}		
 
 		// refresh size of all feature figures
 		getContents().refresh();
@@ -363,6 +367,22 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		}
 		// refresh position of all feature figures
 		getContents().refresh();
+	}
+	
+	public void refresh(){
+		
+		UIJob steve = new UIJob(" Update Feature Model "){
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				getFeatureModel().updateFeatureModel();
+				return Status.OK_STATUS;
+			}			
+		};
+		steve.setPriority(Job.DECORATE);
+		steve.schedule();
+		
+		internRefresh();
+		
 	}
 
 	public void setLayout(){
