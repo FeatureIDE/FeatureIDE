@@ -37,10 +37,10 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 public class FmLabelProvider implements ILabelProvider {
 
 
-	private static Image IMG_OPTIONAL = FMUIPlugin.getImage("optional.gif");
-	private static Image IMG_MANDATORY = FMUIPlugin.getImage("mandatory.gif");
-	private static Image IMG_OR = FMUIPlugin.getImage("or.gif");
-	private static Image IMG_XOR = FMUIPlugin.getImage("exor.gif");
+	private static final Image IMG_OPTIONAL = FMUIPlugin.getImage("optional.gif");
+	private static final Image IMG_MANDATORY = FMUIPlugin.getImage("mandatory.gif");
+	private static final Image IMG_OR = FMUIPlugin.getImage("or.gif");
+	private static final Image IMG_XOR = FMUIPlugin.getImage("exor.gif");
 
 	/*
 	 * (non-Javadoc)
@@ -98,10 +98,8 @@ public class FmLabelProvider implements ILabelProvider {
 			if (((Feature) element).getParent().isAlternative() ||((Feature) element).getParent().isOr())
 				return null;
 			if (((Feature) element).isMandatory()) {
-				//gc.drawImage(IMG_MANDATORY, 0, 0);
 				return IMG_MANDATORY;
 			} else {
-				//gc.drawImage(IMG_OPTIONAL, 0, 0);
 				return IMG_OPTIONAL;
 			}
 		} else if (element instanceof FmOutlineGroupStateStorage) {

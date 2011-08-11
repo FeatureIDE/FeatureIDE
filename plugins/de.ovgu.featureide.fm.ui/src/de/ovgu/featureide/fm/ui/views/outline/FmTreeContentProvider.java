@@ -18,7 +18,6 @@
  */
 package de.ovgu.featureide.fm.ui.views.outline;
 
-
 import java.util.LinkedList;
 import java.util.List;
 
@@ -30,64 +29,72 @@ import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
 /**
- * This class is part of the outline. It provides the content that
- * should be displayed. Therefore it maps the information provided
- * by the fmProject to the methods of the ITreeContentProvider
- * interface.
+ * This class is part of the outline. It provides the content that should be
+ * displayed. Therefore it maps the information provided by the fmProject to the
+ * methods of the ITreeContentProvider interface.
  * 
  * @author Jan Wedding
  * @author Melanie Pflaume
  */
 public class FmTreeContentProvider implements ITreeContentProvider {
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
-	 */
 	private FeatureModel fModel;
 	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
+	 */
 	@Override
 	public void dispose() {
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface
+	 * .viewers.Viewer, java.lang.Object, java.lang.Object)
 	 */
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-		fModel = ((FeatureModel)newInput);
-		
+		fModel = ((FeatureModel) newInput);
+
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getElements(java.lang.Object)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.viewers.ITreeContentProvider#getElements(java.lang.
+	 * Object)
 	 */
 	@Override
 	public Object[] getElements(Object inputElement) {
 		Object[] elements;
 		if (fModel instanceof FeatureModel && fModel != null) {
 			elements = new Object[2];
-//			if (fModel.getRoot().isOr())
-//				elements[0] = new Object[] {new FmOutlineGroupStateStorage(fModel.getRoot(), true) };
-//			else if (fModel.getRoot().isAlternative())
-//				elements[0] = new Object[] {new FmOutlineGroupStateStorage(fModel.getRoot(), false) };
-//			else 
-				elements[0] = fModel.getRoot();
-			
+			elements[0] = fModel.getRoot();
 			elements[1] = "Constraints";
 			return elements;
 		}
-		
-		return new String[] {
-				"No data to display available." };
+
+		return new String[] { "No data to display available." };
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.
+	 * Object)
 	 */
 	@Override
 	public Object[] getChildren(Object parentElement) {
-		if (parentElement == null) return null;
-		
+		if (parentElement == null)
+			return null;
+
+		// we have a String as parent of constraints
 		if (parentElement instanceof String) {
 			Object[] elements = new Object[fModel.getConstraintCount()];
 			List<Constraint> cList = fModel.getConstraints();
@@ -96,22 +103,36 @@ public class FmTreeContentProvider implements ITreeContentProvider {
 			}
 			return elements;
 		}
-		
+
+		// we store the group stage into an extra object in order to be able to
+		// show an own element for GroupStages
 		if (parentElement instanceof FmOutlineGroupStateStorage) {
-			return featureListToArray(((FmOutlineGroupStateStorage)parentElement).getFeature().getChildren());
+			return featureListToArray(((FmOutlineGroupStateStorage) parentElement)
+					.getFeature().getChildren());
 		}
 
-		if (!(parentElement instanceof Feature)) return null;
-		if (!((Feature)parentElement).hasChildren()) return null;
-		
-		if (((Feature)parentElement).isOr())
-			return new Object[] {new FmOutlineGroupStateStorage((Feature) parentElement, true) };
-		if (((Feature)parentElement).isAlternative())
-			return new Object[] {new FmOutlineGroupStateStorage((Feature) parentElement, false) };
-		
-		return featureListToArray(((Feature)parentElement).getChildren());
+		if (!(parentElement instanceof Feature))
+			return null;
+		if (!((Feature) parentElement).hasChildren())
+			return null;
+
+		if (((Feature) parentElement).isOr())
+			return new Object[] { new FmOutlineGroupStateStorage(
+					(Feature) parentElement, true) };
+		if (((Feature) parentElement).isAlternative())
+			return new Object[] { new FmOutlineGroupStateStorage(
+					(Feature) parentElement, false) };
+
+		return featureListToArray(((Feature) parentElement).getChildren());
 	}
-	
+
+	/**
+	 * converts a list of Features into an Array
+	 * 
+	 * @param f
+	 *            FeatureList
+	 * @return Array of Features
+	 */
 	private Feature[] featureListToArray(LinkedList<Feature> f) {
 		Feature[] fArray = new Feature[f.size()];
 		for (int i = 0; i < f.size(); i++) {
@@ -120,33 +141,43 @@ public class FmTreeContentProvider implements ITreeContentProvider {
 		return fArray;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object
+	 * )
 	 */
 	@Override
 	public Object getParent(Object element) {
 		if (element instanceof Feature)
-			return ((Feature)element).getParent();
-		else if (element instanceof Constraint) 
+			return ((Feature) element).getParent();
+		else if (element instanceof Constraint)
 			return "Constraints";
-		else if (element instanceof FmOutlineGroupStateStorage) 
-			return ((FmOutlineGroupStateStorage)element).getFeature();
-		
+		else if (element instanceof FmOutlineGroupStateStorage)
+			return ((FmOutlineGroupStateStorage) element).getFeature();
+
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.Object)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.
+	 * Object)
 	 */
 	@Override
 	public boolean hasChildren(Object element) {
-		if (element instanceof Feature) 
-			return ((Feature)element).hasChildren();
-		else if (element instanceof String) 
-			return true;
+		if (element instanceof Feature)
+			return ((Feature) element).hasChildren();
 		else if (element instanceof FmOutlineGroupStateStorage)
 			return true;
+		else if (element instanceof String)
+			if (((String) element).equals("Constraints"))
+				return fModel.getConstraintCount() > 0;
+
 		return false;
 	}
-	
+
 }

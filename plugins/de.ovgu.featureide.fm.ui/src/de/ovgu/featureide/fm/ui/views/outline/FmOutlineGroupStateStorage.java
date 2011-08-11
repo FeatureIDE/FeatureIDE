@@ -21,14 +21,14 @@ package de.ovgu.featureide.fm.ui.views.outline;
 import de.ovgu.featureide.fm.core.Feature;
 
 /**
- * holds information for the GroupStates in outline views
+ * holds information for the GroupStates of features in outline views
  * 
  * @author Jan Wedding
  */
 public class FmOutlineGroupStateStorage {
 	private Feature feature;
 	private boolean isOrGroup;
-	
+
 	public FmOutlineGroupStateStorage(Feature parentFeature, boolean isOr) {
 		feature = parentFeature;
 		isOrGroup = isOr;
@@ -42,7 +42,9 @@ public class FmOutlineGroupStateStorage {
 		return feature;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
@@ -54,7 +56,9 @@ public class FmOutlineGroupStateStorage {
 		return result;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
@@ -74,6 +78,6 @@ public class FmOutlineGroupStateStorage {
 		if (isOrGroup != other.isOrGroup)
 			return false;
 		return true;
-	}	
+	}
 
 }

@@ -105,7 +105,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	}
 	
 	private IPartListener editorListener = new IPartListener() {
-
+		
 		public void partOpened(IWorkbenchPart part) {
 		}
 
@@ -131,6 +131,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
 	 */
 	public void createPartControl(Composite parent) {
+		
 		IWorkbenchWindow editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		IEditorPart part = null;
 		if (editor != null) {
@@ -302,6 +303,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	public void updateGuiAfterBuild(final IFeatureProject project) {
 		if (featureProject != null && featureProject.equals(project)) {
 			Job job = new Job("Build Collaboration Model") {
+
 				public IStatus run(IProgressMonitor monitor) {
 					if (builded) {
 						builded = false;
@@ -309,7 +311,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 						builded = true;
 						if (model == null) {
 							toolbarAction.setEnabled(true);
-						return Status.OK_STATUS;
+							return Status.OK_STATUS;
 						}
 					
 						UIJob uiJob = new UIJob("Update Collaboration View") {

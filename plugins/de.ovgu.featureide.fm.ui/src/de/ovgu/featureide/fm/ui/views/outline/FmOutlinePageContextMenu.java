@@ -19,6 +19,7 @@
 package de.ovgu.featureide.fm.ui.views.outline;
 
 import org.eclipse.core.commands.operations.ObjectUndoContext;
+import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPartViewer;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.IMenuListener;
@@ -53,6 +54,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.MandatoryAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.RenameAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ReverseOrderAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
 /**
@@ -83,7 +85,7 @@ public class FmOutlinePageContextMenu {
 	private AlternativeAction altAction;
 	private ReverseOrderAction roAction;
 
-	private String menuName = "de.ovgu.feautureide.fm.view.outline.contextmenu";
+	private static final String CONTEXT_MENU_ID = "de.ovgu.feautureide.fm.view.outline.contextmenu";
 
 	public FmOutlinePageContextMenu(IPageSite iPageSite,
 			FeatureModelEditor fTextEditor, TreeViewer viewer,
@@ -97,8 +99,8 @@ public class FmOutlinePageContextMenu {
 
 
 	private void initContextMenu() {
-		addListeners();
 		initActions();
+		addListeners();
 		initMenuManager();
 	}
 
@@ -112,7 +114,7 @@ public class FmOutlinePageContextMenu {
 		});
 		Menu menu = menuMgr.createContextMenu(viewer.getControl());
 		viewer.getControl().setMenu(menu);
-		site.registerContextMenu(menuName, menuMgr, viewer);
+		site.registerContextMenu(CONTEXT_MENU_ID, menuMgr, viewer);
 	}
 
 	private void initActions() {
@@ -134,37 +136,47 @@ public class FmOutlinePageContextMenu {
 		altAction = new AlternativeAction(viewer, fInput);
 	}
 
+	/**
+	 * adds all listeners to the TreeViewer
+	 */
 	private void addListeners() {
 		viewer.addDoubleClickListener(new IDoubleClickListener() {
 			public void doubleClick(DoubleClickEvent event) {
 				if (!(((IStructuredSelection) viewer.getSelection())
 						.getFirstElement() instanceof Feature))
-					return;
-				Feature selection = (Feature) ((IStructuredSelection) viewer
-						.getSelection()).getFirstElement();
-				if (selection.isMandatory())
-					selection.setMandatory(false);
-				else
-					selection.setMandatory(true);
-
-				fTextEditor.diagramEditor.refresh();
+					return;				
+				mAction.run();
 			}
 		});
 		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
 
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
-				if (!(((IStructuredSelection) viewer.getSelection())
-						.getFirstElement() instanceof Feature))
+				EditPart part;
+				if ((((IStructuredSelection) viewer.getSelection())
+						.getFirstElement() instanceof Feature)) {
+					
+					Feature feat = (Feature) ((IStructuredSelection) viewer
+							.getSelection()).getFirstElement();
+	
+					part = (FeatureEditPart) fTextEditor.diagramEditor
+							.getEditPartRegistry().get(feat);
+
+				} else if ((((IStructuredSelection) viewer.getSelection())
+						.getFirstElement() instanceof Constraint)) {
+					
+					Constraint constr = (Constraint) ((IStructuredSelection) viewer
+							.getSelection()).getFirstElement();
+					
+					part = (ConstraintEditPart) fTextEditor.diagramEditor
+					.getEditPartRegistry().get(constr);
+					
+				} else {
 					return;
-				Feature feat = (Feature) ((IStructuredSelection) viewer
-						.getSelection()).getFirstElement();
-
-				FeatureEditPart part = (FeatureEditPart) fTextEditor.diagramEditor
-						.getEditPartRegistry().get(feat);
-
+				}
+				
 				((GraphicalViewerImpl) fTextEditor.diagramEditor)
-						.setSelection(new StructuredSelection(part));
+				.setSelection(new StructuredSelection(part));
 				
 				try {
 					EditPartViewer view = part.getViewer();
@@ -178,7 +190,11 @@ public class FmOutlinePageContextMenu {
 
 		});
 	}
-
+	
+	/**
+	 * fills the ContextMenu depending on the current selection
+	 * @param manager
+	 */
 	protected void fillContextMenu(IMenuManager manager) {
 		Object sel = ((IStructuredSelection) viewer.getSelection())
 				.getFirstElement();

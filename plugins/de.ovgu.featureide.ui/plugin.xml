@@ -232,6 +232,14 @@
             name="Collaboration Diagram"
             restorable="true">
       </view>
+      <view
+            category="FeatureIDE"
+            class="de.ovgu.featureide.ui.views.collaboration.outline.CollaborationOutline"
+            icon="icons/FeatureIconSmall.ico"
+            id="de.ovgu.featureide.ui.views.collaboration.outline.CollaborationOutline"
+            name="Collaboration Outline"
+            restorable="true">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.perspectives">
