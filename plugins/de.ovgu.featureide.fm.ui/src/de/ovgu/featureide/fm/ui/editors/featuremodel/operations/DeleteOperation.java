@@ -91,7 +91,7 @@ public class DeleteOperation extends AbstractOperation {
 		Iterator<?> iter = selection.iterator();
 		while (iter.hasNext()) {
 			
-			
+			op = null;
 			
 			Object editPart = iter.next();
 
@@ -113,6 +113,7 @@ public class DeleteOperation extends AbstractOperation {
 				Feature feature = ((Feature) editPart);
 				if (feature.getRelevantConstraints().isEmpty()) {
 					op = new FeatureDeleteOperation(featureModel, feature, true);
+					executeOperation(op);
 				} else {
 					MessageDialog.openWarning(new Shell(), 
 							" Delete Warning ", 
@@ -121,7 +122,7 @@ public class DeleteOperation extends AbstractOperation {
 							" Unable to delete this feature until all relevant constraints are removed. ");
 				}
 
-				executeOperation(op);
+				
 			}
 			if (editPart instanceof Constraint){
 				Constraint constraint = ((Constraint) editPart);
@@ -134,6 +135,7 @@ public class DeleteOperation extends AbstractOperation {
 						.getFeatureModel();
 				if (feature.getRelevantConstraints().isEmpty()) {
 					op = new FeatureDeleteOperation(featureModel, feature, true);
+					executeOperation(op);
 				} else {
 					MessageDialog.openWarning(new Shell(), 
 							" Delete Warning ", 
@@ -141,10 +143,10 @@ public class DeleteOperation extends AbstractOperation {
 							+ '\n' + '\n' + 
 							" Unable to delete this feature until all relevant constraints are removed. ");
 				}
-				executeOperation(op);
+				
 
 			}
-			operations.add(op);
+			if (op != null) operations.add(op);
 		}
 		featureModel.handleModelDataChanged();
 		return Status.OK_STATUS;

@@ -520,8 +520,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 			return getOutlinePage();
 		}
 		if (IGotoMarker.class.equals(adapter))
-			if (getActivePage() != getTextEditorIndex())
-				setActivePage(getTextEditorIndex());
+			if (getActivePage() != getDiagramEditorIndex())
+				setActivePage(getDiagramEditorIndex());
 		Object o = diagramEditor.getAdapter(adapter);
 		if (o != null)
 			return o;

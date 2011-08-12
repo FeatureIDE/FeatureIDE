@@ -28,6 +28,8 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.Feature;
@@ -74,21 +76,25 @@ public class DeleteAllOperation extends AbstractOperation {
 		featureList = new LinkedList<Feature>();
 		featureList.add(feature);
 		LinkedList<Feature> g = new LinkedList<Feature>();
-		g.add(feature);
-		getFeaturesToDelete(g);
+		g.add(feature);		
 
 		AbstractOperation op = null;
-		Feature fe = null;
-
-		for (int i = 0; i < this.featureList.size(); i++) {
-			fe = this.featureList.get(i);
-			System.out.print(fe.getName());
-			op = new FeatureDeleteOperation(featureModel, fe, false);
-			executeOperation(op);
-			operations.add(op);
+		
+		if (getFeaturesToDelete(g)){
+			for (Feature feat : featureList){			
+				op = new FeatureDeleteOperation(featureModel, feat, false);
+				executeOperation(op);
+				operations.add(op);
+			}			
+			featureModel.handleModelDataChanged();
+		} else {
+			MessageDialog.openWarning(new Shell(), 
+					" Delete Warning ", 
+					" \"" + feature.getName() + "\" or one of its children is containted in constraints! "
+					+ '\n' + '\n' + 
+					" Unable to delete features until all relevant constraints are removed. ");
 		}
 
-		featureModel.handleModelDataChanged();
 		return Status.OK_STATUS;
 	}
 
@@ -119,7 +125,6 @@ public class DeleteAllOperation extends AbstractOperation {
 				} catch (Exception E) {
 
 				}
-
 			}
 		}
 		featureModel.handleModelDataChanged();
@@ -144,8 +149,6 @@ public class DeleteAllOperation extends AbstractOperation {
 		Collections.reverse(operations);
 		while (!ops.isEmpty()) {
 			for (AbstractOperation op : operations) {
-				System.out.print(op.getLabel());
-
 				if (op.canUndo()) {
 					op.undo(arg0, arg1);
 					ops.remove(op);
@@ -162,17 +165,21 @@ public class DeleteAllOperation extends AbstractOperation {
 	 * 
 	 * @param linkedList
 	 */
-	private void getFeaturesToDelete(LinkedList<Feature> linkedList) {
+	private boolean getFeaturesToDelete(LinkedList<Feature> linkedList) {
 		Feature f = null;
 		for (int i = 0; i < linkedList.size(); i++) {
 			f = linkedList.get(i);
+			
+			if (!f.getRelevantConstraints().isEmpty()) return false;
+			
 			if (f.hasChildren()) {
-				getFeaturesToDelete(f.getChildren());
+				return getFeaturesToDelete(f.getChildren());
 			}
 			// don not collect the parent feature itself (is already in the list)
 			if (!f.getName().equals(feature.getName())) {
 				this.featureList.add(f);
 			}
-		}
+		}		
+		return true;
 	}
 }
