@@ -19,7 +19,6 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -29,41 +28,35 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
 
 /**
- * Operation with functionality to delete multiple elements from the feature
- * model editor. Enables Undo/Redo.
+ * Allows to delete a feature including its sub features
  * 
- * @author Fabian Benduhn
+ * @author Jan Wedding
+ * @author Melanie Pflaume
  */
-public class DeleteOperation extends AbstractOperation {
+public class DeleteAllOperation extends AbstractOperation {
 
-	private static final String LABEL = "Delete";
-	private Object viewer;
+	private static final String LABEL = "Delete including subfeatures";
 	private FeatureModel featureModel;
+	private Feature feature;
+	private LinkedList<Feature> featureList;
 	private List<AbstractOperation> operations;
 
 	/**
-	 * 
+	 * @param viewer
+	 * @param featureModel
 	 */
-	public DeleteOperation(Object viewer, FeatureModel featureModel) {
+	public DeleteAllOperation(Object viewer, FeatureModel featureModel,
+			Feature parent) {
 		super(LABEL);
-		this.viewer = viewer;
 		this.featureModel = featureModel;
+		this.feature = parent;
 		this.operations = new LinkedList<AbstractOperation>();
 	}
 
@@ -78,82 +71,27 @@ public class DeleteOperation extends AbstractOperation {
 	public IStatus execute(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
 
+		featureList = new LinkedList<Feature>();
+		featureList.add(feature);
+		LinkedList<Feature> g = new LinkedList<Feature>();
+		g.add(feature);
+		getFeaturesToDelete(g);
+
 		AbstractOperation op = null;
-		
-		IStructuredSelection selection;
-		if (viewer instanceof GraphicalViewerImpl)
-		selection = (IStructuredSelection) ((GraphicalViewerImpl) viewer)
-				.getSelection();
-		else 
-			selection = (IStructuredSelection) ((TreeViewer) viewer)
-			.getSelection();
+		Feature fe = null;
 
-		Iterator<?> iter = selection.iterator();
-		while (iter.hasNext()) {
-			
-			
-			
-			Object editPart = iter.next();
-
-			if (editPart instanceof ConstraintEditPart) {
-
-				Constraint constraint = ((ConstraintEditPart) editPart)
-						.getConstraintModel();
-				op = new ConstraintDeleteOperation(constraint, featureModel);
-
-				executeOperation(op);
-			}
-			if (editPart instanceof LegendEditPart) {
-				op = new LegendHideOperation(featureModel);
-
-				executeOperation(op);
-
-			}
-			if (editPart instanceof Feature){
-				Feature feature = ((Feature) editPart);
-				if (feature.getRelevantConstraints().isEmpty()) {
-					op = new FeatureDeleteOperation(featureModel, feature, true);
-				} else {
-					MessageDialog.openWarning(new Shell(), 
-							" Delete Warning ", 
-							" \"" + feature.getName() + "\" is containted in constraints! "
-							+ '\n' + '\n' + 
-							" Unable to delete this feature until all relevant constraints are removed. ");
-				}
-
-				executeOperation(op);
-			}
-			if (editPart instanceof Constraint){
-				Constraint constraint = ((Constraint) editPart);
-				op = new ConstraintDeleteOperation(constraint, featureModel);
-
-				executeOperation(op);
-			}
-			if (editPart instanceof FeatureEditPart) {
-				Feature feature = ((FeatureEditPart) editPart)
-						.getFeatureModel();
-				if (feature.getRelevantConstraints().isEmpty()) {
-					op = new FeatureDeleteOperation(featureModel, feature, true);
-				} else {
-					MessageDialog.openWarning(new Shell(), 
-							" Delete Warning ", 
-							" \"" + feature.getName() + "\" is containted in constraints! "
-							+ '\n' + '\n' + 
-							" Unable to delete this feature until all relevant constraints are removed. ");
-				}
-				executeOperation(op);
-
-			}
+		for (int i = 0; i < this.featureList.size(); i++) {
+			fe = this.featureList.get(i);
+			System.out.print(fe.getName());
+			op = new FeatureDeleteOperation(featureModel, fe, false);
+			executeOperation(op);
 			operations.add(op);
 		}
+
 		featureModel.handleModelDataChanged();
 		return Status.OK_STATUS;
 	}
 
-	/**
-	 * @param op
-	 *            operation to be executed
-	 */
 	private void executeOperation(AbstractOperation op) {
 		try {
 			PlatformUI.getWorkbench().getOperationSupport()
@@ -165,13 +103,6 @@ public class DeleteOperation extends AbstractOperation {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#redo(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
 	@Override
 	public IStatus redo(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
@@ -182,7 +113,6 @@ public class DeleteOperation extends AbstractOperation {
 		while (!ops.isEmpty()) {
 			for (AbstractOperation op : operations) {
 				try {
-
 					op.redo(monitor, info);
 					ops.remove(op);
 
@@ -214,6 +144,7 @@ public class DeleteOperation extends AbstractOperation {
 		Collections.reverse(operations);
 		while (!ops.isEmpty()) {
 			for (AbstractOperation op : operations) {
+				System.out.print(op.getLabel());
 
 				if (op.canUndo()) {
 					op.undo(arg0, arg1);
@@ -225,4 +156,23 @@ public class DeleteOperation extends AbstractOperation {
 		return Status.OK_STATUS;
 	}
 
+	/**
+	 * traverses through the whole subtree and collects the features that should
+	 * be deleted
+	 * 
+	 * @param linkedList
+	 */
+	private void getFeaturesToDelete(LinkedList<Feature> linkedList) {
+		Feature f = null;
+		for (int i = 0; i < linkedList.size(); i++) {
+			f = linkedList.get(i);
+			if (f.hasChildren()) {
+				getFeaturesToDelete(f.getChildren());
+			}
+			// don not collect the parent feature itself (is already in the list)
+			if (!f.getName().equals(feature.getName())) {
+				this.featureList.add(f);
+			}
+		}
+	}
 }

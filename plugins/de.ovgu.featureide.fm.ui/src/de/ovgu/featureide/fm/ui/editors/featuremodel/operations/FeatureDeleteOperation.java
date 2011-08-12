@@ -44,11 +44,13 @@ public class FeatureDeleteOperation extends AbstractOperation {
 	private int oldIndex;
 	private LinkedList<Feature> oldChildren;
 	private boolean deleted = false;
+	private boolean refresh;
 
-	public FeatureDeleteOperation(FeatureModel featureModel, Feature feature) {
+	public FeatureDeleteOperation(FeatureModel featureModel, Feature feature, boolean refreshDiagram) {
 		super("Delete");
 		this.featureModel = featureModel;
 		this.feature = feature;
+		this.refresh = refreshDiagram;
 
 	}
 
@@ -103,7 +105,9 @@ public class FeatureDeleteOperation extends AbstractOperation {
 		} else {
 			deleted = featureModel.deleteFeature(feature);
 		}
-		featureModel.handleModelDataLoaded();
+		if (refresh)
+			featureModel.handleModelDataLoaded();
+		
 		return Status.OK_STATUS;
 	}
 
@@ -144,8 +148,11 @@ public class FeatureDeleteOperation extends AbstractOperation {
 				featureModel.setRoot(feature);
 			}
 			featureModel.addFeature(feature);
-			featureModel.handleModelDataLoaded();
-			featureModel.redrawDiagram();
+			
+			if (refresh) {
+				featureModel.handleModelDataLoaded();
+				featureModel.redrawDiagram();
+			}
 		} catch (Exception e) {
 			FMUIPlugin.getDefault().logError(e);
 		}

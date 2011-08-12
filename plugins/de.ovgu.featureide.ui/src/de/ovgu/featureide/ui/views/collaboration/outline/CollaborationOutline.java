@@ -26,10 +26,15 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeViewerListener;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
@@ -47,6 +52,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.progress.UIJob;
+import org.eclipse.ui.texteditor.ITextEditor;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
@@ -69,10 +75,11 @@ public class CollaborationOutline extends ViewPart {
 
 	private TreeViewer viewer;
 	private IFile iFile;
-	public static final String ID = UIPlugin.PLUGIN_ID
-			+ ".views.collaboration.outline.CollaborationOutline";
 	private IFeatureProject featureProject;
 	private Object[] expandedElements;
+	private IEditorPart active_editor;
+	public static final String ID = UIPlugin.PLUGIN_ID
+			+ ".views.collaboration.outline.CollaborationOutline";
 
 	private IPartListener editorListener = new IPartListener() {
 
@@ -154,8 +161,8 @@ public class CollaborationOutline extends ViewPart {
 
 	};
 	/**
-	 * colors the tree in case a treeItem has been expanded
-	 * because the children are lazily loaded
+	 * colors the tree in case a treeItem has been expanded (because the
+	 * children are lazily loaded)
 	 */
 	private ITreeViewerListener treeListener = new ITreeViewerListener() {
 
@@ -166,6 +173,35 @@ public class CollaborationOutline extends ViewPart {
 		@Override
 		public void treeExpanded(TreeExpansionEvent event) {
 			colorizeItems(viewer.getTree().getItems());
+		}
+
+	};
+
+	/**
+	 * triggers a scrolling action to the selected field/method in the current
+	 * editor
+	 */
+	private ISelectionChangedListener selectionChangedListener = new ISelectionChangedListener() {
+		@Override
+		public void selectionChanged(SelectionChangedEvent event) {
+			if (iFile != null) {
+				if ((((IStructuredSelection) viewer.getSelection())
+						.getFirstElement() instanceof FSTMethod)) {
+					FSTMethod meth = (FSTMethod) ((IStructuredSelection) viewer
+							.getSelection()).getFirstElement();
+					if (meth.isOwn(iFile)) {
+						scrollToLine(active_editor, meth.getLineNumber(iFile));
+					}
+				} else if ((((IStructuredSelection) viewer.getSelection())
+						.getFirstElement() instanceof FSTField)) {
+					FSTField field = (FSTField) ((IStructuredSelection) viewer
+							.getSelection()).getFirstElement();
+					if (field.isOwn(iFile)) {
+						scrollToLine(active_editor, field.getLineNumber(iFile));
+					}
+				}
+			}
+
 		}
 
 	};
@@ -188,6 +224,7 @@ public class CollaborationOutline extends ViewPart {
 			if (page != null) {
 				part = page.getActiveEditor();
 				if (part != null) {
+					this.active_editor = part;
 					// case: open editor
 					FileEditorInput inputFile = (FileEditorInput) part
 							.getEditorInput();
@@ -218,6 +255,7 @@ public class CollaborationOutline extends ViewPart {
 		viewer.setAutoExpandLevel(2);
 		viewer.addDoubleClickListener(dblClicklistener);
 		viewer.addTreeListener(treeListener);
+		viewer.addSelectionChangedListener(selectionChangedListener);
 	}
 
 	@Override
@@ -281,19 +319,13 @@ public class CollaborationOutline extends ViewPart {
 				if (!((FSTMethod) treeItems[i].getData()).isOwn(iFile)) {
 					treeItems[i].setForeground(viewer.getControl().getDisplay()
 							.getSystemColor(SWT.COLOR_GRAY));
-					continue;
 				}
-			}
-			
-			if (treeItems[i].getData() instanceof FSTField) {
+			} else if (treeItems[i].getData() instanceof FSTField) {
 				if (!((FSTField) treeItems[i].getData()).isOwn(iFile)) {
 					treeItems[i].setForeground(viewer.getControl().getDisplay()
 							.getSystemColor(SWT.COLOR_GRAY));
-					continue;
 				}
-			}
-
-			if (treeItems[i].getData() instanceof Role) {
+			} else if (treeItems[i].getData() instanceof Role) {
 				if (((Role) treeItems[i].getData()).file.equals(iFile)) {
 					// get old Font and simply make it bold
 					treeItems[i]
@@ -302,10 +334,34 @@ public class CollaborationOutline extends ViewPart {
 											.getName(), treeItems[i].getFont()
 											.getFontData()[0].getHeight(),
 									SWT.BOLD));
-					continue;
 				}
 			}
+		}
+	}
 
+	/**
+	 * Jumps to a line in the given editor
+	 * 
+	 * @param editorPart
+	 * @param lineNumber
+	 */
+	private static void scrollToLine(IEditorPart editorPart, int lineNumber) {
+		if (!(editorPart instanceof ITextEditor) || lineNumber <= 0) {
+			return;
+		}
+		ITextEditor editor = (ITextEditor) editorPart;
+		IDocument document = editor.getDocumentProvider().getDocument(
+				editor.getEditorInput());
+		if (document != null) {
+			IRegion lineInfo = null;
+			try {
+				lineInfo = document.getLineInformation(lineNumber - 1);
+			} catch (BadLocationException e) {
+			}
+			if (lineInfo != null) {
+				editor.selectAndReveal(lineInfo.getOffset(),
+						lineInfo.getLength());
+			}
 		}
 	}
 }

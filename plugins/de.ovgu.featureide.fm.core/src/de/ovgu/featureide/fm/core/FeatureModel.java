@@ -444,7 +444,8 @@ public class FeatureModel implements PropertyConstants {
 		
 		try {
 			for(Literal deadFeature : getDeadFeatures()){
-				getFeature(deadFeature.var.toString()).setFeatureStatus(FeatureStatus.DEAD);
+				if (getFeature(deadFeature.var.toString()) != null)
+					getFeature(deadFeature.var.toString()).setFeatureStatus(FeatureStatus.DEAD);
 			}
 						
 			for(Feature bone : getFeatures()) {

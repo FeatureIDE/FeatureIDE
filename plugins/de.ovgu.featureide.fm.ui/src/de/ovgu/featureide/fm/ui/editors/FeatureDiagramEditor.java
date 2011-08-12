@@ -64,6 +64,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateCompoundActio
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateLayerAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAllAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.EditConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.HiddenAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LayoutSelectionAction;
@@ -102,6 +103,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	private CreateLayerAction createLayerAction;
 	private CreateCompoundAction createCompoundAction;
 	private DeleteAction deleteAction;
+	private DeleteAllAction deleteAllAction;
 	private MandatoryAction mandatoryAction;
 	private AbstractAction abstractAction;
 	private HiddenAction hiddenAction;
@@ -165,6 +167,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		createLayerAction = new CreateLayerAction(this, featureModel, null);
 		createCompoundAction = new CreateCompoundAction(this, featureModel, null);
 		deleteAction = new DeleteAction(this, featureModel);
+		deleteAllAction = new DeleteAllAction(this, featureModel);
 		mandatoryAction = new MandatoryAction(this, featureModel);
 		hiddenAction = new HiddenAction(this, featureModel);
 		abstractAction = new AbstractAction(this, featureModel,
@@ -290,6 +293,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 			menu.add(createConstraintAction);
 			menu.add(renameAction);
 			menu.add(deleteAction);
+			menu.add(deleteAllAction);
 			menu.add(new Separator());
 			menu.add(mandatoryAction);
 			menu.add(abstractAction);

@@ -48,6 +48,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateCompoundActio
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateLayerAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAllAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.EditConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.HiddenAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.MandatoryAction;
@@ -75,6 +76,7 @@ public class FmOutlinePageContextMenu {
 	private MandatoryAction mAction;
 	private AbstractAction aAction;
 	private DeleteAction dAction;
+	private DeleteAllAction dAAction;
 	private RenameAction reAction;
 	private CreateCompoundAction cAction;
 	private CreateLayerAction clAction;
@@ -123,6 +125,7 @@ public class FmOutlinePageContextMenu {
 		aAction = new AbstractAction(viewer, fInput,
 				(ObjectUndoContext) fInput.getUndoContext());
 		dAction = new DeleteAction(viewer, fInput);
+		dAAction = new DeleteAllAction(viewer, fInput);
 		ccAction = new CreateConstraintAction(viewer, fInput);
 		ecAction = new EditConstraintAction(viewer, fInput);
 		cAction = new CreateCompoundAction(viewer, fInput,
@@ -226,6 +229,8 @@ public class FmOutlinePageContextMenu {
 			
 			dAction.setText("Delete");
 			manager.add(dAction);
+			
+			manager.add(dAAction);
 			
 			manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 			manager.add(mAction);
