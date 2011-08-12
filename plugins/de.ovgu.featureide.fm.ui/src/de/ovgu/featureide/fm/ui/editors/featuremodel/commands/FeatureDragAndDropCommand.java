@@ -29,6 +29,7 @@ import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureMoveOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureOperationData;
 
@@ -54,20 +55,24 @@ public class FeatureDragAndDropCommand extends Command {
 
 	private int newIndex;
 
+	private FeatureEditPart editPart;
+
 	public FeatureDragAndDropCommand(FeatureModel featureModel,
-			Feature feature, Point newLocation) {
+			Feature feature, Point newLocation,FeatureEditPart editPart) {
 		super("Moving " + feature.getName());
 		this.featureModel = featureModel;
 		this.feature = feature;
 		this.newLocation = newLocation;
-	
+		this.editPart = editPart;
 		oldParent = feature.getParent();
 		oldIndex = oldParent != null ? oldParent.getChildIndex(feature) : 0;
 	}
 
 	@Override
 	public boolean canExecute() {
-	
+		if(editPart.getSelected()!=2){
+			return false;
+		}
 		Point referencePoint = FeatureUIHelper.getSourceLocation(feature,
 				newLocation);
 		Feature next = calculateNext(featureModel.getRoot(), referencePoint);

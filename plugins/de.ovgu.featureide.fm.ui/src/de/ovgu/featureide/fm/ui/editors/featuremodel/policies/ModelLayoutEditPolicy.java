@@ -82,7 +82,7 @@ public class ModelLayoutEditPolicy extends LayoutEditPolicy {
 				Rectangle bounds = FeatureUIHelper.getBounds(feature);
 				bounds = r.getTransformedRectangle(bounds);
 				cmd = new FeatureDragAndDropCommand(featureModel, feature,
-						bounds.getLocation());
+						bounds.getLocation(),editPart);
 			}
 			if (r.getEditParts().get(0) instanceof ConstraintEditPart) {
 				ConstraintEditPart editPart = (ConstraintEditPart) r
