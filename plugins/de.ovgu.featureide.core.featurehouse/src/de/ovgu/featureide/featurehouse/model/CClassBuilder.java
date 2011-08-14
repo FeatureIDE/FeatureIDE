@@ -46,7 +46,7 @@ public class CClassBuilder extends ClassBuilder {
 		LinkedList<String> fields = getFields(terminal.getBody());
 		for (int i = 2;i < fields.size();i++) {
 			// add field
-			FSTField field = new FSTField(fields.get(i), fields.get(1), 0, fields.get(0));
+			FSTField field = new FSTField(fields.get(i), fields.get(1), 0, fields.get(0),terminal.getBody(),terminal.beginLine, terminal.endLine);
 			field.setOwn(modelBuilder.getCurrentFile());
 			modelBuilder.getCurrentClass().fields.put(field.getIdentifier(), field);
 		}
@@ -117,7 +117,7 @@ public class CClassBuilder extends ClassBuilder {
 		for (int i = 3;i < method.size();i++) {
 			parameterTypes.add(method.get(i));
 		}
-		addMethod(method.get(0), parameterTypes, method.get(1), method.get(2));
+		addMethod(method.get(0), parameterTypes, method.get(1), method.get(2), terminal.getBody(), terminal.beginLine, terminal.endLine);
 	}
 	
 	/**
@@ -172,8 +172,8 @@ public class CClassBuilder extends ClassBuilder {
 	}
 
 	private void addMethod(String name, LinkedList<String> parameterTypes, 
-			String returnType, String modifiers) {
-		FSTMethod method = new FSTMethod(name, parameterTypes, returnType, modifiers);								
+			String returnType, String modifiers, String body, int beginLine, int endLine) {
+		FSTMethod method = new FSTMethod(name, parameterTypes, returnType, modifiers, body, beginLine, endLine);								
 		method.setOwn(modelBuilder.getCurrentFile());
 		modelBuilder.getCurrentClass().methods.put(method.getIdentifier(), method);
 	}

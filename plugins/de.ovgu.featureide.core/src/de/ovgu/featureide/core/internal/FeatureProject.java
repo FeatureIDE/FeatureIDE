@@ -1069,7 +1069,6 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
 	public void setPaths(String feature, String src, String configuration) {
 		try {
 			IProjectDescription description = project.getDescription();
@@ -1098,7 +1097,6 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	 * @see
 	 * de.ovgu.featureide.core.IFeatureProject#setComposerID(java.lang.String)
 	 */
-	@SuppressWarnings("unchecked")
 	public void setComposerID(String composerID) {
 		try {
 			project.setPersistentProperty(composerConfigID, composerID);

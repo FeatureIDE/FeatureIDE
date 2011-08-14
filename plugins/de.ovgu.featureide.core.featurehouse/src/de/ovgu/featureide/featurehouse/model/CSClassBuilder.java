@@ -45,7 +45,7 @@ public class CSClassBuilder extends ClassBuilder {
 		String modifiers = terminal.getBody().substring(0, terminal.getBody().indexOf(name));
 
 		// add method
-		addMethod(name, getMethodParameter(terminal), "void", modifiers);
+		addMethod(name, getMethodParameter(terminal), "void", modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine);
 	}
 
 	private String[] modifier = {"static","final","private","public","protected"};
@@ -54,7 +54,7 @@ public class CSClassBuilder extends ClassBuilder {
 		LinkedList<String> fields = getFields(terminal.getBody());
 		for (int i = 2;i < fields.size();i++) {
 			// add field
-			FSTField field = new FSTField(fields.get(i), fields.get(1), 0, fields.get(0));
+			FSTField field = new FSTField(fields.get(i), fields.get(1), 0, fields.get(0), terminal.getBody(), terminal.beginLine, terminal.endLine);
 			field.setOwn(modelBuilder.getCurrentFile());
 			modelBuilder.getCurrentClass().fields.put(field.getIdentifier(), field);
 		}
@@ -174,7 +174,7 @@ public class CSClassBuilder extends ClassBuilder {
 		}
 
 		// add method
-		addMethod(name, getMethodParameter(terminal), returnType, modifiers);
+		addMethod(name, getMethodParameter(terminal), returnType, modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine);
 	}
 	
 	/**
@@ -204,8 +204,8 @@ public class CSClassBuilder extends ClassBuilder {
 	}
 	
 	private void addMethod(String name, LinkedList<String> parameterTypes, 
-			String returnType, String modifiers) {
-		FSTMethod method = new FSTMethod(name, parameterTypes, returnType, modifiers);								
+			String returnType, String modifiers, String body, int beginLine, int endLine) {
+		FSTMethod method = new FSTMethod(name, parameterTypes, returnType, modifiers, body, beginLine, endLine);								
 		method.setOwn(modelBuilder.getCurrentFile());
 		modelBuilder.getCurrentClass().methods.put(method.getIdentifier(), method);
 	}

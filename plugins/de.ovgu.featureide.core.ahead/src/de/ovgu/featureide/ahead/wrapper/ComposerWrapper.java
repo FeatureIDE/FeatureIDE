@@ -375,9 +375,6 @@ public class ComposerWrapper {
 			args[i] = file.getRawLocation().toOSString();
 			i++;
 		}
-		String test = "";
-		for (String arg : args)
-			test += arg;
 		
 		//run Mixin
 		Mixin.main(args);

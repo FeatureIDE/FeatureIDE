@@ -31,14 +31,19 @@ import org.eclipse.core.resources.IFile;
  */
 public class FSTMethod extends FSTModelElement implements Comparable<Object> {
 
-	private String methodName;
+	public String methodName;
 	private LinkedList<String> parameterTypes;
 	private String returnType;
 	private String modifiers;
 	private HashSet<IFile> ownFiles;
 	private HashSet<IFile> availableFiles;
 	private HashMap<IFile, Integer> lineNumbers;
-
+	private String body;
+	private int beginLine;
+	private int endLine;
+	private int composedLine;
+	public boolean isConstructor = false;
+	
 	public FSTMethod() {
 		this(null, null, null,null);
 	}
@@ -52,6 +57,20 @@ public class FSTMethod extends FSTModelElement implements Comparable<Object> {
 		this.availableFiles = new HashSet<IFile>();
 		this.lineNumbers = new HashMap<IFile, Integer>();
 		this.modifiers = modifiers;
+	}
+	
+	public FSTMethod(String methodName, LinkedList<String> parameterTypes,
+			String returnType, String modifiers, String body, int beginLine, int endLine) {
+		this.methodName = methodName;
+		this.parameterTypes = parameterTypes;
+		this.returnType = returnType;
+		this.ownFiles = new HashSet<IFile>();
+		this.availableFiles = new HashSet<IFile>();
+		this.lineNumbers = new HashMap<IFile, Integer>();
+		this.modifiers = modifiers;
+		this.body = body;
+		this.beginLine = beginLine;
+		this.endLine = endLine;
 	}
 
 	public String getName() {
@@ -112,9 +131,10 @@ public class FSTMethod extends FSTModelElement implements Comparable<Object> {
 	}
 
 	public int getLineNumber(IFile file) {
-		if (lineNumbers.containsKey(file))
+		if (lineNumbers.containsKey(file)) {
 			return lineNumbers.get(file);
-		return -1;
+		}
+		return beginLine;
 	}
 
 	public boolean isFinal() {
@@ -135,5 +155,32 @@ public class FSTMethod extends FSTModelElement implements Comparable<Object> {
 
 	public boolean isStatic() {
 		return modifiers.contains("static");
+	}
+	
+	public void setLine(int composedLine) {
+		this.composedLine = composedLine;
+	}
+
+	public IFile getOwnFile() {
+		for (IFile f : ownFiles) {
+			return f;
+		}
+		return  null;
+	}
+	
+	public int getComposedLine() {
+		return composedLine;
+	}
+	
+	public int getBeginLine() {
+		return beginLine;
+	}
+	
+	public int getEndLine() {
+		return endLine;
+	}
+	
+	public String getBody() {
+		return body;
 	}
 }

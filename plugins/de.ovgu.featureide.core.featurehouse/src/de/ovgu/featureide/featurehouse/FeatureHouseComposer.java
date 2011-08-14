@@ -39,7 +39,6 @@ import composer.CmdLineInterpreter;
 import composer.FSTGenComposer;
 import composer.IParseErrorListener;
 
-import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.featurehouse.model.FeatureHouseModelBuilder;
@@ -57,39 +56,45 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	private static final String EXCLUDE_SOURCE_ENTRY = "\" kind=\"src\" path=\"";
 
 	private FSTGenComposer composer;
-	
+
 	public FeatureHouseModelBuilder fhModelBuilder;
-	
-	private static final String BUILDER_PROBLEM_MARKER = CorePlugin.PLUGIN_ID
-			+ ".builderProblemMarker";
-	
+
 	private IParseErrorListener listener = new IParseErrorListener() {
 
 		@Override
 		public void parseErrorOccured(ParseException arg) {
 			try {
-				IFile iFile = featureProject.getProject().getWorkspace()
-						.getRoot().findFilesForLocationURI(composer.getErrorFiles().getLast().toURI())[0];
-				IMarker marker = iFile.createMarker(BUILDER_PROBLEM_MARKER);
-				marker.setAttribute(IMarker.LINE_NUMBER, arg.currentToken.next.endLine);
+				IFile iFile = featureProject
+						.getProject()
+						.getWorkspace()
+						.getRoot()
+						.findFilesForLocationURI(
+								composer.getErrorFiles().getLast().toURI())[0];
+				IMarker marker = iFile.createMarker(FeatureHouseCorePlugin.BUILDER_PROBLEM_MARKER);
+				marker.setAttribute(IMarker.LINE_NUMBER,
+						arg.currentToken.next.endLine);
 				marker.setAttribute(IMarker.MESSAGE, arg.getMessage());
 				marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
 			} catch (CoreException e) {
 				FeatureHouseCorePlugin.getDefault().logError(e);
 			}
 		}
-		
+
 	};
-	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.ComposerExtensionClass#initialize(de.ovgu.featureide.core.IFeatureProject)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.ovgu.featureide.core.builder.ComposerExtensionClass#initialize(de.
+	 * ovgu.featureide.core.IFeatureProject)
 	 */
 	@Override
 	public void initialize(IFeatureProject project) {
 		super.initialize(project);
 		fhModelBuilder = new FeatureHouseModelBuilder(project);
 	}
-	
+
 	public void performFullBuild(IFile config) {
 		assert (featureProject != null) : "Invalid project given";
 
@@ -114,14 +119,13 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 		// A new FSTGenComposer instance is created every time, because this
 		// class seems to remember the FST from a previous build.
-		composer = new FSTGenComposer();
+		composer = new FSTGenComposer(false);
 		composer.addParseErrorListener(listener);
-		composer.run(new String[]{
-				CmdLineInterpreter.INPUT_OPTION_EQUATIONFILE, configPath, 
+		composer.run(new String[] {
+				CmdLineInterpreter.INPUT_OPTION_EQUATIONFILE, configPath,
 				CmdLineInterpreter.INPUT_OPTION_BASE_DIRECTORY, basePath,
-				CmdLineInterpreter.INPUT_OPTION_OUTPUT_DIRECTORY, outputPath + "/"
+				CmdLineInterpreter.INPUT_OPTION_OUTPUT_DIRECTORY, outputPath + "/" 
 		});
-
 		fhModelBuilder.buildModel(composer.getFstnodes());
 
 		TreeBuilderFeatureHouse fstparser = new TreeBuilderFeatureHouse(
@@ -129,8 +133,8 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		fstparser.createProjectTree(composer.getFstnodes());
 		featureProject.setProjectTree(fstparser.getProjectTree());
 		try {
-			featureProject.getProject().refreshLocal(
-					IResource.DEPTH_INFINITE, null);
+			featureProject.getProject().refreshLocal(IResource.DEPTH_INFINITE,
+					null);
 		} catch (CoreException e) {
 			FeatureHouseCorePlugin.getDefault().logError(e);
 		}
@@ -245,7 +249,9 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 				}
 				copy((IFolder) res, folder);
 			} else if (res instanceof IFile) {
-				if (!res.getName().contains(".") || !extensions().contains("." + res.getName().split("[.]")[1])) {
+				if (!res.getName().contains(".")
+						|| !extensions().contains(
+								"." + res.getName().split("[.]")[1])) {
 					IFile file = buildFolder.getFile(res.getName());
 					if (!file.exists()) {
 						res.copy(file.getFullPath(), true, null);
@@ -266,7 +272,6 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 		try {
 			scanner = new Scanner(file);
-
 			if (scanner.hasNext()) {
 				list = new ArrayList<String>();
 				while (scanner.hasNext()) {
@@ -274,7 +279,6 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 				}
 
 			}
-
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} finally {
@@ -314,12 +318,13 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	}
 
 	@Override
-	public void postCompile(IResourceDelta delta, IFile file) {
+	public void postCompile(IResourceDelta delta, final IFile file) {
 		super.postCompile(delta, file);
 		try {
 			if (!file.getWorkspace().isTreeLocked()) {
 				file.refreshLocal(IResource.DEPTH_ZERO, null);
 			}
+			new ErrorPropagation(file);
 		} catch (CoreException e) {
 			FeatureHouseCorePlugin.getDefault().logError(e);
 		}
@@ -329,22 +334,28 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	public int getDefaultTemplateIndex() {
 		return 4;
 	}
-	
+
 	@Override
 	public void buildFSTModel() {
 		try {
-			featureProject.getProject().build(IncrementalProjectBuilder.FULL_BUILD, null);
+			featureProject.getProject().build(
+					IncrementalProjectBuilder.FULL_BUILD, null);
 		} catch (CoreException e) {
 			FeatureHouseCorePlugin.getDefault().logError(e);
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.ComposerExtensionClass#buildConfiguration(org.eclipse.core.resources.IFolder, de.ovgu.featureide.fm.core.configuration.Configuration)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.ovgu.featureide.core.builder.ComposerExtensionClass#buildConfiguration
+	 * (org.eclipse.core.resources.IFolder,
+	 * de.ovgu.featureide.fm.core.configuration.Configuration)
 	 */
 	@Override
 	public void buildConfiguration(IFolder folder, Configuration configuration) {
-		super.buildConfiguration(folder, configuration);	
+		super.buildConfiguration(folder, configuration);
 		composer = new FSTGenComposer();
 		composer.addParseErrorListener(listener);
 		composer.run(new String[]{

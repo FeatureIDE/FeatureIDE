@@ -197,7 +197,7 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 		}
 		if (!model.classesMap.containsKey(source)) {
 			
-			model.classesMap.put(null, currentClass);
+			model.classesMap.put(currentFile, currentClass);
 		}
 	}
 }

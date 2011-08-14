@@ -22,12 +22,12 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.graphics.Image;
 
-import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModelElement;
 import de.ovgu.featureide.ui.UIPlugin;
+import de.ovgu.featureide.ui.views.collaboration.model.Class;
 import de.ovgu.featureide.ui.views.collaboration.model.Role;
 
 /**
@@ -107,9 +107,9 @@ public class CollaborationOutlineLabelProvider implements ILabelProvider {
 					return IMAGE_METHODE_PUBLIC;
 				else 
 					return IMAGE_METHODE_DEFAULT;
-			} else if (fstModelElement instanceof FSTClass) {
-				return IMAGE_CLASS;
 			}
+		} else if (element instanceof Class) {
+			return IMAGE_CLASS;
 		}
 		return null;
 	}
@@ -119,8 +119,8 @@ public class CollaborationOutlineLabelProvider implements ILabelProvider {
 	 */
 	@Override
 	public String getText(Object element) {
-		if (element instanceof  FSTClass)
-			return  ((FSTClass)element).getName();
+		if (element instanceof  Class)
+			return  ((Class)element).getName();
 		
 		if (element instanceof FSTMethod)
 			return ((FSTMethod)element).getName();

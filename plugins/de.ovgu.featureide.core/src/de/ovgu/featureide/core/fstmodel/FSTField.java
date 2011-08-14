@@ -37,6 +37,11 @@ public class FSTField extends FSTModelElement implements Comparable<Object> {
 	private HashSet<IFile> availableFiles;
 	private HashMap<IFile, Integer> lineNumbers;
 
+	private String body;
+	private int beginLine;
+	private int endLine;
+	private int composedLine;
+
 	public FSTField(String fieldName, String typeName, int dim, String modifiers) {
 		this.fieldName = fieldName;
 		this.typeName = typeName;
@@ -47,6 +52,22 @@ public class FSTField extends FSTModelElement implements Comparable<Object> {
 		this.availableFiles = new HashSet<IFile>();
 		this.lineNumbers = new HashMap<IFile, Integer>();
 	}
+
+	public FSTField(String fieldName, String typeName, int dim, String modifiers, String body, int beginLine, int endLine) {
+		this.fieldName = fieldName;
+		this.typeName = typeName;
+		this.dimension = dim;
+		this.modifiers = modifiers;
+
+		this.ownFiles = new HashSet<IFile>();
+		this.availableFiles = new HashSet<IFile>();
+		this.lineNumbers = new HashMap<IFile, Integer>();
+		
+		this.body = body;
+		this.beginLine = beginLine;
+		this.endLine = endLine;
+	}
+
 
 	public String getName() {
 		String name = fieldName + " : " + typeName;
@@ -77,6 +98,13 @@ public class FSTField extends FSTModelElement implements Comparable<Object> {
 		return ownFiles.contains(file);
 	}
 
+	public IFile getOwnFile() {
+		for (IFile f : ownFiles) {
+			return f;
+		}
+		return  null;
+	}
+	
 	public void setAvailable(IFile file) {
 		availableFiles.add(file);
 	}
@@ -94,7 +122,7 @@ public class FSTField extends FSTModelElement implements Comparable<Object> {
 	public int getLineNumber(IFile file) {
 		if (lineNumbers.containsKey(file))
 			return lineNumbers.get(file);
-		return -1;
+		return beginLine;
 	}
 
 	
@@ -120,5 +148,25 @@ public class FSTField extends FSTModelElement implements Comparable<Object> {
 
 	public boolean isStatic() {
 		return modifiers.contains("static");
+	}
+
+	public void setComposedLine(int composedLine) {
+		this.composedLine = composedLine;
+	}
+	
+	public int getComposedLine() {
+		return composedLine;
+	}
+	
+	public int getBeginLine() {
+		return beginLine;
+	}
+	
+	public int getEndLine() {
+		return endLine;
+	}
+	
+	public String getBody() {
+		return body;
 	}
 }

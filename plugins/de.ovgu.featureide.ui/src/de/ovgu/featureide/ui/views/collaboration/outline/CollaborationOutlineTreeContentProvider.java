@@ -20,6 +20,7 @@ package de.ovgu.featureide.ui.views.collaboration.outline;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -29,9 +30,9 @@ import org.eclipse.jface.viewers.Viewer;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
+import de.ovgu.featureide.ui.views.collaboration.model.Class;
 import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModel;
 import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModelBuilder;
 import de.ovgu.featureide.ui.views.collaboration.model.Role;
@@ -106,14 +107,13 @@ public class CollaborationOutlineTreeContentProvider implements
 		IFeatureProject featureProject = CorePlugin
 				.getFeatureProject((IFile) inputElement);
 		if (featureProject != null)
-			if (featureProject.getFSTModel() != null)
-				if (featureProject.getFSTModel().getClass((IFile) inputElement) != null)
-					return new Object[] { featureProject.getFSTModel()
-							.getClass((IFile) inputElement) };
+			if (model != null)
+				if (model.getClass(((IFile) inputElement).getName()) != null)
+					return new Object[] { model.getClass(((IFile) inputElement).getName()) };
 				else
-					return new String[] { "Class in FSTModel not found" };
+					return new String[] { "Class in Collaboration Model not found" };
 			else
-				return new String[] { "FSTModel not found" };
+				return new String[] { "Collaboration Model not found" };
 		else
 			return new String[] { "This is no feature project" };
 	}
@@ -128,23 +128,52 @@ public class CollaborationOutlineTreeContentProvider implements
 	@Override
 	public Object[] getChildren(Object parentElement) {
 		
-		if (parentElement instanceof FSTClass) {
+		if (parentElement instanceof Class) {
 			// get all fields and methods
-			FSTMethod[] methods = ((FSTClass) parentElement).getMethods();
-			FSTField[] fields = ((FSTClass) parentElement).getFields();
-			int methodCount = ((FSTClass) parentElement).getMethodCount();
-			int fieldCount = ((FSTClass) parentElement).getFieldCount();
-			
-			Arrays.sort(methods, methodComparator);
-			Arrays.sort(fields, fieldComparator);
-			Object[] obj = new Object[methodCount + fieldCount];
-
-			for (int i = 0; i < fieldCount; i++) {
-				obj[i] = fields[i];
+			HashMap<String, FSTMethod> methods = new HashMap<String, FSTMethod>();
+			for (Role role : ((Class) parentElement).getRoles()) {
+				for (FSTMethod m : role.methods) {
+					if (!methods.containsKey(m.getName())) {
+						methods.put(m.getName(), m);
+					} else {
+						methods.get(m.getName()).setOwn(m.getOwnFile());
+					}
+				}
+			}
+			FSTMethod[] methodArray = new FSTMethod[methods.size()];
+			int i = 0;
+			for (FSTMethod m : methods.values()) {
+				methodArray[i] = m;
+				i++;
 			}
 			
-			for (int i = 0, j = fieldCount; i < methodCount; i++, j++) {
-				obj[j] = methods[i];
+			HashMap<String, FSTField> fields = new HashMap<String, FSTField>();
+			for (Role role : ((Class) parentElement).getRoles()) {
+				for (FSTField f : role.fields) {
+					if (!fields.containsKey(f.getName())) {
+						fields.put(f.getName(), f);
+					} else {
+						fields.get(f.getName()).setOwn(f.getOwnFile());
+					}
+				}
+			}
+			FSTField[] fieldArray = new FSTField[fields.size()];
+			i = 0;
+			for (FSTField f : fields.values()) {
+				fieldArray[i] = f;
+				i++;
+			}
+			
+			Arrays.sort(methodArray, methodComparator);
+			Arrays.sort(fieldArray, fieldComparator);
+			Object[] obj = new Object[fieldArray.length + methodArray.length];
+
+			for (i = 0; i < fieldArray.length; i++) {
+				obj[i] = fieldArray[i];
+			}
+			i = 0;
+			for (int j = fieldArray.length; i < methodArray.length; i++, j++) {
+				obj[j] = methodArray[i];
 			}
 			
 			return obj;
@@ -155,7 +184,8 @@ public class CollaborationOutlineTreeContentProvider implements
 			List<Role> roles = model.getRoles();
 			for (Role role : roles) {
 				for (FSTMethod m : role.methods) {
-					if (m.isOwn(role.file) && m.equals(parentElement)) {
+					if (m.isOwn(role.file) && ((FSTMethod)parentElement).isOwn(role.file) &&
+							m.getName().equals(((FSTMethod)parentElement).getName())) {
 						roleList.add(role);
 						break;
 					}
@@ -173,8 +203,9 @@ public class CollaborationOutlineTreeContentProvider implements
 			LinkedList<Role> roleList = new LinkedList<Role>();
 			List<Role> roles = model.getRoles();
 			for (Role role : roles) {
-				for (FSTField m : role.fields) {
-					if (m.isOwn(role.file) && m.equals(parentElement)) {
+				for (FSTField f : role.fields) {
+					if (f.isOwn(role.file) && ((FSTField)parentElement).isOwn(role.file) &&
+							f.getName().equals(((FSTField)parentElement).getName())) {
 						roleList.add(role);
 						break;
 					}
@@ -212,9 +243,14 @@ public class CollaborationOutlineTreeContentProvider implements
 	 */
 	@Override
 	public boolean hasChildren(Object element) {
-		if (element instanceof FSTClass)
-			return (((FSTClass) element).getMethodCount() + ((FSTClass) element)
-					.getFieldCount()) > 0;
+		if (element instanceof Class) {
+			for (Role role :((Class) element).getRoles()) {
+				if (role.methods.size() > 0) {
+					return true;
+				}
+			}
+			return false;
+		}
 
 		if (element instanceof FSTMethod)
 			return true;

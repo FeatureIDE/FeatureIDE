@@ -20,6 +20,7 @@ package de.ovgu.featureide.featurehouse;
 
 import org.osgi.framework.BundleContext;
 
+import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 
 /**
@@ -32,6 +33,9 @@ public class FeatureHouseCorePlugin extends AbstractCorePlugin {
 
 	public static final String PLUGIN_ID = "de.ovgu.featureide.core.featurehouse";
 
+	public static final String BUILDER_PROBLEM_MARKER = CorePlugin.PLUGIN_ID
+			+ ".builderProblemMarker";
+	
 	private static FeatureHouseCorePlugin plugin;
 	
 	@Override

@@ -36,7 +36,7 @@ public class HaskellClassBuilder extends ClassBuilder {
 	
 	@Override
 	void caseFieldDeclaration(FSTTerminal terminal) {
-		FSTField field = new FSTField(terminal.getBody(), "", 0, "");
+		FSTField field = new FSTField(terminal.getBody(), "", 0, "", terminal.getBody(), terminal.beginLine, terminal.endLine);
 		field.setOwn(modelBuilder.getCurrentFile());
 		modelBuilder.getCurrentClass().fields.put(field.getIdentifier(), field);
 	}
@@ -52,7 +52,7 @@ public class HaskellClassBuilder extends ClassBuilder {
 		}
 		LinkedList<String> parameter = new LinkedList<String>();
 		parameter.add(method.get(1));
-		addMethod(method.get(0), parameter, "void", "");
+		addMethod(method.get(0), parameter, "void", "", terminal.getBody(), terminal.beginLine, terminal.endLine);
 	}
 	
 	/**
@@ -88,8 +88,8 @@ public class HaskellClassBuilder extends ClassBuilder {
 	}
 
 	private void addMethod(String name, LinkedList<String> parameterTypes, 
-			String returnType, String modifiers) {
-		FSTMethod method = new FSTMethod(name, parameterTypes, returnType, modifiers);								
+			String returnType, String modifiers, String body, int beginLine, int endLine) {
+		FSTMethod method = new FSTMethod(name, parameterTypes, returnType, modifiers, body, beginLine, endLine);								
 		method.setOwn(modelBuilder.getCurrentFile());
 		modelBuilder.getCurrentClass().methods.put(method.getIdentifier(), method);
 	}
