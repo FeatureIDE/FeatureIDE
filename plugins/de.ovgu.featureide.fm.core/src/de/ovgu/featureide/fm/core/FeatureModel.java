@@ -18,7 +18,7 @@
  */
 package de.ovgu.featureide.fm.core;
 
-import java.awt.Point;
+import org.eclipse.draw2d.geometry.Point;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -94,7 +94,9 @@ public class FeatureModel implements PropertyConstants {
 	private Feature root;
 	private boolean legend = true;
 	private boolean autoLayoutLegend = true;
-	private boolean autoLayoutModel = true;
+	private boolean autoLayoutFeatures = true;
+	private boolean autoLayoutConstraints = true;
+	private boolean showHiddenFeatures = true;
 	private Point legendPos = new Point(0, 0);
 	/**
 	 * a hashtable containing all features
@@ -152,6 +154,10 @@ public class FeatureModel implements PropertyConstants {
 	
 	public int getLayoutAlgorithm(){
 		return selectedLayoutAlgorithm;
+	}
+	
+	public static void setFeatureLocation(Point newLocation, Feature feature){
+		feature.setNewLocation(newLocation);
 	}
 	
 	public void reset() {
@@ -1032,14 +1038,28 @@ public class FeatureModel implements PropertyConstants {
 		return autoLayoutLegend;
 	}
 	
-	public void setModelAutoLayout(boolean b) {
-		autoLayoutModel = b;
+	public void setFeaturesAutoLayout(boolean b) {
+		autoLayoutFeatures = b;
 	}
 
-	public boolean hasModelAutoLayout() {
-		return autoLayoutModel;
+	public boolean hasFeaturesAutoLayout() {
+		return autoLayoutFeatures;
 	}
-
+	
+	public boolean hasConstraintsAutoLayout(){
+		return autoLayoutConstraints;
+	}
+	
+	public boolean showHiddenFeatures(){
+		return showHiddenFeatures;
+	}
+	public void showHiddenFeatures(boolean b){
+		showHiddenFeatures = b;
+	}
+	
+	public void setConstraintsAutoLayout(boolean b) {
+		autoLayoutConstraints = b;
+	}
 	/**
 	 * @return true if feature model contains mandatory features otherwise false
 	 */

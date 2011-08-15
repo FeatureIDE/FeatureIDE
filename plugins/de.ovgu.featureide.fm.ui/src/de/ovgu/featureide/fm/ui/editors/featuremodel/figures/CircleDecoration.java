@@ -36,7 +36,7 @@ public class CircleDecoration extends Ellipse implements RotatableDecoration, GU
 		super();
 		setForegroundColor(DECORATOR_FOREGROUND);
 		setBackgroundColor(fill ? DECORATOR_FOREGROUND : DECORATOR_BACKGROUND);
-		setSize(SOURCE_ANCHOR_DIAMETER, SOURCE_ANCHOR_DIAMETER);
+		setSize(SOURCE_ANCHOR_DIAMETER, SOURCE_ANCHOR_DIAMETER);	
 	}
 	
 	@Override

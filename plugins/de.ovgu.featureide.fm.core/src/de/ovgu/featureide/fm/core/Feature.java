@@ -18,6 +18,7 @@
  */
 package de.ovgu.featureide.fm.core;
 
+import org.eclipse.draw2d.geometry.Point;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -54,6 +55,8 @@ public class Feature implements PropertyConstants {
 	private FeatureStatus status = FeatureStatus.NORMAL;
 
 	private FeatureModel featureModel;
+	
+	private Point location = new Point(0,0);
 
 	public Feature(FeatureModel featureModel) {
 		this.featureModel = featureModel;
@@ -66,7 +69,15 @@ public class Feature implements PropertyConstants {
 		this.name = name;
 		sourceConnections.add(parentConnection);
 	}
-
+	
+	public void setNewLocation(Point newLocation){
+		location = newLocation;
+	}
+	
+	public Point getLocation(){
+		return location;
+	}
+	
 	public boolean isAnd() {
 		return and;
 	}

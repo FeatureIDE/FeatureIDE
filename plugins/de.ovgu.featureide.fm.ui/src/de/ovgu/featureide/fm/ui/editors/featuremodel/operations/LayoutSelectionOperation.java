@@ -26,29 +26,23 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 
 public class LayoutSelectionOperation extends AbstractOperation {
 
 	private FeatureModel featureModel;
 	private int newSelectedLayoutAlgorithm;
 	private int oldSelectedLayoutAlgorithm;
+	private boolean hasFeaturesAutoLayout;
 	
-	public LayoutSelectionOperation(FeatureModel featureModel, int newSelectedLayoutAlgorithm, int oldSelectedLayoutAlgorithm) {
-		super(getLayoutText(newSelectedLayoutAlgorithm));
+	public LayoutSelectionOperation(FeatureModel featureModel, 
+			int newSelectedLayoutAlgorithm, int oldSelectedLayoutAlgorithm) {
+		super("Set "+FeatureDiagramLayoutHelper.getLayoutLabel(newSelectedLayoutAlgorithm));
 		this.newSelectedLayoutAlgorithm = newSelectedLayoutAlgorithm;
 		this.oldSelectedLayoutAlgorithm = oldSelectedLayoutAlgorithm;
 		this.featureModel = featureModel;
-	}
-	
-	public static String getLayoutText(int newSelectedLayoutAlgorithm){		
-		switch(newSelectedLayoutAlgorithm){
-			case 1: 
-				return "Set Breadth First Layout"; 
-			case 2: 
-				return "Set Depth First Layout"; 
-			default:
-				return "Set Level Order Layout (default)";
-		}	
+		this.hasFeaturesAutoLayout = featureModel.hasFeaturesAutoLayout();
+		
 	}
 
 	public IStatus execute(IProgressMonitor monitor, IAdaptable info)
@@ -58,18 +52,20 @@ public class LayoutSelectionOperation extends AbstractOperation {
 
 	public IStatus redo(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
-			//oldSelectedLayoutAlgorithm = newSelectedLayoutAlgorithm;
-			featureModel.setLayout(newSelectedLayoutAlgorithm);
-			featureModel.handleModelDataChanged();
+
+		featureModel.setLayout(newSelectedLayoutAlgorithm);
+		featureModel.setFeaturesAutoLayout(true);	
+		featureModel.redrawDiagram();
+		featureModel.handleModelDataChanged();
 
 		return Status.OK_STATUS;
 	}
 
 	public IStatus undo(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
-		
-		//featureModel.setLayout(featureModel.getOldLayoutAlgorithm());
+
 		featureModel.setLayout(oldSelectedLayoutAlgorithm);
+		featureModel.setFeaturesAutoLayout(hasFeaturesAutoLayout);	
 		featureModel.handleModelDataChanged();
 		
 		return Status.OK_STATUS;

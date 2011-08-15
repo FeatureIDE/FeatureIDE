@@ -75,12 +75,10 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ManualLayoutSelecti
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.RenameAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ReverseOrderAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.SelectionAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ShowHiddenFeaturesAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.GraphicalEditPartFactory;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.BreadthFirstLayout;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.DepthFirstLayout;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutManager;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.LevelOrderLayout;
 
 /**
  * An editor based on the Graphical Editing Framework to view and edit feature
@@ -95,7 +93,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	private static final String ID = FMUIPlugin.PLUGIN_ID + ".editors.FeatureDiagramEditor";
 
 	private FeatureModelEditor featureModelEditor;
-
 	private ZoomManager zoomManager;
 
 	private ScalableFreeformRootEditPart rootEditPart;
@@ -111,8 +108,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	private OrAction orAction;
 	private AlternativeAction alternativeAction;
 	private RenameAction renameAction;
-	@SuppressWarnings("unused")
-	private SelectionAction selectionAction;
+
+	private ShowHiddenFeaturesAction showHiddenFeaturesAction;
 
 	private ZoomInAction zoomIn;
 	private ZoomOutAction zoomOut;
@@ -128,6 +125,10 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	private LayoutSelectionAction setLevelOrderLayoutAction;
 	private LayoutSelectionAction setBreadthFirstLayoutAction;
 	private LayoutSelectionAction setDepthFirstLayoutAction;
+	private LayoutSelectionAction setVerticalLayoutAction;
+	private LayoutSelectionAction setVerticalLayoutAction2;
+	private ManualLayoutSelectionAction manualLayoutSelectionAction;
+	
 	
 	private int index;
 
@@ -176,7 +177,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		orAction = new OrAction(this, featureModel);
 		alternativeAction = new AlternativeAction(this, featureModel);
 		renameAction = new RenameAction(this, featureModel, null);
-		selectionAction = new SelectionAction(this, featureModel);
 
 		createConstraintAction = new CreateConstraintAction(this, featureModel);
 		editConstraintAction = new EditConstraintAction(this, featureModel);
@@ -184,15 +184,19 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 
 		legendAction = new LegendAction(this, featureModel);
 		legendLayoutAction = new LegendLayoutAction(this, featureModel);
-
+		
+		showHiddenFeaturesAction = new ShowHiddenFeaturesAction(this, featureModel);
+		
 		zoomIn = new ZoomInAction(zoomManager);
 		zoomOut = new ZoomOutAction(zoomManager);
 		
 		setLevelOrderLayoutAction = new LayoutSelectionAction(this, featureModel,0,0);
 		setBreadthFirstLayoutAction = new LayoutSelectionAction(this, featureModel,1,0);
 		setDepthFirstLayoutAction = new LayoutSelectionAction(this, featureModel,2,0);
+		setVerticalLayoutAction = new LayoutSelectionAction(this, featureModel,3,0);
+		setVerticalLayoutAction2 = new LayoutSelectionAction(this, featureModel,4,0);
 		
-		new ManualLayoutSelectionAction(this, featureModel);
+		manualLayoutSelectionAction = new ManualLayoutSelectionAction(this, featureModel);
 	}
 
 	public void createContextMenu(MenuManager menu) {
@@ -225,34 +229,67 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		setContextMenu(menu);
 	}
 	
+	
 	private void fillContextMenu(IMenuManager menu) {
-		/*
-		 * Menu Management for Feature Diagram Layout entries
-		 */
-		if(getFeatureModel().hasModelAutoLayout()){
+		
+		IMenuManager subMenu=new MenuManager("Set Layout");
+		subMenu.add(manualLayoutSelectionAction);
+		subMenu.add(new Separator());
+		subMenu.add(setLevelOrderLayoutAction);
+		subMenu.add(setBreadthFirstLayoutAction);
+		subMenu.add(setDepthFirstLayoutAction);
+		subMenu.add(setVerticalLayoutAction);
+		//does not work that great. (as this layout can have intersections)
+		//subMenu.add(setVerticalLayoutAction2);		
+		
+		
+		showHiddenFeaturesAction.setChecked(
+				getFeatureModel().showHiddenFeatures());
+		
+		
+		if(getFeatureModel().hasFeaturesAutoLayout()){
 			setLevelOrderLayoutAction.setEnabled(true);
 			setBreadthFirstLayoutAction.setEnabled(true);
 			setDepthFirstLayoutAction.setEnabled(true);
+			setVerticalLayoutAction.setEnabled(true);
+			setVerticalLayoutAction2.setEnabled(true);
+			setVerticalLayoutAction2.setChecked(false);
+			setVerticalLayoutAction.setChecked(false);
 			setLevelOrderLayoutAction.setChecked(false);
 			setBreadthFirstLayoutAction.setChecked(false);
 			setDepthFirstLayoutAction.setChecked(false);
+			
+			manualLayoutSelectionAction.setEnabled(true);
+			manualLayoutSelectionAction.setChecked(false);
 			if(getFeatureModel().getLayoutAlgorithm() == 1){
 				setBreadthFirstLayoutAction.setEnabled(false);
 				setBreadthFirstLayoutAction.setChecked(true);	
 			} else if(getFeatureModel().getLayoutAlgorithm() == 2){
 				setDepthFirstLayoutAction.setEnabled(false);
 				setDepthFirstLayoutAction.setChecked(true);
+			} else if(getFeatureModel().getLayoutAlgorithm() == 3){
+				setVerticalLayoutAction.setEnabled(false);
+				setVerticalLayoutAction.setChecked(true);
+			} else if(getFeatureModel().getLayoutAlgorithm() == 4){
+				setVerticalLayoutAction2.setEnabled(false);
+				setVerticalLayoutAction2.setChecked(true);
 			} else {
 				setLevelOrderLayoutAction.setEnabled(false);
 				setLevelOrderLayoutAction.setChecked(true);
 			}
 		} else {
-			setLevelOrderLayoutAction.setEnabled(false);
-			setBreadthFirstLayoutAction.setEnabled(false);
-			setDepthFirstLayoutAction.setEnabled(false);
+			setLevelOrderLayoutAction.setEnabled(true);
+			setBreadthFirstLayoutAction.setEnabled(true);
+			setDepthFirstLayoutAction.setEnabled(true);
+			setVerticalLayoutAction.setEnabled(true);
+			setVerticalLayoutAction2.setEnabled(true);
+			setVerticalLayoutAction2.setChecked(false);
+			setVerticalLayoutAction.setChecked(false);
 			setLevelOrderLayoutAction.setChecked(false);
 			setBreadthFirstLayoutAction.setChecked(false);
 			setDepthFirstLayoutAction.setChecked(false);
+			manualLayoutSelectionAction.setEnabled(true);
+			manualLayoutSelectionAction.setChecked(true);
 		}
 		
 		boolean connectionSelected = alternativeAction.isConnectionSelected();
@@ -299,10 +336,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 			menu.add(abstractAction);
 			menu.add(hiddenAction);
 			menu.add(new Separator());
-			//menu.add(manualLayoutSelectionAction);
-			menu.add(setLevelOrderLayoutAction);
-			menu.add(setBreadthFirstLayoutAction);
-			menu.add(setDepthFirstLayoutAction);
+			menu.add(subMenu);
 			menu.add(new Separator());
 			menu.add(reverseOrderAction);
 		} else if (editConstraintAction.isEnabled() && !connectionSelected) {
@@ -314,16 +348,15 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		} else if (!connectionSelected){
 			menu.add(createConstraintAction);
 			menu.add(new Separator());
-			//menu.add(manualLayoutSelectionAction);
-			menu.add(setLevelOrderLayoutAction);
-			menu.add(setBreadthFirstLayoutAction);
-			menu.add(setDepthFirstLayoutAction);
+			menu.add(subMenu);
 			menu.add(new Separator());
 			menu.add(reverseOrderAction);	
 		}
 		
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 		menu.add(legendAction);
+		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+		menu.add(showHiddenFeaturesAction);
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
 
@@ -366,9 +399,9 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		// refresh size of all feature figures
 		getContents().refresh();
 		// layout all features if autoLayout is enabled
-		if(getFeatureModel().hasModelAutoLayout()){
-			setLayout();
-		}
+		
+		setLayout();
+		
 		// refresh position of all feature figures
 		getContents().refresh();
 	}
@@ -394,25 +427,18 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		FeatureDiagramLayoutManager layoutManager;
 		FeatureModel featureModel = getFeatureModel();
 		
-		switch(getFeatureModel().getLayoutAlgorithm()){
-			case 1: 
-				layoutManager = new BreadthFirstLayout();
-				break;
-			case 2: 
-				layoutManager = new DepthFirstLayout();
-				break;
-			default:
-				layoutManager = new LevelOrderLayout();
-				break;
-		}	
+		layoutManager = FeatureDiagramLayoutHelper.getLayoutManager(
+				featureModel.getLayoutAlgorithm(), featureModel);
 		
 		int previousLayout = featureModel.getLayoutAlgorithm();
 		
 		setLevelOrderLayoutAction = new LayoutSelectionAction(this, featureModel,0,previousLayout);
 		setBreadthFirstLayoutAction = new LayoutSelectionAction(this, featureModel,1,previousLayout);
 		setDepthFirstLayoutAction = new LayoutSelectionAction(this, featureModel,2,previousLayout);
+		setVerticalLayoutAction = new LayoutSelectionAction(this, featureModel,3,previousLayout);
 		
 		Point size = getControl().getSize();
+		
 		layoutManager.setControlSize(size.x, size.y);
 		layoutManager.layout(featureModel);
 		

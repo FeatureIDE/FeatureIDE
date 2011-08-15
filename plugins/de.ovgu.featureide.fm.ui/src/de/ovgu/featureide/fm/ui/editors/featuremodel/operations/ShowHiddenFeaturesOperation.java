@@ -26,43 +26,50 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 
-public class ManualLayoutSelectionOperation extends AbstractOperation {
+/**
+ * @author David Halm
+ * @author Patrick Sulkowski
+ */
+public class ShowHiddenFeaturesOperation extends AbstractOperation {
 
-	private static final String LABEL_SET_MANUAL_LAYOUT = "set Layout to ManualLayout";
-	private static final String LABEL_SET_AUTOMATIC_LAYOUT = "set Layout to AutoLayout";
-	
 	private FeatureModel featureModel;
 
-	public ManualLayoutSelectionOperation(FeatureModel featureModel) {
-		super(getLabel(featureModel));
+	public ShowHiddenFeaturesOperation(FeatureModel featureModel) {
+		super("Show Hidden Features");
 		this.featureModel = featureModel;
 	}
-	
-	private static String getLabel(FeatureModel featureModel) {
-		if (featureModel.hasFeaturesAutoLayout()) {
-			return LABEL_SET_MANUAL_LAYOUT ;
-		} else {
-			return LABEL_SET_AUTOMATIC_LAYOUT;
-		}
-	}
-	
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.commands.operations.AbstractOperation#execute(org.eclipse.core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
+	 */
+	@Override
 	public IStatus execute(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
 		return redo(monitor, info);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.commands.operations.AbstractOperation#redo(org.eclipse.core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
+	 */
+	@Override
 	public IStatus redo(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
-		
-		featureModel.setFeaturesAutoLayout(!featureModel.hasFeaturesAutoLayout());		
+		featureModel.showHiddenFeatures(!featureModel.showHiddenFeatures());		
+		FeatureUIHelper.showHiddenFeatures(featureModel.showHiddenFeatures());
+		featureModel.redrawDiagram();
 		featureModel.handleModelDataChanged();
 		return Status.OK_STATUS;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.commands.operations.AbstractOperation#undo(org.eclipse.core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
+	 */
+	@Override
 	public IStatus undo(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
 		return redo(monitor, info);
 	}
-	
+
 }

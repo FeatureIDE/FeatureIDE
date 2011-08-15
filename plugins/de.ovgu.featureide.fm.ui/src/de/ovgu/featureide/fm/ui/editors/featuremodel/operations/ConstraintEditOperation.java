@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.Status;
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 
 /**
  * Operation with functionality to edit a constraint. Enables undo/redo
@@ -75,6 +76,8 @@ public class ConstraintEditOperation extends AbstractOperation {
 	public IStatus redo(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
 		featureModel.replacePropNode(index, propNode);
+		FeatureDiagramLayoutHelper.initializeConstraintPosition(featureModel,
+				index);
 		featureModel.handleModelDataChanged();
 		return Status.OK_STATUS;
 	}
@@ -90,6 +93,8 @@ public class ConstraintEditOperation extends AbstractOperation {
 	public IStatus undo(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
 		featureModel.replacePropNode(index, oldPropNode);
+		FeatureDiagramLayoutHelper.initializeConstraintPosition(featureModel,
+				index);
 		featureModel.handleModelDataChanged();
 		return Status.OK_STATUS;
 	}

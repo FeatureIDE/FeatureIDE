@@ -44,7 +44,9 @@ public class ConstraintDragAndDropCommand extends Command {
 	private FeatureModel featureModel;
 	private Constraint constraint;
 	private Point newLocation;
+	private boolean hasAutoLayout;
 	boolean isLastPos;
+
 
 	public ConstraintDragAndDropCommand(FeatureModel featureModel,
 			Constraint constraint, Point newLocation) {
@@ -53,36 +55,40 @@ public class ConstraintDragAndDropCommand extends Command {
 		this.constraint = constraint;
 		this.newLocation = newLocation;
 		isLastPos = false;
+		this.hasAutoLayout = featureModel.hasFeaturesAutoLayout();
 		}
 
 	public boolean canExecute() {
-		setMaxValues();
-		if (newLocation.y > (maxDown + 30) || newLocation.y < (maxUp - 10)
-				|| newLocation.x > (maxRight + 5)
-				|| newLocation.x < (maxLeft - 5)) {
-			return false;
+		if(hasAutoLayout){
+			setMaxValues();
+			if (newLocation.y > (maxDown + 30) || newLocation.y < (maxUp - 10)
+					|| newLocation.x > (maxRight + 5)
+					|| newLocation.x < (maxLeft - 5)) {
+				return false;
+			}
 		}
 		return true;
 	}
 
 	public void execute() {
-
+		
 		int index = calculateNewIndex();
 		int oldIndex = featureModel.getConstraints().indexOf(constraint);
 		if (index > oldIndex && !isLastPos)
 			index--;
-		if (index == oldIndex)
+		if (hasAutoLayout && (index == oldIndex))
 			return;
-		ConstraintMoveOperation op = new ConstraintMoveOperation(constraint,
-				featureModel, index, oldIndex, isLastPos);
-		op.addContext((IUndoContext) featureModel.getUndoContext());
 
+		ConstraintMoveOperation op = new ConstraintMoveOperation(constraint,
+				featureModel, index, oldIndex, isLastPos ,newLocation, 
+				FeatureUIHelper.getLocation(constraint).getCopy());
+		op.addContext((IUndoContext) featureModel.getUndoContext());
+	
 		try {
 			PlatformUI.getWorkbench().getOperationSupport()
-					.getOperationHistory().execute(op, null, null);
+				.getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
-
 		}
 
 	}

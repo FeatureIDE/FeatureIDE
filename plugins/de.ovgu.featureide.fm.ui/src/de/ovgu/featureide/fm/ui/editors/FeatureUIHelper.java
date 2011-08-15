@@ -46,8 +46,18 @@ public class FeatureUIHelper {
 	private static final WeakHashMap<Constraint, Dimension> constraintSize = new WeakHashMap<Constraint, Dimension>();
 	private static Dimension legendSize= new Dimension();
 	private static LegendFigure legendFigure;
+	private static boolean hasVerticalLayout;
+	private static boolean showHiddenFeatures = true;
+	
 	public static Dimension getLegendSize(){
 		return legendSize;
+	}
+	
+	public static boolean showHiddenFeatures(){
+		return showHiddenFeatures;
+	}
+	public static void showHiddenFeatures(boolean b){
+		showHiddenFeatures = b;
 	}
 	
 	public static void setLegendSize(Dimension dim){
@@ -58,6 +68,15 @@ public class FeatureUIHelper {
 	}
 
 	public static void setLocation(Feature feature, Point newLocation) {
+		Point oldLocation = getLocation(feature);
+		feature.setNewLocation(newLocation);
+		if (newLocation == null || newLocation.equals(oldLocation))
+			return;
+		featureLocation.put(feature, newLocation);
+		fireLocationChanged(feature, oldLocation, newLocation);
+	}
+	
+	public static void setTemporaryLocation(Feature feature, Point newLocation) {
 		Point oldLocation = getLocation(feature);
 		if (newLocation == null || newLocation.equals(oldLocation))
 			return;
@@ -94,8 +113,18 @@ public class FeatureUIHelper {
 			Point newLocation) {
 		return new Rectangle(newLocation, getSize(feature)).getCenter();
 	}
-
+	
 	public static Point getSourceLocation(Feature feature) {
+		Feature parentFeature = feature;
+		boolean parentFeatureHidden = false;
+		while(!parentFeature.isRoot()){
+			parentFeature=parentFeature.getParent();
+			if(parentFeature.isHidden())
+				parentFeatureHidden=true;
+		}
+		if((feature.isHidden()||parentFeatureHidden) && !showHiddenFeatures){
+				return getTargetLocation(feature.getParent());			
+		}
 		return getSourceLocation(getBounds(feature));
 	}
 
@@ -103,15 +132,39 @@ public class FeatureUIHelper {
 		return getSourceLocation(new Rectangle(newLocation, getSize(feature)));
 	}
 
-	private static Point getSourceLocation(Rectangle bounds) {
-		return new Point(bounds.getCenter().x, bounds.y);
+	private static Point getSourceLocation(Rectangle bounds) {		
+		if(hasVerticalLayout){
+			return new Point(bounds.getLeft().x, ( bounds.bottom() + bounds.getTop().y ) /2);
+		} else {
+			return new Point(bounds.getCenter().x, bounds.y);		
+		}
 	}
 
 	public static Point getTargetLocation(Feature feature) {
 		Rectangle bounds = getBounds(feature);
-		return new Point(bounds.getCenter().x, bounds.bottom() - 1);
+		if(hasVerticalLayout){
+			return new Point(bounds.getRight().x, ( bounds.bottom() + bounds.getTop().y ) /2);
+		} 
+		
+		return new Point(bounds.getCenter().x, bounds.bottom() - 1);		
+		
 	}
-
+	
+	public static void setShowHiddenFeature(boolean showHiddenFeature) {
+		showHiddenFeatures = showHiddenFeature; 
+	}
+	
+	public static boolean getShowHiddenFeature() {
+		return showHiddenFeatures; 
+	}
+	
+	public static void setVerticalLayoutBounds(boolean isVerticalLayout) {
+		hasVerticalLayout = isVerticalLayout; 
+	}
+	public static boolean hasVerticalLayout() {
+		return hasVerticalLayout; 
+	}
+	
 	public static Dimension getSize(Constraint constraint) {
 		return constraintSize.get(constraint);
 	}
@@ -130,6 +183,7 @@ public class FeatureUIHelper {
 			return;
 		constraintLocation.put(constraint, newLocation);
 		fireLocationChanged(constraint, oldLocation, newLocation);
+		constraint.setLocation(newLocation);
 	}
 
 	private static void fireLocationChanged(Constraint constraint,

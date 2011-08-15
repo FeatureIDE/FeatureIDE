@@ -20,43 +20,29 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 
 import org.eclipse.draw2d.geometry.Point;
 
+import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 
-
 /**
- * Layouts the features at the feature diagram using a depth first search.
+ * Layouts the features at the feature diagram using their saved Positions.
  * 
- * @author Thomas Thuem
+ * @author David Halm
+ * @author Patrick Sulkowski
  */
-public class DepthFirstLayout extends FeatureDiagramLayoutManager {
+public class ManualLayout extends FeatureDiagramLayoutManager {
 	
-	int yoffset;
-	
-	@Override
 	public void layoutFeatureModel(FeatureModel featureModel) {
-		yoffset = 0;
-		depthFirstLayout(featureModel.getRoot(), 0, LAYOUT_MARGIN_X);
-		yoffset=yoffset+FEATURE_SPACE_X;
-		layout(yoffset, featureModel.getConstraints());
-		layoutHidden(featureModel);
-	}
-
-	private int depthFirstLayout(Feature feature, int level, int x) {
-		if(!isHidden(feature)){
-			FeatureUIHelper.setLocation(feature,new Point(x, LAYOUT_MARGIN_Y + level*FEATURE_SPACE_Y));
-			int newX = x;
-			if(yoffset< LAYOUT_MARGIN_Y + level*FEATURE_SPACE_Y)
-				yoffset=LAYOUT_MARGIN_Y + level*FEATURE_SPACE_Y;
-			for (Feature child : feature.getChildren()) {
-				newX = depthFirstLayout(child, level + 1, newX);			
+		for(Feature feature : featureModel.getFeatures()){
+			FeatureUIHelper.setLocation(feature, feature.getLocation());
+			if(!showHidden && isHidden(feature)){
+				FeatureUIHelper.setTemporaryLocation(feature, new Point(0,0));
 			}
-			return Math.max(newX, x + FeatureUIHelper.getSize(feature).width + FEATURE_SPACE_X);
-		} else {
-			return x;
+				
 		}
-
+		for(Constraint constraint : featureModel.getConstraints()){
+			FeatureUIHelper.setLocation(constraint, constraint.getLocation());
+		}
 	}
-
 }

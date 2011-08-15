@@ -84,6 +84,26 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 
 		if (FeatureUIHelper.getLocation(feature) != null)
 			setLocation(FeatureUIHelper.getLocation(feature));
+		
+		if(isHidden(feature)){
+			setSize(new Dimension(0,0));
+		}
+	}
+	
+	boolean isHidden(Feature feature){
+		if(featureModel.showHiddenFeatures()){
+			return false;
+		} else {
+			if(feature.isHidden()){
+				return feature.isHidden();
+			}
+			if(!feature.isRoot()){
+				return isHidden(feature.getParent());
+			} else {
+				return feature.isHidden();
+			}
+		}
+
 	}
 	
 	public void setProperties() {
@@ -167,7 +187,9 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		Rectangle bounds = getBounds();
 		int w = FEATURE_INSETS.getWidth();
 		int h = FEATURE_INSETS.getHeight();
+		
 		bounds.setSize(labelSize.expand(w, h));
+			
 
 		Dimension oldSize = getSize();
 		if (!oldSize.equals(0, 0)) {

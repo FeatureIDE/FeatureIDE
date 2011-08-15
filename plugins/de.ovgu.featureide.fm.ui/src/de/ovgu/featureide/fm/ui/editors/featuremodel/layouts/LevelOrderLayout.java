@@ -23,7 +23,6 @@ import java.util.Vector;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 
-import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 
@@ -39,15 +38,16 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 
 	@Override
 	public void layoutFeatureModel(FeatureModel featureModel) {
-		layout(featureModel.getRoot());
+		layout(new LayoutableFeature(featureModel.getRoot(), showHidden));
 		layout(featureDiagramBottom, featureModel.getConstraints());
+		layoutHidden(featureModel);
 	}
 
-	private void layout(Feature root) {
-		Vector<Vector<Feature>> levels = calculateLevels(root);
+	private void layout(LayoutableFeature root) {
+		Vector<Vector<LayoutableFeature>> levels = calculateLevels(root);
 
 		for (int i = levels.size() - 1; i >= 0; i--) {
-			Vector<Feature> level = levels.get(i);
+			Vector<LayoutableFeature> level = levels.get(i);
 			layoutLevelInY(level, i);
 			layoutLevelInX(level);
 		}
@@ -58,18 +58,18 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 				* (levels.size() - 1);
 	}
 
-	private void layoutLevelInY(Vector<Feature> level, int i) {
+	private void layoutLevelInY(Vector<LayoutableFeature> level, int i) {
 		int y = LAYOUT_MARGIN_Y + FEATURE_SPACE_Y * i;
-		for (Feature feature : level)
-			FeatureUIHelper.setLocation(feature, new Point(0, y));
+		for (LayoutableFeature feature : level)
+			FeatureUIHelper.setLocation(feature.getFeature(), new Point(0, y));
 	}
 
-	private void layoutLevelInX(Vector<Feature> level) {
-		for (Feature feature : level)
+	private void layoutLevelInX(Vector<LayoutableFeature> level) {
+		for (LayoutableFeature feature : level)
 			if (feature.hasChildren())
 				centerAboveChildren(feature);
 
-		Feature lastFeature = null;
+		LayoutableFeature lastFeature = null;
 		int moveWidth = 0;
 		for (int j = 0; j < level.size(); j++) {
 			moveWidth = layoutFeatureInX(level, j, moveWidth, lastFeature);
@@ -77,9 +77,9 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 		}
 	}
 
-	private int layoutFeatureInX(Vector<Feature> level, int j, int moveWidth,
-			Feature lastFeature) {
-		Feature feature = level.get(j);
+	private int layoutFeatureInX(Vector<LayoutableFeature> level, int j, int moveWidth,
+			LayoutableFeature lastFeature) {
+		LayoutableFeature feature = level.get(j);
 		boolean firstCompound = true;
 		if (!feature.hasChildren())
 			nextToLeftSibling(feature, lastFeature);
@@ -87,9 +87,9 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 			if (lastFeature != null)
 				moveWidth = Math.max(
 						moveWidth,
-						FeatureUIHelper.getBounds(lastFeature).right()
+						FeatureUIHelper.getBounds(lastFeature.getFeature()).right()
 								+ FEATURE_SPACE_X
-								- FeatureUIHelper.getLocation(feature).x);
+								- FeatureUIHelper.getLocation(feature.getFeature()).x);
 			if (moveWidth > 0)
 				moveTree(feature, moveWidth);
 			layoutSiblingsEquidistant(level, j, feature);
@@ -107,33 +107,33 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 		return moveWidth;
 	}
 
-	private void layoutSiblingsEquidistant(Vector<Feature> level, int j,
-			Feature feature) {
+	private void layoutSiblingsEquidistant(Vector<LayoutableFeature> level, int j,
+			LayoutableFeature feature) {
 		int width = FEATURE_SPACE_X;
 		int l = 0;
 		int space = 0;
 		boolean right = true;
 		for (int k = j - 1; k >= 0; k--) {
-			Feature sibling = level.get(k);
-			if (sibling.getParent() != feature.getParent()) {
+			LayoutableFeature sibling = level.get(k);
+			if (sibling.getFeature().getParent() != feature.getFeature().getParent()) {
 				l = k + 1;
 				break;
 			}
 			if (sibling.hasChildren()) {
 				l = k + 1;
 				right = false;
-				space = FeatureUIHelper.getBounds(feature).x
-						- FeatureUIHelper.getBounds(sibling).right() - width;
+				space = FeatureUIHelper.getBounds(feature.getFeature()).x
+						- FeatureUIHelper.getBounds(sibling.getFeature()).right() - width;
 				break;
 			}
-			width += FeatureUIHelper.getSize(sibling).width + FEATURE_SPACE_X;
+			width += FeatureUIHelper.getSize(sibling.getFeature()).width + FEATURE_SPACE_X;
 		}
 		if (right)
-			space = FeatureUIHelper.getBounds(feature).x
-					- (FeatureUIHelper.getBounds(level.get(l)).x - FEATURE_SPACE_X)
+			space = FeatureUIHelper.getBounds(feature.getFeature()).x
+					- (FeatureUIHelper.getBounds(level.get(l).getFeature()).x - FEATURE_SPACE_X)
 					- width;
 		for (int k = l; k < j; k++) {
-			Feature sibling = level.get(k);
+			LayoutableFeature sibling = level.get(k);
 			if (right)
 				moveTree(sibling, space);
 			else
@@ -141,17 +141,17 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 		}
 	}
 
-	private Vector<Vector<Feature>> calculateLevels(Feature root) {
-		Vector<Vector<Feature>> levels = new Vector<Vector<Feature>>();
+	private Vector<Vector<LayoutableFeature>> calculateLevels(LayoutableFeature root) {
+		Vector<Vector<LayoutableFeature>> levels = new Vector<Vector<LayoutableFeature>>();
 
-		Vector<Feature> level = new Vector<Feature>();
+		Vector<LayoutableFeature> level = new Vector<LayoutableFeature>();
 		level.add(root);
 
 		while (!level.isEmpty()) {
 			levels.add(level);
-			Vector<Feature> newLevel = new Vector<Feature>();
-			for (Feature feature : level)
-				for (Feature child : feature.getChildren())
+			Vector<LayoutableFeature> newLevel = new Vector<LayoutableFeature>();
+			for (LayoutableFeature feature : level)
+				for (LayoutableFeature child : feature.getChildren())
 					newLevel.add(child);
 			level = newLevel;
 		}
@@ -159,40 +159,40 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 		return levels;
 	}
 
-	private void centerAboveChildren(Feature feature) {
-		int minX = FeatureUIHelper.getBounds(feature.getFirstChild()).x;
-		int maxX = FeatureUIHelper.getBounds(feature.getLastChild()).right();
-		Point location = FeatureUIHelper.getLocation(feature);
-		int x = (maxX + minX) / 2 - FeatureUIHelper.getSize(feature).width / 2;
-		FeatureUIHelper.setLocation(feature, new Point(x, location.y));
+	private void centerAboveChildren(LayoutableFeature feature) {
+		int minX = FeatureUIHelper.getBounds(feature.getFirstChild().getFeature()).x;
+		int maxX = FeatureUIHelper.getBounds(feature.getLastChild().getFeature()).right();
+		Point location = FeatureUIHelper.getLocation(feature.getFeature());
+		int x = (maxX + minX) / 2 - FeatureUIHelper.getSize(feature.getFeature()).width / 2;
+		FeatureUIHelper.setLocation(feature.getFeature(), new Point(x, location.y));
 	}
 
-	private void nextToLeftSibling(Feature feature, Feature leftSibling) {
-		Point location = FeatureUIHelper.getLocation(feature);
-		int x = leftSibling != null ? FeatureUIHelper.getBounds(leftSibling)
+	private void nextToLeftSibling(LayoutableFeature feature, LayoutableFeature lastFeature) {
+		Point location = FeatureUIHelper.getLocation(feature.getFeature());
+		int x = lastFeature != null ? FeatureUIHelper.getBounds(lastFeature.getFeature())
 				.right() + FEATURE_SPACE_X : 0;
-		FeatureUIHelper.setLocation(feature, new Point(x, location.y));
+		FeatureUIHelper.setLocation(feature.getFeature(), new Point(x, location.y));
 	}
 
-	private void nextToRightSibling(Feature feature, Feature rightSibling) {
-		Rectangle bounds = FeatureUIHelper.getBounds(feature);
-		int x = rightSibling != null ? FeatureUIHelper.getBounds(rightSibling).x
+	private void nextToRightSibling(LayoutableFeature feature, LayoutableFeature rightSibling) {
+		Rectangle bounds = FeatureUIHelper.getBounds(feature.getFeature());
+		int x = rightSibling != null ? FeatureUIHelper.getBounds(rightSibling.getFeature()).x
 				- FEATURE_SPACE_X - bounds.width
 				: 0;
-		FeatureUIHelper.setLocation(feature, new Point(x, bounds.y));
+		FeatureUIHelper.setLocation(feature.getFeature(), new Point(x, bounds.y));
 	}
 
-	private void moveTree(Feature feature, int deltaX) {
-		Point location = FeatureUIHelper.getLocation(feature);
-		FeatureUIHelper.setLocation(feature, new Point(location.x + deltaX,
+	private void moveTree(LayoutableFeature root, int deltaX) {
+		Point location = FeatureUIHelper.getLocation(root.getFeature());
+		FeatureUIHelper.setLocation(root.getFeature(), new Point(location.x + deltaX,
 				location.y));
-		for (Feature child : feature.getChildren())
+		for (LayoutableFeature child : root.getChildren())
 			moveTree(child, deltaX);
 	}
 
-	private void centerTheRoot(Feature root) {
-		int newX = (controlWidth - FeatureUIHelper.getBounds(root).width) / 2;
-		moveTree(root, newX - FeatureUIHelper.getLocation(root).x);
+	private void centerTheRoot(LayoutableFeature root) {
+		int newX = (controlWidth - FeatureUIHelper.getBounds(root.getFeature()).width) / 2;
+		moveTree(root, newX - FeatureUIHelper.getLocation(root.getFeature()).x);
 	}
 
 }

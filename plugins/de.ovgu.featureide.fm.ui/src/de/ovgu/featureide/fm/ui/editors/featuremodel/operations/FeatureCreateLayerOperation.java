@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+
 import org.eclipse.gef.tools.DirectEditManager;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -34,6 +35,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCellEditorLocator;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLabelEditManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 
 /**
  * Operation with functionality to create a layer feature. Enables
@@ -90,6 +92,9 @@ public class FeatureCreateLayerOperation extends AbstractOperation {
 		newFeature = new Feature(featureModel, "NewLayer" + number);
 		featureModel.addFeature(newFeature);
 		feature.addChild(newFeature);
+		
+		FeatureDiagramLayoutHelper.initializeLayerFeaturePosition(featureModel, newFeature, feature);
+
 		featureModel.handleModelDataChanged();
 
 		// select the new feature
@@ -127,5 +132,4 @@ public class FeatureCreateLayerOperation extends AbstractOperation {
 		featureModel.handleModelDataChanged();
 		return Status.OK_STATUS;
 	}
-
 }

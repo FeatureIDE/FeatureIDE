@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.Status;
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 
 /**
  * Operation with functionality to create a new constraint. Enables undo/redo
@@ -76,6 +77,10 @@ public class ConstraintCreateOperation extends AbstractOperation {
 			throws ExecutionException {
 
 		featureModel.addPropositionalNode(node);
+		
+		FeatureDiagramLayoutHelper.initializeConstraintPosition(featureModel,
+				 featureModel.getConstraintCount()-1);
+		
 		featureModel.handleModelDataChanged();
 		return Status.OK_STATUS;
 	}

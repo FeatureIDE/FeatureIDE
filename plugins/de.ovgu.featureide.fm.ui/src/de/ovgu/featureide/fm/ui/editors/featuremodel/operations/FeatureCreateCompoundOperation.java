@@ -36,6 +36,8 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCellEditorLocator;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLabelEditManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
+
 
 /**
  * Operation with functionality to create a compound feature. Enables undo/redo
@@ -105,9 +107,11 @@ public class FeatureCreateCompoundOperation extends AbstractOperation {
 			newCompound.addChild(featureModel.getRoot());
 			featureModel.addFeature(newCompound);
 			featureModel.setRoot(newCompound);
-			featureModel.redrawDiagram();
 		}
-
+		
+		FeatureDiagramLayoutHelper.initializeCompoundFeaturePosition(
+				featureModel, selectedFeatures, newCompound);
+		
 		featureModel.handleModelDataChanged();
 
 		// select the new feature
@@ -165,9 +169,11 @@ public class FeatureCreateCompoundOperation extends AbstractOperation {
 			newCompound.addChild(featureModel.getRoot());
 			featureModel.addFeature(newCompound);
 			featureModel.setRoot(newCompound);
-			featureModel.redrawDiagram();
 		}
-
+		
+		FeatureDiagramLayoutHelper.initializeCompoundFeaturePosition(
+				featureModel, selectedFeatures, newCompound);
+		
 		featureModel.handleModelDataChanged();
 
 		return Status.OK_STATUS;
@@ -192,5 +198,7 @@ public class FeatureCreateCompoundOperation extends AbstractOperation {
 		featureModel.handleModelDataChanged();
 		return Status.OK_STATUS;
 	}
-
+	
 }
+
+	

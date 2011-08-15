@@ -36,13 +36,11 @@ public class ManualLayoutSelectionAction extends Action {
 			FeatureModel featureModel) {
 		super("Manual Layout");
 		this.featureModel = featureModel;
-		this.setEnabled(true);
-		this.setChecked(false);
 	}
 
 	@Override
 	public void run() {
-		setChecked(featureModel.hasModelAutoLayout());
+		setChecked(featureModel.hasFeaturesAutoLayout());
 		
 		ManualLayoutSelectionOperation op = new ManualLayoutSelectionOperation(
 						featureModel);

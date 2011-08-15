@@ -89,11 +89,18 @@ public class ModelLayoutEditPolicy extends LayoutEditPolicy {
 						.getEditParts().get(0);
 				Constraint constraint = editPart.getConstraintModel();
 
-				Point point = r.getLocation().getCopy();
-				getHostFigure().translateToRelative(point);
+				if (featureModel.hasFeaturesAutoLayout()){
+					Point point = r.getLocation().getCopy();
+					getHostFigure().translateToRelative(point);
 
-				cmd = new ConstraintDragAndDropCommand(featureModel,
-						constraint, point);
+					cmd = new ConstraintDragAndDropCommand(featureModel,
+							constraint, point);
+				} else {
+					Rectangle bounds = FeatureUIHelper.getBounds(constraint);
+					bounds = r.getTransformedRectangle(bounds);
+					cmd = new ConstraintDragAndDropCommand(featureModel,
+							constraint, bounds.getLocation());
+				}
 
 			}
 			if (r.getEditParts().get(0) instanceof LegendEditPart) {

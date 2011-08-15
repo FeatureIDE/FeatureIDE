@@ -54,8 +54,13 @@ public class FeatureDragAndDropCommand extends Command {
 	private Feature newParent;
 
 	private int newIndex;
-
+	
+	private boolean hasAutoLayout;
+	
+	private boolean hasVerticalLayout;
+	
 	private FeatureEditPart editPart;
+
 
 	public FeatureDragAndDropCommand(FeatureModel featureModel,
 			Feature feature, Point newLocation,FeatureEditPart editPart) {
@@ -63,6 +68,8 @@ public class FeatureDragAndDropCommand extends Command {
 		this.featureModel = featureModel;
 		this.feature = feature;
 		this.newLocation = newLocation;
+		this.hasAutoLayout = featureModel.hasFeaturesAutoLayout();
+		this.hasVerticalLayout = FeatureUIHelper.hasVerticalLayout();
 		this.editPart = editPart;
 		oldParent = feature.getParent();
 		oldIndex = oldParent != null ? oldParent.getChildIndex(feature) : 0;
@@ -70,43 +77,48 @@ public class FeatureDragAndDropCommand extends Command {
 
 	@Override
 	public boolean canExecute() {
-		if(editPart.getSelected()!=2){
-			return false;
+	
+		if(hasAutoLayout){
+			if(editPart.getSelected()!=2){
+				return false;
+			}
+			Point referencePoint = FeatureUIHelper.getSourceLocation(feature,
+					newLocation);
+			Feature next = calculateNext(featureModel.getRoot(), referencePoint);
+
+			// calculate new parent (if exists)
+			if (!calculateNewParentAndIndex(next))
+				return false;
+
+			// no new positions possible next to same feature
+			if (next == feature)
+				return false;
+
+			// not accept the same position
+			if (oldParent == newParent && oldIndex == newIndex)
+				return false;
+
+			// not accept moves to children positions
+			return feature != newParent && !feature.isAncestorOf(newParent);
 		}
-		Point referencePoint = FeatureUIHelper.getSourceLocation(feature,
-				newLocation);
-		Feature next = calculateNext(featureModel.getRoot(), referencePoint);
-
-		// calculate new parent (if exists)
-		if (!calculateNewParentAndIndex(next))
-			return false;
-
-		// no new positions possible next to same feature
-		if (next == feature)
-			return false;
-
-		// not accept the same position
-		if (oldParent == newParent && oldIndex == newIndex)
-			return false;
-
-		// not accept moves to children positions
-		return feature != newParent && !feature.isAncestorOf(newParent);
+		return true;
 	}
 
 	@Override
 	public void execute() {
-		FeatureOperationData data = new FeatureOperationData(feature,
-				oldParent, newParent, newIndex, oldIndex);
-		FeatureMoveOperation op = new FeatureMoveOperation(data, featureModel);
-		op.addContext((ObjectUndoContext) featureModel.getUndoContext());
+			FeatureOperationData data = new FeatureOperationData(feature,
+					oldParent, newParent, newIndex, oldIndex);
+			FeatureMoveOperation op = new FeatureMoveOperation(data, featureModel, newLocation, 
+					FeatureUIHelper.getLocation(feature).getCopy(), feature);
+			op.addContext((ObjectUndoContext) featureModel.getUndoContext());
 
-		try {
-			PlatformUI.getWorkbench().getOperationSupport()
-					.getOperationHistory().execute(op, null, null);
-		} catch (ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
+			try {
+				PlatformUI.getWorkbench().getOperationSupport()
+						.getOperationHistory().execute(op, null, null);
+			} catch (ExecutionException e) {
+				FMUIPlugin.getDefault().logError(e);
 
-		}
+			}
 	}
 
 	private boolean calculateNewParentAndIndex(Feature next) {
@@ -114,39 +126,74 @@ public class FeatureDragAndDropCommand extends Command {
 				.getSourceLocation(feature, newLocation);
 		Point nextLocation = FeatureUIHelper.getTargetLocation(next);
 		Dimension d = location.getDifference(nextLocation);
-
-		if (d.height > 0) {
-			// insert below
-			newParent = next;
-			newIndex = 0;
-			for (Feature child : next.getChildren()) {
-				Dimension cd = FeatureUIHelper.getSourceLocation(child)
-						.getDifference(nextLocation);
-				if (d.width / (double) d.height <= cd.width
-						/ (double) cd.height)
-					break;
-				else
-					newIndex++;
-			}
-		} else {
-			// insert left or right
-			if (next.isRoot()) {
-				// do not accept because root has no parent
-				return false;
+		if(!hasVerticalLayout){
+			if (d.height > 0) {
+				// insert below
+				newParent = next;
+				newIndex = 0;
+				for (Feature child : next.getChildren()) {
+					Dimension cd = FeatureUIHelper.getSourceLocation(child)
+							.getDifference(nextLocation);
+					if (d.width / (double) d.height <= cd.width
+							/ (double) cd.height)
+						break;
+					else
+						newIndex++;
+				}
 			} else {
-				newParent = next.getParent();
-				if (d.width < 0)
-					newIndex = newParent.getChildIndex(next);
-				else
-					newIndex = newParent.getChildIndex(next) + 1;
+				// insert left or right
+				if (next.isRoot()) {
+					// do not accept because root has no parent
+					return false;
+				} else {
+					newParent = next.getParent();
+					if (d.width < 0)
+						newIndex = newParent.getChildIndex(next);
+					else
+						newIndex = newParent.getChildIndex(next) + 1;
+				}
 			}
+
+			if (newParent == oldParent
+					&& oldParent.getChildIndex(feature) < newIndex)
+				newIndex--;
+
+			return true;
+		} else {
+			if (d.width > 0) {
+				// insert below
+				newParent = next;
+				newIndex = 0;
+				for (Feature child : next.getChildren()) {
+					Dimension cd = FeatureUIHelper.getSourceLocation(child)
+							.getDifference(nextLocation);
+					if (d.height / (double) d.width <= cd.height
+							/ (double) cd.width)
+						break;
+					else
+						newIndex++;
+				}
+			} else {
+				// insert left or right
+				if (next.isRoot()) {
+					// do not accept because root has no parent
+					return false;
+				} else {
+					newParent = next.getParent();
+					if (d.height < 0)
+						newIndex = newParent.getChildIndex(next);
+					else
+						newIndex = newParent.getChildIndex(next) + 1;
+				}
+			}
+
+			if (newParent == oldParent
+					&& oldParent.getChildIndex(feature) < newIndex)
+				newIndex--;
+
+			return true;
 		}
-
-		if (newParent == oldParent
-				&& oldParent.getChildIndex(feature) < newIndex)
-			newIndex--;
-
-		return true;
+		
 	}
 
 	public static Feature calculateNext(Feature feature, Point referencePoint) {

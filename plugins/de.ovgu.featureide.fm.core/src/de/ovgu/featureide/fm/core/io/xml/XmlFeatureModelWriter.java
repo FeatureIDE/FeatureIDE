@@ -77,16 +77,33 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
     	Element constraints = doc.createElement("constraints");
     	Element comments = doc.createElement("comments");
     	
+    	if(featureModel.hasFeaturesAutoLayout()){
+    		root.setAttribute("chosenLayoutAlgorithm", ""+featureModel.getLayoutAlgorithm());
+    	} else {
+    		root.setAttribute("hasManualLayout", "true");
+    	}
+    	if(!featureModel.showHiddenFeatures()){
+    		root.setAttribute("showHiddenFeatures", "false");
+    	}
+
+    	
     	doc.appendChild(root);
     	root.appendChild(struct);
     	createXmlDocRec(doc, struct, featureModel.getRoot());
     	
     	root.appendChild(constraints);
-    	for(int i=0; i<featureModel.getPropositionalNodes().size(); i++){
+    	for(int i = 0; i < featureModel.getConstraints().size(); i++){
         	Element rule;
         	rule = doc.createElement("rule");
+        	if(!featureModel.hasFeaturesAutoLayout()){
+        		   rule.setAttribute("coordinates", 
+                   		""+featureModel.getConstraints().get(i).getLocation().x()+"," 
+                   		+" "+featureModel.getConstraints().get(i).getLocation().y());
+        	}
+         
+           
         	constraints.appendChild(rule);
-    		createPropositionalConstraints(doc, rule, featureModel.getPropositionalNodes().get(i));	
+    		createPropositionalConstraints(doc, rule, featureModel.getConstraints().get(i).getNode());	
     	}
     	
     	root.appendChild(comments);
@@ -120,6 +137,10 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
     		if(feat.isHidden())		fnod.setAttribute("hidden", "true");
         	if(feat.isMandatory())	fnod.setAttribute("mandatory", "true");
         	if(feat.isAbstract())	fnod.setAttribute("abstract", "true");
+        	if(!featureModel.hasFeaturesAutoLayout()){
+            	fnod.setAttribute("coordinates", feat.getLocation().x()
+        				+", "+feat.getLocation().y());
+        	}
         	node.appendChild(fnod);
     	}
     	else{
@@ -136,7 +157,9 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
 	    	if(feat.isMandatory())	fnod.setAttribute("mandatory", "true");
 		    if(feat.isAbstract())	fnod.setAttribute("abstract", "true");
 		    if(feat.isHidden())		fnod.setAttribute("hidden", "true");
-	     	   	
+        	if(!featureModel.hasFeaturesAutoLayout()) 
+        		fnod.setAttribute("coordinates", +feat.getLocation().x()
+        				+", "+feat.getLocation().y());
 	    	node.appendChild(fnod);
 	    	
 	    	Iterator<Feature> i = children.iterator();

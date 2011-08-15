@@ -26,33 +26,35 @@ import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.LayoutSelectionOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ShowHiddenFeaturesOperation;
 
-public class LayoutSelectionAction extends Action {
-	
+/**
+ * 
+ * @author David Halm
+ * @author Patrick Sulkowski
+ */
+public class ShowHiddenFeaturesAction extends Action {
+
 	private final FeatureModel featureModel;
-	private int newSelectedLayoutAlgorithm;
-	private int oldSelectedLayoutAlgorithm;
 
-	public LayoutSelectionAction(GraphicalViewerImpl viewer,
-			FeatureModel featureModel, int newSelectedLayoutAlgorithm, int oldSelectedLayoutAlgorithm) {
-		super(FeatureDiagramLayoutHelper.getLayoutLabel(newSelectedLayoutAlgorithm));
-		this.newSelectedLayoutAlgorithm = newSelectedLayoutAlgorithm;
-		this.oldSelectedLayoutAlgorithm = oldSelectedLayoutAlgorithm;
+	public ShowHiddenFeaturesAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
+		super("Show Hidden Features");
 		this.featureModel = featureModel;
+
 	}
 
 	@Override
 	public void run() {
-		LayoutSelectionOperation op = new LayoutSelectionOperation(featureModel, newSelectedLayoutAlgorithm, oldSelectedLayoutAlgorithm);
+		ShowHiddenFeaturesOperation op = new ShowHiddenFeaturesOperation(featureModel);
 		op.addContext((IUndoContext) featureModel.getUndoContext());
+
 		try {
 			PlatformUI.getWorkbench().getOperationSupport()
-				.getOperationHistory().execute(op, null, null);
+					.getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
+
 		}
-	}	
-	
+	}
+
 }

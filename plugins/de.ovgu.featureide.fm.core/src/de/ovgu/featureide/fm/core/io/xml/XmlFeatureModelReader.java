@@ -31,6 +31,7 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
+import org.eclipse.draw2d.geometry.Point;
 import org.prop4j.And;
 import org.prop4j.AtMost;
 import org.prop4j.Equals;
@@ -113,13 +114,12 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 
 			// mode: 0 = start; 1 = struct; 2 = constraints; 3 = comments
 			int mode = 0;
-			
 			ruleTemp.clear();
 			ruleTemp.add(new LinkedList<Node>());
-
+			Point constraintLocation = null;
+			featureModel.showHiddenFeatures(true);
 			while (eventReader.hasNext()) {
 				XMLEvent event = eventReader.nextEvent();
-
 				if (event.isStartElement()) {
 					StartElement currentStartTag = event.asStartElement();
 					String currentTag = currentStartTag.getName()
@@ -136,6 +136,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 						boolean isMandatory = false;
 						boolean isAbstract = false;
 						boolean isHidden = false;
+						Point featureLocation = null;
 						String attrName = "noname";
 						String parent = parentStack.peek()[1];
 
@@ -172,6 +173,19 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 								 else 
 									isHidden = false;
 							}
+							else if (curName == "coordinates"){
+								String subStringX = curValue.substring(0, curValue.indexOf(", "));
+								String subStringY = curValue.substring(curValue.indexOf(", ")+2);
+								try {
+									featureLocation = new Point(Integer.parseInt (subStringX),
+											Integer.parseInt (subStringY));
+								} catch (Exception e) {
+									throw new UnsupportedModelException(e.getMessage()
+											+"is no valid Integer Value",
+											event.getLocation().getLineNumber());
+								}			
+								
+							}
 							else{
 								throw new UnsupportedModelException("'"
 										+ curName
@@ -184,7 +198,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 						if (!featureModel.getFeatureNames().contains(attrName)
 								&& FeatureModel.isValidJavaIdentifier(attrName)) {
 							addFeature(attrName, isMandatory, isAbstract, isHidden,
-									parent);
+									parent, featureLocation);
 						} else {
 							if (!FeatureModel.isValidJavaIdentifier(attrName)) {
 								throw new UnsupportedModelException("'"
@@ -213,8 +227,37 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 									+ currentTag + "' is not a valid tag in constraints-section.",
 									event.getLocation().getLineNumber());	
 						}
-						if (currentTag.equals("rule")
-								|| currentTag.equals("constraints")) {
+						if (currentTag.equals("rule")) {
+							
+							@SuppressWarnings("unchecked")
+							Iterator<Attribute> attributes = currentStartTag
+									.getAttributes();
+							
+							while (attributes.hasNext()) {
+								Attribute attribute = attributes.next();
+								String curName = attribute.getName().getLocalPart();
+								String curValue = attribute.getValue();
+								
+								if (curName == "coordinates"){
+									String subStringX = curValue.substring(0, curValue.indexOf(", "));
+									String subStringY = curValue.substring(curValue.indexOf(", ")+2);
+									try {
+										constraintLocation = new Point(Integer.parseInt (subStringX),
+												Integer.parseInt (subStringY));
+									} catch (Exception e) {
+										throw new UnsupportedModelException(e.getMessage()
+												+"is no valid Integer Value",event.getLocation().getLineNumber());
+									}					
+								} else {
+									throw new UnsupportedModelException("'"
+											+ curName
+											+ "' is not a valid attribute.",
+											event.getLocation().getLineNumber());
+								}
+								
+							}
+						} else if (currentTag.equals("constraints")){
+							
 						} else if (currentTag.equals("var")) {
 							String literalName = eventReader.getElementText();
 
@@ -245,6 +288,47 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 					}
 					else {
 						if (currentTag.equals("featureModel")) {
+	
+							@SuppressWarnings("unchecked")
+							Iterator<Attribute> attributes = currentStartTag
+									.getAttributes();
+							boolean hasAttributes = false;
+							while (attributes.hasNext()) {
+								hasAttributes = true;
+								Attribute attribute = attributes.next();
+								String curName = attribute.getName().getLocalPart();
+								String curValue = attribute.getValue();
+								
+								if (curName == "chosenLayoutAlgorithm"){
+									try {
+										featureModel.setFeaturesAutoLayout(true);
+										featureModel.setLayout(Integer.parseInt(curValue));
+									} catch (Exception e) {
+										throw new UnsupportedModelException(e.getMessage()
+												+"is no valid Integer Value",
+												event.getLocation().getLineNumber());
+									}			
+									
+								} else if (curName == "hasManualLayout") {
+									if(curValue.equals("true")){
+										featureModel.setFeaturesAutoLayout(false);
+									}	
+								} else if (curName == "showHiddenFeatures"){
+									if(curValue.equals("false")){
+										featureModel.showHiddenFeatures(false);
+									}
+											
+								}else{
+									throw new UnsupportedModelException("'"
+											+ curName
+											+ "' is not a valid attribute.",
+											event.getLocation().getLineNumber());
+								}
+							}					
+							if(!hasAttributes) {
+								featureModel.setFeaturesAutoLayout(true);
+								featureModel.setLayout(0);
+							}
 						}
 						else if (currentTag.equals("struct")) {
 							parentStack
@@ -295,6 +379,9 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 									}
 
 									featureModel.addPropositionalNode(node);
+									featureModel.getConstraints().get(
+											featureModel.getConstraintCount()-1).setLocation(constraintLocation);
+									constraintLocation = null;
 									ruleTemp.clear();
 									ruleTemp.add(new LinkedList<Node>());
 								}
@@ -360,7 +447,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 	 *            String with the name of the parent feature
 	 */
 	private void addFeature(String featureName, boolean isMandatory,
-			boolean isAbstract, boolean isHidden, String parent) {
+			boolean isAbstract, boolean isHidden, String parent, Point location) {
 		/*
 		 * HOWTO: add a child to the FeaturModel
 		 * 
@@ -384,7 +471,6 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 			feat.setAbstract(isAbstract);
 			feat.setHidden(isHidden);
 			featureModel.addFeature(feat);
-
 			if (parentStack.peek()[0].equals("and")) {
 				featureModel.getFeature(parent).setAnd();
 			} else if (parentStack.peek()[0].equals("or")) {
@@ -393,6 +479,9 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 				featureModel.getFeature(parent).setAlternative();
 			}
 			featureModel.getFeature(parent).addChild(feat);
+		}
+		if(location != null && feat != null){
+			FeatureModel.setFeatureLocation(location, feat);
 		}
 	}
 }

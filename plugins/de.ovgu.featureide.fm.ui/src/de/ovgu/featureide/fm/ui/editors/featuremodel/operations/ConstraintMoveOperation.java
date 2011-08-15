@@ -24,9 +24,11 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 
 /**
  * Operation with functionality to move Constraints. Provides undo/redo
@@ -43,16 +45,21 @@ public class ConstraintMoveOperation extends AbstractOperation {
 	private int index;
 
 	private int oldIndex;
-
+	
+	private Point newPos;
+	private Point oldPos;
+	
 	public ConstraintMoveOperation(Constraint constraint,
 			FeatureModel featureModel, int newIndex, int oldIndex,
-			boolean isLastPos) {
+			boolean isLastPos, Point newPos, Point oldPos) {
 
 		super(LABEL);
 		this.constraint = constraint;
 		this.featureModel = featureModel;
 		this.index = newIndex;
 		this.oldIndex = oldIndex;
+		this.newPos = newPos;
+		this.oldPos = oldPos;
 	}
 
 	/*
@@ -63,10 +70,10 @@ public class ConstraintMoveOperation extends AbstractOperation {
 	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
 	 */
 	@Override
-	public IStatus execute(IProgressMonitor arg0, IAdaptable arg1)
+	public IStatus execute(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
 
-		return redo(arg0, arg1);
+		return redo(monitor, info);
 	}
 
 	/*
@@ -77,10 +84,11 @@ public class ConstraintMoveOperation extends AbstractOperation {
 	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
 	 */
 	@Override
-	public IStatus redo(IProgressMonitor arg0, IAdaptable arg1)
+	public IStatus redo(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
-		featureModel.removePropositionalNode(constraint);
-		featureModel.addPropositionalNode(constraint.getNode(), index);
+			featureModel.removePropositionalNode(constraint);
+			featureModel.addPropositionalNode(constraint.getNode(), index);
+			FeatureUIHelper.setLocation(featureModel.getConstraints().get(index), newPos);
 		featureModel.handleModelDataChanged();
 		return Status.OK_STATUS;
 	}
@@ -93,10 +101,11 @@ public class ConstraintMoveOperation extends AbstractOperation {
 	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
 	 */
 	@Override
-	public IStatus undo(IProgressMonitor arg0, IAdaptable arg1)
+	public IStatus undo(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
-		featureModel.removePropositionalNode(constraint);
-		featureModel.addPropositionalNode(constraint.getNode(), oldIndex);
+			featureModel.removePropositionalNode(constraint);
+			featureModel.addPropositionalNode(constraint.getNode(), oldIndex);
+			FeatureUIHelper.setLocation(featureModel.getConstraints().get(index), oldPos);
 		featureModel.handleModelDataChanged();
 		return Status.OK_STATUS;
 	}

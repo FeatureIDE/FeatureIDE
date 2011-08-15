@@ -41,10 +41,11 @@ public class BreadthFirstLayout extends FeatureDiagramLayoutManager {
 		yoffset = 0;
 		layout(featureModel.getRoot());
 		layout(yoffset, featureModel.getConstraints());
+		layoutHidden(featureModel);
 	}
 	
 	private void layout(Feature root) {
-		if (root == null)
+		if (root == null || (isHidden(root)) )
 			return;
 		LinkedList<Feature> list = new LinkedList<Feature>();
 		list.add(root);
@@ -53,17 +54,23 @@ public class BreadthFirstLayout extends FeatureDiagramLayoutManager {
 		while (!list.isEmpty()) {
 			//center the features of the level
 			int width = 2 * LAYOUT_MARGIN_X - FEATURE_SPACE_X;
-			for (Feature feature : list)
-				width += FeatureUIHelper.getSize(feature).width + FEATURE_SPACE_X;
+			for (Feature feature : list) {
+				if(!isHidden(feature))
+					width += FeatureUIHelper.getSize(feature).width + FEATURE_SPACE_X;
+				
+				
+			}
+				
 			int xoffset = controlWidth / 2 - width / 2;
 
 			//set location of each feature at this level
 			int levelSize = list.size();
 			for (int i = 0; i < levelSize; i++) {
 				Feature feature = list.removeFirst();
-				FeatureUIHelper.setLocation(feature,new Point(xoffset, yoffset));
-				xoffset += FeatureUIHelper.getSize(feature).width + FEATURE_SPACE_X;
-				
+				if(!isHidden(feature)){
+					FeatureUIHelper.setLocation(feature,new Point(xoffset, yoffset));
+					xoffset += FeatureUIHelper.getSize(feature).width + FEATURE_SPACE_X;
+				}
 				//add the features children
 				for (Feature child : feature.getChildren())
 					list.add(child);

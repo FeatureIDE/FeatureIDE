@@ -39,17 +39,67 @@ abstract public class FeatureDiagramLayoutManager implements GUIDefaults {
 	int controlWidth = 10;
 
 	int controlHeight = 10;
-
+	
+	boolean showHidden;
+	
 	public void layout(FeatureModel featureModel) {
+		this.showHidden = featureModel.showHiddenFeatures();
+		FeatureUIHelper.showHiddenFeatures(featureModel.showHiddenFeatures());		
 		layoutFeatureModel(featureModel);
-		if(featureModel.hasLegendAutoLayout())layoutLegend(featureModel);
+		if(featureModel.hasLegendAutoLayout())layoutLegend(featureModel, this.showHidden);
 	}
+	
+	boolean isHidden(Feature feature){
+		if(showHidden){
+			return false;
+		} else {
+			if(feature.isHidden()){
+				return feature.isHidden();
+			}
+			if(!feature.isRoot()){
+				return isHidden(feature.getParent());
+			} else {
+				return feature.isHidden();
+			}
+		}
 
+	}
+	
+	void layoutHidden(FeatureModel featureModel){
+		for(Feature feature : featureModel.getFeatures()){
+			if(isHidden(feature) && !feature.isRoot()){
+				FeatureUIHelper.setTemporaryLocation(feature, new Point(0,0));
+			}
+		}
+	}
+	
+	
 	abstract public void layoutFeatureModel(FeatureModel featureModel);
 
 	public void setControlSize(int width, int height) {
 		this.controlWidth = width;
 		this.controlHeight = height;
+	}
+	
+	void centerLayoutX(FeatureModel featureModel){
+		int mostRightFeatureX = Integer.MIN_VALUE;
+		int mostLeftFeatureX = Integer.MAX_VALUE;
+		for(Feature feature : featureModel.getFeatures()){
+			int tempX = FeatureUIHelper.getLocation(feature).x();
+			int tempXOffset= FeatureUIHelper.getSize(feature).width();
+			if(mostRightFeatureX < tempX+tempXOffset) 
+				mostRightFeatureX = tempX+tempXOffset;
+			if(mostLeftFeatureX > tempX) 
+				mostLeftFeatureX = tempX;
+		}
+		int width = mostRightFeatureX - mostLeftFeatureX;
+		int offset = mostRightFeatureX - ((controlWidth - width)/2);
+		for(Feature feature : featureModel.getFeatures()){
+			FeatureUIHelper.setLocation(feature,
+					new Point(FeatureUIHelper.getLocation(feature).getCopy().x()+offset,
+					FeatureUIHelper.getLocation(feature).getCopy().y())
+			);
+		}
 	}
 
 	void layout(int yoffset, List<Constraint> constraints) {
@@ -58,6 +108,9 @@ abstract public class FeatureDiagramLayoutManager implements GUIDefaults {
 			Constraint constraint = constraints.get(i);
 			Dimension size = FeatureUIHelper.getSize(constraint);
 			int x = (controlWidth - size.width) / 2;
+			if(this instanceof DepthFirstLayout){
+				x=2*FEATURE_SPACE_X;
+			}
 			FeatureUIHelper.setLocation(constraint, new Point(x, y));
 			y += size.height;
 		}
@@ -66,31 +119,108 @@ abstract public class FeatureDiagramLayoutManager implements GUIDefaults {
 	/**
 	 * sets the position of the legend to the right-bottom of the features
 	 */
-	private static void layoutLegend(FeatureModel featureModel) {
-		int maxX = 0;
-		int maxY = 0;
-
-		for (Feature c : featureModel.getFeatures()) {
-			int nextX = FeatureUIHelper.getLocation(c).x
-					+ FeatureUIHelper.getSize(c).width;
-			if (nextX > maxX)
-				maxX = nextX;
-			int nextY = FeatureUIHelper.getLocation(c).y;
-			if (nextY > maxY)
-				maxY = nextY + FeatureUIHelper.getSize(c).height;
-
+	private static void layoutLegend(FeatureModel featureModel, boolean showHidden) {
+		
+		Point min = new Point (Integer.MAX_VALUE,Integer.MAX_VALUE);
+		Point max = new Point (Integer.MIN_VALUE,Integer.MIN_VALUE);
+		
+		for(Feature feature : LayoutableFeature.
+				createLayoutableFeatures(featureModel.getFeatures(), showHidden)){
+			Point temp = FeatureUIHelper.getLocation(feature);
+			Dimension tempSize = FeatureUIHelper.getSize(feature);
+			if(temp.x() < min.x()) 
+				min.setX(temp.x());
+			if(temp.y() < min.y()) 
+				min.setY(temp.y());
+			if((temp.x() + tempSize.width()) > max.x())
+				max.setX(temp.x() + tempSize.width());
+			if(temp.y() + tempSize.height()>max.y())
+				max.setY(temp.y() + tempSize.height());
 		}
-		Feature root = featureModel.getRoot();
-		int rootY = FeatureUIHelper.getLocation(root).y;
-		if (maxY < rootY + FeatureUIHelper.getLegendSize().height) {
-			for (Constraint c : featureModel.getConstraints()) {
-				int nextX = FeatureUIHelper.getLocation(c).x
-						+ FeatureUIHelper.getSize(c).width;
-				if (nextX > maxX)
-					maxX = nextX;
+		
+		for(Constraint constraint: featureModel.getConstraints()){
+			Point temp = FeatureUIHelper.getLocation(constraint);
+			Dimension tempSize = FeatureUIHelper.getSize(constraint);
+			if(temp.x() < min.x()) 
+				min.setX(temp.x());
+			if(temp.y() < min.y()) 
+				min.setY(temp.y());
+			if((temp.x() + tempSize.width()) > max.x())
+				max.setX(temp.x() + tempSize.width());
+			if(temp.y() + tempSize.height()>max.y())
+				max.setY(temp.y() + tempSize.height());
+		}		
+		Dimension legendSize = FeatureUIHelper.getLegendSize();
+		boolean topRight = true;
+		boolean topLeft = true;
+		boolean botLeft = true;
+		boolean botRight = true;
+		
+		for(Feature feature : LayoutableFeature.
+				createLayoutableFeatures(featureModel.getFeatures(), showHidden)){
+			Point tempLocation = FeatureUIHelper.getLocation(feature);
+			Dimension tempSize = FeatureUIHelper.getSize(feature);
+			if((tempLocation.x()+tempSize.width()) 
+						> (max.x() - legendSize.width() - FEATURE_SPACE_X)
+					&& (tempLocation.y()) 
+						< (min.y() + legendSize.height() + FEATURE_SPACE_Y/2))
+				topRight = false;
+			if((tempLocation.x()) 
+					< (min.x() + legendSize.width() + FEATURE_SPACE_X)
+				&& (tempLocation.y()) 
+					< (min.y() + legendSize.height() + FEATURE_SPACE_Y/2))
+				topLeft = false;
+			if((tempLocation.x()) 
+					< (min.x() + legendSize.width() + FEATURE_SPACE_X)
+				&& (tempLocation.y()+tempSize.height()) 
+					> (max.y() - legendSize.height() - FEATURE_SPACE_Y/2))
+				botLeft = false;
+			if((tempLocation.x()+tempSize.width()) 
+					> (max.x() - legendSize.width() - FEATURE_SPACE_X)
+				&& (tempLocation.y()+tempSize.height())
+					> (max.y() - legendSize.height() - FEATURE_SPACE_Y/2))
+				botRight = false;
+			
+		}			
+		if(topRight||topLeft||botLeft||botRight){
+			for(Constraint constraint: featureModel.getConstraints()){
+				Point tempLocation = FeatureUIHelper.getLocation(constraint);
+				Dimension tempSize = FeatureUIHelper.getSize(constraint);
+				if((tempLocation.x()+tempSize.width()) 
+						> (max.x() - legendSize.width() - FEATURE_SPACE_X)
+					&& (tempLocation.y()) 
+						< (min.y() + legendSize.height() + FEATURE_SPACE_Y/2))
+					topRight = false;
+				if((tempLocation.x()) 
+						< (min.x() + legendSize.width() + FEATURE_SPACE_X)
+					&& (tempLocation.y()) 
+						< (min.y() + legendSize.height() + FEATURE_SPACE_Y/2))
+				topLeft = false;
+				if((tempLocation.x()) 
+						< (min.x() + legendSize.width() + FEATURE_SPACE_X)
+					&& (tempLocation.y()+tempSize.height()) 
+						> (max.y() - legendSize.height() - FEATURE_SPACE_Y/2))
+				botLeft = false;
+				if((tempLocation.x()+tempSize.width()) 
+						> (max.x() - legendSize.width() - FEATURE_SPACE_X)
+					&& (tempLocation.y()+tempSize.height())
+						> (max.y() - legendSize.height() - FEATURE_SPACE_Y/2))
+				botRight = false;
 			}
 		}
-
-		featureModel.setLegendPos(maxX + FEATURE_SPACE_X, rootY);
+		
+		
+		if(topRight){
+			featureModel.setLegendPos(max.x()-legendSize.width(), min.y());
+		} else if (topLeft) {
+			featureModel.setLegendPos(min.x(), min.y());
+		}  else if (botLeft) {
+			featureModel.setLegendPos(min.x(), max.y()-legendSize.height());
+		} else if (botRight) {
+			featureModel.setLegendPos(max.x()-legendSize.width(), max.y()-legendSize.height());
+		} else {
+			featureModel.setLegendPos(max.x() + FEATURE_SPACE_X, min.y());
+		}
+		
 	}
 }
