@@ -92,8 +92,9 @@ public class FmOutlinePage extends ContentOutlinePage {
 		if (fInput != null) {
 			viewer.setInput(fInput);
 		}
-
+		
 		viewer.expandToLevel(2);
-		new FmOutlinePageContextMenu(getSite(),fTextEditor,viewer,fInput);
+		FmOutlinePageContextMenu cm = new FmOutlinePageContextMenu(getSite(),fTextEditor,viewer,fInput);
+		cm.addToolbar(getSite().getActionBars().getToolBarManager());
 	}
 }

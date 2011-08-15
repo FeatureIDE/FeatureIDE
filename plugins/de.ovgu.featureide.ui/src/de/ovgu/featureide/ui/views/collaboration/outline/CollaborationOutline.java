@@ -26,6 +26,9 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -58,6 +61,7 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.editors.ConfigurationEditor;
@@ -78,6 +82,14 @@ public class CollaborationOutline extends ViewPart {
 	private IFeatureProject featureProject;
 	private Object[] expandedElements;
 	private IEditorPart active_editor;
+	private Action collapseAllAction;
+	private Action expandAllAction;
+
+	private static final ImageDescriptor IMG_COLLAPSE = FMUIPlugin.getDefault()
+			.getImageDescriptor("icons/collapse.gif");
+	private static final ImageDescriptor IMG_EXPAND = FMUIPlugin.getDefault()
+			.getImageDescriptor("icons/expand.gif");
+
 	public static final String ID = UIPlugin.PLUGIN_ID
 			+ ".views.collaboration.outline.CollaborationOutline";
 
@@ -253,6 +265,8 @@ public class CollaborationOutline extends ViewPart {
 		viewer.setContentProvider(new CollaborationOutlineTreeContentProvider());
 		viewer.setLabelProvider(new CollaborationOutlineLabelProvider());
 		viewer.setAutoExpandLevel(2);
+		addToolbar(getViewSite().getActionBars().getToolBarManager());
+
 		viewer.addDoubleClickListener(dblClicklistener);
 		viewer.addTreeListener(treeListener);
 		viewer.addSelectionChangedListener(selectionChangedListener);
@@ -337,6 +351,35 @@ public class CollaborationOutline extends ViewPart {
 				}
 			}
 		}
+	}
+
+	/**
+	 * provides functionality to expand and collapse all items in viewer
+	 * 
+	 * @param iToolBarManager
+	 */
+	public void addToolbar(IToolBarManager iToolBarManager) {
+		collapseAllAction = new Action() {
+			public void run() {
+				viewer.collapseAll();
+			}
+		};
+		collapseAllAction.setToolTipText("Collapse All");
+		collapseAllAction.setImageDescriptor(IMG_COLLAPSE);
+
+		expandAllAction = new Action() {
+			public void run() {
+				viewer.expandAll();
+				// treeExpanded event is not triggered, so we manually have to
+				// call this function
+				colorizeItems(viewer.getTree().getItems());
+			}
+		};
+		expandAllAction.setToolTipText("Expand All");
+		expandAllAction.setImageDescriptor(IMG_EXPAND);
+
+		iToolBarManager.add(collapseAllAction);
+		iToolBarManager.add(expandAllAction);
 	}
 
 	/**

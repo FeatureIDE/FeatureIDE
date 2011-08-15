@@ -22,10 +22,13 @@ import org.eclipse.core.commands.operations.ObjectUndoContext;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPartViewer;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -40,6 +43,7 @@ import org.eclipse.ui.part.IPageSite;
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AlternativeAction;
@@ -65,7 +69,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
  * @author Melanie Pflaume
  * 
  */
-public class FmOutlinePageContextMenu {
+public class FmOutlinePageContextMenu{
 
 	private IPageSite site;
 	private FeatureModelEditor fTextEditor;
@@ -86,8 +90,13 @@ public class FmOutlinePageContextMenu {
 	private AndAction andAction;
 	private AlternativeAction altAction;
 	private ReverseOrderAction roAction;
+	private Action collapseAllAction;
+	private Action expandAllAction;
 
 	private static final String CONTEXT_MENU_ID = "de.ovgu.feautureide.fm.view.outline.contextmenu";
+	
+	private static final ImageDescriptor IMG_COLLAPSE = FMUIPlugin.getDefault().getImageDescriptor("icons/collapse.gif");
+	private static final ImageDescriptor IMG_EXPAND = FMUIPlugin.getDefault().getImageDescriptor("icons/expand.gif");
 
 	public FmOutlinePageContextMenu(IPageSite iPageSite,
 			FeatureModelEditor fTextEditor, TreeViewer viewer,
@@ -137,6 +146,22 @@ public class FmOutlinePageContextMenu {
 		roAction = new ReverseOrderAction(viewer, fInput);
 		andAction = new AndAction(viewer, fInput);
 		altAction = new AlternativeAction(viewer, fInput);
+		
+		collapseAllAction = new Action() {
+			public void run() {
+				viewer.collapseAll();
+			}
+		};
+		collapseAllAction.setToolTipText("Collapse All");
+		collapseAllAction.setImageDescriptor(IMG_COLLAPSE);
+		
+		expandAllAction = new Action() {
+			public void run() {
+				viewer.expandAll();
+			}
+		};
+		expandAllAction.setToolTipText("Expand All");
+		expandAllAction.setImageDescriptor(IMG_EXPAND);
 	}
 
 	/**
@@ -246,6 +271,15 @@ public class FmOutlinePageContextMenu {
 			dAction.setText("Delete");
 			manager.add(dAction);
 		}
+	}
+
+
+	/**
+	 * @param iToolBarManager
+	 */
+	public void addToolbar(IToolBarManager iToolBarManager) {
+		iToolBarManager.add(collapseAllAction);
+		iToolBarManager.add(expandAllAction);
 	}
 
 }
