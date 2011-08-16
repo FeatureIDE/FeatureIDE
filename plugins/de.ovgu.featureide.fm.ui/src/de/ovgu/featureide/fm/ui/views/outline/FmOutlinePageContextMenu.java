@@ -38,6 +38,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.part.IPageSite;
 
 import de.ovgu.featureide.fm.core.Constraint;
@@ -71,7 +72,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
  */
 public class FmOutlinePageContextMenu{
 
-	private IPageSite site;
+	private Object site;
 	private FeatureModelEditor fTextEditor;
 	private TreeViewer viewer;
 	private FeatureModel fInput;
@@ -98,10 +99,10 @@ public class FmOutlinePageContextMenu{
 	private static final ImageDescriptor IMG_COLLAPSE = FMUIPlugin.getDefault().getImageDescriptor("icons/collapse.gif");
 	private static final ImageDescriptor IMG_EXPAND = FMUIPlugin.getDefault().getImageDescriptor("icons/expand.gif");
 
-	public FmOutlinePageContextMenu(IPageSite iPageSite,
-			FeatureModelEditor fTextEditor, TreeViewer viewer,
+	public FmOutlinePageContextMenu(
+			Object site, FeatureModelEditor fTextEditor, TreeViewer viewer,
 			FeatureModel fInput) {
-		this.site = iPageSite;
+		this.site = site;
 		this.fTextEditor = fTextEditor;
 		this.viewer = viewer;
 		this.fInput = fInput;
@@ -125,7 +126,11 @@ public class FmOutlinePageContextMenu{
 		});
 		Menu menu = menuMgr.createContextMenu(viewer.getControl());
 		viewer.getControl().setMenu(menu);
-		site.registerContextMenu(CONTEXT_MENU_ID, menuMgr, viewer);
+		
+		if (site instanceof IWorkbenchPartSite )
+			((IWorkbenchPartSite) site).registerContextMenu(CONTEXT_MENU_ID, menuMgr, viewer);
+		else 
+			((IPageSite) site).registerContextMenu(CONTEXT_MENU_ID, menuMgr, viewer);
 	}
 
 	private void initActions() {
@@ -170,26 +175,29 @@ public class FmOutlinePageContextMenu{
 	private void addListeners() {
 		viewer.addDoubleClickListener(new IDoubleClickListener() {
 			public void doubleClick(DoubleClickEvent event) {
-				if (!(((IStructuredSelection) viewer.getSelection())
-						.getFirstElement() instanceof Feature))
-					return;				
-				mAction.run();
+				if ((((IStructuredSelection) viewer.getSelection())
+						.getFirstElement() instanceof Feature))			
+					mAction.run();
+				else if ((((IStructuredSelection) viewer.getSelection())
+						.getFirstElement() instanceof Constraint))
+					ecAction.run();
+				
 			}
 		});
 		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
-
 			@Override
-			public void selectionChanged(SelectionChangedEvent event) {
+			public void selectionChanged(SelectionChangedEvent event) {				
+				if (viewer.getSelection() == null) return;
+				
 				EditPart part;
 				if ((((IStructuredSelection) viewer.getSelection())
 						.getFirstElement() instanceof Feature)) {
 					
 					Feature feat = (Feature) ((IStructuredSelection) viewer
 							.getSelection()).getFirstElement();
-	
+					
 					part = (FeatureEditPart) fTextEditor.diagramEditor
 							.getEditPartRegistry().get(feat);
-
 				} else if ((((IStructuredSelection) viewer.getSelection())
 						.getFirstElement() instanceof Constraint)) {
 					
@@ -203,10 +211,11 @@ public class FmOutlinePageContextMenu{
 					return;
 				}
 				
+				try {
 				((GraphicalViewerImpl) fTextEditor.diagramEditor)
 				.setSelection(new StructuredSelection(part));
 				
-				try {
+				
 					EditPartViewer view = part.getViewer();
 					if (view != null)
 						view.reveal(part);
@@ -271,6 +280,9 @@ public class FmOutlinePageContextMenu{
 			dAction.setText("Delete");
 			manager.add(dAction);
 		}
+		if (sel instanceof String)
+			if (sel.equals("Constraints"))
+				manager.add(ccAction);
 	}
 
 

@@ -58,7 +58,8 @@ public class FmTreeContentProvider implements ITreeContentProvider {
 	 */
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-		fModel = ((FeatureModel) newInput);
+		if (newInput instanceof FeatureModel && newInput != null)
+			fModel = ((FeatureModel) newInput);
 
 	}
 
@@ -95,7 +96,7 @@ public class FmTreeContentProvider implements ITreeContentProvider {
 			return null;
 
 		// we have a String as parent of constraints
-		if (parentElement instanceof String) {
+		if (parentElement instanceof String && ((String)parentElement).equals("Constraints")) {
 			Object[] elements = new Object[fModel.getConstraintCount()];
 			List<Constraint> cList = fModel.getConstraints();
 			for (int i = 0; i < fModel.getConstraintCount(); i++) {

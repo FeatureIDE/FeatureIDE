@@ -22,6 +22,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
+
 
 /**
  * Contains the model for the Collaboration Diagram.
@@ -91,6 +93,15 @@ public class CollaborationModel {
 	
 	public List<Role> getRoles(){
 		return roles;
+	}
+	
+	public Role getRole(IFile iFile) {
+		for (Role r : getRoles()) {
+			if (r.file.equals(iFile))
+				return r;
+		}
+		
+		return null;
 	}
 
 	public void removeClass(Class c) {

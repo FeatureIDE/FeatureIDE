@@ -18,6 +18,7 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.outline;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.graphics.Image;
@@ -47,6 +48,7 @@ public class CollaborationOutlineLabelProvider implements ILabelProvider {
 	private static final Image IMAGE_METHODE_PUBLIC = UIPlugin.getImage("public_co.gif");
 	private static final Image IMAGE_METHODE_DEFAULT =  UIPlugin.getImage("default_co.gif");
 	private static final Image IMAGE_CLASS = UIPlugin.getImage("class_obj.gif");
+	private IFile file;
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#addListener(org.eclipse.jface.viewers.ILabelProviderListener)
@@ -119,8 +121,16 @@ public class CollaborationOutlineLabelProvider implements ILabelProvider {
 	 */
 	@Override
 	public String getText(Object element) {
-		if (element instanceof  Class)
-			return  ((Class)element).getName();
+		if (element instanceof  Class) {
+			String toAppend = ""; 
+			for (Role r : ((Class)element).getRoles()) {
+				if (r.getRoleFile().equals(file)) {
+					toAppend += " - "+r.featureName;
+					break;
+				}
+			}
+			return  ((Class)element).getName()+toAppend;
+		}
 		
 		if (element instanceof FSTMethod)
 			return ((FSTMethod)element).getName();
@@ -138,6 +148,13 @@ public class CollaborationOutlineLabelProvider implements ILabelProvider {
 			return (String) element;
 		
 		return "";
+	}
+
+	/**
+	 * @param iFile
+	 */
+	public void setFile(IFile iFile) {
+		this.file = iFile;
 	}
 
 }

@@ -48,6 +48,7 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener;
+import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -63,6 +64,9 @@ import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
+import de.ovgu.featureide.fm.ui.views.outline.FmLabelProvider;
+import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePageContextMenu;
+import de.ovgu.featureide.fm.ui.views.outline.FmTreeContentProvider;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.editors.ConfigurationEditor;
 import de.ovgu.featureide.ui.views.collaboration.model.Role;
@@ -84,6 +88,11 @@ public class CollaborationOutline extends ViewPart {
 	private IEditorPart active_editor;
 	private Action collapseAllAction;
 	private Action expandAllAction;
+	private CollaborationOutlineTreeContentProvider contentProvider = new CollaborationOutlineTreeContentProvider();
+	private CollaborationOutlineLabelProvider clabel = new CollaborationOutlineLabelProvider();
+	private FmTreeContentProvider modelContentProvider = new FmTreeContentProvider();
+	private FmLabelProvider modelLabelProvider = new FmLabelProvider();
+	private FmOutlinePageContextMenu cm;
 
 	private static final ImageDescriptor IMG_COLLAPSE = FMUIPlugin.getDefault()
 			.getImageDescriptor("icons/collapse.gif");
@@ -101,6 +110,8 @@ public class CollaborationOutline extends ViewPart {
 		}
 
 		public void partDeactivated(IWorkbenchPart part) {
+			if (part instanceof IEditorPart)
+				setEditorActions(part);
 		}
 
 		public void partClosed(IWorkbenchPart part) {
@@ -229,19 +240,28 @@ public class CollaborationOutline extends ViewPart {
 	 */
 	private void setEditorActions(IWorkbenchPart activeEditor) {
 		IEditorPart part = null;
+
 		if (activeEditor != null
-				&& !(activeEditor instanceof FeatureModelEditor)
 				&& !(activeEditor instanceof ConfigurationEditor)) {
 			IWorkbenchPage page = activeEditor.getSite().getPage();
 			if (page != null) {
 				part = page.getActiveEditor();
 				if (part != null) {
-					this.active_editor = part;
+					active_editor = part;
+					active_editor.addPropertyListener(new IPropertyListener() {
+
+						@Override
+						public void propertyChanged(Object source, int propId) {
+							update(iFile);
+						}
+
+					});
 					// case: open editor
 					FileEditorInput inputFile = (FileEditorInput) part
 							.getEditorInput();
 					featureProject = CorePlugin.getFeatureProject(inputFile
 							.getFile());
+
 					if (featureProject != null) {
 						Control control = viewer.getControl();
 						if (control != null && !control.isDisposed()) {
@@ -260,16 +280,31 @@ public class CollaborationOutline extends ViewPart {
 	public void createPartControl(Composite parent) {
 		viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		viewer.getControl().setEnabled(false);
-		getSite().getPage().addPartListener(editorListener); // EditorListener
+		getSite().getPage().addPartListener(editorListener);
 
-		viewer.setContentProvider(new CollaborationOutlineTreeContentProvider());
-		viewer.setLabelProvider(new CollaborationOutlineLabelProvider());
 		viewer.setAutoExpandLevel(2);
 		addToolbar(getViewSite().getActionBars().getToolBarManager());
+
+		getSite().getPage().getActiveEditor()
+				.addPropertyListener(new IPropertyListener() {
+
+					@Override
+					public void propertyChanged(Object source, int propId) {
+						update(iFile);
+					}
+
+				});
 
 		viewer.addDoubleClickListener(dblClicklistener);
 		viewer.addTreeListener(treeListener);
 		viewer.addSelectionChangedListener(selectionChangedListener);
+
+		FileEditorInput inputFile = (FileEditorInput) getSite().getPage()
+				.getActiveEditor().getEditorInput();
+		featureProject = CorePlugin.getFeatureProject(inputFile.getFile());
+
+		if (featureProject != null)
+			update(inputFile.getFile());
 	}
 
 	@Override
@@ -280,21 +315,53 @@ public class CollaborationOutline extends ViewPart {
 	/**
 	 * sets the new input or disables the viewer in case no editor is open
 	 * 
-	 * @param iFile
+	 * @param iFile2
 	 */
-	public void update(IFile iFile) {
+	public void update(IFile iFile2) {
 		if (viewer != null) {
 			Control control = viewer.getControl();
 			if (control != null && !control.isDisposed()) {
-				this.iFile = iFile;
+				this.iFile = iFile2;
+
 				UIJob uiJob = new UIJob("Create Outline View") {
 					public IStatus runInUIThread(IProgressMonitor monitor) {
+
 						if (viewer != null) {
 							if (viewer.getControl() != null
 									&& !viewer.getControl().isDisposed()) {
 								expandedElements = viewer.getExpandedElements();
 								viewer.getControl().setRedraw(false);
-								viewer.setInput(CollaborationOutline.this.iFile);
+
+								if (iFile != null) {
+									if (iFile.getName().equals("model.xml")
+											&& active_editor instanceof FeatureModelEditor) {
+										viewer.setContentProvider(modelContentProvider);
+										viewer.setLabelProvider(modelLabelProvider);
+
+										if (cm == null
+												&& active_editor instanceof FeatureModelEditor) {
+											cm = new FmOutlinePageContextMenu(
+													getSite(),
+													(FeatureModelEditor) active_editor,
+													viewer,
+													((FeatureModelEditor) active_editor)
+															.getFeatureModel());
+										}
+
+										viewer.setInput(((FeatureModelEditor) active_editor)
+												.getFeatureModel());
+
+									} else {
+										viewer.setContentProvider(contentProvider);
+										viewer.setLabelProvider(clabel);
+										clabel.setFile(iFile);
+										viewer.setInput(iFile);
+									}
+								} else {
+									// simply remove the content from the outline
+									viewer.setInput(iFile);
+								}
+
 								viewer.setExpandedElements(expandedElements);
 								viewer.expandToLevel(2);
 								colorizeItems(viewer.getTree().getItems());
@@ -305,11 +372,13 @@ public class CollaborationOutline extends ViewPart {
 								viewer.getControl().setRedraw(true);
 							}
 						}
+
 						return Status.OK_STATUS;
 					}
 				};
 				uiJob.setPriority(Job.SHORT);
 				uiJob.schedule();
+
 			}
 		}
 	}

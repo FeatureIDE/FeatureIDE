@@ -116,6 +116,8 @@ public class CollaborationOutlineTreeContentProvider implements
 				return new String[] { "Collaboration Model not found" };
 		else
 			return new String[] { "This is no feature project" };
+		
+		
 	}
 
 	/*
