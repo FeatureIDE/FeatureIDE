@@ -19,6 +19,7 @@
 package de.ovgu.featureide.fm.core.io.xml;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Stack;
@@ -37,12 +38,14 @@ import org.prop4j.AtMost;
 import org.prop4j.Equals;
 import org.prop4j.Implies;
 import org.prop4j.Literal;
+import org.prop4j.Node;
 import org.prop4j.Not;
 import org.prop4j.Or;
-import org.prop4j.Node;
 import org.prop4j.SatSolver;
 
-import de.ovgu.featureide.fm.core.*;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.ModelWarning;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -74,7 +77,10 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 	 * A kind of mind for the hirachy of the xml contraint model
 	 */
 	LinkedList<LinkedList<Node>> ruleTemp = new LinkedList<LinkedList<Node>>();
-
+	/**
+	 * A list which will be filled with the featureNames in their appropriate order
+	 */
+	ArrayList<String> featureOrderList = new ArrayList<String>();
 	/**
 	 * If occoured an error while reading, set to false and use for fallback
 	 */
@@ -103,7 +109,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 	@Override
 	protected void parseInputStream(InputStream inputStream)
 			throws UnsupportedModelException {
-		
+		featureOrderList.clear();
 
 		featureModel.reset();
 
@@ -112,7 +118,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 			XMLEventReader eventReader = inputFactory
 					.createXMLEventReader(inputStream);
 
-			// mode: 0 = start; 1 = struct; 2 = constraints; 3 = comments
+			// mode: 0 = start; 1 = struct; 2 = constraints; 3 = comments; 4 = featureOrder
 			int mode = 0;
 			ruleTemp.clear();
 			ruleTemp.add(new LinkedList<Node>());
@@ -285,6 +291,28 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 										+ currentTag + "' is not a valid tag in comment-section.",
 										event.getLocation().getLineNumber());	
 						}
+					}else if (mode == 4){
+						if (currentTag.equals("feature")){
+							@SuppressWarnings("unchecked")
+							Iterator<Attribute> attributes = currentStartTag
+									.getAttributes();
+
+							// BEGIN read attributes from XML tag
+							while (attributes.hasNext()) {
+								Attribute attribute = attributes.next();
+								String curName = attribute.getName().getLocalPart();
+								String curValue = attribute.getValue();
+								
+								if (currentTag.equals("feature") && curName.equals("name") &&
+										featureModel.getFeatureNames().contains(curValue)){
+											featureOrderList.add(curValue);
+								}
+							}
+						} else {
+							throw new UnsupportedModelException("'"
+										+ currentTag + "' is not a valid tag in featureOrder-section.",
+										event.getLocation().getLineNumber());	
+						}
 					}
 					else {
 						if (currentTag.equals("featureModel")) {
@@ -340,6 +368,24 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 						}
 						else if (currentTag.equals("comments")) {
 							mode = 3;
+						}
+						else if (currentTag.equals("featureOrder")) {
+							featureModel.setFeatureOrderInXML(true);
+							
+							@SuppressWarnings("unchecked")
+							Iterator<Attribute> attributes = currentStartTag
+									.getAttributes();
+							// BEGIN read attributes from XML tag
+							while (attributes.hasNext()) {
+								Attribute attribute = attributes.next();
+								String curName = attribute.getName().getLocalPart();
+								String curValue = attribute.getValue();
+								if(currentTag.equals("featureOrder") && curName.equals("userDefined")){
+									featureModel.setFeatureOrderUserDefined(Boolean.parseBoolean(curValue));
+									break;
+								}
+							}
+							mode = 4;
 						}
 					}
 				}
@@ -422,10 +468,15 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 						if (currentTag.equals("comments"))
 							mode = 0;
 					}
+					else if (mode == 4){
+						if (currentTag.equals("featureOrder")){
+							featureModel.setFeatureOrderList(featureOrderList);
+							mode = 0;
+						}
+					}
 				}
 			}
 			eventReader.close();
-
 		} catch (XMLStreamException e) {
 			throw new UnsupportedModelException(e.getMessage(), e.getLocation()
 					.getLineNumber());
@@ -438,7 +489,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 	 * Create a new feature and add it to the featureModel.
 	 * 
 	 * @param featureName
-	 *            Srting with the name of the featue
+	 *            String with the name of the feature
 	 * @param isMandatory
 	 *            boolean, true it the feature is mandatory
 	 * @param isAbstract

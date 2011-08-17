@@ -22,6 +22,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -76,6 +77,7 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
     	Element struct = doc.createElement("struct");
     	Element constraints = doc.createElement("constraints");
     	Element comments = doc.createElement("comments");
+    	Element order = doc.createElement("featureOrder");
     	
     	if(featureModel.hasFeaturesAutoLayout()){
     		root.setAttribute("chosenLayoutAlgorithm", ""+featureModel.getLayoutAlgorithm());
@@ -114,7 +116,22 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
         	
         	Text text = doc.createTextNode(featureModel.getComments().get(i));
         	c.appendChild(text);
-       }
+        }
+    	order.setAttribute("userDefined", Boolean.toString(featureModel.isFeatureOrderUserDefined()));
+    	root.appendChild(order);
+    	
+    	if (featureModel.isFeatureOrderUserDefined()) {
+	    	Collection<String> featureOrderList = featureModel.getFeatureOrderList();
+	    	
+	    	if (featureOrderList.isEmpty())
+	    		featureOrderList = featureModel.getLayerNames();
+	    	
+	    	for(String featureName : featureOrderList){
+	    		Element feature = doc.createElement("feature");
+	    		feature.setAttribute("name", featureName);
+	    		order.appendChild(feature);
+	    	}
+    	}
     }
     
     /**

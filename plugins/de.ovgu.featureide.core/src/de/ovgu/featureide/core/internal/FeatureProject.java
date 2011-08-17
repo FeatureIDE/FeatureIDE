@@ -62,6 +62,7 @@ import de.ovgu.featureide.fm.core.FeatureModelFile;
 import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
+import de.ovgu.featureide.fm.core.configuration.FeatureOrderReader;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslReader;
@@ -259,6 +260,42 @@ public class FeatureProject extends BuilderMarkerHandler implements
 				createAndDeleteFeatureFolders();
 				setAllFeatureModuleMarkers(featureModel, sourceFolder);
 			}
+			
+			/* used both for reading and deleting ( does file exist? )
+			 */
+			File file = project.getLocation().toFile();
+			String fileSep = System.getProperty("file.separator");
+			file = new File(file.toString() + fileSep + ".order");
+			
+			//featureOrder not in model.xml
+			if(featureModel.getFeatureOrderList().isEmpty() && !featureModel.isFeatureOrderInXML() 
+					&& file.exists()){
+
+				FeatureOrderReader reader = new FeatureOrderReader(
+						project.getLocation().toFile());
+				ArrayList<String> list = reader.featureOrderRead();
+				if(list != null && list.size() >0 ){
+					featureModel.setFeatureOrderUserDefined(
+							Boolean.parseBoolean(list.get(0)));
+					featureModel.setFeatureOrderList(
+							new ArrayList<String>(
+									list.subList(1, list.size()) ));
+
+				}
+				// write feature order to model
+				XmlFeatureModelWriter modelWriter = new XmlFeatureModelWriter(featureModel);
+				modelWriter.writeToFile(modelFile.getResource());
+			}
+/* TODO delete .order file in 2013
+ * delete de.ovgu.featureide.fm.ui.editors.FeatureOrderEditor#writeToOrderFile() and corresponding call
+ * see TODOs
+ * */
+//			if (file.exists()){
+//				file.delete();
+//				project.refreshLocal(IResource.DEPTH_ONE, null);
+//			}
+			
+
 		} catch (FileNotFoundException e) {
 			modelFile.createModelMarker(e.getMessage(), IMarker.SEVERITY_ERROR,
 					0);

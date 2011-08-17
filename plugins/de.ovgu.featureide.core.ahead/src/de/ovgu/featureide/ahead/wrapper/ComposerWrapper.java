@@ -42,7 +42,6 @@ import org.eclipse.core.runtime.CoreException;
 import de.ovgu.featureide.ahead.AheadCorePlugin;
 import de.ovgu.featureide.ahead.model.JakModelBuilder;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.configuration.FeatureOrderReader;
 
 
 /**
@@ -180,19 +179,21 @@ public class ComposerWrapper {
 			featureFolders.add(featureProject.getSourceFolder().getFolder(line));
 		}
 		reader.close();
-		File file = featureProject.getProject().getLocation().toFile();
-		String fileSep = System.getProperty("file.separator");
-		file = new File(file.toString() + fileSep + ".order");
+//		File file = featureProject.getProject().getLocation().toFile();
+//		String fileSep = System.getProperty("file.separator");
+//		file = new File(file.toString() + fileSep + ".order");
+		/** replaced: list -> featuremodel.featurelist
 		ArrayList<String> list = null;
 		if (file.exists()){
 			FeatureOrderReader reader2 = new FeatureOrderReader(
 					featureProject.getProject().getLocation().toFile());
 			list = reader2.featureOrderRead();
-		}
+		}*/
+		ArrayList<String> featureOrderList = featureProject.getFeatureModel().getFeatureOrderList();
 		for (IFolder folder : featureFolders) {
 			allFeatureFolders.add(folder);
 		}
-		if (list == null || list.size() == 0) {	
+		if (featureOrderList == null || featureOrderList.size() == 0) {	
 			for (String feature : featureProject.getFeatureModel().getLayerNames()) {
 				IFolder folder = featureProject.getSourceFolder().getFolder(feature);
 				if (!allFeatureFolders.contains(folder)) {
@@ -200,7 +201,7 @@ public class ComposerWrapper {
 				}
 			}
 		} else {
-			for (String feature : list) {
+			for (String feature : featureOrderList) {
 				IFolder folder = featureProject.getSourceFolder().getFolder(feature);
 				if (!allFeatureFolders.contains(folder)) {
 					allFeatureFolders.add(folder);

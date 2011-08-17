@@ -41,7 +41,6 @@ import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.configuration.FeatureOrderReader;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /** 
@@ -118,21 +117,15 @@ public class CollaborationModelBuilder {
 		collaboration.configurationFile = configuration;
 		model.collaborations.add(collaboration);
 		
-		//get ordered list of layers from feature model or order file
-		File file = featureProject.getProject().getLocation().toFile();
-		String fileSep = System.getProperty("file.separator");
-		file = new File(file.toString() + fileSep + ".order");
+		//get ordered list of layers from feature model
 		ArrayList<String> layerNames = null;
-		if (file.exists()){
-			FeatureOrderReader reader2 = new FeatureOrderReader(
-					featureProject.getProject().getLocation().toFile());
-			layerNames = reader2.featureOrderRead();
-			if (layerNames.get(0).equals("false")) {
-				layerNames = (ArrayList<String>) featureProject.getFeatureModel().getLayerNames();
-			}
+		if (featureProject.getFeatureModel().isFeatureOrderUserDefined()) {
+			featureProject.getFeatureModel().getFeatureOrderList();
 		} else {
 			layerNames = (ArrayList<String>) featureProject.getFeatureModel().getLayerNames();
 		}
+		
+		
 		if (layerNames == null)
 			return null;
 		

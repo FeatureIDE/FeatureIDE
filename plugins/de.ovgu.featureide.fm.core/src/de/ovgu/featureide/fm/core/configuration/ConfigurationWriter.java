@@ -54,16 +54,10 @@ public class ConfigurationWriter {
 	
 	public String writeIntoString(IFile file){
 		StringBuffer buffer = new StringBuffer();
-		File project = ((IFile) file.getAdapter(IFile.class)).getProject()
-			.getLocation().toFile();
-		FeatureOrderReader reader = new FeatureOrderReader(project);
-		String fileSep = System.getProperty("file.separator");
-		File orderFile = new File(project.toString() + fileSep + ".order");
-		if (orderFile.exists()){
-			ArrayList<String> list = reader.featureOrderRead();
-			if (new String(list.get(0)).equals("true")) {
+		
+			ArrayList<String> list = configuration.getFeatureModel().getFeatureOrderList();
+			if (configuration.getFeatureModel().isFeatureOrderUserDefined()) {
 				Set<Feature> featureset = configuration.getSelectedFeatures();
-				list.remove(0);
 				for (String s : list) {
 					for (Feature f : featureset) {
 						if (f.isLayer()) {
@@ -74,7 +68,7 @@ public class ConfigurationWriter {
 				}
 				return buffer.toString();
 			}
-		}
+		
 		writeSelectedFeatures(configuration.getRoot(), buffer);
 		return buffer.toString();
 	}

@@ -130,6 +130,14 @@ public class FeatureModel implements PropertyConstants {
 	 */
 	private LinkedList<Renaming> renamings = new LinkedList<Renaming>();
 
+	/**
+	 * a list containing the feature names in their specified order
+	 * will be initialized in XmlFeatureModelReader
+	 */
+	private ArrayList<String> featureOrderList = new ArrayList<String>();
+	private boolean featureOrderUserDefined = false;
+	private boolean featureOrderInXML = false;
+	
 	private IFolder sourceFolder;
 
 	private IFMComposerExtension fmComposerExtension = new FMComposerExtension();
@@ -176,6 +184,7 @@ public class FeatureModel implements PropertyConstants {
 		constraints.clear();
 		comments.clear();
 		annotations.clear();
+		featureOrderList.clear();
 	}
 
 	private void deleteChildFeatures(Feature feature) {
@@ -1192,4 +1201,47 @@ public class FeatureModel implements PropertyConstants {
 		propNodes.add(index, node);
 		
 	}
+
+	/**
+	 * @return the featureOrderList
+	 */
+	public ArrayList<String> getFeatureOrderList() {
+		return featureOrderList;
+	}
+
+	/**
+	 * @param featureOrderList the featureOrderList to set
+	 */
+	public void setFeatureOrderList(ArrayList<String> featureOrderList) {
+		this.featureOrderList = featureOrderList;
+	}
+
+	/**
+	 * @return the featureOrderUserDefined
+	 */
+	public boolean isFeatureOrderUserDefined() {
+		return featureOrderUserDefined;
+	}
+
+	/**
+	 * @param featureOrderUserDefined the featureOrderUserDefined to set
+	 */
+	public void setFeatureOrderUserDefined(boolean featureOrderUserDefined) {
+		this.featureOrderUserDefined = featureOrderUserDefined;
+	}
+
+	/**
+	 * @return the featureOrderInXML
+	 */
+	public boolean isFeatureOrderInXML() {
+		return featureOrderInXML;
+	}
+
+	/**
+	 * @param featureOrderInXML the featureOrderInXML to set
+	 */
+	public void setFeatureOrderInXML(boolean featureOrderInXML) {
+		this.featureOrderInXML = featureOrderInXML;
+	}
+	
 }

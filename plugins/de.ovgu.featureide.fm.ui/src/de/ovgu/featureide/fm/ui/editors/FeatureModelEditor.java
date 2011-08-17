@@ -119,6 +119,9 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 	private int getDiagramEditorIndex() {
 		return diagramEditor.getIndex();
 	}
+	private int getOrderEditorIndex() {
+		return featureOrderEditor.getIndex();
+	}
 
 	@Override
 	protected void setInput(IEditorInput input) {
@@ -137,6 +140,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 
 		try {
 			new XmlFeatureModelReader(originalFeatureModel).readFromFile(file);
+			new XmlFeatureModelReader(featureModel).readFromFile(file);
 		} catch (Exception e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
@@ -338,9 +342,17 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 						extensionPageChange(newPageIndex);
 						setActivePage(getTextEditorIndex());
 						return;
-					} else
-						featureOrderEditor.updateOrderEditor(featureModel);
+					}
+					featureOrderEditor.updateOrderEditor(featureModel);
 				}
+			}
+		} else if(oldPage == getOrderEditorIndex()) {
+			if (newPageIndex == getTextEditorIndex()) {
+				//if (isPageModified) {
+					textEditor.updateTextEditor();
+				//}
+			} else {
+				featureOrderEditor.updateOrderEditor(featureModel);
 			}
 		}
 		extensionPageChange(newPageIndex);
@@ -401,7 +413,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		if (!saveEditors())
 			return;
 
-		featureOrderEditor.updateOrderEditor(featureModel);
+		//featureOrderEditor.updateOrderEditor(featureModel);
 		featureOrderEditor.doSave(monitor);
 		featureModel.performRenamings(file);
 
