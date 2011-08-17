@@ -75,6 +75,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ManualLayoutSelecti
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.RenameAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ReverseOrderAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.SelectionAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ShowHiddenFeaturesAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.GraphicalEditPartFactory;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
@@ -108,6 +109,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	private OrAction orAction;
 	private AlternativeAction alternativeAction;
 	private RenameAction renameAction;
+	@SuppressWarnings("unused") 
+	private SelectionAction selectionAction;
 
 	private ShowHiddenFeaturesAction showHiddenFeaturesAction;
 
@@ -178,6 +181,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		orAction = new OrAction(this, featureModel);
 		alternativeAction = new AlternativeAction(this, featureModel);
 		renameAction = new RenameAction(this, featureModel, null);
+		
+		selectionAction = new SelectionAction(this, featureModel); 
 
 		createConstraintAction = new CreateConstraintAction(this, featureModel);
 		editConstraintAction = new EditConstraintAction(this, featureModel);
