@@ -1116,6 +1116,44 @@ public class FeatureModel implements PropertyConstants {
 		}
 		return false;
 	}
+	
+	public boolean hasAbstract() {
+		for (Feature f : this.featureTable.values()) {
+			if (f.isAbstract())
+				return true;
+		}
+		return false;
+	}
+	
+	public boolean hasConcrete() {
+		for (Feature f : this.featureTable.values()) {
+			if (!(f.isAbstract()))
+				return true;
+		}
+		return false;
+	}
+	
+	public boolean hasHidden() {
+		for (Feature f : this.featureTable.values()) {
+			if (f.isHidden())
+				return true;
+		}
+		return false;
+	}
+	
+	public boolean hasDead() {
+		return this.getDeadFeatures().size() >0;
+	}
+	
+	//TODO: getting the false features
+	public boolean hasFalse() {
+		for(Feature f : this.featureTable.values()){
+			if(f.getFeatureStatus() == FeatureStatus.FALSE_OPTIONAL)
+				return true;
+		}	
+		return false;
+	}
+
 
 	public void setUndoContext(Object undoContext) {
 		this.undoContext = undoContext;

@@ -73,7 +73,7 @@ public class FmTreeContentProvider implements ITreeContentProvider {
 	@Override
 	public Object[] getElements(Object inputElement) {
 		Object[] elements;
-		if (fModel instanceof FeatureModel && fModel != null) {
+		if (fModel != null) {
 			elements = new Object[2];
 			elements[0] = fModel.getRoot();
 			elements[1] = "Constraints";

@@ -79,7 +79,7 @@ public class DeleteAllAction extends SingleSelectionAction {
 	 */
 	@Override
 	protected void updateProperties() {
-		setEnabled(!feature.isRoot());
+		setEnabled(!feature.isRoot() && feature.hasChildren());
 		setChecked(false);
 	}
 

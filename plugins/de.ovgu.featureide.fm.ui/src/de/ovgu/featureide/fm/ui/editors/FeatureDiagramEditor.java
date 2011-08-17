@@ -131,6 +131,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	
 	
 	private int index;
+	private UIJob steve;
 
 	public FeatureDiagramEditor(FeatureModelEditor featureModelEditor,
 			Composite container) {
@@ -407,11 +408,14 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	}
 	
 	public void refresh(){
+		if (steve != null && steve.getState() == Job.RUNNING)
+			steve.cancel();
 		
-		UIJob steve = new UIJob(" Update Feature Model "){
+		steve = new UIJob(" Update Feature Model "){
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				getFeatureModel().updateFeatureModel();
+				getContents().refresh();
 				return Status.OK_STATUS;
 			}			
 		};

@@ -52,7 +52,13 @@ public class LegendEditPart extends AbstractGraphicalEditPart {
 		boolean hasAnd = fm.hasAndGroup();
 		boolean hasAlternative = fm.hasAlternativeGroup();
 		boolean hasOr = fm.hasOrGroup();
-		LegendFigure figure = new LegendFigure(((Legend) getModel()).getPos(),hasMandatory,hasOptional,hasOr,hasAlternative,hasAnd);
+		boolean hasAbstract = fm.hasAbstract();
+		boolean hasConcrete = fm.hasConcrete();
+		boolean hasHidden = fm.hasHidden();
+		boolean hasDead = fm.hasDead() || fm.hasFalse();  //same color
+		
+		LegendFigure figure = new LegendFigure(((Legend) getModel()).getPos(),hasMandatory,
+				hasOptional,hasOr,hasAlternative,hasAnd,hasAbstract, hasConcrete, hasHidden,hasDead);
 
 		return figure;
 	}

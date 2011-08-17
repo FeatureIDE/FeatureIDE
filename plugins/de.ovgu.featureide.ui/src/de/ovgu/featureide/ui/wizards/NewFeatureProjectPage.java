@@ -92,7 +92,8 @@ public class NewFeatureProjectPage extends WizardPage {
 		gridData2.horizontalSpan = 2;
 	    descriptionLabel.setLayoutData(gridData2);
 	    
-	    String descriptionString = "Possible choices are:\n\n";
+	    StringBuilder descriptionStringBuilder = new StringBuilder();
+	    descriptionStringBuilder.append("Possible choices are:\n\n");
 	    List<IComposerExtension> composerExtensions = ComposerExtensionManager.getInstance().getComposers();
 	    extensions = new IComposerExtension[composerExtensions.size()]; 
 	    composerExtensions.toArray(extensions);
@@ -103,9 +104,15 @@ public class NewFeatureProjectPage extends WizardPage {
 	    });
 	    
 		for (IComposerExtension composerExtension : extensions) {
-			descriptionString += composerExtension.getName() + ": " + composerExtension.getDescription() + "\n";
+			// StringBuilder is more efficient than concatenating strings with += inside a loop
+			descriptionStringBuilder.append(composerExtension.getName());
+			descriptionStringBuilder.append(": ");
+			descriptionStringBuilder.append(composerExtension.getDescription());
+			descriptionStringBuilder.append("\n");
 			toolCB.add(composerExtension.getName());
 		}
+		
+		String descriptionString = descriptionStringBuilder.toString();
 		if (ComposerExtensionManager.getInstance().getComposers().size() == 0) {
 			descriptionString = "No composition engines installed.";
 			setDescription(descriptionString);

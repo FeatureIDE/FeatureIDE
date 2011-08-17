@@ -68,6 +68,7 @@ public interface GUIDefaults {
 	public static Color HIDDEN_BACKGROUND = GUIBasics.createColor(0.8, 0.8, 1.0);
 	public static Color HIDDEN_FOREGROUND = GUIBasics.createColor(0.4, 0.4, 0.4);
 	public static Color HIDDEN_BORDER_COLOR = GUIBasics.createBorderColor(HIDDEN_BACKGROUND);
+	public static Border HIDDEN_BORDER_LEGEND = new LineBorder(DIAGRAM_BACKGROUND, 1, SWT.LINE_DOT);
 	public static Border HIDDEN_BORDER = new LineBorder(HIDDEN_BORDER_COLOR, 1, 2);
 	public static Border HIDDEN_SELECTED_BORDER = new LineBorder(HIDDEN_BORDER_COLOR, 3, 2);
 	

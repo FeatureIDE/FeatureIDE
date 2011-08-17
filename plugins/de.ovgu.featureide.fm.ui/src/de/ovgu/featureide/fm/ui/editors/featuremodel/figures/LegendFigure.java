@@ -21,10 +21,12 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.PolylineConnection;
+import org.eclipse.draw2d.RectangleFigure;
 import org.eclipse.draw2d.RotatableDecoration;
 import org.eclipse.draw2d.XYLayout;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
+import org.eclipse.swt.graphics.Color;
 
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -58,11 +60,17 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	 * title and second row)
 	 */
 	private static final int LIFT = 10;
+	/**
+	 * Space between abstract/hidden/false Optional/dead features (needs some
+	 * more space for the symbols)
+	 */
+	private static final int LIFT_2 = 12;
 
 	private static final int SYMBOL_SIZE = ROW_HEIGHT;
 
 	private final XYLayout layout = new XYLayout();
 	public Point newPos;
+	private int width;
 
 	@Override
 	public boolean useLocalCoordinates() {
@@ -71,16 +79,20 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	}
 
 	public LegendFigure(Point pos, boolean mandatory, boolean optional,
-			boolean or, boolean alternative, boolean and) {
+			boolean or, boolean alternative, boolean and, boolean abstrac,
+			boolean concrete, boolean hidden, boolean dead) {
 		setLocation(pos);
 		setLayoutManager(layout);
 		setBorder(LEGEND_BORDER);
-		setLegendSize(mandatory, optional, or, alternative, and);
+		setLegendSize(mandatory, optional, or, alternative, and, abstrac,
+				concrete, hidden, dead);
 		FeatureUIHelper.setLegendSize(this.getSize());
 		FeatureUIHelper.setLegendFigure(this);
-		createRows(mandatory, optional, or, alternative, and);
+		createRows(mandatory, optional, or, alternative, and, abstrac,
+				concrete, hidden, dead);
 		setForegroundColor(LEGEND_FOREGROUND);
 		setBackgroundColor(LEGEND_BACKGROUND);
+		this.width = LEGEND_WIDTH;
 	}
 
 	/**
@@ -92,7 +104,8 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	 * @return
 	 */
 	private void setLegendSize(boolean mandatory, boolean optional, boolean or,
-			boolean alternative, boolean and) {
+			boolean alternative, boolean and, boolean _abstract,
+			boolean concrete, boolean hidden, boolean dead) {
 		int height = ROW_HEIGHT * 2 - 5;
 		if (mandatory)
 			height = height + ROW_HEIGHT;
@@ -102,22 +115,33 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			height = height + ROW_HEIGHT;
 		if (alternative)
 			height = height + ROW_HEIGHT;
-//		if (and)
-//			height = height + ROW_HEIGHT;
+		// if (and)
+		// height = height + ROW_HEIGHT;
+		if (_abstract)
+			height = height + ROW_HEIGHT;
+		if (concrete)
+			height = height + ROW_HEIGHT;
+		if (hidden)
+			height = height + ROW_HEIGHT;
+		if (dead)
+			height = height + ROW_HEIGHT;
 
-		int width = LEGEND_WIDTH;
-		if (!mandatory && !alternative) {
-			if (!optional) {
+		width = LEGEND_WIDTH;
+		if (!mandatory && !alternative && !dead) {
+			if (!optional && !concrete  && !_abstract) {
 				width = 50;
 			} else {
 				width = 80;
 			}
+		} else if (dead) {
+			width = 134;
 		}
 		this.setSize(width, height);
 	}
 
 	private void createRows(boolean mandatory, boolean optional, boolean or,
-			boolean alternative, boolean and) {
+			boolean alternative, boolean and, boolean abstrac,
+			boolean concrete, boolean hidden, boolean dead) {
 
 		createRowTitle();
 		int row = 2;
@@ -129,8 +153,17 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			createRowOr(row++);
 		if (alternative)
 			createRowAlternative(row++);
-//		if (and)
-//			createRowAnd(row);
+		// if (and)
+		// createRowAnd(row);
+		if (abstrac)
+			createRowAbstract(row++);
+		if (concrete)
+			createRowConcrete(row++);
+		if (hidden)
+			createRowHidden(row++);
+		if (dead)
+			createRowDead(row++);
+
 	}
 
 	private void createRowTitle() {
@@ -139,36 +172,34 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		labelTitle.setFont(DEFAULT_FONT);
 		labelTitle.setText("Legend:");
 		labelTitle.setLabelAlignment(Label.LEFT);
-		layout.setConstraint(labelTitle, new Rectangle(3, 0, LEGEND_WIDTH,
+		layout.setConstraint(labelTitle, new Rectangle(3, 0, width,
 				ROW_HEIGHT));
 		add(labelTitle);
 	}
 
-//	private void createRowAnd(int row) {
-//		createGroupTypeSymbol(row, false, false);
-//		Label labelOr = createLabel(row, "And");
-//		add(labelOr);
-//		labelOr.setForegroundColor(FEATURE_FOREGROUND);
-//	}
+	// private void createRowAnd(int row) {
+	// createGroupTypeSymbol(row, false, false);
+	// Label labelOr = createLabel(row, "And");
+	// add(labelOr);
+	// labelOr.setForegroundColor(FEATURE_FOREGROUND);
+	// }
 
 	private void createRowAlternative(int row) {
 		createGroupTypeSymbol(row, false, true);
-		Label labelOr = createLabel(row, "Alternative");
+		Label labelOr = createLabel(row, "Alternative", FEATURE_FOREGROUND);
 		add(labelOr);
-		labelOr.setForegroundColor(FEATURE_FOREGROUND);
 	}
 
 	private void createRowOr(int row) {
 		createGroupTypeSymbol(row, true, true);
-		Label labelOr = createLabel(row, "Or");
+		Label labelOr = createLabel(row, "Or", FEATURE_FOREGROUND);
 		add(labelOr);
-		labelOr.setForegroundColor(FEATURE_FOREGROUND);
 	}
 
 	private void createRowOptional(int row) {
 		PolylineConnection p = createConnectionTypeSymbol(row, false);
 		add(p);
-		Label labelMandatory = createLabel(row, "Optional");
+		Label labelMandatory = createLabel(row, "Optional", FEATURE_FOREGROUND);
 		add(labelMandatory);
 	}
 
@@ -176,17 +207,50 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 		PolylineConnection p = createConnectionTypeSymbol(row, true);
 		add(p);
-		Label labelMandatory = createLabel(row, "Mandatory");
+		Label labelMandatory = createLabel(row, "Mandatory", FEATURE_FOREGROUND);
 		add(labelMandatory);
 
 	}
 
-	private Label createLabel(int row, String text) {
+	private void createRowAbstract(int row) {
+
+		createSymbol(row, true, false, false, false);
+		Label labelAbstract = createLabel(row, "Abstract", FEATURE_FOREGROUND);
+		add(labelAbstract);
+
+	}
+
+	private void createRowConcrete(int row) {
+
+		createSymbol(row, false, true, false, false);
+		Label labelConcrete = createLabel(row, "Concrete", FEATURE_FOREGROUND);
+		add(labelConcrete);
+
+	}
+
+	private void createRowHidden(int row) {
+
+		createSymbol(row, false, false, true, false);
+		Label labelHidden = createLabel(row, "Hidden", HIDDEN_FOREGROUND);
+		add(labelHidden);
+
+	}
+
+	private void createRowDead(int row) {
+
+		createSymbol(row, false, false, false, true);
+		Label labelDead = createLabel(row, "Dead/False optional", DEAD_COLOR);
+		add(labelDead);
+
+	}
+
+	private Label createLabel(int row, String text, Color foreground) {
 		Label label = new Label(text);
 		label.setLabelAlignment(Label.LEFT);
 		layout.setConstraint(label, new Rectangle(LABEL_PADDING, ROW_HEIGHT
-				* row - LIFT, LEGEND_WIDTH - LABEL_PADDING, ROW_HEIGHT));
-		label.setForegroundColor(FEATURE_FOREGROUND);
+				* row - LIFT, width - LABEL_PADDING, ROW_HEIGHT));
+		label.setForegroundColor(foreground);
+		label.setBackgroundColor(DIAGRAM_BACKGROUND);
 		label.setFont(DEFAULT_FONT);
 		return label;
 	}
@@ -240,5 +304,33 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 		p.setEndpoints(source, target);
 		return p;
+	}
+
+	private void createSymbol(int row, boolean _abstract, boolean concrete,
+			boolean hidden, boolean dead) {
+		int x1 = (SYMBOL_SIZE / 2 - 2);
+		int y1 = (ROW_HEIGHT * row - LIFT_2 / 2);
+		int x2 = SYMBOL_SIZE + SYMBOL_SIZE / 2;
+		int y2 = (ROW_HEIGHT * row + SYMBOL_SIZE - LIFT_2);
+		Point p1 = new Point(x1, y1);
+
+		Figure rect = new RectangleFigure();
+
+		if (_abstract) {
+			rect.setBorder(ABSTRACT_BORDER);
+			rect.setBackgroundColor(ABSTRACT_BACKGROUND);
+		} else if (concrete) {
+			rect.setBorder(CONCRETE_BORDER);
+			rect.setBackgroundColor(CONCRETE_BACKGROUND);
+		} else if (hidden) {
+			rect.setBorder(HIDDEN_BORDER_LEGEND);
+		} else if (dead) {
+			rect.setBorder(DEAD_BORDER);
+		}
+
+		rect.setSize(x2 - x1, y2 - y1);
+		rect.setLocation(p1);
+
+		this.add(rect);
 	}
 }
