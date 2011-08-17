@@ -92,7 +92,7 @@ public class CollaborationOutline extends ViewPart {
 	private CollaborationOutlineLabelProvider clabel = new CollaborationOutlineLabelProvider();
 	private FmTreeContentProvider modelContentProvider = new FmTreeContentProvider();
 	private FmLabelProvider modelLabelProvider = new FmLabelProvider();
-	private FmOutlinePageContextMenu cm;
+	private FmOutlinePageContextMenu contextMenu;
 
 	private static final ImageDescriptor IMG_COLLAPSE = FMUIPlugin.getDefault()
 			.getImageDescriptor("icons/collapse.gif");
@@ -228,6 +228,7 @@ public class CollaborationOutline extends ViewPart {
 		}
 
 	};
+	private UIJob uiJob;
 
 	public CollaborationOutline() {
 		super();
@@ -322,63 +323,63 @@ public class CollaborationOutline extends ViewPart {
 			Control control = viewer.getControl();
 			if (control != null && !control.isDisposed()) {
 				this.iFile = iFile2;
-
-				UIJob uiJob = new UIJob("Create Outline View") {
-					public IStatus runInUIThread(IProgressMonitor monitor) {
-
-						if (viewer != null) {
-							if (viewer.getControl() != null
-									&& !viewer.getControl().isDisposed()) {
-								expandedElements = viewer.getExpandedElements();
-								viewer.getControl().setRedraw(false);
-
-								if (iFile != null) {
-									if (iFile.getName().equals("model.xml")
-											&& active_editor instanceof FeatureModelEditor) {
-										viewer.setContentProvider(modelContentProvider);
-										viewer.setLabelProvider(modelLabelProvider);
-
-										if (cm == null
+				if (uiJob == null || uiJob.getState() == Job.NONE) {
+					uiJob = new UIJob("Update Outline View") {
+						public IStatus runInUIThread(IProgressMonitor monitor) {
+	
+							if (viewer != null) {
+								if (viewer.getControl() != null
+										&& !viewer.getControl().isDisposed()) {
+									expandedElements = viewer.getExpandedElements();
+									viewer.getControl().setRedraw(false);
+	
+									if (iFile != null) {
+										if (iFile.getName().equals("model.xml")
 												&& active_editor instanceof FeatureModelEditor) {
-											cm = new FmOutlinePageContextMenu(
-													getSite(),
-													(FeatureModelEditor) active_editor,
-													viewer,
-													((FeatureModelEditor) active_editor)
-															.getFeatureModel());
+											viewer.setContentProvider(modelContentProvider);
+											viewer.setLabelProvider(modelLabelProvider);
+	
+											if (contextMenu == null
+													&& active_editor instanceof FeatureModelEditor) {
+												contextMenu = new FmOutlinePageContextMenu(
+														getSite(),
+														(FeatureModelEditor) active_editor,
+														viewer,
+														((FeatureModelEditor) active_editor)
+																.getFeatureModel());
+											}
+	
+											viewer.setInput(((FeatureModelEditor) active_editor)
+													.getFeatureModel());
+	
+										} else {
+											viewer.setContentProvider(contentProvider);
+											viewer.setLabelProvider(clabel);
+											clabel.setFile(iFile);
+											viewer.setInput(iFile);
 										}
-
-										viewer.setInput(((FeatureModelEditor) active_editor)
-												.getFeatureModel());
-
 									} else {
-										viewer.setContentProvider(contentProvider);
-										viewer.setLabelProvider(clabel);
-										clabel.setFile(iFile);
+										// simply remove the content from the outline
 										viewer.setInput(iFile);
 									}
-								} else {
-									// simply remove the content from the outline
-									viewer.setInput(iFile);
+	
+									viewer.setExpandedElements(expandedElements);
+									viewer.expandToLevel(2);
+									colorizeItems(viewer.getTree().getItems());
+									viewer.getControl()
+											.setEnabled(
+													CollaborationOutline.this.iFile != null);
+									viewer.refresh();
+									viewer.getControl().setRedraw(true);
 								}
-
-								viewer.setExpandedElements(expandedElements);
-								viewer.expandToLevel(2);
-								colorizeItems(viewer.getTree().getItems());
-								viewer.getControl()
-										.setEnabled(
-												CollaborationOutline.this.iFile != null);
-								viewer.refresh();
-								viewer.getControl().setRedraw(true);
 							}
+	
+							return Status.OK_STATUS;
 						}
-
-						return Status.OK_STATUS;
-					}
-				};
-				uiJob.setPriority(Job.SHORT);
-				uiJob.schedule();
-
+					};
+					uiJob.setPriority(Job.SHORT);
+					uiJob.schedule();
+				}
 			}
 		}
 	}
