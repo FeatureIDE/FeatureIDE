@@ -1146,7 +1146,6 @@ public class FeatureModel implements PropertyConstants {
 		return this.getDeadFeatures().size() >0;
 	}
 	
-	//TODO: getting the false features
 	public boolean hasFalse() {
 		for(Feature f : this.featureTable.values()){
 			if(f.getFeatureStatus() == FeatureStatus.FALSE_OPTIONAL)
