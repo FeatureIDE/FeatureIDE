@@ -75,6 +75,8 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 	public void setConstraintProperties(){
 		
 		setBorder(constraint.isFeatureSelected() ? CONSTRAINT_SELECTED_BORDER : CONSTRAINT_BORDER);
+		setBackgroundColor(CONSTRAINT_BACKGROUND);
+		setToolTip(null);
 		
 		try {
 			if (!constraint.getFeatureModel().isValid()){
@@ -90,13 +92,13 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 		
 		if (constraint.getConstraintAttribute() == ConstraintAttribute.VOID_MODEL){
 			setBackgroundColor(VOID_MODEL_BACKGROUND);
-			toolTip = " Constraint makes model void! " + '\n';
+			toolTip = " Constraint makes model void. " + '\n';
 			toolTip += '\n' + " " + constraint.getNode().toString(NodeWriter.textualSymbols);
 			setToolTip(new Label(toolTip));
 			
 		} else if (constraint.getConstraintAttribute() == ConstraintAttribute.UNSATISFIABLE) {
 			setBackgroundColor(VOID_MODEL_BACKGROUND);
-			toolTip = " Constraint is unsatisfiable! " + '\n';
+			toolTip = " Constraint is unsatisfiable. " + '\n';
 			toolTip += '\n' + " " + constraint.getNode().toString(NodeWriter.textualSymbols);
 			setToolTip(new Label(toolTip));
 		}
@@ -108,7 +110,7 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 			
 		if (constraint.getConstraintAttribute() == ConstraintAttribute.TAUTOLOGY){
 			setBackgroundColor(WARNING_BACKGROUND);
-			toolTip = " Constraint is Tautology! " + '\n';
+			toolTip = " Constraint is tautology. " + '\n';
 			toolTip += '\n' + " " + constraint.getNode().toString(NodeWriter.textualSymbols);
 			setToolTip(new Label(toolTip));	
 			return;
@@ -127,11 +129,13 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 		
 		if (constraint.getConstraintAttribute() == ConstraintAttribute.REDUNDANT){
 			setBackgroundColor(WARNING_BACKGROUND);
-			toolTip = " Model contains redundant constrains! " + '\n';
+			toolTip = " Model contains redundant constraints. " + '\n';
 			toolTip += '\n' + " " + constraint.getNode().toString(NodeWriter.textualSymbols);
 			setToolTip(new Label(toolTip));	
 			return;
 		}
+		
+		
 	}
 	
 	private String getConstraintText(Constraint constraint) {

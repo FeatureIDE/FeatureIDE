@@ -691,13 +691,13 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		int severity = IMarker.SEVERITY_WARNING;
 		if (feature == null) {
 			severity = IMarker.SEVERITY_ERROR;
-			message = "This feature module has no corresponding feature at the feature model.";
+			message = "The feature module \"" + folder.getName() + "\" has no corresponding feature at the feature model.";
 		} else {
 			if (feature.isConcrete() && folder.members().length == 0) {
 				message = "The feature module is empty.";
 				message += "You either should implement it, mark the feature as abstract, or remove the feature from the feature model.";
 			} else if (feature.isAbstract() && folder.members().length > 0) {
-				message = "This feature module is ignored as the feature is marked as abstract.";
+				message = "This feature module is ignored as \"" + feature.getName() + "\" is marked as abstract.";
 			}
 		}
 		if (message != null) {

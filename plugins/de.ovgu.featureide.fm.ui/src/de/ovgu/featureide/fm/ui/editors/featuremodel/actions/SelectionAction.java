@@ -44,10 +44,15 @@ public class SelectionAction extends Action {
 		public void selectionChanged(SelectionChangedEvent event) {
 			IStructuredSelection selection = (IStructuredSelection) event
 					.getSelection();
+			
+			/*
+			 * TODO @Eric NullPointerException
+			 * 
+			 * */
 			if (isSelectionValid(selection)){				
 				if (selection.getFirstElement() instanceof ConstraintEditPart) {
 					for (Constraint constraint : model.getConstraints()) {
-						constraint.setFeatureSelected(false);
+						if (constraint.isFeatureSelected()) constraint.setFeatureSelected(false);
 					}
 					
 					((ConstraintEditPart) selection.getFirstElement()).performRequest(new Request(RequestConstants.REQ_SELECTION));
@@ -55,27 +60,27 @@ public class SelectionAction extends Action {
 					
 				} else  if (selection.getFirstElement() instanceof FeatureEditPart){
 					for (Feature feature : model.getFeatures()) {
-					feature.setConstraintSelected(false);
+						if (feature.isConstraintSelected()) feature.setConstraintSelected(false);
 					}
 					
 					((FeatureEditPart) selection.getFirstElement()).performRequest(new Request(RequestConstants.REQ_SELECTION));
 					
 				} else {
 					for (Feature feature : model.getFeatures()) {
-						feature.setConstraintSelected(false);
+						if (feature.isConstraintSelected()) feature.setConstraintSelected(false);
 					}
 					
 					for (Constraint constraint : model.getConstraints()) {
-						constraint.setFeatureSelected(false);
+						if (constraint.isFeatureSelected()) constraint.setFeatureSelected(false);
 					}
 				}
 			} else {
 				for (Feature feature : model.getFeatures()) {
-					feature.setConstraintSelected(false);
+					if (feature.isConstraintSelected()) feature.setConstraintSelected(false);
 				}
 				
 				for (Constraint constraint : model.getConstraints()) {
-					constraint.setFeatureSelected(false);
+					if (constraint.isFeatureSelected()) constraint.setFeatureSelected(false);
 				}
 			}
 			

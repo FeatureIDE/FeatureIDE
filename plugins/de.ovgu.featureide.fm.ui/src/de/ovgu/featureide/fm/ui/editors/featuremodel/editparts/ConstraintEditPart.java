@@ -30,6 +30,7 @@ import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.gef.editpolicies.NonResizableEditPolicy;
 
 import de.ovgu.featureide.fm.core.Constraint;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.ui.editors.ConstraintDialog;
@@ -71,15 +72,21 @@ public class ConstraintEditPart extends AbstractGraphicalEditPart implements
 
 	public void performRequest(Request request) {
 		
-		for(Feature feature : getConstraintModel().getFeatureModel().getFeatures())	feature.setConstraintSelected(false);
+		for(Feature feature : getConstraintModel().getFeatureModel().getFeatures())	{
+			if (feature.isConstraintSelected()) feature.setConstraintSelected(false);
+		}
 		
 		if (request.getType() == RequestConstants.REQ_OPEN) {
 			new ConstraintDialog(getConstraintModel().getFeatureModel(),
 					getConstraintModel());					
 		} else if (request.getType() == RequestConstants.REQ_SELECTION) {
-			for (Feature containedFeature : getConstraintModel().getContainedFeatures()){
-				containedFeature.setConstraintSelected(true);				
-			}		
+			try {
+				for (Feature containedFeature : getConstraintModel().getContainedFeatures()){
+					containedFeature.setConstraintSelected(true);
+				}
+			} catch (NullPointerException e){
+				FMCorePlugin.getDefault().reportBug(320);
+			}
 		}
 	}
 

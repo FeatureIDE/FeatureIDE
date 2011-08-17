@@ -100,6 +100,8 @@ public class ConstraintDialog {
 			.getImage("title_banner.gif");
 	private static final Image WARNING_IMAGE = FMUIPlugin
 			.getImage("message_warning.gif");
+	private static final Image FEATURE_HEAD = FMUIPlugin
+			.getImage("FeatureIconSmall.ico");
 
 	private static final String[] OPERATOR_NAMES = { " Not ", " And ", " Or ",
 			" Implies ", " Iff ", "(", ")" /* "At most 1" */};
@@ -125,7 +127,7 @@ public class ConstraintDialog {
 	private Composite lastComposite;
 	private ToolBar helpButtonBar;
 	private ToolItem helpButton;
-	private FeatureModel featuremodel;
+	private FeatureModel featureModel;
 	private Button cancelButton;
 	private int x, y;
 	private Button okButton;
@@ -139,7 +141,7 @@ public class ConstraintDialog {
 	public ConstraintDialog(final FeatureModel featuremodel,
 			final Constraint constraint) {
 		this.constraint = constraint;
-		this.featuremodel = featuremodel;
+		this.featureModel = featuremodel;
 
 		if (constraint == null) {
 			titleText = "Create Propositional Constraint";
@@ -173,6 +175,7 @@ public class ConstraintDialog {
 	private void initShell() {
 		shell = new Shell(Display.getCurrent());
 		shell.setText(titleText);
+		shell.setImage(FEATURE_HEAD);
 		shell.setSize(500, 585);
 		GridLayout shellLayout = new GridLayout();
 		shellLayout.marginWidth = 0;
@@ -340,7 +343,7 @@ public class ConstraintDialog {
 		ContentProposalAdapter adapter = new ContentProposalAdapter(
 				constraintText, new ConstraintContentAdapter(),
 				new ConstraintContentProposalProvider(
-						featuremodel.getFeatureNames()), null, null);
+						featureModel.getFeatureNames()), null, null);
 
 		adapter.setAutoActivationDelay(500);
 		adapter.setPopupSize(new Point(250, 85));
@@ -695,7 +698,7 @@ public class ConstraintDialog {
 		NodeReader nodereader = new NodeReader();
 		String con = constraintText.getText().trim();
 		boolean isWellformed = nodereader.isWellFormed(con,
-				new ArrayList<String>(featuremodel.getFeatureNames()));
+				new ArrayList<String>(featureModel.getFeatureNames()));
 
 		if (!isWellformed) {
 			printHeaderError(nodereader.getErrorMessage());
@@ -713,7 +716,7 @@ public class ConstraintDialog {
 			return false;
 		}
 		try {
-			if (featuremodel.isValid() && voidsModel(con, featuremodel)) {
+			if (featureModel.isValid() && voidsModel(con, featureModel)) {
 
 				printHeaderWarning("constraint makes model void");
 				return false;
@@ -721,12 +724,19 @@ public class ConstraintDialog {
 		} catch (TimeoutException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
-		List<Literal> deadFeatures = getDeadFeatures(con, featuremodel);
+		List<Literal> deadFeatures = getDeadFeatures(con, featureModel);
 		if (!deadFeatures.isEmpty()) {
 			printHeaderWarning(getDeadFeatureString(deadFeatures));
 			return false;
 		}
 		printHeaderText(headerText);
+		
+		for (Constraint constraint : featureModel.getConstraints()){
+			if (constraint.toString().equals(con)) {
+				printHeaderError("constraint already exists");
+				return false;
+			}
+		}
 
 		return true;
 	}
@@ -813,7 +823,7 @@ public class ConstraintDialog {
 	/**
 	 * closes the shell and adds new constraint to the feature model if possible
 	 * 
-	 * @param featuremodel
+	 * @param featureModel
 	 * @param constraint
 	 */
 	private void closeShell() {
@@ -826,7 +836,7 @@ public class ConstraintDialog {
 		}
 
 		List<String> featureList = new ArrayList<String>(
-				featuremodel.getFeatureNames());
+				featureModel.getFeatureNames());
 		Node propNode = nodeReader.stringToNode(input, featureList);
 
 		if (propNode == null) {
@@ -839,20 +849,19 @@ public class ConstraintDialog {
 		int index = 0;
 		AbstractOperation op;
 		if (constraint != null
-				&& (index = featuremodel.getConstraints().indexOf(constraint)) != -1) {
+				&& (index = featureModel.getConstraints().indexOf(constraint)) != -1) {
 
-			op = new ConstraintEditOperation(propNode, featuremodel, index);
+			op = new ConstraintEditOperation(propNode, featureModel, index);
 		} else {
-			op = new ConstraintCreateOperation(propNode, featuremodel);
+			op = new ConstraintCreateOperation(propNode, featureModel);
 
 		}
-		op.addContext((IUndoContext) featuremodel.getUndoContext());
+		op.addContext((IUndoContext) featureModel.getUndoContext());
 		try {
 			PlatformUI.getWorkbench().getOperationSupport()
 					.getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
-
 		}
 
 		shell.dispose();

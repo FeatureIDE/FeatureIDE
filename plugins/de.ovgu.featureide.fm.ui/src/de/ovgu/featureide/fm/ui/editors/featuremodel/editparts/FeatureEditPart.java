@@ -105,7 +105,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements
 	public void performRequest(Request request) {
 		
 		for (Constraint constraint : getFeatureModel().getFeatureModel().getConstraints()){
-			constraint.setFeatureSelected(false);
+			if (constraint.isFeatureSelected()) constraint.setFeatureSelected(false);
 		}
 		
 		if (request.getType() == RequestConstants.REQ_DIRECT_EDIT) {

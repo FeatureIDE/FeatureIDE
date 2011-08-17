@@ -30,13 +30,16 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.Constraint;
+import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -56,6 +59,8 @@ public class DeleteOperation extends AbstractOperation {
 	private Object viewer;
 	private FeatureModel featureModel;
 	private List<AbstractOperation> operations;
+	
+	private static final Image FEATURE_HEAD = FMUIPlugin.getImage("FeatureIconSmall.ico");
 
 	/**
 	 * 
@@ -100,7 +105,9 @@ public class DeleteOperation extends AbstractOperation {
 				Constraint constraint = ((ConstraintEditPart) editPart)
 						.getConstraintModel();
 				op = new ConstraintDeleteOperation(constraint, featureModel);
-
+				for (Constraint resetConstraint : featureModel.getConstraints()){
+					resetConstraint.setConstraintAttribute(ConstraintAttribute.NORMAL);
+				}
 				executeOperation(op);
 			}
 			if (editPart instanceof LegendEditPart) {
@@ -115,14 +122,15 @@ public class DeleteOperation extends AbstractOperation {
 					op = new FeatureDeleteOperation(featureModel, feature, true);
 					executeOperation(op);
 				} else {
-					MessageDialog.openWarning(new Shell(), 
-							" Delete Warning ", 
-							" \"" + feature.getName() + "\" is containted in constraints! "
+					MessageDialog dialog = new MessageDialog(new Shell(), 
+							" Delete Error ", FEATURE_HEAD, 
+							" \"" + feature.getName() + "\" is contained in constraints. "
 							+ '\n' + '\n' + 
-							" Unable to delete this feature until all relevant constraints are removed. ");
-				}
-
-				
+							" Unable to delete this feature until all relevant constraints are removed.",
+							MessageDialog.ERROR, new String[] { IDialogConstants.OK_LABEL }, 0);
+					
+					dialog.open();
+				}				
 			}
 			if (editPart instanceof Constraint){
 				Constraint constraint = ((Constraint) editPart);
@@ -137,11 +145,14 @@ public class DeleteOperation extends AbstractOperation {
 					op = new FeatureDeleteOperation(featureModel, feature, true);
 					executeOperation(op);
 				} else {
-					MessageDialog.openWarning(new Shell(), 
-							" Delete Warning ", 
-							" \"" + feature.getName() + "\" is containted in constraints! "
+					MessageDialog dialog = new MessageDialog(new Shell(), 
+							" Delete Error ", FEATURE_HEAD, 
+							" \"" + feature.getName() + "\" is contained in constraints. "
 							+ '\n' + '\n' + 
-							" Unable to delete this feature until all relevant constraints are removed. ");
+							" Unable to delete this feature until all relevant constraints are removed.",
+							MessageDialog.ERROR, new String[] { IDialogConstants.OK_LABEL }, 0);
+					
+					dialog.open();
 				}
 				
 

@@ -440,9 +440,9 @@ public class FeatureModel implements PropertyConstants {
 			listener.propertyChange(event);
 	}
 	
-	public void updateFeatureModel(){
-		// update features
+	public void updateFeatureModel(){	
 		
+		// update features		
 		for(Feature bone : getFeatures()) {
 			bone.setFeatureStatus(FeatureStatus.NORMAL);
 			bone.setRelevantConstraints();
@@ -472,22 +472,21 @@ public class FeatureModel implements PropertyConstants {
 		
 		// update constraints
 		for(Constraint constraint : getConstraints()){
-			constraint.setContainedFeatures();
+			constraint.setContainedFeatures(constraint.getNode());
 			
-			constraint.setConstraintAttribute(ConstraintAttribute.NORMAL);
+			ConstraintAttribute constraintStatus = ConstraintAttribute.NORMAL;
 			
 			//Redundant
-			FeatureModel newModel = this.clone();
 			FeatureModel dirtyModel = this.clone();
 			dirtyModel.removePropositionalNode(constraint.getNode());
 			ModelComparator comparator = new ModelComparator(20000);
-			Comparison comparison = comparator.compare(newModel, dirtyModel);
-			if (comparison == Comparison.REFACTORING) constraint.setConstraintAttribute(ConstraintAttribute.REDUNDANT); 
+			Comparison comparison = comparator.compare(this, dirtyModel);
+			if (comparison == Comparison.REFACTORING) constraintStatus = ConstraintAttribute.REDUNDANT; 
 			
 			//Tautology
 			SatSolver satsolverTAU = new SatSolver(new Not(constraint.getNode().clone()), 1000);
 			try {
-				if (!satsolverTAU.isSatisfiable()) constraint.setConstraintAttribute(ConstraintAttribute.TAUTOLOGY);
+				if (!satsolverTAU.isSatisfiable()) constraintStatus = ConstraintAttribute.TAUTOLOGY;
 			} catch (TimeoutException e) {
 				e.printStackTrace();
 			}
@@ -496,7 +495,7 @@ public class FeatureModel implements PropertyConstants {
 			FeatureModel clonedModel = this.clone();
 			clonedModel.removePropositionalNode(constraint);
 			try {
-				if (clonedModel.isValid() ^ this.isValid()) constraint.setConstraintAttribute(ConstraintAttribute.VOID_MODEL);
+				if (clonedModel.isValid() ^ this.isValid()) constraintStatus = ConstraintAttribute.VOID_MODEL;
 			} catch (TimeoutException e) {
 				e.printStackTrace();
 			}
@@ -504,10 +503,12 @@ public class FeatureModel implements PropertyConstants {
 			//Contradiction
 			SatSolver satsolverUS = new SatSolver(constraint.getNode().clone(), 1000);
 			try {
-				 if (!satsolverUS.isSatisfiable()) constraint.setConstraintAttribute(ConstraintAttribute.UNSATISFIABLE);
+				 if (!satsolverUS.isSatisfiable()) constraintStatus = ConstraintAttribute.UNSATISFIABLE;
 			} catch (TimeoutException e) {
 				e.printStackTrace();
-			}			
+			}
+			
+			constraint.setConstraintAttribute(constraintStatus);
 		}
 	}
 	

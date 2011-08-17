@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.prop4j.Literal;
 import org.prop4j.Node;
+import org.prop4j.NodeWriter;
 
 /**
  * Represents a propositional constraint below the feature diagram.
@@ -39,7 +40,7 @@ public class Constraint implements PropertyConstants {
 	private Node propNode;
 	private Point location = new Point(0,0);
 	private boolean featureSelected = false;
-	private List<Feature> containedFeatureList;	
+	private List<Feature> containedFeatureList = new ArrayList<Feature>();	
 	private ConstraintAttribute attribute = ConstraintAttribute.NORMAL;
 		
 
@@ -108,16 +109,16 @@ public class Constraint implements PropertyConstants {
 	
 	public Node getNode() {
 		return propNode;
-	}
+	}	
 	
-	public void setContainedFeatures(){
-		List<Feature> containedFeatures = new ArrayList<Feature>();
-		
-		for (String featureName : featureModel.getFeatureNames()){
-			if (propNode.toString().contains(featureName)) containedFeatures.add(featureModel.getFeature(featureName));
+	public void setContainedFeatures(Node actNode){
+		if (actNode instanceof Literal) {
+			containedFeatureList.add(featureModel.getFeature(((Literal) actNode).var.toString()));
+		} else {
+			for (Node child : actNode.getChildren()){
+				setContainedFeatures(child);
+			}
 		}
-	
-		this.containedFeatureList = containedFeatures;
 	}
 
 	public List<Feature> getContainedFeatures(){
@@ -154,5 +155,10 @@ public class Constraint implements PropertyConstants {
 		
 		return propNode.equals(other.propNode);
 		
+	}
+	
+	@Override
+	public String toString(){
+		return propNode.toString(NodeWriter.textualSymbols);
 	}
 }

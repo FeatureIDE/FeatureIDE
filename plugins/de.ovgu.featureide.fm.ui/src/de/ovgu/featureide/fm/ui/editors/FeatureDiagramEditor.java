@@ -469,7 +469,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	public void propertyChange(PropertyChangeEvent event) {
 		String prop = event.getPropertyName();
 		if (prop.equals(MODEL_DATA_CHANGED)) {
-			setContents(getFeatureModel());
+			//setContents(getFeatureModel());
 			refresh();
 			featureModelEditor.setPageModified(true);
 		} else if (prop.equals(MODEL_DATA_LOADED)) {

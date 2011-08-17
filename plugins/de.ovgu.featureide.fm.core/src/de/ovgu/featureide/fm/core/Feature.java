@@ -25,8 +25,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.prop4j.NodeWriter;
-
 /**
  * Provides all properties of a feature. This includes its connections to parent
  * and child features.
@@ -157,8 +155,7 @@ public class Feature implements PropertyConstants {
 		List<Constraint> constraintList = new ArrayList<Constraint>();		
 		
 		for (Constraint constraint : featureModel.getConstraints()) {
-			String node = constraint.getNode().toString(NodeWriter.logicalSymbols);
-			if (node.contains(this.getName())) constraintList.add(constraint);				
+			if (constraint.toString().contains(this.getName())) constraintList.add(constraint);				
 		}
 		
 		this.partOfConstraints = constraintList;

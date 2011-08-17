@@ -28,7 +28,9 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
@@ -48,8 +50,11 @@ public class DeleteAllOperation extends AbstractOperation {
 	private FeatureModel featureModel;
 	private Feature feature;
 	private LinkedList<Feature> featureList;
+	private LinkedList<Feature> containedFeatureList;
 	private List<AbstractOperation> operations;
 
+	private static final Image FEATURE_HEAD = FMUIPlugin.getImage("FeatureIconSmall.ico");
+	
 	/**
 	 * @param viewer
 	 * @param featureModel
@@ -74,13 +79,14 @@ public class DeleteAllOperation extends AbstractOperation {
 			throws ExecutionException {
 
 		featureList = new LinkedList<Feature>();
-		featureList.add(feature);
-		LinkedList<Feature> g = new LinkedList<Feature>();
-		g.add(feature);		
+		containedFeatureList = new LinkedList<Feature>();
+		LinkedList<Feature> list = new LinkedList<Feature>();
+		list.add(feature);	
+		getFeaturesToDelete(list);
 
 		AbstractOperation op = null;
 		
-		if (getFeaturesToDelete(g)){
+		if (containedFeatureList.isEmpty()){
 			for (Feature feat : featureList){			
 				op = new FeatureDeleteOperation(featureModel, feat, false);
 				executeOperation(op);
@@ -88,11 +94,14 @@ public class DeleteAllOperation extends AbstractOperation {
 			}			
 			featureModel.handleModelDataChanged();
 		} else {
-			MessageDialog.openWarning(new Shell(), 
-					" Delete Warning ", 
-					" \"" + feature.getName() + "\" or one of its children is containted in constraints! "
-					+ '\n' + '\n' + 
-					" Unable to delete features until all relevant constraints are removed. ");
+			MessageDialog dialog = new MessageDialog(new Shell(), 
+					" Delete Error ", FEATURE_HEAD, 
+					" The following features are contained in constraints: " + '\n'
+					+ " " + containedFeatureList.toString().substring(1, containedFeatureList.toString().length() - 1) + '\n' + '\n' +
+					" Unable to delete this features until all relevant constraints are removed.",
+					MessageDialog.ERROR, new String[] { IDialogConstants.OK_LABEL }, 0);
+			
+			dialog.open();
 		}
 
 		return Status.OK_STATUS;
@@ -122,9 +131,7 @@ public class DeleteAllOperation extends AbstractOperation {
 					op.redo(monitor, info);
 					ops.remove(op);
 
-				} catch (Exception E) {
-
-				}
+				} catch (Exception E) {}
 			}
 		}
 		featureModel.handleModelDataChanged();
@@ -165,21 +172,13 @@ public class DeleteAllOperation extends AbstractOperation {
 	 * 
 	 * @param linkedList
 	 */
-	private boolean getFeaturesToDelete(LinkedList<Feature> linkedList) {
-		Feature f = null;
-		for (int i = 0; i < linkedList.size(); i++) {
-			f = linkedList.get(i);
-			
-			if (!f.getRelevantConstraints().isEmpty()) return false;
-			
-			if (f.hasChildren()) {
-				return getFeaturesToDelete(f.getChildren());
+	private void getFeaturesToDelete(LinkedList<Feature> linkedList) {		
+		for (Feature feat : linkedList){
+			if (!feat.getRelevantConstraints().isEmpty()) containedFeatureList.add(feat);
+			if (feat.hasChildren()){
+				getFeaturesToDelete(feat.getChildren());
 			}
-			// don not collect the parent feature itself (is already in the list)
-			if (!f.getName().equals(feature.getName())) {
-				this.featureList.add(f);
-			}
-		}		
-		return true;
+			this.featureList.add(feat);
+		}
 	}
 }
