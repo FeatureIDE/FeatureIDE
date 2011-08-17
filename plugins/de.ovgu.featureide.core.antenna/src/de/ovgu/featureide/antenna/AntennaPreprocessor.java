@@ -33,6 +33,10 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
@@ -138,18 +142,29 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	private void preprocessSourceFiles(IFolder sourceFolder) throws CoreException,
 			FileNotFoundException, IOException {
 		
-		for (IResource res : sourceFolder.members()) {
+		for (final IResource res : sourceFolder.members()) {
 			if (res instanceof IFolder) {
 				// for folders do recursively 
 				preprocessSourceFiles((IFolder) res);
 			} else if (res instanceof IFile) {
-				Vector<String> lines = loadStringsFromFile((IFile) res);
-				
 				// delete all existing builder markers 
 				featureProject.deleteBuilderMarkers(res, 0);
-
+				
+				// get all lines from file
+				final Vector<String> lines = loadStringsFromFile((IFile) res);
+				
 				// do checking and some stuff
-				processLinesOfFile(lines, (IFile) res);
+				Job job = new Job("preprocessor annotation checking") {
+					@Override
+					protected IStatus run(IProgressMonitor monitor) {
+						processLinesOfFile(lines, (IFile) res);
+						
+						return Status.OK_STATUS;
+					}
+				};
+				job.setPriority(Job.SHORT);
+				job.schedule();
+				
 
 				boolean changed = false;
 

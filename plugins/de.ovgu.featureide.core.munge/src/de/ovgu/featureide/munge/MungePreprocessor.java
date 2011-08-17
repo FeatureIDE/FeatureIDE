@@ -117,7 +117,7 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 		createBuildFolder(buildFolder);
 		
 		boolean filesAdded = false;
-		for (IResource res : sourceFolder.members()) {
+		for (final IResource res : sourceFolder.members()) {
 			if (res instanceof IFolder) {
 				preprocessSourceFiles((IFolder)res, buildFolder.getFolder(res.getName()));
 			} else 
@@ -126,9 +126,20 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 					args.add(res.getRawLocation().toOSString());
 					filesAdded = true;
 					
-					Vector<String> lines = loadStringsFromFile((IFile) res);
+					// get all lines from file
+					final Vector<String> lines = loadStringsFromFile((IFile) res);
 					
-					processLinesOfFile(lines, (IFile) res);
+					// do checking and some stuff
+					Job job = new Job("preprocessor annotation checking") {
+						@Override
+						protected IStatus run(IProgressMonitor monitor) {
+							processLinesOfFile(lines, (IFile) res);
+							
+							return Status.OK_STATUS;
+						}
+					};
+					job.setPriority(Job.SHORT);
+					job.schedule();
 				}
 			}
 		}
@@ -140,7 +151,7 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 		args.add(buildFolder.getRawLocation().toOSString());
 		
 		//CommandLine syntax:
-		//	–DFEATURE1 –DFEATURE2 ... File1.java File2.java ... outputDirectory
+		//	ï¿½DFEATURE1 ï¿½DFEATURE2 ... File1.java File2.java ... outputDirectory
 		runMunge(args);
 	}
 	
