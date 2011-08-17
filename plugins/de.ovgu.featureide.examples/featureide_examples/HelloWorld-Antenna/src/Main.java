@@ -1,21 +1,17 @@
 public class Main {
 
 	public static void main(String[] args){
-		//#ifdef Hello
+		//#if Hello
 		System.out.print("Hello");
 		//#endif
-		//#ifdef Beautiful
+		//#if Beautiful
 		System.out.print(" beautiful");
 		//#endif
-		//#ifdef Wonderful
+		//#if Wonderful
 //@		System.out.print(" wonderful");	
 		//#endif
-		//#ifdef World	
+		//#if World	
 		System.out.print(" world!");
 		//#endif
-		
-		System.out.println();
-		
-		HelloWorld.doSomething();
 	}
 }

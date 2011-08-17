@@ -18,6 +18,7 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.model;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
@@ -41,6 +42,7 @@ public class Role {
 	private IPath path;
 	public LinkedList<FSTField> fields = new LinkedList<FSTField>();
 	public LinkedList<FSTMethod> methods = new LinkedList<FSTMethod>();	
+	public LinkedList<ArrayList<String>> directives = new LinkedList<ArrayList<String>>();
 	public LinkedList<IFile> files = new LinkedList<IFile>();
 	public IFile file;
 	public String featureName = "";

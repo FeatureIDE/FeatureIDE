@@ -23,6 +23,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Scanner;
@@ -55,7 +56,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
  * Additional editor page for the feature model editor. In this editor the order
- * of the features can be change
+ * of the features can be changed.
  * 
  * @author Christian Becker
  * @author Jens Meinicke
@@ -238,7 +239,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 						firePropertyChange(EditorPart.PROP_DIRTY);
 					}
 				});
-		featurelist = new List(comp, SWT.NONE | SWT.BORDER | SWT.V_SCROLL);
+		featurelist = new List(comp, SWT.NONE | SWT.BORDER | SWT.V_SCROLL | SWT.MULTI);
 	}
 	
 	/**
@@ -268,15 +269,23 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		up.setEnabled(false);
 		up.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
 			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
-				int focus = featurelist.getFocusIndex();
-				if (focus != 0) { // First Element is selected, no change
-					String temp = featurelist.getItem(focus - 1);
-					featurelist.setItem(focus - 1, featurelist.getItem(focus));
-					featurelist.setItem(focus, temp);
-					featurelist.setSelection(focus - 1);
-					dirty = true;
-					firePropertyChange(EditorPart.PROP_DIRTY);
+				ArrayList<String> items = getSelectedItems();
+				
+				for (int i = 0; i < items.size(); i++) {
+					int focus = featurelist.indexOf(items.get(i));
+					
+					if (focus != 0) { // First Element is selected, no change
+						String temp = featurelist.getItem(focus - 1);
+						if (!items.contains(temp)) {
+							featurelist.setItem(focus - 1, featurelist.getItem(focus));
+							featurelist.setItem(focus, temp);
+							dirty = true;
+							firePropertyChange(EditorPart.PROP_DIRTY);
+						}
+					}
 				}
+				
+				selectItems(items);
 			}
 		});
 	}
@@ -289,22 +298,59 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		down.setText("Down");
 		down.setLayoutData(gridData);
 		down.setEnabled(false);
-		down
-				.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
-					public void widgetSelected(
-							org.eclipse.swt.events.SelectionEvent e) {
-						int focus = featurelist.getFocusIndex();
-						if (focus != featurelist.getItemCount() - 1) {
-							String temp = featurelist.getItem(focus + 1);
+		down.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
+			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
+				ArrayList<String> items = getSelectedItems();
+				
+				for (int i = items.size()-1; i >= 0; i--) {
+					int focus = featurelist.indexOf(items.get(i));
+					
+					if (focus != featurelist.getItemCount() - 1) {
+						String temp = featurelist.getItem(focus + 1);
+						if (!items.contains(temp)) {
 							featurelist.setItem(focus + 1, featurelist
 									.getItem(focus));
 							featurelist.setItem(focus, temp);
-							featurelist.setSelection(focus + 1);
 							dirty = true;
 							firePropertyChange(PROP_DIRTY);
 						}
 					}
-				});
+				}
+				
+				selectItems(items);
+			}
+		});
+	}
+	
+	/**
+	 * Returns selected items from feature order list.
+	 * 
+	 * @return selected items
+	 */
+	private ArrayList<String> getSelectedItems() {
+		int[] focuses = featurelist.getSelectionIndices();
+		Arrays.sort(focuses);
+		ArrayList<String> items = new ArrayList<String>();
+		for (int focus : focuses) {
+			items.add(featurelist.getItem(focus));
+		}
+		
+		return items;
+	}
+		
+	/**
+	 * Select items in feature order list.
+	 * 
+	 * @param items to be selected
+	 */
+	private void selectItems(ArrayList<String> items) {
+		int[] newindizies = new int[items.size()];
+		
+		for (int i = 0; i < items.size(); i++) {
+			newindizies[i] = featurelist.indexOf(items.get(i));
+		}
+		
+		featurelist.setSelection(newindizies);
 	}
 	
 	/**

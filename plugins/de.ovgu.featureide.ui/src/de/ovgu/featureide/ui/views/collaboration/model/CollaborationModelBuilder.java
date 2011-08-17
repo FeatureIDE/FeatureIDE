@@ -241,6 +241,12 @@ public class CollaborationModelBuilder {
 												role.methods.add(m);
 											}
 										}
+										
+										LinkedList<ArrayList<String>> directivesList = feature.directives.get(Class.getName());
+										if(directivesList != null) {
+											role.directives = directivesList;
+										}
+										
 										role.setPath(pathToFile);
 										Class cl = new Class(name);
 										if (model.containsClass(cl)) {

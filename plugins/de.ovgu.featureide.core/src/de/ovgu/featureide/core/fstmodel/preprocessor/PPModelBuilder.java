@@ -42,7 +42,7 @@ import de.ovgu.featureide.core.fstmodel.FSTClass;
  */
 public class PPModelBuilder {
 
-	private FSTModel model;
+	protected FSTModel model;
 	private IFeatureProject featureProject;
 	private Collection<String> features;
 	
@@ -90,10 +90,24 @@ public class PPModelBuilder {
 					if (containsFeature(text, feature)) {
 						FSTFeature currentFeature = model.features.get(feature);
 						currentFeature.classes.put(res.getName(), currentClass);
+						buildModelDirectives(feature, currentClass, (IFile) res);
 					}
 				}
 			}
 		}
+	}
+	
+	/**
+	 * This method should be implemented by preprocessor plug-ins.
+	 * Adds directives to model.
+	 * @param feature
+	 * 			The current feature.
+	 * @param currentClass
+	 * 			The current class.
+	 * @param res
+	 * 			The current file.
+	 */
+	protected void buildModelDirectives(String feature, FSTClass currentClass, IFile res) {
 	}
 
 	/**

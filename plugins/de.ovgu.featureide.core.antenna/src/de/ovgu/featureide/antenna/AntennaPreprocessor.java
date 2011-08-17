@@ -18,14 +18,14 @@
  */
 package de.ovgu.featureide.antenna;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.Stack;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -33,13 +33,17 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
+import org.prop4j.And;
+import org.prop4j.Literal;
+import org.prop4j.Node;
+import org.prop4j.Not;
 
 import antenna.preprocessor.v3.PPException;
 import antenna.preprocessor.v3.Preprocessor;
-
 import de.ovgu.featureide.antenna.model.AntennaModelBuilder;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.builder.ComposerExtensionClass;
+import de.ovgu.featureide.core.builder.preprocessor.PPComposerExtensionClass;
+import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 /**
  * Antenna: a purposely-simple Java preprocessor.
@@ -47,12 +51,21 @@ import de.ovgu.featureide.core.builder.ComposerExtensionClass;
  * @author Christoph Giesel
  * @author Marcus Kamieth
  */
-public class AntennaPreprocessor extends ComposerExtensionClass {
+public class AntennaPreprocessor extends PPComposerExtensionClass {
 
-	private ArrayList<String> features;
+	/** antenna preprocessor used from external library */
 	private Preprocessor preprocessor;
 
 	private AntennaModelBuilder antennaModelBuilder;
+	
+	/** pattern for replacing preprocessor commands like "//#if" */
+	static final Pattern replaceCommandPattern = Pattern.compile("//#(.+?)\\s");
+	
+	public AntennaPreprocessor() {
+		super();
+		
+		pluginName = "Antenna";
+	}
 
 	@Override
 	public void initialize(IFeatureProject project) {
@@ -60,25 +73,11 @@ public class AntennaPreprocessor extends ComposerExtensionClass {
 		antennaModelBuilder = new AntennaModelBuilder(project);
 		preprocessor = new Preprocessor(new AntennaLogger(),
 				new AntennaLineFilter());
-		
-		if (project.getProjectSourcePath() == null || project.getProjectSourcePath().equals("")) {
-			project.setPaths(project.getBuildPath(), project.getBuildPath(), project.getConfigPath());
-		}
 
-		setRecursiveUnderived(project.getBuildFolder());
-	}
-	
-	private void setRecursiveUnderived(IFolder folder) {
-		try {
-			for (IResource res : folder.members()) {
-				res.setDerived(false, null);
-				
-				if (res instanceof IFolder) {
-					setRecursiveUnderived((IFolder) res);
-				}
-			}
-		} catch (CoreException e) {
-			AntennaCorePlugin.getDefault().logError(e);
+		if (project.getProjectSourcePath() == null
+				|| project.getProjectSourcePath().equals("")) {
+			project.setPaths(project.getBuildPath(), project.getBuildPath(),
+					project.getConfigPath());
 		}
 	}
 
@@ -91,82 +90,84 @@ public class AntennaPreprocessor extends ComposerExtensionClass {
 
 	@Override
 	public void performFullBuild(IFile config) {
-		assert (featureProject != null) : "Invalid project given";
-
-		final String configPath = config.getRawLocation().toOSString();
-
-		if (configPath == null)
+		if (!prepareFullBuild(config))
 			return;
 
-		// add symbol definitions
-		features = readFeaturesfromConfigurationFile(config.getRawLocation()
-				.toFile());
-		if (features == null) {
-			return;
+		// generate comma separated string of activated features
+		StringBuilder featureList = new StringBuilder();
+		for (String feature : activatedFeatures) {
+			featureList.append(feature + ",");
 		}
-
-		String featureList = "";
-		for (String feature : features) {
-			featureList += feature + ",";
-		}
-
-		featureList = featureList.substring(0, featureList.length() - 1);
+		
+		featureList.deleteCharAt(featureList.length()-1);
 
 		// add source files
 		try {
-			preprocessor.addDefines(featureList);
+			// add activated features as definitions to preprocessor
+			preprocessor.addDefines(featureList.toString());
 
-			addSourceFiles(featureProject.getBuildFolder());
-		} catch (CoreException e) {
-			AntennaCorePlugin.getDefault().logError(e);
-		} catch (PPException e) {
-			AntennaCorePlugin.getDefault().logError(e);
-		} catch (FileNotFoundException e) {
-			AntennaCorePlugin.getDefault().logError(e);
-		} catch (IOException e) {
+			// preprocess for all files in source folder
+			preprocessSourceFiles(featureProject.getBuildFolder());
+		} catch (Exception e) {
 			AntennaCorePlugin.getDefault().logError(e);
 		}
 
 		if (antennaModelBuilder != null)
 			antennaModelBuilder.buildModel();
-
 	}
-	
-	/* 
+
+	/*
 	 * buildFile is not set to derived
-	 * @see de.ovgu.featureide.core.builder.ComposerExtensionClass#postCompile(org.eclipse.core.resources.IResourceDelta, org.eclipse.core.resources.IFile)
+	 * 
+	 * @see
+	 * de.ovgu.featureide.core.builder.ComposerExtensionClass#postCompile(org
+	 * .eclipse.core.resources.IResourceDelta, org.eclipse.core.resources.IFile)
 	 */
 	@Override
 	public void postCompile(IResourceDelta delta, IFile buildFile) {
 	}
 
-	private void addSourceFiles(IFolder sourceFolder) throws CoreException,
+	/**
+	 * preprocess all files in folder
+	 * 
+	 * @param sourceFolder folder with files to preprocess
+	 * @throws CoreException
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
+	private void preprocessSourceFiles(IFolder sourceFolder) throws CoreException,
 			FileNotFoundException, IOException {
-
+		
 		for (IResource res : sourceFolder.members()) {
 			if (res instanceof IFolder) {
-				addSourceFiles((IFolder) res);
+				// for folders do recursively 
+				preprocessSourceFiles((IFolder) res);
 			} else if (res instanceof IFile) {
-				Vector<String> lines = new Vector<String>();
-
-				InputStream istr = ((IFile) res).getContents();
-				Preprocessor.loadStrings(lines, istr,
-						((IFile) res).getCharset());
-				istr.close();
+				Vector<String> lines = loadStringsFromFile((IFile) res);
+				
+				// delete all existing builder markers 
 				featureProject.deleteBuilderMarkers(res, 0);
-				
+
+				// do checking and some stuff
+				processLinesOfFile(lines, (IFile) res);
+
 				boolean changed = false;
-				
+
 				try {
+					// run antenna preprocessor
 					changed = preprocessor.preprocess(lines,
-						((IFile) res).getCharset());
-				}
-				catch (PPException e){
-					featureProject.createBuilderMarker(res, e.getMessage().replace("Line #" + e.getLineNumber() + " :", "Antenna:"),
-														e.getLineNumber()+1, IMarker.SEVERITY_ERROR);
+							((IFile) res).getCharset());
+				} catch (PPException e) {
+					featureProject.createBuilderMarker(
+							res,
+							e.getMessage().replace(
+									"Line #" + e.getLineNumber() + " :",
+									"Antenna:"), e.getLineNumber() + 1,
+							IMarker.SEVERITY_ERROR);
 					AntennaCorePlugin.getDefault().logError(e);
 				}
-				
+
+				// if preprocessor changed file: save & refresh
 				if (changed) {
 					FileOutputStream ostr = new FileOutputStream(res
 							.getRawLocation().toOSString());
@@ -174,34 +175,154 @@ public class AntennaPreprocessor extends ComposerExtensionClass {
 							((IFile) res).getCharset());
 					ostr.close();
 
+					// use touch to support e.g. linux
+					res.touch(null);
 					res.refreshLocal(IResource.DEPTH_ZERO, null);
 				}
 			}
 		}
 	}
-
-	public ArrayList<String> readFeaturesfromConfigurationFile(File file) {
-		Scanner scanner = null;
-		try {
-			ArrayList<String> list;
-			scanner = new Scanner(file);
-			if (scanner.hasNext()) {
-				list = new ArrayList<String>();
-				while (scanner.hasNext()) {
-					list.add(scanner.next());
+	
+	/**
+	 * Do checking for all lines of file.
+	 * 
+	 * @param lines all lines of file
+	 * @param res file
+	 */
+	private void processLinesOfFile(Vector<String> lines, IFile res){
+		expressionStack = new Stack<Node>();
+		
+		// count of if, ifelse and else to remove after processing of else from stack
+		ifelseCountStack = new Stack<Integer>();
+		ifelseCountStack.push(0);
+		
+		// go line for line
+		for (int j = 0; j < lines.size(); ++j) {
+			String line = lines.get(j);
+			
+			// if line is preprocessor directive
+			if (line.contains("//#")) {
+				if (line.contains("//#if ") ||
+					line.contains("//#elif ") ||
+					line.contains("//#condition ") ||
+					line.contains("//#ifdef ") ||
+					line.contains("//#ifndef ") ||
+					line.contains("//#elifdef ") ||
+					line.contains("//#elifndef ") ||
+					line.contains("//#else")) {
+					
+					// if e1, elseif e2, ..., elseif en  ==  if -e1 && -e2 && ... && en
+					// if e1, elseif e2, ..., else  ==  if -e1 && -e2 && ...
+					if (line.contains("//#elif ") || line.contains("//#elifdef ") || line.contains("//#elifndef ") || line.contains("//#else")) {
+						if(!expressionStack.isEmpty()) {
+							Node lastElement = new Not(expressionStack.pop());
+							expressionStack.push(lastElement);
+						}
+					} else if (line.contains("//#if ") || line.contains("//#ifdef ") || line.contains("//#ifndef ")) {
+						ifelseCountStack.push(0);
+					}
+					
+					ifelseCountStack.push(ifelseCountStack.pop() + 1);
+					
+					setMarkersContradictionalFeatures(line, res, j+1);
+					
+					setMarkersNotConcreteFeatures(line, res, j+1);
+				} else if (line.contains("//#endif")) {
+					for (; ifelseCountStack.peek() > 0; ifelseCountStack.push(ifelseCountStack.pop() - 1)) {
+						if (!expressionStack.isEmpty())
+							expressionStack.pop();
+					}
+					
+					ifelseCountStack.pop();
 				}
-				return list;
-			} else {
-				return null;
-			}
-		} catch (FileNotFoundException e) {
-			AntennaCorePlugin.getDefault().logError(e);
-		} finally {
-			if (scanner != null) {
-				scanner.close();
 			}
 		}
-		return null;
+	}
+	
+	/**
+	 * Checks given line if it contains expressions which are always 
+	 * <code>true</code> or <code>false</code>.<br /><br />
+	 * 
+	 * Check in three steps:
+	 * <ol>
+	 * <li>just the given line</li>
+	 * <li>the given line and the feature model</li>
+	 * <li>the given line, the surrounding lines and the feature model</li>
+	 * </ol>
+	 * 
+	 * @param line content of line
+	 * @param res file containing given line
+	 * @param lineNumber line number of given line
+	 */
+	private void setMarkersContradictionalFeatures(String line, IFile res, int lineNumber){
+		if (line.contains("//#else")) {
+			if (!expressionStack.isEmpty()) {
+				Node[] nestedExpressions = new Node[expressionStack.size()];
+				nestedExpressions = expressionStack.toArray(nestedExpressions);
+				
+				And nestedExpressionsAnd = new And(nestedExpressions);
+				
+				isContradictionOrTautology(nestedExpressionsAnd.clone(), true, lineNumber, res);
+			}
+			
+			return;
+		}
+		
+		boolean conditionIsSet = line.contains("//#condition ");
+		boolean negative = line.contains("//#ifndef ") || line.contains("//#elifndef ");
+		
+		// remove "//#if ", "//ifdef", ...
+		line = replaceCommandPattern.matcher(line).replaceAll("");
+		
+		// prepare expression for NodeReader()
+		line = line.trim();
+		line = line.replace("&&", "&");
+		line = line.replace("||", "|");
+		line = line.replace("!", "-");
+		line = line.replace("&", " and ");
+		line = line.replace("|", " or ");
+		line = line.replace("-", " not ");
+		
+		//get all features and generate Node expression for given line
+		Node ppExpression = nodereader.stringToNode(line, featureList);
+		
+		if (ppExpression != null) {
+			if (negative)
+				ppExpression = new Not(ppExpression.clone());
+			
+			if (!conditionIsSet)
+				expressionStack.push(ppExpression);
+			
+			doThreeStepExpressionCheck(ppExpression, lineNumber, res);
+		} else {
+			// if generating of expression failed, generate expression "true"
+			if (!conditionIsSet)
+				expressionStack.push(new Literal(NodeCreator.varTrue));
+		}
+		
+	}
+	
+	/**
+	 * Checks given line if it contains not existing or abstract features.
+	 * 
+	 * @param line content of line
+	 * @param res file containing given line
+	 * @param lineNumber line number of given line
+	 */
+	private void setMarkersNotConcreteFeatures(String line, IFile res, int lineNumber) {
+		String[] splitted = line.split(AntennaModelBuilder.OPERATORS, 0);
+		
+		for (int i = 0; i < splitted.length; ++i) {
+			if (!splitted[i].equals("") && !splitted[i].contains("//#")) {
+				Matcher m = patternIsConcreteFeature.matcher(splitted[i]);
+				
+				if (!m.matches()) {
+					featureProject.createBuilderMarker(res,
+							"Antenna: " + splitted[i] + " is not a concrete feature", lineNumber,
+							IMarker.SEVERITY_WARNING);
+				}
+			}
+		}
 	}
 
 	@Override
@@ -216,12 +337,12 @@ public class AntennaPreprocessor extends ComposerExtensionClass {
 	public boolean clean() {
 		return false;
 	}
-	
+
 	@Override
 	public boolean hasFeatureFolders() {
 		return false;
 	}
-	
+
 	@Override
 	public boolean hasFeatureFolder() {
 		return false;

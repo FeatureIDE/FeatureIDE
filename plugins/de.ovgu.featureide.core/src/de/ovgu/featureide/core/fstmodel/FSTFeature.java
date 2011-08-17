@@ -18,6 +18,8 @@
  */
 package de.ovgu.featureide.core.fstmodel;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.TreeMap;
 
 
@@ -32,10 +34,14 @@ public class FSTFeature extends FSTModelElement {
 	private String name;
 	
 	public TreeMap<String, FSTClass> classes;
+	/* directives maps a class name to a list of preprocessor directives
+	 * which are separated into 3 parts {before feature, feature (will be formatted differently), after feature}*/
+	public TreeMap<String, LinkedList<ArrayList<String>>> directives;
 	
 	public FSTFeature(String name) {
 		this.name = name;
 		classes = new TreeMap<String, FSTClass>();
+		directives = new TreeMap<String, LinkedList<ArrayList<String>>>();
 	}
 
 	public String getName() {

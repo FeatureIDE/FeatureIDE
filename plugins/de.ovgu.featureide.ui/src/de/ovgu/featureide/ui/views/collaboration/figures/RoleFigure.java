@@ -18,6 +18,8 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.figures;
 
+import java.util.ArrayList;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
@@ -25,9 +27,13 @@ import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.FlowLayout;
 import org.eclipse.draw2d.FreeformLayout;
 import org.eclipse.draw2d.Label;
+import org.eclipse.draw2d.Panel;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
 
 import de.ovgu.featureide.core.CorePlugin;
@@ -57,6 +63,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 	private static Image IMAGE_METHODE_DEFAULT =  UIPlugin.getImage("default_co.gif");
 	private static Image IMAGE_CLASS = UIPlugin.getImage("class_obj.gif");
 	private static Image IMAGE_FEATURE = UIPlugin.getImage("FeatureIconSmall.ico");
+	private static Image IMAGE_HASH = UIPlugin.getImage("hash.png");
 	
 	private final Label label = new Label();
 	public Boolean selected = false;
@@ -196,6 +203,29 @@ public class RoleFigure extends Figure implements GUIDefaults{
 			CompartmentFigure fileFigure = new CompartmentFigure(); 
 			fileFigure.add(new Label(role.featureName + " ", IMAGE_FEATURE));
 			fileFigure.add(new Label(role.getName().split("[.]")[0] + " ", IMAGE_CLASS));
+			
+			if(role.directives != null) {
+				for(ArrayList<String> line : role.directives){
+					Panel directivesPanel = new Panel();
+					FlowLayout layout = new FlowLayout(true);
+					layout.setMinorSpacing(0);
+					layout.setMajorSpacing(0);
+					directivesPanel.setLayoutManager(layout);
+					boolean toBeBold = false;
+					directivesPanel.add(new Label(" ", IMAGE_HASH));
+					for(String part : line){
+						Label partLabel = new Label(part);
+						if(toBeBold)	
+							partLabel.setFont(new Font(null, new FontData("Arial Unicode MS", 8, SWT.BOLD)));
+						else 
+							partLabel.setFont(DEFAULT_FONT);
+						toBeBold = !toBeBold;
+						directivesPanel.add(partLabel);
+					}
+					directivesPanel.add(new Label(" "));
+					fileFigure.add(directivesPanel);
+				}
+			}
 			
 			tooltipContent.add(fileFigure);
 		}

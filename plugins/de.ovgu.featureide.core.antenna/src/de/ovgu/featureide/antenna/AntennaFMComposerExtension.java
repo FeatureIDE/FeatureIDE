@@ -57,10 +57,6 @@ public class AntennaFMComposerExtension extends FMComposerExtension {
 	public String getOrderPageMessage() {
 		return ORDER_PAGE_MESSAGE;
 	}
-	
-	public AntennaFMComposerExtension() {
-		// TODO Auto-generated constructor stub
-	}
 
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.fm.core.IFMComposerExtension#hasFeaureOrder()

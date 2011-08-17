@@ -15,6 +15,7 @@ Require-Bundle: org.eclipse.core.runtime,
 Export-Package: 
  de.ovgu.featureide.core,
  de.ovgu.featureide.core.builder,
+ de.ovgu.featureide.core.builder.preprocessor,
  de.ovgu.featureide.core.fstmodel,
  de.ovgu.featureide.core.fstmodel.preprocessor,
  de.ovgu.featureide.core.listeners,
