@@ -88,6 +88,7 @@ public class CollaborationOutline extends ViewPart {
 	private IEditorPart active_editor;
 	private Action collapseAllAction;
 	private Action expandAllAction;
+	private UIJob uiJob;
 	private CollaborationOutlineTreeContentProvider contentProvider = new CollaborationOutlineTreeContentProvider();
 	private CollaborationOutlineLabelProvider clabel = new CollaborationOutlineLabelProvider();
 	private FmTreeContentProvider modelContentProvider = new FmTreeContentProvider();
@@ -131,58 +132,14 @@ public class CollaborationOutline extends ViewPart {
 
 	};
 
-	/**
-	 * opens the corresponding role on double click
-	 */
-	private IDoubleClickListener dblClicklistener = new IDoubleClickListener() {
-
+	private IPropertyListener plistener = new IPropertyListener() {
 		@Override
-		public void doubleClick(DoubleClickEvent event) {
-			if (!(((IStructuredSelection) viewer.getSelection())
-					.getFirstElement() instanceof Role))
-				return;
-
-			Role r = (Role) ((IStructuredSelection) viewer.getSelection())
-					.getFirstElement();
-
-			if (r.file.isAccessible()) {
-				IWorkbenchWindow window = PlatformUI.getWorkbench()
-						.getActiveWorkbenchWindow();
-				IWorkbenchPage page = window.getActivePage();
-				IContentType contentType = null;
-				try {
-					IContentDescription description = r.file
-							.getContentDescription();
-					if (description != null) {
-						contentType = description.getContentType();
-					}
-					IEditorDescriptor desc = null;
-					if (contentType != null) {
-						desc = PlatformUI
-								.getWorkbench()
-								.getEditorRegistry()
-								.getDefaultEditor(r.file.getName(), contentType);
-					} else {
-						desc = PlatformUI.getWorkbench().getEditorRegistry()
-								.getDefaultEditor(r.file.getName());
-					}
-
-					if (desc != null) {
-						page.openEditor(new FileEditorInput(r.file),
-								desc.getId());
-					} else {
-						// case: there is no default editor for the file
-						page.openEditor(new FileEditorInput(r.file),
-								"org.eclipse.ui.DefaultTextEditor");
-					}
-				} catch (CoreException e) {
-					UIPlugin.getDefault().logError(e);
-				}
-			}
-
+		public void propertyChanged(Object source, int propId) {
+			update(iFile);
 		}
 
 	};
+
 	/**
 	 * colors the tree in case a treeItem has been expanded (because the
 	 * children are lazily loaded)
@@ -215,6 +172,7 @@ public class CollaborationOutline extends ViewPart {
 					if (meth.isOwn(iFile)) {
 						scrollToLine(active_editor, meth.getLineNumber(iFile));
 					}
+					return;
 				} else if ((((IStructuredSelection) viewer.getSelection())
 						.getFirstElement() instanceof FSTField)) {
 					FSTField field = (FSTField) ((IStructuredSelection) viewer
@@ -222,13 +180,54 @@ public class CollaborationOutline extends ViewPart {
 					if (field.isOwn(iFile)) {
 						scrollToLine(active_editor, field.getLineNumber(iFile));
 					}
+					return;
+				} else if ((((IStructuredSelection) viewer.getSelection())
+						.getFirstElement() instanceof Role)) {
+						
+	
+					Role r = (Role) ((IStructuredSelection) viewer.getSelection())
+							.getFirstElement();
+	
+					if (r.file.isAccessible()) {
+						IWorkbenchWindow window = PlatformUI.getWorkbench()
+								.getActiveWorkbenchWindow();
+						IWorkbenchPage page = window.getActivePage();
+						IContentType contentType = null;
+						try {
+							IContentDescription description = r.file
+									.getContentDescription();
+							if (description != null) {
+								contentType = description.getContentType();
+							}
+							IEditorDescriptor desc = null;
+							if (contentType != null) {
+								desc = PlatformUI
+										.getWorkbench()
+										.getEditorRegistry()
+										.getDefaultEditor(r.file.getName(), contentType);
+							} else {
+								desc = PlatformUI.getWorkbench().getEditorRegistry()
+										.getDefaultEditor(r.file.getName());
+							}
+	
+							if (desc != null) {
+								page.openEditor(new FileEditorInput(r.file),
+										desc.getId());
+							} else {
+								// case: there is no default editor for the file
+								page.openEditor(new FileEditorInput(r.file),
+										"org.eclipse.ui.DefaultTextEditor");
+							}
+						} catch (CoreException e) {
+							UIPlugin.getDefault().logError(e);
+						}
+					}
 				}
 			}
 
 		}
 
 	};
-	private UIJob uiJob;
 
 	public CollaborationOutline() {
 		super();
@@ -249,14 +248,7 @@ public class CollaborationOutline extends ViewPart {
 				part = page.getActiveEditor();
 				if (part != null) {
 					active_editor = part;
-					active_editor.addPropertyListener(new IPropertyListener() {
-
-						@Override
-						public void propertyChanged(Object source, int propId) {
-							update(iFile);
-						}
-
-					});
+					active_editor.addPropertyListener(plistener);
 					// case: open editor
 					FileEditorInput inputFile = (FileEditorInput) part
 							.getEditorInput();
@@ -287,26 +279,18 @@ public class CollaborationOutline extends ViewPart {
 		addToolbar(getViewSite().getActionBars().getToolBarManager());
 
 		if (getSite().getPage().getActiveEditor() != null) {
-			getSite().getPage().getActiveEditor()
-					.addPropertyListener(new IPropertyListener() {
-						@Override
-						public void propertyChanged(Object source, int propId) {
-							update(iFile);
-						}
-	
-					});
+
+			FileEditorInput inputFile = (FileEditorInput) getSite().getPage()
+					.getActiveEditor().getEditorInput();
+
+			featureProject = CorePlugin.getFeatureProject(inputFile.getFile());
+
+			if (featureProject != null)
+				update(inputFile.getFile());
 		}
 
-		viewer.addDoubleClickListener(dblClicklistener);
 		viewer.addTreeListener(treeListener);
 		viewer.addSelectionChangedListener(selectionChangedListener);
-
-		FileEditorInput inputFile = (FileEditorInput) getSite().getPage()
-				.getActiveEditor().getEditorInput();
-		featureProject = CorePlugin.getFeatureProject(inputFile.getFile());
-
-		if (featureProject != null)
-			update(inputFile.getFile());
 	}
 
 	@Override
@@ -327,21 +311,33 @@ public class CollaborationOutline extends ViewPart {
 				if (uiJob == null || uiJob.getState() == Job.NONE) {
 					uiJob = new UIJob("Update Outline View") {
 						public IStatus runInUIThread(IProgressMonitor monitor) {
-	
+
 							if (viewer != null) {
 								if (viewer.getControl() != null
 										&& !viewer.getControl().isDisposed()) {
-									expandedElements = viewer.getExpandedElements();
+									expandedElements = viewer
+											.getExpandedElements();
 									viewer.getControl().setRedraw(false);
-	
+
 									if (iFile != null) {
 										if (iFile.getName().equals("model.xml")
 												&& active_editor instanceof FeatureModelEditor) {
+
 											viewer.setContentProvider(modelContentProvider);
 											viewer.setLabelProvider(modelLabelProvider);
-	
+											viewer.setInput(((FeatureModelEditor) active_editor)
+													.getFeatureModel());
+											
+											//recreate the context menu in case we switched to another model
 											if (contextMenu == null
-													&& active_editor instanceof FeatureModelEditor) {
+													|| contextMenu
+															.getFeatureModel() != ((FeatureModelEditor) active_editor)
+															.getFeatureModel()) {
+												if (contextMenu != null) {
+													// the listener isn't recreated, if it still exists
+													// but we need a new listener for the new model
+													viewer.removeDoubleClickListener(contextMenu.dblClickListener);
+												}
 												contextMenu = new FmOutlinePageContextMenu(
 														getSite(),
 														(FeatureModelEditor) active_editor,
@@ -349,10 +345,7 @@ public class CollaborationOutline extends ViewPart {
 														((FeatureModelEditor) active_editor)
 																.getFeatureModel());
 											}
-	
-											viewer.setInput(((FeatureModelEditor) active_editor)
-													.getFeatureModel());
-	
+
 										} else {
 											viewer.setContentProvider(contentProvider);
 											viewer.setLabelProvider(clabel);
@@ -360,10 +353,11 @@ public class CollaborationOutline extends ViewPart {
 											viewer.setInput(iFile);
 										}
 									} else {
-										// simply remove the content from the outline
+										// simply remove the content from the
+										// outline
 										viewer.setInput(iFile);
 									}
-	
+
 									viewer.setExpandedElements(expandedElements);
 									viewer.expandToLevel(2);
 									colorizeItems(viewer.getTree().getItems());
@@ -374,7 +368,7 @@ public class CollaborationOutline extends ViewPart {
 									viewer.getControl().setRedraw(true);
 								}
 							}
-	
+
 							return Status.OK_STATUS;
 						}
 					};

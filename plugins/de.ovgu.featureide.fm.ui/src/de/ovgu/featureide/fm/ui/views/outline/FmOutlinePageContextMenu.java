@@ -93,6 +93,7 @@ public class FmOutlinePageContextMenu{
 	private ReverseOrderAction roAction;
 	private Action collapseAllAction;
 	private Action expandAllAction;
+	public IDoubleClickListener dblClickListener;
 
 	private static final String CONTEXT_MENU_ID = "de.ovgu.feautureide.fm.view.outline.contextmenu";
 	
@@ -167,13 +168,8 @@ public class FmOutlinePageContextMenu{
 		};
 		expandAllAction.setToolTipText("Expand All");
 		expandAllAction.setImageDescriptor(IMG_EXPAND);
-	}
-
-	/**
-	 * adds all listeners to the TreeViewer
-	 */
-	private void addListeners() {
-		viewer.addDoubleClickListener(new IDoubleClickListener() {
+		
+		dblClickListener = new IDoubleClickListener() {
 			public void doubleClick(DoubleClickEvent event) {
 				if ((((IStructuredSelection) viewer.getSelection())
 						.getFirstElement() instanceof Feature))			
@@ -183,7 +179,16 @@ public class FmOutlinePageContextMenu{
 					ecAction.run();
 				
 			}
-		});
+		};
+		
+		
+	}
+
+	/**
+	 * adds all listeners to the TreeViewer
+	 */
+	private void addListeners() {
+		viewer.addDoubleClickListener(dblClickListener);
 		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {				
@@ -243,15 +248,7 @@ public class FmOutlinePageContextMenu{
 			manager.add(roAction);
 		}
 		if (sel instanceof Feature) {
-			if (oAction.isEnabled() || altAction.isEnabled()
-					|| andAction.isEnabled()) {
-				manager.add(andAction);
-				manager.add(oAction);
-				manager.add(altAction);
-				manager.add(new Separator(
-						IWorkbenchActionConstants.MB_ADDITIONS));
-			}
-			
+
 			manager.add(cAction);
 			
 			clAction.setText("Create Feature Below");
@@ -267,6 +264,16 @@ public class FmOutlinePageContextMenu{
 			manager.add(dAAction);
 			
 			manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+			
+			if (oAction.isEnabled() || altAction.isEnabled()
+					|| andAction.isEnabled()) {
+				manager.add(andAction);
+				manager.add(oAction);
+				manager.add(altAction);
+				manager.add(new Separator(
+						IWorkbenchActionConstants.MB_ADDITIONS));
+			}
+			
 			manager.add(mAction);
 			manager.add(aAction);
 			manager.add(hAction);
@@ -294,4 +301,7 @@ public class FmOutlinePageContextMenu{
 		iToolBarManager.add(expandAllAction);
 	}
 
+	public FeatureModel getFeatureModel() {
+		return fInput;
+	}
 }
