@@ -58,7 +58,7 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 		this.vertical = FeatureUIHelper.hasVerticalLayout();
 		if(!vertical && !(this instanceof LegendRelationDecoration)){
 			setSize(getTargetAnchorDiameter(), getTargetAnchorDiameter()
-					+FeatureUIHelper.getSize(lastChild.getParent()).height()/2);
+					+FeatureUIHelper.getSize(lastChild.getParent()).height/2);
 		}
 	}
 	@Override
@@ -71,7 +71,7 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 					- FeatureUIHelper.getSize(lastChild.getParent()).height/2));
 		else
 			super.setLocation(p.translate(-getTargetAnchorDiameter()/2,
-					- FeatureUIHelper.getSize(lastChild.getParent()).height()/2));
+					- FeatureUIHelper.getSize(lastChild.getParent()).height/2));
 		
 	}
 	
@@ -118,7 +118,7 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 			}
 			
 			r.shrink(7, 7);
-			r.y += FeatureUIHelper.getSize(lastChild.getParent()).height()/2;
+			r.y += FeatureUIHelper.getSize(lastChild.getParent()).height/2;
 			
 			if (vertical){
 				r.shrink(1,1);
@@ -169,7 +169,7 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 				highestAngle2 = HALF_ARC ? 360 : calculateAngle(r.getCenter(), getFeatureLocation());
 			}
 			r.shrink(7, 7);
-			r.y += FeatureUIHelper.getSize(lastChild.getParent()).height()/2;
+			r.y += FeatureUIHelper.getSize(lastChild.getParent()).height/2;
 			if (vertical){
 				r.shrink(2,2);
 				graphics.drawArc(r,(int) highestAngle1, (int) (highestAngle2 - highestAngle1));	
@@ -205,7 +205,7 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 		int dx = referencePoint.x - point.x;
 		int dy = referencePoint.y - point.y;	
 		if(!(this instanceof LegendRelationDecoration))
-			dy -= FeatureUIHelper.getSize(lastChild.getParent()).height()/2;
+			dy -= FeatureUIHelper.getSize(lastChild.getParent()).height/2;
 		return 360 - Math.round(Math.atan2(dy, dx)/Math.PI*180);
 	}
 

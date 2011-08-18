@@ -75,8 +75,8 @@ public class ModelReverseOrderOperation extends AbstractOperation {
 		reverse(featureModel.getRoot());
 		if(!featureModel.hasFeaturesAutoLayout()){
 			Point mid = FeatureUIHelper.getLocation(featureModel.getRoot()).getCopy();
-			mid.x += FeatureUIHelper.getSize(featureModel.getRoot()).width()/2;
-			mid.y += FeatureUIHelper.getSize(featureModel.getRoot()).height()/2;
+			mid.x += FeatureUIHelper.getSize(featureModel.getRoot()).width/2;
+			mid.y += FeatureUIHelper.getSize(featureModel.getRoot()).height/2;
 			mirrorFeaturePositions(featureModel.getRoot(),mid,
 					FeatureUIHelper.hasVerticalLayout());
 		}
@@ -91,13 +91,13 @@ public class ModelReverseOrderOperation extends AbstractOperation {
 			Dimension size = FeatureUIHelper.getSize(feature).getCopy();
 			
 			if(vertical){
-				featureMid.y += size.height()/2;
-				featureMid.setY(2*mid.y() - featureMid.y());
-				featureMid.y -= size.height()/2;
+				featureMid.y += size.height/2;
+				featureMid.y = 2*mid.y - featureMid.y;
+				featureMid.y -= size.height/2;
 			} else {
-				featureMid.x += size.width()/2;
-				featureMid.setX(2*mid.x() - featureMid.x());
-				featureMid.x -= size.width()/2;
+				featureMid.x += size.width/2;
+				featureMid.x = 2*mid.x - featureMid.x;
+				featureMid.x -= size.width/2;
 			}
 			
 			FeatureUIHelper.setLocation(feature, featureMid);

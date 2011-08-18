@@ -96,9 +96,9 @@ public class DeleteAllOperation extends AbstractOperation {
 		} else {
 			MessageDialog dialog = new MessageDialog(new Shell(), 
 					" Delete Error ", FEATURE_HEAD, 
-					" The following features are contained in constraints: " + '\n'
-					+ " " + containedFeatureList.toString().substring(1, containedFeatureList.toString().length() - 1) + '\n' + '\n' +
-					" Unable to delete this features until all relevant constraints are removed.",
+					"The following features are contained in constraints:" + '\n'
+					+ containedFeatureList.toString().substring(1, containedFeatureList.toString().length() - 1) + '\n' + '\n' +
+					"Unable to delete this features until all relevant constraints are removed.",
 					MessageDialog.ERROR, new String[] { IDialogConstants.OK_LABEL }, 0);
 			
 			dialog.open();

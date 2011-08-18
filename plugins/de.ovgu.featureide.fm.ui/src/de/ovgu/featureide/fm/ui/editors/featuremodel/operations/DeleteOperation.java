@@ -124,9 +124,9 @@ public class DeleteOperation extends AbstractOperation {
 				} else {
 					MessageDialog dialog = new MessageDialog(new Shell(), 
 							" Delete Error ", FEATURE_HEAD, 
-							" \"" + feature.getName() + "\" is contained in constraints. "
+							"\"" + feature.getName() + "\" is contained in constraints. "
 							+ '\n' + '\n' + 
-							" Unable to delete this feature until all relevant constraints are removed.",
+							"Unable to delete this feature until all relevant constraints are removed.",
 							MessageDialog.ERROR, new String[] { IDialogConstants.OK_LABEL }, 0);
 					
 					dialog.open();
@@ -147,9 +147,9 @@ public class DeleteOperation extends AbstractOperation {
 				} else {
 					MessageDialog dialog = new MessageDialog(new Shell(), 
 							" Delete Error ", FEATURE_HEAD, 
-							" \"" + feature.getName() + "\" is contained in constraints. "
+							"\"" + feature.getName() + "\" is contained in constraints. "
 							+ '\n' + '\n' + 
-							" Unable to delete this feature until all relevant constraints are removed.",
+							"Unable to delete this feature until all relevant constraints are removed.",
 							MessageDialog.ERROR, new String[] { IDialogConstants.OK_LABEL }, 0);
 					
 					dialog.open();

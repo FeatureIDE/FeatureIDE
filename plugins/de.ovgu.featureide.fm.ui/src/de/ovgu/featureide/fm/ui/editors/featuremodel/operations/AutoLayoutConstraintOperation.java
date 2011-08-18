@@ -81,18 +81,18 @@ public class AutoLayoutConstraintOperation extends AbstractOperation {
 			featureList.addAll(featureModel.getFeatures());
 			
 			for(int i=0;i<featureList.size();i++){
-				if(y<FeatureUIHelper.getLocation(featureList.get(i)).y()){
-					y=FeatureUIHelper.getLocation(featureList.get(i)).y();
+				if(y<FeatureUIHelper.getLocation(featureList.get(i)).y){
+					y=FeatureUIHelper.getLocation(featureList.get(i)).y;
 				}
 			}
-			newPos.x=FeatureUIHelper.getLocation(featureModel.getRoot()).x();
+			newPos.x=FeatureUIHelper.getLocation(featureModel.getRoot()).x;
 			newPos.y=y+GUIDefaults.CONSTRAINT_SPACE_Y;
 			FeatureUIHelper.setLocation(constraintList.get(0), newPos);
 		}
 		for(int i=1;i<constraintList.size();i++){
 			Point newPos =new Point();
-			newPos.x=FeatureUIHelper.getLocation(constraintList.get(i-1)).x();
-			newPos.y=FeatureUIHelper.getLocation(constraintList.get(i-1)).y()+GUIDefaults.CONSTRAINT_SPACE_Y;
+			newPos.x=FeatureUIHelper.getLocation(constraintList.get(i-1)).x;
+			newPos.y=FeatureUIHelper.getLocation(constraintList.get(i-1)).y+GUIDefaults.CONSTRAINT_SPACE_Y;
 			FeatureUIHelper.setLocation(constraintList.get(i), newPos);
 		}
 		featureModel.handleModelDataChanged();
