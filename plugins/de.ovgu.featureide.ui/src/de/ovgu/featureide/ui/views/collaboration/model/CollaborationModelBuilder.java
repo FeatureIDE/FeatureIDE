@@ -120,7 +120,7 @@ public class CollaborationModelBuilder {
 		//get ordered list of layers from feature model
 		ArrayList<String> layerNames = null;
 		if (featureProject.getFeatureModel().isFeatureOrderUserDefined()) {
-			featureProject.getFeatureModel().getFeatureOrderList();
+			layerNames = featureProject.getFeatureModel().getFeatureOrderList();
 		} else {
 			layerNames = (ArrayList<String>) featureProject.getFeatureModel().getLayerNames();
 		}
