@@ -217,7 +217,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	 * Before loading all error markers will be deleted and afterwards new ones
 	 * might be created if some errors occur.
 	 */
-	private void loadModel() {
+	synchronized private void loadModel() {
 		// Create model.xml automatically, if only model.m exists
 		// @author Dariusz Krolikowski
 		if (project.getFile("model.m").exists()
@@ -921,7 +921,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 				return Status.OK_STATUS;
 			}
 		};
-		job.setPriority(Job.DECORATE);
+		job.setPriority(Job.INTERACTIVE);
 		job.schedule();
 		return true;
 	}
