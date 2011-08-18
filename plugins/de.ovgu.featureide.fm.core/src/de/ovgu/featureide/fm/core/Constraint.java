@@ -40,15 +40,14 @@ public class Constraint implements PropertyConstants {
 	private Node propNode;
 	private Point location = new Point(0,0);
 	private boolean featureSelected = false;
-	private List<Feature> containedFeatureList = new ArrayList<Feature>();	
-	private ConstraintAttribute attribute = ConstraintAttribute.NORMAL;
-		
-
+	private List<Feature> containedFeatureList = new ArrayList<Feature>();
+	private List<Feature> falseOptionalFeatures = new ArrayList<Feature>();
+ 	private ConstraintAttribute attribute = ConstraintAttribute.NORMAL;
+	
 	public Constraint(FeatureModel featureModel, Node propNode) {
 		this.featureModel = featureModel;
 		this.propNode = propNode;
 	}
-	
 	
 	public void setLocation(Point newLocation){
 		location = newLocation;
@@ -58,7 +57,6 @@ public class Constraint implements PropertyConstants {
 		return location;
 	}
 	
-
 	public FeatureModel getFeatureModel() {
 		return featureModel;
 	}
@@ -123,6 +121,24 @@ public class Constraint implements PropertyConstants {
 
 	public List<Feature> getContainedFeatures(){
 		return containedFeatureList;
+	}
+	
+	public void setFalseOptionalFeatures(){
+		falseOptionalFeatures.clear();
+		
+		for (Feature feature : containedFeatureList){
+			if (feature.getFeatureStatus() == FeatureStatus.FALSE_OPTIONAL){
+				FeatureModel clonedModel = featureModel.clone();
+				clonedModel.removePropositionalNode(this);
+				if (clonedModel.getFeature(feature.getName())
+						.getFeatureStatus() != FeatureStatus.FALSE_OPTIONAL && !falseOptionalFeatures.contains(feature)) 
+							falseOptionalFeatures.add(feature);
+			}
+		}
+	}
+	
+	public List<Feature> getFalseOptional(){
+		return falseOptionalFeatures;
 	}
 	
 	private LinkedList<PropertyChangeListener> listenerList = new LinkedList<PropertyChangeListener>();

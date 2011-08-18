@@ -30,6 +30,7 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.ConstraintAttribute;
+import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIBasics;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -47,6 +48,13 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 	private final Label label = new Label();
 	
 	private Constraint constraint;
+	
+	private String VOIDS_MODEL = " Constraint makes model void. ";
+	private String UNSATISFIABLE = " Constraint is unsatisfiable. ";
+	private String TAUTOLOGY = " Constraint is tautology. ";
+	private String KILLS_FEATURE = " Constraint makes following features dead: ";
+	private String FALSE_OPTIONAL = " Constraint makes following features false optional: ";
+	private String REDUNDANCE = " Model contains redundant constraints. ";
 	
 	public ConstraintFigure(Constraint constraint) {
 		super();
@@ -92,13 +100,13 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 		
 		if (constraint.getConstraintAttribute() == ConstraintAttribute.VOID_MODEL){
 			setBackgroundColor(VOID_MODEL_BACKGROUND);
-			toolTip = " Constraint makes model void. " + '\n';
+			toolTip = VOIDS_MODEL + '\n';
 			toolTip += '\n' + " " + constraint.getNode().toString(NodeWriter.textualSymbols);
 			setToolTip(new Label(toolTip));
 			
 		} else if (constraint.getConstraintAttribute() == ConstraintAttribute.UNSATISFIABLE) {
 			setBackgroundColor(VOID_MODEL_BACKGROUND);
-			toolTip = " Constraint is unsatisfiable. " + '\n';
+			toolTip = UNSATISFIABLE + '\n';
 			toolTip += '\n' + " " + constraint.getNode().toString(NodeWriter.textualSymbols);
 			setToolTip(new Label(toolTip));
 		}
@@ -110,7 +118,7 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 			
 		if (constraint.getConstraintAttribute() == ConstraintAttribute.TAUTOLOGY){
 			setBackgroundColor(WARNING_BACKGROUND);
-			toolTip = " Constraint is tautology. " + '\n';
+			toolTip = TAUTOLOGY + '\n';
 			toolTip += '\n' + " " + constraint.getNode().toString(NodeWriter.textualSymbols);
 			setToolTip(new Label(toolTip));	
 			return;
@@ -118,7 +126,7 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 		
 		if (!constraint.getDeadFeatures(constraint.getFeatureModel()).isEmpty()){
 			setBackgroundColor(WARNING_BACKGROUND);
-			toolTip = " Constraint makes following features dead: " + '\n';
+			toolTip = KILLS_FEATURE + '\n';
 			for (Literal dead : constraint.getDeadFeatures(constraint.getFeatureModel())){
 				toolTip += " " + dead.var.toString() + '\n';
 			}
@@ -127,9 +135,20 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 			return;
 		}
 		
+		if (!constraint.getFalseOptional().isEmpty()){
+			setBackgroundColor(WARNING_BACKGROUND);
+			toolTip = FALSE_OPTIONAL + '\n';
+			for (Feature feature : constraint.getFalseOptional()){
+				toolTip += " " + feature.getName() + '\n';
+			}
+			toolTip += '\n' + " " + constraint.getNode().toString(NodeWriter.textualSymbols);
+			setToolTip(new Label(toolTip));	
+			return;
+		}
+		
 		if (constraint.getConstraintAttribute() == ConstraintAttribute.REDUNDANT){
 			setBackgroundColor(WARNING_BACKGROUND);
-			toolTip = " Model contains redundant constraints. " + '\n';
+			toolTip = REDUNDANCE + '\n';
 			toolTip += '\n' + " " + constraint.getNode().toString(NodeWriter.textualSymbols);
 			setToolTip(new Label(toolTip));	
 			return;

@@ -481,6 +481,7 @@ public class FeatureModel implements PropertyConstants {
 		// update constraints
 		for(Constraint constraint : getConstraints()){
 			constraint.setContainedFeatures(constraint.getNode());
+			constraint.setFalseOptionalFeatures();
 			
 			ConstraintAttribute constraintStatus = ConstraintAttribute.NORMAL;
 			

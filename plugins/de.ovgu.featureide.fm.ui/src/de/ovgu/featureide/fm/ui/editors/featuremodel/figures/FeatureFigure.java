@@ -56,6 +56,15 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 	private Feature feature;
 
 	private FeatureModel featureModel;
+	
+	private String CONCRETE = " Concrete";
+	private String ABSTRACT = " Abstract";
+	private String HIDDEN = " hidden";
+	private String DEAD = "is dead ";
+	private String FEATURE = " feature ";
+	private String FALSE_OPTIONAL = "is false optional ";
+	private String VOID = " Feature Model is void ";
+	private String ROOT = " Root ";
 
 	public FeatureFigure(Feature feature, FeatureModel featureModel) {
 		super();
@@ -109,47 +118,54 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 	public void setProperties() {
 	
 		String toolTip = "";
+		boolean modelIsValid = true;
+		
+		try {
+			modelIsValid = featureModel.isValid();
+		} catch (TimeoutException e) {
+			e.printStackTrace();
+		}
 		
 		label.setForegroundColor(FEATURE_FOREGROUND);
 		setBackgroundColor(CONCRETE_BACKGROUND);
 		setBorder(feature.isConstraintSelected() ? CONCRETE_SELECTED_BORDER : CONCRETE_BORDER);
 		
-		if (feature.isConcrete()) toolTip += " Concrete";
+		if (feature.isConcrete()) toolTip += CONCRETE;
 		
 		if (feature.isAbstract()){
 			setBackgroundColor(ABSTRACT_BACKGROUND);
 			setBorder(feature.isConstraintSelected() ? ABSTRACT_SELECTED_BORDER : ABSTRACT_BORDER);
-			toolTip += " Abstract";
+			if (feature.isRoot()){
+				toolTip += ROOT;
+			} else {
+				toolTip += ABSTRACT;
+			}
 		}
 		
 		if (feature.hasHiddenParent()){
 			setBorder(feature.isConstraintSelected() ? HIDDEN_SELECTED_BORDER : HIDDEN_BORDER);
 			label.setForegroundColor(HIDDEN_FOREGROUND);
-			if (feature.isHidden()) toolTip += " hidden";
+			if (feature.isHidden()) toolTip += HIDDEN;
 		}
 		
-		if (!feature.isRoot()) toolTip += " feature ";
+		if (!feature.isRoot()) toolTip += FEATURE;
 		
-		if (feature.getFeatureStatus() == FeatureStatus.DEAD){
+		if ((feature.getFeatureStatus() == FeatureStatus.DEAD) && modelIsValid){
 			label.setForegroundColor(DEAD_COLOR);
 			setBorder(feature.isConstraintSelected() ? DEAD_SELECTED_BORDER : DEAD_BORDER);
-			toolTip += "is dead ";			
+			toolTip += DEAD;			
 		}
 		
 		if (feature.getFeatureStatus() == FeatureStatus.FALSE_OPTIONAL){
 			label.setForegroundColor(DEAD_COLOR);
 			setBorder(feature.isConstraintSelected() ? DEAD_SELECTED_BORDER : DEAD_BORDER);
-			toolTip += "is false optional ";
+			toolTip += FALSE_OPTIONAL;
 		}
 		
-		try {
-			if (feature.isRoot() && !featureModel.isValid()){
-				label.setForegroundColor(DEAD_COLOR);
-				setBorder(feature.isConstraintSelected() ? DEAD_SELECTED_BORDER : DEAD_BORDER);
-				toolTip = " Feature model is void ";
-			}
-		} catch (TimeoutException e) {
-			e.printStackTrace();
+		if (feature.isRoot() && !modelIsValid){
+			label.setForegroundColor(DEAD_COLOR);
+			setBorder(feature.isConstraintSelected() ? DEAD_SELECTED_BORDER : DEAD_BORDER);
+			toolTip = VOID;
 		}
 		
 		toolTip += getRelevantConstraints();

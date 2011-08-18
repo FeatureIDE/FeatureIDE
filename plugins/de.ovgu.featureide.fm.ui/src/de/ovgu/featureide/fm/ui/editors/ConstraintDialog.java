@@ -77,6 +77,7 @@ import org.sat4j.specs.TimeoutException;
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.FeatureStatus;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ConstraintCreateOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ConstraintEditOperation;
@@ -689,6 +690,38 @@ public class ConstraintDialog {
 		}
 		return deadFeaturesAfter;
 	}
+	
+	public List<Feature> getFalseOptional(String input, FeatureModel model){
+		List<Feature> list = new ArrayList<Feature>();
+		FeatureModel clonedModel = model.clone();
+
+		NodeReader nodeReader = new NodeReader();
+
+		List<String> featureList = new ArrayList<String>(
+				clonedModel.getFeatureNames());
+		Node propNode = nodeReader.stringToNode(input, featureList);
+		
+		for (Feature feature : model.getFeatures()){
+			if (input.contains(feature.getName())){
+				if (feature.getFeatureStatus() != FeatureStatus.FALSE_OPTIONAL){
+					clonedModel.addPropositionalNode(propNode);
+					clonedModel.updateFeatureModel();
+					if (clonedModel.getFeature(feature.getName())
+							.getFeatureStatus() == FeatureStatus.FALSE_OPTIONAL && !list.contains(feature)) 
+								list.add(feature);
+				}
+			}
+		}
+		
+		return list;
+	}
+	
+	public String getFalseOptionalString (List<Feature> list){
+		String featureString = new String();
+		featureString += "Constraint causes the following features to be false optional: " + '\n';		
+		featureString += list.toString().substring(1, list.toString().length()-1);
+		return featureString;
+	}
 
 	/**
 	 * validates the current constraint in constraintText
@@ -724,12 +757,18 @@ public class ConstraintDialog {
 		} catch (TimeoutException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
+		
 		List<Literal> deadFeatures = getDeadFeatures(con, featureModel);
 		if (!deadFeatures.isEmpty()) {
 			printHeaderWarning(getDeadFeatureString(deadFeatures));
 			return false;
 		}
-		printHeaderText(headerText);
+		
+		List<Feature> falseOptionalFeatures = getFalseOptional(con, featureModel);
+		if (!falseOptionalFeatures.isEmpty()){
+			printHeaderWarning(getFalseOptionalString(falseOptionalFeatures));
+			return false;
+		}		
 		
 		for (Constraint constraint : featureModel.getConstraints()){
 			if (constraint.toString().equals(con)) {
@@ -737,6 +776,8 @@ public class ConstraintDialog {
 				return false;
 			}
 		}
+		
+		printHeaderText(headerText);
 
 		return true;
 	}
