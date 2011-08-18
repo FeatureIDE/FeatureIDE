@@ -260,13 +260,7 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 		Matcher matcherIf = OP_PATTERN.matcher(line);
 		
 		if (matcherIf.find()) {
-			Matcher matcherConreteFeature = patternIsConcreteFeature.matcher(matcherIf.group(3));
-			
-			if (!matcherConreteFeature.matches()) {
-				featureProject.createBuilderMarker(res,
-						"Munge: " + matcherIf.group(1) + " is not a concrete feature", lineNumber,
-						IMarker.SEVERITY_WARNING);
-			}
+			setMarkersOnNotExistingOrAbstractFeature(matcherIf.group(3), lineNumber, res);
 		}
 	}
 	

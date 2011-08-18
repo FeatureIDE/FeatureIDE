@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.Stack;
 import java.util.Vector;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
@@ -70,6 +71,9 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	/** Pattern for checking of concrete feature: "feature1|feature2|feature3|...". */
 	protected Pattern patternIsConcreteFeature;
 	
+	/** Pattern for checking of abstract feature: "feature1|feature2|feature3|...". */
+	protected Pattern patternIsAbstractFeature;
+	
 	/** Node Reader for parsing expressions in preprocessor annotations to check for tautologies and contradictions. */
 	protected NodeReader nodereader = new NodeReader();
 	
@@ -100,14 +104,20 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 			return false;
 		}
 		
-		// get all concrete features and generate pattern
+		// get all concrete and abstract features and generate pattern
 		StringBuilder concreteFeatures = new StringBuilder();
+		StringBuilder abstractFeatures = new StringBuilder();
 		for (Feature feature : featureProject.getFeatureModel().getFeatures()) {
 			if (feature.isConcrete()) {
-				concreteFeatures.append(feature.getName() + "|");
+				concreteFeatures.append(feature.getName());
+				concreteFeatures.append("|");
+			} else {
+				abstractFeatures.append(feature.getName());
+				abstractFeatures.append("|");
 			}
 		}
-		patternIsConcreteFeature = Pattern.compile(concreteFeatures.deleteCharAt(concreteFeatures.length()-1).toString());
+		patternIsAbstractFeature = Pattern.compile(abstractFeatures.substring(0, abstractFeatures.length()-1));
+		patternIsConcreteFeature = Pattern.compile(concreteFeatures.substring(0, concreteFeatures.length()-1));
 		
 		// create expression of feature model
 		featureModel = NodeCreator.createNodes(featureProject.getFeatureModel());
@@ -202,6 +212,10 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	 * @param res file containing the given expression
 	 */
 	protected void doThreeStepExpressionCheck(Node ppExpression, int lineNumber, IFile res) {
+		if (ppExpression == null) {
+			return;
+		}
+		
 		int result = isContradictionOrTautology(ppExpression.clone(), false, lineNumber, res);
 		
 		if (result == SAT_NONE) {
@@ -214,6 +228,38 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 				And nestedExpressionsAnd = new And(nestedExpressions);
 				
 				isContradictionOrTautology(nestedExpressionsAnd.clone(), true, lineNumber, res);
+			}
+		}
+	}
+	
+	/**
+	 * Set marker if given feature does not exists or is abstract.
+	 * 
+	 * @param name feature name
+	 * @param lineNumber current line number
+	 * @param res file containing the feature name
+	 */
+	protected void setMarkersOnNotExistingOrAbstractFeature(String name, int lineNumber, IFile res) {
+		if (name == null)
+			return;
+		
+		Matcher matcherFeature = patternIsAbstractFeature.matcher(name);
+		
+		if (matcherFeature.matches()) {
+			featureProject.createBuilderMarker(res,
+					pluginName + ": " + name +
+						" is defined as abstract in the feature model. Only concrete features should be referenced in preprocessor directives.",
+					lineNumber,
+					IMarker.SEVERITY_WARNING);
+		} else {
+			Matcher matcherConreteFeature = patternIsConcreteFeature.matcher(name);
+			
+			if (!matcherConreteFeature.matches()) {
+				featureProject.createBuilderMarker(res,
+						pluginName + ": " + name +
+							" is not defined in the feature model and thus always assumed to be false",
+						lineNumber,
+						IMarker.SEVERITY_WARNING);
 			}
 		}
 	}

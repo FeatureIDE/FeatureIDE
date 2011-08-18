@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Stack;
 import java.util.Vector;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
@@ -329,13 +328,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 		
 		for (int i = 0; i < splitted.length; ++i) {
 			if (!splitted[i].equals("") && !splitted[i].contains("//#")) {
-				Matcher m = patternIsConcreteFeature.matcher(splitted[i]);
-				
-				if (!m.matches()) {
-					featureProject.createBuilderMarker(res,
-							"Antenna: " + splitted[i] + " is not a concrete feature", lineNumber,
-							IMarker.SEVERITY_WARNING);
-				}
+				setMarkersOnNotExistingOrAbstractFeature(splitted[i], lineNumber, res);
 			}
 		}
 	}
