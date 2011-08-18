@@ -208,7 +208,6 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 		
 		// count of if, ifelse and else to remove after processing of else from stack
 		ifelseCountStack = new Stack<Integer>();
-		ifelseCountStack.push(0);
 		
 		// go line for line
 		for (int j = 0; j < lines.size(); ++j) {
@@ -229,25 +228,32 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 					// if e1, elseif e2, ..., else  ==  if -e1 && -e2 && ...
 					if (line.contains("//#elif ") || line.contains("//#elifdef ") || line.contains("//#elifndef ") || line.contains("//#else")) {
 						if(!expressionStack.isEmpty()) {
-							Node lastElement = new Not(expressionStack.pop());
+							Node lastElement = new Not(expressionStack.pop().clone());
 							expressionStack.push(lastElement);
 						}
 					} else if (line.contains("//#if ") || line.contains("//#ifdef ") || line.contains("//#ifndef ")) {
 						ifelseCountStack.push(0);
 					}
 					
-					ifelseCountStack.push(ifelseCountStack.pop() + 1);
+					if (!ifelseCountStack.empty() && !line.contains("//#else"))
+						ifelseCountStack.push(ifelseCountStack.pop() + 1);
 					
 					setMarkersContradictionalFeatures(line, res, j+1);
 					
 					setMarkersNotConcreteFeatures(line, res, j+1);
 				} else if (line.contains("//#endif")) {
-					for (; ifelseCountStack.peek() > 0; ifelseCountStack.push(ifelseCountStack.pop() - 1)) {
+					while (!ifelseCountStack.empty()) {
+						if (ifelseCountStack.peek() == 0)
+							break;
+						
 						if (!expressionStack.isEmpty())
 							expressionStack.pop();
+						
+						ifelseCountStack.push(ifelseCountStack.pop() - 1);
 					}
 					
-					ifelseCountStack.pop();
+					if (!ifelseCountStack.empty())
+						ifelseCountStack.pop();
 				}
 			}
 		}

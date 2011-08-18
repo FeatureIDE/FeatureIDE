@@ -776,7 +776,8 @@ public class FeatureProject extends BuilderMarkerHandler implements
 
 			// set markers, only if event is not fired from changes to
 			// markers
-			if (event.findMarkerDeltas(FEATURE_MODULE_MARKER, false).length == 0) {
+			if (event.findMarkerDeltas(FEATURE_MODULE_MARKER, false).length == 0 &&
+					composerExtension != null && composerExtension.hasFeatureFolders()) {
 				setAllFeatureModuleMarkers(featureModel, sourceFolder);
 			}
 		}
