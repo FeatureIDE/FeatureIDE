@@ -41,7 +41,7 @@ import de.ovgu.featureide.core.IFeatureProject;
  * The AheadWrapper class encapsulates all functionality that has to do
  * with the ahead tool suite. It provides methods to set the current
  * configuration file, to add jak files that should be recompiled due to an
- * inkremental or full build. The build methods are capable of composing
+ * incremental or full build. The build methods are capable of composing
  * jak files to java files as well as reduce jak files to java files and
  * compile java files to class files.
  * 
@@ -134,8 +134,8 @@ public class AheadWrapper {
 							for (IMarker marker : markers) {
 								if (marker.exists()) {
 									String content = marker.getAttribute(IMarker.MESSAGE, null);
-									if (content.contains(RAW_TYPE) || content.contains(GENERIC_TYPE) || 
-											content.contains(TYPE_SAFETY)) {
+									if (content != null && (content.contains(RAW_TYPE) || content.contains(GENERIC_TYPE) || 
+											content.contains(TYPE_SAFETY))) {
 										marker.delete();
 									} else {
 										AheadBuildErrorEvent buildError = new AheadBuildErrorEvent(file, marker.getAttribute(IMarker.MESSAGE).toString(), AheadBuildErrorType.JAVAC_ERROR, (Integer)marker.getAttribute(IMarker.LINE_NUMBER));
