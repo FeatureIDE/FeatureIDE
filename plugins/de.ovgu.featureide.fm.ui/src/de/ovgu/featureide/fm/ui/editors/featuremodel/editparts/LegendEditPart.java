@@ -56,9 +56,10 @@ public class LegendEditPart extends AbstractGraphicalEditPart {
 		boolean hasConcrete = fm.hasConcrete();
 		boolean hasHidden = fm.hasHidden();
 		boolean hasDead = fm.hasDead() || fm.hasFalse();  //same color
+		boolean showHidden = fm.showHiddenFeatures();
 		
 		LegendFigure figure = new LegendFigure(((Legend) getModel()).getPos(),hasMandatory,
-				hasOptional,hasOr,hasAlternative,hasAnd,hasAbstract, hasConcrete, hasHidden,hasDead);
+				hasOptional,hasOr,hasAlternative,hasAnd,hasAbstract, hasConcrete, hasHidden,hasDead,showHidden);
 
 		return figure;
 	}

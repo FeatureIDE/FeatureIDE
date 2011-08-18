@@ -80,16 +80,16 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 	public LegendFigure(Point pos, boolean mandatory, boolean optional,
 			boolean or, boolean alternative, boolean and, boolean abstrac,
-			boolean concrete, boolean hidden, boolean dead) {
+			boolean concrete, boolean hidden, boolean dead, boolean showHidden) {
 		setLocation(pos);
 		setLayoutManager(layout);
 		setBorder(LEGEND_BORDER);
 		setLegendSize(mandatory, optional, or, alternative, and, abstrac,
-				concrete, hidden, dead);
+				concrete, hidden, dead, showHidden);
 		FeatureUIHelper.setLegendSize(this.getSize());
 		FeatureUIHelper.setLegendFigure(this);
 		createRows(mandatory, optional, or, alternative, and, abstrac,
-				concrete, hidden, dead);
+				concrete, hidden, dead, showHidden);
 		setForegroundColor(LEGEND_FOREGROUND);
 		setBackgroundColor(LEGEND_BACKGROUND);
 		this.width = LEGEND_WIDTH;
@@ -105,7 +105,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	 */
 	private void setLegendSize(boolean mandatory, boolean optional, boolean or,
 			boolean alternative, boolean and, boolean _abstract,
-			boolean concrete, boolean hidden, boolean dead) {
+			boolean concrete, boolean hidden, boolean dead, boolean showHidden) {
 		int height = ROW_HEIGHT * 2 - 5;
 		if (mandatory)
 			height = height + ROW_HEIGHT;
@@ -117,11 +117,11 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			height = height + ROW_HEIGHT;
 		// if (and)
 		// height = height + ROW_HEIGHT;
-		if (_abstract)
+		if (_abstract && concrete) {
 			height = height + ROW_HEIGHT;
-		if (concrete)
 			height = height + ROW_HEIGHT;
-		if (hidden)
+		}
+		if (hidden && showHidden)
 			height = height + ROW_HEIGHT;
 		if (dead)
 			height = height + ROW_HEIGHT;
@@ -141,7 +141,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 	private void createRows(boolean mandatory, boolean optional, boolean or,
 			boolean alternative, boolean and, boolean abstrac,
-			boolean concrete, boolean hidden, boolean dead) {
+			boolean concrete, boolean hidden, boolean dead, boolean showHidden) {
 
 		createRowTitle();
 		int row = 2;
@@ -155,11 +155,11 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			createRowAlternative(row++);
 		// if (and)
 		// createRowAnd(row);
-		if (abstrac)
+		if (abstrac && concrete) {
 			createRowAbstract(row++);
-		if (concrete)
 			createRowConcrete(row++);
-		if (hidden)
+		}
+		if (hidden && showHidden)
 			createRowHidden(row++);
 		if (dead)
 			createRowDead(row++);
