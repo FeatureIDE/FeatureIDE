@@ -10,7 +10,7 @@ public class Main {
 		//#if Wonderful
 //@		System.out.print(" wonderful");	
 		//#endif
-		//#if World	
+		//#if World
 		System.out.print(" world!");
 		//#endif
 	}
