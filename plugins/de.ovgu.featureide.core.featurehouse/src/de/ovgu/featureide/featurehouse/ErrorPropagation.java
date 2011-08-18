@@ -141,20 +141,56 @@ public class ErrorPropagation {
 	 */
 	private void propagateMarker(IMarker marker, IFile file, int line) {
 		if (file != null && file.exists()) {
-			try {
-				IMarker newMarker = file.createMarker(FeatureHouseCorePlugin.BUILDER_PROBLEM_MARKER);
-				if (!newMarker.exists()) {
-					return;
-				}
-				newMarker.setAttribute(IMarker.LINE_NUMBER, line);
-				newMarker.setAttribute(IMarker.MESSAGE, marker.getAttribute(IMarker.MESSAGE));
-				newMarker.setAttribute(IMarker.SEVERITY, marker.getAttribute(IMarker.SEVERITY));
-				marker.delete();
-			} catch (CoreException e) {
-				FeatureHouseCorePlugin.getDefault().logError(e);
+			Object severity = null;
+			String message = marker.getAttribute(IMarker.MESSAGE, "xxx");
+			if (message.equals("xxx")) {
+				return;
 			}
+			try {
+				severity = marker.getAttribute(IMarker.SEVERITY);
+			} catch (CoreException e) {
+				severity = IMarker.SEVERITY_ERROR;
+			}
+			if (!hasSameMarker(message,line,file)) {
+				IMarker newMarker = null;
+				try {
+					newMarker = file.createMarker(FeatureHouseCorePlugin.BUILDER_PROBLEM_MARKER);
+					newMarker.setAttribute(IMarker.LINE_NUMBER, line);
+					newMarker.setAttribute(IMarker.MESSAGE, message);
+					newMarker.setAttribute(IMarker.SEVERITY, severity);
+					marker.delete();
+				} catch (CoreException e) {
+					FeatureHouseCorePlugin.getDefault().logError(e);
+				}
+			}
+				
+				
+				
 		}
 		
+	}
+
+	/**
+	 * TODO @Jens still duplicate markers
+	 * @param message
+	 * @param line
+	 * @param file
+	 * @return
+	 */
+	private boolean hasSameMarker(String message, int line, IFile file) {
+		try {
+			IMarker[] markers = file.findMarkers(null, true, IResource.DEPTH_INFINITE);
+			for (IMarker m : markers) {
+				if (m.getAttribute(IMarker.LINE_NUMBER, -1) == line) {
+					if (m.getAttribute(IMarker.MESSAGE, "xxx").equals(message)) {
+						return true;
+					}
+				}
+			}
+		} catch (CoreException e) {
+
+		}
+		return false;
 	}
 
 	/**
@@ -196,7 +232,6 @@ public class ErrorPropagation {
 					body = body.replaceFirst("original", m.methodName);
 				}
 				i = content.indexOf(body);
-				System.out.println();
 			}
 			if (i != -1) {
 				int line = countLines(content.substring(0, i));

@@ -221,8 +221,6 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		return true;
 	}
 
-	// copies all not composed Files of selected Features from src to bin and
-	// build
 	private void copy(IFile config) throws CoreException {
 		ArrayList<String> selectedFeatures = getSelectedFeatures(config);
 		if (selectedFeatures != null)
@@ -324,6 +322,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			if (!file.getWorkspace().isTreeLocked()) {
 				file.refreshLocal(IResource.DEPTH_ZERO, null);
 			}
+			//TODO @Jens linearize ErrorPropagation
 			new ErrorPropagation(file);
 		} catch (CoreException e) {
 			FeatureHouseCorePlugin.getDefault().logError(e);

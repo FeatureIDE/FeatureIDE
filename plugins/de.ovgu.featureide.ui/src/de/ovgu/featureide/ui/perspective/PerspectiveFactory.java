@@ -66,8 +66,8 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 		down.addView(IPageLayout.ID_PROBLEM_VIEW);
 		down.addView("org.eclipse.ui.console.ConsoleView");
 		
-		right.addView(IPageLayout.ID_OUTLINE);
 		right.addView(CollaborationOutline.ID);
+		right.addView(IPageLayout.ID_OUTLINE);
 
 		left.addView("org.eclipse.jdt.ui.PackageExplorer");
 

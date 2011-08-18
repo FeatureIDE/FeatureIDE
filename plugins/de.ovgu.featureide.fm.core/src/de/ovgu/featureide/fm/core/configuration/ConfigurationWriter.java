@@ -19,7 +19,6 @@
 package de.ovgu.featureide.fm.core.configuration;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Set;

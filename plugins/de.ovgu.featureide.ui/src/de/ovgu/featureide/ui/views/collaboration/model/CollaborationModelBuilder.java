@@ -118,7 +118,7 @@ public class CollaborationModelBuilder {
 		model.collaborations.add(collaboration);
 		
 		//get ordered list of layers from feature model
-		ArrayList<String> layerNames = null;
+		ArrayList<String> layerNames;
 		if (featureProject.getFeatureModel().isFeatureOrderUserDefined()) {
 			layerNames = featureProject.getFeatureModel().getFeatureOrderList();
 		} else {
