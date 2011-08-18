@@ -47,24 +47,24 @@ abstract public class FeatureDiagramLayoutManager implements GUIDefaults {
 		FeatureUIHelper.showHiddenFeatures(featureModel.showHiddenFeatures());		
 		layoutFeatureModel(featureModel);
 		if(featureModel.hasLegendAutoLayout())layoutLegend(featureModel, this.showHidden);
+		layoutHidden(featureModel);
 	}
 	
+	/**
+	 * check if feature (or any parent) is hidden
+	 */
 	boolean isHidden(Feature feature){
-		if(showHidden){
+		if(showHidden)
 			return false;
-		} else {
-			if(feature.isHidden()){
-				return feature.isHidden();
-			}
-			if(!feature.isRoot()){
-				return isHidden(feature.getParent());
-			} else {
-				return feature.isHidden();
-			}
-		}
-
+		if(!feature.isRoot())
+			return (feature.isHidden() || isHidden(feature.getParent()));
+		 else 
+			return feature.isHidden();
 	}
-	
+	/**
+	 * the location of hidden features is set to (0,0) temporary
+	 * (not the position that is saved in model.xml)
+	 */
 	void layoutHidden(FeatureModel featureModel){
 		for(Feature feature : featureModel.getFeatures()){
 			if(isHidden(feature) && !feature.isRoot()){
@@ -81,6 +81,9 @@ abstract public class FeatureDiagramLayoutManager implements GUIDefaults {
 		this.controlHeight = height;
 	}
 	
+	/**
+	 * method to center the layout on the screen (horizontal only)
+	 */
 	void centerLayoutX(FeatureModel featureModel){
 		int mostRightFeatureX = Integer.MIN_VALUE;
 		int mostLeftFeatureX = Integer.MAX_VALUE;
@@ -117,27 +120,37 @@ abstract public class FeatureDiagramLayoutManager implements GUIDefaults {
 	}
 
 	/**
-	 * sets the position of the legend to the right-bottom of the features
+	 * sets the position of the legend
 	 */
 	private static void layoutLegend(FeatureModel featureModel, boolean showHidden) {
 		
 		Point min = new Point (Integer.MAX_VALUE,Integer.MAX_VALUE);
 		Point max = new Point (Integer.MIN_VALUE,Integer.MIN_VALUE);
 		
+		/*
+		 * update lowest, highest, most left, most right coordinates
+		 * for features
+		 */
 		for(Feature feature : LayoutableFeature.
-				createLayoutableFeatures(featureModel.getFeatures(), showHidden)){
+				convertFeatures(featureModel.getFeatures(), showHidden)){
 			Point temp = FeatureUIHelper.getLocation(feature);
 			Dimension tempSize = FeatureUIHelper.getSize(feature);
+
 			if(temp.x < min.x) 
 				min.x = temp.x;
 			if(temp.y < min.y) 
-				min.x = temp.y;
+				min.y = temp.y;
 			if((temp.x + tempSize.width) > max.x)
 				max.x = temp.x + tempSize.width;
 			if(temp.y + tempSize.height>max.y)
 				max.y = temp.y + tempSize.height;
+
 		}
 		
+		/*
+		 * update lowest, highest, most left, most right coordinates
+		 * for constraints
+		 */
 		for(Constraint constraint: featureModel.getConstraints()){
 			Point temp = FeatureUIHelper.getLocation(constraint);
 			Dimension tempSize = FeatureUIHelper.getSize(constraint);
@@ -150,14 +163,18 @@ abstract public class FeatureDiagramLayoutManager implements GUIDefaults {
 			if(temp.y + tempSize.height>max.y)
 				max.y = temp.y + tempSize.height;
 		}		
+		
 		Dimension legendSize = FeatureUIHelper.getLegendSize();
 		boolean topRight = true;
 		boolean topLeft = true;
 		boolean botLeft = true;
 		boolean botRight = true;
 		
+		/*
+		 * check of features would intersect with the legend on the edges
+		 */
 		for(Feature feature : LayoutableFeature.
-				createLayoutableFeatures(featureModel.getFeatures(), showHidden)){
+				convertFeatures(featureModel.getFeatures(), showHidden)){
 			Point tempLocation = FeatureUIHelper.getLocation(feature);
 			Dimension tempSize = FeatureUIHelper.getSize(feature);
 			if((tempLocation.x+tempSize.width) 
@@ -182,6 +199,9 @@ abstract public class FeatureDiagramLayoutManager implements GUIDefaults {
 				botRight = false;
 			
 		}			
+		/*
+		 * check of constraints would intersect with the legend on the edges
+		 */
 		if(topRight||topLeft||botLeft||botRight){
 			for(Constraint constraint: featureModel.getConstraints()){
 				Point tempLocation = FeatureUIHelper.getLocation(constraint);
@@ -209,7 +229,9 @@ abstract public class FeatureDiagramLayoutManager implements GUIDefaults {
 			}
 		}
 		
-		
+		/*
+		 * set the legend position
+		 */
 		if(topRight){
 			featureModel.setLegendPos(max.x-legendSize.width, min.y);
 		} else if (topLeft) {
@@ -219,6 +241,10 @@ abstract public class FeatureDiagramLayoutManager implements GUIDefaults {
 		} else if (botRight) {
 			featureModel.setLegendPos(max.x-legendSize.width, max.y-legendSize.height);
 		} else {
+
+			/*
+			 * old layout method of the legend
+			 */
 			featureModel.setLegendPos(max.x + FEATURE_SPACE_X, min.y);
 		}
 		

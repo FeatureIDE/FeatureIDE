@@ -38,9 +38,9 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 
 	@Override
 	public void layoutFeatureModel(FeatureModel featureModel) {
-		layout(new LayoutableFeature(featureModel.getRoot(), showHidden));
+		LayoutableFeature root = new LayoutableFeature(featureModel.getRoot(), showHidden);
+		layout(root);
 		layout(featureDiagramBottom, featureModel.getConstraints());
-		layoutHidden(featureModel);
 	}
 
 	private void layout(LayoutableFeature root) {

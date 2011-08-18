@@ -29,7 +29,7 @@ import de.ovgu.featureide.fm.core.Feature;
  */
 public class LayoutableFeature {
 	
-	private static boolean showHidden;
+	private boolean showHidden;
 	private Feature feature;
 	
 	
@@ -77,7 +77,7 @@ public class LayoutableFeature {
 		return feature;
 	}
 	
-	public static LinkedList<Feature> createLayoutableFeatures(
+	public static LinkedList<Feature> convertFeatures(
 			Collection<Feature> features, boolean showHidden){
 		
 		LinkedList<Feature> newFeatures = new LinkedList<Feature>();
@@ -86,7 +86,7 @@ public class LayoutableFeature {
 			if(showHidden) {
 				newFeatures.add(feature);
 			} else {
-				if(!isHidden(feature)){
+				if(!isHidden(feature, showHidden)){
 					newFeatures.add(feature);
 				}
 			}
@@ -95,20 +95,13 @@ public class LayoutableFeature {
 		return newFeatures;
 	}
 
-	static boolean isHidden(Feature feature){
-		if(showHidden){
-			return false;
-		} else {
-			if(feature.isHidden()){
+	public static boolean isHidden(Feature feature, boolean showHidden){
+			if(showHidden)
+				return false;
+			if(!feature.isRoot())
+				return (feature.isHidden() || isHidden(feature.getParent(), showHidden));
+			 else 
 				return feature.isHidden();
-			}
-			if(!feature.isRoot()){
-				return isHidden(feature.getParent());
-			} else {
-				return feature.isHidden();
-			}
 		}
-
-	}
 	
 }

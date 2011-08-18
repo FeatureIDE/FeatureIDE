@@ -35,21 +35,32 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  */
 public class FeatureDiagramLayoutHelper {
 	
+	/**
+	 * returns label texts (e.g. for the context menu)
+	 */
 	public static String getLayoutLabel(int layoutAlgorithmNum){		
 		switch(layoutAlgorithmNum){
+			case 0:
+				return "Manual Layout";
 			case 1: 
-				return "Top-Down (centered)"; 
+				return "Top-Down (ordered)";
 			case 2: 
-				return "Top-Down (left-aligned)"; 
+				return "Top-Down (centered)"; 
 			case 3:
-				return "Left To Right (ordered)";
+				return "Top-Down (left-aligned)"; 
 			case 4: 
-				return "Left To Right";
+				return "Left To Right (ordered)";
+			case 5:
+				return "Left To Right (curved)";
 			default:
 				return "Top-Down (ordered)";
 		}	
 	}
 	
+	/**
+	 * sets initial positions for new constraints
+	 * needed for manual layout
+	 */
 	public static void initializeConstraintPosition(FeatureModel featureModel, int index){
 		Point newLocation = new Point(0,0);
 		Constraint constraint = featureModel.getConstraints().get(index);
@@ -77,6 +88,10 @@ public class FeatureDiagramLayoutHelper {
 		FeatureUIHelper.setLocation(constraint, newLocation);
 	}
 	
+	/**
+	 * sets initial positions for new features (above) 
+	 * needed for manual layout
+	 */
 	public static void initializeCompoundFeaturePosition(FeatureModel featureModel, 
 			LinkedList<Feature> selectedFeatures, Feature newCompound){
 		Point initPos = new Point(0,0);
@@ -98,6 +113,10 @@ public class FeatureDiagramLayoutHelper {
 		
 	}
 	
+	/**
+	 * sets initial positions for new features (below) 
+	 * needed for manual layout
+	 */
 	public static void initializeLayerFeaturePosition(FeatureModel featureModel, 
 			Feature newLayer, Feature feature){
 		if(!FeatureUIHelper.hasVerticalLayout()){
@@ -126,29 +145,40 @@ public class FeatureDiagramLayoutHelper {
 		}
 	}
 
+	/**
+	 * returns the layout manager for the chosen algorithm(id)
+	 * 
+	 */
 	public static FeatureDiagramLayoutManager getLayoutManager(
 			int layoutAlgorithm, FeatureModel featureModel) {
 		
-		if(featureModel.hasFeaturesAutoLayout()){
-			switch(layoutAlgorithm){
+		switch(layoutAlgorithm){
+			case 0:
+				return new ManualLayout();
 			case 1:
 				FeatureUIHelper.setVerticalLayoutBounds(false);
-				return new BreadthFirstLayout();
-			case 2: 
+				featureModel.verticalLayout(FeatureUIHelper.hasVerticalLayout());
+				return new LevelOrderLayout();
+			case 2:
 				FeatureUIHelper.setVerticalLayoutBounds(false);
+				featureModel.verticalLayout(FeatureUIHelper.hasVerticalLayout());
+				return new BreadthFirstLayout();
+			case 3: 
+				FeatureUIHelper.setVerticalLayoutBounds(false);
+				featureModel.verticalLayout(FeatureUIHelper.hasVerticalLayout());
 				return new DepthFirstLayout();
-			case 3:
+			case 4:
 				FeatureUIHelper.setVerticalLayoutBounds(true);
+				featureModel.verticalLayout(FeatureUIHelper.hasVerticalLayout());
 				return new VerticalLayout();
-			case 4: 
+			case 5: 
 				FeatureUIHelper.setVerticalLayoutBounds(true);
+				featureModel.verticalLayout(FeatureUIHelper.hasVerticalLayout());
 				return new VerticalLayout2();
 			default:
 				FeatureUIHelper.setVerticalLayoutBounds(false);
+				featureModel.verticalLayout(FeatureUIHelper.hasVerticalLayout());
 				return new LevelOrderLayout();
-			}
-		} else {
-			return new ManualLayout();
 		}
 
 	}

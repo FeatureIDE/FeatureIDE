@@ -20,6 +20,7 @@ package de.ovgu.featureide.fm.ui.editors;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.LinkedList;
 
 import org.eclipse.core.commands.operations.ObjectUndoContext;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -71,7 +72,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LayoutSelectionActi
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LegendAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LegendLayoutAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.MandatoryAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ManualLayoutSelectionAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AutoLayoutConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.RenameAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ReverseOrderAction;
@@ -125,14 +126,10 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 
 	private ReverseOrderAction reverseOrderAction;
 	
-	private LayoutSelectionAction setLevelOrderLayoutAction;
-	private LayoutSelectionAction setBreadthFirstLayoutAction;
-	private LayoutSelectionAction setDepthFirstLayoutAction;
-	private LayoutSelectionAction setVerticalLayoutAction;
-	private LayoutSelectionAction setVerticalLayoutAction2;
-	private ManualLayoutSelectionAction manualLayoutSelectionAction;
+	private LinkedList<LayoutSelectionAction> setLayoutActions;
 	
-	
+	private AutoLayoutConstraintAction AutoLayoutConstraintAction;	
+
 	private int index;
 	private UIJob steve;
 
@@ -149,7 +146,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 
 		zoomManager = rootEditPart.getZoomManager();
 		zoomManager.setZoomLevels(new double[] { 0.05, 0.10, 0.25, 0.50, 0.75,
-				0.90, 1.00, 1.10, 1.25, 1.50, 2.00, 2.50, 3.00, 4.00 });
+				0.90, 1.00, 1.10, 1.25, 1.50, 2.00, 2.50, 3.00, 4.00 });	
 	}
 
 	void initializeGraphicalViewer() {
@@ -196,13 +193,11 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		zoomIn = new ZoomInAction(zoomManager);
 		zoomOut = new ZoomOutAction(zoomManager);
 		
-		setLevelOrderLayoutAction = new LayoutSelectionAction(this, featureModel,0,0);
-		setBreadthFirstLayoutAction = new LayoutSelectionAction(this, featureModel,1,0);
-		setDepthFirstLayoutAction = new LayoutSelectionAction(this, featureModel,2,0);
-		setVerticalLayoutAction = new LayoutSelectionAction(this, featureModel,3,0);
-		setVerticalLayoutAction2 = new LayoutSelectionAction(this, featureModel,4,0);
-		
-		manualLayoutSelectionAction = new ManualLayoutSelectionAction(this, featureModel);
+		setLayoutActions = new LinkedList<LayoutSelectionAction>();
+		for(int i = 0; i < 5; i++){
+			setLayoutActions.add(new LayoutSelectionAction(this, featureModel,i,0));
+		}
+		AutoLayoutConstraintAction = new AutoLayoutConstraintAction(this, featureModel);
 	}
 
 	public void createContextMenu(MenuManager menu) {
@@ -225,78 +220,25 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		setKeyHandler(handler);
 	}
 	
-	public void createContextSubMenu(MenuManager menu) {
-		menu.addMenuListener(new IMenuListener() {
-			public void menuAboutToShow(IMenuManager manager) {
-				FeatureDiagramEditor.this.fillContextMenu(manager);
-			}
-		});
-		menu.createContextMenu(getControl());
-		setContextMenu(menu);
-	}
-	
-	
 	private void fillContextMenu(IMenuManager menu) {
 		
-		IMenuManager subMenu=new MenuManager("Set Layout");
-		subMenu.add(manualLayoutSelectionAction);
-		subMenu.add(new Separator());
-		subMenu.add(setLevelOrderLayoutAction);
-		subMenu.add(setBreadthFirstLayoutAction);
-		subMenu.add(setDepthFirstLayoutAction);
-		subMenu.add(setVerticalLayoutAction);
-		//does not work that great. (as this layout can have intersections)
-		//subMenu.add(setVerticalLayoutAction2);		
-		
+		IMenuManager subMenu=new MenuManager("Set Layout");	
 		
 		showHiddenFeaturesAction.setChecked(
 				getFeatureModel().showHiddenFeatures());
 		
-		
-		if(getFeatureModel().hasFeaturesAutoLayout()){
-			setLevelOrderLayoutAction.setEnabled(true);
-			setBreadthFirstLayoutAction.setEnabled(true);
-			setDepthFirstLayoutAction.setEnabled(true);
-			setVerticalLayoutAction.setEnabled(true);
-			setVerticalLayoutAction2.setEnabled(true);
-			setVerticalLayoutAction2.setChecked(false);
-			setVerticalLayoutAction.setChecked(false);
-			setLevelOrderLayoutAction.setChecked(false);
-			setBreadthFirstLayoutAction.setChecked(false);
-			setDepthFirstLayoutAction.setChecked(false);
-			
-			manualLayoutSelectionAction.setEnabled(true);
-			manualLayoutSelectionAction.setChecked(false);
-			if(getFeatureModel().getLayoutAlgorithm() == 1){
-				setBreadthFirstLayoutAction.setEnabled(false);
-				setBreadthFirstLayoutAction.setChecked(true);	
-			} else if(getFeatureModel().getLayoutAlgorithm() == 2){
-				setDepthFirstLayoutAction.setEnabled(false);
-				setDepthFirstLayoutAction.setChecked(true);
-			} else if(getFeatureModel().getLayoutAlgorithm() == 3){
-				setVerticalLayoutAction.setEnabled(false);
-				setVerticalLayoutAction.setChecked(true);
-			} else if(getFeatureModel().getLayoutAlgorithm() == 4){
-				setVerticalLayoutAction2.setEnabled(false);
-				setVerticalLayoutAction2.setChecked(true);
-			} else {
-				setLevelOrderLayoutAction.setEnabled(false);
-				setLevelOrderLayoutAction.setChecked(true);
+		for(int i = 0; i < setLayoutActions.size();i++){
+			subMenu.add(setLayoutActions.get(i));
+			if(i==0){
+				subMenu.add(AutoLayoutConstraintAction);
+				subMenu.add(new Separator());
 			}
-		} else {
-			setLevelOrderLayoutAction.setEnabled(true);
-			setBreadthFirstLayoutAction.setEnabled(true);
-			setDepthFirstLayoutAction.setEnabled(true);
-			setVerticalLayoutAction.setEnabled(true);
-			setVerticalLayoutAction2.setEnabled(true);
-			setVerticalLayoutAction2.setChecked(false);
-			setVerticalLayoutAction.setChecked(false);
-			setLevelOrderLayoutAction.setChecked(false);
-			setBreadthFirstLayoutAction.setChecked(false);
-			setDepthFirstLayoutAction.setChecked(false);
-			manualLayoutSelectionAction.setEnabled(true);
-			manualLayoutSelectionAction.setChecked(true);
-		}
+			boolean isChosen = (i == getFeatureModel().getLayoutAlgorithm());
+			setLayoutActions.get(i).setChecked(isChosen);
+			setLayoutActions.get(i).setEnabled(!isChosen);
+		}		
+		
+		AutoLayoutConstraintAction.setEnabled(!getFeatureModel().hasFeaturesAutoLayout());
 		
 		boolean connectionSelected = alternativeAction.isConnectionSelected();
 		if (andAction.isEnabled() || orAction.isEnabled()  || alternativeAction.isEnabled()) {
@@ -358,7 +300,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 			menu.add(new Separator());
 			menu.add(reverseOrderAction);	
 		}
-		
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 		menu.add(legendAction);
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
@@ -441,10 +382,9 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		
 		int previousLayout = featureModel.getLayoutAlgorithm();
 		
-		setLevelOrderLayoutAction = new LayoutSelectionAction(this, featureModel,0,previousLayout);
-		setBreadthFirstLayoutAction = new LayoutSelectionAction(this, featureModel,1,previousLayout);
-		setDepthFirstLayoutAction = new LayoutSelectionAction(this, featureModel,2,previousLayout);
-		setVerticalLayoutAction = new LayoutSelectionAction(this, featureModel,3,previousLayout);
+		for(int i = 0; i < setLayoutActions.size(); i++){
+			setLayoutActions.set(i, new LayoutSelectionAction(this, featureModel,i,previousLayout));
+		}
 		
 		Point size = getControl().getSize();
 		

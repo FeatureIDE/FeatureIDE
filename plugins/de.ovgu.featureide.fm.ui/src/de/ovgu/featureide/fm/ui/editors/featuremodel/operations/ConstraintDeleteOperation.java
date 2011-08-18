@@ -96,7 +96,9 @@ public class ConstraintDeleteOperation extends AbstractOperation {
 	public IStatus undo(IProgressMonitor arg0, IAdaptable arg1)
 			throws ExecutionException {
 		featureModel.addPropositionalNode(constraint.getNode(), index);
-		FeatureDiagramLayoutHelper.initializeConstraintPosition(featureModel,
+		//initialize constraint position in manual layout
+		if(!featureModel.hasFeaturesAutoLayout())
+			FeatureDiagramLayoutHelper.initializeConstraintPosition(featureModel,
 				featureModel.getConstraintCount()-1);
 		featureModel.handleModelDataChanged();
 		return Status.OK_STATUS;

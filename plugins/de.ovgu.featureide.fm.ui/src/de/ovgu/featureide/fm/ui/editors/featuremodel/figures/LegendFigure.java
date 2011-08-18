@@ -290,12 +290,14 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		setForegroundColor(CONNECTION_FOREGROUND);
 
 	}
-
+	
 	private PolylineConnection createConnectionTypeSymbol(int row,
 			boolean mandatory) {
+
 		PolylineConnection p = new PolylineConnection();
 		p.setForegroundColor(CONNECTION_FOREGROUND);
 		p.setSourceDecoration(new CircleDecoration(mandatory));
+
 		Point source = new Point(MANDATORY_PADDING, ROW_HEIGHT * row - LIFT
 				+ SYMBOL_SIZE / 2);
 

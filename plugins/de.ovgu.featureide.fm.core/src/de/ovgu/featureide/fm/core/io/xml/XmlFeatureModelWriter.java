@@ -79,11 +79,11 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
     	Element comments = doc.createElement("comments");
     	Element order = doc.createElement("featureOrder");
     	
-    	if(featureModel.hasFeaturesAutoLayout()){
-    		root.setAttribute("chosenLayoutAlgorithm", ""+featureModel.getLayoutAlgorithm());
-    	} else {
-    		root.setAttribute("hasManualLayout", "true");
-    	}
+    	root.setAttribute("chosenLayoutAlgorithm", ""+featureModel.getLayoutAlgorithm());
+    	
+    	if(featureModel.verticalLayout() && !featureModel.hasFeaturesAutoLayout()){
+    		root.setAttribute("horizontalLayout", "true");
+		}
     	if(!featureModel.showHiddenFeatures()){
     		root.setAttribute("showHiddenFeatures", "false");
     	}
@@ -154,10 +154,11 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
     		if(feat.isHidden())		fnod.setAttribute("hidden", "true");
         	if(feat.isMandatory())	fnod.setAttribute("mandatory", "true");
         	if(feat.isAbstract())	fnod.setAttribute("abstract", "true");
-        	if(!featureModel.hasFeaturesAutoLayout()){
+        	
+        	if(!featureModel.showHiddenFeatures() || !featureModel.hasFeaturesAutoLayout())
             	fnod.setAttribute("coordinates", feat.getLocation().x
         				+", "+feat.getLocation().y);
-        	}
+        	
         	node.appendChild(fnod);
     	}
     	else{
@@ -174,9 +175,11 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
 	    	if(feat.isMandatory())	fnod.setAttribute("mandatory", "true");
 		    if(feat.isAbstract())	fnod.setAttribute("abstract", "true");
 		    if(feat.isHidden())		fnod.setAttribute("hidden", "true");
-        	if(!featureModel.hasFeaturesAutoLayout()) 
+
+        	if(!featureModel.showHiddenFeatures() || !featureModel.hasFeaturesAutoLayout()) 
         		fnod.setAttribute("coordinates", +feat.getLocation().x
         				+", "+feat.getLocation().y);
+
 	    	node.appendChild(fnod);
 	    	
 	    	Iterator<Feature> i = children.iterator();

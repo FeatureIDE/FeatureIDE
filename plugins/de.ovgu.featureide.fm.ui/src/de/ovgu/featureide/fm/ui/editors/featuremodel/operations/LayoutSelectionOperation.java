@@ -33,7 +33,6 @@ public class LayoutSelectionOperation extends AbstractOperation {
 	private FeatureModel featureModel;
 	private int newSelectedLayoutAlgorithm;
 	private int oldSelectedLayoutAlgorithm;
-	private boolean hasFeaturesAutoLayout;
 	
 	public LayoutSelectionOperation(FeatureModel featureModel, 
 			int newSelectedLayoutAlgorithm, int oldSelectedLayoutAlgorithm) {
@@ -41,7 +40,6 @@ public class LayoutSelectionOperation extends AbstractOperation {
 		this.newSelectedLayoutAlgorithm = newSelectedLayoutAlgorithm;
 		this.oldSelectedLayoutAlgorithm = oldSelectedLayoutAlgorithm;
 		this.featureModel = featureModel;
-		this.hasFeaturesAutoLayout = featureModel.hasFeaturesAutoLayout();
 		
 	}
 
@@ -54,7 +52,6 @@ public class LayoutSelectionOperation extends AbstractOperation {
 			throws ExecutionException {
 
 		featureModel.setLayout(newSelectedLayoutAlgorithm);
-		featureModel.setFeaturesAutoLayout(true);	
 		featureModel.redrawDiagram();
 		featureModel.handleModelDataChanged();
 
@@ -65,7 +62,6 @@ public class LayoutSelectionOperation extends AbstractOperation {
 			throws ExecutionException {
 
 		featureModel.setLayout(oldSelectedLayoutAlgorithm);
-		featureModel.setFeaturesAutoLayout(hasFeaturesAutoLayout);	
 		featureModel.handleModelDataChanged();
 		
 		return Status.OK_STATUS;

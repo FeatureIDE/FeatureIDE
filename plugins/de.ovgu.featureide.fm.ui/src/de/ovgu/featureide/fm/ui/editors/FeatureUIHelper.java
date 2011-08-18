@@ -150,14 +150,6 @@ public class FeatureUIHelper {
 		
 	}
 	
-	public static void setShowHiddenFeature(boolean showHiddenFeature) {
-		showHiddenFeatures = showHiddenFeature; 
-	}
-	
-	public static boolean getShowHiddenFeature() {
-		return showHiddenFeatures; 
-	}
-	
 	public static void setVerticalLayoutBounds(boolean isVerticalLayout) {
 		hasVerticalLayout = isVerticalLayout; 
 	}

@@ -94,9 +94,8 @@ public class FeatureModel implements PropertyConstants {
 	private Feature root;
 	private boolean legend = true;
 	private boolean autoLayoutLegend = true;
-	private boolean autoLayoutFeatures = true;
-	private boolean autoLayoutConstraints = true;
 	private boolean showHiddenFeatures = true;
+	private boolean hasVerticalLayout = true;
 	private Point legendPos = new Point(0, 0);
 	/**
 	 * a hashtable containing all features
@@ -108,7 +107,7 @@ public class FeatureModel implements PropertyConstants {
 	 * occur
 	 */
 	
-	private int selectedLayoutAlgorithm = 0;
+	private int selectedLayoutAlgorithm = 1;
 	
 	private List<String> comments = new LinkedList<String>();
 
@@ -1047,17 +1046,9 @@ public class FeatureModel implements PropertyConstants {
 
 		return autoLayoutLegend;
 	}
-	
-	public void setFeaturesAutoLayout(boolean b) {
-		autoLayoutFeatures = b;
-	}
 
 	public boolean hasFeaturesAutoLayout() {
-		return autoLayoutFeatures;
-	}
-	
-	public boolean hasConstraintsAutoLayout(){
-		return autoLayoutConstraints;
+		return (selectedLayoutAlgorithm!=0);
 	}
 	
 	public boolean showHiddenFeatures(){
@@ -1066,10 +1057,13 @@ public class FeatureModel implements PropertyConstants {
 	public void showHiddenFeatures(boolean b){
 		showHiddenFeatures = b;
 	}
-	
-	public void setConstraintsAutoLayout(boolean b) {
-		autoLayoutConstraints = b;
+	public boolean verticalLayout(){
+		return hasVerticalLayout;
 	}
+	public void verticalLayout(boolean b){
+		hasVerticalLayout = b;
+	}
+	
 	/**
 	 * @return true if feature model contains mandatory features otherwise false
 	 */

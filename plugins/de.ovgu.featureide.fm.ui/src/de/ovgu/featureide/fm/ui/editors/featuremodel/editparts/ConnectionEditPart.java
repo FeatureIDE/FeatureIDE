@@ -156,8 +156,8 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 				parentHidden = true;
 			
 		}
-		if ((target.isAnd() || OR_CIRCLES) && !(source.isHidden() && !FeatureUIHelper.getShowHiddenFeature()))	
-			if(!(parentHidden && !FeatureUIHelper.getShowHiddenFeature()))
+		if ((target.isAnd() || OR_CIRCLES) && !(source.isHidden() && !FeatureUIHelper.showHiddenFeatures()))	
+			if(!(parentHidden && !FeatureUIHelper.showHiddenFeatures()))
 					sourceDecoration = new CircleDecoration(source.isMandatory());
 
 		PolylineConnection connection = (PolylineConnection) getConnectionFigure();

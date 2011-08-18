@@ -78,7 +78,9 @@ public class ConstraintCreateOperation extends AbstractOperation {
 
 		featureModel.addPropositionalNode(node);
 		
-		FeatureDiagramLayoutHelper.initializeConstraintPosition(featureModel,
+		//initialize constraint position in manual layout
+		if(!featureModel.hasFeaturesAutoLayout())
+			FeatureDiagramLayoutHelper.initializeConstraintPosition(featureModel,
 				 featureModel.getConstraintCount()-1);
 		
 		featureModel.handleModelDataChanged();

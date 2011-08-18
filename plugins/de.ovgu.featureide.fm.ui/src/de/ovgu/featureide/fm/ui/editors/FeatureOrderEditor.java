@@ -90,6 +90,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 
 	private GridData gridData;
 
+	
 	/**
 	 * @param featureModelEditor
 	 */
@@ -420,6 +421,8 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		updateFeatureOrderList();
 		
 	}
+	
+
 	
 	/**
 	 * Write the order of the features in the .order file in the feature project

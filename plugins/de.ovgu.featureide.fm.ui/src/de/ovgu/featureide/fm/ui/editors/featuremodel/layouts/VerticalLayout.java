@@ -22,20 +22,18 @@ import java.util.LinkedList;
 
 import org.eclipse.draw2d.geometry.Point;
 
-import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 
 /**
- * ordering features on same levels from left to right
- * without any intersections or overlapping
+ * ordering features from left to right without any intersections or overlapping
  * 
  * @author David Halm
  * @author Patrick Sulkowski
  */
 public class VerticalLayout extends FeatureDiagramLayoutManager{
 	
-	private LinkedList<LinkedList<Feature>> levelList = new LinkedList<LinkedList<Feature>>();
+	private LinkedList<LinkedList<LayoutableFeature>> levelList = new LinkedList<LinkedList<LayoutableFeature>>();
 	private int highestLevel = 0;
 	private int height = 0;
 	private int yOffset = 0;
@@ -43,9 +41,6 @@ public class VerticalLayout extends FeatureDiagramLayoutManager{
 	private LinkedList<Integer> positionsY = new LinkedList<Integer>();
 	private LinkedList<Integer> maxFeatureWidthOnLevel = new LinkedList<Integer>();
 	private int childlessNum = 0;
-
-	int lowestFeatureY = 0;
-	int xoffset = 0;
 	
 	public void layoutFeatureModel(FeatureModel featureModel) {
 		
@@ -57,11 +52,13 @@ public class VerticalLayout extends FeatureDiagramLayoutManager{
 		centerChildren(root,0);
 		centerOther(highestLevel);
 		layout(yOffset, featureModel.getConstraints());
-		layoutHidden(featureModel);
 	}
 	
-	private void calculateLevelXPositions(){
-		
+	/**
+	 * calculates positions for each level (horizontal)
+	 * 
+	 */
+	private void calculateLevelXPositions(){	
 		int width = 0;
 		for(int i = 0; i <= highestLevel; i++){
 			width += maxFeatureWidthOnLevel.get(i)+FEATURE_SPACE_Y;
@@ -73,6 +70,9 @@ public class VerticalLayout extends FeatureDiagramLayoutManager{
 		}
 	}
 	
+	/**
+	 * creates lists of features for every level
+	 */
 	private void createLevelList(LayoutableFeature feature, int level){
 		if (feature.getFeature() == null)
 			return;
@@ -80,13 +80,13 @@ public class VerticalLayout extends FeatureDiagramLayoutManager{
 			highestLevel = level;
 		}
 		if(levelList.size()-1 >= level){
-			levelList.get(level).add(feature.getFeature());
+			levelList.get(level).add(feature);
 			if(maxFeatureWidthOnLevel.get(level) < FeatureUIHelper.getSize(feature.getFeature()).width){
 				maxFeatureWidthOnLevel.set(level, FeatureUIHelper.getSize(feature.getFeature()).width);
 			}
 		} else {
-			LinkedList<Feature> subLevelList = new LinkedList<Feature>();
-			subLevelList.add(feature.getFeature());
+			LinkedList<LayoutableFeature> subLevelList = new LinkedList<LayoutableFeature>();
+			subLevelList.add(feature);
 			levelList.add(subLevelList);
 			maxFeatureWidthOnLevel.add(FeatureUIHelper.getSize(feature.getFeature()).width);
 		}
@@ -99,6 +99,10 @@ public class VerticalLayout extends FeatureDiagramLayoutManager{
 		}
 	}
 	
+	/**
+	 * calculates positions for each child (vertical)
+	 * 
+	 */
 	private void getYcenterForChildlessFeatures(){
 		height -= FEATURE_SPACE_X;
 		for(int i = 0; i < positionsY.size(); i++){
@@ -107,6 +111,10 @@ public class VerticalLayout extends FeatureDiagramLayoutManager{
 		}
 	}
 	
+	/**
+	 * positions of features that have no more children are set
+	 * 
+	 */
 	private void centerChildren(LayoutableFeature feature, int level){
 			
 		if(feature.hasChildren()){
@@ -124,9 +132,14 @@ public class VerticalLayout extends FeatureDiagramLayoutManager{
 		
 	}
 	
+	/**
+	 * positions of features that have children are now set from right to left (for each level)
+	 * (centered by their children's positions
+	 * 
+	 */	
 	private void centerOther(int level) {
 		for(int i = 0; i < levelList.get(level).size(); i++){
-			LayoutableFeature feature = new LayoutableFeature(levelList.get(level).get(i), showHidden);
+			LayoutableFeature feature = levelList.get(level).get(i);
 			
 			if(feature.hasChildren()){				
 				int yPos = (FeatureUIHelper.getLocation(feature.getFirstChild().getFeature()).y

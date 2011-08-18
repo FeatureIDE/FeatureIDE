@@ -22,7 +22,6 @@ import java.util.LinkedList;
 
 import org.eclipse.draw2d.geometry.Point;
 
-import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 
@@ -39,24 +38,23 @@ public class BreadthFirstLayout extends FeatureDiagramLayoutManager {
 	@Override
 	public void layoutFeatureModel(FeatureModel featureModel) {
 		yoffset = 0;
-		layout(featureModel.getRoot());
+		LayoutableFeature root = new LayoutableFeature(featureModel.getRoot(), showHidden);
+		layout(root);
 		layout(yoffset, featureModel.getConstraints());
-		layoutHidden(featureModel);
 	}
 	
-	private void layout(Feature root) {
-		if (root == null || (isHidden(root)) )
+	private void layout(LayoutableFeature root) {
+		if (root == null)
 			return;
-		LinkedList<Feature> list = new LinkedList<Feature>();
+		LinkedList<LayoutableFeature> list = new LinkedList<LayoutableFeature>();
 		list.add(root);
 
 		yoffset += LAYOUT_MARGIN_Y;
 		while (!list.isEmpty()) {
 			//center the features of the level
 			int width = 2 * LAYOUT_MARGIN_X - FEATURE_SPACE_X;
-			for (Feature feature : list) {
-				if(!isHidden(feature))
-					width += FeatureUIHelper.getSize(feature).width + FEATURE_SPACE_X;
+			for (LayoutableFeature feature : list) {
+				width += FeatureUIHelper.getSize(feature.getFeature()).width + FEATURE_SPACE_X;
 				
 				
 			}
@@ -66,13 +64,11 @@ public class BreadthFirstLayout extends FeatureDiagramLayoutManager {
 			//set location of each feature at this level
 			int levelSize = list.size();
 			for (int i = 0; i < levelSize; i++) {
-				Feature feature = list.removeFirst();
-				if(!isHidden(feature)){
-					FeatureUIHelper.setLocation(feature,new Point(xoffset, yoffset));
-					xoffset += FeatureUIHelper.getSize(feature).width + FEATURE_SPACE_X;
-				}
+				LayoutableFeature feature = list.removeFirst();
+				FeatureUIHelper.setLocation(feature.getFeature(),new Point(xoffset, yoffset));
+				xoffset += FeatureUIHelper.getSize(feature.getFeature()).width + FEATURE_SPACE_X;
 				//add the features children
-				for (Feature child : feature.getChildren())
+				for (LayoutableFeature child : feature.getChildren())
 					list.add(child);
 			}
 			yoffset += FEATURE_SPACE_Y;

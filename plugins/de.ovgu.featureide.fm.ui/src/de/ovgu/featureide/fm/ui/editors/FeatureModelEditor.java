@@ -133,17 +133,20 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		super.setInput(input);
 
 		featureModel = new FeatureModel();
+
 		featureModelReader = new XmlFeatureModelReader(featureModel);
 		featureModelWriter = new XmlFeatureModelWriter(featureModel);
 
 		originalFeatureModel = new FeatureModel();
-
+		
 		try {
 			new XmlFeatureModelReader(originalFeatureModel).readFromFile(file);
 			new XmlFeatureModelReader(featureModel).readFromFile(file);
 		} catch (Exception e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
+		FeatureUIHelper.showHiddenFeatures(originalFeatureModel.showHiddenFeatures());
+		FeatureUIHelper.setVerticalLayoutBounds(originalFeatureModel.verticalLayout());
 		getExtensions();
 	}
 

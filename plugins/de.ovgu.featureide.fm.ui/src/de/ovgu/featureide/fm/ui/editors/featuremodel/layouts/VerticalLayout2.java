@@ -22,7 +22,6 @@ import java.util.LinkedList;
 
 import org.eclipse.draw2d.geometry.Point;
 
-import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 
@@ -43,25 +42,23 @@ public class VerticalLayout2 extends FeatureDiagramLayoutManager {
 	@Override
 	public void layoutFeatureModel(FeatureModel featureModel) {
 		this.xoffset = 0;
-		layout(featureModel.getRoot());
+		LayoutableFeature root = new LayoutableFeature(featureModel.getRoot(), showHidden);
+		layout(root);
 		centerLayoutX(featureModel);
 		layout(yoffset, featureModel.getConstraints());
-		layoutHidden(featureModel);
 	}
 	
-	private void layout(Feature feature) {
+	private void layout(LayoutableFeature feature) {
 		if (feature == null)
 			return;
-		LinkedList<Feature> featureList = new LinkedList<Feature>();
-		if(!isHidden(feature))
+		LinkedList<LayoutableFeature> featureList = new LinkedList<LayoutableFeature>();
 			featureList.add(feature);
 
 		this.xoffset += LAYOUT_MARGIN_Y/4;
 		while (!featureList.isEmpty()) {
 			int height = 2 * LAYOUT_MARGIN_X - FEATURE_SPACE_X;
-			for (Feature feat : featureList){
-				if(!isHidden(feat))
-					height += FeatureUIHelper.getSize(feat).height + FEATURE_SPACE_X;
+			for (LayoutableFeature feat : featureList){
+				height += FeatureUIHelper.getSize(feat.getFeature()).height + FEATURE_SPACE_X;
 			}
 			this.yoffset = controlHeight / 2 - height / 2;
 					
@@ -69,12 +66,12 @@ public class VerticalLayout2 extends FeatureDiagramLayoutManager {
 
 			int levelSize = featureList.size();
 			for (int i = 0; i < levelSize; i++) {
-				Feature feat = featureList.removeFirst();
-					if(FeatureUIHelper.getSize(feat).width > maxFeatWidth){
-						maxFeatWidth = FeatureUIHelper.getSize(feat).width;
+				LayoutableFeature feat = featureList.removeFirst();
+					if(FeatureUIHelper.getSize(feat.getFeature()).width > maxFeatWidth){
+						maxFeatWidth = FeatureUIHelper.getSize(feat.getFeature()).width;
 					}
-					FeatureUIHelper.setLocation(feat,new Point(this.xoffset, this.yoffset));
-					this.yoffset += FeatureUIHelper.getSize(feat).height + FEATURE_SPACE_X;
+					FeatureUIHelper.setLocation(feat.getFeature(),new Point(this.xoffset, this.yoffset));
+					this.yoffset += FeatureUIHelper.getSize(feat.getFeature()).height + FEATURE_SPACE_X;
 					if(i < (levelSize/2)){
 						this.xoffset +=  10;
 					} else if( i == (levelSize/2)){
@@ -83,9 +80,8 @@ public class VerticalLayout2 extends FeatureDiagramLayoutManager {
 						this.xoffset -= 10;
 					}
 				
-				for (Feature child : feat.getChildren()){
-					if(!isHidden(child))
-						featureList.add(child);
+				for (LayoutableFeature child : feat.getChildren()){
+					featureList.add(child);
 				}
 			}
 			this.xoffset = this.yAcc;

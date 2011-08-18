@@ -18,8 +18,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 
-import org.eclipse.draw2d.geometry.Point;
-
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -35,11 +33,7 @@ public class ManualLayout extends FeatureDiagramLayoutManager {
 	
 	public void layoutFeatureModel(FeatureModel featureModel) {
 		for(Feature feature : featureModel.getFeatures()){
-			FeatureUIHelper.setLocation(feature, feature.getLocation());
-			if(!showHidden && isHidden(feature)){
-				FeatureUIHelper.setTemporaryLocation(feature, new Point(0,0));
-			}
-				
+			FeatureUIHelper.setLocation(feature, feature.getLocation());	
 		}
 		for(Constraint constraint : featureModel.getConstraints()){
 			FeatureUIHelper.setLocation(constraint, constraint.getLocation());

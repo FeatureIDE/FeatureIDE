@@ -18,39 +18,55 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
+import java.util.LinkedList;
+
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.IUndoContext;
+import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ManualLayoutSelectionOperation;
+import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AutoLayoutConstraintOperation;
 
-public class ManualLayoutSelectionAction extends Action {
-	
+
+/**
+ * 
+ * @author David Halm
+ * @author Patrick Sulkowski
+ */
+public class AutoLayoutConstraintAction extends Action {
+
 	private final FeatureModel featureModel;
-
-	public ManualLayoutSelectionAction(GraphicalViewerImpl viewer,
-			FeatureModel featureModel) {
-		super("Manual Layout");
-		this.featureModel = featureModel;
+	private int counter = 0;
+	private LinkedList <LinkedList<Point>> oldPos = new LinkedList <LinkedList<Point>> ();
+	
+	public AutoLayoutConstraintAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
+		super("Auto Layout Constraints");
+		this.featureModel = featureModel;	
 	}
 
 	@Override
 	public void run() {
-		setChecked(featureModel.hasFeaturesAutoLayout());
-		
-		ManualLayoutSelectionOperation op = new ManualLayoutSelectionOperation(
-						featureModel);
+		LinkedList <Point> newList = new LinkedList<Point> ();
+		for(int i=0;i<featureModel.getConstraintCount();i++){			
+			newList.add(FeatureUIHelper.getLocation(featureModel.getConstraints().get(i)).getCopy());
+		}		
+		counter = oldPos.size();
+		oldPos.add(newList);
+		AutoLayoutConstraintOperation op = new AutoLayoutConstraintOperation(featureModel, oldPos, counter);
 		op.addContext((IUndoContext) featureModel.getUndoContext());
+
 		try {
 			PlatformUI.getWorkbench().getOperationSupport()
-				.getOperationHistory().execute(op, null, null);
+					.getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {
-					FMUIPlugin.getDefault().logError(e);
+			FMUIPlugin.getDefault().logError(e);
+
 		}
 	}
-	
+
 }

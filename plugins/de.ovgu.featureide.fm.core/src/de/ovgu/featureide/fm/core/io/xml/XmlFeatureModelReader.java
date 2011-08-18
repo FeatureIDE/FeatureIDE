@@ -124,6 +124,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 			ruleTemp.add(new LinkedList<Node>());
 			Point constraintLocation = null;
 			featureModel.showHiddenFeatures(true);
+			featureModel.verticalLayout(false);
 			while (eventReader.hasNext()) {
 				XMLEvent event = eventReader.nextEvent();
 				if (event.isStartElement()) {
@@ -329,23 +330,20 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 								
 								if (curName == "chosenLayoutAlgorithm"){
 									try {
-										featureModel.setFeaturesAutoLayout(true);
 										featureModel.setLayout(Integer.parseInt(curValue));
 									} catch (Exception e) {
 										throw new UnsupportedModelException(e.getMessage()
 												+"is no valid Integer Value",
 												event.getLocation().getLineNumber());
 									}			
-									
-								} else if (curName == "hasManualLayout") {
-									if(curValue.equals("true")){
-										featureModel.setFeaturesAutoLayout(false);
-									}	
 								} else if (curName == "showHiddenFeatures"){
 									if(curValue.equals("false")){
 										featureModel.showHiddenFeatures(false);
 									}
-											
+								} else if (curName == "horizontalLayout"){
+									if(curValue.equals("true")){
+										featureModel.verticalLayout(true);
+									}			
 								}else{
 									throw new UnsupportedModelException("'"
 											+ curName
@@ -354,8 +352,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 								}
 							}					
 							if(!hasAttributes) {
-								featureModel.setFeaturesAutoLayout(true);
-								featureModel.setLayout(0);
+								featureModel.setLayout(1);
 							}
 						}
 						else if (currentTag.equals("struct")) {

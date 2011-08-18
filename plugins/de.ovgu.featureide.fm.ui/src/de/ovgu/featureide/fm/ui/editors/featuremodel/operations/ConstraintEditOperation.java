@@ -93,8 +93,10 @@ public class ConstraintEditOperation extends AbstractOperation {
 	public IStatus undo(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
 		featureModel.replacePropNode(index, oldPropNode);
-		FeatureDiagramLayoutHelper.initializeConstraintPosition(featureModel,
-				index);
+		//initialize constraint position in manual layout
+		if(!featureModel.hasFeaturesAutoLayout())
+			FeatureDiagramLayoutHelper.initializeConstraintPosition(featureModel,
+							index);
 		featureModel.handleModelDataChanged();
 		return Status.OK_STATUS;
 	}
