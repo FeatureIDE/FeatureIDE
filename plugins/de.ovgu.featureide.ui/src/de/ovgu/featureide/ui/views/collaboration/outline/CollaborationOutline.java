@@ -286,15 +286,16 @@ public class CollaborationOutline extends ViewPart {
 		viewer.setAutoExpandLevel(2);
 		addToolbar(getViewSite().getActionBars().getToolBarManager());
 
-		getSite().getPage().getActiveEditor()
-				.addPropertyListener(new IPropertyListener() {
-
-					@Override
-					public void propertyChanged(Object source, int propId) {
-						update(iFile);
-					}
-
-				});
+		if (getSite().getPage().getActiveEditor() != null) {
+			getSite().getPage().getActiveEditor()
+					.addPropertyListener(new IPropertyListener() {
+						@Override
+						public void propertyChanged(Object source, int propId) {
+							update(iFile);
+						}
+	
+					});
+		}
 
 		viewer.addDoubleClickListener(dblClicklistener);
 		viewer.addTreeListener(treeListener);
