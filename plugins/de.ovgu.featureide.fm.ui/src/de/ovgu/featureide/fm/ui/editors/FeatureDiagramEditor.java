@@ -387,11 +387,9 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		}
 		
 		Point size = getControl().getSize();
-		
+
 		layoutManager.setControlSize(size.x, size.y);
 		layoutManager.layout(featureModel);
-		
-		
 		
 
 				

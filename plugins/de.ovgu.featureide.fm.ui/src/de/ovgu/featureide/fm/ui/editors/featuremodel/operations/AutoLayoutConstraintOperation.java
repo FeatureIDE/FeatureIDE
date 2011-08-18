@@ -73,10 +73,12 @@ public class AutoLayoutConstraintOperation extends AbstractOperation {
 	public IStatus redo(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
 		List <Constraint> constraintList = featureModel.getConstraints();
+		int minX = Integer.MAX_VALUE;
+		int maxX = 0;
 		if(!constraintList.isEmpty()){
 			Point newPos =new Point();
 			int y = 0;
-			
+		
 			LinkedList<Feature> featureList = new LinkedList<Feature>();
 			featureList.addAll(featureModel.getFeatures());
 			
@@ -84,14 +86,21 @@ public class AutoLayoutConstraintOperation extends AbstractOperation {
 				if(y<FeatureUIHelper.getLocation(featureList.get(i)).y){
 					y=FeatureUIHelper.getLocation(featureList.get(i)).y;
 				}
+				if(minX>FeatureUIHelper.getLocation(featureList.get(i)).x){
+					minX=FeatureUIHelper.getLocation(featureList.get(i)).x;
+				}
+				if(maxX<FeatureUIHelper.getLocation(featureList.get(i)).x){
+					maxX=FeatureUIHelper.getLocation(featureList.get(i)).x +
+							FeatureUIHelper.getSize(featureList.get(i)).width;
+				}
 			}
-			newPos.x=FeatureUIHelper.getLocation(featureModel.getRoot()).x;
+			newPos.x=(minX+maxX)/2 - FeatureUIHelper.getSize(constraintList.get(0)).width/2;
 			newPos.y=y+GUIDefaults.CONSTRAINT_SPACE_Y;
 			FeatureUIHelper.setLocation(constraintList.get(0), newPos);
 		}
 		for(int i=1;i<constraintList.size();i++){
 			Point newPos =new Point();
-			newPos.x=FeatureUIHelper.getLocation(constraintList.get(i-1)).x;
+			newPos.x=(minX+maxX)/2 - FeatureUIHelper.getSize(constraintList.get(i)).width/2;
 			newPos.y=FeatureUIHelper.getLocation(constraintList.get(i-1)).y+GUIDefaults.CONSTRAINT_SPACE_Y;
 			FeatureUIHelper.setLocation(constraintList.get(i), newPos);
 		}

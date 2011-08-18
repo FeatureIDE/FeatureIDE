@@ -186,6 +186,17 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements
 		String prop = event.getPropertyName();
 		if (prop.equals(LOCATION_CHANGED)) {
 			getFeatureFigure().setLocation((Point) event.getNewValue());
+			for (FeatureConnection connection : getFeatureModel()
+					.getTargetConnections()) {
+				Map<?, ?> registry = getViewer().getEditPartRegistry();
+				ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry
+						.get(connection);
+				if (connectionEditPart != null) {
+					connectionEditPart.refreshSourceDecoration();
+					connectionEditPart.refreshTargetDecoration();
+					connectionEditPart.refreshToolTip();
+				}
+			}
 		} else if (prop.equals(CHILDREN_CHANGED)) {
 			getFeatureFigure().setProperties();			
 			for (FeatureConnection connection : getFeatureModel()

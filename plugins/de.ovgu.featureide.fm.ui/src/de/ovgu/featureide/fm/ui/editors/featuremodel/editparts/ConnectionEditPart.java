@@ -179,8 +179,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 					targetDecoration = new RelationDecoration(target.isMultiple(),
 							target.getLastChild(), target.getChildren());
 			}
-
-
+		
 		PolylineConnection connection = (PolylineConnection) getConnectionFigure();
 		connection.setTargetDecoration(targetDecoration);
 	}

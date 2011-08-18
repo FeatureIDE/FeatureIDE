@@ -84,6 +84,7 @@ public class FeatureSetHiddenOperation extends AbstractOperation {
 			throws ExecutionException {
 		feature.setHidden(!feature.isHidden());
 		featureModel.handleModelDataChanged();
+		featureModel.redrawDiagram();
 		return Status.OK_STATUS;
 	}
 
