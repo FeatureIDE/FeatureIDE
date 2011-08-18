@@ -136,7 +136,7 @@ public class CollaborationOutlineTreeContentProvider implements
 			for (Role role : ((Class) parentElement).getRoles()) {
 				for (FSTMethod m : role.methods) {
 					if (!methods.containsKey(m.getName())) {
-						methods.put(m.getName(), m);
+						methods.put(m.getName(), m.copy());
 					} else {
 						methods.get(m.getName()).setOwn(m.getOwnFile());
 					}
@@ -153,7 +153,7 @@ public class CollaborationOutlineTreeContentProvider implements
 			for (Role role : ((Class) parentElement).getRoles()) {
 				for (FSTField f : role.fields) {
 					if (!fields.containsKey(f.getName())) {
-						fields.put(f.getName(), f);
+							fields.put(f.getName(), f.copy());
 					} else {
 						fields.get(f.getName()).setOwn(f.getOwnFile());
 					}

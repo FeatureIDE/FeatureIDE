@@ -73,6 +73,7 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 
 		layout.addShowViewShortcut(FeatureModelEditView.ID);
 		layout.addShowViewShortcut(CollaborationView.ID);
+		layout.addShowViewShortcut(CollaborationOutline.ID);
 		layout.addShowViewShortcut(IPageLayout.ID_RES_NAV);
 		layout.addShowViewShortcut(IPageLayout.ID_OUTLINE);
 		layout.addShowViewShortcut(IPageLayout.ID_TASK_LIST);		

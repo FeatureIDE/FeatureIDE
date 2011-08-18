@@ -183,4 +183,31 @@ public class FSTMethod extends FSTModelElement implements Comparable<Object> {
 	public String getBody() {
 		return body;
 	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		if (body != null) {
+			return body;
+		} else {
+			return getName();
+		}
+	}
+
+	public FSTMethod copy() {
+		FSTMethod m = new FSTMethod(methodName, parameterTypes, returnType, modifiers, body, beginLine, endLine);
+		for (IFile file : ownFiles) {
+			m.setOwn(file);
+		}
+		for (IFile file : availableFiles) {
+			m.setAvailable(file);
+		}
+		for (IFile key : lineNumbers.keySet()) {
+			m.setLineNumber(key, lineNumbers.get(key));
+		}
+		m.setLine(composedLine);
+		return m;
+	}
 }

@@ -169,4 +169,19 @@ public class FSTField extends FSTModelElement implements Comparable<Object> {
 	public String getBody() {
 		return body;
 	}
+
+	public FSTField copy() {
+		FSTField f = new FSTField(fieldName, typeName, dimension, modifiers, body, beginLine, endLine);
+		for (IFile file : ownFiles) {
+			f.setOwn(file);
+		}
+		for (IFile file : availableFiles) {
+			f.setAvailable(file);
+		}
+		for (IFile key : lineNumbers.keySet()) {
+			f.setLineNumber(key, lineNumbers.get(key));
+		}
+		f.setComposedLine(composedLine);
+		return f;
+	}
 }

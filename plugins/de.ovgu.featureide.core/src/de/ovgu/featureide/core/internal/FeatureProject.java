@@ -715,14 +715,17 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	 * @param featureModel
 	 * @param folder
 	 *            the folder
-	 * @throws CoreException
 	 */
 	private void setFeatureModuleMarker(final FeatureModel featureModel,
-			IFolder folder) throws CoreException {
+			IFolder folder) {
 
 		Feature feature = featureModel.getFeature(folder.getName());
 
-		folder.deleteMarkers(FEATURE_MODULE_MARKER, true, IResource.DEPTH_ZERO);
+		try {
+			folder.deleteMarkers(FEATURE_MODULE_MARKER, true, IResource.DEPTH_ZERO);
+		} catch (CoreException e) {
+			CorePlugin.getDefault().logError(e);
+		}
 
 		String message = null;
 		int severity = IMarker.SEVERITY_WARNING;
@@ -730,19 +733,27 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			severity = IMarker.SEVERITY_ERROR;
 			message = "The feature module \"" + folder.getName() + "\" has no corresponding feature at the feature model.";
 		} else {
-			if (feature.isConcrete() && folder.members().length == 0) {
-				message = "The feature module is empty.";
-				message += "You either should implement it, mark the feature as abstract, or remove the feature from the feature model.";
-			} else if (feature.isAbstract() && folder.members().length > 0) {
-				message = "This feature module is ignored as \"" + feature.getName() + "\" is marked as abstract.";
+			try {
+				if (feature.isConcrete() && folder.members().length == 0) {
+					message = "The feature module is empty.";
+					message += "You either should implement it, mark the feature as abstract, or remove the feature from the feature model.";
+				} else if (feature.isAbstract() && folder.members().length > 0) {
+					message = "This feature module is ignored as \"" + feature.getName() + "\" is marked as abstract.";
+				}
+			} catch (CoreException e) {
+				CorePlugin.getDefault().logError(e);
 			}
 		}
 		if (message != null) {
-			if (folder.findMarkers(FEATURE_MODULE_MARKER, false,
+			try {
+				if (folder.findMarkers(FEATURE_MODULE_MARKER, false,
 					IResource.DEPTH_ZERO).length == 0 && folder.exists()) {
-				IMarker marker = folder.createMarker(FEATURE_MODULE_MARKER);
-				marker.setAttribute(IMarker.MESSAGE, message);
-				marker.setAttribute(IMarker.SEVERITY, severity);
+					IMarker marker = folder.createMarker(FEATURE_MODULE_MARKER);
+					marker.setAttribute(IMarker.MESSAGE, message);
+					marker.setAttribute(IMarker.SEVERITY, severity);
+				}
+			} catch (CoreException e) {
+			
 			}
 		}
 	}

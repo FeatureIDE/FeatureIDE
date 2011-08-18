@@ -58,6 +58,8 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	private FSTGenComposer composer;
 
 	public FeatureHouseModelBuilder fhModelBuilder;
+	
+	private ErrorPropagation errorPropagation = new ErrorPropagation();
 
 	private IParseErrorListener listener = new IParseErrorListener() {
 
@@ -322,8 +324,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			if (!file.getWorkspace().isTreeLocked()) {
 				file.refreshLocal(IResource.DEPTH_ZERO, null);
 			}
-			//TODO @Jens linearize ErrorPropagation
-			new ErrorPropagation(file);
+			errorPropagation.addFile(file);
 		} catch (CoreException e) {
 			FeatureHouseCorePlugin.getDefault().logError(e);
 		}

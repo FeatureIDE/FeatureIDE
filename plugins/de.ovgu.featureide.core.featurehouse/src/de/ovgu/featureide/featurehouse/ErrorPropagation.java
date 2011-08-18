@@ -19,6 +19,7 @@
 package de.ovgu.featureide.featurehouse;
 
 import java.io.FileNotFoundException;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.TreeMap;
@@ -47,35 +48,88 @@ import de.ovgu.featureide.core.fstmodel.FSTModel;
  */
 public class ErrorPropagation {
 	
-	public ErrorPropagation(final IFile file) {
-		if (!file.getFileExtension().equals("java")) {
-			// TODO implement error propagation for all supported languages
+	private HashSet<IFile> files = new HashSet<IFile>();
+	
+	// Java 1.4 exclusions
+	private static final String RAW_TYPE = "raw type";
+	private static final String GENERIC_TYPE = "generic type";
+	private static final String TYPE_SAFETY = "Type safety";
+	
+	private Job job = null;
+	
+	public ErrorPropagation() {
+		
+	}
+	
+
+	public void addFile(IFile file) {
+		//TODO implement error propagation for all FeatureHouse languages
+		if (file.getFileExtension() == null || !file.getFileExtension().equals("java")) {
 			return;
 		}
-		try {
-			final IMarker[] markers = file.findMarkers(null, true, IResource.DEPTH_ZERO);
-			if (markers.length == 0) {
-				return;
-			}
-			Job job = new Job("Propagate problem markers") {
+		if (!files.contains(file)) {
+			files.add(file);
+		}
+		if (job == null) {
+			job = new Job("Propagate problem markers") {
 				@Override
 				public IStatus run(IProgressMonitor monitor) {
-					propagateMarkers(markers, file);
+					propagateMarkers();
 					return Status.OK_STATUS;
 				}
 			};
 			job.setPriority(Job.DECORATE);
 			job.schedule();
+		}
+		
+		if (job.getState() == Job.NONE) {
+			job.schedule();
+		}
+	}
+
+	protected void propagateMarkers() {
+		if (files.isEmpty()) {
+			return;
+		}
+		
+		for (IFile file : files) {
+			files.remove(file);
+			propagateMarkers(file);
+			break;
+		}
+		propagateMarkers();
+	}
+
+	/**
+	 * @param file
+	 */
+	private void propagateMarkers(IFile file) {
+		try {
+			IMarker[] markers = file.findMarkers(null, true, IResource.DEPTH_INFINITE);
+			if (markers.length != 0) {
+				LinkedList<IMarker> marker = new LinkedList<IMarker>();
+				for (IMarker m : markers) {
+					String message = m.getAttribute(IMarker.MESSAGE, null);
+					if (message == null ||message.contains(RAW_TYPE) || 
+							message.contains(TYPE_SAFETY) || message.contains(GENERIC_TYPE)) {
+						m.delete();
+					}
+					marker.add(m);
+				}
+				if (!marker.isEmpty()) {
+					propagateMarkers(marker, file);
+				}
+			}
 		} catch (CoreException e) {
 			FeatureHouseCorePlugin.getDefault().logError(e);
 		}
 	}
-	
+
 	/**
 	 * Propagates all markers of the given file
 	 */
-	private void propagateMarkers(IMarker[] markers, IFile file) {
-		if (!file.exists() || markers.length == 0) {
+	private void propagateMarkers(LinkedList<IMarker> markers, IFile file) {
+		if (!file.exists()) {
 			return;
 		}
 		String content = getFileContent(file);
@@ -107,9 +161,13 @@ public class ErrorPropagation {
 			if (!marker.exists()) {
 				continue;
 			}
-			boolean propagated = false;
-			int markerLine = marker.getAttribute(IMarker.LINE_NUMBER, -1);
 			
+			int markerLine = marker.getAttribute(IMarker.LINE_NUMBER, -1);
+			if (markerLine == -1) {
+				continue;
+			}
+			
+			boolean propagated = false;
 			for (FSTField f : fields) {
 				if (markerLine >= f.getComposedLine()
 						&& markerLine <= f.getComposedLine()
@@ -171,7 +229,6 @@ public class ErrorPropagation {
 	}
 
 	/**
-	 * TODO @Jens still duplicate markers
 	 * @param message
 	 * @param line
 	 * @param file
