@@ -81,18 +81,18 @@ public class VerticalLayout extends FeatureDiagramLayoutManager{
 		}
 		if(levelList.size()-1 >= level){
 			levelList.get(level).add(feature.getFeature());
-			if(maxFeatureWidthOnLevel.get(level) < FeatureUIHelper.getSize(feature.getFeature()).width()){
-				maxFeatureWidthOnLevel.set(level, FeatureUIHelper.getSize(feature.getFeature()).width());
+			if(maxFeatureWidthOnLevel.get(level) < FeatureUIHelper.getSize(feature.getFeature()).width){
+				maxFeatureWidthOnLevel.set(level, FeatureUIHelper.getSize(feature.getFeature()).width);
 			}
 		} else {
 			LinkedList<Feature> subLevelList = new LinkedList<Feature>();
 			subLevelList.add(feature.getFeature());
 			levelList.add(subLevelList);
-			maxFeatureWidthOnLevel.add(FeatureUIHelper.getSize(feature.getFeature()).width());
+			maxFeatureWidthOnLevel.add(FeatureUIHelper.getSize(feature.getFeature()).width);
 		}
 		if(!feature.hasChildren()){
 			positionsY.add(height);
-			height += FeatureUIHelper.getSize(feature.getFeature()).getCopy().height()+FEATURE_SPACE_X;
+			height += FeatureUIHelper.getSize(feature.getFeature()).getCopy().height+FEATURE_SPACE_X;
 		}
 		for(LayoutableFeature next : feature.getChildren()){
 			createLevelList(next,level+1);
@@ -117,8 +117,8 @@ public class VerticalLayout extends FeatureDiagramLayoutManager{
 			FeatureUIHelper.setLocation(feature.getFeature(), new Point (positionsX.get(level),
 					positionsY.get(childlessNum)));
 			childlessNum++;
-			yOffset = FeatureUIHelper.getLocation(feature.getFeature()).getCopy().y()
-					+ FeatureUIHelper.getSize(feature.getFeature()).getCopy().height()
+			yOffset = FeatureUIHelper.getLocation(feature.getFeature()).getCopy().y
+					+ FeatureUIHelper.getSize(feature.getFeature()).getCopy().height
 					+ FEATURE_SPACE_X;
 		}
 		
@@ -129,8 +129,8 @@ public class VerticalLayout extends FeatureDiagramLayoutManager{
 			LayoutableFeature feature = new LayoutableFeature(levelList.get(level).get(i), showHidden);
 			
 			if(feature.hasChildren()){				
-				int yPos = (FeatureUIHelper.getLocation(feature.getFirstChild().getFeature()).y()
-						+ FeatureUIHelper.getLocation(feature.getLastChild().getFeature()).y()) / 2;
+				int yPos = (FeatureUIHelper.getLocation(feature.getFirstChild().getFeature()).y
+						+ FeatureUIHelper.getLocation(feature.getLastChild().getFeature()).y) / 2;
 				FeatureUIHelper.setLocation(feature.getFeature(), new Point (positionsX.get(level),yPos));
 			}
 			

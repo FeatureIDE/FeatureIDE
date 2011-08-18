@@ -99,8 +99,8 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
         	rule = doc.createElement("rule");
         	if(!featureModel.hasFeaturesAutoLayout()){
         		   rule.setAttribute("coordinates", 
-                   		""+featureModel.getConstraints().get(i).getLocation().x()+"," 
-                   		+" "+featureModel.getConstraints().get(i).getLocation().y());
+                   		""+featureModel.getConstraints().get(i).getLocation().x+"," 
+                   		+" "+featureModel.getConstraints().get(i).getLocation().y);
         	}
          
            
@@ -155,8 +155,8 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
         	if(feat.isMandatory())	fnod.setAttribute("mandatory", "true");
         	if(feat.isAbstract())	fnod.setAttribute("abstract", "true");
         	if(!featureModel.hasFeaturesAutoLayout()){
-            	fnod.setAttribute("coordinates", feat.getLocation().x()
-        				+", "+feat.getLocation().y());
+            	fnod.setAttribute("coordinates", feat.getLocation().x
+        				+", "+feat.getLocation().y);
         	}
         	node.appendChild(fnod);
     	}
@@ -175,8 +175,8 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
 		    if(feat.isAbstract())	fnod.setAttribute("abstract", "true");
 		    if(feat.isHidden())		fnod.setAttribute("hidden", "true");
         	if(!featureModel.hasFeaturesAutoLayout()) 
-        		fnod.setAttribute("coordinates", +feat.getLocation().x()
-        				+", "+feat.getLocation().y());
+        		fnod.setAttribute("coordinates", +feat.getLocation().x
+        				+", "+feat.getLocation().y);
 	    	node.appendChild(fnod);
 	    	
 	    	Iterator<Feature> i = children.iterator();

@@ -82,17 +82,17 @@ public class FeatureDiagramLayoutHelper {
 		Point initPos = new Point(0,0);
 		int xAcc = 0;
 		for (Feature feature : selectedFeatures){	
-			if(initPos.y() < FeatureUIHelper.getLocation(feature).y()){
-				initPos.y = FeatureUIHelper.getLocation(feature).y();
+			if(initPos.y < FeatureUIHelper.getLocation(feature).y){
+				initPos.y = FeatureUIHelper.getLocation(feature).y;
 			}
-			xAcc += FeatureUIHelper.getLocation(feature).x();
+			xAcc += FeatureUIHelper.getLocation(feature).x;
 		}
 		initPos.x = (xAcc/selectedFeatures.size());
 		if(newCompound.isRoot()){
-			initPos.y = (initPos.y() - GUIDefaults.FEATURE_SPACE_Y);
+			initPos.y = (initPos.y - GUIDefaults.FEATURE_SPACE_Y);
 		} else {
-			initPos.y = (initPos.y() + FeatureUIHelper.getLocation(newCompound.getParent()).y()) / 2;
-			initPos.x = (initPos.x() + FeatureUIHelper.getLocation(newCompound.getParent()).x()) / 2;
+			initPos.y = (initPos.y + FeatureUIHelper.getLocation(newCompound.getParent()).y) / 2;
+			initPos.x = (initPos.x + FeatureUIHelper.getLocation(newCompound.getParent()).x) / 2;
 		}
 		FeatureUIHelper.setLocation(newCompound, initPos);
 		
@@ -104,9 +104,9 @@ public class FeatureDiagramLayoutHelper {
 			Point initPos = FeatureUIHelper.getLocation(newLayer.getParent()).getCopy();
 			if (feature.getChildrenCount()>1) {
 				Feature lastChild = feature.getChildren().get(feature.getChildIndex(newLayer)-1);
-				initPos.x = FeatureUIHelper.getLocation(lastChild).x()
-						+FeatureUIHelper.getSize(lastChild).width() + GUIDefaults.FEATURE_SPACE_X;
-				initPos.y = FeatureUIHelper.getLocation(lastChild).y();
+				initPos.x = FeatureUIHelper.getLocation(lastChild).x
+						+FeatureUIHelper.getSize(lastChild).width + GUIDefaults.FEATURE_SPACE_X;
+				initPos.y = FeatureUIHelper.getLocation(lastChild).y;
 			} else {
 				initPos.y += GUIDefaults.FEATURE_SPACE_Y;
 			}
@@ -115,11 +115,11 @@ public class FeatureDiagramLayoutHelper {
 			Point initPos = FeatureUIHelper.getLocation(newLayer.getParent()).getCopy();
 			if (feature.getChildrenCount()>1) {
 				Feature lastChild = feature.getChildren().get(feature.getChildIndex(newLayer)-1);
-				initPos.y = FeatureUIHelper.getLocation(lastChild).y()
-						+FeatureUIHelper.getSize(lastChild).height() + GUIDefaults.FEATURE_SPACE_X;
-				initPos.x = FeatureUIHelper.getLocation(lastChild).x();
+				initPos.y = FeatureUIHelper.getLocation(lastChild).y
+						+FeatureUIHelper.getSize(lastChild).height + GUIDefaults.FEATURE_SPACE_X;
+				initPos.x = FeatureUIHelper.getLocation(lastChild).x;
 			} else {
-				initPos.x += FeatureUIHelper.getSize(newLayer.getParent()).width() 
+				initPos.x += FeatureUIHelper.getSize(newLayer.getParent()).width 
 						+ GUIDefaults.FEATURE_SPACE_Y;
 			}
 			FeatureUIHelper.setLocation(newLayer, initPos);

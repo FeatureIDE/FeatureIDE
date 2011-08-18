@@ -61,7 +61,7 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 	public void setLocation(Point p) {
 		if(FeatureUIHelper.hasVerticalLayout() && !(this instanceof LegendRelationDecoration)){
 			super.setLocation(p.translate(-getTargetAnchorDiameter()/2, 
-					- FeatureUIHelper.getSize(lastChild.getParent()).height()/2));
+					- FeatureUIHelper.getSize(lastChild.getParent()).height/2));
 		}
 		else{
 			if(this instanceof LegendRelationDecoration){

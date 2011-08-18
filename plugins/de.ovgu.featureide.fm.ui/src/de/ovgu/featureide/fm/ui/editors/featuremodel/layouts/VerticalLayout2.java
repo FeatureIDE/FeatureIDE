@@ -70,8 +70,8 @@ public class VerticalLayout2 extends FeatureDiagramLayoutManager {
 			int levelSize = featureList.size();
 			for (int i = 0; i < levelSize; i++) {
 				Feature feat = featureList.removeFirst();
-					if(FeatureUIHelper.getSize(feat).width() > maxFeatWidth){
-						maxFeatWidth = FeatureUIHelper.getSize(feat).width();
+					if(FeatureUIHelper.getSize(feat).width > maxFeatWidth){
+						maxFeatWidth = FeatureUIHelper.getSize(feat).width;
 					}
 					FeatureUIHelper.setLocation(feat,new Point(this.xoffset, this.yoffset));
 					this.yoffset += FeatureUIHelper.getSize(feat).height + FEATURE_SPACE_X;
