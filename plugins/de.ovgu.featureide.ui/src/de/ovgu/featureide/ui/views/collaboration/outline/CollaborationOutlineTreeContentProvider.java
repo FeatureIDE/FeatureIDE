@@ -247,7 +247,7 @@ public class CollaborationOutlineTreeContentProvider implements
 	public boolean hasChildren(Object element) {
 		if (element instanceof Class) {
 			for (Role role :((Class) element).getRoles()) {
-				if (role.methods.size() > 0) {
+				if (role.methods.size() > 0 || role.fields.size() > 0) {
 					return true;
 				}
 			}
