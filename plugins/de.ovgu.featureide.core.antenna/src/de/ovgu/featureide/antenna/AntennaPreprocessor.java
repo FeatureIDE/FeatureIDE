@@ -203,7 +203,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	 * @param lines all lines of file
 	 * @param res file
 	 */
-	private void processLinesOfFile(Vector<String> lines, IFile res){
+	synchronized private void processLinesOfFile(Vector<String> lines, IFile res){
 		expressionStack = new Stack<Node>();
 		
 		// count of if, ifelse and else to remove after processing of else from stack

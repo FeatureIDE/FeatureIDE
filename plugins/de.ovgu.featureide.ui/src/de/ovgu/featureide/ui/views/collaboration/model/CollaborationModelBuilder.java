@@ -369,6 +369,9 @@ public class CollaborationModelBuilder {
 		else 
 			iFile = configuration;
 		
+		if (iFile == null)
+			return null;
+		
 		File file = iFile.getRawLocation().toFile();
 		ArrayList<String> configurationFeatures = readFeaturesfromConfigurationFile(file);
 		if (configurationFeatures == null)
