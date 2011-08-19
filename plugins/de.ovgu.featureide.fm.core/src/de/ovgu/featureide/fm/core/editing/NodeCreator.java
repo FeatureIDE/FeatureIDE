@@ -72,7 +72,31 @@ public class NodeCreator {
 		And and = new And(nodes);
 		and = (And) replaceAbstractVariables(and, replacingMap, false);
 		and = eliminateAbstractVariables(and, replacingMap, featureModel);
+		and = (And)replaceNames(and,featureModel);
+		
 		return and;
+	}
+
+	/**
+	 * @param and
+	 * @param featureModel
+	 * @return
+	 */
+	private static Node replaceNames(Node node, FeatureModel featureModel) {
+		if(node==null)return null;
+		if (node instanceof Literal) {
+			Literal literal = (Literal) node;
+			literal.var=featureModel.getOldName(literal.var.toString());
+		} else {
+			Node[] children = node.getChildren();
+			for (int i = 0; i < children.length; i++) {
+				children[i] = replaceNames(children[i],featureModel);
+				if (children[i] == null)
+					return null;
+			}
+		}
+		
+		return node;
 	}
 
 	public static Node replaceAbstractVariables(Node node,

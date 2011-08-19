@@ -763,21 +763,17 @@ public class ConstraintDialog {
 			printHeaderWarning(getDeadFeatureString(deadFeatures));
 			return false;
 		}
+
 		
 		List<Feature> falseOptionalFeatures = getFalseOptional(con, featureModel);
 		if (!falseOptionalFeatures.isEmpty()){
 			printHeaderWarning(getFalseOptionalString(falseOptionalFeatures));
 			return false;
 		}		
-		
-		for (Constraint constraint : featureModel.getConstraints()){
-			if (constraint.toString().equals(con)) {
-				printHeaderError("constraint already exists");
-				return false;
-			}
-		}
+
 		
 		printHeaderText(headerText);
+
 
 		return true;
 	}
