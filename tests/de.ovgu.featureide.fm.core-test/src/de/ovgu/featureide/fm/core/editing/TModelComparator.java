@@ -90,7 +90,6 @@ public class TModelComparator {
 				"S : A | B;",
 				"S : T; T : A | B;"));
 	}
-
 	/**
 	 * Refactoring: move feature
 	 */
@@ -100,7 +99,38 @@ public class TModelComparator {
 				"S : [T] C :: _S; T : [A] B :: _T;",
 				"S : [T] [B] C :: _S; T : [A] :: _T; %% T iff B;"));
 	}
+//	/**
+//	 * Refactoring: duplicate Constraint
+//	 */
+//	@Test
+//	public void testDuplicateConstraintRefactoring() throws TimeoutException, UnsupportedModelException {
+//		assertEquals(Comparison.REFACTORING, compare(
+//		"TankWar : Platform Tools* [explodieren] GUI [Record] [Soundeffekt] Language Tanks+ AI :: _TankWar ;\n\nPlatform : PC\n\u0009| Handy ;\n\nTools : Beschleunigung\n\u0009| einfrieren\n\u0009| Bombe\n\u0009| Energie\n\u0009| Feuerkraft\n\u0009| Mars ;\n\nGUI : Map [Image] :: _GUI ;\n\nMap : M_240\n\u0009| M_600\n\u0009| M_780 ;\n\nImage : [fuer_PC] [fuer_Handy] [IMG_tool] :: _Image ;\n\nRecord : Re_fuer_PC\n\u0009| Re_fuer_Handy ;\n\nSoundeffekt : Sound_fuer_pc\n\u0009| Sound_fuer_Handy ;\n\nLanguage : EN\n\u0009| DE ;\n\nTanks : USA_M1Abrams\n\u0009| Germany_Leopard\n\u0009| China_Type99 ;\n\nAI : Easy\n\u0009| Hard ;\n\n%%\n\nTools iff IMG_tool ;\nTools iff IMG_tool ;\n\n##\n\nAI { hidden } \nexplodieren { hidden } ",
+//		"TankWar : Platform Tools* [explodieren] GUI [Record] [Soundeffekt] Language Tanks+ AI :: _TankWar ;\n\nPlatform : PC\n\u0009| Handy ;\n\nTools : Beschleunigung\n\u0009| einfrieren\n\u0009| Bombe\n\u0009| Energie\n\u0009| Feuerkraft\n\u0009| Mars ;\n\nGUI : Map [Image] :: _GUI ;\n\nMap : M_240\n\u0009| M_600\n\u0009| M_780 ;\n\nImage : [fuer_PC] [fuer_Handy] [IMG_tool] :: _Image ;\n\nRecord : Re_fuer_PC\n\u0009| Re_fuer_Handy ;\n\nSoundeffekt : Sound_fuer_pc\n\u0009| Sound_fuer_Handy ;\n\nLanguage : EN\n\u0009| DE ;\n\nTanks : USA_M1Abrams\n\u0009| Germany_Leopard\n\u0009| China_Type99 ;\n\nAI : Easy\n\u0009| Hard ;\n\n%%\n\nTools iff IMG_tool ;\n\n##\n\nAI { hidden } \nexplodieren { hidden } "));
+//
+//	}
+//	
+//	/**
+//	 * Refactoring: deleting abstract feature
+//	 * 
+//	 */
+//	@Test
+//	public void testDeleteAbstractFeatureRefactoring() throws TimeoutException, UnsupportedModelException {
+//		assertEquals(Comparison.REFACTORING, compare(
+//				"TankWar : Platform Tools* [explodieren] GUI [Record] [Soundeffekt] Language Tanks+ AI :: _TankWar ;\n\nPlatform : PC\n\u0009| Handy ;\n\nTools : Beschleunigung\n\u0009| einfrieren\n\u0009| Bombe\n\u0009| Energie\n\u0009| Feuerkraft\n\u0009| Mars ;\n\nGUI : Map [Image] :: _GUI ;\n\nMap : M_240\n\u0009| M_600\n\u0009| M_780 ;\n\nImage : [fuer_PC] [fuer_Handy] [IMG_tool] :: _Image ;\n\nRecord : Re_fuer_PC\n\u0009| Re_fuer_Handy ;\n\nSoundeffekt : Sound_fuer_pc\n\u0009| Sound_fuer_Handy ;\n\nLanguage : EN\n\u0009| DE ;\n\nTanks : USA_M1Abrams\n\u0009| Germany_Leopard\n\u0009| China_Type99 ;\n\nAI : Easy\n\u0009| Hard ;\n\n##\n\nAI { hidden } \nexplodieren { hidden } \n",
+//				"TankWar : Platform Tools* [explodieren] Map [Image] [Record] [Soundeffekt] Language Tanks+ AI :: _TankWar ;\n\nPlatform : PC\n\u0009| Handy ;\n\nTools : Beschleunigung\n\u0009| einfrieren\n\u0009| Bombe\n\u0009| Energie\n\u0009| Feuerkraft\n\u0009| Mars ;\n\nMap : M_240\n\u0009| M_600\n\u0009| M_780 ;\n\nImage : [fuer_PC] [fuer_Handy] [IMG_tool] :: _Image ;\n\nRecord : Re_fuer_PC\n\u0009| Re_fuer_Handy ;\n\nSoundeffekt : Sound_fuer_pc\n\u0009| Sound_fuer_Handy ;\n\nLanguage : EN\n\u0009| DE ;\n\nTanks : USA_M1Abrams\n\u0009| Germany_Leopard\n\u0009| China_Type99 ;\n\nAI : Easy\n\u0009| Hard ;\n\n##\n\nAI { hidden } \nexplodieren { hidden } \n"));
+//	}
 
+	/**
+	 * Refactoring: adding dead feature
+	 * 
+	 */
+	@Test
+	public void testAddDeadFeatureRefactoring() throws TimeoutException, UnsupportedModelException {
+		assertEquals(Comparison.REFACTORING, compare(
+				"S : [A] :: _S ;\n\n",
+		"S : [A] [B] :: _S ;\n\n%%\n\nnot B ;\n\n"));
+	}
 	/**
 	 * Generalization: ALTERNATIVE => OR
 	 */
