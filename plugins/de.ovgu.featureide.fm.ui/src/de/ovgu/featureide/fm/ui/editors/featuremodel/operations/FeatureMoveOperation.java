@@ -94,13 +94,13 @@ public class FeatureMoveOperation extends AbstractOperation {
 				while(data.getOldParent().hasChildren()){
 					if(counter==counter2){
 						if(FeatureUIHelper.hasVerticalLayout()){
-							if(FeatureUIHelper.getLocation(featureList.get(counter)).x>newPos.x){
+							if(FeatureUIHelper.getLocation(featureList.get(counter)).y>newPos.y){
 								newFeatureList.add(data.getFeature());	
 								counter=Integer.MIN_VALUE;
 							}
 						}
 						else{
-							if(FeatureUIHelper.getLocation(featureList.get(counter)).y>newPos.y){
+							if(FeatureUIHelper.getLocation(featureList.get(counter)).x>newPos.x){
 								newFeatureList.add(data.getFeature());	
 								counter=Integer.MIN_VALUE;
 							}
