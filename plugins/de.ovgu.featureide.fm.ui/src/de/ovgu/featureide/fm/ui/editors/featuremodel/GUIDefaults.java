@@ -103,7 +103,7 @@ public interface GUIDefaults {
 	//false constraints
 	
 	public static Color WARNING_BACKGROUND = GUIBasics.createColor(1.0, 1.0, 0.6);	
-	public static Color VOID_MODEL_BACKGROUND = DEAD_BACKGROUND;	
+	public static Color ERROR_BACKGROUND = DEAD_BACKGROUND;	
 	
 	//cell editor for renaming features / editing constraints
 	

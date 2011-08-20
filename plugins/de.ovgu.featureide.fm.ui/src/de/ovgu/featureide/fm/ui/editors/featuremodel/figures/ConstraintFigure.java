@@ -93,11 +93,11 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 	// TODO Thomas: remove this method and adopt results of analysis in constraint attributes instead
 	private void setConstraintError(){
 		if (constraint.getConstraintAttribute() == ConstraintAttribute.VOID_MODEL){
-			setBackgroundColor(VOID_MODEL_BACKGROUND);
+			setBackgroundColor(ERROR_BACKGROUND);
 			setToolTip(new Label(VOID_MODEL));
 			
 		} else if (constraint.getConstraintAttribute() == ConstraintAttribute.UNSATISFIABLE) {
-			setBackgroundColor(VOID_MODEL_BACKGROUND);
+			setBackgroundColor(ERROR_BACKGROUND);
 			setToolTip(new Label(UNSATISFIABLE));
 		}
 	}
@@ -111,7 +111,7 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 		
 		// TODO Thomas: this long calculation should be done in analyzeFeatureModel()
 		if (!constraint.getDeadFeatures(constraint.getFeatureModel()).isEmpty()){
-			setBackgroundColor(VOID_MODEL_BACKGROUND);
+			setBackgroundColor(ERROR_BACKGROUND);
 			String toolTip = DEAD_FEATURE;
 			for (Literal dead : constraint.getDeadFeatures(constraint.getFeatureModel()))
 				toolTip += "\n " + dead.var.toString();
