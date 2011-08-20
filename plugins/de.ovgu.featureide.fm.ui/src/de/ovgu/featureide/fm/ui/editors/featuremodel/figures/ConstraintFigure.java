@@ -112,11 +112,9 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 		// TODO Thomas: this long calculation should be done in analyzeFeatureModel()
 		if (!constraint.getDeadFeatures(constraint.getFeatureModel()).isEmpty()){
 			setBackgroundColor(VOID_MODEL_BACKGROUND);
-			String toolTip = DEAD_FEATURE + '\n';
-			for (Literal dead : constraint.getDeadFeatures(constraint.getFeatureModel())){
-				toolTip += " " + dead.var.toString() + '\n';
-			}
-			toolTip += '\n' + " " + constraint.getNode().toString(NodeWriter.textualSymbols);
+			String toolTip = DEAD_FEATURE;
+			for (Literal dead : constraint.getDeadFeatures(constraint.getFeatureModel()))
+				toolTip += "\n " + dead.var.toString();
 			setToolTip(new Label(toolTip));	
 			return;
 		}
@@ -124,11 +122,9 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 		// TODO Thomas: this long calculation should be done in analyzeFeatureModel()
 		if (!constraint.getFalseOptional().isEmpty()){
 			setBackgroundColor(WARNING_BACKGROUND);
-			String toolTip = FALSE_OPTIONAL + '\n';
-			for (Feature feature : constraint.getFalseOptional()){
-				toolTip += " " + feature.getName() + '\n';
-			}
-			toolTip += '\n' + " " + constraint.getNode().toString(NodeWriter.textualSymbols);
+			String toolTip = FALSE_OPTIONAL;
+			for (Feature feature : constraint.getFalseOptional())
+				toolTip += "\n " + feature.getName();
 			setToolTip(new Label(toolTip));	
 			return;
 		}
