@@ -357,10 +357,10 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		if (steve != null && steve.getState() == Job.RUNNING)
 			steve.cancel();
 		
-		steve = new UIJob(" Update Feature Model "){
+		steve = new UIJob(" Analyzing feature model "){
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
-				getFeatureModel().updateFeatureModel();
+				getFeatureModel().analyzeFeatureModel();
 				getContents().refresh();
 				return Status.OK_STATUS;
 			}			

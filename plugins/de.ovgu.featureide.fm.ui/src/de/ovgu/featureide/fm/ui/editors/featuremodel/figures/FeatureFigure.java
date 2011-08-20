@@ -118,13 +118,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 	public void setProperties() {
 	
 		String toolTip = "";
-		boolean modelIsValid = true;
-		
-		try {
-			modelIsValid = featureModel.isValid();
-		} catch (TimeoutException e) {
-			e.printStackTrace();
-		}
+		boolean modelIsValid = featureModel.valid();
 		
 		label.setForegroundColor(FEATURE_FOREGROUND);
 		setBackgroundColor(CONCRETE_BACKGROUND);
@@ -151,19 +145,19 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		if (!feature.isRoot()) toolTip += FEATURE;
 		
 		if ((feature.getFeatureStatus() == FeatureStatus.DEAD) && modelIsValid){
-			label.setForegroundColor(DEAD_COLOR);
+			setBackgroundColor(DEAD_BACKGROUND);
 			setBorder(feature.isConstraintSelected() ? DEAD_SELECTED_BORDER : DEAD_BORDER);
 			toolTip += DEAD;			
 		}
 		
 		if (feature.getFeatureStatus() == FeatureStatus.FALSE_OPTIONAL){
-			label.setForegroundColor(DEAD_COLOR);
+			setBackgroundColor(DEAD_BACKGROUND);
 			setBorder(feature.isConstraintSelected() ? DEAD_SELECTED_BORDER : DEAD_BORDER);
 			toolTip += FALSE_OPTIONAL;
 		}
 		
 		if (feature.isRoot() && !modelIsValid){
-			label.setForegroundColor(DEAD_COLOR);
+			setBackgroundColor(DEAD_BACKGROUND);
 			setBorder(feature.isConstraintSelected() ? DEAD_SELECTED_BORDER : DEAD_BORDER);
 			toolTip = VOID;
 		}

@@ -134,7 +134,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 				width = 80;
 			}
 		} else if (dead) {
-			width = 134;
+			width = 150;
 		}
 		this.setSize(width, height);
 	}
@@ -239,7 +239,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private void createRowDead(int row) {
 
 		createSymbol(row, false, false, false, true);
-		Label labelDead = createLabel(row, "Dead/False optional", DEAD_COLOR);
+		Label labelDead = createLabel(row, "Dead or false optional", FEATURE_FOREGROUND);
 		add(labelDead);
 
 	}
@@ -328,6 +328,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			rect.setBorder(HIDDEN_BORDER_LEGEND);
 		} else if (dead) {
 			rect.setBorder(DEAD_BORDER);
+			rect.setBackgroundColor(DEAD_BACKGROUND);
 		}
 
 		rect.setSize(x2 - x1, y2 - y1);

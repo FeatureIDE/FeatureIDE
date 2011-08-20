@@ -26,7 +26,6 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.prop4j.Literal;
 import org.prop4j.NodeWriter;
-import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.ConstraintAttribute;
@@ -49,12 +48,12 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 	
 	private Constraint constraint;
 	
-	private String VOIDS_MODEL = " Constraint makes model void. ";
-	private String UNSATISFIABLE = " Constraint is unsatisfiable. ";
-	private String TAUTOLOGY = " Constraint is tautology. ";
-	private String KILLS_FEATURE = " Constraint makes following features dead: ";
-	private String FALSE_OPTIONAL = " Constraint makes following features false optional: ";
-	private String REDUNDANCE = " Model contains redundant constraints. ";
+	public final static String VOID_MODEL = " Constraint makes the feature model void. ";
+	public final static String UNSATISFIABLE = " Constraint is unsatisfiable and makes the feature model void. ";
+	public final static String TAUTOLOGY = " Constraint is a tautology and should be removed. ";
+	public final static String DEAD_FEATURE = " Constraint makes following features dead: ";
+	public final static String FALSE_OPTIONAL = " Constraint makes following features false optional: ";
+	public final static String REDUNDANCE = " Constraint is redundant and could be removed. ";
 	
 	public ConstraintFigure(Constraint constraint) {
 		super();
@@ -81,52 +80,39 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 	}
 	
 	public void setConstraintProperties(){
-		
 		setBorder(constraint.isFeatureSelected() ? CONSTRAINT_SELECTED_BORDER : CONSTRAINT_BORDER);
 		setBackgroundColor(CONSTRAINT_BACKGROUND);
 		setToolTip(null);
 		
-		try {
-			if (!constraint.getFeatureModel().isValid()){
-				setConstraintError();
-			} else {
-				setConstraintWarning();
-			}
-		} catch (TimeoutException e) {}		
+		if (!constraint.getFeatureModel().valid())
+			setConstraintError();
+		else
+			setConstraintWarning();
 	}
 	
+	// TODO Thomas: remove this method and adopt results of analysis in constraint attributes instead
 	private void setConstraintError(){
-		String toolTip;								
-		
 		if (constraint.getConstraintAttribute() == ConstraintAttribute.VOID_MODEL){
 			setBackgroundColor(VOID_MODEL_BACKGROUND);
-			toolTip = VOIDS_MODEL + '\n';
-			toolTip += '\n' + " " + constraint.getNode().toString(NodeWriter.textualSymbols);
-			setToolTip(new Label(toolTip));
+			setToolTip(new Label(VOID_MODEL));
 			
 		} else if (constraint.getConstraintAttribute() == ConstraintAttribute.UNSATISFIABLE) {
 			setBackgroundColor(VOID_MODEL_BACKGROUND);
-			toolTip = UNSATISFIABLE + '\n';
-			toolTip += '\n' + " " + constraint.getNode().toString(NodeWriter.textualSymbols);
-			setToolTip(new Label(toolTip));
+			setToolTip(new Label(UNSATISFIABLE));
 		}
 	}
 	
 	private void setConstraintWarning(){	
-		
-		String toolTip;
-			
 		if (constraint.getConstraintAttribute() == ConstraintAttribute.TAUTOLOGY){
 			setBackgroundColor(WARNING_BACKGROUND);
-			toolTip = TAUTOLOGY + '\n';
-			toolTip += '\n' + " " + constraint.getNode().toString(NodeWriter.textualSymbols);
-			setToolTip(new Label(toolTip));	
+			setToolTip(new Label(TAUTOLOGY));	
 			return;
 		}
 		
+		// TODO Thomas: this long calculation should be done in analyzeFeatureModel()
 		if (!constraint.getDeadFeatures(constraint.getFeatureModel()).isEmpty()){
-			setBackgroundColor(WARNING_BACKGROUND);
-			toolTip = KILLS_FEATURE + '\n';
+			setBackgroundColor(VOID_MODEL_BACKGROUND);
+			String toolTip = DEAD_FEATURE + '\n';
 			for (Literal dead : constraint.getDeadFeatures(constraint.getFeatureModel())){
 				toolTip += " " + dead.var.toString() + '\n';
 			}
@@ -135,9 +121,10 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 			return;
 		}
 		
+		// TODO Thomas: this long calculation should be done in analyzeFeatureModel()
 		if (!constraint.getFalseOptional().isEmpty()){
 			setBackgroundColor(WARNING_BACKGROUND);
-			toolTip = FALSE_OPTIONAL + '\n';
+			String toolTip = FALSE_OPTIONAL + '\n';
 			for (Feature feature : constraint.getFalseOptional()){
 				toolTip += " " + feature.getName() + '\n';
 			}
@@ -148,13 +135,9 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 		
 		if (constraint.getConstraintAttribute() == ConstraintAttribute.REDUNDANT){
 			setBackgroundColor(WARNING_BACKGROUND);
-			toolTip = REDUNDANCE + '\n';
-			toolTip += '\n' + " " + constraint.getNode().toString(NodeWriter.textualSymbols);
-			setToolTip(new Label(toolTip));	
+			setToolTip(new Label(REDUNDANCE));	
 			return;
 		}
-		
-		
 	}
 	
 	private String getConstraintText(Constraint constraint) {

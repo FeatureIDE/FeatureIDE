@@ -448,7 +448,18 @@ public class FeatureModel implements PropertyConstants {
 			listener.propertyChange(event);
 	}
 	
-	public void updateFeatureModel(){	
+	private boolean valid = true;
+
+	/**
+	 * Returns the value calculated during the last call of updateFeatureModel().
+	 * 
+	 * @return cached value
+	 */
+	public boolean valid() {
+		return valid;
+	}
+	
+	public void analyzeFeatureModel(){	
 		
 		// update features		
 		for(Feature bone : getFeatures()) {
@@ -457,67 +468,84 @@ public class FeatureModel implements PropertyConstants {
 		}
 		
 		try {
+			valid = isValid();
+		} catch (TimeoutException e) {
+			valid = true;
+			FMCorePlugin.getDefault().logError(e);
+		}
+		
+		try {
 			for(Literal deadFeature : getDeadFeatures()){
 				if (getFeature(deadFeature.var.toString()) != null)
 					getFeature(deadFeature.var.toString()).setFeatureStatus(FeatureStatus.DEAD);
 			}
-						
-			for(Feature bone : getFeatures()) {
-				SatSolver satsolver = new SatSolver(new And(NodeCreator.createNodes(this.clone()), new Not(bone.getName())), 1000);				
-				try {
-					if (!satsolver.isSatisfiable() 
-							&& !bone.isMandatory() 
-							&& !bone.isRoot()
-							&& this.isValid()) bone.setFeatureStatus(FeatureStatus.FALSE_OPTIONAL);
-				} catch (TimeoutException e) {
-					e.printStackTrace();
-				}				
-			}
-			
 		} catch (Exception e){
-			e.printStackTrace();
+			FMCorePlugin.getDefault().logError(e);
+		}		
+			
+		try {
+			if (valid) {
+				// TODO Thomas: export to new function getFalseOptionalFeature(), improve calculation effort and correct calculation (is this feature always selected given that the parent feature is selected)
+				for(Feature bone : getFeatures()) {
+					SatSolver satsolver = new SatSolver(new And(NodeCreator.createNodes(this.clone()), new Not(bone.getName())), 1000);				
+					try {
+						if (!bone.isMandatory() && !bone.isRoot()
+								&& !satsolver.isSatisfiable())
+							bone.setFeatureStatus(FeatureStatus.FALSE_OPTIONAL);
+					} catch (TimeoutException e) {
+						FMCorePlugin.getDefault().logError(e);
+					}				
+				}
+			}
+		} catch (Exception e){
+			FMCorePlugin.getDefault().logError(e);
 		}		
 		
 		// update constraints
 		for(Constraint constraint : getConstraints()){
 			constraint.setContainedFeatures(constraint.getNode());
 			constraint.setFalseOptionalFeatures();
+			constraint.setConstraintAttribute(ConstraintAttribute.NORMAL);
 			
-			ConstraintAttribute constraintStatus = ConstraintAttribute.NORMAL;
-			
-			//Redundant
-			FeatureModel dirtyModel = this.clone();
-			dirtyModel.removePropositionalNode(constraint.getNode());
-			ModelComparator comparator = new ModelComparator(20000);
-			Comparison comparison = comparator.compare(this, dirtyModel);
-			if (comparison == Comparison.REFACTORING) constraintStatus = ConstraintAttribute.REDUNDANT; 
-			
-			//Tautology
+			// tautology
 			SatSolver satsolverTAU = new SatSolver(new Not(constraint.getNode().clone()), 1000);
 			try {
-				if (!satsolverTAU.isSatisfiable()) constraintStatus = ConstraintAttribute.TAUTOLOGY;
+				if (!satsolverTAU.isSatisfiable())
+					constraint.setConstraintAttribute(ConstraintAttribute.TAUTOLOGY);
 			} catch (TimeoutException e) {
-				e.printStackTrace();
+				FMCorePlugin.getDefault().logError(e);
 			}
 			
-			//makes void Model
-			FeatureModel clonedModel = this.clone();
-			clonedModel.removePropositionalNode(constraint);
-			try {
-				if (clonedModel.isValid() ^ this.isValid()) constraintStatus = ConstraintAttribute.VOID_MODEL;
-			} catch (TimeoutException e) {
-				e.printStackTrace();
+			if (valid) {
+				// redundant constraint?
+				FeatureModel dirtyModel = this.clone();
+				dirtyModel.removePropositionalNode(constraint.getNode());
+				ModelComparator comparator = new ModelComparator(20000);
+				Comparison comparison = comparator.compare(this, dirtyModel);
+				if (comparison == Comparison.REFACTORING) 
+					constraint.setConstraintAttribute(ConstraintAttribute.REDUNDANT); 
 			}
-			
-			//Contradiction
-			SatSolver satsolverUS = new SatSolver(constraint.getNode().clone(), 1000);
-			try {
-				 if (!satsolverUS.isSatisfiable()) constraintStatus = ConstraintAttribute.UNSATISFIABLE;
-			} catch (TimeoutException e) {
-				e.printStackTrace();
+			// makes feature model void?
+			else {
+				// inconsistency?
+				FeatureModel clonedModel = this.clone();
+				clonedModel.removePropositionalNode(constraint);
+				try {
+					if (clonedModel.isValid())
+						constraint.setConstraintAttribute(ConstraintAttribute.VOID_MODEL);
+				} catch (TimeoutException e) {
+					FMCorePlugin.getDefault().logError(e);
+				}
+
+				// contradiction?
+				SatSolver satsolverUS = new SatSolver(constraint.getNode().clone(), 1000);
+				try {
+					 if (!satsolverUS.isSatisfiable())
+						 constraint.setConstraintAttribute(ConstraintAttribute.UNSATISFIABLE);
+				} catch (TimeoutException e) {
+					FMCorePlugin.getDefault().logError(e);
+				}
 			}
-			
-			constraint.setConstraintAttribute(constraintStatus);
 		}
 	}
 	
@@ -911,14 +939,11 @@ public class FeatureModel implements PropertyConstants {
 	public List<Literal> getDeadFeatures() {
 		Node root = NodeCreator.createNodes(this);
 		List<Literal> set = new ArrayList<Literal>();
-		for (Literal e : new SatSolver(root, 1000).knownValues()) {
-			if (!e.positive) {
-				
-				if (!e.var.toString().equals("False") && !e.var.toString().equals("True")) set.add(e);
-			}
-		}
+		for (Literal e : new SatSolver(root, 1000).knownValues())
+			if (!e.positive && !e.var.toString().equals("False")
+					&& !e.var.toString().equals("True"))
+				set.add(e);
 		return set;
-
 	}
 
 	/**

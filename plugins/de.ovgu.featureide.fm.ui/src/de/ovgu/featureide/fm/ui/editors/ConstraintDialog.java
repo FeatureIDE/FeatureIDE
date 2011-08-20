@@ -705,7 +705,7 @@ public class ConstraintDialog {
 			if (input.contains(feature.getName())){
 				if (feature.getFeatureStatus() != FeatureStatus.FALSE_OPTIONAL){
 					clonedModel.addPropositionalNode(propNode);
-					clonedModel.updateFeatureModel();
+					clonedModel.analyzeFeatureModel();
 					if (clonedModel.getFeature(feature.getName())
 							.getFeatureStatus() == FeatureStatus.FALSE_OPTIONAL && !list.contains(feature)) 
 								list.add(feature);

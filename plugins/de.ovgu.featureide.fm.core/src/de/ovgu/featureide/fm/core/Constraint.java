@@ -61,6 +61,7 @@ public class Constraint implements PropertyConstants {
 		return featureModel;
 	}
 	
+	// TODO Thomas: rewrite to List<Feature>
 	public List<Literal> getDeadFeatures(FeatureModel model) {
 		List<Literal> deadFeaturesBefore = null;
 		FeatureModel clonedModel = model.clone();
@@ -123,6 +124,7 @@ public class Constraint implements PropertyConstants {
 		return containedFeatureList;
 	}
 	
+	// TODO Thomas: this method looks really weird, please revise
 	public void setFalseOptionalFeatures(){
 		falseOptionalFeatures.clear();
 		
