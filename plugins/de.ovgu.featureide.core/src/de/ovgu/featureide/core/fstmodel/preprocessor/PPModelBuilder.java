@@ -20,9 +20,11 @@ package de.ovgu.featureide.core.fstmodel.preprocessor;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.Vector;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -31,6 +33,7 @@ import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.builder.preprocessor.PPComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
@@ -86,6 +89,9 @@ public class PPModelBuilder {
 				FSTClass currentClass = new FSTClass(res.getName());
 				addClass(res.getName(), res.getFullPath().toOSString());
 				model.classes.put(res.getName(), currentClass);
+				
+				Vector<String> lines = PPComposerExtensionClass.loadStringsFromFile((IFile) res);
+				
 				for (String feature : features) {
 					if (containsFeature(text, feature)) {
 						FSTFeature currentFeature = model.features.get(feature);
@@ -93,10 +99,28 @@ public class PPModelBuilder {
 						buildModelDirectives(feature, currentClass, (IFile) res);
 					}
 				}
+				
+				ArrayList<FSTDirective> list = buildModelDirectivesForFile(lines);
+				if(list != null){
+					model.directives.put(currentClass.getName(), list);
+				}
 			}
 		}
 	}
 	
+	/**
+	 * This method should be implemented by preprocessor plug-ins.
+	 * Adds directives to model.
+	 * 
+	 * @param currentClass
+	 * 			The current class.
+	 * @param res
+	 * 			The current file.
+	 */
+	protected ArrayList<FSTDirective> buildModelDirectivesForFile(Vector<String> lines) {
+		return new ArrayList<FSTDirective>();
+	}
+
 	/**
 	 * This method should be implemented by preprocessor plug-ins.
 	 * Adds directives to model.

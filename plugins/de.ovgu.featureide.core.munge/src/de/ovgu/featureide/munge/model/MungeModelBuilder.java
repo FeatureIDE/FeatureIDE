@@ -18,8 +18,15 @@
  */
 package de.ovgu.featureide.munge.model;
 
+import java.util.ArrayList;
+import java.util.Stack;
+import java.util.Vector;
+import java.util.regex.Matcher;
+
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.core.fstmodel.preprocessor.PPModelBuilder;
+import de.ovgu.featureide.munge.MungePreprocessor;
 
 /**
  * Build the FSTModel for munge projects.
@@ -35,5 +42,69 @@ public class MungeModelBuilder extends PPModelBuilder{
 	@Override
 	protected boolean containsFeature(String text, String feature) {
 		return text.contains("end[" + feature + "]");
+	}
+	
+	@Override
+	protected ArrayList<FSTDirective> buildModelDirectivesForFile(Vector<String> lines) {
+		//for preprocessor outline
+		Stack<FSTDirective> directivesStack = new Stack<FSTDirective>();
+		ArrayList<FSTDirective> directivesList = new ArrayList<FSTDirective>();
+		
+		boolean commentSection = false;
+		
+		for(int i=0; i < lines.size(); i++){
+			String line = lines.get(i);
+			
+			// if line is preprocessor directive
+			if (line.contains("/*") || line.contains("*/") || commentSection) {
+				Matcher m = MungePreprocessor.OP_COM_PATTERN.matcher(line);
+				
+				while (m.find()) {
+					String completeElement = m.group(0);
+					String singleElement = m.group(2);
+					String expression = m.group(4);
+					
+					if (singleElement == null) {
+						if (completeElement.equals("/*")) {
+							commentSection = true;
+						} else if (completeElement.equals("*/")) {
+							commentSection = false;
+						}
+					} else {
+						FSTDirective directive = new FSTDirective();
+						
+						int command = 0;
+						
+						if (singleElement.equals("if")) {
+							command = FSTDirective.IF;
+						} else if (singleElement.equals("if_not")) {
+							command = FSTDirective.IF;
+						} else if (singleElement.equals("else")) {
+							command = FSTDirective.ELSE;
+							directivesStack.pop();
+						} else if (singleElement.equals("end")) {
+							directivesStack.pop();
+							continue;
+						} else {
+							continue;
+						}
+						
+						directive.setCommand(command);
+						directive.setExpression(expression != null ? expression : "");
+						directive.setLineNumber(i);
+						
+						if(!directivesStack.isEmpty()){
+							FSTDirective top = directivesStack.peek();
+							top.getChildrenList().add(directive);
+						} else {
+							directivesList.add(directive);
+						}
+						
+						directivesStack.push(directive);
+					}
+				}
+			}
+		}
+		return directivesList;
 	}
 }

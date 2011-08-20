@@ -21,7 +21,9 @@ package de.ovgu.featureide.antenna.model;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Scanner;
+import java.util.Stack;
 import java.util.TreeMap;
+import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,6 +33,7 @@ import org.eclipse.core.runtime.CoreException;
 import de.ovgu.featureide.antenna.AntennaCorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
+import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.core.fstmodel.preprocessor.PPModelBuilder;
 
 /**
@@ -44,6 +47,9 @@ public class AntennaModelBuilder extends PPModelBuilder {
 	public static final String OPERATORS = "[\\s!=<>\",;&\\^\\|\\(\\)]";
 	public static final String REGEX = "(//#.*" + OPERATORS + ")(%s)("
 			+ OPERATORS + ")";
+	
+	public static final String COMMANDS = "if|ifdef|ifndef|elif|elifdef|elifndef|else|condition|define|undefine|endif";
+	Pattern patternCommands = Pattern.compile("//#("+COMMANDS+")");
 
 	public AntennaModelBuilder(IFeatureProject featureProject) {
 		super(featureProject);
@@ -106,6 +112,80 @@ public class AntennaModelBuilder extends PPModelBuilder {
 				scanner.close();
 		}
 	}
+	@Override
+	protected ArrayList<FSTDirective> buildModelDirectivesForFile(Vector<String> lines) {
+		//for preprocessor outline
+		Stack<FSTDirective> directivesStack = new Stack<FSTDirective>();
+		ArrayList<FSTDirective> directivesList = new ArrayList<FSTDirective>();
+		
+		
+		for(int i=0; i < lines.size(); i++){
+			String line = lines.get(i);
+			
+			// if line is preprocessor directive
+			if (line.contains("//#")) {
+				FSTDirective directive = new FSTDirective();
+				
+				int command = 0;
+				
+				if(line.contains("//#if ")){//1
+					command = FSTDirective.IF;
+				}else if(line.contains("//#ifdef ")){//2
+					command = FSTDirective.IFDEF;
+				}else if(line.contains("//#ifndef ")){//3
+					command = FSTDirective.IFNDEF;
+				}else if(line.contains("//#elif ")){//4
+					command = FSTDirective.ELIF;
+				}else if(line.contains("//#elifdef ")){//5
+					command = FSTDirective.ELIFDEF;
+				}else if(line.contains("//#elifndef ")){//6
+					command = FSTDirective.ELIFNDEF;
+				}else if(line.contains("//#else")){//7
+					command = FSTDirective.ELSE;
+				}else if(line.contains("//#condition ")){//8
+					command = FSTDirective.CONDITION;
+				}else if(line.contains("//#define ")){//9
+					command = FSTDirective.DEFINE;
+				}else if(line.contains("//#undefine ")){//10
+					command = FSTDirective.UNDEFINE;
+				}else if(line.contains("//#endif")){//11
+					command = 0;
+				}else{
+					continue;
+				}
+				
+				if (command != 0)
+					directive.setCommand(command);
+				
+				Matcher m = patternCommands.matcher(line);
+				line = m.replaceAll("").trim();
+				
+				directive.setExpression(line);
+				directive.setLineNumber(i);
+				
+				if (command == FSTDirective.ELIF || command == FSTDirective.ELIFDEF ||
+						command == FSTDirective.ELIFNDEF || command == FSTDirective.ELSE ||
+						command == 0) {
+					directivesStack.pop();
+				}
+				
+				if (command == 0)
+					continue;
+				
+				if(! directivesStack.isEmpty()){
+					FSTDirective top = directivesStack.peek();
+					top.getChildrenList().add(directive);
+				} else {
+					directivesList.add(directive);
+				}
+				
+				if (command != FSTDirective.DEFINE && command != FSTDirective.UNDEFINE && command != FSTDirective.CONDITION)
+					directivesStack.push(directive);
+			}
+		}
+		return directivesList;
+	}
+
 
 	@Override
 	protected boolean containsFeature(String text, String feature) {

@@ -270,7 +270,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	 * @param res file path
 	 * @return lines of the given file
 	 */
-	protected Vector<String> loadStringsFromFile(IFile res) {
+	public static Vector<String> loadStringsFromFile(IFile res) {
 		Vector<String> lines = new Vector<String>();
 		
 		Scanner scanner = null;

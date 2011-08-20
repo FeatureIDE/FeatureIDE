@@ -54,13 +54,13 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 	private MungeModelBuilder mungeModelBuilder;
 
 	/** all allowed instructions in munge as regular expression */
-	static final String OPERATORS = "(if(_not)?|else|end)\\[(.+?)\\]";
+	public static final String OPERATORS = "(if(_not)?|else|end)\\[(.+?)\\]";
 	
 	/** all allowed instructions in munge as compiled regular expression */
-	static final Pattern OP_PATTERN = Pattern.compile(OPERATORS);
+	public static final Pattern OP_PATTERN = Pattern.compile(OPERATORS);
 	
 	/** compiled regular expression for instructions and comment symbols */
-	static final Pattern OP_COM_PATTERN = Pattern.compile("(" + OPERATORS + ")|/\\*|\\*/");
+	public static final Pattern OP_COM_PATTERN = Pattern.compile("(" + OPERATORS + ")|/\\*|\\*/");
 	
 	/** is true if actual line is in comment section (between <code>&#47;*</code> and <code>*&#47;</code>) */
 	private boolean commentSection;

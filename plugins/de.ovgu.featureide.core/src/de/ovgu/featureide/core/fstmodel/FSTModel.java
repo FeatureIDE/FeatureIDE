@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 
 
 /**
@@ -42,6 +43,7 @@ public class FSTModel extends FSTModelElement {
 	public HashMap<IFile, FSTClass> classesMap;
 	public HashMap<String, FSTClass> classes;
 	public HashMap<String, FSTFeature> features;
+	public HashMap<String, ArrayList<FSTDirective>> directives;
 	private String projectName;
 
 	/**
@@ -54,6 +56,7 @@ public class FSTModel extends FSTModelElement {
 		classesMap = new HashMap<IFile, FSTClass>();
 		classes = new HashMap<String, FSTClass>();
 		features = new HashMap<String, FSTFeature>();
+		directives = new HashMap<String, ArrayList<FSTDirective>>();
 		projectName = name;
 	}
 
