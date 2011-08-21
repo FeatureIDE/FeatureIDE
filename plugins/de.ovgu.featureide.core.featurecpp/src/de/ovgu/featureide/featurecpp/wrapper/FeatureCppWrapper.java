@@ -67,7 +67,7 @@ public class FeatureCppWrapper {
 
 	public FeatureCppWrapper() {
 		String sys = System.getProperty("os.name");
-        if (sys.equals("Linux")){
+        if (sys.equals("Linux")) {
         	featureCppExecutableName = "fc++";
         	return;
         	// TODO use lib/fc++Linux
