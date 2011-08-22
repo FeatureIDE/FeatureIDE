@@ -220,7 +220,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 		String prop = event.getPropertyName();
 		if (prop.equals(PARENT_CHANGED)) {
 			refreshParent();
-		} else if (prop.equals(MANDANTORY_CHANGED)) {
+		} else if (prop.equals(MANDATORY_CHANGED)) {
 			refreshSourceDecoration();
 		}
 	}

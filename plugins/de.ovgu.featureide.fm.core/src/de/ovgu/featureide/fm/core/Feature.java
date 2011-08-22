@@ -121,7 +121,7 @@ public class Feature implements PropertyConstants {
 
 	public void setMandatory(boolean mandatory) {
 		this.mandatory = mandatory;
-		fireMandantoryChanged();
+		fireMandatoryChanged();
 	}
 
 	public boolean isHidden() {
@@ -373,9 +373,9 @@ public class Feature implements PropertyConstants {
 			listener.propertyChange(event);
 	}
 
-	private void fireMandantoryChanged() {
+	private void fireMandatoryChanged() {
 		PropertyChangeEvent event = new PropertyChangeEvent(this,
-				MANDANTORY_CHANGED, false, true);
+				MANDATORY_CHANGED, false, true);
 		for (PropertyChangeListener listener : listenerList)
 			listener.propertyChange(event);
 	}
