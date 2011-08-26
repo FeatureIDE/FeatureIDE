@@ -434,7 +434,7 @@ public class CorePlugin extends AbstractCorePlugin {
 	private static void createProjectStructure(IProject project,
 			String sourcePath, String configPath, String buildPath) {
 		try {
-			// just create the bin folder if project hat only the FeatureIDE
+			// just create the bin folder if project has only the FeatureIDE
 			// Nature
 			if (project.getDescription().getNatureIds().length == 1
 					&& project.hasNature(FeatureProjectNature.NATURE_ID)) {

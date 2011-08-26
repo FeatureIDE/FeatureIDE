@@ -16,7 +16,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.featurehouse;
+package de.ovgu.featureide.featurehouse.errorpropagation;
 
 import java.io.FileNotFoundException;
 import java.util.HashSet;
@@ -40,6 +40,7 @@ import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
+import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
 
 /**
  * Propagates error markers for composed files to sources files.
@@ -50,11 +51,6 @@ public class ErrorPropagation {
 	
 	private HashSet<IFile> files = new HashSet<IFile>();
 	
-	// Java 1.4 exclusions
-	private static final String RAW_TYPE = "raw type";
-	private static final String GENERIC_TYPE = "generic type";
-	private static final String TYPE_SAFETY = "Type safety";
-	
 	private Job job = null;
 	
 	public ErrorPropagation() {
@@ -64,26 +60,29 @@ public class ErrorPropagation {
 
 	public void addFile(IFile file) {
 		//TODO implement error propagation for all FeatureHouse languages
-		if (file.getFileExtension() == null || !file.getFileExtension().equals("java")) {
+		if (file.getFileExtension() == null) {
 			return;
 		}
-		if (!files.contains(file)) {
-			files.add(file);
-		}
-		if (job == null) {
-			job = new Job("Propagate problem markers") {
-				@Override
-				public IStatus run(IProgressMonitor monitor) {
-					propagateMarkers();
-					return Status.OK_STATUS;
-				}
-			};
-			job.setPriority(Job.DECORATE);
-			job.schedule();
-		}
-		
-		if (job.getState() == Job.NONE) {
-			job.schedule();
+		if (file.getFileExtension().equals("java") || file.getFileExtension().equals("c") ||
+				file.getFileExtension().equals("h")) {
+			if (!files.contains(file)) {
+				files.add(file);
+			}
+			if (job == null) {
+				job = new Job("Propagate problem markers") {
+					@Override
+					public IStatus run(IProgressMonitor monitor) {
+						propagateMarkers();
+						return Status.OK_STATUS;
+					}
+				};
+				job.setPriority(Job.DECORATE);
+				job.schedule();
+			}
+			
+			if (job.getState() == Job.NONE) {
+				job.schedule();
+			}
 		}
 	}
 
@@ -94,27 +93,49 @@ public class ErrorPropagation {
 		
 		for (IFile file : files) {
 			files.remove(file);
-			propagateMarkers(file);
-			break;
+			ErrorPropagation prop = getErrorPropagation(file);
+			if (prop != null) {
+				prop.propagateMarkers(file);
+				break;
+			}
+			
 		}
 		propagateMarkers();
 	}
 
 	/**
 	 * @param file
+	 * @return
 	 */
-	private void propagateMarkers(IFile file) {
+	private ErrorPropagation getErrorPropagation(IFile file) {
+		if (file.getFileExtension().endsWith("java")) {
+			return new JavaErrorPropagation();
+		}
+		if (file.getFileExtension().endsWith("c") || file.getFileExtension().endsWith("h")) {
+			return new CErrorPropagation();
+		} 
+		return null;
+	}
+
+
+	/**
+	 * @param file
+	 */
+	protected void propagateMarkers(IFile file) {
+		if (!file.exists()) {
+			return;
+		}
 		try {
 			IMarker[] markers = file.findMarkers(null, true, IResource.DEPTH_INFINITE);
 			if (markers.length != 0) {
 				LinkedList<IMarker> marker = new LinkedList<IMarker>();
 				for (IMarker m : markers) {
 					String message = m.getAttribute(IMarker.MESSAGE, null);
-					if (message == null ||message.contains(RAW_TYPE) || 
-							message.contains(TYPE_SAFETY) || message.contains(GENERIC_TYPE)) {
+					if (message == null || deleteMarker(message)) {
 						m.delete();
+					} else if (propagateMarker(m)) {
+						marker.add(m);
 					}
-					marker.add(m);
 				}
 				if (!marker.isEmpty()) {
 					propagateMarkers(marker, file);
@@ -124,6 +145,24 @@ public class ErrorPropagation {
 			FeatureHouseCorePlugin.getDefault().logError(e);
 		}
 	}
+
+	/**
+	 * @param m
+	 * @return
+	 */
+	boolean propagateMarker(IMarker m) {
+		return true;
+	}
+
+
+	/**
+	 * @param message
+	 * @return
+	 */
+	protected boolean deleteMarker(String message) {
+		return false;
+	}
+
 
 	/**
 	 * Propagates all markers of the given file
@@ -161,7 +200,6 @@ public class ErrorPropagation {
 			if (!marker.exists()) {
 				continue;
 			}
-			
 			int markerLine = marker.getAttribute(IMarker.LINE_NUMBER, -1);
 			if (markerLine == -1) {
 				continue;
@@ -195,6 +233,18 @@ public class ErrorPropagation {
 	}
 
 	/**
+	 * @param content
+	 * @param file
+	 * @param fields
+	 * @param methods
+	 */
+	protected void setElementLines(String content, IFile file,
+			LinkedList<FSTField> fields, LinkedList<FSTMethod> methods) {
+		
+	}
+
+
+	/**
 	 * Propagates the marker to the source line
 	 */
 	private void propagateMarker(IMarker marker, IFile file, int line) {
@@ -216,7 +266,6 @@ public class ErrorPropagation {
 					newMarker.setAttribute(IMarker.LINE_NUMBER, line);
 					newMarker.setAttribute(IMarker.MESSAGE, message);
 					newMarker.setAttribute(IMarker.SEVERITY, severity);
-					marker.delete();
 				} catch (CoreException e) {
 					FeatureHouseCorePlugin.getDefault().logError(e);
 				}
@@ -250,55 +299,8 @@ public class ErrorPropagation {
 		return false;
 	}
 
-	/**
-	 * Sets all composed lines to all methods and fields
-	 */
-	private void setElementLines(String content, IFile file, LinkedList<FSTField> fields, LinkedList<FSTMethod> methods) {
-		for (FSTField f : fields) {
-			if (f.getBody() == null) {
-				continue;
-			}
-			int i = content.indexOf(f.getBody());
-			int line = countLines(content.substring(0, i));
-			f.setComposedLine(line);
-		}
-
-		content = content.replaceAll("__wrappee__\\w*\\s*", "");
-		content = content.replaceAll("  ", " ");
-
-		for (FSTMethod m : methods) {
-			if (m.getBody() == null) {
-				continue;
-			}
-			int i = -1;
-			if (m.isConstructor) {
-				String body = m.getBody().substring(m.getBody().indexOf("{") + 1);
-				body = body.replaceAll("  ", " ");
-				body = body.substring(0, body.lastIndexOf("}"));
-				i = content.indexOf(body);
-			} else {
-				String body = m.getBody();
-				body = body.replaceAll("  ", " ");
-				body = body.replaceFirst("\\s*\\(", "(");
-				if (body.startsWith("public")) {
-					body = body.replaceFirst("public", "");
-				} else if (body.startsWith("protected")) {
-					body = body.replaceFirst("protected", "");
-				}
-				if (body.contains("original")) {
-					body = body.replaceFirst("original", m.methodName);
-				}
-				i = content.indexOf(body);
-			}
-			if (i != -1) {
-				int line = countLines(content.substring(0, i));
-				m.setLine(line);
-			}
-		}
-	}
-
-	private int countLines(String substring) {
-		return substring.split("[\n]").length;
+	protected int countLines(String substring) {
+		return (substring + " ").split("[\n]").length;
 	}
 
 	private String getFileContent(IFile file) {
@@ -309,7 +311,7 @@ public class ErrorPropagation {
 			if (scanner.hasNext()) {
 				while (scanner.hasNext()) {
 					buffer.append(scanner.nextLine());
-					buffer.append("\r\n");
+					buffer.append("\n");
 				}
 			}
 			return buffer.toString();

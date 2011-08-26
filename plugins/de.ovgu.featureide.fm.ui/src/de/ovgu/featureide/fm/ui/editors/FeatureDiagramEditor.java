@@ -131,7 +131,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	private AutoLayoutConstraintAction AutoLayoutConstraintAction;	
 
 	private int index;
-	private UIJob steve;
+	
+	private UIJob analyzingJob;
 
 	public FeatureDiagramEditor(FeatureModelEditor featureModelEditor,
 			Composite container) {
@@ -354,10 +355,10 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	}
 	
 	public void refresh(){
-		if (steve != null && steve.getState() == Job.RUNNING)
-			steve.cancel();
+		if (analyzingJob != null && analyzingJob.getState() == Job.RUNNING)
+			analyzingJob.cancel();
 		
-		steve = new UIJob(" Analyzing feature model "){
+		analyzingJob = new UIJob(" Analyzing feature model "){
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				getFeatureModel().analyzeFeatureModel();
@@ -365,8 +366,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 				return Status.OK_STATUS;
 			}			
 		};
-		steve.setPriority(Job.DECORATE);
-		steve.schedule();
+		analyzingJob.setPriority(Job.DECORATE);
+		analyzingJob.schedule();
 		
 		internRefresh();
 		

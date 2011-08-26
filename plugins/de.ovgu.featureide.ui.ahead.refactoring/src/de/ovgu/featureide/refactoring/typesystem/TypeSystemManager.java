@@ -133,6 +133,7 @@ public class TypeSystemManager {
 	 * inside this file. If possible, the necessary AST's are taken from the
 	 * FeatureIDE-PlugIn, else they are created by the typesystem.
 	 */
+	@SuppressWarnings("unused")
 	private static boolean initializeTypesystem(URI projectLocationURI) {
 		TypeSystem typeSystem = TYPESYSTEMS.get(projectLocationURI).ts;
 		IFile eqFile = TYPESYSTEMS.get(projectLocationURI).equationFile;

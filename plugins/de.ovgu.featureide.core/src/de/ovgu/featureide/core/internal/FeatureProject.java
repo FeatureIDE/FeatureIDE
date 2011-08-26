@@ -318,7 +318,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 				createFeatureFolder(feature.getName());
 		// delete all empty folders which do not anymore belong to layers
 		for (IResource res : sourceFolder.members())
-			if (res instanceof IFolder) {
+			if (res instanceof IFolder && res.exists()) {
 				IFolder folder = (IFolder) res;
 				Feature feature = featureModel.getFeature(folder.getName());
 				if (feature == null || !feature.isLayer()) {

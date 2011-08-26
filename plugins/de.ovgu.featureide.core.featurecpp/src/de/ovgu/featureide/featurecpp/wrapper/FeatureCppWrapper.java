@@ -53,10 +53,10 @@ import de.ovgu.featureide.featurecpp.FeatureCppCorePlugin;
  */
 @SuppressWarnings("restriction")
 public class FeatureCppWrapper {
-	final static String EXE_LINUX_64BIT = "fc++v0.6Linux64bit";
-	final static String EXE_LINUX_32BIT = "fc++v0.7Linux32bit";
-	final static String EXE_MAC_OS_X 	= "fc++v0.7MacOSX";
-	final static String EXE_WINDOWS 	= "fc++v0.7WIN.exe";
+	private final static String EXE_LINUX_64BIT = "fc++v0.6Linux64bit";
+	private final static String EXE_LINUX_32BIT = "fc++v0.7Linux32bit";
+	private final static String EXE_MAC_OS_X 	= "fc++v0.7MacOSX";
+	private final static String EXE_WINDOWS 	= "fc++v0.7WIN.exe";
 	
 	final String featureCppExecutableName;
 
