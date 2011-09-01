@@ -117,6 +117,13 @@ public class Prop4JTest {
 	}
 
 	@Test
+	public void testTautologyImplies() throws TimeoutException {
+		taut(new Implies(new And("A", new And(new Or(new Not("A"), new Or("B",
+				"C")), "D")), new And("A", new And(new Or(new Not("A"), new Or(
+				"B", "C")), "D"))));
+	}
+
+	@Test
 	public void testDelphi() throws TimeoutException {
 		Node delphi1 = new Implies(new Not("M"), new And("L", "R"));
 		Node delphi2 = new Implies(new Not(new And("L", "M")), new Not("R"));
@@ -371,6 +378,7 @@ public class Prop4JTest {
 		 */
 
 	}
+
 	@Test
 	public void testReaderFeatureNameContainsOperator() {
 		String testString = "Handy";
@@ -379,13 +387,13 @@ public class Prop4JTest {
 		testReaderByObject(testString, node);
 
 	}
-	
+
 	@Test
 	public void testReaderEmptyString() {
 		new NodeReader().stringToNode("");
 		assertTrue(true);
 	}
-	
+
 	@Test
 	public void testValidatorWithFeatureNames1() {
 		String[] featureNames = { "Hello", "World", "Beautiful", "Wonderful" };
@@ -402,13 +410,11 @@ public class Prop4JTest {
 		assertTrue(testValidatorWithoutFeatureNames(constraint));
 	}
 
-
-
 	@Test
 	public void testValidatorWithFeatureNames3() {
 		String[] featureNames = { "Hello", "World", "Beautiful", "Wonderful" };
 		String constraint = "affe";
-	
+
 		assertFalse(testValidatorWithFeatureNames(constraint, featureNames));
 
 		assertTrue(testValidatorWithoutFeatureNames(constraint));
@@ -446,6 +452,7 @@ public class Prop4JTest {
 		assertFalse(testValidatorWithoutFeatureNames(constraint));
 
 	}
+
 	@Test
 	public void testValidatorWithFeatureNames8() {
 		String[] featureNames = { "Hello", "World", "Beautiful", "Wonderful" };
@@ -453,6 +460,7 @@ public class Prop4JTest {
 		assertFalse(testValidatorWithFeatureNames(constraint, featureNames));
 		assertFalse(testValidatorWithoutFeatureNames(constraint));
 	}
+
 	@Test
 	public void testValidatorWithFeatureNames9() {
 		String[] featureNames = { "Hello", "World", "Beautiful", "Wonderful" };
@@ -461,6 +469,7 @@ public class Prop4JTest {
 		assertFalse(testValidatorWithoutFeatureNames(constraint));
 
 	}
+
 	@Test
 	public void testValidatorWithFeatureNames10() {
 		String[] featureNames = { "Hello", "World", "Beautiful", "Wonderful" };
@@ -469,6 +478,7 @@ public class Prop4JTest {
 		assertFalse(testValidatorWithoutFeatureNames(constraint));
 
 	}
+
 	@Test
 	public void testValidatorWithFeatureNames11() {
 		String[] featureNames = { "Hello", "World", "Beautiful", "Wonderful" };
@@ -477,7 +487,7 @@ public class Prop4JTest {
 		assertTrue(testValidatorWithoutFeatureNames(constraint));
 
 	}
-	
+
 	@Test
 	public void testValidatorWithFeatureNames12() {
 		String[] featureNames = { "Hello", "World", "Beautiful", "Wonderful" };
@@ -486,6 +496,7 @@ public class Prop4JTest {
 		assertTrue(testValidatorWithoutFeatureNames(constraint));
 
 	}
+
 	@Test
 	public void testValidatorWithFeatureNames13() {
 		String[] featureNames = { "Hello", "World", "Beautiful", "Wonderful" };
@@ -494,6 +505,7 @@ public class Prop4JTest {
 		assertFalse(testValidatorWithoutFeatureNames(constraint));
 
 	}
+
 	@Test
 	public void testValidatorWithFeatureNames14() {
 		String[] featureNames = { "Hello", "World", "Beautiful", "Wonderful" };
@@ -502,64 +514,75 @@ public class Prop4JTest {
 		assertFalse(testValidatorWithoutFeatureNames(constraint));
 
 	}
-	
+
 	private boolean testValidatorWithFeatureNames(String constraint,
 			String[] featureNames) {
-			NodeReader n = new NodeReader();
-			return n.isWellFormed(constraint,Arrays.asList(featureNames));
+		NodeReader n = new NodeReader();
+		return n.isWellFormed(constraint, Arrays.asList(featureNames));
 	}
 
 	private boolean testValidatorWithoutFeatureNames(String constraint) {
 		NodeReader n = new NodeReader();
 		return n.isWellFormed(constraint);
 	}
-	
+
 	@Test
 	public void testSimplify1() {
 		Node node = new Or(a, new Or(new Or(b, c), new Or(d, e)));
 		node.simplify();
-		
+
 		assertEquals(a, node.getChildren()[0]);
 		assertEquals(b, node.getChildren()[1]);
 		assertEquals(c, node.getChildren()[2]);
 		assertEquals(d, node.getChildren()[3]);
 		assertEquals(e, node.getChildren()[4]);
 	}
-	
+
 	@Test
 	public void testSimplify2() {
 		Node node = new And(a, new And(new And(b, c), new And(d, e)));
 		node.simplify();
-		
+
 		assertEquals(a, node.getChildren()[0]);
 		assertEquals(b, node.getChildren()[1]);
 		assertEquals(c, node.getChildren()[2]);
 		assertEquals(d, node.getChildren()[3]);
 		assertEquals(e, node.getChildren()[4]);
 	}
-	
+
 	@Test
 	public void testSimplify3() {
 		Node x = new And(b, c);
 		Node y = new And(d, e);
 		Node node = new Or(a, new Or(x, y));
 		node.simplify();
-		
+
 		assertEquals(a, node.getChildren()[0]);
 		assertEquals(x, node.getChildren()[1]);
 		assertEquals(y, node.getChildren()[2]);
 	}
-	
+
 	@Test
 	public void testSimplify4() {
 		Node x = new Or(b, c);
 		Node y = new Or(d, e);
 		Node node = new And(a, new And(x, y));
 		node.simplify();
-		
+
 		assertEquals(a, node.getChildren()[0]);
 		assertEquals(x, node.getChildren()[1]);
 		assertEquals(y, node.getChildren()[2]);
 	}
-	
+
+	@Test
+	public void testSat4J() throws ContradictionException, TimeoutException {
+		ISolver solver = SolverFactory.newDefault();
+		solver.setTimeout(15);
+		solver.addClause(new VecInt(new int[] { 1 }));
+		solver.addClause(new VecInt(new int[] { -1, 2, 3 }));
+		solver.addClause(new VecInt(new int[] { 4 }));
+		solver.isSatisfiable(new VecInt(new int[] { 1, -2, -3 }));
+		assertFalse(solver.isSatisfiable(new VecInt(new int[] { -4 })));
+
+	}
 }
