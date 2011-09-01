@@ -207,7 +207,7 @@ public class ModelComparator {
 		return updatedNodes.isEmpty() ? null : new And(updatedNodes);
 	}
 
-	private boolean implies(Node a, Node b, ExampleCalculator example)
+	boolean implies(Node a, Node b, ExampleCalculator example)
 			throws TimeoutException {
 		if (b == null)
 			return true;

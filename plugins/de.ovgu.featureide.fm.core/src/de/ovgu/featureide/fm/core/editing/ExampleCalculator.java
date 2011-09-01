@@ -79,6 +79,7 @@ public class ExampleCalculator {
 	}
 
 	public boolean hasNextChild() {
+		if(bChildren==null)return false;
 		return bIndex + 1 < bChildren.length;
 	}
 
