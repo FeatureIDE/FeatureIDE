@@ -166,13 +166,15 @@ public class AntennaModelBuilder extends PPModelBuilder {
 				if (command == FSTDirective.ELIF || command == FSTDirective.ELIFDEF ||
 						command == FSTDirective.ELIFNDEF || command == FSTDirective.ELSE ||
 						command == 0) {
-					directivesStack.pop();
+					if (!directivesStack.isEmpty()) {
+						directivesStack.pop();
+					}
 				}
 				
 				if (command == 0)
 					continue;
 				
-				if(! directivesStack.isEmpty()){
+				if(!directivesStack.isEmpty()){
 					FSTDirective top = directivesStack.peek();
 					top.getChildrenList().add(directive);
 				} else {
