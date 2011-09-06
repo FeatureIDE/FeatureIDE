@@ -111,7 +111,7 @@ public class CollaborationOutlineTreeContentProvider implements
 				if (model.getClass(((IFile) inputElement).getName()) != null)
 					return new Object[] { model.getClass(((IFile) inputElement).getName()) };
 				else
-					return new String[] { "Class in Collaboration Model not found" };
+					return new String[] { "An outline is not available." };
 			else
 				return new String[] { "Collaboration Model not found" };
 		else

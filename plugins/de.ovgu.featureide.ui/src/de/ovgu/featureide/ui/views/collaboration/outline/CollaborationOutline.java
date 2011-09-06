@@ -353,6 +353,13 @@ public class CollaborationOutline extends ViewPart {
 									} else {
 										// simply remove the content from the
 										// outline
+										//case: no providers set
+										if (viewer.getContentProvider() == null) {
+											viewer.setContentProvider(contentProvider);
+										}
+										if (viewer.getLabelProvider() == null) {
+											viewer.setLabelProvider(clabel);
+										}
 										viewer.setInput(iFile);
 									}
 
@@ -366,7 +373,13 @@ public class CollaborationOutline extends ViewPart {
 									viewer.getControl().setRedraw(true);
 								}
 							}
-
+							//case: no providers set
+							if (viewer.getContentProvider() == null) {
+								viewer.setContentProvider(contentProvider);
+							}
+							if (viewer.getLabelProvider() == null) {
+								viewer.setLabelProvider(clabel);
+							}
 							return Status.OK_STATUS;
 						}
 					};
