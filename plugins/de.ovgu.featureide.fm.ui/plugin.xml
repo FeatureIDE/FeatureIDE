@@ -4,6 +4,7 @@
    <extension-point id="de.ovgu.featureide.fm.ui.FeatureModelEditor" name="featuremodeleditor" schema="schema/de.ovgu.featureide.fm.ui.featuremodeleditor.exsd"/>
    <extension-point id="de.ovgu.fm.ui.views.outline.FmTreeContentProvider" name="FeatureModelTreeContentProvider" schema="schema/de.ovgu.fm.ui.views.outline.FmTreeContentProvider.exsd"/>
    <extension-point id="de.ovgu.fm.ui.outline.FmLabelProvider" name="FeatureModelLabelProvider" schema="schema/de.ovgu.fm.ui.outline.FmLabelProvider.exsd"/>
+   <extension-point id="de.ovgu.featureide.fm.ui.FeatureDiagram" name="featurediagram" schema="schema/de.ovgu.featureide.fm.ui.FeatureDiagram.exsd"/>
    <extension
          point="org.eclipse.ui.editors">
       <editor

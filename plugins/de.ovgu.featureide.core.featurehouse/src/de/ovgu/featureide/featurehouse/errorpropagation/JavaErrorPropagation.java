@@ -21,6 +21,8 @@ package de.ovgu.featureide.featurehouse.errorpropagation;
 import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
@@ -37,6 +39,8 @@ public class JavaErrorPropagation extends ErrorPropagation {
 	private static final String GENERIC_TYPE = "generic type";
 	private static final String TYPE_SAFETY = "Type safety";
 	private static final String IMPORT = "The import";
+	
+	private static final String TASK = "org.eclipse.jdt.core.task";
 	
 	/**
 	 * Sets all composed lines to all methods and fields
@@ -116,5 +120,15 @@ public class JavaErrorPropagation extends ErrorPropagation {
 		return (message.contains(RAW_TYPE) || 
 		message.contains(TYPE_SAFETY) || message.contains(GENERIC_TYPE) || 
 		message.contains(IMPORT));
+	}
+	
+
+	@Override
+	boolean propagateMarker(IMarker m) {
+		try {
+			return !(m.getType().equals(TASK));
+		} catch (CoreException e) {
+		}
+		return super.propagateMarker(m);
 	}
 }

@@ -34,6 +34,8 @@ import de.ovgu.featureide.core.fstmodel.FSTMethod;
  */
 public class CErrorPropagation extends ErrorPropagation {
 	
+	private static final String TASK = "org.eclipse.cdt.core.task";
+
 	/**
 	 * Sets all composed lines to all methods and fields
 	 */
@@ -114,7 +116,7 @@ public class CErrorPropagation extends ErrorPropagation {
 	@Override
 	boolean propagateMarker(IMarker m) {
 		try {
-			return !(m.getType().equals("org.eclipse.cdt.core.task"));
+			return !(m.getType().equals(TASK));
 		} catch (CoreException e) {
 		}
 		return super.propagateMarker(m);

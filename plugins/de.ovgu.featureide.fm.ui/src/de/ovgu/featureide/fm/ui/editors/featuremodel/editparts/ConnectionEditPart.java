@@ -23,6 +23,8 @@ import java.beans.PropertyChangeListener;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.IUndoContext;
+import org.eclipse.draw2d.Figure;
+import org.eclipse.draw2d.GridLayout;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.PolylineConnection;
@@ -41,6 +43,7 @@ import de.ovgu.featureide.fm.core.FeatureConnection;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.FeatureDiagramExtension;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.CircleDecoration;
@@ -58,6 +61,8 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureChangeGro
 public class ConnectionEditPart extends AbstractConnectionEditPart implements
 		GUIDefaults, PropertyConstants, PropertyChangeListener {
 
+	private Figure toolTipContent = new Figure();
+	
 	public ConnectionEditPart(FeatureConnection connection) {
 		super();
 		setModel(connection);
@@ -184,16 +189,20 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 		connection.setTargetDecoration(targetDecoration);
 	}
 
-	private Label toolTipLabel = new Label("");
-
 	public void refreshToolTip() {
 		Feature target = ((FeatureConnection) getModel()).getTarget();
-		PolylineConnection connection = (PolylineConnection) getConnectionFigure();
-		String toolTip = " Connection type: \n"
+		toolTipContent.removeAll();
+		toolTipContent.setLayoutManager(new GridLayout());
+		toolTipContent.add(new Label(" Connection type: \n"
 				+ (target.isAnd() ? " And" : (target.isMultiple() ? " Or"
-						: " Alternative"));
-		toolTipLabel.setText(toolTip);
-		connection.setToolTip(toolTipLabel);
+						: " Alternative"))));
+		
+		// call of the FeatureDiagramExtensions
+		for (FeatureDiagramExtension extension : FeatureDiagramExtension.getExtensions()) {
+			toolTipContent = extension.extendConnectionToolTip(toolTipContent, this);
+		}
+		
+		((PolylineConnection) getConnectionFigure()).setToolTip(toolTipContent);
 	}
 
 	@Override

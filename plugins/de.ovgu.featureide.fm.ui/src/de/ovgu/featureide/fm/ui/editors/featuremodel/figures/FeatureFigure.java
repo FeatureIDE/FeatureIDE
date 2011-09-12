@@ -21,6 +21,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 import org.eclipse.draw2d.ConnectionAnchor;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.FreeformLayout;
+import org.eclipse.draw2d.GridLayout;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
@@ -31,6 +32,7 @@ import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureStatus;
+import de.ovgu.featureide.fm.ui.editors.FeatureDiagramExtension;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.anchors.SourceAnchor;
@@ -113,7 +115,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		}
 
 	}
-	
+
 	public void setProperties() {
 	
 		String toolTip = "";
@@ -162,7 +164,16 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		}
 		
 		toolTip += getRelevantConstraints();
-		setToolTip(new Label(toolTip));
+		Figure toolTipContent = new Figure();
+		toolTipContent.setLayoutManager(new GridLayout());
+		toolTipContent.add(new Label(toolTip));
+		
+		// call of the FeatureDiagramExtensions
+		for (FeatureDiagramExtension extension : FeatureDiagramExtension.getExtensions()) {
+			toolTipContent = extension.extendFeatureFigureToolTip(toolTipContent, this);
+		}
+		
+		setToolTip(toolTipContent);
 	}
 	
 	private String getRelevantConstraints() {

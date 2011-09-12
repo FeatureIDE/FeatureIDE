@@ -61,6 +61,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AlternativeAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AndAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AutoLayoutConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateCompoundAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateLayerAction;
@@ -72,7 +73,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LayoutSelectionActi
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LegendAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LegendLayoutAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.MandatoryAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AutoLayoutConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.RenameAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ReverseOrderAction;
@@ -110,8 +110,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	private OrAction orAction;
 	private AlternativeAction alternativeAction;
 	private RenameAction renameAction;
-	@SuppressWarnings("unused") 
-	private SelectionAction selectionAction;
 
 	private ShowHiddenFeaturesAction showHiddenFeaturesAction;
 
@@ -148,6 +146,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		zoomManager = rootEditPart.getZoomManager();
 		zoomManager.setZoomLevels(new double[] { 0.05, 0.10, 0.25, 0.50, 0.75,
 				0.90, 1.00, 1.10, 1.25, 1.50, 2.00, 2.50, 3.00, 4.00 });	
+
 	}
 
 	void initializeGraphicalViewer() {
@@ -160,7 +159,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		setRootEditPart(rootEditPart);
 	}
 
-	private FeatureModel getFeatureModel() {
+	public FeatureModel getFeatureModel() {
 		return featureModelEditor.getFeatureModel();
 	}
 
@@ -180,7 +179,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		alternativeAction = new AlternativeAction(this, featureModel);
 		renameAction = new RenameAction(this, featureModel, null);
 		
-		selectionAction = new SelectionAction(this, featureModel); 
+		new SelectionAction(this, featureModel); 
 
 		createConstraintAction = new CreateConstraintAction(this, featureModel);
 		editConstraintAction = new EditConstraintAction(this, featureModel);
@@ -220,9 +219,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		handler.put(KeyStroke.getPressed(SWT.INSERT, 0), createLayerAction);
 		setKeyHandler(handler);
 	}
-	
+
 	private void fillContextMenu(IMenuManager menu) {
-		
 		IMenuManager subMenu=new MenuManager("Set Layout");	
 		
 		showHiddenFeaturesAction.setChecked(
@@ -306,6 +304,14 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 		menu.add(showHiddenFeaturesAction);
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
+		// call of the FeatureDiagramExtensions (for features only)
+		if ((createLayerAction.isEnabled()
+				|| createCompoundAction.isEnabled()) && !connectionSelected) {
+			for (FeatureDiagramExtension extension : FeatureDiagramExtension.getExtensions()) {
+				extension.extendContextMenu(menu, this);
+			}
+		}
 	}
 
 	public IAction getDiagramAction(String workbenchActionID) {
