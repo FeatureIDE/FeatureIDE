@@ -65,6 +65,8 @@ public class RoleFigure extends Figure implements GUIDefaults{
 	private static Image IMAGE_FEATURE = UIPlugin.getImage("FeatureIconSmall.ico");
 	private static Image IMAGE_HASH = UIPlugin.getImage("hash.png");
 	
+	private static Font FONT_BOLD = new Font(null,"Arial", 8, SWT.BOLD);
+		
 	private final Label label = new Label();
 	public Boolean selected = false;
 	private IFolder featureFolder;
@@ -88,7 +90,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		this.add(label);
 		this.setOpaque(true);
 		
-		// defines the tooltipcontent
+		// defines the tool tip content
 		Figure tooltipContent = new Figure();		
 		FlowLayout contentsLayout = new FlowLayout();
 		tooltipContent.setLayoutManager(contentsLayout);
@@ -137,6 +139,9 @@ public class RoleFigure extends Figure implements GUIDefaults{
 			for(FSTMethod m : role.methods){
 				
 				Label methodLabel = new Label(m.getName() + " ");
+				if (m.refines) {
+					methodLabel.setFont(FONT_BOLD);
+				}
 				if (m.isPrivate())			
 					methodLabel.setIcon(IMAGE_METHODE_PRIVATE);
 				else if (m.isProtected())

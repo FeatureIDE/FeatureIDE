@@ -44,7 +44,7 @@ import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
 
 /**
  * Propagates error markers for composed files to sources files.
- * 
+ * TODO add tests
  * @author Jens Meinicke
  */
 public class ErrorPropagation {

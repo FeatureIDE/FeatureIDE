@@ -18,9 +18,12 @@
  */
 package de.ovgu.featureide.featurehouse.model;
 
+import java.util.LinkedList;
+
 import org.eclipse.core.resources.IFile;
 
 import de.ovgu.cide.fstgen.ast.FSTTerminal;
+import de.ovgu.featureide.core.fstmodel.FSTMethod;
 
 /**
  * 
@@ -41,7 +44,7 @@ public class ClassBuilder {
 	void caseConstructorDeclaration(FSTTerminal terminal) {}
 	
 	/**
-	 * @return class builder for the current file
+	 * @return <code>ClassBuilder</code> for the given file
 	 */
 	public static ClassBuilder getClassBuilder(IFile file, FeatureHouseModelBuilder builder) {
 		if (file.getFileExtension().equals("java")) {
@@ -57,7 +60,29 @@ public class ClassBuilder {
 		if (file.getFileExtension().equals("hs")) {
 			return new HaskellClassBuilder(builder);
 		}
-		// TODO#271 implement class builder for all FeatureHouse languages
 		return new ClassBuilder(builder);
+	}
+	
+	/**
+	 * Adds the method with the given parameters to the FSTModel.
+	 * @param name Name of the method
+	 * @param parameterTypes Types of the parameters
+	 * @param returnType Return type
+	 * @param modifiers Modifiers
+	 * @param body The methods body
+	 * @param beginLine Start of the method at features file 
+	 * @param endLine End of the method at features file.
+	 * @param isConstructor <code>true</code> if the method is a constructor 
+	 */
+	void addMethod(String name, LinkedList<String> parameterTypes, 
+			String returnType, String modifiers, String body, int beginLine, int endLine, boolean isConstructor) {
+		FSTMethod method = new FSTMethod(name, parameterTypes, returnType, modifiers, body, beginLine, endLine);								
+		method.setOwn(modelBuilder.getCurrentFile());
+		method.isConstructor = isConstructor;
+		if (body.contains("original")) {
+			body = body.replaceAll(" ", "");
+			method.refines = body.contains("original(");
+		}
+		modelBuilder.getCurrentClass().methods.put(method.getIdentifier(), method);
 	}
 }

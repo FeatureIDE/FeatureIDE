@@ -22,7 +22,6 @@ import java.util.LinkedList;
 
 import de.ovgu.cide.fstgen.ast.FSTTerminal;
 import de.ovgu.featureide.core.fstmodel.FSTField;
-import de.ovgu.featureide.core.fstmodel.FSTMethod;
 
 /**
  * 
@@ -45,7 +44,7 @@ public class CSClassBuilder extends ClassBuilder {
 		String modifiers = terminal.getBody().substring(0, terminal.getBody().indexOf(name));
 
 		// add method
-		addMethod(name, getMethodParameter(terminal), "void", modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine);
+		addMethod(name, getMethodParameter(terminal), "void", modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine, true);
 	}
 
 	private String[] modifier = {"static","final","private","public","protected"};
@@ -174,7 +173,7 @@ public class CSClassBuilder extends ClassBuilder {
 		}
 
 		// add method
-		addMethod(name, getMethodParameter(terminal), returnType, modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine);
+		addMethod(name, getMethodParameter(terminal), returnType, modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine, false);
 	}
 	
 	/**
@@ -201,12 +200,5 @@ public class CSClassBuilder extends ClassBuilder {
 			}
 		}
 		return parameterTypes;
-	}
-	
-	private void addMethod(String name, LinkedList<String> parameterTypes, 
-			String returnType, String modifiers, String body, int beginLine, int endLine) {
-		FSTMethod method = new FSTMethod(name, parameterTypes, returnType, modifiers, body, beginLine, endLine);								
-		method.setOwn(modelBuilder.getCurrentFile());
-		modelBuilder.getCurrentClass().methods.put(method.getIdentifier(), method);
 	}
 }

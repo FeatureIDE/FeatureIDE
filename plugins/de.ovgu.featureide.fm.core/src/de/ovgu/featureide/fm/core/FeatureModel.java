@@ -1163,6 +1163,10 @@ public class FeatureModel implements PropertyConstants {
 		return false;
 	}
 	
+	/**
+	 * 
+	 * @return <code>true</code> if the feature model contains a hidden feature
+	 */
 	public boolean hasHidden() {
 		for (Feature f : this.featureTable.values()) {
 			if (f.isHidden())

@@ -43,6 +43,7 @@ public class FSTMethod extends FSTModelElement implements Comparable<Object> {
 	private int endLine;
 	private int composedLine;
 	public boolean isConstructor = false;
+	public boolean refines = false;
 	
 	public FSTMethod() {
 		this(null, null, null,null);

@@ -22,7 +22,6 @@ import java.util.LinkedList;
 
 import de.ovgu.cide.fstgen.ast.FSTTerminal;
 import de.ovgu.featureide.core.fstmodel.FSTField;
-import de.ovgu.featureide.core.fstmodel.FSTMethod;
 
 /**
  * 
@@ -52,7 +51,7 @@ public class HaskellClassBuilder extends ClassBuilder {
 		}
 		LinkedList<String> parameter = new LinkedList<String>();
 		parameter.add(method.get(1));
-		addMethod(method.get(0), parameter, "void", "", terminal.getBody(), terminal.beginLine, terminal.endLine);
+		addMethod(method.get(0), parameter, "void", "", terminal.getBody(), terminal.beginLine, terminal.endLine, false);
 	}
 	
 	/**
@@ -85,12 +84,5 @@ public class HaskellClassBuilder extends ClassBuilder {
 		}
 		method.add(parameter);
 		return method;
-	}
-
-	private void addMethod(String name, LinkedList<String> parameterTypes, 
-			String returnType, String modifiers, String body, int beginLine, int endLine) {
-		FSTMethod method = new FSTMethod(name, parameterTypes, returnType, modifiers, body, beginLine, endLine);								
-		method.setOwn(modelBuilder.getCurrentFile());
-		modelBuilder.getCurrentClass().methods.put(method.getIdentifier(), method);
 	}
 }

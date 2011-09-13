@@ -240,6 +240,59 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		AutoLayoutConstraintAction.setEnabled(!getFeatureModel().hasFeaturesAutoLayout());
 		
 		boolean connectionSelected = alternativeAction.isConnectionSelected();
+		
+		//don't show menu to change group type of a feature in case a connection line is selected
+		if ((createLayerAction.isEnabled()
+				|| createCompoundAction.isEnabled()) && !connectionSelected) {
+			menu.add(createCompoundAction);
+			menu.add(createLayerAction);
+			menu.add(createConstraintAction);
+			menu.add(renameAction);
+			menu.add(deleteAction);
+			menu.add(deleteAllAction);
+			menu.add(new Separator());
+			connectionEntrys(menu);
+			menu.add(mandatoryAction);
+			menu.add(abstractAction);
+			menu.add(hiddenAction);
+			menu.add(new Separator());
+			menu.add(subMenu);
+			menu.add(new Separator());
+			menu.add(reverseOrderAction);
+		} else if (editConstraintAction.isEnabled() && !connectionSelected) {
+			menu.add(createConstraintAction);
+			menu.add(editConstraintAction);
+			menu.add(deleteAction);
+		} else if (legendLayoutAction.isEnabled()){
+			menu.add(legendLayoutAction);
+		} else if (!connectionSelected){
+			menu.add(createConstraintAction);
+			menu.add(new Separator());
+			menu.add(subMenu);
+			menu.add(new Separator());
+			menu.add(reverseOrderAction);	
+		} else {
+			connectionEntrys(menu);
+		}
+		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+		menu.add(legendAction);
+		if (featureModelEditor.getFeatureModel().hasHidden()) {
+			menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+			menu.add(showHiddenFeaturesAction);
+		}
+		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
+		// call of the FeatureDiagramExtensions (for features only)
+		if ((createLayerAction.isEnabled()
+				|| createCompoundAction.isEnabled()) && !connectionSelected) {
+			for (FeatureDiagramExtension extension : FeatureDiagramExtension.getExtensions()) {
+				extension.extendContextMenu(menu, this);
+			}
+		}
+	}
+	
+	private void connectionEntrys(IMenuManager menu) {
+		boolean connectionSelected = alternativeAction.isConnectionSelected();
 		if (andAction.isEnabled() || orAction.isEnabled()  || alternativeAction.isEnabled()) {
 			if (andAction.isChecked()) {
 				andAction.setText("And");
@@ -267,50 +320,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 			menu.add(orAction);
 			menu.add(alternativeAction);
 			menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-		}
-		
-		//don't show menu to change group type of a feature in case a connection line is selected
-		if ((createLayerAction.isEnabled()
-				|| createCompoundAction.isEnabled()) && !connectionSelected) {
-			menu.add(createCompoundAction);
-			menu.add(createLayerAction);
-			menu.add(createConstraintAction);
-			menu.add(renameAction);
-			menu.add(deleteAction);
-			menu.add(deleteAllAction);
-			menu.add(new Separator());
-			menu.add(mandatoryAction);
-			menu.add(abstractAction);
-			menu.add(hiddenAction);
-			menu.add(new Separator());
-			menu.add(subMenu);
-			menu.add(new Separator());
-			menu.add(reverseOrderAction);
-		} else if (editConstraintAction.isEnabled() && !connectionSelected) {
-			menu.add(createConstraintAction);
-			menu.add(editConstraintAction);
-			menu.add(deleteAction);
-		} else if (legendLayoutAction.isEnabled()){
-			menu.add(legendLayoutAction);
-		} else if (!connectionSelected){
-			menu.add(createConstraintAction);
-			menu.add(new Separator());
-			menu.add(subMenu);
-			menu.add(new Separator());
-			menu.add(reverseOrderAction);	
-		}
-		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-		menu.add(legendAction);
-		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-		menu.add(showHiddenFeaturesAction);
-		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-
-		// call of the FeatureDiagramExtensions (for features only)
-		if ((createLayerAction.isEnabled()
-				|| createCompoundAction.isEnabled()) && !connectionSelected) {
-			for (FeatureDiagramExtension extension : FeatureDiagramExtension.getExtensions()) {
-				extension.extendContextMenu(menu, this);
-			}
 		}
 	}
 

@@ -22,12 +22,11 @@ import java.util.LinkedList;
 
 import de.ovgu.cide.fstgen.ast.FSTTerminal;
 import de.ovgu.featureide.core.fstmodel.FSTField;
-import de.ovgu.featureide.core.fstmodel.FSTMethod;
 
 /**
  * @author Jens Meinicke
  */
-public class JavaClassBuilder extends ClassBuilder{
+public class JavaClassBuilder extends ClassBuilder {
 
 	public JavaClassBuilder(FeatureHouseModelBuilder builder) {
 		super(builder);
@@ -192,13 +191,5 @@ public class JavaClassBuilder extends ClassBuilder{
 			}
 		}
 		return parameterTypes;
-	}
-	
-	private void addMethod(String name, LinkedList<String> parameterTypes, 
-			String returnType, String modifiers, String body, int beginLine, int endLine, boolean isConstructor) {
-		FSTMethod method = new FSTMethod(name, parameterTypes, returnType, modifiers, body, beginLine, endLine);								
-		method.setOwn(modelBuilder.getCurrentFile());
-		method.isConstructor = isConstructor;
-		modelBuilder.getCurrentClass().methods.put(method.getIdentifier(), method);
 	}
 }
