@@ -32,6 +32,10 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 
 import cide.gparser.ParseException;
 
@@ -55,6 +59,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	private static final String SOURCE_ENTRY = "\t<classpathentry kind=\"src\" path=\"";
 	private static final String EXCLUDE_ENTRY = "\t<classpathentry excluding=\"";
 	private static final String EXCLUDE_SOURCE_ENTRY = "\" kind=\"src\" path=\"";
+	private static final String CLASSPATH_START = "<classpath>";
 
 	private FSTGenComposer composer;
 
@@ -113,12 +118,13 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		if (!buildFolder.exists()) {
 			try {
 				buildFolder.create(true, true, null);
+				buildFolder.refreshLocal(IResource.DEPTH_ZERO, null);
 			} catch (CoreException e) {
 				FeatureHouseCorePlugin.getDefault().logError(e);
 			}
 		}
-
-		setJaveBuildPath(config.getName().split("[.]")[0]);
+		
+		setJavaBuildPath(config.getName().split("[.]")[0]);
 
 		// A new FSTGenComposer instance is created every time, because this
 		// class seems to remember the FST from a previous build.
@@ -135,15 +141,39 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 				featureProject.getProjectName());
 		fstparser.createProjectTree(composer.getFstnodes());
 		featureProject.setProjectTree(fstparser.getProjectTree());
-		try {
-			featureProject.getProject().refreshLocal(IResource.DEPTH_INFINITE,
-					null);
-		} catch (CoreException e) {
-			FeatureHouseCorePlugin.getDefault().logError(e);
-		}
+		callCompiler();
 	}
 
-	private void setJaveBuildPath(String buildPath) {
+	/**
+	 * This job calls the compiler by touching the .classpath file of the project.<br> 
+	 * This is necessary after calling <code>setAsCurrentConfiguration</code>.
+	 */
+	private void callCompiler() {
+		Job job = new Job("Call compiler") {
+			protected IStatus run(IProgressMonitor monitor) {
+				IFile iClasspathFile = featureProject.getProject()
+						.getFile(".classpath");
+				if (iClasspathFile.exists()) {
+					try {
+						iClasspathFile.touch(monitor);
+						iClasspathFile.refreshLocal(IResource.DEPTH_ZERO, monitor);
+					} catch (CoreException e) {
+						FeatureHouseCorePlugin.getDefault().logError(e);
+					}
+				}
+				return Status.OK_STATUS;
+			}
+		};
+		job.setPriority(Job.DECORATE);
+		job.schedule();
+		
+	}
+
+	/**
+	 * Sets the Java build path to the folder at the build folder, named like the current configuration.
+	 * @param buildPath The name of the current configuration
+	 */
+	private void setJavaBuildPath(String buildPath) {
 		Scanner scanner = null;
 		FileWriter fw = null;
 		IFile iClasspathFile = featureProject.getProject()
@@ -155,6 +185,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			File file = iClasspathFile.getRawLocation().toFile();
 			StringBuffer fileText = new StringBuffer();
 			scanner = new Scanner(file);
+			boolean hasSourceEntry = false;
 			while (scanner.hasNext()) {
 				String line = scanner.nextLine();
 				if (line.contains(SOURCE_ENTRY)) {
@@ -162,6 +193,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 							+ featureProject.getBuildFolder().getName() + "/"
 							+ buildPath + "\"/>");
 					fileText.append("\r\n");
+					hasSourceEntry = true;
 				} else if (line.contains(EXCLUDE_ENTRY)) {
 					fileText.append(line.substring(0,
 							line.indexOf(EXCLUDE_SOURCE_ENTRY)
@@ -170,12 +202,21 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 							+ "/"
 							+ buildPath + "\"/>");
 					fileText.append("\r\n");
+					hasSourceEntry = true;
 				} else {
 					fileText.append(line);
 					fileText.append("\r\n");
 				}
 			}
-			String fileTextString = fileText.toString();
+			String fileTextString;
+			if (!hasSourceEntry) {
+				fileTextString = fileText.toString().replaceFirst(CLASSPATH_START, 
+						CLASSPATH_START + "\r\n" + SOURCE_ENTRY
+						+ featureProject.getBuildFolder().getName() + "/"
+						+ buildPath + "\"/>");
+			} else {
+				fileTextString = fileText.toString();
+			}
 			fw = new FileWriter(file);
 			fw.write(fileTextString);
 			iClasspathFile.refreshLocal(IResource.DEPTH_ZERO, null);
@@ -198,6 +239,36 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 			}
 		}
+	}
+	
+	/**
+	 * For <code>FeatureHouse<code> a clean does not remove the folder,
+	 * named like the current configuration at the build folder, 
+	 * to prevent build path errors.
+	 */
+	@Override
+	public boolean clean() {
+		if (featureProject == null || featureProject.getBuildFolder() == null) {
+			return false;
+		}
+		try {
+			for (IResource featureFolder : featureProject.getBuildFolder().members()) {
+				if (featureFolder.getName().equals(featureProject.getCurrentConfiguration().getName().split("[.]")[0])) {
+					if (featureFolder instanceof IFolder) {
+						for (IResource res : ((IFolder)featureFolder).members()){
+							res.delete(true, null);
+						}
+					} else {
+						featureFolder.delete(true, null);
+					}
+				} else {
+					featureFolder.delete(true, null);
+				}
+			}
+		} catch (CoreException e) {
+			FeatureHouseCorePlugin.getDefault().logError(e);
+		}
+		return false;
 	}
 
 	@Override

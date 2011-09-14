@@ -88,10 +88,12 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 	protected void clean(IProgressMonitor monitor) throws CoreException {
 		if (!featureProjectLoaded())
 			return;
+		
+		featureProject.deleteBuilderMarkers(featureProject.getSourceFolder(),
+				IResource.DEPTH_INFINITE);
+		composerExtension.initialize(featureProject);
 		if (!composerExtension.clean()) {
 			cleaned = false;
-			featureProject.deleteBuilderMarkers(featureProject.getSourceFolder(),
-					IResource.DEPTH_INFINITE);
 			
 			featureProject.getProject().refreshLocal(IResource.DEPTH_INFINITE,
 					monitor);
@@ -102,10 +104,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 				&& featureProject.getProject().hasNature(FeatureProjectNature.NATURE_ID)) {
 			hasOtherNature = false;
 		}
-		
-		featureProject.deleteBuilderMarkers(featureProject.getSourceFolder(),
-				IResource.DEPTH_INFINITE);
-		
+
 		featureProject.getBuildFolder().refreshLocal(IResource.DEPTH_INFINITE,
 				monitor);
 		if (!hasOtherNature) {
@@ -118,27 +117,19 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		
 		if (cleanBuild) {
 			IFile configFile = featureProject.getCurrentConfiguration();
-			if (configFile == null)
+			if (configFile == null) {
 				return;
-	
-			for (IResource res : featureProject.getBuildFolder().members()) {
-						res.delete(true, monitor);
 			}
-			if (!hasOtherNature) {
-				for (IResource res : featureProject.getBinFolder().members())
-						res.delete(true, monitor);
-			}
-			
 		}else{
-			if (!hasOtherNature) {
-				for (IResource member : featureProject.getBinFolder().members())
-					member.delete(true, monitor);
-			}
-			for (IResource member : featureProject.getBuildFolder().members()) {
-				member.delete(true, monitor);
-			}
 			cleaned = true;
-		}	
+		}
+		if (!hasOtherNature) {
+			for (IResource member : featureProject.getBinFolder().members())
+				member.delete(true, monitor);
+		}
+		for (IResource member : featureProject.getBuildFolder().members()) {
+			member.delete(true, monitor);
+		}
 		
 		featureProject.getBuildFolder().refreshLocal(IResource.DEPTH_INFINITE,
 				monitor);
@@ -181,12 +172,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		
 		featureProject.builded();
 		try {
-			featureProject.getBuildFolder().refreshLocal(
-					IResource.DEPTH_INFINITE, monitor);
-			if (featureProject.getBinFolder() != null) {
-				featureProject.getBinFolder().refreshLocal(
-						IResource.DEPTH_INFINITE, monitor);
-			}
+			featureProject.getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
 			CorePlugin.getDefault().fireBuildUpdated(featureProject);
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
@@ -199,11 +185,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 			CorePlugin.getDefault().logError(e1);
 		}
 		try {
-			featureProject.getBuildFolder().refreshLocal(
-					IResource.DEPTH_INFINITE, monitor);
-			if (featureProject.getBinFolder() != null)
-				featureProject.getBinFolder().refreshLocal(
-						IResource.DEPTH_INFINITE, monitor);
+			featureProject.getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}

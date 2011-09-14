@@ -51,7 +51,7 @@ public interface IComposerExtensionClass {
 	void performFullBuild(IFile config);
 	
 	/**
-	 * Builds a configuration at the given folder
+	 * Builds a configuration to the given folder
 	 * @param folder
 	 * @param configuration
 	 */
@@ -59,13 +59,13 @@ public interface IComposerExtensionClass {
 	
 	/**
 	 * 
-	 * @return  true if clean should be performed before every build
+	 * @return <code>true</code> if clean should be performed before every build
 	 */
 	boolean clean();
 	
 	/**
-	 * Copys not composed files to the source folder
-	 * @return false if not composed files should be moved in a common way
+	 * Copies not composed files to the source folder
+	 * @return <code>false</code> if not composed files should be moved in a common way
 	 */
 	boolean copyNotComposedFiles();
 	
@@ -76,8 +76,8 @@ public interface IComposerExtensionClass {
 	ArrayList<String> extensions();
 	
 	/**
-	 * Make some changes after adding the FeatureIDE nature
-	 * @return true if the source files not have to be moved to the feature folder anymore
+	 * Make some changes after adding the FeatureIDE nature.
+	 * @return <code>true</code> if the source files not have to be moved to the feature folder anymore
 	 */
 	boolean postAddNature(IFolder source, IFolder destination);
 	
@@ -115,7 +115,7 @@ public interface IComposerExtensionClass {
 	void postCompile(IResourceDelta delta, IFile buildFile);
 	
 	/**
-	 * Folders for each feature will be created if true.
+	 * Folders for each feature will be created if <code>true</code>.
 	 */
 	boolean hasFeatureFolders();
 
@@ -131,19 +131,19 @@ public interface IComposerExtensionClass {
 	void postModelChanged();
 	
 	/**
-	 * @return true if the composer has a folder for each features.
+	 * @return <code>true</code> if the composer has a folder for each features.
 	 */
 	boolean hasFeatureFolder();
 
 	/**
-	 * @return returns false if filenames equal the corresponding feature name
-	 * otherwise true.
+	 * @return returns <code>false</code> if filenames equal the corresponding feature name
+	 * otherwise <code>true</code>.
 	 */
 	boolean hasCustomFilename();
 	
 	/**
 	 * 
-	 * @return returns the default configuration extension.
+	 * @return the default configuration extension.
 	 */
 	String getConfigurationExtension();
 
