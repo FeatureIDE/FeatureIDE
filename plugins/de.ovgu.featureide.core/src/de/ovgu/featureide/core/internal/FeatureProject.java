@@ -286,16 +286,14 @@ public class FeatureProject extends BuilderMarkerHandler implements
 				XmlFeatureModelWriter modelWriter = new XmlFeatureModelWriter(featureModel);
 				modelWriter.writeToFile(modelFile.getResource());
 			}
-/* TODO delete .order file in 2013
- * delete de.ovgu.featureide.fm.ui.editors.FeatureOrderEditor#writeToOrderFile() and corresponding call
- * see TODOs
- * */
-//			if (file.exists()){
-//				file.delete();
-//				project.refreshLocal(IResource.DEPTH_ONE, null);
-//			}
-			
-
+			/* TODO delete .order file in 2013
+			 * delete de.ovgu.featureide.fm.ui.editors.FeatureOrderEditor#writeToOrderFile() and corresponding call
+			 * see TODOs
+			 * */
+			//	if (file.exists()){
+			//		file.delete();
+			//		project.refreshLocal(IResource.DEPTH_ONE, null);
+			//	}
 		} catch (FileNotFoundException e) {
 			modelFile.createModelMarker(e.getMessage(), IMarker.SEVERITY_ERROR,
 					0);
@@ -327,7 +325,6 @@ public class FeatureProject extends BuilderMarkerHandler implements
 						folder.delete(false, null);
 				}
 			}
-
 	}
 
 	private void addModelListener() {

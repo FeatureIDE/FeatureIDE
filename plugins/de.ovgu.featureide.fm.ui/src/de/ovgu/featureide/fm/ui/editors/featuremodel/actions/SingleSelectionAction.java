@@ -114,7 +114,7 @@ public abstract class SingleSelectionAction extends Action implements
 		connectionSelected = part instanceof ConnectionEditPart;
 		if (connectionSelected)
 			return ((ConnectionEditPart) part).getConnectionModel().getTarget();
-		return ((FeatureEditPart) part).getFeatureModel();
+		return ((FeatureEditPart) part).getFeature();
 	}
 
 	private void selectionChanged(boolean oneSelected) {

@@ -224,4 +224,10 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		return label.getBounds();
 	}
 	
+	/**
+	 * @return The <code>Feature</code> represented by this <code>FeatureFigure</code>
+	 */
+	public Feature getFeature() {
+		return feature;
+	}
 }

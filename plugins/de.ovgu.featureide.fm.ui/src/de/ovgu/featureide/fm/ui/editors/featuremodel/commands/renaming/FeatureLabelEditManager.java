@@ -50,7 +50,7 @@ public class FeatureLabelEditManager extends DirectEditManager implements GUIDef
 	protected void initCellEditor() {
 		final CellEditor cellEditor = getCellEditor();
 		final Control control = cellEditor.getControl();
-		final String oldValue = ((FeatureEditPart) getEditPart()).getFeatureModel().getName();
+		final String oldValue = ((FeatureEditPart) getEditPart()).getFeature().getName();
 		
 		control.setFont(DEFAULT_FONT);
 		cellEditor.setValue(oldValue);

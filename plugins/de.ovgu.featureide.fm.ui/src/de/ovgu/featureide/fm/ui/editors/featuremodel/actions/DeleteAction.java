@@ -113,7 +113,7 @@ public class DeleteAction extends Action {
 					&& !(editPart instanceof Feature))
 				continue;
 			Feature feature = editPart instanceof FeatureEditPart ? ((FeatureEditPart) editPart)
-					.getFeatureModel() : (Feature) editPart;
+					.getFeature() : (Feature) editPart;
 			if (feature == root) {
 				if (root.getChildrenCount() != 1)
 					return false;

@@ -78,7 +78,7 @@ public class ModelLayoutEditPolicy extends LayoutEditPolicy {
 			if (r.getEditParts().get(0) instanceof FeatureEditPart) {
 				FeatureEditPart editPart = (FeatureEditPart) r.getEditParts()
 						.get(0);
-				Feature feature = editPart.getFeatureModel();
+				Feature feature = editPart.getFeature();
 				Rectangle bounds = FeatureUIHelper.getBounds(feature);
 				bounds = r.getTransformedRectangle(bounds);
 				cmd = new FeatureDragAndDropCommand(featureModel, feature,

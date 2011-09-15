@@ -70,7 +70,7 @@ public class FeatureMoveEditPolicy extends NonResizableEditPolicy implements GUI
 		r.setForegroundColor(ColorConstants.white);
 		r.setBounds(getInitialFeedbackBounds());
 		
-		s = FeatureUIHelper.getSourceLocation(editPart.getFeatureModel());
+		s = FeatureUIHelper.getSourceLocation(editPart.getFeature());
 		Point s2 = s.getCopy();
 		getHostFigure().translateToAbsolute(s2);
 

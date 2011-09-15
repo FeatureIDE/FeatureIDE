@@ -140,7 +140,7 @@ public class DeleteOperation extends AbstractOperation {
 			}
 			if (editPart instanceof FeatureEditPart) {
 				Feature feature = ((FeatureEditPart) editPart)
-						.getFeatureModel();
+						.getFeature();
 				if (feature.getRelevantConstraints().isEmpty()) {
 					op = new FeatureDeleteOperation(featureModel, feature, true);
 					executeOperation(op);

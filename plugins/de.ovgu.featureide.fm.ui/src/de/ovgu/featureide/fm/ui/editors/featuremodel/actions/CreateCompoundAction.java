@@ -120,7 +120,7 @@ public class CreateCompoundAction extends Action {
 			Feature feature;
 			
 			if (editPart instanceof FeatureEditPart)
-				feature = ((FeatureEditPart) editPart).getFeatureModel();
+				feature = ((FeatureEditPart) editPart).getFeature();
 			else
 				feature = (Feature) editPart;
 			

@@ -44,7 +44,6 @@ public class MandatoryAction extends SingleSelectionAction {
 
 	@Override
 	public void run() {
-
 		setChecked(feature.isMandatory());
 		FeatureSetMandatoryOperation op = new FeatureSetMandatoryOperation(
 				feature, featureModel);

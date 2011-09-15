@@ -65,7 +65,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements
 		setModel(feature);
 	}
 
-	public Feature getFeatureModel() {
+	public Feature getFeature() {
 		return (Feature) getModel();
 	}
 
@@ -75,7 +75,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements
 
 	@Override
 	protected IFigure createFigure() {
-		FeatureFigure figure = new FeatureFigure(getFeatureModel(), ((ModelEditPart) getParent())
+		FeatureFigure figure = new FeatureFigure(getFeature(), ((ModelEditPart) getParent())
 				.getFeatureModel());
 		return figure;
 	}
@@ -85,7 +85,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements
 		FeatureModel featureModel = ((ModelEditPart) getParent())
 				.getFeatureModel();
 		installEditPolicy(EditPolicy.DIRECT_EDIT_ROLE,
-				new FeatureDirectEditPolicy(featureModel, getFeatureModel()));
+				new FeatureDirectEditPolicy(featureModel, getFeature()));
 	}
 
 	private DirectEditManager manager;
@@ -104,18 +104,20 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements
 	@Override
 	public void performRequest(Request request) {
 		
-		for (Constraint constraint : getFeatureModel().getFeatureModel().getConstraints()){
+		for (Constraint constraint : getFeature().getFeatureModel().getConstraints()){
 			if (constraint.isFeatureSelected()) constraint.setFeatureSelected(false);
 		}
 		
 		if (request.getType() == RequestConstants.REQ_DIRECT_EDIT) {
 			showRenameManager();
 		} else if (request.getType() == RequestConstants.REQ_OPEN) {
-			Feature feature = getFeatureModel();
+			Feature feature = getFeature();
+			if (feature.isRoot() || !feature.getParent().isAnd()) {
+				return;
+			}
 			FeatureModel featureModel = ((ModelEditPart) this.getParent())
 			.getFeatureModel();
 			FeatureSetMandatoryOperation op = new FeatureSetMandatoryOperation(feature,featureModel);
-			
 			op.addContext((IUndoContext) featureModel.getUndoContext());
 			try {
 				PlatformUI.getWorkbench().getOperationSupport()
@@ -127,7 +129,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements
 
 			featureModel.handleModelDataChanged();
 		} else if (request.getType() == RequestConstants.REQ_SELECTION) {
-			List<Constraint> relevantConstraints = getFeatureModel().getRelevantConstraints();
+			List<Constraint> relevantConstraints = getFeature().getRelevantConstraints();
 			if (!relevantConstraints.isEmpty()){
 				for (Constraint partOf : relevantConstraints){
 					partOf.setFeatureSelected(true);
@@ -166,14 +168,14 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements
 
 	@Override
 	public void activate() {
-		getFeatureModel().addListener(this);
+		getFeature().addListener(this);
 		super.activate();
 	}
 
 	@Override
 	public void deactivate() {
 		super.deactivate();
-		getFeatureModel().removeListener(this);
+		getFeature().removeListener(this);
 	}
 
 	/*
@@ -186,7 +188,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements
 		String prop = event.getPropertyName();
 		if (prop.equals(LOCATION_CHANGED)) {
 			getFeatureFigure().setLocation((Point) event.getNewValue());
-			for (FeatureConnection connection : getFeatureModel()
+			for (FeatureConnection connection : getFeature()
 					.getTargetConnections()) {
 				Map<?, ?> registry = getViewer().getEditPartRegistry();
 				ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry
@@ -199,7 +201,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements
 			}
 		} else if (prop.equals(CHILDREN_CHANGED)) {
 			getFeatureFigure().setProperties();			
-			for (FeatureConnection connection : getFeatureModel()
+			for (FeatureConnection connection : getFeature()
 					.getTargetConnections()) {
 				Map<?, ?> registry = getViewer().getEditPartRegistry();
 				ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry
@@ -211,8 +213,8 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements
 				}
 			}
 		} else if (prop.equals(NAME_CHANGED)) {
-			getFeatureFigure().setName(getFeatureModel().getName());
-			FeatureUIHelper.setSize(getFeatureModel(), getFeatureFigure()
+			getFeatureFigure().setName(getFeature().getName());
+			FeatureUIHelper.setSize(getFeature(), getFeatureFigure()
 					.getSize());
 		} else if (prop.equals(ATTRIBUTE_CHANGED)) {
 			getFeatureFigure().setProperties();
