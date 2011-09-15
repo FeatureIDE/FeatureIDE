@@ -15,15 +15,16 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: RWTH Aachen
 Import-Package: 
+ org.eclipse.core.commands.common,
  org.eclipse.core.resources,
  org.eclipse.core.runtime,
  org.eclipse.core.runtime.jobs,
+ org.eclipse.draw2d,
+ org.eclipse.gef,
  org.eclipse.jface.action,
  org.eclipse.jface.viewers,
  org.eclipse.swt,
  org.eclipse.swt.widgets,
  org.eclipse.ui,
  org.eclipse.ui.part,
- org.eclipse.core.commands.common,
- org.eclipse.gef,
  org.osgi.framework

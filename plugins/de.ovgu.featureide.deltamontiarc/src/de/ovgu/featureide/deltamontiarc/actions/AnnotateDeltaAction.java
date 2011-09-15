@@ -16,34 +16,23 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IObjectActionDelegate;
-import org.eclipse.ui.IWorkbenchPart;
 
-import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.deltamontiarc.AnnotationHelper;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.SingleSelectionAction;
 
-public class AnnotateDeltaAction implements IObjectActionDelegate {
+public class AnnotateDeltaAction extends SingleSelectionAction {
 
-	private Feature selectedFeature;
-	private FeatureModelEditor featureModelEditor;
+	public AnnotateDeltaAction(String text, Object viewer2) {
+		super(text, viewer2);
+	}
 	
 	@Override
-	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
-		if (targetPart instanceof FeatureModelEditor) {
-			this.featureModelEditor = (FeatureModelEditor) targetPart;
-		}
-	}
-
-	@Override
-	public void run(IAction action) {
+	public void run() {
 		FileDialog fileDialog = new FileDialog(new Shell(), SWT.MULTI);
 		fileDialog.setFilterExtensions(new String[]{"*.delta", "*.*"});
 		fileDialog.setOverwrite(false);
@@ -61,6 +50,11 @@ public class AnnotateDeltaAction implements IObjectActionDelegate {
 			List<String> packageStructure = getPackageStructure(inputFile);
 			
 			// copy input file into corresponding feature folder
+			AnnotationHelper helper = new AnnotationHelper();
+			FeatureModelEditor featureModelEditor = helper.getFeatureModelEditor();
+			if (featureModelEditor == null) {
+				return;
+			}
 			IProject project = ((IResource) featureModelEditor.getGrammarFile().getResource().getAdapter(IFile.class)).getProject();
 			String sourceName = featureModelEditor.getFeatureModel().getProjectConfigurationPath(project);
 			IFolder sourceFolder = null;
@@ -68,7 +62,7 @@ public class AnnotateDeltaAction implements IObjectActionDelegate {
 				sourceFolder = project.getFolder(sourceName);
 			}
 			if (sourceFolder != null) {
-				IFolder featureFolder = sourceFolder.getFolder(selectedFeature.getName());
+				IFolder featureFolder = sourceFolder.getFolder(getSelectedFeature().getName());
 				IFolder targetFolder = featureFolder.getFolder(NameHelper.separatedStringFromList(packageStructure, File.separator));
 				try {
 					if (!targetFolder.exists()) {
@@ -86,8 +80,7 @@ public class AnnotateDeltaAction implements IObjectActionDelegate {
 					FMUIPlugin.getDefault().logError(e);
 				}
 			}
-		}
-		
+		}	
 	}
 
 	private List<String> getPackageStructure(File modelFile) {
@@ -109,15 +102,9 @@ public class AnnotateDeltaAction implements IObjectActionDelegate {
 	}
 
 	@Override
-	public void selectionChanged(IAction action, ISelection selection) {
-		if (selection instanceof StructuredSelection) {
-			StructuredSelection structuredSelection = (StructuredSelection) selection;
-			Object element = structuredSelection.getFirstElement();
-			if (element instanceof FeatureEditPart) {
-				FeatureEditPart selectedFeatureEditPart = (FeatureEditPart) element;
-				selectedFeature = selectedFeatureEditPart.getFeatureModel();
-			}
-		}
+	protected void updateProperties() {
+		setEnabled(true);
+		setChecked(false);
 	}
 
 
