@@ -588,7 +588,13 @@ public class FeatureModel implements PropertyConstants {
 	}
 
 	public void createDefaultValues(String projectName) {
-		Feature root = getFeature(projectName.split("[-]")[0]);
+		String rootName = getValidJavaIdentifier(projectName);
+		Feature root;
+		if (!rootName.equals("")) {
+			root = getFeature(rootName);
+		} else {
+			root = getFeature("Root");
+		}
 		root.setAbstract(true);
 		Feature feature = new Feature(this, "Base");
 		root.addChild(feature);
@@ -964,6 +970,27 @@ public class FeatureModel implements PropertyConstants {
 				return false;
 		}
 		return true;
+	}
+	
+	/**
+	 * Removes all invalid java identifiers form a given string.
+	 */
+	private String getValidJavaIdentifier(String s) {
+		StringBuilder stringBuilder = new StringBuilder();
+		int i = 0;
+		for (;i < s.length();i++) {
+			if (Character.isJavaIdentifierStart(s.charAt(i))) {
+				stringBuilder.append(s.charAt(i));
+				i++;
+				break;
+			}
+		}
+		for (;i < s.length();i++) {
+			if (Character.isJavaIdentifierPart(s.charAt(i))) {
+				stringBuilder.append(s.charAt(i));
+			}
+		}
+		return stringBuilder.toString();
 	}
 
 	public String getProjectConfigurationPath(IProject project) {
