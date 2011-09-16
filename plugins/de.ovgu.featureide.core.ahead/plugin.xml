@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+	<extension
+        point="org.eclipse.core.expressions.propertyTesters">
+     <propertyTester          
+        class="de.ovgu.featureide.ahead.actions.ComposerPropertyTester"
+           id="de.ovgu.featureide.ahead.actions.composerpropertytester"
+           namespace="PropertyTester"
+           properties="checkComposer"
+           type="org.eclipse.core.resources.IProject">
+     </propertyTester>
+     </extension>
    <extension
          point="de.ovgu.featureide.core.composers">
       <composer
@@ -11,5 +21,54 @@
             nature="FeatureIDE_Core.jaknature">
       </composer>
    </extension>
-
+      <extension
+         point="org.eclipse.ui.menus">
+         <menuContribution locationURI="popup:org.eclipse.ui.popup.any?after=group.open">
+            <command
+                label="Change the composer to AHEAD"
+                commandId="de.ovgu.featureide.ahead.actions.changecomposeraction"
+                icon="icons/FeatureIconSmall.ico">
+               	<visibleWhen>
+   					<iterate ifEmpty="false">
+      					<adapt type="org.eclipse.core.resources.IProject">
+      						<test
+                  forcePluginActivation="true"
+                  property="PropertyTester.checkComposer"
+                  value="AHEAD"/>
+      					</adapt>
+   					</iterate>
+        		</visibleWhen>
+            </command>
+        </menuContribution>
+      </extension>
+      <extension
+         point="org.eclipse.ui.menus">
+         <menuContribution locationURI="popup:org.eclipse.ui.popup.any?after=group.open">
+            <command
+                label="Change the composer to FeatureHouse"
+                commandId="de.ovgu.featureide.ahead.actions.changecomposeraction"
+                icon="icons/FeatureIconSmall.ico">
+               <visibleWhen>
+				<iterate ifEmpty="false">
+      			<adapt type="org.eclipse.core.resources.IProject">
+      			<test
+               forcePluginActivation="true"
+               property="PropertyTester.checkComposer"
+               value="FeatureHouse"/>
+      			</adapt>
+   				</iterate>
+        </visibleWhen>
+            </command>
+        </menuContribution>
+      </extension>
+    <extension point="org.eclipse.ui.commands">
+    	<command 
+    		id="de.ovgu.featureide.ahead.actions.changecomposeraction" 
+    		name="changecomposeraction"/>
+	</extension>
+   <extension point="org.eclipse.ui.handlers">
+    <handler
+        commandId="de.ovgu.featureide.ahead.actions.changecomposeraction"
+        class="de.ovgu.featureide.ahead.actions.ChangeComposerAction"/>
+	</extension>
 </plugin>

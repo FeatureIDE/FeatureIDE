@@ -715,7 +715,6 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	 */
 	private void setFeatureModuleMarker(final FeatureModel featureModel,
 			IFolder folder) {
-
 		Feature feature = featureModel.getFeature(folder.getName());
 
 		try {

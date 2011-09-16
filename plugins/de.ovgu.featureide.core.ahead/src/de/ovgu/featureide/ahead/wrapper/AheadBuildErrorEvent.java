@@ -134,12 +134,14 @@ public class AheadBuildErrorEvent {
 		}
 		else {
 			IFile jakFile = getJakFile(filename);
-			int jakLine = composedJakLine - line + 1;
-			jakLine += numberOfImportLines(jakFile);
-			jakLine += lineNumberOfLayerDeclaration(jakFile);
-			
-			this.file = jakFile;
-			this.line = jakLine;
+			if (jakFile != null) {
+				int jakLine = composedJakLine - line + 1;
+				jakLine += numberOfImportLines(jakFile);
+				jakLine += lineNumberOfLayerDeclaration(jakFile);
+				
+				this.file = jakFile;
+				this.line = jakLine;
+			}
 		}
 	}
 
@@ -177,7 +179,7 @@ public class AheadBuildErrorEvent {
 		if (newFile.exists())
 			return newFile;
 		
-		AheadCorePlugin.getDefault().logWarning("Was not able to locate an error in the source jak file '" + filename + "'");
+//		AheadCorePlugin.getDefault().logWarning("Was not able to locate an error in the source jak file '" + filename + "'");
 		return null;
 	}
 

@@ -279,7 +279,7 @@ public class AheadComposer extends ComposerExtensionClass {
 	@Override
 	public void postCompile(IResourceDelta delta, IFile file) {
 		super.postCompile(delta, file);
-		if (file.getName().endsWith(".java")) {
+		if (ahead != null && file.getName().endsWith(".java")) {
 			ahead.postCompile(file);
 		}
 	}
