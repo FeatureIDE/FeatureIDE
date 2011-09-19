@@ -78,6 +78,8 @@ import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureStatus;
+import de.ovgu.featureide.fm.core.editing.Comparison;
+import de.ovgu.featureide.fm.core.editing.ModelComparator;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ConstraintCreateOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ConstraintEditOperation;
@@ -771,11 +773,37 @@ public class ConstraintDialog {
 			return false;
 		}		
 
+		try {
+			if (featureModel.isValid() && redundant(con)) {
+				printHeaderWarning("The constraint does not change the product line.");
+				return true;
+			}
+		} catch (TimeoutException e) {
+			FMUIPlugin.getDefault().logError(e);
+		}
 		
 		printHeaderText(headerText);
-
-
 		return true;
+	}
+
+	/**
+	 * Tests if the {@link Constraint} will change the product line. 
+	 * @param constraint The actual {@link Constraint}
+	 * @return <code>true</code> if the {@link Constraint} is redundant
+	 */
+	private boolean redundant(String constraint) {
+		if (constraint.length() == 0) {
+			return false;
+		}
+		FeatureModel clonedModel = featureModel.clone();
+		List<String> featureList = new ArrayList<String>(
+				clonedModel.getFeatureNames());
+		Node propNode = new NodeReader().stringToNode(constraint, featureList);
+		clonedModel.addPropositionalNode(propNode);
+		if (new ModelComparator(20000).compare(featureModel, clonedModel) == Comparison.REFACTORING) {
+			return true;
+		}
+		return false;
 	}
 
 	/**

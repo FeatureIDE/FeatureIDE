@@ -129,7 +129,7 @@ public class Constraint implements PropertyConstants {
 		falseOptionalFeatures.clear();
 		
 		for (Feature feature : containedFeatureList){
-			if (feature.getFeatureStatus() == FeatureStatus.FALSE_OPTIONAL){
+			if (feature != null && feature.getFeatureStatus() == FeatureStatus.FALSE_OPTIONAL){
 				FeatureModel clonedModel = featureModel.clone();
 				clonedModel.removePropositionalNode(this);
 				if (clonedModel.getFeature(feature.getName())
