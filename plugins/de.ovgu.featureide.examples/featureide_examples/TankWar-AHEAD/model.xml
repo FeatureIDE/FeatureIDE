@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-	<featureModel>
+	<featureModel chosenLayoutAlgorithm="1">
 		<struct>
 			<and mandatory="true" name="TankWar">
 				<alt abstract="true" mandatory="true" name="Platform">
@@ -31,7 +31,7 @@
 					<feature mandatory="true" name="Re_fuer_PC"/>
 					<feature mandatory="true" name="Re_fuer_Handy"/>
 				</alt>
-				<alt abstract="true" name="Soundeffekt">
+				<alt name="Soundeffekt">
 					<feature mandatory="true" name="Sound_fuer_pc"/>
 					<feature mandatory="true" name="Sound_fuer_Handy"/>
 				</alt>
@@ -100,4 +100,6 @@
 				</eq>
 			</rule>
 		</constraints>
+		<comments/>
+		<featureOrder userDefined="false"/>
 	</featureModel>
