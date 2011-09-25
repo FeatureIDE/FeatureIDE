@@ -92,6 +92,13 @@
                label="Export model to SPL Conquerer format"
                menubarPath="de.ovgu.featureide.fm.ui_menue/slot4">
          </action>
+                  <action
+               class="de.ovgu.featureide.fm.ui.actions.FeatureDependenciesAction"
+               icon="icons/operator_symbol.gif"
+               id="de.ovgu.featureide.fm.ui.FeatureDependencies"
+               label="Show feature dependencies"
+               menubarPath="de.ovgu.featureide.fm.ui_menue/slot5">
+         </action>
       </objectContribution>
    </extension>
 </plugin>
