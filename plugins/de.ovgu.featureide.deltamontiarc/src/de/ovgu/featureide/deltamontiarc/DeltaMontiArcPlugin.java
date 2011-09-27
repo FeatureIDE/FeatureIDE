@@ -6,7 +6,7 @@ import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 
 public class DeltaMontiArcPlugin extends AbstractCorePlugin {
 
-	public static final String PLUGIN_ID = "mc.deltamontiarc.featureide";
+	public static final String PLUGIN_ID = "de.ovgu.featureide.deltamontiarc";
 
 	private static DeltaMontiArcPlugin plugin;
 	
