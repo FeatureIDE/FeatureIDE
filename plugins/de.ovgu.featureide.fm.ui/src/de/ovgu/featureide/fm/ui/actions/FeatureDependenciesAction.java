@@ -18,7 +18,11 @@
  */
 package de.ovgu.featureide.fm.ui.actions;
 
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
@@ -33,10 +37,9 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 import org.prop4j.And;
@@ -60,9 +63,13 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  */
 public class FeatureDependenciesAction implements IObjectActionDelegate {
 
-	private static final String MESSAGEBOX_ICON = "FeatureIconSmall.ico";
-	private static final String MESSAGEBOX_TITLE = "Feature Dependencies";
-	private static final String LEGEND_TEXT = "X ALWAYS Y := If X is selected Y is selected in every valid configuration.\nX MAYBE Y   := If X is selected Y is selected in at least one but not all valid configurations. \nX NEVER Y   := If X is selected Y cannot be selected in any valid configuration.";
+	private static String sep = System.getProperty("line.separator");
+	private static final String LEGEND_TEXT = "X ALWAYS Y := If X is selected Y is selected in every valid configuration."
+			+ sep
+			+ "X MAYBE Y   := If X is selected Y is selected in at least one but not all valid configurations. "
+			+ sep
+			+ "X NEVER Y   := If X is selected Y cannot be selected in any valid configuration.";
+
 	private ISelection selection;
 
 	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
@@ -88,37 +95,57 @@ public class FeatureDependenciesAction implements IObjectActionDelegate {
 		Job job = new Job("Calculating Feature Dependencies") {
 			protected IStatus run(IProgressMonitor monitor) {
 				final String text = createText(mod.getFeatureNames(), node);
-				//UI access 
+				// UI access
+				final StringBuffer path = new StringBuffer();
 				Display.getDefault().syncExec(new Runnable() {
 
 					@Override
 					public void run() {
-						createMessageBox(text);
+						path.append(openFileDialog());
 					}
 
 				});
+				saveFile(LEGEND_TEXT + text, path.toString());
 				return Status.OK_STATUS;
 			}
+
 		};
+
 		job.setPriority(Job.INTERACTIVE);
 		job.schedule();
 
 	}
+/**
+ * saves the given content to a text File at a given path(including filename)
+ * @param content
+ * @param path
+ */
+	private void saveFile(String content, String path) {
+		if (path == null)
+			return;
+		File outputFile = new File(path);
+
+		try {
+			BufferedWriter out = new BufferedWriter(new FileWriter(outputFile));
+			out.write(content);
+			out.close();
+		} catch (IOException e) {
+		}
+		return;
+	}
 
 	/**
-	 * creates and opens a read-only MessageBox containing the given text
+	 * opens a File Dialog and returns the selected path
 	 * 
 	 * @param text
 	 * 
 	 */
-	private void createMessageBox(String text) {
-		Shell shell = new Shell();
-		shell.setLayout(new FillLayout());
-		shell.setText(MESSAGEBOX_TITLE);
-		shell.setImage(FMUIPlugin.getImage(MESSAGEBOX_ICON));
-		Text box = new Text(shell, SWT.MULTI | SWT.READ_ONLY | SWT.V_SCROLL);
-		box.setText(LEGEND_TEXT + text);
-		shell.open();
+	private String openFileDialog() {
+		FileDialog fileDialog = new FileDialog(new Shell(), SWT.SAVE);
+		fileDialog.setFileName("*.txt");
+		fileDialog.setOverwrite(true);
+		return fileDialog.open();
+
 	}
 
 	/**
@@ -135,7 +162,7 @@ public class FeatureDependenciesAction implements IObjectActionDelegate {
 
 			try {
 
-				textBuf.append("\n"
+				textBuf.append(sep
 						+ createFeatureText(rootNode, s, featureNames));
 			} catch (TimeoutException e) {
 				FMUIPlugin.getDefault().logError(e);
@@ -216,18 +243,18 @@ public class FeatureDependenciesAction implements IObjectActionDelegate {
 		for (String s : featureNames) {
 			if (!s.equals(currentFeature)) {
 				if (nodeImpliesFeature(nodeSel, s, true) == true) {
-					featureString.add(currentFeature + " ALWAYS " + s);
+					featureString.add(sep+currentFeature + " ALWAYS " + s);
 				} else if (nodeImpliesFeature(nodeSel, s, false) == true) {
-					featureString.add(currentFeature + " NEVER " + s);
+					featureString.add(sep+currentFeature + " NEVER " + s);
 				} else {
-					featureString.add(currentFeature + " MAYBE " + s);
+					featureString.add(sep+currentFeature + " MAYBE " + s);
 				}
 			}
 		}
 		StringBuffer b = new StringBuffer();
 
 		for (String s : featureString) {
-			b.append("\n" + s);
+			b.append(s + s);
 		}
 		return b.toString();
 	}
