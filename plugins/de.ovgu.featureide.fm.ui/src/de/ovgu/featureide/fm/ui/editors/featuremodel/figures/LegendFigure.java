@@ -93,6 +93,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		setForegroundColor(LEGEND_FOREGROUND);
 		setBackgroundColor(LEGEND_BACKGROUND);
 		this.width = LEGEND_WIDTH;
+		this.setOpaque(true);
 	}
 
 	/**
