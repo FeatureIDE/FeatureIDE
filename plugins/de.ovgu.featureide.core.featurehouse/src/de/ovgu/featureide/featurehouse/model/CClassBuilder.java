@@ -24,7 +24,9 @@ import de.ovgu.cide.fstgen.ast.FSTTerminal;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 
 /**
+ * Builds Classes for the FSTModel for <code>FeatureHouse</code> C files.
  * 
+ * @see ClassBuilder
  * @author Jens Meinicke
  */
 public class CClassBuilder extends ClassBuilder {

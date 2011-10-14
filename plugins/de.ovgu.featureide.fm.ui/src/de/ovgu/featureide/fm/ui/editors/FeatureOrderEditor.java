@@ -102,7 +102,6 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	@Override
 	public void doSave(IProgressMonitor monitor) {
 		if(hasFeatureOrder) {
-			//TODO can be deleted if .order file is no longer used
 			writeToOrderFile(); //save the feature order also in .order if file exists
 			
 			updateFeatureOrderList();

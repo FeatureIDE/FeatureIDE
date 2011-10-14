@@ -23,7 +23,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 /**
- * TODO description
+ * Test for {@link FeatureHouseModelBuilder} of CSharp files.
  * 
  * @author Jens Meinicke
  */

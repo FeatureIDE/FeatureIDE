@@ -32,10 +32,9 @@ import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 
-
 /**
- * This builder builds the FSTModel for FeatureHouseProjects, by extracting features, 
- * methods and fields from classes to build. 
+ * This builder builds the {@link FSTModel} for FeatureHouse projects, 
+ * by parsing the FeatureHouse internal FSTModel.
  * 
  * @author Jens Meinicke
  */

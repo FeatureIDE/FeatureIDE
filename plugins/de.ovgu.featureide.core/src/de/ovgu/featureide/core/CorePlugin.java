@@ -100,7 +100,7 @@ public class CorePlugin extends AbstractCorePlugin {
 		plugin = this;
 
 		featureProjectMap = new HashMap<IProject, IFeatureProject>();
-		for (IProject project : ResourcesPlugin.getWorkspace().getRoot()
+		for (final IProject project : ResourcesPlugin.getWorkspace().getRoot()
 				.getProjects()) {
 			try {
 				if (project.isOpen()) {

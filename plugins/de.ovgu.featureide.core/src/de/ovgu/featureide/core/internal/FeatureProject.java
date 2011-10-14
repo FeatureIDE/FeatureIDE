@@ -23,6 +23,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -199,6 +200,17 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		setComposerID(getComposerID());
 		setPaths(getProjectSourcePath(), getProjectBuildPath(),
 				getProjectConfigurationPath());
+		
+		// adds the compiler to the feature project if it is an older project
+		IComposerExtension composer = getComposer();
+		if (composer != null) {
+			if (sourceFolder != null) {
+				composer.addCompiler(getProject(),
+						getSourceFolder().getProjectRelativePath().toOSString(),
+						getConfigFolder().getProjectRelativePath().toOSString(),
+						getBuildFolder().getProjectRelativePath().toOSString());
+			}
+		}
 	}
 
 	/*
@@ -715,6 +727,9 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	 */
 	private void setFeatureModuleMarker(final FeatureModel featureModel,
 			IFolder folder) {
+		if (!folder.exists()) {
+			return;
+		}
 		Feature feature = featureModel.getFeature(folder.getName());
 
 		try {
@@ -1147,21 +1162,31 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			project.setPersistentProperty(composerConfigID, composerID);
 			IProjectDescription description = project.getDescription();
 
-			ICommand[] commands = description.getBuildSpec();
-			for (ICommand command : commands) {
-				int i = 0;
+			LinkedList<ICommand> newCommandList = new LinkedList<ICommand>();
+			boolean added = false;
+			for (ICommand command : description.getBuildSpec()) {
 				if (command.getBuilderName().equals(
 						ExtensibleFeatureProjectBuilder.BUILDER_ID)) {
-					Map<String, String> args = command.getArguments();
-					args.put(ExtensibleFeatureProjectBuilder.COMPOSER_KEY,
-							composerID);
-					command.setArguments(args);
-					// Composer must be the first command
-					commands[i] = command;
+					if (!added) {
+						Map<String, String> args = command.getArguments();
+						args.put(ExtensibleFeatureProjectBuilder.COMPOSER_KEY,
+								composerID);
+						command.setArguments(args);
+						// Composer must be the first command
+						newCommandList.addFirst(command);
+						added = true;
+					}
+				} else {
+					newCommandList.add(command);
 				}
+			}
+			ICommand[] newCommandArray = new ICommand[newCommandList.size()];
+			int i = 0;
+			for (ICommand c : newCommandList) {
+				newCommandArray[i] = c;
 				i++;
 			}
-			description.setBuildSpec(commands);
+			description.setBuildSpec(newCommandArray);
 			project.setDescription(description, null);
 		} catch (CoreException ex) {
 		}

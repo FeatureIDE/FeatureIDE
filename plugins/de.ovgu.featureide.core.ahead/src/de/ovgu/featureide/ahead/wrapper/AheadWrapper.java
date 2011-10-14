@@ -141,9 +141,11 @@ public class AheadWrapper {
 										AheadBuildErrorEvent buildError = new AheadBuildErrorEvent(file, marker.getAttribute(IMarker.MESSAGE).toString(), AheadBuildErrorType.JAVAC_ERROR, (Integer)marker.getAttribute(IMarker.LINE_NUMBER));
 										if (!hasMarker(buildError)) {
 											IMarker newMarker = buildError.getResource().createMarker(BUILDER_PROBLEM_MARKER);
-											newMarker.setAttribute(IMarker.LINE_NUMBER, buildError.getLine());
-											newMarker.setAttribute(IMarker.MESSAGE, buildError.getMessage());
-											newMarker.setAttribute(IMarker.SEVERITY, marker.getAttribute(IMarker.SEVERITY));
+											if (newMarker.exists()) {
+												newMarker.setAttribute(IMarker.LINE_NUMBER, buildError.getLine());
+												newMarker.setAttribute(IMarker.MESSAGE, buildError.getMessage());
+												newMarker.setAttribute(IMarker.SEVERITY, marker.getAttribute(IMarker.SEVERITY));
+											}
 										}
 									}
 								}
@@ -158,14 +160,16 @@ public class AheadWrapper {
 
 			private boolean hasMarker(AheadBuildErrorEvent buildError) {
 				try {
-					int LineNumber = buildError.getLine();
-					String Message = buildError.getMessage();
-					IMarker[] marker = buildError.getResource().findMarkers(BUILDER_PROBLEM_MARKER, false, IResource.DEPTH_ZERO);
-					if (marker.length > 0) {
-						for (IMarker m : marker) {
-							if (LineNumber == m.getAttribute(IMarker.LINE_NUMBER, -1)) {
-								if (Message.equals(m.getAttribute(IMarker.MESSAGE, null))) {
-									return true;
+					if (buildError.getResource().exists()) {
+						int LineNumber = buildError.getLine();
+						String Message = buildError.getMessage();
+						IMarker[] marker = buildError.getResource().findMarkers(BUILDER_PROBLEM_MARKER, false, IResource.DEPTH_ZERO);
+						if (marker.length > 0) {
+							for (IMarker m : marker) {
+								if (LineNumber == m.getAttribute(IMarker.LINE_NUMBER, -1)) {
+									if (Message.equals(m.getAttribute(IMarker.MESSAGE, null))) {
+										return true;
+									}
 								}
 							}
 						}

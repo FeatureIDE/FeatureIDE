@@ -19,7 +19,7 @@
 package de.ovgu.featureide.fm.core;
 
 /**
- * TODO description
+ * Provides attributes of a {@link Constraint}.
  * 
  * @author Cyrill Meyer
  */

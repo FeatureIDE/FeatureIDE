@@ -44,7 +44,7 @@ import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
 
 /**
  * Propagates error markers for composed files to sources files.
- * TODO add tests
+ * TODO @Jens add tests
  * @author Jens Meinicke
  */
 public class ErrorPropagation {
@@ -56,7 +56,6 @@ public class ErrorPropagation {
 	public ErrorPropagation() {
 		
 	}
-	
 
 	public void addFile(IFile file) {
 		//TODO implement error propagation for all FeatureHouse languages

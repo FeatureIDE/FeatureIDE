@@ -231,6 +231,9 @@ public class AheadBuildErrorEvent {
      * @throws IOException 
      */
     public static String getString(IFile file) throws CoreException, IOException {
+    	if (!file.isAccessible()) {
+    		return "";
+    	}
         InputStream contentStream = file.getContents();
         Reader in = new InputStreamReader(contentStream);
 

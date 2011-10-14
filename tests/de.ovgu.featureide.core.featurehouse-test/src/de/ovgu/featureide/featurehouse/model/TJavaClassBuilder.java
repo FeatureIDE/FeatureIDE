@@ -23,8 +23,8 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 /**
- * TODO description
- * 
+ * Test for {@link FeatureHouseModelBuilder} of Java files.
+ * @see JavaClassBuilder
  * @author Jens Meinicke
  */
 public class TJavaClassBuilder {

@@ -66,12 +66,14 @@ public class AHEADToFeatureHouseConversion extends ComposerConversion {
 
 	/**
 	 * Replaces <code>Super().methodName()</code> by <code>original()</code>.<br>
-	 * Removes <code>refines</code> from classes that refine.
+	 * Removes <code>refines</code> from classes that refine.<br>
+	 * Removes <code>layer feature;</code> declaration.
 	 */
 	@Override
 	String changeFile(String fileText, IFile file) {
+		fileText = fileText.replaceFirst("layer \\w*;", "");
 		fileText = fileText.replaceFirst("refines ", "");
-		fileText = fileText.replaceAll("Super\\(\\).\\w*\\(", "original(");
+		fileText = fileText.replaceAll("Super\\(\\s*\\w*\\s*\\).\\w*\\(", "original(");
 		return fileText;
 	}
 

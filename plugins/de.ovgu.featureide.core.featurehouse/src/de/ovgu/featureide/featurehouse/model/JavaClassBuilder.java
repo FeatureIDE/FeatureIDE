@@ -22,8 +22,12 @@ import java.util.LinkedList;
 
 import de.ovgu.cide.fstgen.ast.FSTTerminal;
 import de.ovgu.featureide.core.fstmodel.FSTField;
+import de.ovgu.featureide.core.fstmodel.FSTModel;
 
 /**
+ * Builds Classes for the {@link FSTModel} for <code>FeatureHouse</code> Java files.
+ * 
+ * @see ClassBuilder
  * @author Jens Meinicke
  */
 public class JavaClassBuilder extends ClassBuilder {

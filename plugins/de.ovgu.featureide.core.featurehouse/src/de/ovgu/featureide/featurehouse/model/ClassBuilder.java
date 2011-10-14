@@ -24,26 +24,47 @@ import org.eclipse.core.resources.IFile;
 
 import de.ovgu.cide.fstgen.ast.FSTTerminal;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
+import de.ovgu.featureide.core.fstmodel.FSTModel;
 
 /**
- * 
+ * Class builders are creating entries for the FSTModel of their special language.<br>
+ * Parent Class for all Class builders.
+ *
+ * @see {@link JavaClassBuilder}, {@link CClassBuilder}, {@link CSClassBuilder}, 
+ * 		{@link HaskellClassBuilder}
  * @author Jens Meinicke
  */
 public class ClassBuilder {
 	
+	/**
+	 * The {@link FeatureHouseModelBuilder} calling the {@link ClassBuilder}
+	 */
 	FeatureHouseModelBuilder modelBuilder;
 	
 	public ClassBuilder(FeatureHouseModelBuilder modelBuilder) {
 		this.modelBuilder = modelBuilder;
 	}
 
+	/**
+	 * Creates the entry for the given field.
+	 * @param terminal FSTTerminal containing the field
+	 */
 	void caseFieldDeclaration(FSTTerminal terminal) {}
 	
+	/**
+	 * Creates the entry for the given method.
+	 * @param terminal FSTTerminal containing the method
+	 */
 	void caseMethodDeclaration(FSTTerminal terminal) {}
 	
+	/**
+	 * Creates the entry for the given constructor.
+	 * @param terminal FSTTerminal containing the constructor
+	 */
 	void caseConstructorDeclaration(FSTTerminal terminal) {}
 	
 	/**
+	 * Locks for the correct {@link ClassBuilder} of the given file.
 	 * @return <code>ClassBuilder</code> for the given file
 	 */
 	public static ClassBuilder getClassBuilder(IFile file, FeatureHouseModelBuilder builder) {
@@ -64,14 +85,14 @@ public class ClassBuilder {
 	}
 	
 	/**
-	 * Adds the method with the given parameters to the FSTModel.
+	 * Adds the method with the given parameters to the {@link FSTModel}.
 	 * @param name Name of the method
 	 * @param parameterTypes Types of the parameters
 	 * @param returnType Return type
 	 * @param modifiers Modifiers
 	 * @param body The methods body
 	 * @param beginLine Start of the method at features file 
-	 * @param endLine End of the method at features file.
+	 * @param endLine End of the method at features file
 	 * @param isConstructor <code>true</code> if the method is a constructor 
 	 */
 	void addMethod(String name, LinkedList<String> parameterTypes, 

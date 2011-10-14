@@ -18,7 +18,9 @@
  */
 package de.ovgu.featureide.featurehouse.model;
 
+
 /**
+ * Contains node types of the <code>FeatureHouse</code> internal FSTModel.
  * @author Jens Meinicke
  */
 public interface FHNodeTypes {

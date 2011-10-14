@@ -23,8 +23,8 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 /**
- * TODO description
- * 
+ * Test for {@link FeatureHouseModelBuilder} of Haskel files.
+ * @see HaskellClassBuilder
  * @author Jens Meinicke
  */
 public class THaskellClassBuilder {

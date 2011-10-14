@@ -130,6 +130,7 @@ public class AspectJFMCompserExtension extends FMComposerExtension {
 				return;
 			}
 			// TODO revise replacement \w or \W for word char
+			// add tests
 			String fileTextString = fileText.toString().replaceAll(
 					getAspect(oldName), getAspect(newName));
 

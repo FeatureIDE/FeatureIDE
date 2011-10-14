@@ -25,13 +25,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 
+import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
@@ -53,6 +56,10 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 public class AheadComposer extends ComposerExtensionClass {
 
 	public static final String COMPOSER_ID = "de.ovgu.featureide.composer.ahead";
+
+	public static final String OLD_BUILD_COMMAND = "FeatureIDE_Core.jakBuilder";
+
+	private static final String LAYER_REPLACING = "LAYER_REPLACING";
 
 	private AheadWrapper ahead;
 
@@ -83,7 +90,7 @@ public class AheadComposer extends ComposerExtensionClass {
 	public void performFullBuild(IFile config) {
 		assert (ahead != null) : "Ahead instance not initialized";
 		try {
-			checkSourceFiles(featureProject.getSourceFolder());
+			correctSourceFiles(featureProject.getSourceFolder());
 			ahead.setConfiguration(config);
 			ahead.buildAll();
 		} catch (Exception e) {
@@ -92,60 +99,82 @@ public class AheadComposer extends ComposerExtensionClass {
 	}
 	
 	/**
-	 * The first line of a jak file must not start with imports else the 
-	 * imports will be written in the same line at the composed file. 
+	 * Iterated through all jak files of the source folder.<br><br>
+	 * 
+	 * The first line of a jak file must not start with imports.<br>
+	 * Removes derived layer declarations.
 	 * 
 	 * @param folder
 	 * @throws CoreException
 	 */
-	private void checkSourceFiles(IFolder folder) throws CoreException {
+	private void correctSourceFiles(IFolder folder) throws CoreException {
 		for (IResource res : folder.members()) {
 			if (res instanceof IFolder) {
-				checkSourceFiles((IFolder)res);
+				correctSourceFiles((IFolder)res);
 			} else if(res instanceof IFile){
 				if (res.getName().endsWith(".jak")) {
-					checkSourceFile((IFile)res);
+					correctSourceFile((IFile)res);
 				}
 			}
 		}
 	}
 	
-	private void checkSourceFile(IFile file) {
+	/**
+	 * Corrects the given source jak file.<br><br>
+	 * 
+	 * The first line of a jak file must not start with imports.<br> 
+	 * Removes derived layer declarations.
+	 * 
+	 * @param file
+	 */
+	private void correctSourceFile(IFile file) {
 		String text = getFileText(file);
 		if (text != null) {
-			text = "\r\n" + text;
-			setFileText(file, text);
-			try {
-				file.refreshLocal(IResource.DEPTH_ZERO, null);
-			} catch (CoreException e) {
-				AheadCorePlugin.getDefault().logError(e);
+			text = correctFileText(text);
+			if (text != null) {
+				setFileText(file, text);
 			}
 		}
 	}
 
 	/**
-	 * @param file
-	 * @return the file text or null if file not starts with "import"
+	 * Corrects the given file content of the source jak file.<br><br>
+	 * 
+	 * The first line of a jak file must not start with imports.<br>
+	 * Removes derived layer declarations.
+	 * 
+	 * @param fileContent The file content.
+	 * @return
 	 */
-	private String getFileText(IFile iFile) {
+	public static String correctFileText(String fileContent) {
+		boolean changed = false;
+		if (fileContent.startsWith("import ")) {
+			changed = true;
+			fileContent = "\r\n" + fileContent;
+		}
+		if (!fileContent.equals(fileContent.replaceFirst("layer\\s+\\w+\\s*;", ""))
+				&& fileContent.replaceFirst("layer\\s+\\w+\\s*;", LAYER_REPLACING).indexOf(LAYER_REPLACING) < fileContent.indexOf("{")) {
+			return fileContent.replaceFirst("layer\\s+\\w+\\s*;", "");
+		} else if (changed) {
+			return fileContent;
+		}
+		return null;
+	}
+
+	/**
+	 * Returns the content of a file.
+	 * @param file
+	 * @return the file content
+	 */
+	private String getFileText(IFile file) {
 		Scanner scanner = null;
 		try {
-			File file = iFile.getRawLocation().toFile();
 			StringBuffer fileText = new StringBuffer();
-			scanner = new Scanner(file);
-			if (scanner.hasNext()) {
-				String firstLine = scanner.nextLine();
-				if (!firstLine.startsWith("import ")) {
-					return null;
-				}
-				fileText.append(firstLine);
-				fileText.append("\r\n");
-			}
+			scanner = new Scanner(file.getRawLocation().toFile());
 			while (scanner.hasNext()) {
 				fileText.append(scanner.nextLine());
 				fileText.append("\r\n");
 			}
-			
 			return fileText.toString();
 		} catch (FileNotFoundException e) {
 			AheadCorePlugin.getDefault().logError(e);
@@ -158,14 +187,20 @@ public class AheadComposer extends ComposerExtensionClass {
 	}
 
 	/**
+	 * Sets the content of a file.
 	 * @param file
-	 * @param text
+	 * @param content
 	 */
-	private void setFileText(IFile file, String text) {
+	private void setFileText(IFile file, String content) {
 		FileWriter fw = null;
 		try {
 			fw = new FileWriter(file.getRawLocation().toFile());
-			fw.write(text);
+			fw.write(content);
+			try {
+				file.refreshLocal(IResource.DEPTH_ZERO, null);
+			} catch (CoreException e) {
+				AheadCorePlugin.getDefault().logError(e);
+			}
 		} catch (IOException e) {
 			AheadCorePlugin.getDefault().logError(e);
 		} finally {
@@ -177,7 +212,6 @@ public class AheadComposer extends ComposerExtensionClass {
 				}
 			}
 		}
-		
 	}
 
 	@Override
@@ -289,6 +323,36 @@ public class AheadComposer extends ComposerExtensionClass {
 			String configPath, String buildPath) {
 		super.addCompiler(project, sourcePath, configPath, buildPath);
 		addSettings(project);
+		removeOldBuildCommand(project);
+	}
+	
+	/**
+	 * Removes the old build command from project setup.
+	 * "FeatureIDE_Core.jakBuilder"
+	 * @param project 
+	 */
+	private void removeOldBuildCommand(IProject project) {
+		try {
+			IProjectDescription description = project.getDescription();
+			LinkedList<ICommand> newCommandList = new LinkedList<ICommand>();
+			for (ICommand command : description.getBuildSpec()) {
+				if (command.getBuilderName().equals(COMPOSER_ID)) {
+					newCommandList.addFirst(command);
+				}
+				if (!command.getBuilderName().equals(OLD_BUILD_COMMAND)) {
+					newCommandList.add(command);
+				}
+			}
+			ICommand[] newCommandArray = new ICommand[newCommandList.size()];
+			int i = 0;
+			for (ICommand c : newCommandList) {
+				newCommandArray[i] = c;
+				i++;
+			}
+			description.setBuildSpec(newCommandArray);
+			project.setDescription(description, null);
+		} catch (CoreException ex) {
+		}
 	}
 
 	private void addSettings(IProject project) {

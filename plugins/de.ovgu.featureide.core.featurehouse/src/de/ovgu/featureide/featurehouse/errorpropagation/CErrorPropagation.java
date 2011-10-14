@@ -28,7 +28,7 @@ import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 
 /**
- * TODO description
+ * Propagates errors for <code>FeatureHouse</code> C files.
  * 
  * @author Jens Meinicke
  */
