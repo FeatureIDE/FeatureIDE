@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: FeatureHouse Test Fragment
+Bundle-SymbolicName: de.ovgu.featureide.core.featurehouse;singleton:=true
+Bundle-Version: 2.2.4.qualifier
+Fragment-Host: de.ovgu.featureide.core.ahead
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: University of Magdeburg
+Require-Bundle: org.junit4;bundle-version="4.8.1"
