@@ -88,11 +88,22 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 				listOfColls.add((Collaboration) o);
 		}
 		int index = listOfColls.indexOf(this.getRoleModel().getCollaboration());
-		if (roleFigure.selected)
-			roleFigure.setBackgroundColor(GUIDefaults.ROLE_BACKGROUND_SELECTED);
-		else
-			roleFigure
-					.setBackgroundColor(GUIDefaults.ROLE_BACKGROUND_UNSELECTED);
+		if (roleFigure.selected) {
+			if (roleFigure.role.isEditorFile) {
+				roleFigure.setBackgroundColor(GUIDefaults.OPEN_ROLE_BACKGROUND_SELECTED);
+				roleFigure.setBorder(GUIDefaults.OPEN_ROLE_BORDER_SELECTED);
+			} else {
+				roleFigure.setBackgroundColor(GUIDefaults.ROLE_BACKGROUND_SELECTED);
+			}
+		} else {
+			if (roleFigure.role.isEditorFile) {
+				roleFigure.setBackgroundColor(GUIDefaults.OPEN_ROLE_BACKGROUND_UNSELECTED);
+				roleFigure.setBorder(GUIDefaults.OPEN_ROLE_BORDER_UNSELECTED);
+			} else {
+				roleFigure.setBackgroundColor(GUIDefaults.ROLE_BACKGROUND_UNSELECTED);
+			}
+		}
+
 		int yValue = location.y + index * (size.height + 10) + 8;
 		Point newLocation = new Point(xValue, yValue);
 		Rectangle constraint = new Rectangle(newLocation, size);

@@ -70,10 +70,13 @@ public class RoleFigure extends Figure implements GUIDefaults{
 	private final Label label = new Label();
 	public Boolean selected = false;
 	private IFolder featureFolder;
+	public Role role;
 	
 	public RoleFigure(Role role) {
 		
 		super();
+		
+		this.role = role;
 		selected = role.selected;
 		this.setLayoutManager(new FreeformLayout());
 		
@@ -82,10 +85,13 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		else 
 			setBorder(ROLE_BORDER_UNSELECTED);
 		
+		
+		
 		label.setForegroundColor(FOREGROUND);
 		label.setFont(DEFAULT_FONT);
 		label.setLocation(new Point(ROLE_INSETS.left, ROLE_INSETS.top));
 		label.setOpaque(true);
+		
 		this.setName(role.getName());
 		this.add(label);
 		this.setOpaque(true);

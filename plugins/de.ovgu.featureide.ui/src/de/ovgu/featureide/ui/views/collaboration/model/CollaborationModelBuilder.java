@@ -64,6 +64,8 @@ public class CollaborationModelBuilder {
 	private ArrayList<String> extensions;
 	private FSTModel fSTModel;
 	public IFeatureProject project;
+
+	public IFile editorFile;
 	
 	public CollaborationModelBuilder() {
 		model = new CollaborationModel();
@@ -223,6 +225,9 @@ public class CollaborationModelBuilder {
 												.getFile(name);
 											role.files.add(role.file);
 										}
+										if (editorFile != null && role.file.getFullPath().equals(editorFile.getFullPath())) {
+											role.isEditorFile = true;
+										}
 										role.featureName = feature.getName();
 										if (Class.getFields() != null) {
 											for (FSTField f : Class.getFields()) {
@@ -247,6 +252,9 @@ public class CollaborationModelBuilder {
 										} else {
 											role.setParentClass(cl);
 											cl.project = featureProject;
+											if (editorFile != null && cl.getName().equals(editorFile.getName())) {
+												cl.isOpenEditor = true;
+											}
 											model.addClass(cl);
 										}
 										role.selected = selected;
@@ -340,6 +348,9 @@ public class CollaborationModelBuilder {
 						role.setParentClass(model.getClass(cl.getName()));
 					} else {
 						role.setParentClass(cl);
+						if (editorFile != null && cl.getName().equals(editorFile.getName())) {
+							cl.isOpenEditor = true;
+						}
 						cl.project = project;
 						model.addClass(cl);
 					}

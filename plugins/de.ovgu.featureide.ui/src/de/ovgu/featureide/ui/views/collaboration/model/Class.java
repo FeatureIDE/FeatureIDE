@@ -33,6 +33,7 @@ public class Class {
 	private String name;
 	private LinkedList<Role> roles;
 	public IFeatureProject project;
+	public boolean isOpenEditor = false;
 	
 	public Class (String name){
 		this.name = name;

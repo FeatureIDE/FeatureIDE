@@ -190,6 +190,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 								CorePlugin.getDefault().getConfigurationExtensions()
 								.contains(inputFile.getName().substring(inputFile.getName().lastIndexOf(".")))) {
 							//case: open configuration editor
+							builder.editorFile = null;
 							if (builder.configuration != null &&
 									builder.configuration.equals(inputFile) &&
 									featureProject.equals(builder.project)) {
@@ -198,22 +199,14 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 								builder.configuration = (IFile) inputFile.getFile();
 							}
 							
-						} else if (featureProject != null) {
-							//case: open editor is no configuration editor
-							IFile file = featureProject.getCurrentConfiguration();
-							if (file != null) {
-								if (builder.configuration != null &&
-										builder.configuration.equals(file) &&
-										featureProject.equals(builder.project)) {
-									return;
-								} else {
-									builder.configuration = file;
-								}
-							} else {
-								builder.configuration = null;
-							}
 						} else {
-							return;
+							//case: open editor is no configuration editor
+							if (builder.editorFile != null &&
+									builder.editorFile.getName().equals(inputFile.getName())) {
+								return;
+							}
+							builder.editorFile = inputFile.getFile();
+							builder.configuration = featureProject.getCurrentConfiguration();
 						}
 					}
 				}

@@ -47,6 +47,7 @@ public class Role {
 	public IFile file;
 	public String featureName = "";
 	public Boolean selected;
+	public boolean isEditorFile = false;
 	
 	/**
 	 * @return the path

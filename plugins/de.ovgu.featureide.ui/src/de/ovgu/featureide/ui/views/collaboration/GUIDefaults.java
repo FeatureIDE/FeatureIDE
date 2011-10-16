@@ -48,6 +48,13 @@ public interface GUIDefaults {
 	public static Color CLASS_BACKGROUND   		 	  = GUIBasics.createColor(247, 245, 255);
 	public static Color CLASS_BORDER_COLOR	  		  = GUIBasics.createBorderColor(CLASS_BACKGROUND);
 	public static Border CLASS_BORDER				  = new LineBorder(CLASS_BORDER_COLOR, 1);
+
+	/**
+	 * This color highlights the class representing the file at the open editor.
+	 */
+	public static Color OPEN_CLASS_BACKGROUND   	  = GUIBasics.createColor(235, 230, 255);
+	public static Color OPEN_CLASS_BORDER_COLOR	  	  = GUIBasics.createBorderColor(OPEN_CLASS_BACKGROUND);
+	public static Border OPEN_CLASS_BORDER			  = new LineBorder(OPEN_CLASS_BORDER_COLOR, 1);
 	
 	public static Color COLL_BACKGROUND_SELECTED 	  = GUIBasics.createColor(0.8, 0.8, 1.0);
 	public static Color COLL_BORDER_COLOR_SELECTED	  = GUIBasics.createBorderColor(COLL_BACKGROUND_SELECTED);
@@ -57,12 +64,28 @@ public interface GUIDefaults {
 	public static Color COLL_BORDER_COLOR_UNSELECTED  = GUIBasics.createBorderColor(COLL_BACKGROUND_UNSELECTED);
 	public static Border COLL_BORDER_UNSELECTED	 	  = new LineBorder(COLL_BORDER_COLOR_UNSELECTED, 1);
 		
-	public static Color ROLE_BACKGROUND_SELECTED	  = GUIBasics.createColor(0.8, 0.8, 1.0);
+	public static Color ROLE_BACKGROUND_SELECTED	  = GUIBasics.createColor(204, 204, 255);
 	public static Color ROLE_BORDER_COLOR_SELECTED	  = GUIBasics.createBorderColor(ROLE_BACKGROUND_SELECTED);
 	public static Border ROLE_BORDER_SELECTED		  = new LineBorder(ROLE_BORDER_COLOR_SELECTED, 1);
 	
-	public static Color ROLE_BACKGROUND_UNSELECTED    = GUIBasics.createColor(247, 245, 255);
+	public static Color ROLE_BACKGROUND_UNSELECTED    = GUIBasics.createColor(237, 235, 245);
 	public static Color ROLE_BORDER_COLOR_UNSELECTED  = GUIBasics.createBorderColor(ROLE_BACKGROUND_UNSELECTED);
 	public static Border ROLE_BORDER_UNSELECTED	 	  = new LineBorder(ROLE_BORDER_COLOR_UNSELECTED, 1);
 
+	/**
+	 * This color highlights the role(selected) representing the file at the open editor.
+	 */
+	public static Color OPEN_ROLE_BACKGROUND_SELECTED	= ROLE_BACKGROUND_SELECTED; 
+			//GUIBasics.createColor(180, 180, 255);
+	public static Color OPEN_ROLE_BORDER_COLOR_SELECTED	= GUIBasics.createBorderColor(OPEN_ROLE_BACKGROUND_SELECTED);
+	public static Border OPEN_ROLE_BORDER_SELECTED		= new LineBorder(OPEN_ROLE_BORDER_COLOR_SELECTED, 1);
+	
+	/**
+	 * This color highlights the role(selected) representing the file at the open editor.
+	 */
+	public static Color OPEN_ROLE_BACKGROUND_UNSELECTED		= ROLE_BACKGROUND_UNSELECTED; 
+			//GUIBasics.createColor(242, 242, 255);
+	public static Color OPEN_ROLE_BORDER_COLOR_UNSELECTED	= GUIBasics.createBorderColor(OPEN_ROLE_BACKGROUND_UNSELECTED);
+	public static Border OPEN_ROLE_BORDER_UNSELECTED		= new LineBorder(OPEN_ROLE_BORDER_COLOR_UNSELECTED, 1);
+		
 }

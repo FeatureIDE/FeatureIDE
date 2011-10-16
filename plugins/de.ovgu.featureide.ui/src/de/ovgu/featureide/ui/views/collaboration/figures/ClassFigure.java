@@ -47,9 +47,16 @@ public class ClassFigure extends Figure implements GUIDefaults{
 		super();
 		
 		this.setLayoutManager(new FreeformLayout());
+
+		if (c.isOpenEditor) {
+			setBackgroundColor(OPEN_CLASS_BACKGROUND);
+			setBorder(OPEN_CLASS_BORDER);
+		} else {
+			setBackgroundColor(CLASS_BACKGROUND);
+			setBorder(CLASS_BORDER);
+			
+		}
 		
-		setBackgroundColor(CLASS_BACKGROUND);
-		setBorder(CLASS_BORDER);
 		label.setForegroundColor(FOREGROUND);
 		label.setFont(DEFAULT_FONT);
 		label.setLocation(new Point(CLASS_INSETS.left, CLASS_INSETS.top));
