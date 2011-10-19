@@ -18,14 +18,16 @@
  */
 package de.ovgu.featureide.fm.ui.views.outline;
 
+import org.eclipse.jface.viewers.IFontProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.prop4j.NodeWriter;
-
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 
 /**
  * This class is part of the outline. It maps the items provided by the
@@ -34,8 +36,8 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * @author Jan Wedding
  * @author Melanie Pflaume
  */
-public class FmLabelProvider implements ILabelProvider {
-
+public class FmLabelProvider implements ILabelProvider,IFontProvider {
+	
 
 	private static final Image IMG_OPTIONAL = FMUIPlugin.getImage("optional.gif");
 	private static final Image IMG_MANDATORY = FMUIPlugin.getImage("mandatory.gif");
@@ -128,5 +130,15 @@ public class FmLabelProvider implements ILabelProvider {
 			return "";
 	
 		return element.toString();
+	}
+
+
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.IFontProvider#getFont(java.lang.Object)
+	 */
+	@Override
+	public Font getFont(Object element) {
+		return GUIDefaults.DEFAULT_FONT;
 	}
 }
