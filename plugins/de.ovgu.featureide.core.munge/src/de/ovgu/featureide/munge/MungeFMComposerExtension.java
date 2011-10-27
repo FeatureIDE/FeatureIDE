@@ -83,39 +83,69 @@ public class MungeFMComposerExtension extends FMComposerExtension {
 	}
 	
 	private void performRenamings(String oldName, String newName, IFile iFile) {
-		Scanner scanner = null;
+		setFilecontent(performRenamings(oldName, newName, getFileContent(iFile)), iFile);
+	}
+
+	/**
+	 * @param oldName
+	 * @param newName
+	 * @param fileContent
+	 * @return
+	 */
+	public String performRenamings(String oldName, String newName,
+			String fileContent) {
+		if (!fileContent.contains(oldName)) {
+			return null;
+		}
+		return fileContent.toString().replaceAll("\\["+oldName+"\\]\\*\\/","[" + newName + "]*/");
+	}
+
+	/**
+	 * @param filecontent
+	 * @param iFile
+	 */
+	private void setFilecontent(String filecontent, IFile iFile) {
+		File file = iFile.getRawLocation().toFile();
 		FileWriter fw = null;
 		try {
-			File file = iFile.getRawLocation().toFile();
-			StringBuffer fileText = new StringBuffer();
-			scanner = new Scanner(file);
-			while (scanner.hasNext()) {
-				fileText.append(scanner.nextLine());
-				fileText.append("\r\n");
-			}
-			
-			if (!fileText.toString().contains(oldName)) {
-				return;
-			}
-			
-			String fileTextString = fileText.toString().replaceAll("\\["+oldName+"\\]\\*\\/","[" + newName + "]*/");
 			fw = new FileWriter(file);
-			fw.write(fileTextString);
-			
+			fw.write(filecontent);
 		} catch (FileNotFoundException e) {
 			MungeCorePlugin.getDefault().logError(e);
 		} catch (IOException e) {
 			MungeCorePlugin.getDefault().logError(e);
 		} finally{
-			if(scanner!=null)
-			scanner.close();
-			if(fw!=null)
+			if(fw!=null) {
 				try {
 					fw.close();
 				} catch (IOException e) {
 					MungeCorePlugin.getDefault().logError(e);
 				}	
+			}
 		}
+	}
+
+	/**
+	 * @param iFile
+	 * @return
+	 */
+	private String getFileContent(IFile iFile) {
+		Scanner scanner = null;
+		StringBuffer fileText = new StringBuffer();
+		try {
+			scanner = new Scanner(iFile.getRawLocation().toFile());
+			while (scanner.hasNext()) {
+				fileText.append(scanner.nextLine());
+				fileText.append("\r\n");
+			}
+		} catch (FileNotFoundException e) {
+			MungeCorePlugin.getDefault().logError(e);
+		} finally{
+			if(scanner!=null) {
+				scanner.close();
+			}
+		}
+		return fileText.toString();
 	}
 
 	/* (non-Javadoc)

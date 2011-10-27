@@ -142,7 +142,7 @@ public abstract class ComposerConversion {
 	 * @param file The file
 	 * @return The replaced context
 	 */
-	abstract String changeFile(String fileText, IFile file);
+	public abstract String changeFile(String fileText, IFile file);
 
 	/**
 	 * Replaces the file extension of the given file.

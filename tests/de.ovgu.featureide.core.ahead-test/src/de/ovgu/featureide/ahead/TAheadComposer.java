@@ -29,15 +29,24 @@ import org.junit.Test;
  */
 public class TAheadComposer {
 
-	public static final String SOUCE_1 = "layer test;\r\n"
-			+ "import import1;\r\n" + "public class test {\r\n"
-			+ "private Player player;"
-			+ "	private void method1() {\r\n" + "\r\n" + "	}\r\n" + "}";
-	private static final String CORRECTED_1 = "\r\n" + "import import1;\r\n"
-			+ "public class test {\r\n"
-			+ "private Player player;"
-			+ "	private void method1() {\r\n"
-			+ "\r\n" + "	}\r\n" + "}";
+	public static final String SOUCE_1 = 
+			"layer test;\r\n" + 
+			"import import1;\r\n" + 
+			"public class test {\r\n" + 
+			"private Player player;" + 
+			"	private void method1() {\r\n" + 
+			"\r\n" + 
+			"	}\r\n" + 
+			"}";
+	private static final String CORRECTED_1 = 
+			"\r\n" + 
+			"import import1;\r\n" + 
+			"public class test {\r\n" + 
+			"private Player player;" + 
+			"	private void method1() {\r\n" + 
+			"\r\n" + 
+			"	}\r\n" + 
+			"}";
 
 	/**
 	 * Tests layer removing.
@@ -47,12 +56,21 @@ public class TAheadComposer {
 		assertEquals(AheadComposer.correctFileText(SOUCE_1), CORRECTED_1);
 	}
 
-	private static final String SOUCE_2 = "import import1;\r\n"
-			+ "public class test {\r\n" + "	private void method1() {\r\n"
-			+ "\r\n" + "	}\r\n" + "}";
-	private static final String CORRECTED_2 = "\r\n" + "import import1;\r\n"
-			+ "public class test {\r\n" + "	private void method1() {\r\n"
-			+ "\r\n" + "	}\r\n" + "}";
+	private static final String SOUCE_2 = 
+			"import import1;\r\n" + 
+			"public class test {\r\n" + 
+			"	private void method1() {\r\n" + 
+			"\r\n" + 
+			"	}\r\n" + 
+			"}";
+	private static final String CORRECTED_2 = 
+			"\r\n" + 
+			"import import1;\r\n" + 
+			"public class test {\r\n" + 
+			"	private void method1() {\r\n" + 
+			"\r\n" + 
+			"	}\r\n" + 
+			"}";
 
 	/**
 	 * Tests adding a line brake before import;
@@ -62,11 +80,15 @@ public class TAheadComposer {
 		assertEquals(AheadComposer.correctFileText(SOUCE_2), CORRECTED_2);
 	}
 
-	private static final String SOUCE_3 = "\r\n" + "import player.*;\r\n"
-			+ "public class Player {\r\n" + "	private void player() {\r\n"
-			+ "\r\n" + "	}\r\n"
-			+ "private Player player;\r\n"
-			+ "}";
+	private static final String SOUCE_3 = 
+			"\r\n" + 
+			"import player.*;\r\n" + 
+			"public class Player {\r\n" + 
+			"	private void player() {\r\n" + 
+			"\r\n" + 
+			"	}\r\n" + 
+			"private Player player;\r\n" + 
+			"}";
 
 	/**
 	 * Tests ignoring other layer occurrences.

@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.Scanner;
 
 import org.eclipse.core.resources.IFile;
@@ -54,6 +55,9 @@ public class FeatureHouseToAHEADConversion extends ComposerConversion {
 	 * @param featureProject
 	 */
 	public FeatureHouseToAHEADConversion(final IFeatureProject featureProject) {
+		if (featureProject == null) {
+			return;
+		}
 		AheadCorePlugin.getDefault().logInfo("Change the composer of project " 
 				+ featureProject.getProjectName() + 
 				" from FeatureHouse to AHEAD.");
@@ -148,14 +152,26 @@ public class FeatureHouseToAHEADConversion extends ComposerConversion {
 	 * Inserts <code>refines</code> to classes that refine.
 	 */
 	@Override
-	String changeFile(String fileText, IFile file) {
+	public String changeFile(String fileText, IFile file) {
+		return changeFile(fileText, file, null);
+	}
+	
+	private String changeFile(String fileText, IFile file, LinkedList<String> methodNames) {
+		fileText = fileText.replaceFirst("package\\s*\\w*;", ""); 
+		
 		if (fileText.contains("original(")) {
 			fileText = fileText.replaceFirst(" class ",	" refines class ");
 		}
+		int i = 0;
 		while (fileText.contains("original(")) {
-			fileText = fileText.replaceFirst("original\\(", "Super()." + getMethodName(getLine(fileText), file) + "(");
+			fileText = fileText.replaceFirst("original\\(", "Super()." + 
+					(file != null ? getMethodName(getLine(fileText), file) : methodNames.get(i++)) + "(");
 		}
 		return fileText;
+	}
+	
+	public String TChangeFile(String fileText, LinkedList<String> methodNames) {
+		return changeFile(fileText, null, methodNames);
 	}
 
 	/**

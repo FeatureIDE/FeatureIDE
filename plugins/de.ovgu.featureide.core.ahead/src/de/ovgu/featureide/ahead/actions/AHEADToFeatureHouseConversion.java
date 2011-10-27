@@ -41,6 +41,9 @@ public class AHEADToFeatureHouseConversion extends ComposerConversion {
 	 * @param featureProject
 	 */
 	public AHEADToFeatureHouseConversion(final IFeatureProject featureProject) {
+		if (featureProject == null) {
+			return;
+		}
 		AheadCorePlugin.getDefault().logInfo("Change the composer of project "
 				+ featureProject.getProjectName() + 
 				" from AHEAD to FeatureHouse.");
@@ -70,7 +73,7 @@ public class AHEADToFeatureHouseConversion extends ComposerConversion {
 	 * Removes <code>layer feature;</code> declaration.
 	 */
 	@Override
-	String changeFile(String fileText, IFile file) {
+	public String changeFile(String fileText, IFile file) {
 		fileText = fileText.replaceFirst("layer \\w*;", "");
 		fileText = fileText.replaceFirst("refines ", "");
 		fileText = fileText.replaceAll("Super\\(\\s*\\w*\\s*\\).\\w*\\(", "original(");

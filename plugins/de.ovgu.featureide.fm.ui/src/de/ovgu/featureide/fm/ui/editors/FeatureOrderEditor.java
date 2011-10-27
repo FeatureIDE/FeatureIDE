@@ -573,10 +573,8 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 			layers = featureModel.getFeatureOrderList();
 
 		// a copy of the old configuration
-		ArrayList<String> configuration = new ArrayList<String>();
-		for (String layer : oldConfiguration) {
-			configuration.add(layer);
-		}
+		@SuppressWarnings("unchecked")
+		ArrayList<String> configuration = (ArrayList<String>) oldConfiguration.clone();
 		
 		for (String layer : layers)
 			if (oldConfiguration.contains(layer)) {

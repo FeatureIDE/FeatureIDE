@@ -33,6 +33,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 
@@ -221,6 +222,14 @@ public class AspectJComposer extends ComposerExtensionClass {
 	@Override
 	public boolean copyNotComposedFiles() {
 		return true;
+	}
+	
+	/**
+	 * Source files must not set derived.
+	 */
+	@Override
+	public void postCompile(IResourceDelta delta, IFile buildFile) {
+		
 	}
 
 	@Override
@@ -420,6 +429,8 @@ public class AspectJComposer extends ComposerExtensionClass {
 			featureProject.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
 		} catch (CoreException e) {
 			AspectJCorePlugin.getDefault().logError(e);
+		} catch (NullPointerException e) {
+			AspectJCorePlugin.getDefault().reportBug(321);
 		}
 		Feature root = featureProject.getFeatureModel().getRoot();
 		if (root == null) {
