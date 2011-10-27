@@ -23,7 +23,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 /**
- * TODO description
+ * Tests for Munge renaming.
  * 
  * @author Jens Meinicke
  */

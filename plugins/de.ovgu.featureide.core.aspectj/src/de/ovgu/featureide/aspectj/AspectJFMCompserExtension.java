@@ -18,7 +18,6 @@
  */
 package de.ovgu.featureide.aspectj;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -84,7 +83,7 @@ public class AspectJFMCompserExtension extends FMComposerExtension {
 			if (res instanceof IFolder) {
 				renameAspect((IFolder) res, oldName, newName);
 			} else if (res instanceof IFile) {
-				setFileText((IFile) res, oldName, newName);
+				renameAspect((IFile) res, oldName, newName);
 			}
 		}
 	}
@@ -105,57 +104,100 @@ public class AspectJFMCompserExtension extends FMComposerExtension {
 		return aspectName;
 	}
 
-	private void setFileText(IFile res, String oldName, String newName) {
-		Scanner scanner = null;
+	private void renameAspect(IFile res, String oldName, String newName) {
+		String content = getFileContent(res);
+		content = changeFileContent(content, oldName, newName, res.equals(aspectFile));
+		setFileContent(res, content);
+	}
+
+	/**
+	 * TODO description
+	 * @param res
+	 * @param content
+	 */
+	private void setFileContent(IFile res, String content) {
 		FileWriter fw = null;
 		try {
-			String packageName = getPackege(newName);
-			File file = res.getRawLocation().toFile();
-			StringBuffer fileText = new StringBuffer();
-			scanner = new Scanner(file);
-			while (scanner.hasNext()) {
-				String text = scanner.nextLine();
-				if (res.equals(aspectFile) && text.contains("package ")) {
-					if (packageName != null) {
-						fileText.append("package " + packageName + ";");
-						fileText.append("\r\n");
-					}
-				} else {
-					fileText.append(text);
-					fileText.append("\r\n");
-				}
-			}
-
-			if (!fileText.toString().contains(getAspect(oldName))) {
-				return;
-			}
-			// TODO revise replacement \w or \W for word char
-			// add tests
-			String fileTextString = fileText.toString().replaceAll(
-					getAspect(oldName), getAspect(newName));
-
-			if (packageName != null
-					&& !fileTextString.contains("package " + packageName + ";")) {
-				fileTextString = "package " + packageName + ";\r\n"
-						+ fileTextString;
-			}
-			fw = new FileWriter(file);
-			fw.write(fileTextString);
-
-		} catch (FileNotFoundException e) {
-			AspectJCorePlugin.getDefault().logError(e);
+			fw = new FileWriter(res.getRawLocation().toFile());
+			fw.write(content);
 		} catch (IOException e) {
 			AspectJCorePlugin.getDefault().logError(e);
 		} finally {
-			if (scanner != null)
-				scanner.close();
-			if (fw != null)
+			if (fw != null) {
 				try {
 					fw.close();
 				} catch (IOException e) {
 					AspectJCorePlugin.getDefault().logError(e);
 				}
+			}
 		}
+	}
+
+	/**
+	 * TODO description
+	 * @param content
+	 * @param oldName
+	 * @param newName 
+	 * @param isAspectFile 
+	 * @return
+	 */
+	public String changeFileContent(String content, String oldName, String newName, boolean isAspectFile) {
+		String packageName = getPackege(newName);
+		
+		if (isAspectFile && content.contains("package \\w*;")) {
+			if (packageName != null) {
+				content = content.replaceFirst("package\\s+\\w*;", "package " + packageName + ";");
+			}
+		}
+		
+		// TODO revise replacements
+		
+		// renaming for: aspect AspectName {
+		content = content.replaceAll("aspect\\s+" + getAspect(oldName) + " ", "aspect " + getAspect(newName) + " ");
+		content = content.replaceAll("aspect\\s+" + getAspect(oldName) + "\\{", "aspect " + getAspect(newName) + "\\{");
+		
+		// renaming for: aspect A1 extends AspectName {
+		content = content.replaceAll("extends\\s+" + getAspect(oldName) + " ", "extends " + getAspect(newName) + " ");
+		content = content.replaceAll("extends\\s+" + getAspect(oldName) + "\\{", "extends " + getAspect(newName) + "\\{");
+
+		// renaming for: declare precedence: *, Weight, AspectName, DoubleWeight;
+		content = content.replaceAll(":\\s*" + getAspect(oldName) + "s*,", ": " + getAspect(newName) + ",");
+		content = content.replaceAll(":\\s*" + getAspect(oldName) + "s*;", ": " + getAspect(newName) + ";");
+		content = content.replaceAll(",\\s*" + getAspect(oldName) + "s*,", ", " + getAspect(newName) + ",");
+		content = content.replaceAll(",\\s*" + getAspect(oldName) + "s*;", ", " + getAspect(newName) + ";");
+		
+		if (packageName != null
+				&& !content.contains("package " + packageName + ";")) {
+			content = "package " + packageName + ";\r\n"
+					+ content;
+		}
+		return content;
+	}
+
+	/**
+	 * TODO description
+	 * @param res
+	 * @return
+	 */
+	private String getFileContent(IFile res) {
+		Scanner scanner = null;
+		try {
+			scanner = new Scanner(res.getRawLocation().toFile());
+			StringBuffer buffer = new StringBuffer();
+			while (scanner.hasNext()) {
+				buffer.append(scanner.nextLine());
+				buffer.append("\r\n");
+			}
+			return buffer.toString();
+		} catch (FileNotFoundException e) {
+			AspectJCorePlugin.getDefault().logError(e);
+		} finally {
+			if (scanner != null) {
+				scanner.close();
+			}
+		}
+		
+		return null;
 	}
 
 	/*

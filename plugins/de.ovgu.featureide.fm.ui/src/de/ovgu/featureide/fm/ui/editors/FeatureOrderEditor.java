@@ -103,7 +103,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	public void doSave(IProgressMonitor monitor) {
 		if(hasFeatureOrder) {
 			writeToOrderFile(); //save the feature order also in .order if file exists
-			
+		} 
 			updateFeatureOrderList();
 			if(featureModel.getFeatureOrderList().isEmpty())
 				defaultFeatureList();
@@ -116,7 +116,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 				FMUIPlugin.getDefault().logError(e);
 			}
 			super.doSave(monitor);
-		}
+		
 	}
 
 	/*
@@ -229,7 +229,8 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 			label.setText(featureModel.getFMComposerExtension(
 					((IFile) input.getAdapter(IFile.class)).getProject())
 					.getOrderPageMessage());
-	
+			featurelist = new List(comp, SWT.NONE | SWT.BORDER | SWT.V_SCROLL | SWT.MULTI);
+			featurelist.setVisible(false);
 		} else {
 			layout.numColumns = 3;
 			label.setText("User-defined feature order");
