@@ -393,7 +393,6 @@ catch (      Exception e) {
     protected LogSource logSource;
     protected long fileOffset;
     protected ByteBuffer entryBuffer;
-    protected ChecksumValidator validator;
     protected long storedChecksum;
     protected byte loggableType;
     protected byte version;

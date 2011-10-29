@@ -2,6 +2,7 @@ package com.sleepycat.je.log;
 abstract public class LogManager {
   static final int HEADER_CHECKSUM_OFFSET=0;
   private boolean doChecksumOnRead;
+  protected static ChecksumValidator validator;
   public boolean getChecksumOnRead(){
     return doChecksumOnRead;
   }

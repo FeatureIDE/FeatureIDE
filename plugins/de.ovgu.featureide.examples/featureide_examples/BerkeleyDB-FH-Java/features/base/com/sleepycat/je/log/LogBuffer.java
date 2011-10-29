@@ -118,4 +118,8 @@ class LogBuffer implements LogSource {
   }
   protected void hook482(  int capacity) throws DatabaseException {
   }
+  
+  public void release() throws DatabaseException {
+	  
+  }
 }

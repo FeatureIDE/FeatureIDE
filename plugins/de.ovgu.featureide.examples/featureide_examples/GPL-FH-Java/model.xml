@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-	<featureModel>
+	<featureModel chosenLayoutAlgorithm="1">
 		<struct>
 			<alt abstract="true" mandatory="true" name="GPL">
 				<and abstract="true" mandatory="true" name="MainGpl">
+					<alt abstract="true" hidden="true" mandatory="true" name="HiddenGtp">
+						<feature mandatory="true" name="DirectedWithEdges"/>
+						<feature mandatory="true" name="DirectedWithNeighbors"/>
+						<feature mandatory="true" name="DirectedOnlyVertices"/>
+						<feature mandatory="true" name="UndirectedWithEdges"/>
+						<feature mandatory="true" name="UndirectedWithNeighbors"/>
+						<feature mandatory="true" name="UndirectedOnlyVertices"/>
+					</alt>
 					<feature mandatory="true" name="TestProg"/>
 					<or abstract="true" mandatory="true" name="Alg">
 						<feature mandatory="true" name="Number"/>
@@ -29,14 +37,6 @@
 					<alt abstract="true" mandatory="true" name="Wgt">
 						<feature mandatory="true" name="Weighted"/>
 						<feature mandatory="true" name="Unweighted"/>
-					</alt>
-					<alt abstract="true" hidden="true" mandatory="true" name="HiddenGtp">
-						<feature mandatory="true" name="DirectedWithEdges"/>
-						<feature mandatory="true" name="DirectedWithNeighbors"/>
-						<feature mandatory="true" name="DirectedOnlyVertices"/>
-						<feature mandatory="true" name="UndirectedWithEdges"/>
-						<feature mandatory="true" name="UndirectedWithNeighbors"/>
-						<feature mandatory="true" name="UndirectedOnlyVertices"/>
 					</alt>
 					<alt abstract="true" mandatory="true" name="Gtp">
 						<feature mandatory="true" name="Directed"/>
@@ -202,4 +202,6 @@
 				</imp>
 			</rule>
 		</constraints>
+		<comments/>
+		<featureOrder userDefined="false"/>
 	</featureModel>

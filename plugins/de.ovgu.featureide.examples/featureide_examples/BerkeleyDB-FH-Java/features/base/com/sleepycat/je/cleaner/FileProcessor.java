@@ -461,7 +461,6 @@ private static class RootDoWork implements WithRootLatched {
     protected int lookAheadCacheSize;
     protected int adjustMem;
     protected MemoryBudget budget;
-    protected LookAheadCache lookAheadCache;
     protected Set checkPendingDbSet;
     protected Map dbCache;
     protected CleanerFileReader reader;
@@ -602,7 +601,6 @@ private static class RootDoWork implements WithRootLatched {
     protected LNInfo info;
     protected Object lookAheadCachep;
     protected Map dbCache;
-    protected LookAheadCache lookAheadCache;
     protected LN ln;
     protected byte[] key;
     protected byte[] dupKey;

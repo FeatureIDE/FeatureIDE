@@ -1,6 +1,8 @@
 package com.sleepycat.je.cleaner;
 class FileProcessor {
 @MethodObject static class FileProcessor_processLN {
+	protected LookAheadCache lookAheadCache;
+	
     protected void hook117() throws DatabaseException {
     }
     void execute() throws DatabaseException {
