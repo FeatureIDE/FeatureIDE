@@ -18,109 +18,27 @@
  */
 package de.ovgu.featureide.fm.ui.actions;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.Iterator;
-
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IObjectActionDelegate;
-import org.eclipse.ui.IWorkbenchPart;
-
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.waterloo.WaterlooReader;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 
 /**
  * Converts a Waterloo feature model into our feature model format.
  * 
  * @author Fabian Wielgorz
  */
-public class ImportWaterlooAction implements IObjectActionDelegate {
+public class ImportWaterlooAction extends AbstractImportAction {
 
-	private ISelection selection;
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.ovgu.featureide.fm.ui.actions.AbstractImportAction#initModelReader
+	 * (de.ovgu.featureide.fm.core.FeatureModel)
+	 */
+	@Override
+	IFeatureModelReader setModelReader(FeatureModel fm) {
+		return new WaterlooReader(fm);
 
-	private FeatureModelEditor featureModelEditor;
-
-	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
-		featureModelEditor = (targetPart instanceof FeatureModelEditor) ? (FeatureModelEditor) targetPart
-				: null;
 	}
-
-	public void run(IAction action) {
-		if (selection instanceof IStructuredSelection) {
-			for (Iterator<?> it = ((IStructuredSelection) selection).iterator(); it
-					.hasNext();) {
-				Object element = it.next();
-				IFile outputFile = null;
-				if (element instanceof IFile) {
-					outputFile = (IFile) element;
-				} else if (element instanceof IAdaptable) {
-					outputFile = (IFile) ((IAdaptable) element)
-							.getAdapter(IFile.class);
-				}
-				if (outputFile != null) {
-					try {
-
-						boolean proceed = MessageDialog
-								.openQuestion(new Shell(), "Warning!",
-										"This will override the current model irrepealable! Proceed?");
-						if (proceed) {
-
-							FileDialog fileDialog = new FileDialog(new Shell(),
-									SWT.OPEN);
-							fileDialog.setOverwrite(false);
-
-							String filepath = fileDialog.open();
-							if (filepath == null)
-								return;
-							File inputFile = new File(filepath);
-
-							while (!inputFile.exists()) {
-								MessageDialog.openInformation(new Shell(),
-										"File " + "not Found",
-										"Specified file wasn't found");
-								inputFile = new File(fileDialog.open());
-							}
-							FeatureModel fm = featureModelEditor
-									.getFeatureModel();
-							WaterlooReader waterlooReader = new WaterlooReader(
-									fm);
-							waterlooReader.readFromFile(inputFile);
-							XmlFeatureModelWriter fmWriter = new XmlFeatureModelWriter(
-									fm);
-							fmWriter.writeToFile(outputFile);
-							outputFile.refreshLocal(IResource.DEPTH_ZERO, null);
-						}
-					} catch (FileNotFoundException e) {
-						FMUIPlugin.getDefault().logError(e);
-					} catch (UnsupportedModelException e) {
-						String errStr = e.getMessage();
-						MessageDialog.openWarning(new Shell(), "Warning!",
-								"Error while loading file: \n " + errStr);
-						FMUIPlugin.getDefault().logError(e);
-					} catch (CoreException e) {
-						FMUIPlugin.getDefault().logError(e);
-					}
-				}
-			}
-		}
-	}
-
-	public void selectionChanged(IAction action, ISelection selection) {
-		this.selection = selection;
-	}
-
 }
