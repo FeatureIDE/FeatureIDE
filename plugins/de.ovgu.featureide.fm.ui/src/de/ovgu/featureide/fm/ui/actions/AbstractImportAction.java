@@ -33,12 +33,16 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
+import org.eclipse.ui.part.FileEditorInput;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
@@ -68,7 +72,9 @@ public abstract class AbstractImportAction implements IObjectActionDelegate {
 				Object element = it.next();
 				IFile outputFile = null;
 				if (element instanceof IFile) {
+
 					outputFile = (IFile) element;
+
 				} else if (element instanceof IAdaptable) {
 					outputFile = (IFile) ((IAdaptable) element)
 							.getAdapter(IFile.class);
@@ -104,10 +110,7 @@ public abstract class AbstractImportAction implements IObjectActionDelegate {
 									fm);
 							fmWriter.writeToFile(outputFile);
 							outputFile.refreshLocal(IResource.DEPTH_ZERO, null);
-							IWorkbenchWindow window = PlatformUI.getWorkbench()
-									.getActiveWorkbenchWindow();
-							IWorkbenchPage page = window.getActivePage();
-							IDE.openEditor(page, outputFile);
+							openFileInEditor(outputFile);
 
 						}
 					} catch (FileNotFoundException e) {
@@ -123,6 +126,27 @@ public abstract class AbstractImportAction implements IObjectActionDelegate {
 				}
 			}
 		}
+	}
+
+	/**
+	 * opens the imported model in a new editor. If it is already open, the editor will be closed first.
+	 * @throws PartInitException
+	 * 
+	 */
+	private void openFileInEditor(IFile outputFile) throws PartInitException {
+		IWorkbenchWindow window = PlatformUI.getWorkbench()
+				.getActiveWorkbenchWindow();
+		IWorkbenchPage page = window.getActivePage();
+		IEditorInput editorInput = new FileEditorInput(outputFile);
+		IEditorReference[] refs = page.getEditorReferences();
+		for (int i = 0; i < refs.length; i++) {
+			if (refs[i].getEditorInput().equals(editorInput)) {
+				page.closeEditor(refs[i].getEditor(false), false);
+				break;
+			}
+
+		}
+		IDE.openEditor(page, outputFile);
 	}
 
 	public void selectionChanged(IAction action, ISelection selection) {
