@@ -62,6 +62,7 @@ public class AheadWrapper {
 	private static final String RAW_TYPE = "raw type";
 	private static final String GENERIC_TYPE = "generic type";
 	private static final String TYPE_SAFETY = "Type safety";
+	private static final String TASK = "org.eclipse.jdt.core.task";
 	
 	public AheadWrapper(IFeatureProject featureProject) {
 		jak2java = new Jak2JavaWrapper();
@@ -132,7 +133,7 @@ public class AheadWrapper {
 						IMarker[] markers = file.findMarkers(null, false, IResource.DEPTH_ZERO);
 						if (markers != null) {
 							for (IMarker marker : markers) {
-								if (marker.exists()) {
+								if (marker.exists() && !marker.getType().equals(TASK)) {
 									String content = marker.getAttribute(IMarker.MESSAGE, null);
 									if (content != null && (content.contains(RAW_TYPE) || content.contains(GENERIC_TYPE) || 
 											content.contains(TYPE_SAFETY))) {

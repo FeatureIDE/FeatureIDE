@@ -42,6 +42,8 @@ import org.sonatype.plugins.munge.Munge;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.preprocessor.PPComposerExtensionClass;
+import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.munge.model.MungeModelBuilder;
 
 /**
@@ -92,7 +94,7 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 
 		//add source files
 		try {
-			preprocessSourceFiles(featureProject.getSourceFolder(), featureProject.getBuildFolder());
+			preprocessSourceFiles(featureProject.getSourceFolder(), featureProject.getBuildFolder(), true);
 		} catch (CoreException e) {
 			MungeCorePlugin.getDefault().logError(e);
 		}
@@ -108,7 +110,7 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 	 * @param buildFolder folder for preprocessed files
 	 * @throws CoreException
 	 */
-	private void preprocessSourceFiles(IFolder sourceFolder, IFolder buildFolder) throws CoreException {
+	private void preprocessSourceFiles(IFolder sourceFolder, IFolder buildFolder, boolean annotationChecking) throws CoreException {
 		ArrayList<String> args = new ArrayList<String>();
 		for (String feature : activatedFeatures) {
 			args.add("-D" + feature);
@@ -119,28 +121,29 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 		boolean filesAdded = false;
 		for (final IResource res : sourceFolder.members()) {
 			if (res instanceof IFolder) {
-				preprocessSourceFiles((IFolder)res, buildFolder.getFolder(res.getName()));
+				preprocessSourceFiles((IFolder)res, buildFolder.getFolder(res.getName()), annotationChecking);
 			} else 
 			if (res instanceof IFile){
-				if (res.getName().endsWith(".java")) {
+			//	if (res.getName().endsWith(".java")) {
 					args.add(res.getRawLocation().toOSString());
 					filesAdded = true;
-					
-					// get all lines from file
-					final Vector<String> lines = loadStringsFromFile((IFile) res);
-					
-					// do checking and some stuff
-					Job job = new Job("preprocessor annotation checking") {
-						@Override
-						protected IStatus run(IProgressMonitor monitor) {
-							processLinesOfFile(lines, (IFile) res);
-							
-							return Status.OK_STATUS;
-						}
-					};
-					job.setPriority(Job.SHORT);
-					job.schedule();
-				}
+					if (annotationChecking) {
+						// get all lines from file
+						final Vector<String> lines = loadStringsFromFile((IFile) res);
+						
+						// do checking and some stuff
+						Job job = new Job("preprocessor annotation checking") {
+							@Override
+							protected IStatus run(IProgressMonitor monitor) {
+								processLinesOfFile(lines, (IFile) res);
+								
+								return Status.OK_STATUS;
+							}
+						};
+						job.setPriority(Job.SHORT);
+						job.schedule();
+					}
+			//	}
 			}
 		}
 
@@ -151,7 +154,7 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 		args.add(buildFolder.getRawLocation().toOSString());
 		
 		//CommandLine syntax:
-		//	�DFEATURE1 �DFEATURE2 ... File1.java File2.java ... outputDirectory
+		//	-DFEATURE1 -DFEATURE2 ... File1 File2 ... outputDirectory
 		runMunge(args);
 	}
 	
@@ -362,5 +365,25 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 	@Override
 	public void buildFSTModel() {
 		mungeModelBuilder.buildModel();
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.ComposerExtensionClass#buildConfiguration(org.eclipse.core.resources.IFolder, de.ovgu.featureide.fm.core.configuration.Configuration)
+	 */
+	@Override
+	public void buildConfiguration(IFolder folder, Configuration configuration) {
+		if (activatedFeatures == null) {
+			activatedFeatures = new ArrayList<String>();
+		} else {
+			activatedFeatures.clear();
+		}
+		for (Feature feature : configuration.getSelectedFeatures()) {
+			activatedFeatures.add(feature.getName());
+		}
+		try {
+			preprocessSourceFiles(featureProject.getSourceFolder(), folder, false);
+		} catch (CoreException e) {
+			MungeCorePlugin.getDefault().logError(e);
+		}
 	}
 }

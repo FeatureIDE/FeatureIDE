@@ -428,7 +428,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	@Override
 	public void buildConfiguration(IFolder folder, Configuration configuration) {
 		super.buildConfiguration(folder, configuration);
-		composer = new FSTGenComposer();
+		composer = new FSTGenComposer(false);
 		composer.addParseErrorListener(listener);
 		composer.run(new String[]{
 				CmdLineInterpreter.INPUT_OPTION_EQUATIONFILE, folder.getFile(folder.getName() + getConfigurationExtension()).getRawLocation().toOSString(),

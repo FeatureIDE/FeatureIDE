@@ -20,6 +20,7 @@ package de.ovgu.featureide.featurecpp.wrapper;
 
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -101,11 +102,16 @@ public class FeatureCppWrapper {
 					"fc++ can not be found.");
 		}
 		featureCppExecutableName = pathName;
+		
+		// The featurecpp needs to be executable 
+		new File(featureCppExecutableName).setExecutable(true);
 	}
 
 	public void initialize(IFolder source, IFolder build) {
-		this.source = source;
-		sourceFolder = source.getRawLocation().toOSString();
+		if (source != null) {
+			this.source = source;
+			sourceFolder = source.getRawLocation().toOSString();
+		}
 		buildFolder = build.getRawLocation().toOSString();
 		buildDirectory = build;
 	}
@@ -183,6 +189,7 @@ public class FeatureCppWrapper {
 
 	/**
 	 * Opens a message box if featureC++ could not be executed.
+	 * @deprecated is set automatically at constructor.
 	 */
 	private void openMessageBox(IOException e) {
 		if (e.getCause().toString().equals("java.io.IOException: java.io.IOException: error=13, Permission denied")) {

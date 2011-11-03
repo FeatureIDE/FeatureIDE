@@ -15,13 +15,15 @@ Require-Bundle: org.eclipse.ui,
  de.ovgu.featureide.core,
  de.ovgu.featureide.fm.ui
 Bundle-ActivationPolicy: lazy
-Bundle-ClassPath: .
+Bundle-ClassPath:  lib/tools.jar,.
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: University of Magdeburg
 Export-Package: de.ovgu.featureide.ui.editors,
  de.ovgu.featureide.ui.views.collaboration.action,
  de.ovgu.featureide.ui.wizards
-Import-Package: org.eclipse.jface.text,
+Import-Package: org.eclipse.jdt.core,
+ org.eclipse.jdt.internal.core,
+ org.eclipse.jface.text,
  org.eclipse.platform.internal,
  org.eclipse.ui.editors.text,
  org.eclipse.ui.texteditor

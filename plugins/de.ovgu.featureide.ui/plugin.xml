@@ -20,8 +20,6 @@
 	                 id="de.ovgu.featureide.contenttype.extConf"
 	                 name="Configuration (for non-FeatureIDE projects)"
 	                 priority="low"/>
-	                 
-	     
 	 
 	</extension>
 		<extension point="org.eclipse.core.contenttype.contentTypes">
@@ -111,22 +109,32 @@
                style="push">
          </action>
       </objectContribution>
-      <objectContribution
+     <objectContribution
             adaptable="true"
-            id="de.ovgu.featureide.ui.actions.buildallvalidconfigurationsaction"
+            id="de.ovgu.featureide.ui.variantBuilder"
             objectClass="org.eclipse.core.resources.IProject">
-         <visibility>
-         	<objectState
-         		name="nature"
-         		value="de.ovgu.featureide.core.featureProjectNature">
-         	</objectState>
-         </visibility>
+         <menu id="de.ovgu.featureide.ui_menue"
+               label="Variant Builder"
+               icon="icons/FeatureIconSmall.ico"
+               path="group.open"> 
+               <separator name="slot1"/>
+         </menu>  
          <action
                class="de.ovgu.featureide.ui.actions.BuildAllValidConfigurationsAction"
                id="de.ovgu.featureide.ui.actions.buildallvalidconfigurationsaction"
                icon="icons/FeatureIconSmall.ico"
                label="Build All Valid Configurations"
-               menubarPath="group.open"
+               menubarPath="de.ovgu.featureide.ui_menue/slot1"
+               tooltip="Builds all possible configurations."
+               style="push">
+         </action>
+         <action
+               class="de.ovgu.featureide.ui.actions.BuildAllConfigurationsAction"
+               id="de.ovgu.featureide.ui.actions.buildallconfigurationsaction"
+               icon="icons/FeatureIconSmall.ico"
+               label="Build All Current Configurations"
+               menubarPath="de.ovgu.featureide.ui_menue/slot1"
+               tooltip="Builds all current configurations."
                style="push">
          </action>
       </objectContribution>

@@ -20,7 +20,7 @@ package de.ovgu.featureide.ui.actions;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IObjectActionDelegate;
@@ -34,13 +34,11 @@ import de.ovgu.featureide.core.IFeatureProject;
  * 
  * @author Jens Meinicke
  */
-public class BuildAllValidConfigurationsAction implements IObjectActionDelegate {
-	private final static String MESSAGE_TITLE = "Build all valid configurations";
-	private final static String MESSAGE_START = "This could take a very long time.\n";
-	private final static String MESSAGE_END = "All products will be build into: \"";
-
+public class BuildAllValidConfigurationsAction implements
+		IObjectActionDelegate, IConfigurationBuilderBasics {
 	private ISelection selection;
 	private IFeatureProject featureProject;
+	private boolean TOGGLE_STATE = true;
 
 	public BuildAllValidConfigurationsAction() {
 	}
@@ -62,22 +60,27 @@ public class BuildAllValidConfigurationsAction implements IObjectActionDelegate 
 		} else {
 			return;
 		}
-		if (!openDialog()) {
-			return;
+		MessageDialogWithToggle dialog = openDialog();
+		if (dialog.getReturnCode() == MessageDialogWithToggle.OK) {
+			new ConfigurationBuilder(featureProject, true,
+					dialog.getToggleState());
 		}
-		new ConfigurationBuilder(featureProject);
+		TOGGLE_STATE = dialog.getToggleState();
 	}
 
 	/**
 	 * Opens a dialog before building all valid configuration.
+	 * 
 	 * @return true if all valid configurations should be build.
 	 */
-	private boolean openDialog() {
+	private MessageDialogWithToggle openDialog() {
 		String message = MESSAGE_START;
-		message += MESSAGE_END + featureProject.getProject()
+		message += MESSAGE_END
+				+ featureProject.getProject()
 						.getFolder(ConfigurationBuilder.FOLDER_NAME)
 						.getFullPath().toOSString() + "\"";
-		return MessageDialog.openConfirm(null, MESSAGE_TITLE, message);
+		return MessageDialogWithToggle.openOkCancelConfirm(null, MESSAGE_TITLE,
+				message, TOGGLE_MESSAGE, TOGGLE_STATE, null, "");
 	}
 
 	/*

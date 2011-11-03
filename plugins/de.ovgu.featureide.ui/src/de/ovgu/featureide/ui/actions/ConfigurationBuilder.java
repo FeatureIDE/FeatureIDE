@@ -18,16 +18,30 @@
  */
 package de.ovgu.featureide.ui.actions;
 
+import java.io.CharArrayWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.LinkedList;
+import java.util.Scanner;
+import java.util.TreeMap;
+import java.util.regex.Matcher;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.internal.core.JavaProject;
 
+import com.sun.tools.javac.Main;
+
+import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -37,53 +51,65 @@ import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
- * Builds all valid configurations for a selected feature project.
+ * Builds all valid or current configurations for a selected feature project.
  * 
  * @author Jens Meinicke
  */
-public class ConfigurationBuilder {
-
-	private final static String JOB_TITLE = "Build all valid configurations";
-	private final static String SUBTASK_BUILD = "Build Configuration ";
-	private static final String SUBTASK_GET = "Get Configuration ";
-	private final static String CONFIGURATION_NAME = "Variant";
-	final static String FOLDER_NAME = "products";
-	
+@SuppressWarnings("restriction")
+public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	private IFeatureProject project;
 	private IFolder folder;
 	private FeatureModel featureModel;
-	private LinkedList<String> layer;
 	private Configuration configuration;
 	private ConfigurationReader reader;
 	private long confs;
 	private String zeros;
 	private int configurationNumber = 0;
 	private boolean counting = true;
+	private String classpath = "";
+	private IFolder tmp;
+	private boolean compile;
 	
-	ConfigurationBuilder(IFeatureProject featureProject) {
+	/**
+	 * Starts the build process for valid or current configurations for the given feature project.
+	 * @param featureProject The feature project
+	 * @param buildAllValidConfigurations <code>true</code> if all possible valid configurations should be build<br>
+	 * <code>false</code> if all current configurations should be build
+	 * @param compile <code>true</code> if the compiler should be performed after build.
+	 * @see BuildAllConfigurationsAction
+	 * @see BuildAllValidConfigurationsAction
+	 */
+	ConfigurationBuilder(final IFeatureProject featureProject, final boolean buildAllValidConfigurations, boolean compile) {
 		project = featureProject;
 		featureModel = project.getFeatureModel();
-		
-		Job number = new Job("Count configurations") {
-			public IStatus run(IProgressMonitor monitor) {
-				configurationNumber = (int)new Configuration(featureModel, false, false).number(1000000);
-				return Status.OK_STATUS;
-			}
-		};
-		number.setPriority(Job.LONG);
-		number.schedule();
-		
-		Job job = new Job(JOB_TITLE) {
+		this.compile = compile;
+		if (!buildAllValidConfigurations) {
+			configurationNumber = countConfigurations(featureProject.getConfigFolder());
+		} else {
+			Job number = new Job(JOB_TITLE_COUNT_CONFIGURATIONS) {
+				public IStatus run(IProgressMonitor monitor) {
+					configurationNumber = (int)new Configuration(featureModel, false, false).number(1000000);
+					return Status.OK_STATUS;
+				}
+			};
+			number.setPriority(Job.LONG);
+			number.schedule();
+		}
+			
+		Job job = new Job(buildAllValidConfigurations ? JOB_TITLE : JOB_TITLE_CURRENT) {
 			public IStatus run(IProgressMonitor monitor) {
 				try {
 					long time = System.currentTimeMillis();
 					monitor.beginTask("" , 1);
 					
-					init(monitor);
+					init(monitor, buildAllValidConfigurations);
 					
 					monitor.subTask(SUBTASK_GET + confs + "/" + (configurationNumber == 0 ? "counting..." : configurationNumber));
-					buildAll(featureModel.getRoot(), monitor);
-					
+					if (buildAllValidConfigurations) {
+						buildAll(featureModel.getRoot(), monitor);
+					} else {
+						buildActivConfigurations(featureProject, monitor);
+					}
 					try {
 						folder.refreshLocal(IResource.DEPTH_INFINITE, null);
 					} catch (CoreException e) {
@@ -109,10 +135,17 @@ public class ConfigurationBuilder {
 		job.schedule();
 	}
 	
-
-	private void init(IProgressMonitor monitor) {
+	/**
+	 * Initializes the configuration builder.<br>
+	 * -Removes old products
+	 * -Generates the build folder
+	 * @param monitor
+	 * @param buildAllValidConfigurations<code>true</code> if all possible valid configurations should be build<br>
+	 * <code>false</code> if all current configurations should be build
+	 */
+	private void init(IProgressMonitor monitor, boolean buildAllValidConfigurations) {
 		confs = 1;
-		folder = project.getProject().getFolder(FOLDER_NAME);
+		folder = project.getProject().getFolder(buildAllValidConfigurations ? FOLDER_NAME : FOLDER_NAME_CURRENT);
 		if (!folder.exists()) {
 			try {
 				folder.create(true, true, null);
@@ -132,15 +165,261 @@ public class ConfigurationBuilder {
 				UIPlugin.getDefault().logError(e);
 			}
 		}
-		layer = new LinkedList<String>();
-		for (String feature : featureModel.getLayerNames()) {
-				layer.add(feature);
-		}
 		configuration = new Configuration(featureModel);
 		reader = new ConfigurationReader(configuration);
 		project.getComposer().initialize(project);
+		
+		if (compile) {
+			setClassPath();
+		
+			tmp = folder.getFolder(TEMPORARY_BIN_FOLDER);
+			if (!tmp.exists()) {
+				try {
+					tmp.create(true, true, null);
+				} catch (CoreException e) {
+					UIPlugin.getDefault().logError(e);
+				}
+			}
+		}
 	}
 	
+	/**
+	 * Sets the java classPath for compiling.
+	 */
+	private void setClassPath() {
+		String sep = System.getProperty("path.separator");
+		try {
+			JavaProject proj = new JavaProject(project.getProject(), null);
+			IJavaElement[] elements = proj.getChildren();
+			for (IJavaElement e : elements) {
+				if (e.getPath().toString().contains(":")) {
+					classpath += sep + e.getPath().toOSString();
+				} else if (e.getResource().getFileExtension() != null && 
+							e.getResource().getFileExtension().equals("jar")) {
+					classpath += sep + e.getResource().getRawLocation().toOSString();
+				}
+			}
+		} catch (JavaModelException e) {
+			
+		}			
+		classpath = classpath.length() > 0 ? classpath.substring(1) : classpath;
+	}
+	
+	/**
+	 * Compiles the built configuration to create error markers.
+	 * The binary files will be placed into an temporary folder.
+	 * @param confName
+	 */
+	private void compile(String confName) {	
+		LinkedList<IFile> files = getJavaFiles(folder.getFolder(confName));
+		LinkedList<String> options = new LinkedList<String>();
+		options.add("-g");
+		options.add("-Xlint");
+		options.add("-d");
+		options.add(tmp.getRawLocation().toOSString());
+		options.add("-classpath");
+		options.add(classpath);
+		for (IFile file : files) {
+			options.add(file.getRawLocation().toOSString());
+		}
+		
+		CharArrayWriter charWriter = new CharArrayWriter();
+		Main.compile(toArray(options), new PrintWriter(charWriter));
+		files = parseJavacOutput(charWriter.toString(), files, confName);
+		for (IFile file : files) {
+			project.getComposer().postCompile(null, file);
+		}
+	}
+
+	/**
+	 * Converts a given <code>LinkedList</code> into an <code>array</code>.
+	 * @param list a LinkedList
+	 * @return the corresponding array
+	 */
+	private String[] toArray(LinkedList<String> list) {
+		String[] array = new String[list.size()];
+		for(int i = 0;i < list.size();i++) {
+			array[i] = list.get(i);
+		}
+		return array;
+	}
+
+	/**
+	 * Generates the problem markers from the given compiler output. 
+	 * @param output The output from the compiler
+	 * @param files The compiled files
+	 * @param configurationName Name of the actual configuration
+	 * @return 
+	 */
+	public LinkedList<IFile> parseJavacOutput(String output, LinkedList<IFile> files, String configurationName) {
+		LinkedList<IFile> errorFiles = new LinkedList<IFile>();
+		if (output.length() == 0)
+			return errorFiles;
+		TreeMap<String, IFile> sourcePaths = new TreeMap<String, IFile>();
+		for (IFile file : files)
+			sourcePaths.put(file.getRawLocation().toOSString(), file);
+
+		Scanner scanner = new Scanner(output);
+		String currentLine;
+		while (scanner.hasNextLine()) {
+			currentLine = scanner.nextLine();
+
+			Matcher matcher = errorMessagePattern.matcher(currentLine);
+			if (!matcher.find() || !sourcePaths.containsKey(matcher.group(1)))
+				continue;
+			IFile currentFile = sourcePaths.get(matcher.group(1));
+			int line = Integer.parseInt(matcher.group(2));
+
+			String errorMessage = matcher.group(3);
+			errorMessage = errorMessage.substring(1);
+
+			if (errorMessage.equals(CANNOT_FIND_SYMBOL)) {
+				errorMessage = parseCannotFindSymbolMessage(scanner);
+			}
+			if (errorMessage.contains(ERROR_IGNOR_RAW_TYPE) || errorMessage.contains(ERROR_IGNOR_CAST) 
+					|| errorMessage.contains(ERROR_IGNOR_SERIIZABLE) 
+					|| errorMessage.contains(ERROR_IGNOR_DEPRECATION)) {
+				continue;
+			}
+			if (!errorFiles.contains(currentFile)) {
+				errorFiles.add(currentFile);
+			}
+			IMarker newMarker;
+			try {
+				newMarker = currentFile.createMarker(PROBLEM_MARKER);
+				if (newMarker.exists()) {
+					newMarker.setAttribute(IMarker.LINE_NUMBER, line);
+					newMarker.setAttribute(IMarker.MESSAGE, configurationName + " " + errorMessage);
+					newMarker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
+				}
+			} catch (CoreException e) {
+				UIPlugin.getDefault().logError(e);
+			}
+		}
+		return errorFiles;
+	}
+
+	private String parseCannotFindSymbolMessage(Scanner scanner) {
+		while (scanner.hasNextLine()) {
+			String currentLine = scanner.nextLine();
+			if (currentLine.startsWith("symbol")) {
+				String[] tokens = currentLine.split(": ");
+				if (tokens.length == 2)
+					return CANNOT_FIND_SYMBOL + ": "+ tokens[1].substring(0);
+				break;
+			}
+		}
+		return CANNOT_FIND_SYMBOL;
+	}
+
+	/**
+	 * Looks for all java files at the given folder.
+	 * @param folder The folder containing the java files
+	 * @return A list with all java files at the folder
+	 */
+	private LinkedList<IFile> getJavaFiles(IFolder folder) {
+		LinkedList<IFile> files = new LinkedList<IFile>();
+		try {
+			for (IResource res : folder.members()) {
+				if (res instanceof IFolder) {
+					files.addAll(getJavaFiles((IFolder)res));
+				} else if (res.getFileExtension().equals("java")) {
+					files.add((IFile)res);
+				}
+			}
+		} catch (CoreException e) {
+			UIPlugin.getDefault().logError(e);
+		}
+		return files;
+	}
+
+	/**
+	 * Builds all current configurations for the given feature project into the folder for current configurations.
+	 * @param featureProject The feature project
+	 * @param monitor 
+	 */
+	protected void buildActivConfigurations(IFeatureProject featureProject, IProgressMonitor monitor) {
+		monitor.beginTask("" , configurationNumber);
+		try {
+			for (IResource configuration : featureProject.getConfigFolder().members()) {
+				if (monitor.isCanceled()) {
+					return;
+				}
+				if (isConfiguration(configuration)) {
+					build(configuration, monitor);
+				}
+			}
+		} catch (CoreException e) {
+			UIPlugin.getDefault().logError(e);
+		}
+	}
+
+
+	/**
+	 * Builds the given configuration file into the folder for current configurations.
+	 * @param configuration The configuration file
+	 * @param monitor 
+	 */
+	private void build(IResource configuration, IProgressMonitor monitor) {
+		try {
+			reader.readFromFile((IFile)configuration);
+			monitor.subTask(SUBTASK_BUILD + confs + "/" + configurationNumber);
+			project.getComposer().buildConfiguration(folder.getFolder(configuration.getName().split("[.]")[0]), this.configuration);
+			if (monitor.isCanceled()) {
+				return;
+			}
+			confs++;
+			folder.getFolder(configuration.getName().split("[.]")[0]).refreshLocal(IResource.DEPTH_INFINITE, null);
+			if (compile) {
+				monitor.subTask(SUBTASK_COMPILE + confs + "/" + configurationNumber);
+				compile(configuration.getName().split("[.]")[0]);
+			}
+			if (confs <= configurationNumber) { 
+				monitor.subTask(SUBTASK_GET + confs + "/" + configurationNumber);
+			}
+			monitor.worked(1);
+		} catch (CoreException e) {
+			UIPlugin.getDefault().logError(e);
+		} catch (IOException e) {
+			UIPlugin.getDefault().logError(e);
+		}
+	}
+
+	/**
+	 * Counts the configurations at the given folder.
+	 * @param configFolder The folder
+	 * @return Number of configuration files
+	 */
+	private int countConfigurations(IFolder configFolder) {
+		int i = 0;
+		try {
+			for (IResource res : configFolder.members()) {
+				if (isConfiguration(res)) {
+					i++;
+				}		
+			}
+		} catch (CoreException e) {
+			UIPlugin.getDefault().logError(e);
+		}
+		return i;
+	}
+
+	/**
+	 * @param res A file.
+	 * @return <code>true</code> if the given file is a configuration file
+	 */
+	private boolean isConfiguration(IResource res) {
+		return res instanceof IFile && CorePlugin.getDefault().getConfigurationExtensions().contains("." + res.getFileExtension());
+	}
+	
+	/**
+	 * Builds all possible valid configurations for the feature project.<br>
+	 * Iterates through the structure of the feature model and ignores constraints, to get a linear expenditure.<br>
+	 * After collecting a configurations the satsolver tests its validity.<br>
+	 * Then the found configuration will be build into the folder for all valid products.
+	 * @param root The root feature of the feature model
+	 * @param monitor
+	 */
 	private void buildAll(Feature root, IProgressMonitor monitor) {
 		LinkedList<Feature> selectedFeatures2 = new LinkedList<Feature>();
 		selectedFeatures2.add(root);
@@ -183,9 +462,18 @@ public class ConfigurationBuilder {
 						zeros = "";
 					}
 					monitor.subTask(SUBTASK_BUILD + confs + "/" + (configurationNumber == 0 ? "counting..." : configurationNumber));
-					// TODO @Jens composer problem marker.
-					// TODO @Jens compiler could be used to find and propagate errors.
 					project.getComposer().buildConfiguration(folder.getFolder(CONFIGURATION_NAME + zeros + confs), configuration);
+					try {
+						folder.getFolder(CONFIGURATION_NAME + zeros + confs).refreshLocal(IResource.DEPTH_INFINITE, null);
+					} catch (CoreException e) {
+						UIPlugin.getDefault().logError(e);
+					}
+					
+					if (compile) {
+						monitor.subTask(SUBTASK_COMPILE + confs + "/" + configurationNumber);
+						compile(CONFIGURATION_NAME + zeros + confs);
+					}
+					
 					confs++;
 					if (confs <= configurationNumber || configurationNumber == 0) { 
 						monitor.subTask(SUBTASK_GET + confs + "/" + (configurationNumber == 0 ? "counting..." : configurationNumber));
@@ -198,7 +486,6 @@ public class ConfigurationBuilder {
 					if (configurationNumber != 0) {
 						monitor.worked(1);
 					}
-					
 				}
 			}
 			return;
@@ -328,6 +615,11 @@ public class ConfigurationBuilder {
 		
 	}
 
+	/**
+	 * Returns all children of a feature if it is a layer or if it has a child that is a layer.
+	 * @param currentFeature The feature
+	 * @return The children
+	 */
 	private LinkedList<Feature> getChildren(Feature currentFeature) {
 		LinkedList<Feature> children = new LinkedList<Feature>();
 		for (Feature child : currentFeature.getChildren()) {
@@ -338,6 +630,10 @@ public class ConfigurationBuilder {
 		return children;
 	}
 
+	/**
+	 * @param feature The feature
+	 * @return <code>true</code> if  the feature is a layer or if it has a child that is a layer
+	 */
 	private boolean hasLayerChild(Feature feature) {
 		if (feature.hasChildren()) {
 			for (Feature child : feature.getChildren()) {

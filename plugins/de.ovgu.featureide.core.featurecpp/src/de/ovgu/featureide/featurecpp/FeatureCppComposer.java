@@ -21,6 +21,7 @@ package de.ovgu.featureide.featurecpp;
 import java.util.ArrayList;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
@@ -33,6 +34,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.featurecpp.model.FeatureCppModelBuilder;
 import de.ovgu.featureide.featurecpp.wrapper.FeatureCppWrapper;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
 
 /**
  * A FeatureIDE extension to compose FeatureC++ files.
@@ -157,5 +159,24 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 			FeatureCppCorePlugin.getDefault().logError(e);
 		}
 		
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.ComposerExtensionClass#buildConfiguration(org.eclipse.core.resources.IFolder, de.ovgu.featureide.fm.core.configuration.Configuration)
+	 */
+	@Override
+	public void buildConfiguration(IFolder folder, Configuration configuration) {
+		super.buildConfiguration(folder, configuration);
+		featureCpp.initialize(null, folder);
+		try {
+			for (IResource res :folder.members()) {
+				if (res instanceof IFile && res.getFileExtension() != null && 
+						("." + res.getFileExtension()).equals(getConfigurationExtension())) {
+					featureCpp.compose((IFile)res);
+				}
+			}
+		} catch (CoreException e) {
+			FeatureCppCorePlugin.getDefault().logError(e);
+		}
 	}
 }
