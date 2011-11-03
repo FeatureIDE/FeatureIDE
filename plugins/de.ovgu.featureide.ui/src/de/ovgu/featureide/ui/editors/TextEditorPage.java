@@ -85,6 +85,10 @@ public class TextEditorPage extends TextEditor implements IConfigurationEditorPa
 	 */
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
+		if(configurationEditor.configuration==null){
+	
+			return;
+		}
 		String source = new ConfigurationWriter(configurationEditor.configuration)
 				.writeIntoString(configurationEditor.file);
 		IDocumentProvider provider = getDocumentProvider();

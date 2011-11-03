@@ -45,12 +45,11 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	protected static final String JAVA_NATURE = "org.eclipse.jdt.core.javanature";
 	protected IFeatureProject featureProject = null;
 	
-	public void initialize(IFeatureProject project) {
-		if (project == null) {
-			return;
-		}
+	public boolean initialize(IFeatureProject project) {
+	
 		assert (project != null) : "Invalid project given";
 		featureProject = project;
+		return true;
 	}
 
 	public boolean clean() {

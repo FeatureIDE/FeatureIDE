@@ -72,19 +72,23 @@ public class AheadComposer extends ComposerExtensionClass {
 		}
 	}
 
-	public void initialize(IFeatureProject project) {
+	public boolean initialize(IFeatureProject project) {
 		super.initialize(project);
 		if (project == null) {
-			return;
+			return false;
 		}
 		ahead = new AheadWrapper(project);
 		ahead.addBuildErrorListener(new BuilderErrorListener());
+		
 		try {
 			ahead.setConfiguration(featureProject.getCurrentConfiguration());
+			return true;
 		} catch (IOException e) {
 			featureProject.createBuilderMarker(featureProject.getProject(),
 					e.getMessage(), 0, IMarker.SEVERITY_ERROR);
+			return false;
 		}
+		
 	}
 
 	public void performFullBuild(IFile config) {

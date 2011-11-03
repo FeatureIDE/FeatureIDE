@@ -46,7 +46,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
  */
 public interface IComposerExtensionClass {
 		
-	void initialize(IFeatureProject project);
+	boolean initialize(IFeatureProject project);
 	
 	void performFullBuild(IFile config);
 	

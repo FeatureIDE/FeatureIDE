@@ -71,7 +71,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	}
 
 	@Override
-	public void initialize(IFeatureProject project) {
+	public boolean initialize(IFeatureProject project) {
 		super.initialize(project);
 		antennaModelBuilder = new AntennaModelBuilder(project);
 		preprocessor = new Preprocessor(new AntennaLogger(),
@@ -82,6 +82,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 			project.setPaths(project.getBuildPath(), project.getBuildPath(),
 					project.getConfigPath());
 		}
+		return true;
 	}
 
 	@Override

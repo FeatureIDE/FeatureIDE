@@ -370,6 +370,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	}
 	
 	public void refresh(){
+		if(getFeatureModel()==null||getFeatureModel().getRoot()==null)return;
 		if (analyzingJob != null && analyzingJob.getState() == Job.RUNNING)
 			analyzingJob.cancel();
 		

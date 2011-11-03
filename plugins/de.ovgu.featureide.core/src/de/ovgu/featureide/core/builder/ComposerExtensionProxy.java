@@ -93,9 +93,13 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	 * @seefeatureide.core.builder.ICompositionTool#initialize(de.ovgu.featureide.core.
 	 * IFeatureProject)
 	 */
-	public void initialize(IFeatureProject project) {
+	public boolean initialize(IFeatureProject project) {
+		if(project.getFeatureModel()==null||project.getFeatureModel().getRoot()==null){
+			return false;
+		}
 		loadComposerExtension();
-		composerExtensionClass.initialize(project);
+		return composerExtensionClass.initialize(project);
+		
 	}
 
 	/*

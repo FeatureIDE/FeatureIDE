@@ -943,7 +943,8 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		Job job = new Job("Load Model") {
 			protected IStatus run(IProgressMonitor monitor) {
 				loadModel();
-				composerExtension.initialize(getFeatureProject());
+				boolean success = composerExtension.initialize(getFeatureProject());
+				if(!success) return Status.CANCEL_STATUS;
 				composerExtension.postModelChanged();
 				checkConfigurations(getAllConfigurations());
 				return Status.OK_STATUS;

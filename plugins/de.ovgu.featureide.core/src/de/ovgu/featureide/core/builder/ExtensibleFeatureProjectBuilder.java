@@ -167,7 +167,9 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		if (config == null) {
 			return null;
 		}
-		
+		if(featureProject.getFeatureModel()==null||featureProject.getFeatureModel().getRoot()==null){
+			return null;
+		}
 		composerExtension.performFullBuild(config);
 		
 		featureProject.builded();

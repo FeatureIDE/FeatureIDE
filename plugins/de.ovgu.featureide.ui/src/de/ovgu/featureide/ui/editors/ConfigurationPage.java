@@ -90,7 +90,7 @@ public class ConfigurationPage extends ConfigurationEditorPage {
 	private LinkedList<String> hiddenFeatures;
 	
 	public void updateTree(){
-		if (errorMassage())
+		if (errorMessage())
 			refreshTree();
 	}
 
@@ -145,7 +145,7 @@ public class ConfigurationPage extends ConfigurationEditorPage {
 		UIJob job = new UIJob("refresh tree") {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
-				if (errorMassage()) {
+				if (errorMessage()) {
 					setInput(configurationEditor.configuration);			
 				}
 				return Status.OK_STATUS;
@@ -303,8 +303,9 @@ public class ConfigurationPage extends ConfigurationEditorPage {
 		}
 	}
 	
-	private boolean errorMassage() {
-		if (!configurationEditor.configuration.valid() && configurationEditor.configuration.number() == 0){
+	private boolean errorMessage() {
+
+		if (configurationEditor.configuration==null||(!configurationEditor.configuration.valid() && configurationEditor.configuration.number() == 0)){
 			tree.removeAll();
 			TreeItem item = new TreeItem(tree, 1);
 			item.setText("The feature model for this project is void, i.e., " +

@@ -11,12 +11,37 @@
             class="de.ovgu.featureide.fm.ui.editors.FeatureModelEditor"
             contributorClass="de.ovgu.featureide.fm.ui.editors.featuremodel.FeatureModelEditorContributor"
             default="true"
-            filenames="model.xml"
+            
             icon="icons/featuretree.ico"
             id="de.ovgu.featureide.fm.ui.editors.FeatureModelEditor"
             name="Feature Model Editor">
+            <contentTypeBinding
+       		  contentTypeId="de.ovgu.featureide.fm.ui.featureModel">
+     		</contentTypeBinding>
       </editor>
    </extension> 
+   
+
+   
+   
+   <extension point="org.eclipse.core.contenttype.contentTypes">
+   <content-type base-type="org.eclipse.core.runtime.xml"
+                 file-extensions="xml"
+                 id="de.ovgu.featureide.fm.ui.featureModel"
+                 name="Feature Model"
+                 priority="high">
+      <describer class="org.eclipse.core.runtime.content.XMLRootElementContentDescriber">
+         <parameter name="element"
+                    value="featureModel">
+         </parameter>
+      </describer>
+   </content-type>
+</extension>
+   
+   
+   
+   
+   
    
    <extension
          point="org.eclipse.ui.views">

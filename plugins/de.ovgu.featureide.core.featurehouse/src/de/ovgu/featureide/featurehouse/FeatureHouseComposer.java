@@ -98,9 +98,11 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	 * ovgu.featureide.core.IFeatureProject)
 	 */
 	@Override
-	public void initialize(IFeatureProject project) {
-		super.initialize(project);
+	public boolean initialize(IFeatureProject project) {
+		boolean supSuccess =super.initialize(project);
 		fhModelBuilder = new FeatureHouseModelBuilder(project);
+		if(supSuccess==false||fhModelBuilder==null)return false;
+		else return true;
 	}
 
 	public void performFullBuild(IFile config) {

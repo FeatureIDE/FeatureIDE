@@ -408,6 +408,8 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 
 	private void defaultFeatureList() {
 		featurelist.removeAll();
+		
+		if(featureModel!=null&&featureModel.getRoot()!=null)
 		for (String featureName : featureModel.getLayerNames())
 			featurelist.add(featureName);
 	}
@@ -576,7 +578,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		// a copy of the old configuration
 		@SuppressWarnings("unchecked")
 		ArrayList<String> configuration = (ArrayList<String>) oldConfiguration.clone();
-		
+		if(layers==null)return;
 		for (String layer : layers)
 			if (oldConfiguration.contains(layer)) {
 				newConfiguration.add(layer);

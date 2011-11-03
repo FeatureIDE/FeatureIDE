@@ -54,6 +54,8 @@ import de.ovgu.featureide.ui.UIPlugin;
  * @author Jens Meinicke
  * @author Hannes Smurawsky
  */
+//TODO remove duplicate code configurationPage/AdvancedConfigurationPage
+
 public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 	
 	private static final String PAGE_TEXT = "Advanced Configuration";
@@ -72,7 +74,7 @@ public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 
 	public void updateTree() {
 		viewer.refresh();
-		if (!errorMassage())
+		if (!errorMessage())
 			updateForeground(viewer.getTree().getItem(0));
 		removeHiddenFeatures();
 	}
@@ -149,7 +151,7 @@ public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 		viewer.setInput(configurationEditor.configuration);
 		viewer.expandAll();
 		viewer.refresh();
-		if (!errorMassage())
+		if (!errorMessage())
 			updateForeground(viewer.getTree().getItem(0));
 		removeHiddenFeatures();
 		viewer.getTree().setRedraw(true);
@@ -176,9 +178,9 @@ public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 		}	
 	}
 
-	private boolean errorMassage() { 
-		if (!configurationEditor.configuration.valid() && configurationEditor.configuration.number() == 0){
-			for (TreeElement feature : configurationEditor.configuration.getRoot().getChildren())
+	private boolean errorMessage() { 
+		if (configurationEditor.configuration==null||(!configurationEditor.configuration.valid() && configurationEditor.configuration.number() == 0)){
+		for (TreeElement feature : configurationEditor.configuration.getRoot().getChildren())
 				remove(feature);
 			viewer.getTree().getItem(0).setText("The feature model for " +
 					"this project is void, i.e., there is no valid configuration. " +
