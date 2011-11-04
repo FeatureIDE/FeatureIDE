@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Feature Model UI Test Fragment
-Bundle-SymbolicName: de.ovgu.featureide.fm.ui_test;singleton:=true
+Bundle-SymbolicName: de.ovgu.featureide.core.munge_test;singleton:=true
 Bundle-Version: 2.2.4.qualifier
-Fragment-Host: de.ovgu.featureide.fm.ui
+Fragment-Host: de.ovgu.featureide.core.munge
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: University of Magdeburg
 Require-Bundle: org.junit4;bundle-version="4.3.1"
