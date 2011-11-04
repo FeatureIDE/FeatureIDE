@@ -462,34 +462,13 @@ Public License instead of this License.
    <requires>
       <import plugin="org.junit4" version="4.3.1" match="greaterOrEqual"/>
       <import plugin="de.ovgu.featureide.core"/>
+       <import plugin="de.ovgu.featureide.fm.core"/>
+        <import plugin="de.ovgu.featureide.fm.ui"/>
+
    </requires>
 
    <plugin
          id="de.ovgu.featureide.fm.core_test"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="de.ovgu.featureide.core.ahead_test"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="de.ovgu.featureide.core.featurehouse_test"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="de.ovgu.featureide.core.munge_test"
          download-size="0"
          install-size="0"
          version="0.0.0"
