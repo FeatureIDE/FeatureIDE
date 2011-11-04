@@ -16,11 +16,13 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.munge;
+package de.ovgu.featureide.core.munge;
 
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+
+import de.ovgu.featureide.munge.MungeFMComposerExtension;
 
 /**
  * Tests for Munge renaming.
