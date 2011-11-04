@@ -55,14 +55,15 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 
 	private FeatureCppModelBuilder featureCppModelBuilder;
 
-	public void initialize(IFeatureProject project) {
+	public boolean initialize(IFeatureProject project) {
 		if (project == null) {
-			return;
+			return false;
 		}
-		featureCpp.initialize(project.getSourceFolder(), project
+	featureCpp.initialize(project.getSourceFolder(), project
 				.getBuildFolder());
 		
 		featureCppModelBuilder = new FeatureCppModelBuilder(project);
+		return true;
 	}
 
 

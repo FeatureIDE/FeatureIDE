@@ -107,13 +107,14 @@ public class FeatureCppWrapper {
 		new File(featureCppExecutableName).setExecutable(true);
 	}
 
-	public void initialize(IFolder source, IFolder build) {
+	public boolean initialize(IFolder source, IFolder build) {
 		if (source != null) {
 			this.source = source;
 			sourceFolder = source.getRawLocation().toOSString();
 		}
 		buildFolder = build.getRawLocation().toOSString();
 		buildDirectory = build;
+		return true;
 	}
 
 	public void compose(IFile config) {
