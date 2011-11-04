@@ -14,6 +14,30 @@
 			<property name="type" value="feature" />
 			<property name="id" value="de.ovgu.featureide" />
 		</ant>
+		<ant antfile="${genericTargets}" target="${target}">
+			<property name="type" value="feature" />
+			<property name="id" value="de.ovgu.featureide.featurecpp" />
+		</ant>
+		<ant antfile="${genericTargets}" target="${target}">
+			<property name="type" value="feature" />
+			<property name="id" value="de.ovgu.featureide.featurehouse" />
+		</ant>
+		<ant antfile="${genericTargets}" target="${target}">
+			<property name="type" value="feature" />
+			<property name="id" value="de.ovgu.featureide.deltaj" />
+		</ant>
+		<ant antfile="${genericTargets}" target="${target}">
+			<property name="type" value="feature" />
+			<property name="id" value="de.ovgu.featureide.aspectj" />
+		</ant>
+		<ant antfile="${genericTargets}" target="${target}">
+			<property name="type" value="feature" />
+			<property name="id" value="de.ovgu.featureide.munge" />
+		</ant>
+		<ant antfile="${genericTargets}" target="${target}">
+			<property name="type" value="feature" />
+			<property name="id" value="de.ovgu.featureide.test" />
+		</ant>
 		
 	</target>
 
@@ -31,6 +55,36 @@
 		</ant>
 	</target>
 	<target name="assemble.de.ovgu.featureide">
+		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
+			<property name="zipargs" value="" />
+		</ant>
+	</target>
+	<target name="assemble.de.ovgu.featureide.featurecpp">
+		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
+			<property name="zipargs" value="" />
+		</ant>
+	</target>
+	<target name="assemble.de.ovgu.featureide.featurehouse">
+		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
+			<property name="zipargs" value="" />
+		</ant>
+	</target>
+	<target name="assemble.de.ovgu.featureide.deltaj">
+		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
+			<property name="zipargs" value="" />
+		</ant>
+	</target>
+	<target name="assemble.de.ovgu.featureide.aspectj">
+		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
+			<property name="zipargs" value="" />
+		</ant>
+	</target>
+	<target name="assemble.de.ovgu.featureide.munge">
+		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
+			<property name="zipargs" value="" />
+		</ant>
+	</target>
+	<target name="assemble.de.ovgu.featureide.test">
 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
 			<property name="zipargs" value="" />
 		</ant>

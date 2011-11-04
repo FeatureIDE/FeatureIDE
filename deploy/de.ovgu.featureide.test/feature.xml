@@ -465,47 +465,7 @@ Public License instead of this License.
    </requires>
 
    <plugin
-         id="de.ovgu.featureide.core.ahead-test"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="de.ovgu.featureide.core.featurehouse-test"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="de.ovgu.featureide.core.munge-test"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="de.ovgu.featureide.core_test"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="de.ovgu.featureide.fm.core-test"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="de.ovgu.featureide.fm.ui-test"
+         id="de.ovgu.featureide.fm.core_test"
          download-size="0"
          install-size="0"
          version="0.0.0"
