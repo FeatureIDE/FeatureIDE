@@ -36,7 +36,6 @@ import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
-
 public class Configuration {
 
 	private static final int TIMEOUT = 1000;
@@ -61,17 +60,42 @@ public class Configuration {
 		this(featureModel, propagate, true);
 	}
 
-	public Configuration(FeatureModel featureModel, boolean propagate, boolean ignoreAbstractFeatures) {
+	public Configuration(FeatureModel featureModel, boolean propagate,
+			boolean ignoreAbstractFeatures) {
 		this.featureModel = featureModel;
 		this.propagate = propagate;
 
 		root = new SelectableFeature(this, featureModel.getRoot());
 		initFeatures(root, featureModel.getRoot());
 
-		rootNode = NodeCreator.createNodes(featureModel, ignoreAbstractFeatures);
+		rootNode = NodeCreator
+				.createNodes(featureModel, ignoreAbstractFeatures);
 		rootNode = rootNode.toCNF();
 
 		updateAutomaticValues();
+	}
+
+	/**
+	 * if there are hidden features which Selection is UNDEFINED, they are
+	 * selected automatically
+	 */
+	private void updateHiddenFeatureValues() {
+		// try selecting each hidden feature that still are UNDEFINED
+		for (SelectableFeature feature : features) {
+
+			boolean hasHiddenParent = feature.getFeature().hasHiddenParent();
+			boolean isUndefined = feature.getSelection() == Selection.UNDEFINED;
+
+			if (hasHiddenParent && isUndefined) {
+				feature.setAutomatic(Selection.SELECTED);
+				if (!valid()) {
+					feature.setAutomatic(Selection.UNDEFINED);
+
+				}
+			}
+
+		}
+
 	}
 
 	private void initFeatures(SelectableFeature sFeature, Feature feature) {
@@ -94,7 +118,8 @@ public class Configuration {
 	public boolean valid() {
 		LinkedList<Node> children = new LinkedList<Node>();
 		for (SelectableFeature feature : features)
-		    if (feature.getFeature() != null && feature.getFeature().isConcrete()) {
+			if (feature.getFeature() != null
+					&& feature.getFeature().isConcrete()) {
 				Literal literal = new Literal(feature.getName());
 				literal.positive = feature.getSelection() == Selection.SELECTED;
 				children.add(literal);
@@ -110,7 +135,7 @@ public class Configuration {
 	public long number() {
 		return number(250);
 	}
-	
+
 	public long number(long timeout) {
 		LinkedList<Node> children = new LinkedList<Node>();
 		for (SelectableFeature feature : features)
@@ -123,21 +148,28 @@ public class Configuration {
 		Node node = new And(rootNode.clone(), new And(children));
 		return new SatSolver(node, timeout).countSolutions();
 	}
-	
+
 	private void updateAutomaticValues() {
 		if (!propagate)
 			return;
 		resetAutomaticValues();
+
 		updateManualDefinedValues();
 		updateManualUndefinedValues();
+		updateHiddenFeatureValues();
+
 	}
 
 	private void resetAutomaticValues() {
-		for (SelectableFeature feature : features)
+		for (SelectableFeature feature : features) {
+
 			feature.setAutomatic(Selection.UNDEFINED);
+
+		}
 	}
-	
-	public boolean leadToValidConfiguration(SelectableFeature feature, Selection testSelection, Selection actualSelection){
+
+	public boolean leadToValidConfiguration(SelectableFeature feature,
+			Selection testSelection, Selection actualSelection) {
 		feature.setManual(testSelection);
 		updateAutomaticValues();
 		if (valid()) {
@@ -149,9 +181,10 @@ public class Configuration {
 		updateAutomaticValues();
 		return false;
 	}
-	
+
 	private void updateManualDefinedValues() {
 		List<Node> literals = new LinkedList<Node>();
+		// each feature that is not manually defined is added to "literals"
 		for (SelectableFeature feature : features)
 			if (feature.getManual() != Selection.UNDEFINED) {
 				Literal literal = new Literal(feature.getName());
@@ -159,6 +192,9 @@ public class Configuration {
 				literals.add(literal);
 			}
 		SatSolver solver = new SatSolver(rootNode.clone(), TIMEOUT);
+		// for each feature: if negating it is not possible, the feature will be
+		// set as manual defined
+
 		for (Node node : literals) {
 			Literal literal = (Literal) node;
 			literal.positive = !literal.positive;
@@ -189,7 +225,9 @@ public class Configuration {
 			if (feature != null && feature.getManual() == Selection.UNDEFINED)
 				feature.setAutomatic(literal.positive ? Selection.SELECTED
 						: Selection.UNSELECTED);
+
 		}
+
 	}
 
 	public void setManual(SelectableFeature feature, Selection selection) {
@@ -197,13 +235,13 @@ public class Configuration {
 		updateAutomaticValues();
 	}
 
-	public SelectableFeature getSelectablefeature(String name){
+	public SelectableFeature getSelectablefeature(String name) {
 		SelectableFeature feature = table.get(name);
 		if (feature == null)
 			return null;
 		return feature;
 	}
-	
+
 	public void setManual(String name, Selection selection) {
 		SelectableFeature feature = table.get(name);
 		if (feature == null)
@@ -248,8 +286,7 @@ public class Configuration {
 		for (TreeElement child : sf.getChildren())
 			findUnSelectedFeatures((SelectableFeature) child, result);
 	}
-	
-	
+
 	public FeatureModel getFeatureModel() {
 		return featureModel;
 	}
