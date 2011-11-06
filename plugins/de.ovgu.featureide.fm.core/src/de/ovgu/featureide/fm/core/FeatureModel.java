@@ -18,12 +18,12 @@
  */
 package de.ovgu.featureide.fm.core;
 
-import org.eclipse.draw2d.geometry.Point;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.ConcurrentModificationException;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -41,6 +41,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.draw2d.geometry.Point;
 import org.prop4j.And;
 import org.prop4j.Implies;
 import org.prop4j.Literal;
@@ -53,7 +54,7 @@ import org.sat4j.specs.TimeoutException;
 import de.ovgu.featureide.fm.core.editing.Comparison;
 import de.ovgu.featureide.fm.core.editing.ModelComparator;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
- 
+
 /**
  * The model representation of the feature tree that notifies listeners of
  * changes in the tree.
@@ -106,9 +107,9 @@ public class FeatureModel implements PropertyConstants {
 	 * all comment lines from the model file without line number at which they
 	 * occur
 	 */
-	
+
 	private int selectedLayoutAlgorithm = 1;
-	
+
 	private List<String> comments = new LinkedList<String>();
 
 	/**
@@ -130,13 +131,13 @@ public class FeatureModel implements PropertyConstants {
 	private LinkedList<Renaming> renamings = new LinkedList<Renaming>();
 
 	/**
-	 * a list containing the feature names in their specified order
-	 * will be initialized in XmlFeatureModelReader
+	 * a list containing the feature names in their specified order will be
+	 * initialized in XmlFeatureModelReader
 	 */
 	private ArrayList<String> featureOrderList = new ArrayList<String>();
 	private boolean featureOrderUserDefined = false;
 	private boolean featureOrderInXML = false;
-	
+
 	private IFolder sourceFolder;
 
 	private IFMComposerExtension fmComposerExtension = new FMComposerExtension();
@@ -155,18 +156,18 @@ public class FeatureModel implements PropertyConstants {
 		reset();
 	}
 
-	public void setLayout(int newLayoutAlgorithm){	
+	public void setLayout(int newLayoutAlgorithm) {
 		selectedLayoutAlgorithm = newLayoutAlgorithm;
 	}
-	
-	public int getLayoutAlgorithm(){
+
+	public int getLayoutAlgorithm() {
 		return selectedLayoutAlgorithm;
 	}
-	
-	public static void setFeatureLocation(Point newLocation, Feature feature){
+
+	public static void setFeatureLocation(Point newLocation, Feature feature) {
 		feature.setNewLocation(newLocation);
 	}
-	
+
 	public void reset() {
 		if (root != null) {
 			while (root.hasChildren()) {
@@ -221,15 +222,17 @@ public class FeatureModel implements PropertyConstants {
 	}
 
 	public void removePropositionalNode(Node node) {
-		propNodes.remove(node);
-		constraints.remove(constraints.size() - 1);
+		if (propNodes.contains(node)) {
+			propNodes.remove(node);
+			constraints.remove(constraints.size() - 1);
+		}
 	}
 
 	public void removePropositionalNode(Constraint constraint) {
-
-		propNodes.remove(constraint.getNode());
-		constraints.remove(constraint);
-
+		if (propNodes.contains(constraint.getNode())) {
+			propNodes.remove(constraint.getNode());
+			constraints.remove(constraint);
+		}
 	}
 
 	public void removePropositionalNode(int index) {
@@ -281,7 +284,7 @@ public class FeatureModel implements PropertyConstants {
 		}
 
 		// add children to parent
-		
+
 		int index = parent.getChildIndex(feature);
 		while (feature.hasChildren())
 			parent.addChildAtPosition(index, feature.removeLastChild());
@@ -447,108 +450,131 @@ public class FeatureModel implements PropertyConstants {
 		for (PropertyChangeListener listener : listenerList)
 			listener.propertyChange(event);
 	}
-	
+
 	private boolean valid = true;
 
 	/**
-	 * Returns the value calculated during the last call of updateFeatureModel().
+	 * Returns the value calculated during the last call of
+	 * updateFeatureModel().
 	 * 
 	 * @return cached value
 	 */
 	public boolean valid() {
 		return valid;
 	}
-	
-	public void analyzeFeatureModel(){	
-		
-		// update features		
-		for(Feature bone : getFeatures()) {
-			bone.setFeatureStatus(FeatureStatus.NORMAL,false);
+
+	public void analyzeFeatureModel() {
+
+		// update features
+		for (Feature bone : getFeatures()) {
+			bone.setFeatureStatus(FeatureStatus.NORMAL, false);
 			bone.setRelevantConstraints();
 		}
-		
+
 		try {
 			valid = isValid();
 		} catch (TimeoutException e) {
 			valid = true;
 			FMCorePlugin.getDefault().logError(e);
 		}
-		
+
 		try {
-			for(Literal deadFeature : getDeadFeatures()){
+			for (Literal deadFeature : getDeadFeatures()) {
 				if (getFeature(deadFeature.var.toString()) != null)
-					getFeature(deadFeature.var.toString()).setFeatureStatus(FeatureStatus.DEAD,false);
+					getFeature(deadFeature.var.toString()).setFeatureStatus(
+							FeatureStatus.DEAD, false);
 			}
-		} catch (Exception e){
+		} catch (Exception e) {
 			FMCorePlugin.getDefault().logError(e);
-		}		
-			
+		}
+
 		try {
 			if (valid) {
-				// TODO Thomas: export to new function getFalseOptionalFeature(), improve calculation effort and correct calculation (is this feature always selected given that the parent feature is selected)
-				for(Feature bone : getFeatures()) {
-					SatSolver satsolver = new SatSolver(new And(NodeCreator.createNodes(this.clone()), new Not(bone.getName())), 1000);				
+				// TODO Thomas: export to new function
+				// getFalseOptionalFeature(), improve calculation effort and
+				// correct calculation (is this feature always selected given
+				// that the parent feature is selected)
+				for (Feature bone : getFeatures()) {
+					SatSolver satsolver = new SatSolver(new And(
+							NodeCreator.createNodes(this.clone()), new Not(
+									bone.getName())), 1000);
 					try {
 						if (!bone.isMandatory() && !bone.isRoot()
 								&& !satsolver.isSatisfiable())
-							bone.setFeatureStatus(FeatureStatus.FALSE_OPTIONAL,false);
+							bone.setFeatureStatus(FeatureStatus.FALSE_OPTIONAL,
+									false);
 					} catch (TimeoutException e) {
 						FMCorePlugin.getDefault().logError(e);
-					}				
+					}
 				}
 			}
-		} catch (Exception e){
+		} catch (Exception e) {
 			FMCorePlugin.getDefault().logError(e);
-		}		
-		
+		}
+		System.out.println("before");
 		// update constraints
-		for(Constraint constraint : getConstraints()){
-			constraint.setContainedFeatures(constraint.getNode());
-			constraint.setFalseOptionalFeatures();
-			constraint.setConstraintAttribute(ConstraintAttribute.NORMAL,false);
-			
-			// tautology
-			SatSolver satsolverTAU = new SatSolver(new Not(constraint.getNode().clone()), 1000);
-			try {
-				if (!satsolverTAU.isSatisfiable())
-					constraint.setConstraintAttribute(ConstraintAttribute.TAUTOLOGY,false);
-			} catch (TimeoutException e) {
-				FMCorePlugin.getDefault().logError(e);
-			}
-			
-			if (valid) {
-				// redundant constraint?
-				FeatureModel dirtyModel = this.clone();
-				dirtyModel.removePropositionalNode(constraint.getNode());
-				ModelComparator comparator = new ModelComparator(20000);
-				Comparison comparison = comparator.compare(this, dirtyModel);
-				if (comparison == Comparison.REFACTORING) 
-					constraint.setConstraintAttribute(ConstraintAttribute.REDUNDANT,false); 
-			}
-			// makes feature model void?
-			else {
-				// inconsistency?
-				FeatureModel clonedModel = this.clone();
-				clonedModel.removePropositionalNode(constraint);
+		try {
+			for (Constraint constraint : getConstraints()) {
+				constraint.setContainedFeatures(constraint.getNode());
+				constraint.setFalseOptionalFeatures();
+				constraint.setConstraintAttribute(ConstraintAttribute.NORMAL,
+						false);
+
+				// tautology
+				SatSolver satsolverTAU = new SatSolver(new Not(constraint
+						.getNode().clone()), 1000);
 				try {
-					if (clonedModel.isValid())
-						constraint.setConstraintAttribute(ConstraintAttribute.VOID_MODEL,false);
+					if (!satsolverTAU.isSatisfiable())
+						constraint.setConstraintAttribute(
+								ConstraintAttribute.TAUTOLOGY, false);
 				} catch (TimeoutException e) {
 					FMCorePlugin.getDefault().logError(e);
 				}
 
-				// contradiction?
-				SatSolver satsolverUS = new SatSolver(constraint.getNode().clone(), 1000);
-				try {
-					 if (!satsolverUS.isSatisfiable())
-						 constraint.setConstraintAttribute(ConstraintAttribute.UNSATISFIABLE,false);
-				} catch (TimeoutException e) {
-					FMCorePlugin.getDefault().logError(e);
+				if (valid) {
+					// redundant constraint?
+					FeatureModel dirtyModel = this.clone();
+					dirtyModel.removePropositionalNode(constraint.getNode());
+					ModelComparator comparator = new ModelComparator(20000);
+					Comparison comparison = comparator
+							.compare(this, dirtyModel);
+					if (comparison == Comparison.REFACTORING)
+						constraint.setConstraintAttribute(
+								ConstraintAttribute.REDUNDANT, false);
+				}
+				// makes feature model void?
+				else {
+					// inconsistency?
+					FeatureModel clonedModel = this.clone();
+					clonedModel.removePropositionalNode(constraint);
+					try {
+						if (clonedModel.isValid())
+							constraint.setConstraintAttribute(
+									ConstraintAttribute.VOID_MODEL, false);
+					} catch (TimeoutException e) {
+						FMCorePlugin.getDefault().logError(e);
+					}
+
+					// contradiction?
+					SatSolver satsolverUS = new SatSolver(constraint.getNode()
+							.clone(), 1000);
+					try {
+						if (!satsolverUS.isSatisfiable())
+							constraint.setConstraintAttribute(
+									ConstraintAttribute.UNSATISFIABLE, false);
+					} catch (TimeoutException e) {
+						FMCorePlugin.getDefault().logError(e);
+					}
 				}
 			}
+		} catch (ConcurrentModificationException e) {
+			// TODO: find cause for that exception
+			// it does not seem to have any negative effect but should be
+			// avoided
 		}
+
 	}
-	
+
 	public Collection<Feature> getFeatures() {
 		return Collections.unmodifiableCollection(featureTable.values());
 	}
@@ -971,21 +997,21 @@ public class FeatureModel implements PropertyConstants {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Removes all invalid java identifiers form a given string.
 	 */
 	private String getValidJavaIdentifier(String s) {
 		StringBuilder stringBuilder = new StringBuilder();
 		int i = 0;
-		for (;i < s.length();i++) {
+		for (; i < s.length(); i++) {
 			if (Character.isJavaIdentifierStart(s.charAt(i))) {
 				stringBuilder.append(s.charAt(i));
 				i++;
 				break;
 			}
 		}
-		for (;i < s.length();i++) {
+		for (; i < s.length(); i++) {
 			if (Character.isJavaIdentifierPart(s.charAt(i))) {
 				stringBuilder.append(s.charAt(i));
 			}
@@ -1101,22 +1127,25 @@ public class FeatureModel implements PropertyConstants {
 	}
 
 	public boolean hasFeaturesAutoLayout() {
-		return (selectedLayoutAlgorithm!=0);
+		return (selectedLayoutAlgorithm != 0);
 	}
-	
-	public boolean showHiddenFeatures(){
+
+	public boolean showHiddenFeatures() {
 		return showHiddenFeatures;
 	}
-	public void showHiddenFeatures(boolean b){
+
+	public void showHiddenFeatures(boolean b) {
 		showHiddenFeatures = b;
 	}
-	public boolean verticalLayout(){
+
+	public boolean verticalLayout() {
 		return hasVerticalLayout;
 	}
-	public void verticalLayout(boolean b){
+
+	public void verticalLayout(boolean b) {
 		hasVerticalLayout = b;
 	}
-	
+
 	/**
 	 * @return true if feature model contains mandatory features otherwise false
 	 */
@@ -1173,7 +1202,7 @@ public class FeatureModel implements PropertyConstants {
 		}
 		return false;
 	}
-	
+
 	public boolean hasAbstract() {
 		for (Feature f : this.featureTable.values()) {
 			if (f.isAbstract())
@@ -1181,7 +1210,7 @@ public class FeatureModel implements PropertyConstants {
 		}
 		return false;
 	}
-	
+
 	public boolean hasConcrete() {
 		for (Feature f : this.featureTable.values()) {
 			if (!(f.isAbstract()))
@@ -1189,7 +1218,7 @@ public class FeatureModel implements PropertyConstants {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * 
 	 * @return <code>true</code> if the feature model contains a hidden feature
@@ -1201,19 +1230,18 @@ public class FeatureModel implements PropertyConstants {
 		}
 		return false;
 	}
-	
+
 	public boolean hasDead() {
-		return this.getDeadFeatures().size() >0;
-	}
-	
-	public boolean hasFalse() {
-		for(Feature f : this.featureTable.values()){
-			if(f.getFeatureStatus() == FeatureStatus.FALSE_OPTIONAL)
-				return true;
-		}	
-		return false;
+		return this.getDeadFeatures().size() > 0;
 	}
 
+	public boolean hasFalse() {
+		for (Feature f : this.featureTable.values()) {
+			if (f.getFeatureStatus() == FeatureStatus.FALSE_OPTIONAL)
+				return true;
+		}
+		return false;
+	}
 
 	public void setUndoContext(Object undoContext) {
 		this.undoContext = undoContext;
@@ -1226,7 +1254,6 @@ public class FeatureModel implements PropertyConstants {
 		return undoContext;
 	}
 
-	
 	public void setConstraints(List<Constraint> constraints) {
 		this.constraints = constraints;
 		this.propNodes = new LinkedList<Node>();
@@ -1250,7 +1277,7 @@ public class FeatureModel implements PropertyConstants {
 	public void addPropositionalNode(Node node, int index) {
 		constraints.add(index, new Constraint(this, node));
 		propNodes.add(index, node);
-		
+
 	}
 
 	/**
@@ -1261,7 +1288,8 @@ public class FeatureModel implements PropertyConstants {
 	}
 
 	/**
-	 * @param featureOrderList the featureOrderList to set
+	 * @param featureOrderList
+	 *            the featureOrderList to set
 	 */
 	public void setFeatureOrderList(ArrayList<String> featureOrderList) {
 		this.featureOrderList = featureOrderList;
@@ -1275,7 +1303,8 @@ public class FeatureModel implements PropertyConstants {
 	}
 
 	/**
-	 * @param featureOrderUserDefined the featureOrderUserDefined to set
+	 * @param featureOrderUserDefined
+	 *            the featureOrderUserDefined to set
 	 */
 	public void setFeatureOrderUserDefined(boolean featureOrderUserDefined) {
 		this.featureOrderUserDefined = featureOrderUserDefined;
@@ -1289,10 +1318,11 @@ public class FeatureModel implements PropertyConstants {
 	}
 
 	/**
-	 * @param featureOrderInXML the featureOrderInXML to set
+	 * @param featureOrderInXML
+	 *            the featureOrderInXML to set
 	 */
 	public void setFeatureOrderInXML(boolean featureOrderInXML) {
 		this.featureOrderInXML = featureOrderInXML;
 	}
-	
+
 }

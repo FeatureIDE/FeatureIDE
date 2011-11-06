@@ -230,15 +230,18 @@ public class FeatureModelEditView extends ViewPart {
 	private void refresh() {
 		if (job != null && job.getState() == Job.RUNNING)
 			job.cancel();
-
+		//Waiting for job to be actually canceled
+		//TODO replace by job state listener?
+		while(job!=null&&job.getState()==Job.RUNNING);
 		job = new Job("Updating Feature Model Edits") {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				if (featureModelEditor == null)
 					contentProvider.defaultContent();
-				else
+				else{
 					contentProvider.calculateContent(featureModelEditor.getOriginalFeatureModel(), featureModelEditor.getFeatureModel());
-				return Status.OK_STATUS;
+				}
+					return Status.OK_STATUS;
 			}
 		};
 		job.setPriority(Job.LONG);

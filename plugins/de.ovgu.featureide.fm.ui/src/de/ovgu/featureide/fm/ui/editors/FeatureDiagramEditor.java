@@ -386,7 +386,9 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 			return;
 		if (analyzingJob != null && analyzingJob.getState() == Job.RUNNING)
 			analyzingJob.cancel();
-
+		//waiting for job to be actually canceled
+		//TODO: could be replaced by job state listener?
+		while(analyzingJob!=null&&analyzingJob.getState()==Job.RUNNING);
 		analyzingJob = new Job("Analyzing feature model") {
 
 			@Override

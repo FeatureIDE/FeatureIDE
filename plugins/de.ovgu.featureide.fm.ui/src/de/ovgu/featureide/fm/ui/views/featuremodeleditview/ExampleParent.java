@@ -23,9 +23,9 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
+import de.ovgu.featureide.fm.core.editing.Comparison;
 import de.ovgu.featureide.fm.core.editing.ModelComparator;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-
 
 /**
  * Calculates an example for added or removed products.
@@ -34,13 +34,14 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  */
 public class ExampleParent extends TreeParent {
 
-	private static final Image UNDEFINED_IMAGE = FMUIPlugin.getImage("undefined.ico");
+	private static final Image UNDEFINED_IMAGE = FMUIPlugin
+			.getImage("undefined.ico");
 	private static final Image PLUS_IMAGE = FMUIPlugin.getImage("plus.gif");
 	private static final Image MINUS_IMAGE = FMUIPlugin.getImage("minus.gif");
 	private static final Image ZERO_IMAGE = FMUIPlugin.getImage("zero.gif");
-	
+
 	private ModelComparator c;
-	
+
 	private boolean added;
 
 	private int number;
@@ -50,16 +51,19 @@ public class ExampleParent extends TreeParent {
 		this.added = added;
 		this.c = c;
 		this.number = number;
+
 		if (number == 1)
 			name = added ? "Added products" : "Removed products";
-		String imageName = added && !c.isImplied() ? "plus" : !added
-				&& !c.isImplies() ? "minus" : "zero";
-		lazy = !imageName.equals("zero");
-		if (number > 1)
-	 		image = UNDEFINED_IMAGE;
-		else
-			image = imageName.equals("plus") ? PLUS_IMAGE : 
-				imageName.equals("minus") ? MINUS_IMAGE : ZERO_IMAGE;
+		if (c.getResult() == Comparison.ERROR || number > 1) {
+			image = UNDEFINED_IMAGE;
+		} else {
+			String imageName = added && !c.isImplied() ? "plus" : !added
+					&& !c.isImplies() ? "minus" : "zero";
+			lazy = !imageName.equals("zero");
+
+			image = imageName.equals("plus") ? PLUS_IMAGE : imageName
+					.equals("minus") ? MINUS_IMAGE : ZERO_IMAGE;
+		}
 	}
 
 	@Override
