@@ -299,19 +299,26 @@ public class AheadComposer extends ComposerExtensionClass {
 	public ArrayList<String[]> getTemplates() {
 		ArrayList<String[]> list = new ArrayList<String[]>();
 		String[] jak = { "Jak", "jak",
-				"public #refines# class #classname# {\n\n}" };
+				"/**\r\n * TODO description\r\n */\r\npublic " + REFINES_PATTERN + " class " + CLASS_NAME_PATTERN + " {\r\n\r\n}" };
 		list.add(jak);
 		return list;
 	}
 	
 	@Override
-	public String replaceMarker(String text, List<String> list) {
+	public String replaceMarker(String text, List<String> list, String packageName) {
 		if (list != null && list.contains("refines"))
-			text = text.replace("#refines#", "refines ");
+			text = text.replace(REFINES_PATTERN, "refines");
 		else
-			text = text.replace("#refines#", "");
-		
+			text = text.replace(REFINES_PATTERN + " ", "");
 		return text;
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.ComposerExtensionClass#refines()
+	 */
+	@Override
+	public boolean refines() {
+		return true;
 	}
 
 	@Override

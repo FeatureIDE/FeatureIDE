@@ -45,6 +45,11 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
  * @author Tom Brosch
  */
 public interface IComposerExtensionClass {
+	
+	final static String PACKAGE_PATTERN = "#package#";
+	final static String REFINES_PATTERN = "#refines#";
+	final static String CLASS_NAME_PATTERN = "#classname#";
+	final static String FEATUE_PATTER = "#featurename#";
 		
 	boolean initialize(IFeatureProject project);
 	
@@ -103,9 +108,17 @@ public interface IComposerExtensionClass {
 	 * Replaces all markers in the template.
 	 * @param text - String, where markers shall be replaced
 	 * @param list - List of markers, which depend on user input
+	 * @param packageName 
 	 * @return template with replaced markers
 	 */
-	String replaceMarker(String text, List<String> list);
+	String replaceMarker(String text, List<String> list, String packageName);
+	
+	/**
+	 * Defines if a refining class differs from a common one and <code>replaceMarker()</code>
+	 * has to be called.
+	 * @return <code>true</code> if the refining class differs.
+	 */
+	boolean refines();
 	
 	/**
 	 * Is called after changes at composition folder.

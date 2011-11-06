@@ -173,8 +173,8 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#replaceMarker(String text, List<String> list)
 	 */
-	public String replaceMarker(String text, List<String> list) {
-		return composerExtensionClass.replaceMarker(text, list);
+	public String replaceMarker(String text, List<String> list, String packageName) {
+		return composerExtensionClass.replaceMarker(text, list, packageName);
 	}
 	
 	/* (non-Javadoc)
@@ -239,6 +239,13 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	 */
 	public void buildConfiguration(IFolder folder, Configuration configuration) {
 		composerExtensionClass.buildConfiguration(folder, configuration);
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#refines()
+	 */
+	public boolean refines() {
+		return composerExtensionClass.refines();
 	}
 
 }

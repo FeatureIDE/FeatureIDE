@@ -19,6 +19,7 @@
 package de.ovgu.featureide.featurecpp;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -68,6 +69,7 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 
 
 	public void performFullBuild(IFile config) {
+		initialize(CorePlugin.getFeatureProject(config));
 		featureCppModelBuilder.resetModel();
 		featureCpp.compose(config);
 	}
@@ -121,11 +123,30 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 
 	@Override
 	public ArrayList<String[]> getTemplates(){
-		
 		ArrayList<String[]> list = new ArrayList<String[]>();
-		String[] c = {"C++", "h", ""};
+		String[] c = {"C++", "h", "\r\n" + REFINES_PATTERN + " class " + CLASS_NAME_PATTERN + " {\r\n\r\n};"};
 		list.add(c);
 		return list;
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.ComposerExtensionClass#replaceMarker(java.lang.String, java.util.List)
+	 */
+	@Override
+	public String replaceMarker(String text, List<String> list, String packageName) {
+		if (list != null && list.contains("refines"))
+			text = text.replace(REFINES_PATTERN, "refines");
+		else
+			text = text.replace(REFINES_PATTERN + " ", "");
+		return text;
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.ComposerExtensionClass#refines()
+	 */
+	@Override
+	public boolean refines() {
+		return true;
 	}
 
 	@Override

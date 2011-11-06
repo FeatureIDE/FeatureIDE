@@ -18,25 +18,34 @@
  */
 package de.ovgu.featureide.ui.wizards;
 
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.ui.INewWizard;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.core.runtime.*;
-import org.eclipse.jface.operation.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.core.resources.*;
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
-import java.io.*;
-import org.eclipse.ui.*;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.ui.INewWizard;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWizard;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 
 import de.ovgu.featureide.core.builder.IComposerExtension;
+import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
@@ -87,10 +96,12 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 		final IComposerExtension composer = page.getComposer();
 		final String featureName = page.getFeatureName();
 		final String className = page.getClassName();
+		final String packageName = page.getPackage();
+		createFolder(page.getPackage(), page.getSourceFolder().getFolder(featureName));
 		IRunnableWithProgress op = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor) throws InvocationTargetException {
 				try {
-					doFinish(featureName,container, fileName,className, fileExtension, fileTemplate , composer, page.isRefinement (), monitor);
+					doFinish(featureName,container, fileName,className, fileExtension, fileTemplate , composer, page.isRefinement (), packageName,monitor);
 				} catch (CoreException e) {
 					throw new InvocationTargetException(e);
 				} finally {
@@ -111,18 +122,36 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 	}
 	
 	/**
+	 * @param packageName 
+	 * @param sourceFolder
+	 */
+	private void createFolder(String packageName, IFolder folder) {
+		for (String p : packageName.split("[.]")) {
+			folder = folder.getFolder(p);
+			if (!folder.exists()) {
+				try {
+					folder.create(true, true, null);
+				} catch (CoreException e) {
+					UIPlugin.getDefault().logError(e);
+				}
+			}
+		}
+	}
+
+	/**
 	 * The worker method. It will find the container, create the
 	 * file if missing or just replace its contents, and open
 	 * the editor on the newly created file.
+	 * @param packageName 
 	 */
 	private void doFinish(String featureName,IContainer container, String fileName,String classname, String extension, String template, 
-			IComposerExtension composer, boolean refines, IProgressMonitor monitor) throws CoreException {
+			IComposerExtension composer, boolean refines, String packageName, IProgressMonitor monitor) throws CoreException {
 		// create a sample file
 		monitor.beginTask("Creating " + fileName, 2);
 		final IFile file = container.getFile(new Path(fileName + "." + extension));
 	
 		try {
-			InputStream stream = openContentStream(featureName,container, classname, template, composer, refines);
+			InputStream stream = openContentStream(featureName,container, classname, template, composer, refines, packageName);
 			if (file.exists()) {
 				file.setContents(stream, true, true, monitor);
 			} else {
@@ -148,18 +177,21 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 	
 	/**
 	 * We will initialize file contents with a sample text.
+	 * @param packageName 
 	 */
 
-	private InputStream openContentStream(String featurename,IContainer container, String classname, String template, IComposerExtension composer, boolean refines) {
+	private InputStream openContentStream(String featurename,IContainer container, String classname, String template, IComposerExtension composer, boolean refines, String packageName) {
 		String contents = template;
 		List<String> list = new LinkedList<String>();
 		
-		if (refines)
+		if (refines) {
 			list.add("refines");
+		}
 		
-		contents = composer.replaceMarker(contents, list);
-		contents = contents.replace("#classname#", classname);
-		contents = contents.replace("#featurename#", featurename);
+		
+		contents = composer.replaceMarker(contents, list, packageName);
+		contents = contents.replaceAll(IComposerExtensionClass.CLASS_NAME_PATTERN, classname);
+		contents = contents.replaceAll(IComposerExtensionClass.FEATUE_PATTER, featurename);
 		
 		
 		return new ByteArrayInputStream(contents.getBytes());

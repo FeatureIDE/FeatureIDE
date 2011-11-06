@@ -179,11 +179,11 @@ public class DeltajComposer extends ComposerExtensionClass {
 		String[] core = {
 				"DeltaJ (Core Module)",
 				"dj",
-				"features #featurename#\nconfigurations\n#featurename#;\n\n\ncore #featurename# {\n\tclass #classname#{\n\n\t}\n}" };
+				"features " + FEATUE_PATTER + "\nconfigurations\n" + FEATUE_PATTER + ";\n\n\ncore " + FEATUE_PATTER + " {\n\tclass " + CLASS_NAME_PATTERN + "{\n\n\t}\n}" };
 		String[] delta = {
 				"DeltaJ (Delta Module)",
 				"dj",
-				"delta #featurename# when #featurename# {\n\tmodifies class #classname#{\n\n\t}\n}" };
+				"delta " + FEATUE_PATTER + " when " + FEATUE_PATTER + " {\n\tmodifies class " + CLASS_NAME_PATTERN + "{\n\n\t}\n}" };
 		ArrayList<String[]> list = new ArrayList<String[]>();
 		list.add(core);
 		list.add(delta);

@@ -343,7 +343,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	@Override
 	public ArrayList<String[]> getTemplates() {
 		ArrayList<String[]> list = new ArrayList<String[]>();
-		String[] java = { "Java", "java", "public class #classname# {\n\n}" };
+		String[] java = { "Java", "java", PACKAGE_PATTERN + "/**\r\n * TODO description\r\n */\r\npublic class " + CLASS_NAME_PATTERN + " {\n\n}" };
 		list.add(java);
 		return list;
 	}

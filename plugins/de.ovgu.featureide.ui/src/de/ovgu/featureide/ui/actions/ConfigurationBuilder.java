@@ -194,8 +194,9 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			for (IJavaElement e : elements) {
 				if (e.getPath().toString().contains(":")) {
 					classpath += sep + e.getPath().toOSString();
-				} else if (e.getResource().getFileExtension() != null && 
-							e.getResource().getFileExtension().equals("jar")) {
+				} else if (e.getResource() != null && 
+						e.getResource().getFileExtension() != null && 
+						e.getResource().getFileExtension().equals("jar")) {
 					classpath += sep + e.getResource().getRawLocation().toOSString();
 				}
 			}

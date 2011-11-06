@@ -367,14 +367,14 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 		ArrayList<String[]> list = new ArrayList<String[]>();
 
-		String[] alloy = { "Alloy", "als", "module #classname#" };
+		String[] alloy = { "Alloy", "als", "module " + CLASS_NAME_PATTERN };
 		String[] c = { "C", "c", "" };
-		String[] cs = { "C#", "cs", "public class #classname# {\n\n}" };
+		String[] cs = { "C#", "cs", "public class " + CLASS_NAME_PATTERN + " {\n\n}" };
 		String[] haskell = { "Haskell", "hs",
-				"module #classname# where \n{\n\n}" };
-		String[] java = { "Java", "java", "public class #classname# {\n\n}" };
+				"module " + CLASS_NAME_PATTERN + " where \n{\n\n}" };
+		String[] java = { "Java", "java", PACKAGE_PATTERN + "/**\r\n * TODO description\r\n */\r\npublic class " + CLASS_NAME_PATTERN + " {\n\n}" };
 		String[] javacc = { "JavaCC", "jj",
-				"PARSER_BEGIN(#classname#) \n \n PARSER_END(#classname#)" };
+				"PARSER_BEGIN(" + CLASS_NAME_PATTERN + ") \n \n PARSER_END(" + CLASS_NAME_PATTERN + ")" };
 		String[] uml = {
 				"UML",
 				"xmi",
