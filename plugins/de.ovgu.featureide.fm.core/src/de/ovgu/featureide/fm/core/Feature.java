@@ -169,9 +169,9 @@ public class Feature implements PropertyConstants {
 		return featureModel;
 	}
 	
-	public void setFeatureStatus(FeatureStatus stat){
+	public void setFeatureStatus(FeatureStatus stat, boolean fire){
 		this.status = stat;
-		fire(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, false, true));
+		if(fire)fire(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, false, true));
 	}
 
 	public boolean isMultiple() {

@@ -463,7 +463,7 @@ public class FeatureModel implements PropertyConstants {
 		
 		// update features		
 		for(Feature bone : getFeatures()) {
-			bone.setFeatureStatus(FeatureStatus.NORMAL);
+			bone.setFeatureStatus(FeatureStatus.NORMAL,false);
 			bone.setRelevantConstraints();
 		}
 		
@@ -477,7 +477,7 @@ public class FeatureModel implements PropertyConstants {
 		try {
 			for(Literal deadFeature : getDeadFeatures()){
 				if (getFeature(deadFeature.var.toString()) != null)
-					getFeature(deadFeature.var.toString()).setFeatureStatus(FeatureStatus.DEAD);
+					getFeature(deadFeature.var.toString()).setFeatureStatus(FeatureStatus.DEAD,false);
 			}
 		} catch (Exception e){
 			FMCorePlugin.getDefault().logError(e);
@@ -491,7 +491,7 @@ public class FeatureModel implements PropertyConstants {
 					try {
 						if (!bone.isMandatory() && !bone.isRoot()
 								&& !satsolver.isSatisfiable())
-							bone.setFeatureStatus(FeatureStatus.FALSE_OPTIONAL);
+							bone.setFeatureStatus(FeatureStatus.FALSE_OPTIONAL,false);
 					} catch (TimeoutException e) {
 						FMCorePlugin.getDefault().logError(e);
 					}				
@@ -505,13 +505,13 @@ public class FeatureModel implements PropertyConstants {
 		for(Constraint constraint : getConstraints()){
 			constraint.setContainedFeatures(constraint.getNode());
 			constraint.setFalseOptionalFeatures();
-			constraint.setConstraintAttribute(ConstraintAttribute.NORMAL);
+			constraint.setConstraintAttribute(ConstraintAttribute.NORMAL,false);
 			
 			// tautology
 			SatSolver satsolverTAU = new SatSolver(new Not(constraint.getNode().clone()), 1000);
 			try {
 				if (!satsolverTAU.isSatisfiable())
-					constraint.setConstraintAttribute(ConstraintAttribute.TAUTOLOGY);
+					constraint.setConstraintAttribute(ConstraintAttribute.TAUTOLOGY,false);
 			} catch (TimeoutException e) {
 				FMCorePlugin.getDefault().logError(e);
 			}
@@ -523,7 +523,7 @@ public class FeatureModel implements PropertyConstants {
 				ModelComparator comparator = new ModelComparator(20000);
 				Comparison comparison = comparator.compare(this, dirtyModel);
 				if (comparison == Comparison.REFACTORING) 
-					constraint.setConstraintAttribute(ConstraintAttribute.REDUNDANT); 
+					constraint.setConstraintAttribute(ConstraintAttribute.REDUNDANT,false); 
 			}
 			// makes feature model void?
 			else {
@@ -532,7 +532,7 @@ public class FeatureModel implements PropertyConstants {
 				clonedModel.removePropositionalNode(constraint);
 				try {
 					if (clonedModel.isValid())
-						constraint.setConstraintAttribute(ConstraintAttribute.VOID_MODEL);
+						constraint.setConstraintAttribute(ConstraintAttribute.VOID_MODEL,false);
 				} catch (TimeoutException e) {
 					FMCorePlugin.getDefault().logError(e);
 				}
@@ -541,7 +541,7 @@ public class FeatureModel implements PropertyConstants {
 				SatSolver satsolverUS = new SatSolver(constraint.getNode().clone(), 1000);
 				try {
 					 if (!satsolverUS.isSatisfiable())
-						 constraint.setConstraintAttribute(ConstraintAttribute.UNSATISFIABLE);
+						 constraint.setConstraintAttribute(ConstraintAttribute.UNSATISFIABLE,false);
 				} catch (TimeoutException e) {
 					FMCorePlugin.getDefault().logError(e);
 				}

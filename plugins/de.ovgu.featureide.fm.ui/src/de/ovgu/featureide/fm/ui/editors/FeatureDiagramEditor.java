@@ -54,6 +54,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.progress.UIJob;
 
+import de.ovgu.featureide.fm.core.Constraint;
+import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -89,10 +91,12 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayou
  * @author Thomas Thuem
  */
 public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
-		GUIDefaults, PropertyConstants, PropertyChangeListener, IFeatureModelEditorPage {
+		GUIDefaults, PropertyConstants, PropertyChangeListener,
+		IFeatureModelEditorPage {
 
 	private static final String PAGE_TEXT = "Feature Diagram";
-	private static final String ID = FMUIPlugin.PLUGIN_ID + ".editors.FeatureDiagramEditor";
+	private static final String ID = FMUIPlugin.PLUGIN_ID
+			+ ".editors.FeatureDiagramEditor";
 
 	private FeatureModelEditor featureModelEditor;
 	private ZoomManager zoomManager;
@@ -123,14 +127,14 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	private CreateConstraintAction createConstraintAction;
 
 	private ReverseOrderAction reverseOrderAction;
-	
+
 	private LinkedList<LayoutSelectionAction> setLayoutActions;
-	
-	private AutoLayoutConstraintAction AutoLayoutConstraintAction;	
+
+	private AutoLayoutConstraintAction AutoLayoutConstraintAction;
 
 	private int index;
-	
-	private UIJob analyzingJob;
+
+	private Job analyzingJob;
 
 	public FeatureDiagramEditor(FeatureModelEditor featureModelEditor,
 			Composite container) {
@@ -145,7 +149,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 
 		zoomManager = rootEditPart.getZoomManager();
 		zoomManager.setZoomLevels(new double[] { 0.05, 0.10, 0.25, 0.50, 0.75,
-				0.90, 1.00, 1.10, 1.25, 1.50, 2.00, 2.50, 3.00, 4.00 });	
+				0.90, 1.00, 1.10, 1.25, 1.50, 2.00, 2.50, 3.00, 4.00 });
 
 	}
 
@@ -167,7 +171,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		FeatureModel featureModel = getFeatureModel();
 
 		createLayerAction = new CreateLayerAction(this, featureModel, null);
-		createCompoundAction = new CreateCompoundAction(this, featureModel, null);
+		createCompoundAction = new CreateCompoundAction(this, featureModel,
+				null);
 		deleteAction = new DeleteAction(this, featureModel);
 		deleteAllAction = new DeleteAllAction(this, featureModel);
 		mandatoryAction = new MandatoryAction(this, featureModel);
@@ -178,8 +183,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		orAction = new OrAction(this, featureModel);
 		alternativeAction = new AlternativeAction(this, featureModel);
 		renameAction = new RenameAction(this, featureModel, null);
-		
-		new SelectionAction(this, featureModel); 
+
+		new SelectionAction(this, featureModel);
 
 		createConstraintAction = new CreateConstraintAction(this, featureModel);
 		editConstraintAction = new EditConstraintAction(this, featureModel);
@@ -187,17 +192,20 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 
 		legendAction = new LegendAction(this, featureModel);
 		legendLayoutAction = new LegendLayoutAction(this, featureModel);
-		
-		showHiddenFeaturesAction = new ShowHiddenFeaturesAction(this, featureModel);
-		
+
+		showHiddenFeaturesAction = new ShowHiddenFeaturesAction(this,
+				featureModel);
+
 		zoomIn = new ZoomInAction(zoomManager);
 		zoomOut = new ZoomOutAction(zoomManager);
-		
+
 		setLayoutActions = new LinkedList<LayoutSelectionAction>();
-		for(int i = 0; i < 5; i++){
-			setLayoutActions.add(new LayoutSelectionAction(this, featureModel,i,0));
+		for (int i = 0; i < 5; i++) {
+			setLayoutActions.add(new LayoutSelectionAction(this, featureModel,
+					i, 0));
 		}
-		AutoLayoutConstraintAction = new AutoLayoutConstraintAction(this, featureModel);
+		AutoLayoutConstraintAction = new AutoLayoutConstraintAction(this,
+				featureModel);
 	}
 
 	public void createContextMenu(MenuManager menu) {
@@ -221,29 +229,31 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	}
 
 	private void fillContextMenu(IMenuManager menu) {
-		IMenuManager subMenu=new MenuManager("Set Layout");	
-		
-		showHiddenFeaturesAction.setChecked(
-				getFeatureModel().showHiddenFeatures());
-		
-		for(int i = 0; i < setLayoutActions.size();i++){
+		IMenuManager subMenu = new MenuManager("Set Layout");
+
+		showHiddenFeaturesAction.setChecked(getFeatureModel()
+				.showHiddenFeatures());
+
+		for (int i = 0; i < setLayoutActions.size(); i++) {
 			subMenu.add(setLayoutActions.get(i));
-			if(i==0){
+			if (i == 0) {
 				subMenu.add(AutoLayoutConstraintAction);
 				subMenu.add(new Separator());
 			}
 			boolean isChosen = (i == getFeatureModel().getLayoutAlgorithm());
 			setLayoutActions.get(i).setChecked(isChosen);
 			setLayoutActions.get(i).setEnabled(!isChosen);
-		}		
-		
-		AutoLayoutConstraintAction.setEnabled(!getFeatureModel().hasFeaturesAutoLayout());
-		
+		}
+
+		AutoLayoutConstraintAction.setEnabled(!getFeatureModel()
+				.hasFeaturesAutoLayout());
+
 		boolean connectionSelected = alternativeAction.isConnectionSelected();
-		
-		//don't show menu to change group type of a feature in case a connection line is selected
-		if ((createLayerAction.isEnabled()
-				|| createCompoundAction.isEnabled()) && !connectionSelected) {
+
+		// don't show menu to change group type of a feature in case a
+		// connection line is selected
+		if ((createLayerAction.isEnabled() || createCompoundAction.isEnabled())
+				&& !connectionSelected) {
 			menu.add(createCompoundAction);
 			menu.add(createLayerAction);
 			menu.add(createConstraintAction);
@@ -263,14 +273,14 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 			menu.add(createConstraintAction);
 			menu.add(editConstraintAction);
 			menu.add(deleteAction);
-		} else if (legendLayoutAction.isEnabled()){
+		} else if (legendLayoutAction.isEnabled()) {
 			menu.add(legendLayoutAction);
-		} else if (!connectionSelected){
+		} else if (!connectionSelected) {
 			menu.add(createConstraintAction);
 			menu.add(new Separator());
 			menu.add(subMenu);
 			menu.add(new Separator());
-			menu.add(reverseOrderAction);	
+			menu.add(reverseOrderAction);
 		} else {
 			connectionEntrys(menu);
 		}
@@ -283,22 +293,24 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
 		// call of the FeatureDiagramExtensions (for features only)
-		if ((createLayerAction.isEnabled()
-				|| createCompoundAction.isEnabled()) && !connectionSelected) {
-			for (FeatureDiagramExtension extension : FeatureDiagramExtension.getExtensions()) {
+		if ((createLayerAction.isEnabled() || createCompoundAction.isEnabled())
+				&& !connectionSelected) {
+			for (FeatureDiagramExtension extension : FeatureDiagramExtension
+					.getExtensions()) {
 				extension.extendContextMenu(menu, this);
 			}
 		}
 	}
-	
+
 	private void connectionEntrys(IMenuManager menu) {
 		boolean connectionSelected = alternativeAction.isConnectionSelected();
-		if (andAction.isEnabled() || orAction.isEnabled()  || alternativeAction.isEnabled()) {
+		if (andAction.isEnabled() || orAction.isEnabled()
+				|| alternativeAction.isEnabled()) {
 			if (andAction.isChecked()) {
 				andAction.setText("And");
 				if (connectionSelected)
-					orAction.setText("Or (Double Click)"); 
-				else 
+					orAction.setText("Or (Double Click)");
+				else
 					orAction.setText("Or");
 				alternativeAction.setText("Alternative");
 			} else if (orAction.isChecked()) {
@@ -354,64 +366,86 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	public void internRefresh() {
 		if (getContents() == null)
 			return;
-		
-		if (featureModelEditor.getOutlinePage() != null ) {
+
+		if (featureModelEditor.getOutlinePage() != null) {
 			featureModelEditor.getOutlinePage().setInput(getFeatureModel());
-		}		
+		}
 
 		// refresh size of all feature figures
 		getContents().refresh();
 		// layout all features if autoLayout is enabled
-		
+
 		setLayout();
-		
+
 		// refresh position of all feature figures
 		getContents().refresh();
 	}
-	
-	public void refresh(){
-		if(getFeatureModel()==null||getFeatureModel().getRoot()==null)return;
+
+	public void refresh() {
+		if (getFeatureModel() == null || getFeatureModel().getRoot() == null)
+			return;
 		if (analyzingJob != null && analyzingJob.getState() == Job.RUNNING)
 			analyzingJob.cancel();
-		
-		analyzingJob = new UIJob(" Analyzing feature model "){
+
+		analyzingJob = new Job("Analyzing feature model") {
+
 			@Override
-			public IStatus runInUIThread(IProgressMonitor monitor) {
+			protected IStatus run(IProgressMonitor monitor) {
 				getFeatureModel().analyzeFeatureModel();
-				getContents().refresh();
+
+				UIJob refreshGraphics = new UIJob(
+						"Updating feature model attributes") {
+
+					@Override
+					public IStatus runInUIThread(IProgressMonitor monitor) {
+						for (Feature f : getFeatureModel().getFeatures()) {
+							f.fire(new PropertyChangeEvent(this,
+									ATTRIBUTE_CHANGED, false, true));
+						}
+						for (Constraint f : getFeatureModel().getConstraints()) {
+							f.fire(new PropertyChangeEvent(this,
+									ATTRIBUTE_CHANGED, false, true));
+						}
+						return Status.OK_STATUS;
+					}
+
+				};
+				refreshGraphics.setPriority(INTERACTIVE);
+				refreshGraphics.schedule();
 				return Status.OK_STATUS;
-			}			
+
+			}
+
 		};
 		analyzingJob.setPriority(Job.DECORATE);
 		analyzingJob.schedule();
-		
+
 		internRefresh();
-		
+
 	}
 
-	public void setLayout(){
-		
+	public void setLayout() {
+
 		FeatureDiagramLayoutManager layoutManager;
 		FeatureModel featureModel = getFeatureModel();
-		
+
 		layoutManager = FeatureDiagramLayoutHelper.getLayoutManager(
 				featureModel.getLayoutAlgorithm(), featureModel);
-		
+
 		int previousLayout = featureModel.getLayoutAlgorithm();
-		
-		for(int i = 0; i < setLayoutActions.size(); i++){
-			setLayoutActions.set(i, new LayoutSelectionAction(this, featureModel,i,previousLayout));
+
+		for (int i = 0; i < setLayoutActions.size(); i++) {
+			setLayoutActions.set(i, new LayoutSelectionAction(this,
+					featureModel, i, previousLayout));
 		}
-		
+
 		Point size = getControl().getSize();
 
 		layoutManager.setControlSize(size.x, size.y);
 		layoutManager.layout(featureModel);
-		
 
-				
 	}
-	
+
 	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter) {
 		if (GraphicalViewer.class.equals(adapter)
@@ -429,7 +463,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	public void propertyChange(PropertyChangeEvent event) {
 		String prop = event.getPropertyName();
 		if (prop.equals(MODEL_DATA_CHANGED)) {
-			//setContents(getFeatureModel());
+			// setContents(getFeatureModel());
 			refresh();
 			featureModelEditor.setPageModified(true);
 		} else if (prop.equals(MODEL_DATA_LOADED)) {
@@ -442,7 +476,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 			legendAction.refresh();
 			legendLayoutAction.refresh();
 		}
-		
+
 		for (IFeatureModelEditorPage page : featureModelEditor.extensionPages) {
 			page.propertyChange(event);
 		}
@@ -460,8 +494,11 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		return PAGE_TEXT;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#initEditor()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#initEditor()
 	 */
 	@Override
 	public void initEditor() {
@@ -469,22 +506,28 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		createActions();
 		createKeyBindings();
 	}
-	
+
 	private void createContextMenu() {
 		MenuManager menu = new MenuManager("#PopupMenu");
 		menu.setRemoveAllWhenShown(true);
 		createContextMenu(menu);
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#setFeatureModelEditor(de.ovgu.featureide.fm.ui.editors.FeatureModelEditor)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#
+	 * setFeatureModelEditor
+	 * (de.ovgu.featureide.fm.ui.editors.FeatureModelEditor)
 	 */
 	@Override
 	public void setFeatureModelEditor(FeatureModelEditor featureModelEditor) {
 		this.featureModelEditor = featureModelEditor;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#getPage()
 	 */
 	@Override
@@ -492,31 +535,45 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		return new FeatureDiagramEditor(featureModelEditor, container);
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#doSave(org.eclipse.core.runtime.IProgressMonitor)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#doSave(org.eclipse
+	 * .core.runtime.IProgressMonitor)
 	 */
 	@Override
 	public void doSave(IProgressMonitor monitor) {
-		
+
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#pageChangeFrom(int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#pageChangeFrom
+	 * (int)
 	 */
 	@Override
 	public void pageChangeFrom(int newPage) {
-		
+
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#pageChangeTo(int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#pageChangeTo
+	 * (int)
 	 */
 	@Override
 	public void pageChangeTo(int oldPage) {
-		
+
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#getID()
 	 */
 	@Override

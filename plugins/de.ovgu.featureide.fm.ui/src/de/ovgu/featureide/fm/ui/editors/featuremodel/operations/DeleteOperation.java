@@ -106,7 +106,7 @@ public class DeleteOperation extends AbstractOperation {
 						.getConstraintModel();
 				op = new ConstraintDeleteOperation(constraint, featureModel);
 				for (Constraint resetConstraint : featureModel.getConstraints()){
-					resetConstraint.setConstraintAttribute(ConstraintAttribute.NORMAL);
+					resetConstraint.setConstraintAttribute(ConstraintAttribute.NORMAL,true);
 				}
 				executeOperation(op);
 			}

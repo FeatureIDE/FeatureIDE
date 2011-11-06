@@ -88,9 +88,9 @@ public class Constraint implements PropertyConstants {
 		return deadFeaturesAfter;
 	}
 	
-	public void setConstraintAttribute(ConstraintAttribute attri){
-		this.attribute = attri;
-		fire(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, false, true));
+	public void setConstraintAttribute(ConstraintAttribute attri, boolean fire){
+	this.attribute = attri;
+	if(fire)fire(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, false, true));
 	}
 	
 	public ConstraintAttribute getConstraintAttribute(){
