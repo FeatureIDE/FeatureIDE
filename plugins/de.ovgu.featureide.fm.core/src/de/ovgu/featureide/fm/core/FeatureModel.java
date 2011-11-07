@@ -511,7 +511,7 @@ public class FeatureModel implements PropertyConstants {
 		} catch (Exception e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
-		System.out.println("before");
+
 		// update constraints
 		try {
 			for (Constraint constraint : getConstraints()) {
