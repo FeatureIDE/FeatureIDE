@@ -77,14 +77,7 @@ public class ProjectChangeListener implements IResourceChangeListener {
 	}
 
 	private void addProject(final IProject project) {
-		Job job = new Job("Add project") {
-			protected IStatus run(IProgressMonitor monitor) {
-				CorePlugin.getDefault().addProject(project);
-				return Status.OK_STATUS;
-			}
-		};
-		job.setPriority(Job.SHORT);
-		job.schedule();
+		CorePlugin.getDefault().addProjectToList(project);
 	}
 
 	private void removeProject(final IProject project) {

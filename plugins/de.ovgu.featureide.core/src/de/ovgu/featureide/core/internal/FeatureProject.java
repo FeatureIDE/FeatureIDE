@@ -228,9 +228,9 @@ public class FeatureProject extends BuilderMarkerHandler implements
 
 	/**
 	 * Loads the model again from the file. Attend that all local changes in the
-	 * model get lost.
+	 * model get lost.<br>
 	 * 
-	 * Before loading all error markers will be deleted and afterwards new ones
+	 * Before loading, all error markers will be deleted and afterwards new ones
 	 * might be created if some errors occur.
 	 */
 	synchronized private void loadModel() {

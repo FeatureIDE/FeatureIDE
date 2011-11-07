@@ -159,8 +159,8 @@ public class FeatureCppWrapper {
 						if (line.contains(" : warning: ")) {
 							addMarker(getFile(line), getMessage(line), getLineNumber(line));
 						}
-						else
-							FeatureCppCorePlugin.getDefault().logInfo("FeatureC++: " + line);
+						//  else
+						//	FeatureCppCorePlugin.getDefault().logInfo("FeatureC++: " + line);
 					}
 					while ((line = error.readLine()) != null)
 						FeatureCppCorePlugin.getDefault().logWarning(line);

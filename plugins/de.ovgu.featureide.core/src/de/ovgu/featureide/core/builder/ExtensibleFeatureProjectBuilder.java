@@ -73,7 +73,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 			featureProject.createBuilderMarker(featureProject.getProject(),
 					"Could not load the assigned composition engine: "
 							+ featureProject.getComposerID(), 0,
-					IMarker.SEVERITY_WARNING);
+					IMarker.SEVERITY_ERROR);
 			return false;
 		}
 

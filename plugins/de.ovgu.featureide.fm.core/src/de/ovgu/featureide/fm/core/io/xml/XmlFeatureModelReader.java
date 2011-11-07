@@ -511,8 +511,9 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 			feat = featureModel.getFeature(featureName);
 			if (feat == null) {
 				FMCorePlugin.getDefault().reportBug(277);
+			} else {
+				feat.setAbstract(isAbstract);
 			}
-			feat.setAbstract(isAbstract);
 		} else {
 			feat = new Feature(featureModel, featureName);
 			feat.setMandatory(isMandatory);

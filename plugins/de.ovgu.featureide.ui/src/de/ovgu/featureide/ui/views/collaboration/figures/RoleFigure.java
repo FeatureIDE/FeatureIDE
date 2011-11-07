@@ -73,7 +73,6 @@ public class RoleFigure extends Figure implements GUIDefaults{
 	public Role role;
 	
 	public RoleFigure(Role role) {
-		
 		super();
 		
 		this.role = role;
@@ -84,9 +83,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 			setBorder(ROLE_BORDER_SELECTED);
 		else 
 			setBorder(ROLE_BORDER_UNSELECTED);
-		
-		
-		
+
 		label.setForegroundColor(FOREGROUND);
 		label.setFont(DEFAULT_FONT);
 		label.setLocation(new Point(ROLE_INSETS.left, ROLE_INSETS.top));

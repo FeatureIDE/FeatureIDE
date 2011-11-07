@@ -33,18 +33,22 @@ import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ISafeRunnable;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.osgi.framework.BundleContext;
 
 import de.ovgu.featureide.core.builder.FeatureProjectNature;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.internal.FeatureProject;
 import de.ovgu.featureide.core.internal.ProjectChangeListener;
+import de.ovgu.featureide.core.listeners.IConfigurationChangedListener;
 import de.ovgu.featureide.core.listeners.ICurrentBuildListener;
 import de.ovgu.featureide.core.listeners.ICurrentConfigurationListener;
-import de.ovgu.featureide.core.listeners.IConfigurationChangedListener;
 import de.ovgu.featureide.core.listeners.IFeatureFolderListener;
 import de.ovgu.featureide.core.listeners.IProjectListener;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
@@ -76,6 +80,10 @@ public class CorePlugin extends AbstractCorePlugin {
 	private LinkedList<IFeatureFolderListener> featureFolderListeners = new LinkedList<IFeatureFolderListener>();
 
 	private LinkedList<ICurrentBuildListener> currentBuildListeners = new LinkedList<ICurrentBuildListener>();
+	
+	private LinkedList<IProject> projectsToAdd = new LinkedList<IProject>();
+	
+	private Job job = null;
 
 	/**
 	 * add ResourceChangeListener to workspace to track project move/rename
@@ -98,8 +106,10 @@ public class CorePlugin extends AbstractCorePlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
-
+		
 		featureProjectMap = new HashMap<IProject, IFeatureProject>();
+		listener = new ProjectChangeListener();
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(listener);
 		for (final IProject project : ResourcesPlugin.getWorkspace().getRoot()
 				.getProjects()) {
 			try {
@@ -121,9 +131,7 @@ public class CorePlugin extends AbstractCorePlugin {
 				CorePlugin.getDefault().logError(e);
 			}
 		}
-		listener = new ProjectChangeListener();
-
-		ResourcesPlugin.getWorkspace().addResourceChangeListener(listener);
+		
 	}
 
 	private static void changeOldNature(IProject project, String id)
@@ -161,7 +169,7 @@ public class CorePlugin extends AbstractCorePlugin {
 		plugin = null;
 		super.stop(context);
 	}
-
+	
 	public void addProject(IProject project) {
 		if (featureProjectMap.containsKey(project) || !project.isOpen())
 			return;
@@ -510,4 +518,54 @@ public class CorePlugin extends AbstractCorePlugin {
 		extensions.add(".expression");
 		return extensions;
 	}
+
+	/**
+	 * A linear job to add a project. This is necessary if many projects will be add at the same time.
+	 * @param project
+	 */
+	public void addProjectToList(IProject project) {
+		if (projectsToAdd.contains(project)) {
+			return;
+		}
+		if (featureProjectMap.containsKey(project) || !project.isOpen()) {
+			return;
+		}
+		
+		projectsToAdd.add(project);
+		if (job == null) {
+			job = new Job("Add Project") {
+				@Override
+				public IStatus run(IProgressMonitor monitor) {
+					addProjects(monitor);
+					monitor.beginTask("", 1);
+					return Status.OK_STATUS;
+				}
+			};
+			job.setPriority(Job.SHORT);
+			job.schedule();
+		}
+		
+		if (job.getState() == Job.NONE) {
+			i = 1;
+			job.schedule();
+		}
+	}
+	private int i = 1;
+	protected void addProjects(IProgressMonitor monitor) {
+		if (projectsToAdd.isEmpty()) {
+			monitor.done();
+			return;
+		}
+		
+		for (IProject project : projectsToAdd) {
+			monitor.subTask("Add project " + project.getName());
+			projectsToAdd.remove(project);
+			addProject(project);
+			break;
+		}
+		monitor.beginTask("", projectsToAdd.size());
+		monitor.worked(i++);
+		addProjects(monitor);
+	}
+	
 }

@@ -28,6 +28,7 @@ import java.util.Scanner;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
@@ -101,8 +102,41 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	public boolean initialize(IFeatureProject project) {
 		boolean supSuccess =super.initialize(project);
 		fhModelBuilder = new FeatureHouseModelBuilder(project);
+		createBuildStructure();
 		if(supSuccess==false||fhModelBuilder==null)return false;
 		else return true;
+	}
+
+	/**
+	 * Checks the current folder structure at the build folder and creates folders if necessary.
+	 */
+	private void createBuildStructure() {
+		IProject p = featureProject.getProject();
+		if (p != null) {
+			IFolder sourcefolder = featureProject.getBuildFolder();
+			if (sourcefolder != null) {
+				if (!sourcefolder.exists()) {
+					try {
+						sourcefolder.create(true, true, null);
+					} catch (CoreException e) {
+						FeatureHouseCorePlugin.getDefault().logError(e);
+					}
+				}
+				IFile conf = featureProject.getCurrentConfiguration();
+				if (conf != null) {
+					sourcefolder = sourcefolder.getFolder(conf.getName().substring(0, conf.getName().indexOf(".")));
+					if (!sourcefolder.exists()) {
+						try {
+							sourcefolder.create(true, true, null);
+						} catch (CoreException e) {
+							FeatureHouseCorePlugin.getDefault().logError(e);
+						}
+						callCompiler();
+					}
+					setJavaBuildPath(conf.getName().split("[.]")[0]);
+				}
+			}
+		}
 	}
 
 	public void performFullBuild(IFile config) {
@@ -191,6 +225,11 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			while (scanner.hasNext()) {
 				String line = scanner.nextLine();
 				if (line.contains(SOURCE_ENTRY)) {
+					if (line.contains(SOURCE_ENTRY
+							+ featureProject.getBuildFolder().getName() + "/"
+							+ buildPath + "\"/>")) {
+						return;
+					}
 					fileText.append(SOURCE_ENTRY
 							+ featureProject.getBuildFolder().getName() + "/"
 							+ buildPath + "\"/>");
