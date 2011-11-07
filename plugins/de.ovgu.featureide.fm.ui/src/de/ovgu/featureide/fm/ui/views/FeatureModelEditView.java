@@ -60,7 +60,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.LevelOrderLayout;
 import de.ovgu.featureide.fm.ui.views.featuremodeleditview.ViewContentProvider;
 import de.ovgu.featureide.fm.ui.views.featuremodeleditview.ViewLabelProvider;
 
-
 /**
  * A view to calculate the category an edit. Given an open feature model editor
  * the current editing version is compared to the last saved model.
@@ -69,7 +68,8 @@ import de.ovgu.featureide.fm.ui.views.featuremodeleditview.ViewLabelProvider;
  */
 public class FeatureModelEditView extends ViewPart {
 
-	public static final String ID = FMUIPlugin.PLUGIN_ID + ".views.FeatureModelEditView";
+	public static final String ID = FMUIPlugin.PLUGIN_ID
+			+ ".views.FeatureModelEditView";
 
 	private TreeViewer viewer;
 
@@ -158,14 +158,19 @@ public class FeatureModelEditView extends ViewPart {
 
 		if (activeEditor instanceof FeatureModelEditor) {
 			featureModelEditor = (FeatureModelEditor) activeEditor;
-			featureModelEditor.getOriginalFeatureModel().addListener(modelListener);
+			featureModelEditor.getOriginalFeatureModel().addListener(
+					modelListener);
 			featureModelEditor.getFeatureModel().addListener(modelListener);
 
-			if (evaluation == null && featureModelEditor.getGrammarFile().getResource().getProject().getName().startsWith("EvaluationTest")) {
+			if (evaluation == null
+					&& featureModelEditor.getGrammarFile().getResource()
+							.getProject().getName()
+							.startsWith("EvaluationTest")) {
 				evaluation = new Job("Evaluation Test") {
 					@Override
 					protected IStatus run(IProgressMonitor monitor) {
-						Evaluation.evaluate(featureModelEditor.getGrammarFile().getResource().getProject());
+						Evaluation.evaluate(featureModelEditor.getGrammarFile()
+								.getResource().getProject());
 						return Status.OK_STATUS;
 					}
 				};
@@ -175,24 +180,32 @@ public class FeatureModelEditView extends ViewPart {
 					@Override
 					public IStatus runInUIThread(IProgressMonitor monitor) {
 						try {
-							convertModelToBitmapTest(featureModelEditor.getGrammarFile().getResource().getProject().getFolder("models"));
+							convertModelToBitmapTest(featureModelEditor
+									.getGrammarFile().getResource()
+									.getProject().getFolder("models"));
 						} catch (Exception e) {
 							FMUIPlugin.getDefault().logError(e);
 						}
 						return Status.OK_STATUS;
 					}
 
-					public void convertModelToBitmapTest(IFolder folder) throws CoreException {
+					public void convertModelToBitmapTest(IFolder folder)
+							throws CoreException {
 						for (IResource res : folder.members())
-							if (res instanceof IFile && res.getName().endsWith(".m")) {
+							if (res instanceof IFile
+									&& res.getName().endsWith(".m")) {
 								IFile fmFile = (IFile) res;
 								try {
 									FeatureModel fm = new FeatureModel();
-									XmlFeatureModelReader reader = new XmlFeatureModelReader(fm);
+									XmlFeatureModelReader reader = new XmlFeatureModelReader(
+											fm);
 									reader.readFromFile(fmFile);
 
-									String imageName = fmFile.getRawLocation().toOSString();
-									imageName = imageName.substring(0, imageName.length()-".m".length()) + ".png";
+									String imageName = fmFile.getRawLocation()
+											.toOSString();
+									imageName = imageName.substring(0,
+											imageName.length() - ".m".length())
+											+ ".png";
 									createBitmap(fm, new File(imageName));
 								} catch (FileNotFoundException e) {
 									FMUIPlugin.getDefault().logError(e);
@@ -203,11 +216,15 @@ public class FeatureModelEditView extends ViewPart {
 						folder.refreshLocal(IResource.DEPTH_ONE, null);
 					}
 
-					private void createBitmap(FeatureModel featureModel, File file) {
+					private void createBitmap(FeatureModel featureModel,
+							File file) {
 						GraphicalViewerImpl graphicalViewer = new ScrollingGraphicalViewer();
-						graphicalViewer.createControl(viewer.getControl().getParent());
-						graphicalViewer.getControl().setBackground(GUIDefaults.DIAGRAM_BACKGROUND);
-						graphicalViewer.setEditPartFactory(new GraphicalEditPartFactory());
+						graphicalViewer.createControl(viewer.getControl()
+								.getParent());
+						graphicalViewer.getControl().setBackground(
+								GUIDefaults.DIAGRAM_BACKGROUND);
+						graphicalViewer
+								.setEditPartFactory(new GraphicalEditPartFactory());
 						ScalableFreeformRootEditPart rootEditPart = new ScalableFreeformRootEditPart();
 						((ConnectionLayer) rootEditPart
 								.getLayer(LayerConstants.CONNECTION_LAYER))
@@ -230,18 +247,26 @@ public class FeatureModelEditView extends ViewPart {
 	private void refresh() {
 		if (job != null && job.getState() == Job.RUNNING)
 			job.cancel();
-		//Waiting for job to be actually canceled
-		//TODO replace by job state listener?
-		while(job!=null&&job.getState()==Job.RUNNING);
+		// Waiting for job to be actually canceled
+		// waiting for job to be actually canceled
+		try {
+			if (job != null) {
+				job.join();
+			}
+		} catch (InterruptedException e) {
+			FMUIPlugin.getDefault().logError(e);
+		}
 		job = new Job("Updating Feature Model Edits") {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				if (featureModelEditor == null)
 					contentProvider.defaultContent();
-				else{
-					contentProvider.calculateContent(featureModelEditor.getOriginalFeatureModel(), featureModelEditor.getFeatureModel());
+				else {
+					contentProvider.calculateContent(
+							featureModelEditor.getOriginalFeatureModel(),
+							featureModelEditor.getFeatureModel());
 				}
-					return Status.OK_STATUS;
+				return Status.OK_STATUS;
 			}
 		};
 		job.setPriority(Job.LONG);

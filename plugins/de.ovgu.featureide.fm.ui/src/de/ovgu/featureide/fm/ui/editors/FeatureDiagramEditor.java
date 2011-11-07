@@ -384,15 +384,19 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	public void refresh() {
 		if (getFeatureModel() == null || getFeatureModel().getRoot() == null)
 			return;
-		if (analyzingJob != null && analyzingJob.getState() == Job.RUNNING)
-			analyzingJob.cancel();
 		//waiting for job to be actually canceled
-		//TODO: could be replaced by job state listener?
-		while(analyzingJob!=null&&analyzingJob.getState()==Job.RUNNING);
+		try {
+		    if (analyzingJob != null) {
+		        analyzingJob.join();
+		    }
+		} catch (InterruptedException e) {
+		    FMUIPlugin.getDefault().logError(e);
+		}
 		analyzingJob = new Job("Analyzing feature model") {
 
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
+				
 				getFeatureModel().analyzeFeatureModel();
 
 				UIJob refreshGraphics = new UIJob(
