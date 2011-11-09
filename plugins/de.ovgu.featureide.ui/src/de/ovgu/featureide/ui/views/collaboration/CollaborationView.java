@@ -37,7 +37,6 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IActionBars;
@@ -55,7 +54,6 @@ import org.eclipse.ui.progress.UIJob;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.listeners.ICurrentBuildListener;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.action.AddRoleAction;
 import de.ovgu.featureide.ui.views.collaboration.action.DeleteAction;
@@ -85,8 +83,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	private static final String FILTER_LABEL = "Filter";
 	private static final String UNSELECTED_LABEL = "Show unselected features";
 	private static final String TOOL_TIP_LABEL = "Build collaborationmodel";
-	
-	private static final Image REFESH_TAB_IMAGE = UIPlugin.getImage("refresh_tab.gif");
 	
 	private GraphicalViewerImpl viewer;
 	public CollaborationModelBuilder builder = new CollaborationModelBuilder();
@@ -202,7 +198,8 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 						} else {
 							//case: open editor is no configuration editor
 							if (builder.editorFile != null &&
-									builder.editorFile.getName().equals(inputFile.getName())) {
+									builder.editorFile.getName().equals(inputFile.getName()) &&
+									featureProject.getProject().equals(builder.editorFile.getProject())) {
 								return;
 							}
 							builder.editorFile = inputFile.getFile();

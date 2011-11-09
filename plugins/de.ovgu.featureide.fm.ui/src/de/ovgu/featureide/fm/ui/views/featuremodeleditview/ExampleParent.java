@@ -18,27 +18,20 @@
  */
 package de.ovgu.featureide.fm.ui.views.featuremodeleditview;
 
-import org.eclipse.swt.graphics.Image;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.editing.Comparison;
 import de.ovgu.featureide.fm.core.editing.ModelComparator;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 
 /**
  * Calculates an example for added or removed products.
  * 
  * @author Thomas Thuem
  */
-public class ExampleParent extends TreeParent {
-
-	private static final Image UNDEFINED_IMAGE = FMUIPlugin
-			.getImage("undefined.ico");
-	private static final Image PLUS_IMAGE = FMUIPlugin.getImage("plus.gif");
-	private static final Image MINUS_IMAGE = FMUIPlugin.getImage("minus.gif");
-	private static final Image ZERO_IMAGE = FMUIPlugin.getImage("zero.gif");
+public class ExampleParent extends TreeParent implements GUIDefaults {
 
 	private ModelComparator c;
 
@@ -55,7 +48,7 @@ public class ExampleParent extends TreeParent {
 		if (number == 1)
 			name = added ? "Added products" : "Removed products";
 		if (c.getResult() == Comparison.ERROR || number > 1) {
-			image = UNDEFINED_IMAGE;
+			image = IMAGE_UNDEFINED;
 		} else {
 			String imageName = added && !c.isImplied() ? "plus" : !added
 					&& !c.isImplies() ? "minus" : "zero";

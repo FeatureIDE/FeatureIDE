@@ -49,6 +49,7 @@ import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.ui.ahead.AheadUIPlugin;
+import de.ovgu.featureide.ui.ahead.GUIDefaults;
 
 
 
@@ -58,7 +59,7 @@ import de.ovgu.featureide.ui.ahead.AheadUIPlugin;
  * 
  * @author Constanze Adler
  */
-public class JakCompletionProcessor implements IContentAssistProcessor{
+public class JakCompletionProcessor implements IContentAssistProcessor, GUIDefaults {
 	public static final String ID = AheadUIPlugin.PLUGIN_ID + ".editors.jak.JakCompletionProcessor";
 	
 	protected static class Validator implements IContextInformationValidator, IContextInformationPresenter {
@@ -205,7 +206,7 @@ public class JakCompletionProcessor implements IContentAssistProcessor{
 		for (FSTClass nextClass : FSTClasses){
 			String prop;
 			ISharedImages javaImages = JavaUI.getSharedImages();
-			Image img = AheadUIPlugin.getImage("JakFileSmall.png");
+			Image img = IMAGE_JAK_FILE;
 			FSTField[] fields = nextClass.getFields();
 			if (fields!=null)
 			for (FSTField f : fields){
@@ -236,7 +237,7 @@ private List<CompletionProposal> getMethodProposals(String behind, FSTClass[] FS
 	List<CompletionProposal> propList = new ArrayList<CompletionProposal>();
 	for (FSTClass nextClass : FSTClasses){
 		String prop;
-		Image img = AheadUIPlugin.getImage("JakFileSmall.png");
+		Image img = IMAGE_JAK_FILE;
 		FSTMethod[] methods = nextClass.getMethods();
 		ISharedImages javaImages = JavaUI.getSharedImages();
 		String mClass = nextClass.getName().split("[.]")[0];

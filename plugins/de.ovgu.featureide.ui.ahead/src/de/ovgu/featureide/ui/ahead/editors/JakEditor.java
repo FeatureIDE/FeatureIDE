@@ -43,8 +43,6 @@ import de.ovgu.featureide.ui.ahead.views.outline.JakOutlinePage;
 public class JakEditor extends TextEditor {
 	
 	public static final String ID = AheadUIPlugin.PLUGIN_ID + ".editors.JakEditor";
-
-//	private static final Image DERIVED_IMAGE = AheadUIPlugin.getImage("sample.gif");
 	
 	private JakOutlinePage outlinePage;
 

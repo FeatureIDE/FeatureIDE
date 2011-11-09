@@ -30,13 +30,13 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 
 /**
  * Allows to delete a feature including its sub features
@@ -44,7 +44,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * @author Jan Wedding
  * @author Melanie Pflaume
  */
-public class DeleteAllOperation extends AbstractOperation {
+public class DeleteAllOperation extends AbstractOperation implements GUIDefaults {
 
 	private static final String LABEL = "Delete including subfeatures";
 	private FeatureModel featureModel;
@@ -53,8 +53,6 @@ public class DeleteAllOperation extends AbstractOperation {
 	private LinkedList<Feature> containedFeatureList;
 	private List<AbstractOperation> operations;
 
-	private static final Image FEATURE_HEAD = FMUIPlugin.getImage("FeatureIconSmall.ico");
-	
 	/**
 	 * @param viewer
 	 * @param featureModel
@@ -95,7 +93,7 @@ public class DeleteAllOperation extends AbstractOperation {
 			featureModel.handleModelDataChanged();
 		} else {
 			MessageDialog dialog = new MessageDialog(new Shell(), 
-					" Delete Error ", FEATURE_HEAD, 
+					" Delete Error ", FEATURE_SYMBOL, 
 					"The following features are contained in constraints:" + '\n'
 					+ containedFeatureList.toString().substring(1, containedFeatureList.toString().length() - 1) + '\n' + '\n' +
 					"Unable to delete this features until all relevant constraints are removed.",

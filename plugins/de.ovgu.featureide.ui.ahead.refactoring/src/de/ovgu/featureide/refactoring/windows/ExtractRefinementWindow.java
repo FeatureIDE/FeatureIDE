@@ -62,7 +62,7 @@ import refactor.LayerInfo;
 import refactor.Saveable;
 import refactor.TypeSystem;
 import refactor.TypesysUtil;
-import de.ovgu.featureide.refactoring.RefactoringPlugin;
+import de.ovgu.featureide.refactoring.GUIDefaults;
 import de.ovgu.featureide.refactoring.parser.Parser;
 import de.ovgu.featureide.refactoring.typesystem.TypeSystemManager;
 import de.ovgu.featureide.ui.ahead.editors.JakEditor;
@@ -73,7 +73,7 @@ import de.ovgu.featureide.ui.ahead.editors.JakEditor;
  * @author Stephan Kauschka
  */
 public class ExtractRefinementWindow implements Window, SelectionListener,
-		Listener {
+		Listener, GUIDefaults {
 
 	private Display display;
 	private Shell shell;
@@ -102,8 +102,7 @@ public class ExtractRefinementWindow implements Window, SelectionListener,
 
 		this.shell = new Shell(this.display, SWT.MIN);
 		this.shell.setText("Move Refinement");
-		Image image = RefactoringPlugin.getImage("sample.gif");
-		this.shell.setImage(image);
+		this.shell.setImage(IMAGE_SAMPLE);
 		this.shell.setSize(500, 225);
 
 		createGUI();

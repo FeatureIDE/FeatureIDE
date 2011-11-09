@@ -65,7 +65,7 @@ import refactor.Modified;
 import refactor.ModifierInfo;
 import refactor.Saveable;
 import refactor.TypeSystem;
-import de.ovgu.featureide.refactoring.RefactoringPlugin;
+import de.ovgu.featureide.refactoring.GUIDefaults;
 import de.ovgu.featureide.refactoring.typesystem.TypeSystemManager;
 import de.ovgu.featureide.ui.ahead.editors.JakEditor;
 
@@ -75,7 +75,7 @@ import de.ovgu.featureide.ui.ahead.editors.JakEditor;
  * @author Stephan Kauschka
  */
 public class ChangeModifierWindow implements SelectionListener, Window,
-		Listener {
+		Listener, GUIDefaults {
 
 	private Display display;
 	private Shell shell;
@@ -106,8 +106,7 @@ public class ChangeModifierWindow implements SelectionListener, Window,
 
 		this.shell = new Shell(this.display, SWT.MIN);
 		this.shell.setText("Change Modifier");
-		Image image = RefactoringPlugin.getImage("sample.gif");
-		this.shell.setImage(image);
+		this.shell.setImage(IMAGE_SAMPLE);
 		this.shell.setSize(500, 212);
 
 		createGUI();

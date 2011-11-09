@@ -23,7 +23,7 @@ import org.eclipse.swt.graphics.Image;
 
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 
 
 /**
@@ -31,10 +31,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * 
  * @author Thomas Thuem
  */
-public class ViewLabelProvider extends LabelProvider {
-
-	public static final Image IMAGE_ASELECTED = FMUIPlugin.getImage("aselected.ico");
-	public static final Image IMAGE_ADESELECTED = FMUIPlugin.getImage("adeselected.ico");
+public class ViewLabelProvider extends LabelProvider implements GUIDefaults {
 	
 	public ViewLabelProvider() {
 	}

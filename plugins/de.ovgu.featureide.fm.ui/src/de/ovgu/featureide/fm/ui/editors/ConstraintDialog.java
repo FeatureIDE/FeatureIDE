@@ -41,7 +41,6 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
@@ -81,6 +80,7 @@ import de.ovgu.featureide.fm.core.FeatureStatus;
 import de.ovgu.featureide.fm.core.editing.Comparison;
 import de.ovgu.featureide.fm.core.editing.ModelComparator;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ConstraintCreateOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ConstraintEditOperation;
 
@@ -94,17 +94,8 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ConstraintEditOp
  * @author Fabian Benduhn
  */
 
-public class ConstraintDialog {
+public class ConstraintDialog implements GUIDefaults {
 
-	private static final Image HELP_IMAGE = FMUIPlugin.getImage("help.gif");
-	private static final Image ERROR_IMAGE = FMUIPlugin
-			.getImage("icon_error.gif");
-	private static final Image BANNER_IMAGE = FMUIPlugin
-			.getImage("title_banner.gif");
-	private static final Image WARNING_IMAGE = FMUIPlugin
-			.getImage("message_warning.gif");
-	private static final Image FEATURE_HEAD = FMUIPlugin
-			.getImage("FeatureIconSmall.ico");
 
 	private static final String[] OPERATOR_NAMES = { " Not ", " And ", " Or ",
 			" Implies ", " Iff ", "(", ")" /* "At most 1" */};
@@ -178,7 +169,7 @@ public class ConstraintDialog {
 	private void initShell() {
 		shell = new Shell(Display.getCurrent());
 		shell.setText(titleText);
-		shell.setImage(FEATURE_HEAD);
+		shell.setImage(FEATURE_SYMBOL);
 		shell.setSize(500, 585);
 		GridLayout shellLayout = new GridLayout();
 		shellLayout.marginWidth = 0;

@@ -34,12 +34,10 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
-import org.eclipse.swt.graphics.Image;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
-import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 import de.ovgu.featureide.ui.views.collaboration.model.Role;
 
@@ -53,17 +51,6 @@ import de.ovgu.featureide.ui.views.collaboration.model.Role;
  */
 public class RoleFigure extends Figure implements GUIDefaults{
 	
-	private static Image IMAGE_FIELD_PRIVATE = UIPlugin.getImage("field_private_obj.gif");
-	private static Image IMAGE_FIELD_PROTECTED = UIPlugin.getImage("field_protected_obj.gif");
-	private static Image IMAGE_FIELD_PUBLIC = UIPlugin.getImage("field_public_obj.gif");
-	private static Image IMAGE_FIELD_DEFAULT = UIPlugin.getImage("field_default_obj.gif");
-	private static Image IMAGE_METHODE_PRIVATE = UIPlugin.getImage("private_co.gif");
-	private static Image IMAGE_METHODE_PROTECTED = UIPlugin.getImage("protected_co.gif");
-	private static Image IMAGE_METHODE_PUBLIC = UIPlugin.getImage("public_co.gif");
-	private static Image IMAGE_METHODE_DEFAULT =  UIPlugin.getImage("default_co.gif");
-	private static Image IMAGE_CLASS = UIPlugin.getImage("class_obj.gif");
-	private static Image IMAGE_FEATURE = UIPlugin.getImage("FeatureIconSmall.ico");
-	private static Image IMAGE_HASH = UIPlugin.getImage("hash.png");
 	
 	private static Font FONT_BOLD = new Font(null,"Arial", 8, SWT.BOLD);
 		

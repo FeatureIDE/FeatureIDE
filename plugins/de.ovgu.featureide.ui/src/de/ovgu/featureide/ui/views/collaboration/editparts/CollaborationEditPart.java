@@ -31,13 +31,13 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.Request;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.FileEditorInput;
 
 import de.ovgu.featureide.ui.UIPlugin;
+import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 import de.ovgu.featureide.ui.views.collaboration.figures.CollaborationFigure;
 import de.ovgu.featureide.ui.views.collaboration.figures.CompartmentFigure;
 import de.ovgu.featureide.ui.views.collaboration.model.Collaboration;
@@ -47,10 +47,7 @@ import de.ovgu.featureide.ui.views.collaboration.model.Collaboration;
  * 
  * @author Constanze Adler
  */
-public class CollaborationEditPart extends AbstractGraphicalEditPart {
-	private static Image IMAGE_CURRENT_CONFIGURATION = UIPlugin.getImage("currentconfiguration.gif");
-	private static Image IMAGE_CONFIGURATION = UIPlugin.getImage("ConfigurationIcon.png");
-	private static Image IMAGE_FEATURE = UIPlugin.getImage("FeatureIconSmall.ico");
+public class CollaborationEditPart extends AbstractGraphicalEditPart implements GUIDefaults {
 	
 	public CollaborationEditPart(Collaboration coll){
 		super();

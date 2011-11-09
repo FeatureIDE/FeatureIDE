@@ -23,7 +23,7 @@ package de.ovgu.featureide.fm.ui.editors;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 
 /**
  * provides the pictures of constraints or operators in the content assist window
@@ -31,13 +31,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * @author David Broneske
  * @author Fabian Benduhn
  */
-public class ConstraintProposalLabelProvider extends LabelProvider   {
-
-	
-	private static final Image OPERATOR_SYMBOL = FMUIPlugin
-	.getImage("operator_symbol.gif");
-	private static final Image FEATURE_SYMBOL = FMUIPlugin
-	.getImage("FeatureIconSmall.ico");
+public class ConstraintProposalLabelProvider extends LabelProvider implements GUIDefaults {
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ILabelProvider#getImage(java.lang.Object)

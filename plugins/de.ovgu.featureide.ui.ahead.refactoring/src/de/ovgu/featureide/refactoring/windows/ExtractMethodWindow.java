@@ -65,7 +65,7 @@ import refactor.MethodInfo;
 import refactor.Saveable;
 import refactor.TypeSystem;
 import refactor.TypesysUtil;
-import de.ovgu.featureide.refactoring.RefactoringPlugin;
+import de.ovgu.featureide.refactoring.GUIDefaults;
 import de.ovgu.featureide.refactoring.parser.Parser;
 import de.ovgu.featureide.refactoring.typesystem.TypeSystemManager;
 import de.ovgu.featureide.ui.ahead.editors.JakEditor;
@@ -75,7 +75,7 @@ import de.ovgu.featureide.ui.ahead.editors.JakEditor;
  * 
  * @author Stephan Kauschka
  */
-public class ExtractMethodWindow implements Window, SelectionListener, Listener {
+public class ExtractMethodWindow implements Window, SelectionListener, Listener, GUIDefaults {
 
 	private Display display;
 	private Shell shell;
@@ -108,8 +108,7 @@ public class ExtractMethodWindow implements Window, SelectionListener, Listener 
 
 		this.shell = new Shell(this.display, SWT.MIN);
 		this.shell.setText("Move Refining Method");
-		Image image = RefactoringPlugin.getImage("sample.gif");
-		this.shell.setImage(image);
+		this.shell.setImage(IMAGE_SAMPLE);
 		this.shell.setSize(500, 255);
 
 		if (this.selection != null) {

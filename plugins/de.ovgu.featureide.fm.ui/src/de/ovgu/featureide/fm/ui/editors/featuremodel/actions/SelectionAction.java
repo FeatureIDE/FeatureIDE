@@ -46,7 +46,7 @@ public class SelectionAction extends Action {
 					.getSelection();
 			
 			/*
-			 * TODO @Eric NullPointerException
+			 * TODO run in job
 			 * 
 			 * */
 			if (isSelectionValid(selection)){				

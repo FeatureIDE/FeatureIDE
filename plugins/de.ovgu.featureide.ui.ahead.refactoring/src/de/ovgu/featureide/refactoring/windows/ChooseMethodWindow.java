@@ -23,7 +23,6 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -31,15 +30,15 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 
-import de.ovgu.featureide.refactoring.RefactoringPlugin;
 import refactor.MethodInfo;
+import de.ovgu.featureide.refactoring.GUIDefaults;
 
 /**
  * A dialog to select a method for a Jak refactoring.
  * 
  * @author Stephan Kauschka
  */
-public class ChooseMethodWindow implements SelectionListener, DisposeListener {
+public class ChooseMethodWindow implements SelectionListener, DisposeListener, GUIDefaults {
 
 	private Window window;
 	private Shell shell, parentshell;
@@ -55,8 +54,7 @@ public class ChooseMethodWindow implements SelectionListener, DisposeListener {
 
 		this.shell = new Shell(parentShell, SWT.MIN);
 		this.shell.setText("Choose a method");
-		Image image = RefactoringPlugin.getImage("sample.gif");
-		this.shell.setImage(image);
+		this.shell.setImage(IMAGE_SAMPLE);
 		this.shell.setSize(250, 200);
 		this.shell.addDisposeListener(this);
 

@@ -24,9 +24,9 @@ import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.prop4j.NodeWriter;
+
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 
 /**
@@ -36,13 +36,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  * @author Jan Wedding
  * @author Melanie Pflaume
  */
-public class FmLabelProvider implements ILabelProvider,IFontProvider {
-	
-
-	private static final Image IMG_OPTIONAL = FMUIPlugin.getImage("optional.gif");
-	private static final Image IMG_MANDATORY = FMUIPlugin.getImage("mandatory.gif");
-	private static final Image IMG_OR = FMUIPlugin.getImage("or.gif");
-	private static final Image IMG_XOR = FMUIPlugin.getImage("exor.gif");
+public class FmLabelProvider implements ILabelProvider,IFontProvider, GUIDefaults {
 
 	/*
 	 * (non-Javadoc)

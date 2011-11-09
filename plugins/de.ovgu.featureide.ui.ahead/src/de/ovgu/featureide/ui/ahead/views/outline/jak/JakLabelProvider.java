@@ -26,7 +26,7 @@ import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTModelElement;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
-import de.ovgu.featureide.ui.ahead.AheadUIPlugin;
+import de.ovgu.featureide.ui.ahead.GUIDefaults;
 
 
 /**
@@ -36,17 +36,7 @@ import de.ovgu.featureide.ui.ahead.AheadUIPlugin;
  * 
  * @author Tom Brosch
  */
-public class JakLabelProvider implements ILabelProvider {
-	
-	private static Image IMAGE_FIELD_PRIVATE = AheadUIPlugin.getImage("field_private_obj.gif");
-	private static Image IMAGE_FIELD_PROTECTED = AheadUIPlugin.getImage("field_protected_obj.gif");
-	private static Image IMAGE_FIELD_PUBLIC = AheadUIPlugin.getImage("field_public_obj.gif");
-	private static Image IMAGE_FIELD_DEFAULT = AheadUIPlugin.getImage("field_default_obj.gif");
-	private static Image IMAGE_METHODE_PRIVATE = AheadUIPlugin.getImage("private_co.gif");
-	private static Image IMAGE_METHODE_PROTECTED = AheadUIPlugin.getImage("/protected_co.gif");
-	private static Image IMAGE_METHODE_PUBLIC = AheadUIPlugin.getImage("public_co.gif");
-	private static Image IMAGE_METHODE_DEFAULT =  AheadUIPlugin.getImage("default_co.gif");
-	private static Image IMAGE_CLASS = AheadUIPlugin.getImage("class_obj.gif");
+public class JakLabelProvider implements ILabelProvider, GUIDefaults {
 	
 	public Image getImage(Object element) {
 		if (element instanceof FSTModelElement) {

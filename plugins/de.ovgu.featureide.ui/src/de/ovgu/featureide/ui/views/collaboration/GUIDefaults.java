@@ -26,8 +26,10 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.Image;
 
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIBasics;
+import de.ovgu.featureide.ui.UIPlugin;
 
 /**
  * Colors, Fonts, for Collaboration View
@@ -88,4 +90,23 @@ public interface GUIDefaults {
 	public static Color OPEN_ROLE_BORDER_COLOR_UNSELECTED	= GUIBasics.createBorderColor(OPEN_ROLE_BACKGROUND_UNSELECTED);
 	public static Border OPEN_ROLE_BORDER_UNSELECTED		= new LineBorder(OPEN_ROLE_BORDER_COLOR_UNSELECTED, 1);
 		
+	/*
+	 * All images should be declared here, so an image can not be created twice.
+	 */
+	public static final Image IMAGE_CURRENT_CONFIGURATION = UIPlugin.getImage("currentconfiguration.gif");
+	public static final Image IMAGE_CONFIGURATION = UIPlugin.getImage("ConfigurationIcon.png");
+	public static final Image REFESH_TAB_IMAGE = UIPlugin.getImage("refresh_tab.gif");
+
+	// Collaboration Diagram 
+	public static final Image IMAGE_FIELD_PRIVATE = UIPlugin.getImage("field_private_obj.gif");
+	public static final Image IMAGE_FIELD_PROTECTED = UIPlugin.getImage("field_protected_obj.gif");
+	public static final Image IMAGE_FIELD_PUBLIC = UIPlugin.getImage("field_public_obj.gif");
+	public static final Image IMAGE_FIELD_DEFAULT = UIPlugin.getImage("field_default_obj.gif");
+	public static final Image IMAGE_METHODE_PRIVATE = UIPlugin.getImage("private_co.gif");
+	public static final Image IMAGE_METHODE_PROTECTED = UIPlugin.getImage("protected_co.gif");
+	public static final Image IMAGE_METHODE_PUBLIC = UIPlugin.getImage("public_co.gif");
+	public static final Image IMAGE_METHODE_DEFAULT =  UIPlugin.getImage("default_co.gif");
+	public static final Image IMAGE_CLASS = UIPlugin.getImage("class_obj.gif");
+	public static final Image IMAGE_FEATURE = UIPlugin.getImage("FeatureIconSmall.ico");
+	public static final Image IMAGE_HASH = UIPlugin.getImage("hash.png");
 }

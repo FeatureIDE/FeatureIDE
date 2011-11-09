@@ -111,9 +111,9 @@ public class AspectJFMCompserExtension extends FMComposerExtension {
 	}
 
 	/**
-	 * TODO description
-	 * @param res
-	 * @param content
+	 * Sets the content of the given file.
+	 * @param res The file.
+	 * @param content The new file content to set.
 	 */
 	private void setFileContent(IFile res, String content) {
 		FileWriter fw = null;
@@ -134,12 +134,12 @@ public class AspectJFMCompserExtension extends FMComposerExtension {
 	}
 
 	/**
-	 * TODO description
-	 * @param content
-	 * @param oldName
-	 * @param newName 
-	 * @param isAspectFile 
-	 * @return
+	 * Changes the files content if an aspect is renamed.
+	 * @param content The current content.
+	 * @param oldName The old aspect name.
+	 * @param newName The new aspect name.
+	 * @param isAspectFile <code>true</code> if the file is the file defining the aspect.
+	 * @return The new file content.
 	 */
 	public String changeFileContent(String content, String oldName, String newName, boolean isAspectFile) {
 		String packageName = getPackege(newName);
@@ -149,8 +149,6 @@ public class AspectJFMCompserExtension extends FMComposerExtension {
 				content = content.replaceFirst("package\\s+\\w*;", "package " + packageName + ";");
 			}
 		}
-		
-		// TODO revise replacements
 		
 		// renaming for: aspect AspectName {
 		content = content.replaceAll("aspect\\s+" + getAspect(oldName) + " ", "aspect " + getAspect(newName) + " ");
@@ -175,9 +173,9 @@ public class AspectJFMCompserExtension extends FMComposerExtension {
 	}
 
 	/**
-	 * TODO description
-	 * @param res
-	 * @return
+	 * Gets the files content.
+	 * @param res The file.
+	 * @return The content of the file.
 	 */
 	private String getFileContent(IFile res) {
 		Scanner scanner = null;

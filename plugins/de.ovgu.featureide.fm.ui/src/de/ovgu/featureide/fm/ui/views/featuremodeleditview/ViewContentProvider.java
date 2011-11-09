@@ -23,8 +23,6 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.ISharedImages;
-import org.eclipse.ui.PlatformUI;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -32,7 +30,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.TreeElement;
 import de.ovgu.featureide.fm.core.editing.Comparison;
 import de.ovgu.featureide.fm.core.editing.ModelComparator;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.views.FeatureModelEditView;
 
 /**
@@ -41,23 +39,10 @@ import de.ovgu.featureide.fm.ui.views.FeatureModelEditView;
  * @author Thomas Thuem
  */
 public class ViewContentProvider implements IStructuredContentProvider,
-		ITreeContentProvider {
+		ITreeContentProvider, GUIDefaults {
 
 	private static final String DEFAULT_MESSAGE = "Open a feature model.";
 	private static final String CALCULATING_MESSAGE = "Calculating...";
-
-	private static final Image DEFAULT_IMAGE = PlatformUI.getWorkbench()
-			.getSharedImages().getImage(ISharedImages.IMG_OBJ_ELEMENT);
-
-	private static final Image ERROR_IMAGE = PlatformUI.getWorkbench()
-			.getSharedImages().getImage(ISharedImages.IMG_OBJS_ERROR_TSK);
-
-	private static final Image ZERO_IMAGE = FMUIPlugin.getImage("zero.gif");
-	private static final Image PLUS_IMAGE = FMUIPlugin.getImage("plus.gif");
-	private static final Image MINUS_IMAGE = FMUIPlugin.getImage("minus.gif");
-	private static final Image PLUS_MINUS_IMAGE = FMUIPlugin
-			.getImage("plusminus.gif");
-
 	/**
 	 * time in seconds after the calculation is aborted by the SAT solver
 	 */
@@ -136,13 +121,13 @@ public class ViewContentProvider implements IStructuredContentProvider,
 			image = PLUS_MINUS_IMAGE;
 		} else if (comparison == Comparison.OUTOFMEMORY) {
 			message = "Out of memory error!";
-			image = ERROR_IMAGE;
+			image = ERROR_IMAGE_TSK;
 		} else if (comparison == Comparison.TIMEOUT) {
 			message = "SAT4J time out!";
-			image = ERROR_IMAGE;
+			image = ERROR_IMAGE_TSK;
 		} else {
 			message = "An error has occured!";
-			image = ERROR_IMAGE;
+			image = ERROR_IMAGE_TSK;
 		}
 
 		message += " (" + (System.nanoTime() - start) / 1000000 + "msec)";

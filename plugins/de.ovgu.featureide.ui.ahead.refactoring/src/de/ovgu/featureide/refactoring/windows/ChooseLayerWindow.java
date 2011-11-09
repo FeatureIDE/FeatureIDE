@@ -23,7 +23,6 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -31,16 +30,16 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 
-import de.ovgu.featureide.refactoring.RefactoringPlugin;
-import de.ovgu.featureide.refactoring.typesystem.TypeSystemManager;
 import refactor.LayerInfo;
+import de.ovgu.featureide.refactoring.GUIDefaults;
+import de.ovgu.featureide.refactoring.typesystem.TypeSystemManager;
 
 /**
  * A dialog to choose a destination layer for a Jak refactoring.
  * 
  * @author Stephan Kauschka
  */
-public class ChooseLayerWindow implements SelectionListener, DisposeListener {
+public class ChooseLayerWindow implements SelectionListener, DisposeListener, GUIDefaults {
 
 	private Window window;
 	private Shell shell, parentshell;
@@ -52,8 +51,7 @@ public class ChooseLayerWindow implements SelectionListener, DisposeListener {
 		this.parentshell = parentShell;
 		this.shell = new Shell(parentShell, SWT.MIN);
 		this.shell.setText("Choose a layer");
-		Image image = RefactoringPlugin.getImage("sample.gif");
-		this.shell.setImage(image);
+		this.shell.setImage(IMAGE_SAMPLE);
 		this.shell.setSize(250, 200);
 		this.shell.addDisposeListener(this);
 

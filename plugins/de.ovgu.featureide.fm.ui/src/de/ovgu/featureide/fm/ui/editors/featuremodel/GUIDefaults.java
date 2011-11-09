@@ -27,9 +27,14 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
+
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
- * Defaults colors, fonts and borders for the feature diagram.
+ * Default colors, fonts, images and borders for the feature diagram.
  * 
  * @author Thomas Thuem
  */
@@ -124,5 +129,35 @@ public interface GUIDefaults {
 	public static Color LEGEND_BACKGROUND = DIAGRAM_BACKGROUND;
 	public static Color LEGEND_BORDER_COLOR = LEGEND_FOREGROUND;
 	public static Border LEGEND_BORDER = new LineBorder(LEGEND_BORDER_COLOR, 1);
+
+	/*
+	 * All images should be declared here, so an image can not be created twice.
+	 */
+	public static final Image IMAGE_UNDEFINED = FMUIPlugin.getImage("undefined.ico");
+	public static final Image IMAGE_SELECTED = FMUIPlugin.getImage("selected.ico");
+	public static final Image IMAGE_DESELECTED = FMUIPlugin.getImage("deselected.ico");
+	public static final Image IMAGE_ASELECTED = FMUIPlugin.getImage("aselected.ico");
+	public static final Image IMAGE_ADESELECTED = FMUIPlugin.getImage("adeselected.ico");
+	
+	public static final Image HELP_IMAGE = FMUIPlugin.getImage("help.gif");
+	public static final Image ERROR_IMAGE = FMUIPlugin.getImage("icon_error.gif");
+	public static final Image BANNER_IMAGE = FMUIPlugin.getImage("title_banner.gif");
+	public static final Image WARNING_IMAGE = FMUIPlugin.getImage("message_warning.gif");
+	
+	public static final Image OPERATOR_SYMBOL = FMUIPlugin.getImage("operator_symbol.gif");
+	public static final Image FEATURE_SYMBOL = FMUIPlugin.getImage("FeatureIconSmall.ico");
+	
+	public static final Image IMG_OPTIONAL = FMUIPlugin.getImage("optional.gif");
+	public static final Image IMG_MANDATORY = FMUIPlugin.getImage("mandatory.gif");
+	public static final Image IMG_OR = FMUIPlugin.getImage("or.gif");
+	public static final Image IMG_XOR = FMUIPlugin.getImage("exor.gif");
+	
+	public static final Image PLUS_IMAGE = FMUIPlugin.getImage("plus.gif");
+	public static final Image MINUS_IMAGE = FMUIPlugin.getImage("minus.gif");
+	public static final Image ZERO_IMAGE = FMUIPlugin.getImage("zero.gif");
+	public static final Image PLUS_MINUS_IMAGE = FMUIPlugin.getImage("plusminus.gif");
+	
+	public static final Image DEFAULT_IMAGE = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_ELEMENT);
+	public static final Image ERROR_IMAGE_TSK = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJS_ERROR_TSK);
 
 }

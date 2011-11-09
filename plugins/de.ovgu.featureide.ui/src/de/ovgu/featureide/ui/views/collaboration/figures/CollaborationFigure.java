@@ -24,9 +24,7 @@ import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
-import org.eclipse.swt.graphics.Image;
 
-import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 import de.ovgu.featureide.ui.views.collaboration.model.Collaboration;
 
@@ -39,9 +37,6 @@ import de.ovgu.featureide.ui.views.collaboration.model.Collaboration;
  */
 public class CollaborationFigure extends Figure implements GUIDefaults{
 
-	private static Image IMAGE_CURRENT_CONFIGURATION = UIPlugin.getImage("currentconfiguration.gif");
-	private static Image IMAGE_CONFIGURATION = UIPlugin.getImage("ConfigurationIcon.png");
-	
 	private final Label label = new Label();
 	public Boolean selected = true;
 	public Boolean isConfiguration = false;

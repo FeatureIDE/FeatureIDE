@@ -60,7 +60,6 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.views.outline.FmLabelProvider;
 import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePageContextMenu;
@@ -93,9 +92,9 @@ public class CollaborationOutline extends ViewPart {
 	private FmLabelProvider modelLabelProvider = new FmLabelProvider();
 	private FmOutlinePageContextMenu contextMenu;
 
-	private static final ImageDescriptor IMG_COLLAPSE = FMUIPlugin.getDefault()
+	private static final ImageDescriptor IMG_COLLAPSE = UIPlugin.getDefault()
 			.getImageDescriptor("icons/collapse.gif");
-	private static final ImageDescriptor IMG_EXPAND = FMUIPlugin.getDefault()
+	private static final ImageDescriptor IMG_EXPAND = UIPlugin.getDefault()
 			.getImageDescriptor("icons/expand.gif");
 
 	public static final String ID = UIPlugin.PLUGIN_ID

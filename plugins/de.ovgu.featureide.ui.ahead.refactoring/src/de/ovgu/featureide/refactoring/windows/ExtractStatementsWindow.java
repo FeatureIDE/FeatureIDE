@@ -62,7 +62,7 @@ import refactor.ExtractStatements;
 import refactor.LayerInfo;
 import refactor.Saveable;
 import refactor.TypeSystem;
-import de.ovgu.featureide.refactoring.RefactoringPlugin;
+import de.ovgu.featureide.refactoring.GUIDefaults;
 import de.ovgu.featureide.refactoring.parser.Parser;
 import de.ovgu.featureide.refactoring.typesystem.TypeSystemManager;
 import de.ovgu.featureide.ui.ahead.editors.JakEditor;
@@ -73,7 +73,7 @@ import de.ovgu.featureide.ui.ahead.editors.JakEditor;
  * @author Stephan Kauschka
  */
 public class ExtractStatementsWindow implements Window, SelectionListener,
-		Listener {
+		Listener, GUIDefaults {
 
 	private Display display;
 	private Shell shell;
@@ -109,8 +109,7 @@ public class ExtractStatementsWindow implements Window, SelectionListener,
 
 		this.shell = new Shell(this.display, SWT.MIN);
 		this.shell.setText("Extract Method Statements");
-		Image image = RefactoringPlugin.getImage("sample.gif");
-		this.shell.setImage(image);
+		this.shell.setImage(IMAGE_SAMPLE);
 		this.shell.setSize(500, 250);
 
 		if (this.selection != null) {

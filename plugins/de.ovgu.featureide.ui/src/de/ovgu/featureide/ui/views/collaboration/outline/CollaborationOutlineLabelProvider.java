@@ -27,7 +27,7 @@ import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModelElement;
-import de.ovgu.featureide.ui.UIPlugin;
+import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 import de.ovgu.featureide.ui.views.collaboration.model.Class;
 import de.ovgu.featureide.ui.views.collaboration.model.Role;
 
@@ -37,17 +37,8 @@ import de.ovgu.featureide.ui.views.collaboration.model.Role;
  * @author Jan Wedding
  * @author Melanie Pflaume
  */
-public class CollaborationOutlineLabelProvider implements ILabelProvider {
-	
-	private static final Image IMAGE_FIELD_PRIVATE = UIPlugin.getImage("field_private_obj.gif");
-	private static final Image IMAGE_FIELD_PROTECTED = UIPlugin.getImage("field_protected_obj.gif");
-	private static final Image IMAGE_FIELD_PUBLIC = UIPlugin.getImage("field_public_obj.gif");
-	private static final Image IMAGE_FIELD_DEFAULT = UIPlugin.getImage("field_default_obj.gif");
-	private static final Image IMAGE_METHODE_PRIVATE = UIPlugin.getImage("private_co.gif");
-	private static final Image IMAGE_METHODE_PROTECTED = UIPlugin.getImage("protected_co.gif");
-	private static final Image IMAGE_METHODE_PUBLIC = UIPlugin.getImage("public_co.gif");
-	private static final Image IMAGE_METHODE_DEFAULT =  UIPlugin.getImage("default_co.gif");
-	private static final Image IMAGE_CLASS = UIPlugin.getImage("class_obj.gif");
+public class CollaborationOutlineLabelProvider implements ILabelProvider,GUIDefaults{
+
 	private IFile file;
 
 	/* (non-Javadoc)

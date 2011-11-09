@@ -34,7 +34,6 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
@@ -43,6 +42,7 @@ import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
@@ -53,14 +53,12 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
  * 
  * @author Fabian Benduhn
  */
-public class DeleteOperation extends AbstractOperation {
+public class DeleteOperation extends AbstractOperation implements GUIDefaults {
 
 	private static final String LABEL = "Delete";
 	private Object viewer;
 	private FeatureModel featureModel;
 	private List<AbstractOperation> operations;
-	
-	private static final Image FEATURE_HEAD = FMUIPlugin.getImage("FeatureIconSmall.ico");
 
 	/**
 	 * 
@@ -123,7 +121,7 @@ public class DeleteOperation extends AbstractOperation {
 					executeOperation(op);
 				} else {
 					MessageDialog dialog = new MessageDialog(new Shell(), 
-							" Delete Error ", FEATURE_HEAD, 
+							" Delete Error ", FEATURE_SYMBOL, 
 							"\"" + feature.getName() + "\" is contained in constraints. "
 							+ '\n' + '\n' + 
 							"Unable to delete this feature until all relevant constraints are removed.",
@@ -146,7 +144,7 @@ public class DeleteOperation extends AbstractOperation {
 					executeOperation(op);
 				} else {
 					MessageDialog dialog = new MessageDialog(new Shell(), 
-							" Delete Error ", FEATURE_HEAD, 
+							" Delete Error ", FEATURE_SYMBOL, 
 							"\"" + feature.getName() + "\" is contained in constraints. "
 							+ '\n' + '\n' + 
 							"Unable to delete this feature until all relevant constraints are removed.",

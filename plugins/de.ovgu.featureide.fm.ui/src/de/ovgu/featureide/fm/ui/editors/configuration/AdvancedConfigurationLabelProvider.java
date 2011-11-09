@@ -27,7 +27,7 @@ import org.eclipse.swt.graphics.Image;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 
 
 /**
@@ -35,19 +35,8 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * 
  * @author Thomas Thuem
  */
-public class AdvancedConfigurationLabelProvider extends LabelProvider {
+public class AdvancedConfigurationLabelProvider extends LabelProvider implements GUIDefaults {
 
-	public final Image IMAGE_UNDEFINED, IMAGE_SELECTED, IMAGE_DESELECTED,
-	IMAGE_ASELECTED, IMAGE_ADESELECTED;
-
-	public AdvancedConfigurationLabelProvider() {
-		IMAGE_UNDEFINED = FMUIPlugin.getImage("undefined.ico");
-		IMAGE_SELECTED = FMUIPlugin.getImage("selected.ico");
-		IMAGE_DESELECTED = FMUIPlugin.getImage("deselected.ico");
-		IMAGE_ASELECTED = FMUIPlugin.getImage("aselected.ico");
-		IMAGE_ADESELECTED = FMUIPlugin.getImage("adeselected.ico");
-	}
-	
 	public String getText(Object o) {
 		if (o instanceof SelectableFeature) {
 			SelectableFeature feature = (SelectableFeature) o;
