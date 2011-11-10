@@ -155,7 +155,8 @@ public class ViewContentProvider implements IStructuredContentProvider,
 				int features = model.getNumberOfFeatures();
 				int concrete = model.countConcreteFeatures();
 				int terminal = model.countTerminalFeatures();
-
+				int hidden   = model.countHiddenFeatures();
+				
 				try {
 					addChild("Featur model is valid (not void): "
 							+ model.isValid());
@@ -169,6 +170,7 @@ public class ViewContentProvider implements IStructuredContentProvider,
 				addChild("Number of primitive features: " + terminal);
 				addChild("Number of compound features: "
 						+ (features - terminal));
+				addChild("Number of hidden features: " + hidden);
 				addChild(calculateNumberOfVariants(model, true));
 				addChild(calculateNumberOfVariants(model, false));
 			}

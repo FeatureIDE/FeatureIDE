@@ -934,6 +934,16 @@ public class FeatureModel implements PropertyConstants {
 				number++;
 		return number;
 	}
+	
+	public int countHiddenFeatures() {
+		int number = 0;
+		for (Feature feature : getFeatures()) {
+			if (feature.isHidden() || feature.hasHiddenParent()) {
+				number++;
+			}
+		}
+		return number;
+	}
 
 	public int countTerminalFeatures() {
 		int number = 0;
