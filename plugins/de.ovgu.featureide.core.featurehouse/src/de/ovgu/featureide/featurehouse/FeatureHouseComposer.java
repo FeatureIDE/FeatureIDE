@@ -39,6 +39,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
 import cide.gparser.ParseException;
+import cide.gparser.TokenMgrError;
 
 import composer.CmdLineInterpreter;
 import composer.FSTGenComposer;
@@ -71,26 +72,13 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	private IParseErrorListener listener = new IParseErrorListener() {
 
 		@Override
-		public void parseErrorOccured(ParseException arg) {
-			try {
-				IFile iFile = featureProject
-						.getProject()
-						.getWorkspace()
-						.getRoot()
-						.findFilesForLocationURI(
-								composer.getErrorFiles().getLast().toURI())[0];
-				IMarker marker = iFile.createMarker(FeatureHouseCorePlugin.BUILDER_PROBLEM_MARKER);
-				marker.setAttribute(IMarker.LINE_NUMBER,
-						arg.currentToken.next.endLine);
-				marker.setAttribute(IMarker.MESSAGE, arg.getMessage());
-				marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
-			} catch (CoreException e) {
-				FeatureHouseCorePlugin.getDefault().logError(e);
-			}
+		public void parseErrorOccured(ParseException e) {
+				createBuilderProblemMarker(e.currentToken.next.endLine, e.getMessage());
 		}
-
+		
 	};
 
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -105,6 +93,57 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		createBuildStructure();
 		if(supSuccess==false||fhModelBuilder==null)return false;
 		else return true;
+	}
+
+	/**
+	 * Creates an error marker to the last error file.
+	 * @param line The line of the marker.
+	 * @param message The message.
+	 */
+	protected void createBuilderProblemMarker(int line, String message) {
+		try {
+			IMarker marker = getErrorFile().createMarker(FeatureHouseCorePlugin.BUILDER_PROBLEM_MARKER);
+			marker.setAttribute(IMarker.LINE_NUMBER, line);
+			marker.setAttribute(IMarker.MESSAGE, message);
+			marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
+		} catch (CoreException e) {
+			FeatureHouseCorePlugin.getDefault().logError(e);
+		}
+		
+	}
+
+	/**
+	 * Gets the file containing the actual error.
+	 * @return The file.
+	 */
+	protected IFile getErrorFile() {
+		return featureProject.getProject().getWorkspace().getRoot().findFilesForLocationURI(
+						composer.getErrorFiles().getLast().toURI())[0];
+	}
+	
+	/**
+	 * Removes line and column form the message of the TokenMgrError.<br>
+	 * Example message:<br>
+	 * -Lexical error at line 7, column 7.  Encountered: <EOF> after : "" 
+	 * @param message The message
+	 * @return message without "line i, column j." 
+	 */
+	private String getTokenMgrErrorMessage(String message) {
+		if (!message.contains("line ") || !message.contains("Encountered")) return message;
+		message = message.substring(0, message.indexOf(" at ")) + " e" + message.substring(message.indexOf("ncountered:"));
+		return message;
+	}
+	
+	/**
+	 * Gets the line of the message of the TokenMgrError.<br>
+	 * Example message:<br>
+	 * -Lexical error at line 7, column 7.  Encountered: <EOF> after : ""
+	 * @param message The error message
+	 * @return The line
+	 */
+	private int getTokenMgrErrorLine(String message) {
+		if (!message.contains("line ")) return -1;
+		return Integer.parseInt(message.substring(message.indexOf("line ") + 5, message.indexOf(",")));
 	}
 
 	/**
@@ -163,14 +202,20 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		setJavaBuildPath(config.getName().split("[.]")[0]);
 
 		// A new FSTGenComposer instance is created every time, because this
-		// class seems to remember the FST from a previous build.
+		// class remembers the FST from a previous build.
 		composer = new FSTGenComposer(false);
 		composer.addParseErrorListener(listener);
-		composer.run(new String[] {
-				CmdLineInterpreter.INPUT_OPTION_EQUATIONFILE, configPath,
-				CmdLineInterpreter.INPUT_OPTION_BASE_DIRECTORY, basePath,
-				CmdLineInterpreter.INPUT_OPTION_OUTPUT_DIRECTORY, outputPath + "/" 
-		});
+		try {
+			composer.run(new String[] {
+					CmdLineInterpreter.INPUT_OPTION_EQUATIONFILE, configPath,
+					CmdLineInterpreter.INPUT_OPTION_BASE_DIRECTORY, basePath,
+					CmdLineInterpreter.INPUT_OPTION_OUTPUT_DIRECTORY, outputPath + "/" 
+			});
+		} catch (TokenMgrError e) {
+			createBuilderProblemMarker(getTokenMgrErrorLine(e.getMessage()), getTokenMgrErrorMessage(e.getMessage()));
+		} catch (Error e) {
+			FeatureHouseCorePlugin.getDefault().logError(e);
+		}
 		fhModelBuilder.buildModel(composer.getFstnodes());
 
 		TreeBuilderFeatureHouse fstparser = new TreeBuilderFeatureHouse(

@@ -50,8 +50,7 @@ import de.ovgu.featureide.ui.views.collaboration.model.Role;
  * @author Stephan Besecke
  */
 public class RoleFigure extends Figure implements GUIDefaults{
-	
-	
+
 	private static Font FONT_BOLD = new Font(null,"Arial", 8, SWT.BOLD);
 		
 	private final Label label = new Label();
