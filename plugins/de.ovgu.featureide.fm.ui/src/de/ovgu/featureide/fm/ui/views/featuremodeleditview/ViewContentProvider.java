@@ -18,6 +18,8 @@
  */
 package de.ovgu.featureide.fm.ui.views.featuremodeleditview;
 
+import java.util.ConcurrentModificationException;
+
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
@@ -27,6 +29,7 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.TreeElement;
 import de.ovgu.featureide.fm.core.editing.Comparison;
 import de.ovgu.featureide.fm.core.editing.ModelComparator;
@@ -43,6 +46,27 @@ public class ViewContentProvider implements IStructuredContentProvider,
 
 	private static final String DEFAULT_MESSAGE = "Open a feature model.";
 	private static final String CALCULATING_MESSAGE = "Calculating...";
+	
+	private static final String HEAD_REFACTORING = "Refactoring: SPL unchanged";
+	private static final String HEAD_GENERALIZATION = "Generalization: Products added";
+	private static final String HEAD_SPECIALIZATION = "Specialization: Products removed";
+	private static final String HEAD_ARBITRARY = "Arbitrary edit: Products added and removed";
+	private static final String HEAD_OUTOFMEMORY = "Out of memory error!";
+	private static final String HEAD_TIME_OUT = "SAT4J time out!";
+	private static final String HEAD_ERROR = "An error has occured!";
+
+	protected static final String NUMBER_FEATURES = "Number of features: ";
+	protected static final String NUMBER_CONCRETE = "Number of concrete features: ";
+	protected static final String NUMBER_ABSTRACT = "Number of abstract features: ";
+	protected static final String NUMBER_PRIMITIVE = "Number of primitive features: ";
+	protected static final String NUMBER_COMPOUND = "Number of compound features: ";
+	protected static final String NUMBER_HIDDEN = "Number of hidden features: ";
+	protected static final String MODEL_VOID = "Feature model is valid (not void): ";
+	protected static final String MODEL_TIMEOUT = MODEL_VOID + "timeout";
+	
+	private static final String STATISTICS_BEFORE = "Statistics on before edit version";
+	private static final String STATISTICS_AFTER = "Statistics on after edit version";	
+	
 	/**
 	 * time in seconds after the calculation is aborted by the SAT solver
 	 */
@@ -92,102 +116,155 @@ public class ViewContentProvider implements IStructuredContentProvider,
 		refresh();
 	}
 
+	private int i;
+	private FeatureModel model;
+	
 	public void calculateContent(FeatureModel oldModel, FeatureModel newModel) {
 		if (oldModel.getRoot() == null || newModel.getRoot() == null)
 			return;
-
-		invisibleRoot.setChild(new TreeObject(CALCULATING_MESSAGE,
-				DEFAULT_IMAGE));
+		i = 0;
+		ModelComparator comparator = new ModelComparator(TIMEOUT);
+		if (invisibleRoot.getChildren().length < 1) {
+			invisibleRoot.addChild(new TreeObject(CALCULATING_MESSAGE, DEFAULT_IMAGE));
+		} else {
+			((TreeObject)invisibleRoot.getChildren()[i]).setContents(CALCULATING_MESSAGE, DEFAULT_IMAGE);
+		}
 		refresh();
+		TreeObject head = calculateHead(oldModel, newModel, comparator);
+		((TreeObject)invisibleRoot.getChildren()[i++]).setContents(head.getName(), head.getImage());
+		
+		if (invisibleRoot.getChildren().length < 2) {
+			invisibleRoot.addChild("");
+			invisibleRoot.addChild(new ExampleParent(true, comparator, 1, null));
+			invisibleRoot.addChild(new ExampleParent(false, comparator, 1, null));
+			invisibleRoot.addChild("");
+		} else  {
+			i++;
+			((TreeObject)invisibleRoot.getChildren()[i++]).set(new ExampleParent(true, comparator, 1, null));
+			((TreeObject)invisibleRoot.getChildren()[i++]).set(new ExampleParent(false, comparator, 1, null));
+			i++;
+		}
+		addStatistics(invisibleRoot, STATISTICS_BEFORE,
+				oldModel);
+		addStatistics(invisibleRoot, STATISTICS_AFTER,
+				newModel);
+		refresh();
+	}
 
+	/**
+	 * 
+	 */
+	private TreeObject calculateHead(FeatureModel oldModel, FeatureModel newModel,
+			ModelComparator comparator) {
 		long start = System.nanoTime();
 
-		ModelComparator comparator = new ModelComparator(TIMEOUT);
+		
 		Comparison comparison = comparator.compare(oldModel, newModel);
 
 		String message = null;
 		Image image = null;
 		if (comparison == Comparison.REFACTORING) {
-			message = "Refactoring: SPL unchanged";
+			message = HEAD_REFACTORING;
 			image = ZERO_IMAGE;
 		} else if (comparison == Comparison.GENERALIZATION) {
-			message = "Generalization: Products added";
+			message = HEAD_GENERALIZATION;
 			image = PLUS_IMAGE;
 		} else if (comparison == Comparison.SPECIALIZATION) {
-			message = "Specialization: Products removed";
+			message = HEAD_SPECIALIZATION;
 			image = MINUS_IMAGE;
 		} else if (comparison == Comparison.ARBITRARY) {
-			message = "Arbitrary edit: Products added and removed";
+			message = HEAD_ARBITRARY;
 			image = PLUS_MINUS_IMAGE;
 		} else if (comparison == Comparison.OUTOFMEMORY) {
-			message = "Out of memory error!";
+			message = HEAD_OUTOFMEMORY;
 			image = ERROR_IMAGE_TSK;
 		} else if (comparison == Comparison.TIMEOUT) {
-			message = "SAT4J time out!";
+			message = HEAD_TIME_OUT;
 			image = ERROR_IMAGE_TSK;
 		} else {
-			message = "An error has occured!";
+			message = HEAD_ERROR;
 			image = ERROR_IMAGE_TSK;
 		}
 
 		message += " (" + (System.nanoTime() - start) / 1000000 + "msec)";
-		TreeObject result = new TreeObject(message, image);
-		invisibleRoot.setChild(result);
-
-		invisibleRoot.addChild("");
-		invisibleRoot.addChild(new ExampleParent(true, comparator, 1));
-		invisibleRoot.addChild(new ExampleParent(false, comparator, 1));
-
-		invisibleRoot.addChild("");
-		addStatistics(invisibleRoot, "Statistics on before edit version",
-				oldModel);
-		addStatistics(invisibleRoot, "Statistics on after edit version",
-				newModel);
-
-		refresh();
+		return new TreeObject(message, image);
 	}
 
 	private void addStatistics(TreeParent statistics, String text,
 			final FeatureModel model) {
-		TreeParent parent = new TreeParent(text, null, true) {
-			@Override
-			public void initChildren() {
-				int features = model.getNumberOfFeatures();
-				int concrete = model.countConcreteFeatures();
-				int terminal = model.countTerminalFeatures();
-				int hidden   = model.countHiddenFeatures();
-				
-				try {
-					addChild("Featur model is valid (not void): "
-							+ model.isValid());
-				} catch (TimeoutException e) {
-					addChild("Featur model is valid (not void): timeout");
+		final int features = model.getNumberOfFeatures();
+		final int concrete = model.countConcreteFeatures();
+		final int terminal = model.countTerminalFeatures();
+		final int hidden   = model.countHiddenFeatures();
+		
+		if (statistics.getChildren().length < i ||
+				statistics.getChildren()[i].getChildren().length < 1) {
+			TreeParent parent = new TreeParent(text, null, true) {
+				@Override
+				public void initChildren() {
+					try {
+						addChild(MODEL_VOID
+								+ model.isValid());
+					} catch (TimeoutException e) {
+						addChild(MODEL_TIMEOUT);
+					}
+					addChild(NUMBER_FEATURES + features);
+					addChild(NUMBER_CONCRETE + concrete);
+					addChild(NUMBER_ABSTRACT + (features - concrete));
+					addChild(NUMBER_PRIMITIVE + terminal);
+					addChild(NUMBER_COMPOUND + (features - terminal));
+					addChild(NUMBER_HIDDEN + hidden);
+					addChild(calculateNumberOfVariants(model, true));
+					addChild(calculateNumberOfVariants(model, false));
 				}
-				addChild("Number of features: " + features);
-				addChild("Number of concrete features: " + concrete);
-				addChild("Number of abstract features: "
-						+ (features - concrete));
-				addChild("Number of primitive features: " + terminal);
-				addChild("Number of compound features: "
-						+ (features - terminal));
-				addChild("Number of hidden features: " + hidden);
-				addChild(calculateNumberOfVariants(model, true));
-				addChild(calculateNumberOfVariants(model, false));
+			};
+			statistics.addChild(parent);
+		} else {
+			TreeObject parent = (TreeObject)statistics.getChildren()[i];
+			int i = 0;
+			try {
+				if (parent.getChildren()[i++] instanceof SelectableFeature) {
+					((SelectableFeature) parent.getChildren()[i]).setName(MODEL_VOID
+							+ model.isValid());
+				} else {
+					((TreeObject) parent.getChildren()[i]).setName(MODEL_VOID
+							+ model.isValid());
+				}
+			} catch (TimeoutException e) {
+				if (parent.getChildren()[i++] instanceof SelectableFeature) {
+					((SelectableFeature) parent.getChildren()[i]).setName(MODEL_TIMEOUT);
+				} else {
+					((TreeObject)parent.getChildren()[i]).setName(MODEL_TIMEOUT);
+				}
+			} catch (ConcurrentModificationException e) {
+				
 			}
-
-		};
-		statistics.addChild(parent);
+			((TreeObject)parent.getChildren()[i++]).setName(NUMBER_FEATURES + features);
+			((TreeObject)parent.getChildren()[i++]).setName(NUMBER_CONCRETE + concrete);
+			((TreeObject)parent.getChildren()[i++]).setName(NUMBER_ABSTRACT + (features - concrete));
+			((TreeObject)parent.getChildren()[i++]).setName(NUMBER_PRIMITIVE + terminal);
+			((TreeObject)parent.getChildren()[i++]).setName(NUMBER_COMPOUND + (features - terminal));
+			((TreeObject)parent.getChildren()[i++]).setName(NUMBER_HIDDEN + hidden);
+			((TreeObject)parent.getChildren()[i++]).set(calculateNumberOfVariants(model, true));
+			((TreeObject)parent.getChildren()[i++]).set(calculateNumberOfVariants(model, false));
+		}
+		i++;
 	}
 
+	private FeatureModel getModel() {
+		return model;
+	}
 	private TreeParent calculateNumberOfVariants(
 			final FeatureModel model,
 			final boolean ignoreAbstractFeatures) {
+		this.model = model;
 		final String variants = ignoreAbstractFeatures ? "configurations"
 				: "program variants";
 		return new TreeParent("Number of " + variants, null, true) {
 			@Override
 			public void initChildren() {
-				long number = new Configuration(model, false,
+				removeChildren();
+				long number = new Configuration(getModel(), false,
 						ignoreAbstractFeatures).number(1000);
 				String s = "";
 				if (number < 0)

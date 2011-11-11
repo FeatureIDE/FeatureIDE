@@ -39,15 +39,18 @@ public class ExampleParent extends TreeParent implements GUIDefaults {
 
 	private int number;
 
-	public ExampleParent(boolean added, ModelComparator c, int number) {
+	private Configuration example;
+
+	public ExampleParent(boolean added, ModelComparator c, int number, Configuration example) {
 		super("next");
 		this.added = added;
 		this.c = c;
 		this.number = number;
+		this.example = example;
 
 		if (number == 1)
 			name = added ? "Added products" : "Removed products";
-		if (c.getResult() == Comparison.ERROR || number > 1) {
+		if (c.getResult() == Comparison.ERROR) {
 			image = IMAGE_UNDEFINED;
 		} else {
 			String imageName = added && !c.isImplied() ? "plus" : !added
@@ -62,14 +65,21 @@ public class ExampleParent extends TreeParent implements GUIDefaults {
 	@Override
 	public void initChildren() {
 		try {
-			Configuration example = c.calculateExample(added);
-			if (example == null)
+			if (example == null) {
+				example = c.calculateExample(added);
+			}
+			if (example == null) {
 				addChild("none");
+			}
 			else {
 				SelectableFeature root = example.getRoot();
 				root.setName("Product " + number);
 				addChild(root);
-				addChild(new ExampleParent(added, c, number + 1));
+				
+				Configuration example = c.calculateExample(added);
+				if (example != null) {
+					addChild(new ExampleParent(added, c, number + 1, example));
+				}
 			}
 		} catch (TimeoutException e) {
 			addChild("timeout");

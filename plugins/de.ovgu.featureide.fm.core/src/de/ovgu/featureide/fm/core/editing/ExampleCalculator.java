@@ -100,6 +100,9 @@ public class ExampleCalculator {
 			exampleSolver = new SatSolver(new And(a, new Not(child.clone())), timeout);
 		}
 		String solution = exampleSolver.getSolution();
+		if (solution == null) {
+			return null;
+		}
 		if (solution.equals(lastSolution)) {
 			exampleSolver = null;
 			return nextExample();
