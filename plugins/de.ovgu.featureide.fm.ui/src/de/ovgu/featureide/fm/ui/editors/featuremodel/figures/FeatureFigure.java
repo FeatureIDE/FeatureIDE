@@ -166,6 +166,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		toolTip += getRelevantConstraints();
 		Figure toolTipContent = new Figure();
 		toolTipContent.setLayoutManager(new GridLayout());
+		toolTipContent.setFont(DEFAULT_FONT);
 		toolTipContent.add(new Label(toolTip));
 		
 		// call of the FeatureDiagramExtensions
