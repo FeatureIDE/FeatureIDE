@@ -296,6 +296,7 @@ public class FeatureModel implements PropertyConstants {
 	}
 
 	public Feature getFeature(String name) {
+	
 		if (featureTable.isEmpty()) {
 			// create the root feature (it is the only one without a reference)
 			root = new Feature(this, name);
@@ -479,9 +480,9 @@ public class FeatureModel implements PropertyConstants {
 		}
 
 		try {
-			for (Literal deadFeature : getDeadFeatures()) {
-				if (getFeature(deadFeature.var.toString()) != null)
-					getFeature(deadFeature.var.toString()).setFeatureStatus(
+			for (Feature deadFeature : getDeadFeatures()) {
+				if (deadFeature != null)
+					deadFeature.setFeatureStatus(
 							FeatureStatus.DEAD, false);
 			}
 		} catch (Exception e) {
@@ -978,13 +979,13 @@ public class FeatureModel implements PropertyConstants {
 		return common;
 	}
 
-	public List<Literal> getDeadFeatures() {
+	public List<Feature> getDeadFeatures() {
 		Node root = NodeCreator.createNodes(this);
-		List<Literal> set = new ArrayList<Literal>();
+		List<Feature> set = new ArrayList<Feature>();
 		for (Literal e : new SatSolver(root, 1000).knownValues())
 			if (!e.positive && !e.var.toString().equals("False")
 					&& !e.var.toString().equals("True"))
-				set.add(e);
+				set.add(getFeature(e.var.toString()));
 		return set;
 	}
 

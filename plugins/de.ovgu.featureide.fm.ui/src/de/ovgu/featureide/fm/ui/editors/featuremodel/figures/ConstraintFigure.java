@@ -24,7 +24,6 @@ import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
-import org.prop4j.Literal;
 import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.Constraint;
@@ -113,8 +112,8 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 		if (!constraint.getDeadFeatures(constraint.getFeatureModel()).isEmpty()){
 			setBackgroundColor(ERROR_BACKGROUND);
 			String toolTip = DEAD_FEATURE;
-			for (Literal dead : constraint.getDeadFeatures(constraint.getFeatureModel()))
-				toolTip += "\n " + dead.var.toString();
+			for (Feature dead : constraint.getDeadFeatures(constraint.getFeatureModel()))
+				toolTip += "\n " + dead.toString();
 			setToolTip(new Label(toolTip));	
 			return;
 		}

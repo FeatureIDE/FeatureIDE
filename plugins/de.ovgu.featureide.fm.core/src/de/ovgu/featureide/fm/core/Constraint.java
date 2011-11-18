@@ -61,9 +61,8 @@ public class Constraint implements PropertyConstants {
 		return featureModel;
 	}
 	
-	// TODO Thomas: rewrite to List<Feature>
-	public List<Literal> getDeadFeatures(FeatureModel model) {
-		List<Literal> deadFeaturesBefore = null;
+	public List<Feature> getDeadFeatures(FeatureModel model) {
+		List<Feature> deadFeaturesBefore = null;
 		FeatureModel clonedModel = model.clone();
 		
 		Node propNode = this.getNode();
@@ -77,9 +76,9 @@ public class Constraint implements PropertyConstants {
 			clonedModel.handleModelDataChanged();
 		}
 
-		List<Literal> deadFeaturesAfter = new ArrayList<Literal>();
+		List<Feature> deadFeaturesAfter = new ArrayList<Feature>();
 
-		for (Literal l : clonedModel.getDeadFeatures()) {
+		for (Feature l : clonedModel.getDeadFeatures()) {
 			if (!deadFeaturesBefore.contains(l)) {
 				deadFeaturesAfter.add(l);
 

@@ -65,7 +65,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.PlatformUI;
-import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.NodeReader;
 import org.prop4j.NodeWriter;
@@ -654,8 +653,8 @@ public class ConstraintDialog implements GUIDefaults {
 	 * @return List of all dead Features, empty if no feature is caused to be
 	 *         dead
 	 */
-	public List<Literal> getDeadFeatures(String input, FeatureModel model) {
-		List<Literal> deadFeaturesBefore = null;
+	public List<Feature> getDeadFeatures(String input, FeatureModel model) {
+		List<Feature> deadFeaturesBefore = null;
 		FeatureModel clonedModel = model.clone();
 
 		NodeReader nodeReader = new NodeReader();
@@ -669,18 +668,21 @@ public class ConstraintDialog implements GUIDefaults {
 				clonedModel.removePropositionalNode(constraint);
 			}
 			deadFeaturesBefore = clonedModel.getDeadFeatures();
+			System.out.println("before: "+deadFeaturesBefore);
 			clonedModel.addPropositionalNode(propNode);
 			clonedModel.handleModelDataChanged();
 		}
 
-		List<Literal> deadFeaturesAfter = new ArrayList<Literal>();
-
-		for (Literal l : clonedModel.getDeadFeatures()) {
+		List<Feature> deadFeaturesAfter = new ArrayList<Feature>();
+		System.out.println("after: "+deadFeaturesAfter);
+		for (Feature l : clonedModel.getDeadFeatures()) {
+			System.out.println("for "+l);
 			if (!deadFeaturesBefore.contains(l)) {
 				deadFeaturesAfter.add(l);
 
 			}
 		}
+		System.out.println("returning "+deadFeaturesAfter);
 		return deadFeaturesAfter;
 	}
 	
@@ -751,7 +753,7 @@ public class ConstraintDialog implements GUIDefaults {
 			FMUIPlugin.getDefault().logError(e);
 		}
 		
-		List<Literal> deadFeatures = getDeadFeatures(con, featureModel);
+		List<Feature> deadFeatures = getDeadFeatures(con, featureModel);
 		if (!deadFeatures.isEmpty()) {
 			printHeaderWarning(getDeadFeatureString(deadFeatures));
 			return false;
@@ -804,14 +806,15 @@ public class ConstraintDialog implements GUIDefaults {
 	 * @param deadFeatures
 	 *            List of dead Features
 	 * */
-	private String getDeadFeatureString(List<Literal> deadFeatures) {
+	private String getDeadFeatureString(List<Feature> deadFeatures) {
 		StringBuffer featureString = new StringBuffer();
 		featureString
 				.append("Constraint causes the following features to be dead: ");
 		int count = 0;
 		int featureCount = 0;
 		boolean isNewLine = false;
-		for (Literal l : deadFeatures) {
+		System.out.println("deadFeatures "+deadFeatures);
+		for (Feature l : deadFeatures) {
 			count = count + l.toString().length() + 2;
 
 			if (isNewLine == false && count > 35) {
@@ -819,7 +822,7 @@ public class ConstraintDialog implements GUIDefaults {
 				isNewLine = true;
 			}
 			if (count < 90) {
-				featureString.append(l.toString().substring(1));
+				featureString.append(l);
 				if (featureCount < deadFeatures.size() - 1)
 					featureString.append(", ");
 				featureCount++;
