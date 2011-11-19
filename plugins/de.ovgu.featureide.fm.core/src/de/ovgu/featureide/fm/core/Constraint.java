@@ -124,18 +124,21 @@ public class Constraint implements PropertyConstants {
 	}
 	
 	// TODO Thomas: this method looks really weird, please revise
-	public void setFalseOptionalFeatures(){
+	public boolean setFalseOptionalFeatures(){
 		falseOptionalFeatures.clear();
-		
+		boolean found=false;
 		for (Feature feature : containedFeatureList){
 			if (feature != null && feature.getFeatureStatus() == FeatureStatus.FALSE_OPTIONAL){
 				FeatureModel clonedModel = featureModel.clone();
 				clonedModel.removePropositionalNode(this);
 				if (clonedModel.getFeature(feature.getName())
-						.getFeatureStatus() != FeatureStatus.FALSE_OPTIONAL && !falseOptionalFeatures.contains(feature)) 
-							falseOptionalFeatures.add(feature);
+						.getFeatureStatus() != FeatureStatus.FALSE_OPTIONAL && !falseOptionalFeatures.contains(feature)) {
+					found=true;		
+					falseOptionalFeatures.add(feature);
+				}
 			}
 		}
+		return found;
 	}
 	
 	public List<Feature> getFalseOptional(){

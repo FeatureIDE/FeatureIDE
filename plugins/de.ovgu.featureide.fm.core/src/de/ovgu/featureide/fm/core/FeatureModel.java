@@ -297,7 +297,7 @@ public class FeatureModel implements PropertyConstants {
 	}
 
 	public Feature getFeature(String name) {
-	
+
 		if (featureTable.isEmpty()) {
 			// create the root feature (it is the only one without a reference)
 			root = new Feature(this, name);
@@ -464,15 +464,17 @@ public class FeatureModel implements PropertyConstants {
 	public boolean valid() {
 		return valid;
 	}
-	HashMap<Object,Object> oldAttributes;
+
 	public HashMap<Object, Object> analyzeFeatureModel() {
-		if(oldAttributes ==null){
-			oldAttributes = new HashMap<Object,Object>();
-		}
+
+		HashMap<Object, Object> oldAttributes = new HashMap<Object, Object>();
+
+		HashMap<Object, Object> changedAttributes = new HashMap<Object, Object>();
 		
-		HashMap<Object,Object> changedAttributes = new HashMap<Object,Object>(); ;
 		// update features
 		for (Feature bone : getFeatures()) {
+			oldAttributes.put(bone, bone.getFeatureStatus());
+			if(bone.getFeatureStatus()!=FeatureStatus.NORMAL)changedAttributes.put(bone,FeatureStatus.FALSE_OPTIONAL);
 			bone.setFeatureStatus(FeatureStatus.NORMAL, false);
 			bone.setRelevantConstraints();
 		}
@@ -486,12 +488,12 @@ public class FeatureModel implements PropertyConstants {
 
 		try {
 			for (Feature deadFeature : getDeadFeatures()) {
-				if (deadFeature != null){
-					if(oldAttributes.get(deadFeature)!=FeatureStatus.DEAD){
-						changedAttributes.put(deadFeature,FeatureStatus.DEAD);
+				if (deadFeature != null) {
+					if (oldAttributes.get(deadFeature) != FeatureStatus.DEAD) {
+						changedAttributes.put(deadFeature, FeatureStatus.DEAD);
 					}
 					deadFeature.setFeatureStatus(FeatureStatus.DEAD, false);
-					
+
 				}
 			}
 		} catch (Exception e) {
@@ -510,12 +512,14 @@ public class FeatureModel implements PropertyConstants {
 									bone.getName())), 1000);
 					try {
 						if (!bone.isMandatory() && !bone.isRoot()
-								&& !satsolver.isSatisfiable()){
-							if(oldAttributes.get(bone)!=FeatureStatus.FALSE_OPTIONAL){
-								changedAttributes.put(bone,FeatureStatus.FALSE_OPTIONAL);
+								&& !satsolver.isSatisfiable()) {
+							if (oldAttributes.get(bone) != FeatureStatus.FALSE_OPTIONAL) {
+								changedAttributes.put(bone,
+										FeatureStatus.FALSE_OPTIONAL);
 							}
 							bone.setFeatureStatus(FeatureStatus.FALSE_OPTIONAL,
-									false);}
+									false);
+						}
 					} catch (TimeoutException e) {
 						FMCorePlugin.getDefault().logError(e);
 					}
@@ -528,8 +532,11 @@ public class FeatureModel implements PropertyConstants {
 		// update constraints
 		try {
 			for (Constraint constraint : getConstraints()) {
+				oldAttributes.put(constraint, constraint.getConstraintAttribute());
 				constraint.setContainedFeatures(constraint.getNode());
-				constraint.setFalseOptionalFeatures();
+				//if the constraint leads to false optionals it is added to changedAttributes in order to refresh graphics later
+				if(constraint.setFalseOptionalFeatures())
+				changedAttributes.put(constraint,ConstraintAttribute.UNSATISFIABLE);
 				constraint.setConstraintAttribute(ConstraintAttribute.NORMAL,
 						false);
 
@@ -537,9 +544,10 @@ public class FeatureModel implements PropertyConstants {
 				SatSolver satsolverTAU = new SatSolver(new Not(constraint
 						.getNode().clone()), 1000);
 				try {
-					if (!satsolverTAU.isSatisfiable()){
-						if(oldAttributes.get(constraint)!=ConstraintAttribute.TAUTOLOGY){
-							changedAttributes.put(constraint,ConstraintAttribute.TAUTOLOGY);
+					if (!satsolverTAU.isSatisfiable()) {
+						if (oldAttributes.get(constraint) != ConstraintAttribute.TAUTOLOGY) {
+							changedAttributes.put(constraint,
+									ConstraintAttribute.TAUTOLOGY);
 						}
 						constraint.setConstraintAttribute(
 								ConstraintAttribute.TAUTOLOGY, false);
@@ -555,10 +563,11 @@ public class FeatureModel implements PropertyConstants {
 					ModelComparator comparator = new ModelComparator(20000);
 					Comparison comparison = comparator
 							.compare(this, dirtyModel);
-					if (comparison == Comparison.REFACTORING){
-						if(oldAttributes.get(constraint)!=ConstraintAttribute.REDUNDANT){
-							changedAttributes.put(constraint,ConstraintAttribute.REDUNDANT);
-							
+					if (comparison == Comparison.REFACTORING) {
+						if (oldAttributes.get(constraint) != ConstraintAttribute.REDUNDANT) {
+							changedAttributes.put(constraint,
+									ConstraintAttribute.REDUNDANT);
+
 						}
 						constraint.setConstraintAttribute(
 								ConstraintAttribute.REDUNDANT, false);
@@ -570,13 +579,15 @@ public class FeatureModel implements PropertyConstants {
 					FeatureModel clonedModel = this.clone();
 					clonedModel.removePropositionalNode(constraint);
 					try {
-						if (clonedModel.isValid()){
-							if(oldAttributes.get(constraint)!=ConstraintAttribute.VOID_MODEL){
-								changedAttributes.put(constraint,ConstraintAttribute.VOID_MODEL);
-										}
+						if (clonedModel.isValid()) {
+							if (oldAttributes.get(constraint) != ConstraintAttribute.VOID_MODEL) {
+								changedAttributes.put(constraint,
+										ConstraintAttribute.VOID_MODEL);
+							}
 							constraint.setConstraintAttribute(
 									ConstraintAttribute.VOID_MODEL, false);
-					}} catch (TimeoutException e) {
+						}
+					} catch (TimeoutException e) {
 						FMCorePlugin.getDefault().logError(e);
 					}
 
@@ -584,14 +595,16 @@ public class FeatureModel implements PropertyConstants {
 					SatSolver satsolverUS = new SatSolver(constraint.getNode()
 							.clone(), 1000);
 					try {
-						if (!satsolverUS.isSatisfiable()){
-							if(oldAttributes.get(constraint)!=ConstraintAttribute.UNSATISFIABLE){
-								changedAttributes.put(constraint,ConstraintAttribute.UNSATISFIABLE);
-								
+						if (!satsolverUS.isSatisfiable()) {
+							if (oldAttributes.get(constraint) != ConstraintAttribute.UNSATISFIABLE) {
+								changedAttributes.put(constraint,
+										ConstraintAttribute.UNSATISFIABLE);
+
 							}
 							constraint.setConstraintAttribute(
 									ConstraintAttribute.UNSATISFIABLE, false);
-					} }catch (TimeoutException e) {
+						}
+					} catch (TimeoutException e) {
 						FMCorePlugin.getDefault().logError(e);
 					}
 				}
@@ -601,10 +614,10 @@ public class FeatureModel implements PropertyConstants {
 			// it does not seem to have any negative effect but should be
 			// avoided
 		}
-		oldAttributes=changedAttributes;
-		//put root always so it will be refreshed (void/non-void)
+
+		// put root always so it will be refreshed (void/non-void)
 		changedAttributes.put(root, ConstraintAttribute.VOID_MODEL);
-		
+
 		return changedAttributes;
 	}
 
@@ -967,7 +980,7 @@ public class FeatureModel implements PropertyConstants {
 				number++;
 		return number;
 	}
-	
+
 	public int countHiddenFeatures() {
 		int number = 0;
 		for (Feature feature : getFeatures()) {
