@@ -223,7 +223,7 @@ public class ViewContentProvider implements IStructuredContentProvider,
 			TreeObject parent = (TreeObject)statistics.getChildren()[i];
 			int i = 0;
 			try {
-				if (parent.getChildren()[i++] instanceof SelectableFeature) {
+				if (parent.getChildren()[i] instanceof SelectableFeature) {
 					((SelectableFeature) parent.getChildren()[i]).setName(MODEL_VOID
 							+ model.isValid());
 				} else {
@@ -231,7 +231,7 @@ public class ViewContentProvider implements IStructuredContentProvider,
 							+ model.isValid());
 				}
 			} catch (TimeoutException e) {
-				if (parent.getChildren()[i++] instanceof SelectableFeature) {
+				if (parent.getChildren()[i] instanceof SelectableFeature) {
 					((SelectableFeature) parent.getChildren()[i]).setName(MODEL_TIMEOUT);
 				} else {
 					((TreeObject)parent.getChildren()[i]).setName(MODEL_TIMEOUT);
@@ -239,14 +239,14 @@ public class ViewContentProvider implements IStructuredContentProvider,
 			} catch (ConcurrentModificationException e) {
 				
 			}
-			((TreeObject)parent.getChildren()[i++]).setName(NUMBER_FEATURES + features);
-			((TreeObject)parent.getChildren()[i++]).setName(NUMBER_CONCRETE + concrete);
-			((TreeObject)parent.getChildren()[i++]).setName(NUMBER_ABSTRACT + (features - concrete));
-			((TreeObject)parent.getChildren()[i++]).setName(NUMBER_PRIMITIVE + terminal);
-			((TreeObject)parent.getChildren()[i++]).setName(NUMBER_COMPOUND + (features - terminal));
-			((TreeObject)parent.getChildren()[i++]).setName(NUMBER_HIDDEN + hidden);
-			((TreeObject)parent.getChildren()[i++]).set(calculateNumberOfVariants(model, true));
-			((TreeObject)parent.getChildren()[i++]).set(calculateNumberOfVariants(model, false));
+			((TreeObject)parent.getChildren()[++i]).setName(NUMBER_FEATURES + features);
+			((TreeObject)parent.getChildren()[++i]).setName(NUMBER_CONCRETE + concrete);
+			((TreeObject)parent.getChildren()[++i]).setName(NUMBER_ABSTRACT + (features - concrete));
+			((TreeObject)parent.getChildren()[++i]).setName(NUMBER_PRIMITIVE + terminal);
+			((TreeObject)parent.getChildren()[++i]).setName(NUMBER_COMPOUND + (features - terminal));
+			((TreeObject)parent.getChildren()[++i]).setName(NUMBER_HIDDEN + hidden);
+			((TreeObject)parent.getChildren()[++i]).set(calculateNumberOfVariants(model, true));
+			((TreeObject)parent.getChildren()[++i]).set(calculateNumberOfVariants(model, false));
 		}
 		i++;
 	}
