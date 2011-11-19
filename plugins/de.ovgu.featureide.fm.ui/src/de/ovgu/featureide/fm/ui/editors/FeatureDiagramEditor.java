@@ -22,7 +22,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.commands.operations.ObjectUndoContext;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -389,11 +388,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		// waiting for job to be actually canceled
 		try {
 			if (analyzingJob != null) {
-				long tb = System.nanoTime();
+
 				analyzingJob.join();
-				long ta = System.nanoTime();
-				System.out.println(("join " + TimeUnit.MILLISECONDS.convert(ta
-						- tb, TimeUnit.NANOSECONDS)));
 
 			}
 		} catch (InterruptedException e) {
@@ -403,21 +399,15 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
-				long tb = System.nanoTime();
 
 				final HashMap<Object, Object> changedAttributes = getFeatureModel()
 						.analyzeFeatureModel();
-				long ta = System.nanoTime();
-				System.out.println("analyze "
-						+ TimeUnit.MILLISECONDS.convert(ta - tb,
-								TimeUnit.NANOSECONDS));
 
 				UIJob refreshGraphics = new UIJob(
 						"Updating feature model attributes") {
 
 					@Override
 					public IStatus runInUIThread(IProgressMonitor monitor) {
-						long tb = System.nanoTime();
 
 						for (Object f : changedAttributes.keySet()) {
 							if (f instanceof Feature) {
@@ -430,10 +420,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 							}
 						}
 
-						long ta = System.nanoTime();
-						System.out
-								.println(("feature attributes " + TimeUnit.MILLISECONDS
-										.convert(ta - tb, TimeUnit.NANOSECONDS)));
 						return Status.OK_STATUS;
 					}
 
