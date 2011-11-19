@@ -239,6 +239,7 @@ public class ViewContentProvider implements IStructuredContentProvider,
 			} catch (ConcurrentModificationException e) {
 				
 			}
+			try{
 			((TreeObject)parent.getChildren()[++i]).setName(NUMBER_FEATURES + features);
 			((TreeObject)parent.getChildren()[++i]).setName(NUMBER_CONCRETE + concrete);
 			((TreeObject)parent.getChildren()[++i]).setName(NUMBER_ABSTRACT + (features - concrete));
@@ -247,6 +248,10 @@ public class ViewContentProvider implements IStructuredContentProvider,
 			((TreeObject)parent.getChildren()[++i]).setName(NUMBER_HIDDEN + hidden);
 			((TreeObject)parent.getChildren()[++i]).set(calculateNumberOfVariants(model, true));
 			((TreeObject)parent.getChildren()[++i]).set(calculateNumberOfVariants(model, false));
+		}catch(ArrayIndexOutOfBoundsException e){
+			//TODO: @Jens why do we even get this? array size was 2 in one case!
+			
+		}
 		}
 		i++;
 	}

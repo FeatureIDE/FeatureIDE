@@ -20,7 +20,9 @@ package de.ovgu.featureide.fm.ui.editors;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.commands.operations.ObjectUndoContext;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -384,43 +386,62 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	public void refresh() {
 		if (getFeatureModel() == null || getFeatureModel().getRoot() == null)
 			return;
-		//waiting for job to be actually canceled
+		// waiting for job to be actually canceled
 		try {
-		    if (analyzingJob != null) {
-		        analyzingJob.join();
-		    }
+			if (analyzingJob != null) {
+				long tb = System.nanoTime();
+				analyzingJob.join();
+				long ta = System.nanoTime();
+				System.out.println(("join " + TimeUnit.MILLISECONDS.convert(ta
+						- tb, TimeUnit.NANOSECONDS)));
+
+			}
 		} catch (InterruptedException e) {
-		    FMUIPlugin.getDefault().logError(e);
+			FMUIPlugin.getDefault().logError(e);
 		}
 		analyzingJob = new Job("Analyzing feature model") {
 
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
-				
-				getFeatureModel().analyzeFeatureModel();
+				long tb = System.nanoTime();
+
+				final HashMap<Object, Object> changedAttributes = getFeatureModel()
+						.analyzeFeatureModel();
+				long ta = System.nanoTime();
+				System.out.println("analyze "
+						+ TimeUnit.MILLISECONDS.convert(ta - tb,
+								TimeUnit.NANOSECONDS));
 
 				UIJob refreshGraphics = new UIJob(
 						"Updating feature model attributes") {
 
 					@Override
 					public IStatus runInUIThread(IProgressMonitor monitor) {
-						for (Feature f : getFeatureModel().getFeatures()) {
-							f.fire(new PropertyChangeEvent(this,
-									ATTRIBUTE_CHANGED, false, true));
+						long tb = System.nanoTime();
+
+						for (Object f : changedAttributes.keySet()) {
+							if (f instanceof Feature) {
+
+								((Feature) f).fire(new PropertyChangeEvent(
+										this, ATTRIBUTE_CHANGED, false, true));
+							} else if (f instanceof Constraint) {
+								((Constraint) f).fire(new PropertyChangeEvent(
+										this, ATTRIBUTE_CHANGED, false, true));
+							}
 						}
-						for (Constraint f : getFeatureModel().getConstraints()) {
-							f.fire(new PropertyChangeEvent(this,
-									ATTRIBUTE_CHANGED, false, true));
-						}
+
+						long ta = System.nanoTime();
+						System.out
+								.println(("feature attributes " + TimeUnit.MILLISECONDS
+										.convert(ta - tb, TimeUnit.NANOSECONDS)));
 						return Status.OK_STATUS;
 					}
 
 				};
-				refreshGraphics.setPriority(INTERACTIVE);
+				refreshGraphics.setPriority(Job.DECORATE);
 				refreshGraphics.schedule();
 				return Status.OK_STATUS;
-
-			}
+			};
 
 		};
 		analyzingJob.setPriority(Job.DECORATE);
