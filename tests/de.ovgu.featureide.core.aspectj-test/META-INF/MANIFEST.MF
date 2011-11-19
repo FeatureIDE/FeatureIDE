@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: AspectJ Test Fragment
-Bundle-SymbolicName: de.ovgu.featureide.core.aspectj;singleton:=true
+Bundle-SymbolicName: de.ovgu.featureide.core.aspectj_test;singleton:=true
 Bundle-Version: 2.2.4.qualifier
 Fragment-Host: de.ovgu.featureide.core.aspectj
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: University of Magdeburg
-Require-Bundle: org.junit4;bundle-version="4.8.1"
+Require-Bundle: org.junit4;bundle-version="4.3.1"
