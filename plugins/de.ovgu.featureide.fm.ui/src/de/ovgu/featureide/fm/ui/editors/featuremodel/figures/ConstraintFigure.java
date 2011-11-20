@@ -75,18 +75,21 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 		if (FeatureUIHelper.getLocation(constraint) != null)
 			setLocation(FeatureUIHelper.getLocation(constraint));
 		
-		setConstraintProperties();
+		setConstraintProperties(true);
 	}
 	
-	public void setConstraintProperties(){
+	public void setConstraintProperties(boolean calc){
 		setBorder(constraint.isFeatureSelected() ? CONSTRAINT_SELECTED_BORDER : CONSTRAINT_BORDER);
 		setBackgroundColor(CONSTRAINT_BACKGROUND);
 		setToolTip(null);
-		
+
+		if(!calc)return;
 		if (!constraint.getFeatureModel().valid())
 			setConstraintError();
-		else
+		else{
 			setConstraintWarning();
+		}
+
 	}
 	
 	// TODO Thomas: remove this method and adopt results of analysis in constraint attributes instead
@@ -99,15 +102,18 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 			setBackgroundColor(ERROR_BACKGROUND);
 			setToolTip(new Label(UNSATISFIABLE));
 		}
+		
 	}
 	
 	private void setConstraintWarning(){	
+		
 		if (constraint.getConstraintAttribute() == ConstraintAttribute.TAUTOLOGY){
 			setBackgroundColor(WARNING_BACKGROUND);
 			setToolTip(new Label(TAUTOLOGY));	
 			return;
 		}
 		
+
 		// TODO Thomas: this long calculation should be done in analyzeFeatureModel()
 		if (!constraint.getDeadFeatures(constraint.getFeatureModel()).isEmpty()){
 			setBackgroundColor(ERROR_BACKGROUND);
@@ -118,6 +124,7 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 			return;
 		}
 		
+
 		// TODO Thomas: this long calculation should be done in analyzeFeatureModel()
 		if (!constraint.getFalseOptional().isEmpty()){
 			setBackgroundColor(WARNING_BACKGROUND);
@@ -128,11 +135,13 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 			return;
 		}
 		
+
 		if (constraint.getConstraintAttribute() == ConstraintAttribute.REDUNDANT){
 			setBackgroundColor(WARNING_BACKGROUND);
 			setToolTip(new Label(REDUNDANCE));	
 			return;
 		}
+
 	}
 	
 	private String getConstraintText(Constraint constraint) {

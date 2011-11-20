@@ -98,7 +98,7 @@ public class Constraint implements PropertyConstants {
 	
 	public void setFeatureSelected (boolean selected){
 		this.featureSelected = selected;
-		fire(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, false, true));
+		fire(new PropertyChangeEvent(this, CONSTRAINT_SELECTED, false, true));
 	}
 	
 	public boolean isFeatureSelected(){

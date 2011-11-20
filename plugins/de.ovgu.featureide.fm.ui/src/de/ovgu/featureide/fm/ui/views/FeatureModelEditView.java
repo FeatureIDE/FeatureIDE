@@ -248,7 +248,6 @@ public class FeatureModelEditView extends ViewPart {
 		if (job != null && job.getState() == Job.RUNNING)
 			job.cancel();
 		// Waiting for job to be actually canceled
-		// waiting for job to be actually canceled
 		try {
 			if (job != null) {
 				job.join();
@@ -256,6 +255,7 @@ public class FeatureModelEditView extends ViewPart {
 		} catch (InterruptedException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
+			
 		job = new Job("Updating Feature Model Edits") {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {

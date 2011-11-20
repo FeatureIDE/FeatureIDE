@@ -113,7 +113,11 @@ public class ConstraintEditPart extends AbstractGraphicalEditPart implements
 		if (prop.equals(LOCATION_CHANGED)) {
 			getConstraintFigure().setLocation((Point) event.getNewValue());
 		} else if (prop.equals(ATTRIBUTE_CHANGED)) {
-			getConstraintFigure().setConstraintProperties();
+					getConstraintFigure().setConstraintProperties(true);
+				}
+		else if (prop.equals(CONSTRAINT_SELECTED)) {
+				getConstraintFigure().setConstraintProperties(false);
+		
 		}
 	}
 

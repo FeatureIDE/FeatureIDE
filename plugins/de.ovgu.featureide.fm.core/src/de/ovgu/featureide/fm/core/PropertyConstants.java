@@ -52,4 +52,5 @@ public interface PropertyConstants {
 	
 	public final static String ATTRIBUTE_CHANGED = "ATTRIBUTE_CHANGED"; //changed Color Settings
 
+	public final static String CONSTRAINT_SELECTED = "CONSTRAINT_SELECTED";
 }

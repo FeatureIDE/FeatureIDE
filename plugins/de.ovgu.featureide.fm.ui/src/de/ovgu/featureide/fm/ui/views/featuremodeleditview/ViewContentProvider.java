@@ -254,6 +254,7 @@ public class ViewContentProvider implements IStructuredContentProvider,
 		}
 		}
 		i++;
+		
 	}
 
 	private FeatureModel getModel() {
