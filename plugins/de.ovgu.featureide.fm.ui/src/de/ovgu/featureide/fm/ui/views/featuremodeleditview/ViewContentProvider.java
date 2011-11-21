@@ -249,26 +249,25 @@ public class ViewContentProvider implements IStructuredContentProvider,
 	}
 
 	private TreeParent calculateNumberOfVariants(
-			final FeatureModel model,
-			final boolean ignoreAbstractFeatures) {
+			FeatureModel model,
+			boolean ignoreAbstractFeatures) {
 		
-		final String variants = ignoreAbstractFeatures ? "configurations"
+		String variants = ignoreAbstractFeatures ? "configurations"
 				: "program variants";
-		return new TreeParent("Number of " + variants, null, true) {
+		TreeParent p = new TreeParent("Number of " + variants, null, true) {
 			@Override
-			public void initChildren() {
-				removeChildren();
-				final long number = new Configuration(model, false,
-						ignoreAbstractFeatures).number(1000);
-				String s = "";
-				if (number < 0)
-					s += "more than " + (-1 - number);
-				else
-					s += number;
-				s += " " + variants;
-				addChild(s);
-			}
+			public void initChildren() {}
 		};
+		final long number = new Configuration(model, false,
+				ignoreAbstractFeatures).number(1000);
+		String s = "";
+		if (number < 0)
+			s += "more than " + (-1 - number);
+		else
+			s += number;
+		s += " " + variants;
+		p.addChild(s);
+		return p;
 	}
 
 	private void refresh() {
