@@ -52,8 +52,6 @@ import org.prop4j.Or;
 import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.fm.core.editing.Comparison;
-import de.ovgu.featureide.fm.core.editing.ModelComparator;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 /**

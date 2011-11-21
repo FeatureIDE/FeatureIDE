@@ -116,22 +116,21 @@ public class ViewContentProvider implements IStructuredContentProvider,
 		refresh();
 	}
 
-	private int i;
-	private FeatureModel model;
+	private int position;
 	
 	public void calculateContent(FeatureModel oldModel, FeatureModel newModel) {
 		if (oldModel.getRoot() == null || newModel.getRoot() == null)
 			return;
-		i = 0;
+		position = 0;
 		ModelComparator comparator = new ModelComparator(TIMEOUT);
 		if (invisibleRoot.getChildren().length < 1) {
 			invisibleRoot.addChild(new TreeObject(CALCULATING_MESSAGE, DEFAULT_IMAGE));
 		} else {
-			((TreeObject)invisibleRoot.getChildren()[i]).setContents(CALCULATING_MESSAGE, DEFAULT_IMAGE);
+			((TreeObject)invisibleRoot.getChildren()[position]).setContents(CALCULATING_MESSAGE, DEFAULT_IMAGE);
 		}
 		refresh();
 		TreeObject head = calculateHead(oldModel, newModel, comparator);
-		((TreeObject)invisibleRoot.getChildren()[i++]).setContents(head.getName(), head.getImage());
+		((TreeObject)invisibleRoot.getChildren()[position++]).setContents(head.getName(), head.getImage());
 		
 		if (invisibleRoot.getChildren().length < 2) {
 			invisibleRoot.addChild("");
@@ -139,11 +138,12 @@ public class ViewContentProvider implements IStructuredContentProvider,
 			invisibleRoot.addChild(new ExampleParent(false, comparator, 1, null));
 			invisibleRoot.addChild("");
 		} else  {
-			i++;
-			((TreeObject)invisibleRoot.getChildren()[i++]).set(new ExampleParent(true, comparator, 1, null));
-			((TreeObject)invisibleRoot.getChildren()[i++]).set(new ExampleParent(false, comparator, 1, null));
-			i++;
+			position++;
+			((TreeObject)invisibleRoot.getChildren()[position++]).set(new ExampleParent(true, comparator, 1, null));
+			((TreeObject)invisibleRoot.getChildren()[position++]).set(new ExampleParent(false, comparator, 1, null));
+			position++;
 		}
+		// TODO do not calculate statistics if the old feature model does not change
 		addStatistics(invisibleRoot, STATISTICS_BEFORE,
 				oldModel);
 		addStatistics(invisibleRoot, STATISTICS_AFTER,
@@ -158,7 +158,6 @@ public class ViewContentProvider implements IStructuredContentProvider,
 			ModelComparator comparator) {
 		long start = System.nanoTime();
 
-		
 		Comparison comparison = comparator.compare(oldModel, newModel);
 
 		String message = null;
@@ -190,21 +189,20 @@ public class ViewContentProvider implements IStructuredContentProvider,
 		return new TreeObject(message, image);
 	}
 
-	private void addStatistics(TreeParent statistics, String text,
+	private void addStatistics(TreeParent root, String text,
 			final FeatureModel model) {
 		final int features = model.getNumberOfFeatures();
 		final int concrete = model.countConcreteFeatures();
 		final int terminal = model.countTerminalFeatures();
 		final int hidden   = model.countHiddenFeatures();
 		
-		if (statistics.getChildren().length < i ||
-				statistics.getChildren()[i].getChildren().length < 1) {
-			TreeParent parent = new TreeParent(text, null, true) {
+		if (root.getChildren().length < position ||
+				root.getChildren()[position].getChildren().length < 9) {
+			TreeParent statistics = new TreeParent(text, null, true) {
 				@Override
 				public void initChildren() {
 					try {
-						addChild(MODEL_VOID
-								+ model.isValid());
+						addChild(MODEL_VOID + model.isValid());
 					} catch (TimeoutException e) {
 						addChild(MODEL_TIMEOUT);
 					}
@@ -218,59 +216,49 @@ public class ViewContentProvider implements IStructuredContentProvider,
 					addChild(calculateNumberOfVariants(model, false));
 				}
 			};
-			statistics.addChild(parent);
+			root.addChild(statistics);
 		} else {
-			TreeObject parent = (TreeObject)statistics.getChildren()[i];
-			int i = 0;
+			TreeObject statistics = (TreeObject)root.getChildren()[position];
 			try {
-				if (parent.getChildren()[i] instanceof SelectableFeature) {
-					((SelectableFeature) parent.getChildren()[i]).setName(MODEL_VOID
+				if (statistics.getChildren()[0] instanceof SelectableFeature) {
+					((SelectableFeature) statistics.getChildren()[0]).setName(MODEL_VOID
 							+ model.isValid());
 				} else {
-					((TreeObject) parent.getChildren()[i]).setName(MODEL_VOID
+					((TreeObject) statistics.getChildren()[0]).setName(MODEL_VOID
 							+ model.isValid());
 				}
 			} catch (TimeoutException e) {
-				if (parent.getChildren()[i] instanceof SelectableFeature) {
-					((SelectableFeature) parent.getChildren()[i]).setName(MODEL_TIMEOUT);
+				if (statistics.getChildren()[0] instanceof SelectableFeature) {
+					((SelectableFeature) statistics.getChildren()[0]).setName(MODEL_TIMEOUT);
 				} else {
-					((TreeObject)parent.getChildren()[i]).setName(MODEL_TIMEOUT);
+					((TreeObject)statistics.getChildren()[0]).setName(MODEL_TIMEOUT);
 				}
 			} catch (ConcurrentModificationException e) {
 				
 			}
-			try{
-			((TreeObject)parent.getChildren()[++i]).setName(NUMBER_FEATURES + features);
-			((TreeObject)parent.getChildren()[++i]).setName(NUMBER_CONCRETE + concrete);
-			((TreeObject)parent.getChildren()[++i]).setName(NUMBER_ABSTRACT + (features - concrete));
-			((TreeObject)parent.getChildren()[++i]).setName(NUMBER_PRIMITIVE + terminal);
-			((TreeObject)parent.getChildren()[++i]).setName(NUMBER_COMPOUND + (features - terminal));
-			((TreeObject)parent.getChildren()[++i]).setName(NUMBER_HIDDEN + hidden);
-			((TreeObject)parent.getChildren()[++i]).set(calculateNumberOfVariants(model, true));
-			((TreeObject)parent.getChildren()[++i]).set(calculateNumberOfVariants(model, false));
-		}catch(ArrayIndexOutOfBoundsException e){
-			//TODO: @Jens why do we even get this? array size was 2 in one case!
-			
+			((TreeObject)statistics.getChildren()[1]).setName(NUMBER_FEATURES + features);
+			((TreeObject)statistics.getChildren()[2]).setName(NUMBER_CONCRETE + concrete);
+			((TreeObject)statistics.getChildren()[3]).setName(NUMBER_ABSTRACT + (features - concrete));
+			((TreeObject)statistics.getChildren()[4]).setName(NUMBER_PRIMITIVE + terminal);
+			((TreeObject)statistics.getChildren()[5]).setName(NUMBER_COMPOUND + (features - terminal));
+			((TreeObject)statistics.getChildren()[6]).setName(NUMBER_HIDDEN + hidden);
+			((TreeObject)statistics.getChildren()[7]).set(calculateNumberOfVariants(model, true));
+			((TreeObject)statistics.getChildren()[8]).set(calculateNumberOfVariants(model, false));
 		}
-		}
-		i++;
-		
+		position++;
 	}
 
-	private FeatureModel getModel() {
-		return model;
-	}
 	private TreeParent calculateNumberOfVariants(
 			final FeatureModel model,
 			final boolean ignoreAbstractFeatures) {
-		this.model = model;
+		
 		final String variants = ignoreAbstractFeatures ? "configurations"
 				: "program variants";
 		return new TreeParent("Number of " + variants, null, true) {
 			@Override
 			public void initChildren() {
 				removeChildren();
-				long number = new Configuration(getModel(), false,
+				final long number = new Configuration(model, false,
 						ignoreAbstractFeatures).number(1000);
 				String s = "";
 				if (number < 0)

@@ -245,9 +245,6 @@ public class FeatureModelEditView extends ViewPart {
 	}
 
 	private void refresh() {
-		if (job != null && job.getState() == Job.RUNNING)
-			job.cancel();
-		// Waiting for job to be actually canceled
 		try {
 			if (job != null) {
 				job.join();
