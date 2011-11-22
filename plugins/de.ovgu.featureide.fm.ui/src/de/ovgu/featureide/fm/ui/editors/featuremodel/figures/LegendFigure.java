@@ -301,16 +301,19 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	 */
 	private void createGroupTypeSymbol(int row, int type) {
 		boolean fill = true;
-		boolean decoration = false;
+		boolean decoration = true;
 		String toolTipText="";
 		if (type == AND) {
 			
 			fill = false;
 		} else if (type == OR) {
 			toolTipText = OR_TOOLTIP;
+			fill = true;
 			decoration = true;
 		} else {
 			toolTipText=ALTERNATIVE_TOOLTIP;
+			fill = false;
+			decoration = true;
 		}
 		// otherwise type must be ALTERNATIVE and decoration = false;
 
