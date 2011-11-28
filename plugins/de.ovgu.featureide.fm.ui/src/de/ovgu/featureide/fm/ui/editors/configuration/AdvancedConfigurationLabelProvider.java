@@ -76,11 +76,11 @@ public class AdvancedConfigurationLabelProvider extends LabelProvider implements
 
 	@Override
 	public void dispose() {
-		IMAGE_UNDEFINED.dispose();
-		IMAGE_SELECTED.dispose();
-		IMAGE_DESELECTED.dispose();
-		IMAGE_ASELECTED.dispose();
-		IMAGE_ADESELECTED.dispose();
+//		IMAGE_UNDEFINED.dispose();
+//		IMAGE_SELECTED.dispose();
+//		IMAGE_DESELECTED.dispose();
+//		IMAGE_ASELECTED.dispose();
+//		IMAGE_ADESELECTED.dispose();
 		super.dispose();
 	}
 

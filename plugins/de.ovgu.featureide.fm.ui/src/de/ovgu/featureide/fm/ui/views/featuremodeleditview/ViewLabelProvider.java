@@ -53,8 +53,8 @@ public class ViewLabelProvider extends LabelProvider implements GUIDefaults {
 	
 	@Override
 	public void dispose() {
-		IMAGE_ASELECTED.dispose();
-		IMAGE_ADESELECTED.dispose();
+//		IMAGE_ASELECTED.dispose();
+//		IMAGE_ADESELECTED.dispose();
 		super.dispose();
 	}
 
