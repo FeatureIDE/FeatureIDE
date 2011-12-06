@@ -1059,7 +1059,9 @@ public class FeatureModel implements PropertyConstants {
 	}
 
 	public List<Feature> getDeadFeatures() {
-		Node root = NodeCreator.createNodes(this);
+		//cloning the FM, because otherwise the resulting formula is wrong if renamed features are involved
+		// TODO: Check other calls of createNodes 
+		Node root = NodeCreator.createNodes(this.clone());
 		List<Feature> set = new ArrayList<Feature>();
 		for (Literal e : new SatSolver(root, 1000).knownValues())
 			if (!e.positive && !e.var.toString().equals("False")
