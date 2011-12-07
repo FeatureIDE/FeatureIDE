@@ -77,6 +77,7 @@ public class FeatureCreateCompoundOperation extends AbstractOperation {
 	 * org.eclipse.core.commands.operations.AbstractOperation#execute(org.eclipse
 	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
 	 */
+	//TODO: remove duplicate code (execute/redo)
 	@Override
 	public IStatus execute(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
@@ -107,6 +108,8 @@ public class FeatureCreateCompoundOperation extends AbstractOperation {
 			newCompound.addChild(featureModel.getRoot());
 			featureModel.addFeature(newCompound);
 			featureModel.setRoot(newCompound);
+			//TODO: check whether this expensive call can be replaced by something more efficient
+			featureModel.redrawDiagram();
 		}
 		
 		FeatureDiagramLayoutHelper.initializeCompoundFeaturePosition(
@@ -165,10 +168,11 @@ public class FeatureCreateCompoundOperation extends AbstractOperation {
 
 			featureModel.addFeature(newCompound);
 		} else {
-
 			newCompound.addChild(featureModel.getRoot());
 			featureModel.addFeature(newCompound);
 			featureModel.setRoot(newCompound);
+			//TODO: check whether this expensive call can be replaced by something more efficient			
+			featureModel.redrawDiagram();
 		}
 		
 		FeatureDiagramLayoutHelper.initializeCompoundFeaturePosition(
