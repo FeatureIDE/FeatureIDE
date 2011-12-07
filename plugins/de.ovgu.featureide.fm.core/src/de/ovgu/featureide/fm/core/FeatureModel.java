@@ -804,7 +804,7 @@ public class FeatureModel implements PropertyConstants {
 	}
 
 	public boolean isValid() throws TimeoutException {
-		Node root = NodeCreator.createNodes(this);
+		Node root = NodeCreator.createNodes(this.clone());
 		return new SatSolver(root, 1000).isSatisfiable();
 	}
 
