@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -73,7 +74,7 @@ public abstract class AbstractFeatureModelReader implements IFeatureModelReader 
 
 	public void readFromString(String text) throws UnsupportedModelException {
 		warnings.clear();
-        InputStream inputStream = new ByteArrayInputStream(text.getBytes());
+        InputStream inputStream = new ByteArrayInputStream(text.getBytes(Charset.availableCharsets().get("UTF-8")));
         parseInputStream(inputStream);
  	}
 	

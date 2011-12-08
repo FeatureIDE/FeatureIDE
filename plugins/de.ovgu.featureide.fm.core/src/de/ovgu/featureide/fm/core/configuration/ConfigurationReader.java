@@ -24,6 +24,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -59,7 +60,7 @@ public class ConfigurationReader {
 	public boolean readFromString(String text) {
 		InputStream inputStream = null;
 		try {
-			inputStream = new ByteArrayInputStream(text.getBytes());
+			inputStream = new ByteArrayInputStream(text.getBytes(Charset.availableCharsets().get("UTF-8")));
 			return readFromInputStream(inputStream);
 		} catch (IOException e) {
 			FMCorePlugin.getDefault().logError(e);

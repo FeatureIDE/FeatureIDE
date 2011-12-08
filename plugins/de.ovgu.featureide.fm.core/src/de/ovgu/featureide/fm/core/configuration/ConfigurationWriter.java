@@ -20,6 +20,7 @@ package de.ovgu.featureide.fm.core.configuration;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -42,7 +43,7 @@ public class ConfigurationWriter {
 	}
 
 	public void saveToFile(IFile file) throws CoreException {
-		InputStream source = new ByteArrayInputStream(writeIntoString(file).getBytes()); 
+		InputStream source = new ByteArrayInputStream(writeIntoString(file).getBytes(Charset.availableCharsets().get("UTF-8"))); 
 		
 		if (file.exists()) {
 			file.setContents(source, false, true, null);
