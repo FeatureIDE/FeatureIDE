@@ -26,7 +26,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.prop4j.And;
 import org.prop4j.Implies;
@@ -55,6 +57,10 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	static final int SAT_CONTRADICTION = 1;
 	/** The expression is a tautology. */
 	static final int SAT_TAUTOLOGY = 2;
+	protected static final String MESSAGE_DEAD_CODE = ": This expression is dead code because it is always false.";
+	protected static final String MESSAGE_ALWAYS_TRUE = ": This expression is always true.";
+	protected static final String MESSAGE_ABSTRACT = " is defined as abstract in the feature model. Only concrete features should be referenced in preprocessor directives.";
+	protected static final String MESSAGE_NOT_DEFINED = " is not defined in the feature model and thus always assumed to be false";
 
 	/** Feature model node generated in {@link #performFullBuild(IFile)} and used for expression checking. */
 	protected Node featureModel;
@@ -83,6 +89,16 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	/** Stack for count of "if" and "else" instructions for each level. Have to be initialized in subclass. */
 	protected Stack<Integer> ifelseCountStack;
 	
+	private static final String BUILDER_MARKER = CorePlugin.PLUGIN_ID
+			+ ".builderProblemMarker";
+	
+	/**
+	 * Sets the name of the plug-in
+	 */
+	public PPComposerExtensionClass(String pluginName) {
+		this.pluginName = pluginName;
+	}
+	
 	/**
 	 * Initializes class fields. Should called at start of {@link #performFullBuild(IFile)}.
 	 * 
@@ -91,17 +107,18 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	 */
 	public boolean prepareFullBuild(IFile config) {
 		assert (featureProject != null) : "Invalid project given";
-
-		final String configPath = config.getRawLocation().toOSString();
-
-		if (configPath == null)
-			return false;
-
-		// read activated features from configuration
-		activatedFeatures = new ArrayList<String>(loadStringsFromFile(config));
-		
-		if (activatedFeatures == null) {
-			return false;
+		if (config != null) {
+			final String configPath = config.getRawLocation().toOSString();
+	
+			if (configPath == null)
+				return false;
+	
+			// read activated features from configuration
+			activatedFeatures = new ArrayList<String>(loadStringsFromFile(config));
+			
+			if (activatedFeatures == null) {
+				return false;
+			}
 		}
 		
 		// get all concrete and abstract features and generate pattern
@@ -170,11 +187,11 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	protected void setMarkersOnContradictionOrTautology(int status, int lineNumber, IFile res) {
 		if (status == SAT_CONTRADICTION) {
 			featureProject.createBuilderMarker(res,
-					pluginName + ": This expression is dead code because it is always false.", lineNumber,
+					pluginName + MESSAGE_DEAD_CODE, lineNumber,
 					IMarker.SEVERITY_WARNING);
 		} else if (status == SAT_TAUTOLOGY) {
 			featureProject.createBuilderMarker(res,
-					pluginName + ": This expression is always true.", lineNumber,
+					pluginName + MESSAGE_ALWAYS_TRUE, lineNumber,
 					IMarker.SEVERITY_WARNING);
 		}
 	}
@@ -248,7 +265,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		if (matcherFeature.matches()) {
 			featureProject.createBuilderMarker(res,
 					pluginName + ": " + name +
-						" is defined as abstract in the feature model. Only concrete features should be referenced in preprocessor directives.",
+						MESSAGE_ABSTRACT,
 					lineNumber,
 					IMarker.SEVERITY_WARNING);
 		} else {
@@ -257,7 +274,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 			if (!matcherConreteFeature.matches()) {
 				featureProject.createBuilderMarker(res,
 						pluginName + ": " + name +
-							" is not defined in the feature model and thus always assumed to be false",
+							MESSAGE_NOT_DEFINED,
 						lineNumber,
 						IMarker.SEVERITY_WARNING);
 			}
@@ -288,5 +305,39 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		}
 		
 		return lines;
+	}
+	
+	/**
+	 * 
+	 */
+	public void deleteAllPreprocessorAnotationMarkers() {
+		try {
+			IFolder sourceFolder = featureProject.getComposer().hasFeatureFolder() ? featureProject.getSourceFolder() :
+				featureProject.getBuildFolder();
+			IMarker[] markers = sourceFolder.findMarkers(BUILDER_MARKER, false, IResource.DEPTH_INFINITE);
+			for (IMarker marker : markers) {
+				if (isPreprocessorAnotationMarker(marker)) {
+					marker.delete();
+				}
+			}
+		} catch (CoreException e) {
+			CorePlugin.getDefault().logError(e);
+		}
+	}
+
+	/**
+	 * @param marker 
+	 * @return
+	 * @throws CoreException 
+	 */
+	private boolean isPreprocessorAnotationMarker(IMarker marker) throws CoreException {
+		String message = marker.getAttribute(IMarker.MESSAGE, "");
+		if (message.contains(MESSAGE_ABSTRACT) ||
+			message.contains(MESSAGE_ALWAYS_TRUE) ||
+			message.contains(MESSAGE_DEAD_CODE) ||
+			message.contains(MESSAGE_NOT_DEFINED)) {
+				return true;
+		}
+		return false;
 	}
 }

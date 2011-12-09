@@ -65,9 +65,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	static final Pattern replaceCommandPattern = Pattern.compile("//#(.+?)\\s");
 	
 	public AntennaPreprocessor() {
-		super();
-		
-		pluginName = "Antenna";
+		super("Antenna");
 	}
 
 	@Override
@@ -111,7 +109,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 			preprocessor.addDefines(featureList.toString());
 
 			// preprocess for all files in source folder
-			preprocessSourceFiles(featureProject.getBuildFolder());
+			preprocessSourceFiles(featureProject.getBuildFolder(), true);
 		} catch (Exception e) {
 			AntennaCorePlugin.getDefault().logError(e);
 		}
@@ -131,6 +129,24 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	public void postCompile(IResourceDelta delta, IFile buildFile) {
 	}
 
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.ComposerExtensionClass#postModelChanged()
+	 */
+	@Override
+	public void postModelChanged() {
+		try {
+			deleteAllPreprocessorAnotationMarkers();
+			prepareFullBuild(null);
+			preprocessSourceFiles(featureProject.getBuildFolder(), false);
+		} catch (FileNotFoundException e) {
+			AntennaCorePlugin.getDefault().logError(e);
+		} catch (CoreException e) {
+			AntennaCorePlugin.getDefault().logError(e);
+		} catch (IOException e) {
+			AntennaCorePlugin.getDefault().logError(e);
+		}
+	}
+	
 	/**
 	 * preprocess all files in folder
 	 * 
@@ -139,16 +155,18 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	private void preprocessSourceFiles(IFolder sourceFolder) throws CoreException,
+	private void preprocessSourceFiles(IFolder sourceFolder, boolean performFullBuild) throws CoreException,
 			FileNotFoundException, IOException {
 		
 		for (final IResource res : sourceFolder.members()) {
 			if (res instanceof IFolder) {
 				// for folders do recursively 
-				preprocessSourceFiles((IFolder) res);
+				preprocessSourceFiles((IFolder) res, performFullBuild);
 			} else if (res instanceof IFile) {
 				// delete all existing builder markers 
-				featureProject.deleteBuilderMarkers(res, 0);
+				if (performFullBuild) {
+					featureProject.deleteBuilderMarkers(res, 0);
+				}
 				
 				// get all lines from file
 				final Vector<String> lines = loadStringsFromFile((IFile) res);
@@ -158,13 +176,15 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 					@Override
 					protected IStatus run(IProgressMonitor monitor) {
 						processLinesOfFile(lines, (IFile) res);
-						
 						return Status.OK_STATUS;
 					}
 				};
 				job.setPriority(Job.SHORT);
 				job.schedule();
 				
+				if (!performFullBuild) {
+					return;
+				}
 
 				boolean changed = false;
 

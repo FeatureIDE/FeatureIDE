@@ -68,17 +68,22 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 	private boolean commentSection;
 	
 	public MungePreprocessor() {
-		super();
-		
-		pluginName = "Munge";
+		super("Munge");
 	}
 	
 	@Override
 	public boolean initialize(IFeatureProject project) {
 		boolean supSuccess =super.initialize(project);
 		mungeModelBuilder = new MungeModelBuilder(project);
-		if(supSuccess==false||mungeModelBuilder==null)return false;
-		else return true;
+		
+		prepareFullBuild(null);
+		annotationChecking();
+		
+		if(supSuccess==false||mungeModelBuilder==null) {
+			return false;
+		} else {
+			return true;
+		}
 	}
 	
 	@Override
@@ -93,10 +98,9 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 	public void performFullBuild(IFile config) {
 		if (!prepareFullBuild(config))
 			return;
-
-		//add source files
 		try {
-			preprocessSourceFiles(featureProject.getSourceFolder(), featureProject.getBuildFolder(), true);
+			preprocessSourceFiles(featureProject.getBuildFolder());
+			annotationChecking();
 		} catch (CoreException e) {
 			MungeCorePlugin.getDefault().logError(e);
 		}
@@ -104,53 +108,68 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 		if (mungeModelBuilder != null)
 			mungeModelBuilder.buildModel();
 	}
+	
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.ComposerExtensionClass#postModelChanged()
+	 */
+	@Override
+	public void postModelChanged() {
+		prepareFullBuild(null);
+		annotationChecking();
+	}
+
+	private void annotationChecking() {
+		deleteAllPreprocessorAnotationMarkers();
+		annotationChecking(featureProject.getSourceFolder());
+	}
+	
+	private void annotationChecking(IFolder folder) {
+		try {
+			for (final IResource res : folder.members()) {
+				if (res instanceof IFolder) {
+					annotationChecking((IFolder)res);
+				} else 
+				if (res instanceof IFile){
+					final Vector<String> lines = loadStringsFromFile((IFile) res);
+					// do checking and some stuff
+					Job job = new Job("preprocessor annotation checking") {
+						@Override
+						protected IStatus run(IProgressMonitor monitor) {
+							processLinesOfFile(lines, (IFile) res);
+							return Status.OK_STATUS;
+						}
+					};
+					job.setPriority(Job.SHORT);
+					job.schedule();
+				}
+			}
+		} catch (CoreException e) {
+			MungeCorePlugin.getDefault().logError(e);
+		}
+	}
 
 	/**
 	 * preprocess all files in folder
 	 * 
 	 * @param sourceFolder folder with files to preprocess
 	 * @param buildFolder folder for preprocessed files
+	 * @param annotationChecking <code>true</code> if preprocessor annotations should be checked
+	 * @param performFullBuild <code>true</code> if the munge should be called
 	 * @throws CoreException
 	 */
-	private void preprocessSourceFiles(IFolder sourceFolder, IFolder buildFolder, boolean annotationChecking) throws CoreException {
+	private void preprocessSourceFiles(IFolder buildFolder) throws CoreException {
+		
 		ArrayList<String> args = new ArrayList<String>();
 		for (String feature : activatedFeatures) {
 			args.add("-D" + feature);
 		}
 		
-		createBuildFolder(buildFolder);
-		
-		boolean filesAdded = false;
-		for (final IResource res : sourceFolder.members()) {
-			if (res instanceof IFolder) {
-				preprocessSourceFiles((IFolder)res, buildFolder.getFolder(res.getName()), annotationChecking);
-			} else 
-			if (res instanceof IFile){
-			//	if (res.getName().endsWith(".java")) {
-					args.add(res.getRawLocation().toOSString());
-					filesAdded = true;
-					if (annotationChecking) {
-						// get all lines from file
-						final Vector<String> lines = loadStringsFromFile((IFile) res);
-						
-						// do checking and some stuff
-						Job job = new Job("preprocessor annotation checking") {
-							@Override
-							protected IStatus run(IProgressMonitor monitor) {
-								processLinesOfFile(lines, (IFile) res);
-								
-								return Status.OK_STATUS;
-							}
-						};
-						job.setPriority(Job.SHORT);
-						job.schedule();
-					}
-			//	}
-			}
-		}
-
-		if (!filesAdded)
+		ArrayList<String> files = getFiles(featureProject.getSourceFolder(), buildFolder);
+		if (files.size() == 0) {
 			return;
+		}
+		
+		args.addAll(files);
 		
 		//add output directory
 		args.add(buildFolder.getRawLocation().toOSString());
@@ -160,6 +179,29 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 		runMunge(args);
 	}
 	
+	/**
+	 * Collects all file locations
+	 * Creates all package folders at the build path
+	 */
+	private ArrayList<String> getFiles(IFolder sourceFolder, IFolder buildFolder) {
+		ArrayList<String> args = new ArrayList<String>();
+		try {
+			createBuildFolder(buildFolder);
+		
+			for (final IResource res : sourceFolder.members()) {
+				if (res instanceof IFolder) {
+					args.addAll(getFiles((IFolder)res, buildFolder.getFolder(res.getName())));
+				} else 
+				if (res instanceof IFile){
+					args.add(res.getRawLocation().toOSString());
+				}
+			}
+		} catch (CoreException e) {
+			MungeCorePlugin.getDefault().logError(e);
+		}
+		return args;
+	}
+
 	/**
 	 * Do checking for all lines of file.
 	 * 
@@ -383,7 +425,7 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 			activatedFeatures.add(feature.getName());
 		}
 		try {
-			preprocessSourceFiles(featureProject.getSourceFolder(), folder, false);
+			preprocessSourceFiles(folder);
 		} catch (CoreException e) {
 			MungeCorePlugin.getDefault().logError(e);
 		}
