@@ -20,8 +20,6 @@ package de.ovgu.featureide.featurehouse;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -33,10 +31,17 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.core.IClasspathAttribute;
+import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.IPackageFragmentRoot;
+import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.internal.core.ClasspathEntry;
+import org.eclipse.jdt.internal.core.JavaProject;
 
 import cide.gparser.ParseException;
 import cide.gparser.TokenMgrError;
@@ -56,12 +61,8 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
  * 
  * @author Tom Brosch
  */
+@SuppressWarnings("restriction")
 public class FeatureHouseComposer extends ComposerExtensionClass {
-
-	private static final String SOURCE_ENTRY = "\t<classpathentry kind=\"src\" path=\"";
-	private static final String EXCLUDE_ENTRY = "\t<classpathentry excluding=\"";
-	private static final String EXCLUDE_SOURCE_ENTRY = "\" kind=\"src\" path=\"";
-	private static final String CLASSPATH_START = "<classpath>";
 
 	private FSTGenComposer composer;
 
@@ -172,7 +173,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 						}
 						callCompiler();
 					}
-					setJavaBuildPath(conf.getName().split("[.]")[0]);
+					//setJavaBuildPath(conf.getName().split("[.]")[0]);
 				}
 			}
 		}
@@ -201,8 +202,6 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		
 		setJavaBuildPath(config.getName().split("[.]")[0]);
 
-		// A new FSTGenComposer instance is created every time, because this
-		// class remembers the FST from a previous build.
 		composer = new FSTGenComposer(false);
 		composer.addParseErrorListener(listener);
 		try {
@@ -255,75 +254,44 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	 * @param buildPath The name of the current configuration
 	 */
 	private void setJavaBuildPath(String buildPath) {
-		Scanner scanner = null;
-		FileWriter fw = null;
-		IFile iClasspathFile = featureProject.getProject()
-				.getFile(".classpath");
-		if (!iClasspathFile.exists()) {
-			return;
-		}
 		try {
-			File file = iClasspathFile.getRawLocation().toFile();
-			StringBuffer fileText = new StringBuffer();
-			scanner = new Scanner(file);
-			boolean hasSourceEntry = false;
-			while (scanner.hasNext()) {
-				String line = scanner.nextLine();
-				if (line.contains(SOURCE_ENTRY)) {
-					if (line.contains(SOURCE_ENTRY
-							+ featureProject.getBuildFolder().getName() + "/"
-							+ buildPath + "\"/>")) {
+			JavaProject javaProject = new JavaProject(featureProject.getProject(), null);
+			IClasspathEntry[] classpathEntrys = javaProject.getRawClasspath();
+			
+			int i = 0;
+			for (IClasspathEntry e : classpathEntrys) {
+				if (e.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
+					IPath path = featureProject.getBuildFolder().getFolder(buildPath).getFullPath();
+					
+					/** return if nothing has to be changed **/
+					if (e.getPath().equals(path)) {
 						return;
 					}
-					fileText.append(SOURCE_ENTRY
-							+ featureProject.getBuildFolder().getName() + "/"
-							+ buildPath + "\"/>");
-					fileText.append("\r\n");
-					hasSourceEntry = true;
-				} else if (line.contains(EXCLUDE_ENTRY)) {
-					fileText.append(line.substring(0,
-							line.indexOf(EXCLUDE_SOURCE_ENTRY)
-									+ EXCLUDE_SOURCE_ENTRY.length())
-							+ featureProject.getBuildFolder().getName()
-							+ "/"
-							+ buildPath + "\"/>");
-					fileText.append("\r\n");
-					hasSourceEntry = true;
-				} else {
-					fileText.append(line);
-					fileText.append("\r\n");
+					
+					/** change the actual source entry to the new build path **/
+					ClasspathEntry changedEntry = new ClasspathEntry(e.getContentKind(), e.getEntryKind(), 
+							path, e.getInclusionPatterns(), e.getExclusionPatterns(), 
+							e.getSourceAttachmentPath(), e.getSourceAttachmentRootPath(), null, 
+							e.isExported(), e.getAccessRules(), e.combineAccessRules(), e.getExtraAttributes());
+					classpathEntrys[i] = changedEntry;
+					javaProject.setRawClasspath(classpathEntrys, null);
+					return;
 				}
+				i++;
 			}
-			String fileTextString;
-			if (!hasSourceEntry) {
-				fileTextString = fileText.toString().replaceFirst(CLASSPATH_START, 
-						CLASSPATH_START + "\r\n" + SOURCE_ENTRY
-						+ featureProject.getBuildFolder().getName() + "/"
-						+ buildPath + "\"/>");
-			} else {
-				fileTextString = fileText.toString();
-			}
-			fw = new FileWriter(file);
-			fw.write(fileTextString);
-			iClasspathFile.refreshLocal(IResource.DEPTH_ZERO, null);
-		} catch (FileNotFoundException e) {
+			
+			/** case: there is no source entry at the class path
+			 *  	  add the source entry to the classpath **/
+			IFolder folder = featureProject.getBuildFolder().getFolder(buildPath);
+			ClasspathEntry sourceEntry = new ClasspathEntry(IPackageFragmentRoot.K_SOURCE, 
+					IClasspathEntry.CPE_SOURCE, folder.getFullPath(), new IPath[0], new IPath[0], 
+					null, null, null, false, null, false, new IClasspathAttribute[0]);
+			IClasspathEntry[] newEntrys = new IClasspathEntry[classpathEntrys.length + 1];
+			System.arraycopy(classpathEntrys, 0, newEntrys, 0, classpathEntrys.length);
+			newEntrys[newEntrys.length - 1] = sourceEntry;
+			javaProject.setRawClasspath(newEntrys, null);
+		} catch (JavaModelException e) {
 			FeatureHouseCorePlugin.getDefault().logError(e);
-		} catch (IOException e) {
-			FeatureHouseCorePlugin.getDefault().logError(e);
-		} catch (CoreException e) {
-			FeatureHouseCorePlugin.getDefault().logError(e);
-		} finally {
-			if (scanner != null) {
-				scanner.close();
-			}
-			if (fw != null) {
-				try {
-					fw.close();
-				} catch (IOException e) {
-					FeatureHouseCorePlugin.getDefault().logError(e);
-				}
-
-			}
 		}
 	}
 	
