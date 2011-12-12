@@ -91,10 +91,9 @@ public class FeatureCreateLayerOperation extends AbstractOperation {
 			;
 		newFeature = new Feature(featureModel, "NewLayer" + number);
 		featureModel.addFeature(newFeature);
+		feature=featureModel.getFeature(feature.getName());
 		feature.addChild(newFeature);
-		
 		FeatureDiagramLayoutHelper.initializeLayerFeaturePosition(featureModel, newFeature, feature);
-
 		featureModel.handleModelDataChanged();
 
 		// select the new feature
@@ -128,6 +127,7 @@ public class FeatureCreateLayerOperation extends AbstractOperation {
 	@Override
 	public IStatus undo(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
+		newFeature=featureModel.getFeature(newFeature.getName());
 		featureModel.deleteFeature(newFeature);
 		featureModel.handleModelDataChanged();
 		return Status.OK_STATUS;
