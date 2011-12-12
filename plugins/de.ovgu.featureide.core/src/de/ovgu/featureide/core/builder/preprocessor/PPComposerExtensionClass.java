@@ -133,9 +133,12 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 				abstractFeatures.append("|");
 			}
 		}
+		//checking if there are any abstract features
+		if(abstractFeatures.length()>0)
 		patternIsAbstractFeature = Pattern.compile(abstractFeatures.substring(0, abstractFeatures.length()-1));
+		if(concreteFeatures.length()>0)
 		patternIsConcreteFeature = Pattern.compile(concreteFeatures.substring(0, concreteFeatures.length()-1));
-		
+	
 		// create expression of feature model
 		featureModel = NodeCreator.createNodes(featureProject.getFeatureModel());
 		
@@ -260,18 +263,22 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		if (name == null)
 			return;
 		
-		Matcher matcherFeature = patternIsAbstractFeature.matcher(name);
+		Matcher matcherFeature =null;
+		if(patternIsAbstractFeature!=null)
+		matcherFeature = patternIsAbstractFeature.matcher(name);
 		
-		if (matcherFeature.matches()) {
+		if (matcherFeature!=null&&matcherFeature.matches()) {
 			featureProject.createBuilderMarker(res,
 					pluginName + ": " + name +
 						MESSAGE_ABSTRACT,
 					lineNumber,
 					IMarker.SEVERITY_WARNING);
 		} else {
-			Matcher matcherConreteFeature = patternIsConcreteFeature.matcher(name);
+			Matcher matcherConreteFeature=null;;
+			if(patternIsConcreteFeature!=null)
+			matcherConreteFeature = patternIsConcreteFeature.matcher(name);
 			
-			if (!matcherConreteFeature.matches()) {
+			if(matcherConreteFeature!=null&&!matcherConreteFeature.matches()) {
 				featureProject.createBuilderMarker(res,
 						pluginName + ": " + name +
 							MESSAGE_NOT_DEFINED,
