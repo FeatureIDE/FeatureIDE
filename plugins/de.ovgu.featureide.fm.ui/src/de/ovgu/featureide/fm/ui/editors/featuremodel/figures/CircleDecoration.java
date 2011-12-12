@@ -18,34 +18,36 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 
-import org.eclipse.draw2d.Ellipse;
 import org.eclipse.draw2d.RotatableDecoration;
+import org.eclipse.draw2d.RoundedRectangle;
 import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
-
 
 /**
  * A decoration for a feature connection that indicates the mandatory property.
  * 
  * @author Thomas Thuem
  */
-public class CircleDecoration extends Ellipse implements RotatableDecoration, GUIDefaults {
-	
+public class CircleDecoration extends RoundedRectangle implements
+		RotatableDecoration, GUIDefaults {
+
 	public CircleDecoration(boolean fill) {
 		super();
 		setForegroundColor(DECORATOR_FOREGROUND);
 		setBackgroundColor(fill ? DECORATOR_FOREGROUND : DECORATOR_BACKGROUND);
-		setSize(SOURCE_ANCHOR_DIAMETER, SOURCE_ANCHOR_DIAMETER);	
+		setSize(SOURCE_ANCHOR_DIAMETER, SOURCE_ANCHOR_DIAMETER);
+
 	}
-	
+
 	@Override
-	public void setLocation(Point p) {		
-		super.setLocation(p.translate(-SOURCE_ANCHOR_DIAMETER/2, -SOURCE_ANCHOR_DIAMETER/2));
+	public void setLocation(Point p) {
+		super.setLocation(p.translate(-SOURCE_ANCHOR_DIAMETER / 2,
+				-SOURCE_ANCHOR_DIAMETER / 2));
 	}
-	
+
 	public void setReferencePoint(Point p) {
-		//nothing to do because this is a circle
+
 	}
 
 }

@@ -38,7 +38,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLa
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 
-
 /**
  * Operation with functionality to create a compound feature. Enables undo/redo
  * functionality.
@@ -58,9 +57,9 @@ public class FeatureCreateCompoundOperation extends AbstractOperation {
 	/**
 	 * @param label
 	 */
-	public FeatureCreateCompoundOperation(Object viewer,
-			Feature parent, FeatureModel featureModel,
-			LinkedList<Feature> selectedFeatures, Object diagramEditor) {
+	public FeatureCreateCompoundOperation(Object viewer, Feature parent,
+			FeatureModel featureModel, LinkedList<Feature> selectedFeatures,
+			Object diagramEditor) {
 		super(LABEL);
 		this.viewer = viewer;
 		this.featureModel = featureModel;
@@ -77,7 +76,6 @@ public class FeatureCreateCompoundOperation extends AbstractOperation {
 	 * org.eclipse.core.commands.operations.AbstractOperation#execute(org.eclipse
 	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
 	 */
-	//TODO: remove duplicate code (execute/redo)
 	@Override
 	public IStatus execute(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
@@ -90,48 +88,27 @@ public class FeatureCreateCompoundOperation extends AbstractOperation {
 			newCompound.setAND(true);
 			newCompound.setMultiple(parent.isMultiple());
 		}
-		if (parent != null) {
-
-			LinkedList<Feature> newChildren = new LinkedList<Feature>();
-			for (Feature feature : parent.getChildren())
-				if (selectedFeatures.contains(feature)) {
-					if (!newCompound.hasChildren())
-						newChildren.add(newCompound);
-					feature.setMandatory(false);
-					newCompound.addChild(feature);
-				} else
-					newChildren.add(feature);
-			parent.setChildren(newChildren);
-
-			featureModel.addFeature(newCompound);
-		} else {
-			newCompound.addChild(featureModel.getRoot());
-			featureModel.addFeature(newCompound);
-			featureModel.setRoot(newCompound);
-			//TODO: check whether this expensive call can be replaced by something more efficient
-			featureModel.redrawDiagram();
-		}
-		
-		FeatureDiagramLayoutHelper.initializeCompoundFeaturePosition(
-				featureModel, selectedFeatures, newCompound);
-		
-		featureModel.handleModelDataChanged();
+		redo(monitor, info);
 
 		// select the new feature
 		FeatureEditPart part;
 		if (viewer instanceof GraphicalViewerImpl) {
-			part = (FeatureEditPart) ((GraphicalViewerImpl) viewer).getEditPartRegistry().get(newCompound);
+			part = (FeatureEditPart) ((GraphicalViewerImpl) viewer)
+					.getEditPartRegistry().get(newCompound);
 		} else {
-			part =  (FeatureEditPart) ((GraphicalViewerImpl) diagramEditor).getEditPartRegistry().get(newCompound);
+			part = (FeatureEditPart) ((GraphicalViewerImpl) diagramEditor)
+					.getEditPartRegistry().get(newCompound);
 		}
-				
+
 		if (part != null) {
 			if (viewer instanceof GraphicalViewerImpl) {
-				((GraphicalViewerImpl) viewer).setSelection(new StructuredSelection(part));
+				((GraphicalViewerImpl) viewer)
+						.setSelection(new StructuredSelection(part));
 			} else {
-				((GraphicalViewerImpl) diagramEditor).setSelection(new StructuredSelection(part));
+				((GraphicalViewerImpl) diagramEditor)
+						.setSelection(new StructuredSelection(part));
 			}
-			
+
 			part.getViewer().reveal(part);
 
 			// open the renaming command
@@ -171,13 +148,14 @@ public class FeatureCreateCompoundOperation extends AbstractOperation {
 			newCompound.addChild(featureModel.getRoot());
 			featureModel.addFeature(newCompound);
 			featureModel.setRoot(newCompound);
-			//TODO: check whether this expensive call can be replaced by something more efficient			
+			// TODO: check whether this expensive call can be replaced by
+			// something more efficient
 			featureModel.redrawDiagram();
 		}
-		
+
 		FeatureDiagramLayoutHelper.initializeCompoundFeaturePosition(
 				featureModel, selectedFeatures, newCompound);
-		
+
 		featureModel.handleModelDataChanged();
 
 		return Status.OK_STATUS;
@@ -202,7 +180,5 @@ public class FeatureCreateCompoundOperation extends AbstractOperation {
 		featureModel.handleModelDataChanged();
 		return Status.OK_STATUS;
 	}
-	
-}
 
-	
+}
