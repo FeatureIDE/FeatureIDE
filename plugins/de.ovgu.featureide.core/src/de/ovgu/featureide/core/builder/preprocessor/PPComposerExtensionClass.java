@@ -115,7 +115,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	
 			// read activated features from configuration
 			activatedFeatures = new ArrayList<String>(loadStringsFromFile(config));
-			if (activatedFeatures == null||activatedFeatures.isEmpty()) {
+			if (activatedFeatures == null) {
 				return false;
 			}
 		}
