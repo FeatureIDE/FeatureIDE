@@ -115,12 +115,10 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	
 			// read activated features from configuration
 			activatedFeatures = new ArrayList<String>(loadStringsFromFile(config));
-			
-			if (activatedFeatures == null) {
+			if (activatedFeatures == null||activatedFeatures.isEmpty()) {
 				return false;
 			}
 		}
-		
 		// get all concrete and abstract features and generate pattern
 		StringBuilder concreteFeatures = new StringBuilder();
 		StringBuilder abstractFeatures = new StringBuilder();
@@ -310,7 +308,6 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 			if (scanner != null)
 				scanner.close();
 		}
-		
 		return lines;
 	}
 	
