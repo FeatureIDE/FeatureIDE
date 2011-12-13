@@ -100,7 +100,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 		for (String feature : activatedFeatures) {
 			featureList.append(feature + ",");
 		}
-		
+		if(featureList.length()>0)
 		featureList.deleteCharAt(featureList.length()-1);
 
 		// add source files
@@ -136,6 +136,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	public void postModelChanged() {
 		try {
 			deleteAllPreprocessorAnotationMarkers();
+			System.out.println("postModelChanged");
 			prepareFullBuild(null);
 			preprocessSourceFiles(featureProject.getBuildFolder(), false);
 		} catch (FileNotFoundException e) {
