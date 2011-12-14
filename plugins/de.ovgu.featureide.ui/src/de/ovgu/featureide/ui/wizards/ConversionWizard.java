@@ -18,6 +18,7 @@
  */
 package de.ovgu.featureide.ui.wizards;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
@@ -84,12 +85,14 @@ public class ConversionWizard extends Wizard implements INewWizard {
 		String project = "";
 
 		Object obj = selection.getFirstElement();
+		IProject p = null;
 		if (obj instanceof IResource) {
 			IResource res = (IResource) obj;
 			project = res.getProject().getName();
+			p = res.getProject();
 		}
 
-		page = new ConversionPage(" " + project);
+		page = new ConversionPage(" " + project, p);
 		this.selection = selection;
 	}
 }

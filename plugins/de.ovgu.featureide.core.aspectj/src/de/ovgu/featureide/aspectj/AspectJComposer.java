@@ -19,14 +19,10 @@
 package de.ovgu.featureide.aspectj;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Scanner;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -36,6 +32,14 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.core.IClasspathAttribute;
+import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.IPackageFragmentRoot;
+import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.internal.core.ClasspathEntry;
+import org.eclipse.jdt.internal.core.JavaProject;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
@@ -51,23 +55,15 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
  * 
  * @author Jens Meinicke
  */
+@SuppressWarnings("restriction")
 public class AspectJComposer extends ComposerExtensionClass {
 
 	private static final String ASPECTJ_NATURE = "org.eclipse.ajdt.ui.ajnature";
 	
 	private static final String NEW_ASPECT = "\t// TODO Auto-generated aspect\r\n";
 
-	private static final String XML_HEAD = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n";
-	private static final String START_ENTRY = "<classpath>";
-	private static final String EXCLUDE_ENTRY = "\t<classpathentry excluding=\"";
-	private static final String EXCLUDE_SOURCE_ENTRY = "\" kind=\"src\" path=\"";
-	private static final String SOURCE_ENTRY = "\t<classpathentry kind=\"src\" path=\"";
-	private static final String CONTAINER_ENTRY = "\t<classpathentry kind=\"con\" path=\"";
-	private static final String ASPECTJRT_CONTAINER = "org.eclipse.ajdt.core.ASPECTJRT_CONTAINER";
-	private static final String JRE_CONTAINER = "org.eclipse.jdt.launching.JRE_CONTAINER";
-	private static final String OUTPUT_ENTRY = "\t<classpathentry kind=\"output\" path=\"";
-	private static final String END_ENTRY = "</classpath>";
-	
+	public static final IPath ASPECTJRT_CONTAINER = new Path("org.eclipse.ajdt.core.ASPECTJRT_CONTAINER");
+
 	private LinkedList<String> selectedFeatures;
 	private LinkedList<String> unSelectedFeatures;
 	private FeatureModel featureModel;
@@ -122,96 +118,59 @@ public class AspectJComposer extends ComposerExtensionClass {
 			AspectJCorePlugin.getDefault().logError(e);
 		}
 	}
-
+	
+	/**
+	 * Set the unselected aspects to be excluded from build
+	 * @param project
+	 */
 	private void setBuildpaths(IProject project) {
-		Scanner scanner = null;
-		FileWriter fw = null;
-		IFile iClasspathFile = project.getFile(".classpath");
+		String buildPath = null;
+		if (buildPath == null) {
+			if (featureProject == null || featureProject.getBuildPath() == null) {
+				buildPath = IFeatureProject.DEFAULT_SOURCE_PATH;
+			} else {
+				buildPath = featureProject.getBuildPath().toString();
+			}
+		}
+		
 		try {
-			File file = iClasspathFile.getRawLocation().toFile();
-			StringBuffer fileText = new StringBuffer();
-			scanner = new Scanner(file);
-			while (scanner.hasNext()) {
-				String line = scanner.nextLine();
-				if (line.contains(START_ENTRY)) {
-					fileText.append(line);
-					fileText.append("\r\n");
-					break;
-				} else {
-					fileText.append(line);
-					fileText.append("\r\n");
+			JavaProject javaProject = new JavaProject(project, null);
+			IClasspathEntry[] oldEntries = javaProject.getRawClasspath();
+			/** check if entries already exist **/
+			for (int i = 0; i < oldEntries.length; i++) {
+				if (oldEntries[i].getEntryKind() == IClasspathEntry.CPE_SOURCE) {
+					/** correct the source entry **/
+					oldEntries[i] = setSourceEntry(oldEntries[i]);
+					javaProject.setRawClasspath(oldEntries, null);
+					return;
 				}
 			}
 			
-			while (scanner.hasNext()) {
-				String line = scanner.nextLine();
-				if (line.equals(END_ENTRY)) {
-					break;
-				}
-				if (line.contains(EXCLUDE_ENTRY) || line.contains(SOURCE_ENTRY)) {
-					fileText.append(createEntry(line));
-					fileText.append("\r\n");
-				} else {
-					fileText.append(line);
-					fileText.append("\r\n");
-				}
-			}
-			
-			String fileTextString = fileText.toString();			
-			fileTextString = fileTextString + END_ENTRY;
-			fw = new FileWriter(file);
-			fw.write(fileTextString);
-			iClasspathFile.refreshLocal(IResource.DEPTH_ZERO, null);
-		} catch (FileNotFoundException e) {
-			AspectJCorePlugin.getDefault().logError(e);
-		} catch (IOException e) {
-			AspectJCorePlugin.getDefault().logError(e);
-		} catch (CoreException e) {
-			AspectJCorePlugin.getDefault().logError(e);
-		} finally {
-			if(scanner!=null)
-			scanner.close();
-			if(fw!=null) {
-				try {
-					fw.close();
-				} catch (IOException e) {
-					AspectJCorePlugin.getDefault().logError(e);
-				}	
-			}
+			/** add the new entry **/
+			IClasspathEntry[] entries = new IClasspathEntry[oldEntries.length + 1];
+			System.arraycopy(oldEntries, 0, entries, 0, oldEntries.length);
+			entries[oldEntries.length] = setSourceEntry(getSourceEntry(buildPath));
+			javaProject.setRawClasspath(entries, null);
+		} catch (JavaModelException e) {
+			CorePlugin.getDefault().logError(e);
 		}
 	}
 	
-	private String createEntry(String line) {
-		String entry = null;
-		if (!line.contains(SOURCE_ENTRY)) {
-			for (String oldEntry : getOldEntrys(line)) {
-				if (!oldEntry.endsWith(".aj")) {
-					if (entry == null) {
-						entry = oldEntry;
-					} else {
-						entry = entry + "|" + oldEntry;
-					}
-				}
-			}
+	/**
+	 * Set the unselected aspect files to be excluded
+	 * @param e The ClasspathEntry to set
+	 * @return The set entry
+	 */
+	private IClasspathEntry setSourceEntry(IClasspathEntry e) {
+		IPath[] excludedAspects = new IPath[unSelectedFeatures.size()];  
+		int i = 0;
+		for (String f : unSelectedFeatures) {
+			excludedAspects[i++] = new Path(f.replaceAll("_", "/") + ".aj");
 		}
-		for (String excludedFeature : unSelectedFeatures) {
-			if (entry == null) {
-				entry = excludedFeature.replaceAll("_", "/") + ".aj";
-			} else {
-				entry = entry + "|" + excludedFeature.replaceAll("_", "/") + ".aj";
-			}
-		}
-		if (entry != null) {
-			return EXCLUDE_ENTRY + entry + EXCLUDE_SOURCE_ENTRY + featureProject.getBuildFolder().getProjectRelativePath() + "\"/>";
-		} else {
-			return SOURCE_ENTRY + featureProject.getBuildFolder().getName() + "\"/>";
-		}
-	}
-
-	private String[] getOldEntrys(String line) {
-		line = line.substring(line.indexOf("\"") + 1);
-		line = line.replace(EXCLUDE_SOURCE_ENTRY + featureProject.getBuildFolder().getProjectRelativePath() + "\"/>", "");
-		return line.split("[|]");
+		return new ClasspathEntry(e.getContentKind(), e.getEntryKind(), 
+				e.getPath(), e.getInclusionPatterns(), excludedAspects, 
+				e.getSourceAttachmentPath(), e.getSourceAttachmentRootPath(), null, 
+				e.isExported(), e.getAccessRules(), e.combineAccessRules(), e.getExtraAttributes());
 	}
 
 	@Override
@@ -289,52 +248,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 	}
 
 	private void setClasspathFile(IProject project) {
-		Scanner scanner = null;
-		FileWriter fw = null;
-		IFile iClasspathFile = project.getFile(".classpath");
-		if (!iClasspathFile.exists()) {
-			addClasspathFile(project, null);
-		} else {
-			try {
-				File file = iClasspathFile.getRawLocation().toFile();
-				StringBuffer fileText = new StringBuffer();
-				scanner = new Scanner(file);
-				while (scanner.hasNext()) {
-					String line = scanner.nextLine();
-					if (line.contains(END_ENTRY)) {
-						break;
-					} 
-					fileText.append(line);
-					fileText.append("\r\n");
-				}
-				
-				String fileTextString = fileText.toString();
-				if (!fileTextString.contains(ASPECTJRT_CONTAINER)) {
-					fileTextString = fileTextString + CONTAINER_ENTRY + ASPECTJRT_CONTAINER + "\"/>\r\n";
-				}
-				if (!fileTextString.contains(JRE_CONTAINER)) {
-					fileTextString = fileTextString + CONTAINER_ENTRY + JRE_CONTAINER + "\"/>\r\n";
-				}
-				fileTextString = fileTextString + END_ENTRY;
-				fw = new FileWriter(file);
-				fw.write(fileTextString);
-				
-			} catch (FileNotFoundException e) {
-				AspectJCorePlugin.getDefault().logError(e);
-			} catch (IOException e) {
-				AspectJCorePlugin.getDefault().logError(e);
-			} finally {
-				if(scanner!=null)
-				scanner.close();
-				if(fw!=null) {
-					try {
-						fw.close();
-					} catch (IOException e) {
-						AspectJCorePlugin.getDefault().logError(e);
-					}	
-				}
-			}
-		}
+		addClasspathFile(project, null);
 	}
 
 	@Override
@@ -344,32 +258,73 @@ public class AspectJComposer extends ComposerExtensionClass {
 		addClasspathFile(project, buildPath);
 	}
 
-	private void addClasspathFile(IProject project, String buildpath) {
-		if (buildpath == null) {
+	private void addClasspathFile(IProject project, String buildPath) {
+		if (buildPath == null) {
 			if (featureProject == null || featureProject.getBuildPath() == null) {
-				buildpath = IFeatureProject.DEFAULT_SOURCE_PATH;
+				buildPath = IFeatureProject.DEFAULT_SOURCE_PATH;
 			} else {
-				buildpath = featureProject.getBuildPath().toString();
+				buildPath = featureProject.getBuildPath().toString();
 			}
 		}
-		IFile iClasspathFile = project.getFile(".classpath");
-		if (!iClasspathFile.exists()) {
-			String bin = "bin";
-			try {
-				String text = XML_HEAD + 
-			 				  START_ENTRY + "\r\n" +
-			 				  SOURCE_ENTRY + buildpath + "\"/>\r\n" +
-			 				  CONTAINER_ENTRY + ASPECTJRT_CONTAINER + "\"/>\r\n" +
-			 				  CONTAINER_ENTRY + JRE_CONTAINER + "\"/>\r\n" +
-			 				  OUTPUT_ENTRY + bin + "\"/>\r\n" + 
-			 				  END_ENTRY; 
-				InputStream source = new ByteArrayInputStream(text.getBytes());
-				iClasspathFile.create(source, true, null);
-			} catch (CoreException e) {
-				AspectJCorePlugin.getDefault().logError(e);
+		
+		try {
+			JavaProject javaProject = new JavaProject(project, null);
+			IClasspathEntry[] oldEntries = javaProject.getRawClasspath();
+			boolean sourceAdded = false;
+			boolean containerAdded = false;
+			boolean ajContainerAdded = false;
+			/** check if entries already exist **/
+			for (int i = 0; i < oldEntries.length; i++) {
+				if (!sourceAdded && oldEntries[i].getEntryKind() == IClasspathEntry.CPE_SOURCE) {
+					/** correct the source entry **/
+					oldEntries[i] = getSourceEntry(buildPath);
+					sourceAdded = true;
+				} else if ((!containerAdded || !ajContainerAdded) && oldEntries[i].getEntryKind() == IClasspathEntry.CPE_CONTAINER) {
+					/** check the container entries **/
+					if (oldEntries[i].getPath().equals(JRE_CONTAINER)) {
+						containerAdded = true;
+					}
+					if (oldEntries[i].getPath().equals(ASPECTJRT_CONTAINER)) {
+						ajContainerAdded = true;
+					}
+					
+				}
 			}
+			/** case: no new entries **/
+			if (sourceAdded && containerAdded && ajContainerAdded) {
+				javaProject.setRawClasspath(oldEntries, null);
+				return;
+			}
+			
+			/** add the new entries **/
+			IClasspathEntry[] entries = new IClasspathEntry[(sourceAdded ? 0 : 1) + 
+				(containerAdded ? 0 : 1) + (containerAdded ? 0 : 1) + oldEntries.length];
+			System.arraycopy(oldEntries, 0, entries, 0, oldEntries.length);
+			
+			if (!sourceAdded) {
+				entries[oldEntries.length] = getSourceEntry(buildPath);
+			}
+			if (!containerAdded) {
+				int position = (sourceAdded ? 0 : 1) + oldEntries.length;
+				entries[position] = getContainerEntry();
+			}
+			if (!ajContainerAdded) {
+				int position = (sourceAdded ? 0 : 1) + (containerAdded ? 0 : 1) + oldEntries.length;
+				entries[position] = getAJContainerEntry();
+			}
+			javaProject.setRawClasspath(entries, null);
+		} catch (JavaModelException e) {
+			CorePlugin.getDefault().logError(e);
+		}
+	}
 
-		}
+	/**
+	 * @return The ClasspathEnttry for the AspectJ container
+	 */
+	private IClasspathEntry getAJContainerEntry() {
+		return new ClasspathEntry(IPackageFragmentRoot.K_SOURCE, 
+				IClasspathEntry.CPE_CONTAINER, ASPECTJRT_CONTAINER, 
+				new IPath[0], new IPath[0], null, null, null, false, null, false, new IClasspathAttribute[0]);
 	}
 
 	private void addNatures(IProject project) {

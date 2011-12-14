@@ -19,6 +19,7 @@
 package de.ovgu.featureide.core;
 
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -66,6 +67,10 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 public class CorePlugin extends AbstractCorePlugin {
 
 	public static final String PLUGIN_ID = "de.ovgu.featureide.core";
+
+	private static final String COMPOSERS_ID = PLUGIN_ID + ".composers";
+
+	private static final String BASE_FEATURE = "Base";
 
 	private static CorePlugin plugin;
 
@@ -115,10 +120,8 @@ public class CorePlugin extends AbstractCorePlugin {
 			try {
 				if (project.isOpen()) {
 					// conversion for old projects
-					IConfigurationElement[] config = Platform
-							.getExtensionRegistry()
-							.getConfigurationElementsFor(
-									PLUGIN_ID + ".Composers");
+					IConfigurationElement[] config = Platform.getExtensionRegistry()
+							.getConfigurationElementsFor(COMPOSERS_ID);
 					for (IConfigurationElement e : config) {
 						if (project.hasNature(e.getAttribute("nature"))) {
 							changeOldNature(project, e.getAttribute("ID"));
@@ -134,21 +137,27 @@ public class CorePlugin extends AbstractCorePlugin {
 		
 	}
 
-	private static void changeOldNature(IProject project, String id)
+	/**
+	 * If the given project has the old FeatureIDE nature, it will be replaced with the actual one.
+	 * Also sets the composition tool to the given ID.
+	 * @param project The project
+	 * @param composerID The new composer ID
+	 * @throws CoreException
+	 */
+	private static void changeOldNature(IProject project, String composerID)
 			throws CoreException {
-		String projectNature = FeatureProjectNature.NATURE_ID;
 		CorePlugin.getDefault().logInfo(
-				"Change old nature to '" + projectNature
-						+ "' and composer to '" + id + "' in project '"
+				"Change old nature to '" + FeatureProjectNature.NATURE_ID
+						+ "' and composer to '" + composerID + "' in project '"
 						+ project.getName() + "'");
 		IProjectDescription description = project.getDescription();
 		String[] natures = description.getNatureIds();
 		for (int i = 0; i < natures.length; i++)
 			if (natures[i].startsWith("FeatureIDE_Core."))
-				natures[i] = projectNature;
+				natures[i] = FeatureProjectNature.NATURE_ID;
 		description.setNatureIds(natures);
 		project.setDescription(description, null);
-		project.setPersistentProperty(IFeatureProject.composerConfigID, id);
+		project.setPersistentProperty(IFeatureProject.composerConfigID, composerID);
 	}
 
 	/*
@@ -253,16 +262,20 @@ public class CorePlugin extends AbstractCorePlugin {
 		for (IFeatureFolderListener listener : featureFolderListeners)
 			listener.featureFolderChanged(folder);
 	}
-
+	
+	/**
+	 * Setups the projects structure.<br>
+	 * Starts composer specific changes of the project structure, 
+	 * after adding the FeatureIDE nature to a project.
+	 */
 	public static void setupProject(final IProject project,
 			String compositionToolID, final String sourcePath,
 			final String configPath, final String buildPath) {
 		setupFeatureProject(project, compositionToolID, sourcePath,
 				configPath, buildPath, false);
-		// move old source files into feature "Base"
 
 		IConfigurationElement[] config = Platform.getExtensionRegistry()
-				.getConfigurationElementsFor(PLUGIN_ID + ".composers");
+				.getConfigurationElementsFor(COMPOSERS_ID);
 		try {
 			for (IConfigurationElement e : config) {
 				if (e.getAttribute("id").equals(compositionToolID)) {
@@ -275,61 +288,8 @@ public class CorePlugin extends AbstractCorePlugin {
 							}
 
 							public void run() throws Exception {
-								project.getFolder(buildPath).deleteMarkers(
-										null, true, IResource.DEPTH_INFINITE);
-								if (!((IComposerExtensionClass) o)
-										.postAddNature(project.getFolder(buildPath), 
-												!sourcePath.equals("") ? project.getFolder(sourcePath).getFolder("Base"): null)) {
-									if (!sourcePath.equals("")) {
-										if (project.getFolder(sourcePath)
-												.getFolder("Base").exists()) {
-											for (IResource res : project.getFolder(
-													buildPath).members()) {
-												res.move(
-														project.getFolder(
-																sourcePath)
-																.getFolder("Base")
-																.getFile(
-																		res.getName())
-																.getFullPath(),
-														true, null);
-											}
-										} else {
-											// if project does not have feature
-											// folders, use the source path directly
-											if (!((IComposerExtensionClass) o)
-													.hasFeatureFolders()) {
-												project.getFolder(sourcePath)
-														.delete(true, null);
-												project.getFolder(buildPath).move(
-														project.getFolder(
-																sourcePath)
-																.getFullPath(),
-														true, null);
-											} else {
-												project.getFolder(buildPath).move(
-														project.getFolder(
-																sourcePath)
-																.getFolder("Base")
-	
-																.getFullPath(),
-														true, null);
-											}
-										}
-									}
-								}
-								// create a configuration to automaticly build
-								// the project after adding the FeatureIDE
-								// nature
-								IFile configFile = project.getFolder(
-										configPath).getFile(project.getName().split("[-]")[0] + 
-										getDefault().getConfigurationExtensions().getFirst());
-								FileWriter fw = new FileWriter(configFile
-										.getRawLocation().toFile());
-								fw.write("Base");
-								fw.close();
-								configFile.create(null, true, null);
-
+								runProjectConversion(project, sourcePath, configPath, 
+										buildPath, (IComposerExtensionClass) o);
 							}
 						};
 						SafeRunner.run(runnable);
@@ -337,18 +297,62 @@ public class CorePlugin extends AbstractCorePlugin {
 					break;
 				}
 			}
-		} catch (CoreException ex) {
-			getDefault().logError(ex);
+		} catch (CoreException e) {
+			getDefault().logError(e);
 		}
 
 	}
+	
+	/**
+	 * Composer specific changes of the project structure, 
+	 * after adding the FeatureIDE nature to a project.<br>
+	 * Moves the files of the source folder to the features folder(composer specific)<br>
+	 * Creates a configuration file, where the base feature is selected, to automatically build the project.
+	 */
+	protected static void runProjectConversion( IProject project, String sourcePath, String configPath, 
+			String buildPath,  IComposerExtensionClass composer) throws CoreException, IOException {
+		project.getFolder(buildPath).deleteMarkers(null, true, IResource.DEPTH_INFINITE);
+		
+		IFolder source = project.getFolder(buildPath);
+		IFolder destination = !sourcePath.equals("") ? project.getFolder(sourcePath).getFolder(BASE_FEATURE): null;
+		if (!composer.postAddNature(source, destination) && !sourcePath.equals("")) {
+			if (!composer.hasFeatureFolders()) {
+				/** if project does not use feature folders, use the source path directly **/
+				destination = project.getFolder(sourcePath);
+			}
+			if (!destination.exists()) {
+				destination.create(false, true, null);
+			}
+			/** moves all files of the old source folder to the destination **/
+			for (IResource res : source.members()) {
+				res.move(destination.getFile(res.getName()).getFullPath(),true, null);
+			}
+		}
+		/** create a configuration to automatically build
+		 *  the project after adding the FeatureIDE nature **/
+		IFile configFile = project.getFolder(configPath).getFile(
+				project.getName().split("[-]")[0] +	composer.getConfigurationExtension());
+		FileWriter fw = new FileWriter(configFile.getRawLocation().toFile());
+		fw.write(BASE_FEATURE);
+		fw.close();
+		configFile.create(null, true, null);
+		configFile.refreshLocal(IResource.DEPTH_ZERO, null);
+	}
 
+	/**
+	 * Setups the project.<br>
+	 * Creates folders<br>
+	 * Adds the compiler(if necessary)<br>
+	 * Adds the FeatureIDE nature<br>
+	 * Creates the feature model
+	 * @param addCompiler <code>false</code> if the project already has a compiler
+	 */
 	public static void setupFeatureProject(final IProject project,
 			String compositionToolID, final String sourcePath,
-			final String configPath, final String buildPath, boolean addNature) {
+			final String configPath, final String buildPath, boolean addCompiler) {
 		IConfigurationElement[] config = Platform.getExtensionRegistry()
-				.getConfigurationElementsFor(PLUGIN_ID + ".composers");
-		if (addNature) {
+				.getConfigurationElementsFor(COMPOSERS_ID);
+		if (addCompiler) {
 			try {
 				for (IConfigurationElement e : config) {
 					if (e.getAttribute("id").equals(compositionToolID)) {
@@ -371,35 +375,29 @@ public class CorePlugin extends AbstractCorePlugin {
 						break;
 					}
 				}
-			} catch (CoreException ex) {
-				getDefault().logError(ex);
+			} catch (CoreException e) {
+				getDefault().logError(e);
 			}
 		}
 		try {
-			project.setPersistentProperty(IFeatureProject.composerConfigID,
-					compositionToolID);
-			project.setPersistentProperty(IFeatureProject.buildFolderConfigID,
-					buildPath);
-			project.setPersistentProperty(
-					IFeatureProject.configFolderConfigID, configPath);
-			project.setPersistentProperty(IFeatureProject.sourceFolderConfigID,
-					sourcePath);
+			project.setPersistentProperty(IFeatureProject.composerConfigID, compositionToolID);
+			project.setPersistentProperty(IFeatureProject.buildFolderConfigID, buildPath);
+			project.setPersistentProperty(IFeatureProject.configFolderConfigID, configPath);
+			project.setPersistentProperty(IFeatureProject.sourceFolderConfigID, sourcePath);
 		} catch (CoreException e) {
-			CorePlugin.getDefault().logError(
-					"Could not set persistant property", e);
+			CorePlugin.getDefault().logError("Could not set persistant property", e);
 		}
 		createProjectStructure(project, sourcePath, configPath, buildPath);
 		addFeatureNatureToProject(project);
-
 	}
 
 	private static void addFeatureNatureToProject(IProject project) {
 		try {
 			// check if the nature was already added
-			if (!project.isAccessible()
-					|| project.hasNature(FeatureProjectNature.NATURE_ID))
+			if (!project.isAccessible() || project.hasNature(FeatureProjectNature.NATURE_ID)) {
 				return;
-
+			}
+			
 			// add the FeatureIDE nature
 			CorePlugin.getDefault().logInfo(
 					"Add Nature (" + FeatureProjectNature.NATURE_ID + ") to "
@@ -439,11 +437,19 @@ public class CorePlugin extends AbstractCorePlugin {
 		return folder;
 	}
 
+	/**
+	 * Creates the source-, features- and build-folder at the given paths.<br>
+	 * Also creates the bin folder if necessary.<br>
+	 * Creates the default feature model.
+	 * @param project
+	 * @param sourcePath
+	 * @param configPath
+	 * @param buildPath
+	 */
 	private static void createProjectStructure(IProject project,
 			String sourcePath, String configPath, String buildPath) {
 		try {
-			// just create the bin folder if project has only the FeatureIDE
-			// Nature
+			/** just create the bin folder if project has only the FeatureIDE Nature **/
 			if (project.getDescription().getNatureIds().length == 1
 					&& project.hasNature(FeatureProjectNature.NATURE_ID)) {
 				createFolder(project, "bin");
@@ -457,11 +463,9 @@ public class CorePlugin extends AbstractCorePlugin {
 		FeatureModel featureModel = new FeatureModel();
 		featureModel.createDefaultValues(project.getName());
 		try {
-			new XmlFeatureModelWriter(featureModel).writeToFile(project
-					.getFile("model.xml"));
+			new XmlFeatureModelWriter(featureModel).writeToFile(project.getFile("model.xml"));
 		} catch (CoreException e) {
-			CorePlugin.getDefault().logError(
-					"Error while creating feature model", e);
+			CorePlugin.getDefault().logError("Error while creating feature model", e);
 		}
 
 	}
@@ -511,6 +515,9 @@ public class CorePlugin extends AbstractCorePlugin {
 		return getFeatureProject(res) != null;
 	}
 
+	/**
+	 * @return A list of all valid configuration extensions
+	 */
 	public LinkedList<String> getConfigurationExtensions() {
 		LinkedList<String> extensions = new LinkedList<String>();
 		extensions.add(".config");
@@ -550,6 +557,7 @@ public class CorePlugin extends AbstractCorePlugin {
 			job.schedule();
 		}
 	}
+	
 	private int i = 1;
 	protected void addProjects(IProgressMonitor monitor) {
 		if (projectsToAdd.isEmpty()) {

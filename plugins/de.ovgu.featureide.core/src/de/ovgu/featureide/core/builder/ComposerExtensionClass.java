@@ -18,8 +18,6 @@
  */
 package de.ovgu.featureide.core.builder;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +27,14 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.core.IClasspathAttribute;
+import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.IPackageFragmentRoot;
+import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.internal.core.ClasspathEntry;
+import org.eclipse.jdt.internal.core.JavaProject;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
@@ -40,9 +46,11 @@ import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
  * 
  * @author Jens Meinicke
  */
+@SuppressWarnings("restriction")
 public abstract class ComposerExtensionClass implements IComposerExtensionClass {
 
 	protected static final String JAVA_NATURE = "org.eclipse.jdt.core.javanature";
+	public static final IPath JRE_CONTAINER = new Path("org.eclipse.jdt.launching.JRE_CONTAINER");
 	protected IFeatureProject featureProject = null;
 	
 	public boolean initialize(IFeatureProject project) {
@@ -71,27 +79,86 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	public void addCompiler(IProject project, String sourcePath,
 			String configPath, String buildPath) {
 		addNature(project);
-		addClasspathFile(project, sourcePath, configPath, buildPath);
+		addClasspathFile(project, buildPath);
 	}
 	
-	private void addClasspathFile(IProject project, String sourcePath,
-			String configPath, String buildPath) {
-		IFile iClasspathFile = project.getFile(".classpath");
-		if (!iClasspathFile.exists()) {
-			try {
-				String text = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + 
-			 				  "<classpath>\n" +  
-			 				  "\t<classpathentry kind=\"src\" path=\"" + buildPath + "\"/>\n" + 
-			 				  "\t<classpathentry kind=\"con\" path=\"org.eclipse.jdt.launching.JRE_CONTAINER\"/>\r\n" + 
-			 				  "\t<classpathentry kind=\"output\" path=\"bin\"/>\n" + 
-			 				  "</classpath>"; 
-				InputStream source = new ByteArrayInputStream(text.getBytes());
-				iClasspathFile.create(source, true, null);
-			} catch (CoreException e) {
-				CorePlugin.getDefault().logError(e);
+	private void addClasspathFile(IProject project, String buildPath) {
+		try {
+			JavaProject javaProject = new JavaProject(project, null);
+			IClasspathEntry[] oldEntries = javaProject.getRawClasspath();
+			boolean sourceAdded = false;
+			boolean containerAdded = false;
+			/** check if entries already exist **/
+			for (int i = 0; i < oldEntries.length; i++) {
+				if (!sourceAdded && oldEntries[i].getEntryKind() == IClasspathEntry.CPE_SOURCE) {
+					/** correct the source entry **/
+					// XXX the source entry should be equivalent to the build path, 
+					// but e.g. at FeatureHouse the real build path is src/config -> Builder problems
+					// -> is it necessary to correct the path?
+					//oldEntries[i] = setSourceEntry(buildPath, oldEntries[i]);
+					/** find source entry **/
+					sourceAdded = true;
+				} else if (!containerAdded && oldEntries[i].getEntryKind() == IClasspathEntry.CPE_CONTAINER) {
+					/** check the container entries **/
+					if (oldEntries[i].getPath().equals(JRE_CONTAINER)) {
+						containerAdded = true;
+					}
+				}
 			}
+			/** case: no new entries **/
+			if (sourceAdded && containerAdded) {
+				javaProject.setRawClasspath(oldEntries, null);
+				return;
+			}
+			
+			/** add the new entries **/
+			IClasspathEntry[] entries = new IClasspathEntry[(sourceAdded ? 0 : 1) + (containerAdded ? 0 : 1) + oldEntries.length];
+			System.arraycopy(oldEntries, 0, entries, 0, oldEntries.length);
+			
+			if (!sourceAdded) {
+				entries[oldEntries.length] = getSourceEntry(buildPath);
+			}
+			if (!containerAdded) {
+				int position = (sourceAdded ? 0 : 1) + oldEntries.length;
+				entries[position] = getContainerEntry();
+			}
+			
+			javaProject.setRawClasspath(entries, null);
+		} catch (JavaModelException e) {
+			CorePlugin.getDefault().logError(e);
+		}		
+	}
 
-		}
+	/**
+	 * Set the source path of the given <code>ClasspathEntry</code>
+	 * @param buildPath The new build path
+	 * @param e The entry to set
+	 * @return The entry with the new source path
+	 */
+	public IClasspathEntry setSourceEntry(String buildPath, IClasspathEntry e) {
+		return new ClasspathEntry(e.getContentKind(), e.getEntryKind(), 
+				new Path(buildPath), e.getInclusionPatterns(), e.getExclusionPatterns(), 
+				e.getSourceAttachmentPath(), e.getSourceAttachmentRootPath(), null, 
+				e.isExported(), e.getAccessRules(), e.combineAccessRules(), e.getExtraAttributes());
+	}
+
+	/**
+	 * @return A default JRE container entry
+	 */
+	public IClasspathEntry getContainerEntry() {
+		return new ClasspathEntry(IPackageFragmentRoot.K_SOURCE, 
+				IClasspathEntry.CPE_CONTAINER, JRE_CONTAINER, 
+				new IPath[0], new IPath[0], null, null, null, false, null, false, new IClasspathAttribute[0]);
+	}
+
+	/**
+	 * @param path The source path
+	 * @return A default source entry with the given path
+	 */
+	public IClasspathEntry getSourceEntry(String path) {
+		return new ClasspathEntry(IPackageFragmentRoot.K_SOURCE, 
+				IClasspathEntry.CPE_SOURCE, new Path(path), new IPath[0], new IPath[0], 
+				null, null, null, false, null, false, new IClasspathAttribute[0]);
 	}
 
 	private void addNature(IProject project) {
@@ -167,7 +234,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#buildConfiguration(org.eclipse.core.resources.IFolder, de.ovgu.featureide.fm.core.configuration.Configuration)
 	 */
-	/*
+	/**
 	 * Creates a configuration file at the given folder
 	 */
 	public void buildConfiguration(IFolder folder, Configuration configuration) {

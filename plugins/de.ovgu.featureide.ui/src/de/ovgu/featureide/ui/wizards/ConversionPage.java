@@ -18,18 +18,30 @@
  */
 package de.ovgu.featureide.ui.wizards;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.internal.core.JavaProject;
 import org.eclipse.swt.widgets.Composite;
+
+import de.ovgu.featureide.ui.UIPlugin;
 
 /**
  * A dialog page for adding the FeatureIDE Nature.
  * 
  * @author Jens Meinicke
  */
+@SuppressWarnings("restriction")
 public class ConversionPage extends NewFeatureProjectPage {
 	
-	public ConversionPage(String project) {
+	private IProject p;
+	private static final String JAVA_NATURE = "org.eclipse.jdt.core.javanature";
+	private static final String MESSAGE = "The build path is set to the java projects source path automatically";
+
+	public ConversionPage(String project, IProject p) {
 		super();
 		setDescription("Adds the FeatureIDE nature to the project" + project + ".");
+		this.p = p;
 	}
 	
 	/* (non-Javadoc)
@@ -38,5 +50,31 @@ public class ConversionPage extends NewFeatureProjectPage {
 	@Override
 	public void createControl(Composite parent) {
 		super.createControl(parent);
+		setBuildPath();
+	}
+
+	/**
+	 * Set the build path to the java projects build path
+	 */
+	private void setBuildPath() {
+		try {
+			if (p.hasNature(JAVA_NATURE)) {
+				JavaProject javaProject = new JavaProject(p, null);
+				for (IClasspathEntry entry : javaProject.getRawClasspath()) {
+					if (entry.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
+						String path = entry.getPath().toOSString();
+						if (path.contains("\\")) path = path.substring(path.indexOf("\\") + 1);
+						if (path.contains("\\")) path = path.substring(path.indexOf("\\") + 1);
+
+						buildPath.setText(path);
+						buildPath.setEnabled(false);
+						buildLabel.setToolTipText(MESSAGE);
+						return;
+					}
+				}
+			}
+		} catch (CoreException e) {
+			UIPlugin.getDefault().logError(e);
+		}
 	}
 }

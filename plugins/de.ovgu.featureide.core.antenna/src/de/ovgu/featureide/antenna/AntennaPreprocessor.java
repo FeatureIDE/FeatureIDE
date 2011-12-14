@@ -393,4 +393,9 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	public void buildFSTModel() {
 		antennaModelBuilder.buildModel();
 	}
+	
+	@Override
+	public boolean postAddNature(IFolder source, IFolder destination) {
+		return true;
+	}
 }

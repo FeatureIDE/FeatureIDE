@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -52,7 +53,7 @@ public abstract class AbstractFeatureModelWriter implements IFeatureModelWriter 
 	}
 	
 	public void writeToFile(IFile file) throws CoreException {
-		InputStream source = new ByteArrayInputStream(writeToString().getBytes());
+		InputStream source = new ByteArrayInputStream(writeToString().getBytes(Charset.availableCharsets().get("UTF-8")));
 		if (file.exists()) {
 			file.setContents(source, false, true, null);
 		}

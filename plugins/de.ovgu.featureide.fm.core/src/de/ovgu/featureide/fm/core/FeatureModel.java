@@ -781,7 +781,7 @@ public class FeatureModel implements PropertyConstants {
 	@Override
 	public FeatureModel clone() {
 		FeatureModel fm = new FeatureModel();
-		fm.root = root.clone();
+		fm.root = root != null ? root.clone() : new Feature(fm, "Root");
 		List<Feature> list = new LinkedList<Feature>();
 		list.add(fm.root);
 		while (!list.isEmpty()) {

@@ -48,13 +48,15 @@ public class NewFeatureProjectPage extends WizardPage {
 	private IComposerExtension composerExtension = null;
 	private IComposerExtension[] extensions = null;
 	
-	private Text sourcePath,configsPath,buildPath;
+	private Text sourcePath, configsPath;
+	protected Text buildPath;
 	
 	private Composite container;
 	private Combo toolCB;
 	protected GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 	private GridLayout layout = new GridLayout();
 	protected Group pathGroup;
+	protected Label buildLabel;
 	
 	protected NewFeatureProjectPage() {
 		super("");
@@ -104,7 +106,6 @@ public class NewFeatureProjectPage extends WizardPage {
 	    });
 	    
 		for (IComposerExtension composerExtension : extensions) {
-			// StringBuilder is more efficient than concatenating strings with += inside a loop
 			descriptionStringBuilder.append(composerExtension.getName());
 			descriptionStringBuilder.append(": ");
 			descriptionStringBuilder.append(composerExtension.getDescription());
@@ -135,9 +136,9 @@ public class NewFeatureProjectPage extends WizardPage {
 		pathGroup.setLayout(layout);
 		
 		String tooltip = "Sets the path of composed files.";
-		label = new Label(pathGroup, SWT.NULL);
-		label.setText("&Source Path:");
-		label.setToolTipText(tooltip);
+		buildLabel = new Label(pathGroup, SWT.NULL);
+		buildLabel.setText("&Source Path:");
+		buildLabel.setToolTipText(tooltip);
 		buildPath = new Text(pathGroup, SWT.BORDER | SWT.SINGLE);
 		buildPath.setLayoutData(gd);
 		buildPath.setText("src");
@@ -278,21 +279,18 @@ public class NewFeatureProjectPage extends WizardPage {
 	public String getSourcePath() {
 		if (sourcePath.isEnabled()) {
 			return sourcePath.getText();
-		} else if (buildPath.isEnabled()) {
-			return buildPath.getText();
 		} else {
-			return "";
+			return buildPath.getText();
 		}
 	}
 	
 	public String getConfigPath() {
-
 		return configsPath.isEnabled() ? configsPath.getText() : "";
 
 	}
 	
 	public String getBuildPath() {
-		return buildPath.isEnabled() ? buildPath.getText() : "";
+		return buildPath.getText();
 	}
 
 }

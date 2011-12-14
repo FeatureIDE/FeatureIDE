@@ -18,20 +18,22 @@
  */
 package de.ovgu.featureide.ahead.actions;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.LinkedList;
-import java.util.Scanner;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.core.IClasspathAttribute;
+import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.IPackageFragmentRoot;
+import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.internal.core.ClasspathEntry;
+import org.eclipse.jdt.internal.core.JavaProject;
 
 import de.ovgu.featureide.ahead.AheadComposer;
 import de.ovgu.featureide.ahead.AheadCorePlugin;
@@ -43,13 +45,8 @@ import de.ovgu.featureide.core.fstmodel.FSTMethod;
  * 
  * @author Jens Meinicke
  */
+@SuppressWarnings("restriction")
 public class FeatureHouseToAHEADConversion extends ComposerConversion {
-
-	private static final String SOURCE_ENTRY = "\t<classpathentry kind=\"src\" path=\"";
-	private static final String EXCLUDE_ENTRY = "\t<classpathentry excluding=\"";
-	private static final String EXCLUDE_SOURCE_ENTRY = "\" kind=\"src\" path=\"";
-	private static final String CLASSPATH_START = "<classpath>";
-	
 	/**
 	 * Changes the composer of the given feature project to <code>AHEAD</code>.
 	 * @param featureProject
@@ -78,64 +75,47 @@ public class FeatureHouseToAHEADConversion extends ComposerConversion {
 	 * @param featureProject
 	 */
 	private void setJavaBuildPath(IFeatureProject featureProject) {
-		Scanner scanner = null;
-		FileWriter fw = null;
-		IFile iClasspathFile = featureProject.getProject()
-				.getFile(".classpath");
-		if (!iClasspathFile.exists()) {
-			return;
+		try {	
+			JavaProject javaProject = new JavaProject(featureProject.getProject(), null);
+			IClasspathEntry[] classpathEntries = javaProject.getRawClasspath();
+			for (int i = 0; i < classpathEntries.length; i++) {
+				/** change the actual source entry **/
+				if (classpathEntries[i].getEntryKind() == IClasspathEntry.CPE_SOURCE) {
+					classpathEntries[i] = setSourceEntry(classpathEntries[i]);
+					javaProject.setRawClasspath(classpathEntries, null);
+					return;
+				}
+			}
+			
+			/** case: no source entry **/
+			IClasspathEntry[] newEntries = new IClasspathEntry[classpathEntries.length + 1];
+			System.arraycopy(classpathEntries, 0, newEntries, 0, classpathEntries.length);
+			newEntries[newEntries.length - 1] = getSourceEntry();
+			javaProject.setRawClasspath(classpathEntries, null);
+		} catch (JavaModelException e) {
+			AheadCorePlugin.getDefault().logError(e);
 		}
-		try {
-			File file = iClasspathFile.getRawLocation().toFile();
-			StringBuffer fileText = new StringBuffer();
-			scanner = new Scanner(file);
-			boolean hasSourceEntry = false;
-			while (scanner.hasNext()) {
-				String line = scanner.nextLine();
-				if (line.contains(SOURCE_ENTRY)) {
-					fileText.append(SOURCE_ENTRY
-					+ featureProject.getBuildFolder().getName() + "\"/>");
-					fileText.append("\r\n");
-					hasSourceEntry = true;
-				} else if (line.contains(EXCLUDE_ENTRY)) {
-					fileText.append(line.substring(0,
-							line.indexOf(EXCLUDE_SOURCE_ENTRY)
-							+ EXCLUDE_SOURCE_ENTRY.length())
-							+ featureProject.getBuildFolder().getName() + "\"/>");
-					fileText.append("\r\n");
-					hasSourceEntry = true;
-				} else {
-					fileText.append(line);
-					fileText.append("\r\n");
-				}
-			}
-			String fileTextString;
-			if (!hasSourceEntry) {
-				fileTextString = fileText.toString().replaceFirst(CLASSPATH_START, 
-						CLASSPATH_START + "\r\n" + SOURCE_ENTRY
-						+ featureProject.getBuildFolder().getName() + "\"/>");
-			} else {
-				fileTextString = fileText.toString();
-			}
-			fw = new FileWriter(file);
-			fw.write(fileTextString);
-		} catch (FileNotFoundException e) {
-			AheadCorePlugin.getDefault().logError(e);
-		} catch (IOException e) {
-			AheadCorePlugin.getDefault().logError(e);
-		} finally {
-			if (scanner != null) {
-				scanner.close();
-			}
-			if (fw != null) {
-				try {
-					fw.close();
-				} catch (IOException e) {
-					AheadCorePlugin.getDefault().logError(e);
-				}
+	}
+	
+	/**
+	 * Set the source path of given <code>ClasspathEntry</code> to the current build path
+	 * @param e The entry to set
+	 * @return The entry with the new source path
+	 */
+	public IClasspathEntry setSourceEntry(IClasspathEntry e) {
+		return new ClasspathEntry(e.getContentKind(), e.getEntryKind(), 
+				featureProject.getBuildFolder().getFullPath(), e.getInclusionPatterns(), e.getExclusionPatterns(), 
+				e.getSourceAttachmentPath(), e.getSourceAttachmentRootPath(), null, 
+				e.isExported(), e.getAccessRules(), e.combineAccessRules(), e.getExtraAttributes());
+	}
 
-			}
-		}
+	/**
+	 * @return A default source entry
+	 */
+	public IClasspathEntry getSourceEntry() {
+		return new ClasspathEntry(IPackageFragmentRoot.K_SOURCE, 
+				IClasspathEntry.CPE_SOURCE, featureProject.getBuildFolder().getFullPath(), new IPath[0],
+				new IPath[0], null, null, null, false, null, false, new IClasspathAttribute[0]);
 	}
 
 	/**
