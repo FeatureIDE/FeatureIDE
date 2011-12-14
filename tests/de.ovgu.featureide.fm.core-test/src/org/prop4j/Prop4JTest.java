@@ -1,10 +1,12 @@
 package org.prop4j;
 
-import java.util.Arrays;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import java.util.Arrays;
+
 import junit.framework.JUnit4TestAdapter;
 
 import org.junit.Test;
@@ -240,7 +242,7 @@ public class Prop4JTest {
 	private void testReaderByObject(String constraint, Node cNode) {
 		Node node = new NodeReader().stringToNode(constraint);
 
-		assertEquals(node, cNode);
+		assertEquals(cNode, node);
 	}
 
 	@Test
@@ -584,5 +586,20 @@ public class Prop4JTest {
 		solver.isSatisfiable(new VecInt(new int[] { 1, -2, -3 }));
 		assertFalse(solver.isSatisfiable(new VecInt(new int[] { -4 })));
 
+	}
+	
+	@Test
+	public void problemAymericHervieu() {
+		String ctr = "(C => A) & (E => C) & (G => C) & (D => A) & (F => C) & (C => A) &"+
+				"(I => D) & (B => A) & (D => A) & (J => D) & (J => D) & (B => A) & (E "+
+				"=> C) & (F => C) & (I => D) & (G => C) & A & (False | A) & (A => B) &"+
+				"(C => E | F | G) & (E => -G) & (E => -F) & (F => -G) & (D => J | I) &"+
+				"(I => E)"; 
+
+		NodeReader nd = new NodeReader();
+		nd.activateShortSymbols();
+		assertTrue(nd.isWellFormed(ctr));
+		Node n = nd.stringToNode(ctr);
+		assertNotNull(n.getChildren());
 	}
 }
