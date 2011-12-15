@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -63,6 +64,10 @@ public class AspectJComposer extends ComposerExtensionClass {
 	private static final String NEW_ASPECT = "\t// TODO Auto-generated aspect\r\n";
 
 	public static final IPath ASPECTJRT_CONTAINER = new Path("org.eclipse.ajdt.core.ASPECTJRT_CONTAINER");
+
+	private static final String BUILDER_AJ = "core.eclipse.ajdt.core.ajbuilder";
+
+	private static final Object BUILDER_JAVA = "org.eclipse.jdt.core.javabuilder";
 
 	private LinkedList<String> selectedFeatures;
 	private LinkedList<String> unSelectedFeatures;
@@ -357,6 +362,23 @@ public class AspectJComposer extends ComposerExtensionClass {
 				}
 			}
 			description.setNatureIds(newNatures);
+			
+			/** the java builder has to be replaced with the AspectJ builder **/
+			if (description.getBuildSpec().length > 0) {
+				ICommand[] buildSpec = new ICommand[description.getBuildSpec().length];
+				int k = 0;
+				for (ICommand c : description.getBuildSpec()) {
+					if (!c.getBuilderName().equals(BUILDER_JAVA)) {
+						buildSpec[k] = c;
+						k++;
+					} else {
+						c.setBuilderName(BUILDER_AJ);
+						buildSpec[k] = c;
+					}
+				}
+				description.setBuildSpec(buildSpec);
+			}
+			
 			project.setDescription(description, null);
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
@@ -401,11 +423,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 		if (feature.hasChildren()) {
 			for (Feature child : feature.getChildren()) {
 				if (child.isLayer() && !child.getName().equals(rootName)) {
-					try {
-						createAspect(child.getName(), featureProject.getBuildFolder(), null);
-					} catch (CoreException e) {
-						AspectJCorePlugin.getDefault().logError(e);
-					}
+					createAspect(child.getName(), featureProject.getBuildFolder(), null);
 				}
 				checkAspect(child);
 			}
@@ -431,7 +449,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 		}
 	}
  
-	private void createAspect(String aspect, IFolder folder, String aspectPackage) throws CoreException {
+	private void createAspect(String aspect, IFolder folder, String aspectPackage) {
 		IFile aspectFile = getAspectFile(aspect, aspectPackage, folder);
 		if (aspectPackage == null && aspect.contains("_")) {
 			aspectPackage = aspect.substring(0, aspect.lastIndexOf("_")).replaceAll("_", ".");
@@ -453,8 +471,14 @@ public class AspectJComposer extends ComposerExtensionClass {
 						   "}"; 
 			}
 			InputStream source = new ByteArrayInputStream(fileText.getBytes());
-			aspectFile.create(source, true, null);
-			aspectFile.refreshLocal(IResource.DEPTH_ZERO, null);
+			try {
+				aspectFile.create(source, true, null);
+				aspectFile.refreshLocal(IResource.DEPTH_ZERO, null);
+			} catch (CoreException e) {
+				// avoid resource already exists error
+				// has no negative effect
+			}
+			
 		}
 	}
 

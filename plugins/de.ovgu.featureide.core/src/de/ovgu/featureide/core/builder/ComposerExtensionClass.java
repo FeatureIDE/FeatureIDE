@@ -95,7 +95,10 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 					// XXX the source entry should be equivalent to the build path, 
 					// but e.g. at FeatureHouse the real build path is src/config -> Builder problems
 					// -> is it necessary to correct the path?
-					//oldEntries[i] = setSourceEntry(buildPath, oldEntries[i]);
+					if (oldEntries[i].getPath().toString().equals("/" + project.getName())) {
+						/** necessary after creating a new FeatureIDE project **/
+						oldEntries[i] = setSourceEntry(buildPath, oldEntries[i]);
+					}
 					/** find source entry **/
 					sourceAdded = true;
 				} else if (!containerAdded && oldEntries[i].getEntryKind() == IClasspathEntry.CPE_CONTAINER) {
