@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
 	<name>EPL-DeltaJ</name>
-	<comment></comment>
+	<comment>
+	[description]
+	The Expression Problem implemented in DeltaJ.
+	[/description]
+	</comment>
 	<projects>
 	</projects>
 	<buildSpec>

@@ -431,7 +431,7 @@ public class ComposerWrapper {
 	private void handleErrorMessage(ExtendedParseException e,
 			TreeMap<String, IFile> fileMap) {
 		IFile source = null;
-		if (fileMap.containsKey(e.getFilename()))
+		if (fileMap != null && fileMap.containsKey(e.getFilename()))
 			source = fileMap.get(e.getFilename());
 		String message = source != null ? e.getShortMessage() : e
 				.getFullMessage();

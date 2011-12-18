@@ -2,6 +2,9 @@
 <projectDescription>
 	<name>Notepad-FH-Java</name>
 	<comment>
+	[description]
+	Implementation of a simple Notepad.
+	[/description]
 	</comment>
 	<projects>
 	</projects>

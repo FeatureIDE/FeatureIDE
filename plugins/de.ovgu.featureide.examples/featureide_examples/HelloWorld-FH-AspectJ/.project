@@ -3,7 +3,7 @@
 	<name>HelloWorld-FH-AspectJ</name>
 	<comment>
 	[description]
-	This is a simple hello world application for AspectJ.
+	This is a simple hello world application combining FeatureHouse and AspectJ.
 	[/description]	
 	</comment>
 	<projects>

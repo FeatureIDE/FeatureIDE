@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
 	<name>Arith-FH-Haskell</name>
-	<comment></comment>
+	<comment>
+	[description]
+	An arithmetic expression evaluator.
+	[/description]
+	</comment>
 	<projects>
 	</projects>
 	<buildSpec>

@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
 	<name>GPL-FH-CSharp</name>
-	<comment></comment>
+	<comment>
+	[description]
+	A Graph Product Line implemented in C# for FH.
+	[/description]
+	</comment>
 	<projects>
 	</projects>
 	<buildSpec>

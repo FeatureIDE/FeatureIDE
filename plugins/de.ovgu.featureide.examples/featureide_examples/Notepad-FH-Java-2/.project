@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
 	<name>Notepad-FH-Java-2</name>
-	<comment></comment>
+	<comment>
+	[description]
+	Implementation of a simple Notepad.
+	[/description]
+	</comment>
 	<projects>
 	</projects>
 	<buildSpec>

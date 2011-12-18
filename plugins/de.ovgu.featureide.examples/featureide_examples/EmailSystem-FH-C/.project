@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
 	<name>EmailSystem-FH-C</name>
-	<comment></comment>
+	<comment>
+	[description]
+	A case study built upon an e-mail system, introduced by Hall.
+	[/description]
+	</comment>
 	<projects>
 	</projects>
 	<buildSpec>

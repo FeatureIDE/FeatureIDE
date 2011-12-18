@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
 	<name>GPL-AHEAD</name>
-	<comment></comment>
+	<comment>
+	[description]
+	A Graph Product Line implemented in AHEAD.
+	[/description]
+	</comment>
 	<projects>
 	</projects>
 	<buildSpec>

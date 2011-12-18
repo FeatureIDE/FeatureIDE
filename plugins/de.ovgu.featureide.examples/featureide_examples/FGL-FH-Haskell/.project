@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
 	<name>FGL-FH-Haskell</name>
-	<comment></comment>
+	<comment>
+	[description]
+	A Functional Graph Library.
+	[/description]
+	</comment>
 	<projects>
 	</projects>
 	<buildSpec>
