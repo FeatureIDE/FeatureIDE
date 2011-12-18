@@ -310,23 +310,27 @@ public class CorePlugin extends AbstractCorePlugin {
 	 * Creates a configuration file, where the base feature is selected, to automatically build the project.
 	 */
 	protected static void runProjectConversion( IProject project, String sourcePath, String configPath, 
-			String buildPath,  IComposerExtensionClass composer) throws CoreException, IOException {
-		project.getFolder(buildPath).deleteMarkers(null, true, IResource.DEPTH_INFINITE);
-		
-		IFolder source = project.getFolder(buildPath);
-		IFolder destination = !sourcePath.equals("") ? project.getFolder(sourcePath).getFolder(BASE_FEATURE): null;
-		if (!composer.postAddNature(source, destination) && !sourcePath.equals("")) {
-			if (!composer.hasFeatureFolders()) {
-				/** if project does not use feature folders, use the source path directly **/
-				destination = project.getFolder(sourcePath);
+			String buildPath,  IComposerExtensionClass composer) throws IOException {
+		try {
+			project.getFolder(buildPath).deleteMarkers(null, true, IResource.DEPTH_INFINITE);
+			
+			IFolder source = project.getFolder(buildPath);
+			IFolder destination = !sourcePath.equals("") ? project.getFolder(sourcePath).getFolder(BASE_FEATURE): null;
+			if (!composer.postAddNature(source, destination) && !sourcePath.equals("")) {
+				if (!composer.hasFeatureFolders()) {
+					/** if project does not use feature folders, use the source path directly **/
+					destination = project.getFolder(sourcePath);
+				}
+				if (!destination.exists()) {
+					destination.create(false, true, null);
+				}
+				/** moves all files of the old source folder to the destination **/
+				for (IResource res : source.members()) {
+					res.move(destination.getFile(res.getName()).getFullPath(),true, null);
+				}
 			}
-			if (!destination.exists()) {
-				destination.create(false, true, null);
-			}
-			/** moves all files of the old source folder to the destination **/
-			for (IResource res : source.members()) {
-				res.move(destination.getFile(res.getName()).getFullPath(),true, null);
-			}
+		} catch (CoreException e) {
+			CorePlugin.getDefault().logError(e);
 		}
 		/** create a configuration to automatically build
 		 *  the project after adding the FeatureIDE nature **/
@@ -335,8 +339,13 @@ public class CorePlugin extends AbstractCorePlugin {
 		FileWriter fw = new FileWriter(configFile.getRawLocation().toFile());
 		fw.write(BASE_FEATURE);
 		fw.close();
-		configFile.create(null, true, null);
-		configFile.refreshLocal(IResource.DEPTH_ZERO, null);
+		try {
+			configFile.create(null, true, null);
+			configFile.refreshLocal(IResource.DEPTH_ZERO, null);
+		} catch (CoreException e) {
+			// Avoid file exist error
+			// Has no negative efect
+		}
 	}
 
 	/**
