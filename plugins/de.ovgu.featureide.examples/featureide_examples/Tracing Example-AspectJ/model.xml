@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel chosenLayoutAlgorithm="1">
+		<struct>
+			<and abstract="true" mandatory="true" name="Base">
+				<alt abstract="true" name="tracing">
+					<and abstract="true" mandatory="true" name="Lib">
+						<feature mandatory="true" name="tracing_lib_AbstractTrace"/>
+						<feature mandatory="true" name="tracing_lib_TraceMyClasses"/>
+					</and>
+					<and abstract="true" mandatory="true" name="Version1">
+						<feature mandatory="true" name="tracing_version1_TraceMyClasses"/>
+					</and>
+					<and abstract="true" mandatory="true" name="Version2">
+						<feature mandatory="true" name="tracing_version2_TraceMyClasses"/>
+						<feature mandatory="true" name="tracing_version2_Trace"/>
+					</and>
+					<and abstract="true" mandatory="true" name="Version3">
+						<feature mandatory="true" name="tracing_version3_Trace"/>
+						<feature mandatory="true" name="tracing_version3_TraceMyClasses"/>
+					</and>
+				</alt>
+			</and>
+		</struct>
+		<constraints/>
+		<comments/>
+		<featureOrder userDefined="false"/>
+	</featureModel>

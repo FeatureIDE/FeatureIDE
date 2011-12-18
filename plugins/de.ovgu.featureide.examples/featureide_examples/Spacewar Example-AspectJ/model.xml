@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel chosenLayoutAlgorithm="1">
+		<struct>
+			<and abstract="true" mandatory="true" name="SpaceWar">
+				<feature name="coordination_Coordinator"/>
+				<feature name="spacewar_EnsureShipIsAlive"/>
+				<feature name="spacewar_GameSynchronization"/>
+				<feature name="spacewar_RegistrySynchronization"/>
+				<feature name="spacewar_Debug"/>
+				<feature mandatory="true" name="spacewar_Registry"/>
+				<and abstract="true" mandatory="true" name="Display">
+					<feature mandatory="true" name="spacewar_Display"/>
+					<feature mandatory="true" name="spacewar_Display1"/>
+					<feature mandatory="true" name="spacewar_Display2"/>
+				</and>
+				<feature mandatory="true" name="spacewar_Ship"/>
+			</and>
+		</struct>
+		<constraints/>
+		<comments/>
+		<featureOrder userDefined="false"/>
+	</featureModel>
