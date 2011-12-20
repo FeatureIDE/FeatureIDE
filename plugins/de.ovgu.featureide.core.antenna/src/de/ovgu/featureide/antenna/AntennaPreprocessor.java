@@ -32,10 +32,6 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
@@ -109,7 +105,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 			preprocessor.addDefines(featureList.toString());
 
 			// preprocess for all files in source folder
-			preprocessSourceFiles(featureProject.getBuildFolder(), true);
+			startPreprocessingSourceFiles(featureProject.getBuildFolder(), true);
 		} catch (Exception e) {
 			AntennaCorePlugin.getDefault().logError(e);
 		}
@@ -134,11 +130,15 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	 */
 	@Override
 	public void postModelChanged() {
-		try {
 			deleteAllPreprocessorAnotationMarkers();
-			System.out.println("postModelChanged");
 			prepareFullBuild(null);
-			preprocessSourceFiles(featureProject.getBuildFolder(), false);
+			startPreprocessingSourceFiles(featureProject.getBuildFolder(), false);
+	}
+	
+	private void startPreprocessingSourceFiles(IFolder sourceFolder, boolean performFullBuild) {
+		try {
+			preprocessSourceFiles(sourceFolder, performFullBuild);
+			setModelMarkers();
 		} catch (FileNotFoundException e) {
 			AntennaCorePlugin.getDefault().logError(e);
 		} catch (CoreException e) {
@@ -147,7 +147,6 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 			AntennaCorePlugin.getDefault().logError(e);
 		}
 	}
-	
 	/**
 	 * preprocess all files in folder
 	 * 
@@ -158,7 +157,6 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	 */
 	private void preprocessSourceFiles(IFolder sourceFolder, boolean performFullBuild) throws CoreException,
 			FileNotFoundException, IOException {
-		
 		for (final IResource res : sourceFolder.members()) {
 			if (res instanceof IFolder) {
 				// for folders do recursively 
@@ -173,18 +171,10 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 				final Vector<String> lines = loadStringsFromFile((IFile) res);
 				
 				// do checking and some stuff
-				Job job = new Job("preprocessor annotation checking") {
-					@Override
-					protected IStatus run(IProgressMonitor monitor) {
-						processLinesOfFile(lines, (IFile) res);
-						return Status.OK_STATUS;
-					}
-				};
-				job.setPriority(Job.SHORT);
-				job.schedule();
+				processLinesOfFile(lines, (IFile) res);
 				
 				if (!performFullBuild) {
-					return;
+					continue;
 				}
 
 				boolean changed = false;

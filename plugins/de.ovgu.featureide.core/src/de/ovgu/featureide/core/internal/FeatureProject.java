@@ -695,7 +695,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 					// without any source files
 					if (allFeatureModulesEmpty(sourceFolder)) {
 						sourceFolder.deleteMarkers(
-								"de.ovgu.featureide.core.featureModuleMarker",
+								FEATURE_MODULE_MARKER,
 								true, IResource.DEPTH_ONE);
 						return Status.OK_STATUS;
 					}

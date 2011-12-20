@@ -19,6 +19,7 @@
 package de.ovgu.featureide.core.builder.preprocessor;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.Stack;
 import java.util.Vector;
@@ -89,9 +90,11 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	/** Stack for count of "if" and "else" instructions for each level. Have to be initialized in subclass. */
 	protected Stack<Integer> ifelseCountStack;
 	
-	private static final String BUILDER_MARKER = CorePlugin.PLUGIN_ID
-			+ ".builderProblemMarker";
-	
+	private static final String BUILDER_MARKER = CorePlugin.PLUGIN_ID + ".builderProblemMarker";
+	private static final String FEATURE_MODULE_MARKER = CorePlugin.PLUGIN_ID +".featureModuleMarker";
+			
+	/** contains all used features at any source file **/			
+	protected LinkedList<String> usedFeatures = new LinkedList<String>();
 	/**
 	 * Sets the name of the plug-in
 	 */
@@ -106,6 +109,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	 * @return Return <code>false</code> if configuration file does not exists or its feature list is empty.
 	 */
 	public boolean prepareFullBuild(IFile config) {
+		usedFeatures.clear();
 		assert (featureProject != null) : "Invalid project given";
 		if (config != null) {
 			final String configPath = config.getRawLocation().toOSString();
@@ -233,6 +237,11 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		if (ppExpression == null) {
 			return;
 		}
+
+		/** collect all used features **/
+		if (!usedFeatures.contains(ppExpression.toString())) {
+			usedFeatures.add(ppExpression.toString());
+		}
 		
 		int result = isContradictionOrTautology(ppExpression.clone(), false, lineNumber, res);
 		
@@ -260,7 +269,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	protected void setMarkersOnNotExistingOrAbstractFeature(String name, int lineNumber, IFile res) {
 		if (name == null)
 			return;
-		
+
 		Matcher matcherFeature =null;
 		if(patternIsAbstractFeature!=null)
 		matcherFeature = patternIsAbstractFeature.matcher(name);
@@ -341,6 +350,77 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 			message.contains(MESSAGE_DEAD_CODE) ||
 			message.contains(MESSAGE_NOT_DEFINED)) {
 				return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Creates following markers at the Feature Model:<br>
+	 * -A Feature is never used in a preprocessor annotation<br>
+	 * -A used Feature does not exist at the Feature Model<br>
+	 * -A used Feature is abstract 
+	 */
+	@SuppressWarnings("unchecked")
+	protected void setModelMarkers() {
+		removeModelMarkers();
+		LinkedList<String> features = (LinkedList<String>)this.usedFeatures.clone() ;
+		for (Feature f : featureProject.getFeatureModel().getFeatures()) {
+			if (f.isAbstract() && features.contains(f.getName())) {
+				features.remove(f.getName());				
+				createMarker("The Feature \"" + f.getName() + "\" needs to be concrete.");
+			} else if (f.isConcrete() && !features.contains(f.getName())) {
+				createMarker("You should use the Feature \"" + f.getName() + "\" or set it abstract.");
+			} else {
+				features.remove(f.getName());
+			}
+		}
+		for (String f : features) {
+			createMarker("You should create a Feature named \"" + f + "\".");
+		}
+	}
+
+	/**
+	 * Removes the old model markers.
+	 */
+	private void removeModelMarkers() {
+		try {
+			featureProject.getModelFile().deleteMarkers(FEATURE_MODULE_MARKER, false, IResource.DEPTH_ZERO);
+		} catch (CoreException e) {
+			CorePlugin.getDefault().logError(e);
+		}
+	}
+
+	/**
+	 * Creates a marker with the given message at the feature model.
+	 * @param message
+	 */
+	private void createMarker(String message) {
+		try {
+			if (!hasMarker(message)) {
+				IMarker marker = featureProject.getModelFile().createMarker(FEATURE_MODULE_MARKER);
+				marker.setAttribute(IMarker.MESSAGE, message);
+				marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
+				marker.setAttribute(IMarker.LINE_NUMBER, -1);
+			}
+		} catch (CoreException e) {
+			CorePlugin.getDefault().logError(e);
+		}
+	}
+
+	/**
+	 * Tests if the marker with the given message already exists.
+	 * @param message
+	 * @return
+	 */
+	private boolean hasMarker(String message) {
+		try {
+			for (IMarker m : featureProject.getModelFile().findMarkers(FEATURE_MODULE_MARKER, false, IResource.DEPTH_ZERO)) {
+				if (m.getAttribute(IMarker.MESSAGE, "").equals(message)) {
+					return true;
+				}
+			}
+		} catch (CoreException e) {
+			CorePlugin.getDefault().logError(e);
 		}
 		return false;
 	}

@@ -120,7 +120,16 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 
 	private void annotationChecking() {
 		deleteAllPreprocessorAnotationMarkers();
-		annotationChecking(featureProject.getSourceFolder());
+		Job job = new Job("preprocessor annotation checking") {
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				annotationChecking(featureProject.getSourceFolder());
+				setModelMarkers();
+				return Status.OK_STATUS;
+			}
+		};
+		job.setPriority(Job.SHORT);
+		job.schedule();
 	}
 	
 	private void annotationChecking(IFolder folder) {
@@ -132,15 +141,7 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 				if (res instanceof IFile){
 					final Vector<String> lines = loadStringsFromFile((IFile) res);
 					// do checking and some stuff
-					Job job = new Job("preprocessor annotation checking") {
-						@Override
-						protected IStatus run(IProgressMonitor monitor) {
-							processLinesOfFile(lines, (IFile) res);
-							return Status.OK_STATUS;
-						}
-					};
-					job.setPriority(Job.SHORT);
-					job.schedule();
+					processLinesOfFile(lines, (IFile) res);
 				}
 			}
 		} catch (CoreException e) {
@@ -287,7 +288,6 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 						
 						ifelseCountStack.push(ifelseCountStack.pop() + 1);
 						expressionStack.push(ppExpression);
-					
 						doThreeStepExpressionCheck(ppExpression, lineNumber, res);
 					}
 					
