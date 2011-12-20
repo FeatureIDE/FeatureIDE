@@ -97,7 +97,7 @@ public class MungeFMComposerExtension extends FMComposerExtension {
 		if (!fileContent.contains(oldName)) {
 			return null;
 		}
-		return fileContent.toString().replaceAll("\\["+oldName+"\\]\\*\\/","[" + newName + "]*/");
+		return fileContent.replaceAll("\\["+oldName+"\\]\\*\\/","[" + newName + "]*/");
 	}
 
 	/**
@@ -105,6 +105,9 @@ public class MungeFMComposerExtension extends FMComposerExtension {
 	 * @param iFile
 	 */
 	private void setFilecontent(String filecontent, IFile iFile) {
+		if (filecontent == null) {
+			return;
+		}
 		File file = iFile.getRawLocation().toFile();
 		FileWriter fw = null;
 		try {
