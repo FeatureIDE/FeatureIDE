@@ -387,8 +387,7 @@ public class NodeCreator {
 			Node value = map.get(key);
 			HashMap<Object, Node> tempMap = new HashMap<Object, Node>();
 			tempMap.put(var, replacing);
-			value = NodeCreator
-					.replaceAbstractVariables(value, tempMap, true);
+			value = NodeCreator.replaceAbstractVariables(value, tempMap, true);
 			map.put(key, value);
 		}
 		map.put(var, replacing);

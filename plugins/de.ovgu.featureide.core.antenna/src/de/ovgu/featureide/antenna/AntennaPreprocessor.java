@@ -195,12 +195,17 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 
 				// if preprocessor changed file: save & refresh
 				if (changed) {
-					FileOutputStream ostr = new FileOutputStream(res
-							.getRawLocation().toOSString());
-					Preprocessor.saveStrings(lines, ostr,
-							((IFile) res).getCharset());
-					ostr.close();
-
+					FileOutputStream ostr = null;
+					try {
+						ostr = new FileOutputStream(res
+								.getRawLocation().toOSString());
+						Preprocessor.saveStrings(lines, ostr,
+								((IFile) res).getCharset());
+					} finally {
+						if (ostr != null) {
+							ostr.close();
+						}
+					}
 					// use touch to support e.g. linux
 					res.touch(null);
 					res.refreshLocal(IResource.DEPTH_ZERO, null);

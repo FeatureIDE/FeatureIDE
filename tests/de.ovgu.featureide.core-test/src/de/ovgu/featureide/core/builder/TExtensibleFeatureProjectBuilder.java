@@ -23,7 +23,7 @@ public class TExtensibleFeatureProjectBuilder {
 	public TemporaryFolder testFolder = new TemporaryFolder();
 
 	@Test
-	public void TestGetSelectedFeatures() throws IOException {
+	public void testGetSelectedFeatures() throws IOException {
 		ArrayList<String> expectedList = new ArrayList<String>();
 		expectedList.add("one");
 		expectedList.add("two");

@@ -89,6 +89,8 @@ public class CorePlugin extends AbstractCorePlugin {
 	private LinkedList<IProject> projectsToAdd = new LinkedList<IProject>();
 	
 	private Job job = null;
+	
+	private int couterAddProjects = 0;
 
 	/**
 	 * add ResourceChangeListener to workspace to track project move/rename
@@ -336,15 +338,20 @@ public class CorePlugin extends AbstractCorePlugin {
 		 *  the project after adding the FeatureIDE nature **/
 		IFile configFile = project.getFolder(configPath).getFile(
 				project.getName().split("[-]")[0] +	composer.getConfigurationExtension());
-		FileWriter fw = new FileWriter(configFile.getRawLocation().toFile());
-		fw.write(BASE_FEATURE);
-		fw.close();
+		FileWriter fw = null;
 		try {
+			fw = new FileWriter(configFile.getRawLocation().toFile());
+			fw.write(BASE_FEATURE);
+		
 			configFile.create(null, true, null);
 			configFile.refreshLocal(IResource.DEPTH_ZERO, null);
 		} catch (CoreException e) {
 			// Avoid file exist error
 			// Has no negative efect
+		} finally {
+			if (fw != null) {
+				fw.close();
+			}
 		}
 	}
 
@@ -562,26 +569,28 @@ public class CorePlugin extends AbstractCorePlugin {
 		}
 		
 		if (job.getState() == Job.NONE) {
-			i = 1;
+			couterAddProjects = 0;
 			job.schedule();
 		}
 	}
-	
-	private int i = 1;
+
 	protected void addProjects(IProgressMonitor monitor) {
 		if (projectsToAdd.isEmpty()) {
 			monitor.done();
 			return;
 		}
 		
-		for (IProject project : projectsToAdd) {
-			monitor.subTask("Add project " + project.getName());
+		while (!projectsToAdd.isEmpty()) {
+			IProject project = projectsToAdd.getFirst();
 			projectsToAdd.remove(project);
+			
+			monitor.beginTask("", projectsToAdd.size() + couterAddProjects);
+			monitor.worked(++couterAddProjects);
+			monitor.subTask("Add project " + project.getName());
+			
 			addProject(project);
-			break;
+			
 		}
-		monitor.beginTask("", projectsToAdd.size());
-		monitor.worked(i++);
 		addProjects(monitor);
 	}
 	

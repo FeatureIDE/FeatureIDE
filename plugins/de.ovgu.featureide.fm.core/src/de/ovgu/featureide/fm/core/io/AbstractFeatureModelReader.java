@@ -22,6 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.LinkedList;
@@ -29,6 +30,7 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
 
@@ -60,16 +62,37 @@ public abstract class AbstractFeatureModelReader implements IFeatureModelReader 
 	public void readFromFile(IFile file) throws UnsupportedModelException, FileNotFoundException {
 		warnings.clear();
 		String fileName = file.getRawLocation().toOSString();		
-        InputStream inputStream = new FileInputStream(fileName);
-        parseInputStream(inputStream);
+		InputStream inputStream = null;
+		try {
+			inputStream = new FileInputStream(fileName);
+		    parseInputStream(inputStream);
+		} finally {
+			if (inputStream != null) {
+				try {
+					inputStream.close();
+				} catch (IOException e) {
+					FMCorePlugin.getDefault().logError(e);
+				}
+			}
+		}
  	}
 	
-	//@Override
 	public void readFromFile(File file) throws UnsupportedModelException, FileNotFoundException {
 		warnings.clear();
 		String fileName = file.getPath();		
-        InputStream inputStream = new FileInputStream(fileName);
-        parseInputStream(inputStream);
+		InputStream inputStream = null;
+		try {
+			inputStream = new FileInputStream(fileName);
+		    parseInputStream(inputStream);
+		} finally {
+			if (inputStream != null) {
+				try {
+					inputStream.close();
+				} catch (IOException e) {
+					FMCorePlugin.getDefault().logError(e);
+				}
+			}
+		}
  	}
 
 	public void readFromString(String text) throws UnsupportedModelException {

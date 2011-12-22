@@ -238,6 +238,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		// @author Dariusz Krolikowski
 		if (project.getFile("model.m").exists()
 				&& !project.getFile("model.xml").exists()) {
+			// TODO REFACTORING extract to method
 			try {
 				IFile file = project.getFile("model.xml");
 
@@ -279,6 +280,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			
 			/* used both for reading and deleting ( does file exist? )
 			 */
+			//TODO REFACTORING extract to method
 			File file = project.getLocation().toFile();
 			String fileSep = System.getProperty("file.separator");
 			file = new File(file.toString() + fileSep + ".order");

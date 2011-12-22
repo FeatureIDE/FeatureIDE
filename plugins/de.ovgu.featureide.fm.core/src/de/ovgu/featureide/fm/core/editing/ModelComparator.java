@@ -61,8 +61,6 @@ public class ModelComparator {
 
 	private Set<String> deletedFeatures;
 
-	private Set<String> replaceFeatures;
-
 	private Node oldRoot;
 
 	private Node newRoot;
@@ -256,10 +254,6 @@ public class ModelComparator {
 
 	public Set<String> getDeletedFeatures() {
 		return deletedFeatures;
-	}
-
-	public Set<String> getReplaceFeatures() {
-		return replaceFeatures;
 	}
 
 	public Node getOldRoot() {

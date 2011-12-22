@@ -64,7 +64,7 @@ public class CClassBuilder extends ClassBuilder {
 		LinkedList<String> fields = new LinkedList<String>();
 		String modifiers = "";
 		String type = "";
-		String names = "";
+		StringBuilder nameBuilder = new StringBuilder();
 		while (body.contains(" ,")) {
 			body = body.replaceAll(" ,", ",");
 		}
@@ -90,12 +90,12 @@ public class CClassBuilder extends ClassBuilder {
 					type = type + " " + s;
 				}
 			} else {
-				names = names + s;
+				nameBuilder.append(s);
 			}
 		}
 		fields.add(modifiers);
-		fields.add(type);
-		names = names.replaceAll(";", "");
+		fields.add(type); 
+		String names = nameBuilder.toString().replaceAll(";", "");
 		for (String name : names.split("[,]")) {
 			fields.add(name);
 		}
@@ -144,11 +144,11 @@ public class CClassBuilder extends ClassBuilder {
 		
 		String returnType = body.substring(0, body.indexOf(name));
 		returnType = returnType.replaceAll("\n", "");
-		String modifiers = "";
+		StringBuilder modifiers = new StringBuilder();
 		for (String m : modifier) {
 			if (returnType.contains(m)) {
 				returnType = returnType.replaceAll(m + " ", "");
-				modifiers = modifiers + m + " ";
+				modifiers.append(m + " ");
 			}
 		}
 		while (returnType.startsWith(" ")) {
@@ -158,7 +158,7 @@ public class CClassBuilder extends ClassBuilder {
 			returnType = returnType.substring(0, returnType.length() - 1);
 		}
 		method.add(returnType);
-		method.add(modifiers);
+		method.add(modifiers.toString());
 		
 		String parameter = body.substring(body.indexOf("(")+1, body.indexOf(")"));
 		String[] params = parameter.split(",");

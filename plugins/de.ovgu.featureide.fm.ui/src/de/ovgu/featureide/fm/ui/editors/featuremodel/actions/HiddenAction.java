@@ -28,7 +28,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureSetHidden
 
 public class HiddenAction extends SingleSelectionAction {
 
-	public static String ID = "de.ovgu.featureide.hidden";
+	public static final String ID = "de.ovgu.featureide.hidden";
 
 	private final FeatureModel featureModel;
 

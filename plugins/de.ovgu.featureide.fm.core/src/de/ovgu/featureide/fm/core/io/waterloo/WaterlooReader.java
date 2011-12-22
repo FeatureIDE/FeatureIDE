@@ -336,8 +336,7 @@ public class WaterlooReader extends AbstractFeatureModelReader {
     		throws UnsupportedModelException {
     	org.prop4j.Node node;
     	for (FeatCardinality featCard : featList) {   		
-    		Feature feat = featCard.feat;
-    		node = new And();    		
+    		Feature feat = featCard.feat;    		
     		LinkedList<Feature> children = feat.getChildren();
     		for (Feature child : children) child.setMandatory(false);
     		int start = featCard.start;
@@ -568,7 +567,7 @@ public class WaterlooReader extends AbstractFeatureModelReader {
 		}
     }
     
-    private class FeatureIndent extends Feature {
+    private static class FeatureIndent extends Feature {
     	
     	private int indentation = 0;
     	
@@ -590,7 +589,7 @@ public class WaterlooReader extends AbstractFeatureModelReader {
 //		}
     }
     
-    private class FeatCardinality {
+    private static class FeatCardinality {
     	
     	Feature feat;
     	int start;

@@ -18,7 +18,6 @@
  */
 package de.ovgu.featureide.core.fstmodel;
 
-import java.util.LinkedList;
 import java.util.TreeMap;
 
 import org.eclipse.core.resources.IFile;
@@ -41,8 +40,6 @@ public class FSTClass extends FSTModelElement {
 	public TreeMap<String, FSTField> fields;
 
 	private String className;
-
-	private LinkedList<IFile> sources;
 	
 	private boolean isClassFile = false;
 
@@ -319,10 +316,6 @@ public class FSTClass extends FSTModelElement {
 
 	public boolean hasChildren() {
 		return getOwnMethodCount() + getOwnFieldCount() > 0;
-	}
-
-	public LinkedList<IFile> getSources() {
-		return sources;
 	}
 
 	/**

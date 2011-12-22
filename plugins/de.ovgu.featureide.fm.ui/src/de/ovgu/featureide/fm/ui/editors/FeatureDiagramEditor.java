@@ -131,7 +131,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 
 	private LinkedList<LayoutSelectionAction> setLayoutActions;
 
-	private AutoLayoutConstraintAction AutoLayoutConstraintAction;
+	private AutoLayoutConstraintAction autoLayoutConstraintAction;
 
 	private int index;
 
@@ -205,7 +205,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 			setLayoutActions.add(new LayoutSelectionAction(this, featureModel,
 					i, 0));
 		}
-		AutoLayoutConstraintAction = new AutoLayoutConstraintAction(this,
+		autoLayoutConstraintAction = new AutoLayoutConstraintAction(this,
 				featureModel);
 	}
 
@@ -238,7 +238,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		for (int i = 0; i < setLayoutActions.size(); i++) {
 			subMenu.add(setLayoutActions.get(i));
 			if (i == 0) {
-				subMenu.add(AutoLayoutConstraintAction);
+				subMenu.add(autoLayoutConstraintAction);
 				subMenu.add(new Separator());
 			}
 			boolean isChosen = (i == getFeatureModel().getLayoutAlgorithm());
@@ -246,7 +246,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 			setLayoutActions.get(i).setEnabled(!isChosen);
 		}
 
-		AutoLayoutConstraintAction.setEnabled(!getFeatureModel()
+		autoLayoutConstraintAction.setEnabled(!getFeatureModel()
 				.hasFeaturesAutoLayout());
 
 		boolean connectionSelected = alternativeAction.isConnectionSelected();

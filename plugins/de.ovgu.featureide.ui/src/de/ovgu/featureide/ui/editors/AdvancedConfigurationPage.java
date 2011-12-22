@@ -179,9 +179,10 @@ public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 	}
 
 	private boolean errorMessage() { 
-		if (configurationEditor.configuration==null||(!configurationEditor.configuration.valid() && configurationEditor.configuration.number() == 0)){
-		for (TreeElement feature : configurationEditor.configuration.getRoot().getChildren())
-				remove(feature);
+		if (!configurationEditor.configuration.valid() && configurationEditor.configuration.number() == 0){
+			for (TreeElement feature : configurationEditor.configuration.getRoot().getChildren()) {
+					remove(feature);
+			}
 			viewer.getTree().getItem(0).setText("The feature model for " +
 					"this project is void, i.e., there is no valid configuration. " +
 					"You need to correct the feature model before you can create " +

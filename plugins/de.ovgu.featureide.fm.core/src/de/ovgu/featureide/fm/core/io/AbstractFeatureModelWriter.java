@@ -63,14 +63,20 @@ public abstract class AbstractFeatureModelWriter implements IFeatureModelWriter 
 	}
 	
 	public void writeToFile(File file) {
+		FileOutputStream output = null;
 		try {
 			if (!file.exists()) file.createNewFile();
-			FileOutputStream output = new FileOutputStream(file);
+			output = new FileOutputStream(file);
 			output.write(writeToString().getBytes());
 			output.flush();
-			output.close();
 		} catch (IOException e) {
 			FMCorePlugin.getDefault().logError(e);
+		} finally {
+			try {
+				output.close();
+			} catch (IOException e) {
+				FMCorePlugin.getDefault().logError(e);
+			}
 		}
 	}
 	

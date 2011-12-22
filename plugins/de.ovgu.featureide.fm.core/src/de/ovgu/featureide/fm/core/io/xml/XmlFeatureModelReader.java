@@ -63,32 +63,23 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 	}
 
 	/**
-	 * Set this true to see some information about the parseprocess while
-	 * developing!
-	 */
-	boolean DEBUG_XML = false;
-
-	/**
 	 * A kind of mind for the hirachy of the xml model
 	 */
-	Stack<String[]> parentStack = new Stack<String[]>();
+	private Stack<String[]> parentStack = new Stack<String[]>();
 
 	/**
 	 * A kind of mind for the hirachy of the xml contraint model
 	 */
-	LinkedList<LinkedList<Node>> ruleTemp = new LinkedList<LinkedList<Node>>();
+	private LinkedList<LinkedList<Node>> ruleTemp = new LinkedList<LinkedList<Node>>();
+	
 	/**
 	 * A list which will be filled with the featureNames in their appropriate order
 	 */
-	ArrayList<String> featureOrderList = new ArrayList<String>();
-	/**
-	 * If occoured an error while reading, set to false and use for fallback
-	 */
-	boolean isValidWhileReading = true;
+	private ArrayList<String> featureOrderList = new ArrayList<String>();
 
-	String[] validTagsStruct = {"and", "or", "alt", "feature", "direct-alt", "direct-or"};
+	private static final String[] validTagsStruct = {"and", "or", "alt", "feature", "direct-alt", "direct-or"};
 
-	String[] validTagsConst = {"var", "conj", "disj", "imp", "eq", "not", "atmost1", "rule"};
+	private static final String[] validTagsConst = {"var", "conj", "disj", "imp", "eq", "not", "atmost1", "rule"};
 	
 	/*
 	 * (non-Javadoc)
@@ -273,7 +264,6 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 								ruleTemp.getLast()
 										.add(new Literal(literalName));
 							} else {
-								// isValidWhileReading = false;
 								throw new UnsupportedModelException("Feature '"
 										+ literalName + "' does not exist.",
 										event.getLocation().getLineNumber());
@@ -391,12 +381,12 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 
 					String currentTag = endElement.getName().getLocalPart();
 					if (mode == 1) {
-						if (currentTag != "feature") {
-							if (parentStack.peek()[0] == currentTag) {
+						if (!currentTag.equals("feature")) {
+							if (parentStack.peek()[0].equals(currentTag)) {
 								parentStack.pop();
 							}
 						}
-						if (currentTag == "struct") {
+						if (currentTag.equals("struct")) {
 							mode = 0;
 						}
 					} else if (mode == 2) {
@@ -499,9 +489,11 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 		/*
 		 * HOWTO: add a child to the FeaturModel
 		 * 
-		 * first: create an Feature second: set flags like mandatory and
-		 * abstract third: add the Feature to the FeatureModel last: get the
-		 * parent of the current Feature and add the current Feature as a child
+		 * first: create an Feature 
+		 * second: set flags like mandatory and
+		 * abstract 
+		 * third: add the Feature to the FeatureModel 
+		 * last: get the parent of the current Feature and add the current Feature as a child
 		 * of this parent (Feature)
 		 * 
 		 * Note: addChild DOESN'T ADD THE FEATURE!

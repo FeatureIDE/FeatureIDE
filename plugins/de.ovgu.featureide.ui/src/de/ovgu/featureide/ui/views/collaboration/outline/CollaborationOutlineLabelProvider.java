@@ -116,7 +116,7 @@ public class CollaborationOutlineLabelProvider implements ILabelProvider,GUIDefa
 			String toAppend = ""; 
 			for (Role r : ((Class)element).getRoles()) {
 				if (r.getRoleFile().equals(file)) {
-					toAppend += " - "+r.featureName;
+					toAppend = " - " + r.featureName;
 					break;
 				}
 			}

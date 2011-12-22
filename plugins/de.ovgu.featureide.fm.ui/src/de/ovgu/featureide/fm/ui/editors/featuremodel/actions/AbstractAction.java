@@ -28,7 +28,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureSetAbstra
 
 public class AbstractAction extends SingleSelectionAction {
 
-	public static String ID = "de.ovgu.featureide.abstract";
+	public static final String ID = "de.ovgu.featureide.abstract";
 
 	private ObjectUndoContext undoContext;
 

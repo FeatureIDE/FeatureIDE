@@ -147,8 +147,9 @@ public class JakAutoIndentStrategy extends DefaultIndentLineAutoEditStrategy {
 				case '\'' :
 					begin= getStringEnd(document, begin, end, curr);
 					break;
-				default :
-					}
+				default : 
+					break;
+			}
 		}
 		return bracketcount;
 	}

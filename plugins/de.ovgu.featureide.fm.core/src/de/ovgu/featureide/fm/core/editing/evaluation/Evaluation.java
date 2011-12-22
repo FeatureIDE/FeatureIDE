@@ -50,8 +50,8 @@ public class Evaluation {
 	final static int[] edites = new int[] {3};
 	final static int[] edites2 = new int[] {3};
 
-	static int id = 500;
-	static int count = 100;
+//	static int id = 500;
+//	static int count = 100;
 
 	public static void evaluate(IProject project) {
 		FMCorePlugin.getDefault().logInfo("Evaluation.evaluate(" + project + ")");

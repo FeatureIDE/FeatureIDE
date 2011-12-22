@@ -181,9 +181,15 @@ public class FeatureCppWrapper {
 		}finally{
 			try {
 				if(input!=null)input.close();
-				if(error!=null)error.close();
 			} catch (IOException e) {
 				FeatureCppCorePlugin.getDefault().logError(e);
+			} finally {
+				if(error!=null)
+					try {
+						error.close();
+					} catch (IOException e) {
+						FeatureCppCorePlugin.getDefault().logError(e);
+					}
 			}
 		}
 	}
@@ -217,7 +223,7 @@ public class FeatureCppWrapper {
 		}
 		fileName = fileName.substring(sourceFolder.length() +1);
 		IFolder folder = source;
-		while (fileName != "") {
+		while (!fileName.equals("")) {
 			if (!fileName.contains("\\")) {
 				if (fileName.endsWith(".h")) {
 					return folder.getFile(fileName);

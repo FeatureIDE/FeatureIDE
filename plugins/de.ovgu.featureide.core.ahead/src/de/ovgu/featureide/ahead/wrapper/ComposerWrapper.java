@@ -101,7 +101,7 @@ public class ComposerWrapper {
 		return composeAll(configFile);
 	}
 
-	private class FeatureVisitor implements IResourceVisitor {
+	private static class FeatureVisitor implements IResourceVisitor {
 		private ComposerWrapper composer;
 
 		public FeatureVisitor(ComposerWrapper composer) {
@@ -170,15 +170,20 @@ public class ComposerWrapper {
 		if (config == null) {
 			return;
 		}
-		reader = new BufferedReader(new FileReader(config
-				.getRawLocation().toFile()));
-		String line = null;
-		while ((line = reader.readLine()) != null) {
-			if (line.startsWith("#"))
-				continue;
-			featureFolders.add(featureProject.getSourceFolder().getFolder(line));
+		try {
+			reader = new BufferedReader(new FileReader(config
+					.getRawLocation().toFile()));
+			String line = null;
+			while ((line = reader.readLine()) != null) {
+				if (line.startsWith("#"))
+					continue;
+				featureFolders.add(featureProject.getSourceFolder().getFolder(line));
+			}
+		} finally {
+			if (reader != null) { 
+				reader.close();
+			}
 		}
-		reader.close();
 //		File file = featureProject.getProject().getLocation().toFile();
 //		String fileSep = System.getProperty("file.separator");
 //		file = new File(file.toString() + fileSep + ".order");

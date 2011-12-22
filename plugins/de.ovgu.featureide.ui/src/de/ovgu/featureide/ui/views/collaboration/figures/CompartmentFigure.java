@@ -42,7 +42,7 @@ public class CompartmentFigure extends Figure {
 	    setBorder(new CompartmentFigureBorder());
 	}
 	    
-	  public class CompartmentFigureBorder extends AbstractBorder {
+	  public static class CompartmentFigureBorder extends AbstractBorder {
 		  public Insets getInsets(IFigure figure) {
 			  return new Insets(1,0,0,0);
 		  }

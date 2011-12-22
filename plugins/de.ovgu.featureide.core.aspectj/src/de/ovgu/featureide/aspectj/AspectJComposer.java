@@ -130,12 +130,10 @@ public class AspectJComposer extends ComposerExtensionClass {
 	 */
 	private void setBuildpaths(IProject project) {
 		String buildPath = null;
-		if (buildPath == null) {
-			if (featureProject == null || featureProject.getBuildPath() == null) {
-				buildPath = IFeatureProject.DEFAULT_SOURCE_PATH;
-			} else {
-				buildPath = featureProject.getBuildPath().toString();
-			}
+		if (featureProject == null || featureProject.getBuildPath() == null) {
+			buildPath = IFeatureProject.DEFAULT_SOURCE_PATH;
+		} else {
+			buildPath = featureProject.getBuildPath();
 		}
 		
 		try {
@@ -268,7 +266,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 			if (featureProject == null || featureProject.getBuildPath() == null) {
 				buildPath = IFeatureProject.DEFAULT_SOURCE_PATH;
 			} else {
-				buildPath = featureProject.getBuildPath().toString();
+				buildPath = featureProject.getBuildPath();
 			}
 		}
 		
@@ -414,7 +412,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 			return;
 		}
 		rootName = root.getName();
-		if (root != null && !rootName.equals("") && root.hasChildren()) {
+		if (!rootName.equals("") && root.hasChildren()) {
 			checkAspect(root);
 		}
 	}

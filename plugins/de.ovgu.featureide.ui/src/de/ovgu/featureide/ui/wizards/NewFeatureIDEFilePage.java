@@ -639,14 +639,10 @@ public class NewFeatureIDEFilePage extends WizardPage {
 		}
 
 		if (resource.getParent().equals(sourceFolder)) {
-
 			container = sourceFolder.getFolder(comboFeature.getText());
-
-		} else if (featureProject != null) {
-			if (featureProject.getComposer().refines()) {
-				buttonRefines.setSelection(true);
-				refines = true;
-			}
+		} else if (featureProject.getComposer().refines()) {
+			buttonRefines.setSelection(true);
+			refines = true;
 		}
 
 	}

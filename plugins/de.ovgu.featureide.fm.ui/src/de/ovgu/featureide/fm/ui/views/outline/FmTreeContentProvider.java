@@ -58,7 +58,7 @@ public class FmTreeContentProvider implements ITreeContentProvider {
 	 */
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-		if (newInput instanceof FeatureModel && newInput != null)
+		if (newInput != null && newInput instanceof FeatureModel)
 			fModel = ((FeatureModel) newInput);
 
 	}

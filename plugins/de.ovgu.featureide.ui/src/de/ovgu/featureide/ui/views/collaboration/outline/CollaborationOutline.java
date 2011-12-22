@@ -376,9 +376,6 @@ public class CollaborationOutline extends ViewPart {
 							if (viewer.getContentProvider() == null) {
 								viewer.setContentProvider(contentProvider);
 							}
-							if (viewer.getLabelProvider() == null) {
-								viewer.setLabelProvider(clabel);
-							}
 							return Status.OK_STATUS;
 						}
 					};

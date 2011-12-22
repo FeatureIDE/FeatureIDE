@@ -70,10 +70,11 @@ public class FSTField extends FSTModelElement implements Comparable<Object> {
 
 
 	public String getName() {
-		String name = fieldName + " : " + typeName;
+		StringBuilder name = new StringBuilder();
+		name.append(fieldName + " : " + typeName);
 		for (int i = 0; i < dimension; i++)
-			name += "[]";
-		return name;
+			name.append("[]");
+		return name.toString();
 	}
 
 	public FSTModelElement[] getChildren() {

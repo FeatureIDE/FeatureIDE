@@ -34,7 +34,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ModelReverseOrde
  */
 public class ReverseOrderAction extends Action {
 
-	public static String ID = "de.ovgu.featureide.reverseorder";
+	public static final String ID = "de.ovgu.featureide.reverseorder";
 
 	private final FeatureModel featureModel;
 

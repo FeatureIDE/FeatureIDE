@@ -306,7 +306,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			if (currentLine.startsWith("symbol")) {
 				String[] tokens = currentLine.split(": ");
 				if (tokens.length == 2)
-					return CANNOT_FIND_SYMBOL + ": "+ tokens[1].substring(0);
+					return CANNOT_FIND_SYMBOL + ": "+ tokens[1];
 				break;
 			}
 		}
@@ -432,7 +432,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			return;
 		}
 		if (selectedFeatures2.isEmpty()) {
-			if (reader.readFromString(selected.toString())) {
+			if (reader.readFromString(selected)) {
 				if (configuration.valid()) {
 					LinkedList<String> selectedFeatures3 = new LinkedList<String>();
 					for (String f : selected.split("[ ]")) {

@@ -123,13 +123,13 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 					graphics.fillArc(r.x-20,r.y+10,r.width,r.height,(int) 270, (int) (180));
 				else
 					graphics.fillArc(r.x-20,r.y+10,r.width,r.height,(int) highestAngle1, (int) (highestAngle2 - highestAngle1));	
-			}
-			else { if(highestAngle1>360)
-				    	graphics.fillArc(r,180, 180);
-				   if(highestAngle2>450)
-					    graphics.fillArc(r,(int) highestAngle1, (int)(highestAngle2 - highestAngle1) );					
-			       else
-				        graphics.fillArc(r,(int) highestAngle1 , (int) (highestAngle2 - highestAngle1));
+			} else { 
+				if(highestAngle1>360)
+					graphics.fillArc(r,180, 180);
+//				if(highestAngle2>450)
+					graphics.fillArc(r,(int) highestAngle1, (int)(highestAngle2 - highestAngle1));					
+//				else
+//					graphics.fillArc(r,(int) highestAngle1, (int)(highestAngle2 - highestAngle1));
 			}	
 		}
 	}

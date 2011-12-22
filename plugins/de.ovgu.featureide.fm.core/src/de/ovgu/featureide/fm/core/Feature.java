@@ -18,12 +18,13 @@
  */
 package de.ovgu.featureide.fm.core;
 
-import org.eclipse.draw2d.geometry.Point;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.eclipse.draw2d.geometry.Point;
 
 /**
  * Provides all properties of a feature. This includes its connections to parent

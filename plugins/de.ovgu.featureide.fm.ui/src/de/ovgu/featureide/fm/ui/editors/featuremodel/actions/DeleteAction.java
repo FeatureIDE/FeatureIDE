@@ -50,7 +50,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteOperation;
  */
 public class DeleteAction extends Action {
 
-	public static String ID = ActionFactory.DELETE.getId();
+	public static final String ID = ActionFactory.DELETE.getId();
 
 	private static ImageDescriptor deleteImage = PlatformUI.getWorkbench()
 			.getSharedImages()

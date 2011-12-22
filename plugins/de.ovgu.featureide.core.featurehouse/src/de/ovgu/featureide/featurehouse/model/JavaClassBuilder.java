@@ -59,8 +59,8 @@ public class JavaClassBuilder extends ClassBuilder {
 	 */
 	public LinkedList<String> getFields(String body) {
 		String modifiers = "";
-		String type = "";
-		String names = "";
+		StringBuilder type = new StringBuilder();
+		StringBuilder namesBuilder = new StringBuilder();
 		boolean mod = false;
 		boolean t1 = false;
 		boolean t2 = false;
@@ -78,7 +78,7 @@ public class JavaClassBuilder extends ClassBuilder {
 		for (String s : body.split(" ")) {
 			if (s.contains("=")) {
 				if (!s.startsWith("=")) {
-					names += s.split("[=]")[0];
+					namesBuilder.append(s.split("[=]")[0]);
 				}
 				break;
 			}
@@ -94,7 +94,7 @@ public class JavaClassBuilder extends ClassBuilder {
 				// case: type
 				mod = true;
 				t1 = true;
-				type += s;
+				type.append(s);
 				if (s.contains("<")) {
 					// case: has type arguments
 					t2 = true;
@@ -105,16 +105,16 @@ public class JavaClassBuilder extends ClassBuilder {
 			} else if (t2 || s.contains("<")) {
 				// case: type with type arguments
 				t2 = true;
-				type += s;
+				type.append(s);
 				if (s.contains(">")) {
 					t2 = false;
 				}
 			} else {
 				// case: name(s)
-				names += s;
+				namesBuilder.append(s);
 			}
 		}
-		
+		String names = namesBuilder.toString();
 		if (names.endsWith(";") || names.endsWith("+") || names.endsWith("-")) {
 			names = names.substring(0,names.length() - 1);
 		}
@@ -132,7 +132,7 @@ public class JavaClassBuilder extends ClassBuilder {
 		
 		LinkedList<String> field = new LinkedList<String>();
 		field.add(modifiers);
-		field.add(type);
+		field.add(type.toString());
 		for (String name : namesArray) {
 			field.add(name);
 		}

@@ -124,13 +124,21 @@ public class FeatureDependenciesAction implements IObjectActionDelegate {
 		if (path == null)
 			return;
 		File outputFile = new File(path);
-
+		BufferedWriter out = null;
 		try {
-			BufferedWriter out = new BufferedWriter(new FileWriter(outputFile));
+			out = new BufferedWriter(new FileWriter(outputFile));
 			out.write(content);
-			out.close();
 		} catch (IOException e) {
+		} finally {
+			if (out != null) {
+				try {
+					out.close();
+				} catch (IOException e) {
+					FMUIPlugin.getDefault().logError(e);
+				}
+			}
 		}
+		
 		return;
 	}
 

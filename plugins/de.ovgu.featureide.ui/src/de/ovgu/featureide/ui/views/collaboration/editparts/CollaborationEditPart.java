@@ -95,11 +95,10 @@ public class CollaborationEditPart extends AbstractGraphicalEditPart implements 
 					CollaborationFigure collaborationFigure = (CollaborationFigure) ((CollaborationEditPart)o).getFigure();
 					Point location = collaborationFigure.getBounds().getLocation();
 					Dimension size2 = collFigure.getSize();
-					Rectangle constraint = new Rectangle(location, size2);
 					int i = children.indexOf((CollaborationEditPart)o);
 					int xValue = location.x;
 					int yValue = location.y + i * (size2.height+8) + 8;
-					constraint = new Rectangle(new Point(xValue,yValue), size2);
+					Rectangle constraint = new Rectangle(new Point(xValue,yValue), size2);
 					if (i>0){
 						EditPart part = (EditPart) children.get(i-1);
 						if (part instanceof CollaborationEditPart){

@@ -231,23 +231,27 @@ public class AheadBuildErrorEvent {
      * @throws IOException 
      */
     public static String getString(IFile file) throws CoreException, IOException {
+    	
     	if (!file.isAccessible()) {
     		return "";
     	}
-        InputStream contentStream = file.getContents();
-        Reader in = new InputStreamReader(contentStream);
-
-        int chunkSize = contentStream.available();
-        StringBuffer buffer = new StringBuffer(chunkSize);
-        char[] readBuffer = new char[chunkSize];
-        
-        int n = in.read(readBuffer);
-        while (n > 0) {
-            buffer.append(readBuffer);
-            n = in.read(readBuffer);
-        }
-
-        in.close();
+    	Reader in = null;
+    	StringBuffer buffer = new StringBuffer();
+    	try {
+	        InputStream contentStream = file.getContents();
+	        in = new InputStreamReader(contentStream);
+	
+	        int chunkSize = contentStream.available();
+	        char[] readBuffer = new char[chunkSize];
+	        
+	        int n = in.read(readBuffer);
+	        while (n > 0) {
+	            buffer.append(readBuffer);
+	            n = in.read(readBuffer);
+	        }
+	    } finally {
+    		in.close();
+    	}
         return buffer.toString();
     }
 

@@ -116,8 +116,8 @@ public class JakCompletionProcessor implements IContentAssistProcessor, GUIDefau
 		IContextInformation[] result= new IContextInformation[5];
 		for (int i= 0; i < result.length; i++)
 			result[i]= new ContextInformation(
-					MessageFormat.format(JakEditorMessages.getString("CompletionProcessor.ContextInfo.display.pattern"), new Object[] { new Integer(i), new Integer(offset) }),  //$NON-NLS-1$
-					MessageFormat.format(JakEditorMessages.getString("CompletionProcessor.ContextInfo.value.pattern"), new Object[] { new Integer(i), new Integer(offset - 5), new Integer(offset + 5)})); //$NON-NLS-1$
+					MessageFormat.format(JakEditorMessages.getString("CompletionProcessor.ContextInfo.display.pattern"), new Object[] { Integer.valueOf(i), Integer.valueOf(offset) }),  //$NON-NLS-1$
+					MessageFormat.format(JakEditorMessages.getString("CompletionProcessor.ContextInfo.value.pattern"), new Object[] { Integer.valueOf(i), Integer.valueOf(offset - 5), Integer.valueOf(offset + 5)})); //$NON-NLS-1$
 		return result;
 	}
 
@@ -178,15 +178,12 @@ public class JakCompletionProcessor implements IContentAssistProcessor, GUIDefau
 			IWorkbenchWindow editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 			FileEditorInput inputFile = (FileEditorInput)editor.getActivePage().getActiveEditor().getEditorInput(); 
 			IFeatureProject featureProject = CorePlugin.getFeatureProject(inputFile.getFile());
-			FSTClass[] classes = null;
 			if (featureProject!=null){
 				FSTModel project = featureProject.getFSTModel();
 				if (project!=null) {
-					classes = project.getClasses();
-					if (classes!=null){
-						propList.addAll(getFieldProposals(behind, classes, offset));
-						propList.addAll(getMethodProposals(behind, classes, offset));	
-					}
+					FSTClass[] classes = project.getClasses();
+					propList.addAll(getFieldProposals(behind, classes, offset));
+					propList.addAll(getMethodProposals(behind, classes, offset));
 				}
 			}
 			
@@ -311,7 +308,7 @@ private List<CompletionProposal> getProposalsFromCurrentDocument(String behind, 
 }	
 
 	
-	protected class CompletionMethod{
+	protected static class CompletionMethod{
 		private Image img;
 		private String returnValue;
 		private ArrayList<String> paramList;
@@ -349,7 +346,7 @@ private List<CompletionProposal> getProposalsFromCurrentDocument(String behind, 
 		
 		
 	}
-	protected class CompletionField{
+	protected static class CompletionField{
 		private String fieldName;
 		private Image  image;
 		private String type;
@@ -377,7 +374,7 @@ private List<CompletionProposal> getProposalsFromCurrentDocument(String behind, 
 			return type;
 		}
 	}
-	protected class CompletionClass{
+	protected static class CompletionClass{
 		private String className;
 		private String parent;
 		private String interfaces;
@@ -413,7 +410,7 @@ private List<CompletionProposal> getProposalsFromCurrentDocument(String behind, 
 			return image;
 		}
 	}
-	protected class DocumentParser{
+	protected static class DocumentParser{
 		
 		private IDocument document; 
 		private ArrayList<String> publicLines;

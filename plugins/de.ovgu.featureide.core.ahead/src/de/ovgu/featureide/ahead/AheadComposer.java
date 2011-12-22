@@ -270,6 +270,7 @@ public class AheadComposer extends ComposerExtensionClass {
 	}
 
 	private void performRenamings(IFile iFile) {
+		FileWriter fw = null;
 		try {
 			File file = iFile.getRawLocation().toFile();
 			StringBuffer fileTextBuffer = new StringBuffer();
@@ -280,13 +281,20 @@ public class AheadComposer extends ComposerExtensionClass {
 			scanner.close();
 
 			String fileText = fileTextBuffer.toString().replaceFirst("package", "layer");
-			FileWriter fw = new FileWriter(file);
+			fw = new FileWriter(file);
 			fw.write(fileText);
-			fw.close();
 		} catch (FileNotFoundException e) {
 			AheadCorePlugin.getDefault().logError(e);
 		} catch (IOException e) {
 			AheadCorePlugin.getDefault().logError(e);
+		} finally {
+			try {
+				if (fw != null) {
+					fw.close();
+				}
+			} catch (IOException e) {
+				AheadCorePlugin.getDefault().logError(e);
+			}
 		}
 	}
 

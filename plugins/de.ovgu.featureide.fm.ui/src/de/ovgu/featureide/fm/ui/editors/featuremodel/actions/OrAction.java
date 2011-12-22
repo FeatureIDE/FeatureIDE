@@ -33,7 +33,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureChangeGro
  */
 public class OrAction extends SingleSelectionAction {
 
-	public static String ID = "de.ovgu.featureide.or";
+	public static final String ID = "de.ovgu.featureide.or";
 
 	private final FeatureModel featureModel;
 

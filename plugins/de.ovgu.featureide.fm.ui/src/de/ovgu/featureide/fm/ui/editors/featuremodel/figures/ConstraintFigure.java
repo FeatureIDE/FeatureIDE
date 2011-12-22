@@ -117,10 +117,12 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 		// TODO Thomas: this long calculation should be done in analyzeFeatureModel()
 		if (!constraint.getDeadFeatures(constraint.getFeatureModel()).isEmpty()){
 			setBackgroundColor(ERROR_BACKGROUND);
-			String toolTip = DEAD_FEATURE;
-			for (Feature dead : constraint.getDeadFeatures(constraint.getFeatureModel()))
-				toolTip += "\n " + dead.toString();
-			setToolTip(new Label(toolTip));	
+			StringBuilder toolTip = new StringBuilder(); 
+			toolTip.append(DEAD_FEATURE);
+			for (Feature dead : constraint.getDeadFeatures(constraint.getFeatureModel())) {
+				toolTip.append("\n " + dead.toString());
+			}
+			setToolTip(new Label(toolTip.toString()));	
 			return;
 		}
 		
@@ -128,10 +130,11 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 		// TODO Thomas: this long calculation should be done in analyzeFeatureModel()
 		if (!constraint.getFalseOptional().isEmpty()){
 			setBackgroundColor(WARNING_BACKGROUND);
-			String toolTip = FALSE_OPTIONAL;
+			StringBuilder toolTip = new StringBuilder();
+			toolTip.append(FALSE_OPTIONAL);
 			for (Feature feature : constraint.getFalseOptional())
-				toolTip += "\n " + feature.getName();
-			setToolTip(new Label(toolTip));	
+				toolTip.append("\n " + feature.getName());
+			setToolTip(new Label(toolTip.toString()));	
 			return;
 		}
 		
@@ -147,10 +150,10 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 	private String getConstraintText(Constraint constraint) {
 		if (symbols == null) {
 			symbols = NodeWriter.logicalSymbols;
-			String s = "";
+			StringBuilder s = new StringBuilder();
 			for (int i = 0; i < symbols.length; i++)
-				s += symbols[i];
-			if (!GUIBasics.unicodeStringTest(label.getFont(), s))
+				s.append(symbols[i]);
+			if (!GUIBasics.unicodeStringTest(label.getFont(), s.toString()))
 				symbols = NodeWriter.shortSymbols;
 		}
 		return constraint.getNode().toString(symbols);

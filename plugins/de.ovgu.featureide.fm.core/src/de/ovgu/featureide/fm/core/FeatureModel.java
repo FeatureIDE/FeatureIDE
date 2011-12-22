@@ -173,7 +173,7 @@ public class FeatureModel implements PropertyConstants {
 				Feature child = root.getLastChild();
 				deleteChildFeatures(child);
 				root.removeChild(child);
-				featureTable.remove(child);
+				featureTable.remove(child.getName());
 			}
 			root = null;
 		}
@@ -191,7 +191,7 @@ public class FeatureModel implements PropertyConstants {
 			Feature child = feature.getLastChild();
 			deleteChildFeatures(child);
 			feature.removeChild(child);
-			featureTable.remove(child);
+			featureTable.remove(child.getName());
 		}
 	}
 
@@ -273,7 +273,7 @@ public class FeatureModel implements PropertyConstants {
 		// use the group type of the feature to delete
 		Feature parent = feature.getParent();
 
-		if (parent != null && parent.getChildrenCount() == 1) {
+		if (parent.getChildrenCount() == 1) {
 			if (feature.isAnd())
 				parent.setAnd();
 			else if (feature.isAlternative())

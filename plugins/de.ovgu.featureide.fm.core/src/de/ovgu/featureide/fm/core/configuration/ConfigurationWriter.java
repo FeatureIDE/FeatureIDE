@@ -32,10 +32,10 @@ import de.ovgu.featureide.fm.core.Feature;
 
 public class ConfigurationWriter {
 
-	private static Configuration configuration;
+	private Configuration configuration;
 
 	public ConfigurationWriter(Configuration configuration) {
-		ConfigurationWriter.configuration = configuration;
+		this.configuration = configuration;
 	}
 
 	public ConfigurationWriter() {

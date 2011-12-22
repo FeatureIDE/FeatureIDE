@@ -3,6 +3,7 @@ package org.prop4j;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * This class can be used to parse propositional formulas.
@@ -102,7 +103,7 @@ public class NodeReader {
 
 			ArrayList<String> operators = new ArrayList<String>();
 			for (int i = 0; i < OPERATOR_NAMES.length; i++) {
-				operators.add(OPERATOR_NAMES[i].toLowerCase().trim());
+				operators.add(OPERATOR_NAMES[i].toLowerCase(Locale.ENGLISH).trim());
 			}
 
 			// checking number of brackets

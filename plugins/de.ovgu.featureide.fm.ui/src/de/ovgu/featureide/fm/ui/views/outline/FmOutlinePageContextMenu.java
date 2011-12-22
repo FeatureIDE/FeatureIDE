@@ -215,19 +215,13 @@ public class FmOutlinePageContextMenu{
 				} else {
 					return;
 				}
-				
-				try {
 				((GraphicalViewerImpl) fTextEditor.diagramEditor)
-				.setSelection(new StructuredSelection(part));
+					.setSelection(new StructuredSelection(part));
 				
-				
-					EditPartViewer view = part.getViewer();
-					if (view != null)
-						view.reveal(part);
-				} catch (Exception e) {
-					
+				EditPartViewer view = part.getViewer();
+				if (view != null) {
+					view.reveal(part);
 				}
-
 			}
 
 		});

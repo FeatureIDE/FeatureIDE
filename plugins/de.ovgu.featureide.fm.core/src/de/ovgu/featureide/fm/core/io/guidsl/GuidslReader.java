@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 import org.prop4j.And;
 import org.prop4j.Choose;
@@ -190,8 +191,8 @@ public class GuidslReader extends AbstractFeatureModelReader {
 			List<String> list = stringToList(annotations);
 			for(int i=0; i<list.size(); i++){
 				String line = list.get(i);
-				if(line.indexOf("{") > 0){
-					String tempLine = line.substring(line.indexOf("{")).toLowerCase();
+				if(line.contains("{")){
+					String tempLine = line.substring(line.indexOf("{")).toLowerCase(Locale.ENGLISH);
 					if(tempLine.contains("hidden")){
 						int ix = tempLine.indexOf("hidden");
 						String ch = tempLine.substring(ix-1,ix);

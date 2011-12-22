@@ -45,7 +45,7 @@ import org.eclipse.jface.text.source.SourceViewerConfiguration;
  */
 public class JakConfiguration extends SourceViewerConfiguration {
 	
-	class SingleTokenScanner extends BufferedRuleBasedScanner {
+	private static class SingleTokenScanner extends BufferedRuleBasedScanner {
         public SingleTokenScanner(TextAttribute attribute) {
             setDefaultReturnToken(new Token(attribute));
         }

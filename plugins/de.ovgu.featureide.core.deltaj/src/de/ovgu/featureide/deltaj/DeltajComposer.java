@@ -236,7 +236,7 @@ public class DeltajComposer extends ComposerExtensionClass {
 			newFileText = getNewFileStringDelta(file);
 		}
 		if (newFileText!=null&&!newFileText.equals(oldFileText))
-			SaveStringToFile(newFileText, file);
+			saveStringToFile(newFileText, file);
 	}
 
 	private String getImportsString(String fileName) {
@@ -280,7 +280,7 @@ public class DeltajComposer extends ComposerExtensionClass {
 
 	}
 
-	private void SaveStringToFile(String text, File file) {
+	private void saveStringToFile(String text, File file) {
 		if (text == null || text.equals(""))
 			return;
 		FileWriter fw = null;
@@ -376,7 +376,6 @@ public class DeltajComposer extends ComposerExtensionClass {
 			f.read(buffer);
 		} catch (FileNotFoundException e) {
 			DeltajCorePlugin.getDefault().logError(e);
-
 		} catch (IOException e) {
 			DeltajCorePlugin.getDefault().logError(e);
 		} finally {

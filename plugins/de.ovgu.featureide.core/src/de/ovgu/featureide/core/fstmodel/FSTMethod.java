@@ -75,16 +75,17 @@ public class FSTMethod extends FSTModelElement implements Comparable<Object> {
 	}
 
 	public String getName() {
-		String name = methodName + "(";
+		StringBuilder name = new StringBuilder();
+		name.append(methodName + "(");
 		for (int i = 0; i < parameterTypes.size(); i++) {
 			if (i > 0)
-				name += ", ";
-			name += parameterTypes.get(i);
+				name.append(", ");
+			name.append(parameterTypes.get(i));
 		}
-		name += ")";
+		name.append(")");
 		if (!returnType.equals("void"))
-			name += " : " + returnType;
-		return name;
+			name.append(" : " + returnType);
+		return name.toString();
 	}
 
 	public String getMethodName() {
@@ -96,12 +97,13 @@ public class FSTMethod extends FSTModelElement implements Comparable<Object> {
 	}
 
 	public String getIdentifier() {
-		String id = (returnType != null ? returnType : "")
-				+ (methodName != null ? methodName : "");
+		StringBuilder id = new StringBuilder();
+		id.append((returnType != null ? returnType : "")
+				+ (methodName != null ? methodName : ""));
 		if (parameterTypes != null)
 			for (String type : parameterTypes)
-				id += type;
-		return id;
+				id.append(type);
+		return id.toString();
 	}
 
 	public int compareTo(Object arg0) {

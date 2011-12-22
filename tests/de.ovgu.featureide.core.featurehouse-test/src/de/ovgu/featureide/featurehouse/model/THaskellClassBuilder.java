@@ -36,7 +36,7 @@ public class THaskellClassBuilder {
 	private String EXPECTED_PARAMETER_1_METHOD_1 = "(a -> Result b err) -> Result a err -> Result b err";
 	
 	@Test
-	public void MethodTest1() {
+	public void methodTest1() {
 		assertEquals(EXPECTED_NAME_METHOD_1, builder.getMethod(TEST_METHOD_1).get(0));
 		assertEquals(EXPECTED_PARAMETER_1_METHOD_1, builder.getMethod(TEST_METHOD_1).get(1));
 	}

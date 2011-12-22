@@ -88,11 +88,12 @@ public class NodeWriter {
 		if (children.length == 1)
 			return nodeToString(children[0], symbols, optionalBrackets, parent);
 
-		String s = "";
+		StringBuilder s = new StringBuilder();
 		String separator = getSeparator(node, symbols);
-		for (Node child : children)
-			s += separator + nodeToString(child, symbols, optionalBrackets, node.getClass());
-		s = s.substring(separator.length());
+		for (Node child : children) {
+			s.append(separator);
+			s.append(nodeToString(child, symbols, optionalBrackets, node.getClass()));
+		}
 		
 		String prefix = "";
 		if (node instanceof Choose)
@@ -106,9 +107,9 @@ public class NodeWriter {
 		int orderChild = order(node.getClass());
 		optionalBrackets = optionalBrackets || prefix.length() > 0 || orderParent > orderChild;
 		optionalBrackets |= orderParent == orderChild && orderParent == order(Implies.class);
-		s = optionalBrackets ? "(" + s + ")" : s;
-		
-		return prefix + s;
+		return prefix + (optionalBrackets ? 
+					"(" + s.toString().substring(separator.length()) + ")" : 
+					s.toString().substring(separator.length()));
 	}
 	
 	/**

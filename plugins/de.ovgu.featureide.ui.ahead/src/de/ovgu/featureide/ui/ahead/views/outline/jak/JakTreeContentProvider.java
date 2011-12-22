@@ -19,7 +19,6 @@
 package de.ovgu.featureide.ui.ahead.views.outline.jak;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ui.part.FileEditorInput;
@@ -67,7 +66,6 @@ public class JakTreeContentProvider implements ITreeContentProvider {
 	}
 
 	public Object[] getElements(Object inputElement) {
-		IPath path = jakfile.getFullPath();
 		IFeatureProject featureProject = CorePlugin.getFeatureProject(jakfile);
 		if (featureProject == null)
 			return null;
@@ -79,9 +77,7 @@ public class JakTreeContentProvider implements ITreeContentProvider {
 					"No data to display available.",
 					"Jakfile is no sourcefile"
 			};
-		} else {	
-			feature = path.segment(path.segmentCount()-2);
-			
+		} else {
 			errMessage = new String[] {
 				"No data to display available."
 			};

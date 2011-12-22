@@ -178,14 +178,15 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 	}
 	
 	private String getRelevantConstraints() {
-		String relevant = "";
+		StringBuilder relevant = new StringBuilder();
 		for (Constraint constraint : featureModel.getConstraints()) {
 			String node = constraint.getNode().toString(NodeWriter.logicalSymbols);
 			if (node.contains(feature.getName()))
-				relevant += "\n " + node + " ";
+				relevant.append("\n " + node + " ");
 		}
-		if (!relevant.isEmpty())
-			return "\n" + relevant;
+		if (relevant.length() > 0) {
+			return "\n" + relevant.toString();
+		}
 		return "";
 	}
 

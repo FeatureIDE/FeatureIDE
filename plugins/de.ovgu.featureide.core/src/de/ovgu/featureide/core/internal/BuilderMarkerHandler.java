@@ -146,9 +146,8 @@ public class BuilderMarkerHandler implements IBuilderMarkerHandler {
 	 * @return
 	 */
 	private boolean hasMarker(IResource resource, String message, int lineNumber) {
-		IMarker[] marker = null;
 		try {
-			marker = resource.findMarkers(CONFIGURATION_MARKER, false, IResource.DEPTH_ZERO);
+			IMarker[] marker = resource.findMarkers(CONFIGURATION_MARKER, false, IResource.DEPTH_ZERO);
 			if (marker != null) {
 				for (IMarker m : marker) {
 					if (m.getAttribute(IMarker.MESSAGE).equals(message) &&

@@ -88,9 +88,7 @@ public class AheadWrapper {
 	}
 
 	public void build() {
-		IFile[] jakfiles = null;
-		jakfiles = composer.compose();
-		reduceJak2Java(jakfiles);
+		reduceJak2Java(composer.compose());
 	}
 	
 	public void setCompositionFolder(IFolder folder) {
@@ -101,17 +99,15 @@ public class AheadWrapper {
 		
 		IFile[] javaFiles = new IFile[jakFiles.length];
 		String filename = null;
-		if (jakFiles != null) {
-			for (int i = 0; i < jakFiles.length; i++) {
-				IFile jakFile = jakFiles[i];
-				if (jakFile.exists()) {
-					jak2java.reduce2Java(jakFile.getRawLocation().toFile());
-	
-					filename = jakFile.getName();
-					filename = filename.substring(0, filename.lastIndexOf('.'));
-					javaFiles[i] = ((IFolder)jakFile.getParent()).getFile(filename
-							+ ".java");
-				}
+		for (int i = 0; i < jakFiles.length; i++) {
+			IFile jakFile = jakFiles[i];
+			if (jakFile.exists()) {
+				jak2java.reduce2Java(jakFile.getRawLocation().toFile());
+
+				filename = jakFile.getName();
+				filename = filename.substring(0, filename.lastIndexOf('.'));
+				javaFiles[i] = ((IFolder)jakFile.getParent()).getFile(filename
+						+ ".java");
 			}
 		}
 		return javaFiles;

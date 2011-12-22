@@ -20,6 +20,7 @@ package de.ovgu.featureide.fm.ui.editors;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.AbstractOperation;
@@ -398,7 +399,7 @@ public class ConstraintDialog implements GUIDefaults {
 					temp.insert(x > y ? y : x, /*
 												 * " " +
 												 */button.getText()
-							.toLowerCase()
+							.toLowerCase(Locale.ENGLISH)
 					/* .replaceAll(" ", "") + " " */);
 					constraintText.setText(NodeReader.reduceWhiteSpaces(temp
 							.toString()));
@@ -484,10 +485,10 @@ public class ConstraintDialog implements GUIDefaults {
 							Object element) {
 						return ((Feature) element)
 								.getName()
-								.toLowerCase()
+								.toLowerCase(Locale.ENGLISH)
 								.contains(
 										searchFeatureText.getText()
-												.toLowerCase());
+												.toLowerCase(Locale.ENGLISH));
 					}
 
 				};
@@ -712,8 +713,7 @@ public class ConstraintDialog implements GUIDefaults {
 	}
 	
 	public String getFalseOptionalString (List<Feature> list){
-		String featureString = new String();
-		featureString += "Constraint causes the following features to be false optional: " + '\n';		
+		String featureString = "Constraint causes the following features to be false optional: " + '\n';		
 		featureString += list.toString().substring(1, list.toString().length()-1);
 		return featureString;
 	}

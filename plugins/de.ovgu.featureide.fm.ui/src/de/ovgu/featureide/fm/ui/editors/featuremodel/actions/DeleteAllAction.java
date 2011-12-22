@@ -36,7 +36,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteAllOperati
  */
 public class DeleteAllAction extends SingleSelectionAction {
 
-	public static String ID = "de.ovgu.featureide.deleteall";
+	public static final String ID = "de.ovgu.featureide.deleteall";
 	private FeatureModel featureModel;
 	private static ImageDescriptor deleteImage = PlatformUI.getWorkbench()
 			.getSharedImages()

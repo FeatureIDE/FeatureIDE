@@ -19,6 +19,7 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel;
 
 import java.io.File;
+import java.util.Locale;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -150,7 +151,7 @@ public class GEFImageWriter {
 	}
 
 	private static int readFormatFromFileName(String saveFilePath) {
-		String file = saveFilePath.toLowerCase();
+		String file = saveFilePath.toLowerCase(Locale.ENGLISH);
 		if (file.endsWith(".bmp"))
 			return SWT.IMAGE_BMP;
 		if (file.endsWith(".gif"))

@@ -440,8 +440,9 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 				return;
 			}
 		String newLine = System.getProperty("line.separator");
+		FileWriter fw = null;
 		try {
-			FileWriter fw = new FileWriter(file.toString());
+			fw = new FileWriter(file.toString());
 			if (featureModel.isFeatureOrderUserDefined())
 				fw.write("true" + newLine);
 			else
@@ -455,10 +456,17 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 				fw.write(featureName);
 				fw.append(System.getProperty("line.separator"));
 			}
-			fw.close();
+			
 		} catch (IOException e) {
-
 			FMUIPlugin.getDefault().logError(e);
+		} finally {
+			if (fw != null) {
+				try {
+					fw.close();
+				} catch (IOException e) {
+					FMUIPlugin.getDefault().logError(e);
+				}
+			}
 		}
 	}
 	

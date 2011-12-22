@@ -159,7 +159,6 @@ public class OpenWithGuidslAction implements IObjectActionDelegate {
 //		}
 	}
 	
-	private final boolean showOutputs = true;
 
 	private void execProcess(String command, File dir) throws IOException {
         System.out.println("Starting process: " + command);
@@ -173,41 +172,44 @@ public class OpenWithGuidslAction implements IObjectActionDelegate {
              cmd[2] = command;
              process = Runtime.getRuntime().exec(cmd,null,dir);
         }
-       
-        BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        BufferedReader error = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-        
-        long start = System.currentTimeMillis();
-        int diff = 250;
-        while (true) {
-            try {
-                String line;
-                while ((line = input.readLine()) != null) {
-                    if (showOutputs) {
-                        System.out.println(">>>" + line);
-                    }
-                }
-                while ((line = error.readLine()) != null) {
-                    System.err.println(">>>" + line);
-                }
-                if (System.currentTimeMillis() - start > diff) {
-                    start += diff;
-                    System.out.print(".");
-                }
-                int exitValue = process.exitValue();
-                System.out.println("...finished (exit=" + exitValue + ")!");
-                if (exitValue != 0) {
-                    throw new IOException(
-                            "The process doesn't finish normally (exit=" + exitValue + ")!");
-                }
-                return;
-            }
-            catch (IllegalThreadStateException e) {
-            }
-            finally{
-            	if(input!=null)input.close();
-            	if(error!=null)error.close();
-            }
+        BufferedReader input = null;
+        BufferedReader error = null;
+        try {
+	        input = new BufferedReader(new InputStreamReader(process.getInputStream()));
+	        error = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+	        
+	        long start = System.currentTimeMillis();
+	        int diff = 250;
+	        while (true) {
+	            try {
+	                String line;
+	                while ((line = input.readLine()) != null) {
+	                	System.out.println(">>>" + line);
+	                }
+	                while ((line = error.readLine()) != null) {
+	                    System.err.println(">>>" + line);
+	                }
+	                if (System.currentTimeMillis() - start > diff) {
+	                    start += diff;
+	                    System.out.print(".");
+	                }
+	                int exitValue = process.exitValue();
+	                System.out.println("...finished (exit=" + exitValue + ")!");
+	                if (exitValue != 0) {
+	                    throw new IOException(
+	                            "The process doesn't finish normally (exit=" + exitValue + ")!");
+	                }
+	                return;
+	            }
+	            catch (IllegalThreadStateException e) {
+	            }
+	        }
+		} finally {
+			try {
+        	if(input!=null)input.close();
+			} finally {
+				if(error!=null)error.close();
+			}
         }
     }
 

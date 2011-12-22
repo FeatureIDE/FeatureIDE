@@ -33,7 +33,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureSetMandat
  */
 public class MandatoryAction extends SingleSelectionAction {
 
-	public static String ID = "de.ovgu.featureide.mandatory";
+	public static final String ID = "de.ovgu.featureide.mandatory";
 
 	private final FeatureModel featureModel;
 

@@ -129,7 +129,7 @@ public class DeleteAllOperation extends AbstractOperation implements GUIDefaults
 					op.redo(monitor, info);
 					ops.remove(op);
 
-				} catch (Exception E) {}
+				} catch (Exception e) {}
 			}
 		}
 		featureModel.handleModelDataChanged();

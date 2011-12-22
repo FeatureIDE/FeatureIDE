@@ -178,8 +178,8 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				part = page.getActiveEditor();
 				if (part != null) {
 					//case: open editor
-					FileEditorInput inputFile = (FileEditorInput)part.getEditorInput();
-					featureProject = CorePlugin.getFeatureProject(inputFile.getFile());
+					IFile inputFile = ((FileEditorInput)part.getEditorInput()).getFile();
+					featureProject = CorePlugin.getFeatureProject(inputFile);
 					if (featureProject != null) {
 						//case: it's a featureIDE project
 						if (inputFile.getName().contains(".") &&
@@ -192,7 +192,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 									featureProject.equals(builder.project)) {
 								return;
 							} else {
-								builder.configuration = (IFile) inputFile.getFile();
+								builder.configuration = inputFile;
 							}
 							
 						} else {
@@ -202,7 +202,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 									featureProject.getProject().equals(builder.editorFile.getProject())) {
 								return;
 							}
-							builder.editorFile = inputFile.getFile();
+							builder.editorFile = inputFile;
 							builder.configuration = featureProject.getCurrentConfiguration();
 						}
 					}
