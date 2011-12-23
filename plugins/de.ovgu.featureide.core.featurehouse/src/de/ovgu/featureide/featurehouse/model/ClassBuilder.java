@@ -104,6 +104,6 @@ public class ClassBuilder {
 			body = body.replaceAll(" ", "");
 			method.refines = body.contains("original(");
 		}
-		modelBuilder.getCurrentClass().methods.put(method.getIdentifier(), method);
+		modelBuilder.getCurrentClass().add(method);
 	}
 }

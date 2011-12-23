@@ -174,7 +174,7 @@ public class FeatureHouseToAHEADConversion extends ComposerConversion {
 				featureProject.getFSTModel().getClass(file) !=  null) {
 			for (FSTMethod method : featureProject.getFSTModel().getClass(file).getMethods()) {
 				if (method.getBeginLine() <= line && method.getEndLine() >= line) {
-					return method.methodName;
+					return method.getMethodName();
 				}
 			}
 		}

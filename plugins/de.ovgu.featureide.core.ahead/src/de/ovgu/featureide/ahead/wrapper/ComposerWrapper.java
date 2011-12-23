@@ -123,6 +123,7 @@ public class ComposerWrapper {
 	 * @param configFile
 	 * @return Array of composed jakfiles
 	 */
+	@SuppressWarnings("unchecked")
 	public IFile[] composeAll(IFile configFile) throws IOException {
 		// Set the given configuration file as the current one
 		// Search in all feature directories for jakfiles and add
@@ -130,7 +131,7 @@ public class ComposerWrapper {
 		// Compose all and return the array of composed jakfiles
 
 		setConfiguration(configFile);
-		for (IFolder featureFolder : allFeatureFolders) {
+		for (IFolder featureFolder : (LinkedList<IFolder>)allFeatureFolders.clone()) {
 			try {
 				if (featureFolder.exists())
 					featureFolder.accept(new FeatureVisitor(this));
@@ -298,14 +299,14 @@ public class ComposerWrapper {
 		return composedFilesArray;
 	}
 
-//	@SuppressWarnings("deprecation")
+	@SuppressWarnings("unchecked")
 	private void composeJakFiles(IFolder compositionDir) {
 		composedFiles.clear();
 			
 		TreeMap<String, IFile> fileMap = new TreeMap<String, IFile>();
 		jakModelBuilder.clearFeatures();
 		
-		for (String jakFile : absoluteJakFilenames.keySet()) {
+		for (String jakFile : ((TreeMap<String, LinkedList<IFile>>)absoluteJakFilenames.clone()).keySet()) {
 			LinkedList<IFile> filesVec = absoluteJakFilenames.get(jakFile);
 			String[] files = new String[filesVec.size()];
 			IFile[] files2  = new IFile[filesVec.size()];
@@ -436,7 +437,7 @@ public class ComposerWrapper {
 	private void handleErrorMessage(ExtendedParseException e,
 			TreeMap<String, IFile> fileMap) {
 		IFile source = null;
-		if (fileMap != null && fileMap.containsKey(e.getFilename()))
+		if (fileMap != null && e.getFilename() != null && fileMap.containsKey(e.getFilename()))
 			source = fileMap.get(e.getFilename());
 		String message = source != null ? e.getShortMessage() : e
 				.getFullMessage();

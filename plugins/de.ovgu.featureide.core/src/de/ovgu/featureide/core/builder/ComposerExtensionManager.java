@@ -33,15 +33,13 @@ import de.ovgu.featureide.core.ExtensionPointManager;
  */
 public class ComposerExtensionManager extends ExtensionPointManager<IComposerExtension> {
 
-	private static ComposerExtensionManager instance;
+	private static ComposerExtensionManager instance = new ComposerExtensionManager();
 
 	ComposerExtensionManager() {
 		super(CorePlugin.PLUGIN_ID, IComposerExtension.extensionPointID);
 	}
 	
 	public static ComposerExtensionManager getInstance() {
-		if (instance == null)
-			instance = new ComposerExtensionManager();
 		return instance;
 	}
 	

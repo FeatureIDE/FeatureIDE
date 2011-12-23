@@ -683,7 +683,7 @@ public class FeatureModel implements PropertyConstants {
 			initFeatures(child);
 	}
 
-	public Collection<String> getLayerNames() {
+	public ArrayList<String> getLayerNames() {
 		ArrayList<String> layerNames = new ArrayList<String>();
 		if (root == null)
 			return null;

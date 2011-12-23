@@ -31,7 +31,7 @@ import org.eclipse.core.resources.IFile;
  */
 public class FSTMethod extends FSTModelElement implements Comparable<Object> {
 
-	public String methodName;
+	private String methodName;
 	private LinkedList<String> parameterTypes;
 	private String returnType;
 	private String modifiers;
@@ -93,7 +93,7 @@ public class FSTMethod extends FSTModelElement implements Comparable<Object> {
 	}
 
 	public FSTModelElement[] getChildren() {
-		return null;
+		return new FSTModelElement[0];
 	}
 
 	public String getIdentifier() {

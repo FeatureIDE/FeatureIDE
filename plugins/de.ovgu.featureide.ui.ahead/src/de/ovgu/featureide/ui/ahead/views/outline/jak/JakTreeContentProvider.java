@@ -49,7 +49,6 @@ public class JakTreeContentProvider implements ITreeContentProvider {
 	public Object[] getChildren(Object parentElement) {
 		if (parentElement instanceof FSTModelElement)
 			return ((FSTModelElement) parentElement).getChildren();
-
 		return null;
 	}
 

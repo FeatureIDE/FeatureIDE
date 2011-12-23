@@ -169,7 +169,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		projectsList.setContentProvider(new ITreeContentProvider() {
 
 			public Object[] getChildren(Object parentElement) {
-				return null;
+				return new Object[0];
 			}
 
 			public Object[] getElements(Object inputElement) {

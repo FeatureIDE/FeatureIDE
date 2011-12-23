@@ -28,7 +28,7 @@ package de.ovgu.featureide.core.fstmodel;
 public class FSTModelElement {
 
 	public FSTModelElement[] getChildren() {
-		return null;
+		return new FSTModelElement[0];
 	}
 
 	public String getName() {

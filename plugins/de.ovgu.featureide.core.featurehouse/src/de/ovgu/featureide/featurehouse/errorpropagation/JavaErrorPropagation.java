@@ -100,8 +100,8 @@ public class JavaErrorPropagation extends ErrorPropagation {
 					body = body.replaceFirst("protected", "");
 				}
 				body = body.replaceAll("\r\n", "\n");
-				body = body.replaceAll("original\\(", m.methodName + "(");
-				body = body.replaceAll("original\\s*\\(", m.methodName + " (");
+				body = body.replaceAll("original\\(", m.getMethodName() + "(");
+				body = body.replaceAll("original\\s*\\(", m.getMethodName() + " (");
 				
 				i = content.indexOf(body);
 			}

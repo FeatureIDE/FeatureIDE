@@ -221,7 +221,7 @@ public class CollaborationOutlineTreeContentProvider implements
 
 			return obj;
 		}
-		return null;
+		return new Role[0];
 	}
 
 	/*

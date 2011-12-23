@@ -60,7 +60,7 @@ public class AntennaModelBuilder extends PPModelBuilder {
 			IFile res) {
 		Pattern pattern = Pattern.compile(String.format("(//#.*" + OPERATORS + ")(%s)(" + OPERATORS + "|$)", feature));
 		
-		TreeMap<String, LinkedList<ArrayList<String>>> directives = model.features.get(feature).directives;
+		TreeMap<String, LinkedList<ArrayList<String>>> directives = model.getFeaturesMap().get(feature).directives;
 		LinkedList<ArrayList<String>> lines = directives.get(currentClass.getName());
 		
 		if (lines == null) {

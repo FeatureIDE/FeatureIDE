@@ -98,8 +98,8 @@ public class CErrorPropagation extends ErrorPropagation {
 				while (body.contains(" \n")) {
 					body = body.replaceAll(" \n", "\n");
 				}
-				body = body.replaceAll("original\\(", m.methodName + "(");
-				body = body.replaceAll("original\\s*\\(", m.methodName + " (");
+				body = body.replaceAll("original\\(", m.getMethodName() + "(");
+				body = body.replaceAll("original\\s*\\(", m.getMethodName() + " (");
 				i = content.indexOf(body);
 				System.out.println();
 			}

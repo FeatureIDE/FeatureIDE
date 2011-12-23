@@ -83,22 +83,10 @@ public class JakModelBuilder {
 	public void addClass(String className, LinkedList<IFile> sources,
 			AST_Program[] composedASTs, AST_Program[] ownASTs) {
 		FSTClass currentClass = null;
-		// Parse the name and the ownASTs to know to which IFiles this class
-		// file belongs to
-
+		for (IFile file : sources) {
+			currentClass = model.addClass(className, file);
+		}
 		
-		// This class doesnt exist, than create a new class object
-		if (model.classes.containsKey(className)) {
-			currentClass = model.classes.get(className);
-		} else {
-			currentClass = new FSTClass(className);
-			model.classes.put(className, currentClass);
-		}
-
-		for (int i = 0; i < sources.size(); i++) {
-			if (!model.classesMap.containsKey(sources.get(i)))
-				model.classesMap.put(sources.get(i), currentClass);
-		}
 		try {
 			updateAst(currentClass, sources, composedASTs, ownASTs);
 		} catch (Throwable e) {
@@ -122,8 +110,7 @@ public class JakModelBuilder {
 		FSTMethod newMethod = null;
 		LinkedList<FSTField> newFields = null;
 		int lineNumber = -1;
-		currentClass.methods.clear();
-		currentClass.fields.clear();
+		currentClass.clear();
 
 		for (int i = 0; i < sources.size(); i++) {
 			currentFile = sources.get(i);
@@ -141,18 +128,15 @@ public class JakModelBuilder {
 					// Put it back to the methodsMap
 
 					newMethod = getMethod((MethodDcl) c.node);
-					if (currentClass.methods.containsKey(newMethod
-							.getIdentifier())) {
-						newMethod = currentClass.methods.get(newMethod
-								.getIdentifier());
-						currentClass.methods.remove(newMethod.getIdentifier());
+					if (currentClass.contains(newMethod)) {
+						newMethod = (FSTMethod) currentClass.get(newMethod);
+						currentClass.remove(newMethod);
 					}
 
 					lineNumber = getLineNumber(c.node);
 					newMethod.setOwn(currentFile);
 					newMethod.setLineNumber(currentFile, lineNumber);
-					currentClass.methods.put(newMethod.getIdentifier(),
-							newMethod);
+					currentClass.add(newMethod);
 
 					c.Sibling();
 				}
@@ -160,16 +144,14 @@ public class JakModelBuilder {
 					newFields = getFields((FldVarDec) c.node);
 					for (FSTField field : newFields) {
 
-						if (currentClass.fields.containsKey(field
-								.getIdentifier())) {
-							field = currentClass.fields.get(field
-									.getIdentifier());
-							currentClass.fields.remove(field.getIdentifier());
+						if (currentClass.contains(field)) {
+							field = (FSTField) currentClass.get(field);
+							currentClass.remove(field);
 						}
 
 						field.setOwn(currentFile);
 						field.setLineNumber(currentFile, getLineNumber(c.node));
-						currentClass.fields.put(field.getIdentifier(), field);
+						currentClass.add(field);
 					}
 					c.Sibling();
 				}
@@ -177,11 +159,11 @@ public class JakModelBuilder {
 		
 			}
 			FSTFeature f = getFeature(currentClass, currentFile);
-			if (!model.features.containsKey(f.getName())) {
-				model.features.put(f.getName(), f);
+			if (!model.getFeaturesMap().containsKey(f.getName())) {
+				model.getFeaturesMap().put(f.getName(), f);
 			}
 			else{
-				model.features.get(f.getName()).classes.put(currentClass.getName(),currentClass);
+				model.getFeaturesMap().get(f.getName()).getClasses().put(currentClass.getName(),currentClass);
 			}
 
 		}
@@ -289,8 +271,8 @@ public class JakModelBuilder {
 		sourceFolder = CorePlugin.getFeatureProject(currentFile).getSourceFolder();
 		String featureName = getFeature((IFolder)currentFile.getParent());
 		FSTFeature f = new FSTFeature(featureName);
-		f.classes.put(currentClass.getName(), currentClass);
-		f.classes.get(currentClass.getName()).setFile(currentFile);
+		f.getClasses().put(currentClass.getName(), currentClass);
+		f.getClasses().get(currentClass.getName()).setFile(currentFile);
 		return f;
 	}
 	
@@ -301,6 +283,6 @@ public class JakModelBuilder {
 	}
 
 	public void clearFeatures() {
-		model.features.clear();
+		model.getFeaturesMap().clear();
 	}
 }

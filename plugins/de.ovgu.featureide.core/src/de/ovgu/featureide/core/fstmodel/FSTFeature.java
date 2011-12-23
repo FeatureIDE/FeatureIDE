@@ -33,14 +33,14 @@ public class FSTFeature extends FSTModelElement {
 	
 	private String name;
 	
-	public TreeMap<String, FSTClass> classes;
+	private TreeMap<String, FSTClass> classes;
 	/* directives maps a class name to a list of preprocessor directives
 	 * which are separated into 3 parts {before feature, feature (will be formatted differently), after feature}*/
 	public TreeMap<String, LinkedList<ArrayList<String>>> directives;
 	
 	public FSTFeature(String name) {
 		this.name = name;
-		classes = new TreeMap<String, FSTClass>();
+		setClasses(new TreeMap<String, FSTClass>());
 		directives = new TreeMap<String, LinkedList<ArrayList<String>>>();
 	}
 
@@ -49,11 +49,35 @@ public class FSTFeature extends FSTModelElement {
 	}
 
 	public FSTModelElement[] getChildren() {
-		if (classes == null) return null;
-		FSTClass[] elements = new FSTClass[classes.size()];
+		if (getClasses() == null) {
+			return new FSTModelElement[0];
+		}
+		FSTClass[] elements = new FSTClass[getClasses().size()];
 		int i = 0;
-		for (FSTClass c : classes.values())
+		for (FSTClass c : getClasses().values()) {
 			elements[i++] =  c;		
+		}
 		return elements;
+	}
+
+	/**
+	 * @param currentClass
+	 */
+	public void add(FSTClass currentClass) {
+		getClasses().put(currentClass.getName(), currentClass);
+	}
+
+	/**
+	 * @return the classes
+	 */
+	public TreeMap<String, FSTClass> getClasses() {
+		return classes;
+	}
+
+	/**
+	 * @param classes the classes to set
+	 */
+	public void setClasses(TreeMap<String, FSTClass> classes) {
+		this.classes = classes;
 	}
 }

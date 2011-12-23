@@ -19,7 +19,6 @@
 package de.ovgu.featureide.featurecpp.model;
 
 import java.io.FileNotFoundException;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Scanner;
 
@@ -63,9 +62,7 @@ public class FeatureCppModelBuilder {
 	}
 	
 	public void resetModel() {
-		model.classesMap = new HashMap<IFile, FSTClass>();
-		model.classes = new HashMap<String, FSTClass>();
-		model.features = new HashMap<String, FSTFeature>();
+		model.reset();
 	}
 	
 	/**
@@ -87,7 +84,7 @@ public class FeatureCppModelBuilder {
 			String[] array = info.split("[;]");
 			addFeature(array[0]);
 			addClass(className);
-			currentFeature.classes.put(className, currentClass);
+			currentFeature.getClasses().put(className, currentClass);
 			if (array.length == 7) {
 				addField(array);
 			} else {
@@ -101,8 +98,8 @@ public class FeatureCppModelBuilder {
 	 */
 	private void addClass(String className) {
 		
-		for (String key : currentFeature.classes.keySet()) {
-			FSTClass fstclass = currentFeature.classes.get(key);
+		for (String key : currentFeature.getClasses().keySet()) {
+			FSTClass fstclass = currentFeature.getClasses().get(key);
 			if (fstclass.getFile().equals(getFile(className))) {
 				currentClass = fstclass;
 				return;
@@ -111,50 +108,24 @@ public class FeatureCppModelBuilder {
 		currentClass = new FSTClass(className);
 		currentFile = getFile(className);
 		currentClass.setFile(currentFile);
-		addClass(className, currentFile.getFullPath().toOSString());
-	}
-
-	/**
-	 * Adds a class to the java project model
-	 * 
-	 */
-	private void addClass(String className, String source) {
-		FSTClass currentClass = null;
-		
-		if (model.classes.containsKey(className)) {
-			currentClass = model.classes.get(className);
-		} else {
-			currentClass = new FSTClass(className);
-			model.classes.put(className, currentClass);
-		}
-		if (!model.classesMap.containsKey(source)) {
-			
-			model.classesMap.put(null, currentClass);
-		}
+		model.addClass(className, currentFile);
 	}
 	
-	private boolean addFeature(String feature) {
-		if (currentFeature != null && model.features.containsKey(feature)) {
-			currentFeature = model.features.get(feature);
-			return false;
-		} else {
-			currentFeature = new FSTFeature(feature);
-			model.features.put(feature, currentFeature);
-			return true;
-		}
+	private void addFeature(String feature) {
+		currentFeature = model.addFeature(feature);
 	}
 
 	private void addField(String[] array) {
 		FSTField field = new FSTField(array[4], array[5], 0, array[6]);
 		field.setOwn(currentFile);
-		currentClass.fields.put(field.getIdentifier(), field);
+		currentClass.add(field);
 		
 	}
 
 	private void addMethod(String[] array) {
 		FSTMethod method = new FSTMethod(array[4], getParameter(array), array[5], array[6]);
 		method.setOwn(currentFile);
-		currentClass.methods.put(method.getIdentifier(), method);
+		currentClass.add(method);
 	}
 
 	private LinkedList<String> getParameter(String[] array) {

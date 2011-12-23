@@ -18,6 +18,7 @@
  */
 package de.ovgu.featureide.core.fstmodel;
 
+import java.util.LinkedList;
 import java.util.TreeMap;
 
 import org.eclipse.core.resources.IFile;
@@ -34,10 +35,12 @@ public class FSTClass extends FSTModelElement {
 	// Only the own AST methods are implemented
 
 	private IFile currentFile;
+	
+	private LinkedList<IFile> files = new LinkedList<IFile>();
 
-	public TreeMap<String, FSTMethod> methods;
+	private TreeMap<String, FSTMethod> methods;
 
-	public TreeMap<String, FSTField> fields;
+	private TreeMap<String, FSTField> fields;
 
 	private String className;
 	
@@ -45,6 +48,15 @@ public class FSTClass extends FSTModelElement {
 
 	public FSTClass() {
 		this("");
+	}
+	
+	public boolean isClassFile(IFile file) {
+		return files.contains(file);
+	}
+	
+	public void clear() {
+		methods.clear();
+		fields.clear();
 	}
 
 	/**
@@ -329,7 +341,69 @@ public class FSTClass extends FSTModelElement {
 		this.isClassFile = true;
 	}
 
-	public boolean isClassfile() {
+	public boolean isClassFile() {
 		return isClassFile;
+	}
+
+	/**
+	 * @param source
+	 */
+	public void addFile(IFile source) {
+		if (!files.contains(source)) {
+			files.add(source);
+		}
+		currentFile = source;
+	}
+
+	/**
+	 * Checks if the class contains the given element.
+	 * @param element A Method or Field
+	 * @return
+	 */
+	public boolean contains(FSTModelElement element) {
+		if (element instanceof FSTMethod) {
+			return methods.containsKey(((FSTMethod)element).getIdentifier());
+		} else if (element instanceof FSTField) {
+			return fields.containsKey(((FSTField)element).getIdentifier());
+		}
+		return false;
+	}
+
+	/**
+	 * Returns the element with the same identifier. 
+	 * @param identifier
+	 * @return
+	 */
+	public FSTModelElement get(FSTModelElement element) {
+		if (element instanceof FSTMethod) {
+			return methods.get(((FSTMethod)element).getIdentifier());
+		} else if (element instanceof FSTField) {
+			return fields.get(((FSTField)element).getIdentifier());
+		}
+		return null;
+	}
+
+	/**
+	 * Removes the given element.
+	 * @param identifier
+	 */
+	public void remove(FSTModelElement element) {
+		if (element instanceof FSTMethod) {
+			methods.remove(((FSTMethod)element).getIdentifier());
+		} else if (element instanceof FSTField) {
+			fields.remove(((FSTField)element).getIdentifier());
+		}
+	}
+	
+	/**
+	 * Adds the given element.
+	 * @param element
+	 */
+	public void add(FSTModelElement element) {
+		if (element instanceof FSTMethod) {
+			methods.put(((FSTMethod)element).getIdentifier(), (FSTMethod)element);
+		} else if (element instanceof FSTField) {
+			fields.put(((FSTField)element).getIdentifier(), (FSTField)element);
+		}
 	}
 }

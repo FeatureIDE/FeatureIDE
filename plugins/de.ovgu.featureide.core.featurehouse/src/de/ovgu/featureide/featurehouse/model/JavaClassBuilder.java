@@ -44,7 +44,7 @@ public class JavaClassBuilder extends ClassBuilder {
 			// add field
 			FSTField field = new FSTField(fields.get(i), fields.get(1), 0, fields.get(0), terminal.getBody(), terminal.beginLine, terminal.endLine);
 			field.setOwn(modelBuilder.getCurrentFile());
-			modelBuilder.getCurrentClass().fields.put(field.getIdentifier(), field);
+			modelBuilder.getCurrentClass().add(field);
 		}
 	}
 	

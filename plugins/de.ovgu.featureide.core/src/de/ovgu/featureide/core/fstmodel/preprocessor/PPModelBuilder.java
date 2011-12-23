@@ -21,8 +21,6 @@ package de.ovgu.featureide.core.fstmodel.preprocessor;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.Scanner;
 import java.util.Vector;
 
@@ -34,9 +32,9 @@ import org.eclipse.core.runtime.CoreException;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.preprocessor.PPComposerExtensionClass;
-import de.ovgu.featureide.core.fstmodel.FSTModel;
-import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
+import de.ovgu.featureide.core.fstmodel.FSTFeature;
+import de.ovgu.featureide.core.fstmodel.FSTModel;
 
 /**
  * Build the FSTModel for preprocessor projects.
@@ -47,7 +45,7 @@ public class PPModelBuilder {
 
 	protected FSTModel model;
 	private IFeatureProject featureProject;
-	private Collection<String> features;
+	private ArrayList<String> features = new ArrayList<String>();
 	
 	public PPModelBuilder(IFeatureProject featureProject) {
 		FSTModel oldModel = featureProject.getFSTModel();
@@ -60,14 +58,12 @@ public class PPModelBuilder {
 	}
 	
 	public void buildModel() {
-		model.classesMap = new HashMap<IFile, FSTClass>();
-		model.classes = new HashMap<String, FSTClass>();
-		model.features = new HashMap<String, FSTFeature>();
+		model.reset();
 		
 		features = featureProject.getFeatureModel().getLayerNames();
 		for (String feature : features) {
 			FSTFeature f = new FSTFeature(feature);
-			model.features.put(feature, f);
+			model.getFeaturesMap().put(feature, f);
 		}
 		try {
 			buildModel(featureProject.getSourceFolder());
@@ -87,22 +83,21 @@ public class PPModelBuilder {
 			} else if (res instanceof IFile) {
 				String text = getText((IFile)res);
 				FSTClass currentClass = new FSTClass(res.getName());
-				addClass(res.getName(), res.getFullPath().toOSString());
-				model.classes.put(res.getName(), currentClass);
+				model.addClass(res.getName(), (IFile)res);
 				
 				Vector<String> lines = PPComposerExtensionClass.loadStringsFromFile((IFile) res);
 				
 				for (String feature : features) {
 					if (containsFeature(text, feature)) {
-						FSTFeature currentFeature = model.features.get(feature);
-						currentFeature.classes.put(res.getName(), currentClass);
+						FSTFeature currentFeature = model.getFeaturesMap().get(feature);
+						currentFeature.getClasses().put(res.getName(), currentClass);
 						buildModelDirectives(feature, currentClass, (IFile) res);
 					}
 				}
 				
 				ArrayList<FSTDirective> list = buildModelDirectivesForFile(lines);
 				if(list != null){
-					model.directives.put(currentClass.getName(), list);
+					model.getDirectives().put(currentClass.getName(), list);
 				}
 			}
 		}
@@ -168,23 +163,5 @@ public class PPModelBuilder {
 		}
 		return "";
 	}
-	
-	/**
-	 * Adds a class to the java project model
-	 * 
-	 */
-	private void addClass(String className, String source) {
-		FSTClass currentClass = null;
-		
-		if (model.classes.containsKey(className)) {
-			currentClass = model.classes.get(className);
-		} else {
-			currentClass = new FSTClass(className);
-			model.classes.put(className, currentClass);
-		}
-		if (!model.classesMap.containsKey(source)) {
-			
-			model.classesMap.put(null, currentClass);
-		}
-	}
+
 }

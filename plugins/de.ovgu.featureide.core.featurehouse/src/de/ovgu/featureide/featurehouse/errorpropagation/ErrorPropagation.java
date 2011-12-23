@@ -180,8 +180,8 @@ public class ErrorPropagation {
 		if (model == null) {
 			return;
 		}
-		for (FSTFeature f : model.features.values()) {
-			TreeMap<String, FSTClass> z = f.classes;
+		for (FSTFeature f : model.getFeaturesMap().values()) {
+			TreeMap<String, FSTClass> z = f.getClasses();
 			if (z.containsKey(file.getName())) {
 				FSTClass c = z.get(file.getName());
 				for (FSTField field : c.getFields()) {

@@ -279,6 +279,7 @@ public class ModelComparator {
 	public boolean isImplied() {		
 		if (isImplied == null) {
 			FMCorePlugin.getDefault().reportBug(278);
+			return false;
 		}
 		return isImplied;
 	}

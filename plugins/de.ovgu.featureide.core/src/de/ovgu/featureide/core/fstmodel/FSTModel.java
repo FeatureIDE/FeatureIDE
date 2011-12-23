@@ -36,32 +36,45 @@ import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
  * The model of a featureproject
  * 
  * @author Tom Brosch
+ * @author Jens Meinicke
  * 
  */
 public class FSTModel extends FSTModelElement {
 
-	public HashMap<IFile, FSTClass> classesMap;
-	public HashMap<String, FSTClass> classes;
-	public HashMap<String, FSTFeature> features;
-	public HashMap<String, ArrayList<FSTDirective>> directives;
+	private HashMap<String, FSTClass> classes;
+	private HashMap<String, FSTFeature> features;
+	private HashMap<String, ArrayList<FSTDirective>> directives;
 	private String projectName;
 
 	/**
+	 * @return Preprocessor directives
+	 */
+	public HashMap<String, ArrayList<FSTDirective>> getDirectives() {
+		return directives;
+	}
+	
+	public HashMap<String, FSTClass> getClassesMap() {
+		return classes;
+	}
+
+	/**
+	 * 
+	 * @return The features
+	 */
+	public HashMap<String, FSTFeature> getFeaturesMap() {
+		return features;
+	}
+	
+	/**
 	 * Creates a new instance of a FSTModel
 	 * 
-	 * @param name
-	 *            Name of the project
+	 * @param name Name of the project
 	 */
 	public FSTModel(String name) {
-		classesMap = new HashMap<IFile, FSTClass>();
 		classes = new HashMap<String, FSTClass>();
 		features = new HashMap<String, FSTFeature>();
 		directives = new HashMap<String, ArrayList<FSTDirective>>();
 		projectName = name;
-	}
-
-	public int getNumberOfSelectedFeatures() {
-		return 0;
 	}
 
 	public ArrayList<FSTFeature> getSelectedFeatures() {
@@ -125,7 +138,7 @@ public class FSTModel extends FSTModelElement {
 	}
 
 	public int getNumberOfClasses() {
-		return classesMap.size();
+		return classes.size();
 	}
 
 	public FSTClass[] getClasses() {
@@ -135,14 +148,6 @@ public class FSTModel extends FSTModelElement {
 			classArray[pos++] = c;
 		}
 		return classArray;
-	}
-
-	public FSTClass getClass(IFile file) {
-		if (!classesMap.containsKey(file))
-			return null;
-		FSTClass c = classesMap.get(file);
-		c.setFile(file);
-		return c;
 	}
 
 	public String getName() {
@@ -159,6 +164,63 @@ public class FSTModel extends FSTModelElement {
 
 	public void markObsolete() {
 		//do nothing
+	}
+	
+	/**
+	 * Adds a the class with the given name to the feature model.
+	 * @param className The name of the class to add
+	 * @param source The file corresponding to the class
+	 * @return The added class
+	 */
+	public FSTClass addClass(String className, IFile source) {
+		FSTClass currentClass = null;
+		
+		if (!classes.containsKey(className)) {
+			currentClass = new FSTClass(className);
+			classes.put(className, currentClass);
+		} else {
+			currentClass = classes.get(className);
+			currentClass.addFile(source);
+		}
+		return currentClass;
+	}
+	
+	/**
+	 * Adds a feature with the given name to the feature model
+	 * @param feature The name of the feature
+	 * @return The added feature
+	 */
+	public FSTFeature addFeature(String feature) {
+		if (features.containsKey(feature)) {
+			return features.get(feature);
+		} else {
+			FSTFeature fstFeature = new FSTFeature(feature);
+			features.put(feature, fstFeature);
+			return fstFeature;
+		}
+	}
+	
+	/**
+	 * Clears the content of the model.
+	 */
+	public void reset() {
+		classes = new HashMap<String, FSTClass>();
+		features = new HashMap<String, FSTFeature>();
+		directives = new HashMap<String, ArrayList<FSTDirective>>();
+	}
+
+	/**
+	 * Returns the class corresponding to the given file.
+	 * @param file The file
+	 * @return The class or <code>null</code> if the class not exists.
+	 */
+	public FSTClass getClass(IFile file) {
+		for (FSTClass c : classes.values()) {
+			if (c.isClassFile(file)) {
+				return c;
+			}
+		}
+		return null;
 	}
 
 }

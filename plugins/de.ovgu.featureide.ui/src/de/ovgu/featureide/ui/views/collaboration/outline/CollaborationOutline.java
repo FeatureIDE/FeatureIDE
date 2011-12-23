@@ -60,12 +60,14 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
+import de.ovgu.featureide.core.listeners.ICurrentBuildListener;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.views.outline.FmLabelProvider;
 import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePageContextMenu;
 import de.ovgu.featureide.fm.ui.views.outline.FmTreeContentProvider;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.editors.ConfigurationEditor;
+import de.ovgu.featureide.ui.views.collaboration.model.Class;
 import de.ovgu.featureide.ui.views.collaboration.model.Role;
 
 /**
@@ -76,12 +78,11 @@ import de.ovgu.featureide.ui.views.collaboration.model.Role;
  * @author Jan Wedding
  * @author Melanie Pflaume
  */
-public class CollaborationOutline extends ViewPart {
+public class CollaborationOutline extends ViewPart implements ICurrentBuildListener {
 
 	private TreeViewer viewer;
 	private IFile iFile;
 	private IFeatureProject featureProject;
-	private Object[] expandedElements;
 	private IEditorPart active_editor;
 	private Action collapseAllAction;
 	private Action expandAllAction;
@@ -206,7 +207,7 @@ public class CollaborationOutline extends ViewPart {
 								desc = PlatformUI.getWorkbench().getEditorRegistry()
 										.getDefaultEditor(r.file.getName());
 							}
-	
+							iFile = r.file;
 							if (desc != null) {
 								page.openEditor(new FileEditorInput(r.file),
 										desc.getId());
@@ -225,9 +226,9 @@ public class CollaborationOutline extends ViewPart {
 		}
 
 	};
-
 	public CollaborationOutline() {
 		super();
+		CorePlugin.getDefault().addCurrentBuildListener(this);
 	}
 
 	/**
@@ -304,7 +305,30 @@ public class CollaborationOutline extends ViewPart {
 		if (viewer != null) {
 			Control control = viewer.getControl();
 			if (control != null && !control.isDisposed()) {
-				this.iFile = iFile2;
+				if (iFile2 != null && iFile != null) {
+					/** only set the colors of the tree if the content is the same **/
+					if (iFile2.getName().equals(iFile.getName()) && 
+							viewer.getTree().getItems().length > 0) {
+						iFile = iFile2;
+						TreeItem item = viewer.getTree().getItems()[0];
+						if (item != null) {
+							if (item.getData() instanceof  Class) {
+								String toAppend = ""; 
+								for (Role r : ((Class)item.getData()).getRoles()) {
+									if (r.getRoleFile().equals(iFile)) {
+										toAppend = " - " + r.featureName;
+										break;
+									}
+								}
+								item.setText(((Class)item.getData()).getName()+toAppend);
+								colorizeItems(viewer.getTree().getItems());
+								return;
+							}
+						}
+					}
+				}
+				
+				iFile = iFile2;
 				if (uiJob == null || uiJob.getState() == Job.NONE) {
 					uiJob = new UIJob("Update Outline View") {
 						public IStatus runInUIThread(IProgressMonitor monitor) {
@@ -312,8 +336,6 @@ public class CollaborationOutline extends ViewPart {
 							if (viewer != null) {
 								if (viewer.getControl() != null
 										&& !viewer.getControl().isDisposed()) {
-									expandedElements = viewer
-											.getExpandedElements();
 									viewer.getControl().setRedraw(false);
 
 									if (iFile != null) {
@@ -344,37 +366,28 @@ public class CollaborationOutline extends ViewPart {
 											}
 
 										} else {
+											clabel.setFile(iFile);
 											viewer.setContentProvider(contentProvider);
 											viewer.setLabelProvider(clabel);
-											clabel.setFile(iFile);
 											viewer.setInput(iFile);
 										}
 									} else {
-										// simply remove the content from the
-										// outline
+										// simply remove the content from the outline
 										//case: no providers set
 										if (viewer.getContentProvider() == null) {
 											viewer.setContentProvider(contentProvider);
 										}
-										if (viewer.getLabelProvider() == null) {
+										if (!(viewer.getLabelProvider() instanceof CollaborationOutlineLabelProvider)) {
 											viewer.setLabelProvider(clabel);
 										}
-										viewer.setInput(iFile);
+										viewer.setInput(null);
 									}
-
-									viewer.setExpandedElements(expandedElements);
-									viewer.expandToLevel(2);
 									colorizeItems(viewer.getTree().getItems());
-									viewer.getControl()
-											.setEnabled(
+									viewer.getControl().setEnabled(
 													CollaborationOutline.this.iFile != null);
 									viewer.refresh();
 									viewer.getControl().setRedraw(true);
 								}
-							}
-							//case: no providers set
-							if (viewer.getContentProvider() == null) {
-								viewer.setContentProvider(contentProvider);
 							}
 							return Status.OK_STATUS;
 						}
@@ -405,21 +418,31 @@ public class CollaborationOutline extends ViewPart {
 				if (!((FSTMethod) treeItems[i].getData()).isOwn(iFile)) {
 					treeItems[i].setForeground(viewer.getControl().getDisplay()
 							.getSystemColor(SWT.COLOR_GRAY));
+				} else {
+					treeItems[i].setForeground(viewer.getControl().getDisplay()
+							.getSystemColor(SWT.DEFAULT));
 				}
 			} else if (treeItems[i].getData() instanceof FSTField) {
 				if (!((FSTField) treeItems[i].getData()).isOwn(iFile)) {
 					treeItems[i].setForeground(viewer.getControl().getDisplay()
 							.getSystemColor(SWT.COLOR_GRAY));
+				} else {
+					treeItems[i].setForeground(viewer.getControl().getDisplay()
+							.getSystemColor(SWT.DEFAULT));
 				}
 			} else if (treeItems[i].getData() instanceof Role) {
 				if (((Role) treeItems[i].getData()).file.equals(iFile)) {
 					// get old Font and simply make it bold
-					treeItems[i]
-							.setFont(new Font(treeItems[i].getDisplay(),
+					treeItems[i].setFont(new Font(treeItems[i].getDisplay(),
 									treeItems[i].getFont().getFontData()[0]
 											.getName(), treeItems[i].getFont()
 											.getFontData()[0].getHeight(),
 									SWT.BOLD));
+				} else {
+					treeItems[i].setFont(new Font(treeItems[i].getDisplay(),
+						treeItems[i].getFont().getFontData()[0].getName(), 
+						treeItems[i].getFont().getFontData()[0].getHeight(),
+									0));
 				}
 			}
 		}
@@ -433,7 +456,7 @@ public class CollaborationOutline extends ViewPart {
 	public void addToolbar(IToolBarManager iToolBarManager) {
 		collapseAllAction = new Action() {
 			public void run() {
-				viewer.collapseAll();
+				viewer.expandToLevel(1);
 			}
 		};
 		collapseAllAction.setToolTipText("Collapse All");
@@ -477,6 +500,18 @@ public class CollaborationOutline extends ViewPart {
 				editor.selectAndReveal(lineInfo.getOffset(),
 						lineInfo.getLength());
 			}
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.listeners.ICurrentBuildListener#updateGuiAfterBuild(de.ovgu.featureide.core.IFeatureProject)
+	 */
+	@Override
+	public void updateGuiAfterBuild(IFeatureProject project) {
+		if (iFile != null && project.equals(CorePlugin.getFeatureProject(iFile))) {
+			IFile iFile2 = iFile;
+			iFile = null;
+			update(iFile2);
 		}
 	}
 }

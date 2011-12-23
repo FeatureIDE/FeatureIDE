@@ -55,16 +55,20 @@ public class DeleteAction extends Action {
 	public void setEnabled(boolean enable) {
 		IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
 		part = selection.getFirstElement();
-		enable = part instanceof RoleEditPart || part instanceof ClassEditPart || part instanceof CollaborationEditPart;
-		if (part instanceof RoleEditPart)
-			super.setText(text + " Role");
-		if (part instanceof ClassEditPart)
-			super.setText(text + " Class");
-		if (part instanceof CollaborationEditPart)
-			super.setText(text + " Feature");
-		if (!enable)
+		if (!(part instanceof RoleEditPart || 
+				  part instanceof ClassEditPart || 
+			      part instanceof CollaborationEditPart)) {
 			super.setText(text);
-		super.setEnabled(enable);
+			super.setEnabled(false);
+		} else {
+			if (part instanceof RoleEditPart)
+				super.setText(text + " Role");
+			if (part instanceof ClassEditPart)
+				super.setText(text + " Class");
+			if (part instanceof CollaborationEditPart)
+				super.setText(text + " Feature");
+			super.setEnabled(true);
+		}
 	}
 
 	public void run() {

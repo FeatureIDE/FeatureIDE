@@ -78,7 +78,7 @@ public class FSTField extends FSTModelElement implements Comparable<Object> {
 	}
 
 	public FSTModelElement[] getChildren() {
-		return null;
+		return new FSTModelElement[0];
 	}
 
 	public String getIdentifier() {

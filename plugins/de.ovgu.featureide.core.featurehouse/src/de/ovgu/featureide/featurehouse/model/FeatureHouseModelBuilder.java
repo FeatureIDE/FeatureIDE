@@ -70,9 +70,7 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 	}
 
 	public void buildModel(List<FSTNode> nodes) {
-		model.classesMap.clear();
-		model.classes.clear();
-		model.features.clear();
+		model.reset();
 		
 		for (FSTNode node : nodes) {
 			if (node.getType().equals(NODE_TYPE_FEATURE)) {
@@ -94,27 +92,22 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 	}
 	
 	private void caseAddFeature(FSTNode node) {
-		if (currentFeature != null && model.features.containsKey(node.getName())) {
-			currentFeature = model.features.get(node.getName());
-		} else {
-			currentFeature = new FSTFeature(node.getName());
-			model.features.put(node.getName(), currentFeature);
-		}
+		currentFeature = model.addFeature(node.getName());
 	}
 	
 	private void caseAddClass(FSTNode node) {
 		String className = node.getName().substring(
 				node.getName().lastIndexOf(File.separator) + 1);
-		currentClass = new FSTClass(className);
-		currentClass.setClassFile();
 		currentFile = getFile(node.getName());
 		if (!canCompose()) {
 			return;
 		}
+		
+		currentClass = new FSTClass(className);
+		currentClass.setClassFile();
 		currentClass.setFile(currentFile);
-		model.classes.put(className, currentClass);
-		addClass(className, node.getName());
-		currentFeature.classes.put(className, currentClass);
+		model.addClass(className, currentFile);
+		currentFeature.getClasses().put(className, currentClass);
 	}
 
 	private boolean canCompose() {
@@ -181,22 +174,4 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 		return featureProject.getProject().getFile(new Path(name));
 	}
 
-	/**
-	 * Adds a class to the java project model
-	 * 
-	 */
-	private void addClass(String className, String source) {
-		FSTClass currentClass = null;
-		
-		if (model.classes.containsKey(className)) {
-			currentClass = model.classes.get(className);
-		} else {
-			currentClass = new FSTClass(className);
-			model.classes.put(className, currentClass);
-		}
-		if (!model.classesMap.containsKey(source)) {
-			
-			model.classesMap.put(currentFile, currentClass);
-		}
-	}
 }
