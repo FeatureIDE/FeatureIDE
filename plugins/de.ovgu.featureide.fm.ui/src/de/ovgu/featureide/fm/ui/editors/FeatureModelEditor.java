@@ -23,7 +23,11 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.core.commands.operations.IOperationHistory;
+import org.eclipse.core.commands.operations.IOperationHistoryListener;
+import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.core.commands.operations.ObjectUndoContext;
+import org.eclipse.core.commands.operations.OperationHistoryEvent;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -51,6 +55,7 @@ import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.dialogs.ListDialog;
 import org.eclipse.ui.ide.IGotoMarker;
@@ -102,12 +107,12 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 
 	FeatureModelFile fmFile;
 	private IFile file;
-
+	private int operationCounter;
 	private PrintAction printAction;
 	private SelectAllAction selectAllAction;
 	private UndoActionHandler undoAction;
 	private RedoActionHandler redoAction;
-	
+
 	private FmOutlinePage outlinePage;
 
 	public LinkedList<IFeatureModelEditorPage> extensionPages = new LinkedList<IFeatureModelEditorPage>();
@@ -119,6 +124,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 	private int getDiagramEditorIndex() {
 		return diagramEditor.getIndex();
 	}
+
 	private int getOrderEditorIndex() {
 		return featureOrderEditor.getIndex();
 	}
@@ -138,7 +144,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		featureModelWriter = new XmlFeatureModelWriter(featureModel);
 
 		originalFeatureModel = new FeatureModel();
-		
+
 		try {
 			// TODO do not parse the model two times
 			new XmlFeatureModelReader(originalFeatureModel).readFromFile(file);
@@ -146,8 +152,10 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		} catch (Exception e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
-		FeatureUIHelper.showHiddenFeatures(originalFeatureModel.showHiddenFeatures());
-		FeatureUIHelper.setVerticalLayoutBounds(originalFeatureModel.verticalLayout());
+		FeatureUIHelper.showHiddenFeatures(originalFeatureModel
+				.showHiddenFeatures());
+		FeatureUIHelper.setVerticalLayoutBounds(originalFeatureModel
+				.verticalLayout());
 		getExtensions();
 	}
 
@@ -217,7 +225,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 				page.setFeatureModelEditor(this);
 				page = page.getPage(getContainer());
 				if (page instanceof IEditorPart) {
-					page.setIndex(addPage((IEditorPart)page, getEditorInput()));
+					page.setIndex(addPage((IEditorPart) page, getEditorInput()));
 				} else {
 					page.setIndex(addPage(page.getControl()));
 				}
@@ -242,6 +250,42 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 	}
 
 	private void createActions() {
+		IOperationHistory history = PlatformUI.getWorkbench()
+				.getOperationSupport().getOperationHistory();
+		history.addOperationHistoryListener(new IOperationHistoryListener() {
+
+			@Override
+			public void historyNotification(OperationHistoryEvent event) {
+				if (!hasFMUndoContext(event))
+					return;
+				if (event.getEventType() == OperationHistoryEvent.DONE
+						|| event.getEventType() == OperationHistoryEvent.REDONE) {
+					operationCounter++;
+				}
+				if (event.getEventType() == OperationHistoryEvent.UNDONE) {
+					operationCounter--;
+				}
+				if (operationCounter == 0) {
+					setPageModified(false);
+				}
+			}
+
+			/**
+			 * returns true if the event matches the FMUndoContext
+			 * 
+			 * @param event
+			 * @param hasFMContext
+			 */
+			private boolean hasFMUndoContext(OperationHistoryEvent event) {
+				for (IUndoContext c : event.getOperation().getContexts()) {
+					if (c.matches((IUndoContext) featureModel.getUndoContext())) {
+						return true;
+					}
+				}
+				return false;
+			}
+
+		});
 		ObjectUndoContext undoContext = new ObjectUndoContext(this);
 		featureModel.setUndoContext(undoContext);
 
@@ -350,17 +394,17 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 					featureOrderEditor.updateOrderEditor(featureModel);
 				}
 			}
-		} else if(oldPage == getOrderEditorIndex()) {
+		} else if (oldPage == getOrderEditorIndex()) {
 			if (newPageIndex == getTextEditorIndex()) {
-				//if (isPageModified) {
-					textEditor.updateTextEditor();
-				//}
+				// if (isPageModified) {
+				textEditor.updateTextEditor();
+				// }
 			} else {
 				featureOrderEditor.updateOrderEditor(featureModel);
 			}
 		}
 		extensionPageChange(newPageIndex);
-		
+
 		isPageModified = false;
 
 		IEditorActionBarContributor contributor = getEditorSite()
@@ -369,7 +413,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 			((FeatureModelEditorContributor) contributor).setActivePage(this,
 					newPageIndex);
 		oldPage = newPageIndex;
-		
+
 		super.pageChange(newPageIndex);
 
 	}
@@ -417,7 +461,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		if (!saveEditors())
 			return;
 
-		//featureOrderEditor.updateOrderEditor(featureModel);
+		// featureOrderEditor.updateOrderEditor(featureModel);
 		featureOrderEditor.doSave(monitor);
 		featureModel.performRenamings(file);
 
@@ -436,7 +480,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		for (IFeatureModelEditorPage page : extensionPages) {
 			page.doSave(monitor);
 		}
-		
+
 		textEditor.doSave(monitor);
 		try {
 			new XmlFeatureModelReader(originalFeatureModel).readFromFile(fmFile
@@ -643,6 +687,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 	}
 
 	public void setPageModified(boolean modified) {
+		if (!modified)
+			operationCounter = 0;
 		isPageModified = modified;
 		firePropertyChange(PROP_DIRTY);
 	}
@@ -650,7 +696,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 	public FmOutlinePage getOutlinePage() {
 		return outlinePage;
 	}
-	
+
 	private void setOutlinePage(FmOutlinePage fmOutlinePage) {
 		outlinePage = fmOutlinePage;
 	}

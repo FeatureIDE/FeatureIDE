@@ -83,7 +83,7 @@ public class LegendDragAndDropCommand extends Command {
 			return;
 		}
 		LegendMoveOperation op = new LegendMoveOperation(model, p,legendFigure.newPos, legendFigure);
-		op.addContext((IUndoContext) model.getUndoContext());
+		
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport()
