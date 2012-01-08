@@ -79,6 +79,8 @@ public class FeatureCppWrapper {
 				version = 0.6;
 			} else {
 				featureCppExecutable = EXE_LINUX_32BIT;
+				// The current 32bit version does not support 0.7 commands
+				version = 0.6;
 			}
         } else if (System.getProperty("os.name").contains("Mac OS")) {
         	featureCppExecutable = EXE_MAC_OS_X;
@@ -103,7 +105,7 @@ public class FeatureCppWrapper {
 		}
 		featureCppExecutableName = pathName;
 		
-		// The featurecpp needs to be executable 
+		// The FeatureC++ needs to be executable 
 		new File(featureCppExecutableName).setExecutable(true);
 	}
 
@@ -159,7 +161,8 @@ public class FeatureCppWrapper {
 						if (line.contains(" : warning: ")) {
 							addMarker(getFile(line), getMessage(line), getLineNumber(line));
 						}
-						//  else
+						/** Lines to debug executing FeatureC++ **/
+						//else
 						//	FeatureCppCorePlugin.getDefault().logInfo("FeatureC++: " + line);
 					}
 					while ((line = error.readLine()) != null)
