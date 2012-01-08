@@ -164,11 +164,17 @@ public class FeatureCppWrapper {
 							addMarker(getFile(line), getMessage(line), getLineNumber(line));
 						}
 						/** Lines to debug executing FeatureC++ **/
-						//else
-						//	FeatureCppCorePlugin.getDefault().logInfo("FeatureC++: " + line);
+//						else {
+//							FeatureCppCorePlugin.getDefault().logInfo("FeatureC++: " + line);
+//						}
 					}
 					while ((line = error.readLine()) != null)
 						FeatureCppCorePlugin.getDefault().logWarning(line);
+					try {
+						process.waitFor();
+					} catch (InterruptedException e) {
+						FeatureCppCorePlugin.getDefault().logError(e);
+					}
 					int exitValue = process.exitValue();
 					if (exitValue != 0) {
 						throw new IOException(
