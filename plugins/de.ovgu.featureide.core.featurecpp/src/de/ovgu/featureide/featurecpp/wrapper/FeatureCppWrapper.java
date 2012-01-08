@@ -55,8 +55,8 @@ import de.ovgu.featureide.featurecpp.FeatureCppCorePlugin;
 @SuppressWarnings("restriction")
 public class FeatureCppWrapper {
 	private final static String EXE_LINUX_64BIT = "fc++v0.6Linux64bit";
-	private final static String EXE_LINUX_32BIT = "fc++v0.7Linux32bit";
-	private final static String EXE_MAC_OS_X 	= "fc++v0.7MacOSX";
+	private final static String EXE_LINUX_32BIT = "fc++v0.8Linux32bit";
+	private final static String EXE_MAC_OS_X 	= "fc++v0.8MacOSX";
 	private final static String EXE_WINDOWS 	= "fc++v0.7WIN.exe";
 	
 	final String featureCppExecutableName;
@@ -80,12 +80,14 @@ public class FeatureCppWrapper {
 			} else {
 				featureCppExecutable = EXE_LINUX_32BIT;
 				// The current 32bit version does not support 0.7 commands
-				version = 0.6;
+				version = 0.8;
 			}
         } else if (System.getProperty("os.name").contains("Mac OS")) {
         	featureCppExecutable = EXE_MAC_OS_X;
+        	version = 0.8;
         } else {
         	featureCppExecutable = EXE_WINDOWS;
+        	version = 0.7;
         }
 		URL url = BundleUtility.find(FeatureCppCorePlugin.getDefault().getBundle(), "lib/" + featureCppExecutable);
 		try {
