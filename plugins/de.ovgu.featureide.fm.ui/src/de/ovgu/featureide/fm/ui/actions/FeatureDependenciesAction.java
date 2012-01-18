@@ -203,7 +203,7 @@ public class FeatureDependenciesAction implements IObjectActionDelegate {
 	 */
 	private FeatureModel readModel(IFile inputFile) {
 		FeatureModel fm = new FeatureModel();
-		XmlFeatureModelReader fmReader = new XmlFeatureModelReader(fm);
+		XmlFeatureModelReader fmReader = new XmlFeatureModelReader(fm,inputFile.getProject());
 
 		try {
 			fmReader.readFromFile(inputFile);

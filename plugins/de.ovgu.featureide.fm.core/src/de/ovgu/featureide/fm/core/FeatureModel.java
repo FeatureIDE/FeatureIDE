@@ -87,7 +87,6 @@ public class FeatureModel implements PropertyConstants {
 	public static final String DEFAULT_SOURCE_PATH = "src";
 	public static final String BUILDER_ID = "de.ovgu.featureide.core"
 			+ ".extensibleFeatureProjectBuilder";
-
 	/**
 	 * the root feature
 	 */
@@ -1073,22 +1072,13 @@ public class FeatureModel implements PropertyConstants {
 	/**
 	 * Checks a string to be a valid featurename.
 	 * 
-	 * @param s
-	 *            Possible featurename to be checked
+	 * @param s Possible featurename to be checked
 	 * @return boolean
 	 */
-	public static boolean isValidJavaIdentifier(String s) {
-		if (s == null)
-			return false;
-		final int len = s.length();
-		if (len == 0 || !Character.isJavaIdentifierStart(s.charAt(0)))
-			return false;
-		for (int i = 1; i < len; i++) {
-			if (!Character.isJavaIdentifierPart(s.charAt(i)))
-				return false;
-		}
-		return true;
+	public boolean isValidFeatureName(String s) {
+		return fmComposerExtension.isValidFeatureName(s);
 	}
+	
 
 	/**
 	 * Removes all invalid java identifiers form a given string.
@@ -1142,6 +1132,7 @@ public class FeatureModel implements PropertyConstants {
 	}
 
 	private void setComposerID(IProject project) {
+		if(project==null)return;
 		try {
 			String id = project.getPersistentProperty(composerConfigID);
 			if (id != null) {

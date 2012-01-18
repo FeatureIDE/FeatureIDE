@@ -78,7 +78,7 @@ public class ExportConquererAction implements IObjectActionDelegate {
 						if (filepath == null) return;
 						File outputFile = new File(filepath);
 						FeatureModel fm = new FeatureModel();
-						IFeatureModelReader reader = new XmlFeatureModelReader(fm);
+						IFeatureModelReader reader = new XmlFeatureModelReader(fm,inputFile.getProject());
 						reader.readFromFile(inputFile);
 						IFeatureModelWriter writer = new ConquererFMWriter(fm);
 						writer.writeToFile(outputFile);

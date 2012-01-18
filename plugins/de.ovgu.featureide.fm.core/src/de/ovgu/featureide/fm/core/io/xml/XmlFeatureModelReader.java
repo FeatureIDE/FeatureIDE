@@ -32,6 +32,7 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.draw2d.geometry.Point;
 import org.prop4j.And;
 import org.prop4j.AtMost;
@@ -58,8 +59,9 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
  */
 public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 
-	public XmlFeatureModelReader(FeatureModel featureModel) {
+	public XmlFeatureModelReader(FeatureModel featureModel,IProject project) {
 		setFeatureModel(featureModel);
+		featureModel.getFMComposerExtension(project);
 	}
 
 	/**
@@ -194,11 +196,11 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 						// END read attributes from XML tag
 
 						if (!featureModel.getFeatureNames().contains(attrName)
-								&& FeatureModel.isValidJavaIdentifier(attrName)) {
+								&& featureModel.isValidFeatureName(attrName)) {
 							addFeature(attrName, isMandatory, isAbstract, isHidden,
 									parent, featureLocation);
 						} else {
-							if (!FeatureModel.isValidJavaIdentifier(attrName)) {
+							if (!featureModel.isValidFeatureName(attrName)) {
 								throw new UnsupportedModelException("'"
 										+ attrName
 										+ "' is not a valid feature name",

@@ -18,7 +18,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.commands;
 
-import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.commands.Command;

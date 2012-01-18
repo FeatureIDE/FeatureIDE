@@ -51,4 +51,17 @@ public class FMComposerExtension implements IFMComposerExtension {
 			IProject project) {
 		return false;
 	}
+	
+	public boolean isValidFeatureName(String s){
+	    if (s == null)
+			return false;
+		final int len = s.length();
+		if (len == 0 || !Character.isJavaIdentifierStart(s.charAt(0)))
+			return false;
+		for (int i = 1; i < len; i++) {
+			if (!Character.isJavaIdentifierPart(s.charAt(i)))
+				return false;
+		}
+		return true;
+	}
 }

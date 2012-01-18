@@ -150,7 +150,7 @@ public class TConfiguration {
 		xml = "<featureModel><struct>" + xml;
 		xml += "</struct></featureModel>";
 		FeatureModel fm = new FeatureModel();
-		IFeatureModelReader reader = new XmlFeatureModelReader(fm);
+		IFeatureModelReader reader = new XmlFeatureModelReader(fm,null);
 		try {
 			reader.readFromString(xml);
 		} catch (UnsupportedModelException e) {

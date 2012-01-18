@@ -43,4 +43,10 @@ public interface IFMComposerExtension {
 	 * @return true if composer supports a feature order
 	 */
 	boolean hasFeaureOrder();
+	
+	/**
+	 * @param true if name is a valid feature name
+	 * @return
+	 */
+	boolean isValidFeatureName(String name);
 }

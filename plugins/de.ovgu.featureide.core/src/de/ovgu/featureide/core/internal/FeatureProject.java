@@ -165,7 +165,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		featureModel = new FeatureModel();
 		featureModelChangeListner = new FeatureModelChangeListner();
 		featureModel.addListener(featureModelChangeListner);
-		modelReader = new XmlFeatureModelReader(featureModel);
+		modelReader = new XmlFeatureModelReader(featureModel,aProject);
 
 		// initialize project structure
 		try {
@@ -241,8 +241,9 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			// TODO REFACTORING extract to method
 			try {
 				IFile file = project.getFile("model.xml");
-
+				System.out.println("loadmodel");
 				FeatureModel fm = new FeatureModel();
+				fm.getFMComposerExtension(project);
 				GuidslReader fmReader = new GuidslReader(fm);
 				fmReader.readFromFile(project.getFile("model.m"));
 				XmlFeatureModelWriter fmWriter = new XmlFeatureModelWriter(fm);

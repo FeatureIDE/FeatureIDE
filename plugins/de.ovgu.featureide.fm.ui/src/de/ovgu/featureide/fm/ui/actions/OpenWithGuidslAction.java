@@ -108,7 +108,7 @@ public class OpenWithGuidslAction implements IObjectActionDelegate {
 			
 			
 				FeatureModel fm = new FeatureModel();
-				XmlFeatureModelReader fmReader = new XmlFeatureModelReader(fm);
+				XmlFeatureModelReader fmReader = new XmlFeatureModelReader(fm,modelfile.getProject());
 				fmReader.readFromFile(modelfile);
 				GuidslWriter fmWriter = new GuidslWriter(fm);
 				

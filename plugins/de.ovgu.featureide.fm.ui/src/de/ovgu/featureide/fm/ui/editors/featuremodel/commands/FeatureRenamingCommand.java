@@ -54,7 +54,7 @@ public class FeatureRenamingCommand extends Command {
 			return false;
 		if (featureModel.getFeatureNames().contains(newName))
 			return false;
-		return FeatureModel.isValidJavaIdentifier(newName);
+		return featureModel.isValidFeatureName(newName);
 	}
 	
 	@Override

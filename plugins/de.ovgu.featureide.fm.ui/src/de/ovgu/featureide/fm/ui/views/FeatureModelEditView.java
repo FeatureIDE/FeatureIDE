@@ -198,7 +198,7 @@ public class FeatureModelEditView extends ViewPart {
 								try {
 									FeatureModel fm = new FeatureModel();
 									XmlFeatureModelReader reader = new XmlFeatureModelReader(
-											fm);
+											fm,fmFile.getProject());
 									reader.readFromFile(fmFile);
 
 									String imageName = fmFile.getRawLocation()

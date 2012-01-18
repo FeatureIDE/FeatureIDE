@@ -76,7 +76,7 @@ public class ExportWaterlooAction implements IObjectActionDelegate {
 						if (filepath == null) return;
 						File outputFile = new File(filepath);
 						FeatureModel fm = new FeatureModel();
-						XmlFeatureModelReader fmReader = new XmlFeatureModelReader(fm);		
+						XmlFeatureModelReader fmReader = new XmlFeatureModelReader(fm,inputFile.getProject());		
 						fmReader.readFromFile(inputFile);
 						WaterlooWriter waterlooWriter = new WaterlooWriter(fm);
 						waterlooWriter.writeToFile(outputFile);
