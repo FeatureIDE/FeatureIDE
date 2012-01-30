@@ -16,26 +16,28 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.fm.core.io.waterloo;
+package de.ovgu.featureide.fm.core.io.sxfm;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.io.sxfm.SXFMReader;
+import de.ovgu.featureide.fm.core.io.sxfm.SXFMWriter;
 
 /**
- * Test class for WaterlooReader/Writer
+ * Test class for SXFM reader and writer
  * 
  * @author Fabian Benduhn
  */
-public class TWaterlooReaderWriter extends TAbstractFeatureModelReaderWriter{
+public class TSXFMReaderWriter extends TAbstractFeatureModelReaderWriter{
 
 	/**
 	 * @param file
 	 * @throws UnsupportedModelException 
 	 */
-	public TWaterlooReaderWriter(FeatureModel fm, String s) throws UnsupportedModelException {
+	public TSXFMReaderWriter(FeatureModel fm, String s) throws UnsupportedModelException {
 		super(fm,s);
 	}
 
@@ -44,7 +46,7 @@ public class TWaterlooReaderWriter extends TAbstractFeatureModelReaderWriter{
 	 */
 	@Override
 	protected IFeatureModelWriter getWriter(FeatureModel fm) {
-		return new WaterlooWriter(fm);
+		return new SXFMWriter(fm);
 	}
 
 	/* (non-Javadoc)
@@ -52,7 +54,7 @@ public class TWaterlooReaderWriter extends TAbstractFeatureModelReaderWriter{
 	 */
 	@Override
 	protected IFeatureModelReader getReader(FeatureModel fm) {
-		return new WaterlooReader(fm);
+		return new SXFMReader(fm);
 	}
 
 	
