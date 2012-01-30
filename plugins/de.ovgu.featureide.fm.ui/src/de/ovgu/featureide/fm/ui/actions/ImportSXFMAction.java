@@ -20,14 +20,14 @@ package de.ovgu.featureide.fm.ui.actions;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
-import de.ovgu.featureide.fm.core.io.waterloo.WaterlooReader;
+import de.ovgu.featureide.fm.core.io.sxfm.SXFMReader;
 
 /**
- * Converts a Waterloo feature model into our feature model format.
+ * Converts a SXFM feature model into our feature model format.
  * 
  * @author Fabian Wielgorz
  */
-public class ImportWaterlooAction extends AbstractImportAction {
+public class ImportSXFMAction extends AbstractImportAction {
 
 	/*
 	 * (non-Javadoc)
@@ -38,7 +38,7 @@ public class ImportWaterlooAction extends AbstractImportAction {
 	 */
 	@Override
 	IFeatureModelReader setModelReader(FeatureModel fm) {
-		return new WaterlooReader(fm);
+		return new SXFMReader(fm);
 
 	}
 }

@@ -83,17 +83,17 @@
                tooltip="GUIDSL is a configuration tool written by Don Batory">
          </action>
          <action
-               class="de.ovgu.featureide.fm.ui.actions.ExportWaterlooAction"
+               class="de.ovgu.featureide.fm.ui.actions.ExportSXFMAction"
                icon="icons/export_wiz.gif"
-               id="de.ovgu.featureide.fm.ui.ExportWaterloo"
-               label="Export model to Waterloo format"
+               id="de.ovgu.featureide.fm.ui.ExportSXFM"
+               label="Export model to SXFM (S.P.L.O.T.) format"
                menubarPath="de.ovgu.featureide.fm.ui_menue/slot2">
          </action>
          <action
-               class="de.ovgu.featureide.fm.ui.actions.ImportWaterlooAction"
+               class="de.ovgu.featureide.fm.ui.actions.ImportSXFMAction"
                icon="icons/import_wiz.gif"
-               id="de.ovgu.featureide.fm.ui.ImportWaterloo"
-               label="Import model from Waterloo format"
+               id="de.ovgu.featureide.fm.ui.ImportSXFM"
+               label="Import model from SXFM (S.P.L.O.T.) format"
                menubarPath="de.ovgu.featureide.fm.ui_menue/slot2">
          </action>
          <action

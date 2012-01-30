@@ -37,17 +37,17 @@ import org.eclipse.ui.IWorkbenchPart;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.waterloo.WaterlooWriter;
+import de.ovgu.featureide.fm.core.io.sxfm.SXFMWriter;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 
 /**
- * Converts a feature model file into the Waterloo format.
+ * Converts a feature model file into the SXFM format.
  * 
  * @author Fabian Wielgorz
  */
-public class ExportWaterlooAction implements IObjectActionDelegate {
+public class ExportSXFMAction implements IObjectActionDelegate {
 	
 	private ISelection selection;
 	
@@ -70,7 +70,7 @@ public class ExportWaterlooAction implements IObjectActionDelegate {
 					try {
 						FileDialog fileDialog = new FileDialog(new Shell(), 
 								SWT.SAVE);
-						fileDialog.setFileName("waterloomodel.xml");
+						fileDialog.setFileName("sxfm.xml");
 						fileDialog.setOverwrite(true);
 						String filepath = fileDialog.open();
 						if (filepath == null) return;
@@ -78,8 +78,8 @@ public class ExportWaterlooAction implements IObjectActionDelegate {
 						FeatureModel fm = new FeatureModel();
 						XmlFeatureModelReader fmReader = new XmlFeatureModelReader(fm,inputFile.getProject());		
 						fmReader.readFromFile(inputFile);
-						WaterlooWriter waterlooWriter = new WaterlooWriter(fm);
-						waterlooWriter.writeToFile(outputFile);
+						SXFMWriter sxfmWriter = new SXFMWriter(fm);
+						sxfmWriter.writeToFile(outputFile);
 						inputFile.getProject().refreshLocal(
 								IResource.DEPTH_INFINITE, null);  
 					} catch (FileNotFoundException e) {

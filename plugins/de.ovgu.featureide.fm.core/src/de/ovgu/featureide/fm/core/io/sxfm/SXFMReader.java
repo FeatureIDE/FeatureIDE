@@ -16,7 +16,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.fm.core.io.waterloo;
+package de.ovgu.featureide.fm.core.io.sxfm;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -50,11 +50,11 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
 
 /**
- * Parses feature model files in the Waterloo format.
+ * Parses feature model files in the SXFM format.
  * 
  * @author Fabian Wielgorz
  */
-public class WaterlooReader extends AbstractFeatureModelReader {
+public class SXFMReader extends AbstractFeatureModelReader {
 	
 	private int line;
 	
@@ -65,7 +65,7 @@ public class WaterlooReader extends AbstractFeatureModelReader {
 	 * 
 	 * @param featureModel the structure to fill
 	 */
-	public WaterlooReader(FeatureModel featureModel) {
+	public SXFMReader(FeatureModel featureModel) {
 		setFeatureModel(featureModel);
 	}
 	

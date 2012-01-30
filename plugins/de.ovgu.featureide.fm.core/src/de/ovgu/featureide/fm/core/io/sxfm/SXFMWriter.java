@@ -16,7 +16,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.fm.core.io.waterloo;
+package de.ovgu.featureide.fm.core.io.sxfm;
 
 import java.io.StringWriter;
 import java.util.Iterator;
@@ -47,18 +47,18 @@ import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
 
 
 /**
- * Prints feature models in the Waterloo format.
+ * Prints feature models in the SXFM format.
  * 
  * @author Fabian Wielgorz
  */
-public class WaterlooWriter extends AbstractFeatureModelWriter {
+public class SXFMWriter extends AbstractFeatureModelWriter {
 	
 	/**
 	 * Creates a new writer and sets the feature model to write out.
 	 * 
 	 * @param featureModel the structure to write
 	 */
-	public WaterlooWriter(FeatureModel featureModel) {
+	public SXFMWriter(FeatureModel featureModel) {
 		setFeatureModel(featureModel);
 	}
 	
