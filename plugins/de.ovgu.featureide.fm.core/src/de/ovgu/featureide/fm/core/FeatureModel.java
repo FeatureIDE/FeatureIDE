@@ -667,7 +667,7 @@ public class FeatureModel implements PropertyConstants {
 	private LinkedList<Feature> layers = new LinkedList<Feature>();
 	private Object undoContext;
 
-	public Collection<Feature> getLayers() {
+	public Collection<Feature> getConcreteFeatures() {
 		layers.clear();
 		if (root != null) {
 			initFeatures(root);
@@ -682,11 +682,11 @@ public class FeatureModel implements PropertyConstants {
 			initFeatures(child);
 	}
 
-	public ArrayList<String> getLayerNames() {
+	public ArrayList<String> getConcreteFeatureNames() {
 		ArrayList<String> layerNames = new ArrayList<String>();
 		if (root == null)
 			return null;
-		for (Feature layer : getLayers()) {
+		for (Feature layer : getConcreteFeatures()) {
 			layerNames.add(layer.getName());
 		}
 		return layerNames;
