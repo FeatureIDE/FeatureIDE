@@ -595,7 +595,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 			return;
 		}
 		comboFeature.removeAll();
-		for (String s : featureProject.getFeatureModel().getLayerNames())
+		for (String s : featureProject.getFeatureModel().getConcreteFeatureNames())
 			comboFeature.add(s);
 		if (feature != null) {
 			comboFeature.setText(feature);

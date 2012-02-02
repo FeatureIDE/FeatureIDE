@@ -60,7 +60,7 @@ public class PPModelBuilder {
 	public void buildModel() {
 		model.reset();
 		
-		features = featureProject.getFeatureModel().getLayerNames();
+		features = featureProject.getFeatureModel().getConcreteFeatureNames();
 		for (String feature : features) {
 			FSTFeature f = new FSTFeature(feature);
 			model.getFeaturesMap().put(feature, f);

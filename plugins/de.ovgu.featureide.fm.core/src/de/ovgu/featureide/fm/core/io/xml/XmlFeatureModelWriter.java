@@ -124,7 +124,7 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
 	    	Collection<String> featureOrderList = featureModel.getFeatureOrderList();
 	    	
 	    	if (featureOrderList.isEmpty())
-	    		featureOrderList = featureModel.getLayerNames();
+	    		featureOrderList = featureModel.getConcreteFeatureNames();
 	    	
 	    	for(String featureName : featureOrderList){
 	    		Element feature = doc.createElement("feature");

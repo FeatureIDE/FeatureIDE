@@ -135,7 +135,7 @@ public class ComposerWrapper {
 			try {
 				if (featureFolder.exists())
 					featureFolder.accept(new FeatureVisitor(this));
-				else if (featureProject.getFeatureModel().getLayerNames()
+				else if (featureProject.getFeatureModel().getConcreteFeatureNames()
 						.contains(featureFolder.getName()))
 					featureProject.createBuilderMarker(featureProject
 							.getProject(), "Feature folder "
@@ -200,7 +200,7 @@ public class ComposerWrapper {
 			allFeatureFolders.add(folder);
 		}
 		if (featureOrderList == null || featureOrderList.size() == 0) {	
-			for (String feature : featureProject.getFeatureModel().getLayerNames()) {
+			for (String feature : featureProject.getFeatureModel().getConcreteFeatureNames()) {
 				IFolder folder = featureProject.getSourceFolder().getFolder(feature);
 				if (!allFeatureFolders.contains(folder)) {
 					allFeatureFolders.add(folder);

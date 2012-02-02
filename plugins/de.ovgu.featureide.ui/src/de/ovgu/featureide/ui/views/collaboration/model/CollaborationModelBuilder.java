@@ -124,7 +124,7 @@ public class CollaborationModelBuilder {
 		if (featureProject.getFeatureModel().isFeatureOrderUserDefined()) {
 			layerNames = featureProject.getFeatureModel().getFeatureOrderList();
 		} else {
-			layerNames = (ArrayList<String>) featureProject.getFeatureModel().getLayerNames();
+			layerNames = (ArrayList<String>) featureProject.getFeatureModel().getConcreteFeatureNames();
 		}
 		
 		

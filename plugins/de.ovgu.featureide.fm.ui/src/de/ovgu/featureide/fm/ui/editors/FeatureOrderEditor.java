@@ -156,7 +156,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		if (!hasFeatureOrder) {
 			return;
 		}
-		Collection<String> newFeatureNames = featureModel.getLayerNames();
+		Collection<String> newFeatureNames = featureModel.getConcreteFeatureNames();
 		LinkedList<String> oldFeatureNames = new LinkedList<String>();
 
 		for (int i = 0; i < featurelist.getItemCount(); i++) {
@@ -185,7 +185,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 			Collection<String> newFeatureOrderList = featureModel.getFeatureOrderList();
 			
 			if (newFeatureOrderList.isEmpty())
-				newFeatureOrderList = featureModel.getLayerNames();
+				newFeatureOrderList = featureModel.getConcreteFeatureNames();
 			
 			featurelist.removeAll();
 			
@@ -410,7 +410,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		featurelist.removeAll();
 		
 		if(featureModel!=null&&featureModel.getRoot()!=null)
-		for (String featureName : featureModel.getLayerNames())
+		for (String featureName : featureModel.getConcreteFeatureNames())
 			featurelist.add(featureName);
 	}
 
@@ -450,7 +450,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 			
 			Collection<String> list = featureModel.getFeatureOrderList();
 			if(list.isEmpty())
-				list = featureModel.getLayerNames(); //set default values
+				list = featureModel.getConcreteFeatureNames(); //set default values
 			
 			for(String featureName : list){
 				fw.write(featureName);
@@ -578,7 +578,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		Collection<String> layers;
 		if (!hasFeatureOrder || !activate.getSelection())
 			// Default order
-			layers = featureModel.getLayerNames();
+			layers = featureModel.getConcreteFeatureNames();
 		else
 			// User specified order
 			layers = featureModel.getFeatureOrderList();

@@ -109,7 +109,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 		for (Feature feature : configuration.getSelectedFeatures()) {
 			selectedFeatures.add(feature.getName());
 		}
-		for (Feature feature : featureProject.getFeatureModel().getLayers()) {
+		for (Feature feature : featureProject.getFeatureModel().getConcreteFeatures()) {
 			if (!selectedFeatures.contains(feature.getName())) {
 				unSelectedFeatures.add(feature.getName());
 			}
