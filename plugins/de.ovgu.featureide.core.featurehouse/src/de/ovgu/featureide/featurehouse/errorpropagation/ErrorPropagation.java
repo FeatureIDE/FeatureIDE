@@ -19,7 +19,6 @@
 package de.ovgu.featureide.featurehouse.errorpropagation;
 
 import java.io.FileNotFoundException;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.TreeMap;
@@ -48,23 +47,40 @@ import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
  */
 public class ErrorPropagation {
 	
-	private HashSet<IFile> files = new HashSet<IFile>();
+	/**
+	 * A list containing composed files.
+	 * These files will be checked for propagation. 
+	 */
+	private LinkedList<IFile> composedFiles = new LinkedList<IFile>();
 	
+	/**
+	 * The main background job calling the corresponding error propagation class for each file. 
+	 */
 	private Job job = null;
 	
+	/**
+	 * Propagates error markers for composed files to sources files.<br>
+	 * Call <code>addFile(sourceFile)</code> to propagate the markers of the 
+	 * given source file, to the corresponding file at the features folder. 
+	 */
 	public ErrorPropagation() {
 		
 	}
 
-	public void addFile(IFile file) {
+	/**
+	 * Propagates the markers of the given source file, to the corresponding file
+	 * at the features folder. 
+	 * @param sourceFile The composed file
+	 */
+	public void addFile(IFile sourceFile) {
 		//TODO implement error propagation for all FeatureHouse languages
-		if (file.getFileExtension() == null) {
+		if (sourceFile.getFileExtension() == null) {
 			return;
 		}
-		if (file.getFileExtension().equals("java") || file.getFileExtension().equals("c") ||
-				file.getFileExtension().equals("h")) {
-			if (!files.contains(file)) {
-				files.add(file);
+		if (sourceFile.getFileExtension().equals("java") || sourceFile.getFileExtension().equals("c") ||
+				sourceFile.getFileExtension().equals("h")) {
+			if (!composedFiles.contains(sourceFile)) {
+				composedFiles.add(sourceFile);
 			}
 			if (job == null) {
 				job = new Job("Propagate problem markers") {
@@ -84,26 +100,29 @@ public class ErrorPropagation {
 		}
 	}
 
+	/**
+	 * Calls the corresponding propagation for all files at <code>composedFiles</code>.
+	 */
 	protected void propagateMarkers() {
-		if (files.isEmpty()) {
+		if (composedFiles.isEmpty()) {
 			return;
 		}
 		
-		for (IFile file : files) {
-			files.remove(file);
+		while (!composedFiles.isEmpty()) {
+			IFile file = composedFiles.getFirst();
+			composedFiles.remove(file);
 			ErrorPropagation prop = getErrorPropagation(file);
 			if (prop != null) {
 				prop.propagateMarkers(file);
-				break;
 			}
-			
 		}
-		propagateMarkers();
 	}
 
 	/**
-	 * @param file
-	 * @return
+	 * Returns the corresponding error propagation class of the given file.
+	 *
+	 * @param file 
+	 * @return The corresponding <code>ErrorPropagation</code>
 	 */
 	private ErrorPropagation getErrorPropagation(IFile file) {
 		if (file.getFileExtension().endsWith("java")) {
@@ -117,6 +136,7 @@ public class ErrorPropagation {
 
 
 	/**
+	 * Removes the  not composed markers form the given source file and calls <code>propagateMarkers(marker, file)</code>
 	 * @param file
 	 */
 	protected void propagateMarkers(IFile file) {
@@ -145,17 +165,21 @@ public class ErrorPropagation {
 	}
 
 	/**
-	 * @param m
-	 * @return
+	 * Necessary if a marker should not be removed but also should not be propagated.
+	 * <br><code>Needs to be implemented by the Subclass.</code>
+	 * @param marker
+	 * @return <code>false</code> if the marker should not be propagated. 
 	 */
-	boolean propagateMarker(IMarker m) {
+	boolean propagateMarker(IMarker marker) {
 		return true;
 	}
 
 
 	/**
+	 * Necessary if a marker should be removed and also should not be propagated.
+	 * <br><code>Needs to be implemented by the Subclass.</code>
 	 * @param message
-	 * @return
+	 * @return <code>true</code> if the marker should not be removed.
 	 */
 	protected boolean deleteMarker(String message) {
 		return false;
@@ -164,6 +188,8 @@ public class ErrorPropagation {
 
 	/**
 	 * Propagates all markers of the given file
+	 * @param markers
+	 * @param file
 	 */
 	private void propagateMarkers(LinkedList<IMarker> markers, IFile file) {
 		if (!file.exists()) {
@@ -192,7 +218,7 @@ public class ErrorPropagation {
 				}
 			}
 		}
-		setElementLines(content, file, fields, methods);
+		setElementLines(content, fields, methods);
 
 		for (IMarker marker : markers) {
 			if (!marker.exists()) {
@@ -227,25 +253,43 @@ public class ErrorPropagation {
 					break;
 				}
 			}
+			
+			if (propagated) {
+				continue;
+			}
+			
+			propagateUnsupportedMarker(marker, file);
 		}
 	}
 
 	/**
-	 * @param content
+	 * Propagates markers outside of methods and fields. 
+	 * <br><code>Needs to be implemented by the Subclass.</code>
+	 * @param marker
 	 * @param file
+	 */
+	protected void propagateUnsupportedMarker(IMarker marker, IFile file) {
+		FeatureHouseCorePlugin.getDefault().logInfo("Marker not propagated: " + marker.getAttribute(IMarker.MESSAGE, ""));
+	}
+
+	/**
+	 * Sets the composed lines of the given fields and methods.
+	 * <br><code>Needs to be implemented by the Subclass.</code>
+	 * @param content The content of the composed file
 	 * @param fields
 	 * @param methods
 	 */
-	protected void setElementLines(String content, IFile file,
+	protected void setElementLines(String content,
 			LinkedList<FSTField> fields, LinkedList<FSTMethod> methods) {
-		
 	}
 
-
 	/**
-	 * Propagates the marker to the source line
+	 * Propagates the given marker to the given source line
+	 * @param marker The marker to propagate
+	 * @param file The features file
+	 * @param line The marker line at the features file
 	 */
-	private void propagateMarker(IMarker marker, IFile file, int line) {
+	protected void propagateMarker(IMarker marker, IFile file, int line) {
 		if (file != null && file.exists()) {
 			Object severity = null;
 			String message = marker.getAttribute(IMarker.MESSAGE, "xxx");
@@ -272,10 +316,11 @@ public class ErrorPropagation {
 	}
 
 	/**
+	 * Checks if the file already the given marker.
 	 * @param message
 	 * @param line
 	 * @param file
-	 * @return
+	 * @return 
 	 */
 	private boolean hasSameMarker(String message, int line, IFile file) {
 		try {
@@ -293,10 +338,18 @@ public class ErrorPropagation {
 		return false;
 	}
 
+	/**
+	 * Count the lines of the given substring.
+	 */
 	protected int countLines(String substring) {
 		return (substring + " ").split("[\n]").length;
 	}
 
+	/**
+	 * 
+	 * @param file
+	 * @return The content of the given file
+	 */
 	private String getFileContent(IFile file) {
 		Scanner scanner = null;
 		try {

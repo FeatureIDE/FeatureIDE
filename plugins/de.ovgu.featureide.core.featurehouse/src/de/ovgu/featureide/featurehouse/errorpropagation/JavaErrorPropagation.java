@@ -18,12 +18,19 @@
  */
 package de.ovgu.featureide.featurehouse.errorpropagation;
 
+import java.io.FileNotFoundException;
 import java.util.LinkedList;
+import java.util.Scanner;
+import java.util.TreeMap;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 
+import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.fstmodel.FSTClass;
+import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 
@@ -38,15 +45,16 @@ public class JavaErrorPropagation extends ErrorPropagation {
 	private static final String RAW_TYPE = "raw type";
 	private static final String GENERIC_TYPE = "generic type";
 	private static final String TYPE_SAFETY = "Type safety";
-	private static final String IMPORT = "The import";
+	//private static final String IMPORT = "The import";
 	
 	private static final String TASK = "org.eclipse.jdt.core.task";
 	
 	/**
+	 * TODO improve description
 	 * Sets all composed lines to all methods and fields
 	 */
 	@Override
-	protected void setElementLines(String content, IFile file, LinkedList<FSTField> fields, LinkedList<FSTMethod> methods) {
+	protected void setElementLines(String content, LinkedList<FSTField> fields, LinkedList<FSTMethod> methods) {
 		for (FSTField f : fields) {
 			if (f.getBody() == null) {
 				continue;
@@ -118,8 +126,10 @@ public class JavaErrorPropagation extends ErrorPropagation {
 	@Override
 	protected boolean deleteMarker(String message) {
 		return (message.contains(RAW_TYPE) || 
-		message.contains(TYPE_SAFETY) || message.contains(GENERIC_TYPE) || 
-		message.contains(IMPORT));
+		message.contains(TYPE_SAFETY) || 
+		message.contains(GENERIC_TYPE)
+		//||message.contains(IMPORT)
+		); 
 	}
 	
 
@@ -131,4 +141,122 @@ public class JavaErrorPropagation extends ErrorPropagation {
 		}
 		return super.propagateMarker(m);
 	}
+	
+	@Override
+	protected void propagateUnsupportedMarker(IMarker marker, IFile file) {
+		int markerLine = marker.getAttribute(IMarker.LINE_NUMBER, -1);
+		String lineContent = getLineContent(file, markerLine);
+		LinkedList<IFile> featureFiles = getFeatureFiles(file);
+		for (IFile featureFile : featureFiles) {
+			int newMarkerLine = getLine(featureFile, lineContent);
+			if (newMarkerLine != -1) {
+				propagateMarker(marker, featureFile, newMarkerLine);
+				return;
+			}
+		}
+		super.propagateUnsupportedMarker(marker, file);
+	}
+	
+	/**
+	 * Checks if the given file contains a line with the given content.
+	 * @param featureFile
+	 * @param lineContent the content to look for
+	 * @return The line of the content or <code>-1</code> if the does not contain the content. 
+	 */
+	private int getLine(IFile file, String lineContent) {
+		Scanner scanner = null;
+		lineContent = correctString(lineContent);
+		try {
+			int line = 1;
+			scanner = new Scanner(file.getRawLocation().toFile());
+			if (scanner.hasNext()) {
+				while (scanner.hasNext()) {
+					String content = scanner.nextLine();
+					content = correctString(content);
+					if (content.endsWith(lineContent)) {
+						return line;
+					}
+					line++;
+				}
+			}
+		} catch (FileNotFoundException e) {
+			CorePlugin.getDefault().logError(e);
+		} finally {
+			if (scanner != null)
+				scanner.close();
+		}
+		return -1;
+	}
+
+	/**
+	 * Corrects the given string to avoid changes by the <code>FeatureHouse</code> composer.
+	 * @param string
+	 * @return
+	 */
+	private String correctString(String string) {
+		while (string.contains("  ")) {
+			string = string.replaceAll("  ", " ");
+		}
+		if (string.endsWith("{")) {
+			string = string.substring(0, string.indexOf("{"));
+		}
+		if (string.endsWith(" ")) {
+			string = string.substring(0,string.length()-1);
+		}
+		return string;
+	}
+
+	/**
+	 * @param file A composed file
+	 * @return A list containing all corresponding feature files
+	 */
+	private LinkedList<IFile> getFeatureFiles(IFile file) {
+		IFeatureProject project = CorePlugin.getFeatureProject(file);
+		if (project == null) {
+			return null;
+		}
+		// TODO FSTMODEL this needs to be easier
+		LinkedList<IFile> featureFiles = new LinkedList<IFile>();
+		for (String name : project.getFeatureModel().getConcreteFeatureNames()) {
+			for (FSTFeature f : project.getFSTModel().getFeaturesMap().values()) {
+				if (f.getName().equals(name)) {
+					TreeMap<String, FSTClass> z = f.getClasses();
+					if (z.containsKey(file.getName())) {
+						featureFiles.add((z.get(file.getName())).getFile());
+					}
+				}
+			}
+		}
+		return featureFiles;
+	}
+
+	/**
+	 * 
+	 * @param file
+	 * @param line The line to lock for
+	 * @return the content at the given line of the file 
+	 */
+	private String getLineContent(IFile file, int line) {
+		Scanner scanner = null;
+		try {
+			scanner = new Scanner(file.getRawLocation().toFile());
+			if (scanner.hasNext()) {
+				while (scanner.hasNext()) {
+					if (line == 1) {
+						return scanner.nextLine();
+					}
+					line--;
+					scanner.nextLine();
+				}
+			}
+		} catch (FileNotFoundException e) {
+			CorePlugin.getDefault().logError(e);
+		} finally {
+			if (scanner != null)
+				scanner.close();
+		}
+		return "";
+	}
+	
+	
 }

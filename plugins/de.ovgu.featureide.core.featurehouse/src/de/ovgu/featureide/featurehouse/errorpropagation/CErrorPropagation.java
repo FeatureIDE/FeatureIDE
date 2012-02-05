@@ -20,7 +20,6 @@ package de.ovgu.featureide.featurehouse.errorpropagation;
 
 import java.util.LinkedList;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 
@@ -40,7 +39,7 @@ public class CErrorPropagation extends ErrorPropagation {
 	 * Sets all composed lines to all methods and fields
 	 */
 	@Override
-	protected void setElementLines(String content, IFile file, LinkedList<FSTField> fields, LinkedList<FSTMethod> methods) {
+	protected void setElementLines(String content, LinkedList<FSTField> fields, LinkedList<FSTMethod> methods) {
 		for (FSTField f : fields) {
 			if (f.getBody() == null) {
 				continue;

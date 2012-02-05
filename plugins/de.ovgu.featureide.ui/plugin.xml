@@ -118,7 +118,13 @@
                icon="icons/FeatureIconSmall.ico"
                path="group.open"> 
                <separator name="slot1"/>
-         </menu>  
+         </menu>
+         <visibility>
+         	<objectState
+         		name="nature"
+         		value="de.ovgu.featureide.core.featureProjectNature">
+         	</objectState>
+         </visibility>  
          <action
                class="de.ovgu.featureide.ui.actions.BuildAllValidConfigurationsAction"
                id="de.ovgu.featureide.ui.actions.buildallvalidconfigurationsaction"

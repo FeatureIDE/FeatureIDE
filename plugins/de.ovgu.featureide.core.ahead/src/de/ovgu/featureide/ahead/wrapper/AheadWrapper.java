@@ -150,7 +150,10 @@ public class AheadWrapper {
 						}
 					}
 				} catch (CoreException e) {
-					AheadCorePlugin.getDefault().logError(e);
+					/** avoid exception: Marker id xxx not found. **/
+					if (!e.getMessage().startsWith("Marker")) {
+						AheadCorePlugin.getDefault().logError(e);
+					}
 				}
 				return Status.OK_STATUS;
 			}

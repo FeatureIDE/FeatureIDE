@@ -54,6 +54,10 @@ public class FSTClass extends FSTModelElement {
 		return files.contains(file);
 	}
 	
+	public LinkedList<IFile> getClassFiles() {
+		return files;
+	}
+	
 	public void clear() {
 		methods.clear();
 		fields.clear();

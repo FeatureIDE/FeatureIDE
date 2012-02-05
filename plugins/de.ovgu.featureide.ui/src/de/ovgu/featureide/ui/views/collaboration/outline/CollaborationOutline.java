@@ -297,6 +297,7 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 	}
 
 	/**
+	 * TODO revise
 	 * sets the new input or disables the viewer in case no editor is open
 	 * 
 	 * @param iFile2
