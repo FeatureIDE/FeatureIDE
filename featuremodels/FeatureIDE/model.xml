@@ -7,7 +7,7 @@
 				<feature name="AJDT"/>
 				<and name="FeatureModeling">
 					<feature name="CIDE"/>
-					<feature name="HomogeneousFM"/>
+					<feature name="FAMILIAR"/>
 					<or name="FeatureIDE">
 						<feature mandatory="true" name="AHEAD"/>
 						<feature mandatory="true" name="FeatureHouse"/>
@@ -16,9 +16,10 @@
 						<feature mandatory="true" name="AspectJ"/>
 						<feature mandatory="true" name="Munge"/>
 						<feature mandatory="true" name="Antenna"/>
+						<feature mandatory="true" name="DeltaMontiArc"/>
 					</or>
 					<feature name="ExtendedFM"/>
-					<feature name="DeltaMontiArc"/>
+					<feature name="MoSoPoLiTe"/>
 				</and>
 				<feature name="DeltaJEclipsePlugin"/>
 			</and>
