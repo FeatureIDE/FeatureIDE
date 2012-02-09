@@ -13,7 +13,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.typecheck.Checker;
-import de.ovgu.featureide.core.typecheck.FujiWrapper;
+import de.ovgu.featureide.core.typecheck.parser.FujiWrapper;
 
 /**
  * 

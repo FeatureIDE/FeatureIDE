@@ -5,34 +5,35 @@ import java.util.Collection;
 import java.util.List;
 
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.typecheck.parser.Parser;
 import de.ovgu.featureide.fm.core.Feature;
 
 public class Checker {
 
-	IFeatureProject project;
-	FujiWrapper wrap;
+	IFeatureProject _project;
+	Parser _parser;
 
 	public Checker(IFeatureProject project) {
-		this.project = project;
-		this.wrap = new FujiWrapper();
+		_project = project;
+		_parser = new Parser();
 	}
 
 	public void run() {
 
-		String sourcePath = project.getSourcePath();
-		Collection<Feature> features = project.getFeatureModel().getConcreteFeatures();
+		String sourcePath = _project.getSourcePath();
+		Collection<Feature> features = _project.getFeatureModel().getConcreteFeatures();
 		List<String> concrete_features = new ArrayList<String>();
 
 		for (Feature feature : features) {
 			concrete_features.add(feature.getName());
 		}
 
-		if (project.getFeatureModel().isFeatureOrderUserDefined()) {
-			wrap.getAST(sourcePath, project.getFeatureModel()
+		if (_project.getFeatureModel().isFeatureOrderUserDefined()) {
+			_parser.parse(sourcePath, _project.getFeatureModel()
 					.getFeatureOrderList());
 		} else {
-			wrap.getAST(sourcePath, concrete_features);
+			_parser.parse(sourcePath, concrete_features);
 		}
-
+		System.out.println(_parser.getClassTable().dumpString());
 	}
 }
