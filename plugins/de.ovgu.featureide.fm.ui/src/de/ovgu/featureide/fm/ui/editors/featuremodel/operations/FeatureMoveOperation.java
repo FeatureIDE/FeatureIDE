@@ -1,6 +1,6 @@
 
 /* FeatureIDE - An IDE to support feature-oriented software development
- * Copyright (C) 2005-2011  FeatureIDE Team, University of Magdeburg
+ * Copyright (C) 2005-2012  FeatureIDE team, University of Magdeburg
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
