@@ -18,8 +18,11 @@
  */
 package de.ovgu.featureide.core.typecheck.parser;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import de.ovgu.featureide.fm.core.Feature;
 
 import AST.CompilationUnit;
 import AST.Program;
@@ -37,20 +40,20 @@ public class Parser {
 		_class_table = new ClassTable();
 	}
 
-	public void parse(String feature_path, List<String> feature_list) {
+	public void parse(String feature_path, List<Feature> feature_list) {
 		for (int i = 0; i < feature_list.size(); i++) {
-			parseFeature(feature_path, feature_list.subList(i, i + 1));
+			parseFeature(feature_path, feature_list.get(i));
 		}
 	}
 
-	private void parseFeature(String feature_path, List<String> feature) {
-		if (feature.size() != 1) {
-			return;
-		}
+	private void parseFeature(String feature_path, Feature feature) {
 
 		try {
+			List<String> list = new ArrayList<String>();
+			list.add(feature.getName());
+			
 			Iterator<Program> iter = FujiWrapper.getFujiCompositionIterator(
-					feature, feature_path);
+					list, feature_path);
 			
 			while (iter.hasNext()) {
 				Program ast = iter.next();
@@ -60,7 +63,7 @@ public class Parser {
 				while (it.hasNext()) {
 					CompilationUnit cu = it.next();
 					if (cu.fromSource()) {
-						parseCU(feature.get(0), cu);
+						parseCU(feature, cu);
 					} else {
 						
 						// TODO: handle external classes
@@ -75,14 +78,14 @@ public class Parser {
 		}
 	}
 	
-	private void parseCU(String feature, CompilationUnit cu)
+	private void parseCU(Feature feature, CompilationUnit cu)
 	{
 		for (TypeDecl type : cu.getTypeDeclList()) {
 			parseClass(feature, type);
 		}
 	}
 	
-	private void parseClass(String feature, TypeDecl class_ast)
+	private void parseClass(Feature feature, TypeDecl class_ast)
 	{
 		_class_table.add(feature, class_ast);
 	}

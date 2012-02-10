@@ -18,6 +18,7 @@
  */
 package de.ovgu.featureide.core.typecheck.parser;
 
+import de.ovgu.featureide.fm.core.Feature;
 import AST.TypeDecl;
 
 /**
@@ -26,18 +27,18 @@ import AST.TypeDecl;
  * @author soenke
  */
 public class ClassTableEntry {
-	private String _feature_name;
+	private Feature _feature;
 	private TypeDecl _class_ast;
 	
-	public ClassTableEntry(String feature, TypeDecl class_ast)
+	public ClassTableEntry(Feature feature, TypeDecl class_ast)
 	{
-		_feature_name = feature;
+		_feature = feature;
 		_class_ast = class_ast;
 	}
 	
 	public String getFeatureName()
 	{
-		return _feature_name;
+		return _feature.getName();
 	}
 	
 	public String getClassName()

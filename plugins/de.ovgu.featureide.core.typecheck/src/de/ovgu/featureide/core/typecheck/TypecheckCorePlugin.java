@@ -2,7 +2,6 @@ package de.ovgu.featureide.core.typecheck;
 
 import org.osgi.framework.BundleContext;
 
-import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 
 
