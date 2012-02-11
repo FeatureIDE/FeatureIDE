@@ -181,15 +181,16 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			// Nature
 			if (project.getDescription().getNatureIds().length == 1
 					&& project.hasNature(FeatureProjectNature.NATURE_ID)) {
-				binFolder = CorePlugin.createFolder(project, "bin");
+				if (!(getProjectBuildPath().equals("") && getProjectSourcePath().equals(""))) {
+					binFolder = CorePlugin.createFolder(project, "bin");
+				}
 			}
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
 		libFolder = project.getFolder("lib");
 		buildFolder = CorePlugin.createFolder(project, getProjectBuildPath());
-		configFolder = CorePlugin.createFolder(project,
-				getProjectConfigurationPath());
+		configFolder = CorePlugin.createFolder(project,getProjectConfigurationPath());
 		sourceFolder = CorePlugin.createFolder(project, getProjectSourcePath());
 		featureIDEProjectModel = null;
 		// loading model data and listen to changes in the model file
@@ -327,7 +328,6 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	}
 
 	private void createAndDeleteFeatureFolders() throws CoreException {
-
 		sourceFolder.refreshLocal(IResource.DEPTH_ONE, null);
 		// create folders for all layers
 		for (Feature feature : featureModel.getFeatures())
@@ -843,7 +843,8 @@ public class FeatureProject extends BuilderMarkerHandler implements
 				}
 			}
 
-			if (composerExtension != null && buildFolder.isAccessible()) {
+			if (composerExtension != null && buildFolder != null &&
+					buildFolder.isAccessible()) {
 				checkBuildFolder(buildFolder, event);
 			}
 

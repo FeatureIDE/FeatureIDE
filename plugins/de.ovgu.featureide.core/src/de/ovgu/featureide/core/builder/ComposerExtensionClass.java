@@ -252,4 +252,8 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 			CorePlugin.getDefault().logError(e);
 		}
 	}
+	
+	public boolean hasSourceFolder() {
+		return true;
+	}
 }

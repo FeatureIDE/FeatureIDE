@@ -248,4 +248,11 @@ public class ComposerExtensionProxy implements IComposerExtension {
 		return composerExtensionClass.refines();
 	}
 
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#hasSourceFolder()
+	 */
+	public boolean hasSourceFolder() {
+		return composerExtensionClass.hasSourceFolder();
+	}
+
 }

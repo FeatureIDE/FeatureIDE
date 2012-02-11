@@ -210,6 +210,7 @@ public class NewFeatureProjectPage extends WizardPage {
 	protected void dialogChanged() {
 		getCompositionTool().loadComposerExtension();
 		sourcePath.setEnabled(getCompositionTool().hasFeatureFolder());
+		buildPath.setEnabled(getCompositionTool().hasSourceFolder());
 		
 		if (isEnabled(sourcePath) && isEnabled(configsPath) &&
 				getSourcePath().equals(getConfigPath())) {
@@ -280,7 +281,7 @@ public class NewFeatureProjectPage extends WizardPage {
 		if (sourcePath.isEnabled()) {
 			return sourcePath.getText();
 		} else {
-			return buildPath.getText();
+			return getBuildPath();
 		}
 	}
 	
@@ -290,7 +291,7 @@ public class NewFeatureProjectPage extends WizardPage {
 	}
 	
 	public String getBuildPath() {
-		return buildPath.getText();
+		return buildPath.isEnabled() ? buildPath.getText() : "";
 	}
 
 }

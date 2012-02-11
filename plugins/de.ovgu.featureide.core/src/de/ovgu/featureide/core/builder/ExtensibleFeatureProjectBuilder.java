@@ -105,8 +105,9 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 			hasOtherNature = false;
 		}
 
-		featureProject.getBuildFolder().refreshLocal(IResource.DEPTH_INFINITE,
-				monitor);
+		if (featureProject.getBuildFolder() != null) {
+			featureProject.getBuildFolder().refreshLocal(IResource.DEPTH_INFINITE, monitor);
+		}
 		if (!hasOtherNature) {
 			if (featureProject.getBinFolder() != null && 
 					featureProject.getBinFolder().exists()) {

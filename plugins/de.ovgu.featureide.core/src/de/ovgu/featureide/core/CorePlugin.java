@@ -347,7 +347,7 @@ public class CorePlugin extends AbstractCorePlugin {
 			configFile.refreshLocal(IResource.DEPTH_ZERO, null);
 		} catch (CoreException e) {
 			// Avoid file exist error
-			// Has no negative efect
+			// Has no negative effect
 		} finally {
 			if (fw != null) {
 				fw.close();
@@ -468,7 +468,9 @@ public class CorePlugin extends AbstractCorePlugin {
 			/** just create the bin folder if project has only the FeatureIDE Nature **/
 			if (project.getDescription().getNatureIds().length == 1
 					&& project.hasNature(FeatureProjectNature.NATURE_ID)) {
-				createFolder(project, "bin");
+				if (buildPath.equals("") && sourcePath.equals("")) {
+					createFolder(project, "bin");
+				}
 			}
 		} catch (CoreException e) {
 			getDefault().logError(e);

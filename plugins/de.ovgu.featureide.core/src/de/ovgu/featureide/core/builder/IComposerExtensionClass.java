@@ -160,4 +160,9 @@ public interface IComposerExtensionClass {
 	 */
 	String getConfigurationExtension();
 
+	/**
+	 * 
+	 * @return <code>false</code> if a source folder should not be created. Default: <code>true</code>
+	 */
+	boolean hasSourceFolder();
 }

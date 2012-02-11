@@ -82,4 +82,23 @@
              type="org.eclipse.core.resources.problemmarker">
        </super>
     </extension>
+  <extension
+        point="de.ovgu.featureide.core.composers">
+     <composer
+           class="de.ovgu.featureide.core.featuremodeling.FeatureModeling"
+           description="Creation of Feature Models and Configurations."
+           id="de.ovgu.featureide.core.FeatureModeling"
+           name="Feature Modeling"
+           nature="FeatureIDE_Core.FeatureModelingNature">
+     </composer>
+  </extension>
+  <extension
+        point="de.ovgu.featureide.fm.core.FMComposer">
+     <fmComposer
+           class="de.ovgu.featureide.core.featuremodeling.FeatureModelingFMExtension"
+           composer="de.ovgu.featureide.core.FeatureModeling"
+           id="de.ovgu.featureide.core.FeatureModelingFMExtension"
+           name="FMFeature Modeling">
+     </fmComposer>
+  </extension>
 </plugin>

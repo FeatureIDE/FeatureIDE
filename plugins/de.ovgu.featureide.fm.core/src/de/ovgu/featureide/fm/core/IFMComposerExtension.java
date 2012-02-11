@@ -35,6 +35,7 @@ public interface IFMComposerExtension {
 	 * @param oldName
 	 * @param newName
 	 * @param project
+	 * @return <code>false</code> if only the feature folder should be renamed.
 	 */
 	boolean performRenaming(String oldName, String newName, IProject project);
 	
