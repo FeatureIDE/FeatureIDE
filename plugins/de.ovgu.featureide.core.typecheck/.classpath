@@ -8,6 +8,6 @@
 			<attribute name="javadoc_location" value="jar:platform:/resource/de.ovgu.featureide.core.typecheck/lib/commons-cli-1.2/commons-cli-1.2-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="lib/fuji.jar" sourcepath="/Fuji"/>
+	<classpathentry kind="lib" path="lib/fuji.jar" sourcepath="/FujiCompiler/src"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
