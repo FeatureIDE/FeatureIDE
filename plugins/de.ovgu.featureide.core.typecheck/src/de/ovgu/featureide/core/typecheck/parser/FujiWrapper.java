@@ -18,30 +18,35 @@ import fuji.WrongArgumentException;
 
 /**
  * 
- * @author SÃ¶nke Holthusen
+ * @author Sönke Holthusen
  * 
  */
-public class FujiWrapper {
-
-	public static boolean hasSuperClass(ClassDecl cl, ClassDecl superclass) {
-		if (cl.hasSuperclass()) {
-			if (cl.superclass().equals(superclass)) {
+public class FujiWrapper
+{
+	public static boolean hasSuperClass(ClassDecl cl, ClassDecl superclass)
+	{
+		if (cl.hasSuperclass())
+		{
+			if (cl.superclass().equals(superclass))
+			{
 				return true;
-			} else {
+			} else
+			{
 				return hasSuperClass(cl.superclass(), superclass);
 			}
 		}
 		return false;
 	}
-	
-	public static Iterator<Program> getFujiCompositionIterator(List<String> features, String feature_path) throws WrongArgumentException, ParseException, IOException, FeatureDirNotFoundException, SyntacticErrorException, SemanticErrorException, CompilerWarningException
+
+	public static Iterator<Program> getFujiCompositionIterator(List<String> features, String feature_path) throws WrongArgumentException, ParseException,
+			IOException, FeatureDirNotFoundException, SyntacticErrorException, SemanticErrorException, CompilerWarningException
 	{
 		String[] fuji_options = { "-progmode", "-basedir", feature_path };
-		
+
 		Main m = new Main(fuji_options, features);
-		
+
 		Composition composition = m.getComposition(m);
-		
+
 		return composition.getASTIterator();
 	}
 }

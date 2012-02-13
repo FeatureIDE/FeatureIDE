@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import AST.ClassDecl;
-import AST.TypeDecl;
 import de.ovgu.featureide.fm.core.Feature;
 
 /**
@@ -31,21 +30,28 @@ import de.ovgu.featureide.fm.core.Feature;
  * 
  * @author soenke
  */
-public class ClassTable {
+public class ClassTable
+{
+
+	// TODO: caching of classes
 
 	private ArrayList<ClassTableEntry> _class_table = new ArrayList<ClassTableEntry>();
 	private HashSet<String> _classes = new HashSet<String>();
-	private HashSet<String> _features = new HashSet<String>();
+	private HashSet<Feature> _features = new HashSet<Feature>();
 	private HashMap<String, ArrayList<ClassTableEntry>> _classes_by_feature = new HashMap<String, ArrayList<ClassTableEntry>>();
 	private HashMap<String, ArrayList<Feature>> _features_by_class = new HashMap<String, ArrayList<Feature>>();
 
-	public ClassTable() {
+	public ClassTable()
+	{
 
 	}
 
-	public ClassDecl get(String feature, String classname) {
-		for (ClassTableEntry entry : _classes_by_feature.get(feature)) {
-			if (entry.getClassName().equals(classname)) {
+	public ClassDecl get(String feature, String classname)
+	{
+		for (ClassTableEntry entry : _classes_by_feature.get(feature))
+		{
+			if (entry.getClassName().equals(classname))
+			{
 				return entry.getAST();
 			}
 		}
@@ -56,69 +62,76 @@ public class ClassTable {
 	{
 		return _classes.contains(className);
 	}
-	
+
 	public ArrayList<ClassTableEntry> getClasses()
 	{
 		return _class_table;
 	}
-	
+
 	public ArrayList<String> getClassNames()
 	{
 		return new ArrayList<String>(_classes);
 	}
-	
-	public ArrayList<String> getFeatures()
+
+	public ArrayList<Feature> getFeatures()
 	{
-		return new ArrayList<String>(_features);
+		return new ArrayList<Feature>(_features);
 	}
-	
+
 	public ArrayList<ClassTableEntry> getClassesByFeature(String feature)
 	{
 		return _classes_by_feature.get(feature);
 	}
-	
+
 	public ArrayList<Feature> getFeaturesByClass(String class_name)
 	{
 		return _features_by_class.get(class_name);
 	}
-	
-	public boolean add(Feature feature, ClassDecl class_ast) {
+
+	public boolean add(Feature feature, ClassDecl class_ast)
+	{
 		ClassTableEntry entry = new ClassTableEntry(feature, class_ast);
 
-		if (_class_table.contains(entry)) {
+		if (_class_table.contains(entry))
+		{
 			return false;
 		}
 
 		ArrayList<ClassTableEntry> class_entries = _classes_by_feature.get(feature.getName());
 		ArrayList<Feature> feature_entries = _features_by_class.get(class_ast.fullName());
 
-		if (class_entries == null) {
+		if (class_entries == null)
+		{
 			class_entries = new ArrayList<ClassTableEntry>();
 			_classes_by_feature.put(feature.getName(), class_entries);
 		}
 
-		if(feature_entries == null)
+		if (feature_entries == null)
 		{
 			feature_entries = new ArrayList<Feature>();
 			_features_by_class.put(class_ast.fullName(), feature_entries);
 		}
-		
-		if (class_entries.contains(entry) || feature_entries.contains(entry)) {
+
+		if (class_entries.contains(entry) || feature_entries.contains(entry))
+		{
 			return false;
 		}
 
 		_class_table.add(entry);
 		_classes.add(entry.getClassName());
-		_features.add(feature.getName());
+		_features.add(feature);
 		class_entries.add(entry);
 		feature_entries.add(feature);
 		return true;
 	}
 
-	public String dumpString() {
+	@Override
+	public String toString()
+	{
 		StringBuilder builder = new StringBuilder();
-		for (ClassTableEntry entry : _class_table) {
-			builder.append(entry + "\n");
+		for (ClassTableEntry entry : _class_table)
+		{
+			builder.append(entry).append("\n");
 		}
 		return builder.toString();
 	}
