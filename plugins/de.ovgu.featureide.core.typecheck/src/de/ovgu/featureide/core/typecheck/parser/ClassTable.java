@@ -28,7 +28,7 @@ import de.ovgu.featureide.fm.core.Feature;
 /**
  * TODO description
  * 
- * @author soenke
+ * @author Sönke Holthusen
  */
 public class ClassTable
 {
@@ -125,6 +125,23 @@ public class ClassTable
 		return true;
 	}
 
+	public ArrayList<Feature> featuresToUpdate()
+	{
+		ArrayList<Feature> update_needed = new ArrayList<Feature>();
+		for(Feature feature : _features)
+		{
+			for(ClassTableEntry entry : getClassesByFeature(feature.getName()))
+			{
+				if(entry.needsUpdate())
+				{
+					update_needed.add(feature);
+					break;
+				}
+			}
+		}
+		return update_needed;
+	}
+	
 	@Override
 	public String toString()
 	{

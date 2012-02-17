@@ -18,21 +18,17 @@
  */
 package de.ovgu.featureide.core.typecheck.parser;
 
-import java.util.ArrayList;
-
-import de.ovgu.featureide.fm.core.Feature;
 import AST.ClassDecl;
-import AST.TypeDecl;
+import de.ovgu.featureide.fm.core.Feature;
 
 /**
  * TODO description
  * 
- * @author soenke
+ * @author Sönke Holthusen
  */
 public class ClassTableEntry {
 	private Feature _feature;
 	private ClassDecl _class_ast;
-	private ArrayList<TypeDecl> _external_classes;
 	
 	public ClassTableEntry(Feature feature, ClassDecl class_ast)
 	{
@@ -58,5 +54,10 @@ public class ClassTableEntry {
 	public String toString()
 	{
 		return getFeatureName() + "." + getClassName();
+	}
+	
+	public boolean needsUpdate()
+	{
+		return true;
 	}
 }

@@ -26,13 +26,13 @@ import de.ovgu.featureide.fm.core.Feature;
 /**
  * TODO description
  * 
- * @author soenke
+ * @author Sönke Holthusen
  */
 public class Checks
 {
 	IFeatureProject _project;
 	ClassTable _class_table;
-	
+
 	/**
 	 * 
 	 */
@@ -41,7 +41,7 @@ public class Checks
 		_project = project;
 		_class_table = class_table;
 	}
-	
+
 	public void superClassCheck()
 	{
 		for (Feature feature : _class_table.getFeatures())
@@ -54,19 +54,19 @@ public class Checks
 					System.out.println(feature.getName() + "@" + entry.getClassName() + " has local Superclass " + superclass);
 					for (Feature providing_feature : _class_table.getFeaturesByClass(superclass))
 					{
+						// TODO: check if one of the features providing the superclass is always selected when the given feature is selected
+						// feature and (feature or feature or ...)
 						if (!feature.getName().equals(providing_feature.getName()))
 						{
 							System.out.println("\tFeature " + providing_feature.getName() + " can provide this Superclass");
 						}
 					}
-				} else
+				}
+				else
 				{
 					// ignore external superclasses for now
 				}
-
 			}
 		}
-
 	}
-
 }

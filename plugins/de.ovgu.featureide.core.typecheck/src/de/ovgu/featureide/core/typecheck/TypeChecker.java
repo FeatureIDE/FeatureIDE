@@ -1,7 +1,24 @@
+/* FeatureIDE - An IDE to support feature-oriented software development
+ * Copyright (C) 2005-2011  FeatureIDE Team, University of Magdeburg
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ * See http://www.fosd.de/featureide/ for further information.
+ */
 package de.ovgu.featureide.core.typecheck;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import de.ovgu.featureide.core.IFeatureProject;
@@ -10,6 +27,11 @@ import de.ovgu.featureide.core.typecheck.parser.ClassTable;
 import de.ovgu.featureide.core.typecheck.parser.Parser;
 import de.ovgu.featureide.fm.core.Feature;
 
+/**
+ * TODO description
+ * 
+ * @author Sönke Holthusen
+ */
 public class TypeChecker
 {
 
@@ -26,14 +48,7 @@ public class TypeChecker
 	public void run()
 	{
 		System.out.println("Starting parsing project " + _project.getProjectName());
-		String sourcePath = _project.getSourcePath();
-		Collection<Feature> features = _project.getFeatureModel().getConcreteFeatures();
-		List<Feature> concrete_features = new ArrayList<Feature>();
-
-		for (Feature feature : features)
-		{
-			concrete_features.add(feature);
-		}
+		List<Feature> concrete_features = new ArrayList<Feature>(_project.getFeatureModel().getConcreteFeatures());
 
 		// TODO: consider the userdefined feature order
 		// if (_project.getFeatureModel().isFeatureOrderUserDefined()) {
@@ -41,7 +56,7 @@ public class TypeChecker
 		// .getFeatureOrderList());
 		// } else {
 
-		_parser.parse(sourcePath, (concrete_features));
+		_parser.parse(_project.getSourcePath(), (concrete_features));
 
 		_class_table = _parser.getClassTable();
 

@@ -2,12 +2,15 @@ package de.ovgu.featureide.core.typecheck;
 
 import org.osgi.framework.BundleContext;
 
+import de.ovgu.featureide.core.typecheck.parser.ClassTableCache;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 
 
 public class TypecheckCorePlugin extends AbstractCorePlugin {
 
 	public static final String PLUGIN_ID = "de.ovgu.featureide.core.typecheck";
+
+	public static ClassTableCache class_table_cache = new ClassTableCache();
 
 	private static TypecheckCorePlugin plugin;
 	

@@ -32,7 +32,7 @@ import de.ovgu.featureide.fm.core.Feature;
 /**
  * TODO description
  * 
- * @author soenke
+ * @author Sönke Holthusen
  */
 public class Parser {
 	public Timer timer = new Timer();

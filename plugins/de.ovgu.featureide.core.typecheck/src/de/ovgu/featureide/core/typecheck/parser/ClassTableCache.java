@@ -16,47 +16,19 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.core.typecheck.helper;
+package de.ovgu.featureide.core.typecheck.parser;
+
+import java.util.HashMap;
+
+import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.core.Feature;
 
 /**
  * TODO description
  * 
  * @author Sönke Holthusen
  */
-public class Timer
+public class ClassTableCache
 {
-	private long _time_passed = 0;
-	private long _time_last_start = 0;
-	private boolean _started = false;
-
-	public void start()
-	{
-		_time_passed = 0;
-		_started = true;
-		_time_last_start = System.currentTimeMillis();
-	}
-
-	public void stop()
-	{
-		_time_passed += System.currentTimeMillis() - _time_last_start;
-		_started = false;
-	}
-
-	public void resume()
-	{
-		_started = true;
-		_time_last_start = System.currentTimeMillis();
-	}
-
-	public long getTime()
-	{
-		if (!_started)
-		{
-			return _time_passed;
-		}
-		else
-		{
-			return _time_passed + (System.currentTimeMillis() - _time_last_start);
-		}
-	}
+	HashMap<IFeatureProject, HashMap<Feature, ClassTable>> _class_table;
 }
