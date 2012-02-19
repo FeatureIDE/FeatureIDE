@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import org.eclipse.core.resources.IFile;
+
 import AST.ClassDecl;
 import de.ovgu.featureide.fm.core.Feature;
 
@@ -88,9 +90,9 @@ public class ClassTable
 		return _features_by_class.get(class_name);
 	}
 
-	public boolean add(Feature feature, ClassDecl class_ast)
+	public boolean add(Feature feature, ClassDecl class_ast, IFile file)
 	{
-		ClassTableEntry entry = new ClassTableEntry(feature, class_ast);
+		ClassTableEntry entry = new ClassTableEntry(feature, class_ast, file);
 
 		if (_class_table.contains(entry))
 		{

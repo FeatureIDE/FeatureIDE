@@ -22,10 +22,15 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.Path;
+
 import AST.ClassDecl;
 import AST.CompilationUnit;
 import AST.Program;
 import AST.TypeDecl;
+import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.typecheck.helper.Timer;
 import de.ovgu.featureide.fm.core.Feature;
 
@@ -34,50 +39,63 @@ import de.ovgu.featureide.fm.core.Feature;
  * 
  * @author Sönke Holthusen
  */
-public class Parser {
+public class Parser
+{
 	public Timer timer = new Timer();
 
+	private IFeatureProject _project;
 	private ClassTable _class_table;
 
-	public Parser() {
+	public Parser(IFeatureProject project)
+	{
+		_project = project;
+
 		_class_table = new ClassTable();
 	}
 
-	public void parse(String feature_path, List<Feature> feature_list) {
-		for (int i = 0; i < feature_list.size(); i++) {
+	public void parse(String feature_path, List<Feature> feature_list)
+	{
+		for (int i = 0; i < feature_list.size(); i++)
+		{
 			parseFeature(feature_path, feature_list.get(i));
 		}
 	}
 
-	private void parseFeature(String feature_path, Feature feature) {
+	private void parseFeature(String feature_path, Feature feature)
+	{
 		Timer timer = new Timer();
 		System.out.print("Parsing Feature " + feature.getName() + " ... ");
 		timer.start();
 		this.timer.resume();
 
-		try {
+		try
+		{
 			List<String> list = new ArrayList<String>();
 			list.add(feature.getName());
 
-			Iterator<Program> iter = FujiWrapper.getFujiCompositionIterator(
-					list, feature_path);
+			Iterator<Program> iter = FujiWrapper.getFujiCompositionIterator(list, feature_path);
 
-			while (iter.hasNext()) {
+			while (iter.hasNext())
+			{
 				// XXX: takes a very long time
 				Program ast = iter.next();
 
 				@SuppressWarnings("unchecked")
 				Iterator<CompilationUnit> it = ast.compilationUnitIterator();
-				while (it.hasNext()) {
+				while (it.hasNext())
+				{
 					CompilationUnit cu = it.next();
-					if (cu.fromSource()) {
+					if (cu.fromSource())
+					{
 						parseCU(feature, cu);
 					}
 				}
 
 			}
 
-		} catch (Exception e) {
+		}
+		catch (Exception e)
+		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -86,20 +104,30 @@ public class Parser {
 		System.out.println(" done (" + timer.getTime() + " ms)");
 	}
 
-	private void parseCU(Feature feature, CompilationUnit cu) {
+	private void parseCU(Feature feature, CompilationUnit cu)
+	{
 		// TODO: handle imports
-		for (TypeDecl type : cu.getTypeDeclList()) {
-			if (type instanceof ClassDecl) {
-				parseClass(feature, (ClassDecl) type);
+
+		final IProject project = _project.getProject();
+		
+		IFile class_path = project.getFile(new Path(cu.pathName()).makeRelativeTo(project.getLocation()));
+
+		for (TypeDecl type : cu.getTypeDeclList())
+		{
+			if (type instanceof ClassDecl)
+			{
+				parseClass(feature, (ClassDecl) type, class_path);
 			}
 		}
 	}
 
-	private void parseClass(Feature feature, ClassDecl class_ast) {
-		_class_table.add(feature, class_ast);
+	private void parseClass(Feature feature, ClassDecl class_ast, IFile class_path)
+	{
+		_class_table.add(feature, class_ast, class_path);
 	}
 
-	public ClassTable getClassTable() {
+	public ClassTable getClassTable()
+	{
 		return _class_table;
 	}
 }

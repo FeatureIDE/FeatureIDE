@@ -22,7 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.typecheck.checks.Checks;
+import de.ovgu.featureide.core.typecheck.check.CheckPluginManager;
+import de.ovgu.featureide.core.typecheck.check.SuperClassCheck;
 import de.ovgu.featureide.core.typecheck.parser.ClassTable;
 import de.ovgu.featureide.core.typecheck.parser.Parser;
 import de.ovgu.featureide.fm.core.Feature;
@@ -38,11 +39,16 @@ public class TypeChecker
 	private IFeatureProject _project;
 	private Parser _parser;
 	private ClassTable _class_table;
+	
+	private CheckPluginManager _checks;
 
 	public TypeChecker(IFeatureProject project)
 	{
 		_project = project;
-		_parser = new Parser();
+		_parser = new Parser(_project);
+		_checks = new CheckPluginManager();
+		
+		_checks.addCheck(new SuperClassCheck());
 	}
 
 	public void run()
@@ -57,7 +63,7 @@ public class TypeChecker
 		// } else {
 
 		_parser.parse(_project.getSourcePath(), (concrete_features));
-
+		
 		_class_table = _parser.getClassTable();
 
 		// }
@@ -93,8 +99,7 @@ public class TypeChecker
 
 		System.out.println("Parsing finished... (" + _parser.timer.getTime() + " ms)");
 		System.out.println("Checking superclasses...");
-		Checks checks = new Checks(_project, _class_table);
-		checks.superClassCheck();
+		_checks.invokeChecks(_project, _class_table);
 		System.out.println("Superclass check finished...");
 	}
 }

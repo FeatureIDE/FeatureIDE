@@ -18,6 +18,8 @@
  */
 package de.ovgu.featureide.core.typecheck.parser;
 
+import org.eclipse.core.resources.IFile;
+
 import AST.ClassDecl;
 import de.ovgu.featureide.fm.core.Feature;
 
@@ -29,11 +31,17 @@ import de.ovgu.featureide.fm.core.Feature;
 public class ClassTableEntry {
 	private Feature _feature;
 	private ClassDecl _class_ast;
+	private IFile _class_file;
 	
-	public ClassTableEntry(Feature feature, ClassDecl class_ast)
+	private long _class_file_modification_stamp;
+	
+	public ClassTableEntry(Feature feature, ClassDecl class_ast, IFile class_file)
 	{
 		_feature = feature;
 		_class_ast = class_ast;
+		_class_file = class_file;
+		
+		_class_file_modification_stamp = _class_file.getModificationStamp();
 	}
 	
 	public String getFeatureName()
@@ -51,6 +59,11 @@ public class ClassTableEntry {
 		return _class_ast;
 	}
 	
+	public IFile getClassFile()
+	{
+		return _class_file;
+	}
+	
 	public String toString()
 	{
 		return getFeatureName() + "." + getClassName();
@@ -58,6 +71,6 @@ public class ClassTableEntry {
 	
 	public boolean needsUpdate()
 	{
-		return true;
+		return _class_file_modification_stamp != _class_file.getModificationStamp();
 	}
 }
