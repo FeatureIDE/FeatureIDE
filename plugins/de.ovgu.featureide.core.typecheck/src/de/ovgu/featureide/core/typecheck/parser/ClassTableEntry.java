@@ -25,7 +25,7 @@ import org.eclipse.core.resources.IFile;
 import AST.BodyDecl;
 import AST.ClassDecl;
 import AST.CompilationUnit;
-import AST.FieldDecl;
+import AST.FieldDeclaration;
 import AST.MethodDecl;
 import de.ovgu.featureide.fm.core.Feature;
 
@@ -93,15 +93,15 @@ public class ClassTableEntry
 		return methods;
 	}
 
-	public ArrayList<FieldDecl> getFields()
+	public ArrayList<FieldDeclaration> getFields()
 	{
-		ArrayList<FieldDecl> fields = new ArrayList<FieldDecl>();
+		ArrayList<FieldDeclaration> fields = new ArrayList<FieldDeclaration>();
 
 		for (BodyDecl body : _class_ast.getBodyDeclList())
 		{
-			if (body instanceof FieldDecl)
+			if (body instanceof FieldDeclaration)
 			{
-				fields.add((FieldDecl) body);
+				fields.add((FieldDeclaration) body);
 			}
 		}
 

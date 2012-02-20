@@ -18,10 +18,7 @@
  */
 package de.ovgu.featureide.core.typecheck.check;
 
-import AST.BodyDecl;
-import AST.FieldDecl;
-import AST.MethodDecl;
-import AST.Modifier;
+import AST.FieldDeclaration;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.typecheck.parser.ClassTable;
 import de.ovgu.featureide.core.typecheck.parser.ClassTableEntry;
@@ -47,11 +44,11 @@ public class TestCheckPlugin implements ICheckPlugin
 		{
 			System.out.println("Class " + entry.toString() + " has linenumber " + entry.getAST().lineNumber());
 			project.deleteBuilderMarkers(entry.getClassFile(), 1);
-			for (FieldDecl field : entry.getFields())
+			for (FieldDeclaration field : entry.getFields())
 			{
 				//project.createBuilderMarker(entry.getClassFile(), "method", method.lineNumber(), 0);
 
-				System.out.println("\t" + field.lineNumber() + ":" + field.dumpString());
+				System.out.println("\t" + field.lineNumber() + ":" + field.toString());
 			}
 		}
 	}

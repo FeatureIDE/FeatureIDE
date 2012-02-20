@@ -19,13 +19,17 @@
 package de.ovgu.featureide.core.typecheck.parser;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.cli.ParseException;
 
 import AST.ClassDecl;
+import AST.MethodAccess;
+import AST.MethodDecl;
 import AST.Program;
+import AST.TypeAccess;
 import fuji.CompilerWarningException;
 import fuji.Composition;
 import fuji.FeatureDirNotFoundException;
@@ -67,4 +71,17 @@ public class FujiWrapper
 
 		return composition.getASTIterator();
 	}
+	
+	public static ArrayList<MethodAccess> getMethodAccesses(MethodDecl method)
+	{
+		ArrayList<MethodAccess> method_accesses = new ArrayList<MethodAccess>();
+		return method_accesses;
+	}
+	
+	public static ArrayList<TypeAccess> getTypeAccesses(MethodDecl method)
+	{
+		ArrayList<TypeAccess> type_accesses = new ArrayList<TypeAccess>();
+		return type_accesses;
+	}
+	
 }
