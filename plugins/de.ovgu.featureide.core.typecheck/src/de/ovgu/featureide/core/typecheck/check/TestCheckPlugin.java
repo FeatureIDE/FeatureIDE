@@ -18,53 +18,41 @@
  */
 package de.ovgu.featureide.core.typecheck.check;
 
-import java.util.ArrayList;
-
+import AST.BodyDecl;
+import AST.FieldDecl;
+import AST.MethodDecl;
+import AST.Modifier;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.typecheck.parser.ClassTable;
+import de.ovgu.featureide.core.typecheck.parser.ClassTableEntry;
 
 /**
  * TODO description
  * 
- * @author Sönke Holthusen
+ * @author soenke
  */
-public class CheckPluginManager
+public class TestCheckPlugin implements ICheckPlugin
 {
-	private ArrayList<ICheckPlugin> _plugins;
-	
-	public CheckPluginManager()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.ovgu.featureide.core.typecheck.check.ICheckPlugin#invokeCheck(de.ovgu.featureide.core.IFeatureProject,
+	 * de.ovgu.featureide.core.typecheck.parser.ClassTable)
+	 */
+	@Override
+	public void invokeCheck(IFeatureProject project, ClassTable class_table)
 	{
-		_plugins = new ArrayList<ICheckPlugin>();
-	}
-	
-	public CheckPluginManager(ICheckPlugin... plugins)
-	{
-		this();
-		
-		for(ICheckPlugin plugin : plugins)
+		for (ClassTableEntry entry : class_table.getClasses())
 		{
-			_plugins.add(plugin);
-		}
-	}
-	
-	public void addCheck(ICheckPlugin plugin)
-	{
-		_plugins.add(plugin);
-	}
-	
-	public void addCheck(ICheckPlugin... plugins)
-	{
-		for(ICheckPlugin plugin : plugins)
-		{
-			_plugins.add(plugin);
-		}
-	}
-	
-	public void invokeChecks(IFeatureProject project, ClassTable class_table)
-	{
-		for(ICheckPlugin plugin : _plugins)
-		{
-			plugin.invokeCheck(project, class_table);
+			System.out.println("Class " + entry.toString() + " has linenumber " + entry.getAST().lineNumber());
+			project.deleteBuilderMarkers(entry.getClassFile(), 1);
+			for (FieldDecl field : entry.getFields())
+			{
+				//project.createBuilderMarker(entry.getClassFile(), "method", method.lineNumber(), 0);
+
+				System.out.println("\t" + field.lineNumber() + ":" + field.dumpString());
+			}
 		}
 	}
 }

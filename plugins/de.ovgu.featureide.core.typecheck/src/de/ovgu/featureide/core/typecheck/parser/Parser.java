@@ -116,14 +116,14 @@ public class Parser
 		{
 			if (type instanceof ClassDecl)
 			{
-				parseClass(feature, (ClassDecl) type, class_path);
+				parseClass(feature, (ClassDecl) type, cu, class_path);
 			}
 		}
 	}
 
-	private void parseClass(Feature feature, ClassDecl class_ast, IFile class_path)
+	private void parseClass(Feature feature, ClassDecl class_ast, CompilationUnit cu, IFile class_path)
 	{
-		_class_table.add(feature, class_ast, class_path);
+		_class_table.add(feature, class_ast, cu, class_path);
 	}
 
 	public ClassTable getClassTable()

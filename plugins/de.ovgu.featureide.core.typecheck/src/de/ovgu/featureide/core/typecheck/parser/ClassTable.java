@@ -25,6 +25,7 @@ import java.util.HashSet;
 import org.eclipse.core.resources.IFile;
 
 import AST.ClassDecl;
+import AST.CompilationUnit;
 import de.ovgu.featureide.fm.core.Feature;
 
 /**
@@ -90,9 +91,9 @@ public class ClassTable
 		return _features_by_class.get(class_name);
 	}
 
-	public boolean add(Feature feature, ClassDecl class_ast, IFile file)
+	public boolean add(Feature feature, ClassDecl class_ast, CompilationUnit cu, IFile file)
 	{
-		ClassTableEntry entry = new ClassTableEntry(feature, class_ast, file);
+		ClassTableEntry entry = new ClassTableEntry(feature, class_ast, cu, file);
 
 		if (_class_table.contains(entry))
 		{
@@ -130,11 +131,11 @@ public class ClassTable
 	public ArrayList<Feature> featuresToUpdate()
 	{
 		ArrayList<Feature> update_needed = new ArrayList<Feature>();
-		for(Feature feature : _features)
+		for (Feature feature : _features)
 		{
-			for(ClassTableEntry entry : getClassesByFeature(feature.getName()))
+			for (ClassTableEntry entry : getClassesByFeature(feature.getName()))
 			{
-				if(entry.needsUpdate())
+				if (entry.needsUpdate())
 				{
 					update_needed.add(feature);
 					break;
@@ -143,7 +144,7 @@ public class ClassTable
 		}
 		return update_needed;
 	}
-	
+
 	@Override
 	public String toString()
 	{
