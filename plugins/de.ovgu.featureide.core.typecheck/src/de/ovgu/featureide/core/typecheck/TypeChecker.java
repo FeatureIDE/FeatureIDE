@@ -23,6 +23,7 @@ import java.util.List;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.typecheck.check.CheckPluginManager;
+import de.ovgu.featureide.core.typecheck.check.MethodCheck;
 import de.ovgu.featureide.core.typecheck.check.SuperClassCheck;
 import de.ovgu.featureide.core.typecheck.check.TestCheckPlugin;
 import de.ovgu.featureide.core.typecheck.parser.ClassTable;
@@ -49,7 +50,7 @@ public class TypeChecker
 		_parser = new Parser(_project);
 		_checks = new CheckPluginManager();
 
-		_checks.addCheck(new SuperClassCheck(), new TestCheckPlugin());
+		_checks.addCheck(new SuperClassCheck(), new MethodCheck());
 	}
 
 	public void run()
