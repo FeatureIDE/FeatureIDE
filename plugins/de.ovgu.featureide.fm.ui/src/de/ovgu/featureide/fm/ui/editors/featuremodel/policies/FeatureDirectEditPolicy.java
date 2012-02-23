@@ -24,7 +24,6 @@ import org.eclipse.gef.requests.DirectEditRequest;
 
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.FeatureRenamingCommand;
 
 
@@ -33,7 +32,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.FeatureRenamingCom
  * 
  * @author Thomas Thuem
  */
-public class FeatureDirectEditPolicy extends DirectEditPolicy implements GUIDefaults {
+public class FeatureDirectEditPolicy extends DirectEditPolicy {
 	
 	private final FeatureModel featureModel;
 

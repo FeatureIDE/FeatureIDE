@@ -29,6 +29,7 @@ import org.prop4j.NodeWriter;
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.propertypage.IPersistentPropertyManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIBasics;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -46,7 +47,9 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 	private final Label label = new Label();
 	
 	private Constraint constraint;
-	
+
+	private IPersistentPropertyManager manager;
+
 	public final static String VOID_MODEL = " Constraint makes the feature model void. ";
 	public final static String UNSATISFIABLE = " Constraint is unsatisfiable and makes the feature model void. ";
 	public final static String TAUTOLOGY = " Constraint is a tautology and should be removed. ";
@@ -57,7 +60,7 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 	public ConstraintFigure(Constraint constraint) {
 		super();
 		this.constraint = constraint;
-		
+		manager = constraint.getFeatureModel().getPersistentPropertyManager();
 		setLayoutManager(new FreeformLayout());
 
 		label.setForegroundColor(CONSTRAINT_FOREGROUND);
@@ -79,8 +82,8 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 	}
 	
 	public void setConstraintProperties(boolean calc){
-		setBorder(constraint.isFeatureSelected() ? CONSTRAINT_SELECTED_BORDER : CONSTRAINT_BORDER);
-		setBackgroundColor(CONSTRAINT_BACKGROUND);
+		setBorder(manager.getConstrinatBorder(constraint.isFeatureSelected()));
+		setBackgroundColor(manager.getConstraintBackgroundColor());
 		setToolTip(null);
 
 		if(!calc)return;
@@ -95,11 +98,11 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 	// TODO Thomas: remove this method and adopt results of analysis in constraint attributes instead
 	private void setConstraintError(){
 		if (constraint.getConstraintAttribute() == ConstraintAttribute.VOID_MODEL){
-			setBackgroundColor(ERROR_BACKGROUND);
+			setBackgroundColor(manager.getDeadFeatureBackgroundColor());
 			setToolTip(new Label(VOID_MODEL));
 			
 		} else if (constraint.getConstraintAttribute() == ConstraintAttribute.UNSATISFIABLE) {
-			setBackgroundColor(ERROR_BACKGROUND);
+			setBackgroundColor(manager.getDeadFeatureBackgroundColor());
 			setToolTip(new Label(UNSATISFIABLE));
 		}
 		
@@ -108,7 +111,7 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 	private void setConstraintWarning(){	
 		
 		if (constraint.getConstraintAttribute() == ConstraintAttribute.TAUTOLOGY){
-			setBackgroundColor(WARNING_BACKGROUND);
+			setBackgroundColor(manager.getDeadFeatureBackgroundColor());
 			setToolTip(new Label(TAUTOLOGY));	
 			return;
 		}
@@ -116,7 +119,7 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 
 		// TODO Thomas: this long calculation should be done in analyzeFeatureModel()
 		if (!constraint.getDeadFeatures(constraint.getFeatureModel()).isEmpty()){
-			setBackgroundColor(ERROR_BACKGROUND);
+			setBackgroundColor(manager.getDeadFeatureBackgroundColor());
 			StringBuilder toolTip = new StringBuilder(); 
 			toolTip.append(DEAD_FEATURE);
 			for (Feature dead : constraint.getDeadFeatures(constraint.getFeatureModel())) {
@@ -129,7 +132,7 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 
 		// TODO Thomas: this long calculation should be done in analyzeFeatureModel()
 		if (!constraint.getFalseOptional().isEmpty()){
-			setBackgroundColor(WARNING_BACKGROUND);
+			setBackgroundColor(manager.getWarningColor());
 			StringBuilder toolTip = new StringBuilder();
 			toolTip.append(FALSE_OPTIONAL);
 			for (Feature feature : constraint.getFalseOptional())
@@ -140,7 +143,7 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 		
 
 		if (constraint.getConstraintAttribute() == ConstraintAttribute.REDUNDANT){
-			setBackgroundColor(WARNING_BACKGROUND);
+			setBackgroundColor(manager.getWarningColor());
 			setToolTip(new Label(REDUNDANCE));	
 			return;
 		}

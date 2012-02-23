@@ -26,7 +26,6 @@ import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.LegendHideOperation;
 
 /**
@@ -34,14 +33,14 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.LegendHideOperat
  * 
  * @author Fabian Benduhn
  */
-public class LegendAction extends Action implements GUIDefaults {
+public class LegendAction extends Action {
 
 	private final FeatureModel featureModel;
 
 	public LegendAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
 		super();
 		this.featureModel = featureModel;
-		if (featureModel.hasLegend()) {
+		if (!featureModel.getPersistentPropertyManager().isLegendHidden()) {
 			this.setText("Hide Legend");
 		} else {
 			this.setText("Show Legend");
@@ -66,7 +65,7 @@ public class LegendAction extends Action implements GUIDefaults {
 	}
 
 	public void refresh() {
-		if (featureModel.hasLegend()) {
+		if (!featureModel.getPersistentPropertyManager().isLegendHidden()) {
 			this.setText("Hide Legend");
 		} else {
 			this.setText("Show Legend");

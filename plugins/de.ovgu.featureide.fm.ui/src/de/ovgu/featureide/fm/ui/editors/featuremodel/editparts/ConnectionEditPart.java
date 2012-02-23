@@ -42,6 +42,7 @@ import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureConnection;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.propertypage.IPersistentPropertyManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramExtension;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
@@ -62,9 +63,11 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 		GUIDefaults, PropertyConstants, PropertyChangeListener {
 
 	private Figure toolTipContent = new Figure();
+	private IPersistentPropertyManager manager;
 	
 	public ConnectionEditPart(FeatureConnection connection) {
 		super();
+		manager = connection.getSource().getFeatureModel().getPersistentPropertyManager();
 		setModel(connection);
 	}
 
@@ -75,7 +78,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 	@Override
 	protected IFigure createFigure() {
 		PolylineConnection figure = new PolylineConnection();
-		figure.setForegroundColor(CONNECTION_FOREGROUND);
+		figure.setForegroundColor(manager.getConnectionForgroundColor());
 		return figure;
 	}
 
@@ -163,7 +166,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 		}
 		if ((target.isAnd() || OR_CIRCLES) && !(source.isHidden() && !FeatureUIHelper.showHiddenFeatures()))	
 			if(!(parentHidden && !FeatureUIHelper.showHiddenFeatures()))
-					sourceDecoration = new CircleDecoration(source.isMandatory());
+					sourceDecoration = new CircleDecoration(source.isMandatory(), manager);
 
 		PolylineConnection connection = (PolylineConnection) getConnectionFigure();
 		connection.setSourceDecoration(sourceDecoration);
@@ -178,11 +181,11 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 			if(FeatureUIHelper.hasVerticalLayout()){
 				if (!target.isAnd() && (target.getChildIndex(source) == (target.getChildrenCount()-1)))
 					targetDecoration = new RelationDecoration(target.isMultiple(),
-							target.getFirstChild(), target.getChildren());
+							target.getFirstChild(), target.getChildren(), manager);
 			} else {
 				if (!target.isAnd() && target.isFirstChild(source))
 					targetDecoration = new RelationDecoration(target.isMultiple(),
-							target.getLastChild(), target.getChildren());
+							target.getLastChild(), target.getChildren(), manager);
 			}
 		
 		PolylineConnection connection = (PolylineConnection) getConnectionFigure();

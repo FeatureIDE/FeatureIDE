@@ -229,7 +229,8 @@ public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 		updateForeground(viewer.getTree().getItem(0));
 	}
 	
-	private void updateForeground(TreeItem item) {	
+	private void updateForeground(
+			TreeItem item) {	
 		// TODO implement coloring
 //		for (TreeItem child : item.getItems()) {
 //			SelectableFeature feature = configurationEditor.configuration.getSelectablefeature(child.getText());

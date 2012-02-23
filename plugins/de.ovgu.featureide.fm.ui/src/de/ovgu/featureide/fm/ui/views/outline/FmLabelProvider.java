@@ -133,6 +133,6 @@ public class FmLabelProvider implements ILabelProvider,IFontProvider, GUIDefault
 	 */
 	@Override
 	public Font getFont(Object element) {
-		return GUIDefaults.DEFAULT_FONT;
+		return DEFAULT_FONT;
 	}
 }

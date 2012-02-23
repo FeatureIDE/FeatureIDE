@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.propertypage.IPersistentPropertyManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 
 
@@ -33,6 +34,13 @@ import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
  */
 public class BreadthFirstLayout extends FeatureDiagramLayoutManager {
 	
+	/**
+	 * @param manager
+	 */
+	public BreadthFirstLayout(IPersistentPropertyManager manager) {
+		super(manager);
+	}
+
 	int yoffset;
 
 	@Override
@@ -49,12 +57,12 @@ public class BreadthFirstLayout extends FeatureDiagramLayoutManager {
 		LinkedList<LayoutableFeature> list = new LinkedList<LayoutableFeature>();
 		list.add(root);
 
-		yoffset += LAYOUT_MARGIN_Y;
+		yoffset += manager.getLayoutMarginY();
 		while (!list.isEmpty()) {
 			//center the features of the level
-			int width = 2 * LAYOUT_MARGIN_X - FEATURE_SPACE_X;
+			int width = 2 * manager.getLayoutMarginX() - manager.getFeatureSpaceX();
 			for (LayoutableFeature feature : list) {
-				width += FeatureUIHelper.getSize(feature.getFeature()).width + FEATURE_SPACE_X;
+				width += FeatureUIHelper.getSize(feature.getFeature()).width + manager.getFeatureSpaceX();
 				
 				
 			}
@@ -66,14 +74,14 @@ public class BreadthFirstLayout extends FeatureDiagramLayoutManager {
 			for (int i = 0; i < levelSize; i++) {
 				LayoutableFeature feature = list.removeFirst();
 				FeatureUIHelper.setLocation(feature.getFeature(),new Point(xoffset, yoffset));
-				xoffset += FeatureUIHelper.getSize(feature.getFeature()).width + FEATURE_SPACE_X;
+				xoffset += FeatureUIHelper.getSize(feature.getFeature()).width + manager.getFeatureSpaceX();
 				//add the features children
 				for (LayoutableFeature child : feature.getChildren())
 					list.add(child);
 			}
-			yoffset += FEATURE_SPACE_Y;
+			yoffset += manager.getFeatureSpaceY();
 		}
-		yoffset -= FEATURE_SPACE_Y;
+		yoffset -= manager.getFeatureSpaceY();
 	}
 	
 }

@@ -144,7 +144,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		featureModelWriter = new XmlFeatureModelWriter(featureModel);
 
 		originalFeatureModel = new FeatureModel();
-
 		try {
 			// TODO do not parse the model two times
 			new XmlFeatureModelReader(originalFeatureModel,file.getProject()).readFromFile(file);
@@ -156,6 +155,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 				.showHiddenFeatures());
 		FeatureUIHelper.setVerticalLayoutBounds(originalFeatureModel
 				.verticalLayout());
+		
 		getExtensions();
 	}
 
@@ -699,6 +699,10 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 
 	private void setOutlinePage(FmOutlinePage fmOutlinePage) {
 		outlinePage = fmOutlinePage;
+	}
+	
+	public IFile getModelFile() {
+		return file;
 	}
 
 }

@@ -21,6 +21,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.propertypage.IPersistentPropertyManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 
 
@@ -31,26 +32,33 @@ import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
  */
 public class DepthFirstLayout extends FeatureDiagramLayoutManager {
 	
+	/**
+	 * @param manager
+	 */
+	public DepthFirstLayout(IPersistentPropertyManager manager) {
+		super(manager);
+	}
+
 	int yoffset;
 	
 	@Override
 	public void layoutFeatureModel(FeatureModel featureModel) {
 		yoffset = 0;
 		LayoutableFeature root = new LayoutableFeature(featureModel.getRoot(), showHidden);
-		depthFirstLayout(root, 0, LAYOUT_MARGIN_X);
-		yoffset=yoffset+FEATURE_SPACE_X;
+		depthFirstLayout(root, 0, manager.getLayoutMarginX());
+		yoffset=yoffset+manager.getFeatureSpaceX();
 		layout(yoffset, featureModel.getConstraints());
 	}
 
 	private int depthFirstLayout(LayoutableFeature feature, int level, int x) {
-		FeatureUIHelper.setLocation(feature.getFeature(),new Point(x, LAYOUT_MARGIN_Y + level*FEATURE_SPACE_Y));
+		FeatureUIHelper.setLocation(feature.getFeature(),new Point(x, manager.getLayoutMarginY() + level*manager.getFeatureSpaceY()));
 		int newX = x;
-		if(yoffset< LAYOUT_MARGIN_Y + level*FEATURE_SPACE_Y)
-			yoffset=LAYOUT_MARGIN_Y + level*FEATURE_SPACE_Y;
+		if(yoffset< manager.getLayoutMarginY() + level*manager.getFeatureSpaceY())
+			yoffset = manager.getLayoutMarginY() + level*manager.getFeatureSpaceY();
 		for (LayoutableFeature child : feature.getChildren()) {
 			newX = depthFirstLayout(child, level + 1, newX);			
 		}
-		return Math.max(newX, x + FeatureUIHelper.getSize(feature.getFeature()).width + FEATURE_SPACE_X);
+		return Math.max(newX, x + FeatureUIHelper.getSize(feature.getFeature()).width + manager.getFeatureSpaceX());
 	}
 
 }

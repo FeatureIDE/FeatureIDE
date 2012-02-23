@@ -201,7 +201,6 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#getDefaultTemplateIndex()
 	 */
 	public int getDefaultTemplateIndex() {
-		
 		return composerExtensionClass.getDefaultTemplateIndex();
 	}
 

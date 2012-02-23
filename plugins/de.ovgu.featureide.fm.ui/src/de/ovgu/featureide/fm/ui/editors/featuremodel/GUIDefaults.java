@@ -31,10 +31,13 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
+import de.ovgu.featureide.fm.core.propertypage.IPersistentPropertyManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
- * Default colors, fonts, images and borders for the feature diagram.
+ * Default colors, fonts, images and borders for the feature diagram.<br>
+ * It is recommended to use {@link IPersistentPropertyManager} 
+ * for colors and borders instead of these values.
  * 
  * @author Thomas Thuem
  */
@@ -80,7 +83,6 @@ public interface GUIDefaults {
 	public static Color DEAD_BACKGROUND = GUIBasics.createColor(1.0, 0.8, 0.8);
 	public static Color DEAD_BORDER_COLOR = GUIBasics.createBorderColor(DEAD_BACKGROUND);
 	public static Border DEAD_BORDER = new LineBorder(DEAD_BORDER_COLOR, 1);
-	public static Color DEAD_SELECTED_BORDER_COLOR = DEAD_BORDER_COLOR;
 	public static Border DEAD_SELECTED_BORDER = new LineBorder(DEAD_BORDER_COLOR, 3);
 	
 	//connections and decorators
@@ -92,7 +94,7 @@ public interface GUIDefaults {
 	public static Color DECORATOR_FOREGROUND = CONNECTION_FOREGROUND;
 	public static Color DECORATOR_BACKGROUND = DIAGRAM_BACKGROUND;
 	public static int SOURCE_ANCHOR_DIAMETER = 9;
-	@SuppressWarnings("all")
+
 	public static int TARGET_ANCHOR_DIAMETER = HALF_ARC ? 20 : 40;
 	
 	//cross-tree constraints
@@ -124,7 +126,7 @@ public interface GUIDefaults {
 	public static int CONSTRAINT_SPACE_Y = 5 + 20;
 	
 	//legend
-	public static int LEGEND_WIDTH = 95;
+	public static int LEGEND_WIDTH = 105;
 	public static Color LEGEND_FOREGROUND = FEATURE_FOREGROUND;
 	public static Color LEGEND_BACKGROUND = DIAGRAM_BACKGROUND;
 	public static Color LEGEND_BORDER_COLOR = LEGEND_FOREGROUND;

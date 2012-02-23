@@ -29,6 +29,9 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.graphics.Color;
 
+import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.propertypage.ILanguage;
+import de.ovgu.featureide.fm.core.propertypage.IPersistentPropertyManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 
@@ -87,6 +90,8 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private final XYLayout layout = new XYLayout();
 	public Point newPos;
 	private int width;
+	private ILanguage language;
+	private IPersistentPropertyManager manager;
 
 	@Override
 	public boolean useLocalCoordinates() {
@@ -94,20 +99,31 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 	}
 
-	public LegendFigure(Point pos, boolean mandatory, boolean optional,
-			boolean or, boolean alternative, boolean and, boolean abstrac,
-			boolean concrete, boolean hidden, boolean dead, boolean showHidden) {
+	public LegendFigure(FeatureModel featureModel, Point pos) {
+		manager = featureModel.getPersistentPropertyManager();
+		boolean mandatory = featureModel.hasMandatoryFeatures();
+		boolean optional = featureModel.hasOptionalFeatures();
+		boolean and = featureModel.hasAndGroup();
+		boolean alternative = featureModel.hasAlternativeGroup();
+		boolean or = featureModel.hasOrGroup();
+		boolean abstrac = featureModel.hasAbstract();
+		boolean concrete = featureModel.hasConcrete();
+		boolean hidden = featureModel.hasHidden();
+		boolean dead = featureModel.hasDead() || featureModel.hasFalse();  //same color
+		boolean showHidden = featureModel.showHiddenFeatures();
+		
+		language = manager.getLanguage();
 		setLocation(pos);
 		setLayoutManager(layout);
-		setBorder(LEGEND_BORDER);
+		setBorder(manager.getLegendBorder());
 		setLegendSize(mandatory, optional, or, alternative, and, abstrac,
 				concrete, hidden, dead, showHidden);
 		FeatureUIHelper.setLegendSize(this.getSize());
 		FeatureUIHelper.setLegendFigure(this);
 		createRows(mandatory, optional, or, alternative, and, abstrac,
 				concrete, hidden, dead, showHidden);
-		setForegroundColor(LEGEND_FOREGROUND);
-		setBackgroundColor(LEGEND_BACKGROUND);
+		setForegroundColor(manager.getLegendForgroundColor());
+		setBackgroundColor(manager.getLegendBackgroundColor());
 		this.width = LEGEND_WIDTH;
 		this.setOpaque(true);
 	}
@@ -151,7 +167,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 				width = 80;
 			}
 		} else if (dead) {
-			width = 150;
+			width = 160;
 		}
 		this.setSize(width, height);
 	}
@@ -185,9 +201,9 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 	private void createRowTitle() {
 		Label labelTitle = new Label();
-		labelTitle.setForegroundColor(FEATURE_FOREGROUND);
+		labelTitle.setForegroundColor(manager.getFeatureForgroundColor());
 		labelTitle.setFont(DEFAULT_FONT);
-		labelTitle.setText("Legend:");
+		labelTitle.setText(language.getLagendTitle());
 		labelTitle.setLabelAlignment(Label.LEFT);
 		layout.setConstraint(labelTitle, new Rectangle(3, 0, width, ROW_HEIGHT));
 		add(labelTitle);
@@ -202,7 +218,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 	private void createRowAlternative(int row) {
 		createGroupTypeSymbol(row, ALTERNATIVE);
-		Label labelOr = createLabel(row, "Alternative", FEATURE_FOREGROUND,
+		Label labelOr = createLabel(row, language.getAlternative(), manager.getFeatureForgroundColor(),
 				ALTERNATIVE_TOOLTIP);
 
 		add(labelOr);
@@ -210,14 +226,14 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 	private void createRowOr(int row) {
 		createGroupTypeSymbol(row, OR);
-		Label labelOr = createLabel(row, "Or", FEATURE_FOREGROUND, OR_TOOLTIP);
+		Label labelOr = createLabel(row, language.getOr(), manager.getFeatureForgroundColor(), OR_TOOLTIP);
 		add(labelOr);
 	}
 
 	private void createRowOptional(int row) {
 		PolylineConnection p = createConnectionTypeSymbol(row, false);
 		add(p);
-		Label labelMandatory = createLabel(row, "Optional", FEATURE_FOREGROUND,
+		Label labelMandatory = createLabel(row, language.getOptional(), manager.getFeatureForgroundColor(),
 				OPTIONAL_TOOLTIP);
 		add(labelMandatory);
 	}
@@ -226,8 +242,8 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 		PolylineConnection p = createConnectionTypeSymbol(row, true);
 		add(p);
-		Label labelMandatory = createLabel(row, "Mandatory",
-				FEATURE_FOREGROUND, MANDATORY_TOOLTIP);
+		Label labelMandatory = createLabel(row, language.getMandatory(),
+				manager.getFeatureForgroundColor(), MANDATORY_TOOLTIP);
 		add(labelMandatory);
 
 	}
@@ -235,7 +251,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private void createRowAbstract(int row) {
 
 		createSymbol(row, ABSTRACT);
-		Label labelAbstract = createLabel(row, "Abstract", FEATURE_FOREGROUND,
+		Label labelAbstract = createLabel(row, language.getAbstract(), manager.getFeatureForgroundColor(),
 				ABSTRACT_TOOLTIP);
 		add(labelAbstract);
 
@@ -244,7 +260,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private void createRowConcrete(int row) {
 
 		createSymbol(row, CONCRETE);
-		Label labelConcrete = createLabel(row, "Concrete", FEATURE_FOREGROUND,
+		Label labelConcrete = createLabel(row, language.getConcrete(), manager.getFeatureForgroundColor(),
 				CONCRETE_TOOLTIP);
 		add(labelConcrete);
 
@@ -253,7 +269,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private void createRowHidden(int row) {
 
 		createSymbol(row, HIDDEN);
-		Label labelHidden = createLabel(row, "Hidden", HIDDEN_FOREGROUND,
+		Label labelHidden = createLabel(row, language.getHidden(), HIDDEN_FOREGROUND,
 				HIDDEN_TOOLTIP);
 		add(labelHidden);
 
@@ -262,8 +278,8 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private void createRowDead(int row) {
 
 		createSymbol(row, DEAD);
-		Label labelDead = createLabel(row, "Dead or false optional",
-				FEATURE_FOREGROUND, DEAD_TOOLTIP);
+		Label labelDead = createLabel(row, language.getDeadOrFalseOptional(),
+				manager.getFeatureForgroundColor(), DEAD_TOOLTIP);
 		add(labelDead);
 
 	}
@@ -275,7 +291,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		layout.setConstraint(label, new Rectangle(LABEL_PADDING, ROW_HEIGHT
 				* row - LIFT, width - LABEL_PADDING, ROW_HEIGHT));
 		label.setForegroundColor(foreground);
-		label.setBackgroundColor(DIAGRAM_BACKGROUND);
+		label.setBackgroundColor(manager.getDiagramBackgroundColor());
 		label.setFont(DEFAULT_FONT);
 		label.setToolTip(createToolTipContent(tooltip));
 		return label;
@@ -325,16 +341,16 @@ public class LegendFigure extends Figure implements GUIDefaults {
 				- LIFT);
 
 		RotatableDecoration sourceDecoration = new LegendRelationDecoration(
-				fill, p1);
+				fill, p1, manager);
 		PolylineConnection line = new PolylineConnection();
-		line.setForegroundColor(CONNECTION_FOREGROUND);
+		line.setForegroundColor(manager.getConnectionForgroundColor());
 
 		line.setEndpoints(p2, p3);
 
 		if (decoration)
 			line.setSourceDecoration(sourceDecoration);
 		PolylineConnection line2 = new PolylineConnection();
-		line2.setForegroundColor(CONNECTION_FOREGROUND);
+		line2.setForegroundColor(manager.getConnectionForgroundColor());
 
 		line2.setEndpoints(p2, p1);
 		this.add(line);
@@ -342,7 +358,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		Figure toolTipContent = createToolTipContent(toolTipText);
 		line.setToolTip(toolTipContent);
 		line2.setToolTip(toolTipContent);
-		setForegroundColor(CONNECTION_FOREGROUND);
+		setForegroundColor(manager.getConnectionForgroundColor());
 
 	}
 
@@ -350,8 +366,8 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			boolean mandatory) {
 
 		PolylineConnection p = new PolylineConnection();
-		p.setForegroundColor(CONNECTION_FOREGROUND);
-		p.setSourceDecoration(new CircleDecoration(mandatory));
+		p.setForegroundColor(manager.getConnectionForgroundColor());
+		p.setSourceDecoration(new CircleDecoration(mandatory, manager));
 
 		Point source = new Point(MANDATORY_PADDING, ROW_HEIGHT * row - LIFT
 				+ SYMBOL_SIZE / 2);
@@ -381,22 +397,22 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		switch (type) {
 
 		case (ABSTRACT):
-			rect.setBorder(ABSTRACT_BORDER);
-			rect.setBackgroundColor(ABSTRACT_BACKGROUND);
+			rect.setBorder(manager.getAbsteactFeatureBorder(false));
+			rect.setBackgroundColor(manager.getAbstractFeatureBackgroundColor());
 			toolTipText = ABSTRACT_TOOLTIP;
 			break;
 		case (CONCRETE):
-			rect.setBorder(CONCRETE_BORDER);
-			rect.setBackgroundColor(CONCRETE_BACKGROUND);
+			rect.setBorder(manager.getConcreteFeatureBorder(false));
+			rect.setBackgroundColor(manager.getConcreteFeatureBackgroundColor());
 			toolTipText = CONCRETE_TOOLTIP;
 			break;
 		case (HIDDEN):
-			rect.setBorder(HIDDEN_BORDER_LEGEND);
+			rect.setBorder(manager.getHiddenLegendBorder());
 			toolTipText = HIDDEN_TOOLTIP;
 			break;
 		case (DEAD):
-			rect.setBorder(DEAD_BORDER);
-			rect.setBackgroundColor(DEAD_BACKGROUND);
+			rect.setBorder(manager.getDeadFeatureBorder(false));
+			rect.setBackgroundColor(manager.getDeadFeatureBackgroundColor());
 			toolTipText = DEAD_TOOLTIP;
 			break;
 		}

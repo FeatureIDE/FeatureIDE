@@ -101,4 +101,18 @@
            name="FMFeature Modeling">
      </fmComposer>
   </extension>
+  <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            class="de.ovgu.featureide.core.propertypage.BasePropertyPage"
+            id="de.ovgu.featureide.core.propertypage"
+            name="FeatureIDE">
+      </page>
+      <page
+            category="de.ovgu.featureide.core.propertypage"
+            class="de.ovgu.featureide.core.propertypage.FeatureProjectPropertyPage"
+            id="de.ovgu.featureide.core.propertypage2"
+            name="FeatureProject">
+      </page>
+   </extension>
 </plugin>

@@ -32,7 +32,6 @@ import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.Legend;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.policies.ModelLayoutEditPolicy;
 
@@ -45,7 +44,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.policies.ModelLayoutEditPol
  * 
  * @author Thomas Thuem
  */
-public class ModelEditPart extends AbstractGraphicalEditPart implements GUIDefaults {
+public class ModelEditPart extends AbstractGraphicalEditPart {
 	
 	public ModelEditPart(FeatureModel featureModel) {
 		super();
@@ -72,7 +71,9 @@ public class ModelEditPart extends AbstractGraphicalEditPart implements GUIDefau
 	protected List<Object> getModelChildren() {
 		LinkedList<Object> list = new LinkedList<Object>();
 		addFeatures(getFeatureModel().getRoot(), list);
-		if(getFeatureModel().hasLegend())list.add(new Legend((FeatureModel)getModel()));
+		if(!getFeatureModel().getPersistentPropertyManager().isLegendHidden()) {
+			list.add(new Legend((FeatureModel)getModel()));
+		}
 		addConstraints(getFeatureModel().getConstraints(), list);
 		return list;
 	}

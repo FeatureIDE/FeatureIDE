@@ -21,6 +21,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.propertypage.IPersistentPropertyManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 
 /**
@@ -30,7 +31,14 @@ import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
  * @author Patrick Sulkowski
  */
 public class ManualLayout extends FeatureDiagramLayoutManager {
-	
+
+	/**
+	 * @param manager
+	 */
+	public ManualLayout(IPersistentPropertyManager manager) {
+		super(manager);
+	}
+
 	public void layoutFeatureModel(FeatureModel featureModel) {
 		for(Feature feature : featureModel.getFeatures()){
 			FeatureUIHelper.setLocation(feature, feature.getLocation());	

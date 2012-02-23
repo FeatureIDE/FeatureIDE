@@ -50,6 +50,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.editing.evaluation.Evaluation;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
+import de.ovgu.featureide.fm.core.propertypage.IPersistentPropertyManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GEFImageWriter;
@@ -66,7 +67,7 @@ import de.ovgu.featureide.fm.ui.views.featuremodeleditview.ViewLabelProvider;
  * 
  * @author Thomas Thuem
  */
-public class FeatureModelEditView extends ViewPart {
+public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 
 	public static final String ID = FMUIPlugin.PLUGIN_ID
 			+ ".views.FeatureModelEditView";
@@ -218,11 +219,11 @@ public class FeatureModelEditView extends ViewPart {
 
 					private void createBitmap(FeatureModel featureModel,
 							File file) {
+						IPersistentPropertyManager manager = featureModel.getPersistentPropertyManager();
 						GraphicalViewerImpl graphicalViewer = new ScrollingGraphicalViewer();
 						graphicalViewer.createControl(viewer.getControl()
 								.getParent());
-						graphicalViewer.getControl().setBackground(
-								GUIDefaults.DIAGRAM_BACKGROUND);
+						graphicalViewer.getControl().setBackground(DIAGRAM_BACKGROUND);
 						graphicalViewer
 								.setEditPartFactory(new GraphicalEditPartFactory());
 						ScalableFreeformRootEditPart rootEditPart = new ScalableFreeformRootEditPart();
@@ -231,7 +232,7 @@ public class FeatureModelEditView extends ViewPart {
 								.setAntialias(SWT.ON);
 						graphicalViewer.setRootEditPart(rootEditPart);
 						graphicalViewer.setContents(featureModel);
-						FeatureDiagramLayoutManager layoutManager = new LevelOrderLayout();
+						FeatureDiagramLayoutManager layoutManager = new LevelOrderLayout(manager);
 						layoutManager.layout(featureModel);
 						GEFImageWriter.writeToFile(graphicalViewer, file);
 					}

@@ -26,21 +26,32 @@ import org.eclipse.draw2d.geometry.Point;
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.propertypage.IPersistentPropertyManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 
 /**
  * Calculates locations for all features in the feature diagram.
  * 
  * @author Thomas Thuem
  */
-abstract public class FeatureDiagramLayoutManager implements GUIDefaults {
+abstract public class FeatureDiagramLayoutManager{
 
 	int controlWidth = 10;
 
 	int controlHeight = 10;
 	
 	boolean showHidden;
+
+	static IPersistentPropertyManager manager;
+	
+	/**
+	 * 
+	 */
+	public FeatureDiagramLayoutManager(IPersistentPropertyManager manager) {
+		if (FeatureDiagramLayoutManager.manager == null) {
+			FeatureDiagramLayoutManager.manager = manager;
+		}
+	}
 	
 	public void layout(FeatureModel featureModel) {
 		this.showHidden = featureModel.showHiddenFeatures();
@@ -106,13 +117,13 @@ abstract public class FeatureDiagramLayoutManager implements GUIDefaults {
 	}
 
 	void layout(int yoffset, List<Constraint> constraints) {
-		int y = yoffset + CONSTRAINT_SPACE_Y;
+		int y = yoffset + manager.getConstraintSpace();
 		for (int i = 0; i < constraints.size(); i++) {
 			Constraint constraint = constraints.get(i);
 			Dimension size = FeatureUIHelper.getSize(constraint);
 			int x = (controlWidth - size.width) / 2;
 			if(this instanceof DepthFirstLayout){
-				x=2*FEATURE_SPACE_X;
+				x=2*manager.getFeatureSpaceX();
 			}
 			FeatureUIHelper.setLocation(constraint, new Point(x, y));
 			y += size.height;
@@ -123,7 +134,7 @@ abstract public class FeatureDiagramLayoutManager implements GUIDefaults {
 	 * sets the position of the legend
 	 */
 	private static void layoutLegend(FeatureModel featureModel, boolean showHidden) {
-		
+		manager = featureModel.getPersistentPropertyManager();
 		Point min = new Point (Integer.MAX_VALUE,Integer.MAX_VALUE);
 		Point max = new Point (Integer.MIN_VALUE,Integer.MIN_VALUE);
 		
@@ -178,24 +189,24 @@ abstract public class FeatureDiagramLayoutManager implements GUIDefaults {
 			Point tempLocation = FeatureUIHelper.getLocation(feature);
 			Dimension tempSize = FeatureUIHelper.getSize(feature);
 			if((tempLocation.x+tempSize.width) 
-						> (max.x - legendSize.width - FEATURE_SPACE_X)
+						> (max.x - legendSize.width - manager.getFeatureSpaceX())
 					&& (tempLocation.y) 
-						< (min.y + legendSize.height + FEATURE_SPACE_Y/2))
+						< (min.y + legendSize.height + manager.getFeatureSpaceY()/2))
 				topRight = false;
 			if((tempLocation.x) 
-					< (min.x + legendSize.width + FEATURE_SPACE_X)
+					< (min.x + legendSize.width + manager.getFeatureSpaceX())
 				&& (tempLocation.y) 
-					< (min.y + legendSize.height + FEATURE_SPACE_Y/2))
+					< (min.y + legendSize.height + manager.getFeatureSpaceY()/2))
 				topLeft = false;
 			if((tempLocation.x) 
-					< (min.x + legendSize.width + FEATURE_SPACE_X)
+					< (min.x + legendSize.width + manager.getFeatureSpaceX())
 				&& (tempLocation.y+tempSize.height) 
-					> (max.y - legendSize.height - FEATURE_SPACE_Y/2))
+					> (max.y - legendSize.height - manager.getFeatureSpaceY()/2))
 				botLeft = false;
 			if((tempLocation.x+tempSize.width) 
-					> (max.x - legendSize.width - FEATURE_SPACE_X)
+					> (max.x - legendSize.width - manager.getFeatureSpaceX())
 				&& (tempLocation.y+tempSize.height)
-					> (max.y - legendSize.height - FEATURE_SPACE_Y/2))
+					> (max.y - legendSize.height - manager.getFeatureSpaceY()/2))
 				botRight = false;
 			
 		}			
@@ -207,24 +218,24 @@ abstract public class FeatureDiagramLayoutManager implements GUIDefaults {
 				Point tempLocation = FeatureUIHelper.getLocation(constraint);
 				Dimension tempSize = FeatureUIHelper.getSize(constraint);
 				if((tempLocation.x+tempSize.width) 
-						> (max.x - legendSize.width - FEATURE_SPACE_X)
+						> (max.x - legendSize.width - manager.getFeatureSpaceX())
 					&& (tempLocation.y) 
-						< (min.y + legendSize.height + FEATURE_SPACE_Y/2))
+						< (min.y + legendSize.height + manager.getFeatureSpaceY()/2))
 					topRight = false;
 				if((tempLocation.x) 
-						< (min.x + legendSize.width + FEATURE_SPACE_X)
+						< (min.x + legendSize.width + manager.getFeatureSpaceX())
 					&& (tempLocation.y) 
-						< (min.y + legendSize.height + FEATURE_SPACE_Y/2))
+						< (min.y + legendSize.height + manager.getFeatureSpaceY()/2))
 				topLeft = false;
 				if((tempLocation.x) 
-						< (min.x + legendSize.width + FEATURE_SPACE_X)
+						< (min.x + legendSize.width + manager.getFeatureSpaceX())
 					&& (tempLocation.y+tempSize.height) 
-						> (max.y - legendSize.height - FEATURE_SPACE_Y/2))
+						> (max.y - legendSize.height - manager.getFeatureSpaceY()/2))
 				botLeft = false;
 				if((tempLocation.x+tempSize.width) 
-						> (max.x - legendSize.width - FEATURE_SPACE_X)
+						> (max.x - legendSize.width - manager.getFeatureSpaceX())
 					&& (tempLocation.y+tempSize.height)
-						> (max.y - legendSize.height - FEATURE_SPACE_Y/2))
+						> (max.y - legendSize.height - manager.getFeatureSpaceY()/2))
 				botRight = false;
 			}
 		}
@@ -245,7 +256,7 @@ abstract public class FeatureDiagramLayoutManager implements GUIDefaults {
 			/*
 			 * old layout method of the legend
 			 */
-			featureModel.setLegendPos(max.x + FEATURE_SPACE_X, min.y);
+			featureModel.setLegendPos(max.x + manager.getFeatureSpaceX(), min.y);
 		}
 		
 	}

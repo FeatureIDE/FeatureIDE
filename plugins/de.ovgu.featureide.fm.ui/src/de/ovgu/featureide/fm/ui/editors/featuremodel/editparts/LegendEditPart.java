@@ -23,7 +23,6 @@ import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.gef.editpolicies.NonResizableEditPolicy;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.Legend;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
 
@@ -46,22 +45,7 @@ public class LegendEditPart extends AbstractGraphicalEditPart {
 	 */
 	@Override
 	protected IFigure createFigure() {
-		FeatureModel fm = ((Legend)this.getModel()).getModel();
-		boolean hasMandatory = fm.hasMandatoryFeatures();
-		boolean hasOptional = fm.hasOptionalFeatures();
-		boolean hasAnd = fm.hasAndGroup();
-		boolean hasAlternative = fm.hasAlternativeGroup();
-		boolean hasOr = fm.hasOrGroup();
-		boolean hasAbstract = fm.hasAbstract();
-		boolean hasConcrete = fm.hasConcrete();
-		boolean hasHidden = fm.hasHidden();
-		boolean hasDead = fm.hasDead() || fm.hasFalse();  //same color
-		boolean showHidden = fm.showHiddenFeatures();
-		
-		LegendFigure figure = new LegendFigure(((Legend) getModel()).getPos(),hasMandatory,
-				hasOptional,hasOr,hasAlternative,hasAnd,hasAbstract, hasConcrete, hasHidden,hasDead,showHidden);
-
-		return figure;
+		return new LegendFigure(((Legend)this.getModel()).getModel(), ((Legend) getModel()).getPos());
 	}
 
 	/*

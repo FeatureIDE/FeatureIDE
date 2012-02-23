@@ -32,8 +32,8 @@ import org.eclipse.draw2d.geometry.Point;
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.propertypage.IPersistentPropertyManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 
 /**
  * @author David Halm
@@ -41,14 +41,14 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  */
 public class AutoLayoutConstraintOperation extends AbstractOperation {
 	
-	
 	private int counter;
 	private FeatureModel featureModel;	
 	private LinkedList <LinkedList<Point>> oldPos = new LinkedList <LinkedList<Point>>();
+	private IPersistentPropertyManager manager;
 	
 	public AutoLayoutConstraintOperation(FeatureModel featureModel, LinkedList<LinkedList<Point>> oldPos, int counter) {
-		
 		super("Auto Layout Constraints");
+		manager = featureModel.getPersistentPropertyManager();
 		this.featureModel = featureModel;
 		this.counter = counter;
 		if(!(oldPos == null) && !oldPos.isEmpty())
@@ -95,13 +95,13 @@ public class AutoLayoutConstraintOperation extends AbstractOperation {
 				}
 			}
 			newPos.x=(minX+maxX)/2 - FeatureUIHelper.getSize(constraintList.get(0)).width/2;
-			newPos.y=y+GUIDefaults.CONSTRAINT_SPACE_Y;
+			newPos.y=y+ manager.getConstraintSpace();
 			FeatureUIHelper.setLocation(constraintList.get(0), newPos);
 		}
 		for(int i=1;i<constraintList.size();i++){
 			Point newPos =new Point();
 			newPos.x=(minX+maxX)/2 - FeatureUIHelper.getSize(constraintList.get(i)).width/2;
-			newPos.y=FeatureUIHelper.getLocation(constraintList.get(i-1)).y+GUIDefaults.CONSTRAINT_SPACE_Y;
+			newPos.y=FeatureUIHelper.getLocation(constraintList.get(i-1)).y+ manager.getConstraintSpace();
 			FeatureUIHelper.setLocation(constraintList.get(i), newPos);
 		}
 		featureModel.handleModelDataChanged();

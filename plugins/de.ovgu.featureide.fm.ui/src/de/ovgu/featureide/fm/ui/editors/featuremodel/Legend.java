@@ -33,7 +33,6 @@ public class Legend {
 
 	public Legend(FeatureModel model) {
 		this.model = model;
-
 		this.pos = new Point(model.getLegendPos().x, model.getLegendPos().y);
 	}
 

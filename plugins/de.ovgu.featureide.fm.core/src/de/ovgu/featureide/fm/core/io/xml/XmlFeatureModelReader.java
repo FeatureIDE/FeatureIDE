@@ -99,8 +99,12 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 		return false;
 	}
 	
+	/* 
+	 * synchronized should prevent the "NullPointer when saving the feature model" 
+	 * see ticket: #277 
+	 * */
 	@Override
-	protected void parseInputStream(InputStream inputStream)
+	protected synchronized void parseInputStream(InputStream inputStream)
 			throws UnsupportedModelException {
 		featureOrderList.clear();
 

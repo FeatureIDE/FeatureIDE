@@ -5,6 +5,31 @@
    <extension-point id="de.ovgu.fm.ui.views.outline.FmTreeContentProvider" name="FeatureModelTreeContentProvider" schema="schema/de.ovgu.fm.ui.views.outline.FmTreeContentProvider.exsd"/>
    <extension-point id="de.ovgu.fm.ui.outline.FmLabelProvider" name="FeatureModelLabelProvider" schema="schema/de.ovgu.fm.ui.outline.FmLabelProvider.exsd"/>
    <extension-point id="de.ovgu.featureide.fm.ui.FeatureDiagram" name="featurediagram" schema="schema/de.ovgu.featureide.fm.ui.FeatureDiagram.exsd"/>
+   <extension-point id="de.ovgu.featureide.fm.ui.language" name="language" schema="schema/language.exsd"/>
+   <extension
+         id="modelProblemMarker"
+         name="Model Problem Marker"
+         point="org.eclipse.core.resources.markers">
+      <super type="org.eclipse.core.resources.problemmarker"/>
+      <persistent value="true"/>
+   </extension>
+   <extension
+         point="de.ovgu.featureide.fm.ui.language">
+      <language
+            class="de.ovgu.featureide.fm.ui.propertypage.English"
+            id="english"
+            name="english">
+      </language>
+   </extension>
+   <extension
+         point="de.ovgu.featureide.fm.ui.language">
+      <language
+            class="de.ovgu.featureide.fm.ui.propertypage.German"
+            id="german"
+            name="german">
+      </language>
+   </extension>
+ 
    <extension
          point="org.eclipse.ui.editors">
       <editor
@@ -36,14 +61,8 @@
          </parameter>
       </describer>
    </content-type>
-</extension>
-   
-   
-   
-   
-   
-   
-   <extension
+</extension>  
+	<extension
          point="org.eclipse.ui.views">
       <category
             id="FeatureIDE"
@@ -125,5 +144,14 @@
                menubarPath="de.ovgu.featureide.fm.ui_menue/slot5">
          </action>
       </objectContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            category="de.ovgu.featureide.core.propertypage"
+            class="de.ovgu.featureide.fm.ui.propertypage.FMPropertyPage"
+            id="de.ovgu.featureide.fm.ui.propertypage"
+            name="Feature Model Editor">
+      </page>
    </extension>
 </plugin>

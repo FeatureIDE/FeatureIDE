@@ -18,8 +18,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.policies;
 
-import org.eclipse.gef.editpolicies.NonResizableEditPolicy;
-
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.FigureUtilities;
 import org.eclipse.draw2d.FreeformLayer;
@@ -30,11 +28,10 @@ import org.eclipse.draw2d.RectangleFigure;
 import org.eclipse.draw2d.XYAnchor;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.PrecisionRectangle;
-
+import org.eclipse.gef.editpolicies.NonResizableEditPolicy;
 import org.eclipse.gef.requests.ChangeBoundsRequest;
 
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.ConstraintDragAndDropCommand;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 
@@ -44,7 +41,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPar
  * @author David Broneske
  * @author Fabian Benduhn
  */
-public class ConstraintMoveEditPolicy extends NonResizableEditPolicy implements GUIDefaults{
+public class ConstraintMoveEditPolicy extends NonResizableEditPolicy {
 	
 		
 

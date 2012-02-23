@@ -24,6 +24,7 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.propertypage.IPersistentPropertyManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 
 /**
@@ -35,6 +36,13 @@ import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 
 	private int featureDiagramBottom = 0;
+
+	/**
+	 * @param manager
+	 */
+	public LevelOrderLayout(IPersistentPropertyManager manager) {
+		super(manager);
+	}
 
 	@Override
 	public void layoutFeatureModel(FeatureModel featureModel) {
@@ -54,12 +62,12 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 
 		centerTheRoot(root);
 
-		featureDiagramBottom = LAYOUT_MARGIN_Y + FEATURE_SPACE_Y
+		featureDiagramBottom = manager.getLayoutMarginY() + manager.getFeatureSpaceY()
 				* (levels.size() - 1);
 	}
 
 	private void layoutLevelInY(Vector<LayoutableFeature> level, int i) {
-		int y = LAYOUT_MARGIN_Y + FEATURE_SPACE_Y * i;
+		int y = manager.getLayoutMarginY() + manager.getFeatureSpaceY() * i;
 		for (LayoutableFeature feature : level)
 			FeatureUIHelper.setLocation(feature.getFeature(), new Point(0, y));
 	}
@@ -88,7 +96,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 				moveWidth = Math.max(
 						moveWidth,
 						FeatureUIHelper.getBounds(lastFeature.getFeature()).right()
-								+ FEATURE_SPACE_X
+								+ manager.getFeatureSpaceX()
 								- FeatureUIHelper.getLocation(feature.getFeature()).x);
 			if (moveWidth > 0)
 				moveTree(feature, moveWidth);
@@ -109,7 +117,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 
 	private void layoutSiblingsEquidistant(Vector<LayoutableFeature> level, int j,
 			LayoutableFeature feature) {
-		int width = FEATURE_SPACE_X;
+		int width = manager.getFeatureSpaceX();
 		int l = 0;
 		int space = 0;
 		boolean right = true;
@@ -126,11 +134,11 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 						- FeatureUIHelper.getBounds(sibling.getFeature()).right() - width;
 				break;
 			}
-			width += FeatureUIHelper.getSize(sibling.getFeature()).width + FEATURE_SPACE_X;
+			width += FeatureUIHelper.getSize(sibling.getFeature()).width + manager.getFeatureSpaceX();
 		}
 		if (right)
 			space = FeatureUIHelper.getBounds(feature.getFeature()).x
-					- (FeatureUIHelper.getBounds(level.get(l).getFeature()).x - FEATURE_SPACE_X)
+					- (FeatureUIHelper.getBounds(level.get(l).getFeature()).x - manager.getFeatureSpaceX())
 					- width;
 		for (int k = l; k < j; k++) {
 			LayoutableFeature sibling = level.get(k);
@@ -170,14 +178,14 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 	private void nextToLeftSibling(LayoutableFeature feature, LayoutableFeature lastFeature) {
 		Point location = FeatureUIHelper.getLocation(feature.getFeature());
 		int x = lastFeature != null ? FeatureUIHelper.getBounds(lastFeature.getFeature())
-				.right() + FEATURE_SPACE_X : 0;
+				.right() + manager.getFeatureSpaceX() : 0;
 		FeatureUIHelper.setLocation(feature.getFeature(), new Point(x, location.y));
 	}
 
 	private void nextToRightSibling(LayoutableFeature feature, LayoutableFeature rightSibling) {
 		Rectangle bounds = FeatureUIHelper.getBounds(feature.getFeature());
 		int x = rightSibling != null ? FeatureUIHelper.getBounds(rightSibling.getFeature()).x
-				- FEATURE_SPACE_X - bounds.width
+				- manager.getFeatureSpaceX() - bounds.width
 				: 0;
 		FeatureUIHelper.setLocation(feature.getFeature(), new Point(x, bounds.y));
 	}

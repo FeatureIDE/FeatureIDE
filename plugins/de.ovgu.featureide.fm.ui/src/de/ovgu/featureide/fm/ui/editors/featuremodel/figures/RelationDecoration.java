@@ -27,6 +27,7 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 
 import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.propertypage.IPersistentPropertyManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 
@@ -47,13 +48,13 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 	
 	private boolean vertical;
 
-	public RelationDecoration(boolean fill, Feature lastChild, LinkedList<Feature> children) {
+	public RelationDecoration(boolean fill, Feature lastChild, LinkedList<Feature> children, IPersistentPropertyManager manager) {
 		super();
 		this.fill = fill;
 		this.children = children;
 		this.lastChild = lastChild;
-		setForegroundColor(DECORATOR_FOREGROUND);
-		setBackgroundColor(DECORATOR_FOREGROUND);		
+		setForegroundColor(manager.getDecoratorForgroundColor());
+		setBackgroundColor(manager.getDecoratorForgroundColor());		
 		setSize(getTargetAnchorDiameter(), getTargetAnchorDiameter()/2);
 		this.vertical = FeatureUIHelper.hasVerticalLayout();
 	}

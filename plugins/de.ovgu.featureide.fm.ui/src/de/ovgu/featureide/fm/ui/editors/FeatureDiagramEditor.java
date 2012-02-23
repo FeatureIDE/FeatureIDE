@@ -59,6 +59,7 @@ import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.propertypage.IPersistentPropertyManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractAction;
@@ -73,7 +74,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAllAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.EditConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.HiddenAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LayoutSelectionAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LegendAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LegendLayoutAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.MandatoryAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
@@ -84,6 +84,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ShowHiddenFeaturesA
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.GraphicalEditPartFactory;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutManager;
+import de.ovgu.featureide.fm.ui.propertypage.PersistentPropertyManager;
 
 /**
  * An editor based on the Graphical Editing Framework to view and edit feature
@@ -121,7 +122,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	private ZoomInAction zoomIn;
 	private ZoomOutAction zoomOut;
 
-	private LegendAction legendAction;
+//  legend action replaced with property page
+//	private LegendAction legendAction;
 	private LegendLayoutAction legendLayoutAction;
 
 	private EditConstraintAction editConstraintAction;
@@ -136,12 +138,15 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	private int index;
 
 	private Job analyzingJob;
+	
+	private IPersistentPropertyManager manager;
 
 	public FeatureDiagramEditor(FeatureModelEditor featureModelEditor,
 			Composite container) {
 		super();
+		manager = new PersistentPropertyManager(featureModelEditor.getModelFile().getProject());
 		this.featureModelEditor = featureModelEditor;
-
+		featureModelEditor.featureModel.setPersistentPropertyManager(manager);
 		setKeyHandler(new GraphicalViewerKeyHandler(this));
 
 		createControl(container);
@@ -151,11 +156,11 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		zoomManager = rootEditPart.getZoomManager();
 		zoomManager.setZoomLevels(new double[] { 0.05, 0.10, 0.25, 0.50, 0.75,
 				0.90, 1.00, 1.10, 1.25, 1.50, 2.00, 2.50, 3.00, 4.00 });
-
+		
 	}
 
 	void initializeGraphicalViewer() {
-		getControl().setBackground(DIAGRAM_BACKGROUND);
+		getControl().setBackground(manager.getDiagramBackgroundColor());
 		setEditPartFactory(new GraphicalEditPartFactory());
 		rootEditPart = new ScalableFreeformRootEditPart();
 		((ConnectionLayer) rootEditPart
@@ -191,7 +196,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		editConstraintAction = new EditConstraintAction(this, featureModel);
 		reverseOrderAction = new ReverseOrderAction(this, featureModel);
 
-		legendAction = new LegendAction(this, featureModel);
+//		legendAction = new LegendAction(this, featureModel);
 		legendLayoutAction = new LegendLayoutAction(this, featureModel);
 
 		showHiddenFeaturesAction = new ShowHiddenFeaturesAction(this,
@@ -286,7 +291,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 			connectionEntrys(menu);
 		}
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-		menu.add(legendAction);
+//		menu.add(legendAction);
 		if (featureModelEditor.getFeatureModel().hasHidden()) {
 			menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 			menu.add(showHiddenFeaturesAction);
@@ -371,7 +376,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		if (featureModelEditor.getOutlinePage() != null) {
 			featureModelEditor.getOutlinePage().setInput(getFeatureModel());
 		}
-
 		// refresh size of all feature figures
 		getContents().refresh();
 		// layout all features if autoLayout is enabled
@@ -464,8 +468,9 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		if (GraphicalViewer.class.equals(adapter)
 				|| EditPartViewer.class.equals(adapter))
 			return this;
-		if (ZoomManager.class.equals(adapter))
+		if (ZoomManager.class.equals(adapter)) {
 			return zoomManager;
+		}
 		if (CommandStack.class.equals(adapter))
 			return getEditDomain().getCommandStack();
 		if (EditDomain.class.equals(adapter))
@@ -486,7 +491,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 			featureModelEditor.textEditor.updateDiagram();
 		} else if (prop.equals(REFRESH_ACTIONS)) {
 			// additional actions can be refreshed here
-			legendAction.refresh();
+//			legendAction.refresh();
 			legendLayoutAction.refresh();
 		}
 

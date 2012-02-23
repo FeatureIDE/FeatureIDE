@@ -20,6 +20,8 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 
 import org.eclipse.draw2d.geometry.Point;
 
+import de.ovgu.featureide.fm.core.propertypage.IPersistentPropertyManager;
+
 /**
  * Adjusted RelationDecoration that can be used with Coordinates instead of
  * Features
@@ -29,8 +31,8 @@ import org.eclipse.draw2d.geometry.Point;
 public class LegendRelationDecoration extends RelationDecoration {
 	private Point point;
 	
-	public LegendRelationDecoration(boolean fill, Point point) {
-		super(fill, null, null);
+	public LegendRelationDecoration(boolean fill, Point point, IPersistentPropertyManager manager) {
+		super(fill, null, null, manager);
 		this.point = point;
 		
 	}

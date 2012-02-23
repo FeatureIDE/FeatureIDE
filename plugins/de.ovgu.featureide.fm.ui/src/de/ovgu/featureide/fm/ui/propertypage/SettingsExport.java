@@ -1,0 +1,90 @@
+/* FeatureIDE - An IDE to support feature-oriented software development
+ * Copyright (C) 2005-2011  FeatureIDE Team, University of Magdeburg
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ * See http://www.fosd.de/featureide/ for further information.
+ */
+package de.ovgu.featureide.fm.ui.propertypage;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.QualifiedName;
+
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
+
+/**
+ * Exports the persistent properties into a file.
+ * 
+ * @author Jens Meinicke
+ */
+public class SettingsExport {
+
+	/**
+	 * @param persitentProperties Properties to export
+	 * @param file the file in that the properties should be exported
+	 */
+	public SettingsExport(PersistentPropertyManager persitentProperties, File file) {
+		exportSettings(file, persitentProperties);
+	}
+
+	/**
+	 * @param file
+	 * @param persitentProperties
+	 * @throws CoreException
+	 * @throws IOException
+	 */
+	private void exportSettings(File file,
+			PersistentPropertyManager persitentProperties) {
+		FileWriter fw = null;
+		try {
+			if (!file.exists()) {
+				fw = new FileWriter(file);
+				fw.write(getSettings(persitentProperties));
+			} else {
+				fw = new FileWriter(file);
+				fw.write(getSettings(persitentProperties));
+			}
+		} catch (IOException e) {
+			FMUIPlugin.getDefault().logError(e);
+		} finally {
+			if (fw != null) {
+				try {
+					fw.close();
+				} catch (IOException e) {
+					FMUIPlugin.getDefault().logError(e);
+				}
+			}
+		}
+	}
+	
+	private String getSettings(PersistentPropertyManager persitentProperties) {
+		StringBuilder settings = new StringBuilder();
+		for (QualifiedName qn : persitentProperties.getQualifiedNames()) {
+			try {
+				settings.append(qn.getQualifier());
+				settings.append("=");
+				settings.append(persitentProperties.workspaceRoot.getPersistentProperty(qn));
+				settings.append("\r\n");
+			} catch (CoreException e) {
+				FMUIPlugin.getDefault().logError(e);
+			}
+		}
+		
+		return settings.toString();
+	}
+}

@@ -69,11 +69,11 @@ public class LegendHideOperation extends AbstractOperation {
 	public IStatus redo(IProgressMonitor arg0, IAdaptable arg1)
 			throws ExecutionException {
 
-		if (featureModel.hasLegend()) {
-			featureModel.setLegend(false);
+		if (!featureModel.getPersistentPropertyManager().isLegendHidden()) {
+			featureModel.getPersistentPropertyManager().setHideLegend(false);
 
 		} else {
-			featureModel.setLegend(true);
+			featureModel.getPersistentPropertyManager().setHideLegend(true);
 		}
 		featureModel.handleModelDataChanged();
 		featureModel.refreshContextMenu();
