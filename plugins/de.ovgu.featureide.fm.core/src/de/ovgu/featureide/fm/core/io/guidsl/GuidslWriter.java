@@ -53,7 +53,7 @@ public class GuidslWriter extends AbstractFeatureModelWriter {
 	
 	public String writeToString() {
 		//open a string buffer for writing
-		StringBuffer out = new StringBuffer();// = new BufferedWriter(new FileWriter(file));
+		StringBuilder out = new StringBuilder();// = new BufferedWriter(new FileWriter(file));
 
 		//write generating information
 //		DateFormat formatter = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.MEDIUM, Locale.ENGLISH);
@@ -78,12 +78,12 @@ public class GuidslWriter extends AbstractFeatureModelWriter {
 		return out.toString();
 	}
 	
-	private void writeComments(StringBuffer out) {
+	private void writeComments(StringBuilder out) {
 		for (int i = 0; i<featureModel.getComments().size(); i++)
 			out.append("//" + featureModel.getComments().get(i) + "\n");
 	}
 
-	private void writeGrammarDefinition(StringBuffer out) {
+	private void writeGrammarDefinition(StringBuilder out) {
 		Feature root = featureModel.getRoot();
 		if (root != null) {
 			if (root.isOr()) {
@@ -100,7 +100,7 @@ public class GuidslWriter extends AbstractFeatureModelWriter {
 			out.append("\r\n");
 	}
 
-	private void writePropositionalConstraints(StringBuffer out) {
+	private void writePropositionalConstraints(StringBuilder out) {
 		if (featureModel.getPropositionalNodes().isEmpty())
 			return;
 		out.append("%%\r\n\r\n");
@@ -114,7 +114,7 @@ public class GuidslWriter extends AbstractFeatureModelWriter {
 //			out.append(featureModel.getAnnotations() + "\r\n\r\n");
 //	}
 
-	private void writeRule(Feature mainFeature, StringBuffer out) {
+	private void writeRule(Feature mainFeature, StringBuilder out) {
 		
 //		if (mainFeature.isAbstract())
 //			this.hasAbstract = true;
@@ -188,7 +188,7 @@ public class GuidslWriter extends AbstractFeatureModelWriter {
 		return feature.isMandatory() ? feature.getName() : "[" + feature.getName() + "]";
 	}
 
-	private void writeChildRules(Feature mainFeature, LinkedList<Feature> mainChildren, StringBuffer out) {
+	private void writeChildRules(Feature mainFeature, LinkedList<Feature> mainChildren, StringBuilder out) {
 		for (int i = 0; i < mainChildren.size(); i++) {
 			Feature feature = mainChildren.get(i);
 			if (!mainFeature.isAnd() && feature.hasInlineRule()) {

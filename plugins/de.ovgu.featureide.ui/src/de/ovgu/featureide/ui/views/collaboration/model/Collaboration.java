@@ -30,10 +30,10 @@ import org.eclipse.core.resources.IFile;
  * @author Constanze Adler
  */
 public class Collaboration {
-	public Boolean selected = true;
+	public boolean selected = true;
 	private String name;
 	private LinkedList<Role> roles;
-	public Boolean isConfiguration = false;
+	public boolean isConfiguration = false;
 	public IFile configurationFile = null;
 	
 	public Collaboration(String name) {
@@ -58,5 +58,13 @@ public class Collaboration {
 	
 	public LinkedList<Role> getRoles(){
 		return roles;
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return name;
 	}
 }

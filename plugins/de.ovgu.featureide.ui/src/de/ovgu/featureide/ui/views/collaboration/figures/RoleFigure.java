@@ -18,7 +18,7 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.figures;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -33,11 +33,11 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.FontData;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
+import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 import de.ovgu.featureide.ui.views.collaboration.model.Role;
 
@@ -54,7 +54,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 	private static Font FONT_BOLD = new Font(null,"Arial", 8, SWT.BOLD);
 		
 	private final Label label = new Label();
-	public Boolean selected = false;
+	public boolean selected = false;
 	private IFolder featureFolder;
 	public Role role;
 	
@@ -197,28 +197,23 @@ public class RoleFigure extends Figure implements GUIDefaults{
 			CompartmentFigure fileFigure = new CompartmentFigure(); 
 			fileFigure.add(new Label(role.featureName + " ", IMAGE_FEATURE));
 			fileFigure.add(new Label(role.getName().split("[.]")[0] + " ", IMAGE_CLASS));
-			
-			if(role.directives != null) {
-				for(ArrayList<String> line : role.directives){
+			LinkedList<String> duplicates = new LinkedList<String>();
+			for (FSTDirective d : role.directives) {
+				if (role.file.equals(d.file) && !duplicates.contains(d.toDependencyString())) {
+					duplicates.add(d.toDependencyString());
 					Panel directivesPanel = new Panel();
 					FlowLayout layout = new FlowLayout(true);
 					layout.setMinorSpacing(0);
 					layout.setMajorSpacing(0);
 					directivesPanel.setLayoutManager(layout);
-					boolean toBeBold = false;
-					directivesPanel.add(new Label(" ", IMAGE_HASH));
-					for(String part : line){
-						Label partLabel = new Label(part);
-						if(toBeBold)	
-							partLabel.setFont(new Font(null, new FontData("Arial Unicode MS", 8, SWT.BOLD)));
-						else 
-							partLabel.setFont(DEFAULT_FONT);
-						toBeBold = !toBeBold;
-						directivesPanel.add(partLabel);
-					}
+					Label partLabel = new Label(d.toDependencyString(), IMAGE_HASH);
+					partLabel.setFont(DEFAULT_FONT);
+					directivesPanel.add(partLabel);
+					
 					directivesPanel.add(new Label(" "));
 					fileFigure.add(directivesPanel);
 				}
+				System.out.println();
 			}
 			
 			tooltipContent.add(fileFigure);
@@ -234,10 +229,11 @@ public class RoleFigure extends Figure implements GUIDefaults{
 	 * @return
 	 */
 	private String getParentNames(IResource file) {
-		if (file.getParent().equals(featureFolder)) {
+		IResource parent = file.getParent();
+		if (parent.equals(featureFolder)) {
 			return "";
 		}
-		return getParentNames(file.getParent()) + file.getParent().getName() + "/";
+		return getParentNames(parent) + parent.getName() + "/";
 	}
 
 	private void setName(String name) {

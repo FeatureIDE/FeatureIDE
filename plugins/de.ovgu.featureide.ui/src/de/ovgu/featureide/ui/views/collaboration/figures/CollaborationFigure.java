@@ -38,8 +38,8 @@ import de.ovgu.featureide.ui.views.collaboration.model.Collaboration;
 public class CollaborationFigure extends Figure implements GUIDefaults{
 
 	private final Label label = new Label();
-	public Boolean selected = true;
-	public Boolean isConfiguration = false;
+	public boolean selected = true;
+	public boolean isConfiguration = false;
 	
 	public CollaborationFigure(Collaboration coll) {
 		

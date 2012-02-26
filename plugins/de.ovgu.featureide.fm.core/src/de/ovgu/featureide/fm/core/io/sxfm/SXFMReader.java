@@ -149,7 +149,7 @@ public class SXFMReader extends AbstractFeatureModelReader {
      */
     private void handleFeatureTree(Node n) throws UnsupportedModelException {
     	NodeList children = n.getChildNodes();
-    	StringBuffer buffer = new StringBuffer();
+    	StringBuilder buffer = new StringBuilder();
     	Node node;
     	for (int i = 0; i < children.getLength(); i++) {
     		node = children.item(i);
@@ -445,7 +445,7 @@ public class SXFMReader extends AbstractFeatureModelReader {
      */
     private void handleConstraints(Node n) throws UnsupportedModelException {
     	NodeList children = n.getChildNodes();
-    	StringBuffer buffer = new StringBuffer();
+    	StringBuilder buffer = new StringBuilder();
     	String lineText;
     	Node node;
     	for (int i = 0; i < children.getLength(); i++) {

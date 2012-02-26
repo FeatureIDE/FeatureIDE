@@ -20,6 +20,8 @@ package de.ovgu.featureide.core.fstmodel.preprocessor;
 
 import java.util.ArrayList;
 
+import org.eclipse.core.resources.IFile;
+
 import de.ovgu.featureide.core.fstmodel.FSTModelElement;
 
 /**
@@ -32,11 +34,15 @@ public class FSTDirective extends FSTModelElement {
 
 	public int lineNumber;
 	
+	public IFile file = null;
+	
 	public int command;
 	
 	public String expression;
 	
-	public ArrayList<FSTDirective> children;
+	private ArrayList<FSTDirective> children;
+
+	private FSTDirective parent = null;
 
 	public static final int IF = 1;
 	public static final int IF_NOT = 2;
@@ -135,7 +141,55 @@ public class FSTDirective extends FSTModelElement {
 	 * @param children the children to set
 	 */
 	public void setChildren(ArrayList<FSTDirective> children) {
+		for (FSTDirective d : children) {
+			d.setParent(this);
+		}
 		this.children = children;
+	}
+	
+	public void addChild(FSTDirective child) {
+		child.setParent(this);
+		children.add(child);
+	}
+
+	/**
+	 * @param parent
+	 */
+	private void setParent(FSTDirective parent) {
+		this.parent = parent;
+	}
+
+	/**
+	 * Returns a representation of the directive with its parents and children.
+	 * @return
+	 */
+	public String toDependencyString() {
+		if (parent != null) {
+			return parent.toDependencyString();
+		}
+		return toString(0);
+	}
+	
+	/**
+	 * This is just a auxiliary function for <code>toDependencyString()</code>
+	 * @param i The count of parents
+	 * @return
+	 */
+	private String toString(int i) {
+		StringBuilder ret = new StringBuilder();
+		for (int j = i;j > 0;j--) {
+			ret.append("     ");
+		}
+		ret.append(interpretCommand(command));
+		ret.append(" ");
+		ret.append(expression);
+		if (children.size() > 0) {
+			for(FSTDirective child : children){
+				ret.append("\n");
+				ret.append(child.toString(i + 1));
+			}
+		}
+		return ret.toString();
 	}
 
 	/* (non-Javadoc)
@@ -143,14 +197,25 @@ public class FSTDirective extends FSTModelElement {
 	 */
 	@Override
 	public String toString() {
-		StringBuilder ret = new StringBuilder("line:"+lineNumber+" "+command+" "+expression+"\n");
-		ret.append("==>\n");
-		for(FSTDirective child : children){
-			ret.append(child.toString());
-			ret.append("\n");
+		return interpretCommand(command) + ' ' + expression;
+	}
+	
+	private String interpretCommand(int command) {
+		switch (command) {
+			case 1: return "if";
+			case 2: return "if not";
+			case 3: return "ifdef";
+			case 4: return "ifndef";
+			case 5: return "elif";
+			case 6: return "elifdef";
+			case 7: return "elifndef";
+			case 8: return "else";
+			case 9: return "condition";
+			case 10: return "define";
+			case 11: return "undefine";
+			default: return "";
+			
 		}
-		ret.append("<==\n");
-		return ret.toString();
 	}
 	
 }

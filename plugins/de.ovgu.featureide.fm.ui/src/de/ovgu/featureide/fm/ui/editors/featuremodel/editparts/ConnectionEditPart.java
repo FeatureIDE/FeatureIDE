@@ -84,16 +84,17 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 
 	@Override
 	protected void createEditPolicies() {
-		installEditPolicy(EditPolicy.DIRECT_EDIT_ROLE, new DirectEditPolicy() {
-			@Override
-			protected void showCurrentEditValue(DirectEditRequest request) {
-			}
+		installEditPolicy(EditPolicy.DIRECT_EDIT_ROLE, new RoleDirectEditPolicy());
+	}
 
-			@Override
-			protected Command getDirectEditCommand(DirectEditRequest request) {
-				return null;
-			}
-		});
+	private static final class RoleDirectEditPolicy extends DirectEditPolicy {
+		@Override
+		protected void showCurrentEditValue(DirectEditRequest request) {}
+
+		@Override
+		protected Command getDirectEditCommand(DirectEditRequest request) {
+			return null;
+		}
 	}
 
 	@Override

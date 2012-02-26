@@ -253,7 +253,7 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
      * @return
      */
     private String prettyPrint (String text) {
-    	StringBuffer result = new StringBuffer();
+    	StringBuilder result = new StringBuilder();
     	String line;
     	int indentLevel = 0;
     	BufferedReader reader = new BufferedReader(new StringReader(text));

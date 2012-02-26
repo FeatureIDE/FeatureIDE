@@ -18,7 +18,6 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.model;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
@@ -26,6 +25,7 @@ import org.eclipse.core.runtime.IPath;
 
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
+import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 
 
 /**
@@ -42,12 +42,12 @@ public class Role {
 	private IPath path;
 	public LinkedList<FSTField> fields = new LinkedList<FSTField>();
 	public LinkedList<FSTMethod> methods = new LinkedList<FSTMethod>();	
-	public LinkedList<ArrayList<String>> directives = new LinkedList<ArrayList<String>>();
 	public LinkedList<IFile> files = new LinkedList<IFile>();
 	public IFile file;
 	public String featureName = "";
-	public Boolean selected;
+	public boolean selected;
 	public boolean isEditorFile = false;
+	public LinkedList<FSTDirective> directives = new LinkedList<FSTDirective>();
 	
 	/**
 	 * @return the path
@@ -116,6 +116,17 @@ public class Role {
 			return null;
 //		return ResourcesPlugin.getWorkspace().getRoot().getFile(path);
 		return file;
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		if (collaboration != null) {
+			return collaboration.toString() + '@' + name;
+		}
+		return name;
 	}
 
 }

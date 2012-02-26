@@ -19,20 +19,12 @@
 package de.ovgu.featureide.antenna.model;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Scanner;
 import java.util.Stack;
-import java.util.TreeMap;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
-
-import de.ovgu.featureide.antenna.AntennaCorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.core.fstmodel.preprocessor.PPModelBuilder;
 
@@ -55,63 +47,6 @@ public class AntennaModelBuilder extends PPModelBuilder {
 		super(featureProject);
 	}
 	
-	@Override
-	protected void buildModelDirectives(String feature, FSTClass currentClass,
-			IFile res) {
-		Pattern pattern = Pattern.compile(String.format("(//#.*" + OPERATORS + ")(%s)(" + OPERATORS + "|$)", feature));
-		
-		TreeMap<String, LinkedList<ArrayList<String>>> directives = model.getFeaturesMap().get(feature).directives;
-		LinkedList<ArrayList<String>> lines = directives.get(currentClass.getName());
-		
-		if (lines == null) {
-			lines = new LinkedList<ArrayList<String>>();
-			directives.put(currentClass.getName(), lines);
-		}
-		
-		Scanner scanner = null;
-		try {
-			scanner = new Scanner(res.getContents());
-			
-			while (scanner.hasNext()) {
-				String line = scanner.nextLine();
-				Matcher matcher = pattern.matcher(line);
-				
-				if (matcher.find()) {
-					ArrayList<String> list = new ArrayList<String>();
-					line = line.replace("//#", "").trim();
-					String[] splitarray = line.split("(?<=" + OPERATORS + ")");
-					
-					Pattern p = Pattern.compile(feature + OPERATORS + "?");
-
-					for(String s : splitarray){
-						Matcher m = p.matcher(s);
-						
-						if(m.matches()){
-							if(s.substring(s.length()-1).matches(OPERATORS)){
-								list.add(s.substring(0, s.length()-1));
-								list.add(s.substring(s.length()-1));
-							} else {
-								list.add(s);
-							}
-						} else {
-							if (!list.isEmpty()) {
-								list.set(list.size()-1, list.get(list.size()-1).concat(s));
-							} else {
-								list.add(s);
-							}
-						}
-					}
-					
-					lines.add(list);
-				}
-			}
-		} catch (CoreException e) {
-			AntennaCorePlugin.getDefault().logError(e);
-		} finally {
-			if (scanner != null)
-				scanner.close();
-		}
-	}
 	@Override
 	protected ArrayList<FSTDirective> buildModelDirectivesForFile(Vector<String> lines) {
 		//for preprocessor outline
@@ -176,7 +111,7 @@ public class AntennaModelBuilder extends PPModelBuilder {
 				
 				if(!directivesStack.isEmpty()){
 					FSTDirective top = directivesStack.peek();
-					top.getChildrenList().add(directive);
+					top.addChild(directive);
 				} else {
 					directivesList.add(directive);
 				}

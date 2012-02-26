@@ -72,7 +72,7 @@ public class SettingsImport {
 	 */
 	private String getContents(File settingsFile,
 			PersistentPropertyManager persitentProperties) {
-    	StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
     	BufferedReader reader = null;
     	try {
     		reader = new BufferedReader(new FileReader(settingsFile));

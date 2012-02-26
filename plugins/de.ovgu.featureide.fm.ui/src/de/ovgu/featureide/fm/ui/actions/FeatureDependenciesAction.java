@@ -96,7 +96,7 @@ public class FeatureDependenciesAction implements IObjectActionDelegate {
 			protected IStatus run(IProgressMonitor monitor) {
 				final String text = createText(mod.getFeatureNames(), node);
 				// UI access
-				final StringBuffer path = new StringBuffer();
+				final StringBuilder path = new StringBuilder();
 				Display.getDefault().syncExec(new Runnable() {
 
 					@Override
@@ -165,7 +165,7 @@ public class FeatureDependenciesAction implements IObjectActionDelegate {
 	 *            the Node representing the Model
 	 */
 	private String createText(Set<String> featureNames, Node rootNode) {
-		StringBuffer textBuf = new StringBuffer();
+		StringBuilder textBuf = new StringBuilder();
 		for (String s : featureNames) {
 
 			try {
@@ -259,7 +259,7 @@ public class FeatureDependenciesAction implements IObjectActionDelegate {
 				}
 			}
 		}
-		StringBuffer b = new StringBuffer();
+		StringBuilder b = new StringBuilder();
 
 		for (String s : featureString) {
 			b.append(s + s);

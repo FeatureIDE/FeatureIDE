@@ -32,6 +32,7 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
+import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.ui.views.collaboration.model.Class;
 import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModel;
 import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModelBuilder;
@@ -62,6 +63,14 @@ public class CollaborationOutlineTreeContentProvider implements
 		@Override
 		public int compare(FSTField o1, FSTField o2) {
 			return o1.getName().compareToIgnoreCase(o2.getName());
+		}
+		
+	};
+	private Comparator<? super FSTDirective> directiveComparator = new Comparator<FSTDirective>(){
+
+		@Override
+		public int compare(FSTDirective o1, FSTDirective o2) {
+			return o1.lineNumber > o2.lineNumber ? 1 : 0;
 		}
 		
 	};
@@ -135,10 +144,11 @@ public class CollaborationOutlineTreeContentProvider implements
 			HashMap<String, FSTMethod> methods = new HashMap<String, FSTMethod>();
 			for (Role role : ((Class) parentElement).getRoles()) {
 				for (FSTMethod m : role.methods) {
-					if (!methods.containsKey(m.getName())) {
-						methods.put(m.getName(), m.copy());
+					String methodName = m.getName();
+					if (!methods.containsKey(methodName)) {
+						methods.put(methodName, m.copy());
 					} else {
-						methods.get(m.getName()).setOwn(m.getOwnFile());
+						methods.get(methodName).setOwn(m.getOwnFile());
 					}
 				}
 			}
@@ -152,10 +162,11 @@ public class CollaborationOutlineTreeContentProvider implements
 			HashMap<String, FSTField> fields = new HashMap<String, FSTField>();
 			for (Role role : ((Class) parentElement).getRoles()) {
 				for (FSTField f : role.fields) {
-					if (!fields.containsKey(f.getName())) {
-							fields.put(f.getName(), f.copy());
+					String fieldName = f.getName();
+					if (!fields.containsKey(fieldName)) {
+							fields.put(fieldName, f.copy());
 					} else {
-						fields.get(f.getName()).setOwn(f.getOwnFile());
+						fields.get(fieldName).setOwn(f.getOwnFile());
 					}
 				}
 			}
@@ -166,9 +177,24 @@ public class CollaborationOutlineTreeContentProvider implements
 				i++;
 			}
 			
+			LinkedList<FSTDirective> directives = new LinkedList<FSTDirective>();
+			for (Role role : ((Class) parentElement).getRoles()) {
+				for (FSTDirective f : role.directives) {
+					directives.add(f);
+				}
+			}
+			FSTDirective[] directiveArray = new FSTDirective[directives.size()];
+			i = 0;
+			for (FSTDirective f : directives) {
+				directiveArray[i] = f;
+				i++;
+			}
+			
 			Arrays.sort(methodArray, methodComparator);
 			Arrays.sort(fieldArray, fieldComparator);
-			Object[] obj = new Object[fieldArray.length + methodArray.length];
+			Arrays.sort(directiveArray, directiveComparator);
+			
+			Object[] obj = new Object[fieldArray.length + methodArray.length + directiveArray.length];
 
 			for (i = 0; i < fieldArray.length; i++) {
 				obj[i] = fieldArray[i];
@@ -176,6 +202,10 @@ public class CollaborationOutlineTreeContentProvider implements
 			i = 0;
 			for (int j = fieldArray.length; i < methodArray.length; i++, j++) {
 				obj[j] = methodArray[i];
+			}
+			i = 0;
+			for (int j = fieldArray.length + methodArray.length; i < directiveArray.length; i++, j++) {
+				obj[j] = directiveArray[i];
 			}
 			
 			return obj;
@@ -247,7 +277,8 @@ public class CollaborationOutlineTreeContentProvider implements
 	public boolean hasChildren(Object element) {
 		if (element instanceof Class) {
 			for (Role role :((Class) element).getRoles()) {
-				if (role.methods.size() > 0 || role.fields.size() > 0) {
+				if (role.methods.size() > 0 || role.fields.size() > 0 ||
+						role.directives.size() > 0) {
 					return true;
 				}
 			}

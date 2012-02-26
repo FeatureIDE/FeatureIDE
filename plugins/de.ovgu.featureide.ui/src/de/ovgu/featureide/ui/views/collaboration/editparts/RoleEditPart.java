@@ -25,7 +25,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
-import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
@@ -62,8 +61,7 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 
 	@Override
 	protected IFigure createFigure() {
-		Figure fig = new RoleFigure(getRoleModel());
-		return fig;
+		return new RoleFigure(getRoleModel());
 	}
 
 	@Override
@@ -72,11 +70,13 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 
 	protected void refreshVisuals() {
 		RoleFigure roleFigure = (RoleFigure) getFigure();
-		Point location = roleFigure.getBounds().getLocation();
-		Dimension size = roleFigure.getBounds().getSize();
+		Rectangle roleBounds = roleFigure.getBounds();
+		Point location = roleBounds.getLocation();
+		Dimension size = roleBounds.getSize();
 		ClassEditPart classEditPart = (ClassEditPart) getParent();
-		Dimension size2 = classEditPart.getFigure().getBounds().getSize();
-		Point location2 = classEditPart.getFigure().getBounds().getLocation();
+		Rectangle classBounds = classEditPart.getFigure().getBounds();
+		Dimension size2 = classBounds.getSize();
+		Point location2 = classBounds.getLocation();
 
 		int xValue = location2.x + ((size2.width - size.width) / 2);
 

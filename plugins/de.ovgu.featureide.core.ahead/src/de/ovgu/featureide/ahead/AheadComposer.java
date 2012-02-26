@@ -157,7 +157,7 @@ public class AheadComposer extends ComposerExtensionClass {
 			fileContent = "\r\n" + fileContent;
 		}
 		if (!fileContent.equals(fileContent.replaceFirst("layer\\s+\\w+\\s*;", ""))
-				&& fileContent.replaceFirst("layer\\s+\\w+\\s*;", LAYER_REPLACING).indexOf(LAYER_REPLACING) < fileContent.indexOf("{")) {
+				&& fileContent.replaceFirst("layer\\s+\\w+\\s*;", LAYER_REPLACING).indexOf(LAYER_REPLACING) < fileContent.indexOf('{')) {
 			return fileContent.replaceFirst("layer\\s+\\w+\\s*;", "");
 		} else if (changed) {
 			return fileContent;
@@ -273,7 +273,7 @@ public class AheadComposer extends ComposerExtensionClass {
 		FileWriter fw = null;
 		try {
 			File file = iFile.getRawLocation().toFile();
-			StringBuffer fileTextBuffer = new StringBuffer();
+			StringBuilder fileTextBuffer = new StringBuilder();
 			Scanner scanner = new Scanner(file);
 			while (scanner.hasNext()) {
 				fileTextBuffer.append(scanner.nextLine() + "\r\n");

@@ -393,7 +393,7 @@ public class ConstraintDialog implements GUIDefaults {
 			button.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
 				public void widgetSelected(
 						org.eclipse.swt.events.SelectionEvent e) {
-					StringBuffer temp = new StringBuffer(constraintText
+					StringBuilder temp = new StringBuilder(constraintText
 							.getText());
 					temp.delete(x, y);
 					temp.insert(x > y ? y : x, /*
@@ -535,7 +535,7 @@ public class ConstraintDialog implements GUIDefaults {
 			@Override
 			public void handleEvent(Event event) {
 				TableItem[] selectedItem = featureTable.getSelection();
-				StringBuffer temp = new StringBuffer(constraintText.getText());
+				StringBuilder temp = new StringBuilder(constraintText.getText());
 
 				temp.delete(x, y);
 				if (selectedItem.length > 0) {
@@ -807,7 +807,7 @@ public class ConstraintDialog implements GUIDefaults {
 	 *            List of dead Features
 	 * */
 	private String getDeadFeatureString(List<Feature> deadFeatures) {
-		StringBuffer featureString = new StringBuffer();
+		StringBuilder featureString = new StringBuilder();
 		featureString
 				.append("Constraint causes the following features to be dead: ");
 		int count = 0;
@@ -818,7 +818,7 @@ public class ConstraintDialog implements GUIDefaults {
 			count = count + l.toString().length() + 2;
 
 			if (isNewLine == false && count > 35) {
-				featureString.append("\n");
+				featureString.append('\n');
 				isNewLine = true;
 			}
 			if (count < 90) {

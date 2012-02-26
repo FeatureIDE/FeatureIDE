@@ -42,4 +42,14 @@ public class FeatureModeling extends ComposerExtensionClass {
 		return false;
 	}
 
+	@Override
+	public boolean clean() {
+		return false;
+	}
+
+	@Override
+	public boolean copyNotComposedFiles() {
+		return true;
+	}
+
 }

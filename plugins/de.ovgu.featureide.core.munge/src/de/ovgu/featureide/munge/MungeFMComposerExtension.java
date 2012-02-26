@@ -134,7 +134,7 @@ public class MungeFMComposerExtension extends FMComposerExtension {
 	 */
 	private String getFileContent(IFile iFile) {
 		Scanner scanner = null;
-		StringBuffer fileText = new StringBuffer();
+		StringBuilder fileText = new StringBuilder();
 		try {
 			scanner = new Scanner(iFile.getRawLocation().toFile());
 			while (scanner.hasNext()) {

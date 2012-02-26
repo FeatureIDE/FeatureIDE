@@ -53,7 +53,7 @@ public class ConfigurationWriter {
 	}
 	
 	public String writeIntoString(IFile file){
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		
 			ArrayList<String> list = configuration.getFeatureModel().getFeatureOrderList();
 			if (configuration.getFeatureModel().isFeatureOrderUserDefined()) {
@@ -74,7 +74,7 @@ public class ConfigurationWriter {
 	}
 
 	private void writeSelectedFeatures(SelectableFeature feature,
-			StringBuffer buffer) {
+			StringBuilder buffer) {
 		if (feature.getFeature().isLayer()
 				&& feature.getSelection() == Selection.SELECTED)
 			buffer.append(feature.getName() + "\r\n");

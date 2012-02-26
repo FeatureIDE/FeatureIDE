@@ -40,6 +40,7 @@ import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
+import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.ui.UIPlugin;
 
@@ -56,7 +57,7 @@ public class CollaborationModelBuilder {
 
 	public LinkedList<String> classFilter = new LinkedList<String>();
 	public LinkedList<String> featureFilter = new LinkedList<String>();
-	public Boolean showUnselectedFeatures = false;
+	public boolean showUnselectedFeatures = false;
 	public IFile configuration = null;
 	
 	private ArrayList<String> iFeatureNames = new ArrayList<String>();
@@ -74,6 +75,7 @@ public class CollaborationModelBuilder {
 	public CollaborationModel buildCollaborationModel(
 			IFeatureProject featureProject) {
 		//reset model
+		// TODO @Jens: refactor this method into several
 		model.classes.clear();
 		model.roles.clear();
 		model.collaborations.clear();
@@ -193,7 +195,7 @@ public class CollaborationModelBuilder {
 				if (featureFilter.size() == 0 || featureFilter.contains(layerName)) {
 					if (iFeatureNames.contains(layerName)) {
 						//case: add class files
-						Boolean selected = true;
+						boolean selected = true;
 						FSTFeature feature = fSTModel.getFeature(layerName);
 						collaboration = null;
 						if (configuration != null && !featureNames.contains(layerName))
@@ -229,20 +231,24 @@ public class CollaborationModelBuilder {
 											role.isEditorFile = true;
 										}
 										role.featureName = feature.getName();
-										if (Class.getFields() != null) {
-											for (FSTField f : Class.getFields()) {
+										FSTField[] fields = Class.getFields();
+										if (fields != null) {
+											for (FSTField f : fields) {
 												role.fields.add(f);
 											}
 										}
-										if (Class.getMethods() != null) {
-											for (FSTMethod m : Class.getMethods()) {
+										
+										FSTMethod[] methods = Class.getMethods();
+										if (methods != null) {
+											for (FSTMethod m : methods) {
 												role.methods.add(m);
 											}
 										}
-										
-										LinkedList<ArrayList<String>> directivesList = feature.directives.get(Class.getName());
-										if(directivesList != null) {
-											role.directives = directivesList;
+
+										for (FSTDirective d : feature.directives) {
+											if (role.file.equals(d.file)) {
+												role.directives.add(d);
+											}
 										}
 										
 										role.setPath(pathToFile);
@@ -281,7 +287,7 @@ public class CollaborationModelBuilder {
 						}
 					} else {
 						//case: add arbitrary files
-						Boolean selected = false;
+						boolean selected = false;
 						if (configuration != null && featureNames.contains(layerName))
 							selected = true;
 						IFolder folder = featureProject.getSourceFolder().getFolder(layerName);
@@ -306,7 +312,7 @@ public class CollaborationModelBuilder {
 		return model;	
 	}
 
-	private void addArbitraryFiles(IResource res, String featureName, Boolean selected) {
+	private void addArbitraryFiles(IResource res, String featureName, boolean selected) {
 		if (!selected && !showUnselectedFeatures)
 			return;
 		

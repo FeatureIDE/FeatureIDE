@@ -213,7 +213,7 @@ public class SXFMWriter extends AbstractFeatureModelWriter {
      * @return
      */
     private String addBrackets (String original) {
-    	StringBuffer result = new StringBuffer();
+    	StringBuilder result = new StringBuilder();
     	String newLine = original.replace("(", " ( ");
 		newLine = newLine.replace(")", " ) ");
 		newLine = newLine.replace("~", " ~ ");

@@ -103,7 +103,7 @@ public class AntennaFMComposerExtension extends FMComposerExtension {
 		try {
 			File file = iFile.getRawLocation().toFile();
 			
-			StringBuffer fileText = new StringBuffer();
+			StringBuilder fileText = new StringBuilder();
 			scanner = new Scanner(file);
 			while (scanner.hasNext()) {
 				fileText.append(scanner.nextLine());

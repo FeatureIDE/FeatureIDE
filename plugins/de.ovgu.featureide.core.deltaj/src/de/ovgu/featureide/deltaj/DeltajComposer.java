@@ -64,7 +64,7 @@ public class DeltajComposer extends ComposerExtensionClass {
 	private String filename;
 
 	private Set<String> selectedFeatures;
-	private Boolean sourceFilesAdded;
+	private boolean sourceFilesAdded;
 	private Set<String> featureNames;
 
 	public void run() {
@@ -241,17 +241,17 @@ public class DeltajComposer extends ComposerExtensionClass {
 
 	private String getImportsString(String fileName) {
 		IFolder folder = featureProject.getSourceFolder();
-		StringBuffer strBuf = new StringBuffer();
+		StringBuilder strBuf = new StringBuilder();
 
 		try {
 			for (IResource res : folder.members()) {
-
 				if (res instanceof IFile) {
-					if (res.getName().endsWith(".dj")
-							&& !res.getName().equals(fileName)) {
-
-						strBuf.append("import \"" + res.getName() + "\"\n");
-
+					String resourceName = res.getName();
+					if (resourceName.endsWith(".dj")
+							&& !resourceName.equals(fileName)) {
+						strBuf.append("import \"");
+						strBuf.append(resourceName);
+						strBuf.append("\"\n");
 					}
 
 				}
@@ -319,7 +319,7 @@ public class DeltajComposer extends ComposerExtensionClass {
 
 		Matcher matcher = getMatcherFromFileTextDelta(fileString);
 
-		StringBuffer buf = new StringBuffer(fileString);
+		StringBuilder buf = new StringBuilder(fileString);
 		if (matcher.matches())
 			buf.replace(matcher.start(1), matcher.end(1),
 					getImportsString(file.getName()));
@@ -331,7 +331,7 @@ public class DeltajComposer extends ComposerExtensionClass {
 		String fileString = fileToString(file.getAbsolutePath());
 		Matcher matcher = getMatcherFromFileTextCore(fileString);
 		matcher.matches();
-		StringBuffer buf = new StringBuffer(matcher.group(0));
+		StringBuilder buf = new StringBuilder(matcher.group(0));
 		String configurationString = getConfigurationString(selectedFeatures);
 		String features = getFeatureString(featureNames);
 
@@ -352,7 +352,7 @@ public class DeltajComposer extends ComposerExtensionClass {
 		Configuration configuration = new Configuration(
 				featureProject.getFeatureModel());
 		updateSelectedFeatures(configuration);
-		StringBuffer features = new StringBuffer();
+		StringBuilder features = new StringBuilder();
 
 		for (String s : selectedFeatures) {
 			features.append(" " + s + ",");

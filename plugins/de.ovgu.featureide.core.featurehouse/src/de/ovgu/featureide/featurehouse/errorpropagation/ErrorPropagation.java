@@ -358,7 +358,7 @@ public class ErrorPropagation {
 			if (scanner.hasNext()) {
 				while (scanner.hasNext()) {
 					buffer.append(scanner.nextLine());
-					buffer.append("\n");
+					buffer.append('\n');
 				}
 			}
 			return buffer.toString();

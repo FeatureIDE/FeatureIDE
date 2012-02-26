@@ -255,7 +255,7 @@ public class SatSolver {
 		if (contradiction)
             return "contradiction\n";
 
-		StringBuffer out = new StringBuffer();
+		StringBuilder out = new StringBuilder();
         IProblem problem = new ModelIterator(solver);
         int[] lastModel = null;
     	for (int i = 0; i < number; i++) {

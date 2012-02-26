@@ -236,7 +236,7 @@ public class AheadBuildErrorEvent {
     		return "";
     	}
     	Reader in = null;
-    	StringBuffer buffer = new StringBuffer();
+    	StringBuilder buffer = new StringBuilder();
     	try {
 	        InputStream contentStream = file.getContents();
 	        in = new InputStreamReader(contentStream);
@@ -250,7 +250,9 @@ public class AheadBuildErrorEvent {
 	            n = in.read(readBuffer);
 	        }
 	    } finally {
-    		in.close();
+	    	if (in != null) {
+	    		in.close();
+	    	}
     	}
         return buffer.toString();
     }

@@ -82,15 +82,16 @@ public class PPModelBuilder {
 				buildModel((IFolder)res);
 			} else if (res instanceof IFile) {
 				String text = getText((IFile)res);
-				FSTClass currentClass = new FSTClass(res.getName());
-				model.addClass(res.getName(), (IFile)res);
+				String resourceName = res.getName();
+				FSTClass currentClass = new FSTClass(resourceName);
+				model.addClass(resourceName, (IFile)res);
 				
 				Vector<String> lines = PPComposerExtensionClass.loadStringsFromFile((IFile) res);
 				
 				for (String feature : features) {
 					if (containsFeature(text, feature)) {
 						FSTFeature currentFeature = model.getFeaturesMap().get(feature);
-						currentFeature.getClasses().put(res.getName(), currentClass);
+						currentFeature.getClasses().put(resourceName, currentClass);
 						buildModelDirectives(feature, currentClass, (IFile) res);
 					}
 				}
@@ -98,11 +99,39 @@ public class PPModelBuilder {
 				ArrayList<FSTDirective> list = buildModelDirectivesForFile(lines);
 				if(list != null){
 					model.getDirectives().put(currentClass.getName(), list);
+					addDirectivesToModel(list, (IFile)res);
 				}
 			}
 		}
 	}
 	
+	/**
+	 * @param list
+	 * @param res 
+	 */
+	private void addDirectivesToModel(ArrayList<FSTDirective> list, IFile res) {
+		for (FSTDirective d : list) {
+			d.file = res;
+			FSTFeature feature = model.getFeature(getFeatureName(d.expression));
+			
+			if (feature != null) {
+				feature.directives.add(d);
+			} else {
+				System.out.println();
+			}
+			addDirectivesToModel(d.getChildrenList(), res);
+		}
+	}
+
+	/**
+	 * @param expression
+	 * @return
+	 */
+	private String getFeatureName(String expression) {
+		expression = expression.replaceAll("[(]", "");
+		return expression.replaceAll("[)]", "");
+	}
+
 	/**
 	 * This method should be implemented by preprocessor plug-ins.
 	 * Adds directives to model.
@@ -148,7 +177,7 @@ public class PPModelBuilder {
 		Scanner scanner = null;
 		try {
 			File file = iFile.getRawLocation().toFile();
-			StringBuffer fileText = new StringBuffer();
+			StringBuilder fileText = new StringBuilder();
 			scanner = new Scanner(file);
 			while (scanner.hasNext()) {
 				fileText.append(scanner.nextLine());

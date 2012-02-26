@@ -381,7 +381,7 @@ public class GuidslReader extends AbstractFeatureModelReader {
 
 	public Node readPropositionalString(String propString, FeatureModel featureModel) throws UnsupportedModelException{
 		//String featureString = new FeatureModelWriter(featureModel).writeToString();
-		StringBuffer featureString= new StringBuffer(
+		StringBuilder featureString= new StringBuilder(
 				new GuidslWriter(featureModel).writeToString());		
 
 		if( featureModel.getConstraintCount()== 0)

@@ -314,21 +314,23 @@ public class CorePlugin extends AbstractCorePlugin {
 	protected static void runProjectConversion( IProject project, String sourcePath, String configPath, 
 			String buildPath,  IComposerExtensionClass composer) throws IOException {
 		try {
-			project.getFolder(buildPath).deleteMarkers(null, true, IResource.DEPTH_INFINITE);
+			if (composer.hasSourceFolder() || composer.hasFeatureFolder()) {
+				project.getFolder(buildPath).deleteMarkers(null, true, IResource.DEPTH_INFINITE);
 			
-			IFolder source = project.getFolder(buildPath);
-			IFolder destination = !sourcePath.equals("") ? project.getFolder(sourcePath).getFolder(BASE_FEATURE): null;
-			if (!composer.postAddNature(source, destination) && !sourcePath.equals("")) {
-				if (!composer.hasFeatureFolders()) {
-					/** if project does not use feature folders, use the source path directly **/
-					destination = project.getFolder(sourcePath);
-				}
-				if (!destination.exists()) {
-					destination.create(false, true, null);
-				}
-				/** moves all files of the old source folder to the destination **/
-				for (IResource res : source.members()) {
-					res.move(destination.getFile(res.getName()).getFullPath(),true, null);
+				IFolder source = project.getFolder(buildPath);
+				IFolder destination = !sourcePath.equals("") ? project.getFolder(sourcePath).getFolder(BASE_FEATURE): null;
+				if (!composer.postAddNature(source, destination) && !sourcePath.equals("")) {
+					if (!composer.hasFeatureFolders()) {
+						/** if project does not use feature folders, use the source path directly **/
+						destination = project.getFolder(sourcePath);
+					}
+					if (!destination.exists()) {
+						destination.create(false, true, null);
+					}
+					/** moves all files of the old source folder to the destination **/
+					for (IResource res : source.members()) {
+						res.move(destination.getFile(res.getName()).getFullPath(),true, null);
+					}
 				}
 			}
 		} catch (CoreException e) {

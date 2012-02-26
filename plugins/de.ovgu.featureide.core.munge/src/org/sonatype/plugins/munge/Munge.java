@@ -342,7 +342,7 @@ public class Munge {
         StringTokenizer st = new StringTokenizer(
                 commentText, "[] \t\r\n", true);
         boolean foundTag = false;
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
 
         try {
             while (st.hasMoreTokens()) {

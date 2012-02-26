@@ -68,8 +68,9 @@ public class AspectJComposer extends ComposerExtensionClass {
 	private static final String BUILDER_AJ = "core.eclipse.ajdt.core.ajbuilder";
 
 	private static final Object BUILDER_JAVA = "org.eclipse.jdt.core.javabuilder";
+	
+	private static final String[] JAVA_TEMPLATE = {"Java", "java", PACKAGE_PATTERN + "/**\r\n * TODO description\r\n */\r\npublic class " + CLASS_NAME_PATTERN +" {\n\n}"};
 
-	private LinkedList<String> selectedFeatures;
 	private LinkedList<String> unSelectedFeatures;
 	private FeatureModel featureModel;
 	private boolean hadAspectJNature;
@@ -104,7 +105,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 		} catch (IOException e) {
 			AspectJCorePlugin.getDefault().logError(e);
 		}
-		selectedFeatures = new LinkedList<String>();
+		LinkedList<String> selectedFeatures = new LinkedList<String>();
 		unSelectedFeatures = new LinkedList<String>();
 		for (Feature feature : configuration.getSelectedFeatures()) {
 			selectedFeatures.add(feature.getName());
@@ -240,8 +241,9 @@ public class AspectJComposer extends ComposerExtensionClass {
 			if (res instanceof IFolder) {
 				hasAspects = addAspects((IFolder)res, folders + res.getName() + "_");
 			} else if (res instanceof IFile) {
-				if (res.getName().endsWith(".aj")) {
-					Feature feature = new Feature(featureModel, folders + res.getName().split("[.]")[0]);
+				String name = res.getName();
+				if (name.endsWith(".aj")) {
+					Feature feature = new Feature(featureModel, folders + name.split("[.]")[0]);
 					featureModel.getRoot().addChild(feature);
 					hasAspects = true;
 				}
@@ -386,8 +388,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 	@Override
 	public ArrayList<String[]> getTemplates() {
 		ArrayList<String[]> list = new ArrayList<String[]>();
-		String[] java = {"Java", "java", PACKAGE_PATTERN + "/**\r\n * TODO description\r\n */\r\npublic class " + CLASS_NAME_PATTERN +" {\n\n}"};
-		list.add(java);
+		list.add(JAVA_TEMPLATE);
 		return list;
 	}
 
@@ -412,7 +413,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 			return;
 		}
 		rootName = root.getName();
-		if (!rootName.equals("") && root.hasChildren()) {
+		if (!"".equals(rootName) && root.hasChildren()) {
 			checkAspect(root);
 		}
 	}
@@ -450,8 +451,8 @@ public class AspectJComposer extends ComposerExtensionClass {
 	private void createAspect(String aspect, IFolder folder, String aspectPackage) {
 		IFile aspectFile = getAspectFile(aspect, aspectPackage, folder);
 		if (aspectPackage == null && aspect.contains("_")) {
-			aspectPackage = aspect.substring(0, aspect.lastIndexOf("_")).replaceAll("_", ".");
-			aspect = aspect.substring(aspect.lastIndexOf("_") + 1);
+			aspectPackage = aspect.substring(0, aspect.lastIndexOf('_')).replaceAll("_", ".");
+			aspect = aspect.substring(aspect.lastIndexOf('_') + 1);
 		}
 		if (!aspectFile.exists()) {
 			String fileText;

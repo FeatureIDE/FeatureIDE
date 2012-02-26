@@ -319,7 +319,7 @@ public class NodeReader {
 		
 		if (str.length() < 2)
 			return str;
-		StringBuffer strBuf = new StringBuffer();
+		StringBuilder strBuf = new StringBuilder();
 		strBuf.append(str.charAt(0));
 		for (int i = 1; i < str.length(); i++) {
 			if (!(Character.isWhitespace(str.charAt(i - 1)) && Character

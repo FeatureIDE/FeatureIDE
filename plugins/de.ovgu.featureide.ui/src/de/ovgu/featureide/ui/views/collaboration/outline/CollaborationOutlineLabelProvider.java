@@ -27,6 +27,7 @@ import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModelElement;
+import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 import de.ovgu.featureide.ui.views.collaboration.model.Class;
 import de.ovgu.featureide.ui.views.collaboration.model.Role;
@@ -115,9 +116,11 @@ public class CollaborationOutlineLabelProvider implements ILabelProvider,GUIDefa
 		if (element instanceof  Class) {
 			String toAppend = ""; 
 			for (Role r : ((Class)element).getRoles()) {
+				if (r.directives.size() > 0) {
+					return  ((Class)element).getName();
+				}
 				if (r.getRoleFile().equals(file)) {
 					toAppend = " - " + r.featureName;
-					break;
 				}
 			}
 			return  ((Class)element).getName()+toAppend;
@@ -134,6 +137,10 @@ public class CollaborationOutlineLabelProvider implements ILabelProvider,GUIDefa
 		
 		if (element instanceof Role)
 			return ((Role)element).featureName;
+		
+		if (element instanceof FSTDirective) {
+			return ((FSTDirective)element).toString();
+		}
 		
 		if (element instanceof String)
 			return (String) element;

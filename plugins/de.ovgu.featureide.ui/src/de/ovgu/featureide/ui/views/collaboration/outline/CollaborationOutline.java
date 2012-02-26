@@ -60,6 +60,7 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
+import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.core.listeners.ICurrentBuildListener;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.views.outline.FmLabelProvider;
@@ -82,10 +83,7 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 
 	private TreeViewer viewer;
 	private IFile iFile;
-	private IFeatureProject featureProject;
 	private IEditorPart active_editor;
-	private Action collapseAllAction;
-	private Action expandAllAction;
 	private UIJob uiJob;
 	private CollaborationOutlineTreeContentProvider contentProvider = new CollaborationOutlineTreeContentProvider();
 	private CollaborationOutlineLabelProvider clabel = new CollaborationOutlineLabelProvider();
@@ -180,6 +178,12 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 					}
 					return;
 				} else if ((((IStructuredSelection) viewer.getSelection())
+						.getFirstElement() instanceof FSTDirective)) {
+					FSTDirective directive = (FSTDirective) ((IStructuredSelection) viewer
+							.getSelection()).getFirstElement();
+					scrollToLine(active_editor, directive.lineNumber + 1);
+					return;
+				} else if ((((IStructuredSelection) viewer.getSelection())
 						.getFirstElement() instanceof Role)) {
 						
 	
@@ -250,7 +254,7 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 					// case: open editor
 					FileEditorInput inputFile = (FileEditorInput) part
 							.getEditorInput();
-					featureProject = CorePlugin.getFeatureProject(inputFile
+					IFeatureProject featureProject = CorePlugin.getFeatureProject(inputFile
 							.getFile());
 
 					if (featureProject != null) {
@@ -281,7 +285,7 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 			FileEditorInput inputFile = (FileEditorInput) getSite().getPage()
 					.getActiveEditor().getEditorInput();
 
-			featureProject = CorePlugin.getFeatureProject(inputFile.getFile());
+			IFeatureProject featureProject = CorePlugin.getFeatureProject(inputFile.getFile());
 
 			if (featureProject != null)
 				update(inputFile.getFile());
@@ -297,18 +301,22 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 	}
 
 	/**
-	 * TODO revise
 	 * sets the new input or disables the viewer in case no editor is open
 	 * 
 	 * @param iFile2
 	 */
-	public void update(IFile iFile2) {
+	/*
+	 * TODO @Jens revise
+	 * TODO @Jens fix bug when selecting a feature and the related editor is not open
+	 * 			  the tree changes its expansion level to 1
+	 */
+	private void update(IFile iFile2) {
 		if (viewer != null) {
 			Control control = viewer.getControl();
 			if (control != null && !control.isDisposed()) {
 				if (iFile2 != null && iFile != null) {
 					/** only set the colors of the tree if the content is the same **/
-					if (iFile2.getName().equals(iFile.getName()) && 
+					if (iFile2.equals(iFile) && 
 							viewer.getTree().getItems().length > 0) {
 						iFile = iFile2;
 						TreeItem item = viewer.getTree().getItems()[0];
@@ -316,9 +324,12 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 							if (item.getData() instanceof  Class) {
 								String toAppend = ""; 
 								for (Role r : ((Class)item.getData()).getRoles()) {
+									if (r.directives.size() > 0) {
+										toAppend =  "";
+										break;
+									}
 									if (r.getRoleFile().equals(iFile)) {
 										toAppend = " - " + r.featureName;
-										break;
 									}
 								}
 								item.setText(((Class)item.getData()).getName()+toAppend);
@@ -455,15 +466,16 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 	 * @param iToolBarManager
 	 */
 	public void addToolbar(IToolBarManager iToolBarManager) {
-		collapseAllAction = new Action() {
+		Action collapseAllAction = new Action() {
 			public void run() {
 				viewer.expandToLevel(1);
+				viewer.refresh();
 			}
 		};
 		collapseAllAction.setToolTipText("Collapse All");
 		collapseAllAction.setImageDescriptor(IMG_COLLAPSE);
 
-		expandAllAction = new Action() {
+		Action expandAllAction = new Action() {
 			public void run() {
 				viewer.expandAll();
 				// treeExpanded event is not triggered, so we manually have to
