@@ -50,12 +50,12 @@ public class TypeChecker
 		_parser = new Parser(_project);
 		_checks = new CheckPluginManager();
 
-		_checks.addCheck(new SuperClassCheck(), new MethodCheck());
+		_checks.addCheck(new SuperClassCheck());
 	}
 
 	public void run()
 	{
-		System.out.println("Starting parsing project " + _project.getProjectName());
+		TypecheckCorePlugin.logln("Starting parsing project " + _project.getProjectName());
 		List<Feature> concrete_features = new ArrayList<Feature>(_project.getFeatureModel().getConcreteFeatures());
 
 		// TODO: consider the userdefined feature order?
@@ -64,9 +64,9 @@ public class TypeChecker
 
 		_class_table = _parser.getClassTable();
 
-		System.out.println("Parsing finished... (" + _parser.timer.getTime() + " ms)");
-		System.out.println("Running checks...");
+		TypecheckCorePlugin.logln("Parsing finished... (" + _parser.timer.getTime() + " ms)");
+		TypecheckCorePlugin.logln("Running checks...");
 		_checks.invokeChecks(_project, _class_table);
-		System.out.println("Checks finished...");
+		TypecheckCorePlugin.logln("Checks finished...");
 	}
 }

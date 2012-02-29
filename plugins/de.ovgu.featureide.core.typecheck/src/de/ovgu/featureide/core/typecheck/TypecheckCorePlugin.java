@@ -83,4 +83,12 @@ public class TypecheckCorePlugin extends AbstractCorePlugin {
 		Implies finalFormula = new Implies(featureModel, condition);
 		return !new SatSolver(new Not(finalFormula), 1000).isSatisfiable();
 	}
+	
+	public static void logln(String message)
+	{
+		if(getDefault().isDebugging())
+		{
+			System.out.println(message);
+		}
+	}
 }
