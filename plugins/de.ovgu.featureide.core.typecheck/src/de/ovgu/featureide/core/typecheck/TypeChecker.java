@@ -33,7 +33,7 @@ import de.ovgu.featureide.fm.core.Feature;
 /**
  * TODO description
  * 
- * @author Sönke Holthusen
+ * @author Sï¿½nke Holthusen
  */
 public class TypeChecker
 {
@@ -50,7 +50,7 @@ public class TypeChecker
 		_parser = new Parser(_project);
 		_checks = new CheckPluginManager();
 
-		_checks.addCheck(new SuperClassCheck());
+		_checks.addCheck(new SuperClassCheck(), new MethodCheck());
 	}
 
 	public void run()

@@ -19,8 +19,12 @@
 package de.ovgu.featureide.core.typecheck.check;
 
 import AST.Block;
+import AST.Expr;
+import AST.ExprStmt;
 import AST.MethodDecl;
+import AST.ReturnStmt;
 import AST.Stmt;
+import AST.VariableDeclaration;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.typecheck.parser.ClassTable;
 import de.ovgu.featureide.core.typecheck.parser.ClassTableEntry;
@@ -29,38 +33,90 @@ import de.ovgu.featureide.fm.core.Feature;
 /**
  * TODO description
  * 
- * @author Sönke Holthusen
+ * @author Sï¿½nke Holthusen
  */
-public class MethodCheck implements ICheckPlugin
-{
+public class MethodCheck implements ICheckPlugin {
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.typecheck.check.ICheckPlugin#invokeCheck(de.ovgu.featureide.core.IFeatureProject, de.ovgu.featureide.core.typecheck.parser.ClassTable)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.ovgu.featureide.core.typecheck.check.ICheckPlugin#invokeCheck(de.ovgu
+	 * .featureide.core.IFeatureProject,
+	 * de.ovgu.featureide.core.typecheck.parser.ClassTable)
 	 */
 	@Override
-	public void invokeCheck(IFeatureProject project, ClassTable class_table)
-	{
+	public void invokeCheck(IFeatureProject project, ClassTable class_table) {
 		// possible method invocations
 		// - Constructor
 		// - Method body
-		// - Field initializing (Var x = Class.staticMethod();)
-		for(Feature feature : class_table.getFeatures())
-		{
-			for(ClassTableEntry entry : class_table.getClassesByFeature(feature.getName()))
-			{
+		// - Field initialising (Var x = Class.staticMethod();)
+		for (Feature feature : class_table.getFeatures()) {
+			for (ClassTableEntry entry : class_table
+					.getClassesByFeature(feature.getName())) {
 				System.out.println(entry);
-				for(MethodDecl method : entry.getMethods())
-				{
-					if(method.hasBlock())
-					{
+				System.out.println(entry.getAST().lookupMethod("addExtension(String)"));
+				for (MethodDecl method : entry.getMethods()) {
+					if (method.hasBlock()) {
 						Block block = method.getBlock();
-						for(Stmt stmt : block.getStmtList())
-						{
-							System.out.println(stmt.lineNumber());
-						}
+						//checkBlock(block);
 					}
 				}
 			}
 		}
+	}
+
+	private void checkBlock(Block block) {
+		for (Stmt stmt : block.getStmtList()) {
+			checkStatement(stmt);
+		}
+	}
+
+	private void checkStatement(Stmt stmt) {
+		if (stmt instanceof ExprStmt) {
+			checkExpr(((ExprStmt) stmt).getExpr());
+//			System.out.println("expr at line " + stmt.lineNumber());
+		} else if (stmt instanceof ReturnStmt) {
+			ReturnStmt returnstmt = (ReturnStmt) stmt;
+			checkExpr(returnstmt.getResult());
+		} else if (stmt instanceof VariableDeclaration)
+		{
+			VariableDeclaration varstmt = (VariableDeclaration) stmt;
+			System.out.println(varstmt.getTypeAccess().packageName() + varstmt.getTypeAccess() + " " + varstmt.getID());
+		}
+		
+		
+		// TODO: get the enclosed statements
+		// else if (stmt instanceof SwitchStmt) {
+		// SwitchStmt switchstmt = (SwitchStmt) stmt;
+		// } else if (stmt instanceof IfStmt) {
+		// IfStmt ifstm = (IfStmt) stmt;
+		// System.out.println("if at line " + stmt.lineNumber());
+		// } else if (stmt instanceof WhileStmt) {
+		// WhileStmt whilestm = (WhileStmt) stmt;
+		// System.out.println("while at line " + stmt.lineNumber());
+		// } else if (stmt instanceof DoStmt) {
+		// DoStmt dostmt = (DoStmt) stmt;
+		// System.out.println("do at line " + stmt.lineNumber());
+		// } else if (stmt instanceof ForStmt) {
+		// ForStmt forstmt = (ForStmt) stmt;
+		// System.out.println("do at line " + stmt.lineNumber());
+		// } else if (stmt instanceof BreakStmt) {
+		//
+		// } else if (stmt instanceof ContinueStmt) {
+		//
+		// } else if (stmt instanceof ThrowStmt) {
+		//
+		// } else if (stmt instanceof TryStmt) {
+		//
+		// } else if (stmt instanceof ContinueStmt) {
+		//
+		// }
+	}
+
+	private void checkExpr(Expr expr) {
+//		System.out.println("EXPR: " + expr + " in line " + expr.lineNumber());
+		
+
 	}
 }
