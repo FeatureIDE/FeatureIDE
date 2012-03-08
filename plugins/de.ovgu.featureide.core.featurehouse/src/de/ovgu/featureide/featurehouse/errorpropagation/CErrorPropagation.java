@@ -70,7 +70,7 @@ public class CErrorPropagation extends ErrorPropagation {
 			}
 			int i = -1;
 			if (m.isConstructor) {
-				String body = m.getBody().substring(m.getBody().indexOf("{") + 1);
+				String body = m.getBody().substring(m.getBody().indexOf('{') + 1);
 				while (body.contains("  ")) {
 					body = body.replaceAll("  ", " ");
 				}
@@ -82,7 +82,7 @@ public class CErrorPropagation extends ErrorPropagation {
 				while (body.contains(" \n")) {
 					body = body.replaceAll(" \n", "\n");
 				}
-				body = body.substring(0, body.lastIndexOf("}"));
+				body = body.substring(0, body.lastIndexOf('}'));
 				i = content.indexOf(body);
 			} else {
 				String body = m.getBody();
@@ -115,7 +115,7 @@ public class CErrorPropagation extends ErrorPropagation {
 	@Override
 	boolean propagateMarker(IMarker m) {
 		try {
-			return !(m.getType().equals(TASK));
+			return !(TASK.equals(m.getType()));
 		} catch (CoreException e) {
 		}
 		return super.propagateMarker(m);

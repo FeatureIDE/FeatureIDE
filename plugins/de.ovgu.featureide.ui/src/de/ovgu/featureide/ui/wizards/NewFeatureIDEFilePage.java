@@ -322,9 +322,11 @@ public class NewFeatureIDEFilePage extends WizardPage {
 	private void initComboClassName() {
 		String c = comboClass.getText();
 		Object obj = selection.getFirstElement();
-		if (obj instanceof IFile && ((IFile) obj).getFileExtension() != null &&
-				composer.extensions().contains((".") + ((IFile) obj).getFileExtension())) {
-			c = ((IFile) obj).getName().substring(0, ((IFile) obj).getName().lastIndexOf("."));
+		String fileExtension = ((IFile) obj).getFileExtension();
+		if (obj instanceof IFile && fileExtension != null &&
+				composer.extensions().contains("." + fileExtension)) {
+			String fileName = ((IFile) obj).getName();
+			c = fileName.substring(0, fileName.lastIndexOf('.'));
 		}
 		comboClass.removeAll();
 		LinkedList<String> inclusions = new LinkedList<String>();
@@ -385,9 +387,11 @@ public class NewFeatureIDEFilePage extends WizardPage {
 		try {
 			for (IResource res : folder.members()) {
 				if (res instanceof IFile) {
-					if (res.getFileExtension() != null && 
-							res.getFileExtension().equals(getExtension())) {
-						classes.add(res.getName().substring(0, res.getName().lastIndexOf(".")));
+					String fileExtension = res.getFileExtension(); 
+					if (fileExtension != null && 
+							fileExtension.equals(getExtension())) {
+						String resourceName = res.getName();
+						classes.add(resourceName.substring(0, resourceName.lastIndexOf('.')));
 					}
 				}
 			}
@@ -425,7 +429,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 			} else {
 				for (IResource res : folder.members()) {
 					if (res instanceof IFolder) {
-						String subPackage = (packageName.equals("") ? "" : packageName + ".") + res.getName();
+						String subPackage = ("".equals(packageName) ? "" : packageName + ".") + res.getName();
 						if (!containsPackage(subPackage)) {
 							comboPackage.add(subPackage);
 						}
@@ -453,10 +457,10 @@ public class NewFeatureIDEFilePage extends WizardPage {
 		while (!featureProject.getProject().getFolder(folder.getName()).equals(folder)) {
 			if (!composer.hasFeatureFolders()) {
 				if (sourceFolder.equals(folder)) {
-					return p.equals("") ? p : p.substring(1);
+					return "".equals(p) ? p : p.substring(1);
 				}
 			} else if (sourceFolder.getFolder(folder.getName()).equals(folder)) {
-				return p.equals("") ? p : p.substring(1);
+				return "".equals(p) ? p : p.substring(1);
 			} else {
 				p = "." + folder.getName() + p;
 				folder = (IFolder) folder.getParent();

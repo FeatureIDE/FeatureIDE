@@ -145,7 +145,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 
 		originalFeatureModel = new FeatureModel();
 		try {
-			// TODO do not parse the model two times
+			// TODO do not parse the model twice
 			new XmlFeatureModelReader(originalFeatureModel,file.getProject()).readFromFile(file);
 			new XmlFeatureModelReader(featureModel,file.getProject()).readFromFile(file);
 		} catch (Exception e) {

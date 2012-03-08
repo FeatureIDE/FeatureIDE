@@ -19,6 +19,7 @@
 package de.ovgu.featureide.featurehouse.errorpropagation;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.TreeMap;
@@ -33,6 +34,7 @@ import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
+import de.ovgu.featureide.fm.core.FeatureModel;
 
 /**
  * Propagates errors for <code>FeatureHouse</code> Java files.
@@ -48,9 +50,10 @@ public class JavaErrorPropagation extends ErrorPropagation {
 	//private static final String IMPORT = "The import";
 	
 	private static final String TASK = "org.eclipse.jdt.core.task";
+	private ArrayList<String> layerNames = null;
 	
 	/**
-	 * TODO improve description
+	 * TODO @Jens improve description
 	 * Sets all composed lines to all methods and fields
 	 */
 	@Override
@@ -82,7 +85,7 @@ public class JavaErrorPropagation extends ErrorPropagation {
 			}
 			int i = -1;
 			if (m.isConstructor) {
-				String body = m.getBody().substring(m.getBody().indexOf("{") + 1);
+				String body = m.getBody().substring(m.getBody().indexOf('{') + 1);
 				while (body.contains("  ")) {
 					body = body.replaceAll("  ", " ");
 				}
@@ -91,7 +94,7 @@ public class JavaErrorPropagation extends ErrorPropagation {
 					body = body.replaceAll(" \\(", "(");
 				}
 				body = body.replaceAll("\r\n", "\n");
-				body = body.substring(0, body.lastIndexOf("}"));
+				body = body.substring(0, body.lastIndexOf('}'));
 				i = content.indexOf(body);
 			} else {
 				String body = m.getBody();
@@ -136,7 +139,7 @@ public class JavaErrorPropagation extends ErrorPropagation {
 	@Override
 	boolean propagateMarker(IMarker m) {
 		try {
-			return !(m.getType().equals(TASK));
+			return !(TASK.equals(m.getType()));
 		} catch (CoreException e) {
 		}
 		return super.propagateMarker(m);
@@ -169,15 +172,13 @@ public class JavaErrorPropagation extends ErrorPropagation {
 		try {
 			int line = 1;
 			scanner = new Scanner(file.getRawLocation().toFile());
-			if (scanner.hasNext()) {
-				while (scanner.hasNext()) {
-					String content = scanner.nextLine();
-					content = correctString(content);
-					if (content.endsWith(lineContent)) {
-						return line;
-					}
-					line++;
+			while (scanner.hasNext()) {
+				String content = scanner.nextLine();
+				content = correctString(content);
+				if (content.endsWith(lineContent)) {
+					return line;
 				}
+				line++;
 			}
 		} catch (FileNotFoundException e) {
 			CorePlugin.getDefault().logError(e);
@@ -198,7 +199,7 @@ public class JavaErrorPropagation extends ErrorPropagation {
 			string = string.replaceAll("  ", " ");
 		}
 		if (string.endsWith("{")) {
-			string = string.substring(0, string.indexOf("{"));
+			string = string.substring(0, string.indexOf('{'));
 		}
 		if (string.endsWith(" ")) {
 			string = string.substring(0,string.length()-1);
@@ -215,14 +216,24 @@ public class JavaErrorPropagation extends ErrorPropagation {
 		if (project == null) {
 			return null;
 		}
-		// TODO FSTMODEL this needs to be easier
+		
+		if (layerNames == null) {
+			FeatureModel model = project.getFeatureModel();
+			if (model.isFeatureOrderUserDefined()) {
+				layerNames = model.getFeatureOrderList();
+			} else {
+				layerNames = (ArrayList<String>) model.getConcreteFeatureNames();
+			}
+		}
+		
 		LinkedList<IFile> featureFiles = new LinkedList<IFile>();
-		for (String name : project.getFeatureModel().getConcreteFeatureNames()) {
+		for (String name : layerNames) {
 			for (FSTFeature f : project.getFSTModel().getFeaturesMap().values()) {
 				if (f.getName().equals(name)) {
 					TreeMap<String, FSTClass> z = f.getClasses();
-					if (z.containsKey(file.getName())) {
-						featureFiles.add((z.get(file.getName())).getFile());
+					String fileName = file.getName();
+					if (z.containsKey(fileName)) {
+						featureFiles.add((z.get(fileName)).getFile());
 					}
 				}
 			}

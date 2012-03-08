@@ -376,10 +376,9 @@ public class PersistentPropertyManager implements IPersistentPropertyManager,
 	 */
 	private int getInt(QualifiedName name, int defaultValue) {
 		try {
-			if (workspaceRoot.getPersistentProperty(name) != null &&
-					!workspaceRoot.getPersistentProperty(name).equals("")) {
-				String x = workspaceRoot.getPersistentProperty(name);
-				return Integer.parseInt(x);
+			String property = workspaceRoot.getPersistentProperty(name);
+			if (property != null && !"".equals(property)) {
+				return Integer.parseInt(property);
 			}
 		} catch (CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
@@ -409,11 +408,7 @@ public class PersistentPropertyManager implements IPersistentPropertyManager,
 	 */
 	private boolean getBoolean(QualifiedName name) {
 		try {
-			if (workspaceRoot.getPersistentProperty(name) != null &&
-					!workspaceRoot.getPersistentProperty(name).equals("")) {
-				return workspaceRoot.getPersistentProperty(name).equals("true") ? true
-						: false;
-			}
+			return "true".equals(workspaceRoot.getPersistentProperty(name));
 		} catch (CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
@@ -443,12 +438,13 @@ public class PersistentPropertyManager implements IPersistentPropertyManager,
 	 */
 	private Color getColor(QualifiedName name, Color deafaultColor) {
 		try {
-			if (workspaceRoot.getPersistentProperty(name) != null &&
-					!workspaceRoot.getPersistentProperty(name).equals("")) {
-				String[] color = workspaceRoot.getPersistentProperty(name)
-						.split("[|]");
-				return new Color(null, Integer.parseInt(color[0]),
-						Integer.parseInt(color[1]), Integer.parseInt(color[2]));
+			String property = workspaceRoot.getPersistentProperty(name);
+			if (property != null) {
+				String[] color = property.split("[|]");
+				if (color.length == 3) {
+					return new Color(null, Integer.parseInt(color[0]),
+							Integer.parseInt(color[1]), Integer.parseInt(color[2]));
+				}
 			}
 		} catch (CoreException e) {
 			FMCorePlugin.getDefault().logError(e);

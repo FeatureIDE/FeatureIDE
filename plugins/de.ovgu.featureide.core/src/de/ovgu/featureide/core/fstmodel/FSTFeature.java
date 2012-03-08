@@ -76,7 +76,7 @@ public class FSTFeature extends FSTModelElement {
 	/**
 	 * @param classes the classes to set
 	 */
-	public void setClasses(TreeMap<String, FSTClass> classes) {
+	public final void setClasses(TreeMap<String, FSTClass> classes) {
 		this.classes = classes;
 	}
 

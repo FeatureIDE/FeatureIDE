@@ -62,6 +62,7 @@ import de.ovgu.featureide.fm.core.propertypage.IPersistentPropertyManager;
  * @author Thomas Thuem
  * 
  */
+// TODO all retruning lists shoul be of the same type
 public class FeatureModel implements PropertyConstants {
 
 	/**
@@ -1355,6 +1356,7 @@ public class FeatureModel implements PropertyConstants {
 	 * @return the featureOrderList
 	 */
 	public ArrayList<String> getFeatureOrderList() {
+		// TODO should return getConcreteFeatureNames() if null.
 		return featureOrderList;
 	}
 

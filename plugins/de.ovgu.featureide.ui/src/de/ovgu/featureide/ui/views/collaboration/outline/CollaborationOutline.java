@@ -351,7 +351,7 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 									viewer.getControl().setRedraw(false);
 
 									if (iFile != null) {
-										if (iFile.getName().equals("model.xml")
+										if ("model.xml".equals(iFile.getName())
 												&& active_editor instanceof FeatureModelEditor) {
 
 											viewer.setContentProvider(modelContentProvider);

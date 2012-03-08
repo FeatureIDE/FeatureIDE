@@ -26,7 +26,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
-import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
@@ -79,8 +78,7 @@ public class ClassEditPart extends AbstractGraphicalEditPart {
 				height = ((CollaborationEditPart) o).getFigure().getSize().height + 8;
 			}
 		}
-		Figure fig = new ClassFigure(getClassModel(), height * (count) - 8);
-		return fig;
+		return new ClassFigure(getClassModel(), height * (count) - 8);
 	}
 
 	/*
@@ -95,11 +93,7 @@ public class ClassEditPart extends AbstractGraphicalEditPart {
 
 	@Override
 	protected List<?> getModelChildren() {
-
-		Class c = getClassModel();
-		List<?> list = c.getRoles();
-		return list;
-
+		return getClassModel().getRoles();
 	}
 
 	protected void refreshVisuals() {

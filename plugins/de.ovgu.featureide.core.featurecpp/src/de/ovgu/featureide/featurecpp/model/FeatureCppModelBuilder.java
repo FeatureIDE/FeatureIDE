@@ -119,7 +119,6 @@ public class FeatureCppModelBuilder {
 		FSTField field = new FSTField(array[4], array[5], 0, array[6]);
 		field.setOwn(currentFile);
 		currentClass.add(field);
-		
 	}
 
 	private void addMethod(String[] array) {

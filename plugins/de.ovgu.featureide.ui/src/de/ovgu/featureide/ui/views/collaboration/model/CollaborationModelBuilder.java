@@ -332,8 +332,8 @@ public class CollaborationModelBuilder {
 					              ".";
 					Role role;
 					if (extensions.contains(name)) {
-						role = new Role(res.getName());
 						name = res.getName();
+						role = new Role(name);
 					} else {
 						name = "*" + name;
 						role = new Role(name);

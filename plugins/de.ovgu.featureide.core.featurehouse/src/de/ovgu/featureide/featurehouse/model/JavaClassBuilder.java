@@ -21,7 +21,6 @@ package de.ovgu.featureide.featurehouse.model;
 import java.util.LinkedList;
 
 import de.ovgu.cide.fstgen.ast.FSTTerminal;
-import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 
 /**
@@ -42,13 +41,9 @@ public class JavaClassBuilder extends ClassBuilder {
 		LinkedList<String> fields = getFields(terminal.getBody());
 		for (int i = 2;i < fields.size();i++) {
 			// add field
-			FSTField field = new FSTField(fields.get(i), fields.get(1), 0, fields.get(0), terminal.getBody(), terminal.beginLine, terminal.endLine);
-			field.setOwn(modelBuilder.getCurrentFile());
-			modelBuilder.getCurrentClass().add(field);
+			addField(fields.get(i), fields.get(1), 0, fields.get(0), terminal.getBody(), terminal.beginLine, terminal.endLine);
 		}
 	}
-	
-	
 
 	/**
 	 * 
@@ -181,12 +176,12 @@ public class JavaClassBuilder extends ClassBuilder {
 	}
 	
 	private String getMethodName(FSTTerminal terminal) {
-		return terminal.getName().substring(0, terminal.getName().indexOf("("));
+		return terminal.getName().substring(0, terminal.getName().indexOf('('));
 	}
 	
 	private LinkedList<String> getMethodParameter(FSTTerminal terminal) {
 		String parameter = terminal.getName().substring(
-				terminal.getName().indexOf("(") + 1, terminal.getName().indexOf(")"));
+				terminal.getName().indexOf('(') + 1, terminal.getName().indexOf(')'));
 		LinkedList<String> parameterTypes = new LinkedList<String>();
 		if (!parameter.equals("") && !parameter.startsWith("{")) {
 			String[] p = parameter.split("[-]");

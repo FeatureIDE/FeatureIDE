@@ -294,9 +294,10 @@ public class ConfigurationPage extends ConfigurationEditorPage {
 	
 	private void add(TreeItem parent,TreeElement[] children){
 		for (TreeElement child : children){
-			if (!hiddenFeatures.contains(child.toString())) {
+			String childName = child.toString();
+			if (!hiddenFeatures.contains(childName)) {
 				TreeItem item = new TreeItem(parent,0);
-				item.setText(child.toString());
+				item.setText(childName);
 				add(item,child.getChildren());
 				item.setExpanded(true);
 			}

@@ -65,7 +65,7 @@ public class AddRoleAction extends Action {
 			else if (selectedItem instanceof ClassEditPart) {
 				clss = ((ClassEditPart) selectedItem).getClassModel().getName();
 				if (clss.contains("."))
-					clss = clss.substring(0,clss.lastIndexOf("."));
+					clss = clss.substring(0,clss.lastIndexOf('.'));
 			}
 		}
 		

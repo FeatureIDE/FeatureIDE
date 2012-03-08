@@ -27,7 +27,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.Vector;
 
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
@@ -104,8 +103,6 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	 */
 	private final FeatureModel featureModel;
 
-	private PropertyChangeListener featureModelChangeListner;
-
 	private final IFeatureModelReader modelReader;
 
 	private FSTModel featureIDEProjectModel;
@@ -163,8 +160,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		project = aProject;
 
 		featureModel = new FeatureModel();
-		featureModelChangeListner = new FeatureModelChangeListner();
-		featureModel.addListener(featureModelChangeListner);
+		featureModel.addListener(new FeatureModelChangeListner());
 		modelReader = new XmlFeatureModelReader(featureModel,aProject);
 
 		// initialize project structure
@@ -181,7 +177,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			// Nature
 			if (project.getDescription().getNatureIds().length == 1
 					&& project.hasNature(FeatureProjectNature.NATURE_ID)) {
-				if (!(getProjectBuildPath().equals("") && getProjectSourcePath().equals(""))) {
+				if (!("".equals(getProjectBuildPath()) && "".equals(getProjectSourcePath()))) {
 					binFolder = CorePlugin.createFolder(project, "bin");
 				}
 			}
@@ -640,7 +636,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	 * @see de.ovgu.featureide.core.IFeatureProject#getJavaClassPath()
 	 */
 	public String[] getJavaClassPath() {
-		Vector<String> cp = new Vector<String>();
+		ArrayList<String> cp = new ArrayList<String>();
 		cp.add(".");
 		cp.add(binFolder.getRawLocation().toOSString());
 		if (libFolder.exists()) { // delete lib folder implementation
@@ -668,7 +664,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	 * @see de.ovgu.featureide.core.IFeatureProject#getAdditionalJavaClassPath()
 	 */
 	public String[] getAdditionalJavaClassPath() {
-		Vector<String> cp = new Vector<String>();
+		ArrayList<String> cp = new ArrayList<String>();
 		String classPath = null;
 		try {
 			classPath = project.getPersistentProperty(javaClassPathID);

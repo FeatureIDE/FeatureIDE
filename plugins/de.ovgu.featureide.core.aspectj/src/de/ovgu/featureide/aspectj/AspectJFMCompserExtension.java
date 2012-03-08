@@ -91,14 +91,14 @@ public class AspectJFMCompserExtension extends FMComposerExtension {
 	private String getPackege(String aspectName) {
 		if (aspectName.contains("_")) {
 			return aspectName.replaceAll("_", ".").substring(0,
-					aspectName.lastIndexOf("_"));
+					aspectName.lastIndexOf('_'));
 		}
 		return null;
 	}
 
 	private String getAspect(String aspectName) {
 		if (aspectName.contains("_")) {
-			return aspectName.substring(aspectName.lastIndexOf("_") + 1,
+			return aspectName.substring(aspectName.lastIndexOf('_') + 1,
 					aspectName.length());
 		}
 		return aspectName;

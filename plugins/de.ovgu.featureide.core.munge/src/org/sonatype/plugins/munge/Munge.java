@@ -190,7 +190,7 @@ public class Munge {
 
         IFolder folder = featureProject.getSourceFolder();
         while (inName.contains("\\")) {
-            folder = folder.getFolder(inName.substring(0, inName.indexOf("\\")));
+            folder = folder.getFolder(inName.substring(0, inName.indexOf('\\')));
         }
 
         return folder.getFile(inName);

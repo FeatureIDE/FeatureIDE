@@ -63,9 +63,9 @@ public class ConversionPage extends NewFeatureProjectPage {
 				for (IClasspathEntry entry : javaProject.getRawClasspath()) {
 					if (entry.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
 						String path = entry.getPath().toOSString();
-						if (path.contains("\\")) path = path.substring(path.indexOf("\\") + 1);
-						if (path.contains("\\")) path = path.substring(path.indexOf("\\") + 1);
-
+						if (path.contains("\\")) path = path.substring(path.indexOf('\\') + 1);
+						if (path.contains("\\")) path = path.substring(path.indexOf('\\') + 1);
+						
 						buildPath.setText(path);
 						buildPath.setEnabled(false);
 						buildLabel.setToolTipText(MESSAGE);

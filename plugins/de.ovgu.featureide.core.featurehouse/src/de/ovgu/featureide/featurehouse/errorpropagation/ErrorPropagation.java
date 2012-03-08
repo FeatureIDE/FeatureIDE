@@ -19,6 +19,7 @@
 package de.ovgu.featureide.featurehouse.errorpropagation;
 
 import java.io.FileNotFoundException;
+import java.util.AbstractCollection;
 import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.TreeMap;
@@ -191,10 +192,11 @@ public class ErrorPropagation {
 	 * @param markers
 	 * @param file
 	 */
-	private void propagateMarkers(LinkedList<IMarker> markers, IFile file) {
+	private void propagateMarkers(AbstractCollection<IMarker> markers, IFile file) {
 		if (!file.exists()) {
 			return;
 		}
+
 		String content = getFileContent(file);
 		LinkedList<FSTField> fields = new LinkedList<FSTField>();
 		LinkedList<FSTMethod> methods = new LinkedList<FSTMethod>();
@@ -224,6 +226,11 @@ public class ErrorPropagation {
 			if (!marker.exists()) {
 				continue;
 			}
+			
+			if (marker.getAttribute(IMarker.MESSAGE, "").startsWith("The import")) {
+				propagateUnsupportedMarker(marker, file);
+				continue;
+			}
 			int markerLine = marker.getAttribute(IMarker.LINE_NUMBER, -1);
 			if (markerLine == -1) {
 				continue;
@@ -231,6 +238,9 @@ public class ErrorPropagation {
 			
 			boolean propagated = false;
 			for (FSTField f : fields) {
+				if (f.getEndLine() == -1) {
+					continue;
+				}
 				if (markerLine >= f.getComposedLine()
 						&& markerLine <= f.getComposedLine()
 								+ (f.getEndLine() - f.getBeginLine())) {
@@ -246,6 +256,9 @@ public class ErrorPropagation {
 			}
 
 			for (FSTMethod m : methods) {
+				if (m.getEndLine() == -1) {
+					continue;
+				}
 				if (markerLine >= m.getComposedLine() && 
 						markerLine <= m.getComposedLine() + (m.getEndLine() - m.getBeginLine())) {
 					propagateMarker(marker, m.getOwnFile(), m.getBeginLine() + markerLine - m.getComposedLine());

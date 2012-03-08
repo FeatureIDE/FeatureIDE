@@ -103,7 +103,7 @@ public class FSTField extends FSTModelElement implements Comparable<Object> {
 		for (IFile f : ownFiles) {
 			return f;
 		}
-		return  null;
+		return null;
 	}
 	
 	public void setAvailable(IFile file) {

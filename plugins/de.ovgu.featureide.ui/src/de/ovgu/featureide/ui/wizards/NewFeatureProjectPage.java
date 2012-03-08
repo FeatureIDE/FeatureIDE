@@ -114,7 +114,7 @@ public class NewFeatureProjectPage extends WizardPage {
 		}
 		
 		String descriptionString = descriptionStringBuilder.toString();
-		if (ComposerExtensionManager.getInstance().getComposers().size() == 0) {
+		if (composerExtensions.isEmpty()) {
 			descriptionString = "No composition engines installed.";
 			setDescription(descriptionString);
 			toolCB.setEnabled(false);

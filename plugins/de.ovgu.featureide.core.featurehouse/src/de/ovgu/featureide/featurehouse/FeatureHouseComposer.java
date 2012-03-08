@@ -29,7 +29,6 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -131,8 +130,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	 */
 	private String getTokenMgrErrorMessage(String message) {
 		if (!message.contains("line ") || !message.contains("Encountered")) return message;
-		message = message.substring(0, message.indexOf(" at ")) + " e" + message.substring(message.indexOf("ncountered:"));
-		return message;
+		return message.substring(0, message.indexOf(" at ")) + " e" + message.substring(message.indexOf("ncountered:"));
 	}
 	
 	/**
@@ -144,7 +142,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	 */
 	private int getTokenMgrErrorLine(String message) {
 		if (!message.contains("line ")) return -1;
-		return Integer.parseInt(message.substring(message.indexOf("line ") + 5, message.indexOf(",")));
+		return Integer.parseInt(message.substring(message.indexOf("line ") + 5, message.indexOf(',')));
 	}
 
 	/**
@@ -164,7 +162,8 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 				}
 				IFile conf = featureProject.getCurrentConfiguration();
 				if (conf != null) {
-					sourcefolder = sourcefolder.getFolder(conf.getName().substring(0, conf.getName().indexOf(".")));
+					String configName = conf.getName();
+					sourcefolder = sourcefolder.getFolder(configName.substring(0, configName.indexOf('.')));
 					if (!sourcefolder.exists()) {
 						try {
 							sourcefolder.create(true, true, null);
@@ -203,7 +202,6 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		setJavaBuildPath(config.getName().split("[.]")[0]);
 
 		composer = new FSTGenComposer(false);
-		composer.addParseErrorListener(listener);
 		try {
 			composer.run(new String[] {
 					CmdLineInterpreter.INPUT_OPTION_EQUATIONFILE, configPath,
@@ -211,11 +209,33 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 					CmdLineInterpreter.INPUT_OPTION_OUTPUT_DIRECTORY, outputPath + "/" 
 			});
 		} catch (TokenMgrError e) {
+			
+		}
+		fhModelBuilder.buildModel(composer.getFstnodes(), false);
+		
+		composer = new FSTGenComposer(false);
+		composer.addParseErrorListener(listener);
+		
+		ArrayList<String> featureOrderList = featureProject.getFeatureModel().getConcreteFeatureNames();
+		String[] features = new String[featureOrderList.size()];
+		int i = 0;
+		for (String f : featureOrderList) {
+			features[i++] = f;
+		}
+		
+		try {
+			composer.buildFullFST(new String[] {
+					CmdLineInterpreter.INPUT_OPTION_EQUATIONFILE, configPath,
+					CmdLineInterpreter.INPUT_OPTION_BASE_DIRECTORY, basePath,
+					CmdLineInterpreter.INPUT_OPTION_OUTPUT_DIRECTORY, outputPath + "/" 
+			}, features);
+		} catch (TokenMgrError e) {
 			createBuilderProblemMarker(getTokenMgrErrorLine(e.getMessage()), getTokenMgrErrorMessage(e.getMessage()));
 		} catch (Error e) {
 			FeatureHouseCorePlugin.getDefault().logError(e);
 		}
-		fhModelBuilder.buildModel(composer.getFstnodes());
+		
+		fhModelBuilder.buildModel(composer.getFstnodes(), true);
 
 		TreeBuilderFeatureHouse fstparser = new TreeBuilderFeatureHouse(
 				featureProject.getProjectName());
@@ -375,10 +395,11 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 				}
 				copy((IFolder) res, folder);
 			} else if (res instanceof IFile) {
-				if (!res.getName().contains(".")
+				String resourceName = res.getName();
+				if (!resourceName.contains(".")
 						|| !extensions().contains(
-								"." + res.getName().split("[.]")[1])) {
-					IFile file = buildFolder.getFile(res.getName());
+								"." + resourceName.split("[.]")[1])) {
+					IFile file = buildFolder.getFile(resourceName);
 					if (!file.exists()) {
 						res.copy(file.getFullPath(), true, null);
 					}
@@ -463,12 +484,38 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 	@Override
 	public void buildFSTModel() {
+		assert (featureProject != null) : "Invalid project given";
+
+		final String configPath = featureProject.getCurrentConfiguration().getRawLocation().toOSString();
+		final String basePath = featureProject.getSourcePath();
+		final String outputPath = featureProject.getBuildPath();
+
+		if (configPath == null || basePath == null || outputPath == null)
+			return;
+		
+		composer = new FSTGenComposer(false);
+		composer.addParseErrorListener(listener);
+		
+		ArrayList<String> featureOrderList = featureProject.getFeatureModel().getConcreteFeatureNames();
+		String[] features = new String[featureOrderList.size()];
+		int i = 0;
+		for (String f : featureOrderList) {
+			features[i++] = f;
+		}
+		
 		try {
-			featureProject.getProject().build(
-					IncrementalProjectBuilder.FULL_BUILD, null);
-		} catch (CoreException e) {
+			composer.buildFullFST(new String[] {
+					CmdLineInterpreter.INPUT_OPTION_EQUATIONFILE, configPath,
+					CmdLineInterpreter.INPUT_OPTION_BASE_DIRECTORY, basePath,
+					CmdLineInterpreter.INPUT_OPTION_OUTPUT_DIRECTORY, outputPath + "/" 
+			}, features);
+		} catch (TokenMgrError e) {
+			createBuilderProblemMarker(getTokenMgrErrorLine(e.getMessage()), getTokenMgrErrorMessage(e.getMessage()));
+		} catch (Error e) {
 			FeatureHouseCorePlugin.getDefault().logError(e);
 		}
+		
+		fhModelBuilder.buildModel(composer.getFstnodes(), false);
 	}
 
 	/*

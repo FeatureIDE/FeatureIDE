@@ -713,9 +713,9 @@ public class ConstraintDialog implements GUIDefaults {
 	}
 	
 	public String getFalseOptionalString (List<Feature> list){
+		String listString = list.toString();
 		String featureString = "Constraint causes the following features to be false optional: " + '\n';		
-		featureString += list.toString().substring(1, list.toString().length()-1);
-		return featureString;
+		return featureString + listString.substring(1, listString.length()-1);
 	}
 
 	/**

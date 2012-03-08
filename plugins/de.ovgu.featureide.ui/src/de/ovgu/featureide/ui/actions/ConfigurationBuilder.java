@@ -192,12 +192,14 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			JavaProject proj = new JavaProject(project.getProject(), null);
 			IJavaElement[] elements = proj.getChildren();
 			for (IJavaElement e : elements) {
-				if (e.getPath().toString().contains(":")) {
-					classpath += sep + e.getPath().toOSString();
-				} else if (e.getResource() != null && 
-						e.getResource().getFileExtension() != null && 
-						e.getResource().getFileExtension().equals("jar")) {
-					classpath += sep + e.getResource().getRawLocation().toOSString();
+				String path = e.getPath().toOSString();
+				if (path.contains(":")) {
+					classpath += sep + path;
+					continue;
+				}
+				IResource resource = e.getResource();
+				if (resource != null && "jar".equals(resource.getFileExtension())) {
+					classpath += sep + resource.getRawLocation().toOSString();
 				}
 			}
 		} catch (JavaModelException e) {
@@ -274,7 +276,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			String errorMessage = matcher.group(3);
 			errorMessage = errorMessage.substring(1);
 
-			if (errorMessage.equals(CANNOT_FIND_SYMBOL)) {
+			if (CANNOT_FIND_SYMBOL.equals(errorMessage)) {
 				errorMessage = parseCannotFindSymbolMessage(scanner);
 			}
 			if (errorMessage.contains(ERROR_IGNOR_RAW_TYPE) || errorMessage.contains(ERROR_IGNOR_CAST) 
@@ -324,7 +326,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			for (IResource res : folder.members()) {
 				if (res instanceof IFolder) {
 					files.addAll(getJavaFiles((IFolder)res));
-				} else if (res.getFileExtension().equals("java")) {
+				} else if ("java".equals(res.getFileExtension())) {
 					files.add((IFile)res);
 				}
 			}
@@ -436,7 +438,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 				if (configuration.valid()) {
 					LinkedList<String> selectedFeatures3 = new LinkedList<String>();
 					for (String f : selected.split("[ ]")) {
-						if (!f.equals("")) {
+						if (!"".equals(f)) {
 							selectedFeatures3.add(f);
 						}
 					}
@@ -506,7 +508,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		selectedFeatures2.removeFirst();
 		LinkedList<Feature> selectedFeatures3 = new LinkedList<Feature>();
 		if (currentFeature.isLayer()) {
-			if (selected.equals("")) {
+			if ("".equals(selected)) {
 				selected = currentFeature.getName();
 			} else {
 				selected += " " + currentFeature.getName();
@@ -536,7 +538,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		selectedFeatures2.removeFirst();
 		LinkedList<Feature> selectedFeatures3 = new LinkedList<Feature>();
 		if (currentFeature.isLayer()) {
-			if (selected.equals("")) {
+			if ("".equals(selected)) {
 				selected = currentFeature.getName();
 			} else {
 				selected += " " + currentFeature.getName();
@@ -576,7 +578,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		selectedFeatures2.removeFirst();
 		LinkedList<Feature> selectedFeatures3 = new LinkedList<Feature>();
 		if (currentFeature.isLayer()) {
-			if (selected.equals("")) {
+			if ("".equals(selected)) {
 				selected = currentFeature.getName();
 			} else {
 				selected += " " + currentFeature.getName();

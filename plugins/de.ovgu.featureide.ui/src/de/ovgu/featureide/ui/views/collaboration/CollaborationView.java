@@ -53,6 +53,7 @@ import org.eclipse.ui.progress.UIJob;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.builder.IComposerExtension;
 import de.ovgu.featureide.core.listeners.ICurrentBuildListener;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.action.AddRoleAction;
@@ -184,7 +185,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 						//case: it's a featureIDE project
 						if (inputFile.getName().contains(".") &&
 								CorePlugin.getDefault().getConfigurationExtensions()
-								.contains(inputFile.getName().substring(inputFile.getName().lastIndexOf(".")))) {
+								.contains(inputFile.getName().substring(inputFile.getName().lastIndexOf('.')))) {
 							//case: open configuration editor
 							builder.editorFile = null;
 							if (builder.configuration != null &&
@@ -275,8 +276,13 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 							return Status.OK_STATUS;
 						toolbarAction.setEnabled(false);
 						builded = true;
-						featureProject.getComposer().buildFSTModel();
-						updateGuiAfterBuild(featureProject);
+						if (featureProject != null) {
+							IComposerExtension composer = featureProject.getComposer();
+							if (composer != null) {
+								composer.buildFSTModel();
+								updateGuiAfterBuild(featureProject);
+							}
+						}
 						return Status.OK_STATUS;
 					}
 				};

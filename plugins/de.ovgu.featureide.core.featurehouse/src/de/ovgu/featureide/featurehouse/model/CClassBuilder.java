@@ -134,12 +134,12 @@ public class CClassBuilder extends ClassBuilder {
 	public LinkedList<String> getMethod(String body) {
 		LinkedList<String> method = new LinkedList<String>();
 		
-		String name = body.substring(0, body.indexOf("("));
+		String name = body.substring(0, body.indexOf('('));
 		name = name.replaceAll("\n", " ");
 		while (name.endsWith(" ")) {
 			name = name.substring(0, name.length() - 1);
 		}
-		name = name.substring(name.lastIndexOf(" ") + 1);
+		name = name.substring(name.lastIndexOf(' ') + 1);
 		method.add(name);
 		
 		String returnType = body.substring(0, body.indexOf(name));
@@ -160,7 +160,7 @@ public class CClassBuilder extends ClassBuilder {
 		method.add(returnType);
 		method.add(modifiers.toString());
 		
-		String parameter = body.substring(body.indexOf("(")+1, body.indexOf(")"));
+		String parameter = body.substring(body.indexOf('(')+1, body.indexOf(')'));
 		String[] params = parameter.split(",");
 		for (String p : params) {
 			while (p.startsWith(" ")) {

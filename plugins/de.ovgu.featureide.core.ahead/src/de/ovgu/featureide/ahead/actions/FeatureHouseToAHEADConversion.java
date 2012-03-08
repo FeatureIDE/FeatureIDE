@@ -18,6 +18,7 @@
  */
 package de.ovgu.featureide.ahead.actions;
 
+import java.util.AbstractList;
 import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
@@ -38,7 +39,10 @@ import org.eclipse.jdt.internal.core.JavaProject;
 import de.ovgu.featureide.ahead.AheadComposer;
 import de.ovgu.featureide.ahead.AheadCorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.fstmodel.FSTClass;
+import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
+import de.ovgu.featureide.core.fstmodel.FSTModel;
 
 /**
  * Changes the composer of an feature project project to <code>AHEAD</code>.
@@ -47,6 +51,8 @@ import de.ovgu.featureide.core.fstmodel.FSTMethod;
  */
 @SuppressWarnings("restriction")
 public class FeatureHouseToAHEADConversion extends ComposerConversion {
+	private FSTModel model;
+
 	/**
 	 * Changes the composer of the given feature project to <code>AHEAD</code>.
 	 * @param featureProject
@@ -55,19 +61,38 @@ public class FeatureHouseToAHEADConversion extends ComposerConversion {
 		if (featureProject == null) {
 			return;
 		}
+		this.featureProject = featureProject; 
 		AheadCorePlugin.getDefault().logInfo("Change the composer of project " 
 				+ featureProject.getProjectName() + 
 				" from FeatureHouse to AHEAD.");
 		Job job = new Job("Change composer.") {
 			protected IStatus run(IProgressMonitor monitor) {
-				setJavaBuildPath(featureProject);
-				start(featureProject);
+				try {
+					setJavaBuildPath(featureProject);
+					monitor.beginTask("Change composer.", 2);
+					monitor.subTask("Build full FSTModel.");
+					buildFullFSTModel();
+					model = featureProject.getFSTModel();
+					monitor.worked(1);
+					monitor.subTask("Replace keywords.");
+					start(featureProject);
+					monitor.worked(1);
+				} finally {
+					monitor.done();
+				}
 				return Status.OK_STATUS;
 			}
 		};
-		job.setPriority(Job.SHORT);
+		job.setPriority(Job.BUILD);
 		job.schedule();
 		
+	}
+
+	/**
+	 * 
+	 */
+	protected void buildFullFSTModel() {
+		featureProject.getComposer().buildFSTModel();
 	}
 
 	/**
@@ -136,10 +161,12 @@ public class FeatureHouseToAHEADConversion extends ComposerConversion {
 		return changeFile(fileText, file, null);
 	}
 	
-	private String changeFile(String fileText, IFile file, LinkedList<String> methodNames) {
-		fileText = fileText.replaceFirst("package\\s*\\w*;", ""); 
+	// XXX private fields used in refining classes need to be set package private  
+	private String changeFile(String fileText, IFile file, AbstractList<String> methodNames) {
+		fileText = fileText.replaceFirst("package\\s[\\w,\\s,.]*;", ""); 
 		
 		if (fileText.contains("original(")) {
+			// XXX also set refines if the file exists in a feature before
 			fileText = fileText.replaceFirst(" class ",	" refines class ");
 		}
 		int i = 0;
@@ -163,16 +190,26 @@ public class FeatureHouseToAHEADConversion extends ComposerConversion {
 	}
 
 	/**
-	 * TODO a full FST for FH is needed
-	 * 
+	 *
 	 * @param line
 	 * @param file
 	 * @return The Method at the given line
 	 */
 	private String getMethodName(int line, IFile file) {
-		if (featureProject.getFSTModel() != null &&
-				featureProject.getFSTModel().getClass(file) !=  null) {
-			for (FSTMethod method : featureProject.getFSTModel().getClass(file).getMethods()) {
+		if (model != null && model.getClass(file) !=  null) {
+			FSTFeature[] features = model.getFeatures();
+			LinkedList<FSTMethod> methods = new LinkedList<FSTMethod>();
+			for (FSTFeature f : features) {
+				for (FSTClass c : f.getClasses().values()) {
+					if (c.getFile().getName().equals(file.getName())) {
+						for (FSTMethod m : c.getMethods()) {
+							methods.add(m);
+						}
+					}
+				}
+			}
+
+			for (FSTMethod method : methods) {
 				if (method.getBeginLine() <= line && method.getEndLine() >= line) {
 					return method.getMethodName();
 				}
@@ -200,7 +237,7 @@ public class FeatureHouseToAHEADConversion extends ComposerConversion {
 	 */
 	@Override
 	boolean canConvert(String fileExtension) {
-		return fileExtension.equals("java");
+		return "java".equals(fileExtension);
 	}
 
 }

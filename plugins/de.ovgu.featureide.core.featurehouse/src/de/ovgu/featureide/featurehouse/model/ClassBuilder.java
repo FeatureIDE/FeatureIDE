@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import org.eclipse.core.resources.IFile;
 
 import de.ovgu.cide.fstgen.ast.FSTTerminal;
+import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 
@@ -97,6 +98,9 @@ public class ClassBuilder {
 	 */
 	void addMethod(String name, LinkedList<String> parameterTypes, 
 			String returnType, String modifiers, String body, int beginLine, int endLine, boolean isConstructor) {
+//		beginLine = modelBuilder.completeModel ? -1 : beginLine;
+		endLine = modelBuilder.completeModel ? -1 : endLine;
+		
 		FSTMethod method = new FSTMethod(name, parameterTypes, returnType, modifiers, body, beginLine, endLine);								
 		method.setOwn(modelBuilder.getCurrentFile());
 		method.isConstructor = isConstructor;
@@ -106,4 +110,24 @@ public class ClassBuilder {
 		}
 		modelBuilder.getCurrentClass().add(method);
 	}
+	
+	/**
+	 * @param fieldName
+	 * @param typeName
+	 * @param i
+	 * @param modifiers
+	 * @param body
+	 * @param beginLine
+	 * @param endLine
+	 */
+	protected void addField(String fieldName, String typeName, int i, String modifiers,
+			String body, int beginLine, int endLine) {
+//		beginLine = modelBuilder.completeModel ? -1 : beginLine;
+		endLine = modelBuilder.completeModel ? -1 : endLine;
+		
+		FSTField field = new FSTField(fieldName, typeName, 0, modifiers, body, beginLine, endLine);
+		field.setOwn(modelBuilder.getCurrentFile());
+		modelBuilder.getCurrentClass().add(field);
+	}
+
 }

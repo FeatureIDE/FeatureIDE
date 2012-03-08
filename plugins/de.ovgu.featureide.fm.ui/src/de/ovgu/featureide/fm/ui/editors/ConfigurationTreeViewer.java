@@ -35,7 +35,6 @@ import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationContentProvider;
 import de.ovgu.featureide.fm.ui.editors.configuration.AdvancedConfigurationLabelProvider;
 
-
 /**
  * requires a configuration as input (via setInput) and additionally a feature
  * model with the constructor
@@ -49,37 +48,36 @@ public class ConfigurationTreeViewer extends TreeViewer {
 		super(parent, style);
 		setContentProvider(new ConfigurationContentProvider());
 		setLabelProvider(new AdvancedConfigurationLabelProvider());
-		addDoubleClickListener(listener);
-	}
+		addDoubleClickListener(new IDoubleClickListener() {
 
-	private IDoubleClickListener listener = new IDoubleClickListener() {
-
-		public void doubleClick(DoubleClickEvent event) {
-			Object object = ((ITreeSelection) event.getSelection())
-					.getFirstElement();
-			if (object instanceof SelectableFeature) {
-				final SelectableFeature feature = (SelectableFeature) object;
-				if (feature.getAutomatic() == Selection.UNDEFINED) {
-					// set to the next value
-					if (feature.getManual() == Selection.UNDEFINED)
-						set(feature, Selection.SELECTED);
-					else if (feature.getManual() == Selection.SELECTED)
-						set(feature, Selection.UNSELECTED);
-					else
-						// case: unselected
-						set(feature, Selection.UNDEFINED);
-					fireChanged();
-					ConfigurationTreeViewer.this.refresh();
+			public void doubleClick(DoubleClickEvent event) {
+				Object object = ((ITreeSelection) event.getSelection())
+						.getFirstElement();
+				if (object instanceof SelectableFeature) {
+					final SelectableFeature feature = (SelectableFeature) object;
+					if (feature.getAutomatic() == Selection.UNDEFINED) {
+						// set to the next value
+						if (feature.getManual() == Selection.UNDEFINED)
+							set(feature, Selection.SELECTED);
+						else if (feature.getManual() == Selection.SELECTED)
+							set(feature, Selection.UNSELECTED);
+						else
+							// case: unselected
+							set(feature, Selection.UNDEFINED);
+						fireChanged();
+						ConfigurationTreeViewer.this.refresh();
+					}
 				}
 			}
-		}
 
-		private void set(SelectableFeature feature, Selection selection) {
-			assert getInput() instanceof Configuration;
-			((Configuration) getInput()).setManual(feature, selection);
-		}
+			private void set(SelectableFeature feature, Selection selection) {
+				assert getInput() instanceof Configuration;
+				((Configuration) getInput()).setManual(feature, selection);
+			}
 
-	};
+		});
+
+	}
 
 	protected void fireChanged() {
 		for (PropertyChangeListener l : listeners)

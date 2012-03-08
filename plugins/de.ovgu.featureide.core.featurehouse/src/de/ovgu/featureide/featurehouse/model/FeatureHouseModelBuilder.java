@@ -19,6 +19,7 @@
 package de.ovgu.featureide.featurehouse.model;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -48,6 +49,8 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 	private FSTClass currentClass = null;
 	private IFile currentFile = null;
 
+	boolean completeModel = false;
+
 	public FeatureHouseModelBuilder(IFeatureProject featureProject) {
 		if (featureProject == null) {
 			return;
@@ -69,8 +72,16 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 		return currentClass;
 	}
 
-	public void buildModel(List<FSTNode> nodes) {
-		model.reset();
+	/**
+	 * Builds the model out of the FSTNodes of the FeatureHouse composer
+	 * @param nodes The fstNodes
+	 * @param completeModel <code>true</code> for completions mode: old methods will not be overwritten
+	 */
+	public void buildModel(List<FSTNode> nodes, boolean completeModel) {
+		this.completeModel = completeModel;
+		if (!completeModel) {
+			model.reset();
+		}
 		
 		for (FSTNode node : nodes) {
 			if (node.getType().equals(NODE_TYPE_FEATURE)) {

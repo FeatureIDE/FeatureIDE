@@ -27,7 +27,7 @@ import de.ovgu.featureide.core.projectstructure.nodetypes.ProjectTreeNode;
 
 /**
  * This tree represents a Feature Project
- * 
+ * TODO is this tree still used
  * @author Janet Feigenspan
  */
 public class ProjectTree {

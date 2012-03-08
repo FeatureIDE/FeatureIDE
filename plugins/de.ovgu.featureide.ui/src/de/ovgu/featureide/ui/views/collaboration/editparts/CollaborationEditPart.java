@@ -63,8 +63,7 @@ public class CollaborationEditPart extends AbstractGraphicalEditPart implements 
 	 */
 	@Override
 	protected IFigure createFigure() {
-		IFigure fig = new CollaborationFigure(getCollaborationModel());
-		return fig;
+		return new CollaborationFigure(getCollaborationModel());
 	}
 
 	/* (non-Javadoc)

@@ -129,7 +129,7 @@ public class ConstraintContentProposalProvider implements
 		}
 
 		if (words[LAST].trim().startsWith("(") && words[LAST].length() > 1) {
-			words[LAST] = words[LAST].substring(words[LAST].indexOf("(")+1);
+			words[LAST] = words[LAST].substring(words[LAST].indexOf('(')+1);
 
 		}
 		if (words[CURRENT].trim().startsWith("(")) {

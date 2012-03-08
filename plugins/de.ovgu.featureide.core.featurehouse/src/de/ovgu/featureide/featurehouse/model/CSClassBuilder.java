@@ -183,17 +183,16 @@ public class CSClassBuilder extends ClassBuilder {
 	 * @return
 	 */
 	private String getMethodName(FSTTerminal terminal) {
-		String name = terminal.getBody().substring(0, terminal.getBody().indexOf("("));
+		String name = terminal.getBody().substring(0, terminal.getBody().indexOf('('));
 		while (name.endsWith(" ")) {
 			name = name.substring(0,name.length() - 1);
 		}
-		name = name.substring(name.lastIndexOf(" ") + 1);
-		return name;
+		return name.substring(name.lastIndexOf(' ') + 1);
 	}
 
 	private LinkedList<String> getMethodParameter(FSTTerminal terminal) {
 		String parameter = terminal.getBody().substring(
-				terminal.getBody().indexOf("(") + 1, terminal.getBody().indexOf(")"));
+				terminal.getBody().indexOf('(') + 1, terminal.getBody().indexOf(')'));
 		LinkedList<String> parameterTypes = new LinkedList<String>();
 		if (!parameter.equals("") && !parameter.startsWith("{")) {
 			String[] p = parameter.split("[-]");
