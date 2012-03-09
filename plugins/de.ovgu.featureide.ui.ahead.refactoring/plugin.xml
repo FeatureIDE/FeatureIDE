@@ -9,7 +9,7 @@
       <objectContribution
             adaptable="true"
             id="de.ovgu.featureide.ui.ahead.refactoring.contribution1"
-            nameFilter="*.jak"
+            nameFilter="*.jak[Currently removed]"
             objectClass="org.eclipse.core.resources.IFile">
          <action
                class="de.ovgu.featureide.refactoring.actions.ExtractStatementsAction"
@@ -58,7 +58,7 @@
       <objectContribution
             adaptable="true"
             id="de.ovgu.featureide.ui.ahead.refactoring.contribution2"
-            nameFilter="*.equation*"
+            nameFilter="*.equation[Currently removed]"
             objectClass="org.eclipse.core.resources.IFile">
          <action
                class="de.ovgu.featureide.refactoring.actions.CreateTypesystemAction"

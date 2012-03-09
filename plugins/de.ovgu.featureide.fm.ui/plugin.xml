@@ -82,23 +82,26 @@
             id="de.ovgu.featureide.fm.ui.featureModelContribution"
             nameFilter="*.xml"
             objectClass="org.eclipse.core.resources.IFile">
-         <menu id="de.ovgu.featureide.fm.ui_menue"
-               label="FeatureIDE"
-               icon="icons/FeatureIconSmall.ico"
-               path="group.open"> 
-               <separator name="slot1"/>
-               <separator name="slot2"/>
-               <separator name="slot3"/>
-               <separator
-                     name="slot4">
-               </separator>
-         </menu>     
+         <action
+               class="de.ovgu.featureide.fm.ui.actions.ExportGuidslAction"
+               icon="icons/export_wiz.gif"
+               id="de.ovgu.featureide.fm.ui.ExportGuidsl"
+               label="Export model to GUIDSL format"
+               menubarPath="de.ovgu.featureide.ui.menu/guidsl">
+         </action>
+         <action
+               class="de.ovgu.featureide.fm.ui.actions.ImportGuidslAction"
+               icon="icons/import_wiz.gif"
+               id="de.ovgu.featureide.fm.ui.ImportGuidsl"
+               label="Import model from GUIDSL format"
+               menubarPath="de.ovgu.featureide.ui.menu/guidsl">
+         </action>
          <action
                class="de.ovgu.featureide.fm.ui.actions.OpenWithGuidslAction"
                icon="icons/guidsl.gif"
                id="de.ovgu.featureide.fm.ui.openWithGuidsl"
                label="Open with GUIDSL"
-               menubarPath="de.ovgu.featureide.fm.ui_menue/slot1"
+               menubarPath="de.ovgu.featureide.ui.menu/guidsl"
                tooltip="GUIDSL is a configuration tool written by Don Batory">
          </action>
          <action
@@ -106,42 +109,28 @@
                icon="icons/export_wiz.gif"
                id="de.ovgu.featureide.fm.ui.ExportSXFM"
                label="Export model to SXFM (S.P.L.O.T.) format"
-               menubarPath="de.ovgu.featureide.fm.ui_menue/slot2">
+               menubarPath="de.ovgu.featureide.ui.menu/splot">
          </action>
          <action
                class="de.ovgu.featureide.fm.ui.actions.ImportSXFMAction"
                icon="icons/import_wiz.gif"
                id="de.ovgu.featureide.fm.ui.ImportSXFM"
                label="Import model from SXFM (S.P.L.O.T.) format"
-               menubarPath="de.ovgu.featureide.fm.ui_menue/slot2">
-         </action>
-         <action
-               class="de.ovgu.featureide.fm.ui.actions.ExportGuidslAction"
-               icon="icons/export_wiz.gif"
-               id="de.ovgu.featureide.fm.ui.ExportGuidsl"
-               label="Export model to GUIDSL format"
-               menubarPath="de.ovgu.featureide.fm.ui_menue/slot3">
-         </action>
-         <action
-               class="de.ovgu.featureide.fm.ui.actions.ImportGuidslAction"
-               icon="icons/import_wiz.gif"
-               id="de.ovgu.featureide.fm.ui.ImportGuidsl"
-               label="Import model from GUIDSL format"
-               menubarPath="de.ovgu.featureide.fm.ui_menue/slot3">
+               menubarPath="de.ovgu.featureide.ui.menu/splot">
          </action>
          <action
                class="de.ovgu.featureide.fm.ui.actions.ExportConquererAction"
                icon="icons/export_wiz.gif"
                id="de.ovgu.featureide.fm.ui.ExportSPLConquerer"
                label="Export model to SPL Conquerer format"
-               menubarPath="de.ovgu.featureide.fm.ui_menue/slot4">
+               menubarPath="de.ovgu.featureide.ui.menu/conquerer">
          </action>
                   <action
                class="de.ovgu.featureide.fm.ui.actions.FeatureDependenciesAction"
                icon="icons/export_wiz.gif"
                id="de.ovgu.featureide.fm.ui.FeatureDependencies"
                label="Export feature dependency information"
-               menubarPath="de.ovgu.featureide.fm.ui_menue/slot5">
+               menubarPath="de.ovgu.featureide.ui.menu/dependency">
          </action>
       </objectContribution>
    </extension>

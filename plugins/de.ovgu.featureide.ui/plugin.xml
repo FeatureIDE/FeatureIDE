@@ -10,38 +10,31 @@
 	                 file-extensions="config,equation,expression"
 	                 id="de.ovgu.featureide.contenttype.conf"
 	                 name="Configuration (for FeatureIDE projects)"
-	                 priority="high"/>               
+	                 priority="high"/>
+    <content-type
+          base-type="org.eclipse.core.runtime.text"
+          file-extensions="config"
+          id="de.ovgu.featureide.contenttype.extConf"
+          name="Configuration (for non-FeatureIDE projects)"
+          priority="low">
+    </content-type>
+    <content-type
+          base-type="org.eclipse.core.runtime.text"
+          file-extensions="equation"
+          id="de.ovgu.featureide.contenttype.extConfE"
+          name="Equation (for non-FeatureIDE projects)"
+          priority="low">
+    </content-type>
+    <content-type
+          base-type="org.eclipse.core.runtime.text"
+          file-extensions="expression"
+          id="de.ovgu.featureide.contenttype.expression"
+          name="Expression (for non-FeatureIDE projects)"
+          priority="low">
+    </content-type>               
 	
 	</extension>
 
-	<extension point="org.eclipse.core.contenttype.contentTypes">
-	   <content-type base-type="org.eclipse.core.runtime.text"
-	                 file-extensions="config"
-	                 id="de.ovgu.featureide.contenttype.extConf"
-	                 name="Configuration (for non-FeatureIDE projects)"
-	                 priority="low"/>
-	 
-	</extension>
-		<extension point="org.eclipse.core.contenttype.contentTypes">
-	   <content-type base-type="org.eclipse.core.runtime.text"
-	                 file-extensions="equation"
-	                 id="de.ovgu.featureide.contenttype.extConfE"
-	                 name="Equation (for non-FeatureIDE projects)"
-	                 priority="low"/>
-	                 
-	     
-	 
-	</extension>
-		<extension point="org.eclipse.core.contenttype.contentTypes">
-	   <content-type base-type="org.eclipse.core.runtime.text"
-	                 file-extensions="expression"
-	                 id="de.ovgu.featureide.contenttype.expression"
-	                 name="Expression (for non-FeatureIDE projects)"
-	                 priority="low"/>
-	                 
-	     
-	 
-	</extension>
 	<extension
          point="org.eclipse.ui.editors">
       <editor
@@ -90,6 +83,17 @@
          point="org.eclipse.ui.popupMenus">
       <objectContribution
             adaptable="true"
+            id="de.ovgu.featureide.ui.menu"
+            objectClass="org.eclipse.core.resources.IResource">
+         <menu
+               icon="icons/FeatureIconSmall.ico"
+               id="de.ovgu.featureide.ui.menu"
+               label="FeatureIDE"
+               path="group.open">
+         </menu>
+      </objectContribution>
+      <objectContribution
+            adaptable="true"
             id="de.ovgu.featureide.ui.actions.conversionaction"
             objectClass="org.eclipse.core.resources.IProject">
          <visibility>
@@ -105,32 +109,20 @@
                id="de.ovgu.featureide.ui.actions.conversionaction1"
                icon="icons/FeatureIconSmall.ico"
                label="Add FeatureIDE Nature"
-               menubarPath="group.open"
+               menubarPath="de.ovgu.featureide.ui.menu/ui"
                style="push">
          </action>
       </objectContribution>
      <objectContribution
             adaptable="true"
             id="de.ovgu.featureide.ui.variantBuilder"
-            objectClass="org.eclipse.core.resources.IProject">
-         <menu id="de.ovgu.featureide.ui_menue"
-               label="Variant Builder"
-               icon="icons/FeatureIconSmall.ico"
-               path="group.open"> 
-               <separator name="slot1"/>
-         </menu>
-         <visibility>
-         	<objectState
-         		name="nature"
-         		value="de.ovgu.featureide.core.featureProjectNature">
-         	</objectState>
-         </visibility>  
+            objectClass="org.eclipse.core.resources.IProject">  
          <action
                class="de.ovgu.featureide.ui.actions.BuildAllValidConfigurationsAction"
                id="de.ovgu.featureide.ui.actions.buildallvalidconfigurationsaction"
                icon="icons/FeatureIconSmall.ico"
                label="Build All Valid Configurations"
-               menubarPath="de.ovgu.featureide.ui_menue/slot1"
+               menubarPath="de.ovgu.featureide.ui.menu/ui"
                tooltip="Builds all possible configurations."
                style="push">
          </action>
@@ -139,14 +131,20 @@
                id="de.ovgu.featureide.ui.actions.buildallconfigurationsaction"
                icon="icons/FeatureIconSmall.ico"
                label="Build All Current Configurations"
-               menubarPath="de.ovgu.featureide.ui_menue/slot1"
+               menubarPath="de.ovgu.featureide.ui.menu/ui"
                tooltip="Builds all current configurations."
                style="push">
          </action>
+         <visibility>
+         	<objectState
+         		name="nature"
+         		value="de.ovgu.featureide.core.featureProjectNature">
+         	</objectState>
+         </visibility>
       </objectContribution>
       <objectContribution
             adaptable="true"
-            id="de.ovgu.featureide.ui.equationFileContribution"
+            id="de.ovgu.featureide.ui.configFileContribution"
             nameFilter="*.config"
             objectClass="org.eclipse.core.resources.IFile">
          <action
