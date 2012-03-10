@@ -121,6 +121,8 @@ public class AheadWrapper {
 		final IFile jakFile = ((IFolder)file.getParent()).getFile(file.getName().replace(".java",".jak"));
 		if (!jakFile.exists())
 			return;
+		
+		// TODO this job should not run parallel multiple times
 		Job job = new Job("Propagate problem markers") {
 			@Override
 			public IStatus run(IProgressMonitor monitor) {
@@ -129,7 +131,7 @@ public class AheadWrapper {
 						IMarker[] markers = file.findMarkers(null, false, IResource.DEPTH_ZERO);
 						if (markers != null) {
 							for (IMarker marker : markers) {
-								if (marker.exists() && !marker.getType().equals(TASK)) {
+								if (marker.exists() && !TASK.equals(marker.getType())) {
 									String content = marker.getAttribute(IMarker.MESSAGE, null);
 									if (content != null && (content.contains(RAW_TYPE) || content.contains(GENERIC_TYPE) || 
 											content.contains(TYPE_SAFETY))) {

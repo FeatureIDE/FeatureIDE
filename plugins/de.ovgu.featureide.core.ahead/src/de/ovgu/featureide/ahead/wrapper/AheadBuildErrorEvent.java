@@ -76,12 +76,20 @@ public class AheadBuildErrorEvent {
 				calculateJakLine();
 			}
 		} catch (Exception e) {
-			//if calculation failes the error will be at the old position
+			//if calculation fails the error will be at the old position
 			AheadCorePlugin.getDefault().logError(e);
 		}
 	}
 
-	//private static Pattern inheritedPattern = Pattern.compile("(// inherited constructors(?:[^{}]+|\\{[^{}]+\\})+\\{[^{}]+\\})\\s*}");
+	/*
+	 * TODO fix wrong line calculation for AHEAD
+	 * 
+	 * The first pattern seems to cause an endless loop.
+	 * 
+	 * The second pattern caused a wrong line calculation.
+	 * see: Example "DesktopSearcher" at class MainFrame(Feature:Tree_View): "Variable position not used"
+	 */
+//	private static Pattern inheritedPattern = Pattern.compile("(// inherited constructors(?:[^{}]+|\\{[^{}]+\\})+\\{[^{}]+\\})\\s*}");
 	private static Pattern inheritedPattern = Pattern.compile("(// inherited constructors(?:[^{}]+|\\{[^{}]+\\})+)\\}");
 	
 	private void convertToComposedJak() throws CoreException, IOException {
@@ -137,7 +145,12 @@ public class AheadBuildErrorEvent {
 			if (jakFile != null) {
 				int jakLine = composedJakLine - line + 1;
 				jakLine += numberOfImportLines(jakFile);
-				jakLine += lineNumberOfLayerDeclaration(jakFile);
+				
+				/*
+				 * Removed because layer declaration is not supported and necessary anymore.
+				 * It caused a wrong line calculation.
+				 */
+//				jakLine += lineNumberOfLayerDeclaration(jakFile);
 				
 				this.file = jakFile;
 				this.line = jakLine;
@@ -200,13 +213,13 @@ public class AheadBuildErrorEvent {
 		return content.lineNumber() - 1;
 	}
 
-	private int lineNumberOfLayerDeclaration(IFile jakFile) throws CoreException, IOException {
-		jakFile.refreshLocal(IResource.DEPTH_ZERO, null);
-		String contentString = getString(jakFile);
-		PosString content = new PosString(contentString);
-		content.pos = contentString.indexOf("layer");
-		return content.lineNumber() - 1;
-	}
+//	private int lineNumberOfLayerDeclaration(IFile jakFile) throws CoreException, IOException {
+//		jakFile.refreshLocal(IResource.DEPTH_ZERO, null);
+//		String contentString = getString(jakFile);
+//		PosString content = new PosString(contentString);
+//		content.pos = contentString.indexOf("layer");
+//		return content.lineNumber() - 1;
+//	}
 
 	public int getLine() {
 		return line;
