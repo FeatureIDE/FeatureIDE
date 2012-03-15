@@ -215,6 +215,11 @@ public class FmOutlinePageContextMenu{
 				} else {
 					return;
 				}
+				// workaround for bug: close the FM-editor and open it again, 
+				//					-> selecting something at the outline causes a null-pointer exception
+				if (part == null) { 
+					return;
+				}
 				((GraphicalViewerImpl) fTextEditor.diagramEditor)
 					.setSelection(new StructuredSelection(part));
 				

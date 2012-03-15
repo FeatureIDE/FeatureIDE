@@ -34,6 +34,9 @@ import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
  * @author Jan Wedding
  * @author Melanie Pflaume
  */
+/*
+ * TODO fix bug: tree minimizes after selecting the editor page
+ */
 public class FmOutlinePage extends ContentOutlinePage {
 
 	protected FeatureModel fInput;
