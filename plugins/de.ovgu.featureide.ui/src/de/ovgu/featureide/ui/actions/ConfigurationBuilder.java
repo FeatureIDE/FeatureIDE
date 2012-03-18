@@ -21,6 +21,7 @@ package de.ovgu.featureide.ui.actions;
 import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.AbstractList;
 import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.TreeMap;
@@ -239,7 +240,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 * @param list a LinkedList
 	 * @return the corresponding array
 	 */
-	private String[] toArray(LinkedList<String> list) {
+	private String[] toArray(AbstractList<String> list) {
 		String[] array = new String[list.size()];
 		for(int i = 0;i < list.size();i++) {
 			array[i] = list.get(i);

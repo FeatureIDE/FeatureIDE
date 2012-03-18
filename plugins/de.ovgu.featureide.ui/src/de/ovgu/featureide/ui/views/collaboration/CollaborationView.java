@@ -277,6 +277,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 						toolbarAction.setEnabled(false);
 						builded = true;
 						if (featureProject != null) {
+							// TODO @Jens check this method
 							IComposerExtension composer = featureProject.getComposer();
 							if (composer != null) {
 								composer.buildFSTModel();

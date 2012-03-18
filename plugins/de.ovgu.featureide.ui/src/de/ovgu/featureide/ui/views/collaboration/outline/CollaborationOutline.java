@@ -79,6 +79,10 @@ import de.ovgu.featureide.ui.views.collaboration.model.Role;
  * @author Jan Wedding
  * @author Melanie Pflaume
  */
+/*
+ * TODO fix bug: do not close the tree if a corresponding file 
+ * was opened with an other way e.g. via collaboration diagram
+ */
 public class CollaborationOutline extends ViewPart implements ICurrentBuildListener {
 
 	private TreeViewer viewer;

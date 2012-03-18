@@ -416,6 +416,7 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 	 */
 	@Override
 	public void buildConfiguration(IFolder folder, Configuration configuration) {
+		super.buildConfiguration(folder, configuration);
 		if (activatedFeatures == null) {
 			activatedFeatures = new ArrayList<String>();
 		} else {
