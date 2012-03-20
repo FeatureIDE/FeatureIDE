@@ -2,7 +2,7 @@
 <feature
       id="de.ovgu.featureide.deltaj"
       label="FeatureIDE extension for DeltaJ (optional)"
-      version="2.6.0.qualifier"
+      version="2.6.1.qualifier"
       provider-name="University of Magdeburg">
 
    <description url="http://www.fosd.de/featureide/">
@@ -483,5 +483,33 @@ Public License instead of this License.
       <import plugin="org.eclipse.xtext.ui.shared"/>
       <import plugin="org.eclipse.xtext.builder"/>
    </requires>
+
+   <plugin
+         id="org.xtext.example.dj"
+         download-size="0"
+         install-size="0"
+         version="2.6.1.qualifier"
+         unpack="false"/>
+
+   <plugin
+         id="org.xtext.example.dj.generator"
+         download-size="0"
+         install-size="0"
+         version="2.6.1.qualifier"
+         unpack="false"/>
+
+   <plugin
+         id="org.xtext.example.dj.ui"
+         download-size="0"
+         install-size="0"
+         version="2.6.1.qualifier"
+         unpack="false"/>
+
+   <plugin
+         id="de.ovgu.featureide.core.deltaj"
+         download-size="0"
+         install-size="0"
+         version="2.6.1.qualifier"
+         unpack="false"/>
 
 </feature>
