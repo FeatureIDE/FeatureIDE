@@ -4,6 +4,5 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/lucene-core-2.9.1.jar"/>
 	<classpathentry kind="lib" path="lib/lucene-demos-2.9.1.jar"/>
-	<classpathentry kind="lib" path="lib/tools.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
