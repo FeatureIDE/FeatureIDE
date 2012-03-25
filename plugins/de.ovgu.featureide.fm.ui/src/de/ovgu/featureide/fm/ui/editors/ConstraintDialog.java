@@ -101,12 +101,9 @@ public class ConstraintDialog implements GUIDefaults {
 			" Implies ", " Iff ", "(", ")" /* "At most 1" */};
 	private static final String FILTERTEXT = "type filter text";
 	private Shell shell;
-
-	private GridData gridData;
+	
 	private String initialConstraint;
 
-	private Composite headComposite;
-	private Label imageLabel;
 	private Label errorMarker;
 	private Text errorMessage;
 	private String titleText;
@@ -118,11 +115,7 @@ public class ConstraintDialog implements GUIDefaults {
 	private Group buttonGroup;
 	private Composite constraintTextComposite;
 	private Text constraintText;
-	private Composite lastComposite;
-	private ToolBar helpButtonBar;
-	private ToolItem helpButton;
 	private FeatureModel featureModel;
-	private Button cancelButton;
 	private int x, y;
 	private Button okButton;
 	private Constraint constraint;
@@ -201,9 +194,9 @@ public class ConstraintDialog implements GUIDefaults {
 	 */
 	private void initBottom(final FeatureModel featuremodel,
 			final Constraint constraint) {
-		gridData = new GridData(GridData.FILL_HORIZONTAL);
+		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
 
-		lastComposite = new Composite(shell, SWT.NONE);
+		Composite lastComposite = new Composite(shell, SWT.NONE);
 		lastComposite.setLayoutData(gridData);
 
 		FormLayout lastCompositeLayout = new FormLayout();
@@ -211,8 +204,8 @@ public class ConstraintDialog implements GUIDefaults {
 		lastCompositeLayout.marginTop = 85;
 		lastCompositeLayout.marginWidth = 5;
 		lastComposite.setLayout(lastCompositeLayout);
-		helpButtonBar = new ToolBar(lastComposite, SWT.FLAT);
-		helpButton = new ToolItem(helpButtonBar, SWT.NONE);
+		ToolBar helpButtonBar = new ToolBar(lastComposite, SWT.FLAT);
+		ToolItem helpButton = new ToolItem(helpButtonBar, SWT.NONE);
 		helpButton.setImage(HELP_IMAGE);
 		helpButton
 				.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
@@ -225,7 +218,7 @@ public class ConstraintDialog implements GUIDefaults {
 		formDataHelp.left = new FormAttachment(0, 5);
 		helpButtonBar.setLayoutData(formDataHelp);
 
-		cancelButton = new Button(lastComposite, SWT.NONE);
+		Button cancelButton = new Button(lastComposite, SWT.NONE);
 		cancelButton.setText("Cancel");
 		FormData formDataCancel = new FormData();
 		formDataCancel.width = 70;
@@ -267,11 +260,10 @@ public class ConstraintDialog implements GUIDefaults {
 	 * initializes the upper part of the dialog
 	 */
 	private void initHead() {
-
-		headComposite = new Composite(shell, SWT.NONE);
+		Composite headComposite = new Composite(shell, SWT.NONE);
 		headComposite.setBackground(shell.getDisplay().getSystemColor(
 				SWT.COLOR_WHITE));
-		gridData = new GridData(GridData.FILL_HORIZONTAL);
+		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
 		headComposite.setLayoutData(gridData);
 
 		GridLayout headLayout = new GridLayout();
@@ -290,7 +282,7 @@ public class ConstraintDialog implements GUIDefaults {
 		gridData = new GridData();
 		gridData.horizontalSpan = 2;
 		capture.setLayoutData(gridData);
-		imageLabel = new Label(headComposite, SWT.RIGHT | SWT.DOWN);
+		Label imageLabel = new Label(headComposite, SWT.RIGHT | SWT.DOWN);
 		imageLabel.setImage(BANNER_IMAGE);
 		imageLabel.setBackground(shell.getDisplay().getSystemColor(
 				SWT.COLOR_WHITE));
@@ -326,7 +318,7 @@ public class ConstraintDialog implements GUIDefaults {
 	 */
 	private void initConstraintText() {
 		constraintTextComposite = new Composite(shell, SWT.NONE);
-		gridData = new GridData(GridData.FILL_HORIZONTAL);
+		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
 
 		constraintTextComposite.setLayoutData(gridData);
 		FormLayout constraintTextLayout = new FormLayout();
@@ -377,7 +369,7 @@ public class ConstraintDialog implements GUIDefaults {
 	private void initButtonGroup() {
 		buttonGroup = new Group(shell, SWT.NONE);
 		buttonGroup.setText("Operators");
-		gridData = new GridData(GridData.FILL_HORIZONTAL);
+		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.grabExcessHorizontalSpace = true;
 		buttonGroup.setLayoutData(gridData);
 		GridLayout buttonGroupLayout = new GridLayout();
@@ -422,7 +414,7 @@ public class ConstraintDialog implements GUIDefaults {
 	private void initFeatureGroup(final FeatureModel featuremodel) {
 		featureGroup = new Group(shell, SWT.NONE);
 		featureGroup.setText("Features");
-		gridData = new GridData(GridData.FILL_HORIZONTAL);
+		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.grabExcessVerticalSpace = true;
 		featureGroup.setLayoutData(gridData);

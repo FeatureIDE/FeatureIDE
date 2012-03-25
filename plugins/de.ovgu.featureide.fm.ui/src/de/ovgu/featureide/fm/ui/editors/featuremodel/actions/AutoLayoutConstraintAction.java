@@ -41,7 +41,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AutoLayoutConstr
 public class AutoLayoutConstraintAction extends Action {
 
 	private final FeatureModel featureModel;
-	private int counter = 0;
 	private LinkedList <LinkedList<Point>> oldPos = new LinkedList <LinkedList<Point>> ();
 	
 	public AutoLayoutConstraintAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
@@ -55,7 +54,7 @@ public class AutoLayoutConstraintAction extends Action {
 		for(int i=0;i<featureModel.getConstraintCount();i++){			
 			newList.add(FeatureUIHelper.getLocation(featureModel.getConstraints().get(i)).getCopy());
 		}		
-		counter = oldPos.size();
+		int counter = oldPos.size();
 		oldPos.add(newList);
 		AutoLayoutConstraintOperation op = new AutoLayoutConstraintOperation(featureModel, oldPos, counter);
 		op.addContext((IUndoContext) featureModel.getUndoContext());

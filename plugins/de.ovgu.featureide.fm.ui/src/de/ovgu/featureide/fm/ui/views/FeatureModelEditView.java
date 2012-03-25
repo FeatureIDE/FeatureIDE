@@ -26,9 +26,11 @@ import java.io.FileNotFoundException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.draw2d.ConnectionLayer;
@@ -36,8 +38,12 @@ import org.eclipse.gef.LayerConstants;
 import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.gef.ui.parts.ScrollingGraphicalViewer;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener;
@@ -72,12 +78,31 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 	public static final String ID = FMUIPlugin.PLUGIN_ID
 			+ ".views.FeatureModelEditView";
 
+	public static final Image REFESH_TAB_IMAGE = FMUIPlugin.getImage("refresh_tab.gif");
+
+	private static final QualifiedName ACTIVATOR_KEY = new QualifiedName(FMUIPlugin.PLUGIN_ID + ".EditViewActivator", FMUIPlugin.PLUGIN_ID + ".EditViewActivator");
+
+	private static final String ACTIVATOR_ACTION_TEXT = "Disable automatic calculations";
+	private static final String MANUAL_CALCULATION_TEXT = "Start calculation";
+	
+	private IWorkspaceRoot workspaceRoot;
+	
 	private TreeViewer viewer;
 
 	private FeatureModelEditor featureModelEditor;
 
 	private Job job;
-
+	
+	/**
+	 * Button to start manual calculations.
+	 */
+	private Action manualAction;
+	
+	/**
+	 * Button to enable/disable automatic calculations.
+	 */
+	private Action activatorAction;
+	
 	private IPartListener editorListener = new IPartListener() {
 
 		public void partOpened(IWorkbenchPart part) {
@@ -118,6 +143,89 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 		getSite().getPage().addPartListener(editorListener);
 		IWorkbenchPage page = getSite().getPage();
 		setFeatureModelEditor(page.getActiveEditor());
+		
+		makeActions();
+		fillLocalToolBar(getViewSite().getActionBars().getToolBarManager());
+	}
+
+	private void makeActions() {
+		manualAction = new Action() {
+			public void run() {
+				Job job = new Job("Updating Feature Model Edits") {
+					protected IStatus run(IProgressMonitor monitor) {
+						if (featureModelEditor == null)
+							contentProvider.defaultContent();
+						else {
+							contentProvider.calculateContent(
+									featureModelEditor.getOriginalFeatureModel(),
+									featureModelEditor.getFeatureModel());
+						}
+						return Status.OK_STATUS;
+					}
+				};
+				job.setPriority(Job.SHORT);
+				job.schedule();
+			}
+		};
+		
+		activatorAction = new Action() {
+			public void run() {
+				Job job = new Job("") {
+					protected IStatus run(IProgressMonitor monitor) {
+						activatorAction.setChecked(activatorAction.isChecked());
+						manualAction.setEnabled(activatorAction.isChecked());
+						setActivatorChecked(activatorAction.isChecked());
+						return Status.OK_STATUS;
+					}
+
+				};
+				job.setPriority(Job.SHORT);
+				job.schedule();
+			}
+		};
+	}
+
+	/**
+	 * @param toolBarManager
+	 */
+	private void fillLocalToolBar(IToolBarManager manager) {
+		manager.add(activatorAction);
+		activatorAction.setChecked(isActivatorChecked());
+		activatorAction.setToolTipText(ACTIVATOR_ACTION_TEXT);
+		activatorAction.setImageDescriptor(ImageDescriptor.createFromImage(REFESH_TAB_IMAGE));
+		
+		manager.add(manualAction);
+		manualAction.setEnabled(activatorAction.isChecked());
+		manualAction.setToolTipText(MANUAL_CALCULATION_TEXT);
+		manualAction.setImageDescriptor(ImageDescriptor.createFromImage(REFESH_TAB_IMAGE));
+	}
+
+	/**
+	 * @return The persistent property status of the activator action
+	 */
+	private boolean isActivatorChecked() {
+		if (workspaceRoot != null) {
+			try {
+				return "true".equals(workspaceRoot.getPersistentProperty(ACTIVATOR_KEY));
+			} catch (CoreException e) {
+				FMUIPlugin.getDefault().logError(e);
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Sets the persistent property status of the activator action.
+	 * @param checked The new status
+	 */
+	private void setActivatorChecked(boolean checked) {
+		if (workspaceRoot != null) {
+			try {
+				workspaceRoot.setPersistentProperty(ACTIVATOR_KEY, checked ? "true" : "false");
+			} catch (CoreException e) {
+				FMUIPlugin.getDefault().logError(e);
+			}
+		}
 	}
 
 	@Override
@@ -145,7 +253,7 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 	}
 
 	private Job evaluation;
-
+	
 	private void setFeatureModelEditor(IWorkbenchPart activeEditor) {
 		if (featureModelEditor == activeEditor)
 			return;
@@ -162,7 +270,9 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 			featureModelEditor.getOriginalFeatureModel().addListener(
 					modelListener);
 			featureModelEditor.getFeatureModel().addListener(modelListener);
-
+			
+			setWorkspaceRoot(featureModelEditor);
+			
 			if (evaluation == null
 					&& featureModelEditor.getGrammarFile().getResource()
 							.getProject().getName()
@@ -241,8 +351,13 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 				conversion.schedule();
 			}
 		}
-
 		refresh();
+	}
+
+	private void setWorkspaceRoot(FeatureModelEditor editor) {
+		if (workspaceRoot == null) {
+			workspaceRoot = editor.getGrammarFile().getResource().getProject().getWorkspace().getRoot();
+		}
 	}
 
 	private void refresh() {
@@ -257,9 +372,11 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 		job = new Job("Updating Feature Model Edits") {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
-				if (featureModelEditor == null)
+				if (featureModelEditor == null) {
 					contentProvider.defaultContent();
-				else {
+				} else if (isActivatorChecked()) {
+					contentProvider.defaultManualContent();
+				} else {
 					contentProvider.calculateContent(
 							featureModelEditor.getOriginalFeatureModel(),
 							featureModelEditor.getFeatureModel());

@@ -42,6 +42,8 @@ public class ConstraintDeleteOperation extends AbstractOperation {
 	private static final String LABEL = "Delete Constraint";
 	private FeatureModel featureModel;
 	private Constraint constraint;
+	
+	//TODO @Fabian this List is never used
 	private List<Constraint> constraints = new LinkedList<Constraint>();
 	private int index;
 

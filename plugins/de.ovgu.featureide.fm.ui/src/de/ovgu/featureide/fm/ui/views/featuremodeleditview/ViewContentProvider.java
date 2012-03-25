@@ -45,6 +45,7 @@ public class ViewContentProvider implements IStructuredContentProvider,
 		ITreeContentProvider, GUIDefaults {
 
 	private static final String DEFAULT_MESSAGE = "Open a feature model.";
+	private static final String DEFAULT_MANUAL_MESSAGE = "Start manual or activate automatic calculation to show statistics.";
 	private static final String CALCULATING_MESSAGE = "Calculating...";
 	
 	private static final String HEAD_REFACTORING = "Refactoring: SPL unchanged";
@@ -111,6 +112,17 @@ public class ViewContentProvider implements IStructuredContentProvider,
 		return false;
 	}
 
+	/**
+	 * Displays a default message if the automatic calculations are disabled and
+	 * there are no statistics displayed.
+	 */
+	public void defaultManualContent() {
+		if (invisibleRoot.getChildren().length <= 1) {
+			invisibleRoot.setChild(new TreeObject(DEFAULT_MANUAL_MESSAGE, DEFAULT_IMAGE));
+			refresh();
+		}
+	}
+	
 	public void defaultContent() {
 		invisibleRoot.setChild(new TreeObject(DEFAULT_MESSAGE, DEFAULT_IMAGE));
 		refresh();
@@ -128,7 +140,6 @@ public class ViewContentProvider implements IStructuredContentProvider,
 		} else {
 			((TreeObject)invisibleRoot.getChildren()[position]).setContents(CALCULATING_MESSAGE, DEFAULT_IMAGE);
 		}
-		refresh();
 		TreeObject head = calculateHead(oldModel, newModel, comparator);
 		((TreeObject)invisibleRoot.getChildren()[position++]).setContents(head.getName(), head.getImage());
 		
