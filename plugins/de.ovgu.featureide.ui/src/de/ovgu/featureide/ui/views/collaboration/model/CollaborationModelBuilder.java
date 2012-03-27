@@ -42,11 +42,12 @@ import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /** 
  * This CollaborationModelBuilder builds the CollaborationModel with the help of
- * JakProjectModel.
+ * the FSTModel.
  * 
  * @author Constanze Adler
  * @author Jens Meinicke
@@ -67,6 +68,12 @@ public class CollaborationModelBuilder {
 	public IFeatureProject project;
 
 	public IFile editorFile;
+
+	private ArrayList<String> selectedFeatureNames;
+
+	private ArrayList<String> layerNames;
+
+	private IComposerExtension composer;
 	
 	public CollaborationModelBuilder() {
 		model = new CollaborationModel();
@@ -74,43 +81,324 @@ public class CollaborationModelBuilder {
 
 	public CollaborationModel buildCollaborationModel(
 			IFeatureProject featureProject) {
-		//reset model
 		// TODO @Jens: refactor this method into several
+		if (!initilize(featureProject)) {
+			return null;
+		}
+			
+		//start building the model
+		if (fSTModel == null) {
+			buildModelWithoutFSTModel();
+		} else {
+			buildModelWithFSTModel();
+		}
+		return model;	
+	}
+
+	/**
+	 * This method is used to show model with informations form the FSTModel. 
+	 */
+	private void buildModelWithFSTModel() {
+		//case: FSTModel builded
+		ArrayList<FSTFeature> iFeatures = fSTModel.getSelectedFeatures();
+		if (iFeatures == null) {
+			return;// TODO before: return null;
+		}
+		
+		for (FSTFeature feature : iFeatures) {
+			iFeatureNames.add(feature.getName());
+		}
+		
+		IFolder path = project.getSourceFolder();
+		for (String layerName : layerNames) {
+			if (featureFilter.size() == 0 || featureFilter.contains(layerName)) {
+				if (iFeatureNames.contains(layerName)) {
+					addRoles(layerName, path);
+				} else {
+					//case: add arbitrary files
+					addArbitraryFiles(layerName);
+				}
+			}
+		}
+	}
+
+	/**
+	 * @param layerName 
+	 * @param sourceFolder 
+	 * 
+	 */
+	private void addRoles(String layerName, IFolder sourceFolder) {
+		//case: add class files
+		boolean selected = true;
+		FSTFeature feature = fSTModel.getFeature(layerName);
+		collaboration = null;
+		if (configuration != null && !selectedFeatureNames.contains(layerName))
+			selected = false;
+		if (selected || showUnselectedFeatures) {
+			FSTModelElement[] element = feature.getChildren();
+			if (element instanceof FSTClass[]) {
+				for (FSTClass Class : (FSTClass[]) element) {
+					String className = Class.getName();
+					if (classFilter.size() == 0 || classFilter.contains(className)) {
+						if (collaboration == null)
+							collaboration = new Collaboration(feature.getName());
+						IPath pathToFile = sourceFolder.getFullPath();
+						if (composer.hasFeatureFolders()) {
+							pathToFile = pathToFile.append(feature.getName());
+						}
+						pathToFile = pathToFile.append(className);
+						Role role = new Role(className);
+						if (composer.hasFeatureFolders()) {
+							if (Class.isClassFile()) {
+								role.file = Class.getFile();
+							} else {
+								role.file = project.getSourceFolder()
+									.getFolder(feature.getName())
+									.getFile(className);
+							}
+						} else {
+							role.file = project.getSourceFolder()
+								.getFile(className);
+							role.files.add(role.file);
+						}
+						if (editorFile != null && role.file.getFullPath().equals(editorFile.getFullPath())) {
+							role.isEditorFile = true;
+						}
+						role.featureName = feature.getName();
+						FSTField[] fields = Class.getFields();
+						if (fields != null) {
+							for (FSTField f : fields) {
+								role.fields.add(f);
+							}
+						}
+						
+						FSTMethod[] methods = Class.getMethods();
+						if (methods != null) {
+							for (FSTMethod m : methods) {
+								role.methods.add(m);
+							}
+						}
+
+						for (FSTDirective d : feature.directives) {
+							if (role.file.equals(d.file)) {
+								role.directives.add(d);
+							}
+						}
+						
+						role.setPath(pathToFile);
+						Class cl = new Class(className);
+						if (model.containsClass(cl)) {
+							role.setParentClass(model.getClass(cl.getName()));
+						} else {
+							role.setParentClass(cl);
+							cl.project = project;
+							if (editorFile != null && cl.getName().equals(editorFile.getName())) {
+								cl.isOpenEditor = true;
+							}
+							model.addClass(cl);
+						}
+						role.selected = selected;
+						role.setCollaboration(collaboration);
+						model.roles.add(role);
+					}
+				}
+			}
+			if (composer.hasFeatureFolders()) {
+				IResource[] members = null;
+				try {
+					members = project.getSourceFolder().getFolder(feature.getName()).members();
+				} catch (CoreException e) {
+					UIPlugin.getDefault().logError(e);
+				}
+				
+				for (IResource res : members)
+					addArbitraryFiles(res, feature.getName(), selected);
+			}
+			if (collaboration != null) {
+				collaboration.selected = selected;
+				model.collaborations.add(collaboration);
+			}
+		}
+	}
+
+	/**
+	 * This method is used if a FSTModel exists but it does not contains the given feature
+	 * @param layerName 
+	 * 
+	 */
+	private void addArbitraryFiles(String layerName) {
+		boolean selected = false;
+		if (configuration != null && selectedFeatureNames.contains(layerName)) {
+			selected = true;
+		}
+		IFolder folder = project.getSourceFolder().getFolder(layerName);
+		if (folder.exists()) {
+			collaboration = null;
+			IResource[] members = null;
+				try {
+					members = folder.members();
+				} catch (CoreException e) {
+					UIPlugin.getDefault().logError(e);
+				}
+				for (IResource res : members) {
+					addArbitraryFiles(res, layerName, selected);
+			}
+			if (collaboration != null)
+				model.collaborations.add(collaboration);
+		}
+	}
+
+	/**
+	 * This method is used to show a default model without informations form the FSTModel. 
+	 */
+	private void buildModelWithoutFSTModel() {
+		if(project.getSourceFolder() != null) {
+			//case: FSTModel not builded			
+			for (String layerName : layerNames) {
+				if (selectedFeatureNames.contains(layerName)) {
+					//case: selected
+					if (featureFilter.size() == 0 || featureFilter.contains(layerName)) {
+						collaboration = null;
+						IResource[] members = null;
+						IFolder folder = project.getSourceFolder().getFolder(layerName);
+						if (folder.exists()) {
+							try {
+								members = folder.members();
+							} catch (CoreException e) {
+								UIPlugin.getDefault().logError(e);
+							}
+							for (IResource res : members) {
+								addArbitraryFiles(res, layerName, true);
+							}
+							if (collaboration != null)
+								model.collaborations.add(collaboration);
+						}
+					}
+				} else {
+					//case: not selected
+					if (featureFilter.size() == 0 || featureFilter.contains(layerName)) {
+						collaboration = null;
+						IResource[] members = null;
+						IFolder folder = project.getSourceFolder().getFolder(layerName);
+						if (folder.exists()) {
+							try {
+								members = folder.members();
+							} catch (CoreException e) {
+								UIPlugin.getDefault().logError(e);
+							}
+							for (IResource res : members) {
+								addArbitraryFiles(res, layerName, false);
+							}
+							if (collaboration != null)
+								model.collaborations.add(collaboration);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * @return
+	 */
+	private boolean initilize(IFeatureProject featureProject) {
+		resetModel();
+		
+		// set the featureProject
+		if (featureProject == null) {
+			return false;
+		}
+		project = featureProject;
+		
+		// set the composer
+		composer = project.getComposer();
+		if (composer == null) {
+			return false; 	
+		}
+			
+		// set the FSTmodel
+		getFstModel(composer);
+		
+		// set supported extensions
+		extensions = composer.extensions();
+		if (extensions == null)
+			return  false;
+		
+		// TODO what if selected features are empty
+		// set selected features(selected features)
+		setSelectedFeatureNames();
+		
+		// add the symbol for the configuration to the model
+		addConfigurationToModel();
+		
+		// set ordered list of layers from feature model(all features)
+		layerNames = getLayerNames();
+		if (layerNames == null) {
+			return false;
+		}
+		
+		return true;
+	}
+
+	/**
+	 * sets the list: <code>selectedFeatureNames</code>
+	 */
+	private void setSelectedFeatureNames() {
+		selectedFeatureNames = new ArrayList<String>();
+		ArrayList<Feature> features = getSelectedFeatures(project);
+		if (features == null) {
+			return;
+		}
+		
+		for (Feature feature : features)
+			selectedFeatureNames.add(feature.getName());
+	}
+
+	/**
+	 * sets the FSTModel
+	 * @param composer
+	 */
+	private void getFstModel(IComposerExtension composer) {
+		fSTModel = project.getFSTModel();
+		if (fSTModel == null) {
+			composer.initialize(project);
+			composer.buildFSTModel();
+			// TODO @Jens is this necessary?
+			fSTModel = project.getFSTModel();
+		}
+	}
+
+	/**
+	 * get ordered list of layers from feature model
+	 * @return
+	 */
+	private ArrayList<String> getLayerNames() {
+		FeatureModel featureModel = project.getFeatureModel();
+		if (featureModel.isFeatureOrderUserDefined()) {
+			return featureModel.getFeatureOrderList();
+		} else {
+			return (ArrayList<String>) featureModel.getConcreteFeatureNames();
+		}
+	}
+
+	/**
+	 * clears the model
+	 */
+	private void resetModel() {
 		model.classes.clear();
 		model.roles.clear();
 		model.collaborations.clear();
 		
-		if (featureProject == null)
-			return null;
-		project = featureProject;
-		
-		//initialize builder
-		IComposerExtension composer = featureProject.getComposer();
-		if (composer == null)
-			return null; 	
-		fSTModel = featureProject.getFSTModel();
-		if (fSTModel == null ) {
-			composer.initialize(project);
-			composer.buildFSTModel();
-			fSTModel = featureProject.getFSTModel();
-		}
-		
-		extensions = composer.extensions();
-		if (extensions == null)
-			return  null;
-		
-		ArrayList<Feature> features = getSelectedFeatures(featureProject);
-		if (features == null)
-			return null;
-		
 		iFeatureNames = new ArrayList<String>();
-		ArrayList<String> featureNames = new ArrayList<String>();
-		for (Feature feature : features)
-			featureNames.add(feature.getName());
+	}
 
-		//Add the configuration to the model  
-		if (configuration == null || configuration.equals(featureProject.getCurrentConfiguration())) {
-			collaboration = new Collaboration(featureProject.getCurrentConfiguration().getName().split("[.]")[0]);
+	/**
+	 * Adds the configuration to the model.
+	 * @param featureProject
+	 */
+	private void addConfigurationToModel() {
+		if (configuration == null || configuration.equals(project.getCurrentConfiguration())) {
+			collaboration = new Collaboration(project.getCurrentConfiguration().getName().split("[.]")[0]);
 			collaboration.selected = true;
 			collaboration.isConfiguration = true;
 		} else {
@@ -120,196 +408,6 @@ public class CollaborationModelBuilder {
 		}
 		collaboration.configurationFile = configuration;
 		model.collaborations.add(collaboration);
-		
-		//get ordered list of layers from feature model
-		ArrayList<String> layerNames;
-		if (featureProject.getFeatureModel().isFeatureOrderUserDefined()) {
-			layerNames = featureProject.getFeatureModel().getFeatureOrderList();
-		} else {
-			layerNames = (ArrayList<String>) featureProject.getFeatureModel().getConcreteFeatureNames();
-		}
-		
-		
-		if (layerNames == null)
-			return null;
-		
-		//start building the model
-		if (fSTModel == null) {
-			if(featureProject.getSourceFolder() != null) {
-				//case: FSTModel not builded			
-				for (String layerName : layerNames) {
-					if (featureNames.contains(layerName)) {
-						//case: selected
-						if (featureFilter.size() == 0 || featureFilter.contains(layerName)) {
-							collaboration = null;
-							IResource[] members = null;
-							IFolder folder = featureProject.getSourceFolder().getFolder(layerName);
-							if (folder.exists()) {
-								try {
-									members = folder.members();
-								} catch (CoreException e) {
-									UIPlugin.getDefault().logError(e);
-								}
-								for (IResource res : members) {
-									addArbitraryFiles(res, layerName, true);
-								}
-								if (collaboration != null)
-									model.collaborations.add(collaboration);
-							}
-						}
-					} else {
-						//case: not selected
-						if (featureFilter.size() == 0 || featureFilter.contains(layerName)) {
-							collaboration = null;
-							IResource[] members = null;
-							IFolder folder = featureProject.getSourceFolder().getFolder(layerName);
-							if (folder.exists()) {
-								try {
-									members = featureProject.getSourceFolder().getFolder(layerName).members();
-								} catch (CoreException e) {
-									UIPlugin.getDefault().logError(e);
-								}
-								for (IResource res : members) {
-									addArbitraryFiles(res, layerName, false);
-								}
-								if (collaboration != null)
-									model.collaborations.add(collaboration);
-							}
-						}
-					}
-				}
-			}
-		} else {
-			//case: FSTModel builded
-			ArrayList<FSTFeature> iFeatures = fSTModel.getSelectedFeatures();
-			if (iFeatures == null) {
-				return null;
-			}
-			
-			for (FSTFeature feature : iFeatures) {
-				iFeatureNames.add(feature.getName());
-			}
-			
-			IFolder path = featureProject.getSourceFolder();
-			for (String layerName : layerNames) {
-				if (featureFilter.size() == 0 || featureFilter.contains(layerName)) {
-					if (iFeatureNames.contains(layerName)) {
-						//case: add class files
-						boolean selected = true;
-						FSTFeature feature = fSTModel.getFeature(layerName);
-						collaboration = null;
-						if (configuration != null && !featureNames.contains(layerName))
-							selected = false;
-						if (selected || showUnselectedFeatures) {
-							FSTModelElement[] element = feature.getChildren();
-							if (element instanceof FSTClass[]) {
-								for (FSTClass Class : (FSTClass[]) element) {
-									if (classFilter.size() == 0 || classFilter.contains(Class.getName())) {
-										if (collaboration == null)
-											collaboration = new Collaboration(feature.getName());
-										IPath pathToFile = path.getFullPath();
-										if (composer.hasFeatureFolders()) {
-											pathToFile = pathToFile.append(feature.getName());
-										}
-										pathToFile = pathToFile.append(Class.getName());
-										String name = Class.getName();
-										Role role = new Role(name);
-										if (composer.hasFeatureFolders()) {
-											if (Class.isClassFile()) {
-												role.file = Class.getFile();
-											} else {
-												role.file = featureProject.getSourceFolder()
-													.getFolder(feature.getName())
-													.getFile(name);
-											}
-										} else {
-											role.file = featureProject.getSourceFolder()
-												.getFile(name);
-											role.files.add(role.file);
-										}
-										if (editorFile != null && role.file.getFullPath().equals(editorFile.getFullPath())) {
-											role.isEditorFile = true;
-										}
-										role.featureName = feature.getName();
-										FSTField[] fields = Class.getFields();
-										if (fields != null) {
-											for (FSTField f : fields) {
-												role.fields.add(f);
-											}
-										}
-										
-										FSTMethod[] methods = Class.getMethods();
-										if (methods != null) {
-											for (FSTMethod m : methods) {
-												role.methods.add(m);
-											}
-										}
-
-										for (FSTDirective d : feature.directives) {
-											if (role.file.equals(d.file)) {
-												role.directives.add(d);
-											}
-										}
-										
-										role.setPath(pathToFile);
-										Class cl = new Class(name);
-										if (model.containsClass(cl)) {
-											role.setParentClass(model.getClass(cl.getName()));
-										} else {
-											role.setParentClass(cl);
-											cl.project = featureProject;
-											if (editorFile != null && cl.getName().equals(editorFile.getName())) {
-												cl.isOpenEditor = true;
-											}
-											model.addClass(cl);
-										}
-										role.selected = selected;
-										role.setCollaboration(collaboration);
-										model.roles.add(role);
-									}
-								}
-							}
-							if (composer.hasFeatureFolders()) {
-								IResource[] members = null;
-								try {
-									members = featureProject.getSourceFolder().getFolder(feature.getName()).members();
-								} catch (CoreException e) {
-									UIPlugin.getDefault().logError(e);
-								}
-								
-								for (IResource res : members)
-									addArbitraryFiles(res, feature.getName(), selected);
-							}
-							if (collaboration != null) {
-								collaboration.selected = selected;
-								model.collaborations.add(collaboration);
-							}
-						}
-					} else {
-						//case: add arbitrary files
-						boolean selected = false;
-						if (configuration != null && featureNames.contains(layerName))
-							selected = true;
-						IFolder folder = featureProject.getSourceFolder().getFolder(layerName);
-						if (folder.exists()) {
-							collaboration = null;
-							IResource[] members = null;
-								try {
-									members = folder.members();
-								} catch (CoreException e) {
-									UIPlugin.getDefault().logError(e);
-								}
-								for (IResource res : members) {
-									addArbitraryFiles(res, layerName, selected);
-							}
-							if (collaboration != null)
-								model.collaborations.add(collaboration);
-						}
-					}
-				}
-			}
-		}
-		return model;	
 	}
 
 	private void addArbitraryFiles(IResource res, String featureName, boolean selected) {
@@ -317,10 +415,11 @@ public class CollaborationModelBuilder {
 			return;
 		
 		if (!(res instanceof IFolder)) {
-			String fileExtension = res.getName().contains(".") ? (res.getName().split("[.]"))[1] : " ";
+			String folderName = res.getName();
+			String fileExtension = folderName.contains(".") ? (folderName.split("[.]"))[1] : " ";
 			if (classFilter.size() == 0 
 					|| classFilter.contains("*." + fileExtension)
-					|| classFilter.contains(res.getName())) {
+					|| classFilter.contains(folderName)) {
 				
 				if (!(fSTModel != null && extensions.contains("." + fileExtension)) 
 						|| !iFeatureNames.contains(featureName)) {
@@ -328,11 +427,11 @@ public class CollaborationModelBuilder {
 						collaboration = new Collaboration(featureName);
 						collaboration.selected = selected;
 					}
-					String name = res.getName().contains(".") ? "." + fileExtension : 
+					String name = folderName.contains(".") ? "." + fileExtension : 
 					              ".";
 					Role role;
 					if (extensions.contains(name)) {
-						name = res.getName();
+						name = folderName;
 						role = new Role(name);
 					} else {
 						name = "*" + name;

@@ -172,15 +172,6 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		selectorWarning = createSelectorEntry(colorGroup, COLOR_WARNING, persitentProperties.getWarningColor().getRGB(), COLOR_WARNING_TIP);
 		selectorDeadBackground = createSelectorEntry(colorGroup, COLOR_DEAD, persitentProperties.getDeadFeatureBackgroundColor().getRGB(), COLOR_DEAD_TIP);
 	}
-
-	/**
-	 * TODO @Jens: implement
-	 * Creates the group to enable or disable extension.
-	 * @param composite
-	 */
-//	private void addExtensionsGroup(Composite composite) {
-//		Group group = createGroup(composite, EXTENSIONS_GROUP_TEXT);
-//	}
 	
 	/**
 	 * Add the export and import buttons to the button group on the bottom of the dialog.

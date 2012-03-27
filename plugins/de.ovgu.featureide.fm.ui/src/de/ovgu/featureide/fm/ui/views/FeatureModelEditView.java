@@ -135,6 +135,7 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 	private ViewContentProvider contentProvider = new ViewContentProvider(this);
 
 	public void createPartControl(Composite parent) {
+		FMUIPlugin.getDefault().logInfo("createPartControl()");
 		viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		viewer.setContentProvider(contentProvider);
 		viewer.setLabelProvider(new ViewLabelProvider());
@@ -190,6 +191,9 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 	 */
 	private void fillLocalToolBar(IToolBarManager manager) {
 		manager.add(activatorAction);
+		if (workspaceRoot == null) {
+			activatorAction.setEnabled(false);
+		}
 		activatorAction.setChecked(isActivatorChecked());
 		activatorAction.setToolTipText(ACTIVATOR_ACTION_TEXT);
 		activatorAction.setImageDescriptor(ImageDescriptor.createFromImage(REFESH_TAB_IMAGE));
@@ -255,7 +259,7 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 	private Job evaluation;
 	
 	private void setFeatureModelEditor(IWorkbenchPart activeEditor) {
-		if (featureModelEditor == activeEditor)
+		if (featureModelEditor != null && featureModelEditor == activeEditor)
 			return;
 
 		if (featureModelEditor != null) {
@@ -372,6 +376,11 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 		job = new Job("Updating Feature Model Edits") {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
+				if (workspaceRoot != null) {
+					activatorAction.setEnabled(true);
+					activatorAction.setChecked(isActivatorChecked());
+					manualAction.setEnabled(isActivatorChecked());
+				}
 				if (featureModelEditor == null) {
 					contentProvider.defaultContent();
 				} else if (isActivatorChecked()) {
