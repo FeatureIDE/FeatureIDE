@@ -286,14 +286,15 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 			menu.add(deleteAction);
 		} else if (legendLayoutAction.isEnabled()) {
 			menu.add(legendLayoutAction);
-		} else if (!connectionSelected) {
+		} else if (andAction.isEnabled() || orAction.isEnabled()
+				|| alternativeAction.isEnabled()) {
+			connectionEntrys(menu);
+		} else {
 			menu.add(createConstraintAction);
 			menu.add(new Separator());
 			menu.add(subMenu);
 			menu.add(new Separator());
 			menu.add(reverseOrderAction);
-		} else {
-			connectionEntrys(menu);
 		}
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 //		menu.add(legendAction);
