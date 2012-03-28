@@ -33,6 +33,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
+import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.model.Class;
 import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModel;
 import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModelBuilder;
@@ -50,7 +51,6 @@ public class CollaborationOutlineTreeContentProvider implements
 	private CollaborationModel model;
 	private CollaborationModelBuilder builder = new CollaborationModelBuilder();
 	private Comparator<? super FSTMethod> methodComparator = new Comparator<FSTMethod>() {
-
 
 		@Override
 		public int compare(FSTMethod o1, FSTMethod o2) {
@@ -179,8 +179,10 @@ public class CollaborationOutlineTreeContentProvider implements
 			
 			LinkedList<FSTDirective> directives = new LinkedList<FSTDirective>();
 			for (Role role : ((Class) parentElement).getRoles()) {
-				for (FSTDirective f : role.directives) {
-					directives.add(f);
+				for (FSTDirective d : role.directives) {
+					if (d.getParent() == null) {
+						directives.add(d);
+					}
 				}
 			}
 			FSTDirective[] directiveArray = new FSTDirective[directives.size()];
@@ -209,7 +211,6 @@ public class CollaborationOutlineTreeContentProvider implements
 			}
 			
 			return obj;
-			
 		} else if (parentElement instanceof FSTMethod) {
 			// get all the roles that belong to a method
 			LinkedList<Role> roleList = new LinkedList<Role>();
@@ -229,7 +230,6 @@ public class CollaborationOutlineTreeContentProvider implements
 				obj[i] = roleList.get(i);
 			}
 			return obj;
-			
 		} else if (parentElement instanceof FSTField) {
 			// get all the roles that belong to a field
 			LinkedList<Role> roleList = new LinkedList<Role>();
@@ -250,6 +250,10 @@ public class CollaborationOutlineTreeContentProvider implements
 			}
 
 			return obj;
+		} else if (parentElement instanceof FSTDirective) {
+			FSTDirective[] directiveArray = ((FSTDirective)parentElement).getChildren().clone();
+			Arrays.sort(directiveArray, directiveComparator);
+			return directiveArray;
 		}
 		return new Role[0];
 	}
@@ -290,6 +294,10 @@ public class CollaborationOutlineTreeContentProvider implements
 
 		if (element instanceof FSTField)
 			return true;
+		
+		if (element instanceof FSTDirective) {
+			return ((FSTDirective)element).getChildren().length != 0;
+		}
 
 		return false;
 	}

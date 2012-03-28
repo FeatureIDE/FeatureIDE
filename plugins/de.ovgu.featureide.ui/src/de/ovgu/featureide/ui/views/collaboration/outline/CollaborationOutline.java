@@ -472,7 +472,8 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 	public void addToolbar(IToolBarManager iToolBarManager) {
 		Action collapseAllAction = new Action() {
 			public void run() {
-				viewer.expandToLevel(1);
+				viewer.collapseAll();
+				viewer.expandToLevel(2);
 				viewer.refresh();
 			}
 		};
