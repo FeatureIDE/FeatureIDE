@@ -18,7 +18,9 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.outline;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -305,46 +307,19 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 	}
 
 	/**
-	 * sets the new input or disables the viewer in case no editor is open
+	 * Sets the new input or disables the viewer in case no editor is open
 	 * 
 	 * @param iFile2
-	 */
-	/*
-	 * TODO @Jens revise
-	 * TODO @Jens fix bug when selecting a feature and the related editor is not open
-	 * 			  the tree changes its expansion level to 1
 	 */
 	private void update(IFile iFile2) {
 		if (viewer != null) {
 			Control control = viewer.getControl();
 			if (control != null && !control.isDisposed()) {
-				if (iFile2 != null && iFile != null) {
-					/** only set the colors of the tree if the content is the same **/
-					if (iFile2.equals(iFile) && 
-							viewer.getTree().getItems().length > 0) {
-						iFile = iFile2;
-						TreeItem item = viewer.getTree().getItems()[0];
-						if (item != null) {
-							if (item.getData() instanceof  Class) {
-								String toAppend = ""; 
-								for (Role r : ((Class)item.getData()).getRoles()) {
-									if (r.directives.size() > 0) {
-										toAppend =  "";
-										break;
-									}
-									if (r.getRoleFile().equals(iFile)) {
-										toAppend = " - " + r.featureName;
-									}
-								}
-								item.setText(((Class)item.getData()).getName()+toAppend);
-								colorizeItems(viewer.getTree().getItems());
-								return;
-							}
-						}
-					}
+				if (refreshContent(iFile2)) {
+					return;
 				}
-				
 				iFile = iFile2;
+				
 				if (uiJob == null || uiJob.getState() == Job.NONE) {
 					uiJob = new UIJob("Update Outline View") {
 						public IStatus runInUIThread(IProgressMonitor monitor) {
@@ -413,6 +388,93 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 				}
 			}
 		}
+	}
+
+	/**
+	 * This method only updates the root and colors  
+	 * @param iFile2 
+	 * @return <code>false</code> if the content needs to be replaced
+	 */
+	private boolean refreshContent(IFile iFile2) {
+		if (iFile2 != null && iFile != null) {
+			/** only set the colors of the tree if the content is the same **/
+			TreeItem[] items = viewer.getTree().getItems();
+			if (iFile2.getName().equals(iFile.getName()) && items.length > 0) {
+				TreeItem item = items[0];
+				if (item != null) {
+					if (item.getData() instanceof  Class) {
+						if (!hasSameClass((Class) item.getData(), iFile2)) {
+							return false;
+						}
+						iFile = iFile2;
+						String toAppend = " - Composed class"; 
+						for (Role r : ((Class)item.getData()).getRoles()) {
+							if (r.directives.size() > 0) {
+								toAppend =  "";
+								break;
+							}
+							if (r.getRoleFile().equals(iFile)) {
+								toAppend = " - " + r.featureName;
+								break;
+							}
+						}
+						item.setText(((Class)item.getData()).getName()+toAppend);
+						colorizeItems(viewer.getTree().getItems());
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * @return <code>true</code> if the new input does not change the old content.
+	 */
+	private boolean hasSameClass(Class Class, IFile iFile2) {
+		if (!iFile2.getProject().equals(iFile.getProject())) {
+			return false;
+		}
+		if (isBuildFile(iFile2.getParent(), 
+				CorePlugin.getFeatureProject(iFile2).getBuildFolder())) {
+			return true;
+		}
+		if (isBuildFile(iFile.getParent(), 
+				CorePlugin.getFeatureProject(iFile).getBuildFolder())) {
+			return true;
+		}
+		
+		if (iFile2.equals(iFile)) {
+			return true;
+		}
+		boolean i = false;
+		boolean j = false;
+		for (Role role : Class.getRoles()) {
+			if (role.getRoleFile().equals(iFile)) {
+				i = true;
+			} else if (role.getRoleFile().equals(iFile2)) {
+				j = true;
+			}
+		}
+		return j && i;
+	}
+
+	/**
+	 * @param parent
+	 * @param buildFolder
+	 * @return <code>true</code> if the build folder contains the given folder
+	 */
+	private boolean isBuildFile(IContainer parent, IFolder buildFolder) {
+		if (parent == null) {
+			return false;
+		}
+		if (parent instanceof IFolder) {
+			if (parent.equals(buildFolder)) {
+				return true;
+			}
+			return isBuildFile(parent.getParent(), buildFolder);
+		}
+		return false;
 	}
 
 	/**
