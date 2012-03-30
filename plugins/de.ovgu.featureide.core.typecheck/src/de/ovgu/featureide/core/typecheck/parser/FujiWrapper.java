@@ -25,10 +25,14 @@ import java.util.List;
 
 import org.apache.commons.cli.ParseException;
 
+import AST.ASTNode;
 import AST.ClassDecl;
+import AST.CompilationUnit;
+import AST.IntrosRefsUtil;
 import AST.MethodAccess;
 import AST.MethodDecl;
 import AST.Program;
+import AST.ReferenceType;
 import AST.TypeAccess;
 import fuji.CompilerWarningException;
 import fuji.Composition;
@@ -45,6 +49,16 @@ import fuji.WrongArgumentException;
  */
 public class FujiWrapper
 {
+    public static void getIntros(CompilationUnit cu, java.util.List<String> featureModulePathnames) {
+        java.util.Collection<ReferenceType> refiningTypes = cu.getRefiningTypes();
+        if (refiningTypes != null) {
+            for (ReferenceType rt : refiningTypes) {
+                System.out.print(IntrosRefsUtil.introPrefix(rt, featureModulePathnames));
+                System.out.println(IntrosRefsUtil.typeDeclQName(rt));
+            }
+        }
+    }
+	
 	public static boolean hasSuperClass(ClassDecl cl, ClassDecl superclass)
 	{
 		if (cl.hasSuperclass())
@@ -72,15 +86,37 @@ public class FujiWrapper
 		return composition.getASTIterator();
 	}
 	
-	public static ArrayList<MethodAccess> getMethodAccesses(MethodDecl method)
+	public static ArrayList<ASTNode> getMethodAccesses(ASTNode method)
 	{
-		ArrayList<MethodAccess> method_accesses = new ArrayList<MethodAccess>();
+		ArrayList<ASTNode> method_accesses = new ArrayList<ASTNode>();
+		for(int i = method.getNumChild(); i > 0; i--)
+		{
+			ASTNode node = method.getChild(i-1);
+			
+			if(node instanceof MethodAccess)
+			{
+				method_accesses.add(node);
+			}
+			
+			method_accesses.addAll(getMethodAccesses(node));
+		}
 		return method_accesses;
 	}
 	
-	public static ArrayList<TypeAccess> getTypeAccesses(MethodDecl method)
+	public static ArrayList<ASTNode> getTypeAccesses(ASTNode method)
 	{
-		ArrayList<TypeAccess> type_accesses = new ArrayList<TypeAccess>();
+		ArrayList<ASTNode> type_accesses = new ArrayList<ASTNode>();
+		for(int i = method.getNumChild(); i > 0; i--)
+		{
+			ASTNode node = method.getChild(i-1);
+			
+			if(node instanceof TypeAccess)
+			{
+				type_accesses.add(node);
+			}
+			
+			type_accesses.addAll(getTypeAccesses(node));
+		}
 		return type_accesses;
 	}
 	

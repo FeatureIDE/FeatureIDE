@@ -35,7 +35,7 @@ import de.ovgu.featureide.fm.core.Feature;
  * 
  * @author S�nke Holthusen
  */
-public class MethodCheck implements ICheckPlugin {
+public class MethodCheck  extends AbstractCheckPlugin {
 
 	/*
 	 * (non-Javadoc)

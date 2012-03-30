@@ -19,6 +19,7 @@
 package de.ovgu.featureide.core.typecheck.check;
 
 import java.util.ArrayList;
+import java.util.Observable;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.typecheck.parser.ClassTable;
@@ -28,7 +29,7 @@ import de.ovgu.featureide.core.typecheck.parser.ClassTable;
  * 
  * @author Sönke Holthusen
  */
-public class CheckPluginManager
+public class CheckPluginManager extends Observable
 {
 	private ArrayList<ICheckPlugin> _plugins;
 	

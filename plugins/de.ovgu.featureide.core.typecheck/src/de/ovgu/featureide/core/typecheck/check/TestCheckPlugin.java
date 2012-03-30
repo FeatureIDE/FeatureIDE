@@ -28,7 +28,7 @@ import de.ovgu.featureide.core.typecheck.parser.ClassTableEntry;
  * 
  * @author soenke
  */
-public class TestCheckPlugin implements ICheckPlugin
+public class TestCheckPlugin extends AbstractCheckPlugin
 {
 
 	/*

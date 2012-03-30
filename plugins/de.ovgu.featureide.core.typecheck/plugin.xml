@@ -15,9 +15,9 @@
          </visibility>
          <action
                class="de.ovgu.featureide.core.typecheck.actions.TypecheckAction"
-               id="de.ovgu.featureide.core.fuji.checkaction1"
+               id="de.ovgu.featureide.typecheck.check"
                label="SPL Type Check"
-               menubarPath="group.open"
+               menubarPath="de.ovgu.featureide.ui.menu/typechecker"
                style="push">
          </action>
       </objectContribution>

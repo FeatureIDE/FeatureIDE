@@ -33,7 +33,7 @@ import de.ovgu.featureide.fm.core.Feature;
  * 
  * @author Sönke Holthusen
  */
-public class SuperClassCheck implements ICheckPlugin
+public class SuperClassCheck  extends AbstractCheckPlugin
 {
 	/*
 	 * (non-Javadoc)
@@ -48,6 +48,7 @@ public class SuperClassCheck implements ICheckPlugin
 			for (ClassTableEntry entry : class_table.getClassesByFeature(feature.getName()))
 			{
 				String superclass = entry.getAST().superclass().fullName();
+				System.out.println(entry.getClassName() + " has superclass " + superclass);
 				if (class_table.contains(superclass))
 				{
 					HashSet<Feature> featureset = new HashSet<Feature>();
@@ -62,7 +63,7 @@ public class SuperClassCheck implements ICheckPlugin
 
 					try
 					{
-						if (!TypecheckCorePlugin.checkImpliesDisjunct(project.getFeatureModel(), featureset, providing_feature_set))
+						if (TypecheckCorePlugin.checkImpliesDisjunct(project.getFeatureModel(), featureset, providing_feature_set))
 						{
 							//TODO: error marker
 							//project.createBuilderMarker(entry.getClassFile(), "", 1, 0);
@@ -81,5 +82,15 @@ public class SuperClassCheck implements ICheckPlugin
 				}
 			}
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.typecheck.check.ICheckPlugin#register(de.ovgu.featureide.core.typecheck.check.CheckPluginManager)
+	 */
+	@Override
+	public void register(CheckPluginManager manager)
+	{
+		// TODO Auto-generated method stub
+		
 	}
 }

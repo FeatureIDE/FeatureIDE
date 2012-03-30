@@ -61,6 +61,52 @@ public class Parser
 		}
 	}
 
+	public void parseFeatures(String feature_path, List<Feature> feature_list)
+	{		
+		Timer timer = new Timer();
+		//System.out.print("Parsing Feature " + feature.getName() + " ... ");
+		timer.start();
+		this.timer.resume();
+
+		try
+		{
+			List<String> list = new ArrayList<String>();
+			for(Feature feature : feature_list)
+			{
+				list.add(feature.getName());
+			}
+
+			Iterator<Program> iter = FujiWrapper.getFujiCompositionIterator(list, feature_path);
+
+			while (iter.hasNext())
+			{
+				// XXX: takes a very long time
+				Program ast = iter.next();
+
+				@SuppressWarnings("unchecked")
+				Iterator<CompilationUnit> it = ast.compilationUnitIterator();
+				while (it.hasNext())
+				{
+					CompilationUnit cu = it.next();
+					if (cu.fromSource())
+					{
+						parseCU(cu, feature_path, list);
+					}
+				}
+
+			}
+
+		}
+		catch (Exception e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		this.timer.stop();
+		timer.stop();
+		System.out.println(" done (" + timer.getTime() + " ms)");
+	}
+	
 	private void parseFeature(String feature_path, Feature feature)
 	{
 		Timer timer = new Timer();
@@ -104,6 +150,22 @@ public class Parser
 		System.out.println(" done (" + timer.getTime() + " ms)");
 	}
 
+	private void parseCU(CompilationUnit cu, String feature_path, List<String> feature_list)
+	{
+		System.out.println(cu.classQName());
+		List<String> feature_paths = new ArrayList<String>();
+		for(String feature_name : feature_list)
+		{
+			System.out.println(feature_name);
+			
+			feature_paths.add(feature_path + feature_name);
+			//FujiWrapper.getIntros(cu, feature_paths);
+			
+		}
+		cu.printIntros(feature_paths);
+		cu.printRefs(feature_paths);
+	}
+	
 	private void parseCU(Feature feature, CompilationUnit cu)
 	{
 		// TODO: handle imports

@@ -21,11 +21,11 @@ package de.ovgu.featureide.core.typecheck;
 import java.util.ArrayList;
 import java.util.List;
 
+import AST.ASTNode;
+
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.typecheck.check.CheckPluginManager;
-import de.ovgu.featureide.core.typecheck.check.MethodCheck;
 import de.ovgu.featureide.core.typecheck.check.SuperClassCheck;
-import de.ovgu.featureide.core.typecheck.check.TestCheckPlugin;
 import de.ovgu.featureide.core.typecheck.parser.ClassTable;
 import de.ovgu.featureide.core.typecheck.parser.Parser;
 import de.ovgu.featureide.fm.core.Feature;
@@ -50,23 +50,27 @@ public class TypeChecker
 		_parser = new Parser(_project);
 		_checks = new CheckPluginManager();
 
-		_checks.addCheck(new SuperClassCheck(), new MethodCheck());
+		_checks.addCheck(new SuperClassCheck());
 	}
 
 	public void run()
 	{
 		TypecheckCorePlugin.logln("Starting parsing project " + _project.getProjectName());
+		
+		System.out.println(ASTNode.class);
 		List<Feature> concrete_features = new ArrayList<Feature>(_project.getFeatureModel().getConcreteFeatures());
 
 		// TODO: consider the userdefined feature order?
 
-		_parser.parse(_project.getSourcePath(), (concrete_features));
-
-		_class_table = _parser.getClassTable();
-
-		TypecheckCorePlugin.logln("Parsing finished... (" + _parser.timer.getTime() + " ms)");
-		TypecheckCorePlugin.logln("Running checks...");
-		_checks.invokeChecks(_project, _class_table);
-		TypecheckCorePlugin.logln("Checks finished...");
+		_parser.parseFeatures(_project.getSourcePath(), concrete_features);
+		
+//		_parser.parse(_project.getSourcePath(), (concrete_features));
+//
+//		_class_table = _parser.getClassTable();
+//
+//		TypecheckCorePlugin.logln("Parsing finished... (" + _parser.timer.getTime() + " ms)");
+//		TypecheckCorePlugin.logln("Running checks...");
+//		_checks.invokeChecks(_project, _class_table);
+//		TypecheckCorePlugin.logln("Checks finished...");
 	}
 }

@@ -19,47 +19,34 @@
 package de.ovgu.featureide.core.typecheck.check;
 
 import java.util.Observable;
+import java.util.Observer;
 
 import AST.FieldDecl;
 import AST.FieldDeclaration;
-
-import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.typecheck.parser.ClassTable;
 
 /**
  * TODO description
  * 
  * @author soenke
  */
-public class FieldCheck extends AbstractCheckPlugin
+public abstract class AbstractCheckPlugin implements ICheckPlugin, Observer
 {
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.typecheck.check.ICheckPlugin#invokeCheck(de.ovgu.featureide.core.IFeatureProject,
-	 * de.ovgu.featureide.core.typecheck.parser.ClassTable)
+	private CheckPluginManager _manager;
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.typecheck.check.ICheckPlugin#register(de.ovgu.featureide.core.typecheck.check.CheckPluginManager)
 	 */
 	@Override
-	public void invokeCheck(IFeatureProject project, ClassTable class_table)
+	public void register(CheckPluginManager manager)
 	{
-
+		_manager = manager;
 	}
-
+	
+	/* (non-Javadoc)
+	 * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+	 */
 	@Override
-	public void update(Observable obs, Object arg)
+	public void update(Observable o, Object arg)
 	{
-		if (arg instanceof FieldDeclaration)
-		{
 
-		}
-		else
-		{
-			if (arg instanceof FieldDecl)
-			{
-
-			}
-		}
 	}
-
 }

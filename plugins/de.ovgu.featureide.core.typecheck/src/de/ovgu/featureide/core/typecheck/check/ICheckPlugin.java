@@ -28,5 +28,6 @@ import de.ovgu.featureide.core.typecheck.parser.ClassTable;
  */
 public interface ICheckPlugin
 {
+	public void register(CheckPluginManager manager);
 	public void invokeCheck(IFeatureProject project, ClassTable class_table);
 }
