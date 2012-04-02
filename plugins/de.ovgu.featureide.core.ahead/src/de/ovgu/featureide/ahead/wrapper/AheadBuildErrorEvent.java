@@ -52,6 +52,18 @@ public class AheadBuildErrorEvent {
 	private AheadBuildErrorType type;
 	
 	private int line;
+
+	public String fileName;
+
+	private Matcher matcher;
+	
+	/**
+	 * Constructor for test purpose<br>
+	 * Does nothing.
+	 */
+	public AheadBuildErrorEvent() {
+		
+	}
 	
 	public AheadBuildErrorEvent(IResource source, String message, AheadBuildErrorType type, int line) {
 		this.type = type;
@@ -81,17 +93,10 @@ public class AheadBuildErrorEvent {
 		}
 	}
 
-	/*
-	 * TODO fix wrong line calculation for AHEAD
-	 * 
-	 * The first pattern seems to cause an endless loop.
-	 * 
-	 * The second pattern caused a wrong line calculation.
-	 * see: Example "DesktopSearcher" at class MainFrame(Feature:Tree_View): "Variable position not used"
+	/**
+	 * @throws CoreException
+	 * @throws IOException
 	 */
-//	private static Pattern inheritedPattern = Pattern.compile("(// inherited constructors(?:[^{}]+|\\{[^{}]+\\})+\\{[^{}]+\\})\\s*}");
-	private static Pattern inheritedPattern = Pattern.compile("(// inherited constructors(?:[^{}]+|\\{[^{}]+\\})+)\\}");
-	
 	private void convertToComposedJak() throws CoreException, IOException {
 		IFile javaFile = (IFile) this.file;
 		int javaLine = this.line;
@@ -100,9 +105,31 @@ public class AheadBuildErrorEvent {
 		String jakName = javaName.substring(0, javaName.lastIndexOf('.')) + ".jak"; 
 		IFile composedJakFile = ((IFolder) javaFile.getParent()).getFile(jakName);
 
-		int composedJakLine = javaLine;
 		javaFile.refreshLocal(IResource.DEPTH_ZERO, null);
-		String contentString = getString(javaFile);
+
+		this.file = composedJakFile;
+		this.line = calculateComposedJakLine(javaLine, getString(javaFile));
+	}
+
+	/*
+	 * TODO fix wrong line calculation for AHEAD
+	 * 
+	 * The first pattern causes an endless loop.
+	 * 
+	 * The second pattern caused a wrong line calculation.
+	 * see: Tests @ TAheadErrorPropagation
+	 */	
+//	private static Pattern inheritedPattern = Pattern.compile("(// inherited constructors(?:[^{}]+|\\{[^{}]+\\})+\\{[^{}]+\\})\\s*}");
+	private static Pattern inheritedPattern = Pattern.compile("(// inherited constructors(?:[^{}]+|\\{[^{}]+\\})+)\\}");
+	
+	/**
+	 * Calculates the corresponding line of the composed jak file to the java file
+	 *
+	 * @param javaLine The line at the java file
+	 * @return the line at the composed jak file
+	 */
+	public int calculateComposedJakLine(int javaLine, String contentString) {
+		int composedJakLine = javaLine;
 		PosString content = new PosString(contentString);
 		Matcher matcher = inheritedPattern.matcher(content.string);
 		while (matcher.find()) {
@@ -111,22 +138,49 @@ public class AheadBuildErrorEvent {
 				break;
 			composedJakLine -= new PosString(matcher.group(1), matcher.end(1)).lineNumber();
 		}
-		
-		this.file = composedJakFile;
-		this.line = composedJakLine;
+		return composedJakLine;
 	}
 
 	private static Pattern jakPattern = Pattern.compile("SoUrCe[^\"]+\"([^\"]+)\";");
 	
+	/**
+	 * Calculates the line at the jak source files and searches the right feature
+	 * @throws CoreException
+	 * @throws IOException
+	 */
 	private void calculateJakLine() throws CoreException, IOException {
 		IFile composedJakFile = (IFile) this.file;
 		int composedJakLine = this.line;
 		
 		composedJakFile.refreshLocal(IResource.DEPTH_ZERO, null);
+		
 		String contentString = getString(composedJakFile);
+		int line = setSourceFile(contentString, composedJakLine);
+		
+		if (fileName == null) {
+			this.line = lookupImportInAllJakFiles(contentString, matcher);
+		}
+		else {
+			IFile jakFile = getJakFile(fileName);
+			if (jakFile != null) {
+				jakFile.refreshLocal(IResource.DEPTH_ZERO, null);
+				String jakContent = getString(jakFile);
+					
+				this.file = jakFile;
+				this.line = setSourceLine(composedJakLine, line, jakContent);
+			}
+		}
+	}
+
+	/**
+	 * TODO description / rename
+	 * @param contentString
+	 * @param composedJakLine 
+	 * @return
+	 */
+	public int setSourceFile(String contentString, int composedJakLine) {
 		PosString content = new PosString(contentString);
-		Matcher matcher = jakPattern.matcher(content.string);
-		String filename = null;
+		matcher = jakPattern.matcher(content.string);
 		int line = 0;
 		while (matcher.find(content.pos)) {
 			content.pos = matcher.end(1);
@@ -134,36 +188,43 @@ public class AheadBuildErrorEvent {
 			if (newLine >= composedJakLine)
 				break;
 			line = newLine;
-			filename = matcher.group(1);
+			fileName = matcher.group(1);
+		}
+		return line;
+	}
+	
+	/**
+	 * TODO description/rename
+	 * @param composedJakLine 
+	 * @param jakContent 
+	 * @return
+	 * @throws IOException 
+	 * @throws CoreException 
+	 */
+	public int setSourceLine(int composedJakLine, int line, String jakContent) {
+		int jakLine = composedJakLine - line + 1;
+		try {
+			jakLine += numberOfImportLines(jakContent);
+		} catch (CoreException e) {
+			AheadCorePlugin.getDefault().logError(e);
+		} catch (IOException e) {
+			AheadCorePlugin.getDefault().logError(e);
 		}
 		
-		if (filename == null) {
-			lookupImportInAllJakFiles(contentString, matcher);
-		}
-		else {
-			IFile jakFile = getJakFile(filename);
-			if (jakFile != null) {
-				int jakLine = composedJakLine - line + 1;
-				jakLine += numberOfImportLines(jakFile);
-				
-				/*
-				 * Removed because layer declaration is not supported and necessary anymore.
-				 * It caused a wrong line calculation.
-				 */
-//				jakLine += lineNumberOfLayerDeclaration(jakFile);
-				
-				this.file = jakFile;
-				this.line = jakLine;
-			}
-		}
+		/*
+		 * Removed because layer declaration is not supported and necessary anymore.
+		 * It caused a wrong line calculation.
+		 */
+//		jakLine += lineNumberOfLayerDeclaration(jakFile);
+		return jakLine;
 	}
 
-	private void lookupImportInAllJakFiles(String composedJakContent, Matcher matcher) throws CoreException, IOException {
+	private int lookupImportInAllJakFiles(String composedJakContent, Matcher matcher) throws CoreException, IOException {
 		int a = 0;
 		int b = 0;
 		for (int i = 0; i < line; i++) {
 			if (b < 0)
-				return;
+				return line;
 			a = b;
 			b = composedJakContent.indexOf('\n', b) + 1;
 		}
@@ -176,13 +237,13 @@ public class AheadBuildErrorEvent {
 				String text = getString(jakFile);
 				int pos = text.indexOf(importString);
 				if (pos >= 0) {
-					this.line = new PosString(text, pos).lineNumber();
 					this.file = jakFile;
-					return;
+					return new PosString(text, pos).lineNumber();
 				}
 			}
 		}
 		while (matcher.find());
+		return line;
 	}
 
 	private IFile getJakFile(String filename) {
@@ -198,9 +259,7 @@ public class AheadBuildErrorEvent {
 
 	private static Pattern importPattern = Pattern.compile("(import)\\s[^;\\(\\)\\{\\}\\[\\]]+;");
 
-	private int numberOfImportLines(IFile jakFile) throws CoreException, IOException {
-		jakFile.refreshLocal(IResource.DEPTH_ZERO, null);
-		String contentString = getString(jakFile);
+	private int numberOfImportLines(String contentString) throws CoreException, IOException {
 		PosString content = new PosString(contentString);
 
 		Matcher matcher = importPattern.matcher(content.string);
