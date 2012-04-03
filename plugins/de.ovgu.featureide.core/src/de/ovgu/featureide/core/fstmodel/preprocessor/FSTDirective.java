@@ -71,6 +71,14 @@ public class FSTDirective extends FSTModelElement {
 		
 		children = new ArrayList<FSTDirective>();
 	}
+	
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.fstmodel.FSTModelElement#getParent()
+	 */
+	@Override
+	public FSTModelElement getParent() {
+		return parent;
+	}
 
 
 	/**

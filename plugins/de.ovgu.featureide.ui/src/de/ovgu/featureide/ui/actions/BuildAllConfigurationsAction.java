@@ -72,9 +72,7 @@ public class BuildAllConfigurationsAction implements IObjectActionDelegate,
 	 * @return true if all current configurations should be build.
 	 */
 	private MessageDialogWithToggle openDialog() {
-		String message = MESSAGE_START
-				+ MESSAGE_END
-				+ featureProject.getProject()
+		String message = MESSAGE_END + featureProject.getProject()
 						.getFolder(ConfigurationBuilder.FOLDER_NAME_CURRENT)
 						.getFullPath().toOSString() + "\"";
 		return MessageDialogWithToggle.openOkCancelConfirm(null, MESSAGE_TITLE,

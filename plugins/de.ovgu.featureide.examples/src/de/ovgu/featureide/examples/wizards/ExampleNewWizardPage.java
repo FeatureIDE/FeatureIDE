@@ -105,8 +105,6 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 	private CheckboxTreeViewer projectsList;
 	private Text descBox;
 
-	private Composite workArea;
-
 	private ProjectRecord[] selectedProjects = new ProjectRecord[0];
 	private IProject[] wsProjects;
 	private String samplePath;
@@ -125,7 +123,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 	public void createControl(Composite parent) {
 		initializeDialogUnits(parent);
 
-		workArea = new Composite(parent, SWT.NONE);
+		Composite workArea = new Composite(parent, SWT.NONE);
 		setControl(workArea);
 
 		workArea.setLayout(new GridLayout());

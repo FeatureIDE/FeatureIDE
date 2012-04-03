@@ -28,7 +28,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.fm.core.Feature;
-
+import de.ovgu.featureide.fm.core.FeatureModel;
 
 public class ConfigurationWriter {
 
@@ -43,32 +43,33 @@ public class ConfigurationWriter {
 	}
 
 	public void saveToFile(IFile file) throws CoreException {
-		InputStream source = new ByteArrayInputStream(writeIntoString(file).getBytes(Charset.availableCharsets().get("UTF-8"))); 
-		
+		InputStream source = new ByteArrayInputStream(writeIntoString(file)
+				.getBytes(Charset.availableCharsets().get("UTF-8")));
+
 		if (file.exists()) {
 			file.setContents(source, false, true, null);
 		} else {
 			file.create(source, true, null);
 		}
 	}
-	
-	public String writeIntoString(IFile file){
+
+	public String writeIntoString(IFile file) {
 		StringBuilder buffer = new StringBuilder();
-		
-			ArrayList<String> list = configuration.getFeatureModel().getFeatureOrderList();
-			if (configuration.getFeatureModel().isFeatureOrderUserDefined()) {
-				Set<Feature> featureset = configuration.getSelectedFeatures();
-				for (String s : list) {
-					for (Feature f : featureset) {
-						if (f.isLayer()) {
-							if (f.getName().equals(s))
-								buffer.append(s + "\r\n");
-						}
+		FeatureModel featureModel = configuration.getFeatureModel();
+		ArrayList<String> list = featureModel.getFeatureOrderList();
+		if (featureModel.isFeatureOrderUserDefined()) {
+			Set<Feature> featureset = configuration.getSelectedFeatures();
+			for (String s : list) {
+				for (Feature f : featureset) {
+					if (f.isLayer()) {
+						if (f.getName().equals(s))
+							buffer.append(s + "\r\n");
 					}
 				}
-				return buffer.toString();
 			}
-		
+			return buffer.toString();
+		}
+
 		writeSelectedFeatures(configuration.getRoot(), buffer);
 		return buffer.toString();
 	}

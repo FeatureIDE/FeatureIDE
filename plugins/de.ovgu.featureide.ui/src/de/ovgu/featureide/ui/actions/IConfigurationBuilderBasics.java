@@ -36,7 +36,7 @@ public interface IConfigurationBuilderBasics {
 	 * Basics for the dialogs.
 	 */
 	final static String MESSAGE_TITLE = "Build all valid configurations";
-	final static String MESSAGE_START = "This could take a very long time.\n";
+	final static String MESSAGE_START = "This could take a very long time.\nThe current algorithm is very efficient if your model contains many constraints.\n";
 	final static String MESSAGE_END = "All products will be built into: \"";
 	final static String TOGGLE_MESSAGE = "Call the compiler after build(Java1.6 only).";
 	

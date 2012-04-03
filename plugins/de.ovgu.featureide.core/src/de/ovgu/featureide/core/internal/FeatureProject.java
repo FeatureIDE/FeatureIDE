@@ -144,9 +144,15 @@ public class FeatureProject extends BuilderMarkerHandler implements
 
 	private IComposerExtension composerExtension = null;
 
+	/**
+	 * If <code>true</code> there is something changed that is relevant for composition.<br>
+	 * Usually the the folders of the selected features and the actual configuration file. 
+	 */
 	private boolean buildRelevantChanges = false;
 
 	private IFile currentConfiguration = null;
+
+	private Job syncJob;
 
 	/**
 	 * Creating a new ProjectData includes creating folders if they don't exist,
@@ -679,43 +685,85 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		return cp.toArray(new String[cp.size()]);
 	}
 
+	protected volatile boolean waiting;
+	
 	/**
 	 * refreshes Feature Module Markers for all folders in the source folder
 	 * 
 	 * @param featureModel
 	 * @param sourceFolder
 	 */
+	/*
+	 * The first job is waiting for the synchronization job to finish and sets the variable waiting, 
+	 * so the job will finish early. Than a new job is started. 
+	 * 
+	 * If <syncJob.join()> is called outside of a job the workspace is blocked, because the method has
+	 * a higher priority than the synchronization job.
+	 * 
+	 * The goal of this is that a synchronization can't be executed unnecessarily multiple times.
+	 */
 	private void setAllFeatureModuleMarkers(final FeatureModel featureModel,
 			final IFolder sourceFolder) {
-		Job job = new Job("Synchronize feature model and feature modules") {
+		
+		Job waiter = new Job("Synchronize feature model and feature modules") {
+
+			@Override
 			protected IStatus run(IProgressMonitor monitor) {
-				try {
-					// prevent warnings, if the user has just created a project
-					// without any source files
-					if (allFeatureModulesEmpty(sourceFolder)) {
-						sourceFolder.deleteMarkers(
-								FEATURE_MODULE_MARKER,
-								true, IResource.DEPTH_ONE);
+				if (waiting) {
+					monitor.done();
+					return Status.OK_STATUS;
+				}
+				if(syncJob != null) {
+					waiting = true;
+					try {
+						syncJob.join();
+					} catch (InterruptedException e) {
+						CorePlugin.getDefault().logError(e);
+					}
+					waiting = false;
+				}
+				syncJob = new Job("Synchronize feature model and feature modules") {
+					protected IStatus run(IProgressMonitor monitor) {
+						try {
+							// prevent warnings, if the user has just created a project
+							// without any source files
+							// TODO This could be removed because the user could use the modeling extension instead
+							if (allFeatureModulesEmpty(sourceFolder)) {
+								sourceFolder.deleteMarkers(
+										FEATURE_MODULE_MARKER,
+										true, IResource.DEPTH_ONE);
+								monitor.done();
+								return Status.OK_STATUS;
+							}
+							// set marker for each folder
+							if (sourceFolder.exists()) {
+								monitor.beginTask("", sourceFolder.members().length);
+								for (IResource res : sourceFolder.members()) {
+									if (waiting) {
+										monitor.done();
+										return Status.OK_STATUS;
+									}
+									if (res instanceof IFolder)
+										setFeatureModuleMarker(featureModel,
+												(IFolder) res);
+									monitor.worked(1);
+								}
+							}
+						} catch (CoreException e) {
+							CorePlugin.getDefault().logError(e);
+						}
+						monitor.done();
 						return Status.OK_STATUS;
 					}
-					// set marker for each folder
-					if (sourceFolder.exists()) {
-						monitor.beginTask("", sourceFolder.members().length);
-						for (IResource res : sourceFolder.members()) {
-							if (res instanceof IFolder)
-								setFeatureModuleMarker(featureModel,
-										(IFolder) res);
-							monitor.worked(1);
-						}
-					}
-				} catch (CoreException e) {
-					CorePlugin.getDefault().logError(e);
-				}
+				};
+				syncJob.setPriority(Job.DECORATE);
+				syncJob.schedule();
+				monitor.done();
 				return Status.OK_STATUS;
 			}
 		};
-		job.setPriority(Job.DECORATE);
-		job.schedule();
+		waiter.setPriority(Job.DECORATE);
+		waiter.schedule();
 	}
 
 	/**

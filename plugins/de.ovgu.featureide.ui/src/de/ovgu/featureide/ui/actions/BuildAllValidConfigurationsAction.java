@@ -74,8 +74,7 @@ public class BuildAllValidConfigurationsAction implements
 	 * @return true if all valid configurations should be build.
 	 */
 	private MessageDialogWithToggle openDialog() {
-		String message = MESSAGE_START;
-		message += MESSAGE_END
+		String message = MESSAGE_START + MESSAGE_END
 				+ featureProject.getProject()
 						.getFolder(ConfigurationBuilder.FOLDER_NAME)
 						.getFullPath().toOSString() + "\"";

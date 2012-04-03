@@ -96,12 +96,43 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 	/**
 	 * Button to start manual calculations.
 	 */
-	private Action manualAction;
+	private Action manualAction = new Action() {
+		public void run() {
+			Job job = new Job("Updating Feature Model Edits") {
+				protected IStatus run(IProgressMonitor monitor) {
+					if (featureModelEditor == null)
+						contentProvider.defaultContent();
+					else {
+						contentProvider.calculateContent(
+								featureModelEditor.getOriginalFeatureModel(),
+								featureModelEditor.getFeatureModel());
+					}
+					return Status.OK_STATUS;
+				}
+			};
+			job.setPriority(Job.SHORT);
+			job.schedule();
+		}
+	};
 	
 	/**
 	 * Button to enable/disable automatic calculations.
 	 */
-	private Action activatorAction;
+	private Action activatorAction = new Action() {
+		public void run() {
+			Job job = new Job("") {
+				protected IStatus run(IProgressMonitor monitor) {
+					activatorAction.setChecked(activatorAction.isChecked());
+					manualAction.setEnabled(activatorAction.isChecked());
+					setActivatorChecked(activatorAction.isChecked());
+					return Status.OK_STATUS;
+				}
+
+			};
+			job.setPriority(Job.SHORT);
+			job.schedule();
+		}
+	};
 	
 	private IPartListener editorListener = new IPartListener() {
 
@@ -145,7 +176,7 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 		IWorkbenchPage page = getSite().getPage();
 		setFeatureModelEditor(page.getActiveEditor());
 		
-		makeActions();
+		//makeActions();
 		fillLocalToolBar(getViewSite().getActionBars().getToolBarManager());
 	}
 
