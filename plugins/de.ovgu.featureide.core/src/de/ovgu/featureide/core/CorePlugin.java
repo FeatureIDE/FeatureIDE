@@ -215,7 +215,7 @@ public class CorePlugin extends AbstractCorePlugin {
 
 	public void fireBuildUpdated(IFeatureProject featureProject) {
 		for (ICurrentBuildListener listener : currentBuildListeners)
-			listener.updateGuiAfterBuild(featureProject);
+			listener.updateGuiAfterBuild(featureProject, featureProject.getCurrentConfiguration());
 	}
 
 	public void addProjectListener(IProjectListener listener) {

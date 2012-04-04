@@ -18,6 +18,8 @@
  */
 package de.ovgu.featureide.core.listeners;
 
+import org.eclipse.core.resources.IFile;
+
 import de.ovgu.featureide.core.IFeatureProject;
 
 /**
@@ -25,5 +27,5 @@ import de.ovgu.featureide.core.IFeatureProject;
  * @author Constanze Adler
  */
 public interface ICurrentBuildListener {
-	void updateGuiAfterBuild(IFeatureProject project);
+	void updateGuiAfterBuild(IFeatureProject project, IFile configurationFile);
 }

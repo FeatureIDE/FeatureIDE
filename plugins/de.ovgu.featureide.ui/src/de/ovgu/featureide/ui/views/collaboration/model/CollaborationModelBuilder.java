@@ -81,7 +81,6 @@ public class CollaborationModelBuilder {
 
 	public CollaborationModel buildCollaborationModel(
 			IFeatureProject featureProject) {
-		// TODO @Jens: refactor this method into several
 		if (!initilize(featureProject)) {
 			return null;
 		}

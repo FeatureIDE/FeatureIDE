@@ -101,7 +101,7 @@ public class FilterAction extends Action {
 			featureFilter = new LinkedList<String>();
 			collaborationView.builder.classFilter = classFilter;
 			collaborationView.builder.featureFilter = featureFilter;
-			collaborationView.updateGuiAfterBuild(collaborationView.getFeatureProject());
+			collaborationView.updateGuiAfterBuild(collaborationView.getFeatureProject(), null);
 		}
 	}
 }

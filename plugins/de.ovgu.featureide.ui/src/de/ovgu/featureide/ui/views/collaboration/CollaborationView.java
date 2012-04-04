@@ -183,9 +183,10 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 					featureProject = CorePlugin.getFeatureProject(inputFile);
 					if (featureProject != null) {
 						//case: it's a featureIDE project
-						if (inputFile.getName().contains(".") &&
+						String fileName = inputFile.getName();
+						if (fileName.contains(".") &&
 								CorePlugin.getDefault().getConfigurationExtensions()
-								.contains(inputFile.getName().substring(inputFile.getName().lastIndexOf('.')))) {
+								.contains(fileName.substring(fileName.lastIndexOf('.')))) {
 							//case: open configuration editor
 							builder.editorFile = null;
 							if (builder.configuration != null &&
@@ -221,7 +222,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				model.collaborations.add(new Collaboration(CONFIGURATION_MESSAGE));
 				viewer.setContents(model);
 			} else
-				updateGuiAfterBuild(featureProject);
+				updateGuiAfterBuild(featureProject, null);
 		}
 	}
 	
@@ -281,7 +282,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 							IComposerExtension composer = featureProject.getComposer();
 							if (composer != null) {
 								composer.buildFSTModel();
-								updateGuiAfterBuild(featureProject);
+								updateGuiAfterBuild(featureProject, null);
 							}
 						}
 						return Status.OK_STATUS;
@@ -297,13 +298,16 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.core.listeners.ICurrentBuildListener#updateGuiAfterBuild(de.ovgu.featureide.core.IFeatureProject)
 	 */
-	public void updateGuiAfterBuild(final IFeatureProject project) {
+	public void updateGuiAfterBuild(final IFeatureProject project, final IFile configurationFile) {
 		if (featureProject != null && featureProject.equals(project)) {
 			Job job = new Job("Build Collaboration Model") {
 
 				public IStatus run(IProgressMonitor monitor) {
 					if (builded) {
 						builded = false;
+						if (configurationFile != null && builder.editorFile != null) {
+							builder.configuration = configurationFile;
+						}
 						model = builder.buildCollaborationModel(project);
 						builded = true;
 						if (model == null) {

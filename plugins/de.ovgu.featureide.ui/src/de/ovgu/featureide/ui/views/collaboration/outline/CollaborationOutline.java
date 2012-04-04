@@ -587,7 +587,7 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 	 * @see de.ovgu.featureide.core.listeners.ICurrentBuildListener#updateGuiAfterBuild(de.ovgu.featureide.core.IFeatureProject)
 	 */
 	@Override
-	public void updateGuiAfterBuild(IFeatureProject project) {
+	public void updateGuiAfterBuild(IFeatureProject project, IFile configurationFile) {
 		if (iFile != null && project.equals(CorePlugin.getFeatureProject(iFile))) {
 			IFile iFile2 = iFile;
 			iFile = null;

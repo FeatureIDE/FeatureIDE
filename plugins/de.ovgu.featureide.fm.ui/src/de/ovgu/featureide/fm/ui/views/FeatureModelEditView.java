@@ -166,7 +166,6 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 	private ViewContentProvider contentProvider = new ViewContentProvider(this);
 
 	public void createPartControl(Composite parent) {
-		FMUIPlugin.getDefault().logInfo("createPartControl()");
 		viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		viewer.setContentProvider(contentProvider);
 		viewer.setLabelProvider(new ViewLabelProvider());
@@ -176,45 +175,7 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 		IWorkbenchPage page = getSite().getPage();
 		setFeatureModelEditor(page.getActiveEditor());
 		
-		//makeActions();
 		fillLocalToolBar(getViewSite().getActionBars().getToolBarManager());
-	}
-
-	private void makeActions() {
-		manualAction = new Action() {
-			public void run() {
-				Job job = new Job("Updating Feature Model Edits") {
-					protected IStatus run(IProgressMonitor monitor) {
-						if (featureModelEditor == null)
-							contentProvider.defaultContent();
-						else {
-							contentProvider.calculateContent(
-									featureModelEditor.getOriginalFeatureModel(),
-									featureModelEditor.getFeatureModel());
-						}
-						return Status.OK_STATUS;
-					}
-				};
-				job.setPriority(Job.SHORT);
-				job.schedule();
-			}
-		};
-		
-		activatorAction = new Action() {
-			public void run() {
-				Job job = new Job("") {
-					protected IStatus run(IProgressMonitor monitor) {
-						activatorAction.setChecked(activatorAction.isChecked());
-						manualAction.setEnabled(activatorAction.isChecked());
-						setActivatorChecked(activatorAction.isChecked());
-						return Status.OK_STATUS;
-					}
-
-				};
-				job.setPriority(Job.SHORT);
-				job.schedule();
-			}
-		};
 	}
 
 	/**
