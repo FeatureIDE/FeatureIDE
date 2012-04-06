@@ -30,7 +30,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 /**
  * TODO description
  * 
- * @author soenke
+ * @author Soenke Holthusen
  */
 public class FeatureModelReaderIFileWrapper extends
 	AbstractFeatureModelReader {
