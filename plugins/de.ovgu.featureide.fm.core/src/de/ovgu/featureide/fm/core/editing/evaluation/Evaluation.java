@@ -88,7 +88,7 @@ public class Evaluation {
 		for (int i = 0; i < comparator.length; i++)
 			comparator[i] = new ModelComparator(60000, i);
 		//IFeatureModelReader reader = new XmlFeatureModelReader(null,project);
-		FeatureModelReaderIFileWrapper reader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(null,project));
+		FeatureModelReaderIFileWrapper reader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(null));
 		IFeatureModelWriter writer = new XmlFeatureModelWriter(null);
 		for (int k = 0; k < sizes.length; k++)
 			for (int i = 1; i <= 5; i++) {
@@ -207,7 +207,7 @@ public class Evaluation {
 						
 						FeatureModel fmout = new FeatureModel();
 						//IFeatureModelReader reader = new XmlFeatureModelReader(fmout,project);
-						FeatureModelReaderIFileWrapper reader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fmout,project));
+						FeatureModelReaderIFileWrapper reader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fmout));
 						reader.readFromFile(file);
 						valid = fmout.isValid();
 					} catch (Exception e) {
@@ -235,7 +235,7 @@ public class Evaluation {
 					IFile file = folder.getFile(size + "-" + id + ".m");
 					FeatureModel fm = new FeatureModel();
 					//IFeatureModelReader reader = new XmlFeatureModelReader(fm,project);
-					FeatureModelReaderIFileWrapper reader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fm,project));
+					FeatureModelReaderIFileWrapper reader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fm));
 					//check if it is valid
 					String output = null;
 					try {

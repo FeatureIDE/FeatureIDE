@@ -205,7 +205,7 @@ public class FeatureDependenciesAction implements IObjectActionDelegate {
 	private FeatureModel readModel(IFile inputFile) {
 		FeatureModel fm = new FeatureModel();
 		//XmlFeatureModelReader fmReader = new XmlFeatureModelReader(fm,inputFile.getProject());
-		FeatureModelReaderIFileWrapper fmReader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fm,inputFile.getProject()));
+		FeatureModelReaderIFileWrapper fmReader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fm));
 		
 		try {
 			fmReader.readFromFile(inputFile);

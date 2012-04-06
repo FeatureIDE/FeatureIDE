@@ -307,7 +307,7 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 									FeatureModel fm = new FeatureModel();
 									//XmlFeatureModelReader reader = new XmlFeatureModelReader(fm,fmFile.getProject());
 									FeatureModelReaderIFileWrapper reader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(
-											fm,fmFile.getProject()));
+											fm));
 									
 									reader.readFromFile(fmFile);
 

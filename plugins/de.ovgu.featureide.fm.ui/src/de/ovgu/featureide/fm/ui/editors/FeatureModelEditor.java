@@ -141,7 +141,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 
 		featureModel = new FeatureModel();
 
-		featureModelReader = new XmlFeatureModelReader(featureModel,file.getProject());
+		featureModelReader = new XmlFeatureModelReader(featureModel);
 		featureModelWriter = new XmlFeatureModelWriter(featureModel);
 
 		originalFeatureModel = new FeatureModel();
@@ -149,8 +149,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 			// TODO do not parse the model twice
 			//new XmlFeatureModelReader(originalFeatureModel,file.getProject()).readFromFile(file);
 			//new XmlFeatureModelReader(featureModel,file.getProject()).readFromFile(file);
-		    	new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(originalFeatureModel,file.getProject())).readFromFile(file);
-		    	new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(featureModel,file.getProject())).readFromFile(file);
+		    	new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(originalFeatureModel)).readFromFile(file);
+		    	new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(featureModel)).readFromFile(file);
 		} catch (Exception e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
@@ -486,7 +486,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 
 		textEditor.doSave(monitor);
 		try {
-			new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(originalFeatureModel,file.getProject()))
+			new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(originalFeatureModel))
 				.readFromFile(fmFile.getResource());
 		} catch (Exception e) {
 			FMUIPlugin.getDefault().logError(e);

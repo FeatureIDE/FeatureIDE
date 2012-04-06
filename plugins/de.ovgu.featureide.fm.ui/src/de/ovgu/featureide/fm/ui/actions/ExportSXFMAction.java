@@ -78,7 +78,7 @@ public class ExportSXFMAction implements IObjectActionDelegate {
 						File outputFile = new File(filepath);
 						FeatureModel fm = new FeatureModel();
 						//XmlFeatureModelReader fmReader = new XmlFeatureModelReader(fm,inputFile.getProject());		
-						FeatureModelReaderIFileWrapper fmReader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fm,inputFile.getProject()));
+						FeatureModelReaderIFileWrapper fmReader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fm));
 						fmReader.readFromFile(inputFile);
 						SXFMWriter sxfmWriter = new SXFMWriter(fm);
 						sxfmWriter.writeToFile(outputFile);

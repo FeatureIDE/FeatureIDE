@@ -169,7 +169,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 
 		featureModel = new FeatureModel();
 		featureModel.addListener(new FeatureModelChangeListner());
-		modelReader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(featureModel,aProject));
+		modelReader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(featureModel));
 
 		// initialize project structure
 		try {

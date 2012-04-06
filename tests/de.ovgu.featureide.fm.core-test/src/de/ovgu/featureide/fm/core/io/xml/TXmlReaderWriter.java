@@ -56,7 +56,7 @@ public class TXmlReaderWriter extends TAbstractFeatureModelReaderWriter {
 	 */
 	@Override
 	protected IFeatureModelReader getReader(FeatureModel fm) {
-		return new XmlFeatureModelReader(fm,null);
+		return new XmlFeatureModelReader(fm);
 	}
 
 }

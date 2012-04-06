@@ -91,7 +91,7 @@ public abstract class TAbstractFeatureModelReaderWriter {
 			Object[] models = new Object[2];
 
 			FeatureModel fm = new FeatureModel();
-			XmlFeatureModelReader r = new XmlFeatureModelReader(fm,null);
+			XmlFeatureModelReader r = new XmlFeatureModelReader(fm);
 			r.readFromFile(f);
 			models[0] = fm;
 			models[1] = f.getName();

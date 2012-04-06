@@ -75,7 +75,7 @@ public class ExportGuidslAction implements IObjectActionDelegate {
 						
 						FeatureModel fm = new FeatureModel();
 						//XmlFeatureModelReader fmReader = new XmlFeatureModelReader(fm,inputFile.getProject());
-						FeatureModelReaderIFileWrapper fmReader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fm,inputFile.getProject()));
+						FeatureModelReaderIFileWrapper fmReader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fm));
 						fmReader.readFromFile(inputFile);
 						GuidslWriter fmWriter = new GuidslWriter(fm);
 						
