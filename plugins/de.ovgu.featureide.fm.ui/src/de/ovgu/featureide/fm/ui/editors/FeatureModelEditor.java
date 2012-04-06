@@ -70,6 +70,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelFile;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
+import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslWriter;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
@@ -146,8 +147,10 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		originalFeatureModel = new FeatureModel();
 		try {
 			// TODO do not parse the model twice
-			new XmlFeatureModelReader(originalFeatureModel,file.getProject()).readFromFile(file);
-			new XmlFeatureModelReader(featureModel,file.getProject()).readFromFile(file);
+			//new XmlFeatureModelReader(originalFeatureModel,file.getProject()).readFromFile(file);
+			//new XmlFeatureModelReader(featureModel,file.getProject()).readFromFile(file);
+		    	new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(originalFeatureModel,file.getProject())).readFromFile(file);
+		    	new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(featureModel,file.getProject())).readFromFile(file);
 		} catch (Exception e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
@@ -483,8 +486,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 
 		textEditor.doSave(monitor);
 		try {
-			new XmlFeatureModelReader(originalFeatureModel,file.getProject()).readFromFile(fmFile
-					.getResource());
+			new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(originalFeatureModel,file.getProject()))
+				.readFromFile(fmFile.getResource());
 		} catch (Exception e) {
 			FMUIPlugin.getDefault().logError(e);
 		}

@@ -37,6 +37,7 @@ import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslWriter;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
@@ -73,7 +74,8 @@ public class ExportGuidslAction implements IObjectActionDelegate {
 					try {
 						
 						FeatureModel fm = new FeatureModel();
-						XmlFeatureModelReader fmReader = new XmlFeatureModelReader(fm,inputFile.getProject());
+						//XmlFeatureModelReader fmReader = new XmlFeatureModelReader(fm,inputFile.getProject());
+						FeatureModelReaderIFileWrapper fmReader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fm,inputFile.getProject()));
 						fmReader.readFromFile(inputFile);
 						GuidslWriter fmWriter = new GuidslWriter(fm);
 						

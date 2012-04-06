@@ -54,6 +54,7 @@ import org.eclipse.ui.progress.UIJob;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.editing.evaluation.Evaluation;
+import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 import de.ovgu.featureide.fm.core.propertypage.IPersistentPropertyManager;
@@ -304,8 +305,10 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 								IFile fmFile = (IFile) res;
 								try {
 									FeatureModel fm = new FeatureModel();
-									XmlFeatureModelReader reader = new XmlFeatureModelReader(
-											fm,fmFile.getProject());
+									//XmlFeatureModelReader reader = new XmlFeatureModelReader(fm,fmFile.getProject());
+									FeatureModelReaderIFileWrapper reader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(
+											fm,fmFile.getProject()));
+									
 									reader.readFromFile(fmFile);
 
 									String imageName = fmFile.getRawLocation()

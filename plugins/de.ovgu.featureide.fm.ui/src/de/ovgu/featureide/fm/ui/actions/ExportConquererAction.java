@@ -38,6 +38,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
+import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.splconquerer.ConquererFMWriter;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
@@ -78,7 +79,8 @@ public class ExportConquererAction implements IObjectActionDelegate {
 						if (filepath == null) return;
 						File outputFile = new File(filepath);
 						FeatureModel fm = new FeatureModel();
-						IFeatureModelReader reader = new XmlFeatureModelReader(fm,inputFile.getProject());
+						//IFeatureModelReader reader = new XmlFeatureModelReader(fm,inputFile.getProject());
+						FeatureModelReaderIFileWrapper reader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fm,inputFile.getProject()));
 						reader.readFromFile(inputFile);
 						IFeatureModelWriter writer = new ConquererFMWriter(fm);
 						writer.writeToFile(outputFile);

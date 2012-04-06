@@ -28,8 +28,6 @@ import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.core.resources.IFile;
-
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
@@ -59,23 +57,23 @@ public abstract class AbstractFeatureModelReader implements IFeatureModelReader 
 		return featureModel;
 	}
 	
-	public void readFromFile(IFile file) throws UnsupportedModelException, FileNotFoundException {
-		warnings.clear();
-		String fileName = file.getRawLocation().toOSString();		
-		InputStream inputStream = null;
-		try {
-			inputStream = new FileInputStream(fileName);
-		    parseInputStream(inputStream);
-		} finally {
-			if (inputStream != null) {
-				try {
-					inputStream.close();
-				} catch (IOException e) {
-					FMCorePlugin.getDefault().logError(e);
-				}
-			}
-		}
- 	}
+//	public void readFromFile(IFile file) throws UnsupportedModelException, FileNotFoundException {
+//		warnings.clear();
+//		String fileName = file.getRawLocation().toOSString();		
+//		InputStream inputStream = null;
+//		try {
+//			inputStream = new FileInputStream(fileName);
+//		    parseInputStream(inputStream);
+//		} finally {
+//			if (inputStream != null) {
+//				try {
+//					inputStream.close();
+//				} catch (IOException e) {
+//					FMCorePlugin.getDefault().logError(e);
+//				}
+//			}
+//		}
+// 	}
 	
 	public void readFromFile(File file) throws UnsupportedModelException, FileNotFoundException {
 		warnings.clear();

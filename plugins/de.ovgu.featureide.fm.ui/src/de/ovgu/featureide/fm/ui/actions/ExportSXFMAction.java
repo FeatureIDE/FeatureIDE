@@ -36,6 +36,7 @@ import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.sxfm.SXFMWriter;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
@@ -76,7 +77,8 @@ public class ExportSXFMAction implements IObjectActionDelegate {
 						if (filepath == null) return;
 						File outputFile = new File(filepath);
 						FeatureModel fm = new FeatureModel();
-						XmlFeatureModelReader fmReader = new XmlFeatureModelReader(fm,inputFile.getProject());		
+						//XmlFeatureModelReader fmReader = new XmlFeatureModelReader(fm,inputFile.getProject());		
+						FeatureModelReaderIFileWrapper fmReader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fm,inputFile.getProject()));
 						fmReader.readFromFile(inputFile);
 						SXFMWriter sxfmWriter = new SXFMWriter(fm);
 						sxfmWriter.writeToFile(outputFile);

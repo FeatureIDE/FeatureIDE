@@ -64,6 +64,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.FeatureOrderReader;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
+import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslReader;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
@@ -103,7 +104,8 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	 */
 	private final FeatureModel featureModel;
 
-	private final IFeatureModelReader modelReader;
+	//private final IFeatureModelReader modelReader;
+	private FeatureModelReaderIFileWrapper modelReader;
 
 	private FSTModel featureIDEProjectModel;
 
@@ -167,7 +169,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 
 		featureModel = new FeatureModel();
 		featureModel.addListener(new FeatureModelChangeListner());
-		modelReader = new XmlFeatureModelReader(featureModel,aProject);
+		modelReader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(featureModel,aProject));
 
 		// initialize project structure
 		try {
@@ -248,7 +250,8 @@ public class FeatureProject extends BuilderMarkerHandler implements
 				FeatureModel fm = new FeatureModel();
 				fm.getFMComposerExtension(project);
 				GuidslReader fmReader = new GuidslReader(fm);
-				fmReader.readFromFile(project.getFile("model.m"));
+				FeatureModelReaderIFileWrapper reader = new FeatureModelReaderIFileWrapper(fmReader);
+				reader.readFromFile(project.getFile("model.m"));
 				XmlFeatureModelWriter fmWriter = new XmlFeatureModelWriter(fm);
 				fmWriter.writeToFile(file);
 

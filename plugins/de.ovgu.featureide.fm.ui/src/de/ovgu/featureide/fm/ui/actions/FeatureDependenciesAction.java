@@ -52,6 +52,7 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -203,8 +204,9 @@ public class FeatureDependenciesAction implements IObjectActionDelegate {
 	 */
 	private FeatureModel readModel(IFile inputFile) {
 		FeatureModel fm = new FeatureModel();
-		XmlFeatureModelReader fmReader = new XmlFeatureModelReader(fm,inputFile.getProject());
-
+		//XmlFeatureModelReader fmReader = new XmlFeatureModelReader(fm,inputFile.getProject());
+		FeatureModelReaderIFileWrapper fmReader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fm,inputFile.getProject()));
+		
 		try {
 			fmReader.readFromFile(inputFile);
 		} catch (FileNotFoundException e) {

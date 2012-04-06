@@ -22,8 +22,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.List;
 
-import org.eclipse.core.resources.IFile;
-
 import de.ovgu.featureide.fm.core.FeatureModel;
 
 
@@ -55,8 +53,8 @@ public interface IFeatureModelReader {
 	 * @throws UnsupportedModelException
 	 * @throws FileNotFoundException
 	 */
-	public void readFromFile(IFile file)
-			throws UnsupportedModelException, FileNotFoundException;
+//	public void readFromFile(IFile file)
+//			throws UnsupportedModelException, FileNotFoundException;
 	/**
 	 * Parses a specific feature model file.
 	 * 
