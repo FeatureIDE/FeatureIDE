@@ -32,6 +32,7 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.editing.Comparison;
 import de.ovgu.featureide.fm.core.editing.ModelComparator;
+import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
@@ -89,7 +90,8 @@ public class Evaluation {
 			comparator[i] = new ModelComparator(60000, i);
 		//IFeatureModelReader reader = new XmlFeatureModelReader(null,project);
 		FeatureModelReaderIFileWrapper reader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(null));
-		IFeatureModelWriter writer = new XmlFeatureModelWriter(null);
+		//IFeatureModelWriter writer = new XmlFeatureModelWriter(null);
+		FeatureModelWriterIFileWrapper writer = new FeatureModelWriterIFileWrapper(new XmlFeatureModelWriter(null));
 		for (int k = 0; k < sizes.length; k++)
 			for (int i = 1; i <= 5; i++) {
 				int start = i*100;
@@ -198,7 +200,8 @@ public class Evaluation {
 					}
 					
 					FeatureModel fm = Generator.generateFeatureModel(id, size);
-					IFeatureModelWriter writer = new XmlFeatureModelWriter(fm);
+					//IFeatureModelWriter writer = new XmlFeatureModelWriter(fm);
+					FeatureModelWriterIFileWrapper writer = new FeatureModelWriterIFileWrapper(new XmlFeatureModelWriter(fm));
 					boolean valid = false;
 					try {
 						if (!folder.exists())
@@ -259,7 +262,8 @@ public class Evaluation {
 						} catch (TimeoutException e) {
 							FMCorePlugin.getDefault().logError(e);
 						}
-						IFeatureModelWriter writer = new XmlFeatureModelWriter(fm);
+						//IFeatureModelWriter writer = new XmlFeatureModelWriter(fm);
+						FeatureModelWriterIFileWrapper writer = new FeatureModelWriterIFileWrapper(new XmlFeatureModelWriter(fm));
 						try {
 							writer.writeToFile(file);
 						} catch (CoreException e) {

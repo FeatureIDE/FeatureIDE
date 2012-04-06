@@ -52,15 +52,15 @@ public abstract class AbstractFeatureModelWriter implements IFeatureModelWriter 
 		return featureModel;
 	}
 	
-	public void writeToFile(IFile file) throws CoreException {
-		InputStream source = new ByteArrayInputStream(writeToString().getBytes(Charset.availableCharsets().get("UTF-8")));
-		if (file.exists()) {
-			file.setContents(source, false, true, null);
-		}
-		else {
-			file.create(source, false, null);
-		}
-	}
+//	public void writeToFile(IFile file) throws CoreException {
+//		InputStream source = new ByteArrayInputStream(writeToString().getBytes(Charset.availableCharsets().get("UTF-8")));
+//		if (file.exists()) {
+//			file.setContents(source, false, true, null);
+//		}
+//		else {
+//			file.create(source, false, null);
+//		}
+//	}
 	
 	public void writeToFile(File file) {
 		FileOutputStream output = null;

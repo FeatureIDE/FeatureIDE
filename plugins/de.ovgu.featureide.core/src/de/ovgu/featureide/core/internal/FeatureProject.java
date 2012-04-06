@@ -63,6 +63,7 @@ import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.FeatureOrderReader;
+import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -252,7 +253,8 @@ public class FeatureProject extends BuilderMarkerHandler implements
 				GuidslReader fmReader = new GuidslReader(fm);
 				FeatureModelReaderIFileWrapper reader = new FeatureModelReaderIFileWrapper(fmReader);
 				reader.readFromFile(project.getFile("model.m"));
-				XmlFeatureModelWriter fmWriter = new XmlFeatureModelWriter(fm);
+				//XmlFeatureModelWriter fmWriter = new XmlFeatureModelWriter(fm);
+				FeatureModelWriterIFileWrapper fmWriter = new FeatureModelWriterIFileWrapper(new XmlFeatureModelWriter(fm));
 				fmWriter.writeToFile(file);
 
 				if (!fmReader.getAnnLine().isEmpty()) {
@@ -308,7 +310,9 @@ public class FeatureProject extends BuilderMarkerHandler implements
 
 				}
 				// write feature order to model
-				XmlFeatureModelWriter modelWriter = new XmlFeatureModelWriter(featureModel);
+				//XmlFeatureModelWriter modelWriter = new XmlFeatureModelWriter(featureModel);
+				FeatureModelWriterIFileWrapper modelWriter = new FeatureModelWriterIFileWrapper(new XmlFeatureModelWriter(
+					featureModel));
 				modelWriter.writeToFile(modelFile.getResource());
 			}
 			/* TODO delete .order file in 2013

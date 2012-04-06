@@ -53,7 +53,7 @@ public interface IFeatureModelWriter {
 	 * @param file
 	 * @throws CoreException
 	 */
-	public abstract void writeToFile(IFile file) throws CoreException;
+//	public abstract void writeToFile(IFile file) throws CoreException;
 	
 	/**
 	 * Saves a feature model to a file.

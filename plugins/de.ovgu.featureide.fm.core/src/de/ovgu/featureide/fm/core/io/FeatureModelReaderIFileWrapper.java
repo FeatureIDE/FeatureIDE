@@ -57,8 +57,6 @@ public class FeatureModelReaderIFileWrapper extends
 	File file = ifile.getRawLocation().makeAbsolute().toFile();
 
 	reader.readFromFile(file);
-
-	// TODO: refresh ifile?
     }
 
     public void readFromFile(File file) throws FileNotFoundException,

@@ -45,6 +45,7 @@ import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.FileEditorInput;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
@@ -106,8 +107,8 @@ public abstract class AbstractImportAction implements IObjectActionDelegate {
 							FeatureModel fm = new FeatureModel();
 							modelReader = setModelReader(fm);
 							modelReader.readFromFile(inputFile);
-							XmlFeatureModelWriter fmWriter = new XmlFeatureModelWriter(
-									fm);
+							FeatureModelWriterIFileWrapper fmWriter = new FeatureModelWriterIFileWrapper(new XmlFeatureModelWriter(
+									fm));
 							fmWriter.writeToFile(outputFile);
 							outputFile.refreshLocal(IResource.DEPTH_ZERO, null);
 							openFileInEditor(outputFile);

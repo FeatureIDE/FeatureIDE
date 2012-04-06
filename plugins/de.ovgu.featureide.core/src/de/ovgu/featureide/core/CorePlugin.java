@@ -54,6 +54,7 @@ import de.ovgu.featureide.core.listeners.IFeatureFolderListener;
 import de.ovgu.featureide.core.listeners.IProjectListener;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 
 /**
@@ -484,7 +485,7 @@ public class CorePlugin extends AbstractCorePlugin {
 		featureModel.getFMComposerExtension(project);
 		featureModel.createDefaultValues(project.getName());
 		try {
-			new XmlFeatureModelWriter(featureModel).writeToFile(project.getFile("model.xml"));
+			new FeatureModelWriterIFileWrapper(new XmlFeatureModelWriter(featureModel)).writeToFile(project.getFile("model.xml"));
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError("Error while creating feature model", e);
 		}
