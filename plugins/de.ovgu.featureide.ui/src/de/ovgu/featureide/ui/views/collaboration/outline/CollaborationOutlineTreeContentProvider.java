@@ -33,7 +33,6 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
-import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.model.Class;
 import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModel;
 import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModelBuilder;

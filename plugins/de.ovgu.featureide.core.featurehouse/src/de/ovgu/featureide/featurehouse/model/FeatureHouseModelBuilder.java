@@ -19,7 +19,6 @@
 package de.ovgu.featureide.featurehouse.model;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;

@@ -230,7 +230,7 @@ public class FeatureCppWrapper {
 	private IFile getFile(String line) {
 		String fileName = line.substring(0, line.indexOf(" : warning:"));
 		if (fileName.contains("(")) {
-			fileName = fileName.substring(0,fileName.indexOf("("));
+			fileName = fileName.substring(0,fileName.indexOf('('));
 		}
 		fileName = fileName.substring(sourceFolder.length() +1);
 		IFolder folder = source;
@@ -242,8 +242,8 @@ public class FeatureCppWrapper {
 					return null;
 				}
 			} else {
-				String folderName = fileName.substring(0, fileName.indexOf("\\"));
-				fileName = fileName.substring(fileName.indexOf("\\") + 1);
+				String folderName = fileName.substring(0, fileName.indexOf('\\'));
+				fileName = fileName.substring(fileName.indexOf('\\') + 1);
 				folder = folder.getFolder(folderName);
 			}
 		}
@@ -257,7 +257,7 @@ public class FeatureCppWrapper {
 	private int getLineNumber(String line) {
 		if (line.contains(") : warning: ")) {
 			line = line.substring(0, line.indexOf(") : warning: "));
-			line = line.substring(line.indexOf("(") + 1);
+			line = line.substring(line.indexOf('(') + 1);
 			return Integer.parseInt(line);
 		}
 		return 0;

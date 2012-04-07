@@ -63,9 +63,8 @@ import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.FeatureOrderReader;
-import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
-import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
+import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslReader;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
@@ -982,7 +981,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 				IFile config = (IFile) res;
 				String name = config.getName();
 				if (CorePlugin.getDefault().getConfigurationExtensions()
-						.contains(name.substring(name.lastIndexOf("."))))
+						.contains(name.substring(name.lastIndexOf('.'))))
 					configs.add(config);
 			}
 		} catch (CoreException e) {

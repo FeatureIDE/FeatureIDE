@@ -131,7 +131,7 @@ public class GuidslReader extends AbstractFeatureModelReader {
 	private List<String> stringToList(String str){
 		List<String> result = new LinkedList<String>();
 		while(str.contains("\n")){
-			int ind = str.indexOf("\n");
+			int ind = str.indexOf('\n');
 			if (ind>0)
 				result.add(str.substring(0,ind-1));
 			str = str.substring(ind + 1);
@@ -156,7 +156,7 @@ public class GuidslReader extends AbstractFeatureModelReader {
 		while (guidsl.contains("//"))
 		{
 			guidsl = guidsl.substring(guidsl.indexOf("//"));
-			int index = guidsl.indexOf("\n");
+			int index = guidsl.indexOf('\n');
 			if (index > 0)
 				comments.add(guidsl.substring(2,index-1));
 			else comments.add(guidsl.substring(2,guidsl.length()-1));
@@ -192,12 +192,12 @@ public class GuidslReader extends AbstractFeatureModelReader {
 			for(int i=0; i<list.size(); i++){
 				String line = list.get(i);
 				if(line.contains("{")){
-					String tempLine = line.substring(line.indexOf("{")).toLowerCase(Locale.ENGLISH);
+					String tempLine = line.substring(line.indexOf('{')).toLowerCase(Locale.ENGLISH);
 					if(tempLine.contains("hidden")){
 						int ix = tempLine.indexOf("hidden");
 						String ch = tempLine.substring(ix-1,ix);
 						if (ch.equals(" ") || ch.equals("{")){
-							String featName = line.substring(0,line.indexOf("{")-1);
+							String featName = line.substring(0,line.indexOf('{')-1);
 							if (featureModel.getFeature(featName) != null)
 								featureModel.getFeature(featName).setHidden(true);
 							else 

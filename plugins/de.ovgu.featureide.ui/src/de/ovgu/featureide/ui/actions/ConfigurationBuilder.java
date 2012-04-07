@@ -105,7 +105,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 					
 					init(monitor, buildAllValidConfigurations);
 					
-					monitor.subTask(SUBTASK_GET + confs + "/" + (configurationNumber == 0 ? "counting..." : configurationNumber));
+					monitor.setTaskName(SUBTASK_GET + confs + "/" + (configurationNumber == 0 ? "counting..." : configurationNumber));
 					if (buildAllValidConfigurations) {
 						buildAll(featureModel.getRoot(), monitor);
 					} else {
@@ -158,7 +158,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 				int countProducts = folder.members().length;
 				int current = 1;
 				for (IResource res : folder.members()) {
-					monitor.subTask("Remove old products : " + current + "/" + countProducts);
+					monitor.setTaskName("Remove old products : " + current + "/" + countProducts);
 					current++;
 					res.delete(true, null);
 				}
@@ -367,7 +367,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	private void build(IResource configuration, IProgressMonitor monitor) {
 		try {
 			reader.readFromFile((IFile)configuration);
-			monitor.subTask(SUBTASK_BUILD + confs + "/" + configurationNumber);
+			monitor.setTaskName(SUBTASK_BUILD + confs + "/" + configurationNumber);
 			project.getComposer().buildConfiguration(folder.getFolder(configuration.getName().split("[.]")[0]), this.configuration);
 			if (monitor.isCanceled()) {
 				return;
@@ -375,11 +375,11 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			confs++;
 			folder.getFolder(configuration.getName().split("[.]")[0]).refreshLocal(IResource.DEPTH_INFINITE, null);
 			if (compile) {
-				monitor.subTask(SUBTASK_COMPILE + confs + "/" + configurationNumber);
+				monitor.setTaskName(SUBTASK_COMPILE + confs + "/" + configurationNumber);
 				compile(configuration.getName().split("[.]")[0]);
 			}
 			if (confs <= configurationNumber) { 
-				monitor.subTask(SUBTASK_GET + confs + "/" + configurationNumber);
+				monitor.setTaskName(SUBTASK_GET + confs + "/" + configurationNumber);
 			}
 			monitor.worked(1);
 		} catch (CoreException e) {
@@ -465,7 +465,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 					} else {
 						zeros = "";
 					}
-					monitor.subTask(SUBTASK_BUILD + confs + "/" + (configurationNumber == 0 ? "counting..." : configurationNumber));
+					monitor.setTaskName(SUBTASK_BUILD + confs + "/" + (configurationNumber == 0 ? "counting..." : configurationNumber));
 					project.getComposer().buildConfiguration(folder.getFolder(CONFIGURATION_NAME + zeros + confs), configuration);
 					try {
 						folder.getFolder(CONFIGURATION_NAME + zeros + confs).refreshLocal(IResource.DEPTH_INFINITE, null);
@@ -474,13 +474,13 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 					}
 					
 					if (compile) {
-						monitor.subTask(SUBTASK_COMPILE + confs + "/" + configurationNumber);
+						monitor.setTaskName(SUBTASK_COMPILE + confs + "/" + configurationNumber);
 						compile(CONFIGURATION_NAME + zeros + confs);
 					}
 					
 					confs++;
 					if (confs <= configurationNumber || configurationNumber == 0) { 
-						monitor.subTask(SUBTASK_GET + confs + "/" + (configurationNumber == 0 ? "counting..." : configurationNumber));
+						monitor.setTaskName(SUBTASK_GET + confs + "/" + (configurationNumber == 0 ? "counting..." : configurationNumber));
 					}
 					if (counting && configurationNumber != 0) {
 						counting = false;

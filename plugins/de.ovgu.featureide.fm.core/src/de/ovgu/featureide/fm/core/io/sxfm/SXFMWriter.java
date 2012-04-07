@@ -131,11 +131,11 @@ public class SXFMWriter extends AbstractFeatureModelWriter {
      * @param indent indentation of the parent feature
      */
     private void createXmlDocRec(Document doc, Node nod, Feature feat, 
-    		Boolean andMode, String indent) {
+    		boolean andMode, String indent) {
     	String newIndent;
     	Node textNode;
     	LinkedList<Feature> children;
-    	Boolean nextAndMode = false;
+    	boolean nextAndMode = false;
     	if (feat == null) return;
     	String fName = feat.getName();
     	if (feat.isRoot()) {

@@ -205,7 +205,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 	 * @param enabeled The status of the member
 	 * @return The created text field
 	 */
-	private Text addPathMember(Group group, String labelText, IFolder folder, Boolean enabeled) {
+	private Text addPathMember(Group group, String labelText, IFolder folder, boolean enabeled) {
 		Label label = new Label(group, SWT.NULL);
 		label.setText(labelText);
 		Text text = new Text(group, SWT.BORDER | SWT.SINGLE);

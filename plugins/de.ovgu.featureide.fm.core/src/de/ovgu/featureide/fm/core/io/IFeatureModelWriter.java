@@ -20,7 +20,6 @@ package de.ovgu.featureide.fm.core.io;
 
 import java.io.File;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.fm.core.FeatureModel;

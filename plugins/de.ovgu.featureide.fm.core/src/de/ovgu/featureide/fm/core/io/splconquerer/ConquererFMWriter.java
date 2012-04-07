@@ -258,7 +258,7 @@ public class ConquererFMWriter extends AbstractFeatureModelWriter {
      * @return
      */
     private String prettyPrint (String text) {
-    	StringBuffer result = new StringBuffer();
+    	StringBuilder result = new StringBuilder();
     	String line;
     	int indentLevel = 0;
     	BufferedReader reader = new BufferedReader(new StringReader(text));
@@ -269,20 +269,20 @@ public class ConquererFMWriter extends AbstractFeatureModelWriter {
 				if (line.startsWith("</") ) {
 					indentLevel--;
 					for (int i=0; i < indentLevel; i++) {
-						result.append("\t");
+						result.append('\t');
 					}
 				} 
 
 				else if (line.startsWith("<")) {
 					for (int i=0; i < indentLevel; i++) {
-						result.append("\t");
+						result.append('\t');
 					}
 					if (!line.contains("</") ) {
 						indentLevel++;
 					}	
 				} else {
 					for (int i=0; i < indentLevel; i++) {
-						result.append("\t");
+						result.append('\t');
 					}
 				}
 				result.append(line + "\n");

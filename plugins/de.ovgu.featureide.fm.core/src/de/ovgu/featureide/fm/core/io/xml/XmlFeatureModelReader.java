@@ -32,7 +32,6 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.draw2d.geometry.Point;
 import org.prop4j.And;
 import org.prop4j.AtMost;
