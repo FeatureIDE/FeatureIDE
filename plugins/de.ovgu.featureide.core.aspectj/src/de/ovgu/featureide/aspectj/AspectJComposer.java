@@ -49,6 +49,7 @@ import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
+import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 
 /**
@@ -226,7 +227,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 				root.setName("Base");
 				featureModel.setRoot(root);
 				featureModel.getRoot().setAbstract(false);
-				XmlFeatureModelWriter w = new XmlFeatureModelWriter(featureModel);
+				FeatureModelWriterIFileWrapper w = new FeatureModelWriterIFileWrapper(new XmlFeatureModelWriter(featureModel));
 				w.writeToFile(project.getProject().getFile("model.xml"));
 				project.getProject().getFile("model.xml").refreshLocal(IResource.DEPTH_ZERO, null);
 			}
