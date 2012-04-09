@@ -19,20 +19,16 @@
 package de.ovgu.featureide.ui.ahead.editors;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.internal.ui.javaeditor.CompilationUnitEditor;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.editors.text.TextEditor;
-import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.ui.ahead.AheadUIPlugin;
-import de.ovgu.featureide.ui.ahead.editors.jak.JakConfiguration;
-import de.ovgu.featureide.ui.ahead.editors.jak.JakDocumentProvider;
-import de.ovgu.featureide.ui.ahead.views.outline.JakOutlinePage;
 
 /**
  * An editor for Jak files that supports the Jak-specific keywords.
@@ -40,27 +36,21 @@ import de.ovgu.featureide.ui.ahead.views.outline.JakOutlinePage;
  * @author Marcus Leich
  *
  */
-public class JakEditor extends TextEditor {
+@SuppressWarnings("restriction")
+public class JakEditor extends CompilationUnitEditor {
 	
 	public static final String ID = AheadUIPlugin.PLUGIN_ID + ".editors.JakEditor";
-	
-	private JakOutlinePage outlinePage;
 
-private IFeatureProject featureProject;
-
-	public JakEditor() {
-		super();
-		setSourceViewerConfiguration(new JakConfiguration());
-		setDocumentProvider(new JakDocumentProvider());
-	}
+	private static final Image TITLE_IMAGE = AheadUIPlugin.getImage("JakFileIcon.png");
 
 	@Override
 	public void init(IEditorSite site, IEditorInput input)
 			throws PartInitException {
 		super.init(site, input);
+		
 		if (input instanceof IFileEditorInput) {
 			IFile file = ((IFileEditorInput) input).getFile();
-			featureProject = CorePlugin.getFeatureProject(file);
+			IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
 			// check that the project is a FeatureIDE project and registered
 			if (featureProject == null)
 				return;
@@ -68,44 +58,12 @@ private IFeatureProject featureProject;
 			if (feature != null)
 				setPartName(file.getName() + "[" + feature + "]");
 			else {
-				String config = featureProject.getConfigName(file);
+				String config = featureProject.getCurrentConfiguration().getName().split("[.]")[0];
 				if (config != null)
 					setPartName(file.getName() + "<" + config + ">");
-//				setTitleImage(DERIVED_IMAGE);
 			}
+			setTitleImage(TITLE_IMAGE);
 		}
-	}
-
-	@SuppressWarnings("rawtypes")
-	public Object getAdapter(Class required) {
-		if (IContentOutlinePage.class.equals(required)) {
-			if (outlinePage == null) {
-				outlinePage = new JakOutlinePage(getDocumentProvider(), this);
-				outlinePage.setInput(getEditorInput());
-			}
-			return outlinePage;
-		}
-		return super.getAdapter(required);
-	}
-	
-	
-	/* update Outline after build process*/
-	public void setFocus(){
-		if (outlinePage!=null){
-			outlinePage.setInput(getEditorInput());
-		}
-		super.setFocus();
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#doSave(org.eclipse.core.runtime.IProgressMonitor)
-	 */
-	@Override
-	public void doSave(IProgressMonitor progressMonitor) {
-		super.doSave(progressMonitor);
-		featureProject.getComposer().initialize(featureProject);
-		featureProject.getComposer().buildFSTModel();
-		setFocus();
 	}
 	
 }

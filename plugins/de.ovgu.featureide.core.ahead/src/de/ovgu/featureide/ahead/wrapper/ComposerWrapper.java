@@ -178,7 +178,10 @@ public class ComposerWrapper {
 			while ((line = reader.readLine()) != null) {
 				if (line.startsWith("#"))
 					continue;
-				featureFolders.add(featureProject.getSourceFolder().getFolder(line));
+				IFolder f = featureProject.getSourceFolder().getFolder(line);
+				if (f != null) {
+					featureFolders.add(f);
+				}
 			}
 		} finally {
 			if (reader != null) { 
