@@ -26,6 +26,7 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 
 import de.ovgu.featureide.fm.core.Constraint;
+import de.ovgu.featureide.fm.core.FMPoint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
@@ -67,9 +68,13 @@ public class FeatureUIHelper {
 		return featureLocation.get(feature);
 	}
 
+	public static void setLocation(Feature feature, FMPoint newLocation){
+	    setLocation(feature, toPoint(newLocation));
+	}
+	
 	public static void setLocation(Feature feature, Point newLocation) {
 		Point oldLocation = getLocation(feature);
-		feature.setNewLocation(newLocation);
+		feature.setNewLocation(toFMPoint(newLocation));
 		if (newLocation == null || newLocation.equals(oldLocation))
 			return;
 		featureLocation.put(feature, newLocation);
@@ -169,13 +174,17 @@ public class FeatureUIHelper {
 		return constraintLocation.get(constraint);
 	}
 
+	public static void setLocation(Constraint constraint, FMPoint newLocation){
+	    setLocation(constraint, toPoint(newLocation));
+	}
+	
 	public static void setLocation(Constraint constraint, Point newLocation) {
 		Point oldLocation = getLocation(constraint);
 		if (newLocation == null || newLocation.equals(oldLocation))
 			return;
 		constraintLocation.put(constraint, newLocation);
 		fireLocationChanged(constraint, oldLocation, newLocation);
-		constraint.setLocation(newLocation);
+		constraint.setLocation(toFMPoint(newLocation));
 	}
 
 	private static void fireLocationChanged(Constraint constraint,
@@ -192,5 +201,12 @@ public class FeatureUIHelper {
 	public static LegendFigure getLegendFigure() {
 		return legendFigure;
 	}
+	
+	public static Point toPoint(FMPoint point){
+	    return new Point(point.getX(), point.getY());
+	}
 
+	public static FMPoint toFMPoint(Point point){
+	    return new FMPoint(point.x, point.y);
+	}
 }

@@ -24,8 +24,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.draw2d.geometry.Point;
-
 /**
  * Provides all properties of a feature. This includes its connections to parent
  * and child features.
@@ -55,7 +53,7 @@ public class Feature implements PropertyConstants {
 
 	private FeatureModel featureModel;
 	
-	private Point location = new Point(0,0);
+	private FMPoint location = new FMPoint(0,0);
 
 	public Feature(FeatureModel featureModel) {
 		this.featureModel = featureModel;
@@ -69,11 +67,11 @@ public class Feature implements PropertyConstants {
 		sourceConnections.add(parentConnection);
 	}
 	
-	public void setNewLocation(Point newLocation){
+	public void setNewLocation(FMPoint newLocation){
 		location = newLocation;
 	}
 	
-	public Point getLocation(){
+	public FMPoint getLocation(){
 		return location;
 	}
 	

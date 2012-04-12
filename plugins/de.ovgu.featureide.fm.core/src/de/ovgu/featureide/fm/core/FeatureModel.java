@@ -42,7 +42,6 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.QualifiedName;
-import org.eclipse.draw2d.geometry.Point;
 import org.prop4j.And;
 import org.prop4j.Implies;
 import org.prop4j.Literal;
@@ -96,7 +95,7 @@ public class FeatureModel implements PropertyConstants {
 	private boolean autoLayoutLegend = true;
 	private boolean showHiddenFeatures = true;
 	private boolean hasVerticalLayout = true;
-	private Point legendPos = new Point(0, 0);
+	private FMPoint legendPos = new FMPoint(0, 0);
 	/**
 	 * a hashtable containing all features
 	 */
@@ -163,7 +162,7 @@ public class FeatureModel implements PropertyConstants {
 		return selectedLayoutAlgorithm;
 	}
 
-	public static void setFeatureLocation(Point newLocation, Feature feature) {
+	public static void setFeatureLocation(FMPoint newLocation, Feature feature) {
 		feature.setNewLocation(newLocation);
 	}
 
@@ -1181,12 +1180,12 @@ public class FeatureModel implements PropertyConstants {
 		}
 	}
 
-	public Point getLegendPos() {
+	public FMPoint getLegendPos() {
 		return legendPos;
 	}
 
 	public void setLegendPos(int x, int y) {
-		this.legendPos = new Point(x, y);
+		this.legendPos = new FMPoint(x, y);
 	}
 
 	public void setLegendAutoLayout(boolean b) {

@@ -18,7 +18,6 @@
  */
 package de.ovgu.featureide.fm.core;
 
-import org.eclipse.draw2d.geometry.Point;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -38,7 +37,7 @@ public class Constraint implements PropertyConstants {
 
 	private FeatureModel featureModel;
 	private Node propNode;
-	private Point location = new Point(0,0);
+	private FMPoint location = new FMPoint(0,0);
 	private boolean featureSelected = false;
 	private List<Feature> containedFeatureList = new ArrayList<Feature>();
 	private List<Feature> falseOptionalFeatures = new ArrayList<Feature>();
@@ -49,11 +48,11 @@ public class Constraint implements PropertyConstants {
 		this.propNode = propNode;
 	}
 	
-	public void setLocation(Point newLocation){
+	public void setLocation(FMPoint newLocation){
 		location = newLocation;
 	}
 	
-	public Point getLocation(){
+	public FMPoint getLocation(){
 		return location;
 	}
 	

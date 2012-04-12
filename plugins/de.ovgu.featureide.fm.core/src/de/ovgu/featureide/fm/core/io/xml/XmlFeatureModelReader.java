@@ -32,7 +32,6 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
-import org.eclipse.draw2d.geometry.Point;
 import org.prop4j.And;
 import org.prop4j.AtMost;
 import org.prop4j.Equals;
@@ -44,6 +43,7 @@ import org.prop4j.Or;
 import org.prop4j.SatSolver;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.FMPoint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
@@ -121,7 +121,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 			int mode = 0;
 			ruleTemp.clear();
 			ruleTemp.add(new LinkedList<Node>());
-			Point constraintLocation = null;
+			FMPoint constraintLocation = null;
 			featureModel.showHiddenFeatures(true);
 			featureModel.verticalLayout(false);
 			while (eventReader.hasNext()) {
@@ -142,7 +142,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 						boolean isMandatory = false;
 						boolean isAbstract = false;
 						boolean isHidden = false;
-						Point featureLocation = null;
+						FMPoint featureLocation = null;
 						String attrName = "noname";
 						String parent = parentStack.peek()[1];
 
@@ -183,7 +183,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 								String subStringX = curValue.substring(0, curValue.indexOf(", "));
 								String subStringY = curValue.substring(curValue.indexOf(", ")+2);
 								try {
-									featureLocation = new Point(Integer.parseInt (subStringX),
+									featureLocation = new FMPoint(Integer.parseInt (subStringX),
 											Integer.parseInt (subStringY));
 								} catch (Exception e) {
 									throw new UnsupportedModelException(e.getMessage()
@@ -248,7 +248,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 									String subStringX = curValue.substring(0, curValue.indexOf(", "));
 									String subStringY = curValue.substring(curValue.indexOf(", ")+2);
 									try {
-										constraintLocation = new Point(Integer.parseInt (subStringX),
+										constraintLocation = new FMPoint(Integer.parseInt (subStringX),
 												Integer.parseInt (subStringY));
 									} catch (Exception e) {
 										throw new UnsupportedModelException(e.getMessage()
@@ -493,7 +493,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 	 *            String with the name of the parent feature
 	 */
 	private void addFeature(String featureName, boolean isMandatory,
-			boolean isAbstract, boolean isHidden, String parent, Point location) {
+			boolean isAbstract, boolean isHidden, String parent, FMPoint location) {
 		/*
 		 * HOWTO: add a child to the FeaturModel
 		 * 
