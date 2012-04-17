@@ -16,7 +16,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.fm.ui.editors;
+package de.ovgu.featureide.ui.editors.confuguration;
 
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -32,8 +32,6 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
-import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationContentProvider;
-import de.ovgu.featureide.fm.ui.editors.configuration.AdvancedConfigurationLabelProvider;
 
 /**
  * requires a configuration as input (via setInput) and additionally a feature

@@ -46,6 +46,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IEditorDescriptor;
+import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IPropertyListener;
@@ -74,8 +75,7 @@ import de.ovgu.featureide.ui.views.collaboration.model.Class;
 import de.ovgu.featureide.ui.views.collaboration.model.Role;
 
 /**
- * 
- * another outline view displaying the same information as the collaboration
+ * Another outline view displaying the same information as the collaboration
  * diagram
  * 
  * @author Jan Wedding
@@ -84,6 +84,9 @@ import de.ovgu.featureide.ui.views.collaboration.model.Role;
 /*
  * TODO fix bug: do not close the tree if a corresponding file 
  * was opened with an other way e.g. via collaboration diagram
+ * 
+ * TODO Sometimes the outline has no content -> display a warning / message 
+ * 
  */
 public class CollaborationOutline extends ViewPart implements ICurrentBuildListener {
 
@@ -255,20 +258,23 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 			if (page != null) {
 				part = page.getActiveEditor();
 				if (part != null) {
-					active_editor = part;
-					active_editor.addPropertyListener(plistener);
-					// case: open editor
-					FileEditorInput inputFile = (FileEditorInput) part
-							.getEditorInput();
-					IFeatureProject featureProject = CorePlugin.getFeatureProject(inputFile
-							.getFile());
-
-					if (featureProject != null) {
-						Control control = viewer.getControl();
-						if (control != null && !control.isDisposed()) {
-							update(inputFile.getFile());
+					IEditorInput editorInput = part.getEditorInput();
+					if (editorInput instanceof FileEditorInput) {
+						active_editor = part;
+						active_editor.addPropertyListener(plistener);
+						// case: open editor
+						FileEditorInput inputFile = (FileEditorInput) part
+								.getEditorInput();
+						IFeatureProject featureProject = CorePlugin.getFeatureProject(inputFile
+								.getFile());
+	
+						if (featureProject != null) {
+							Control control = viewer.getControl();
+							if (control != null && !control.isDisposed()) {
+								update(inputFile.getFile());
+							}
+							return;
 						}
-						return;
 					}
 				}
 			}

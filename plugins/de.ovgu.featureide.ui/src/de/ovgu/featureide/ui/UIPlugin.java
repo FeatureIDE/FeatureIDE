@@ -19,9 +19,11 @@
 package de.ovgu.featureide.ui;
 
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.PlatformUI;
 import org.osgi.framework.BundleContext;
 
 import de.ovgu.featureide.fm.ui.AbstractUIPlugin;
+import de.ovgu.featureide.ui.editors.JavaEditor;
 
 /**
  * The activator class controls the plug-in life cycle.
@@ -51,6 +53,8 @@ public class UIPlugin extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+		// XXX this is a bad workaround, but it seems to work pretty good
+		PlatformUI.getWorkbench().getEditorRegistry().setDefaultEditor("*.java", JavaEditor.ID);
 	}
 
 	/*

@@ -16,7 +16,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.ui.editors;
+package de.ovgu.featureide.ui.editors.confuguration;
 
 import java.beans.PropertyChangeEvent;
 
@@ -26,6 +26,7 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
 import de.ovgu.featureide.ui.UIPlugin;
+import de.ovgu.featureide.ui.editors.ConfigurationEditor;
 
 /**
  * Displays the source.

@@ -16,7 +16,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.fm.ui.editors.configuration;
+package de.ovgu.featureide.ui.editors.confuguration;
 
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;

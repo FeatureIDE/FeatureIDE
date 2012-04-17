@@ -16,7 +16,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.ui.editors;
+package de.ovgu.featureide.ui.editors.confuguration;
 
 
 import java.beans.PropertyChangeEvent;
@@ -44,8 +44,6 @@ import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.configuration.TreeElement;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.configuration.AdvancedConfigurationLabelProvider;
-import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationContentProvider;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**

@@ -68,6 +68,10 @@ import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.ui.UIPlugin;
+import de.ovgu.featureide.ui.editors.confuguration.AdvancedConfigurationPage;
+import de.ovgu.featureide.ui.editors.confuguration.ConfigurationPage;
+import de.ovgu.featureide.ui.editors.confuguration.IConfigurationEditorPage;
+import de.ovgu.featureide.ui.editors.confuguration.TextEditorPage;
 
 /**
  * Displays a configuration file.
@@ -76,6 +80,9 @@ import de.ovgu.featureide.ui.UIPlugin;
  * @author Christian Becker
  * @author Jens Meinicke
  * @author Hannes Smurawsky
+ */
+/*
+ * TODO should this be refactored into .fm.ui
  */
 public class ConfigurationEditor extends MultiPageEditorPart implements
 		GUIDefaults, PropertyConstants, PropertyChangeListener,
@@ -89,7 +96,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements
 
 	private TextEditorPage sourceEditor;
 
-	IFile file;
+	public IFile file;
 
 	public FeatureModel featureModel;
 

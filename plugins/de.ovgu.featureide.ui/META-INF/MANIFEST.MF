@@ -23,6 +23,7 @@ Export-Package: de.ovgu.featureide.ui.editors,
  de.ovgu.featureide.ui.wizards
 Import-Package: org.eclipse.jdt.core,
  org.eclipse.jdt.internal.core,
+ org.eclipse.jdt.internal.ui.javaeditor,
  org.eclipse.jface.text,
  org.eclipse.platform.internal,
  org.eclipse.ui.editors.text,

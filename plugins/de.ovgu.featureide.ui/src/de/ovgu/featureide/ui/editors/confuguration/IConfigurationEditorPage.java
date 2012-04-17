@@ -16,11 +16,13 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.ui.editors;
+package de.ovgu.featureide.ui.editors.confuguration;
 
 import java.beans.PropertyChangeEvent;
 
 import org.eclipse.ui.IEditorPart;
+
+import de.ovgu.featureide.ui.editors.ConfigurationEditor;
 
 /**
  * Basic interface for all pages at configuration editor.

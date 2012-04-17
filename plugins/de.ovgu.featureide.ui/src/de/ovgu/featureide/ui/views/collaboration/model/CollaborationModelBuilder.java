@@ -396,6 +396,7 @@ public class CollaborationModelBuilder {
 	 * @param featureProject
 	 */
 	private void addConfigurationToModel() {
+		// TODO add case: project.getCurrentConfiguration() == null
 		if (configuration == null || configuration.equals(project.getCurrentConfiguration())) {
 			collaboration = new Collaboration(project.getCurrentConfiguration().getName().split("[.]")[0]);
 			collaboration.selected = true;

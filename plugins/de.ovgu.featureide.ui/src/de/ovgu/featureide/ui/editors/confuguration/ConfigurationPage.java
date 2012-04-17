@@ -16,7 +16,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.ui.editors;
+package de.ovgu.featureide.ui.editors.confuguration;
 
 import java.beans.PropertyChangeEvent;
 import java.util.HashMap;
@@ -44,7 +44,6 @@ import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.configuration.TreeElement;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.configuration.AdvancedConfigurationLabelProvider;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
@@ -176,7 +175,7 @@ public class ConfigurationPage extends ConfigurationEditorPage {
 	/**
 	 * Stops the coloring job.
 	 */
-	protected void resetColor() {
+	public void resetColor() {
 		returnFormThread = true;
 		try {
 			if (job_color != null) {

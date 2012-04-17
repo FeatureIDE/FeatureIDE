@@ -262,4 +262,53 @@
             name="FeatureIDE">
       </perspective>
    </extension>
+   
+   <extension point="org.eclipse.core.contenttype.contentTypes">
+	   <content-type base-type="org.eclipse.core.runtime.xml"
+	                 file-extensions="jak"
+	                 id="de.ovgu.featureide.contenttype.jak"
+	                 name="Jak (for FeatureIDE projects)"
+	                 priority="high"/>
+    <content-type
+          base-type="org.eclipse.jdt.core.javaSource"
+          file-extensions="java"
+          id="de.ovgu.featureide.contenttype.java"
+          name="Java (for FeatureIDE projects)"
+          priority="high">
+    </content-type>
+    <content-type
+          base-type="org.eclipse.core.runtime.text"
+          file-extensions="jak"
+          id="de.ovgu.featureide.contenttype.extJak"
+          name="Jak (for non-FeatureIDE projects)"
+          priority="low">
+    </content-type>               
+	
+	</extension>
+	
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="de.ovgu.featureide.ui.editors.JavaEditor"
+            contributorClass="org.eclipse.jdt.internal.ui.javaeditor.BasicJavaEditorActionContributor"
+           	default="true"
+            icon="icons/JakFileIcon.png"
+            id="de.ovgu.featureide.ui.editors.JakEditor"
+            name="Jak Editor">
+            <contentTypeBinding
+     		    contentTypeId="de.ovgu.featureide.contenttype.jak">
+    		  </contentTypeBinding>
+      </editor>
+      <editor
+            class="de.ovgu.featureide.ui.editors.JavaEditor"
+            contributorClass="org.eclipse.jdt.internal.ui.javaeditor.BasicJavaEditorActionContributor"
+            default="true"
+            icon="icons/JakFileIcon.png"
+            id="de.ovgu.featureide.ui.editors.JavaEditor"
+            name="Extended Java Editor">
+         <contentTypeBinding
+               contentTypeId="de.ovgu.featureide.contenttype.java">
+         </contentTypeBinding>
+      </editor>
+   </extension>
 </plugin>

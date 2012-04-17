@@ -16,7 +16,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.ui.editors;
+package de.ovgu.featureide.ui.editors.confuguration;
 
 import java.beans.PropertyChangeEvent;
 
@@ -27,6 +27,8 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
+
+import de.ovgu.featureide.ui.editors.ConfigurationEditor;
 
 
 /**

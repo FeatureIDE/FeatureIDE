@@ -18,12 +18,11 @@
  */
 package de.ovgu.featureide.fm.core;
 
-import java.awt.Point;
 
 /**
  * TODO description
  * 
- * @author soenke
+ * @author Soenke Holthusen
  */
 public class FMPoint {
     public int x;
