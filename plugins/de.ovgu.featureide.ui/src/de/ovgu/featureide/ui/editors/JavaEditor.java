@@ -18,7 +18,11 @@
  */
 package de.ovgu.featureide.ui.editors;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.internal.ui.javaeditor.CompilationUnitEditor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorInput;
@@ -49,6 +53,8 @@ public class JavaEditor extends CompilationUnitEditor {
 
 	private static final Image TITLE_IMAGE = UIPlugin.getImage("JakFileIcon.png");
 
+	private IComposerExtension composer;
+
 	@Override
 	public void init(IEditorSite site, IEditorInput input)
 			throws PartInitException {
@@ -60,7 +66,7 @@ public class JavaEditor extends CompilationUnitEditor {
 			// check that the project is a FeatureIDE project and registered
 			if (featureProject == null)
 				return;
-			IComposerExtension composer = featureProject.getComposer();
+			composer = featureProject.getComposer();
 			if (composer.hasFeatureFolder()) {
 				String feature = featureProject.getFeatureName(file);
 				if (feature != null) {
@@ -69,18 +75,68 @@ public class JavaEditor extends CompilationUnitEditor {
 						setPartName(file.getName() + "[" + feature + "]");
 					}
 				} else {
-					// case: a composed file
-					IFile configuration = featureProject.getCurrentConfiguration();
-					if (configuration != null) {
-						String config = configuration.getName().split("[.]")[0];
-						if (config != null) {
-							setPartName(file.getName() + "<" + config + ">");
+					if (isComposedFile(file.getParent(), featureProject.getBuildFolder())) {
+						// case: a composed file
+						IFile configuration = featureProject.getCurrentConfiguration();
+						if (configuration != null) {
+							String config = configuration.getName().split("[.]")[0];
+							if (config != null) {
+								setPartName(file.getName() + "<" + config + ">");
+							}
+						}
+					} else {
+						String configuration = getConfiguration(file.getParent());
+						if (configuration != null) {
+							// case: a generated products file
+							setPartName(file.getName() + "<" + configuration + ">");
 						}
 					}
 				}
 			}
 			setTitleImage(TITLE_IMAGE);
 		}
+	}
+
+	/**
+	 * Looks for the corresponding configuration file<br>
+	 * Necessary for generated products
+	 * @param parent
+	 * @return The name of the configuration or <code>null</code> if there is none
+	 */
+	private String getConfiguration(IContainer parent) {
+		try {
+			for (IResource res : parent.members()) {
+				if (res instanceof IFile) {
+					String extension = res.getFileExtension();
+					if (extension != null && composer.getConfigurationExtension().equals("." + extension)) {
+						return res.getName().split("[.]")[0];
+					}
+				}
+			}
+		} catch (CoreException e) {
+			UIPlugin.getDefault().logError(e);
+		}
+		IContainer p = parent.getParent();
+		if (p != null) {
+			return getConfiguration(p);
+		}
+		return null;
+	}
+
+	/**
+	 * @param parent
+	 * @param buildFolder 
+	 * @return <code>true</code> if the build folder is a parent of the given file
+	 */
+	private boolean isComposedFile(IContainer parent, IFolder buildFolder) {
+		if (parent != null) {
+			if (parent.equals(buildFolder)) {
+				return true;
+			} else {
+				return isComposedFile(parent.getParent(), buildFolder);
+			}
+		}
+		return false;
 	}
 	
 }
