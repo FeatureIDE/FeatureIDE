@@ -290,7 +290,7 @@
          point="org.eclipse.ui.editors">
       <editor
             class="de.ovgu.featureide.ui.editors.JavaEditor"
-            contributorClass="org.eclipse.jdt.internal.ui.javaeditor.BasicJavaEditorActionContributor"
+            contributorClass="org.eclipse.ui.editors.text.TextEditorActionContributor"
            	default="true"
             icon="icons/JakFileIcon.png"
             id="de.ovgu.featureide.ui.editors.JakEditor"
@@ -301,7 +301,7 @@
       </editor>
       <editor
             class="de.ovgu.featureide.ui.editors.JavaEditor"
-            contributorClass="org.eclipse.jdt.internal.ui.javaeditor.BasicJavaEditorActionContributor"
+            contributorClass="org.eclipse.ui.editors.text.TextEditorActionContributor"
             default="true"
             icon="icons/JakFileIcon.png"
             id="de.ovgu.featureide.ui.editors.JavaEditor"

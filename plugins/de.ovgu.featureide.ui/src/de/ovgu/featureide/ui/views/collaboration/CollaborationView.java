@@ -177,7 +177,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 			IWorkbenchPage page = activeEditor.getSite().getPage();
 			if (page != null) {
 				part = page.getActiveEditor();
-				if (part != null) {
+				if (part != null && part.getEditorInput() instanceof FileEditorInput) {
 					//case: open editor
 					IFile inputFile = ((FileEditorInput)part.getEditorInput()).getFile();
 					featureProject = CorePlugin.getFeatureProject(inputFile);

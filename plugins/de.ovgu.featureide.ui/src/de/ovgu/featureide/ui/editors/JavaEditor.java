@@ -28,13 +28,19 @@ import org.eclipse.ui.PartInitException;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.builder.IComposerExtension;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
- * An editor for Jak files that supports the Jak-specific keywords.
+ * This Editor extends the standard Java editor {@link CompilationUnitEditor}
+ * It only sets the part name to differ a source from a composed file.
  * 
- * @author Marcus Leich
+ * @author Jens Meinicke
  *
+ */
+/*
+ * TODO maybe the BasicJavaEditorActionContributor should used at plugin.xml
+ * TODO the images for composed and source files should differ(?)
  */
 @SuppressWarnings("restriction")
 public class JavaEditor extends CompilationUnitEditor {
@@ -54,14 +60,23 @@ public class JavaEditor extends CompilationUnitEditor {
 			// check that the project is a FeatureIDE project and registered
 			if (featureProject == null)
 				return;
-			if (featureProject.getComposer().hasFeatureFolders()) {
+			IComposerExtension composer = featureProject.getComposer();
+			if (composer.hasFeatureFolder()) {
 				String feature = featureProject.getFeatureName(file);
 				if (feature != null) {
-					setPartName(file.getName() + "[" + feature + "]");
+					// case: a source file
+					if (composer.hasFeatureFolders()){
+						setPartName(file.getName() + "[" + feature + "]");
+					}
 				} else {
-					String config = featureProject.getCurrentConfiguration().getName().split("[.]")[0];
-					if (config != null)
-						setPartName(file.getName() + "<" + config + ">");
+					// case: a composed file
+					IFile configuration = featureProject.getCurrentConfiguration();
+					if (configuration != null) {
+						String config = configuration.getName().split("[.]")[0];
+						if (config != null) {
+							setPartName(file.getName() + "<" + config + ">");
+						}
+					}
 				}
 			}
 			setTitleImage(TITLE_IMAGE);
