@@ -24,8 +24,6 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.Set;
-import java.util.TreeSet;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IAdaptable;
@@ -42,16 +40,9 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
-import org.prop4j.And;
-import org.prop4j.Implies;
-import org.prop4j.Literal;
-import org.prop4j.Node;
-import org.prop4j.Not;
-import org.prop4j.SatSolver;
-import org.sat4j.specs.TimeoutException;
 
+import de.ovgu.featureide.fm.core.FeatureDependencies;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
@@ -63,23 +54,12 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * @author Fabian Benduhn
  */
 public class FeatureDependenciesAction implements IObjectActionDelegate {
-
-	private static String sep = System.getProperty("line.separator");
-	private static final String LEGEND_TEXT = "X ALWAYS Y := If X is selected Y is selected in every valid configuration."
-			+ sep
-			+ "X MAYBE Y   := If X is selected Y is selected in at least one but not all valid configurations. "
-			+ sep
-			+ "X NEVER Y   := If X is selected Y cannot be selected in any valid configuration.";
-
 	private ISelection selection;
 
 	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
 	}
 
 	public void run(IAction action) {
-		FeatureModel fm = null;
-		Node rootNode = null;
-
 		if (!(selection instanceof IStructuredSelection))
 			return;
 
@@ -89,13 +69,10 @@ public class FeatureDependenciesAction implements IObjectActionDelegate {
 		if (inputFile == null)
 			return;
 
-		fm = readModel(inputFile);
-		rootNode = createRootNode(fm);
-		final Node node = rootNode;
-		final FeatureModel mod = fm;
+		final FeatureModel mod = readModel(inputFile);
 		Job job = new Job("Calculating Feature Dependencies") {
 			protected IStatus run(IProgressMonitor monitor) {
-				final String text = createText(mod.getFeatureNames(), node);
+				final String text = new FeatureDependencies(mod).toStringWithLegend();
 				// UI access
 				final StringBuilder path = new StringBuilder();
 				Display.getDefault().syncExec(new Runnable() {
@@ -106,7 +83,7 @@ public class FeatureDependenciesAction implements IObjectActionDelegate {
 					}
 
 				});
-				saveFile(LEGEND_TEXT + text, path.toString());
+				saveFile(text, path.toString());
 				return Status.OK_STATUS;
 			}
 
@@ -157,42 +134,7 @@ public class FeatureDependenciesAction implements IObjectActionDelegate {
 
 	}
 
-	/**
-	 * creates a String containing all information about feature dependencies
-	 * 
-	 * @param featureNames
-	 *            the names of all features in the featuremodel
-	 * @param rootNode
-	 *            the Node representing the Model
-	 */
-	private String createText(Set<String> featureNames, Node rootNode) {
-		StringBuilder textBuf = new StringBuilder();
-		for (String s : featureNames) {
 
-			try {
-
-				textBuf.append(sep
-						+ createFeatureText(rootNode, s, featureNames));
-			} catch (TimeoutException e) {
-				FMUIPlugin.getDefault().logError(e);
-			}
-
-		}
-		return textBuf.toString();
-	}
-
-	/**
-	 * creates the Node representation of the featureModel
-	 * 
-	 * @param fm
-	 *            featureModel
-	 * @return Node representing the featureModel
-	 */
-	private Node createRootNode(FeatureModel fm) {
-		Node rootNode = NodeCreator.createNodes(fm, true);
-		rootNode = rootNode.toCNF();
-		return rootNode;
-	}
 
 	/**
 	 * reads the featureModel from file
@@ -232,63 +174,6 @@ public class FeatureDependenciesAction implements IObjectActionDelegate {
 			inputFile = (IFile) ((IAdaptable) element).getAdapter(IFile.class);
 		}
 		return inputFile;
-	}
-
-	/**
-	 * creates a String that contains feature dependency information for a
-	 * certain feature
-	 * 
-	 * @param node
-	 *            the node representing the featureModel
-	 * @param name
-	 *            of the feature
-	 * @return String
-	 * @throws TimeoutException
-	 */
-	private String createFeatureText(Node node, String currentFeature,
-			Set<String> featureNames) throws TimeoutException {
-		TreeSet<String> featureString = new TreeSet<String>();
-		Node nodeSel = new And(node, new Literal(currentFeature));
-
-		for (String s : featureNames) {
-			if (!s.equals(currentFeature)) {
-				if (nodeImpliesFeature(nodeSel, s, true) == true) {
-					featureString.add(sep+currentFeature + " ALWAYS " + s);
-				} else if (nodeImpliesFeature(nodeSel, s, false) == true) {
-					featureString.add(sep+currentFeature + " NEVER " + s);
-				} else {
-					featureString.add(sep+currentFeature + " MAYBE " + s);
-				}
-			}
-		}
-		StringBuilder b = new StringBuilder();
-
-		for (String s : featureString) {
-			b.append(s + s);
-		}
-		return b.toString();
-	}
-
-	/**
-	 * @param node
-	 * @param s
-	 * @param positive
-	 *            if false, the feature is negated
-	 * @return true if the given feature is selected in every valid
-	 *         configuration for the featureModel represented by node
-	 * @throws TimeoutException
-	 */
-	private boolean nodeImpliesFeature(Node node, String featureName,
-			boolean positive) throws TimeoutException {
-		Node nodeNeg = null;
-		if (positive) {
-			nodeNeg = new Not((new Implies(node, new Literal(featureName))));
-		} else {
-			nodeNeg = new Not((new Implies(node, new Not(featureName))));
-		}
-		SatSolver solver = new SatSolver(nodeNeg, 2500);
-		return !solver.isSatisfiable();
-
 	}
 
 	public void selectionChanged(IAction action, ISelection selection) {
