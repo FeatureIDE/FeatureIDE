@@ -26,6 +26,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.TreeMap;
 
 import mixin.AST_Program;
@@ -198,7 +199,7 @@ public class ComposerWrapper {
 					featureProject.getProject().getLocation().toFile());
 			list = reader2.featureOrderRead();
 		}*/
-		ArrayList<String> featureOrderList = featureProject.getFeatureModel().getFeatureOrderList();
+		List<String> featureOrderList = featureProject.getFeatureModel().getFeatureOrderList();
 		for (IFolder folder : featureFolders) {
 			allFeatureFolders.add(folder);
 		}

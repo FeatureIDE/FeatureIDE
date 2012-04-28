@@ -87,8 +87,8 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		 * listens to changed feature names
 		 */
 		public void propertyChange(PropertyChangeEvent evt) {
-			if (evt.getPropertyName().equals(
-					PropertyConstants.FEATURE_NAME_CHANGED)) {
+			if (PropertyConstants.FEATURE_NAME_CHANGED.equals(
+					evt.getPropertyName())) {
 				String oldName = (String) evt.getOldValue();
 				String newName = (String) evt.getNewValue();
 
@@ -289,24 +289,21 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			/* used both for reading and deleting ( does file exist? )
 			 */
 			//TODO REFACTORING extract to method
-			File file = project.getLocation().toFile();
+			File projectFile = project.getLocation().toFile();
 			String fileSep = System.getProperty("file.separator");
-			file = new File(file.toString() + fileSep + ".order");
+			File file = new File(projectFile.toString() + fileSep + ".order");
 			
 			//featureOrder not in model.xml
 			if(featureModel.getFeatureOrderList().isEmpty() && !featureModel.isFeatureOrderInXML() 
 					&& file.exists()){
 
-				FeatureOrderReader reader = new FeatureOrderReader(
-						project.getLocation().toFile());
+				FeatureOrderReader reader = new FeatureOrderReader(projectFile);
 				ArrayList<String> list = reader.featureOrderRead();
 				if(list != null && list.size() >0 ){
 					featureModel.setFeatureOrderUserDefined(
 							Boolean.parseBoolean(list.get(0)));
 					featureModel.setFeatureOrderList(
-							new ArrayList<String>(
-									list.subList(1, list.size()) ));
-
+							new ArrayList<String>(list.subList(1, list.size())));
 				}
 				// write feature order to model
 				//XmlFeatureModelWriter modelWriter = new XmlFeatureModelWriter(featureModel);

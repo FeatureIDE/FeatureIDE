@@ -85,6 +85,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.GraphicalEditPart
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutManager;
 import de.ovgu.featureide.fm.ui.propertypage.PersistentPropertyManager;
+import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePage;
 
 /**
  * An editor based on the Graphical Editing Framework to view and edit feature
@@ -379,15 +380,18 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		if (getContents() == null)
 			return;
 
-		if (featureModelEditor.getOutlinePage() != null) {
-			featureModelEditor.getOutlinePage().setInput(getFeatureModel());
+		// TODO is this necessary?
+		FmOutlinePage outline = featureModelEditor.getOutlinePage();
+		if (outline != null) {
+			outline.setInput(getFeatureModel());
 		}
+		
 		// refresh size of all feature figures
 		getContents().refresh();
+		
 		// layout all features if autoLayout is enabled
-
 		setLayout();
-
+		
 		// refresh position of all feature figures
 		getContents().refresh();
 	}
@@ -395,12 +399,12 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	public void refresh() {
 		if (getFeatureModel() == null || getFeatureModel().getRoot() == null)
 			return;
+		
 		// waiting for job to be actually canceled
+		// XXX check if this stops the UI
 		try {
 			if (analyzingJob != null) {
-
 				analyzingJob.join();
-
 			}
 		} catch (InterruptedException e) {
 			FMUIPlugin.getDefault().logError(e);
@@ -429,7 +433,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 										this, ATTRIBUTE_CHANGED, false, true));
 							}
 						}
-
 						return Status.OK_STATUS;
 					}
 
@@ -444,7 +447,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		analyzingJob.schedule();
 
 		internRefresh();
-
 	}
 
 	public void setLayout() {
@@ -580,7 +582,9 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	 */
 	@Override
 	public void pageChangeFrom(int newPage) {
-
+		if (newPage == getIndex()) {
+			featureModelEditor.textEditor.updateDiagram();
+		}
 	}
 
 	/*
@@ -592,7 +596,14 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	 */
 	@Override
 	public void pageChangeTo(int oldPage) {
-
+		if (oldPage == featureModelEditor.textEditor.getIndex()) {
+			if (!featureModelEditor.textEditor.updateDiagram()) {
+				// there are errors in the file, stay at this editor page
+				featureModelEditor.isPageModified = false;
+				featureModelEditor.setActiveEditorPage(featureModelEditor.textEditor.getIndex());
+				return;
+			}
+		}
 	}
 
 	/*

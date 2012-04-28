@@ -21,6 +21,7 @@ package de.ovgu.featureide.featurehouse;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import org.eclipse.core.resources.IFile;
@@ -216,7 +217,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		composer = new FSTGenComposer(false);
 		composer.addParseErrorListener(listener);
 		
-		ArrayList<String> featureOrderList = featureProject.getFeatureModel().getConcreteFeatureNames();
+		List<String> featureOrderList = featureProject.getFeatureModel().getConcreteFeatureNames();
 		String[] features = new String[featureOrderList.size()];
 		int i = 0;
 		for (String f : featureOrderList) {
@@ -496,7 +497,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		composer = new FSTGenComposer(false);
 		composer.addParseErrorListener(listener);
 		
-		ArrayList<String> featureOrderList = featureProject.getFeatureModel().getConcreteFeatureNames();
+		List<String> featureOrderList = featureProject.getFeatureModel().getConcreteFeatureNames();
 		String[] features = new String[featureOrderList.size()];
 		int i = 0;
 		for (String f : featureOrderList) {

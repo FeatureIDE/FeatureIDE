@@ -163,7 +163,13 @@ public class FeatureModelTextEditorPage extends TextEditor implements
 	 */
 	@Override
 	public void pageChangeTo(int oldPage) {
-		
+		if (featureModelEditor.isPageModified) {
+			updateTextEditor();
+		}
+			
+		if (featureModelEditor.featureModel.isRenamed()) {
+			featureModelEditor.saveModelForConsistentRenamings();
+		}
 	}
 
 	/* (non-Javadoc)

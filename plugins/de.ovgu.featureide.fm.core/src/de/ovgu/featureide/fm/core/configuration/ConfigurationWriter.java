@@ -21,7 +21,7 @@ package de.ovgu.featureide.fm.core.configuration;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
@@ -56,7 +56,7 @@ public class ConfigurationWriter {
 	public String writeIntoString(IFile file) {
 		StringBuilder buffer = new StringBuilder();
 		FeatureModel featureModel = configuration.getFeatureModel();
-		ArrayList<String> list = featureModel.getFeatureOrderList();
+		List<String> list = featureModel.getFeatureOrderList();
 		if (featureModel.isFeatureOrderUserDefined()) {
 			Set<Feature> featureset = configuration.getSelectedFeatures();
 			for (String s : list) {

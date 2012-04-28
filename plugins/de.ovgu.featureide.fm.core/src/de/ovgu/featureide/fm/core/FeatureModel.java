@@ -61,7 +61,6 @@ import de.ovgu.featureide.fm.core.propertypage.IPersistentPropertyManager;
  * @author Thomas Thuem
  * 
  */
-// TODO all retruning lists shoul be of the same type
 public class FeatureModel implements PropertyConstants {
 
 	/**
@@ -108,20 +107,20 @@ public class FeatureModel implements PropertyConstants {
 
 	private int selectedLayoutAlgorithm = 1;
 
-	private List<String> comments = new LinkedList<String>();
+	private LinkedList<String> comments = new LinkedList<String>();
 
 	/**
 	 * 
 	 */
-	private List<Node> propNodes = new LinkedList<Node>();
+	private LinkedList<Node> propNodes = new LinkedList<Node>();
 
-	private List<Constraint> constraints = new LinkedList<Constraint>();
+	private LinkedList<Constraint> constraints = new LinkedList<Constraint>();
 
 	/**
 	 * This string saves the annotations from the model file as they were read,
 	 * because they were not yet used.
 	 */
-	private List<String> annotations = new LinkedList<String>();
+	private LinkedList<String> annotations = new LinkedList<String>();
 
 	/**
 	 * a list containing all renamings since the last save
@@ -132,7 +131,7 @@ public class FeatureModel implements PropertyConstants {
 	 * a list containing the feature names in their specified order will be
 	 * initialized in XmlFeatureModelReader
 	 */
-	private ArrayList<String> featureOrderList = new ArrayList<String>();
+	private List<String> featureOrderList = new LinkedList<String>();
 	private boolean featureOrderUserDefined = false;
 	private boolean featureOrderInXML = false;
 
@@ -259,7 +258,6 @@ public class FeatureModel implements PropertyConstants {
 	}
 
 	public boolean deleteFeature(Feature feature) {
-
 		// the root can not be deleted
 		if (feature == root)
 			return false;
@@ -282,7 +280,6 @@ public class FeatureModel implements PropertyConstants {
 		}
 
 		// add children to parent
-
 		int index = parent.getChildIndex(feature);
 		while (feature.hasChildren())
 			parent.addChildAtPosition(index, feature.removeLastChild());
@@ -290,11 +287,18 @@ public class FeatureModel implements PropertyConstants {
 		// delete feature
 		parent.removeChild(feature);
 		featureTable.remove(name);
+		
+		// remove feature from order list
+		for (int i = 0;i < featureOrderList.size();i++) {
+			if (featureOrderList.get(i).equals(name)) {
+				featureOrderList.remove(i);
+				break;
+			}
+		}
 		return true;
 	}
 
 	public Feature getFeature(String name) {
-
 		if (featureTable.isEmpty()) {
 			// create the root feature (it is the only one without a reference)
 			root = new Feature(this, name);
@@ -314,6 +318,14 @@ public class FeatureModel implements PropertyConstants {
 		renamings.add(new Renaming(oldName, newName));
 		for (Node node : propNodes) {
 			renameVariables(node, oldName, newName);
+		}
+		
+		// update the feature order list
+		for (int i = 0;i < featureOrderList.size();i++) {
+			if (featureOrderList.get(i).equals(oldName)) {
+				featureOrderList.set(i, newName);
+				break;
+			}
 		}
 		return true;
 	}
@@ -684,8 +696,8 @@ public class FeatureModel implements PropertyConstants {
 			initFeatures(child);
 	}
 
-	public ArrayList<String> getConcreteFeatureNames() {
-		ArrayList<String> layerNames = new ArrayList<String>();
+	public LinkedList<String> getConcreteFeatureNames() {
+		LinkedList<String> layerNames = new LinkedList<String>();
 		if (root == null)
 			return null;
 		for (Feature layer : getConcreteFeatures()) {
@@ -1046,24 +1058,24 @@ public class FeatureModel implements PropertyConstants {
 	 *            a list of feature names for which
 	 * @return a list of features that is common to all variants
 	 */
-	public Collection<String> commonFeatures(long timeout,
+	public LinkedList<String> commonFeatures(long timeout,
 			Object... selectedFeatures) {
 		Node formula = NodeCreator.createNodes(this);
 		if (selectedFeatures.length > 0)
 			formula = new And(formula, new Or(selectedFeatures));
 		SatSolver solver = new SatSolver(formula, timeout);
-		List<String> common = new LinkedList<String>();
+		LinkedList<String> common = new LinkedList<String>();
 		for (Literal literal : solver.knownValues())
 			if (literal.positive)
 				common.add(literal.var.toString());
 		return common;
 	}
 
-	public List<Feature> getDeadFeatures() {
+	public LinkedList<Feature> getDeadFeatures() {
 		//cloning the FM, because otherwise the resulting formula is wrong if renamed features are involved
 		// TODO: Check other calls of createNodes 
 		Node root = NodeCreator.createNodes(this.clone());
-		List<Feature> set = new ArrayList<Feature>();
+		LinkedList<Feature> set = new LinkedList<Feature>();
 		for (Literal e : new SatSolver(root, 1000).knownValues())
 			if (!e.positive && !e.var.toString().equals("False")
 					&& !e.var.toString().equals("True"))
@@ -1325,7 +1337,7 @@ public class FeatureModel implements PropertyConstants {
 		return undoContext;
 	}
 
-	public void setConstraints(List<Constraint> constraints) {
+	public void setConstraints(LinkedList<Constraint> constraints) {
 		this.constraints = constraints;
 		this.propNodes = new LinkedList<Node>();
 		for (Constraint c : constraints) {
@@ -1351,11 +1363,14 @@ public class FeatureModel implements PropertyConstants {
 
 	}
 
+	
 	/**
 	 * @return the featureOrderList
 	 */
-	public ArrayList<String> getFeatureOrderList() {
-		// TODO should return getConcreteFeatureNames() if null.
+	public List<String> getFeatureOrderList() {
+//		for (int i = 0;i < featureOrderList.size();i++) {
+//			featureOrderList.set(i, getNewName(featureOrderList.get(i))); 
+//		}
 		return featureOrderList;
 	}
 
@@ -1363,7 +1378,7 @@ public class FeatureModel implements PropertyConstants {
 	 * @param featureOrderList
 	 *            the featureOrderList to set
 	 */
-	public void setFeatureOrderList(ArrayList<String> featureOrderList) {
+	public void setFeatureOrderList(List<String> featureOrderList) {
 		this.featureOrderList = featureOrderList;
 	}
 

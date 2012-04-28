@@ -23,6 +23,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Scanner;
 
 import org.eclipse.core.resources.IFile;
@@ -56,22 +57,22 @@ import de.ovgu.featureide.ui.UIPlugin;
 public class CollaborationModelBuilder {
 	private CollaborationModel model;
 
-	public LinkedList<String> classFilter = new LinkedList<String>();
-	public LinkedList<String> featureFilter = new LinkedList<String>();
+	public List<String> classFilter = new LinkedList<String>();
+	public List<String> featureFilter = new LinkedList<String>();
 	public boolean showUnselectedFeatures = false;
 	public IFile configuration = null;
 	
-	private ArrayList<String> iFeatureNames = new ArrayList<String>();
+	private List<String> iFeatureNames = new LinkedList<String>();
 	private Collaboration collaboration;
-	private ArrayList<String> extensions;
+	private List<String> extensions;
 	private FSTModel fSTModel;
 	public IFeatureProject project;
 
 	public IFile editorFile;
 
-	private ArrayList<String> selectedFeatureNames;
+	private List<String> selectedFeatureNames;
 
-	private ArrayList<String> layerNames;
+	private List<String> layerNames;
 
 	private IComposerExtension composer;
 	
@@ -99,9 +100,9 @@ public class CollaborationModelBuilder {
 	 */
 	private void buildModelWithFSTModel() {
 		//case: FSTModel builded
-		ArrayList<FSTFeature> iFeatures = fSTModel.getSelectedFeatures();
+		Collection<FSTFeature> iFeatures = fSTModel.getSelectedFeatures();
 		if (iFeatures == null) {
-			return;// TODO before: return null;
+			return;
 		}
 		
 		for (FSTFeature feature : iFeatures) {
@@ -344,7 +345,7 @@ public class CollaborationModelBuilder {
 	 */
 	private void setSelectedFeatureNames() {
 		selectedFeatureNames = new ArrayList<String>();
-		ArrayList<Feature> features = getSelectedFeatures(project);
+		LinkedList<Feature> features = getSelectedFeatures(project);
 		if (features == null) {
 			return;
 		}
@@ -371,12 +372,12 @@ public class CollaborationModelBuilder {
 	 * get ordered list of layers from feature model
 	 * @return
 	 */
-	private ArrayList<String> getLayerNames() {
+	private List<String> getLayerNames() {
 		FeatureModel featureModel = project.getFeatureModel();
 		if (featureModel.isFeatureOrderUserDefined()) {
 			return featureModel.getFeatureOrderList();
 		} else {
-			return (ArrayList<String>) featureModel.getConcreteFeatureNames();
+			return featureModel.getConcreteFeatureNames();
 		}
 	}
 
@@ -474,22 +475,23 @@ public class CollaborationModelBuilder {
 		}
 	}
 
-	private ArrayList<Feature> getSelectedFeatures(IFeatureProject featureProject) {
+	private LinkedList<Feature> getSelectedFeatures(IFeatureProject featureProject) {
 		if (featureProject == null)
 			return null;
 
 		final IFile iFile;
-		ArrayList<Feature> list = new ArrayList<Feature>();
+		LinkedList<Feature> list = new LinkedList<Feature>();
 		if (configuration == null)
 			iFile = featureProject.getCurrentConfiguration();
 		else 
 			iFile = configuration;
 		
-		if (iFile == null)
+		if (iFile == null || !iFile.exists()) {
 			return null;
+		}
 		
 		File file = iFile.getRawLocation().toFile();
-		ArrayList<String> configurationFeatures = readFeaturesfromConfigurationFile(file);
+		LinkedList<String> configurationFeatures = readFeaturesfromConfigurationFile(file);
 		if (configurationFeatures == null)
 			return null;
 		
@@ -504,8 +506,8 @@ public class CollaborationModelBuilder {
 		return list;
 	}
 
-	private ArrayList<String> readFeaturesfromConfigurationFile(File file) {
-		ArrayList<String> list;
+	private LinkedList<String> readFeaturesfromConfigurationFile(File file) {
+		LinkedList<String> list;
 		Scanner scanner = null;
 		if (!file.exists())
 			return null;
@@ -517,7 +519,7 @@ public class CollaborationModelBuilder {
 		}
 
 		if (scanner.hasNext()) {
-			list = new ArrayList<String>();
+			list = new LinkedList<String>();
 			while (scanner.hasNext()) {
 				list.add(scanner.next());
 			}

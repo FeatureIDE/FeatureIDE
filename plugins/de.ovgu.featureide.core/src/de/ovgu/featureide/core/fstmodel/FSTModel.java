@@ -21,6 +21,7 @@ package de.ovgu.featureide.core.fstmodel;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -77,7 +78,7 @@ public class FSTModel extends FSTModelElement {
 		projectName = name;
 	}
 
-	public ArrayList<FSTFeature> getSelectedFeatures() {
+	public LinkedList<FSTFeature> getSelectedFeatures() {
 		Collection <IFeatureProject> featureProjects = CorePlugin.getFeatureProjects();
 		IFeatureProject featureProject = null;
 		for (IFeatureProject project : featureProjects) { 
@@ -89,9 +90,9 @@ public class FSTModel extends FSTModelElement {
 		if (featureProject == null)
 			return null;
 		
-		ArrayList<FSTFeature>list = new ArrayList<FSTFeature>();
+		LinkedList<FSTFeature>list = new LinkedList<FSTFeature>();
 		if (featureProject.getComposer().hasFeatureFolders()) {
-			ArrayList<String> allFeatures = new ArrayList<String>();//(file);
+			LinkedList<String> allFeatures = new LinkedList<String>();//(file);
 			try {
 				for (IResource res : featureProject.getSourceFolder().members()) {
 					if (res instanceof IFolder) {

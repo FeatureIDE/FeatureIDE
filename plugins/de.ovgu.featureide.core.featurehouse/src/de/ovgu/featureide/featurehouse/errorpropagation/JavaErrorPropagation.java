@@ -19,8 +19,8 @@
 package de.ovgu.featureide.featurehouse.errorpropagation;
 
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.TreeMap;
 
@@ -50,7 +50,7 @@ public class JavaErrorPropagation extends ErrorPropagation {
 	//private static final String IMPORT = "The import";
 	
 	private static final String TASK = "org.eclipse.jdt.core.task";
-	private ArrayList<String> layerNames = null;
+	private List<String> layerNames = null;
 	
 	/**
 	 * TODO @Jens improve description
@@ -222,7 +222,7 @@ public class JavaErrorPropagation extends ErrorPropagation {
 			if (model.isFeatureOrderUserDefined()) {
 				layerNames = model.getFeatureOrderList();
 			} else {
-				layerNames = (ArrayList<String>) model.getConcreteFeatureNames();
+				layerNames = model.getConcreteFeatureNames();
 			}
 		}
 		

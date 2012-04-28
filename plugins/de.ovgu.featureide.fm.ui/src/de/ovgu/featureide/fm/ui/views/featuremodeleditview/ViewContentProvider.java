@@ -46,6 +46,7 @@ import de.ovgu.featureide.fm.ui.views.FeatureModelEditView;
  * 
  * @author Thomas Thuem
  */
+// TODO differences should be highlighted
 public class ViewContentProvider implements IStructuredContentProvider,
 		ITreeContentProvider, GUIDefaults {
 
@@ -182,7 +183,7 @@ public class ViewContentProvider implements IStructuredContentProvider,
 			// case: update
 			if (isCanceled()) return;
 
-			if (Runtime.getRuntime().availableProcessors() >= 3) {
+			if (Runtime.getRuntime().availableProcessors() >= 2) {
 				// case: running in parallel jobs
 		        // TODO it is unnecessary to refresh this every time while nothing has changed
 				Job oldCalculationJob = new Job("Calculate: \"" + STATISTICS_BEFORE + "\"") {
@@ -225,10 +226,9 @@ public class ViewContentProvider implements IStructuredContentProvider,
 				if (isCanceled()) return;
 				monitor.worked(1);
 
-				// TODO it is unneccesary to refresh this every time while nothing has changed
+				// TODO it is unnecessary to refresh this every time while nothing has changed
 				addStatistics(invisibleRoot, STATISTICS_BEFORE, oldModel, INDEX_STATISTICS_BEFORE, false, monitor);
 				if (isCanceled()) return;
-				
 				addStatistics(invisibleRoot, STATISTICS_AFTER, newModel, INDEX_STATISTICS_AFTER, false, monitor);
 			}		
 		}
@@ -298,7 +298,7 @@ public class ViewContentProvider implements IStructuredContentProvider,
 	 * @param init A flag which indicates if the statistics only should be initialized or if they should be calculated 
 	 * @param monitor The monitor of the running job
 	 */
-	private void addStatistics(TreeParent root, String text,
+	private void addStatistics(TreeParent root, final String text,
 			final FeatureModel model, int position, boolean init, IProgressMonitor monitor) {
 		if (monitor != null) {
 			monitor.setTaskName("Calculate: \"" + text + "\"");
@@ -335,7 +335,7 @@ public class ViewContentProvider implements IStructuredContentProvider,
 			// case: update
 			// calculates the statistics
 			TreeObject statistics = (TreeObject)root.getChildren()[position];
-			TreeElement[] children = statistics.getChildren();
+			final TreeElement[] children = statistics.getChildren();
 			try {
 				if (children[INDEX_VALID] instanceof SelectableFeature) {
 					((SelectableFeature) children[INDEX_VALID]).setName(MODEL_VOID
@@ -359,14 +359,44 @@ public class ViewContentProvider implements IStructuredContentProvider,
 			((TreeObject)children[INDEX_PRIMITIVE]).setName(NUMBER_PRIMITIVE + terminal);
 			((TreeObject)children[INDEX_COMPOUND]).setName(NUMBER_COMPOUND + (features - terminal));
 			((TreeObject)children[INDEX_HIDDEN]).setName(NUMBER_HIDDEN + hidden);
+			
 			if (isCanceled()) return;
-			((TreeObject)children[INDEX_CONFIGS]).set(calculateNumberOfVariants(model, true));
-			refresh();
-			if (monitor != null) monitor.worked(1);
-			if (isCanceled()) return;
-			((TreeObject)children[INDEX_VARIANTS]).set(calculateNumberOfVariants(model, false));
-			refresh();
-			if (monitor != null) monitor.worked(1);
+			
+			if (Runtime.getRuntime().availableProcessors() >= 2) {
+				Job job = new Job("Calculate: \"" + text + "\"") {
+					@Override
+					protected IStatus run(IProgressMonitor monitor) {
+						monitor.setTaskName("Calculate number of configurations");
+						((TreeObject)children[INDEX_CONFIGS]).set(calculateNumberOfVariants(model, true));
+						refresh();
+						return Status.OK_STATUS;
+					}
+				};
+				job.setPriority(Job.DECORATE);
+				job.schedule();
+				
+				monitor.setTaskName("Calculate number of program variants");
+				
+				((TreeObject)children[INDEX_VARIANTS]).set(calculateNumberOfVariants(model, false));
+				refresh();
+				monitor.worked(1);
+				try {
+					monitor.setTaskName("Waiting for subtask to finish");
+					job.join();
+					monitor.worked(1);
+					monitor.done();
+				} catch (InterruptedException e) {
+					FMUIPlugin.getDefault().logError(e);
+				}
+			} else {
+				((TreeObject)children[INDEX_CONFIGS]).set(calculateNumberOfVariants(model, true));
+				refresh();
+				monitor.worked(1);
+				if (isCanceled()) return;
+				((TreeObject)children[INDEX_VARIANTS]).set(calculateNumberOfVariants(model, false));
+				refresh();
+				monitor.worked(1);
+			}
 		}
 	}
 
@@ -379,8 +409,15 @@ public class ViewContentProvider implements IStructuredContentProvider,
 			@Override
 			public void initChildren() {}
 		};
+		
+		if (!ignoreAbstractFeatures && model.countConcreteFeatures() == 0) {
+			// case: there is no concrete feature so there is only one program variant,
+			//       without this the calculation least much to long
+			p.addChild("1 " + variants);
+			return p;
+		}
 		final long number = new Configuration(model, false,
-				ignoreAbstractFeatures).number(TIMEOUT_CONFIGURATION);
+					ignoreAbstractFeatures).number(TIMEOUT_CONFIGURATION);			
 		String s = "";
 		if (number < 0)
 			s += "more than " + (-1 - number);

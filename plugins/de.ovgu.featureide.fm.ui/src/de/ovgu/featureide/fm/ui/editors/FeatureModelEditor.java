@@ -68,9 +68,10 @@ import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelFile;
+import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
+import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
-import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslWriter;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
@@ -96,12 +97,12 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 	public FeatureModelTextEditorPage textEditor;
 	public FeatureOrderEditor featureOrderEditor;
 
-	private boolean isPageModified;
+	boolean isPageModified;
 
 	private boolean closeEditor;
 
-	FeatureModel featureModel;
-	private FeatureModel originalFeatureModel;
+	public FeatureModel featureModel;
+	public FeatureModel originalFeatureModel;
 
 	IFeatureModelReader featureModelReader;
 	IFeatureModelWriter featureModelWriter;
@@ -147,10 +148,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		originalFeatureModel = new FeatureModel();
 		try {
 			// TODO do not parse the model twice
-			//new XmlFeatureModelReader(originalFeatureModel,file.getProject()).readFromFile(file);
-			//new XmlFeatureModelReader(featureModel,file.getProject()).readFromFile(file);
-		    	new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(originalFeatureModel)).readFromFile(file);
-		    	new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(featureModel)).readFromFile(file);
+	    	new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(originalFeatureModel)).readFromFile(file);
+	    	new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(featureModel)).readFromFile(file);
 		} catch (Exception e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
@@ -348,98 +347,55 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 			textEditor.setFocus();
 	}
 
-	private int oldPage;
+	private int oldPageIndex;
 
 	@Override
 	protected void pageChange(int newPageIndex) {
-		if (newPageIndex == getTextEditorIndex()) {
-			if (isPageModified && featureModel.isRenamed()) {
-				textEditor.updateTextEditor();
-				saveModelForConsistentRenamings();
-			}
+		IEditorActionBarContributor contributor = getEditorSite().getActionBarContributor();
+		if (contributor instanceof FeatureModelEditorContributor) {
+			((FeatureModelEditorContributor) contributor).setActivePage(this, newPageIndex);
 		}
+		getPage(oldPageIndex).pageChangeFrom(newPageIndex);
+		getPage(newPageIndex).pageChangeTo(oldPageIndex);
 
-		if (oldPage == getDiagramEditorIndex()) {
-			if (newPageIndex == getTextEditorIndex()) {
-				if (isPageModified) {
-					textEditor.updateTextEditor();
-				}
-			} else if (newPageIndex == featureOrderEditor.getIndex()) {
-				if (isPageModified) {
-					textEditor.updateTextEditor();
-					featureOrderEditor.updateOrderEditor(featureModel);
-				}
-			} else if (oldPage == newPageIndex) {
-				textEditor.updateDiagram();
-			}
-		} else if (oldPage == getTextEditorIndex()) {
-			if (newPageIndex == getDiagramEditorIndex()) {
-				// delete this line, so the import in the source view is correct
-				// if (isDirty() || grammarFile.hasModelMarkers())
-				if (!textEditor.updateDiagram()) {
-					// there are errors in the file, stay at this editor page
-					isPageModified = false;
-					extensionPageChange(newPageIndex);
-					setActivePage(getTextEditorIndex());
-					return;
-				}
-			} else if (newPageIndex == featureOrderEditor.getIndex()) {
-				if (isDirty() || fmFile.hasModelMarkers()) {
-
-					if (!textEditor.updateDiagram()) {
-						// there are errors in the file, stay at this editor
-						// page
-						isPageModified = false;
-						extensionPageChange(newPageIndex);
-						setActivePage(getTextEditorIndex());
-						return;
-					}
-					featureOrderEditor.updateOrderEditor(featureModel);
-				}
-			}
-		} else if (oldPage == getOrderEditorIndex()) {
-			if (newPageIndex == getTextEditorIndex()) {
-				// if (isPageModified) {
-				textEditor.updateTextEditor();
-				// }
-			} else {
-				featureOrderEditor.updateOrderEditor(featureModel);
-			}
-		}
-		extensionPageChange(newPageIndex);
-
+		oldPageIndex = newPageIndex;
 		isPageModified = false;
-
-		IEditorActionBarContributor contributor = getEditorSite()
-				.getActionBarContributor();
-		if (contributor instanceof FeatureModelEditorContributor)
-			((FeatureModelEditorContributor) contributor).setActivePage(this,
-					newPageIndex);
-		oldPage = newPageIndex;
-
 		super.pageChange(newPageIndex);
-
 	}
 
-	private void extensionPageChange(int newPage) {
+	/**
+	 * Gets the corresponding page for the given index.
+	 * @param index The index of the page
+	 * @return The page
+	 */
+	private IFeatureModelEditorPage getPage(int index) {
+		if (index == getDiagramEditorIndex()) {
+			return diagramEditor;
+		}
+		if (index == getOrderEditorIndex()) {
+			return featureOrderEditor;
+		}
+		if (index == getTextEditorIndex()) {
+			return textEditor;
+		}
+		
 		for (IFeatureModelEditorPage page : extensionPages) {
-			if (page.getIndex() == newPage) {
-				page.pageChangeTo(oldPage);
-			}
-			if (page.getIndex() == oldPage) {
-				page.pageChangeFrom(newPage);
+			if (page.getIndex() == index) {
+				return page; 
 			}
 		}
+
+		return null;
 	}
 
 	/**
 	 * Open a dialog to save the model.
 	 */
 	public void saveModelForConsistentRenamings() {
-		ArrayList<String> editor = new ArrayList<String>();
+		LinkedList<String> editor = new LinkedList<String>();
 		editor.add(fmFile.getResource().getName());
 
-		ArrayList<IEditorPart> editorspart = new ArrayList<IEditorPart>();
+		LinkedList<IEditorPart> editorspart = new LinkedList<IEditorPart>();
 		editorspart.add(this.getEditor(getDiagramEditorIndex()));
 
 		ListDialog dialog = new ListDialog(getSite().getWorkbenchWindow()
@@ -464,33 +420,31 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		if (!saveEditors())
 			return;
 
-		// featureOrderEditor.updateOrderEditor(featureModel);
 		featureOrderEditor.doSave(monitor);
 		featureModel.performRenamings(file);
-
-		if (getActivePage() == getDiagramEditorIndex() && isPageModified) {
-			textEditor.updateTextEditor();
-			// TODO why do we need these two lines?
-			setActivePage(getTextEditorIndex());
-			setActivePage(getDiagramEditorIndex());
-		} else if (getActivePage() == getTextEditorIndex()) {
-			// TODO why to update the diagram here?
-			textEditor.updateDiagram();
-		} else if (getActivePage() == featureOrderEditor.getIndex()) {
-			textEditor.updateTextEditor();
-		}
-
 		for (IFeatureModelEditorPage page : extensionPages) {
 			page.doSave(monitor);
 		}
+		
+		// write the model to the file
+		if (getActivePage() == textEditor.getIndex()) {
+			textEditor.doSave(monitor);
+		} else {
+			try {
+				new FeatureModelWriterIFileWrapper(new XmlFeatureModelWriter(featureModel)).writeToFile(getModelFile());
+			} catch (CoreException e) {
+				FMUIPlugin.getDefault().logError(e);
+			}
+		}
 
-		textEditor.doSave(monitor);
+		// set originalFeatureModel
 		try {
 			new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(originalFeatureModel))
 				.readFromFile(fmFile.getResource());
 		} catch (Exception e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
+		
 		setPageModified(false);
 	}
 
@@ -706,6 +660,14 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 	
 	public IFile getModelFile() {
 		return file;
+	}
+	
+	/**
+	 * This is just a call to the private method <code>setActivePage(int index)</code>.
+	 * @param index
+	 */
+	public void setActiveEditorPage(int index) {
+		setActivePage(index);
 	}
 
 }
