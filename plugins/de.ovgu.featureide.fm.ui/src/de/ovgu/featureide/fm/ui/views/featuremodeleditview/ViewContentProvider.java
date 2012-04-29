@@ -147,8 +147,10 @@ public class ViewContentProvider implements IStructuredContentProvider,
 	}
 	
 	public void defaultContent() {
-		invisibleRoot.setChild(new TreeObject(DEFAULT_MESSAGE, DEFAULT_IMAGE));
-		refresh();
+		if (invisibleRoot != null) {
+			invisibleRoot.setChild(new TreeObject(DEFAULT_MESSAGE, DEFAULT_IMAGE));
+			refresh();
+		}
 	}
 
 	private boolean cancel = false;

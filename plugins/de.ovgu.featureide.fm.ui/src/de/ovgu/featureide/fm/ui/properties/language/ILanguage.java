@@ -16,7 +16,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.fm.core.propertypage;
+package de.ovgu.featureide.fm.ui.properties.language;
 
 /**
  * Interface of the extension point 

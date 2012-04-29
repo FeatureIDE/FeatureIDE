@@ -23,8 +23,8 @@ import java.util.LinkedList;
 import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.propertypage.IPersistentPropertyManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 
 /**
@@ -37,8 +37,8 @@ public class BreadthFirstLayout extends FeatureDiagramLayoutManager {
 	/**
 	 * @param manager
 	 */
-	public BreadthFirstLayout(IPersistentPropertyManager manager) {
-		super(manager);
+	public BreadthFirstLayout() {
+		super();
 	}
 
 	int yoffset;
@@ -57,12 +57,12 @@ public class BreadthFirstLayout extends FeatureDiagramLayoutManager {
 		LinkedList<LayoutableFeature> list = new LinkedList<LayoutableFeature>();
 		list.add(root);
 
-		yoffset += manager.getLayoutMarginY();
+		yoffset += FMPropertyManager.getLayoutMarginY();
 		while (!list.isEmpty()) {
 			//center the features of the level
-			int width = 2 * manager.getLayoutMarginX() - manager.getFeatureSpaceX();
+			int width = 2 * FMPropertyManager.getLayoutMarginX() - FMPropertyManager.getFeatureSpaceX();
 			for (LayoutableFeature feature : list) {
-				width += FeatureUIHelper.getSize(feature.getFeature()).width + manager.getFeatureSpaceX();
+				width += FeatureUIHelper.getSize(feature.getFeature()).width + FMPropertyManager.getFeatureSpaceX();
 				
 				
 			}
@@ -74,14 +74,14 @@ public class BreadthFirstLayout extends FeatureDiagramLayoutManager {
 			for (int i = 0; i < levelSize; i++) {
 				LayoutableFeature feature = list.removeFirst();
 				FeatureUIHelper.setLocation(feature.getFeature(),new Point(xoffset, yoffset));
-				xoffset += FeatureUIHelper.getSize(feature.getFeature()).width + manager.getFeatureSpaceX();
+				xoffset += FeatureUIHelper.getSize(feature.getFeature()).width + FMPropertyManager.getFeatureSpaceX();
 				//add the features children
 				for (LayoutableFeature child : feature.getChildren())
 					list.add(child);
 			}
-			yoffset += manager.getFeatureSpaceY();
+			yoffset += FMPropertyManager.getFeatureSpaceY();
 		}
-		yoffset -= manager.getFeatureSpaceY();
+		yoffset -= FMPropertyManager.getFeatureSpaceY();
 	}
 	
 }

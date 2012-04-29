@@ -30,10 +30,10 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.graphics.Color;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.propertypage.ILanguage;
-import de.ovgu.featureide.fm.core.propertypage.IPersistentPropertyManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
+import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
+import de.ovgu.featureide.fm.ui.properties.language.ILanguage;
 
 /**
  * represents a legend for the feature model
@@ -91,7 +91,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	public Point newPos;
 	private int width;
 	private ILanguage language;
-	private IPersistentPropertyManager manager;
 
 	@Override
 	public boolean useLocalCoordinates() {
@@ -100,7 +99,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	}
 
 	public LegendFigure(FeatureModel featureModel, Point pos) {
-		manager = featureModel.getPersistentPropertyManager();
 		boolean mandatory = featureModel.hasMandatoryFeatures();
 		boolean optional = featureModel.hasOptionalFeatures();
 		boolean and = featureModel.hasAndGroup();
@@ -112,18 +110,18 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		boolean dead = featureModel.hasDead() || featureModel.hasFalse();  //same color
 		boolean showHidden = featureModel.showHiddenFeatures();
 		
-		language = manager.getLanguage();
+		language = FMPropertyManager.getLanguage();
 		setLocation(pos);
 		setLayoutManager(layout);
-		setBorder(manager.getLegendBorder());
+		setBorder(FMPropertyManager.getLegendBorder());
 		setLegendSize(mandatory, optional, or, alternative, and, abstrac,
 				concrete, hidden, dead, showHidden);
 		FeatureUIHelper.setLegendSize(this.getSize());
 		FeatureUIHelper.setLegendFigure(this);
 		createRows(mandatory, optional, or, alternative, and, abstrac,
 				concrete, hidden, dead, showHidden);
-		setForegroundColor(manager.getLegendForgroundColor());
-		setBackgroundColor(manager.getLegendBackgroundColor());
+		setForegroundColor(FMPropertyManager.getLegendForgroundColor());
+		setBackgroundColor(FMPropertyManager.getLegendBackgroundColor());
 		this.width = LEGEND_WIDTH;
 		this.setOpaque(true);
 	}
@@ -201,7 +199,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 	private void createRowTitle() {
 		Label labelTitle = new Label();
-		labelTitle.setForegroundColor(manager.getFeatureForgroundColor());
+		labelTitle.setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
 		labelTitle.setFont(DEFAULT_FONT);
 		labelTitle.setText(language.getLagendTitle());
 		labelTitle.setLabelAlignment(Label.LEFT);
@@ -218,7 +216,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 	private void createRowAlternative(int row) {
 		createGroupTypeSymbol(row, ALTERNATIVE);
-		Label labelOr = createLabel(row, language.getAlternative(), manager.getFeatureForgroundColor(),
+		Label labelOr = createLabel(row, language.getAlternative(), FMPropertyManager.getFeatureForgroundColor(),
 				ALTERNATIVE_TOOLTIP);
 
 		add(labelOr);
@@ -226,14 +224,14 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 	private void createRowOr(int row) {
 		createGroupTypeSymbol(row, OR);
-		Label labelOr = createLabel(row, language.getOr(), manager.getFeatureForgroundColor(), OR_TOOLTIP);
+		Label labelOr = createLabel(row, language.getOr(), FMPropertyManager.getFeatureForgroundColor(), OR_TOOLTIP);
 		add(labelOr);
 	}
 
 	private void createRowOptional(int row) {
 		PolylineConnection p = createConnectionTypeSymbol(row, false);
 		add(p);
-		Label labelMandatory = createLabel(row, language.getOptional(), manager.getFeatureForgroundColor(),
+		Label labelMandatory = createLabel(row, language.getOptional(), FMPropertyManager.getFeatureForgroundColor(),
 				OPTIONAL_TOOLTIP);
 		add(labelMandatory);
 	}
@@ -243,7 +241,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		PolylineConnection p = createConnectionTypeSymbol(row, true);
 		add(p);
 		Label labelMandatory = createLabel(row, language.getMandatory(),
-				manager.getFeatureForgroundColor(), MANDATORY_TOOLTIP);
+				FMPropertyManager.getFeatureForgroundColor(), MANDATORY_TOOLTIP);
 		add(labelMandatory);
 
 	}
@@ -251,7 +249,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private void createRowAbstract(int row) {
 
 		createSymbol(row, ABSTRACT);
-		Label labelAbstract = createLabel(row, language.getAbstract(), manager.getFeatureForgroundColor(),
+		Label labelAbstract = createLabel(row, language.getAbstract(), FMPropertyManager.getFeatureForgroundColor(),
 				ABSTRACT_TOOLTIP);
 		add(labelAbstract);
 
@@ -260,7 +258,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private void createRowConcrete(int row) {
 
 		createSymbol(row, CONCRETE);
-		Label labelConcrete = createLabel(row, language.getConcrete(), manager.getFeatureForgroundColor(),
+		Label labelConcrete = createLabel(row, language.getConcrete(), FMPropertyManager.getFeatureForgroundColor(),
 				CONCRETE_TOOLTIP);
 		add(labelConcrete);
 
@@ -279,7 +277,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 		createSymbol(row, DEAD);
 		Label labelDead = createLabel(row, language.getDeadOrFalseOptional(),
-				manager.getFeatureForgroundColor(), DEAD_TOOLTIP);
+				FMPropertyManager.getFeatureForgroundColor(), DEAD_TOOLTIP);
 		add(labelDead);
 
 	}
@@ -291,7 +289,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		layout.setConstraint(label, new Rectangle(LABEL_PADDING, ROW_HEIGHT
 				* row - LIFT, width - LABEL_PADDING, ROW_HEIGHT));
 		label.setForegroundColor(foreground);
-		label.setBackgroundColor(manager.getDiagramBackgroundColor());
+		label.setBackgroundColor(FMPropertyManager.getDiagramBackgroundColor());
 		label.setFont(DEFAULT_FONT);
 		label.setToolTip(createToolTipContent(tooltip));
 		return label;
@@ -341,16 +339,16 @@ public class LegendFigure extends Figure implements GUIDefaults {
 				- LIFT);
 
 		RotatableDecoration sourceDecoration = new LegendRelationDecoration(
-				fill, p1, manager);
+				fill, p1);
 		PolylineConnection line = new PolylineConnection();
-		line.setForegroundColor(manager.getConnectionForgroundColor());
+		line.setForegroundColor(FMPropertyManager.getConnectionForgroundColor());
 
 		line.setEndpoints(p2, p3);
 
 		if (decoration)
 			line.setSourceDecoration(sourceDecoration);
 		PolylineConnection line2 = new PolylineConnection();
-		line2.setForegroundColor(manager.getConnectionForgroundColor());
+		line2.setForegroundColor(FMPropertyManager.getConnectionForgroundColor());
 
 		line2.setEndpoints(p2, p1);
 		this.add(line);
@@ -358,7 +356,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		Figure toolTipContent = createToolTipContent(toolTipText);
 		line.setToolTip(toolTipContent);
 		line2.setToolTip(toolTipContent);
-		setForegroundColor(manager.getConnectionForgroundColor());
+		setForegroundColor(FMPropertyManager.getConnectionForgroundColor());
 
 	}
 
@@ -366,8 +364,8 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			boolean mandatory) {
 
 		PolylineConnection p = new PolylineConnection();
-		p.setForegroundColor(manager.getConnectionForgroundColor());
-		p.setSourceDecoration(new CircleDecoration(mandatory, manager));
+		p.setForegroundColor(FMPropertyManager.getConnectionForgroundColor());
+		p.setSourceDecoration(new CircleDecoration(mandatory));
 
 		Point source = new Point(MANDATORY_PADDING, ROW_HEIGHT * row - LIFT
 				+ SYMBOL_SIZE / 2);
@@ -397,22 +395,22 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		switch (type) {
 
 		case (ABSTRACT):
-			rect.setBorder(manager.getAbsteactFeatureBorder(false));
-			rect.setBackgroundColor(manager.getAbstractFeatureBackgroundColor());
+			rect.setBorder(FMPropertyManager.getAbsteactFeatureBorder(false));
+			rect.setBackgroundColor(FMPropertyManager.getAbstractFeatureBackgroundColor());
 			toolTipText = ABSTRACT_TOOLTIP;
 			break;
 		case (CONCRETE):
-			rect.setBorder(manager.getConcreteFeatureBorder(false));
-			rect.setBackgroundColor(manager.getConcreteFeatureBackgroundColor());
+			rect.setBorder(FMPropertyManager.getConcreteFeatureBorder(false));
+			rect.setBackgroundColor(FMPropertyManager.getConcreteFeatureBackgroundColor());
 			toolTipText = CONCRETE_TOOLTIP;
 			break;
 		case (HIDDEN):
-			rect.setBorder(manager.getHiddenLegendBorder());
+			rect.setBorder(FMPropertyManager.getHiddenLegendBorder());
 			toolTipText = HIDDEN_TOOLTIP;
 			break;
 		case (DEAD):
-			rect.setBorder(manager.getDeadFeatureBorder(false));
-			rect.setBackgroundColor(manager.getDeadFeatureBackgroundColor());
+			rect.setBorder(FMPropertyManager.getDeadFeatureBorder(false));
+			rect.setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 			toolTipText = DEAD_TOOLTIP;
 			break;
 		}

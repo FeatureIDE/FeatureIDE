@@ -25,8 +25,8 @@ import org.eclipse.draw2d.geometry.Point;
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.propertypage.IPersistentPropertyManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
  * 
@@ -62,7 +62,6 @@ public class FeatureDiagramLayoutHelper {
 	 * needed for manual layout
 	 */
 	public static void initializeConstraintPosition(FeatureModel featureModel, int index){
-		IPersistentPropertyManager manager = featureModel.getPersistentPropertyManager();
 		Point newLocation = new Point(0,0);
 		Constraint constraint = featureModel.getConstraints().get(index);
 		int leftX = Integer.MAX_VALUE;
@@ -80,11 +79,11 @@ public class FeatureDiagramLayoutHelper {
 				}
 			}
 			newLocation.x = (leftX + rightX)/2;
-			newLocation.y += manager.getFeatureSpaceY();
+			newLocation.y += FMPropertyManager.getFeatureSpaceY();
 		} else {
 			Constraint lastConstraint = featureModel.getConstraints().get(featureModel.getConstraintCount()-2);
 			newLocation = FeatureUIHelper.getLocation(lastConstraint).getCopy();
-			newLocation.y += manager.getConstraintSpace();				
+			newLocation.y += FMPropertyManager.getConstraintSpace();				
 		}
 		FeatureUIHelper.setLocation(constraint, newLocation);
 	}
@@ -95,7 +94,6 @@ public class FeatureDiagramLayoutHelper {
 	 */
 	public static void initializeCompoundFeaturePosition(FeatureModel featureModel, 
 			LinkedList<Feature> selectedFeatures, Feature newCompound){
-		IPersistentPropertyManager manager = featureModel.getPersistentPropertyManager();
 		Point initPos = new Point(0,0);
 		int xAcc = 0;
 		for (Feature feature : selectedFeatures){	
@@ -106,7 +104,7 @@ public class FeatureDiagramLayoutHelper {
 		}
 		initPos.x = (xAcc/selectedFeatures.size());
 		if(newCompound.isRoot()){
-			initPos.y = (initPos.y - manager.getFeatureSpaceY());
+			initPos.y = (initPos.y - FMPropertyManager.getFeatureSpaceY());
 		} else {
 			initPos.y = (initPos.y + FeatureUIHelper.getLocation(newCompound.getParent()).y) / 2;
 			initPos.x = (initPos.x + FeatureUIHelper.getLocation(newCompound.getParent()).x) / 2;
@@ -121,16 +119,15 @@ public class FeatureDiagramLayoutHelper {
 	 */
 	public static void initializeLayerFeaturePosition(FeatureModel featureModel, 
 			Feature newLayer, Feature feature){
-		IPersistentPropertyManager manager = featureModel.getPersistentPropertyManager();
 		if(!FeatureUIHelper.hasVerticalLayout()){
 			Point initPos = FeatureUIHelper.getLocation(newLayer.getParent()).getCopy();
 			if (feature.getChildrenCount()>1) {
 				Feature lastChild = feature.getChildren().get(feature.getChildIndex(newLayer)-1);
 				initPos.x = FeatureUIHelper.getLocation(lastChild).x
-						+FeatureUIHelper.getSize(lastChild).width + manager.getFeatureSpaceX();
+						+FeatureUIHelper.getSize(lastChild).width + FMPropertyManager.getFeatureSpaceX();
 				initPos.y = FeatureUIHelper.getLocation(lastChild).y;
 			} else {
-				initPos.y += manager.getFeatureSpaceY();
+				initPos.y += FMPropertyManager.getFeatureSpaceY();
 			}
 			FeatureUIHelper.setLocation(newLayer, initPos);
 		} else {
@@ -138,11 +135,11 @@ public class FeatureDiagramLayoutHelper {
 			if (feature.getChildrenCount()>1) {
 				Feature lastChild = feature.getChildren().get(feature.getChildIndex(newLayer)-1);
 				initPos.y = FeatureUIHelper.getLocation(lastChild).y
-						+FeatureUIHelper.getSize(lastChild).height + manager.getFeatureSpaceX();
+						+FeatureUIHelper.getSize(lastChild).height + FMPropertyManager.getFeatureSpaceX();
 				initPos.x = FeatureUIHelper.getLocation(lastChild).x;
 			} else {
 				initPos.x += FeatureUIHelper.getSize(newLayer.getParent()).width 
-						+ manager.getFeatureSpaceY();
+						+ FMPropertyManager.getFeatureSpaceY();
 			}
 			FeatureUIHelper.setLocation(newLayer, initPos);
 		}
@@ -154,34 +151,33 @@ public class FeatureDiagramLayoutHelper {
 	 */
 	public static FeatureDiagramLayoutManager getLayoutManager(
 			int layoutAlgorithm, FeatureModel featureModel) {
-		IPersistentPropertyManager manager = featureModel.getPersistentPropertyManager();
 		switch(layoutAlgorithm){
 			case 0:
-				return new ManualLayout(manager);
+				return new ManualLayout();
 			case 1:
 				FeatureUIHelper.setVerticalLayoutBounds(false);
 				featureModel.verticalLayout(FeatureUIHelper.hasVerticalLayout());
-				return new LevelOrderLayout(manager);
+				return new LevelOrderLayout();
 			case 2:
 				FeatureUIHelper.setVerticalLayoutBounds(false);
 				featureModel.verticalLayout(FeatureUIHelper.hasVerticalLayout());
-				return new BreadthFirstLayout(manager);
+				return new BreadthFirstLayout();
 			case 3: 
 				FeatureUIHelper.setVerticalLayoutBounds(false);
 				featureModel.verticalLayout(FeatureUIHelper.hasVerticalLayout());
-				return new DepthFirstLayout(manager);
+				return new DepthFirstLayout();
 			case 4:
 				FeatureUIHelper.setVerticalLayoutBounds(true);
 				featureModel.verticalLayout(FeatureUIHelper.hasVerticalLayout());
-				return new VerticalLayout(manager);
+				return new VerticalLayout();
 			case 5: 
 				FeatureUIHelper.setVerticalLayoutBounds(true);
 				featureModel.verticalLayout(FeatureUIHelper.hasVerticalLayout());
-				return new VerticalLayout2(manager);
+				return new VerticalLayout2();
 			default:
 				FeatureUIHelper.setVerticalLayoutBounds(false);
 				featureModel.verticalLayout(FeatureUIHelper.hasVerticalLayout());
-				return new LevelOrderLayout(manager);
+				return new LevelOrderLayout();
 		}
 
 	}

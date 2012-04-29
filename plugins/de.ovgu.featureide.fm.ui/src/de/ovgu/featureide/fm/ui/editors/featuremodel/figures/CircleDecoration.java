@@ -22,8 +22,8 @@ import org.eclipse.draw2d.RotatableDecoration;
 import org.eclipse.draw2d.RoundedRectangle;
 import org.eclipse.draw2d.geometry.Point;
 
-import de.ovgu.featureide.fm.core.propertypage.IPersistentPropertyManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
+import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
  * A decoration for a feature connection that indicates the mandatory property.
@@ -33,10 +33,10 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 public class CircleDecoration extends RoundedRectangle implements
 		RotatableDecoration, GUIDefaults {
 
-	public CircleDecoration(boolean fill, IPersistentPropertyManager manager) {
+	public CircleDecoration(boolean fill) {
 		super();
-		setForegroundColor(manager.getDecoratorForgroundColor());
-		setBackgroundColor(fill ? manager.getDecoratorForgroundColor() : manager.getDecoratorBackgroundColor());
+		setForegroundColor(FMPropertyManager.getDecoratorForgroundColor());
+		setBackgroundColor(fill ? FMPropertyManager.getDecoratorForgroundColor() : FMPropertyManager.getDecoratorBackgroundColor());
 		setSize(SOURCE_ANCHOR_DIAMETER, SOURCE_ANCHOR_DIAMETER);
 
 	}

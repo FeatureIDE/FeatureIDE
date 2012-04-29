@@ -16,7 +16,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.fm.ui.propertypage;
+package de.ovgu.featureide.fm.ui.properties.page;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.QualifiedName;
 
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 
 /**
@@ -40,24 +41,23 @@ public class SettingsImport {
 	 * @param persitentProperties Properties saving the import
 	 * @param file the file containing the properties
 	 */
-	public SettingsImport(PersistentPropertyManager persitentProperties, File file) {
+	public SettingsImport(File file) {
 		if (!file.exists()) {
 			return;
 		}
-		importSettings(file, persitentProperties);
+		importSettings(file);
 	}
 
 	/**
 	 * @param settingsFile
 	 * @param persitentProperties
 	 */
-	private void importSettings(File settingsFile,
-			PersistentPropertyManager persitentProperties) {
-		String[] settings = getContents(settingsFile, persitentProperties).split("[\r\n]");
+	private void importSettings(File settingsFile) {
+		String[] settings = getContents(settingsFile).split("[\r\n]");
 		for (String s : settings) {
 			try {
-				if (s.contains("=") && !s.split("[=]")[1].equals("null")) {
-					persitentProperties.workspaceRoot.setPersistentProperty(new QualifiedName(s.split("[=]")[0], (s.split("[=]")[0])), s.split("[=]")[1]);
+				if (s.contains("=") && !"null".equals(s.split("[=]")[1])) {
+					FMPropertyManager.workspaceRoot.setPersistentProperty(new QualifiedName(s.split("[=]")[0], (s.split("[=]")[0])), s.split("[=]")[1]);
 				}
 			} catch (CoreException e) {
 				FMUIPlugin.getDefault().logError(e);
@@ -70,8 +70,7 @@ public class SettingsImport {
 	 * @param persitentProperties
 	 * @return
 	 */
-	private String getContents(File settingsFile,
-			PersistentPropertyManager persitentProperties) {
+	private String getContents(File settingsFile) {
 		StringBuilder buffer = new StringBuilder();
     	BufferedReader reader = null;
     	try {

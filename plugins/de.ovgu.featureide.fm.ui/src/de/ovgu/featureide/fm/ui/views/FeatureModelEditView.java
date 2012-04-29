@@ -57,7 +57,6 @@ import de.ovgu.featureide.fm.core.editing.evaluation.Evaluation;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
-import de.ovgu.featureide.fm.core.propertypage.IPersistentPropertyManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GEFImageWriter;
@@ -339,8 +338,6 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 
 					private void createBitmap(FeatureModel featureModel,
 							File file) {
-						IPersistentPropertyManager manager = featureModel
-								.getPersistentPropertyManager();
 						GraphicalViewerImpl graphicalViewer = new ScrollingGraphicalViewer();
 						graphicalViewer.createControl(viewer.getControl()
 								.getParent());
@@ -354,8 +351,7 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 								.setAntialias(SWT.ON);
 						graphicalViewer.setRootEditPart(rootEditPart);
 						graphicalViewer.setContents(featureModel);
-						FeatureDiagramLayoutManager layoutManager = new LevelOrderLayout(
-								manager);
+						FeatureDiagramLayoutManager layoutManager = new LevelOrderLayout();
 						layoutManager.layout(featureModel);
 						GEFImageWriter.writeToFile(graphicalViewer, file);
 					}

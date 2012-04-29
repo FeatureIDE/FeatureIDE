@@ -79,7 +79,6 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		
 	};
 
-	
 	/*
 	 * (non-Javadoc)
 	 * 

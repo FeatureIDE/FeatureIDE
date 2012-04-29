@@ -23,8 +23,8 @@ import java.util.LinkedList;
 import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.propertypage.IPersistentPropertyManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
  * ordering features from left to right without any intersections or overlapping
@@ -46,8 +46,8 @@ public class VerticalLayout extends FeatureDiagramLayoutManager {
 	/**
 	 * @param manager
 	 */
-	public VerticalLayout(IPersistentPropertyManager manager) {
-		super(manager);
+	public VerticalLayout() {
+		super();
 	}
 
 	public void layoutFeatureModel(FeatureModel featureModel) {
@@ -68,12 +68,12 @@ public class VerticalLayout extends FeatureDiagramLayoutManager {
 	private void calculateLevelXPositions(){	
 		int width = 0;
 		for(int i = 0; i <= highestLevel; i++){
-			width += maxFeatureWidthOnLevel.get(i)+manager.getFeatureSpaceY();
+			width += maxFeatureWidthOnLevel.get(i)+FMPropertyManager.getFeatureSpaceY();
 		}
-		width -= manager.getFeatureSpaceY();
+		width -= FMPropertyManager.getFeatureSpaceY();
 		positionsX.add((controlWidth - width) /2);
 		for(int i = 1; i <= highestLevel; i++){
-			positionsX.add(positionsX.get(i-1)+maxFeatureWidthOnLevel.get(i-1)+manager.getFeatureSpaceY());
+			positionsX.add(positionsX.get(i-1)+maxFeatureWidthOnLevel.get(i-1)+FMPropertyManager.getFeatureSpaceY());
 		}
 	}
 	
@@ -99,7 +99,7 @@ public class VerticalLayout extends FeatureDiagramLayoutManager {
 		}
 		if(!feature.hasChildren()){
 			positionsY.add(height);
-			height += FeatureUIHelper.getSize(feature.getFeature()).getCopy().height+manager.getFeatureSpaceX();
+			height += FeatureUIHelper.getSize(feature.getFeature()).getCopy().height+FMPropertyManager.getFeatureSpaceX();
 		}
 		for(LayoutableFeature next : feature.getChildren()){
 			createLevelList(next,level+1);
@@ -111,7 +111,7 @@ public class VerticalLayout extends FeatureDiagramLayoutManager {
 	 * 
 	 */
 	private void getYcenterForChildlessFeatures(){
-		height -= manager.getFeatureSpaceX();
+		height -= FMPropertyManager.getFeatureSpaceX();
 		for(int i = 0; i < positionsY.size(); i++){
 			int newPos =  positionsY.get(i)+(controlHeight/2-height/2);
 			positionsY.set(i,newPos);
@@ -134,7 +134,7 @@ public class VerticalLayout extends FeatureDiagramLayoutManager {
 			childlessNum++;
 			yOffset = FeatureUIHelper.getLocation(feature.getFeature()).getCopy().y
 					+ FeatureUIHelper.getSize(feature.getFeature()).getCopy().height
-					+ manager.getFeatureSpaceX();
+					+ FMPropertyManager.getFeatureSpaceX();
 		}
 		
 	}

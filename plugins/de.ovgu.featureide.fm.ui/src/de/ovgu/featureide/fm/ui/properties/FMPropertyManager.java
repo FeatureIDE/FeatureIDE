@@ -16,25 +16,26 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.fm.ui.propertypage;
+package de.ovgu.featureide.fm.ui.properties;
 
 import java.util.LinkedList;
 
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
-
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.draw2d.Border;
 import org.eclipse.draw2d.LineBorder;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.propertypage.ILanguage;
-import de.ovgu.featureide.fm.core.propertypage.IPersistentPropertyManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIBasics;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
+import de.ovgu.featureide.fm.ui.properties.language.English;
+import de.ovgu.featureide.fm.ui.properties.language.German;
+import de.ovgu.featureide.fm.ui.properties.language.ILanguage;
+import de.ovgu.featureide.fm.ui.properties.page.FMPropertyPage;
 
 /**
  * Manages all persistent properties defined at the property pages.<br>
@@ -43,8 +44,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  * @see FMPropertyPage
  * @author Jens Meinicke
  */
-public class PersistentPropertyManager implements IPersistentPropertyManager,
-		GUIDefaults {
+public class FMPropertyManager implements GUIDefaults {
 
 	private static final QualifiedName QN_HIDE_LEGEND = createName("hidelegend");
 	private static final QualifiedName QN_LEGEND_FORGOUND = createName("legendforground");
@@ -73,296 +73,242 @@ public class PersistentPropertyManager implements IPersistentPropertyManager,
 	private static final String TRUE = "true";
 	private static final String FALSE = "false";
 
-	IWorkspaceRoot workspaceRoot;
-	
-	public PersistentPropertyManager(IProject project) {
-		workspaceRoot = project.getWorkspace().getRoot();
-	}
+	public static final IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 
-	@Override
-	public void setHideLegend(boolean value) {
+	public static void setHideLegend(boolean value) {
 		setBoolean(QN_HIDE_LEGEND, value);
 	}
 
-	@Override
-	public boolean isLegendHidden() {
+	public static boolean isLegendHidden() {
 		return getBoolean(QN_HIDE_LEGEND);
 	}
 
-	@Override
-	public void setLegendForgroundColor(Color color) {
+	public static void setLegendForgroundColor(Color color) {
 		setColor(QN_LEGEND_FORGOUND, color);
 	}
 
-	@Override
-	public Color getLegendForgroundColor() {
+	public static Color getLegendForgroundColor() {
 		return getColor(QN_LEGEND_FORGOUND, LEGEND_FOREGROUND);
 	}
 
-	@Override
-	public void setLegendBackgroundColor(Color color) {
+	public static void setLegendBackgroundColor(Color color) {
 		setColor(QN_LEGEND_BACKGROUND, color);
 	}
 
-	@Override
-	public Color getLegendBackgroundColor() {
+	public static Color getLegendBackgroundColor() {
 		return getColor(QN_LEGEND_BACKGROUND, LEGEND_BACKGROUND);
 	}
 
-	@Override
-	public void setLegendBorderColor(Color color) {
+	public static void setLegendBorderColor(Color color) {
 		setColor(QN_LEGEND_BORDER, color);
 	}
 
-	@Override
-	public Color getLegendBorderColor() {
+	public static Color getLegendBorderColor() {
 		return getColor(QN_LEGEND_BORDER, LEGEND_BORDER_COLOR);
 	}
 
-	@Override
-	public Color getFeatureForgroundColor() {
+	public static Color getFeatureForgroundColor() {
 		return getColor(QN_FEATURE_FORGROUND, FEATURE_FOREGROUND);
 	}
 
-	@Override
-	public void setFeatureForgroundColor(Color color) {
+	public static void setFeatureForgroundColor(Color color) {
 		setColor(QN_FEATURE_FORGROUND, color);
 	}
 
-	@Override
-	public Color getDiagramBackgroundColor() {
+	public static Color getDiagramBackgroundColor() {
 		return getColor(QN_DIAGRAM_BACKGROUND, DIAGRAM_BACKGROUND);
 	}
 
-	@Override
-	public void setDiagramBackgroundColor(Color color) {
+	public static void setDiagramBackgroundColor(Color color) {
 		setColor(QN_DIAGRAM_BACKGROUND, color);
 	}
 
-	@Override
-	public Color getConcreteFeatureBackgroundColor() {
+	public static Color getConcreteFeatureBackgroundColor() {
 		return getColor(QN_FEATURE_CONCRETE, CONCRETE_BACKGROUND);
 	}
 
-	@Override
-	public void setConcreteFeatureBackgroundColor(Color color) {
+	public static void setConcreteFeatureBackgroundColor(Color color) {
 		setColor(QN_FEATURE_CONCRETE, color);
 	}
 
-	@Override
-	public Color getAbstractFeatureBackgroundColor() {
+	public static Color getAbstractFeatureBackgroundColor() {
 		return getColor(QN_FEATURE_ABSTRACT, ABSTRACT_BACKGROUND);
 	}
 
-	@Override
-	public void setAbstractFeatureBackgroundColor(Color color) {
+	public static void setAbstractFeatureBackgroundColor(Color color) {
 		setColor(QN_FEATURE_ABSTRACT, color);
 	}
 
-	@Override
-	public Color getHiddenFeatureForgroundColor() {
+	public static Color getHiddenFeatureForgroundColor() {
 		return getColor(QN_FEATURE_HIDEEN_FORGROUND, HIDDEN_FOREGROUND);
 	}
 
-	@Override
-	public void setHiddenFeatureForgroundColor(Color color) {
+	public static void setHiddenFeatureForgroundColor(Color color) {
 		setColor(QN_FEATURE_HIDEEN_FORGROUND, color);
 	}
 
-	@Override
-	public Color getHiddenFeatureBackgroundColor() {
+	public static Color getHiddenFeatureBackgroundColor() {
 		return getColor(QN_FEATURE_HIDEEN_BACKGROUND, HIDDEN_BACKGROUND);
 	}
 
-	@Override
-	public void setHiddenFeatureBackgroundColor(Color color) {
+	public static void setHiddenFeatureBackgroundColor(Color color) {
 		setColor(QN_FEATURE_HIDEEN_BACKGROUND, color);
 	}
 
-	@Override
-	public Color getDeadFeatureBackgroundColor() {
+	public static Color getDeadFeatureBackgroundColor() {
 		return getColor(QN_FEATURE_DEAD, DEAD_BACKGROUND);
 	}
 
-	@Override
-	public void setDeadFeatureBackgroundColor(Color color) {
+	public static void setDeadFeatureBackgroundColor(Color color) {
 		setColor(QN_FEATURE_DEAD, color);
 	}
 
-	@Override
-	public Color getConstraintBackgroundColor() {
+	public static Color getConstraintBackgroundColor() {
 		return getColor(QN_CONSTRAINT, CONSTRAINT_BACKGROUND);
 	}
 
-	@Override
-	public void setConstraintBackgroundColor(Color color) {
+	public static void setConstraintBackgroundColor(Color color) {
 		setColor(QN_CONSTRAINT, color);
 	}
 
-	@Override
-	public Color getConnectionForgroundColor() {
+	public static Color getConnectionForgroundColor() {
 		return getColor(QN_CONNECTION, CONNECTION_FOREGROUND);
 	}
 
-	@Override
-	public void setConnectionForgroundColor(Color color) {
+	public static void setConnectionForgroundColor(Color color) {
 		setColor(QN_CONNECTION, color);
 	}
 
-	@Override
-	public Color getWarningColor() {
+	public static Color getWarningColor() {
 		return getColor(QN_WARNING, WARNING_BACKGROUND);
 	}
 
-	@Override
-	public void setWarningColor(Color color) {
+	public static void setWarningColor(Color color) {
 		setColor(QN_WARNING, color);
 	}
 
-	@Override
-	public void setLanguage(String text) {
+	public static void setLanguage(String text) {
 		setString(QN_LANGUAGE, text);
 	}
 
-	@Override
-	public ILanguage getLanguage() {
-		if (getString(QN_LANGUAGE).equals(German.name)) {
+	public static ILanguage getLanguage() {
+		if (German.name.equals(getString(QN_LANGUAGE))) {
 			return new German();
 		}
 		return new English();
 	}
 
-	@Override
-	public int getLayoutMarginX() {
+	public static int getLayoutMarginX() {
 		return getInt(QN_LAYOUT_MARGIN_X, LAYOUT_MARGIN_X);
 	}
 
-	@Override
-	public void setlayoutMagrginX(int value) {
+	public static void setlayoutMagrginX(int value) {
 		setInt(QN_LAYOUT_MARGIN_X, value);
 	}
 
-	@Override
-	public int getLayoutMarginY() {
+	public static int getLayoutMarginY() {
 		return getInt(QN_LAYOUT_MARGIN_Y, LAYOUT_MARGIN_Y);
 	}
 
-	@Override
-	public void setlayoutMagrginY(int value) {
+	public static void setlayoutMagrginY(int value) {
 		setInt(QN_LAYOUT_MARGIN_Y, value);
 	}
 
-	@Override
-	public int getFeatureSpaceX() {
+	public static int getFeatureSpaceX() {
 		return getInt(QN_FEATURE_X, FEATURE_SPACE_X);
 	}
 
-	@Override
-	public void setFeatureSpaceX(int value) {
+	public static void setFeatureSpaceX(int value) {
 		setInt(QN_FEATURE_X, value);
 	}
 
-	@Override
-	public int getFeatureSpaceY() {
+	public static int getFeatureSpaceY() {
 		return getInt(QN_FEATURE_Y, FEATURE_SPACE_Y);
 	}
 
-	@Override
-	public void setFeatureSpaceY(int value) {
+	public static void setFeatureSpaceY(int value) {
 		setInt(QN_FEATURE_Y, value);
 	}
 
-	@Override
-	public int getConstraintSpace() {
+	public static int getConstraintSpace() {
 		return getInt(QN_CONSTRAINT_SPACE, CONSTRAINT_SPACE_Y);
 	}
 
-	@Override
-	public void setConstraintSpace(int value) {
+	public static void setConstraintSpace(int value) {
 		setInt(QN_CONSTRAINT_SPACE, value);
 	}
-	
-	@Override
-	public Color getConstrinatBorderColor(boolean selected) {
+
+	public static Color getConstrinatBorderColor(boolean selected) {
 		if (selected) {
 			return GUIBasics.createBorderColor(getConstraintBackgroundColor());
 		}
 		return getConstraintBackgroundColor();
 	}
 
-	@Override
-	public Border getConstrinatBorder(boolean selected) {
+	public static Border getConstrinatBorder(boolean selected) {
 		if (selected) {
 			return new LineBorder(getConstrinatBorderColor(true), 3);
 		}
 		return new LineBorder(getConstrinatBorderColor(false), 0);
 	}
 
-	@Override
-	public Border getHiddenFeatureBorder(boolean selected) {
+	public static Border getHiddenFeatureBorder(boolean selected) {
 		if (selected) {
 			new LineBorder(getHiddenBorderColor(), 3, 2);
 		}
 		return new LineBorder(HIDDEN_BORDER_COLOR, 1, 2);
 	}
 
-	private Color getHiddenBorderColor() {
+	private static Color getHiddenBorderColor() {
 		return GUIBasics.createBorderColor(getDeadFeatureBackgroundColor());
 	}
 
-	@Override
-	public Border getDeadFeatureBorder(boolean selected) {
+	public static Border getDeadFeatureBorder(boolean selected) {
 		if (selected) {
 			return new LineBorder(getDeadBorderColor(), 3);
 		}
 		return new LineBorder(getDeadBorderColor(), 1);
 	}
 
-	private Color getDeadBorderColor() {
+	private static Color getDeadBorderColor() {
 		return GUIBasics.createBorderColor(getDeadFeatureBackgroundColor());
 	}
 
-	@Override
-	public Border getLegendBorder() {
+	public static Border getLegendBorder() {
 		return new LineBorder(getLegendBorderColor(), 1);
 	}
 
-	@Override
-	public Border getConcreteFeatureBorder(boolean selected) {
+	public static Border getConcreteFeatureBorder(boolean selected) {
 		if (selected) {
 			return new LineBorder(getConcreteBorderColor(), 3);
 		}
 		return new LineBorder(getConcreteBorderColor(), 1);
 	}
 
-	private Color getConcreteBorderColor() {
+	private static Color getConcreteBorderColor() {
 		return GUIBasics.createBorderColor(getConcreteFeatureBackgroundColor());
 	}
 
-	@Override
-	public Border getAbsteactFeatureBorder(boolean selected) {
+	public static Border getAbsteactFeatureBorder(boolean selected) {
 		if (selected) {
 			new LineBorder(getAbstractBorderColor(), 3);
 		}
 		return new LineBorder(getAbstractBorderColor(), 1);
 	}
 
-	private Color getAbstractBorderColor() {
+	private static Color getAbstractBorderColor() {
 		return GUIBasics.createBorderColor(getAbstractFeatureBackgroundColor());
 	}
 
-	@Override
-	public Border getHiddenLegendBorder() {
+	public static Border getHiddenLegendBorder() {
 		return new LineBorder(getDiagramBackgroundColor(), 1, SWT.LINE_DOT);
 	}
 
-	@Override
-	public Color getDecoratorForgroundColor() {
+	public static Color getDecoratorForgroundColor() {
 		return getConnectionForgroundColor();
 	}
 
-	@Override
-	public Color getDecoratorBackgroundColor() {
+	public static Color getDecoratorBackgroundColor() {
 		return getDiagramBackgroundColor();
 	}
 
@@ -374,7 +320,7 @@ public class PersistentPropertyManager implements IPersistentPropertyManager,
 	 * @param defaultValue The default value from {@link GUIDefaults}
 	 * @return The value for the QualifiedName
 	 */
-	private int getInt(QualifiedName name, int defaultValue) {
+	private static int getInt(QualifiedName name, int defaultValue) {
 		try {
 			String property = workspaceRoot.getPersistentProperty(name);
 			if (property != null && !"".equals(property)) {
@@ -391,7 +337,7 @@ public class PersistentPropertyManager implements IPersistentPropertyManager,
 	 * @param name The QualifiedName
 	 * @param value The value to set
 	 */
-	private void setInt(QualifiedName name, int value) {
+	private static void setInt(QualifiedName name, int value) {
 		try {
 			workspaceRoot.setPersistentProperty(name, Integer.toString(value));
 		} catch (CoreException e) {
@@ -406,7 +352,7 @@ public class PersistentPropertyManager implements IPersistentPropertyManager,
 	 * @param name The QualifiedName
 	 * @return The value for the QualifiedName
 	 */
-	private boolean getBoolean(QualifiedName name) {
+	private static boolean getBoolean(QualifiedName name) {
 		try {
 			return "true".equals(workspaceRoot.getPersistentProperty(name));
 		} catch (CoreException e) {
@@ -420,7 +366,7 @@ public class PersistentPropertyManager implements IPersistentPropertyManager,
 	 * @param name The QualifiedName
 	 * @param value The value to set
 	 */
-	private void setBoolean(QualifiedName name, boolean value) {
+	private static void setBoolean(QualifiedName name, boolean value) {
 		try {
 			workspaceRoot.setPersistentProperty(name, value ? TRUE : FALSE);
 		} catch (CoreException e) {
@@ -436,7 +382,7 @@ public class PersistentPropertyManager implements IPersistentPropertyManager,
 	 * @param defaultColor The default value from {@link GUIDefaults}
 	 * @return The value for the QualifiedName
 	 */
-	private Color getColor(QualifiedName name, Color deafaultColor) {
+	private static Color getColor(QualifiedName name, Color deafaultColor) {
 		try {
 			String property = workspaceRoot.getPersistentProperty(name);
 			if (property != null) {
@@ -457,7 +403,7 @@ public class PersistentPropertyManager implements IPersistentPropertyManager,
 	 * @param name The QualifiedName
 	 * @param color The color to set
 	 */
-	private void setColor(QualifiedName name, Color color) {
+	private static void setColor(QualifiedName name, Color color) {
 		String c = color.getRed() + "|" + color.getGreen() + "|"
 				+ color.getBlue();
 		try {
@@ -474,7 +420,7 @@ public class PersistentPropertyManager implements IPersistentPropertyManager,
 	 * @param name The QualifiedName
 	 * @return The value for the QualifiedName
 	 */
-	private String getString(QualifiedName name) {
+	private static String getString(QualifiedName name) {
 		try {
 			if (workspaceRoot.getPersistentProperty(name) != null) {
 				return workspaceRoot.getPersistentProperty(name);
@@ -490,7 +436,7 @@ public class PersistentPropertyManager implements IPersistentPropertyManager,
 	 * @param name The QualifiedName
 	 * @param value The value to set
 	 */
-	private void setString(QualifiedName name, String value) {
+	private static void setString(QualifiedName name, String value) {
 		try {
 			workspaceRoot.setPersistentProperty(name, value);
 		} catch (CoreException e) {
@@ -507,7 +453,7 @@ public class PersistentPropertyManager implements IPersistentPropertyManager,
 		return new QualifiedName(FMCorePlugin.PLUGIN_ID + "." + name, FMCorePlugin.PLUGIN_ID + "." + name);
 	}
 
-	LinkedList<QualifiedName> getQualifiedNames() {
+	public static LinkedList<QualifiedName> getQualifiedNames() {
 		LinkedList<QualifiedName> names = new LinkedList<QualifiedName>();
 		names.add(QN_HIDE_LEGEND);
 //		names.add(QN_LEGEND_FORGOUND);

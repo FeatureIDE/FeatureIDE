@@ -107,12 +107,21 @@
             class="de.ovgu.featureide.core.propertypage.BasePropertyPage"
             id="de.ovgu.featureide.core.propertypage"
             name="FeatureIDE">
+         <filter
+               name="projectNature"
+               value="de.ovgu.featureide.core.featureProjectNature">
+         </filter>
       </page>
+     
       <page
             category="de.ovgu.featureide.core.propertypage"
             class="de.ovgu.featureide.core.propertypage.FeatureProjectPropertyPage"
             id="de.ovgu.featureide.core.propertypage2"
-            name="FeatureProject">
+            name="Feature Project">
+         <filter
+               name="projectNature"
+               value="de.ovgu.featureide.core.featureProjectNature">
+         </filter>
       </page>
    </extension>
 </plugin>

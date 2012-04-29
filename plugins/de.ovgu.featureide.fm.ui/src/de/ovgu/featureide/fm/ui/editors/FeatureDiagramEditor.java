@@ -59,7 +59,6 @@ import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.PropertyConstants;
-import de.ovgu.featureide.fm.core.propertypage.IPersistentPropertyManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractAction;
@@ -84,7 +83,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ShowHiddenFeaturesA
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.GraphicalEditPartFactory;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutManager;
-import de.ovgu.featureide.fm.ui.propertypage.PersistentPropertyManager;
+import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePage;
 
 /**
@@ -139,17 +138,11 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	private int index;
 
 	private Job analyzingJob;
-	
-	private IPersistentPropertyManager manager;
 
 	public FeatureDiagramEditor(FeatureModelEditor featureModelEditor,
 			Composite container) {
 		super();
-		manager = new PersistentPropertyManager(featureModelEditor.getModelFile().getProject());
 		this.featureModelEditor = featureModelEditor;
-		
-		// TODO @Jens is this line necessary?
-		featureModelEditor.featureModel.setPersistentPropertyManager(manager);
 		
 		setKeyHandler(new GraphicalViewerKeyHandler(this));
 
@@ -164,7 +157,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	}
 
 	void initializeGraphicalViewer() {
-		getControl().setBackground(manager.getDiagramBackgroundColor());
+		getControl().setBackground(FMPropertyManager.getDiagramBackgroundColor());
 		setEditPartFactory(new GraphicalEditPartFactory());
 		rootEditPart = new ScalableFreeformRootEditPart();
 		((ConnectionLayer) rootEditPart

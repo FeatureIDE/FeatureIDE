@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
  * 
@@ -69,11 +70,11 @@ public class LegendHideOperation extends AbstractOperation {
 	public IStatus redo(IProgressMonitor arg0, IAdaptable arg1)
 			throws ExecutionException {
 
-		if (!featureModel.getPersistentPropertyManager().isLegendHidden()) {
-			featureModel.getPersistentPropertyManager().setHideLegend(false);
+		if (!FMPropertyManager.isLegendHidden()) {
+			FMPropertyManager.setHideLegend(false);
 
 		} else {
-			featureModel.getPersistentPropertyManager().setHideLegend(true);
+			FMPropertyManager.setHideLegend(true);
 		}
 		featureModel.handleModelDataChanged();
 		featureModel.refreshContextMenu();

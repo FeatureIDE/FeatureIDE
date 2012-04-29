@@ -23,8 +23,8 @@ import java.util.LinkedList;
 import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.propertypage.IPersistentPropertyManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
  * ordering features by breadth first search (with a round order)
@@ -39,8 +39,8 @@ public class VerticalLayout2 extends FeatureDiagramLayoutManager {
 	/**
 	 * @param manager
 	 */
-	public VerticalLayout2(IPersistentPropertyManager manager) {
-		super(manager);
+	public VerticalLayout2() {
+		super();
 	}
 
 	int yoffset;
@@ -62,11 +62,11 @@ public class VerticalLayout2 extends FeatureDiagramLayoutManager {
 		LinkedList<LayoutableFeature> featureList = new LinkedList<LayoutableFeature>();
 			featureList.add(feature);
 
-		this.xoffset += manager.getLayoutMarginY()/4;
+		this.xoffset += FMPropertyManager.getLayoutMarginY()/4;
 		while (!featureList.isEmpty()) {
-			int height = 2 * manager.getLayoutMarginX() - manager.getFeatureSpaceX();
+			int height = 2 * FMPropertyManager.getLayoutMarginX() - FMPropertyManager.getFeatureSpaceX();
 			for (LayoutableFeature feat : featureList){
-				height += FeatureUIHelper.getSize(feat.getFeature()).height + manager.getFeatureSpaceX();
+				height += FeatureUIHelper.getSize(feat.getFeature()).height + FMPropertyManager.getFeatureSpaceX();
 			}
 			this.yoffset = controlHeight / 2 - height / 2;
 					
@@ -79,7 +79,7 @@ public class VerticalLayout2 extends FeatureDiagramLayoutManager {
 						maxFeatWidth = FeatureUIHelper.getSize(feat.getFeature()).width;
 					}
 					FeatureUIHelper.setLocation(feat.getFeature(),new Point(this.xoffset, this.yoffset));
-					this.yoffset += FeatureUIHelper.getSize(feat.getFeature()).height + manager.getFeatureSpaceX();
+					this.yoffset += FeatureUIHelper.getSize(feat.getFeature()).height + FMPropertyManager.getFeatureSpaceX();
 					if(i < (levelSize/2)){
 						this.xoffset +=  10;
 					} else if( i == (levelSize/2)){
@@ -93,9 +93,9 @@ public class VerticalLayout2 extends FeatureDiagramLayoutManager {
 				}
 			}
 			this.xoffset = this.yAcc;
-			this.xoffset += maxFeatWidth + manager.getFeatureSpaceY()/3;			
+			this.xoffset += maxFeatWidth + FMPropertyManager.getFeatureSpaceY()/3;			
 		}
-		this.xoffset -= manager.getFeatureSpaceY();
+		this.xoffset -= FMPropertyManager.getFeatureSpaceY();
 	}
 	
 	

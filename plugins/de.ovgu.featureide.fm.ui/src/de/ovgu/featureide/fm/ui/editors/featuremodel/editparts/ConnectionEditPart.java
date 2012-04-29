@@ -42,7 +42,6 @@ import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureConnection;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.PropertyConstants;
-import de.ovgu.featureide.fm.core.propertypage.IPersistentPropertyManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramExtension;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
@@ -50,6 +49,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.CircleDecoration;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.RelationDecoration;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureChangeGroupTypeOperation;
+import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 
 /**
@@ -63,11 +63,9 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 		GUIDefaults, PropertyConstants, PropertyChangeListener {
 
 	private Figure toolTipContent = new Figure();
-	private IPersistentPropertyManager manager;
 	
 	public ConnectionEditPart(FeatureConnection connection) {
 		super();
-		manager = connection.getSource().getFeatureModel().getPersistentPropertyManager();
 		setModel(connection);
 	}
 
@@ -78,7 +76,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 	@Override
 	protected IFigure createFigure() {
 		PolylineConnection figure = new PolylineConnection();
-		figure.setForegroundColor(manager.getConnectionForgroundColor());
+		figure.setForegroundColor(FMPropertyManager.getConnectionForgroundColor());
 		return figure;
 	}
 
@@ -167,7 +165,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 		}
 		if ((target.isAnd() || OR_CIRCLES) && !(source.isHidden() && !FeatureUIHelper.showHiddenFeatures()))	
 			if(!(parentHidden && !FeatureUIHelper.showHiddenFeatures()))
-					sourceDecoration = new CircleDecoration(source.isMandatory(), manager);
+					sourceDecoration = new CircleDecoration(source.isMandatory());
 
 		PolylineConnection connection = (PolylineConnection) getConnectionFigure();
 		connection.setSourceDecoration(sourceDecoration);
@@ -182,11 +180,11 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 			if(FeatureUIHelper.hasVerticalLayout()){
 				if (!target.isAnd() && (target.getChildIndex(source) == (target.getChildrenCount()-1)))
 					targetDecoration = new RelationDecoration(target.isMultiple(),
-							target.getFirstChild(), target.getChildren(), manager);
+							target.getFirstChild(), target.getChildren());
 			} else {
 				if (!target.isAnd() && target.isFirstChild(source))
 					targetDecoration = new RelationDecoration(target.isMultiple(),
-							target.getLastChild(), target.getChildren(), manager);
+							target.getLastChild(), target.getChildren());
 			}
 		
 		PolylineConnection connection = (PolylineConnection) getConnectionFigure();

@@ -16,9 +16,8 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.fm.ui.propertypage;
+package de.ovgu.featureide.fm.ui.properties.language;
 
-import de.ovgu.featureide.fm.core.propertypage.ILanguage;
 
 /**
  * Class implementing the extension point 
@@ -26,18 +25,18 @@ import de.ovgu.featureide.fm.core.propertypage.ILanguage;
  * 
  * @author Jens Meinicke
  */
-public class German implements ILanguage {
-
-	public static final String name = "German";
+public class English implements ILanguage {
 	
-	private static final String LEGEND = "Legende:";
-	private static final String MANDATORY = "Obligatorisch";
-	private static final String ABSTRACT = "Abstrakt";
-	private static final String CONCRETE = "Konkret";
-	private static final String HIDDEN = "Versteckt";
-	private static final String DEAD_FALSE_OPTIONAL = "Unwählbar/falsch-optional";
+	public static final String name = "English";
+	
+	private static final String LEGEND = "Legend:";
+	private static final String MANDATORY = "Mandatory";
+	private static final String ABSTRACT = "Abstract";
+	private static final String CONCRETE = "Concrete";
+	private static final String HIDDEN = "Hidden";
+	private static final String DEAD_FALSE_OPTIONAL = "Dead or false optional";
 	private static final String ALTERNATIVE = "Alternative";
-	private static final String OR = "Oder";
+	private static final String OR = "Or";
 	private static final String OPTIONAL = "Optional";
 
 	@Override
@@ -89,4 +88,5 @@ public class German implements ILanguage {
 	public String getOptional() {
 		return OPTIONAL;
 	}
+	
 }

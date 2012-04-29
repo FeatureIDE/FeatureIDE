@@ -1,4 +1,4 @@
-package de.ovgu.featureide.fm.ui.propertypage;
+package de.ovgu.featureide.fm.ui.properties.page;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -32,9 +32,11 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.PropertyPage;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.propertypage.ILanguage;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
+import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
+import de.ovgu.featureide.fm.ui.properties.language.English;
+import de.ovgu.featureide.fm.ui.properties.language.ILanguage;
 
 /**
  * At this property page, feature model specific settings can be specified
@@ -57,20 +59,13 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		selectorDeadBackground, selectorLegendBorder, selectorDiagramBackground, selectorConstraint, selectorConnection,
 		selectorWarning;
 	//selectorHiddenBackground
-	
-	private PersistentPropertyManager persitentProperties = null;
-	
+
 	public FMPropertyPage() {
 
 	}
 
 	@Override
 	protected Control createContents(Composite parent) {
-		if (!getPersistentPropertyManager()) {
-			FMCorePlugin.getDefault().logWarning("no resource");
-			return null;
-		}
-		
 		Composite composite = new Composite(parent, SWT.NULL);
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 1;
@@ -85,27 +80,6 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 	}
 
 	/**
-	 * Sets the persistent property manger for the current workspace.
-	 * @return <code>true</code> if successful
-	 */
-	private boolean getPersistentPropertyManager() {
-		IProject project;
-		IAdaptable resource = getElement();
-		if (resource instanceof JavaProject) {
-			JavaProject javaProject = (JavaProject)resource;
-			project  = javaProject.getProject();
-		} else if (resource instanceof IProject){
-			project = (IProject)resource;
-		} else if (resource instanceof IFile) {
-			project = ((IFile)resource).getProject();
-		} else {
-			return false;
-		}
-		persitentProperties = new PersistentPropertyManager(project);
-		return true;
-	}
-
-	/**
 	 * Creates the group to specify legend specific settings.
 	 */
 	private void addLegendGroup(Composite composite) {
@@ -117,7 +91,7 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		buttonHideLegend = new Button(group, SWT.CHECK);
 		GridData gd = new GridData(GridData.BEGINNING);
 		buttonHideLegend.setLayoutData(gd);
-		buttonHideLegend.setSelection(persitentProperties.isLegendHidden());
+		buttonHideLegend.setSelection(FMPropertyManager.isLegendHidden());
 
 		label = new Label(group, SWT.NULL);
 		label.setText(LEGEND_LANGUAGE_LABEL);		
@@ -130,15 +104,15 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		languageCombo.setText(English.name);
 		int i = 0;
 		for (String language : languageCombo.getItems()) {
-			if (language.equals(persitentProperties.getLanguage().getName())) {
+			if (language.equals(FMPropertyManager.getLanguage().getName())) {
 				languageCombo.select(i);
 				break;
 			}
 			i++;
 		}
 
-		selectorLegendBackground = createSelectorEntry(group, LEGEND_BACKGROUND_LABEL, persitentProperties.getLegendBackgroundColor().getRGB(), LEGEND_BACKGROUND__TIP);
-		selectorLegendBorder = createSelectorEntry(group, LEGEND_BORDER_LABEL, persitentProperties.getLegendBorderColor().getRGB(), LEGEND_BORDER_TIP);
+		selectorLegendBackground = createSelectorEntry(group, LEGEND_BACKGROUND_LABEL, FMPropertyManager.getLegendBackgroundColor().getRGB(), LEGEND_BACKGROUND__TIP);
+		selectorLegendBorder = createSelectorEntry(group, LEGEND_BORDER_LABEL, FMPropertyManager.getLegendBorderColor().getRGB(), LEGEND_BORDER_TIP);
 	}
 
 	/**
@@ -148,12 +122,11 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 	private void addSpacesGroup(Composite composite) {
 		Group group = createGroup(composite, SPACES_GROUP_TEXT);
 
-		textMarginX = createTextEntry(group, SPACES_MARGIN_X, persitentProperties.getLayoutMarginX(), SPACES_TIP_MARGIN_X);
-		textMarginY = createTextEntry(group, SPACES_MARGIN_Y, persitentProperties.getLayoutMarginY(), SPACES_TIP_MARGIN_Y);
-		textFeatureX = createTextEntry(group, SPACES_FEATURE_X, persitentProperties.getFeatureSpaceX(), SPACES_TIP_FEATURE_X);
-		textFeatureY = createTextEntry(group, SPACES_FEATURE_Y, persitentProperties.getFeatureSpaceY() - SPECES_FEATURE_X_ADJUST, SPACES_TIP_FEATURE_Y);
-		textConstraint = createTextEntry(group, SPACES_CONSTRAINT, persitentProperties.getConstraintSpace() - SPECES_CONSTRAIT_ADJUST, SPACES_TIP_CONSTRIANT);
-		
+		textMarginX = createTextEntry(group, SPACES_MARGIN_X, FMPropertyManager.getLayoutMarginX(), SPACES_TIP_MARGIN_X);
+		textMarginY = createTextEntry(group, SPACES_MARGIN_Y, FMPropertyManager.getLayoutMarginY(), SPACES_TIP_MARGIN_Y);
+		textFeatureX = createTextEntry(group, SPACES_FEATURE_X, FMPropertyManager.getFeatureSpaceX(), SPACES_TIP_FEATURE_X);
+		textFeatureY = createTextEntry(group, SPACES_FEATURE_Y, FMPropertyManager.getFeatureSpaceY() - SPECES_FEATURE_X_ADJUST, SPACES_TIP_FEATURE_Y);
+		textConstraint = createTextEntry(group, SPACES_CONSTRAINT, FMPropertyManager.getConstraintSpace() - SPECES_CONSTRAIT_ADJUST, SPACES_TIP_CONSTRIANT);
 	}
 
 	/**
@@ -163,14 +136,14 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 	private void addColorGroup(Composite composite) {
 		Group colorGroup = createGroup(composite, COLOR_GROUP_TEXT);
 
-		selectorDiagramBackground = createSelectorEntry(colorGroup, COLOR_DIAGRAM_LABEL,persitentProperties.getDiagramBackgroundColor().getRGB(), COLOR_BACKGROUND_TIP);
-		selectorConcreteBackground = createSelectorEntry(colorGroup, COLOR_CONCRETE_LABEL, persitentProperties.getConcreteFeatureBackgroundColor().getRGB(), COLOR_CONCRETE_TIP);
-		selectorAbstractBackground = createSelectorEntry(colorGroup, COLOR_ABSTRACT_LABEL, persitentProperties.getAbstractFeatureBackgroundColor().getRGB(), COLOR_ABSTRACT_TIP);
-//		selectorHiddenBackground = createSelectorEntry(colorGroup, COLOR_HIDDEN, persitentProperties.getHiddenFeatureBackgroundColor().getRGB(), COLOR_HIDDEN_TIP);
-		selectorConnection = createSelectorEntry(colorGroup, COLOR_CONNECTION, persitentProperties.getConnectionForgroundColor().getRGB(), COLOR_CONNECTION_TIP);
-		selectorConstraint = createSelectorEntry(colorGroup, COLOR_CONSTRAINT, persitentProperties.getConstraintBackgroundColor().getRGB(), COLOR_CONSTRAINT_TIP);
-		selectorWarning = createSelectorEntry(colorGroup, COLOR_WARNING, persitentProperties.getWarningColor().getRGB(), COLOR_WARNING_TIP);
-		selectorDeadBackground = createSelectorEntry(colorGroup, COLOR_DEAD, persitentProperties.getDeadFeatureBackgroundColor().getRGB(), COLOR_DEAD_TIP);
+		selectorDiagramBackground = createSelectorEntry(colorGroup, COLOR_DIAGRAM_LABEL,FMPropertyManager.getDiagramBackgroundColor().getRGB(), COLOR_BACKGROUND_TIP);
+		selectorConcreteBackground = createSelectorEntry(colorGroup, COLOR_CONCRETE_LABEL, FMPropertyManager.getConcreteFeatureBackgroundColor().getRGB(), COLOR_CONCRETE_TIP);
+		selectorAbstractBackground = createSelectorEntry(colorGroup, COLOR_ABSTRACT_LABEL, FMPropertyManager.getAbstractFeatureBackgroundColor().getRGB(), COLOR_ABSTRACT_TIP);
+//		selectorHiddenBackground = createSelectorEntry(colorGroup, COLOR_HIDDEN, PersistentPropertyManager.getHiddenFeatureBackgroundColor().getRGB(), COLOR_HIDDEN_TIP);
+		selectorConnection = createSelectorEntry(colorGroup, COLOR_CONNECTION, FMPropertyManager.getConnectionForgroundColor().getRGB(), COLOR_CONNECTION_TIP);
+		selectorConstraint = createSelectorEntry(colorGroup, COLOR_CONSTRAINT, FMPropertyManager.getConstraintBackgroundColor().getRGB(), COLOR_CONSTRAINT_TIP);
+		selectorWarning = createSelectorEntry(colorGroup, COLOR_WARNING, FMPropertyManager.getWarningColor().getRGB(), COLOR_WARNING_TIP);
+		selectorDeadBackground = createSelectorEntry(colorGroup, COLOR_DEAD, FMPropertyManager.getDeadFeatureBackgroundColor().getRGB(), COLOR_DEAD_TIP);
 	}
 	
 	/**
@@ -220,20 +193,19 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		String path = x.getFilterPath();
 		String fileName = x.getFileName();
 		File file = new File(path + "\\" + fileName);
-		new SettingsImport(persitentProperties, file);
+		new SettingsImport(file);
 		update();
 		
 	}
 	
 	private void performExport() {
 		FileDialog x = new FileDialog(new Shell(),SWT.SAVE);
-		x.setFilterPath(persitentProperties.workspaceRoot.getLocation().toOSString());
+		x.setFilterPath(FMPropertyManager.workspaceRoot.getLocation().toOSString());
 		x.setFilterIndex(0);
 		x.open();
 		String path = x.getFilterPath();
 		String fileName = x.getFileName();
-		File file = new File(path + "\\" + fileName);
-		new SettingsExport(persitentProperties, file);
+		new SettingsExport(new File(path + "\\" + fileName));
 	}
 	
 	/**
@@ -305,35 +277,35 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 	 * Saves the selected values for: legend group
 	 */
 	private void performLegendGroup() {
-		persitentProperties.setHideLegend(buttonHideLegend.getSelection());
-		persitentProperties.setLanguage(languageCombo.getText());
-		persitentProperties.setLegendBackgroundColor(new Color(null, selectorLegendBackground.getColorValue()));
-		persitentProperties.setLegendBorderColor(new Color(null, selectorLegendBorder.getColorValue()));
+		FMPropertyManager.setHideLegend(buttonHideLegend.getSelection());
+		FMPropertyManager.setLanguage(languageCombo.getText());
+		FMPropertyManager.setLegendBackgroundColor(new Color(null, selectorLegendBackground.getColorValue()));
+		FMPropertyManager.setLegendBorderColor(new Color(null, selectorLegendBorder.getColorValue()));
 	}
 
 	/**
 	 * Saves the selected values for: spaces group
 	 */
 	private void performSpecesGroup() {
-		persitentProperties.setlayoutMagrginX(Integer.parseInt(textMarginX.getText()));
-		persitentProperties.setlayoutMagrginY(Integer.parseInt(textMarginY.getText()));
-		persitentProperties.setFeatureSpaceX(Integer.parseInt(textFeatureX.getText()));
-		persitentProperties.setFeatureSpaceY(Integer.parseInt(textFeatureY.getText()) + SPECES_FEATURE_X_ADJUST);
-		persitentProperties.setConstraintSpace(Integer.parseInt(textConstraint.getText()) + SPECES_CONSTRAIT_ADJUST);
+		FMPropertyManager.setlayoutMagrginX(Integer.parseInt(textMarginX.getText()));
+		FMPropertyManager.setlayoutMagrginY(Integer.parseInt(textMarginY.getText()));
+		FMPropertyManager.setFeatureSpaceX(Integer.parseInt(textFeatureX.getText()));
+		FMPropertyManager.setFeatureSpaceY(Integer.parseInt(textFeatureY.getText()) + SPECES_FEATURE_X_ADJUST);
+		FMPropertyManager.setConstraintSpace(Integer.parseInt(textConstraint.getText()) + SPECES_CONSTRAIT_ADJUST);
 	}
 	
 	/**
 	 * Saves the selected values for: feature group
 	 */
 	private void performFeatureGroup() {
-		persitentProperties.setDiagramBackgroundColor(new Color(null, selectorDiagramBackground.getColorValue()));
-		persitentProperties.setConcreteFeatureBackgroundColor(new Color(null, selectorConcreteBackground.getColorValue()));
-		persitentProperties.setAbstractFeatureBackgroundColor(new Color(null, selectorAbstractBackground.getColorValue()));
-//		persitentProperties.setHiddenFeatureBackgroundColor(new Color(null, selectorHiddenBackground.getColorValue()));
-		persitentProperties.setDeadFeatureBackgroundColor(new Color(null, selectorDeadBackground.getColorValue()));
-		persitentProperties.setConstraintBackgroundColor(new Color(null, selectorConstraint.getColorValue()));
-		persitentProperties.setConnectionForgroundColor(new Color(null, selectorConnection.getColorValue()));
-		persitentProperties.setWarningColor(new Color(null, selectorWarning.getColorValue()));
+		FMPropertyManager.setDiagramBackgroundColor(new Color(null, selectorDiagramBackground.getColorValue()));
+		FMPropertyManager.setConcreteFeatureBackgroundColor(new Color(null, selectorConcreteBackground.getColorValue()));
+		FMPropertyManager.setAbstractFeatureBackgroundColor(new Color(null, selectorAbstractBackground.getColorValue()));
+//		PersistentPropertyManager.setHiddenFeatureBackgroundColor(new Color(null, selectorHiddenBackground.getColorValue()));
+		FMPropertyManager.setDeadFeatureBackgroundColor(new Color(null, selectorDeadBackground.getColorValue()));
+		FMPropertyManager.setConstraintBackgroundColor(new Color(null, selectorConstraint.getColorValue()));
+		FMPropertyManager.setConnectionForgroundColor(new Color(null, selectorConnection.getColorValue()));
+		FMPropertyManager.setWarningColor(new Color(null, selectorWarning.getColorValue()));
 	}
 
 	@Override
@@ -408,42 +380,42 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 	 * Sets the default values at: legend group.
 	 */
 	private void updateLegendGroup() {
-		buttonHideLegend.setSelection(persitentProperties.isLegendHidden());
+		buttonHideLegend.setSelection(FMPropertyManager.isLegendHidden());
 		languageCombo.setText(English.name);
 		int i = 0;
 		for (String language : languageCombo.getItems()) {
-			if (language.equals(persitentProperties.getLanguage().getName())) {
+			if (language.equals(FMPropertyManager.getLanguage().getName())) {
 				languageCombo.select(i);
 				break;
 			}
 			i++;
 		}
-		selectorLegendBorder.setColorValue(persitentProperties.getLegendBorderColor().getRGB());
-		selectorLegendBackground.setColorValue(persitentProperties.getLegendBackgroundColor().getRGB());
+		selectorLegendBorder.setColorValue(FMPropertyManager.getLegendBorderColor().getRGB());
+		selectorLegendBackground.setColorValue(FMPropertyManager.getLegendBackgroundColor().getRGB());
 	}
 	
 	/**
 	 * Sets the default values at: spaces group.
 	 */
 	private void updateSpecesGroup() {
-		textMarginX.setText(Integer.toString(persitentProperties.getLayoutMarginX()));
-		textMarginY.setText(Integer.toString(persitentProperties.getLayoutMarginY()));
-		textFeatureX.setText(Integer.toString(persitentProperties.getFeatureSpaceX()));
-		textFeatureY.setText(Integer.toString(persitentProperties.getFeatureSpaceY() - SPECES_FEATURE_X_ADJUST));
-		textConstraint.setText(Integer.toString(persitentProperties.getConstraintSpace() - SPECES_CONSTRAIT_ADJUST));
+		textMarginX.setText(Integer.toString(FMPropertyManager.getLayoutMarginX()));
+		textMarginY.setText(Integer.toString(FMPropertyManager.getLayoutMarginY()));
+		textFeatureX.setText(Integer.toString(FMPropertyManager.getFeatureSpaceX()));
+		textFeatureY.setText(Integer.toString(FMPropertyManager.getFeatureSpaceY() - SPECES_FEATURE_X_ADJUST));
+		textConstraint.setText(Integer.toString(FMPropertyManager.getConstraintSpace() - SPECES_CONSTRAIT_ADJUST));
 	}
 	
 	/**
 	 * Sets the default values at: feature group.
 	 */
 	private void updateFeatureGroup() {
-		selectorDiagramBackground.setColorValue(persitentProperties.getDiagramBackgroundColor().getRGB());
-		selectorConcreteBackground.setColorValue(persitentProperties.getConcreteFeatureBackgroundColor().getRGB());
-		selectorAbstractBackground.setColorValue(persitentProperties.getAbstractFeatureBackgroundColor().getRGB());
-//		selectorHiddenBackground.setColorValue(persitentProperties.getHiddenFeatureBackgroundColor().getRGB());
-		selectorDeadBackground.setColorValue(persitentProperties.getDeadFeatureBackgroundColor().getRGB());
-		selectorConstraint.setColorValue(persitentProperties.getConstraintBackgroundColor().getRGB());
-		selectorConnection.setColorValue(persitentProperties.getConnectionForgroundColor().getRGB());
-		selectorWarning.setColorValue(persitentProperties.getWarningColor().getRGB());
+		selectorDiagramBackground.setColorValue(FMPropertyManager.getDiagramBackgroundColor().getRGB());
+		selectorConcreteBackground.setColorValue(FMPropertyManager.getConcreteFeatureBackgroundColor().getRGB());
+		selectorAbstractBackground.setColorValue(FMPropertyManager.getAbstractFeatureBackgroundColor().getRGB());
+//		selectorHiddenBackground.setColorValue(PersistentPropertyManager.getHiddenFeatureBackgroundColor().getRGB());
+		selectorDeadBackground.setColorValue(FMPropertyManager.getDeadFeatureBackgroundColor().getRGB());
+		selectorConstraint.setColorValue(FMPropertyManager.getConstraintBackgroundColor().getRGB());
+		selectorConnection.setColorValue(FMPropertyManager.getConnectionForgroundColor().getRGB());
+		selectorWarning.setColorValue(FMPropertyManager.getWarningColor().getRGB());
 	}
 }

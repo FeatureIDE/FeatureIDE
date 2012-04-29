@@ -16,7 +16,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.fm.ui.propertypage;
+package de.ovgu.featureide.fm.ui.properties.page;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.QualifiedName;
 
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
  * Exports the persistent properties into a file.
@@ -38,8 +39,8 @@ public class SettingsExport {
 	 * @param persitentProperties Properties to export
 	 * @param file the file in that the properties should be exported
 	 */
-	public SettingsExport(PersistentPropertyManager persitentProperties, File file) {
-		exportSettings(file, persitentProperties);
+	public SettingsExport(File file) {
+		exportSettings(file);
 	}
 
 	/**
@@ -48,16 +49,15 @@ public class SettingsExport {
 	 * @throws CoreException
 	 * @throws IOException
 	 */
-	private void exportSettings(File file,
-			PersistentPropertyManager persitentProperties) {
+	private void exportSettings(File file) {
 		FileWriter fw = null;
 		try {
 			if (!file.exists()) {
 				fw = new FileWriter(file);
-				fw.write(getSettings(persitentProperties));
+				fw.write(getSettings());
 			} else {
 				fw = new FileWriter(file);
-				fw.write(getSettings(persitentProperties));
+				fw.write(getSettings());
 			}
 		} catch (IOException e) {
 			FMUIPlugin.getDefault().logError(e);
@@ -72,13 +72,13 @@ public class SettingsExport {
 		}
 	}
 	
-	private String getSettings(PersistentPropertyManager persitentProperties) {
+	private String getSettings() {
 		StringBuilder settings = new StringBuilder();
-		for (QualifiedName qn : persitentProperties.getQualifiedNames()) {
+		for (QualifiedName qn : FMPropertyManager.getQualifiedNames()) {
 			try {
 				settings.append(qn.getQualifier());
 				settings.append("=");
-				settings.append(persitentProperties.workspaceRoot.getPersistentProperty(qn));
+				settings.append(FMPropertyManager.workspaceRoot.getPersistentProperty(qn));
 				settings.append("\r\n");
 			} catch (CoreException e) {
 				FMUIPlugin.getDefault().logError(e);

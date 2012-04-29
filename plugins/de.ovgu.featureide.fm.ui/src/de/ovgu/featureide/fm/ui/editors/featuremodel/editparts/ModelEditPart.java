@@ -34,6 +34,7 @@ import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.Legend;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.policies.ModelLayoutEditPolicy;
+import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 
 /**
@@ -71,7 +72,7 @@ public class ModelEditPart extends AbstractGraphicalEditPart {
 	protected List<Object> getModelChildren() {
 		LinkedList<Object> list = new LinkedList<Object>();
 		addFeatures(getFeatureModel().getRoot(), list);
-		if(!getFeatureModel().getPersistentPropertyManager().isLegendHidden()) {
+		if(!FMPropertyManager.isLegendHidden()) {
 			list.add(new Legend((FeatureModel)getModel()));
 		}
 		addConstraints(getFeatureModel().getConstraints(), list);
@@ -86,9 +87,8 @@ public class ModelEditPart extends AbstractGraphicalEditPart {
 			addFeatures(child, list);
 	}
 	
-	private void addConstraints(List<Constraint> constraints, LinkedList<Object> list) {
-		for (int i = 0; i < constraints.size(); i++)
-			list.add(constraints.get(i));
+	private void addConstraints(List<Constraint> constraints, List<Object> list) {
+		list.addAll(constraints);
 	}
 
 }

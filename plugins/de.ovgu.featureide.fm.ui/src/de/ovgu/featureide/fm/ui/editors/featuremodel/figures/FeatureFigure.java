@@ -32,12 +32,12 @@ import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureStatus;
-import de.ovgu.featureide.fm.core.propertypage.IPersistentPropertyManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramExtension;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.anchors.SourceAnchor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.anchors.TargetAnchor;
+import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 
 /**
@@ -68,11 +68,8 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 	private String VOID = " Feature Model is void ";
 	private String ROOT = " Root ";
 
-	private IPersistentPropertyManager manager;
-
 	public FeatureFigure(Feature feature, FeatureModel featureModel) {
 		super();
-		manager = featureModel.getPersistentPropertyManager();
 		this.feature = feature;
 		this.featureModel = featureModel;
 		
@@ -81,7 +78,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		
 		setLayoutManager(layout);
 
-		label.setForegroundColor(manager.getFeatureForgroundColor());
+		label.setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
 		label.setFont(DEFAULT_FONT);
 
 		label.setLocation(new Point(FEATURE_INSETS.left, FEATURE_INSETS.top));
@@ -125,15 +122,15 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		String toolTip = "";
 		boolean modelIsValid = featureModel.valid();
 		
-		label.setForegroundColor(manager.getFeatureForgroundColor());
-		setBackgroundColor(manager.getConcreteFeatureBackgroundColor());
-		setBorder(manager.getConcreteFeatureBorder(feature.isConstraintSelected()));
+		label.setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
+		setBackgroundColor(FMPropertyManager.getConcreteFeatureBackgroundColor());
+		setBorder(FMPropertyManager.getConcreteFeatureBorder(feature.isConstraintSelected()));
 		
 		if (feature.isConcrete()) toolTip += CONCRETE;
 		
 		if (feature.isAbstract()){
-			setBackgroundColor(manager.getAbstractFeatureBackgroundColor());
-			setBorder(manager.getAbsteactFeatureBorder(feature.isConstraintSelected()));
+			setBackgroundColor(FMPropertyManager.getAbstractFeatureBackgroundColor());
+			setBorder(FMPropertyManager.getAbsteactFeatureBorder(feature.isConstraintSelected()));
 			if (feature.isRoot()){
 				toolTip += ROOT;
 			} else {
@@ -142,7 +139,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		}
 		
 		if (feature.hasHiddenParent()){
-			setBorder(manager.getHiddenFeatureBorder(feature.isConstraintSelected()));
+			setBorder(FMPropertyManager.getHiddenFeatureBorder(feature.isConstraintSelected()));
 			label.setForegroundColor(HIDDEN_FOREGROUND);
 			if (feature.isHidden()) toolTip += HIDDEN;
 		}
@@ -150,20 +147,20 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		if (!feature.isRoot()) toolTip += FEATURE;
 		
 		if ((feature.getFeatureStatus() == FeatureStatus.DEAD) && modelIsValid){
-			setBackgroundColor(manager.getDeadFeatureBackgroundColor());
-			setBorder(manager.getDeadFeatureBorder(feature.isConstraintSelected()));
+			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
+			setBorder(FMPropertyManager.getDeadFeatureBorder(feature.isConstraintSelected()));
 			toolTip += DEAD;			
 		}
 		
 		if (feature.getFeatureStatus() == FeatureStatus.FALSE_OPTIONAL){
-			setBackgroundColor(manager.getDeadFeatureBackgroundColor());
-			setBorder(manager.getDeadFeatureBorder(feature.isConstraintSelected()));
+			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
+			setBorder(FMPropertyManager.getDeadFeatureBorder(feature.isConstraintSelected()));
 			toolTip += FALSE_OPTIONAL;
 		}
 		
 		if (feature.isRoot() && !modelIsValid){
-			setBackgroundColor(manager.getDeadFeatureBackgroundColor());
-			setBorder(manager.getDeadFeatureBorder(feature.isConstraintSelected()));
+			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
+			setBorder(FMPropertyManager.getDeadFeatureBorder(feature.isConstraintSelected()));
 			toolTip = VOID;
 		}
 		

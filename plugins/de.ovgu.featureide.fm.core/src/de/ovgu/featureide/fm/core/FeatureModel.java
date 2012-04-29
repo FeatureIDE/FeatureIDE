@@ -52,7 +52,6 @@ import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
-import de.ovgu.featureide.fm.core.propertypage.IPersistentPropertyManager;
 
 /**
  * The model representation of the feature tree that notifies listeners of
@@ -678,8 +677,6 @@ public class FeatureModel implements PropertyConstants {
 	 */
 	private LinkedList<Feature> layers = new LinkedList<Feature>();
 	private Object undoContext;
-	
-	private IPersistentPropertyManager manager;
 
 	public Collection<Feature> getConcreteFeatures() {
 		layers.clear();
@@ -1410,21 +1407,6 @@ public class FeatureModel implements PropertyConstants {
 	 */
 	public void setFeatureOrderInXML(boolean featureOrderInXML) {
 		this.featureOrderInXML = featureOrderInXML;
-	}
-
-	/**
-	 * @param manager
-	 */
-	public void setPersistentPropertyManager(IPersistentPropertyManager manager) {
-		this.manager = manager;
-	}
-	
-	/**
-	 * Returns the {@link IPersistentPropertyManager}.<br>
-	 * Use this to get UI colors and settings.
-	 */
-	public IPersistentPropertyManager getPersistentPropertyManager() {
-		return manager;
 	}
 
 }
