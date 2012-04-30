@@ -39,8 +39,10 @@ import de.ovgu.featureide.fm.ui.properties.page.FMPropertyPage;
 
 /**
  * Manages all persistent properties defined at the property pages.<br>
- * These properties are defined for the whole workspace.
+ * These properties are defined for the whole workspace.<br><br>
  * 
+ * Use all methods in a static way: <code>FMPropertyManager.method()</code>
+ *  
  * @see FMPropertyPage
  * @author Jens Meinicke
  */

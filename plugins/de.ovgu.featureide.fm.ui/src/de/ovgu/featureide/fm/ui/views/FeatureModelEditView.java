@@ -27,6 +27,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -88,7 +89,7 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 	private static final String ACTIVATOR_ACTION_TEXT = "Disable automatic calculations";
 	private static final String MANUAL_CALCULATION_TEXT = "Start calculation";
 
-	private IWorkspaceRoot workspaceRoot;
+	private static final IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 
 	private TreeViewer viewer;
 
@@ -118,9 +119,6 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 		}
 	};
 
-	/*
-	 * TODO set default disabled
-	 */
 	/**
 	 * Button to enable/disable automatic calculations.
 	 */
@@ -189,9 +187,6 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 	 */
 	private void fillLocalToolBar(IToolBarManager manager) {
 		manager.add(activatorAction);
-		if (workspaceRoot == null) {
-			activatorAction.setEnabled(false);
-		}
 		activatorAction.setChecked(isActivatorChecked());
 		activatorAction.setToolTipText(ACTIVATOR_ACTION_TEXT);
 		activatorAction.setImageDescriptor(ImageDescriptor
@@ -208,13 +203,10 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 	 * @return The persistent property status of the activator action
 	 */
 	private boolean isActivatorChecked() {
-		if (workspaceRoot != null) {
-			try {
-				return "true".equals(workspaceRoot
-						.getPersistentProperty(ACTIVATOR_KEY));
-			} catch (CoreException e) {
-				FMUIPlugin.getDefault().logError(e);
-			}
+		try {
+			return "true".equals(workspaceRoot.getPersistentProperty(ACTIVATOR_KEY));
+		} catch (CoreException e) {
+			FMUIPlugin.getDefault().logError(e);
 		}
 		return true;
 	}
@@ -226,13 +218,11 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 	 *            The new status
 	 */
 	private void setActivatorChecked(boolean checked) {
-		if (workspaceRoot != null) {
-			try {
-				workspaceRoot.setPersistentProperty(ACTIVATOR_KEY,
-						checked ? "true" : "false");
-			} catch (CoreException e) {
-				FMUIPlugin.getDefault().logError(e);
-			}
+		try {
+			workspaceRoot.setPersistentProperty(ACTIVATOR_KEY,
+					checked ? "true" : "false");
+		} catch (CoreException e) {
+			FMUIPlugin.getDefault().logError(e);
 		}
 	}
 
@@ -278,8 +268,6 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 			featureModelEditor.getOriginalFeatureModel().addListener(
 					modelListener);
 			featureModelEditor.getFeatureModel().addListener(modelListener);
-
-			setWorkspaceRoot(featureModelEditor);
 
 			if (evaluation == null
 					&& featureModelEditor.getGrammarFile().getResource()
@@ -363,13 +351,6 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 		refresh();
 	}
 
-	private void setWorkspaceRoot(FeatureModelEditor editor) {
-		if (workspaceRoot == null) {
-			workspaceRoot = editor.getGrammarFile().getResource().getProject()
-					.getWorkspace().getRoot();
-		}
-	}
-
 	private void refresh() {
 		if (contentProvider.isCanceled()) {
 			return;
@@ -397,11 +378,10 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 				job = new Job("Updating Feature Model Edits") {
 					@Override
 					protected IStatus run(IProgressMonitor monitor) {
-						if (workspaceRoot != null) {
-							activatorAction.setEnabled(true);
-							activatorAction.setChecked(isActivatorChecked());
-							manualAction.setEnabled(isActivatorChecked());
-						}
+						activatorAction.setEnabled(true);
+						activatorAction.setChecked(isActivatorChecked());
+						manualAction.setEnabled(isActivatorChecked());
+
 						if (featureModelEditor == null) {
 							contentProvider.defaultContent();
 						} else if (isActivatorChecked()) {
