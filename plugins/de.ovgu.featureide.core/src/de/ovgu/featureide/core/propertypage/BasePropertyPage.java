@@ -1,9 +1,10 @@
 package de.ovgu.featureide.core.propertypage;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.jdt.internal.core.JavaProject;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.internal.core.JavaElement;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -44,17 +45,16 @@ public class BasePropertyPage extends PropertyPage {
 	}
 	
 	/**
-	 * @return
+	 * Gets the project of the selected resource.
+	 * @return <code>true</code> if successful
 	 */
 	private boolean getProject() {
 		IAdaptable resource = getElement();
-		if (resource instanceof JavaProject) {
-			JavaProject javaProject = (JavaProject)resource;
+		if (resource instanceof JavaElement) {
+			IJavaProject javaProject = ((JavaElement)resource).getJavaProject();
 			project  = javaProject.getProject();
-		} else if (resource instanceof IProject){
-			project = (IProject)resource;
-		} else if (resource instanceof IFile) {
-			project = ((IFile)resource).getProject();
+		} else if (resource instanceof IResource) {
+			project = ((IResource) resource).getProject();
 		} else {
 			return false;
 		}

@@ -5,12 +5,13 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.jdt.internal.core.JavaProject;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.internal.core.JavaElement;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -120,13 +121,11 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 	 */
 	private boolean getProject() {
 		IAdaptable resource = getElement();
-		if (resource instanceof JavaProject) {
-			JavaProject javaProject = (JavaProject)resource;
+		if (resource instanceof JavaElement) {
+			IJavaProject javaProject = ((JavaElement)resource).getJavaProject();
 			project  = javaProject.getProject();
-		} else if (resource instanceof IProject){
-			project = (IProject)resource;
-		} else if (resource instanceof IFile) {
-			project = ((IFile)resource).getProject();
+		} else if (resource instanceof IResource) {
+			project = ((IResource) resource).getProject();
 		} else {
 			return false;
 		}
@@ -310,7 +309,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 	}
 	
 	/**
-	 * Calles if something at the dialog has been changed
+	 * Called if something at the dialog has been changed
 	 */
 	protected void dialogChanged() {
 		for (IComposerExtension c : extensions) {
