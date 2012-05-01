@@ -29,9 +29,11 @@ import org.eclipse.core.runtime.CoreException;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
 /**
- * TODO description
+ * This Wrapper makes it possible, to write feature models to IFiles, 
+ * e.g. if working with Eclipse plugins
+ * Otherwise only the classes extending {@link AbstractFeatureModelWriter} are needed
  * 
- * @author Soenke Holthusen
+ * @author Sönke Holthusen
  */
 public class FeatureModelWriterIFileWrapper extends AbstractFeatureModelWriter {
 

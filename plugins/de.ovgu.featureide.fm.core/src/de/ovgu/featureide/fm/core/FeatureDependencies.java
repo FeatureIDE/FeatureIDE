@@ -34,7 +34,7 @@ import org.sat4j.specs.TimeoutException;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 /**
- * TODO description
+ * Calculates dependencies of features
  * 
  * @author Sönke Holthusen
  */
@@ -130,14 +130,26 @@ public class FeatureDependencies {
 
     }
     
+    /**
+     * @param feature
+     * @return
+     */
     public Set<Feature> always(Feature feature) {
 	return always.get(feature);
     }
 
+    /**
+     * @param feature
+     * @return
+     */
     public Set<Feature> never(Feature feature) {
 	return never.get(feature);
     }
 
+    /**
+     * @param feature
+     * @return
+     */
     public Set<Feature> maybe(Feature feature) {
 	return maybe.get(feature);
     }

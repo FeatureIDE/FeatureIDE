@@ -136,6 +136,10 @@ public class SXFMReader extends AbstractFeatureModelReader {
     	} else if (tag.equals("constraints")) {
     		line++;
     		handleConstraints(n);
+    	} else if (tag.equals("meta")) {
+    	    	return;
+    	} else if(tag.equals("data") && n.getParentNode().getNodeName().equals("meta")) {
+    	    return;
     	} else {
     		throw new UnsupportedModelException("Unknown Xml-Tag", line);
     	}

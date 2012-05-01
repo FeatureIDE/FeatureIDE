@@ -28,9 +28,11 @@ import org.eclipse.core.resources.IFile;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
 /**
- * TODO description
+ * This Wrapper makes it possible, to read feature models from IFiles, 
+ * e.g. if working with Eclipse plugins
+ * Otherwise only the classes extending {@link AbstractFeatureModelReader} are needed
  * 
- * @author Soenke Holthusen
+ * @author Sönke Holthusen
  */
 public class FeatureModelReaderIFileWrapper extends
 	AbstractFeatureModelReader {

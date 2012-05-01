@@ -35,6 +35,8 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 /**
  * Default reader to be extended for each feature model format.
  * 
+ * If IFile support is needed, the {@link FeatureModelReaderIFileWrapper} has to be used.
+ * 
  * @author Thomas Thuem
  */
 public abstract class AbstractFeatureModelReader implements IFeatureModelReader {
@@ -56,24 +58,6 @@ public abstract class AbstractFeatureModelReader implements IFeatureModelReader 
 	public FeatureModel getFeatureModel() {
 		return featureModel;
 	}
-	
-//	public void readFromFile(IFile file) throws UnsupportedModelException, FileNotFoundException {
-//		warnings.clear();
-//		String fileName = file.getRawLocation().toOSString();		
-//		InputStream inputStream = null;
-//		try {
-//			inputStream = new FileInputStream(fileName);
-//		    parseInputStream(inputStream);
-//		} finally {
-//			if (inputStream != null) {
-//				try {
-//					inputStream.close();
-//				} catch (IOException e) {
-//					FMCorePlugin.getDefault().logError(e);
-//				}
-//			}
-//		}
-// 	}
 	
 	public void readFromFile(File file) throws UnsupportedModelException, FileNotFoundException {
 		warnings.clear();
