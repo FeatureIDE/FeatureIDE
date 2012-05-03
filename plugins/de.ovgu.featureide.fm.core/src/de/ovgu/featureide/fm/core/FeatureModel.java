@@ -20,14 +20,12 @@ package de.ovgu.featureide.fm.core;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -47,7 +45,6 @@ import org.prop4j.Implies;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Not;
-import org.prop4j.Or;
 import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
@@ -813,6 +810,10 @@ public class FeatureModel implements PropertyConstants {
 		return fm;
 	}
 
+	/**
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalysis#isValid()} instead.
+	 */
+	
 	public boolean isValid() throws TimeoutException {
 		Node root = NodeCreator.createNodes(this.clone());
 		return new SatSolver(root, 1000).isSatisfiable();
@@ -833,22 +834,13 @@ public class FeatureModel implements PropertyConstants {
 	 *            set of features that form a conjunction
 	 * @return
 	 * @throws TimeoutException
+	 * 
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalysis#checkImplies(Set, Set)} instead.
 	 */
+	@Deprecated
 	public boolean checkImplies(Set<Feature> a, Set<Feature> b)
 			throws TimeoutException {
-		if (b.isEmpty())
-			return true;
-
-		Node featureModel = NodeCreator.createNodes(this);
-
-		// B1 and B2 and ... Bn
-		Node condition = conjunct(b);
-		// (A1 and ... An) => (B1 and ... Bn)
-		if (!a.isEmpty())
-			condition = new Implies(conjunct(a), condition);
-		// FM => (A => B)
-		Implies finalFormula = new Implies(featureModel, condition);
-		return !new SatSolver(new Not(finalFormula), 1000).isSatisfiable();
+	    	return analysis.checkImplies(a, b);
 	}
 
 	/**
@@ -857,18 +849,13 @@ public class FeatureModel implements PropertyConstants {
 	 * 
 	 * @return
 	 * @throws TimeoutException
+	 * 
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalysis#checkCondition(Node)} instead.
 	 */
+	@Deprecated
 	public boolean checkCondition(Node condition) {
 
-		Node featureModel = NodeCreator.createNodes(this);
-		// FM => (condition)
-		Implies finalFormula = new Implies(featureModel, condition.clone());
-		try {
-			return !new SatSolver(new Not(finalFormula), 1000).isSatisfiable();
-		} catch (TimeoutException e) {
-			FMCorePlugin.getDefault().logError(e);
-			return false;
-		}
+	    	return analysis.checkCondition(condition);
 	}
 
 	/**
@@ -897,48 +884,13 @@ public class FeatureModel implements PropertyConstants {
 	 * @return true, if the feature sets are mutually exclusive || false,
 	 *         otherwise
 	 * @throws TimeoutException
+	 * 
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalysis#areMutualExclusive(Set, List)} instead.
 	 */
+	@Deprecated
 	public boolean areMutualExclusive(Set<Feature> context,
 			List<Set<Feature>> featureSets) throws TimeoutException {
-		if ((featureSets == null) || (featureSets.size() < 2))
-			return true;
-
-		Node featureModel = NodeCreator.createNodes(this);
-
-		ArrayList<Node> conjunctions = new ArrayList<Node>(featureSets.size());
-		for (Set<Feature> features : featureSets) {
-			if ((features != null) && !features.isEmpty())
-				conjunctions.add(conjunct(features));
-			else
-				// If one feature set is empty (i.e. the code-fragment is always
-				// present) than it cannot be
-				// mutually exclusive to the other ones.
-				return false;
-		}
-
-		// We build the conjunctive normal form of the formula to check
-		LinkedList<Object> forOr = new LinkedList<Object>();
-		LinkedList<Object> allNot = new LinkedList<Object>();
-		for (int i = 0; i < conjunctions.size(); ++i) {
-			allNot.add(new Not(conjunctions.get(i).clone()));
-
-			LinkedList<Object> forAnd = new LinkedList<Object>();
-			for (int j = 0; j < conjunctions.size(); ++j) {
-				if (j == i)
-					forAnd.add(conjunctions.get(j).clone());
-				else
-					forAnd.add(new Not(conjunctions.get(j).clone()));
-			}
-			forOr.add(new And(forAnd));
-		}
-		forOr.add(new And(allNot));
-
-		Node condition = new Or(forOr);
-		if ((context != null) && !context.isEmpty())
-			condition = new Implies(conjunct(context), condition);
-
-		Implies finalFormula = new Implies(featureModel, condition);
-		return !new SatSolver(new Not(finalFormula), 1000).isSatisfiable();
+	    	return analysis.areMutualExclusive(context, featureSets);
 	}
 
 	/**
@@ -961,28 +913,13 @@ public class FeatureModel implements PropertyConstants {
 	 * @return true, if there exists such a set of features, i.e. if the
 	 *         code-fragment may be missing || false, otherwise
 	 * @throws TimeoutException
+	 * 
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalysis#mayBeMissing(Set, List)} instead.
 	 */
+	@Deprecated
 	public boolean mayBeMissing(Set<Feature> context,
 			List<Set<Feature>> featureSets) throws TimeoutException {
-		if ((featureSets == null) || featureSets.isEmpty())
-			return false;
-
-		Node featureModel = NodeCreator.createNodes(this);
-		LinkedList<Object> forAnd = new LinkedList<Object>();
-
-		for (Set<Feature> features : featureSets) {
-			if ((features != null) && !features.isEmpty())
-				forAnd.add(new Not(conjunct(features)));
-			else
-				return false;
-		}
-
-		Node condition = new And(forAnd);
-		if ((context != null) && !context.isEmpty())
-			condition = new And(conjunct(context), condition);
-
-		Node finalFormula = new And(featureModel, condition);
-		return new SatSolver(finalFormula, 1000).isSatisfiable();
+		return analysis.mayBeMissing(context, featureSets);
 	}
 
 	/**
@@ -996,25 +933,25 @@ public class FeatureModel implements PropertyConstants {
 	 * 
 	 * @return true if there exists such a set of features || false, otherwise
 	 * @throws TimeoutException
+	 * 
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalysis#exists(Set)} instead.
 	 */
+	@Deprecated
 	public boolean exists(Set<Feature> features) throws TimeoutException {
-		if ((features == null) || (features.isEmpty()))
-			return true;
-
-		Node featureModel = NodeCreator.createNodes(this);
-		Node finalFormula = new And(featureModel, conjunct(features));
-		return new SatSolver(finalFormula, 1000).isSatisfiable();
+	    	return analysis.exists(features);
 	}
-
-	private Node conjunct(Set<Feature> b) {
-		Iterator<Feature> iterator = b.iterator();
-		Node result = new Literal(
-				NodeCreator.getVariable(iterator.next(), this));
-		while (iterator.hasNext())
-			result = new And(result, new Literal(NodeCreator.getVariable(
-					iterator.next(), this)));
-
-		return result;
+	
+	
+	/**
+	 * 
+	 * @param b
+	 * @return
+	 * 
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalysis#conjunct(Set)} instead.
+	 */
+	@Deprecated
+	public Node conjunct(Set<Feature> b) {
+	    	return analysis.conjunct(b);
 	}
 
 	public int countConcreteFeatures() {
@@ -1054,30 +991,21 @@ public class FeatureModel implements PropertyConstants {
 	 * @param selectedFeatures
 	 *            a list of feature names for which
 	 * @return a list of features that is common to all variants
+	 * 
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalysis#commonFeatures(long, Object...)} instead.
 	 */
+	@Deprecated
 	public LinkedList<String> commonFeatures(long timeout,
 			Object... selectedFeatures) {
-		Node formula = NodeCreator.createNodes(this);
-		if (selectedFeatures.length > 0)
-			formula = new And(formula, new Or(selectedFeatures));
-		SatSolver solver = new SatSolver(formula, timeout);
-		LinkedList<String> common = new LinkedList<String>();
-		for (Literal literal : solver.knownValues())
-			if (literal.positive)
-				common.add(literal.var.toString());
-		return common;
+	    	return analysis.commonFeatures(timeout, selectedFeatures);
 	}
 
+	/**
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalysis#getDeadFeatures()} instead.
+	 */
+	@Deprecated
 	public LinkedList<Feature> getDeadFeatures() {
-		//cloning the FM, because otherwise the resulting formula is wrong if renamed features are involved
-		// TODO: Check other calls of createNodes 
-		Node root = NodeCreator.createNodes(this.clone());
-		LinkedList<Feature> set = new LinkedList<Feature>();
-		for (Literal e : new SatSolver(root, 1000).knownValues())
-			if (!e.positive && !e.var.toString().equals("False")
-					&& !e.var.toString().equals("True"))
-				set.add(getFeature(e.var.toString()));
-		return set;
+	    	return analysis.getDeadFeatures();
 	}
 
 	/**
@@ -1407,6 +1335,12 @@ public class FeatureModel implements PropertyConstants {
 	 */
 	public void setFeatureOrderInXML(boolean featureOrderInXML) {
 		this.featureOrderInXML = featureOrderInXML;
+	}
+	
+	private FeatureModelAnalysis analysis = new FeatureModelAnalysis(this);
+	
+	public FeatureModelAnalysis getAnalysis(){
+	    return analysis;
 	}
 
 }
