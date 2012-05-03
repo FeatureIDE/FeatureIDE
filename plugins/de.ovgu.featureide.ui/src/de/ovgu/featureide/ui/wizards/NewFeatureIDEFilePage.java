@@ -322,11 +322,13 @@ public class NewFeatureIDEFilePage extends WizardPage {
 	private void initComboClassName() {
 		String c = comboClass.getText();
 		Object obj = selection.getFirstElement();
-		String fileExtension = ((IFile) obj).getFileExtension();
-		if (obj instanceof IFile && fileExtension != null &&
-				composer.extensions().contains("." + fileExtension)) {
-			String fileName = ((IFile) obj).getName();
-			c = fileName.substring(0, fileName.lastIndexOf('.'));
+		if (obj instanceof IFile) {
+			String fileExtension = ((IFile) obj).getFileExtension();
+			if (fileExtension != null &&
+					composer.extensions().contains("." + fileExtension)) {
+				String fileName = ((IFile) obj).getName();
+				c = fileName.substring(0, fileName.lastIndexOf('.'));
+			}
 		}
 		comboClass.removeAll();
 		LinkedList<String> inclusions = new LinkedList<String>();
