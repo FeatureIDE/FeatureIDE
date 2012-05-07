@@ -62,15 +62,15 @@ public class TypeChecker
 
 		// TODO: consider the userdefined feature order?
 
-		_parser.parseFeatures(_project.getSourcePath(), concrete_features);
+		//_parser.parseFeatures(_project.getSourcePath(), concrete_features);
 		
-//		_parser.parse(_project.getSourcePath(), (concrete_features));
-//
-//		_class_table = _parser.getClassTable();
-//
-//		TypecheckCorePlugin.logln("Parsing finished... (" + _parser.timer.getTime() + " ms)");
-//		TypecheckCorePlugin.logln("Running checks...");
-//		_checks.invokeChecks(_project, _class_table);
-//		TypecheckCorePlugin.logln("Checks finished...");
+		_parser.parse(_project.getSourcePath(), (concrete_features));
+
+		_class_table = _parser.getClassTable();
+
+		TypecheckCorePlugin.logln("Parsing finished... (" + _parser.timer.getTime() + " ms)");
+		TypecheckCorePlugin.logln("Running checks...");
+		_checks.invokeChecks(_project, _class_table);
+		TypecheckCorePlugin.logln("Checks finished...");
 	}
 }

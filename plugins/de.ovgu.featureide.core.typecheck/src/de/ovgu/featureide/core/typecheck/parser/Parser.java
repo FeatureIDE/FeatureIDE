@@ -133,7 +133,7 @@ public class Parser
 					CompilationUnit cu = it.next();
 					if (cu.fromSource())
 					{
-						parseCU(feature, cu);
+						parseCU(feature, feature_path, cu);
 					}
 				}
 
@@ -162,11 +162,12 @@ public class Parser
 			//FujiWrapper.getIntros(cu, feature_paths);
 			
 		}
-		cu.printIntros(feature_paths);
+		FujiWrapper.getIntros(cu, feature_paths);
+		//cu.printIntros(feature_paths);
 		cu.printRefs(feature_paths);
 	}
 	
-	private void parseCU(Feature feature, CompilationUnit cu)
+	private void parseCU(Feature feature, String feature_path, CompilationUnit cu)
 	{
 		// TODO: handle imports
 
@@ -178,14 +179,14 @@ public class Parser
 		{
 			if (type instanceof ClassDecl)
 			{
-				parseClass(feature, (ClassDecl) type, cu, class_path);
+				parseClass(feature, feature_path, (ClassDecl) type, cu, class_path);
 			}
 		}
 	}
 
-	private void parseClass(Feature feature, ClassDecl class_ast, CompilationUnit cu, IFile class_path)
+	private void parseClass(Feature feature, String feature_path, ClassDecl class_ast, CompilationUnit cu, IFile class_path)
 	{
-		_class_table.add(feature, class_ast, cu, class_path);
+		_class_table.add(feature, feature_path, class_ast, cu, class_path);
 	}
 
 	public ClassTable getClassTable()

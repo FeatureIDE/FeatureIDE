@@ -91,9 +91,9 @@ public class ClassTable
 		return _features_by_class.get(class_name);
 	}
 
-	public boolean add(Feature feature, ClassDecl class_ast, CompilationUnit cu, IFile file)
+	public boolean add(Feature feature, String feature_path, ClassDecl class_ast, CompilationUnit cu, IFile file)
 	{
-		ClassTableEntry entry = new ClassTableEntry(feature, class_ast, cu, file);
+		ClassTableEntry entry = new ClassTableEntry(feature, feature_path, class_ast, cu, file);
 
 		if (_class_table.contains(entry))
 		{

@@ -18,7 +18,9 @@
  */
 package de.ovgu.featureide.core.typecheck.check;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 import org.sat4j.specs.TimeoutException;
 
@@ -47,6 +49,9 @@ public class SuperClassCheck  extends AbstractCheckPlugin
 		{
 			for (ClassTableEntry entry : class_table.getClassesByFeature(feature.getName()))
 			{
+			    List<String> list  = new ArrayList<String>();
+			    list.add(project.getSourcePath() + "\\" + feature.getName());
+			    entry.getCompilationUnit().printIntros(list);
 				String superclass = entry.getAST().superclass().fullName();
 				System.out.println(entry.getClassName() + " has superclass " + superclass);
 				if (class_table.contains(superclass))

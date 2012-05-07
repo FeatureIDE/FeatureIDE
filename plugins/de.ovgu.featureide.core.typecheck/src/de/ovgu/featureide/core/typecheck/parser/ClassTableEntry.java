@@ -19,6 +19,7 @@
 package de.ovgu.featureide.core.typecheck.parser;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 
@@ -40,17 +41,16 @@ public class ClassTableEntry
 	private CompilationUnit _cu_ast;
 	private ClassDecl _class_ast;
 	private IFile _class_file;
+	private String _feature_path;
 
 	private long _class_file_modification_stamp;
 
-	public ClassTableEntry(Feature feature, ClassDecl class_ast, CompilationUnit cu, IFile class_file)
+	public ClassTableEntry(Feature feature, String feature_path, ClassDecl class_ast, CompilationUnit cu, IFile class_file)
 	{
 		_feature = feature;
 		_class_ast = class_ast;
 		_cu_ast = cu;
 		_class_file = class_file;
-
-		_class_file_modification_stamp = _class_file.getModificationStamp();
 	}
 
 	public String getFeatureName()
@@ -116,5 +116,12 @@ public class ClassTableEntry
 	public boolean needsUpdate()
 	{
 		return _class_file_modification_stamp != _class_file.getModificationStamp();
+	}
+	
+	public void print()
+	{
+	    List<String> paths = new ArrayList<String>();
+	    paths.add(_feature_path);
+	    _cu_ast.printIntros(paths);
 	}
 }
