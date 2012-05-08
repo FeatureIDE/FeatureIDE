@@ -480,4 +480,12 @@ Public License instead of this License.
          fragment="true"
          unpack="false"/>
 
+   <plugin
+         id="de.ovgu.featureide.core_test"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
 </feature>
