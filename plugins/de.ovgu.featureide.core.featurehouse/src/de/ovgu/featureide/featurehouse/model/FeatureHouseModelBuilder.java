@@ -19,6 +19,7 @@
 package de.ovgu.featureide.featurehouse.model;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -76,13 +77,14 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 	 * @param nodes The fstNodes
 	 * @param completeModel <code>true</code> for completions mode: old methods will not be overwritten
 	 */
-	public void buildModel(List<FSTNode> nodes, boolean completeModel) {
+	@SuppressWarnings("unchecked")
+	public void buildModel(ArrayList<FSTNode> nodes, boolean completeModel) {
 		this.completeModel = completeModel;
 		if (!completeModel) {
 			model.reset();
 		}
 		
-		for (FSTNode node : nodes) {
+		for (FSTNode node : (ArrayList<FSTNode>)nodes.clone()) {
 			if (node.getType().equals(NODE_TYPE_FEATURE)) {
 				caseAddFeature(node);
 			} else if (node.getType().equals(NODE_TYPE_CLASS)) {

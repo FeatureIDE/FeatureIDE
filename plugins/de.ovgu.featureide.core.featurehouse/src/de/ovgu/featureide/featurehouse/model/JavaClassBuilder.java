@@ -148,17 +148,25 @@ public class JavaClassBuilder extends ClassBuilder {
 		String name = getMethodName(terminal);
 		
 		// get return type
-		String body = terminal.getBody().substring(0, terminal.getBody().indexOf(name));
-		String returnType = body.split("[ ]")[body.split("[ ]").length -1];
+		String head = getHead(terminal.getBody(), name);
+		String returnType = head.split("[ ]")[head.split("[ ]").length -1];
 		
 		// get modifiers
 		String modifiers = "";
-		if (body.indexOf(returnType) != 0) {
-			modifiers = body.substring(0, body.indexOf(returnType)-1);
+		if (head.indexOf(returnType) != 0) {
+			modifiers = head.substring(0, head.indexOf(returnType)-1);
 		}
 
 		// add method
 		addMethod(name, getMethodParameter(terminal), returnType, modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine, false);
+	}
+
+	/**
+	 * @param body
+	 * @return
+	 */
+	public String getHead(String body, String name) {
+		return body.substring(0, body.indexOf(name + "("));
 	}
 
 	public void caseConstructorDeclaration(FSTTerminal terminal) {
