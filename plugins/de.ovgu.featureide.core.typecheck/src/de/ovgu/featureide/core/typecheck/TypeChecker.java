@@ -21,11 +21,16 @@ package de.ovgu.featureide.core.typecheck;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.osgi.internal.resolver.ComputeNodeOrder;
+
 import AST.ASTNode;
+import AST.CompilationUnit;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.typecheck.check.CheckPluginManager;
 import de.ovgu.featureide.core.typecheck.check.SuperClassCheck;
+import de.ovgu.featureide.core.typecheck.parser.CUParser;
+import de.ovgu.featureide.core.typecheck.parser.CUTable;
 import de.ovgu.featureide.core.typecheck.parser.ClassTable;
 import de.ovgu.featureide.core.typecheck.parser.Parser;
 import de.ovgu.featureide.fm.core.Feature;
@@ -37,10 +42,12 @@ import de.ovgu.featureide.fm.core.Feature;
  */
 public class TypeChecker
 {
-
 	private IFeatureProject _project;
 	private Parser _parser;
 	private ClassTable _class_table;
+	
+	private CUTable cutable;
+	private CUParser cuparser;
 
 	private CheckPluginManager _checks;
 
@@ -49,6 +56,8 @@ public class TypeChecker
 		_project = project;
 		_parser = new Parser(_project);
 		_checks = new CheckPluginManager();
+		
+		cuparser = new CUParser(_checks);
 
 		_checks.addCheck(new SuperClassCheck());
 	}
@@ -57,14 +66,15 @@ public class TypeChecker
 	{
 		TypecheckCorePlugin.logln("Starting parsing project " + _project.getProjectName());
 		
-		System.out.println(ASTNode.class);
 		List<Feature> concrete_features = new ArrayList<Feature>(_project.getFeatureModel().getConcreteFeatures());
 
 		// TODO: consider the userdefined feature order?
 
 		//_parser.parseFeatures(_project.getSourcePath(), concrete_features);
 		
-		_parser.parse(_project.getSourcePath(), (concrete_features));
+		//_parser.parse(_project.getSourcePath(), (concrete_features));
+		
+		cuparser.parse(_project.getSourcePath(), concrete_features, true);
 
 		_class_table = _parser.getClassTable();
 

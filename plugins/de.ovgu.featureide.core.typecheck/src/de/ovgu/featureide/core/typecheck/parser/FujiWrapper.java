@@ -21,6 +21,7 @@ package de.ovgu.featureide.core.typecheck.parser;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.cli.ParseException;
@@ -44,93 +45,116 @@ import fuji.WrongArgumentException;
 
 /**
  * 
- * @author Sönke Holthusen
+ * @author Sï¿½nke Holthusen
  * 
  */
 public class FujiWrapper {
-    
-    
-    
-    public static void getIntros(CompilationUnit cu,
-	    java.util.List<String> featureModulePathnames) {
-	java.util.Collection<ReferenceType> refiningTypes = cu
-		.getRefiningTypes();
-	if (refiningTypes != null) {
-	    for (ReferenceType rt : refiningTypes) {
-		System.out.print(IntrosRefsUtil.introPrefix(rt,
-			featureModulePathnames));
-		System.out.println(IntrosRefsUtil.typeDeclQName(rt));
-	    }
+
+	public static void getIntros(CompilationUnit cu,
+			java.util.List<String> featureModulePathnames) {
+		java.util.Collection<ReferenceType> refiningTypes = cu
+				.getRefiningTypes();
+		if (refiningTypes != null) {
+			for (ReferenceType rt : refiningTypes) {
+				System.out.print(IntrosRefsUtil.introPrefix(rt,
+						featureModulePathnames));
+				System.out.println(IntrosRefsUtil.typeDeclQName(rt));
+			}
+		}
+		for (int i = 0; i < cu.getNumChild(); i++) {
+			cu.getChild(i).printIntros(featureModulePathnames);
+		}
+
 	}
-	for (int i = 0; i < cu.getNumChild(); i++) {
-	    cu.getChild(i).printIntros(featureModulePathnames);
+
+	public static boolean hasSuperClass(ClassDecl cl, ClassDecl superclass) {
+		if (cl.hasSuperclass()) {
+			if (cl.superclass().equals(superclass)) {
+				return true;
+			} else {
+				return hasSuperClass(cl.superclass(), superclass);
+			}
+		}
+		return false;
 	}
 
-    }
+	public static Iterator<Program> getFujiCompositionIterator(
+			List<String> features, String feature_path)
+			throws WrongArgumentException, ParseException, IOException,
+			FeatureDirNotFoundException, SyntacticErrorException,
+			SemanticErrorException, CompilerWarningException {
+		String[] fuji_options = { "-progmode", "-basedir", feature_path };
 
-    public static boolean hasSuperClass(ClassDecl cl, ClassDecl superclass) {
-	if (cl.hasSuperclass()) {
-	    if (cl.superclass().equals(superclass)) {
-		return true;
-	    } else {
-		return hasSuperClass(cl.superclass(), superclass);
-	    }
+		Main m = new Main(fuji_options, features);
+
+		Composition composition = m.getComposition(m);
+
+		return composition.getASTIterator();
 	}
-	return false;
-    }
 
-    public static Iterator<Program> getFujiCompositionIterator(
-	    List<String> features, String feature_path)
-	    throws WrongArgumentException, ParseException, IOException,
-	    FeatureDirNotFoundException, SyntacticErrorException,
-	    SemanticErrorException, CompilerWarningException {
-	String[] fuji_options = { "-progmode", "-basedir", feature_path };
+	public static ArrayList<ASTNode> getMethodAccesses(ASTNode method) {
+		ArrayList<ASTNode> method_accesses = new ArrayList<ASTNode>();
+		for (int i = method.getNumChild(); i > 0; i--) {
+			ASTNode node = method.getChild(i - 1);
 
-	Main m = new Main(fuji_options, features);
+			if (node instanceof MethodAccess) {
+				method_accesses.add(node);
+			}
 
-	Composition composition = m.getComposition(m);
-
-	return composition.getASTIterator();
-    }
-
-    public static ArrayList<ASTNode> getMethodAccesses(ASTNode method) {
-	ArrayList<ASTNode> method_accesses = new ArrayList<ASTNode>();
-	for (int i = method.getNumChild(); i > 0; i--) {
-	    ASTNode node = method.getChild(i - 1);
-
-	    if (node instanceof MethodAccess) {
-		method_accesses.add(node);
-	    }
-
-	    method_accesses.addAll(getMethodAccesses(node));
+			method_accesses.addAll(getMethodAccesses(node));
+		}
+		return method_accesses;
 	}
-	return method_accesses;
-    }
 
-    public static ArrayList<ASTNode> getTypeAccesses(ASTNode method) {
-	ArrayList<ASTNode> type_accesses = new ArrayList<ASTNode>();
-	for (int i = method.getNumChild(); i > 0; i--) {
-	    ASTNode node = method.getChild(i - 1);
+	public static ArrayList<ASTNode> getTypeAccesses(ASTNode method) {
+		ArrayList<ASTNode> type_accesses = new ArrayList<ASTNode>();
+		for (int i = method.getNumChild(); i > 0; i--) {
+			ASTNode node = method.getChild(i - 1);
 
-	    if (node instanceof TypeAccess) {
-		type_accesses.add(node);
-	    }
+			if (node instanceof TypeAccess) {
+				type_accesses.add(node);
+			}
 
-	    type_accesses.addAll(getTypeAccesses(node));
+			type_accesses.addAll(getTypeAccesses(node));
+		}
+		return type_accesses;
 	}
-	return type_accesses;
-    }
-    
-    public static List<MethodDecl> getMethodDecls(ASTNode node){
-	List<MethodDecl> methods = new ArrayList<MethodDecl>();
-	for(int i = 0; i < node.getNumChild(); i++){
-	    ASTNode child = node.getChild(i);
-	    if(child instanceof MethodDecl){
-		methods.add((MethodDecl) child);
-	    }
-	    methods.addAll(getMethodDecls(child));
-	}
-	return methods;
-    }
 
+	public static List<MethodDecl> getMethodDecls(ASTNode node) {
+		List<MethodDecl> methods = new ArrayList<MethodDecl>();
+
+		// Iterator<ASTNode> it = node.iterator();
+		// while(it.hasNext()){
+		// ASTNode child = it.next();
+		// if (child instanceof MethodDecl) {
+		// methods.add((MethodDecl) child);
+		// }
+		// methods.addAll(getMethodDecls(child));
+		// }
+		for (int i = 0; i < node.getNumChild(); i++) {
+			ASTNode child = node.getChild(i);
+			if (child instanceof MethodDecl) {
+				methods.add((MethodDecl) child);
+			}
+			methods.addAll(getMethodDecls(child));
+		}
+		return methods;
+	}
+
+	public static List<ReferenceType> getIntroducedTypes(CompilationUnit cu) {
+		List<ReferenceType> introduced_types = new ArrayList<ReferenceType>();
+
+		java.util.Collection<ReferenceType> refiningTypes = cu
+				.getRefiningTypes();
+
+		if (refiningTypes != null) {
+			for (ReferenceType rt : refiningTypes) {
+				if (!(rt.isAnonymous() || rt.isLocalClass() || rt.isArrayDecl())) {
+					introduced_types.add(rt);
+				}
+			}
+		}
+
+		return introduced_types;
+	}
 }

@@ -18,6 +18,7 @@
  */
 package de.ovgu.featureide.core.typecheck.check;
 
+import AST.ASTNode;
 import AST.Block;
 import AST.Expr;
 import AST.ExprStmt;
@@ -118,5 +119,14 @@ public class MethodCheck  extends AbstractCheckPlugin {
 //		System.out.println("EXPR: " + expr + " in line " + expr.lineNumber());
 		
 
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.typecheck.check.ICheckPlugin#invokeNodeParse(AST.ASTNode)
+	 */
+	@Override
+	public void invokeNodeParse(ASTNode node) {
+		// TODO Auto-generated method stub
+		
 	}
 }

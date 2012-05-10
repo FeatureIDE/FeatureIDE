@@ -21,17 +21,14 @@ package de.ovgu.featureide.core.typecheck.check;
 import java.util.Observable;
 import java.util.Observer;
 
-import AST.FieldDecl;
-import AST.FieldDeclaration;
-
 /**
  * TODO description
  * 
  * @author soenke
  */
-public abstract class AbstractCheckPlugin implements ICheckPlugin, Observer
+public abstract class AbstractCheckPlugin implements ICheckPlugin
 {
-	private CheckPluginManager _manager;
+	protected CheckPluginManager _manager;
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.core.typecheck.check.ICheckPlugin#register(de.ovgu.featureide.core.typecheck.check.CheckPluginManager)
 	 */
@@ -39,14 +36,8 @@ public abstract class AbstractCheckPlugin implements ICheckPlugin, Observer
 	public void register(CheckPluginManager manager)
 	{
 		_manager = manager;
+		init();
 	}
 	
-	/* (non-Javadoc)
-	 * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
-	 */
-	@Override
-	public void update(Observable o, Object arg)
-	{
-
-	}
+	public void init(){}
 }

@@ -19,7 +19,12 @@
 package de.ovgu.featureide.core.typecheck.check;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Observable;
+
+import AST.ASTNode;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.typecheck.parser.ClassTable;
@@ -27,45 +32,66 @@ import de.ovgu.featureide.core.typecheck.parser.ClassTable;
 /**
  * TODO description
  * 
- * @author Sönke Holthusen
+ * @author Sï¿½nke Holthusen
  */
-public class CheckPluginManager extends Observable
-{
+public class CheckPluginManager extends Observable {
 	private ArrayList<ICheckPlugin> _plugins;
-	
-	public CheckPluginManager()
-	{
+	private Map<String, List<ICheckPlugin>> node_parse_plugins = new HashMap<String, List<ICheckPlugin>>();
+
+	public CheckPluginManager() {
 		_plugins = new ArrayList<ICheckPlugin>();
 	}
-	
-	public CheckPluginManager(ICheckPlugin... plugins)
-	{
+
+	public CheckPluginManager(ICheckPlugin... plugins) {
 		this();
-		
-		for(ICheckPlugin plugin : plugins)
-		{
-			_plugins.add(plugin);
+
+		for (ICheckPlugin plugin : plugins) {
+			add(plugin);
 		}
 	}
-	
-	public void addCheck(ICheckPlugin plugin)
-	{
+
+	public void addCheck(ICheckPlugin plugin) {
+		add(plugin);
+	}
+
+	public void addCheck(ICheckPlugin... plugins) {
+		for (ICheckPlugin plugin : plugins) {
+			add(plugin);
+		}
+	}
+
+	private void add(ICheckPlugin plugin){
+		plugin.register(this);
 		_plugins.add(plugin);
 	}
 	
-	public void addCheck(ICheckPlugin... plugins)
-	{
-		for(ICheckPlugin plugin : plugins)
-		{
-			_plugins.add(plugin);
+	public void invokeChecks(IFeatureProject project, ClassTable class_table) {
+		for (ICheckPlugin plugin : _plugins) {
+			plugin.invokeCheck(project, class_table);
 		}
 	}
-	
-	public void invokeChecks(IFeatureProject project, ClassTable class_table)
-	{
-		for(ICheckPlugin plugin : _plugins)
-		{
-			plugin.invokeCheck(project, class_table);
+
+	public void registerForNodeParse(String node, ICheckPlugin plugin) {
+		System.out.println("registering for: " + node);
+		List<ICheckPlugin> list = node_parse_plugins.get(node);
+		if (list == null) {
+			list = new ArrayList<ICheckPlugin>();
+			node_parse_plugins.put(node, list);
+		}
+		list.add(plugin);
+	}
+
+	public void invokeNodeParse(ASTNode node) {
+		String node_name = node.getClass().getCanonicalName();
+		List<ICheckPlugin> list = node_parse_plugins.get(node_name);
+		if (list == null) {
+			//System.out.println("PluginManager: nobody interested in: " + node_name);
+			return;
+		} else {
+			//System.out.println("CheckPluginManager: found plugins for: " + node_name);
+			for (ICheckPlugin plugin : list) {
+				plugin.invokeNodeParse(node);
+			}
 		}
 	}
 }

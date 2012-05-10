@@ -18,6 +18,7 @@
  */
 package de.ovgu.featureide.core.typecheck.check;
 
+import AST.ASTNode;
 import AST.FieldDeclaration;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.typecheck.parser.ClassTable;
@@ -51,5 +52,14 @@ public class TestCheckPlugin extends AbstractCheckPlugin
 				System.out.println("\t" + field.lineNumber() + ":" + field.toString());
 			}
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.typecheck.check.ICheckPlugin#invokeNodeParse(AST.ASTNode)
+	 */
+	@Override
+	public void invokeNodeParse(ASTNode node) {
+		// TODO Auto-generated method stub
+		
 	}
 }

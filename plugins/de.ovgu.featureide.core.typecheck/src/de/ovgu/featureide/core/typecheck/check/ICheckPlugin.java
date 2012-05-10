@@ -18,16 +18,18 @@
  */
 package de.ovgu.featureide.core.typecheck.check;
 
+import AST.ASTNode;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.typecheck.parser.ClassTable;
 
 /**
  * TODO description
  * 
- * @author Sönke Holthusen
+ * @author Sï¿½nke Holthusen
  */
 public interface ICheckPlugin
 {
 	public void register(CheckPluginManager manager);
 	public void invokeCheck(IFeatureProject project, ClassTable class_table);
+	public void invokeNodeParse(ASTNode node);
 }

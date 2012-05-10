@@ -24,6 +24,9 @@ import java.util.List;
 
 import org.sat4j.specs.TimeoutException;
 
+import AST.ASTNode;
+import AST.ClassDecl;
+
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.typecheck.TypecheckCorePlugin;
 import de.ovgu.featureide.core.typecheck.parser.ClassTable;
@@ -33,10 +36,14 @@ import de.ovgu.featureide.fm.core.Feature;
 /**
  * TODO description
  * 
- * @author Sönke Holthusen
+ * @author Sï¿½nke Holthusen
  */
-public class SuperClassCheck  extends AbstractCheckPlugin
+public class SuperClassCheck extends AbstractCheckPlugin
 {
+	public void init(){
+		_manager.registerForNodeParse(ClassDecl.class.getCanonicalName(), this);
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -90,12 +97,14 @@ public class SuperClassCheck  extends AbstractCheckPlugin
 	}
 
 	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.typecheck.check.ICheckPlugin#register(de.ovgu.featureide.core.typecheck.check.CheckPluginManager)
+	 * @see de.ovgu.featureide.core.typecheck.check.ICheckPlugin#invokeNodeParse(AST.ASTNode)
 	 */
 	@Override
-	public void register(CheckPluginManager manager)
-	{
-		// TODO Auto-generated method stub
-		
+	public void invokeNodeParse(ASTNode node) {
+		if(node instanceof ClassDecl){
+			ClassDecl cd = (ClassDecl) node;
+			System.out.println("found classdecl for class: " + cd.name());
+			System.out.println(cd.compilationUnit().pathName());
+		}
 	}
 }

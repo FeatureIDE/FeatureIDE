@@ -20,6 +20,7 @@ package de.ovgu.featureide.core.typecheck.check;
 
 import java.util.Observable;
 
+import AST.ASTNode;
 import AST.FieldDecl;
 import AST.FieldDeclaration;
 
@@ -46,20 +47,13 @@ public class FieldCheck extends AbstractCheckPlugin
 
 	}
 
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.typecheck.check.ICheckPlugin#invokeNodeParse(AST.ASTNode)
+	 */
 	@Override
-	public void update(Observable obs, Object arg)
-	{
-		if (arg instanceof FieldDeclaration)
-		{
-
-		}
-		else
-		{
-			if (arg instanceof FieldDecl)
-			{
-
-			}
-		}
+	public void invokeNodeParse(ASTNode node) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
