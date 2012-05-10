@@ -97,7 +97,7 @@ public class CUParser {
 
 					if (cu.fromSource()) {
 
-						parseAST(cu);
+						parseAST(features.get(0), cu);
 						// List<MethodDecl> methods = FujiWrapper
 						// .getMethodDecls(cu);
 						// for (MethodDecl method : methods) {
@@ -126,10 +126,10 @@ public class CUParser {
 		System.out.println("Parsing finished (" + timer.getTime() + " ms)");
 	}
 
-	public void parseAST(ASTNode node) {
-		plugins.invokeNodeParse(node);
+	public void parseAST(Feature feature, ASTNode node) {
+		plugins.invokeNodeParse(feature, node);
 		for (int i = 0; i < node.getNumChild(); i++) {
-			parseAST(node.getChild(i));
+			parseAST(feature, node.getChild(i));
 		}
 	}
 }

@@ -28,6 +28,7 @@ import AST.ASTNode;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.typecheck.parser.ClassTable;
+import de.ovgu.featureide.fm.core.Feature;
 
 /**
  * TODO description
@@ -36,7 +37,7 @@ import de.ovgu.featureide.core.typecheck.parser.ClassTable;
  */
 public class CheckPluginManager extends Observable {
 	private ArrayList<ICheckPlugin> _plugins;
-	private Map<String, List<ICheckPlugin>> node_parse_plugins = new HashMap<String, List<ICheckPlugin>>();
+	private Map<Class, List<ICheckPlugin>> node_parse_plugins = new HashMap<Class, List<ICheckPlugin>>();
 
 	public CheckPluginManager() {
 		_plugins = new ArrayList<ICheckPlugin>();
@@ -71,7 +72,7 @@ public class CheckPluginManager extends Observable {
 		}
 	}
 
-	public void registerForNodeParse(String node, ICheckPlugin plugin) {
+	public void registerForNodeParse(Class node, ICheckPlugin plugin) {
 		System.out.println("registering for: " + node);
 		List<ICheckPlugin> list = node_parse_plugins.get(node);
 		if (list == null) {
@@ -81,7 +82,7 @@ public class CheckPluginManager extends Observable {
 		list.add(plugin);
 	}
 
-	public void invokeNodeParse(ASTNode node) {
+	public void invokeNodeParse(Feature feature, ASTNode node) {
 		String node_name = node.getClass().getCanonicalName();
 		List<ICheckPlugin> list = node_parse_plugins.get(node_name);
 		if (list == null) {
@@ -90,7 +91,7 @@ public class CheckPluginManager extends Observable {
 		} else {
 			//System.out.println("CheckPluginManager: found plugins for: " + node_name);
 			for (ICheckPlugin plugin : list) {
-				plugin.invokeNodeParse(node);
+				plugin.invokeNodeParse(feature, node);
 			}
 		}
 	}

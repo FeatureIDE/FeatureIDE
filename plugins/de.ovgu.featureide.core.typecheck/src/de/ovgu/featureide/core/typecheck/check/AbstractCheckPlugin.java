@@ -18,8 +18,16 @@
  */
 package de.ovgu.featureide.core.typecheck.check;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
+
+import de.ovgu.featureide.fm.core.Feature;
+
+import AST.ASTNode;
 
 /**
  * TODO description
@@ -29,6 +37,24 @@ import java.util.Observer;
 public abstract class AbstractCheckPlugin implements ICheckPlugin
 {
 	protected CheckPluginManager _manager;
+	protected List<Class> registered_node_types = new ArrayList<Class>();
+	
+	/*
+	 * Feature 	-> Node Type 	-> Data
+	 * 							   Data
+	 * 			-> Node Type	-> Data
+	 * 							   Data
+	 * 							   Data
+	 * Feature	-> Node Type	-> Data
+	 * ...
+	 */
+	protected Map<String, Map<Class, List<ASTNode>>> nodes = new HashMap<String, Map<Class,List<ASTNode>>>();
+	
+	protected void registerNodeType(Class node_type){
+		registered_node_types.add(node_type);
+	}
+	
+	
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.core.typecheck.check.ICheckPlugin#register(de.ovgu.featureide.core.typecheck.check.CheckPluginManager)
 	 */
@@ -36,7 +62,22 @@ public abstract class AbstractCheckPlugin implements ICheckPlugin
 	public void register(CheckPluginManager manager)
 	{
 		_manager = manager;
+		
+		for(Class node_type : registered_node_types){
+			_manager.registerForNodeParse(node_type, this);
+		}
+		
 		init();
+	}
+	
+	public void invokeNodeParse(Feature feature, ASTNode node){
+		Map<Class, List<ASTNode>> map = nodes.get(feature.getName());
+		if(map == null){
+			map = new HashMap<Class, List<ASTNode>>();
+			nodes.put(feature.getName(), map);
+		}
+		
+		ASTNode moo = new ASTNode<ASTNode>();
 	}
 	
 	public void init(){}

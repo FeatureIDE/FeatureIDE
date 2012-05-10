@@ -41,7 +41,7 @@ import de.ovgu.featureide.fm.core.Feature;
 public class SuperClassCheck extends AbstractCheckPlugin
 {
 	public void init(){
-		_manager.registerForNodeParse(ClassDecl.class.getCanonicalName(), this);
+		_manager.registerForNodeParse(ClassDecl.class, this);
 	}
 	
 	/*
@@ -100,7 +100,7 @@ public class SuperClassCheck extends AbstractCheckPlugin
 	 * @see de.ovgu.featureide.core.typecheck.check.ICheckPlugin#invokeNodeParse(AST.ASTNode)
 	 */
 	@Override
-	public void invokeNodeParse(ASTNode node) {
+	public void invokeNodeParse(Feature feature, ASTNode node) {
 		if(node instanceof ClassDecl){
 			ClassDecl cd = (ClassDecl) node;
 			System.out.println("found classdecl for class: " + cd.name());
