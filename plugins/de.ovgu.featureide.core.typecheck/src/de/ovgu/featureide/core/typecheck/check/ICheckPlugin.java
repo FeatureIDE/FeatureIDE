@@ -33,4 +33,5 @@ public interface ICheckPlugin
 	public void register(CheckPluginManager manager);
 	public void invokeCheck(IFeatureProject project, ClassTable class_table);
 	public void invokeNodeParse(Feature feature, ASTNode node);
+	public String getName();
 }

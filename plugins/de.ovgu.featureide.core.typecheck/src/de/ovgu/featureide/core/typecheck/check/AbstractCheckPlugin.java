@@ -22,83 +22,99 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Observable;
-import java.util.Observer;
-
-import de.ovgu.featureide.fm.core.Feature;
 
 import AST.ASTNode;
+import de.ovgu.featureide.fm.core.Feature;
 
 /**
  * TODO description
  * 
  * @author soenke
  */
+@SuppressWarnings("rawtypes")
 public abstract class AbstractCheckPlugin implements ICheckPlugin {
-	protected CheckPluginManager _manager;
-	protected List<Class> registered_node_types = new ArrayList<Class>();
+    protected CheckPluginManager _manager;
+    protected List<Class> registered_node_types = new ArrayList<Class>();
 
-	/*
-	 * Feature -> Node Type -> Data Data -> Node Type -> Data Data Data Feature
-	 * -> Node Type -> Data ...
-	 */
-	protected Map<String, Map<Class, List<ASTNode>>> nodes = new HashMap<String, Map<Class, List<ASTNode>>>();
+    protected String plugin_name = "AbstractCheckPlugin";
 
-	protected void registerNodeType(Class node_type) {
-		registered_node_types.add(node_type);
+    /*
+     * Feature -> Node Type -> Data Data -> Node Type -> Data Data Data Feature
+     * -> Node Type -> Data ...
+     */
+    protected Map<Feature, Map<Class, List<ASTNode>>> nodes = new HashMap<Feature, Map<Class, List<ASTNode>>>();
+    protected List<Feature> features = new ArrayList<Feature>();
+
+    protected void registerNodeType(Class node_type) {
+	registered_node_types.add(node_type);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * de.ovgu.featureide.core.typecheck.check.ICheckPlugin#register(de.ovgu
+     * .featureide.core.typecheck.check.CheckPluginManager)
+     */
+    @Override
+    public void register(CheckPluginManager manager) {
+	_manager = manager;
+
+	for (Class node_type : registered_node_types) {
+	    _manager.registerForNodeParse(node_type, this);
+	}
+    }
+
+    @Override
+    public void invokeNodeParse(Feature feature, ASTNode node) {
+//	System.out.println("Adding Node " + node.getClass().getName()
+//		+ " to Feature " + feature.getName());
+	
+	if(!nodes.containsKey(feature)){
+	    nodes.put(feature, new HashMap<Class, List<ASTNode>>());
+	}
+	
+	Map<Class, List<ASTNode>> map = nodes.get(feature);
+
+//	System.out.println("Map has " + map.size() + " elements");
+
+	if (!map.containsKey(node.getClass())) {
+	    map.put(node.getClass(), new ArrayList<ASTNode>());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ovgu.featureide.core.typecheck.check.ICheckPlugin#register(de.ovgu
-	 * .featureide.core.typecheck.check.CheckPluginManager)
-	 */
-	@Override
-	public void register(CheckPluginManager manager) {
-		_manager = manager;
+	map.get(node.getClass()).add(node);
 
-		for (Class node_type : registered_node_types) {
-			_manager.registerForNodeParse(node_type, this);
+//	System.out.println("List has " + map.get(node.getClass()).size() + " elements");
+
+	features.add(feature);
+    }
+
+    public Map<Class, List<ASTNode>> getNodes(Feature feature) {
+	return nodes.get(feature);
+    }
+
+    public <T> Map<Feature, List<T>> getNodes(Class<T> c) {
+	Map<Feature, List<T>> feature_node_map = new HashMap<Feature, List<T>>();
+	for (Feature f : nodes.keySet()) {
+	    Map<Class, List<ASTNode>> class_node_map = getNodes(f);
+	    List<ASTNode> nodes = class_node_map.get(c);
+
+	    List<T> new_node_list = new ArrayList<T>();
+
+	    for (ASTNode n : nodes) {
+		if (c.isInstance(n)) {
+		    new_node_list.add(c.cast(n));
 		}
+	    }
 
-		init();
+	    feature_node_map.put(f, new_node_list);
 	}
 
-	public void invokeNodeParse(Feature feature, ASTNode node) {
-		Map<Class, List<ASTNode>> map = nodes.get(feature.getName());
-		if (map == null) {
-			map = new HashMap<Class, List<ASTNode>>();
-			nodes.put(feature.getName(), map);
-		}
-	}
+	return feature_node_map;
+    }
 
-	public Map<Class, List<ASTNode>> getNodes(String feature) {
-		return nodes.get(feature);
-	}
-
-	public <T> Map<String, List<T>> getNodes(Class<T> c) {
-		Map<String, List<T>> feature_node_map = new HashMap<String, List<T>>();
-
-		for (String f : nodes.keySet()) {
-			Map<Class, List<ASTNode>> class_node_map = getNodes(f);
-			List<ASTNode> nodes = class_node_map.get(c);
-
-			List<T> new_node_list = new ArrayList<T>();
-
-			for (ASTNode n : nodes) {
-				if (c.isInstance(n)) {
-					new_node_list.add(c.cast(n));
-				}
-			}
-
-			feature_node_map.put(f, new_node_list);
-		}
-
-		return feature_node_map;
-	}
-
-	public void init() {
-	}
+    @Override
+    public String getName() {
+	return plugin_name;
+    }
 }

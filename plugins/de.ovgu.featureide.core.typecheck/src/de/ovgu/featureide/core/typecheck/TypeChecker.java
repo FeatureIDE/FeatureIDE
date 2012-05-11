@@ -78,7 +78,7 @@ public class TypeChecker
 
 		_class_table = _parser.getClassTable();
 
-		TypecheckCorePlugin.logln("Parsing finished... (" + _parser.timer.getTime() + " ms)");
+		TypecheckCorePlugin.logln("Parsing finished... (" + cuparser.timer.getTime() + " ms)");
 		TypecheckCorePlugin.logln("Running checks...");
 		_checks.invokeChecks(_project, _class_table);
 		TypecheckCorePlugin.logln("Checks finished...");

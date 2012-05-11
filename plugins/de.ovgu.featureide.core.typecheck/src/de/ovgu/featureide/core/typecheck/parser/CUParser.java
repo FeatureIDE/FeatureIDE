@@ -37,99 +37,98 @@ import de.ovgu.featureide.fm.core.Feature;
  * @author soenke
  */
 public class CUParser {
-	private CUTable cutable;
+    private CUTable cutable;
 
-	private Timer timer;
+    public Timer timer;
 
-	private CheckPluginManager plugins;
+    private CheckPluginManager plugins;
 
-	/**
+    /**
 	 * 
 	 */
-	public CUParser(CheckPluginManager manager) {
-		this.plugins = manager;
-		this.timer = new Timer();
+    public CUParser(CheckPluginManager manager) {
+	this.plugins = manager;
+	this.timer = new Timer();
+    }
+
+    public void parse(String feature_path, List<Feature> feature_list,
+	    boolean single_feature) {
+	if (single_feature) {
+	    parse(feature_path, feature_list);
+	} else {
+	    parseFeature(feature_path, feature_list);
 	}
+    }
 
-	public void parse(String feature_path, List<Feature> feature_list,
-			boolean single_feature) {
-		if (single_feature) {
-			parse(feature_path, feature_list);
-		} else {
-			parseFeature(feature_path, feature_list);
-		}
+    public void parse(String feature_path, List<Feature> feature_list) {
+	for (int i = 0; i < feature_list.size(); i++) {
+	    parseFeature(feature_path, feature_list.subList(i, i + 1));
 	}
+    }
 
-	public void parse(String feature_path, List<Feature> feature_list) {
-		for (int i = 0; i < feature_list.size(); i++) {
-			parseFeature(feature_path, feature_list.subList(i, i + 1));
-		}
+    private void parseFeature(String feature_path, List<Feature> features) {
+	Timer timer = new Timer();
+	if (features.size() == 1) {
+	    System.out.println("Parsing Feature " + features.get(0).getName()
+		    + " ... ");
+	} else {
+	    System.out.println("Parsing Features ...");
 	}
+	timer.start();
+	this.timer.resume();
 
-	private void parseFeature(String feature_path, List<Feature> features) {
-		Timer timer = new Timer();
-		if (features.size() == 1) {
-			System.out.println("Parsing Feature " + features.get(0).getName()
-					+ " ... ");
-		} else {
-			System.out.println("Parsing Features ...");
+	try {
+	    List<String> list = new ArrayList<String>();
+	    for (Feature f : features) {
+		list.add(f.getName());
+	    }
+
+	    Iterator<Program> iter = FujiWrapper.getFujiCompositionIterator(
+		    list, feature_path);
+
+	    while (iter.hasNext()) {
+		// XXX: takes a very long time
+		Program ast = iter.next();
+
+		@SuppressWarnings("unchecked")
+		Iterator<CompilationUnit> it = ast.compilationUnitIterator();
+		while (it.hasNext()) {
+		    CompilationUnit cu = it.next();
+		    if (cu.fromSource()) {
+			//System.out.println(cu.pathName());
+			parseAST(features.get(0), cu);
+			// List<MethodDecl> methods = FujiWrapper
+			// .getMethodDecls(cu);
+			// for (MethodDecl method : methods) {
+			// System.out.println(method.hostPackage().toString()
+			// + "." + method.hostType().name() + " "
+			// + method.signature() + " Feature# "
+			// + method.featureID());
+			// }
+
+			// System.out.println("At CompilationUnit " +
+			// cu.pathName() + " " + cu.featureID());
+			// cutable.addCU(features.get(cu.featureID()),
+			// feature_path, cu);
+		    }
+		    // System.out.println();
 		}
-		timer.start();
-		this.timer.resume();
 
-		try {
-			List<String> list = new ArrayList<String>();
-			for (Feature f : features) {
-				list.add(f.getName());
-			}
+	    }
 
-			Iterator<Program> iter = FujiWrapper.getFujiCompositionIterator(
-					list, feature_path);
-
-			while (iter.hasNext()) {
-				// XXX: takes a very long time
-				Program ast = iter.next();
-
-				@SuppressWarnings("unchecked")
-				Iterator<CompilationUnit> it = ast.compilationUnitIterator();
-				while (it.hasNext()) {
-					CompilationUnit cu = it.next();
-
-					if (cu.fromSource()) {
-
-						parseAST(features.get(0), cu);
-						// List<MethodDecl> methods = FujiWrapper
-						// .getMethodDecls(cu);
-						// for (MethodDecl method : methods) {
-						// System.out.println(method.hostPackage().toString()
-						// + "." + method.hostType().name() + " "
-						// + method.signature() + " Feature# "
-						// + method.featureID());
-						// }
-
-						// System.out.println("At CompilationUnit " +
-						// cu.pathName() + " " + cu.featureID());
-						// cutable.addCU(features.get(cu.featureID()),
-						// feature_path, cu);
-					}
-					// System.out.println();
-				}
-
-			}
-
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		this.timer.stop();
-		timer.stop();
-		System.out.println("Parsing finished (" + timer.getTime() + " ms)");
+	} catch (Exception e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
 	}
+	this.timer.stop();
+	timer.stop();
+	System.out.println("Parsing finished (" + timer.getTime() + " ms)");
+    }
 
-	public void parseAST(Feature feature, ASTNode node) {
-		plugins.invokeNodeParse(feature, node);
-		for (int i = 0; i < node.getNumChild(); i++) {
-			parseAST(feature, node.getChild(i));
-		}
+    public void parseAST(Feature feature, ASTNode node) {
+	plugins.invokeNodeParse(feature, node);
+	for (int i = 0; i < node.getNumChild(); i++) {
+	    parseAST(feature, node.getChild(i));
 	}
+    }
 }

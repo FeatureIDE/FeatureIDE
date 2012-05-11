@@ -25,6 +25,7 @@ import java.util.List;
 
 import AST.Access;
 import AST.ClassDecl;
+import AST.ClassInstanceExpr;
 import AST.CompilationUnit;
 import AST.IntrosRefsUtil;
 import AST.MethodDecl;
@@ -194,4 +195,8 @@ public class CUTableEntry {
 
 		return referenced_subtyping_types;
 	}
+
+    public List<ClassInstanceExpr> getClassInstance() {
+	return null;
+    }
 }

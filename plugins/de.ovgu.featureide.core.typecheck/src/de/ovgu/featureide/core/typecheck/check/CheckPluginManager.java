@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Observable;
 
 import AST.ASTNode;
+import AST.ClassDecl;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.typecheck.parser.ClassTable;
@@ -36,63 +37,64 @@ import de.ovgu.featureide.fm.core.Feature;
  * @author S�nke Holthusen
  */
 public class CheckPluginManager extends Observable {
-	private ArrayList<ICheckPlugin> _plugins;
-	private Map<Class, List<ICheckPlugin>> node_parse_plugins = new HashMap<Class, List<ICheckPlugin>>();
+    private ArrayList<ICheckPlugin> _plugins;
+    private Map<Class, List<ICheckPlugin>> node_parse_plugins = new HashMap<Class, List<ICheckPlugin>>();
 
-	public CheckPluginManager() {
-		_plugins = new ArrayList<ICheckPlugin>();
-	}
+    public CheckPluginManager() {
+	_plugins = new ArrayList<ICheckPlugin>();
+    }
 
-	public CheckPluginManager(ICheckPlugin... plugins) {
-		this();
+    public CheckPluginManager(ICheckPlugin... plugins) {
+	this();
 
-		for (ICheckPlugin plugin : plugins) {
-			add(plugin);
-		}
+	for (ICheckPlugin plugin : plugins) {
+	    add(plugin);
 	}
+    }
 
-	public void addCheck(ICheckPlugin plugin) {
-		add(plugin);
-	}
+    public void addCheck(ICheckPlugin plugin) {
+	add(plugin);
+    }
 
-	public void addCheck(ICheckPlugin... plugins) {
-		for (ICheckPlugin plugin : plugins) {
-			add(plugin);
-		}
+    public void addCheck(ICheckPlugin... plugins) {
+	for (ICheckPlugin plugin : plugins) {
+	    add(plugin);
 	}
+    }
 
-	private void add(ICheckPlugin plugin){
-		plugin.register(this);
-		_plugins.add(plugin);
-	}
-	
-	public void invokeChecks(IFeatureProject project, ClassTable class_table) {
-		for (ICheckPlugin plugin : _plugins) {
-			plugin.invokeCheck(project, class_table);
-		}
-	}
+    private void add(ICheckPlugin plugin) {
+	plugin.register(this);
+	_plugins.add(plugin);
+    }
 
-	public void registerForNodeParse(Class node, ICheckPlugin plugin) {
-		System.out.println("registering for: " + node);
-		List<ICheckPlugin> list = node_parse_plugins.get(node);
-		if (list == null) {
-			list = new ArrayList<ICheckPlugin>();
-			node_parse_plugins.put(node, list);
-		}
-		list.add(plugin);
+    public void invokeChecks(IFeatureProject project, ClassTable class_table) {
+	for (ICheckPlugin plugin : _plugins) {
+	    plugin.invokeCheck(project, class_table);
 	}
+    }
 
-	public void invokeNodeParse(Feature feature, ASTNode node) {
-		String node_name = node.getClass().getCanonicalName();
-		List<ICheckPlugin> list = node_parse_plugins.get(node_name);
-		if (list == null) {
-			//System.out.println("PluginManager: nobody interested in: " + node_name);
-			return;
-		} else {
-			//System.out.println("CheckPluginManager: found plugins for: " + node_name);
-			for (ICheckPlugin plugin : list) {
-				plugin.invokeNodeParse(feature, node);
-			}
-		}
+    public void registerForNodeParse(Class node, ICheckPlugin plugin) {
+	List<ICheckPlugin> list = node_parse_plugins.get(node);
+	if (list == null) {
+	    list = new ArrayList<ICheckPlugin>();
+	    node_parse_plugins.put(node, list);
 	}
+	list.add(plugin);
+    }
+
+    public void invokeNodeParse(Feature feature, ASTNode node) {
+	List<ICheckPlugin> list = node_parse_plugins.get(node.getClass());
+	if (list == null) {
+	    // System.out.println("PluginManager: nobody interested in: " +
+	    // node_name);
+	    return;
+	} else {
+//	    System.out.println("CheckPluginManager: found plugins for: "
+//		    + node.getClass().getName());
+	    for (ICheckPlugin plugin : list) {
+//		System.out.println(plugin.getName());
+		plugin.invokeNodeParse(feature, node);
+	    }
+	}
+    }
 }

@@ -23,40 +23,33 @@ package de.ovgu.featureide.core.typecheck.helper;
  * 
  * @author Sönke Holthusen
  */
-public class Timer
-{
-	private long _time_passed = 0;
-	private long _time_last_start = 0;
-	private boolean _started = false;
+public class Timer {
+    private long _time_passed = 0;
+    private long _time_last_start = 0;
+    private boolean _started = false;
 
-	public void start()
-	{
-		_time_passed = 0;
-		_started = true;
-		_time_last_start = System.currentTimeMillis();
-	}
+    public void start() {
+	_time_passed = 0;
+	_started = true;
+	_time_last_start = System.currentTimeMillis();
+    }
 
-	public void stop()
-	{
-		_time_passed += System.currentTimeMillis() - _time_last_start;
-		_started = false;
-	}
+    public void stop() {
+	_time_passed += System.currentTimeMillis() - _time_last_start;
+	_started = false;
+    }
 
-	public void resume()
-	{
-		_started = true;
-		_time_last_start = System.currentTimeMillis();
-	}
+    public void resume() {
+	_started = true;
+	_time_last_start = System.currentTimeMillis();
+    }
 
-	public long getTime()
-	{
-		if (!_started)
-		{
-			return _time_passed;
-		}
-		else
-		{
-			return _time_passed + (System.currentTimeMillis() - _time_last_start);
-		}
+    public long getTime() {
+	if (!_started) {
+	    return _time_passed;
+	} else {
+	    return _time_passed
+		    + (System.currentTimeMillis() - _time_last_start);
 	}
+    }
 }

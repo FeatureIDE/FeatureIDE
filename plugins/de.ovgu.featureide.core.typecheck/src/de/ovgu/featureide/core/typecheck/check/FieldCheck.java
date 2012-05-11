@@ -26,6 +26,7 @@ import AST.FieldDeclaration;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.typecheck.parser.ClassTable;
+import de.ovgu.featureide.fm.core.Feature;
 
 /**
  * TODO description
@@ -51,7 +52,7 @@ public class FieldCheck extends AbstractCheckPlugin
 	 * @see de.ovgu.featureide.core.typecheck.check.ICheckPlugin#invokeNodeParse(AST.ASTNode)
 	 */
 	@Override
-	public void invokeNodeParse(ASTNode node) {
+	public void invokeNodeParse(Feature feature,ASTNode node) {
 		// TODO Auto-generated method stub
 		
 	}
