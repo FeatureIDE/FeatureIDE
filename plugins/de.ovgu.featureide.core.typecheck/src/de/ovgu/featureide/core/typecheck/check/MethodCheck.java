@@ -18,10 +18,14 @@
  */
 package de.ovgu.featureide.core.typecheck.check;
 
+import java.util.List;
+import java.util.Map;
+
 import AST.ASTNode;
 import AST.Block;
 import AST.Expr;
 import AST.ExprStmt;
+import AST.MethodAccess;
 import AST.MethodDecl;
 import AST.ReturnStmt;
 import AST.Stmt;
@@ -36,97 +40,43 @@ import de.ovgu.featureide.fm.core.Feature;
  * 
  * @author S�nke Holthusen
  */
-public class MethodCheck  extends AbstractCheckPlugin {
+public class MethodCheck extends AbstractCheckPlugin {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ovgu.featureide.core.typecheck.check.ICheckPlugin#invokeCheck(de.ovgu
-	 * .featureide.core.IFeatureProject,
-	 * de.ovgu.featureide.core.typecheck.parser.ClassTable)
-	 */
-	@Override
-	public void invokeCheck(IFeatureProject project, ClassTable class_table) {
-		// possible method invocations
-		// - Constructor
-		// - Method body
-		// - Field initialising (Var x = Class.staticMethod();)
-		for (Feature feature : class_table.getFeatures()) {
-			for (ClassTableEntry entry : class_table
-					.getClassesByFeature(feature.getName())) {
-				System.out.println(entry);
-				System.out.println(entry.getAST().lookupMethod("addExtension(String)"));
-				for (MethodDecl method : entry.getMethods()) {
-					if (method.hasBlock()) {
-						Block block = method.getBlock();
-						//checkBlock(block);
-					}
-				}
-			}
+    public MethodCheck() {
+	plugin_name = "MethodCheck";
+	registerNodeType(MethodAccess.class);
+	registerNodeType(MethodDecl.class);
+    }
+
+    @Override
+    public void invokeCheck(IFeatureProject project, ClassTable class_table) {
+	// Map<Feature, List<MethodDecl>> methoddecl_map =
+	// getNodes(MethodDecl.class);
+	//
+	// for(Feature f : methoddecl_map.keySet()){
+	// System.out.println("Feature " + f.getName() +
+	// " provides following methods: ");
+	// for(MethodDecl md : methoddecl_map.get(f)){
+	// System.out.println("\t" + md.hostType().name() + "@" +
+	// md.signature());
+	// }
+	// }
+
+	Map<Feature, List<MethodAccess>> methodaccess_map = getNodes(MethodAccess.class);
+	for (Feature f : methodaccess_map.keySet()) {
+	    System.out.println("Feature " + f.getName()
+		    + " needs following methods: ");
+	    for (MethodAccess ma : methodaccess_map.get(f)) {
+		if (ma.decl().hostType().name().equals("Unknown")) {
+		    System.out.println(ma);
+		    for (Expr e : ma.getArgs()) {
+			System.out.println(e.type().name());
+		    }
+		} else {
+//		    System.out.println("\t" + ma.decl().hostType().name() + "@"
+//			    + ma.decl().signature());
 		}
+	    }
 	}
-
-	private void checkBlock(Block block) {
-		for (Stmt stmt : block.getStmtList()) {
-			checkStatement(stmt);
-		}
-	}
-
-	private void checkStatement(Stmt stmt) {
-		if (stmt instanceof ExprStmt) {
-			checkExpr(((ExprStmt) stmt).getExpr());
-//			System.out.println("expr at line " + stmt.lineNumber());
-		} else if (stmt instanceof ReturnStmt) {
-			ReturnStmt returnstmt = (ReturnStmt) stmt;
-			checkExpr(returnstmt.getResult());
-		} else if (stmt instanceof VariableDeclaration)
-		{
-			VariableDeclaration varstmt = (VariableDeclaration) stmt;
-			System.out.println(varstmt.getTypeAccess().packageName() + varstmt.getTypeAccess() + " " + varstmt.getID());
-		}
-		
-		
-		// TODO: get the enclosed statements
-		// else if (stmt instanceof SwitchStmt) {
-		// SwitchStmt switchstmt = (SwitchStmt) stmt;
-		// } else if (stmt instanceof IfStmt) {
-		// IfStmt ifstm = (IfStmt) stmt;
-		// System.out.println("if at line " + stmt.lineNumber());
-		// } else if (stmt instanceof WhileStmt) {
-		// WhileStmt whilestm = (WhileStmt) stmt;
-		// System.out.println("while at line " + stmt.lineNumber());
-		// } else if (stmt instanceof DoStmt) {
-		// DoStmt dostmt = (DoStmt) stmt;
-		// System.out.println("do at line " + stmt.lineNumber());
-		// } else if (stmt instanceof ForStmt) {
-		// ForStmt forstmt = (ForStmt) stmt;
-		// System.out.println("do at line " + stmt.lineNumber());
-		// } else if (stmt instanceof BreakStmt) {
-		//
-		// } else if (stmt instanceof ContinueStmt) {
-		//
-		// } else if (stmt instanceof ThrowStmt) {
-		//
-		// } else if (stmt instanceof TryStmt) {
-		//
-		// } else if (stmt instanceof ContinueStmt) {
-		//
-		// }
-	}
-
-	private void checkExpr(Expr expr) {
-//		System.out.println("EXPR: " + expr + " in line " + expr.lineNumber());
-		
-
-	}
-
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.typecheck.check.ICheckPlugin#invokeNodeParse(AST.ASTNode)
-	 */
-	@Override
-	public void invokeNodeParse(Feature feature, ASTNode node) {
-		// TODO Auto-generated method stub
-		
-	}
+    }
 }

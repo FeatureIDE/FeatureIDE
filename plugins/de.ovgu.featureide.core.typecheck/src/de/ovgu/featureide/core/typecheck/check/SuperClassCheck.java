@@ -18,10 +18,11 @@
  */
 package de.ovgu.featureide.core.typecheck.check;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import AST.Access;
 import AST.ClassDecl;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.typecheck.parser.ClassTable;
@@ -34,7 +35,6 @@ import de.ovgu.featureide.fm.core.Feature;
  */
 
 public class SuperClassCheck extends AbstractCheckPlugin {
-
     public SuperClassCheck() {
 	plugin_name = "SuperClassCheck";
 	registerNodeType(ClassDecl.class);
@@ -48,84 +48,45 @@ public class SuperClassCheck extends AbstractCheckPlugin {
     @Override
     public void invokeCheck(IFeatureProject project, ClassTable class_table) {
 	Map<Feature, List<ClassDecl>> map = getNodes(ClassDecl.class);
-	// System.out.println(map.size());
 	for (Feature key : map.keySet()) {
 	    for (ClassDecl cd : map.get(key)) {
-		// if (cd.superclass().compilationUnit().fromSource()) {
-		System.out.println(key.getName()
-			+ ":"
-			+ (cd.packageName().isEmpty() ? ""
-				: (cd.packageName() + ".")) + cd.name());
-		System.out.println("\tSuperclass: "
-			+ (cd.superclass().packageName().isEmpty() ? "" : (cd
-				.superclass().packageName() + "."))
-			+ cd.superclass().name());
-		for (Access a : cd.getImplementsList()) {
-		    System.out.println("\tImplements: " + a.typeName());
+		if (cd.superclass().name().equals("Unknown")) {
+		    // superclass couldn't be resolved by fuji
+		    Map<Feature, ClassDecl> providing_features = providesType(map,
+			    getSuperclassName(cd));
+		    if (providing_features.size() == 0) {
+			// no feature provides the superclass => error
+		    } else {
+			for (Feature p : providing_features.keySet()) {
+			    System.out.println("\t" + p.getName()
+				    + " can provide class " + providing_features.get(p).name());
+			}
+		    }
 		}
-		// }
+	    }
+	}
+    }
+
+    private Map<Feature, ClassDecl> providesType(Map<Feature, List<ClassDecl>> map,
+	    String type) {
+	Map<Feature, ClassDecl> providing_features = new HashMap<Feature, ClassDecl>();
+
+	for (Feature f : map.keySet()) {
+	    for (ClassDecl cd : map.get(f)) {
+		if (cd.name().equals(type)) {
+		    providing_features.put(f, cd);
+		}
 	    }
 	}
 
-	// for (Feature feature : class_table.getFeatures()) {
-	// for (ClassTableEntry entry : class_table
-	// .getClassesByFeature(feature.getName())) {
-	// List<String> list = new ArrayList<String>();
-	// list.add(project.getSourcePath() + "\\" + feature.getName());
-	// entry.getCompilationUnit().printIntros(list);
-	// String superclass = entry.getAST().superclass().fullName();
-	// System.out.println(entry.getClassName() + " has superclass "
-	// + superclass);
-	// if (class_table.contains(superclass)) {
-	// HashSet<Feature> featureset = new HashSet<Feature>();
-	// featureset.add(feature);
-	//
-	// HashSet<Feature> providing_feature_set = new HashSet<Feature>();
-	//
-	// for (Feature providing_feature : class_table
-	// .getFeaturesByClass(superclass)) {
-	// providing_feature_set.add(providing_feature);
-	// }
-	//
-	// try {
-	// if (TypecheckCorePlugin.checkImpliesDisjunct(
-	// project.getFeatureModel(), featureset,
-	// providing_feature_set)) {
-	// // TODO: error marker
-	// // project.createBuilderMarker(entry.getClassFile(),
-	// // "", 1, 0);
-	// System.out
-	// .println("Class "
-	// + entry.getClassName()
-	// + " in Feature "
-	// + feature.getName()
-	// + " needs Superclass "
-	// + superclass
-	// + " but there is no valid Configuration which can provide it!");
-	// }
-	// } catch (TimeoutException e) {
-	// e.printStackTrace();
-	// }
-	// } else {
-	// // ignore external superclasses for now
-	// }
-	// }
-	// }
+	return providing_features;
     }
 
-    // /*
-    // * (non-Javadoc)
-    // *
-    // * @see
-    // * de.ovgu.featureide.core.typecheck.check.ICheckPlugin#invokeNodeParse(
-    // * AST.ASTNode)
-    // */
-    // @Override
-    // public void invokeNodeParse(Feature feature, ASTNode node) {
-    // if (node instanceof ClassDecl) {
-    // ClassDecl cd = (ClassDecl) node;
-    // System.out.println("found classdecl for class: " + cd.name());
-    // System.out.println(cd.compilationUnit().pathName());
-    // }
-    // }
+    private String getSuperclassName(ClassDecl cd) {
+	// TODO: improve matching?
+	String superclass = cd.toString().split(" extends ")[1];
+	superclass = superclass.substring(0, superclass.indexOf(" "));
+
+	return superclass;
+    }
 }

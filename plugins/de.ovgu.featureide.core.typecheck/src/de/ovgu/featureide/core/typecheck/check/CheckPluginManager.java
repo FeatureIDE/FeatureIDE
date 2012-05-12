@@ -32,31 +32,29 @@ import de.ovgu.featureide.core.typecheck.parser.ClassTable;
 import de.ovgu.featureide.fm.core.Feature;
 
 /**
- * TODO description
+ * Manages the check plug-ins
  * 
- * @author Sï¿½nke Holthusen
+ * Provides methods for the execution of checks and node iterating
+ * 
+ * @author Sönke Holthusen
  */
 public class CheckPluginManager extends Observable {
-    private ArrayList<ICheckPlugin> _plugins;
+    private ArrayList<ICheckPlugin> _plugins =  new ArrayList<ICheckPlugin>();
     private Map<Class, List<ICheckPlugin>> node_parse_plugins = new HashMap<Class, List<ICheckPlugin>>();
 
-    public CheckPluginManager() {
-	_plugins = new ArrayList<ICheckPlugin>();
-    }
 
+    /**
+     * @author Sönke Holthusen
+     * 
+     * 
+     * 
+     * @param plugins the plug-ins to be registered for checks
+     */
     public CheckPluginManager(ICheckPlugin... plugins) {
-	this();
-
-	for (ICheckPlugin plugin : plugins) {
-	    add(plugin);
-	}
+	addCheck(plugins);
     }
 
-    public void addCheck(ICheckPlugin plugin) {
-	add(plugin);
-    }
-
-    public void addCheck(ICheckPlugin... plugins) {
+    private void addCheck(ICheckPlugin... plugins) {
 	for (ICheckPlugin plugin : plugins) {
 	    add(plugin);
 	}
@@ -67,32 +65,49 @@ public class CheckPluginManager extends Observable {
 	_plugins.add(plugin);
     }
 
+    
+    /**
+     * @author Sönke Holthusen
+     * 
+     * Invokes a check in every registered plug-in
+     * 
+     * @param project
+     * @param class_table
+     */
     public void invokeChecks(IFeatureProject project, ClassTable class_table) {
 	for (ICheckPlugin plugin : _plugins) {
 	    plugin.invokeCheck(project, class_table);
 	}
     }
 
+    /**
+     * @author Sönke Holthusen
+     * 
+     * Registers a check plug-in for a specific ASTNode 
+     * 
+     * @param node The node type the plug-in registers for 
+     * @param plugin the plug-in itself
+     */
     public void registerForNodeParse(Class node, ICheckPlugin plugin) {
+	if(!node_parse_plugins.containsValue(node)){
+	    node_parse_plugins.put(node, new ArrayList<ICheckPlugin>());
+	}	
 	List<ICheckPlugin> list = node_parse_plugins.get(node);
-	if (list == null) {
-	    list = new ArrayList<ICheckPlugin>();
-	    node_parse_plugins.put(node, list);
-	}
 	list.add(plugin);
     }
 
+    /**
+     * @author Sönke Holthusen
+     * 
+     * Delivers an ASTNode to the registered plug-ins
+     * 
+     * @param feature the feature the node is associated with
+     * @param node the node to 
+     */
     public void invokeNodeParse(Feature feature, ASTNode node) {
 	List<ICheckPlugin> list = node_parse_plugins.get(node.getClass());
-	if (list == null) {
-	    // System.out.println("PluginManager: nobody interested in: " +
-	    // node_name);
-	    return;
-	} else {
-//	    System.out.println("CheckPluginManager: found plugins for: "
-//		    + node.getClass().getName());
+	if (list != null) {
 	    for (ICheckPlugin plugin : list) {
-//		System.out.println(plugin.getName());
 		plugin.invokeNodeParse(feature, node);
 	    }
 	}

@@ -67,25 +67,16 @@ public abstract class AbstractCheckPlugin implements ICheckPlugin {
 
     @Override
     public void invokeNodeParse(Feature feature, ASTNode node) {
-//	System.out.println("Adding Node " + node.getClass().getName()
-//		+ " to Feature " + feature.getName());
-	
-	if(!nodes.containsKey(feature)){
+	if (!nodes.containsKey(feature)) {
 	    nodes.put(feature, new HashMap<Class, List<ASTNode>>());
 	}
-	
+
 	Map<Class, List<ASTNode>> map = nodes.get(feature);
-
-//	System.out.println("Map has " + map.size() + " elements");
-
 	if (!map.containsKey(node.getClass())) {
 	    map.put(node.getClass(), new ArrayList<ASTNode>());
 	}
 
 	map.get(node.getClass()).add(node);
-
-//	System.out.println("List has " + map.get(node.getClass()).size() + " elements");
-
 	features.add(feature);
     }
 
@@ -97,17 +88,19 @@ public abstract class AbstractCheckPlugin implements ICheckPlugin {
 	Map<Feature, List<T>> feature_node_map = new HashMap<Feature, List<T>>();
 	for (Feature f : nodes.keySet()) {
 	    Map<Class, List<ASTNode>> class_node_map = getNodes(f);
-	    List<ASTNode> nodes = class_node_map.get(c);
+	    if (class_node_map.containsKey(c)) {
+		List<ASTNode> nodes = class_node_map.get(c);
 
-	    List<T> new_node_list = new ArrayList<T>();
+		List<T> new_node_list = new ArrayList<T>();
 
-	    for (ASTNode n : nodes) {
-		if (c.isInstance(n)) {
-		    new_node_list.add(c.cast(n));
+		for (ASTNode n : nodes) {
+		    if (c.isInstance(n)) {
+			new_node_list.add(c.cast(n));
+		    }
 		}
-	    }
 
-	    feature_node_map.put(f, new_node_list);
+		feature_node_map.put(f, new_node_list);
+	    }
 	}
 
 	return feature_node_map;

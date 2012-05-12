@@ -28,6 +28,7 @@ import AST.CompilationUnit;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.typecheck.check.CheckPluginManager;
+import de.ovgu.featureide.core.typecheck.check.MethodCheck;
 import de.ovgu.featureide.core.typecheck.check.SuperClassCheck;
 import de.ovgu.featureide.core.typecheck.parser.CUParser;
 import de.ovgu.featureide.core.typecheck.parser.CUTable;
@@ -55,11 +56,11 @@ public class TypeChecker
 	{
 		_project = project;
 		_parser = new Parser(_project);
-		_checks = new CheckPluginManager();
+		_checks = new CheckPluginManager(new SuperClassCheck(), new MethodCheck());
 		
 		cuparser = new CUParser(_checks);
 
-		_checks.addCheck(new SuperClassCheck());
+		//_checks.addCheck(new SuperClassCheck());
 	}
 
 	public void run()
