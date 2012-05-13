@@ -95,7 +95,7 @@ public class FeatureModelTextEditorPage extends TextEditor implements
 				featureModelEditor.fmFile.createModelMarker(warning.message,
 						IMarker.SEVERITY_WARNING, warning.line);
 			try {
-				if (!featureModelEditor.featureModel.isValid())
+				if (!featureModelEditor.featureModel.getAnalyser().isValid())
 					featureModelEditor.fmFile.createModelMarker(
 							"The feature model is void, i.e., it contains no products",
 							IMarker.SEVERITY_ERROR, 0);

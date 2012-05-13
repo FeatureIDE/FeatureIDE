@@ -318,7 +318,7 @@ public class ViewContentProvider implements IStructuredContentProvider,
 				@Override
 				public void initChildren() {
 					try {
-						addChild(MODEL_VOID + model.isValid());
+						addChild(MODEL_VOID + model.getAnalyser().isValid());
 					} catch (TimeoutException e) {
 						addChild(MODEL_TIMEOUT);
 					}
@@ -341,10 +341,10 @@ public class ViewContentProvider implements IStructuredContentProvider,
 			try {
 				if (children[INDEX_VALID] instanceof SelectableFeature) {
 					((SelectableFeature) children[INDEX_VALID]).setName(MODEL_VOID
-							+ model.isValid());
+							+ model.getAnalyser().isValid());
 				} else {
 					((TreeObject) children[INDEX_VALID]).setName(MODEL_VOID
-							+ model.isValid());
+							+ model.getAnalyser().isValid());
 				}
 			} catch (TimeoutException e) {
 				if (children[INDEX_VALID] instanceof SelectableFeature) {

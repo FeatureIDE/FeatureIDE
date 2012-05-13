@@ -70,14 +70,14 @@ public class Constraint implements PropertyConstants {
 			if (this != null) {
 				clonedModel.removePropositionalNode(this);
 			}
-			deadFeaturesBefore = clonedModel.getAnalysis().getDeadFeatures();
+			deadFeaturesBefore = clonedModel.getAnalyser().getDeadFeatures();
 			clonedModel.addPropositionalNode(propNode);
 			clonedModel.handleModelDataChanged();
 		}
 
 		List<Feature> deadFeaturesAfter = new ArrayList<Feature>();
 
-		for (Feature l : clonedModel.getAnalysis().getDeadFeatures()) {
+		for (Feature l : clonedModel.getAnalyser().getDeadFeatures()) {
 			if (!deadFeaturesBefore.contains(l)) {
 				deadFeaturesAfter.add(l);
 

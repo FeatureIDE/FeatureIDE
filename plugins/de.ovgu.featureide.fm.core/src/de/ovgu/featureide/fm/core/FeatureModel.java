@@ -22,7 +22,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -40,11 +39,8 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.QualifiedName;
-import org.prop4j.And;
-import org.prop4j.Implies;
 import org.prop4j.Literal;
 import org.prop4j.Node;
-import org.prop4j.Not;
 import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
@@ -458,7 +454,7 @@ public class FeatureModel implements PropertyConstants {
 			listener.propertyChange(event);
 	}
 
-	private boolean valid = true;
+	protected boolean valid = true;
 
 	/**
 	 * Returns the value calculated during the last call of
@@ -469,197 +465,18 @@ public class FeatureModel implements PropertyConstants {
 	public boolean valid() {
 		return valid;
 	}
-/**
- * 
- * @return Hashmap: key entry is Feature/Constraint, value usually indicating the kind of attribute
- * 
- * 	if Feature 
- */
+	
+        /**
+         * 
+         * @return Hashmap: key entry is Feature/Constraint, value usually indicating the kind of attribute
+         * 
+         * 	if Feature 
+         * 
+         * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyser#analyzeFeatureModel()} instead. 
+         */
+	@Deprecated
 	public HashMap<Object, Object> analyzeFeatureModel() {
-
-		HashMap<Object, Object> oldAttributes = new HashMap<Object, Object>();
-
-		HashMap<Object, Object> changedAttributes = new HashMap<Object, Object>();
-		updateFeatures(oldAttributes, changedAttributes);
-		updateConstraints(oldAttributes, changedAttributes);
-		// put root always in so it will be refreshed (void/non-void)
-		changedAttributes.put(root, ConstraintAttribute.VOID_MODEL);
-
-		return changedAttributes;
-	}
-
-	/**
-	 * @param oldAttributes
-	 * @param changedAttributes
-	 */
-	private void updateConstraints(HashMap<Object, Object> oldAttributes,
-			HashMap<Object, Object> changedAttributes) {
-		// update constraints
-		try {
-			for (Constraint constraint : getConstraints()) {
-				oldAttributes.put(constraint, constraint.getConstraintAttribute());
-				constraint.setContainedFeatures(constraint.getNode());
-				//if the constraint leads to false optionals it is added to changedAttributes in order to refresh graphics later
-				
-				if(constraint.setFalseOptionalFeatures())
-				changedAttributes.put(constraint,ConstraintAttribute.UNSATISFIABLE);
-				constraint.setConstraintAttribute(ConstraintAttribute.NORMAL,
-						false);
-				// tautology
-				SatSolver satsolverTAU = new SatSolver(new Not(constraint
-						.getNode().clone()), 1000);
-				try {
-					if (!satsolverTAU.isSatisfiable()) {
-						if (oldAttributes.get(constraint) != ConstraintAttribute.TAUTOLOGY) {
-							changedAttributes.put(constraint,
-									ConstraintAttribute.TAUTOLOGY);
-						}
-						constraint.setConstraintAttribute(
-								ConstraintAttribute.TAUTOLOGY, false);
-					}
-				} catch (TimeoutException e) {
-					FMCorePlugin.getDefault().logError(e);
-				}
-			
-				if (valid) {
-					//TODO temporarily removed for performance reasons
-					
-//					// redundant constraint?
-//					
-//					FeatureModel dirtyModel = this.clone();
-//					dirtyModel.removePropositionalNode(constraint.getNode());
-//					ModelComparator comparator = new ModelComparator(500);
-//					Comparison comparison = comparator
-//							.compare(this, dirtyModel);
-//					if (comparison == Comparison.REFACTORING) {
-//						if (oldAttributes.get(constraint) != ConstraintAttribute.REDUNDANT) {
-//							changedAttributes.put(constraint,
-//									ConstraintAttribute.REDUNDANT);
-//
-//						}
-//						constraint.setConstraintAttribute(
-//								ConstraintAttribute.REDUNDANT, false);
-//					}
-				}
-				// makes feature model void?
-				else {
-					// inconsistency?
-					FeatureModel clonedModel = this.clone();
-					clonedModel.removePropositionalNode(constraint);
-					try {
-						if (clonedModel.isValid()) {
-							if (oldAttributes.get(constraint) != ConstraintAttribute.VOID_MODEL) {
-								changedAttributes.put(constraint,
-										ConstraintAttribute.VOID_MODEL);
-							}
-							constraint.setConstraintAttribute(
-									ConstraintAttribute.VOID_MODEL, false);
-						}
-					} catch (TimeoutException e) {
-						FMCorePlugin.getDefault().logError(e);
-					}
-					// contradiction?
-					SatSolver satsolverUS = new SatSolver(constraint.getNode()
-							.clone(), 1000);
-					try {
-						if (!satsolverUS.isSatisfiable()) {
-							if (oldAttributes.get(constraint) != ConstraintAttribute.UNSATISFIABLE) {
-								changedAttributes.put(constraint,
-										ConstraintAttribute.UNSATISFIABLE);
-
-							}
-							constraint.setConstraintAttribute(
-									ConstraintAttribute.UNSATISFIABLE, false);
-						}
-					} catch (TimeoutException e) {
-						FMCorePlugin.getDefault().logError(e);
-					}
-				
-				}
-			}
-		} catch (ConcurrentModificationException e) {
-			// TODO: find cause for that exception
-			// it does not seem to have any negative effect but should be
-			// avoided
-		}
-
-		
-	}
-
-	/**
-	 * @param oldAttributes
-	 * @param changedAttributes
-	 */
-	private void updateFeatures(HashMap<Object, Object> oldAttributes,
-			HashMap<Object, Object> changedAttributes) {
-		for (Feature bone : getFeatures()) {
-			oldAttributes.put(bone, bone.getFeatureStatus());
-			if(bone.getFeatureStatus()!=FeatureStatus.NORMAL)changedAttributes.put(bone,FeatureStatus.FALSE_OPTIONAL);
-			bone.setFeatureStatus(FeatureStatus.NORMAL, false);
-			bone.setRelevantConstraints();
-		}
-
-		try {
-			valid = isValid();
-		} catch (TimeoutException e) {
-			valid = true;
-			FMCorePlugin.getDefault().logError(e);
-		}
-
-		try {
-			for (Feature deadFeature : getDeadFeatures()) {
-				if (deadFeature != null) {
-					if (oldAttributes.get(deadFeature) != FeatureStatus.DEAD) {
-						changedAttributes.put(deadFeature, FeatureStatus.DEAD);
-					}
-					deadFeature.setFeatureStatus(FeatureStatus.DEAD, false);
-
-				}
-			}
-		} catch (Exception e) {
-			FMCorePlugin.getDefault().logError(e);
-		}
-
-		try {
-			if (valid) {
-				getFalseOptionalFeature(oldAttributes, changedAttributes);
-			}
-		} catch (Exception e) {
-			FMCorePlugin.getDefault().logError(e);
-		}
-	}
-
-	/**
-	 * @param oldAttributes
-	 * @param changedAttributes
-	 */
-	private void getFalseOptionalFeature(HashMap<Object, Object> oldAttributes,
-			HashMap<Object, Object> changedAttributes) {
-		// TODO Thomas: improve calculation effort and
-		// correct calculation (is this feature always selected given
-		// that the parent feature is selected)
-		for (Feature bone : getFeatures()) {
-			
-			try {
-				if (!bone.isMandatory() && !bone.isRoot()){
-					// -((parent and fm)=>bone)
-					SatSolver satsolver = new SatSolver(new Not(new Implies(new And(new Literal(bone.getParent().getName()),
-							NodeCreator.createNodes(this.clone())), new Literal(
-									bone.getName()))), 1000);
-					if(!satsolver.isSatisfiable()) {
-					if (oldAttributes.get(bone) != FeatureStatus.FALSE_OPTIONAL) {
-						changedAttributes.put(bone,
-								FeatureStatus.FALSE_OPTIONAL);
-					}
-					bone.setFeatureStatus(FeatureStatus.FALSE_OPTIONAL,
-							false);
-				}
-			} }catch (TimeoutException e) {
-				FMCorePlugin.getDefault().logError(e);
-			}
-			
-		}
-
+	    return getAnalyser().analyzeFeatureModel();
 	}
 
 	public Collection<Feature> getFeatures() {
@@ -811,9 +628,9 @@ public class FeatureModel implements PropertyConstants {
 	}
 
 	/**
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalysis#isValid()} instead.
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyser#isValid()} instead.
 	 */
-	
+	@Deprecated
 	public boolean isValid() throws TimeoutException {
 		Node root = NodeCreator.createNodes(this.clone());
 		return new SatSolver(root, 1000).isSatisfiable();
@@ -835,12 +652,12 @@ public class FeatureModel implements PropertyConstants {
 	 * @return
 	 * @throws TimeoutException
 	 * 
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalysis#checkImplies(Set, Set)} instead.
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyser#checkImplies(Set, Set)} instead.
 	 */
 	@Deprecated
 	public boolean checkImplies(Set<Feature> a, Set<Feature> b)
 			throws TimeoutException {
-	    	return analysis.checkImplies(a, b);
+	    	return analyser.checkImplies(a, b);
 	}
 
 	/**
@@ -850,12 +667,12 @@ public class FeatureModel implements PropertyConstants {
 	 * @return
 	 * @throws TimeoutException
 	 * 
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalysis#checkCondition(Node)} instead.
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyser#checkCondition(Node)} instead.
 	 */
 	@Deprecated
 	public boolean checkCondition(Node condition) {
 
-	    	return analysis.checkCondition(condition);
+	    	return analyser.checkCondition(condition);
 	}
 
 	/**
@@ -885,12 +702,12 @@ public class FeatureModel implements PropertyConstants {
 	 *         otherwise
 	 * @throws TimeoutException
 	 * 
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalysis#areMutualExclusive(Set, List)} instead.
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyser#areMutualExclusive(Set, List)} instead.
 	 */
 	@Deprecated
 	public boolean areMutualExclusive(Set<Feature> context,
 			List<Set<Feature>> featureSets) throws TimeoutException {
-	    	return analysis.areMutualExclusive(context, featureSets);
+	    	return analyser.areMutualExclusive(context, featureSets);
 	}
 
 	/**
@@ -914,12 +731,12 @@ public class FeatureModel implements PropertyConstants {
 	 *         code-fragment may be missing || false, otherwise
 	 * @throws TimeoutException
 	 * 
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalysis#mayBeMissing(Set, List)} instead.
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyser#mayBeMissing(Set, List)} instead.
 	 */
 	@Deprecated
 	public boolean mayBeMissing(Set<Feature> context,
 			List<Set<Feature>> featureSets) throws TimeoutException {
-		return analysis.mayBeMissing(context, featureSets);
+		return analyser.mayBeMissing(context, featureSets);
 	}
 
 	/**
@@ -934,11 +751,11 @@ public class FeatureModel implements PropertyConstants {
 	 * @return true if there exists such a set of features || false, otherwise
 	 * @throws TimeoutException
 	 * 
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalysis#exists(Set)} instead.
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyser#exists(Set)} instead.
 	 */
 	@Deprecated
 	public boolean exists(Set<Feature> features) throws TimeoutException {
-	    	return analysis.exists(features);
+	    	return analyser.exists(features);
 	}
 	
 	
@@ -947,11 +764,11 @@ public class FeatureModel implements PropertyConstants {
 	 * @param b
 	 * @return
 	 * 
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalysis#conjunct(Set)} instead.
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyser#conjunct(Set)} instead.
 	 */
 	@Deprecated
 	public Node conjunct(Set<Feature> b) {
-	    	return analysis.conjunct(b);
+	    	return analyser.conjunct(b);
 	}
 
 	public int countConcreteFeatures() {
@@ -992,20 +809,20 @@ public class FeatureModel implements PropertyConstants {
 	 *            a list of feature names for which
 	 * @return a list of features that is common to all variants
 	 * 
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalysis#commonFeatures(long, Object...)} instead.
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyser#commonFeatures(long, Object...)} instead.
 	 */
 	@Deprecated
 	public LinkedList<String> commonFeatures(long timeout,
 			Object... selectedFeatures) {
-	    	return analysis.commonFeatures(timeout, selectedFeatures);
+	    	return analyser.commonFeatures(timeout, selectedFeatures);
 	}
 
 	/**
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalysis#getDeadFeatures()} instead.
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyser#getDeadFeatures()} instead.
 	 */
 	@Deprecated
 	public LinkedList<Feature> getDeadFeatures() {
-	    	return analysis.getDeadFeatures();
+	    	return analyser.getDeadFeatures();
 	}
 
 	/**
@@ -1337,10 +1154,10 @@ public class FeatureModel implements PropertyConstants {
 		this.featureOrderInXML = featureOrderInXML;
 	}
 	
-	private FeatureModelAnalysis analysis = new FeatureModelAnalysis(this);
+	private FeatureModelAnalyser analyser = new FeatureModelAnalyser(this);
 	
-	public FeatureModelAnalysis getAnalysis(){
-	    return analysis;
+	public FeatureModelAnalyser getAnalyser(){
+	    return analyser;
 	}
 
 }

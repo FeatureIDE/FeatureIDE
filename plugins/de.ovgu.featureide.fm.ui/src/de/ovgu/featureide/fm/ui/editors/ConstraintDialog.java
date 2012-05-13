@@ -609,7 +609,7 @@ public class ConstraintDialog implements GUIDefaults {
 	public boolean voidsModel(String input, FeatureModel model)
 			throws TimeoutException {
 
-		if (!model.isValid()) {
+		if (!model.getAnalyser().isValid()) {
 
 			return false;
 		}
@@ -631,7 +631,7 @@ public class ConstraintDialog implements GUIDefaults {
 			clonedModel.handleModelDataChanged();
 		}
 
-		return (!clonedModel.isValid());
+		return (!clonedModel.getAnalyser().isValid());
 
 	}
 
@@ -660,7 +660,7 @@ public class ConstraintDialog implements GUIDefaults {
 			if (constraint != null) {
 				clonedModel.removePropositionalNode(constraint);
 			}
-			deadFeaturesBefore = clonedModel.getDeadFeatures();
+			deadFeaturesBefore = clonedModel.getAnalyser().getDeadFeatures();
 			System.out.println("before: "+deadFeaturesBefore);
 			clonedModel.addPropositionalNode(propNode);
 			clonedModel.handleModelDataChanged();
@@ -668,7 +668,7 @@ public class ConstraintDialog implements GUIDefaults {
 
 		List<Feature> deadFeaturesAfter = new ArrayList<Feature>();
 		System.out.println("after: "+deadFeaturesAfter);
-		for (Feature l : clonedModel.getDeadFeatures()) {
+		for (Feature l : clonedModel.getAnalyser().getDeadFeatures()) {
 			System.out.println("for "+l);
 			if (!deadFeaturesBefore.contains(l)) {
 				deadFeaturesAfter.add(l);
@@ -693,7 +693,7 @@ public class ConstraintDialog implements GUIDefaults {
 			if (input.contains(feature.getName())){
 				if (feature.getFeatureStatus() != FeatureStatus.FALSE_OPTIONAL){
 					clonedModel.addPropositionalNode(propNode);
-					clonedModel.analyzeFeatureModel();
+					clonedModel.getAnalyser().analyzeFeatureModel();
 					if (clonedModel.getFeature(feature.getName())
 							.getFeatureStatus() == FeatureStatus.FALSE_OPTIONAL && !list.contains(feature)) 
 								list.add(feature);
@@ -736,7 +736,7 @@ public class ConstraintDialog implements GUIDefaults {
 			return false;
 		}
 		try {
-			if (featureModel.isValid() && voidsModel(con, featureModel)) {
+			if (featureModel.getAnalyser().isValid() && voidsModel(con, featureModel)) {
 
 				printHeaderWarning("constraint makes model void");
 				return false;
@@ -759,7 +759,7 @@ public class ConstraintDialog implements GUIDefaults {
 		}		
 
 		try {
-			if (featureModel.isValid() && redundant(con)) {
+			if (featureModel.getAnalyser().isValid() && redundant(con)) {
 				printHeaderWarning("The constraint does not change the product line.");
 				return true;
 			}

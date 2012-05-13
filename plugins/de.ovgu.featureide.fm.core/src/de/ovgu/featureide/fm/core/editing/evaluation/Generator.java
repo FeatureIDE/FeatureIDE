@@ -86,7 +86,7 @@ public abstract class Generator {
 	public static void generateConstraints(FeatureModel fm, Random random, int numberOfConstraints) {
 		boolean valid = true;
 		try {
-			valid = fm.isValid();
+			valid = fm.getAnalyser().isValid();
 			if (!valid)
 				FMCorePlugin.getDefault().logInfo("Feature model not valid!");
 		} catch (TimeoutException e) {
@@ -114,7 +114,7 @@ public abstract class Generator {
 			}
 			fm.addPropositionalNode(node);
 			try {
-				if (!valid || fm.isValid()) {
+				if (!valid || fm.getAnalyser().isValid()) {
 					i++;
 					System.out.println("E\t" + i + "\t" + node);
 				}
@@ -304,7 +304,7 @@ public abstract class Generator {
 	public static FeatureModel arbitraryEdits(FeatureModel originalFM, long id, int numberOfEdits) {
 		boolean valid = false;
 		try {
-			valid = originalFM.isValid();
+			valid = originalFM.getAnalyser().isValid();
 		} catch (TimeoutException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
@@ -400,7 +400,7 @@ public abstract class Generator {
 			}
 			
 			try {
-				if (valid && !fm.isValid()) {
+				if (valid && !fm.getAnalyser().isValid()) {
 					System.out.println("Void feature model by arbitrary edit	" + r);
 					fm = backup;
 					i--;

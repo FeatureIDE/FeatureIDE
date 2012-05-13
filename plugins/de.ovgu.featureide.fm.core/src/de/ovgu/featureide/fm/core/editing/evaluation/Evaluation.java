@@ -210,7 +210,7 @@ public class Evaluation {
 						//IFeatureModelReader reader = new XmlFeatureModelReader(fmout,project);
 						FeatureModelReaderIFileWrapper reader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fmout));
 						reader.readFromFile(file);
-						valid = fmout.isValid();
+						valid = fmout.getAnalyser().isValid();
 					} catch (Exception e) {
 						FMCorePlugin.getDefault().logError(e);
 					}
@@ -241,7 +241,7 @@ public class Evaluation {
 					String output = null;
 					try {
 						reader.readFromFile(file);
-						valid = fm.isValid();
+						valid = fm.getAnalyser().isValid();
 						output = "" + valid;
 					} catch (Exception e) {
 						FMCorePlugin.getDefault().logError(e);
@@ -256,7 +256,7 @@ public class Evaluation {
 						//generate a new one
 						fm = Generator.generateFeatureModel(id, size);
 						try {
-							System.out.println(fm.isValid());
+							System.out.println(fm.getAnalyser().isValid());
 						} catch (TimeoutException e) {
 							FMCorePlugin.getDefault().logError(e);
 						}

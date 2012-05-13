@@ -408,7 +408,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 			protected IStatus run(IProgressMonitor monitor) {
 
 				final HashMap<Object, Object> changedAttributes = getFeatureModel()
-						.analyzeFeatureModel();
+						.getAnalyser().analyzeFeatureModel();
 
 				UIJob refreshGraphics = new UIJob(
 						"Updating feature model attributes") {

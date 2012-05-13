@@ -19,6 +19,8 @@
 package de.ovgu.featureide.fm.core;
 
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -41,20 +43,20 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
  * 
  * @author Sönke Holthusen
  */
-public class FeatureModelAnalysis {
+public class FeatureModelAnalyser {
     private FeatureModel fm;
 
     /**
      * 
      */
-    protected FeatureModelAnalysis(FeatureModel fm) {
+    protected FeatureModelAnalyser(FeatureModel fm) {
 	this.fm = fm;
     }
 
-    public FeatureDependencies getDependencies(){
+    public FeatureDependencies getDependencies() {
 	return new FeatureDependencies(fm);
     }
-    
+
     public boolean isValid() throws TimeoutException {
 	Node root = NodeCreator.createNodes(fm.clone());
 	return new SatSolver(root, 1000).isSatisfiable();
@@ -294,5 +296,202 @@ public class FeatureModelAnalysis {
 		    && !e.var.toString().equals("True"))
 		set.add(fm.getFeature(e.var.toString()));
 	return set;
+    }
+
+    /**
+     * 
+     * @return Hashmap: key entry is Feature/Constraint, value usually
+     *         indicating the kind of attribute
+     * 
+     *         if Feature
+     */
+    public HashMap<Object, Object> analyzeFeatureModel() {
+
+	HashMap<Object, Object> oldAttributes = new HashMap<Object, Object>();
+
+	HashMap<Object, Object> changedAttributes = new HashMap<Object, Object>();
+	updateFeatures(oldAttributes, changedAttributes);
+	updateConstraints(oldAttributes, changedAttributes);
+	// put root always in so it will be refreshed (void/non-void)
+	changedAttributes.put(fm.getRoot(), ConstraintAttribute.VOID_MODEL);
+
+	return changedAttributes;
+    }
+
+    /**
+     * @param oldAttributes
+     * @param changedAttributes
+     */
+    private void updateConstraints(HashMap<Object, Object> oldAttributes,
+	    HashMap<Object, Object> changedAttributes) {
+	// update constraints
+	try {
+	    for (Constraint constraint : fm.getConstraints()) {
+		oldAttributes.put(constraint,
+			constraint.getConstraintAttribute());
+		constraint.setContainedFeatures(constraint.getNode());
+		// if the constraint leads to false optionals it is added to
+		// changedAttributes in order to refresh graphics later
+
+		if (constraint.setFalseOptionalFeatures())
+		    changedAttributes.put(constraint,
+			    ConstraintAttribute.UNSATISFIABLE);
+		constraint.setConstraintAttribute(ConstraintAttribute.NORMAL,
+			false);
+		// tautology
+		SatSolver satsolverTAU = new SatSolver(new Not(constraint
+			.getNode().clone()), 1000);
+		try {
+		    if (!satsolverTAU.isSatisfiable()) {
+			if (oldAttributes.get(constraint) != ConstraintAttribute.TAUTOLOGY) {
+			    changedAttributes.put(constraint,
+				    ConstraintAttribute.TAUTOLOGY);
+			}
+			constraint.setConstraintAttribute(
+				ConstraintAttribute.TAUTOLOGY, false);
+		    }
+		} catch (TimeoutException e) {
+		    FMCorePlugin.getDefault().logError(e);
+		}
+
+		if (fm.valid) {
+		    // TODO temporarily removed for performance reasons
+
+		    // // redundant constraint?
+		    //
+		    // FeatureModel dirtyModel = this.clone();
+		    // dirtyModel.removePropositionalNode(constraint.getNode());
+		    // ModelComparator comparator = new ModelComparator(500);
+		    // Comparison comparison = comparator
+		    // .compare(this, dirtyModel);
+		    // if (comparison == Comparison.REFACTORING) {
+		    // if (oldAttributes.get(constraint) !=
+		    // ConstraintAttribute.REDUNDANT) {
+		    // changedAttributes.put(constraint,
+		    // ConstraintAttribute.REDUNDANT);
+		    //
+		    // }
+		    // constraint.setConstraintAttribute(
+		    // ConstraintAttribute.REDUNDANT, false);
+		    // }
+		}
+		// makes feature model void?
+		else {
+		    // inconsistency?
+		    FeatureModel clonedModel = fm.clone();
+		    clonedModel.removePropositionalNode(constraint);
+		    try {
+			if (clonedModel.getAnalyser().isValid()) {
+			    if (oldAttributes.get(constraint) != ConstraintAttribute.VOID_MODEL) {
+				changedAttributes.put(constraint,
+					ConstraintAttribute.VOID_MODEL);
+			    }
+			    constraint.setConstraintAttribute(
+				    ConstraintAttribute.VOID_MODEL, false);
+			}
+		    } catch (TimeoutException e) {
+			FMCorePlugin.getDefault().logError(e);
+		    }
+		    // contradiction?
+		    SatSolver satsolverUS = new SatSolver(constraint.getNode()
+			    .clone(), 1000);
+		    try {
+			if (!satsolverUS.isSatisfiable()) {
+			    if (oldAttributes.get(constraint) != ConstraintAttribute.UNSATISFIABLE) {
+				changedAttributes.put(constraint,
+					ConstraintAttribute.UNSATISFIABLE);
+
+			    }
+			    constraint.setConstraintAttribute(
+				    ConstraintAttribute.UNSATISFIABLE, false);
+			}
+		    } catch (TimeoutException e) {
+			FMCorePlugin.getDefault().logError(e);
+		    }
+
+		}
+	    }
+	} catch (ConcurrentModificationException e) {
+	    // TODO: find cause for that exception
+	    // it does not seem to have any negative effect but should be
+	    // avoided
+	}
+
+    }
+
+    /**
+     * @param oldAttributes
+     * @param changedAttributes
+     */
+    private void updateFeatures(HashMap<Object, Object> oldAttributes,
+	    HashMap<Object, Object> changedAttributes) {
+	for (Feature bone : fm.getFeatures()) {
+	    oldAttributes.put(bone, bone.getFeatureStatus());
+	    if (bone.getFeatureStatus() != FeatureStatus.NORMAL)
+		changedAttributes.put(bone, FeatureStatus.FALSE_OPTIONAL);
+	    bone.setFeatureStatus(FeatureStatus.NORMAL, false);
+	    bone.setRelevantConstraints();
+	}
+
+	try {
+	    fm.valid = isValid();
+	} catch (TimeoutException e) {
+	    fm.valid = true;
+	    FMCorePlugin.getDefault().logError(e);
+	}
+
+	try {
+	    for (Feature deadFeature : getDeadFeatures()) {
+		if (deadFeature != null) {
+		    if (oldAttributes.get(deadFeature) != FeatureStatus.DEAD) {
+			changedAttributes.put(deadFeature, FeatureStatus.DEAD);
+		    }
+		    deadFeature.setFeatureStatus(FeatureStatus.DEAD, false);
+
+		}
+	    }
+	} catch (Exception e) {
+	    FMCorePlugin.getDefault().logError(e);
+	}
+
+	try {
+	    if (fm.valid) {
+		getFalseOptionalFeature(oldAttributes, changedAttributes);
+	    }
+	} catch (Exception e) {
+	    FMCorePlugin.getDefault().logError(e);
+	}
+    }
+
+    /**
+     * @param oldAttributes
+     * @param changedAttributes
+     */
+    private void getFalseOptionalFeature(HashMap<Object, Object> oldAttributes,
+	    HashMap<Object, Object> changedAttributes) {
+	// TODO Thomas: improve calculation effort and
+	// correct calculation (is this feature always selected given
+	// that the parent feature is selected)
+	for (Feature bone : fm.getFeatures()) {
+	    try {
+		if (!bone.isMandatory() && !bone.isRoot()) {
+		    // -((parent and fm)=>bone)
+		    SatSolver satsolver = new SatSolver(new Not(new Implies(
+			    new And(new Literal(bone.getParent().getName()),
+				    NodeCreator.createNodes(fm.clone())),
+			    new Literal(bone.getName()))), 1000);
+		    if (!satsolver.isSatisfiable()) {
+			if (oldAttributes.get(bone) != FeatureStatus.FALSE_OPTIONAL) {
+			    changedAttributes.put(bone,
+				    FeatureStatus.FALSE_OPTIONAL);
+			}
+			bone.setFeatureStatus(FeatureStatus.FALSE_OPTIONAL,
+				false);
+		    }
+		}
+	    } catch (TimeoutException e) {
+		FMCorePlugin.getDefault().logError(e);
+	    }
+	}
     }
 }
