@@ -20,8 +20,10 @@
 
 import java.util.LinkedList;
 
+import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 
+import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
@@ -81,25 +83,29 @@ public class VerticalLayout extends FeatureDiagramLayoutManager {
 	 * creates lists of features for every level
 	 */
 	private void createLevelList(LayoutableFeature feature, int level){
-		if (feature.getFeature() == null)
+		Feature f = feature.getFeature();
+		if (f == null) {
 			return;
+		}
+		Dimension size = FeatureUIHelper.getSize(f);
+		
 		if(level > highestLevel){
 			highestLevel = level;
 		}
 		if(levelList.size()-1 >= level){
 			levelList.get(level).add(feature);
-			if(maxFeatureWidthOnLevel.get(level) < FeatureUIHelper.getSize(feature.getFeature()).width){
-				maxFeatureWidthOnLevel.set(level, FeatureUIHelper.getSize(feature.getFeature()).width);
+			if(maxFeatureWidthOnLevel.get(level) < size.width){
+				maxFeatureWidthOnLevel.set(level, size.width);
 			}
 		} else {
 			LinkedList<LayoutableFeature> subLevelList = new LinkedList<LayoutableFeature>();
 			subLevelList.add(feature);
 			levelList.add(subLevelList);
-			maxFeatureWidthOnLevel.add(FeatureUIHelper.getSize(feature.getFeature()).width);
+			maxFeatureWidthOnLevel.add(size.width);
 		}
 		if(!feature.hasChildren()){
 			positionsY.add(height);
-			height += FeatureUIHelper.getSize(feature.getFeature()).getCopy().height+FMPropertyManager.getFeatureSpaceX();
+			height += size.height+FMPropertyManager.getFeatureSpaceX();
 		}
 		for(LayoutableFeature next : feature.getChildren()){
 			createLevelList(next,level+1);
@@ -129,11 +135,12 @@ public class VerticalLayout extends FeatureDiagramLayoutManager {
 				centerChildren(child, level+1);
 			}
 		} else {
-			FeatureUIHelper.setLocation(feature.getFeature(), new Point (positionsX.get(level),
+			Feature f = feature.getFeature();
+			FeatureUIHelper.setLocation(f, new Point (positionsX.get(level),
 					positionsY.get(childlessNum)));
 			childlessNum++;
-			yOffset = FeatureUIHelper.getLocation(feature.getFeature()).getCopy().y
-					+ FeatureUIHelper.getSize(feature.getFeature()).getCopy().height
+			yOffset = FeatureUIHelper.getLocation(f).y
+					+ FeatureUIHelper.getSize(f).height
 					+ FMPropertyManager.getFeatureSpaceX();
 		}
 		

@@ -169,24 +169,23 @@ public class ComposerWrapper {
 		} else {
 			config = configFile;
 		}
-		if (config == null) {
-			return;
-		}
-		try {
-			reader = new BufferedReader(new FileReader(config
-					.getRawLocation().toFile()));
-			String line = null;
-			while ((line = reader.readLine()) != null) {
-				if (line.startsWith("#"))
-					continue;
-				IFolder f = featureProject.getSourceFolder().getFolder(line);
-				if (f != null) {
-					featureFolders.add(f);
+		if (config != null) {
+			try {
+				reader = new BufferedReader(new FileReader(config
+						.getRawLocation().toFile()));
+				String line = null;
+				while ((line = reader.readLine()) != null) {
+					if (line.startsWith("#"))
+						continue;
+					IFolder f = featureProject.getSourceFolder().getFolder(line);
+					if (f != null) {
+						featureFolders.add(f);
+					}
 				}
-			}
-		} finally {
-			if (reader != null) { 
-				reader.close();
+			} finally {
+				if (reader != null) { 
+					reader.close();
+				}
 			}
 		}
 //		File file = featureProject.getProject().getLocation().toFile();
@@ -203,7 +202,7 @@ public class ComposerWrapper {
 		for (IFolder folder : featureFolders) {
 			allFeatureFolders.add(folder);
 		}
-		if (featureOrderList == null || featureOrderList.size() == 0) {	
+		if (featureOrderList == null || featureOrderList.isEmpty()) {	
 			for (String feature : featureProject.getFeatureModel().getConcreteFeatureNames()) {
 				IFolder folder = featureProject.getSourceFolder().getFolder(feature);
 				if (!allFeatureFolders.contains(folder)) {

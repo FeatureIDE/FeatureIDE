@@ -20,8 +20,8 @@ package de.ovgu.featureide.ui.views.collaboration.model;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
@@ -35,12 +35,12 @@ import org.eclipse.core.runtime.IPath;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtension;
-import de.ovgu.featureide.core.fstmodel.FSTModel;
-import de.ovgu.featureide.core.fstmodel.FSTModelElement;
-import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
+import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
+import de.ovgu.featureide.core.fstmodel.FSTModel;
+import de.ovgu.featureide.core.fstmodel.FSTModelElement;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -57,20 +57,20 @@ import de.ovgu.featureide.ui.UIPlugin;
 public class CollaborationModelBuilder {
 	private CollaborationModel model;
 
-	public List<String> classFilter = new LinkedList<String>();
-	public List<String> featureFilter = new LinkedList<String>();
+	public LinkedHashSet<String> classFilter = new LinkedHashSet<String>();
+	public LinkedHashSet<String> featureFilter = new LinkedHashSet<String>();
 	public boolean showUnselectedFeatures = false;
 	public IFile configuration = null;
 	
-	private List<String> iFeatureNames = new LinkedList<String>();
+	private LinkedHashSet<String> iFeatureNames = new LinkedHashSet<String>();
 	private Collaboration collaboration;
-	private List<String> extensions;
+	private LinkedHashSet<String> extensions;
 	private FSTModel fSTModel;
 	public IFeatureProject project;
 
 	public IFile editorFile;
 
-	private List<String> selectedFeatureNames;
+	private LinkedHashSet<String> selectedFeatureNames;
 
 	private List<String> layerNames;
 
@@ -111,7 +111,7 @@ public class CollaborationModelBuilder {
 		
 		IFolder path = project.getSourceFolder();
 		for (String layerName : layerNames) {
-			if (featureFilter.size() == 0 || featureFilter.contains(layerName)) {
+			if (featureFilter.isEmpty() || featureFilter.contains(layerName)) {
 				if (iFeatureNames.contains(layerName)) {
 					addRoles(layerName, path);
 				} else {
@@ -276,7 +276,7 @@ public class CollaborationModelBuilder {
 					}
 				} else {
 					//case: not selected
-					if (featureFilter.size() == 0 || featureFilter.contains(layerName)) {
+					if (featureFilter.isEmpty() || featureFilter.contains(layerName)) {
 						collaboration = null;
 						IResource[] members = null;
 						IFolder folder = project.getSourceFolder().getFolder(layerName);
@@ -344,7 +344,7 @@ public class CollaborationModelBuilder {
 	 * sets the list: <code>selectedFeatureNames</code>
 	 */
 	private void setSelectedFeatureNames() {
-		selectedFeatureNames = new ArrayList<String>();
+		selectedFeatureNames = new LinkedHashSet<String>();
 		LinkedList<Feature> features = getSelectedFeatures(project);
 		if (features == null) {
 			return;
@@ -363,7 +363,6 @@ public class CollaborationModelBuilder {
 		if (fSTModel == null) {
 			composer.initialize(project);
 			composer.buildFSTModel();
-			// TODO @Jens is this necessary?
 			fSTModel = project.getFSTModel();
 		}
 	}
@@ -389,7 +388,7 @@ public class CollaborationModelBuilder {
 		model.roles.clear();
 		model.collaborations.clear();
 		
-		iFeatureNames = new ArrayList<String>();
+		iFeatureNames.clear();
 	}
 
 	/**
@@ -397,9 +396,13 @@ public class CollaborationModelBuilder {
 	 * @param featureProject
 	 */
 	private void addConfigurationToModel() {
-		// TODO add case: project.getCurrentConfiguration() == null
-		if (configuration == null || configuration.equals(project.getCurrentConfiguration())) {
-			collaboration = new Collaboration(project.getCurrentConfiguration().getName().split("[.]")[0]);
+		IFile config = project.getCurrentConfiguration(); 
+		if (config == null) {
+			collaboration = new Collaboration("No configuration");
+			collaboration.selected = false;
+			collaboration.isConfiguration = true;
+		} else if (configuration == null || configuration.equals(config)) {
+			collaboration = new Collaboration(config.getName().split("[.]")[0]);
 			collaboration.selected = true;
 			collaboration.isConfiguration = true;
 		} else {
@@ -418,7 +421,7 @@ public class CollaborationModelBuilder {
 		if (!(res instanceof IFolder)) {
 			String folderName = res.getName();
 			String fileExtension = folderName.contains(".") ? (folderName.split("[.]"))[1] : " ";
-			if (classFilter.size() == 0 
+			if (classFilter.isEmpty() 
 					|| classFilter.contains("*." + fileExtension)
 					|| classFilter.contains(folderName)) {
 				

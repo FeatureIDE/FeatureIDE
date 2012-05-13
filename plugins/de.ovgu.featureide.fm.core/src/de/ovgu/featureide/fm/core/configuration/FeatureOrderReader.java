@@ -20,45 +20,52 @@ package de.ovgu.featureide.fm.core.configuration;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Scanner;
+
+import org.eclipse.core.resources.IFile;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 
 /**
- * Read the .order file from the project directory. 
- * The constructor need the location of the project as parameter
+ * Read the .order file from the project directory. The constructor need the
+ * location of the project as parameter
  * 
  * @author Christian Becker
  */
 public class FeatureOrderReader {
 
 	private File file;
-	
-	public FeatureOrderReader(File file){
-		
-		this.file = new File(file.toString()+System.getProperty("file.separator")+".order");
+
+	public FeatureOrderReader(File file) {
+		this.file = new File(file.toString() + System.getProperty("file.separator") + ".order");
 	}
+
+	/**
+	 * @param orderFile
+	 */
+	public FeatureOrderReader(IFile orderFile) {
+		file = orderFile.getRawLocation().toFile();
+	}
+
 	/**
 	 * 
-	 * @return Return the  feature order as an ArrayList
+	 * @return Return the feature order
 	 */
-	
-	public ArrayList<String> featureOrderRead(){	
-		ArrayList<String> list = new ArrayList<String>();
+
+	public LinkedList<String> featureOrderRead() {
+		LinkedList<String> list = new LinkedList<String>();
 		try {
 			Scanner scanner = new Scanner(file);
-			while(scanner.hasNext()){
+			while (scanner.hasNext()) {
 				list.add(scanner.next());
 			}
 			scanner.close();
 		} catch (FileNotFoundException e) {
-			FMCorePlugin.getDefault().logInfo("Can not read .order file");		
+			FMCorePlugin.getDefault().logInfo("Can not read .order file");
 		}
-		
-		
+
 		return list;
 	}
-	
-	
+
 }

@@ -10,8 +10,6 @@ import org.junit.Test;
 import de.ovgu.featureide.ahead.wrapper.AheadBuildErrorEvent;
 import de.ovgu.featureide.core.CorePlugin;
 
-import static org.junit.Assert.assertEquals;
-
 /**
  * Tests the class {@link AheadBuildErrorEvent}<br><br>
  * 

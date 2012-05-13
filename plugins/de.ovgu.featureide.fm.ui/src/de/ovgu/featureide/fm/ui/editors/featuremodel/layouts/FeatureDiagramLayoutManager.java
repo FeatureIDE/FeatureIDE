@@ -43,10 +43,10 @@ abstract public class FeatureDiagramLayoutManager{
 	boolean showHidden;
 	
 	public void layout(FeatureModel featureModel) {
-		this.showHidden = featureModel.showHiddenFeatures();
-		FeatureUIHelper.showHiddenFeatures(featureModel.showHiddenFeatures());		
+		showHidden = featureModel.showHiddenFeatures();
+		FeatureUIHelper.showHiddenFeatures(showHidden);		
 		layoutFeatureModel(featureModel);
-		if(featureModel.hasLegendAutoLayout())layoutLegend(featureModel, this.showHidden);
+		if(featureModel.hasLegendAutoLayout())layoutLegend(featureModel, showHidden);
 		layoutHidden(featureModel);
 	}
 	

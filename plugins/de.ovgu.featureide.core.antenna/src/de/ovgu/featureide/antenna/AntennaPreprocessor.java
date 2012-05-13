@@ -22,6 +22,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.Stack;
 import java.util.Vector;
 import java.util.regex.Pattern;
@@ -80,8 +81,8 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	}
 
 	@Override
-	public ArrayList<String> extensions() {
-		ArrayList<String> extensions = new ArrayList<String>();
+	public LinkedHashSet<String> extensions() {
+		LinkedHashSet<String> extensions = new LinkedHashSet<String>();
 		extensions.add(".java");
 		return extensions;
 	}

@@ -77,7 +77,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	public static final String ID = UIPlugin.PLUGIN_ID + ".views.collaboration.Collaboration";
 	
 	private static final String OPEN_MESSAGE = "Open a file from a FeatureIDE project";
-	private static final String CONFIGURATION_MESSAGE = "Please create a new configuration file";
+//	private static final String CONFIGURATION_MESSAGE = "Please create a new configuration file";
 	
 	private static final String ADD_LABEL = "Add new Class / Role";
 	private static final String DELETE_LABEL = "Delete";
@@ -217,11 +217,11 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 			model.collaborations.add(new Collaboration(OPEN_MESSAGE));
 			viewer.setContents(model);
 		} else {
-			if (featureProject.getCurrentConfiguration() == null){
-				model = new CollaborationModel();
-				model.collaborations.add(new Collaboration(CONFIGURATION_MESSAGE));
-				viewer.setContents(model);
-			} else
+//			if (featureProject.getCurrentConfiguration() == null){
+//				model = new CollaborationModel();
+//				model.collaborations.add(new Collaboration(CONFIGURATION_MESSAGE));
+//				viewer.setContents(model);
+//			} else
 				updateGuiAfterBuild(featureProject, null);
 		}
 	}

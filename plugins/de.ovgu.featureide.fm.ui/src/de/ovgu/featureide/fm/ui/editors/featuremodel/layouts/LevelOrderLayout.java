@@ -18,11 +18,11 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 
-import java.util.Vector;
-
+import java.util.LinkedList;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 
+import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
@@ -52,10 +52,10 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 	}
 
 	private void layout(LayoutableFeature root) {
-		Vector<Vector<LayoutableFeature>> levels = calculateLevels(root);
+		LinkedList<LinkedList<LayoutableFeature>> levels = calculateLevels(root);
 
 		for (int i = levels.size() - 1; i >= 0; i--) {
-			Vector<LayoutableFeature> level = levels.get(i);
+			LinkedList<LayoutableFeature> level = levels.get(i);
 			layoutLevelInY(level, i);
 			layoutLevelInX(level);
 		}
@@ -66,13 +66,13 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 				* (levels.size() - 1);
 	}
 
-	private void layoutLevelInY(Vector<LayoutableFeature> level, int i) {
+	private void layoutLevelInY(LinkedList<LayoutableFeature> level, int i) {
 		int y = FMPropertyManager.getLayoutMarginY() + FMPropertyManager.getFeatureSpaceY() * i;
 		for (LayoutableFeature feature : level)
 			FeatureUIHelper.setLocation(feature.getFeature(), new Point(0, y));
 	}
 
-	private void layoutLevelInX(Vector<LayoutableFeature> level) {
+	private void layoutLevelInX(LinkedList<LayoutableFeature> level) {
 		for (LayoutableFeature feature : level)
 			if (feature.hasChildren())
 				centerAboveChildren(feature);
@@ -85,7 +85,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 		}
 	}
 
-	private int layoutFeatureInX(Vector<LayoutableFeature> level, int j, int moveWidth,
+	private int layoutFeatureInX(LinkedList<LayoutableFeature> level, int j, int moveWidth,
 			LayoutableFeature lastFeature) {
 		LayoutableFeature feature = level.get(j);
 		boolean firstCompound = true;
@@ -115,7 +115,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 		return moveWidth;
 	}
 
-	private void layoutSiblingsEquidistant(Vector<LayoutableFeature> level, int j,
+	private void layoutSiblingsEquidistant(LinkedList<LayoutableFeature> level, int j,
 			LayoutableFeature feature) {
 		int width = FMPropertyManager.getFeatureSpaceX();
 		int l = 0;
@@ -149,15 +149,15 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 		}
 	}
 
-	private Vector<Vector<LayoutableFeature>> calculateLevels(LayoutableFeature root) {
-		Vector<Vector<LayoutableFeature>> levels = new Vector<Vector<LayoutableFeature>>();
+	private LinkedList<LinkedList<LayoutableFeature>> calculateLevels(LayoutableFeature root) {
+		LinkedList<LinkedList<LayoutableFeature>> levels = new LinkedList<LinkedList<LayoutableFeature>>();
 
-		Vector<LayoutableFeature> level = new Vector<LayoutableFeature>();
+		LinkedList<LayoutableFeature> level = new LinkedList<LayoutableFeature>();
 		level.add(root);
 
 		while (!level.isEmpty()) {
 			levels.add(level);
-			Vector<LayoutableFeature> newLevel = new Vector<LayoutableFeature>();
+			LinkedList<LayoutableFeature> newLevel = new LinkedList<LayoutableFeature>();
 			for (LayoutableFeature feature : level)
 				for (LayoutableFeature child : feature.getChildren())
 					newLevel.add(child);
@@ -170,9 +170,10 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 	private void centerAboveChildren(LayoutableFeature feature) {
 		int minX = FeatureUIHelper.getBounds(feature.getFirstChild().getFeature()).x;
 		int maxX = FeatureUIHelper.getBounds(feature.getLastChild().getFeature()).right();
-		Point location = FeatureUIHelper.getLocation(feature.getFeature());
-		int x = (maxX + minX) / 2 - FeatureUIHelper.getSize(feature.getFeature()).width / 2;
-		FeatureUIHelper.setLocation(feature.getFeature(), new Point(x, location.y));
+		Feature f = feature.getFeature();
+		Point location = FeatureUIHelper.getLocation(f);
+		int x = (maxX + minX) / 2 - FeatureUIHelper.getSize(f).width / 2;
+		FeatureUIHelper.setLocation(f, new Point(x, location.y));
 	}
 
 	private void nextToLeftSibling(LayoutableFeature feature, LayoutableFeature lastFeature) {
@@ -191,16 +192,18 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 	}
 
 	private void moveTree(LayoutableFeature root, int deltaX) {
-		Point location = FeatureUIHelper.getLocation(root.getFeature());
-		FeatureUIHelper.setLocation(root.getFeature(), new Point(location.x + deltaX,
+		Feature f = root.getFeature();
+		Point location = FeatureUIHelper.getLocation(f);
+		FeatureUIHelper.setLocation(f, new Point(location.x + deltaX,
 				location.y));
 		for (LayoutableFeature child : root.getChildren())
 			moveTree(child, deltaX);
 	}
 
 	private void centerTheRoot(LayoutableFeature root) {
-		int newX = (controlWidth - FeatureUIHelper.getBounds(root.getFeature()).width) / 2;
-		moveTree(root, newX - FeatureUIHelper.getLocation(root.getFeature()).x);
+		Feature f = root.getFeature();
+		int newX = (controlWidth - FeatureUIHelper.getBounds(f).width) / 2;
+		moveTree(root, newX - FeatureUIHelper.getLocation(f).x);
 	}
 
 }

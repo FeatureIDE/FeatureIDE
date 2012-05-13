@@ -162,14 +162,15 @@ public class ModelComparator {
 
 	private void optimizeReplacingMaps(HashMap<Object, Node> oldMap, HashMap<Object, Node> newMap) {
 		List<Object> toBeRemoved = new LinkedList<Object>();
-		for (Entry<Object, Node> entry : oldMap.entrySet())
-			if (newMap.containsKey(entry.getKey())) {
-				Object var = entry.getKey();
+		for (Entry<Object, Node> entry : oldMap.entrySet()) {
+			Object var = entry.getKey();
+			if (newMap.containsKey(var)) {
 				Node oldRepl = entry.getValue();
-				Node newRepl = newMap.get(entry.getKey());
+				Node newRepl = newMap.get(var);
 				if (oldRepl != null && oldRepl.equals(newRepl))
 					toBeRemoved.add(var);
 			}
+		}
 		for (Object var : toBeRemoved) {
 			oldMap.remove(var);
 			newMap.remove(var);

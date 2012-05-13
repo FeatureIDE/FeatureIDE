@@ -22,6 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 
 import org.eclipse.core.resources.ICommand;
@@ -77,8 +78,8 @@ public class AspectJComposer extends ComposerExtensionClass {
 	private boolean hadAspectJNature;
 	
 	@Override
-	public ArrayList<String> extensions() {
-		ArrayList<String> extensions = new ArrayList<String>();
+	public LinkedHashSet<String> extensions() {
+		LinkedHashSet<String> extensions = new LinkedHashSet<String>();
 		extensions.add(".java");
 		return extensions;
 	}

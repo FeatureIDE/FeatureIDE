@@ -19,6 +19,7 @@
 package de.ovgu.featureide.featurecpp;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -75,8 +76,8 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 	}
 
 	@Override
-	public ArrayList<String> extensions() {
-		ArrayList<String> extensions = new ArrayList<String>();
+	public LinkedHashSet<String> extensions() {
+		LinkedHashSet<String> extensions = new LinkedHashSet<String>();
 		extensions.add(".h");
 		return extensions;
 	}

@@ -24,6 +24,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
@@ -141,8 +142,8 @@ public class DeltajComposer extends ComposerExtensionClass {
 	}
 
 	@Override
-	public ArrayList<String> extensions() {
-		ArrayList<String> extensions = new ArrayList<String>();
+	public LinkedHashSet<String> extensions() {
+		LinkedHashSet<String> extensions = new LinkedHashSet<String>();
 		extensions.add(".dj");
 		return extensions;
 	}

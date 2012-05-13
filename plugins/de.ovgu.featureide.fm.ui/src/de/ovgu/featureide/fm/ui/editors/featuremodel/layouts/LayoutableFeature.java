@@ -63,8 +63,9 @@ public class LayoutableFeature {
 	}
 
 	public LayoutableFeature getLastChild() {
-		if (!getChildren().isEmpty()) {
-			return getChildren().getLast();
+		LinkedList<LayoutableFeature> children = getChildren();
+		if (!children.isEmpty()) {
+			return children.getLast();
 		}
 		return null;
 	}

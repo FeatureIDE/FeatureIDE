@@ -34,50 +34,49 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  * 
  * @author Sönke Holthusen
  */
-public class FeatureModelReaderIFileWrapper extends
-	AbstractFeatureModelReader {
-    private AbstractFeatureModelReader reader;
+public class FeatureModelReaderIFileWrapper extends AbstractFeatureModelReader {
+	private AbstractFeatureModelReader reader;
 
-    public FeatureModelReaderIFileWrapper(AbstractFeatureModelReader reader) {
-	this.reader = reader;
-    }
+	public FeatureModelReaderIFileWrapper(AbstractFeatureModelReader reader) {
+		this.reader = reader;
+	}
 
-    public void setFeatureModel(FeatureModel featureModel) {
-	reader.featureModel = featureModel;
-    }
+	public void setFeatureModel(FeatureModel featureModel) {
+		reader.featureModel = featureModel;
+	}
 
-    public FeatureModel getFeatureModel() {
-	return reader.featureModel;
-    }
+	public FeatureModel getFeatureModel() {
+		return reader.featureModel;
+	}
 
-    public void readFromString(String text) throws UnsupportedModelException {
-	reader.readFromString(text);
-    }
+	public void readFromString(String text) throws UnsupportedModelException {
+		reader.readFromString(text);
+	}
 
-    public void readFromFile(IFile ifile) throws UnsupportedModelException,
-	    FileNotFoundException {
-    	reader.featureModel.getFMComposerExtension(ifile.getProject());
-	File file = ifile.getRawLocation().makeAbsolute().toFile();
+	public void readFromFile(IFile ifile) throws UnsupportedModelException,
+			FileNotFoundException {
+		reader.featureModel.getFMComposerExtension(ifile.getProject());
+		File file = ifile.getRawLocation().makeAbsolute().toFile();
 
-	reader.readFromFile(file);
-    }
+		reader.readFromFile(file);
+	}
 
-    public void readFromFile(File file) throws FileNotFoundException,
-	    UnsupportedModelException {
-	reader.readFromFile(file);
-    }
+	public void readFromFile(File file) throws FileNotFoundException,
+			UnsupportedModelException {
+		reader.readFromFile(file);
+	}
 
-    public List<ModelWarning> getWarnings() {
-	return reader.getWarnings();
-    }
+	public List<ModelWarning> getWarnings() {
+		return reader.getWarnings();
+	}
 
-    public AbstractFeatureModelReader getReader(){
-	return reader;
-    }
-    
-    @Override
-    protected void parseInputStream(InputStream inputStream)
-	    throws UnsupportedModelException {
-	reader.parseInputStream(inputStream);
-    }
+	public AbstractFeatureModelReader getReader() {
+		return reader;
+	}
+
+	@Override
+	protected void parseInputStream(InputStream inputStream)
+			throws UnsupportedModelException {
+		reader.parseInputStream(inputStream);
+	}
 }

@@ -20,7 +20,7 @@ package de.ovgu.featureide.fm.core;
 
 
 /**
- * TODO description
+ * TODO @Soenke description
  * 
  * @author Soenke Holthusen
  */

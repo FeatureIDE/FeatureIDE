@@ -44,11 +44,7 @@ public class SelectionAction extends Action {
 		public void selectionChanged(SelectionChangedEvent event) {
 			IStructuredSelection selection = (IStructuredSelection) event
 					.getSelection();
-			
-			/*
-			 * TODO run in job
-			 * 
-			 * */
+
 			if (isSelectionValid(selection)){				
 				if (selection.getFirstElement() instanceof ConstraintEditPart) {
 					for (Constraint constraint : model.getConstraints()) {
@@ -87,16 +83,13 @@ public class SelectionAction extends Action {
 		}
 	};
 	
-	private GraphicalViewerImpl view;
-	
 	private FeatureModel model;
 	
 	public SelectionAction (GraphicalViewerImpl viewer, FeatureModel featureModel){
 		super("Selection");
-		this.view = viewer;
 		this.model = featureModel;
 		
-		view.addSelectionChangedListener(listener);
+		viewer.addSelectionChangedListener(listener);
 	}
 	
 	public boolean isSelectionValid(IStructuredSelection selection){

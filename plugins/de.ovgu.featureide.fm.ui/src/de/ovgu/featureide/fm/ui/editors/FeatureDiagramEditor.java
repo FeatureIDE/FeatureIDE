@@ -231,8 +231,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		setKeyHandler(handler);
 	}
 
-	// TODO fix bug: select a connection or the legend, left-click to an empty place, right-click without selection
-	//				-> no context menu
 	private void fillContextMenu(IMenuManager menu) {
 		IMenuManager subMenu = new MenuManager("Set Layout");
 

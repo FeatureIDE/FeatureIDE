@@ -19,6 +19,8 @@
 package de.ovgu.featureide.munge;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.Stack;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -87,8 +89,8 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 	}
 	
 	@Override
-	public ArrayList<String> extensions() {
-		ArrayList<String> extensions = new ArrayList<String>();
+	public LinkedHashSet<String> extensions() {
+		LinkedHashSet<String> extensions = new LinkedHashSet<String>();
 		extensions.add(".java");
 		extensions.clear();
 		return extensions;
@@ -159,8 +161,7 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 	 * @throws CoreException
 	 */
 	private void preprocessSourceFiles(IFolder buildFolder) throws CoreException {
-		
-		ArrayList<String> args = new ArrayList<String>();
+		LinkedList<String> args = new LinkedList<String>();
 		for (String feature : activatedFeatures) {
 			args.add("-D" + feature);
 		}
@@ -311,7 +312,7 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 		}
 	}
 	
-	private void runMunge(ArrayList<String> args) {
+	private void runMunge(LinkedList<String> args) {
 		//convert into an Array
 		String[] argArray = new String[args.size()];
 		for (int i = 0;i < args.size();i++) {

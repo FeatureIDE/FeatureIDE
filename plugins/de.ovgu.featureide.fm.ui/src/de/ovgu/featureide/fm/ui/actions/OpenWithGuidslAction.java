@@ -194,7 +194,7 @@ public class OpenWithGuidslAction implements IObjectActionDelegate {
 	                }
 	                if (System.currentTimeMillis() - start > diff) {
 	                    start += diff;
-	                    System.out.print(".");
+	                    System.out.print('.');
 	                }
 	                int exitValue = process.exitValue();
 	                System.out.println("...finished (exit=" + exitValue + ")!");

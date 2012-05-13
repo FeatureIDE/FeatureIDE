@@ -133,6 +133,9 @@ public class FeatureModel implements PropertyConstants {
 	private String COMPOSER_ID;
 
 	/**
+	 * TODO @Jens description / rename
+	 * 		this should be done at the constructor
+	 * 
 	 * @return the fMComposerExtension
 	 */
 	public IFMComposerExtension getFMComposerExtension(IProject project) {
@@ -142,7 +145,7 @@ public class FeatureModel implements PropertyConstants {
 	}
 
 	public FeatureModel() {
-		reset();
+
 	}
 
 	public void setLayout(int newLayoutAlgorithm) {

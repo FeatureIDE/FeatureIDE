@@ -19,6 +19,7 @@
 package de.ovgu.featureide.core.builder;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -68,8 +69,8 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		return false;
 	}
 
-	public ArrayList<String> extensions() {
-		return new ArrayList<String>();
+	public LinkedHashSet<String> extensions() {
+		return new LinkedHashSet<String>();
 	}
 
 	public boolean postAddNature(IFolder source, IFolder destination) {

@@ -239,44 +239,8 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	 * might be created if some errors occur.
 	 */
 	synchronized private void loadModel() {
-		// Create model.xml automatically, if only model.m exists
-		// @author Dariusz Krolikowski
-		if (project.getFile("model.m").exists()
-				&& !project.getFile("model.xml").exists()) {
-			// TODO REFACTORING extract to method
-			try {
-				IFile file = project.getFile("model.xml");
-				System.out.println("loadmodel");
-				FeatureModel fm = new FeatureModel();
-				fm.getFMComposerExtension(project);
-				GuidslReader fmReader = new GuidslReader(fm);
-				FeatureModelReaderIFileWrapper reader = new FeatureModelReaderIFileWrapper(fmReader);
-				reader.readFromFile(project.getFile("model.m"));
-				//XmlFeatureModelWriter fmWriter = new XmlFeatureModelWriter(fm);
-				FeatureModelWriterIFileWrapper fmWriter = new FeatureModelWriterIFileWrapper(new XmlFeatureModelWriter(fm));
-				fmWriter.writeToFile(file);
-
-				if (!fmReader.getAnnLine().isEmpty()) {
-					FeatureModelFile gFile = new FeatureModelFile(
-							project.getFile("model.m"));
-					for (int i = 0; i < fmReader.getAnnLine().size(); i++)
-						gFile.createModelMarker(
-								"This annotation is not supported yet - moved to the comment section.",
-								IMarker.SEVERITY_WARNING, fmReader.getAnnLine()
-										.get(i));
-				}
-
-				// delete model.m automatically - default: false
-				// project.getFile("model.m").delete(true, null);
-
-			} catch (FileNotFoundException e) {
-				CorePlugin.getDefault().logError(e);
-			} catch (CoreException e) {
-				CorePlugin.getDefault().logError(e);
-			} catch (UnsupportedModelException e) {
-				CorePlugin.getDefault().logError(e);
-			}
-		}
+		guidslToXML();
+		
 		try {
 			modelReader.readFromFile(modelFile.getResource());
 			getComposer();
@@ -286,39 +250,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 				setAllFeatureModuleMarkers(featureModel, sourceFolder);
 			}
 			
-			/* used both for reading and deleting ( does file exist? )
-			 */
-			//TODO REFACTORING extract to method
-			File projectFile = project.getLocation().toFile();
-			String fileSep = System.getProperty("file.separator");
-			File file = new File(projectFile.toString() + fileSep + ".order");
-			
-			//featureOrder not in model.xml
-			if(featureModel.getFeatureOrderList().isEmpty() && !featureModel.isFeatureOrderInXML() 
-					&& file.exists()){
-
-				FeatureOrderReader reader = new FeatureOrderReader(projectFile);
-				ArrayList<String> list = reader.featureOrderRead();
-				if(list != null && list.size() >0 ){
-					featureModel.setFeatureOrderUserDefined(
-							Boolean.parseBoolean(list.get(0)));
-					featureModel.setFeatureOrderList(
-							new ArrayList<String>(list.subList(1, list.size())));
-				}
-				// write feature order to model
-				//XmlFeatureModelWriter modelWriter = new XmlFeatureModelWriter(featureModel);
-				FeatureModelWriterIFileWrapper modelWriter = new FeatureModelWriterIFileWrapper(new XmlFeatureModelWriter(
-					featureModel));
-				modelWriter.writeToFile(modelFile.getResource());
-			}
-			/* TODO delete .order file in 2013
-			 * delete de.ovgu.featureide.fm.ui.editors.FeatureOrderEditor#writeToOrderFile() and corresponding call
-			 * see TODOs
-			 * */
-			//	if (file.exists()){
-			//		file.delete();
-			//		project.refreshLocal(IResource.DEPTH_ONE, null);
-			//	}
+			readFeatureOrder();
 		} catch (FileNotFoundException e) {
 			modelFile.createModelMarker(e.getMessage(), IMarker.SEVERITY_ERROR,
 					0);
@@ -329,6 +261,77 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			CorePlugin.getDefault().logError(
 					"Error while loading feature model from "
 							+ modelFile.getResource(), e);
+		}
+	}
+
+	/**
+	 * Reads the feature order from the deprecated order file if it still exists 
+	 * 
+	 * @throws CoreException 
+	 * 
+	 */
+	private void readFeatureOrder() throws CoreException {
+		IFile orderFile = project.getFile(".order");
+		if(featureModel.getFeatureOrderList().isEmpty() && !featureModel.isFeatureOrderInXML() 
+				&& orderFile.exists()){
+
+			FeatureOrderReader reader = new FeatureOrderReader(orderFile);
+			LinkedList<String> list = reader.featureOrderRead();
+			if(list != null && list.size() > 0){
+				featureModel.setFeatureOrderUserDefined(
+						Boolean.parseBoolean(list.get(0)));
+				featureModel.setFeatureOrderList(
+						new ArrayList<String>(list.subList(1, list.size())));
+			}
+			// write feature order to model
+			//XmlFeatureModelWriter modelWriter = new XmlFeatureModelWriter(featureModel);
+			FeatureModelWriterIFileWrapper modelWriter = new FeatureModelWriterIFileWrapper(new XmlFeatureModelWriter(
+				featureModel));
+			modelWriter.writeToFile(modelFile.getResource());
+		}
+		/* TODO delete .order file in 2013
+		 * delete de.ovgu.featureide.fm.ui.editors.FeatureOrderEditor#writeToOrderFile() and corresponding call
+		 * see TODOs
+		 * */
+		//	if (file.exists()){
+		//		file.delete();
+		//		project.refreshLocal(IResource.DEPTH_ONE, null);
+		//	}
+	}
+
+	/**
+	 * If the project contains only an old model in guidsl format it will be converted into a .xml
+	 */
+	private void guidslToXML() {
+		if (project.getFile("model.m").exists()
+				&& !project.getFile("model.xml").exists()) {
+			try {
+				IFile file = project.getFile("model.xml");
+				FeatureModel fm = new FeatureModel();
+				//fm.getFMComposerExtension(project);
+				GuidslReader guidslReader = new GuidslReader(fm);
+				FeatureModelReaderIFileWrapper reader = new FeatureModelReaderIFileWrapper(guidslReader);
+				reader.readFromFile(project.getFile("model.m"));
+				FeatureModelWriterIFileWrapper fmWriter = new FeatureModelWriterIFileWrapper(new XmlFeatureModelWriter(fm));
+				fmWriter.writeToFile(file);
+
+				if (!guidslReader.getAnnLine().isEmpty()) {
+					FeatureModelFile modelFile = new FeatureModelFile(
+							project.getFile("model.m"));
+					for (int i = 0; i < guidslReader.getAnnLine().size(); i++)
+						modelFile.createModelMarker(
+								"This annotation is not supported yet - moved to the comment section.",
+								IMarker.SEVERITY_WARNING, guidslReader.getAnnLine()
+										.get(i));
+				}
+
+			} catch (FileNotFoundException e) {
+				CorePlugin.getDefault().logError(e);
+			} catch (CoreException e) {
+				CorePlugin.getDefault().logError(e);
+			} catch (UnsupportedModelException e) {
+				CorePlugin.getDefault().logError(e);
+			}
 		}
 	}
 

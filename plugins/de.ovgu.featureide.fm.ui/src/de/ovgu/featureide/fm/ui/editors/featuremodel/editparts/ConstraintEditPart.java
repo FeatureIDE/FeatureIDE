@@ -59,8 +59,7 @@ public class ConstraintEditPart extends AbstractGraphicalEditPart implements
 
 	@Override
 	protected IFigure createFigure() {
-		ConstraintFigure figure = new ConstraintFigure(getConstraintModel());
-		return figure;
+		return new ConstraintFigure(getConstraintModel());
 	}
 
 	@Override

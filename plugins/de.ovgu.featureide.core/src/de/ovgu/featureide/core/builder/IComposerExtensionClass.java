@@ -19,6 +19,7 @@
 package de.ovgu.featureide.core.builder;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -78,7 +79,7 @@ public interface IComposerExtensionClass {
 	 * 
 	 * @return a list of file extensions witch will be composed 
 	 */
-	ArrayList<String> extensions();
+	 LinkedHashSet<String> extensions();
 	
 	/**
 	 * Make some changes after adding the FeatureIDE nature.

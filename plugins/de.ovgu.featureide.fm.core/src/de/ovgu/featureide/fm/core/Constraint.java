@@ -88,7 +88,7 @@ public class Constraint implements PropertyConstants {
 	
 	public void setConstraintAttribute(ConstraintAttribute attri, boolean fire){
 	this.attribute = attri;
-	if(fire)fire(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, false, true));
+	if(fire)fire(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
 	}
 	
 	public ConstraintAttribute getConstraintAttribute(){
@@ -97,7 +97,7 @@ public class Constraint implements PropertyConstants {
 	
 	public void setFeatureSelected (boolean selected){
 		this.featureSelected = selected;
-		fire(new PropertyChangeEvent(this, CONSTRAINT_SELECTED, false, true));
+		fire(new PropertyChangeEvent(this, CONSTRAINT_SELECTED, Boolean.FALSE, Boolean.TRUE));
 	}
 	
 	public boolean isFeatureSelected(){

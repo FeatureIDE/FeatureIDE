@@ -62,8 +62,6 @@ public class ConstraintMoveEditPolicy extends NonResizableEditPolicy {
 			this.superPolicy = superPolicy;
 		}
 		
-		private Point s;
-		
 		private RectangleFigure r;
 		
 		private PolylineConnection c;
@@ -77,9 +75,8 @@ public class ConstraintMoveEditPolicy extends NonResizableEditPolicy {
 			r.setForegroundColor(ColorConstants.white);
 			r.setBounds(getInitialFeedbackBounds());
 			
-			s = FeatureUIHelper.getLocation(editPart.getConstraintModel());
-			Point s2 = s.getCopy();
-			getHostFigure().translateToAbsolute(s2);
+			Point s = FeatureUIHelper.getLocation(editPart.getConstraintModel()).getCopy();
+			getHostFigure().translateToAbsolute(s);
 
 			c = new PolylineConnection();
 			c.setForegroundColor(ColorConstants.white);
@@ -128,7 +125,6 @@ public class ConstraintMoveEditPolicy extends NonResizableEditPolicy {
 		@Override
 		protected void eraseChangeBoundsFeedback(ChangeBoundsRequest request) {
 			super.eraseChangeBoundsFeedback(request);
-			s = null;
 			r = null;
 			c = null;
 		}

@@ -21,6 +21,7 @@ package de.ovgu.featureide.featurehouse;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Scanner;
 
@@ -319,15 +320,20 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	 * For <code>FeatureHouse<code> a clean does not remove the folder,
 	 * named like the current configuration at the build folder, 
 	 * to prevent build path errors.
+	 * @return always <code>false</code>
 	 */
 	@Override
 	public boolean clean() {
 		if (featureProject == null || featureProject.getBuildFolder() == null) {
 			return false;
 		}
+		IFile config = featureProject.getCurrentConfiguration();
+		if (config == null) {
+			return false;
+		}
 		try {
 			for (IResource featureFolder : featureProject.getBuildFolder().members()) {
-				if (featureFolder.getName().equals(featureProject.getCurrentConfiguration().getName().split("[.]")[0])) {
+				if (featureFolder.getName().equals(config.getName().split("[.]")[0])) {
 					if (featureFolder instanceof IFolder) {
 						for (IResource res : ((IFolder)featureFolder).members()){
 							res.delete(true, null);
@@ -344,10 +350,19 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		}
 		return false;
 	}
+	
+	private static final LinkedHashSet<String> extensions = setExtensions();
 
 	@Override
-	public ArrayList<String> extensions() {
-		ArrayList<String> extensions = new ArrayList<String>();
+	public LinkedHashSet<String> extensions() {
+		return extensions;
+	}
+
+	/**
+	 * @return
+	 */
+	private static LinkedHashSet<String> setExtensions() {
+		LinkedHashSet<String> extensions = new LinkedHashSet<String>();
 		extensions.add(".java");
 		extensions.add(".cs");
 		extensions.add(".c");
@@ -484,9 +499,15 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 	@Override
 	public void buildFSTModel() {
-		assert (featureProject != null) : "Invalid project given";
-
-		final String configPath = featureProject.getCurrentConfiguration().getRawLocation().toOSString();
+		if (featureProject == null) {
+			return;
+		}
+		final String configPath;
+		if (featureProject.getCurrentConfiguration() != null) {
+			configPath = featureProject.getCurrentConfiguration().getRawLocation().toOSString();
+		} else {
+			configPath = featureProject.getProject().getFile(".project").getRawLocation().toOSString();
+		}
 		final String basePath = featureProject.getSourcePath();
 		final String outputPath = featureProject.getBuildPath();
 

@@ -131,7 +131,7 @@ public class TreeBuilderFeatureHouse {
 	}
 
 	private String getLanguage(ArrayList<FSTNode> fstNodes) {
-		if (fstNodes == null || fstNodes.size() == 0)
+		if (fstNodes == null || fstNodes.isEmpty())
 			return null;
 		
 		String language = fstNodes.get(0).getName();

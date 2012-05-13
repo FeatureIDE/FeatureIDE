@@ -63,6 +63,10 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 
 	public String getProjectName();
 
+	/**
+	 * 
+	 * @return The current configuration file or <code>null</code> if there is none.
+	 */
 	public IFile getCurrentConfiguration();
 
 	public void setCurrentConfiguration(IFile file);

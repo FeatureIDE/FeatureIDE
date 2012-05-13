@@ -18,7 +18,7 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.action;
 
-import java.util.LinkedList;
+import java.util.LinkedHashSet;
 
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
@@ -26,10 +26,10 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Display;
 
 import de.ovgu.featureide.ui.UIPlugin;
+import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
 import de.ovgu.featureide.ui.views.collaboration.editparts.ClassEditPart;
 import de.ovgu.featureide.ui.views.collaboration.editparts.CollaborationEditPart;
 import de.ovgu.featureide.ui.views.collaboration.editparts.RoleEditPart;
-import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
 import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModel;
 
 /**
@@ -40,7 +40,8 @@ import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModel;
 public class FilterAction extends Action {
 
 	private GraphicalViewerImpl viewer;
-	private LinkedList<String> classFilter ,featureFilter;
+	private LinkedHashSet<String> classFilter = new LinkedHashSet<String>(); 
+	private LinkedHashSet<String> featureFilter = new LinkedHashSet<String>();
 	private CollaborationModel model;
 	private CollaborationView collaborationView;
 	
@@ -55,8 +56,6 @@ public class FilterAction extends Action {
 
 	public void setEnabled(boolean enabled) {
 		IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
-		classFilter = new LinkedList<String>();
-		featureFilter = new LinkedList<String>();
 		super.setEnabled(false);
 		
 		for (Object part : selection.toList()) {
@@ -97,8 +96,8 @@ public class FilterAction extends Action {
 		} else {
 			setChecked(false);
 			checked = false;
-			classFilter = new LinkedList<String>();
-			featureFilter = new LinkedList<String>();
+			classFilter.clear();
+			featureFilter.clear();
 			collaborationView.builder.classFilter = classFilter;
 			collaborationView.builder.featureFilter = featureFilter;
 			collaborationView.updateGuiAfterBuild(collaborationView.getFeatureProject(), null);

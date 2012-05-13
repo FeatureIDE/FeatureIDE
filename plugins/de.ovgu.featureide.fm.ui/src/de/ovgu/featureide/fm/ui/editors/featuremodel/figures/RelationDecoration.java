@@ -54,8 +54,9 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 		this.children = children;
 		this.lastChild = lastChild;
 		setForegroundColor(FMPropertyManager.getDecoratorForgroundColor());
-		setBackgroundColor(FMPropertyManager.getDecoratorForgroundColor());		
-		setSize(getTargetAnchorDiameter(), getTargetAnchorDiameter()/2);
+		setBackgroundColor(FMPropertyManager.getDecoratorForgroundColor());
+		int diameter = getTargetAnchorDiameter();
+		setSize(diameter, diameter/2);
 		this.vertical = FeatureUIHelper.hasVerticalLayout();
 	}
 	@Override

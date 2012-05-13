@@ -505,6 +505,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	}
 
 	// TODO: replace with a configuration reader
+	// the problem is that we need the old feature names 
 	public LinkedList<String> readFeaturesfromConfigurationFile(File file) {
 		Scanner scanner = null;
 		LinkedList<String> list = new LinkedList<String>();
@@ -521,11 +522,10 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 			}
 		}
 		return list;
-		
 	}
 
 	// TODO replace with a configuration writer 
-	public void writeFeaturestoConfigurationFile(File file,
+	public void writeFeaturesToConfigurationFile(File file,
 			LinkedList<String> newConfiguration) {
 		FileWriter fw = null;
 		try {
@@ -609,7 +609,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		}
 		
 		// Write Configuration
-		writeFeaturestoConfigurationFile(file, newConfiguration);
+		writeFeaturesToConfigurationFile(file, newConfiguration);
 	}
 
 	/**

@@ -108,6 +108,8 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 	private ProjectRecord[] selectedProjects = new ProjectRecord[0];
 	private IProject[] wsProjects;
 	private String samplePath;
+	
+	private static final String[] response = new String[] { YES, ALL, NO, NO_ALL, CANCEL };
 
 	/**
 	 * Constructor for SampleNewWizardPage.
@@ -706,7 +708,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 						IDialogConstants.NO_LABEL,
 						IDialogConstants.NO_TO_ALL_LABEL,
 						IDialogConstants.CANCEL_LABEL }, 0);
-		String[] response = new String[] { YES, ALL, NO, NO_ALL, CANCEL };
+		
 		// run in syncExec because callback is from an operation,
 		// which is probably not running in the UI thread.
 		getControl().getDisplay().syncExec(new Runnable() {

@@ -106,8 +106,9 @@ public class FeatureDiagramLayoutHelper {
 		if(newCompound.isRoot()){
 			initPos.y = (initPos.y - FMPropertyManager.getFeatureSpaceY());
 		} else {
-			initPos.y = (initPos.y + FeatureUIHelper.getLocation(newCompound.getParent()).y) / 2;
-			initPos.x = (initPos.x + FeatureUIHelper.getLocation(newCompound.getParent()).x) / 2;
+			Feature parent = newCompound.getParent();
+			initPos.y = (initPos.y + FeatureUIHelper.getLocation(parent).y) / 2;
+			initPos.x = (initPos.x + FeatureUIHelper.getLocation(parent).x) / 2;
 		}
 		FeatureUIHelper.setLocation(newCompound, initPos);
 		

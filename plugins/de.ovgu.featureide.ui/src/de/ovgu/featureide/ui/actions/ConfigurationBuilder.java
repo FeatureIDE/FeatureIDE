@@ -64,7 +64,6 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	private Configuration configuration;
 	private ConfigurationReader reader;
 	private long confs;
-	private String zeros;
 	private int configurationNumber = 0;
 	private boolean counting = true;
 	private String classpath = "";
@@ -455,7 +454,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 							return;
 						}
 					}
-					
+					String zeros;
 					if (confs < 10) {
 						zeros = "000";
 					} else if (confs < 100) {

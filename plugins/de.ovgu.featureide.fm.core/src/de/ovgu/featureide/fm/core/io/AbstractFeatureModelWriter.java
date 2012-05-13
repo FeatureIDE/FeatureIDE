@@ -59,7 +59,9 @@ public abstract class AbstractFeatureModelWriter implements IFeatureModelWriter 
 			FMCorePlugin.getDefault().logError(e);
 		} finally {
 			try {
-				output.close();
+				if (output != null) { 
+					output.close();
+				}
 			} catch (IOException e) {
 				FMCorePlugin.getDefault().logError(e);
 			}

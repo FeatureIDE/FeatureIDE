@@ -19,6 +19,7 @@
 package de.ovgu.featureide.core.builder;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -138,7 +139,7 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#extensions()
 	 */
-	public ArrayList<String> extensions() {
+	public LinkedHashSet<String> extensions() {
 		return composerExtensionClass.extensions();
 	}
 

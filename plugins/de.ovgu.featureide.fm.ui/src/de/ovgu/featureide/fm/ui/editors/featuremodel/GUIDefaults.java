@@ -35,7 +35,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
  * Default colors, fonts, images and borders for the feature diagram.<br>
- * It is recommended to use {@link IPersistentPropertyManager} 
+ * It is recommended to use {@link FMPropertyManager} 
  * for colors and borders instead of these values.
  * 
  * @author Thomas Thuem
