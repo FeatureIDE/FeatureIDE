@@ -51,7 +51,7 @@ public class LayoutSelectionOperation extends AbstractOperation {
 	public IStatus redo(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
 
-		featureModel.setLayout(newSelectedLayoutAlgorithm);
+		featureModel.getLayout().setLayout(newSelectedLayoutAlgorithm);
 		featureModel.redrawDiagram();
 		featureModel.handleModelDataChanged();
 
@@ -61,7 +61,7 @@ public class LayoutSelectionOperation extends AbstractOperation {
 	public IStatus undo(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
 
-		featureModel.setLayout(oldSelectedLayoutAlgorithm);
+		featureModel.getLayout().setLayout(oldSelectedLayoutAlgorithm);
 		featureModel.handleModelDataChanged();
 		
 		return Status.OK_STATUS;

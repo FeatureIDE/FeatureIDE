@@ -307,9 +307,9 @@ public class ViewContentProvider implements IStructuredContentProvider,
 		}
 		
 		final int features = model.getNumberOfFeatures();
-		final int concrete = model.countConcreteFeatures();
-		final int terminal = model.countTerminalFeatures();
-		final int hidden   = model.countHiddenFeatures();
+		final int concrete = model.getAnalyser().countConcreteFeatures();
+		final int terminal = model.getAnalyser().countTerminalFeatures();
+		final int hidden   = model.getAnalyser().countHiddenFeatures();
 		
 		if (init) {
 			// case: init
@@ -412,7 +412,7 @@ public class ViewContentProvider implements IStructuredContentProvider,
 			public void initChildren() {}
 		};
 		
-		if (!ignoreAbstractFeatures && model.countConcreteFeatures() == 0) {
+		if (!ignoreAbstractFeatures && model.getAnalyser().countConcreteFeatures() == 0) {
 			// case: there is no concrete feature so there is only one program variant,
 			//       without this the calculation least much to long
 			p.addChild("1 " + variants);

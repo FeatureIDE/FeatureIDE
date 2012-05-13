@@ -102,7 +102,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 	}
 	
 	boolean isHidden(Feature feature){
-		if(featureModel.showHiddenFeatures()){
+		if(featureModel.getLayout().showHiddenFeatures()){
 			return false;
 		} else {
 			if(feature.isHidden()){

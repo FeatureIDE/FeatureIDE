@@ -68,7 +68,7 @@ public class FeatureDragAndDropCommand extends Command {
 		this.featureModel = featureModel;
 		this.feature = feature;
 		this.newLocation = newLocation;
-		this.hasAutoLayout = featureModel.hasFeaturesAutoLayout();
+		this.hasAutoLayout = featureModel.getLayout().hasFeaturesAutoLayout();
 		this.hasVerticalLayout = FeatureUIHelper.hasVerticalLayout();
 		this.editPart = editPart;
 		oldParent = feature.getParent();

@@ -157,27 +157,27 @@ public class FeatureDiagramLayoutHelper {
 				return new ManualLayout();
 			case 1:
 				FeatureUIHelper.setVerticalLayoutBounds(false);
-				featureModel.verticalLayout(FeatureUIHelper.hasVerticalLayout());
+				featureModel.getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout());
 				return new LevelOrderLayout();
 			case 2:
 				FeatureUIHelper.setVerticalLayoutBounds(false);
-				featureModel.verticalLayout(FeatureUIHelper.hasVerticalLayout());
+				featureModel.getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout());
 				return new BreadthFirstLayout();
 			case 3: 
 				FeatureUIHelper.setVerticalLayoutBounds(false);
-				featureModel.verticalLayout(FeatureUIHelper.hasVerticalLayout());
+				featureModel.getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout());
 				return new DepthFirstLayout();
 			case 4:
 				FeatureUIHelper.setVerticalLayoutBounds(true);
-				featureModel.verticalLayout(FeatureUIHelper.hasVerticalLayout());
+				featureModel.getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout());
 				return new VerticalLayout();
 			case 5: 
 				FeatureUIHelper.setVerticalLayoutBounds(true);
-				featureModel.verticalLayout(FeatureUIHelper.hasVerticalLayout());
+				featureModel.getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout());
 				return new VerticalLayout2();
 			default:
 				FeatureUIHelper.setVerticalLayoutBounds(false);
-				featureModel.verticalLayout(FeatureUIHelper.hasVerticalLayout());
+				featureModel.getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout());
 				return new LevelOrderLayout();
 		}
 

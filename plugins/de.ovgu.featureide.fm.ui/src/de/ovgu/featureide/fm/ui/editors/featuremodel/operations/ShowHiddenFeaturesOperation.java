@@ -56,8 +56,8 @@ public class ShowHiddenFeaturesOperation extends AbstractOperation {
 	@Override
 	public IStatus redo(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
-		featureModel.showHiddenFeatures(!featureModel.showHiddenFeatures());		
-		FeatureUIHelper.showHiddenFeatures(featureModel.showHiddenFeatures());
+		featureModel.getLayout().showHiddenFeatures(!featureModel.getLayout().showHiddenFeatures());		
+		FeatureUIHelper.showHiddenFeatures(featureModel.getLayout().showHiddenFeatures());
 		featureModel.redrawDiagram();
 		featureModel.handleModelDataChanged();
 		return Status.OK_STATUS;

@@ -164,7 +164,7 @@ public class NodeCreator {
 					and = new And(children);
 				}
 			}
-		Node[] concreteFeatures = new Node[featureModel.countConcreteFeatures() + 1];
+		Node[] concreteFeatures = new Node[featureModel.getAnalyser().countConcreteFeatures() + 1];
 		int i = 0;
 		for (Feature feature : featureModel.getFeatures())
 			if (feature.isConcrete())

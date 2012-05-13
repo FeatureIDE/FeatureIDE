@@ -41,10 +41,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.QualifiedName;
 import org.prop4j.Literal;
 import org.prop4j.Node;
-import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
-
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 /**
  * The model representation of the feature tree that notifies listeners of
@@ -83,10 +80,10 @@ public class FeatureModel implements PropertyConstants {
 	 * the root feature
 	 */
 	private Feature root;
-	private boolean autoLayoutLegend = true;
-	private boolean showHiddenFeatures = true;
-	private boolean hasVerticalLayout = true;
-	private FMPoint legendPos = new FMPoint(0, 0);
+//	private boolean autoLayoutLegend = true;
+//	private boolean showHiddenFeatures = true;
+//	private boolean hasVerticalLayout = true;
+//	private FMPoint legendPos = new FMPoint(0, 0);
 	/**
 	 * a hashtable containing all features
 	 */
@@ -97,7 +94,7 @@ public class FeatureModel implements PropertyConstants {
 	 * occur
 	 */
 
-	private int selectedLayoutAlgorithm = 1;
+//	private int selectedLayoutAlgorithm = 1;
 
 	private LinkedList<String> comments = new LinkedList<String>();
 
@@ -148,12 +145,20 @@ public class FeatureModel implements PropertyConstants {
 
 	}
 
+	/**
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelLayout#setLayout(int)} instead.
+	 */
+	@Deprecated
 	public void setLayout(int newLayoutAlgorithm) {
-		selectedLayoutAlgorithm = newLayoutAlgorithm;
+	    layout.setLayout(newLayoutAlgorithm);
 	}
 
+	/**
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelLayout#getLayoutAlgorithm()} instead.
+	 */
+	@Deprecated
 	public int getLayoutAlgorithm() {
-		return selectedLayoutAlgorithm;
+	    return layout.getLayoutAlgorithm();
 	}
 
 	public static void setFeatureLocation(FMPoint newLocation, Feature feature) {
@@ -479,7 +484,7 @@ public class FeatureModel implements PropertyConstants {
          */
 	@Deprecated
 	public HashMap<Object, Object> analyzeFeatureModel() {
-	    return getAnalyser().analyzeFeatureModel();
+	    return analyser.analyzeFeatureModel();
 	}
 
 	public Collection<Feature> getFeatures() {
@@ -635,8 +640,7 @@ public class FeatureModel implements PropertyConstants {
 	 */
 	@Deprecated
 	public boolean isValid() throws TimeoutException {
-		Node root = NodeCreator.createNodes(this.clone());
-		return new SatSolver(root, 1000).isSatisfiable();
+	    return analyser.isValid();
 	}
 
 	/**
@@ -774,30 +778,31 @@ public class FeatureModel implements PropertyConstants {
 	    	return analyser.conjunct(b);
 	}
 
+	/**
+	 * 
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyser#countConcreteFeatures()} instead.
+	 */
+	@Deprecated
 	public int countConcreteFeatures() {
-		int number = 0;
-		for (Feature feature : getFeatures())
-			if (feature.isConcrete())
-				number++;
-		return number;
+	    return analyser.countConcreteFeatures();
 	}
 
+	/**
+	 * 
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyser#countHiddenFeatures()} instead.
+	 */
+	@Deprecated
 	public int countHiddenFeatures() {
-		int number = 0;
-		for (Feature feature : getFeatures()) {
-			if (feature.isHidden() || feature.hasHiddenParent()) {
-				number++;
-			}
-		}
-		return number;
+	    return analyser.countHiddenFeatures();
 	}
 
+	/**
+	 * 
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyser#countTerminalFeatures()} instead.
+	 */
+	@Deprecated
 	public int countTerminalFeatures() {
-		int number = 0;
-		for (Feature feature : getFeatures())
-			if (!feature.hasChildren())
-				number++;
-		return number;
+	    return analyser.countTerminalFeatures();
 	}
 
 	/**
@@ -937,41 +942,76 @@ public class FeatureModel implements PropertyConstants {
 		}
 	}
 
+	/**
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelLayout#getLegendPos()} instead.
+	 */
+	@Deprecated
 	public FMPoint getLegendPos() {
-		return legendPos;
+	    return layout.getLegendPos();
 	}
 
+	/**
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelLayout#setLegendPos(int, int)} instead.
+	 */
+	@Deprecated
 	public void setLegendPos(int x, int y) {
-		this.legendPos = new FMPoint(x, y);
+	    layout.setLegendPos(x, y);
 	}
 
+	/**
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelLayout#setLegendAutoLayout(boolean)} instead.
+	 */
+	@Deprecated
 	public void setLegendAutoLayout(boolean b) {
-		autoLayoutLegend = b;
+	    layout.setLegendAutoLayout(b);
 	}
 
+	/**
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelLayout#hasLegendAutoLayout()} instead.
+	 */
+	@Deprecated
 	public boolean hasLegendAutoLayout() {
-
-		return autoLayoutLegend;
+	    return layout.hasLegendAutoLayout();
 	}
 
+	/**
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelLayout#hasFeaturesAutoLayout()} instead.
+	 */
+	@Deprecated
 	public boolean hasFeaturesAutoLayout() {
-		return (selectedLayoutAlgorithm != 0);
+	    return layout.hasFeaturesAutoLayout();
 	}
 
+	/**
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelLayout#showHiddenFeatures()} instead.
+	 */
+	@Deprecated
 	public boolean showHiddenFeatures() {
-		return showHiddenFeatures;
+	    return layout.showHiddenFeatures();
 	}
 
+	/**
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelLayout#showHiddenFeatures(boolean)} instead.
+	 */
+	@Deprecated
 	public void showHiddenFeatures(boolean b) {
-		showHiddenFeatures = b;
+	    layout.showHiddenFeatures(b);
 	}
 
+	/**
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelLayout#verticalLayout()} instead.
+	 */
+	@Deprecated
 	public boolean verticalLayout() {
-		return hasVerticalLayout;
+	    return layout.verticalLayout();
 	}
 
+	/**
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelLayout#verticalLayout(boolean)} instead.
+	 */
+	@Deprecated
 	public void verticalLayout(boolean b) {
-		hasVerticalLayout = b;
+	    layout.verticalLayout(b);
 	}
 
 	/**
@@ -1157,10 +1197,16 @@ public class FeatureModel implements PropertyConstants {
 		this.featureOrderInXML = featureOrderInXML;
 	}
 	
-	private FeatureModelAnalyser analyser = new FeatureModelAnalyser(this);
-	
-	public FeatureModelAnalyser getAnalyser(){
-	    return analyser;
-	}
+    private FeatureModelAnalyser analyser = new FeatureModelAnalyser(this);
+
+    public FeatureModelAnalyser getAnalyser() {
+	return analyser;
+    }
+
+    private FeatureModelLayout layout = new FeatureModelLayout();
+
+    public FeatureModelLayout getLayout() {
+	return layout;
+    }
 
 }

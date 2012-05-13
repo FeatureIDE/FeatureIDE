@@ -235,7 +235,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		IMenuManager subMenu = new MenuManager("Set Layout");
 
 		showHiddenFeaturesAction.setChecked(getFeatureModel()
-				.showHiddenFeatures());
+				.getLayout().showHiddenFeatures());
 
 		for (int i = 0; i < setLayoutActions.size(); i++) {
 			subMenu.add(setLayoutActions.get(i));
@@ -243,13 +243,13 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 				subMenu.add(autoLayoutConstraintAction);
 				subMenu.add(new Separator());
 			}
-			boolean isChosen = (i == getFeatureModel().getLayoutAlgorithm());
+			boolean isChosen = (i == getFeatureModel().getLayout().getLayoutAlgorithm());
 			setLayoutActions.get(i).setChecked(isChosen);
 			setLayoutActions.get(i).setEnabled(!isChosen);
 		}
 
 		autoLayoutConstraintAction.setEnabled(!getFeatureModel()
-				.hasFeaturesAutoLayout());
+				.getLayout().hasFeaturesAutoLayout());
 
 		boolean connectionSelected = alternativeAction.isConnectionSelected();
 
@@ -446,9 +446,9 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		FeatureModel featureModel = getFeatureModel();
 
 		layoutManager = FeatureDiagramLayoutHelper.getLayoutManager(
-				featureModel.getLayoutAlgorithm(), featureModel);
+				featureModel.getLayout().getLayoutAlgorithm(), featureModel);
 
-		int previousLayout = featureModel.getLayoutAlgorithm();
+		int previousLayout = featureModel.getLayout().getLayoutAlgorithm();
 
 		for (int i = 0; i < setLayoutActions.size(); i++) {
 			setLayoutActions.set(i, new LayoutSelectionAction(this,

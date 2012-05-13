@@ -89,7 +89,7 @@ public class ModelLayoutEditPolicy extends LayoutEditPolicy {
 						.getEditParts().get(0);
 				Constraint constraint = editPart.getConstraintModel();
 
-				if (featureModel.hasFeaturesAutoLayout()){
+				if (featureModel.getLayout().hasFeaturesAutoLayout()){
 					Point point = r.getLocation().getCopy();
 					getHostFigure().translateToRelative(point);
 

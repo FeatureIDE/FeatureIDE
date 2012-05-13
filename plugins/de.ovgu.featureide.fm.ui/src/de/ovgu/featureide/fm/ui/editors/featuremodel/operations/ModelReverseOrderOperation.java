@@ -73,7 +73,7 @@ public class ModelReverseOrderOperation extends AbstractOperation {
 	public IStatus redo(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
 		reverse(featureModel.getRoot());
-		if(!featureModel.hasFeaturesAutoLayout()){
+		if(!featureModel.getLayout().hasFeaturesAutoLayout()){
 			Point mid = FeatureUIHelper.getLocation(featureModel.getRoot()).getCopy();
 			mid.x += FeatureUIHelper.getSize(featureModel.getRoot()).width/2;
 			mid.y += FeatureUIHelper.getSize(featureModel.getRoot()).height/2;

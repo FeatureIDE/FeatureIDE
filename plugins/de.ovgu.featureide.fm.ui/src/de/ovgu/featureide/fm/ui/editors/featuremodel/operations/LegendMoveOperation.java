@@ -51,8 +51,8 @@ public class LegendMoveOperation extends AbstractOperation {
 		this.featureModel = featureModel;
 		this.pos = p;
 		this.figure = figure;
-		this.oldPos = new Point(featureModel.getLegendPos().x,
-				featureModel.getLegendPos().y);
+		this.oldPos = new Point(featureModel.getLayout().getLegendPos().x,
+				featureModel.getLayout().getLegendPos().y);
 	}
 
 	/*
@@ -66,7 +66,7 @@ public class LegendMoveOperation extends AbstractOperation {
 	public IStatus execute(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
 	
-		this.wasAutoLayout = featureModel.hasLegendAutoLayout();
+		this.wasAutoLayout = featureModel.getLayout().hasLegendAutoLayout();
 		return redo(monitor, info);
 	}
 
@@ -82,8 +82,8 @@ public class LegendMoveOperation extends AbstractOperation {
 			throws ExecutionException {
 		figure=FeatureUIHelper.getLegendFigure();
 		figure.setLocation(pos);
-		featureModel.setLegendPos(pos.x, pos.y);
-		featureModel.setLegendAutoLayout(false);
+		featureModel.getLayout().setLegendPos(pos.x, pos.y);
+		featureModel.getLayout().setLegendAutoLayout(false);
 		featureModel.refreshContextMenu();
 	//	featureModel.handleModelDataChanged();
 		//featureModel.redrawDiagram();
@@ -101,8 +101,8 @@ public class LegendMoveOperation extends AbstractOperation {
 	public IStatus undo(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
 
-		featureModel.setLegendPos(oldPos.x, oldPos.y);
-		featureModel.setLegendAutoLayout(wasAutoLayout);
+		featureModel.getLayout().setLegendPos(oldPos.x, oldPos.y);
+		featureModel.getLayout().setLegendAutoLayout(wasAutoLayout);
 		featureModel.redrawDiagram();
 		featureModel.refreshContextMenu();
 		return Status.OK_STATUS;

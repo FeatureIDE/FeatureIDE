@@ -43,10 +43,10 @@ abstract public class FeatureDiagramLayoutManager{
 	boolean showHidden;
 	
 	public void layout(FeatureModel featureModel) {
-		showHidden = featureModel.showHiddenFeatures();
+		showHidden = featureModel.getLayout().showHiddenFeatures();
 		FeatureUIHelper.showHiddenFeatures(showHidden);		
 		layoutFeatureModel(featureModel);
-		if(featureModel.hasLegendAutoLayout())layoutLegend(featureModel, showHidden);
+		if(featureModel.getLayout().hasLegendAutoLayout())layoutLegend(featureModel, showHidden);
 		layoutHidden(featureModel);
 	}
 	
@@ -232,19 +232,19 @@ abstract public class FeatureDiagramLayoutManager{
 		 * set the legend position
 		 */
 		if(topRight){
-			featureModel.setLegendPos(max.x-legendSize.width, min.y);
+			featureModel.getLayout().setLegendPos(max.x-legendSize.width, min.y);
 		} else if (topLeft) {
-			featureModel.setLegendPos(min.x, min.y);
+			featureModel.getLayout().setLegendPos(min.x, min.y);
 		}  else if (botLeft) {
-			featureModel.setLegendPos(min.x, max.y-legendSize.height);
+			featureModel.getLayout().setLegendPos(min.x, max.y-legendSize.height);
 		} else if (botRight) {
-			featureModel.setLegendPos(max.x-legendSize.width, max.y-legendSize.height);
+			featureModel.getLayout().setLegendPos(max.x-legendSize.width, max.y-legendSize.height);
 		} else {
 
 			/*
 			 * old layout method of the legend
 			 */
-			featureModel.setLegendPos(max.x + FMPropertyManager.getFeatureSpaceX(), min.y);
+			featureModel.getLayout().setLegendPos(max.x + FMPropertyManager.getFeatureSpaceX(), min.y);
 		}
 		
 	}

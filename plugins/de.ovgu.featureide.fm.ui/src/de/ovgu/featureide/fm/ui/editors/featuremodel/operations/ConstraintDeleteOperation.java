@@ -99,7 +99,7 @@ public class ConstraintDeleteOperation extends AbstractOperation {
 			throws ExecutionException {
 		featureModel.addPropositionalNode(constraint.getNode(), index);
 		//initialize constraint position in manual layout
-		if(!featureModel.hasFeaturesAutoLayout())
+		if(!featureModel.getLayout().hasFeaturesAutoLayout())
 			FeatureDiagramLayoutHelper.initializeConstraintPosition(featureModel,
 				featureModel.getConstraintCount()-1);
 		featureModel.handleModelDataChanged();

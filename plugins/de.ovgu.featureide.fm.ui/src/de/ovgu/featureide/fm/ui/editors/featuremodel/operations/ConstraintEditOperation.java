@@ -94,7 +94,7 @@ public class ConstraintEditOperation extends AbstractOperation {
 			throws ExecutionException {
 		featureModel.replacePropNode(index, oldPropNode);
 		//initialize constraint position in manual layout
-		if(!featureModel.hasFeaturesAutoLayout())
+		if(!featureModel.getLayout().hasFeaturesAutoLayout())
 			FeatureDiagramLayoutHelper.initializeConstraintPosition(featureModel,
 							index);
 		featureModel.handleModelDataChanged();

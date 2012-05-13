@@ -128,7 +128,7 @@ public class FeatureMoveOperation extends AbstractOperation {
 	@Override
 	public IStatus redo(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {	
-			if(!featureModel.hasFeaturesAutoLayout()){
+			if(!featureModel.getLayout().hasFeaturesAutoLayout()){
 				newInnerOrder(newPos);
 			}
 			else{
@@ -156,7 +156,7 @@ public class FeatureMoveOperation extends AbstractOperation {
 	@Override
 	public IStatus undo(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
-			if(!featureModel.hasFeaturesAutoLayout()){
+			if(!featureModel.getLayout().hasFeaturesAutoLayout()){
 				newInnerOrder(oldPos);
 			} else{
 				try{

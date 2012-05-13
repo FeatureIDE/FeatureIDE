@@ -108,7 +108,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		boolean concrete = featureModel.hasConcrete();
 		boolean hidden = featureModel.hasHidden();
 		boolean dead = featureModel.hasDead() || featureModel.hasFalse();  //same color
-		boolean showHidden = featureModel.showHiddenFeatures();
+		boolean showHidden = featureModel.getLayout().showHiddenFeatures();
 		
 		language = FMPropertyManager.getLanguage();
 		setLocation(pos);

@@ -79,12 +79,12 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
     	Element comments = doc.createElement("comments");
     	Element order = doc.createElement("featureOrder");
     	
-    	root.setAttribute("chosenLayoutAlgorithm", ""+featureModel.getLayoutAlgorithm());
+    	root.setAttribute("chosenLayoutAlgorithm", ""+featureModel.getLayout().getLayoutAlgorithm());
     	
-    	if(featureModel.verticalLayout() && !featureModel.hasFeaturesAutoLayout()){
+    	if(featureModel.getLayout().verticalLayout() && !featureModel.getLayout().hasFeaturesAutoLayout()){
     		root.setAttribute("horizontalLayout", "true");
 		}
-    	if(!featureModel.showHiddenFeatures()){
+    	if(!featureModel.getLayout().showHiddenFeatures()){
     		root.setAttribute("showHiddenFeatures", "false");
     	}
 
@@ -97,7 +97,7 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
     	for(int i = 0; i < featureModel.getConstraints().size(); i++){
         	Element rule;
         	rule = doc.createElement("rule");
-        	if(!featureModel.hasFeaturesAutoLayout()){
+        	if(!featureModel.getLayout().hasFeaturesAutoLayout()){
         		   rule.setAttribute("coordinates", 
                    		""+featureModel.getConstraints().get(i).getLocation().x+"," 
                    		+" "+featureModel.getConstraints().get(i).getLocation().y);
@@ -155,7 +155,7 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
         	if(feat.isMandatory())	fnod.setAttribute("mandatory", "true");
         	if(feat.isAbstract())	fnod.setAttribute("abstract", "true");
         	
-        	if(!featureModel.showHiddenFeatures() || !featureModel.hasFeaturesAutoLayout())
+        	if(!featureModel.getLayout().showHiddenFeatures() || !featureModel.getLayout().hasFeaturesAutoLayout())
             	fnod.setAttribute("coordinates", feat.getLocation().x
         				+", "+feat.getLocation().y);
         	
@@ -176,7 +176,7 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
 		    if(feat.isAbstract())	fnod.setAttribute("abstract", "true");
 		    if(feat.isHidden())		fnod.setAttribute("hidden", "true");
 
-        	if(!featureModel.showHiddenFeatures() || !featureModel.hasFeaturesAutoLayout()) 
+        	if(!featureModel.getLayout().showHiddenFeatures() || !featureModel.getLayout().hasFeaturesAutoLayout()) 
         		fnod.setAttribute("coordinates", +feat.getLocation().x
         				+", "+feat.getLocation().y);
 

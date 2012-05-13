@@ -154,9 +154,9 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 			FMUIPlugin.getDefault().logError(e);
 		}
 		FeatureUIHelper.showHiddenFeatures(originalFeatureModel
-				.showHiddenFeatures());
+				.getLayout().showHiddenFeatures());
 		FeatureUIHelper.setVerticalLayoutBounds(originalFeatureModel
-				.verticalLayout());
+				.getLayout().verticalLayout());
 		
 		getExtensions();
 	}
