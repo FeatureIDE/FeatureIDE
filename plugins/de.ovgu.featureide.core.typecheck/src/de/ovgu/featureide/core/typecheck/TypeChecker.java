@@ -30,6 +30,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.typecheck.check.CheckPluginManager;
 import de.ovgu.featureide.core.typecheck.check.MethodCheck;
 import de.ovgu.featureide.core.typecheck.check.SuperClassCheck;
+import de.ovgu.featureide.core.typecheck.helper.Timer;
 import de.ovgu.featureide.core.typecheck.parser.CUParser;
 import de.ovgu.featureide.core.typecheck.parser.CUTable;
 import de.ovgu.featureide.core.typecheck.parser.ClassTable;
@@ -56,7 +57,7 @@ public class TypeChecker
 	{
 		_project = project;
 		_parser = new Parser(_project);
-		_checks = new CheckPluginManager(new SuperClassCheck(), new MethodCheck());
+		_checks = new CheckPluginManager(new SuperClassCheck());
 		
 		cuparser = new CUParser(_checks);
 
@@ -81,7 +82,10 @@ public class TypeChecker
 
 		TypecheckCorePlugin.logln("Parsing finished... (" + cuparser.timer.getTime() + " ms)");
 		TypecheckCorePlugin.logln("Running checks...");
+		Timer timer = new Timer();
+		timer.start();
 		_checks.invokeChecks(_project, _class_table);
-		TypecheckCorePlugin.logln("Checks finished...");
+		timer.stop();
+		TypecheckCorePlugin.logln("Checks finished... (" + timer.getTime() + " ms)");
 	}
 }

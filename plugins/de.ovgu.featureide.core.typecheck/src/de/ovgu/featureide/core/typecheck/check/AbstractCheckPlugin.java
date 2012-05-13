@@ -80,14 +80,14 @@ public abstract class AbstractCheckPlugin implements ICheckPlugin {
 	features.add(feature);
     }
 
-    public Map<Class, List<ASTNode>> getNodes(Feature feature) {
+    public Map<Class, List<ASTNode>> getNodesByFeature(Feature feature) {
 	return nodes.get(feature);
     }
 
-    public <T> Map<Feature, List<T>> getNodes(Class<T> c) {
+    public <T> Map<Feature, List<T>> getNodesByType(Class<T> c) {
 	Map<Feature, List<T>> feature_node_map = new HashMap<Feature, List<T>>();
 	for (Feature f : nodes.keySet()) {
-	    Map<Class, List<ASTNode>> class_node_map = getNodes(f);
+	    Map<Class, List<ASTNode>> class_node_map = getNodesByFeature(f);
 	    if (class_node_map.containsKey(c)) {
 		List<ASTNode> nodes = class_node_map.get(c);
 

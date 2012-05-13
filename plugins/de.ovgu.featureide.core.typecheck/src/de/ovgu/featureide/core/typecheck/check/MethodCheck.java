@@ -50,19 +50,18 @@ public class MethodCheck extends AbstractCheckPlugin {
 
     @Override
     public void invokeCheck(IFeatureProject project, ClassTable class_table) {
-	// Map<Feature, List<MethodDecl>> methoddecl_map =
-	// getNodes(MethodDecl.class);
-	//
-	// for(Feature f : methoddecl_map.keySet()){
-	// System.out.println("Feature " + f.getName() +
-	// " provides following methods: ");
-	// for(MethodDecl md : methoddecl_map.get(f)){
-	// System.out.println("\t" + md.hostType().name() + "@" +
-	// md.signature());
-	// }
-	// }
+	Map<Feature, List<MethodDecl>> methoddecl_map = getNodesByType(MethodDecl.class);
 
-	Map<Feature, List<MethodAccess>> methodaccess_map = getNodes(MethodAccess.class);
+	for (Feature f : methoddecl_map.keySet()) {
+	    System.out.println("Feature " + f.getName()
+		    + " provides following methods: ");
+	    for (MethodDecl md : methoddecl_map.get(f)) {
+		System.out.println("\t" + md.hostType().name() + "@"
+			+ md.signature());
+	    }
+	}
+
+	Map<Feature, List<MethodAccess>> methodaccess_map = getNodesByType(MethodAccess.class);
 	for (Feature f : methodaccess_map.keySet()) {
 	    System.out.println("Feature " + f.getName()
 		    + " needs following methods: ");
@@ -73,8 +72,9 @@ public class MethodCheck extends AbstractCheckPlugin {
 			System.out.println(e.type().name());
 		    }
 		} else {
-//		    System.out.println("\t" + ma.decl().hostType().name() + "@"
-//			    + ma.decl().signature());
+		    // System.out.println("\t" + ma.decl().hostType().name() +
+		    // "@"
+		    // + ma.decl().signature());
 		}
 	    }
 	}

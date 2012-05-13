@@ -47,7 +47,7 @@ public class SuperClassCheck extends AbstractCheckPlugin {
      */
     @Override
     public void invokeCheck(IFeatureProject project, ClassTable class_table) {
-	Map<Feature, List<ClassDecl>> map = getNodes(ClassDecl.class);
+	Map<Feature, List<ClassDecl>> map = getNodesByType(ClassDecl.class);
 	for (Feature key : map.keySet()) {
 	    for (ClassDecl cd : map.get(key)) {
 		if (cd.superclass().name().equals("Unknown")) {
@@ -55,7 +55,7 @@ public class SuperClassCheck extends AbstractCheckPlugin {
 		    Map<Feature, ClassDecl> providing_features = providesType(map,
 			    getSuperclassName(cd));
 		    if (providing_features.size() == 0) {
-			// no feature provides the superclass => error
+			System.out.println("No Feature can provide Superclass " + getSuperclassName(cd));
 		    } else {
 			for (Feature p : providing_features.keySet()) {
 			    System.out.println("\t" + p.getName()
