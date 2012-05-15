@@ -24,3 +24,7 @@ feature@de.ovgu.featureide.test=COPY,/vol1/teamcity_itidb/TeamCity/buildAgent/wo
 fragment@de.ovgu.featureide.fm.core_test=COPY,/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/tests,de.ovgu.featureide.fm.core-test
 fragment@de.ovgu.featureide.fm.ui_test=COPY,/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/tests,de.ovgu.featureide.fm.ui-test
 fragment@de.ovgu.featureide.core.ahead_test=COPY,/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/tests,de.ovgu.featureide.core.ahead-test
+fragment@de.ovgu.featureide.core.aspectj_test=COPY,/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/tests,de.ovgu.featureide.core.aspectj-test
+fragment@de.ovgu.featureide.core.featurehouse_test=COPY,/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/tests,de.ovgu.featureide.core.featurehouse-test
+fragment@de.ovgu.featureide.core.munge_test=COPY,/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/tests,de.ovgu.featureide.core.munge-test
+fragment@de.ovgu.featureide.core_test=COPY,/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/tests,de.ovgu.featureide.core-test
