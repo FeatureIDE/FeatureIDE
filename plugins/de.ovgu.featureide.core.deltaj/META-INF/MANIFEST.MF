@@ -9,15 +9,11 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.resources,
  de.ovgu.featureide.core,
  de.ovgu.featureide.fm.core,
- org.xtext.example.dj,
- org.xtext.example.dj.generator,
- org.xtext.example.dj.ui;bundle-version="1.0.0",
  org.junit
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: de.ovgu.featureide.core,
  de.ovgu.featureide.core.builder,
  de.ovgu.featureide.fm.core,
- djtemplates,
  org.eclipse.core.resources
 Bundle-Vendor: University of Magdeburg
