@@ -24,6 +24,9 @@ import java.util.List;
 import java.util.Map;
 
 import AST.ClassDecl;
+import AST.CompilationUnit;
+import AST.TypeAccess;
+import AST.UnknownType;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.typecheck.parser.ClassTable;
 import de.ovgu.featureide.fm.core.Feature;
@@ -35,58 +38,57 @@ import de.ovgu.featureide.fm.core.Feature;
  */
 
 public class SuperClassCheck extends AbstractCheckPlugin {
-    public SuperClassCheck() {
-	plugin_name = "SuperClassCheck";
-	registerNodeType(ClassDecl.class);
-    }
+	public SuperClassCheck() {
+		plugin_name = "SuperClassCheck";
+		registerNodeType(ClassDecl.class);
+		registerNodeType(TypeAccess.class);
+	}
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.ovgu.featureide.core.typecheck.checks.ICheckPlugin#invokeCheck()
-     */
-    @Override
-    public void invokeCheck(IFeatureProject project, ClassTable class_table) {
-	Map<Feature, List<ClassDecl>> map = getNodesByType(ClassDecl.class);
-	for (Feature key : map.keySet()) {
-	    for (ClassDecl cd : map.get(key)) {
-		if (cd.superclass().name().equals("Unknown")) {
-		    // superclass couldn't be resolved by fuji
-		    Map<Feature, ClassDecl> providing_features = providesType(map,
-			    getSuperclassName(cd));
-		    if (providing_features.size() == 0) {
-			System.out.println("No Feature can provide Superclass " + getSuperclassName(cd));
-		    } else {
-			for (Feature p : providing_features.keySet()) {
-			    System.out.println("\t" + p.getName()
-				    + " can provide class " + providing_features.get(p).name());
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.ovgu.featureide.core.typecheck.checks.ICheckPlugin#invokeCheck()
+	 */
+	@Override
+	public void invokeCheck(IFeatureProject project, ClassTable class_table) {
+		Map<Feature, List<ClassDecl>> map = getNodesByType(ClassDecl.class);
+		for (Feature key : map.keySet()) {
+			for (ClassDecl cd : map.get(key)) {
+				if(cd.hasSuperClassAccess() && cd.getSuperClassAccess().type() instanceof UnknownType){
+					System.out.println("Unknown Type: " + cd.getSuperClassAccess().typeName());
+				}
+				
+//				if (cd.superclass().name().equals("Unknown")) {
+//					// superclass couldn't be resolved by fuji
+//					Map<Feature, ClassDecl> providing_features = providesType(
+//							map, getSuperclassName(cd));
+//					if (providing_features.size() == 0) {
+//						System.out.println("No Feature can provide Superclass "
+//								+ getSuperclassName(cd));
+//					} else {
+//						for (Feature p : providing_features.keySet()) {
+//							System.out.println("\t" + p.getName()
+//									+ " can provide class "
+//									+ providing_features.get(p).name());
+//						}
+//					}
+//				}
 			}
-		    }
 		}
-	    }
-	}
-    }
-
-    private Map<Feature, ClassDecl> providesType(Map<Feature, List<ClassDecl>> map,
-	    String type) {
-	Map<Feature, ClassDecl> providing_features = new HashMap<Feature, ClassDecl>();
-
-	for (Feature f : map.keySet()) {
-	    for (ClassDecl cd : map.get(f)) {
-		if (cd.name().equals(type)) {
-		    providing_features.put(f, cd);
-		}
-	    }
 	}
 
-	return providing_features;
-    }
+	private Map<Feature, ClassDecl> providesType(
+			Map<Feature, List<ClassDecl>> map, String type) {
+		Map<Feature, ClassDecl> providing_features = new HashMap<Feature, ClassDecl>();
 
-    private String getSuperclassName(ClassDecl cd) {
-	// TODO: improve matching?
-	String superclass = cd.toString().split(" extends ")[1];
-	superclass = superclass.substring(0, superclass.indexOf(" "));
+		for (Feature f : map.keySet()) {
+			for (ClassDecl cd : map.get(f)) {
+				if (cd.name().equals(type)) {
+					providing_features.put(f, cd);
+				}
+			}
+		}
 
-	return superclass;
-    }
+		return providing_features;
+	}
 }

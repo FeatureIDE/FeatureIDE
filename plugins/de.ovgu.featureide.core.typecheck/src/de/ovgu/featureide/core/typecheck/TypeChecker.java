@@ -30,6 +30,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.typecheck.check.CheckPluginManager;
 import de.ovgu.featureide.core.typecheck.check.MethodCheck;
 import de.ovgu.featureide.core.typecheck.check.SuperClassCheck;
+import de.ovgu.featureide.core.typecheck.check.TypeCheck;
 import de.ovgu.featureide.core.typecheck.helper.Timer;
 import de.ovgu.featureide.core.typecheck.parser.CUParser;
 import de.ovgu.featureide.core.typecheck.parser.CUTable;
