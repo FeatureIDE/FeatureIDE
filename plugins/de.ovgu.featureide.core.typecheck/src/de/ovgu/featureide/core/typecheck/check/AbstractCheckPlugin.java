@@ -115,4 +115,8 @@ public abstract class AbstractCheckPlugin implements ICheckPlugin {
 	public String getName() {
 		return plugin_name;
 	}
+	
+	public boolean checkFeatureImplication(Feature feature, List<Feature> implies){
+	    return false;
+	}
 }

@@ -58,7 +58,7 @@ public class TypeChecker
 	{
 		_project = project;
 		_parser = new Parser(_project);
-		_checks = new CheckPluginManager(new SuperClassCheck());
+		_checks = new CheckPluginManager(new TypeCheck());
 		
 		cuparser = new CUParser(_checks);
 
