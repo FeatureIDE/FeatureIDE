@@ -249,7 +249,7 @@
             class="de.ovgu.featureide.ui.views.collaboration.outline.CollaborationOutline"
             icon="icons/FeatureIconSmall.ico"
             id="de.ovgu.featureide.ui.views.collaboration.outline.CollaborationOutline"
-            name="Outline"
+            name="Collaboration Outline"
             restorable="true">
       </view>
    </extension>
