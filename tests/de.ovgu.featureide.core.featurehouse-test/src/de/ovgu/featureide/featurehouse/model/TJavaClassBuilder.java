@@ -98,5 +98,15 @@ public class TJavaClassBuilder {
 		assertEquals(EXPECTED_HEAD_1,builder.getHead(METHOD_1,METHOD_NAME_1));
 	}
 	
+	//Test 6
+	private String METHOD_2 = "private void display () {\r\n\t}";
+	private String METHOD_NAME_2 = "display";
+	private String EXPECTED_HEAD_2 = "private void ";
+	
+	@Test
+	public void MethodTestGetBody2() {
+		assertEquals(EXPECTED_HEAD_2,builder.getHead(METHOD_2,METHOD_NAME_2));
+	}
+	
 	
 }

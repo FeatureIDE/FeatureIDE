@@ -166,6 +166,7 @@ public class JavaClassBuilder extends ClassBuilder {
 	 * @return
 	 */
 	public String getHead(String body, String name) {
+		body = body.replaceAll(name + "\\s*\\(", name + "(");
 		return body.substring(0, body.indexOf(name + "("));
 	}
 
