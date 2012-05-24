@@ -118,8 +118,7 @@ public class Configuration {
 	public boolean valid() {
 		LinkedList<Node> children = new LinkedList<Node>();
 		for (SelectableFeature feature : features)
-			if (feature.getFeature() != null
-					&& feature.getFeature().isConcrete()) {
+			if (feature.getFeature() != null) {
 				Literal literal = new Literal(feature.getName());
 				literal.positive = feature.getSelection() == Selection.SELECTED;
 				children.add(literal);
