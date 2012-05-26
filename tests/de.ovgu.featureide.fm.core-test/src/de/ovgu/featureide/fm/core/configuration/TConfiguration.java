@@ -39,9 +39,11 @@ public class TConfiguration {
 
 	public static FeatureModel fm = loadGUIDSL("S : [A] [B] C :: _S; %% not B;");
 
+	
 	@Test
 	public void testSelection1() {
-		Configuration c = new Configuration(fm, false);
+		Configuration c = new Configuration(fm, true);
+//		Configuration c = new Configuration(fm, false);
 		c.setManual("C", Selection.SELECTED);
 		assertTrue(c.valid());
 		assertEquals(2, c.number());
@@ -56,7 +58,8 @@ public class TConfiguration {
 
 	@Test
 	public void testSelection3() {
-		Configuration c = new Configuration(fm, false);
+		Configuration c = new Configuration(fm, true);
+//		Configuration c = new Configuration(fm, false);
 		c.setManual("A", Selection.SELECTED);
 		c.setManual("C", Selection.SELECTED);
 		assertTrue(c.valid());

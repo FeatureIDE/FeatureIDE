@@ -111,9 +111,9 @@ public class Configuration {
 	}
 
 	/**
-	 * Checks that all manual and automatic selections are valid.
-	 * 
-	 * @return
+	 * Checks that all manual and automatic selections are valid.<br>
+	 * Abstract features will <code>not</code> be ignored.
+	 * @return <code>true</code> if the current selection is satisfiable
 	 */
 	public boolean valid() {
 		LinkedList<Node> children = new LinkedList<Node>();
