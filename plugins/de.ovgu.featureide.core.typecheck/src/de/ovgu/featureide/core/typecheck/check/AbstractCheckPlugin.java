@@ -132,4 +132,9 @@ public abstract class AbstractCheckPlugin implements ICheckPlugin {
 		}
 		return false;
 	}
+
+	public void resetFeature(Feature feature) {
+		nodes.remove(feature);
+		features.remove(feature);
+	}
 }

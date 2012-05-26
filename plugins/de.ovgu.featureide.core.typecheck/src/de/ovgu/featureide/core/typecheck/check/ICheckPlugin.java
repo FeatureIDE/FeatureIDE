@@ -32,5 +32,6 @@ public interface ICheckPlugin
 	public void register(CheckPluginManager manager);
 	public void invokeCheck(FeatureModel fm);
 	public void invokeNodeParse(Feature feature, ASTNode node);
+	public void resetFeature(Feature feature);
 	public String getName();
 }

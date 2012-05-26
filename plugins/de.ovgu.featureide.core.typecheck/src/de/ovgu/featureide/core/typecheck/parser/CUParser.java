@@ -78,6 +78,8 @@ public class CUParser {
 			timer.start();
 			this.timer.resume();
 
+			plugins.resetFeature(feature);
+			
 			try {
 				List<String> list = new ArrayList<String>();
 

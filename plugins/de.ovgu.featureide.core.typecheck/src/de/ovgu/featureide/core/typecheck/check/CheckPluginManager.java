@@ -116,4 +116,10 @@ public class CheckPluginManager extends Observable {
 			}
 		}
 	}
+	
+	public void resetFeature(Feature feature){
+		for(ICheckPlugin plugin : _plugins){
+			plugin.resetFeature(feature);
+		}
+	}
 }
