@@ -1,6 +1,8 @@
 package de.ovgu.featureide.core.typecheck.actions;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.action.IAction;
@@ -24,6 +26,8 @@ public class TypecheckAction implements IObjectActionDelegate {
 	
 	// for now only support for featurehouse projects
 	private String[] supportedComposers = { "de.ovgu.featureide.composer.featurehouse" };
+	
+	private Map<IFeatureProject, TypeChecker> typechecker = new HashMap<IFeatureProject, TypeChecker>();
 
 	public TypecheckAction() {
 		// TODO Auto-generated constructor stub
@@ -39,8 +43,10 @@ public class TypecheckAction implements IObjectActionDelegate {
 
 			if (Arrays.asList(supportedComposers).contains(
 					project.getComposerID())) {
-				TypeChecker checker = new TypeChecker(project);
-				checker.run();
+				if(!typechecker.containsKey(project)){
+					typechecker.put(project, new TypeChecker(project));
+				}
+				typechecker.get(project).run();
 			} else {
 				// TODO: change output method
 				System.out.println("unsupported composer found");

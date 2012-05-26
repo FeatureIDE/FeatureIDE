@@ -18,18 +18,18 @@
  */
 package de.ovgu.featureide.core.typecheck.check;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import AST.ClassDecl;
-import AST.CompilationUnit;
 import AST.TypeAccess;
 import AST.UnknownType;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.typecheck.parser.ClassTable;
 import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.FeatureModel;
 
 /**
  * TODO description
@@ -50,29 +50,28 @@ public class SuperClassCheck extends AbstractCheckPlugin {
 	 * @see de.ovgu.featureide.core.typecheck.checks.ICheckPlugin#invokeCheck()
 	 */
 	@Override
-	public void invokeCheck(IFeatureProject project, ClassTable class_table) {
+	public void invokeCheck(FeatureModel fm) {
 		Map<Feature, List<ClassDecl>> map = getNodesByType(ClassDecl.class);
 		for (Feature key : map.keySet()) {
 			for (ClassDecl cd : map.get(key)) {
 				if(cd.hasSuperClassAccess() && cd.getSuperClassAccess().type() instanceof UnknownType){
-					System.out.println("Unknown Type: " + cd.getSuperClassAccess().typeName());
+					System.out.println("Unknown Type: " + cd.getSuperClassAccess().typeName() + " in Feature " + key.getName());
+					System.out.println("\t can be provided by");
+					Set<Feature> providing_features = providesType(map, cd.getSuperClassAccess().typeName()).keySet();
+					for(Feature f : providing_features){
+						System.out.println("\t\t" + f.getName());
+					}
+					if(checkFeatureImplication(fm, key, providing_features)){
+						System.out.print("\t\t\t" + key.getName() + " -> ");
+						for(Feature f : providing_features){
+							System.out.print(f.getName() + " ");
+						}
+						System.out.println(" holds!");
+					}
+					else {
+						System.out.println("Missing dependency!!!");
+					}
 				}
-				
-//				if (cd.superclass().name().equals("Unknown")) {
-//					// superclass couldn't be resolved by fuji
-//					Map<Feature, ClassDecl> providing_features = providesType(
-//							map, getSuperclassName(cd));
-//					if (providing_features.size() == 0) {
-//						System.out.println("No Feature can provide Superclass "
-//								+ getSuperclassName(cd));
-//					} else {
-//						for (Feature p : providing_features.keySet()) {
-//							System.out.println("\t" + p.getName()
-//									+ " can provide class "
-//									+ providing_features.get(p).name());
-//						}
-//					}
-//				}
 			}
 		}
 	}

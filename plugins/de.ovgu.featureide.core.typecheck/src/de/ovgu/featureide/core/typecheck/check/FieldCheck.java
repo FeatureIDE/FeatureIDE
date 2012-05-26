@@ -27,6 +27,7 @@ import AST.FieldDeclaration;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.typecheck.parser.ClassTable;
 import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.FeatureModel;
 
 /**
  * TODO description
@@ -43,7 +44,7 @@ public class FieldCheck extends AbstractCheckPlugin
 	 * de.ovgu.featureide.core.typecheck.parser.ClassTable)
 	 */
 	@Override
-	public void invokeCheck(IFeatureProject project, ClassTable class_table)
+	public void invokeCheck(FeatureModel fm)
 	{
 
 	}

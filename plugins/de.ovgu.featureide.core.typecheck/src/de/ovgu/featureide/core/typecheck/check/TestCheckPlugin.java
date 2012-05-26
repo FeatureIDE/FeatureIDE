@@ -24,43 +24,38 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.typecheck.parser.ClassTable;
 import de.ovgu.featureide.core.typecheck.parser.ClassTableEntry;
 import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.FeatureModel;
 
 /**
  * TODO description
  * 
  * @author soenke
  */
-public class TestCheckPlugin extends AbstractCheckPlugin
-{
+public class TestCheckPlugin extends AbstractCheckPlugin {
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see de.ovgu.featureide.core.typecheck.check.ICheckPlugin#invokeCheck(de.ovgu.featureide.core.IFeatureProject,
+	 * @see
+	 * de.ovgu.featureide.core.typecheck.check.ICheckPlugin#invokeCheck(de.ovgu
+	 * .featureide.core.IFeatureProject,
 	 * de.ovgu.featureide.core.typecheck.parser.ClassTable)
 	 */
 	@Override
-	public void invokeCheck(IFeatureProject project, ClassTable class_table)
-	{
-		for (ClassTableEntry entry : class_table.getClasses())
-		{
-			System.out.println("Class " + entry.toString() + " has linenumber " + entry.getAST().lineNumber());
-			project.deleteBuilderMarkers(entry.getClassFile(), 1);
-			for (FieldDeclaration field : entry.getFields())
-			{
-				//project.createBuilderMarker(entry.getClassFile(), "method", method.lineNumber(), 0);
+	public void invokeCheck(FeatureModel fm) {
 
-				System.out.println("\t" + field.lineNumber() + ":" + field.toString());
-			}
-		}
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.typecheck.check.ICheckPlugin#invokeNodeParse(AST.ASTNode)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.ovgu.featureide.core.typecheck.check.ICheckPlugin#invokeNodeParse(
+	 * AST.ASTNode)
 	 */
 	@Override
 	public void invokeNodeParse(Feature feature, ASTNode node) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

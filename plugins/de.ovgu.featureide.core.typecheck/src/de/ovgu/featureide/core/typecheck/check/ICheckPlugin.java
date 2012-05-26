@@ -19,9 +19,8 @@
 package de.ovgu.featureide.core.typecheck.check;
 
 import AST.ASTNode;
-import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.typecheck.parser.ClassTable;
 import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.FeatureModel;
 
 /**
  * TODO description
@@ -31,7 +30,7 @@ import de.ovgu.featureide.fm.core.Feature;
 public interface ICheckPlugin
 {
 	public void register(CheckPluginManager manager);
-	public void invokeCheck(IFeatureProject project, ClassTable class_table);
+	public void invokeCheck(FeatureModel fm);
 	public void invokeNodeParse(Feature feature, ASTNode node);
 	public String getName();
 }

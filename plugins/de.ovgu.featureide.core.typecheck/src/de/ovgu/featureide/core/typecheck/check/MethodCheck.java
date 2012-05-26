@@ -34,6 +34,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.typecheck.parser.ClassTable;
 import de.ovgu.featureide.core.typecheck.parser.ClassTableEntry;
 import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.FeatureModel;
 
 /**
  * TODO description
@@ -49,7 +50,7 @@ public class MethodCheck extends AbstractCheckPlugin {
     }
 
     @Override
-    public void invokeCheck(IFeatureProject project, ClassTable class_table) {
+    public void invokeCheck(FeatureModel fm) {
 	Map<Feature, List<MethodDecl>> methoddecl_map = getNodesByType(MethodDecl.class);
 
 	for (Feature f : methoddecl_map.keySet()) {

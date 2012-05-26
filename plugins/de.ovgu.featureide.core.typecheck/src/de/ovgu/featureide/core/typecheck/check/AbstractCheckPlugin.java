@@ -25,9 +25,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.sat4j.specs.TimeoutException;
+
 import AST.ASTNode;
 import AST.CompilationUnit;
+import de.ovgu.featureide.core.typecheck.TypecheckCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.FeatureModel;
 
 /**
  * TODO description
@@ -64,7 +68,7 @@ public abstract class AbstractCheckPlugin implements ICheckPlugin {
 		_manager = manager;
 
 		registered_node_types.add(CompilationUnit.class);
-		
+
 		for (Class node_type : registered_node_types) {
 			_manager.registerForNodeParse(node_type, this);
 		}
@@ -115,8 +119,17 @@ public abstract class AbstractCheckPlugin implements ICheckPlugin {
 	public String getName() {
 		return plugin_name;
 	}
-	
-	public boolean checkFeatureImplication(Feature feature, List<Feature> implies){
-	    return false;
+
+	public boolean checkFeatureImplication(FeatureModel fm, Feature feature,
+			Set<Feature> implies) {
+		Set<Feature> set = new HashSet<Feature>();
+		set.add(feature);
+		try {
+			return TypecheckCorePlugin.checkImpliesDisjunct(fm, set, implies);
+		} catch (TimeoutException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
 	}
 }
