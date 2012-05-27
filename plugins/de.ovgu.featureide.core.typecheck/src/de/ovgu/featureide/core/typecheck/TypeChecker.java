@@ -55,9 +55,12 @@ public class TypeChecker {
 	public TypeChecker(IFeatureProject project) {
 		_project = project;
 
-		_checks = new CheckPluginManager(new SuperClassCheck()
-		// , new TypeCheck()
-		// , new MethodCheck()
+		_checks = new CheckPluginManager(
+//		new SuperClassCheck()
+//			,
+		new TypeCheck()
+//			,
+//		new MethodCheck()
 		);
 
 		_cuparser = new CUParser(_checks);

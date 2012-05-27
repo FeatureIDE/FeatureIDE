@@ -91,7 +91,7 @@ public class CheckPluginManager extends Observable {
 	 *            the plug-in itself
 	 */
 	public void registerForNodeParse(Class node, ICheckPlugin plugin) {
-		if (!node_parse_plugins.containsValue(node)) {
+		if (!node_parse_plugins.containsKey(node)) {
 			node_parse_plugins.put(node, new ArrayList<ICheckPlugin>());
 		}
 		List<ICheckPlugin> list = node_parse_plugins.get(node);

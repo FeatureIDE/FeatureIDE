@@ -40,101 +40,121 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  */
 @SuppressWarnings("rawtypes")
 public abstract class AbstractCheckPlugin implements ICheckPlugin {
-	protected CheckPluginManager _manager;
-	protected Set<Class> registered_node_types = new HashSet<Class>();
+    protected CheckPluginManager _manager;
+    protected Set<Class> registered_node_types = new HashSet<Class>();
+    
+    private List<CheckProblem> problems = new ArrayList<CheckProblem>();
 
-	protected String plugin_name = "AbstractCheckPlugin";
+    protected String plugin_name = "AbstractCheckPlugin";
 
-	/*
-	 * Feature -> Node Type -> Data Data -> Node Type -> Data Data Data Feature
-	 * -> Node Type -> Data ...
-	 */
-	protected Map<Feature, Map<Class, List<ASTNode>>> nodes = new HashMap<Feature, Map<Class, List<ASTNode>>>();
-	protected List<Feature> features = new ArrayList<Feature>();
+    /*
+     * Feature -> Node Type -> Data Data -> Node Type -> Data Data Data Feature
+     * -> Node Type -> Data ...
+     */
+    protected Map<Feature, Map<Class, List<ASTNode>>> nodes = new HashMap<Feature, Map<Class, List<ASTNode>>>();
+    protected List<Feature> features = new ArrayList<Feature>();
 
-	protected void registerNodeType(Class node_type) {
-		registered_node_types.add(node_type);
+    protected void registerNodeType(Class node_type) {
+	registered_node_types.add(node_type);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * de.ovgu.featureide.core.typecheck.check.ICheckPlugin#register(de.ovgu
+     * .featureide.core.typecheck.check.CheckPluginManager)
+     */
+    @Override
+    public void register(CheckPluginManager manager) {
+	_manager = manager;
+
+	registered_node_types.add(CompilationUnit.class);
+
+	for (Class node_type : registered_node_types) {
+	    _manager.registerForNodeParse(node_type, this);
+	}
+    }
+
+    @Override
+    public void invokeNodeParse(Feature feature, ASTNode node) {
+	if (!nodes.containsKey(feature)) {
+	    nodes.put(feature, new HashMap<Class, List<ASTNode>>());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ovgu.featureide.core.typecheck.check.ICheckPlugin#register(de.ovgu
-	 * .featureide.core.typecheck.check.CheckPluginManager)
-	 */
-	@Override
-	public void register(CheckPluginManager manager) {
-		_manager = manager;
-
-		registered_node_types.add(CompilationUnit.class);
-
-		for (Class node_type : registered_node_types) {
-			_manager.registerForNodeParse(node_type, this);
-		}
+	Map<Class, List<ASTNode>> map = nodes.get(feature);
+	if (!map.containsKey(node.getClass())) {
+	    map.put(node.getClass(), new ArrayList<ASTNode>());
 	}
 
-	@Override
-	public void invokeNodeParse(Feature feature, ASTNode node) {
-		if (!nodes.containsKey(feature)) {
-			nodes.put(feature, new HashMap<Class, List<ASTNode>>());
-		}
+	map.get(node.getClass()).add(node);
+	features.add(feature);
+    }
 
-		Map<Class, List<ASTNode>> map = nodes.get(feature);
-		if (!map.containsKey(node.getClass())) {
-			map.put(node.getClass(), new ArrayList<ASTNode>());
-		}
+    public Map<Class, List<ASTNode>> getNodesByFeature(Feature feature) {
+	return nodes.get(feature);
+    }
 
-		map.get(node.getClass()).add(node);
-		features.add(feature);
-	}
+    public <T> Map<Feature, List<T>> getNodesByType(Class<T> c) {
+	Map<Feature, List<T>> feature_node_map = new HashMap<Feature, List<T>>();
+	for (Feature f : nodes.keySet()) {
+	    Map<Class, List<ASTNode>> class_node_map = getNodesByFeature(f);
+	    if (class_node_map.containsKey(c)) {
+		List<ASTNode> nodes = class_node_map.get(c);
 
-	public Map<Class, List<ASTNode>> getNodesByFeature(Feature feature) {
-		return nodes.get(feature);
-	}
+		List<T> new_node_list = new ArrayList<T>();
 
-	public <T> Map<Feature, List<T>> getNodesByType(Class<T> c) {
-		Map<Feature, List<T>> feature_node_map = new HashMap<Feature, List<T>>();
-		for (Feature f : nodes.keySet()) {
-			Map<Class, List<ASTNode>> class_node_map = getNodesByFeature(f);
-			if (class_node_map.containsKey(c)) {
-				List<ASTNode> nodes = class_node_map.get(c);
-
-				List<T> new_node_list = new ArrayList<T>();
-
-				for (ASTNode n : nodes) {
-					if (c.isInstance(n)) {
-						new_node_list.add(c.cast(n));
-					}
-				}
-
-				feature_node_map.put(f, new_node_list);
-			}
+		for (ASTNode n : nodes) {
+		    if (c.isInstance(n)) {
+			new_node_list.add(c.cast(n));
+		    }
 		}
 
-		return feature_node_map;
+		feature_node_map.put(f, new_node_list);
+	    }
 	}
 
-	@Override
-	public String getName() {
-		return plugin_name;
+	return feature_node_map;
+    }
+
+    @Override
+    public String getName() {
+	return plugin_name;
+    }
+
+    public boolean checkFeatureImplication(FeatureModel fm, Feature feature,
+	    Set<Feature> implies) {
+	if (implies.isEmpty()) {
+	    return false;
 	}
 
-	public boolean checkFeatureImplication(FeatureModel fm, Feature feature,
-			Set<Feature> implies) {
-		Set<Feature> set = new HashSet<Feature>();
-		set.add(feature);
-		try {
-			return TypecheckCorePlugin.checkImpliesDisjunct(fm, set, implies);
-		} catch (TimeoutException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return false;
+	Set<Feature> set = new HashSet<Feature>();
+	set.add(feature);
+	try {
+	    return TypecheckCorePlugin.checkImpliesDisjunct(fm, set, implies);
+	} catch (TimeoutException e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
 	}
+	return false;
+    }
 
-	public void resetFeature(Feature feature) {
-		nodes.remove(feature);
-		features.remove(feature);
+    public void resetFeature(Feature feature) {
+	nodes.remove(feature);
+	features.remove(feature);
+    }
+    
+    public void resetProblems(){
+	problems = new ArrayList<CheckProblem>();
+    }
+    
+    public void newProblem(CheckProblem problem){
+	problems.add(problem);
+    }
+    
+    public void reportProblems(){
+	for(CheckProblem problem : problems){
+	    System.out.println(problem);
 	}
+    }
 }

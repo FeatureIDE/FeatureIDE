@@ -18,57 +18,32 @@
  */
 package de.ovgu.featureide.core.typecheck.check;
 
-import java.util.Observable;
-
-import AST.ASTNode;
-import AST.FieldDecl;
-import AST.FieldDeclaration;
-
-import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.typecheck.parser.ClassTable;
 import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
 
 /**
  * TODO description
  * 
  * @author soenke
  */
-public class FieldCheck extends AbstractCheckPlugin {
+public class CheckProblem {
+    private Feature feature;
+    private String filename;
+    private int linenumber;
+    private String message;
 
-    /**
-     * 
-     */
-    public FieldCheck() {
-	plugin_name = "Field Access Check";
-	
-	
-    }
-    
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * de.ovgu.featureide.core.typecheck.check.ICheckPlugin#invokeCheck(de.ovgu
-     * .featureide.core.IFeatureProject,
-     * de.ovgu.featureide.core.typecheck.parser.ClassTable)
-     */
-    @Override
-    public void invokeCheck(FeatureModel fm) {
-
+    public CheckProblem(Feature feature, String filename, int linenumber,
+	    String message) {
+	this.feature = feature;
+	this.filename = filename;
+	this.linenumber = linenumber;
+	this.message = message;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * de.ovgu.featureide.core.typecheck.check.ICheckPlugin#invokeNodeParse(
-     * AST.ASTNode)
-     */
-    @Override
-    public void invokeNodeParse(Feature feature, ASTNode node) {
-	// TODO Auto-generated method stub
-
+    public String toString() {
+	StringBuilder builder = new StringBuilder();
+	builder.append("Problem: ").append(message).append(" in Feature ")
+		.append(feature.getName()).append(" in File ").append(filename)
+		.append(" at line ").append(linenumber);
+	return builder.toString();
     }
-
 }

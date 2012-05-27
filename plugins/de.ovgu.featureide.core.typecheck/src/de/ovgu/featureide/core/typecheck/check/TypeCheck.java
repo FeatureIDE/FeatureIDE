@@ -22,16 +22,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import AST.ClassDecl;
 import AST.CompilationUnit;
-import AST.ImportDecl;
 import AST.InterfaceDecl;
+import AST.ReferenceType;
 import AST.TypeAccess;
 import AST.TypeDecl;
 import AST.UnknownType;
-import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.typecheck.parser.ClassTable;
+import de.ovgu.featureide.core.typecheck.parser.FujiWrapper;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
@@ -41,161 +41,82 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  * @author soenke
  */
 public class TypeCheck extends AbstractCheckPlugin {
+    private Map<Feature, List<ReferenceType>> intros;
 
-	private Map<String, List<Map<Feature, TypeDecl>>> classtable;
+    public TypeCheck() {
+	plugin_name = "Type Check Plugin";
+	registerNodeType(ClassDecl.class);
+	registerNodeType(CompilationUnit.class);
+    }
 
-	public TypeCheck() {
-		plugin_name = "Type Check Plugin";
-		registerNodeType(TypeAccess.class);
-		registerNodeType(ClassDecl.class);
-		registerNodeType(InterfaceDecl.class);
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * de.ovgu.featureide.core.typecheck.check.ICheckPlugin#invokeCheck(de.ovgu
+     * .featureide.core.IFeatureProject,
+     * de.ovgu.featureide.core.typecheck.parser.ClassTable)
+     */
+    @Override
+    public void invokeCheck(FeatureModel fm) {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ovgu.featureide.core.typecheck.check.ICheckPlugin#invokeCheck(de.ovgu
-	 * .featureide.core.IFeatureProject,
-	 * de.ovgu.featureide.core.typecheck.parser.ClassTable)
-	 */
-	@Override
-	public void invokeCheck(FeatureModel fm) {
-		Map<Feature, List<TypeAccess>> map = getNodesByType(TypeAccess.class);
+	// doesn't work with annotations and stuff
+	Map<Feature, List<ClassDecl>> cdmap = getNodesByType(ClassDecl.class);
 
-		for (Feature f : map.keySet()) {
-			System.out.println("Checking Feature " + f.getName());
-			for (TypeAccess ta : map.get(f)) {
-				if (ta.type() instanceof UnknownType) {
+	init_intros();
 
-					TypeDecl td = ta.type().lookupType(ta.packageName(),
-							ta.name());
-					if (td == null) {
-						System.out
-								.println("Lookup for "
-										+ ta.typeName()
-										+ " was not successful, but following features may provide it:");
-						for (Map<Feature, TypeDecl> m : getProvidingFeatures(ta
-								.name())) {
-							if (m != null) {
-								for (Feature pf : m.keySet()) {
-									System.out.println("\t" + pf.getName());
-								}
-							}
-						}
-					} else {
-						System.out.println(td.fullName());
-					}
+	for (Feature f : cdmap.keySet()) {
+	    for (ClassDecl cd : cdmap.get(f)) {
+		for (TypeAccess ta : FujiWrapper.getChildNodesByType(cd,
+			TypeAccess.class)) {
+		    if (ta.type() instanceof UnknownType) {
+			Set<Feature> providing_features = providesType(
+				ta.name()).keySet();
 
-					// ASTNode parent = ta.getParent();
-					// while (!(parent instanceof CompilationUnit)) {
-					// parent = parent.getParent();
-					// }
-					//
-					// isImported((CompilationUnit) parent, ta);
-					//
-					// if (getProvidingFeatures(ta.name()).size() == 0) {
-					// System.out.println("no feature provides "
-					// + ta.packageName() + ta.typeName());
-					// }
-
-					// System.out.println(ta.typeName()
-					// + " is unknown to feature " + f.getName());
-					// for (Feature feature :
-					// getProvidingFeatures(ta.typeName())
-					// .keySet()) {
-					// System.out.println("\tFeature " + feature.getName()
-					// + " can provide type " + ta.typeName());
-					// }
-				}
+			if (!checkFeatureImplication(fm, f, providing_features)) {
+			    newProblem(new CheckProblem(f, cd.compilationUnit().pathName(), ta.lineNumber(), "Missing type dependency " + ta.name()));
 			}
+		    }
 		}
+	    }
 	}
+	
+	reportProblems();
+    }
 
-	private boolean isImported(CompilationUnit cu, TypeAccess ta) {
-		System.out.println(cu.pathName());
-		for (ImportDecl id : cu.getImportDeclList()) {
-			System.out.println(id.typeName());
-		}
-		return false;
-	}
+    protected void init_intros() {
+	Map<Feature, List<CompilationUnit>> cumap = getNodesByType(CompilationUnit.class);
 
-	// TODO: cache results
-	private List<Map<Feature, TypeDecl>> getProvidingFeatures(String type) {
-
-		if (classtable == null) {
-			initCT();
-		}
-
-		if (classtable.containsKey(type)) {
-			return classtable.get(type);
-		} else {
-			return null;
-		}
-
-		// for (Feature f : getNodesByType(ClassDecl.class).keySet()) {
-		// for (ClassDecl cd : getNodesByType(ClassDecl.class).get(f)) {
-		// if (cd.name().equals(type)) {
-		// map.put(f, cd);
-		// }
-		// }
-		// }
-		//
-		// for (Feature f : getNodesByType(InterfaceDecl.class).keySet()) {
-		// for (InterfaceDecl cd : getNodesByType(InterfaceDecl.class).get(f)) {
-		// if (cd.name().equals(type)) {
-		// map.put(f, cd);
-		// }
-		// }
-		// }
-		//
-		// return map;
-	}
-
-	protected void initCT() {
-		classtable = new HashMap<String, List<Map<Feature, TypeDecl>>>();
-
-		Map<Feature, List<ClassDecl>> class_map = getNodesByType(ClassDecl.class);
-
-		for (Feature f : class_map.keySet()) {
-			for (ClassDecl cd : class_map.get(f)) {
-				if (!classtable.containsKey(cd.typeName())) {
-					classtable.put(cd.typeName(),
-							new ArrayList<Map<Feature, TypeDecl>>());
-				}
-				Map<Feature, TypeDecl> map2 = new HashMap<Feature, TypeDecl>();
-				map2.put(f, cd);
-				classtable.get(cd.typeName()).add(map2);
+	intros = new HashMap<Feature, List<ReferenceType>>();
+	for (Feature f : cumap.keySet()) {
+	    if (!intros.containsKey(f)) {
+		intros.put(f, new ArrayList<ReferenceType>());
+	    }
+	    for (CompilationUnit cu : cumap.get(f)) {
+		for (TypeDecl td : cu.getTypeDecls()) {
+		    if (td instanceof ReferenceType) {
+			ReferenceType rt = (ReferenceType) td;
+			if (!(rt.isAnonymous() || rt.isLocalClass() || rt
+				.isArrayDecl())) {
+			    intros.get(f).add(rt);
 			}
+		    }
 		}
+	    }
+	}
+    }
 
-		Map<Feature, List<InterfaceDecl>> import_map = getNodesByType(InterfaceDecl.class);
+    private Map<Feature, ReferenceType> providesType(String type) {
+	Map<Feature, ReferenceType> providing_features = new HashMap<Feature, ReferenceType>();
 
-		for (Feature f : import_map.keySet()) {
-			for (InterfaceDecl cd : import_map.get(f)) {
-				if (!classtable.containsKey(cd.typeName())) {
-					classtable.put(cd.typeName(),
-							new ArrayList<Map<Feature, TypeDecl>>());
-				}
-				Map<Feature, TypeDecl> map2 = new HashMap<Feature, TypeDecl>();
-				map2.put(f, cd);
-				classtable.get(cd.typeName()).add(map2);
-			}
+	for (Feature f : intros.keySet()) {
+	    for (ReferenceType rt : intros.get(f)) {
+		if (rt.name().equals(type)) {
+		    providing_features.put(f, rt);
 		}
+	    }
 	}
 
-	protected String printCT() {
-		StringBuilder builder = new StringBuilder();
-
-		for (String type : classtable.keySet()) {
-			builder.append(type + " is defined in features\n");
-			for (Map<Feature, TypeDecl> map : classtable.get(type)) {
-				for (Feature f : map.keySet()) {
-					builder.append("\t" + f.getName() + "\n");
-				}
-			}
-		}
-
-		return builder.toString();
-	}
+	return providing_features;
+    }
 }

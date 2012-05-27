@@ -27,6 +27,7 @@ import AST.Expr;
 import AST.ExprStmt;
 import AST.MethodAccess;
 import AST.MethodDecl;
+import AST.ParameterDeclaration;
 import AST.ReturnStmt;
 import AST.Stmt;
 import AST.VariableDeclaration;
@@ -44,7 +45,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 public class MethodCheck extends AbstractCheckPlugin {
 
     public MethodCheck() {
-	plugin_name = "MethodCheck";
+	plugin_name = "MethodAccess Check";
 	registerNodeType(MethodAccess.class);
 	registerNodeType(MethodDecl.class);
     }
@@ -57,27 +58,32 @@ public class MethodCheck extends AbstractCheckPlugin {
 	    System.out.println("Feature " + f.getName()
 		    + " provides following methods: ");
 	    for (MethodDecl md : methoddecl_map.get(f)) {
-		System.out.println("\t" + md.hostType().name() + "@"
-			+ md.signature());
+		System.out.print("\t" + md.hostType().name() + "@"
+			+ md.name() + " ");
+		for(ParameterDeclaration pd : md.getParameters()){
+		    System.out.print(pd.getTypeAccess() + " ");
+		}
+		System.out.println();
+//		System.out.println(md.getTypeAccess());
 	    }
 	}
 
-	Map<Feature, List<MethodAccess>> methodaccess_map = getNodesByType(MethodAccess.class);
-	for (Feature f : methodaccess_map.keySet()) {
-	    System.out.println("Feature " + f.getName()
-		    + " needs following methods: ");
-	    for (MethodAccess ma : methodaccess_map.get(f)) {
-		if (ma.decl().hostType().name().equals("Unknown")) {
-		    System.out.println(ma);
-		    for (Expr e : ma.getArgs()) {
-			System.out.println(e.type().name());
-		    }
-		} else {
-		    // System.out.println("\t" + ma.decl().hostType().name() +
-		    // "@"
-		    // + ma.decl().signature());
-		}
-	    }
-	}
+//	Map<Feature, List<MethodAccess>> methodaccess_map = getNodesByType(MethodAccess.class);
+//	for (Feature f : methodaccess_map.keySet()) {
+//	    System.out.println("Feature " + f.getName()
+//		    + " needs following methods: ");
+//	    for (MethodAccess ma : methodaccess_map.get(f)) {
+//		if (ma.decl().hostType().name().equals("Unknown")) {
+//		    System.out.println(ma);
+//		    for (Expr e : ma.getArgs()) {
+//			System.out.println(e.type().name());
+//		    }
+//		} else {
+//		    // System.out.println("\t" + ma.decl().hostType().name() +
+//		    // "@"
+//		    // + ma.decl().signature());
+//		}
+//	    }
+//	}
     }
 }
