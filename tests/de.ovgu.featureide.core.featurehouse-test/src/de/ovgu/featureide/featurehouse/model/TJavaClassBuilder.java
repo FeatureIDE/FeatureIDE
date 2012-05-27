@@ -108,5 +108,14 @@ public class TJavaClassBuilder {
 		assertEquals(EXPECTED_HEAD_2,builder.getHead(METHOD_2,METHOD_NAME_2));
 	}
 	
+	//Test 7
+	private String METHOD_3 = "@Deprecated\r\nprivate void a() {\r\n\t}";
+	private String METHOD_NAME_3 = "a";
+	private String EXPECTED_HEAD_3 = "private void ";
+	
+	@Test
+	public void MethodTestGetBody3() {
+		assertEquals(EXPECTED_HEAD_3,builder.getHead(METHOD_3,METHOD_NAME_3));
+	}
 	
 }
