@@ -23,6 +23,7 @@ import java.util.List;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.typecheck.check.CheckPluginManager;
+import de.ovgu.featureide.core.typecheck.check.MethodCheck;
 import de.ovgu.featureide.core.typecheck.check.TypeCheck;
 import de.ovgu.featureide.core.typecheck.helper.Timer;
 import de.ovgu.featureide.core.typecheck.parser.CUParser;
@@ -35,45 +36,44 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  * @author S�nke Holthusen
  */
 public class TypeChecker {
-	private IFeatureProject _project;
-	private CUParser _cuparser;
+    private IFeatureProject _project;
+    private CUParser _cuparser;
 
-	private CheckPluginManager _checks;
-	
-	public TypeChecker(IFeatureProject project) {
-		_project = project;
+    private CheckPluginManager _checks;
 
-		_checks = new CheckPluginManager(
-//		new SuperClassCheck()
-//			,
-		new TypeCheck()
-//			,
-//		new MethodCheck()
-		);
+    public TypeChecker(IFeatureProject project) {
+	_project = project;
 
-		_cuparser = new CUParser(_checks);
-	}
+	_checks = new CheckPluginManager(
+	// new SuperClassCheck()
+	// ,
+	// new TypeCheck()
+	// ,
+		new MethodCheck());
 
-	public void run() {
-		TypecheckCorePlugin.logln("Starting parsing project "
-				+ _project.getProjectName());
-		_cuparser.timer.reset();
+	_cuparser = new CUParser(_checks);
+    }
 
-		FeatureModel fm = _project.getFeatureModel();
+    public void run() {
+	TypecheckCorePlugin.logln("Starting parsing project "
+		+ _project.getProjectName());
+	_cuparser.timer.reset();
 
-		List<Feature> concrete_features = new ArrayList<Feature>(
-				fm.getConcreteFeatures());
+	FeatureModel fm = _project.getFeatureModel();
 
-		_cuparser.parse(_project.getSourcePath(), concrete_features);
+	List<Feature> concrete_features = new ArrayList<Feature>(
+		fm.getConcreteFeatures());
 
-		TypecheckCorePlugin.logln("Parsing finished... ("
-				+ _cuparser.timer.getTime() + " ms)");
-		TypecheckCorePlugin.logln("Running checks...");
-		Timer timer = new Timer();
-		timer.start();
-		_checks.invokeChecks(fm);
-		timer.stop();
-		TypecheckCorePlugin.logln("Checks finished... (" + timer.getTime()
-				+ " ms)");
-	}
+	_cuparser.parse(_project.getSourcePath(), concrete_features);
+
+	TypecheckCorePlugin.logln("Parsing finished... ("
+		+ _cuparser.timer.getTime() + " ms)");
+	TypecheckCorePlugin.logln("Running checks...");
+	Timer timer = new Timer();
+	timer.start();
+	_checks.invokeChecks(fm);
+	timer.stop();
+	TypecheckCorePlugin.logln("Checks finished... (" + timer.getTime()
+		+ " ms)");
+    }
 }
