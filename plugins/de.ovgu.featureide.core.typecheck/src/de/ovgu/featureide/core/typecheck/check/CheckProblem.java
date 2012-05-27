@@ -41,7 +41,7 @@ public class CheckProblem {
 
     public String toString() {
 	StringBuilder builder = new StringBuilder();
-	builder.append("Problem: ").append(message).append(" in Feature ")
+	builder.append(message).append(" in Feature ")
 		.append(feature.getName()).append(" in File ").append(filename)
 		.append(" at line ").append(linenumber);
 	return builder.toString();

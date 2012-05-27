@@ -50,6 +50,15 @@ public class MethodCheck extends AbstractCheckPlugin {
 	registerNodeType(MethodDecl.class);
     }
 
+    /* (non-Javadoc)
+     * @see de.ovgu.featureide.core.typecheck.check.ICheckPlugin#init()
+     */
+    @Override
+    public void init() {
+        // TODO Auto-generated method stub
+        
+    }
+    
     @Override
     public void invokeCheck(FeatureModel fm) {
 	Map<Feature, List<MethodDecl>> methoddecl_map = getNodesByType(MethodDecl.class);

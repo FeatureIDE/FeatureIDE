@@ -29,9 +29,46 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  */
 public interface ICheckPlugin
 {
+    /**
+     * Registers with the Plug-in Manager for checks
+     * 
+     * @param manager the plug-in manager
+     */
 	public void register(CheckPluginManager manager);
+
+	/**
+	 * Will be called before invoking the check itself
+	 * can be used to initialize data structures using the collected ASTNodes
+	 */
+	public void init();
+	
+	/**
+	 * Will be called by the plug-in manager after {@link ICheckPlugin#init()}
+	 * 
+	 * @param fm the feature model for the software product line to be checked
+	 */
 	public void invokeCheck(FeatureModel fm);
+	
+	/**
+	 * Will be called by the plug-in manager while parsing the AST
+	 * when registered for the specific ASTNode
+	 * 
+	 * @param feature the feature the node belongs to
+	 * @param node the current node
+	 */
 	public void invokeNodeParse(Feature feature, ASTNode node);
+	
+	/**
+	 * Removes all data about the feature from the node list
+	 * Will be called by the parser when a feature is parsed the first time or has to be reparsed
+	 * 
+	 * @param feature
+	 */
 	public void resetFeature(Feature feature);
+	
+	/**
+	 * returns the name of the plug-in
+	 * @return the name
+	 */
 	public String getName();
 }

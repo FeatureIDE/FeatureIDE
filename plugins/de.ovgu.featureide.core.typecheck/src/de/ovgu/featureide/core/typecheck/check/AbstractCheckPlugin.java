@@ -42,8 +42,6 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 public abstract class AbstractCheckPlugin implements ICheckPlugin {
     protected CheckPluginManager _manager;
     protected Set<Class> registered_node_types = new HashSet<Class>();
-    
-    private List<CheckProblem> problems = new ArrayList<CheckProblem>();
 
     protected String plugin_name = "AbstractCheckPlugin";
 
@@ -52,7 +50,6 @@ public abstract class AbstractCheckPlugin implements ICheckPlugin {
      * -> Node Type -> Data ...
      */
     protected Map<Feature, Map<Class, List<ASTNode>>> nodes = new HashMap<Feature, Map<Class, List<ASTNode>>>();
-    protected List<Feature> features = new ArrayList<Feature>();
 
     protected void registerNodeType(Class node_type) {
 	registered_node_types.add(node_type);
@@ -88,7 +85,6 @@ public abstract class AbstractCheckPlugin implements ICheckPlugin {
 	}
 
 	map.get(node.getClass()).add(node);
-	features.add(feature);
     }
 
     public Map<Class, List<ASTNode>> getNodesByFeature(Feature feature) {
@@ -141,20 +137,9 @@ public abstract class AbstractCheckPlugin implements ICheckPlugin {
 
     public void resetFeature(Feature feature) {
 	nodes.remove(feature);
-	features.remove(feature);
     }
-    
-    public void resetProblems(){
-	problems = new ArrayList<CheckProblem>();
-    }
-    
-    public void newProblem(CheckProblem problem){
-	problems.add(problem);
-    }
-    
-    public void reportProblems(){
-	for(CheckProblem problem : problems){
-	    System.out.println(problem);
-	}
+     
+    public void newProblem(CheckProblem problem) {
+	_manager.addProblem(problem, this);
     }
 }

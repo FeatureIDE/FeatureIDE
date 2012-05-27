@@ -49,42 +49,7 @@ public class TypeCheck extends AbstractCheckPlugin {
 	registerNodeType(CompilationUnit.class);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * de.ovgu.featureide.core.typecheck.check.ICheckPlugin#invokeCheck(de.ovgu
-     * .featureide.core.IFeatureProject,
-     * de.ovgu.featureide.core.typecheck.parser.ClassTable)
-     */
-    @Override
-    public void invokeCheck(FeatureModel fm) {
-
-	// doesn't work with annotations and stuff
-	Map<Feature, List<ClassDecl>> cdmap = getNodesByType(ClassDecl.class);
-
-	init_intros();
-
-	for (Feature f : cdmap.keySet()) {
-	    for (ClassDecl cd : cdmap.get(f)) {
-		for (TypeAccess ta : FujiWrapper.getChildNodesByType(cd,
-			TypeAccess.class)) {
-		    if (ta.type() instanceof UnknownType) {
-			Set<Feature> providing_features = providesType(
-				ta.name()).keySet();
-
-			if (!checkFeatureImplication(fm, f, providing_features)) {
-			    newProblem(new CheckProblem(f, cd.compilationUnit().pathName(), ta.lineNumber(), "Missing type dependency " + ta.name()));
-			}
-		    }
-		}
-	    }
-	}
-	
-	reportProblems();
-    }
-
-    protected void init_intros() {
+    public void init() {
 	Map<Feature, List<CompilationUnit>> cumap = getNodesByType(CompilationUnit.class);
 
 	intros = new HashMap<Feature, List<ReferenceType>>();
@@ -99,6 +64,38 @@ public class TypeCheck extends AbstractCheckPlugin {
 			if (!(rt.isAnonymous() || rt.isLocalClass() || rt
 				.isArrayDecl())) {
 			    intros.get(f).add(rt);
+			}
+		    }
+		}
+	    }
+	}
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * de.ovgu.featureide.core.typecheck.check.ICheckPlugin#invokeCheck(de.ovgu
+     * .featureide.core.IFeatureProject,
+     * de.ovgu.featureide.core.typecheck.parser.ClassTable)
+     */
+    @Override
+    public void invokeCheck(FeatureModel fm) {
+
+	// doesn't work with annotations and stuff
+	Map<Feature, List<ClassDecl>> cdmap = getNodesByType(ClassDecl.class);
+
+	for (Feature f : cdmap.keySet()) {
+	    for (ClassDecl cd : cdmap.get(f)) {
+		for (TypeAccess ta : FujiWrapper.getChildNodesByType(cd,
+			TypeAccess.class)) {
+		    if (ta.type() instanceof UnknownType) {
+			Set<Feature> providing_features = providesType(
+				ta.name()).keySet();
+			if (!checkFeatureImplication(fm, f, providing_features)) {
+			    newProblem(new CheckProblem(f, cd.compilationUnit()
+				    .pathName(), ta.lineNumber(),
+				    "Missing type dependency " + ta.name()));
 			}
 		    }
 		}

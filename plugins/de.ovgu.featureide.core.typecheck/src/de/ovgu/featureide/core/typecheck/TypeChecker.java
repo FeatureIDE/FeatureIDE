@@ -21,21 +21,11 @@ package de.ovgu.featureide.core.typecheck;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.osgi.internal.resolver.ComputeNodeOrder;
-
-import AST.ASTNode;
-import AST.CompilationUnit;
-
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.typecheck.check.CheckPluginManager;
-import de.ovgu.featureide.core.typecheck.check.MethodCheck;
-import de.ovgu.featureide.core.typecheck.check.SuperClassCheck;
 import de.ovgu.featureide.core.typecheck.check.TypeCheck;
 import de.ovgu.featureide.core.typecheck.helper.Timer;
 import de.ovgu.featureide.core.typecheck.parser.CUParser;
-import de.ovgu.featureide.core.typecheck.parser.CUTable;
-import de.ovgu.featureide.core.typecheck.parser.ClassTable;
-import de.ovgu.featureide.core.typecheck.parser.Parser;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
@@ -50,8 +40,6 @@ public class TypeChecker {
 
 	private CheckPluginManager _checks;
 	
-	private int runs = 0;
-
 	public TypeChecker(IFeatureProject project) {
 		_project = project;
 
@@ -87,6 +75,5 @@ public class TypeChecker {
 		timer.stop();
 		TypecheckCorePlugin.logln("Checks finished... (" + timer.getTime()
 				+ " ms)");
-		TypecheckCorePlugin.logln("Run #" + ++runs);
 	}
 }

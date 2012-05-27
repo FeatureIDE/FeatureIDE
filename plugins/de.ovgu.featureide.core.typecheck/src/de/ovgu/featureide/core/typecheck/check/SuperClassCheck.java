@@ -47,61 +47,7 @@ public class SuperClassCheck extends AbstractCheckPlugin {
 	registerNodeType(CompilationUnit.class);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.ovgu.featureide.core.typecheck.checks.ICheckPlugin#invokeCheck()
-     */
-    @Override
-    public void invokeCheck(FeatureModel fm) {
-	init_intros();
-
-	Map<Feature, List<ClassDecl>> map = getNodesByType(ClassDecl.class);
-
-	for (Feature key : map.keySet()) {
-	    for (ClassDecl cd : map.get(key)) {
-		if (cd.hasSuperClassAccess()
-			&& cd.getSuperClassAccess().type() instanceof UnknownType) {
-//		    System.out.println("Unknown Type: "
-//			    + cd.getSuperClassAccess().typeName()
-//			    + " in Feature " + key.getName());
-//		    System.out.println("\t can be provided by");
-		    Set<Feature> providing_features = providesType(
-			    cd.getSuperClassAccess().typeName()).keySet();
-//		    for (Feature f : providing_features) {
-//			System.out.println("\t\t" + f.getName());
-//		    }
-		    if (checkFeatureImplication(fm, key, providing_features)) {
-//			System.out.print("\t\t\t" + key.getName() + " -> ");
-//			for (Feature f : providing_features) {
-//			    System.out.print(f.getName() + " ");
-//			}
-//			System.out.println(" holds!");
-		    } else {
-			newProblem(new CheckProblem(key, cd.compilationUnit().pathName(), cd.getSuperClassAccess().lineNumber(), "Missing superclass " + cd.getSuperClassAccess().typeName()));
-//			System.out.println("Missing dependency!!!");
-		    }
-		}
-	    }
-	}
-	reportProblems();
-    }
-
-    private Map<Feature, ReferenceType> providesType(String type) {
-	Map<Feature, ReferenceType> providing_features = new HashMap<Feature, ReferenceType>();
-
-	for (Feature f : intros.keySet()) {
-	    for (ReferenceType rt : intros.get(f)) {
-		if (rt.name().equals(type)) {
-		    providing_features.put(f, rt);
-		}
-	    }
-	}
-
-	return providing_features;
-    }
-
-    protected void init_intros() {
+    public void init() {
 	Map<Feature, List<CompilationUnit>> cumap = getNodesByType(CompilationUnit.class);
 
 	intros = new HashMap<Feature, List<ReferenceType>>();
@@ -121,5 +67,46 @@ public class SuperClassCheck extends AbstractCheckPlugin {
 		}
 	    }
 	}
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.ovgu.featureide.core.typecheck.checks.ICheckPlugin#invokeCheck()
+     */
+    @Override
+    public void invokeCheck(FeatureModel fm) {
+	Map<Feature, List<ClassDecl>> map = getNodesByType(ClassDecl.class);
+
+	for (Feature key : map.keySet()) {
+	    for (ClassDecl cd : map.get(key)) {
+		if (cd.hasSuperClassAccess()
+			&& cd.getSuperClassAccess().type() instanceof UnknownType) {
+		    Set<Feature> providing_features = providesType(
+			    cd.getSuperClassAccess().typeName()).keySet();
+		    if (checkFeatureImplication(fm, key, providing_features)) {
+		    } else {
+			newProblem(new CheckProblem(key, cd.compilationUnit()
+				.pathName(), cd.getSuperClassAccess()
+				.lineNumber(), "Missing superclass "
+				+ cd.getSuperClassAccess().typeName()));
+		    }
+		}
+	    }
+	}
+    }
+
+    private Map<Feature, ReferenceType> providesType(String type) {
+	Map<Feature, ReferenceType> providing_features = new HashMap<Feature, ReferenceType>();
+
+	for (Feature f : intros.keySet()) {
+	    for (ReferenceType rt : intros.get(f)) {
+		if (rt.name().equals(type)) {
+		    providing_features.put(f, rt);
+		}
+	    }
+	}
+
+	return providing_features;
     }
 }

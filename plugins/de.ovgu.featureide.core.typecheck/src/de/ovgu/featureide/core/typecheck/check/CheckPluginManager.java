@@ -40,86 +40,106 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  * @author S�nke Holthusen
  */
 public class CheckPluginManager extends Observable {
-	private ArrayList<ICheckPlugin> _plugins = new ArrayList<ICheckPlugin>();
-	private Map<Class, List<ICheckPlugin>> node_parse_plugins = new HashMap<Class, List<ICheckPlugin>>();
+    private ArrayList<ICheckPlugin> _plugins = new ArrayList<ICheckPlugin>();
+    private Map<Class, List<ICheckPlugin>> node_parse_plugins = new HashMap<Class, List<ICheckPlugin>>();
 
-	/**
-	 * @author S�nke Holthusen
-	 * 
-	 * 
-	 * 
-	 * @param plugins
-	 *            the plug-ins to be registered for checks
-	 */
-	public CheckPluginManager(ICheckPlugin... plugins) {
-		addCheck(plugins);
-	}
+    private Map<CheckProblem, ICheckPlugin> problems = new HashMap<CheckProblem, ICheckPlugin>();
 
-	private void addCheck(ICheckPlugin... plugins) {
-		for (ICheckPlugin plugin : plugins) {
-			add(plugin);
-		}
-	}
+    /**
+     * @author S�nke Holthusen
+     * 
+     * 
+     * 
+     * @param plugins
+     *            the plug-ins to be registered for checks
+     */
+    public CheckPluginManager(ICheckPlugin... plugins) {
+	addCheck(plugins);
+    }
 
-	private void add(ICheckPlugin plugin) {
-		plugin.register(this);
-		_plugins.add(plugin);
+    private void addCheck(ICheckPlugin... plugins) {
+	for (ICheckPlugin plugin : plugins) {
+	    add(plugin);
 	}
+    }
 
-	/**
-	 * @author S�nke Holthusen
-	 * 
-	 *         Invokes a check in every registered plug-in
-	 * 
-	 * @param project
-	 * @param class_table
-	 */
-	public void invokeChecks(FeatureModel fm) {
-		for (ICheckPlugin plugin : _plugins) {
-			plugin.invokeCheck(fm);
-		}
-	}
+    private void add(ICheckPlugin plugin) {
+	plugin.register(this);
+	_plugins.add(plugin);
+    }
 
-	/**
-	 * @author S�nke Holthusen
-	 * 
-	 *         Registers a check plug-in for a specific ASTNode
-	 * 
-	 * @param node
-	 *            The node type the plug-in registers for
-	 * @param plugin
-	 *            the plug-in itself
-	 */
-	public void registerForNodeParse(Class node, ICheckPlugin plugin) {
-		if (!node_parse_plugins.containsKey(node)) {
-			node_parse_plugins.put(node, new ArrayList<ICheckPlugin>());
-		}
-		List<ICheckPlugin> list = node_parse_plugins.get(node);
-		list.add(plugin);
+    /**
+     * @author S�nke Holthusen
+     * 
+     *         Invokes a check in every registered plug-in
+     * 
+     * @param project
+     * @param class_table
+     */
+    public void invokeChecks(FeatureModel fm) {
+	resetProblems();
+	for (ICheckPlugin plugin : _plugins) {
+	    plugin.init();
+	    plugin.invokeCheck(fm);
 	}
+	reportproblems();
+    }
 
-	/**
-	 * @author S�nke Holthusen
-	 * 
-	 *         Delivers an ASTNode to the registered plug-ins
-	 * 
-	 * @param feature
-	 *            the feature the node is associated with
-	 * @param node
-	 *            the node to
-	 */
-	public void invokeNodeParse(Feature feature, ASTNode node) {
-		List<ICheckPlugin> list = node_parse_plugins.get(node.getClass());
-		if (list != null) {
-			for (ICheckPlugin plugin : list) {
-				plugin.invokeNodeParse(feature, node);
-			}
-		}
+    /**
+     * @author S�nke Holthusen
+     * 
+     *         Registers a check plug-in for a specific ASTNode
+     * 
+     * @param node
+     *            The node type the plug-in registers for
+     * @param plugin
+     *            the plug-in itself
+     */
+    public void registerForNodeParse(Class node, ICheckPlugin plugin) {
+	if (!node_parse_plugins.containsKey(node)) {
+	    node_parse_plugins.put(node, new ArrayList<ICheckPlugin>());
 	}
-	
-	public void resetFeature(Feature feature){
-		for(ICheckPlugin plugin : _plugins){
-			plugin.resetFeature(feature);
-		}
+	List<ICheckPlugin> list = node_parse_plugins.get(node);
+	list.add(plugin);
+    }
+
+    /**
+     * @author S�nke Holthusen
+     * 
+     *         Delivers an ASTNode to the registered plug-ins
+     * 
+     * @param feature
+     *            the feature the node is associated with
+     * @param node
+     *            the node to
+     */
+    public void invokeNodeParse(Feature feature, ASTNode node) {
+	List<ICheckPlugin> list = node_parse_plugins.get(node.getClass());
+	if (list != null) {
+	    for (ICheckPlugin plugin : list) {
+		plugin.invokeNodeParse(feature, node);
+	    }
 	}
+    }
+
+    public void resetFeature(Feature feature) {
+	for (ICheckPlugin plugin : _plugins) {
+	    plugin.resetFeature(feature);
+	}
+    }
+
+    public void resetProblems(){
+	problems = new HashMap<CheckProblem, ICheckPlugin>();
+    }
+    
+    public void addProblem(CheckProblem problem, ICheckPlugin plugin) {
+	problems.put(problem, plugin);
+    }
+
+    public void reportproblems() {
+	for (CheckProblem problem : problems.keySet()) {
+	    System.out.println(problems.get(problem).getName() + " reported a Problem:");
+	    System.out.println(problem);
+	}
+    }
 }
