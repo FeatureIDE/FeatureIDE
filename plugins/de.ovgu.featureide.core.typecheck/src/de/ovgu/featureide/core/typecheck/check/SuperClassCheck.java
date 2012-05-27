@@ -18,16 +18,17 @@
  */
 package de.ovgu.featureide.core.typecheck.check;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import AST.ClassDecl;
-import AST.TypeAccess;
+import AST.CompilationUnit;
+import AST.ReferenceType;
+import AST.TypeDecl;
 import AST.UnknownType;
-import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.typecheck.parser.ClassTable;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
@@ -38,56 +39,87 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  */
 
 public class SuperClassCheck extends AbstractCheckPlugin {
-	public SuperClassCheck() {
-		plugin_name = "SuperClassCheck";
-		registerNodeType(ClassDecl.class);
-		registerNodeType(TypeAccess.class);
-	}
+    private Map<Feature, List<ReferenceType>> intros;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.typecheck.checks.ICheckPlugin#invokeCheck()
-	 */
-	@Override
-	public void invokeCheck(FeatureModel fm) {
-		Map<Feature, List<ClassDecl>> map = getNodesByType(ClassDecl.class);
-		for (Feature key : map.keySet()) {
-			for (ClassDecl cd : map.get(key)) {
-				if(cd.hasSuperClassAccess() && cd.getSuperClassAccess().type() instanceof UnknownType){
-					System.out.println("Unknown Type: " + cd.getSuperClassAccess().typeName() + " in Feature " + key.getName());
-					System.out.println("\t can be provided by");
-					Set<Feature> providing_features = providesType(map, cd.getSuperClassAccess().typeName()).keySet();
-					for(Feature f : providing_features){
-						System.out.println("\t\t" + f.getName());
-					}
-					if(checkFeatureImplication(fm, key, providing_features)){
-						System.out.print("\t\t\t" + key.getName() + " -> ");
-						for(Feature f : providing_features){
-							System.out.print(f.getName() + " ");
-						}
-						System.out.println(" holds!");
-					}
-					else {
-						System.out.println("Missing dependency!!!");
-					}
-				}
+    public SuperClassCheck() {
+	plugin_name = "SuperClassCheck";
+	registerNodeType(ClassDecl.class);
+	registerNodeType(CompilationUnit.class);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.ovgu.featureide.core.typecheck.checks.ICheckPlugin#invokeCheck()
+     */
+    @Override
+    public void invokeCheck(FeatureModel fm) {
+	init_intros();
+
+	Map<Feature, List<ClassDecl>> map = getNodesByType(ClassDecl.class);
+
+	for (Feature key : map.keySet()) {
+	    for (ClassDecl cd : map.get(key)) {
+		if (cd.hasSuperClassAccess()
+			&& cd.getSuperClassAccess().type() instanceof UnknownType) {
+		    System.out.println("Unknown Type: "
+			    + cd.getSuperClassAccess().typeName()
+			    + " in Feature " + key.getName());
+		    System.out.println("\t can be provided by");
+		    Set<Feature> providing_features = providesType(
+			    cd.getSuperClassAccess().typeName()).keySet();
+		    for (Feature f : providing_features) {
+			System.out.println("\t\t" + f.getName());
+		    }
+		    if (providing_features.size() > 0
+			    && checkFeatureImplication(fm, key,
+				    providing_features)) {
+			System.out.print("\t\t\t" + key.getName() + " -> ");
+			for (Feature f : providing_features) {
+			    System.out.print(f.getName() + " ");
 			}
+			System.out.println(" holds!");
+		    } else {
+			System.out.println("Missing dependency!!!");
+		    }
 		}
+	    }
+	}
+    }
+
+    private Map<Feature, ReferenceType> providesType(String type) {
+	Map<Feature, ReferenceType> providing_features = new HashMap<Feature, ReferenceType>();
+
+	for (Feature f : intros.keySet()) {
+	    for (ReferenceType rt : intros.get(f)) {
+		if (rt.name().equals(type)) {
+		    providing_features.put(f, rt);
+		}
+	    }
 	}
 
-	private Map<Feature, ClassDecl> providesType(
-			Map<Feature, List<ClassDecl>> map, String type) {
-		Map<Feature, ClassDecl> providing_features = new HashMap<Feature, ClassDecl>();
+	return providing_features;
+    }
 
-		for (Feature f : map.keySet()) {
-			for (ClassDecl cd : map.get(f)) {
-				if (cd.name().equals(type)) {
-					providing_features.put(f, cd);
-				}
+    protected void init_intros() {
+	Map<Feature, List<CompilationUnit>> cumap = getNodesByType(CompilationUnit.class);
+
+	intros = new HashMap<Feature, List<ReferenceType>>();
+	for (Feature f : cumap.keySet()) {
+	    if (!intros.containsKey(f)) {
+		intros.put(f, new ArrayList<ReferenceType>());
+	    }
+	    for (CompilationUnit cu : cumap.get(f)) {
+		for (TypeDecl td : cu.getTypeDecls()) {
+		    if (td instanceof ReferenceType) {
+			ReferenceType rt = (ReferenceType) td;
+			if (!(rt.isAnonymous() || rt.isLocalClass() || rt
+				.isArrayDecl())) {
+			    intros.get(f).add(rt);
 			}
+		    }
 		}
-
-		return providing_features;
+	    }
 	}
+    }
 }

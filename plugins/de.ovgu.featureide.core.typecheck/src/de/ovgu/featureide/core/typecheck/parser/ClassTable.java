@@ -115,7 +115,7 @@ public class ClassTable
 			_features_by_class.put(class_ast.fullName(), feature_entries);
 		}
 
-		if (class_entries.contains(entry) || feature_entries.contains(entry))
+		if (class_entries.contains(entry) || feature_entries.contains(feature))
 		{
 			return false;
 		}

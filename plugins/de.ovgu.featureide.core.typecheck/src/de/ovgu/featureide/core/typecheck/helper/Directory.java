@@ -40,7 +40,7 @@ public class Directory {
 	public Directory(File dir) {
 		directory = dir;
 
-		init();
+		update();
 	}
 
 	public boolean changed() {
@@ -60,14 +60,6 @@ public class Directory {
 		}
 
 		return false;
-	}
-
-	private void init() {
-		times = new HashMap<File, Long>();
-
-		for (File f : parse()) {
-			times.put(f, 0l);
-		}
 	}
 
 	public void update() {

@@ -1,6 +1,8 @@
 package de.ovgu.featureide.core.typecheck;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 import org.osgi.framework.BundleContext;
@@ -12,7 +14,7 @@ import org.prop4j.Or;
 import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.core.typecheck.parser.ClassTableCache;
+import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -23,7 +25,8 @@ public class TypecheckCorePlugin extends AbstractCorePlugin {
 
 	public static final String PLUGIN_ID = "de.ovgu.featureide.core.typecheck";
 
-	public static ClassTableCache class_table_cache = new ClassTableCache();
+	public Map<IFeatureProject, TypeChecker> typechecker = new HashMap<IFeatureProject, TypeChecker>();
+	public static  String[] supportedComposers = { "de.ovgu.featureide.composer.featurehouse" };
 
 	private static TypecheckCorePlugin plugin;
 	

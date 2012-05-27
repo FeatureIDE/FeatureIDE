@@ -20,7 +20,7 @@ import de.ovgu.featureide.core.typecheck.TypecheckCorePlugin;
  * @author Sönke Holthusen
  * 
  */
-public class TypecheckAction implements IObjectActionDelegate {
+public class TypecheckCleanAction implements IObjectActionDelegate {
 
     private IStructuredSelection selection;
 
@@ -36,9 +36,9 @@ public class TypecheckAction implements IObjectActionDelegate {
 
 	    if (Arrays.asList(TypecheckCorePlugin.supportedComposers).contains(
 		    project.getComposerID())) {
-		if (!typechecker.containsKey(project)) {
-		    typechecker.put(project, new TypeChecker(project));
-		}
+
+		typechecker.put(project, new TypeChecker(project));
+
 		typechecker.get(project).run();
 	    } else {
 		// TODO: change output method
