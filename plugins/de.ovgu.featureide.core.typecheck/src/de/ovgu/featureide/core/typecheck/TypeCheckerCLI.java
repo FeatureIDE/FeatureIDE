@@ -42,7 +42,7 @@ public class TypeCheckerCLI {
 	String fmfile = args[0];
 	String sourcepath = args[1];
 
-	System.out.println("Reading FeatureModel from " + fmfile);
+	System.out.print("Reading FeatureModel from " + fmfile + "... ");
 	FeatureModel fm = new FeatureModel();
 	XmlFeatureModelReader reader = new XmlFeatureModelReader(fm);
 	try {
@@ -57,6 +57,8 @@ public class TypeCheckerCLI {
 	}
 	List<Feature> concrete_features = new ArrayList<Feature>(
 		fm.getConcreteFeatures());
+	
+	System.out.println("done");
 
 	CheckPluginManager manager = new CheckPluginManager(new TypeCheck(), new SuperClassCheck());
 	CUParser parser = new CUParser(manager);
