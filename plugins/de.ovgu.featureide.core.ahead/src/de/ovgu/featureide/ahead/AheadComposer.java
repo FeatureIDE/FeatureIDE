@@ -375,6 +375,7 @@ public class AheadComposer extends ComposerExtensionClass {
 		}
 	}
 
+	// TODO this should be done with external classes
 	private void addSettings(IProject project) {
 		IFolder settingsFolder = project.getFolder(".settings");
 		if (!settingsFolder.exists()) {
@@ -412,10 +413,10 @@ public class AheadComposer extends ComposerExtensionClass {
 	 * @see de.ovgu.featureide.core.builder.ComposerExtensionClass#buildConfiguration(org.eclipse.core.resources.IFolder, de.ovgu.featureide.fm.core.configuration.Configuration)
 	 */
 	@Override
-	public void buildConfiguration(IFolder folder, Configuration configuration) {
-		super.buildConfiguration(folder, configuration);
+	public void buildConfiguration(IFolder folder, Configuration configuration, String configurationName) {
+		super.buildConfiguration(folder, configuration, configurationName);
 		ahead.setCompositionFolder(folder);
-		performFullBuild(folder.getFile(folder.getName() + getConfigurationExtension()));
+		performFullBuild(folder.getFile(configurationName + getConfigurationExtension()));
 		ahead.setCompositionFolder(featureProject.getBuildFolder());
 	}
 }

@@ -19,11 +19,9 @@
 package de.ovgu.featureide.featurehouse;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Scanner;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -375,24 +373,21 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	}
 
 	@Override
-	public boolean copyNotComposedFiles() {
+	public void copyNotComposedFiles(IFile config, IFolder destination) {
 		try {
-			copy(featureProject.getCurrentConfiguration());
+			copy(config, destination);
 		} catch (CoreException e) {
 			FeatureHouseCorePlugin.getDefault().logError(e);
 		}
-		return true;
 	}
 
-	private void copy(IFile config) throws CoreException {
+	private void copy(IFile config, IFolder destination) throws CoreException {
 		ArrayList<String> selectedFeatures = getSelectedFeatures(config);
 		if (selectedFeatures != null)
 			for (String feature : selectedFeatures) {
 				IFolder folder = featureProject.getSourceFolder().getFolder(
 						feature);
-				copy(folder,
-						featureProject.getBuildFolder().getFolder(
-								config.getName().split("[.]")[0]));
+				copy(folder,destination);
 			}
 	}
 
@@ -426,28 +421,6 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	private static ArrayList<String> getSelectedFeatures(IFile config) {
 		File configFile = config.getRawLocation().toFile();
 		return getTokenListFromFile(configFile);
-	}
-
-	private static ArrayList<String> getTokenListFromFile(File file) {
-		ArrayList<String> list = null;
-		Scanner scanner = null;
-
-		try {
-			scanner = new Scanner(file);
-			if (scanner.hasNext()) {
-				list = new ArrayList<String>();
-				while (scanner.hasNext()) {
-					list.add(scanner.next());
-				}
-
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} finally {
-			if (scanner != null)
-				scanner.close();
-		}
-		return list;
 	}
 
 	@Override
@@ -548,14 +521,22 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	 * de.ovgu.featureide.fm.core.configuration.Configuration)
 	 */
 	@Override
-	public void buildConfiguration(IFolder folder, Configuration configuration) {
-		super.buildConfiguration(folder, configuration);
+	public void buildConfiguration(IFolder folder, Configuration configuration, String congurationName) {
+		super.buildConfiguration(folder, configuration, folder.getName());
+		IFile configurationFile = folder.getFile(folder.getName() + getConfigurationExtension());
 		composer = new FSTGenComposer(false);
 		composer.addParseErrorListener(listener);
 		composer.run(new String[]{
-				CmdLineInterpreter.INPUT_OPTION_EQUATIONFILE, folder.getFile(folder.getName() + getConfigurationExtension()).getRawLocation().toOSString(),
+				CmdLineInterpreter.INPUT_OPTION_EQUATIONFILE, configurationFile.getRawLocation().toOSString(),
 				CmdLineInterpreter.INPUT_OPTION_BASE_DIRECTORY, featureProject.getSourcePath(),
-				CmdLineInterpreter.INPUT_OPTION_OUTPUT_DIRECTORY, folder.getParent().getRawLocation().toOSString() + "/"
+				CmdLineInterpreter.INPUT_OPTION_OUTPUT_DIRECTORY, folder.getParent().getLocation().toOSString() + "/"
 		});
+		if (!configurationFile.getName().startsWith(congurationName)) {
+			try {
+				configurationFile.move(((IFolder)configurationFile.getParent()).getFile(congurationName + getConfigurationExtension()).getFullPath(), true, null);
+			} catch (CoreException e) {
+				FeatureHouseCorePlugin.getDefault().logError(e);
+			}
+		}
 	}
 }

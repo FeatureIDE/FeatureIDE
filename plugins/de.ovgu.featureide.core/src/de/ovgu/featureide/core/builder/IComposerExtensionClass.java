@@ -58,10 +58,11 @@ public interface IComposerExtensionClass {
 	
 	/**
 	 * Builds a configuration to the given folder
-	 * @param folder
-	 * @param configuration
+	 * @param folder The destination
+	 * @param configuration The configuration to build
+	 * @param congurationName The name of the configuration
 	 */
-	void buildConfiguration(IFolder folder, Configuration configuration);
+	void buildConfiguration(IFolder folder, Configuration configuration, String congurationName);
 	
 	/**
 	 * 
@@ -71,9 +72,10 @@ public interface IComposerExtensionClass {
 	
 	/**
 	 * Copies not composed files to the source folder
-	 * @return <code>false</code> if not composed files should be moved in a common way
+	 * @param config The configuration file
+	 * @param destination The destination to copy
 	 */
-	boolean copyNotComposedFiles();
+	void copyNotComposedFiles(IFile config, IFolder destination);
 	
 	/**
 	 * 

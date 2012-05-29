@@ -18,14 +18,9 @@
  */
 package de.ovgu.featureide.core.builder;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.Map;
-import java.util.Scanner;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -180,13 +175,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
-		try {
-			if (!composerExtension.copyNotComposedFiles()) {
-				copy(config);
-			}
-		} catch (CoreException e1) {
-			CorePlugin.getDefault().logError(e1);
-		}
+		composerExtension.copyNotComposedFiles(config, featureProject.getBuildFolder());
 		try {
 			featureProject.getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
 		} catch (CoreException e) {
@@ -194,77 +183,6 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		}
 		return null;
 		
-	}
-	
-	/**
-	 *  copies all not composed Files of selected Features from src to build
-	 * @throws CoreException
-	 */
-	private void copy(IFile config) throws CoreException {
-		ArrayList<String > selectedFeatures = getSelectedFeatures(config);
-		if (selectedFeatures != null)
-			for (String feature : selectedFeatures) {
-				IFolder folder = featureProject.getSourceFolder().getFolder(feature);
-				copy(folder, featureProject.getBuildFolder());
-			}
-	}
-	
-	private void copy(IFolder featureFolder, IFolder buildFolder) throws CoreException {
-		if (!featureFolder.exists()) {
-			return;
-		}
-		
-		for (IResource res : featureFolder.members()) {
-			if (res instanceof IFolder) {
-				IFolder folder = buildFolder.getFolder(res.getName());
-				if (!folder.exists()) {
-					folder.create(false, true, null);
-				}
-				copy((IFolder)res, folder);
-			} else if (res instanceof IFile) {
-				if (!composerExtension.extensions().contains("." + res.getName().split("[.]")[1])) {
-					IFile file = buildFolder.getFile(res.getName());
-					if (!file.exists()) {
-						res.copy(file.getFullPath(), true, null);
-					}
-				}
-			}
-		}
-	}
-
-	private static ArrayList<String> getSelectedFeatures(IFile config) {
-		File configFile = config.getRawLocation().toFile();
-		return getTokenListFromFile(configFile);
-	}
-
-	/**
-	 * returns a List of the tokens in file+
-	 * this method is public for testing purposes 
-	 * 
-	 * @param file
-	 * @return List of tokens
-	 */
-	public static ArrayList<String> getTokenListFromFile(File file) {
-		ArrayList<String> list = null;
-		Scanner scanner = null;
-
-		try {
-			scanner = new Scanner(file);
-
-			if (scanner.hasNext()) {
-				list = new ArrayList<String>();
-				while (scanner.hasNext()) {
-					list.add(scanner.next());
-				}
-
-			}
-
-		} catch (FileNotFoundException e) {
-			CorePlugin.getDefault().logError(e);
-		} finally {
-			if(scanner!=null)scanner.close();
-		}
-		return list;
 	}
 
 }

@@ -34,7 +34,7 @@ public class TExtensibleFeatureProjectBuilder {
 		FileWriter fw = new FileWriter(tempFile);
 		fw.write("one   two \n three");
 		fw.close();
-		ArrayList<String> list = ExtensibleFeatureProjectBuilder
+		ArrayList<String> list = ComposerExtensionClass
 				.getTokenListFromFile(tempFile);
 		assertEquals(expectedList, list);
 	}

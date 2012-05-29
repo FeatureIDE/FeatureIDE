@@ -149,9 +149,8 @@ public class DeltajComposer extends ComposerExtensionClass {
 	}
 
 	@Override
-	public boolean copyNotComposedFiles() {
+	public void copyNotComposedFiles(IFile config, IFolder destination) {
 		copyFolderMembers(featureProject.getSourceFolder());
-		return false;
 	}
 
 	private void copyFolderMembers(IFolder folder) {

@@ -416,8 +416,8 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 	 * @see de.ovgu.featureide.core.builder.ComposerExtensionClass#buildConfiguration(org.eclipse.core.resources.IFolder, de.ovgu.featureide.fm.core.configuration.Configuration)
 	 */
 	@Override
-	public void buildConfiguration(IFolder folder, Configuration configuration) {
-		super.buildConfiguration(folder, configuration);
+	public void buildConfiguration(IFolder folder, Configuration configuration, String congurationName) {
+		super.buildConfiguration(folder, configuration, congurationName);
 		if (activatedFeatures == null) {
 			activatedFeatures = new ArrayList<String>();
 		} else {

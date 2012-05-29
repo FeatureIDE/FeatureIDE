@@ -61,7 +61,8 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 		if (project == null) {
 			return false;
 		}
-	featureCpp.initialize(project.getSourceFolder(), project
+		super.initialize(project);
+		featureCpp.initialize(project.getSourceFolder(), project
 				.getBuildFolder());
 		
 		featureCppModelBuilder = new FeatureCppModelBuilder(project);
@@ -188,8 +189,8 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 	 * @see de.ovgu.featureide.core.builder.ComposerExtensionClass#buildConfiguration(org.eclipse.core.resources.IFolder, de.ovgu.featureide.fm.core.configuration.Configuration)
 	 */
 	@Override
-	public void buildConfiguration(IFolder folder, Configuration configuration) {
-		super.buildConfiguration(folder, configuration);
+	public void buildConfiguration(IFolder folder, Configuration configuration, String congurationName) {
+		super.buildConfiguration(folder, configuration, congurationName);
 		featureCpp.initialize(null, folder);
 		try {
 			for (IResource res :folder.members()) {

@@ -146,8 +146,8 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#copyNotComposedFiles()
 	 */
-	public boolean copyNotComposedFiles() {
-		return composerExtensionClass.copyNotComposedFiles();
+	public void copyNotComposedFiles(IFile config, IFolder destination) {
+		composerExtensionClass.copyNotComposedFiles(config, destination);
 	}
 
 	/* (non-Javadoc)
@@ -237,8 +237,8 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#buildConfiguration(org.eclipse.core.resources.IFolder, de.ovgu.featureide.fm.core.configuration.Configuration)
 	 */
-	public void buildConfiguration(IFolder folder, Configuration configuration) {
-		composerExtensionClass.buildConfiguration(folder, configuration);
+	public void buildConfiguration(IFolder folder, Configuration configuration, String congurationName) {
+		composerExtensionClass.buildConfiguration(folder, configuration, congurationName);
 	}
 
 	/* (non-Javadoc)

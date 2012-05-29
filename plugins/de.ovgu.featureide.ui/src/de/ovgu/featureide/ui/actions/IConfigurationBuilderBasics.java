@@ -20,6 +20,8 @@ package de.ovgu.featureide.ui.actions;
 
 import java.util.regex.Pattern;
 
+import org.eclipse.core.runtime.QualifiedName;
+
 import de.ovgu.featureide.core.CorePlugin;
 
 /**
@@ -32,17 +34,22 @@ import de.ovgu.featureide.core.CorePlugin;
  */
 public interface IConfigurationBuilderBasics {
 	
-	/*
+	/**
 	 * Basics for the dialogs.
 	 */
-	final static String MESSAGE_TITLE = "Build all valid configurations";
-	final static String MESSAGE_START = "This could take a very long time.\nThe current algorithm is very efficient if your model contains many constraints.\n";
-	final static String MESSAGE_END = "All products will be built into: \"";
-	final static String TOGGLE_MESSAGE = "Call the compiler after build(Java1.6 only).";
+	final static String MESSAGE_TITLE_VALID = "Build all valid configurations";
+	final static String MESSAGE_TITLE_CURRENT = "Build all current configurations";
+	final static String MESSAGE_CURRENT = "Builds all current configurations";
+	final static String MESSAGE_START = "This could take a very long time.\nThe current algorithm is very inefficient, if your model contains many constraints.\n";
+	final static String TOGGLE_MESSAGE = "Create a new project for each variant";
+	
+	static final QualifiedName TOGGLE_STATE = new QualifiedName("CreateNewProject", "CreateNewProject");
+	final static String TRUE = "true";
+	final static String FALSE = "false";
 	
 //------------------------------------------------------------------------------
 	
-	/*
+	/**
 	 * Basics for the ConfigurationBuilder.
 	 */
 	final static String JOB_TITLE = "Build all valid configurations";

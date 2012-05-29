@@ -58,6 +58,7 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
  * 
  * @author Jens Meinicke
  */
+// implement buildconfiguration
 @SuppressWarnings("restriction")
 public class AspectJComposer extends ComposerExtensionClass {
 
@@ -185,8 +186,8 @@ public class AspectJComposer extends ComposerExtensionClass {
 	}
 
 	@Override
-	public boolean copyNotComposedFiles() {
-		return true;
+	public void copyNotComposedFiles(IFile config, IFolder destination) {
+		
 	}
 	
 	/**

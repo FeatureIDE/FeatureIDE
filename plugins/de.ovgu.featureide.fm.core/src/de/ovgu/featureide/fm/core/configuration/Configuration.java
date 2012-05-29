@@ -290,4 +290,19 @@ public class Configuration {
 		return featureModel;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		for (Feature f : getSelectedFeatures()) {
+			if (f.isAbstract()) {
+				continue;
+			}
+			builder.append(f.getName());
+			builder.append("\r\n");
+		}
+		return builder.toString();
+	}
 }

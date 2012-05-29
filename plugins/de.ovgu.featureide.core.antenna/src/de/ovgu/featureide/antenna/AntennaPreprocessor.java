@@ -51,6 +51,7 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
  * @author Christoph Giesel
  * @author Marcus Kamieth
  */
+// TODO implement buildConfiguration
 public class AntennaPreprocessor extends PPComposerExtensionClass {
 
 	/** antenna preprocessor used from external library */
@@ -381,8 +382,8 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	}
 
 	@Override
-	public boolean copyNotComposedFiles() {
-		return true;
+	public void copyNotComposedFiles(IFile config, IFolder destination) {
+		
 	}
 
 	@Override

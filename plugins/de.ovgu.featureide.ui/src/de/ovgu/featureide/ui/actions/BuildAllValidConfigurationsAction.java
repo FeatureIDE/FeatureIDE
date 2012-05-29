@@ -19,6 +19,8 @@
 package de.ovgu.featureide.ui.actions;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.viewers.ISelection;
@@ -28,6 +30,7 @@ import org.eclipse.ui.IWorkbenchPart;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 
 /**
  * Builds all valid configurations for a selected feature project.
@@ -37,8 +40,6 @@ import de.ovgu.featureide.core.IFeatureProject;
 public class BuildAllValidConfigurationsAction implements
 		IObjectActionDelegate, IConfigurationBuilderBasics {
 	private ISelection selection;
-	private IFeatureProject featureProject;
-	private boolean TOGGLE_STATE = true;
 
 	public BuildAllValidConfigurationsAction() {
 	}
@@ -51,6 +52,7 @@ public class BuildAllValidConfigurationsAction implements
 	@Override
 	public void run(IAction action) {
 		Object obj = ((IStructuredSelection) selection).getFirstElement();
+		IFeatureProject featureProject;
 		if (obj instanceof IResource) {
 			IResource res = (IResource) obj;
 			featureProject = CorePlugin.getFeatureProject(res);
@@ -65,7 +67,7 @@ public class BuildAllValidConfigurationsAction implements
 			new ConfigurationBuilder(featureProject, true,
 					dialog.getToggleState());
 		}
-		TOGGLE_STATE = dialog.getToggleState();
+		setToggleState(dialog.getToggleState());
 	}
 
 	/**
@@ -74,12 +76,31 @@ public class BuildAllValidConfigurationsAction implements
 	 * @return true if all valid configurations should be build.
 	 */
 	private MessageDialogWithToggle openDialog() {
-		String message = MESSAGE_START + MESSAGE_END
-				+ featureProject.getProject()
-						.getFolder(ConfigurationBuilder.FOLDER_NAME)
-						.getFullPath().toOSString() + "\"";
-		return MessageDialogWithToggle.openOkCancelConfirm(null, MESSAGE_TITLE,
-				message, TOGGLE_MESSAGE, TOGGLE_STATE, null, "");
+		return MessageDialogWithToggle.openOkCancelConfirm(null, MESSAGE_TITLE_VALID,
+				MESSAGE_START, TOGGLE_MESSAGE, getToggleState(), null, "");
+	}
+	
+	/**
+	 * Gets the toggle state from persistent properties
+	 */
+	private static boolean getToggleState() {
+		try {
+			return "true".equals(ResourcesPlugin.getWorkspace().getRoot().getPersistentProperty(TOGGLE_STATE));
+		} catch (CoreException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+		return false;
+	}
+
+	/**
+	 * Saves the toggle state of the dialog at persistent properties
+	 */
+	private static void setToggleState(boolean value) {
+		try {
+			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(TOGGLE_STATE, value ? TRUE : FALSE);
+		} catch (CoreException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
 	}
 
 	/*

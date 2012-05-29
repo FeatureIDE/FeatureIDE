@@ -18,14 +18,18 @@
  */
 package de.ovgu.featureide.core.builder;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Scanner;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -65,8 +69,76 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		return true;
 	}
 
-	public boolean copyNotComposedFiles() {
-		return false;
+	public void copyNotComposedFiles(IFile config, IFolder destination) {
+		ArrayList<String > selectedFeatures = getSelectedFeatures(config);
+		if (selectedFeatures != null)
+			for (String feature : selectedFeatures) {
+				IFolder folder = featureProject.getSourceFolder().getFolder(feature);
+				try {
+					copy(folder, destination);
+				} catch (CoreException e) {
+					CorePlugin.getDefault().logError(e);
+				}
+			}
+	}
+	
+	private void copy(IFolder featureFolder, IFolder buildFolder) throws CoreException {
+		if (!featureFolder.exists()) {
+			return;
+		}
+		
+		for (IResource res : featureFolder.members()) {
+			if (res instanceof IFolder) {
+				IFolder folder = buildFolder.getFolder(res.getName());
+				if (!folder.exists()) {
+					folder.create(false, true, null);
+				}
+				copy((IFolder)res, folder);
+			} else if (res instanceof IFile) {
+				if (!extensions().contains("." + res.getName().split("[.]")[1])) {
+					IFile file = buildFolder.getFile(res.getName());
+					if (!file.exists()) {
+						res.copy(file.getFullPath(), true, null);
+					}
+				}
+			}
+		}
+	}
+
+	// TODO this should be done with a ConfigurationReader
+	private ArrayList<String> getSelectedFeatures(IFile config) {
+		File configFile = config.getRawLocation().toFile();
+		return getTokenListFromFile(configFile);
+	}
+
+	/**
+	 * returns a List of the tokens in file+
+	 * this method is public for testing purposes 
+	 * 
+	 * @param file
+	 * @return List of tokens
+	 */
+	public static ArrayList<String> getTokenListFromFile(File file) {
+		ArrayList<String> list = null;
+		Scanner scanner = null;
+
+		try {
+			scanner = new Scanner(file);
+
+			if (scanner.hasNext()) {
+				list = new ArrayList<String>();
+				while (scanner.hasNext()) {
+					list.add(scanner.next());
+				}
+
+			}
+
+		} catch (FileNotFoundException e) {
+			CorePlugin.getDefault().logError(e);
+		} finally {
+			if(scanner!=null)scanner.close();
+		}
+		return list;
 	}
 
 	public LinkedHashSet<String> extensions() {
@@ -241,14 +313,15 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	/**
 	 * Creates a configuration file at the given folder
 	 */
-	public void buildConfiguration(IFolder folder, Configuration configuration) {
+	public void buildConfiguration(IFolder folder, Configuration configuration, String congurationName) {
 		try {
 			if (!folder.exists()) {
 				folder.create(true, false, null);
 			}
-			IFile configurationFile = folder.getFile(folder.getName() + getConfigurationExtension());
+			IFile configurationFile = folder.getFile(congurationName + getConfigurationExtension());
 			ConfigurationWriter writer = new ConfigurationWriter(configuration);
 			writer.saveToFile(configurationFile);
+			copyNotComposedFiles(configurationFile, folder);
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}

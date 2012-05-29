@@ -27,23 +27,35 @@ import java.util.Scanner;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 
+import org.eclipse.core.internal.resources.Workspace;
+import org.eclipse.core.resources.ICommand;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.internal.core.ClasspathEntry;
 import org.eclipse.jdt.internal.core.JavaProject;
 
 import com.sun.tools.javac.Main;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.builder.ExtensibleFeatureProjectBuilder;
+import de.ovgu.featureide.core.builder.FeatureProjectNature;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
@@ -58,7 +70,7 @@ import de.ovgu.featureide.ui.UIPlugin;
  */
 @SuppressWarnings("restriction")
 public class ConfigurationBuilder implements IConfigurationBuilderBasics {
-	private IFeatureProject project;
+	private IFeatureProject featureProject;
 	private IFolder folder;
 	private FeatureModel featureModel;
 	private Configuration configuration;
@@ -68,23 +80,24 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	private boolean counting = true;
 	private String classpath = "";
 	private IFolder tmp;
-	private boolean compile;
+	private boolean createNewProjects;
 	
 	/**
 	 * Starts the build process for valid or current configurations for the given feature project.
 	 * @param featureProject The feature project
 	 * @param buildAllValidConfigurations <code>true</code> if all possible valid configurations should be build<br>
 	 * <code>false</code> if all current configurations should be build
-	 * @param compile <code>true</code> if the compiler should be performed after build.
+	 * @param createNewProjects <code>true</code> if the configurations should be built into separate projects
 	 * @see BuildAllConfigurationsAction
 	 * @see BuildAllValidConfigurationsAction
 	 */
-	ConfigurationBuilder(final IFeatureProject featureProject, final boolean buildAllValidConfigurations, boolean compile) {
-		project = featureProject;
-		featureModel = project.getFeatureModel();
-		this.compile = compile;
+	ConfigurationBuilder(final IFeatureProject featureProject, final boolean buildAllValidConfigurations,
+			final boolean createNewProjects) {
+		this.featureProject = featureProject;
+		featureModel = this.featureProject.getFeatureModel();
+		this.createNewProjects = createNewProjects;
 		if (!buildAllValidConfigurations) {
-			configurationNumber = countConfigurations(featureProject.getConfigFolder());
+			configurationNumber = countConfigurations(this.featureProject.getConfigFolder());
 		} else {
 			Job number = new Job(JOB_TITLE_COUNT_CONFIGURATIONS) {
 				public IStatus run(IProgressMonitor monitor) {
@@ -110,10 +123,12 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 					} else {
 						buildActivConfigurations(featureProject, monitor);
 					}
-					try {
-						folder.refreshLocal(IResource.DEPTH_INFINITE, null);
-					} catch (CoreException e) {
-						UIPlugin.getDefault().logError(e);
+					if (!createNewProjects) {
+						try {
+							folder.refreshLocal(IResource.DEPTH_INFINITE, null);
+						} catch (CoreException e) {
+							UIPlugin.getDefault().logError(e);
+						}
 					}
 					
 					time = System.currentTimeMillis() - time;
@@ -128,8 +143,6 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 				return Status.OK_STATUS;
 			}
 
-			
-			
 		};
 		job.setPriority(Job.LONG);
 		job.schedule();
@@ -145,31 +158,33 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 */
 	private void init(IProgressMonitor monitor, boolean buildAllValidConfigurations) {
 		confs = 1;
-		folder = project.getProject().getFolder(buildAllValidConfigurations ? FOLDER_NAME : FOLDER_NAME_CURRENT);
-		if (!folder.exists()) {
-			try {
-				folder.create(true, true, null);
-			} catch (CoreException e) {
-				UIPlugin.getDefault().logError(e);
-			}
-		} else {
-			try {
-				int countProducts = folder.members().length;
-				int current = 1;
-				for (IResource res : folder.members()) {
-					monitor.setTaskName("Remove old products : " + current + "/" + countProducts);
-					current++;
-					res.delete(true, null);
-				}
-			} catch (CoreException e) {
-				UIPlugin.getDefault().logError(e);
-			}
-		}
+		
 		configuration = new Configuration(featureModel);
 		reader = new ConfigurationReader(configuration);
-		project.getComposer().initialize(project);
+		featureProject.getComposer().initialize(featureProject);
 		
-		if (compile) {
+		if (!createNewProjects) {
+			folder = featureProject.getProject().getFolder(buildAllValidConfigurations ? FOLDER_NAME : FOLDER_NAME_CURRENT);
+			if (!folder.exists()) {
+				try {
+					folder.create(true, true, null);
+				} catch (CoreException e) {
+					UIPlugin.getDefault().logError(e);
+				}
+			} else {
+				try {
+					IResource[] members = folder.members();
+					int countProducts = members.length;
+					int current = 1;
+					for (IResource res : members) {
+						monitor.setTaskName("Remove old products : " + current + "/" + countProducts);
+						current++;
+						res.delete(true, null);
+					}
+				} catch (CoreException e) {
+					UIPlugin.getDefault().logError(e);
+				}
+			}
 			setClassPath();
 		
 			tmp = folder.getFolder(TEMPORARY_BIN_FOLDER);
@@ -180,6 +195,25 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 					UIPlugin.getDefault().logError(e);
 				}
 			}
+		} else {
+			try {
+				for (IResource res : ResourcesPlugin.getWorkspace().getRoot().members()) {
+					if (res instanceof IProject) {
+						IProject p = (IProject)res;
+						if (buildAllValidConfigurations) {
+							if (p.getName().startsWith(featureProject.getProjectName() + " v.")) {
+								res.delete(true, null);
+							}
+						} else {
+							if (p.getName().startsWith(featureProject.getProjectName() + "-")) {
+								res.delete(true, null);
+							}
+						}
+					}
+				}
+			} catch (CoreException e) {
+				UIPlugin.getDefault().logError(e);
+			}
 		}
 	}
 	
@@ -189,7 +223,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	private void setClassPath() {
 		String sep = System.getProperty("path.separator");
 		try {
-			JavaProject proj = new JavaProject(project.getProject(), null);
+			JavaProject proj = new JavaProject(featureProject.getProject(), null);
 			IJavaElement[] elements = proj.getChildren();
 			for (IJavaElement e : elements) {
 				String path = e.getPath().toOSString();
@@ -230,7 +264,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		Main.compile(toArray(options), new PrintWriter(charWriter));
 		files = parseJavacOutput(charWriter.toString(), files, confName);
 		for (IFile file : files) {
-			project.getComposer().postCompile(null, file);
+			featureProject.getComposer().postCompile(null, file);
 		}
 	}
 
@@ -367,13 +401,19 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		try {
 			reader.readFromFile((IFile)configuration);
 			monitor.setTaskName(SUBTASK_BUILD + confs + "/" + configurationNumber);
-			project.getComposer().buildConfiguration(folder.getFolder(configuration.getName().split("[.]")[0]), this.configuration);
+			if (createNewProjects) {
+				buildConfiguration(featureProject.getProjectName() + "-" + configuration.getName().split("[.]")[0]);
+			} else {
+				featureProject.getComposer().buildConfiguration(folder.getFolder(configuration.getName().split("[.]")[0]), 
+						this.configuration, configuration.getName().split("[.]")[0]);
+			}
 			if (monitor.isCanceled()) {
 				return;
 			}
 			confs++;
-			folder.getFolder(configuration.getName().split("[.]")[0]).refreshLocal(IResource.DEPTH_INFINITE, null);
-			if (compile) {
+			
+			if (!createNewProjects) {
+				folder.getFolder(configuration.getName().split("[.]")[0]).refreshLocal(IResource.DEPTH_INFINITE, null);
 				monitor.setTaskName(SUBTASK_COMPILE + confs + "/" + configurationNumber);
 				compile(configuration.getName().split("[.]")[0]);
 			}
@@ -465,14 +505,17 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 						zeros = "";
 					}
 					monitor.setTaskName(SUBTASK_BUILD + confs + "/" + (configurationNumber == 0 ? "counting..." : configurationNumber));
-					project.getComposer().buildConfiguration(folder.getFolder(CONFIGURATION_NAME + zeros + confs), configuration);
-					try {
-						folder.getFolder(CONFIGURATION_NAME + zeros + confs).refreshLocal(IResource.DEPTH_INFINITE, null);
-					} catch (CoreException e) {
-						UIPlugin.getDefault().logError(e);
-					}
+					if (createNewProjects) {
+						buildConfiguration(featureProject.getProjectName() + " v." + zeros + confs);
+					} else {
+						featureProject.getComposer().buildConfiguration(folder.getFolder(CONFIGURATION_NAME + zeros + confs), 
+								configuration, CONFIGURATION_NAME + zeros + confs);
+						try {
+							folder.getFolder(CONFIGURATION_NAME + zeros + confs).refreshLocal(IResource.DEPTH_INFINITE, null);
+						} catch (CoreException e) {
+							UIPlugin.getDefault().logError(e);
+						}
 					
-					if (compile) {
 						monitor.setTaskName(SUBTASK_COMPILE + confs + "/" + configurationNumber);
 						compile(CONFIGURATION_NAME + zeros + confs);
 					}
@@ -501,6 +544,136 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		} else if (currentFeature.isAlternative()) {
 			buildAlternative(selected, selectedFeatures2, monitor);
 		}				
+	}
+
+	/**
+	 * Builds the configuration in a new project with the given name.
+	 * @param name The name of the new project
+	 */
+	private void buildConfiguration(String name) {
+		IPath p2 = new Path("/" + name);
+		ConfigurationProject project = new ConfigurationProject(p2, (Workspace) featureProject.getProject().getWorkspace());
+		try {
+			if (!project.exists()) { 
+				project.create(null);
+			}
+			project.open(null);
+			setDescription(project);
+		} catch (CoreException e) {
+			UIPlugin.getDefault().logError(e);
+		}
+		
+		setClassPath(project);
+		
+		featureProject.getComposer().buildConfiguration(project.getFolder("src"), configuration, name);
+		try {
+			project.refreshLocal(IResource.DEPTH_INFINITE, null);
+		} catch (CoreException e) {
+			UIPlugin.getDefault().logError(e);
+		}
+	}
+
+	/**
+	 * Sets the classpath entries for the newly created project
+	 * @param p The new project
+	 */
+	// TODO remove redundant calculations for each configuration
+	// TODO copy settings
+	private void setClassPath(IProject p) {
+		JavaProject baseProject = new JavaProject(featureProject.getProject(), null);
+		JavaProject newProject = new JavaProject(p, null);
+		try {
+			IClasspathEntry[] entries = baseProject.getRawClasspath().clone();
+			for (int i = 0;i < entries.length;i++) {
+				// set source entry to "src"
+				IClasspathEntry e = entries[i];
+				if (entries[i].getEntryKind() == IClasspathEntry.CPE_SOURCE) {
+					entries[i] = new ClasspathEntry(e.getContentKind(), e.getEntryKind(), 
+								new Path("src"), e.getInclusionPatterns(), e.getExclusionPatterns(), 
+								e.getSourceAttachmentPath(), e.getSourceAttachmentRootPath(), null, 
+								e.isExported(), e.getAccessRules(), e.combineAccessRules(), e.getExtraAttributes());
+				} else if (e.getEntryKind() == IClasspathEntry.CPE_LIBRARY){
+					// set the library entries and copy the libraries 
+					// which are direct at the old projects folder  
+					IPath path = e.getPath().removeFirstSegments(1);
+					IProject project = featureProject.getProject();
+					IFile file = project.getFile(path);
+					if (!file.exists()) {
+						path = e.getPath();
+						file = project.getFile(path);
+						if (!file.exists()) {
+							continue;
+						}
+					}
+					createLibFolder(p.getFile(path).getParent());
+					file.copy(p.getFile(e.getPath().removeFirstSegments(1)).getFullPath(), true, null);
+					entries[i] = new ClasspathEntry(e.getContentKind(), e.getEntryKind(), 
+							e.getPath().removeFirstSegments(1), e.getInclusionPatterns(), e.getExclusionPatterns(), 
+							e.getSourceAttachmentPath(), e.getSourceAttachmentRootPath(), null, 
+							e.isExported(), e.getAccessRules(), e.combineAccessRules(), e.getExtraAttributes());
+				}
+			}
+			newProject.setRawClasspath(entries, null);
+		} catch (JavaModelException e) {
+			UIPlugin.getDefault().logError(e);
+		} catch (CoreException e) {
+			UIPlugin.getDefault().logError(e);
+		}
+	}
+
+	/**
+	 * Creates all parent folders of the parent folder
+	 * @param parent The folder containing the library
+	 */
+	private void createLibFolder(IContainer parent) {
+		if (!parent.exists() && parent instanceof IFolder) {
+			createLibFolder(parent.getParent());
+			try {
+				((IFolder)parent).create(true, true, null);
+			} catch (CoreException e) {
+				UIPlugin.getDefault().logError(e);
+			}
+		}
+	}
+
+	/**
+	 * @param description
+	 * @param iProjectDescription 
+	 * @return
+	 * @throws CoreException 
+	 */
+	private void setDescription(IProject newProject) throws CoreException {
+		IProject project = featureProject.getProject();
+		IProjectDescription newDescription = newProject.getDescription();
+		IProjectDescription oldDescription = project.getDescription();
+		
+		// remove FeatureIDE build commands
+		ICommand[] buildSpec = oldDescription.getBuildSpec();
+		ICommand[] commands = new ICommand[buildSpec.length - 1];
+		int i = 0;
+		for (ICommand c : buildSpec) {
+			if (ExtensibleFeatureProjectBuilder.BUILDER_ID.equals(c.getBuilderName())) {
+				continue;
+			}
+			commands[i] = c;
+			i++;
+		}
+		newDescription.setBuildSpec(commands);
+		
+		// remove the FeatureIDE nature
+		String[] natureIDs = oldDescription.getNatureIds();
+		String[] natures = new String[natureIDs.length - 1];
+		int j = 0;
+		for (String id : natureIDs) {
+			if (FeatureProjectNature.NATURE_ID.equals(id)) {
+				continue;
+			}
+			natures[j] = id;
+			j++;
+		}
+		newDescription.setNatureIds(natures);
+		
+		newProject.setDescription(newDescription, null);
 	}
 
 	private void buildAlternative(String selected, LinkedList<Feature> selectedFeatures2, IProgressMonitor monitor) {
