@@ -18,6 +18,8 @@
  */
 package de.ovgu.featureide.core.typecheck.check;
 
+import java.util.Set;
+
 import de.ovgu.featureide.fm.core.Feature;
 
 /**
@@ -30,20 +32,68 @@ public class CheckProblem {
     private String filename;
     private int linenumber;
     private String message;
+    private Set<Feature> providingFeatures;
 
     public CheckProblem(Feature feature, String filename, int linenumber,
-	    String message) {
+	    String message, Set<Feature> providing_features) {
 	this.feature = feature;
 	this.filename = filename;
 	this.linenumber = linenumber;
 	this.message = message;
+	this.providingFeatures = providing_features;
     }
 
     public String toString() {
 	StringBuilder builder = new StringBuilder();
 	builder.append(message).append(" in Feature ")
-		.append(feature.getName()).append(" in File ").append(filename)
-		.append(" at line ").append(linenumber);
+		.append(feature.getName());
+//	builder.append(" in File ").append(filename).append(" at line ")
+//		.append(linenumber);
+	if (providingFeatures != null && !providingFeatures.isEmpty()) {
+	    builder.append("\nFollowing features could solve dependencies: ");
+	    int i = 0;
+	    for (Feature f : providingFeatures) {
+		builder.append(f);
+		if (i++ < providingFeatures.size() - 1) {
+		    builder.append(", ");
+		}
+	    }
+	}
 	return builder.toString();
+    }
+
+    /**
+     * @return the feature
+     */
+    public Feature getFeature() {
+	return feature;
+    }
+
+    /**
+     * @return the filename
+     */
+    public String getFilename() {
+	return filename;
+    }
+
+    /**
+     * @return the linenumber
+     */
+    public int getLinenumber() {
+	return linenumber;
+    }
+
+    /**
+     * @return the message
+     */
+    public String getMessage() {
+	return message;
+    }
+
+    /**
+     * @return the providingFeatures
+     */
+    public Set<Feature> getProvidingFeatures() {
+	return providingFeatures;
     }
 }

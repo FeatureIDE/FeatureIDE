@@ -42,23 +42,6 @@ import fuji.SyntacticErrorException;
 public class CUParser {
     private Map<Feature, Directory> feature_directories = new HashMap<Feature, Directory>();
 
-    private boolean check_for_changes = true;
-
-    /**
-     * @return the check_for_changes
-     */
-    public boolean isCheckForChanges() {
-	return check_for_changes;
-    }
-
-    /**
-     * @param check_for_changes
-     *            the check_for_changes to set
-     */
-    public void setCheckForChanges(boolean check_for_changes) {
-	this.check_for_changes = check_for_changes;
-    }
-
     public Timer timer;
 
     private CheckPluginManager plugins;
@@ -80,17 +63,15 @@ public class CUParser {
     private void parseFeature(String feature_path, Feature feature) {
 	boolean update_needed = true;
 
-	if (check_for_changes) {
-
-	    if (!feature_directories.containsKey(feature)) {
-		feature_directories.put(feature, new Directory(new File(
-			feature_path, feature.getName())));
-	    } else if (!feature_directories.get(feature).changed()) {
-		System.out.println("Feature " + feature.getName()
-			+ " didn't change...");
-		update_needed = false;
-	    }
+	if (!feature_directories.containsKey(feature)) {
+	    feature_directories.put(feature, new Directory(new File(
+		    feature_path, feature.getName())));
+	} else if (!feature_directories.get(feature).changed()) {
+	    System.out.println("Feature " + feature.getName()
+		    + " ignored, no changes...");
+	    update_needed = false;
 	}
+
 	if (update_needed) {
 	    Timer timer = new Timer();
 	    System.out

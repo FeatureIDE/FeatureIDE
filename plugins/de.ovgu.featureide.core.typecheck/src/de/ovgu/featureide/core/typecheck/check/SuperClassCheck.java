@@ -78,18 +78,18 @@ public class SuperClassCheck extends AbstractCheckPlugin {
     public void invokeCheck(FeatureModel fm) {
 	Map<Feature, List<ClassDecl>> map = getNodesByType(ClassDecl.class);
 
-	for (Feature key : map.keySet()) {
-	    for (ClassDecl cd : map.get(key)) {
+	for (Feature f : map.keySet()) {
+	    for (ClassDecl cd : map.get(f)) {
 		if (cd.hasSuperClassAccess()
 			&& cd.getSuperClassAccess().type() instanceof UnknownType) {
 		    Set<Feature> providing_features = providesType(
 			    cd.getSuperClassAccess().typeName()).keySet();
-		    if (checkFeatureImplication(fm, key, providing_features)) {
+		    if (checkFeatureImplication(fm, f, providing_features)) {
 		    } else {
-			newProblem(new CheckProblem(key, cd.compilationUnit()
+			newProblem(new CheckProblem(f, cd.compilationUnit()
 				.pathName(), cd.getSuperClassAccess()
 				.lineNumber(), "Missing superclass "
-				+ cd.getSuperClassAccess().typeName()));
+				+ cd.getSuperClassAccess().typeName(), providing_features));
 		    }
 		}
 	    }

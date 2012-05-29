@@ -95,7 +95,7 @@ public class TypeCheck extends AbstractCheckPlugin {
 			if (!checkFeatureImplication(fm, f, providing_features)) {
 			    newProblem(new CheckProblem(f, cd.compilationUnit()
 				    .pathName(), ta.lineNumber(),
-				    "Missing type dependency " + ta.name()));
+				    "Missing type dependency " + ta.name(), providing_features));
 			}
 		    }
 		}

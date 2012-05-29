@@ -26,6 +26,7 @@ public class TypecheckCorePlugin extends AbstractCorePlugin {
 	public static final String PLUGIN_ID = "de.ovgu.featureide.core.typecheck";
 
 	public Map<IFeatureProject, TypeChecker> typechecker = new HashMap<IFeatureProject, TypeChecker>();
+	
 	public static  String[] supportedComposers = { "de.ovgu.featureide.composer.featurehouse" };
 
 	private static TypecheckCorePlugin plugin;

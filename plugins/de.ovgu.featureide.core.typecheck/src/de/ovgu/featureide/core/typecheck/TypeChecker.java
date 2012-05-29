@@ -18,17 +18,19 @@
  */
 package de.ovgu.featureide.core.typecheck;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.typecheck.check.CheckPluginManager;
-import de.ovgu.featureide.core.typecheck.check.MethodCheck;
 import de.ovgu.featureide.core.typecheck.check.TypeCheck;
 import de.ovgu.featureide.core.typecheck.helper.Timer;
 import de.ovgu.featureide.core.typecheck.parser.CUParser;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 
 /**
  * TODO description
@@ -36,44 +38,84 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  * @author S�nke Holthusen
  */
 public class TypeChecker {
-    private IFeatureProject _project;
     private CUParser _cuparser;
 
     private CheckPluginManager _checks;
 
-    public TypeChecker(IFeatureProject project) {
-	_project = project;
+    private String source_path;
+    private FeatureModel fm;
 
+    public static void main(String[] args) {
+	if (args.length != 2) {
+	    return;
+	}
+	String fmfile = args[0];
+	String source_path = args[1];
+
+	TypeChecker checker = new TypeChecker();
+	
+	checker.log("Reading feature model from file " + fmfile);
+	FeatureModel fm = checker.readFM(fmfile);
+	checker.log("\tdone");
+	
+	checker.setParameters(fm, source_path);
+	checker.run();
+    }
+
+    public TypeChecker() {
 	_checks = new CheckPluginManager(
 	// new SuperClassCheck()
 	// ,
-	// new TypeCheck()
+		new TypeCheck()
 	// ,
-		new MethodCheck());
+	// new MethodCheck()
+	);
 
 	_cuparser = new CUParser(_checks);
     }
 
-    public void run() {
-	TypecheckCorePlugin.logln("Starting parsing project "
-		+ _project.getProjectName());
-	_cuparser.timer.reset();
+    public void setParameters(FeatureModel fm, String source_path) {
+	this.fm = fm;
+	this.source_path = source_path;
+    }
 
-	FeatureModel fm = _project.getFeatureModel();
+    public void run() {
+	log("Starting parsing Features in " + source_path);
+	_cuparser.timer.reset();
 
 	List<Feature> concrete_features = new ArrayList<Feature>(
 		fm.getConcreteFeatures());
 
-	_cuparser.parse(_project.getSourcePath(), concrete_features);
+	_cuparser.parse(source_path, concrete_features);
 
-	TypecheckCorePlugin.logln("Parsing finished... ("
+	log("Parsing finished... ("
 		+ _cuparser.timer.getTime() + " ms)");
-	TypecheckCorePlugin.logln("Running checks...");
+	log("Running checks...");
 	Timer timer = new Timer();
 	timer.start();
 	_checks.invokeChecks(fm);
 	timer.stop();
-	TypecheckCorePlugin.logln("Checks finished... (" + timer.getTime()
+	log("Checks finished... (" + timer.getTime()
 		+ " ms)");
+    }
+
+    public void log(String msg) {
+	System.out.println(msg);
+    }
+    
+    public FeatureModel readFM(String fmfile){
+	FeatureModel fm = new FeatureModel();
+	XmlFeatureModelReader reader = new XmlFeatureModelReader(fm);
+	try {
+	    reader.readFromFile(new File(fmfile));
+	} catch (FileNotFoundException e) {
+	    System.err.println("FeatureModel File " + fmfile
+		    + " was not found!");
+	    e.printStackTrace();
+	} catch (UnsupportedModelException e) {
+	    System.err.println("FeatureModel not supported!");
+	    e.printStackTrace();
+	}
+	return fm;
     }
 }

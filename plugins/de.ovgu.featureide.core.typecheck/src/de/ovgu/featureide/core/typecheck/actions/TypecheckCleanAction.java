@@ -37,8 +37,8 @@ public class TypecheckCleanAction implements IObjectActionDelegate {
 	    if (Arrays.asList(TypecheckCorePlugin.supportedComposers).contains(
 		    project.getComposerID())) {
 
-		typechecker.put(project, new TypeChecker(project));
-
+		typechecker.put(project, new TypeChecker());
+		typechecker.get(project).setParameters(project.getFeatureModel(), project.getSourcePath());
 		typechecker.get(project).run();
 	    } else {
 		// TODO: change output method
