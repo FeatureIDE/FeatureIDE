@@ -93,7 +93,7 @@ public class TypeCheck extends AbstractCheckPlugin {
 			Set<Feature> providing_features = providesType(
 				ta.name()).keySet();
 			if (!checkFeatureImplication(fm, f, providing_features)) {
-			    newProblem(new CheckProblem(f, cd.compilationUnit()
+			    newProblem(new CheckProblem(f, cd, cd.compilationUnit()
 				    .pathName(), ta.lineNumber(),
 				    "Missing type dependency " + ta.name(), providing_features));
 			}

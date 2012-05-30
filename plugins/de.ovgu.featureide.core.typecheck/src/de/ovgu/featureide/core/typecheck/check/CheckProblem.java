@@ -20,6 +20,8 @@ package de.ovgu.featureide.core.typecheck.check;
 
 import java.util.Set;
 
+import AST.ClassDecl;
+
 import de.ovgu.featureide.fm.core.Feature;
 
 /**
@@ -29,14 +31,16 @@ import de.ovgu.featureide.fm.core.Feature;
  */
 public class CheckProblem {
     private Feature feature;
+    private ClassDecl classs;
     private String filename;
     private int linenumber;
     private String message;
     private Set<Feature> providingFeatures;
 
-    public CheckProblem(Feature feature, String filename, int linenumber,
+    public CheckProblem(Feature feature,ClassDecl cd, String filename, int linenumber,
 	    String message, Set<Feature> providing_features) {
 	this.feature = feature;
+	this.classs = cd;
 	this.filename = filename;
 	this.linenumber = linenumber;
 	this.message = message;
@@ -47,8 +51,8 @@ public class CheckProblem {
 	StringBuilder builder = new StringBuilder();
 	builder.append(message).append(" in Feature ")
 		.append(feature.getName());
-//	builder.append(" in File ").append(filename).append(" at line ")
-//		.append(linenumber);
+	builder.append(" in Class ").append(classs.name());
+	builder.append(" at line ").append(linenumber);
 	if (providingFeatures != null && !providingFeatures.isEmpty()) {
 	    builder.append("\nFollowing features could solve dependencies: ");
 	    int i = 0;

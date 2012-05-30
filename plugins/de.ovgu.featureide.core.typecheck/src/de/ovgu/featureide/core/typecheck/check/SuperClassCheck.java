@@ -86,7 +86,7 @@ public class SuperClassCheck extends AbstractCheckPlugin {
 			    cd.getSuperClassAccess().typeName()).keySet();
 		    if (checkFeatureImplication(fm, f, providing_features)) {
 		    } else {
-			newProblem(new CheckProblem(f, cd.compilationUnit()
+			newProblem(new CheckProblem(f, cd, cd.compilationUnit()
 				.pathName(), cd.getSuperClassAccess()
 				.lineNumber(), "Missing superclass "
 				+ cd.getSuperClassAccess().typeName(), providing_features));
