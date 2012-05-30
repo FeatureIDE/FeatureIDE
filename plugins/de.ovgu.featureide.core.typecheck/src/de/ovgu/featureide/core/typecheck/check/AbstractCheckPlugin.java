@@ -29,7 +29,7 @@ import org.sat4j.specs.TimeoutException;
 
 import AST.ASTNode;
 import AST.CompilationUnit;
-import de.ovgu.featureide.core.typecheck.TypecheckCorePlugin;
+import de.ovgu.featureide.core.typecheck.TypeChecker;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
@@ -45,23 +45,20 @@ public abstract class AbstractCheckPlugin implements ICheckPlugin {
 
     protected String plugin_name = "AbstractCheckPlugin";
 
-    /*
-     * Feature -> Node Type -> Data Data -> Node Type -> Data Data Data Feature
-     * -> Node Type -> Data ...
+    /**
+     * the nodes collected for the plug-in, sorted by feature and then by type
      */
     protected Map<Feature, Map<Class, List<ASTNode>>> nodes = new HashMap<Feature, Map<Class, List<ASTNode>>>();
 
+    /**
+     * registers the plug-in for the specific type of ASTNodes
+     * 
+     * @param node_type
+     */
     protected void registerNodeType(Class node_type) {
 	registered_node_types.add(node_type);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * de.ovgu.featureide.core.typecheck.check.ICheckPlugin#register(de.ovgu
-     * .featureide.core.typecheck.check.CheckPluginManager)
-     */
     @Override
     public void register(CheckPluginManager manager) {
 	_manager = manager;
@@ -87,10 +84,23 @@ public abstract class AbstractCheckPlugin implements ICheckPlugin {
 	map.get(node.getClass()).add(node);
     }
 
+    /**
+     * Returns all nodes of a given feature the plug-in is registered for
+     * 
+     * @param feature
+     * @return the nodes
+     */
     public Map<Class, List<ASTNode>> getNodesByFeature(Feature feature) {
 	return nodes.get(feature);
     }
 
+    /**
+     * Returns all nodes of the specific type, sorted by feature
+     * 
+     * @param the
+     *            class type
+     * @return the nodes, sorted by feature
+     */
     public <T> Map<Feature, List<T>> getNodesByType(Class<T> c) {
 	Map<Feature, List<T>> feature_node_map = new HashMap<Feature, List<T>>();
 	for (Feature f : nodes.keySet()) {
@@ -118,6 +128,15 @@ public abstract class AbstractCheckPlugin implements ICheckPlugin {
 	return plugin_name;
     }
 
+    /**
+     * Checks if, if the first feature is chosen, one of the second set of
+     * features is always chosen as well
+     * 
+     * @param fm
+     * @param feature
+     * @param implies
+     * @return true if the implication holds, false otherwise
+     */
     public boolean checkFeatureImplication(FeatureModel fm, Feature feature,
 	    Set<Feature> implies) {
 	if (implies.isEmpty()) {
@@ -127,7 +146,7 @@ public abstract class AbstractCheckPlugin implements ICheckPlugin {
 	Set<Feature> set = new HashSet<Feature>();
 	set.add(feature);
 	try {
-	    return TypecheckCorePlugin.checkImpliesDisjunct(fm, set, implies);
+	    return TypeChecker.checkImpliesDisjunct(fm, set, implies);
 	} catch (TimeoutException e) {
 	    // TODO Auto-generated catch block
 	    e.printStackTrace();
@@ -135,10 +154,22 @@ public abstract class AbstractCheckPlugin implements ICheckPlugin {
 	return false;
     }
 
+    /**
+     * removes the nodes of a given feature in the case the feature is re-parsed
+     * 
+     * @param feature
+     *            the feature
+     */
     public void resetFeature(Feature feature) {
 	nodes.remove(feature);
     }
-     
+
+    /**
+     * lets the plug-in add a new {@link CheckProblem} for the plug-in manager
+     * to report
+     * 
+     * @param problem
+     */
     public void newProblem(CheckProblem problem) {
 	_manager.addProblem(problem, this);
     }

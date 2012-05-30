@@ -58,35 +58,7 @@ public class TypecheckCorePlugin extends AbstractCorePlugin {
 		return plugin;
 	}
 	
-	
-	// modified to work with a disjunction from FeatureModel.java
-	private static Node disjunct(FeatureModel fm, Set<Feature> b) {
-		Iterator<Feature> iterator = b.iterator();
-		Node result = new Literal(
-				NodeCreator.getVariable(iterator.next(), fm));
-		while (iterator.hasNext())
-			result = new Or(result, new Literal(NodeCreator.getVariable(
-					iterator.next(), fm)));
 
-		return result;
-	}
-	
-	public static boolean checkImpliesDisjunct(FeatureModel fm, Set<Feature> a, Set<Feature> b)
-			throws TimeoutException {
-		if (b.isEmpty())
-			return true;
-
-		Node featureModel = NodeCreator.createNodes(fm);
-
-		// B1 and B2 and ... Bn
-		Node condition = disjunct(fm, b);
-		// (A1 and ... An) => (B1 and ... Bn)
-		if (!a.isEmpty())
-			condition = new Implies(disjunct(fm, a), condition);
-		// FM => (A => B)
-		Implies finalFormula = new Implies(featureModel, condition);
-		return !new SatSolver(new Not(finalFormula), 1000).isSatisfiable();
-	}
 	
 	public static void logln(String message)
 	{

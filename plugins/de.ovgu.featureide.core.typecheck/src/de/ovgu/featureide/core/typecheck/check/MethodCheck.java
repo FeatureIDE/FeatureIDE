@@ -23,22 +23,13 @@ import java.util.List;
 import java.util.Map;
 
 import AST.ASTNode;
-import AST.Access;
-import AST.Block;
 import AST.CompilationUnit;
 import AST.Expr;
-import AST.ExprStmt;
 import AST.MethodAccess;
 import AST.MethodDecl;
 import AST.ParameterDeclaration;
-import AST.ReturnStmt;
-import AST.Stmt;
 import AST.UnknownType;
 import AST.VarAccess;
-import AST.VariableDeclaration;
-import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.typecheck.parser.ClassTable;
-import de.ovgu.featureide.core.typecheck.parser.ClassTableEntry;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 

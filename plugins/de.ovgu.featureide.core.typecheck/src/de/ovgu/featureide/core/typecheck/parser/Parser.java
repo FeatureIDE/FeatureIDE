@@ -18,179 +18,111 @@
  */
 package de.ovgu.featureide.core.typecheck.parser;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.Path;
-
-import AST.ClassDecl;
+import AST.ASTNode;
 import AST.CompilationUnit;
 import AST.Program;
-import AST.TypeDecl;
-import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.typecheck.check.CheckPluginManager;
+import de.ovgu.featureide.core.typecheck.helper.Directory;
+import de.ovgu.featureide.core.typecheck.helper.FujiWrapper;
 import de.ovgu.featureide.core.typecheck.helper.Timer;
 import de.ovgu.featureide.fm.core.Feature;
+import fuji.SyntacticErrorException;
 
 /**
  * TODO description
  * 
- * @author Sönke Holthusen
+ * @author soenke
  */
-public class Parser
-{
-	public Timer timer = new Timer();
+public class Parser {
+    private Map<Feature, Directory> feature_directories = new HashMap<Feature, Directory>();
 
-	private IFeatureProject _project;
-	private ClassTable _class_table;
+    public Timer timer;
 
-	public Parser(IFeatureProject project)
-	{
-		_project = project;
+    private CheckPluginManager plugins;
 
-		_class_table = new ClassTable();
+    /**
+	 * 
+	 */
+    public Parser(CheckPluginManager manager) {
+	this.plugins = manager;
+	this.timer = new Timer();
+    }
+
+    public void parse(String feature_path, List<Feature> feature_list) {
+	for (int i = 0; i < feature_list.size(); i++) {
+	    parseFeature(feature_path, feature_list.get(i));
+	}
+    }
+
+    private void parseFeature(String feature_path, Feature feature) {
+	boolean update_needed = true;
+
+	if (!feature_directories.containsKey(feature)) {
+	    feature_directories.put(feature, new Directory(new File(
+		    feature_path, feature.getName())));
+	} else if (!feature_directories.get(feature).changed()) {
+	    System.out.println("Feature " + feature.getName()
+		    + " ignored, no changes...");
+	    update_needed = false;
 	}
 
-	public void parse(String feature_path, List<Feature> feature_list)
-	{
-		for (int i = 0; i < feature_list.size(); i++)
-		{
-			parseFeature(feature_path, feature_list.get(i));
-		}
-	}
+	if (update_needed) {
+	    Timer timer = new Timer();
+	    System.out
+		    .println("Parsing Feature " + feature.getName() + " ... ");
+	    timer.start();
+	    this.timer.resume();
 
-	public void parseFeatures(String feature_path, List<Feature> feature_list)
-	{		
-		Timer timer = new Timer();
-		//System.out.print("Parsing Feature " + feature.getName() + " ... ");
-		timer.start();
-		this.timer.resume();
+	    plugins.resetFeature(feature);
 
-		try
-		{
-			List<String> list = new ArrayList<String>();
-			for(Feature feature : feature_list)
-			{
-				list.add(feature.getName());
+	    try {
+		List<String> list = new ArrayList<String>();
+
+		list.add(feature.getName());
+
+		Iterator<Program> iter = FujiWrapper
+			.getFujiCompositionIterator(list, feature_path);
+
+		while (iter.hasNext()) {
+		    // XXX: takes a very long time
+		    Program ast = iter.next();
+
+		    @SuppressWarnings("unchecked")
+		    Iterator<CompilationUnit> it = ast
+			    .compilationUnitIterator();
+		    while (it.hasNext()) {
+			CompilationUnit cu = it.next();
+			if (cu.fromSource()) {
+			    // System.out.println(cu.pathName());
+			    parseAST(feature, cu);
 			}
-
-			Iterator<Program> iter = FujiWrapper.getFujiCompositionIterator(list, feature_path);
-
-			while (iter.hasNext())
-			{
-				// XXX: takes a very long time
-				Program ast = iter.next();
-
-				@SuppressWarnings("unchecked")
-				Iterator<CompilationUnit> it = ast.compilationUnitIterator();
-				while (it.hasNext())
-				{
-					CompilationUnit cu = it.next();
-					if (cu.fromSource())
-					{
-						parseCU(cu, feature_path, list);
-					}
-				}
-
-			}
-
+		    }
 		}
-		catch (Exception e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		this.timer.stop();
-		timer.stop();
-		System.out.println(" done (" + timer.getTime() + " ms)");
+	    } catch (SyntacticErrorException see) {
+		System.out.println("Syntaxerror: " + see.getMessage());
+
+	    } catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	    }
+	    feature_directories.get(feature).update();
+	    this.timer.stop();
+	    timer.stop();
+	    System.out.println("Parsing finished (" + timer.getTime() + " ms)");
 	}
-	
-	private void parseFeature(String feature_path, Feature feature)
-	{
-		Timer timer = new Timer();
-		System.out.print("Parsing Feature " + feature.getName() + " ... ");
-		timer.start();
-		this.timer.resume();
+    }
 
-		try
-		{
-			List<String> list = new ArrayList<String>();
-			list.add(feature.getName());
-
-			Iterator<Program> iter = FujiWrapper.getFujiCompositionIterator(list, feature_path);
-
-			while (iter.hasNext())
-			{
-				// XXX: takes a very long time
-				Program ast = iter.next();
-
-				@SuppressWarnings("unchecked")
-				Iterator<CompilationUnit> it = ast.compilationUnitIterator();
-				while (it.hasNext())
-				{
-					CompilationUnit cu = it.next();
-					if (cu.fromSource())
-					{
-						parseCU(feature, feature_path, cu);
-					}
-				}
-
-			}
-
-		}
-		catch (Exception e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		this.timer.stop();
-		timer.stop();
-		System.out.println(" done (" + timer.getTime() + " ms)");
+    public void parseAST(Feature feature, ASTNode node) {
+	plugins.invokeNodeParse(feature, node);
+	for (int i = 0; i < node.getNumChild(); i++) {
+	    parseAST(feature, node.getChild(i));
 	}
-
-	private void parseCU(CompilationUnit cu, String feature_path, List<String> feature_list)
-	{
-		System.out.println(cu.classQName());
-		List<String> feature_paths = new ArrayList<String>();
-		for(String feature_name : feature_list)
-		{
-			System.out.println(feature_name);
-			
-			feature_paths.add(feature_path + feature_name);
-			//FujiWrapper.getIntros(cu, feature_paths);
-			
-		}
-		FujiWrapper.getIntros(cu, feature_paths);
-		//cu.printIntros(feature_paths);
-		cu.printRefs(feature_paths);
-	}
-	
-	private void parseCU(Feature feature, String feature_path, CompilationUnit cu)
-	{
-		// TODO: handle imports
-
-		final IProject project = _project.getProject();
-		
-		IFile class_path = project.getFile(new Path(cu.pathName()).makeRelativeTo(project.getLocation()));
-
-		for (TypeDecl type : cu.getTypeDeclList())
-		{
-			if (type instanceof ClassDecl)
-			{
-				parseClass(feature, feature_path, (ClassDecl) type, cu, class_path);
-			}
-		}
-	}
-
-	private void parseClass(Feature feature, String feature_path, ClassDecl class_ast, CompilationUnit cu, IFile class_path)
-	{
-		_class_table.add(feature, feature_path, class_ast, cu, class_path);
-	}
-
-	public ClassTable getClassTable()
-	{
-		return _class_table;
-	}
+    }
 }

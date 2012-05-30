@@ -31,7 +31,7 @@ import AST.ReferenceType;
 import AST.TypeAccess;
 import AST.TypeDecl;
 import AST.UnknownType;
-import de.ovgu.featureide.core.typecheck.parser.FujiWrapper;
+import de.ovgu.featureide.core.typecheck.helper.FujiWrapper;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 

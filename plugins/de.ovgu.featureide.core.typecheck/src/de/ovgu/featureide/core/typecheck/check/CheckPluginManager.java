@@ -25,10 +25,6 @@ import java.util.Map;
 import java.util.Observable;
 
 import AST.ASTNode;
-import AST.ClassDecl;
-
-import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.typecheck.parser.ClassTable;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 

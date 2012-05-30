@@ -16,7 +16,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.core.typecheck.parser;
+package de.ovgu.featureide.core.typecheck.helper;
 
 import java.io.IOException;
 import java.util.ArrayList;
