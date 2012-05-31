@@ -76,8 +76,7 @@ public class AHEADToFeatureHouseConversion extends ComposerConversion {
 	public String changeFile(String fileText, IFile file) {
 		fileText = fileText.replaceFirst("layer \\w*;", "");
 		fileText = fileText.replaceFirst("refines ", "");
-		fileText = fileText.replaceAll("Super\\(\\s*\\w*\\s*\\).\\w*\\(", "original(");
-		return fileText;
+		return fileText.replaceAll("Super\\(\\s*\\w*\\s*\\).\\w*\\(", "original(");
 	}
 
 	/**

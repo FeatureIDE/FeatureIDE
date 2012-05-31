@@ -40,7 +40,7 @@ public interface IConfigurationBuilderBasics {
 	final static String MESSAGE_TITLE_VALID = "Build all valid configurations";
 	final static String MESSAGE_TITLE_CURRENT = "Build all current configurations";
 	final static String MESSAGE_CURRENT = "Builds all current configurations";
-	final static String MESSAGE_START = "This could take a very long time.\nThe current algorithm is very inefficient, if your model contains many constraints.\n";
+	final static String MESSAGE_START = "This could take a long time.\nThe current algorithm is very inefficient, if your model contains many constraints.\n";
 	final static String TOGGLE_MESSAGE = "Create a new project for each variant";
 	
 	static final QualifiedName TOGGLE_STATE = new QualifiedName("CreateNewProject", "CreateNewProject");

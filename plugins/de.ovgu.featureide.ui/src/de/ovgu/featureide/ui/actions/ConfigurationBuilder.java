@@ -69,6 +69,7 @@ import de.ovgu.featureide.ui.UIPlugin;
  * @author Jens Meinicke
  */
 @SuppressWarnings("restriction")
+// TODO refactor into a separate package
 public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	private IFeatureProject featureProject;
 	private IFolder folder;
@@ -82,6 +83,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	private IFolder tmp;
 	private boolean createNewProjects;
 	
+	private long timeToBuild = 0;
 	/**
 	 * Starts the build process for valid or current configurations for the given feature project.
 	 * @param featureProject The feature project
@@ -136,7 +138,12 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 					long min = (time/(60 * 1000))%60;
 					long h = time/(60 * 60 * 1000);
 					String t = h + "h " + (min < 10 ? "0" + min : min) + "min " + (s < 10 ? "0" + s : s) + "s.";
-					UIPlugin.getDefault().logInfo(confs-1 + (configurationNumber != 0 ? " of " + configurationNumber : "") + " configurations built in " + t);
+					
+					long s2 = (timeToBuild/1000)%60;
+					long min2 = (timeToBuild/(60 * 1000))%60;
+					long h2 = timeToBuild/(60 * 60 * 1000);
+					String t2 = h2 + "h " + (min2 < 10 ? "0" + min2 : min2) + "min " + (s2 < 10 ? "0" + s2 : s2) + "s.";
+					UIPlugin.getDefault().logInfo(confs-1 + (configurationNumber != 0 ? " of " + configurationNumber : "") + " configurations built in " + t + " Duration of composition: " + t2);
 				} finally {
 					monitor.done();
 				}
@@ -205,6 +212,9 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 								res.delete(true, null);
 							}
 						} else {
+							// TODO this is a very critical part
+							// some other projects could be removed
+							// maybe use " c." instead of "-"
 							if (p.getName().startsWith(featureProject.getProjectName() + "-")) {
 								res.delete(true, null);
 							}
@@ -404,8 +414,10 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			if (createNewProjects) {
 				buildConfiguration(featureProject.getProjectName() + "-" + configuration.getName().split("[.]")[0]);
 			} else {
+				long time = System.currentTimeMillis();
 				featureProject.getComposer().buildConfiguration(folder.getFolder(configuration.getName().split("[.]")[0]), 
 						this.configuration, configuration.getName().split("[.]")[0]);
+				timeToBuild += System.currentTimeMillis() - time;
 			}
 			if (monitor.isCanceled()) {
 				return;
@@ -508,8 +520,11 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 					if (createNewProjects) {
 						buildConfiguration(featureProject.getProjectName() + " v." + zeros + confs);
 					} else {
+						long time = System.currentTimeMillis();
 						featureProject.getComposer().buildConfiguration(folder.getFolder(CONFIGURATION_NAME + zeros + confs), 
 								configuration, CONFIGURATION_NAME + zeros + confs);
+						timeToBuild += System.currentTimeMillis() - time;
+						
 						try {
 							folder.getFolder(CONFIGURATION_NAME + zeros + confs).refreshLocal(IResource.DEPTH_INFINITE, null);
 						} catch (CoreException e) {
@@ -565,7 +580,10 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		
 		setClassPath(project);
 		
+		long time = System.currentTimeMillis();		
 		featureProject.getComposer().buildConfiguration(project.getFolder("src"), configuration, name);
+		timeToBuild += System.currentTimeMillis() - time;
+		
 		try {
 			project.refreshLocal(IResource.DEPTH_INFINITE, null);
 		} catch (CoreException e) {
