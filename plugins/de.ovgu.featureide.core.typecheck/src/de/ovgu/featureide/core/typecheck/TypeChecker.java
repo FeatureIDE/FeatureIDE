@@ -49,9 +49,9 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
  * @author S�nke Holthusen
  */
 public class TypeChecker {
-    private Parser _cuparser;
+    private Parser parser;
 
-    private CheckPluginManager _checks;
+    private CheckPluginManager plugin_manager;
 
     private String source_path;
     private FeatureModel fm;
@@ -64,17 +64,17 @@ public class TypeChecker {
 	String source_path = args[1];
 
 	TypeChecker checker = new TypeChecker();
-	
+
 	checker.log("Reading feature model from file " + fmfile);
 	FeatureModel fm = checker.readFM(fmfile);
 	checker.log("\tdone");
-	
+
 	checker.setParameters(fm, source_path);
 	checker.run();
     }
 
     public TypeChecker() {
-	_checks = new CheckPluginManager(
+	plugin_manager = new CheckPluginManager(
 	// new SuperClassCheck()
 	// ,
 		new TypeCheck()
@@ -82,7 +82,7 @@ public class TypeChecker {
 	// new MethodCheck()
 	);
 
-	_cuparser = new Parser(_checks);
+	parser = new Parser(plugin_manager);
     }
 
     public void setParameters(FeatureModel fm, String source_path) {
@@ -92,29 +92,32 @@ public class TypeChecker {
 
     public void run() {
 	log("Starting parsing Features in " + source_path);
-	_cuparser.timer.reset();
+	parser.timer.reset();
 
 	List<Feature> concrete_features = new ArrayList<Feature>(
 		fm.getConcreteFeatures());
 
-	_cuparser.parse(source_path, concrete_features);
+	parser.parse(source_path, concrete_features);
 
-	log("Parsing finished... ("
-		+ _cuparser.timer.getTime() + " ms)");
-	log("Running checks...");
-	Timer timer = new Timer();
-	timer.start();
-	_checks.invokeChecks(fm);
-	timer.stop();
-	log("Checks finished... (" + timer.getTime()
-		+ " ms)");
+	log("Parsing finished... (" + parser.timer.getTime() + " ms)");
+
+	if (parser.hasParseErrors()) {
+	    System.out.println(parser.printParseErrors());
+	} else {
+	    log("Running checks...");
+	    Timer timer = new Timer();
+	    timer.start();
+	    plugin_manager.invokeChecks(fm);
+	    timer.stop();
+	    log("Checks finished... (" + timer.getTime() + " ms)");
+	}
     }
 
     public void log(String msg) {
 	System.out.println(msg);
     }
-    
-    public FeatureModel readFM(String fmfile){
+
+    public FeatureModel readFM(String fmfile) {
 	FeatureModel fm = new FeatureModel();
 	XmlFeatureModelReader reader = new XmlFeatureModelReader(fm);
 	try {
@@ -129,34 +132,32 @@ public class TypeChecker {
 	}
 	return fm;
     }
-    
-	
-	// modified to work with a disjunction from FeatureModel.java
-	private static Node disjunct(FeatureModel fm, Set<Feature> b) {
-		Iterator<Feature> iterator = b.iterator();
-		Node result = new Literal(
-				NodeCreator.getVariable(iterator.next(), fm));
-		while (iterator.hasNext())
-			result = new Or(result, new Literal(NodeCreator.getVariable(
-					iterator.next(), fm)));
 
-		return result;
-	}
-	
-	public static boolean checkImpliesDisjunct(FeatureModel fm, Set<Feature> a, Set<Feature> b)
-			throws TimeoutException {
-		if (b.isEmpty())
-			return true;
+    // modified to work with a disjunction from FeatureModel.java
+    private static Node disjunct(FeatureModel fm, Set<Feature> b) {
+	Iterator<Feature> iterator = b.iterator();
+	Node result = new Literal(NodeCreator.getVariable(iterator.next(), fm));
+	while (iterator.hasNext())
+	    result = new Or(result, new Literal(NodeCreator.getVariable(
+		    iterator.next(), fm)));
 
-		Node featureModel = NodeCreator.createNodes(fm);
+	return result;
+    }
 
-		// B1 and B2 and ... Bn
-		Node condition = disjunct(fm, b);
-		// (A1 and ... An) => (B1 and ... Bn)
-		if (!a.isEmpty())
-			condition = new Implies(disjunct(fm, a), condition);
-		// FM => (A => B)
-		Implies finalFormula = new Implies(featureModel, condition);
-		return !new SatSolver(new Not(finalFormula), 1000).isSatisfiable();
-	}
+    public static boolean checkImpliesDisjunct(FeatureModel fm, Set<Feature> a,
+	    Set<Feature> b) throws TimeoutException {
+	if (b.isEmpty())
+	    return true;
+
+	Node featureModel = NodeCreator.createNodes(fm);
+
+	// B1 and B2 and ... Bn
+	Node condition = disjunct(fm, b);
+	// (A1 and ... An) => (B1 and ... Bn)
+	if (!a.isEmpty())
+	    condition = new Implies(disjunct(fm, a), condition);
+	// FM => (A => B)
+	Implies finalFormula = new Implies(featureModel, condition);
+	return !new SatSolver(new Not(finalFormula), 1000).isSatisfiable();
+    }
 }

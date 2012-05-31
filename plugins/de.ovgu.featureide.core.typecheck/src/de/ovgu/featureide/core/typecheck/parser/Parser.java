@@ -20,6 +20,7 @@ package de.ovgu.featureide.core.typecheck.parser;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -27,6 +28,7 @@ import java.util.Map;
 
 import AST.ASTNode;
 import AST.CompilationUnit;
+import AST.Problem;
 import AST.Program;
 import de.ovgu.featureide.core.typecheck.check.CheckPluginManager;
 import de.ovgu.featureide.core.typecheck.helper.Directory;
@@ -36,9 +38,10 @@ import de.ovgu.featureide.fm.core.Feature;
 import fuji.SyntacticErrorException;
 
 /**
- * TODO description
+ * Parses feature modules using Fuji, gives the plug-ins access to the ASTs of
+ * the features
  * 
- * @author soenke
+ * @author Soenke Holthusen
  */
 public class Parser {
     private Map<Feature, Directory> feature_directories = new HashMap<Feature, Directory>();
@@ -47,20 +50,35 @@ public class Parser {
 
     private CheckPluginManager plugins;
 
-    /**
-	 * 
-	 */
+    private List<Problem> parse_errors = new ArrayList<Problem>();
+
     public Parser(CheckPluginManager manager) {
 	this.plugins = manager;
 	this.timer = new Timer();
     }
 
+    /**
+     * Takes a list of feature names and parses every feature on its own
+     * 
+     * @param feature_path
+     *            the path to the feature modules
+     * @param feature_list
+     *            the list of features to parse
+     */
     public void parse(String feature_path, List<Feature> feature_list) {
 	for (int i = 0; i < feature_list.size(); i++) {
 	    parseFeature(feature_path, feature_list.get(i));
 	}
     }
 
+    /**
+     * Parses one feature
+     * 
+     * @param feature_path
+     *            the path to the feature modules
+     * @param feature
+     *            the feature to parse
+     */
     private void parseFeature(String feature_path, Feature feature) {
 	boolean update_needed = true;
 
@@ -99,6 +117,9 @@ public class Parser {
 			    .compilationUnitIterator();
 		    while (it.hasNext()) {
 			CompilationUnit cu = it.next();
+
+			checkForSyntaxErrors(cu);
+
 			if (cu.fromSource()) {
 			    // System.out.println(cu.pathName());
 			    parseAST(feature, cu);
@@ -106,10 +127,10 @@ public class Parser {
 		    }
 		}
 	    } catch (SyntacticErrorException see) {
-		System.out.println("Syntaxerror: " + see.getMessage());
+		// TODO: handle syntax error
+		System.out.println(see.getMessage());
 
 	    } catch (Exception e) {
-		// TODO Auto-generated catch block
 		e.printStackTrace();
 	    }
 	    feature_directories.get(feature).update();
@@ -119,10 +140,34 @@ public class Parser {
 	}
     }
 
+    /**
+     * iterates the AST, lets the plug-in manager 
+     * @param feature
+     * @param node
+     */
     public void parseAST(Feature feature, ASTNode node) {
 	plugins.invokeNodeParse(feature, node);
 	for (int i = 0; i < node.getNumChild(); i++) {
 	    parseAST(feature, node.getChild(i));
 	}
+    }
+
+    public void checkForSyntaxErrors(CompilationUnit cu) {
+	List<Problem> parseErrors = (List<Problem>) cu.parseErrors();
+	if (!parseErrors.isEmpty()) {
+	    parse_errors.addAll(parseErrors);
+	}
+    }
+
+    public boolean hasParseErrors() {
+	return !parse_errors.isEmpty();
+    }
+
+    public String printParseErrors() {
+	StringBuilder message = new StringBuilder();
+	for (Problem p : parse_errors) {
+	    message.append(p + "\n");
+	}
+	return message.toString();
     }
 }

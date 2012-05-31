@@ -25,68 +25,94 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * TODO description
+ * Auxiliary class to detect file changes in a given directory and its sub
+ * directories
  * 
- * @author soenke
+ * @author Soenke Holthussen
  */
 public class Directory {
-	private File directory;
+    /**
+     * The directory to watch
+     */
+    private File directory;
 
-	private Map<File, Long> times;
+    /**
+     * The recorded times of the last modification of the files at the last
+     * iteration
+     */
+    private Map<File, Long> times;
 
-	/**
-	 * 
-	 */
-	public Directory(File dir) {
-		directory = dir;
+    /**
+     * Set the directory, update the modification times
+     * 
+     * @param dir
+     */
+    public Directory(File dir) {
+	directory = dir;
 
-		update();
+	update();
+    }
+
+    /**
+     * Checks if a file in the directory or its sub-directories was changed
+     * 
+     * @return true if a file was changed, false otherwise
+     */
+    public boolean changed() {
+	Set<File> current_files = parse();
+	if (current_files.size() != times.keySet().size()) {
+	    return true;
 	}
 
-	public boolean changed() {
-		Set<File> current_files = parse();
-		if (current_files.size() != times.keySet().size()) {
-			return true;
+	for (File f : current_files) {
+	    if (times.containsKey(f)) {
+		if (times.get(f) != f.lastModified()) {
+		    return true;
 		}
-
-		for (File f : current_files) {
-			if (times.containsKey(f)) {
-				if (times.get(f) != f.lastModified()) {
-					return true;
-				}
-			} else {
-				return true;
-			}
-		}
-
-		return false;
+	    } else {
+		return true;
+	    }
 	}
 
-	public void update() {
-		times = new HashMap<File, Long>();
+	return false;
+    }
 
-		for (File f : parse()) {
-			times.put(f, f.lastModified());
-		}
+    /**
+     * updates the modification times
+     */
+    public void update() {
+	times = new HashMap<File, Long>();
+
+	for (File f : parse()) {
+	    times.put(f, f.lastModified());
 	}
+    }
 
-	private Set<File> parse() {
-		return parse(directory);
+    private Set<File> parse() {
+	return parse(directory);
+    }
+
+    /**
+     * iterates through a directory, searching for .java files
+     * 
+     * @param directory
+     *            to search through
+     * @return a set of .java files in the given directory and its
+     *         sub-directories
+     */
+    private Set<File> parse(File f) {
+	Set<File> set = new HashSet<File>();
+
+	if (f.isFile()) {
+	    if (f.getName().endsWith(".java")) {
+		set.add(f);
+	    }
+	} else {
+	    for (File c : f.listFiles()) {
+		set.addAll(parse(c));
+	    }
 	}
-
-	private Set<File> parse(File f) {
-		Set<File> set = new HashSet<File>();
-
-		if (f.isFile()) {
-			if (f.getName().endsWith(".java")) {
-				set.add(f);
-			}
-		} else {
-			for (File c : f.listFiles()) {
-				set.addAll(parse(c));
-			}
-		}
-		return set;
-	}
+	return set;
+    }
 
 }

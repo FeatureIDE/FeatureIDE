@@ -59,6 +59,81 @@ public abstract class AbstractCheckPlugin implements ICheckPlugin {
 	registered_node_types.add(node_type);
     }
 
+    /**
+     * Returns all nodes of a given feature the plug-in is registered for
+     * 
+     * @param feature
+     * @return the nodes
+     */
+    public Map<Class, List<ASTNode>> getNodesByFeature(Feature feature) {
+        return nodes.get(feature);
+    }
+
+    /**
+     * Returns all nodes of the specific type, sorted by feature
+     * 
+     * @param the
+     *            class type
+     * @return the nodes, sorted by feature
+     */
+    public <T> Map<Feature, List<T>> getNodesByType(Class<T> c) {
+        Map<Feature, List<T>> feature_node_map = new HashMap<Feature, List<T>>();
+        for (Feature f : nodes.keySet()) {
+            Map<Class, List<ASTNode>> class_node_map = getNodesByFeature(f);
+            if (class_node_map.containsKey(c)) {
+        	List<ASTNode> nodes = class_node_map.get(c);
+    
+        	List<T> new_node_list = new ArrayList<T>();
+    
+        	for (ASTNode n : nodes) {
+        	    if (c.isInstance(n)) {
+        		new_node_list.add(c.cast(n));
+        	    }
+        	}
+    
+        	feature_node_map.put(f, new_node_list);
+            }
+        }
+    
+        return feature_node_map;
+    }
+
+    /**
+     * Checks if, if the first feature is chosen, one of the second set of
+     * features is always chosen as well
+     * 
+     * @param fm
+     * @param feature
+     * @param implies
+     * @return true if the implication holds, false otherwise
+     */
+    public boolean checkFeatureImplication(FeatureModel fm, Feature feature,
+            Set<Feature> implies) {
+        if (implies.isEmpty()) {
+            return false;
+        }
+    
+        Set<Feature> set = new HashSet<Feature>();
+        set.add(feature);
+        try {
+            return TypeChecker.checkImpliesDisjunct(fm, set, implies);
+        } catch (TimeoutException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
+     * lets the plug-in add a new {@link CheckProblem} for the plug-in manager
+     * to report
+     * 
+     * @param problem
+     */
+    public void newProblem(CheckProblem problem) {
+        _manager.addProblem(problem, this);
+    }
+
     @Override
     public void register(CheckPluginManager manager) {
 	_manager = manager;
@@ -84,93 +159,13 @@ public abstract class AbstractCheckPlugin implements ICheckPlugin {
 	map.get(node.getClass()).add(node);
     }
 
-    /**
-     * Returns all nodes of a given feature the plug-in is registered for
-     * 
-     * @param feature
-     * @return the nodes
-     */
-    public Map<Class, List<ASTNode>> getNodesByFeature(Feature feature) {
-	return nodes.get(feature);
-    }
-
-    /**
-     * Returns all nodes of the specific type, sorted by feature
-     * 
-     * @param the
-     *            class type
-     * @return the nodes, sorted by feature
-     */
-    public <T> Map<Feature, List<T>> getNodesByType(Class<T> c) {
-	Map<Feature, List<T>> feature_node_map = new HashMap<Feature, List<T>>();
-	for (Feature f : nodes.keySet()) {
-	    Map<Class, List<ASTNode>> class_node_map = getNodesByFeature(f);
-	    if (class_node_map.containsKey(c)) {
-		List<ASTNode> nodes = class_node_map.get(c);
-
-		List<T> new_node_list = new ArrayList<T>();
-
-		for (ASTNode n : nodes) {
-		    if (c.isInstance(n)) {
-			new_node_list.add(c.cast(n));
-		    }
-		}
-
-		feature_node_map.put(f, new_node_list);
-	    }
-	}
-
-	return feature_node_map;
-    }
-
     @Override
-    public String getName() {
+    public final String getName() {
 	return plugin_name;
     }
 
-    /**
-     * Checks if, if the first feature is chosen, one of the second set of
-     * features is always chosen as well
-     * 
-     * @param fm
-     * @param feature
-     * @param implies
-     * @return true if the implication holds, false otherwise
-     */
-    public boolean checkFeatureImplication(FeatureModel fm, Feature feature,
-	    Set<Feature> implies) {
-	if (implies.isEmpty()) {
-	    return false;
-	}
-
-	Set<Feature> set = new HashSet<Feature>();
-	set.add(feature);
-	try {
-	    return TypeChecker.checkImpliesDisjunct(fm, set, implies);
-	} catch (TimeoutException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	}
-	return false;
-    }
-
-    /**
-     * removes the nodes of a given feature in the case the feature is re-parsed
-     * 
-     * @param feature
-     *            the feature
-     */
+    @Override
     public void resetFeature(Feature feature) {
-	nodes.remove(feature);
-    }
-
-    /**
-     * lets the plug-in add a new {@link CheckProblem} for the plug-in manager
-     * to report
-     * 
-     * @param problem
-     */
-    public void newProblem(CheckProblem problem) {
-	_manager.addProblem(problem, this);
+        nodes.remove(feature);
     }
 }
