@@ -31,10 +31,11 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 /**
  * Manages the check plug-ins
  * 
- * Provides methods for the execution of checks and node iterating
+ * Provides methods for the execution of checks and node iteration
  * 
- * @author S�nke Holthusen
+ * @author Soenke Holthusen
  */
+@SuppressWarnings("rawtypes")
 public class CheckPluginManager extends Observable {
     private ArrayList<ICheckPlugin> _plugins = new ArrayList<ICheckPlugin>();
     private Map<Class, List<ICheckPlugin>> node_parse_plugins = new HashMap<Class, List<ICheckPlugin>>();
@@ -42,9 +43,7 @@ public class CheckPluginManager extends Observable {
     private Map<CheckProblem, ICheckPlugin> problems = new HashMap<CheckProblem, ICheckPlugin>();
 
     /**
-     * @author S�nke Holthusen
-     * 
-     * 
+     * initiates the plug-in manager with the given plug-ins
      * 
      * @param plugins
      *            the plug-ins to be registered for checks
@@ -65,9 +64,7 @@ public class CheckPluginManager extends Observable {
     }
 
     /**
-     * @author S�nke Holthusen
-     * 
-     *         Invokes a check in every registered plug-in
+     * Invokes a check in every registered plug-in
      * 
      * @param project
      * @param class_table
@@ -82,9 +79,7 @@ public class CheckPluginManager extends Observable {
     }
 
     /**
-     * @author S�nke Holthusen
-     * 
-     *         Registers a check plug-in for a specific ASTNode
+     * Registers a check plug-in for a specific ASTNode
      * 
      * @param node
      *            The node type the plug-in registers for
@@ -100,9 +95,7 @@ public class CheckPluginManager extends Observable {
     }
 
     /**
-     * @author S�nke Holthusen
-     * 
-     *         Delivers an ASTNode to the registered plug-ins
+     * Delivers an ASTNode to the registered plug-ins
      * 
      * @param feature
      *            the feature the node is associated with
@@ -118,23 +111,41 @@ public class CheckPluginManager extends Observable {
 	}
     }
 
+    /**
+     * resets the data about a feature to prepare a re-parse
+     * 
+     * @param feature
+     */
     public void resetFeature(Feature feature) {
 	for (ICheckPlugin plugin : _plugins) {
 	    plugin.resetFeature(feature);
 	}
     }
 
-    public void resetProblems(){
+    /**
+     * resets the problems of the last iteration
+     */
+    public void resetProblems() {
 	problems = new HashMap<CheckProblem, ICheckPlugin>();
     }
-    
+
+    /**
+     * let's a plug-in report a problem to the plug-in manager
+     * 
+     * @param problem
+     * @param plugin
+     */
     public void addProblem(CheckProblem problem, ICheckPlugin plugin) {
 	problems.put(problem, plugin);
     }
 
+    /**
+     * prints problems encountered while checking the software product line
+     */
     public void reportproblems() {
 	for (CheckProblem problem : problems.keySet()) {
-	    System.out.println(problems.get(problem).getName() + " reported a Problem:");
+	    System.out.println(problems.get(problem).getName()
+		    + " reported a Problem:");
 	    System.out.println(problem);
 	}
     }

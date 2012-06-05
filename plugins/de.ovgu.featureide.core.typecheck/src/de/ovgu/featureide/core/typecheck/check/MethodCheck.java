@@ -20,7 +20,6 @@ package de.ovgu.featureide.core.typecheck.check;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import AST.ASTNode;
 import AST.CompilationUnit;
@@ -30,13 +29,12 @@ import AST.MethodDecl;
 import AST.ParameterDeclaration;
 import AST.UnknownType;
 import AST.VarAccess;
-import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
 /**
- * TODO description
+ * NYI
  * 
- * @author S�nke Holthusen
+ * @author Soenke Holthusen
  */
 public class MethodCheck extends AbstractCheckPlugin {
 
@@ -59,16 +57,16 @@ public class MethodCheck extends AbstractCheckPlugin {
 
     @Override
     public void invokeCheck(FeatureModel fm) {
-	Map<Feature, List<MethodDecl>> methoddecl_map = getNodesByType(MethodDecl.class);
-	Map<Feature, List<MethodAccess>> methodaccess_map = getNodesByType(MethodAccess.class);
-
-	for (Feature f : methodaccess_map.keySet()) {
-	    for (MethodAccess ma : methodaccess_map.get(f)) {
-		Method m = new Method(ma);
+	//Map<Feature, List<MethodDecl>> methoddecl_map = getNodesByType(MethodDecl.class);
+//	Map<Feature, List<MethodAccess>> methodaccess_map = getNodesByType(MethodAccess.class);
+//
+//	for (Feature f : methodaccess_map.keySet()) {
+//	    for (MethodAccess ma : methodaccess_map.get(f)) {
+		//Method m = new Method(ma);
 		// if (!m.isAnonymous())
 		// System.out.println(m);
-	    }
-	}
+//	    }
+//	}
 
 	// for (Feature f : methoddecl_map.keySet()) {
 	// for (MethodDecl md : methoddecl_map.get(f)) {
@@ -117,6 +115,7 @@ public class MethodCheck extends AbstractCheckPlugin {
 	    }
 	}
 
+	@SuppressWarnings("rawtypes")
 	public Method(MethodAccess ma) {
 	    host_type = ma.hostType().name();
 	    type = ma.typeName();

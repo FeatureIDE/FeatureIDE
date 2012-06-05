@@ -20,7 +20,6 @@ package de.ovgu.featureide.core.typecheck.parser;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -145,6 +144,7 @@ public class Parser {
      * @param feature
      * @param node
      */
+    @SuppressWarnings("rawtypes")
     public void parseAST(Feature feature, ASTNode node) {
 	plugins.invokeNodeParse(feature, node);
 	for (int i = 0; i < node.getNumChild(); i++) {
@@ -152,6 +152,11 @@ public class Parser {
 	}
     }
 
+    /**
+     * Checks if Fuji encountered syntax errors while parsing the feature module
+     * @param cu the compilation unit
+     */
+    @SuppressWarnings("unchecked")
     public void checkForSyntaxErrors(CompilationUnit cu) {
 	List<Problem> parseErrors = (List<Problem>) cu.parseErrors();
 	if (!parseErrors.isEmpty()) {
@@ -159,6 +164,10 @@ public class Parser {
 	}
     }
 
+    /**
+     * 
+     * @return return true is the parser encountered syntax errors, false otherwise
+     */
     public boolean hasParseErrors() {
 	return !parse_errors.isEmpty();
     }

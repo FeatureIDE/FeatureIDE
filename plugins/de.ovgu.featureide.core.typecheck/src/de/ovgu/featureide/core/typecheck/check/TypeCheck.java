@@ -26,7 +26,6 @@ import java.util.Set;
 
 import AST.ClassDecl;
 import AST.CompilationUnit;
-import AST.InterfaceDecl;
 import AST.ReferenceType;
 import AST.TypeAccess;
 import AST.TypeDecl;
@@ -36,9 +35,9 @@ import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
 /**
- * TODO description
+ * Checks if every accessed type in a feature is reachable
  * 
- * @author soenke
+ * @author Soenke Holthusen
  */
 public class TypeCheck extends AbstractCheckPlugin {
     private Map<Feature, List<ReferenceType>> intros;
@@ -49,6 +48,10 @@ public class TypeCheck extends AbstractCheckPlugin {
 	registerNodeType(CompilationUnit.class);
     }
 
+    /**
+     * creates an introduction table
+     * which feature introduces which type?
+     */
     public void init() {
 	Map<Feature, List<CompilationUnit>> cumap = getNodesByType(CompilationUnit.class);
 
@@ -81,21 +84,28 @@ public class TypeCheck extends AbstractCheckPlugin {
      */
     @Override
     public void invokeCheck(FeatureModel fm) {
-
 	// doesn't work with annotations and stuff
 	Map<Feature, List<ClassDecl>> cdmap = getNodesByType(ClassDecl.class);
 
 	for (Feature f : cdmap.keySet()) {
 	    for (ClassDecl cd : cdmap.get(f)) {
+		// for every type access inside a class declaration
 		for (TypeAccess ta : FujiWrapper.getChildNodesByType(cd,
 			TypeAccess.class)) {
+		    // utilise the type resolution of fuji and handle only
+		    // unknown types
 		    if (ta.type() instanceof UnknownType) {
+			// which feature can provide the unknown type?
 			Set<Feature> providing_features = providesType(
 				ta.name()).keySet();
+			// is one of the providing features always present with
+			// feature f?
 			if (!checkFeatureImplication(fm, f, providing_features)) {
-			    newProblem(new CheckProblem(f, cd, cd.compilationUnit()
-				    .pathName(), ta.lineNumber(),
-				    "Missing type dependency " + ta.name(), providing_features));
+			    // it is not, create a new problem
+			    newProblem(new CheckProblem(f, cd, cd
+				    .compilationUnit().pathName(),
+				    ta.lineNumber(), "Missing type dependency "
+					    + ta.name(), providing_features));
 			}
 		    }
 		}

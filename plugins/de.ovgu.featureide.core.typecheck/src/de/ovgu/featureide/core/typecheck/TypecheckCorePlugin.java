@@ -1,24 +1,12 @@
 package de.ovgu.featureide.core.typecheck;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 import org.osgi.framework.BundleContext;
-import org.prop4j.Implies;
-import org.prop4j.Literal;
-import org.prop4j.Node;
-import org.prop4j.Not;
-import org.prop4j.Or;
-import org.prop4j.SatSolver;
-import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 
 public class TypecheckCorePlugin extends AbstractCorePlugin {

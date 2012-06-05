@@ -23,9 +23,9 @@ import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
 /**
- * TODO description
+ * Provides an interface for {@link CheckPluginManager}
  * 
- * @author S�nke Holthusen
+ * @author Soenke Holthusen
  */
 public interface ICheckPlugin {
     /**
@@ -60,11 +60,13 @@ public interface ICheckPlugin {
      * @param node
      *            the current node
      */
+    
+    @SuppressWarnings("rawtypes")
     public void invokeNodeParse(Feature feature, ASTNode node);
 
     /**
      * Removes all data about the feature from the node list Will be called by
-     * the parser when a feature is parsed the first time or has to be reparsed
+     * the parser when a feature is parsed the first time or has to be re-parsed
      * 
      * @param feature
      */

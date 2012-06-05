@@ -19,37 +19,55 @@
 package de.ovgu.featureide.core.typecheck.helper;
 
 /**
- * TODO description
+ * A timer class to measure time 
  * 
- * @author S�nke Holthusen
+ * @author Soenke Holthusen
  */
 public class Timer {
 	private long _time_passed = 0;
 	private long _time_last_start = 0;
 	private boolean _started = false;
 
+	/**
+	 * starts the timer
+	 */
 	public void start() {
 		_time_passed = 0;
 		_started = true;
 		_time_last_start = System.currentTimeMillis();
 	}
 
+	/**
+	 * stops the timer
+	 */
 	public void stop() {
 		_time_passed += System.currentTimeMillis() - _time_last_start;
 		_started = false;
 	}
 
+	/**
+	 * resumes the timer
+	 */
 	public void resume() {
 		_started = true;
 		_time_last_start = System.currentTimeMillis();
 	}
 
+	/**
+	 * resets the timer, setting the time passed to 0
+	 */
 	public void reset() {
 		_started = false;
 		_time_passed = 0;
 		_time_last_start = 0;
 	}
 
+	/**
+	 * Returns the passed time
+	 * if the timer is running, the passed time till the last stop is added to the time passed since the last start
+	 * if it is not running, the time passed till the last stop is returned
+	 * @return
+	 */
 	public long getTime() {
 		if (!_started) {
 			return _time_passed;

@@ -25,9 +25,9 @@ import AST.ClassDecl;
 import de.ovgu.featureide.fm.core.Feature;
 
 /**
- * TODO description
+ * Provides information about a problem, encountered by the typechecks
  * 
- * @author soenke
+ * @author Soenke Holthusen
  */
 public class CheckProblem {
     private Feature feature;

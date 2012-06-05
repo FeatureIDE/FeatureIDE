@@ -26,14 +26,7 @@ import java.util.List;
 import org.apache.commons.cli.ParseException;
 
 import AST.ASTNode;
-import AST.ClassDecl;
-import AST.CompilationUnit;
-import AST.IntrosRefsUtil;
-import AST.MethodAccess;
-import AST.MethodDecl;
 import AST.Program;
-import AST.ReferenceType;
-import AST.TypeAccess;
 import fuji.CompilerWarningException;
 import fuji.Composition;
 import fuji.FeatureDirNotFoundException;
@@ -43,7 +36,7 @@ import fuji.SyntacticErrorException;
 import fuji.WrongArgumentException;
 
 /**
- * Auxiliary class to help with Fuji
+ * Auxiliary class to help working with Fuji
  * 
  * @author Soenke Holthusen
  * 
@@ -82,6 +75,7 @@ public class FujiWrapper {
      * @param type the node type to look for
      * @return a list of nodes of the given type
      */
+    @SuppressWarnings("rawtypes")
     public static <T> List<T> getChildNodesByType(ASTNode node, Class<T> type) {
 	List<T> list = new ArrayList<T>();
 	for (int i = 0; i < node.getNumChild(); i++) {

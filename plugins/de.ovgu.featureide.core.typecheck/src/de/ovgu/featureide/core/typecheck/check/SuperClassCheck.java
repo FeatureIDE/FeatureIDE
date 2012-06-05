@@ -35,7 +35,8 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 /**
  * TODO description
  * 
- * @author S�nke Holthusen
+ * @author Soenke Holthusen
+ * @deprecated {@link TypeCheck} finds all missing superclass errors
  */
 
 public class SuperClassCheck extends AbstractCheckPlugin {
