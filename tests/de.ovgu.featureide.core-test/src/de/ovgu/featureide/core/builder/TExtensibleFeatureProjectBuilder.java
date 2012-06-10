@@ -1,17 +1,16 @@
 package de.ovgu.featureide.core.builder;
 
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-
-import de.ovgu.featureide.core.builder.ExtensibleFeatureProjectBuilder;
 
 /**
  * 

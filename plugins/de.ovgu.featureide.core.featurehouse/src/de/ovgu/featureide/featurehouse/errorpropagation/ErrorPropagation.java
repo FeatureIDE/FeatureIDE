@@ -21,8 +21,11 @@ package de.ovgu.featureide.featurehouse.errorpropagation;
 import java.io.FileNotFoundException;
 import java.util.AbstractCollection;
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.TreeMap;
+
+import javax.annotation.CheckForNull;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -48,16 +51,35 @@ import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
  */
 public class ErrorPropagation {
 	
+	private static final String NO_ATTRIBUTE = "#NO_ATTRIBUTE#";
+
 	/**
 	 * A list containing composed files.
 	 * These files will be checked for propagation. 
 	 */
-	private LinkedList<IFile> composedFiles = new LinkedList<IFile>();
+	/*
+	 * This list needs to be static else there are some problems with getFirst or
+	 * get(0) because the element was not found.
+	 */
+	private static LinkedList<IFile> composedFiles = new LinkedList<IFile>();
+	
+	private synchronized IFile getComposedFile() {
+		if (!composedFiles.isEmpty()) {
+			IFile composedFile = composedFiles.getFirst();
+			composedFiles.remove();
+			return composedFile;
+		}
+		return null;
+	}
+	
+	private void addComposedFile(IFile file) {
+		composedFiles.add(file);
+	}
 	
 	/**
 	 * The main background job calling the corresponding error propagation class for each file. 
 	 */
-	private Job job = null;
+	public Job job = null;
 	
 	/**
 	 * Propagates error markers for composed files to sources files.<br>
@@ -75,13 +97,14 @@ public class ErrorPropagation {
 	 */
 	public void addFile(IFile sourceFile) {
 		//TODO implement error propagation for all FeatureHouse languages
-		if (sourceFile.getFileExtension() == null) {
+		String fileExtension = sourceFile.getFileExtension();
+		if (fileExtension == null) {
 			return;
 		}
-		if (sourceFile.getFileExtension().equals("java") || sourceFile.getFileExtension().equals("c") ||
-				sourceFile.getFileExtension().equals("h")) {
+		if ("java".equals(fileExtension) || "c".equals(fileExtension) ||
+				"h".equals(fileExtension)) {
 			if (!composedFiles.contains(sourceFile)) {
-				composedFiles.add(sourceFile);
+				addComposedFile(sourceFile);
 			}
 			if (job == null) {
 				job = new Job("Propagate problem markers") {
@@ -91,7 +114,7 @@ public class ErrorPropagation {
 						return Status.OK_STATUS;
 					}
 				};
-				job.setPriority(Job.DECORATE);
+				job.setPriority(Job.SHORT);
 				job.schedule();
 			}
 			
@@ -103,19 +126,25 @@ public class ErrorPropagation {
 
 	/**
 	 * Calls the corresponding propagation for all files at <code>composedFiles</code>.
+	 * @param clone 
 	 */
 	protected void propagateMarkers() {
 		if (composedFiles.isEmpty()) {
 			return;
 		}
 		
-		while (!composedFiles.isEmpty()) {
-			IFile file = composedFiles.getFirst();
-			composedFiles.remove(file);
-			ErrorPropagation prop = getErrorPropagation(file);
-			if (prop != null) {
-				prop.propagateMarkers(file);
+		try {
+			while (!composedFiles.isEmpty()) {
+				IFile file = getComposedFile();
+				if (file != null) {
+					ErrorPropagation prop = getErrorPropagation(file);
+					if (prop != null) {
+						prop.propagateMarkers(file);
+					}
+				}
 			}
+		} catch (NoSuchElementException e) {
+			FeatureHouseCorePlugin.getDefault().logError(e);
 		}
 	}
 
@@ -125,16 +154,17 @@ public class ErrorPropagation {
 	 * @param file 
 	 * @return The corresponding <code>ErrorPropagation</code>
 	 */
+	@CheckForNull
 	private ErrorPropagation getErrorPropagation(IFile file) {
-		if (file.getFileExtension().endsWith("java")) {
+		String fileExtension = file.getFileExtension();
+		if ("java".equals(fileExtension)) {
 			return new JavaErrorPropagation();
 		}
-		if (file.getFileExtension().endsWith("c") || file.getFileExtension().endsWith("h")) {
+		if ("c".equals(fileExtension) || "h".equals(fileExtension)) {
 			return new CErrorPropagation();
 		} 
 		return null;
 	}
-
 
 	/**
 	 * Removes the  not composed markers form the given source file and calls <code>propagateMarkers(marker, file)</code>
@@ -210,8 +240,9 @@ public class ErrorPropagation {
 		}
 		for (FSTFeature f : model.getFeaturesMap().values()) {
 			TreeMap<String, FSTClass> z = f.getClasses();
-			if (z.containsKey(file.getName())) {
-				FSTClass c = z.get(file.getName());
+			String fileName = file.getName();
+			if (z.containsKey(fileName)) {
+				FSTClass c = z.get(fileName);
 				for (FSTField field : c.getFields()) {
 					fields.add(field);
 				}
@@ -241,11 +272,12 @@ public class ErrorPropagation {
 				if (f.getEndLine() == -1) {
 					continue;
 				}
-				if (markerLine >= f.getComposedLine()
-						&& markerLine <= f.getComposedLine()
+				int composedLine = f.getComposedLine();
+				if (markerLine >= composedLine
+						&& markerLine <= composedLine
 								+ (f.getEndLine() - f.getBeginLine())) {
 					propagateMarker(marker, f.getOwnFile(), f.getBeginLine()
-							+ markerLine - f.getComposedLine());
+							+ markerLine - composedLine);
 					propagated = true;
 					break;
 				}
@@ -259,8 +291,9 @@ public class ErrorPropagation {
 				if (m.getEndLine() == -1) {
 					continue;
 				}
-				if (markerLine >= m.getComposedLine() && 
-						markerLine <= m.getComposedLine() + (m.getEndLine() - m.getBeginLine())) {
+				int composedLine = m.getComposedLine();
+				if (markerLine >= composedLine && 
+						markerLine <= composedLine + (m.getEndLine() - m.getBeginLine())) {
 					propagateMarker(marker, m.getOwnFile(), m.getBeginLine() + markerLine - m.getComposedLine());
 					propagated = true;
 					break;
@@ -305,8 +338,8 @@ public class ErrorPropagation {
 	protected void propagateMarker(IMarker marker, IFile file, int line) {
 		if (file != null && file.exists()) {
 			Object severity = null;
-			String message = marker.getAttribute(IMarker.MESSAGE, "xxx");
-			if (message.equals("xxx")) {
+			String message = marker.getAttribute(IMarker.MESSAGE, NO_ATTRIBUTE);
+			if (NO_ATTRIBUTE.equals(message)) {
 				return;
 			}
 			try {

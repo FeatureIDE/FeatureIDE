@@ -122,7 +122,7 @@ public class AheadWrapper {
 		if (!jakFile.exists())
 			return;
 		
-		// TODO this job should not run parallel multiple times
+		// TODO @Jens this job should not run parallel multiple times
 		Job job = new Job("Propagate problem markers") {
 			@Override
 			public IStatus run(IProgressMonitor monitor) {

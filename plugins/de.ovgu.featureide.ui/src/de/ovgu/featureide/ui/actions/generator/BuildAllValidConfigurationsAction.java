@@ -16,7 +16,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.ui.actions;
+package de.ovgu.featureide.ui.actions.generator;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -33,13 +33,13 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 
 /**
- * Builds all current configurations for a selected feature project.
+ * Builds all valid configurations for a selected feature project.
  * 
  * @author Jens Meinicke
  */
-public class BuildAllConfigurationsAction implements IObjectActionDelegate,
-		IConfigurationBuilderBasics {
-
+public class BuildAllValidConfigurationsAction implements
+		IObjectActionDelegate, IConfigurationBuilderBasics {
+	
 	private ISelection selection;
 
 	/*
@@ -62,22 +62,22 @@ public class BuildAllConfigurationsAction implements IObjectActionDelegate,
 		}
 		MessageDialogWithToggle dialog = openDialog();
 		if (dialog.getReturnCode() == MessageDialogWithToggle.OK) {
-			new ConfigurationBuilder(featureProject, false,
+			new ConfigurationBuilder(featureProject, true,
 					dialog.getToggleState());
 		}
 		setToggleState(dialog.getToggleState());
 	}
 
 	/**
-	 * Opens a dialog before building all current configuration.
+	 * Opens a dialog before building all valid configuration.
 	 * 
-	 * @return true if all current configurations should be build.
+	 * @return true if all valid configurations should be build.
 	 */
 	private MessageDialogWithToggle openDialog() {
-		return MessageDialogWithToggle.openOkCancelConfirm(null, MESSAGE_TITLE_CURRENT,
-				MESSAGE_CURRENT, TOGGLE_MESSAGE, getToggleState(), null, "key");
+		return MessageDialogWithToggle.openOkCancelConfirm(null, MESSAGE_TITLE_VALID,
+				MESSAGE_START, TOGGLE_MESSAGE, getToggleState(), null, "");
 	}
-
+	
 	/**
 	 * Gets the toggle state from persistent properties
 	 */
@@ -100,7 +100,7 @@ public class BuildAllConfigurationsAction implements IObjectActionDelegate,
 			FMCorePlugin.getDefault().logError(e);
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 

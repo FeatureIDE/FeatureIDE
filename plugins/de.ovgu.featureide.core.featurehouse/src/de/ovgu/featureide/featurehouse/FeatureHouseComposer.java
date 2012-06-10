@@ -60,6 +60,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
  * 
  * @author Tom Brosch
  */
+// TODO set "Composition errors" like *.png could not be composed with *.png
 @SuppressWarnings("restriction")
 public class FeatureHouseComposer extends ComposerExtensionClass {
 
@@ -69,15 +70,18 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	
 	private ErrorPropagation errorPropagation = new ErrorPropagation();
 
-	private IParseErrorListener listener = new IParseErrorListener() {
+	private IParseErrorListener listener = createParseErrorListener();
 
-		@Override
-		public void parseErrorOccured(ParseException e) {
-				createBuilderProblemMarker(e.currentToken.next.endLine, e.getMessage());
-		}
-		
-	};
+	private IParseErrorListener createParseErrorListener() {
+		return new IParseErrorListener() {
 
+			@Override
+			public void parseErrorOccured(ParseException e) {
+					createBuilderProblemMarker(e.currentToken.next.endLine, e.getMessage());
+			}
+		};
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -524,13 +528,26 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	public void buildConfiguration(IFolder folder, Configuration configuration, String congurationName) {
 		super.buildConfiguration(folder, configuration, folder.getName());
 		IFile configurationFile = folder.getFile(folder.getName() + getConfigurationExtension());
-		composer = new FSTGenComposer(false);
-		composer.addParseErrorListener(listener);
+		FSTGenComposer composer = new FSTGenComposer(false);
+		composer.addParseErrorListener(createParseErrorListener());
 		composer.run(new String[]{
 				CmdLineInterpreter.INPUT_OPTION_EQUATIONFILE, configurationFile.getRawLocation().toOSString(),
 				CmdLineInterpreter.INPUT_OPTION_BASE_DIRECTORY, featureProject.getSourcePath(),
 				CmdLineInterpreter.INPUT_OPTION_OUTPUT_DIRECTORY, folder.getParent().getLocation().toOSString() + "/"
-		});
+		}); 
+		if (errorPropagation.job != null) {
+			/*
+			 * Waiting for the propagation job to finish, 
+			 * because the corresponding FSTModel is necessary for propagation at FH
+			 * This is in general no problem because the compiler is much faster then the composer
+			 */
+			try {
+				errorPropagation.job.join();
+			} catch (InterruptedException e) {
+				FeatureHouseCorePlugin.getDefault().logError(e);
+			}
+		}
+		fhModelBuilder.buildModel(composer.getFstnodes(), false);
 		if (!configurationFile.getName().startsWith(congurationName)) {
 			try {
 				configurationFile.move(((IFolder)configurationFile.getParent()).getFile(congurationName + getConfigurationExtension()).getFullPath(), true, null);
@@ -538,5 +555,13 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 				FeatureHouseCorePlugin.getDefault().logError(e);
 			}
 		}
+	}
+	
+	/**
+	 * FeatureHouse causes access violation errors if it is executed parallel.
+	 */
+	@Override
+	public boolean canGeneratInParallelJobs() {
+		return false;
 	}
 }

@@ -168,4 +168,10 @@ public interface IComposerExtensionClass {
 	 * @return <code>false</code> if a source folder should not be created. Default: <code>true</code>
 	 */
 	boolean hasSourceFolder();
+
+	/** 
+	 * @return <code>true</code> if the composition can be called parallel
+	 */
+	boolean canGeneratInParallelJobs();
+
 }

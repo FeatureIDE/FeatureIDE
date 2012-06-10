@@ -84,7 +84,7 @@ public class FilterAction extends Action {
 			collaborationView.builder.featureFilter = featureFilter;
 			model = collaborationView.builder.buildCollaborationModel(collaborationView.getFeatureProject());
 			if (model == null) {
-				UIPlugin.getDefault().logInfo("model loading error");
+				UIPlugin.getDefault().logWarning("model loading error");
 				return;
 			}
 			Display.getDefault().syncExec(new Runnable(){	

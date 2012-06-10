@@ -255,4 +255,11 @@ public class ComposerExtensionProxy implements IComposerExtension {
 		return composerExtensionClass.hasSourceFolder();
 	}
 
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtension#canGeneratInParallelJobs()
+	 */
+	public boolean canGeneratInParallelJobs() {
+		return composerExtensionClass.canGeneratInParallelJobs();
+	}
+
 }

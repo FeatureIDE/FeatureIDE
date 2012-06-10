@@ -16,7 +16,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.ui.actions;
+package de.ovgu.featureide.ui.actions.generator;
 
 import java.util.regex.Pattern;
 
@@ -40,7 +40,7 @@ public interface IConfigurationBuilderBasics {
 	final static String MESSAGE_TITLE_VALID = "Build all valid configurations";
 	final static String MESSAGE_TITLE_CURRENT = "Build all current configurations";
 	final static String MESSAGE_CURRENT = "Builds all current configurations";
-	final static String MESSAGE_START = "This could take a long time.\nThe current algorithm is very inefficient, if your model contains many constraints.\n";
+	final static String MESSAGE_START = "This could take a long time.\nThe current algorithm is inefficient, if your model contains many constraints.\n";
 	final static String TOGGLE_MESSAGE = "Create a new project for each variant";
 	
 	static final QualifiedName TOGGLE_STATE = new QualifiedName("CreateNewProject", "CreateNewProject");
@@ -55,11 +55,7 @@ public interface IConfigurationBuilderBasics {
 	final static String JOB_TITLE = "Build all valid configurations";
 	final static String JOB_TITLE_CURRENT = "Build all current configurations";
 	final static String JOB_TITLE_COUNT_CONFIGURATIONS = "Count configurations";
-	
-	final static String SUBTASK_BUILD = "Build Configuration ";
-	final static String SUBTASK_GET = "Get Configuration ";
-	final static String SUBTASK_COMPILE = "Compile Configuration ";
-
+		
 	final static String CONFIGURATION_NAME = "Variant";
 	final static String FOLDER_NAME = "products";
 	final static String FOLDER_NAME_CURRENT = "currentproducts";
@@ -73,4 +69,7 @@ public interface IConfigurationBuilderBasics {
 	final static String ERROR_IGNOR_DEPRECATION = "has been deprecated";
 	
 	final static Pattern errorMessagePattern = Pattern.compile("(.+):(\\d+):(.+)");
+	
+	final static String SEPARATOR_VARIANT = " v.";
+	final static String SEPARATOR_CONFIGURATION = " c.";
 }

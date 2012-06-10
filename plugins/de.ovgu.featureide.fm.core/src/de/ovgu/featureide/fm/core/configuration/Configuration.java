@@ -74,6 +74,26 @@ public class Configuration {
 
 		updateAutomaticValues();
 	}
+	
+	/**
+	 * This method creates a clone of the given {@link Configuration}
+	 * @param configuration The configuration to clone
+	 */
+	public Configuration(Configuration configuration) {
+		this.featureModel = configuration.featureModel;
+		this.propagate = false;
+
+		root = new SelectableFeature(this, featureModel.getRoot());
+		initFeatures(root, featureModel.getRoot());
+
+		rootNode = NodeCreator
+				.createNodes(featureModel, false);
+		rootNode = rootNode.toCNF();
+		
+		for (SelectableFeature f : configuration.features) {
+			setManual(f.getName(), f.getSelection());
+		}
+	}
 
 	/**
 	 * if there are hidden features which Selection is UNDEFINED, they are
@@ -305,4 +325,5 @@ public class Configuration {
 		}
 		return builder.toString();
 	}
+
 }

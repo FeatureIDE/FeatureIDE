@@ -16,7 +16,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.ui.actions;
+package de.ovgu.featureide.ui.actions.generator;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -33,16 +33,14 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 
 /**
- * Builds all valid configurations for a selected feature project.
+ * Builds all current configurations for a selected feature project.
  * 
  * @author Jens Meinicke
  */
-public class BuildAllValidConfigurationsAction implements
-		IObjectActionDelegate, IConfigurationBuilderBasics {
-	private ISelection selection;
+public class BuildAllConfigurationsAction implements IObjectActionDelegate,
+		IConfigurationBuilderBasics {
 
-	public BuildAllValidConfigurationsAction() {
-	}
+	private ISelection selection;
 
 	/*
 	 * (non-Javadoc)
@@ -64,22 +62,22 @@ public class BuildAllValidConfigurationsAction implements
 		}
 		MessageDialogWithToggle dialog = openDialog();
 		if (dialog.getReturnCode() == MessageDialogWithToggle.OK) {
-			new ConfigurationBuilder(featureProject, true,
+			new ConfigurationBuilder(featureProject, false,
 					dialog.getToggleState());
 		}
 		setToggleState(dialog.getToggleState());
 	}
 
 	/**
-	 * Opens a dialog before building all valid configuration.
+	 * Opens a dialog before building all current configuration.
 	 * 
-	 * @return true if all valid configurations should be build.
+	 * @return true if all current configurations should be build.
 	 */
 	private MessageDialogWithToggle openDialog() {
-		return MessageDialogWithToggle.openOkCancelConfirm(null, MESSAGE_TITLE_VALID,
-				MESSAGE_START, TOGGLE_MESSAGE, getToggleState(), null, "");
+		return MessageDialogWithToggle.openOkCancelConfirm(null, MESSAGE_TITLE_CURRENT,
+				MESSAGE_CURRENT, TOGGLE_MESSAGE, getToggleState(), null, "key");
 	}
-	
+
 	/**
 	 * Gets the toggle state from persistent properties
 	 */
@@ -102,7 +100,7 @@ public class BuildAllValidConfigurationsAction implements
 			FMCorePlugin.getDefault().logError(e);
 		}
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 

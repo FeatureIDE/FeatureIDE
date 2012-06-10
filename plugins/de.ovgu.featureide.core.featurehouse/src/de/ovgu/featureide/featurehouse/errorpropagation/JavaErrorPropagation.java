@@ -157,7 +157,6 @@ public class JavaErrorPropagation extends ErrorPropagation {
 				return;
 			}
 		}
-		super.propagateUnsupportedMarker(marker, file);
 	}
 	
 	/**

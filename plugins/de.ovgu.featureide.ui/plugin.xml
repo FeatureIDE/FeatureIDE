@@ -118,7 +118,7 @@
             id="de.ovgu.featureide.ui.variantBuilder"
             objectClass="org.eclipse.core.resources.IProject">  
          <action
-               class="de.ovgu.featureide.ui.actions.BuildAllValidConfigurationsAction"
+               class="de.ovgu.featureide.ui.actions.generator.BuildAllValidConfigurationsAction"
                id="de.ovgu.featureide.ui.actions.buildallvalidconfigurationsaction"
                icon="icons/FeatureIconSmall.ico"
                label="Build All Valid Configurations"
@@ -127,7 +127,7 @@
                style="push">
          </action>
          <action
-               class="de.ovgu.featureide.ui.actions.BuildAllConfigurationsAction"
+               class="de.ovgu.featureide.ui.actions.generator.BuildAllConfigurationsAction"
                id="de.ovgu.featureide.ui.actions.buildallconfigurationsaction"
                icon="icons/FeatureIconSmall.ico"
                label="Build All Current Configurations"

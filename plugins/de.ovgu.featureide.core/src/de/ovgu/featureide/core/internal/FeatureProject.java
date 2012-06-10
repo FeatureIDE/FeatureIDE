@@ -692,6 +692,8 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	}
 
 	protected volatile boolean waiting;
+
+	private Job waiter;
 	
 	/**
 	 * refreshes Feature Module Markers for all folders in the source folder
@@ -708,25 +710,42 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	 * 
 	 * The goal of this is that a synchronization can't be executed unnecessarily multiple times.
 	 */
+	// TODO this should not be called if only markers are changed
+	// TODO if waiting is not not set false, sync will never happen again
+	//      so this should be revised
 	private void setAllFeatureModuleMarkers(final FeatureModel featureModel,
-			final IFolder sourceFolder) {
+		final IFolder sourceFolder) {
+		if (waiting) {
+			return;
+		}
 		
-		Job waiter = new Job("Synchronize feature model and feature modules") {
+		if (waiter != null) {
+			waiting = true;
+			waiter.schedule();
+			return;
+		}
+	
+		waiter = new Job("Synchronize feature model and feature modules") {
 
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
-				if (waiting) {
+				try {
+					if(syncJob != null) {
+						try {
+							syncJob.join();
+						} catch (InterruptedException e) {
+							CorePlugin.getDefault().logError(e);
+						}
+						
+					}
+				} finally {
+					// waiting must set false in any situations
+					waiting = false;
+				}
+				if (syncJob != null) {
+					syncJob.schedule();
 					monitor.done();
 					return Status.OK_STATUS;
-				}
-				if(syncJob != null) {
-					waiting = true;
-					try {
-						syncJob.join();
-					} catch (InterruptedException e) {
-						CorePlugin.getDefault().logError(e);
-					}
-					waiting = false;
 				}
 				syncJob = new Job("Synchronize feature model and feature modules") {
 					protected IStatus run(IProgressMonitor monitor) {

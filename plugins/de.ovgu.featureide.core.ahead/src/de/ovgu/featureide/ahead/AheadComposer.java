@@ -416,7 +416,20 @@ public class AheadComposer extends ComposerExtensionClass {
 	public void buildConfiguration(IFolder folder, Configuration configuration, String configurationName) {
 		super.buildConfiguration(folder, configuration, configurationName);
 		ahead.setCompositionFolder(folder);
-		performFullBuild(folder.getFile(configurationName + getConfigurationExtension()));
-		ahead.setCompositionFolder(featureProject.getBuildFolder());
+		try {
+			ahead.setConfiguration(folder.getFile(configurationName + getConfigurationExtension()));
+			ahead.buildAll();
+		} catch (Exception e) {
+			AheadCorePlugin.getDefault().logError(e);
+		}
 	}
+	
+	/**
+	 * AHEAD causes some errors if it is called parallel
+	 */
+	@Override
+	public boolean canGeneratInParallelJobs() {
+		return false;
+	}
+
 }
