@@ -20,8 +20,6 @@ package de.ovgu.featureide.ui.actions.generator;
 
 import java.util.LinkedList;
 
-import javax.annotation.CheckForNull;
-
 import org.eclipse.core.internal.resources.Workspace;
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IContainer;
@@ -70,7 +68,6 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 	 */
 	private int nr;
 
-	@CheckForNull
 	private Compiler compiler;
 	
 	LinkedList<BuilderConfiguration> configurations = new LinkedList<BuilderConfiguration>();
@@ -179,7 +176,6 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 		return Status.OK_STATUS;
 	}
 
-	@CheckForNull
 	public BuilderConfiguration getConfiguration() {
 		if (configurations.isEmpty()) {
 			return null;
