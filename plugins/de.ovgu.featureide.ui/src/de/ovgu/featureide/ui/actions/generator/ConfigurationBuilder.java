@@ -23,6 +23,8 @@ import java.security.KeyStore.Builder;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+import javax.annotation.CheckForNull;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -151,6 +153,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 * Gets the first entry of configurations or <code>null</code> if there is none.
 	 * @return The first entry
 	 */
+	@CheckForNull
 	public synchronized BuilderConfiguration getConfiguration() {
 		if (configurations.isEmpty()) {
 			return null;
