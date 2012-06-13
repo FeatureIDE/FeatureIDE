@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<associateSites>
+<associateSite url="http://download.eclipse.org/tools/ajdt/37/update" label="AJDT: AspectJ Development Tools for Eclipse 3.7"/>
+</associateSites> 
