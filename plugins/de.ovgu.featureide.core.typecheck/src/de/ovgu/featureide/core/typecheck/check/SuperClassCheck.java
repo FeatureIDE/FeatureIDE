@@ -29,6 +29,7 @@ import AST.CompilationUnit;
 import AST.ReferenceType;
 import AST.TypeDecl;
 import AST.UnknownType;
+import de.ovgu.featureide.core.typecheck.correction.Action;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
@@ -109,5 +110,14 @@ public class SuperClassCheck extends AbstractCheckPlugin {
 	}
 
 	return providing_features;
+    }
+
+    /* (non-Javadoc)
+     * @see de.ovgu.featureide.core.typecheck.check.ICheckPlugin#determineAction(de.ovgu.featureide.core.typecheck.check.CheckProblem)
+     */
+    @Override
+    public List<Action> determineActions(CheckProblem problem) {
+	// TODO Auto-generated method stub
+	return null;
     }
 }

@@ -14,6 +14,7 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.typecheck.TypeChecker;
 import de.ovgu.featureide.core.typecheck.TypecheckCorePlugin;
+import de.ovgu.featureide.core.typecheck.correction.ConsoleProblemHandler;
 
 /**
  * 
@@ -37,7 +38,7 @@ public class TypecheckCleanAction implements IObjectActionDelegate {
 	    if (Arrays.asList(TypecheckCorePlugin.supportedComposers).contains(
 		    project.getComposerID())) {
 
-		typechecker.put(project, new TypeChecker());
+		typechecker.put(project, new TypeChecker(new ConsoleProblemHandler()));
 		typechecker.get(project).setParameters(project.getFeatureModel(), project.getSourcePath());
 		typechecker.get(project).run();
 	    } else {

@@ -35,13 +35,11 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  * 
  * @author Soenke Holthusen
  */
-@SuppressWarnings("rawtypes")
 public class CheckPluginManager extends Observable {
     private ArrayList<ICheckPlugin> _plugins = new ArrayList<ICheckPlugin>();
-    private Map<Class, List<ICheckPlugin>> node_parse_plugins = new HashMap<Class, List<ICheckPlugin>>();
+    private @SuppressWarnings("rawtypes") Map<Class, List<ICheckPlugin>> node_parse_plugins = new HashMap<Class, List<ICheckPlugin>>();
 
-    private Map<CheckProblem, ICheckPlugin> problems = new HashMap<CheckProblem, ICheckPlugin>();
-
+    private List<CheckProblem> problems = new ArrayList<CheckProblem>();
     /**
      * initiates the plug-in manager with the given plug-ins
      * 
@@ -49,10 +47,6 @@ public class CheckPluginManager extends Observable {
      *            the plug-ins to be registered for checks
      */
     public CheckPluginManager(ICheckPlugin... plugins) {
-	addCheck(plugins);
-    }
-
-    private void addCheck(ICheckPlugin... plugins) {
 	for (ICheckPlugin plugin : plugins) {
 	    add(plugin);
 	}
@@ -66,8 +60,7 @@ public class CheckPluginManager extends Observable {
     /**
      * Invokes a check in every registered plug-in
      * 
-     * @param project
-     * @param class_table
+     * @param fm
      */
     public void invokeChecks(FeatureModel fm) {
 	resetProblems();
@@ -75,7 +68,6 @@ public class CheckPluginManager extends Observable {
 	    plugin.init();
 	    plugin.invokeCheck(fm);
 	}
-	reportproblems();
     }
 
     /**
@@ -86,7 +78,7 @@ public class CheckPluginManager extends Observable {
      * @param plugin
      *            the plug-in itself
      */
-    public void registerForNodeParse(Class node, ICheckPlugin plugin) {
+    public void registerForNodeParse(@SuppressWarnings("rawtypes") Class node, ICheckPlugin plugin) {
 	if (!node_parse_plugins.containsKey(node)) {
 	    node_parse_plugins.put(node, new ArrayList<ICheckPlugin>());
 	}
@@ -102,7 +94,7 @@ public class CheckPluginManager extends Observable {
      * @param node
      *            the node to
      */
-    public void invokeNodeParse(Feature feature, ASTNode node) {
+    public void invokeNodeParse(Feature feature, @SuppressWarnings("rawtypes") ASTNode node) {
 	List<ICheckPlugin> list = node_parse_plugins.get(node.getClass());
 	if (list != null) {
 	    for (ICheckPlugin plugin : list) {
@@ -126,7 +118,7 @@ public class CheckPluginManager extends Observable {
      * resets the problems of the last iteration
      */
     public void resetProblems() {
-	problems = new HashMap<CheckProblem, ICheckPlugin>();
+	problems = new ArrayList<CheckProblem>();
     }
 
     /**
@@ -135,18 +127,12 @@ public class CheckPluginManager extends Observable {
      * @param problem
      * @param plugin
      */
-    public void addProblem(CheckProblem problem, ICheckPlugin plugin) {
-	problems.put(problem, plugin);
+    public void addProblem(CheckProblem problem) {
+	problems.add(problem);
     }
 
-    /**
-     * prints problems encountered while checking the software product line
-     */
-    public void reportproblems() {
-	for (CheckProblem problem : problems.keySet()) {
-	    System.out.println(problems.get(problem).getName()
-		    + " reported a Problem:");
-	    System.out.println(problem);
-	}
+    
+    public List<CheckProblem> getProblems(){
+	return problems;
     }
 }

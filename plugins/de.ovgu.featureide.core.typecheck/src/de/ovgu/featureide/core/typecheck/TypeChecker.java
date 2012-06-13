@@ -35,6 +35,9 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.core.typecheck.check.CheckPluginManager;
 import de.ovgu.featureide.core.typecheck.check.TypeCheck;
+import de.ovgu.featureide.core.typecheck.correction.ConsoleProblemHandler;
+import de.ovgu.featureide.core.typecheck.correction.IProblemHandler;
+import de.ovgu.featureide.core.typecheck.correction.ProblemManager;
 import de.ovgu.featureide.core.typecheck.helper.Timer;
 import de.ovgu.featureide.core.typecheck.parser.Parser;
 import de.ovgu.featureide.fm.core.Feature;
@@ -46,12 +49,13 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 /**
  * TODO description
  * 
- * @author S�nke Holthusen
+ * @author Soenke Holthusen
  */
 public class TypeChecker {
     private Parser parser;
 
     private CheckPluginManager plugin_manager;
+    private ProblemManager problem_manager;
 
     private String source_path;
     private FeatureModel fm;
@@ -63,7 +67,7 @@ public class TypeChecker {
 	String fmfile = args[0];
 	String source_path = args[1];
 
-	TypeChecker checker = new TypeChecker();
+	TypeChecker checker = new TypeChecker(new ConsoleProblemHandler());
 
 	checker.log("Reading feature model from file " + fmfile);
 	FeatureModel fm = checker.readFM(fmfile);
@@ -73,7 +77,7 @@ public class TypeChecker {
 	checker.run();
     }
 
-    public TypeChecker() {
+    public TypeChecker(IProblemHandler... problem_handler) {
 	plugin_manager = new CheckPluginManager(
 	// new SuperClassCheck()
 	// ,
@@ -81,6 +85,8 @@ public class TypeChecker {
 	// ,
 	// new MethodCheck()
 	);
+
+	this.problem_manager = new ProblemManager(problem_handler);
 
 	parser = new Parser(plugin_manager);
     }
@@ -110,6 +116,10 @@ public class TypeChecker {
 	    plugin_manager.invokeChecks(fm);
 	    timer.stop();
 	    log("Checks finished... (" + timer.getTime() + " ms)");
+	    log("Problems reported:");
+	    problem_manager.addProblems(plugin_manager.getProblems());
+	    problem_manager.run();
+	    log("Problem reorting finished");
 	}
     }
 

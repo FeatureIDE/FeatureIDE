@@ -131,7 +131,8 @@ public abstract class AbstractCheckPlugin implements ICheckPlugin {
      * @param problem
      */
     public void newProblem(CheckProblem problem) {
-        _manager.addProblem(problem, this);
+	problem.setOrigin(this);
+        _manager.addProblem(problem);
     }
 
     @Override

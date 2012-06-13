@@ -30,6 +30,7 @@ import AST.ReferenceType;
 import AST.TypeAccess;
 import AST.TypeDecl;
 import AST.UnknownType;
+import de.ovgu.featureide.core.typecheck.correction.Action;
 import de.ovgu.featureide.core.typecheck.helper.FujiWrapper;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -113,7 +114,7 @@ public class TypeCheck extends AbstractCheckPlugin {
 	}
     }
 
-    private Map<Feature, ReferenceType> providesType(String type) {
+    protected Map<Feature, ReferenceType> providesType(String type) {
 	Map<Feature, ReferenceType> providing_features = new HashMap<Feature, ReferenceType>();
 
 	for (Feature f : intros.keySet()) {
@@ -125,5 +126,13 @@ public class TypeCheck extends AbstractCheckPlugin {
 	}
 
 	return providing_features;
+    }
+
+    /* (non-Javadoc)
+     * @see de.ovgu.featureide.core.typecheck.check.ICheckPlugin#determineAction(de.ovgu.featureide.core.typecheck.check.CheckProblem)
+     */
+    @Override
+    public List<Action> determineActions(CheckProblem problem) {
+	return null;
     }
 }

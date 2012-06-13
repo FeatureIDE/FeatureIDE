@@ -18,10 +18,12 @@
  */
 package de.ovgu.featureide.core.typecheck.check;
 
+import java.util.List;
 import java.util.Set;
 
 import AST.ClassDecl;
 
+import de.ovgu.featureide.core.typecheck.correction.Action;
 import de.ovgu.featureide.fm.core.Feature;
 
 /**
@@ -36,6 +38,23 @@ public class CheckProblem {
     private int linenumber;
     private String message;
     private Set<Feature> providingFeatures;
+    private ICheckPlugin origin;
+    
+    private List<Action> actions;
+
+    /**
+     * @return the origin
+     */
+    public ICheckPlugin getOrigin() {
+        return origin;
+    }
+
+    /**
+     * @param origin the origin to set
+     */
+    public void setOrigin(ICheckPlugin origin) {
+        this.origin = origin;
+    }
 
     public CheckProblem(Feature feature,ClassDecl cd, String filename, int linenumber,
 	    String message, Set<Feature> providing_features) {
@@ -99,5 +118,13 @@ public class CheckProblem {
      */
     public Set<Feature> getProvidingFeatures() {
 	return providingFeatures;
+    }
+    
+    public void setActions(List<Action> actions){
+	this.actions = actions;
+    }
+    
+    public List<Action> getActions(){
+	return this.actions;
     }
 }

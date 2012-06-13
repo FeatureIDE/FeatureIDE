@@ -18,7 +18,10 @@
  */
 package de.ovgu.featureide.core.typecheck.check;
 
+import java.util.List;
+
 import AST.ASTNode;
+import de.ovgu.featureide.core.typecheck.correction.Action;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
@@ -78,4 +81,6 @@ public interface ICheckPlugin {
      * @return the name
      */
     public String getName();
+    
+    public List<Action> determineActions(CheckProblem problem);
 }

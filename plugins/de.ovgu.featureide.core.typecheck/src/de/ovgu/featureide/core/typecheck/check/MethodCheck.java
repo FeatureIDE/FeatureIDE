@@ -29,6 +29,7 @@ import AST.MethodDecl;
 import AST.ParameterDeclaration;
 import AST.UnknownType;
 import AST.VarAccess;
+import de.ovgu.featureide.core.typecheck.correction.Action;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
 /**
@@ -157,5 +158,14 @@ public class MethodCheck extends AbstractCheckPlugin {
 	    builder.append(")");
 	    return builder.toString();
 	}
+    }
+
+    /* (non-Javadoc)
+     * @see de.ovgu.featureide.core.typecheck.check.ICheckPlugin#determineAction(de.ovgu.featureide.core.typecheck.check.CheckProblem)
+     */
+    @Override
+    public List<Action> determineActions(CheckProblem problem) {
+	// TODO Auto-generated method stub
+	return null;
     }
 }
