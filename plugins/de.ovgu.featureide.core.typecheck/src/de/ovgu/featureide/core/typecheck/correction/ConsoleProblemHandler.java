@@ -39,6 +39,10 @@ public class ConsoleProblemHandler implements IProblemHandler {
     public void handleProblems(Collection<CheckProblem> problems) {
 	for (CheckProblem problem : problems) {
 	    System.out.println(problem);
+	    System.out.println("Possible ways to fix the problem: ");
+	    for(Action action : problem.getActions()){
+		System.out.println(action);
+	    }
 	}
     }
 }

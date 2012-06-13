@@ -119,7 +119,7 @@ public class TypeChecker {
 	    log("Problems reported:");
 	    problem_manager.addProblems(plugin_manager.getProblems());
 	    problem_manager.run();
-	    log("Problem reorting finished");
+	    log("Problem reporting finished");
 	}
     }
 

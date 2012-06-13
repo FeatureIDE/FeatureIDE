@@ -133,6 +133,8 @@ public class TypeCheck extends AbstractCheckPlugin {
      */
     @Override
     public List<Action> determineActions(CheckProblem problem) {
-	return null;
+	List<Action> actions = new ArrayList<Action>();
+	actions.add(new Action());
+	return actions;
     }
 }

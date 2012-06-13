@@ -18,7 +18,6 @@
  */
 package de.ovgu.featureide.core.typecheck.correction;
 
-
 /**
  * TODO description
  * 
@@ -26,22 +25,21 @@ package de.ovgu.featureide.core.typecheck.correction;
  */
 public class Action {
     public enum ActionType {
-	UNDEFINED,
-	ADD_CONSTRAINT
+	UNDEFINED, ADD_CONSTRAINT
     }
-    
+
     public ActionType type = ActionType.UNDEFINED;
-    
+
     public String constraint;
-    
-    public String toString(){
+
+    public String toString() {
 	StringBuilder builder = new StringBuilder();
-	switch(type){
-	case UNDEFINED:
-	    break;
+	switch (type) {
 	case ADD_CONSTRAINT:
-	    builder.append("Add a Constraint ").append(constraint).append("\n");
+	    builder.append("Add a Constraint ").append(constraint);
 	    break;
+	default:
+	    builder.append("Default Action");
 	}
 	return builder.toString();
     }
