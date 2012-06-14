@@ -34,7 +34,8 @@ public class English implements ILanguage {
 	private static final String ABSTRACT = "Abstract";
 	private static final String CONCRETE = "Concrete";
 	private static final String HIDDEN = "Hidden";
-	private static final String DEAD_FALSE_OPTIONAL = "Dead or false optional";
+	private static final String DEAD = "Dead";
+	private static final String FALSE_OPTIONAL = "False optional";
 	private static final String ALTERNATIVE = "Alternative";
 	private static final String OR = "Or";
 	private static final String OPTIONAL = "Optional";
@@ -70,10 +71,15 @@ public class English implements ILanguage {
 	}
 
 	@Override
-	public String getDeadOrFalseOptional() {
-		return DEAD_FALSE_OPTIONAL;
+	public String getDead() {
+		return DEAD;
 	}
 
+	@Override
+	public String getFalseOptional() {
+		return FALSE_OPTIONAL;
+	}
+	
 	@Override
 	public String getAlternative() {
 		return ALTERNATIVE;

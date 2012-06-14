@@ -62,6 +62,7 @@ public class FMPropertyManager implements GUIDefaults {
 	private static final QualifiedName QN_FEATURE_HIDEEN_FORGROUND = createName("hiddenforground");
 	private static final QualifiedName QN_FEATURE_HIDEEN_BACKGROUND = createName("hiddenbackground");
 	private static final QualifiedName QN_FEATURE_DEAD = createName("dead");
+	private static final QualifiedName QN_FEATURE_FALSE_OPT = createName("falseoptional");
 	private static final QualifiedName QN_CONSTRAINT = createName("constraint");
 	private static final QualifiedName QN_CONNECTION = createName("connection");
 	private static final QualifiedName QN_WARNING = createName("warning");
@@ -162,9 +163,19 @@ public class FMPropertyManager implements GUIDefaults {
 	}
 
 	public static void setDeadFeatureBackgroundColor(Color color) {
-		setColor(QN_FEATURE_DEAD, color);
+		setColor(QN_FEATURE_FALSE_OPT, color);
 	}
 
+
+	public static Color getFalseOptionalFeatureBackgroundColor() {
+		return getColor(QN_FEATURE_DEAD, WARNING_BACKGROUND);
+	}
+	
+	public static void setFalseOptionalFeatureBackgroundColor(Color color) {
+		
+		setColor(QN_FEATURE_DEAD, color);
+	}
+	
 	public static Color getConstraintBackgroundColor() {
 		return getColor(QN_CONSTRAINT, CONSTRAINT_BACKGROUND);
 	}
@@ -479,4 +490,6 @@ public class FMPropertyManager implements GUIDefaults {
 		names.add(QN_CONSTRAINT_SPACE);
 		return names;
 	}
+
+
 }

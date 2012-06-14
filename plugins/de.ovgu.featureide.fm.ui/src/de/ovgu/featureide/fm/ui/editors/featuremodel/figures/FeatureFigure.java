@@ -153,8 +153,8 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		}
 		
 		if (feature.getFeatureStatus() == FeatureStatus.FALSE_OPTIONAL){
-			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
-			setBorder(FMPropertyManager.getDeadFeatureBorder(feature.isConstraintSelected()));
+			setBackgroundColor(FMPropertyManager.getWarningColor());
+			setBorder(FMPropertyManager.getConcreteFeatureBorder(feature.isConstraintSelected()));
 			toolTip += FALSE_OPTIONAL;
 		}
 		

@@ -79,6 +79,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private static final String CONCRETE_TOOLTIP = "Concrete feature:\n\nThis feature contains implementation modules,\ni.e. a corresponding folder is used.";
 	private static final String HIDDEN_TOOLTIP = "Hidden feature:\n\nThis feature will not be shown in the configuration editor.\nNon-hidden features should determine when to select the feature automatically.";
 	private static final String DEAD_TOOLTIP = "Dead feature:\n\nThis feature cannot be selected in any valid configuration.";
+	private static final String FALSE_OPT_TOOLTIP = "False optional feature:\n\nThis feature is declared optional but cannot be selected in any valid configuration.";
 	private static final int ABSTRACT = 0;
 	private static final int CONCRETE = 1;
 	private static final int HIDDEN = 2;
@@ -86,7 +87,9 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private static final int AND = 4;
 	private static final int OR = 5;
 	private static final int ALTERNATIVE = 6;
+	private static final int FALSE_OPT = 7;
 
+	
 	private final XYLayout layout = new XYLayout();
 	public Point newPos;
 	private int width;
@@ -107,19 +110,20 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		boolean abstrac = featureModel.hasAbstract();
 		boolean concrete = featureModel.hasConcrete();
 		boolean hidden = featureModel.hasHidden();
-		boolean dead = featureModel.hasDead() || featureModel.hasFalse();  //same color
+		boolean dead = featureModel.hasDead() ;  //same color
 		boolean showHidden = featureModel.getLayout().showHiddenFeatures();
-		
+		boolean falseOpt = featureModel.hasFalse();
 		language = FMPropertyManager.getLanguage();
 		setLocation(pos);
 		setLayoutManager(layout);
 		setBorder(FMPropertyManager.getLegendBorder());
 		setLegendSize(mandatory, optional, or, alternative, and, abstrac,
-				concrete, hidden, dead, showHidden);
+				concrete, hidden, dead, falseOpt, showHidden);
 		FeatureUIHelper.setLegendSize(this.getSize());
 		FeatureUIHelper.setLegendFigure(this);
+		System.out.println("falseOpt:"+falseOpt);
 		createRows(mandatory, optional, or, alternative, and, abstrac,
-				concrete, hidden, dead, showHidden);
+				concrete, hidden, dead, falseOpt, showHidden);
 		setForegroundColor(FMPropertyManager.getLegendForgroundColor());
 		setBackgroundColor(FMPropertyManager.getLegendBackgroundColor());
 		this.width = LEGEND_WIDTH;
@@ -136,7 +140,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	 */
 	private void setLegendSize(boolean mandatory, boolean optional, boolean or,
 			boolean alternative, boolean and, boolean _abstract,
-			boolean concrete, boolean hidden, boolean dead, boolean showHidden) {
+			boolean concrete, boolean hidden, boolean dead, boolean falseOpt, boolean showHidden) {
 		int height = ROW_HEIGHT * 2 - 5;
 		if (mandatory)
 			height = height + ROW_HEIGHT;
@@ -156,7 +160,8 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			height = height + ROW_HEIGHT;
 		if (dead)
 			height = height + ROW_HEIGHT;
-
+		if (falseOpt)
+			height = height + ROW_HEIGHT;
 		width = LEGEND_WIDTH;
 		if (!mandatory && !alternative && !dead) {
 			if (!optional && !concrete && !_abstract) {
@@ -172,7 +177,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 	private void createRows(boolean mandatory, boolean optional, boolean or,
 			boolean alternative, boolean and, boolean abstrac,
-			boolean concrete, boolean hidden, boolean dead, boolean showHidden) {
+			boolean concrete, boolean hidden, boolean dead, boolean falseoptional, boolean showHidden) {
 
 		createRowTitle();
 		int row = 2;
@@ -192,9 +197,22 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		}
 		if (hidden && showHidden)
 			createRowHidden(row++);
+        if (falseoptional)
+        	createRowFalseOpt(row++);
 		if (dead)
 			createRowDead(row++);
 
+	}
+
+
+	private void createRowFalseOpt(int row) {
+		System.out.println("creating false op:"+row);
+		createSymbol(row, FALSE_OPT);
+		Label labelFalseOpt = createLabel(row, language.getFalseOptional(),
+				FMPropertyManager.getFeatureForgroundColor(), FALSE_OPT_TOOLTIP);
+		add(labelFalseOpt);
+
+		
 	}
 
 	private void createRowTitle() {
@@ -274,9 +292,9 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	}
 
 	private void createRowDead(int row) {
-
+		System.out.println("creating dead :"+row);
 		createSymbol(row, DEAD);
-		Label labelDead = createLabel(row, language.getDeadOrFalseOptional(),
+		Label labelDead = createLabel(row, language.getDead(),
 				FMPropertyManager.getFeatureForgroundColor(), DEAD_TOOLTIP);
 		add(labelDead);
 
@@ -413,8 +431,12 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			rect.setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 			toolTipText = DEAD_TOOLTIP;
 			break;
-		}
-
+	    case (FALSE_OPT):
+	    	rect.setBorder(FMPropertyManager.getConcreteFeatureBorder(false));
+			rect.setBackgroundColor(FMPropertyManager.getWarningColor());
+			toolTipText = FALSE_OPT_TOOLTIP;
+			break;
+	 	}
 		rect.setSize(x2 - x1, y2 - y1);
 		rect.setLocation(p1);
 		rect.setToolTip(createToolTipContent(toolTipText));

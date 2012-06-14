@@ -57,9 +57,14 @@ public interface ILanguage {
 	public String getHidden();
 	
 	/**
-	 * @return The translation for: "Dead or false optional"
+	 * @return The translation for: "Dead"
 	 */
-	public String getDeadOrFalseOptional();
+	public String getDead();
+	
+	/**
+	 * @return The translation for: "False Optional"
+	 */
+	public String getFalseOptional();
 	
 	/**
 	 * @return The word for: "alternative"

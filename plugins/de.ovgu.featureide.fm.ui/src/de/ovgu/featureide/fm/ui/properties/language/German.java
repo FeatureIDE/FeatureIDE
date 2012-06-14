@@ -34,7 +34,8 @@ public class German implements ILanguage {
 	private static final String ABSTRACT = "Abstrakt";
 	private static final String CONCRETE = "Konkret";
 	private static final String HIDDEN = "Versteckt";
-	private static final String DEAD_FALSE_OPTIONAL = "Unwählbar/falsch-optional";
+	private static final String DEAD = "Unwählbar";
+	private static final String FALSE_OPTIONAL ="falsch-optional";
 	private static final String ALTERNATIVE = "Alternative";
 	private static final String OR = "Oder";
 	private static final String OPTIONAL = "Optional";
@@ -70,10 +71,15 @@ public class German implements ILanguage {
 	}
 
 	@Override
-	public String getDeadOrFalseOptional() {
-		return DEAD_FALSE_OPTIONAL;
+	public String getDead() {
+		return DEAD;
 	}
-
+	
+	@Override
+	public String getFalseOptional() {
+		return FALSE_OPTIONAL;
+	}
+	
 	@Override
 	public String getAlternative() {
 		return ALTERNATIVE;
