@@ -523,20 +523,6 @@ Public License instead of this License.
          unpack="false"/>
 
    <plugin
-         id="de.ovgu.featureide.ui.ahead"
-         download-size="0"
-         install-size="0"
-         version="2.6.1.qualifier"
-         unpack="false"/>
-
-   <plugin
-         id="de.ovgu.featureide.ui.ahead.refactoring"
-         download-size="0"
-         install-size="0"
-         version="2.6.1.qualifier"
-         unpack="false"/>
-
-   <plugin
          id="de.ovgu.featureide.ui.doc"
          download-size="0"
          install-size="0"
