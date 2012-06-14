@@ -74,14 +74,15 @@ public class FilterAction extends Action {
 			super.setEnabled(true);
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void run() {
 		if (((classFilter.size() != 0 || featureFilter.size() != 0) && !checked) &&
 				collaborationView.builder.classFilter.size() == 0 &&
 				collaborationView.builder.featureFilter.size() == 0) {
 			setChecked(true);
 			checked = true;
-			collaborationView.builder.classFilter = classFilter;
-			collaborationView.builder.featureFilter = featureFilter;
+			collaborationView.builder.classFilter = (LinkedHashSet<String>) classFilter.clone();
+			collaborationView.builder.featureFilter = (LinkedHashSet<String>) featureFilter.clone();
 			model = collaborationView.builder.buildCollaborationModel(collaborationView.getFeatureProject());
 			if (model == null) {
 				UIPlugin.getDefault().logWarning("model loading error");
@@ -98,8 +99,8 @@ public class FilterAction extends Action {
 			checked = false;
 			classFilter.clear();
 			featureFilter.clear();
-			collaborationView.builder.classFilter = classFilter;
-			collaborationView.builder.featureFilter = featureFilter;
+			collaborationView.builder.classFilter.clear();
+			collaborationView.builder.featureFilter.clear();
 			collaborationView.updateGuiAfterBuild(collaborationView.getFeatureProject(), null);
 		}
 	}
