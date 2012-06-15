@@ -121,7 +121,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 				concrete, hidden, dead, falseOpt, showHidden);
 		FeatureUIHelper.setLegendSize(this.getSize());
 		FeatureUIHelper.setLegendFigure(this);
-		System.out.println("falseOpt:"+falseOpt);
 		createRows(mandatory, optional, or, alternative, and, abstrac,
 				concrete, hidden, dead, falseOpt, showHidden);
 		setForegroundColor(FMPropertyManager.getLegendForgroundColor());
@@ -206,7 +205,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 
 	private void createRowFalseOpt(int row) {
-		System.out.println("creating false op:"+row);
 		createSymbol(row, FALSE_OPT);
 		Label labelFalseOpt = createLabel(row, language.getFalseOptional(),
 				FMPropertyManager.getFeatureForgroundColor(), FALSE_OPT_TOOLTIP);
@@ -292,7 +290,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	}
 
 	private void createRowDead(int row) {
-		System.out.println("creating dead :"+row);
 		createSymbol(row, DEAD);
 		Label labelDead = createLabel(row, language.getDead(),
 				FMPropertyManager.getFeatureForgroundColor(), DEAD_TOOLTIP);

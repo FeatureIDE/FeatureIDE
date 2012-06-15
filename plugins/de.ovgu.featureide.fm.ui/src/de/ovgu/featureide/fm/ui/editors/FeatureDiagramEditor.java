@@ -416,14 +416,15 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 
 						for (Object f : changedAttributes.keySet()) {
 							if (f instanceof Feature) {
-
-								((Feature) f).fire(new PropertyChangeEvent(
+							((Feature) f).fire(new PropertyChangeEvent(
 										this, ATTRIBUTE_CHANGED, false, true));
 							} else if (f instanceof Constraint) {
 								((Constraint) f).fire(new PropertyChangeEvent(
 										this, ATTRIBUTE_CHANGED, false, true));
 							}
 						}
+						//call refresh to redraw legend
+						getContents().refresh();
 						return Status.OK_STATUS;
 					}
 
