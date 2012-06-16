@@ -18,8 +18,6 @@
  */
 package de.ovgu.featureide.deltaj;
 
-import org.eclipse.core.resources.IProject;
-
 import de.ovgu.featureide.fm.core.FMComposerExtension;
 
 /**
@@ -42,19 +40,6 @@ public class DeltajFMComposer extends FMComposerExtension {
 	@Override
 	public String getOrderPageMessage() {
 		return ORDER_PAGE_MESSAGE;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ovgu.featureide.fm.core.IFMComposerExtension#performRenaming(java.
-	 * lang.String, java.lang.String, org.eclipse.core.resources.IProject)
-	 */
-	@Override
-	public boolean performRenaming(String oldName, String newName,
-			IProject project) {
-		return false;
 	}
 
 	/*

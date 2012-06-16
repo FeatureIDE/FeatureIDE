@@ -23,10 +23,7 @@ import java.util.Stack;
 import java.util.Vector;
 import java.util.regex.Matcher;
 
-import org.eclipse.core.resources.IFile;
-
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.core.fstmodel.preprocessor.PPModelBuilder;
 import de.ovgu.featureide.munge.MungePreprocessor;
@@ -45,15 +42,6 @@ public class MungeModelBuilder extends PPModelBuilder{
 	@Override
 	protected boolean containsFeature(String text, String feature) {
 		return text.contains("end[" + feature + "]");
-	}
-	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.fstmodel.preprocessor.PPModelBuilder#buildModelDirectives(java.lang.String, de.ovgu.featureide.core.fstmodel.FSTClass, org.eclipse.core.resources.IFile)
-	 */
-	@Override
-	protected void buildModelDirectives(String feature, FSTClass currentClass,
-			IFile res) {
-		
 	}
 	
 	@Override

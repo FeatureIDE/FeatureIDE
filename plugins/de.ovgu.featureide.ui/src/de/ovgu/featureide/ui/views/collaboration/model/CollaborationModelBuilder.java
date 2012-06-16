@@ -29,8 +29,10 @@ import java.util.Scanner;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.QualifiedName;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
@@ -42,6 +44,7 @@ import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTModelElement;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.ui.UIPlugin;
@@ -54,12 +57,13 @@ import de.ovgu.featureide.ui.UIPlugin;
  * @author Jens Meinicke
  * @author Stephan Besecke
  */
+// TODO @Jens test with code coverage
 public class CollaborationModelBuilder {
 	private CollaborationModel model;
 
 	public LinkedHashSet<String> classFilter = new LinkedHashSet<String>();
 	public LinkedHashSet<String> featureFilter = new LinkedHashSet<String>();
-	public boolean showUnselectedFeatures = false;
+	
 	public IFile configuration = null;
 	
 	private LinkedHashSet<String> iFeatureNames = new LinkedHashSet<String>();
@@ -75,6 +79,38 @@ public class CollaborationModelBuilder {
 	private List<String> layerNames;
 
 	private IComposerExtension composer;
+	
+	public boolean showUnselectedFeatures = showUnselectedFeatures();
+	
+	private static final QualifiedName SHOW_UNSELECTED_FEATURES = new QualifiedName("ShowUnselectedFeatures", "ShowUnselectedFeatures");
+	private static final String TRUE = "true";
+	private static final String FALSE = "false";
+	
+	/**
+	 * Sets the persistent property of <i>showUnselectedFeatures 
+	 * @param value The value to set
+	 */
+	public void showUnselectedFeatures(boolean value) {
+		try {
+			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(SHOW_UNSELECTED_FEATURES, value ? TRUE : FALSE);
+			showUnselectedFeatures = value;
+		} catch (CoreException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+	}
+	
+	/**
+	 * Gets the the persistent property of <i>showUnselectedFeatures
+	 * @return The persistent property
+	 */
+	public boolean showUnselectedFeatures() {
+		try {
+			return TRUE.equals(ResourcesPlugin.getWorkspace().getRoot().getPersistentProperty(SHOW_UNSELECTED_FEATURES));
+		} catch (CoreException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+		return false;
+	}
 	
 	public CollaborationModelBuilder() {
 		model = new CollaborationModel();
@@ -321,9 +357,7 @@ public class CollaborationModelBuilder {
 		
 		// set supported extensions
 		extensions = composer.extensions();
-		if (extensions == null)
-			return  false;
-		
+
 		// TODO what if selected features are empty
 		// set selected features(selected features)
 		setSelectedFeatureNames();
@@ -419,26 +453,26 @@ public class CollaborationModelBuilder {
 			return;
 		
 		if (!(res instanceof IFolder)) {
-			String folderName = res.getName();
-			String fileExtension = folderName.contains(".") ? (folderName.split("[.]"))[1] : " ";
+			String fileName = res.getName();
+			String fileExtension = res.getFileExtension();
 			if (classFilter.isEmpty() 
 					|| classFilter.contains("*." + fileExtension)
-					|| classFilter.contains(folderName)) {
+					|| classFilter.contains(fileName)) {
 				
-				if (!(fSTModel != null && extensions.contains("." + fileExtension)) 
+				if (fSTModel == null || !extensions.contains(fileExtension) 
 						|| !iFeatureNames.contains(featureName)) {
 					if (collaboration == null) {
 						collaboration = new Collaboration(featureName);
 						collaboration.selected = selected;
 					}
-					String name = folderName.contains(".") ? "." + fileExtension : 
-					              ".";
+					String name;
 					Role role;
-					if (extensions.contains(name)) {
-						name = folderName;
+					if (extensions.contains(res.getFileExtension())) {
+						name = fileName;
 						role = new Role(name);
 					} else {
-						name = "*" + name;
+						String extension = res.getFileExtension();
+						name = "*." + (extension == null ? "" : extension);
 						role = new Role(name);
 					}
 					role.file = (IFile)res;

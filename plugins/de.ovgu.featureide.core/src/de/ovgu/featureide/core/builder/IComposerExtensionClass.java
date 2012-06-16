@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -81,7 +83,8 @@ public interface IComposerExtensionClass {
 	 * 
 	 * @return a list of file extensions witch will be composed 
 	 */
-	 LinkedHashSet<String> extensions();
+	@Nonnull
+	LinkedHashSet<String> extensions();
 	
 	/**
 	 * Make some changes after adding the FeatureIDE nature.
@@ -161,6 +164,7 @@ public interface IComposerExtensionClass {
 	 * 
 	 * @return the default configuration extension.
 	 */
+	@Nonnull
 	String getConfigurationExtension();
 
 	/**

@@ -145,8 +145,8 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	/**
 	 * Gets the current composer.
 	 * 
-	 * @return The composer, specified for this project
-	 * 
+	 * @return The composer, specified for this project or <code>null</code> if the composerID is unknown
+	 * <br>
 	 * - The composer is now a property of the project and not
 	 *   specified by the nature or builder (every project has the same nature
 	 *   and builder, which can be extended by other eclipse plug-ins)

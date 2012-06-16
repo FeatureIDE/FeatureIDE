@@ -340,7 +340,7 @@ public class CorePlugin extends AbstractCorePlugin {
 		/** create a configuration to automatically build
 		 *  the project after adding the FeatureIDE nature **/
 		IFile configFile = project.getFolder(configPath).getFile(
-				project.getName().split("[-]")[0] +	composer.getConfigurationExtension());
+				project.getName().split("[-]")[0] +	"." + composer.getConfigurationExtension());
 		FileWriter fw = null;
 		try {
 			fw = new FileWriter(configFile.getRawLocation().toFile());
@@ -542,9 +542,9 @@ public class CorePlugin extends AbstractCorePlugin {
 	 */
 	public LinkedList<String> getConfigurationExtensions() {
 		LinkedList<String> extensions = new LinkedList<String>();
-		extensions.add(".config");
-		extensions.add(".equation");
-		extensions.add(".expression");
+		extensions.add("config");
+		extensions.add("equation");
+		extensions.add("expression");
 		return extensions;
 	}
 

@@ -69,17 +69,18 @@ public class ClassBuilder {
 	 * @return <code>ClassBuilder</code> for the given file
 	 */
 	public static ClassBuilder getClassBuilder(IFile file, FeatureHouseModelBuilder builder) {
-		if (file.getFileExtension().equals("java")) {
+		final String fileExtension = file.getFileExtension();
+		if ("java".equals(fileExtension)) {
 			return new JavaClassBuilder(builder);
 		}
-		if (file.getFileExtension().equals("h") || 
-				file.getFileExtension().equals("c")) {
+		if ("h".equals(fileExtension) || 
+				"c".equals(fileExtension)) {
 			return new CClassBuilder(builder);
 		}
-		if (file.getFileExtension().equals("cs")) {
+		if ("cs".equals(fileExtension)) {
 			return new CSClassBuilder(builder);
 		}
-		if (file.getFileExtension().equals("hs")) {
+		if ("hs".equals(fileExtension)) {
 			return new HaskellClassBuilder(builder);
 		}
 		return new ClassBuilder(builder);

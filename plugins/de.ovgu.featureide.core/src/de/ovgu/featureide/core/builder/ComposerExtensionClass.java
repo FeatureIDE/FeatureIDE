@@ -58,6 +58,8 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	public static final IPath JRE_CONTAINER = new Path("org.eclipse.jdt.launching.JRE_CONTAINER");
 	protected IFeatureProject featureProject = null;
 	
+	protected final static String[] JAVA_TEMPLATE = new String[]{"Java", "java", PACKAGE_PATTERN + "/**\r\n * TODO description\r\n */\r\npublic class " + CLASS_NAME_PATTERN +" {\n\n}"};
+	
 	public boolean initialize(IFeatureProject project) {
 	
 		assert (project != null) : "Invalid project given";
@@ -95,7 +97,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 				}
 				copy((IFolder)res, folder);
 			} else if (res instanceof IFile) {
-				if (!extensions().contains("." + res.getName().split("[.]")[1])) {
+				if (!extensions().contains(res.getFileExtension())) {
 					IFile file = buildFolder.getFile(res.getName());
 					if (!file.exists()) {
 						res.copy(file.getFullPath(), true, null);
@@ -142,7 +144,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	}
 
 	public LinkedHashSet<String> extensions() {
-		return new LinkedHashSet<String>();
+		return new LinkedHashSet<String>(0);
 	}
 
 	public boolean postAddNature(IFolder source, IFolder destination) {
@@ -318,7 +320,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 			if (!folder.exists()) {
 				folder.create(true, false, null);
 			}
-			IFile configurationFile = folder.getFile(congurationName + getConfigurationExtension());
+			IFile configurationFile = folder.getFile(congurationName + "." + getConfigurationExtension());
 			ConfigurationWriter writer = new ConfigurationWriter(configuration);
 			writer.saveToFile(configurationFile);
 			copyNotComposedFiles(configurationFile, folder);

@@ -138,7 +138,7 @@ public class Feature implements PropertyConstants {
 	
 	public void setConstraintSelected(boolean selection) {
 		this.constraintSelected = selection;
-		fire(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, false, true));
+		fire(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
 	}
 
 	public void setAbstract(boolean value) {
@@ -170,7 +170,7 @@ public class Feature implements PropertyConstants {
 	
 	public void setFeatureStatus(FeatureStatus stat, boolean fire){
 		this.status = stat;
-		if(fire)fire(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, false, true));
+		if(fire)fire(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
 	}
 
 	public boolean isMultiple() {
@@ -353,28 +353,28 @@ public class Feature implements PropertyConstants {
 
 	private void fireNameChanged() {
 		PropertyChangeEvent event = new PropertyChangeEvent(this, NAME_CHANGED,
-				false, true);
+				Boolean.FALSE, Boolean.TRUE);
 		for (PropertyChangeListener listener : listenerList)
 			listener.propertyChange(event);
 	}
 	
 	private void fireHiddenChanged() {
 		PropertyChangeEvent event = new PropertyChangeEvent(this, HIDDEN_CHANGED,
-				false, true);
+				Boolean.FALSE, Boolean.TRUE);
 		for (PropertyChangeListener listener : listenerList)
 			listener.propertyChange(event);
 	}
 
 	private void fireChildrenChanged() {
-		PropertyChangeEvent event = new PropertyChangeEvent(this,
-				CHILDREN_CHANGED, false, true);
+		PropertyChangeEvent event = new PropertyChangeEvent(this, CHILDREN_CHANGED, 
+				Boolean.FALSE, Boolean.TRUE);
 		for (PropertyChangeListener listener : listenerList)
 			listener.propertyChange(event);
 	}
 
 	private void fireMandatoryChanged() {
-		PropertyChangeEvent event = new PropertyChangeEvent(this,
-				MANDATORY_CHANGED, false, true);
+		PropertyChangeEvent event = new PropertyChangeEvent(this, MANDATORY_CHANGED,
+				Boolean.FALSE, Boolean.TRUE);
 		for (PropertyChangeListener listener : listenerList)
 			listener.propertyChange(event);
 	}

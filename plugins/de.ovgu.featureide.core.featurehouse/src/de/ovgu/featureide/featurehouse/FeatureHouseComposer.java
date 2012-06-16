@@ -353,27 +353,24 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		return false;
 	}
 	
-	private static final LinkedHashSet<String> extensions = setExtensions();
+	public static final LinkedHashSet<String> EXTENSIONS = createExtensions(); 
+	
+	private static LinkedHashSet<String> createExtensions() {
+		LinkedHashSet<String> extensions = new LinkedHashSet<String>();
+		extensions.add("java");
+		extensions.add("cs");
+		extensions.add("c");
+		extensions.add("h");
+		extensions.add("hs");
+		extensions.add("jj");
+		extensions.add("als");
+		extensions.add("xmi");
+		return extensions;
+	}  
 
 	@Override
 	public LinkedHashSet<String> extensions() {
-		return extensions;
-	}
-
-	/**
-	 * @return
-	 */
-	private static LinkedHashSet<String> setExtensions() {
-		LinkedHashSet<String> extensions = new LinkedHashSet<String>();
-		extensions.add(".java");
-		extensions.add(".cs");
-		extensions.add(".c");
-		extensions.add(".h");
-		extensions.add(".hs");
-		extensions.add(".jj");
-		extensions.add(".als");
-		extensions.add(".xmi");
-		return extensions;
+		return EXTENSIONS;
 	}
 
 	@Override
@@ -409,11 +406,8 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 				}
 				copy((IFolder) res, folder);
 			} else if (res instanceof IFile) {
-				String resourceName = res.getName();
-				if (!resourceName.contains(".")
-						|| !extensions().contains(
-								"." + resourceName.split("[.]")[1])) {
-					IFile file = buildFolder.getFile(resourceName);
+				if (!extensions().contains(res.getFileExtension())) {
+					IFile file = buildFolder.getFile(res.getName());
 					if (!file.exists()) {
 						res.copy(file.getFullPath(), true, null);
 					}
@@ -429,31 +423,22 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 	@Override
 	public ArrayList<String[]> getTemplates() {
-
-		ArrayList<String[]> list = new ArrayList<String[]>();
-
-		String[] alloy = { "Alloy", "als", "module " + CLASS_NAME_PATTERN };
-		String[] c = { "C", "c", "" };
-		String[] cs = { "C#", "cs", "public class " + CLASS_NAME_PATTERN + " {\n\n}" };
-		String[] haskell = { "Haskell", "hs",
-				"module " + CLASS_NAME_PATTERN + " where \n{\n\n}" };
-		String[] java = { "Java", "java", PACKAGE_PATTERN + "/**\r\n * TODO description\r\n */\r\npublic class " + CLASS_NAME_PATTERN + " {\n\n}" };
-		String[] javacc = { "JavaCC", "jj",
-				"PARSER_BEGIN(" + CLASS_NAME_PATTERN + ") \n \n PARSER_END(" + CLASS_NAME_PATTERN + ")" };
-		String[] uml = {
-				"UML",
-				"xmi",
-				"<?xml version = '1.0' encoding = 'UTF-8' ?> \n	<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML'>\n\n</XMI>" };
-
-		list.add(alloy);
-		list.add(c);
-		list.add(cs);
-		list.add(haskell);
-		list.add(java);
-		list.add(javacc);
-		list.add(uml);
-
-		return list;
+		return TEMPLATES;
+	}
+	
+	private static final ArrayList<String[]> TEMPLATES = createTempltes();
+	
+	private static ArrayList<String[]> createTempltes() {
+		 ArrayList<String[]> list = new  ArrayList<String[]>(8);
+		 list.add(new String[]{"Alloy", "als", "module " + CLASS_NAME_PATTERN});
+		 list.add(new String[]{"C", "c", ""});
+		 list.add(new String[]{"C#", "cs", "public class " + CLASS_NAME_PATTERN + " {\n\n}"});
+		 list.add(new String[]{"Haskell", "hs", "module " + CLASS_NAME_PATTERN + " where \n{\n\n}"});
+		 list.add(JAVA_TEMPLATE);
+		 list.add(new String[]{"JavaCC", "jj", "PARSER_BEGIN(" + CLASS_NAME_PATTERN + ") \n \n PARSER_END(" + CLASS_NAME_PATTERN + ")"});
+		 list.add(new String[]{"UML", "xmi", "<?xml version = '1.0' encoding = 'UTF-8' ?> \n	<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML'>\n\n</XMI>"});
+		 list.add(new String[]{ "Jak", "jak", "/**\r\n * TODO description\r\n */\r\npublic " + REFINES_PATTERN + " class " + CLASS_NAME_PATTERN + " {\r\n\r\n}" });
+		 return list;
 	}
 
 	@Override
@@ -527,7 +512,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	@Override
 	public void buildConfiguration(IFolder folder, Configuration configuration, String congurationName) {
 		super.buildConfiguration(folder, configuration, folder.getName());
-		IFile configurationFile = folder.getFile(folder.getName() + getConfigurationExtension());
+		IFile configurationFile = folder.getFile(folder.getName() + "." + getConfigurationExtension());
 		FSTGenComposer composer = new FSTGenComposer(false);
 		composer.addParseErrorListener(createParseErrorListener());
 		composer.run(new String[]{

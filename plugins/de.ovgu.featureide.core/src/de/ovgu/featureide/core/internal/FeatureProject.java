@@ -997,11 +997,9 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			for (IResource res : configFolder.members()) {
 				if (!(res instanceof IFile))
 					continue;
-				IFile config = (IFile) res;
-				String name = config.getName();
 				if (CorePlugin.getDefault().getConfigurationExtensions()
-						.contains(name.substring(name.lastIndexOf('.'))))
-					configs.add(config);
+						.contains(res.getFileExtension()))
+					configs.add((IFile) res);
 			}
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);

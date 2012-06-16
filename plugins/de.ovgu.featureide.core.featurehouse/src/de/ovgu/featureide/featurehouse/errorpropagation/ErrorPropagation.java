@@ -58,10 +58,12 @@ public class ErrorPropagation {
 	 * These files will be checked for propagation. 
 	 */
 	/*
+	 * TODO Fix problem with java.util.NoSuchElementException maybe volatile fixed it
+	 *
 	 * This list needs to be static else there are some problems with getFirst or
-	 * get(0) because the element was not found.
+	 * get(0) because the element was not found. (This does not fixed the problem)
 	 */
-	private static LinkedList<IFile> composedFiles = new LinkedList<IFile>();
+	private static volatile LinkedList<IFile> composedFiles = new LinkedList<IFile>();
 	
 	private synchronized IFile getComposedFile() {
 		if (!composedFiles.isEmpty()) {

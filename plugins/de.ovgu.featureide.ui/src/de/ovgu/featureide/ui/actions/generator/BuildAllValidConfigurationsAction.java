@@ -83,7 +83,7 @@ public class BuildAllValidConfigurationsAction implements
 	 */
 	private static boolean getToggleState() {
 		try {
-			return "true".equals(ResourcesPlugin.getWorkspace().getRoot().getPersistentProperty(TOGGLE_STATE));
+			return TRUE.equals(ResourcesPlugin.getWorkspace().getRoot().getPersistentProperty(TOGGLE_STATE));
 		} catch (CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}

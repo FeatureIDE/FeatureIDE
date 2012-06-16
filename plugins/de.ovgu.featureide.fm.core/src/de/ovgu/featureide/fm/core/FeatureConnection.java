@@ -66,7 +66,7 @@ public class FeatureConnection implements PropertyConstants {
 	}
 	
 	private void fireParentChanged() {
-		PropertyChangeEvent event = new PropertyChangeEvent(this, PARENT_CHANGED, false, true);
+		PropertyChangeEvent event = new PropertyChangeEvent(this, PARENT_CHANGED, Boolean.FALSE, Boolean.TRUE);
 		for (PropertyChangeListener listener : listenerList)
 			listener.propertyChange(event);
 	}

@@ -84,7 +84,7 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 	public boolean performFinish() {
 		final IContainer container = page.getContainerObject();
 		IComposerExtension composer = page.featureProject.getComposer();
-		final String fileName = page.getFileName()+ composer.getConfigurationExtension();
+		final String fileName = page.getFileName() + "." + composer.getConfigurationExtension();
 		IRunnableWithProgress op = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor) throws InvocationTargetException {
 				try {

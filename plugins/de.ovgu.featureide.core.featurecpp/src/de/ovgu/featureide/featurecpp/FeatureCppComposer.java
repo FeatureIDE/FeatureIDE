@@ -76,11 +76,17 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 		featureCpp.compose(config);
 	}
 
+	private static final LinkedHashSet<String> EXTENSIONS = createExtensions(); 
+	
+	private static LinkedHashSet<String> createExtensions() {
+		LinkedHashSet<String> extensions = new LinkedHashSet<String>();
+		extensions.add("h");
+		return extensions;
+	}  
+
 	@Override
 	public LinkedHashSet<String> extensions() {
-		LinkedHashSet<String> extensions = new LinkedHashSet<String>();
-		extensions.add(".h");
-		return extensions;
+		return EXTENSIONS;
 	}
 
 	@Override
@@ -124,11 +130,16 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 	}
 
 	@Override
-	public ArrayList<String[]> getTemplates(){
-		ArrayList<String[]> list = new ArrayList<String[]>();
-		String[] c = {"C++", "h", "\r\n" + REFINES_PATTERN + " class " + CLASS_NAME_PATTERN + " {\r\n\r\n};"};
-		list.add(c);
-		return list;
+	public ArrayList<String[]> getTemplates() {
+		return TEMPLATES;
+	}
+	
+	private static final ArrayList<String[]> TEMPLATES = createTempltes();
+	
+	private static ArrayList<String[]> createTempltes() {
+		 ArrayList<String[]> list = new  ArrayList<String[]>(1);
+		 list.add(new String[]{"C++", "h", "\r\n" + REFINES_PATTERN + " class " + CLASS_NAME_PATTERN + " {\r\n\r\n};"});
+		 return list;
 	}
 	
 	/* (non-Javadoc)
@@ -166,23 +177,22 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 
 	@Override
 	public String getConfigurationExtension() {
-		return ".equation";
+		return "equation";
 	}
 
 	@Override
 	public void buildFSTModel() {
-		try {
-			if (featureProject != null && featureProject.getProject() != null) {
-				featureProject.getProject().build(IncrementalProjectBuilder.FULL_BUILD, null);
-			} else {
-				featureCppModelBuilder.resetModel();
-				featureCppModelBuilder.buildModel();
+		if (featureProject != null && featureProject.getProject() != null) {
+			featureCppModelBuilder.resetModel();
+			if (!featureCppModelBuilder.buildModel()) {
+				try {
+					// TODO @Jens implement building a full configuration into a temporary folder
+					featureProject.getProject().build(IncrementalProjectBuilder.FULL_BUILD, null);
+				} catch (CoreException e) {
+					FeatureCppCorePlugin.getDefault().logError(e);
+				}
 			}
-			
-		} catch (CoreException e) {
-			FeatureCppCorePlugin.getDefault().logError(e);
 		}
-		
 	}
 	
 	/* (non-Javadoc)
@@ -194,8 +204,7 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 		featureCpp.initialize(null, folder);
 		try {
 			for (IResource res :folder.members()) {
-				if (res instanceof IFile && res.getFileExtension() != null && 
-						("." + res.getFileExtension()).equals(getConfigurationExtension())) {
+				if (res instanceof IFile && getConfigurationExtension().equals(res.getFileExtension())) {
 					featureCpp.compose((IFile)res);
 				}
 			}

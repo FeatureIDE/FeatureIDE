@@ -68,10 +68,15 @@ public class FeatureCppModelBuilder {
 	/**
 	 * Builds The full FSTModel
 	 */
-	public void buildModel() {
-		for (IFile file : getInfoFiles()) {
+	public boolean buildModel() {
+		LinkedList<IFile> infoFiles = getInfoFiles();
+		if (infoFiles.isEmpty()) {
+			return false;
+		}
+		for (IFile file : infoFiles) {
 			buildModel(file);
 		}
+		return true;
 	}
 	/**
 	 * adds the informations of this class to the FSTModel
@@ -97,7 +102,6 @@ public class FeatureCppModelBuilder {
 	 * @param className
 	 */
 	private void addClass(String className) {
-		
 		for (String key : currentFeature.getClasses().keySet()) {
 			FSTClass fstclass = currentFeature.getClasses().get(key);
 			if (fstclass.getFile().equals(getFile(className))) {

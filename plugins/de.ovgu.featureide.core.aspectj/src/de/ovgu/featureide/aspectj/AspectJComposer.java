@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
@@ -71,18 +72,22 @@ public class AspectJComposer extends ComposerExtensionClass {
 	private static final String BUILDER_AJ = "core.eclipse.ajdt.core.ajbuilder";
 
 	private static final Object BUILDER_JAVA = "org.eclipse.jdt.core.javabuilder";
-	
-	private static final String[] JAVA_TEMPLATE = {"Java", "java", PACKAGE_PATTERN + "/**\r\n * TODO description\r\n */\r\npublic class " + CLASS_NAME_PATTERN +" {\n\n}"};
 
 	private LinkedList<String> unSelectedFeatures;
 	private FeatureModel featureModel;
 	private boolean hadAspectJNature;
 	
+	private static final LinkedHashSet<String> EXTENSIONS = createExtensions(); 
+	
+	private static LinkedHashSet<String> createExtensions() {
+		LinkedHashSet<String> extensions = new LinkedHashSet<String>();
+		extensions.add("java");
+		return extensions;
+	}  
+	
 	@Override
 	public LinkedHashSet<String> extensions() {
-		LinkedHashSet<String> extensions = new LinkedHashSet<String>();
-		extensions.add(".java");
-		return extensions;
+		return EXTENSIONS;
 	}
 
 	@Override
@@ -390,11 +395,26 @@ public class AspectJComposer extends ComposerExtensionClass {
 
 	@Override
 	public ArrayList<String[]> getTemplates() {
-		ArrayList<String[]> list = new ArrayList<String[]>();
-		list.add(JAVA_TEMPLATE);
-		return list;
+		return TEMPLATES;
 	}
+	
+	private static final ArrayList<String[]> TEMPLATES = createTemplates();
 
+	// TODO add aspect template
+	private static ArrayList<String[]> createTemplates() {
+		 ArrayList<String[]> list = new  ArrayList<String[]>(1);
+		 list.add(JAVA_TEMPLATE);
+		 return list;
+	}
+	
+	@Override
+	public String replaceMarker(String text, List<String> list, String packageName) {
+		if (list != null && list.contains("refines"))
+			text = text.replace(REFINES_PATTERN, "refines");
+		else
+			text = text.replace(REFINES_PATTERN + " ", "");
+		return text;
+	}
 	@Override
 	public boolean hasFeatureFolders() {
 		return false;

@@ -81,11 +81,17 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 		return true;
 	}
 
+	private static final LinkedHashSet<String> EXTENSIONS = createExtensions(); 
+	
+	private static LinkedHashSet<String> createExtensions() {
+		LinkedHashSet<String> extensions = new LinkedHashSet<String>();
+		extensions.add("java");
+		return extensions;
+	}  
+
 	@Override
 	public LinkedHashSet<String> extensions() {
-		LinkedHashSet<String> extensions = new LinkedHashSet<String>();
-		extensions.add(".java");
-		return extensions;
+		return EXTENSIONS;
 	}
 
 	@Override
@@ -357,13 +363,18 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 			}
 		}
 	}
-
+	
 	@Override
 	public ArrayList<String[]> getTemplates() {
-		ArrayList<String[]> list = new ArrayList<String[]>();
-		String[] java = { "Java", "java", PACKAGE_PATTERN + "/**\r\n * TODO description\r\n */\r\npublic class " + CLASS_NAME_PATTERN + " {\n\n}" };
-		list.add(java);
-		return list;
+		return TEMPLATES;
+	}
+	
+	private static final ArrayList<String[]> TEMPLATES = createTempltes();
+	
+	private static ArrayList<String[]> createTempltes() {
+		 ArrayList<String[]> list = new  ArrayList<String[]>(1);
+		 list.add(JAVA_TEMPLATE);
+		 return list;
 	}
 
 	@Override

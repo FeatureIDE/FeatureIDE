@@ -157,6 +157,7 @@ public class PPModelBuilder {
 	 * 			The current file.
 	 */
 	protected void buildModelDirectives(String feature, FSTClass currentClass, IFile res) {
+		
 	}
 
 	/**

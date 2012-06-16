@@ -144,7 +144,7 @@ public class DeltajComposer extends ComposerExtensionClass {
 	@Override
 	public LinkedHashSet<String> extensions() {
 		LinkedHashSet<String> extensions = new LinkedHashSet<String>();
-		extensions.add(".dj");
+		extensions.add("dj");
 		return extensions;
 	}
 
@@ -157,13 +157,11 @@ public class DeltajComposer extends ComposerExtensionClass {
 
 		try {
 			for (IResource res : folder.members()) {
-
-				if ((res.getFileExtension() == null || !res.getFileExtension()
-						.equals("dj")))
-
+				if (!extensions().contains(res.getFileExtension())) {
 					res.copy(new Path(featureProject.getBuildFolder()
 							.getFullPath().toString()
 							+ "/" + res.getName()), true, null);
+				}
 				if (res instanceof IFolder) {
 					copyFolderMembers((IFolder) res);
 				}
@@ -172,22 +170,20 @@ public class DeltajComposer extends ComposerExtensionClass {
 			DeltajCorePlugin.getDefault().logError(e);
 		}
 	}
-
+	
 	@Override
 	public ArrayList<String[]> getTemplates() {
+		return TEMPLATES;
+	}
 
-		String[] core = {
-				"DeltaJ (Core Module)",
-				"dj",
-				"features " + FEATUE_PATTER + "\nconfigurations\n" + FEATUE_PATTER + ";\n\n\ncore " + FEATUE_PATTER + " {\n\tclass " + CLASS_NAME_PATTERN + "{\n\n\t}\n}" };
-		String[] delta = {
-				"DeltaJ (Delta Module)",
-				"dj",
-				"delta " + FEATUE_PATTER + " when " + FEATUE_PATTER + " {\n\tmodifies class " + CLASS_NAME_PATTERN + "{\n\n\t}\n}" };
-		ArrayList<String[]> list = new ArrayList<String[]>();
-		list.add(core);
-		list.add(delta);
-		return list;
+	private static final ArrayList<String[]> TEMPLATES = createTempltes();
+	
+	private static ArrayList<String[]> createTempltes() {
+		 ArrayList<String[]> list = new  ArrayList<String[]>(2);
+		 list.add(new String[]{"DeltaJ (Core Module)", "dj", "features " + FEATUE_PATTER + "\nconfigurations\n" + FEATUE_PATTER + ";\n\n\ncore " + FEATUE_PATTER + " {\n\tclass " + CLASS_NAME_PATTERN + "{\n\n\t}\n}" });
+		 list.add(new String[]{"DeltaJ (Delta Module)", "dj", "delta " + FEATUE_PATTER + " when " + FEATUE_PATTER + " {\n\tmodifies class " + CLASS_NAME_PATTERN + "{\n\n\t}\n}"});
+		 
+		 return list;
 	}
 
 	@Override
@@ -397,7 +393,7 @@ public class DeltajComposer extends ComposerExtensionClass {
 			@Override
 			public IStatus run(IProgressMonitor monitor) {
 				try {
-					if (file.exists() && !file.getFileExtension().equals("dj")) {
+					if (file.exists() && !extensions().contains(file.getFileExtension())) {
 						IMarker[] markers = file.findMarkers(null, false,
 								IResource.DEPTH_ZERO);
 						if (markers.length!=0) {

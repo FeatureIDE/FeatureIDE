@@ -169,10 +169,10 @@ public class SXFMReader extends AbstractFeatureModelReader {
     private String removeWhitespaces(String str){
     	str = str.trim();
     	if (str.contains(" ")){
-	    	String temp = str.substring(0,str.indexOf(" ")+1);
-	    	str = str.substring(str.indexOf(" ") + 1);
+	    	String temp = str.substring(0,str.indexOf(' ')+1);
+	    	str = str.substring(str.indexOf(' ') + 1);
 	    	while(str.contains(" ")){
-	    		str = str.substring(0,str.indexOf(" ")) + str.substring(str.indexOf(" ")+1,str.length()); 
+	    		str = str.substring(0,str.indexOf(' ')) + str.substring(str.indexOf(' ')+1,str.length()); 
 	    	}
 	    	str = temp + str;
     	}

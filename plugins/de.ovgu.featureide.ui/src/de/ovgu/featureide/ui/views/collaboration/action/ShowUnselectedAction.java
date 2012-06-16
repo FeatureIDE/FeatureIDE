@@ -50,7 +50,7 @@ public class ShowUnselectedAction extends Action {
 	}
 	
 	public void run() {
-		collaborationView.builder.showUnselectedFeatures = !collaborationView.builder.showUnselectedFeatures;
+		collaborationView.builder.showUnselectedFeatures(!collaborationView.builder.showUnselectedFeatures);
 		model = collaborationView.builder.buildCollaborationModel(collaborationView.getFeatureProject());
 		if (model == null) {
 			UIPlugin.getDefault().logInfo("model loading error");

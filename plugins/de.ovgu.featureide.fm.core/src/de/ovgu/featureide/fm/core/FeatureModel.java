@@ -436,28 +436,28 @@ public class FeatureModel implements PropertyConstants {
 
 	public void handleModelDataLoaded() {
 		PropertyChangeEvent event = new PropertyChangeEvent(this,
-				MODEL_DATA_LOADED, false, true);
+				MODEL_DATA_LOADED, Boolean.FALSE, Boolean.TRUE);
 		for (PropertyChangeListener listener : listenerList)
 			listener.propertyChange(event);
 	}
 
 	public void handleModelDataChanged() {
 		PropertyChangeEvent event = new PropertyChangeEvent(this,
-				MODEL_DATA_CHANGED, false, true);
+				MODEL_DATA_CHANGED, Boolean.FALSE, Boolean.TRUE);
 		for (PropertyChangeListener listener : listenerList)
 			listener.propertyChange(event);
 	}
 
 	public void refreshContextMenu() {
 		PropertyChangeEvent event = new PropertyChangeEvent(this,
-				REFRESH_ACTIONS, false, true);
+				REFRESH_ACTIONS, Boolean.FALSE, Boolean.TRUE);
 		for (PropertyChangeListener listener : listenerList)
 			listener.propertyChange(event);
 	}
 
 	public void redrawDiagram() {
 		PropertyChangeEvent event = new PropertyChangeEvent(this,
-				REDRAW_DIAGRAM, false, true);
+				REDRAW_DIAGRAM, Boolean.FALSE, Boolean.TRUE);
 		for (PropertyChangeListener listener : listenerList)
 			listener.propertyChange(event);
 	}

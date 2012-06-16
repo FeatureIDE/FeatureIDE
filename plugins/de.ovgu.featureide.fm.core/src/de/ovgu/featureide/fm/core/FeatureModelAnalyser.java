@@ -291,10 +291,12 @@ public class FeatureModelAnalyser {
 	// TODO: Check other calls of createNodes
 	Node root = NodeCreator.createNodes(fm.clone());
 	LinkedList<Feature> set = new LinkedList<Feature>();
-	for (Literal e : new SatSolver(root, 1000).knownValues())
-	    if (!e.positive && !e.var.toString().equals("False")
-		    && !e.var.toString().equals("True"))
-		set.add(fm.getFeature(e.var.toString()));
+	for (Literal e : new SatSolver(root, 1000).knownValues()) {
+		String var = e.var.toString();
+	    if (!e.positive && !"False".equals(var) && !"True".equals(var)) { 
+	    	set.add(fm.getFeature(var));
+	    }
+	}
 	return set;
     }
 

@@ -455,7 +455,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 * @return <code>true</code> if the given file is a configuration file
 	 */
 	private boolean isConfiguration(IResource res) {
-		return res instanceof IFile && CorePlugin.getDefault().getConfigurationExtensions().contains("." + res.getFileExtension());
+		return res instanceof IFile && CorePlugin.getDefault().getConfigurationExtensions().contains(res.getFileExtension());
 	}
 	
 	/**

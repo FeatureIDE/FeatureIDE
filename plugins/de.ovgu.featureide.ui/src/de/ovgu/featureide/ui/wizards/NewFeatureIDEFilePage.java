@@ -324,8 +324,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 		Object obj = selection.getFirstElement();
 		if (obj instanceof IFile) {
 			String fileExtension = ((IFile) obj).getFileExtension();
-			if (fileExtension != null &&
-					composer.extensions().contains("." + fileExtension)) {
+			if (composer.extensions().contains(fileExtension)) {
 				String fileName = ((IFile) obj).getName();
 				c = fileName.substring(0, fileName.lastIndexOf('.'));
 			}

@@ -31,6 +31,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
+import de.ovgu.featureide.featurehouse.FeatureHouseComposer;
 
 /**
  * This builder builds the {@link FSTModel} for FeatureHouse projects, 
@@ -122,8 +123,8 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 	}
 
 	private boolean canCompose() {
-		return featureProject.getComposer().extensions()
-				.contains("." + currentFile.getFileExtension()) &&
+		return  FeatureHouseComposer.EXTENSIONS
+				.contains(currentFile.getFileExtension()) &&
 				currentFile.exists();
 	}
 

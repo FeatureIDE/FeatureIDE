@@ -117,7 +117,7 @@ public class AheadComposer extends ComposerExtensionClass {
 			if (res instanceof IFolder) {
 				correctSourceFiles((IFolder)res);
 			} else if(res instanceof IFile){
-				if (res.getName().endsWith(".jak")) {
+				if (extensions().contains(res.getFileExtension())) {
 					correctSourceFile((IFile)res);
 				}
 			}
@@ -218,12 +218,18 @@ public class AheadComposer extends ComposerExtensionClass {
 			}
 		}
 	}
+	
+	private static final LinkedHashSet<String> EXTENSIONS = createExtensions(); 
+			
+	private static LinkedHashSet<String> createExtensions() {
+		LinkedHashSet<String> extensions = new LinkedHashSet<String>();
+		extensions.add("jak");
+		return extensions;
+	}  
 
 	@Override
 	public LinkedHashSet<String> extensions() {
-		LinkedHashSet<String> extensions = new LinkedHashSet<String>();
-		extensions.add(".jak");
-		return extensions;
+		return EXTENSIONS;
 	}
 
 	/**
@@ -306,11 +312,15 @@ public class AheadComposer extends ComposerExtensionClass {
 
 	@Override
 	public ArrayList<String[]> getTemplates() {
-		ArrayList<String[]> list = new ArrayList<String[]>();
-		String[] jak = { "Jak", "jak",
-				"/**\r\n * TODO description\r\n */\r\npublic " + REFINES_PATTERN + " class " + CLASS_NAME_PATTERN + " {\r\n\r\n}" };
-		list.add(jak);
-		return list;
+		return TEMPLATES;
+	}
+	
+	private static final ArrayList<String[]> TEMPLATES = createTempltes();
+	
+	private static ArrayList<String[]> createTempltes() {
+		 ArrayList<String[]> list = new  ArrayList<String[]>(1);
+		 list.add(new String[]{ "Jak", "jak", "/**\r\n * TODO description\r\n */\r\npublic " + REFINES_PATTERN + " class " + CLASS_NAME_PATTERN + " {\r\n\r\n}" });
+		 return list;
 	}
 	
 	@Override
@@ -417,7 +427,7 @@ public class AheadComposer extends ComposerExtensionClass {
 		super.buildConfiguration(folder, configuration, configurationName);
 		ahead.setCompositionFolder(folder);
 		try {
-			ahead.setConfiguration(folder.getFile(configurationName + getConfigurationExtension()));
+			ahead.setConfiguration(folder.getFile(configurationName + "." + getConfigurationExtension()));
 			ahead.buildAll();
 		} catch (Exception e) {
 			AheadCorePlugin.getDefault().logError(e);

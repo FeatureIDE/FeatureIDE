@@ -24,7 +24,10 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.editparts.ClassEditPart;
@@ -69,10 +72,19 @@ public class DeleteAction extends Action {
 				super.setText(text + " Feature");
 			super.setEnabled(true);
 		}
+		
+		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
+				.getImageDescriptor(ISharedImages.IMG_ETOOL_DELETE));
+		
 	}
 
 	public void run() {
-	
+		MessageDialog messageDialog = new MessageDialog(null, "Delete Resources", null, 
+				"Are you sure you want to remove " +  getDialogText(), 
+				MessageDialog.INFORMATION, new String[]{"OK", "Cancel"}, 0);
+		if (messageDialog.open() != 0) {
+			return;
+		}
 		if (part instanceof RoleEditPart){
 			Role role = ((RoleEditPart) part).getRoleModel();
 		try {
@@ -105,6 +117,25 @@ public class DeleteAction extends Action {
 			}
 		}
 			
+	}
+
+	/**
+	 * @return A part specific message
+	 */
+	private String getDialogText() {
+		if (part instanceof RoleEditPart){
+			Role role = ((RoleEditPart) part).getRoleModel();
+			return "the role of class '" + role.getName() + "' at feature '" + role.getCollaboration().getName() + "'";
+			}
+		else if (part instanceof ClassEditPart){
+			Class c = ((ClassEditPart) part).getClassModel();
+			return "all files of class '" + c.getName() + "'?";
+		}
+		else if (part instanceof CollaborationEditPart){
+			Collaboration coll = ((CollaborationEditPart) part).getCollaborationModel();
+			return " all files of feature '" + coll.getName() + "'?";
+		}
+		return null;
 	}	
 		
 }
