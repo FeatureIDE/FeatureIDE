@@ -43,9 +43,13 @@ import fuji.WrongArgumentException;
  */
 public class FujiWrapper {
     /**
-     * Initiates the Fuju Compiler and returns an iterator over all declared Programs
-     * @param features the list of features to use for the composition
-     * @param feature_path the path to the feature-modules
+     * Initiates the Fuju Compiler and returns an iterator over all declared
+     * Programs
+     * 
+     * @param features
+     *            the list of features to use for the composition
+     * @param feature_path
+     *            the path to the feature-modules
      * @return an iterator over the programs
      * @throws WrongArgumentException
      * @throws ParseException
@@ -68,11 +72,15 @@ public class FujiWrapper {
 
 	return composition.getASTIterator();
     }
-    
+
     /**
-     * Iterates a abstract syntax tree, searching for ASTNodes of the specific type
-     * @param node the current node
-     * @param type the node type to look for
+     * Iterates a abstract syntax tree, searching for ASTNodes of the specific
+     * type
+     * 
+     * @param node
+     *            the current node
+     * @param type
+     *            the node type to look for
      * @return a list of nodes of the given type
      */
     @SuppressWarnings("rawtypes")
@@ -86,5 +94,14 @@ public class FujiWrapper {
 	    list.addAll(getChildNodesByType(c, type));
 	}
 	return list;
+    }
+
+    @SuppressWarnings("rawtypes")
+    public static <T> T getParentByType(ASTNode node, Class<T> type) {
+	if (type.isInstance(node.getParent())) {
+	    return type.cast(node.getParent());
+	} else {
+	    return getParentByType(node.getParent(), type);
+	}
     }
 }

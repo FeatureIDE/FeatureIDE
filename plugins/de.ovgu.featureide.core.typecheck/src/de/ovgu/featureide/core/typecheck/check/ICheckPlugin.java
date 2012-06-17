@@ -68,7 +68,7 @@ public interface ICheckPlugin {
     public void invokeNodeParse(Feature feature, ASTNode node);
 
     /**
-     * Removes all data about the feature from the node list Will be called by
+     * Removes all data about the feature from auxiliary data structures. Will be called by
      * the parser when a feature is parsed the first time or has to be re-parsed
      * 
      * @param feature

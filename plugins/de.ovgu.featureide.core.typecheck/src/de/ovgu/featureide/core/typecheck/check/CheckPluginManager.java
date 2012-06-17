@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Observable;
 
 import AST.ASTNode;
 import de.ovgu.featureide.fm.core.Feature;
@@ -35,8 +34,8 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  * 
  * @author Soenke Holthusen
  */
-public class CheckPluginManager extends Observable {
-    private ArrayList<ICheckPlugin> _plugins = new ArrayList<ICheckPlugin>();
+public class CheckPluginManager {
+    private List<ICheckPlugin> _plugins = new ArrayList<ICheckPlugin>();
     private @SuppressWarnings("rawtypes") Map<Class, List<ICheckPlugin>> node_parse_plugins = new HashMap<Class, List<ICheckPlugin>>();
 
     private List<CheckProblem> problems = new ArrayList<CheckProblem>();
@@ -46,7 +45,7 @@ public class CheckPluginManager extends Observable {
      * @param plugins
      *            the plug-ins to be registered for checks
      */
-    public CheckPluginManager(ICheckPlugin... plugins) {
+    public CheckPluginManager(List<ICheckPlugin> plugins) {
 	for (ICheckPlugin plugin : plugins) {
 	    add(plugin);
 	}

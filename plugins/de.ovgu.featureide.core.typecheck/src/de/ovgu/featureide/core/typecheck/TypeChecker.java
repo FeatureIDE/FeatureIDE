@@ -34,6 +34,9 @@ import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.core.typecheck.check.CheckPluginManager;
+import de.ovgu.featureide.core.typecheck.check.FieldCheck;
+import de.ovgu.featureide.core.typecheck.check.ICheckPlugin;
+import de.ovgu.featureide.core.typecheck.check.MethodCheck;
 import de.ovgu.featureide.core.typecheck.check.TypeCheck;
 import de.ovgu.featureide.core.typecheck.correction.ConsoleProblemHandler;
 import de.ovgu.featureide.core.typecheck.correction.IProblemHandler;
@@ -67,7 +70,12 @@ public class TypeChecker {
 	String fmfile = args[0];
 	String source_path = args[1];
 
-	TypeChecker checker = new TypeChecker(new ConsoleProblemHandler());
+	List<ICheckPlugin> plugins = new ArrayList<ICheckPlugin>();
+//	plugins.add(new MethodCheck());
+	plugins.add(new TypeCheck());
+	plugins.add(new FieldCheck());
+	
+	TypeChecker checker = new TypeChecker(plugins, new ConsoleProblemHandler());
 
 	checker.log("Reading feature model from file " + fmfile);
 	FeatureModel fm = checker.readFM(fmfile);
@@ -77,14 +85,8 @@ public class TypeChecker {
 	checker.run();
     }
 
-    public TypeChecker(IProblemHandler... problem_handler) {
-	plugin_manager = new CheckPluginManager(
-	// new SuperClassCheck()
-	// ,
-		new TypeCheck()
-	// ,
-	// new MethodCheck()
-	);
+    public TypeChecker(List<ICheckPlugin> plugins, IProblemHandler... problem_handler) {
+	plugin_manager = new CheckPluginManager(plugins);
 
 	this.problem_manager = new ProblemManager(problem_handler);
 

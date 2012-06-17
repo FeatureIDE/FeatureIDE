@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 
 import AST.ClassDecl;
+import AST.TypeDecl;
 
 import de.ovgu.featureide.core.typecheck.correction.Action;
 import de.ovgu.featureide.fm.core.Feature;
@@ -33,31 +34,32 @@ import de.ovgu.featureide.fm.core.Feature;
  */
 public class CheckProblem {
     private Feature feature;
-    private ClassDecl classs;
+    private TypeDecl classs;
     private String filename;
     private int linenumber;
     private String message;
     private Set<Feature> providingFeatures;
     private ICheckPlugin origin;
-    
+
     private List<Action> actions;
 
     /**
      * @return the origin
      */
     public ICheckPlugin getOrigin() {
-        return origin;
+	return origin;
     }
 
     /**
-     * @param origin the origin to set
+     * @param origin
+     *            the origin to set
      */
     public void setOrigin(ICheckPlugin origin) {
-        this.origin = origin;
+	this.origin = origin;
     }
 
-    public CheckProblem(Feature feature,ClassDecl cd, String filename, int linenumber,
-	    String message, Set<Feature> providing_features) {
+    public CheckProblem(Feature feature, TypeDecl cd, String filename,
+	    int linenumber, String message, Set<Feature> providing_features) {
 	this.feature = feature;
 	this.classs = cd;
 	this.filename = filename;
@@ -70,7 +72,9 @@ public class CheckProblem {
 	StringBuilder builder = new StringBuilder();
 	builder.append(message).append(" in Feature ")
 		.append(feature.getName());
-	builder.append(" in Class ").append(classs.name());
+	if (classs != null) {
+	    builder.append(" in Class ").append(classs.name());
+	}
 	builder.append(" at line ").append(linenumber);
 	if (providingFeatures != null && !providingFeatures.isEmpty()) {
 	    builder.append("\nFollowing features could solve dependencies: ");
@@ -119,12 +123,12 @@ public class CheckProblem {
     public Set<Feature> getProvidingFeatures() {
 	return providingFeatures;
     }
-    
-    public void setActions(List<Action> actions){
+
+    public void setActions(List<Action> actions) {
 	this.actions = actions;
     }
-    
-    public List<Action> getActions(){
+
+    public List<Action> getActions() {
 	return this.actions;
     }
 }

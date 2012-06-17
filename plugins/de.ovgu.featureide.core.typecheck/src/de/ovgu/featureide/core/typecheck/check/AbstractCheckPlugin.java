@@ -76,7 +76,7 @@ public abstract class AbstractCheckPlugin implements ICheckPlugin {
      *            class type
      * @return the nodes, sorted by feature
      */
-    public <T> Map<Feature, List<T>> getNodesByType(Class<T> c) {
+    public final <T> Map<Feature, List<T>> getNodesByType(Class<T> c) {
         Map<Feature, List<T>> feature_node_map = new HashMap<Feature, List<T>>();
         for (Feature f : nodes.keySet()) {
             Map<Class, List<ASTNode>> class_node_map = getNodesByFeature(f);

@@ -86,15 +86,18 @@ public class TypeCheck extends AbstractCheckPlugin {
     @Override
     public void invokeCheck(FeatureModel fm) {
 	// doesn't work with annotations and stuff
-	Map<Feature, List<ClassDecl>> cdmap = getNodesByType(ClassDecl.class);
+	//Map<Feature, List<ClassDecl>> cdmap = getNodesByType(ClassDecl.class);
+	Map<Feature, List<CompilationUnit>> cdmap = getNodesByType(CompilationUnit.class);
+	int count = 0;
 
 	for (Feature f : cdmap.keySet()) {
-	    for (ClassDecl cd : cdmap.get(f)) {
+	    for (CompilationUnit cd : cdmap.get(f)) {
 		// for every type access inside a class declaration
 		for (TypeAccess ta : FujiWrapper.getChildNodesByType(cd,
 			TypeAccess.class)) {
 		    // utilise the type resolution of fuji and handle only
 		    // unknown types
+		    count++;
 		    if (ta.type() instanceof UnknownType) {
 			// which feature can provide the unknown type?
 			Set<Feature> providing_features = providesType(
@@ -103,8 +106,9 @@ public class TypeCheck extends AbstractCheckPlugin {
 			// feature f?
 			if (!checkFeatureImplication(fm, f, providing_features)) {
 			    // it is not, create a new problem
-			    newProblem(new CheckProblem(f, cd, cd
-				    .compilationUnit().pathName(),
+			    newProblem(new CheckProblem(f, ta.hostType(), cd
+				    //.compilationUnit()
+				    .pathName(),
 				    ta.lineNumber(), "Missing type dependency "
 					    + ta.name(), providing_features));
 			}
@@ -112,6 +116,7 @@ public class TypeCheck extends AbstractCheckPlugin {
 		}
 	    }
 	}
+	System.out.println(count + " typeaccesses");
     }
 
     protected Map<Feature, ReferenceType> providesType(String type) {

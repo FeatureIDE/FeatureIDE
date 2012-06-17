@@ -34,7 +34,6 @@ import de.ovgu.featureide.core.typecheck.helper.Directory;
 import de.ovgu.featureide.core.typecheck.helper.FujiWrapper;
 import de.ovgu.featureide.core.typecheck.helper.Timer;
 import de.ovgu.featureide.fm.core.Feature;
-import fuji.SyntacticErrorException;
 
 /**
  * Parses feature modules using Fuji, gives the plug-ins access to the ASTs of
@@ -117,18 +116,13 @@ public class Parser {
 		    while (it.hasNext()) {
 			CompilationUnit cu = it.next();
 
-			checkForSyntaxErrors(cu);
-
 			if (cu.fromSource()) {
+			    checkForSyntaxErrors(cu);
 			    // System.out.println(cu.pathName());
 			    parseAST(feature, cu);
 			}
 		    }
 		}
-	    } catch (SyntacticErrorException see) {
-		// TODO: handle syntax error
-		System.out.println(see.getMessage());
-
 	    } catch (Exception e) {
 		e.printStackTrace();
 	    }
@@ -140,7 +134,8 @@ public class Parser {
     }
 
     /**
-     * iterates the AST, lets the plug-in manager 
+     * iterates the AST, lets the plug-in manager
+     * 
      * @param feature
      * @param node
      */
@@ -154,7 +149,9 @@ public class Parser {
 
     /**
      * Checks if Fuji encountered syntax errors while parsing the feature module
-     * @param cu the compilation unit
+     * 
+     * @param cu
+     *            the compilation unit
      */
     @SuppressWarnings("unchecked")
     public void checkForSyntaxErrors(CompilationUnit cu) {
@@ -166,7 +163,8 @@ public class Parser {
 
     /**
      * 
-     * @return return true is the parser encountered syntax errors, false otherwise
+     * @return return true is the parser encountered syntax errors, false
+     *         otherwise
      */
     public boolean hasParseErrors() {
 	return !parse_errors.isEmpty();
