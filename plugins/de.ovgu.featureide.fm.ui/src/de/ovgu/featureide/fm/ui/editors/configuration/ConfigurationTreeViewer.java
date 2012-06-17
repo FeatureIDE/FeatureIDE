@@ -16,7 +16,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.ui.editors.confuguration;
+package de.ovgu.featureide.fm.ui.editors.configuration;
 
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;

@@ -109,9 +109,12 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 			defaultFeatureList();
 		
 		try {
-			for (IResource res : configFolder.members())
-				updateConfigurationOrder(res);
-			configFolder.refreshLocal(IResource.DEPTH_ONE, null);
+			if (configFolder.exists()) {
+				for (IResource res : configFolder.members()) {
+					updateConfigurationOrder(res);
+				}
+				configFolder.refreshLocal(IResource.DEPTH_ONE, null);
+			}
 		} catch (CoreException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}

@@ -16,7 +16,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.ui.editors.confuguration;
+package de.ovgu.featureide.fm.ui.editors.configuration;
 
 import java.beans.PropertyChangeEvent;
 
@@ -25,8 +25,7 @@ import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
-import de.ovgu.featureide.ui.UIPlugin;
-import de.ovgu.featureide.ui.editors.ConfigurationEditor;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
  * Displays the source.
@@ -35,7 +34,7 @@ import de.ovgu.featureide.ui.editors.ConfigurationEditor;
  */
 public class TextEditorPage extends TextEditor implements IConfigurationEditorPage{
 
-	private static final String ID = UIPlugin.PLUGIN_ID + "TextEditorPage";
+	private static final String ID = FMUIPlugin.PLUGIN_ID + "TextEditorPage";
 	private static final String PAGE_TEXT = "Source";
 
 	private int index;

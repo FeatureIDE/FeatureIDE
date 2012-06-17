@@ -19,7 +19,7 @@
 /**
  * 
  */
-package de.ovgu.featureide.ui.editors.confuguration;
+package de.ovgu.featureide.fm.ui.editors.configuration;
 
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;

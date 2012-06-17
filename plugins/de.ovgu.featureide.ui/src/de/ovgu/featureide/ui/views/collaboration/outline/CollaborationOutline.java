@@ -70,7 +70,6 @@ import de.ovgu.featureide.fm.ui.views.outline.FmLabelProvider;
 import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePageContextMenu;
 import de.ovgu.featureide.fm.ui.views.outline.FmTreeContentProvider;
 import de.ovgu.featureide.ui.UIPlugin;
-import de.ovgu.featureide.ui.editors.ConfigurationEditor;
 import de.ovgu.featureide.ui.views.collaboration.model.Class;
 import de.ovgu.featureide.ui.views.collaboration.model.Role;
 
@@ -252,8 +251,7 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 	private void setEditorActions(IWorkbenchPart activeEditor) {
 		IEditorPart part = null;
 
-		if (activeEditor != null
-				&& !(activeEditor instanceof ConfigurationEditor)) {
+		if (activeEditor != null) {
 			IWorkbenchPage page = activeEditor.getSite().getPage();
 			if (page != null) {
 				part = page.getActiveEditor();

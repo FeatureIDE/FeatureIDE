@@ -213,8 +213,9 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 		setClassPath(project);
 			
 		builder.featureProject.getComposer().buildConfiguration(project.getFolder("src"), configuration, name);
-		
 		try {
+			IFile modelFile = builder.featureProject.getModelFile();
+			modelFile.copy(project.getFile(modelFile.getName()).getFullPath(), true, null);
 			project.refreshLocal(IResource.DEPTH_INFINITE, null);
 		} catch (CoreException e) {
 			UIPlugin.getDefault().logError(e);

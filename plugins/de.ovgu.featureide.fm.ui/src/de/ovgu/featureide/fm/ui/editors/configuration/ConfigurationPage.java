@@ -16,7 +16,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.ui.editors.confuguration;
+package de.ovgu.featureide.fm.ui.editors.configuration;
 
 import java.beans.PropertyChangeEvent;
 import java.util.HashMap;
@@ -44,7 +44,6 @@ import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.configuration.TreeElement;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.ui.UIPlugin;
 
 /**
  * Displays the tree for common configuration selection at the configuration editor
@@ -54,7 +53,7 @@ import de.ovgu.featureide.ui.UIPlugin;
  */
 public class ConfigurationPage extends ConfigurationEditorPage {
 	private static final String PAGE_TEXT = "Configuration";
-	private static final String ID = UIPlugin.PLUGIN_ID + "ConfigurationPage";
+	private static final String ID = FMUIPlugin.PLUGIN_ID + "ConfigurationPage";
 	
 	private Tree tree;
 	
@@ -182,7 +181,7 @@ public class ConfigurationPage extends ConfigurationEditorPage {
 				job_color.join();
 			}
 		} catch (InterruptedException e) {
-			UIPlugin.getDefault().logError(e);
+			FMUIPlugin.getDefault().logError(e);
 		}
 		items = new HashMap<SelectableFeature, TreeItem>();
 		features = new LinkedList<SelectableFeature>();
@@ -308,9 +307,16 @@ public class ConfigurationPage extends ConfigurationEditorPage {
 		if (configurationEditor.configuration==null||(!configurationEditor.configuration.valid() && configurationEditor.configuration.number() == 0)){
 			tree.removeAll();
 			TreeItem item = new TreeItem(tree, 1);
-			item.setText("The feature model for this project is void, i.e., " +
-					"there is no valid configuration. You need to correct the " +
-					"feature model before you can create or edit configurations.");
+			if (configurationEditor.modelFile ==  null) {
+				item.setText("There is no feature model corresponding to this configuration, reopen the editor and select one.");
+			} else if (!configurationEditor.modelFile.exists()) {
+				// This case should never happen
+				item.setText("The given feature model " + configurationEditor.modelFile.getPath() + " does not exist.");
+			} else {
+				item.setText("The feature model for this project is void, i.e., " +
+						"there is no valid configuration. You need to correct the " +
+						"feature model before you can create or edit configurations.");
+			}
 			item.setImage(FMUIPlugin.getDefault()
 					.getWorkbench().getSharedImages().getImage
 					(ISharedImages.IMG_OBJS_ERROR_TSK));

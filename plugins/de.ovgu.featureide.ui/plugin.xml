@@ -1,53 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
-   <extension-point id="de.ovgu.featureide.ui.ConfigurationEditor" name="ConfigurationEditorExtension" schema="schema/de.ovgu.featureide.ui.ConfigurationPage.exsd"/>
 
-
-
-	<extension point="org.eclipse.core.contenttype.contentTypes">
-	   <content-type base-type="org.eclipse.core.runtime.text"
-	                 file-extensions="config,equation,expression"
-	                 id="de.ovgu.featureide.contenttype.conf"
-	                 name="Configuration (for FeatureIDE projects)"
-	                 priority="high"/>
-    <content-type
-          base-type="org.eclipse.core.runtime.text"
-          file-extensions="config"
-          id="de.ovgu.featureide.contenttype.extConf"
-          name="Configuration (for non-FeatureIDE projects)"
-          priority="low">
-    </content-type>
-    <content-type
-          base-type="org.eclipse.core.runtime.text"
-          file-extensions="equation"
-          id="de.ovgu.featureide.contenttype.extConfE"
-          name="Equation (for non-FeatureIDE projects)"
-          priority="low">
-    </content-type>
-    <content-type
-          base-type="org.eclipse.core.runtime.text"
-          file-extensions="expression"
-          id="de.ovgu.featureide.contenttype.expression"
-          name="Expression (for non-FeatureIDE projects)"
-          priority="low">
-    </content-type>               
-	
-	</extension>
-
-	<extension
-         point="org.eclipse.ui.editors">
-      <editor
-            class="de.ovgu.featureide.ui.editors.ConfigurationEditor"
-            default="true"
-            icon="icons/ConfigurationIcon.png"
-            id="de.ovgu.featureide.ui.editors.ConfigurationEditor"
-            name="Configuration Editor">
-      <contentTypeBinding
-         contentTypeId="de.ovgu.featureide.contenttype.conf">
-      </contentTypeBinding>
-      </editor>
-   </extension>
    <extension
          point="org.eclipse.ui.newWizards">
       <wizard
@@ -282,8 +236,7 @@
           id="de.ovgu.featureide.contenttype.extJak"
           name="Jak (for non-FeatureIDE projects)"
           priority="low">
-    </content-type>               
-	
+    </content-type>
 	</extension>
 	
    <extension

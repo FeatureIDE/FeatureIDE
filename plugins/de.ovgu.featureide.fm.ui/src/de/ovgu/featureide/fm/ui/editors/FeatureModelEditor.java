@@ -18,6 +18,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
+import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -68,6 +69,7 @@ import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelFile;
+import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
@@ -76,6 +78,7 @@ import de.ovgu.featureide.fm.core.io.guidsl.GuidslWriter;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.FeatureModelEditorContributor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GEFImageWriter;
 import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePage;
@@ -446,6 +449,32 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		}
 		
 		setPageModified(false);
+		updateConfigurationEditors();
+	}
+
+	/**
+	 * Sets the actual FeatureModel at the corresponding {@link ConfigurationEditor}s.
+	 * @see ConfigurationEditor#propertyChange(PropertyChangeEvent)
+	 */
+	@SuppressWarnings("deprecation")
+	private void updateConfigurationEditors() {
+		IProject project = file.getProject();
+		for (IWorkbenchWindow window : getSite().getWorkbenchWindow()
+				.getWorkbench().getWorkbenchWindows()) {
+			for (IWorkbenchPage page : window.getPages()) {
+				for (IEditorPart editor : page.getEditors()) {
+					if (editor instanceof ConfigurationEditor) {
+						IEditorInput editorInput = editor.getEditorInput();
+						IFile editorFile = (IFile) editorInput
+								.getAdapter(IFile.class);
+						if (editorFile.getProject().equals(project)) {
+							((ConfigurationEditor) editor).propertyChange(
+									new PropertyChangeEvent(file,PropertyConstants.MODEL_DATA_CHANGED,null,null));
+						}
+					}
+				}
+			}
+		}
 	}
 
 	@SuppressWarnings("deprecation")
@@ -458,12 +487,10 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 					.getWorkbench().getWorkbenchWindows()) {
 				for (IWorkbenchPage page : window.getPages()) {
 					for (IEditorPart editor : page.getEditors()) {
-						if (editor.isDirty()) {
+						if (editor instanceof ConfigurationEditor && editor.isDirty()) {
 							IEditorInput editorInput = editor.getEditorInput();
-							IFile editorFile = (IFile) editorInput
-									.getAdapter(IFile.class);
-							if (editorFile.getProject().equals(project)
-									&& !editorFile.getName().endsWith(".xml")) {
+							IFile editorFile = (IFile) editorInput.getAdapter(IFile.class);
+							if (editorFile.getProject().equals(project)) {
 								dirtyEditors.add(editorFile.getName());
 								dirtyEditors2.add(editor);
 							}

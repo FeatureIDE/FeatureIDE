@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="de.ovgu.featureide.ui" xmlns="http://www.w3.org/2001/XMLSchema">
+<schema targetNamespace="de.ovgu.featureide.fm.ui" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appInfo>
-         <meta.schema plugin="de.ovgu.featureide.ui" id="de.ovgu.featureide.ui.ConfigurationPage" name="ConfigurationPageExtension"/>
+         <meta.schema plugin="de.ovgu.featureide.fm.ui" id="de.ovgu.featureide.fm.ui.ConfigurationPage" name="ConfigurationPageExtension"/>
       </appInfo>
       <documentation>
          [Enter description of this extension point.]
@@ -76,7 +76,7 @@
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn=":de.ovgu.featureide.ui.editors.IConfigurationEditorPage"/>
+                  <meta.attribute kind="java" basedOn=":de.ovgu.featureide.fm.ui.editors.configuration.IConfigurationEditorPage"/>
                </appInfo>
             </annotation>
          </attribute>

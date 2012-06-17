@@ -16,7 +16,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.ui.editors.confuguration;
+package de.ovgu.featureide.fm.ui.editors.configuration;
 
 
 import java.beans.PropertyChangeEvent;
@@ -44,7 +44,6 @@ import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.configuration.TreeElement;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.ui.UIPlugin;
 
 /**
  * Displays the tree for advanced configuration selection at the configuration editor.
@@ -58,7 +57,7 @@ public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 	
 	private static final String PAGE_TEXT = "Advanced Configuration";
 
-	private static final String ID = UIPlugin.PLUGIN_ID + "AdvancedConfigurationPage";
+	private static final String ID = FMUIPlugin.PLUGIN_ID + "AdvancedConfigurationPage";
 
 	private TreeViewer viewer;
 	
