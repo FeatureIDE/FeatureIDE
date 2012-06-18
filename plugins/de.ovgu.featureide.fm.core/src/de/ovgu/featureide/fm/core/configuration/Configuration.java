@@ -107,7 +107,7 @@ public class Configuration {
 			boolean isUndefined = feature.getSelection() == Selection.UNDEFINED;
 
 			if (hasHiddenParent && isUndefined) {
-				feature.setAutomatic(Selection.SELECTED);
+				feature.setAutomatic(Selection.UNSELECTED);
 				if (!valid()) {
 					feature.setAutomatic(Selection.UNDEFINED);
 
@@ -253,7 +253,10 @@ public class Configuration {
 		feature.setManual(selection);
 		updateAutomaticValues();
 	}
-
+	public void setAutomatic(SelectableFeature feature, Selection selection) {
+		feature.setAutomatic(selection);
+		updateAutomaticValues();
+	}
 	public SelectableFeature getSelectablefeature(String name) {
 		SelectableFeature feature = table.get(name);
 		if (feature == null)
@@ -267,7 +270,14 @@ public class Configuration {
 			throw new FeatureNotFoundException();
 		setManual(feature, selection);
 	}
-
+	
+	public void setAutomatic(String name, Selection selection) {
+		SelectableFeature feature = table.get(name);
+		if (feature == null)
+			throw new FeatureNotFoundException();
+		setAutomatic(feature, selection);
+	}
+	
 	public SelectableFeature getRoot() {
 		return root;
 	}

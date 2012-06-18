@@ -60,25 +60,32 @@ public class THiddenFeaturesConfiguration extends AbstractConfigurationTest {
 		assertEquals(1, c.number());
 		HashSet<Feature> set = new HashSet<Feature>();
 		set.add(fm.getFeature("S"));
-		set.add(fm.getFeature("B"));
-		assertEquals(c.getSelectedFeatures(),set);
+		assertEquals(set,c.getSelectedFeatures());
 	}
 	
 	@Test
 	public void testAlternativeHidden() {
 		FeatureModel fm = loadXML("<alt mandatory=\"true\" name=\"S\"><feature mandatory=\"true\" name=\"A\"/><feature hidden=\"true\" mandatory=\"false\" name=\"B\"/></alt>");
 		Configuration c = new Configuration(fm);
-		assertEquals(1, c.number());
+		assertEquals(2, c.number());
 		HashSet<Feature> set = new HashSet<Feature>();
 		set.add(fm.getFeature("S"));
-		set.add(fm.getFeature("B"));
-		//set={S,B}
-		assertEquals(c.getSelectedFeatures(),set);
+		//set={S}
+		assertEquals(set,c.getSelectedFeatures());
 		c.setManual("A", Selection.SELECTED);
-		set.remove(fm.getFeature("B"));
+	
 		set.add(fm.getFeature("A"));
 		//set={S,A}
 		assertEquals(c.getSelectedFeatures(),set);
 	}
-	
+	@Test
+	public void testHidden() {
+		FeatureModel fm = loadXML("<and mandatory=\"true\" name=\"S\"><feature hidden=\"true\" mandatory=\"false\" name=\"B\"/></and>");
+		Configuration c = new Configuration(fm);
+		assertEquals(1, c.number());
+		HashSet<Feature> set = new HashSet<Feature>();
+		set.add(fm.getFeature("S"));
+		assertEquals(set,c.getSelectedFeatures());
+		
+	}
 }

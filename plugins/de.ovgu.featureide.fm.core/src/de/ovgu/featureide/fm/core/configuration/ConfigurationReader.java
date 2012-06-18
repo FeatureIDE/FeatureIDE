@@ -119,7 +119,7 @@ public class ConfigurationReader {
 				}
 				for (String name : hiddenFeatures) {
 					try {
-						configuration.setManual(name, Selection.UNDEFINED);
+						configuration.setAutomatic(name, Selection.SELECTED);
 					} catch (FeatureNotFoundException e) {
 						successful = false;
 						warnings.add("Feature " + name
