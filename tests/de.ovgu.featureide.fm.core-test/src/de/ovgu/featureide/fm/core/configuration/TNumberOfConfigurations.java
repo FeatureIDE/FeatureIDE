@@ -151,16 +151,17 @@ public class TNumberOfConfigurations extends AbstractConfigurationTest {
 	public void testAbstract4() {
 		FeatureModel fm = loadXML(
 				"<and mandatory=\"true\" name=\"S\"><feature abstract=\"true\" name=\"A\"/><feature name=\"B\"/><feature name=\"C\"/></and>");
-		Configuration c = new Configuration(fm,true,true);
+		Configuration c = new Configuration(fm);
 		assertEquals(8, c.number());
 	}
 	
+	
+	//TODO: replace selection strategy for hidden features
 	@Test
 	public void testHidden() {
 		FeatureModel fm = loadXML(
-				"<and mandatory=\"true\" name=\"S\"><feature mandatory=\"false\" name=\"A\"/><feature hidden=\"true\" name=\"B\"/></and>",
-				"<rule><eq><var>A</var><var>B</var></eq></rule>");
-		Configuration c = new Configuration(fm,true,true);
+				"<and mandatory=\"true\" name=\"S\"><feature mandatory=\"false\" name=\"A\"/><feature hidden=\"true\" name=\"B\"/></and>");
+		Configuration c = new Configuration(fm);
 		assertEquals(2, c.number());
 	}
 	
@@ -169,7 +170,7 @@ public class TNumberOfConfigurations extends AbstractConfigurationTest {
 		FeatureModel fm = loadXML(
 				"<and mandatory=\"true\" name=\"S\"><feature name=\"A\"/></and>",
 				"<rule><var>A</var></rule>");
-		Configuration c = new Configuration(fm,true,true);
+		Configuration c = new Configuration(fm);
 		assertEquals(1, c.number());
 	}
 
@@ -178,7 +179,7 @@ public class TNumberOfConfigurations extends AbstractConfigurationTest {
 		FeatureModel fm = loadXML(
 				"<and mandatory=\"true\" name=\"S\"><feature name=\"A\"/></and>",
 				"<rule><not><var>A</var></not></rule>");
-		Configuration c = new Configuration(fm,true,true);
+		Configuration c = new Configuration(fm);
 		assertEquals(1, c.number());
 
 	}
@@ -188,7 +189,7 @@ public class TNumberOfConfigurations extends AbstractConfigurationTest {
 		FeatureModel fm = loadXML(
 				"<and mandatory=\"true\" name=\"S\"><feature mandatory=\"true\" name=\"A\"/><feature name=\"B\"/></and>",
 				"<rule><imp><var>A</var><var>B</var></imp></rule>");
-		Configuration c = new Configuration(fm,true,true);
+		Configuration c = new Configuration(fm);
 		assertEquals(1, c.number());
 
 	}
@@ -198,7 +199,7 @@ public class TNumberOfConfigurations extends AbstractConfigurationTest {
 		FeatureModel fm = loadXML(
 				"<and mandatory=\"true\" name=\"S\"><feature name=\"A\"/><feature name=\"B\"/><feature name=\"C\"/><feature name=\"D\"/></and>",
 			"<rule><disj><var>A</var><imp><var>B</var><eq><var>C</var><not><var>D</var></not></eq></imp></disj></rule>"	);
-		Configuration c = new Configuration(fm,true,true);
+		Configuration c = new Configuration(fm);
 		assertEquals(14, c.number());
 
 	}
