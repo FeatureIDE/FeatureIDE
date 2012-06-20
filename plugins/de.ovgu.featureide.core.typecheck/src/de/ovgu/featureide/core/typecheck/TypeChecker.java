@@ -99,6 +99,8 @@ public class TypeChecker {
     }
 
     public void run() {
+	Timer all_timer = new Timer();
+	all_timer.start();
 	log("Starting parsing Features in " + source_path);
 	parser.timer.reset();
 
@@ -123,6 +125,7 @@ public class TypeChecker {
 	    problem_manager.run();
 	    log("Problem reporting finished");
 	}
+	log("Time needeed: " + all_timer.getTime() + "ms");
     }
 
     public void log(String msg) {
