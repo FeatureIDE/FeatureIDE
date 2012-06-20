@@ -71,7 +71,7 @@ public class TypeChecker {
 	String source_path = args[1];
 
 	List<ICheckPlugin> plugins = new ArrayList<ICheckPlugin>();
-//	plugins.add(new MethodCheck());
+	plugins.add(new MethodCheck());
 	plugins.add(new TypeCheck());
 	plugins.add(new FieldCheck());
 	
