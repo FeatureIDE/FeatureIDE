@@ -72,8 +72,8 @@ public class TypeChecker {
 
 	List<ICheckPlugin> plugins = new ArrayList<ICheckPlugin>();
 	plugins.add(new MethodCheck());
-	plugins.add(new TypeCheck());
-	plugins.add(new FieldCheck());
+//	plugins.add(new TypeCheck());
+//	plugins.add(new FieldCheck());
 	
 	TypeChecker checker = new TypeChecker(plugins, new ConsoleProblemHandler());
 
