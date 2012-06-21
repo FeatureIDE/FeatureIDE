@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<aggregator:Aggregation xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:aggregator="http://www.eclipse.org/b3/2011/aggregator/1.1.0" label="FeatureIDE" buildRoot="aggregated_update_site">
+  <validationSets description="main" label="Eclipse 3.7">
+    <contributions label="AspectJ Development Tools for Eclipse 3.7">
+      <repositories location="http://download.eclipse.org/tools/ajdt/37/update/" mirrorArtifacts="false">
+        <features name="org.eclipse.ajdt.feature.group" versionRange="2.1.3.e37x-20110628-1900" categories="//@customCategories[identifier='aindigo']"/>
+      </repositories>
+    </contributions>
+    <contributions label="FeatureIDE">
+      <repositories location="http://localhost/updatesite" mirrorArtifacts="false">
+        <features name="de.ovgu.featureide.feature.group" categories="//@customCategories[identifier='aindigo']"/>
+        <features name="de.ovgu.featureide.antenna.feature.group" categories="//@customCategories[identifier='aindigo']"/>
+        <features name="de.ovgu.featureide.deltaj.feature.group" categories="//@customCategories[identifier='aindigo']"/>
+        <features name="de.ovgu.featureide.exampleprojects.feature.group" categories="//@customCategories[identifier='aindigo']"/>
+        <features name="de.ovgu.featureide.featurecpp.feature.group" categories="//@customCategories[identifier='aindigo']"/>
+        <features name="de.ovgu.featureide.featuremodeling.feature.group" categories="//@customCategories[identifier='aindigo']"/>
+        <features name="de.ovgu.featureide.featurehouse.feature.group" categories="//@customCategories[identifier='aindigo']"/>
+        <features name="de.ovgu.featureide.munge.feature.group" categories="//@customCategories[identifier='aindigo']"/>
+        <features name="de.ovgu.featureide.aspectj.feature.group" categories="//@customCategories[identifier='aindigo']"/>
+      </repositories>
+    </contributions>
+    <validationRepositories location="http://download.eclipse.org/releases/indigo"/>
+  </validationSets>
+  <validationSets label="Eclipse 3.6">
+    <contributions label="AspectJ Development Tools for Eclipse 3.6">
+      <repositories location="http://download.eclipse.org/tools/ajdt/36/update/" mirrorArtifacts="false">
+        <features name="org.eclipse.ajdt.feature.group" versionRange="(2.1.1.e35x-release-20101021-0900,2.1.3.e37x-20110628-1900)" categories="//@customCategories[identifier='bhelios']"/>
+      </repositories>
+    </contributions>
+    <contributions label="FeatureIDE">
+      <repositories location="http://localhost/updatesite" mirrorArtifacts="false">
+        <features name="de.ovgu.featureide.feature.group" categories="//@customCategories[identifier='bhelios']"/>
+        <features name="de.ovgu.featureide.antenna.feature.group" categories="//@customCategories[identifier='bhelios']"/>
+        <features name="de.ovgu.featureide.deltaj.feature.group" categories="//@customCategories[identifier='bhelios']"/>
+        <features name="de.ovgu.featureide.exampleprojects.feature.group" categories="//@customCategories[identifier='bhelios']"/>
+        <features name="de.ovgu.featureide.featurecpp.feature.group" categories="//@customCategories[identifier='bhelios']"/>
+        <features name="de.ovgu.featureide.featuremodeling.feature.group" categories="//@customCategories[identifier='bhelios']"/>
+        <features name="de.ovgu.featureide.featurehouse.feature.group" categories="//@customCategories[identifier='bhelios']"/>
+        <features name="de.ovgu.featureide.munge.feature.group" categories="//@customCategories[identifier='bhelios']"/>
+        <features name="de.ovgu.featureide.aspectj.feature.group" categories="//@customCategories[identifier='bhelios']"/>
+      </repositories>
+    </contributions>
+    <validationRepositories location="http://download.eclipse.org/releases/helios"/>
+  </validationSets>
+  <validationSets label="Eclipse 3.5">
+    <contributions label="AspectJ Development Tools for Eclipse 3.5">
+      <repositories location="http://download.eclipse.org/tools/ajdt/35/update/" mirrorArtifacts="false">
+        <features name="org.eclipse.ajdt.feature.group" versionRange="[0.0.0.0,2.1.1.e35x-release-20101021-0900]" categories="//@customCategories[identifier='cgalileo']"/>
+      </repositories>
+    </contributions>
+    <contributions label="FeatureIDE">
+      <repositories location="http://localhost/updatesite" mirrorArtifacts="false">
+        <features name="de.ovgu.featureide.feature.group" categories="//@customCategories[identifier='cgalileo']"/>
+        <features name="de.ovgu.featureide.antenna.feature.group" categories="//@customCategories[identifier='cgalileo']"/>
+        <features name="de.ovgu.featureide.deltaj.feature.group" categories="//@customCategories[identifier='cgalileo']"/>
+        <features name="de.ovgu.featureide.exampleprojects.feature.group" categories="//@customCategories[identifier='cgalileo']"/>
+        <features name="de.ovgu.featureide.featurecpp.feature.group" categories="//@customCategories[identifier='cgalileo']"/>
+        <features name="de.ovgu.featureide.featuremodeling.feature.group" categories="//@customCategories[identifier='cgalileo']"/>
+        <features name="de.ovgu.featureide.featurehouse.feature.group" categories="//@customCategories[identifier='cgalileo']"/>
+        <features name="de.ovgu.featureide.munge.feature.group" categories="//@customCategories[identifier='cgalileo']"/>
+        <features name="de.ovgu.featureide.aspectj.feature.group" categories="//@customCategories[identifier='cgalileo']"/>
+      </repositories>
+    </contributions>
+    <contributions label="Xtext">
+      <repositories location="http://download.eclipse.org/modeling/tmf/xtext/updates/composite/releases/">
+        <features name="org.eclipse.xtext.ui.feature.group" categories="//@customCategories[identifier='cgalileo']"/>
+      </repositories>
+    </contributions>
+    <validationRepositories location="http://download.eclipse.org/releases/galileo"/>
+  </validationSets>
+  <configurations/>
+  <configurations operatingSystem="linux" windowSystem="gtk"/>
+  <configurations operatingSystem="macosx" windowSystem="cocoa"/>
+  <customCategories identifier="aindigo" label="FeatureIDE for Eclipse 3.7 (Indigo)" description="FeatureIDE for Eclipse 3.7. (AspectJ Development tools are only required for AspectJ extension for FeatureIDE)" features="//@validationSets[label='Eclipse%203.7']/@contributions[label='AspectJ%20Development%20Tools%20for%20Eclipse%203.7']/@repositories.0/@features.0 //@validationSets[label='Eclipse%203.7']/@contributions[label='FeatureIDE']/@repositories.0/@features.0 //@validationSets[label='Eclipse%203.7']/@contributions[label='FeatureIDE']/@repositories.0/@features.1 //@validationSets[label='Eclipse%203.7']/@contributions[label='FeatureIDE']/@repositories.0/@features.8 //@validationSets[label='Eclipse%203.7']/@contributions[label='FeatureIDE']/@repositories.0/@features.2 //@validationSets[label='Eclipse%203.7']/@contributions[label='FeatureIDE']/@repositories.0/@features.3 //@validationSets[label='Eclipse%203.7']/@contributions[label='FeatureIDE']/@repositories.0/@features.4 //@validationSets[label='Eclipse%203.7']/@contributions[label='FeatureIDE']/@repositories.0/@features.6 //@validationSets[label='Eclipse%203.7']/@contributions[label='FeatureIDE']/@repositories.0/@features.5 //@validationSets[label='Eclipse%203.7']/@contributions[label='FeatureIDE']/@repositories.0/@features.7"/>
+  <customCategories identifier="bhelios" label="FeatureIDE for Eclipse 3.6 (Helios)" description="FeatureIDE for Eclipse 3.7. (AspectJ Development tools are only required for AspectJ extension for FeatureIDE)" features="//@validationSets[label='Eclipse%203.6']/@contributions[label='AspectJ%20Development%20Tools%20for%20Eclipse%203.6']/@repositories.0/@features.0 //@validationSets[label='Eclipse%203.6']/@contributions[label='FeatureIDE']/@repositories.0/@features.0 //@validationSets[label='Eclipse%203.6']/@contributions[label='FeatureIDE']/@repositories.0/@features.1 //@validationSets[label='Eclipse%203.6']/@contributions[label='FeatureIDE']/@repositories.0/@features.8 //@validationSets[label='Eclipse%203.6']/@contributions[label='FeatureIDE']/@repositories.0/@features.2 //@validationSets[label='Eclipse%203.6']/@contributions[label='FeatureIDE']/@repositories.0/@features.3 //@validationSets[label='Eclipse%203.6']/@contributions[label='FeatureIDE']/@repositories.0/@features.4 //@validationSets[label='Eclipse%203.6']/@contributions[label='FeatureIDE']/@repositories.0/@features.6 //@validationSets[label='Eclipse%203.6']/@contributions[label='FeatureIDE']/@repositories.0/@features.5 //@validationSets[label='Eclipse%203.6']/@contributions[label='FeatureIDE']/@repositories.0/@features.7"/>
+  <customCategories identifier="cgalileo" label="FeatureIDE for Eclipse 3.5 (Galileo)" features="//@validationSets[label='Eclipse%203.5']/@contributions[label='AspectJ%20Development%20Tools%20for%20Eclipse%203.5']/@repositories.0/@features.0 //@validationSets[label='Eclipse%203.5']/@contributions[label='FeatureIDE']/@repositories.0/@features.0 //@validationSets[label='Eclipse%203.5']/@contributions[label='FeatureIDE']/@repositories.0/@features.1 //@validationSets[label='Eclipse%203.5']/@contributions[label='FeatureIDE']/@repositories.0/@features.8 //@validationSets[label='Eclipse%203.5']/@contributions[label='FeatureIDE']/@repositories.0/@features.2 //@validationSets[label='Eclipse%203.5']/@contributions[label='FeatureIDE']/@repositories.0/@features.3 //@validationSets[label='Eclipse%203.5']/@contributions[label='FeatureIDE']/@repositories.0/@features.4 //@validationSets[label='Eclipse%203.5']/@contributions[label='FeatureIDE']/@repositories.0/@features.6 //@validationSets[label='Eclipse%203.5']/@contributions[label='FeatureIDE']/@repositories.0/@features.5 //@validationSets[label='Eclipse%203.5']/@contributions[label='FeatureIDE']/@repositories.0/@features.7 //@validationSets[label='Eclipse%203.5']/@contributions[label='Xtext']/@repositories.0/@features.0"/>
+</aggregator:Aggregation>
