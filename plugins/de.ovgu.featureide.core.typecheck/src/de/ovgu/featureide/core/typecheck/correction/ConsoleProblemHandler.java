@@ -44,6 +44,7 @@ public class ConsoleProblemHandler implements IProblemHandler {
 		System.out.println(action);
 	    }
 	}
+	System.out.println("Reported " + problems.size() + " Problems");
     }
 
     /* (non-Javadoc)
