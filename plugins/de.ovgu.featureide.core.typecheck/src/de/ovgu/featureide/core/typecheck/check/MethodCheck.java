@@ -25,11 +25,14 @@ import java.util.List;
 import java.util.Map;
 
 import AST.ASTNode;
+import AST.AmbiguousAccess;
+import AST.ClassDecl;
 import AST.CompilationUnit;
 import AST.Expr;
 import AST.MethodAccess;
 import AST.MethodDecl;
 import AST.ParameterDeclaration;
+import AST.TypeAccess;
 import AST.TypeDecl;
 import AST.UnknownType;
 import AST.VarAccess;
@@ -110,49 +113,61 @@ public class MethodCheck extends AbstractCheckPlugin {
 	//
 	for (Feature f : methodaccess_map.keySet()) {
 	    for (MethodAccess ma : methodaccess_map.get(f)) {
+//		System.out.println(ma.name());
+//		if (!FujiWrapper.getParentByType(ma.decl().hostType(),
+//			CompilationUnit.class).fromSource()) {
+//		    continue;
+//		}
 
-		if (!FujiWrapper.getParentByType(ma.decl(),
-			CompilationUnit.class).fromSource()) {
+		if (ma.decl().name().contains("Anonymous")) {
 		    continue;
 		}
 
-		if(ma.decl().name().contains("Anonymous")){
-		    continue;
-		}
 		
-//		System.out.println(ma.decl().hostType().name() + "."
-//			+ ma.name());
+		
+		// System.out.println(ma.decl().hostType().name() + "."
+		// + ma.name());
 
 		List<String> args = argsToString(ma.getArgList());
-//		for (String arg : args) {
-//		    System.out.println(arg);
-//		}
+		// for (String arg : args) {
+		// System.out.println(arg);
+		// }
 		Map<Feature, List<MethodMatch>> providing_features = providesMethod(
 			ma.decl().hostType().name(), ma.decl().name(), args);
 
-		if(providing_features.size() == 0){
-		    System.out.println("Not found: "
-			    + ma.decl().hostType().name() + "." + ma.name());
+		if (countMethodMatches(providing_features) == 0) {
+		    if(ma.decl().hostType() instanceof UnknownType){
+			System.out.println(ma.name());
+			System.out.println(FujiWrapper.getParentByType(ma, CompilationUnit.class).pathName() + ":" + ma.lineNumber());
+			System.out.println(FujiWrapper.getParentByType(ma, ClassDecl.class).name());
+			System.out.println(ma.getParent());
+		    }
+//		    System.out.println("Not found: "
+//			    + ma.decl().hostType().name() + "." + ma.name());
 		}
-		
-		//TODO: distinguish between different matches
-		for(Feature pf : providing_features.keySet()){
-		    for(MethodMatch mm : providing_features.get(pf)){
-			if(mm.type == MethodMatch.MATCH){
+
+		// TODO: distinguish between different matches
+		for (Feature pf : providing_features.keySet()) {
+		    for (MethodMatch mm : providing_features.get(pf)) {
+//			if (mm.type == MethodMatch.MATCH) {
 //			    System.out.println("Match: ");
-			    System.out.println(printMA(ma) + " vs " + printMD(mm.md));
-			}
-//			if(mm.type == MethodMatch.PARAMETER_MATCH){
-//			    System.out.println("Parametertypes don't match: ");
-//			    System.out.println(printMA(ma) + " vs " + printMD(mm.md));
+//			    System.out.println(printMA(ma) + " vs "
+//				    + printMD(mm.md));
 //			}
-//			if(mm.type == MethodMatch.NAME_MATCH){
-//			    System.out.println("Parametercount doesn't match: ");
-//			    System.out.println(printMA(ma) + " vs " + printMD(mm.md));
+//			if (mm.type == MethodMatch.PARAMETER_MATCH) {
+//			    System.out.println("Parametertypes don't match: ");
+//			    System.out.println(printMA(ma) + " vs "
+//				    + printMD(mm.md));
+//			}
+//			if (mm.type == MethodMatch.NAME_MATCH) {
+//			    System.out
+//				    .println("Parametercount doesn't match: ");
+//			    System.out.println(printMA(ma) + " vs "
+//				    + printMD(mm.md));
 //			}
 		    }
 		}
-		
+
 		// if (providing_features.size() == 0) {
 
 		// } else {
@@ -245,8 +260,8 @@ public class MethodCheck extends AbstractCheckPlugin {
 		for (MethodDecl md : method_intros.get(f).get(host_type)) {
 		    if (md.name().equals(name)) {
 			if (md.getNumParameter() == args.size()) {
-			    if (compareMethodParameters(paramsToString(md.getParameterList()),
-				   args)) {
+			    if (compareMethodParameters(
+				    paramsToString(md.getParameterList()), args)) {
 				if (!providing_features.containsKey(f)) {
 				    providing_features
 					    .put(f,
@@ -317,7 +332,7 @@ public class MethodCheck extends AbstractCheckPlugin {
 	    List<String> args) {
 
 	for (int i = 0; i < parameters.size(); i++) {
-	    if (args.get(i).equals(parameters.get(i))) {
+	    if (!args.get(i).equals(parameters.get(i))) {
 		return false;
 	    }
 	}
@@ -325,43 +340,51 @@ public class MethodCheck extends AbstractCheckPlugin {
 	return true;
     }
 
-    public String printMA(MethodAccess ma){
+    public String printMA(MethodAccess ma) {
 	StringBuilder builder = new StringBuilder();
-	
-	builder.append(ma.hostType().name()).append(".").append(ma.name());
+
+	builder.append(ma.decl().hostType().name()).append(".")
+		.append(ma.name());
 	builder.append("(");
 	List<String> args = argsToString(ma.getArgList());
 
-	for(int i = 0; i < args.size(); i++){
+	for (int i = 0; i < args.size(); i++) {
 	    builder.append(args.get(i));
-	    if(i < args.size() - 1){
+	    if (i < args.size() - 1) {
 		builder.append(", ");
 	    }
 	}
-	
+
 	builder.append(")");
-	
+
 	return builder.toString();
     }
-    
-    
-    public String printMD(MethodDecl md){
+
+    public String printMD(MethodDecl md) {
 	StringBuilder builder = new StringBuilder();
-	
+
 	builder.append(md.hostType().name()).append(".").append(md.name());
 	builder.append("(");
 	List<String> args = paramsToString(md.getParameterList());
 
-	for(int i = 0; i < args.size(); i++){
+	for (int i = 0; i < args.size(); i++) {
 	    builder.append(args.get(i));
-	    if(i < args.size() - 1){
+	    if (i < args.size() - 1) {
 		builder.append(", ");
 	    }
 	}
-	
+
 	builder.append(")");
-	
+
 	return builder.toString();
+    }
+
+    private int countMethodMatches(Map<Feature, List<MethodMatch>> map){
+	int count = 0;
+	for(Feature f : map.keySet()){
+	    count+=map.get(f).size();
+	}
+	return count;
     }
     
     class Method implements Comparable<Method> {

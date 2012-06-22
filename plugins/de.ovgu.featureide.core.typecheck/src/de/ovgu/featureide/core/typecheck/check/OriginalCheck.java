@@ -24,6 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import AST.CompilationUnit;
 import AST.MethodAccess;
 import AST.MethodDecl;
 
@@ -66,7 +67,6 @@ public class OriginalCheck extends AbstractCheckPlugin {
 		method_intros.get(f).add(md);
 	    }
 	}
-
     }
 
     /*
@@ -98,22 +98,24 @@ public class OriginalCheck extends AbstractCheckPlugin {
 		    }
 
 		    if (providing_features.isEmpty()) {
-			System.out
-				.println("no fitting original method found :(");
-			System.out.println(f.getName() + " "
-				+ md.hostType().name() + "." + md.signature());
-			// TODO: create problem
+			newProblem(new CheckProblem(f, md.hostType(),
+				FujiWrapper.getParentByType(md,
+					CompilationUnit.class)
+				// .compilationUnit()
+					.pathName(), ma.lineNumber(),
+				"original() method not found: "
+					+ md.signature(), null));
 		    } else {
 			if (!checkFeatureImplication(fm, f,
 				providing_features.keySet())) {
-			    System.out
-				    .println("Missing dependency in feature model");
-			    System.out.print(f.getName() + " -> ");
-			    for(Feature ff : providing_features.keySet()){
-				System.out.print(ff.getName() + " ");
-			    }
-			    System.out.println();
-			    // TODO: create problem
+
+			    newProblem(new CheckProblem(f, md.hostType(),
+				    FujiWrapper.getParentByType(md,
+					    CompilationUnit.class).pathName(),
+				    ma.lineNumber(),
+				    "Missing dependency to original() method: "
+					    + md.signature(),
+				    providing_features.keySet()));
 			}
 		    }
 		}
@@ -172,7 +174,9 @@ public class OriginalCheck extends AbstractCheckPlugin {
 
     private List<Feature> getFeatureList(Feature root) {
 	List<Feature> features = new ArrayList<Feature>();
-	features.add(root);
+	if (!root.isAbstract()) {
+	    features.add(root);
+	}
 	for (Feature c : root.getChildren()) {
 	    features.addAll(getFeatureList(c));
 	}
@@ -188,8 +192,9 @@ public class OriginalCheck extends AbstractCheckPlugin {
      */
     @Override
     public List<Action> determineActions(CheckProblem problem) {
-	// TODO Auto-generated method stub
-	return null;
+	List<Action> actions = new ArrayList<Action>();
+	actions.add(new Action());
+	return actions;
     }
 
 }

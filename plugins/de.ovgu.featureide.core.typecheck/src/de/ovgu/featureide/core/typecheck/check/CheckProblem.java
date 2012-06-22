@@ -21,9 +21,7 @@ package de.ovgu.featureide.core.typecheck.check;
 import java.util.List;
 import java.util.Set;
 
-import AST.ClassDecl;
 import AST.TypeDecl;
-
 import de.ovgu.featureide.core.typecheck.correction.Action;
 import de.ovgu.featureide.fm.core.Feature;
 
@@ -104,7 +102,7 @@ public class CheckProblem {
     }
 
     /**
-     * @return the linenumber
+     * @return the line number
      */
     public int getLinenumber() {
 	return linenumber;

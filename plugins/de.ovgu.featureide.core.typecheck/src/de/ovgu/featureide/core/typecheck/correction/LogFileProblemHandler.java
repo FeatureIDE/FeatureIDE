@@ -18,16 +18,41 @@
  */
 package de.ovgu.featureide.core.typecheck.correction;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Collection;
 
 import de.ovgu.featureide.core.typecheck.check.CheckProblem;
 
 /**
- * TODO description
+ * Not working yet
  * 
  * @author Soenke Holthusen
  */
-public class ConsoleProblemHandler implements IProblemHandler {
+public class LogFileProblemHandler implements IProblemHandler {
+    String log_file;
+
+    /**
+     * 
+     */
+    public LogFileProblemHandler(String log_file) {
+	this.log_file = log_file;
+	File log = new File(log_file);
+	if(!log.exists()){
+	    try {
+		log.createNewFile();
+	    } catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	    }
+	}
+    }
+
     /*
      * (non-Javadoc)
      * 
@@ -37,20 +62,25 @@ public class ConsoleProblemHandler implements IProblemHandler {
      */
     @Override
     public void handleProblems(Collection<CheckProblem> problems) {
-	for (CheckProblem problem : problems) {
-	    System.out.println(problem);
-	    System.out.println("Action which could fix the problem: ");
-	    for(Action action : problem.getActions()){
-		System.out.println(action);
-	    }
-	}
+	// TODO Auto-generated method stub
+
     }
 
-    /* (non-Javadoc)
-     * @see de.ovgu.featureide.core.typecheck.correction.IProblemHandler#log(java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * de.ovgu.featureide.core.typecheck.correction.IProblemHandler#log(java
+     * .lang.String)
      */
     @Override
     public void log(String message) {
-	System.out.println(message);
+	try {
+	    new PrintStream(new FileOutputStream(log_file)).println(message);
+	} catch (FileNotFoundException e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	}
     }
+
 }

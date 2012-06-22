@@ -29,5 +29,6 @@ import de.ovgu.featureide.core.typecheck.check.CheckProblem;
  */
 public interface IProblemHandler {
     public void handleProblems(Collection<CheckProblem> problems);
+    public void log(String message);
 
 }

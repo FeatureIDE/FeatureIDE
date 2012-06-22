@@ -18,7 +18,6 @@
  */
 package de.ovgu.featureide.core.typecheck.correction;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -36,11 +35,8 @@ public class ProblemManager {
     /**
      * 
      */
-    public ProblemManager(IProblemHandler... problem_handler) {
-	this.problem_handler = new ArrayList<IProblemHandler>();
-	for (IProblemHandler handler : problem_handler) {
-	    this.problem_handler.add(handler);
-	}
+    public ProblemManager(List<IProblemHandler> problem_handler) {
+	this.problem_handler = problem_handler;
     }
     
     public void addProblems(Collection<CheckProblem> problems){
@@ -51,6 +47,12 @@ public class ProblemManager {
 	determineActions();
 	for(IProblemHandler handler : problem_handler){
 	    handler.handleProblems(problems);
+	}
+    }
+    
+    public void log(String message){
+	for(IProblemHandler handler : problem_handler){
+	    handler.log(message);
 	}
     }
     

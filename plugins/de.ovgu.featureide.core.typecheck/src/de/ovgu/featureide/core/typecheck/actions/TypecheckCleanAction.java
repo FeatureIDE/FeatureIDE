@@ -1,8 +1,6 @@
 package de.ovgu.featureide.core.typecheck.actions;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IResource;
@@ -16,12 +14,6 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.typecheck.TypeChecker;
 import de.ovgu.featureide.core.typecheck.TypecheckCorePlugin;
-import de.ovgu.featureide.core.typecheck.check.FieldCheck;
-import de.ovgu.featureide.core.typecheck.check.ICheckPlugin;
-import de.ovgu.featureide.core.typecheck.check.MethodCheck;
-import de.ovgu.featureide.core.typecheck.check.OriginalCheck;
-import de.ovgu.featureide.core.typecheck.check.TypeCheck;
-import de.ovgu.featureide.core.typecheck.correction.ConsoleProblemHandler;
 
 /**
  * 
@@ -44,14 +36,14 @@ public class TypecheckCleanAction implements IObjectActionDelegate {
 
 	    if (Arrays.asList(TypecheckCorePlugin.supportedComposers).contains(
 		    project.getComposerID())) {
-		List<ICheckPlugin> plugins = new ArrayList<ICheckPlugin>();
+//		List<ICheckPlugin> plugins = new ArrayList<ICheckPlugin>();
 //		    plugins.add(new MethodCheck());
 //		    plugins.add(new FieldCheck());
 //		    plugins.add(new TypeCheck());
-		    plugins.add(new OriginalCheck());
+//		    plugins.add(new OriginalCheck());
 
-		typechecker.put(project, new TypeChecker(plugins,
-			new ConsoleProblemHandler()));
+		typechecker.put(project, new TypeChecker(TypeChecker.defaultCheckPlugins(),
+			    TypeChecker.defaultProblemHandlers()));
 		typechecker.get(project).setParameters(
 			project.getFeatureModel(), project.getSourcePath());
 		typechecker.get(project).run();

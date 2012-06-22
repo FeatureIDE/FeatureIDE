@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.cli.TypeHandler;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
@@ -45,14 +46,14 @@ public class TypecheckAction implements IObjectActionDelegate {
 	    if (Arrays.asList(TypecheckCorePlugin.supportedComposers).contains(
 		    project.getComposerID())) {
 		if (!typechecker.containsKey(project)) {
-		    List<ICheckPlugin> plugins = new ArrayList<ICheckPlugin>();
+//		    List<ICheckPlugin> plugins = new ArrayList<ICheckPlugin>();
 //		    plugins.add(new MethodCheck());
 //		    plugins.add(new FieldCheck());
 //		    plugins.add(new TypeCheck());
-		    plugins.add(new OriginalCheck());
+//		    plugins.add(new OriginalCheck());
 		    
-		    typechecker.put(project, new TypeChecker(plugins,
-			    new ConsoleProblemHandler()));
+		    typechecker.put(project, new TypeChecker(TypeChecker.defaultCheckPlugins(),
+			    TypeChecker.defaultProblemHandlers()));
 		}
 		typechecker.get(project).setParameters(
 			project.getFeatureModel(), project.getSourcePath());

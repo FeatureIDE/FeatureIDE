@@ -34,9 +34,9 @@ import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.core.typecheck.check.CheckPluginManager;
-import de.ovgu.featureide.core.typecheck.check.FieldCheck;
 import de.ovgu.featureide.core.typecheck.check.ICheckPlugin;
 import de.ovgu.featureide.core.typecheck.check.MethodCheck;
+import de.ovgu.featureide.core.typecheck.check.OriginalCheck;
 import de.ovgu.featureide.core.typecheck.check.TypeCheck;
 import de.ovgu.featureide.core.typecheck.correction.ConsoleProblemHandler;
 import de.ovgu.featureide.core.typecheck.correction.IProblemHandler;
@@ -72,10 +72,11 @@ public class TypeChecker {
 
 	List<ICheckPlugin> plugins = new ArrayList<ICheckPlugin>();
 	plugins.add(new MethodCheck());
-//	plugins.add(new TypeCheck());
-//	plugins.add(new FieldCheck());
-	
-	TypeChecker checker = new TypeChecker(plugins, new ConsoleProblemHandler());
+	// plugins.add(new TypeCheck());
+	// plugins.add(new FieldCheck());
+
+	TypeChecker checker = new TypeChecker(defaultCheckPlugins(),
+		defaultProblemHandlers());
 
 	checker.log("Reading feature model from file " + fmfile);
 	FeatureModel fm = checker.readFM(fmfile);
@@ -85,7 +86,8 @@ public class TypeChecker {
 	checker.run();
     }
 
-    public TypeChecker(List<ICheckPlugin> plugins, IProblemHandler... problem_handler) {
+    public TypeChecker(List<ICheckPlugin> plugins,
+	    List<IProblemHandler> problem_handler) {
 	plugin_manager = new CheckPluginManager(plugins);
 
 	this.problem_manager = new ProblemManager(problem_handler);
@@ -129,7 +131,7 @@ public class TypeChecker {
     }
 
     public void log(String msg) {
-	System.out.println(msg);
+	problem_manager.log(msg);
     }
 
     public FeatureModel readFM(String fmfile) {
@@ -174,5 +176,21 @@ public class TypeChecker {
 	// FM => (A => B)
 	Implies finalFormula = new Implies(featureModel, condition);
 	return !new SatSolver(new Not(finalFormula), 1000).isSatisfiable();
+    }
+    
+    public static List<ICheckPlugin> defaultCheckPlugins(){
+	List<ICheckPlugin> plugins = new ArrayList<ICheckPlugin>();
+	plugins.add(new TypeCheck());
+	plugins.add(new OriginalCheck());
+//	plugins.add(new FieldCheck());
+//	plugins.add(new MethodCheck());
+	return plugins;
+    }
+    
+    public static List<IProblemHandler> defaultProblemHandlers(){
+	List<IProblemHandler> problem_handler = new ArrayList<IProblemHandler>();
+	problem_handler.add(new ConsoleProblemHandler());
+//	problem_handler.add(new LogFileProblemHandler("log.txt"));
+	return problem_handler;
     }
 }
