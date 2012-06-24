@@ -91,6 +91,8 @@ public class ExportGuidslAction implements IObjectActionDelegate {
 						FileDialog fileDialog = new FileDialog(new Shell(),
 								SWT.SAVE);
 						fileDialog.setFileName("model.m");
+						fileDialog.setFilterExtensions(new String[]{"*.m"});
+						fileDialog.setFilterNames(new String[]{"GUIDSL foramt *.m"});
 						fileDialog.setOverwrite(true);
 						String filepath = fileDialog.open();
 						if (filepath == null) return;

@@ -22,6 +22,7 @@ import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
@@ -44,6 +45,8 @@ public class AddRoleAction extends Action {
 	public AddRoleAction(String text, GraphicalViewerImpl view, CollaborationView collaborationView) {
 		super(text);
 		viewer = view;
+		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
+				.getImageDescriptor(ISharedImages.IMG_OBJ_ADD));
 	}
 
 	public void setEnabled(boolean enable) {

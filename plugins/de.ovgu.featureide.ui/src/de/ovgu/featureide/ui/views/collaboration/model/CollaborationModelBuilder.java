@@ -82,7 +82,9 @@ public class CollaborationModelBuilder {
 	
 	public boolean showUnselectedFeatures = showUnselectedFeatures();
 	
-	private static final QualifiedName SHOW_UNSELECTED_FEATURES = new QualifiedName("ShowUnselectedFeatures", "ShowUnselectedFeatures");
+	private static final QualifiedName SHOW_UNSELECTED_FEATURES = 
+			new QualifiedName(CollaborationModelBuilder.class.getName() +"#ShowUnselectedFeatures", 
+						      CollaborationModelBuilder.class.getName() +"#ShowUnselectedFeatures");
 	private static final String TRUE = "true";
 	private static final String FALSE = "false";
 	
@@ -267,20 +269,22 @@ public class CollaborationModelBuilder {
 		if (configuration != null && selectedFeatureNames.contains(layerName)) {
 			selected = true;
 		}
-		IFolder folder = project.getSourceFolder().getFolder(layerName);
-		if (folder.exists()) {
-			collaboration = null;
-			IResource[] members = null;
-				try {
-					members = folder.members();
-				} catch (CoreException e) {
-					UIPlugin.getDefault().logError(e);
+		if (project.getComposer().hasSourceFolder()) {
+			IFolder folder = project.getSourceFolder().getFolder(layerName);
+			if (folder.exists()) {
+				collaboration = null;
+				IResource[] members = null;
+					try {
+						members = folder.members();
+					} catch (CoreException e) {
+						UIPlugin.getDefault().logError(e);
+					}
+					for (IResource res : members) {
+						addArbitraryFiles(res, layerName, selected);
 				}
-				for (IResource res : members) {
-					addArbitraryFiles(res, layerName, selected);
+				if (collaboration != null)
+					model.collaborations.add(collaboration);
 			}
-			if (collaboration != null)
-				model.collaborations.add(collaboration);
 		}
 	}
 

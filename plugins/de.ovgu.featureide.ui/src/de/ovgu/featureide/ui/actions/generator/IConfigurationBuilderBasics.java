@@ -43,7 +43,8 @@ public interface IConfigurationBuilderBasics {
 	final static String MESSAGE_START = "This could take a long time.\nThe current algorithm is inefficient, if your model contains many constraints.\n";
 	final static String TOGGLE_MESSAGE = "Create a new project for each variant";
 	
-	static final QualifiedName TOGGLE_STATE = new QualifiedName("CreateNewProject", "CreateNewProject");
+	static final QualifiedName TOGGLE_STATE = new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#CreateNewProject", 
+			IConfigurationBuilderBasics.class.getName() + "#CreateNewProject");
 	final static String TRUE = "true";
 	final static String FALSE = "false";
 	

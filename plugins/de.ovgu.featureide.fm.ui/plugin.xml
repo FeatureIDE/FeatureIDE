@@ -114,7 +114,18 @@
    </extension>
          
    <extension
-         point="org.eclipse.ui.popupMenus"> 
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            adaptable="true"
+            id="de.ovgu.featureide.fm.ui.menu"
+            objectClass="org.eclipse.core.resources.IResource">
+         <menu
+               icon="icons/FeatureIconSmall.ico"
+               id="de.ovgu.featureide.fm.ui.menu"
+               label="FeatureIDE"
+               path="group.open">
+         </menu>
+      </objectContribution> 
       <objectContribution
             adaptable="true"
             id="de.ovgu.featureide.fm.ui.featureModelContribution"
@@ -125,21 +136,21 @@
                icon="icons/export_wiz.gif"
                id="de.ovgu.featureide.fm.ui.ExportGuidsl"
                label="Export model to GUIDSL format"
-               menubarPath="de.ovgu.featureide.ui.menu/guidsl">
+               menubarPath="de.ovgu.featureide.fm.ui.menu/guidsl">
          </action>
          <action
                class="de.ovgu.featureide.fm.ui.actions.ImportGuidslAction"
                icon="icons/import_wiz.gif"
                id="de.ovgu.featureide.fm.ui.ImportGuidsl"
                label="Import model from GUIDSL format"
-               menubarPath="de.ovgu.featureide.ui.menu/guidsl">
+               menubarPath="de.ovgu.featureide.fm.ui.menu/guidsl">
          </action>
          <action
                class="de.ovgu.featureide.fm.ui.actions.OpenWithGuidslAction"
                icon="icons/guidsl.gif"
                id="de.ovgu.featureide.fm.ui.openWithGuidsl"
                label="Open with GUIDSL"
-               menubarPath="de.ovgu.featureide.ui.menu/guidsl"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/guidsl"
                tooltip="GUIDSL is a configuration tool written by Don Batory">
          </action>
          <action
@@ -147,42 +158,38 @@
                icon="icons/export_wiz.gif"
                id="de.ovgu.featureide.fm.ui.ExportSXFM"
                label="Export model to SXFM (S.P.L.O.T.) format"
-               menubarPath="de.ovgu.featureide.ui.menu/splot">
+               menubarPath="de.ovgu.featureide.fm.ui.menu/splot">
          </action>
          <action
                class="de.ovgu.featureide.fm.ui.actions.ImportSXFMAction"
                icon="icons/import_wiz.gif"
                id="de.ovgu.featureide.fm.ui.ImportSXFM"
                label="Import model from SXFM (S.P.L.O.T.) format"
-               menubarPath="de.ovgu.featureide.ui.menu/splot">
+               menubarPath="de.ovgu.featureide.fm.ui.menu/splot">
          </action>
          <action
                class="de.ovgu.featureide.fm.ui.actions.ExportConquererAction"
                icon="icons/export_wiz.gif"
                id="de.ovgu.featureide.fm.ui.ExportSPLConquerer"
                label="Export model to SPL Conquerer format"
-               menubarPath="de.ovgu.featureide.ui.menu/conquerer">
+               menubarPath="de.ovgu.featureide.fm.ui.menu/conquerer">
          </action>
                   <action
                class="de.ovgu.featureide.fm.ui.actions.FeatureDependenciesAction"
                icon="icons/export_wiz.gif"
                id="de.ovgu.featureide.fm.ui.FeatureDependencies"
                label="Export feature dependency information"
-               menubarPath="de.ovgu.featureide.ui.menu/dependency">
+               menubarPath="de.ovgu.featureide.fm.ui.menu/dependency">
          </action>
       </objectContribution>
    </extension>
    <extension
          point="org.eclipse.ui.propertyPages">
       <page
-            category="de.ovgu.featureide.core.propertypage"
             class="de.ovgu.featureide.fm.ui.properties.page.FMPropertyPage"
             id="de.ovgu.featureide.fm.ui.propertypage"
-            name="Feature Model Editor">
-         <filter
-               name="projectNature"
-               value="de.ovgu.featureide.core.featureProjectNature">
-         </filter>
+            name="Feature Model Editor"
+            nameFilter="*.xml">
       </page>
    </extension>
 </plugin>

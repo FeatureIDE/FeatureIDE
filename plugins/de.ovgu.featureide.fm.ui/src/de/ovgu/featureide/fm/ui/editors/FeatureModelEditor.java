@@ -150,7 +150,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 
 		originalFeatureModel = new FeatureModel();
 		try {
-			// TODO do not parse the model twice
 	    	new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(originalFeatureModel)).readFromFile(file);
 	    	new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(featureModel)).readFromFile(file);
 		} catch (Exception e) {

@@ -37,17 +37,6 @@
          point="org.eclipse.ui.popupMenus">
       <objectContribution
             adaptable="true"
-            id="de.ovgu.featureide.ui.menu"
-            objectClass="org.eclipse.core.resources.IResource">
-         <menu
-               icon="icons/FeatureIconSmall.ico"
-               id="de.ovgu.featureide.ui.menu"
-               label="FeatureIDE"
-               path="group.open">
-         </menu>
-      </objectContribution>
-      <objectContribution
-            adaptable="true"
             id="de.ovgu.featureide.ui.actions.conversionaction"
             objectClass="org.eclipse.core.resources.IProject">
          <visibility>
@@ -63,7 +52,7 @@
                id="de.ovgu.featureide.ui.actions.conversionaction1"
                icon="icons/FeatureIconSmall.ico"
                label="Add FeatureIDE Nature"
-               menubarPath="de.ovgu.featureide.ui.menu/ui"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/ui"
                style="push">
          </action>
       </objectContribution>
@@ -76,7 +65,7 @@
                id="de.ovgu.featureide.ui.actions.buildallvalidconfigurationsaction"
                icon="icons/FeatureIconSmall.ico"
                label="Build All Valid Configurations"
-               menubarPath="de.ovgu.featureide.ui.menu/ui"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/ui"
                tooltip="Builds all possible configurations."
                style="push">
          </action>
@@ -85,7 +74,7 @@
                id="de.ovgu.featureide.ui.actions.buildallconfigurationsaction"
                icon="icons/FeatureIconSmall.ico"
                label="Build All Current Configurations"
-               menubarPath="de.ovgu.featureide.ui.menu/ui"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/ui"
                tooltip="Builds all current configurations."
                style="push">
          </action>

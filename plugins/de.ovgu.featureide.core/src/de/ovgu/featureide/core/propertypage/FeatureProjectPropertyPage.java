@@ -33,10 +33,11 @@ import de.ovgu.featureide.core.builder.IComposerExtension;
 /**
  * At this property page you can specify composer specific settings for a FeatureProject
  * This property page specifies project specific settings
- * TODO distinction between rename and move of folders
  * 
  * @author Jens Meinicke
  */
+// TODO distinction between rename and move of folders
+// TODO change from FeatureModelling -> Antenna : Sourcepath is not written 
 @SuppressWarnings("restriction")
 public class FeatureProjectPropertyPage extends PropertyPage {
 
@@ -285,9 +286,9 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 	 * @return
 	 */
 	private boolean noPathChanged() {
-		return featureProject.getSourceFolder().getProjectRelativePath().toOSString().equals(featurePath.getText()) &&
-			   featureProject.getBuildFolder().getProjectRelativePath().toOSString().equals(sourcePath.getText()) &&
-			   featureProject.getConfigFolder().getProjectRelativePath().toOSString().equals(configPath.getText());
+		return featureProject.getSourceFolder() != null ? featureProject.getSourceFolder().getProjectRelativePath().toOSString().equals(featurePath.getText()) : true &&
+			   featureProject.getBuildFolder() != null ? featureProject.getBuildFolder().getProjectRelativePath().toOSString().equals(sourcePath.getText()) : true &&
+			   featureProject.getConfigFolder() != null ? featureProject.getConfigFolder().getProjectRelativePath().toOSString().equals(configPath.getText()): true;
 	}
 
 	@Override

@@ -224,12 +224,14 @@ public class ConfigurationEditor extends MultiPageEditorPart implements
 	 * @return a string describing the absolute path of the selected model file
 	 * @see FileDialog#open()
 	 */
+	// TODO add all model extensions
 	private String openFileDialog() {
 		FileDialog dialog = new FileDialog(getSite()
 				.getWorkbenchWindow().getShell(), SWT.MULTI);
 		dialog.setText("Select the corresponding Featuremodel.");
 		dialog.setFileName("model.xml");
-		dialog.setFilterExtensions(new String [] {"*.xml"});// TODO add all model extensions	
+		dialog.setFilterExtensions(new String [] {"*.xml"});
+		dialog.setFilterNames(new String[]{ "XML *.xml"});
 		dialog.setFilterPath(file.getProject().getLocation().toOSString());
 		return dialog.open();
 	}

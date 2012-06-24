@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
+import javax.annotation.CheckForNull;
+
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -494,8 +496,9 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	 * 
 	 * @see de.ovgu.featureide.core.IFeatureProject#getBuildPath()
 	 */
+	@CheckForNull
 	public String getBuildPath() {
-		return buildFolder.getRawLocation().toOSString();
+		return buildFolder != null ? buildFolder.getRawLocation().toOSString() : null;
 	}
 
 	/*
