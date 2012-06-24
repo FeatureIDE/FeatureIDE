@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import java.util.Scanner;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
@@ -48,10 +49,10 @@ public class FeatureCppModelBuilder {
 	private FSTClass currentClass = null;
 	private IFile currentFile = null;
 
-	public FeatureCppModelBuilder(IFeatureProject featureProject) {
-		if (featureProject == null) {
-			return;
-		}
+	private IFolder tempFolder;
+
+	public FeatureCppModelBuilder(IFeatureProject featureProject, IFolder tempFolder) {
+		this.tempFolder = tempFolder;
 		FSTModel oldModel = featureProject.getFSTModel();
 		if (oldModel != null)
 			oldModel.markObsolete();
@@ -78,6 +79,7 @@ public class FeatureCppModelBuilder {
 		}
 		return true;
 	}
+	
 	/**
 	 * adds the informations of this class to the FSTModel
 	 * @param file
@@ -167,8 +169,11 @@ public class FeatureCppModelBuilder {
 	 */
 	private LinkedList<IFile> getInfoFiles() {
 		LinkedList<IFile> files = new LinkedList<IFile>();
+		if (!tempFolder.exists()) {
+			return files;
+		}
 		try {
-			for (IResource res : featureProject.getBuildFolder().members()) {
+			for (IResource res : tempFolder.members()) {
 				if (res instanceof IFile) {
 					if (res.getName().endsWith(".info")) {
 						files.add((IFile)res);

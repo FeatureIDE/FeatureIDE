@@ -18,6 +18,9 @@
  */
 package de.ovgu.featureide.featurecpp;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -28,7 +31,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.CorePlugin;
@@ -50,30 +52,80 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 	public static final String C_NATURE = "org.eclipse.cdt.core.cnature";
 	public static final String CC_NATURE = "org.eclipse.cdt.core.ccnature";
 
-//	private final FeatureCppWrapper featureCpp = new FeatureCppWrapper(
-//			(FeatureCppCorePlugin.getDefault().getBundle().getLocation() + "lib/fc++.exe")
-//			.substring(16));
+	/**
+	 * This wrapper builds the current configuration into the build folder.
+	 */
 	private final FeatureCppWrapper featureCpp = new FeatureCppWrapper();
-
+	
+	/**
+	 * This wrapper builds a complete configuration into the temp folder to 
+	 * generate a full FST model.
+	 */
+	private final FeatureCppWrapper featureCppModelWrapper = new FeatureCppWrapper();
+	
+	/**
+	 * This folder called FSTModel is the location where the model wrapper will build the full configuration.
+	 */
+	private IFolder tempFolder;
+	
+	/**
+	 * This folder called .tmp contains the full configuration and the temp folder.
+	 */
+	private IFolder parentFolder;
+	
 	private FeatureCppModelBuilder featureCppModelBuilder;
+	
 
 	public boolean initialize(IFeatureProject project) {
 		if (project == null) {
 			return false;
 		}
 		super.initialize(project);
-		featureCpp.initialize(project.getSourceFolder(), project
-				.getBuildFolder());
+		featureCpp.initialize(project.getSourceFolder(), project.getBuildFolder());
+		createTempFolder();
 		
-		featureCppModelBuilder = new FeatureCppModelBuilder(project);
+		featureCppModelWrapper.initialize(project.getSourceFolder(), tempFolder);
+		
+		if (featureCppModelBuilder == null) {
+			featureCppModelBuilder = new FeatureCppModelBuilder(project, tempFolder);
+			buildFSTModel();
+		}
 		return true;
+	}
+
+
+	/**
+	 * Creates the folders for building a full FST model.<br>
+	 * {@link FeatureCppComposer#parentFolder}<br>
+	 * {@link FeatureCppComposer#tempFolder}
+	 */
+	private void createTempFolder() {
+		parentFolder = featureProject.getProject().getFolder(".tmp");
+		if (!parentFolder.exists()) {
+			try {
+				parentFolder.create(true, true, null);
+				parentFolder.refreshLocal(IResource.DEPTH_ZERO, null);
+			} catch (CoreException e) {
+				FeatureCppCorePlugin.getDefault().logError(e);
+			}
+		}
+		
+		tempFolder = parentFolder.getFolder("FSTModel");
+		if (!tempFolder.exists()) {
+			try {
+				tempFolder.create(true, true, null);
+				tempFolder.refreshLocal(IResource.DEPTH_ZERO, null);
+			} catch (CoreException e) {
+				FeatureCppCorePlugin.getDefault().logError(e);
+			}
+		}
 	}
 
 
 	public void performFullBuild(IFile config) {
 		initialize(CorePlugin.getFeatureProject(config));
-		featureCppModelBuilder.resetModel();
 		featureCpp.compose(config);
+		buildFSTModel();
 	}
 
 	private static final LinkedHashSet<String> EXTENSIONS = createExtensions(); 
@@ -167,9 +219,6 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 		super.postCompile(delta, file);
 		try {
 			file.refreshLocal(IResource.DEPTH_ZERO, null);
-			if (file.getName().endsWith(".info")) {
-				featureCppModelBuilder.buildModel(file);
-			}
 		} catch (CoreException e) {
 			FeatureCppCorePlugin.getDefault().logError(e);
 		}
@@ -182,16 +231,48 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 
 	@Override
 	public void buildFSTModel() {
+		if (!tempFolder.exists()) {
+			createTempFolder();
+		} else {
+			try {
+				for (IResource res : tempFolder.members()) {
+					res.delete(true, null);
+				}
+				tempFolder.refreshLocal(IResource.DEPTH_INFINITE, null);
+			} catch (CoreException e) {
+				FeatureCppCorePlugin.getDefault().logError(e);
+			}
+		}
+		
+		
 		if (featureProject != null && featureProject.getProject() != null) {
 			featureCppModelBuilder.resetModel();
-			if (!featureCppModelBuilder.buildModel()) {
-				try {
-					// TODO @Jens implement building a full configuration into a temporary folder
-					featureProject.getProject().build(IncrementalProjectBuilder.FULL_BUILD, null);
-				} catch (CoreException e) {
-					FeatureCppCorePlugin.getDefault().logError(e);
-				}
+			StringBuilder stringBuilder = new StringBuilder();
+			for (String name : featureProject.getFeatureModel().getConcreteFeatureNames()) {
+				stringBuilder.append(name);
+				stringBuilder.append("\r\n");
 			}
+			
+			InputStream source = new ByteArrayInputStream(stringBuilder.toString()
+					.getBytes(Charset.availableCharsets().get("UTF-8")));
+			
+			IFile file = parentFolder.getFile("." + getConfigurationExtension());
+			try {
+				if (file.exists()) {
+					file.setContents(source, false, true, null);	
+				} else {
+					file.create(source, true, null);
+				}
+			} catch (CoreException e) {
+				FeatureCppCorePlugin.getDefault().logError(e);
+			}
+			featureCppModelWrapper.compose(file);
+			try {
+				tempFolder.refreshLocal(IResource.DEPTH_INFINITE, null);
+			} catch (CoreException e) {
+				FeatureCppCorePlugin.getDefault().logError(e);
+			}
+			featureCppModelBuilder.buildModel();
 		}
 	}
 	
