@@ -41,7 +41,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  * 
  * @author soenke
  */
-public class FieldCheck extends AbstractCheckPlugin {
+public class FieldCheck extends AbstractTypeCheckPlugin {
 
     Map<Feature, Map<TypeDecl, List<FieldDeclaration>>> field_intros;
 

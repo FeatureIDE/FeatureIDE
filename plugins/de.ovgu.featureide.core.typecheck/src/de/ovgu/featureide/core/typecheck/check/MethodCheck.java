@@ -48,7 +48,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  * 
  * @author Soenke Holthusen
  */
-public class MethodCheck extends AbstractCheckPlugin {
+public class MethodCheck extends AbstractTypeCheckPlugin {
 
     private Map<Feature, Map<String, List<MethodDecl>>> method_intros;
 

@@ -40,13 +40,14 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  * 
  * @author Soenke Holthusen
  */
-public class TypeCheck extends AbstractCheckPlugin {
+public class TypeReferenceCheck extends AbstractTypeCheckPlugin {
     private Map<Feature, List<ReferenceType>> intros;
 
-    public TypeCheck() {
+    public TypeReferenceCheck() {
 	plugin_name = "Type Check Plugin";
 	registerNodeType(ClassDecl.class);
 	registerNodeType(CompilationUnit.class);
+	registerNodeType(TypeAccess.class);
     }
 
     /**
@@ -88,13 +89,14 @@ public class TypeCheck extends AbstractCheckPlugin {
 	// doesn't work with annotations and stuff
 	//Map<Feature, List<ClassDecl>> cdmap = getNodesByType(ClassDecl.class);
 	Map<Feature, List<CompilationUnit>> cdmap = getNodesByType(CompilationUnit.class);
+	Map<Feature, List<TypeAccess>> tamap = getNodesByType(TypeAccess.class);
 	int count = 0;
 
 	for (Feature f : cdmap.keySet()) {
 	    for (CompilationUnit cd : cdmap.get(f)) {
 		// for every type access inside a class declaration
-		for (TypeAccess ta : FujiWrapper.getChildNodesByType(cd,
-			TypeAccess.class)) {
+		for (TypeAccess ta : FujiWrapper.getChildNodesByType(cd,			TypeAccess.class)) {
+//		for(TypeAccess ta : tamap.get(f)){
 		    // utilise the type resolution of fuji and handle only
 		    // unknown types
 		    count++;

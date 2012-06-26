@@ -21,8 +21,10 @@ import de.ovgu.featureide.core.typecheck.check.FieldCheck;
 import de.ovgu.featureide.core.typecheck.check.ICheckPlugin;
 import de.ovgu.featureide.core.typecheck.check.MethodCheck;
 import de.ovgu.featureide.core.typecheck.check.OriginalCheck;
-import de.ovgu.featureide.core.typecheck.check.TypeCheck;
+import de.ovgu.featureide.core.typecheck.check.TypeReferenceCheck;
 import de.ovgu.featureide.core.typecheck.correction.ConsoleProblemHandler;
+import de.ovgu.featureide.core.typecheck.correction.FIDEProblemHandler;
+import de.ovgu.featureide.core.typecheck.correction.IProblemHandler;
 
 /**
  * 
@@ -52,8 +54,11 @@ public class TypecheckAction implements IObjectActionDelegate {
 //		    plugins.add(new TypeCheck());
 //		    plugins.add(new OriginalCheck());
 		    
+		    List<IProblemHandler> problem_handlers = new ArrayList<IProblemHandler>();
+		    problem_handlers.add(new FIDEProblemHandler(project));
+		    
 		    typechecker.put(project, new TypeChecker(TypeChecker.defaultCheckPlugins(),
-			    TypeChecker.defaultProblemHandlers()));
+			    problem_handlers));
 		}
 		typechecker.get(project).setParameters(
 			project.getFeatureModel(), project.getSourcePath());

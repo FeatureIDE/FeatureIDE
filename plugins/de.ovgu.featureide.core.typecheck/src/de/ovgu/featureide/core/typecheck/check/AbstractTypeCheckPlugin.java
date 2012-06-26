@@ -39,7 +39,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  * @author soenke
  */
 @SuppressWarnings("rawtypes")
-public abstract class AbstractCheckPlugin implements ICheckPlugin {
+public abstract class AbstractTypeCheckPlugin implements ICheckPlugin {
     protected CheckPluginManager _manager;
     protected Set<Class> registered_node_types = new HashSet<Class>();
 

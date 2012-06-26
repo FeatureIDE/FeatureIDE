@@ -98,6 +98,9 @@ public class FujiWrapper {
 
     @SuppressWarnings("rawtypes")
     public static <T> T getParentByType(ASTNode node, Class<T> type) {
+	if (node == null) {
+	    return null;
+	}
 	if (type.isInstance(node.getParent())) {
 	    return type.cast(node.getParent());
 	} else {

@@ -37,10 +37,10 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  * TODO description
  * 
  * @author Soenke Holthusen
- * @deprecated {@link TypeCheck} finds all missing superclass errors
+ * @deprecated {@link TypeReferenceCheck} finds all missing superclass errors
  */
 
-public class SuperClassCheck extends AbstractCheckPlugin {
+public class SuperClassCheck extends AbstractTypeCheckPlugin {
     private Map<Feature, List<ReferenceType>> intros;
 
     public SuperClassCheck() {

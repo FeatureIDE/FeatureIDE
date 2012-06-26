@@ -16,14 +16,14 @@
          <action
                class="de.ovgu.featureide.core.typecheck.actions.TypecheckAction"
                id="de.ovgu.featureide.typecheck.check"
-               label="SPL Type Check"
+               label="Family-Based Type Check"
                menubarPath="de.ovgu.featureide.ui.menu/typechecker"
                style="push">
          </action>
          <action
                class="de.ovgu.featureide.core.typecheck.actions.TypecheckCleanAction"
                id="de.ovgu.featureide.typecheck.forcecheck"
-               label="SPL Type Check (clean)"
+               label="Family-Based Type Check (clean)"
                menubarPath="de.ovgu.featureide.ui.menu/typechecker"
                style="push">
          </action>

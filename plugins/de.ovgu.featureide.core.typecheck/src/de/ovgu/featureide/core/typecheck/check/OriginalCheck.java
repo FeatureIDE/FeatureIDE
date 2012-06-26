@@ -38,7 +38,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  * 
  * @author Soenke Holthusen
  */
-public class OriginalCheck extends AbstractCheckPlugin {
+public class OriginalCheck extends AbstractTypeCheckPlugin {
     private Map<Feature, List<MethodDecl>> method_intros;
 
     public OriginalCheck() {

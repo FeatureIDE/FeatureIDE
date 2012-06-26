@@ -37,7 +37,7 @@ import de.ovgu.featureide.core.typecheck.check.CheckPluginManager;
 import de.ovgu.featureide.core.typecheck.check.ICheckPlugin;
 import de.ovgu.featureide.core.typecheck.check.MethodCheck;
 import de.ovgu.featureide.core.typecheck.check.OriginalCheck;
-import de.ovgu.featureide.core.typecheck.check.TypeCheck;
+import de.ovgu.featureide.core.typecheck.check.TypeReferenceCheck;
 import de.ovgu.featureide.core.typecheck.correction.ConsoleProblemHandler;
 import de.ovgu.featureide.core.typecheck.correction.IProblemHandler;
 import de.ovgu.featureide.core.typecheck.correction.ProblemManager;
@@ -180,7 +180,7 @@ public class TypeChecker {
     
     public static List<ICheckPlugin> defaultCheckPlugins(){
 	List<ICheckPlugin> plugins = new ArrayList<ICheckPlugin>();
-	plugins.add(new TypeCheck());
+	plugins.add(new TypeReferenceCheck());
 	plugins.add(new OriginalCheck());
 //	plugins.add(new FieldCheck());
 //	plugins.add(new MethodCheck());
