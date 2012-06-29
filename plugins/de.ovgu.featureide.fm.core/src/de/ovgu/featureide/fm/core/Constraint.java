@@ -43,6 +43,8 @@ public class Constraint implements PropertyConstants {
 	private List<Feature> falseOptionalFeatures = new ArrayList<Feature>();
  	private ConstraintAttribute attribute = ConstraintAttribute.NORMAL;
 	
+	private List<Feature> deadFeatures = new ArrayList<Feature>();
+	
 	public Constraint(FeatureModel featureModel, Node propNode) {
 		this.featureModel = featureModel;
 		this.propNode = propNode;
@@ -179,5 +181,16 @@ public class Constraint implements PropertyConstants {
 	@Override
 	public String toString(){
 		return propNode.toString(NodeWriter.textualSymbols);
+	}
+
+	/**
+	 * @param deadFeatures
+	 */
+	public void setDeadFeatures(List<Feature> deadFeatures) {
+		this.deadFeatures  = deadFeatures; 
+	}
+	
+	public List<Feature> getDeadFeatures() {
+		return deadFeatures;
 	}
 }

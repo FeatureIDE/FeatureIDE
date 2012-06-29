@@ -49,7 +49,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 	
 	private final Label label = new Label();
 	
-	private final FreeformLayout layout = new FreeformLayout();
+	private static final FreeformLayout layout = new FreeformLayout();
 
 	private final ConnectionAnchor sourceAnchor;
 	
@@ -59,14 +59,16 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 
 	private FeatureModel featureModel;
 	
-	private String CONCRETE = " Concrete";
-	private String ABSTRACT = " Abstract";
-	private String HIDDEN = " hidden";
-	private String DEAD = "is dead ";
-	private String FEATURE = " feature ";
-	private String FALSE_OPTIONAL = "is false optional ";
-	private String VOID = " Feature Model is void ";
-	private String ROOT = " Root ";
+	private static GridLayout gl = new GridLayout();
+	
+	private static String CONCRETE = " Concrete";
+	private static String ABSTRACT = " Abstract";
+	private static String HIDDEN = " hidden";
+	private static String DEAD = "is dead ";
+	private static String FEATURE = " feature ";
+	private static String FALSE_OPTIONAL = "is false optional ";
+	private static String VOID = " Feature Model is void ";
+	private static String ROOT = " Root ";
 
 	public FeatureFigure(Feature feature, FeatureModel featureModel) {
 		super();
@@ -106,7 +108,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 			return false;
 		} else {
 			if(feature.isHidden()){
-				return feature.isHidden();
+				return true;
 			}
 			if(!feature.isRoot()){
 				return isHidden(feature.getParent());
@@ -166,7 +168,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		
 		toolTip += getRelevantConstraints();
 		Figure toolTipContent = new Figure();
-		toolTipContent.setLayoutManager(new GridLayout());
+		toolTipContent.setLayoutManager(gl);
 		toolTipContent.setFont(DEFAULT_FONT);
 		toolTipContent.add(new Label(toolTip));
 		

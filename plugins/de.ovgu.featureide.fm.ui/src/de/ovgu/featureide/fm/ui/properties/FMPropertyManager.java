@@ -20,8 +20,6 @@ package de.ovgu.featureide.fm.ui.properties;
 
 import java.util.LinkedList;
 
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.draw2d.Border;
@@ -46,157 +44,211 @@ import de.ovgu.featureide.fm.ui.properties.page.FMPropertyPage;
  * @see FMPropertyPage
  * @author Jens Meinicke
  */
-public class FMPropertyManager implements GUIDefaults {
+public class FMPropertyManager extends FMPropertyManagerDefaults implements GUIDefaults {
 
-	private static final QualifiedName QN_HIDE_LEGEND = createName("hidelegend");
-	private static final QualifiedName QN_LEGEND_FORGOUND = createName("legendforground");
-	private static final QualifiedName QN_LEGEND_BACKGROUND = createName("legendbackground");
-	private static final QualifiedName QN_LEGEND_BORDER = createName("legendboder");
-
-	private static final QualifiedName QN_LANGUAGE = createName("language");
-
-	private static final QualifiedName QN_DIAGRAM_BACKGROUND = createName("diagrambackground");
-	private static final QualifiedName QN_FEATURE_FORGROUND = createName("feature");
-	private static final QualifiedName QN_FEATURE_CONCRETE = createName("concrete");
-	private static final QualifiedName QN_FEATURE_ABSTRACT = createName("abstract");
-	private static final QualifiedName QN_FEATURE_HIDEEN_FORGROUND = createName("hiddenforground");
-	private static final QualifiedName QN_FEATURE_HIDEEN_BACKGROUND = createName("hiddenbackground");
-	private static final QualifiedName QN_FEATURE_DEAD = createName("dead");
-	private static final QualifiedName QN_FEATURE_FALSE_OPT = createName("falseoptional");
-	private static final QualifiedName QN_CONSTRAINT = createName("constraint");
-	private static final QualifiedName QN_CONNECTION = createName("connection");
-	private static final QualifiedName QN_WARNING = createName("warning");
-
-	private static final QualifiedName QN_LAYOUT_MARGIN_X = createName("margin_x");
-	private static final QualifiedName QN_LAYOUT_MARGIN_Y = createName("margin_y");
-	private static final QualifiedName QN_FEATURE_X = createName("feature_x");
-	private static final QualifiedName QN_FEATURE_Y = createName("feature_y");
-	private static final QualifiedName QN_CONSTRAINT_SPACE = createName("constraint_space");
-
-	private static final String TRUE = "true";
-	private static final String FALSE = "false";
-
-	public static final IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-
+	/*°****************************************************
+	 * current values
+	 ******************************************************/
+	private volatile static Boolean CURRENT_HIDE_LEGEND = null;
+	private volatile static Color CURRENT_LEGEND_FORGOUND = null;
+	private volatile static Color CURRENT_LEGEND_BACKGROUND = null;
+	private volatile static Color CURRENT_DECORATOR_FORGROUND_COLOR = null;
+	private volatile static Color CURRENT_FEATURE_FOREGROUND = null;
+	private volatile static Color CURRENT_CONCRETE_BACKGROUND = null;
+	private volatile static Color CURRENT_ABSTRACT_BACKGROUND = null;
+	private volatile static Color CURRENT_CONNECTION_FOREGROUND = null;
+	private volatile static Color CURRENT_DIAGRAM_BACKGROUND = null;
+	private volatile static Color CURRENT_LEGEND_BORDER_COLOR = null;
+	private volatile static Color CURRENT_HIDDEN_FOREGROUND = null;
+	private volatile static Color CURRENT_HIDDEN_BACKGROUND = null;
+	private volatile static Color CURRENT_DEAD_BACKGROUND = null;
+	private volatile static Color CURRENT_FEATURE_DEAD = null;
+	private volatile static Color CURRENT_CONSTRAINT_BACKGROUND = null;
+	private volatile static Color CURRENT_WARNING_BACKGROUND = null;
+	private volatile static Integer CURRENT_CONSTRAINT_SPACE_Y = null;
+	private volatile static Integer CURRENT_FEATURE_SPACE_Y = null;
+	private volatile static Integer CURRENT_FEATURE_SPACE_X = null;
+	private volatile static Integer CURRENT_LAYOUT_MARGIN_Y = null;
+	private volatile static Integer CURRENT_LAYOUT_MARGIN_X = null;
+	
 	public static void setHideLegend(boolean value) {
+		CURRENT_HIDE_LEGEND = value;
 		setBoolean(QN_HIDE_LEGEND, value);
 	}
 
 	public static boolean isLegendHidden() {
-		return getBoolean(QN_HIDE_LEGEND);
+		if (CURRENT_HIDE_LEGEND == null) {
+			CURRENT_HIDE_LEGEND = getBoolean(QN_HIDE_LEGEND);
+		}
+		return CURRENT_HIDE_LEGEND;
 	}
 
 	public static void setLegendForgroundColor(Color color) {
+		CURRENT_LEGEND_FORGOUND = color;
 		setColor(QN_LEGEND_FORGOUND, color);
 	}
 
 	public static Color getLegendForgroundColor() {
-		return getColor(QN_LEGEND_FORGOUND, LEGEND_FOREGROUND);
+		if (CURRENT_LEGEND_FORGOUND == null) {
+			CURRENT_LEGEND_FORGOUND = getColor(QN_LEGEND_FORGOUND, LEGEND_FOREGROUND); 
+		}
+		return CURRENT_LEGEND_FORGOUND;
 	}
 
 	public static void setLegendBackgroundColor(Color color) {
+		CURRENT_LEGEND_BACKGROUND = color;
 		setColor(QN_LEGEND_BACKGROUND, color);
 	}
 
 	public static Color getLegendBackgroundColor() {
-		return getColor(QN_LEGEND_BACKGROUND, LEGEND_BACKGROUND);
+		if (CURRENT_LEGEND_BACKGROUND == null) {
+			CURRENT_LEGEND_BACKGROUND = getColor(QN_LEGEND_BACKGROUND, LEGEND_BACKGROUND);
+		}
+		return CURRENT_LEGEND_BACKGROUND;
 	}
 
 	public static void setLegendBorderColor(Color color) {
+		CURRENT_LEGEND_BORDER_COLOR = color;
 		setColor(QN_LEGEND_BORDER, color);
 	}
 
 	public static Color getLegendBorderColor() {
-		return getColor(QN_LEGEND_BORDER, LEGEND_BORDER_COLOR);
-	}
-
-	public static Color getFeatureForgroundColor() {
-		return getColor(QN_FEATURE_FORGROUND, FEATURE_FOREGROUND);
+		if (CURRENT_LEGEND_BORDER_COLOR == null) {
+			CURRENT_LEGEND_BORDER_COLOR = getColor(QN_LEGEND_BORDER, LEGEND_BORDER_COLOR);
+		}
+		return CURRENT_LEGEND_BORDER_COLOR;
 	}
 
 	public static void setFeatureForgroundColor(Color color) {
+		CURRENT_FEATURE_FOREGROUND = color;
 		setColor(QN_FEATURE_FORGROUND, color);
+	}
+	
+	public static Color getFeatureForgroundColor() {
+		if (CURRENT_FEATURE_FOREGROUND == null) {
+			CURRENT_FEATURE_FOREGROUND = getColor(QN_FEATURE_FORGROUND, FEATURE_FOREGROUND);
+		}
+		return CURRENT_FEATURE_FOREGROUND;
 	}
 
 	public static Color getDiagramBackgroundColor() {
-		return getColor(QN_DIAGRAM_BACKGROUND, DIAGRAM_BACKGROUND);
+		if (CURRENT_DIAGRAM_BACKGROUND == null) {
+			CURRENT_DIAGRAM_BACKGROUND = getColor(QN_DIAGRAM_BACKGROUND, DIAGRAM_BACKGROUND);
+		}
+		return CURRENT_DIAGRAM_BACKGROUND ;
 	}
 
 	public static void setDiagramBackgroundColor(Color color) {
+		CURRENT_DIAGRAM_BACKGROUND = color;
 		setColor(QN_DIAGRAM_BACKGROUND, color);
 	}
 
-	public static Color getConcreteFeatureBackgroundColor() {
-		return getColor(QN_FEATURE_CONCRETE, CONCRETE_BACKGROUND);
-	}
-
 	public static void setConcreteFeatureBackgroundColor(Color color) {
+		CURRENT_CONCRETE_BACKGROUND = color;
 		setColor(QN_FEATURE_CONCRETE, color);
+	}
+	
+	public static Color getConcreteFeatureBackgroundColor() {
+		if (CURRENT_CONCRETE_BACKGROUND == null) {
+			CURRENT_CONCRETE_BACKGROUND = getColor(QN_FEATURE_CONCRETE, CONCRETE_BACKGROUND);
+		}
+		return CURRENT_CONCRETE_BACKGROUND;
 	}
 
 	public static Color getAbstractFeatureBackgroundColor() {
-		return getColor(QN_FEATURE_ABSTRACT, ABSTRACT_BACKGROUND);
+		if (CURRENT_ABSTRACT_BACKGROUND == null) {
+			CURRENT_ABSTRACT_BACKGROUND = getColor(QN_FEATURE_ABSTRACT, ABSTRACT_BACKGROUND);
+		}
+		return CURRENT_ABSTRACT_BACKGROUND;
 	}
 
 	public static void setAbstractFeatureBackgroundColor(Color color) {
+		CURRENT_ABSTRACT_BACKGROUND = color;
 		setColor(QN_FEATURE_ABSTRACT, color);
 	}
 
 	public static Color getHiddenFeatureForgroundColor() {
-		return getColor(QN_FEATURE_HIDEEN_FORGROUND, HIDDEN_FOREGROUND);
+		if (CURRENT_HIDDEN_FOREGROUND == null) {
+			CURRENT_HIDDEN_FOREGROUND = getColor(QN_FEATURE_HIDEEN_FORGROUND, HIDDEN_FOREGROUND);
+		}
+		return CURRENT_HIDDEN_FOREGROUND ;
 	}
 
 	public static void setHiddenFeatureForgroundColor(Color color) {
+		CURRENT_HIDDEN_FOREGROUND = color;
 		setColor(QN_FEATURE_HIDEEN_FORGROUND, color);
 	}
 
 	public static Color getHiddenFeatureBackgroundColor() {
-		return getColor(QN_FEATURE_HIDEEN_BACKGROUND, HIDDEN_BACKGROUND);
+		if (CURRENT_HIDDEN_BACKGROUND == null) {
+			CURRENT_HIDDEN_BACKGROUND = getColor(QN_FEATURE_HIDEEN_BACKGROUND, HIDDEN_BACKGROUND);
+		}
+		return CURRENT_HIDDEN_BACKGROUND;
 	}
 
 	public static void setHiddenFeatureBackgroundColor(Color color) {
+		CURRENT_HIDDEN_BACKGROUND = color;
 		setColor(QN_FEATURE_HIDEEN_BACKGROUND, color);
 	}
 
 	public static Color getDeadFeatureBackgroundColor() {
-		return getColor(QN_FEATURE_DEAD, DEAD_BACKGROUND);
+		if (CURRENT_DEAD_BACKGROUND == null) {
+			CURRENT_DEAD_BACKGROUND  = getColor(QN_FEATURE_DEAD, DEAD_BACKGROUND);
+		}
+		return CURRENT_DEAD_BACKGROUND;
 	}
 
 	public static void setDeadFeatureBackgroundColor(Color color) {
-		setColor(QN_FEATURE_FALSE_OPT, color);
+		CURRENT_DEAD_BACKGROUND = color;
+		setColor(QN_FEATURE_DEAD, color);
 	}
 
 
 	public static Color getFalseOptionalFeatureBackgroundColor() {
-		return getColor(QN_FEATURE_DEAD, WARNING_BACKGROUND);
+		if (CURRENT_FEATURE_DEAD == null) {
+			CURRENT_FEATURE_DEAD = getColor(QN_FEATURE_DEAD, DEAD_BACKGROUND);
+		}
+		return CURRENT_FEATURE_DEAD;
 	}
 	
 	public static void setFalseOptionalFeatureBackgroundColor(Color color) {
-		
+		CURRENT_FEATURE_DEAD = color;
 		setColor(QN_FEATURE_DEAD, color);
 	}
 	
 	public static Color getConstraintBackgroundColor() {
-		return getColor(QN_CONSTRAINT, CONSTRAINT_BACKGROUND);
+		if (CURRENT_CONSTRAINT_BACKGROUND == null) {
+			CURRENT_CONSTRAINT_BACKGROUND = getColor(QN_CONSTRAINT, CONSTRAINT_BACKGROUND);
+		}
+		return CURRENT_CONSTRAINT_BACKGROUND;
 	}
 
 	public static void setConstraintBackgroundColor(Color color) {
+		CURRENT_CONSTRAINT_BACKGROUND = color;
 		setColor(QN_CONSTRAINT, color);
 	}
 
-	public static Color getConnectionForgroundColor() {
-		return getColor(QN_CONNECTION, CONNECTION_FOREGROUND);
-	}
-
 	public static void setConnectionForgroundColor(Color color) {
+		CURRENT_CONNECTION_FOREGROUND = color;
 		setColor(QN_CONNECTION, color);
+	}
+	
+	public static Color getConnectionForgroundColor() {
+		if (CURRENT_CONNECTION_FOREGROUND == null) {
+			CURRENT_CONNECTION_FOREGROUND  = getColor(QN_CONNECTION, CONNECTION_FOREGROUND);
+		}
+		return CURRENT_CONNECTION_FOREGROUND;
 	}
 
 	public static Color getWarningColor() {
-		return getColor(QN_WARNING, WARNING_BACKGROUND);
+		if (CURRENT_WARNING_BACKGROUND == null) {
+			CURRENT_WARNING_BACKGROUND = getColor(QN_WARNING, WARNING_BACKGROUND);
+		}
+		return CURRENT_WARNING_BACKGROUND;
 	}
 
 	public static void setWarningColor(Color color) {
+		CURRENT_WARNING_BACKGROUND = color;
 		setColor(QN_WARNING, color);
 	}
 
@@ -212,42 +264,62 @@ public class FMPropertyManager implements GUIDefaults {
 	}
 
 	public static int getLayoutMarginX() {
-		return getInt(QN_LAYOUT_MARGIN_X, LAYOUT_MARGIN_X);
+		if (CURRENT_LAYOUT_MARGIN_X == null) {
+			CURRENT_LAYOUT_MARGIN_X = getInt(QN_LAYOUT_MARGIN_X, LAYOUT_MARGIN_X);
+		}
+		return CURRENT_LAYOUT_MARGIN_X;
 	}
 
 	public static void setlayoutMagrginX(int value) {
+		CURRENT_LAYOUT_MARGIN_X = value;
 		setInt(QN_LAYOUT_MARGIN_X, value);
 	}
 
 	public static int getLayoutMarginY() {
-		return getInt(QN_LAYOUT_MARGIN_Y, LAYOUT_MARGIN_Y);
+		if (CURRENT_LAYOUT_MARGIN_Y == null) {
+			CURRENT_LAYOUT_MARGIN_Y = getInt(QN_LAYOUT_MARGIN_Y, LAYOUT_MARGIN_Y);
+		}
+		return CURRENT_LAYOUT_MARGIN_Y;
 	}
 
 	public static void setlayoutMagrginY(int value) {
+		CURRENT_LAYOUT_MARGIN_Y = value;
 		setInt(QN_LAYOUT_MARGIN_Y, value);
 	}
 
 	public static int getFeatureSpaceX() {
-		return getInt(QN_FEATURE_X, FEATURE_SPACE_X);
+		if (CURRENT_FEATURE_SPACE_X == null) {
+			CURRENT_FEATURE_SPACE_X = getInt(QN_FEATURE_X, FEATURE_SPACE_X);
+		}
+		return CURRENT_FEATURE_SPACE_X;
 	}
 
 	public static void setFeatureSpaceX(int value) {
+		CURRENT_FEATURE_SPACE_X = value;
 		setInt(QN_FEATURE_X, value);
 	}
 
 	public static int getFeatureSpaceY() {
-		return getInt(QN_FEATURE_Y, FEATURE_SPACE_Y);
+		if (CURRENT_FEATURE_SPACE_Y == null) {
+			CURRENT_FEATURE_SPACE_Y = getInt(QN_FEATURE_Y, FEATURE_SPACE_Y);
+		}
+		return CURRENT_FEATURE_SPACE_Y;
 	}
 
 	public static void setFeatureSpaceY(int value) {
+		CURRENT_FEATURE_SPACE_Y =  value;
 		setInt(QN_FEATURE_Y, value);
 	}
 
 	public static int getConstraintSpace() {
-		return getInt(QN_CONSTRAINT_SPACE, CONSTRAINT_SPACE_Y);
+		if (CURRENT_CONSTRAINT_SPACE_Y == null) {
+			CURRENT_CONSTRAINT_SPACE_Y = getInt(QN_CONSTRAINT_SPACE, CONSTRAINT_SPACE_Y);
+		}
+		return CURRENT_CONSTRAINT_SPACE_Y;
 	}
 
 	public static void setConstraintSpace(int value) {
+		CURRENT_CONSTRAINT_SPACE_Y = value;
 		setInt(QN_CONSTRAINT_SPACE, value);
 	}
 
@@ -318,7 +390,10 @@ public class FMPropertyManager implements GUIDefaults {
 	}
 
 	public static Color getDecoratorForgroundColor() {
-		return getConnectionForgroundColor();
+		if (CURRENT_DECORATOR_FORGROUND_COLOR  == null) {
+			CURRENT_DECORATOR_FORGROUND_COLOR = getConnectionForgroundColor();
+		}
+		return CURRENT_DECORATOR_FORGROUND_COLOR;
 	}
 
 	public static Color getDecoratorBackgroundColor() {
@@ -457,15 +532,6 @@ public class FMPropertyManager implements GUIDefaults {
 		}
 	}
 
-	/**
-	 * Creates a Qualified name.
-	 * @param name the identifier for the QualifiedName
-	 * @return The new QualifiedName
-	 */
-	private static QualifiedName createName(String name) {
-		return new QualifiedName(FMCorePlugin.PLUGIN_ID + "." + name, FMCorePlugin.PLUGIN_ID + "." + name);
-	}
-
 	public static LinkedList<QualifiedName> getQualifiedNames() {
 		LinkedList<QualifiedName> names = new LinkedList<QualifiedName>();
 		names.add(QN_HIDE_LEGEND);
@@ -490,6 +556,5 @@ public class FMPropertyManager implements GUIDefaults {
 		names.add(QN_CONSTRAINT_SPACE);
 		return names;
 	}
-
 
 }

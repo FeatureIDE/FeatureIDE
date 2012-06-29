@@ -20,6 +20,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.FreeformLayout;
+import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
@@ -54,6 +55,12 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 	public final static String DEAD_FEATURE = " Constraint makes following features dead: ";
 	public final static String FALSE_OPTIONAL = " Constraint makes following features false optional: ";
 	public final static String REDUNDANCE = " Constraint is redundant and could be removed. ";
+
+	private static final IFigure VOID_LABEL = new Label(VOID_MODEL);
+
+	private static final IFigure UNSATISFIABLE_LABEL = new Label(UNSATISFIABLE);
+
+	private static final IFigure TAUTOLOGY_LABEL = new Label(TAUTOLOGY);
 	
 	public ConstraintFigure(Constraint constraint) {
 		super();
@@ -75,7 +82,7 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 		if (FeatureUIHelper.getLocation(constraint) != null)
 			setLocation(FeatureUIHelper.getLocation(constraint));
 		
-		setConstraintProperties(true);
+		setConstraintProperties(false);
 	}
 	
 	public void setConstraintProperties(boolean calc){
@@ -96,38 +103,33 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 	private void setConstraintError(){
 		if (constraint.getConstraintAttribute() == ConstraintAttribute.VOID_MODEL){
 			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
-			setToolTip(new Label(VOID_MODEL));
+			setToolTip(VOID_LABEL);
 			
 		} else if (constraint.getConstraintAttribute() == ConstraintAttribute.UNSATISFIABLE) {
 			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
-			setToolTip(new Label(UNSATISFIABLE));
+			setToolTip(UNSATISFIABLE_LABEL);
 		}
 		
 	}
 	
 	private void setConstraintWarning(){	
-		
 		if (constraint.getConstraintAttribute() == ConstraintAttribute.TAUTOLOGY){
 			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
-			setToolTip(new Label(TAUTOLOGY));	
+			setToolTip(TAUTOLOGY_LABEL);	
 			return;
 		}
 		
-
-		// TODO Thomas: this long calculation should be done in analyzeFeatureModel()
-		if (!constraint.getDeadFeatures(constraint.getFeatureModel()).isEmpty()){
+		if (constraint.getConstraintAttribute() == ConstraintAttribute.DEAD){
 			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 			StringBuilder toolTip = new StringBuilder(); 
 			toolTip.append(DEAD_FEATURE);
-			for (Feature dead : constraint.getDeadFeatures(constraint.getFeatureModel())) {
+			for (Feature dead : constraint.getDeadFeatures()) {
 				toolTip.append("\n " + dead.toString());
 			}
 			setToolTip(new Label(toolTip.toString()));	
 			return;
 		}
 		
-
-		// TODO Thomas: this long calculation should be done in analyzeFeatureModel()
 		if (!constraint.getFalseOptional().isEmpty()){
 			setBackgroundColor(FMPropertyManager.getWarningColor());
 			StringBuilder toolTip = new StringBuilder();
@@ -138,7 +140,6 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 			return;
 		}
 		
-
 		if (constraint.getConstraintAttribute() == ConstraintAttribute.REDUNDANT){
 			setBackgroundColor(FMPropertyManager.getWarningColor());
 			setToolTip(new Label(REDUNDANCE));	

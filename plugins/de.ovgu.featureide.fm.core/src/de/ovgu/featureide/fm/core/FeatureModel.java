@@ -20,6 +20,7 @@ package de.ovgu.featureide.fm.core;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -488,7 +489,7 @@ public class FeatureModel implements PropertyConstants {
 	}
 
 	public Collection<Feature> getFeatures() {
-		return Collections.unmodifiableCollection(featureTable.values());
+		return new ArrayList<Feature>(featureTable.values());
 	}
 
 	/*

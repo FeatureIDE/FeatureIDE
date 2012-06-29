@@ -138,7 +138,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	private int index;
 
 	private Job analyzingJob;
-
+	
 	public FeatureDiagramEditor(FeatureModelEditor featureModelEditor,
 			Composite container) {
 		super();
@@ -153,7 +153,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		zoomManager = rootEditPart.getZoomManager();
 		zoomManager.setZoomLevels(new double[] { 0.05, 0.10, 0.25, 0.50, 0.75,
 				0.90, 1.00, 1.10, 1.25, 1.50, 2.00, 2.50, 3.00, 4.00 });
-		
 	}
 
 	void initializeGraphicalViewer() {
@@ -386,58 +385,80 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		// refresh position of all feature figures
 		getContents().refresh();
 	}
+	
+	boolean waiting = false;
 
 	public void refresh() {
 		if (getFeatureModel() == null || getFeatureModel().getRoot() == null)
 			return;
-		
-		// waiting for job to be actually canceled
-		// XXX check if this stops the UI
-		try {
-			if (analyzingJob != null) {
-				analyzingJob.join();
-			}
-		} catch (InterruptedException e) {
-			FMUIPlugin.getDefault().logError(e);
-		}
-		analyzingJob = new Job("Analyzing feature model") {
 
+		if (waiting) {
+			return;
+		}
+		waiting = true;
+		
+		/**
+		 * This extra job is necessary, else the UI will stop. 
+		 */
+		Job waiter = new Job("Analyzing feature model") {
+			
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
-
-				final HashMap<Object, Object> changedAttributes = getFeatureModel()
-						.getAnalyser().analyzeFeatureModel();
-
-				UIJob refreshGraphics = new UIJob(
-						"Updating feature model attributes") {
-
-					@Override
-					public IStatus runInUIThread(IProgressMonitor monitor) {
-
-						for (Object f : changedAttributes.keySet()) {
-							if (f instanceof Feature) {
-							((Feature) f).fire(new PropertyChangeEvent(
-										this, ATTRIBUTE_CHANGED, false, true));
-							} else if (f instanceof Constraint) {
-								((Constraint) f).fire(new PropertyChangeEvent(
-										this, ATTRIBUTE_CHANGED, false, true));
-							}
-						}
-						//call refresh to redraw legend
-						getContents().refresh();
-						return Status.OK_STATUS;
+				try {
+					if (analyzingJob != null) {
+						// waiting for analyzing job to finish
+						analyzingJob.join();
 					}
-
+				} catch (InterruptedException e) {
+					FMUIPlugin.getDefault().logError(e);
+				} finally {
+					// avoid a dead lock
+					waiting = false;
+				}
+				waiting = false;
+				
+				analyzingJob = new Job("Analyzing feature model") {
+		
+					@Override
+					protected IStatus run(IProgressMonitor monitor) {
+						final HashMap<Object, Object> changedAttributes = getFeatureModel()
+								.getAnalyser().analyzeFeatureModel();
+		
+						UIJob refreshGraphics = new UIJob(
+								"Updating feature model attributes") {
+		
+							@Override
+							public IStatus runInUIThread(IProgressMonitor monitor) {
+		
+								for (Object f : changedAttributes.keySet()) {
+									if (f instanceof Feature) {
+										((Feature) f).fire(new PropertyChangeEvent(
+												this, ATTRIBUTE_CHANGED, false, true));
+									} else if (f instanceof Constraint) {
+										((Constraint) f).fire(new PropertyChangeEvent(
+												this, ATTRIBUTE_CHANGED, false, true));
+									}
+								}
+								
+								//call refresh to redraw legend
+								getContents().refresh();
+								return Status.OK_STATUS;
+							}
+		
+						};
+						refreshGraphics.setPriority(Job.DECORATE);
+						refreshGraphics.schedule();
+						return Status.OK_STATUS;
+					};
+		
 				};
-				refreshGraphics.setPriority(Job.DECORATE);
-				refreshGraphics.schedule();
+				analyzingJob.setPriority(Job.DECORATE);
+				analyzingJob.schedule();
 				return Status.OK_STATUS;
-			};
-
+			}
 		};
-		analyzingJob.setPriority(Job.DECORATE);
-		analyzingJob.schedule();
-
+		waiter.setPriority(Job.DECORATE);
+		waiter.schedule();
 		internRefresh();
 	}
 

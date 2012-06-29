@@ -18,6 +18,7 @@
  */
 package de.ovgu.featureide.fm.core.editing;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -66,7 +67,7 @@ public class NodeCreator {
 			// convert grammar rules into propositional formulas
 			createNodes(nodes, root, featureModel, true, replacingMap);
 			// add extra constraints
-			for (Node node : featureModel.getPropositionalNodes())
+			for (Node node : new ArrayList<Node>(featureModel.getPropositionalNodes()))
 				nodes.add(node.clone());
 		}
 		And and = new And(nodes);

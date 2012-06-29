@@ -35,6 +35,7 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
+import de.ovgu.featureide.fm.ui.properties.FMPropertyManagerDefaults;
 import de.ovgu.featureide.fm.ui.properties.language.English;
 import de.ovgu.featureide.fm.ui.properties.language.ILanguage;
 

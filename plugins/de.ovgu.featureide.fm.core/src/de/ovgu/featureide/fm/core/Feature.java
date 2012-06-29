@@ -471,10 +471,11 @@ public class Feature implements PropertyConstants {
 			listener.propertyChange(event);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Feature clone() {
 		Feature feature = new Feature(featureModel, name);
-		for (Feature child : children) {
+		for (Feature child : (LinkedList<Feature>)children.clone()) {
 			feature.addChild(child.clone());
 		}
 		feature.and = and;

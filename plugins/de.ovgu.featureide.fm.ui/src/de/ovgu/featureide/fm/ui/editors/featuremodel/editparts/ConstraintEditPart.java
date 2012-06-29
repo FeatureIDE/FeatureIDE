@@ -64,8 +64,7 @@ public class ConstraintEditPart extends AbstractGraphicalEditPart implements
 
 	@Override
 	protected void createEditPolicies() {
-		installEditPolicy(EditPolicy.SELECTION_FEEDBACK_ROLE,
-				new NonResizableEditPolicy());
+		installEditPolicy(EditPolicy.SELECTION_FEEDBACK_ROLE, new NonResizableEditPolicy());
 
 	}
 
