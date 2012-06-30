@@ -81,7 +81,7 @@ public class FIDEProblemHandler implements IProblemHandler {
 	String path = problem.getFilename().split(
 		project.getSourceFolder().getFullPath().toString())[1];
 	IFile file = project.getSourceFolder().getFile(path);
-	project.createBuilderMarker(file, problem.toString(),
+	project.createBuilderMarker(file, problem.getMessage(),
 		problem.getLinenumber(), 2);
 	marked_files.add(file);
     }

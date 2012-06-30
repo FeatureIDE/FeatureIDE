@@ -113,8 +113,9 @@ public class OriginalCheck extends AbstractTypeCheckPlugin {
 				    FujiWrapper.getParentByType(md,
 					    CompilationUnit.class).pathName(),
 				    ma.lineNumber(),
-				    "Missing dependency to original() method: "
-					    + md.signature(),
+//				    "Missing dependency to original() method: "
+				    "Method " + md.hostType().name() + "." + md.signature() + " can not be accessed in Feature"
+					    + f.getName() + ".",
 				    providing_features.keySet()));
 			}
 		    }

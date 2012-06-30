@@ -111,8 +111,7 @@ public class TypeReferenceCheck extends AbstractTypeCheckPlugin {
 			    newProblem(new CheckProblem(f, ta.hostType(), cd
 				    //.compilationUnit()
 				    .pathName(),
-				    ta.lineNumber(), "Missing type dependency "
-					    + ta.name(), providing_features));
+				    ta.lineNumber(), "Class " + ta.name() + " can not be accessed in Feature " + f.getName(), providing_features));
 			}
 		    }
 		}
