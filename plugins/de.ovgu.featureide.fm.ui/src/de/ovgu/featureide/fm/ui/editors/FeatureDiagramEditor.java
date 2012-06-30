@@ -392,6 +392,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		if (getFeatureModel() == null || getFeatureModel().getRoot() == null)
 			return;
 
+		internRefresh();
+				
 		if (waiting) {
 			return;
 		}
@@ -421,6 +423,10 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		
 					@Override
 					protected IStatus run(IProgressMonitor monitor) {
+						if (waiting) {
+							return Status.OK_STATUS;
+						}
+
 						final HashMap<Object, Object> changedAttributes = getFeatureModel()
 								.getAnalyser().analyzeFeatureModel();
 		
@@ -429,7 +435,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		
 							@Override
 							public IStatus runInUIThread(IProgressMonitor monitor) {
-		
 								for (Object f : changedAttributes.keySet()) {
 									if (f instanceof Feature) {
 										((Feature) f).fire(new PropertyChangeEvent(
@@ -446,7 +451,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 							}
 		
 						};
-						refreshGraphics.setPriority(Job.DECORATE);
+						refreshGraphics.setPriority(Job.SHORT);
 						refreshGraphics.schedule();
 						return Status.OK_STATUS;
 					};
@@ -459,7 +464,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		};
 		waiter.setPriority(Job.DECORATE);
 		waiter.schedule();
-		internRefresh();
 	}
 
 	public void setLayout() {

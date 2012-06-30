@@ -312,6 +312,7 @@ public class NodeCreator {
 		return node;
 	}
 
+	@SuppressWarnings("unchecked")
 	private static void createNodes(LinkedList<Node> nodes,
 			Feature rootFeature, FeatureModel featureModel, boolean recursive,
 			HashMap<Object, Node> replacings) {
@@ -359,7 +360,7 @@ public class NodeCreator {
 		}
 
 		if (recursive)
-			for (Feature feature : rootFeature.getChildren())
+			for (Feature feature : (LinkedList<Feature>)rootFeature.getChildren().clone())
 				createNodes(nodes, feature, featureModel, true, replacings);
 	}
 

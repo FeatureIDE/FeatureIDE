@@ -117,8 +117,6 @@ public class PPModelBuilder {
 			
 			if (feature != null) {
 				feature.directives.add(d);
-			} else {
-				System.out.println();
 			}
 			addDirectivesToModel(d.getChildrenList(), res);
 		}

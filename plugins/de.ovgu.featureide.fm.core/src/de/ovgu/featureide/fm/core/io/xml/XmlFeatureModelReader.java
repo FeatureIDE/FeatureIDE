@@ -58,14 +58,10 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
  */
 public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 
-//	public XmlFeatureModelReader(FeatureModel featureModel,IProject project) {
-//		setFeatureModel(featureModel);
-//		featureModel.getFMComposerExtension(project);
-//	}
-    
 	public XmlFeatureModelReader(FeatureModel featureModel) {
 		setFeatureModel(featureModel);
 	}
+	
 	/**
 	 * A kind of mind for the hirachy of the xml model
 	 */

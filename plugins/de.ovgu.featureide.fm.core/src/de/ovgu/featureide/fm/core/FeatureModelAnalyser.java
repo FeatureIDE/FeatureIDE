@@ -310,15 +310,14 @@ public class FeatureModelAnalyser {
 	 *         if Feature
 	 */
 	public HashMap<Object, Object> analyzeFeatureModel() {
-
 		HashMap<Object, Object> oldAttributes = new HashMap<Object, Object>();
-
 		HashMap<Object, Object> changedAttributes = new HashMap<Object, Object>();
+		
 		updateFeatures(oldAttributes, changedAttributes);
 		updateConstraints(oldAttributes, changedAttributes);
+		
 		// put root always in so it will be refreshed (void/non-void)
 		changedAttributes.put(fm.getRoot(), ConstraintAttribute.VOID_MODEL);
-
 		return changedAttributes;
 	}
 
@@ -329,8 +328,11 @@ public class FeatureModelAnalyser {
 	private void updateConstraints(HashMap<Object, Object> oldAttributes,
 			HashMap<Object, Object> changedAttributes) {
 		// update constraints
+		
+		FeatureModel clone = fm.clone();
+		LinkedList<Feature> fmDeadFeatures = clone.getAnalyser().getDeadFeatures();
 		try {
-			for (Constraint constraint : fm.getConstraints()) {
+			for (Constraint constraint : new ArrayList<Constraint>(fm.getConstraints())) {
 				oldAttributes.put(constraint,
 						constraint.getConstraintAttribute());
 				constraint.setContainedFeatures(constraint.getNode());
@@ -359,29 +361,24 @@ public class FeatureModelAnalyser {
 				}
 
 				if (fm.valid) {
-					if (!constraint.getDeadFeatures(constraint.getFeatureModel()).isEmpty()){
-						constraint.setDeadFeatures(constraint.getDeadFeatures(constraint.getFeatureModel()));
-						
+					List<Feature> deadFeatures = constraint.getDeadFeatures(clone, fmDeadFeatures);
+					if (!deadFeatures.isEmpty()){
+						constraint.setDeadFeatures(deadFeatures);
 						constraint.setConstraintAttribute(ConstraintAttribute.DEAD, false);
 						changedAttributes.put(constraint, ConstraintAttribute.DEAD);
 					}
 					
-					// // redundant constraint?
-					//
-					 FeatureModel dirtyModel = fm.clone();
-					 dirtyModel.removePropositionalNode(constraint.getNode());
-					 ModelComparator comparator = new ModelComparator(500);
-					 Comparison comparison = comparator.compare(fm, dirtyModel);
-					 if (comparison == Comparison.REFACTORING) {
-					 if (oldAttributes.get(constraint) !=
-					 ConstraintAttribute.REDUNDANT) {
-					 changedAttributes.put(constraint,
-					 ConstraintAttribute.REDUNDANT);
-					
-					 }
-					 constraint.setConstraintAttribute(
-					 ConstraintAttribute.REDUNDANT, false);
-					 }
+					// redundant constraint?
+					FeatureModel dirtyModel = fm.clone();
+					dirtyModel.removePropositionalNode(constraint.getNode());
+					ModelComparator comparator = new ModelComparator(500);
+					Comparison comparison = comparator.compare(fm, dirtyModel);
+					if (comparison == Comparison.REFACTORING) {
+						if (oldAttributes.get(constraint) != ConstraintAttribute.REDUNDANT) {
+							changedAttributes.put(constraint, ConstraintAttribute.REDUNDANT);
+						}
+						constraint.setConstraintAttribute(ConstraintAttribute.REDUNDANT, false);
+					}
 				}
 				// makes feature model void?
 				else {
@@ -420,9 +417,7 @@ public class FeatureModelAnalyser {
 				}
 			}
 		} catch (ConcurrentModificationException e) {
-			// TODO: find cause for that exception
-			// it does not seem to have any negative effect but should be
-			// avoided
+			FMCorePlugin.getDefault().logError(e);
 		}
 
 	}

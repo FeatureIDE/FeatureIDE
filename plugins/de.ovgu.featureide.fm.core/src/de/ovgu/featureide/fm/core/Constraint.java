@@ -20,6 +20,7 @@ package de.ovgu.featureide.fm.core;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.AbstractCollection;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -39,8 +40,8 @@ public class Constraint implements PropertyConstants {
 	private Node propNode;
 	private FMPoint location = new FMPoint(0,0);
 	private boolean featureSelected = false;
-	private List<Feature> containedFeatureList = new ArrayList<Feature>();
-	private List<Feature> falseOptionalFeatures = new ArrayList<Feature>();
+	private List<Feature> containedFeatureList = new LinkedList<Feature>();
+	private List<Feature> falseOptionalFeatures = new LinkedList<Feature>();
  	private ConstraintAttribute attribute = ConstraintAttribute.NORMAL;
 	
 	private List<Feature> deadFeatures = new ArrayList<Feature>();
@@ -62,24 +63,27 @@ public class Constraint implements PropertyConstants {
 		return featureModel;
 	}
 	
-	public List<Feature> getDeadFeatures(FeatureModel model) {
-		List<Feature> deadFeaturesBefore = null;
-		FeatureModel clonedModel = model.clone();
-		
+	/**
+	 * Looks for all dead features if they ares caused dead by this constraint
+	 * @param fm The model
+	 * @param fmDeadFeatures The dead features of this model (This is calculated before, so the need to be generated only once)
+	 * @return The dead features caused by this constraint
+	 */
+	public List<Feature> getDeadFeatures(FeatureModel fm, AbstractCollection<Feature> fmDeadFeatures) {
+		List<Feature> deadFeaturesBefore = null;		
 		Node propNode = this.getNode();
 
 		if (propNode != null) {
 			if (this != null) {
-				clonedModel.removePropositionalNode(this);
+				fm.removePropositionalNode(this);
 			}
-			deadFeaturesBefore = clonedModel.getAnalyser().getDeadFeatures();
-			clonedModel.addPropositionalNode(propNode);
-			clonedModel.handleModelDataChanged();
+			deadFeaturesBefore = fm.getAnalyser().getDeadFeatures();
+			fm.addPropositionalNode(propNode);
+			fm.handleModelDataChanged();
 		}
 
-		List<Feature> deadFeaturesAfter = new ArrayList<Feature>();
-
-		for (Feature l : clonedModel.getAnalyser().getDeadFeatures()) {
+		List<Feature> deadFeaturesAfter = new LinkedList<Feature>();
+		for (Feature l : fmDeadFeatures) {
 			if (!deadFeaturesBefore.contains(l)) {
 				deadFeaturesAfter.add(l);
 
@@ -89,8 +93,8 @@ public class Constraint implements PropertyConstants {
 	}
 	
 	public void setConstraintAttribute(ConstraintAttribute attri, boolean fire){
-	this.attribute = attri;
-	if(fire)fire(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
+		this.attribute = attri;
+		if(fire)fire(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
 	}
 	
 	public ConstraintAttribute getConstraintAttribute(){
@@ -125,6 +129,8 @@ public class Constraint implements PropertyConstants {
 	}
 	
 	// TODO Thomas: this method looks really weird, please revise
+	// TODO this calculation does not always work, e.g. if a child of a feature must be selected in because of a constraint
+	// the parent feature could be false optional(The feature is marked as false optional)
 	public boolean setFalseOptionalFeatures(){
 		falseOptionalFeatures.clear();
 		boolean found=false;
@@ -164,16 +170,12 @@ public class Constraint implements PropertyConstants {
 	
 	@Override
 	public boolean equals(Object obj){
-		
-		
-			if (this == obj)
-				return true;
-			if (!(obj instanceof Constraint))
-				return false;
+		if (this == obj)
+			return true;
+		if (!(obj instanceof Constraint))
+			return false;
 
-			Constraint other = (Constraint) obj;
-
-		
+		Constraint other = (Constraint) obj;		
 		return propNode.equals(other.propNode);
 		
 	}
@@ -184,13 +186,19 @@ public class Constraint implements PropertyConstants {
 	}
 
 	/**
+	 * Set the dead features of this constraint
 	 * @param deadFeatures
 	 */
 	public void setDeadFeatures(List<Feature> deadFeatures) {
 		this.deadFeatures  = deadFeatures; 
 	}
 	
+	/**
+	 * Gets the dead features of this constraint without new calculation
+	 * @return The dead features
+	 */
 	public List<Feature> getDeadFeatures() {
 		return deadFeatures;
 	}
+
 }

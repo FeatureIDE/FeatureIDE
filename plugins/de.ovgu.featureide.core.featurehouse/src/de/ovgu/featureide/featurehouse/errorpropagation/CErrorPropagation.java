@@ -100,7 +100,6 @@ public class CErrorPropagation extends ErrorPropagation {
 				body = body.replaceAll("original\\(", m.getMethodName() + "(");
 				body = body.replaceAll("original\\s*\\(", m.getMethodName() + " (");
 				i = content.indexOf(body);
-				System.out.println();
 			}
 			if (i != -1) {
 				int line = countLines(content.substring(0, i));

@@ -661,21 +661,17 @@ public class ConstraintDialog implements GUIDefaults {
 				clonedModel.removePropositionalNode(constraint);
 			}
 			deadFeaturesBefore = clonedModel.getAnalyser().getDeadFeatures();
-			System.out.println("before: "+deadFeaturesBefore);
 			clonedModel.addPropositionalNode(propNode);
 			clonedModel.handleModelDataChanged();
 		}
 
 		List<Feature> deadFeaturesAfter = new ArrayList<Feature>();
-		System.out.println("after: "+deadFeaturesAfter);
 		for (Feature l : clonedModel.getAnalyser().getDeadFeatures()) {
-			System.out.println("for "+l);
 			if (!deadFeaturesBefore.contains(l)) {
 				deadFeaturesAfter.add(l);
 
 			}
 		}
-		System.out.println("returning "+deadFeaturesAfter);
 		return deadFeaturesAfter;
 	}
 	
