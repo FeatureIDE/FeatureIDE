@@ -72,7 +72,6 @@ public class Constraint implements PropertyConstants {
 	public List<Feature> getDeadFeatures(FeatureModel fm, AbstractCollection<Feature> fmDeadFeatures) {
 		List<Feature> deadFeaturesBefore = null;		
 		Node propNode = this.getNode();
-
 		if (propNode != null) {
 			if (this != null) {
 				fm.removePropositionalNode(this);
@@ -86,7 +85,6 @@ public class Constraint implements PropertyConstants {
 		for (Feature l : fmDeadFeatures) {
 			if (!deadFeaturesBefore.contains(l)) {
 				deadFeaturesAfter.add(l);
-
 			}
 		}
 		return deadFeaturesAfter;

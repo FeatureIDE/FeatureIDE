@@ -429,7 +429,11 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 
 						final HashMap<Object, Object> changedAttributes = getFeatureModel()
 								.getAnalyser().analyzeFeatureModel();
-		
+						
+						if (waiting) {
+							return Status.OK_STATUS;
+						}
+						
 						UIJob refreshGraphics = new UIJob(
 								"Updating feature model attributes") {
 		

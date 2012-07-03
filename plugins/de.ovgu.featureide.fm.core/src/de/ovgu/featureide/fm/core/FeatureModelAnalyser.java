@@ -301,7 +301,7 @@ public class FeatureModelAnalyser {
 		}
 		return set;
 	}
-
+	
 	/**
 	 * 
 	 * @return Hashmap: key entry is Feature/Constraint, value usually
@@ -325,23 +325,24 @@ public class FeatureModelAnalyser {
 	 * @param oldAttributes
 	 * @param changedAttributes
 	 */
-	private void updateConstraints(HashMap<Object, Object> oldAttributes,
+	public void updateConstraints(HashMap<Object, Object> oldAttributes,
 			HashMap<Object, Object> changedAttributes) {
 		// update constraints
 		
 		FeatureModel clone = fm.clone();
 		LinkedList<Feature> fmDeadFeatures = clone.getAnalyser().getDeadFeatures();
+		boolean hasDeadFeatures = !fmDeadFeatures.isEmpty();
 		try {
 			for (Constraint constraint : new ArrayList<Constraint>(fm.getConstraints())) {
 				oldAttributes.put(constraint,
 						constraint.getConstraintAttribute());
 				constraint.setContainedFeatures(constraint.getNode());
+				
 				// if the constraint leads to false optionals it is added to
 				// changedAttributes in order to refresh graphics later
-
+				// TODO this calculation is only necessary if the model has false optional features
 				if (constraint.setFalseOptionalFeatures())
-					changedAttributes.put(constraint,
-							ConstraintAttribute.UNSATISFIABLE);
+					changedAttributes.put(constraint, ConstraintAttribute.UNSATISFIABLE);
 //				constraint.setConstraintAttribute(ConstraintAttribute.NORMAL,
 //						false);
 				// tautology
@@ -361,24 +362,16 @@ public class FeatureModelAnalyser {
 				}
 
 				if (fm.valid) {
-					List<Feature> deadFeatures = constraint.getDeadFeatures(clone, fmDeadFeatures);
-					if (!deadFeatures.isEmpty()){
-						constraint.setDeadFeatures(deadFeatures);
-						constraint.setConstraintAttribute(ConstraintAttribute.DEAD, false);
-						changedAttributes.put(constraint, ConstraintAttribute.DEAD);
-					}
-					
-					// redundant constraint?
-					FeatureModel dirtyModel = fm.clone();
-					dirtyModel.removePropositionalNode(constraint.getNode());
-					ModelComparator comparator = new ModelComparator(500);
-					Comparison comparison = comparator.compare(fm, dirtyModel);
-					if (comparison == Comparison.REFACTORING) {
-						if (oldAttributes.get(constraint) != ConstraintAttribute.REDUNDANT) {
-							changedAttributes.put(constraint, ConstraintAttribute.REDUNDANT);
+					if (hasDeadFeatures) {
+						List<Feature> deadFeatures = constraint.getDeadFeatures(clone, fmDeadFeatures);
+						if (!deadFeatures.isEmpty()){
+							constraint.setDeadFeatures(deadFeatures);
+							constraint.setConstraintAttribute(ConstraintAttribute.DEAD, false);
+							changedAttributes.put(constraint, ConstraintAttribute.DEAD);
 						}
-						constraint.setConstraintAttribute(ConstraintAttribute.REDUNDANT, false);
 					}
+					// redundant constraint?
+					findRedundantConstraints(constraint, changedAttributes, oldAttributes);
 				}
 				// makes feature model void?
 				else {
@@ -423,10 +416,29 @@ public class FeatureModelAnalyser {
 	}
 
 	/**
+	 * @param constraint 
+	 * @param changedAttributes 
+	 * @param oldAttributes 
+	 * 
+	 */
+	public void findRedundantConstraints(Constraint constraint, HashMap<Object, Object> changedAttributes, HashMap<Object,Object> oldAttributes) {
+		FeatureModel dirtyModel = fm.clone();
+		dirtyModel.removePropositionalNode(constraint.getNode());
+		ModelComparator comparator = new ModelComparator(500);
+		Comparison comparison = comparator.compare(fm, dirtyModel);
+		if (comparison == Comparison.REFACTORING) {
+			if (oldAttributes.get(constraint) != ConstraintAttribute.REDUNDANT) {
+				changedAttributes.put(constraint, ConstraintAttribute.REDUNDANT);
+			}
+			constraint.setConstraintAttribute(ConstraintAttribute.REDUNDANT, false);
+		}
+	}
+
+	/**
 	 * @param oldAttributes
 	 * @param changedAttributes
 	 */
-	private void updateFeatures(HashMap<Object, Object> oldAttributes,
+	public void updateFeatures(HashMap<Object, Object> oldAttributes,
 			HashMap<Object, Object> changedAttributes) {
 		for (Feature bone : fm.getFeatures()) {
 			oldAttributes.put(bone, bone.getFeatureStatus());
