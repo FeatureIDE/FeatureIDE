@@ -1,11 +1,7 @@
 package de.ovgu.featureide.core.typecheck.actions;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 
-import org.apache.commons.cli.TypeHandler;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
@@ -15,20 +11,12 @@ import org.eclipse.ui.IWorkbenchPart;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.typecheck.TypeChecker;
+import de.ovgu.featureide.core.typecheck.TypeCheckerFIDE;
 import de.ovgu.featureide.core.typecheck.TypecheckCorePlugin;
-import de.ovgu.featureide.core.typecheck.check.FieldCheck;
-import de.ovgu.featureide.core.typecheck.check.ICheckPlugin;
-import de.ovgu.featureide.core.typecheck.check.MethodCheck;
-import de.ovgu.featureide.core.typecheck.check.OriginalCheck;
-import de.ovgu.featureide.core.typecheck.check.TypeReferenceCheck;
-import de.ovgu.featureide.core.typecheck.correction.ConsoleProblemHandler;
-import de.ovgu.featureide.core.typecheck.correction.FIDEProblemHandler;
-import de.ovgu.featureide.core.typecheck.correction.IProblemHandler;
 
 /**
  * 
- * @author Sönke Holthusen
+ * @author Soenke Holthusen
  * 
  */
 public class TypecheckAction implements IObjectActionDelegate {
@@ -37,8 +25,6 @@ public class TypecheckAction implements IObjectActionDelegate {
 
     @Override
     public void run(IAction action) {
-	Map<IFeatureProject, TypeChecker> typechecker = TypecheckCorePlugin
-		.getDefault().typechecker;
 	Object obj = selection.getFirstElement();
 	if (obj instanceof IResource) {
 	    IResource res = (IResource) obj;
@@ -47,22 +33,7 @@ public class TypecheckAction implements IObjectActionDelegate {
 
 	    if (Arrays.asList(TypecheckCorePlugin.supportedComposers).contains(
 		    project.getComposerID())) {
-		if (!typechecker.containsKey(project)) {
-//		    List<ICheckPlugin> plugins = new ArrayList<ICheckPlugin>();
-//		    plugins.add(new MethodCheck());
-//		    plugins.add(new FieldCheck());
-//		    plugins.add(new TypeCheck());
-//		    plugins.add(new OriginalCheck());
-		    
-		    List<IProblemHandler> problem_handlers = new ArrayList<IProblemHandler>();
-		    problem_handlers.add(new FIDEProblemHandler(project));
-		    
-		    typechecker.put(project, new TypeChecker(TypeChecker.defaultCheckPlugins(),
-			    problem_handlers));
-		}
-		typechecker.get(project).setParameters(
-			project.getFeatureModel(), project.getSourcePath());
-		typechecker.get(project).run();
+		new TypeCheckerFIDE().run(project);
 	    } else {
 		// TODO: change output method
 		System.out.println("unsupported composer found");

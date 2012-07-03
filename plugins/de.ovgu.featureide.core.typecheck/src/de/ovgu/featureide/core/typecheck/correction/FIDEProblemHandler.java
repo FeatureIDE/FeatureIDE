@@ -27,9 +27,13 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.typecheck.TypeCheckerFIDE;
+import de.ovgu.featureide.core.typecheck.TypecheckCorePlugin;
 import de.ovgu.featureide.core.typecheck.check.CheckProblem;
 
 /**
@@ -56,36 +60,57 @@ public class FIDEProblemHandler implements IProblemHandler {
      */
     @Override
     public void handleProblems(Collection<CheckProblem> problems) {
+//	TypecheckCorePlugin.getDefault().clearMarkers(project.getSourceFolder());
 	clearMarkers(project.getSourceFolder());
 	for (CheckProblem problem : problems) {
 	    createMarker(problem);
 	}
     }
 
-    protected void clearMarkers(IResource res) {
-	if (res instanceof IFile) {
-	    project.deleteBuilderMarkers(res, IResource.DEPTH_INFINITE);
-	} else if (res instanceof IFolder) {
+    public static void clearMarkers(IResource res) {
+//	if (res instanceof IFile) {
+	    //project.deleteBuilderMarkers(res, IResource.DEPTH_INFINITE);
 	    try {
-		for (IResource r : ((IFolder) res).members()) {
-		    clearMarkers(r);
-		}
+		res.deleteMarkers(TypeCheckerFIDE.CHECK_MARKER, false, IResource.DEPTH_INFINITE);
 	    } catch (CoreException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	    }
+	// } else if (res instanceof IFolder) {
+	// try {
+	// for (IResource r : ((IFolder) res).members()) {
+	// clearMarkers(r);
+	// }
+	// } catch (CoreException e) {
+	// // TODO Auto-generated catch block
+	// e.printStackTrace();
+	// }
+	// }
+    }
+
+    // TODO: change the method from using the FIDE build markers to use own markers
+    protected void createMarker(CheckProblem problem) {
+	IFile file = project.getSourceFolder().getFile(
+		new Path(problem.getFilename()).makeRelativeTo(project
+			.getSourceFolder().getRawLocation()));
+//	 TypecheckCorePlugin.getDefault().createMarker
+	project.createBuilderMarker
+	 (file, problem.getMessage(),
+	 problem.getLinenumber(), 2);
+    }
+
+    protected void createMarker(IResource res, String message, int line, int severity){
+	try {
+	    IMarker marker = res.createMarker(TypeCheckerFIDE.CHECK_MARKER);
+	    marker.setAttribute(IMarker.MESSAGE, message);
+	    marker.setAttribute(IMarker.LINE_NUMBER, line);
+	    marker.setAttribute(IMarker.SEVERITY, severity);
+	} catch (CoreException e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
 	}
     }
-
-    protected void createMarker(CheckProblem problem) {
-	String path = problem.getFilename().split(
-		project.getSourceFolder().getFullPath().toString())[1];
-	IFile file = project.getSourceFolder().getFile(path);
-	project.createBuilderMarker(file, problem.getMessage(),
-		problem.getLinenumber(), 2);
-	marked_files.add(file);
-    }
-
+    
     /*
      * (non-Javadoc)
      * 
