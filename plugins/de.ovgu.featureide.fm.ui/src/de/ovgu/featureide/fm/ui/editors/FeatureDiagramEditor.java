@@ -137,7 +137,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 
 	private int index;
 
-	private Job analyzingJob;
+	private Job analyzeJob;
 	
 	public FeatureDiagramEditor(FeatureModelEditor featureModelEditor,
 			Composite container) {
@@ -402,31 +402,32 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		/**
 		 * This extra job is necessary, else the UI will stop. 
 		 */
-		Job waiter = new Job("Analyzing feature model") {
+		Job waiter = new Job("Analyze feature model") {
 			
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
-					if (analyzingJob != null) {
+					if (analyzeJob != null) {
 						// waiting for analyzing job to finish
-						analyzingJob.join();
+						getFeatureModel().getAnalyser().cancel(true);
+						analyzeJob.join();		
 					}
 				} catch (InterruptedException e) {
 					FMUIPlugin.getDefault().logError(e);
 				} finally {
 					// avoid a dead lock
+					getFeatureModel().getAnalyser().cancel(false);
 					waiting = false;
 				}
-				waiting = false;
 				
-				analyzingJob = new Job("Analyzing feature model") {
+				analyzeJob = new Job("Analyze feature model") {
 		
 					@Override
 					protected IStatus run(IProgressMonitor monitor) {
 						if (waiting) {
 							return Status.OK_STATUS;
 						}
-
+						
 						final HashMap<Object, Object> changedAttributes = getFeatureModel()
 								.getAnalyser().analyzeFeatureModel();
 						
@@ -461,8 +462,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 					};
 		
 				};
-				analyzingJob.setPriority(Job.DECORATE);
-				analyzingJob.schedule();
+				analyzeJob.setPriority(Job.LONG);
+				analyzeJob.schedule();
 				return Status.OK_STATUS;
 			}
 		};

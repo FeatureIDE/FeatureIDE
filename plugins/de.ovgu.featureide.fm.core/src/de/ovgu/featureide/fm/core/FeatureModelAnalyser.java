@@ -40,14 +40,20 @@ import de.ovgu.featureide.fm.core.editing.ModelComparator;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 /**
- * a collection of methods for working with {@link FeatureModel} will replace
+ * A collection of methods for working with {@link FeatureModel} will replace
  * the corresponding methods in {@link FeatureModel}
  * 
  * @author Soenke Holthusen
  */
 public class FeatureModelAnalyser {
+	
 	private FeatureModel fm;
 
+	/**
+	 * A flag indicating that the calculation should be canceled.
+	 */
+	private boolean cancel = false;
+	
 	/**
      * 
      */
@@ -312,10 +318,10 @@ public class FeatureModelAnalyser {
 	public HashMap<Object, Object> analyzeFeatureModel() {
 		HashMap<Object, Object> oldAttributes = new HashMap<Object, Object>();
 		HashMap<Object, Object> changedAttributes = new HashMap<Object, Object>();
-		
 		updateFeatures(oldAttributes, changedAttributes);
-		updateConstraints(oldAttributes, changedAttributes);
-		
+		if (!cancel) {
+			updateConstraints(oldAttributes, changedAttributes);
+		}
 		// put root always in so it will be refreshed (void/non-void)
 		changedAttributes.put(fm.getRoot(), ConstraintAttribute.VOID_MODEL);
 		return changedAttributes;
@@ -334,6 +340,9 @@ public class FeatureModelAnalyser {
 		boolean hasDeadFeatures = !fmDeadFeatures.isEmpty();
 		try {
 			for (Constraint constraint : new ArrayList<Constraint>(fm.getConstraints())) {
+				if (cancel) {
+					return;
+				}
 				oldAttributes.put(constraint,
 						constraint.getConstraintAttribute());
 				constraint.setContainedFeatures(constraint.getNode());
@@ -457,6 +466,9 @@ public class FeatureModelAnalyser {
 
 		try {
 			for (Feature deadFeature : getDeadFeatures()) {
+				if (cancel) {
+					return;
+				}
 				if (deadFeature != null) {
 					if (oldAttributes.get(deadFeature) != FeatureStatus.DEAD) {
 						changedAttributes.put(deadFeature, FeatureStatus.DEAD);
@@ -534,5 +546,13 @@ public class FeatureModelAnalyser {
 			if (!feature.hasChildren())
 				number++;
 		return number;
+	}
+	
+	/**
+	 * Sets the cancel status of analysis.<br>
+	 * <code>true</code> if analysis should be stopped.
+	 */
+	public void cancel(boolean value) {
+		cancel = value;
 	}
 }
