@@ -26,6 +26,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.CheckForNull;
+
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.prop4j.And;
 import org.prop4j.Implies;
 import org.prop4j.Literal;
@@ -53,6 +56,9 @@ public class FeatureModelAnalyser {
 	 * A flag indicating that the calculation should be canceled.
 	 */
 	private boolean cancel = false;
+
+	@CheckForNull
+	private IProgressMonitor monitor;
 	
 	/**
      * 
@@ -310,12 +316,15 @@ public class FeatureModelAnalyser {
 	
 	/**
 	 * 
+	 * @param monitor 
 	 * @return Hashmap: key entry is Feature/Constraint, value usually
 	 *         indicating the kind of attribute
 	 * 
 	 *         if Feature
 	 */
-	public HashMap<Object, Object> analyzeFeatureModel() {
+	public HashMap<Object, Object> analyzeFeatureModel(IProgressMonitor monitor) {
+		this.monitor = monitor;
+		beginTask("Analyze", fm.getConstraintCount());
 		HashMap<Object, Object> oldAttributes = new HashMap<Object, Object>();
 		HashMap<Object, Object> changedAttributes = new HashMap<Object, Object>();
 		updateFeatures(oldAttributes, changedAttributes);
@@ -328,32 +337,46 @@ public class FeatureModelAnalyser {
 	}
 
 	/**
+	 * 
+	 * @param name
+	 * @param totalWork
+	 */
+	private void beginTask(String name, int totalWork) {
+		if (monitor != null) {
+			monitor.beginTask(name, totalWork);
+		}
+	}
+
+	/**
 	 * @param oldAttributes
 	 * @param changedAttributes
 	 */
 	public void updateConstraints(HashMap<Object, Object> oldAttributes,
 			HashMap<Object, Object> changedAttributes) {
-		// update constraints
-		
 		FeatureModel clone = fm.clone();
-		LinkedList<Feature> fmDeadFeatures = clone.getAnalyser().getDeadFeatures();
+		LinkedList<Feature> fmDeadFeatures = fm.getCalculatedDeadFeatures();
 		boolean hasDeadFeatures = !fmDeadFeatures.isEmpty();
+		boolean hasFalsOptionalFeatures = !fm.getFalseOptionalFeatures().isEmpty();
 		try {
 			for (Constraint constraint : new ArrayList<Constraint>(fm.getConstraints())) {
 				if (cancel) {
 					return;
 				}
+				setSubTask(constraint.toString());
+				worked(1);
 				oldAttributes.put(constraint,
 						constraint.getConstraintAttribute());
 				constraint.setContainedFeatures(constraint.getNode());
 				
 				// if the constraint leads to false optionals it is added to
 				// changedAttributes in order to refresh graphics later
-				// TODO this calculation is only necessary if the model has false optional features
-				if (constraint.setFalseOptionalFeatures())
+				if (!hasFalsOptionalFeatures) {
+					constraint.getFalseOptional().clear();
+				} else if (constraint.setFalseOptionalFeatures()) {
 					changedAttributes.put(constraint, ConstraintAttribute.UNSATISFIABLE);
-//				constraint.setConstraintAttribute(ConstraintAttribute.NORMAL,
-//						false);
+				}
+				constraint.setConstraintAttribute(ConstraintAttribute.NORMAL,
+						false);
 				// tautology
 				SatSolver satsolverTAU = new SatSolver(new Not(constraint
 						.getNode().clone()), 1000);
@@ -373,13 +396,15 @@ public class FeatureModelAnalyser {
 				if (fm.valid) {
 					if (hasDeadFeatures) {
 						List<Feature> deadFeatures = constraint.getDeadFeatures(clone, fmDeadFeatures);
-						if (!deadFeatures.isEmpty()){
+						if (!deadFeatures.isEmpty()) {
 							constraint.setDeadFeatures(deadFeatures);
 							constraint.setConstraintAttribute(ConstraintAttribute.DEAD, false);
 							changedAttributes.put(constraint, ConstraintAttribute.DEAD);
 						}
 					}
 					// redundant constraint?
+					// TODO for some models this least very long and the solver does not stop after timeout
+					// this happens if the model has many abstract features
 					findRedundantConstraints(constraint, changedAttributes, oldAttributes);
 				}
 				// makes feature model void?
@@ -417,11 +442,33 @@ public class FeatureModelAnalyser {
 					}
 
 				}
+
+				// updates all constraints that are changed to NORMAL
+				if (constraint.getConstraintAttribute() != ConstraintAttribute.NORMAL) {
+					if (!changedAttributes.containsKey(constraint)) {
+						changedAttributes.put(constraint, ConstraintAttribute.NORMAL);
+					}
+				}
 			}
 		} catch (ConcurrentModificationException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 
+	}
+
+	/**
+	 * 
+	 */
+	private void worked(int workDone) {
+		if (monitor != null) {
+			monitor.worked(workDone);
+		}
+	}
+	
+	private void setSubTask(String name) {
+		if (monitor != null) {
+			monitor.subTask(name);
+		}
 	}
 
 	/**
@@ -465,6 +512,7 @@ public class FeatureModelAnalyser {
 		}
 
 		try {
+			LinkedList<Feature> deadFeatures = fm.getCalculatedDeadFeatures();
 			for (Feature deadFeature : getDeadFeatures()) {
 				if (cancel) {
 					return;
@@ -473,6 +521,7 @@ public class FeatureModelAnalyser {
 					if (oldAttributes.get(deadFeature) != FeatureStatus.DEAD) {
 						changedAttributes.put(deadFeature, FeatureStatus.DEAD);
 					}
+					deadFeatures.add(deadFeature);
 					deadFeature.setFeatureStatus(FeatureStatus.DEAD, false);
 
 				}
@@ -496,30 +545,36 @@ public class FeatureModelAnalyser {
 	 */
 	private void getFalseOptionalFeature(HashMap<Object, Object> oldAttributes,
 			HashMap<Object, Object> changedAttributes) {
+		LinkedList<Feature> falseOptionalFeatures = fm.getFalseOptionalFeatures();
+		falseOptionalFeatures.clear();
+		for (Feature f : getFalseOptionalFeatures()) {
+			changedAttributes.put(f,FeatureStatus.FALSE_OPTIONAL);
+			f.setFeatureStatus(FeatureStatus.FALSE_OPTIONAL, false);
+			falseOptionalFeatures.add(f);
+		}
+	}
+	
+	public LinkedList<Feature> getFalseOptionalFeatures() {
 		// TODO Thomas: improve calculation effort and
 		// correct calculation (is this feature always selected given
 		// that the parent feature is selected)
-		for (Feature bone : fm.getFeatures()) {
+		LinkedList<Feature> falseOptionalFeatures = new LinkedList<Feature>();
+		for (Feature feature : fm.getFeatures()) {
 			try {
-				if (!bone.isMandatory() && !bone.isRoot()) {
-					// -((parent and fm)=>bone)
+				if (!feature.isMandatory() && !feature.isRoot()) {
 					SatSolver satsolver = new SatSolver(new Not(new Implies(
-							new And(new Literal(bone.getParent().getName()),
+							new And(new Literal(feature.getParent().getName()),
 									NodeCreator.createNodes(fm.clone())),
-							new Literal(bone.getName()))), 1000);
+							new Literal(feature.getName()))), 1000);
 					if (!satsolver.isSatisfiable()) {
-						if (oldAttributes.get(bone) != FeatureStatus.FALSE_OPTIONAL) {
-							changedAttributes.put(bone,
-									FeatureStatus.FALSE_OPTIONAL);
-						}
-						bone.setFeatureStatus(FeatureStatus.FALSE_OPTIONAL,
-								false);
+						falseOptionalFeatures.add(feature);
 					}
 				}
 			} catch (TimeoutException e) {
 				FMCorePlugin.getDefault().logError(e);
 			}
 		}
+		return falseOptionalFeatures;
 	}
 
 	public int countConcreteFeatures() {

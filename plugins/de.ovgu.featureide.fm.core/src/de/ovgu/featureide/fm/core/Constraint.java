@@ -83,7 +83,7 @@ public class Constraint implements PropertyConstants {
 
 		List<Feature> deadFeaturesAfter = new LinkedList<Feature>();
 		for (Feature l : fmDeadFeatures) {
-			if (!deadFeaturesBefore.contains(l)) {
+			if (!deadFeaturesBefore.contains(fm.getFeature(l.getName()))) {
 				deadFeaturesAfter.add(l);
 			}
 		}
@@ -125,22 +125,17 @@ public class Constraint implements PropertyConstants {
 	public List<Feature> getContainedFeatures(){
 		return containedFeatureList;
 	}
-	
-	// TODO Thomas: this method looks really weird, please revise
-	// TODO this calculation does not always work, e.g. if a child of a feature must be selected in because of a constraint
-	// the parent feature could be false optional(The feature is marked as false optional)
+
 	public boolean setFalseOptionalFeatures(){
 		falseOptionalFeatures.clear();
 		boolean found=false;
-		for (Feature feature : containedFeatureList){
-			if (feature != null && feature.getFeatureStatus() == FeatureStatus.FALSE_OPTIONAL){
-				FeatureModel clonedModel = featureModel.clone();
-				clonedModel.removePropositionalNode(this);
-				if (clonedModel.getFeature(feature.getName())
-						.getFeatureStatus() != FeatureStatus.FALSE_OPTIONAL && !falseOptionalFeatures.contains(feature)) {
-					found=true;		
-					falseOptionalFeatures.add(feature);
-				}
+		FeatureModel clonedModel = featureModel.clone();
+		clonedModel.removePropositionalNode(this);
+		LinkedList<Feature> foFeatures = clonedModel.getAnalyser().getFalseOptionalFeatures();
+		for (Feature feature : featureModel.getFalseOptionalFeatures()) {
+			if (!foFeatures.contains(clonedModel.getFeature(feature.getName())) && !falseOptionalFeatures.contains(feature)) {
+				falseOptionalFeatures.add(feature);
+				found = true;
 			}
 		}
 		return found;

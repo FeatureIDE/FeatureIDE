@@ -99,7 +99,7 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 
 	}
 	
-	// TODO Thomas: remove this method and adopt results of analysis in constraint attributes instead
+	// TODO @Jens: remove this method and adopt results of analysis in constraint attributes instead
 	private void setConstraintError(){
 		if (constraint.getConstraintAttribute() == ConstraintAttribute.VOID_MODEL){
 			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());

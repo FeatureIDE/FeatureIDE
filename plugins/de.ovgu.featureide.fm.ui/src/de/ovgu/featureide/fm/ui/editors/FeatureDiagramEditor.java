@@ -402,7 +402,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		/**
 		 * This extra job is necessary, else the UI will stop. 
 		 */
-		Job waiter = new Job("Analyze feature model") {
+		Job waiter = new Job("Analyze feature model (waiting)") {
 			
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
@@ -429,14 +429,9 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 						}
 						
 						final HashMap<Object, Object> changedAttributes = getFeatureModel()
-								.getAnalyser().analyzeFeatureModel();
+								.getAnalyser().analyzeFeatureModel(monitor);
 						
-						if (waiting) {
-							return Status.OK_STATUS;
-						}
-						
-						UIJob refreshGraphics = new UIJob(
-								"Updating feature model attributes") {
+						UIJob refreshGraphics = new UIJob("Updating feature model attributes") {
 		
 							@Override
 							public IStatus runInUIThread(IProgressMonitor monitor) {
@@ -458,6 +453,10 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 						};
 						refreshGraphics.setPriority(Job.SHORT);
 						refreshGraphics.schedule();
+						
+						monitor.subTask(null);
+						monitor.done();
+						monitor.setCanceled(true);
 						return Status.OK_STATUS;
 					};
 		

@@ -485,7 +485,7 @@ public class FeatureModel implements PropertyConstants {
          */
 	@Deprecated
 	public HashMap<Object, Object> analyzeFeatureModel() {
-	    return analyser.analyzeFeatureModel();
+	    return analyser.analyzeFeatureModel(null);
 	}
 
 	public Collection<Feature> getFeatures() {
@@ -1205,9 +1205,25 @@ public class FeatureModel implements PropertyConstants {
     }
 
     private FeatureModelLayout layout = new FeatureModelLayout();
+	private LinkedList<Feature> falseOptionalFeatures = new LinkedList<Feature>();
+	private LinkedList<Feature> deadFeatures = new LinkedList<Feature>();
+	
+	/**
+	 * @return the falseOptionalFeatures
+	 */
+	public LinkedList<Feature> getFalseOptionalFeatures() {
+		return falseOptionalFeatures;
+	}
 
     public FeatureModelLayout getLayout() {
 	return layout;
     }
+
+	/**
+	 * @return
+	 */
+	public LinkedList<Feature> getCalculatedDeadFeatures() {
+		return deadFeatures;
+	}
 
 }

@@ -84,7 +84,7 @@ public abstract class TAbstractFeatureModelReaderWriter {
 		//first tries the location on build server, if this fails tries to use local location
 		if (!MODEL_FILE_FOLDER.canRead()){
 			MODEL_FILE_FOLDER = new File(ClassLoader.getSystemResource(
-			"testFeatureModels").getPath());;
+			"testFeatureModels").getPath());
 		}
 		Collection<Object[]> params = new ArrayList<Object[]>();
 		for (File f : MODEL_FILE_FOLDER.listFiles(getFileFilter(".xml"))) {

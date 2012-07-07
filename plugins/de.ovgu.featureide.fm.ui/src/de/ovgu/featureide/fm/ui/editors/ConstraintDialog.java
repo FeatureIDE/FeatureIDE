@@ -689,7 +689,7 @@ public class ConstraintDialog implements GUIDefaults {
 			if (input.contains(feature.getName())){
 				if (feature.getFeatureStatus() != FeatureStatus.FALSE_OPTIONAL){
 					clonedModel.addPropositionalNode(propNode);
-					clonedModel.getAnalyser().analyzeFeatureModel();
+					clonedModel.getAnalyser().analyzeFeatureModel(null);
 					if (clonedModel.getFeature(feature.getName())
 							.getFeatureStatus() == FeatureStatus.FALSE_OPTIONAL && !list.contains(feature)) 
 								list.add(feature);
