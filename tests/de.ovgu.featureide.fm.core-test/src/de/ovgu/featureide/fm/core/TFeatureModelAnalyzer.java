@@ -31,11 +31,14 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 
 /**
- * TODO description
+ * Tests for {@link FeatureModelAnalyser}
  * 
  * @author Jens Meinicke
  */
-public class TFeatureModelAnanlyzer {
+public class TFeatureModelAnalyzer {
+	
+	protected static File MODEL_FILE_FOLDER = getFolder();
+
 	private static final FileFilter filter = new FileFilter() {
 		@Override
 		public boolean accept(File pathname) {
@@ -60,8 +63,7 @@ public class TFeatureModelAnanlyzer {
 	
 	private final FeatureModel init(String name) {
 		FeatureModel fm = new FeatureModel();
-		File MODEL_FILE_FOLDER = new File(ClassLoader.getSystemResource(
-				"analyzefeaturemodels").getPath());
+
 		for (File f : MODEL_FILE_FOLDER.listFiles(filter)) {
 			if (f.getName().equals(name)) {
 				try {
@@ -77,6 +79,18 @@ public class TFeatureModelAnanlyzer {
 		return fm;
 	}
 	
+	/**
+	 * @return
+	 */
+	private static File getFolder() {
+		File folder =  new File("/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/analyzefeaturemodels/");
+		if (!folder.canRead()) {
+			folder =  new File(ClassLoader.getSystemResource(
+					"analyzefeaturemodels").getPath());
+		}
+		return folder;
+	}
+
 	@Test
 	public void TFalseOptional_FM1_F1() {
 		assertEquals(FM1_DATA.get(FM1_F1), FeatureStatus.FALSE_OPTIONAL);
