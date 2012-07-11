@@ -109,9 +109,15 @@ public class Configuration {
 			if (hasHiddenParent && isUndefined) {
 				feature.setAutomatic(Selection.UNSELECTED);
 				if (!valid()) {
-					feature.setAutomatic(Selection.UNDEFINED);
+					feature.setAutomatic(Selection.SELECTED);
+					
+					if (!valid()) {
+						
+						feature.setAutomatic(Selection.UNDEFINED);
 
-				}
+					}
+					
+									}
 			}
 
 		}
