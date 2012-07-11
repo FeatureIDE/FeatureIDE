@@ -114,8 +114,7 @@ public class ConstraintEditPart extends AbstractGraphicalEditPart implements
 					getConstraintFigure().setConstraintProperties(true);
 				}
 		else if (prop.equals(CONSTRAINT_SELECTED)) {
-				getConstraintFigure().setConstraintProperties(false);
-		
+				getConstraintFigure().setConstraintProperties(true);
 		}
 	}
 

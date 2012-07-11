@@ -46,7 +46,7 @@ import de.ovgu.featureide.fm.ui.properties.page.FMPropertyPage;
  */
 public class FMPropertyManager extends FMPropertyManagerDefaults implements GUIDefaults {
 
-	/*°****************************************************
+	/* ****************************************************
 	 * current values
 	 ******************************************************/
 	private volatile static Boolean CURRENT_HIDE_LEGEND = null;
@@ -323,18 +323,18 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		setInt(QN_CONSTRAINT_SPACE, value);
 	}
 
-	public static Color getConstrinatBorderColor(boolean selected) {
+	public static Color getConstraintBorderColor(boolean selected) {
 		if (selected) {
 			return GUIBasics.createBorderColor(getConstraintBackgroundColor());
 		}
 		return getConstraintBackgroundColor();
 	}
 
-	public static Border getConstrinatBorder(boolean selected) {
+	public static Border getConstraintBorder(boolean selected) {
 		if (selected) {
-			return new LineBorder(getConstrinatBorderColor(true), 3);
+			return new LineBorder(getConstraintBorderColor(true), 3);
 		}
-		return new LineBorder(getConstrinatBorderColor(false), 0);
+		return new LineBorder(getConstraintBorderColor(false), 0);
 	}
 
 	public static Border getHiddenFeatureBorder(boolean selected) {

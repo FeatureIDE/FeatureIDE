@@ -364,8 +364,7 @@ public class FeatureModelAnalyser {
 				}
 				setSubTask(constraint.toString());
 				worked(1);
-				oldAttributes.put(constraint,
-						constraint.getConstraintAttribute());
+				oldAttributes.put(constraint, constraint.getConstraintAttribute());
 				constraint.setContainedFeatures(constraint.getNode());
 				
 				// if the constraint leads to false optionals it is added to
@@ -443,12 +442,14 @@ public class FeatureModelAnalyser {
 
 				}
 
-				// updates all constraints that are changed to NORMAL
-				if (constraint.getConstraintAttribute() != ConstraintAttribute.NORMAL) {
-					if (!changedAttributes.containsKey(constraint)) {
-						changedAttributes.put(constraint, ConstraintAttribute.NORMAL);
-					}
+				/**
+				 * TODO @Jens This is a bad workaround to update some constraints that are changed to NORMAL
+				 * 			  Revise this so only changed constraints will be updated(unimportant)
+				 */
+				if (!changedAttributes.containsKey(constraint)) {
+					changedAttributes.put(constraint, ConstraintAttribute.NORMAL);
 				}
+
 			}
 		} catch (ConcurrentModificationException e) {
 			FMCorePlugin.getDefault().logError(e);

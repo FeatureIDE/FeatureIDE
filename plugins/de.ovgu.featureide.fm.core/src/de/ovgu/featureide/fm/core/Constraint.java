@@ -83,13 +83,33 @@ public class Constraint implements PropertyConstants {
 
 		List<Feature> deadFeaturesAfter = new LinkedList<Feature>();
 		for (Feature l : fmDeadFeatures) {
-			if (!deadFeaturesBefore.contains(fm.getFeature(l.getName()))) {
+			if (!contains(fm.getFeature(l.getName()), deadFeaturesBefore) &&
+					!contains(fm.getFeature(l.getName()), deadFeaturesAfter)) {
 				deadFeaturesAfter.add(l);
 			}
 		}
 		return deadFeaturesAfter;
 	}
 	
+	/**
+	 * Checks if the given list contains a Feature with the same name.<br>
+	 * 
+	 * @param feature The feature to check
+	 * @param fetureList The list
+	 * @return <code>true</code> if the list contains a feature with the same name.
+	 * @see List#contains(Object)
+	 */
+	// This is necessary because the methods work with copies and not the original objects. 
+	// Maybe .equals should be implemented, so this could be replaced with standard .contains(Object)
+	private boolean contains(Feature feature, List<Feature> fetureList) {
+		for (Feature f : fetureList) {
+			if (f.getName().equals(feature.getName())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public void setConstraintAttribute(ConstraintAttribute attri, boolean fire){
 		this.attribute = attri;
 		if(fire)fire(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));

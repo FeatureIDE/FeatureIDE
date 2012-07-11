@@ -85,10 +85,10 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 		setConstraintProperties(false);
 	}
 	
+	// TODO @Jens there is no calculation necessary anymore
 	public void setConstraintProperties(boolean calc){
-		setBorder(FMPropertyManager.getConstrinatBorder(constraint.isFeatureSelected()));
+		setBorder(FMPropertyManager.getConstraintBorder(constraint.isFeatureSelected()));
 		setBackgroundColor(FMPropertyManager.getConstraintBackgroundColor());
-		setToolTip(null);
 
 		if(!calc)return;
 		if (!constraint.getFeatureModel().valid())
@@ -118,21 +118,24 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 			setToolTip(TAUTOLOGY_LABEL);	
 			return;
 		}
-		
+		StringBuilder toolTip = new StringBuilder(); 
 		if (constraint.getConstraintAttribute() == ConstraintAttribute.DEAD){
 			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
-			StringBuilder toolTip = new StringBuilder(); 
+			
 			toolTip.append(DEAD_FEATURE);
 			for (Feature dead : constraint.getDeadFeatures()) {
 				toolTip.append("\n " + dead.toString());
 			}
 			setToolTip(new Label(toolTip.toString()));	
-			return;
+//			return;
 		}
 		
-		if (!constraint.getFalseOptional().isEmpty()){
-			setBackgroundColor(FMPropertyManager.getWarningColor());
-			StringBuilder toolTip = new StringBuilder();
+		if (!constraint.getFalseOptional().isEmpty()) {
+			if (constraint.getConstraintAttribute() != ConstraintAttribute.DEAD) {
+				setBackgroundColor(FMPropertyManager.getWarningColor());
+			} else {
+				toolTip.append("\n\n");
+			}
 			toolTip.append(FALSE_OPTIONAL);
 			for (Feature feature : constraint.getFalseOptional())
 				toolTip.append("\n " + feature.getName());

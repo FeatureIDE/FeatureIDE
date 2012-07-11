@@ -31,14 +31,11 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 
 /**
- * Tests for {@link FeatureModelAnalyser}
+ * TODO description
  * 
  * @author Jens Meinicke
  */
 public class TFeatureModelAnalyzer {
-	
-	protected static File MODEL_FILE_FOLDER = getFolder();
-
 	private static final FileFilter filter = new FileFilter() {
 		@Override
 		public boolean accept(File pathname) {
@@ -61,9 +58,17 @@ public class TFeatureModelAnalyzer {
 	private Constraint FM2_C3 = FM_test_2.getConstraints().get(2);
 	private HashMap<Object, Object> FM2_DATA = FM_test_2.getAnalyser().analyzeFeatureModel(null);
 	
+	private FeatureModel FM_test_3 = init("test_3.xml");
+	private Feature FM3_F2 = FM_test_3.getFeature("F2");
+	private Feature FM3_F3 = FM_test_3.getFeature("F3");
+	private Constraint FM3_C1 = FM_test_3.getConstraints().get(0);
+	private HashMap<Object, Object> FM3_DATA = FM_test_3.getAnalyser().analyzeFeatureModel(null);
+	
+	
 	private final FeatureModel init(String name) {
 		FeatureModel fm = new FeatureModel();
-
+		File MODEL_FILE_FOLDER = new File(ClassLoader.getSystemResource(
+				"analyzefeaturemodels").getPath());
 		for (File f : MODEL_FILE_FOLDER.listFiles(filter)) {
 			if (f.getName().equals(name)) {
 				try {
@@ -79,18 +84,6 @@ public class TFeatureModelAnalyzer {
 		return fm;
 	}
 	
-	/**
-	 * @return
-	 */
-	private static File getFolder() {
-		File folder =  new File("/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/analyzefeaturemodels/");
-		if (!folder.canRead()) {
-			folder =  new File(ClassLoader.getSystemResource(
-					"analyzefeaturemodels").getPath());
-		}
-		return folder;
-	}
-
 	@Test
 	public void TFalseOptional_FM1_F1() {
 		assertEquals(FM1_DATA.get(FM1_F1), FeatureStatus.FALSE_OPTIONAL);
@@ -171,4 +164,30 @@ public class TFeatureModelAnalyzer {
 	public void TFalseOptional_FM2_C3_F() {
 		assertTrue(FM2_C3.getFalseOptional().isEmpty());
 	}
+	
+	@Test
+	public void TFalseOptional_FM3_F2() {
+		assertEquals(FM3_DATA.get(FM3_F2), FeatureStatus.FALSE_OPTIONAL);
+	}
+	
+	@Test
+	public void TDead_FM3_F2() {
+		assertEquals(FM3_DATA.get(FM3_F3), FeatureStatus.DEAD);
+	}
+	
+	@Test
+	public void TFalseOptional_FM3_C1() {
+		assertEquals(FM3_DATA.get(FM3_C1), ConstraintAttribute.DEAD);
+	}
+	
+	@Test
+	public void TFalseOptional_FM3_C1_contains() {
+		assertTrue(FM3_C1.getFalseOptional().contains(FM3_F2));
+	}
+	
+	@Test
+	public void TDead_FM3_C1_contains() {
+		assertTrue(FM3_C1.getDeadFeatures().contains(FM3_F3));
+	}
+	
 }
