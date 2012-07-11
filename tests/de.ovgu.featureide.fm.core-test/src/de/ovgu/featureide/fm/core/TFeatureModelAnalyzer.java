@@ -31,7 +31,7 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 
 /**
- * TODO description
+ * Tests for {@link FeatureModelAnalyser} 
  * 
  * @author Jens Meinicke
  */
