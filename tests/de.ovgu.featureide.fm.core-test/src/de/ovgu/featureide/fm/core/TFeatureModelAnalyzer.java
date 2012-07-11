@@ -36,6 +36,9 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
  * @author Jens Meinicke
  */
 public class TFeatureModelAnalyzer {
+	
+	protected static File MODEL_FILE_FOLDER = getFolder();
+	
 	private static final FileFilter filter = new FileFilter() {
 		@Override
 		public boolean accept(File pathname) {
@@ -64,11 +67,19 @@ public class TFeatureModelAnalyzer {
 	private Constraint FM3_C1 = FM_test_3.getConstraints().get(0);
 	private HashMap<Object, Object> FM3_DATA = FM_test_3.getAnalyser().analyzeFeatureModel(null);
 	
+	/** 
+     * @return 
+	 */ 
+	private static File getFolder() { 
+		File folder =  new File("/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/analyzefeaturemodels/"); 
+		if (!folder.canRead()) { 
+			folder =  new File(ClassLoader.getSystemResource("analyzefeaturemodels").getPath()); 
+		} 
+		return folder; 
+	}
 	
 	private final FeatureModel init(String name) {
 		FeatureModel fm = new FeatureModel();
-		File MODEL_FILE_FOLDER = new File(ClassLoader.getSystemResource(
-				"analyzefeaturemodels").getPath());
 		for (File f : MODEL_FILE_FOLDER.listFiles(filter)) {
 			if (f.getName().equals(name)) {
 				try {
