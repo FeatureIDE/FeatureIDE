@@ -448,7 +448,12 @@ public class FeatureModel implements PropertyConstants {
 		for (PropertyChangeListener listener : listenerList)
 			listener.propertyChange(event);
 	}
-
+	public void handleModelLayoutChanged() {
+		PropertyChangeEvent event = new PropertyChangeEvent(this,
+				MODEL_LAYOUT_CHANGED, Boolean.FALSE, Boolean.TRUE);
+		for (PropertyChangeListener listener : listenerList)
+			listener.propertyChange(event);
+	}
 	public void refreshContextMenu() {
 		PropertyChangeEvent event = new PropertyChangeEvent(this,
 				REFRESH_ACTIONS, Boolean.FALSE, Boolean.TRUE);

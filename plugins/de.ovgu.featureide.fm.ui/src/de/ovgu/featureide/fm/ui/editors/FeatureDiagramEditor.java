@@ -515,7 +515,9 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 			featureModelEditor.setPageModified(true);
 		} else if (prop.equals(MODEL_DATA_LOADED)) {
 			refresh();
-		} else if (prop.equals(REDRAW_DIAGRAM)) {
+		} else if (prop.equals(MODEL_LAYOUT_CHANGED)) {
+			featureModelEditor.setPageModified(true);
+		}else if (prop.equals(REDRAW_DIAGRAM)) {
 			featureModelEditor.textEditor.updateTextEditor();
 			featureModelEditor.textEditor.updateDiagram();
 		} else if (prop.equals(REFRESH_ACTIONS)) {

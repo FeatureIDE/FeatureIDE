@@ -29,6 +29,7 @@ public interface PropertyConstants {
 	public final static String MODEL_DATA_LOADED = "MODEL_DATA_LOADED";
 	public final static String REDRAW_DIAGRAM = "REDRAW_DIAGRAM";
 	public final static String MODEL_DATA_CHANGED = "MODEL_DATA_CHANGED";
+	public final static String MODEL_LAYOUT_CHANGED = "MODEL_LAYOUT_CHANGED";
 	public final static String REFRESH_ACTIONS = "REFRESH_ACTIONS";
 	public final static String NAME_CHANGED = "NAME_CHANGED";
 	

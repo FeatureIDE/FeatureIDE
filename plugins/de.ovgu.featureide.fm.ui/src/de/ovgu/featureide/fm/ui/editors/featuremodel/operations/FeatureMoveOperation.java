@@ -130,6 +130,7 @@ public class FeatureMoveOperation extends AbstractOperation {
 			throws ExecutionException {	
 			if(!featureModel.getLayout().hasFeaturesAutoLayout()){
 				newInnerOrder(newPos);
+				featureModel.handleModelLayoutChanged();
 			}
 			else{
 				try{
@@ -141,7 +142,7 @@ public class FeatureMoveOperation extends AbstractOperation {
 					FMUIPlugin.getDefault().logError(e);
 				}
 			}
-			featureModel.handleModelDataChanged();
+		
 			
 			return Status.OK_STATUS;
 	}
