@@ -95,7 +95,11 @@ public class ViewContentProvider implements IStructuredContentProvider,
 	private static final int INDEX_HIDDEN = 6;
 	private static final int INDEX_CONFIGS = 7;
 	private static final int INDEX_VARIANTS = 8;
-
+	/**
+	 * minimal number of available processors needed to activate parallelization
+	 */
+	private static final int PROCESSOR_LIMIT = 4;
+	
 	private final FeatureModelEditView view;
 
 	TreeParent invisibleRoot = new TreeParent("");
@@ -185,7 +189,7 @@ public class ViewContentProvider implements IStructuredContentProvider,
 			// case: update
 			if (isCanceled()) return;
 
-			if (Runtime.getRuntime().availableProcessors() >= 2) {
+			if (Runtime.getRuntime().availableProcessors() >= PROCESSOR_LIMIT) {
 				// case: running in parallel jobs
 		        // TODO it is unnecessary to refresh this every time while nothing has changed
 				Job oldCalculationJob = new Job("Calculate: \"" + STATISTICS_BEFORE + "\"") {
@@ -364,7 +368,7 @@ public class ViewContentProvider implements IStructuredContentProvider,
 			
 			if (isCanceled()) return;
 			
-			if (Runtime.getRuntime().availableProcessors() >= 2) {
+			if (Runtime.getRuntime().availableProcessors() >= PROCESSOR_LIMIT) {
 				Job job = new Job("Calculate: \"" + text + "\"") {
 					@Override
 					protected IStatus run(IProgressMonitor monitor) {
