@@ -54,6 +54,7 @@ import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.progress.UIJob;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.editing.evaluation.Evaluation;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -163,6 +164,7 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 
 	private PropertyChangeListener modelListener = new PropertyChangeListener() {
 		public void propertyChange(PropertyChangeEvent evt) {
+			if(!evt.getPropertyName().equals(PropertyConstants.MODEL_LAYOUT_CHANGED))
 			refresh();
 		}
 	};
