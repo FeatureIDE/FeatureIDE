@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<site>
+<site associateSitesURL="associateSites.xml">
    <description name="FeatureIDE Update Site" url="http://wwwiti.cs.uni-magdeburg.de/iti_db/research/featureide/deploy/">
       FeatureIDE
    </description>
