@@ -31,14 +31,15 @@ public class TypecheckClearAction implements IObjectActionDelegate {
 	    if (Arrays.asList(TypecheckCorePlugin.supportedComposers).contains(
 		    project.getComposerID())) {
 
-		try {
-		    project.getSourceFolder().deleteMarkers(
-			    TypeCheckerFIDE.CHECK_MARKER, false,
-			    IResource.DEPTH_INFINITE);
-		} catch (CoreException e) {
-		    // TODO Auto-generated catch block
-		    e.printStackTrace();
-		}
+//		try {
+//		    project.getSourceFolder().deleteMarkers(
+//			    TypeCheckerFIDE.CHECK_MARKER, false,
+//			    IResource.DEPTH_INFINITE);
+		    project.deleteBuilderMarkers(project.getSourceFolder(), IResource.DEPTH_INFINITE);
+//		} catch (CoreException e) {
+//		    // TODO Auto-generated catch block
+//		    e.printStackTrace();
+//		}
 
 	    } else {
 		// TODO: change output method
