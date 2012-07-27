@@ -30,4 +30,9 @@ public interface IBuilderMarkerHandler {
 			String message, int lineNumber, int severity);
 
 	public abstract void deleteBuilderMarkers(IResource resource, int depth);
+	
+	public abstract void createTypecheckMarker(IResource resource,
+		String message, int lineNumber, int severity);
+
+public abstract void deleteTypecheckMarkers(IResource resource, int depth);
 }
