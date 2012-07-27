@@ -51,7 +51,7 @@ public class FIDEProblemHandler implements IProblemHandler {
 
     public FIDEProblemHandler(IFeatureProject project) {
 	this.project = project;
-	//this.plugin = TypecheckCorePlugin.getDefault();
+	this.plugin = TypecheckCorePlugin.getDefault();
     }
 
     /*
@@ -71,31 +71,9 @@ public class FIDEProblemHandler implements IProblemHandler {
     }
 
     public void clearMarkers(IResource res) {
-
-	if (plugin != null) {
-	    plugin.clearMarkers(res);
-	} else {
-
-	    // if (res instanceof IFile) {
-	     project.deleteBuilderMarkers(res, IResource.DEPTH_INFINITE);
-//	    try {
-//		res.deleteMarkers(TypeCheckerFIDE.CHECK_MARKER, false,
-//			IResource.DEPTH_INFINITE);
-//	    } catch (CoreException e) {
-//		// TODO Auto-generated catch block
-//		e.printStackTrace();
-//	    }
-	    // } else if (res instanceof IFolder) {
-	    // try {
-	    // for (IResource r : ((IFolder) res).members()) {
-	    // clearMarkers(r);
-	    // }
-	    // } catch (CoreException e) {
-	    // // TODO Auto-generated catch block
-	    // e.printStackTrace();
-	    // }
-	    // }
-	}
+	// plugin.clearMarkers(res);
+	// project.deleteBuilderMarkers(res, IResource.DEPTH_INFINITE);
+	project.deleteTypecheckMarkers(res, IResource.DEPTH_INFINITE);
     }
 
     // TODO: change the method from using the FIDE build markers to use own
@@ -104,27 +82,13 @@ public class FIDEProblemHandler implements IProblemHandler {
 	IFile file = project.getSourceFolder().getFile(
 		new Path(problem.getFilename()).makeRelativeTo(project
 			.getSourceFolder().getRawLocation()));
-	// TypecheckCorePlugin.getDefault().createMarker
-	if (plugin != null) {
-	    plugin.createMarker(file, problem.getMessage(),
-		    problem.getLinenumber(), 2);
-	} else {
-	    project.createBuilderMarker(file, problem.getMessage(),
-		    problem.getLinenumber(), 2);
-	}
-    }
 
-    protected void createMarker(IResource res, String message, int line,
-	    int severity) {
-	try {
-	    IMarker marker = res.createMarker(TypeCheckerFIDE.CHECK_MARKER);
-	    marker.setAttribute(IMarker.MESSAGE, message);
-	    marker.setAttribute(IMarker.LINE_NUMBER, line);
-	    marker.setAttribute(IMarker.SEVERITY, severity);
-	} catch (CoreException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	}
+	// plugin.createMarker(file, problem.getMessage(),
+	// problem.getLinenumber(), 2);
+	// project.createBuilderMarker(file, problem.getMessage(),
+	// problem.getLinenumber(), 2);
+	project.createTypecheckMarker(file, problem.getMessage(),
+		problem.getLinenumber(), 2);
     }
 
     /*
