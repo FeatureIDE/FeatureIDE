@@ -34,200 +34,139 @@ import de.ovgu.featureide.core.IBuilderMarkerHandler;
  */
 public class BuilderMarkerHandler implements IBuilderMarkerHandler {
 
-    private static final String BUILDER_MARKER = CorePlugin.PLUGIN_ID
-	    + ".builderProblemMarker";
+	private static final String BUILDER_MARKER = CorePlugin.PLUGIN_ID
+			+ ".builderProblemMarker";
 
-    private static final String TYPECHECK_MARKER = CorePlugin.PLUGIN_ID
-	    + ".typecheckProblemMarker";
+	private static final String CONFIGURATION_MARKER = CorePlugin.PLUGIN_ID
+			+ ".configurationProblemMarker";
 
-    private static final String CONFIGURATION_MARKER = CorePlugin.PLUGIN_ID
-	    + ".configurationProblemMarker";
-
-    public BuilderMarkerHandler(IProject project) {
-	this.project = project;
-    }
-
-    protected final IProject project;
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * de.ovgu.featureide.core.internal.IMarkerHandler#createBuilderMarker(org
-     * .eclipse.core.resources.IResource, java.lang.String, int, int)
-     */
-    public void createBuilderMarker(IResource resource, String message,
-	    int lineNumber, int severity) {
-	if (resource != null) {
-	    // for creating and deleting markers a synchronized file is
-	    // neccessary
-	    try {
-		resource.refreshLocal(IResource.DEPTH_ZERO, null);
-	    } catch (CoreException e) {
-		CorePlugin.getDefault().logError(e);
-	    }
-	} else
-	    resource = project;
-
-	// prevent duplicate error markers (e.g. caused by changing a jak file
-	// that refines a non-valid jak file)
-	deleteIfExists(resource, message, lineNumber, severity);
-
-	try {
-	    IMarker marker = resource.createMarker(BUILDER_MARKER);
-	    marker.setAttribute(IMarker.MESSAGE, message);
-	    marker.setAttribute(IMarker.SEVERITY, severity);
-	    marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
-	} catch (CoreException e) {
-	    CorePlugin.getDefault().logError(e);
+	public BuilderMarkerHandler(IProject project) {
+		this.project = project;
 	}
-    }
 
-    private void deleteIfExists(IResource resource, String message,
-	    int lineNumber, int severity) {
-	try {
-	    IMarker[] markers = resource.findMarkers(BUILDER_MARKER, false,
-		    IResource.DEPTH_ZERO);
-	    if (!resource.exists())
-		return;
-	    for (IMarker marker : markers) {
-		if (marker.getAttribute(IMarker.MESSAGE).equals(message)
-			&& (Integer) marker.getAttribute(IMarker.LINE_NUMBER) == lineNumber
-			&& (Integer) marker.getAttribute(IMarker.SEVERITY) == severity) {
-		    marker.delete();
+	protected final IProject project;
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.ovgu.featureide.core.internal.IMarkerHandler#createBuilderMarker(org
+	 * .eclipse.core.resources.IResource, java.lang.String, int, int)
+	 */
+	public void createBuilderMarker(IResource resource, String message,
+			int lineNumber, int severity) {
+		if (resource != null) {
+			// for creating and deleting markers a synchronized file is
+			// neccessary
+			try {
+				resource.refreshLocal(IResource.DEPTH_ZERO, null);
+			} catch (CoreException e) {
+				CorePlugin.getDefault().logError(e);
+			}
+		} else
+			resource = project;
+
+		// prevent duplicate error markers (e.g. caused by changing a jak file
+		// that refines a non-valid jak file)
+		deleteIfExists(resource, message, lineNumber, severity);
+
+		try {
+			IMarker marker = resource.createMarker(BUILDER_MARKER);
+			marker.setAttribute(IMarker.MESSAGE, message);
+			marker.setAttribute(IMarker.SEVERITY, severity);
+			marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
+		} catch (CoreException e) {
+			CorePlugin.getDefault().logError(e);
 		}
-	    }
-	} catch (CoreException e) {
-	    CorePlugin.getDefault().logError(e);
 	}
-    }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * de.ovgu.featureide.core.internal.IMarkerHandler#deleteBuilderMarkers(
-     * org.eclipse.core.resources.IResource, int)
-     */
-    public void deleteBuilderMarkers(IResource resource, int depth) {
-	if (resource != null && resource.exists()) {
-	    try {
-		resource.deleteMarkers(BUILDER_MARKER, false, depth);
-	    } catch (CoreException e) {
-		CorePlugin.getDefault().logError(e);
-	    }
-	}
-    }
-
-    public void createConfigurationMarker(IResource resource, String message,
-	    int lineNumber, int severity) {
-	try {
-	    resource.refreshLocal(IResource.DEPTH_ZERO, null);
-	} catch (CoreException e) {
-	    CorePlugin.getDefault().logError(e);
-	}
-	if (hasMarker(resource, message, lineNumber)) {
-	    return;
-	}
-	try {
-	    IMarker marker = resource.createMarker(CONFIGURATION_MARKER);
-	    marker.setAttribute(IMarker.MESSAGE, message);
-	    marker.setAttribute(IMarker.SEVERITY, severity);
-	    if (lineNumber == -1) {
-		lineNumber = 1;
-	    }
-	    marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
-	} catch (CoreException e) {
-	    CorePlugin.getDefault().logError(e);
-	}
-    }
-
-    /**
-     * @param resource
-     * @param message
-     * @param lineNumber
-     * @return
-     */
-    private boolean hasMarker(IResource resource, String message, int lineNumber) {
-	try {
-	    IMarker[] marker = resource.findMarkers(CONFIGURATION_MARKER,
-		    false, IResource.DEPTH_ZERO);
-	    if (marker != null) {
-		for (IMarker m : marker) {
-		    if (m.getAttribute(IMarker.MESSAGE).equals(message)
-			    && m.getAttribute(IMarker.LINE_NUMBER).equals(
-				    lineNumber)) {
-			return true;
-		    }
+	private void deleteIfExists(IResource resource, String message,
+			int lineNumber, int severity) {
+		try {
+			IMarker[] markers = resource.findMarkers(BUILDER_MARKER, false,
+					IResource.DEPTH_ZERO);
+			if (!resource.exists())
+				return;
+			for (IMarker marker : markers) {
+				if (marker.getAttribute(IMarker.MESSAGE).equals(message)
+						&& (Integer) marker.getAttribute(IMarker.LINE_NUMBER) == lineNumber
+						&& (Integer) marker.getAttribute(IMarker.SEVERITY) == severity) {
+					marker.delete();
+				}
+			}
+		} catch (CoreException e) {
+			CorePlugin.getDefault().logError(e);
 		}
-	    }
-	} catch (CoreException e) {
-	    CorePlugin.getDefault().logError(e);
 	}
-	return false;
-    }
 
-    public void deleteConfigurationMarkers(IResource resource, int depth) {
-	try {
-	    resource.deleteMarkers(CONFIGURATION_MARKER, false, depth);
-	} catch (CoreException e) {
-	    CorePlugin.getDefault().logError(e);
-	}
-    }
-
-    public void createTypecheckMarker(IResource resource, String message,
-	    int lineNumber, int severity) {
-	if (resource != null) {
-	    // for creating and deleting markers a synchronized file is
-	    // neccessary
-	    try {
-		resource.refreshLocal(IResource.DEPTH_ZERO, null);
-	    } catch (CoreException e) {
-		CorePlugin.getDefault().logError(e);
-	    }
-	} else
-	    resource = project;
-
-	// prevent duplicate error markers (e.g. caused by changing a jak file
-	// that refines a non-valid jak file)
-	deleteTypecheckMarkerIfExists(resource, message, lineNumber, severity);
-
-	try {
-	    IMarker marker = resource.createMarker(TYPECHECK_MARKER);
-	    marker.setAttribute(IMarker.MESSAGE, message);
-	    marker.setAttribute(IMarker.SEVERITY, severity);
-	    marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
-	} catch (CoreException e) {
-	    CorePlugin.getDefault().logError(e);
-	}
-    }
-
-    private void deleteTypecheckMarkerIfExists(IResource resource, String message,
-	    int lineNumber, int severity) {
-	try {
-	    IMarker[] markers = resource.findMarkers(TYPECHECK_MARKER, false,
-		    IResource.DEPTH_ZERO);
-	    if (!resource.exists())
-		return;
-	    for (IMarker marker : markers) {
-		if (marker.getAttribute(IMarker.MESSAGE).equals(message)
-			&& (Integer) marker.getAttribute(IMarker.LINE_NUMBER) == lineNumber
-			&& (Integer) marker.getAttribute(IMarker.SEVERITY) == severity) {
-		    marker.delete();
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.ovgu.featureide.core.internal.IMarkerHandler#deleteBuilderMarkers(
+	 * org.eclipse.core.resources.IResource, int)
+	 */
+	public void deleteBuilderMarkers(IResource resource, int depth) {
+		if (resource != null && resource.exists()) {
+			try {
+				resource.deleteMarkers(BUILDER_MARKER, false, depth);
+			} catch (CoreException e) {
+				CorePlugin.getDefault().logError(e);
+			}
 		}
-	    }
-	} catch (CoreException e) {
-	    CorePlugin.getDefault().logError(e);
 	}
-    }
 
-    public void deleteTypecheckMarkers(IResource resource, int depth) {
-	if (resource != null && resource.exists()) {
-	    try {
-		resource.deleteMarkers(TYPECHECK_MARKER, false, depth);
-	    } catch (CoreException e) {
-		CorePlugin.getDefault().logError(e);
-	    }
+	public void createConfigurationMarker(IResource resource, String message,
+			int lineNumber, int severity) {
+		try {
+			resource.refreshLocal(IResource.DEPTH_ZERO, null);
+		} catch (CoreException e) {
+			CorePlugin.getDefault().logError(e);
+		}
+		if (hasMarker(resource, message, lineNumber)) {
+			return;
+		}
+		try {
+			IMarker marker = resource.createMarker(CONFIGURATION_MARKER);
+			marker.setAttribute(IMarker.MESSAGE, message);
+			marker.setAttribute(IMarker.SEVERITY, severity);
+			if (lineNumber == -1) {
+				lineNumber = 1;
+			}
+			marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
+		} catch (CoreException e) {
+			CorePlugin.getDefault().logError(e);
+		}
 	}
-    }
+
+	/**
+	 * @param resource
+	 * @param message
+	 * @param lineNumber
+	 * @return
+	 */
+	private boolean hasMarker(IResource resource, String message, int lineNumber) {
+		try {
+			IMarker[] marker = resource.findMarkers(CONFIGURATION_MARKER, false, IResource.DEPTH_ZERO);
+			if (marker != null) {
+				for (IMarker m : marker) {
+					if (m.getAttribute(IMarker.MESSAGE).equals(message) &&
+							m.getAttribute(IMarker.LINE_NUMBER).equals(lineNumber)) {
+						return true;
+					}
+				}
+			}
+		} catch (CoreException e) {
+			CorePlugin.getDefault().logError(e);
+		}
+		return false;
+	}
+
+	public void deleteConfigurationMarkers(IResource resource, int depth) {
+		try {
+			resource.deleteMarkers(CONFIGURATION_MARKER, false, depth);
+		} catch (CoreException e) {
+			CorePlugin.getDefault().logError(e);
+		}
+	}
 }
