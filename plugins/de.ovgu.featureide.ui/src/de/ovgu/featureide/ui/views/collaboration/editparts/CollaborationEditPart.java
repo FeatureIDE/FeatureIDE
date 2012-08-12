@@ -146,7 +146,7 @@ public class CollaborationEditPart extends AbstractGraphicalEditPart implements 
 			 try {
 				 IWorkbenchPage page = dw.getActivePage();
 				 if (page != null) {
-					 page.openEditor(fileEditorInput,"de.ovgu.featureide.ui.editors.ConfigurationEditor");
+					 page.openEditor(fileEditorInput, "de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor");
 				 }
 			 } catch (PartInitException e) {
 				 UIPlugin.getDefault().logError(e);

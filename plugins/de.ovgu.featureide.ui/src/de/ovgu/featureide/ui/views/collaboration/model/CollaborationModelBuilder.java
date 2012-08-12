@@ -137,7 +137,7 @@ public class CollaborationModelBuilder {
 	 * This method is used to show model with informations form the FSTModel. 
 	 */
 	private void buildModelWithFSTModel() {
-		//case: FSTModel builded
+		//case: FSTModel built
 		Collection<FSTFeature> iFeatures = fSTModel.getSelectedFeatures();
 		if (iFeatures == null) {
 			return;
@@ -293,7 +293,7 @@ public class CollaborationModelBuilder {
 	 */
 	private void buildModelWithoutFSTModel() {
 		if(project.getSourceFolder() != null) {
-			//case: FSTModel not builded			
+			//case: FSTModel not built			
 			for (String layerName : layerNames) {
 				if (selectedFeatureNames.contains(layerName)) {
 					//case: selected

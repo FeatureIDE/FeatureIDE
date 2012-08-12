@@ -170,7 +170,7 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	 */
 	public boolean buildRelavantChanges();
 	
-	public void builded();
+	public void built();
 
 	public String getProjectConfigurationPath();
 	

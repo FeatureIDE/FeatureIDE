@@ -1308,9 +1308,9 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see de.ovgu.featureide.core.IFeatureProject#builded()
+	 * @see de.ovgu.featureide.core.IFeatureProject#built()
 	 */
-	public void builded() {
+	public void built() {
 		buildRelevantChanges = false;
 	}
 

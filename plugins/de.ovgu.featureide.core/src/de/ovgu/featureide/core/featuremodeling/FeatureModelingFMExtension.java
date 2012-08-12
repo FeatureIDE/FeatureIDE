@@ -11,15 +11,9 @@ import de.ovgu.featureide.fm.core.FMComposerExtension;
  */
 public class FeatureModelingFMExtension extends FMComposerExtension {
 
-	public FeatureModelingFMExtension() {
-		
-	}
-
-	@Override
-	public boolean isValidFeatureName(String s) {
-		return true;
-	}
-	
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.FMComposerExtension#performRenaming(java.lang.String, java.lang.String, org.eclipse.core.resources.IProject)
+	 */
 	@Override
 	public boolean performRenaming(String oldName, String newName,
 			IProject project) {

@@ -41,7 +41,7 @@ public interface IFMComposerExtension {
 	
 	/**
 	 * 
-	 * @return true if composer supports a feature order
+	 * @return <code>true</code> if composer supports a feature order
 	 */
 	boolean hasFeaureOrder();
 	

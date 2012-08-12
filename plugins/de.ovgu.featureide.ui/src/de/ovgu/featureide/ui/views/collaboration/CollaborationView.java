@@ -128,7 +128,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
 	 */
 	public void createPartControl(Composite parent) {
-		
 		IWorkbenchWindow editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		IEditorPart part = null;
 		if (editor != null) {
@@ -170,42 +169,48 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	public void setFocus() {
 		viewer.getControl().setFocus();
 	}
-	
+
+	/**
+	 * Gets the input of the given part and sets the content of the diagram.
+	 * @param activeEditor
+	 */
 	private void setEditorActions(IWorkbenchPart activeEditor) {
-		IEditorPart part = null;
-		if (activeEditor != null) {
+		IEditorPart part = null;	
+		if (activeEditor instanceof IEditorPart) {
+			part = (IEditorPart) activeEditor;
+		} else {
 			IWorkbenchPage page = activeEditor.getSite().getPage();
 			if (page != null) {
-				part = page.getActiveEditor();
-				if (part != null && part.getEditorInput() instanceof FileEditorInput) {
-					//case: open editor
-					IFile inputFile = ((FileEditorInput)part.getEditorInput()).getFile();
-					featureProject = CorePlugin.getFeatureProject(inputFile);
-					if (featureProject != null) {
-						//case: it's a featureIDE project
-						if (CorePlugin.getDefault().getConfigurationExtensions()
-								.contains(inputFile.getFileExtension())) {
-							//case: open configuration editor
-							builder.editorFile = null;
-							if (builder.configuration != null &&
-									builder.configuration.equals(inputFile) &&
-									featureProject.equals(builder.project)) {
-								return;
-							} else {
-								builder.configuration = inputFile;
-							}
-							
-						} else {
-							//case: open editor is no configuration editor
-							if (builder.editorFile != null &&
-									builder.editorFile.getName().equals(inputFile.getName()) &&
-									featureProject.getProject().equals(builder.editorFile.getProject())) {
-								return;
-							}
-							builder.editorFile = inputFile;
-							builder.configuration = featureProject.getCurrentConfiguration();
-						}
+				part = page.getActiveEditor();	
+			}
+		}
+		
+		if (part != null && part.getEditorInput() instanceof FileEditorInput) {
+			//case: open editor
+			IFile inputFile = ((FileEditorInput)part.getEditorInput()).getFile();
+			featureProject = CorePlugin.getFeatureProject(inputFile);
+			if (featureProject != null) {
+				//case: it's a FeatureIDE project
+				if (CorePlugin.getDefault().getConfigurationExtensions()
+						.contains(inputFile.getFileExtension())) {
+					//case: open configuration editor
+					builder.editorFile = null;
+					if (builder.configuration != null &&
+							builder.configuration.equals(inputFile) &&
+							featureProject.equals(builder.project)) {
+						return;
+					} else {
+						builder.configuration = inputFile;
 					}
+				} else {
+					//case: open editor is no configuration editor
+					if (builder.editorFile != null &&
+							builder.editorFile.getName().equals(inputFile.getName()) &&
+							featureProject.getProject().equals(builder.editorFile.getProject())) {
+						return;
+					}
+					builder.editorFile = inputFile;
+					builder.configuration = featureProject.getCurrentConfiguration();
 				}
 			}
 		}
@@ -215,12 +220,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 			model.collaborations.add(new Collaboration(OPEN_MESSAGE));
 			viewer.setContents(model);
 		} else {
-//			if (featureProject.getCurrentConfiguration() == null){
-//				model = new CollaborationModel();
-//				model.collaborations.add(new Collaboration(CONFIGURATION_MESSAGE));
-//				viewer.setContents(model);
-//			} else
-				updateGuiAfterBuild(featureProject, null);
+			updateGuiAfterBuild(featureProject, null);
 		}
 	}
 	
@@ -274,7 +274,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 						if (!toolbarAction.isEnabled())
 							return Status.OK_STATUS;
 						toolbarAction.setEnabled(false);
-						builded = true;
+						built = true;
 						if (featureProject != null) {
 							// TODO @Jens check this method
 							IComposerExtension composer = featureProject.getComposer();
@@ -292,7 +292,8 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		};
 	}
 	
-	private boolean builded = true; 
+	private boolean built = true;
+	
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.core.listeners.ICurrentBuildListener#updateGuiAfterBuild(de.ovgu.featureide.core.IFeatureProject)
 	 */
@@ -301,13 +302,13 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 			Job job = new Job("Build Collaboration Model") {
 
 				public IStatus run(IProgressMonitor monitor) {
-					if (builded) {
-						builded = false;
+					if (built) {
+						built = false;
 						if (configurationFile != null && builder.editorFile != null) {
 							builder.configuration = configurationFile;
 						}
 						model = builder.buildCollaborationModel(project);
-						builded = true;
+						built = true;
 						if (model == null) {
 							toolbarAction.setEnabled(true);
 							return Status.OK_STATUS;
