@@ -98,25 +98,30 @@ public class OriginalCheck extends AbstractTypeCheckPlugin {
 		    }
 
 		    if (providing_features.isEmpty()) {
-			newProblem(new CheckProblem(f, md.hostType(),
-				FujiWrapper.getParentByType(md,
+			CheckProblem problem = new CheckProblem(f,
+				md.hostType(), FujiWrapper.getParentByType(md,
 					CompilationUnit.class)
 				// .compilationUnit()
 					.pathName(), ma.lineNumber(),
 				"original() method not found: "
-					+ md.signature(), null));
+					+ md.signature(), null);
+			problem.setSeverity(CheckProblem.SEVERITY_ERROR);
+			newProblem(problem);
 		    } else {
 			if (!checkFeatureImplication(fm, f,
 				providing_features.keySet())) {
-
-			    newProblem(new CheckProblem(f, md.hostType(),
-				    FujiWrapper.getParentByType(md,
-					    CompilationUnit.class).pathName(),
-				    ma.lineNumber(),
-//				    "Missing dependency to original() method: "
-				    "Method " + md.hostType().name() + "." + md.signature() + " can not be accessed in Feature"
+			    CheckProblem problem = new CheckProblem(f,
+				    md.hostType(), FujiWrapper.getParentByType(
+					    md, CompilationUnit.class)
+					    .pathName(), ma.lineNumber(),
+				    // "Missing dependency to original() method: "
+				    "Method " + md.hostType().name() + "."
+					    + md.signature()
+					    + " can not be accessed in Feature"
 					    + f.getName() + ".",
-				    providing_features.keySet()));
+				    providing_features.keySet());
+			    problem.setSeverity(CheckProblem.SEVERITY_WARNING);
+			    newProblem(problem);
 			}
 		    }
 		}

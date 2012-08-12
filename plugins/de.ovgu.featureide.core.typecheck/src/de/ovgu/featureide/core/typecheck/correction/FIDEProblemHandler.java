@@ -71,9 +71,9 @@ public class FIDEProblemHandler implements IProblemHandler {
     }
 
     public void clearMarkers(IResource res) {
-	// plugin.clearMarkers(res);
-	// project.deleteBuilderMarkers(res, IResource.DEPTH_INFINITE);
-	project.deleteTypecheckMarkers(res, IResource.DEPTH_INFINITE);
+	 plugin.clearMarkers(res);
+//	 project.deleteBuilderMarkers(res, IResource.DEPTH_INFINITE);
+//	project.deleteTypecheckMarkers(res, IResource.DEPTH_INFINITE);
     }
 
     // TODO: change the method from using the FIDE build markers to use own
@@ -83,12 +83,12 @@ public class FIDEProblemHandler implements IProblemHandler {
 		new Path(problem.getFilename()).makeRelativeTo(project
 			.getSourceFolder().getRawLocation()));
 
-	// plugin.createMarker(file, problem.getMessage(),
-	// problem.getLinenumber(), 2);
-	// project.createBuilderMarker(file, problem.getMessage(),
-	// problem.getLinenumber(), 2);
-	project.createTypecheckMarker(file, problem.getMessage(),
-		problem.getLinenumber(), 2);
+	 plugin.createMarker(file, problem.getMessage(),
+	 problem.getLinenumber(), problem.getSeverity());
+//	 project.createBuilderMarker(file, problem.getMessage(),
+//	 problem.getLinenumber(), 2);
+//	project.createTypecheckMarker(file, problem.getMessage(),
+//		problem.getLinenumber(), problem.getSeverity());
     }
 
     /*

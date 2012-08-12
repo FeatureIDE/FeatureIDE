@@ -38,6 +38,22 @@ public class CheckProblem {
     private String message;
     private Set<Feature> providingFeatures;
     private ICheckPlugin origin;
+    
+    private int severity = SEVERITY_INFO;
+
+    /**
+     * @return the severity
+     */
+    public int getSeverity() {
+        return severity;
+    }
+
+    /**
+     * @param severity the severity to set
+     */
+    public void setSeverity(int severity) {
+        this.severity = severity;
+    }
 
     private List<Action> actions;
 
@@ -129,4 +145,8 @@ public class CheckProblem {
     public List<Action> getActions() {
 	return this.actions;
     }
+    
+    public static final int SEVERITY_INFO = 0;
+    public static final int SEVERITY_WARNING = 1;
+    public static final int SEVERITY_ERROR = 2;
 }

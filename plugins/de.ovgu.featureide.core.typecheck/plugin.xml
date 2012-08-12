@@ -36,5 +36,16 @@
          </action>
       </objectContribution>
    </extension>
+   <extension
+         id="checkMarker"
+         name="Typecheck Problem"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+      <persistent
+            value="true">
+      </persistent>
+   </extension>
 
 </plugin>

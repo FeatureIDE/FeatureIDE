@@ -32,10 +32,10 @@ public class TypecheckClearAction implements IObjectActionDelegate {
 		    project.getComposerID())) {
 		TypecheckCorePlugin.getDefault().clearMarkers(
 			project.getSourceFolder());
-		project.deleteTypecheckMarkers(project.getSourceFolder(),
-			IResource.DEPTH_INFINITE);
-		project.deleteBuilderMarkers(project.getSourceFolder(),
-			IResource.DEPTH_INFINITE);
+//		project.deleteTypecheckMarkers(project.getSourceFolder(),
+//			IResource.DEPTH_INFINITE);
+//		project.deleteBuilderMarkers(project.getSourceFolder(),
+//			IResource.DEPTH_INFINITE);
 	    } else {
 		// TODO: change output method
 		System.out.println("unsupported composer found");

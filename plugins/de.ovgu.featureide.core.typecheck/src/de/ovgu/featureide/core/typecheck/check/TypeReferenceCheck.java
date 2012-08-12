@@ -24,6 +24,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IResource;
+
 import AST.ClassDecl;
 import AST.CompilationUnit;
 import AST.ReferenceType;
@@ -51,8 +54,7 @@ public class TypeReferenceCheck extends AbstractTypeCheckPlugin {
     }
 
     /**
-     * creates an introduction table
-     * which feature introduces which type?
+     * creates an introduction table which feature introduces which type?
      */
     public void init() {
 	Map<Feature, List<CompilationUnit>> cumap = getNodesByType(CompilationUnit.class);
@@ -87,7 +89,8 @@ public class TypeReferenceCheck extends AbstractTypeCheckPlugin {
     @Override
     public void invokeCheck(FeatureModel fm) {
 	// doesn't work with annotations and stuff
-	//Map<Feature, List<ClassDecl>> cdmap = getNodesByType(ClassDecl.class);
+	// Map<Feature, List<ClassDecl>> cdmap =
+	// getNodesByType(ClassDecl.class);
 	Map<Feature, List<CompilationUnit>> cdmap = getNodesByType(CompilationUnit.class);
 	Map<Feature, List<TypeAccess>> tamap = getNodesByType(TypeAccess.class);
 	int count = 0;
@@ -95,8 +98,9 @@ public class TypeReferenceCheck extends AbstractTypeCheckPlugin {
 	for (Feature f : cdmap.keySet()) {
 	    for (CompilationUnit cd : cdmap.get(f)) {
 		// for every type access inside a class declaration
-		for (TypeAccess ta : FujiWrapper.getChildNodesByType(cd,			TypeAccess.class)) {
-//		for(TypeAccess ta : tamap.get(f)){
+		for (TypeAccess ta : FujiWrapper.getChildNodesByType(cd,
+			TypeAccess.class)) {
+		    // for(TypeAccess ta : tamap.get(f)){
 		    // utilise the type resolution of fuji and handle only
 		    // unknown types
 		    count++;
@@ -104,14 +108,34 @@ public class TypeReferenceCheck extends AbstractTypeCheckPlugin {
 			// which feature can provide the unknown type?
 			Set<Feature> providing_features = providesType(
 				ta.name()).keySet();
-			// is one of the providing features always present with
-			// feature f?
-			if (!checkFeatureImplication(fm, f, providing_features)) {
+
+			if (providing_features.isEmpty()) {
+			    CheckProblem problem = new CheckProblem(
+				    f,
+				    ta.hostType(),
+				    cd.pathName(),
+				    ta.lineNumber(),
+				    "Class "
+					    + ta.name()
+					    + " can not be accessed in Feature "
+					    + f.getName(), null);
+			    problem.setSeverity(CheckProblem.SEVERITY_ERROR);
+
+			    newProblem(problem);
+			} else if (!checkFeatureImplication(fm, f,
+				providing_features)) {
 			    // it is not, create a new problem
-			    newProblem(new CheckProblem(f, ta.hostType(), cd
-				    //.compilationUnit()
-				    .pathName(),
-				    ta.lineNumber(), "Class " + ta.name() + " can not be accessed in Feature " + f.getName(), providing_features));
+			    CheckProblem problem = new CheckProblem(
+				    f,
+				    ta.hostType(),
+				    cd.pathName(),
+				    ta.lineNumber(),
+				    "Class "
+					    + ta.name()
+					    + " can not be accessed in Feature "
+					    + f.getName(), providing_features);
+			    problem.setSeverity(CheckProblem.SEVERITY_WARNING);
+			    newProblem(problem);
 			}
 		    }
 		}
@@ -134,8 +158,12 @@ public class TypeReferenceCheck extends AbstractTypeCheckPlugin {
 	return providing_features;
     }
 
-    /* (non-Javadoc)
-     * @see de.ovgu.featureide.core.typecheck.check.ICheckPlugin#determineAction(de.ovgu.featureide.core.typecheck.check.CheckProblem)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * de.ovgu.featureide.core.typecheck.check.ICheckPlugin#determineAction(
+     * de.ovgu.featureide.core.typecheck.check.CheckProblem)
      */
     @Override
     public List<Action> determineActions(CheckProblem problem) {
