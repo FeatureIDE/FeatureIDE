@@ -472,7 +472,6 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		}
 		final String basePath = featureProject.getSourcePath();
 		final String outputPath = featureProject.getBuildPath();
-
 		if (configPath == null || basePath == null || outputPath == null)
 			return;
 		

@@ -43,7 +43,7 @@ Bundle-ClassPath: .,
  lib/guidsl.jar,
  lib/jakarta.jar,
  lib/org.sat4j.core.jar,
- lib/jsr305.jar
+ lib/annotations.jar
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Activator: de.ovgu.featureide.fm.core.FMCorePlugin
 Bundle-Vendor: University of Magdeburg
