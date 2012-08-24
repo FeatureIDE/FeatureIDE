@@ -52,7 +52,7 @@ public class LayoutSelectionOperation extends AbstractOperation {
 			throws ExecutionException {
 
 		featureModel.getLayout().setLayout(newSelectedLayoutAlgorithm);
-		featureModel.redrawDiagram();
+		
 		featureModel.handleModelDataChanged();
 
 		return Status.OK_STATUS;
