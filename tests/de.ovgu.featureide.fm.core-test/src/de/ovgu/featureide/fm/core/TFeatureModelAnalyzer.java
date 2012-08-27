@@ -64,7 +64,7 @@ public class TFeatureModelAnalyzer {
 	private FeatureModel FM_test_3 = init("test_3.xml");
 	private Feature FM3_F2 = FM_test_3.getFeature("F2");
 	private Feature FM3_F3 = FM_test_3.getFeature("F3");
-	private Constraint FM3_C1 = FM_test_3.getConstraints().get(0);
+	private Constraint FM3_C1 = FM_test_3.getConstraints().get(0); 
 	private HashMap<Object, Object> FM3_DATA = FM_test_3.getAnalyser().analyzeFeatureModel(null);
 	
 	/** 
