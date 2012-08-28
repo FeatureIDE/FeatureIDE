@@ -80,6 +80,7 @@ public class ModelEditPart extends AbstractGraphicalEditPart {
 		List<Object> list = new LinkedList<Object>();
 		addCollaboration(model.getCollaborations(), list);
 		addClass(model.getClasses(), list);
+		System.out.println("ModelEditPart/83" + list.toString());
 		return list;
 	}
 

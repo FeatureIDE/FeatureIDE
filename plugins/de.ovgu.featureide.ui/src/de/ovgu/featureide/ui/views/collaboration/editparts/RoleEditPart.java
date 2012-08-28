@@ -109,6 +109,9 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 		Rectangle constraint = new Rectangle(newLocation, size);
 		classEditPart.setLayoutConstraint(this, roleFigure, constraint);
 		roleFigure.setBounds(constraint);
+		
+		System.out.println("RoleEditPart/113 " + modelEditChildren.toString());
+		System.out.println("RoleEditPart/114 " + listOfColls.toString());
 	}
 
 	/**
