@@ -452,7 +452,6 @@ public class Prop4JTest {
 		String constraint = "not Hello and World ()";
 		assertFalse(testValidatorWithFeatureNames(constraint, featureNames));
 		assertFalse(testValidatorWithoutFeatureNames(constraint));
-
 	}
 
 	@Test
@@ -490,6 +489,7 @@ public class Prop4JTest {
 
 	}
 
+
 	@Test
 	public void testValidatorWithFeatureNames12() {
 		String[] featureNames = { "Hello", "World", "Beautiful", "Wonderful" };
@@ -511,12 +511,42 @@ public class Prop4JTest {
 	@Test
 	public void testValidatorWithFeatureNames14() {
 		String[] featureNames = { "Hello", "World", "Beautiful", "Wonderful" };
-		String constraint = "Hello) or (World";
+		String constraint = "()()()()";
 		assertFalse(testValidatorWithFeatureNames(constraint, featureNames));
 		assertFalse(testValidatorWithoutFeatureNames(constraint));
 
 	}
 
+	@Test
+	public void testValidatorWithFeatureNames15() {
+		String[] featureNames = { "Hello", "World", "Beautiful", "Wonderful" };
+		String constraint = "Hello Wonderful";
+		assertFalse(testValidatorWithFeatureNames(constraint, featureNames));
+		assertFalse(testValidatorWithoutFeatureNames(constraint));
+
+	}
+	
+	@Test
+	public void testValidatorWithFeatureNames16() {
+		String[] featureNames = { "Hello", "World", "Beautiful", "Wonderful" };
+		String constraint = "(World and Beautiful)";
+		assertTrue(testValidatorWithFeatureNames(constraint, featureNames));
+		assertTrue(testValidatorWithoutFeatureNames(constraint));
+
+	}
+	
+	@Test
+	public void testValidatorWithFeatureNames17() {
+		String[] featureNames = { "Hello", "World", "Beautiful", "Wonderful", "Hello and World" };
+		String constraint = "\"Hello and World\" or Wonderful";
+		assertTrue(testValidatorWithFeatureNames(constraint, featureNames));
+		assertTrue(testValidatorWithoutFeatureNames(constraint));
+
+	}
+	
+	
+	
+	
 	private boolean testValidatorWithFeatureNames(String constraint,
 			String[] featureNames) {
 		NodeReader n = new NodeReader();
@@ -590,10 +620,10 @@ public class Prop4JTest {
 	
 	@Test
 	public void problemAymericHervieu() {
-		String ctr = "(C => A) & (E => C) & (G => C) & (D => A) & (F => C) & (C => A) &"+
+		String ctr = "(C => A) & (E => C) & (G => C) & (D => A) & (F => C) & (C => A) & "+
 				"(I => D) & (B => A) & (D => A) & (J => D) & (J => D) & (B => A) & (E "+
-				"=> C) & (F => C) & (I => D) & (G => C) & A & (False | A) & (A => B) &"+
-				"(C => E | F | G) & (E => -G) & (E => -F) & (F => -G) & (D => J | I) &"+
+				"=> C) & (F => C) & (I => D) & (G => C) & A & (False | A) & (A => B) & "+
+				"(C => E | F | G) & (E => -G) & (E => -F) & (F => -G) & (D => J | I) & "+
 				"(I => E)"; 
 
 		NodeReader nd = new NodeReader();
