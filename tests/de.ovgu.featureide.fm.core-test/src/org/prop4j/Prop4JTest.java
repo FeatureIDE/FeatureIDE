@@ -541,12 +541,80 @@ public class Prop4JTest {
 		String constraint = "\"Hello and World\" or Wonderful";
 		assertTrue(testValidatorWithFeatureNames(constraint, featureNames));
 		assertTrue(testValidatorWithoutFeatureNames(constraint));
-
 	}
 	
+	@Test
+	public void testValidatorWithFeatureNames18() {
+		String[] featureNames = { "Beautiful", "Wonderful", "Hello and World" };
+		String constraint = "\"Hello and World\" or Wonderful";
+		assertTrue(testValidatorWithFeatureNames(constraint, featureNames));
+		assertTrue(testValidatorWithoutFeatureNames(constraint));
+	}
 	
+	@Test
+	public void testValidatorWithFeatureNames19() {
+		String[] featureNames = {"Wonderful"};
+		String constraint = "\"Hello and World\" or Wonderful";
+		assertFalse(testValidatorWithFeatureNames(constraint, featureNames));
+		assertTrue(testValidatorWithoutFeatureNames(constraint));
+	}
+		
+	@Test
+	public void testValidatorWithFeatureNames21() {
+		String[] featureNames = { "Hello", "World", "Beautiful", "Wonderful", "Hello and World" };
+		String constraint = "(\"Hello and World\" or Wonderful) or \"Hello\"";
+		assertTrue(testValidatorWithFeatureNames(constraint, featureNames));
+		assertTrue(testValidatorWithoutFeatureNames(constraint));
+	}		
 	
+	@Test
+	public void testValidatorWithFeatureNames22() {
+		String[] featureNames = {"Beautiful", "Wonderful", "Hello and World" };
+		String constraint = "(Hello \"and World\" or Wonderful)";
+		assertFalse(testValidatorWithFeatureNames(constraint, featureNames));
+		assertFalse(testValidatorWithoutFeatureNames(constraint));
+	}		
 	
+	@Test
+	public void testValidatorWithFeatureNames23() {
+		String[] featureNames = {"Beautiful", "Wonderful", "Hello and World" };
+		String constraint = "((\"Hello and World\") or Wonderful)";
+		assertTrue(testValidatorWithFeatureNames(constraint, featureNames));
+		assertTrue(testValidatorWithoutFeatureNames(constraint));
+	}		
+
+	@Test
+	public void testValidatorWithFeatureNames24() {
+		String[] featureNames = {"Beautiful", "Wonderful", "Hello and World" };
+		String constraint = "((\"Hello and World\") \"or\" Wonderful)";
+		assertFalse(testValidatorWithFeatureNames(constraint, featureNames));
+		assertFalse(testValidatorWithoutFeatureNames(constraint));
+	}		
+
+	@Test
+	public void testValidatorWithFeatureNames25() {
+		String[] featureNames = {"Beautiful and", "Wonderful", "Hello and World" };
+		String constraint = "((((\"Hello and World\" and \"Beautiful and\"))) or Wonderful)";
+		assertTrue(testValidatorWithFeatureNames(constraint, featureNames));
+		assertTrue(testValidatorWithoutFeatureNames(constraint));
+	}		
+	
+	@Test
+	public void testValidatorWithFeatureNames26() {
+		String[] featureNames = {"Beautiful and", "Wonderful", "Hello and World" };
+		String constraint = "(((\"Hello and World\" and \"Beautiful and\"))) or Wonderful)";
+		assertFalse(testValidatorWithFeatureNames(constraint, featureNames));
+		assertFalse(testValidatorWithoutFeatureNames(constraint));
+	}		
+	
+	@Test
+	public void testValidatorWithFeatureNames27() {
+		String[] featureNames = {"Hello and World" };
+		String constraint = "((((\"Hello and World\" and \"Beautiful and\"))) or Wonderful)";
+		assertFalse(testValidatorWithFeatureNames(constraint, featureNames));
+		assertTrue(testValidatorWithoutFeatureNames(constraint));
+	}		
+
 	private boolean testValidatorWithFeatureNames(String constraint,
 			String[] featureNames) {
 		NodeReader n = new NodeReader();
