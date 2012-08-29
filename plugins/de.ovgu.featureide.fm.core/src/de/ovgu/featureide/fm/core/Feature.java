@@ -31,7 +31,9 @@ import java.util.List;
  * @author Thomas Thuem
  * 
  */
-public class Feature implements PropertyConstants {
+public class Feature implements PropertyConstants, PropertyChangeListener {
+	
+	public static final int INVALID_COLOR = -1;
 
 	private String name;
 
@@ -46,6 +48,8 @@ public class Feature implements PropertyConstants {
 	private boolean hidden = false;
 	
 	private boolean constraintSelected = false;
+	
+	private ArrayList<Integer> colors = new ArrayList<Integer>();
 	
 	private List<Constraint> partOfConstraints = new ArrayList<Constraint>();
 	
@@ -139,6 +143,56 @@ public class Feature implements PropertyConstants {
 	public void setConstraintSelected(boolean selection) {
 		this.constraintSelected = selection;
 		fire(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
+	}
+	
+	public boolean hasColor() {
+		return colors.get(featureModel.getCurColorScheme()) > INVALID_COLOR;
+	}
+	
+	public int getColor() {
+		return colors.get(featureModel.getCurColorScheme());
+	}
+	
+	public void setColor(int color) {
+		colors.set(featureModel.getCurColorScheme(), color);
+	}
+	
+	public void removeColor() {
+		colors.set(featureModel.getCurColorScheme(), INVALID_COLOR);
+	}
+	
+	public boolean hasColor(int scheme) {
+		return colors.get(scheme) > INVALID_COLOR;
+	}
+	
+	public int getColor(int scheme) {
+		return colors.get(scheme);
+	}
+	
+	public boolean hasNoColorSchemes() {
+		return colors.isEmpty();
+	}
+	
+	public void setupColorSchemes(int[] newColors) {
+		colors.clear();
+		for (int i = 0; i < newColors.length; i++) {
+			colors.add(newColors[i]);
+		}
+	}
+	
+	public void setupColorSchemes(int count) {
+		colors.clear();
+		for (int i = 0; i < count; i++) {
+			colors.add(INVALID_COLOR);
+		}
+	}
+	
+	public void addColorScheme() {
+		colors.add(INVALID_COLOR);
+	}
+	
+	public void removeColorScheme() {
+		colors.remove(featureModel.getCurColorScheme());
 	}
 
 	public void setAbstract(boolean value) {
@@ -378,6 +432,13 @@ public class Feature implements PropertyConstants {
 		for (PropertyChangeListener listener : listenerList)
 			listener.propertyChange(event);
 	}
+	
+//	private void fireColorChanged(int oldValue, int newValue) {
+//		PropertyChangeEvent event = new PropertyChangeEvent(this, COLOR_CHANGED,
+//				oldValue, newValue);
+//		for (PropertyChangeListener listener : listenerList)
+//			listener.propertyChange(event);
+//	}
 
 	// public Point getReferencePoint() {
 	// return new Rectangle(location, size).getCenter();
@@ -483,6 +544,9 @@ public class Feature implements PropertyConstants {
 		feature.multiple = multiple;
 		feature.hidden = hidden;
 		feature.concret = concret;
+		for (Integer color : colors) {
+			feature.colors.add(color);
+		}
 		return feature;
 	}
 
@@ -523,6 +587,15 @@ public class Feature implements PropertyConstants {
 	@Override
 	public String toString() {
 		return name;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+	 */
+	@Override
+	public void propertyChange(PropertyChangeEvent event) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 	public String toString(boolean writeMarks)

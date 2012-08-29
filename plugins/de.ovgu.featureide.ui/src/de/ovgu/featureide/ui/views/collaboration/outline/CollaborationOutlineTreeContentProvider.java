@@ -69,7 +69,7 @@ public class CollaborationOutlineTreeContentProvider implements
 
 		@Override
 		public int compare(FSTDirective o1, FSTDirective o2) {
-			return o1.lineNumber > o2.lineNumber ? 1 : 0;
+			return o1.getStartLine() > o2.getStartLine() ? 1 : 0;
 		}
 		
 	};

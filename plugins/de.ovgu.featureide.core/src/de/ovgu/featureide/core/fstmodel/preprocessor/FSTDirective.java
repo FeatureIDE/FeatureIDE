@@ -22,6 +22,7 @@ import java.util.ArrayList;
 
 import org.eclipse.core.resources.IFile;
 
+import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTModelElement;
 
 /**
@@ -32,15 +33,23 @@ import de.ovgu.featureide.core.fstmodel.FSTModelElement;
  */
 public class FSTDirective extends FSTModelElement {
 
-	public int lineNumber;
+	private int startLine;
 	
-	public IFile file = null;
+	private int endLine;
+
+	private int startOffset;
+	
+	private int endOffset;
+	
+	private ArrayList<FSTFeature> referencedFeatures = new ArrayList<FSTFeature>();
 	
 	public int command;
 	
 	public String expression;
 	
-	private ArrayList<FSTDirective> children;
+	public IFile file = null;
+	
+	private ArrayList<FSTDirective> children = new ArrayList<FSTDirective>();
 
 	private FSTDirective parent = null;
 
@@ -57,19 +66,17 @@ public class FSTDirective extends FSTModelElement {
 	public static final int UNDEFINE = 11;
 	
 	public FSTDirective() {
-		this.lineNumber = 0;
+		this.startLine = 0;
+		this.endLine = 0;
+		this.startOffset = 0;
 		this.command = 0;
 		this.expression = "";
-		
-		children = new ArrayList<FSTDirective>();
 	}
 	
 	public FSTDirective(int lineNumber, int command, String expression){
-		this.lineNumber = lineNumber;
+		this.startLine = lineNumber;
 		this.command = command;
 		this.expression = expression;
-		
-		children = new ArrayList<FSTDirective>();
 	}
 	
 	/* (non-Javadoc)
@@ -79,23 +86,80 @@ public class FSTDirective extends FSTModelElement {
 	public FSTModelElement getParent() {
 		return parent;
 	}
-
-
+	
 	/**
-	 * @return the lineNumber
+	 * @return the startLine
 	 */
-	public int getLineNumber() {
-		return lineNumber;
+	public int getStartLine() {
+		return startLine;
 	}
 
-
 	/**
-	 * @param lineNumber the lineNumber to set
+	 * @return the offset
 	 */
-	public void setLineNumber(int lineNumber) {
-		this.lineNumber = lineNumber;
+	public int getStartOffset() {
+		return startOffset;
 	}
 
+	/**
+	 * @param startLine the startLine to set
+	 */
+	public void setStartLine(int startLine) {
+		this.startLine = startLine;
+	}
+
+	/**
+	 * @param startOffset the startOffset to set
+	 */
+	public void setStartOffset(int startOffset) {
+		this.startOffset = startOffset;
+	}
+
+	/**
+	 * @param startLine the startLine to set
+	 * @param startOffset the offset to set
+	 */
+	public void setStartLine(int startLine, int startOffset) {
+		this.startLine = startLine;
+		this.startOffset = startOffset;
+	}
+
+	/**
+	 * @return the endLine
+	 */
+	public int getEndLine() {
+		return endLine;
+	}
+	
+	/**
+	 * @return the length
+	 */
+	public int getEndOffset() {
+		return endOffset;
+	}
+	
+	/**
+	 * @param endLine the endLine to set
+	 */
+	public void setEndLine(int endLine) {
+		this.endLine = endLine;
+	}
+
+	/**
+	 * @param endOffset the endOffset to set
+	 */
+	public void setEndOffset(int endOffset) {
+		this.endOffset = endOffset;
+	}
+
+	/**
+	 * @param endLine the endLine to set
+	 * @param endOffset the length to set
+	 */
+	public void setEndLine(int endLine, int endOffset) {
+		this.endLine = endLine;
+		this.endOffset = endOffset;
+	}
 
 	/**
 	 * @return the command
@@ -103,7 +167,7 @@ public class FSTDirective extends FSTModelElement {
 	public int getCommand() {
 		return command;
 	}
-
+	
 
 	/**
 	 * @param command the command to set
@@ -128,6 +192,19 @@ public class FSTDirective extends FSTModelElement {
 		this.expression = expression;
 	}
 
+	/**
+	 * @return the referencedFeatures
+	 */
+	public ArrayList<FSTFeature> getReferencedFeatures() {
+		return referencedFeatures;
+	}
+
+	/**
+	 * @param referencedFeatures the referencedFeatures to set
+	 */
+	public void addReferencedFeature(FSTFeature feature) {
+		referencedFeatures.add(feature);
+	}
 
 	/**
 	 * @return the children
@@ -224,6 +301,5 @@ public class FSTDirective extends FSTModelElement {
 			default: return "";
 			
 		}
-	}
-	
+	}	
 }

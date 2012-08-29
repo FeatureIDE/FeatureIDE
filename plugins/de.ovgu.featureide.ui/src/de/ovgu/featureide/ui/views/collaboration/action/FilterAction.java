@@ -83,17 +83,7 @@ public class FilterAction extends Action {
 			checked = true;
 			collaborationView.builder.classFilter = (LinkedHashSet<String>) classFilter.clone();
 			collaborationView.builder.featureFilter = (LinkedHashSet<String>) featureFilter.clone();
-			model = collaborationView.builder.buildCollaborationModel(collaborationView.getFeatureProject());
-			if (model == null) {
-				UIPlugin.getDefault().logWarning("model loading error");
-				return;
-			}
-			Display.getDefault().syncExec(new Runnable(){	
-				public void run(){
-					viewer.setContents(model);		
-					viewer.getContents().refresh();
-				}
-			});	
+			collaborationView.refresh();
 		} else {
 			setChecked(false);
 			checked = false;

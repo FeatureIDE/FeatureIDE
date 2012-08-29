@@ -18,39 +18,29 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.action;
 
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
-import org.eclipse.swt.widgets.Display;
-
-import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
-import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModel;
 
 /**
  * Shows unselected features at collaboration model
  * 
  * @author Jens Meinicke
  */
-public class ShowUnselectedAction extends Action {
+public class ShowCompleteOutlineAction extends Action {
 
-	private CollaborationModel model;
 	private CollaborationView collaborationView;
-	private GraphicalViewerImpl view;
-	
-	public ShowUnselectedAction(String text, GraphicalViewerImpl view, CollaborationView collaborationView, CollaborationModel model) {
+	public ShowCompleteOutlineAction(String text, CollaborationView collaborationView) {
 		super(text);
 		this.collaborationView = collaborationView;
-		this.model = model;
-		this.view = view;
 	}
 
 	public void setEnabled(boolean enabled) {
-		super.setChecked(collaborationView.builder.showUnselectedFeatures);
+		super.setChecked(collaborationView.builder.showCompleteOutline);
 		super.setEnabled(true);
 	}
 	
 	public void run() {
-		collaborationView.builder.showUnselectedFeatures(!collaborationView.builder.showUnselectedFeatures);
+		collaborationView.builder.showCompleteOutline(!collaborationView.builder.showCompleteOutline);
 		collaborationView.refresh();
 	}
 }

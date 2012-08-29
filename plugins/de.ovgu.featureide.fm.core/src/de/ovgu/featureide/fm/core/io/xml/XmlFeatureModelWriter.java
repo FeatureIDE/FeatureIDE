@@ -22,6 +22,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -74,6 +75,7 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
 	 */
     private void createXmlDoc(Document doc) {
         Element root = doc.createElement("featureModel");
+    	Element colorSchemes = doc.createElement("colorSchemes");
     	Element struct = doc.createElement("struct");
     	Element constraints = doc.createElement("constraints");
     	Element comments = doc.createElement("comments");
@@ -87,7 +89,17 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
     	if(!featureModel.getLayout().showHiddenFeatures()){
     		root.setAttribute("showHiddenFeatures", "false");
     	}
-
+    	
+    	root.appendChild(colorSchemes);
+    	ArrayList<String> csNames = featureModel.getColorSchemeNames();
+    	for (int i = 0; i< csNames.size(); i++) {
+    		Element colorScheme = doc.createElement("colorscheme");
+    		colorScheme.setAttribute("name", csNames.get(i));
+    		if (i == featureModel.getCurColorScheme()) {
+    			colorScheme.setAttribute("cur", "true");
+    		}
+    		colorSchemes.appendChild(colorScheme);
+		}
     	
     	doc.appendChild(root);
     	root.appendChild(struct);
@@ -150,16 +162,8 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
     	children = feat.getChildren();
     	if (children.isEmpty()) {
     		fnod = doc.createElement("feature");
-    		fnod.setAttribute("name", feat.getName());
-    		if(feat.isHidden())		fnod.setAttribute("hidden", "true");
-        	if(feat.isMandatory())	fnod.setAttribute("mandatory", "true");
-        	if(feat.isAbstract())	fnod.setAttribute("abstract", "true");
-        	
-        	if(!featureModel.getLayout().showHiddenFeatures() || !featureModel.getLayout().hasFeaturesAutoLayout())
-            	fnod.setAttribute("coordinates", feat.getLocation().x
-        				+", "+feat.getLocation().y);
-        	
-        	node.appendChild(fnod);
+    		
+    		writeAttributes(node, fnod, feat);
     	}
     	else{
     		if (feat.isAnd()) {
@@ -170,23 +174,30 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
     			fnod = doc.createElement("alt");
 	    	} else fnod = doc.createElement("unknown");//FMCorePlugin.getDefault().logInfo("creatXMlDockRec: Unexpected error!");
 	    	
-	    	fnod.setAttribute("name", feat.getName());
-	    	
-	    	if(feat.isMandatory())	fnod.setAttribute("mandatory", "true");
-		    if(feat.isAbstract())	fnod.setAttribute("abstract", "true");
-		    if(feat.isHidden())		fnod.setAttribute("hidden", "true");
-
-        	if(!featureModel.getLayout().showHiddenFeatures() || !featureModel.getLayout().hasFeaturesAutoLayout()) 
-        		fnod.setAttribute("coordinates", +feat.getLocation().x
-        				+", "+feat.getLocation().y);
-
-	    	node.appendChild(fnod);
+    		writeAttributes(node, fnod, feat);
 	    	
 	    	Iterator<Feature> i = children.iterator();
 	    	while (i.hasNext()) {
 	    		createXmlDocRec(doc, fnod ,i.next());
 	    	}
     	}
+    }
+    
+    private void writeAttributes(Element node, Element fnod, Feature feat) {
+    	fnod.setAttribute("name", feat.getName());
+		if(feat.isHidden())		fnod.setAttribute("hidden", "true");
+    	if(feat.isMandatory())	fnod.setAttribute("mandatory", "true");
+    	if(feat.isAbstract())	fnod.setAttribute("abstract", "true");
+    	
+    	for (int i = 0; i < featureModel.getColorSchemeCount(); i++) {
+    		if(feat.hasColor(i))	fnod.setAttribute("color"+i, Integer.toString(feat.getColor(i)));
+		}
+    	
+    	if(!featureModel.getLayout().showHiddenFeatures() || !featureModel.getLayout().hasFeaturesAutoLayout()) 
+    		fnod.setAttribute("coordinates", +feat.getLocation().x
+    				+", "+feat.getLocation().y);
+    	
+    	node.appendChild(fnod);
     }
   
     /**
@@ -330,6 +341,5 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
 		}
 
 		return prettyPrint(result.getWriter().toString()); 
-		
 	}    
 }

@@ -18,17 +18,11 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.editparts;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.draw2d.IFigure;
-import org.eclipse.draw2d.geometry.Dimension;
-import org.eclipse.draw2d.geometry.Point;
-import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.Request;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.ui.IEditorDescriptor;
@@ -38,9 +32,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 
 import de.ovgu.featureide.ui.UIPlugin;
-import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 import de.ovgu.featureide.ui.views.collaboration.figures.RoleFigure;
-import de.ovgu.featureide.ui.views.collaboration.model.Collaboration;
 import de.ovgu.featureide.ui.views.collaboration.model.Role;
 
 /**
@@ -68,50 +60,11 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 	protected void createEditPolicies() {
 	}
 
+	/**
+	 * {@link ModelEditPart#refreshVisuals()}
+	 */
+	@Override
 	protected void refreshVisuals() {
-		RoleFigure roleFigure = (RoleFigure) getFigure();
-		Rectangle roleBounds = roleFigure.getBounds();
-		Point location = roleBounds.getLocation();
-		Dimension size = roleBounds.getSize();
-		ClassEditPart classEditPart = (ClassEditPart) getParent();
-		Rectangle classBounds = classEditPart.getFigure().getBounds();
-		Dimension size2 = classBounds.getSize();
-		Point location2 = classBounds.getLocation();
-
-		int xValue = location2.x + ((size2.width - size.width) / 2);
-
-		List<Collaboration> listOfColls = new LinkedList<Collaboration>();
-		ModelEditPart modelEdit = (ModelEditPart) classEditPart.getParent();
-		List<?> modelEditChildren = modelEdit.getModelChildren();
-		for (Object o : modelEditChildren) {
-			if (o instanceof Collaboration)
-				listOfColls.add((Collaboration) o);
-		}
-		int index = listOfColls.indexOf(this.getRoleModel().getCollaboration());
-		if (roleFigure.selected) {
-			if (roleFigure.role.isEditorFile) {
-				roleFigure.setBackgroundColor(GUIDefaults.OPEN_ROLE_BACKGROUND_SELECTED);
-				roleFigure.setBorder(GUIDefaults.OPEN_ROLE_BORDER_SELECTED);
-			} else {
-				roleFigure.setBackgroundColor(GUIDefaults.ROLE_BACKGROUND_SELECTED);
-			}
-		} else {
-			if (roleFigure.role.isEditorFile) {
-				roleFigure.setBackgroundColor(GUIDefaults.OPEN_ROLE_BACKGROUND_UNSELECTED);
-				roleFigure.setBorder(GUIDefaults.OPEN_ROLE_BORDER_UNSELECTED);
-			} else {
-				roleFigure.setBackgroundColor(GUIDefaults.ROLE_BACKGROUND_UNSELECTED);
-			}
-		}
-
-		int yValue = location.y + index * (size.height + 10) + 8;
-		Point newLocation = new Point(xValue, yValue);
-		Rectangle constraint = new Rectangle(newLocation, size);
-		classEditPart.setLayoutConstraint(this, roleFigure, constraint);
-		roleFigure.setBounds(constraint);
-		
-		System.out.println("RoleEditPart/113 " + modelEditChildren.toString());
-		System.out.println("RoleEditPart/114 " + listOfColls.toString());
 	}
 
 	/**

@@ -77,6 +77,7 @@ public class FeatureModel implements PropertyConstants {
 	public static final String DEFAULT_SOURCE_PATH = "src";
 	public static final String BUILDER_ID = "de.ovgu.featureide.core"
 			+ ".extensibleFeatureProjectBuilder";
+	public static final String DEFAULT_COLORSCHEMENAME = "Default Colorscheme";
 	/**
 	 * the root feature
 	 */
@@ -125,6 +126,9 @@ public class FeatureModel implements PropertyConstants {
 	private boolean featureOrderUserDefined = false;
 	private boolean featureOrderInXML = false;
 
+	private ArrayList<String> colorSchemeNames = new ArrayList<String>();
+	private int curColorScheme = 0;
+
 	private IFolder sourceFolder;
 
 	private IFMComposerExtension fmComposerExtension = new FMComposerExtension();
@@ -148,10 +152,6 @@ public class FeatureModel implements PropertyConstants {
 		return COMPOSER_ID.endsWith("FeatureModeling");
 	}
 	
-	public FeatureModel() {
-
-	}
-
 	/**
 	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelLayout#setLayout(int)} instead.
 	 */
@@ -189,6 +189,8 @@ public class FeatureModel implements PropertyConstants {
 		comments.clear();
 		annotations.clear();
 		featureOrderList.clear();
+		colorSchemeNames.clear();
+		curColorScheme = 0;
 	}
 
 	private void deleteChildFeatures(Feature feature) {
@@ -257,6 +259,9 @@ public class FeatureModel implements PropertyConstants {
 		if (featureTable.containsKey(name))
 			return false;
 		featureTable.put(name, feature);
+		if (feature.hasNoColorSchemes()) {
+			feature.setupColorSchemes(colorSchemeNames.size());
+		}
 		return true;
 	}
 
@@ -644,6 +649,8 @@ public class FeatureModel implements PropertyConstants {
 			fm.annotations.add(annotations.get(i));
 		for (int i = 0; i < comments.size(); i++)
 			fm.comments.add(comments.get(i));
+		fm.colorSchemeNames = new ArrayList<String>(colorSchemeNames);
+		fm.curColorScheme = curColorScheme;
 		return fm;
 	}
 
@@ -1236,4 +1243,63 @@ public class FeatureModel implements PropertyConstants {
 		return deadFeatures;
 	}
 
+	/**
+	 * @return the colorSchemeNames
+	 */
+	public ArrayList<String> getColorSchemeNames() {
+		return colorSchemeNames;
+	}
+
+	/**
+	 * @param name the new Color Scheme name
+	 */
+	public void addColorScheme(String name) {
+		colorSchemeNames.add(name);
+		for (Feature feat : featureTable.values()) {
+			feat.addColorScheme();
+		}
+	}
+	
+	public void removeColorScheme() {
+		if (colorSchemeNames.size() == 1) {
+			colorSchemeNames.set(0, DEFAULT_COLORSCHEMENAME);
+			for (Feature feat : featureTable.values()) {
+				feat.removeColor();
+			}
+		} else {
+			colorSchemeNames.remove(curColorScheme);
+			for (Feature feat : featureTable.values()) {
+				feat.removeColorScheme();
+			}
+			if (curColorScheme == colorSchemeNames.size()) {
+				curColorScheme--;
+			}
+		}
+	}
+	
+	public void renameColorScheme(String name) {
+		colorSchemeNames.set(curColorScheme, name);
+	}
+	
+	public boolean hasNoColorScheme() {
+		return colorSchemeNames.isEmpty();
+	}
+	
+	public int getColorSchemeCount() {
+		return colorSchemeNames.size();
+	}
+
+	/**
+	 * @return the curColorScheme
+	 */
+	public int getCurColorScheme() {
+		return curColorScheme;
+	}
+
+	/**
+	 * @param curColorScheme the curColorScheme to set
+	 */
+	public void setCurColorScheme(int curColorScheme) {
+		this.curColorScheme = curColorScheme;
+	}
 }

@@ -22,6 +22,8 @@ import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
 
+import de.ovgu.featureide.fm.core.Feature;
+
 
 /**
  * An instance of this class represents a collaboration. 
@@ -31,14 +33,23 @@ import org.eclipse.core.resources.IFile;
  */
 public class Collaboration {
 	public boolean selected = true;
+	public final boolean hasFeature;
+	public final int color;
 	private String name;
-	private LinkedList<Role> roles;
+	private LinkedList<Role> roles = new LinkedList<Role>();
 	public boolean isConfiguration = false;
 	public IFile configurationFile = null;
 	
 	public Collaboration(String name) {
 		this.name = name;
-		this.roles = new LinkedList<Role>();
+		hasFeature = false;
+		color = Feature.INVALID_COLOR;
+	}
+	
+	public Collaboration(Feature feature) {
+		this.name = feature.getName();
+		hasFeature = true;
+		this.color = feature.getColor();
 	}
 
 	/**
@@ -66,5 +77,17 @@ public class Collaboration {
 	@Override
 	public String toString() {
 		return name;
+	}
+	
+	public boolean hasFeature() {
+		return hasFeature;
+	}
+	
+	public int getFeatureColor() {
+		return color;
+	}
+
+	public boolean hasFeatureColor() {
+		return color > Feature.INVALID_COLOR;
 	}
 }

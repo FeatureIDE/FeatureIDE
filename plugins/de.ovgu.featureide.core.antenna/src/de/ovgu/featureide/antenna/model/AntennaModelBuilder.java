@@ -25,6 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.core.fstmodel.preprocessor.PPModelBuilder;
 
@@ -96,13 +97,20 @@ public class AntennaModelBuilder extends PPModelBuilder {
 				line = m.replaceAll("").trim();
 				
 				directive.setExpression(line);
-				directive.setLineNumber(i);
+				directive.setStartLine(i, 0);
+				
+				FSTFeature[] features = model.getFeatures();
+				for (int j = 0; j < features.length; j++) {
+					if (line.contains(features[j].getName())) {
+						directive.addReferencedFeature(features[j]);
+					}
+				}
 				
 				if (command == FSTDirective.ELIF || command == FSTDirective.ELIFDEF ||
 						command == FSTDirective.ELIFNDEF || command == FSTDirective.ELSE ||
 						command == 0) {
 					if (!directivesStack.isEmpty()) {
-						directivesStack.pop();
+						directivesStack.pop().setEndLine(i+1, 0);
 					}
 				}
 				
@@ -115,6 +123,8 @@ public class AntennaModelBuilder extends PPModelBuilder {
 				} else {
 					directivesList.add(directive);
 				}
+				
+				
 				
 				if (command != FSTDirective.DEFINE && command != FSTDirective.UNDEFINE && command != FSTDirective.CONDITION)
 					directivesStack.push(directive);

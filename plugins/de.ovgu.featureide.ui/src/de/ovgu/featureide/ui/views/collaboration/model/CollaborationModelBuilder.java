@@ -82,9 +82,16 @@ public class CollaborationModelBuilder {
 	
 	public boolean showUnselectedFeatures = showUnselectedFeatures();
 	
+	public boolean showCompleteOutline = showCompleteOutline();
+	
 	private static final QualifiedName SHOW_UNSELECTED_FEATURES = 
 			new QualifiedName(CollaborationModelBuilder.class.getName() +"#ShowUnselectedFeatures", 
 						      CollaborationModelBuilder.class.getName() +"#ShowUnselectedFeatures");
+	
+	private static final QualifiedName SHOW_COMPLETE_OUTLINE = 
+			new QualifiedName(CollaborationModelBuilder.class.getName() +"#ShowCompleteOutline", 
+						      CollaborationModelBuilder.class.getName() +"#ShowCompleteOutline");
+	
 	private static final String TRUE = "true";
 	private static final String FALSE = "false";
 	
@@ -108,6 +115,19 @@ public class CollaborationModelBuilder {
 	public boolean showUnselectedFeatures() {
 		try {
 			return TRUE.equals(ResourcesPlugin.getWorkspace().getRoot().getPersistentProperty(SHOW_UNSELECTED_FEATURES));
+		} catch (CoreException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+		return false;
+	}
+	
+	public void showCompleteOutline(boolean value) {
+		showCompleteOutline = value;
+	}
+	
+	public boolean showCompleteOutline() {
+		try {
+			return TRUE.equals(ResourcesPlugin.getWorkspace().getRoot().getPersistentProperty(SHOW_COMPLETE_OUTLINE));
 		} catch (CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
@@ -168,21 +188,27 @@ public class CollaborationModelBuilder {
 	private void addRoles(String layerName, IFolder sourceFolder) {
 		//case: add class files
 		boolean selected = true;
-		FSTFeature feature = fSTModel.getFeature(layerName);
+		FSTFeature fstFeature = fSTModel.getFeature(layerName);
 		collaboration = null;
 		if (configuration != null && !selectedFeatureNames.contains(layerName))
 			selected = false;
 		if (selected || showUnselectedFeatures) {
-			FSTModelElement[] element = feature.getChildren();
+			FSTModelElement[] element = fstFeature.getChildren();
 			if (element instanceof FSTClass[]) {
 				for (FSTClass Class : (FSTClass[]) element) {
 					String className = Class.getName();
 					if (classFilter.size() == 0 || classFilter.contains(className)) {
-						if (collaboration == null)
-							collaboration = new Collaboration(feature.getName());
+						if (collaboration == null) {
+							Feature feature = project.getFeatureModel().getFeature(fstFeature.getName());
+							if (feature != null) {
+								collaboration = new Collaboration(feature);
+							} else {
+								collaboration = new Collaboration(fstFeature.getName());
+							}
+						}
 						IPath pathToFile = sourceFolder.getFullPath();
 						if (composer.hasFeatureFolders()) {
-							pathToFile = pathToFile.append(feature.getName());
+							pathToFile = pathToFile.append(fstFeature.getName());
 						}
 						pathToFile = pathToFile.append(className);
 						Role role = new Role(className);
@@ -191,7 +217,7 @@ public class CollaborationModelBuilder {
 								role.file = Class.getFile();
 							} else {
 								role.file = project.getSourceFolder()
-									.getFolder(feature.getName())
+									.getFolder(fstFeature.getName())
 									.getFile(className);
 							}
 						} else {
@@ -202,7 +228,7 @@ public class CollaborationModelBuilder {
 						if (editorFile != null && role.file.getFullPath().equals(editorFile.getFullPath())) {
 							role.isEditorFile = true;
 						}
-						role.featureName = feature.getName();
+						role.featureName = fstFeature.getName();
 						FSTField[] fields = Class.getFields();
 						if (fields != null) {
 							for (FSTField f : fields) {
@@ -217,7 +243,7 @@ public class CollaborationModelBuilder {
 							}
 						}
 
-						for (FSTDirective d : feature.directives) {
+						for (FSTDirective d : fstFeature.directives) {
 							if (role.file.equals(d.file)) {
 								role.directives.add(d);
 							}
@@ -236,6 +262,7 @@ public class CollaborationModelBuilder {
 							model.addClass(cl);
 						}
 						role.selected = selected;
+						role.showCompleteOutline = showCompleteOutline;
 						role.setCollaboration(collaboration);
 						model.roles.add(role);
 					}
@@ -244,13 +271,13 @@ public class CollaborationModelBuilder {
 			if (composer.hasFeatureFolders()) {
 				IResource[] members = null;
 				try {
-					members = project.getSourceFolder().getFolder(feature.getName()).members();
+					members = project.getSourceFolder().getFolder(fstFeature.getName()).members();
 				} catch (CoreException e) {
 					UIPlugin.getDefault().logError(e);
 				}
 				
 				for (IResource res : members)
-					addArbitraryFiles(res, feature.getName(), selected);
+					addArbitraryFiles(res, fstFeature.getName(), selected);
 			}
 			if (collaboration != null) {
 				collaboration.selected = selected;
@@ -466,7 +493,12 @@ public class CollaborationModelBuilder {
 				if (fSTModel == null || !extensions.contains(fileExtension) 
 						|| !iFeatureNames.contains(featureName)) {
 					if (collaboration == null) {
-						collaboration = new Collaboration(featureName);
+						Feature feature = project.getFeatureModel().getFeature(featureName);
+						if (feature != null) {
+							collaboration = new Collaboration(feature);
+						} else {
+							collaboration = new Collaboration(featureName);
+						}
 						collaboration.selected = selected;
 					}
 					String name;
@@ -502,6 +534,7 @@ public class CollaborationModelBuilder {
 						model.addClass(cl);
 					}
 					role.selected = selected;
+					role.showCompleteOutline = showCompleteOutline;
 					role.setCollaboration(collaboration);
 					model.roles.add(role);
 				}

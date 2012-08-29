@@ -18,17 +18,8 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.editparts;
 
-import java.util.List;
-
 import org.eclipse.core.resources.IFile;
-import org.eclipse.draw2d.Figure;
-import org.eclipse.draw2d.FlowLayout;
 import org.eclipse.draw2d.IFigure;
-import org.eclipse.draw2d.Label;
-import org.eclipse.draw2d.geometry.Dimension;
-import org.eclipse.draw2d.geometry.Point;
-import org.eclipse.draw2d.geometry.Rectangle;
-import org.eclipse.gef.EditPart;
 import org.eclipse.gef.Request;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.ui.IWorkbenchPage;
@@ -39,7 +30,6 @@ import org.eclipse.ui.part.FileEditorInput;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 import de.ovgu.featureide.ui.views.collaboration.figures.CollaborationFigure;
-import de.ovgu.featureide.ui.views.collaboration.figures.CompartmentFigure;
 import de.ovgu.featureide.ui.views.collaboration.model.Collaboration;
 
 /**
@@ -73,60 +63,11 @@ public class CollaborationEditPart extends AbstractGraphicalEditPart implements 
 	protected void createEditPolicies() {
 	}
 	
+	/**
+	 * {@link ModelEditPart#refreshVisuals()}
+	 */
+	@Override
 	protected void refreshVisuals() {
-		CollaborationFigure collFigure = (CollaborationFigure) getFigure();
-		Dimension size = collFigure.getBounds().getSize();
-		ModelEditPart modelEditPart = (ModelEditPart) getParent();
-		int width = size.width;
-		List<?> children = modelEditPart.getChildren();
-		for (Object o : children) {
-			if (o instanceof CollaborationEditPart) {
-				width = (width > ((CollaborationEditPart)o).getFigure().getSize().width) ? width : ((CollaborationEditPart)o).getFigure().getSize().width;
-			}
-		}
-		
-		collFigure.setSize(width,size.height);
-
-		// Sets the size of all collaborations to the longest width
-		if (children.size() == children.indexOf(this)+1) {
-			for (Object o : children) {
-				if (o instanceof CollaborationEditPart) {
-					CollaborationFigure collaborationFigure = (CollaborationFigure) ((CollaborationEditPart)o).getFigure();
-					Point location = collaborationFigure.getBounds().getLocation();
-					Dimension size2 = collFigure.getSize();
-					int i = children.indexOf((CollaborationEditPart)o);
-					int xValue = location.x;
-					int yValue = location.y + i * (size2.height+8) + 8;
-					Rectangle constraint = new Rectangle(new Point(xValue,yValue), size2);
-					if (i>0){
-						EditPart part = (EditPart) children.get(i-1);
-						if (part instanceof CollaborationEditPart){
-							Dimension size3 = ((CollaborationEditPart) part).getFigure().getBounds().getSize();
-							Point location3 = ((CollaborationEditPart) part).getFigure().getBounds().getLocation();
-							Point newLocation = new Point(location3.x ,location3.y + i * (size3.height+8) + 8);
-							constraint = new Rectangle(newLocation, size2);
-						}
-					}
-					modelEditPart.setLayoutConstraint(((CollaborationEditPart)o), collaborationFigure, constraint);
-					
-					Figure tooltipContent = new Figure();		
-					FlowLayout contentsLayout = new FlowLayout();
-					tooltipContent.setLayoutManager(contentsLayout);
-					CompartmentFigure tooltipFigure = new CompartmentFigure();
-					if (collaborationFigure.isConfiguration)
-						if (collaborationFigure.selected) {
-							tooltipFigure.add(new Label(" Current configuration ", IMAGE_CURRENT_CONFIGURATION));
-						} else
-							tooltipFigure.add(new Label(" Configuration ", IMAGE_CONFIGURATION));
-					else if (collaborationFigure.selected)
-						tooltipFigure.add(new Label(" Selected feature ", IMAGE_FEATURE));
-					else
-						tooltipFigure.add(new Label(" Unselected feature ", IMAGE_FEATURE));
-					if (children.size() > 1)
-						collaborationFigure.setToolTip(tooltipFigure);
-				}
-			}
-		}
 	}
 	
 	/**

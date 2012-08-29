@@ -56,6 +56,8 @@ import de.ovgu.featureide.munge.model.MungeModelBuilder;
 public class MungePreprocessor extends PPComposerExtensionClass{
 	
 	private MungeModelBuilder mungeModelBuilder;
+	public static final String COMMENT_START = "/*";
+	public static final String COMMENT_END = "*/";
 
 	/** all allowed instructions in munge as regular expression */
 	public static final String OPERATORS = "(if(_not)?|else|end)\\[(.+?)\\]";

@@ -174,11 +174,6 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 		});
 		monitor.worked(1);
 	}
-	
-	/**
-	 * We will initialize file contents with a sample text.
-	 * @param packageName 
-	 */
 
 	private InputStream openContentStream(String featurename,IContainer container, String classname, String template, IComposerExtension composer, boolean refines, String packageName) {
 		String contents = template;

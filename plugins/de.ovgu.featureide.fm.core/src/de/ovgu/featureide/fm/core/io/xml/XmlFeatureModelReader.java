@@ -120,14 +120,36 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 			FMPoint constraintLocation = null;
 			featureModel.getLayout().showHiddenFeatures(true);
 			featureModel.getLayout().verticalLayout(false);
+			int[] colors = {Feature.INVALID_COLOR};
+			
 			while (eventReader.hasNext()) {
 				XMLEvent event = eventReader.nextEvent();
 				if (event.isStartElement()) {
 					StartElement currentStartTag = event.asStartElement();
-					String currentTag = currentStartTag.getName()
-							.getLocalPart();
-
+					String currentTag = currentStartTag.getName().getLocalPart();
+					
 					if (mode == 1) {
+						if (currentTag.equals("colorscheme")){
+							
+							@SuppressWarnings("unchecked")
+							Iterator<Attribute> attributes = currentStartTag.getAttributes();
+
+							// BEGIN read attributes from XML tag
+							while (attributes.hasNext()) {
+								Attribute attribute = attributes.next();
+								String curName = attribute.getName().getLocalPart();
+								String curValue = attribute.getValue();
+								
+								if (curName.equals("name")) {
+									featureModel.addColorScheme(curValue);
+								}
+								else if (curName.equals("cur") && curValue.equals("true")) {
+									featureModel.setCurColorScheme(featureModel.getColorSchemeCount()-1);
+								}
+							}
+						}
+					}
+					else if (mode == 2) {
 						if (!isInArray(currentTag,validTagsStruct)){
 							throw new UnsupportedModelException("'"
 									+ currentTag + "' is not a valid tag in struct-section.",
@@ -137,7 +159,11 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 						// features
 						boolean isMandatory = false;
 						boolean isAbstract = false;
-						boolean isHidden = false;
+						boolean isHidden = false;						
+						for (int i = 0; i < colors.length; i++) {
+							colors[i] = Feature.INVALID_COLOR;
+						}
+						
 						FMPoint featureLocation = null;
 						String attrName = "noname";
 						String parent = parentStack.peek()[1];
@@ -175,6 +201,12 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 								 else 
 									isHidden = false;
 							}
+							else if (curName.startsWith("color")) {
+								int index = Integer.parseInt(curName.substring(5));
+								if (index < colors.length) {
+									colors[index] = Integer.parseInt(curValue);
+								}
+							}
 							else if (curName == "coordinates"){
 								String subStringX = curValue.substring(0, curValue.indexOf(", "));
 								String subStringY = curValue.substring(curValue.indexOf(", ")+2);
@@ -199,8 +231,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 
 						if (!featureModel.getFeatureNames().contains(attrName)
 								&& featureModel.isValidFeatureName(attrName)) {
-							addFeature(attrName, isMandatory, isAbstract, isHidden,
-									parent, featureLocation);
+							addFeature(attrName, isMandatory, isAbstract, isHidden, colors,	parent, featureLocation);
 						} else {
 							if (!featureModel.isValidFeatureName(attrName)) {
 								throw new UnsupportedModelException("'"
@@ -223,7 +254,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 						// features
 						}
 
-					} else if (mode == 2) {
+					} else if (mode == 3) {
 						if (!isInArray(currentTag,validTagsConst)){
 							throw new UnsupportedModelException("'"
 									+ currentTag + "' is not a valid tag in constraints-section.",
@@ -277,7 +308,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 						}
 
 					} 
-					else if (mode == 3) {
+					else if (mode == 4) {
 						if (currentTag.equals("c")){
 							featureModel.addComment(eventReader.getElementText()); 
 						}
@@ -286,7 +317,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 										+ currentTag + "' is not a valid tag in comment-section.",
 										event.getLocation().getLineNumber());	
 						}
-					}else if (mode == 4){
+					}else if (mode == 5){
 						if (currentTag.equals("feature")){
 							@SuppressWarnings("unchecked")
 							Iterator<Attribute> attributes = currentStartTag
@@ -349,16 +380,24 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 								featureModel.getLayout().setLayout(1);
 							}
 						}
-						else if (currentTag.equals("struct")) {
-							parentStack
-									.push(new String[] { currentTag, "root" });
+						else if (currentTag.equals("colorSchemes")) {
 							mode = 1;
 						}
-						else if (currentTag.equals("constraints")) {
+						else if (currentTag.equals("struct")) {
+							parentStack.push(new String[] { currentTag, "root" });	
+							
+							if (featureModel.hasNoColorScheme()) {
+								featureModel.addColorScheme(FeatureModel.DEFAULT_COLORSCHEMENAME);
+							}
+							colors = new int[featureModel.getColorSchemeCount()];
+							
 							mode = 2;
 						}
-						else if (currentTag.equals("comments")) {
+						else if (currentTag.equals("constraints")) {
 							mode = 3;
+						}
+						else if (currentTag.equals("comments")) {
+							mode = 4;
 						}
 						else if (currentTag.equals("featureOrder")) {
 							featureModel.setFeatureOrderInXML(true);
@@ -376,7 +415,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 									break;
 								}
 							}
-							mode = 4;
+							mode = 5;
 						}
 					}
 				}
@@ -385,6 +424,11 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 
 					String currentTag = endElement.getName().getLocalPart();
 					if (mode == 1) {
+						if (currentTag.equals("colorSchemes")) {							
+							mode = 0;
+						}
+					}
+					else if (mode == 2) {
 						if (!currentTag.equals("feature")) {
 							if (parentStack.peek()[0].equals(currentTag)) {
 								parentStack.pop();
@@ -393,7 +437,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 						if (currentTag.equals("struct")) {
 							mode = 0;
 						}
-					} else if (mode == 2) {
+					} else if (mode == 3) {
 						if (currentTag.equals("constraints")) {
 							mode = 0;
 						}
@@ -455,11 +499,11 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 							ruleTemp.getLast().add(node);
 						}
 					}
-					else if (mode == 3){
+					else if (mode == 4){
 						if (currentTag.equals("comments"))
 							mode = 0;
 					}
-					else if (mode == 4){
+					else if (mode == 5){
 						if (currentTag.equals("featureOrder")){
 							featureModel.setFeatureOrderList(featureOrderList);
 							mode = 0;
@@ -489,7 +533,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 	 *            String with the name of the parent feature
 	 */
 	private void addFeature(String featureName, boolean isMandatory,
-			boolean isAbstract, boolean isHidden, String parent, FMPoint location) {
+			boolean isAbstract, boolean isHidden, int[] colors, String parent, FMPoint location) {
 		/*
 		 * HOWTO: add a child to the FeaturModel
 		 * 
@@ -515,6 +559,8 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 			feat.setMandatory(isMandatory);
 			feat.setAbstract(isAbstract);
 			feat.setHidden(isHidden);
+			feat.setupColorSchemes(colors);
+			
 			featureModel.addFeature(feat);
 			if (parentStack.peek()[0].equals("and")) {
 				featureModel.getFeature(parent).setAnd();

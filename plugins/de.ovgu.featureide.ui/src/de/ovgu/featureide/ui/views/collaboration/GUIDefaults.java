@@ -38,9 +38,15 @@ import de.ovgu.featureide.ui.UIPlugin;
  */
 public interface GUIDefaults {
 	
+	public static Insets ROLE_INSETS2 			 	  = new Insets(1, 6, 1, 6);
 	public static Insets ROLE_INSETS 			 	  = new Insets(3, 6, 3, 6);
 	public static Insets COLLABORATION_INSETS 		  = new Insets(4, 6, 4, 6);
 	public static Insets CLASS_INSETS 		     	  = new Insets(10, 20, 10, 20);
+	
+	public static final int ROLE_DISTANCE             		 = 8;
+	public static final int ROLE_PREFERED_SIZE         		 = 16;
+	public static final int ROLE_GRIDLAYOUT_MARGIN_HEIGHT    = 3; 
+	public static final int ROLE_GRIDLAYOUT_VERTICAL_SPACING = 1; 
 	
 	public static Color FOREGROUND    		  	 	  = ColorConstants.black;
 	public static Font DEFAULT_FONT 			 	  = new Font(null, new FontData("Arial Unicode MS", 8, SWT.NORMAL));
@@ -59,14 +65,14 @@ public interface GUIDefaults {
 	public static Border OPEN_CLASS_BORDER			  = new LineBorder(OPEN_CLASS_BORDER_COLOR, 1);
 	
 	public static Color COLL_BACKGROUND_SELECTED 	  = GUIBasics.createColor(0.8, 0.8, 1.0);
-	public static Color COLL_BORDER_COLOR_SELECTED	  = GUIBasics.createBorderColor(COLL_BACKGROUND_SELECTED);
-	public static Border COLL_BORDER_SELECTED	 	  = new LineBorder(COLL_BORDER_COLOR_SELECTED, 1);
+	public static Color COLL_BORDER_COLOR_SELECTED	  = ColorConstants.black;
+	public static Border COLL_BORDER_SELECTED	 	  = new LineBorder(COLL_BORDER_COLOR_SELECTED, 2);
 	
 	public static Color COLL_BACKGROUND_UNSELECTED 	  = GUIBasics.createColor(247, 245, 255);
-	public static Color COLL_BORDER_COLOR_UNSELECTED  = GUIBasics.createBorderColor(COLL_BACKGROUND_UNSELECTED);
+	public static Color COLL_BORDER_COLOR_UNSELECTED  = ColorConstants.black;
 	public static Border COLL_BORDER_UNSELECTED	 	  = new LineBorder(COLL_BORDER_COLOR_UNSELECTED, 1);
 		
-	public static Color ROLE_BACKGROUND_SELECTED	  = GUIBasics.createColor(204, 204, 255);
+	public static Color ROLE_BACKGROUND_SELECTED	  = COLL_BACKGROUND_SELECTED;
 	public static Color ROLE_BORDER_COLOR_SELECTED	  = GUIBasics.createBorderColor(ROLE_BACKGROUND_SELECTED);
 	public static Border ROLE_BORDER_SELECTED		  = new LineBorder(ROLE_BORDER_COLOR_SELECTED, 1);
 	

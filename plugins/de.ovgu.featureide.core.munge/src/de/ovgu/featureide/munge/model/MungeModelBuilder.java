@@ -24,6 +24,7 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.core.fstmodel.preprocessor.PPModelBuilder;
 import de.ovgu.featureide.munge.MungePreprocessor;
@@ -56,7 +57,9 @@ public class MungeModelBuilder extends PPModelBuilder{
 			String line = lines.get(i);
 			
 			// if line is preprocessor directive
-			if (line.contains("/*") || line.contains("*/") || commentSection) {
+			if (line.contains(MungePreprocessor.COMMENT_START) || 
+					line.contains(MungePreprocessor.COMMENT_END) || 
+					commentSection) {
 				Matcher m = MungePreprocessor.OP_COM_PATTERN.matcher(line);
 				
 				while (m.find()) {
@@ -65,9 +68,9 @@ public class MungeModelBuilder extends PPModelBuilder{
 					String expression = m.group(4);
 					
 					if (singleElement == null) {
-						if (completeElement.equals("/*")) {
+						if (completeElement.equals(MungePreprocessor.COMMENT_START)) {
 							commentSection = true;
-						} else if (completeElement.equals("*/")) {
+						} else if (completeElement.equals(MungePreprocessor.COMMENT_END)) {
 							commentSection = false;
 						}
 					} else {
@@ -83,15 +86,22 @@ public class MungeModelBuilder extends PPModelBuilder{
 							command = FSTDirective.ELSE;
 							directivesStack.pop();
 						} else if (singleElement.equals("end")) {
-							directivesStack.pop();
+							directivesStack.pop().setEndLine(i, m.end(0)+MungePreprocessor.COMMENT_END.length());
 							continue;
 						} else {
 							continue;
 						}
 						
 						directive.setCommand(command);
-						directive.setExpression(expression != null ? expression : "");
-						directive.setLineNumber(i);
+						directive.setExpression(expression != null ? expression : "");				
+						directive.setStartLine(i, m.start(0)-MungePreprocessor.COMMENT_START.length());
+						
+						FSTFeature[] features = model.getFeatures();
+						for (int j = 0; j < features.length; j++) {
+							if (line.contains(features[j].getName())) {
+								directive.addReferencedFeature(features[j]);
+							}
+						}
 						
 						if(!directivesStack.isEmpty()){
 							FSTDirective top = directivesStack.peek();

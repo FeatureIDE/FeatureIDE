@@ -169,34 +169,28 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 		@Override
 		public void selectionChanged(SelectionChangedEvent event) {
 			if (iFile != null) {
-				if ((((IStructuredSelection) viewer.getSelection())
-						.getFirstElement() instanceof FSTMethod)) {
-					FSTMethod meth = (FSTMethod) ((IStructuredSelection) viewer
-							.getSelection()).getFirstElement();
+				Object selection = ((IStructuredSelection) viewer.getSelection()).getFirstElement();
+				if (selection instanceof FSTMethod) {
+					FSTMethod meth = (FSTMethod) selection;
 					if (meth.isOwn(iFile)) {
 						scrollToLine(active_editor, meth.getLineNumber(iFile));
 					}
 					return;
-				} else if ((((IStructuredSelection) viewer.getSelection())
-						.getFirstElement() instanceof FSTField)) {
-					FSTField field = (FSTField) ((IStructuredSelection) viewer
-							.getSelection()).getFirstElement();
+				} else if (selection instanceof FSTField) {
+					FSTField field = (FSTField) selection;
 					if (field.isOwn(iFile)) {
 						scrollToLine(active_editor, field.getLineNumber(iFile));
 					}
 					return;
-				} else if ((((IStructuredSelection) viewer.getSelection())
-						.getFirstElement() instanceof FSTDirective)) {
-					FSTDirective directive = (FSTDirective) ((IStructuredSelection) viewer
-							.getSelection()).getFirstElement();
-					scrollToLine(active_editor, directive.lineNumber + 1);
+				} else if (selection instanceof FSTDirective) {
+					FSTDirective directive = (FSTDirective) selection;
+					scrollToLine(active_editor, directive.getStartLine(), directive.getEndLine(), 
+							directive.getStartOffset(), directive.getEndOffset());
 					return;
-				} else if ((((IStructuredSelection) viewer.getSelection())
-						.getFirstElement() instanceof Role)) {
+				} else if (selection instanceof Role) {
 						
 	
-					Role r = (Role) ((IStructuredSelection) viewer.getSelection())
-							.getFirstElement();
+					Role r = (Role) selection;
 	
 					if (r.file.isAccessible()) {
 						IWorkbenchWindow window = PlatformUI.getWorkbench()
@@ -581,8 +575,32 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 			} catch (BadLocationException e) {
 			}
 			if (lineInfo != null) {
-				editor.selectAndReveal(lineInfo.getOffset(),
-						lineInfo.getLength());
+				editor.selectAndReveal(lineInfo.getOffset(), lineInfo.getLength());
+			}
+		}
+	}
+	
+	/**
+	 * Highlights the whole if-Block for a FSTDirective
+	 * 
+	 * @param editorPart
+	 * @param startLine the first line of a directive
+	 * @param endLine the last line of a directive
+	 * @param startOffset characters before the statement starts
+	 * @param endOffset length of the last line
+	 */
+	private static void scrollToLine(IEditorPart editorPart, int startLine, int endLine, int startOffset, int endOffset) {
+		if (!(editorPart instanceof ITextEditor) || startLine < 0 || endLine < 0) {
+			return;
+		}
+		ITextEditor editor = (ITextEditor) editorPart;
+		IDocument document = editor.getDocumentProvider().getDocument(
+				editor.getEditorInput());
+		if (document != null) {
+			try {
+				int offset = document.getLineOffset(startLine)+startOffset;
+				editor.selectAndReveal(offset, document.getLineOffset(endLine) - (offset) + endOffset);
+			} catch (BadLocationException e) {
 			}
 		}
 	}

@@ -29,44 +29,44 @@ import org.eclipse.core.runtime.CoreException;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
 /**
- * This Wrapper makes it possible, to write feature models to IFiles, 
- * e.g. if working with Eclipse plugins
- * Otherwise only the classes extending {@link AbstractFeatureModelWriter} are needed
+ * This Wrapper makes it possible, to write feature models to IFiles, e.g. if
+ * working with Eclipse plugins Otherwise only the classes extending
+ * {@link AbstractFeatureModelWriter} are needed
  * 
  * @author Sönke Holthusen
  */
 public class FeatureModelWriterIFileWrapper extends AbstractFeatureModelWriter {
 
-    private AbstractFeatureModelWriter writer;
+	private AbstractFeatureModelWriter writer;
 
-    public FeatureModelWriterIFileWrapper(AbstractFeatureModelWriter writer) {
-	this.writer = writer;
-    }
-
-    public void setFeatureModel(FeatureModel featureModel) {
-	writer.setFeatureModel(featureModel);
-    }
-
-    public FeatureModel getFeatureModel() {
-	return writer.getFeatureModel();
-    }
-    
-    public void writeToFile(File file){
-	writer.writeToFile(file);
-    }
-
-    @Override
-    public String writeToString() {
-	return writer.writeToString();
-    }
-
-    public void writeToFile(IFile file) throws CoreException {
-	InputStream source = new ByteArrayInputStream(writeToString().getBytes(
-		Charset.availableCharsets().get("UTF-8")));
-	if (file.exists()) {
-	    file.setContents(source, false, true, null);
-	} else {
-	    file.create(source, false, null);
+	public FeatureModelWriterIFileWrapper(AbstractFeatureModelWriter writer) {
+		this.writer = writer;
 	}
-    }
+
+	public void setFeatureModel(FeatureModel featureModel) {
+		writer.setFeatureModel(featureModel);
+	}
+
+	public FeatureModel getFeatureModel() {
+		return writer.getFeatureModel();
+	}
+
+	public void writeToFile(File file) {
+		writer.writeToFile(file);
+	}
+
+	@Override
+	public String writeToString() {
+		return writer.writeToString();
+	}
+
+	public void writeToFile(IFile file) throws CoreException {
+		InputStream source = new ByteArrayInputStream(writeToString().getBytes(
+				Charset.availableCharsets().get("UTF-8")));
+		if (file.exists()) {
+			file.setContents(source, false, true, null);
+		} else {
+			file.create(source, false, null);
+		}
+	}
 }

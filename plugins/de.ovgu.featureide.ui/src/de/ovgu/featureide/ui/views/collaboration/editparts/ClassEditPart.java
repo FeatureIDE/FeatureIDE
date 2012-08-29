@@ -27,10 +27,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.draw2d.IFigure;
-import org.eclipse.draw2d.geometry.Dimension;
-import org.eclipse.draw2d.geometry.Point;
-import org.eclipse.draw2d.geometry.Rectangle;
-import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.Request;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
@@ -68,17 +64,7 @@ public class ClassEditPart extends AbstractGraphicalEditPart {
 	 */
 	@Override
 	protected IFigure createFigure() {
-
-		List<?> children = ((ModelEditPart) getParent()).getChildren();
-		int count = 0;
-		int height = 0;
-		for (Object o : children) {
-			if (o instanceof CollaborationEditPart) {
-				count++;
-				height = ((CollaborationEditPart) o).getFigure().getSize().height + 8;
-			}
-		}
-		return new ClassFigure(getClassModel(), height * (count) - 8);
+		return new ClassFigure(getClassModel(), 1);
 	}
 
 	/*
@@ -95,46 +81,12 @@ public class ClassEditPart extends AbstractGraphicalEditPart {
 	protected List<?> getModelChildren() {
 		return getClassModel().getRoles();
 	}
-
+	
+	/**
+	 * {@link ModelEditPart#refreshVisuals()}
+	 */
+	@Override
 	protected void refreshVisuals() {
-		ClassFigure classFigure = (ClassFigure) getFigure();
-		Point location = classFigure.getBounds().getLocation();
-		Dimension size = classFigure.getBounds().getSize();
-		Rectangle constraint = new Rectangle(location, size);
-		ModelEditPart modelEditPart = (ModelEditPart) getParent();
-		List<?> children = modelEditPart.getChildren();
-		int width = 0;
-		for (Object o : children) {
-			if (o instanceof CollaborationEditPart) {
-				int newWidth = ((CollaborationEditPart) o).getFigure()
-						.getSize().width;
-				width = (width > newWidth) ? width : newWidth;
-			}
-		}
-		if (children.contains(this)) {
-			int i = children.indexOf(this);
-			EditPart part = (EditPart) children.get(i - 1);
-			if (part instanceof CollaborationEditPart) {
-				Point location2 = ((CollaborationEditPart) part).getFigure()
-						.getBounds().getLocation();
-				Point newLocation = new Point(location2.x + width + 10,
-						location.y);
-				constraint = new Rectangle(newLocation, size);
-			}
-			if (part instanceof ClassEditPart) {
-				Dimension size2 = ((ClassEditPart) part).getFigure()
-						.getBounds().getSize();
-				Point location2 = ((ClassEditPart) part).getFigure()
-						.getBounds().getLocation();
-				Point newLocation = new Point(location2.x + size2.width + 5,
-						location2.y);
-				constraint = new Rectangle(newLocation, size);
-			}
-
-		}
-
-		modelEditPart.setLayoutConstraint(this, classFigure, constraint);
-		classFigure.setBounds(constraint);
 	}
 
 	/**

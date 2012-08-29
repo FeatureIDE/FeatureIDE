@@ -23,12 +23,17 @@ import java.util.LinkedList;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.draw2d.AbstractBorder;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.FlowLayout;
 import org.eclipse.draw2d.FreeformLayout;
+import org.eclipse.draw2d.Graphics;
+import org.eclipse.draw2d.GridLayout;
+import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.Panel;
 import org.eclipse.draw2d.geometry.Dimension;
+import org.eclipse.draw2d.geometry.Insets;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.SWT;
@@ -52,31 +57,68 @@ import de.ovgu.featureide.ui.views.collaboration.model.Role;
 public class RoleFigure extends Figure implements GUIDefaults{
 
 	private static Font FONT_BOLD = new Font(null,"Arial", 8, SWT.BOLD);
-		
-	private final Label label = new Label();
-	public boolean selected = false;
-	private IFolder featureFolder;
-	public Role role;
 	
+	private final Panel panel = new Panel();
+	private boolean selected = false;
+	
+	private IFolder featureFolder;
+	private Role role;
+	
+	 public static class RoleFigureBorder extends AbstractBorder {
+		 
+		 private final int leftY;
+		 private final int rightY;
+		 
+		 public RoleFigureBorder(int leftY, int rightY)
+		 {
+			 this.leftY = leftY;
+			 this.rightY = rightY;
+		 }
+		 
+		  public Insets getInsets(IFigure figure) {
+			  return new Insets(1,0,0,0);
+		  }
+	    
+		  public void paint(IFigure figure, Graphics graphics, Insets insets) {
+			  Point left = getPaintRectangle(figure, insets).getTopLeft();
+			  Point rigth = tempRect.getTopRight();
+			  left.y = left.y + leftY;
+			  rigth.y = rigth.y + rightY;
+			  graphics.drawLine(left, rigth);
+		  }
+		  
+	 }
+	 
+	public boolean isSelected() 
+	{
+		return selected;
+	}
+
+	
+	public Role getRole() 
+	{
+		return role;
+	}
+
 	public RoleFigure(Role role) {
 		super();
 		
 		this.role = role;
 		selected = role.selected;
+		GridLayout gridLayout = new GridLayout(1, true);
+		gridLayout.verticalSpacing = ROLE_GRIDLAYOUT_VERTICAL_SPACING;
+		gridLayout.marginHeight = ROLE_GRIDLAYOUT_MARGIN_HEIGHT;
+		panel.setLayoutManager(gridLayout);
 		this.setLayoutManager(new FreeformLayout());
-		
+		this.setSize(0, gridLayout.marginHeight*2);
+	
 		if (selected)
 			setBorder(ROLE_BORDER_SELECTED);
 		else 
 			setBorder(ROLE_BORDER_UNSELECTED);
-
-		label.setForegroundColor(FOREGROUND);
-		label.setFont(DEFAULT_FONT);
-		label.setLocation(new Point(ROLE_INSETS.left, ROLE_INSETS.top));
-		label.setOpaque(true);
 		
-		this.setName(role.getName());
-		this.add(label);
+		this.add(panel);
+		
 		this.setOpaque(true);
 		
 		// defines the tool tip content
@@ -84,144 +126,234 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		FlowLayout contentsLayout = new FlowLayout();
 		tooltipContent.setLayoutManager(contentsLayout);
 		
-		String name = label.getText();
-		name = (name.split("[.]"))[0];
-		if (role.files.size() == 0) {
-			
-			CompartmentFigure fieldFigure = new CompartmentFigure();
-			CompartmentFigure methodFigure = new CompartmentFigure();
-			
-			fieldFigure.add(new Label(name + " ", IMAGE_CLASS));
-			methodFigure.add(new Label(role.featureName + " ", IMAGE_FEATURE));
-			
-			int fieldCount = 0;
-			int methodCount = 0;
-			for(FSTField f : role.fields){
-				
-				Label fieldLabel = new Label(f.getName() + " ");
-				if (f.isPrivate())
-					fieldLabel.setIcon(IMAGE_FIELD_PRIVATE);
-				else if (f.isProtected())
-					fieldLabel.setIcon(IMAGE_FIELD_PROTECTED);
-				else if (f.isPublic())
-					fieldLabel.setIcon(IMAGE_FIELD_PUBLIC);
-				else 
-					fieldLabel.setIcon(IMAGE_FIELD_DEFAULT);
-				
-				if (f.isOwn(role.file)) {
-					fieldFigure.add(fieldLabel);
-					fieldCount++;
-					if (fieldCount % 25 == 0) {
-						tooltipContent.add(fieldFigure);
-						fieldFigure = new CompartmentFigure();
-						fieldFigure.add(new Label(""));
+		int fieldCount = 0;
+		int methodCount = 0;
+		
+		if (this.role.showCompleteOutline) {
+
+			if (role.files.size() == 0) {
+
+				for (FSTField f : role.fields) {
+					if (f.isOwn(role.file)) {
+						Label fieldLabel = createFieldLabel(f);
+						this.addLabel(fieldLabel);
+						fieldCount++;
+					}
+				}
+
+				for (FSTMethod m : role.methods) {
+
+					if (m.isOwn(role.file)) {
+						Label methodLabel = createMethodLabel(m);
+						this.addLabel(methodLabel);
+						methodCount++;
+					}
+				}
+
+				tooltipContent.add(new Label(" Fields: " + fieldCount
+						+ " Methods: " + methodCount + " "));
+				this.setToolTip(tooltipContent);
+
+				// draw separationline between fields and methods
+				if ((fieldCount > 0) && (methodCount > 0)) {
+					int xyValue = fieldCount * (ROLE_PREFERED_SIZE + ROLE_GRIDLAYOUT_VERTICAL_SPACING) + ROLE_GRIDLAYOUT_MARGIN_HEIGHT;
+					panel.setBorder(new RoleFigureBorder(xyValue, xyValue));
+				}
+
+			} else if (role.getName().startsWith("*.")) {
+				featureFolder = CorePlugin.getFeatureProject(role.files.getFirst()).getSourceFolder()
+						.getFolder(role.getCollaboration().getName());
+				int fileCount = 0;
+				long size = 0;
+				for (IFile file : role.files) {
+					long currentSize = file.getRawLocation().toFile().length();
+					size += currentSize;
+					Label fieldLabel;
+					if (currentSize <= 1000000) {
+						fieldLabel = new Label(" " + getParentNames(file) + file.getName() + " (" + currentSize / 1000 + "." + currentSize % 1000 + " bytes) ");
+					} 
+					else {
+						fieldLabel = new Label(" " + getParentNames(file) + file.getName() + " (" + currentSize / 1000000 + "." + currentSize / 1000 + " kb) ");
+					}
+					this.addLabel(fieldLabel);
+
+					fileCount++;
+				}
+				if (size <= 1000000) {
+					tooltipContent.add(new Label(" Files: " + fileCount + " (" + size / 1000 + "." + size % 1000 + " bytes) "));
+				} 
+				else {
+					tooltipContent.add(new Label(" Files: " + fileCount + " (" + size / 1000000 + "." + size / 1000 + " kb) "));
+				}
+				this.setToolTip(tooltipContent);
+			} 
+			else {
+				LinkedList<String> duplicates = new LinkedList<String>();
+				for (FSTDirective d : role.directives) {
+					if (role.file.equals(d.file) && !duplicates.contains(d.toDependencyString())) {
+						duplicates.add(d.toDependencyString());
+						Label partLabel = new Label(d.toDependencyString(),	IMAGE_HASH);
+						this.addLabel(partLabel);
 					}
 				}
 			}
-			if (fieldCount == 0) {
-				fieldFigure.add(new Label(""));
-				tooltipContent.add(fieldFigure);
-			}
-			if (fieldCount % 25 != 0)
-				tooltipContent.add(fieldFigure);
-			
-			for(FSTMethod m : role.methods){
-				
-				Label methodLabel = new Label(m.getName() + " ");
-				if (m.refines) {
-					methodLabel.setFont(FONT_BOLD);
-				}
-				if (m.isPrivate())			
-					methodLabel.setIcon(IMAGE_METHODE_PRIVATE);
-				else if (m.isProtected())
-					methodLabel.setIcon(IMAGE_METHODE_PROTECTED);
-				else if (m.isPublic())
-					methodLabel.setIcon(IMAGE_METHODE_PUBLIC);
-				else 
-					methodLabel.setIcon(IMAGE_METHODE_DEFAULT);
-			
-				if (m.isOwn(role.file)) {
-					methodFigure.add(methodLabel);
-					methodCount++;
-					if (methodCount % 25 == 0) {
-						tooltipContent.add(methodFigure);
-						methodFigure = new CompartmentFigure();
-						methodFigure.add(new Label(""));
-					}
-				}
-			}
-			if (methodCount == 0) {
-				methodFigure.add(new Label(""));
-				tooltipContent.add(methodFigure);
-			}
-			if (methodCount % 25 != 0)
-				tooltipContent.add(methodFigure);
-			
-			setName("Fields: " + fieldCount + " Methods: " + methodCount);
-			
-		} else if (role.getName().startsWith("*.")) {
-			featureFolder = CorePlugin.getFeatureProject(role.files.getFirst())
-					.getSourceFolder().getFolder(role.getCollaboration().getName());
-			CompartmentFigure fileFigure = new CompartmentFigure();
-			fileFigure.add(new Label(role.featureName + " ", IMAGE_FEATURE));
-			int fileCount = 0;
-			long size = 0;
-			for (IFile file : role.files) {
-				long currentSize = file.getRawLocation().toFile().length();
-				size += currentSize;
-				Label fieldLabel;
-				if (currentSize <= 1000000) {
-					fieldLabel = new Label(" " + getParentNames(file) + file.getName() + " (" + currentSize/1000 + "." + currentSize%1000 + "bytes) ");
-				} else {
-					fieldLabel = new Label(" " + getParentNames(file) + file.getName() + " (" + currentSize/1000000 + "." + currentSize/1000 + "kb) ");
-				}
-				fileFigure.add(fieldLabel);
-				fileCount++;
-				if (fileCount % 25 == 0) {
-					tooltipContent.add(fileFigure);
-					fileFigure = new CompartmentFigure();
-					fileFigure.add(new Label(""));
-				}
-				
-			}
-			if (size <= 1000000) {
-				setName("Files: " + fileCount + " (" + size/1000 + "." + size%1000 + "bytes) ");
-			} else {
-				setName("Files: " + fileCount + " (" + size/1000000 + "." + size/1000 + "kb) ");
-			}
-			
-			if (fileCount % 25 != 0)
-				tooltipContent.add(fileFigure);
 		} else {
-			this.setName("   ...   ");
-			CompartmentFigure fileFigure = new CompartmentFigure(); 
-			fileFigure.add(new Label(role.featureName + " ", IMAGE_FEATURE));
-			fileFigure.add(new Label(role.getName().split("[.]")[0] + " ", IMAGE_CLASS));
-			LinkedList<String> duplicates = new LinkedList<String>();
-			for (FSTDirective d : role.directives) {
-				if (role.file.equals(d.file) && !duplicates.contains(d.toDependencyString())) {
-					duplicates.add(d.toDependencyString());
-					Panel directivesPanel = new Panel();
-					FlowLayout layout = new FlowLayout(true);
-					layout.setMinorSpacing(0);
-					layout.setMajorSpacing(0);
-					directivesPanel.setLayoutManager(layout);
-					Label partLabel = new Label(d.toDependencyString(), IMAGE_HASH);
-					partLabel.setFont(DEFAULT_FONT);
-					directivesPanel.add(partLabel);
-					
-					directivesPanel.add(new Label(" "));
-					fileFigure.add(directivesPanel);
+			String name = role.getName();
+			name = (name.split("[.]"))[0];
+			if (role.files.size() == 0) {
+
+				CompartmentFigure fieldFigure = new CompartmentFigure();
+				CompartmentFigure methodFigure = new CompartmentFigure();
+
+				fieldFigure.add(new Label(name + " ", IMAGE_CLASS));
+				methodFigure.add(new Label(role.featureName + " ",
+						IMAGE_FEATURE));
+
+				for (FSTField f : role.fields) {
+
+					if (f.isOwn(role.file)) {
+						Label fieldLabel = createFieldLabel(f);
+						fieldFigure.add(fieldLabel);
+						fieldCount++;
+						if (fieldCount % 25 == 0) {
+							tooltipContent.add(fieldFigure);
+							fieldFigure = new CompartmentFigure();
+							fieldFigure.add(new Label(""));
+						}
+					}
 				}
-				System.out.println();
+
+				if (fieldCount == 0) {
+					fieldFigure.add(new Label(""));
+					tooltipContent.add(fieldFigure);
+				}
+				if (fieldCount % 25 != 0)
+					tooltipContent.add(fieldFigure);
+
+				for (FSTMethod m : role.methods) {
+					Label methodLabel = createMethodLabel(m);
+
+					if (m.isOwn(role.file)) {
+						methodFigure.add(methodLabel);
+						methodCount++;
+						if (methodCount % 25 == 0) {
+							tooltipContent.add(methodFigure);
+							methodFigure = new CompartmentFigure();
+							methodFigure.add(new Label(""));
+						}
+					}
+				}
+				if (methodCount == 0) {
+					methodFigure.add(new Label(""));
+					tooltipContent.add(methodFigure);
+				}
+				if (methodCount % 25 != 0)
+					tooltipContent.add(methodFigure);
+
+				this.addLabel(new Label("Fields: " + fieldCount + " Methods: "	+ methodCount));
+
+			} else if (role.getName().startsWith("*.")) {
+				featureFolder = CorePlugin.getFeatureProject(role.files.getFirst()).getSourceFolder()
+						.getFolder(role.getCollaboration().getName());
+				CompartmentFigure fileFigure = new CompartmentFigure();
+				fileFigure.add(new Label(role.featureName + " ", IMAGE_FEATURE));
+				int fileCount = 0;
+				long size = 0;
+				for (IFile file : role.files) {
+					long currentSize = file.getRawLocation().toFile().length();
+					size += currentSize;
+					Label fieldLabel;
+					if (currentSize <= 1000000) {
+						fieldLabel = new Label(" " + getParentNames(file) + file.getName() + " (" + currentSize / 1000 + "." + currentSize % 1000 + " bytes) ");
+					} else {
+						fieldLabel = new Label(" " + getParentNames(file) + file.getName() + " (" + currentSize / 1000000 + "." + currentSize / 1000 + " kb) ");
+					}
+					fileFigure.add(fieldLabel);
+					fileCount++;
+					if (fileCount % 25 == 0) {
+						tooltipContent.add(fileFigure);
+						fileFigure = new CompartmentFigure();
+						fileFigure.add(new Label(""));
+					}
+				}
+				if (size <= 1000000) {
+					this.addLabel(new Label("Files: " + fileCount + " (" + size/ 1000 + "." + size % 1000 + " bytes) "));
+				} else {
+					this.addLabel(new Label("Files: " + fileCount + " (" + size/ 1000000 + "." + size / 1000 + " kb) "));
+				}
+
+				if (fileCount % 25 != 0)
+					tooltipContent.add(fileFigure);
+			} else {
+				this.addLabel(new Label("   ...   "));
+				CompartmentFigure fileFigure = new CompartmentFigure();
+				fileFigure.add(new Label(role.featureName + " ", IMAGE_FEATURE));
+				fileFigure.add(new Label(role.getName().split("[.]")[0] + " ", IMAGE_CLASS));
+				LinkedList<String> duplicates = new LinkedList<String>();
+
+				for (FSTDirective d : role.directives) {
+					if (role.file.equals(d.file) && !duplicates.contains(d.toDependencyString())) {
+						duplicates.add(d.toDependencyString());
+						Panel directivesPanel = new Panel();
+						FlowLayout layout = new FlowLayout(true);
+						layout.setMinorSpacing(0);
+						layout.setMajorSpacing(0);
+						directivesPanel.setLayoutManager(layout);
+						Label partLabel = new Label(d.toDependencyString(), IMAGE_HASH);
+						partLabel.setFont(DEFAULT_FONT);
+						directivesPanel.add(partLabel);
+
+						directivesPanel.add(new Label(" "));
+						fileFigure.add(directivesPanel);
+					}
+				}
+
+				tooltipContent.add(fileFigure);
 			}
-			
-			tooltipContent.add(fileFigure);
+
+			contentsLayout.setConstraint(this, new Rectangle(0, 0, -1, -1));
+
+			this.setToolTip(tooltipContent);
 		}
-		
-		contentsLayout.setConstraint(this, new Rectangle(0,0,-1,-1));
-		
-		this.setToolTip(tooltipContent);
+	}
+
+
+	/**
+	 * @param m
+	 * @return
+	 */
+	private Label createMethodLabel(FSTMethod m) {
+		Label methodLabel = new Label(m.getName() + " ");
+		if (m.refines) {
+			methodLabel.setFont(FONT_BOLD);
+		}
+		if (m.isPrivate())
+			methodLabel.setIcon(IMAGE_METHODE_PRIVATE);
+		else if (m.isProtected())
+			methodLabel.setIcon(IMAGE_METHODE_PROTECTED);
+		else if (m.isPublic())
+			methodLabel.setIcon(IMAGE_METHODE_PUBLIC);
+		else
+			methodLabel.setIcon(IMAGE_METHODE_DEFAULT);
+		return methodLabel;
+	}
+
+
+	/**
+	 * @param f
+	 * @return
+	 */
+	private Label createFieldLabel(FSTField f) {
+		Label fieldLabel = new Label(f.getName() + " ");
+		if (f.isPrivate())
+			fieldLabel.setIcon(IMAGE_FIELD_PRIVATE);
+		else if (f.isProtected())
+			fieldLabel.setIcon(IMAGE_FIELD_PROTECTED);
+		else if (f.isPublic())
+			fieldLabel.setIcon(IMAGE_FIELD_PUBLIC);
+		else
+			fieldLabel.setIcon(IMAGE_FIELD_DEFAULT);
+		return fieldLabel;
 	}
 	
 	/**
@@ -236,27 +368,30 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		return getParentNames(parent) + parent.getName() + "/";
 	}
 
-	private void setName(String name) {
+	private void addLabel(Label label) {
 		
-		label.setText(name);
+		label.setForegroundColor(FOREGROUND);
+		if (label.getFont() == null) label.setFont(DEFAULT_FONT);
+		label.setLocation(new Point(ROLE_INSETS2.left, ROLE_INSETS2.top));
+		label.setOpaque(true);
+		
 		Dimension labelSize = label.getPreferredSize();
 		
 		if (labelSize.equals(label.getSize()))
 			return;
 		label.setSize(labelSize);
-
-		Rectangle bounds = getBounds();
-		int w = ROLE_INSETS.getWidth();
-		int h = ROLE_INSETS.getHeight();
-		bounds.setSize(labelSize.expand(w, h));
+		
+		panel.add(label);
+		GridLayout layout = (GridLayout) panel.getLayoutManager();
 
 		Dimension oldSize = getSize();
-		if (!oldSize.equals(0, 0)) {
-			int dx = (oldSize.width - bounds.width) / 2;
-			bounds.x += dx;
-		}
+		int w = labelSize.width + ROLE_INSETS.left + ROLE_INSETS.right;
+		int h = labelSize.height + layout.verticalSpacing; 
+		
+		oldSize.expand(0, h);
+		if (oldSize.width() < w) oldSize.setWidth(w);
 
-		setBounds(bounds);
+		panel.setSize(oldSize);
+		setSize(oldSize);
 	}
-	
 }

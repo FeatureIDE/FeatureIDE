@@ -34,6 +34,8 @@ public class FSTFeature extends FSTModelElement {
 	
 	private String name;
 	
+	private int color;
+	
 	private TreeMap<String, FSTClass> classes;
 
 	public LinkedList<FSTDirective> directives = new LinkedList<FSTDirective>();
@@ -41,6 +43,7 @@ public class FSTFeature extends FSTModelElement {
 	public FSTFeature(String name) {
 		this.name = name;
 		setClasses(new TreeMap<String, FSTClass>());
+		this.color = -1;
 	}
 
 	public String getName() {
@@ -83,5 +86,30 @@ public class FSTFeature extends FSTModelElement {
 	@Override
 	public String toString() {
 		return name;
+	}
+
+	/**
+	 * @return the color
+	 */
+	public int getColor() {
+		return color;
+	}
+	
+	/**
+	 * @return color > -1
+	 */
+	public boolean hasColor() {
+		return color > -1;
+	}
+
+	/**
+	 * @param color the color to set
+	 */
+	public void setColor(int color) {
+		this.color = color;
+	}
+	
+	public void removeColor() {
+		this.color = -1;
 	}
 }

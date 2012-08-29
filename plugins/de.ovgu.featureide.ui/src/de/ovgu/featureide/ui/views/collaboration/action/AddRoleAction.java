@@ -18,6 +18,9 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.action;
 
+
+import java.util.List;
+
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -28,6 +31,9 @@ import org.eclipse.ui.PlatformUI;
 import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
 import de.ovgu.featureide.ui.views.collaboration.editparts.ClassEditPart;
 import de.ovgu.featureide.ui.views.collaboration.editparts.CollaborationEditPart;
+import de.ovgu.featureide.ui.views.collaboration.editparts.RoleEditPart;
+import de.ovgu.featureide.ui.views.collaboration.figures.ClassFigure;
+import de.ovgu.featureide.ui.views.collaboration.figures.CollaborationFigure;
 import de.ovgu.featureide.ui.wizards.NewFeatureIDEFileWizard;
 
 /**
@@ -39,12 +45,14 @@ import de.ovgu.featureide.ui.wizards.NewFeatureIDEFileWizard;
  */
 public class AddRoleAction extends Action {
 	private GraphicalViewerImpl viewer;
+	private CollaborationView collcaborationView;
 
 	protected IStructuredSelection selection;
 
-	public AddRoleAction(String text, GraphicalViewerImpl view, CollaborationView collaborationView) {
+	public AddRoleAction(String text, GraphicalViewerImpl view, CollaborationView collcaborationView) {
 		super(text);
 		viewer = view;
+		this.collcaborationView = collcaborationView;
 		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
 				.getImageDescriptor(ISharedImages.IMG_OBJ_ADD));
 	}
@@ -56,21 +64,30 @@ public class AddRoleAction extends Action {
 
 	public void run() {
 		IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
-		String feature = "";
-		String clss = "";
 		Object selectedItem = selection.getFirstElement();
-
-		if (selectedItem != null){
-			if (selectedItem instanceof CollaborationEditPart) {
+		
+		String feature = getFeatureName();
+		String clss = "";
+		
+		if (selectedItem != null)
+		{
+			if (selectedItem instanceof CollaborationEditPart) 
+			{
 				feature = ((CollaborationEditPart) selectedItem).getCollaborationModel().getName();
 			}
-
-			else if (selectedItem instanceof ClassEditPart) {
+			else if (selectedItem instanceof RoleEditPart)
+			{ 
+				feature = ((RoleEditPart) selectedItem).getRoleModel().featureName;
+			}
+			else if (selectedItem instanceof ClassEditPart)
+			{
 				clss = ((ClassEditPart) selectedItem).getClassModel().getName();
 				if (clss.contains("."))
 					clss = clss.substring(0,clss.lastIndexOf('.'));
 			}
 		}
+		
+		
 		
 		NewFeatureIDEFileWizard wizard = new NewFeatureIDEFileWizard();
 		wizard.init(PlatformUI.getWorkbench(), (IStructuredSelection)selection, feature, clss);
@@ -79,5 +96,51 @@ public class AddRoleAction extends Action {
 		dialog.create();
 		dialog.open();
 
+	}
+
+
+	private String getFeatureName() 
+	{
+		String feature = "";
+		
+    	List<?> list = viewer.getContents().getChildren();
+    	int cursorY = collcaborationView.getCursorPosition().y;
+    	
+		for (Object object : list) 
+		{	
+			if (object instanceof CollaborationEditPart) 
+			{
+				CollaborationFigure collFigure = ((CollaborationFigure) ((CollaborationEditPart) object).getFigure());
+				
+				if (collFigure.isConfiguration)
+					continue;
+				
+				int index = list.indexOf(object);
+				
+				int min = collFigure.getBounds().y() - 4; 
+				int max = collFigure.getBounds().y() + collFigure.getBounds().height() + 4;
+				
+				if (list.size() > index + 1)
+				{
+					Object edit = list.get(index + 1);
+					if (edit instanceof CollaborationEditPart) {
+				
+						CollaborationFigure nextCollFigure = ((CollaborationFigure) ((CollaborationEditPart) edit).getFigure());
+						max = nextCollFigure.getBounds().y() - 4;
+					}
+					else if (edit instanceof ClassEditPart)
+					{
+						ClassFigure nextCollFigure = ((ClassFigure) ((ClassEditPart) edit).getFigure());
+						max = nextCollFigure.getBounds().height() - 4;
+					}
+				}
+				if (cursorY >= min && cursorY <= max)
+				{
+					feature = ((CollaborationEditPart) object).getCollaborationModel().getName();
+					break;
+				}
+			}
+		}
+		return feature;
 	}
 }

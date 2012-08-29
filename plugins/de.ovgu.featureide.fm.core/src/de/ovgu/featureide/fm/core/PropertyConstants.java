@@ -41,6 +41,8 @@ public interface PropertyConstants {
 																		// CORE
 																		// feature.
 
+	public final static String COLOR_CHANGED = "COLOR_CHANGED";
+	
 	public final static String MANDATORY_CHANGED = "MANDATORY_CHANGED";
 	
 	public final static String HIDDEN_CHANGED = "HIDDEN_CHANGED";

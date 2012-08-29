@@ -25,6 +25,7 @@ import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 
+import de.ovgu.featureide.ui.color.ColorPalette;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 import de.ovgu.featureide.ui.views.collaboration.model.Collaboration;
 
@@ -47,13 +48,13 @@ public class CollaborationFigure extends Figure implements GUIDefaults{
 		selected = coll.selected;
 		isConfiguration = coll.isConfiguration;
 		this.setLayoutManager(new FreeformLayout());
+
+		this.setBackgroundColor(COLL_BACKGROUND_UNSELECTED);
 		
 		if (selected) {
-			setBackgroundColor(COLL_BACKGROUND_SELECTED);
-			setBorder(COLL_BORDER_SELECTED);
+			this.setBorder(COLL_BORDER_SELECTED);
 		} else {
-			setBackgroundColor(COLL_BACKGROUND_UNSELECTED);
-			setBorder(COLL_BORDER_UNSELECTED);
+			this.setBorder(COLL_BORDER_UNSELECTED);
 		}
 		if (isConfiguration)
 			if (selected)
@@ -61,16 +62,19 @@ public class CollaborationFigure extends Figure implements GUIDefaults{
 			else
 				label.setIcon(IMAGE_CONFIGURATION);
 		
-		label.setForegroundColor(FOREGROUND);
 		label.setFont(DEFAULT_FONT);
 		label.setLocation(new Point(COLLABORATION_INSETS.left, COLLABORATION_INSETS.top));
 		
 		this.setName(coll.getName());
-		
 		this.add(label);
+		
+		if (coll.hasFeature() && coll.hasFeatureColor()) {
+			this.setBackgroundColor(ColorPalette.getColor(coll.getFeatureColor(), 0.4f));
+		}
+		
 		this.setOpaque(true);
 	}
-	
+
 	private void setName(String name){
 		label.setText(name);
 		Dimension labelSize = label.getPreferredSize();
