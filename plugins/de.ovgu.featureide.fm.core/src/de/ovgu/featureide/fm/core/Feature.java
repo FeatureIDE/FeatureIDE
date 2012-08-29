@@ -525,6 +525,21 @@ public class Feature implements PropertyConstants {
 		return name;
 	}
 	
+	public String toString(boolean writeMarks)
+	{
+		if (writeMarks)
+		{
+			if (this.name.contains(" "))
+			{
+				return "\"" + this.name + "\"";
+			}
+			return name;
+		}else
+		{
+			return this.toString();
+		}
+	}
+	
 	/* auto-generated methods
 	 * cause the diagram to be shown incorrectly
 	 */

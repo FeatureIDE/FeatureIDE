@@ -18,15 +18,29 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming;
 
+import java.util.Collection;
+import java.util.Iterator;
+
 import org.eclipse.gef.tools.DirectEditManager;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ICellEditorListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.ToolTip;
+import org.eclipse.ui.internal.UIPlugin;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.core.resources.IProject;
 
+import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.FeatureRenamingCommand;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
 
@@ -45,7 +59,8 @@ public class FeatureLabelEditManager extends DirectEditManager implements GUIDef
 		super(editpart, editorType, locator);
 		this.featureModel = featureModel;
 	}
-
+	
+	
 	@Override
 	protected void initCellEditor() {
 		final CellEditor cellEditor = getCellEditor();
@@ -58,14 +73,18 @@ public class FeatureLabelEditManager extends DirectEditManager implements GUIDef
 		cellEditor.addListener(new ICellEditorListener() {
 			private ToolTip tooltip;
 			
-			public void editorValueChanged(boolean oldValidState, boolean newValidState) {
+			public void editorValueChanged(boolean oldValidState, boolean newValidState) 
+			{
+				boolean notvalid;
 				closeTooltip();
 				String value = (String) cellEditor.getValue();
 				if (!value.equals(oldValue)) {
 					if (value.equalsIgnoreCase(oldValue))
 						createTooltip("It is not recommended to change upper and lower case. You currently try to rename " + oldValue + " to " + value + ".", SWT.ICON_WARNING);
-					else if (!featureModel.isValidFeatureName(value))
+					else if ((notvalid = !featureModel.isValidFeatureName(value)) && !featureModel.isFeatureModelingComposer())
 						createTooltip("The name need to be a valid Java identifier.", SWT.ICON_ERROR);
+					else if (notvalid)
+						createTooltip("The following Characaters are not allowed \", (, )", SWT.ICON_ERROR);
 					else if (featureModel.getFeatureNames().contains(value))
 						createTooltip("This name is already used for another feature.", SWT.ICON_ERROR);
 				}

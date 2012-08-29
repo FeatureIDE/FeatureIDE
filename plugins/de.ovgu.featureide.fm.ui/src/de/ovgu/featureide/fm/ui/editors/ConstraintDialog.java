@@ -19,8 +19,12 @@
 package de.ovgu.featureide.fm.ui.editors;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.AbstractOperation;
@@ -84,6 +88,8 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ConstraintCreateOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ConstraintEditOperation;
 
+import org.prop4j.*;
+
 /**
  * A simple editor for propositional constraints written below the feature
  * diagram.
@@ -97,8 +103,8 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ConstraintEditOp
 public class ConstraintDialog implements GUIDefaults {
 
 
-	private static final String[] OPERATOR_NAMES = { " Not ", " And ", " Or ",
-			" Implies ", " Iff ", "(", ")" /* "At most 1" */};
+	private static final String[] OPERATOR_NAMES = { "Not", "And", "Or",
+			"Implies", "Iff", "(", ")" /* "At most 1" */};
 	private static final String FILTERTEXT = "type filter text";
 	private Shell shell;
 	
@@ -119,7 +125,7 @@ public class ConstraintDialog implements GUIDefaults {
 	private int x, y;
 	private Button okButton;
 	private Constraint constraint;
-
+	
 	/**
 	 * 
 	 * @param featuremodel
@@ -138,6 +144,7 @@ public class ConstraintDialog implements GUIDefaults {
 		} else {
 			titleText = "Edit Propositional Constraint";
 			headerText = "Edit your Constraint";
+			
 			initialConstraint = constraint.getNode().toString(
 					NodeWriter.textualSymbols);
 		}
@@ -390,8 +397,8 @@ public class ConstraintDialog implements GUIDefaults {
 					temp.delete(x, y);
 					temp.insert(x > y ? y : x, /*
 												 * " " +
-												 */button.getText()
-							.toLowerCase(Locale.ENGLISH)
+												 */button.getText().toLowerCase(Locale.ENGLISH) + " "
+							
 					/* .replaceAll(" ", "") + " " */);
 					constraintText.setText(NodeReader.reduceWhiteSpaces(temp
 							.toString()));
@@ -412,6 +419,7 @@ public class ConstraintDialog implements GUIDefaults {
 	 * @param featuremodel
 	 */
 	private void initFeatureGroup(final FeatureModel featuremodel) {
+	
 		featureGroup = new Group(shell, SWT.NONE);
 		featureGroup.setText("Features");
 		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
@@ -517,7 +525,8 @@ public class ConstraintDialog implements GUIDefaults {
 			}
 
 		});
-		featureTableViewer.setInput(featuremodel.getFeatures());
+		
+		featureTableViewer.setInput(featureModel.getFeatures());
 
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.grabExcessVerticalSpace = true;
@@ -531,8 +540,9 @@ public class ConstraintDialog implements GUIDefaults {
 
 				temp.delete(x, y);
 				if (selectedItem.length > 0) {
-					temp.insert(x > y ? y : x, " " + selectedItem[0].getText()
+					temp.insert(x > y ? y : x, " " + (selectedItem[0].getText().contains(" ") ? "\"" + selectedItem[0].getText() + "\"" : selectedItem[0].getText())
 							+ " ");
+					
 				}
 				constraintText.setText(NodeReader.reduceWhiteSpaces(temp
 						.toString()));
@@ -558,13 +568,15 @@ public class ConstraintDialog implements GUIDefaults {
 	 * @param timeout
 	 *            timeout in ms
 	 */
-	public boolean isSatisfiable(String constraint, int timeout) {
+	public boolean isSatisfiable(String constraint, int timeout) 
+	{
 		NodeReader nodeReader = new NodeReader();
-		SatSolver satsolver = new SatSolver(nodeReader.stringToNode(constraint)
-				.clone(), timeout);
-		try {
+		SatSolver satsolver = new SatSolver(nodeReader.stringToNode(constraint).clone(), timeout);
+		try 
+		{
 			return satsolver.isSatisfiable();
-		} catch (TimeoutException e) {
+		} catch (TimeoutException e) 
+		{
 			FMUIPlugin.getDefault().logError(e);
 			return true;
 		}
@@ -885,7 +897,8 @@ public class ConstraintDialog implements GUIDefaults {
 		List<String> featureList = new ArrayList<String>(
 				featureModel.getFeatureNames());
 		Node propNode = nodeReader.stringToNode(input, featureList);
-
+		
+		
 		if (propNode == null) {
 			printHeaderError(nodeReader.getErrorMessage());
 			return;
@@ -905,8 +918,7 @@ public class ConstraintDialog implements GUIDefaults {
 		}
 		op.addContext((IUndoContext) featureModel.getUndoContext());
 		try {
-			PlatformUI.getWorkbench().getOperationSupport()
-					.getOperationHistory().execute(op, null, null);
+			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}

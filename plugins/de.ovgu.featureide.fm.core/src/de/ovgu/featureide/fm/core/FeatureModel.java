@@ -142,6 +142,12 @@ public class FeatureModel implements PropertyConstants {
 		return fmComposerExtension;
 	}
 
+	public boolean isFeatureModelingComposer()
+	{
+		if (COMPOSER_ID == null) return true;
+		return COMPOSER_ID.endsWith("FeatureModeling");
+	}
+	
 	public FeatureModel() {
 
 	}
@@ -930,7 +936,6 @@ public class FeatureModel implements PropertyConstants {
 		if (COMPOSER_ID == null) {
 			return;
 		}
-
 		IConfigurationElement[] config = Platform.getExtensionRegistry()
 				.getConfigurationElementsFor(
 						FMCorePlugin.PLUGIN_ID + ".FMComposer");

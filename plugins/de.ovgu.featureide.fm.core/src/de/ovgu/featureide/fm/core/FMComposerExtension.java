@@ -18,6 +18,9 @@
  */
 package de.ovgu.featureide.fm.core;
 
+import java.util.Collection;
+import java.util.Iterator;
+
 import org.eclipse.core.resources.IProject;
 
 /**
@@ -52,13 +55,15 @@ public class FMComposerExtension implements IFMComposerExtension {
 		return false;
 	}
 	
-	public boolean isValidFeatureName(String s){
+	public boolean isValidFeatureName(String s)
+	{		
 	    if (s == null)
 			return false;
 		final int len = s.length();
 		if (len == 0 || !Character.isJavaIdentifierStart(s.charAt(0)))
 			return false;
-		for (int i = 1; i < len; i++) {
+		for (int i = 1; i < len; i++)
+		{
 			if (!Character.isJavaIdentifierPart(s.charAt(i)))
 				return false;
 		}

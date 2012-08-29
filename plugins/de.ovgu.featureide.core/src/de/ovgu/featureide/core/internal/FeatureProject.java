@@ -89,6 +89,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		 * listens to changed feature names
 		 */
 		public void propertyChange(PropertyChangeEvent evt) {
+			
 			if (PropertyConstants.FEATURE_NAME_CHANGED.equals(
 					evt.getPropertyName())) {
 				String oldName = (String) evt.getOldValue();

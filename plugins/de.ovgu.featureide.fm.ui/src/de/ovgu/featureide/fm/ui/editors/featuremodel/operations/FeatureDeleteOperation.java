@@ -19,6 +19,7 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.AbstractOperation;
@@ -26,7 +27,9 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.prop4j.Node;
 
+import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -42,16 +45,27 @@ public class FeatureDeleteOperation extends AbstractOperation {
 	private Feature feature;
 	private Feature oldParent;
 	private int oldIndex;
+	private LinkedList<Constraint> oldConstraints;
 	private LinkedList<Feature> oldChildren;
 	private boolean deleted = false;
 	private boolean refresh;
+	private Feature replaceWithFeature;
 
-	public FeatureDeleteOperation(FeatureModel featureModel, Feature feature, boolean refreshDiagram) {
+	public FeatureDeleteOperation(FeatureModel featureModel, Feature feature, boolean refreshDiagram) 
+	{
 		super("Delete");
 		this.featureModel = featureModel;
 		this.feature = feature;
 		this.refresh = refreshDiagram;
-
+		this.replaceWithFeature = null;
+	}
+	
+	public FeatureDeleteOperation(FeatureModel featureModel, Feature feature, boolean refreshDiagram, Feature replaceWithFeature) {
+		super("Delete");
+		this.featureModel = featureModel;
+		this.feature = feature;
+		this.refresh = refreshDiagram;
+		this.replaceWithFeature = replaceWithFeature;
 	}
 
 	/*
@@ -108,6 +122,21 @@ public class FeatureDeleteOperation extends AbstractOperation {
 		if (refresh)
 			featureModel.handleModelDataLoaded();
 		
+		//Replace Featurename in Constraints
+		if (replaceWithFeature != null)
+		{
+			oldConstraints = new LinkedList<Constraint>();
+			for (Constraint c : featureModel.getConstraints())
+			{				
+				oldConstraints.add(new Constraint(featureModel, c.getNode().clone()));
+				if (c.getContainedFeatures().contains(feature))
+				{
+					 c.getNode().replaceFeature(feature, replaceWithFeature);
+				}
+			}			
+		}
+		
+		
 		return Status.OK_STATUS;
 	}
 
@@ -129,10 +158,13 @@ public class FeatureDeleteOperation extends AbstractOperation {
 			}
 			LinkedList<Feature> oldChildrenCopy = new LinkedList<Feature>();
 
-			for (Feature f : oldChildren) {
-				if (!f.getName().equals(feature.getName())) {
+			for (Feature f : oldChildren)
+			{
+				if (!f.getName().equals(feature.getName()))
+				{
 					Feature child = featureModel.getFeature(f.getName());
-					if (child != null && child.getParent() != null) {
+					if (child != null && child.getParent() != null)
+					{
 						child.getParent().removeChild(child);
 					}
 					oldChildrenCopy.add(child);
@@ -148,6 +180,12 @@ public class FeatureDeleteOperation extends AbstractOperation {
 				featureModel.setRoot(feature);
 			}
 			featureModel.addFeature(feature);
+			
+			//Replace Featurename in Constraints
+			if (replaceWithFeature != null)
+			{
+				featureModel.setConstraints(oldConstraints);
+			}
 			
 			if (refresh) {
 				featureModel.handleModelDataLoaded();

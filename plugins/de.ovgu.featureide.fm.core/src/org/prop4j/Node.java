@@ -5,6 +5,9 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Feature;
+
 /**
  * A propositional node that can be transformed into conjunctive normal form
  * (cnf).
@@ -94,7 +97,8 @@ public abstract class Node {
 	}
 
 	@Override
-	public String toString() {
+	public String toString() 
+	{
 		return NodeWriter.nodeToString(this);
 	}
 
@@ -111,7 +115,7 @@ public abstract class Node {
 	 * @return a string representing this node
 	 */
 	public String toString(String[] symbols) {
-		return NodeWriter.nodeToString(this, symbols);
+		return NodeWriter.nodeToString(this, symbols, false, true);
 	}
 
 	public static Node[] clone(Node[] array) {
@@ -140,6 +144,30 @@ public abstract class Node {
 	
 	protected Node clausify() {
 		throw new RuntimeException(getClass().getName() + " is not supporting this method");
+	}
+
+	public List<Node> replaceFeature(Feature feature, Feature replaceWithFeature)
+	{
+		return replaceFeature(feature, replaceWithFeature, new LinkedList<Node>());	
+	}	
+	
+	public List<Node> replaceFeature(Feature feature, Feature replaceWithFeature, List<Node> list)
+	{
+		if (this instanceof Literal)
+		{
+			if (((Literal)this).var.equals(feature.getName())) 
+			{
+				((Literal)this).var = replaceWithFeature.getName();
+				list.add(this);
+			}
+		}else
+		{
+			for (Node child : this.children)
+			{
+				child.replaceFeature(feature, replaceWithFeature, list);
+			}
+		}
+		return list;
 	}
 	
 	protected void fuseWithSimilarChildren() {

@@ -20,6 +20,23 @@ public class FeatureModelingFMExtension extends FMComposerExtension {
 		return true;
 	}
 	
+	
+	@Override
+	public boolean isValidFeatureName(String s)
+	{
+	    if (s == null)
+			return false;
+		final int len = s.length();
+		if (len == 0)
+			return false;
+		for (int i = 1; i < len; i++)
+		{
+			if (s.charAt(i) == '"' || s.charAt(i) == '(' || s.charAt(i) == ')')
+				return false;
+		}			
+		return true;
+	}
+	
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.fm.core.FMComposerExtension#hasFeaureOrder()
 	 */

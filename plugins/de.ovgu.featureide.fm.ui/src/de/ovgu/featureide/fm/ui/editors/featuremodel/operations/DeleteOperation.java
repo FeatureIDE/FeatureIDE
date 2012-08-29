@@ -36,12 +36,21 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.internal.UIPlugin;
+import org.prop4j.Literal;
+import org.prop4j.NodeReader;
+import org.prop4j.SatSolver;
+import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.ConstraintAttribute;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.FeatureDependencies;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.ConstraintDialog;
+import de.ovgu.featureide.fm.ui.editors.DeleteOperationAlternativeDialog;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
@@ -55,6 +64,10 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
  */
 public class DeleteOperation extends AbstractOperation implements GUIDefaults {
 
+	
+	public final static String[] textualSymbols = new String[] { "iff",
+		"implies", "or", "and", "not" };
+	
 	private static final String LABEL = "Delete";
 	private Object viewer;
 	private FeatureModel featureModel;
@@ -116,10 +129,12 @@ public class DeleteOperation extends AbstractOperation implements GUIDefaults {
 			}
 			if (editPart instanceof Feature){
 				Feature feature = ((Feature) editPart);
+				
 				if (feature.getRelevantConstraints().isEmpty()) {
 					op = new FeatureDeleteOperation(featureModel, feature, true);
 					executeOperation(op);
 				} else {
+					
 					MessageDialog dialog = new MessageDialog(new Shell(), 
 							" Delete Error ", FEATURE_SYMBOL, 
 							"\"" + feature.getName() + "\" is contained in constraints. "
@@ -139,18 +154,34 @@ public class DeleteOperation extends AbstractOperation implements GUIDefaults {
 			if (editPart instanceof FeatureEditPart) {
 				Feature feature = ((FeatureEditPart) editPart)
 						.getFeature();
+				
+				
 				if (feature.getRelevantConstraints().isEmpty()) {
 					op = new FeatureDeleteOperation(featureModel, feature, true);
 					executeOperation(op);
 				} else {
-					MessageDialog dialog = new MessageDialog(new Shell(), 
-							" Delete Error ", FEATURE_SYMBOL, 
-							"\"" + feature.getName() + "\" is contained in constraints. "
-							+ '\n' + '\n' + 
-							"Unable to delete this feature until all relevant constraints are removed.",
-							MessageDialog.ERROR, new String[] { IDialogConstants.OK_LABEL }, 0);
 					
-					dialog.open();
+					FeatureDependencies fd = new FeatureDependencies(featureModel);
+					List<Feature> equivalent = new LinkedList<Feature>();
+					for (Feature f2 : fd.always(feature))
+					{
+						if (fd.always(f2).contains(feature))
+						{
+							equivalent.add(f2);
+						}
+					}
+					if (!equivalent.isEmpty())					
+						new DeleteOperationAlternativeDialog(featureModel, feature, equivalent);
+					else
+					{
+						MessageDialog dialog = new MessageDialog(new Shell(), 
+								" Delete Error ", FEATURE_SYMBOL, 
+								"\"" + feature.getName() + "\" is contained in constraints. "
+								+ '\n' + '\n' + 
+								"Unable to delete this feature until all relevant constraints are removed.",
+								MessageDialog.ERROR, new String[] { IDialogConstants.OK_LABEL }, 0);
+						dialog.open();
+					}
 				}
 				
 

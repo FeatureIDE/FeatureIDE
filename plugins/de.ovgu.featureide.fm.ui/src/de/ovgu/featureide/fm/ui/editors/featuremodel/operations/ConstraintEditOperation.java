@@ -43,8 +43,7 @@ public class ConstraintEditOperation extends AbstractOperation {
 	private int index;
 	private Node oldPropNode;
 
-	public ConstraintEditOperation(Node propNode, FeatureModel featuremodel,
-			int index) {
+	public ConstraintEditOperation(Node propNode, FeatureModel featuremodel, int index) {
 		super(LABEL);
 		this.propNode = propNode;
 		this.featureModel = featuremodel;
@@ -76,8 +75,7 @@ public class ConstraintEditOperation extends AbstractOperation {
 	public IStatus redo(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
 		featureModel.replacePropNode(index, propNode);
-		FeatureDiagramLayoutHelper.initializeConstraintPosition(featureModel,
-				index);
+		FeatureDiagramLayoutHelper.initializeConstraintPosition(featureModel, index);
 		featureModel.handleModelDataChanged();
 		return Status.OK_STATUS;
 	}

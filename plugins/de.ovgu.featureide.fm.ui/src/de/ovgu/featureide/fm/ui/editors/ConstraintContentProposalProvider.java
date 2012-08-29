@@ -25,6 +25,9 @@ import java.util.Set;
 import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.jface.fieldassist.IContentProposalProvider;
 
+import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
+
 /**
  * provides proposals for content assist while typing constraints
  * 
@@ -55,31 +58,50 @@ public class ConstraintContentProposalProvider implements
 	 */
 	public IContentProposal[] getProposals(String contents, int position) {
 
+		
 		String[] words = getWords(contents, position);
+		
+		List<ContentProposal> proposalList = getProposalList(words, contents);
 
-		List<ContentProposal> proposalList = getProposalList(words);
 
 		return (IContentProposal[]) proposalList
 				.toArray(new IContentProposal[proposalList.size()]);
 
 	}
 
-	private List<ContentProposal> getProposalList(String[] words) {
-		List<ContentProposal> proposalList = new ArrayList<ContentProposal>();
-		
-		if (words[CURRENT].equals("(") || words[CURRENT].equals(" ")
-				|| words[CURRENT].equals("")) {
-			proposalList = getProposalList(words[LAST], features);
-		} else {
-			for (ContentProposal proposal : getProposalList(words[LAST],
-					features)) {
-
-				if (proposal.getContent().length() > words[CURRENT].trim().length()
-						&& proposal.getContent()
-								.substring(0, words[CURRENT].trim().length())
-								.equalsIgnoreCase(words[CURRENT].trim())) {
-
-					proposalList.add(proposal);
+	/**
+	 *  @return all possible feature names or junctors.
+	 *  @param current and previous word of edited string
+	 *  @param complete string being edited
+	 * 
+	 */
+	private List<ContentProposal> getProposalList(String[] words, String contents) 
+	{
+		List<ContentProposal> proposalList = new ArrayList<ContentProposal>();	
+			
+		boolean caught = false;
+		for (String feature: features)
+		{
+			if (feature.contains(" ") && feature.toLowerCase().startsWith(contents.substring(contents.lastIndexOf('"') + 1).toLowerCase()))
+			{
+				proposalList.add(new ContentProposal("\"" + feature + "\""));
+				caught = true;
+			}
+		}
+		if (!caught)
+		{
+			if (words[CURRENT].equals("(") || words[CURRENT].equals(" ") || words[CURRENT].equals("")) 
+			{
+				proposalList = getProposalList(words[LAST], features);
+				
+			}else{
+				for (ContentProposal proposal : getProposalList(words[LAST], features)) 
+				{
+					if (proposal.getContent().length() > words[CURRENT].trim().length()
+							&& proposal.getContent().substring(0, words[CURRENT].trim().length()).equalsIgnoreCase(words[CURRENT].trim())) 
+					{
+						proposalList.add(proposal);
+					} 
 				}
 			}
 		}
@@ -154,13 +176,24 @@ public class ConstraintContentProposalProvider implements
 		return words;
 	}
 
+	/**
+	 * 
+	 * @param wordBefore
+	 * 			
+	 * @param features
+	 * 			set of features
+	 * @return 
+	 * 		List of proposals, either operators or feature names
+	 */
 	private static List<ContentProposal> getProposalList(String wordBefore,
 			Set<String> features) {
 
 		ArrayList<ContentProposal> proposals = new ArrayList<ContentProposal>();
 		ArrayList<String> featureList = new ArrayList<String>(features);
 		Collections.sort(featureList, String.CASE_INSENSITIVE_ORDER);
-		if (wordBefore.equals(") ")||features.contains(wordBefore.trim())) {
+		
+		
+		if (wordBefore.equals(") ") || features.contains(wordBefore.trim()) || wordBefore.trim().endsWith("\"")) {
 			proposals.add(new ContentProposal("and"));
 			proposals.add(new ContentProposal("iff"));
 			proposals.add(new ContentProposal("implies"));
@@ -170,11 +203,12 @@ public class ConstraintContentProposalProvider implements
 			proposals.add(new ContentProposal("not"));
 
 			for (String s : featureList) {
-				proposals.add(new ContentProposal(s));
+				if (s.contains(" "))
+					proposals.add(new ContentProposal("\"" + s + "\""));
+				else 
+					proposals.add(new ContentProposal(s));
 			}
-
 		}
-
 		return proposals;
 	}
 

@@ -63,7 +63,6 @@ public class FeatureDependencies {
 	calculateDependencies();
     }
 
-
     /**
      * calculates feature dependencies
      */
@@ -78,17 +77,18 @@ public class FeatureDependencies {
 	    for (Feature current_feature : fm.getFeatures()) {
 		if (!current_feature.equals(feature)) {
 		    try {
-			if (nodeImpliesFeature(nodeSel,
-				current_feature.getName(), true)) {
-			    always.get(feature).add(current_feature);
-			} else if (nodeImpliesFeature(nodeSel,
-				current_feature.getName(), false)) {
-			    never.get(feature).add(current_feature);
-			} else {
-			    maybe.get(feature).add(current_feature);
-			}
+				if (nodeImpliesFeature(nodeSel, current_feature.getName(), true)) 
+				{
+				    always.get(feature).add(current_feature);
+				} else if (nodeImpliesFeature(nodeSel, current_feature.getName(), false)) 
+				{
+				    never.get(feature).add(current_feature);
+				} else 
+				{
+				    maybe.get(feature).add(current_feature);
+				}
 		    } catch (TimeoutException e) {
-			FMCorePlugin.getDefault().logError(e);
+		    	FMCorePlugin.getDefault().logError(e);
 		    }
 		}
 	    }
@@ -117,17 +117,13 @@ public class FeatureDependencies {
      *         configuration for the featureModel represented by node
      * @throws TimeoutException
      */
-    private  boolean nodeImpliesFeature(Node node, String featureName,
-	    boolean positive) throws TimeoutException {
-	Node nodeNeg = null;
-	if (positive) {
-	    nodeNeg = new Not((new Implies(node, new Literal(featureName))));
-	} else {
-	    nodeNeg = new Not((new Implies(node, new Not(featureName))));
-	}
-	SatSolver solver = new SatSolver(nodeNeg, 2500);
-	return !solver.isSatisfiable();
-
+    private  boolean nodeImpliesFeature(Node node, String featureName, boolean positive) throws TimeoutException 
+    {
+    	Node nodeNeg = null;
+    	if (positive) nodeNeg = new Not((new Implies(node, new Literal(featureName))));
+    		else nodeNeg = new Not((new Implies(node, new Not(featureName))));
+    	SatSolver solver = new SatSolver(nodeNeg, 2500);
+    	return !solver.isSatisfiable();
     }
     
     /**
