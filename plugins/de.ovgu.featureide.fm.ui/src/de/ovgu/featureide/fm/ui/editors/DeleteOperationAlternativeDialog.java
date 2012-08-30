@@ -18,19 +18,12 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
-import java.awt.Component;
-import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.JComboBox;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.AbstractOperation;
 import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -42,24 +35,16 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
-import org.prop4j.Node;
-import org.prop4j.NodeReader;
 
-import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ConstraintCreateOperation;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ConstraintEditOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureDeleteOperation;
 
 /**
@@ -69,22 +54,14 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureDeleteOpe
  */
 public class DeleteOperationAlternativeDialog implements GUIDefaults 
 {
-
-	
-	private Label errorMarker;
 	private Text errorMessage;
 	
-	//private String headerText = "bla";
-	private Group featureGroup;
-	private StyledText searchFeatureText;
 	private List<Feature> features;
 	
-	private Composite constraintTextComposite;
 	private Shell shell;
 	private Feature feature;
 	
 	private FeatureModel featureModel;
-	private int x, y;
 	private Button okButton;
 	private Combo featureCombo;
 	private String titleText;

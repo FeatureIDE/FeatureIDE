@@ -30,6 +30,7 @@ import javax.annotation.CheckForNull;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.prop4j.And;
+import org.prop4j.Equals;
 import org.prop4j.Implies;
 import org.prop4j.Literal;
 import org.prop4j.Node;
@@ -569,6 +570,63 @@ public class FeatureModelAnalyser {
 				}
 				
 			}
+			
+			/*	FeatureDependencies fd = new FeatureDependencies(fm);
+
+			LinkedList<Feature> l = new LinkedList<Feature>(); 
+			for (Feature f: fm.getFeatures())
+			{
+				if (f.hasHiddenParent() || f.isHidden())
+				{	
+					for (Constraint c : f.getRelevantConstraints())
+					{
+						if (c.getNode() instanceof Equals)
+						{
+							
+							if (((Equals)c.getNode()).getChildren()[0] instanceof Literal &&
+								((Literal) ((Equals)c.getNode()).getChildren()[0]).var.equals(f.getName()) && 
+								!(new Constraint(fm, c.getNode().getChildren()[1]).hasHiddenFeatures())
+								 ||
+								((Equals)c.getNode()).getChildren()[1] instanceof Literal && 
+								((Literal) ((Equals)c.getNode()).getChildren()[1]).var.equals(f.getName()) &&
+								!(new Constraint(fm, c.getNode().getChildren()[0]).hasHiddenFeatures())) 
+							{
+									l.add(f);
+									break;
+							}
+						}				
+					}
+				}
+			}
+			
+			
+			for (Feature f: fm.getFeatures())
+			{
+				if ((f.hasHiddenParent() || f.isHidden()) && !l.contains(f))
+				{	
+					
+					Set<Feature> s = fd.always(f);
+					boolean noHidden = false;
+					for (Feature f2 : s)						
+					{
+						if (fd.always(f2).contains(f))
+						{
+							if (!f2.isHidden() && !f2.hasHiddenParent() || l.contains(f2))
+							{
+								noHidden = true; 
+								break;
+							}
+						}
+					}	
+
+					if (!noHidden)
+					{
+						changedAttributes.put(f, FeatureStatus.INDETERMINATE_HIDDEN);					
+						f.setFeatureStatus(FeatureStatus.INDETERMINATE_HIDDEN, false);
+					}
+				}
+			}
+			*/
 		} catch (Exception e) {
 			FMCorePlugin.getDefault().logError(e);
 		}

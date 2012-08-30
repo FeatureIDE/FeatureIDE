@@ -39,11 +39,11 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
  * @author Sönke Holthusen
  */
 public class FeatureDependencies {
-    private static final String LEGEND_TEXT = "X ALWAYS Y := If X is selected Y is selected in every valid configuration."
+    private static final String LEGEND_TEXT = "X ALWAYS Y := If X is selected then Y is selected in every valid configuration."
 	    + "\n"
-	    + "X MAYBE  Y := If X is selected Y is selected in at least one but not all valid configurations. "
+	    + "X MAYBE  Y := If X is selected then Y is selected in at least one but not all valid configurations. "
 	    + "\n"
-	    + "X NEVER  Y := If X is selected Y cannot be selected in any valid configuration."
+	    + "X NEVER  Y := If X is selected then Y cannot be selected in any valid configuration."
 	    + "\n";
 
     private FeatureModel fm;

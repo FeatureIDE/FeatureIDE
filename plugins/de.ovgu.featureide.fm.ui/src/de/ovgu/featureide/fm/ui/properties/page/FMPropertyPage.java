@@ -3,13 +3,8 @@ package de.ovgu.featureide.fm.ui.properties.page;
 import java.io.File;
 import java.util.LinkedList;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.jdt.internal.core.JavaProject;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.preference.ColorSelector;
 import org.eclipse.swt.SWT;
@@ -35,7 +30,6 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
-import de.ovgu.featureide.fm.ui.properties.FMPropertyManagerDefaults;
 import de.ovgu.featureide.fm.ui.properties.language.English;
 import de.ovgu.featureide.fm.ui.properties.language.ILanguage;
 

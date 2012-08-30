@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
 
 /**
@@ -255,5 +254,6 @@ public abstract class Node {
 		for (int i = 0; i < nodes.length; i++)
 			nodes[i] = new Not(nodes[i]);
 	}
+	
 
 }

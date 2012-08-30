@@ -32,6 +32,7 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
  * Default colors, fonts, images and borders for the feature diagram.<br>

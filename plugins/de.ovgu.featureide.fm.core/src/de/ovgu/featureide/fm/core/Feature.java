@@ -38,7 +38,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 	public static final int INVALID_COLOR = -1;
 
 	private String name;
-
+	
 	private boolean indet = false;
 	
 	private boolean mandatory = false;

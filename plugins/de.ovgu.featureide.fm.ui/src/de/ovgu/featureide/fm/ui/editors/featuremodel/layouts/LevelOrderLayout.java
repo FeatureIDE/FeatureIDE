@@ -19,6 +19,7 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 
 import java.util.LinkedList;
+
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 

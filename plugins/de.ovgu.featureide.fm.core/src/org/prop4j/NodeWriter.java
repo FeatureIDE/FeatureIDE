@@ -1,6 +1,5 @@
 package org.prop4j;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
 
 /**
  * Converts a propositional node to a String object.

@@ -1,12 +1,7 @@
 package org.prop4j;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
-
-import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.FeatureModel;
 
 /**
  * This class can be used to parse propositional formulas.

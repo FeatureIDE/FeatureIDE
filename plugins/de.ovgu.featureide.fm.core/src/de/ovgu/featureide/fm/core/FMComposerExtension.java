@@ -18,9 +18,6 @@
  */
 package de.ovgu.featureide.fm.core;
 
-import java.util.Collection;
-import java.util.Iterator;
-
 import org.eclipse.core.resources.IProject;
 
 /**

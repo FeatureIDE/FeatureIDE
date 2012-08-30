@@ -196,6 +196,17 @@ public class Constraint implements PropertyConstants {
 	public String toString(){
 		return propNode.toString(NodeWriter.textualSymbols);
 	}
+	
+	public boolean hasHiddenFeatures()
+	{
+		for (Feature f: this.getContainedFeatures())
+		{
+			if (f.isHidden() || f.hasHiddenParent())
+					return true;
+					
+		}
+		return false;
+	}
 
 	/**
 	 * Set the dead features of this constraint

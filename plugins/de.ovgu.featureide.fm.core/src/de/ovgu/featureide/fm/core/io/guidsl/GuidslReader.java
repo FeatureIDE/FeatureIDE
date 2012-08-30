@@ -18,28 +18,6 @@
  */
 package de.ovgu.featureide.fm.core.io.guidsl;
 
-import java.io.InputStream;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-
-import org.prop4j.And;
-import org.prop4j.Choose;
-import org.prop4j.Equals;
-import org.prop4j.Implies;
-import org.prop4j.Literal;
-import org.prop4j.Node;
-import org.prop4j.Not;
-import org.prop4j.Or;
-import org.prop4j.SatSolver;
-
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
-import de.ovgu.featureide.fm.core.io.ModelWarning;
-import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-
 import guidsl.AstListNode;
 import guidsl.AstNode;
 import guidsl.AstOptNode;
@@ -76,6 +54,28 @@ import guidsl.TermList;
 import guidsl.TermName;
 import guidsl.Var;
 import guidsl.VarStmt;
+
+import java.io.InputStream;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+
+import org.prop4j.And;
+import org.prop4j.Choose;
+import org.prop4j.Equals;
+import org.prop4j.Implies;
+import org.prop4j.Literal;
+import org.prop4j.Node;
+import org.prop4j.Not;
+import org.prop4j.Or;
+import org.prop4j.SatSolver;
+
+import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
+import de.ovgu.featureide.fm.core.io.ModelWarning;
+import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
 /**
  * Parses the feature models in the GUIDSL format (grammar).
