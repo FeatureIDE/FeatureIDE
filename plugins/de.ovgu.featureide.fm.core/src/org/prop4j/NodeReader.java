@@ -467,8 +467,7 @@ public class NodeReader {
 	 * @param str
 	 * @return
 	 */
-	public static String reduceWhiteSpaces(String str) {
-		boolean inf = false;
+	/*public static String reduceWhiteSpaces(String str) {
 		if (str.length() < 2)
 			return str;
 		StringBuilder strBuf = new StringBuilder();
@@ -482,7 +481,7 @@ public class NodeReader {
 		}
 		return strBuf.toString();
 	}
-
+*/
 	private boolean hasFeatureNames() {
 		return featureNames != null;
 	}

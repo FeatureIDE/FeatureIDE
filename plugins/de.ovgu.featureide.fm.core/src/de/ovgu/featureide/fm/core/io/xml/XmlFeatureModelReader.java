@@ -233,7 +233,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 								&& featureModel.isValidFeatureName(attrName)) {
 							addFeature(attrName, isMandatory, isAbstract, isHidden, colors,	parent, featureLocation);
 						} else {
-							if (!featureModel.isValidFeatureName(attrName)) {
+							if (!featureModel.isValidFeatureName(attrName) ) {
 								throw new UnsupportedModelException("'"
 										+ attrName
 										+ "' is not a valid feature name",

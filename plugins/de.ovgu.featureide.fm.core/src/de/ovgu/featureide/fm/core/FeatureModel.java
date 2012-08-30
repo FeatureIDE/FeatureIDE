@@ -152,6 +152,12 @@ public class FeatureModel implements PropertyConstants {
 		return COMPOSER_ID.endsWith("FeatureModeling");
 	}
 	
+	public FeatureModel() 
+	{
+		
+	}
+
+
 	/**
 	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelLayout#setLayout(int)} instead.
 	 */
@@ -1077,7 +1083,7 @@ public class FeatureModel implements PropertyConstants {
 		}
 		return false;
 	}
-
+	
 	/**
 	 * @return true if feature model contains or group otherwise false
 	 */
@@ -1120,6 +1126,60 @@ public class FeatureModel implements PropertyConstants {
 	public boolean hasDead() {
 		return this.getDeadFeatures().size() > 0;
 	}
+	
+	public boolean hasIndetHidden()
+	{
+		for (Feature f : this.featureTable.values()) {
+			if (f.getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN)
+				return true;
+		}
+		return false;
+	}
+	
+	public boolean hasUnsatisfiableConst()
+	{
+		for (Constraint c : this.constraints) {
+			if (c.getConstraintAttribute() == ConstraintAttribute.UNSATISFIABLE)
+				return true;
+		}
+		return false;
+	}
+	
+	public boolean hasTautologyConst()
+	{
+		for (Constraint c : this.constraints) {
+			if (c.getConstraintAttribute() == ConstraintAttribute.TAUTOLOGY)
+				return true;
+		}
+		return false;
+	}
+	public boolean hasDeadConst()
+	{
+		for (Constraint c : this.constraints) {
+			if (c.getConstraintAttribute() == ConstraintAttribute.DEAD)
+				return true;
+		}
+		return false;
+	}
+	
+	public boolean hasVoidModelConst()
+	{
+		for (Constraint c : this.constraints) {
+			if (c.getConstraintAttribute() == ConstraintAttribute.VOID_MODEL)
+				return true;
+		}
+		return false;
+	}
+	
+	public boolean hasRedundantConst()
+	{
+		for (Constraint c : this.constraints) {
+			if (c.getConstraintAttribute() == ConstraintAttribute.REDUNDANT)
+				return true;
+		}
+		return false;
+	}
+
 
 	public boolean hasFalse() {
 		for (Feature f : this.featureTable.values()) {
@@ -1132,7 +1192,7 @@ public class FeatureModel implements PropertyConstants {
 	public void setUndoContext(Object undoContext) {
 		this.undoContext = undoContext;
 	}
-
+	
 	/**
 	 * @return
 	 */

@@ -428,8 +428,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 							return Status.OK_STATUS;
 						}
 						
-						final HashMap<Object, Object> changedAttributes = getFeatureModel()
-								.getAnalyser().analyzeFeatureModel(monitor);
+						final HashMap<Object, Object> changedAttributes = getFeatureModel().getAnalyser().analyzeFeatureModel(monitor);
 						
 						UIJob refreshGraphics = new UIJob("Updating feature model attributes") {
 		
@@ -510,7 +509,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	public void propertyChange(PropertyChangeEvent event) {
 		String prop = event.getPropertyName();
 		if (prop.equals(MODEL_DATA_CHANGED)) {
-			// setContents(getFeatureModel());
+			setContents(getFeatureModel());
 			refresh();
 			featureModelEditor.setPageModified(true);
 		} else if (prop.equals(MODEL_DATA_LOADED)) {

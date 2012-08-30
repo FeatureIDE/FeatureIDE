@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.prop4j.Literal;
+
 /**
  * Provides all properties of a feature. This includes its connections to parent
  * and child features.
@@ -37,6 +39,8 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 
 	private String name;
 
+	private boolean indet = false;
+	
 	private boolean mandatory = false;
 
 	private boolean concret = true;
@@ -126,7 +130,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 		this.mandatory = mandatory;
 		fireMandatoryChanged();
 	}
-
+	
 	public boolean isHidden() {
 		return hidden;
 	}
@@ -226,7 +230,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 		this.status = stat;
 		if(fire)fire(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
 	}
-
+	
 	public boolean isMultiple() {
 		return multiple;
 	}

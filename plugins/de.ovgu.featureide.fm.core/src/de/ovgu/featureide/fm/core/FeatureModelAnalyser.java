@@ -366,7 +366,6 @@ public class FeatureModelAnalyser {
 				worked(1);
 				oldAttributes.put(constraint, constraint.getConstraintAttribute());
 				constraint.setContainedFeatures(constraint.getNode());
-				
 				// if the constraint leads to false optionals it is added to
 				// changedAttributes in order to refresh graphics later
 				if (!hasFalsOptionalFeatures) {
@@ -374,16 +373,14 @@ public class FeatureModelAnalyser {
 				} else if (constraint.setFalseOptionalFeatures()) {
 					changedAttributes.put(constraint, ConstraintAttribute.UNSATISFIABLE);
 				}
-				constraint.setConstraintAttribute(ConstraintAttribute.NORMAL,
-						false);
+				constraint.setConstraintAttribute(ConstraintAttribute.NORMAL, false);
 				// tautology
-				SatSolver satsolverTAU = new SatSolver(new Not(constraint
-						.getNode().clone()), 1000);
+				SatSolver satsolverTAU = new SatSolver(new Not(constraint.getNode().clone()), 1000);
 				try {
 					if (!satsolverTAU.isSatisfiable()) {
-						if (oldAttributes.get(constraint) != ConstraintAttribute.TAUTOLOGY) {
-							changedAttributes.put(constraint,
-									ConstraintAttribute.TAUTOLOGY);
+						if (oldAttributes.get(constraint) != ConstraintAttribute.TAUTOLOGY) 
+						{
+							changedAttributes.put(constraint, ConstraintAttribute.TAUTOLOGY);
 						}
 						constraint.setConstraintAttribute(
 								ConstraintAttribute.TAUTOLOGY, false);
@@ -402,7 +399,7 @@ public class FeatureModelAnalyser {
 						}
 					}
 					// redundant constraint?
-					// TODO for some models this least very long and the solver does not stop after timeout
+					// TODO for some models this lasts very long and the solver does not stop after timeout
 					// this happens if the model has many abstract features
 					findRedundantConstraints(constraint, changedAttributes, oldAttributes);
 				}
@@ -424,8 +421,7 @@ public class FeatureModelAnalyser {
 						FMCorePlugin.getDefault().logError(e);
 					}
 					// contradiction?
-					SatSolver satsolverUS = new SatSolver(constraint.getNode()
-							.clone(), 1000);
+					SatSolver satsolverUS = new SatSolver(constraint.getNode().clone(), 1000);
 					try {
 						if (!satsolverUS.isSatisfiable()) {
 							if (oldAttributes.get(constraint) != ConstraintAttribute.UNSATISFIABLE) {
@@ -497,10 +493,13 @@ public class FeatureModelAnalyser {
 	 */
 	public void updateFeatures(HashMap<Object, Object> oldAttributes,
 			HashMap<Object, Object> changedAttributes) {
-		for (Feature bone : fm.getFeatures()) {
+		for (Feature bone : fm.getFeatures()) 
+		{
 			oldAttributes.put(bone, bone.getFeatureStatus());
+			
 			if (bone.getFeatureStatus() != FeatureStatus.NORMAL)
 				changedAttributes.put(bone, FeatureStatus.FALSE_OPTIONAL);
+				
 			bone.setFeatureStatus(FeatureStatus.NORMAL, false);
 			bone.setRelevantConstraints();
 		}
@@ -538,8 +537,46 @@ public class FeatureModelAnalyser {
 		} catch (Exception e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
+		try
+		{			
+			for (Feature f: fm.getFeatures())
+			{
+				if (f.hasHiddenParent() || f.isHidden())
+				{				
+					if  (f.getRelevantConstraints().size() == 0)
+					{
+						changedAttributes.put(f, FeatureStatus.INDETERMINATE_HIDDEN);					
+						f.setFeatureStatus(FeatureStatus.INDETERMINATE_HIDDEN, false);
+					}else
+					{
+						FeatureDependencies fd = new FeatureDependencies(fm);
+
+						Set<Feature> s = fd.always(f);
+						boolean noHidden = false;
+						for (Feature f2 : s)								
+						{
+							if (noHidden = (!f2.isHidden()))
+							{
+								break;
+							}
+						}
+						if (!noHidden)
+						{
+							changedAttributes.put(f, FeatureStatus.INDETERMINATE_HIDDEN);					
+							f.setFeatureStatus(FeatureStatus.INDETERMINATE_HIDDEN, false);
+						}
+					}
+				}
+				
+			}
+		} catch (Exception e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
 	}
 
+	
+	
+	
 	/**
 	 * @param oldAttributes
 	 * @param changedAttributes
@@ -551,6 +588,7 @@ public class FeatureModelAnalyser {
 		for (Feature f : getFalseOptionalFeatures()) {
 			changedAttributes.put(f,FeatureStatus.FALSE_OPTIONAL);
 			f.setFeatureStatus(FeatureStatus.FALSE_OPTIONAL, false);
+			
 			falseOptionalFeatures.add(f);
 		}
 	}

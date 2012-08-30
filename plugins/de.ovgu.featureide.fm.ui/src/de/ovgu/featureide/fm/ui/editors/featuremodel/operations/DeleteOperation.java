@@ -95,15 +95,16 @@ public class DeleteOperation extends AbstractOperation implements GUIDefaults {
 			throws ExecutionException {
 
 		AbstractOperation op = null;
+		LinkedList <Feature> notDeleted = new LinkedList<Feature>();
 		
 		IStructuredSelection selection;
 		if (viewer instanceof GraphicalViewerImpl)
-		selection = (IStructuredSelection) ((GraphicalViewerImpl) viewer)
-				.getSelection();
+		selection = (IStructuredSelection) ((GraphicalViewerImpl) viewer).getSelection();
 		else 
-			selection = (IStructuredSelection) ((TreeViewer) viewer)
-			.getSelection();
+			selection = (IStructuredSelection) ((TreeViewer) viewer).getSelection();
 
+		
+		
 		Iterator<?> iter = selection.iterator();
 		while (iter.hasNext()) {
 			
@@ -113,8 +114,7 @@ public class DeleteOperation extends AbstractOperation implements GUIDefaults {
 
 			if (editPart instanceof ConstraintEditPart) {
 
-				Constraint constraint = ((ConstraintEditPart) editPart)
-						.getConstraintModel();
+				Constraint constraint = ((ConstraintEditPart) editPart).getConstraintModel();
 				op = new ConstraintDeleteOperation(constraint, featureModel);
 				for (Constraint resetConstraint : featureModel.getConstraints()){
 					resetConstraint.setConstraintAttribute(ConstraintAttribute.NORMAL,true);
@@ -152,35 +152,40 @@ public class DeleteOperation extends AbstractOperation implements GUIDefaults {
 				executeOperation(op);
 			}
 			if (editPart instanceof FeatureEditPart) {
-				Feature feature = ((FeatureEditPart) editPart)
-						.getFeature();
+				Feature feature = ((FeatureEditPart) editPart).getFeature();
 				
 				
 				if (feature.getRelevantConstraints().isEmpty()) {
 					op = new FeatureDeleteOperation(featureModel, feature, true);
 					executeOperation(op);
 				} else {
-					
-					FeatureDependencies fd = new FeatureDependencies(featureModel);
-					List<Feature> equivalent = new LinkedList<Feature>();
-					for (Feature f2 : fd.always(feature))
+					if (selection.size() == 1)
 					{
-						if (fd.always(f2).contains(feature))
+						FeatureDependencies fd = new FeatureDependencies(featureModel);
+						List<Feature> equivalent = new LinkedList<Feature>();
+						for (Feature f2 : fd.always(feature))
 						{
-							equivalent.add(f2);
+							if (fd.always(f2).contains(feature))
+							{
+								equivalent.add(f2);
+							}
 						}
-					}
-					if (!equivalent.isEmpty())					
-						new DeleteOperationAlternativeDialog(featureModel, feature, equivalent);
-					else
+						////// Feature in message angeben
+						if (!equivalent.isEmpty())					
+							new DeleteOperationAlternativeDialog(featureModel, feature, equivalent);
+						else
+						{
+							MessageDialog dialog = new MessageDialog(new Shell(), 
+									" Delete Error ", FEATURE_SYMBOL, 
+									"\"" + feature.getName() + "\" is contained in constraints. "
+									+ '\n' + '\n' + 
+									"Unable to delete this feature until all relevant constraints are removed.",
+									MessageDialog.ERROR, new String[] { IDialogConstants.OK_LABEL }, 0);
+							dialog.open();
+						}
+					}else
 					{
-						MessageDialog dialog = new MessageDialog(new Shell(), 
-								" Delete Error ", FEATURE_SYMBOL, 
-								"\"" + feature.getName() + "\" is contained in constraints. "
-								+ '\n' + '\n' + 
-								"Unable to delete this feature until all relevant constraints are removed.",
-								MessageDialog.ERROR, new String[] { IDialogConstants.OK_LABEL }, 0);
-						dialog.open();
+						notDeleted.add(feature); 
 					}
 				}
 				
@@ -188,6 +193,25 @@ public class DeleteOperation extends AbstractOperation implements GUIDefaults {
 			}
 			if (op != null) operations.add(op);
 		}
+		
+		if (notDeleted.size() > 0)
+		{
+			String notDeletedFeatures = "";
+			for (Feature f : notDeleted)
+			{
+				notDeletedFeatures += "\"" + f.getName() + "\", ";
+					
+			}
+			notDeletedFeatures = notDeletedFeatures.substring(0, notDeletedFeatures.length() -2);
+			MessageDialog dialog = new MessageDialog(new Shell(), 
+					" Delete Error ", FEATURE_SYMBOL, 
+					"" +  "The following features are contained in constraints:" +
+					 "\n" + notDeletedFeatures + "\n" + 
+					"Select only one feature in order to replace it with an equivalent one.",
+					MessageDialog.ERROR, new String[] { IDialogConstants.OK_LABEL }, 0);
+			dialog.open();
+		}
+		
 		featureModel.handleModelDataChanged();
 		return Status.OK_STATUS;
 	}

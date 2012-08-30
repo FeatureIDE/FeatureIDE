@@ -43,7 +43,6 @@ public class Constraint implements PropertyConstants {
 	private List<Feature> containedFeatureList = new LinkedList<Feature>();
 	private List<Feature> falseOptionalFeatures = new LinkedList<Feature>();
  	private ConstraintAttribute attribute = ConstraintAttribute.NORMAL;
-	
 	private List<Feature> deadFeatures = new ArrayList<Feature>();
 	
 	public Constraint(FeatureModel featureModel, Node propNode) {

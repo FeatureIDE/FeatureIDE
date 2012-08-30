@@ -26,6 +26,32 @@ package de.ovgu.featureide.fm.ui.properties.language;
  */
 public interface ILanguage {
 	
+	
+	/**
+	 * @return The word for: "indeterminate hidden"
+	 */	public String getRedundantConst();
+	
+	/**
+	 * @return The word for: "indeterminate hidden"
+	 */	public String getDeadConst();
+	 
+	/**
+ 	 * @return The word for: "indeterminate hidden"
+	 */	public String getUnsatisfiableConst();
+	 
+	/**
+	 * @return The word for: "indeterminate hidden"
+	 */	public String getTautologyConst();
+	 
+	/**
+	 * @return The word for: "indeterminate hidden"
+	 */	public String getVoidModelConst();
+	 
+	 
+	/**
+	 * @return The word for: "indeterminate hidden"
+	 */	public String getIndetHidden();
+	
 	/**
 	 * @return The title of the legend
 	 */

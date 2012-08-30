@@ -73,7 +73,7 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults
 	
 	private Label errorMarker;
 	private Text errorMessage;
-	private String titleText = "Replace Feature in Constraints";
+	
 	//private String headerText = "bla";
 	private Group featureGroup;
 	private StyledText searchFeatureText;
@@ -87,6 +87,7 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults
 	private int x, y;
 	private Button okButton;
 	private Combo featureCombo;
+	private String titleText;
 	
 	
 	public DeleteOperationAlternativeDialog(FeatureModel featureModel, Feature feature, List<Feature> foundFeatures)
@@ -99,7 +100,7 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults
 		initText();
 		initCombo();
 		initButtons();
-		shell.open();
+		shell.open();	
 	}
 
 	private void initCombo()
@@ -116,6 +117,7 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults
 	
 	private void initShell() {
 		shell = new Shell(Display.getCurrent());
+		titleText = "Replace \"" +  feature.getName() + "\" in constraints";
 		shell.setText(titleText);
 		shell.setImage(FEATURE_SYMBOL);
 		shell.setSize(400, 250);
@@ -124,6 +126,8 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults
 		shellLayout.marginHeight = 0;
 		shell.setLayout(shellLayout);
 
+		
+		
 		Monitor primary = shell.getDisplay().getPrimaryMonitor();
 		Rectangle bounds = primary.getBounds();
 		Rectangle rect = shell.getBounds();
@@ -146,7 +150,8 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults
 		errorMessage.setBackground(shell.getDisplay().getSystemColor(
 				SWT.COLOR_WHITE));
 		errorMessage.setBounds(20, 20, 380, 65);
-		errorMessage.setText("Caution!\nThe feature you are about to delete is contained in several Constraints.\nPlease select one of the following features in order to replace it.");
+		errorMessage.setText("Caution!\nThe feature you are about to delete is contained in several constraints.\nPlease select one of the following features in order to replace it.");
+		
 	}
 		
 	
@@ -219,11 +224,8 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults
 				FMUIPlugin.getDefault().logError(e);
 			}
 		}
-		
-
 		shell.dispose();
-		
-		
+	
 	}
 	
 	

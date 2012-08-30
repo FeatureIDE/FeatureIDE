@@ -67,6 +67,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 	private static String DEAD = "is dead ";
 	private static String FEATURE = " feature ";
 	private static String FALSE_OPTIONAL = "is false optional ";
+	private static String INDETERMINATE_HIDDEN = "is hidden and indeterminate";
 	private static String VOID = " Feature Model is void ";
 	private static String ROOT = " Root ";
 
@@ -158,6 +159,12 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 			setBackgroundColor(FMPropertyManager.getWarningColor());
 			setBorder(FMPropertyManager.getConcreteFeatureBorder(feature.isConstraintSelected()));
 			toolTip += FALSE_OPTIONAL;
+		}
+		
+		if (feature.getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN){
+			setBackgroundColor(FMPropertyManager.getWarningColor());
+			setBorder(FMPropertyManager.getConcreteFeatureBorder(feature.isConstraintSelected()));
+			toolTip += INDETERMINATE_HIDDEN;
 		}
 		
 		if (feature.isRoot() && !modelIsValid){

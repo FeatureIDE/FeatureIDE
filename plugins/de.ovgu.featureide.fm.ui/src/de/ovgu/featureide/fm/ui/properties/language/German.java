@@ -39,7 +39,50 @@ public class German implements ILanguage {
 	private static final String ALTERNATIVE = "Alternative";
 	private static final String OR = "Oder";
 	private static final String OPTIONAL = "Optional";
+	private static final String INDETHIDDEN = "versteckt & unbestimmbar";
+	private static final String REDUNDANT = "Redundant";
+	private static final String DEAD_CONST = "???";
+	private static final String UNSATISFIABLE_CONST = "Unerfüllbar";
+	private static final String TAUTOLOGY_CONST = "Tautologie";
+	private static final String VOID_MODEL_CONST = "???";	
+	
+	
+	@Override
+	public String getRedundantConst()
+	{
+		return REDUNDANT;
+	}
+	
+	@Override
+	public String getDeadConst()
+	{
+		return DEAD_CONST;
+	}
+	 
+	@Override
+	public String getUnsatisfiableConst()
+	{
+		return UNSATISFIABLE_CONST;
+	}	
+	
+	@Override
+	public String getTautologyConst()
+	{
+		return TAUTOLOGY_CONST;
+	}
+	 
+	@Override
+	public String getVoidModelConst()
+	{
+		return VOID_MODEL_CONST;
+	}
+	 	
 
+	@Override
+	public String getIndetHidden() {
+		return INDETHIDDEN;
+	}
+	
 	@Override
 	public String getName() {
 		return name;

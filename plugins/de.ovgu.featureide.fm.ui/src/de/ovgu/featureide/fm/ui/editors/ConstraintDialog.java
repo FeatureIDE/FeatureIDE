@@ -400,8 +400,7 @@ public class ConstraintDialog implements GUIDefaults {
 												 */button.getText().toLowerCase(Locale.ENGLISH) + " "
 							
 					/* .replaceAll(" ", "") + " " */);
-					constraintText.setText(NodeReader.reduceWhiteSpaces(temp
-							.toString()));
+					constraintText.setText(temp.toString()); //NodeReader.reduceWhiteSpaces(temp.toString()));
 					constraintText.setFocus();
 					constraintText.setSelection(constraintText.getCharCount());
 
@@ -544,8 +543,7 @@ public class ConstraintDialog implements GUIDefaults {
 							+ " ");
 					
 				}
-				constraintText.setText(NodeReader.reduceWhiteSpaces(temp
-						.toString()));
+				constraintText.setText(temp.toString()); //NodeReader.reduceWhiteSpaces(temp.toString()));
 
 				constraintText.setSelection(constraintText.getCharCount());
 				searchFeatureText.setText(FILTERTEXT);

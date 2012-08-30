@@ -39,7 +39,50 @@ public class English implements ILanguage {
 	private static final String ALTERNATIVE = "Alternative";
 	private static final String OR = "Or";
 	private static final String OPTIONAL = "Optional";
+	private static final String INDETHIDDEN = "Indeterminate Hidden";
+	private static final String REDUNDANT = "Redundant constraint";
+	private static final String DEAD_CONST = "Dead constraint";
+	private static final String UNSATISFIABLE_CONST = "Unsatisfiable Constraint";
+	private static final String TAUTOLOGY_CONST = "Constraint is tautology";
+	private static final String VOID_MODEL_CONST = "Constraint makes the model void";	
+	
+	
+	@Override
+	public String getRedundantConst()
+	{
+		return REDUNDANT;
+	}
+	
+	@Override
+	public String getDeadConst()
+	{
+		return DEAD_CONST;
+	}
+	 
+	@Override
+	public String getUnsatisfiableConst()
+	{
+		return UNSATISFIABLE_CONST;
+	}	
+	
+	@Override
+	public String getTautologyConst()
+	{
+		return TAUTOLOGY_CONST;
+	}
+	 
+	@Override
+	public String getVoidModelConst()
+	{
+		return VOID_MODEL_CONST;
+	}
 
+	@Override
+	public String getIndetHidden() {
+		return INDETHIDDEN;
+	}
+	
+	
 	@Override
 	public String getName() {
 		return name;
