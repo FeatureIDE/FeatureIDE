@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -53,8 +52,6 @@ import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.progress.UIJob;
 
 import de.ovgu.featureide.ui.UIPlugin;
-import de.ovgu.featureide.ui.views.collaboration.model.Collaboration;
-import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModel;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.FeatureModel;

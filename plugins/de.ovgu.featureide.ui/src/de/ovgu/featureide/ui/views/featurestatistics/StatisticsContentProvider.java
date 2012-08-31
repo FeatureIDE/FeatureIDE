@@ -18,21 +18,14 @@
  */
 package de.ovgu.featureide.ui.views.featurestatistics;
 
-	import java.awt.event.MouseEvent;
-
-import javax.swing.event.TreeSelectionListener;
-
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
-	import org.eclipse.core.runtime.IStatus;
-	import org.eclipse.core.runtime.Status;
-	import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
-	import org.eclipse.jface.viewers.ITreeContentProvider;
-	import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.swt.events.MouseAdapter;
-import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.widgets.Event;
+import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ui.progress.UIJob;
 
 import de.ovgu.featureide.core.IFeatureProject;
@@ -47,17 +40,16 @@ import de.ovgu.featureide.fm.ui.views.featuremodeleditview.TreeParent;
 public class StatisticsContentProvider implements IStructuredContentProvider,
 		ITreeContentProvider, GUIDefaults {
 
-
-	private IProject project;	
+	private IProject project;
 	protected static final int INDEX_STATISTICS_BEFORE = 5;
 	protected static final int INDEX_STATISTICS_AFTER = 6;
-	
+
 	private static final long TIMEOUT_CONFIGURATION = 10000;
-	
+
 	private final FeatureStatistics view;
 	private IFeatureProject featureProject;
-	
-	public  String[] compactList = new String[0];
+
+	public String[] compactList = new String[0];
 	TreeParent invisibleRoot = new TreeParent("");
 	TreeParent Features = new TreeParent("");
 
@@ -68,13 +60,13 @@ public class StatisticsContentProvider implements IStructuredContentProvider,
 	/**
 	 * @param featureStatistics
 	 */
-	
+
 	public void inputChanged(Viewer v, Object oldInput, Object newInput) {
 	}
 
 	public void dispose() {
 		invisibleRoot = null;
-	}	
+	}
 
 	public Object getParent(Object child) {
 		if (child instanceof TreeElement)
@@ -100,18 +92,19 @@ public class StatisticsContentProvider implements IStructuredContentProvider,
 	 */
 	public void defaultManualContent() {
 		if (invisibleRoot.getChildren().length <= 1) {
-		refresh();
+			refresh();
 		}
 	}
-	
+
 	public void defaultContent() {
 		if (invisibleRoot != null) {
-		refresh();
+			refresh();
 		}
 	}
 
 	private boolean cancel = false;
-	protected void refresh() {		
+
+	protected void refresh() {
 		UIJob job_setColor = new UIJob("Refresh edit view") {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
@@ -127,44 +120,39 @@ public class StatisticsContentProvider implements IStructuredContentProvider,
 
 	/**
 	 * Stops the calculation and the running job
+	 * 
 	 * @param value
 	 */
 	public void setCanceled(boolean value) {
-		cancel  = value;
+		cancel = value;
 	}
-	
+
 	/**
 	 * @return <code>true</code> if the calculation is canceled
 	 */
 	public boolean isCanceled() {
 		return cancel;
 	}
-	
+
 	public Object[] getElements(Object parent) {
 		if (parent.equals(view.getViewSite()))
 			return getChildren(invisibleRoot);
 		return getChildren(parent);
 	}
-	
 
-	
-	
-	
-	
-	
-public void getFeatureModelSpecification(FeatureModel model) {
+	public void getFeatureModelSpecification(FeatureModel model) {
 		featureProject = FeatureStatistics.featureProject;
 		invisibleRoot.removeChildren();
-		Features.removeChildren();							
+		Features.removeChildren();
 		project = featureProject.getProject();
-		
+
 		final int features = model.getNumberOfFeatures();
 		final int concrete = model.getAnalyser().countConcreteFeatures();
 		final int terminal = model.getAnalyser().countTerminalFeatures();
 		final int hidden = model.getAnalyser().countHiddenFeatures();
-		
+
 		invisibleRoot.addChild("Project: " + project.getName());
-		
+
 		Features.setName("Features " + features);
 		Features.addChild("Concrete Features " + concrete);
 		Features.addChild("Abstract Features " + (features - concrete));
@@ -172,22 +160,26 @@ public void getFeatureModelSpecification(FeatureModel model) {
 		Features.addChild("Compound Features " + (features - terminal));
 		Features.addChild("Hidden Features " + hidden);
 		invisibleRoot.addChild(Features);
-		
-		TreeParent programVariants = new TreeParent("Program Variants: " + calculateNumberOfVariants2(model, false));
-		TreeParent configurations = new TreeParent("Configurations: " + calculateNumberOfVariants2(model, true));
-		
+
+		TreeParent programVariants = new TreeParent("Program Variants: "
+				+ calculateNumberOfVariants2(model, false));
+		TreeParent configurations = new TreeParent("Configurations: "
+				+ calculateNumberOfVariants2(model, true));
+
 		invisibleRoot.addChild(programVariants);
-				
+
 		invisibleRoot.addChild(configurations);
-		
-		invisibleRoot.addChild("Composer: " + ComposerExtensionManager.getInstance().getComposerById(featureProject.getComposerID()).getName());
-		
+
+		invisibleRoot.addChild("Composer: "
+				+ ComposerExtensionManager.getInstance()
+						.getComposerById(featureProject.getComposerID())
+						.getName());
+
 		refresh();
-		
+
 		return;
 
 	}
-
 
 	private String calculateNumberOfVariants2(FeatureModel model,
 			boolean ignoreAbstractFeatures) {
@@ -217,18 +209,15 @@ public void getFeatureModelSpecification(FeatureModel model) {
 			s += number;
 
 		return s;
-	}	
-	
-	public void print(){
+	}
+
+	public void print() {
 		refresh();
 		return;
 	}
-			
+
 	/**
 	 * @return <code>true</code> if the calculation is canceled
 	 */
-	
-
-	
 
 }
