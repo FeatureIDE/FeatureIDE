@@ -18,7 +18,9 @@
  */
 package de.ovgu.featureide.ui.views.featurestatistics;
 
-	import java.util.ArrayList;
+	import java.awt.event.MouseEvent;
+
+import javax.swing.event.TreeSelectionListener;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -28,18 +30,18 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 	import org.eclipse.jface.viewers.ITreeContentProvider;
 	import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.progress.UIJob;
 
-import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionManager;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.TreeElement;
-import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.views.featuremodeleditview.TreeParent;
-import de.ovgu.featureide.ui.views.FeatureStatistics;
 
 // TODO differences should be highlighted
 public class StatisticsContentProvider implements IStructuredContentProvider,
@@ -54,10 +56,10 @@ public class StatisticsContentProvider implements IStructuredContentProvider,
 	
 	private final FeatureStatistics view;
 	private IFeatureProject featureProject;
-	public static ArrayList<String> viewableContent = new ArrayList<String>();
+	
 	public  String[] compactList = new String[0];
-
 	TreeParent invisibleRoot = new TreeParent("");
+	TreeParent Features = new TreeParent("");
 
 	public StatisticsContentProvider(FeatureStatistics featureStatistics) {
 		this.view = featureStatistics;
@@ -109,7 +111,7 @@ public class StatisticsContentProvider implements IStructuredContentProvider,
 	}
 
 	private boolean cancel = false;
-	protected void refresh() {
+	protected void refresh() {		
 		UIJob job_setColor = new UIJob("Refresh edit view") {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
@@ -138,60 +140,51 @@ public class StatisticsContentProvider implements IStructuredContentProvider,
 		return cancel;
 	}
 	
-	public Object[] getElements(Object parent) {		
-		if(compactList.length == 0){
-			return new String[]{};
-		} return compactList;
+	public Object[] getElements(Object parent) {
+		if (parent.equals(view.getViewSite()))
+			return getChildren(invisibleRoot);
+		return getChildren(parent);
 	}
 	
-		
+
 	
 	
-public ArrayList<String> getFeatureModelSpecification(final FeatureModelEditor editor) {
-		
-		FeatureModel model = editor.getFeatureModel();		
-		project = editor.getGrammarFile().getResource().getProject();
-		featureProject = CorePlugin.getFeatureProject(project);
-				
-		
-		viewableContent.add("Project: " + project.getName());
+	
+	
+	
+public void getFeatureModelSpecification(FeatureModel model) {
+		featureProject = FeatureStatistics.featureProject;
+		invisibleRoot.removeChildren();
+		Features.removeChildren();							
+		project = featureProject.getProject();
 		
 		final int features = model.getNumberOfFeatures();
-		viewableContent.add("Features:");
-
 		final int concrete = model.getAnalyser().countConcreteFeatures();
-
-		viewableContent.add(" Conrete Features: "
-				+ new Integer(concrete).toString());
-
-		viewableContent.add(" Abstract Features: "
-				+ new Integer(features - concrete).toString());
-
 		final int terminal = model.getAnalyser().countTerminalFeatures();
-		viewableContent.add(" Primitive Features: "
-				+ new Integer(terminal).toString());
-
-		viewableContent.add(" Compound Features: "
-				+ new Integer(features - terminal).toString());
-
 		final int hidden = model.getAnalyser().countHiddenFeatures();
-
-		viewableContent.add(" Hidden Features: "
-				+ new Integer(hidden).toString());
-		viewableContent.add("Total: " + new Integer(features).toString());
-		viewableContent.add("\n");
-
-		viewableContent.add("Configurations: "
-				+ calculateNumberOfVariants2(model, true));
-
-		viewableContent.add("Program Variants: "
-				+ calculateNumberOfVariants2(model, false));
 		
+		invisibleRoot.addChild("Project: " + project.getName());
+		
+		Features.setName("Features " + features);
+		Features.addChild("Concrete Features " + concrete);
+		Features.addChild("Abstract Features " + (features - concrete));
+		Features.addChild("Primitve Features " + terminal);
+		Features.addChild("Compound Features " + (features - terminal));
+		Features.addChild("Hidden Features " + hidden);
+		invisibleRoot.addChild(Features);
+		
+		TreeParent programVariants = new TreeParent("Program Variants: " + calculateNumberOfVariants2(model, false));
+		TreeParent configurations = new TreeParent("Configurations: " + calculateNumberOfVariants2(model, true));
+		
+		invisibleRoot.addChild(programVariants);
 				
-		viewableContent.add("Composer: " + ComposerExtensionManager.getInstance()
-				.getComposerById(featureProject.getComposerID()).getName());
+		invisibleRoot.addChild(configurations);
 		
-		return viewableContent;
+		invisibleRoot.addChild("Composer: " + ComposerExtensionManager.getInstance().getComposerById(featureProject.getComposerID()).getName());
+		
+		refresh();
+		
+		return;
 
 	}
 
@@ -224,14 +217,13 @@ public ArrayList<String> getFeatureModelSpecification(final FeatureModelEditor e
 			s += number;
 
 		return s;
-	}
+	}	
 	
-	public void printSpec(ArrayList<String> arrList) {
-		compactList = arrList.toArray(new String[arrList.size()]);
-		viewableContent.clear();
+	public void print(){
 		refresh();
+		return;
 	}
-		
+			
 	/**
 	 * @return <code>true</code> if the calculation is canceled
 	 */
