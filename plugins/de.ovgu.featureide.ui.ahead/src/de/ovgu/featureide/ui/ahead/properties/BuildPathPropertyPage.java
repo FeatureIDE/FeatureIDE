@@ -19,6 +19,7 @@
 package de.ovgu.featureide.ui.ahead.properties;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;

@@ -24,6 +24,8 @@ package de.ovgu.featureide.fm.ui.properties.language;
  * <code>"de.ovgu.featureide.fm.core.language"</code> 
  * 
  * @author Jens Meinicke
+ * @author Florian Proksch
+ * @author Stefan Krueger
  */
 public class English implements ILanguage {
 	
@@ -34,15 +36,15 @@ public class English implements ILanguage {
 	private static final String ABSTRACT = "Abstract";
 	private static final String CONCRETE = "Concrete";
 	private static final String HIDDEN = "Hidden";
-	private static final String DEAD = "Dead";
+	private static final String DEAD = "Dead feature";
 	private static final String FALSE_OPTIONAL = "False optional";
 	private static final String ALTERNATIVE = "Alternative";
 	private static final String OR = "Or";
 	private static final String OPTIONAL = "Optional";
-	private static final String INDETHIDDEN = "Indeterminate Hidden";
+	private static final String INDETHIDDEN = "Indeterminate hidden";
 	private static final String REDUNDANT = "Redundant constraint";
 	private static final String DEAD_CONST = "Dead constraint";
-	private static final String UNSATISFIABLE_CONST = "Unsatisfiable Constraint";
+	private static final String UNSATISFIABLE_CONST = "Unsatisfiable constraint";
 	private static final String TAUTOLOGY_CONST = "Constraint is tautology";
 	private static final String VOID_MODEL_CONST = "Constraint makes the model void";	
 	

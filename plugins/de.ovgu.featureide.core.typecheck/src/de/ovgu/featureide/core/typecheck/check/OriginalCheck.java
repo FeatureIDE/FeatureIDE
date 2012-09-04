@@ -27,7 +27,6 @@ import java.util.Map;
 import AST.CompilationUnit;
 import AST.MethodAccess;
 import AST.MethodDecl;
-
 import de.ovgu.featureide.core.typecheck.correction.Action;
 import de.ovgu.featureide.core.typecheck.helper.FujiWrapper;
 import de.ovgu.featureide.fm.core.Feature;

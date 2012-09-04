@@ -19,6 +19,7 @@
 package de.ovgu.featureide.ui.views.collaboration.action;
 
 import org.eclipse.jface.action.Action;
+
 import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
 
 /**

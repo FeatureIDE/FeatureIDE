@@ -31,6 +31,8 @@ import org.eclipse.jface.fieldassist.IContentProposalProvider;
  * 
  * @author David Broneske
  * @author Fabian Benduhn
+ * @author Florian Proksch
+ * @author Stefan Krueger
  */
 public class ConstraintContentProposalProvider implements
 		IContentProposalProvider {
@@ -69,8 +71,10 @@ public class ConstraintContentProposalProvider implements
 
 	/**
 	 *  @return all possible feature names or junctors.
-	 *  @param current and previous word of edited string
-	 *  @param complete string being edited
+	 *  @param words
+	 *  		current and previous word of edited string
+	 *  @param contents
+	 *  		complete string being edited
 	 * 
 	 */
 	private List<ContentProposal> getProposalList(String[] words, String contents) 

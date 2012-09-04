@@ -63,7 +63,10 @@ public class ConfigurationWriter {
 				for (Feature f : featureset) {
 					if (f.isLayer()) {
 						if (f.getName().equals(s))
-							buffer.append(s + "\r\n");
+							if (s.contains(" "))
+								buffer.append("\"" + s + "\"\r\n");
+								else
+									buffer.append(s + "\r\n");
 					}
 				}
 			}
@@ -78,7 +81,10 @@ public class ConfigurationWriter {
 			StringBuilder buffer) {
 		if (feature.getFeature().isLayer()
 				&& feature.getSelection() == Selection.SELECTED)
-			buffer.append(feature.getName() + "\r\n");
+			if (feature.getName().contains(" "))
+				buffer.append("\"" + feature.getName() + "\"\r\n");
+				else
+					buffer.append(feature.getName() + "\r\n");
 		for (TreeElement child : feature.getChildren())
 			writeSelectedFeatures((SelectableFeature) child, buffer);
 	}

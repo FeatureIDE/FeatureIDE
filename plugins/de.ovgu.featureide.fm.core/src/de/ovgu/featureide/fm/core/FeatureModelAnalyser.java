@@ -48,6 +48,8 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
  * the corresponding methods in {@link FeatureModel}
  * 
  * @author Soenke Holthusen
+ * @author Florian Proksch
+ * @author Stefan Krueger
  */
 public class FeatureModelAnalyser {
 	
@@ -527,6 +529,7 @@ public class FeatureModelAnalyser {
 
 				}
 			}
+			
 		} catch (Exception e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
@@ -539,39 +542,14 @@ public class FeatureModelAnalyser {
 			FMCorePlugin.getDefault().logError(e);
 		}
 		try
-		{			
-			for (Feature f: fm.getFeatures())
-			{
-				if (f.hasHiddenParent() || f.isHidden())
-				{				
-					if  (f.getRelevantConstraints().size() == 0)
-					{
-						changedAttributes.put(f, FeatureStatus.INDETERMINATE_HIDDEN);					
-						f.setFeatureStatus(FeatureStatus.INDETERMINATE_HIDDEN, false);
-					}else
-					{
-						FeatureDependencies fd = new FeatureDependencies(fm);
-
-						Set<Feature> s = fd.always(f);
-						boolean noHidden = false;
-						for (Feature f2 : s)								
-						{
-							if (noHidden = (!f2.isHidden()))
-							{
-								break;
-							}
-						}
-						if (!noHidden)
-						{
-							changedAttributes.put(f, FeatureStatus.INDETERMINATE_HIDDEN);					
-							f.setFeatureStatus(FeatureStatus.INDETERMINATE_HIDDEN, false);
-						}
-					}
-				}
-				
-			}
-			
-			/*	FeatureDependencies fd = new FeatureDependencies(fm);
+		{				
+			/**
+			 * First every relevant constraint of every hidden feature is checked if its form equals 
+			 * "hidden feature" <=> A
+			 * where A is an expression containing only non hidden features
+			 * If there is a constraint of that kind for a hidden feature it is added to a list. 
+			 */
+			FeatureDependencies fd = new FeatureDependencies(fm);
 
 			LinkedList<Feature> l = new LinkedList<Feature>(); 
 			for (Feature f: fm.getFeatures())
@@ -582,14 +560,18 @@ public class FeatureModelAnalyser {
 					{
 						if (c.getNode() instanceof Equals)
 						{
+							Constraint  lConst = new Constraint(fm, c.getNode().getChildren()[0]), 
+										rConst = new Constraint(fm, c.getNode().getChildren()[1]);
+							lConst.setContainedFeatures(lConst.getNode());
+							rConst.setContainedFeatures(rConst.getNode());
 							
 							if (((Equals)c.getNode()).getChildren()[0] instanceof Literal &&
-								((Literal) ((Equals)c.getNode()).getChildren()[0]).var.equals(f.getName()) && 
-								!(new Constraint(fm, c.getNode().getChildren()[1]).hasHiddenFeatures())
+								((Literal) ((Equals)c.getNode()).getChildren()[0]).var.equals(f.getName()) &&  
+								!rConst.hasHiddenFeatures()
 								 ||
 								((Equals)c.getNode()).getChildren()[1] instanceof Literal && 
 								((Literal) ((Equals)c.getNode()).getChildren()[1]).var.equals(f.getName()) &&
-								!(new Constraint(fm, c.getNode().getChildren()[0]).hasHiddenFeatures())) 
+								!lConst.hasHiddenFeatures()) 
 							{
 									l.add(f);
 									break;
@@ -599,6 +581,14 @@ public class FeatureModelAnalyser {
 				}
 			}
 			
+			
+			/**
+			 * Additionally each Node is checked if the atomic set containing it, consists of indeterminate hidden nodes only.
+			 * If this is the case it's also indeterminate.
+			 * A node is therefore not marked indeterminate if it either
+			 *  - has a non-hidden Node in its atomic set defining its state or
+			 *  - if a Node of its atomic set is determined by a constraint of the above form.
+			 */
 			
 			for (Feature f: fm.getFeatures())
 			{
@@ -626,14 +616,11 @@ public class FeatureModelAnalyser {
 					}
 				}
 			}
-			*/
+			
 		} catch (Exception e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 	}
-
-	
-	
 	
 	/**
 	 * @param oldAttributes

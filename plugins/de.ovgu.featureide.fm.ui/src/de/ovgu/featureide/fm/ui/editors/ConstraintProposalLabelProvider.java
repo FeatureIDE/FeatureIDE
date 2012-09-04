@@ -53,9 +53,7 @@ public class ConstraintProposalLabelProvider extends LabelProvider implements GU
 			}
 			if(((ContentProposal)element).getContent().equals("implies")){
 				return OPERATOR_SYMBOL;
-			}
-			
-			
+			}	
 		}
 		return FEATURE_SYMBOL;
 	}

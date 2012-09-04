@@ -35,6 +35,8 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
  * a tooltip if the current name is not allowed.
  * 
  * @author Thomas Thuem
+ * @author Florian Proksch
+ * @author Stefan Krueger
  */
 public class FeatureLabelEditManager extends DirectEditManager implements GUIDefaults {
 

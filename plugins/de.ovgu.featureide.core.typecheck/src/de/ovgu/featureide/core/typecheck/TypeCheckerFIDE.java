@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.ConsoleHandler;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -33,7 +32,6 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.typecheck.check.ICheckPlugin;
 import de.ovgu.featureide.core.typecheck.check.OriginalCheck;
 import de.ovgu.featureide.core.typecheck.check.TypeReferenceCheck;
-import de.ovgu.featureide.core.typecheck.correction.ConsoleProblemHandler;
 import de.ovgu.featureide.core.typecheck.correction.FIDEProblemHandler;
 import de.ovgu.featureide.core.typecheck.correction.IProblemHandler;
 

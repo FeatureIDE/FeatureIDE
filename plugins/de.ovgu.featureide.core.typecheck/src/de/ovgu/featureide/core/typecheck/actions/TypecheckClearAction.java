@@ -3,7 +3,6 @@ package de.ovgu.featureide.core.typecheck.actions;
 import java.util.Arrays;
 
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -12,9 +11,7 @@ import org.eclipse.ui.IWorkbenchPart;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.typecheck.TypeCheckerFIDE;
 import de.ovgu.featureide.core.typecheck.TypecheckCorePlugin;
-import de.ovgu.featureide.core.typecheck.correction.FIDEProblemHandler;
 
 public class TypecheckClearAction implements IObjectActionDelegate {
 

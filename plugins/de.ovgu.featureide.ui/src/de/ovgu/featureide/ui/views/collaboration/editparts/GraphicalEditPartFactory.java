@@ -21,10 +21,6 @@ package de.ovgu.featureide.ui.views.collaboration.editparts;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPartFactory;
 
-import de.ovgu.featureide.ui.views.collaboration.editparts.ClassEditPart;
-import de.ovgu.featureide.ui.views.collaboration.editparts.CollaborationEditPart;
-import de.ovgu.featureide.ui.views.collaboration.editparts.ModelEditPart;
-import de.ovgu.featureide.ui.views.collaboration.editparts.RoleEditPart;
 import de.ovgu.featureide.ui.views.collaboration.model.Class;
 import de.ovgu.featureide.ui.views.collaboration.model.Collaboration;
 import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModel;

@@ -29,7 +29,6 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.graphics.Color;
 
-import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -40,6 +39,8 @@ import de.ovgu.featureide.fm.ui.properties.language.ILanguage;
  * represents a legend for the feature model
  * 
  * @author Fabian Benduhn
+ * @author Florian Proksch
+ * @author Stefan Krueger
  */
 public class LegendFigure extends Figure implements GUIDefaults {
 
@@ -214,7 +215,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			}
 		} else if (dead) {
 			width = 160;
-		}else if (indetHidden)
+		}else if (indetHidden || unsatisfiableConst || deadConst  || redundantConst || voidModelConst || tautologyConst)
 		{
 			width = 170;
 		}
@@ -257,6 +258,18 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			redShown = true;
 		}		
 		
+		if (voidModelConst)
+		{			
+			createRowVoidModelConst(row++, redShown);
+			redShown = true;
+		}
+		
+		if (unsatisfiableConst)
+		{			
+			createRowUnsatisfiableConst(row++, redShown);
+			redShown = true;
+		}
+		
 		//Yellow lines must be after one another
 		if (falseoptional)
         {
@@ -274,21 +287,13 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			createRowRedundantConst(row++, yellowShown);
 			yellowShown = true;
 		}
-		if (unsatisfiableConst)
-		{			
-			createRowUnsatisfiableConst(row++, yellowShown);
-			yellowShown = true;
-		}
+
 		if (tautologyConst)
 		{			
 			createRowTautologyConst(row++, yellowShown);
 			yellowShown = true;
 		}		
-		if (voidModelConst)
-		{			
-			createRowVoidModelConst(row++, yellowShown);
-			yellowShown = true;
-		}		
+		
 	}
 
 	private void createRowRedundantConst(int row, boolean drawBox) {
@@ -299,14 +304,14 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	}	
 	
 	private void createRowDeadConst(int row, boolean drawBox) {
-		createSymbol(row, FALSE_OPT, drawBox);
+		createSymbol(row, DEAD, drawBox);
 		Label labelIndetHidden = createLabel(row, language.getDeadConst(),
 				FMPropertyManager.getFeatureForgroundColor(), DEAD_CONST_TOOLTIP);
 		add(labelIndetHidden);		
 	}	
 	
 	private void createRowUnsatisfiableConst(int row, boolean drawBox) {
-		createSymbol(row, FALSE_OPT, drawBox);
+		createSymbol(row, DEAD, drawBox);
 		Label labelIndetHidden = createLabel(row, language.getUnsatisfiableConst(),
 				FMPropertyManager.getFeatureForgroundColor(), UNSATISFIABLE_CONST_TOOLTIP);
 		add(labelIndetHidden);		
@@ -320,7 +325,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	}	
 
 	private void createRowVoidModelConst(int row, boolean drawBox) {
-		createSymbol(row, FALSE_OPT, drawBox);
+		createSymbol(row, DEAD, drawBox);
 		Label labelIndetHidden = createLabel(row, language.getVoidModelConst(),
 				FMPropertyManager.getFeatureForgroundColor(), MODEL_CONST_TOOLTIP);
 		add(labelIndetHidden);		

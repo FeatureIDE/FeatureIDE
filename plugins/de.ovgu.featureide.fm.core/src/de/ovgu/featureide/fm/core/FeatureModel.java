@@ -49,6 +49,8 @@ import org.sat4j.specs.TimeoutException;
  * changes in the tree.
  * 
  * @author Thomas Thuem
+ * @author Florian Proksch
+ * @author Stefan Krueger
  * 
  */
 public class FeatureModel implements PropertyConstants {
@@ -920,6 +922,20 @@ public class FeatureModel implements PropertyConstants {
 		return null;
 	}
 
+	/**
+	 * for unit testing purposes only
+	 * @param s
+	 */
+	public void setComposerID(String s, Object o)
+	{
+		COMPOSER_ID = s;
+		fmComposerExtension = (IFMComposerExtension)o;
+		/*final FeatureModelingFMExtension f;// = new FMComposerExtension();
+		fmComposerExtension =  (IFMComposerExtension)f;*/
+		//setComposer();
+	}
+	
+	
 	private void setComposerID(IProject project) {
 		if(project==null)return;
 		try {
@@ -928,7 +944,8 @@ public class FeatureModel implements PropertyConstants {
 				COMPOSER_ID = id;
 				return;
 			}
-
+			
+			
 			for (ICommand command : project.getDescription().getBuildSpec()) {
 				if (command.getBuilderName().equals(BUILDER_ID)) {
 					id = (String) command.getArguments().get(COMPOSER_KEY);

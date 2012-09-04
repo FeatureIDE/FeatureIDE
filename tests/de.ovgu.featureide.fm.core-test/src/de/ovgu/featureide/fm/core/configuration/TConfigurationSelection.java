@@ -18,7 +18,8 @@
  */
 package de.ovgu.featureide.fm.core.configuration;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -32,13 +33,15 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 public class TConfigurationSelection extends AbstractConfigurationTest{
 	
 	@Override
-	FeatureModel loadModel() {
+	FeatureModel loadModel() 
+	{
 		return loadGUIDSL("S : [A] [B] C :: _S; %% not B;");
 	}
 
 	
 	@Test
-	public void testSelection1() {
+	public void testSelection1() 
+	{
 		Configuration c = new Configuration(fm, true);
 //		Configuration c = new Configuration(fm, false);
 		c.setManual("C", Selection.SELECTED);
@@ -47,14 +50,16 @@ public class TConfigurationSelection extends AbstractConfigurationTest{
 	}
 
 	@Test
-	public void testSelection2() {
+	public void testSelection2() 
+	{
 		Configuration c = new Configuration(fm, true);
 		assertTrue(c.valid());
 		assertEquals(2, c.number());
 	}
 
 	@Test
-	public void testSelection3() {
+	public void testSelection3() 
+	{
 		Configuration c = new Configuration(fm, true);
 //		Configuration c = new Configuration(fm, false);
 		c.setManual("A", Selection.SELECTED);
@@ -64,7 +69,8 @@ public class TConfigurationSelection extends AbstractConfigurationTest{
 	}
 
 	@Test
-	public void testSelection4() {
+	public void testSelection4() 
+	{
 		Configuration c = new Configuration(fm, true);
 		c.setManual("A", Selection.SELECTED);
 		assertTrue(c.valid());
@@ -72,7 +78,8 @@ public class TConfigurationSelection extends AbstractConfigurationTest{
 	}
 
 	@Test
-	public void testSelection5() {
+	public void testSelection5() 
+	{
 		Configuration c = new Configuration(fm, true);
 		boolean exception = false;
 		try {

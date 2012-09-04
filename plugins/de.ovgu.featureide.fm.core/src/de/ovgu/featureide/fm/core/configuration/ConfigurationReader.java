@@ -28,6 +28,7 @@ import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.resources.IFile;
@@ -85,8 +86,10 @@ public class ConfigurationReader {
 		boolean successful = true;
 		try {
 			reader = new BufferedReader(new InputStreamReader(inputStream));
-			while ((line = reader.readLine()) != null) {
-				if (line.startsWith("#") || line.isEmpty()) {
+			while ((line = reader.readLine()) != null)
+			{				
+				if (line.startsWith("#") || line.isEmpty() || line.equals(" "))
+				{
 					lineNumber++;
 					continue;
 				}
@@ -95,9 +98,48 @@ public class ConfigurationReader {
 				StringTokenizer tokenizer = new StringTokenizer(line);
 				LinkedList<String> hiddenFeatures = new LinkedList<String>();
 				while (tokenizer.hasMoreTokens()) {
-					String name = tokenizer.nextToken();
-					Feature feature = configuration.getFeatureModel()
-							.getFeature(name);
+					String name = tokenizer.nextToken(" ");
+					if (name.startsWith("\""))
+					{
+						try 
+						{
+							name = name.substring(1);
+							name += tokenizer.nextToken("\"");
+						} catch (NoSuchElementException e) 
+						{
+							successful = false;
+							warnings.add("Feature '" + name + "' is corrupt. No ending quotation marks found.");
+							positions.add(lineNumber);
+							return false;
+						} catch (NullPointerException e)
+						{
+							successful = false;
+							warnings.add("Feature '" + name + "' is corrupt. No ending quotation marks found.");
+							positions.add(lineNumber);
+							return false;
+						}
+						//Check for ending quotation mark
+						try
+						{
+							String endingDelimiter = tokenizer.nextToken(" ");
+							if (!endingDelimiter.startsWith("\""))
+							{
+								successful = false;
+								warnings.add("Feature '" + name + "' is corrupt. No ending quotation marks found.");
+								positions.add(lineNumber);
+								return false;
+							}
+						}
+						catch (Exception e)
+						{
+							successful = false;
+							warnings.add("Feature '" + name + "' is corrupt. No ending quotation marks found.");
+							positions.add(lineNumber);
+							return false;
+						}
+					}
+
+					Feature feature = configuration.getFeatureModel().getFeature(name);
 					if (feature != null && feature.hasHiddenParent()) {
 						hiddenFeatures.add(name);
 					} else {
@@ -106,16 +148,17 @@ public class ConfigurationReader {
 						} catch (FeatureNotFoundException e) {
 							successful = false;
 							warnings.add("Feature " + name
-									+ " does not exist anymore");
+									+ " does not exist");
 							positions.add(lineNumber);
+							return false;
 						} catch (SelectionNotPossibleException e) {
 							successful = false;
 							warnings.add("Feature " + name
-									+ " cannot be selected anymore");
+									+ " cannot be selected");
 							positions.add(lineNumber);
+							return false;
 						}
 					}
-					lineNumber++;
 				}
 				for (String name : hiddenFeatures) {
 					try {
@@ -123,16 +166,18 @@ public class ConfigurationReader {
 					} catch (FeatureNotFoundException e) {
 						successful = false;
 						warnings.add("Feature " + name
-								+ " does not exist anymore");
+								+ " does not exist");
 						positions.add(lineNumber);
+						return false;
 					} catch (SelectionNotPossibleException e) {
 						successful = false;
 						warnings.add("Feature " + name
-								+ " cannot be selected anymore");
+								+ " cannot be selected");
 						positions.add(lineNumber);
+						return false;
 					}
-					lineNumber++;
 				}
+				lineNumber++;
 			}
 		} finally {
 			if (reader != null) {

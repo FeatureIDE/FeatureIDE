@@ -33,6 +33,8 @@ import org.prop4j.NodeWriter;
  * Represents a propositional constraint below the feature diagram.
  * 
  * @author Thomas Thuem
+ * @author Florian Proksch
+ * @author Stefan Krueger
  */
 public class Constraint implements PropertyConstants {
 
@@ -196,6 +198,11 @@ public class Constraint implements PropertyConstants {
 	public String toString(){
 		return propNode.toString(NodeWriter.textualSymbols);
 	}
+	
+	/**
+	 * 
+	 * @return true if constraint has hidden features
+	 */
 	
 	public boolean hasHiddenFeatures()
 	{

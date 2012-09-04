@@ -24,9 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IResource;
-
 import AST.ClassDecl;
 import AST.CompilationUnit;
 import AST.ReferenceType;

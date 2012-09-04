@@ -1,8 +1,5 @@
 package de.ovgu.featureide.core.typecheck;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
@@ -11,7 +8,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.osgi.framework.BundleContext;
 
 import de.ovgu.featureide.core.CorePlugin;
-import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 
 public class TypecheckCorePlugin extends AbstractCorePlugin {

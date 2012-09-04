@@ -187,6 +187,41 @@ public class DeleteOperation extends AbstractOperation implements GUIDefaults {
 			if (op != null) operations.add(op);
 		}
 		
+		
+		if (notDeleted.size() > 0)
+		{
+			Feature start =  notDeleted.getFirst();
+			notDeleted.remove(start);
+			FeatureDependencies fd = new FeatureDependencies(featureModel);
+			List<Feature> equivalent = new LinkedList<Feature>();
+			for (Feature f : notDeleted)
+			{
+
+				if (fd.always(f).contains(start) && fd.always(start).contains(f))
+				{
+					equivalent.add(f);
+					//notDeleted.remove(f);
+				}
+			}
+			notDeleted.removeAll(equivalent);
+			if (notDeleted.isEmpty())
+			{
+				//Complete Atomic set
+				List<Feature> atomicSet = new LinkedList<Feature>();
+				for (Feature f2 : fd.always(start))
+				{
+					if (fd.always(f2).contains(start))
+					{
+						atomicSet.add(f2);
+					}
+				}
+				equivalent.add(start);
+				atomicSet.removeAll(equivalent);				
+				
+				new DeleteOperationAlternativeDialog(featureModel, equivalent, atomicSet);				
+			}
+		}
+		
 		if (notDeleted.size() > 0)
 		{
 			String notDeletedFeatures = "";

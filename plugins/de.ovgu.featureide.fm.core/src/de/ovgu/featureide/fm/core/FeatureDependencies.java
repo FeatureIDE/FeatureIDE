@@ -37,6 +37,7 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
  * Calculates dependencies of features
  * 
  * @author Sönke Holthusen
+ * 
  */
 public class FeatureDependencies {
     private static final String LEGEND_TEXT = "X ALWAYS Y := If X is selected then Y is selected in every valid configuration."

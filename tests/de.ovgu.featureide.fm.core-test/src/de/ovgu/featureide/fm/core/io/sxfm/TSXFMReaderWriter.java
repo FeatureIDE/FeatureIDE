@@ -23,8 +23,6 @@ import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.sxfm.SXFMReader;
-import de.ovgu.featureide.fm.core.io.sxfm.SXFMWriter;
 
 /**
  * Test class for SXFM reader and writer

@@ -18,6 +18,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.commands.ExecutionException;
@@ -48,18 +49,20 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureDeleteOperation;
 
 /**
- * TODO description
+ * provides a dialog for choosing the an alternative for the to be deleted feature
  * 
  * @author Florian Proksch
+ * @author Stefan Krueger
  */
 public class DeleteOperationAlternativeDialog implements GUIDefaults 
 {
-	private Text errorMessage;
+	private Text warningMessage;
 	
 	private List<Feature> features;
 	
 	private Shell shell;
 	private Feature feature;
+	private List<Feature> delFeatures;
 	
 	private FeatureModel featureModel;
 	private Button okButton;
@@ -67,11 +70,37 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults
 	private String titleText;
 	
 	
+	public DeleteOperationAlternativeDialog(FeatureModel featureModel, List<Feature> delFeatures, List<Feature> foundFeatures)
+	{
+		this.features = foundFeatures;
+		this.delFeatures = delFeatures; 
+		this.featureModel = featureModel;
+		this.feature = delFeatures.get(0);
+		
+		initShell();
+		initText();
+		initCombo();
+		initButtons();
+		shell.open();	
+	}
+	
+	
+	/**
+	 * 
+	 * @param featureModel
+	 * 			featureModel of the feature
+	 * @param feature
+	 * 			Feature which is about to be deleted and should be replaced
+	 * @param foundFeatures
+	 * 			List of features which are equivalent to feature and could replace it and its constraints
+	 */	
 	public DeleteOperationAlternativeDialog(FeatureModel featureModel, Feature feature, List<Feature> foundFeatures)
 	{
-		features = foundFeatures;
+		this.features = foundFeatures;
 		this.feature = feature; 
 		this.featureModel = featureModel;
+		this.delFeatures = new LinkedList<Feature>();
+		this.delFeatures.add(feature);
 		
 		initShell();
 		initText();
@@ -80,6 +109,10 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults
 		shell.open();	
 	}
 
+	
+	/**
+	 * initializes and fills combobox with list of possible replacement features
+	 */
 	private void initCombo()
 	{		
 		featureCombo = new Combo(shell, SWT.READ_ONLY);
@@ -92,9 +125,15 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults
 	    featureCombo.setText(featureCombo.getItem(0));
 	}
 	
+	/**
+	 * initializes window 
+	 */
 	private void initShell() {
 		shell = new Shell(Display.getCurrent());
-		titleText = "Replace \"" +  feature.getName() + "\" in constraints";
+		titleText = "Replace ";
+		for (Feature f : delFeatures) titleText += "\"" + f.getName() + "\", ";
+		titleText = titleText.substring(0, titleText.length() - 2);
+		titleText += " in constraints";
 		shell.setText(titleText);
 		shell.setImage(FEATURE_SYMBOL);
 		shell.setSize(400, 250);
@@ -120,19 +159,25 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults
 		});
 	}
 	
+	/**
+	 * initializes the warning message
+	 */
+	
 	public void initText()
 	{
-		errorMessage = new Text(shell, SWT.MULTI);
-		errorMessage.setEditable(false);
-		errorMessage.setBackground(shell.getDisplay().getSystemColor(
+		warningMessage = new Text(shell, SWT.MULTI);
+		warningMessage.setEditable(false);
+		warningMessage.setBackground(shell.getDisplay().getSystemColor(
 				SWT.COLOR_WHITE));
-		errorMessage.setBounds(20, 20, 380, 65);
-		errorMessage.setText("Caution!\nThe feature you are about to delete is contained in several constraints.\nPlease select one of the following features in order to replace it.");
+		warningMessage.setBounds(20, 20, 380, 65);
+		warningMessage.setText("Caution!\nThe feature you are about to delete is contained in several constraints.\nPlease select one of the following features in order to replace it.");
 		
 	}
 		
 	
-	
+	/**
+	 * initializes OK and Cancel buttons
+	 */
 	public void initButtons()
 	{
 		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
@@ -179,26 +224,31 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults
 	}
 
 	/**
-	 * 
+	 * OK button pressed
 	 */
 	private void closeShell() 
 	{
 		AbstractOperation op = null;
-		for (Feature f : features)
+		if (delFeatures.isEmpty()) delFeatures.add(this.feature);
+			
+		for (Feature feature : delFeatures)
 		{
-			if (f.getName().equals(featureCombo.getText()))				
+			for (Feature f : features)
 			{
-				op = new FeatureDeleteOperation(featureModel, feature, true, f);
-				break;
+				if (f.getName().equals(featureCombo.getText()))				
+				{
+					op = new FeatureDeleteOperation(featureModel, feature, true, f);
+					break;
+				}
 			}
-		}
-		if (op != null)
-		{
-			op.addContext((IUndoContext) featureModel.getUndoContext());
-			try {
-				PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-			} catch (ExecutionException e) {
-				FMUIPlugin.getDefault().logError(e);
+			if (op != null)
+			{
+				op.addContext((IUndoContext) featureModel.getUndoContext());
+				try {
+					PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
+				} catch (ExecutionException e) {
+					FMUIPlugin.getDefault().logError(e);
+				}
 			}
 		}
 		shell.dispose();

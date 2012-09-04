@@ -8,6 +8,8 @@ import de.ovgu.featureide.fm.core.FMComposerExtension;
  * FMComposerExtension for the Feature Modeling extension.
  * 
  * @author Jens Meinicke
+ * @author Florian Proksch
+ * @author Stefan Krueger
  */
 public class FeatureModelingFMExtension extends FMComposerExtension {
 

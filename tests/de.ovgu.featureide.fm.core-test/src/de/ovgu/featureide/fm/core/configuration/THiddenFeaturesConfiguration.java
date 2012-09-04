@@ -19,6 +19,7 @@
 package de.ovgu.featureide.fm.core.configuration;
 
 import static org.junit.Assert.assertEquals;
+
 import java.util.HashSet;
 
 import org.junit.Test;

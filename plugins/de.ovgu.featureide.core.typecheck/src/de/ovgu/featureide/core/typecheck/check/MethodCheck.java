@@ -19,21 +19,16 @@
 package de.ovgu.featureide.core.typecheck.check;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import AST.ASTNode;
-import AST.AmbiguousAccess;
 import AST.ClassDecl;
 import AST.CompilationUnit;
 import AST.Expr;
 import AST.MethodAccess;
 import AST.MethodDecl;
 import AST.ParameterDeclaration;
-import AST.TypeAccess;
-import AST.TypeDecl;
 import AST.UnknownType;
 import AST.VarAccess;
 import AST.Variable;

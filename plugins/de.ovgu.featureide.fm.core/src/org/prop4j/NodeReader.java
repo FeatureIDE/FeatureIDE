@@ -10,6 +10,8 @@ import java.util.List;
  * @author David Broneske
  * @author Fabian Benduhn
  * @author Thomas Thuem
+ * @author Florian Proksch
+ * @author Stefan Krueger
  * 
  */
 public class NodeReader {

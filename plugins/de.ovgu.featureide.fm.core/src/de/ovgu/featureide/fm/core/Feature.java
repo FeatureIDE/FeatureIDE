@@ -24,8 +24,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.prop4j.Literal;
-
 /**
  * Provides all properties of a feature. This includes its connections to parent
  * and child features.
@@ -38,8 +36,6 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 	public static final int INVALID_COLOR = -1;
 
 	private String name;
-	
-	private boolean indet = false;
 	
 	private boolean mandatory = false;
 

@@ -24,6 +24,8 @@ package de.ovgu.featureide.fm.ui.properties.language;
  * <code>"de.ovgu.featureide.fm.core.language"</code> 
  * 
  * @author Jens Meinicke
+ * @author Florian Proksch
+ * @author Stefan Krueger
  */
 public class German implements ILanguage {
 

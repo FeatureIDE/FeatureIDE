@@ -19,6 +19,7 @@
 package de.ovgu.featureide.ui.wizards;
 
 import org.eclipse.jface.wizard.Wizard;
+
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.ui.UIPlugin;
 

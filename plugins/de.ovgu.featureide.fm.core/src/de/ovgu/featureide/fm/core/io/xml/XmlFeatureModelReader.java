@@ -230,7 +230,8 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 						// END read attributes from XML tag
 
 						if (!featureModel.getFeatureNames().contains(attrName)
-								&& featureModel.isValidFeatureName(attrName)) {
+								&& featureModel.isValidFeatureName(attrName)) 
+						{
 							addFeature(attrName, isMandatory, isAbstract, isHidden, colors,	parent, featureLocation);
 						} else {
 							if (!featureModel.isValidFeatureName(attrName) ) {

@@ -24,13 +24,10 @@ import java.util.List;
 import java.util.Map;
 
 import AST.CompilationUnit;
-import AST.FieldDecl;
 import AST.FieldDeclaration;
 import AST.TypeDecl;
-import AST.UnknownType;
 import AST.VarAccess;
 import AST.VariableDeclaration;
-
 import de.ovgu.featureide.core.typecheck.correction.Action;
 import de.ovgu.featureide.core.typecheck.helper.FujiWrapper;
 import de.ovgu.featureide.fm.core.Feature;
