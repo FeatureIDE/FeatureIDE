@@ -135,8 +135,8 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		setLegendSize(mandatory, optional, or, alternative, and, abstrac,
 				concrete, hidden, dead, falseOpt, showHidden, indetHidden,
 				unsatisfiableConst, tautologyConst, deadConst,  voidModelConst, redundantConst);
-		FeatureUIHelper.setLegendSize(this.getSize());
-		FeatureUIHelper.setLegendFigure(this);
+		FeatureUIHelper.setLegendSize(featureModel,this.getSize());
+		FeatureUIHelper.setLegendFigure(featureModel,this);
 		createRows(mandatory, optional, or, alternative, and, abstrac,
 				concrete, hidden, dead, falseOpt, showHidden, indetHidden,
 				unsatisfiableConst, tautologyConst, deadConst, voidModelConst, redundantConst);

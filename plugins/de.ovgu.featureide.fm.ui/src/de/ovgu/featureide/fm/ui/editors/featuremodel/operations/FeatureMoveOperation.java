@@ -93,7 +93,7 @@ public class FeatureMoveOperation extends AbstractOperation {
 			
 				while(data.getOldParent().hasChildren()){
 					if(counter==counter2){
-						if(FeatureUIHelper.hasVerticalLayout()){
+						if(FeatureUIHelper.hasVerticalLayout(featureModel)){
 							if(FeatureUIHelper.getLocation(featureList.get(counter)).y>newPos.y){
 								newFeatureList.add(data.getFeature());	
 								counter=Integer.MIN_VALUE;

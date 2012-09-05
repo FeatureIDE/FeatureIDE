@@ -104,9 +104,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 
 	private void changeConnectionType() {
 		Feature feature = getConnectionModel().getTarget();
-		ModelEditPart parent = (ModelEditPart) getSource().getParent();
-		
-		FeatureModel featureModel = parent.getFeatureModel();
+		FeatureModel featureModel = feature.getFeatureModel();
 			
 	
 		int groupType;	
@@ -132,6 +130,15 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 		
 		
 		featureModel.handleModelDataChanged();
+	}
+
+	/**
+	 * @return
+	 */
+	private FeatureModel getFeatureModel() {
+		Feature feature = getConnectionModel().getTarget();
+		FeatureModel featureModel = feature.getFeatureModel();
+		return featureModel;
 	}
 
 	@Override
@@ -163,8 +170,8 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 				parentHidden = true;
 			
 		}
-		if ((target.isAnd() || OR_CIRCLES) && !(source.isHidden() && !FeatureUIHelper.showHiddenFeatures()))	
-			if(!(parentHidden && !FeatureUIHelper.showHiddenFeatures()))
+		if ((target.isAnd() || OR_CIRCLES) && !(source.isHidden() && !FeatureUIHelper.showHiddenFeatures(getFeatureModel())))	
+			if(!(parentHidden && !FeatureUIHelper.showHiddenFeatures(getFeatureModel())))
 					sourceDecoration = new CircleDecoration(source.isMandatory());
 
 		PolylineConnection connection = (PolylineConnection) getConnectionFigure();
@@ -177,7 +184,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 
 		RotatableDecoration targetDecoration = null;
 		if (target.getChildrenCount() > 1 || HALF_ARC)
-			if(FeatureUIHelper.hasVerticalLayout()){
+			if(FeatureUIHelper.hasVerticalLayout(getFeatureModel())){
 				if (!target.isAnd() && (target.getChildIndex(source) == (target.getChildrenCount()-1)))
 					targetDecoration = new RelationDecoration(target.isMultiple(),
 							target.getFirstChild(), target.getChildren());

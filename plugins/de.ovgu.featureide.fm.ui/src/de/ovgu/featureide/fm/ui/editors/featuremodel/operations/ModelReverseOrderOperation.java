@@ -78,7 +78,7 @@ public class ModelReverseOrderOperation extends AbstractOperation {
 			mid.x += FeatureUIHelper.getSize(featureModel.getRoot()).width/2;
 			mid.y += FeatureUIHelper.getSize(featureModel.getRoot()).height/2;
 			mirrorFeaturePositions(featureModel.getRoot(),mid,
-					FeatureUIHelper.hasVerticalLayout());
+					FeatureUIHelper.hasVerticalLayout(featureModel));
 		}
 
 		featureModel.handleModelDataChanged();

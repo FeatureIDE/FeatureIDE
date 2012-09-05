@@ -80,7 +80,7 @@ public class LegendMoveOperation extends AbstractOperation {
 	@Override
 	public IStatus redo(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
-		figure=FeatureUIHelper.getLegendFigure();
+		figure=FeatureUIHelper.getLegendFigure(featureModel);
 		figure.setLocation(pos);
 		featureModel.getLayout().setLegendPos(pos.x, pos.y);
 		featureModel.getLayout().setLegendAutoLayout(false);

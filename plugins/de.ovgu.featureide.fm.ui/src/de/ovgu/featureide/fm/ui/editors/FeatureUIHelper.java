@@ -19,6 +19,7 @@
 package de.ovgu.featureide.fm.ui.editors;
 
 import java.beans.PropertyChangeEvent;
+import java.util.ArrayList;
 import java.util.WeakHashMap;
 
 import org.eclipse.draw2d.geometry.Dimension;
@@ -28,6 +29,7 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.FMPoint;
 import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
 
@@ -45,24 +47,25 @@ public class FeatureUIHelper {
 	private static final WeakHashMap<Feature, Dimension> featureSize = new WeakHashMap<Feature, Dimension>();
 	private static final WeakHashMap<Constraint, Point> constraintLocation = new WeakHashMap<Constraint, Point>();
 	private static final WeakHashMap<Constraint, Dimension> constraintSize = new WeakHashMap<Constraint, Dimension>();
-	private static Dimension legendSize= new Dimension();
-	private static LegendFigure legendFigure;
-	private static boolean hasVerticalLayout;
-	private static boolean showHiddenFeatures = true;
+	private static WeakHashMap <FeatureModel,Dimension> legendSize = new WeakHashMap<FeatureModel,Dimension>();
+	private static  WeakHashMap <FeatureModel,LegendFigure>  legendFigure = new WeakHashMap<FeatureModel,LegendFigure>();
+	private static  ArrayList <FeatureModel> hasVerticalLayout= new ArrayList<FeatureModel>();
+	private static ArrayList <FeatureModel> showHiddenFeatures = new ArrayList<FeatureModel>();;
 	
-	public static Dimension getLegendSize(){
-		return legendSize;
+	public static Dimension getLegendSize(FeatureModel featureModel){
+		return legendSize.get(featureModel);
 	}
 	
-	public static boolean showHiddenFeatures(){
-		return showHiddenFeatures;
+	public static boolean showHiddenFeatures(FeatureModel featureModel){
+		return showHiddenFeatures.contains(featureModel);
 	}
-	public static void showHiddenFeatures(boolean b){
-		showHiddenFeatures = b;
+	public static void showHiddenFeatures(boolean show, FeatureModel featureModel){
+		if(show)showHiddenFeatures.add(featureModel);
+		else showHiddenFeatures.remove(featureModel);
 	}
 	
-	public static void setLegendSize(Dimension dim){
-		legendSize = dim;
+	public static void setLegendSize(FeatureModel featureModel, Dimension dim){
+		legendSize.put(featureModel, dim);
 	}
 	public static Point getLocation(Feature feature) {
 		return featureLocation.get(feature);
@@ -127,18 +130,19 @@ public class FeatureUIHelper {
 			if(parentFeature.isHidden())
 				parentFeatureHidden=true;
 		}
-		if((feature.isHidden()||parentFeatureHidden) && !showHiddenFeatures){
+		if((feature.isHidden()||parentFeatureHidden) && !showHiddenFeatures.contains(feature.getFeatureModel())){
 				return getTargetLocation(feature.getParent());			
 		}
-		return getSourceLocation(getBounds(feature));
+		
+		return getSourceLocation(getBounds(feature),feature.getFeatureModel());
 	}
 
 	public static Point getSourceLocation(Feature feature, Point newLocation) {
-		return getSourceLocation(new Rectangle(newLocation, getSize(feature)));
+		return getSourceLocation(new Rectangle(newLocation, getSize(feature)),feature.getFeatureModel());
 	}
 
-	private static Point getSourceLocation(Rectangle bounds) {		
-		if(hasVerticalLayout){
+	private static Point getSourceLocation(Rectangle bounds,FeatureModel featureModel) {		
+		if(hasVerticalLayout.contains(featureModel)){
 			return new Point(bounds.getLeft().x, ( bounds.bottom() + bounds.getTop().y ) /2);
 		} else {
 			return new Point(bounds.getCenter().x, bounds.y);		
@@ -147,7 +151,7 @@ public class FeatureUIHelper {
 
 	public static Point getTargetLocation(Feature feature) {
 		Rectangle bounds = getBounds(feature);
-		if(hasVerticalLayout){
+		if(hasVerticalLayout.contains(feature.getFeatureModel())){
 			return new Point(bounds.getRight().x, ( bounds.bottom() + bounds.getTop().y ) /2);
 		} 
 		
@@ -155,11 +159,12 @@ public class FeatureUIHelper {
 		
 	}
 	
-	public static void setVerticalLayoutBounds(boolean isVerticalLayout) {
-		hasVerticalLayout = isVerticalLayout; 
+	public static void setVerticalLayoutBounds(boolean isVerticalLayout, FeatureModel featureModel) {
+		if(isVerticalLayout)hasVerticalLayout.add(featureModel);
+		else hasVerticalLayout.remove(featureModel);
 	}
-	public static boolean hasVerticalLayout() {
-		return hasVerticalLayout; 
+	public static boolean hasVerticalLayout(FeatureModel featureModel) {
+		return hasVerticalLayout.contains(featureModel); 
 	}
 	
 	public static Dimension getSize(Constraint constraint) {
@@ -195,11 +200,11 @@ public class FeatureUIHelper {
 
 	}
 
-	public static void setLegendFigure(LegendFigure figure){
-		legendFigure=figure;
+	public static void setLegendFigure(FeatureModel featureModel, LegendFigure figure){
+		legendFigure.put(featureModel, figure);
 	}
-	public static LegendFigure getLegendFigure() {
-		return legendFigure;
+	public static LegendFigure getLegendFigure(FeatureModel featureModel) {
+		return legendFigure.get(featureModel);
 	}
 	
 	public static Point toPoint(FMPoint point){

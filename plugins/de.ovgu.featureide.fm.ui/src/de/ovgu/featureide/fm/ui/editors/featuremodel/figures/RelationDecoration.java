@@ -27,6 +27,7 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 
 import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
@@ -47,7 +48,8 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 	private LinkedList<Feature> children;
 	
 	private boolean vertical;
-
+	private FeatureModel featureModel;
+	
 	public RelationDecoration(boolean fill, Feature lastChild, LinkedList<Feature> children) {
 		super();
 		this.fill = fill;
@@ -57,7 +59,8 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 		setBackgroundColor(FMPropertyManager.getDecoratorForgroundColor());
 		int diameter = getTargetAnchorDiameter();
 		setSize(diameter, diameter/2);
-		this.vertical = FeatureUIHelper.hasVerticalLayout();
+		if(lastChild!=null)featureModel=lastChild.getFeatureModel();
+		this.vertical = FeatureUIHelper.hasVerticalLayout(featureModel);
 	}
 	@Override
 	public void setLocation(Point p) {
@@ -95,7 +98,7 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 					Feature temp;
 					temp = this.lastChild;
 					this.lastChild = children.get(i);
-					if(!(this.lastChild.isHidden()&&!FeatureUIHelper.showHiddenFeatures())){
+					if(!(this.lastChild.isHidden()&&!FeatureUIHelper.showHiddenFeatures(featureModel))){
 						double angle2 = HALF_ARC ? 360 : calculateAngle(r.getCenter(), getFeatureLocation());
 						double angle1 = HALF_ARC ? 180 : calculateAngle(r.getCenter(), getFeatureLocation());
 						if(angle2 > 450 && !vertical) {
@@ -157,7 +160,7 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 					Feature temp;
 					temp = this.lastChild;
 					this.lastChild = children.get(i);
-					if(!(this.lastChild.isHidden()&&!FeatureUIHelper.showHiddenFeatures())){
+					if(!(this.lastChild.isHidden()&&!FeatureUIHelper.showHiddenFeatures(featureModel))){
 						double angle2 = HALF_ARC ? 360 : calculateAngle(r.getCenter(), getFeatureLocation());
 						double angle1 = HALF_ARC ? 180 : calculateAngle(r.getCenter(), getFeatureLocation());
 						if(angle2 > 450 && !vertical) {

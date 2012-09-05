@@ -44,7 +44,7 @@ abstract public class FeatureDiagramLayoutManager{
 	
 	public void layout(FeatureModel featureModel) {
 		showHidden = featureModel.getLayout().showHiddenFeatures();
-		FeatureUIHelper.showHiddenFeatures(showHidden);		
+		FeatureUIHelper.showHiddenFeatures(showHidden,featureModel);		
 		layoutFeatureModel(featureModel);
 		if(featureModel.getLayout().hasLegendAutoLayout())layoutLegend(featureModel, showHidden);
 		layoutHidden(featureModel);
@@ -163,7 +163,7 @@ abstract public class FeatureDiagramLayoutManager{
 				max.y = temp.y + tempSize.height;
 		}		
 		
-		Dimension legendSize = FeatureUIHelper.getLegendSize();
+		Dimension legendSize = FeatureUIHelper.getLegendSize(featureModel);
 		boolean topRight = true;
 		boolean topLeft = true;
 		boolean botLeft = true;
