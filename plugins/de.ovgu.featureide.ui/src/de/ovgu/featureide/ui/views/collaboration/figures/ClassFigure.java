@@ -50,7 +50,7 @@ public class ClassFigure extends Figure implements GUIDefaults{
 
 		if (c.isOpenEditor) {
 			setBackgroundColor(OPEN_CLASS_BACKGROUND);
-			setBorder(OPEN_CLASS_BORDER);
+			setBorder(CLASS_BORDER_SELECTED);
 		} else {
 			setBackgroundColor(CLASS_BACKGROUND);
 			setBorder(CLASS_BORDER);
@@ -64,7 +64,7 @@ public class ClassFigure extends Figure implements GUIDefaults{
 		this.setName(c.getName());
 	
 		this.add(label);
-		this.setOpaque(true);
+		this.setOpaque(false);
 			
 	}
 	

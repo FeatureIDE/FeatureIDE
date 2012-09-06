@@ -53,11 +53,6 @@ public class MethodCheck extends AbstractTypeCheckPlugin {
 	registerNodeType(MethodDecl.class);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.ovgu.featureide.core.typecheck.check.ICheckPlugin#init()
-     */
     @Override
     public void init() {
 	method_intros = new HashMap<Feature, Map<String, List<MethodDecl>>>();
@@ -142,8 +137,8 @@ public class MethodCheck extends AbstractTypeCheckPlugin {
 		}
 
 		// TODO: distinguish between different matches
-		for (Feature pf : providing_features.keySet()) {
-		    for (MethodMatch mm : providing_features.get(pf)) {
+//		for (Feature pf : providing_features.keySet()) {
+//		    for (MethodMatch mm : providing_features.get(pf)) {
 //			if (mm.type == MethodMatch.MATCH) {
 //			    System.out.println("Match: ");
 //			    System.out.println(printMA(ma) + " vs "
@@ -160,8 +155,8 @@ public class MethodCheck extends AbstractTypeCheckPlugin {
 //			    System.out.println(printMA(ma) + " vs "
 //				    + printMD(mm.md));
 //			}
-		    }
-		}
+//		    }
+//		}
 
 		// if (providing_features.size() == 0) {
 
@@ -407,7 +402,6 @@ public class MethodCheck extends AbstractTypeCheckPlugin {
 	    }
 	}
 
-	@SuppressWarnings("rawtypes")
 	public Method(MethodAccess ma) {
 	    host_type = ma.hostType().name();
 	    type = ma.typeName();
@@ -459,11 +453,6 @@ public class MethodCheck extends AbstractTypeCheckPlugin {
 	    return builder.toString();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Comparable#compareTo(java.lang.Object)
-	 */
 	@Override
 	public int compareTo(Method o) {
 	    int ret = host_type.compareTo(o.host_type);
@@ -519,13 +508,6 @@ public class MethodCheck extends AbstractTypeCheckPlugin {
 	}
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * de.ovgu.featureide.core.typecheck.check.ICheckPlugin#determineAction(
-     * de.ovgu.featureide.core.typecheck.check.CheckProblem)
-     */
     @Override
     public List<Action> determineActions(CheckProblem problem) {
 	// TODO Auto-generated method stub

@@ -20,7 +20,9 @@ package de.ovgu.featureide.core.builder;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Vector;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -31,6 +33,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 
 
@@ -262,4 +265,17 @@ public class ComposerExtensionProxy implements IComposerExtension {
 		return composerExtensionClass.canGeneratInParallelJobs();
 	}
 
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#showContextFieldsAndMethods()
+	 */
+	public boolean showContextFieldsAndMethods() {
+		return composerExtensionClass.showContextFieldsAndMethods();
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#buildModelDirectivesForFile(java.util.ArrayList)
+	 */
+	public LinkedList<FSTDirective> buildModelDirectivesForFile(Vector<String> lines) {
+		return composerExtensionClass.buildModelDirectivesForFile(lines);
+	}
 }

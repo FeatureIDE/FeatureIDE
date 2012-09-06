@@ -22,8 +22,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Vector;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -43,6 +45,7 @@ import org.eclipse.jdt.internal.core.JavaProject;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
 
@@ -336,5 +339,12 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	public boolean canGeneratInParallelJobs() {
 		return true; 
 	}
-
+	
+	public boolean showContextFieldsAndMethods() {
+		return true;
+	}
+	
+	public LinkedList<FSTDirective> buildModelDirectivesForFile(Vector<String> lines) {
+		return null;
+	}
 }

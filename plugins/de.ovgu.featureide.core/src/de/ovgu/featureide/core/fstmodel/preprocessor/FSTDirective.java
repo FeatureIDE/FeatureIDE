@@ -18,30 +18,31 @@
  */
 package de.ovgu.featureide.core.fstmodel.preprocessor;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
 
-import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTModelElement;
+import de.ovgu.featureide.fm.core.ColorList;
 
 /**
  * preprocessor directive in class
  * 
  * @author Christoph Giesel
  * @author Marcus Kamieth
+ * @author Sebastian Krieter
  */
 public class FSTDirective extends FSTModelElement {
+	
+	private final int id;
 
 	private int startLine;
 	
 	private int endLine;
 
 	private int startOffset;
-	
-	private int endOffset;
-	
-	private ArrayList<FSTFeature> referencedFeatures = new ArrayList<FSTFeature>();
+
+	private int endLength;
 	
 	public int command;
 	
@@ -49,7 +50,9 @@ public class FSTDirective extends FSTModelElement {
 	
 	public IFile file = null;
 	
-	private ArrayList<FSTDirective> children = new ArrayList<FSTDirective>();
+	private int color = ColorList.INVALID_COLOR;
+	
+	private LinkedList<FSTDirective> children = new LinkedList<FSTDirective>();
 
 	private FSTDirective parent = null;
 
@@ -65,100 +68,51 @@ public class FSTDirective extends FSTModelElement {
 	public static final int DEFINE = 10;
 	public static final int UNDEFINE = 11;
 	
-	public FSTDirective() {
-		this.startLine = 0;
-		this.endLine = 0;
-		this.startOffset = 0;
-		this.command = 0;
+	public FSTDirective(int id) {
+		this.id = id;
 		this.expression = "";
 	}
 	
-	public FSTDirective(int lineNumber, int command, String expression){
-		this.startLine = lineNumber;
-		this.command = command;
-		this.expression = expression;
-	}
-	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.fstmodel.FSTModelElement#getParent()
-	 */
 	@Override
 	public FSTModelElement getParent() {
 		return parent;
 	}
 	
-	/**
-	 * @return the startLine
-	 */
+	public boolean hasParent() {
+		return parent != null;
+	}
+	
 	public int getStartLine() {
 		return startLine;
 	}
 
-	/**
-	 * @return the offset
-	 */
 	public int getStartOffset() {
 		return startOffset;
 	}
-
-	/**
-	 * @param startLine the startLine to set
-	 */
-	public void setStartLine(int startLine) {
-		this.startLine = startLine;
+	
+	public int getEndLine() {
+		return endLine;
+	}
+	
+	public int getEndLength() {
+		return endLength;
 	}
 
-	/**
-	 * @param startOffset the startOffset to set
-	 */
-	public void setStartOffset(int startOffset) {
-		this.startOffset = startOffset;
-	}
-
-	/**
-	 * @param startLine the startLine to set
-	 * @param startOffset the offset to set
-	 */
 	public void setStartLine(int startLine, int startOffset) {
 		this.startLine = startLine;
 		this.startOffset = startOffset;
 	}
 
-	/**
-	 * @return the endLine
-	 */
-	public int getEndLine() {
-		return endLine;
+	public void setEndLine(int endLine, int endLength) {
+		this.endLine = endLine;
+		this.endLength = endLength;
 	}
 	
-	/**
-	 * @return the length
-	 */
-	public int getEndOffset() {
-		return endOffset;
-	}
-	
-	/**
-	 * @param endLine the endLine to set
-	 */
-	public void setEndLine(int endLine) {
-		this.endLine = endLine;
-	}
-
-	/**
-	 * @param endOffset the endOffset to set
-	 */
-	public void setEndOffset(int endOffset) {
-		this.endOffset = endOffset;
-	}
-
-	/**
-	 * @param endLine the endLine to set
-	 * @param endOffset the length to set
-	 */
-	public void setEndLine(int endLine, int endOffset) {
-		this.endLine = endLine;
-		this.endOffset = endOffset;
+	public void updatePosition(FSTDirective newDirective) {
+		this.startLine = newDirective.startLine;
+		this.endLine = newDirective.endLine;
+		this.startOffset = newDirective.startOffset;
+		this.endLength = newDirective.endLength;
 	}
 
 	/**
@@ -191,20 +145,12 @@ public class FSTDirective extends FSTModelElement {
 	public void setExpression(String expression) {
 		this.expression = expression;
 	}
-
-	/**
-	 * @return the referencedFeatures
-	 */
-	public ArrayList<FSTFeature> getReferencedFeatures() {
-		return referencedFeatures;
+	
+	@Override
+	public boolean hasChildren() {
+		return !children.isEmpty();
 	}
 
-	/**
-	 * @param referencedFeatures the referencedFeatures to set
-	 */
-	public void addReferencedFeature(FSTFeature feature) {
-		referencedFeatures.add(feature);
-	}
 
 	/**
 	 * @return the children
@@ -217,7 +163,7 @@ public class FSTDirective extends FSTModelElement {
 		return elements;
 	}
 	
-	public ArrayList<FSTDirective> getChildrenList() {
+	public LinkedList<FSTDirective> getChildrenList() {
 		return children;
 	}
 
@@ -225,7 +171,7 @@ public class FSTDirective extends FSTModelElement {
 	/**
 	 * @param children the children to set
 	 */
-	public void setChildren(ArrayList<FSTDirective> children) {
+	public void setChildren(LinkedList<FSTDirective> children) {
 		for (FSTDirective d : children) {
 			d.setParent(this);
 		}
@@ -301,5 +247,26 @@ public class FSTDirective extends FSTModelElement {
 			default: return "";
 			
 		}
-	}	
+	}
+
+	/**
+	 * @return the color
+	 */
+	public int getColor() {
+		return color;
+	}
+
+	/**
+	 * @param color the color to set
+	 */
+	public void setColor(int color) {
+		this.color = color;
+	}
+
+	/**
+	 * @return the id
+	 */
+	public int getId() {
+		return id;
+	}
 }

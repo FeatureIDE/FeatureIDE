@@ -28,7 +28,6 @@ import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
 import de.ovgu.featureide.ui.views.collaboration.editparts.ClassEditPart;
 import de.ovgu.featureide.ui.views.collaboration.editparts.CollaborationEditPart;
 import de.ovgu.featureide.ui.views.collaboration.editparts.RoleEditPart;
-import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModel;
 
 /**
  * Filters the collaboration model
@@ -40,16 +39,14 @@ public class FilterAction extends Action {
 	private GraphicalViewerImpl viewer;
 	private LinkedHashSet<String> classFilter = new LinkedHashSet<String>(); 
 	private LinkedHashSet<String> featureFilter = new LinkedHashSet<String>();
-	private CollaborationModel model;
 	private CollaborationView collaborationView;
 	
 	public boolean checked = false;
 	
-	public FilterAction(String text, GraphicalViewerImpl view, CollaborationView collaborationView, CollaborationModel model) {
+	public FilterAction(String text, GraphicalViewerImpl view, CollaborationView collaborationView) {
 		super(text);
 		this.collaborationView = collaborationView;
 		viewer = view;
-		this.model = model;
 	}
 
 	public void setEnabled(boolean enabled) {

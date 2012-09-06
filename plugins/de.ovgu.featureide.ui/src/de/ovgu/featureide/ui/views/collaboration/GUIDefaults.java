@@ -22,6 +22,7 @@ import org.eclipse.draw2d.Border;
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.LineBorder;
 import org.eclipse.draw2d.geometry.Insets;
+import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -43,10 +44,15 @@ public interface GUIDefaults {
 	public static Insets COLLABORATION_INSETS 		  = new Insets(4, 6, 4, 6);
 	public static Insets CLASS_INSETS 		     	  = new Insets(10, 20, 10, 20);
 	
-	public static final int ROLE_DISTANCE             		 = 8;
+	public static final int GENERAL_DISTANCE             	 =  8;
 	public static final int ROLE_PREFERED_SIZE         		 = 16;
-	public static final int ROLE_GRIDLAYOUT_MARGIN_HEIGHT    = 3; 
-	public static final int ROLE_GRIDLAYOUT_VERTICAL_SPACING = 1; 
+	public static final int GRIDLAYOUT_MARGIN_HEIGHT    	 =  3; 
+	public static final int GRIDLAYOUT_VERTICAL_SPACING 	 =  1; 
+	public static final int DEFAULT_UNDERLAYER_HEIGHT	 	 = 35;
+	
+	public static final Point COLLFIGURE_LOCATION		= new Point(16, 16);
+	
+	public static final int DEFAULT_INSET_TO_EDGE	  = 10;
 	
 	public static Color FOREGROUND    		  	 	  = ColorConstants.black;
 	public static Font DEFAULT_FONT 			 	  = new Font(null, new FontData("Arial Unicode MS", 8, SWT.NORMAL));
@@ -79,6 +85,17 @@ public interface GUIDefaults {
 	public static Color ROLE_BACKGROUND_UNSELECTED    = GUIBasics.createColor(237, 235, 245);
 	public static Color ROLE_BORDER_COLOR_UNSELECTED  = GUIBasics.createBorderColor(ROLE_BACKGROUND_UNSELECTED);
 	public static Border ROLE_BORDER_UNSELECTED	 	  = new LineBorder(ROLE_BORDER_COLOR_UNSELECTED, 1);
+	
+	public static Color ROLE_FOREGROUND_UNSELECTED    = GUIBasics.createColor(41, 41, 41);
+	public static Color ROLE_BACKGROUND    			  = GUIBasics.createColor(241, 241, 241);
+	
+	public static Color DEFAULT_UNDERLAYING_COLOR_1   = GUIBasics.createColor(253, 253, 253);
+	public static Color DEFAULT_UNDERLAYING_COLOR_2   = GUIBasics.createColor(238, 238, 238);
+	
+	public static Color  CLASS_BORDER_COLOR_SELECTED  = ColorConstants.darkBlue;
+	public static Border CLASS_BORDER_SELECTED	 	  = new LineBorder(CLASS_BORDER_COLOR_SELECTED, 2);
+	
+	
 
 	/**
 	 * This color highlights the role(selected) representing the file at the open editor.

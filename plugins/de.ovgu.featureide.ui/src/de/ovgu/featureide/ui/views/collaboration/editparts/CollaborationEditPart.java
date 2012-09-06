@@ -29,7 +29,7 @@ import org.eclipse.ui.part.FileEditorInput;
 
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
-import de.ovgu.featureide.ui.views.collaboration.figures.CollaborationFigure;
+import de.ovgu.featureide.ui.views.collaboration.figures.UnderlayerFigure;
 import de.ovgu.featureide.ui.views.collaboration.model.Collaboration;
 
 /**
@@ -53,7 +53,7 @@ public class CollaborationEditPart extends AbstractGraphicalEditPart implements 
 	 */
 	@Override
 	protected IFigure createFigure() {
-		return new CollaborationFigure(getCollaborationModel());
+		return new UnderlayerFigure(getCollaborationModel());
 	}
 
 	/* (non-Javadoc)
@@ -68,6 +68,8 @@ public class CollaborationEditPart extends AbstractGraphicalEditPart implements 
 	 */
 	@Override
 	protected void refreshVisuals() {
+		this.getFigure().getBounds().setX(GUIDefaults.DEFAULT_INSET_TO_EDGE);
+		this.getFigure().getBounds().setY(this.getFigure().getBounds().y() + GUIDefaults.DEFAULT_INSET_TO_EDGE);
 	}
 	
 	/**

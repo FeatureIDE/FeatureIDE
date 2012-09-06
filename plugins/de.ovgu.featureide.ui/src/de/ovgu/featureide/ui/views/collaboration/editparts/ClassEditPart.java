@@ -37,6 +37,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 
 import de.ovgu.featureide.ui.UIPlugin;
+import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 import de.ovgu.featureide.ui.views.collaboration.figures.ClassFigure;
 import de.ovgu.featureide.ui.views.collaboration.model.Class;
 import de.ovgu.featureide.ui.views.collaboration.policy.ClassXYLayoutPolicy;
@@ -87,6 +88,7 @@ public class ClassEditPart extends AbstractGraphicalEditPart {
 	 */
 	@Override
 	protected void refreshVisuals() {
+		this.getFigure().getBounds().setY(GUIDefaults.DEFAULT_INSET_TO_EDGE - 5);
 	}
 
 	/**

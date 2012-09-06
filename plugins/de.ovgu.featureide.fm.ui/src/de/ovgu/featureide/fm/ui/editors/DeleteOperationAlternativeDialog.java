@@ -75,7 +75,6 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults
 	private Shell shell;
 	
 	private FeatureModel featureModel;
-	private Button okButton;
 
 	private Table alternativefeatureTable;
 	private Table featureTable;
@@ -186,7 +185,7 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults
 			lastCompositeLayout.marginBottom = 15;
 			lastComposite.setLayout(lastCompositeLayout);
 			
-			okButton = new Button(lastComposite, SWT.NONE);
+			Button okButton = new Button(lastComposite, SWT.NONE);
 			okButton.setText("Close");
 			FormData formDataCancel = new FormData();
 			formDataCancel.width = 70;

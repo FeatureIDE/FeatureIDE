@@ -23,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.Stack;
 import java.util.Vector;
 import java.util.regex.Pattern;
@@ -43,6 +44,7 @@ import antenna.preprocessor.v3.Preprocessor;
 import de.ovgu.featureide.antenna.model.AntennaModelBuilder;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.preprocessor.PPComposerExtensionClass;
+import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 /**
@@ -405,5 +407,18 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	@Override
 	public boolean postAddNature(IFolder source, IFolder destination) {
 		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#showContextFieldsAndMethods()
+	 */
+	@Override
+	public boolean showContextFieldsAndMethods() {
+		return false;
+	}
+	
+	@Override
+	public LinkedList<FSTDirective> buildModelDirectivesForFile(Vector<String> lines) {
+		return antennaModelBuilder.buildModelDirectivesForFile(lines);
 	}
 }

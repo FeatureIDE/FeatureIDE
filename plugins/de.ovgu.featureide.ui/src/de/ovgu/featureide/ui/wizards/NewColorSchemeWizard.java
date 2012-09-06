@@ -61,9 +61,9 @@ public class NewColorSchemeWizard extends Wizard {
 	public boolean performFinish() {
 		final String csName = page.getColorSchemeName();
 		if (csName != null && !csName.isEmpty()) {
-			featureModel.addColorScheme(csName);
+			featureModel.getColorschemeTable().addColorscheme(csName);
 			if (page.isCurColorScheme()) {
-				featureModel.setCurColorScheme(featureModel.getColorSchemeCount()-1);
+				featureModel.getColorschemeTable().setSelectedColorscheme(featureModel.getColorschemeTable().size());
 			}
 			return true;
 		} else {

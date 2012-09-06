@@ -22,7 +22,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -72,9 +71,8 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
 	 * Creates XML-Document
 	 * @param doc document to write
 	 */
-    private void createXmlDoc(Document doc) {
+    protected void createXmlDoc(Document doc) {
         Element root = doc.createElement("featureModel");
-    	Element colorSchemes = doc.createElement("colorSchemes");
     	Element struct = doc.createElement("struct");
     	Element constraints = doc.createElement("constraints");
     	Element comments = doc.createElement("comments");
@@ -88,17 +86,6 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
     	if(!featureModel.getLayout().showHiddenFeatures()){
     		root.setAttribute("showHiddenFeatures", "false");
     	}
-    	
-    	root.appendChild(colorSchemes);
-    	ArrayList<String> csNames = featureModel.getColorSchemeNames();
-    	for (int i = 0; i< csNames.size(); i++) {
-    		Element colorScheme = doc.createElement("colorscheme");
-    		colorScheme.setAttribute("name", csNames.get(i));
-    		if (i == featureModel.getCurColorScheme()) {
-    			colorScheme.setAttribute("cur", "true");
-    		}
-    		colorSchemes.appendChild(colorScheme);
-		}
     	
     	doc.appendChild(root);
     	root.appendChild(struct);
@@ -187,10 +174,6 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
 		if(feat.isHidden())		fnod.setAttribute("hidden", "true");
     	if(feat.isMandatory())	fnod.setAttribute("mandatory", "true");
     	if(feat.isAbstract())	fnod.setAttribute("abstract", "true");
-    	
-    	for (int i = 0; i < featureModel.getColorSchemeCount(); i++) {
-    		if(feat.hasColor(i))	fnod.setAttribute("color"+i, Integer.toString(feat.getColor(i)));
-		}
     	
     	if(!featureModel.getLayout().showHiddenFeatures() || !featureModel.getLayout().hasFeaturesAutoLayout()) 
     		fnod.setAttribute("coordinates", +feat.getLocation().x

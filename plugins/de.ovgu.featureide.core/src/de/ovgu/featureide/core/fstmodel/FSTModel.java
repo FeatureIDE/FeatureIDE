@@ -18,7 +18,6 @@
  */
 package de.ovgu.featureide.core.fstmodel;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -44,13 +43,13 @@ public class FSTModel extends FSTModelElement {
 
 	private HashMap<String, FSTClass> classes;
 	private HashMap<String, FSTFeature> features;
-	private HashMap<String, ArrayList<FSTDirective>> directives;
+	private HashMap<String, LinkedList<FSTDirective>> directives;
 	private String projectName;
 
 	/**
 	 * @return Preprocessor directives
 	 */
-	public HashMap<String, ArrayList<FSTDirective>> getDirectives() {
+	public HashMap<String, LinkedList<FSTDirective>> getDirectives() {
 		return directives;
 	}
 	
@@ -74,7 +73,7 @@ public class FSTModel extends FSTModelElement {
 	public FSTModel(String name) {
 		classes = new HashMap<String, FSTClass>();
 		features = new HashMap<String, FSTFeature>();
-		directives = new HashMap<String, ArrayList<FSTDirective>>();
+		directives = new HashMap<String, LinkedList<FSTDirective>>();
 		projectName = name;
 	}
 
@@ -207,7 +206,7 @@ public class FSTModel extends FSTModelElement {
 	public void reset() {
 		classes = new HashMap<String, FSTClass>();
 		features = new HashMap<String, FSTFeature>();
-		directives = new HashMap<String, ArrayList<FSTDirective>>();
+		directives = new HashMap<String, LinkedList<FSTDirective>>();
 	}
 
 	/**

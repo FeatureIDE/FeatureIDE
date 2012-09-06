@@ -20,7 +20,9 @@ package de.ovgu.featureide.core.builder;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Vector;
 
 import javax.annotation.Nonnull;
 
@@ -30,6 +32,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceDelta;
 
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 
 
@@ -177,5 +180,16 @@ public interface IComposerExtensionClass {
 	 * @return <code>true</code> if the composition can be called parallel
 	 */
 	boolean canGeneratInParallelJobs();
-
+	
+	/** 
+	 * @return <code>true</code> if the fields and Methods can be shown on context Menu of Collaboration Diagram
+	 */
+	boolean showContextFieldsAndMethods();
+	
+	/** 
+	 * @return List of all FSTDirectives in the text with parent == null
+	 * 
+	 * @param lines of file / document
+	 */
+	LinkedList<FSTDirective> buildModelDirectivesForFile(Vector<String> lines);
 }

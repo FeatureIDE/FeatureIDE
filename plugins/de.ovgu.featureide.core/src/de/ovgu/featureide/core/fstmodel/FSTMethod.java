@@ -87,6 +87,10 @@ public class FSTMethod extends FSTModelElement implements Comparable<Object> {
 			name.append(" : " + returnType);
 		return name.toString();
 	}
+	
+	public String getOnlyName() {
+		return this.methodName;
+	}
 
 	public String getMethodName() {
 		return methodName;

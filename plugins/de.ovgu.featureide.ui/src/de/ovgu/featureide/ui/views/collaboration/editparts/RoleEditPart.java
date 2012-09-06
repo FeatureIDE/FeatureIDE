@@ -18,22 +18,36 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.editparts;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
+import org.eclipse.draw2d.FigureCanvas;
 import org.eclipse.draw2d.IFigure;
+import org.eclipse.draw2d.Panel;
+import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.Request;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
+import org.eclipse.ui.texteditor.ITextEditor;
 
+import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.fstmodel.FSTField;
+import de.ovgu.featureide.core.fstmodel.FSTMethod;
+import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.figures.RoleFigure;
+import de.ovgu.featureide.ui.views.collaboration.figures.RoleFigureLabel;
 import de.ovgu.featureide.ui.views.collaboration.model.Role;
+import de.ovgu.featureide.ui.views.collaboration.outline.CollaborationOutline;
 
 /**
  * EditPart for Roles.
@@ -61,14 +75,14 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 	}
 
 	/**
-	 * {@link ModelEditPart#refreshVisuals()}
+	 * {@Link ModelEditPart#refreshVisuals()}
 	 */
 	@Override
 	protected void refreshVisuals() {
 	}
 
 	/**
-	 * opens the file of the role with its default editor.
+	 * opens the fields/methods/file of the role with its default editor.
 	 */
 	public void performRequest(Request request) {
 		if (REQ_OPEN.equals(request.getType())) {
@@ -76,38 +90,132 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 			if (file == null)
 				return;
 
-			IWorkbenchWindow dw = UIPlugin.getDefault().getWorkbench()
-					.getActiveWorkbenchWindow();
-			IWorkbenchPage page = dw.getActivePage();
+			IWorkbenchPage page = getActivePage();
 			if (page != null) {
-				IContentType contentType = null;
 				try {
-					IContentDescription description = file
-							.getContentDescription();
-					if (description != null) {
-						contentType = description.getContentType();
+					
+					RoleFigure roleFigure = (RoleFigure) this.getFigure();
+					if (roleFigure.isFieldMethodFilterActive() || !CorePlugin.getFeatureProject(file).getComposer().showContextFieldsAndMethods()) {
+						openClickedElementInEditor(roleFigure, file);
 					}
-					IEditorDescriptor desc = null;
-					if (contentType != null) {
-						desc = PlatformUI.getWorkbench().getEditorRegistry()
-								.getDefaultEditor(file.getName(), contentType);
-					} else {
-						desc = PlatformUI.getWorkbench().getEditorRegistry()
-								.getDefaultEditor(file.getName());
-					}
-
-					if (desc != null) {
-						page.openEditor(new FileEditorInput(file), desc.getId());
-					} else {
-						// case: there is no default editor for the file
-						page.openEditor(new FileEditorInput(file),
-								"org.eclipse.ui.DefaultTextEditor");
-					}
+					else 
+						openEditor(file);
 				} catch (CoreException e) {
 					UIPlugin.getDefault().logError(e);
 				}
 			}
 		}
 		super.performRequest(request);
+	}
+
+	private IWorkbenchPage getActivePage() {
+		return UIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getActivePage();
+	}
+	
+	private IEditorDescriptor getDescriptor(IFile file) throws CoreException
+	{
+		IContentType contentType = null;
+		IContentDescription description = file.getContentDescription();
+		if (description != null) {
+			contentType = description.getContentType();
+		}
+		if (contentType != null) {
+			return PlatformUI.getWorkbench().getEditorRegistry()
+					.getDefaultEditor(file.getName(), contentType);
+		} else {
+			return PlatformUI.getWorkbench().getEditorRegistry()
+					.getDefaultEditor(file.getName());
+		}
+	}
+	
+	private ITextEditor openEditor(IFile file) throws CoreException
+	{
+		IWorkbenchPage page = getActivePage();
+		if (page == null) return null;
+		
+		IEditorDescriptor desc = getDescriptor(file);
+		
+		if (desc != null) {
+			return (ITextEditor) page.openEditor(new FileEditorInput(file), desc.getId());
+		} else {
+			// case: there is no default editor for the file
+			return (ITextEditor) page.openEditor(new FileEditorInput(file),
+					"org.eclipse.ui.DefaultTextEditor");
+		}
+	}
+	
+	/**
+	 * search clicked element of current cursor position and open element in editor
+	 */
+	private void openClickedElementInEditor(RoleFigure roleFigure, IFile file) throws CoreException {
+		Point point = getCursorPosition();
+		List<?> panelList = roleFigure.getChildren();
+		ITextEditor editor; 
+		
+		for (Object o : panelList) {
+			Panel panel = (Panel) o;
+			List<?> labelList = panel.getChildren();
+
+			for (Object child : labelList) {
+				RoleFigureLabel label = (RoleFigureLabel) child;
+				Rectangle rect = label.getBounds();
+				int y = rect.y();
+				if (point.y >= y && point.y <= (y + rect.height)) {
+					LinkedList<FSTField> fields = this.getRoleModel().fields;
+					for (FSTField fstField : fields) {
+						if (fstField.getName().equals(label.getElementName())) {
+							editor = openEditor(file);
+							if (editor != null)	CollaborationOutline.scrollToLine(editor,fstField.getLineNumber(file));
+							return;
+						}
+					}
+					
+					LinkedList<FSTMethod> methods = this.getRoleModel().methods;
+					for (FSTMethod fstMethod : methods) {
+						if (fstMethod.getName().equals(label.getElementName())) {
+							editor = openEditor(file);
+							if (editor != null)	CollaborationOutline.scrollToLine(editor,fstMethod.getLineNumber(file));
+							return;
+						}
+					}
+					
+					LinkedList<FSTDirective> directives = this.getRoleModel().directives;
+					for (FSTDirective fstDirective : directives) {
+						if (fstDirective.toDependencyString().equals(label.getElementName())) {
+							editor = openEditor(file);
+							if (editor != null)	CollaborationOutline.scrollToLine(editor, fstDirective.getStartLine(), fstDirective.getEndLine(), fstDirective.getStartOffset(), fstDirective.getEndLength());
+							return;
+						}
+					}
+					
+					LinkedList<IFile> files = this.getRoleModel().files;
+					for (IFile iFile : files) {
+						if (iFile.getName().equals(label.getElementName())) {
+							openEditor(iFile);
+							return;
+						}
+					}
+				}
+			}
+		}
+		//if no element found, open file in editor
+		openEditor(file);
+		getViewer().getContents().refresh();
+	}
+	
+	private Point getCursorPosition() 
+	{
+		Display display = Display.getDefault();
+		FigureCanvas figureCanvas = (FigureCanvas)this.getViewer().getControl();
+		Point point = figureCanvas.toControl(display.getCursorLocation());
+		
+		org.eclipse.draw2d.geometry.Point location = figureCanvas.getViewport().getViewLocation();
+		
+		int x = point.x + location.x;
+		int y = point.y + location.y;
+		if (point.x < 0) x += figureCanvas.getViewport().getBounds().width;
+		if (point.y < 0) y += figureCanvas.getViewport().getBounds().height;
+		
+		return new Point(x,y);
 	}
 }

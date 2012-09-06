@@ -44,6 +44,7 @@ import org.sonatype.plugins.munge.Munge;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.preprocessor.PPComposerExtensionClass;
+import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.munge.model.MungeModelBuilder;
@@ -444,5 +445,17 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 			MungeCorePlugin.getDefault().logError(e);
 		}
 	}
-	
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#showContextFieldsAndMethods()
+	 */
+	@Override
+	public boolean showContextFieldsAndMethods() {
+		return false;
+	}
+
+	@Override
+	public LinkedList<FSTDirective> buildModelDirectivesForFile(Vector<String> lines) {
+		return mungeModelBuilder.buildModelDirectivesForFile(lines);
+	}
 }

@@ -16,23 +16,26 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.ui.views.collaboration.color.action;
+package de.ovgu.featureide.ui.views.collaboration.action;
 
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
-import org.eclipse.jface.action.Action;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
 
 /**
- * TODO description
+ * Action to delete a colorscheme
  * 
  * @author Sebastian Krieter
  */
-public class SetColorSchemeAction extends AbstractColorAction {
+public class DeleteColorSchemeAction extends AbstractColorAction {
 	
-	public SetColorSchemeAction(String text, GraphicalViewerImpl view, CollaborationView collaborationView, int index) {
-		super(text, view, collaborationView, index, Action.AS_RADIO_BUTTON);
+	public DeleteColorSchemeAction(String text, GraphicalViewerImpl view, CollaborationView collaborationView) {
+		super(text, view, collaborationView, 0);
+		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
+				.getImageDescriptor(ISharedImages.IMG_ETOOL_DELETE));
 	}
 
 	/* (non-Javadoc)
@@ -40,11 +43,8 @@ public class SetColorSchemeAction extends AbstractColorAction {
 	 */
 	@Override
 	protected boolean action(FeatureModel fm, String collName) {
-		if (fm.getCurColorScheme() != index) {
-			fm.setCurColorScheme(index);
-			return true;
-		}
-		return false;		
+		fm.getColorschemeTable().removeColorscheme();
+		return true;
 	}
 	
 }

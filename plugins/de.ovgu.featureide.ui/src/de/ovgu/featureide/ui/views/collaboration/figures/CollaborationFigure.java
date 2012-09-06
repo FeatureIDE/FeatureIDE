@@ -19,13 +19,12 @@
 package de.ovgu.featureide.ui.views.collaboration.figures;
 
 import org.eclipse.draw2d.Figure;
-import org.eclipse.draw2d.FreeformLayout;
+import org.eclipse.draw2d.GridLayout;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 
-import de.ovgu.featureide.ui.color.ColorPalette;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 import de.ovgu.featureide.ui.views.collaboration.model.Collaboration;
 
@@ -43,13 +42,15 @@ public class CollaborationFigure extends Figure implements GUIDefaults{
 	public boolean isConfiguration = false;
 	
 	public CollaborationFigure(Collaboration coll) {
-		
 		super();
 		selected = coll.selected;
 		isConfiguration = coll.isConfiguration;
-		this.setLayoutManager(new FreeformLayout());
+		GridLayout gridLayout = new GridLayout(1, true);
+		gridLayout.verticalSpacing = GRIDLAYOUT_VERTICAL_SPACING;
+		gridLayout.marginHeight = GRIDLAYOUT_MARGIN_HEIGHT - 1;
+		this.setLayoutManager(gridLayout);
 
-		this.setBackgroundColor(COLL_BACKGROUND_UNSELECTED);
+		this.setBackgroundColor(ROLE_BACKGROUND);
 		
 		if (selected) {
 			this.setBorder(COLL_BORDER_SELECTED);
@@ -67,10 +68,6 @@ public class CollaborationFigure extends Figure implements GUIDefaults{
 		
 		this.setName(coll.getName());
 		this.add(label);
-		
-		if (coll.hasFeature() && coll.hasFeatureColor()) {
-			this.setBackgroundColor(ColorPalette.getColor(coll.getFeatureColor(), 0.4f));
-		}
 		
 		this.setOpaque(true);
 	}

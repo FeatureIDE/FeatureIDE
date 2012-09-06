@@ -16,25 +16,23 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.ui.views.collaboration.color.action;
+package de.ovgu.featureide.ui.views.collaboration.action;
 
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
-import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.ui.PlatformUI;
+import org.eclipse.jface.action.Action;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
-import de.ovgu.featureide.ui.wizards.RenameColorSchemeWizard;
 
 /**
- * TODO description
+ * Action to select a colorscheme
  * 
  * @author Sebastian Krieter
  */
-public class RenameColorSchemeAction extends AbstractColorAction {
+public class SetColorSchemeAction extends AbstractColorAction {
 	
-	public RenameColorSchemeAction(String text, GraphicalViewerImpl view, CollaborationView collaborationView) {
-		super(text, view, collaborationView, 0);
+	public SetColorSchemeAction(String text, GraphicalViewerImpl view, CollaborationView collaborationView, int index) {
+		super(text, view, collaborationView, index, Action.AS_CHECK_BOX);
 	}
 
 	/* (non-Javadoc)
@@ -42,13 +40,12 @@ public class RenameColorSchemeAction extends AbstractColorAction {
 	 */
 	@Override
 	protected boolean action(FeatureModel fm, String collName) {
-		RenameColorSchemeWizard wizard = new RenameColorSchemeWizard(fm);
-
-		WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
-		dialog.create();
-		dialog.open();
-		
-		return false;
+		if (fm.getColorschemeTable().getSelectedColorscheme() != index) {
+			fm.getColorschemeTable().setSelectedColorscheme(index);
+		} else {
+			fm.getColorschemeTable().setEmptyColorscheme();
+		}
+		return true;
 	}
 	
 }

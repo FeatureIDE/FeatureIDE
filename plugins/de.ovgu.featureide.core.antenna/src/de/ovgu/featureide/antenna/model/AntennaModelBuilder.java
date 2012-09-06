@@ -18,14 +18,13 @@
  */
 package de.ovgu.featureide.antenna.model;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Stack;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.core.fstmodel.preprocessor.PPModelBuilder;
 
@@ -34,6 +33,7 @@ import de.ovgu.featureide.core.fstmodel.preprocessor.PPModelBuilder;
  * 
  * @author Christoph Giesel
  * @author Marcus Kamieth
+ * @author Sebastian Krieter
  */
 public class AntennaModelBuilder extends PPModelBuilder {
 
@@ -42,6 +42,8 @@ public class AntennaModelBuilder extends PPModelBuilder {
 			+ OPERATORS + ")";
 	
 	public static final String COMMANDS = "if|ifdef|ifndef|elif|elifdef|elifndef|else|condition|define|undefine|endif";
+	private static final String ENDIF = "//#endif";
+	
 	Pattern patternCommands = Pattern.compile("//#("+COMMANDS+")");
 
 	public AntennaModelBuilder(IFeatureProject featureProject) {
@@ -49,20 +51,22 @@ public class AntennaModelBuilder extends PPModelBuilder {
 	}
 	
 	@Override
-	protected ArrayList<FSTDirective> buildModelDirectivesForFile(Vector<String> lines) {
+	public LinkedList<FSTDirective> buildModelDirectivesForFile(Vector<String> lines) {
 		//for preprocessor outline
 		Stack<FSTDirective> directivesStack = new Stack<FSTDirective>();
-		ArrayList<FSTDirective> directivesList = new ArrayList<FSTDirective>();
+		LinkedList<FSTDirective> directivesList = new LinkedList<FSTDirective>();
 		
+		int id = 0;
 		
-		for(int i=0; i < lines.size(); i++){
+		for (int i = 0; i < lines.size(); i++) {
 			String line = lines.get(i);
 			
 			// if line is preprocessor directive
 			if (line.contains("//#")) {
-				FSTDirective directive = new FSTDirective();
+				FSTDirective directive = new FSTDirective(id++);
 				
 				int command = 0;
+				boolean endif = false;
 				
 				if(line.contains("//#if ")){//1
 					command = FSTDirective.IF;
@@ -84,35 +88,32 @@ public class AntennaModelBuilder extends PPModelBuilder {
 					command = FSTDirective.DEFINE;
 				}else if(line.contains("//#undefine ")){//10
 					command = FSTDirective.UNDEFINE;
-				}else if(line.contains("//#endif")){//11
-					command = 0;
+				}else if(line.contains(ENDIF)){//11
+					endif = true;
 				}else{
 					continue;
 				}
 				
 				if (command != 0)
-					directive.setCommand(command);
+					directive.setCommand(command);				
+				
+				if (command == FSTDirective.ELIF || command == FSTDirective.ELIFDEF ||
+						command == FSTDirective.ELIFNDEF || command == FSTDirective.ELSE ||
+						endif) {
+					if (!directivesStack.isEmpty()) {
+						if (i + 1 < lines.size()) {
+							directivesStack.pop().setEndLine(i + 1, 0);
+						} else if (endif) {
+							directivesStack.pop().setEndLine(i, line.indexOf(ENDIF) + ENDIF.length());
+						}
+					}
+				}
 				
 				Matcher m = patternCommands.matcher(line);
 				line = m.replaceAll("").trim();
 				
 				directive.setExpression(line);
 				directive.setStartLine(i, 0);
-				
-				FSTFeature[] features = model.getFeatures();
-				for (int j = 0; j < features.length; j++) {
-					if (line.contains(features[j].getName())) {
-						directive.addReferencedFeature(features[j]);
-					}
-				}
-				
-				if (command == FSTDirective.ELIF || command == FSTDirective.ELIFDEF ||
-						command == FSTDirective.ELIFNDEF || command == FSTDirective.ELSE ||
-						command == 0) {
-					if (!directivesStack.isEmpty()) {
-						directivesStack.pop().setEndLine(i+1, 0);
-					}
-				}
 				
 				if (command == 0)
 					continue;
@@ -122,9 +123,7 @@ public class AntennaModelBuilder extends PPModelBuilder {
 					top.addChild(directive);
 				} else {
 					directivesList.add(directive);
-				}
-				
-				
+				}				
 				
 				if (command != FSTDirective.DEFINE && command != FSTDirective.UNDEFINE && command != FSTDirective.CONDITION)
 					directivesStack.push(directive);
@@ -132,7 +131,6 @@ public class AntennaModelBuilder extends PPModelBuilder {
 		}
 		return directivesList;
 	}
-
 
 	@Override
 	protected boolean containsFeature(String text, String feature) {

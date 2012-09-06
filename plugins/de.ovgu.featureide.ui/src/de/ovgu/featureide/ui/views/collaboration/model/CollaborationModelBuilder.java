@@ -82,15 +82,11 @@ public class CollaborationModelBuilder {
 	
 	public boolean showUnselectedFeatures = showUnselectedFeatures();
 	
-	public boolean showCompleteOutline = showCompleteOutline();
+	private boolean[] selectedFieldMethodEntry = new boolean[7];
 	
 	private static final QualifiedName SHOW_UNSELECTED_FEATURES = 
 			new QualifiedName(CollaborationModelBuilder.class.getName() +"#ShowUnselectedFeatures", 
 						      CollaborationModelBuilder.class.getName() +"#ShowUnselectedFeatures");
-	
-	private static final QualifiedName SHOW_COMPLETE_OUTLINE = 
-			new QualifiedName(CollaborationModelBuilder.class.getName() +"#ShowCompleteOutline", 
-						      CollaborationModelBuilder.class.getName() +"#ShowCompleteOutline");
 	
 	private static final String TRUE = "true";
 	private static final String FALSE = "false";
@@ -121,17 +117,12 @@ public class CollaborationModelBuilder {
 		return false;
 	}
 	
-	public void showCompleteOutline(boolean value) {
-		showCompleteOutline = value;
+	public void setSelectedFieldMethod(boolean[] arr) {
+		System.arraycopy(arr, 0, selectedFieldMethodEntry, 0, arr.length);
 	}
 	
-	public boolean showCompleteOutline() {
-		try {
-			return TRUE.equals(ResourcesPlugin.getWorkspace().getRoot().getPersistentProperty(SHOW_COMPLETE_OUTLINE));
-		} catch (CoreException e) {
-			FMCorePlugin.getDefault().logError(e);
-		}
-		return false;
+	public boolean[] getSelectedFieldMethod() {
+		return selectedFieldMethodEntry.clone();
 	}
 	
 	public CollaborationModelBuilder() {
@@ -262,7 +253,7 @@ public class CollaborationModelBuilder {
 							model.addClass(cl);
 						}
 						role.selected = selected;
-						role.showCompleteOutline = showCompleteOutline;
+						role.selectedFieldMethod = selectedFieldMethodEntry;
 						role.setCollaboration(collaboration);
 						model.roles.add(role);
 					}
@@ -534,7 +525,7 @@ public class CollaborationModelBuilder {
 						model.addClass(cl);
 					}
 					role.selected = selected;
-					role.showCompleteOutline = showCompleteOutline;
+					role.selectedFieldMethod = selectedFieldMethodEntry;
 					role.setCollaboration(collaboration);
 					model.roles.add(role);
 				}

@@ -76,6 +76,10 @@ public class FSTField extends FSTModelElement implements Comparable<Object> {
 			name.append("[]");
 		return name.toString();
 	}
+	
+	public String getOnlyName() {
+		return this.fieldName;
+	}
 
 	public FSTModelElement[] getChildren() {
 		return new FSTModelElement[0];

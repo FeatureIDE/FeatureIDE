@@ -16,7 +16,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.ui.views.collaboration.color.action;
+package de.ovgu.featureide.ui.views.collaboration.action;
 
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.wizard.WizardDialog;
@@ -25,19 +25,19 @@ import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
-import de.ovgu.featureide.ui.wizards.NewColorSchemeWizard;
+import de.ovgu.featureide.ui.wizards.RenameColorSchemeWizard;
 
 /**
- * TODO description
+ * Action to rename a colorscheme
  * 
  * @author Sebastian Krieter
  */
-public class AddColorSchemeAction extends AbstractColorAction {
+public class RenameColorSchemeAction extends AbstractColorAction {
 	
-	public AddColorSchemeAction(String text, GraphicalViewerImpl view, CollaborationView collaborationView) {
+	public RenameColorSchemeAction(String text, GraphicalViewerImpl view, CollaborationView collaborationView) {
 		super(text, view, collaborationView, 0);
 		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
-				.getImageDescriptor(ISharedImages.IMG_OBJ_ADD));
+				.getImageDescriptor(ISharedImages.IMG_ETOOL_CLEAR));
 	}
 
 	/* (non-Javadoc)
@@ -45,14 +45,12 @@ public class AddColorSchemeAction extends AbstractColorAction {
 	 */
 	@Override
 	protected boolean action(FeatureModel fm, String collName) {
-		NewColorSchemeWizard wizard = new NewColorSchemeWizard(fm);
+		RenameColorSchemeWizard wizard = new RenameColorSchemeWizard(fm);
 
 		WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
 		dialog.create();
-		if (dialog.open() == WizardDialog.OK && fm.getCurColorScheme() == fm.getColorSchemeCount()-1) {
-			return true;			
-		}
+		dialog.open();
+		
 		return false;
 	}
-	
 }

@@ -24,6 +24,7 @@ import org.osgi.framework.BundleContext;
 
 import de.ovgu.featureide.fm.ui.AbstractUIPlugin;
 import de.ovgu.featureide.ui.editors.JavaEditor;
+import de.ovgu.featureide.ui.editors.annotation.EditorTracker;
 
 /**
  * The activator class controls the plug-in life cycle.
@@ -37,32 +38,31 @@ public class UIPlugin extends AbstractUIPlugin {
 	public static final String PLUGIN_ID = "de.ovgu.featureide.ui";
 
 	private static UIPlugin plugin;
+
+	private EditorTracker editorTracker;
 	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.plugin.AbstractUIPlugin#getID()
-	 */
 	@Override
 	public String getID() {
 		return PLUGIN_ID;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
-	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+		
 		// XXX this is a bad workaround, but it seems to work pretty good
 		PlatformUI.getWorkbench().getEditorRegistry().setDefaultEditor("*.java", JavaEditor.ID);
+		
+		editorTracker = new EditorTracker(PlatformUI.getWorkbench());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
-	 */
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
+		
+		if (editorTracker != null) {
+		    editorTracker.dispose();
+		}
+		
 		super.stop(context);
 	}
 
@@ -71,8 +71,7 @@ public class UIPlugin extends AbstractUIPlugin {
 	}
 
 	public static Image getImage(String name) {
-		return getDefault().getImageDescriptor(
-				"icons/" + name).createImage();
+		return getDefault().getImageDescriptor("icons/" + name).createImage();
 	}
 
 }

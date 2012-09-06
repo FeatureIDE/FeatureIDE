@@ -185,7 +185,7 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 				} else if (selection instanceof FSTDirective) {
 					FSTDirective directive = (FSTDirective) selection;
 					scrollToLine(active_editor, directive.getStartLine(), directive.getEndLine(), 
-							directive.getStartOffset(), directive.getEndOffset());
+							directive.getStartOffset(), directive.getEndLength());
 					return;
 				} else if (selection instanceof Role) {
 						
@@ -561,7 +561,7 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 	 * @param editorPart
 	 * @param lineNumber
 	 */
-	private static void scrollToLine(IEditorPart editorPart, int lineNumber) {
+	public static void scrollToLine(IEditorPart editorPart, int lineNumber) {
 		if (!(editorPart instanceof ITextEditor) || lineNumber <= 0) {
 			return;
 		}
@@ -589,7 +589,7 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 	 * @param startOffset characters before the statement starts
 	 * @param endOffset length of the last line
 	 */
-	private static void scrollToLine(IEditorPart editorPart, int startLine, int endLine, int startOffset, int endOffset) {
+	public static void scrollToLine(IEditorPart editorPart, int startLine, int endLine, int startOffset, int endOffset) {
 		if (!(editorPart instanceof ITextEditor) || startLine < 0 || endLine < 0) {
 			return;
 		}

@@ -16,37 +16,41 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.ui.views.collaboration.color.action;
+package de.ovgu.featureide.ui.views.collaboration.action;
 
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
+import de.ovgu.featureide.ui.wizards.NewColorSchemeWizard;
 
 /**
- * TODO description
+ * Action to add an colorscheme
  * 
  * @author Sebastian Krieter
  */
-public class RemoveColorAction extends AbstractColorAction {
+public class AddColorSchemeAction extends AbstractColorAction {
 	
-	public RemoveColorAction(String text, GraphicalViewerImpl view,
-			CollaborationView collaborationView) {
+	public AddColorSchemeAction(String text, GraphicalViewerImpl view, CollaborationView collaborationView) {
 		super(text, view, collaborationView, 0);
 		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
-				.getImageDescriptor(ISharedImages.IMG_ETOOL_DELETE));
+				.getImageDescriptor(ISharedImages.IMG_OBJ_ADD));
 	}
 
 	@Override
 	protected boolean action(FeatureModel fm, String collName) {
-		Feature feat = fm.getFeature(collName);
-		if (feat != null && feat.hasColor()) {
-			feat.removeColor();
+		NewColorSchemeWizard wizard = new NewColorSchemeWizard(fm);
+
+		WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
+		dialog.create();
+		if (dialog.open() == WizardDialog.OK && 
+				fm.getColorschemeTable().getSelectedColorscheme() == fm.getColorschemeTable().size()) {
 			return true;
 		}
 		return false;
 	}
+	
 }

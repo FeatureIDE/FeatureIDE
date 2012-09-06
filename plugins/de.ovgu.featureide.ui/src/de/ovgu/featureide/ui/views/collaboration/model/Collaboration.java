@@ -22,6 +22,7 @@ import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
 
+import de.ovgu.featureide.fm.core.ColorList;
 import de.ovgu.featureide.fm.core.Feature;
 
 
@@ -43,13 +44,13 @@ public class Collaboration {
 	public Collaboration(String name) {
 		this.name = name;
 		hasFeature = false;
-		color = Feature.INVALID_COLOR;
+		color = ColorList.INVALID_COLOR;
 	}
 	
 	public Collaboration(Feature feature) {
 		this.name = feature.getName();
 		hasFeature = true;
-		this.color = feature.getColor();
+		this.color = feature.getColorList().getColor();
 	}
 
 	/**
@@ -88,6 +89,6 @@ public class Collaboration {
 	}
 
 	public boolean hasFeatureColor() {
-		return color > Feature.INVALID_COLOR;
+		return color > ColorList.INVALID_COLOR;
 	}
 }

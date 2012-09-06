@@ -18,13 +18,13 @@
  */
 package de.ovgu.featureide.munge.model;
 
-import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Stack;
 import java.util.Vector;
 import java.util.regex.Matcher;
 
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.core.fstmodel.preprocessor.PPModelBuilder;
 import de.ovgu.featureide.munge.MungePreprocessor;
@@ -33,6 +33,7 @@ import de.ovgu.featureide.munge.MungePreprocessor;
  * Build the FSTModel for munge projects.
  * 
  * @author Jens Meinicke
+ * @author Sebastian Krieter
  */
 public class MungeModelBuilder extends PPModelBuilder{
 
@@ -46,15 +47,19 @@ public class MungeModelBuilder extends PPModelBuilder{
 	}
 	
 	@Override
-	protected ArrayList<FSTDirective> buildModelDirectivesForFile(Vector<String> lines) {
+	public LinkedList<FSTDirective> buildModelDirectivesForFile(Vector<String> lines) {
 		//for preprocessor outline
 		Stack<FSTDirective> directivesStack = new Stack<FSTDirective>();
-		ArrayList<FSTDirective> directivesList = new ArrayList<FSTDirective>();
+		LinkedList<FSTDirective> directivesList = new LinkedList<FSTDirective>();
 		
 		boolean commentSection = false;
 		
-		for(int i=0; i < lines.size(); i++){
-			String line = lines.get(i);
+		Iterator<String> linesIt = lines.iterator();
+		int lineCount = 0;
+		int id = 0;
+		
+		while (linesIt.hasNext()) {
+			String line = linesIt.next();
 			
 			// if line is preprocessor directive
 			if (line.contains(MungePreprocessor.COMMENT_START) || 
@@ -74,7 +79,7 @@ public class MungeModelBuilder extends PPModelBuilder{
 							commentSection = false;
 						}
 					} else {
-						FSTDirective directive = new FSTDirective();
+						FSTDirective directive = new FSTDirective(id++);
 						
 						int command = 0;
 						
@@ -86,7 +91,7 @@ public class MungeModelBuilder extends PPModelBuilder{
 							command = FSTDirective.ELSE;
 							directivesStack.pop();
 						} else if (singleElement.equals("end")) {
-							directivesStack.pop().setEndLine(i, m.end(0)+MungePreprocessor.COMMENT_END.length());
+							directivesStack.pop().setEndLine(lineCount, m.end(0)+MungePreprocessor.COMMENT_END.length());
 							continue;
 						} else {
 							continue;
@@ -94,14 +99,7 @@ public class MungeModelBuilder extends PPModelBuilder{
 						
 						directive.setCommand(command);
 						directive.setExpression(expression != null ? expression : "");				
-						directive.setStartLine(i, m.start(0)-MungePreprocessor.COMMENT_START.length());
-						
-						FSTFeature[] features = model.getFeatures();
-						for (int j = 0; j < features.length; j++) {
-							if (line.contains(features[j].getName())) {
-								directive.addReferencedFeature(features[j]);
-							}
-						}
+						directive.setStartLine(lineCount, m.start(0)-MungePreprocessor.COMMENT_START.length());
 						
 						if(!directivesStack.isEmpty()){
 							FSTDirective top = directivesStack.peek();
@@ -114,6 +112,7 @@ public class MungeModelBuilder extends PPModelBuilder{
 					}
 				}
 			}
+			lineCount++;
 		}
 		return directivesList;
 	}

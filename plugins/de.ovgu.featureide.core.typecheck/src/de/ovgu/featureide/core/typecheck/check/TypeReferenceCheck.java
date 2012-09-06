@@ -89,7 +89,6 @@ public class TypeReferenceCheck extends AbstractTypeCheckPlugin {
 	// Map<Feature, List<ClassDecl>> cdmap =
 	// getNodesByType(ClassDecl.class);
 	Map<Feature, List<CompilationUnit>> cdmap = getNodesByType(CompilationUnit.class);
-	Map<Feature, List<TypeAccess>> tamap = getNodesByType(TypeAccess.class);
 	int count = 0;
 
 	for (Feature f : cdmap.keySet()) {

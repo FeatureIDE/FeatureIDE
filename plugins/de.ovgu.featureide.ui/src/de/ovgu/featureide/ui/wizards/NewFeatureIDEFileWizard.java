@@ -80,6 +80,7 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 	 */
 	public void addPages() {
 		page = new NewFeatureIDEFilePage(selection, feature, clss);
+		this.page.setRefines(!clss.isEmpty());
 		addPage(page);
 	}
 

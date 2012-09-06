@@ -16,7 +16,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.ui.views.collaboration.color.action;
+package de.ovgu.featureide.ui.views.collaboration.action;
 
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
@@ -28,7 +28,7 @@ import de.ovgu.featureide.ui.views.collaboration.editparts.CollaborationEditPart
 import de.ovgu.featureide.ui.views.collaboration.model.Collaboration;
 
 /**
- * TODO description
+ * The superclass for all actions in the color contextmenu
  * 
  * @author Sebastian Krieter
  */
@@ -60,8 +60,11 @@ public abstract class AbstractColorAction extends Action {
 			if (coll.hasFeature()) {
 				FeatureModel fm = collaborationView.getFeatureProject().getFeatureModel();
 				
-				if (action(fm, coll.getName())) {		
-					collaborationView.saveAndRefresh();
+				boolean refresh = action(fm, coll.getName());
+				collaborationView.saveColorsToFile();
+				
+				if (refresh) {	
+					collaborationView.refreshAll();
 				}
 			}
 		}

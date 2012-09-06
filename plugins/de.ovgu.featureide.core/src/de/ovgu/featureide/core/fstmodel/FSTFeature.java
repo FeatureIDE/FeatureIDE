@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import java.util.TreeMap;
 
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
+import de.ovgu.featureide.fm.core.ColorList;
 
 
 
@@ -34,7 +35,7 @@ public class FSTFeature extends FSTModelElement {
 	
 	private String name;
 	
-	private int color;
+	private int color = ColorList.INVALID_COLOR;
 	
 	private TreeMap<String, FSTClass> classes;
 
@@ -43,7 +44,6 @@ public class FSTFeature extends FSTModelElement {
 	public FSTFeature(String name) {
 		this.name = name;
 		setClasses(new TreeMap<String, FSTClass>());
-		this.color = -1;
 	}
 
 	public String getName() {
@@ -96,20 +96,9 @@ public class FSTFeature extends FSTModelElement {
 	}
 	
 	/**
-	 * @return color > -1
-	 */
-	public boolean hasColor() {
-		return color > -1;
-	}
-
-	/**
 	 * @param color the color to set
 	 */
 	public void setColor(int color) {
 		this.color = color;
-	}
-	
-	public void removeColor() {
-		this.color = -1;
 	}
 }

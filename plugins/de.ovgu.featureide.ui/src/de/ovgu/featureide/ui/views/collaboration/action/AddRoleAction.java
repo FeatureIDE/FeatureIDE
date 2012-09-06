@@ -34,6 +34,7 @@ import de.ovgu.featureide.ui.views.collaboration.editparts.CollaborationEditPart
 import de.ovgu.featureide.ui.views.collaboration.editparts.RoleEditPart;
 import de.ovgu.featureide.ui.views.collaboration.figures.ClassFigure;
 import de.ovgu.featureide.ui.views.collaboration.figures.CollaborationFigure;
+import de.ovgu.featureide.ui.views.collaboration.figures.UnderlayerFigure;
 import de.ovgu.featureide.ui.wizards.NewFeatureIDEFileWizard;
 
 /**
@@ -45,21 +46,14 @@ import de.ovgu.featureide.ui.wizards.NewFeatureIDEFileWizard;
  */
 public class AddRoleAction extends Action {
 	private GraphicalViewerImpl viewer;
-	private CollaborationView collcaborationView;
-
-	protected IStructuredSelection selection;
+	private CollaborationView collaborationView;
 
 	public AddRoleAction(String text, GraphicalViewerImpl view, CollaborationView collcaborationView) {
 		super(text);
 		viewer = view;
-		this.collcaborationView = collcaborationView;
+		this.collaborationView = collcaborationView;
 		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
 				.getImageDescriptor(ISharedImages.IMG_OBJ_ADD));
-	}
-
-	public void setEnabled(boolean enable) {
-		selection = (IStructuredSelection)viewer.getSelection();
-		super.setEnabled(true);
 	}
 
 	public void run() {
@@ -87,30 +81,29 @@ public class AddRoleAction extends Action {
 			}
 		}
 		
-		
-		
 		NewFeatureIDEFileWizard wizard = new NewFeatureIDEFileWizard();
 		wizard.init(PlatformUI.getWorkbench(), (IStructuredSelection)selection, feature, clss);
-
+		
 		WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
 		dialog.create();
 		dialog.open();
-
 	}
 
-
+	/**
+	 * returns feature name of current cursor position
+	 */
 	private String getFeatureName() 
 	{
 		String feature = "";
 		
     	List<?> list = viewer.getContents().getChildren();
-    	int cursorY = collcaborationView.getCursorPosition().y;
+    	int cursorY = collaborationView.getCursorPosition().y;
     	
 		for (Object object : list) 
 		{	
 			if (object instanceof CollaborationEditPart) 
 			{
-				CollaborationFigure collFigure = ((CollaborationFigure) ((CollaborationEditPart) object).getFigure());
+				CollaborationFigure collFigure = ((UnderlayerFigure) ((CollaborationEditPart) object).getFigure()).getCollaborationFigure();
 				
 				if (collFigure.isConfiguration)
 					continue;
@@ -125,7 +118,8 @@ public class AddRoleAction extends Action {
 					Object edit = list.get(index + 1);
 					if (edit instanceof CollaborationEditPart) {
 				
-						CollaborationFigure nextCollFigure = ((CollaborationFigure) ((CollaborationEditPart) edit).getFigure());
+						CollaborationFigure nextCollFigure = ((UnderlayerFigure) ((CollaborationEditPart) edit).getFigure()).getCollaborationFigure();
+						
 						max = nextCollFigure.getBounds().y() - 4;
 					}
 					else if (edit instanceof ClassEditPart)

@@ -891,8 +891,7 @@ public class ConstraintDialog implements GUIDefaults {
 		Node propNode = nodeReader.stringToNode(input, featureList);
 		
 		
-		if (propNode == null) 
-		{
+		if (propNode == null) {
 			printHeaderError(nodeReader.getErrorMessage());
 			return;
 		}
@@ -916,11 +915,9 @@ public class ConstraintDialog implements GUIDefaults {
 			op = new ConstraintCreateOperation(propNode, featureModel);
 		}
 		op.addContext((IUndoContext) featureModel.getUndoContext());
-		try 
-		{
+		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (ExecutionException e) 
-		{
+		} catch (ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
 

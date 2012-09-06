@@ -32,8 +32,6 @@ import java.util.List;
  * 
  */
 public class Feature implements PropertyConstants, PropertyChangeListener {
-	
-	public static final int INVALID_COLOR = -1;
 
 	private String name;
 	
@@ -49,7 +47,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 	
 	private boolean constraintSelected = false;
 	
-	private ArrayList<Integer> colors = new ArrayList<Integer>();
+	private ColorList colorList;
 	
 	private List<Constraint> partOfConstraints = new ArrayList<Constraint>();
 	
@@ -63,14 +61,16 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 		this.featureModel = featureModel;
 		name = "Unknown";
 		sourceConnections.add(parentConnection);
+		colorList = new ColorList(this);
 	}
 
 	public Feature(FeatureModel featureModel, String name) {
 		this.featureModel = featureModel;
 		this.name = name;
 		sourceConnections.add(parentConnection);
+		colorList = new ColorList(this);
 	}
-	
+
 	public void setNewLocation(FMPoint newLocation){
 		location = newLocation;
 	}
@@ -143,56 +143,6 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 	public void setConstraintSelected(boolean selection) {
 		this.constraintSelected = selection;
 		fire(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
-	}
-	
-	public boolean hasColor() {
-		return colors.get(featureModel.getCurColorScheme()) > INVALID_COLOR;
-	}
-	
-	public int getColor() {
-		return colors.get(featureModel.getCurColorScheme());
-	}
-	
-	public void setColor(int color) {
-		colors.set(featureModel.getCurColorScheme(), color);
-	}
-	
-	public void removeColor() {
-		colors.set(featureModel.getCurColorScheme(), INVALID_COLOR);
-	}
-	
-	public boolean hasColor(int scheme) {
-		return colors.get(scheme) > INVALID_COLOR;
-	}
-	
-	public int getColor(int scheme) {
-		return colors.get(scheme);
-	}
-	
-	public boolean hasNoColorSchemes() {
-		return colors.isEmpty();
-	}
-	
-	public void setupColorSchemes(int[] newColors) {
-		colors.clear();
-		for (int i = 0; i < newColors.length; i++) {
-			colors.add(newColors[i]);
-		}
-	}
-	
-	public void setupColorSchemes(int count) {
-		colors.clear();
-		for (int i = 0; i < count; i++) {
-			colors.add(INVALID_COLOR);
-		}
-	}
-	
-	public void addColorScheme() {
-		colors.add(INVALID_COLOR);
-	}
-	
-	public void removeColorScheme() {
-		colors.remove(featureModel.getCurColorScheme());
 	}
 
 	public void setAbstract(boolean value) {
@@ -544,9 +494,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 		feature.multiple = multiple;
 		feature.hidden = hidden;
 		feature.concret = concret;
-		for (Integer color : colors) {
-			feature.colors.add(color);
-		}
+		feature.colorList = colorList.clone(feature);
 		return feature;
 	}
 
@@ -611,6 +559,10 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 		{
 			return this.toString();
 		}
+	}
+
+	public ColorList getColorList() {
+		return colorList;
 	}
 	
 	/* auto-generated methods

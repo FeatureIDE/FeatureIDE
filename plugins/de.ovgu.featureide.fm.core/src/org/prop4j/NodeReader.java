@@ -25,9 +25,6 @@ public class NodeReader {
 	public final static String[] logicalSymbols = new String[] { "\u21D4",
 			"\u21D2", "\u2228", "\u2227", "\u00AC" };
 
-	private static final String[] OPERATOR_NAMES = { "Not", "And", "Or",
-			"Implies", "Iff", "(", ")" /* "At most 1" */};
-
 	private List<String> featureNames;
 
 	private String errorMessage = "";

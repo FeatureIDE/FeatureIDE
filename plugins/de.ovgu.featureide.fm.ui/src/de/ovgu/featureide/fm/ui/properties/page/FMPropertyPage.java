@@ -38,7 +38,6 @@ import de.ovgu.featureide.fm.ui.properties.language.ILanguage;
  * 
  * @author Jens Meinicke
  */
-@SuppressWarnings({ "restriction", "unused" })
 public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUIDefaults {
 
 	/* legend group objects: */

@@ -18,11 +18,8 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.action;
 
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
-
 import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
-import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModel;
 
 /**
  * Shows unselected features at collaboration model
@@ -31,15 +28,10 @@ import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModel;
  */
 public class ShowUnselectedAction extends Action {
 
-	private CollaborationModel model;
 	private CollaborationView collaborationView;
-	private GraphicalViewerImpl view;
-	
-	public ShowUnselectedAction(String text, GraphicalViewerImpl view, CollaborationView collaborationView, CollaborationModel model) {
+	public ShowUnselectedAction(String text, CollaborationView collaborationView) {
 		super(text);
 		this.collaborationView = collaborationView;
-		this.model = model;
-		this.view = view;
 	}
 
 	public void setEnabled(boolean enabled) {
