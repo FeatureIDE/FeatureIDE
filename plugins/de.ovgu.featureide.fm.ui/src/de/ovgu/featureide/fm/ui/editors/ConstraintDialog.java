@@ -262,8 +262,7 @@ public class ConstraintDialog implements GUIDefaults {
 	 */
 	private void initHead() {
 		Composite headComposite = new Composite(shell, SWT.NONE);
-		headComposite.setBackground(shell.getDisplay().getSystemColor(
-				SWT.COLOR_WHITE));
+		headComposite.setBackground(shell.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
 		headComposite.setLayoutData(gridData);
 
@@ -285,8 +284,7 @@ public class ConstraintDialog implements GUIDefaults {
 		capture.setLayoutData(gridData);
 		Label imageLabel = new Label(headComposite, SWT.RIGHT | SWT.DOWN);
 		imageLabel.setImage(BANNER_IMAGE);
-		imageLabel.setBackground(shell.getDisplay().getSystemColor(
-				SWT.COLOR_WHITE));
+		imageLabel.setBackground(shell.getDisplay().getSystemColor(	SWT.COLOR_WHITE));
 		gridData = new GridData(GridData.FILL_VERTICAL | GridData.END
 				| GridData.HORIZONTAL_ALIGN_END | GridData.VERTICAL_ALIGN_END);
 		gridData.widthHint = 90;
@@ -877,11 +875,13 @@ public class ConstraintDialog implements GUIDefaults {
 	 * @param featureModel
 	 * @param constraint
 	 */
-	private void closeShell() {
+	private void closeShell() 
+	{
 		NodeReader nodeReader = new NodeReader();
 		String input = constraintText.getText().trim();
 
-		if (input.length() == 0) {
+		if (input.length() == 0) 
+		{
 			printHeaderError("constraint is empty");
 			return;
 		}
@@ -891,27 +891,36 @@ public class ConstraintDialog implements GUIDefaults {
 		Node propNode = nodeReader.stringToNode(input, featureList);
 		
 		
-		if (propNode == null) {
+		if (propNode == null) 
+		{
 			printHeaderError(nodeReader.getErrorMessage());
 			return;
 		}
-		if (!isSatisfiable(input, 1000)) {
+		if (!isSatisfiable(input, 1000)) 
+		{
 			printHeaderWarning("constraint is unsatisfiable");			
 		}
+		
+		for ( Constraint c : featureModel.getConstraints())
+		{
+			FMUIPlugin.getDefault().logInfo(c.toString());
+		}
+		
 		int index = 0;
 		AbstractOperation op;
-		if (constraint != null
-				&& (index = featureModel.getConstraints().indexOf(constraint)) != -1) {
-
+		if (constraint != null && (index = featureModel.getConstraints().indexOf(constraint)) != -1) 
+		{
 			op = new ConstraintEditOperation(propNode, featureModel, index);
-		} else {
+		} else
+		{
 			op = new ConstraintCreateOperation(propNode, featureModel);
-
 		}
 		op.addContext((IUndoContext) featureModel.getUndoContext());
-		try {
+		try 
+		{
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (ExecutionException e) {
+		} catch (ExecutionException e) 
+		{
 			FMUIPlugin.getDefault().logError(e);
 		}
 

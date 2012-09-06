@@ -24,9 +24,9 @@ import org.eclipse.ui.IPerspectiveFactory;
 
 import de.ovgu.featureide.fm.ui.views.FeatureModelEditView;
 import de.ovgu.featureide.ui.UIPlugin;
-import de.ovgu.featureide.ui.views.featurestatistics.FeatureStatistics;
 import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
 import de.ovgu.featureide.ui.views.collaboration.outline.CollaborationOutline;
+import de.ovgu.featureide.ui.views.featurestatistics.FeatureStatistics;
 import de.ovgu.featureide.ui.wizards.NewConfigurationFileWizard;
 import de.ovgu.featureide.ui.wizards.NewFeatureIDEFileWizard;
 import de.ovgu.featureide.ui.wizards.NewFeatureProjectWizard;

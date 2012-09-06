@@ -83,7 +83,7 @@ public class DeleteAllOperation extends AbstractOperation implements GUIDefaults
 		getFeaturesToDelete(list);
 
 		AbstractOperation op = null;
-		
+
 		if (containedFeatureList.isEmpty()){
 			for (Feature feat : featureList){			
 				op = new FeatureDeleteOperation(featureModel, feat, false);
@@ -172,7 +172,8 @@ public class DeleteAllOperation extends AbstractOperation implements GUIDefaults
 	 */
 	private void getFeaturesToDelete(LinkedList<Feature> linkedList) {		
 		for (Feature feat : linkedList){
-			if (!feat.getRelevantConstraints().isEmpty()) containedFeatureList.add(feat);
+			if (!feat.getRelevantConstraints().isEmpty()) 
+				containedFeatureList.add(feat);
 			if (feat.hasChildren()){
 				getFeaturesToDelete(feat.getChildren());
 			}

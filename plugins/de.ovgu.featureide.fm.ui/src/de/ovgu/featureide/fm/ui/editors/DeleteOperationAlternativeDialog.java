@@ -18,13 +18,27 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.AbstractOperation;
 import org.eclipse.core.commands.operations.IUndoContext;
+import org.eclipse.jface.layout.TableColumnLayout;
+import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -32,14 +46,16 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.Feature;
@@ -55,172 +71,80 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureDeleteOpe
  * @author Stefan Krueger
  */
 public class DeleteOperationAlternativeDialog implements GUIDefaults 
-{
-	private Text warningMessage;
-	
-	private List<Feature> features;
-	
+{		
 	private Shell shell;
-	private Feature feature;
-	private List<Feature> delFeatures;
 	
 	private FeatureModel featureModel;
 	private Button okButton;
-	private Combo featureCombo;
-	private String titleText;
-	
-	
-	public DeleteOperationAlternativeDialog(FeatureModel featureModel, List<Feature> delFeatures, List<Feature> foundFeatures)
-	{
-		this.features = foundFeatures;
-		this.delFeatures = delFeatures; 
-		this.featureModel = featureModel;
-		this.feature = delFeatures.get(0);
-		
-		initShell();
-		initText();
-		initCombo();
-		initButtons();
-		shell.open();	
-	}
-	
-	
-	/**
-	 * 
-	 * @param featureModel
-	 * 			featureModel of the feature
-	 * @param feature
-	 * 			Feature which is about to be deleted and should be replaced
-	 * @param foundFeatures
-	 * 			List of features which are equivalent to feature and could replace it and its constraints
-	 */	
-	public DeleteOperationAlternativeDialog(FeatureModel featureModel, Feature feature, List<Feature> foundFeatures)
-	{
-		this.features = foundFeatures;
-		this.feature = feature; 
-		this.featureModel = featureModel;
-		this.delFeatures = new LinkedList<Feature>();
-		this.delFeatures.add(feature);
-		
-		initShell();
-		initText();
-		initCombo();
-		initButtons();
-		shell.open();	
-	}
 
+	private Table alternativefeatureTable;
+	private Table featureTable;
+	private HashMap<Feature, List<Feature>> featureMap;
+
+	private Group featureGroup;
 	
-	/**
-	 * initializes and fills combobox with list of possible replacement features
-	 */
-	private void initCombo()
-	{		
-		featureCombo = new Combo(shell, SWT.READ_ONLY);
-	    featureCombo.setBounds(120, 20, 350, 65);
-	    
-	    for (Feature f : features)
-	    {
-	    	featureCombo.add(f.getName());
-	    }	
-	    featureCombo.setText(featureCombo.getItem(0));
+	
+	public DeleteOperationAlternativeDialog(FeatureModel featureModel, HashMap<Feature, List<Feature> > featureMap)
+	{
+		this.featureMap = featureMap;
+		this.featureModel = featureModel;
+
+		List<Feature> toBeDeleted = new LinkedList<Feature>();
+		for (Feature f: featureMap.keySet())
+		{
+			if (featureMap.get(f).isEmpty())
+				toBeDeleted.add(f);
+		}
+
+		String labeltext = " ";
+
+		for (Feature f: toBeDeleted)
+		{
+			labeltext += f.getName() + ", ";
+			featureMap.remove(f);
+		}
+		
+ 		initShell();
+		initHead();
+		initFeatureGroup();
+		initBottom(labeltext);
+		shell.open();	
 	}
 	
 	/**
 	 * initializes window 
 	 */
-	private void initShell() {
-		shell = new Shell(Display.getCurrent());
-		titleText = "Replace ";
-		for (Feature f : delFeatures) titleText += "\"" + f.getName() + "\", ";
-		titleText = titleText.substring(0, titleText.length() - 2);
-		titleText += " in constraints";
-		shell.setText(titleText);
-		shell.setImage(FEATURE_SYMBOL);
-		shell.setSize(400, 250);
-		GridLayout shellLayout = new GridLayout();
-		shellLayout.marginWidth = 0;
-		shellLayout.marginHeight = 0;
-		shell.setLayout(shellLayout);
+	private void initShell() 
+	{
+			shell = new Shell(Display.getCurrent(), SWT.APPLICATION_MODAL | SWT.DIALOG_TRIM );			
+			shell.setText("Feature Deletion and Replacement in constraints");
+			shell.setImage(FEATURE_SYMBOL);
+			shell.setSize(520, 450);
+			GridLayout shellLayout = new GridLayout();
+			shellLayout.marginWidth = 0;
+			shellLayout.marginHeight = 0;
+			shellLayout.numColumns = 1;
+			shell.setLayout(shellLayout);
 
-		
-		
-		Monitor primary = shell.getDisplay().getPrimaryMonitor();
-		Rectangle bounds = primary.getBounds();
-		Rectangle rect = shell.getBounds();
-		int x = bounds.x + (bounds.width - rect.width) / 2;
-		int y = bounds.y + (bounds.height - rect.height) / 2;
-		shell.setLocation(x, y);
-		shell.addListener(SWT.Traverse, new Listener() {
-			public void handleEvent(Event event) {
-				if (event.detail == SWT.TRAVERSE_ESCAPE) {
-					shell.close();
+			Monitor primary = shell.getDisplay().getPrimaryMonitor();
+			Rectangle bounds = primary.getBounds();
+			Rectangle rect = shell.getBounds();
+			int x = bounds.x + (bounds.width - rect.width) / 2;
+			int y = bounds.y + (bounds.height - rect.height) / 2;
+			shell.setLocation(x, y);
+			shell.addListener(SWT.Traverse, new Listener() 
+			{
+				public void handleEvent(Event event) 
+				{
+					if (event.detail == SWT.TRAVERSE_ESCAPE) 
+					{
+
+						shell.close();
+
+					}
 				}
-			}
-		});
-	}
-	
-	/**
-	 * initializes the warning message
-	 */
-	
-	public void initText()
-	{
-		warningMessage = new Text(shell, SWT.MULTI);
-		warningMessage.setEditable(false);
-		warningMessage.setBackground(shell.getDisplay().getSystemColor(
-				SWT.COLOR_WHITE));
-		warningMessage.setBounds(20, 20, 380, 65);
-		warningMessage.setText("Caution!\nThe feature you are about to delete is contained in several constraints.\nPlease select one of the following features in order to replace it.");
-		
-	}
-		
-	
-	/**
-	 * initializes OK and Cancel buttons
-	 */
-	public void initButtons()
-	{
-		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
+			});
 
-		Composite lastComposite = new Composite(shell, SWT.NONE);
-		lastComposite.setLayoutData(gridData);
-
-		FormLayout lastCompositeLayout = new FormLayout();
-		lastCompositeLayout.marginHeight = 5;
-		lastCompositeLayout.marginTop = 85;
-		lastCompositeLayout.marginWidth = 5;
-		lastComposite.setLayout(lastCompositeLayout);
-		
-		Button cancelButton = new Button(lastComposite, SWT.NONE);
-		cancelButton.setText("Cancel");
-		FormData formDataCancel = new FormData();
-		formDataCancel.width = 70;
-		formDataCancel.right = new FormAttachment(100, -5);
-		formDataCancel.bottom = new FormAttachment(100, -5);
-		cancelButton.setLayoutData(formDataCancel);
-		
-		
-		okButton = new Button(lastComposite, SWT.NONE);
-		okButton.setText("OK");
-		FormData formDataOk = new FormData();
-		formDataOk.width = 70;
-		formDataOk.right = new FormAttachment(cancelButton, -5);
-		formDataOk.bottom = new FormAttachment(100, -5);
-		okButton.setLayoutData(formDataOk);
-		okButton.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
-			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
-
-				closeShell();
-
-			}
-
-		});
-		cancelButton.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
-			public void widgetSelected(
-					org.eclipse.swt.events.SelectionEvent e) {
-				shell.dispose();
-			}
-		});		
 	}
 
 	/**
@@ -228,32 +152,295 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults
 	 */
 	private void closeShell() 
 	{
-		AbstractOperation op = null;
-		if (delFeatures.isEmpty()) delFeatures.add(this.feature);
-			
-		for (Feature feature : delFeatures)
+		shell.dispose();
+	}
+
+		/**
+		 * initializes the bottom part of the dialog
+		 * 
+		 * @param featuremodel
+		 * @param constraint
+		 */
+		private void initBottom(String labeltext) 
 		{
-			for (Feature f : features)
-			{
-				if (f.getName().equals(featureCombo.getText()))				
+			GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
+			
+			Composite tableComposite = new Composite(shell, SWT.NONE);
+			gridData = new GridData(GridData.FILL_HORIZONTAL);
+			gridData.grabExcessVerticalSpace = true;
+			gridData.grabExcessHorizontalSpace = true;
+			tableComposite.setLayoutData(gridData);			
+			
+			final Label label = new Label(shell, 0);
+			if ((labeltext.length() > 1))
+			label.setText("  The following features do not have any equivalents and cannot be deleted:\n  " + labeltext.substring(0, labeltext.length() -2));
+			label.setLayoutData(gridData);			
+			Composite lastComposite = new Composite(shell, SWT.NONE);			
+			lastComposite.setLayoutData(gridData);
+
+			
+			FormLayout lastCompositeLayout = new FormLayout();
+			lastCompositeLayout.marginHeight = 5;
+			lastCompositeLayout.marginTop = 5;
+			lastCompositeLayout.marginWidth = 15;
+			lastCompositeLayout.marginBottom = 15;
+			lastComposite.setLayout(lastCompositeLayout);
+			
+			okButton = new Button(lastComposite, SWT.NONE);
+			okButton.setText("Close");
+			FormData formDataCancel = new FormData();
+			formDataCancel.width = 70;
+			formDataCancel.right = new FormAttachment(100, 5);
+			formDataCancel.bottom = new FormAttachment(100, 15);
+			okButton.setLayoutData(formDataCancel);
+
+
+			lastComposite.setTabList(new Control[] { okButton });
+			okButton.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
+				public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) 
 				{
-					op = new FeatureDeleteOperation(featureModel, feature, true, f);
-					break;
+					closeShell();
 				}
-			}
-			if (op != null)
+
+			});
+		}
+
+		/**
+		 * initializes the upper part of the dialog
+		 */
+		private void initHead() {
+			Composite headComposite = new Composite(shell, SWT.NONE);
+			headComposite.setBackground(shell.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+			GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
+			headComposite.setLayoutData(gridData);
+
+			GridLayout headLayout = new GridLayout();
+			headLayout.numColumns = 3;
+			headComposite.setLayout(headLayout);
+
+			final Label capture = new Label(headComposite, SWT.NONE);
+			FontData fontData = capture.getFont().getFontData()[0];
+			Font font = new Font(shell.getDisplay(), new FontData(fontData.getName(), 10, SWT.NONE));
+			capture.setFont(font);
+			capture.setText("One or more features could not be deleted, because they are contained within one or\n" +
+					"more constraints.\n" +
+					"To delete these features anyway you can replace their occurences in\n" +
+					"constraints with another feature. Select one or more features on the left in order to\n" +
+					"replace them with one of their respective semantically equivalent features shown\n" +
+					"on the right hand side.");
+			capture.setBackground(shell.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+
+			gridData = new GridData();
+			gridData.horizontalSpan = 2;
+			capture.setLayoutData(gridData);
+			Label imageLabel = new Label(headComposite, SWT.RIGHT | SWT.DOWN);
+			imageLabel.setImage(BANNER_IMAGE);
+			imageLabel.setBackground(shell.getDisplay().getSystemColor(	SWT.COLOR_WHITE));
+			gridData = new GridData(GridData.FILL_VERTICAL | GridData.END | GridData.HORIZONTAL_ALIGN_END | GridData.VERTICAL_ALIGN_END);
+			gridData.widthHint = 90;
+			gridData.verticalSpan = 3;
+			imageLabel.setLayoutData(gridData);
+
+			gridData = new GridData(GridData.BEGINNING);
+			gridData.widthHint = 20;
+			gridData.heightHint = 20;
+			gridData.verticalSpan = 2;
+			gridData = new GridData(GridData.FILL_HORIZONTAL);
+			gridData.grabExcessHorizontalSpace = true;
+			gridData.grabExcessVerticalSpace = true;
+			gridData.verticalSpan = 1;
+		}
+
+		/**
+		 * initializes the group containing the searchText and featureTable
+		 * 
+		 * @param featuremodel
+		 */
+		private void initFeatureGroup() 
+		{
+			featureGroup = new Group(shell, SWT.NONE);
+			featureGroup.setText("Features");
+			GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
+			gridData.grabExcessHorizontalSpace = true;
+			featureGroup.setLayoutData(gridData);
+			GridLayout featureGroupLayout = new GridLayout();
+			featureGroupLayout.numColumns = 2;
+			featureGroup.setLayout(featureGroupLayout);
+
+			Composite tableComposite = new Composite(featureGroup, SWT.NONE);
+			gridData = new GridData(GridData.FILL_HORIZONTAL);
+			gridData.grabExcessVerticalSpace = true;
+			gridData.grabExcessHorizontalSpace = true;
+			tableComposite.setLayoutData(gridData);
+			
+			final TableViewer tableViewer =  new TableViewer(tableComposite, SWT.BORDER | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+			alternativefeatureTable = tableViewer.getTable();
+			alternativefeatureTable.setLayoutData(gridData);
+			alternativefeatureTable.setToolTipText("Features supposed to be deleted");
+			TableViewerColumn viewerNameColumn = new TableViewerColumn(	tableViewer, SWT.NONE);
+			TableColumnLayout tableColumnLayout = new TableColumnLayout();
+			tableComposite.setLayout(tableColumnLayout);
+			tableColumnLayout.setColumnData(viewerNameColumn.getColumn(), new ColumnWeightData(100, 100, false));
+			
+			tableViewer.setComparator(new ViewerComparator() 
 			{
-				op.addContext((IUndoContext) featureModel.getUndoContext());
-				try {
-					PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-				} catch (ExecutionException e) {
-					FMUIPlugin.getDefault().logError(e);
+				@Override
+				public int compare(Viewer viewer, Object feature1, Object feature2) {
+
+					
+					return ((Feature) feature1).getName().compareToIgnoreCase(
+							((Feature) feature2).getName());
 				}
+
+			});
+
+			viewerNameColumn.setLabelProvider(new CellLabelProvider() {
+				@Override
+				public void update(ViewerCell cell) 
+				{
+					cell.setText(((Feature) cell.getElement()).getName());
+
+				}
+			});
+			Collection<Feature> l = new ArrayList<Feature>();
+			l.addAll(featureMap.keySet());
+			tableViewer.setContentProvider(new ArrayContentProvider());
+			tableViewer.setInput(l);	
+						
+			
+			
+			tableComposite = new Composite(featureGroup, SWT.NONE);
+			gridData = new GridData(GridData.FILL_HORIZONTAL);
+			gridData.grabExcessVerticalSpace = true;
+			gridData.grabExcessHorizontalSpace = true;
+			tableComposite.setLayoutData(gridData);
+		
+			final TableViewer tableViewer2 =  new TableViewer(tableComposite, SWT.BORDER | SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL);
+			featureTable = tableViewer2.getTable();
+			featureTable.setLayoutData(gridData);
+			featureTable.setToolTipText("alternative features");
+			TableViewerColumn viewerNameColumn2 = new TableViewerColumn(	tableViewer2, SWT.NONE);
+			tableColumnLayout = new TableColumnLayout();
+			tableComposite.setLayout(tableColumnLayout);
+			tableColumnLayout.setColumnData(viewerNameColumn2.getColumn(),
+					new ColumnWeightData(100, 100, false));
+			tableViewer2.setContentProvider(new ArrayContentProvider());
+			
+			
+			featureTable.addListener(SWT.MouseDoubleClick, new Listener() {
+				@Override
+				public void handleEvent(Event event) 
+				{
+					execute();
+				}
+			});
+			
+			alternativefeatureTable.addListener(SWT.MouseUp, new Listener() {
+				@Override
+				public void handleEvent(Event event) 
+				{				
+					final Collection<Feature> l = new ArrayList<Feature>();
+					l.addAll(featureMap.get((Feature)(alternativefeatureTable.getSelection()[0]).getData()));
+					for (int i = 0; i < alternativefeatureTable.getSelectionCount(); i++ )
+					{
+						
+						if (!featureMap.get((Feature)(alternativefeatureTable.getSelection()[0]).getData()).equals(featureMap.get((Feature)(alternativefeatureTable.getSelection()[i]).getData())))
+						{
+							l.clear();
+							break;
+						}
+					}
+					tableViewer2.setInput(l);
+					featureTable.select(0);
+					tableViewer2.refresh(true, true);
+				}
+			});
+		
+			viewerNameColumn2.setLabelProvider(new CellLabelProvider() 
+			{
+				@Override
+				public void update(ViewerCell cell) 
+				{
+					cell.setText(((Feature) cell.getElement()).getName());
+
+				}
+			});
+			
+			final Label label = new Label(featureGroup, 0);
+			gridData = new GridData(GridData.FILL_HORIZONTAL);
+			label.setLayoutData(gridData);
+
+	
+			final Button button = new Button(featureGroup, SWT.PUSH);
+			button.setText("Replace");
+			gridData = new GridData(GridData.FILL_HORIZONTAL);
+			button.setLayoutData(gridData);
+			
+
+			button.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() 
+			{
+				public void widgetSelected(	org.eclipse.swt.events.SelectionEvent e) 
+				{
+					execute();
+				}
+			});
+		}
+	
+	
+	private void executeOp(AbstractOperation op)
+	{
+		if (op != null)
+		{
+			op.addContext((IUndoContext) featureModel.getUndoContext());
+			try {
+				PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
+			} catch (ExecutionException e1) {
+				FMUIPlugin.getDefault().logError(e1);
 			}
 		}
-		shell.dispose();
-	
 	}
 	
+	private void execute()
+	{
+		AbstractOperation op = null;
+		Feature toBeDeleted;
+		Feature alternative;
+		List<Feature> delFeatures = new LinkedList<Feature>();
+		
+		if (featureTable.getSelectionCount() > 0 )
+			alternative = (Feature)(featureTable.getSelection()[0]).getData();
+		else return;
+		
+		for (int i = 0; i < alternativefeatureTable.getSelectionCount(); i++)
+		{	
+			toBeDeleted = (Feature)(alternativefeatureTable.getSelection()[i]).getData();
+			
+			op = new FeatureDeleteOperation(featureModel, toBeDeleted, true, alternative);
+			executeOp(op);
+			delFeatures.add(toBeDeleted);						
+		}
+		
+		
+		List <Integer> removableIndices = new LinkedList <Integer>();
+		for (Feature f : delFeatures)
+		{
+			for (int j = 0; j < alternativefeatureTable.getItemCount(); j++)
+			{
+				if (f.getName().equals(((Feature)alternativefeatureTable.getItem(j).getData()).getName()))
+					removableIndices.add(j);
+			}
+		}
+		
+		int rem[] = new int[removableIndices.size()];
+		int i = 0;
+		for (int index : removableIndices)
+		{
+			rem[i] = index;
+			i++;
+		}						
+		alternativefeatureTable.remove(rem);
+			
+		featureTable.removeAll();		
+	}
 	
 }

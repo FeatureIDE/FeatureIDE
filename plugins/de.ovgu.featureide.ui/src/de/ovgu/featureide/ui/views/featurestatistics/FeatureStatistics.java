@@ -22,6 +22,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
@@ -51,7 +52,6 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.progress.UIJob;
 
-import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -68,6 +68,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.GraphicalEditPart
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.LevelOrderLayout;
 import de.ovgu.featureide.fm.ui.views.featuremodeleditview.ViewLabelProvider;
+import de.ovgu.featureide.ui.UIPlugin;
 
 public class FeatureStatistics extends ViewPart implements GUIDefaults {
 

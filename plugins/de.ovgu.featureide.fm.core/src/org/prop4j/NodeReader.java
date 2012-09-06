@@ -450,37 +450,4 @@ public class NodeReader {
 		return true;
 	}
 
-	private static String insertWhitespacesAtBrackets(String str) {
-		str = str.replaceAll("\\)", " ) ");
-		str = str.replaceAll("\\(", " ( ");
-		return str;
-
-	}
-
-	/**
-	 * replaces unnecessary white spaces inside str single white spaces are not
-	 * deleted
-	 * 
-	 * @param str
-	 * @return
-	 */
-	/*public static String reduceWhiteSpaces(String str) {
-		if (str.length() < 2)
-			return str;
-		StringBuilder strBuf = new StringBuilder();
-		strBuf.append(str.charAt(0));
-		for (int i = 1; i < str.length(); i++) 
-		{
-			if (!(Character.isWhitespace(str.charAt(i - 1)) && Character.isWhitespace(str.charAt(i)))) 
-			{
-				strBuf.append(str.charAt(i));
-			}
-		}
-		return strBuf.toString();
-	}
-*/
-	private boolean hasFeatureNames() {
-		return featureNames != null;
-	}
-
 }
