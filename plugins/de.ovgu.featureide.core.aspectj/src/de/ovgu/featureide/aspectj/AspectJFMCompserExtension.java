@@ -180,7 +180,7 @@ public class AspectJFMCompserExtension extends FMComposerExtension {
 	private String getFileContent(IFile res) {
 		Scanner scanner = null;
 		try {
-			scanner = new Scanner(res.getRawLocation().toFile());
+			scanner = new Scanner(res.getRawLocation().toFile(), "UTF-8");
 			StringBuffer buffer = new StringBuffer();
 			while (scanner.hasNext()) {
 				buffer.append(scanner.nextLine());

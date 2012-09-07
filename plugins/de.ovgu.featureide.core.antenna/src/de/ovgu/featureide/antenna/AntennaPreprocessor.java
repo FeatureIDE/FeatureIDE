@@ -421,4 +421,9 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	public LinkedList<FSTDirective> buildModelDirectivesForFile(Vector<String> lines) {
 		return antennaModelBuilder.buildModelDirectivesForFile(lines);
 	}
+
+	@Override
+	public boolean needColor() {
+		return true;
+	}
 }

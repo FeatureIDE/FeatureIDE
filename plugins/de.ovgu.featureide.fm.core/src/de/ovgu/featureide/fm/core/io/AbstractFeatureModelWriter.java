@@ -21,6 +21,7 @@ package de.ovgu.featureide.fm.core.io;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -53,7 +54,7 @@ public abstract class AbstractFeatureModelWriter implements IFeatureModelWriter 
 		try {
 			if (!file.exists()) file.createNewFile();
 			output = new FileOutputStream(file);
-			output.write(writeToString().getBytes());
+			output.write(writeToString().getBytes(Charset.availableCharsets().get("UTF-8")));
 			output.flush();
 		} catch (IOException e) {
 			FMCorePlugin.getDefault().logError(e);

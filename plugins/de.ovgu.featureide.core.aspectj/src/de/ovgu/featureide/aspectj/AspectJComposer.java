@@ -21,6 +21,7 @@ package de.ovgu.featureide.aspectj;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -492,7 +493,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 						   NEW_ASPECT +
 						   "}"; 
 			}
-			InputStream source = new ByteArrayInputStream(fileText.getBytes());
+			InputStream source = new ByteArrayInputStream(fileText.getBytes(Charset.availableCharsets().get("UTF-8")));
 			try {
 				aspectFile.create(source, true, null);
 				aspectFile.refreshLocal(IResource.DEPTH_ZERO, null);

@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.Charset;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -311,7 +312,7 @@ public class AheadBuildErrorEvent {
     	StringBuilder buffer = new StringBuilder();
     	try {
 	        InputStream contentStream = file.getContents();
-	        in = new InputStreamReader(contentStream);
+	        in = new InputStreamReader(contentStream, Charset.availableCharsets().get("UTF-8"));
 	
 	        int chunkSize = contentStream.available();
 	        char[] readBuffer = new char[chunkSize];

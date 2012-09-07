@@ -22,6 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.Charset;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -154,7 +155,7 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 	 */
 	private InputStream openContentStream() {
 		String contents = "";
-		return new ByteArrayInputStream(contents.getBytes());
+		return new ByteArrayInputStream(contents.getBytes(Charset.availableCharsets().get("UTF-8")));
 	}
 
 	private void throwCoreException(String message) throws CoreException {

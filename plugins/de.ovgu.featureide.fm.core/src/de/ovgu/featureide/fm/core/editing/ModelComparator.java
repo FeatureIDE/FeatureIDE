@@ -214,8 +214,7 @@ public class ModelComparator {
 		if (!strategy.contains(Strategy.SingleTesting)) {
 			Node node = new And(a.clone(), new Not(b.clone()));
 			SatSolver solver = new SatSolver(node, timeout);
-			boolean valid = !solver.isSatisfiable();
-			return valid;
+			return !solver.isSatisfiable();
 		}
 
 		example.setLeft(a);

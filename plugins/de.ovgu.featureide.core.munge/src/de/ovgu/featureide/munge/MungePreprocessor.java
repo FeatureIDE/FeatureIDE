@@ -425,9 +425,6 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 		mungeModelBuilder.buildModel();
 	}
 	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.ComposerExtensionClass#buildConfiguration(org.eclipse.core.resources.IFolder, de.ovgu.featureide.fm.core.configuration.Configuration)
-	 */
 	@Override
 	public void buildConfiguration(IFolder folder, Configuration configuration, String congurationName) {
 		super.buildConfiguration(folder, configuration, congurationName);
@@ -446,9 +443,6 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#showContextFieldsAndMethods()
-	 */
 	@Override
 	public boolean showContextFieldsAndMethods() {
 		return false;
@@ -457,5 +451,10 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 	@Override
 	public LinkedList<FSTDirective> buildModelDirectivesForFile(Vector<String> lines) {
 		return mungeModelBuilder.buildModelDirectivesForFile(lines);
+	}
+	
+	@Override
+	public boolean needColor() {
+		return true;
 	}
 }

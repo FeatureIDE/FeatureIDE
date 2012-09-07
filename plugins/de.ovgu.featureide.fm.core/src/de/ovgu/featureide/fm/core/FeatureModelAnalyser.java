@@ -639,7 +639,7 @@ public class FeatureModelAnalyser {
 	}
 	
 	public LinkedList<Feature> getFalseOptionalFeatures() {
-		// TODO Thomas: improve calculation effort and
+		// TODO @Thomas: improve calculation effort and
 		// correct calculation (is this feature always selected given
 		// that the parent feature is selected)
 		LinkedList<Feature> falseOptionalFeatures = new LinkedList<Feature>();

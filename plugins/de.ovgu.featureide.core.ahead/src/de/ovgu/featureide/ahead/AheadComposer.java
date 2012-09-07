@@ -24,6 +24,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -175,7 +176,7 @@ public class AheadComposer extends ComposerExtensionClass {
 		Scanner scanner = null;
 		try {
 			StringBuffer fileText = new StringBuffer();
-			scanner = new Scanner(file.getRawLocation().toFile());
+			scanner = new Scanner(file.getRawLocation().toFile(), "UTF-8");
 			while (scanner.hasNext()) {
 				fileText.append(scanner.nextLine());
 				fileText.append("\r\n");
@@ -281,7 +282,7 @@ public class AheadComposer extends ComposerExtensionClass {
 		try {
 			File file = iFile.getRawLocation().toFile();
 			StringBuilder fileTextBuffer = new StringBuilder();
-			Scanner scanner = new Scanner(file);
+			Scanner scanner = new Scanner(file, "UTF-8");
 			while (scanner.hasNext()) {
 				fileTextBuffer.append(scanner.nextLine() + "\r\n");
 			}
@@ -410,7 +411,7 @@ public class AheadComposer extends ComposerExtensionClass {
 				"org.eclipse.jdt.core.compiler.problem.enumIdentifier=error\r\n" +
 				"org.eclipse.jdt.core.compiler.source=1.6\r\n" +
 				"org.eclipse.jdt.core.builder.resourceCopyExclusionFilter=*.jak";
-			InputStream source = new ByteArrayInputStream(text.getBytes());
+			InputStream source = new ByteArrayInputStream(text.getBytes(Charset.availableCharsets().get("UTF-8")));
 			try {
 				settingsFile.create(source, true, null);
 			} catch (CoreException e) {

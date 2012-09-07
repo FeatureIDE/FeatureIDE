@@ -52,7 +52,6 @@ import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.ColorList;
 import de.ovgu.featureide.ui.UIPlugin;
-import de.ovgu.featureide.ui.color.ColorDecider;
 
 /**
  * Assigns color annotations to the editor.
@@ -146,9 +145,8 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 				if (colormodel == null) {
 					IDocument document = provider.getDocument(input);
 					IFile file = ((FileEditorInput) input).getFile();
-					IFeatureProject project = CorePlugin.getFeatureProject(file);			
-					
-					if (ColorDecider.needColor(project)) {
+					IFeatureProject project = CorePlugin.getFeatureProject(file);
+					if (project != null && project.getComposer().needColor()) {
 						
 						colormodel = new ColorAnnotationModel(document, file, project, editor);
 						modelex.addAnnotationModel(KEY, colormodel);

@@ -25,6 +25,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import javax.annotation.CheckForNull;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -521,6 +523,7 @@ public class CorePlugin extends AbstractCorePlugin {
 	 * @return <code>null</code> if there is no associated project, no active
 	 *         instance of this plug-in or resource is the workspace root
 	 */
+	@CheckForNull
 	public static IFeatureProject getFeatureProject(IResource res) {
 		if (res == null) {
 			getDefault().logWarning(

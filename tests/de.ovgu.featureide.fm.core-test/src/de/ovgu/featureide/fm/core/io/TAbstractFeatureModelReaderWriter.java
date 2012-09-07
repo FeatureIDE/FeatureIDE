@@ -230,7 +230,7 @@ public abstract class TAbstractFeatureModelReaderWriter {
 		}
 	}
 
-	//TODO @Test
+	//TODO @Fabian @Test
 	public void testPropNodes() throws FileNotFoundException,
 			UnsupportedModelException {
 
@@ -263,7 +263,7 @@ public abstract class TAbstractFeatureModelReaderWriter {
 				origFm.getAnnotations());
 	}
 
-	//TODO @Test
+	//TODO @Fabian @Test
 	public void testIsRefactoring() throws FileNotFoundException,
 			UnsupportedModelException {
 

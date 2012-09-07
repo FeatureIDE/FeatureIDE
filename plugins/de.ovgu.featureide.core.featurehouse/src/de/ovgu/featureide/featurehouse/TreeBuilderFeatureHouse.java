@@ -122,7 +122,7 @@ public class TreeBuilderFeatureHouse {
 
 				LeafTree leafTree = createLeafTree(iterator, fileNode);
 				projectTree.insertLeafTreeNode(leafTree, fileNode);
-				if (fileNode != null && leafTree != null) {
+				if (leafTree != null) {
 					leafTree.setIdentifier(fileNode.getIdentifier());
 				}
 			}

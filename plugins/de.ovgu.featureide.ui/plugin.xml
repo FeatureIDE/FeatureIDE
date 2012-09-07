@@ -131,7 +131,7 @@
             id="de.ovgu.featureide.ui.viewerContribution"
             targetID="#CompilationUnitEditorContext">
          <action
-               class="de.ovgu.featureide.ui.actions.generator.EditorHighlightingAction"
+               class="de.ovgu.featureide.ui.editors.annotation.EditorHighlightingAction"
                id="de.ovgu.featureide.ui.actions.editorhighlightingaction"
                label="Enable Editor Highlighting"
                menubarPath="de.ovgu.featureide.ui.FeatureColorMenu/ui"
@@ -193,15 +193,6 @@
                relationship="right"
                relative="org.eclipse.ui.views.TaskList"/>
       </perspectiveExtension>
-      <perspectiveExtension
-            targetID="org.eclipse.ui.resourcePerspective">
-         <view
-               id="de.ovgu.featureide.ui.views.FeatureStatistics"
-               ratio="0.5"
-               relationship="right"
-               relative="org.eclipse.ui.views.TaskList">
-         </view>
-      </perspectiveExtension>
    </extension>
    <extension
          point="org.eclipse.ui.views">
@@ -219,14 +210,6 @@
             icon="icons/FeatureIconSmall.ico"
             id="de.ovgu.featureide.ui.views.collaboration.outline.CollaborationOutline"
             name="Collaboration Outline"
-            restorable="true">
-      </view>
-      <view
-            category="FeatureIDE"
-            class="de.ovgu.featureide.ui.views.featurestatistics.FeatureStatistics"
-            icon="icons/FeatureIconSmall.ico"
-            id="de.ovgu.featureide.ui.views.FeatureStatistics"
-            name="FeatureStatistics"
             restorable="true">
       </view>
    </extension>

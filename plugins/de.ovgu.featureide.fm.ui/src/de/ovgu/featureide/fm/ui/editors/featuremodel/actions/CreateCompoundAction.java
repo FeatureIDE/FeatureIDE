@@ -61,7 +61,7 @@ public class CreateCompoundAction extends Action {
 
 	private static ImageDescriptor createImage = PlatformUI.getWorkbench()
 			.getSharedImages()
-			.getImageDescriptor(ISharedImages.IMG_TOOL_NEW_WIZARD);
+			.getImageDescriptor(ISharedImages.IMG_OBJ_ADD);
 
 	private ISelectionChangedListener listener = new ISelectionChangedListener() {
 		public void selectionChanged(SelectionChangedEvent event) {

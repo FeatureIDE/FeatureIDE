@@ -578,7 +578,7 @@ public class CollaborationModelBuilder {
 			return null;
 		
 		try {
-			scanner = new Scanner(file);
+			scanner = new Scanner(file, "UTF-8");
 		} catch (FileNotFoundException e) {
 			UIPlugin.getDefault().logError(e);
 		}

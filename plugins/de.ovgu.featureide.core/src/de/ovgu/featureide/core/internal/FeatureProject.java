@@ -443,7 +443,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			return null;
 
 		List<IFile> configs = getAllConfigurations();
-		if (configs == null || configs.isEmpty())
+		if (configs.isEmpty())
 			return null;
 
 		// select the first configuration
@@ -1171,10 +1171,9 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	private String getPath(String argument) {
 		try {
 			for (ICommand command : project.getDescription().getBuildSpec()) {
-				if (command.getBuilderName().equals(
-						ExtensibleFeatureProjectBuilder.BUILDER_ID)) {
-					String path = (String) command.getArguments().get(argument);
-					return path;
+				if (ExtensibleFeatureProjectBuilder.BUILDER_ID.equals(
+						command.getBuilderName())) {
+					return (String) command.getArguments().get(argument);
 				}
 			}
 		} catch (CoreException e) {
@@ -1322,7 +1321,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		Scanner scanner = null;
 		try {
 			ArrayList<String> list;
-			scanner = new Scanner(file);
+			scanner = new Scanner(file, "UTF-8");
 			if (scanner.hasNext()) {
 				list = new ArrayList<String>();
 				while (scanner.hasNext()) {

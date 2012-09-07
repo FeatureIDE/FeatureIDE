@@ -150,7 +150,7 @@ public class FeatureCppModelBuilder {
 		LinkedList<String> informations = new LinkedList<String>();
 		Scanner scanner = null;
 		try {
-			scanner = new Scanner(file.getRawLocation().toFile());
+			scanner = new Scanner(file.getRawLocation().toFile(), "UTF-8");
 			while(scanner.hasNext()) {
 				informations.add(scanner.nextLine());
 			}

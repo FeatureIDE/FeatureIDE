@@ -22,6 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -190,7 +191,7 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 		contents = contents.replaceAll(IComposerExtensionClass.FEATUE_PATTER, featurename);
 		
 		
-		return new ByteArrayInputStream(contents.getBytes());
+		return new ByteArrayInputStream(contents.getBytes(Charset.availableCharsets().get("UTF-8")));
 	}
 
 	/**

@@ -80,7 +80,6 @@ public class SettingsImport {
     			buffer.append(line);
     			buffer.append("\r\n");
     		}
-			System.out.println();
 	    } catch (IOException e) {
 			FMUIPlugin.getDefault().logError(e);
 		} finally {

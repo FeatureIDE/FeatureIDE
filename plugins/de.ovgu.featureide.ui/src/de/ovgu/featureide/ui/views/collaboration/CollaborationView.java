@@ -59,7 +59,6 @@ import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.ISaveablePart;
-import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -79,7 +78,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GEFImageWriter;
 import de.ovgu.featureide.ui.UIPlugin;
-import de.ovgu.featureide.ui.color.ColorPalette;
+import de.ovgu.featureide.ui.editors.annotation.ColorPalette;
 import de.ovgu.featureide.ui.views.collaboration.action.AddColorSchemeAction;
 import de.ovgu.featureide.ui.views.collaboration.action.AddRoleAction;
 import de.ovgu.featureide.ui.views.collaboration.action.DeleteAction;
@@ -118,6 +117,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	private static final String DELETE_LABEL = "Delete";
 	private static final String FILTER_LABEL = "Filter";
 	private static final String UNSELECTED_LABEL = "Show unselected features";
+
 	private static final String TOOL_TIP_LABEL = "Build collaborationmodel";
 	
 	private static final String[] FIELD_METHOD_LABEL_NAMES = {
@@ -196,12 +196,15 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	private IPartListener editorListener = new IPartListener() {
 		
 		public void partOpened(IWorkbenchPart part) {
+			
 		}
 
 		public void partDeactivated(IWorkbenchPart part) {
+		
 		}
 
 		public void partClosed(IWorkbenchPart part) {
+			
 		}
 
 		public void partBroughtToTop(IWorkbenchPart part) {
@@ -210,7 +213,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		}
 
 		public void partActivated(IWorkbenchPart part) {
-			if (part instanceof IViewPart)
+			if (part instanceof IEditorPart || part instanceof ViewPart)
 				setEditorActions(part);
 		}
 

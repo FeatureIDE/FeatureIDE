@@ -278,4 +278,11 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	public LinkedList<FSTDirective> buildModelDirectivesForFile(Vector<String> lines) {
 		return composerExtensionClass.buildModelDirectivesForFile(lines);
 	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#needColor()
+	 */
+	public boolean needColor() {
+		return composerExtensionClass.needColor();
+	}
 }

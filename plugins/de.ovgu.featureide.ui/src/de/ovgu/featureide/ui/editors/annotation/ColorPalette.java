@@ -16,12 +16,13 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.ui.color;
+package de.ovgu.featureide.ui.editors.annotation;
 
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 
 /**
+ * TODO description
  * @author Sebastian Krieter
  */
 public class ColorPalette {

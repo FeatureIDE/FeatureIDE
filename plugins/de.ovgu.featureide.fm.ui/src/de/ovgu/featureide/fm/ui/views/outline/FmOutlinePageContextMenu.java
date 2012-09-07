@@ -60,8 +60,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.MandatoryAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.RenameAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ReverseOrderAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
 /**
  * Context Menu for Outline view of FeatureModels
@@ -201,7 +199,7 @@ public class FmOutlinePageContextMenu{
 					Feature feat = (Feature) ((IStructuredSelection) viewer
 							.getSelection()).getFirstElement();
 					
-					part = (FeatureEditPart) fTextEditor.diagramEditor
+					part = (EditPart) fTextEditor.diagramEditor
 							.getEditPartRegistry().get(feat);
 				} else if ((((IStructuredSelection) viewer.getSelection())
 						.getFirstElement() instanceof Constraint)) {
@@ -209,7 +207,7 @@ public class FmOutlinePageContextMenu{
 					Constraint constr = (Constraint) ((IStructuredSelection) viewer
 							.getSelection()).getFirstElement();
 					
-					part = (ConstraintEditPart) fTextEditor.diagramEditor
+					part = (EditPart) fTextEditor.diagramEditor
 					.getEditPartRegistry().get(constr);
 					
 				} else {

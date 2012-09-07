@@ -128,7 +128,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		Scanner scanner = null;
 
 		try {
-			scanner = new Scanner(file);
+			scanner = new Scanner(file, "UTF-8");
 
 			if (scanner.hasNext()) {
 				list = new ArrayList<String>();
@@ -346,5 +346,9 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	
 	public LinkedList<FSTDirective> buildModelDirectivesForFile(Vector<String> lines) {
 		return null;
+	}
+
+	public boolean needColor() {
+		return false;
 	}
 }

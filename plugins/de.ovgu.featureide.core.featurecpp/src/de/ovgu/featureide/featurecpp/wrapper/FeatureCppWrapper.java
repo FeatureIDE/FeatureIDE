@@ -24,6 +24,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.util.AbstractList;
 import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
@@ -145,16 +147,16 @@ public class FeatureCppWrapper {
 		process(command);
 	}
 
-	private void process(LinkedList<String> command) {
+	private void process(AbstractList<String> command) {
 		ProcessBuilder processBuilder = new ProcessBuilder(command);
 		BufferedReader input = null;
 		BufferedReader error = null;
 		try {
 			Process process = processBuilder.start();
 			 input = new BufferedReader(new InputStreamReader(
-					process.getInputStream()));
+					process.getInputStream(), Charset.availableCharsets().get("UTF-8")));
 			 error = new BufferedReader(new InputStreamReader(
-					process.getErrorStream()));
+					process.getErrorStream(), Charset.availableCharsets().get("UTF-8")));
 			boolean x = true;
 			while (x) {
 				try {

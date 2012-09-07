@@ -115,13 +115,11 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 		}
 
 		public void partDeactivated(IWorkbenchPart part) {
-			if (part instanceof IEditorPart)
-				setEditorActions(part);
+
 		}
 
 		public void partClosed(IWorkbenchPart part) {
-			if (part instanceof IEditorPart)
-				setEditorActions(part);
+
 		}
 
 		public void partBroughtToTop(IWorkbenchPart part) {
@@ -130,7 +128,7 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 		}
 
 		public void partActivated(IWorkbenchPart part) {
-			if (part instanceof IEditorPart)
+			if (part instanceof IEditorPart || part instanceof ViewPart)
 				setEditorActions(part);
 		}
 

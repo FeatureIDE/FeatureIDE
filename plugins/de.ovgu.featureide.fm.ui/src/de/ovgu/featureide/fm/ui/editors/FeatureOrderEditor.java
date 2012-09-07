@@ -513,7 +513,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		Scanner scanner = null;
 		LinkedList<String> list = new LinkedList<String>();
 		try {
-			scanner = new Scanner(file);
+			scanner = new Scanner(file, "UTF-8");
 			while (scanner.hasNext()) {
 				list.add(featureModelEditor.featureModel.getNewName(scanner.next()));
 			}
@@ -644,9 +644,8 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	private String getPath(IProject project, String argument) {
 		try {
 			for (ICommand command : project.getDescription().getBuildSpec()) {
-				if (command.getBuilderName().equals(BUILDER_ID)) {
-					String path = (String) command.getArguments().get(argument);
-					return path;
+				if (BUILDER_ID.equals(command.getBuilderName())) {
+					return (String) command.getArguments().get(argument);
 				}
 			}
 		} catch (CoreException e) {

@@ -110,9 +110,8 @@ public class GEFImageWriter {
 	private static IFigure getRootFigure(GraphicalViewer viewer) {
 		ScalableFreeformRootEditPart rootEditPart = (ScalableFreeformRootEditPart) viewer
 				.getEditPartRegistry().get(LayerManager.ID);
-		IFigure rootFigure = ((LayerManager) rootEditPart)
+		return ((LayerManager) rootEditPart)
 				.getLayer(LayerConstants.PRINTABLE_LAYERS);
-		return rootFigure;
 	}
 
 	private static Rectangle calculateUsedRectangle(Image image) {

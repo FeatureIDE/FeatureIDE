@@ -99,7 +99,6 @@ public class ModelEditPart extends AbstractGraphicalEditPart implements GUIDefau
 		List<Object> list = new LinkedList<Object>();
 		addCollaboration(model.getCollaborations(), list);
 		addClass(model.getClasses(), list);
-		System.out.println("ModelEditPart/83" + list.toString());
 		return list;
 	}
 
@@ -113,9 +112,6 @@ public class ModelEditPart extends AbstractGraphicalEditPart implements GUIDefau
 			list.add(c);
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.gef.editparts.AbstractGraphicalEditPart#removeChildVisual(org.eclipse.gef.EditPart)
-	 */
 	@Override
 	protected void removeChildVisual(EditPart childEditPart) {
 		super.removeChildVisual(childEditPart);
@@ -326,7 +322,6 @@ public class ModelEditPart extends AbstractGraphicalEditPart implements GUIDefau
 				Rectangle rect = ((Label) o).getBounds();
 				int xValue = constraintClass.getLocation().x() + ((constraintClass.width() - rect.width()) / 2);
 				rect.setX(xValue);
-				System.out.println();
 			}
 		}		
 	}

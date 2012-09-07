@@ -500,18 +500,10 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		fhModelBuilder.buildModel(composer.getFstnodes(), false);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ovgu.featureide.core.builder.ComposerExtensionClass#buildConfiguration
-	 * (org.eclipse.core.resources.IFolder,
-	 * de.ovgu.featureide.fm.core.configuration.Configuration)
-	 */
 	@Override
 	public void buildConfiguration(IFolder folder, Configuration configuration, String congurationName) {
 		super.buildConfiguration(folder, configuration, folder.getName());
-		IFile configurationFile = folder.getFile(folder.getName() + "." + getConfigurationExtension());
+		IFile configurationFile = folder.getFile(folder.getName() + '.' + getConfigurationExtension());
 		FSTGenComposer composer = new FSTGenComposer(false);
 		composer.addParseErrorListener(createParseErrorListener());
 		composer.run(new String[]{
@@ -534,7 +526,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		fhModelBuilder.buildModel(composer.getFstnodes(), false);
 		if (!configurationFile.getName().startsWith(congurationName)) {
 			try {
-				configurationFile.move(((IFolder)configurationFile.getParent()).getFile(congurationName + getConfigurationExtension()).getFullPath(), true, null);
+				configurationFile.move(((IFolder)configurationFile.getParent()).getFile(congurationName + '.' + getConfigurationExtension()).getFullPath(), true, null);
 			} catch (CoreException e) {
 				FeatureHouseCorePlugin.getDefault().logError(e);
 			}

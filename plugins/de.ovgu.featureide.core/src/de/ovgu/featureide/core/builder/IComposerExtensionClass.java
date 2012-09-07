@@ -192,4 +192,9 @@ public interface IComposerExtensionClass {
 	 * @param lines of file / document
 	 */
 	LinkedList<FSTDirective> buildModelDirectivesForFile(Vector<String> lines);
+	
+	/**
+	 * @return <code>true</code> if a highlighting at the editor is available for the composition tool.
+	 */
+	boolean needColor();
 }

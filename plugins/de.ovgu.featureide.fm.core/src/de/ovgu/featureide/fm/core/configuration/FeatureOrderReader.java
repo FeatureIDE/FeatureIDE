@@ -56,7 +56,7 @@ public class FeatureOrderReader {
 	public LinkedList<String> featureOrderRead() {
 		LinkedList<String> list = new LinkedList<String>();
 		try {
-			Scanner scanner = new Scanner(file);
+			Scanner scanner = new Scanner(file, "UTF-8");
 			while (scanner.hasNext()) {
 				list.add(scanner.next());
 			}

@@ -35,6 +35,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
  * 
  * @author Fabian Benduhn
  */
+// TODO @Fabian redo/undo does not work
 public class LegendMoveOperation extends AbstractOperation {
 
 	private static final String LABEL = "Move Legend";
@@ -44,7 +45,9 @@ public class LegendMoveOperation extends AbstractOperation {
 	private boolean wasAutoLayout;
 	private LegendFigure figure;
 
-
+	/*
+	 * TODO @Fabian parameter figure is never used
+	 */
 	public LegendMoveOperation(FeatureModel featureModel,
 			org.eclipse.draw2d.geometry.Point p, Point newPos, LegendFigure figure) {
 		super(LABEL);

@@ -102,7 +102,7 @@ public class TAheadErrorPropagation {
 		Scanner scanner = null;
 		StringBuilder builder = new StringBuilder();
 		try {
-			scanner = new Scanner(file);
+			scanner = new Scanner(file, "UTF-8");
 			while (scanner.hasNext()) {
 				builder.append(scanner.nextLine());
 				builder.append("\r\n");

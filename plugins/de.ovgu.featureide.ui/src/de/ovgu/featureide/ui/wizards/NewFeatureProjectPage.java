@@ -51,7 +51,6 @@ public class NewFeatureProjectPage extends WizardPage {
 	private Text sourcePath, configsPath;
 	protected Text buildPath;
 	
-	private Composite container;
 	private Combo toolCB;
 	protected GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 	private GridLayout layout = new GridLayout();
@@ -65,7 +64,7 @@ public class NewFeatureProjectPage extends WizardPage {
 	}
 	
 	public void createControl(Composite parent) {
-		container = new Composite(parent, SWT.NULL);
+		Composite container = new Composite(parent, SWT.NULL);
 	    final GridLayout gridLayout = new GridLayout();
 	    gridLayout.numColumns = 1;
 	    container.setLayout(gridLayout);
@@ -208,9 +207,10 @@ public class NewFeatureProjectPage extends WizardPage {
 	}
 	
 	protected void dialogChanged() {
-		getCompositionTool().loadComposerExtension();
-		sourcePath.setEnabled(getCompositionTool().hasFeatureFolder());
-		buildPath.setEnabled(getCompositionTool().hasSourceFolder());
+		IComposerExtension compositionTool = getCompositionTool();
+		compositionTool.loadComposerExtension();
+		sourcePath.setEnabled(compositionTool.hasFeatureFolder());
+		buildPath.setEnabled(compositionTool.hasSourceFolder());
 		
 		if (isEnabled(sourcePath) && isEnabled(configsPath) &&
 				getSourcePath().equals(getConfigPath())) {

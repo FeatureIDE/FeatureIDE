@@ -306,7 +306,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		
 		Scanner scanner = null;
 		try {
-			scanner = new Scanner(res.getContents());
+			scanner = new Scanner(res.getContents(), "UTF-8");
 			
 			while (scanner.hasNext()) {
 				lines.add(scanner.nextLine());

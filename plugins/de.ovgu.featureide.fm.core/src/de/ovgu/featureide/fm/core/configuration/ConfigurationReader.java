@@ -85,7 +85,7 @@ public class ConfigurationReader {
 		Integer lineNumber = 1;
 		boolean successful = true;
 		try {
-			reader = new BufferedReader(new InputStreamReader(inputStream));
+			reader = new BufferedReader(new InputStreamReader(inputStream, Charset.availableCharsets().get("UTF-8")));
 			while ((line = reader.readLine()) != null)
 			{				
 				if (line.startsWith("#") || line.isEmpty() || line.equals(" "))

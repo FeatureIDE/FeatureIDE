@@ -33,7 +33,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 
 /**
- * 
+ * TODO @Fabian description
  * 
  * @author Fabian Benduhn
  */

@@ -39,8 +39,7 @@ public class CreateLayerAction extends SingleSelectionAction {
 	public static final String ID = "de.ovgu.featureide.createlayer";
 
 	private static ImageDescriptor createImage = PlatformUI.getWorkbench()
-			.getSharedImages()
-			.getImageDescriptor(ISharedImages.IMG_TOOL_NEW_WIZARD);
+			.getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD);
 
 	private final FeatureModel featureModel;
 

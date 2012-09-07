@@ -16,7 +16,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.ui.actions.generator;
+package de.ovgu.featureide.ui.editors.annotation;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
@@ -26,7 +26,6 @@ import org.eclipse.ui.IViewActionDelegate;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.texteditor.ITextEditor;
 
-import de.ovgu.featureide.ui.editors.annotation.ColorAnnotationModel;
 
 /**
  * Action in the editor's contextmenu to toggle 

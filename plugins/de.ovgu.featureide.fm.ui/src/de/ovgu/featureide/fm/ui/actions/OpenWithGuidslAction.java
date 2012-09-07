@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.Iterator;
 
 import org.eclipse.core.resources.IFile;
@@ -168,7 +169,7 @@ public class OpenWithGuidslAction implements IObjectActionDelegate {
         Process process = Runtime.getRuntime().exec(command, null, dir);
         String sys = System.getProperty("os.name");
         // #58 ,OS dependent Code for excuting commands,  Linux does not execute without a shell
-        if (sys.equals("Linux")){
+        if ("Linux".equals(sys)){
         	String[] cmd = new String[3];
         	 cmd[0] = "/bin/bash";
              cmd[1] = "-c";
@@ -178,8 +179,8 @@ public class OpenWithGuidslAction implements IObjectActionDelegate {
         BufferedReader input = null;
         BufferedReader error = null;
         try {
-	        input = new BufferedReader(new InputStreamReader(process.getInputStream()));
-	        error = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+	        input = new BufferedReader(new InputStreamReader(process.getInputStream(), Charset.availableCharsets().get("UTF-8")));
+	        error = new BufferedReader(new InputStreamReader(process.getErrorStream(), Charset.availableCharsets().get("UTF-8")));
 	        
 	        long start = System.currentTimeMillis();
 	        int diff = 250;

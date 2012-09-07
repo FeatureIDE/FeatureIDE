@@ -20,7 +20,7 @@ package de.ovgu.featureide.ui.views.collaboration.figures;
 
 import org.eclipse.draw2d.Figure;
 
-import de.ovgu.featureide.ui.color.ColorPalette;
+import de.ovgu.featureide.ui.editors.annotation.ColorPalette;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 import de.ovgu.featureide.ui.views.collaboration.model.Collaboration;
 

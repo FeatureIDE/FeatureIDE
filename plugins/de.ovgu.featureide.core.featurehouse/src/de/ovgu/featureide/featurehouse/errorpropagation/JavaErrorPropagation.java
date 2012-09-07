@@ -170,7 +170,7 @@ public class JavaErrorPropagation extends ErrorPropagation {
 		lineContent = correctString(lineContent);
 		try {
 			int line = 1;
-			scanner = new Scanner(file.getRawLocation().toFile());
+			scanner = new Scanner(file.getRawLocation().toFile(), "UTF-8");
 			while (scanner.hasNext()) {
 				String content = scanner.nextLine();
 				content = correctString(content);
@@ -249,7 +249,7 @@ public class JavaErrorPropagation extends ErrorPropagation {
 	private String getLineContent(IFile file, int line) {
 		Scanner scanner = null;
 		try {
-			scanner = new Scanner(file.getRawLocation().toFile());
+			scanner = new Scanner(file.getRawLocation().toFile(), "UTF-8");
 			if (scanner.hasNext()) {
 				while (scanner.hasNext()) {
 					if (line == 1) {

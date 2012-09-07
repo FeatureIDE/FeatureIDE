@@ -82,68 +82,68 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 		if (FeatureUIHelper.getLocation(constraint) != null)
 			setLocation(FeatureUIHelper.getLocation(constraint));
 		
-		setConstraintProperties(false);
+		setConstraintProperties(true);
 	}
 	
-	// TODO @Jens there is no calculation necessary anymore
-	public void setConstraintProperties(boolean calc){
+	/**
+	 * Sets the properties <i>color, border and tooltips</i> of the {@link ConstraintFigure}
+	 * @param init <code>true</code> if this method is called by the constructor else the
+	 * calculated properties will be set.
+	 */
+	public void setConstraintProperties(boolean init) {
 		setBorder(FMPropertyManager.getConstraintBorder(constraint.isFeatureSelected()));
 		setBackgroundColor(FMPropertyManager.getConstraintBackgroundColor());
 
-		if(!calc)return;
-		if (!constraint.getFeatureModel().valid())
-			setConstraintError();
-		else{
-			setConstraintWarning();
+		if(init) {
+			return;
 		}
 
-	}
-	
-	// TODO @Jens: remove this method and adopt results of analysis in constraint attributes instead
-	private void setConstraintError(){
-		if (constraint.getConstraintAttribute() == ConstraintAttribute.VOID_MODEL){
+		ConstraintAttribute constraintAttribute = constraint.getConstraintAttribute();
+		if (constraintAttribute == ConstraintAttribute.VOID_MODEL){
 			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 			setToolTip(VOID_LABEL);
-			
-		} else if (constraint.getConstraintAttribute() == ConstraintAttribute.UNSATISFIABLE) {
-			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
-			setToolTip(UNSATISFIABLE_LABEL);
+			return;
 		}
 		
-	}
-	
-	private void setConstraintWarning(){	
-		if (constraint.getConstraintAttribute() == ConstraintAttribute.TAUTOLOGY){
+		if (constraintAttribute == ConstraintAttribute.UNSATISFIABLE) {
+			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
+			setToolTip(UNSATISFIABLE_LABEL);
+			return;
+		}
+		
+		if (constraintAttribute == ConstraintAttribute.TAUTOLOGY){
 			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 			setToolTip(TAUTOLOGY_LABEL);	
 			return;
 		}
+		
 		StringBuilder toolTip = new StringBuilder(); 
-		if (constraint.getConstraintAttribute() == ConstraintAttribute.DEAD){
+		if (constraintAttribute == ConstraintAttribute.DEAD){
 			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
-			
 			toolTip.append(DEAD_FEATURE);
 			for (Feature dead : constraint.getDeadFeatures()) {
-				toolTip.append("\n " + dead.toString());
+				toolTip.append("\n   ");
+				toolTip.append(dead.toString());
 			}
-			setToolTip(new Label(toolTip.toString()));	
-//			return;
+			setToolTip(new Label(toolTip.toString()));
 		}
 		
 		if (!constraint.getFalseOptional().isEmpty()) {
-			if (constraint.getConstraintAttribute() != ConstraintAttribute.DEAD) {
+			if (constraintAttribute != ConstraintAttribute.DEAD) {
 				setBackgroundColor(FMPropertyManager.getWarningColor());
 			} else {
 				toolTip.append("\n\n");
 			}
 			toolTip.append(FALSE_OPTIONAL);
-			for (Feature feature : constraint.getFalseOptional())
-				toolTip.append("\n " + feature.getName());
+			for (Feature feature : constraint.getFalseOptional()) {
+				toolTip.append("\n   ");
+				toolTip.append(feature.getName());
+			}
 			setToolTip(new Label(toolTip.toString()));	
 			return;
 		}
 		
-		if (constraint.getConstraintAttribute() == ConstraintAttribute.REDUNDANT){
+		if (constraintAttribute == ConstraintAttribute.REDUNDANT) {
 			setBackgroundColor(FMPropertyManager.getWarningColor());
 			setToolTip(new Label(REDUNDANCE));	
 			return;

@@ -40,6 +40,8 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
 
+import Jakarta.util.ExitError;
+
 import de.ovgu.featureide.ahead.AheadCorePlugin;
 import de.ovgu.featureide.ahead.model.JakModelBuilder;
 import de.ovgu.featureide.core.IFeatureProject;
@@ -387,7 +389,12 @@ public class ComposerWrapper {
 		}
 		
 		//run Mixin
-		Mixin.main(args);
+		try {
+			Mixin.main(args);
+		} catch (ExitError e) {
+			AheadCorePlugin.getDefault().logError(e);
+		}	
+		
 	}
 
 	private IFile[] removeUnselectedFeatures(IFile[] files) {

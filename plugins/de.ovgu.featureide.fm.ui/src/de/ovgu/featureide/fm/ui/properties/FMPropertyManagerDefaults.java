@@ -25,7 +25,7 @@ import org.eclipse.core.runtime.QualifiedName;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 
 /**
- * TODO description
+ * Provides all {@link QualifiedName}s for the {@link FMPropertyManager}.
  * 
  * @author Jens Meinicke
  */

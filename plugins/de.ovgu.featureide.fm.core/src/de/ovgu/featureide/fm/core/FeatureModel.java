@@ -30,6 +30,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -88,7 +90,7 @@ public class FeatureModel implements PropertyConstants {
 //	private boolean hasVerticalLayout = true;
 //	private FMPoint legendPos = new FMPoint(0, 0);
 	/**
-	 * a hashtable containing all features
+	 * a {@link Hashtable} containing all features
 	 */
 	private Hashtable<String, Feature> featureTable = new Hashtable<String, Feature>();
 
@@ -131,6 +133,8 @@ public class FeatureModel implements PropertyConstants {
 
 	private IFMComposerExtension fmComposerExtension = new FMComposerExtension();
 	private String COMPOSER_ID;
+	
+	private Object undoContext;
 
 	/**
 	 * TODO @Jens description / rename
@@ -353,7 +357,7 @@ public class FeatureModel implements PropertyConstants {
 		IProject project = ((IResource) file.getAdapter(IFile.class))
 				.getProject();
 		String sourceName = getProjectConfigurationPath(project);
-		if (sourceName != null && !sourceName.equals("")) {
+		if (!"".equals(sourceName)) {
 			sourceFolder = project.getFolder(sourceName);
 		}
 		for (Renaming renaming : renamings) {
@@ -512,44 +516,45 @@ public class FeatureModel implements PropertyConstants {
 		return new ArrayList<Feature>(featureTable.values());
 	}
 
-	/*
-	 * public Collection<Feature> getLayers() { LinkedList<Feature> layers = new
-	 * LinkedList<Feature>(); for (Feature feature : featureTable.values()) if
-	 * (feature.isConcrete()) layers.add(feature); return
-	 * Collections.unmodifiableCollection(layers); }
+	/**
+	 * 
+	 * @return A list of all concrete features. This list is in preorder of the tree. 
 	 */
-	private LinkedList<Feature> layers = new LinkedList<Feature>();
-	private Object undoContext;
-
+	@Nonnull
 	public Collection<Feature> getConcreteFeatures() {
-		layers.clear();
+		LinkedList<Feature> concreteFeatures = new LinkedList<Feature>();
 		if (root != null) {
-			initFeatures(root);
+			initFeatures(root, concreteFeatures);
 		}
-		return Collections.unmodifiableCollection(layers);
+		return Collections.unmodifiableCollection(concreteFeatures);
 	}
 
-	private void initFeatures(Feature feature) {
-		if (feature.isConcrete())
-			layers.add(feature);
-		for (Feature child : feature.getChildren())
-			initFeatures(child);
+	private void initFeatures(Feature feature, LinkedList<Feature> concreteFeatures) {
+		if (feature.isConcrete()) {
+			concreteFeatures.add(feature);
+		}
+		for (Feature child : feature.getChildren()) {
+			initFeatures(child, concreteFeatures);
+		}
 	}
 
+	/**
+	 * 
+	 * @return A list of all concrete feature names. This list is in preorder of the tree. 
+	 */
+	@Nonnull
 	public LinkedList<String> getConcreteFeatureNames() {
-		LinkedList<String> layerNames = new LinkedList<String>();
-		if (root == null)
-			return null;
-		for (Feature layer : getConcreteFeatures()) {
-			layerNames.add(layer.getName());
+		LinkedList<String> concreteFeatureNames = new LinkedList<String>();
+		for (Feature f : getConcreteFeatures()) {
+			concreteFeatureNames.add(f.getName());
 		}
-		return layerNames;
+		return concreteFeatureNames;
 	}
 
 	public void createDefaultValues(String projectName) {
 		String rootName = getValidJavaIdentifier(projectName);
 		Feature root;
-		if (!rootName.equals("")) {
+		if (!"".equals(rootName)) {
 			root = getFeature(rootName);
 		} else {
 			root = getFeature("Root");
@@ -906,9 +911,8 @@ public class FeatureModel implements PropertyConstants {
 	private String getPath(IProject project, String argument) {
 		try {
 			for (ICommand command : project.getDescription().getBuildSpec()) {
-				if (command.getBuilderName().equals(BUILDER_ID)) {
-					String path = (String) command.getArguments().get(argument);
-					return path;
+				if (BUILDER_ID.equals(command.getBuilderName())) {
+					return (String) command.getArguments().get(argument);
 				}
 			}
 		} catch (CoreException e) {
@@ -942,7 +946,7 @@ public class FeatureModel implements PropertyConstants {
 			
 			
 			for (ICommand command : project.getDescription().getBuildSpec()) {
-				if (command.getBuilderName().equals(BUILDER_ID)) {
+				if (BUILDER_ID.equals(command.getBuilderName())) {
 					id = (String) command.getArguments().get(COMPOSER_KEY);
 					if (id != null) {
 						COMPOSER_ID = id;
@@ -1055,15 +1059,15 @@ public class FeatureModel implements PropertyConstants {
 	 */
 	public boolean hasMandatoryFeatures() {
 		for (Feature f : this.featureTable.values()) {
-			if ((f.getParent() != null) && f.getParent().isAnd()
-					&& f.isMandatory())
+			Feature parent = f.getParent();
+			if (parent != null && parent.isAnd() && f.isMandatory())
 				return true;
 		}
 		return false;
 	}
 
 	/**
-	 * @return true if feature model contains optional features otherwise false
+	 * @return <code>true</code> if feature model contains optional features otherwise false
 	 */
 	public boolean hasOptionalFeatures() {
 		for (Feature f : this.featureTable.values()) {
@@ -1290,7 +1294,7 @@ public class FeatureModel implements PropertyConstants {
     private FeatureModelAnalyser analyser = new FeatureModelAnalyser(this);
 
     public FeatureModelAnalyser getAnalyser() {
-	return analyser;
+    	return analyser;
     }
 
     private FeatureModelLayout layout = new FeatureModelLayout();
@@ -1305,7 +1309,7 @@ public class FeatureModel implements PropertyConstants {
 	}
 
     public FeatureModelLayout getLayout() {
-	return layout;
+    	return layout;
     }
 
 	/**

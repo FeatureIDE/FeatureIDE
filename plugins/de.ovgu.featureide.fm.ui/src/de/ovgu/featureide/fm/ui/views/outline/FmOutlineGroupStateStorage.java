@@ -52,8 +52,7 @@ public class FmOutlineGroupStateStorage {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((feature == null) ? 0 : feature.hashCode());
-		result = prime * result + (isOrGroup ? 1231 : 1237);
-		return result;
+		return prime * result + (isOrGroup ? 1231 : 1237);
 	}
 
 	/*

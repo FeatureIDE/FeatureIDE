@@ -401,7 +401,7 @@ public class ErrorPropagation {
 	private String getFileContent(IFile file) {
 		Scanner scanner = null;
 		try {
-			scanner = new Scanner(file.getRawLocation().toFile());
+			scanner = new Scanner(file.getRawLocation().toFile(), "UTF-8");
 			StringBuffer buffer = new StringBuffer();
 			if (scanner.hasNext()) {
 				while (scanner.hasNext()) {

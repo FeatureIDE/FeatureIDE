@@ -158,6 +158,8 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 		}
 
 		public void partActivated(IWorkbenchPart part) {
+			if (part instanceof IEditorPart)
+				setFeatureModelEditor(part);
 		}
 
 	};

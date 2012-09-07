@@ -798,12 +798,10 @@ public class ConstraintDialog implements GUIDefaults {
 	 * */
 	private String getDeadFeatureString(List<Feature> deadFeatures) {
 		StringBuilder featureString = new StringBuilder();
-		featureString
-				.append("Constraint causes the following features to be dead: ");
+		featureString.append("Constraint causes the following features to be dead: ");
 		int count = 0;
 		int featureCount = 0;
 		boolean isNewLine = false;
-		System.out.println("deadFeatures "+deadFeatures);
 		for (Feature l : deadFeatures) {
 			count = count + l.toString().length() + 2;
 
@@ -898,11 +896,6 @@ public class ConstraintDialog implements GUIDefaults {
 		if (!isSatisfiable(input, 1000)) 
 		{
 			printHeaderWarning("constraint is unsatisfiable");			
-		}
-		
-		for ( Constraint c : featureModel.getConstraints())
-		{
-			FMUIPlugin.getDefault().logInfo(c.toString());
 		}
 		
 		int index = 0;

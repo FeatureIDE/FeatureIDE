@@ -36,7 +36,7 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
 /**
  * Calculates dependencies of features
  * 
- * @author Sönke Holthusen
+ * @author Soenke Holthusen
  * 
  */
 public class FeatureDependencies {
@@ -104,9 +104,8 @@ public class FeatureDependencies {
      * @return Node representing the featureModel
      */
     private  Node createRootNode(FeatureModel fm) {
-	Node rootNode = NodeCreator.createNodes(fm, true);
-	rootNode = rootNode.toCNF();
-	return rootNode;
+    	Node rootNode = NodeCreator.createNodes(fm, true);
+		return rootNode.toCNF();
     }
 
     /**
