@@ -32,9 +32,14 @@ public class ColorList {
 	private ArrayList<Integer> colors = new ArrayList<Integer>();
 	
 	public ColorList(Feature feature) {
-		colorschemeTable = feature.getFeatureModel().getColorschemeTable();
-		for (int i = 0; i < colorschemeTable.size() + 1; i++) {
-			colors.add(INVALID_COLOR);
+		FeatureModel fm = feature.getFeatureModel();
+		if (fm != null) {
+			colorschemeTable = feature.getFeatureModel().getColorschemeTable();
+			for (int i = 0; i < colorschemeTable.size() + 1; i++) {
+				colors.add(INVALID_COLOR);
+			}
+		} else {
+			colorschemeTable = null;
 		}
 	}
 	
@@ -43,32 +48,50 @@ public class ColorList {
 	}
 
 	public boolean hasColor() {
+		if (colorschemeTable == null) {
+			return false;
+		}
 		return colors.get(colorschemeTable.getSelectedColorscheme()) > INVALID_COLOR;
 	}
 	
 	public int getColor() {
+		if (colorschemeTable == null) {
+			return INVALID_COLOR;
+		}
 		return colors.get(colorschemeTable.getSelectedColorscheme());
 	}
 	
 	public void setColor(int color) {
-		colors.set(colorschemeTable.getSelectedColorscheme(), color);
+		if (colorschemeTable != null) {
+			colors.set(colorschemeTable.getSelectedColorscheme(), color);
+		}
 	}
 	
 	public void removeColor() {
-		colors.set(colorschemeTable.getSelectedColorscheme(), INVALID_COLOR);
+		if (colorschemeTable != null) {
+			colors.set(colorschemeTable.getSelectedColorscheme(), INVALID_COLOR);
+		}
 	}
 	
 	
 	public boolean hasColor(int scheme) {
+		if (scheme >= colors.size()) {
+			return false;
+		}
 		return colors.get(scheme) > INVALID_COLOR;
 	}
 	
 	public int getColor(int scheme) {
+		if (scheme >= colors.size()) {
+			return INVALID_COLOR;
+		}
 		return colors.get(scheme);
 	}
 	
 	public void setColor(int scheme, int color) {
-		colors.set(scheme, color);
+		if (scheme < colors.size()) {
+			colors.set(scheme, color);
+		}
 	}
 	
 	public void addColorscheme() {
@@ -76,7 +99,9 @@ public class ColorList {
 	}
 	
 	public void removeColorscheme() {
-		colors.remove(colorschemeTable.getSelectedColorscheme());
+		if (colorschemeTable != null) {
+			colors.remove(colorschemeTable.getSelectedColorscheme());
+		}
 	}
 
 	public ColorList clone(Feature feature) {
