@@ -120,7 +120,7 @@ public class Constraint implements PropertyConstants {
 		return attribute;
 	}
 	
-	public void setFeatureSelected (boolean selected){
+	public void setFeatureSelected(boolean selected){
 		this.featureSelected = selected;
 		fire(new PropertyChangeEvent(this, CONSTRAINT_SELECTED, Boolean.FALSE, Boolean.TRUE));
 	}
@@ -133,7 +133,15 @@ public class Constraint implements PropertyConstants {
 		return propNode;
 	}	
 	
-	public void setContainedFeatures(Node actNode){
+	/**
+	 * Sets the <code>containedFeatureList</code> given by <code>propNode</code>.
+	 */
+	public void setContainedFeatures() {
+		containedFeatureList.clear();
+		setContainedFeatures(propNode);
+	}
+	
+	private void setContainedFeatures(Node actNode){
 		if (actNode instanceof Literal) {
 			containedFeatureList.add(featureModel.getFeature(((Literal) actNode).var.toString()));
 		} else {
@@ -143,6 +151,10 @@ public class Constraint implements PropertyConstants {
 		}
 	}
 
+	/**
+	 * 
+	 * @return All {@link Feature}s contained at this {@link Constraint}.
+	 */
 	public List<Feature> getContainedFeatures(){
 		return containedFeatureList;
 	}

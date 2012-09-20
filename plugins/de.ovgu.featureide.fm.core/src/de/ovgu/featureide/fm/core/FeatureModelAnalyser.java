@@ -311,7 +311,10 @@ public class FeatureModelAnalyser {
 		for (Literal e : new SatSolver(root, 1000).knownValues()) {
 			String var = e.var.toString();
 			if (!e.positive && !"False".equals(var) && !"True".equals(var)) {
-				set.add(fm.getFeature(var));
+				Feature feature = fm.getFeature(var);
+				if (feature != null) {
+					set.add(feature);
+				}
 			}
 		}
 		return set;
@@ -368,7 +371,8 @@ public class FeatureModelAnalyser {
 				setSubTask(constraint.toString());
 				worked(1);
 				oldAttributes.put(constraint, constraint.getConstraintAttribute());
-				constraint.setContainedFeatures(constraint.getNode());
+				constraint.setContainedFeatures();
+				
 				// if the constraint leads to false optionals it is added to
 				// changedAttributes in order to refresh graphics later
 				if (!hasFalsOptionalFeatures) {
@@ -515,19 +519,22 @@ public class FeatureModelAnalyser {
 		}
 
 		try {
-			LinkedList<Feature> deadFeatures = fm.getCalculatedDeadFeatures();
+			/**
+			 * here the saved dead features at the feature model are calculated and set
+			 */
+			LinkedList<Feature> fmDeadFeatures = fm.getCalculatedDeadFeatures();
+			fmDeadFeatures.clear();
+			
 			for (Feature deadFeature : getDeadFeatures()) {
-				if (cancel) {
-					return;
+				if (oldAttributes.get(deadFeature) != FeatureStatus.DEAD) {
+					changedAttributes.put(deadFeature, FeatureStatus.DEAD);
 				}
-				if (deadFeature != null) {
-					if (oldAttributes.get(deadFeature) != FeatureStatus.DEAD) {
-						changedAttributes.put(deadFeature, FeatureStatus.DEAD);
-					}
-					deadFeatures.add(deadFeature);
-					deadFeature.setFeatureStatus(FeatureStatus.DEAD, false);
-
-				}
+				fmDeadFeatures.add(deadFeature);
+				deadFeature.setFeatureStatus(FeatureStatus.DEAD, false);
+			}
+			
+			if (cancel) {
+				return;
 			}
 			
 		} catch (Exception e) {
@@ -541,8 +548,8 @@ public class FeatureModelAnalyser {
 		} catch (Exception e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
-		try
-		{				
+		// TODO @Jens revise
+		try	{				
 			/**
 			 * First every relevant constraint of every hidden feature is checked if its form equals 
 			 * "hidden feature" <=> A
@@ -550,20 +557,15 @@ public class FeatureModelAnalyser {
 			 * If there is a constraint of that kind for a hidden feature it is added to a list. 
 			 */
 			FeatureDependencies fd = new FeatureDependencies(fm);
-
 			LinkedList<Feature> l = new LinkedList<Feature>(); 
-			for (Feature f: fm.getFeatures())
-			{
-				if (f.hasHiddenParent() || f.isHidden())
-				{	
-					for (Constraint c : f.getRelevantConstraints())
-					{
-						if (c.getNode() instanceof Equals)
-						{
+			for (Feature f: fm.getFeatures()) {
+				if (f.hasHiddenParent() || f.isHidden()) {	
+					for (Constraint c : f.getRelevantConstraints()) {
+						if (c.getNode() instanceof Equals) {
 							Constraint  lConst = new Constraint(fm, c.getNode().getChildren()[0]), 
 										rConst = new Constraint(fm, c.getNode().getChildren()[1]);
-							lConst.setContainedFeatures(lConst.getNode());
-							rConst.setContainedFeatures(rConst.getNode());
+							lConst.setContainedFeatures();
+							rConst.setContainedFeatures();
 							
 							if (((Equals)c.getNode()).getChildren()[0] instanceof Literal &&
 								((Literal) ((Equals)c.getNode()).getChildren()[0]).var.equals(f.getName()) &&  
@@ -571,12 +573,11 @@ public class FeatureModelAnalyser {
 								 ||
 								((Equals)c.getNode()).getChildren()[1] instanceof Literal && 
 								((Literal) ((Equals)c.getNode()).getChildren()[1]).var.equals(f.getName()) &&
-								!lConst.hasHiddenFeatures()) 
-							{
+								!lConst.hasHiddenFeatures()) {
 									l.add(f);
 									break;
 							}
-						}				
+						}
 					}
 				}
 			}
@@ -590,27 +591,21 @@ public class FeatureModelAnalyser {
 			 *  - if a Node of its atomic set is determined by a constraint of the above form.
 			 */
 			
-			for (Feature f: fm.getFeatures())
-			{
-				if ((f.hasHiddenParent() || f.isHidden()) && !l.contains(f))
-				{	
+			for (Feature f: fm.getFeatures()) {
+				if ((f.hasHiddenParent() || f.isHidden()) && !l.contains(f)) {	
 					
 					Set<Feature> s = fd.always(f);
 					boolean noHidden = false;
-					for (Feature f2 : s)						
-					{
-						if (fd.always(f2).contains(f))
-						{
-							if (!f2.isHidden() && !f2.hasHiddenParent() || l.contains(f2))
-							{
+					for (Feature f2 : s) {
+						if (fd.always(f2).contains(f)) {
+							if (!f2.isHidden() && !f2.hasHiddenParent() || l.contains(f2)) {
 								noHidden = true; 
 								break;
 							}
 						}
 					}	
 
-					if (!noHidden)
-					{
+					if (!noHidden) {
 						changedAttributes.put(f, FeatureStatus.INDETERMINATE_HIDDEN);					
 						f.setFeatureStatus(FeatureStatus.INDETERMINATE_HIDDEN, false);
 					}

@@ -30,6 +30,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 import org.eclipse.core.resources.ICommand;
@@ -309,6 +310,7 @@ public class FeatureModel implements PropertyConstants {
 		return true;
 	}
 
+	@CheckForNull
 	public Feature getFeature(String name) {
 		if (featureTable.isEmpty()) {
 			// create the root feature (it is the only one without a reference)

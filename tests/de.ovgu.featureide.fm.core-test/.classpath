@@ -4,5 +4,8 @@
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="/de.ovgu.featureide.fm.core/lib/annotations.jar"/>
+	<classpathentry kind="lib" path="lib/org.jbenchx_0.3.0.201110301613.jar"/>
+	<classpathentry kind="lib" path="lib/org.jbenchx.ui.eclipse_0.3.0.201110301613.jar"/>
+	<classpathentry kind="lib" path="lib/xstream-1.4.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

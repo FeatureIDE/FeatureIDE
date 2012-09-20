@@ -376,7 +376,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 
 	public static Border getAbsteactFeatureBorder(boolean selected) {
 		if (selected) {
-			new LineBorder(getAbstractBorderColor(), 3);
+			return new LineBorder(getAbstractBorderColor(), 3);
 		}
 		return new LineBorder(getAbstractBorderColor(), 1);
 	}
