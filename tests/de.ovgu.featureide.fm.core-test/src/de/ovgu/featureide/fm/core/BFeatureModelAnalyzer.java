@@ -61,11 +61,21 @@ public class BFeatureModelAnalyzer {
 	
 	private FeatureModel fm200_100 = init("200-100.xml");
 	
+	/**
+	 * A copy if 200-100.xml with some random hidden features.
+	 */
+	private FeatureModel fm200_100_hidden = init("200-100-hidden.xml");
+	
 	private FeatureModel fm100_100 = init("100-100.xml");
 	
 	private FeatureModel fm50_100 = init("50-100.xml");
 	
 	private FeatureModel fm20_100 = init("20-100.xml");
+
+	/**
+	 * A copy if 20-100.xml with some random hidden features.
+	 */
+	private FeatureModel fm20_100_hidden = init("20-100-hidden.xml");
 	
 	private FeatureModel fm10_100 = init("10-100.xml");
 	
@@ -91,8 +101,8 @@ public class BFeatureModelAnalyzer {
 	/**
 	 * Calculates the full duration of analyzing the feature model.
 	 */
-	@Bench //(maxRunCount = 1) // For 500 and higher it is not practicable to calculate a more precise value
-	public void BAnalyzeFeatureModel(@ForEachInt({1, 2, 10, 20, 50, 100, 200, /*500, 1000*/}) int i) {
+	@Bench (maxRunCount = 1)
+	public void BAnalyzeFeatureModel(@ForEachInt({1, 2, 10, 20, 21, 50, 100, 200, 201, 500}) int i) {
 		getFM(i).getAnalyser().analyzeFeatureModel(null);
 	}
 	
@@ -100,7 +110,7 @@ public class BFeatureModelAnalyzer {
 	 * Calculates the duration of analyzing constraints
 	 */
 	@Bench (maxRunCount = 1)
-	public void BUpdateConstraints(@ForEachInt({1, 2, 10, 20, 50, 100, 200, 500}) int i) {
+	public void BUpdateConstraints(@ForEachInt({1, 10, 20, 21, 50, 100, 200, 201, 500}) int i) {
 		getFM(i).getAnalyser().updateConstraints(new HashMap<Object, Object>(), new HashMap<Object, Object>());
 	}
 	
@@ -108,12 +118,12 @@ public class BFeatureModelAnalyzer {
 	 * Calculates the duration of analyzing features
 	 */
 	@Bench (maxRunCount = 1)
-	public void BUpdateFeatures(@ForEachInt({1, 2, 10, 20, 50, 100, 200, 500}) int i) {
+	public void BUpdateFeatures(@ForEachInt({1, 10, 20, 21, 50, 100, 200, 201, 500}) int i) {
 		getFM(i).getAnalyser().updateFeatures(new HashMap<Object, Object>(), new HashMap<Object, Object>());
 	}
 	
-	@Bench
-	public void clone(@ForEachInt({1,2,10,20,50,100,200, 500, 1000}) int i) {
+//	@Bench
+	public void clone(@ForEachInt({1, 2, 10, 20, 50, 100, 200, 500, 1000}) int i) {
 		getFM(i).clone();
 	}
 
@@ -131,12 +141,16 @@ public class BFeatureModelAnalyzer {
 			return fm10_100;
 		case 20 :
 			return fm20_100;
+		case 21 :
+			return fm20_100_hidden;
 		case 50 :
 			return fm50_100;
 		case 100 :
 			return fm100_100;
 		case 200 :
 			return fm200_100;
+		case 201 :
+			return fm200_100_hidden;
 		case 500 :
 			return fm500_100;
 		case 1000 :

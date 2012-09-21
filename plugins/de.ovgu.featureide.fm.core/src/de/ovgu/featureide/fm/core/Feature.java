@@ -150,11 +150,11 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 		fireChildrenChanged();
 	}
 	
-	public List<Constraint> getRelevantConstraints(){
+	public List<Constraint> getRelevantConstraints() {
 		return partOfConstraints;
 	}
 	
-	public void setRelevantConstraints(){	
+	public void setRelevantConstraints() {	
 		List<Constraint> constraintList = new ArrayList<Constraint>();		
 		
 		for (Constraint constraint : featureModel.getConstraints()) {
@@ -164,15 +164,15 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 		this.partOfConstraints = constraintList;
 	}
 	
-	public FeatureStatus getFeatureStatus(){		
+	public FeatureStatus getFeatureStatus() {		
 		return status;
 	}
 	
-	public FeatureModel getFeatureModel(){
+	public FeatureModel getFeatureModel() {
 		return featureModel;
 	}
 	
-	public void setFeatureStatus(FeatureStatus stat, boolean fire){
+	public void setFeatureStatus(FeatureStatus stat, boolean fire) {
 		this.status = stat;
 		if(fire)fire(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
 	}

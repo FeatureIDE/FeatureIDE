@@ -84,8 +84,10 @@ public class Constraint implements PropertyConstants {
 
 		List<Feature> deadFeaturesAfter = new LinkedList<Feature>();
 		for (Feature l : fmDeadFeatures) {
-			if (!contains(fm.getFeature(l.getName()), deadFeaturesBefore) &&
-					!contains(fm.getFeature(l.getName()), deadFeaturesAfter)) {
+			Feature feature = fm.getFeature(l.getName());
+			// XXX why can the given feature not be found?
+			if (feature != null && !contains(feature, deadFeaturesBefore) &&
+					!contains(feature, deadFeaturesAfter)) {
 				deadFeaturesAfter.add(l);
 			}
 		}
@@ -104,7 +106,7 @@ public class Constraint implements PropertyConstants {
 	// Maybe .equals should be implemented, so this could be replaced with standard .contains(Object)
 	private boolean contains(Feature feature, List<Feature> fetureList) {
 		for (Feature f : fetureList) {
-			if (f.getName().equals(feature.getName())) {
+			if (f != null && f.getName().equals(feature.getName())) {
 				return true;
 			}
 		}
@@ -216,13 +218,11 @@ public class Constraint implements PropertyConstants {
 	 * @return true if constraint has hidden features
 	 */
 	
-	public boolean hasHiddenFeatures()
-	{
-		for (Feature f: this.getContainedFeatures())
-		{
-			if (f.isHidden() || f.hasHiddenParent())
+	public boolean hasHiddenFeatures() {
+		for (Feature f: getContainedFeatures())	{
+			if (f.isHidden() || f.hasHiddenParent()) {
 					return true;
-					
+			}		
 		}
 		return false;
 	}

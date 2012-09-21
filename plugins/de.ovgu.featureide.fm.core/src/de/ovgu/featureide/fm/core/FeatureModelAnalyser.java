@@ -330,11 +330,11 @@ public class FeatureModelAnalyser {
 	 */
 	public HashMap<Object, Object> analyzeFeatureModel(IProgressMonitor monitor) {
 		this.monitor = monitor;
-		beginTask("Analyze", fm.getConstraintCount());
+		beginTask(fm.getConstraintCount());
 		HashMap<Object, Object> oldAttributes = new HashMap<Object, Object>();
 		HashMap<Object, Object> changedAttributes = new HashMap<Object, Object>();
 		updateFeatures(oldAttributes, changedAttributes);
-		if (!cancel) {
+		if (!canceled()) {
 			updateConstraints(oldAttributes, changedAttributes);
 		}
 		// put root always in so it will be refreshed (void/non-void)
@@ -347,9 +347,9 @@ public class FeatureModelAnalyser {
 	 * @param name
 	 * @param totalWork
 	 */
-	private void beginTask(String name, int totalWork) {
+	private void beginTask(int totalWork) {
 		if (monitor != null) {
-			monitor.beginTask(name, totalWork);
+			monitor.beginTask("Analyze", totalWork);
 		}
 	}
 
@@ -365,7 +365,7 @@ public class FeatureModelAnalyser {
 		boolean hasFalsOptionalFeatures = !fm.getFalseOptionalFeatures().isEmpty();
 		try {
 			for (Constraint constraint : new ArrayList<Constraint>(fm.getConstraints())) {
-				if (cancel) {
+				if (canceled()) {
 					return;
 				}
 				setSubTask(constraint.toString());
@@ -461,6 +461,13 @@ public class FeatureModelAnalyser {
 	}
 
 	/**
+	 * @return
+	 */
+	private boolean canceled() {
+		return cancel || monitor != null ? monitor.isCanceled() : false;
+	}
+
+	/**
 	 * 
 	 */
 	private void worked(int workDone) {
@@ -500,8 +507,7 @@ public class FeatureModelAnalyser {
 	 */
 	public void updateFeatures(HashMap<Object, Object> oldAttributes,
 			HashMap<Object, Object> changedAttributes) {
-		for (Feature bone : fm.getFeatures()) 
-		{
+		for (Feature bone : fm.getFeatures()) {
 			oldAttributes.put(bone, bone.getFeatureStatus());
 			
 			if (bone.getFeatureStatus() != FeatureStatus.NORMAL)
@@ -533,7 +539,7 @@ public class FeatureModelAnalyser {
 				deadFeature.setFeatureStatus(FeatureStatus.DEAD, false);
 			}
 			
-			if (cancel) {
+			if (canceled()) {
 				return;
 			}
 			
@@ -548,75 +554,103 @@ public class FeatureModelAnalyser {
 		} catch (Exception e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
-		// TODO @Jens revise
-		try	{				
-			/**
-			 * First every relevant constraint of every hidden feature is checked if its form equals 
-			 * "hidden feature" <=> A
-			 * where A is an expression containing only non hidden features
-			 * If there is a constraint of that kind for a hidden feature it is added to a list. 
-			 */
-			FeatureDependencies fd = new FeatureDependencies(fm);
-			LinkedList<Feature> l = new LinkedList<Feature>(); 
-			for (Feature f: fm.getFeatures()) {
-				if (f.hasHiddenParent() || f.isHidden()) {	
-					for (Constraint c : f.getRelevantConstraints()) {
-						if (c.getNode() instanceof Equals) {
-							Constraint  lConst = new Constraint(fm, c.getNode().getChildren()[0]), 
-										rConst = new Constraint(fm, c.getNode().getChildren()[1]);
-							lConst.setContainedFeatures();
-							rConst.setContainedFeatures();
-							
-							if (((Equals)c.getNode()).getChildren()[0] instanceof Literal &&
-								((Literal) ((Equals)c.getNode()).getChildren()[0]).var.equals(f.getName()) &&  
-								!rConst.hasHiddenFeatures()
-								 ||
-								((Equals)c.getNode()).getChildren()[1] instanceof Literal && 
-								((Literal) ((Equals)c.getNode()).getChildren()[1]).var.equals(f.getName()) &&
-								!lConst.hasHiddenFeatures()) {
-									l.add(f);
-									break;
-							}
-						}
-					}
-				}
-			}
-			
-			
-			/**
-			 * Additionally each Node is checked if the atomic set containing it, consists of indeterminate hidden nodes only.
-			 * If this is the case it's also indeterminate.
-			 * A node is therefore not marked indeterminate if it either
-			 *  - has a non-hidden Node in its atomic set defining its state or
-			 *  - if a Node of its atomic set is determined by a constraint of the above form.
-			 */
-			
-			for (Feature f: fm.getFeatures()) {
-				if ((f.hasHiddenParent() || f.isHidden()) && !l.contains(f)) {	
-					
-					Set<Feature> s = fd.always(f);
-					boolean noHidden = false;
-					for (Feature f2 : s) {
-						if (fd.always(f2).contains(f)) {
-							if (!f2.isHidden() && !f2.hasHiddenParent() || l.contains(f2)) {
-								noHidden = true; 
-								break;
-							}
-						}
-					}	
+		calculateHidden(changedAttributes);
+	}
 
-					if (!noHidden) {
-						changedAttributes.put(f, FeatureStatus.INDETERMINATE_HIDDEN);					
-						f.setFeatureStatus(FeatureStatus.INDETERMINATE_HIDDEN, false);
+	/**
+	 * Calculations for indeterminat hidden features
+	 * @param changedAttributes
+	 */
+	private void calculateHidden(HashMap<Object, Object> changedAttributes) {
+		if (!fm.hasHidden()) {
+			return;
+		}			
+		setSubTask("calculate indetrminate hidden features");
+		/**
+		 * First every relevant constraint of every hidden feature is checked if its form equals 
+		 * "hidden feature" <=> A
+		 * where A is an expression containing only non hidden features
+		 * If there is a constraint of that kind for a hidden feature it is added to a list. 
+		 */
+		LinkedList<Feature> list = new LinkedList<Feature>();
+		LinkedList<Feature> hiddenFeatures = getHiddenFeatures();
+		for (Feature f: hiddenFeatures) {	
+			for (Constraint c : f.getRelevantConstraints()) {
+				final Node node = c.getNode();
+				if (node instanceof Equals) {
+					final Node[] children = node.getChildren();
+					final Node leftChild = children[0];
+					final Node rightChild = children[1];
+					if (leftChild instanceof Literal && ((Literal) leftChild).var.equals(f.getName())) {
+						Constraint	rightConstraint = new Constraint(fm, rightChild);
+						rightConstraint.setContainedFeatures();
+						if (!rightConstraint.hasHiddenFeatures()) {
+							list.add(f);
+							break;
+						}
+					}
+					if (rightChild instanceof Literal &&  ((Literal) rightChild).var.equals(f.getName())) {
+						Constraint  leftConstraint = new Constraint(fm, leftChild);
+						leftConstraint.setContainedFeatures();
+						if (!leftConstraint.hasHiddenFeatures()) {
+							list.add(f);
+							break;
+						}
 					}
 				}
 			}
-			
-		} catch (Exception e) {
-			FMCorePlugin.getDefault().logError(e);
+		}
+		
+		/**
+		 * Additionally each Node is checked if the atomic set containing it, consists of indeterminate hidden nodes only.
+		 * If this is the case it's also indeterminate.
+		 * A node is therefore not marked indeterminate if it either
+		 *  - has a non-hidden Node in its atomic set defining its state or
+		 *  - if a Node of its atomic set is determined by a constraint of the above form.
+		 */
+		FeatureDependencies featureDependencies = new FeatureDependencies(fm, false);
+		beginTask(fm.getConstraintCount() + hiddenFeatures.size());
+		for (Feature feature: hiddenFeatures) {
+			if (canceled()) {
+				return;
+			}
+			setSubTask("calculate indetrminate hidden features for " + feature.getName());
+			if (!list.contains(feature)) {
+				Set<Feature> set = featureDependencies.getImpliedFeatures(feature);
+				boolean noHidden = false;
+				for (Feature f : set) {
+					if (!f.isHidden() && !f.hasHiddenParent() || list.contains(f)) {
+						if (featureDependencies.isAlways(f, feature)) {
+							noHidden = true; 
+							break;
+						}
+					}
+				}	
+
+				if (!noHidden) {
+					changedAttributes.put(feature, FeatureStatus.INDETERMINATE_HIDDEN);					
+					feature.setFeatureStatus(FeatureStatus.INDETERMINATE_HIDDEN, false);
+				}
+				
+				worked(1);
+			}
 		}
 	}
 	
+	/**
+	 * Gets all hidden features their children
+	 * @return
+	 */
+	public LinkedList<Feature> getHiddenFeatures() {
+		LinkedList<Feature> hiddenFeatures = new LinkedList<Feature>();
+		for (Feature f : fm.getFeatures()) {
+			if (f.isHidden() || f.hasHiddenParent()) {
+				hiddenFeatures.add(f);
+			}
+		}
+		return hiddenFeatures;
+	}
+
 	/**
 	 * @param oldAttributes
 	 * @param changedAttributes
