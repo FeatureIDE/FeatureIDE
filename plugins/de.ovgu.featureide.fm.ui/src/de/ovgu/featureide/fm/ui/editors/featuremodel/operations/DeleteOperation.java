@@ -18,11 +18,12 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.core.commands.ExecutionException;
@@ -40,37 +41,30 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.Constraint;
-import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureDependencies;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.DeleteOperationAlternativeDialog;
+import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
+import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePage;
 
 /**
- * Operation with functionality to delete multiple elements from the feature
- * model editor. Enables Undo/Redo.
+ * Operation with functionality to delete multiple elements from the {@link FeatureModelEditor}
+ * and the {@link FmOutlinePage}. Enables Undo/Redo.
  * 
  * @author Fabian Benduhn
  */
 public class DeleteOperation extends AbstractOperation implements GUIDefaults {
 
-	
-	public final static String[] textualSymbols = new String[] { "iff",
-		"implies", "or", "and", "not" };
-	
 	private static final String LABEL = "Delete";
 	private Object viewer;
 	private FeatureModel featureModel;
 	private List<AbstractOperation> operations;
-	private HashMap<Feature, List<Feature>> removalMap;
-	/**
-	 * 
-	 */
+	
 	public DeleteOperation(Object viewer, FeatureModel featureModel) {
 		super(LABEL);
 		this.viewer = viewer;
@@ -78,263 +72,169 @@ public class DeleteOperation extends AbstractOperation implements GUIDefaults {
 		this.operations = new LinkedList<AbstractOperation>();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#execute(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
 	@Override
 	public IStatus execute(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
-
 		doDelete();
-		/*
-		if (notDeleted.size() > 0)
-		{
-			Feature start =  notDeleted.getFirst();
-			notDeleted.remove(start);
-			FeatureDependencies fd = new FeatureDependencies(featureModel);
-			List<Feature> equivalent = new LinkedList<Feature>();
-			for (Feature f : notDeleted)
-			{
-
-				if (fd.always(f).contains(start) && fd.always(start).contains(f))
-				{
-					equivalent.add(f);
-				}
-			}
-			notDeleted.removeAll(equivalent);
-			if (notDeleted.isEmpty())
-			{
-				//Complete Atomic set
-				List<Feature> atomicSet = new LinkedList<Feature>();
-				for (Feature f2 : fd.always(start))
-				{
-					if (fd.always(f2).contains(start))
-					{
-						atomicSet.add(f2);
-					}
-				}
-				equivalent.add(start);
-				atomicSet.removeAll(equivalent);				
-				
-				HashMap<Feature, List<Feature>> s = new HashMap<Feature, List<Feature>>();
-				for (Feature f : equivalent)
-				{
-					s.put(f, atomicSet);
-				}
-				new DeleteOperationAlternativeDialog(featureModel, s);				
-			}
-		}
-		
-		if (notDeleted.size() > 0)
-		{
-			String notDeletedFeatures = "";
-			for (Feature f : notDeleted)
-			{
-				notDeletedFeatures += "\"" + f.getName() + "\", ";
-					
-			}
-			notDeletedFeatures = notDeletedFeatures.substring(0, notDeletedFeatures.length() -2);
-			MessageDialog dialog = new MessageDialog(new Shell(), 
-					" Delete Error ", FEATURE_SYMBOL, 
-					"" +  "The following features are contained in constraints:" +
-					 "\n" + notDeletedFeatures + "\n" + 
-					"Select only one feature in order to replace it with an equivalent one.",
-					MessageDialog.ERROR, new String[] { IDialogConstants.OK_LABEL }, 0);
-			dialog.open();
-		}
-*/		
 		featureModel.handleModelDataChanged();
 		return Status.OK_STATUS;
 	}
 
-	
-	public void doDelete()
-	{
-		doDelete(null);
-	}
 	/**
-	 *  
+	 * Executes the requested delete operation.
 	 */
-	public void doDelete(List<Feature> toDelete) {
-		AbstractOperation op = null;
-		
+	public void doDelete() {
 		IStructuredSelection selection;
-		if (viewer instanceof GraphicalViewerImpl)
-		selection = (IStructuredSelection) ((GraphicalViewerImpl) viewer).getSelection();
-		else 
+		if (viewer instanceof GraphicalViewerImpl) {
+			selection = (IStructuredSelection) ((GraphicalViewerImpl) viewer).getSelection();
+		} else { 
 			selection = (IStructuredSelection) ((TreeViewer) viewer).getSelection();
-
-		
-		removalMap = new HashMap<Feature, List<Feature>>();
-		Iterator<?> iter;	
-/*		if (toDelete.isEmpty())
-		{*/
-			iter = selection.iterator();
-/*		}else
-		{
-			iter = toDelete.iterator();
-		}*/
-		List<Feature> alreadyDeleted = new LinkedList<Feature>();
-		while (iter.hasNext()) {
-			
-			op = null;
-			
-			Object editPart = iter.next();
-
-			if (editPart instanceof ConstraintEditPart) {
-
-				Constraint constraint = ((ConstraintEditPart) editPart).getConstraintModel();
-				op = new ConstraintDeleteOperation(constraint, featureModel);
-				for (Constraint resetConstraint : featureModel.getConstraints()){
-					resetConstraint.setConstraintAttribute(ConstraintAttribute.NORMAL,true);
-				}
-				executeOperation(op);
-			}
-			if (editPart instanceof LegendEditPart) {
-				op = new LegendHideOperation(featureModel);
-
-				executeOperation(op);
-
-			}
-			if (editPart instanceof Feature){
-				Feature feature = ((Feature) editPart);
-				
-				if (feature.getRelevantConstraints().isEmpty()) {
-//////////////////////////////////////////////////////////////////////////////////////////					
-					op = new FeatureDeleteOperation(featureModel, feature, true);
-					
-////////////////////////////////////////////////////////////////////////////////////////					
-					executeOperation(op);
-				} else {
-					
-					MessageDialog dialog = new MessageDialog(new Shell(), 
-							" Delete Error ", FEATURE_SYMBOL, 
-							"\"" + feature.getName() + "\" is contained in constraints. "
-							+ '\n' + '\n' + 
-							"Unable to delete this feature until all relevant constraints are removed.",
-							MessageDialog.ERROR, new String[] { IDialogConstants.OK_LABEL }, 0);
-					
-					dialog.open();
-				}				
-			}
-			if (editPart instanceof Constraint){
-				Constraint constraint = ((Constraint) editPart);
-				op = new ConstraintDeleteOperation(constraint, featureModel);
-
-				executeOperation(op);
-			}
-			if (editPart instanceof FeatureEditPart) {
-				Feature feature = ((FeatureEditPart) editPart).getFeature();
-				
-				
-				if (feature.getRelevantConstraints().isEmpty()) {
-					op = new FeatureDeleteOperation(featureModel, feature, true);
-					executeOperation(op);
-					alreadyDeleted.add(feature);
-				} else {
-
-						FeatureDependencies fd = new FeatureDependencies(featureModel);
-						List<Feature> equivalent = new LinkedList<Feature>();
-						for (Feature f2 : fd.always(feature))
-						{
-							if (fd.always(f2).contains(feature))
-							{
-								equivalent.add(f2);
-							}
-						}
-
-						//removalMap = new HashMap<Feature, List<Feature>>();
-						removalMap.put(feature, equivalent);
-							//new DeleteOperationAlternativeDialog(featureModel, s);
-				}
-				
-
-			}
-			if (op != null) operations.add(op);
 		}
 		
-		//Nur eins, keine Ersetzung möglich
+		/**
+		 * The key of the Map is the feature which could be replaced by their equivalents given at the 
+		 * corresponding List. 
+		 */
+		Map<Feature, List<Feature>> removalMap = new HashMap<Feature, List<Feature>>();
+		List<Feature> alreadyDeleted = new LinkedList<Feature>();
 		
-		if (!removalMap.isEmpty())
-		{
-			boolean hasDeletableFeature = false;
-			List<Feature> notDeletable = new LinkedList<Feature>();
-			List<Feature> toBeDeleted = new LinkedList<Feature>();
-			Iterator<Entry<Feature, List<Feature>>> removalIterator = removalMap.entrySet().iterator();
+		for (Object element : selection.toArray()) {
+			if (removeConstraint(element)) {
+				continue;
+			}
+			removeFeature(element, removalMap, alreadyDeleted);
+		}
+		
+		removeContainedFeatures(removalMap, alreadyDeleted);
+	}
+
+	/**
+	 * If the given element is a {@link Constraint} it will be removed instantly.
+	 * @param element The constraint to remove.
+	 * @return <code>true</code> if the given element was a constraint.
+	 */
+	private boolean removeConstraint(Object element) {
+		if (element instanceof ConstraintEditPart) {
+			Constraint constraint = ((ConstraintEditPart) element).getConstraintModel();
+			executeOperation(new ConstraintDeleteOperation(constraint, featureModel));
+			return true;
+		} else if (element instanceof Constraint){
+			Constraint constraint = ((Constraint) element);
+			executeOperation(new ConstraintDeleteOperation(constraint, featureModel));
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Tries to remove the given {@link Feature} else there will be an dialog for exception handling. 
+	 * @param element The feature to remove.
+	 * @param removalMap A map with the features and their equivalents.
+	 * @param alreadyDeleted A List of features which are already deleted.
+	 */
+	private void removeFeature(Object element, Map<Feature, List<Feature>> removalMap, 
+			List<Feature> alreadyDeleted) {
+		Feature feature = null;
+		if (element instanceof Feature) {
+			feature = ((Feature) element);
+		} else if (element instanceof FeatureEditPart) {
+			feature = ((FeatureEditPart) element).getFeature();
+		}
+		if (feature != null) {	
+			if (feature.getRelevantConstraints().isEmpty()) {
+				// feature can be removed because it has no relevant constraint
+				executeOperation(new FeatureDeleteOperation(featureModel, feature, true));
+				alreadyDeleted.add(feature);
+			} else {
+				// check for all equivalent features
+				FeatureDependencies featureDependencies = new FeatureDependencies(featureModel, false);
+				List<Feature> equivalent = new LinkedList<Feature>();
+				for (Feature f2 : featureDependencies.getImpliedFeatures(feature)) {
+					if (featureDependencies.isAlways(f2, feature)) {
+						equivalent.add(f2);
+					}
+				}
+				removalMap.put(feature, equivalent);
+			}
+		}
+	}
 	
-			/*
-			while (removalIterator.hasNext())
-			{			 
-				toBeDeleted.add(removalIterator.next().getKey());
-			}*/
-			toBeDeleted.addAll(removalMap.keySet());
+	/**
+	 * @param operation the operation to execute.
+	 */
+	private void executeOperation(AbstractOperation operation) {
+		operations.add(operation);
+		try {
+			PlatformUI.getWorkbench().getOperationSupport()
+					.getOperationHistory().execute(operation, null, null);
+		} catch (ExecutionException e) {
+			FMUIPlugin.getDefault().logError(e);
+		}
+	}
+	
+	/**
+	 * Exception handling if the {@link Feature} to remove is contained in {@link Constraint}s.<br>
+	 * If the feature could be removed a {@link DeleteOperationAlternativeDialog} will be opened to 
+	 * select the features to replace with.<br> 
+	 * If the feature has no equivalent an error message will be displayed.
+	 * @param removalMap A map with the features and their equivalents.
+	 * @param alreadyDeleted A List of features which are already deleted.
+	 */
+	private void removeContainedFeatures(Map<Feature, List<Feature>> removalMap,
+			List<Feature> alreadyDeleted) {
+		if (!removalMap.isEmpty()) {
+			boolean hasDeletableFeature = false;
+			List<Feature> toBeDeleted = new ArrayList<Feature>(removalMap.keySet());
 			
-			removalIterator = removalMap.entrySet().iterator();
-			while (removalIterator.hasNext())
-			{
-				
-				Entry<Feature, List<Feature>> entry = removalIterator.next();
-				Feature feature =  entry.getKey();
+			List<Feature> notDeletable = new LinkedList<Feature>();
+			for (Entry<Feature, List<Feature>> entry : removalMap.entrySet()) {
 				List<Feature> featureList = entry.getValue();		
 				featureList.removeAll(toBeDeleted);
 				featureList.removeAll(alreadyDeleted);
-				if (featureList.isEmpty())
-				{
-					notDeletable.add(feature);
-				}else
-				{
+				if (featureList.isEmpty()) {
+					notDeletable.add(entry.getKey());
+				} else {
 					hasDeletableFeature = true;
 				}
 			}
-			if (hasDeletableFeature)
-			{
+			
+			if (hasDeletableFeature) {
+				// case: features can be replaced with an equivalent feature 
 				new DeleteOperationAlternativeDialog(featureModel, removalMap);	
-			}else
-			{
-				String notDeletedFeatures = "";
-				for (Feature f : notDeletable)
-				{
-					notDeletedFeatures += "\"" + f.getName() + "\", ";
-						
-				}
-				notDeletedFeatures = notDeletedFeatures.substring(0, notDeletedFeatures.length() -2);
-				MessageDialog dialog = new MessageDialog(new Shell(), 
-						" Delete Error ", FEATURE_SYMBOL, 
-						"" +  "The following features are contained in constraints:" +
-						 "\n" + notDeletedFeatures + "\n" + 
-						"Select only one feature in order to replace it with an equivalent one.",
-						MessageDialog.ERROR, new String[] { IDialogConstants.OK_LABEL }, 0);
-				dialog.open();			
+			} else {
+				// case: features can NOT be replaced with an equivalent feature
+				openErrorDialog(notDeletable);
 			}
 		}
 	}
-
+	
 	/**
-	 * @param op
-	 *            operation to be executed
+	 * Opens an error dialog displaying the {@link Feature}s which could not be replaced by alternatives.
+	 * @param notDeletable The not deletable features
 	 */
-	private void executeOperation(AbstractOperation op) {
-		try {
-			PlatformUI.getWorkbench().getOperationSupport()
-					.getOperationHistory().execute(op, null, null);
-
-		} catch (ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
-
+	private void openErrorDialog(List<Feature> notDeletable) {
+		String notDeletedFeatures = null;
+		for (Feature f : notDeletable) {
+			if (notDeletedFeatures == null) {
+				notDeletedFeatures = "\"" + f.getName() + "\"";
+			} else {
+				notDeletedFeatures += ", \"" + f.getName() + "\"";
+			}
 		}
+		
+		MessageDialog dialog = new MessageDialog(new Shell(), 
+				" Delete Error ", FEATURE_SYMBOL, 
+				((notDeletable.size() != 1) 
+						? "The following features are contained in constraints:" 
+						: "The following feature is contained in constraints:") + "\n" +
+				notDeletedFeatures  + "\n" + 
+				((notDeletable.size() != 1) 
+						? "Select only one feature in order to replace it with an equivalent one." 
+						: "It can not be replaced with an equivalent one."),
+				MessageDialog.ERROR, new String[] { IDialogConstants.OK_LABEL }, 0);
+		dialog.open();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#redo(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
 	@Override
 	public IStatus redo(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
@@ -362,22 +262,13 @@ public class DeleteOperation extends AbstractOperation implements GUIDefaults {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#undo(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
 	@Override
 	public IStatus undo(IProgressMonitor arg0, IAdaptable arg1)
 			throws ExecutionException {
-		List<AbstractOperation> ops = new LinkedList<AbstractOperation>();
-		ops.addAll(operations);
+		List<AbstractOperation> ops = new ArrayList<AbstractOperation>(operations);
 		Collections.reverse(operations);
 		while (!ops.isEmpty()) {
 			for (AbstractOperation op : operations) {
-
 				if (op.canUndo()) {
 					op.undo(arg0, arg1);
 					ops.remove(op);

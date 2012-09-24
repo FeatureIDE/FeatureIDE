@@ -44,6 +44,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  * @author Jan Wedding
  * @author Melanie Pflaume
  */
+// TODO this method should just call DeleteOperation
 public class DeleteAllOperation extends AbstractOperation implements GUIDefaults {
 
 	private static final String LABEL = "Delete including subfeatures";

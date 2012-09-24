@@ -58,6 +58,7 @@ import org.eclipse.ui.progress.UIJob;
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -387,7 +388,9 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	}
 	
 	boolean waiting = false;
-
+	
+	private FeatureModelAnalyzer analyzer;
+	
 	public void refresh() {
 		if (getFeatureModel() == null || getFeatureModel().getRoot() == null)
 			return;
@@ -398,7 +401,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 			return;
 		}
 		waiting = true;
-		
 		/**
 		 * This extra job is necessary, else the UI will stop. 
 		 */
@@ -406,20 +408,22 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 			
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
+				
 				try {
-					if (analyzeJob != null) {
+					if (analyzeJob != null && analyzer != null) {
 						// waiting for analyzing job to finish
-						getFeatureModel().getAnalyser().cancel(true);
-						analyzeJob.join();		
+						analyzer.cancel(true);
+						analyzeJob.join();
 					}
 				} catch (InterruptedException e) {
 					FMUIPlugin.getDefault().logError(e);
 				} finally {
 					// avoid a dead lock
-					getFeatureModel().getAnalyser().cancel(false);
+					if (analyzer != null) {
+						analyzer.cancel(false);
+					}
 					waiting = false;
 				}
-				
 				analyzeJob = new Job("Analyze feature model") {
 		
 					@Override
@@ -427,8 +431,10 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 						if (waiting) {
 							return Status.OK_STATUS;
 						}
-						
-						final HashMap<Object, Object> changedAttributes = getFeatureModel().getAnalyser().analyzeFeatureModel(monitor);
+
+						analyzer = getFeatureModel().getAnalyser();
+
+						final HashMap<Object, Object> changedAttributes = analyzer.analyzeFeatureModel(monitor);
 						
 						UIJob refreshGraphics = new UIJob("Updating feature model attributes") {
 		

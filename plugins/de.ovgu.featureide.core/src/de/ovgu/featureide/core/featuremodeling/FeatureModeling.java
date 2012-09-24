@@ -14,10 +14,6 @@ import de.ovgu.featureide.core.builder.ComposerExtensionClass;
  */
 public class FeatureModeling extends ComposerExtensionClass {
 
-	public FeatureModeling() {
-		
-	}
-
 	public void performFullBuild(IFile config) {
 		
 	}

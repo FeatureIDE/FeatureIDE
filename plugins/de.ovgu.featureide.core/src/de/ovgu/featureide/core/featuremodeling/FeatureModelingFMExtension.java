@@ -24,8 +24,7 @@ public class FeatureModelingFMExtension extends FMComposerExtension {
 	
 	
 	@Override
-	public boolean isValidFeatureName(String s)
-	{
+	public boolean isValidFeatureName(String s) {
 	    if (s == null)
 			return false;
 		final int len = s.length();

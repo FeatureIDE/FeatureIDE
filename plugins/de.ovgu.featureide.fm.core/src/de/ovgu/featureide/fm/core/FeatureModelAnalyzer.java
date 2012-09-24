@@ -51,7 +51,7 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
  * @author Florian Proksch
  * @author Stefan Krueger
  */
-public class FeatureModelAnalyser {
+public class FeatureModelAnalyzer {
 	
 	private FeatureModel fm;
 
@@ -62,11 +62,11 @@ public class FeatureModelAnalyser {
 
 	@CheckForNull
 	private IProgressMonitor monitor;
-	
+
 	/**
      * 
      */
-	protected FeatureModelAnalyser(FeatureModel fm) {
+	protected FeatureModelAnalyzer(FeatureModel fm) {
 		this.fm = fm;
 	}
 
@@ -321,12 +321,17 @@ public class FeatureModelAnalyser {
 	}
 	
 	/**
-	 * 
 	 * @param monitor 
 	 * @return Hashmap: key entry is Feature/Constraint, value usually
 	 *         indicating the kind of attribute
-	 * 
-	 *         if Feature
+	 */
+	/*
+	 * check all changes of this method and called methods with the related tests and
+	 * benchmarks, see fm.core-test plug-in
+	 * think about performance (no unnecessary or redundant calculations)
+	 */
+	/*
+	 * Because most checks are independent they could be parallelized.
 	 */
 	public HashMap<Object, Object> analyzeFeatureModel(IProgressMonitor monitor) {
 		this.monitor = monitor;
@@ -464,7 +469,7 @@ public class FeatureModelAnalyser {
 	 * @return
 	 */
 	private boolean canceled() {
-		return cancel || monitor != null ? monitor.isCanceled() : false;
+		return cancel || (monitor != null ? monitor.isCanceled() : false);
 	}
 
 	/**
@@ -558,10 +563,10 @@ public class FeatureModelAnalyser {
 	}
 
 	/**
-	 * Calculations for indeterminat hidden features
+	 * Calculations for indeterminate hidden features
 	 * @param changedAttributes
 	 */
-	private void calculateHidden(HashMap<Object, Object> changedAttributes) {
+	public void calculateHidden(HashMap<Object, Object> changedAttributes) {
 		if (!fm.hasHidden()) {
 			return;
 		}			
@@ -576,11 +581,11 @@ public class FeatureModelAnalyser {
 		LinkedList<Feature> hiddenFeatures = getHiddenFeatures();
 		for (Feature f: hiddenFeatures) {	
 			for (Constraint c : f.getRelevantConstraints()) {
-				final Node node = c.getNode();
+				Node node = c.getNode();
 				if (node instanceof Equals) {
-					final Node[] children = node.getChildren();
-					final Node leftChild = children[0];
-					final Node rightChild = children[1];
+					Node[] children = node.getChildren();
+					Node leftChild = children[0];
+					Node rightChild = children[1];
 					if (leftChild instanceof Literal && ((Literal) leftChild).var.equals(f.getName())) {
 						Constraint	rightConstraint = new Constraint(fm, rightChild);
 						rightConstraint.setContainedFeatures();

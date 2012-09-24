@@ -164,6 +164,7 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#buildFSTModel()
 	 */
 	public void buildFSTModel() {
+		loadComposerExtension();
 		composerExtensionClass.buildFSTModel();
 	}
 	

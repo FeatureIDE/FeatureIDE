@@ -139,8 +139,9 @@
                style="toggle">
          </action>
          <menu
+               icon="icons/FeatureIconSmall.ico"
                id="de.ovgu.featureide.ui.FeatureColorMenu"
-               label="FeatureColor"
+               label="Feature Highlighting"
                path="additions">
          </menu>
       </viewerContribution>

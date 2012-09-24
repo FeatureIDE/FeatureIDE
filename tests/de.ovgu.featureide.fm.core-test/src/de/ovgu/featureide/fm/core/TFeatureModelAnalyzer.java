@@ -32,7 +32,7 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 
 /**
- * Tests for {@link FeatureModelAnalyser} 
+ * Tests for {@link FeatureModelAnalyzer} 
  * 
  * @author Jens Meinicke
  * @author Stefan Krueger
@@ -82,7 +82,6 @@ public class TFeatureModelAnalyzer {
 	private Feature FM4_F9 = FM_test_4.getFeature("C");
 	private Feature FM4_F10 = FM_test_4.getFeature("J");
 	private HashMap<Object, Object> FM4_DATA = FM_test_4.getAnalyser().analyzeFeatureModel(null);
-	
 	
 	/** 
      * @return 

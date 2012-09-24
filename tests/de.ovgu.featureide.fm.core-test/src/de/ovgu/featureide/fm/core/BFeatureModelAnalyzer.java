@@ -110,7 +110,7 @@ public class BFeatureModelAnalyzer {
 	 * Calculates the duration of analyzing constraints
 	 */
 	@Bench (maxRunCount = 1)
-	public void BUpdateConstraints(@ForEachInt({1, 10, 20, 21, 50, 100, 200, 201, 500}) int i) {
+	public void BUpdateConstraints(@ForEachInt({1, 2, 10, 20, 21, 50, 100, 200, 201, 500}) int i) {
 		getFM(i).getAnalyser().updateConstraints(new HashMap<Object, Object>(), new HashMap<Object, Object>());
 	}
 	
@@ -118,12 +118,20 @@ public class BFeatureModelAnalyzer {
 	 * Calculates the duration of analyzing features
 	 */
 	@Bench (maxRunCount = 1)
-	public void BUpdateFeatures(@ForEachInt({1, 10, 20, 21, 50, 100, 200, 201, 500}) int i) {
+	public void BUpdateFeatures(@ForEachInt({1, 2, 10, 20, 21, 50, 100, 200, 201, 500}) int i) {
 		getFM(i).getAnalyser().updateFeatures(new HashMap<Object, Object>(), new HashMap<Object, Object>());
 	}
 	
-//	@Bench
-	public void clone(@ForEachInt({1, 2, 10, 20, 50, 100, 200, 500, 1000}) int i) {
+	/**
+	 * Calculates the duration of analyzing hidden features
+	 */
+	@Bench
+	public void BCalculateHidden(@ForEachInt({1, 2, 10, 20, 21, 50, 100, 200, 201, 500, 1000, 10000}) int i) {
+		getFM(i).getAnalyser().calculateHidden(new HashMap<Object, Object>());
+	}
+	
+	@Bench
+	public void clone(@ForEachInt({1, 2, 10, 20, 50, 100, 200, 500, 1000, 10000}) int i) {
 		getFM(i).clone();
 	}
 
@@ -159,7 +167,7 @@ public class BFeatureModelAnalyzer {
 			return fm10000_100;
 		default:
 			System.err.println("NO FM");
-			return berkeley_1;
+			return fm10_100;
 		}
 	}
 	

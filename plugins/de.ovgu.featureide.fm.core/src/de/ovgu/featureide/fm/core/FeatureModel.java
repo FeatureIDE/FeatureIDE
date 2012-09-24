@@ -507,7 +507,7 @@ public class FeatureModel implements PropertyConstants {
          * 
          * 	if Feature 
          * 
-         * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyser#analyzeFeatureModel()} instead. 
+         * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#analyzeFeatureModel()} instead. 
          */
 	@Deprecated
 	public HashMap<Object, Object> analyzeFeatureModel() {
@@ -665,7 +665,7 @@ public class FeatureModel implements PropertyConstants {
 	}
 
 	/**
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyser#isValid()} instead.
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#isValid()} instead.
 	 */
 	@Deprecated
 	public boolean isValid() throws TimeoutException {
@@ -688,7 +688,7 @@ public class FeatureModel implements PropertyConstants {
 	 * @return
 	 * @throws TimeoutException
 	 * 
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyser#checkImplies(Set, Set)} instead.
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#checkImplies(Set, Set)} instead.
 	 */
 	@Deprecated
 	public boolean checkImplies(Set<Feature> a, Set<Feature> b)
@@ -703,7 +703,7 @@ public class FeatureModel implements PropertyConstants {
 	 * @return
 	 * @throws TimeoutException
 	 * 
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyser#checkCondition(Node)} instead.
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#checkCondition(Node)} instead.
 	 */
 	@Deprecated
 	public boolean checkCondition(Node condition) {
@@ -738,7 +738,7 @@ public class FeatureModel implements PropertyConstants {
 	 *         otherwise
 	 * @throws TimeoutException
 	 * 
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyser#areMutualExclusive(Set, List)} instead.
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#areMutualExclusive(Set, List)} instead.
 	 */
 	@Deprecated
 	public boolean areMutualExclusive(Set<Feature> context,
@@ -767,7 +767,7 @@ public class FeatureModel implements PropertyConstants {
 	 *         code-fragment may be missing || false, otherwise
 	 * @throws TimeoutException
 	 * 
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyser#mayBeMissing(Set, List)} instead.
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#mayBeMissing(Set, List)} instead.
 	 */
 	@Deprecated
 	public boolean mayBeMissing(Set<Feature> context,
@@ -787,7 +787,7 @@ public class FeatureModel implements PropertyConstants {
 	 * @return true if there exists such a set of features || false, otherwise
 	 * @throws TimeoutException
 	 * 
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyser#exists(Set)} instead.
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#exists(Set)} instead.
 	 */
 	@Deprecated
 	public boolean exists(Set<Feature> features) throws TimeoutException {
@@ -800,7 +800,7 @@ public class FeatureModel implements PropertyConstants {
 	 * @param b
 	 * @return
 	 * 
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyser#conjunct(Set)} instead.
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#conjunct(Set)} instead.
 	 */
 	@Deprecated
 	public Node conjunct(Set<Feature> b) {
@@ -809,7 +809,7 @@ public class FeatureModel implements PropertyConstants {
 
 	/**
 	 * 
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyser#countConcreteFeatures()} instead.
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#countConcreteFeatures()} instead.
 	 */
 	@Deprecated
 	public int countConcreteFeatures() {
@@ -818,7 +818,7 @@ public class FeatureModel implements PropertyConstants {
 
 	/**
 	 * 
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyser#countHiddenFeatures()} instead.
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#countHiddenFeatures()} instead.
 	 */
 	@Deprecated
 	public int countHiddenFeatures() {
@@ -827,7 +827,7 @@ public class FeatureModel implements PropertyConstants {
 
 	/**
 	 * 
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyser#countTerminalFeatures()} instead.
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#countTerminalFeatures()} instead.
 	 */
 	@Deprecated
 	public int countTerminalFeatures() {
@@ -846,7 +846,7 @@ public class FeatureModel implements PropertyConstants {
 	 *            a list of feature names for which
 	 * @return a list of features that is common to all variants
 	 * 
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyser#commonFeatures(long, Object...)} instead.
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#commonFeatures(long, Object...)} instead.
 	 */
 	@Deprecated
 	public LinkedList<String> commonFeatures(long timeout,
@@ -855,7 +855,7 @@ public class FeatureModel implements PropertyConstants {
 	}
 
 	/**
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyser#getDeadFeatures()} instead.
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#getDeadFeatures()} instead.
 	 */
 	@Deprecated
 	public LinkedList<Feature> getDeadFeatures() {
@@ -1060,7 +1060,7 @@ public class FeatureModel implements PropertyConstants {
 	 * @return true if feature model contains mandatory features otherwise false
 	 */
 	public boolean hasMandatoryFeatures() {
-		for (Feature f : this.featureTable.values()) {
+		for (Feature f : featureTable.values()) {
 			Feature parent = f.getParent();
 			if (parent != null && parent.isAnd() && f.isMandatory())
 				return true;
@@ -1072,8 +1072,8 @@ public class FeatureModel implements PropertyConstants {
 	 * @return <code>true</code> if feature model contains optional features otherwise false
 	 */
 	public boolean hasOptionalFeatures() {
-		for (Feature f : this.featureTable.values()) {
-			if (!f.equals(this.root) && f.getParent().isAnd()
+		for (Feature f : featureTable.values()) {
+			if (!f.equals(root) && f.getParent().isAnd()
 					&& !f.isMandatory())
 				return true;
 		}
@@ -1084,7 +1084,7 @@ public class FeatureModel implements PropertyConstants {
 	 * @return true if feature model contains and group otherwise false
 	 */
 	public boolean hasAndGroup() {
-		for (Feature f : this.featureTable.values()) {
+		for (Feature f : featureTable.values()) {
 			if (f.getChildrenCount() > 1 && f.isAnd())
 				return true;
 		}
@@ -1095,7 +1095,7 @@ public class FeatureModel implements PropertyConstants {
 	 * @return true if feature model contains alternative group otherwise false
 	 */
 	public boolean hasAlternativeGroup() {
-		for (Feature f : this.featureTable.values()) {
+		for (Feature f : featureTable.values()) {
 			if (f.getChildrenCount() > 1 && f.isAlternative())
 				return true;
 		}
@@ -1106,7 +1106,7 @@ public class FeatureModel implements PropertyConstants {
 	 * @return true if feature model contains or group otherwise false
 	 */
 	public boolean hasOrGroup() {
-		for (Feature f : this.featureTable.values()) {
+		for (Feature f : featureTable.values()) {
 			if (f.getChildrenCount() > 1 && f.isOr())
 				return true;
 		}
@@ -1114,7 +1114,7 @@ public class FeatureModel implements PropertyConstants {
 	}
 
 	public boolean hasAbstract() {
-		for (Feature f : this.featureTable.values()) {
+		for (Feature f : featureTable.values()) {
 			if (f.isAbstract())
 				return true;
 		}
@@ -1122,7 +1122,7 @@ public class FeatureModel implements PropertyConstants {
 	}
 
 	public boolean hasConcrete() {
-		for (Feature f : this.featureTable.values()) {
+		for (Feature f : featureTable.values()) {
 			if (!(f.isAbstract()))
 				return true;
 		}
@@ -1133,8 +1133,12 @@ public class FeatureModel implements PropertyConstants {
 	 * 
 	 * @return <code>true</code> if the feature model contains a hidden feature
 	 */
+	/*
+	 * TODO sometimes this method returns false while the model has hidden features 	
+	 * 		the model seems to be initialized wrong 
+	 */
 	public boolean hasHidden() {
-		for (Feature f : this.featureTable.values()) {
+		for (Feature f : featureTable.values()) {
 			if (f.isHidden())
 				return true;
 		}
@@ -1145,52 +1149,46 @@ public class FeatureModel implements PropertyConstants {
 		return this.getDeadFeatures().size() > 0;
 	}
 	
-	public boolean hasIndetHidden()
-	{
-		for (Feature f : this.featureTable.values()) {
+	public boolean hasIndetHidden() {
+		for (Feature f : featureTable.values()) {
 			if (f.getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN)
 				return true;
 		}
 		return false;
 	}
 	
-	public boolean hasUnsatisfiableConst()
-	{
-		for (Constraint c : this.constraints) {
+	public boolean hasUnsatisfiableConst() {
+		for (Constraint c : constraints) {
 			if (c.getConstraintAttribute() == ConstraintAttribute.UNSATISFIABLE)
 				return true;
 		}
 		return false;
 	}
 	
-	public boolean hasTautologyConst()
-	{
-		for (Constraint c : this.constraints) {
+	public boolean hasTautologyConst() {
+		for (Constraint c : constraints) {
 			if (c.getConstraintAttribute() == ConstraintAttribute.TAUTOLOGY)
 				return true;
 		}
 		return false;
 	}
-	public boolean hasDeadConst()
-	{
-		for (Constraint c : this.constraints) {
+	public boolean hasDeadConst() {
+		for (Constraint c : constraints) {
 			if (c.getConstraintAttribute() == ConstraintAttribute.DEAD)
 				return true;
 		}
 		return false;
 	}
 	
-	public boolean hasVoidModelConst()
-	{
-		for (Constraint c : this.constraints) {
+	public boolean hasVoidModelConst() {
+		for (Constraint c : constraints) {
 			if (c.getConstraintAttribute() == ConstraintAttribute.VOID_MODEL)
 				return true;
 		}
 		return false;
 	}
 	
-	public boolean hasRedundantConst()
-	{
+	public boolean hasRedundantConst() {
 		for (Constraint c : this.constraints) {
 			if (c.getConstraintAttribute() == ConstraintAttribute.REDUNDANT)
 				return true;
@@ -1200,7 +1198,7 @@ public class FeatureModel implements PropertyConstants {
 
 
 	public boolean hasFalse() {
-		for (Feature f : this.featureTable.values()) {
+		for (Feature f : featureTable.values()) {
 			if (f.getFeatureStatus() == FeatureStatus.FALSE_OPTIONAL)
 				return true;
 		}
@@ -1293,9 +1291,9 @@ public class FeatureModel implements PropertyConstants {
 		this.featureOrderInXML = featureOrderInXML;
 	}
 	
-    private FeatureModelAnalyser analyser = new FeatureModelAnalyser(this);
+    private FeatureModelAnalyzer analyser = new FeatureModelAnalyzer(this);
 
-    public FeatureModelAnalyser getAnalyser() {
+    public FeatureModelAnalyzer getAnalyser() {
     	return analyser;
     }
 
