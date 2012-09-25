@@ -86,9 +86,9 @@ public class ConstraintMoveOperation extends AbstractOperation {
 	@Override
 	public IStatus redo(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
-			featureModel.removePropositionalNode(constraint);
-			featureModel.addPropositionalNode(constraint.getNode(), index);
-			FeatureUIHelper.setLocation(featureModel.getConstraints().get(index), newPos);
+		featureModel.removePropositionalNode(constraint);
+		featureModel.addConstraint(constraint, index);
+		FeatureUIHelper.setLocation(featureModel.getConstraints().get(index), newPos);
 		featureModel.handleModelDataChanged();
 		return Status.OK_STATUS;
 	}
@@ -103,9 +103,9 @@ public class ConstraintMoveOperation extends AbstractOperation {
 	@Override
 	public IStatus undo(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
-			featureModel.removePropositionalNode(constraint);
-			featureModel.addPropositionalNode(constraint.getNode(), oldIndex);
-			FeatureUIHelper.setLocation(featureModel.getConstraints().get(index), oldPos);
+		featureModel.removePropositionalNode(constraint);
+		featureModel.addConstraint(constraint, oldIndex);
+		FeatureUIHelper.setLocation(featureModel.getConstraints().get(index), oldPos);
 		featureModel.handleModelDataChanged();
 		return Status.OK_STATUS;
 	}

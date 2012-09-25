@@ -18,9 +18,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.AbstractOperation;
 import org.eclipse.core.runtime.IAdaptable;
@@ -43,8 +40,6 @@ public class ConstraintDeleteOperation extends AbstractOperation {
 	private FeatureModel featureModel;
 	private Constraint constraint;
 	
-	//TODO @Fabian this List is never used
-	private List<Constraint> constraints = new LinkedList<Constraint>();
 	private int index;
 
 	public ConstraintDeleteOperation(Constraint constraint,
@@ -52,32 +47,14 @@ public class ConstraintDeleteOperation extends AbstractOperation {
 		super(LABEL);
 		this.featureModel = featureModel;
 		this.constraint = constraint;
-
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#execute(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
 	@Override
 	public IStatus execute(IProgressMonitor arg0, IAdaptable arg1)
 			throws ExecutionException {
-
-		constraints.clear();
-		constraints.addAll(featureModel.getConstraints());
 		return redo(arg0, arg1);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#redo(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
 	@Override
 	public IStatus redo(IProgressMonitor arg0, IAdaptable arg1)
 			throws ExecutionException {
@@ -87,17 +64,10 @@ public class ConstraintDeleteOperation extends AbstractOperation {
 		return Status.OK_STATUS;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#undo(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
 	@Override
 	public IStatus undo(IProgressMonitor arg0, IAdaptable arg1)
 			throws ExecutionException {
-		featureModel.addPropositionalNode(constraint.getNode(), index);
+		featureModel.addConstraint(constraint, index);
 		//initialize constraint position in manual layout
 		if(!featureModel.getLayout().hasFeaturesAutoLayout())
 			FeatureDiagramLayoutHelper.initializeConstraintPosition(featureModel,

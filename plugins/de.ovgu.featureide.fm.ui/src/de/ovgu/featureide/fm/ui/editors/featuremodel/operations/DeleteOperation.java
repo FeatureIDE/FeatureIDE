@@ -256,7 +256,11 @@ public class DeleteOperation extends AbstractOperation implements GUIDefaults {
 			}
 		}
 		featureModel.handleModelDataChanged();
-		featureModel.redrawDiagram();
+		
+		/*
+		 * TODO why was the model redrawed here?
+		 */
+//		featureModel.redrawDiagram();
 
 		return Status.OK_STATUS;
 

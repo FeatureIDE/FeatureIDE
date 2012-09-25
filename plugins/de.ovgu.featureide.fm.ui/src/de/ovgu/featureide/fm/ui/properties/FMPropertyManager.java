@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.draw2d.Border;
+import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.LineBorder;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -135,7 +136,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		if (CURRENT_DIAGRAM_BACKGROUND == null) {
 			CURRENT_DIAGRAM_BACKGROUND = getColor(QN_DIAGRAM_BACKGROUND, DIAGRAM_BACKGROUND);
 		}
-		return CURRENT_DIAGRAM_BACKGROUND ;
+		return CURRENT_DIAGRAM_BACKGROUND;
 	}
 
 	public static void setDiagramBackgroundColor(Color color) {
@@ -339,14 +340,14 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 
 	public static Border getHiddenFeatureBorder(boolean selected) {
 		if (selected) {
-			new LineBorder(getHiddenBorderColor(), 3, 2);
+			return new LineBorder(HIDDEN_BORDER_COLOR, 3, Graphics.LINE_DOT);
 		}
-		return new LineBorder(HIDDEN_BORDER_COLOR, 1, 2);
+		return new LineBorder(HIDDEN_BORDER_COLOR, 1, Graphics.LINE_DASH);
 	}
 
-	private static Color getHiddenBorderColor() {
-		return GUIBasics.createBorderColor(getDeadFeatureBackgroundColor());
-	}
+//	private static Color getHiddenBorderColor() {
+//		return GUIBasics.createBorderColor(getDeadFeatureBackgroundColor());
+//	}
 
 	public static Border getDeadFeatureBorder(boolean selected) {
 		if (selected) {

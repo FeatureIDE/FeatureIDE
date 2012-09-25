@@ -873,8 +873,7 @@ public class ConstraintDialog implements GUIDefaults {
 	 * @param featureModel
 	 * @param constraint
 	 */
-	private void closeShell() 
-	{
+	private void closeShell() {
 		NodeReader nodeReader = new NodeReader();
 		String input = constraintText.getText().trim();
 
@@ -893,18 +892,22 @@ public class ConstraintDialog implements GUIDefaults {
 			printHeaderError(nodeReader.getErrorMessage());
 			return;
 		}
-		if (!isSatisfiable(input, 1000)) 
-		{
+		if (!isSatisfiable(input, 1000)) {
 			printHeaderWarning("constraint is unsatisfiable");			
 		}
 		
 		int index = 0;
-		AbstractOperation op;
-		if (constraint != null && (index = featureModel.getConstraints().indexOf(constraint)) != -1) 
-		{
-			op = new ConstraintEditOperation(propNode, featureModel, index);
-		} else
-		{
+		AbstractOperation op = null;
+		if (constraint != null && featureModel.getConstraints().contains(constraint)) {
+			for (Constraint c : featureModel.getConstraints()) {
+				if (c == constraint) {
+					op = new ConstraintEditOperation(propNode, featureModel, index);
+					break;
+				}
+				index++;
+			}	
+		}
+		if (op == null) {
 			op = new ConstraintCreateOperation(propNode, featureModel);
 		}
 		op.addContext((IUndoContext) featureModel.getUndoContext());

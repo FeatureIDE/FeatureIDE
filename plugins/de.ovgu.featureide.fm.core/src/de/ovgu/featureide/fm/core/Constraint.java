@@ -205,7 +205,6 @@ public class Constraint implements PropertyConstants {
 
 		Constraint other = (Constraint) obj;		
 		return propNode.equals(other.propNode);
-		
 	}
 	
 	@Override

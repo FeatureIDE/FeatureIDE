@@ -147,12 +147,24 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	}
 
 	/**
+	 * 
 	 * @param mandatory
 	 * @param optional
 	 * @param or
 	 * @param alternative
 	 * @param and
-	 * @return
+	 * @param _abstract
+	 * @param concrete
+	 * @param hidden
+	 * @param dead
+	 * @param falseOpt
+	 * @param showHidden
+	 * @param indetHidden
+	 * @param unsatisfiableConst
+	 * @param tautologyConst
+	 * @param deadConst
+	 * @param voidModelConst
+	 * @param redundantConst
 	 */
 	private void setLegendSize(boolean mandatory, boolean optional, boolean or,
 			boolean alternative, boolean and, boolean _abstract,

@@ -56,22 +56,8 @@ import org.sat4j.specs.TimeoutException;
  * @author Stefan Krueger
  * 
  */
+// TODO remove unnecessary initializations/calculations especially after clone()
 public class FeatureModel implements PropertyConstants {
-
-	/**
-	 * @return the featureTable
-	 */
-	public Hashtable<String, Feature> getFeatureTable() {
-		return featureTable;
-	}
-
-	/**
-	 * @param featureTable
-	 *            the featureTable to set
-	 */
-	public void setFeatureTable(Hashtable<String, Feature> featureTable) {
-		this.featureTable = featureTable;
-	}
 
 	public static final String COMPOSER_KEY = "composer";
 	public static final QualifiedName composerConfigID = new QualifiedName(
@@ -108,7 +94,10 @@ public class FeatureModel implements PropertyConstants {
 	 * 
 	 */
 	private LinkedList<Node> propNodes = new LinkedList<Node>();
-
+	
+	/*
+	 * TODO why are constraints saved redundant
+	 */
 	private LinkedList<Constraint> constraints = new LinkedList<Constraint>();
 
 	/**
@@ -137,6 +126,29 @@ public class FeatureModel implements PropertyConstants {
 	
 	private Object undoContext;
 
+	private final LinkedList<PropertyChangeListener> listenerList = new LinkedList<PropertyChangeListener>();
+	private ColorschemeTable colorschemeTable = new ColorschemeTable(this);
+	protected boolean valid = true;
+    private FeatureModelAnalyzer analyser = new FeatureModelAnalyzer(this);
+    private FeatureModelLayout layout = new FeatureModelLayout();
+	private LinkedList<Feature> falseOptionalFeatures = new LinkedList<Feature>();
+	private LinkedList<Feature> deadFeatures = new LinkedList<Feature>();
+
+	/**
+	 * @return the featureTable
+	 */
+	public Hashtable<String, Feature> getFeatureTable() {
+		return featureTable;
+	}
+
+	/**
+	 * @param featureTable
+	 *            the featureTable to set
+	 */
+	public void setFeatureTable(Hashtable<String, Feature> featureTable) {
+		this.featureTable = featureTable;
+	}
+	
 	/**
 	 * TODO @Jens description / rename
 	 * 		this should be done at the constructor
@@ -149,11 +161,10 @@ public class FeatureModel implements PropertyConstants {
 		return fmComposerExtension;
 	}
 
-
-	public boolean isFeatureModelingComposer()
-	{
+	public boolean isFeatureModelingComposer() {
 		if (COMPOSER_ID == null) return true;
 		return COMPOSER_ID.endsWith("FeatureModeling");
+		// TODO @Jens wrong usage of composer extension
 	}
 	
 	/**
@@ -236,8 +247,21 @@ public class FeatureModel implements PropertyConstants {
 			constraints.remove(constraints.size() - 1);
 		}
 	}
-
+	
+	/*
+	 * It is neccassary to remove the same object and not an equivalent one.
+	 */
 	public void removePropositionalNode(Constraint constraint) {
+		int i = 0;
+		for (Constraint c : constraints) {
+			if (c == constraint) {
+				constraints.remove(i);
+				propNodes.remove(i);
+				return;
+			}
+			i++;
+		}
+		
 		if (propNodes.contains(constraint.getNode())) {
 			propNodes.remove(constraint.getNode());
 			constraints.remove(constraint);
@@ -438,9 +462,6 @@ public class FeatureModel implements PropertyConstants {
 		return feature != null && feature.isLayer();
 	}
 
-	private final LinkedList<PropertyChangeListener> listenerList = new LinkedList<PropertyChangeListener>();
-	private ColorschemeTable colorschemeTable = new ColorschemeTable(this);
-
 	public void addListener(PropertyChangeListener listener) {
 		if (!listenerList.contains(listener))
 			listenerList.add(listener);
@@ -463,12 +484,14 @@ public class FeatureModel implements PropertyConstants {
 		for (PropertyChangeListener listener : listenerList)
 			listener.propertyChange(event);
 	}
+	
 	public void handleModelLayoutChanged() {
 		PropertyChangeEvent event = new PropertyChangeEvent(this,
 				MODEL_LAYOUT_CHANGED, Boolean.FALSE, Boolean.TRUE);
 		for (PropertyChangeListener listener : listenerList)
 			listener.propertyChange(event);
 	}
+	
 	public void refreshContextMenu() {
 		PropertyChangeEvent event = new PropertyChangeEvent(this,
 				REFRESH_ACTIONS, Boolean.FALSE, Boolean.TRUE);
@@ -482,14 +505,13 @@ public class FeatureModel implements PropertyConstants {
 		for (PropertyChangeListener listener : listenerList)
 			listener.propertyChange(event);
 	}
+	
 //	public void handleFeatureNameChanged() {
 //		PropertyChangeEvent event = new PropertyChangeEvent(this,
 //				FEATURE_NAME_CHANGED, Boolean.FALSE, Boolean.TRUE);
 //		for (PropertyChangeListener listener : listenerList)
 //			listener.propertyChange(event);
 //	}
-
-	protected boolean valid = true;
 
 	/**
 	 * Returns the value calculated during the last call of
@@ -501,14 +523,14 @@ public class FeatureModel implements PropertyConstants {
 		return valid;
 	}
 	
-        /**
-         * 
-         * @return Hashmap: key entry is Feature/Constraint, value usually indicating the kind of attribute
-         * 
-         * 	if Feature 
-         * 
-         * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#analyzeFeatureModel()} instead. 
-         */
+    /**
+     * 
+     * @return Hashmap: key entry is Feature/Constraint, value usually indicating the kind of attribute
+     * 
+     * 	if Feature 
+     * 
+     * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#analyzeFeatureModel()} instead. 
+     */
 	@Deprecated
 	public HashMap<Object, Object> analyzeFeatureModel() {
 	    return analyser.analyzeFeatureModel(null);
@@ -631,7 +653,6 @@ public class FeatureModel implements PropertyConstants {
 		assert (index < constraints.size());
 		constraints.set(index, new Constraint(this, node));
 		propNodes.set(index, node);
-
 	}
 
 	public int getNumberOfFeatures() {
@@ -707,7 +728,6 @@ public class FeatureModel implements PropertyConstants {
 	 */
 	@Deprecated
 	public boolean checkCondition(Node condition) {
-
 	    	return analyser.checkCondition(condition);
 	}
 
@@ -793,8 +813,7 @@ public class FeatureModel implements PropertyConstants {
 	public boolean exists(Set<Feature> features) throws TimeoutException {
 	    	return analyser.exists(features);
 	}
-	
-	
+
 	/**
 	 * 
 	 * @param b
@@ -872,7 +891,6 @@ public class FeatureModel implements PropertyConstants {
 		return fmComposerExtension.isValidFeatureName(s);
 	}
 	
-
 	/**
 	 * Removes all invalid java identifiers form a given string.
 	 */
@@ -927,8 +945,7 @@ public class FeatureModel implements PropertyConstants {
 	 * for unit testing purposes only
 	 * @param s
 	 */
-	public void setComposerID(String s, Object o)
-	{
+	public void setComposerID(String s, Object o) {
 		COMPOSER_ID = s;
 		fmComposerExtension = (IFMComposerExtension)o;
 		/*final FeatureModelingFMExtension f;// = new FMComposerExtension();
@@ -1228,8 +1245,14 @@ public class FeatureModel implements PropertyConstants {
 	 * @param constraint
 	 */
 	public int getConstraintIndex(Constraint constraint) {
-		return constraints.indexOf(constraint);
-
+		int j = 0;
+		for (Constraint c : constraints) {
+			if (constraint == c) {
+				return j;
+			}
+			j++;
+		}
+		return -1;
 	}
 
 	/**
@@ -1239,7 +1262,11 @@ public class FeatureModel implements PropertyConstants {
 	public void addPropositionalNode(Node node, int index) {
 		constraints.add(index, new Constraint(this, node));
 		propNodes.add(index, node);
-
+	}
+	
+	public void addConstraint(Constraint constraint, int index) {
+		constraints.add(index, constraint);
+		propNodes.add(index, constraint.getNode());
 	}
 
 	
@@ -1247,9 +1274,6 @@ public class FeatureModel implements PropertyConstants {
 	 * @return the featureOrderList
 	 */
 	public List<String> getFeatureOrderList() {
-//		for (int i = 0;i < featureOrderList.size();i++) {
-//			featureOrderList.set(i, getNewName(featureOrderList.get(i))); 
-//		}
 		return featureOrderList;
 	}
 
@@ -1291,16 +1315,10 @@ public class FeatureModel implements PropertyConstants {
 		this.featureOrderInXML = featureOrderInXML;
 	}
 	
-    private FeatureModelAnalyzer analyser = new FeatureModelAnalyzer(this);
-
     public FeatureModelAnalyzer getAnalyser() {
     	return analyser;
     }
 
-    private FeatureModelLayout layout = new FeatureModelLayout();
-	private LinkedList<Feature> falseOptionalFeatures = new LinkedList<Feature>();
-	private LinkedList<Feature> deadFeatures = new LinkedList<Feature>();
-	
 	/**
 	 * @return the falseOptionalFeatures
 	 */

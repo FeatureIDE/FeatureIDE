@@ -50,13 +50,6 @@ public class ConstraintEditOperation extends AbstractOperation {
 		this.index = index;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#execute(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
 	@Override
 	public IStatus execute(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
@@ -64,13 +57,6 @@ public class ConstraintEditOperation extends AbstractOperation {
 		return redo(monitor, info);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#redo(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
 	@Override
 	public IStatus redo(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
@@ -80,13 +66,6 @@ public class ConstraintEditOperation extends AbstractOperation {
 		return Status.OK_STATUS;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#undo(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
 	@Override
 	public IStatus undo(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {

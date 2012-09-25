@@ -396,7 +396,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 			return;
 
 		internRefresh();
-				
+
 		if (waiting) {
 			return;
 		}
