@@ -79,7 +79,9 @@ public class AheadComposer extends ComposerExtensionClass {
 		if (project == null) {
 			return false;
 		}
-		ahead = new AheadWrapper(project);
+		if (ahead == null) {
+			ahead = new AheadWrapper(project);
+		}
 		ahead.addBuildErrorListener(new BuilderErrorListener());
 		
 		try {

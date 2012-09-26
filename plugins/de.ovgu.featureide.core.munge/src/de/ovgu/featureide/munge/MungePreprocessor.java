@@ -79,7 +79,9 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 	@Override
 	public boolean initialize(IFeatureProject project) {
 		boolean supSuccess =super.initialize(project);
-		mungeModelBuilder = new MungeModelBuilder(project);
+		if (mungeModelBuilder == null) {
+			mungeModelBuilder = new MungeModelBuilder(project);
+		}
 		
 		prepareFullBuild(null);
 		annotationChecking();

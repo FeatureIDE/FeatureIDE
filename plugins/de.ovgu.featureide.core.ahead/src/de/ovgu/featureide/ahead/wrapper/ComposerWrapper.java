@@ -93,7 +93,9 @@ public class ComposerWrapper {
 		configFile = null;
 		errorListeners = new LinkedList<AheadBuildErrorListener>();
 		this.featureProject = featureProject;
-		jakModelBuilder = new JakModelBuilder(this.featureProject);
+		if (jakModelBuilder == null) {
+			jakModelBuilder = new JakModelBuilder(this.featureProject);			
+		}
 	}
 	
 	void setCompositionFolder(IFolder folder) {

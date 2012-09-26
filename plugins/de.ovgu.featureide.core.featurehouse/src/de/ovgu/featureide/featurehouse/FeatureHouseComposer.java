@@ -92,7 +92,9 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	@Override
 	public boolean initialize(IFeatureProject project) {
 		boolean supSuccess =super.initialize(project);
-		fhModelBuilder = new FeatureHouseModelBuilder(project);
+		if (fhModelBuilder == null) {
+			fhModelBuilder = new FeatureHouseModelBuilder(project);
+		}
 		createBuildStructure();
 		if(supSuccess==false || fhModelBuilder==null) {
 			return false;
