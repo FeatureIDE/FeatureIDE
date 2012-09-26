@@ -546,18 +546,14 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 		
 	}
 	
-	public String toString(boolean writeMarks)
-	{
-		if (writeMarks)
-		{
-			if (this.name.contains(" "))
-			{
+	public String toString(boolean writeMarks) {
+		if (writeMarks) {
+			if (this.name.contains(" ")) {
 				return "\"" + this.name + "\"";
 			}
 			return name;
-		}else
-		{
-			return this.toString();
+		} else {
+			return toString();
 		}
 	}
 

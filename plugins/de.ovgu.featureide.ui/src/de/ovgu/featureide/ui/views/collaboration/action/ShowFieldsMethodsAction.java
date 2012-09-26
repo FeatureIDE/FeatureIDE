@@ -22,6 +22,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
+import de.ovgu.featureide.ui.views.collaboration.figures.RoleFigure;
 
 /**
  * collaboration diagram contextmenu option
@@ -55,17 +56,15 @@ public class ShowFieldsMethodsAction extends Action {
 		super.setChecked(isSelected());
 	}
 	
-	private static ImageDescriptor getImageDiscriptor(Image image)
-	{
+	private static ImageDescriptor getImageDiscriptor(Image image) {
 		if (image != null){
 			return ImageDescriptor.createFromImage(image);
 		}
 		return null;
 	}
 	
-	public void run()  
-	{
-		boolean[] selected = collaborationView.builder.getSelectedFieldMethod();
+	public void run() {
+		boolean[] selected = RoleFigure.getSelectedFieldMethod();
 		
 		switch (this.index) {
 			case SELECT_ALL:
@@ -84,12 +83,11 @@ public class ShowFieldsMethodsAction extends Action {
 			default:
 				noOnlyFieldOrMethodSelected(selected);
 		}
-		collaborationView.builder.setSelectedFieldMethod(selected);
+		RoleFigure.setSelectedFieldMethod(selected);
 		collaborationView.refresh();
 	}
 
-	private void setSelected(boolean value, boolean[] selected)
-	{
+	private void setSelected(boolean value, boolean[] selected) {
 		for (int i = ONLY_FIELDS; i < selected.length; i++) {
 			if (i != HIDE_PARAMETERS_AND_TYPES)
 			selected[i] = value;
@@ -97,21 +95,17 @@ public class ShowFieldsMethodsAction extends Action {
 		
 	}
 	
-	private void noOnlyFieldOrMethodSelected(boolean[] selected)
-	{
-		if(!selected[ONLY_FIELDS] && !selected[ONLY_METHODS])
-		{
+	private void noOnlyFieldOrMethodSelected(boolean[] selected) {
+		if(!selected[ONLY_FIELDS] && !selected[ONLY_METHODS]) {
 			selected[ONLY_FIELDS] = true;
 			selected[ONLY_METHODS] = true;
 		}
 		selected[index] = !selected[index];
 	}
 	
-	private void noDeclarationTypSelected(boolean[] selected)
-	{
+	private void noDeclarationTypSelected(boolean[] selected) {
 		if(!selected[PUBLIC_FIELDSMETHODS] && !selected[PROTECTED_FIELDSMETHODS] && 
-		   !selected[DEFAULT_FIELDSMETHODS] && !selected[PRIVATE_FIELDSMETHODS])
-		{
+		   !selected[DEFAULT_FIELDSMETHODS] && !selected[PRIVATE_FIELDSMETHODS]) {
 			selected[PUBLIC_FIELDSMETHODS] = true;
 			selected[PROTECTED_FIELDSMETHODS] = true;
 			selected[DEFAULT_FIELDSMETHODS] = true;
@@ -120,17 +114,14 @@ public class ShowFieldsMethodsAction extends Action {
 		selected[index] = !selected[index];
 	}
 	
-	private boolean isSelected()
-	{
-		boolean[] selected = collaborationView.builder.getSelectedFieldMethod();
-		
+	private boolean isSelected() {
 		switch (index) {
 			case SELECT_ALL:
 				return false;
 			case DESELECT_ALL:
 				return false;
 			default:
-				return selected[index];
+				return RoleFigure.getSelectedFieldMethod()[index];
 		}	
 	}
 }

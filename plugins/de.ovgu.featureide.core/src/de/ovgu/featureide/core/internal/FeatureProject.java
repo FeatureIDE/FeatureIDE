@@ -110,7 +110,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	//private final IFeatureModelReader modelReader;
 	private FeatureModelReaderIFileWrapper modelReader;
 
-	private FSTModel featureIDEProjectModel;
+	private FSTModel fstModel;
 
 	/**
 	 * a folder for the generated files (only needed if the Prject has only the
@@ -199,7 +199,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		buildFolder = CorePlugin.createFolder(project, getProjectBuildPath());
 		configFolder = CorePlugin.createFolder(project,getProjectConfigurationPath());
 		sourceFolder = CorePlugin.createFolder(project, getProjectSourcePath());
-		featureIDEProjectModel = null;
+		fstModel = null;
 		// loading model data and listen to changes in the model file
 		addModelListener();
 		loadModel();
@@ -630,7 +630,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	 * @see de.ovgu.featureide.core.IFeatureProject#getJakProject()
 	 */
 	public FSTModel getFSTModel() {
-		return featureIDEProjectModel;
+		return fstModel;
 	}
 
 	/*
@@ -1293,7 +1293,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	 * core. jakprojectmodel.IJakProjectModel)
 	 */
 	public void setFSTModel(FSTModel model) {
-		featureIDEProjectModel = model;
+		fstModel = model;
 	}
 
 	/*

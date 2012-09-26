@@ -47,7 +47,6 @@ public class Role {
 	public String featureName = "";
 	public boolean selected;
 	public boolean isEditorFile = false;
-	public boolean[] selectedFieldMethod = new boolean[3];
 	public LinkedList<FSTDirective> directives = new LinkedList<FSTDirective>();
 	
 	/**

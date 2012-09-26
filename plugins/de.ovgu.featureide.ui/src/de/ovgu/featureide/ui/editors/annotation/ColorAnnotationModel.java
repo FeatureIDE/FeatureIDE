@@ -269,6 +269,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 	 *  @return the directive list
 	 */
 	private LinkedList<FSTDirective> createDirectiveList() {
+	// TODO @Jens is this neccessary
 		composer.buildFSTModel();
 		
 		// TODO Use the FSTClass to find the FSTDirectives

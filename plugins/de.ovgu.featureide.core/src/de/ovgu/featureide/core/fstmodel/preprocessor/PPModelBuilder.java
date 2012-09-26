@@ -74,6 +74,7 @@ public class PPModelBuilder {
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
+		featureProject.setFSTModel(model);
 	}
 
 	/**
