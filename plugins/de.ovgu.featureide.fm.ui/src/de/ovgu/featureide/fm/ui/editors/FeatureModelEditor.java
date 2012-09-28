@@ -361,7 +361,13 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		getPage(newPageIndex).pageChangeTo(oldPageIndex);
 
 		oldPageIndex = newPageIndex;
-		isPageModified = false;
+		
+		/*
+		 * TODO why was isPageModified set false
+		 * this causes the error that the text editor does not update if
+		 * you change the pages from Model to order to text editor page 
+		 */
+//		isPageModified = false;
 		super.pageChange(newPageIndex);
 	}
 
@@ -396,9 +402,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 	public void saveModelForConsistentRenamings() {
 		LinkedList<String> editor = new LinkedList<String>();
 		editor.add(fmFile.getResource().getName());
-
-		LinkedList<IEditorPart> editorspart = new LinkedList<IEditorPart>();
-		editorspart.add(this.getEditor(getDiagramEditorIndex()));
 
 		ListDialog dialog = new ListDialog(getSite().getWorkbenchWindow()
 				.getShell());

@@ -69,10 +69,8 @@ public class LegendHideOperation extends AbstractOperation {
 	@Override
 	public IStatus redo(IProgressMonitor arg0, IAdaptable arg1)
 			throws ExecutionException {
-
 		if (!FMPropertyManager.isLegendHidden()) {
 			FMPropertyManager.setHideLegend(false);
-
 		} else {
 			FMPropertyManager.setHideLegend(true);
 		}

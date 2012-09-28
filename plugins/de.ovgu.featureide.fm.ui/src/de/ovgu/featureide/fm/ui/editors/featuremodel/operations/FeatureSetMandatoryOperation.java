@@ -36,13 +36,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  */
 public class FeatureSetMandatoryOperation extends AbstractOperation {
 
-	/**
-	 * 
-	 */
 	private static final String LABEL_MANDATORY = "Set Feature Mandatory";
-	/**
-	 * 
-	 */
 	private static final String LABEL_OPTIONAL = "Set Feature Optional";
 	private Feature feature;
 	private FeatureModel featureModel;

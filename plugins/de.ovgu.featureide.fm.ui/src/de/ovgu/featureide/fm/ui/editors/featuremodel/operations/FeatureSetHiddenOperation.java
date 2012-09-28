@@ -84,7 +84,6 @@ public class FeatureSetHiddenOperation extends AbstractOperation {
 			throws ExecutionException {
 		feature.setHidden(!feature.isHidden());
 		featureModel.handleModelDataChanged();
-		featureModel.redrawDiagram();
 		return Status.OK_STATUS;
 	}
 
@@ -98,7 +97,7 @@ public class FeatureSetHiddenOperation extends AbstractOperation {
 	@Override
 	public IStatus undo(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
-
+		featureModel.handleModelDataChanged();
 		return redo(monitor, info);
 	}
 

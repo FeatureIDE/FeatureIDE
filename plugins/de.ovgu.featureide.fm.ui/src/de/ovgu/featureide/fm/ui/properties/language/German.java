@@ -50,32 +50,27 @@ public class German implements ILanguage {
 	
 	
 	@Override
-	public String getRedundantConst()
-	{
+	public String getRedundantConst() {
 		return REDUNDANT;
 	}
 	
 	@Override
-	public String getDeadConst()
-	{
+	public String getDeadConst() {
 		return DEAD_CONST;
 	}
 	 
 	@Override
-	public String getUnsatisfiableConst()
-	{
+	public String getUnsatisfiableConst() {
 		return UNSATISFIABLE_CONST;
 	}	
 	
 	@Override
-	public String getTautologyConst()
-	{
+	public String getTautologyConst() {
 		return TAUTOLOGY_CONST;
 	}
 	 
 	@Override
-	public String getVoidModelConst()
-	{
+	public String getVoidModelConst() {
 		return VOID_MODEL_CONST;
 	}
 	 	

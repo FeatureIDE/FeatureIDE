@@ -20,11 +20,12 @@ package de.ovgu.featureide.fm.ui.properties;
 
 import java.util.LinkedList;
 
+import javax.annotation.CheckReturnValue;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.draw2d.Border;
 import org.eclipse.draw2d.Graphics;
-import org.eclipse.draw2d.LineBorder;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 
@@ -45,6 +46,7 @@ import de.ovgu.featureide.fm.ui.properties.page.FMPropertyPage;
  * @see FMPropertyPage
  * @author Jens Meinicke
  */
+@CheckReturnValue
 public class FMPropertyManager extends FMPropertyManagerDefaults implements GUIDefaults {
 
 	/* ****************************************************
@@ -333,16 +335,16 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 
 	public static Border getConstraintBorder(boolean selected) {
 		if (selected) {
-			return new LineBorder(getConstraintBorderColor(true), 3);
+			return GUIBasics.createLineBorder(getConstraintBorderColor(true), 3);
 		}
-		return new LineBorder(getConstraintBorderColor(false), 0);
+		return GUIBasics.createLineBorder(getConstraintBorderColor(false), 0);
 	}
 
 	public static Border getHiddenFeatureBorder(boolean selected) {
 		if (selected) {
-			return new LineBorder(HIDDEN_BORDER_COLOR, 3, Graphics.LINE_DOT);
+			return GUIBasics.createLineBorder(HIDDEN_BORDER_COLOR, 3, Graphics.LINE_DOT);
 		}
-		return new LineBorder(HIDDEN_BORDER_COLOR, 1, Graphics.LINE_DASH);
+		return GUIBasics.createLineBorder(HIDDEN_BORDER_COLOR, 1, Graphics.LINE_DASH);
 	}
 
 //	private static Color getHiddenBorderColor() {
@@ -351,9 +353,9 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 
 	public static Border getDeadFeatureBorder(boolean selected) {
 		if (selected) {
-			return new LineBorder(getDeadBorderColor(), 3);
+			return GUIBasics.createLineBorder(getDeadBorderColor(), 3);
 		}
-		return new LineBorder(getDeadBorderColor(), 1);
+		return GUIBasics.createLineBorder(getDeadBorderColor(), 1);
 	}
 
 	private static Color getDeadBorderColor() {
@@ -361,14 +363,14 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	}
 
 	public static Border getLegendBorder() {
-		return new LineBorder(getLegendBorderColor(), 1);
+		return GUIBasics.createLineBorder(getLegendBorderColor(), 1);
 	}
 
 	public static Border getConcreteFeatureBorder(boolean selected) {
 		if (selected) {
-			return new LineBorder(getConcreteBorderColor(), 3);
+			return GUIBasics.createLineBorder(getConcreteBorderColor(), 3);
 		}
-		return new LineBorder(getConcreteBorderColor(), 1);
+		return GUIBasics.createLineBorder(getConcreteBorderColor(), 1);
 	}
 
 	private static Color getConcreteBorderColor() {
@@ -377,9 +379,9 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 
 	public static Border getAbsteactFeatureBorder(boolean selected) {
 		if (selected) {
-			return new LineBorder(getAbstractBorderColor(), 3);
+			return GUIBasics.createLineBorder(getAbstractBorderColor(), 3);
 		}
-		return new LineBorder(getAbstractBorderColor(), 1);
+		return GUIBasics.createLineBorder(getAbstractBorderColor(), 1);
 	}
 
 	private static Color getAbstractBorderColor() {
@@ -387,7 +389,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	}
 
 	public static Border getHiddenLegendBorder() {
-		return new LineBorder(getDiagramBackgroundColor(), 1, SWT.LINE_DOT);
+		return GUIBasics.createLineBorder(getDiagramBackgroundColor(), 1, SWT.LINE_DOT);
 	}
 
 	public static Color getDecoratorForgroundColor() {

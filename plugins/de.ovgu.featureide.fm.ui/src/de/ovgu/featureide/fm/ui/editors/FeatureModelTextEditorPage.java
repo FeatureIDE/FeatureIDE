@@ -134,33 +134,21 @@ public class FeatureModelTextEditorPage extends TextEditor implements
 		return this;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#getControl1()
-	 */
 	@Override
 	public Control getControl() {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#propertyChange(java.beans.PropertyChangeEvent)
-	 */
 	@Override
 	public void propertyChange(PropertyChangeEvent event) {
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#pageChangeFrom(int)
-	 */
 	@Override
 	public void pageChangeFrom(int newPage) {
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#pageChangeTo(int)
-	 */
 	@Override
 	public void pageChangeTo(int oldPage) {
 		if (featureModelEditor.isPageModified) {
@@ -172,9 +160,6 @@ public class FeatureModelTextEditorPage extends TextEditor implements
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#getID()
-	 */
 	@Override
 	public String getID() {
 		return ID;

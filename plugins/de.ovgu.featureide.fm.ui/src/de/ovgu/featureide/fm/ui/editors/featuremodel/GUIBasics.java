@@ -18,6 +18,9 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel;
 
+import javax.annotation.CheckReturnValue;
+
+import org.eclipse.draw2d.LineBorder;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
@@ -27,6 +30,7 @@ import org.eclipse.swt.graphics.FontData;
  * 
  * @author Thomas Thuem
  */
+@CheckReturnValue
 public class GUIBasics {
 
 	public static Color createColor(int r, int g, int b) {
@@ -42,6 +46,14 @@ public class GUIBasics {
 		int g = (int) (color.getGreen()*0.75);
 		int b = (int) (color.getBlue()*0.75);
 		return new Color(null, r, g, b);
+	}
+
+	public static LineBorder createLineBorder(Color color, int width, int style) {
+		return new LineBorder(color, width, style);
+	}
+
+	public static LineBorder createLineBorder(Color color, int width) {
+		return new LineBorder(color, width);
 	}
 	
 	public static boolean unicodeStringTest(Font swtFont, String s) {
