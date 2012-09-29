@@ -23,7 +23,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.AbstractOperation;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -44,35 +43,23 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  * @author Jan Wedding
  * @author Melanie Pflaume
  */
-// TODO this method should just call DeleteOperation
-public class DeleteAllOperation extends AbstractOperation implements GUIDefaults {
+public class DeleteAllOperation extends AbstractFeatureModelOperation implements GUIDefaults {
 
 	private static final String LABEL = "Delete including subfeatures";
-	private FeatureModel featureModel;
 	private Feature feature;
 	private LinkedList<Feature> featureList;
 	private LinkedList<Feature> containedFeatureList;
-	private List<AbstractOperation> operations;
+	private List<AbstractFeatureModelOperation> operations = new LinkedList<AbstractFeatureModelOperation>();
 
 	/**
 	 * @param viewer
 	 * @param featureModel
 	 */
-	public DeleteAllOperation(Object viewer, FeatureModel featureModel,
-			Feature parent) {
-		super(LABEL);
-		this.featureModel = featureModel;
+	public DeleteAllOperation(FeatureModel featureModel, Feature parent) {
+		super(featureModel, LABEL);
 		this.feature = parent;
-		this.operations = new LinkedList<AbstractOperation>();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#execute(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
 	@Override
 	public IStatus execute(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
@@ -83,34 +70,30 @@ public class DeleteAllOperation extends AbstractOperation implements GUIDefaults
 		list.add(feature);	
 		getFeaturesToDelete(list);
 
-		AbstractOperation op = null;
-
 		if (containedFeatureList.isEmpty()){
 			for (Feature feat : featureList){			
-				op = new FeatureDeleteOperation(featureModel, feat, false);
+				AbstractFeatureModelOperation op = new FeatureDeleteOperation(featureModel, feat);
 				executeOperation(op);
 				operations.add(op);
-			}			
-			featureModel.handleModelDataChanged();
+			}
 		} else {
+			final String containedFeatures = containedFeatureList.toString();
 			MessageDialog dialog = new MessageDialog(new Shell(), 
 					" Delete Error ", FEATURE_SYMBOL, 
 					"The following features are contained in constraints:" + '\n'
-					+ containedFeatureList.toString().substring(1, containedFeatureList.toString().length() - 1) + '\n' + '\n' +
+					+ containedFeatures.substring(1, containedFeatures.length() - 1) + '\n' + '\n' +
 					"Unable to delete this features until all relevant constraints are removed.",
 					MessageDialog.ERROR, new String[] { IDialogConstants.OK_LABEL }, 0);
 			
 			dialog.open();
 		}
-
 		return Status.OK_STATUS;
 	}
 
-	private void executeOperation(AbstractOperation op) {
+	private void executeOperation(AbstractFeatureModelOperation op) {
 		try {
 			PlatformUI.getWorkbench().getOperationSupport()
 					.getOperationHistory().execute(op, null, null);
-
 		} catch (ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
 
@@ -118,51 +101,33 @@ public class DeleteAllOperation extends AbstractOperation implements GUIDefaults
 	}
 
 	@Override
-	public IStatus redo(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
-
-		List<AbstractOperation> ops = new LinkedList<AbstractOperation>();
+	void redo() {
+		List<AbstractFeatureModelOperation> ops = new LinkedList<AbstractFeatureModelOperation>();
 		ops.addAll(operations);
 		Collections.reverse(operations);
 		while (!ops.isEmpty()) {
-			for (AbstractOperation op : operations) {
+			for (AbstractFeatureModelOperation op : operations) {
 				try {
-					op.redo(monitor, info);
+					op.redo();
 					ops.remove(op);
-
 				} catch (Exception e) {}
 			}
 		}
-		featureModel.handleModelDataChanged();
-		featureModel.redrawDiagram();
-
-		return Status.OK_STATUS;
-
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#undo(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
 	@Override
-	public IStatus undo(IProgressMonitor arg0, IAdaptable arg1)
-			throws ExecutionException {
-		List<AbstractOperation> ops = new LinkedList<AbstractOperation>();
+	void undo() {
+		List<AbstractFeatureModelOperation> ops = new LinkedList<AbstractFeatureModelOperation>();
 		ops.addAll(operations);
 		Collections.reverse(operations);
 		while (!ops.isEmpty()) {
-			for (AbstractOperation op : operations) {
+			for (AbstractFeatureModelOperation op : operations) {
 				if (op.canUndo()) {
-					op.undo(arg0, arg1);
+					op.undo();
 					ops.remove(op);
 				}
 			}
 		}
-		featureModel.handleModelDataLoaded();
-		return Status.OK_STATUS;
 	}
 
 	/**
@@ -172,13 +137,14 @@ public class DeleteAllOperation extends AbstractOperation implements GUIDefaults
 	 * @param linkedList
 	 */
 	private void getFeaturesToDelete(LinkedList<Feature> linkedList) {		
-		for (Feature feat : linkedList){
-			if (!feat.getRelevantConstraints().isEmpty()) 
+		for (Feature feat : linkedList) {
+			if (!feat.getRelevantConstraints().isEmpty()) {
 				containedFeatureList.add(feat);
-			if (feat.hasChildren()){
+			}
+			if (feat.hasChildren()) {
 				getFeaturesToDelete(feat.getChildren());
 			}
-			this.featureList.add(feat);
+			featureList.add(feat);
 		}
 	}
 }

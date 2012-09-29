@@ -21,12 +21,6 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import java.util.LinkedList;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.AbstractOperation;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.Feature;
@@ -39,49 +33,23 @@ import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
  * 
  * @author Fabian Benduhn
  */
-public class FeatureMoveOperation extends AbstractOperation {
+public class FeatureMoveOperation extends AbstractFeatureModelOperation {
 
 	private static final String LABEL = "Move Feature";
 	private FeatureOperationData data;
-	private FeatureModel featureModel;
 	private Point newPos;
 	private Point oldPos;
 	private Feature feature;
 
 	public FeatureMoveOperation(FeatureOperationData data,
 			FeatureModel featureModel, Point newPos, Point oldPos, Feature feature) {
-		super(LABEL);
+		super(featureModel, LABEL);
 		this.data = data;
-		this.featureModel = featureModel;
 		this.newPos = newPos;
 		this.oldPos = oldPos;
 		this.feature = feature;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#execute(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
-	@Override
-	public IStatus execute(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
-		return redo(monitor, info);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#redo(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 * If manual Layout is on, their will be create a new Index for
-	 * the moved Feature
-	 * 
-	 */
-	
 	public void newInnerOrder (Point newPos){
 			FeatureUIHelper.setLocation(feature, newPos);	
 			if(!data.getFeature().isRoot()){
@@ -126,25 +94,18 @@ public class FeatureMoveOperation extends AbstractOperation {
 	}
 	
 	@Override
-	public IStatus redo(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {	
-			if(!featureModel.getLayout().hasFeaturesAutoLayout()){
-				newInnerOrder(newPos);
-				featureModel.handleModelLayoutChanged();
+	void redo() {	
+		if(!featureModel.getLayout().hasFeaturesAutoLayout()){
+			newInnerOrder(newPos);
+		} else {
+			try{
+				data.getOldParent().removeChild(data.getFeature());
+				data.getNewParent().addChildAtPosition(data.getNewIndex(),
+						data.getFeature());
+			} catch (Exception e){
+				FMUIPlugin.getDefault().logError(e);
 			}
-			else{
-				try{
-					data.getOldParent().removeChild(data.getFeature());
-					data.getNewParent().addChildAtPosition(data.getNewIndex(),
-							data.getFeature());
-					featureModel.handleModelDataChanged();
-				} catch (Exception e){
-					FMUIPlugin.getDefault().logError(e);
-				}
-			}
-		
-			
-			return Status.OK_STATUS;
+		}
 	}
 
 	/*
@@ -155,24 +116,23 @@ public class FeatureMoveOperation extends AbstractOperation {
 	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
 	 */
 	@Override
-	public IStatus undo(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
-			if(!featureModel.getLayout().hasFeaturesAutoLayout()){
-				newInnerOrder(oldPos);
-			} else{
-				try{
-					data.getNewParent().removeChild(data.getFeature());
-					if(data.getOldParent()!=null){
-						data.getOldParent().addChildAtPosition(data.getOldIndex(),
-								data.getFeature());
-					}
-					featureModel.handleModelDataChanged();
-				} catch (Exception e){
-					FMUIPlugin.getDefault().logError(e);
+	void undo() {
+		if(!featureModel.getLayout().hasFeaturesAutoLayout()){
+			newInnerOrder(oldPos);
+			/*
+			 * TODO model wasn't refreshed in this case 
+			 */
+		} else {
+			try{
+				data.getNewParent().removeChild(data.getFeature());
+				if(data.getOldParent()!=null){
+					data.getOldParent().addChildAtPosition(data.getOldIndex(),
+							data.getFeature());
 				}
+			} catch (Exception e){
+				FMUIPlugin.getDefault().logError(e);
 			}
-		
-		return Status.OK_STATUS;
+		}
 	}
 
 }

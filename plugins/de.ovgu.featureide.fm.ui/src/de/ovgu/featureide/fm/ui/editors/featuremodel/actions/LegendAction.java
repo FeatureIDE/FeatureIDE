@@ -51,7 +51,6 @@ public class LegendAction extends Action {
 
 	@Override
 	public void run() {
-
 		LegendHideOperation op = new LegendHideOperation(featureModel);
 		op.addContext((IUndoContext) featureModel.getUndoContext());
 

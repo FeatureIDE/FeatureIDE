@@ -18,13 +18,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.AbstractOperation;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
@@ -34,11 +27,8 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  * 
  * @author Fabian Benduhn
  */
-public class FeatureChangeGroupTypeOperation extends AbstractOperation {
+public class FeatureChangeGroupTypeOperation extends AbstractFeatureModelOperation {
 
-	/**
-	 * 
-	 */
 	private static final String LABEL = "Change Group Type";
 	public static final int ALTERNATIVE = 0;
 	public static final int AND = 1;
@@ -47,7 +37,6 @@ public class FeatureChangeGroupTypeOperation extends AbstractOperation {
 	protected Feature feature;
 	private int groupType;
 	private int oldGroupType;
-	private FeatureModel featureModel;
 
 	/**
 	 * Grouptype of feature will be set to groupType when this operation is
@@ -55,12 +44,10 @@ public class FeatureChangeGroupTypeOperation extends AbstractOperation {
 	 */
 	public FeatureChangeGroupTypeOperation(int groupType, Feature feature,
 			FeatureModel featureModel) {
-
-		super(getLabel(groupType));
+		super(featureModel, getLabel(groupType));
 		this.groupType = groupType;
 		this.oldGroupType = getGroupType(feature);
 		this.feature = feature;
-		this.featureModel = featureModel;
 	}
 
 	/**
@@ -77,29 +64,8 @@ public class FeatureChangeGroupTypeOperation extends AbstractOperation {
 		return LABEL;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#execute(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
 	@Override
-	public IStatus execute(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
-		return redo(monitor, info);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#redo(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
-	@Override
-	public IStatus redo(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
+	void redo() {
 		if (groupType == ALTERNATIVE) {
 			feature.changeToAlternative();
 		} else if (groupType == OR) {
@@ -107,20 +73,10 @@ public class FeatureChangeGroupTypeOperation extends AbstractOperation {
 		} else {
 			feature.changeToAnd();
 		}
-		featureModel.handleModelDataChanged();
-		return Status.OK_STATUS;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#undo(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
 	@Override
-	public IStatus undo(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
+	void undo() {
 		if (oldGroupType == ALTERNATIVE) {
 			feature.changeToAlternative();
 		} else if (oldGroupType == AND) {
@@ -128,12 +84,9 @@ public class FeatureChangeGroupTypeOperation extends AbstractOperation {
 		} else {
 			feature.changeToOr();
 		}
-		featureModel.handleModelDataChanged();
-		return Status.OK_STATUS;
-
 	}
 
-		private static int getGroupType(Feature feature) {
+	private static int getGroupType(Feature feature) {
 		if (feature.isAlternative()) {
 			return ALTERNATIVE;
 		} else if (feature.isAnd()) {

@@ -18,12 +18,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.AbstractOperation;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.Constraint;
@@ -36,12 +30,11 @@ import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
  * 
  * @author Fabian Benduhn
  */
-public class ConstraintMoveOperation extends AbstractOperation {
+public class ConstraintMoveOperation extends AbstractFeatureModelOperation {
 
 	private static final String LABEL = "Move Constraint";
 
 	private Constraint constraint;
-	private FeatureModel featureModel;
 	private int index;
 
 	private int oldIndex;
@@ -53,61 +46,26 @@ public class ConstraintMoveOperation extends AbstractOperation {
 			FeatureModel featureModel, int newIndex, int oldIndex,
 			boolean isLastPos, Point newPos, Point oldPos) {
 
-		super(LABEL);
+		super(featureModel, LABEL);
 		this.constraint = constraint;
-		this.featureModel = featureModel;
 		this.index = newIndex;
 		this.oldIndex = oldIndex;
 		this.newPos = newPos;
 		this.oldPos = oldPos;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#execute(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
 	@Override
-	public IStatus execute(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
-
-		return redo(monitor, info);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#redo(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
-	@Override
-	public IStatus redo(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
+	void redo() {
 		featureModel.removePropositionalNode(constraint);
 		featureModel.addConstraint(constraint, index);
 		FeatureUIHelper.setLocation(featureModel.getConstraints().get(index), newPos);
-		featureModel.handleModelDataChanged();
-		return Status.OK_STATUS;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#undo(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
+	
 	@Override
-	public IStatus undo(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
+	void undo() {
 		featureModel.removePropositionalNode(constraint);
 		featureModel.addConstraint(constraint, oldIndex);
 		FeatureUIHelper.setLocation(featureModel.getConstraints().get(index), oldPos);
-		featureModel.handleModelDataChanged();
-		return Status.OK_STATUS;
 	}
 
 }

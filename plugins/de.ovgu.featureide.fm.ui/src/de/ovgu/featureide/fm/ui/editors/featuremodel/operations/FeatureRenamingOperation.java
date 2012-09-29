@@ -18,13 +18,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.AbstractOperation;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-
 import de.ovgu.featureide.fm.core.FeatureModel;
 
 /**
@@ -33,63 +26,27 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  * 
  * @author Fabian Benduhn
  */
-public class FeatureRenamingOperation extends AbstractOperation {
+public class FeatureRenamingOperation extends AbstractFeatureModelOperation {
 
 	private static final String LABEL = "Rename Feature";
-	private FeatureModel featureModel;
 	private String oldName;
 	private String newName;
 
 	public FeatureRenamingOperation(FeatureModel featureModel, String oldName,
 			String newName) {
-		super(LABEL);
-		this.featureModel = featureModel;
+		super(featureModel, LABEL);
 		this.oldName = oldName;
 		this.newName = newName;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#execute(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
 	@Override
-	public IStatus execute(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
-
-		return redo(monitor, info);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#redo(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
-	@Override
-	public IStatus redo(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
+	void redo() {
 		featureModel.renameFeature(oldName, newName);
-		featureModel.handleModelDataChanged();
-		return Status.OK_STATUS;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#undo(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
 	@Override
-	public IStatus undo(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
+	void undo() {
 		featureModel.renameFeature(newName, oldName);
-		featureModel.handleModelDataChanged();
-		return Status.OK_STATUS;
 	}
 
 }

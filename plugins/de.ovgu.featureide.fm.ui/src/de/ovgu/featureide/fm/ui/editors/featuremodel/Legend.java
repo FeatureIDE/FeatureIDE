@@ -40,8 +40,8 @@ public class Legend {
 		return model;
 	}
 	public void update() {
-		model.redrawDiagram();
-
+//		model.redrawDiagram();
+		model.handleModelDataChanged();
 	}
 
 	public Point getPos() {

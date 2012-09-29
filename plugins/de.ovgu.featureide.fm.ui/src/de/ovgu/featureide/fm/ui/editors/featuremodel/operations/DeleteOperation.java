@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.AbstractOperation;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -58,25 +57,21 @@ import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePage;
  * 
  * @author Fabian Benduhn
  */
-public class DeleteOperation extends AbstractOperation implements GUIDefaults {
+public class DeleteOperation extends AbstractFeatureModelOperation implements GUIDefaults {
 
 	private static final String LABEL = "Delete";
 	private Object viewer;
-	private FeatureModel featureModel;
-	private List<AbstractOperation> operations;
+	private List<AbstractFeatureModelOperation > operations = new LinkedList<AbstractFeatureModelOperation >();
 	
 	public DeleteOperation(Object viewer, FeatureModel featureModel) {
-		super(LABEL);
+		super(featureModel, LABEL);
 		this.viewer = viewer;
-		this.featureModel = featureModel;
-		this.operations = new LinkedList<AbstractOperation>();
 	}
 
 	@Override
 	public IStatus execute(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
 		doDelete();
-		featureModel.handleModelDataChanged();
 		return Status.OK_STATUS;
 	}
 
@@ -84,13 +79,6 @@ public class DeleteOperation extends AbstractOperation implements GUIDefaults {
 	 * Executes the requested delete operation.
 	 */
 	public void doDelete() {
-		IStructuredSelection selection;
-		if (viewer instanceof GraphicalViewerImpl) {
-			selection = (IStructuredSelection) ((GraphicalViewerImpl) viewer).getSelection();
-		} else { 
-			selection = (IStructuredSelection) ((TreeViewer) viewer).getSelection();
-		}
-		
 		/**
 		 * The key of the Map is the feature which could be replaced by their equivalents given at the 
 		 * corresponding List. 
@@ -98,7 +86,7 @@ public class DeleteOperation extends AbstractOperation implements GUIDefaults {
 		Map<Feature, List<Feature>> removalMap = new HashMap<Feature, List<Feature>>();
 		List<Feature> alreadyDeleted = new LinkedList<Feature>();
 		
-		for (Object element : selection.toArray()) {
+		for (Object element : getSelection().toArray()) {
 			if (removeConstraint(element)) {
 				continue;
 			}
@@ -106,6 +94,14 @@ public class DeleteOperation extends AbstractOperation implements GUIDefaults {
 		}
 		
 		removeContainedFeatures(removalMap, alreadyDeleted);
+	}
+
+	private IStructuredSelection getSelection() {
+		if (viewer instanceof GraphicalViewerImpl) {
+			return (IStructuredSelection) ((GraphicalViewerImpl) viewer).getSelection();
+		} else { 
+			return (IStructuredSelection) ((TreeViewer) viewer).getSelection();
+		}
 	}
 
 	/**
@@ -143,7 +139,7 @@ public class DeleteOperation extends AbstractOperation implements GUIDefaults {
 		if (feature != null) {	
 			if (feature.getRelevantConstraints().isEmpty()) {
 				// feature can be removed because it has no relevant constraint
-				executeOperation(new FeatureDeleteOperation(featureModel, feature, true));
+				executeOperation(new FeatureDeleteOperation(featureModel, feature));
 				alreadyDeleted.add(feature);
 			} else {
 				// check for all equivalent features
@@ -162,7 +158,7 @@ public class DeleteOperation extends AbstractOperation implements GUIDefaults {
 	/**
 	 * @param operation the operation to execute.
 	 */
-	private void executeOperation(AbstractOperation operation) {
+	public void executeOperation(AbstractFeatureModelOperation  operation) {
 		operations.add(operation);
 		try {
 			PlatformUI.getWorkbench().getOperationSupport()
@@ -200,7 +196,7 @@ public class DeleteOperation extends AbstractOperation implements GUIDefaults {
 			
 			if (hasDeletableFeature) {
 				// case: features can be replaced with an equivalent feature 
-				new DeleteOperationAlternativeDialog(featureModel, removalMap);	
+				new DeleteOperationAlternativeDialog(featureModel, removalMap, this);	
 			} else {
 				// case: features can NOT be replaced with an equivalent feature
 				openErrorDialog(notDeletable);
@@ -236,17 +232,14 @@ public class DeleteOperation extends AbstractOperation implements GUIDefaults {
 	}
 
 	@Override
-	public IStatus redo(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
-
-		List<AbstractOperation> ops = new LinkedList<AbstractOperation>();
+	void redo() {
+		List<AbstractFeatureModelOperation > ops = new LinkedList<AbstractFeatureModelOperation >();
 		ops.addAll(operations);
 		Collections.reverse(operations);
 		while (!ops.isEmpty()) {
-			for (AbstractOperation op : operations) {
+			for (AbstractFeatureModelOperation  op : operations) {
 				try {
-
-					op.redo(monitor, info);
+					op.redo();
 					ops.remove(op);
 
 				} catch (Exception e) {
@@ -255,32 +248,21 @@ public class DeleteOperation extends AbstractOperation implements GUIDefaults {
 
 			}
 		}
-		featureModel.handleModelDataChanged();
-		
-		/*
-		 * TODO why was the model redrawed here?
-		 */
-//		featureModel.redrawDiagram();
-
-		return Status.OK_STATUS;
 
 	}
 
 	@Override
-	public IStatus undo(IProgressMonitor arg0, IAdaptable arg1)
-			throws ExecutionException {
-		List<AbstractOperation> ops = new ArrayList<AbstractOperation>(operations);
+	void undo() {
+		List<AbstractFeatureModelOperation > ops = new ArrayList<AbstractFeatureModelOperation >(operations);
 		Collections.reverse(operations);
 		while (!ops.isEmpty()) {
-			for (AbstractOperation op : operations) {
+			for (AbstractFeatureModelOperation  op : operations) {
 				if (op.canUndo()) {
-					op.undo(arg0, arg1);
+					op.undo();
 					ops.remove(op);
 				}
 			}
 		}
-		featureModel.handleModelDataLoaded();
-		return Status.OK_STATUS;
 	}
 
 }

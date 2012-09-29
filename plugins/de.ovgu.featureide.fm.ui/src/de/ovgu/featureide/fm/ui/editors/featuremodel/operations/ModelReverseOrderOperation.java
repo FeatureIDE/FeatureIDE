@@ -20,12 +20,6 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import java.util.LinkedList;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.AbstractOperation;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 
@@ -39,50 +33,25 @@ import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
  * 
  * @author Fabian Benduhn
  */
-public class ModelReverseOrderOperation extends AbstractOperation {
+public class ModelReverseOrderOperation extends AbstractFeatureModelOperation {
 
 	private static final String LABEL = "Reverse Layout Order";
-	private FeatureModel featureModel;
 
 	public ModelReverseOrderOperation(FeatureModel featureModel) {
-		super(LABEL);
-		this.featureModel = featureModel;
+		super(featureModel, LABEL);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#execute(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
 	@Override
-	public IStatus execute(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
-		return redo(monitor, info);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#redo(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
-	@Override
-	public IStatus redo(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
-		reverse(featureModel.getRoot());
+	void redo() {
+		final Feature root = featureModel.getRoot();
+		reverse(root);
 		if(!featureModel.getLayout().hasFeaturesAutoLayout()){
-			Point mid = FeatureUIHelper.getLocation(featureModel.getRoot()).getCopy();
-			mid.x += FeatureUIHelper.getSize(featureModel.getRoot()).width/2;
-			mid.y += FeatureUIHelper.getSize(featureModel.getRoot()).height/2;
-			mirrorFeaturePositions(featureModel.getRoot(),mid,
+			Point mid = FeatureUIHelper.getLocation(root).getCopy();
+			mid.x += FeatureUIHelper.getSize(root).width/2;
+			mid.y += FeatureUIHelper.getSize(root).height/2;
+			mirrorFeaturePositions(root,mid,
 					FeatureUIHelper.hasVerticalLayout(featureModel));
 		}
-
-		featureModel.handleModelDataChanged();
-		return Status.OK_STATUS;
 	}
 
 	private void mirrorFeaturePositions(Feature feature, Point mid, boolean vertical) {	
@@ -117,17 +86,9 @@ public class ModelReverseOrderOperation extends AbstractOperation {
 			reverse(child);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#undo(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
 	@Override
-	public IStatus undo(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
-		return redo(monitor, info);
+	void undo() {
+		redo();
 	}
 
 }

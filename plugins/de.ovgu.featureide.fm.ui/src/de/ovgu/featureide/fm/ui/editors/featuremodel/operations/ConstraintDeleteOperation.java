@@ -18,13 +18,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.AbstractOperation;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
@@ -34,46 +27,32 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayou
  * 
  * @author Fabian Benduhn
  */
-public class ConstraintDeleteOperation extends AbstractOperation {
+public class ConstraintDeleteOperation extends AbstractFeatureModelOperation {
 
 	private static final String LABEL = "Delete Constraint";
-	private FeatureModel featureModel;
 	private Constraint constraint;
 	
 	private int index;
 
 	public ConstraintDeleteOperation(Constraint constraint,
 			FeatureModel featureModel) {
-		super(LABEL);
-		this.featureModel = featureModel;
+		super(featureModel, LABEL);
 		this.constraint = constraint;
 	}
 
 	@Override
-	public IStatus execute(IProgressMonitor arg0, IAdaptable arg1)
-			throws ExecutionException {
-		return redo(arg0, arg1);
-	}
-
-	@Override
-	public IStatus redo(IProgressMonitor arg0, IAdaptable arg1)
-			throws ExecutionException {
+	void redo() {
 		index = featureModel.getConstraintIndex(constraint);
 		featureModel.removePropositionalNode(constraint);
-		featureModel.handleModelDataChanged();
-		return Status.OK_STATUS;
 	}
 
 	@Override
-	public IStatus undo(IProgressMonitor arg0, IAdaptable arg1)
-			throws ExecutionException {
+	void undo() {
 		featureModel.addConstraint(constraint, index);
 		//initialize constraint position in manual layout
 		if(!featureModel.getLayout().hasFeaturesAutoLayout())
 			FeatureDiagramLayoutHelper.initializeConstraintPosition(featureModel,
 				featureModel.getConstraintCount()-1);
-		featureModel.handleModelDataChanged();
-		return Status.OK_STATUS;
 	}
 
 }

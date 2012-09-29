@@ -18,12 +18,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.AbstractOperation;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -35,47 +29,33 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayou
  * 
  * @author Fabian Benduhn
  */
-public class ConstraintEditOperation extends AbstractOperation {
+public class ConstraintEditOperation extends AbstractFeatureModelOperation {
 
 	private static final String LABEL = "Edit Constraint";
 	private Node propNode;
-	private FeatureModel featureModel;
 	private int index;
 	private Node oldPropNode;
 
 	public ConstraintEditOperation(Node propNode, FeatureModel featuremodel, int index) {
-		super(LABEL);
+		super(featuremodel, LABEL);
 		this.propNode = propNode;
-		this.featureModel = featuremodel;
 		this.index = index;
 	}
 
 	@Override
-	public IStatus execute(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
+	void redo() {
 		oldPropNode = featureModel.getConstraint(index);
-		return redo(monitor, info);
-	}
-
-	@Override
-	public IStatus redo(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
 		featureModel.replacePropNode(index, propNode);
 		FeatureDiagramLayoutHelper.initializeConstraintPosition(featureModel, index);
-		featureModel.handleModelDataChanged();
-		return Status.OK_STATUS;
 	}
 
 	@Override
-	public IStatus undo(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
+	void undo() {
 		featureModel.replacePropNode(index, oldPropNode);
 		//initialize constraint position in manual layout
 		if(!featureModel.getLayout().hasFeaturesAutoLayout())
 			FeatureDiagramLayoutHelper.initializeConstraintPosition(featureModel,
 							index);
-		featureModel.handleModelDataChanged();
-		return Status.OK_STATUS;
 	}
 
 }

@@ -18,13 +18,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.AbstractOperation;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
@@ -33,63 +26,27 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * 
  * @author Fabian Benduhn
  */
-public class LegendHideOperation extends AbstractOperation {
+public class LegendHideOperation extends AbstractFeatureModelOperation {
 
 	private static final String LABEL = "Show/Hide Legend";
-	private FeatureModel featureModel;
 
 	/**
 	 * @param label
 	 */
 	public LegendHideOperation(FeatureModel featureModel) {
-		super(LABEL);
+		super(featureModel, LABEL);
 		this.featureModel = featureModel;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#execute(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
 	@Override
-	public IStatus execute(IProgressMonitor arg0, IAdaptable arg1)
-			throws ExecutionException {
-		return redo(arg0, arg1);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#redo(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
-	@Override
-	public IStatus redo(IProgressMonitor arg0, IAdaptable arg1)
-			throws ExecutionException {
-		if (!FMPropertyManager.isLegendHidden()) {
-			FMPropertyManager.setHideLegend(false);
-		} else {
-			FMPropertyManager.setHideLegend(true);
-		}
-		featureModel.handleModelDataChanged();
+	void redo() {
+		FMPropertyManager.setHideLegend(FMPropertyManager.isLegendHidden());
 		featureModel.refreshContextMenu();
-		return Status.OK_STATUS;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#undo(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
 	@Override
-	public IStatus undo(IProgressMonitor arg0, IAdaptable arg1)
-			throws ExecutionException {
-		return redo(arg0, arg1);
+	void undo() {
+		redo();
 	}
 
 }

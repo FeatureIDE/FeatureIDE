@@ -19,14 +19,14 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.AbstractOperation;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.draw2d.geometry.Point;
 
+import de.ovgu.featureide.fm.core.FMPoint;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.FeatureModelLayout;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
 
@@ -35,80 +35,41 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
  * 
  * @author Fabian Benduhn
  */
-// TODO @Fabian redo/undo does not work
-public class LegendMoveOperation extends AbstractOperation {
+public class LegendMoveOperation extends AbstractFeatureModelOperation {
 
 	private static final String LABEL = "Move Legend";
-	private FeatureModel featureModel;
 	private Point pos;
-	private org.eclipse.draw2d.geometry.Point oldPos;
+	private Point oldPos;
 	private boolean wasAutoLayout;
-	private LegendFigure figure;
 
-	/*
-	 * TODO @Fabian parameter figure is never used
-	 */
-	public LegendMoveOperation(FeatureModel featureModel,
-			org.eclipse.draw2d.geometry.Point p, Point newPos, LegendFigure figure) {
-		super(LABEL);
-		this.featureModel = featureModel;
+	public LegendMoveOperation(FeatureModel featureModel, Point p, Point newPos, LegendFigure figure) {
+		super(featureModel, LABEL);
 		this.pos = p;
-		this.figure = figure;
-		this.oldPos = new Point(featureModel.getLayout().getLegendPos().x,
-				featureModel.getLayout().getLegendPos().y);
+		final FMPoint legendPos = featureModel.getLayout().getLegendPos();
+		this.oldPos = new Point(legendPos.x, legendPos.y);
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#execute(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
+	
 	@Override
 	public IStatus execute(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
-	
 		this.wasAutoLayout = featureModel.getLayout().hasLegendAutoLayout();
 		return redo(monitor, info);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#redo(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
 	@Override
-	public IStatus redo(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
-		figure=FeatureUIHelper.getLegendFigure(featureModel);
-		figure.setLocation(pos);
-		featureModel.getLayout().setLegendPos(pos.x, pos.y);
-		featureModel.getLayout().setLegendAutoLayout(false);
-		featureModel.refreshContextMenu();
-	//	featureModel.handleModelDataChanged();
-		//featureModel.redrawDiagram();
-		return Status.OK_STATUS;
+	void redo() {
+		FeatureUIHelper.getLegendFigure(featureModel).setLocation(pos);
+		final FeatureModelLayout layout = featureModel.getLayout();
+		layout.setLegendPos(pos.x, pos.y);
+		layout.setLegendAutoLayout(false);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#undo(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
 	@Override
-	public IStatus undo(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
-
-		featureModel.getLayout().setLegendPos(oldPos.x, oldPos.y);
-		featureModel.getLayout().setLegendAutoLayout(wasAutoLayout);
-		featureModel.redrawDiagram();
-		featureModel.refreshContextMenu();
-		return Status.OK_STATUS;
+	void undo() {
+		FeatureUIHelper.getLegendFigure(featureModel).setLocation(oldPos);
+		final FeatureModelLayout layout = featureModel.getLayout();
+		layout.setLegendPos(oldPos.x, oldPos.y);
+		layout.setLegendAutoLayout(wasAutoLayout);
 	}
 
 }

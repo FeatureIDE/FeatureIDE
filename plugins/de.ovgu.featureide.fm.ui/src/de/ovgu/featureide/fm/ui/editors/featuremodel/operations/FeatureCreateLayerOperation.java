@@ -19,7 +19,6 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.AbstractOperation;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -42,59 +41,46 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayou
  * 
  * @author Fabian Benduhn
  */
-public class FeatureCreateLayerOperation extends AbstractOperation {
+public class FeatureCreateLayerOperation extends AbstractFeatureModelOperation {
 
 	private static final String LABEL = "Create Layer";
 	private Feature feature;
 	private Object viewer;
-	FeatureModel featureModel;
 	private Feature newFeature;
 	private Object diagramEditor;
 
 	public FeatureCreateLayerOperation(Feature feature,
 			Object viewer, FeatureModel featureModel, Object diagramEditor) {
-		super(LABEL);
+		super(featureModel, LABEL);
 		this.feature = feature;
-
 		this.viewer = viewer;
-		this.featureModel = featureModel;
 		this.diagramEditor = diagramEditor;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#execute(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
-	@Override
-	public IStatus execute(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
-		return redo(monitor, info);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#redo(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
 	@Override
 	public IStatus redo(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
+		redo();
+		return Status.OK_STATUS;
+	}
+
+	@Override
+	void redo() {
 		int number = 0;
 
-		while (featureModel.getFeatureNames().contains("NewLayer" + ++number))
-			;
+		while (featureModel.getFeatureNames().contains("NewLayer" + ++number));
+		
 		newFeature = new Feature(featureModel, "NewLayer" + number);
 		featureModel.addFeature(newFeature);
 		feature=featureModel.getFeature(feature.getName());
 		feature.addChild(newFeature);
 		FeatureDiagramLayoutHelper.initializeLayerFeaturePosition(featureModel, newFeature, feature);
+		
+		/*
+		 * the model must be refreshed here else the new feature will not be found
+		 */
 		featureModel.handleModelDataChanged();
-
+		
 		// select the new feature
 		FeatureEditPart part;
 		if (viewer instanceof GraphicalViewerImpl) {
@@ -113,22 +99,11 @@ public class FeatureCreateLayerOperation extends AbstractOperation {
 				TextCellEditor.class, new FeatureCellEditorLocator(
 						part.getFeatureFigure()), featureModel);
 		manager.show();
-		return Status.OK_STATUS;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#undo(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
 	@Override
-	public IStatus undo(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
-		newFeature=featureModel.getFeature(newFeature.getName());
+	void undo() {
+		newFeature = featureModel.getFeature(newFeature.getName());
 		featureModel.deleteFeature(newFeature);
-		featureModel.handleModelDataChanged();
-		return Status.OK_STATUS;
 	}
 }

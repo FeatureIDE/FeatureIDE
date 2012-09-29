@@ -21,7 +21,6 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 import java.util.LinkedList;
 
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.AbstractOperation;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -44,10 +43,9 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayou
  * 
  * @author Fabian Benduhn
  */
-public class FeatureCreateCompoundOperation extends AbstractOperation {
+public class FeatureCreateCompoundOperation extends AbstractFeatureModelOperation {
 
 	private static final String LABEL = "Create Compound";
-	private FeatureModel featureModel;
 	Feature newCompound;
 	private Feature parent;
 	private Object viewer;
@@ -60,22 +58,14 @@ public class FeatureCreateCompoundOperation extends AbstractOperation {
 	public FeatureCreateCompoundOperation(Object viewer, Feature parent,
 			FeatureModel featureModel, LinkedList<Feature> selectedFeatures,
 			Object diagramEditor) {
-		super(LABEL);
+		super(featureModel, LABEL);
 		this.viewer = viewer;
-		this.featureModel = featureModel;
 		this.parent = parent;
 		this.selectedFeatures = new LinkedList<Feature>();
 		this.selectedFeatures.addAll(selectedFeatures);
 		this.diagramEditor = diagramEditor;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#execute(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
 	@Override
 	public IStatus execute(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
@@ -120,18 +110,9 @@ public class FeatureCreateCompoundOperation extends AbstractOperation {
 		return Status.OK_STATUS;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#redo(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
 	@Override
-	public IStatus redo(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
+	void redo() {
 		if (parent != null) {
-
 			LinkedList<Feature> newChildren = new LinkedList<Feature>();
 			for (Feature feature : parent.getChildren())
 				if (selectedFeatures.contains(feature)) {
@@ -142,7 +123,6 @@ public class FeatureCreateCompoundOperation extends AbstractOperation {
 				} else
 					newChildren.add(feature);
 			parent.setChildren(newChildren);
-
 			featureModel.addFeature(newCompound);
 		} else {
 			newCompound.addChild(featureModel.getRoot());
@@ -150,35 +130,20 @@ public class FeatureCreateCompoundOperation extends AbstractOperation {
 			featureModel.setRoot(newCompound);
 			// TODO: check whether this expensive call can be replaced by
 			// something more efficient
-			featureModel.redrawDiagram();
+//			featureModel.handleModelDataChanged();
 		}
 
 		FeatureDiagramLayoutHelper.initializeCompoundFeaturePosition(
 				featureModel, selectedFeatures, newCompound);
-
-		featureModel.handleModelDataChanged();
-
-		return Status.OK_STATUS;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#undo(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
 	@Override
-	public IStatus undo(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
+	void undo() {
 		if (parent == null) {
-
 			featureModel.replaceRoot(featureModel.getRoot().removeLastChild());
-			featureModel.redrawDiagram();
-		} else
+		} else {
 			featureModel.deleteFeature(newCompound);
-		featureModel.handleModelDataChanged();
-		return Status.OK_STATUS;
+		}
 	}
 
 }

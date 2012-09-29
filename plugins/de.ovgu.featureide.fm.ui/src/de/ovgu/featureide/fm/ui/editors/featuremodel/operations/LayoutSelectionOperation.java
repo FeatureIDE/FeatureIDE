@@ -18,53 +18,29 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.AbstractOperation;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 
-public class LayoutSelectionOperation extends AbstractOperation {
+public class LayoutSelectionOperation extends AbstractFeatureModelOperation {
 
-	private FeatureModel featureModel;
 	private int newSelectedLayoutAlgorithm;
 	private int oldSelectedLayoutAlgorithm;
 	
 	public LayoutSelectionOperation(FeatureModel featureModel, 
 			int newSelectedLayoutAlgorithm, int oldSelectedLayoutAlgorithm) {
-		super("Set "+FeatureDiagramLayoutHelper.getLayoutLabel(newSelectedLayoutAlgorithm));
+		super(featureModel, "Set "+FeatureDiagramLayoutHelper.getLayoutLabel(newSelectedLayoutAlgorithm));
 		this.newSelectedLayoutAlgorithm = newSelectedLayoutAlgorithm;
 		this.oldSelectedLayoutAlgorithm = oldSelectedLayoutAlgorithm;
-		this.featureModel = featureModel;
-		
 	}
 
-	public IStatus execute(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
-		return redo(monitor, info);
-	}
-
-	public IStatus redo(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
-
+	@Override
+	void redo() {
 		featureModel.getLayout().setLayout(newSelectedLayoutAlgorithm);
-		
-		featureModel.handleModelDataChanged();
-
-		return Status.OK_STATUS;
 	}
 
-	public IStatus undo(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
-
+	@Override
+	void undo() {
 		featureModel.getLayout().setLayout(oldSelectedLayoutAlgorithm);
-		featureModel.handleModelDataChanged();
-		
-		return Status.OK_STATUS;
 	}
 	
 }

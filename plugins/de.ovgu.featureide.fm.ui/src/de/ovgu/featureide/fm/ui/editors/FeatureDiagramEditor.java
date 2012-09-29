@@ -174,8 +174,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		FeatureModel featureModel = getFeatureModel();
 
 		createLayerAction = new CreateLayerAction(this, featureModel, null);
-		createCompoundAction = new CreateCompoundAction(this, featureModel,
-				null);
+		createCompoundAction = new CreateCompoundAction(this, featureModel, null);
 		deleteAction = new DeleteAction(this, featureModel);
 		deleteAllAction = new DeleteAllAction(this, featureModel);
 		mandatoryAction = new MandatoryAction(this, featureModel);

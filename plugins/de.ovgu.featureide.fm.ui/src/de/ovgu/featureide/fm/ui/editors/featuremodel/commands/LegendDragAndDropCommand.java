@@ -18,6 +18,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.commands;
 
+import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.commands.Command;
@@ -82,7 +83,7 @@ public class LegendDragAndDropCommand extends Command {
 			return;
 		}
 		LegendMoveOperation op = new LegendMoveOperation(model, p,legendFigure.newPos, legendFigure);
-		
+		op.addContext((IUndoContext) model.getUndoContext());
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport()

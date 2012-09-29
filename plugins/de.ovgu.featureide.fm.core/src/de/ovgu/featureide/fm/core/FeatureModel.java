@@ -498,7 +498,10 @@ public class FeatureModel implements PropertyConstants {
 		for (PropertyChangeListener listener : listenerList)
 			listener.propertyChange(event);
 	}
-
+	/**
+	 * Use {@link FeatureModel#handleModelDataChanged()} instead to refresh the diagram.
+	 */
+	@Deprecated
 	public void redrawDiagram() {
 		PropertyChangeEvent event = new PropertyChangeEvent(this,
 				REDRAW_DIAGRAM, Boolean.FALSE, Boolean.TRUE);
@@ -1342,5 +1345,13 @@ public class FeatureModel implements PropertyConstants {
 	 */
 	public ColorschemeTable getColorschemeTable() {
 		return colorschemeTable;
+	}
+
+	/**
+	 * @param constraint
+	 */
+	public void addConstraint(Constraint constraint) {
+		propNodes.add(constraint.getNode());
+		constraints.add(constraint);
 	}
 }

@@ -18,14 +18,9 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.AbstractOperation;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.prop4j.Node;
 
+import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 
@@ -35,10 +30,9 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayou
  * 
  * @author Fabian Benduhn
  */
-public class ConstraintCreateOperation extends AbstractOperation {
+public class ConstraintCreateOperation extends AbstractFeatureModelOperation {
 	private final static String LABEL = "Create Constraint";
-	private Node node;
-	private FeatureModel featureModel;
+	private Constraint constraint;
 
 	/**
 	 * @param node
@@ -47,59 +41,23 @@ public class ConstraintCreateOperation extends AbstractOperation {
 	 *            model that will be used to add the constraint
 	 */
 	public ConstraintCreateOperation(Node node, FeatureModel featureModel) {
-		super(LABEL);
-		this.node = node;
-		this.featureModel = featureModel;
+		super(featureModel, LABEL);
+		constraint = new Constraint(featureModel, node);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#execute(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
 	@Override
-	public IStatus execute(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
-		return redo(monitor, info);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#redo(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
-	@Override
-	public IStatus redo(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
-
-		featureModel.addPropositionalNode(node);
+	void redo() {
+		featureModel.addConstraint(constraint);
 		
 		//initialize constraint position in manual layout
 		if(!featureModel.getLayout().hasFeaturesAutoLayout())
 			FeatureDiagramLayoutHelper.initializeConstraintPosition(featureModel,
 				 featureModel.getConstraintCount()-1);
-		
-		featureModel.handleModelDataChanged();
-		return Status.OK_STATUS;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#undo(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
 	@Override
-	public IStatus undo(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
-		featureModel.removePropositionalNode(node);
-		featureModel.handleModelDataChanged();
-		return Status.OK_STATUS;
+	void undo() {
+		featureModel.removePropositionalNode(constraint);
 	}
 
 }

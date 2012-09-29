@@ -56,8 +56,7 @@ public class DeleteAllAction extends SingleSelectionAction {
 
 	@Override
 	public void run() {
-		DeleteAllOperation op = new DeleteAllOperation(viewer, featureModel,
-				feature);
+		DeleteAllOperation op = new DeleteAllOperation(featureModel, feature);
 
 		op.addContext((IUndoContext) featureModel.getUndoContext());
 

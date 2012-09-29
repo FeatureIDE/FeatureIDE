@@ -26,30 +26,12 @@ import de.ovgu.featureide.fm.core.Feature;
  * @author Fabian Benduhn
  */
 public class FeatureOperationData {
-	/**
-	 * 
-	 */
-	private Feature oldParent;
-	/**
-	 * 
-	 */
-	private Feature feature;
-	/**
-	 * 
-	 */
-	private Feature newParent;
-	/**
-	 * 
-	 */
-	private int newIndex;
-	/**
-	 * 
-	 */
-	private int oldIndex;
 
-	/**
-	 * 
-	 */
+	private Feature oldParent;
+	private Feature feature;
+	private Feature newParent;
+	private int newIndex;
+	private int oldIndex;
 
 	public FeatureOperationData(Feature feature, Feature oldParent,
 			Feature newParent, int newIndex, int oldIndex) {

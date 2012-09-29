@@ -21,12 +21,6 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.AbstractOperation;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.Constraint;
@@ -39,37 +33,20 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * @author David Halm
  * @author Patrick Sulkowski
  */
-public class AutoLayoutConstraintOperation extends AbstractOperation {
+public class AutoLayoutConstraintOperation extends AbstractFeatureModelOperation {
 	
 	private int counter;
-	private FeatureModel featureModel;	
 	private LinkedList <LinkedList<Point>> oldPos = new LinkedList <LinkedList<Point>>();
 	
 	public AutoLayoutConstraintOperation(FeatureModel featureModel, LinkedList<LinkedList<Point>> oldPos, int counter) {
-		super("Auto Layout Constraints");
-		this.featureModel = featureModel;
+		super(featureModel, "Auto Layout Constraints");
 		this.counter = counter;
 		if(!(oldPos == null) && !oldPos.isEmpty())
 			this.oldPos.addAll(oldPos);
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.commands.operations.AbstractOperation#execute(org.eclipse.core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
 	@Override
-	public IStatus execute(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
-		return redo(monitor, info);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.commands.operations.AbstractOperation#redo(org.eclipse.core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
-	
-	@Override
-	public IStatus redo(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
+	void redo() {
 		List <Constraint> constraintList = featureModel.getConstraints();
 		int minX = Integer.MAX_VALUE;
 		int maxX = 0;
@@ -102,16 +79,10 @@ public class AutoLayoutConstraintOperation extends AbstractOperation {
 			newPos.y=FeatureUIHelper.getLocation(constraintList.get(i-1)).y+ FMPropertyManager.getConstraintSpace();
 			FeatureUIHelper.setLocation(constraintList.get(i), newPos);
 		}
-		featureModel.handleModelDataChanged();
-		return Status.OK_STATUS;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.commands.operations.AbstractOperation#undo(org.eclipse.core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
 	@Override
-	public IStatus undo(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
+	void undo() {
 		List <Constraint> constraintList = featureModel.getConstraints();
 		if(!constraintList.isEmpty() && (!(oldPos == null) && !oldPos.isEmpty())){
 			FeatureUIHelper.setLocation(constraintList.get(0), oldPos.get(counter).get(0));
@@ -119,8 +90,6 @@ public class AutoLayoutConstraintOperation extends AbstractOperation {
 		for(int i=1;i<constraintList.size();i++){			
 			FeatureUIHelper.setLocation(featureModel.getConstraints().get(i), oldPos.get(counter).get(i));
 		}
-		featureModel.handleModelDataChanged();		
-		return Status.OK_STATUS;
 	}
 
 }
