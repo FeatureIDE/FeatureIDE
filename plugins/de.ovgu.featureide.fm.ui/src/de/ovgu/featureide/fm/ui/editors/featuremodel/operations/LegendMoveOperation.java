@@ -57,7 +57,7 @@ public class LegendMoveOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	void redo() {
+	protected void redo() {
 		FeatureUIHelper.getLegendFigure(featureModel).setLocation(pos);
 		final FeatureModelLayout layout = featureModel.getLayout();
 		layout.setLegendPos(pos.x, pos.y);
@@ -65,7 +65,7 @@ public class LegendMoveOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	void undo() {
+	protected void undo() {
 		FeatureUIHelper.getLegendFigure(featureModel).setLocation(oldPos);
 		final FeatureModelLayout layout = featureModel.getLayout();
 		layout.setLegendPos(oldPos.x, oldPos.y);

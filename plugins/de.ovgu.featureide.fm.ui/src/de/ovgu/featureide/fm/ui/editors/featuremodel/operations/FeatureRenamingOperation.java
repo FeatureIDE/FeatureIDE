@@ -40,12 +40,12 @@ public class FeatureRenamingOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	void redo() {
+	protected void redo() {
 		featureModel.renameFeature(oldName, newName);
 	}
 
 	@Override
-	void undo() {
+	protected void undo() {
 		featureModel.renameFeature(newName, oldName);
 	}
 

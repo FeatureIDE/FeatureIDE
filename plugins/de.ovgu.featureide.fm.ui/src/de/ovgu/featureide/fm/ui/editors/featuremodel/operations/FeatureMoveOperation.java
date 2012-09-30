@@ -94,7 +94,7 @@ public class FeatureMoveOperation extends AbstractFeatureModelOperation {
 	}
 	
 	@Override
-	void redo() {	
+	protected void redo() {	
 		if(!featureModel.getLayout().hasFeaturesAutoLayout()){
 			newInnerOrder(newPos);
 		} else {
@@ -108,24 +108,14 @@ public class FeatureMoveOperation extends AbstractFeatureModelOperation {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.operations.AbstractOperation#undo(org.eclipse
-	 * .core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
-	 */
 	@Override
-	void undo() {
+	protected void undo() {
 		if(!featureModel.getLayout().hasFeaturesAutoLayout()){
 			newInnerOrder(oldPos);
-			/*
-			 * TODO model wasn't refreshed in this case 
-			 */
 		} else {
 			try{
 				data.getNewParent().removeChild(data.getFeature());
-				if(data.getOldParent()!=null){
+				if(data.getOldParent()!=null) {
 					data.getOldParent().addChildAtPosition(data.getOldIndex(),
 							data.getFeature());
 				}

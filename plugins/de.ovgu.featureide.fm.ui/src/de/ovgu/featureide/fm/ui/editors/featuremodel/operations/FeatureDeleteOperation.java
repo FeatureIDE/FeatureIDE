@@ -24,6 +24,7 @@ import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  *
@@ -52,7 +53,7 @@ public class FeatureDeleteOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	void redo() {
+	protected void redo() {
 		feature = featureModel.getFeature(feature.getName());
 		oldParent = feature.getParent();
 		if (oldParent != null) {
@@ -92,7 +93,7 @@ public class FeatureDeleteOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	void undo() {
+	protected void undo() {
 		try {
 			if (!deleted) {
 				return;

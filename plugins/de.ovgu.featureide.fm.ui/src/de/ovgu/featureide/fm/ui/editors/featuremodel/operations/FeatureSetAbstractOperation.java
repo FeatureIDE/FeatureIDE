@@ -58,12 +58,12 @@ public class FeatureSetAbstractOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	void redo() {
+	protected void redo() {
 		feature.setAbstract(!feature.isAbstract());
 	}
 
 	@Override
-	void undo() {
+	protected void undo() {
 		redo();
 	}
 }

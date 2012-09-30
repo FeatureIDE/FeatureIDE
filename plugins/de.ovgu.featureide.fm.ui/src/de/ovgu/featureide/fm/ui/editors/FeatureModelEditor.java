@@ -201,7 +201,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		diagramEditor.getControl().getDisplay().asyncExec(new Runnable() {
 			public void run() {
 				diagramEditor.setContents(featureModel);
-				isPageModified = true;
 				pageChange(getDiagramEditorIndex());
 			}
 		});

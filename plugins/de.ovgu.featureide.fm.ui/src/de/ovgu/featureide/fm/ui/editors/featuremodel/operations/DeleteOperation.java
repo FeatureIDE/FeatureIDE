@@ -232,7 +232,7 @@ public class DeleteOperation extends AbstractFeatureModelOperation implements GU
 	}
 
 	@Override
-	void redo() {
+	protected void redo() {
 		List<AbstractFeatureModelOperation > ops = new LinkedList<AbstractFeatureModelOperation >();
 		ops.addAll(operations);
 		Collections.reverse(operations);
@@ -241,9 +241,8 @@ public class DeleteOperation extends AbstractFeatureModelOperation implements GU
 				try {
 					op.redo();
 					ops.remove(op);
-
 				} catch (Exception e) {
-
+					
 				}
 
 			}
@@ -252,7 +251,7 @@ public class DeleteOperation extends AbstractFeatureModelOperation implements GU
 	}
 
 	@Override
-	void undo() {
+	protected void undo() {
 		List<AbstractFeatureModelOperation > ops = new ArrayList<AbstractFeatureModelOperation >(operations);
 		Collections.reverse(operations);
 		while (!ops.isEmpty()) {

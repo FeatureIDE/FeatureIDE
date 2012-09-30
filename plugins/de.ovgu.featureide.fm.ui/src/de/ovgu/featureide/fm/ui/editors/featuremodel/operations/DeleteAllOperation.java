@@ -101,7 +101,7 @@ public class DeleteAllOperation extends AbstractFeatureModelOperation implements
 	}
 
 	@Override
-	void redo() {
+	protected void redo() {
 		List<AbstractFeatureModelOperation> ops = new LinkedList<AbstractFeatureModelOperation>();
 		ops.addAll(operations);
 		Collections.reverse(operations);
@@ -116,7 +116,7 @@ public class DeleteAllOperation extends AbstractFeatureModelOperation implements
 	}
 
 	@Override
-	void undo() {
+	protected void undo() {
 		List<AbstractFeatureModelOperation> ops = new LinkedList<AbstractFeatureModelOperation>();
 		ops.addAll(operations);
 		Collections.reverse(operations);

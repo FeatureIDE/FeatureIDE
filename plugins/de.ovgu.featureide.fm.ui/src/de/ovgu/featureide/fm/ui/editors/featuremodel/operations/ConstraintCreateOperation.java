@@ -46,7 +46,7 @@ public class ConstraintCreateOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	void redo() {
+	protected void redo() {
 		featureModel.addConstraint(constraint);
 		
 		//initialize constraint position in manual layout
@@ -56,7 +56,7 @@ public class ConstraintCreateOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	void undo() {
+	protected void undo() {
 		featureModel.removePropositionalNode(constraint);
 	}
 

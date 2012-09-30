@@ -55,14 +55,14 @@ public class ConstraintMoveOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	void redo() {
+	protected void redo() {
 		featureModel.removePropositionalNode(constraint);
 		featureModel.addConstraint(constraint, index);
 		FeatureUIHelper.setLocation(featureModel.getConstraints().get(index), newPos);
 	}
 	
 	@Override
-	void undo() {
+	protected void undo() {
 		featureModel.removePropositionalNode(constraint);
 		featureModel.addConstraint(constraint, oldIndex);
 		FeatureUIHelper.setLocation(featureModel.getConstraints().get(index), oldPos);

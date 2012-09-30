@@ -33,14 +33,14 @@ public class ShowHiddenFeaturesOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	void redo() {
+	protected void redo() {
 		final FeatureModelLayout layout = featureModel.getLayout();
 		layout.showHiddenFeatures(!layout.showHiddenFeatures());		
 		FeatureUIHelper.showHiddenFeatures(layout.showHiddenFeatures(),featureModel);
 	}
 
 	@Override
-	void undo() {
+	protected void undo() {
 		redo();
 	}
 

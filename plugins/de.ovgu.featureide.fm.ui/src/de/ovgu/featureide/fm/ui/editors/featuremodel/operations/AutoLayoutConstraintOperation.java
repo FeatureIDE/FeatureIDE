@@ -46,7 +46,7 @@ public class AutoLayoutConstraintOperation extends AbstractFeatureModelOperation
 	}
 
 	@Override
-	void redo() {
+	protected void redo() {
 		List <Constraint> constraintList = featureModel.getConstraints();
 		int minX = Integer.MAX_VALUE;
 		int maxX = 0;
@@ -69,9 +69,10 @@ public class AutoLayoutConstraintOperation extends AbstractFeatureModelOperation
 							FeatureUIHelper.getSize(featureList.get(i)).width;
 				}
 			}
-			newPos.x=(minX+maxX)/2 - FeatureUIHelper.getSize(constraintList.get(0)).width/2;
+			final Constraint constraint = constraintList.get(0);
+			newPos.x=(minX+maxX)/2 - FeatureUIHelper.getSize(constraint).width/2;
 			newPos.y=y+ FMPropertyManager.getConstraintSpace();
-			FeatureUIHelper.setLocation(constraintList.get(0), newPos);
+			FeatureUIHelper.setLocation(constraint, newPos);
 		}
 		for(int i=1;i<constraintList.size();i++){
 			Point newPos =new Point();
@@ -82,7 +83,7 @@ public class AutoLayoutConstraintOperation extends AbstractFeatureModelOperation
 	}
 
 	@Override
-	void undo() {
+	protected void undo() {
 		List <Constraint> constraintList = featureModel.getConstraints();
 		if(!constraintList.isEmpty() && (!(oldPos == null) && !oldPos.isEmpty())){
 			FeatureUIHelper.setLocation(constraintList.get(0), oldPos.get(counter).get(0));

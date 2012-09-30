@@ -53,12 +53,12 @@ public class FeatureSetMandatoryOperation extends AbstractFeatureModelOperation 
 	}
 
 	@Override
-	void redo() {
+	protected void redo() {
 		feature.setMandatory(!feature.isMandatory());
 	}
 
 	@Override
-	void undo() {
+	protected void undo() {
 		redo();
 	}
 

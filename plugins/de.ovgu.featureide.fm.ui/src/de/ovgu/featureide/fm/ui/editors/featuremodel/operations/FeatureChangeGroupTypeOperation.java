@@ -44,28 +44,14 @@ public class FeatureChangeGroupTypeOperation extends AbstractFeatureModelOperati
 	 */
 	public FeatureChangeGroupTypeOperation(int groupType, Feature feature,
 			FeatureModel featureModel) {
-		super(featureModel, getLabel(groupType));
+		super(featureModel, LABEL);
 		this.groupType = groupType;
 		this.oldGroupType = getGroupType(feature);
 		this.feature = feature;
 	}
 
-	/**
-	 * @param groupType
-	 * @return
-	 */
-	private static String getLabel(int groupType) {
-		// if (groupType == AND)
-		// return "AND";
-		// else if (groupType == OR)
-		// return "OR";
-		// else
-		// return "ALTERNATIVE";
-		return LABEL;
-	}
-
 	@Override
-	void redo() {
+	protected void redo() {
 		if (groupType == ALTERNATIVE) {
 			feature.changeToAlternative();
 		} else if (groupType == OR) {
@@ -76,7 +62,7 @@ public class FeatureChangeGroupTypeOperation extends AbstractFeatureModelOperati
 	}
 
 	@Override
-	void undo() {
+	protected void undo() {
 		if (oldGroupType == ALTERNATIVE) {
 			feature.changeToAlternative();
 		} else if (oldGroupType == AND) {

@@ -56,7 +56,7 @@ public abstract class AbstractFeatureModelOperation extends AbstractOperation {
 		return Status.OK_STATUS;
 	}
 
-	abstract void redo();
+	protected abstract void redo();
 
 	@Override
 	public IStatus undo(IProgressMonitor monitor, IAdaptable info)
@@ -66,6 +66,6 @@ public abstract class AbstractFeatureModelOperation extends AbstractOperation {
 		return Status.OK_STATUS;
 	}
 	
-	abstract void undo();
+	protected abstract void undo();
 
 }

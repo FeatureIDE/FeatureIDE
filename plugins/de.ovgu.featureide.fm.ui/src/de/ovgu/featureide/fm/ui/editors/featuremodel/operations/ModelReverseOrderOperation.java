@@ -42,7 +42,7 @@ public class ModelReverseOrderOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	void redo() {
+	protected void redo() {
 		final Feature root = featureModel.getRoot();
 		reverse(root);
 		if(!featureModel.getLayout().hasFeaturesAutoLayout()){
@@ -87,7 +87,7 @@ public class ModelReverseOrderOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	void undo() {
+	protected void undo() {
 		redo();
 	}
 

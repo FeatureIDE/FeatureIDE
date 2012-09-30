@@ -47,12 +47,12 @@ public class FeatureSetHiddenOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	void redo() {
+	protected void redo() {
 		feature.setHidden(!feature.isHidden());
 	}
 
 	@Override
-	void undo() {
+	protected void undo() {
 		redo();
 	}
 

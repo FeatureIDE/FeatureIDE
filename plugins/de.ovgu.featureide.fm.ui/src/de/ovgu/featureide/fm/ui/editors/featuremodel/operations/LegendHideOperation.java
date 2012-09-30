@@ -39,13 +39,13 @@ public class LegendHideOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	void redo() {
+	protected void redo() {
 		FMPropertyManager.setHideLegend(FMPropertyManager.isLegendHidden());
 		featureModel.refreshContextMenu();
 	}
 
 	@Override
-	void undo() {
+	protected void undo() {
 		redo();
 	}
 

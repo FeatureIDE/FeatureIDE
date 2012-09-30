@@ -111,7 +111,7 @@ public class FeatureCreateCompoundOperation extends AbstractFeatureModelOperatio
 	}
 
 	@Override
-	void redo() {
+	protected void redo() {
 		if (parent != null) {
 			LinkedList<Feature> newChildren = new LinkedList<Feature>();
 			for (Feature feature : parent.getChildren())
@@ -138,7 +138,7 @@ public class FeatureCreateCompoundOperation extends AbstractFeatureModelOperatio
 	}
 
 	@Override
-	void undo() {
+	protected void undo() {
 		if (parent == null) {
 			featureModel.replaceRoot(featureModel.getRoot().removeLastChild());
 		} else {

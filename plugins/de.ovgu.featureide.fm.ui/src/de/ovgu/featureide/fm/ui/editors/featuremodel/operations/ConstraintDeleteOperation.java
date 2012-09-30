@@ -41,13 +41,13 @@ public class ConstraintDeleteOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	void redo() {
+	protected void redo() {
 		index = featureModel.getConstraintIndex(constraint);
 		featureModel.removePropositionalNode(constraint);
 	}
 
 	@Override
-	void undo() {
+	protected void undo() {
 		featureModel.addConstraint(constraint, index);
 		//initialize constraint position in manual layout
 		if(!featureModel.getLayout().hasFeaturesAutoLayout())

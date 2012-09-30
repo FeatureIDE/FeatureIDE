@@ -65,14 +65,14 @@ public class FeatureCreateLayerOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	void redo() {
+	protected void redo() {
 		int number = 0;
 
 		while (featureModel.getFeatureNames().contains("NewLayer" + ++number));
 		
 		newFeature = new Feature(featureModel, "NewLayer" + number);
 		featureModel.addFeature(newFeature);
-		feature=featureModel.getFeature(feature.getName());
+		feature = featureModel.getFeature(feature.getName());
 		feature.addChild(newFeature);
 		FeatureDiagramLayoutHelper.initializeLayerFeaturePosition(featureModel, newFeature, feature);
 		
@@ -102,7 +102,7 @@ public class FeatureCreateLayerOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	void undo() {
+	protected void undo() {
 		newFeature = featureModel.getFeature(newFeature.getName());
 		featureModel.deleteFeature(newFeature);
 	}
