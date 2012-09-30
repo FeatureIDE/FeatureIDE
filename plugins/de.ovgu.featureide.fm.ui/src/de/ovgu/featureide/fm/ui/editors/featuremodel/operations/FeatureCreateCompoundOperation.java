@@ -114,23 +114,22 @@ public class FeatureCreateCompoundOperation extends AbstractFeatureModelOperatio
 	protected void redo() {
 		if (parent != null) {
 			LinkedList<Feature> newChildren = new LinkedList<Feature>();
-			for (Feature feature : parent.getChildren())
+			for (Feature feature : parent.getChildren()) {
 				if (selectedFeatures.contains(feature)) {
 					if (!newCompound.hasChildren())
 						newChildren.add(newCompound);
 					feature.setMandatory(false);
 					newCompound.addChild(feature);
-				} else
+				} else {
 					newChildren.add(feature);
+				}
+			}
 			parent.setChildren(newChildren);
 			featureModel.addFeature(newCompound);
 		} else {
 			newCompound.addChild(featureModel.getRoot());
 			featureModel.addFeature(newCompound);
 			featureModel.setRoot(newCompound);
-			// TODO: check whether this expensive call can be replaced by
-			// something more efficient
-//			featureModel.handleModelDataChanged();
 		}
 
 		FeatureDiagramLayoutHelper.initializeCompoundFeaturePosition(

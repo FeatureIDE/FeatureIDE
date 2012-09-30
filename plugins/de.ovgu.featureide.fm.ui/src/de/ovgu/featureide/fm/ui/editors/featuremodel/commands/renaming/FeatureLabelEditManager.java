@@ -68,7 +68,7 @@ public class FeatureLabelEditManager extends DirectEditManager implements GUIDef
 				if (!value.equals(oldValue)) {
 					if (value.equalsIgnoreCase(oldValue))
 						createTooltip("It is not recommended to change upper and lower case. You currently try to rename " + oldValue + " to " + value + ".", SWT.ICON_WARNING);
-					// TODO @Jens wrong usage of extension
+					// TODO #455 wrong usage of extension
 					else if ((notvalid = !featureModel.isValidFeatureName(value)) && !featureModel.isFeatureModelingComposer())
 						createTooltip("The name need to be a valid Java identifier.", SWT.ICON_ERROR);
 					else if (notvalid)

@@ -53,7 +53,7 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
  * @author Christoph Giesel
  * @author Marcus Kamieth
  */
-// TODO implement buildConfiguration
+// TODO #413 implement buildConfiguration
 public class AntennaPreprocessor extends PPComposerExtensionClass {
 
 	/** antenna preprocessor used from external library */

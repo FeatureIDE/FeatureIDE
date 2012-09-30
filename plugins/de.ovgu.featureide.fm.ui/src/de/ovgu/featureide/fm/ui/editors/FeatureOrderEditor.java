@@ -420,8 +420,9 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	/**
 	 * Write the order of the features in the .order file in the feature project
 	 * directory, it will be supported for old versions
-	 * TODO can be deleted if .order file is no longer used
+	 * 
 	 */
+//	TODO can be deleted if .order file is no longer used
 	public void writeToOrderFile() {
 			File file = ((IFile) input.getAdapter(IFile.class)).getProject()
 					.getLocation().toFile();
@@ -507,7 +508,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		return new LinkedList<String>();
 	}
 
-	// TODO: replace with a configuration reader
+	// TODO #460 replace with a configuration reader
 	// the problem is that we need the old feature names 
 	public LinkedList<String> readFeaturesfromConfigurationFile(File file) {
 		Scanner scanner = null;
@@ -527,7 +528,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		return list;
 	}
 
-	// TODO replace with a configuration writer 
+	// TODO #460 replace with a configuration writer 
 	public void writeFeaturesToConfigurationFile(File file,
 			LinkedList<String> newConfiguration) {
 		FileWriter fw = null;

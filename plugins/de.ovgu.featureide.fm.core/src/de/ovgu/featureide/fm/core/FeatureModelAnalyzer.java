@@ -450,10 +450,6 @@ public class FeatureModelAnalyzer {
 
 				}
 
-				/**
-				 * TODO @Jens This is a bad workaround to update some constraints that are changed to NORMAL
-				 * 			  Revise this so only changed constraints will be updated(unimportant)
-				 */
 				if (!changedAttributes.containsKey(constraint)) {
 					changedAttributes.put(constraint, ConstraintAttribute.NORMAL);
 				}
@@ -673,7 +669,7 @@ public class FeatureModelAnalyzer {
 	}
 	
 	public LinkedList<Feature> getFalseOptionalFeatures() {
-		// TODO @Thomas: improve calculation effort and
+		// TODO #456 improve calculation effort and
 		// correct calculation (is this feature always selected given
 		// that the parent feature is selected)
 		LinkedList<Feature> falseOptionalFeatures = new LinkedList<Feature>();

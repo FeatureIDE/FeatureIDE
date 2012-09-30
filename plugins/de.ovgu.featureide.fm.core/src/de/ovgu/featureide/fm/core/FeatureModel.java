@@ -56,7 +56,7 @@ import org.sat4j.specs.TimeoutException;
  * @author Stefan Krueger
  * 
  */
-// TODO remove unnecessary initializations/calculations especially after clone()
+// TODO #459 remove unnecessary initializations/calculations especially after clone()
 public class FeatureModel implements PropertyConstants {
 
 	public static final String COMPOSER_KEY = "composer";
@@ -96,7 +96,7 @@ public class FeatureModel implements PropertyConstants {
 	private LinkedList<Node> propNodes = new LinkedList<Node>();
 	
 	/*
-	 * TODO why are constraints saved redundant
+	 * TODO #461 why are constraints saved redundant
 	 */
 	private LinkedList<Constraint> constraints = new LinkedList<Constraint>();
 
@@ -150,11 +150,12 @@ public class FeatureModel implements PropertyConstants {
 	}
 	
 	/**
-	 * TODO @Jens description / rename
+	 * 
 	 * 		this should be done at the constructor
 	 * 
 	 * @return the fMComposerExtension
 	 */
+//	TODO @Jens description / rename
 	public IFMComposerExtension getFMComposerExtension(IProject project) {
 		setComposerID(project);
 		setComposer();
@@ -164,7 +165,7 @@ public class FeatureModel implements PropertyConstants {
 	public boolean isFeatureModelingComposer() {
 		if (COMPOSER_ID == null) return true;
 		return COMPOSER_ID.endsWith("FeatureModeling");
-		// TODO @Jens wrong usage of composer extension
+		// TODO #455 wrong usage of composer extension
 	}
 	
 	/**

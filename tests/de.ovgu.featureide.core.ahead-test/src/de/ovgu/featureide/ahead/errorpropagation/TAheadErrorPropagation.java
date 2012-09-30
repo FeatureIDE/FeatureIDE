@@ -90,7 +90,7 @@ public class TAheadErrorPropagation {
 			System.out.println("Wrong source line @ " + className + ".java (expected: " + jakLine +
 					" but was: " + sourceLine + ")");
 		}
-		// TODO AHEAD error propagation add this test
+		// TODO #457 AHEAD error propagation add this test
 		//assertEquals(jakLine, sourceLine);
 	}
 	

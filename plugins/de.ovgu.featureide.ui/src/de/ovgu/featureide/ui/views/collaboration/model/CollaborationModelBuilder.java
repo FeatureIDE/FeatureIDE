@@ -57,7 +57,6 @@ import de.ovgu.featureide.ui.UIPlugin;
  * @author Jens Meinicke
  * @author Stephan Besecke
  */
-// TODO @Jens test with code coverage
 public class CollaborationModelBuilder {
 	private CollaborationModel model;
 
@@ -370,7 +369,6 @@ public class CollaborationModelBuilder {
 		// set supported extensions
 		extensions = composer.extensions();
 
-		// TODO what if selected features are empty
 		// set selected features(selected features)
 		setSelectedFeatureNames();
 		

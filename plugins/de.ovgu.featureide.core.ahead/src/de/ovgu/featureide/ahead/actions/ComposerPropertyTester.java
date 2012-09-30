@@ -30,7 +30,7 @@ public class ComposerPropertyTester extends PropertyTester {
     	if (FEATURE_PROJECT.getComposerID() != null) {
 	    	if (expectedValue.equals("FeatureHouse")) {
 		    	if (FEATURE_PROJECT.getComposerID().equals(AheadComposer.COMPOSER_ID)) {
-		    		return false;// TODO @Jens COMPOSER CONVERSION: currently conversion is unavailable because
+		    		return false;// TODO #454 COMPOSER CONVERSION: currently conversion is unavailable because
 		    					 // 	 it seems not to be perfect and could lead to problems. 
 		    	}
 		    } else if (FEATURE_PROJECT.getComposerID().equals(FH_COMPOSER_ID)) {

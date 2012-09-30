@@ -715,8 +715,6 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	 * The goal of this is that a synchronization can't be executed unnecessarily multiple times.
 	 */
 	// TODO this should not be called if only markers are changed
-	// TODO if waiting is not not set false, sync will never happen again
-	//      so this should be revised
 	private void setAllFeatureModuleMarkers(final FeatureModel featureModel,
 		final IFolder sourceFolder) {
 		if (waiting) {

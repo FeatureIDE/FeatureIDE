@@ -32,102 +32,72 @@ import de.ovgu.featureide.core.featuremodeling.FeatureModelingFMExtension;
  */
 public class TFMComposerExtension {
 
-	/**
-	 * Test method for {@link de.ovgu.featureide.fm.core.FMComposerExtension#isValidFeatureName(java.lang.String, boolean)}.
-	 */
-	/*@Test
-	public void testIsValidFeatureName() 
-	{
-		//fail("Not yet implemented"); // TODO
-		
-		
-		
-		
-	}*/
-	
-	
 	private FeatureModelingFMExtension f1 = new FeatureModelingFMExtension();
 	private IFMComposerExtension f2 = new FMComposerExtension();
-	
+
 	@Test
-	public void FM_valid()
-	{
-		assertTrue( f1.isValidFeatureName("Hans Christian Andersen"));
-	}
-	
-	@Test
-	public void FM_valid2()
-	{
-		assertTrue( f1.isValidFeatureName("% a9 0km !önc"));
-	}
-	
-	
-	@Test
-	public void FM_valid3()
-	{
-		assertFalse( f1.isValidFeatureName(" Han\"s Christian Andersen"));
-	}
-	
-	@Test
-	public void FM_valid4()
-	{
-		assertTrue( f1.isValidFeatureName("Hans and Christian Andersen"));
-	}
-	
-	
-	@Test
-	public void FM_valid5()
-	{
-		assertTrue( f1.isValidFeatureName("Hans or Christian Andersen"));
-	}
-	
-	@Test
-	public void FM_valid6()
-	{
-		assertTrue( f1.isValidFeatureName("Hans iff Christian Andersen"));
-	}
-	
-	@Test
-	public void FM_valid7()
-	{
-		assertTrue( f1.isValidFeatureName("Hans implies Christian Andersen"));
-	}
-	
-	@Test
-	public void notFM_valid()
-	{
-		assertTrue( f2.isValidFeatureName("HansChristianAndersen"));
+	public void FM_valid() {
+		assertTrue(f1.isValidFeatureName("Hans Christian Andersen"));
 	}
 
 	@Test
-	public void notFM_valid2()
-	{
-		assertTrue( f2.isValidFeatureName("Javaidentifier"));
+	public void FM_valid2() {
+		assertTrue(f1.isValidFeatureName("% a9 0km !önc"));
 	}
 
-	
 	@Test
-	public void FM_notvalid1()
-	{
-		assertFalse( f1.isValidFeatureName(" Han(s Christian Andersen"));
+	public void FM_valid3() {
+		assertFalse(f1.isValidFeatureName(" Han\"s Christian Andersen"));
 	}
-	
+
 	@Test
-	public void FM_notvalid2()
-	{
-		assertFalse( f1.isValidFeatureName(" Han)s Christian Andersen"));
+	public void FM_valid4() {
+		assertTrue(f1.isValidFeatureName("Hans and Christian Andersen"));
 	}
-	
+
 	@Test
-	public void notFM_notvalid()
-	{
-		assertFalse( f2.isValidFeatureName("Christian Andersen"));
+	public void FM_valid5() {
+		assertTrue(f1.isValidFeatureName("Hans or Christian Andersen"));
 	}
-	
+
 	@Test
-	public void notFM_notvalid2()
-	{
-		assertFalse( f2.isValidFeatureName("\" n"));
+	public void FM_valid6() {
+		assertTrue(f1.isValidFeatureName("Hans iff Christian Andersen"));
 	}
-	
+
+	@Test
+	public void FM_valid7() {
+		assertTrue(f1.isValidFeatureName("Hans implies Christian Andersen"));
+	}
+
+	@Test
+	public void notFM_valid() {
+		assertTrue(f2.isValidFeatureName("HansChristianAndersen"));
+	}
+
+	@Test
+	public void notFM_valid2() {
+		assertTrue(f2.isValidFeatureName("Javaidentifier"));
+	}
+
+	@Test
+	public void FM_notvalid1() {
+		assertFalse(f1.isValidFeatureName(" Han(s Christian Andersen"));
+	}
+
+	@Test
+	public void FM_notvalid2() {
+		assertFalse(f1.isValidFeatureName(" Han)s Christian Andersen"));
+	}
+
+	@Test
+	public void notFM_notvalid() {
+		assertFalse(f2.isValidFeatureName("Christian Andersen"));
+	}
+
+	@Test
+	public void notFM_notvalid2() {
+		assertFalse(f2.isValidFeatureName("\" n"));
+	}
+
 }

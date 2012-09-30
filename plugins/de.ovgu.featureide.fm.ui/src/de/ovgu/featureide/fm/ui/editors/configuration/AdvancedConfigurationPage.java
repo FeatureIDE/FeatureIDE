@@ -51,7 +51,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * @author Jens Meinicke
  * @author Hannes Smurawsky
  */
-//TODO remove duplicate code configurationPage/AdvancedConfigurationPage
+//TODO #458 remove duplicate code configurationPage/AdvancedConfigurationPage
 
 public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 	
@@ -228,7 +228,7 @@ public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 	
 	private void updateForeground(
 			TreeItem item) {	
-		// TODO implement coloring
+		// TODO #458 implement coloring
 //		for (TreeItem child : item.getItems()) {
 //			SelectableFeature feature = configurationEditor.configuration.getSelectablefeature(child.getText());
 //			child.setForeground(null);

@@ -24,7 +24,6 @@ import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  *

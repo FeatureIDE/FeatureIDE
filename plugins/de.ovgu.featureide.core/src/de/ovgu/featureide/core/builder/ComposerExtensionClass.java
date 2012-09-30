@@ -110,7 +110,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		}
 	}
 
-	// TODO this should be done with a ConfigurationReader
+	// TODO #460 this should be done with a ConfigurationReader
 	private ArrayList<String> getSelectedFeatures(IFile config) {
 		File configFile = config.getRawLocation().toFile();
 		return getTokenListFromFile(configFile);

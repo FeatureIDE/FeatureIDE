@@ -81,7 +81,7 @@ import de.ovgu.featureide.ui.views.collaboration.model.Role;
  * @author Melanie Pflaume
  */
 /*
- * TODO fix bug: do not close the tree if a corresponding file 
+ * TODO #404 fix bug: do not close the tree if a corresponding file 
  * was opened with an other way e.g. via collaboration diagram
  * 
  * TODO Sometimes the outline has no content -> display a warning / message 

@@ -53,9 +53,10 @@ public class JavaErrorPropagation extends ErrorPropagation {
 	private List<String> layerNames = null;
 	
 	/**
-	 * TODO @Jens improve description
+	 * 
 	 * Sets all composed lines to all methods and fields
 	 */
+//	TODO @Jens improve descriptions
 	@Override
 	protected void setElementLines(String content, LinkedList<FSTField> fields, LinkedList<FSTMethod> methods) {
 		for (FSTField f : fields) {

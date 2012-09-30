@@ -537,13 +537,9 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 		return name;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
-	 */
 	@Override
 	public void propertyChange(PropertyChangeEvent event) {
-		// TODO Auto-generated method stub
-		
+
 	}
 	
 	public String toString(boolean writeMarks) {

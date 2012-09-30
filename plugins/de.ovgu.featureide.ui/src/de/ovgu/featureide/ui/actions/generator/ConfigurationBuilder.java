@@ -298,7 +298,6 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 * @param buildAllValidConfigurations<code>true</code> if all possible valid configurations should be build<br>
 	 * <code>false</code> if all current configurations should be build
 	 */
-	// TODO remove buildermarker
 	private boolean init(IProgressMonitor monitor, boolean buildAllValidConfigurations) {
 		confs = 1;
 		

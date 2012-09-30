@@ -361,12 +361,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 
 		oldPageIndex = newPageIndex;
 		
-		/*
-		 * TODO why was isPageModified set false
-		 * this causes the error that the text editor does not update if
-		 * you change the pages from Model to order to text editor page 
-		 */
-//		isPageModified = false;
 		super.pageChange(newPageIndex);
 	}
 

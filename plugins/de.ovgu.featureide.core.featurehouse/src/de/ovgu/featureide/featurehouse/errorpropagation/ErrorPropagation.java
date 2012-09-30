@@ -98,7 +98,6 @@ public class ErrorPropagation {
 	 * @param sourceFile The composed file
 	 */
 	public void addFile(IFile sourceFile) {
-		//TODO implement error propagation for all FeatureHouse languages
 		String fileExtension = sourceFile.getFileExtension();
 		if (fileExtension == null) {
 			return;
