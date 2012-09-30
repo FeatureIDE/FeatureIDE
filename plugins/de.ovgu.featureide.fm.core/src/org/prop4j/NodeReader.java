@@ -109,7 +109,7 @@ public class NodeReader {
 			{
 				while (string.contains(" " + symbols[i] + " ")) 
 				{
-					int index = string.indexOf(symbols[i]); // 1st symbol occurrence
+					int index = string.indexOf(" "+symbols[i]+" ")+1; // 1st symbol occurrence
 	
 					if (index == -1)
 					{
@@ -117,7 +117,7 @@ public class NodeReader {
 						error = true;
 						return new Literal("");
 					}
-	
+					
 					// recursion for children nodes
 					Node node1 = null;
 					if (i != 4)	node1 = checkExpression( string.substring( 0, index ), list);
@@ -176,7 +176,6 @@ public class NodeReader {
 					}
 				}
 			}
-			
 			string = string.trim();
 			if (isIntNumber(string))
 			{
@@ -184,6 +183,7 @@ public class NodeReader {
 				{
 					if (featureNames != null)
 					{
+						
 						if (featureNames.contains(list.get(Integer.parseInt(string) - 100000)))
 						{
 							return new Literal(list.get(Integer.parseInt(string) - 100000));
@@ -382,7 +382,7 @@ public class NodeReader {
 		{
 			while (string.contains(" " + symbols[i] + " ")) 
 			{
-				int index = string.indexOf(symbols[i]); // 1st symbol occurrence
+				int index = string.indexOf(" "+symbols[i]+" ")+1; // 1st symbol occurrence
 
 				// recursion for children nodes
 				Node node1 = stringToNodeRec( string.substring( 0, index ), list);
