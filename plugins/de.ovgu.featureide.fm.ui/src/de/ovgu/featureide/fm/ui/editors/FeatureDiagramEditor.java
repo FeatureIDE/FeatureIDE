@@ -50,6 +50,8 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbenchActionConstants;
@@ -157,6 +159,19 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	}
 
 	void initializeGraphicalViewer() {
+		getControl().addControlListener(new ControlListener() {
+			
+			@Override
+			public void controlResized(ControlEvent e) {
+				internRefresh(true);
+			}
+			
+			@Override
+			public void controlMoved(ControlEvent e) {
+				// do nothing
+				
+			}
+		});
 		getControl().setBackground(FMPropertyManager.getDiagramBackgroundColor());
 		setEditPartFactory(new GraphicalEditPartFactory());
 		rootEditPart = new ScalableFreeformRootEditPart();
@@ -366,13 +381,13 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		return null;
 	}
 
-	public void internRefresh() {
+	public void internRefresh(boolean refreshOutline) {
 		if (getContents() == null)
 			return;
 
 		// TODO is this necessary?
 		FmOutlinePage outline = featureModelEditor.getOutlinePage();
-		if (outline != null) {
+		if (refreshOutline && outline != null) {
 			outline.setInput(getFeatureModel());
 		}
 		
@@ -394,7 +409,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		if (getFeatureModel() == null || getFeatureModel().getRoot() == null)
 			return;
 
-		internRefresh();
+		internRefresh(true);
 
 		if (waiting) {
 			return;
