@@ -182,7 +182,7 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 
 	private IFile getFile(String name) {
 		String projectName = featureProject.getProjectName();
-		name = name.substring(name.indexOf(projectName) + projectName.length() + 1);
+		name = name.substring(name.indexOf(projectName + "\\" + featureProject.getSourceFolder().getName()) + projectName.length() + 1);
 		return featureProject.getProject().getFile(new Path(name));
 	}
 
