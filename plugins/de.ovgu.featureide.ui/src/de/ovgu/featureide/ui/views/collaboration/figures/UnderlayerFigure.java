@@ -50,11 +50,11 @@ public class UnderlayerFigure extends Figure implements GUIDefaults{
 	}
 	
 	public void setCollaborationFigureWidth(int width) {
-		collaborationFigure.getBounds().setWidth(width);
+		collaborationFigure.getBounds().width=width;
 	}
 
 	public int getCollaborationFigureWidth() {
-		return collaborationFigure.getBounds().width();
+		return collaborationFigure.getBounds().width;
 	}	
 	
 	/**

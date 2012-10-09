@@ -547,7 +547,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		int h = labelSize.height + layout.verticalSpacing; 
 		
 		oldSize.expand(0, h);
-		if (oldSize.width() < w) oldSize.setWidth(w);
+		if (oldSize.width < w) oldSize.width=w;
 
 		panel.setSize(oldSize);
 		setSize(oldSize);

@@ -88,7 +88,7 @@ public class ClassEditPart extends AbstractGraphicalEditPart {
 	 */
 	@Override
 	protected void refreshVisuals() {
-		this.getFigure().getBounds().setY(GUIDefaults.DEFAULT_INSET_TO_EDGE - 5);
+		this.getFigure().getBounds().y=GUIDefaults.DEFAULT_INSET_TO_EDGE - 5;
 	}
 
 	/**

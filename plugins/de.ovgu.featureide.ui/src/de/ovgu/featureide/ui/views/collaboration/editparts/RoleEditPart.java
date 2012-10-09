@@ -159,7 +159,7 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 			for (Object child : labelList) {
 				RoleFigureLabel label = (RoleFigureLabel) child;
 				Rectangle rect = label.getBounds();
-				int y = rect.y();
+				int y = rect.y;
 				if (point.y >= y && point.y <= (y + rect.height)) {
 					LinkedList<FSTField> fields = this.getRoleModel().fields;
 					for (FSTField fstField : fields) {

@@ -110,8 +110,8 @@ public class AddRoleAction extends Action {
 				
 				int index = list.indexOf(object);
 				
-				int min = collFigure.getBounds().y() - 4; 
-				int max = collFigure.getBounds().y() + collFigure.getBounds().height() + 4;
+				int min = collFigure.getBounds().y - 4; 
+				int max = collFigure.getBounds().y + collFigure.getBounds().height + 4;
 				
 				if (list.size() > index + 1)
 				{
@@ -120,12 +120,12 @@ public class AddRoleAction extends Action {
 				
 						CollaborationFigure nextCollFigure = ((UnderlayerFigure) ((CollaborationEditPart) edit).getFigure()).getCollaborationFigure();
 						
-						max = nextCollFigure.getBounds().y() - 4;
+						max = nextCollFigure.getBounds().y - 4;
 					}
 					else if (edit instanceof ClassEditPart)
 					{
 						ClassFigure nextCollFigure = ((ClassFigure) ((ClassEditPart) edit).getFigure());
-						max = nextCollFigure.getBounds().height() - 4;
+						max = nextCollFigure.getBounds().height - 4;
 					}
 				}
 				if (cursorY >= min && cursorY <= max)

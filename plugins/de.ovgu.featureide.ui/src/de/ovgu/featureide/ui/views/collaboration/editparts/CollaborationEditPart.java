@@ -68,8 +68,8 @@ public class CollaborationEditPart extends AbstractGraphicalEditPart implements 
 	 */
 	@Override
 	protected void refreshVisuals() {
-		this.getFigure().getBounds().setX(GUIDefaults.DEFAULT_INSET_TO_EDGE);
-		this.getFigure().getBounds().setY(this.getFigure().getBounds().y() + GUIDefaults.DEFAULT_INSET_TO_EDGE);
+		this.getFigure().getBounds().x =GUIDefaults.DEFAULT_INSET_TO_EDGE;
+		this.getFigure().getBounds().y= this.getFigure().getBounds().y + GUIDefaults.DEFAULT_INSET_TO_EDGE;
 	}
 	
 	/**
