@@ -2,7 +2,7 @@
 <feature
       id="de.ovgu.featureide.featuremodeling"
       label="Feature Modeling (required)"
-      version="2.6.2.qualifier"
+      version="2.6.3.qualifier"
       provider-name="University of Magdeburg">
 
    <description url="http://www.fosd.de/featureide/">
@@ -479,14 +479,14 @@ Public License instead of this License.
          id="de.ovgu.featureide.fm.core"
          download-size="0"
          install-size="0"
-         version="2.6.2.qualifier"
+         version="2.6.3.qualifier"
          unpack="false"/>
 
    <plugin
          id="de.ovgu.featureide.fm.ui"
          download-size="0"
          install-size="0"
-         version="2.6.2.qualifier"
+         version="2.6.3.qualifier"
          unpack="false"/>
 
 </feature>
