@@ -77,6 +77,7 @@ import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureStatus;
+import de.ovgu.featureide.fm.core.Operator;
 import de.ovgu.featureide.fm.core.editing.Comparison;
 import de.ovgu.featureide.fm.core.editing.ModelComparator;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -97,8 +98,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ConstraintEditOp
 public class ConstraintDialog implements GUIDefaults {
 
 
-	private static final String[] OPERATOR_NAMES = { "Not", "And", "Or",
-			"Implies", "Iff", "(", ")" /* "At most 1" */};
+	
 	private static final String FILTERTEXT = "type filter text";
 	private Shell shell;
 	
@@ -375,10 +375,10 @@ public class ConstraintDialog implements GUIDefaults {
 		buttonGroupLayout.numColumns = 7;
 		buttonGroup.setLayout(buttonGroupLayout);
 
-		for (int i = 0; i < OPERATOR_NAMES.length; i++) {
+		for (int i = 0; i < Operator.NAMES.length; i++) {
 
 			final Button button = new Button(buttonGroup, SWT.PUSH);
-			button.setText(OPERATOR_NAMES[i]);
+			button.setText(Operator.NAMES[i]);
 			gridData = new GridData(GridData.FILL_HORIZONTAL);
 			button.setLayoutData(gridData);
 			button.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
@@ -531,7 +531,7 @@ public class ConstraintDialog implements GUIDefaults {
 
 				temp.delete(x, y);
 				if (selectedItem.length > 0) {
-					temp.insert(x > y ? y : x, " " + (selectedItem[0].getText().contains(" ") ? "\"" + selectedItem[0].getText() + "\"" : selectedItem[0].getText())
+					temp.insert(x > y ? y : x, " " + (selectedItem[0].getText().contains(" ")||Operator.isOperatorName(selectedItem[0].getText()) ? "\"" + selectedItem[0].getText() + "\"" : selectedItem[0].getText())
 							+ " ");
 					
 				}

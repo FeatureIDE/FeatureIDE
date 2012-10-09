@@ -26,6 +26,8 @@ import java.util.Set;
 import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.jface.fieldassist.IContentProposalProvider;
 
+import de.ovgu.featureide.fm.core.Operator;
+
 /**
  * provides proposals for content assist while typing constraints
  * 
@@ -84,7 +86,7 @@ public class ConstraintContentProposalProvider implements
 		boolean caught = false;
 		for (String feature: features)
 		{
-			if (feature.contains(" ") && feature.toLowerCase().startsWith(contents.substring(contents.lastIndexOf('"') + 1).toLowerCase()))
+			if (Operator.isOperatorName(feature)||(feature.contains(" ") && feature.toLowerCase().startsWith(contents.substring(contents.lastIndexOf('"') + 1).toLowerCase())))
 			{
 				proposalList.add(new ContentProposal("\"" + feature + "\""));
 				caught = true;

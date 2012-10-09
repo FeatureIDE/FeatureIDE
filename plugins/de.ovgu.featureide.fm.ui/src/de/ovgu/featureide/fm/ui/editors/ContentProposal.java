@@ -155,4 +155,8 @@ import org.eclipse.jface.fieldassist.IContentProposal;
 		public String getLabel() {
 			return label;
 		}
+		
+		public String toString(){
+			return content+"-"+label;
+		}
 	}

@@ -34,7 +34,7 @@ import java.util.List;
 public class Feature implements PropertyConstants, PropertyChangeListener {
 
 	private String name;
-	
+
 	private boolean mandatory = false;
 
 	private boolean concret = true;
@@ -44,18 +44,18 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 	private boolean multiple = false;
 
 	private boolean hidden = false;
-	
+
 	private boolean constraintSelected = false;
-	
+
 	private ColorList colorList;
-	
+
 	private List<Constraint> partOfConstraints = new ArrayList<Constraint>();
-	
+
 	private FeatureStatus status = FeatureStatus.NORMAL;
 
 	private FeatureModel featureModel;
-	
-	private FMPoint location = new FMPoint(0,0);
+
+	private FMPoint location = new FMPoint(0, 0);
 
 	public Feature(FeatureModel featureModel) {
 		this.featureModel = featureModel;
@@ -71,14 +71,14 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 		colorList = new ColorList(this);
 	}
 
-	public void setNewLocation(FMPoint newLocation){
+	public void setNewLocation(FMPoint newLocation) {
 		location = newLocation;
 	}
-	
-	public FMPoint getLocation(){
+
+	public FMPoint getLocation() {
 		return location;
 	}
-	
+
 	public boolean isAnd() {
 		return and;
 	}
@@ -126,7 +126,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 		this.mandatory = mandatory;
 		fireMandatoryChanged();
 	}
-	
+
 	public boolean isHidden() {
 		return hidden;
 	}
@@ -135,48 +135,52 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 		this.hidden = hid;
 		fireHiddenChanged();
 	}
-	
+
 	public boolean isConstraintSelected() {
 		return constraintSelected;
 	}
-	
+
 	public void setConstraintSelected(boolean selection) {
 		this.constraintSelected = selection;
-		fire(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
+		fire(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, Boolean.FALSE,
+				Boolean.TRUE));
 	}
 
 	public void setAbstract(boolean value) {
 		this.concret = !value;
 		fireChildrenChanged();
 	}
-	
+
 	public List<Constraint> getRelevantConstraints() {
 		return partOfConstraints;
 	}
-	
-	public void setRelevantConstraints() {	
-		List<Constraint> constraintList = new ArrayList<Constraint>();		
-		
+
+	public void setRelevantConstraints() {
+		List<Constraint> constraintList = new ArrayList<Constraint>();
+
 		for (Constraint constraint : featureModel.getConstraints()) {
-			if (constraint.toString().contains(this.getName())) constraintList.add(constraint);				
+			if (constraint.toString().contains(this.getName()))
+				constraintList.add(constraint);
 		}
-		
+
 		this.partOfConstraints = constraintList;
 	}
-	
-	public FeatureStatus getFeatureStatus() {		
+
+	public FeatureStatus getFeatureStatus() {
 		return status;
 	}
-	
+
 	public FeatureModel getFeatureModel() {
 		return featureModel;
 	}
-	
+
 	public void setFeatureStatus(FeatureStatus stat, boolean fire) {
 		this.status = stat;
-		if(fire)fire(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
+		if (fire)
+			fire(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED,
+					Boolean.FALSE, Boolean.TRUE));
 	}
-	
+
 	public boolean isMultiple() {
 		return multiple;
 	}
@@ -361,34 +365,34 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 		for (PropertyChangeListener listener : listenerList)
 			listener.propertyChange(event);
 	}
-	
+
 	private void fireHiddenChanged() {
-		PropertyChangeEvent event = new PropertyChangeEvent(this, HIDDEN_CHANGED,
-				Boolean.FALSE, Boolean.TRUE);
+		PropertyChangeEvent event = new PropertyChangeEvent(this,
+				HIDDEN_CHANGED, Boolean.FALSE, Boolean.TRUE);
 		for (PropertyChangeListener listener : listenerList)
 			listener.propertyChange(event);
 	}
 
 	private void fireChildrenChanged() {
-		PropertyChangeEvent event = new PropertyChangeEvent(this, CHILDREN_CHANGED, 
-				Boolean.FALSE, Boolean.TRUE);
+		PropertyChangeEvent event = new PropertyChangeEvent(this,
+				CHILDREN_CHANGED, Boolean.FALSE, Boolean.TRUE);
 		for (PropertyChangeListener listener : listenerList)
 			listener.propertyChange(event);
 	}
 
 	private void fireMandatoryChanged() {
-		PropertyChangeEvent event = new PropertyChangeEvent(this, MANDATORY_CHANGED,
-				Boolean.FALSE, Boolean.TRUE);
+		PropertyChangeEvent event = new PropertyChangeEvent(this,
+				MANDATORY_CHANGED, Boolean.FALSE, Boolean.TRUE);
 		for (PropertyChangeListener listener : listenerList)
 			listener.propertyChange(event);
 	}
-	
-//	private void fireColorChanged(int oldValue, int newValue) {
-//		PropertyChangeEvent event = new PropertyChangeEvent(this, COLOR_CHANGED,
-//				oldValue, newValue);
-//		for (PropertyChangeListener listener : listenerList)
-//			listener.propertyChange(event);
-//	}
+
+	// private void fireColorChanged(int oldValue, int newValue) {
+	// PropertyChangeEvent event = new PropertyChangeEvent(this, COLOR_CHANGED,
+	// oldValue, newValue);
+	// for (PropertyChangeListener listener : listenerList)
+	// listener.propertyChange(event);
+	// }
 
 	// public Point getReferencePoint() {
 	// return new Rectangle(location, size).getCenter();
@@ -486,7 +490,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 	@Override
 	public Feature clone() {
 		Feature feature = new Feature(featureModel, name);
-		for (Feature child : (LinkedList<Feature>)children.clone()) {
+		for (Feature child : (LinkedList<Feature>) children.clone()) {
 			feature.addChild(child.clone());
 		}
 		feature.and = and;
@@ -541,10 +545,11 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 	public void propertyChange(PropertyChangeEvent event) {
 
 	}
-	
+
+	@Deprecated
 	public String toString(boolean writeMarks) {
 		if (writeMarks) {
-			if (this.name.contains(" ")) {
+			if (this.name.contains(" ") || Operator.isOperatorName(this.name)) {
 				return "\"" + this.name + "\"";
 			}
 			return name;
@@ -553,70 +558,44 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 		}
 	}
 
+
+
 	public ColorList getColorList() {
 		return colorList;
 	}
-	
-	/* auto-generated methods
-	 * cause the diagram to be shown incorrectly
-	 */
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (and ? 1231 : 1237);
-		result = prime * result
-				+ ((children == null) ? 0 : children.hashCode());
-		result = prime * result + (concret ? 1231 : 1237);
-		result = prime * result + (hidden ? 1231 : 1237);
-		result = prime * result + (mandatory ? 1231 : 1237);
-		result = prime * result + (multiple ? 1231 : 1237);
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result + ((parent == null) ? 0 : parent.hashCode());
-		return result;
-	}
 
-	/* (non-Javadoc)
+	/*
+	 * auto-generated methods cause the diagram to be shown incorrectly
+	 */
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#hashCode()
+	 * 
+	 * @Override public int hashCode() { final int prime = 31; int result = 1;
+	 * result = prime * result + (and ? 1231 : 1237); result = prime * result +
+	 * ((children == null) ? 0 : children.hashCode()); result = prime * result +
+	 * (concret ? 1231 : 1237); result = prime * result + (hidden ? 1231 :
+	 * 1237); result = prime * result + (mandatory ? 1231 : 1237); result =
+	 * prime * result + (multiple ? 1231 : 1237); result = prime * result +
+	 * ((name == null) ? 0 : name.hashCode()); result = prime * result +
+	 * ((parent == null) ? 0 : parent.hashCode()); return result; }
+	 * 
+	 * /* (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#equals(java.lang.Object)
-	 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Feature other = (Feature) obj;
-		if (and != other.and)
-			return false;
-		if (children == null) {
-			if (other.children != null)
-				return false;
-		} else if (!children.equals(other.children))
-			return false;
-		if (concret != other.concret)
-			return false;
-		if (hidden != other.hidden)
-			return false;
-		if (mandatory != other.mandatory)
-			return false;
-		if (multiple != other.multiple)
-			return false;
-		if (name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!name.equals(other.name))
-			return false;
-		if (parent == null) {
-			if (other.parent != null)
-				return false;
-		} else if (!parent.equals(other.parent))
-			return false;
-		return true;
-	}*/
+	 * 
+	 * @Override public boolean equals(Object obj) { if (this == obj) return
+	 * true; if (obj == null) return false; if (getClass() != obj.getClass())
+	 * return false; Feature other = (Feature) obj; if (and != other.and) return
+	 * false; if (children == null) { if (other.children != null) return false;
+	 * } else if (!children.equals(other.children)) return false; if (concret !=
+	 * other.concret) return false; if (hidden != other.hidden) return false; if
+	 * (mandatory != other.mandatory) return false; if (multiple !=
+	 * other.multiple) return false; if (name == null) { if (other.name != null)
+	 * return false; } else if (!name.equals(other.name)) return false; if
+	 * (parent == null) { if (other.parent != null) return false; } else if
+	 * (!parent.equals(other.parent)) return false; return true; }
+	 */
 
 }

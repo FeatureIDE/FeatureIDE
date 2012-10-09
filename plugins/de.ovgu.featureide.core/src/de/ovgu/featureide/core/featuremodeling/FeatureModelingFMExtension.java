@@ -32,10 +32,6 @@ public class FeatureModelingFMExtension extends FMComposerExtension {
 			return false;
 		final int len = s.length();
 
-		if (s.equals("or") || s.equals("and") || s.equals("implies")
-				|| s.equals("not") || s.equals("iff"))
-			return false;
-
 		if (len == 0)
 			return false;
 		for (int i = 0; i < len; i++) {

@@ -26,7 +26,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.jface.fieldassist.IContentProposal;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -43,7 +43,7 @@ public class ConstraintContentProposalProviderTest {
 	static final int CURRENT=ConstraintContentProposalProvider.CURRENT;
 	static final int LAST=ConstraintContentProposalProvider.LAST;
 	
-	static Set<String> features = new HashSet<String>();
+	Set<String> features = new HashSet<String>();
 	
 
 		
@@ -154,8 +154,8 @@ public class ConstraintContentProposalProviderTest {
 		assertEquals(current,words[CURRENT].trim());
 		assertEquals(last,words[LAST].trim());
 	}
-	@BeforeClass
-	public static void init(){
+	@Before
+	public void init(){
 		features.add("FeatureA");
 		features.add("FeatureB");
 		features.add("FeatureC");
@@ -300,6 +300,40 @@ public class ConstraintContentProposalProviderTest {
 		String[] expectedProps = PROPS_OPERATORS;
 		testGetProposals(content,expectedProps );
 				
+	}
+	
+	@Test
+	public void getProposalsOperatorNameAnd(){
+		features.add("And");
+		String content = "\"|";
+		String[] expectedProps = {"\"And\""};
+		testGetProposals(content,expectedProps);
+	}
+	
+	@Test
+	public void getProposalsOperatorNameOr(){
+		features.add("Or");
+		String content = "\"|";
+		String[] expectedProps = {"\"Or\""};
+		testGetProposals(content,expectedProps);
+	}
+	
+	@Test
+	public void getProposalsOperatorNameNot(){
+		features.add("Not");
+		String content = "\"|";
+		String[] expectedProps = {"\"Not\""};
+		testGetProposals(content,expectedProps);
+	}
+	
+	@Test
+	public void getProposalsWhiteSpace(){
+		features.clear();
+		features.add("Feature A");
+		features.add("Feature B");
+		String content = "\"|";
+		String[] expectedProps = {"\"Feature A\"","\"Feature B\""};
+		testGetProposals(content,expectedProps);
 	}
 	
 	private void testGetProposals(String content,String[] expectedProps) {
