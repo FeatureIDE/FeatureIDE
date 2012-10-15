@@ -1159,7 +1159,7 @@ public class FeatureModel implements PropertyConstants {
 	 * 		the model seems to be initialized wrong 
 	 */
 	public boolean hasHidden() {
-		for (Feature f : featureTable.values()) {
+		for (Feature f : new ArrayList<Feature>(featureTable.values())) {
 			if (f.isHidden())
 				return true;
 		}
