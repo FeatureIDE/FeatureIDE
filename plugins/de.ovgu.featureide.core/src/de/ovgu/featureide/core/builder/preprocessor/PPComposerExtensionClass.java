@@ -116,12 +116,10 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	
 			if (configPath == null)
 				return false;
-	
-			// read activated features from configuration
+
+//			// read activated features from configuration
 			activatedFeatures = new ArrayList<String>(loadStringsFromFile(config));
-			if (activatedFeatures.isEmpty()) {
-				return false;
-			}
+
 		}
 		// get all concrete and abstract features and generate pattern
 		StringBuilder concreteFeatures = new StringBuilder();
