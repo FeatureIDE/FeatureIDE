@@ -70,7 +70,7 @@ public class PPModelBuilder {
 			model.getFeaturesMap().put(featureName, fstFeature);
 		}
 		try {
-			buildModel(featureProject.getSourceFolder());
+			buildModel(featureProject.getSourceFolder(), "");
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
@@ -79,15 +79,16 @@ public class PPModelBuilder {
 
 	/**
 	 * @param folder
+	 * @param packageName 
 	 * @throws CoreException 
 	 */
-	private void buildModel(IFolder folder) throws CoreException {
+	private void buildModel(IFolder folder, String packageName) throws CoreException {
 		for (IResource res : folder.members()) {
 			if (res instanceof IFolder) {
-				buildModel((IFolder)res);
+				buildModel((IFolder)res,packageName.isEmpty() ? res.getName() : packageName + "/" + res.getName());
 			} else if (res instanceof IFile) {
 				String text = getText((IFile)res);
-				String resourceName = res.getName();
+				String resourceName = packageName.isEmpty() ? res.getName() : packageName + "/" + res.getName();
 				FSTClass currentClass = new FSTClass(resourceName);
 				model.addClass(resourceName, (IFile)res);
 				

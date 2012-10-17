@@ -103,7 +103,11 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 		final String featureName = page.getFeatureName();
 		final String className = page.getClassName();
 		final String packageName = page.getPackage();
-		createFolder(page.getPackage(), page.getSourceFolder().getFolder(featureName));
+		IFolder sourceFolder = page.getSourceFolder();
+		if (composer.hasFeatureFolders()) {
+			sourceFolder = sourceFolder.getFolder(featureName);
+		}
+		createFolder(page.getPackage(), sourceFolder);
 		IRunnableWithProgress op = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor) throws InvocationTargetException {
 				try {

@@ -49,6 +49,7 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtension;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
+import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.ColorList;
 import de.ovgu.featureide.ui.UIPlugin;
@@ -274,8 +275,12 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 		
 		// TODO Use the FSTClass to find the FSTDirectives
 		LinkedList<FSTDirective> directiveList = new LinkedList<FSTDirective>();
-		
-		for (FSTFeature fstFeature : project.getFSTModel().getFeaturesMap().values()) {
+		FSTModel model = project.getFSTModel();
+		if (model == null) {
+			return directiveList;//TODO maybe the model should be build in this case
+		}
+ 		
+		for (FSTFeature fstFeature : model.getFeaturesMap().values()) {
 			int color = fstFeature.getColor();
 			for (FSTDirective dir : fstFeature.directives) {
 				if (file.equals(dir.file)) {

@@ -176,42 +176,46 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 			args.add("-D" + feature);
 		}
 		
-		ArrayList<String> files = getFiles(featureProject.getSourceFolder(), buildFolder);
-		if (files.size() == 0) {
-			return;
-		}
-		
-		args.addAll(files);
-		
-		//add output directory
-		args.add(buildFolder.getRawLocation().toOSString());
-		
-		//CommandLine syntax:
-		//	-DFEATURE1 -DFEATURE2 ... File1 File2 ... outputDirectory
-		runMunge(args);
+		runMunge(args, featureProject.getSourceFolder(), buildFolder);
 	}
 	
+	
+
 	/**
-	 * Collects all file locations
+	 * Calls munge for each package separate
 	 * Creates all package folders at the build path
+	 * @param featureArgs
+	 * @param sourceFolder
+	 * @param buildFolder
 	 */
-	private ArrayList<String> getFiles(IFolder sourceFolder, IFolder buildFolder) {
-		ArrayList<String> args = new ArrayList<String>();
+	private void runMunge(LinkedList<String> featureArgs, IFolder sourceFolder,
+			IFolder buildFolder) {
+		@SuppressWarnings("unchecked")
+		LinkedList<String> packageArgs = (LinkedList<String>) featureArgs.clone();
+		boolean added = false;
 		try {
 			createBuildFolder(buildFolder);
-		
 			for (final IResource res : sourceFolder.members()) {
 				if (res instanceof IFolder) {
-					args.addAll(getFiles((IFolder)res, buildFolder.getFolder(res.getName())));
+					runMunge(featureArgs, (IFolder)res, buildFolder.getFolder(res.getName()));
 				} else 
 				if (res instanceof IFile){
-					args.add(res.getRawLocation().toOSString());
+					added = true;
+					packageArgs.add(res.getRawLocation().toOSString());
 				}
 			}
 		} catch (CoreException e) {
 			MungeCorePlugin.getDefault().logError(e);
 		}
-		return args;
+		if (!added) {
+			return;
+		}
+		//add output directory
+		packageArgs.add(buildFolder.getRawLocation().toOSString());
+				
+		//CommandLine syntax:
+		//	-DFEATURE1 -DFEATURE2 ... File1 File2 ... outputDirectory
+		runMunge(packageArgs);
 	}
 
 	/**
