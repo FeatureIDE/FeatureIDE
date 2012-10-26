@@ -27,9 +27,11 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.core.internal.runtime.InternalPlatform;
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
@@ -44,6 +46,7 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.core.ClasspathEntry;
 import org.eclipse.jdt.internal.core.JavaProject;
+import org.osgi.framework.Bundle;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
@@ -63,7 +66,8 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 // implement buildconfiguration
 @SuppressWarnings("restriction")
 public class AspectJComposer extends ComposerExtensionClass {
-
+	private static final String ASPECTJ_ID = "org.eclipse.ajdt";
+	private static final String AJDT_WARNING = "The required bundle org.eclipse.ajdt is not installed.";
 	private static final String ASPECTJ_NATURE = "org.eclipse.ajdt.ui.ajnature";
 	
 	private static final String NEW_ASPECT = "\t// TODO Auto-generated aspect\r\n";
@@ -97,6 +101,9 @@ public class AspectJComposer extends ComposerExtensionClass {
 			return;
 		}
 		assert(featureProject != null) : "Invalid project given";
+		if(!isAJDTInstalled()){
+			generateAJDTWarning();	
+		}
 		
 		final String configPath =  config.getRawLocation().toOSString();
 		final String outputPath = featureProject.getBuildPath();
@@ -132,6 +139,24 @@ public class AspectJComposer extends ComposerExtensionClass {
 		} catch (CoreException e) {
 			AspectJCorePlugin.getDefault().logError(e);
 		}
+	}
+
+	/**
+	 * generates a warning that indicates missing AJDT plugin
+	 */
+	private void generateAJDTWarning() {
+		this.featureProject.createBuilderMarker(featureProject
+				.getProject(), AJDT_WARNING, 0, IMarker.SEVERITY_WARNING);
+	}
+
+	/**
+	 * returns true if AJDT plugin is installed
+	 */
+	private boolean isAJDTInstalled() {
+		for(Bundle b :InternalPlatform.getDefault().getBundleContext().getBundles()){
+			if(b.getSymbolicName().startsWith(ASPECTJ_ID))return true;
+		}
+		return false;
 	}
 	
 	/**
