@@ -68,6 +68,7 @@ public class ViewContentProvider implements IStructuredContentProvider,
 	protected static final String NUMBER_PRIMITIVE = "Number of primitive features: ";
 	protected static final String NUMBER_COMPOUND = "Number of compound features: ";
 	protected static final String NUMBER_HIDDEN = "Number of hidden features: ";
+	protected static final String NUMBER_CONSTRAINTS = "Number of constraints: ";
 	protected static final String MODEL_VOID = "Feature model is valid (not void): ";
 	protected static final String MODEL_TIMEOUT = MODEL_VOID + "timeout";
 	
@@ -93,8 +94,9 @@ public class ViewContentProvider implements IStructuredContentProvider,
 	private static final int INDEX_PRIMITIVE = 4;
 	private static final int INDEX_COMPOUND = 5;
 	private static final int INDEX_HIDDEN = 6;
-	private static final int INDEX_CONFIGS = 7;
-	private static final int INDEX_VARIANTS = 8;
+	private static final int INDEX_CONSTRAINTS = 7;
+	private static final int INDEX_CONFIGS = 8;
+	private static final int INDEX_VARIANTS = 9;
 	/**
 	 * minimal number of available processors needed to activate parallelization
 	 */
@@ -311,6 +313,7 @@ public class ViewContentProvider implements IStructuredContentProvider,
 		}
 		
 		final int features = model.getNumberOfFeatures();
+		final int constraints = model.getConstraintCount();
 		final int concrete = model.getAnalyser().countConcreteFeatures();
 		final int terminal = model.getAnalyser().countTerminalFeatures();
 		final int hidden   = model.getAnalyser().countHiddenFeatures();
@@ -332,6 +335,7 @@ public class ViewContentProvider implements IStructuredContentProvider,
 					addChild(NUMBER_PRIMITIVE + terminal);
 					addChild(NUMBER_COMPOUND + (features - terminal));
 					addChild(NUMBER_HIDDEN + hidden);
+					addChild(NUMBER_CONSTRAINTS + constraints);
 					addChild(new TreeObject(CALCULATING_MESSAGE, DEFAULT_IMAGE));
 					addChild(new TreeObject(CALCULATING_MESSAGE, DEFAULT_IMAGE));
 				}
@@ -365,6 +369,7 @@ public class ViewContentProvider implements IStructuredContentProvider,
 			((TreeObject)children[INDEX_PRIMITIVE]).setName(NUMBER_PRIMITIVE + terminal);
 			((TreeObject)children[INDEX_COMPOUND]).setName(NUMBER_COMPOUND + (features - terminal));
 			((TreeObject)children[INDEX_HIDDEN]).setName(NUMBER_HIDDEN + hidden);
+			((TreeObject)children[INDEX_CONSTRAINTS]).setName(NUMBER_CONSTRAINTS + constraints);
 			
 			if (isCanceled()) return;
 			
