@@ -254,6 +254,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 			newNatures[natures.length] = JAVA_NATURE;
 			description.setNatureIds(newNatures);
 			project.setDescription(description, null);
+			
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}

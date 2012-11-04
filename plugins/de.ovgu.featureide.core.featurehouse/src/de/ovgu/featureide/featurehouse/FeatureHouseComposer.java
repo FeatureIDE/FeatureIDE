@@ -47,6 +47,7 @@ import cide.gparser.TokenMgrError;
 
 import composer.CmdLineInterpreter;
 import composer.FSTGenComposer;
+import composer.FSTGenComposerExtension;
 import composer.IParseErrorListener;
 
 import de.ovgu.featureide.core.IFeatureProject;
@@ -212,14 +213,15 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			composer.run(new String[] {
 					CmdLineInterpreter.INPUT_OPTION_EQUATIONFILE, configPath,
 					CmdLineInterpreter.INPUT_OPTION_BASE_DIRECTORY, basePath,
-					CmdLineInterpreter.INPUT_OPTION_OUTPUT_DIRECTORY, outputPath + "/" 
+					CmdLineInterpreter.INPUT_OPTION_OUTPUT_DIRECTORY, outputPath + "/",
+					CmdLineInterpreter.INPUT_OPTION_CONTRACT_STYLE, getContractParameter()
 			});
 		} catch (TokenMgrError e) {
 			
 		}
 		fhModelBuilder.buildModel(composer.getFstnodes(), false);
 		
-		composer = new FSTGenComposer(false);
+		composer = new FSTGenComposerExtension();
 		composer.addParseErrorListener(listener);
 		
 		List<String> featureOrderList = featureProject.getFeatureModel().getConcreteFeatureNames();
@@ -230,10 +232,11 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		}
 		
 		try {
-			composer.buildFullFST(new String[] {
+		((FSTGenComposerExtension)composer).buildFullFST(new String[] {
 					CmdLineInterpreter.INPUT_OPTION_EQUATIONFILE, configPath,
 					CmdLineInterpreter.INPUT_OPTION_BASE_DIRECTORY, basePath,
-					CmdLineInterpreter.INPUT_OPTION_OUTPUT_DIRECTORY, outputPath + "/" 
+					CmdLineInterpreter.INPUT_OPTION_OUTPUT_DIRECTORY, outputPath + "/", 
+					CmdLineInterpreter.INPUT_OPTION_CONTRACT_STYLE, getContractParameter()
 			}, features);
 		} catch (TokenMgrError e) {
 			createBuilderProblemMarker(getTokenMgrErrorLine(e.getMessage()), getTokenMgrErrorMessage(e.getMessage()));
@@ -248,6 +251,20 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		fstparser.createProjectTree(composer.getFstnodes());
 		featureProject.setProjectTree(fstparser.getProjectTree());
 		callCompiler();
+	}
+
+	/**
+	 * @return
+	 */
+	private String getContractParameter() {
+		String contractComposition= featureProject.getContractComposition().toLowerCase();
+		if(contractComposition==null||contractComposition.equals("none"))return "none";
+		if(contractComposition.equals("plain contracting"))return "plain_contracting";
+		if(contractComposition.equals("contract overriding"))return "contract_overriding";
+		if(contractComposition.equals("explicit contract refinement"))return "explicit_contracting";
+		if(contractComposition.equals("consecutive contract refinement"))return "consecutive_contracting";
+		
+		return "none";
 	}
 
 	/**
@@ -478,7 +495,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		if (configPath == null || basePath == null || outputPath == null)
 			return;
 		
-		composer = new FSTGenComposer(false);
+		composer = new FSTGenComposerExtension();
 		composer.addParseErrorListener(listener);
 		
 		List<String> featureOrderList = featureProject.getFeatureModel().getConcreteFeatureNames();
@@ -489,10 +506,11 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		}
 		
 		try {
-			composer.buildFullFST(new String[] {
+			((FSTGenComposerExtension)composer).buildFullFST(new String[] {
 					CmdLineInterpreter.INPUT_OPTION_EQUATIONFILE, configPath,
 					CmdLineInterpreter.INPUT_OPTION_BASE_DIRECTORY, basePath,
-					CmdLineInterpreter.INPUT_OPTION_OUTPUT_DIRECTORY, outputPath + "/" 
+					CmdLineInterpreter.INPUT_OPTION_OUTPUT_DIRECTORY, outputPath + "/",
+					CmdLineInterpreter.INPUT_OPTION_CONTRACT_STYLE, getContractParameter()
 			}, features);
 		} catch (TokenMgrError e) {
 			createBuilderProblemMarker(getTokenMgrErrorLine(e.getMessage()), getTokenMgrErrorMessage(e.getMessage()));
@@ -512,7 +530,8 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		composer.run(new String[]{
 				CmdLineInterpreter.INPUT_OPTION_EQUATIONFILE, configurationFile.getRawLocation().toOSString(),
 				CmdLineInterpreter.INPUT_OPTION_BASE_DIRECTORY, featureProject.getSourcePath(),
-				CmdLineInterpreter.INPUT_OPTION_OUTPUT_DIRECTORY, folder.getParent().getLocation().toOSString() + "/"
+				CmdLineInterpreter.INPUT_OPTION_OUTPUT_DIRECTORY, folder.getParent().getLocation().toOSString() + "/",
+				CmdLineInterpreter.INPUT_OPTION_CONTRACT_STYLE, getContractParameter()
 		}); 
 		if (errorPropagation.job != null) {
 			/*
@@ -542,5 +561,13 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	@Override
 	public boolean canGeneratInParallelJobs() {
 		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#hasContractComposition()
+	 */
+	@Override
+	public boolean hasContractComposition() {
+		return true;
 	}
 }

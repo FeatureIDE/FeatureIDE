@@ -45,10 +45,11 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	public static final String DEFAULT_SOURCE_PATH = "src";
 	public static final String DEFAULT_CONFIGS_PATH = "equations";
 	public static final String DEFAULT_BUILD_PATH = "build";
-	
+	public static final String DEFAULT_CONTRACT_COMPOSITION= "None";
 	public static final QualifiedName configConfigID = new QualifiedName("featureproject.configs", "currentEquation");
 	
 	public static final QualifiedName javaClassPathID = new QualifiedName("featureproject.configs", "javaClassPath");
+	public static final QualifiedName contractCompositionID = new QualifiedName("featureproject.contract", "contractComposition");
 	
 	public void dispose();
 
@@ -91,6 +92,7 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	
 	public String[] getJavaClassPath();
 	
+	public String getContractComposition();
 	/**
 	 * Gets the java class path without the default paths
 	 * 
@@ -164,6 +166,12 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	 * @param model
 	 */
 	public void setFSTModel(FSTModel model);
+	
+	/**
+	 * sets the contract composition mechanism
+	 * @param model
+	 */
+	public void setContractComposition(String contractComposition);
 	
 	/**
 	 * @return True if a source file, or the current configuration changed.

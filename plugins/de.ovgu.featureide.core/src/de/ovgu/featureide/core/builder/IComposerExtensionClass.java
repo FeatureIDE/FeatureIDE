@@ -197,4 +197,9 @@ public interface IComposerExtensionClass {
 	 * @return <code>true</code> if a highlighting at the editor is available for the composition tool.
 	 */
 	boolean needColor();
+	
+	/**
+	 * @return <code>true</code> if the composition tool supports contract composition.
+	 */
+	boolean hasContractComposition();
 }

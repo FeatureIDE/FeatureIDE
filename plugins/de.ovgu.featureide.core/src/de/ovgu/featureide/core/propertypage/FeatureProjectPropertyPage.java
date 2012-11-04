@@ -53,10 +53,11 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 	private static final String DESCRIPTION = null;
 	private static final String COMPOSER_GROUP_TEXT = "Composition tool settings";
 	private static final String COMPOSER_SELECTION_TEXT = "&Composition tool:";
+	private static final String CONTRACT_SELECTION_TEXT = "&Contract composition:";
 	private static final String COMPOSER_CONFIG_PATH = "&configurations path:";
 	private static final String COMPOSER_FEATURE_PATH = "&Feature path:";
 	private static final String COMPOSER_SOURCE_PATH = "&Source path:";
-
+	private static final String CONTRACT_COMPOSITION = "Contract composition";
 	private GridData gd = new GridData(GridData.FILL_BOTH);
 	
 	private static IComposerExtension[] extensions = null;
@@ -69,6 +70,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 	
 	private IComposerExtension composer = null;
 	private Combo composerCombo;
+	private Combo contractCombo;
 	
 	private boolean canFinish = true;
 
@@ -111,7 +113,8 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		label.setText("&Project: \t\t" + project.getName());
 		label = new Label(composite, SWT.NONE);
 		label.setText("&Compostion tool: " + composer.getName());
-		
+		label = new Label(composite, SWT.NONE);
+		label.setText("&Contract Composition: " + featureProject.getContractComposition());
 		addCompositionGroup(composite);
 		return composite;
 	}
@@ -147,6 +150,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		
 		addComposerMember(compositionGroup);
 		addAllPathMember(compositionGroup);
+		addContractMember(compositionGroup);
 	}
 
 	/**
@@ -179,7 +183,33 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		}
 		composerCombo.addModifyListener(listener);
 	}
-	
+	/**
+	 * Adds the composer combo box
+	 * @param group
+	 */
+	private void addContractMember(Group group) {
+		Label label = new Label(group, SWT.NULL);
+		label.setText(CONTRACT_SELECTION_TEXT);		
+		contractCombo = new Combo(group, SWT.READ_ONLY | SWT.DROP_DOWN);
+		contractCombo.setLayoutData(gd);
+		contractCombo.add("None");
+		contractCombo.add("Plain Contracting");
+		contractCombo.add("Contract Overriding");
+		contractCombo.add("Explicit Contract Refinement");
+		contractCombo.add("Consecutive Contract Refinement");
+			
+		String composer = featureProject.getContractComposition();
+		
+	    int i = 0;
+		for (String item : contractCombo.getItems()) {
+			if (item.equals(composer)) {
+				contractCombo.select(i);
+				break;
+			}
+			i++;
+		}
+		contractCombo.addModifyListener(listener);
+	}
 	/**
 	 * Adds the text fields of features, source and configurations path
 	 * @param group
@@ -194,6 +224,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		// add configurations path
 		configPath = addPathMember(group, COMPOSER_CONFIG_PATH,
 				featureProject.getConfigFolder(), true);
+	
 	}
 
 	
@@ -233,6 +264,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		}
 		setComposer();
 		setPaths();
+		setContractComposition();
 		try {
 			/* update the FeatureProject settings */
 			project.close(null);
@@ -241,6 +273,26 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 			CorePlugin.getDefault().logError(e);
 		}
 		return true;
+	}
+
+	/**
+	 * 
+	 */
+	private void setContractComposition() {
+		if(!contractChanged()){
+			return;
+		}
+		
+		featureProject.setContractComposition(contractCombo.getItem(contractCombo.getSelectionIndex()));
+		
+	}
+
+	/**
+	 * @return
+	 */
+	private boolean contractChanged() {
+		return !featureProject.getContractComposition().equals(contractCombo.getText());
+	
 	}
 
 	/**
@@ -272,7 +324,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 	 * @return <code>true</code> if the shown settings are equal to the old
 	 */
 	private boolean nothingChanged() {
-		return  !composerChanged() && noPathChanged();
+		return  !composerChanged() && noPathChanged() && !contractChanged();
 	}
 
 	/**
@@ -302,6 +354,14 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 			}
 			i++;
 		}
+		    i = 0;
+			for (String item : contractCombo.getItems()) {
+				if (item.equals(featureProject.getContractComposition())) {
+					contractCombo.select(i);
+					break;
+				}
+				i++;
+			}
 		featurePath.setEnabled(composer.hasFeatureFolder());
 		featurePath.setText(featureProject.getSourceFolder().getProjectRelativePath().toOSString());
 		sourcePath.setEnabled(composer.hasSourceFolder());
@@ -316,6 +376,13 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		for (IComposerExtension c : extensions) {
 			if (c.getName().equals(composerCombo.getItem(composerCombo.getSelectionIndex()))) {
 				c.loadComposerExtension();
+				
+				if(!c.hasContractComposition()){
+					contractCombo.setEnabled(false);
+				}
+				else{
+					contractCombo.setEnabled(true);
+				}
 				if (c.hasFeatureFolder()) {
 					featurePath.setEnabled(true);
 					if (featurePath.getText().equals("")) {

@@ -698,6 +698,8 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	protected volatile boolean waiting;
 
 	private Job waiter;
+
+
 	
 	/**
 	 * refreshes Feature Module Markers for all folders in the source folder
@@ -1337,6 +1339,36 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			}
 		}
 		return new ArrayList<String>();
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.IFeatureProject#getContractComposition()
+	 */
+	public String getContractComposition() {
+		String contractComposition = null;
+		try {
+			contractComposition = project.getPersistentProperty(contractCompositionID);
+		} catch (CoreException e) {
+
+			CorePlugin.getDefault().logError(e);
+		}
+		if(contractComposition==null)return DEFAULT_CONTRACT_COMPOSITION;
+		return contractComposition;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.IFeatureProject#setContractComposition(java.lang.String)
+	 */
+	public void setContractComposition(String contractComposition) {
+		try {
+			project.setPersistentProperty(contractCompositionID, contractComposition);
+		} catch (CoreException e) {
+			
+			CorePlugin.getDefault().logError(e);
+		}
+		
+		
+		
 	}
 
 }

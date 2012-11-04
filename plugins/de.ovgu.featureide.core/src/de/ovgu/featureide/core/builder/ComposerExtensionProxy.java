@@ -286,4 +286,11 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	public boolean needColor() {
 		return composerExtensionClass.needColor();
 	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#hasContractComposition()
+	 */
+	public boolean hasContractComposition() {
+		return composerExtensionClass.hasContractComposition();
+	}
 }
