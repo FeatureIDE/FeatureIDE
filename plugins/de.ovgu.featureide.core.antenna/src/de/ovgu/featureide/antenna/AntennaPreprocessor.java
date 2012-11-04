@@ -429,12 +429,4 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#hasContractComposition()
-	 */
-	@Override
-	public boolean hasContractComposition() {
-	
-		return false;
-	}
 }

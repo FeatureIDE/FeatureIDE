@@ -352,4 +352,8 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	public boolean needColor() {
 		return false;
 	}
+	
+	public boolean hasContractComposition() {
+		return false;
+	}
 }
