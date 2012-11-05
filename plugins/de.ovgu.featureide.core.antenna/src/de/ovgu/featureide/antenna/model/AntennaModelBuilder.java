@@ -38,18 +38,31 @@ import de.ovgu.featureide.core.fstmodel.preprocessor.PPModelBuilder;
 public class AntennaModelBuilder extends PPModelBuilder {
 
 	public static final String OPERATORS = "[\\s!=<>\",;&\\^\\|\\(\\)]";
-	public static final String REGEX = "(//#.*" + OPERATORS + ")(%s)("
+	public static final String REGEX = "(//\\s*#.*" + OPERATORS + ")(%s)("
 			+ OPERATORS + ")";
 	
 	public static final String COMMANDS = "if|ifdef|ifndef|elif|elifdef|elifndef|else|condition|define|undefine|endif";
-	private static final String ENDIF = "//#endif";
+	private static final String ENDIF = "//\\s*#endif";
 	
-	Pattern patternCommands = Pattern.compile("//#("+COMMANDS+")");
+	Pattern patternCommands = Pattern.compile("//\\s*#("+COMMANDS+")");
 
 	public AntennaModelBuilder(IFeatureProject featureProject) {
 		super(featureProject);
 	}
 	
+	
+	
+	/**
+	 * returns true if the regular expression regex can be matched by a substring of text
+	 * @param text
+	 * @param pattern
+	 * @return
+	 */
+	protected static boolean containsRegex(String text, String regex){
+		Pattern pattern = Pattern.compile(regex);
+		Matcher matcher = pattern.matcher(text);
+		return matcher.find();
+	}
 	@Override
 	public LinkedList<FSTDirective> buildModelDirectivesForFile(Vector<String> lines) {
 		//for preprocessor outline
@@ -62,33 +75,33 @@ public class AntennaModelBuilder extends PPModelBuilder {
 			String line = lines.get(i);
 			
 			// if line is preprocessor directive
-			if (line.contains("//#")) {
+			if (containsRegex(line,"//\\s*#")) {
 				FSTDirective directive = new FSTDirective(id++);
 				
 				int command = 0;
 				boolean endif = false;
 				
-				if(line.contains("//#if ")){//1
+				if(containsRegex(line,"//\\s*#if ")){//1
 					command = FSTDirective.IF;
-				}else if(line.contains("//#ifdef ")){//2
+				}else if(containsRegex(line,"//\\s*#ifdef ")){//2
 					command = FSTDirective.IFDEF;
-				}else if(line.contains("//#ifndef ")){//3
+				}else if(containsRegex(line,"//\\s*#ifndef ")){//3
 					command = FSTDirective.IFNDEF;
-				}else if(line.contains("//#elif ")){//4
+				}else if(containsRegex(line,"//\\s*#elif ")){//4
 					command = FSTDirective.ELIF;
-				}else if(line.contains("//#elifdef ")){//5
+				}else if(containsRegex(line,"//\\s*#elifdef ")){//5
 					command = FSTDirective.ELIFDEF;
-				}else if(line.contains("//#elifndef ")){//6
+				}else if(containsRegex(line,"//\\s*#elifndef ")){//6
 					command = FSTDirective.ELIFNDEF;
-				}else if(line.contains("//#else")){//7
+				}else if(containsRegex(line,"//\\s*#else")){//7
 					command = FSTDirective.ELSE;
-				}else if(line.contains("//#condition ")){//8
+				}else if(containsRegex(line,"//\\s*#condition ")){//8
 					command = FSTDirective.CONDITION;
-				}else if(line.contains("//#define ")){//9
+				}else if(containsRegex(line,"//\\s*#define ")){//9
 					command = FSTDirective.DEFINE;
-				}else if(line.contains("//#undefine ")){//10
+				}else if(containsRegex(line,"//\\s*#undefine ")){//10
 					command = FSTDirective.UNDEFINE;
-				}else if(line.contains(ENDIF)){//11
+				}else if(containsRegex(line,ENDIF)){//11
 					endif = true;
 				}else{
 					continue;
@@ -104,7 +117,12 @@ public class AntennaModelBuilder extends PPModelBuilder {
 						if (i + 1 < lines.size()) {
 							directivesStack.pop().setEndLine(i + 1, 0);
 						} else if (endif) {
-							directivesStack.pop().setEndLine(i, line.indexOf(ENDIF) + ENDIF.length());
+							
+							Pattern p  =  Pattern.compile(ENDIF);
+							Matcher m = p.matcher(line);
+							int index = 0;
+							if(m.find()) index=m.start();
+							directivesStack.pop().setEndLine(i, index + ENDIF.length());
 						}
 					}
 				}
