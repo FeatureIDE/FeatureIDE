@@ -17,11 +17,10 @@ import de.ovgu.featureide.fm.core.editing.Comparison;
 import de.ovgu.featureide.fm.core.editing.ModelComparator;
 
 /**
- * 
+ * Generates all valid feature models for a given number of concrete features.
  * @author Jens Meinicke
  *
  */
-// TODO remove unnecessary list dimensions 
 public class FeatureModelBuilder {
 
 	/**
@@ -45,10 +44,14 @@ public class FeatureModelBuilder {
 	private LinkedList<LinkedList<FeatureModel>> models = new LinkedList<LinkedList<FeatureModel>>();
 
 	/**
-	 * first index == #Features<br>
-	 * second index == The models with an equivalent hash value
+	 * first index: The models with an equivalent hash value modulo the selected modulo value<br>
+	 * second index: Differing models
 	 */
-	private LinkedList<ArrayList<LinkedList<FeatureModelCounter>>> sortedModels = new LinkedList<ArrayList<LinkedList<FeatureModelCounter>>>();
+	private ArrayList<LinkedList<FeatureModelCounter>> sortedModels = new ArrayList<LinkedList<FeatureModelCounter>>(MODULO);
+	
+	public ArrayList<LinkedList<FeatureModelCounter>> getSortedModels() {
+		return sortedModels;
+	}
 
 	public static void main(String[] args) {
 		long time = System.currentTimeMillis();	
@@ -57,71 +60,31 @@ public class FeatureModelBuilder {
 			builder.getModels(i);
 			builder.renameAllModels(i);
 		}
-		
-//		int i = -1;
-//		for (LinkedList<FeatureModel> m1 : builder.models) {
-//			if (i < 1) {
-//				i++;
-//				continue;
-//			}
-//			System.out.println("Features: "+ i++ + " Count: "+ m1.size() + " -------------------------------------");
-//			for (FeatureModel m : m1) {
-//					System.out.println(builder.print(m));
-//			}
-//		}
-//		System.out.println();
-		System.out.println("Count Features | Done/TODO");
 		try {
 			builder.createConstraints(COUNT_FEATURES);
 		} catch (TimeoutException e1) {
 			e1.printStackTrace();
 		}
 		time = System.currentTimeMillis() - time;
-		System.out.println("Calculation finished("+time+" ms)");
-		
-//
-//		int countFeatures = -1;
-//		for (ArrayList<LinkedList<FeatureModelCounter>> m1 : builder.sortedModels) {
-//			if (countFeatures < 1) {
-//				countFeatures++;
-//				continue;
-//			}
-//			System.out.println("----------------- " + countFeatures++ + " ------------------");
-//			
-//			int counter = 1;
-//			for (LinkedList<FeatureModelCounter> m : m1) {
-//				
-//				for (FeatureModelCounter fm : m) {
-//					System.out.println("Nr.: " + counter++ + " Duplicates: " + fm.count + " Example: " + fm.model);
-//				}
-//				
-//			}
-//		}
-//		
-//		System.out.println("#################################################");
-//		
-		int n = 0;
-		for (ArrayList<LinkedList<FeatureModelCounter>> m1 : builder.sortedModels) {
-			if (n <= 1) {
-				n++;
-				continue;
-			}
+		System.out.println("Calculation for " + (COUNT_FEATURES-1) + " features finished("+time+" ms)");
 
+		for (int n = 2;n <= 6;n++) {
 			Double number = (double) (n==2 ? 2 : 
 						  n==3 ? 10 :
 						  n==4 ? 218 :
 						  n==5 ? 64594 :
+						  n==6 ? 42946420349.0 :	  
 						  -1);
 			if (COUNT_INVALID_MODELS) {
 				number = Math.pow(2, Math.pow(2, n-1));
 			}
 			Double counter = (double) 0;
 			if (n == COUNT_FEATURES) {
-				for (LinkedList<FeatureModelCounter> list : m1) {
+				for (LinkedList<FeatureModelCounter> list : builder.getSortedModels()) {
 					counter += list.size();
 				}
 			} else {
-				if (COUNT_INVALID_MODELS) {
+				if (!COUNT_INVALID_MODELS) {
 					counter = (double) (n==2 ? 2 :
 						  n==3 ? 10 :
 						  n==4 ? 112 :
@@ -132,15 +95,16 @@ public class FeatureModelBuilder {
 					counter = (double) (n==2 ? 4 :
 						  n==3 ? 16 :
 						  n==4 ? 150 :
-						  n==5 ? 2570 :
-						  n==6 ? 113544 :
 						  -1);
 				}
 			}
 			Double percentage = (counter / number)*100;
-			System.out.println("#Feature " + (n++ -1) + " -> #Models " + counter + "/" + number + " = " + percentage + "%");
+			System.out.println();
+			System.out.print("Feature " + (n-1) + " -> #Models " + counter + "/" + number + " = " + percentage + "%");
+			if (n == COUNT_FEATURES) {
+				System.out.print(" RECALCULATED");
+			}
 		}
-		System.out.println("Time: " + time/1000 + "s");
 	}
 
 	public FeatureModelBuilder(int countFeaturesMax) {
@@ -265,11 +229,7 @@ public class FeatureModelBuilder {
 		while (true) {
 			FeatureModel mc = getModel(i);
 			if (mc == null) {
-				i++;
-				if (i > COUNT_FEATURES) {
-					return;
-				}
-				continue;
+				return;
 			}
 			final LinkedList<FeatureModel> newModelsWithConstraints = new LinkedList<FeatureModel>();
 			newModelsWithConstraints.add(mc);
@@ -335,7 +295,7 @@ public class FeatureModelBuilder {
 				}
 			}
 			
-			if (configurations.size() < i) {
+			if (configurations.isEmpty()) {
 				initConfigurations(newModelsWithConstraints.getFirst(), i);
 			}
 			System.out.println();
@@ -348,13 +308,11 @@ public class FeatureModelBuilder {
 					output = 0;
 					System.out.print('.');
 				}
-				Double hashCode = hashCode(m, i);
-//				FeatureModelCounter c = new FeatureModelCounter(hashCode, print(m));
+				Double hashCode = hashCode(m);
 				FeatureModelCounter c = new FeatureModelCounter(hashCode);
 				boolean found = false;
 				for (FeatureModelCounter fmc : counterModels) {
 					if (fmc.equals(c)) {
-//						fmc.count++;
 						found = true;
 					}
 				}
@@ -364,7 +322,7 @@ public class FeatureModelBuilder {
 			}
 			newModelsWithConstraints.clear();
 			System.out.println();
-			insert(counterModels, i);
+			insert(counterModels);
 			System.out.println("Features: " + i + " " + counter++ + "/" + models.get(i).size());	
 		}
 	}
@@ -377,26 +335,12 @@ public class FeatureModelBuilder {
 		}
 		return false;
 	}
-	
-	private Double hashCode(FeatureModel newModel, int i) {
-		Double hashCode = 0.0;
-		Double multiplier = 1.1;
-		for (Configuration conf : configurations.get(i)) {
-			if (new Configuration(conf, newModel).valid()) {
-				hashCode += multiplier;
-			}
-			multiplier = multiplier*2;
-		}
-		return hashCode;
-	}
 
 	/**
 	 * Insets all calculated models into sortedModels.
 	 */
-	private void insert(LinkedList<FeatureModelCounter> newModelsWithConstraints, final int i) {
-		while (sortedModels.size() <= i) {
-			sortedModels.add(new ArrayList<LinkedList<FeatureModelCounter>>());
-		}
+	private void insert(LinkedList<FeatureModelCounter> newModelsWithConstraints) {
+		
 		System.out.print("insert "+ newModelsWithConstraints.size() + " ");
 		int output = 0;
 		for (FeatureModelCounter newModel : newModelsWithConstraints) {
@@ -404,57 +348,65 @@ public class FeatureModelBuilder {
 			if (number < 0) {
 				number = number*-1;
 			}
-			while (sortedModels.get(i).size() <= number) {
-				sortedModels.get(i).add(new LinkedList<FeatureModelCounter>());
+			while (sortedModels.size() <= number) {
+				sortedModels.add(new LinkedList<FeatureModelCounter>());
 			}
-			if (sortedModels.get(i).get(number).isEmpty()) {
-				sortedModels.get(i).get(number).add(newModel);
+			if (sortedModels.get(number).isEmpty()) {
+				sortedModels.get(number).add(newModel);
 			} else {
 				boolean found = false;
-				for (FeatureModelCounter hash : sortedModels.get(i).get(number)) {
+				for (FeatureModelCounter hash : sortedModels.get(number)) {
 					if (hash.equals(newModel.hashCode)) {
 						found = true;
-//						hash.count += newModel.count;
 						break;
 					}
 				}
 				if (!found) {
-					sortedModels.get(i).get(number).add(newModel);
+					sortedModels.get(number).add(newModel);
 				}
 			}
-			if ((output++)%100 == 0) {
+			if ((output++)%1000 == 0) {
 				System.out.print('.');
 			}
 		}
 		System.out.println();
 	}
 	
-	private LinkedList<LinkedList<Configuration>> configurations = new LinkedList<LinkedList<Configuration>>();
+	private LinkedList<Configuration> configurations = new LinkedList<Configuration>();
+	
+	/**
+	 * Generate a hash value for the given model.
+	 */
+	private Double hashCode(FeatureModel newModel) {
+		Double hashCode = 0.0;
+		Double multiplier = 1.0;
+		for (Configuration conf : configurations) {
+			if (new Configuration(conf, newModel).valid()) {
+				hashCode += multiplier;
+			}
+			multiplier = multiplier*2;
+		}
+		return hashCode;
+	}
 	
 	/**
 	 * Initializes configurations for calculation of the hash values.
 	 */
 	public void initConfigurations(FeatureModel model, int i) {
-		if (configurations.size() == i) {
-			return;
-		}
-		while (configurations.size() <= i) {
-			configurations.add(new LinkedList<Configuration>());
-		}
 		Configuration c = new Configuration(model, false, false);
 		c.setManual(model.getRoot().getName(), Selection.SELECTED);
-		configurations.get(i).add(c);
+		configurations.add(c);
 		for (String feature : model.getFeatureNames()) {
 			if (feature.equals("") || feature.equals(model.getRoot().getName())) {
 				continue;
 			}
 			LinkedList<Configuration> toAdd = new LinkedList<Configuration>();
-			for (Configuration conf : configurations.get(i)) {
+			for (Configuration conf : configurations) {
 				Configuration configuration = new Configuration(conf);
 				configuration.setManual(feature, Selection.SELECTED);
 				toAdd.add(configuration);
 			}
-			configurations.get(i).addAll(toAdd);
+			configurations.addAll(toAdd);
 		}
 	}
 	

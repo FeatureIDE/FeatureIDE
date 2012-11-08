@@ -9,7 +9,11 @@ import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 
-
+/**
+ * Counts possible feature models without dead features.
+ * @author Jens Meinicke
+ *
+ */
 public class ValidModelCounter {
 	private static double POW;
 	
