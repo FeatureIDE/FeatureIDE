@@ -381,24 +381,24 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		return null;
 	}
 
-	public void internRefresh(boolean refreshOutline) {
+	public void internRefresh(boolean onlyLayout) {
 		if (getContents() == null)
 			return;
 
 		// TODO is this necessary?
 		FmOutlinePage outline = featureModelEditor.getOutlinePage();
-		if (refreshOutline && outline != null) {
+		if (!onlyLayout && outline != null) {
 			outline.setInput(getFeatureModel());
 		}
 		
 		// refresh size of all feature figures
-		getContents().refresh();
+		if (!onlyLayout)	getContents().refresh();
 		
 		// layout all features if autoLayout is enabled
 		setLayout();
 		
 		// refresh position of all feature figures
-		getContents().refresh();
+		if (!onlyLayout)	getContents().refresh();
 	}
 	
 	boolean waiting = false;
@@ -409,7 +409,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		if (getFeatureModel() == null || getFeatureModel().getRoot() == null)
 			return;
 
-		internRefresh(true);
+		internRefresh(false);
 
 		if (waiting) {
 			return;
