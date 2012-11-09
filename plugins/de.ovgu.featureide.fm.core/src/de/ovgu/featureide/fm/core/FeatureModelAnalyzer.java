@@ -303,12 +303,16 @@ public class FeatureModelAnalyzer {
 	}
 
 	public LinkedList<Feature> getDeadFeatures() {
+		return getDeadFeatures(1000);
+	}
+	
+	public LinkedList<Feature> getDeadFeatures(int timeout) {
 		// cloning the FM, because otherwise the resulting formula is wrong if
 		// renamed features are involved
 		// TODO: Check other calls of createNodes
 		Node root = NodeCreator.createNodes(fm.clone());
 		LinkedList<Feature> set = new LinkedList<Feature>();
-		for (Literal e : new SatSolver(root, 1000).knownValues()) {
+		for (Literal e : new SatSolver(root, timeout).knownValues()) {
 			String var = e.var.toString();
 			if (!e.positive && !"False".equals(var) && !"True".equals(var)) {
 				Feature feature = fm.getFeature(var);

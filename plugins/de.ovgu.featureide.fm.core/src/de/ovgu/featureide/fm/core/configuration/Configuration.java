@@ -80,7 +80,11 @@ public class Configuration {
 	 * @param configuration The configuration to clone
 	 */
 	public Configuration(Configuration configuration) {
-		this.featureModel = configuration.featureModel;
+		this(configuration, configuration.featureModel);
+	}
+	
+	public Configuration(Configuration configuration, FeatureModel model) {
+		this.featureModel = model;
 		this.propagate = false;
 
 		root = new SelectableFeature(this, featureModel.getRoot());

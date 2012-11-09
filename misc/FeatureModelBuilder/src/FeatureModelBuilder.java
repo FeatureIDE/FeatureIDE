@@ -61,6 +61,7 @@ public class FeatureModelBuilder {
 			builder.renameAllModels(i);
 		}
 		try {
+			/* generating in multiple threads is to memory intensive */
 			builder.createConstraints(COUNT_FEATURES);
 		} catch (TimeoutException e1) {
 			e1.printStackTrace();

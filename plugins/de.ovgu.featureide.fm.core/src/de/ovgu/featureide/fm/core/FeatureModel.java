@@ -71,7 +71,7 @@ public class FeatureModel implements PropertyConstants {
 	/**
 	 * the root feature
 	 */
-	private Feature root;
+	protected Feature root;
 //	private boolean autoLayoutLegend = true;
 //	private boolean showHiddenFeatures = true;
 //	private boolean hasVerticalLayout = true;
@@ -79,7 +79,7 @@ public class FeatureModel implements PropertyConstants {
 	/**
 	 * a {@link Hashtable} containing all features
 	 */
-	private Hashtable<String, Feature> featureTable = new Hashtable<String, Feature>();
+	protected Hashtable<String, Feature> featureTable = new Hashtable<String, Feature>();
 
 	/**
 	 * all comment lines from the model file without line number at which they
@@ -88,23 +88,23 @@ public class FeatureModel implements PropertyConstants {
 
 //	private int selectedLayoutAlgorithm = 1;
 
-	private LinkedList<String> comments = new LinkedList<String>();
+	protected LinkedList<String> comments = new LinkedList<String>();
 
 	/**
 	 * 
 	 */
-	private LinkedList<Node> propNodes = new LinkedList<Node>();
+	protected LinkedList<Node> propNodes = new LinkedList<Node>();
 	
 	/*
 	 * TODO #461 why are constraints saved redundant
 	 */
-	private LinkedList<Constraint> constraints = new LinkedList<Constraint>();
+	protected LinkedList<Constraint> constraints = new LinkedList<Constraint>();
 
 	/**
 	 * This string saves the annotations from the model file as they were read,
 	 * because they were not yet used.
 	 */
-	private LinkedList<String> annotations = new LinkedList<String>();
+	protected LinkedList<String> annotations = new LinkedList<String>();
 
 	/**
 	 * a list containing all renamings since the last save
@@ -127,7 +127,7 @@ public class FeatureModel implements PropertyConstants {
 	private Object undoContext;
 
 	private final LinkedList<PropertyChangeListener> listenerList = new LinkedList<PropertyChangeListener>();
-	private ColorschemeTable colorschemeTable = new ColorschemeTable(this);
+	protected ColorschemeTable colorschemeTable = new ColorschemeTable(this);
 	protected boolean valid = true;
     private FeatureModelAnalyzer analyser = new FeatureModelAnalyzer(this);
     private FeatureModelLayout layout = new FeatureModelLayout();
@@ -1354,5 +1354,53 @@ public class FeatureModel implements PropertyConstants {
 	public void addConstraint(Constraint constraint) {
 		propNodes.add(constraint.getNode());
 		constraints.add(constraint);
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return print(this);
+	}
+	
+	private String print(FeatureModel fm) {
+		String x = printFeatures(fm.getRoot());
+		for (Constraint c : fm.getConstraints()) {
+			x +=c.toString() + " ";
+		}
+		return x;
+	}
+
+	private String printFeatures(Feature feature) {
+		String x = feature.getName();
+		if (!feature.hasChildren()) {
+			return x;
+		}
+		if (feature.isOr()) {
+			x += " or [";
+		} else if (feature.isAlternative()) {
+			x += " alt [";
+		} else {
+			x += " and [";
+		}
+		
+		for (Feature child : feature.getChildren()) {
+			x += " ";
+			if (feature.isAnd()) {
+				if (child.isMandatory()) {
+					x += "M ";
+				} else {
+					x += "O ";
+				}
+			}
+			
+			if (child.hasChildren()) {
+				x += printFeatures(child);
+			} else {
+				x += child.getName();
+			}
+		}
+		return x + " ] ";
 	}
 }
