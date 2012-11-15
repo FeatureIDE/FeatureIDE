@@ -8,10 +8,70 @@
       name="FeatureIDE"/>
       <cheatsheet
             category="de.ovgu.featureide.ui.doc.cheatsheet"
-            composite="false"
+            composite="true"
             contentFile="cheatsheets/helloworld_cheatsheet.xml"
             id="de.ovgu.featureide.ui.doc.cheatsheet"
             name="FeatureIDE Tutorial">
+      </cheatsheet>
+      <cheatsheet
+            composite="false"
+            contentFile="cheatsheets/setup_cheatsheet.xml"
+            id="de.ovgu.featureide.ui.doc.cheatsheet.setup"
+            name="Creating a FeatureIDE project">
+      </cheatsheet>
+      <cheatsheet
+            composite="false"
+            contentFile="cheatsheets/model_cheatsheet.xml"
+            id="de.ovgu.featureide.ui.doc.cheatsheet.model"
+            name="Creating a feature model">
+      </cheatsheet>
+      <cheatsheet
+            composite="false"
+            contentFile="cheatsheets/configuration_cheatsheet.xml"
+            id="de.ovgu.featureide.ui.doc.cheatsheet.configuration"
+            name="Creating a configuration">
+      </cheatsheet>
+      <cheatsheet
+            composite="false"
+            contentFile="cheatsheets/ahead_cheatsheet.xml"
+            id="de.ovgu.featureide.ui.doc.cheatsheet.implementation.ahead"
+            name="AHEAD">
+      </cheatsheet>
+      <cheatsheet
+            composite="false"
+            contentFile="cheatsheets/cpp_cheatsheet.xml"
+            id="de.ovgu.featureide.ui.doc.cheatsheet.implementation.cpp"
+            name="FeatureC++">
+      </cheatsheet>
+      <cheatsheet
+            composite="false"
+            contentFile="cheatsheets/featurehouse_cheatsheet.xml"
+            id="de.ovgu.featureide.ui.doc.cheatsheet.implementation.featurehouse"
+            name="FeatureHouse">
+      </cheatsheet>
+      <cheatsheet
+            composite="false"
+            contentFile="cheatsheets/munge_cheatsheet.xml"
+            id="de.ovgu.featureide.ui.doc.cheatsheet.implementation.munge"
+            name="Munge">
+      </cheatsheet>
+      <cheatsheet
+            composite="false"
+            contentFile="cheatsheets/antenna_cheatsheet.xml"
+            id="de.ovgu.featureide.ui.doc.cheatsheet.implementation.antenna"
+            name="Antenna">
+      </cheatsheet>
+      <cheatsheet
+            composite="false"
+            contentFile="cheatsheets/ahead_cheatsheet.xml"
+            id="de.ovgu.featureide.ui.doc.cheatsheet.implementation.aspectj"
+            name="AspectJ">
+      </cheatsheet>
+      <cheatsheet
+            composite="false"
+            contentFile="cheatsheets/whatnext_cheatsheet.xml"
+            id="de.ovgu.featureide.ui.doc.cheatsheet.whatnext"
+            name="What next?">
       </cheatsheet>
    </extension>
    <extension
