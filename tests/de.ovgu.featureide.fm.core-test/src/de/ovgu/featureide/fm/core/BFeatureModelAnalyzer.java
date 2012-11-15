@@ -23,15 +23,13 @@ import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 
-import org.jbenchx.annotations.Bench;
-import org.jbenchx.annotations.ForEachInt;
+import org.junit.Test;
 
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 
 /**
- * This is a benchmark for analyzes at the {@link FeatureModel}<br> 
- * To run this benchmark you need the plug-in JBenchX. 
+ * This is a benchmark for analyzes at the {@link FeatureModel}
  *  
  * @author Jens Meinicke
  */
@@ -99,40 +97,174 @@ public class BFeatureModelAnalyzer {
 	}
 
 	/**
-	 * Calculates the full duration of analyzing the feature model.
+	 * Analyzes the model completely.
 	 */
-	@Bench (maxRunCount = 1)
-	public void BAnalyzeFeatureModel(@ForEachInt({1, 2, 10, 20, 21, 50, 100, 200, 201, 500}) int i) {
+	private void analyze(int i) {
 		getFM(i).getAnalyser().analyzeFeatureModel(null);
+	}
+
+	@Test (timeout=20000) // 6,377s @ i5(3,3GHz)
+	public void BAnalyzeFeatureModel1() {
+		analyze(1);
+	}
+
+	@Test (timeout=6000) // 1,210s @ i5(3,3GHz)
+	public void BAnalyzeFeatureModel2() {
+		analyze(2);
+	}
+	
+	@Test (timeout=2000) // 0,310s @ i5(3,3GHz)
+	public void BAnalyzeFeatureModel10() {
+		analyze(10);
+	}
+	
+	@Test (timeout=2000) // 0,315s @ i5(3,3GHz)
+	public void BAnalyzeFeatureModel20() {
+		analyze(20);
+	}
+	
+	@Test (timeout=2000) // 0,330s @ i5(3,3GHz)
+	public void BAnalyzeFeatureModel21() {
+		analyze(21);
+	}
+	
+	@Test (timeout=2000) // 0,375s @ i5(3,3GHz)
+	public void BAnalyzeFeatureModel50() {
+		analyze(50);
+	}
+	
+	@Test (timeout=4000) // 0,799s @ i5(3,3GHz)
+	public void BAnalyzeFeatureModel100() {
+		analyze(100);
+	}
+	
+	@Test (timeout=12000) // 3,812s @ i5(3,3GHz)
+	public void BAnalyzeFeatureModel200() {
+		analyze(200);
+	}
+	
+	@Test (timeout=50000) // 11,183s @ i5(3,3GHz)
+	public void BAnalyzeFeatureModel201() {
+		analyze(201);
+	}
+	
+	//@Test (timeout=200000) // 53,082s @ i5(3,3GHz)
+	public void BAnalyzeFeatureModel500() {
+		analyze(500);
 	}
 	
 	/**
-	 * Calculates the duration of analyzing constraints
+	 * Analyzes constraints only
 	 */
-	@Bench (maxRunCount = 1)
-	public void BUpdateConstraints(@ForEachInt({1, 2, 10, 20, 21, 50, 100, 200, 201, 500}) int i) {
+	private void BUpdateConstraints(int i) {
 		getFM(i).getAnalyser().updateConstraints(new HashMap<Object, Object>(), new HashMap<Object, Object>());
 	}
 	
+	@Test (timeout=5000) // 1,356s @ i5(3,3GHz)
+	public void BUpdateConstraints1() {
+		BUpdateConstraints(1);
+	}
+	
+	@Test (timeout=5000) // 1,184s @ i5(3,3GHz)
+	public void BUpdateConstraints2() {
+		BUpdateConstraints(2);
+	}
+	
+	@Test (timeout=2000) // 0,325s @ i5(3,3GHz)
+	public void BUpdateConstraints10() {
+		BUpdateConstraints(10);
+	}
+	
+	@Test (timeout=2000) // 0,324s @ i5(3,3GHz)
+	public void BUpdateConstraints20() {
+		BUpdateConstraints(20);
+	}
+	
+	@Test (timeout=2000) // 0,329s @ i5(3,3GHz)
+	public void BUpdateConstraints21() {
+		BUpdateConstraints(21);
+	}
+	
+	@Test (timeout=2000) // 0,342s @ i5(3,3GHz)
+	public void BUpdateConstraints50() {
+		BUpdateConstraints(50);
+	}
+	
+	@Test (timeout=2000) // 0,425s @ i5(3,3GHz)
+	public void BUpdateConstraints100() {
+		BUpdateConstraints(100);
+	}
+	
+	@Test (timeout=3000) // 0,850s @ i5(3,3GHz)
+	public void BUpdateConstraints200() {
+		BUpdateConstraints(201);
+	}
+	
+	@Test (timeout=3000) // 0,847s @ i5(3,3GHz)
+	public void BUpdateConstraints201() {
+		BUpdateConstraints(201);
+	}
+	
+	//@Test (timeout=50000) // 11,091s @ i5(3,3GHz)
+	public void BUpdateConstraints500() {
+		BUpdateConstraints(500);
+	}
+	
 	/**
-	 * Calculates the duration of analyzing features
+	 * Analyzes features only
 	 */
-	@Bench (maxRunCount = 1)
-	public void BUpdateFeatures(@ForEachInt({1, 2, 10, 20, 21, 50, 100, 200, 201, 500}) int i) {
+	private void BUpdateFeatures(int i) {
 		getFM(i).getAnalyser().updateFeatures(new HashMap<Object, Object>(), new HashMap<Object, Object>());
 	}
 	
-	/**
-	 * Calculates the duration of analyzing hidden features
-	 */
-	@Bench
-	public void BCalculateHidden(@ForEachInt({1, 2, 10, 20, 21, 50, 100, 200, 201, 500, 1000, 10000}) int i) {
-		getFM(i).getAnalyser().calculateHidden(new HashMap<Object, Object>());
+	@Test (timeout=2000) // 0,421s @ i5(3,3GHz)
+	public void BUpdateFeaturess1() {
+		BUpdateFeatures(1);
 	}
 	
-	@Bench
-	public void clone(@ForEachInt({1, 2, 10, 20, 50, 100, 200, 500, 1000, 10000}) int i) {
-		getFM(i).clone();
+	@Test (timeout=2000) // 0,419s @ i5(3,3GHz)
+	public void BUpdateFeatures2() {
+		BUpdateFeatures(2);
+	}
+	
+	@Test (timeout=2000) // 0,309s @ i5(3,3GHz)
+	public void BUpdateFeatures10() {
+		BUpdateFeatures(10);
+	}
+	
+	@Test (timeout=2000) // 0,311s @ i5(3,3GHz)
+	public void BUpdateFeatures20() {
+		BUpdateFeatures(20);
+	}
+	
+	@Test (timeout=2000) // 0,323s @ i5(3,3GHz)
+	public void BUpdateFeatures21() {
+		BUpdateFeatures(21);
+	}
+	
+	@Test (timeout=2000) // 0,319s @ i5(3,3GHz)
+	public void BUpdateFeatures50() {
+		BUpdateFeatures(50);
+	}
+	
+	@Test (timeout=2000) // 0,347s @ i5(3,3GHz)
+	public void BUpdateFeatures100() {
+		BUpdateFeatures(100);
+	}
+	
+	@Test (timeout=2000) // 0,473s @ i5(3,3GHz)
+	public void BUpdateFeatures200() {
+		BUpdateFeatures(200);
+	}
+	
+	@Test (timeout=30000) // 8,077s @ i5(3,3GHz)
+	public void BUpdateFeatures201() {
+		BUpdateFeatures(201);
+	}
+	
+	@Test (timeout=4000) // 0,934s @ i5(3,3GHz)
+	public void BUpdateFeatures500() {
+		BUpdateFeatures(500);
 	}
 
 	/**
