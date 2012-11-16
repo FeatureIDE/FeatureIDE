@@ -28,6 +28,11 @@ import org.eclipse.core.resources.IProject;
  */
 public interface IFMComposerExtension {
 	
+	/*
+	 * This is necessary for feature models out of a feature project.
+	 */
+	void hasComposer(boolean hasComposer);
+	
 	String getOrderPageMessage();
 	
 	/**

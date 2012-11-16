@@ -986,8 +986,10 @@ public class FeatureModel implements PropertyConstants {
 
 	private void setComposer() {
 		if (COMPOSER_ID == null) {
+			fmComposerExtension.hasComposer(false);
 			return;
 		}
+		fmComposerExtension.hasComposer(true);
 		IConfigurationElement[] config = Platform.getExtensionRegistry()
 				.getConfigurationElementsFor(
 						FMCorePlugin.PLUGIN_ID + ".FMComposer");

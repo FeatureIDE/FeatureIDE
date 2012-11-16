@@ -26,42 +26,55 @@ import org.eclipse.core.resources.IProject;
  * @author Jens Meinicke
  */
 public class FMComposerExtension implements IFMComposerExtension {
-	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.IFMComposerExtension#getComposer()
-	 */
+
+	private boolean hasComposer = false;
+
 	@Override
 	public String getOrderPageMessage() {
 		return "";
 	}
-	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.IFMComposerExtension#hasFeaureOrder()
-	 */
+
 	@Override
 	public boolean hasFeaureOrder() {
 		return true;
 	}
-	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.IFMComposerExtension#performRenaming(java.lang.String, java.lang.String, org.eclipse.core.resources.IProject)
-	 */
+
 	@Override
 	public boolean performRenaming(String oldName, String newName,
 			IProject project) {
 		return false;
 	}
 	
-	public boolean isValidFeatureName(String s) {		
-	    if (s == null)
+	public boolean isValidFeatureName(String s) {
+		if (s == null) {
 			return false;
-		final int len = s.length();
-		if (len == 0 || !Character.isJavaIdentifierStart(s.charAt(0)))
-			return false;
-		for (int i = 1; i < len; i++) {
-			if (!Character.isJavaIdentifierPart(s.charAt(i)))
-				return false;
 		}
-		return true;
+		final int len = s.length();
+		if (len == 0) {
+			return false;
+		}
+		
+		if (hasComposer) {
+			// Default behavior for feature projects
+			if (!Character.isJavaIdentifierStart(s.charAt(0)))
+				return false;
+			for (int i = 1; i < len; i++) {
+				if (!Character.isJavaIdentifierPart(s.charAt(i)))
+					return false;
+			}
+			return true;
+		} else {
+			// Default behavior for NON feature projects
+			for (int i = 0; i < len; i++) {
+				if (s.charAt(i) == '"' || s.charAt(i) == '(' || s.charAt(i) == ')')
+					return false;
+			}
+			return true;
+		}
+	}
+
+	@Override
+	public final void hasComposer(boolean hasComposer) {
+		this.hasComposer  = hasComposer;
 	}
 }
