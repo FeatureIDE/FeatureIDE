@@ -13,13 +13,6 @@ import de.ovgu.featureide.fm.core.FMComposerExtension;
  */
 public class FeatureModelingFMExtension extends FMComposerExtension {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ovgu.featureide.fm.core.FMComposerExtension#performRenaming(java.lang
-	 * .String, java.lang.String, org.eclipse.core.resources.IProject)
-	 */
 	@Override
 	public boolean performRenaming(String oldName, String newName,
 			IProject project) {
@@ -41,13 +34,16 @@ public class FeatureModelingFMExtension extends FMComposerExtension {
 		return true;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.fm.core.FMComposerExtension#hasFeaureOrder()
-	 */
 	@Override
 	public boolean hasFeaureOrder() {
 		return false;
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.FMComposerExtension#getErroMessage()
+	 */
+	@Override
+	public String getErroMessage() {
+		return ERROR_MESSAGE_NO_COMPOSER;
 	}
 }

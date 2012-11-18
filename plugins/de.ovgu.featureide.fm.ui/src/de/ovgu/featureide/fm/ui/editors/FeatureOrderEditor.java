@@ -211,7 +211,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	 */
 	@Override
 	public void createPartControl(Composite parent) {
-		hasFeatureOrder = featureModelEditor.featureModel.getFMComposerExtension(
+		hasFeatureOrder = featureModelEditor.featureModel.initFMComposerExtension(
 				((IFile) input.getAdapter(IFile.class)).getProject())
 				.hasFeaureOrder();
 		comp = new Composite(parent, SWT.NONE);
@@ -220,7 +220,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		Label label = new Label(comp, SWT.NONE);
 		if (!hasFeatureOrder) {
 			layout.numColumns = 1;
-			label.setText(featureModelEditor.featureModel.getFMComposerExtension(
+			label.setText(featureModelEditor.featureModel.initFMComposerExtension(
 					((IFile) input.getAdapter(IFile.class)).getProject())
 					.getOrderPageMessage());
 			featurelist = new org.eclipse.swt.widgets.List(comp, SWT.NONE | SWT.BORDER | SWT.V_SCROLL | SWT.MULTI);

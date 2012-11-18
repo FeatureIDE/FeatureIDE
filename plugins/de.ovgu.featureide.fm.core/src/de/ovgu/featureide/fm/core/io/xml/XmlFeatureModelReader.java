@@ -199,11 +199,11 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 						// END read attributes from XML tag
 
 						if (!featureModel.getFeatureNames().contains(attrName)
-								&& featureModel.isValidFeatureName(attrName)) 
+								&& featureModel.getFMComposerExtension().isValidFeatureName(attrName)) 
 						{
 							addFeature(attrName, isMandatory, isAbstract, isHidden,	parent, featureLocation);
 						} else {
-							if (!featureModel.isValidFeatureName(attrName) ) {
+							if (!featureModel.getFMComposerExtension().isValidFeatureName(attrName) ) {
 								throw new UnsupportedModelException("'"
 										+ attrName
 										+ "' is not a valid feature name",

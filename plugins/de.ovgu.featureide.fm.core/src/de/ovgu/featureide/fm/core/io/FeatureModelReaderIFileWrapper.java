@@ -56,7 +56,7 @@ public class FeatureModelReaderIFileWrapper extends AbstractFeatureModelReader {
 	public void readFromFile(IFile ifile) throws UnsupportedModelException,
 			FileNotFoundException {
 		////
-		reader.featureModel.getFMComposerExtension(ifile.getProject());
+		reader.featureModel.initFMComposerExtension(ifile.getProject());
 		/////
 		File file = ifile.getRawLocation().makeAbsolute().toFile();
 

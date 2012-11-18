@@ -62,19 +62,17 @@ public class FeatureLabelEditManager extends DirectEditManager implements GUIDef
 			private ToolTip tooltip;
 			
 			public void editorValueChanged(boolean oldValidState, boolean newValidState) {
-				boolean notvalid;
 				closeTooltip();
 				String value = (String) cellEditor.getValue();
 				if (!value.equals(oldValue)) {
-					if (value.equalsIgnoreCase(oldValue))
+					if (value.equalsIgnoreCase(oldValue)) {
 						createTooltip("It is not recommended to change upper and lower case. You currently try to rename " + oldValue + " to " + value + ".", SWT.ICON_WARNING);
 					// TODO #455 wrong usage of extension
-					else if ((notvalid = !featureModel.isValidFeatureName(value)) && !featureModel.isFeatureModelingComposer())
-						createTooltip("The name need to be a valid Java identifier.", SWT.ICON_ERROR);
-					else if (notvalid)
-						createTooltip("The following Characaters are not allowed \", (, )", SWT.ICON_ERROR);
-					else if (featureModel.getFeatureNames().contains(value))
+					} else if ((!featureModel.getFMComposerExtension().isValidFeatureName(value))) {
+						createTooltip(featureModel.getFMComposerExtension().getErroMessage(), SWT.ICON_ERROR);
+					} else if (featureModel.getFeatureNames().contains(value)) {
 						createTooltip("This name is already used for another feature.", SWT.ICON_ERROR);
+					}
 				}
 			}
 			

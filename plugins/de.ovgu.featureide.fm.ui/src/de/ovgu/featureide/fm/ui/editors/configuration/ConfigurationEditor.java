@@ -409,7 +409,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements
 	 * Reads the featureModel from the modelFile.
 	 */
 	private void readFeatureModel() {
-		featureModel.getFMComposerExtension(file.getProject());
+		featureModel.initFMComposerExtension(file.getProject());
 		XmlFeatureModelReader reader = new XmlFeatureModelReader(featureModel);
 		try {
 			reader.readFromFile(modelFile);

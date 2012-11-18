@@ -128,22 +128,20 @@ public class FeatureModel implements PropertyConstants {
 	
 	/*
 	 * 
-	 * this should be done at the constructor		
+	 * this should be done once at the constructor		
 	 * 
 	 * @return the fMComposerExtension
 	 */
-	public IFMComposerExtension getFMComposerExtension(IProject project) {
+	public IFMComposerExtension initFMComposerExtension(IProject project) {
 		setComposerID(project);
 		setComposer();
 		return fmComposerExtension;
 	}
 
-	public boolean isFeatureModelingComposer() {
-		if (COMPOSER_ID == null) return true;
-		return COMPOSER_ID.endsWith("FeatureModeling");
-		// TODO #455 wrong usage of composer extension
+	public IFMComposerExtension getFMComposerExtension() {
+		return fmComposerExtension;
 	}
-	
+
 	/**
 	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelLayout#setLayout(int)} instead.
 	 */
@@ -206,7 +204,7 @@ public class FeatureModel implements PropertyConstants {
 		addFeature(feature);
 	}
 
-	/*°*****************************************************************
+	/* *****************************************************************
 	 * 
 	 * Feature handling
 	 * 
@@ -361,7 +359,7 @@ public class FeatureModel implements PropertyConstants {
 		root = feature;
 	}
 
-	/*°*****************************************************************
+	/* *****************************************************************
 	 * 
 	 * Constraint handling
 	 * 
@@ -443,7 +441,7 @@ public class FeatureModel implements PropertyConstants {
 	public int getConstraintCount() {
 		return constraints.size();
 	}
-	/*°************************************************************/
+	/* ************************************************************/
 	
 	public List<String> getAnnotations() {
 		return Collections.unmodifiableList(annotations);
@@ -461,7 +459,7 @@ public class FeatureModel implements PropertyConstants {
 		comments.add(comment);
 	}
 	
-	/*°*****************************************************************
+	/* *****************************************************************
 	 * 
 	 * Renaming
 	 * 
@@ -521,7 +519,7 @@ public class FeatureModel implements PropertyConstants {
 
 	private boolean performComposerRenamings(final String oldName,
 			final String newName, final IProject project) {
-		return getFMComposerExtension(project).performRenaming(oldName,	newName, project);
+		return initFMComposerExtension(project).performRenaming(oldName,	newName, project);
 	}
 
 	public void moveFolder(String oldName, String newName) {
@@ -617,7 +615,7 @@ public class FeatureModel implements PropertyConstants {
 		return Collections.unmodifiableSet(names);
 	}
 	
-	/*°************************************************************/
+	/* ************************************************************/
 
 	public void addListener(PropertyChangeListener listener) {
 		if (!listenerList.contains(listener))
@@ -912,16 +910,6 @@ public class FeatureModel implements PropertyConstants {
 	@Deprecated
 	public LinkedList<Feature> getDeadFeatures() {
 	    	return analyser.getDeadFeatures();
-	}
-
-	/**
-	 * Checks a string to be a valid featurename.
-	 * 
-	 * @param s Possible featurename to be checked
-	 * @return boolean
-	 */
-	public boolean isValidFeatureName(String s) {
-		return fmComposerExtension.isValidFeatureName(s);
 	}
 	
 	/**

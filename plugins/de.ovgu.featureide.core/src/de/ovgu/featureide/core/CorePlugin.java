@@ -484,7 +484,7 @@ public class CorePlugin extends AbstractCorePlugin {
 		createFolder(project, configPath);
 		createFolder(project, buildPath);
 		FeatureModel featureModel = new FeatureModel();
-		featureModel.getFMComposerExtension(project);
+		featureModel.initFMComposerExtension(project);
 		featureModel.createDefaultValues(project.getName());
 		try {
 			new FeatureModelWriterIFileWrapper(new XmlFeatureModelWriter(featureModel)).writeToFile(project.getFile("model.xml"));

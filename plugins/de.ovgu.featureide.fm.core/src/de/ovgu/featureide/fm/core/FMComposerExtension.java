@@ -77,4 +77,9 @@ public class FMComposerExtension implements IFMComposerExtension {
 	public final void hasComposer(boolean hasComposer) {
 		this.hasComposer  = hasComposer;
 	}
+
+	@Override
+	public String getErroMessage() {
+		return hasComposer ? ERROR_MESSAGE_COMPOSER : ERROR_MESSAGE_NO_COMPOSER;
+	}
 }
