@@ -43,7 +43,7 @@ public class ConstraintDeleteOperation extends AbstractFeatureModelOperation {
 	@Override
 	protected void redo() {
 		index = featureModel.getConstraintIndex(constraint);
-		featureModel.removePropositionalNode(constraint);
+		featureModel.removeConstraint(constraint);
 	}
 
 	@Override

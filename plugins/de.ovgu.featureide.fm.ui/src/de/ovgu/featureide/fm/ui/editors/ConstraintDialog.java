@@ -627,7 +627,7 @@ public class ConstraintDialog implements GUIDefaults {
 		Node propNode = nodeReader.stringToNode(input, featureList);
 		if (propNode != null) {
 			if (constraint != null) {
-				clonedModel.removePropositionalNode(constraint);
+				clonedModel.removeConstraint(constraint);
 			}
 			clonedModel.addPropositionalNode(propNode);
 			clonedModel.handleModelDataChanged();
@@ -660,7 +660,7 @@ public class ConstraintDialog implements GUIDefaults {
 
 		if (propNode != null) {
 			if (constraint != null) {
-				clonedModel.removePropositionalNode(constraint);
+				clonedModel.removeConstraint(constraint);
 			}
 			deadFeaturesBefore = clonedModel.getAnalyser().getDeadFeatures();
 			clonedModel.addPropositionalNode(propNode);

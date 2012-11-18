@@ -32,8 +32,12 @@ import de.ovgu.featureide.core.featuremodeling.FeatureModelingFMExtension;
  */
 public class TFMComposerExtension {
 
-	private FeatureModelingFMExtension f1 = new FeatureModelingFMExtension();
-	private IFMComposerExtension f2 = new FMComposerExtension();
+	private static FeatureModelingFMExtension f1 = new FeatureModelingFMExtension();
+	private static IFMComposerExtension f2 = new FMComposerExtension();
+	static {
+		f1.hasComposer(false);
+		f2.hasComposer(true);
+	}
 
 	@Test
 	public void FM_valid() {

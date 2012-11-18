@@ -393,7 +393,7 @@ public abstract class Generator {
 				//delete or add constraint
 				if (fm.getPropositionalNodes().size() > 0 && random.nextBoolean()) {
 					int index = random.nextInt(fm.getPropositionalNodes().size());
-					fm.removePropositionalNode(index);
+					fm.removeConstraint(index);
 				}
 				else
 					generateConstraints(fm, random, 1);

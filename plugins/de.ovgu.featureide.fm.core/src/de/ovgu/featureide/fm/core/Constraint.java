@@ -75,7 +75,7 @@ public class Constraint implements PropertyConstants {
 		Node propNode = this.getNode();
 		if (propNode != null) {
 			if (this != null) {
-				fm.removePropositionalNode(this);
+				fm.removeConstraint(this);
 			}
 			deadFeaturesBefore = fm.getAnalyser().getDeadFeatures();
 			fm.addPropositionalNode(propNode);
@@ -165,7 +165,7 @@ public class Constraint implements PropertyConstants {
 		falseOptionalFeatures.clear();
 		boolean found=false;
 		FeatureModel clonedModel = featureModel.clone();
-		clonedModel.removePropositionalNode(this);
+		clonedModel.removeConstraint(this);
 		LinkedList<Feature> foFeatures = clonedModel.getAnalyser().getFalseOptionalFeatures();
 		for (Feature feature : featureModel.getFalseOptionalFeatures()) {
 			if (!foFeatures.contains(clonedModel.getFeature(feature.getName())) && !falseOptionalFeatures.contains(feature)) {

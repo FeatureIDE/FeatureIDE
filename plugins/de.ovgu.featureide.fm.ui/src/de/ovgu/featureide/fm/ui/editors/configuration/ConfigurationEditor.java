@@ -290,7 +290,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements
 	private boolean isModified(IFile iFile) {
 		LinkedList<String> treeFeatures = new LinkedList<String>();
 		for (Feature feature : configuration.getSelectedFeatures()) {
-			if (feature.isLayer()) {
+			if (feature.isConcrete()) {
 				treeFeatures.add(feature.getName());
 			}
 		}

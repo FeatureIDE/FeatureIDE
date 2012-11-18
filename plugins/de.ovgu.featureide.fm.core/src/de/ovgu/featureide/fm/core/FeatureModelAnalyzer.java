@@ -423,7 +423,7 @@ public class FeatureModelAnalyzer {
 				else {
 					// inconsistency?
 					FeatureModel clonedModel = fm.clone();
-					clonedModel.removePropositionalNode(constraint);
+					clonedModel.removeConstraint(constraint);
 					try {
 						if (clonedModel.getAnalyser().isValid()) {
 							if (oldAttributes.get(constraint) != ConstraintAttribute.VOID_MODEL) {

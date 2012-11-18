@@ -501,7 +501,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 						}
 					}
 					for (Feature f : configuration.getSelectedFeatures()) {
-						if (f.isLayer()) {
+						if (f.isConcrete()) {
 							if (!selectedFeatures3.contains(f.getName())) {
 								return;
 							}
@@ -583,7 +583,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		Feature currentFeature = selectedFeatures2.getFirst();
 		selectedFeatures2.removeFirst();
 		LinkedList<Feature> selectedFeatures3 = new LinkedList<Feature>();
-		if (currentFeature.isLayer()) {
+		if (currentFeature.isConcrete()) {
 			if ("".equals(selected)) {
 				selected = currentFeature.getName();
 			} else {
@@ -613,7 +613,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		Feature currentFeature = selectedFeatures2.getFirst();
 		selectedFeatures2.removeFirst();
 		LinkedList<Feature> selectedFeatures3 = new LinkedList<Feature>();
-		if (currentFeature.isLayer()) {
+		if (currentFeature.isConcrete()) {
 			if ("".equals(selected)) {
 				selected = currentFeature.getName();
 			} else {
@@ -653,7 +653,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		Feature currentFeature = selectedFeatures2.getFirst();
 		selectedFeatures2.removeFirst();
 		LinkedList<Feature> selectedFeatures3 = new LinkedList<Feature>();
-		if (currentFeature.isLayer()) {
+		if (currentFeature.isConcrete()) {
 			if ("".equals(selected)) {
 				selected = currentFeature.getName();
 			} else {
@@ -702,7 +702,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	private LinkedList<Feature> getChildren(Feature currentFeature) {
 		LinkedList<Feature> children = new LinkedList<Feature>();
 		for (Feature child : currentFeature.getChildren()) {
-			if (child.isLayer() || hasLayerChild(child)) {
+			if (child.isConcrete() || hasLayerChild(child)) {
 				children.add(child);
 			}
 		}
@@ -716,7 +716,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	private boolean hasLayerChild(Feature feature) {
 		if (feature.hasChildren()) {
 			for (Feature child : feature.getChildren()) {
-				if (child.isLayer() || hasLayerChild(child)) {
+				if (child.isConcrete() || hasLayerChild(child)) {
 					return true;
 				}
 			}

@@ -470,7 +470,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 	private void checkAspect(Feature feature) {
 		if (feature.hasChildren()) {
 			for (Feature child : feature.getChildren()) {
-				if (child.isLayer() && !child.getName().equals(rootName)) {
+				if (child.isConcrete() && !child.getName().equals(rootName)) {
 					createAspect(child.getName(), featureProject.getBuildFolder(), null);
 				}
 				checkAspect(child);

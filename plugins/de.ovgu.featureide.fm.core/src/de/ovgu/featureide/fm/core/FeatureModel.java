@@ -90,14 +90,6 @@ public class FeatureModel implements PropertyConstants {
 
 	protected LinkedList<String> comments = new LinkedList<String>();
 
-	/**
-	 * 
-	 */
-	protected LinkedList<Node> propNodes = new LinkedList<Node>();
-	
-	/*
-	 * TODO #461 why are constraints saved redundant
-	 */
 	protected LinkedList<Constraint> constraints = new LinkedList<Constraint>();
 
 	/**
@@ -133,29 +125,13 @@ public class FeatureModel implements PropertyConstants {
     private FeatureModelLayout layout = new FeatureModelLayout();
 	private LinkedList<Feature> falseOptionalFeatures = new LinkedList<Feature>();
 	private LinkedList<Feature> deadFeatures = new LinkedList<Feature>();
-
-	/**
-	 * @return the featureTable
-	 */
-	public Hashtable<String, Feature> getFeatureTable() {
-		return featureTable;
-	}
-
-	/**
-	 * @param featureTable
-	 *            the featureTable to set
-	 */
-	public void setFeatureTable(Hashtable<String, Feature> featureTable) {
-		this.featureTable = featureTable;
-	}
 	
-	/**
+	/*
 	 * 
-	 * 		this should be done at the constructor
+	 * this should be done at the constructor		
 	 * 
 	 * @return the fMComposerExtension
 	 */
-//	TODO @Jens description / rename
 	public IFMComposerExtension getFMComposerExtension(IProject project) {
 		setComposerID(project);
 		setComposer();
@@ -200,14 +176,13 @@ public class FeatureModel implements PropertyConstants {
 		}
 		featureTable.clear();
 		renamings.clear();
-		propNodes.clear();
 		constraints.clear();
 		comments.clear();
 		annotations.clear();
 		featureOrderList.clear();
 		colorschemeTable.reset();
 	}
-
+	
 	private void deleteChildFeatures(Feature feature) {
 		while (feature.hasChildren()) {
 			Feature child = feature.getLastChild();
@@ -216,78 +191,124 @@ public class FeatureModel implements PropertyConstants {
 			featureTable.remove(child.getName());
 		}
 	}
-
-	public List<String> getAnnotations() {
-		return Collections.unmodifiableList(annotations);
-	}
-
-	public void addAnnotation(String annotation) {
-		annotations.add(annotation);
-	}
-
-	public List<String> getComments() {
-		return Collections.unmodifiableList(comments);
-	}
-
-	public void addComment(String comment) {
-		comments.add(comment);
-	}
-
-	public List<Node> getPropositionalNodes() {
-		return Collections.unmodifiableList(propNodes);
-	}
-
-	public void addPropositionalNode(Node node) {
-		propNodes.add(node);
-		constraints.add(new Constraint(this, node));
-	}
-
-	public void removePropositionalNode(Node node) {
-		if (propNodes.contains(node)) {
-			propNodes.remove(node);
-			constraints.remove(constraints.size() - 1);
+	
+	public void createDefaultValues(String projectName) {
+		String rootName = getValidJavaIdentifier(projectName);
+		Feature root;
+		if (!"".equals(rootName)) {
+			root = getFeature(rootName);
+		} else {
+			root = getFeature("Root");
 		}
+		root.setAbstract(true);
+		Feature feature = new Feature(this, "Base");
+		root.addChild(feature);
+		addFeature(feature);
+	}
+
+	/*°*****************************************************************
+	 * 
+	 * Feature handling
+	 * 
+	 *#*****************************************************************/
+	public void setRoot(Feature root) {
+		this.root = root;
 	}
 	
-	/*
-	 * It is neccassary to remove the same object and not an equivalent one.
-	 */
-	public void removePropositionalNode(Constraint constraint) {
-		int i = 0;
-		for (Constraint c : constraints) {
-			if (c == constraint) {
-				constraints.remove(i);
-				propNodes.remove(i);
-				return;
-			}
-			i++;
-		}
-		
-		if (propNodes.contains(constraint.getNode())) {
-			propNodes.remove(constraint.getNode());
-			constraints.remove(constraint);
-		}
-	}
-
-	public void removePropositionalNode(int index) {
-		propNodes.remove(index);
-		constraints.remove(constraints.size() - 1);
-	}
-
 	public Feature getRoot() {
 		return root;
 	}
 
-	public void setRoot(Feature root) {
-		this.root = root;
+	/**
+	 * @param featureTable
+	 *            the featureTable to set
+	 */
+	public void setFeatureTable(Hashtable<String, Feature> featureTable) {
+		this.featureTable = featureTable;
 	}
-
+	
 	public boolean addFeature(Feature feature) {
 		String name = feature.getName();
 		if (featureTable.containsKey(name))
 			return false;
 		featureTable.put(name, feature);
 		return true;
+	}
+	
+	public Collection<Feature> getFeatures() {
+		return new ArrayList<Feature>(featureTable.values());
+	}
+	
+	/**
+	 * @return The {@link Feature} with the given name or <code>null</code> there is no Feature with this name. 
+	 */
+	@CheckForNull
+	public Feature getFeature(String name) {
+		if (featureTable.isEmpty()) {
+			// create the root feature (it is the only one without a reference)
+			root = new Feature(this, name);
+			addFeature(root);
+			return root;
+		}
+		return featureTable.get(name);
+	}
+
+	/**
+	 * 
+	 * @return A list of all concrete features. This list is in preorder of the tree. 
+	 */
+	@Nonnull
+	public Collection<Feature> getConcreteFeatures() {
+		LinkedList<Feature> concreteFeatures = new LinkedList<Feature>();
+		if (root != null) {
+			getConcreteFeatures(root, concreteFeatures);
+		}
+		return Collections.unmodifiableCollection(concreteFeatures);
+	}
+
+	private void getConcreteFeatures(Feature feature, LinkedList<Feature> concreteFeatures) {
+		if (feature.isConcrete()) {
+			concreteFeatures.add(feature);
+		}
+		for (Feature child : feature.getChildren()) {
+			getConcreteFeatures(child, concreteFeatures);
+		}
+	}
+	
+	/**
+	 * 
+	 * @return A list of all concrete feature names. This list is in preorder of the tree. 
+	 */
+	@Nonnull
+	public LinkedList<String> getConcreteFeatureNames() {
+		LinkedList<String> concreteFeatureNames = new LinkedList<String>();
+		for (Feature f : getConcreteFeatures()) {
+			concreteFeatureNames.add(f.getName());
+		}
+		return concreteFeatureNames;
+	}
+	
+	/**
+	 * @return <code>true</code> if a feature with the given name exists and is concrete.
+	 */
+	public boolean isConcrete(String featureName) {
+		Feature feature = featureTable.get(featureName);
+		return feature != null && feature.isConcrete();
+	}
+	
+	/**
+	 * @return the featureTable
+	 */
+	public Hashtable<String, Feature> getFeatureTable() {
+		return featureTable;
+	}
+	
+	public Set<String> getFeatureNames() {
+		return Collections.unmodifiableSet(featureTable.keySet());
+	}
+	
+	public int getNumberOfFeatures() {
+		return featureTable.size();
 	}
 
 	public void deleteFeatureFromTable(Feature feature) {
@@ -334,18 +355,117 @@ public class FeatureModel implements PropertyConstants {
 		}
 		return true;
 	}
-
-	@CheckForNull
-	public Feature getFeature(String name) {
-		if (featureTable.isEmpty()) {
-			// create the root feature (it is the only one without a reference)
-			root = new Feature(this, name);
-			addFeature(root);
-			return root;
-		}
-		return featureTable.get(name);
+	
+	public void replaceRoot(Feature feature) {
+		featureTable.remove(root.getName());
+		root = feature;
 	}
 
+	/*°*****************************************************************
+	 * 
+	 * Constraint handling
+	 * 
+	 *#*****************************************************************/
+	public void setConstraints(LinkedList<Constraint> constraints) {
+		this.constraints = constraints;
+	}
+	
+	public void addPropositionalNode(Node node) {
+		addConstraint(new Constraint(this, node));
+	}
+	
+	public void addConstraint(Constraint constraint) {
+		constraints.add(constraint);
+	}
+
+	public void addPropositionalNode(Node node, int index) {
+		addConstraint(new Constraint(this, node), index);
+	}
+	
+	public void addConstraint(Constraint constraint, int index) {
+		constraints.add(index, constraint);
+	}
+	
+	public List<Node> getPropositionalNodes() {
+		LinkedList<Node> nodes = new LinkedList<Node>();
+		for (Constraint c : constraints) {
+			nodes.add(c.getNode());
+		}
+		return Collections.unmodifiableList(nodes);
+	}
+	
+	public Node getConstraint(int index) {
+		return constraints.get(index).getNode();
+	}
+	public List<Constraint> getConstraints() {
+		return Collections.unmodifiableList(constraints);
+	}
+
+	/**
+	 * 
+	 * @param constraint
+	 * @return The position of the given {@link Constraint} or 
+	 * 			-1 if it does not exist.
+	 */
+	public int getConstraintIndex(Constraint constraint) {
+		int j = 0;
+		for (Constraint c : constraints) {
+			if (constraint == c) {
+				return j;
+			}
+			j++;
+		}
+		return -1;
+	}
+
+	public void removePropositionalNode(Node node) {
+		for (Constraint c : constraints) {
+			if (c.getNode().equals(node)) {
+				removeConstraint(c);
+				break;
+			}
+		}
+	}
+
+	public void removeConstraint(Constraint constraint) {
+		constraints.remove(constraint);
+	}
+
+	public void removeConstraint(int index) {
+		constraints.remove(index);
+	}
+	
+	public void replacePropNode(int index, Node node) {
+		assert (index < constraints.size());
+		constraints.set(index, new Constraint(this, node));
+	}
+	
+	public int getConstraintCount() {
+		return constraints.size();
+	}
+	/*°************************************************************/
+	
+	public List<String> getAnnotations() {
+		return Collections.unmodifiableList(annotations);
+	}
+
+	public void addAnnotation(String annotation) {
+		annotations.add(annotation);
+	}
+
+	public List<String> getComments() {
+		return Collections.unmodifiableList(comments);
+	}
+
+	public void addComment(String comment) {
+		comments.add(comment);
+	}
+	
+	/*°*****************************************************************
+	 * 
+	 * Renaming
+	 * 
+	 *#*****************************************************************/
 	public boolean renameFeature(String oldName, String newName) {
 		if (!featureTable.containsKey(oldName)
 				|| featureTable.containsKey(newName))
@@ -354,8 +474,8 @@ public class FeatureModel implements PropertyConstants {
 		feature.setName(newName);
 		featureTable.put(newName, feature);
 		renamings.add(new Renaming(oldName, newName));
-		for (Node node : propNodes) {
-			renameVariables(node, oldName, newName);
+		for (Constraint c : constraints) {
+			renameVariables(c.getNode(), oldName, newName);
 		}
 		
 		// update the feature order list
@@ -367,15 +487,15 @@ public class FeatureModel implements PropertyConstants {
 		}
 		return true;
 	}
-
+	
 	public boolean isRenamed() {
 		return (renamings.size() != 0);
 	}
 
 	public void performRenamings() {
 		for (Renaming renaming : renamings) {
-			for (Node node : propNodes)
-				renameVariables(node, renaming.oldName, renaming.newName);
+			for (Constraint c : constraints)
+				renameVariables(c.getNode(), renaming.oldName, renaming.newName);
 		}
 		renamings.clear();
 	};
@@ -457,11 +577,47 @@ public class FeatureModel implements PropertyConstants {
 		for (Node child : node.getChildren())
 			renameVariables(child, oldName, newName);
 	}
-
-	public boolean containsLayer(String featureName) {
-		Feature feature = featureTable.get(featureName);
-		return feature != null && feature.isLayer();
+	
+	/**
+	 * Returns the current name of a feature given its name at the last save.
+	 * 
+	 * @param name
+	 *            name when last saved
+	 * @return current name of this feature
+	 */
+	public String getNewName(String name) {
+		for (Renaming renaming : renamings)
+			if (renaming.oldName.equals(name))
+				name = renaming.newName;
+		return name;
 	}
+
+	/**
+	 * Returns the name of a feature at the time of the last save given its
+	 * current name.
+	 * 
+	 * @param name
+	 *            current name of a feature
+	 * @return name when last saved
+	 */
+	public String getOldName(String name) {
+		for (int i = renamings.size() - 1; i >= 0; i--)
+			if (renamings.get(i).newName.equals(name))
+				name = renamings.get(i).oldName;
+		return name;
+	}
+
+	public Set<String> getOldFeatureNames() {
+		Set<String> names = new HashSet<String>(featureTable.keySet());
+		for (int i = renamings.size() - 1; i >= 0; i--) {
+			Renaming renaming = renamings.get(i);
+			names.remove(renaming.newName);
+			names.add(renaming.oldName);
+		}
+		return Collections.unmodifiableSet(names);
+	}
+	
+	/*°************************************************************/
 
 	public void addListener(PropertyChangeListener listener) {
 		if (!listenerList.contains(listener))
@@ -540,153 +696,26 @@ public class FeatureModel implements PropertyConstants {
 	    return analyser.analyzeFeatureModel(null);
 	}
 
-	public Collection<Feature> getFeatures() {
-		return new ArrayList<Feature>(featureTable.values());
-	}
-
-	/**
-	 * 
-	 * @return A list of all concrete features. This list is in preorder of the tree. 
-	 */
-	@Nonnull
-	public Collection<Feature> getConcreteFeatures() {
-		LinkedList<Feature> concreteFeatures = new LinkedList<Feature>();
-		if (root != null) {
-			initFeatures(root, concreteFeatures);
-		}
-		return Collections.unmodifiableCollection(concreteFeatures);
-	}
-
-	private void initFeatures(Feature feature, LinkedList<Feature> concreteFeatures) {
-		if (feature.isConcrete()) {
-			concreteFeatures.add(feature);
-		}
-		for (Feature child : feature.getChildren()) {
-			initFeatures(child, concreteFeatures);
-		}
-	}
-
-	/**
-	 * 
-	 * @return A list of all concrete feature names. This list is in preorder of the tree. 
-	 */
-	@Nonnull
-	public LinkedList<String> getConcreteFeatureNames() {
-		LinkedList<String> concreteFeatureNames = new LinkedList<String>();
-		for (Feature f : getConcreteFeatures()) {
-			concreteFeatureNames.add(f.getName());
-		}
-		return concreteFeatureNames;
-	}
-
-	public void createDefaultValues(String projectName) {
-		String rootName = getValidJavaIdentifier(projectName);
-		Feature root;
-		if (!"".equals(rootName)) {
-			root = getFeature(rootName);
-		} else {
-			root = getFeature("Root");
-		}
-		root.setAbstract(true);
-		Feature feature = new Feature(this, "Base");
-		root.addChild(feature);
-		addFeature(feature);
-	}
-
-	public void replaceRoot(Feature feature) {
-		featureTable.remove(root.getName());
-		root = feature;
-	}
-
-	/**
-	 * Returns the current name of a feature given its name at the last save.
-	 * 
-	 * @param name
-	 *            name when last saved
-	 * @return current name of this feature
-	 */
-	public String getNewName(String name) {
-		for (Renaming renaming : renamings)
-			if (renaming.oldName.equals(name))
-				name = renaming.newName;
-		return name;
-	}
-
-	/**
-	 * Returns the name of a feature at the time of the last save given its
-	 * current name.
-	 * 
-	 * @param name
-	 *            current name of a feature
-	 * @return name when last saved
-	 */
-	public String getOldName(String name) {
-		for (int i = renamings.size() - 1; i >= 0; i--)
-			if (renamings.get(i).newName.equals(name))
-				name = renamings.get(i).oldName;
-		return name;
-	}
-
-	public Set<String> getFeatureNames() {
-		return Collections.unmodifiableSet(featureTable.keySet());
-	}
-
-	public Set<String> getOldFeatureNames() {
-		Set<String> names = new HashSet<String>(featureTable.keySet());
-		for (int i = renamings.size() - 1; i >= 0; i--) {
-			Renaming renaming = renamings.get(i);
-			names.remove(renaming.newName);
-			names.add(renaming.oldName);
-		}
-		return Collections.unmodifiableSet(names);
-	}
-
-	public Node getConstraint(int index) {
-		return propNodes.get(index);
-	}
-
-	public int getConstraintCount() {
-		return constraints.size();
-	}
-
-	public List<Constraint> getConstraints() {
-		return Collections.unmodifiableList(constraints);
-	}
-
-	public void replacePropNode(int index, Node node) {
-		assert (index < constraints.size());
-		constraints.set(index, new Constraint(this, node));
-		propNodes.set(index, node);
-	}
-
-	public int getNumberOfFeatures() {
-		return featureTable.size();
-	}
-
+	@SuppressWarnings("unchecked")
 	@Override
 	public FeatureModel clone() {
-		FeatureModel fm = new FeatureModel();
-		fm.root = root != null ? root.clone() : new Feature(fm, "Root");
+		FeatureModel clone = new FeatureModel();
+		clone.root = root != null ? root.clone() : new Feature(clone, "Root");
 		List<Feature> list = new LinkedList<Feature>();
-		list.add(fm.root);
+		list.add(clone.root);
 		while (!list.isEmpty()) {
 			Feature feature = list.remove(0);
-			fm.featureTable.put(feature.getName(), feature);
+			clone.featureTable.put(feature.getName(), feature);
 			for (Feature child : feature.getChildren())
 				list.add(child);
 		}
-		fm.propNodes = new LinkedList<Node>();
-		for (Node node : propNodes) {
-			fm.propNodes.add(node);
-
-			fm.constraints.add(new Constraint(fm, node));
-		}
+		clone.constraints = (LinkedList<Constraint>) constraints.clone();
 		for (int i = 0; i < annotations.size(); i++)
-			fm.annotations.add(annotations.get(i));
+			clone.annotations.add(annotations.get(i));
 		for (int i = 0; i < comments.size(); i++)
-			fm.comments.add(comments.get(i));
-		fm.colorschemeTable = colorschemeTable.clone(fm);
-		return fm;
+			clone.comments.add(comments.get(i));
+		clone.colorschemeTable = colorschemeTable.clone(clone);
+		return clone;
 	}
 
 	/**
@@ -1238,43 +1267,6 @@ public class FeatureModel implements PropertyConstants {
 	public Object getUndoContext() {
 		return undoContext;
 	}
-
-	public void setConstraints(LinkedList<Constraint> constraints) {
-		this.constraints = constraints;
-		this.propNodes = new LinkedList<Node>();
-		for (Constraint c : constraints) {
-			propNodes.add(c.getNode());
-		}
-	}
-
-	/**
-	 * @param constraint
-	 */
-	public int getConstraintIndex(Constraint constraint) {
-		int j = 0;
-		for (Constraint c : constraints) {
-			if (constraint == c) {
-				return j;
-			}
-			j++;
-		}
-		return -1;
-	}
-
-	/**
-	 * @param node
-	 * @param constraintIndex
-	 */
-	public void addPropositionalNode(Node node, int index) {
-		constraints.add(index, new Constraint(this, node));
-		propNodes.add(index, node);
-	}
-	
-	public void addConstraint(Constraint constraint, int index) {
-		constraints.add(index, constraint);
-		propNodes.add(index, constraint.getNode());
-	}
-
 	
 	/**
 	 * @return the featureOrderList
@@ -1349,18 +1341,7 @@ public class FeatureModel implements PropertyConstants {
 	public ColorschemeTable getColorschemeTable() {
 		return colorschemeTable;
 	}
-
-	/**
-	 * @param constraint
-	 */
-	public void addConstraint(Constraint constraint) {
-		propNodes.add(constraint.getNode());
-		constraints.add(constraint);
-	}
 	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString() {
 		return print(this);

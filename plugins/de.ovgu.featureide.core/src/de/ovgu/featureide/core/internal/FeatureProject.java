@@ -342,14 +342,14 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		sourceFolder.refreshLocal(IResource.DEPTH_ONE, null);
 		// create folders for all layers
 		for (Feature feature : featureModel.getFeatures())
-			if (feature.isLayer())
+			if (feature.isConcrete())
 				createFeatureFolder(feature.getName());
 		// delete all empty folders which do not anymore belong to layers
 		for (IResource res : sourceFolder.members())
 			if (res instanceof IFolder && res.exists()) {
 				IFolder folder = (IFolder) res;
 				Feature feature = featureModel.getFeature(folder.getName());
-				if (feature == null || !feature.isLayer()) {
+				if (feature == null || !feature.isConcrete()) {
 					folder.refreshLocal(IResource.DEPTH_ONE, null);
 					if (folder.members().length == 0)
 						folder.delete(false, null);

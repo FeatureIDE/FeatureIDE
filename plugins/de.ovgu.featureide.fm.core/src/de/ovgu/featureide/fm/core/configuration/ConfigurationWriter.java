@@ -61,7 +61,7 @@ public class ConfigurationWriter {
 			Set<Feature> featureset = configuration.getSelectedFeatures();
 			for (String s : list) {
 				for (Feature f : featureset) {
-					if (f.isLayer()) {
+					if (f.isConcrete()) {
 						if (f.getName().equals(s))
 							if (s.contains(" "))
 								buffer.append("\"" + s + "\"\r\n");
@@ -79,7 +79,7 @@ public class ConfigurationWriter {
 
 	private void writeSelectedFeatures(SelectableFeature feature,
 			StringBuilder buffer) {
-		if (feature.getFeature().isLayer()
+		if (feature.getFeature().isConcrete()
 				&& feature.getSelection() == Selection.SELECTED)
 			if (feature.getName().contains(" "))
 				buffer.append("\"" + feature.getName() + "\"\r\n");

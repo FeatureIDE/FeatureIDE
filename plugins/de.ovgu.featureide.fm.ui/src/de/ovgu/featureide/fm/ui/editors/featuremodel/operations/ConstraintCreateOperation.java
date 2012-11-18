@@ -57,7 +57,7 @@ public class ConstraintCreateOperation extends AbstractFeatureModelOperation {
 
 	@Override
 	protected void undo() {
-		featureModel.removePropositionalNode(constraint);
+		featureModel.removeConstraint(constraint);
 	}
 
 }

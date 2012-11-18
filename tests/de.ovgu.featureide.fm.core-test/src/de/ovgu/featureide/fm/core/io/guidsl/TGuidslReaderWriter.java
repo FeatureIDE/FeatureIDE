@@ -60,7 +60,7 @@ public class TGuidslReaderWriter extends TAbstractFeatureModelReaderWriter{
 	@Override
 	public void testFeatureConcrete(){
 		for (Feature origF : origFm.getFeatures()) {
-			if (!origF.isLayer()&&origF.isConcrete()) {
+			if (!origF.isConcrete()&&origF.isConcrete()) {
 				Feature newF = newFm.getFeature(origF.getName());
 				if (newF == null){
 					//fail("Feature " + origF.getName() + " cannot be found");

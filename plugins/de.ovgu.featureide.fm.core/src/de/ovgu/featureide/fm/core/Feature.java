@@ -454,15 +454,11 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 	}
 
 	public boolean isAbstract() {
-		return (!this.concret);
+		return !isConcrete();
 	}
 
 	public boolean isConcrete() {
-		return this.concret;
-	}
-
-	public boolean isLayer() {
-		return !isAbstract();
+		return concret;
 	}
 
 	public boolean isANDPossible() {
