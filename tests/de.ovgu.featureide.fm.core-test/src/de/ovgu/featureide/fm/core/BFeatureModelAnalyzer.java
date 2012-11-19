@@ -79,8 +79,7 @@ public class BFeatureModelAnalyzer {
 	
 	private final FeatureModel init(String name) {
 		FeatureModel fm = new FeatureModel();
-		File MODEL_FILE_FOLDER = new File(ClassLoader.getSystemResource(
-				"benchmarkFeatureModels").getPath());
+		File MODEL_FILE_FOLDER = getFolder();
 		for (File f : MODEL_FILE_FOLDER.listFiles(filter)) {
 			if (f.getName().equals(name)) {
 				try {
@@ -94,6 +93,14 @@ public class BFeatureModelAnalyzer {
 			}
 		}
 		return fm;
+	}
+	
+	private static File getFolder() { 
+		File folder =  new File("/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/analyzefeaturemodels/"); 
+		if (!folder.canRead()) { 
+			folder = new File(ClassLoader.getSystemResource("benchmarkFeatureModels").getPath()); 
+		} 
+		return folder; 
 	}
 
 	/**
