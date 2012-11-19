@@ -13,6 +13,15 @@ import de.ovgu.featureide.fm.core.FMComposerExtension;
  */
 public class FeatureModelingFMExtension extends FMComposerExtension {
 
+	private static String ORDER_PAGE_MESSAGE = 
+			"FeatureIDE projects for modelling purpose only do not\n" +
+			"need an order, as there is no source code to compose.";
+	
+	@Override
+	public String getOrderPageMessage() {
+		return ORDER_PAGE_MESSAGE;
+	}
+	
 	@Override
 	public boolean performRenaming(String oldName, String newName,
 			IProject project) {

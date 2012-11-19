@@ -50,25 +50,16 @@ public class AntennaFMComposerExtension extends FMComposerExtension {
 			"FeatureIDE projects based on preprocessors such as Antenna do not\n" +
 			"need an order, as the order is given directly at the source code.";
 	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.IFMComposerExtension#getComposer()
-	 */
 	@Override
 	public String getOrderPageMessage() {
 		return ORDER_PAGE_MESSAGE;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.IFMComposerExtension#hasFeaureOrder()
-	 */
 	@Override
 	public boolean hasFeaureOrder() {
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.FMComposerExtension#performRenaming(java.lang.String, java.lang.String, org.eclipse.core.resources.IProject)
-	 */
 	@Override
 	public boolean performRenaming(String oldName, String newName, IProject project) {
 		IFeatureProject featureProject = CorePlugin.getFeatureProject(project);

@@ -220,9 +220,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		Label label = new Label(comp, SWT.NONE);
 		if (!hasFeatureOrder) {
 			layout.numColumns = 1;
-			label.setText(featureModelEditor.featureModel.initFMComposerExtension(
-					((IFile) input.getAdapter(IFile.class)).getProject())
-					.getOrderPageMessage());
+			label.setText(featureModelEditor.featureModel.getFMComposerExtension().getOrderPageMessage());
 			featurelist = new org.eclipse.swt.widgets.List(comp, SWT.NONE | SWT.BORDER | SWT.V_SCROLL | SWT.MULTI);
 			featurelist.setVisible(false);
 		} else {
@@ -424,13 +422,13 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	 */
 //	TODO can be deleted if .order file is no longer used
 	public void writeToOrderFile() {
-			File file = ((IFile) input.getAdapter(IFile.class)).getProject()
-					.getLocation().toFile();
-			String fileSep = System.getProperty("file.separator");
-			file = new File(file.toString() + fileSep + ".order");
-			if (!file.exists()) {
-				return;
-			}
+		File file = ((IFile) input.getAdapter(IFile.class)).getProject()
+				.getLocation().toFile();
+		String fileSep = System.getProperty("file.separator");
+		file = new File(file.toString() + fileSep + ".order");
+		if (!file.exists()) {
+			return;
+		}
 		String newLine = System.getProperty("line.separator");
 		FileWriter fw = null;
 		try {

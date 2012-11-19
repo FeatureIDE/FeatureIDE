@@ -42,7 +42,8 @@ Export-Package: de.ovgu.featureide.fm.ui,
  de.ovgu.featureide.fm.ui.editors.featuremodel.policies,
  de.ovgu.featureide.fm.ui.views,
  de.ovgu.featureide.fm.ui.views.featuremodeleditview,
- de.ovgu.featureide.fm.ui.views.outline
+ de.ovgu.featureide.fm.ui.views.outline,
+ de.ovgu.featureide.fm.ui.wizards
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: University of Magdeburg
 Import-Package: org.eclipse.jdt.internal.core
