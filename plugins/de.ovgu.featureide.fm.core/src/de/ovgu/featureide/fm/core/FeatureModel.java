@@ -511,9 +511,10 @@ public class FeatureModel implements PropertyConstants {
 				moveFolder(renaming.oldName, renaming.newName);
 			}
 		}
-
-		colorschemeTable.readColorsFromFile(project);
-		colorschemeTable.saveColorsToFile(project);
+		if (colorschemeTable.getColorFile(project).exists()) {
+			colorschemeTable.readColorsFromFile(project);
+			colorschemeTable.saveColorsToFile(project);
+		}
 		renamings.clear();
 	}
 

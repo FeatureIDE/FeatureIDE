@@ -39,7 +39,7 @@ import de.ovgu.featureide.fm.core.io.xml.XmlColorModelWriter;
  */
 public class ColorschemeTable {
 	private static final String DEFAULT_COLORSCHEMENAME = "Default Colorscheme";
-	private static final String COLOR_FILE_NAME = "color.xml";
+	private static final String COLOR_FILE_NAME = ".color.xml";
 	
 	private final FeatureModel featureModel;
 	
@@ -161,17 +161,21 @@ public class ColorschemeTable {
 	public void saveColorsToFile(IProject project) {
 		try {
 			FeatureModelWriterIFileWrapper w = new FeatureModelWriterIFileWrapper(new XmlColorModelWriter(featureModel));
-			w.writeToFile(project.getFile(COLOR_FILE_NAME));
+			w.writeToFile(getColorFile(project));
 		} catch (CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 	}
 	
+	public IFile getColorFile(IProject project) {
+		return project.getFile(COLOR_FILE_NAME);
+	}
+	
 	/**
-	 * Method to read colorschemes and colors from the color.xml file
+	 * Method to read color schemes and colors from the color.xml file
 	 */
 	public void readColorsFromFile(IProject project) {
-		IFile file = project.getFile(COLOR_FILE_NAME);
+		IFile file = getColorFile(project);
 		if (file != null && file.exists()) {
 			try {
 				FeatureModelReaderIFileWrapper reader = new FeatureModelReaderIFileWrapper(new XmlColorModelReader(featureModel));
