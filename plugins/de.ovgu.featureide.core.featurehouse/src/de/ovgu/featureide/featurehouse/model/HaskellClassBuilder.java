@@ -38,9 +38,8 @@ public class HaskellClassBuilder extends ClassBuilder {
 	
 	@Override
 	void caseFieldDeclaration(FSTTerminal terminal) {
-		FSTField field = new FSTField(terminal.getBody(), "", 0, "", terminal.getBody(), terminal.beginLine, terminal.endLine);
-		field.setOwn(modelBuilder.getCurrentFile());
-		modelBuilder.getCurrentClass().add(field);
+		FSTField field = new FSTField(terminal.getBody(), "", "", terminal.getBody(), terminal.beginLine, terminal.endLine);
+		modelBuilder.getCurrentRole().add(field);
 	}
 	
 	@Override

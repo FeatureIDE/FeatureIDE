@@ -82,14 +82,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			}
 		};
 	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ovgu.featureide.core.builder.ComposerExtensionClass#initialize(de.
-	 * ovgu.featureide.core.IFeatureProject)
-	 */
+
 	@Override
 	public boolean initialize(IFeatureProject project) {
 		boolean supSuccess =super.initialize(project);
@@ -219,8 +212,9 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		} catch (TokenMgrError e) {
 			
 		}
-		fhModelBuilder.buildModel(composer.getFstnodes(), false);
 		
+		fhModelBuilder.buildModel(composer.getFstnodes(), false);
+
 		composer = new FSTGenComposerExtension();
 		composer.addParseErrorListener(listener);
 		
@@ -244,6 +238,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			FeatureHouseCorePlugin.getDefault().logError(e);
 		}
 		
+		
 		fhModelBuilder.buildModel(composer.getFstnodes(), true);
 
 		TreeBuilderFeatureHouse fstparser = new TreeBuilderFeatureHouse(
@@ -263,7 +258,6 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		if(contractComposition.equals("contract overriding"))return "contract_overriding";
 		if(contractComposition.equals("explicit contract refinement"))return "explicit_contracting";
 		if(contractComposition.equals("consecutive contract refinement"))return "consecutive_contracting";
-		
 		return "none";
 	}
 
@@ -497,7 +491,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		
 		composer = new FSTGenComposerExtension();
 		composer.addParseErrorListener(listener);
-		
+
 		List<String> featureOrderList = featureProject.getFeatureModel().getConcreteFeatureNames();
 		String[] features = new String[featureOrderList.size()];
 		int i = 0;
@@ -519,6 +513,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		}
 		
 		fhModelBuilder.buildModel(composer.getFstnodes(), false);
+		composer.getFstnodes().clear();
 	}
 
 	@Override
@@ -563,9 +558,6 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#hasContractComposition()
-	 */
 	@Override
 	public boolean hasContractComposition() {
 		return true;

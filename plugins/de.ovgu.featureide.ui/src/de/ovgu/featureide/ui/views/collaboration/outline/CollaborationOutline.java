@@ -61,8 +61,11 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
+import de.ovgu.featureide.core.fstmodel.FSTRole;
+import de.ovgu.featureide.core.fstmodel.RoleElement;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.core.listeners.ICurrentBuildListener;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
@@ -70,8 +73,6 @@ import de.ovgu.featureide.fm.ui.views.outline.FmLabelProvider;
 import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePageContextMenu;
 import de.ovgu.featureide.fm.ui.views.outline.FmTreeContentProvider;
 import de.ovgu.featureide.ui.UIPlugin;
-import de.ovgu.featureide.ui.views.collaboration.model.Class;
-import de.ovgu.featureide.ui.views.collaboration.model.Role;
 
 /**
  * Another outline view displaying the same information as the collaboration
@@ -170,33 +171,29 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 				Object selection = ((IStructuredSelection) viewer.getSelection()).getFirstElement();
 				if (selection instanceof FSTMethod) {
 					FSTMethod meth = (FSTMethod) selection;
-					if (meth.isOwn(iFile)) {
-						scrollToLine(active_editor, meth.getLineNumber(iFile));
+					int line = getMethodLine(iFile, meth);
+					if (line != -1) {
+						scrollToLine(active_editor, line);
 					}
-					return;
 				} else if (selection instanceof FSTField) {
 					FSTField field = (FSTField) selection;
-					if (field.isOwn(iFile)) {
-						scrollToLine(active_editor, field.getLineNumber(iFile));
+					int line = getFieldLine(iFile, field);
+					if (line != -1) {
+						scrollToLine(active_editor, line);
 					}
-					return;
 				} else if (selection instanceof FSTDirective) {
 					FSTDirective directive = (FSTDirective) selection;
 					scrollToLine(active_editor, directive.getStartLine(), directive.getEndLine(), 
 							directive.getStartOffset(), directive.getEndLength());
-					return;
-				} else if (selection instanceof Role) {
-						
-	
-					Role r = (Role) selection;
-	
-					if (r.file.isAccessible()) {
+				} else if (selection instanceof FSTRole) {
+					FSTRole r = (FSTRole) selection;
+					if (r.getFile().isAccessible()) {
 						IWorkbenchWindow window = PlatformUI.getWorkbench()
 								.getActiveWorkbenchWindow();
 						IWorkbenchPage page = window.getActivePage();
 						IContentType contentType = null;
 						try {
-							IContentDescription description = r.file
+							IContentDescription description = r.getFile()
 									.getContentDescription();
 							if (description != null) {
 								contentType = description.getContentType();
@@ -206,18 +203,18 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 								desc = PlatformUI
 										.getWorkbench()
 										.getEditorRegistry()
-										.getDefaultEditor(r.file.getName(), contentType);
+										.getDefaultEditor(r.getFile().getName(), contentType);
 							} else {
 								desc = PlatformUI.getWorkbench().getEditorRegistry()
-										.getDefaultEditor(r.file.getName());
+										.getDefaultEditor(r.getFile().getName());
 							}
-							iFile = r.file;
+							iFile = r.getFile();
 							if (desc != null) {
-								page.openEditor(new FileEditorInput(r.file),
+								page.openEditor(new FileEditorInput(r.getFile()),
 										desc.getId());
 							} else {
 								// case: there is no default editor for the file
-								page.openEditor(new FileEditorInput(r.file),
+								page.openEditor(new FileEditorInput(r.getFile()),
 										"org.eclipse.ui.DefaultTextEditor");
 							}
 						} catch (CoreException e) {
@@ -229,7 +226,35 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 
 		}
 
+		// TODO refactor into FSTModel
+		private int getFieldLine(IFile iFile, FSTField field) {
+			for (FSTRole r : field.getRole().getFSTClass().getRoles()) {
+				if (r.getFile().equals(iFile)) {
+					for (FSTField f : r.getFields()) {
+						if (f.getFullName().equals(field.getFullName())) {
+							return f.getLine();
+						}
+					}
+				}
+			}
+			return -1;
+		}
+
+		private int getMethodLine(IFile iFile, FSTMethod meth) {
+			for (FSTRole r : meth.getRole().getFSTClass().getRoles()) {
+				if (r.getFile().equals(iFile)) {
+					for (FSTMethod m : r.getMethods()) {
+						if (m.getFullName().equals(meth.getFullName())) {
+							return m.getLine();
+						}
+					}
+				}
+			}
+			return -1;
+		}
+
 	};
+	
 	public CollaborationOutline() {
 		super();
 		CorePlugin.getDefault().addCurrentBuildListener(this);
@@ -238,7 +263,6 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 	/**
 	 * handles all the editorActions
 	 * 
-	 * @param part
 	 */
 	private void setEditorActions(IWorkbenchPart activeEditor) {
 		IEditorPart part = null;
@@ -305,7 +329,6 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 	/**
 	 * Sets the new input or disables the viewer in case no editor is open
 	 * 
-	 * @param iFile2
 	 */
 	private void update(IFile iFile2) {
 		if (viewer != null) {
@@ -387,8 +410,7 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 	}
 
 	/**
-	 * This method only updates the root and colors  
-	 * @param iFile2 
+	 * This method only updates the root and colors
 	 * @return <code>false</code> if the content needs to be replaced
 	 */
 	private boolean refreshContent(IFile iFile2) {
@@ -398,23 +420,23 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 			if (iFile2.getName().equals(iFile.getName()) && items.length > 0) {
 				TreeItem item = items[0];
 				if (item != null) {
-					if (item.getData() instanceof  Class) {
-						if (!hasSameClass((Class) item.getData(), iFile2)) {
+					if (item.getData() instanceof FSTClass) {
+						if (!hasSameClass((FSTClass) item.getData(), iFile2)) {
 							return false;
 						}
 						iFile = iFile2;
 						String toAppend = " - Composed class"; 
-						for (Role r : ((Class)item.getData()).getRoles()) {
-							if (r.directives.size() > 0) {
+						for (FSTRole r : ((FSTClass)item.getData()).getRoles()) {
+							if (!r.getDirectives().isEmpty()) {
 								toAppend =  "";
 								break;
 							}
-							if (r.getRoleFile().equals(iFile)) {
-								toAppend = " - " + r.featureName;
+							if (r.getFile().equals(iFile)) {
+								toAppend = " - " + r.getFeture().getName();
 								break;
 							}
 						}
-						item.setText(((Class)item.getData()).getName()+toAppend);
+						item.setText(((FSTClass)item.getData()).getName()+toAppend);
 						colorizeItems(viewer.getTree().getItems());
 						return true;
 					}
@@ -427,7 +449,7 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 	/**
 	 * @return <code>true</code> if the new input does not change the old content.
 	 */
-	private boolean hasSameClass(Class Class, IFile iFile2) {
+	private boolean hasSameClass(FSTClass Class, IFile iFile2) {
 		if (!iFile2.getProject().equals(iFile.getProject())) {
 			return false;
 		}
@@ -445,10 +467,10 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 		}
 		boolean i = false;
 		boolean j = false;
-		for (Role role : Class.getRoles()) {
-			if (role.getRoleFile().equals(iFile)) {
+		for (FSTRole role : Class.getRoles()) {
+			if (role.getFile().equals(iFile)) {
 				i = true;
-			} else if (role.getRoleFile().equals(iFile2)) {
+			} else if (role.getFile().equals(iFile2)) {
 				j = true;
 			}
 		}
@@ -484,34 +506,17 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 	 */
 	private void colorizeItems(TreeItem[] treeItems) {
 		for (int i = 0; i < treeItems.length; i++) {
-			if (treeItems[i].getItems().length > 0) {
-				colorizeItems(treeItems[i].getItems());
-			}
-
-			if (treeItems[i].getData() instanceof FSTMethod) {
-				if (!((FSTMethod) treeItems[i].getData()).isOwn(iFile)) {
-					treeItems[i].setForeground(viewer.getControl().getDisplay()
-							.getSystemColor(SWT.COLOR_GRAY));
-				} else {
-					treeItems[i].setForeground(viewer.getControl().getDisplay()
-							.getSystemColor(SWT.DEFAULT));
-				}
-			} else if (treeItems[i].getData() instanceof FSTField) {
-				if (!((FSTField) treeItems[i].getData()).isOwn(iFile)) {
-					treeItems[i].setForeground(viewer.getControl().getDisplay()
-							.getSystemColor(SWT.COLOR_GRAY));
-				} else {
-					treeItems[i].setForeground(viewer.getControl().getDisplay()
-							.getSystemColor(SWT.DEFAULT));
-				}
-			} else if (treeItems[i].getData() instanceof Role) {
-				if (((Role) treeItems[i].getData()).file.equals(iFile)) {
+			if (treeItems[i].getData() instanceof RoleElement) {
+				setForeground(treeItems[i]);
+			} else if (treeItems[i].getData() instanceof FSTRole) {
+				if (((FSTRole) treeItems[i].getData()).getFile().equals(iFile)) {
 					// get old Font and simply make it bold
 					treeItems[i].setFont(new Font(treeItems[i].getDisplay(),
 									treeItems[i].getFont().getFontData()[0]
 											.getName(), treeItems[i].getFont()
 											.getFontData()[0].getHeight(),
 									SWT.BOLD));
+					
 				} else {
 					treeItems[i].setFont(new Font(treeItems[i].getDisplay(),
 						treeItems[i].getFont().getFontData()[0].getName(), 
@@ -519,7 +524,39 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 									0));
 				}
 			}
+			if (treeItems[i].getItems().length > 0) {
+				colorizeItems(treeItems[i].getItems());
+			}
 		}
+	}
+
+	private void setForeground(TreeItem item) {
+		RoleElement element = (RoleElement) item.getData();
+		
+		for (FSTRole role : element.getRole().getFSTClass().getRoles()) {
+			if (!role.getFile().equals(iFile)) {
+				continue;
+			}
+			if (element instanceof FSTMethod) {
+				for (FSTMethod method : role.getMethods()) {
+					if (method.getFullName().equals(element.getFullName())) {
+						item.setForeground(viewer.getControl().getDisplay()
+								.getSystemColor(SWT.DEFAULT));
+						return;
+					}
+				}
+			}
+			if (element instanceof FSTField) {
+				for (FSTField field : role.getFields()) {
+					if (field.getFullName().equals(element.getFullName())) {
+						item.setForeground(viewer.getControl().getDisplay()
+								.getSystemColor(SWT.DEFAULT));
+						return;
+					}
+				}
+			}
+		}
+		item.setForeground(viewer.getControl().getDisplay().getSystemColor(SWT.COLOR_GRAY));
 	}
 
 	/**
@@ -603,9 +640,6 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.listeners.ICurrentBuildListener#updateGuiAfterBuild(de.ovgu.featureide.core.IFeatureProject)
-	 */
 	@Override
 	public void updateGuiAfterBuild(IFeatureProject project, IFile configurationFile) {
 		if (iFile != null && project.equals(CorePlugin.getFeatureProject(iFile))) {

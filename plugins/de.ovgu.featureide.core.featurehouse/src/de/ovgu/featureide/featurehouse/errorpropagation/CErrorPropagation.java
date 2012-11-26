@@ -69,7 +69,7 @@ public class CErrorPropagation extends ErrorPropagation {
 				continue;
 			}
 			int i = -1;
-			if (m.isConstructor) {
+			if (m.isConstructor()) {
 				String body = m.getBody().substring(m.getBody().indexOf('{') + 1);
 				while (body.contains("  ")) {
 					body = body.replaceAll("  ", " ");
@@ -97,20 +97,17 @@ public class CErrorPropagation extends ErrorPropagation {
 				while (body.contains(" \n")) {
 					body = body.replaceAll(" \n", "\n");
 				}
-				body = body.replaceAll("original\\(", m.getMethodName() + "(");
-				body = body.replaceAll("original\\s*\\(", m.getMethodName() + " (");
+				body = body.replaceAll("original\\(", m.getName() + "(");
+				body = body.replaceAll("original\\s*\\(", m.getName() + " (");
 				i = content.indexOf(body);
 			}
 			if (i != -1) {
 				int line = countLines(content.substring(0, i));
-				m.setLine(line);
+				m.setComposedLine(line);
 			}
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.featurehouse.errorpropagation.ErrorPropagation#propagateMarker(org.eclipse.core.resources.IMarker)
-	 */
+
 	@Override
 	boolean propagateMarker(IMarker m) {
 		try {

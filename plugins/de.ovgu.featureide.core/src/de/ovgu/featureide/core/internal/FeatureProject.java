@@ -1341,9 +1341,6 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		return new ArrayList<String>();
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.IFeatureProject#getContractComposition()
-	 */
 	public String getContractComposition() {
 		String contractComposition = null;
 		try {
@@ -1356,9 +1353,6 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		return contractComposition;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.IFeatureProject#setContractComposition(java.lang.String)
-	 */
 	public void setContractComposition(String contractComposition) {
 		try {
 			project.setPersistentProperty(contractCompositionID, contractComposition);
@@ -1366,9 +1360,10 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			
 			CorePlugin.getDefault().logError(e);
 		}
-		
-		
-		
 	}
 
+	@Override
+	public String toString() {
+		return project.getName();
+	}
 }

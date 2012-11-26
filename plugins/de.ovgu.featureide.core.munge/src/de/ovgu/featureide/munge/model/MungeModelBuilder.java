@@ -25,6 +25,7 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirectiveCommand;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.core.fstmodel.preprocessor.PPModelBuilder;
 import de.ovgu.featureide.munge.MungePreprocessor;
@@ -56,7 +57,6 @@ public class MungeModelBuilder extends PPModelBuilder{
 		
 		Iterator<String> linesIt = lines.iterator();
 		int lineCount = 0;
-		int id = 0;
 		
 		while (linesIt.hasNext()) {
 			String line = linesIt.next();
@@ -79,16 +79,15 @@ public class MungeModelBuilder extends PPModelBuilder{
 							commentSection = false;
 						}
 					} else {
-						FSTDirective directive = new FSTDirective(id++);
-						
-						int command = 0;
+						FSTDirective directive = new FSTDirective();
+						FSTDirectiveCommand command = null;
 						
 						if (singleElement.equals("if")) {
-							command = FSTDirective.IF;
+							command = FSTDirectiveCommand.IF;
 						} else if (singleElement.equals("if_not")) {
-							command = FSTDirective.IF;
+							command = FSTDirectiveCommand.IF;
 						} else if (singleElement.equals("else")) {
-							command = FSTDirective.ELSE;
+							command = FSTDirectiveCommand.ELSE;
 							directivesStack.pop();
 						} else if (singleElement.equals("end")) {
 							directivesStack.pop().setEndLine(lineCount, m.end(0)+MungePreprocessor.COMMENT_END.length());

@@ -48,9 +48,10 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtension;
+import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
-import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
+import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.fm.core.ColorList;
 import de.ovgu.featureide.ui.UIPlugin;
 
@@ -79,7 +80,6 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 	private final IDocument document;
 	private final IFeatureProject project;
 	private final IComposerExtension composer;
-	private final IFile file;
 	
 	private int openConnections = 0;
 	private int docLines, docLength;	
@@ -104,7 +104,6 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 	
 	private ColorAnnotationModel(IDocument document, IFile file, IFeatureProject project, ITextEditor editor) {
 		this.document = document;
-		this.file = file;
 		this.project = project;
 		composer = project.getComposer();
 		composer.initialize(project);
@@ -280,16 +279,19 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 			return directiveList;//TODO maybe the model should be build in this case
 		}
  		
-		for (FSTFeature fstFeature : model.getFeaturesMap().values()) {
-			int color = fstFeature.getColor();
-			for (FSTDirective dir : fstFeature.directives) {
-				if (file.equals(dir.file)) {
-					dir.setColor(color);
-					if (!dir.hasParent()) {
-						directiveList.offer(dir);
-					}
-				}
+		for (FSTFeature fstFeature : model.getFeatures()) {
+			for (FSTRole role : fstFeature.getRoles()) {
+				directiveList.addAll(role.getDirectives());
 			}
+			
+//			for (FSTDirective dir : fstFeature.directives) {
+//				if (file.equals(dir.file)) {
+//					dir.setColor(color);
+//					if (!dir.hasParent()) {
+//						directiveList.offer(dir);
+//					}
+//				}
+//			}
 		}
 		
 //		FSTClass fstClass = project.getFSTModel().getClass(file);
@@ -331,7 +333,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 			if (expressionMap.containsKey(newDir.getExpression())) {
 				int color = expressionMap.get(newDir.getExpression());
 				if (ColorList.isValidColor(color)) {
-					newDir.setColor(color);
+					newDir.getRole().getFeture().setColor(color);
 					dirList.offer(newDir);
 				}
 				if (newDir.hasChildren()) {

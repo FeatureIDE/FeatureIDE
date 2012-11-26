@@ -37,12 +37,11 @@ import org.eclipse.core.runtime.QualifiedName;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtension;
-import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
-import de.ovgu.featureide.core.fstmodel.FSTModelElement;
+import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
@@ -65,7 +64,7 @@ public class CollaborationModelBuilder {
 	
 	public IFile configuration = null;
 	
-	private LinkedHashSet<String> iFeatureNames = new LinkedHashSet<String>();
+	private LinkedHashSet<String> featureNames = new LinkedHashSet<String>();
 	private Collaboration collaboration;
 	private LinkedHashSet<String> extensions;
 	private FSTModel fSTModel;
@@ -138,20 +137,20 @@ public class CollaborationModelBuilder {
 	 */
 	private void buildModelWithFSTModel() {
 		//case: FSTModel built
-		LinkedList<FSTFeature> iFeatures = fSTModel.getSelectedFeatures();
+		LinkedList<FSTFeature> features = fSTModel.getFeatures();
 		
-		if (iFeatures == null) {
+		if (features == null) {
 			return;
 		}
 		
-		for (FSTFeature feature : iFeatures) {
-			iFeatureNames.add(feature.getName());
+		for (FSTFeature feature : features) {
+			featureNames.add(feature.getName());
 		}
 		
 		IFolder path = project.getSourceFolder();
 		for (String layerName : layerNames) {
 			if (featureFilter.isEmpty() || featureFilter.contains(layerName)) {
-				if (iFeatureNames.contains(layerName)) {
+				if (featureNames.contains(layerName)) {
 					addRoles(layerName, path);
 				} else {
 					//case: add arbitrary files
@@ -161,23 +160,18 @@ public class CollaborationModelBuilder {
 		}
 	}
 
-	/**
-	 * @param layerName 
-	 * @param sourceFolder 
-	 * 
-	 */
-	private void addRoles(String layerName, IFolder sourceFolder) {
+	private void addRoles(String featureName, IFolder sourceFolder) {
 		//case: add class files
 		boolean selected = true;
-		FSTFeature fstFeature = fSTModel.getFeature(layerName);
+		FSTFeature fstFeature = fSTModel.getFeature(featureName);
 		collaboration = null;
-		if (configuration != null && !selectedFeatureNames.contains(layerName))
+		if (configuration != null && !selectedFeatureNames.contains(featureName))
 			selected = false;
 		if (selected || showUnselectedFeatures) {
-			FSTModelElement[] element = fstFeature.getChildren();
-			if (element instanceof FSTClass[]) {
-				for (FSTClass Class : (FSTClass[]) element) {
-					String className = Class.getName();
+			LinkedList<FSTRole> roles = fstFeature.getRoles();
+			
+				for (FSTRole fstRole : roles) {
+					String className = fstRole.getFSTClass().getName();
 					if (classFilter.size() == 0 || classFilter.contains(className)) {
 						if (collaboration == null) {
 							Feature feature = project.getFeatureModel().getFeature(fstFeature.getName());
@@ -193,41 +187,27 @@ public class CollaborationModelBuilder {
 						}
 						pathToFile = pathToFile.append(className);
 						Role role = new Role(className);
-						if (composer.hasFeatureFolders()) {
-							if (Class.isClassFile()) {
-								role.file = Class.getFile();
-							} else {
-								role.file = project.getSourceFolder()
-									.getFolder(fstFeature.getName())
-									.getFile(className);
-							}
-						} else {
-							role.file = project.getSourceFolder()
-								.getFile(className);
-							role.files.add(role.file);
-						}
+						role.file = fstRole.getFile();
 						if (editorFile != null && role.file.getFullPath().equals(editorFile.getFullPath())) {
 							role.isEditorFile = true;
 						}
 						role.featureName = fstFeature.getName();
-						FSTField[] fields = Class.getFields();
+						LinkedList<FSTField> fields = fstRole.getFields();
 						if (fields != null) {
 							for (FSTField f : fields) {
 								role.fields.add(f);
 							}
 						}
 						
-						FSTMethod[] methods = Class.getMethods();
+						LinkedList<FSTMethod> methods = fstRole.getMethods();
 						if (methods != null) {
 							for (FSTMethod m : methods) {
 								role.methods.add(m);
 							}
 						}
 
-						for (FSTDirective d : fstFeature.directives) {
-							if (role.file.equals(d.file)) {
-								role.directives.add(d);
-							}
+						for (FSTDirective d : fstRole.getDirectives()) {
+							role.directives.add(d);
 						}
 						
 						role.setPath(pathToFile);
@@ -247,7 +227,7 @@ public class CollaborationModelBuilder {
 						model.roles.add(role);
 					}
 				}
-			}
+			
 			if (composer.hasFeatureFolders()) {
 				IResource[] members = null;
 				try {
@@ -268,8 +248,6 @@ public class CollaborationModelBuilder {
 
 	/**
 	 * This method is used if a FSTModel exists but it does not contains the given feature
-	 * @param layerName 
-	 * 
 	 */
 	private void addArbitraryFiles(String layerName) {
 		boolean selected = false;
@@ -345,9 +323,6 @@ public class CollaborationModelBuilder {
 		}
 	}
 
-	/**
-	 * @return
-	 */
 	private boolean initilize(IFeatureProject featureProject) {
 		resetModel();
 		
@@ -432,12 +407,11 @@ public class CollaborationModelBuilder {
 		model.roles.clear();
 		model.collaborations.clear();
 		
-		iFeatureNames.clear();
+		featureNames.clear();
 	}
 
 	/**
 	 * Adds the configuration to the model.
-	 * @param featureProject
 	 */
 	private void addConfigurationToModel() {
 		IFile config = project.getCurrentConfiguration(); 
@@ -470,7 +444,7 @@ public class CollaborationModelBuilder {
 					|| classFilter.contains(fileName)) {
 				
 				if (fSTModel == null || !extensions.contains(fileExtension) 
-						|| !iFeatureNames.contains(featureName)) {
+						|| !featureNames.contains(featureName)) {
 					if (collaboration == null) {
 						Feature feature = project.getFeatureModel().getFeature(featureName);
 						if (feature != null) {

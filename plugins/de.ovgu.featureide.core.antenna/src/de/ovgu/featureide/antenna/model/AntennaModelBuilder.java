@@ -25,6 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirectiveCommand;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.core.fstmodel.preprocessor.PPModelBuilder;
 
@@ -50,68 +51,62 @@ public class AntennaModelBuilder extends PPModelBuilder {
 		super(featureProject);
 	}
 	
-	
-	
 	/**
 	 * returns true if the regular expression regex can be matched by a substring of text
-	 * @param text
-	 * @param pattern
-	 * @return
 	 */
 	protected static boolean containsRegex(String text, String regex){
 		Pattern pattern = Pattern.compile(regex);
 		Matcher matcher = pattern.matcher(text);
 		return matcher.find();
 	}
+	
 	@Override
 	public LinkedList<FSTDirective> buildModelDirectivesForFile(Vector<String> lines) {
 		//for preprocessor outline
 		Stack<FSTDirective> directivesStack = new Stack<FSTDirective>();
 		LinkedList<FSTDirective> directivesList = new LinkedList<FSTDirective>();
 		
-		int id = 0;
-		
 		for (int i = 0; i < lines.size(); i++) {
 			String line = lines.get(i);
 			
 			// if line is preprocessor directive
 			if (containsRegex(line,"//\\s*#")) {
-				FSTDirective directive = new FSTDirective(id++);
+				FSTDirective directive = new FSTDirective();
 				
-				int command = 0;
+				FSTDirectiveCommand command = null;
 				boolean endif = false;
 				
 				if(containsRegex(line,"//\\s*#if ")){//1
-					command = FSTDirective.IF;
+					command = FSTDirectiveCommand.IF;
 				}else if(containsRegex(line,"//\\s*#ifdef ")){//2
-					command = FSTDirective.IFDEF;
+					command = FSTDirectiveCommand.IFDEF;
 				}else if(containsRegex(line,"//\\s*#ifndef ")){//3
-					command = FSTDirective.IFNDEF;
+					command = FSTDirectiveCommand.IFNDEF;
 				}else if(containsRegex(line,"//\\s*#elif ")){//4
-					command = FSTDirective.ELIF;
+					command = FSTDirectiveCommand.ELIF;
 				}else if(containsRegex(line,"//\\s*#elifdef ")){//5
-					command = FSTDirective.ELIFDEF;
+					command = FSTDirectiveCommand.ELIFDEF;
 				}else if(containsRegex(line,"//\\s*#elifndef ")){//6
-					command = FSTDirective.ELIFNDEF;
+					command = FSTDirectiveCommand.ELIFNDEF;
 				}else if(containsRegex(line,"//\\s*#else")){//7
-					command = FSTDirective.ELSE;
+					command = FSTDirectiveCommand.ELSE;
 				}else if(containsRegex(line,"//\\s*#condition ")){//8
-					command = FSTDirective.CONDITION;
+					command = FSTDirectiveCommand.CONDITION;
 				}else if(containsRegex(line,"//\\s*#define ")){//9
-					command = FSTDirective.DEFINE;
+					command = FSTDirectiveCommand.DEFINE;
 				}else if(containsRegex(line,"//\\s*#undefine ")){//10
-					command = FSTDirective.UNDEFINE;
+					command = FSTDirectiveCommand.UNDEFINE;
 				}else if(containsRegex(line,ENDIF)){//11
 					endif = true;
 				}else{
 					continue;
 				}
 				
-				if (command != 0)
+				if (command != null)
 					directive.setCommand(command);				
 				
-				if (command == FSTDirective.ELIF || command == FSTDirective.ELIFDEF ||
-						command == FSTDirective.ELIFNDEF || command == FSTDirective.ELSE ||
+				if (command == FSTDirectiveCommand.ELIF || command == FSTDirectiveCommand.ELIFDEF ||
+						command == FSTDirectiveCommand.ELIFNDEF || command == FSTDirectiveCommand.ELSE ||
 						endif) {
 					if (!directivesStack.isEmpty()) {
 						if (i + 1 < lines.size()) {
@@ -133,7 +128,7 @@ public class AntennaModelBuilder extends PPModelBuilder {
 				directive.setExpression(line);
 				directive.setStartLine(i, 0);
 				
-				if (command == 0)
+				if (command == null)
 					continue;
 				
 				if(!directivesStack.isEmpty()){
@@ -143,7 +138,7 @@ public class AntennaModelBuilder extends PPModelBuilder {
 					directivesList.add(directive);
 				}				
 				
-				if (command != FSTDirective.DEFINE && command != FSTDirective.UNDEFINE && command != FSTDirective.CONDITION)
+				if (command != FSTDirectiveCommand.DEFINE && command != FSTDirectiveCommand.UNDEFINE && command != FSTDirectiveCommand.CONDITION)
 					directivesStack.push(directive);
 			}
 		}
@@ -168,7 +163,6 @@ public class AntennaModelBuilder extends PPModelBuilder {
 	public static boolean contains(String text, String feature) {
 		Pattern pattern = Pattern.compile(String.format(REGEX, feature));
 		Matcher matcher = pattern.matcher(text);
-
 		return matcher.find();
 	}
 }

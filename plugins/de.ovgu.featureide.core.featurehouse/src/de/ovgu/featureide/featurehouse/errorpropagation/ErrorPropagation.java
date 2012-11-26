@@ -23,7 +23,6 @@ import java.util.AbstractCollection;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
-import java.util.TreeMap;
 
 import javax.annotation.CheckForNull;
 
@@ -39,10 +38,10 @@ import org.eclipse.core.runtime.jobs.Job;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
-import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
+import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
 
 /**
@@ -59,7 +58,7 @@ public class ErrorPropagation {
 	 */
 	/*
 	 * TODO Fix problem with java.util.NoSuchElementException maybe volatile fixed it
-	 *
+	 * use a vector
 	 * This list needs to be static else there are some problems with getFirst or
 	 * get(0) because the element was not found. (This does not fixed the problem)
 	 */
@@ -127,7 +126,6 @@ public class ErrorPropagation {
 
 	/**
 	 * Calls the corresponding propagation for all files at <code>composedFiles</code>.
-	 * @param clone 
 	 */
 	protected void propagateMarkers() {
 		if (composedFiles.isEmpty()) {
@@ -152,7 +150,6 @@ public class ErrorPropagation {
 	/**
 	 * Returns the corresponding error propagation class of the given file.
 	 *
-	 * @param file 
 	 * @return The corresponding <code>ErrorPropagation</code>
 	 */
 	@CheckForNull
@@ -169,7 +166,6 @@ public class ErrorPropagation {
 
 	/**
 	 * Removes the  not composed markers form the given source file and calls <code>propagateMarkers(marker, file)</code>
-	 * @param file
 	 */
 	protected void propagateMarkers(IFile file) {
 		if (!file.exists()) {
@@ -239,19 +235,20 @@ public class ErrorPropagation {
 		if (model == null) {
 			return;
 		}
-		for (FSTFeature f : model.getFeaturesMap().values()) {
-			TreeMap<String, FSTClass> z = f.getClasses();
-			String fileName = file.getName();
-			if (z.containsKey(fileName)) {
-				FSTClass c = z.get(fileName);
-				for (FSTField field : c.getFields()) {
-					fields.add(field);
-				}
-				for (FSTMethod method : c.getMethods()) {
-					methods.add(method);
-				}
+		FSTClass fstClass = model.getClass(file.getName());
+		if (fstClass == null) {
+			return;
+		}
+		
+		for (FSTRole role : fstClass.getRoles()) {
+			for (FSTField field : role.getFields()) {
+				fields.add(field);
+			}
+			for (FSTMethod method : role.getMethods()) {
+				methods.add(method);
 			}
 		}
+		
 		setElementLines(content, fields, methods);
 
 		for (IMarker marker : markers) {
@@ -276,8 +273,8 @@ public class ErrorPropagation {
 				int composedLine = f.getComposedLine();
 				if (markerLine >= composedLine
 						&& markerLine <= composedLine
-								+ (f.getEndLine() - f.getBeginLine())) {
-					propagateMarker(marker, f.getOwnFile(), f.getBeginLine()
+								+ (f.getEndLine() - f.getLine())) {
+					propagateMarker(marker, f.getFile(), f.getLine()
 							+ markerLine - composedLine);
 					propagated = true;
 					break;
@@ -294,8 +291,8 @@ public class ErrorPropagation {
 				}
 				int composedLine = m.getComposedLine();
 				if (markerLine >= composedLine && 
-						markerLine <= composedLine + (m.getEndLine() - m.getBeginLine())) {
-					propagateMarker(marker, m.getOwnFile(), m.getBeginLine() + markerLine - m.getComposedLine());
+						markerLine <= composedLine + (m.getEndLine() - m.getLine())) {
+					propagateMarker(marker, m.getFile(), m.getLine() + markerLine - m.getComposedLine());
 					propagated = true;
 					break;
 				}
@@ -312,8 +309,6 @@ public class ErrorPropagation {
 	/**
 	 * Propagates markers outside of methods and fields. 
 	 * <br><code>Needs to be implemented by the Subclass.</code>
-	 * @param marker
-	 * @param file
 	 */
 	protected void propagateUnsupportedMarker(IMarker marker, IFile file) {
 		FeatureHouseCorePlugin.getDefault().logInfo("Marker not propagated: " + marker.getAttribute(IMarker.MESSAGE, ""));
@@ -323,8 +318,6 @@ public class ErrorPropagation {
 	 * Sets the composed lines of the given fields and methods.
 	 * <br><code>Needs to be implemented by the Subclass.</code>
 	 * @param content The content of the composed file
-	 * @param fields
-	 * @param methods
 	 */
 	protected void setElementLines(String content,
 			LinkedList<FSTField> fields, LinkedList<FSTMethod> methods) {
@@ -364,10 +357,6 @@ public class ErrorPropagation {
 
 	/**
 	 * Checks if the file already the given marker.
-	 * @param message
-	 * @param line
-	 * @param file
-	 * @return 
 	 */
 	private boolean hasSameMarker(String message, int line, IFile file) {
 		try {
@@ -393,8 +382,6 @@ public class ErrorPropagation {
 	}
 
 	/**
-	 * 
-	 * @param file
 	 * @return The content of the given file
 	 */
 	private String getFileContent(IFile file) {

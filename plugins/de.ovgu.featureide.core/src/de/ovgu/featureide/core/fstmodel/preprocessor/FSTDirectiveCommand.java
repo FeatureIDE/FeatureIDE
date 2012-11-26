@@ -1,5 +1,5 @@
 /* FeatureIDE - An IDE to support feature-oriented software development
- * Copyright (C) 2005-2012  FeatureIDE team, University of Magdeburg
+ * Copyright (C) 2005-2011  FeatureIDE Team, University of Magdeburg
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,31 +16,13 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.core.fstmodel;
-
-
+package de.ovgu.featureide.core.fstmodel.preprocessor;
 
 /**
+ * Definition of directive kinds.
  * 
- * @author Tom Brosch
- * 
+ * @author Jens Meinicke
  */
-public class FSTModelElement {
-
-	public FSTModelElement[] getChildren() {
-		return new FSTModelElement[0];
-	}
-
-	public String getName() {
-		return null;
-	}
-
-	public FSTModelElement getParent() {
-		return null;
-	}
-
-	public boolean hasChildren() {
-		return false;
-	}
-
+public enum FSTDirectiveCommand {
+	IF, IF_NOT, IFDEF, IFNDEF, ELIF, ELIFDEF, ELIFNDEF, ELSE, CONDITION, DEFINE, UNDEFINE;
 }

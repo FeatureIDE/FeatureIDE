@@ -55,9 +55,8 @@ public class CSClassBuilder extends ClassBuilder {
 		LinkedList<String> fields = getFields(terminal.getBody());
 		for (int i = 2;i < fields.size();i++) {
 			// add field
-			FSTField field = new FSTField(fields.get(i), fields.get(1), 0, fields.get(0), terminal.getBody(), terminal.beginLine, terminal.endLine);
-			field.setOwn(modelBuilder.getCurrentFile());
-			modelBuilder.getCurrentClass().add(field);
+			FSTField field = new FSTField(fields.get(i), fields.get(1), fields.get(0), terminal.getBody(), terminal.beginLine, terminal.endLine);
+			modelBuilder.getCurrentRole().add(field);
 		}
 	}
 	
@@ -177,11 +176,7 @@ public class CSClassBuilder extends ClassBuilder {
 		// add method
 		addMethod(name, getMethodParameter(terminal), returnType, modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine, false);
 	}
-	
-	/**
-	 * @param terminal
-	 * @return
-	 */
+
 	private String getMethodName(FSTTerminal terminal) {
 		String name = terminal.getBody().substring(0, terminal.getBody().indexOf('('));
 		while (name.endsWith(" ")) {

@@ -43,9 +43,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 
 import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
-import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 import de.ovgu.featureide.ui.views.collaboration.action.ShowFieldsMethodsAction;
@@ -199,9 +199,6 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		add(panel);
 	}
 
-	/**
-	 * TODO description
-	 */
 	private void createContentForDefault() {
 		int fieldCount = 0;
 		int methodCount = 0;
@@ -233,7 +230,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		GridLayout contentsLayout = new GridLayout(1,true);
 		tooltipContent.setLayoutManager(contentsLayout);
 		
-		if (role.files.size() == 0) {
+		if (role.directives.isEmpty() && role.files.isEmpty()) {
 			if (showOnlyFields()) {
 				fieldCount = getCountForFieldContentCreate(tooltipContent);
 			}
@@ -258,11 +255,6 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		setToolTip(tooltipContent);
 	}
 
-	/**
-	 * TODO description
-	 * @param tooltipContent
-	 * @return
-	 */
 	private int getCountForMethodContentCreate(Figure tooltipContent) {
 		
 		CompartmentFigure methodFigure = new CompartmentFigure();
@@ -278,7 +270,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		for (FSTMethod m : role.methods) {
 			Label methodLabel = createMethodLabel(m);
 
-			if (m.isOwn(role.file) && matchFilter(m)) {
+			if (matchFilter(m)) {
 				methodFigure.add(methodLabel);
 				methodCount++;
 				
@@ -304,11 +296,6 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		return role.getName().split("[.]")[0];
 	}
 
-	/**
-	 * TODO description
-	 * @param tooltipContent
-	 * @return
-	 */
 	private int getCountForFieldContentCreate(Figure tooltipContent) {
 		CompartmentFigure fieldFigure = new CompartmentFigure();
 		Label label = new Label(getClassName() + " ", IMAGE_CLASS);
@@ -321,7 +308,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		
 		int fieldCount = 0;
 		for (FSTField f : role.fields) {
-			if (f.isOwn(role.file) && matchFilter(f)) {
+			if (matchFilter(f)) {
 				Label fieldLabel = createFieldLabel(f);
 				fieldFigure.add(fieldLabel);
 				fieldCount++;
@@ -356,6 +343,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 	}
 	
 	private void setContentForFiles(Figure contentContainer, Figure tooltipContent){
+		// TODO open selected file like at method and fields
 		featureFolder = CorePlugin.getFeatureProject(role.files.getFirst()).getSourceFolder()
 				.getFolder(role.getCollaboration().getName());
 		contentContainer.add(new Label(role.featureName + " ", IMAGE_FEATURE));
@@ -405,11 +393,11 @@ public class RoleFigure extends Figure implements GUIDefaults{
 	private void setDirectivesContent(Figure tooltipContent, String className) {
 		LinkedList<String> duplicates = new LinkedList<String>();
 		tooltipContent.add(new Label(className + " ", IMAGE_CLASS));
-		tooltipContent.add(new Label(this.role.featureName + " ", IMAGE_FEATURE));
+		tooltipContent.add(new Label(role.featureName + " ", IMAGE_FEATURE));
 		this.setToolTip(tooltipContent);
 		
-		for (FSTDirective d : this.role.directives) {
-			if (this.role.file.equals(d.file) && !duplicates.contains(d.toDependencyString())) {
+		for (FSTDirective d : role.directives) {
+			if (!duplicates.contains(d.toDependencyString())) {
 				duplicates.add(d.toDependencyString());
 				Label partLabel = new RoleFigureLabel(d.toDependencyString(), IMAGE_HASH, d.toDependencyString());
 				addLabel(partLabel);
@@ -473,12 +461,14 @@ public class RoleFigure extends Figure implements GUIDefaults{
 	}
 	
 	private Label createMethodLabel(FSTMethod m) {
-		String name = (m.getName());
+		String name;
 		if (showOnlyNames()){
-			name = (m.getOnlyName());
+			name = m.getName();
+		} else {
+			name = m.getFullName();
 		}
-		Label methodLabel = new RoleFigureLabel(name, m.getName());
-		if (m.refines) {
+		Label methodLabel = new RoleFigureLabel(name, m.getFullName());
+		if (m.refines()) {
 			methodLabel.setFont(FONT_BOLD);
 		}
 		if (m.isPrivate())
@@ -493,17 +483,14 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		return methodLabel;
 	}
 
-
-	/**
-	 * @param f
-	 * @return
-	 */
 	private Label createFieldLabel(FSTField f) {
-		String name = (f.getName());
+		String name;
 		if (showOnlyNames()){
-			name = (f.getOnlyName());
+			name = f.getName();
+		} else {
+			name = f.getFullName();
 		}
-		Label fieldLabel = new RoleFigureLabel(name, f.getName());
+		Label fieldLabel = new RoleFigureLabel(name, f.getFullName());
 		if (!selected)
 		fieldLabel.setForegroundColor(ROLE_FOREGROUND_UNSELECTED);
 		if (f.isPrivate())

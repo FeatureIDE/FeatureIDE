@@ -23,9 +23,9 @@ import java.util.LinkedList;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
 
+import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
-import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 
 
 /**
@@ -114,13 +114,9 @@ public class Role {
 	public IFile getRoleFile() {
 		if (path == null || !path.isAbsolute()) 
 			return null;
-//		return ResourcesPlugin.getWorkspace().getRoot().getFile(path);
 		return file;
 	}
-	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
+
 	@Override
 	public String toString() {
 		if (collaboration != null) {

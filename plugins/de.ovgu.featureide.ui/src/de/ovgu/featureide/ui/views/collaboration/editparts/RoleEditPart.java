@@ -96,7 +96,7 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 					
 					RoleFigure roleFigure = (RoleFigure) this.getFigure();
 					if (roleFigure.isFieldMethodFilterActive() || !CorePlugin.getFeatureProject(file).getComposer().showContextFieldsAndMethods()) {
-						openClickedElementInEditor(roleFigure, file);
+						openElement(roleFigure, file);
 					}
 					else 
 						openEditor(file);
@@ -112,8 +112,7 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 		return UIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getActivePage();
 	}
 	
-	private IEditorDescriptor getDescriptor(IFile file) throws CoreException
-	{
+	private IEditorDescriptor getDescriptor(IFile file) throws CoreException {
 		IContentType contentType = null;
 		IContentDescription description = file.getContentDescription();
 		if (description != null) {
@@ -128,8 +127,7 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 		}
 	}
 	
-	private ITextEditor openEditor(IFile file) throws CoreException
-	{
+	private ITextEditor openEditor(IFile file) throws CoreException {
 		IWorkbenchPage page = getActivePage();
 		if (page == null) return null;
 		
@@ -147,7 +145,7 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 	/**
 	 * search clicked element of current cursor position and open element in editor
 	 */
-	private void openClickedElementInEditor(RoleFigure roleFigure, IFile file) throws CoreException {
+	private void openElement(RoleFigure roleFigure, IFile file) throws CoreException {
 		Point point = getCursorPosition();
 		List<?> panelList = roleFigure.getChildren();
 		ITextEditor editor; 
@@ -163,27 +161,33 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 				if (point.y >= y && point.y <= (y + rect.height)) {
 					LinkedList<FSTField> fields = this.getRoleModel().fields;
 					for (FSTField fstField : fields) {
-						if (fstField.getName().equals(label.getElementName())) {
+						if (fstField.getFullName().equals(label.getElementName())) {
 							editor = openEditor(file);
-							if (editor != null)	CollaborationOutline.scrollToLine(editor,fstField.getLineNumber(file));
+							if (editor != null) {
+								CollaborationOutline.scrollToLine(editor,fstField.getLine());
+							}
 							return;
 						}
 					}
 					
 					LinkedList<FSTMethod> methods = this.getRoleModel().methods;
 					for (FSTMethod fstMethod : methods) {
-						if (fstMethod.getName().equals(label.getElementName())) {
+						if (fstMethod.getFullName().equals(label.getElementName())) {
 							editor = openEditor(file);
-							if (editor != null)	CollaborationOutline.scrollToLine(editor,fstMethod.getLineNumber(file));
+							if (editor != null)	{
+								CollaborationOutline.scrollToLine(editor,fstMethod.getLine());
+							}
 							return;
 						}
 					}
-					
+
 					LinkedList<FSTDirective> directives = this.getRoleModel().directives;
 					for (FSTDirective fstDirective : directives) {
 						if (fstDirective.toDependencyString().equals(label.getElementName())) {
 							editor = openEditor(file);
-							if (editor != null)	CollaborationOutline.scrollToLine(editor, fstDirective.getStartLine(), fstDirective.getEndLine(), fstDirective.getStartOffset(), fstDirective.getEndLength());
+							if (editor != null)	{
+								CollaborationOutline.scrollToLine(editor, fstDirective.getStartLine(), fstDirective.getEndLine(), fstDirective.getStartOffset(), fstDirective.getEndLength());
+							}
 							return;
 						}
 					}
@@ -203,8 +207,7 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 		getViewer().getContents().refresh();
 	}
 	
-	private Point getCursorPosition() 
-	{
+	private Point getCursorPosition() {
 		Display display = Display.getDefault();
 		FigureCanvas figureCanvas = (FigureCanvas)this.getViewer().getControl();
 		Point point = figureCanvas.toControl(display.getCursorLocation());

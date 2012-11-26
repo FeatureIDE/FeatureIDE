@@ -23,17 +23,17 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.graphics.Image;
 
+import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
+import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
-import de.ovgu.featureide.core.fstmodel.FSTModelElement;
-import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
+import de.ovgu.featureide.core.fstmodel.FSTRole;
+import de.ovgu.featureide.core.fstmodel.RoleElement;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
-import de.ovgu.featureide.ui.views.collaboration.model.Class;
-import de.ovgu.featureide.ui.views.collaboration.model.Role;
 
 /**
- * provides labels and images for Collaboration outline
+ * Provides labels and images for Collaboration outline
  * 
  * @author Jan Wedding
  * @author Melanie Pflaume
@@ -42,45 +42,30 @@ public class CollaborationOutlineLabelProvider implements ILabelProvider,GUIDefa
 
 	private IFile file;
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#addListener(org.eclipse.jface.viewers.ILabelProviderListener)
-	 */
 	@Override
 	public void addListener(ILabelProviderListener listener) {
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#dispose()
-	 */
 	@Override
 	public void dispose() {
 
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#isLabelProperty(java.lang.Object, java.lang.String)
-	 */
 	@Override
 	public boolean isLabelProperty(Object element, String property) {
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#removeListener(org.eclipse.jface.viewers.ILabelProviderListener)
-	 */
 	@Override
 	public void removeListener(ILabelProviderListener listener) {
 	
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ILabelProvider#getImage(java.lang.Object)
-	 */
 	@Override
 	public Image getImage(Object element) {
-		if (element instanceof FSTModelElement) {
-			FSTModelElement fstModelElement = (FSTModelElement)element;
+		if (element instanceof RoleElement) {
+			RoleElement fstModelElement = (RoleElement)element;
 			if (fstModelElement instanceof FSTField) {
 				FSTField field = (FSTField)fstModelElement;
 				if (field.isPrivate())
@@ -102,41 +87,38 @@ public class CollaborationOutlineLabelProvider implements ILabelProvider,GUIDefa
 				else 
 					return IMAGE_METHODE_DEFAULT;
 			}
-		} else if (element instanceof Class) {
+		} else if (element instanceof FSTClass) {
 			return IMAGE_CLASS;
 		}
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
-	 */
 	@Override
 	public String getText(Object element) {
-		if (element instanceof  Class) {
+		if (element instanceof  FSTClass) {
 			String toAppend = ""; 
-			for (Role r : ((Class)element).getRoles()) {
-				if (r.directives.size() > 0) {
-					return  ((Class)element).getName();
+			for (FSTRole r : ((FSTClass)element).getRoles()) {
+				if (!r.getDirectives().isEmpty()) {
+					return  ((FSTClass)element).getName();
 				}
-				if (r.getRoleFile().equals(file)) {
-					toAppend = " - " + r.featureName;
+				if (r.getFile().equals(file)) {
+					toAppend = " - " + r.getFeture().getName();
 				}
 			}
-			return  ((Class)element).getName()+toAppend;
+			return  ((FSTClass)element).getName()+toAppend;
 		}
 		
 		if (element instanceof FSTMethod)
-			return ((FSTMethod)element).getName();
+			return ((FSTMethod)element).getFullName();
 		
 		if (element instanceof FSTField)
-			return ((FSTField)element).getName();
+			return ((FSTField)element).getFullName();
 		
 		if (element instanceof FSTFeature)
 			return ((FSTFeature)element).getName();
 		
-		if (element instanceof Role)
-			return ((Role)element).featureName;
+		if (element instanceof FSTRole)
+			return ((FSTRole)element).getFeture().getName();
 		
 		if (element instanceof FSTDirective) {
 			return ((FSTDirective)element).toString();
@@ -148,11 +130,8 @@ public class CollaborationOutlineLabelProvider implements ILabelProvider,GUIDefa
 		return "";
 	}
 
-	/**
-	 * @param iFile
-	 */
-	public void setFile(IFile iFile) {
-		this.file = iFile;
+	public void setFile(IFile file) {
+		this.file = file;
 	}
 
 }

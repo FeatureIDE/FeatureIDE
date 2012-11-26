@@ -101,10 +101,8 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	public String[] getAdditionalJavaClassPath();
 
 	/**
-	 * Returns the name of the feature this resource belongs to, or <code>null</code> if thr the resource
+	 * Returns the name of the feature this resource belongs to, or <code>null</code> if the resource
 	 * does not belong to any feature in this project
-	 * @param res
-	 * @return
 	 */
 	public String getFeatureName(IResource resource);
 

@@ -41,7 +41,7 @@ public class JavaClassBuilder extends ClassBuilder {
 		LinkedList<String> fields = getFields(terminal.getBody());
 		for (int i = 2;i < fields.size();i++) {
 			// add field
-			addField(fields.get(i), fields.get(1), 0, fields.get(0), terminal.getBody(), terminal.beginLine, terminal.endLine);
+			addField(fields.get(i), fields.get(1), fields.get(0), terminal.getBody(), terminal.beginLine, terminal.endLine);
 		}
 	}
 
@@ -195,7 +195,7 @@ public class JavaClassBuilder extends ClassBuilder {
 		String parameter = terminal.getName().substring(
 				terminal.getName().indexOf('(') + 1, terminal.getName().indexOf(')'));
 		LinkedList<String> parameterTypes = new LinkedList<String>();
-		if (!parameter.equals("") && !parameter.startsWith("{")) {
+		if (!"".equals(parameter) && !parameter.startsWith("{")) {
 			String[] p = parameter.split("[-]");
 			for (int i = 0; i < p.length; i+=2) {
 				parameterTypes.add(p[i]);

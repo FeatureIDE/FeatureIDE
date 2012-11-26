@@ -1,5 +1,5 @@
 /* FeatureIDE - An IDE to support feature-oriented software development
- * Copyright (C) 2005-2012  FeatureIDE team, University of Magdeburg
+ * Copyright (C) 2005-2011  FeatureIDE Team, University of Magdeburg
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,133 +20,51 @@ package de.ovgu.featureide.core.fstmodel.preprocessor;
 
 import java.util.LinkedList;
 
-import org.eclipse.core.resources.IFile;
+import javax.annotation.CheckForNull;
 
-import de.ovgu.featureide.core.fstmodel.FSTModelElement;
-import de.ovgu.featureide.fm.core.ColorList;
+import de.ovgu.featureide.core.fstmodel.FSTRole;
 
 /**
- * preprocessor directive in class
+ * Representation of a directive at a role.
  * 
- * @author Christoph Giesel
- * @author Marcus Kamieth
- * @author Sebastian Krieter
+ * @author Jens Meinicke
  */
-public class FSTDirective extends FSTModelElement {
-	
-	private final int id;
+public class FSTDirective {
 
-	private int startLine;
-	
-	private int endLine;
-
-	private int startOffset;
-
-	private int endLength;
-	
-	public int command;
-	
-	public String expression;
-	
-	public IFile file = null;
-	
-	private int color = ColorList.INVALID_COLOR;
-	
+	private String expression;
+	private FSTDirectiveCommand command;
 	private LinkedList<FSTDirective> children = new LinkedList<FSTDirective>();
+	private @CheckForNull FSTDirective parent;
+	private int startLine;
+	private int startOffset;
+	private int endLine;
+	private int endLength;
+	private @CheckForNull FSTRole role;
 
-	private FSTDirective parent = null;
-
-	public static final int IF = 1;
-	public static final int IF_NOT = 2;
-	public static final int IFDEF = 3;
-	public static final int IFNDEF = 4;
-	public static final int ELIF = 5;
-	public static final int ELIFDEF = 6;
-	public static final int ELIFNDEF = 7;
-	public static final int ELSE = 8;
-	public static final int CONDITION = 9;
-	public static final int DEFINE = 10;
-	public static final int UNDEFINE = 11;
-	
-	public FSTDirective(int id) {
-		this.id = id;
-		this.expression = "";
-	}
-	
-	@Override
-	public FSTModelElement getParent() {
+	public FSTDirective getParent() {
 		return parent;
 	}
-	
-	public boolean hasParent() {
-		return parent != null;
-	}
-	
-	public int getStartLine() {
-		return startLine;
+
+	public FSTDirective() {
+		
 	}
 
-	public int getStartOffset() {
-		return startOffset;
-	}
-	
-	public int getEndLine() {
-		return endLine;
-	}
-	
-	public int getEndLength() {
-		return endLength;
-	}
-
-	public void setStartLine(int startLine, int startOffset) {
-		this.startLine = startLine;
-		this.startOffset = startOffset;
-	}
-
-	public void setEndLine(int endLine, int endLength) {
-		this.endLine = endLine;
-		this.endLength = endLength;
-	}
-	
-	public void updatePosition(FSTDirective newDirective) {
-		this.startLine = newDirective.startLine;
-		this.endLine = newDirective.endLine;
-		this.startOffset = newDirective.startOffset;
-		this.endLength = newDirective.endLength;
-	}
-
-	/**
-	 * @return the command
-	 */
-	public int getCommand() {
-		return command;
-	}
-	
-
-	/**
-	 * @param command the command to set
-	 */
-	public void setCommand(int command) {
+	public void setCommand(FSTDirectiveCommand command) {
 		this.command = command;
 	}
 
+	public FSTDirectiveCommand getCommand() {
+		return command;
+	}
 
-	/**
-	 * @return the expression
-	 */
 	public String getExpression() {
 		return expression;
 	}
 
-
-	/**
-	 * @param expression the expression to set
-	 */
 	public void setExpression(String expression) {
 		this.expression = expression;
 	}
-	
-	@Override
+
 	public boolean hasChildren() {
 		return !children.isEmpty();
 	}
@@ -223,50 +141,67 @@ public class FSTDirective extends FSTModelElement {
 		return ret.toString();
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString() {
 		return interpretCommand(command) + ' ' + expression;
 	}
 	
-	private String interpretCommand(int command) {
+	private String interpretCommand(FSTDirectiveCommand command) {
 		switch (command) {
-			case 1: return "if";
-			case 2: return "if not";
-			case 3: return "ifdef";
-			case 4: return "ifndef";
-			case 5: return "elif";
-			case 6: return "elifdef";
-			case 7: return "elifndef";
-			case 8: return "else";
-			case 9: return "condition";
-			case 10: return "define";
-			case 11: return "undefine";
+			case IF: return "if";
+			case IF_NOT: return "if not";
+			case IFDEF: return "ifdef";
+			case IFNDEF: return "ifndef";
+			case ELIF: return "elif";
+			case ELIFDEF: return "elifdef";
+			case ELIFNDEF: return "elifndef";
+			case ELSE: return "else";
+			case CONDITION: return "condition";
+			case DEFINE: return "define";
+			case UNDEFINE: return "undefine";
 			default: return "";
 			
 		}
 	}
 
-	/**
-	 * @return the color
-	 */
 	public int getColor() {
-		return color;
+		return getRole().getFeture().getColor();
 	}
 
-	/**
-	 * @param color the color to set
-	 */
-	public void setColor(int color) {
-		this.color = color;
+	public int getStartLine() {
+		return startLine;
 	}
 
-	/**
-	 * @return the id
-	 */
-	public int getId() {
-		return id;
+	public int getStartOffset() {
+		return startOffset;
+	}
+	
+	public int getEndLine() {
+		return endLine;
+	}
+	
+	public int getEndLength() {
+		return endLength;
+	}
+
+	public void setStartLine(int startLine, int startOffset) {
+		this.startLine = startLine;
+		this.startOffset = startOffset;
+	}
+
+	public void setEndLine(int endLine, int endLength) {
+		this.endLine = endLine;
+		this.endLength = endLength;
+	}
+
+	public void setRole(FSTRole fstRole) {
+		this.role = fstRole;
+	}
+	
+	public FSTRole getRole() {
+		if (role == null) {
+			return parent.getRole();
+		}
+		return role;
 	}
 }

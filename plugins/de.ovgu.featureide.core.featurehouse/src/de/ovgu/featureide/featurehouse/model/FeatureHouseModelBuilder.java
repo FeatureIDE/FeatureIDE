@@ -28,9 +28,9 @@ import de.ovgu.cide.fstgen.ast.FSTNode;
 import de.ovgu.cide.fstgen.ast.FSTNonTerminal;
 import de.ovgu.cide.fstgen.ast.FSTTerminal;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
+import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.featurehouse.FeatureHouseComposer;
 
 /**
@@ -45,21 +45,18 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 
 	private IFeatureProject featureProject;
 	
-	private FSTFeature currentFeature = null;
-	private FSTClass currentClass = null;
+	private FSTRole currentRole = null;
 	private IFile currentFile = null;
 
 	boolean completeModel = false;
+
+	private FSTFeature currentFeature;
 
 	public FeatureHouseModelBuilder(IFeatureProject featureProject) {
 		if (featureProject == null) {
 			return;
 		}
-		FSTModel oldModel = featureProject.getFSTModel();
-		if (oldModel != null)
-			oldModel.markObsolete();
-
-		model = new FSTModel(featureProject.getProjectName());
+		model = new FSTModel(featureProject);
 		featureProject.setFSTModel(model);
 		this.featureProject = featureProject;
 	}
@@ -68,8 +65,8 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 		return currentFile;
 	}
 	
-	public FSTClass getCurrentClass() {
-		return currentClass;
+	public FSTRole getCurrentRole() {
+		return currentRole;
 	}
 
 	/**
@@ -85,19 +82,19 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 		}
 		
 		for (FSTNode node : (ArrayList<FSTNode>)nodes.clone()) {
-			if (node.getType().equals(NODE_TYPE_FEATURE)) {
+			if (NODE_TYPE_FEATURE.equals(node.getType())) {
 				caseAddFeature(node);
-			} else if (node.getType().equals(NODE_TYPE_CLASS)) {
+			} else if (NODE_TYPE_CLASS.equals(node.getType())) {
 				caseAddClass(node);
-			} else if (node.getType().equals(JAVA_NODE_CLASS_DECLARATION)) {
+			} else if (JAVA_NODE_CLASS_DECLARATION.equals(node.getType())) {
 				caseClassDeclaration(node);
-			} else if (node.getType().equals(C_NODE_SEQUENCE_CODEUNIT_TOPLEVEL)) {
+			} else if (C_NODE_SEQUENCE_CODEUNIT_TOPLEVEL.equals(node.getType())) {
 				caseClassDeclaration(node);
-			} else if (node.getType().equals(CSHARP_NODE_CLASS_MEMBER_DECLARATION)) {
+			} else if (CSHARP_NODE_CLASS_MEMBER_DECLARATION.equals(node.getType())) {
 				caseClassDeclaration(node);
-			} else if (node.getType().equals(HASKELL_NODE_DEFINITIONS)) {
+			} else if (HASKELL_NODE_DEFINITIONS.equals(node.getType())) {
 				caseClassDeclaration(node);
-			} else if (node.getType().equals(HASKELL_NODE_DATA_DECLARATION)) {
+			} else if (HASKELL_NODE_DATA_DECLARATION.equals(node.getType())) {
 				caseClassDeclaration(node);
 			}
 		}
@@ -108,18 +105,14 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 	}
 	
 	private void caseAddClass(FSTNode node) {
-		String className = node.getName().substring(
-				node.getName().lastIndexOf(File.separator) + 1);
-		currentFile = getFile(node.getName());
+		String name = node.getName();
+		String className = name.substring(
+				name.lastIndexOf(File.separator) + 1);
+		currentFile = getFile(name);
 		if (!canCompose()) {
 			return;
 		}
-		
-		currentClass = new FSTClass(className);
-		currentClass.setClassFile();
-		currentClass.setFile(currentFile);
-		model.addClass(className, currentFile);
-		currentFeature.getClasses().put(className, currentClass);
+		currentRole = model.addRole(currentFeature.getName(), className, currentFile);
 	}
 
 	private boolean canCompose() {
@@ -133,46 +126,46 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 			for (FSTNode child : ((FSTNonTerminal) node).getChildren()) {
 				if (child instanceof FSTTerminal) {
 					FSTTerminal terminal = (FSTTerminal) child;
-					if (terminal.getType().equals(JAVA_NODE_FIELD)) {
+					if (JAVA_NODE_FIELD.equals(terminal.getType())) {
 						ClassBuilder.getClassBuilder(currentFile, this)
 								.caseFieldDeclaration(terminal);
-					} else if (terminal.getType().equals(JAVA_NODE_METHOD)) {
+					} else if (JAVA_NODE_METHOD.equals(terminal.getType())) {
 						ClassBuilder.getClassBuilder(currentFile, this)
 								.caseMethodDeclaration(terminal);
-					} else if (terminal.getType().equals(JAVA_NODE_CONSTRUCTOR)) {
+					} else if (JAVA_NODE_CONSTRUCTOR.equals(terminal.getType())) {
 						ClassBuilder.getClassBuilder(currentFile, this)
 								.caseConstructorDeclaration(terminal);
-					} else if (terminal.getType().equals(C_NODE_FUNC)) {
+					} else if (C_NODE_FUNC.equals(terminal.getType())) {
 						ClassBuilder.getClassBuilder(currentFile, this)
 							.caseMethodDeclaration(terminal);
-					} else if (terminal.getType().equals(C_NODE_STATEMENT)) {
+					} else if (C_NODE_STATEMENT.equals(terminal.getType())) {
 						ClassBuilder.getClassBuilder(currentFile, this)
 							.caseFieldDeclaration(terminal);
-					} else if (terminal.getType().equals(C_NODE_STMTL)) {
+					} else if (C_NODE_STMTL.equals(terminal.getType())) {
 						ClassBuilder.getClassBuilder(currentFile, this)
 							.caseFieldDeclaration(terminal);
-					} else if (terminal.getType().equals(CSHARP_NODE_CLAASS_MEMBER_DECLARATION_END)) {
-						if (terminal.getCompositionMechanism().equals(CSHARP_NODE_COMPOSITON_METHOD)) {
+					} else if (CSHARP_NODE_CLAASS_MEMBER_DECLARATION_END.equals(terminal.getType())) {
+						if (CSHARP_NODE_COMPOSITON_METHOD.equals(terminal.getCompositionMechanism())) {
 							ClassBuilder.getClassBuilder(currentFile, this)
 								.caseMethodDeclaration(terminal);
-						} else if (terminal.getCompositionMechanism().equals(CSHARP_NODE_COMPOSITION_FIELD)){
+						} else if (CSHARP_NODE_COMPOSITION_FIELD.equals(terminal.getCompositionMechanism())){
 							ClassBuilder.getClassBuilder(currentFile, this)
 								.caseFieldDeclaration(terminal);
-						} else if (terminal.getCompositionMechanism().equals(CSHARP_NODE_COMPOSITION_CONSTRUCTOR)){
+						} else if (CSHARP_NODE_COMPOSITION_CONSTRUCTOR.equals(terminal.getCompositionMechanism())){
 							ClassBuilder.getClassBuilder(currentFile, this)
 								.caseConstructorDeclaration(terminal);
 						}					
-					} else if (terminal.getType().equals(HASKELL_NODE_DECLARATION)) {
+					} else if (HASKELL_NODE_DECLARATION.equals(terminal.getType())) {
 						ClassBuilder.getClassBuilder(currentFile, this)
 							.caseMethodDeclaration(terminal);
-					} else if (terminal.getType().equals(HASKELL_NODE_SIMPLE_TYPE)) {
+					} else if (HASKELL_NODE_SIMPLE_TYPE.equals(terminal.getType())) {
 						ClassBuilder.getClassBuilder(currentFile, this)
 							.caseFieldDeclaration(terminal);
 					}
 				} else if (child instanceof FSTNonTerminal) {
-					 if (child.getType().equals(C_NODE_STRUCTDEC)) {
+					 if (C_NODE_STRUCTDEC.equals(child.getType())) {
 						 caseClassDeclaration(child);
-					 } else if (child.getType().equals(JAVA_NODE_INNER_CLASS_TYPE)) {
+					 } else if (JAVA_NODE_INNER_CLASS_TYPE.equals(child.getType())) {
 						 caseClassDeclaration(child);
 					 }
 				}

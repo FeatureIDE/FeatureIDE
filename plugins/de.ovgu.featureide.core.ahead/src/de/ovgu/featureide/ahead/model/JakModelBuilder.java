@@ -36,13 +36,11 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 
 import de.ovgu.featureide.ahead.AheadCorePlugin;
-import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.fstmodel.FSTClass;
-import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
+import de.ovgu.featureide.core.fstmodel.FSTRole;
 
 /**
  * This builder builds the JakProjectModel, by extracting features, 
@@ -50,6 +48,7 @@ import de.ovgu.featureide.core.fstmodel.FSTModel;
  * 
  * @author Tom Brosch
  * @author Constanze Adler
+ * @author Jens Meinicke
  */
 public class JakModelBuilder {
 
@@ -59,13 +58,13 @@ public class JakModelBuilder {
 
 	public JakModelBuilder(IFeatureProject featureProject) {
 		if (featureProject != null) {
-			FSTModel oldModel = featureProject.getFSTModel();
-			if (oldModel != null)
-				oldModel.markObsolete();
-	
-			model = new FSTModel(featureProject.getProjectName());
+			model = new FSTModel(featureProject);
 			featureProject.setFSTModel(model);
 		}
+	}
+	
+	public void reset() {
+		model.reset();
 	}
 
 	/**
@@ -82,99 +81,49 @@ public class JakModelBuilder {
 	 */
 	public void addClass(String className, LinkedList<IFile> sources,
 			AST_Program[] composedASTs, AST_Program[] ownASTs) {
-		FSTClass currentClass = null;
-		for (IFile file : sources) {
-			currentClass = model.addClass(className, file);
-		}
-		
+		sourceFolder = model.getFeatureProject().getSourceFolder();
 		try {
-			updateAst(currentClass, sources, composedASTs, ownASTs);
+			updateAst(className, sources, composedASTs, ownASTs);
 		} catch (Throwable e) {
 			AheadCorePlugin.getDefault().logError(e);
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.jakprojectmodel.IClass#updateAst(java.util.Vector,
-	 * mixin.AST_Program[], mixin.AST_Program[])
-	 */
-	public void updateAst(FSTClass currentClass, LinkedList<IFile> sources,
+	public void updateAst(String currentClass, LinkedList<IFile> sources,
 			AST_Program[] composedASTs, AST_Program[] ownASTs) {
 		IFile currentFile = null;
 		AstCursor c = new AstCursor();
-
-		
-		
-		FSTMethod newMethod = null;
-		LinkedList<FSTField> newFields = null;
-		int lineNumber = -1;
-		currentClass.clear();
-
 		for (int i = 0; i < sources.size(); i++) {
 			currentFile = sources.get(i);
-			
+			// The role corresponding to the current source file
+			FSTRole role = model.addRole(getFeature((IFolder)currentFile.getParent()), currentClass, currentFile);
 		
-			// Parse the tree and every method that was found add it to
-			// both vectors
-
+			// Add methods and fields of the FST to the role
 			for (c.First(ownASTs[i]); c.More(); c.PlusPlus()) {
 				if (c.node instanceof MethodDcl) {
-
-					// Get the method from the Ast
-					// This method was not new in this file, than just update
-					// the own and available flag
-					// Put it back to the methodsMap
-
-					newMethod = getMethod((MethodDcl) c.node);
-					if (currentClass.contains(newMethod)) {
-						newMethod = (FSTMethod) currentClass.get(newMethod);
-						currentClass.remove(newMethod);
-					}
-
-					lineNumber = getLineNumber(c.node);
-					newMethod.setOwn(currentFile);
-					newMethod.setLineNumber(currentFile, lineNumber);
-					currentClass.add(newMethod);
-
+					FSTMethod method = getMethod((MethodDcl) c.node);
+					role.add(method);
 					c.Sibling();
 				}
 				if (c.node instanceof FldVarDec) {
-					newFields = getFields((FldVarDec) c.node);
-					for (FSTField field : newFields) {
-
-						if (currentClass.contains(field)) {
-							field = (FSTField) currentClass.get(field);
-							currentClass.remove(field);
-						}
-
-						field.setOwn(currentFile);
-						field.setLineNumber(currentFile, getLineNumber(c.node));
-						currentClass.add(field);
+					for (FSTField field : getFields((FldVarDec) c.node)) {
+						field.setLine(getLineNumber(c.node));
+						role.add(field);
 					}
 					c.Sibling();
 				}
-				
-		
 			}
-			FSTFeature f = getFeature(currentClass, currentFile);
-			if (!model.getFeaturesMap().containsKey(f.getName())) {
-				model.getFeaturesMap().put(f.getName(), f);
-			}
-			else{
-				model.getFeaturesMap().get(f.getName()).getClasses().put(currentClass.getName(),currentClass);
-			}
-
 		}
 	}
 
 	private int getLineNumber(AstNode node) {
 		AstCursor cur = new AstCursor();
-		for (cur.First(node); cur.More(); cur.PlusPlus())
+		for (cur.First(node); cur.More(); cur.PlusPlus()) {
 			if (cur.node != null && cur.node.tok != null
-					&& cur.node.tok[0] != null)
+					&& cur.node.tok[0] != null) {
 				return ((AstToken) cur.node.tok[0]).lineNum();
+			}
+		}
 		return -1;
 	}
 
@@ -226,8 +175,8 @@ public class JakModelBuilder {
 			}
 
 		}
-
-		return new FSTMethod(name, paramTypes, type, modifiers);
+		int lineNumber = getLineNumber(methDcl);
+		return new FSTMethod(name, paramTypes, type, modifiers, lineNumber);
 	}
 
 	private LinkedList<FSTField> getFields(FldVarDec fieldDcl) {
@@ -259,30 +208,18 @@ public class JakModelBuilder {
 			else if (cur.node instanceof DecNameDim) {
 				// to do: find out the dimension more correctly
 				fields.add(new FSTField(((DecNameDim) cur.node).getQName()
-						.GetName(), type, 0, modifiers));
+						.GetName(), type, modifiers));
 			}
 
 		}
 
 		return fields;
 	}
-	
-	private FSTFeature getFeature(FSTClass currentClass, IFile currentFile){
-		sourceFolder = CorePlugin.getFeatureProject(currentFile).getSourceFolder();
-		String featureName = getFeature((IFolder)currentFile.getParent());
-		FSTFeature f = new FSTFeature(featureName);
-		f.getClasses().put(currentClass.getName(), currentClass);
-		f.getClasses().get(currentClass.getName()).setFile(currentFile);
-		return f;
-	}
-	
+
 	private String getFeature(IFolder folder) {
 		if (((IFolder)folder.getParent()).equals(sourceFolder))
 			return folder.getName();
 		return getFeature((IFolder)folder.getParent());
 	}
 
-	public void clearFeatures() {
-		model.getFeaturesMap().clear();
-	}
 }

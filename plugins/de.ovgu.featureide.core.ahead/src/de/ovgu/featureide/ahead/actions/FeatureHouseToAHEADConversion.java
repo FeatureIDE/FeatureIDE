@@ -39,10 +39,9 @@ import org.eclipse.jdt.internal.core.JavaProject;
 import de.ovgu.featureide.ahead.AheadComposer;
 import de.ovgu.featureide.ahead.AheadCorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.fstmodel.FSTClass;
-import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
+import de.ovgu.featureide.core.fstmodel.FSTRole;
 
 /**
  * Changes the composer of an feature project project to <code>AHEAD</code>.
@@ -190,28 +189,17 @@ public class FeatureHouseToAHEADConversion extends ComposerConversion {
 	}
 
 	/**
-	 *
-	 * @param line
-	 * @param file
 	 * @return The Method at the given line
 	 */
 	private String getMethodName(int line, IFile file) {
-		if (model != null && model.getClass(file) !=  null) {
-			FSTFeature[] features = model.getFeatures();
+		if (model != null && model.getClass(file.getName()) !=  null) {
 			LinkedList<FSTMethod> methods = new LinkedList<FSTMethod>();
-			for (FSTFeature f : features) {
-				for (FSTClass c : f.getClasses().values()) {
-					if (c.getFile().getName().equals(file.getName())) {
-						for (FSTMethod m : c.getMethods()) {
-							methods.add(m);
-						}
-					}
-				}
+			for (FSTRole role : model.getClass(file.getName()).getRoles()) {
+				methods.addAll(role.getMethods());
 			}
-
 			for (FSTMethod method : methods) {
-				if (method.getBeginLine() <= line && method.getEndLine() >= line) {
-					return method.getMethodName();
+				if (method.getLine() <= line && method.getEndLine() >= line) {
+					return method.getName();
 				}
 			}
 		}

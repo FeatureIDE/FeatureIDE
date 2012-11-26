@@ -94,7 +94,7 @@ public class ComposerWrapper {
 		errorListeners = new LinkedList<AheadBuildErrorListener>();
 		this.featureProject = featureProject;
 		if (jakModelBuilder == null) {
-			jakModelBuilder = new JakModelBuilder(this.featureProject);			
+			jakModelBuilder = new JakModelBuilder(featureProject);			
 		}
 	}
 	
@@ -309,9 +309,8 @@ public class ComposerWrapper {
 	@SuppressWarnings("unchecked")
 	private void composeJakFiles(IFolder compositionDir) {
 		composedFiles.clear();
-			
+		jakModelBuilder.reset();
 		TreeMap<String, IFile> fileMap = new TreeMap<String, IFile>();
-		jakModelBuilder.clearFeatures();
 		
 		for (String jakFile : ((TreeMap<String, LinkedList<IFile>>)absoluteJakFilenames.clone()).keySet()) {
 			LinkedList<IFile> filesVec = absoluteJakFilenames.get(jakFile);

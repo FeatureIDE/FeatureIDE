@@ -47,9 +47,8 @@ public class CClassBuilder extends ClassBuilder {
 		LinkedList<String> fields = getFields(terminal.getBody());
 		for (int i = 2;i < fields.size();i++) {
 			// add field
-			FSTField field = new FSTField(fields.get(i), fields.get(1), 0, fields.get(0),terminal.getBody(),terminal.beginLine, terminal.endLine);
-			field.setOwn(modelBuilder.getCurrentFile());
-			modelBuilder.getCurrentClass().add(field);
+			FSTField field = new FSTField(fields.get(i), fields.get(1), fields.get(0),terminal.getBody(),terminal.beginLine, terminal.endLine);
+			modelBuilder.getCurrentRole().add(field);
 		}
 	}
 

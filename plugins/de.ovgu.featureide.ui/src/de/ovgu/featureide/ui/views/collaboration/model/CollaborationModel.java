@@ -30,6 +30,7 @@ import org.eclipse.core.resources.IFile;
  * 
  * @author Constanze Adler
  */
+// TODO @Jens replace with FSTModel
 public class CollaborationModel {
 	
 	protected LinkedList<Class> classes;

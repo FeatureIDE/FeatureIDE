@@ -32,9 +32,9 @@ import org.eclipse.core.runtime.CoreException;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.preprocessor.PPComposerExtensionClass;
-import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
+import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.fm.core.Feature;
 
 /**
@@ -49,11 +49,7 @@ public class PPModelBuilder {
 	private LinkedList<String> featureNames = new LinkedList<String>();
 	
 	public PPModelBuilder(IFeatureProject featureProject) {
-		FSTModel oldModel = featureProject.getFSTModel();
-		if (oldModel != null)
-			oldModel.markObsolete();
-
-		model = new FSTModel(featureProject.getProjectName());
+		model = new FSTModel(featureProject);
 		featureProject.setFSTModel(model);
 		this.featureProject = featureProject;
 	}
@@ -63,11 +59,9 @@ public class PPModelBuilder {
 		
 		featureNames = featureProject.getFeatureModel().getConcreteFeatureNames();
 		for (String featureName : featureNames) {
-			FSTFeature fstFeature = new FSTFeature(featureName);
+			FSTFeature fstFeature = model.addFeature(featureName);
 			Feature feature = featureProject.getFeatureModel().getFeature(featureName);
 			fstFeature.setColor(feature.getColorList().getColor());
-			
-			model.getFeaturesMap().put(featureName, fstFeature);
 		}
 		try {
 			buildModel(featureProject.getSourceFolder(), "");
@@ -88,48 +82,30 @@ public class PPModelBuilder {
 				buildModel((IFolder)res,packageName.isEmpty() ? res.getName() : packageName + "/" + res.getName());
 			} else if (res instanceof IFile) {
 				String text = getText((IFile)res);
-				String resourceName = packageName.isEmpty() ? res.getName() : packageName + "/" + res.getName();
-				FSTClass currentClass = new FSTClass(resourceName);
-				model.addClass(resourceName, (IFile)res);
-				
+				String className = packageName.isEmpty() ? res.getName() : packageName + "/" + res.getName();
+	
 				Vector<String> lines = PPComposerExtensionClass.loadStringsFromFile((IFile) res);
-				
 				for (String feature : featureNames) {
 					if (containsFeature(text, feature)) {
-						FSTFeature currentFeature = model.getFeaturesMap().get(feature);
-						currentFeature.getClasses().put(resourceName, currentClass);
-						buildModelDirectives(feature, currentClass, (IFile) res);
+						model.addRole(feature, className, (IFile) res);
+						buildModelDirectives(feature, (IFile) res);
 					}
 				}
 				
-				LinkedList<FSTDirective> list = buildModelDirectivesForFile(lines);
-				model.getDirectives().put(currentClass.getName(), list);
-				addDirectivesToModel(list, (IFile)res);
+				LinkedList<FSTDirective> directives = buildModelDirectivesForFile(lines);
+				addDirectivesToModel(directives, (IFile)res);
 			}
 		}
 	}
-	
-	/**
-	 * @param list
-	 * @param res 
-	 */
+
 	private void addDirectivesToModel(LinkedList<FSTDirective> list, IFile res) {
 		for (FSTDirective d : list) {
-			d.file = res;
-			FSTFeature feature = model.getFeature(getFeatureName(d.expression));
-			
-			if (feature != null) {
-				feature.directives.add(d);
-				d.setColor(feature.getColor());
-			}
+			FSTRole role = model.addRole(getFeatureName(d.getExpression()), res.getName(), res);
+			role.add(d);
 			addDirectivesToModel(d.getChildrenList(), res);
 		}
 	}
 
-	/**
-	 * @param expression
-	 * @return
-	 */
 	private String getFeatureName(String expression) {
 		expression = expression.replaceAll("[(]", "");
 		return expression.replaceAll("[)]", "");
@@ -153,12 +129,10 @@ public class PPModelBuilder {
 	 * Adds directives to model.
 	 * @param feature
 	 * 			The current feature.
-	 * @param currentClass
-	 * 			The current class.
 	 * @param res
 	 * 			The current file.
 	 */
-	protected void buildModelDirectives(String feature, FSTClass currentClass, IFile res) {
+	protected void buildModelDirectives(String feature, IFile res) {
 		
 	}
 

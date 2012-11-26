@@ -28,11 +28,10 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.fstmodel.FSTClass;
-import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
+import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.featurecpp.FeatureCppCorePlugin;
 
 /**
@@ -44,20 +43,14 @@ public class FeatureCppModelBuilder {
 	private FSTModel model;
 
 	private IFeatureProject featureProject;
-	
-	private FSTFeature currentFeature = null;
-	private FSTClass currentClass = null;
-	private IFile currentFile = null;
+
+	private FSTRole currentRole;
 
 	private IFolder tempFolder;
 
 	public FeatureCppModelBuilder(IFeatureProject featureProject, IFolder tempFolder) {
 		this.tempFolder = tempFolder;
-		FSTModel oldModel = featureProject.getFSTModel();
-		if (oldModel != null)
-			oldModel.markObsolete();
-
-		model = new FSTModel(featureProject.getProjectName());
+		model = new FSTModel(featureProject);
 		featureProject.setFSTModel(model);
 		this.featureProject = featureProject;
 	}
@@ -89,9 +82,8 @@ public class FeatureCppModelBuilder {
 		String className = infos.getFirst().split("[;]")[2] + ".h";
 		for (String info : infos) {
 			String[] array = info.split("[;]");
-			addFeature(array[0]);
-			addClass(className);
-			currentFeature.getClasses().put(className, currentClass);
+			currentRole = model.addRole(array[0], className, null);
+			currentRole.setFile(getFile(className));
 			if (array.length == 7) {
 				addField(array);
 			} else {
@@ -99,41 +91,16 @@ public class FeatureCppModelBuilder {
 			}
 		}
 	}
-	
-	/**
-	 * @param className
-	 */
-	private void addClass(String className) {
-		for (String key : currentFeature.getClasses().keySet()) {
-			FSTClass fstclass = currentFeature.getClasses().get(key);
-			if (fstclass.getFile().equals(getFile(className))) {
-				currentClass = fstclass;
-				return;
-			}
-		}
-		currentClass = new FSTClass(className);
-		currentFile = getFile(className);
-		currentClass.setFile(currentFile);
-		model.addClass(className, currentFile);
-	}
-	
-	private void addFeature(String feature) {
-		currentFeature = model.addFeature(feature);
-	}
 
 	private void addField(String[] array) {
-		FSTField field = new FSTField(array[4], array[5], 0, array[6]);
-		field.setOwn(currentFile);
-		currentClass.add(field);
+		currentRole.add(new FSTField(array[4], array[5], array[6]));
 	}
 
 	private void addMethod(String[] array) {
-		FSTMethod method = new FSTMethod(array[4], getParameter(array), array[5], array[6]);
-		method.setOwn(currentFile);
-		currentClass.add(method);
+		currentRole.add(new FSTMethod(array[4], getParameter(array), array[5], array[6]));
 	}
 
-	private LinkedList<String> getParameter(String[] array) {
+	private LinkedList<String> getParameter(String... array) {
 		LinkedList<String> parameter = new LinkedList<String>();
 		for (int i = 8;i < array.length;i++) {
 			parameter.add(array[i]);
@@ -143,7 +110,7 @@ public class FeatureCppModelBuilder {
 
 	private IFile getFile(String className) {
 		return featureProject.getSourceFolder()
-			.getFolder(currentFeature.getName()).getFile(className);
+			.getFolder(currentRole.getFeture().getName()).getFile(className);
 	}
 
 	private LinkedList<String> getInfo(IFile file) {

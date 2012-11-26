@@ -1,5 +1,5 @@
 /* FeatureIDE - An IDE to support feature-oriented software development
- * Copyright (C) 2005-2012  FeatureIDE team, University of Magdeburg
+ * Copyright (C) 2005-2011  FeatureIDE Team, University of Magdeburg
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,87 +18,43 @@
  */
 package de.ovgu.featureide.core.fstmodel;
 
+import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.TreeMap;
-
-import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
-import de.ovgu.featureide.fm.core.ColorList;
-
-
 
 /**
- * @author Constanze Adler
- * @author Tom Brosch
+ * Represents a feature at the {@link FSTModel}.<br>
+ * Contains {@link FSTRole}s with their corresponding {@link FSTClass}.
  * 
+ * @author Jens Meinicke
  */
-public class FSTFeature extends FSTModelElement {
-	
-	private String name;
-	
-	private int color = ColorList.INVALID_COLOR;
-	
-	private TreeMap<String, FSTClass> classes;
+public class FSTFeature {
 
-	public LinkedList<FSTDirective> directives = new LinkedList<FSTDirective>();
-	
+	HashMap<String, FSTRole> roles;
+	String name;
+	int color;
+
 	public FSTFeature(String name) {
 		this.name = name;
-		setClasses(new TreeMap<String, FSTClass>());
+		roles = new HashMap<String, FSTRole>();
+	}
+
+	public void setColor(int color) {
+		this.color = color;
+	}
+	
+	public int getColor() {
+		return color;
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	public FSTModelElement[] getChildren() {
-		if (getClasses() == null) {
-			return new FSTModelElement[0];
-		}
-		FSTClass[] elements = new FSTClass[getClasses().size()];
-		int i = 0;
-		for (FSTClass c : getClasses().values()) {
-			elements[i++] =  c;		
-		}
-		return elements;
+	public LinkedList<FSTRole> getRoles() {
+		 return new LinkedList<FSTRole>(roles.values());
 	}
 
-	/**
-	 * @param currentClass
-	 */
-	public void add(FSTClass currentClass) {
-		getClasses().put(currentClass.getName(), currentClass);
-	}
-
-	/**
-	 * @return the classes
-	 */
-	public TreeMap<String, FSTClass> getClasses() {
-		return classes;
-	}
-
-	/**
-	 * @param classes the classes to set
-	 */
-	public final void setClasses(TreeMap<String, FSTClass> classes) {
-		this.classes = classes;
-	}
-
-	@Override
-	public String toString() {
-		return name;
-	}
-
-	/**
-	 * @return the color
-	 */
-	public int getColor() {
-		return color;
-	}
-	
-	/**
-	 * @param color the color to set
-	 */
-	public void setColor(int color) {
-		this.color = color;
+	public FSTRole getRole(String className) {
+		return roles.get(className);
 	}
 }

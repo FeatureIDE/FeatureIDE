@@ -99,36 +99,19 @@ public class ClassBuilder {
 	 */
 	void addMethod(String name, LinkedList<String> parameterTypes, 
 			String returnType, String modifiers, String body, int beginLine, int endLine, boolean isConstructor) {
-//		beginLine = modelBuilder.completeModel ? -1 : beginLine;
-		endLine = modelBuilder.completeModel ? -1 : endLine;
-		
 		FSTMethod method = new FSTMethod(name, parameterTypes, returnType, modifiers, body, beginLine, endLine);								
-		method.setOwn(modelBuilder.getCurrentFile());
-		method.isConstructor = isConstructor;
+		method.setConstructor(isConstructor);
 		if (body.contains("original")) {
 			body = body.replaceAll(" ", "");
-			method.refines = body.contains("original(");
+			method.setRefines(body.contains("original("));
 		}
-		modelBuilder.getCurrentClass().add(method);
+		modelBuilder.getCurrentRole().add(method);
 	}
 	
-	/**
-	 * @param fieldName
-	 * @param typeName
-	 * @param i
-	 * @param modifiers
-	 * @param body
-	 * @param beginLine
-	 * @param endLine
-	 */
-	protected void addField(String fieldName, String typeName, int i, String modifiers,
+	protected void addField(String fieldName, String typeName, String modifiers,
 			String body, int beginLine, int endLine) {
-//		beginLine = modelBuilder.completeModel ? -1 : beginLine;
-		endLine = modelBuilder.completeModel ? -1 : endLine;
-		
-		FSTField field = new FSTField(fieldName, typeName, 0, modifiers, body, beginLine, endLine);
-		field.setOwn(modelBuilder.getCurrentFile());
-		modelBuilder.getCurrentClass().add(field);
+		FSTField field = new FSTField(fieldName, typeName, modifiers, body, beginLine, endLine);
+		modelBuilder.getCurrentRole().add(field);
 	}
 
 }

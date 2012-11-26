@@ -22,7 +22,6 @@ import java.io.FileNotFoundException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
-import java.util.TreeMap;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -31,9 +30,9 @@ import org.eclipse.core.runtime.CoreException;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
-import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
+import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
 /**
@@ -56,7 +55,6 @@ public class JavaErrorPropagation extends ErrorPropagation {
 	 * 
 	 * Sets all composed lines to all methods and fields
 	 */
-//	TODO @Jens improve descriptions
 	@Override
 	protected void setElementLines(String content, LinkedList<FSTField> fields, LinkedList<FSTMethod> methods) {
 		for (FSTField f : fields) {
@@ -85,7 +83,7 @@ public class JavaErrorPropagation extends ErrorPropagation {
 				continue;
 			}
 			int i = -1;
-			if (m.isConstructor) {
+			if (m.isConstructor()) {
 				String body = m.getBody().substring(m.getBody().indexOf('{') + 1);
 				while (body.contains("  ")) {
 					body = body.replaceAll("  ", " ");
@@ -112,21 +110,18 @@ public class JavaErrorPropagation extends ErrorPropagation {
 					body = body.replaceFirst("protected", "");
 				}
 				body = body.replaceAll("\r\n", "\n");
-				body = body.replaceAll("original\\(", m.getMethodName() + "(");
-				body = body.replaceAll("original\\s*\\(", m.getMethodName() + " (");
+				body = body.replaceAll("original\\(", m.getName() + "(");
+				body = body.replaceAll("original\\s*\\(", m.getName() + " (");
 				
 				i = content.indexOf(body);
 			}
 			if (i != -1) {
 				int line = countLines(content.substring(0, i));
-				m.setLine(line);
+				m.setComposedLine(line);
 			}
 		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see errorpropagation.ErrorPropagation#deleteMarker(java.lang.String)
-	 */
 	@Override
 	protected boolean deleteMarker(String message) {
 		return (message.contains(RAW_TYPE) || 
@@ -162,7 +157,6 @@ public class JavaErrorPropagation extends ErrorPropagation {
 	
 	/**
 	 * Checks if the given file contains a line with the given content.
-	 * @param featureFile
 	 * @param lineContent the content to look for
 	 * @return The line of the content or <code>-1</code> if the does not contain the content. 
 	 */
@@ -191,8 +185,6 @@ public class JavaErrorPropagation extends ErrorPropagation {
 
 	/**
 	 * Corrects the given string to avoid changes by the <code>FeatureHouse</code> composer.
-	 * @param string
-	 * @return
 	 */
 	private String correctString(String string) {
 		while (string.contains("  ")) {
@@ -227,23 +219,15 @@ public class JavaErrorPropagation extends ErrorPropagation {
 		}
 		
 		LinkedList<IFile> featureFiles = new LinkedList<IFile>();
-		for (String name : layerNames) {
-			for (FSTFeature f : project.getFSTModel().getFeaturesMap().values()) {
-				if (f.getName().equals(name)) {
-					TreeMap<String, FSTClass> z = f.getClasses();
-					String fileName = file.getName();
-					if (z.containsKey(fileName)) {
-						featureFiles.add((z.get(fileName)).getFile());
-					}
-				}
-			}
+		FSTClass c = project.getFSTModel().getClass(file.getName());
+		for (FSTRole role : c.getRoles()) {
+			featureFiles.add(role.getFile());
 		}
 		return featureFiles;
 	}
 
 	/**
 	 * 
-	 * @param file
 	 * @param line The line to lock for
 	 * @return the content at the given line of the file 
 	 */
