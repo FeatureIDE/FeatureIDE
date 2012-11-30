@@ -63,7 +63,7 @@
       </cheatsheet>
       <cheatsheet
             composite="false"
-            contentFile="cheatsheets/ahead_cheatsheet.xml"
+            contentFile="cheatsheets/aspectj_cheatsheet.xml"
             id="de.ovgu.featureide.ui.doc.cheatsheet.implementation.aspectj"
             name="AspectJ">
       </cheatsheet>
