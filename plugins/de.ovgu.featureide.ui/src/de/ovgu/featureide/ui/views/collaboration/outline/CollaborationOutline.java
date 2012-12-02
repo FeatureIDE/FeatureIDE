@@ -231,7 +231,7 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 			for (FSTRole r : field.getRole().getFSTClass().getRoles()) {
 				if (r.getFile().equals(iFile)) {
 					for (FSTField f : r.getFields()) {
-						if (f.getFullName().equals(field.getFullName())) {
+						if (f.comparesTo(field)) {
 							return f.getLine();
 						}
 					}
@@ -244,7 +244,7 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 			for (FSTRole r : meth.getRole().getFSTClass().getRoles()) {
 				if (r.getFile().equals(iFile)) {
 					for (FSTMethod m : r.getMethods()) {
-						if (m.getFullName().equals(meth.getFullName())) {
+						if (m.comparesTo(meth)) {
 							return m.getLine();
 						}
 					}
@@ -539,7 +539,7 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 			}
 			if (element instanceof FSTMethod) {
 				for (FSTMethod method : role.getMethods()) {
-					if (method.getFullName().equals(element.getFullName())) {
+					if (method.comparesTo(element)) {
 						item.setForeground(viewer.getControl().getDisplay()
 								.getSystemColor(SWT.DEFAULT));
 						return;
@@ -548,7 +548,7 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 			}
 			if (element instanceof FSTField) {
 				for (FSTField field : role.getFields()) {
-					if (field.getFullName().equals(element.getFullName())) {
+					if (field.comparesTo(element)) {
 						item.setForeground(viewer.getControl().getDisplay()
 								.getSystemColor(SWT.DEFAULT));
 						return;
@@ -569,7 +569,7 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 			public void run() {
 				viewer.collapseAll();
 				viewer.expandToLevel(2);
-				viewer.refresh();
+				colorizeItems(viewer.getTree().getItems());
 			}
 		};
 		collapseAllAction.setToolTipText("Collapse All");

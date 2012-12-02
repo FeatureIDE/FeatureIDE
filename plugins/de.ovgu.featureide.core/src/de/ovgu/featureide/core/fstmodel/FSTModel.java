@@ -21,6 +21,8 @@ package de.ovgu.featureide.core.fstmodel;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import javax.annotation.Nonnull;
+
 import org.eclipse.core.resources.IFile;
 
 import de.ovgu.featureide.core.IFeatureProject;
@@ -35,13 +37,11 @@ import de.ovgu.featureide.core.IFeatureProject;
 
 public class FSTModel {
 	
-	private HashMap<String, FSTClass> classes;
-	private HashMap<String, FSTFeature> features;
+	private HashMap<String, FSTClass> classes = new HashMap<String, FSTClass>();
+	private HashMap<String, FSTFeature> features = new HashMap<String, FSTFeature>();
 	private IFeatureProject featurProject;
 
 	public FSTModel(IFeatureProject featureProject) {
-		classes = new HashMap<String, FSTClass>();
-		features = new HashMap<String, FSTFeature>();
 		this.featurProject = featureProject;
 	}
 
@@ -50,6 +50,7 @@ public class FSTModel {
 		features.clear();
 	}
 	
+	@Nonnull
 	public LinkedList<FSTFeature> getFeatures() {
 		return new LinkedList<FSTFeature>(features.values());
 	}

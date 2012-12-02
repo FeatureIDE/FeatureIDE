@@ -20,6 +20,8 @@ package de.ovgu.featureide.core.fstmodel;
 
 import java.util.LinkedList;
 
+import javax.annotation.Nonnull;
+
 import org.eclipse.core.resources.IFile;
 
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
@@ -31,9 +33,9 @@ import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
  */
 public class FSTRole {
 
-	private LinkedList<FSTMethod> methods;
-	private LinkedList<FSTField> fields;
-	private LinkedList<FSTDirective> directives;
+	private LinkedList<FSTMethod> methods = new LinkedList<FSTMethod>();
+	private LinkedList<FSTField> fields = new LinkedList<FSTField>();
+	private LinkedList<FSTDirective> directives = new LinkedList<FSTDirective>();
 	private IFile file;
 	private FSTFeature feature;
 	private FSTClass fstClass;
@@ -42,13 +44,6 @@ public class FSTRole {
 		this.feature = feature;
 		this.fstClass = fstClass;
 		this.file = file;
-		methods = new LinkedList<FSTMethod>();
-		fields = new LinkedList<FSTField>();
-		directives = new LinkedList<FSTDirective>();
-	}
-	
-	public LinkedList<FSTDirective> getDirectives() {
-		return directives;
 	}
 
 	public void add(FSTDirective directive) {
@@ -59,7 +54,7 @@ public class FSTRole {
 	public void add(RoleElement element) {
 		if (element instanceof FSTMethod) {
 			for (FSTMethod m : methods) {
-				if (m.getFullName().equals(element.getFullName())) {
+				if (m.comparesTo(element)) {
 //					CorePlugin.getDefault().logWarning("Model already contains method " 
 //					+ element.getFullName() + " @ " + feature.getName()+ "/" + fstClass.getName());
 					return;
@@ -68,7 +63,7 @@ public class FSTRole {
 			methods.add((FSTMethod) element);
 		} else {
 			for (FSTField f : fields) {
-				if (f.getFullName().equals(element.getFullName())) {
+				if (f.comparesTo(element)) {
 //					CorePlugin.getDefault().logWarning("Model already contains method " 
 //					+ element.getFullName() + " @ " + feature.getName()+ "/" + fstClass.getName());
 					return;
@@ -95,12 +90,19 @@ public class FSTRole {
 		this.file = file;
 	}
 
+	@Nonnull
 	public LinkedList<FSTField> getFields() {
 		return fields;
 	}
 
+	@Nonnull
 	public LinkedList<FSTMethod> getMethods() {
 		return methods;
+	}
+	
+	@Nonnull
+	public LinkedList<FSTDirective> getDirectives() {
+		return directives;
 	}
 
 	@Override

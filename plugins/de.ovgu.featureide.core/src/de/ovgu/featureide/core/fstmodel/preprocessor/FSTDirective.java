@@ -21,6 +21,7 @@ package de.ovgu.featureide.core.fstmodel.preprocessor;
 import java.util.LinkedList;
 
 import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 
@@ -81,6 +82,7 @@ public class FSTDirective {
 		return elements;
 	}
 	
+	@Nonnull
 	public LinkedList<FSTDirective> getChildrenList() {
 		return children;
 	}
@@ -198,6 +200,7 @@ public class FSTDirective {
 		this.role = fstRole;
 	}
 	
+	@Nonnull
 	public FSTRole getRole() {
 		if (role == null) {
 			return parent.getRole();

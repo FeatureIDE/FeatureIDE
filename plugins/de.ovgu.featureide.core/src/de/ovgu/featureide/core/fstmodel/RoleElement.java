@@ -135,4 +135,13 @@ public abstract class RoleElement {
 	public String toString() {
 		return getName();
 	}
+	
+	/**
+	 * @return <code>true</code> if the given element is equivalent 
+	 * in it's structure and it has the same class as this element
+	 */
+	public boolean comparesTo(RoleElement element) {
+		return getFullName().equals(element.getFullName()) && 
+			getClass().equals(element.getClass());
+	}
 }

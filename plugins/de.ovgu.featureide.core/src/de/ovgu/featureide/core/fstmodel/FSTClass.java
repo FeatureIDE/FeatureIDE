@@ -21,6 +21,8 @@ package de.ovgu.featureide.core.fstmodel;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import javax.annotation.Nonnull;
+
 /**
  * Represents a class at the {@link FSTModel}.<br>
  * Contains {@link FSTRole}s with their corresponding {@link FSTFeature}.
@@ -29,18 +31,18 @@ import java.util.LinkedList;
  */
 public class FSTClass {
 
-	private HashMap<String, FSTRole> roles;
+	private HashMap<String, FSTRole> roles = new HashMap<String, FSTRole>();
 	private String name;
 
 	public FSTClass(String name) {
 		this.name = name;
-		roles = new HashMap<String, FSTRole>();
 	}
 
 	public String getName() {
 		return name;
 	}
 	
+	@Nonnull
 	public LinkedList<FSTRole> getRoles() {
 		return new LinkedList<FSTRole>(roles.values());
 	}
