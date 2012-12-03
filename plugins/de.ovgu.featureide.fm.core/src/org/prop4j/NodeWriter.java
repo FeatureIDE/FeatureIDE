@@ -23,6 +23,12 @@ public class NodeWriter {
 	 */
 	public final static String[] shortSymbols = new String[] {"-", " & ", " | ", " => ", " <=> ", ", ", "choose", "atleast", "atmost"};
 	
+	private final static String noJavaSymbol = " no symbol ";
+	/**
+	 * java textual representation
+	 */
+	public final static String[] javaSymbols = new String[] {"!", " && ", " || ", noJavaSymbol, " == ", noJavaSymbol, noJavaSymbol, noJavaSymbol, noJavaSymbol};
+	
 	/**
 	 * Converts the given node into a short textual representation.
 	 * 

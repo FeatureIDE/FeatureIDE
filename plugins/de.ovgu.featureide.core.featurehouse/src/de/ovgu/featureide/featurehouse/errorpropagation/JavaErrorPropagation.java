@@ -42,6 +42,9 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  */
 public class JavaErrorPropagation extends ErrorPropagation {
 
+	private static final String REMOVED_LINES_2 = "2Lines";
+	private static final String REMOVED_LINES_4 = "4Lines";
+	
 	// Java 1.4 exclusions
 	private static final String RAW_TYPE = "raw type";
 	private static final String GENERIC_TYPE = "generic type";
@@ -68,8 +71,13 @@ public class JavaErrorPropagation extends ErrorPropagation {
 			int line = countLines(content.substring(0, i));
 			f.setComposedLine(line);
 		}
-
 		content = content.replaceAll("__wrappee__\\w*\\s*", "");
+
+		content = content.replaceAll("[^{]if \\(!FeatureModel.\\w*\\) \\{[^}]*\\}\\n", REMOVED_LINES_4);
+		content = content.replaceAll("[^{]if \\(!FeatureModel.\\w*\\)[^;]*;\\n", REMOVED_LINES_2);
+
+		content = content.replaceAll("/\\*@", "");
+		content = content.replaceAll("@\\*/", "");
 		while (content.contains("  ")) {
 			content = content.replaceAll("  ", " ");
 		}
@@ -77,14 +85,13 @@ public class JavaErrorPropagation extends ErrorPropagation {
 		while (content.contains(" (")) {
 			content = content.replaceAll(" \\(", "(");
 		}
-
-		for (FSTMethod m : methods) {
-			if (m.getBody() == null) {
+		for (FSTMethod method : methods) {
+			if (method.getBody() == null) {
 				continue;
 			}
-			int i = -1;
-			if (m.isConstructor()) {
-				String body = m.getBody().substring(m.getBody().indexOf('{') + 1);
+			if (method.isConstructor()) {
+				int i = -1;
+				String body = method.getBody().substring(method.getBody().indexOf('{') + 1);
 				while (body.contains("  ")) {
 					body = body.replaceAll("  ", " ");
 				}
@@ -95,8 +102,12 @@ public class JavaErrorPropagation extends ErrorPropagation {
 				body = body.replaceAll("\r\n", "\n");
 				body = body.substring(0, body.lastIndexOf('}'));
 				i = content.indexOf(body);
+				if (i != -1) {
+					int line = countLines(content.substring(0, i));
+					method.setLine(line);
+				}
 			} else {
-				String body = m.getBody();
+				String body = method.getBody();
 				while (body.contains("  ")) {
 					body = body.replaceAll("  ", " ");
 				}
@@ -110,14 +121,38 @@ public class JavaErrorPropagation extends ErrorPropagation {
 					body = body.replaceFirst("protected", "");
 				}
 				body = body.replaceAll("\r\n", "\n");
-				body = body.replaceAll("original\\(", m.getName() + "(");
-				body = body.replaceAll("original\\s*\\(", m.getName() + " (");
-				
-				i = content.indexOf(body);
-			}
-			if (i != -1) {
-				int line = countLines(content.substring(0, i));
-				m.setComposedLine(line);
+				body = body.replaceAll("original\\(", method.getName() + "(");
+				body = body.replaceAll("original\\s*\\(", method.getName() + " (");
+				StringBuilder stringBuilder = new StringBuilder();
+				int lineCounter = 1;
+				int methodOverhead = 0;
+				boolean found = false;
+				for (String line : content.split("[\n]")) {
+					stringBuilder.append(line);
+					stringBuilder.append("\n");
+					String actualContent = stringBuilder.toString();
+					if (actualContent.replaceAll(REMOVED_LINES_4, "").replaceAll(REMOVED_LINES_2, "").contains(body)) {
+						found = true;
+						if (!actualContent.contains(body)) {
+							if (actualContent.replaceAll(REMOVED_LINES_4, "").contains(body)) {
+								methodOverhead = 4;
+							} else {
+								methodOverhead = 2;
+							}
+						}
+						break;
+					}
+					if (line.startsWith(REMOVED_LINES_4)) {
+						lineCounter += 4;
+					} else if (line.startsWith(REMOVED_LINES_2)) {
+						lineCounter += 2;
+					}
+					
+					lineCounter++;
+				}
+				if (found) {
+					method.setLine(lineCounter - (method.getEndLine() - method.getLine() + methodOverhead));
+				}
 			}
 		}
 	}

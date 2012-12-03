@@ -21,7 +21,9 @@ package de.ovgu.featureide.featurehouse;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -33,6 +35,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IClasspathAttribute;
@@ -53,7 +56,12 @@ import composer.IParseErrorListener;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.featurehouse.errorpropagation.ErrorPropagation;
+import de.ovgu.featureide.featurehouse.meta.FeatureModelClassGenerator;
+import de.ovgu.featureide.featurehouse.meta.VerifyProductAction;
 import de.ovgu.featureide.featurehouse.model.FeatureHouseModelBuilder;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 
 /**
@@ -65,6 +73,8 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 @SuppressWarnings("restriction")
 public class FeatureHouseComposer extends ComposerExtensionClass {
 
+	public static final String COMPOSER_ID = "de.ovgu.featureide.composer.featurehouse";
+	
 	private FSTGenComposer composer;
 
 	public FeatureHouseModelBuilder fhModelBuilder;
@@ -178,9 +188,10 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		}
 	}
 
+	// TODO refactor into cases
 	public void performFullBuild(IFile config) {
 		assert (featureProject != null) : "Invalid project given";
-
+		
 		final String configPath = config.getRawLocation().toOSString();
 		final String basePath = featureProject.getSourcePath();
 		final String outputPath = featureProject.getBuildPath();
@@ -200,21 +211,56 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		}
 		
 		setJavaBuildPath(config.getName().split("[.]")[0]);
-
-		composer = new FSTGenComposer(false);
-		try {
-			composer.run(new String[] {
-					CmdLineInterpreter.INPUT_OPTION_EQUATIONFILE, configPath,
-					CmdLineInterpreter.INPUT_OPTION_BASE_DIRECTORY, basePath,
-					CmdLineInterpreter.INPUT_OPTION_OUTPUT_DIRECTORY, outputPath + "/",
-					CmdLineInterpreter.INPUT_OPTION_CONTRACT_STYLE, getContractParameter()
-			});
-		} catch (TokenMgrError e) {
+		if (buildMetaProduct()) {
+			new FeatureModelClassGenerator(featureProject);
+			composer = new FSTGenComposerExtension();
+			FeatureModel featureModel = featureProject.getFeatureModel();
+			List<String> featureOrderList = featureModel.getConcreteFeatureNames();
+			// dead features should not be composed
+			LinkedList<String> deadFeatures = new LinkedList<String>();
+			for (Feature deadFeature : featureModel.getAnalyser().getDeadFeatures()) {
+				deadFeatures.add(deadFeature.getName());
+			}
 			
+			String[] features = new String[featureOrderList.size()];
+			int i = 0;		
+			for (String f : featureOrderList) {
+				if (!deadFeatures.contains(f)) {
+					features[i++] = f;
+				}
+			}
+			
+			try {
+				((FSTGenComposerExtension) composer).buildMetaProduct(new String[] {
+						CmdLineInterpreter.INPUT_OPTION_EQUATIONFILE, configPath,
+						CmdLineInterpreter.INPUT_OPTION_BASE_DIRECTORY, basePath,
+						CmdLineInterpreter.INPUT_OPTION_OUTPUT_DIRECTORY, outputPath + "/",
+						CmdLineInterpreter.INPUT_OPTION_CONTRACT_STYLE, "explicit_contracting"
+				}, features);
+				fhModelBuilder.buildModel(composer.getFstnodes(), false);
+			} catch (TokenMgrError e) {
+			} catch (Error e) {
+				FeatureHouseCorePlugin.getDefault().logError(e);
+			}
+		} else {
+			composer = new FSTGenComposer(false);
+			try {
+				composer.run(new String[] {
+						CmdLineInterpreter.INPUT_OPTION_EQUATIONFILE, configPath,
+						CmdLineInterpreter.INPUT_OPTION_BASE_DIRECTORY, basePath,
+						CmdLineInterpreter.INPUT_OPTION_OUTPUT_DIRECTORY, outputPath + "/",
+						CmdLineInterpreter.INPUT_OPTION_CONTRACT_STYLE, getContractParameter()
+				});
+			} catch (TokenMgrError e) {
+				
+			}
+			fhModelBuilder.buildModel(composer.getFstnodes(), false);
+		}
+
+		if (verifyProduct()) {
+			(new VerifyProductAction()).runMonkey(featureProject.getProject());
 		}
 		
-		fhModelBuilder.buildModel(composer.getFstnodes(), false);
-
 		composer = new FSTGenComposerExtension();
 		composer.addParseErrorListener(listener);
 		
@@ -226,7 +272,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		}
 		
 		try {
-		((FSTGenComposerExtension)composer).buildFullFST(new String[] {
+			((FSTGenComposerExtension)composer).buildFullFST(new String[] {
 					CmdLineInterpreter.INPUT_OPTION_EQUATIONFILE, configPath,
 					CmdLineInterpreter.INPUT_OPTION_BASE_DIRECTORY, basePath,
 					CmdLineInterpreter.INPUT_OPTION_OUTPUT_DIRECTORY, outputPath + "/", 
@@ -238,8 +284,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			FeatureHouseCorePlugin.getDefault().logError(e);
 		}
 		
-		
-		fhModelBuilder.buildModel(composer.getFstnodes(), true);
+		fhModelBuilder.buildModel(composer.getFstnodes(), false);
 
 		TreeBuilderFeatureHouse fstparser = new TreeBuilderFeatureHouse(
 				featureProject.getProjectName());
@@ -248,16 +293,23 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		callCompiler();
 	}
 
-	/**
-	 * @return
-	 */
 	private String getContractParameter() {
-		String contractComposition= featureProject.getContractComposition().toLowerCase();
-		if(contractComposition==null||contractComposition.equals("none"))return "none";
-		if(contractComposition.equals("plain contracting"))return "plain_contracting";
-		if(contractComposition.equals("contract overriding"))return "contract_overriding";
-		if(contractComposition.equals("explicit contract refinement"))return "explicit_contracting";
-		if(contractComposition.equals("consecutive contract refinement"))return "consecutive_contracting";
+		String contractComposition= featureProject.getContractComposition().toLowerCase(Locale.ENGLISH);
+		if("none".equals(contractComposition)) {
+			return "none";
+		}
+		if("plain contracting".equals(contractComposition)) {
+			return "plain_contracting";
+		}
+		if("contract overriding".equals(contractComposition)) {
+			return "contract_overriding";
+		}
+		if("explicit contract refinement".equals(contractComposition)) {
+			return "explicit_contracting";
+		}
+		if("consecutive contract refinement".equals(contractComposition)) {
+			return "consecutive_contracting";
+		}
 		return "none";
 	}
 
@@ -479,8 +531,9 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			return;
 		}
 		final String configPath;
-		if (featureProject.getCurrentConfiguration() != null) {
-			configPath = featureProject.getCurrentConfiguration().getRawLocation().toOSString();
+		IFile currentConfiguration = featureProject.getCurrentConfiguration();
+		if (currentConfiguration != null) {
+			configPath = currentConfiguration.getRawLocation().toOSString();
 		} else {
 			configPath = featureProject.getProject().getFile(".project").getRawLocation().toOSString();
 		}
@@ -518,8 +571,9 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 	@Override
 	public void buildConfiguration(IFolder folder, Configuration configuration, String congurationName) {
-		super.buildConfiguration(folder, configuration, folder.getName());
-		IFile configurationFile = folder.getFile(folder.getName() + '.' + getConfigurationExtension());
+		String folderName = folder.getName();
+		super.buildConfiguration(folder, configuration, folderName);
+		IFile configurationFile = folder.getFile(folderName + '.' + getConfigurationExtension());
 		FSTGenComposer composer = new FSTGenComposer(false);
 		composer.addParseErrorListener(createParseErrorListener());
 		composer.run(new String[]{
@@ -555,6 +609,33 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	 */
 	@Override
 	public boolean canGeneratInParallelJobs() {
+		return false;
+	}
+	
+	public static final QualifiedName BUILD_META_PRODUCT = 
+			new QualifiedName(FeatureHouseComposer.class.getName() +"#BuildMetaProduct", 
+							  FeatureHouseComposer.class.getName() +"#BuildMetaProduct");
+	public static final QualifiedName VERIFY_PRODUCT = 
+			new QualifiedName(FeatureHouseComposer.class.getName() +"#VerifyProduct", 
+							  FeatureHouseComposer.class.getName() +"#VerifyProduct");
+	
+	private static final String TRUE = "true";
+	
+	public final boolean buildMetaProduct() {
+		try {
+			return TRUE.equals(featureProject.getProject().getPersistentProperty(BUILD_META_PRODUCT));
+		} catch (CoreException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+		return false;
+	}
+	
+	public final boolean verifyProduct() {
+		try {
+			return TRUE.equals(featureProject.getProject().getPersistentProperty(VERIFY_PRODUCT));
+		} catch (CoreException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
 		return false;
 	}
 

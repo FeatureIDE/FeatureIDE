@@ -83,8 +83,8 @@ public class Configuration {
 		this(configuration, configuration.featureModel);
 	}
 	
-	public Configuration(Configuration configuration, FeatureModel model) {
-		this.featureModel = model;
+	public Configuration(Configuration configuration, FeatureModel featureModel) {
+		this.featureModel = featureModel;
 		this.propagate = false;
 
 		root = new SelectableFeature(this, featureModel.getRoot());

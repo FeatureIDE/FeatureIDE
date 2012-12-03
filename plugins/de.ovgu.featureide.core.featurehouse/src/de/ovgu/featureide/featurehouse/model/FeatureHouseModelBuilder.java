@@ -163,11 +163,7 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 							.caseFieldDeclaration(terminal);
 					}
 				} else if (child instanceof FSTNonTerminal) {
-					 if (C_NODE_STRUCTDEC.equals(child.getType())) {
-						 caseClassDeclaration(child);
-					 } else if (JAVA_NODE_INNER_CLASS_TYPE.equals(child.getType())) {
-						 caseClassDeclaration(child);
-					 }
+					caseClassDeclaration(child);
 				}
 			}
 		}

@@ -342,9 +342,8 @@ public class ErrorPropagation {
 				severity = IMarker.SEVERITY_ERROR;
 			}
 			if (!hasSameMarker(message,line,file)) {
-				IMarker newMarker = null;
 				try {
-					newMarker = file.createMarker(FeatureHouseCorePlugin.BUILDER_PROBLEM_MARKER);
+					IMarker newMarker = file.createMarker(FeatureHouseCorePlugin.BUILDER_PROBLEM_MARKER);
 					newMarker.setAttribute(IMarker.LINE_NUMBER, line);
 					newMarker.setAttribute(IMarker.MESSAGE, message);
 					newMarker.setAttribute(IMarker.SEVERITY, severity);

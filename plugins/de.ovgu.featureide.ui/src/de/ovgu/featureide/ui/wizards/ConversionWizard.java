@@ -49,11 +49,16 @@ public class ConversionWizard extends Wizard implements INewWizard {
 		if (obj instanceof IResource) {
 			IResource res = (IResource) obj;
 			if (page.hasCompositionTool()) {
-				CorePlugin.setupProject(res.getProject(), page
-						.getCompositionTool().getId(), page.getSourcePath(),
-						page.getConfigPath(), page.getBuildPath());
-				UIPlugin.getDefault().openEditor(FeatureModelEditor.ID,
-						(res.getProject()).getFile("model.xml"));
+				IProject project = res.getProject();
+				if (project.isOpen()) {
+					CorePlugin.setupProject(project, page
+							.getCompositionTool().getId(), page.getSourcePath(),
+							page.getConfigPath(), page.getBuildPath());
+					UIPlugin.getDefault().openEditor(FeatureModelEditor.ID,
+							project.getFile("model.xml"));
+				} else {
+					return false;
+				}
 			}
 			return true;
 		}

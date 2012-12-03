@@ -303,7 +303,7 @@ public class FeatureModelAnalyzer {
 	}
 
 	public LinkedList<Feature> getDeadFeatures() {
-		return getDeadFeatures(1000);
+		return getDeadFeatures(1000);	
 	}
 	
 	public LinkedList<Feature> getDeadFeatures(int timeout) {
@@ -311,17 +311,35 @@ public class FeatureModelAnalyzer {
 		// renamed features are involved
 		// TODO: Check other calls of createNodes
 		Node root = NodeCreator.createNodes(fm.clone());
-		LinkedList<Feature> set = new LinkedList<Feature>();
+		LinkedList<Feature> deadFeatures = new LinkedList<Feature>();
 		for (Literal e : new SatSolver(root, timeout).knownValues()) {
 			String var = e.var.toString();
 			if (!e.positive && !"False".equals(var) && !"True".equals(var)) {
 				Feature feature = fm.getFeature(var);
 				if (feature != null) {
-					set.add(feature);
+					deadFeatures.add(feature);
 				}
 			}
 		}
-		return set;
+		return deadFeatures;
+	}
+	
+	public LinkedList<Feature> getCoreFeatures() {
+		// cloning the FM, because otherwise the resulting formula is wrong if
+		// renamed features are involved
+		// TODO: Check other calls of createNodes
+		Node root = NodeCreator.createNodes(fm.clone());
+		LinkedList<Feature> coreFeatures = new LinkedList<Feature>();
+		for (Literal e : new SatSolver(root, 1000).knownValues()) {
+			String var = e.var.toString();
+			if (e.positive && !"False".equals(var) && !"True".equals(var)) {
+				Feature feature = fm.getFeature(var);
+				if (feature != null) {
+					coreFeatures.add(feature);
+				}
+			}
+		}
+		return coreFeatures;
 	}
 	
 	/**
@@ -673,9 +691,6 @@ public class FeatureModelAnalyzer {
 	}
 	
 	public LinkedList<Feature> getFalseOptionalFeatures() {
-		// TODO #456 improve calculation effort and
-		// correct calculation (is this feature always selected given
-		// that the parent feature is selected)
 		LinkedList<Feature> falseOptionalFeatures = new LinkedList<Feature>();
 		for (Feature feature : fm.getFeatures()) {
 			try {

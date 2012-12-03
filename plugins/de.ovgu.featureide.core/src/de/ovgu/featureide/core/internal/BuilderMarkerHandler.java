@@ -83,10 +83,10 @@ public class BuilderMarkerHandler implements IBuilderMarkerHandler {
 	private void deleteIfExists(IResource resource, String message,
 			int lineNumber, int severity) {
 		try {
-			IMarker[] markers = resource.findMarkers(BUILDER_MARKER, false,
-					IResource.DEPTH_ZERO);
 			if (!resource.exists())
 				return;
+			IMarker[] markers = resource.findMarkers(BUILDER_MARKER, false,
+					IResource.DEPTH_ZERO);
 			for (IMarker marker : markers) {
 				if (marker.getAttribute(IMarker.MESSAGE).equals(message)
 						&& (Integer) marker.getAttribute(IMarker.LINE_NUMBER) == lineNumber

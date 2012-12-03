@@ -57,7 +57,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 	private static final String COMPOSER_CONFIG_PATH = "&configurations path:";
 	private static final String COMPOSER_FEATURE_PATH = "&Feature path:";
 	private static final String COMPOSER_SOURCE_PATH = "&Source path:";
-	private static final String CONTRACT_COMPOSITION = "Contract composition";
+//	private static final String CONTRACT_COMPOSITION = "Contract composition";
 	private GridData gd = new GridData(GridData.FILL_BOTH);
 	
 	private static IComposerExtension[] extensions = null;

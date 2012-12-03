@@ -11,5 +11,54 @@
             nature="FeatureIDE_Core.featureHouseNature">
       </composer>
    </extension>
-
+	<extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            adaptable="true"
+            id="de.ovgu.featureide.ui.actions.conversionaction"
+            objectClass="org.eclipse.core.resources.IProject">
+         <action
+               class="de.ovgu.featureide.featurehouse.meta.VerifyProductAction"
+               icon="icons/logo16.gif"
+               id="de.ovgu.featureide.featurehouse.meta.verifyaction"
+               label="Verify product"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/featurehouse">
+         </action>
+         <visibility>
+            <objectState
+                  name="nature"
+                  value="org.eclipse.jdt.core.javanature">
+            </objectState>
+         </visibility>
+      </objectContribution>
+      <objectContribution
+            adaptable="true"
+            id="de.ovgu.featureide.featurehouse.meta.buildmetaproduct"
+            objectClass="org.eclipse.core.resources.IProject">
+         <action
+               class="de.ovgu.featureide.featurehouse.meta.BuildMetaProductAction"
+               id="de.ovgu.featureide.featurehouse.meta.buildmetaproductaction"
+               label="Build Meta Product"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/featurehouse"
+               style="toggle">
+         </action>
+         <visibility>
+            <objectState
+                  name="nature"
+                  value="de.ovgu.featureide.core.featureProjectNature">
+            </objectState>
+         </visibility>
+      </objectContribution>
+	</extension>
+ <extension
+       id="de.ovgu.featureide.featurehouse.meta.verificationmarker"
+       name="Verifikation Marker"
+       point="org.eclipse.core.resources.markers">
+    <super
+          type="org.eclipse.core.resources.problemmarker">
+    </super>
+    <persistent
+          value="true">
+    </persistent>
+ </extension>
 </plugin>

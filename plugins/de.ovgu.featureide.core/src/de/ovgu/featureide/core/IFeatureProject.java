@@ -49,7 +49,8 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	public static final QualifiedName configConfigID = new QualifiedName("featureproject.configs", "currentEquation");
 	
 	public static final QualifiedName javaClassPathID = new QualifiedName("featureproject.configs", "javaClassPath");
-	public static final QualifiedName contractCompositionID = new QualifiedName("featureproject.contract", "contractComposition");
+	public static final QualifiedName contractCompositionID = new QualifiedName(IFeatureProject.class.getName() + "#ContractComposition",
+			IFeatureProject.class.getName() + "#ContractComposition");
 	
 	public void dispose();
 

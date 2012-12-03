@@ -35,7 +35,7 @@ public class JavaClassBuilder extends ClassBuilder {
 		super(builder);
 	}
 
-	private String[] modifier = {"static","final","private","public","protected"};
+	private String[] modifier = {"static","final","private","public","protected", "nullable"};
 	
 	public void caseFieldDeclaration(FSTTerminal terminal) {
 		LinkedList<String> fields = getFields(terminal.getBody());
