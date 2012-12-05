@@ -61,6 +61,7 @@ import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.FeatureModelLayout;
 import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -125,8 +126,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	private ZoomInAction zoomIn;
 	private ZoomOutAction zoomOut;
 
-//  legend action replaced with property page
-//	private LegendAction legendAction;
+	// legend action replaced with property page
+	// private LegendAction legendAction;
 	private LegendLayoutAction legendLayoutAction;
 
 	private EditConstraintAction editConstraintAction;
@@ -141,12 +142,12 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	private int index;
 
 	private Job analyzeJob;
-	
+
 	public FeatureDiagramEditor(FeatureModelEditor featureModelEditor,
 			Composite container) {
 		super();
 		this.featureModelEditor = featureModelEditor;
-		
+
 		setKeyHandler(new GraphicalViewerKeyHandler(this));
 
 		createControl(container);
@@ -161,18 +162,59 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	void initializeGraphicalViewer() {
 		getControl().addControlListener(new ControlListener() {
 			
-			@Override
-			public void controlResized(ControlEvent e) {
+				@Override
+				/**
+				 * used to remove the feature model when resizing the window
+				 */
+				public void controlResized(ControlEvent e) {
+				// checks for null are necessary because we cannot prevent this
+				// method may be called before the model is loaded correctly
+				// (including positions in FeatureUIHelper)
+				FeatureModel fm = getFeatureModel();
+				if (fm == null)
+					return;
+
+				org.eclipse.draw2d.geometry.Point oldLoc = FeatureUIHelper
+						.getLocation(fm.getRoot());
+				if (oldLoc == null)
+					return;
 				internRefresh(true);
+
+				org.eclipse.draw2d.geometry.Point newLoc = FeatureUIHelper
+						.getLocation(fm.getRoot());
+				if (newLoc == null)
+					return;
+				int difX = newLoc.x - oldLoc.x;
+				moveLegend(fm, difX);
+
 			}
-			
+
+			/**
+			 * moves the legend for the editor associated with feature model fm
+			 * horizontally (used to move the legend along with the model when resizing the window)
+			 * 
+			 * @param fm
+			 * @param delta
+			 */
+			private void moveLegend(FeatureModel fm, int delta) {
+				
+				FeatureModelLayout fmLayout = fm.getLayout();
+
+				org.eclipse.draw2d.geometry.Point location = FeatureUIHelper
+						.getLegendFigure(fm).getLocation();
+				FeatureUIHelper.getLegendFigure(fm).setLocation(
+						new org.eclipse.draw2d.geometry.Point(
+								location.x + delta, location.y));
+			}
+
 			@Override
 			public void controlMoved(ControlEvent e) {
 				// do nothing
-				
+
 			}
 		});
-		getControl().setBackground(FMPropertyManager.getDiagramBackgroundColor());
+		getControl().setBackground(
+				FMPropertyManager.getDiagramBackgroundColor());
 		setEditPartFactory(new GraphicalEditPartFactory());
 		rootEditPart = new ScalableFreeformRootEditPart();
 		((ConnectionLayer) rootEditPart
@@ -189,7 +231,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		FeatureModel featureModel = getFeatureModel();
 
 		createLayerAction = new CreateLayerAction(this, featureModel, null);
-		createCompoundAction = new CreateCompoundAction(this, featureModel, null);
+		createCompoundAction = new CreateCompoundAction(this, featureModel,
+				null);
 		deleteAction = new DeleteAction(this, featureModel);
 		deleteAllAction = new DeleteAllAction(this, featureModel);
 		mandatoryAction = new MandatoryAction(this, featureModel);
@@ -207,7 +250,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		editConstraintAction = new EditConstraintAction(this, featureModel);
 		reverseOrderAction = new ReverseOrderAction(this, featureModel);
 
-//		legendAction = new LegendAction(this, featureModel);
+		// legendAction = new LegendAction(this, featureModel);
 		legendLayoutAction = new LegendLayoutAction(this, featureModel);
 
 		showHiddenFeaturesAction = new ShowHiddenFeaturesAction(this,
@@ -248,8 +291,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	private void fillContextMenu(IMenuManager menu) {
 		IMenuManager subMenu = new MenuManager("Set Layout");
 
-		showHiddenFeaturesAction.setChecked(getFeatureModel()
-				.getLayout().showHiddenFeatures());
+		showHiddenFeaturesAction.setChecked(getFeatureModel().getLayout()
+				.showHiddenFeatures());
 
 		for (int i = 0; i < setLayoutActions.size(); i++) {
 			subMenu.add(setLayoutActions.get(i));
@@ -257,13 +300,14 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 				subMenu.add(autoLayoutConstraintAction);
 				subMenu.add(new Separator());
 			}
-			boolean isChosen = (i == getFeatureModel().getLayout().getLayoutAlgorithm());
+			boolean isChosen = (i == getFeatureModel().getLayout()
+					.getLayoutAlgorithm());
 			setLayoutActions.get(i).setChecked(isChosen);
 			setLayoutActions.get(i).setEnabled(!isChosen);
 		}
 
-		autoLayoutConstraintAction.setEnabled(!getFeatureModel()
-				.getLayout().hasFeaturesAutoLayout());
+		autoLayoutConstraintAction.setEnabled(!getFeatureModel().getLayout()
+				.hasFeaturesAutoLayout());
 
 		boolean connectionSelected = alternativeAction.isConnectionSelected();
 
@@ -303,7 +347,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 			menu.add(reverseOrderAction);
 		}
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-//		menu.add(legendAction);
+		// menu.add(legendAction);
 		if (featureModelEditor.getFeatureModel().hasHidden()) {
 			menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 			menu.add(showHiddenFeaturesAction);
@@ -390,21 +434,23 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		if (!onlyLayout && outline != null) {
 			outline.setInput(getFeatureModel());
 		}
-		
+
 		// refresh size of all feature figures
-		if (!onlyLayout)	getContents().refresh();
-		
+		if (!onlyLayout)
+			getContents().refresh();
+
 		// layout all features if autoLayout is enabled
 		setLayout();
-		
+
 		// refresh position of all feature figures
-		if (!onlyLayout)	getContents().refresh();
+		if (!onlyLayout)
+			getContents().refresh();
 	}
-	
+
 	boolean waiting = false;
-	
+
 	private FeatureModelAnalyzer analyzer;
-	
+
 	public void refresh() {
 		if (getFeatureModel() == null || getFeatureModel().getRoot() == null)
 			return;
@@ -416,13 +462,13 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		}
 		waiting = true;
 		/**
-		 * This extra job is necessary, else the UI will stop. 
+		 * This extra job is necessary, else the UI will stop.
 		 */
 		Job waiter = new Job("Analyze feature model (waiting)") {
-			
+
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
-				
+
 				try {
 					if (analyzeJob != null && analyzer != null) {
 						// waiting for analyzing job to finish
@@ -439,7 +485,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 					waiting = false;
 				}
 				analyzeJob = new Job("Analyze feature model") {
-		
+
 					@Override
 					protected IStatus run(IProgressMonitor monitor) {
 						if (waiting) {
@@ -448,37 +494,46 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 
 						analyzer = getFeatureModel().getAnalyser();
 
-						final HashMap<Object, Object> changedAttributes = analyzer.analyzeFeatureModel(monitor);
-						
-						UIJob refreshGraphics = new UIJob("Updating feature model attributes") {
-		
+						final HashMap<Object, Object> changedAttributes = analyzer
+								.analyzeFeatureModel(monitor);
+
+						UIJob refreshGraphics = new UIJob(
+								"Updating feature model attributes") {
+
 							@Override
-							public IStatus runInUIThread(IProgressMonitor monitor) {
+							public IStatus runInUIThread(
+									IProgressMonitor monitor) {
 								for (Object f : changedAttributes.keySet()) {
 									if (f instanceof Feature) {
-										((Feature) f).fire(new PropertyChangeEvent(
-												this, ATTRIBUTE_CHANGED, false, true));
+										((Feature) f)
+												.fire(new PropertyChangeEvent(
+														this,
+														ATTRIBUTE_CHANGED,
+														false, true));
 									} else if (f instanceof Constraint) {
-										((Constraint) f).fire(new PropertyChangeEvent(
-												this, ATTRIBUTE_CHANGED, false, true));
+										((Constraint) f)
+												.fire(new PropertyChangeEvent(
+														this,
+														ATTRIBUTE_CHANGED,
+														false, true));
 									}
 								}
-								
-								//call refresh to redraw legend
+
+								// call refresh to redraw legend
 								getContents().refresh();
 								return Status.OK_STATUS;
 							}
-		
+
 						};
 						refreshGraphics.setPriority(Job.SHORT);
 						refreshGraphics.schedule();
-						
+
 						monitor.subTask(null);
 						monitor.done();
 						monitor.setCanceled(true);
 						return Status.OK_STATUS;
 					};
-		
+
 				};
 				analyzeJob.setPriority(Job.LONG);
 				analyzeJob.schedule();
@@ -536,12 +591,12 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 			refresh();
 		} else if (prop.equals(MODEL_LAYOUT_CHANGED)) {
 			featureModelEditor.setPageModified(true);
-		}else if (prop.equals(REDRAW_DIAGRAM)) {
+		} else if (prop.equals(REDRAW_DIAGRAM)) {
 			featureModelEditor.textEditor.updateTextEditor();
 			featureModelEditor.textEditor.updateDiagram();
 		} else if (prop.equals(REFRESH_ACTIONS)) {
 			// additional actions can be refreshed here
-//			legendAction.refresh();
+			// legendAction.refresh();
 			legendLayoutAction.refresh();
 		}
 
@@ -642,7 +697,9 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 			if (!featureModelEditor.textEditor.updateDiagram()) {
 				// there are errors in the file, stay at this editor page
 				featureModelEditor.isPageModified = false;
-				featureModelEditor.setActiveEditorPage(featureModelEditor.textEditor.getIndex());
+				featureModelEditor
+						.setActiveEditorPage(featureModelEditor.textEditor
+								.getIndex());
 				return;
 			}
 		}
