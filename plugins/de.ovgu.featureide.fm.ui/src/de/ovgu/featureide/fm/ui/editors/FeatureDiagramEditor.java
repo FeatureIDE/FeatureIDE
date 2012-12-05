@@ -61,7 +61,6 @@ import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
-import de.ovgu.featureide.fm.core.FeatureModelLayout;
 import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
