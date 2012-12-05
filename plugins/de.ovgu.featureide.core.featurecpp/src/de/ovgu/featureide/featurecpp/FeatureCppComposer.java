@@ -47,7 +47,8 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
  * @author Jens Meinicke
  */
 public class FeatureCppComposer extends ComposerExtensionClass {
-
+	private static final String PLUGIN_ID = "org.eclipse.cdt";
+	private static final String PLUGIN_WARNING = "The required bundle "+PLUGIN_ID+" is not installed.";
 	public static final String COMPOSER_ID = "de.ovgu.featureide.composer.featurecpp";
 	public static final String C_NATURE = "org.eclipse.cdt.core.cnature";
 	public static final String CC_NATURE = "org.eclipse.cdt.core.ccnature";
@@ -123,6 +124,10 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 
 
 	public void performFullBuild(IFile config) {
+		if(!isPluginInstalled(PLUGIN_ID)){
+			generateWarning(PLUGIN_WARNING);	
+			return;
+		}
 		initialize(CorePlugin.getFeatureProject(config));
 		featureCpp.compose(config);
 		buildFSTModel();

@@ -27,8 +27,10 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.Vector;
 
+import org.eclipse.core.internal.runtime.InternalPlatform;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
@@ -42,6 +44,7 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.core.ClasspathEntry;
 import org.eclipse.jdt.internal.core.JavaProject;
+import org.osgi.framework.Bundle;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
@@ -355,5 +358,16 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	
 	public boolean hasContractComposition() {
 		return false;
+	}
+	
+	protected boolean isPluginInstalled(String ID) {
+		for(Bundle b :InternalPlatform.getDefault().getBundleContext().getBundles()){
+			if(b.getSymbolicName().startsWith(ID))return true;
+		}
+		return false;
+	}
+	protected void generateWarning(String Warning) {
+		this.featureProject.createBuilderMarker(featureProject
+				.getProject(), Warning, 0, IMarker.SEVERITY_WARNING);
 	}
 }

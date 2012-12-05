@@ -66,8 +66,8 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 // implement buildconfiguration
 @SuppressWarnings("restriction")
 public class AspectJComposer extends ComposerExtensionClass {
-	private static final String ASPECTJ_ID = "org.eclipse.ajdt";
-	private static final String AJDT_WARNING = "The required bundle org.eclipse.ajdt is not installed.";
+	private static final String PLUGIN_ID = "org.eclipse.ajdt";
+	private static final String PLUGIN_WARNING = "The required bundle "+PLUGIN_ID+" is not installed.";
 	private static final String ASPECTJ_NATURE = "org.eclipse.ajdt.ui.ajnature";
 	
 	private static final String NEW_ASPECT = "\t// TODO Auto-generated aspect\r\n";
@@ -101,8 +101,9 @@ public class AspectJComposer extends ComposerExtensionClass {
 			return;
 		}
 		assert(featureProject != null) : "Invalid project given";
-		if(!isAJDTInstalled()){
-			generateAJDTWarning();	
+		if(!isPluginInstalled(PLUGIN_ID)){
+			generateWarning(PLUGIN_WARNING);	
+			return;
 		}
 		
 		final String configPath =  config.getRawLocation().toOSString();
@@ -141,20 +142,13 @@ public class AspectJComposer extends ComposerExtensionClass {
 		}
 	}
 
-	/**
-	 * generates a warning that indicates missing AJDT plugin
-	 */
-	private void generateAJDTWarning() {
-		this.featureProject.createBuilderMarker(featureProject
-				.getProject(), AJDT_WARNING, 0, IMarker.SEVERITY_WARNING);
-	}
 
-	/**
-	 * returns true if AJDT plugin is installed
-	 */
-	private boolean isAJDTInstalled() {
+
+
+
+	public boolean isPluginInstalled(String ID) {
 		for(Bundle b :InternalPlatform.getDefault().getBundleContext().getBundles()){
-			if(b.getSymbolicName().startsWith(ASPECTJ_ID))return true;
+			if(b.getSymbolicName().startsWith(ID))return true;
 		}
 		return false;
 	}
