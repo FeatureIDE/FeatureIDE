@@ -146,7 +146,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 					IDocument document = provider.getDocument(input);
 					IFile file = ((FileEditorInput) input).getFile();
 					IFeatureProject project = CorePlugin.getFeatureProject(file);
-					if (project != null && project.getComposer().needColor()) {
+					if (project != null && project.getComposer()!=null&&project.getComposer().needColor()) {
 						
 						colormodel = new ColorAnnotationModel(document, file, project, editor);
 						modelex.addAnnotationModel(KEY, colormodel);
