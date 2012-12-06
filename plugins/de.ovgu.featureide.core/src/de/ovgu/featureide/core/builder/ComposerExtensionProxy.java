@@ -149,7 +149,7 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#copyNotComposedFiles()
 	 */
-	public void copyNotComposedFiles(IFile config, IFolder destination) {
+	public void copyNotComposedFiles(Configuration config, IFolder destination) {
 		composerExtensionClass.copyNotComposedFiles(config, destination);
 	}
 

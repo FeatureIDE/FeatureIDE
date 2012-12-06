@@ -45,6 +45,7 @@ import de.ovgu.featureide.antenna.model.AntennaModelBuilder;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.preprocessor.PPComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 /**
@@ -397,7 +398,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	}
 
 	@Override
-	public void copyNotComposedFiles(IFile config, IFolder destination) {
+	public void copyNotComposedFiles(Configuration config, IFolder destination) {
 		
 	}
 

@@ -18,13 +18,11 @@
  */
 package de.ovgu.featureide.core.builder;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Scanner;
+import java.util.Set;
 import java.util.Vector;
 
 import org.eclipse.core.internal.runtime.InternalPlatform;
@@ -49,6 +47,7 @@ import org.osgi.framework.Bundle;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
+import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
 
@@ -77,11 +76,12 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		return true;
 	}
 
-	public void copyNotComposedFiles(IFile config, IFolder destination) {
-		ArrayList<String > selectedFeatures = getSelectedFeatures(config);
+	public void copyNotComposedFiles(Configuration c, IFolder destination) {
+		
+		Set<Feature> selectedFeatures = c.getSelectedFeatures();
 		if (selectedFeatures != null)
-			for (String feature : selectedFeatures) {
-				IFolder folder = featureProject.getSourceFolder().getFolder(feature);
+			for (Feature feature : selectedFeatures) {
+				IFolder folder = featureProject.getSourceFolder().getFolder(feature.getName());
 				try {
 					copy(folder, destination);
 				} catch (CoreException e) {
@@ -113,41 +113,8 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		}
 	}
 
-	// TODO #460 this should be done with a ConfigurationReader
-	private ArrayList<String> getSelectedFeatures(IFile config) {
-		File configFile = config.getRawLocation().toFile();
-		return getTokenListFromFile(configFile);
-	}
 
-	/**
-	 * returns a List of the tokens in file+
-	 * this method is public for testing purposes 
-	 * 
-	 * @param file
-	 * @return List of tokens
-	 */
-	public static ArrayList<String> getTokenListFromFile(File file) {
-		ArrayList<String> list = null;
-		Scanner scanner = null;
-
-		try {
-			scanner = new Scanner(file, "UTF-8");
-
-			if (scanner.hasNext()) {
-				list = new ArrayList<String>();
-				while (scanner.hasNext()) {
-					list.add(scanner.next());
-				}
-
-			}
-
-		} catch (FileNotFoundException e) {
-			CorePlugin.getDefault().logError(e);
-		} finally {
-			if(scanner!=null)scanner.close();
-		}
-		return list;
-	}
+	
 
 	public LinkedHashSet<String> extensions() {
 		return new LinkedHashSet<String>(0);
@@ -330,7 +297,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 			IFile configurationFile = folder.getFile(congurationName + "." + getConfigurationExtension());
 			ConfigurationWriter writer = new ConfigurationWriter(configuration);
 			writer.saveToFile(configurationFile);
-			copyNotComposedFiles(configurationFile, folder);
+			copyNotComposedFiles(configuration, folder);
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}

@@ -210,7 +210,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 	}
 
 	@Override
-	public void copyNotComposedFiles(IFile config, IFolder destination) {
+	public void copyNotComposedFiles(Configuration config, IFolder destination) {
 		
 	}
 	

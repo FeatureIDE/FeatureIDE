@@ -5,6 +5,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
 
 /**
  * 
@@ -45,7 +46,7 @@ public class FeatureModeling extends ComposerExtensionClass {
 	}
 
 	@Override
-	public void copyNotComposedFiles(IFile config, IFolder destination) {
+	public void copyNotComposedFiles(Configuration config, IFolder destination) {
 	
 	}
 

@@ -61,7 +61,8 @@ public class ConfigurationReader {
 	public boolean readFromString(String text) {
 		InputStream inputStream = null;
 		try {
-			inputStream = new ByteArrayInputStream(text.getBytes(Charset.availableCharsets().get("UTF-8")));
+			inputStream = new ByteArrayInputStream(text.getBytes(Charset
+					.availableCharsets().get("UTF-8")));
 			return readFromInputStream(inputStream);
 		} catch (IOException e) {
 			FMCorePlugin.getDefault().logError(e);
@@ -85,11 +86,10 @@ public class ConfigurationReader {
 		Integer lineNumber = 1;
 		boolean successful = true;
 		try {
-			reader = new BufferedReader(new InputStreamReader(inputStream, Charset.availableCharsets().get("UTF-8")));
-			while ((line = reader.readLine()) != null)
-			{				
-				if (line.startsWith("#") || line.isEmpty() || line.equals(" "))
-				{
+			reader = new BufferedReader(new InputStreamReader(inputStream,
+					Charset.availableCharsets().get("UTF-8")));
+			while ((line = reader.readLine()) != null) {
+				if (line.startsWith("#") || line.isEmpty() || line.equals(" ")) {
 					lineNumber++;
 					continue;
 				}
@@ -99,47 +99,48 @@ public class ConfigurationReader {
 				LinkedList<String> hiddenFeatures = new LinkedList<String>();
 				while (tokenizer.hasMoreTokens()) {
 					String name = tokenizer.nextToken(" ");
-					if (name.startsWith("\""))
-					{
-						try 
-						{
+					if (name.startsWith("\"")) {
+						try {
 							name = name.substring(1);
 							name += tokenizer.nextToken("\"");
-						} catch (NoSuchElementException e) 
-						{
+						} catch (NoSuchElementException e) {
 							successful = false;
-							warnings.add("Feature '" + name + "' is corrupt. No ending quotation marks found.");
+							warnings.add("Feature '"
+									+ name
+									+ "' is corrupt. No ending quotation marks found.");
 							positions.add(lineNumber);
 							return false;
-						} catch (NullPointerException e)
-						{
+						} catch (NullPointerException e) {
 							successful = false;
-							warnings.add("Feature '" + name + "' is corrupt. No ending quotation marks found.");
+							warnings.add("Feature '"
+									+ name
+									+ "' is corrupt. No ending quotation marks found.");
 							positions.add(lineNumber);
 							return false;
 						}
-						//Check for ending quotation mark
-						try
-						{
+						// Check for ending quotation mark
+						try {
 							String endingDelimiter = tokenizer.nextToken(" ");
-							if (!endingDelimiter.startsWith("\""))
-							{
+							if (!endingDelimiter.startsWith("\"")) {
 								successful = false;
-								warnings.add("Feature '" + name + "' is corrupt. No ending quotation marks found.");
+								warnings.add("Feature '"
+										+ name
+										+ "' is corrupt. No ending quotation marks found.");
 								positions.add(lineNumber);
 								return false;
 							}
-						}
-						catch (Exception e)
-						{
+						} catch (Exception e) {
 							successful = false;
-							warnings.add("Feature '" + name + "' is corrupt. No ending quotation marks found.");
+							warnings.add("Feature '"
+									+ name
+									+ "' is corrupt. No ending quotation marks found.");
 							positions.add(lineNumber);
 							return false;
 						}
 					}
 
-					Feature feature = configuration.getFeatureModel().getFeature(name);
+					Feature feature = configuration.getFeatureModel()
+							.getFeature(name);
 					if (feature != null && feature.hasHiddenParent()) {
 						hiddenFeatures.add(name);
 					} else {
@@ -147,8 +148,7 @@ public class ConfigurationReader {
 							configuration.setManual(name, Selection.SELECTED);
 						} catch (FeatureNotFoundException e) {
 							successful = false;
-							warnings.add("Feature " + name
-									+ " does not exist");
+							warnings.add("Feature " + name + " does not exist");
 							positions.add(lineNumber);
 							return false;
 						} catch (SelectionNotPossibleException e) {
@@ -165,14 +165,12 @@ public class ConfigurationReader {
 						configuration.setAutomatic(name, Selection.SELECTED);
 					} catch (FeatureNotFoundException e) {
 						successful = false;
-						warnings.add("Feature " + name
-								+ " does not exist");
+						warnings.add("Feature " + name + " does not exist");
 						positions.add(lineNumber);
 						return false;
 					} catch (SelectionNotPossibleException e) {
 						successful = false;
-						warnings.add("Feature " + name
-								+ " cannot be selected");
+						warnings.add("Feature " + name + " cannot be selected");
 						positions.add(lineNumber);
 						return false;
 					}

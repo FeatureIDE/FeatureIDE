@@ -18,7 +18,6 @@
  */
 package de.ovgu.featureide.featurehouse;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -438,54 +437,9 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	public LinkedHashSet<String> extensions() {
 		return EXTENSIONS;
 	}
+	
 
-	@Override
-	public void copyNotComposedFiles(IFile config, IFolder destination) {
-		try {
-			copy(config, destination);
-		} catch (CoreException e) {
-			FeatureHouseCorePlugin.getDefault().logError(e);
-		}
-	}
 
-	private void copy(IFile config, IFolder destination) throws CoreException {
-		ArrayList<String> selectedFeatures = getSelectedFeatures(config);
-		if (selectedFeatures != null)
-			for (String feature : selectedFeatures) {
-				IFolder folder = featureProject.getSourceFolder().getFolder(
-						feature);
-				copy(folder,destination);
-			}
-	}
-
-	private void copy(IFolder featureFolder, IFolder buildFolder)
-			throws CoreException {
-		if (!featureFolder.exists()) {
-			return;
-		}
-
-		for (IResource res : featureFolder.members()) {
-			if (res instanceof IFolder) {
-				IFolder folder = buildFolder.getFolder(res.getName());
-				if (!folder.exists()) {
-					folder.create(false, true, null);
-				}
-				copy((IFolder) res, folder);
-			} else if (res instanceof IFile) {
-				if (!extensions().contains(res.getFileExtension())) {
-					IFile file = buildFolder.getFile(res.getName());
-					if (!file.exists()) {
-						res.copy(file.getFullPath(), true, null);
-					}
-				}
-			}
-		}
-	}
-
-	private static ArrayList<String> getSelectedFeatures(IFile config) {
-		File configFile = config.getRawLocation().toFile();
-		return getTokenListFromFile(configFile);
-	}
 
 	@Override
 	public ArrayList<String[]> getTemplates() {

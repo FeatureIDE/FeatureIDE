@@ -30,6 +30,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 
 
 /**
@@ -146,7 +148,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 			return null;
 
 		cleaned = false;
-		IFile config = featureProject.getCurrentConfiguration();
+		IFile configFile = featureProject.getCurrentConfiguration();
 		featureProject.deleteBuilderMarkers(getProject(),
 				IResource.DEPTH_INFINITE);
 		
@@ -160,13 +162,13 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 			CorePlugin.getDefault().logError(e);
 		}
 
-		if (config == null) {
+		if (configFile == null) {
 			return null;
 		}
 		if(featureProject.getFeatureModel()==null||featureProject.getFeatureModel().getRoot()==null){
 			return null;
 		}
-		composerExtension.performFullBuild(config);
+		composerExtension.performFullBuild(configFile);
 		
 		featureProject.built();
 		try {
@@ -175,7 +177,14 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
-		composerExtension.copyNotComposedFiles(config, featureProject.getBuildFolder());
+		Configuration c = new Configuration(featureProject.getFeatureModel());
+		ConfigurationReader reader = new ConfigurationReader(c);
+		try {
+			reader.readFromFile(configFile);
+		} catch (Exception e) {
+			CorePlugin.getDefault().logError(e);
+		} 
+		composerExtension.copyNotComposedFiles(c, featureProject.getBuildFolder());
 		try {
 			featureProject.getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
 		} catch (CoreException e) {

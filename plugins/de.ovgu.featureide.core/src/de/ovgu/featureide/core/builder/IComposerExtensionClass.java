@@ -77,10 +77,10 @@ public interface IComposerExtensionClass {
 	
 	/**
 	 * Copies not composed files to the source folder
-	 * @param config The configuration file
+	 * @param config The configuration 
 	 * @param destination The destination to copy
 	 */
-	void copyNotComposedFiles(IFile config, IFolder destination);
+	void copyNotComposedFiles(Configuration config, IFolder destination);
 	
 	/**
 	 * 
