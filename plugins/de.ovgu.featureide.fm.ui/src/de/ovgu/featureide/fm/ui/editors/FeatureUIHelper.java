@@ -101,9 +101,19 @@ public class FeatureUIHelper {
 	}
 
 	public static Rectangle getBounds(Feature feature) {
+
+		if(getLocation(feature)==null||getSize(feature)==null){
+			//UIHelper not set up correctly, refresh the feature model
+			feature.getFeatureModel().handleModelDataChanged();
+		}
+	
 		return new Rectangle(getLocation(feature), getSize(feature));
 	}
 	public static Rectangle getBounds(Constraint constraint) {
+		if(getLocation(constraint)==null||getSize(constraint)==null){
+			//UIHelper not set up correctly, refresh the feature model
+			constraint.getFeatureModel().handleModelDataChanged();
+		}
 		return new Rectangle(getLocation(constraint), getSize(constraint));
 	}
 	private static void fireLocationChanged(Feature feature, Point oldLocation,

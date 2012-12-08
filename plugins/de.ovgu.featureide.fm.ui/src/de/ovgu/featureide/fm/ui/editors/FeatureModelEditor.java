@@ -54,6 +54,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -113,7 +114,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 	FeatureModelFile fmFile;
 	private IFile file;
 	private int operationCounter;
-	private PrintAction printAction;
+	private FMPrintAction printAction;
 	private SelectAllAction selectAllAction;
 	private UndoActionHandler undoAction;
 	private RedoActionHandler redoAction;
@@ -292,7 +293,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		ObjectUndoContext undoContext = new ObjectUndoContext(this);
 		featureModel.setUndoContext(undoContext);
 
-		printAction = new PrintAction(this);
+		printAction = new FMPrintAction((IWorkbenchPart)this);
 		selectAllAction = new SelectAllAction(this);
 
 		undoAction = new UndoActionHandler(this.getSite(), undoContext);
