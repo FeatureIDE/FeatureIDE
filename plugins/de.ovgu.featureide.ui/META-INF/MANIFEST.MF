@@ -18,7 +18,7 @@ Bundle-ActivationPolicy: lazy
 Bundle-ClassPath:  lib/tools.jar,.
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: University of Magdeburg
-Export-Package: de.ovgu.featureide.ui.editors,
+Export-Package: 
  de.ovgu.featureide.ui.views.collaboration.action,
  de.ovgu.featureide.ui.wizards
 Import-Package: de.ovgu.featureide.ui.views.collaboration.action,

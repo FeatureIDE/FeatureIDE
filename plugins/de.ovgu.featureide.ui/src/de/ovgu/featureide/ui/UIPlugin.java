@@ -23,7 +23,7 @@ import org.eclipse.ui.PlatformUI;
 import org.osgi.framework.BundleContext;
 
 import de.ovgu.featureide.fm.ui.AbstractUIPlugin;
-import de.ovgu.featureide.ui.editors.JavaEditor;
+
 import de.ovgu.featureide.ui.editors.annotation.EditorTracker;
 
 /**
@@ -50,8 +50,6 @@ public class UIPlugin extends AbstractUIPlugin {
 		super.start(context);
 		plugin = this;
 		
-		// XXX this is a bad workaround, but it seems to work pretty good
-		PlatformUI.getWorkbench().getEditorRegistry().setDefaultEditor("*.java", JavaEditor.ID);
 		
 		editorTracker = new EditorTracker(PlatformUI.getWorkbench());
 	}

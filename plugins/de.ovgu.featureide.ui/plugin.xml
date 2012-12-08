@@ -259,17 +259,6 @@
      		    contentTypeId="de.ovgu.featureide.contenttype.jak">
     		  </contentTypeBinding>
       </editor>
-      <editor
-            class="de.ovgu.featureide.ui.editors.JavaEditor"
-            contributorClass="org.eclipse.ui.editors.text.TextEditorActionContributor"
-            default="true"
-            icon="icons/JakFileIcon.png"
-            id="de.ovgu.featureide.ui.editors.JavaEditor"
-            name="Extended Java Editor">
-         <contentTypeBinding
-               contentTypeId="de.ovgu.featureide.contenttype.java">
-         </contentTypeBinding>
-      </editor>
    </extension>
    <extension
          point="org.eclipse.help.contexts">
