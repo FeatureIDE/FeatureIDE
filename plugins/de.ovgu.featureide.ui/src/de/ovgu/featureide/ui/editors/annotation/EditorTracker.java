@@ -74,22 +74,14 @@ public class EditorTracker {
 
 	private IPartListener2 partListener = new IPartListener2() {
 		public void partOpened(IWorkbenchPartReference partref) {
-			try {
-				renameEditor(partref);
-			} catch (Exception e) {
-				UIPlugin.getDefault().logError(e);
-			}
+
 			annotateEditor(partref);
 		}
 
 		public void partActivated(IWorkbenchPartReference partref) {
 
 			if (annotatedPartrefSet.contains(partref)) {
-				try {
-					renameEditor(partref);
-				} catch (Exception e) {
-					UIPlugin.getDefault().logError(e);
-				}
+		
 				updateEditor(partref);
 			}
 		}
@@ -98,7 +90,11 @@ public class EditorTracker {
 		}
 
 		public void partVisible(IWorkbenchPartReference partref) {
-
+			try {
+				renameEditor(partref);
+			} catch (Exception e) {
+				UIPlugin.getDefault().logError(e);
+			}
 		}
 
 		public void partInputChanged(IWorkbenchPartReference partref) {
@@ -153,19 +149,21 @@ public class EditorTracker {
 	private void renameEditor(IWorkbenchPartReference partref)
 			throws IllegalAccessException, IllegalArgumentException,
 			InvocationTargetException, NoSuchMethodException, SecurityException {
+		if(!(partref.getPart(true) instanceof IEditorPart))return;
 		IEditorPart editorPart = (IEditorPart) partref.getPart(true);
 		IEditorInput input = editorPart.getEditorInput();
 		if (!(input instanceof IFileEditorInput))
 			return;
 		IFile file = ((IFileEditorInput) input).getFile();
-		if (!file.getFileExtension().equals("java"))
+		if(file==null)return;
+		String fileExt = file.getFileExtension();
+		if (fileExt==null||!fileExt.equals("java"))
 			return;
 		IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
 		if (featureProject == null)
 			return;
 		String title = getTitle(partref, file);
 		WorkbenchPart workBenchpart = (WorkbenchPart) partref.getPart(false);
-
 		invokeMethod(workBenchpart, "setPartName", String.class, title);
 		invokeMethod(workBenchpart, "setTitleImage", Image.class, TITLE_IMAGE);
 	}
