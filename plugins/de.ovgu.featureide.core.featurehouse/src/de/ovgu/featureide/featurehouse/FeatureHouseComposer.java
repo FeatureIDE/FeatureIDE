@@ -52,6 +52,7 @@ import composer.FSTGenComposer;
 import composer.FSTGenComposerExtension;
 import composer.IParseErrorListener;
 
+import de.ovgu.cide.fstgen.ast.FSTNode;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.featurehouse.errorpropagation.ErrorPropagation;
@@ -282,13 +283,14 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		} catch (Error e) {
 			FeatureHouseCorePlugin.getDefault().logError(e);
 		}
-		
-		fhModelBuilder.buildModel(composer.getFstnodes(), false);
-
-		TreeBuilderFeatureHouse fstparser = new TreeBuilderFeatureHouse(
-				featureProject.getProjectName());
-		fstparser.createProjectTree(composer.getFstnodes());
-		featureProject.setProjectTree(fstparser.getProjectTree());
+		ArrayList<FSTNode> fstnodes = composer.getFstnodes();
+		if (fstnodes != null) {
+			fhModelBuilder.buildModel(fstnodes, false);
+			TreeBuilderFeatureHouse fstparser = new TreeBuilderFeatureHouse(
+					featureProject.getProjectName());
+			fstparser.createProjectTree(fstnodes);
+			featureProject.setProjectTree(fstparser.getProjectTree());
+		}
 		callCompiler();
 	}
 
@@ -519,8 +521,11 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			FeatureHouseCorePlugin.getDefault().logError(e);
 		}
 		
-		fhModelBuilder.buildModel(composer.getFstnodes(), false);
-		composer.getFstnodes().clear();
+		ArrayList<FSTNode> fstnodes = composer.getFstnodes();
+		if (fstnodes != null) {
+			fhModelBuilder.buildModel(fstnodes, false);
+			fstnodes.clear();
+		}
 	}
 
 	@Override
@@ -597,4 +602,11 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	public boolean hasContractComposition() {
 		return true;
 	}
+	@Override
+	public void copyNotComposedFiles(Configuration config, IFolder destination) {
+		super.copyNotComposedFiles(config, destination.getFolder(
+				featureProject.getCurrentConfiguration().getName().split("[.]")[0]));
+
+	}
+	
 }

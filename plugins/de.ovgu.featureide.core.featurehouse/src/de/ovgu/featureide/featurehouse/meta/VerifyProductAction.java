@@ -10,24 +10,35 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Scanner;
 
+import javax.annotation.CheckForNull;
+
+import org.eclipse.core.internal.resources.Workspace;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.deferred.SetModel;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.internal.win32.OPENFILENAME;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.util.BundleUtility;
 
 import de.ovgu.featureide.core.CorePlugin;
@@ -45,7 +56,10 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 public class VerifyProductAction implements IObjectActionDelegate {
 
 	private final static String VERIFIKATION_MARKER = "de.ovgu.featureide.featurehouse.meta.verificationmarker";
-
+	public static final IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+	private static final QualifiedName MONKEY = new QualifiedName(VerifyProductAction.class.getName() +"#MonKey",
+			VerifyProductAction.class.getName() +"#MonKey");
+	
 	private boolean errorOccured = false;
 
 	private StructuredSelection selection;
@@ -53,8 +67,9 @@ public class VerifyProductAction implements IObjectActionDelegate {
 	private Process process;
 	
 	private static ArrayList<String> command = new ArrayList<String>();
-	static {
-		command.add(getCommand("monkey.exe", "MonKeY"));
+	private void setCommand() {
+		command.clear();
+		command.add(getMonKeY());
 		command.add("-batch");
 		command.add("-nosplash");
 //		command.add("-mtcontract"); // Method Treatment Contract
@@ -67,6 +82,49 @@ public class VerifyProductAction implements IObjectActionDelegate {
 		command.add("-out");
 	};
 
+	private String getMonKeY() {
+		Path path;
+		String library;
+		String persistentPath = getPersistentMonKeY();
+		if (persistentPath != null) {
+			path = new Path(persistentPath);
+			library = path.toOSString();
+			if (path.isAbsolute() && path.isValidPath(library)) {
+				return library;
+			}
+		}
+		path = new Path(openFileDialog());
+		library = path.toOSString();
+		if (!path.isAbsolute()) {
+			FeatureHouseCorePlugin.getDefault().logWarning(library + " is not an absolute path. " +
+					"MonKeY can not be found.");
+		}
+		if (!path.isValidPath(library)) {
+			FeatureHouseCorePlugin.getDefault().logWarning(library + " is no valid path. " +
+					"MonKey can not be found.");
+		}
+		setPersistentMonKeY(library);
+		return library;
+	}
+	
+	@CheckForNull
+	private String getPersistentMonKeY() {
+		try {
+			return workspaceRoot.getPersistentProperty(MONKEY);
+		} catch (CoreException e) {
+			FeatureHouseCorePlugin.getDefault().logError(e);
+		}
+		return null;
+	}
+	
+	private void setPersistentMonKeY(String path) {
+		try {
+			 workspaceRoot.setPersistentProperty(MONKEY, path);
+		} catch (CoreException e) {
+			FeatureHouseCorePlugin.getDefault().logError(e);
+		}
+	}
+	
 	private static String getCommand(String pathName, String toolName) {
 		URL url = BundleUtility.find(FeatureHouseCorePlugin.getDefault().getBundle(), "lib/monkey/" + pathName);
 		try {
@@ -87,6 +145,13 @@ public class VerifyProductAction implements IObjectActionDelegate {
 		return library;
 	}
 	
+	private static String openFileDialog() {
+		FileDialog dialog = new FileDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), SWT.MULTI);
+		dialog.setText("Select MonKeY");
+		dialog.setFileName("monkey.exe");		
+		return dialog.open();
+	}
+	
 	private static final String TRUE = "true";
 	private static final String FALSE = "false";
 	
@@ -101,6 +166,7 @@ public class VerifyProductAction implements IObjectActionDelegate {
 	
 	@Override
 	public void run(IAction action) {
+		setCommand();
 		if (selection == null) {
 			return;
 		}

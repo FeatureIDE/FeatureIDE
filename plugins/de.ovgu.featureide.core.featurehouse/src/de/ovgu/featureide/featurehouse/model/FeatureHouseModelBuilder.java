@@ -21,6 +21,8 @@ package de.ovgu.featureide.featurehouse.model;
 import java.io.File;
 import java.util.ArrayList;
 
+import javax.annotation.Nonnull;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.Path;
 
@@ -75,7 +77,8 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 	 * @param completeModel <code>true</code> for completions mode: old methods will not be overwritten
 	 */
 	@SuppressWarnings("unchecked")
-	public void buildModel(ArrayList<FSTNode> nodes, boolean completeModel) {
+	public void buildModel(@Nonnull ArrayList<FSTNode> nodes, boolean completeModel) {
+
 		this.completeModel = completeModel;
 		if (!completeModel) {
 			model.reset();

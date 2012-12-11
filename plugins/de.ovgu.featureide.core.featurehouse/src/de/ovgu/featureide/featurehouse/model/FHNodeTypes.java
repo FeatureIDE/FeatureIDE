@@ -29,7 +29,7 @@ public interface FHNodeTypes {
 
 	// Java specific node types
 	static final String JAVA_NODE_CLASS_DECLARATION = "ClassDeclaration";
-	static final String JAVA_NODE_FIELD = "ModFieldDeclaration";
+	static final String JAVA_NODE_FIELD = "FieldDecl";
 	static final String JAVA_NODE_METHOD = "MethodDecl";
 	static final String JAVA_NODE_CONSTRUCTOR = "ConstructorDecl";
 //	static final String COMPOSITION_RULE_NAME = "JavaMethodOverriding";
