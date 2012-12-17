@@ -77,7 +77,7 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 	 * @param completeModel <code>true</code> for completions mode: old methods will not be overwritten
 	 */
 	@SuppressWarnings("unchecked")
-	public void buildModel(@Nonnull ArrayList<FSTNode> nodes, boolean completeModel) {
+	public void buildModel(ArrayList<FSTNode> nodes, boolean completeModel) {
 
 		this.completeModel = completeModel;
 		if (!completeModel) {

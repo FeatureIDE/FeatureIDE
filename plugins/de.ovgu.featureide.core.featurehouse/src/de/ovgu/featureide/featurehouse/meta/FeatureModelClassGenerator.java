@@ -115,7 +115,7 @@ public class FeatureModelClassGenerator {
 				stringBuilder.append(" = random();\n");
 			}
 		}
-		stringBuilder.append("\t\tif (!fm()) {\n\t\t\tthrow new Error();\n\t\t}\n\t}\n\n\t/**\r\n\t * This formula represents the validity of the current feature selection.\r\n\t */\r\n\tprivate /*@pure@*/ static boolean fm() {\n\t\treturn ");
+		stringBuilder.append("\t\tif (!fm()) {\n\t\t\tthrow new Error();\n\t\t}\n\t}\n\n\t/**\r\n\t * This formula represents the validity of the current feature selection.\r\n\t */\r\n\tpublic /*@pure@*/ static boolean fm() {\n\t\treturn ");
 	}
 
 }

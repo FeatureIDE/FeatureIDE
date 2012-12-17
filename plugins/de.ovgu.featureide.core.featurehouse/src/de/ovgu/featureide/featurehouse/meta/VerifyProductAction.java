@@ -12,7 +12,6 @@ import java.util.Scanner;
 
 import javax.annotation.CheckForNull;
 
-import org.eclipse.core.internal.resources.Workspace;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
@@ -32,9 +31,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.deferred.SetModel;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.internal.win32.OPENFILENAME;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
