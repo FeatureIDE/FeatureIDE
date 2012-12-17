@@ -169,7 +169,6 @@ public class CollaborationModelBuilder {
 			selected = false;
 		if (selected || showUnselectedFeatures) {
 			LinkedList<FSTRole> roles = fstFeature.getRoles();
-			
 				for (FSTRole fstRole : roles) {
 					String className = fstRole.getFSTClass().getName();
 					if (classFilter.size() == 0 || classFilter.contains(className)) {

@@ -414,12 +414,10 @@ public class ModelEditPart extends AbstractGraphicalEditPart implements GUIDefau
 		return new Rectangle(partFigure.getBounds());
 	}
 	
-	private UnderlayerFigure getUnderlayerFigure(RoleEditPart editPart)
-	{
+	private UnderlayerFigure getUnderlayerFigure(RoleEditPart editPart) {
 		List<Collaboration> listOfColls = new ArrayList<Collaboration>();
 		
-		for (Object o : this.getModelChildren()) 
-		{
+		for (Object o : this.getModelChildren()) {
 			if (o instanceof Collaboration)
 				listOfColls.add((Collaboration) o);
 		}
