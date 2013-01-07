@@ -88,21 +88,20 @@ public class PPModelBuilder {
 				for (String feature : featureNames) {
 					if (containsFeature(text, feature)) {
 						model.addRole(feature, className, (IFile) res);
-						buildModelDirectives(feature, (IFile) res);
 					}
 				}
 				
 				LinkedList<FSTDirective> directives = buildModelDirectivesForFile(lines);
-				addDirectivesToModel(directives, (IFile)res);
+				addDirectivesToModel(directives, (IFile)res, className);
 			}
 		}
 	}
 
-	private void addDirectivesToModel(LinkedList<FSTDirective> list, IFile res) {
+	private void addDirectivesToModel(LinkedList<FSTDirective> list, IFile res, String className) {
 		for (FSTDirective d : list) {
-			FSTRole role = model.addRole(getFeatureName(d.getExpression()), res.getName(), res);
+			FSTRole role = model.addRole(getFeatureName(d.getExpression()), className, res);//addRole(getFeatureName(d.getExpression()), res.getName(), res);
 			role.add(d);
-			addDirectivesToModel(d.getChildrenList(), res);
+			addDirectivesToModel(d.getChildrenList(), res, className);
 		}
 	}
 
@@ -122,18 +121,6 @@ public class PPModelBuilder {
 	 */
 	public LinkedList<FSTDirective> buildModelDirectivesForFile(Vector<String> lines) {
 		return new LinkedList<FSTDirective>();
-	}
-
-	/**
-	 * This method should be implemented by preprocessor plug-ins.
-	 * Adds directives to model.
-	 * @param feature
-	 * 			The current feature.
-	 * @param res
-	 * 			The current file.
-	 */
-	protected void buildModelDirectives(String feature, IFile res) {
-		
 	}
 
 	/**

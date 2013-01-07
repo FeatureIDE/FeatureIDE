@@ -72,9 +72,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	@Override
 	public boolean initialize(IFeatureProject project) {
 		super.initialize(project);
-		if (antennaModelBuilder == null) {
-			antennaModelBuilder = new AntennaModelBuilder(project);
-		}
+		antennaModelBuilder = new AntennaModelBuilder(project);
 		preprocessor = new Preprocessor(new AntennaLogger(),
 				new AntennaLineFilter());
 
@@ -412,9 +410,6 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#showContextFieldsAndMethods()
-	 */
 	@Override
 	public boolean showContextFieldsAndMethods() {
 		return false;

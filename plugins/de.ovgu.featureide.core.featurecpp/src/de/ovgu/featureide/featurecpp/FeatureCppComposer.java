@@ -87,10 +87,9 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 		
 		featureCppModelWrapper.initialize(project.getSourceFolder(), tempFolder);
 		
-		if (featureCppModelBuilder == null) {
-			featureCppModelBuilder = new FeatureCppModelBuilder(project, tempFolder);
-			buildFSTModel();
-		}
+		featureCppModelBuilder = new FeatureCppModelBuilder(project, tempFolder);
+		buildFSTModel();
+		
 		return true;
 	}
 
