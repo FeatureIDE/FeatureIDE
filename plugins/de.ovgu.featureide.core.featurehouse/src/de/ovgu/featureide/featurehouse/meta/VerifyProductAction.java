@@ -32,6 +32,7 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
@@ -56,6 +57,8 @@ public class VerifyProductAction implements IObjectActionDelegate {
 	public static final IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 	private static final QualifiedName MONKEY = new QualifiedName(VerifyProductAction.class.getName() +"#MonKey",
 			VerifyProductAction.class.getName() +"#MonKey");
+	private static final QualifiedName JAVAREDUX = new QualifiedName(VerifyProductAction.class.getName() +"#JavaRedux",
+			VerifyProductAction.class.getName() +"#JavaRedux");
 	
 	private boolean errorOccured = false;
 
@@ -75,7 +78,7 @@ public class VerifyProductAction implements IObjectActionDelegate {
 	//	command.add("10");
 	//	command.add("-h");			// displays all commands
 		command.add("-bc");
-		command.add(getCommand("JavaRedux", "JavaRedux"));
+		command.add(getJavaRedux());
 		command.add("-out");
 	};
 
@@ -90,7 +93,11 @@ public class VerifyProductAction implements IObjectActionDelegate {
 				return library;
 			}
 		}
-		path = new Path(openFileDialog());
+		
+		FileDialog dialog = new FileDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), SWT.MULTI);
+		dialog.setText("Select MonKeY");
+		dialog.setFileName("MonKeY.exe");		
+		path = new Path(dialog.open());
 		library = path.toOSString();
 		if (!path.isAbsolute()) {
 			FeatureHouseCorePlugin.getDefault().logWarning(library + " is not an absolute path. " +
@@ -101,6 +108,33 @@ public class VerifyProductAction implements IObjectActionDelegate {
 					"MonKey can not be found.");
 		}
 		setPersistentMonKeY(library);
+		return library;
+	}
+	
+	private String getJavaRedux() {
+		Path path;
+		String library;
+		String persistentPath = getPersistentJavaRedux();
+		if (persistentPath != null) {
+			path = new Path(persistentPath);
+			library = path.toOSString();
+			if (path.isAbsolute() && path.isValidPath(library)) {
+				return library;
+			}
+		}
+		DirectoryDialog dialog = new DirectoryDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), SWT.OPEN);
+		dialog.setText("Select JavaRedux");
+		path = new Path(dialog.open());
+		library = path.toOSString();
+		if (!path.isAbsolute()) {
+			FeatureHouseCorePlugin.getDefault().logWarning(library + " is not an absolute path. " +
+					"JavaRedux can not be found.");
+		}
+		if (!path.isValidPath(library)) {
+			FeatureHouseCorePlugin.getDefault().logWarning(library + " is no valid path. " +
+					"MonKey can not be found.");
+		}
+		setPersistentJavaRedux(library);
 		return library;
 	}
 	
@@ -117,6 +151,24 @@ public class VerifyProductAction implements IObjectActionDelegate {
 	private void setPersistentMonKeY(String path) {
 		try {
 			 workspaceRoot.setPersistentProperty(MONKEY, path);
+		} catch (CoreException e) {
+			FeatureHouseCorePlugin.getDefault().logError(e);
+		}
+	}
+	
+	@CheckForNull
+	private String getPersistentJavaRedux() {
+		try {
+			return workspaceRoot.getPersistentProperty(JAVAREDUX);
+		} catch (CoreException e) {
+			FeatureHouseCorePlugin.getDefault().logError(e);
+		}
+		return null;
+	}
+	
+	private void setPersistentJavaRedux(String path) {
+		try {
+			 workspaceRoot.setPersistentProperty(JAVAREDUX, path);
 		} catch (CoreException e) {
 			FeatureHouseCorePlugin.getDefault().logError(e);
 		}
@@ -140,13 +192,6 @@ public class VerifyProductAction implements IObjectActionDelegate {
 					toolName + " can not be found.");
 		}
 		return library;
-	}
-	
-	private static String openFileDialog() {
-		FileDialog dialog = new FileDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), SWT.MULTI);
-		dialog.setText("Select MonKeY");
-		dialog.setFileName("monkey.exe");		
-		return dialog.open();
 	}
 	
 	private static final String TRUE = "true";
