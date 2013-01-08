@@ -4,7 +4,7 @@
       label="FeatureIDE extension for FeatureC++ (optional)"
       version="2.6.3.qualifier"
       provider-name="University of Magdeburg"
-      os="linux,win32">
+      >
 
    <description url="http://www.fosd.de/featureide/">
       FeatureC++ composes C++ header files.
