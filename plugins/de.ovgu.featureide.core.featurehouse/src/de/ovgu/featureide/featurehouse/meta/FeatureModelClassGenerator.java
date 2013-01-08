@@ -53,6 +53,7 @@ public class FeatureModelClassGenerator {
 		saveToFile(featureProject.getBuildFolder().getFolder(featureProject.getCurrentConfiguration().getName().split("[.]")[0]).getFile("FeatureModel.java"));
 	}
 	
+	@SuppressWarnings("deprecation")
 	public void saveToFile(IFile file) {
 		InputStream source = new ByteArrayInputStream(stringBuilder.toString()
 				.getBytes(Charset.availableCharsets().get("UTF-8")));
@@ -62,7 +63,7 @@ public class FeatureModelClassGenerator {
 			} else {
 				file.create(source, true, null);
 			}
-			file.setDerived(true, null);
+			file.setDerived(true);
 		} catch (CoreException e) {
 			FeatureHouseCorePlugin.getDefault().logError(e);
 		}
