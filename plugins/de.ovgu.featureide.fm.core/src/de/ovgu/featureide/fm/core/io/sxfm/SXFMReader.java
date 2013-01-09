@@ -294,10 +294,7 @@ public class SXFMReader extends AbstractFeatureModelReader {
 		    		feat.changeToAnd();
 				} else throw new UnsupportedModelException("Couldn't match with " +
 						"known Types: :r, :m, :o, :g, :", line);
-				if (!featureModel.addFeature(feat)) {
-					feat.setName(featId);
-					featureModel.addFeature(feat);
-				}
+				addFeatureToModel(feat);
 
 				if (idTable.containsKey(featId)) throw 
 					new UnsupportedModelException("Id: " + featId + " occured" +
@@ -314,6 +311,20 @@ public class SXFMReader extends AbstractFeatureModelReader {
 			FMCorePlugin.getDefault().logError(e);
 		}
     }
+    /**
+     * adds Feature feat to the model
+     * if the feature name is already taken,
+     * a unique identifier i is added to the name (FeatureA -> FeatureA_i)
+     * @param feat
+     */
+	private void addFeatureToModel(Feature feat) {
+		String orig_name = feat.getName();
+		int i=1;
+		while(!featureModel.addFeature(feat)){
+			feat.setName(orig_name+"_"+i++);
+		}
+		
+	}
     
     private String setNameGetID (Feature feat, String lineText) {
     	String featId, name;    	
