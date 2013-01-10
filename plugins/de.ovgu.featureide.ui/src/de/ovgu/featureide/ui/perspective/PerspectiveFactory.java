@@ -46,8 +46,7 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 	public void createInitialLayout(IPageLayout layout) {
 		String editorArea = layout.getEditorArea();
 
-		layout.addNewWizardShortcut(NewFeatureProjectWizard.ID);
-		
+		layout.addNewWizardShortcut(NewFeatureProjectWizard.ID);	
 		layout.addNewWizardShortcut(NewFeatureIDEFileWizard.ID);
 		layout.addNewWizardShortcut(NewConfigurationFileWizard.ID);
 		layout.addNewWizardShortcut(NewFeatureModelWizard.ID);

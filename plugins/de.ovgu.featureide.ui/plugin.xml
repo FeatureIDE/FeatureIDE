@@ -20,14 +20,26 @@
             hasPages="true"
             icon="icons/NewFeatureProjectIcon.png"
             id="de.ovgu.featureide.ui.wizards.NewFeatureIDEFileWizard"
-            name="FeatureIDE File">
+            name="FeatureIDE File"
+            project="false">
       </wizard>
       <wizard
             category="de.ovgu.featureide.ui.category"
             class="de.ovgu.featureide.ui.wizards.NewConfigurationFileWizard"
             icon="icons/NewConfigurationIcon.png"
             id="de.ovgu.featureide.ui.wizards.NewConfigurationFileWizard"
-            name="Configuration File"/>
+            name="Configuration File"
+            project="false"/>
+      <wizard
+            canFinishEarly="false"
+            category="de.ovgu.featureide.ui.category"
+            class="de.ovgu.featureide.fm.ui.wizards.NewFeatureModelWizard"
+            hasPages="true"
+            icon="icons/featuretree.ico"
+            id="de.ovgu.featureide.fm.ui.wizard.NewFeatureModelWizard"
+            name="Feature Model"
+            project="false">
+      </wizard>
       <category
             id="de.ovgu.featureide.ui.category"
             name="FeatureIDE">

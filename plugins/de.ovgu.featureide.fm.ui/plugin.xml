@@ -192,17 +192,5 @@
             nameFilter="*.xml">
       </page>
    </extension>
-   <extension
-         point="org.eclipse.ui.newWizards">
-         <wizard
-               canFinishEarly="false"
-               category="de.ovgu.featureide.ui.category"
-               class="de.ovgu.featureide.fm.ui.wizards.NewFeatureModelWizard"
-               hasPages="true"
-               icon="icons/featuretree.ico"
-               id="de.ovgu.featureide.fm.ui.wizard.NewFeatureModelWizard"
-               name="Feature Model"
-               project="false">
-         </wizard>
-   </extension>
+   
 </plugin>

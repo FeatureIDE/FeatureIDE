@@ -3,7 +3,6 @@ package de.ovgu.featureide.featurehouse.meta;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.AbstractList;
 import java.util.ArrayList;
@@ -21,7 +20,6 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
@@ -37,7 +35,6 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.internal.util.BundleUtility;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
@@ -50,7 +47,6 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
  *
  * @author Jens Meinicke
  */
-@SuppressWarnings("restriction")
 public class VerifyProductAction implements IObjectActionDelegate {
 
 	private final static String VERIFIKATION_MARKER = "de.ovgu.featureide.featurehouse.meta.verificationmarker";
@@ -132,7 +128,7 @@ public class VerifyProductAction implements IObjectActionDelegate {
 		}
 		if (!path.isValidPath(library)) {
 			FeatureHouseCorePlugin.getDefault().logWarning(library + " is no valid path. " +
-					"MonKey can not be found.");
+					"JavaRedux can not be found.");
 		}
 		setPersistentJavaRedux(library);
 		return library;
@@ -172,26 +168,6 @@ public class VerifyProductAction implements IObjectActionDelegate {
 		} catch (CoreException e) {
 			FeatureHouseCorePlugin.getDefault().logError(e);
 		}
-	}
-	
-	private static String getCommand(String pathName, String toolName) {
-		URL url = BundleUtility.find(FeatureHouseCorePlugin.getDefault().getBundle(), "lib/monkey/" + pathName);
-		try {
-			url = FileLocator.toFileURL(url);
-		} catch (IOException e) {
-			FeatureHouseCorePlugin.getDefault().logError(e);
-		}
-		Path path = new Path(url.getFile());
-		String library = path.toOSString();
-		if (!path.isAbsolute()) {
-			FeatureHouseCorePlugin.getDefault().logWarning(library + " is not an absolute path. " +
-					toolName + " can not be found.");
-		}
-		if (!path.isValidPath(library)) {
-			FeatureHouseCorePlugin.getDefault().logWarning(library + " is no valid path. " +
-					toolName + " can not be found.");
-		}
-		return library;
 	}
 	
 	private static final String TRUE = "true";
@@ -241,9 +217,10 @@ public class VerifyProductAction implements IObjectActionDelegate {
 						try {
 							verifyProduct(true, project);
 							project.build(IncrementalProjectBuilder.FULL_BUILD, null);
-							verifyProduct(false, project);
 						} catch (CoreException e) {
 							FeatureHouseCorePlugin.getDefault().logError(e);
+						} finally {
+							verifyProduct(false, project);
 						}
 						verified++;
 						time = System.currentTimeMillis() - time;
@@ -443,16 +420,11 @@ public class VerifyProductAction implements IObjectActionDelegate {
 			String method = proof.substring(proof.indexOf('#') + 1);
 			
 			try {
-				project.getFolder("src").refreshLocal(IResource.DEPTH_ZERO, null);
+				project.getFolder("src").refreshLocal(IResource.DEPTH_INFINITE, null);
 			} catch (CoreException e1) {
 				FeatureHouseCorePlugin.getDefault().logError(e1);
 			}
 			IFile res = findMember(project.getFolder("src"), file);
-			try {
-				res.refreshLocal(IResource.DEPTH_ZERO, null);
-			} catch (CoreException e) {
-				FeatureHouseCorePlugin.getDefault().logError(e);
-			}
 			int lineNr = findLine(res, method);
 			if (hasSameMarker(MESSAGE, lineNr, res)) {
 				return;
@@ -526,7 +498,7 @@ public class VerifyProductAction implements IObjectActionDelegate {
 							
 						}
 					}
-				} else if (text.matches("[\\w,\\W]* " + method + "\\s*\\([\\W,\\w]*")) {
+				} else if (text.matches("[\\w,\\W]*" + method + "\\s*\\([\\W,\\w]*")) {
 					found = true;
 					foundLine = line;
 					if (text.contains("{")) {
