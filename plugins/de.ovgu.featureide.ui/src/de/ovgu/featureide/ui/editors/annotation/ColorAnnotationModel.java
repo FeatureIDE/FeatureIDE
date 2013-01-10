@@ -333,7 +333,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 			if (expressionMap.containsKey(newDir.getExpression())) {
 				int color = expressionMap.get(newDir.getExpression());
 				if (ColorList.isValidColor(color)) {
-					newDir.getRole().getFeture().setColor(color);
+					if(newDir.getRole()!=null)newDir.getRole().getFeture().setColor(color);
 					dirList.offer(newDir);
 				}
 				if (newDir.hasChildren()) {
@@ -396,6 +396,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 						Position newPos = new Position(lineOffset, lineLength);
 						
 						if (!annotatedPositions.containsKey(i)) {
+							if(!ColorList.isValidColor(dir.getColor()))break;
 							ColorAnnotation ca = new ColorAnnotation(dir.getColor(), 
 									new Position(lineOffset, lineLength), ColorAnnotation.TYPE_IMAGE);
 							annotations.add(ca);

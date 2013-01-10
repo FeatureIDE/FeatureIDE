@@ -46,7 +46,8 @@ import de.ovgu.featureide.core.builder.IComposerExtension;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
- * Listens for an editorpart to attach the color annotation model and renaming of titel for java editor
+ * Listens for an editorpart to attach the color annotation model and renaming
+ * of titel for java editor
  * 
  * @author Sebastian Krieter
  */
@@ -74,23 +75,25 @@ public class EditorTracker {
 
 	private IPartListener2 partListener = new IPartListener2() {
 		public void partOpened(IWorkbenchPartReference partref) {
-
-			annotateEditor(partref);
+			//System.out.println("opened "+partref.getTitle());
+			
 		}
 
 		public void partActivated(IWorkbenchPartReference partref) {
-
-			if (annotatedPartrefSet.contains(partref)) {
-		
-				updateEditor(partref);
-			}
+		//	System.out.println("activated "  +partref.getTitle());
+			annotateEditor(partref);
 		}
 
 		public void partBroughtToTop(IWorkbenchPartReference partref) {
+		//	System.out.println("toTop "  +partref.getTitle());
 		}
 
 		public void partVisible(IWorkbenchPartReference partref) {
+			//System.out.println("visible "  +partref.getTitle());
 			try {
+				if (annotatedPartrefSet.contains(partref)) {
+					updateEditor(partref);
+				}
 				renameEditor(partref);
 			} catch (Exception e) {
 				UIPlugin.getDefault().logError(e);
@@ -144,20 +147,20 @@ public class EditorTracker {
 		}
 	}
 
-
-
 	private void renameEditor(IWorkbenchPartReference partref)
 			throws IllegalAccessException, IllegalArgumentException,
 			InvocationTargetException, NoSuchMethodException, SecurityException {
-		if(!(partref.getPart(true) instanceof IEditorPart))return;
+		if (!(partref.getPart(true) instanceof IEditorPart))
+			return;
 		IEditorPart editorPart = (IEditorPart) partref.getPart(true);
 		IEditorInput input = editorPart.getEditorInput();
 		if (!(input instanceof IFileEditorInput))
 			return;
 		IFile file = ((IFileEditorInput) input).getFile();
-		if(file==null)return;
+		if (file == null)
+			return;
 		String fileExt = file.getFileExtension();
-		if (fileExt==null||!fileExt.equals("java"))
+		if (fileExt == null || !fileExt.equals("java"))
 			return;
 		IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
 		if (featureProject == null)

@@ -167,7 +167,9 @@ public class FSTDirective {
 	}
 
 	public int getColor() {
+		if(getRole()!=null&&getRole().getFeture()!=null)
 		return getRole().getFeture().getColor();
+		else return -1;
 	}
 
 	public int getStartLine() {
@@ -200,9 +202,9 @@ public class FSTDirective {
 		this.role = fstRole;
 	}
 	
-	@Nonnull
+
 	public FSTRole getRole() {
-		if (role == null) {
+		if (role == null&&parent!=null) {
 			return parent.getRole();
 		}
 		return role;
