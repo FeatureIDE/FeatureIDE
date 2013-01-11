@@ -102,7 +102,6 @@ public class AspectJComposer extends ComposerExtensionClass {
 		assert(featureProject != null) : "Invalid project given";
 		if(!isPluginInstalled(PLUGIN_ID)){
 			generateWarning(PLUGIN_WARNING);	
-			return;
 		}
 		
 		final String configPath =  config.getRawLocation().toOSString();
