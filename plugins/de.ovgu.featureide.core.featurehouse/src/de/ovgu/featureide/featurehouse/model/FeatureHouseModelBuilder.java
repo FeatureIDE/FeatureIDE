@@ -130,6 +130,9 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 					if (JAVA_NODE_FIELD.equals(terminal.getType())) {
 						ClassBuilder.getClassBuilder(currentFile, this)
 								.caseFieldDeclaration(terminal);
+					} else if (JVVA_NODE_FIELD_2.equals(terminal.getType())) {
+							ClassBuilder.getClassBuilder(currentFile, this)
+									.caseFieldDeclaration(terminal);	 
 					} else if (JAVA_NODE_METHOD.equals(terminal.getType())) {
 						ClassBuilder.getClassBuilder(currentFile, this)
 								.caseMethodDeclaration(terminal);
