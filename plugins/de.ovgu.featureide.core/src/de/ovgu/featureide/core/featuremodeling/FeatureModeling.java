@@ -50,12 +50,4 @@ public class FeatureModeling extends ComposerExtensionClass {
 	
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#hasContractComposition()
-	 */
-	public boolean hasContractComposition() {
-	
-		return false;
-	}
-
 }

@@ -71,6 +71,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 	private IComposerExtension composer = null;
 	private Combo composerCombo;
 	private Combo contractCombo;
+	private Combo metaCombo;
 
 	private boolean canFinish = true;
 
@@ -117,6 +118,9 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		label = new Label(composite, SWT.NONE);
 		label.setText("&Contract Composition: "
 				+ featureProject.getContractComposition());
+		label = new Label(composite, SWT.NONE);
+		label.setText("&Meta Product Generation: "
+				+ featureProject.getMetaProductGeneration());
 		addCompositionGroup(composite);
 		return composite;
 	}
@@ -156,6 +160,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		addComposerMember(compositionGroup);
 		addAllPathMember(compositionGroup);
 		addContractMember(compositionGroup);
+		addMetaProductMember(compositionGroup);
 	}
 
 	/**
@@ -201,17 +206,14 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		label.setText(CONTRACT_SELECTION_TEXT);
 		contractCombo = new Combo(group, SWT.READ_ONLY | SWT.DROP_DOWN);
 		contractCombo.setLayoutData(gd);
-		contractCombo.add("None");
+		contractCombo.add(IFeatureProject.DEFAULT_CONTRACT_COMPOSITION);
 		contractCombo.add("Plain Contracting");
 		contractCombo.add("Contract Overriding");
 		contractCombo.add("Explicit Contract Refinement");
 		contractCombo.add("Consecutive Contract Refinement");
 
 		String composer = featureProject.getContractComposition();
-
-	
 		refreshContractCombo(composer);
-
 		contractCombo.addModifyListener(listener);
 	}
 
@@ -223,7 +225,6 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 			int i = 0;
 			for (String item : contractCombo.getItems()) {
 				if (item.equals(composer)) {
-
 					contractCombo.select(i);
 					break;
 				}
@@ -232,6 +233,34 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		}
 	}
 
+	private void addMetaProductMember(Group group) {
+		Label label = new Label(group, SWT.NULL);
+		label.setText("&Mata Product Generation");
+		metaCombo = new Combo(group, SWT.READ_ONLY | SWT.DROP_DOWN);
+		metaCombo.setLayoutData(gd);
+		metaCombo.add(IFeatureProject.DEFAULT_META_PRODUCT_GENERATION);
+		metaCombo.add("Java Pathfinder");
+		String composer = featureProject.getMetaProductGeneration();
+		refreshMetaCombo(composer);
+		metaCombo.addModifyListener(listener);
+	}
+	
+	private void refreshMetaCombo(String composer) {
+		if (!this.composer.hasMetaProductGeneration()) {
+			metaCombo.setEnabled(false);
+			metaCombo.select(0);
+		} else {
+			int i = 0;
+			for (String item : metaCombo.getItems()) {
+				if (item.equals(composer)) {
+					metaCombo.select(i);
+					break;
+				}
+				i++;
+			}
+		}
+	}
+	
 	/**
 	 * Adds the text fields of features, source and configurations path
 	 * 
@@ -294,6 +323,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		setComposer();
 		setPaths();
 		setContractComposition();
+		setMetaProductGeneration();
 		try {
 			/* update the FeatureProject settings */
 			project.close(null);
@@ -304,9 +334,6 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		return true;
 	}
 
-	/**
-	 * 
-	 */
 	private void setContractComposition() {
 		if (!contractChanged()) {
 			return;
@@ -317,12 +344,25 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 
 	}
 
-	/**
-	 * @return
-	 */
 	private boolean contractChanged() {
 		return !featureProject.getContractComposition().equals(
 				contractCombo.getText());
+
+	}
+
+	private void setMetaProductGeneration() {
+		if (!metaProductChanged()) {
+			return;
+		}
+
+		featureProject.setMetaProductGeneration(metaCombo
+				.getItem(metaCombo.getSelectionIndex()));
+
+	}
+
+	private boolean metaProductChanged() {
+		return !featureProject.getMetaProductGeneration().equals(
+				metaCombo.getText());
 
 	}
 
@@ -356,7 +396,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 	 * @return <code>true</code> if the shown settings are equal to the old
 	 */
 	private boolean nothingChanged() {
-		return !composerChanged() && noPathChanged() && !contractChanged();
+		return !composerChanged() && noPathChanged() && !contractChanged() && !metaProductChanged();
 	}
 
 	/**
@@ -401,6 +441,14 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 			}
 			i++;
 		}
+		i = 0;
+		for (String item : metaCombo.getItems()) {
+			if (item.equals(featureProject.getMetaProductGeneration())) {
+				metaCombo.select(i);
+				break;
+			}
+			i++;
+		}
 		featurePath.setEnabled(composer.hasFeatureFolder());
 		featurePath.setText(featureProject.getSourceFolder()
 				.getProjectRelativePath().toOSString());
@@ -410,6 +458,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		configPath.setText(featureProject.getConfigFolder()
 				.getProjectRelativePath().toOSString());
 		refreshContractCombo(composerCombo.getText());
+		refreshMetaCombo(metaCombo.getText());
 	}
 
 	/**

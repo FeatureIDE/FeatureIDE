@@ -46,6 +46,7 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	public static final String DEFAULT_CONFIGS_PATH = "equations";
 	public static final String DEFAULT_BUILD_PATH = "build";
 	public static final String DEFAULT_CONTRACT_COMPOSITION= "None";
+	public static final String DEFAULT_META_PRODUCT_GENERATION= "KeY";
 	public static final QualifiedName configConfigID = new QualifiedName("featureproject.configs", "currentEquation");
 	
 	public static final QualifiedName javaClassPathID = new QualifiedName("featureproject.configs", "javaClassPath");
@@ -94,6 +95,8 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	public String[] getJavaClassPath();
 	
 	public String getContractComposition();
+	
+	public String getMetaProductGeneration();
 	/**
 	 * Gets the java class path without the default paths
 	 * 
@@ -171,6 +174,13 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	 * @param model
 	 */
 	public void setContractComposition(String contractComposition);
+	
+	
+	/**
+	 * sets the meta product generation mechanism.
+	 * @param model
+	 */
+	public void setMetaProductGeneration(String metaProductGeneration);
 	
 	/**
 	 * @return True if a source file, or the current configuration changed.

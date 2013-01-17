@@ -58,20 +58,10 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.builder.ICompositionTool#getName()
-	 */
 	public String getName() {
 		return name;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.builder.ICompositionTool#getId()
-	 */
 	public String getId() {
 		return id;
 	}
@@ -91,12 +81,6 @@ public class ComposerExtensionProxy implements IComposerExtension {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @seefeatureide.core.builder.ICompositionTool#initialize(de.ovgu.featureide.core.
-	 * IFeatureProject)
-	 */
 	public boolean initialize(IFeatureProject project) {
 		if(project.getFeatureModel()==null||project.getFeatureModel().getRoot()==null){
 			return false;
@@ -106,13 +90,6 @@ public class ComposerExtensionProxy implements IComposerExtension {
 		
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ovgu.featureide.core.builder.ICompositionTool#performFullBuild(org.eclipse
-	 * .core.resources.IFile)
-	 */
 	public void performFullBuild(IFile config) {
 		CorePlugin.getDefault().logInfo(
 				"Perform a full build for configuration '" + config + "'");
@@ -120,78 +97,44 @@ public class ComposerExtensionProxy implements IComposerExtension {
 		composerExtensionClass.performFullBuild(config);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.builder.ICompositionTool#getDescription()
-	 */
 	public String getDescription() {
 		return description;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.builder.IComposerExtension#clean()
-	 */
 	public boolean clean() {
 		loadComposerExtension();
 		return composerExtensionClass.clean();
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#extensions()
-	 */
 	public LinkedHashSet<String> extensions() {
 		return composerExtensionClass.extensions();
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#copyNotComposedFiles()
-	 */
 	public void copyNotComposedFiles(Configuration config, IFolder destination) {
 		composerExtensionClass.copyNotComposedFiles(config, destination);
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#composerSpecficMove(org.eclipse.core.resources.IFolder, org.eclipse.core.runtime.IPath)
-	 */
 	public boolean postAddNature(IFolder source, IFolder destination) {
 		return composerExtensionClass.postAddNature(source, destination);
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#buildFSTModel()
-	 */
 	public void buildFSTModel() {
 		loadComposerExtension();
 		composerExtensionClass.buildFSTModel();
 	}
-	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#getTemplates()
-	 */
+
 	public ArrayList<String[]> getTemplates(){
 		return composerExtensionClass.getTemplates();
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#replaceMarker(String text, List<String> list)
-	 */
 	public String replaceMarker(String text, List<String> list, String packageName) {
 		return composerExtensionClass.replaceMarker(text, list, packageName);
 	}
-	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#prebuild()
-	 */
+
 	public void postCompile(IResourceDelta delta, IFile file) {
 		composerExtensionClass.postCompile(delta, file);
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#addProjectNature()
-	 */
 	public void addCompiler(IProject project, String sourcePath,String configPath, String buildPath) {
 		composerExtensionClass.addCompiler(project, sourcePath, configPath, buildPath);
 		
@@ -201,96 +144,59 @@ public class ComposerExtensionProxy implements IComposerExtension {
 		return composerExtensionClass.hasFeatureFolders();
 	}
 
-
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#getDefaultTemplateIndex()
-	 */
 	public int getDefaultTemplateIndex() {
 		return composerExtensionClass.getDefaultTemplateIndex();
 	}
 
-
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#postModelChanged()
-	 */
 	public void postModelChanged() {
 		composerExtensionClass.postModelChanged();
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#hasCustomFilename()
-	 */
 	public boolean hasCustomFilename() {
 		return composerExtensionClass.hasCustomFilename();
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#hasFeatureFolder()
-	 */
 	public boolean hasFeatureFolder() {
 		return composerExtensionClass.hasFeatureFolder();
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#getComfigurationExtension()
-	 */
 	public String getConfigurationExtension() {
 		return composerExtensionClass.getConfigurationExtension();
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#buildConfiguration(org.eclipse.core.resources.IFolder, de.ovgu.featureide.fm.core.configuration.Configuration)
-	 */
 	public void buildConfiguration(IFolder folder, Configuration configuration, String congurationName) {
 		composerExtensionClass.buildConfiguration(folder, configuration, congurationName);
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#refines()
-	 */
 	public boolean refines() {
 		return composerExtensionClass.refines();
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#hasSourceFolder()
-	 */
 	public boolean hasSourceFolder() {
 		return composerExtensionClass.hasSourceFolder();
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtension#canGeneratInParallelJobs()
-	 */
 	public boolean canGeneratInParallelJobs() {
 		return composerExtensionClass.canGeneratInParallelJobs();
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#showContextFieldsAndMethods()
-	 */
 	public boolean showContextFieldsAndMethods() {
 		return composerExtensionClass.showContextFieldsAndMethods();
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#buildModelDirectivesForFile(java.util.ArrayList)
-	 */
 	public LinkedList<FSTDirective> buildModelDirectivesForFile(Vector<String> lines) {
 		return composerExtensionClass.buildModelDirectivesForFile(lines);
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#needColor()
-	 */
 	public boolean needColor() {
 		return composerExtensionClass.needColor();
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#hasContractComposition()
-	 */
 	public boolean hasContractComposition() {
 		return composerExtensionClass.hasContractComposition();
+	}
+
+	public boolean hasMetaProductGeneration() {
+		return composerExtensionClass.hasMetaProductGeneration();
 	}
 }

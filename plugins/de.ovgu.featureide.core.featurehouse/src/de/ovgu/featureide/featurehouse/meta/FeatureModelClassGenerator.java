@@ -44,12 +44,16 @@ public class FeatureModelClassGenerator {
 
 	private StringBuilder stringBuilder = new StringBuilder();
 	
-	private final static String head = "/**\r\n * Variability encoding of the feature model.\r\n * Auto-generated class.\r\n */\r\npublic class FeatureModel {\n\n\t//@ static invariant fm();\n\tpublic final static boolean ";
-	private static final String bottom = ";\n\t}\n\n\tprivate static boolean random() {\n\t\t return Math.random() > 0.5;\n\t}\n}";
+	private static final String head_JPF = "import gov.nasa.jpf.jvm.Verify;\r\n\r\n";
+	private final static String head_1 = "/**\r\n * Variability encoding of the feature model.\r\n * Auto-generated class.\r\n */\r\npublic class FeatureModel {\n\n\t//@ static invariant fm();\n\tpublic ";
+	private final static String head_2 = "static boolean "; 
+	private static final String bottom_1 = ";\r\n\t}\n\n\tprivate static boolean random() {\r\n\t\t return ";
+	private static final String bottom_KeY = "Math.random() > 0.5;\r\n\t}\r\n}";
+	private static final String bottom_JPF = "Verify.getBoolean();\r\n\t}\r\n\r\n\t/**\r\n\t * @return The current feature-selection.\r\n\t */\r\n\tpublic static String getSelection() {\r\n\t\t";
 
 	public FeatureModelClassGenerator(IFeatureProject featureProject) {
 		FeatureModel model = featureProject.getFeatureModel();
-		printModel(model);
+		printModel(model, IFeatureProject.DEFAULT_META_PRODUCT_GENERATION.equals(featureProject.getMetaProductGeneration()));
 		saveToFile(featureProject.getBuildFolder().getFolder(featureProject.getCurrentConfiguration().getName().split("[.]")[0]).getFile("FeatureModel.java"));
 	}
 	
@@ -69,15 +73,43 @@ public class FeatureModelClassGenerator {
 		}
 	}
 
-	public FeatureModelClassGenerator(FeatureModel model) {
-		printModel(model);
+	private void printModel(FeatureModel model, boolean KeY) {
+		if (!KeY) {
+			stringBuilder.append(head_JPF);
+		}
+		stringBuilder.append(head_1);
+		if (KeY) {
+			stringBuilder.append("final ");
+		}
+		stringBuilder.append(head_2);
+		addFeatures(model, KeY);
+		stringBuilder.append(getFormula(model));
+		stringBuilder.append(bottom_1);
+		if (KeY) {
+			stringBuilder.append(bottom_KeY);
+		} else {
+			stringBuilder.append(bottom_JPF);
+			getSelection(model);
+			stringBuilder.append(";\r\n\t}\r\n}");
+		}
 	}
 
-	private void printModel(FeatureModel model) {
-		stringBuilder.append(head);
-		addFeatures(model);
-		stringBuilder.append(getFormula(model));
-		stringBuilder.append(bottom);
+	/**
+	 * @param model 
+	 * @return The current feature selection for Java Pathfinder.
+	 */
+	private void getSelection(FeatureModel model) {
+		ArrayList<Feature> features = new ArrayList<Feature>(model.getFeatures());
+		stringBuilder.append("return ");
+		for (int i = 0;i < features.size();i++) {
+			if (i != 0) {
+				stringBuilder.append(" + \"\\r\\n");	
+			} else {
+				stringBuilder.append("\"");
+			}
+			String name = features.get(i).getName();
+			stringBuilder.append(name + ": \" + " + name.toLowerCase() + " " );
+		}
 	}
 
 	/**
@@ -94,7 +126,7 @@ public class FeatureModelClassGenerator {
 	 * @param features
 	 * @param deadFeatures 
 	 */
-	private void addFeatures(FeatureModel model) {
+	private void addFeatures(FeatureModel model, boolean KeY) {
 		ArrayList<Feature> features = new ArrayList<Feature>(model.getFeatures());
 		LinkedList<Feature> deadFeatures = model.getAnalyser().getDeadFeatures();
 		LinkedList<Feature> coreFeatures = model.getAnalyser().getCoreFeatures();
@@ -116,7 +148,10 @@ public class FeatureModelClassGenerator {
 				stringBuilder.append(" = random();\n");
 			}
 		}
-		stringBuilder.append("\t\tif (!fm()) {\n\t\t\tthrow new Error();\n\t\t}\n\t}\n\n\t/**\r\n\t * This formula represents the validity of the current feature selection.\r\n\t */\r\n\tpublic /*@pure@*/ static boolean fm() {\n\t\treturn ");
+		if (KeY) {
+			stringBuilder.append("\t\tif (!fm()) {\n\t\t\tthrow new Error();\r\n\t\t}\r\n");
+		}
+		stringBuilder.append("\t}\r\n\r\n\t/**\r\n\t * This formula represents the validity of the current feature selection.\r\n\t */\r\n\tpublic /*@pure@*/ static boolean fm() {\n\t\treturn ");
 	}
 
 }

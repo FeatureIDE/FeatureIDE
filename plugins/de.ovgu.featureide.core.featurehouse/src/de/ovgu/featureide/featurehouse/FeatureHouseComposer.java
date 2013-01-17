@@ -73,6 +73,12 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 @SuppressWarnings("restriction")
 public class FeatureHouseComposer extends ComposerExtensionClass {
 
+	private static final String CONTRACT_COMPOSITION_CONSECUTIVE_CONTRACT_REFINEMENT = "consecutive contract refinement";
+	private static final String CONTRACT_COMPOSITION_EXPLICIT_CONTRACT_REFINEMENT = "explicit contract refinement";
+	private static final String CONTRACT_COMPOSITION_CONTRACT_OVERRIDING = "contract overriding";
+	private static final String CONTRACT_COMPOSITION_PLAIN_CONTRACTING = "plain contracting";
+	private static final String CONTRACT_COMPOSITION_NONE = "none";
+
 	public static final String COMPOSER_ID = "de.ovgu.featureide.composer.featurehouse";
 	
 	private FSTGenComposer composer;
@@ -235,7 +241,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 						CmdLineInterpreter.INPUT_OPTION_EQUATIONFILE, configPath,
 						CmdLineInterpreter.INPUT_OPTION_BASE_DIRECTORY, basePath,
 						CmdLineInterpreter.INPUT_OPTION_OUTPUT_DIRECTORY, outputPath + "/",
-						CmdLineInterpreter.INPUT_OPTION_CONTRACT_STYLE, "explicit_contracting"
+						CmdLineInterpreter.INPUT_OPTION_CONTRACT_STYLE, CONTRACT_COMPOSITION_EXPLICIT_CONTRACT_REFINEMENT
 				}, features);
 				fhModelBuilder.buildModel(composer.getFstnodes(), false);
 			} catch (TokenMgrError e) {
@@ -296,22 +302,22 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 	private String getContractParameter() {
 		String contractComposition= featureProject.getContractComposition().toLowerCase(Locale.ENGLISH);
-		if("none".equals(contractComposition)) {
-			return "none";
+		if(CONTRACT_COMPOSITION_NONE.equals(contractComposition)) {
+			return CONTRACT_COMPOSITION_NONE;
 		}
-		if("plain contracting".equals(contractComposition)) {
-			return "plain_contracting";
+		if(CONTRACT_COMPOSITION_PLAIN_CONTRACTING.equals(contractComposition)) {
+			return CONTRACT_COMPOSITION_PLAIN_CONTRACTING;
 		}
-		if("contract overriding".equals(contractComposition)) {
-			return "contract_overriding";
+		if(CONTRACT_COMPOSITION_CONTRACT_OVERRIDING.equals(contractComposition)) {
+			return CONTRACT_COMPOSITION_CONTRACT_OVERRIDING;
 		}
-		if("explicit contract refinement".equals(contractComposition)) {
-			return "explicit_contracting";
+		if(CONTRACT_COMPOSITION_EXPLICIT_CONTRACT_REFINEMENT.equals(contractComposition)) {
+			return CONTRACT_COMPOSITION_EXPLICIT_CONTRACT_REFINEMENT;
 		}
-		if("consecutive contract refinement".equals(contractComposition)) {
-			return "consecutive_contracting";
+		if(CONTRACT_COMPOSITION_CONSECUTIVE_CONTRACT_REFINEMENT.equals(contractComposition)) {
+			return CONTRACT_COMPOSITION_CONSECUTIVE_CONTRACT_REFINEMENT;
 		}
-		return "none";
+		return CONTRACT_COMPOSITION_NONE;
 	}
 
 	/**
@@ -602,6 +608,12 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	public boolean hasContractComposition() {
 		return true;
 	}
+	
+	@Override
+	public boolean hasMetaProductGeneration() {
+		return true;
+	}
+	
 	@Override
 	public void copyNotComposedFiles(Configuration config, IFolder destination) {
 		super.copyNotComposedFiles(config, destination.getFolder(

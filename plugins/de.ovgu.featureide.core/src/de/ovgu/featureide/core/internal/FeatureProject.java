@@ -47,6 +47,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
@@ -1344,21 +1345,53 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		return new ArrayList<String>();
 	}
 
+	private static final QualifiedName CONTRACT_COMPOSITION = 
+			new QualifiedName(FeatureProject.class.getName() +"#ContractComposition", 
+					FeatureProject.class.getName() +"#ContractComposition");
+	
+	
 	public String getContractComposition() {
 		String contractComposition = null;
-		ProjectScope ps = new ProjectScope(project);
-		IEclipsePreferences prefs = ps.getNode("de.ovgu.featureide.core");
-		contractComposition = prefs.get("contract", DEFAULT_CONTRACT_COMPOSITION);
+		try {
+			contractComposition = project.getPersistentProperty(CONTRACT_COMPOSITION);
+		} catch (CoreException e) {
+			CorePlugin.getDefault().logError(e);
+		}
+		if (contractComposition == null) {
+			return DEFAULT_CONTRACT_COMPOSITION;
+		}
 		return contractComposition;
-	}
+	} 
 
 	public void setContractComposition(String contractComposition) {
 		try {
-			ProjectScope ps = new ProjectScope(project);
-			IEclipsePreferences prefs = ps.getNode("de.ovgu.featureide.core");
-			prefs.put("contract", contractComposition);
-			prefs.flush();
-		} catch (BackingStoreException e) {
+			project.setPersistentProperty(CONTRACT_COMPOSITION, contractComposition);
+		} catch (CoreException e) {
+			CorePlugin.getDefault().logError(e);
+		}
+	}
+	
+	private static final QualifiedName META_PRODUCT_GENERATION = 
+			new QualifiedName(FeatureProject.class.getName() +"#MetaProductGeneration", 
+					FeatureProject.class.getName() +"#MetaProductGeneration");
+	
+	public String getMetaProductGeneration() {
+		String metaProductGeneration = null;
+		try {
+			metaProductGeneration = project.getPersistentProperty(META_PRODUCT_GENERATION);
+		} catch (CoreException e) {
+			CorePlugin.getDefault().logError(e);
+		}
+		if (metaProductGeneration == null) {
+			return DEFAULT_META_PRODUCT_GENERATION;
+		}
+		return metaProductGeneration;
+	}
+
+	public void setMetaProductGeneration(String metaProductGeneration) {
+		try {
+			project.setPersistentProperty(META_PRODUCT_GENERATION, metaProductGeneration);
+		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
 	}

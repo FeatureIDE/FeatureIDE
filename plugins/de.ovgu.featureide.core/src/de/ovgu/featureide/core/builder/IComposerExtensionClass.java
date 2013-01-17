@@ -202,4 +202,9 @@ public interface IComposerExtensionClass {
 	 * @return <code>true</code> if the composition tool supports contract composition.
 	 */
 	boolean hasContractComposition();
+	
+	/**
+	 * @return <code>true</code> if the composition tool supports meta product generation.
+	 */
+	boolean hasMetaProductGeneration();
 }
