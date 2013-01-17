@@ -77,9 +77,12 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	private static final String CONTRACT_COMPOSITION_EXPLICIT_CONTRACT_REFINEMENT = "explicit contract refinement";
 	private static final String CONTRACT_COMPOSITION_CONTRACT_OVERRIDING = "contract overriding";
 	private static final String CONTRACT_COMPOSITION_PLAIN_CONTRACTING = "plain contracting";
+	private static final String CONTRACT_COMPOSITION_EXPLICIT_CONTRACTING = "explicit_contracting";
+	private static final String CONTRACT_COMPOSITION_CONSECUTIVE_CONTRACTING = "consecutive_contracting";
 	private static final String CONTRACT_COMPOSITION_NONE = "none";
 
 	public static final String COMPOSER_ID = "de.ovgu.featureide.composer.featurehouse";
+
 	
 	private FSTGenComposer composer;
 
@@ -241,7 +244,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 						CmdLineInterpreter.INPUT_OPTION_EQUATIONFILE, configPath,
 						CmdLineInterpreter.INPUT_OPTION_BASE_DIRECTORY, basePath,
 						CmdLineInterpreter.INPUT_OPTION_OUTPUT_DIRECTORY, outputPath + "/",
-						CmdLineInterpreter.INPUT_OPTION_CONTRACT_STYLE, CONTRACT_COMPOSITION_EXPLICIT_CONTRACT_REFINEMENT
+						CmdLineInterpreter.INPUT_OPTION_CONTRACT_STYLE, CONTRACT_COMPOSITION_EXPLICIT_CONTRACTING
 				}, features);
 				fhModelBuilder.buildModel(composer.getFstnodes(), false);
 			} catch (TokenMgrError e) {
@@ -312,10 +315,10 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			return CONTRACT_COMPOSITION_CONTRACT_OVERRIDING;
 		}
 		if(CONTRACT_COMPOSITION_EXPLICIT_CONTRACT_REFINEMENT.equals(contractComposition)) {
-			return CONTRACT_COMPOSITION_EXPLICIT_CONTRACT_REFINEMENT;
+			return CONTRACT_COMPOSITION_EXPLICIT_CONTRACTING;
 		}
 		if(CONTRACT_COMPOSITION_CONSECUTIVE_CONTRACT_REFINEMENT.equals(contractComposition)) {
-			return CONTRACT_COMPOSITION_CONSECUTIVE_CONTRACT_REFINEMENT;
+			return CONTRACT_COMPOSITION_CONSECUTIVE_CONTRACTING;
 		}
 		return CONTRACT_COMPOSITION_NONE;
 	}

@@ -138,7 +138,7 @@ public class FeatureModelClassGenerator {
 		for (int i = 0;i< features.size();i++) {
 			stringBuilder.append(features.get(i).toString().toLowerCase());
 			if (i != features.size() - 1) {
-				stringBuilder.append(" ,");
+				stringBuilder.append(", ");
 			}
 		}
 		stringBuilder.append(";\n\n\t/**\r\n\t * Core features are set 'selected' and dead features 'unselected'.\r\n\t * All other features have unknown selection states.\r\n\t */\r\n\tstatic {\n");
