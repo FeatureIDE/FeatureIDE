@@ -45,8 +45,9 @@ public class FeatureModelClassGenerator {
 	private StringBuilder stringBuilder = new StringBuilder();
 	
 	private static final String head_JPF = "import gov.nasa.jpf.jvm.Verify;\r\n\r\n";
-	private final static String head_1 = "/**\r\n * Variability encoding of the feature model.\r\n * Auto-generated class.\r\n */\r\npublic class FeatureModel {\n\n\t//@ static invariant fm();\n\tpublic ";
-	private final static String head_2 = "static boolean "; 
+	private final static String head_1 = "/**\r\n * Variability encoding of the feature model.\r\n * Auto-generated class.\r\n */\r\npublic class FeatureModel {\n\n\t//@ ";
+	private final static String head_2 = "invariant fm();\n\tpublic "; 
+	private final static String head_3 = "static boolean "; 
 	private static final String bottom_1 = ";\r\n\t}\n\n\tprivate static boolean random() {\r\n\t\t return ";
 	private static final String bottom_KeY = "Math.random() > 0.5;\r\n\t}\r\n}";
 	private static final String bottom_JPF = "Verify.getBoolean();\r\n\t}\r\n\r\n\t/**\r\n\t * @return The current feature-selection.\r\n\t */\r\n\tpublic static String getSelection() {\r\n\t\t";
@@ -79,9 +80,13 @@ public class FeatureModelClassGenerator {
 		}
 		stringBuilder.append(head_1);
 		if (KeY) {
-			stringBuilder.append("final ");
+			stringBuilder.append("static ");
 		}
 		stringBuilder.append(head_2);
+		if (KeY) {
+			stringBuilder.append("final ");
+		}
+		stringBuilder.append(head_3);
 		addFeatures(model, KeY);
 		stringBuilder.append(getFormula(model));
 		stringBuilder.append(bottom_1);
