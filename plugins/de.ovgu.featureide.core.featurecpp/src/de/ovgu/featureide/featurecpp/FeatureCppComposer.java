@@ -124,8 +124,7 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 
 	public void performFullBuild(IFile config) {
 		if(!isPluginInstalled(PLUGIN_ID)){
-			generateWarning(PLUGIN_WARNING);	
-			return;
+			generateWarning(PLUGIN_WARNING);
 		}
 		initialize(CorePlugin.getFeatureProject(config));
 		featureCpp.compose(config);
