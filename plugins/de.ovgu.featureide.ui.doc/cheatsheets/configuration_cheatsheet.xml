@@ -39,7 +39,7 @@ Create a new configuration file with the according wizard.
  	You have already used the AHEAD composer in the FeatureIDE tutorial. It supports composition of Jak files. Jak extends Java with keywords for Feature-Oriented-Programming.<br/> <br/>
  	Keywords: <br/>
 	refines: used to specify refinements of an existing class. <br/>
-	super: used to call a refined method . 	<br/><br/>
+	Super(): used to call a refined method . 	<br/><br/>
 	Example:<br/>
 	public refines class Main {<br/>
 	public void print() {<br/>
