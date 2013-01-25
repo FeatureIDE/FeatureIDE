@@ -2,7 +2,7 @@
 <feature
       id="de.ovgu.featureide"
       label="FeatureIDE"
-      version="2.6.3.qualifier"
+      version="2.6.4.qualifier"
       provider-name="University of Magdeburg">
    <install-handler library=""/>
 
@@ -505,28 +505,28 @@ Public License instead of this License.
          id="de.ovgu.featureide.core"
          download-size="0"
          install-size="0"
-         version="2.6.3.qualifier"
+         version="2.6.4.qualifier"
          unpack="false"/>
 
    <plugin
          id="de.ovgu.featureide.core.ahead"
          download-size="0"
          install-size="0"
-         version="2.6.3.qualifier"
+         version="2.6.4.qualifier"
          unpack="false"/>
 
    <plugin
          id="de.ovgu.featureide.ui"
          download-size="0"
          install-size="0"
-         version="2.6.3.qualifier"
+         version="2.6.4.qualifier"
          unpack="false"/>
 
    <plugin
          id="de.ovgu.featureide.ui.doc"
          download-size="0"
          install-size="0"
-         version="2.6.3.qualifier"
+         version="2.6.4.qualifier"
          unpack="false"/>
 
 </feature>
