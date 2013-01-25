@@ -149,7 +149,7 @@ public class DeltajComposer extends ComposerExtensionClass {
 	}
 
 	@Override
-	public void copyNotComposedFiles(IFile config, IFolder destination) {
+	public void copyNotComposedFiles(Configuration c, IFolder destination) {
 		copyFolderMembers(featureProject.getSourceFolder());
 	}
 
