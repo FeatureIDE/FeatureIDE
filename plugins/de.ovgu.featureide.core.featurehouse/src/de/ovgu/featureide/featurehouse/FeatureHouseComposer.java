@@ -222,6 +222,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		setJavaBuildPath(config.getName().split("[.]")[0]);
 		if (buildMetaProduct()) {
 			new FeatureModelClassGenerator(featureProject);
+			FSTGenComposerExtension.key = IFeatureProject.DEFAULT_META_PRODUCT_GENERATION.equals(featureProject.getMetaProductGeneration());
 			composer = new FSTGenComposerExtension();
 			FeatureModel featureModel = featureProject.getFeatureModel();
 			List<String> featureOrderList = featureModel.getConcreteFeatureNames();
@@ -619,8 +620,13 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	
 	@Override
 	public void copyNotComposedFiles(Configuration config, IFolder destination) {
-		super.copyNotComposedFiles(config, destination.getFolder(
-				featureProject.getCurrentConfiguration().getName().split("[.]")[0]));
+		if (destination.getProject().equals(featureProject.getProject())) {
+			super.copyNotComposedFiles(config, destination.getFolder(
+					featureProject.getCurrentConfiguration().getName().split("[.]")[0]));
+		} else {
+			// case: build into an external project
+			super.copyNotComposedFiles(config, destination);
+		}
 
 	}
 	
