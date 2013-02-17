@@ -78,7 +78,7 @@ public class FeatureUIHelper {
 	public static void setLocation(Feature feature, Point newLocation) {
 		Point oldLocation = getLocation(feature);
 		feature.setNewLocation(toFMPoint(newLocation));
-		if (newLocation == null || newLocation.equals(oldLocation))
+		if (newLocation == null )
 			return;
 		featureLocation.put(feature, newLocation);
 		fireLocationChanged(feature, oldLocation, newLocation);
