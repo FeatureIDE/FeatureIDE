@@ -18,8 +18,10 @@
  */
 package de.ovgu.featureide.ui.actions.generator;
 
-import java.io.CharArrayWriter;
-import java.io.PrintWriter;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.AbstractList;
 import java.util.LinkedList;
 import java.util.Scanner;
@@ -36,8 +38,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
-import com.sun.tools.javac.Main;
-
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
@@ -45,6 +45,7 @@ import de.ovgu.featureide.ui.UIPlugin;
  * 
  * @author Jens Meinicke
  */
+// TODO use compiler of the given project directly
 public class Compiler extends Job implements IConfigurationBuilderBasics {
 
 	private Generator generator;
@@ -144,6 +145,7 @@ public class Compiler extends Job implements IConfigurationBuilderBasics {
 	void compile(String confName, IFolder tmpFolder) {	
 		LinkedList<IFile> files = getJavaFiles(generator.builder.folder.getFolder(confName));
 		LinkedList<String> options = new LinkedList<String>();
+		options.add("javac");
 		options.add("-g");
 		options.add("-Xlint");
 		options.add("-d");
@@ -154,25 +156,63 @@ public class Compiler extends Job implements IConfigurationBuilderBasics {
 			options.add(file.getRawLocation().toOSString());
 		}
 		
-		CharArrayWriter charWriter = new CharArrayWriter();
-		Main.compile(toArray(options), new PrintWriter(charWriter));
-		files = parseJavacOutput(charWriter.toString(), files, confName);
+		String output = process(options);
+		files = parseJavacOutput(output, files, confName);
 		for (IFile file : files) {
 			generator.builder.featureProject.getComposer().postCompile(null, file);
 		}
 	}
-
-	/**
-	 * Converts a given <code>LinkedList</code> into an <code>array</code>.
-	 * @param list a LinkedList
-	 * @return the corresponding array
-	 */
-	private String[] toArray(AbstractList<String> list) {
-		String[] array = new String[list.size()];
-		for(int i = 0;i < list.size();i++) {
-			array[i] = list.get(i);
+	
+	private String process(AbstractList<String> command) {
+		ProcessBuilder processBuilder = new ProcessBuilder(command);
+		BufferedReader input = null;
+		BufferedReader error = null;
+		StringBuilder output = new StringBuilder();
+		try {
+			Process process = processBuilder.start();
+			input = new BufferedReader(new InputStreamReader(
+					process.getInputStream(), Charset.availableCharsets().get("UTF-8")));
+			error = new BufferedReader(new InputStreamReader(
+					process.getErrorStream(), Charset.availableCharsets().get("UTF-8")));
+			boolean x = true;
+			while (x) {
+				try {
+					String line;
+					while ((line = input.readLine()) != null) {
+						output.append(line);
+						output.append("\r\n");
+					}
+					while ((line = error.readLine()) != null) {
+						output.append(line);
+						output.append("\r\n");
+					}
+					try {
+						process.waitFor();
+					} catch (InterruptedException e) {
+						UIPlugin.getDefault().logError(e);
+					}
+					x = false;
+				} catch (IllegalThreadStateException e) {
+					UIPlugin.getDefault().logError(e);
+				}
+			}
+		} catch (IOException e) {
+			UIPlugin.getDefault().logError(e);
+		} finally {
+			try {
+				if(input!=null)input.close();
+			} catch (IOException e) {
+				UIPlugin.getDefault().logError(e);
+			} finally {
+				if(error!=null)
+					try {
+						error.close();
+					} catch (IOException e) {
+						UIPlugin.getDefault().logError(e);
+					}
+			}
 		}
-		return array;
+		return output.toString();
 	}
 
 	/**
