@@ -448,7 +448,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	private FeatureModelAnalyzer analyzer;
 
 	public void refresh() {
-		if (getFeatureModel() == null || getFeatureModel().getRoot() == null)
+		if (getFeatureModel() == null || getFeatureModel().getRoot() == null||getContents()==null)
 			return;
 
 		internRefresh(false);
@@ -695,7 +695,9 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 				featureModelEditor.isPageModified = false;
 				featureModelEditor
 						.setActiveEditorPage(featureModelEditor.textEditor
-								.getIndex());
+							.getIndex());
+				featureModelEditor.oldPageIndex=featureModelEditor.textEditor
+						.getIndex();
 				return;
 			}
 		}

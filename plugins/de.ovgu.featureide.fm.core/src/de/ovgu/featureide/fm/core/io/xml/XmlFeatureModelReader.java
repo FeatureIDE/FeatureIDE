@@ -197,9 +197,8 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 							}
 						}
 						// END read attributes from XML tag
-						int i = 0;
-						while(featureModel.getFeatureNames().contains(attrName))attrName=attrName+i++;
-						if (featureModel.getFMComposerExtension().isValidFeatureName(attrName)) 
+						if (!featureModel.getFeatureNames().contains(attrName)
+								&& featureModel.getFMComposerExtension().isValidFeatureName(attrName)) 
 						{
 							addFeature(attrName, isMandatory, isAbstract, isHidden,	parent, featureLocation);
 						} else {
@@ -209,7 +208,12 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 										+ "' is not a valid feature name",
 										event.getLocation().getLineNumber());
 							}
-							
+							if (featureModel.getFeatureNames().contains(
+									attrName)) {
+								throw new UnsupportedModelException(
+										"Cannot redefine '" + attrName + "'",
+										event.getLocation().getLineNumber());
+							}
 						}
 
 						if (currentTag != "feature") {

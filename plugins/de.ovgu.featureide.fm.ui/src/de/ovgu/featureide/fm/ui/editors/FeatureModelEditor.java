@@ -193,17 +193,21 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		createFeatureOrderPage();
 		createExtensionPages();
 		createSourcePage();
+		//if there are errors in the model file, go to source page
+		if(!textEditor.updateDiagram())setActivePage(getTextEditorIndex());
+		else 
+			diagramEditor.getControl().getDisplay().asyncExec(new Runnable() {
+				public void run() {
+					diagramEditor.setContents(featureModel);
+					pageChange(getDiagramEditorIndex());
+				}
+			});
+	
 	}
 
 	void createDiagramPage() {
 		diagramEditor = new FeatureDiagramEditor(this, getContainer());
 		featureModel.addListener(diagramEditor);
-		diagramEditor.getControl().getDisplay().asyncExec(new Runnable() {
-			public void run() {
-				diagramEditor.setContents(featureModel);
-				pageChange(getDiagramEditorIndex());
-			}
-		});
 		diagramEditor.setIndex(addPage(diagramEditor.getControl()));
 		setPageText(getDiagramEditorIndex(), diagramEditor.getPageText());
 		diagramEditor.initEditor();
@@ -348,7 +352,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 			textEditor.setFocus();
 	}
 
-	private int oldPageIndex;
+	int oldPageIndex;
 
 	@Override
 	protected void pageChange(int newPageIndex) {
@@ -356,10 +360,15 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		if (contributor instanceof FeatureModelEditorContributor) {
 			((FeatureModelEditorContributor) contributor).setActivePage(this, newPageIndex);
 		}
-		getPage(oldPageIndex).pageChangeFrom(newPageIndex);
-		getPage(newPageIndex).pageChangeTo(oldPageIndex);
-
+		
+		int oldPage = oldPageIndex;
+		//set oldPageIndex before calling methods pageChangeFrom/To to allow
+		//changes to OldPageIndex from inside these methods
+		//(used to block page changes in case of errors in the model)
 		oldPageIndex = newPageIndex;
+		getPage(oldPageIndex).pageChangeFrom(newPageIndex);
+		getPage(newPageIndex).pageChangeTo(oldPage);
+
 		
 		super.pageChange(newPageIndex);
 	}
@@ -417,7 +426,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 	public void doSave(IProgressMonitor monitor) {
 		if (!saveEditors())
 			return;
-
 		featureOrderEditor.doSave(monitor);
 		featureModel.performRenamings(file);
 		for (IFeatureModelEditorPage page : extensionPages) {
@@ -426,6 +434,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		
 		// write the model to the file
 		if (getActivePage() == textEditor.getIndex()) {
+			textEditor.updateDiagram();
 			textEditor.doSave(monitor);
 		} else {
 			try {

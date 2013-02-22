@@ -32,8 +32,9 @@ import org.eclipse.core.runtime.CoreException;
  */
 public class ModelMarkerHandler implements IModelMarkerHandler {
 
-	private static final String MODEL_MARKER = FMCorePlugin.PLUGIN_ID + ".modelProblemMarker";
-
+	//TODO: replace this ID by FMCorePlugin.PLUGIN_ID + ".modelProblemMarker";
+	private static final String MODEL_MARKER = "de.ovgu.featureide.core"+".featureModuleMarker";
+	
 	public ModelMarkerHandler(IFile modelFile) {
 		this.modelFile = modelFile;
 		this.project = modelFile.getProject();
@@ -52,6 +53,11 @@ public class ModelMarkerHandler implements IModelMarkerHandler {
 	public void createModelMarker(String message, int severity, int lineNumber) {
 		try {
 			IResource resource = modelFile.exists() ? modelFile : project;
+			for (IMarker m : resource.findMarkers(MODEL_MARKER, false, IResource.DEPTH_ZERO)) {
+				if (m.getAttribute(IMarker.MESSAGE, "").equals(message)) {
+					return;
+				}
+			}
 			IMarker marker = resource.createMarker(MODEL_MARKER);
 			if (marker.exists()) {
 				marker.setAttribute(IMarker.MESSAGE, message);

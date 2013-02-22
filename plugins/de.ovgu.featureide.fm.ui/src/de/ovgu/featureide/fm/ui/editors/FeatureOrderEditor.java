@@ -674,6 +674,19 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	 */
 	@Override
 	public void pageChangeTo(int oldPage) {
+
+		if (oldPage == featureModelEditor.textEditor.getIndex()) {
+			if (!featureModelEditor.textEditor.updateDiagram()) {
+				// there are errors in the file, stay at this editor page
+				featureModelEditor.isPageModified = false;
+				featureModelEditor
+						.setActiveEditorPage(featureModelEditor.textEditor
+							.getIndex());
+				featureModelEditor.oldPageIndex=featureModelEditor.textEditor
+						.getIndex();
+				return;
+			}
+		}
 		updateOrderEditor();
 	}
 }

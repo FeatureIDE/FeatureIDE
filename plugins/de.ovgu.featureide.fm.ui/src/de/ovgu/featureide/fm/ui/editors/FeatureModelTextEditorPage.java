@@ -21,6 +21,7 @@ package de.ovgu.featureide.fm.ui.editors;
 import java.beans.PropertyChangeEvent;
 
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -76,6 +77,8 @@ public class FeatureModelTextEditorPage extends TextEditor implements
 	 * Updates the text editor from diagram.
 	 */
 	public void updateTextEditor() {
+		//prevent writing incorrectly read models due to errors in the model
+		if(featureModelEditor.fmFile.hasModelMarkers())return;
 		String text = featureModelEditor.featureModelWriter.writeToString();
 		getDocumentProvider().getDocument(getEditorInput()).set(text);
 	}
