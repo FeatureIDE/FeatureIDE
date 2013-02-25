@@ -148,7 +148,7 @@ public class FeatureModelClassGenerator {
 				stringBuilder.append(" + ");	
 			}
 			String name = features.get(i).getName();
-			stringBuilder.append(" (" + name.toLowerCase() + "_ ? \"" + name + "\\r\\n\" : \"\") ");
+			stringBuilder.append(" (" + name.toLowerCase()+"_ != null && " + name.toLowerCase() + "_ ? \"" + name + "\\r\\n\" : \"\") ");
 		}
 		stringBuilder.append(";\r\n\t\treturn ");
 		for (int i = 0;i < features.size();i++) {
@@ -193,18 +193,19 @@ public class FeatureModelClassGenerator {
 		}
 		if (!KeY) {
 			stringBuilder.append(";\n\n\t/**\r\n\t * Core features are set 'selected' and dead features 'unselected'.\r\n\t * All other features have unknown selection states.\r\n\t */\r\n\tstatic {\r\n");
-			
 			for (int i = 0;i< features.size();i++) {
-				stringBuilder.append("\t\t" + features.get(i).toString().toLowerCase()+(KeY ? "" : "_"));
 				if (deadFeatures.contains(features.get(i))) {
+					stringBuilder.append("\t\t" + features.get(i).toString().toLowerCase()+(KeY ? "" : "_"));
 					stringBuilder.append(" = false;\n");
 				} if (coreFeatures.contains(features.get(i))) {
+					stringBuilder.append("\t\t" + features.get(i).toString().toLowerCase()+(KeY ? "" : "_"));
 					stringBuilder.append(" = true;\n");
 				} else {
 					if (KeY) {
+						stringBuilder.append("\t\t" + features.get(i).toString().toLowerCase()+(KeY ? "" : "_"));
 						stringBuilder.append(" = random();\n");
 					} else {
-						stringBuilder.append(" = null;\n");
+						//stringBuilder.append(" = null;\n");
 					}
 				}
 			}
