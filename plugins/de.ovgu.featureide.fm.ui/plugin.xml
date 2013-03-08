@@ -174,11 +174,18 @@
                label="Export model to SPL Conquerer format"
                menubarPath="de.ovgu.featureide.fm.ui.menu/conquerer">
          </action>
-                  <action
+         <action
                class="de.ovgu.featureide.fm.ui.actions.FeatureDependenciesAction"
                icon="icons/export_wiz.gif"
                id="de.ovgu.featureide.fm.ui.FeatureDependencies"
                label="Export feature dependency information"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/dependency">
+         </action>
+         <action
+               class="de.ovgu.featureide.fm.ui.actions.ExportCNFAction"
+               icon="icons/export_wiz.gif"
+               id="de.ovgu.featureide.fm.ui.ExportCNF"
+               label="Export CNF"
                menubarPath="de.ovgu.featureide.fm.ui.menu/dependency">
          </action>
       </objectContribution>
