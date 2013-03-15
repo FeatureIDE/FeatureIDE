@@ -29,9 +29,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
 
-import mixin.AST_Program;
-import mixin.ExtendedParseException;
+
 import mixin.Mixin;
+import jampack.Jampack;
+
+/*import mixin.AST_Program;
+import mixin.ExtendedParseException;
+import mixin.Mixin;*/
+/*
+import jampack.AST_Program;
+import jampack.ExtendedParseException;
+import jampack.Jampack;*/
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -43,7 +51,9 @@ import org.eclipse.core.runtime.CoreException;
 import Jakarta.util.ExitError;
 
 import de.ovgu.featureide.ahead.AheadCorePlugin;
-import de.ovgu.featureide.ahead.model.JakModelBuilder;
+import de.ovgu.featureide.ahead.model.AbstractJakModelBuilder;
+import de.ovgu.featureide.ahead.model.MixinJakModelBuilder;
+import de.ovgu.featureide.ahead.model.JampackJakModelBuilder;
 import de.ovgu.featureide.core.IFeatureProject;
 
 
@@ -67,8 +77,9 @@ public class ComposerWrapper {
 	private LinkedList<IFolder> allFeatureFolders;
 	private LinkedList<IFolder> featureFolders;
 
-	private Mixin mixin = new Mixin();
-
+	private Mixin mixin = new Mixin();	
+	private Jampack jampack = new Jampack();
+	
 	private LinkedList<IFile> composedFiles;
 
 	private IFolder compositionFolder;
@@ -77,7 +88,7 @@ public class ComposerWrapper {
 
 	private IFeatureProject featureProject;
 
-	private JakModelBuilder jakModelBuilder;
+	private AbstractJakModelBuilder<?> jakModelBuilder;
 
 	/**
 	 * Creates a new instance of Composer
@@ -94,7 +105,11 @@ public class ComposerWrapper {
 		errorListeners = new LinkedList<AheadBuildErrorListener>();
 		this.featureProject = featureProject;
 		if (jakModelBuilder == null) {
-			jakModelBuilder = new JakModelBuilder(featureProject);			
+			if (featureProject.getCompositionTool().equals("Jampack")) {
+				jakModelBuilder = new JampackJakModelBuilder(featureProject);
+			} else {
+				jakModelBuilder = new MixinJakModelBuilder(featureProject);
+			}
 		}
 	}
 	
@@ -292,7 +307,14 @@ public class ComposerWrapper {
 	}
 
 	public IFile[] compose() {
-		composeJakFiles(compositionFolder);
+		// decide method to call based on composition tool
+		if (featureProject.getCompositionTool().equals("Jampack")) {
+			AheadCorePlugin.getDefault().logInfo("compose with jampack");
+			composeJampackJakFiles(compositionFolder);
+		} else {
+			AheadCorePlugin.getDefault().logInfo("compose with mixin");
+			composeMixinJakFiles(compositionFolder);
+		}
 		IFile[] composedFilesArray = new IFile[composedFiles.size()];
 		for (int i = 0; i < composedFilesArray.length; i++) {
 			composedFilesArray[i] = composedFiles.get(i);
@@ -306,8 +328,9 @@ public class ComposerWrapper {
 		return composedFilesArray;
 	}
 
+	
 	@SuppressWarnings("unchecked")
-	private void composeJakFiles(IFolder compositionDir) {
+	private void composeMixinJakFiles(IFolder compositionDir) {
 		composedFiles.clear();
 		jakModelBuilder.reset();
 		TreeMap<String, IFile> fileMap = new TreeMap<String, IFile>();
@@ -324,13 +347,13 @@ public class ComposerWrapper {
 
 			IFile newJakIFile = compositionDir.getFile(jakFile);
 			try {
-				AST_Program[] composedASTs = new AST_Program[files.length];
-				AST_Program[] ownASTs = new AST_Program[files.length];
+				mixin.AST_Program[] composedASTs = new mixin.AST_Program[files.length];
+				mixin.AST_Program[] ownASTs = new mixin.AST_Program[files.length];
 				mixin.compose(null, featureProject.getSourceFolder().getRawLocation().toOSString(),
 						files, "x", composedASTs, ownASTs);
 
 				// Add the currently composed class to the JakProject
-				jakModelBuilder.addClass(jakFile, filesVec, composedASTs, ownASTs);
+				((MixinJakModelBuilder) jakModelBuilder).addClass(jakFile, filesVec, composedASTs, ownASTs);
 				composedFiles.add(newJakIFile);
 
 				try {
@@ -340,9 +363,10 @@ public class ComposerWrapper {
 				} catch (CoreException e) {
 					AheadCorePlugin.getDefault().logError(e);
 				}
-			} catch (ExtendedParseException e) {
+			} catch (mixin.ExtendedParseException e) {
 				handleErrorMessage(e, fileMap);
 			} catch (Exception e) {
+				AheadCorePlugin.getDefault().logError(e);
 				handleErrorMessage(featureProject.getSourceFolder(),
 						"Unexpected error while parsing "
 								+ newJakIFile.getName(), 0);
@@ -365,6 +389,52 @@ public class ComposerWrapper {
 		}
 	}
 
+	
+	@SuppressWarnings("unchecked")
+	private void composeJampackJakFiles(IFolder compositionDir) {
+		composedFiles.clear();
+		jakModelBuilder.reset();
+		TreeMap<String, IFile> fileMap = new TreeMap<String, IFile>();
+		
+		for (String jakFile : ((TreeMap<String, LinkedList<IFile>>)absoluteJakFilenames.clone()).keySet()) {
+			LinkedList<IFile> filesVec = absoluteJakFilenames.get(jakFile);
+			String[] files = new String[filesVec.size()];
+			IFile[] files2  = new IFile[filesVec.size()];
+			for (int i = 0; i < filesVec.size(); i++) {
+				files[i] = filesVec.get(i).getRawLocation().toOSString();
+				files2[i] = filesVec.get(i);
+				fileMap.put(files[i], filesVec.get(i));
+			}
+
+			IFile newJakIFile = compositionDir.getFile(jakFile);
+			try {
+				jampack.AST_Program[] composedASTs = new jampack.AST_Program[files.length];
+				jampack.AST_Program[] ownASTs = new jampack.AST_Program[files.length];
+				jampack.compose(null, featureProject.getSourceFolder().getRawLocation().toOSString(),
+						files, "x", composedASTs, ownASTs);
+
+				// Add the currently composed class to the JakProject
+				((JampackJakModelBuilder) jakModelBuilder).addClass(jakFile, filesVec, composedASTs, ownASTs);
+				composedFiles.add(newJakIFile);
+
+				try {
+					if (configFile != null) {
+						runJampack(files2);
+					}
+				} catch (CoreException e) {
+					AheadCorePlugin.getDefault().logError(e);
+				}
+			} catch (jampack.ExtendedParseException e) {
+				handleErrorMessage(e, fileMap);
+			} catch (Exception e) {
+				AheadCorePlugin.getDefault().logError(e);
+				handleErrorMessage(featureProject.getSourceFolder(),
+						"Unexpected error while parsing "
+								+ newJakIFile.getName(), 0);
+			}
+		}
+	}
+	
 	private void runMixin(IFile[] files) throws CoreException {
 		files = removeUnselectedFeatures(files);
 		if (files.length == 0) {
@@ -398,6 +468,39 @@ public class ComposerWrapper {
 		
 	}
 
+	private void runJampack(IFile[] files) throws CoreException {
+		files = removeUnselectedFeatures(files);
+		if (files.length == 0) {
+			return;
+		}
+		String layer = setLayer((IFolder)files[0].getParent());
+		int i = 4;
+		if (layer == null) {
+			i = 2;
+		}
+		String[] args = new String[files.length + i];
+		IFolder outputfolder = setOutputFolder(layer);
+		args[0] = "-f";
+		args[1] = outputfolder.getRawLocation().toOSString() + File.separator + files[0].getName(); 
+		if (layer != null) {
+			args[2] = "-a";
+			args[3] = layer;
+		}
+		for (IFile file : files) {
+			
+			args[i] = file.getRawLocation().toOSString();
+			i++;
+		}
+		
+		//run Jampack
+		try {
+			Jampack.main(args);
+		} catch (ExitError e) {
+			AheadCorePlugin.getDefault().logError(e);
+		}	
+		
+	}
+	
 	private IFile[] removeUnselectedFeatures(IFile[] files) {
 		ArrayList<IFile> selectedFiles = new ArrayList<IFile>();
 		for (IFile file : files) {
@@ -445,7 +548,7 @@ public class ComposerWrapper {
 		return setLayer((IFolder)folder.getParent()) + "." + folder.getName();
 	}
 
-	private void handleErrorMessage(ExtendedParseException e,
+	private void handleErrorMessage(mixin.ExtendedParseException e,
 			TreeMap<String, IFile> fileMap) {
 		IFile source = null;
 		if (fileMap != null && e.getFilename() != null && fileMap.containsKey(e.getFilename()))
@@ -455,6 +558,16 @@ public class ComposerWrapper {
 		handleErrorMessage(source, message, e.getLineNumber());
 	}
 
+	private void handleErrorMessage(jampack.ExtendedParseException e,
+			TreeMap<String, IFile> fileMap) {
+		IFile source = null;
+		if (fileMap != null && e.getFilename() != null && fileMap.containsKey(e.getFilename()))
+			source = fileMap.get(e.getFilename());
+		String message = source != null ? e.getShortMessage() : e
+				.getFullMessage();
+		handleErrorMessage(source, message, e.getLineNumber());
+	}
+	
 	private void handleErrorMessage(IResource source, String message,
 			int lineNumber) {
 		AheadBuildErrorEvent evt = new AheadBuildErrorEvent(source, message,

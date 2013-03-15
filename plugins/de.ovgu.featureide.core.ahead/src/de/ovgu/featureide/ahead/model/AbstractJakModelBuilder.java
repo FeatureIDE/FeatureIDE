@@ -1,0 +1,69 @@
+package de.ovgu.featureide.ahead.model;
+/* FeatureIDE - An IDE to support feature-oriented software development
+ * Copyright (C) 2005-2012  FeatureIDE team, University of Magdeburg
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ * See http://www.fosd.de/featureide/ for further information.
+ */
+
+import java.util.LinkedList;
+
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+
+import de.ovgu.featureide.ahead.AheadCorePlugin;
+import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.fstmodel.FSTField;
+import de.ovgu.featureide.core.fstmodel.FSTMethod;
+import de.ovgu.featureide.core.fstmodel.FSTModel;
+import de.ovgu.featureide.core.fstmodel.FSTRole;
+
+/**
+ * This builder builds the JakProjectModel, by extracting features, 
+ * methods and fields from classes to build. 
+ * 
+ * @author Tom Brosch
+ * @author Constanze Adler
+ * @author Jens Meinicke
+ */
+/**
+ * Hacky: jampack and mixin have their own AST... types, which are functionally equivalent
+ * due to being generated from the same code.
+ * 
+ * @author Felix Rieger
+ */
+public abstract class AbstractJakModelBuilder<AST_Program_Type> {
+	/**
+	 * Adds a class to the jak project model
+	 * 
+	 * @param className
+	 *            Name of the class
+	 * @param sources
+	 *            source files that were composed to build this class
+	 * @param composedASTs
+	 *            composed ahead ASTs during the composition step
+	 * @param ownASTs
+	 *            ahead ASTs of each source file without composing
+	 */
+	public abstract void addClass(String className, LinkedList<IFile> sources,
+			AST_Program_Type[] composedASTs, AST_Program_Type[] ownASTs);
+
+	public abstract void updateAst(String currentClass, LinkedList<IFile> sources,
+			AST_Program_Type[] composedASTs, AST_Program_Type[] ownASTs);
+
+	public abstract void reset();
+}
+
+

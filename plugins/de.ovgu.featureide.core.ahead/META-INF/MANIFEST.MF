@@ -15,6 +15,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: University of Magdeburg
 Bundle-ClassPath: lib/jak2java.jar,
  lib/mixin.jar,
+ lib/jampack.jar,
  .
 Export-Package: de.ovgu.featureide.ahead,
  de.ovgu.featureide.ahead.model

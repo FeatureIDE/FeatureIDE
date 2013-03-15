@@ -20,17 +20,17 @@ package de.ovgu.featureide.ahead.model;
 
 import java.util.LinkedList;
 
-import mixin.AST_Modifiers;
-import mixin.AST_ParList;
-import mixin.AST_Program;
-import mixin.AST_TypeName;
-import mixin.AstCursor;
-import mixin.AstNode;
-import mixin.AstToken;
-import mixin.DecNameDim;
-import mixin.FldVarDec;
-import mixin.MethodDcl;
-import mixin.MthDector;
+import jampack.AST_Modifiers;
+import jampack.AST_ParList;
+import jampack.AST_Program;
+import jampack.AST_TypeName;
+import jampack.AstCursor;
+import jampack.AstNode;
+import jampack.AstToken;
+import jampack.DecNameDim;
+import jampack.FldVarDec;
+import jampack.MethodDcl;
+import jampack.MthDector;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -49,20 +49,22 @@ import de.ovgu.featureide.core.fstmodel.FSTRole;
  * @author Tom Brosch
  * @author Constanze Adler
  * @author Jens Meinicke
+ * @author Felix Rieger
  */
-public class JakModelBuilder {
+public class JampackJakModelBuilder extends AbstractJakModelBuilder<AST_Program>{
 
 	private FSTModel model;
 	
 	private IFolder sourceFolder;
 
-	public JakModelBuilder(IFeatureProject featureProject) {
+	public JampackJakModelBuilder(IFeatureProject featureProject) {
 		if (featureProject != null) {
 			model = new FSTModel(featureProject);
 			featureProject.setFSTModel(model);
 		}
 	}
 	
+	@Override
 	public void reset() {
 		model.reset();
 	}
