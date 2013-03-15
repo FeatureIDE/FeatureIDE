@@ -294,6 +294,23 @@
     </target>
     
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <!-- The "jampack" target builds the Jampack tool, which composes Jak  -->
+    <!-- code. -->
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+    <target
+        name="jampack"
+        depends="grammar"
+        description="Builds the Jampack composition tool.">
+
+	<antcall target="method.build">
+	    <param name="arg.tool" value="jampack"/>
+	</antcall>
+
+    </target>
+	
+
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- The "ahead" target builds the Ahead class, which composes Jak code -->
     <!-- by converting the operand classes into an inheritance chain.      -->
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
