@@ -1397,4 +1397,34 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	public String toString() {
 		return project.getName();
 	}
+	
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.IFeatureProject#getCompositionTool()
+	 */
+	// TODO: change name	
+	public String getCompositionTool() {
+		String compositionTool = null;
+		try {
+			compositionTool = project.getPersistentProperty(compositionToolConfigID);
+		} catch (CoreException e) {
+			CorePlugin.getDefault().logError(e);
+		}
+		if (compositionTool == null) {
+			return DEFAULT_COMPOSITION_TOOL;
+		}
+		return compositionTool;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.IFeatureProject#setCompositionTool(java.lang.String)
+	 */
+	// TODO: change name
+	public void setCompositionTool(String compositionTool) {
+		try {
+			project.setPersistentProperty(compositionToolConfigID, compositionTool);
+		} catch (CoreException e) {
+			CorePlugin.getDefault().logError(e);
+		}
+	}
+	
 }

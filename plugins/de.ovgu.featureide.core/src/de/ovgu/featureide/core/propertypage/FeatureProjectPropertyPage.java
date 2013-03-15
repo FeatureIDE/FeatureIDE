@@ -72,6 +72,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 	private Combo composerCombo;
 	private Combo contractCombo;
 	private Combo metaCombo;
+	private Combo toolCombo;
 
 	private boolean canFinish = true;
 
@@ -121,6 +122,10 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		label = new Label(composite, SWT.NONE);
 		label.setText("&Meta Product Generation: "
 				+ featureProject.getMetaProductGeneration());
+		label = new Label(composite, SWT.NONE);
+		// TODO: change text
+		label.setText("Composition tool: " 
+				+ featureProject.getCompositionTool());
 		addCompositionGroup(composite);
 		return composite;
 	}
@@ -161,6 +166,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		addAllPathMember(compositionGroup);
 		addContractMember(compositionGroup);
 		addMetaProductMember(compositionGroup);
+		addCompositionToolMember(compositionGroup);
 	}
 
 	/**
@@ -235,7 +241,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 
 	private void addMetaProductMember(Group group) {
 		Label label = new Label(group, SWT.NULL);
-		label.setText("&Mata Product Generation");
+		label.setText("&Meta Product Generation");
 		metaCombo = new Combo(group, SWT.READ_ONLY | SWT.DROP_DOWN);
 		metaCombo.setLayoutData(gd);
 		metaCombo.add(IFeatureProject.DEFAULT_META_PRODUCT_GENERATION);
@@ -260,6 +266,36 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 			}
 		}
 	}
+	
+	// TODO: change name
+	private void addCompositionToolMember(Group group) {
+		Label label = new Label(group, SWT.NULL);
+		label.setText("Composition tool");
+		toolCombo = new Combo(group, SWT.READ_ONLY | SWT.DROP_DOWN);
+		toolCombo.setLayoutData(gd);
+		toolCombo.add(IFeatureProject.DEFAULT_COMPOSITION_TOOL);
+		toolCombo.add("Jampack");
+		String composer = featureProject.getCompositionTool();
+		refreshCompositionToolCombo(composer);
+		toolCombo.addModifyListener(listener);
+	}
+	
+	// TODO: change name
+	private void refreshCompositionToolCombo(String compositionTool) {
+		if (!this.composer.hasCompositionTools()) {
+			toolCombo.setEnabled(false);
+			toolCombo.select(0);
+		} else {
+			int i = 0;
+			for (String item : toolCombo.getItems()) {
+				if (item.equals(compositionTool)) {
+					toolCombo.select(i);
+					break;
+				}
+				i++;
+			}
+		}
+	}	
 	
 	/**
 	 * Adds the text fields of features, source and configurations path
@@ -324,6 +360,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		setPaths();
 		setContractComposition();
 		setMetaProductGeneration();
+		setCompositionTool();
 		try {
 			/* update the FeatureProject settings */
 			project.close(null);
@@ -366,6 +403,25 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 
 	}
 
+	// TODO: change name
+	private void setCompositionTool() {
+		if (!compositionToolChanged()) {
+			return;
+		}
+
+		featureProject.setCompositionTool(toolCombo
+				.getItem(toolCombo.getSelectionIndex()));
+
+	}
+
+	// TODO: change name
+	private boolean compositionToolChanged() {
+		return !featureProject.getCompositionTool().equals(
+				toolCombo.getText());
+
+	}
+	
+	
 	/**
 	 * Sets the composer of the feature project
 	 */
@@ -396,7 +452,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 	 * @return <code>true</code> if the shown settings are equal to the old
 	 */
 	private boolean nothingChanged() {
-		return !composerChanged() && noPathChanged() && !contractChanged() && !metaProductChanged();
+		return !composerChanged() && noPathChanged() && !contractChanged() && !metaProductChanged() && !compositionToolChanged();
 	}
 
 	/**
@@ -449,6 +505,14 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 			}
 			i++;
 		}
+		i = 0;
+		for (String item : toolCombo.getItems()) {
+			if (item.equals(featureProject.getCompositionTool())) {
+				toolCombo.select(i);
+				break;
+			}
+			i++;
+		}
 		featurePath.setEnabled(composer.hasFeatureFolder());
 		featurePath.setText(featureProject.getSourceFolder()
 				.getProjectRelativePath().toOSString());
@@ -459,6 +523,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 				.getProjectRelativePath().toOSString());
 		refreshContractCombo(composerCombo.getText());
 		refreshMetaCombo(metaCombo.getText());
+		refreshCompositionToolCombo(toolCombo.getText());
 	}
 
 	/**

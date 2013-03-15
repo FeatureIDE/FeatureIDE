@@ -331,6 +331,11 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		return false;
 	}
 	
+	public boolean hasCompositionTools() {
+		return false;
+	}
+	
+	
 	protected boolean isPluginInstalled(String ID) {
 		for(Bundle b :InternalPlatform.getDefault().getBundleContext().getBundles()){
 			if(b.getSymbolicName().startsWith(ID))return true;

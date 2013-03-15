@@ -207,4 +207,10 @@ public interface IComposerExtensionClass {
 	 * @return <code>true</code> if the composition tool supports meta product generation.
 	 */
 	boolean hasMetaProductGeneration();
+	
+	/**
+	 * @return <code>true</code> if the composition tool supports different composition tools
+	 */
+	// TODO: change name
+	boolean hasCompositionTools();
 }

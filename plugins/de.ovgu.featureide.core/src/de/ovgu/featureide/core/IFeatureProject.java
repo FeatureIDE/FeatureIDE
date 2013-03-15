@@ -37,6 +37,8 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	public static final QualifiedName buildFolderConfigID = new QualifiedName("featureproject.configs", "build");
 	public static final QualifiedName configFolderConfigID = new QualifiedName("featureproject.configs", "equations");
 	public static final QualifiedName sourceFolderConfigID = new QualifiedName("featureproject.configs", "source");
+	// TODO: change name
+	public static final QualifiedName compositionToolConfigID = new QualifiedName("featureproject.configs", "compositiontool");
 	
 	public static final String SOURCE_ARGUMENT = "source";
 	public static final String CONFIGS_ARGUMENT = "equations";
@@ -47,12 +49,13 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	public static final String DEFAULT_BUILD_PATH = "build";
 	public static final String DEFAULT_CONTRACT_COMPOSITION= "None";
 	public static final String DEFAULT_META_PRODUCT_GENERATION= "KeY";
+	public static final String DEFAULT_COMPOSITION_TOOL = "Mixin";
 	public static final QualifiedName configConfigID = new QualifiedName("featureproject.configs", "currentEquation");
 	
 	public static final QualifiedName javaClassPathID = new QualifiedName("featureproject.configs", "javaClassPath");
 	public static final QualifiedName contractCompositionID = new QualifiedName(IFeatureProject.class.getName() + "#ContractComposition",
 			IFeatureProject.class.getName() + "#ContractComposition");
-	
+
 	public void dispose();
 
 	/**
@@ -97,6 +100,10 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	public String getContractComposition();
 	
 	public String getMetaProductGeneration();
+	
+	// TODO: change name
+	public String getCompositionTool();
+	
 	/**
 	 * Gets the java class path without the default paths
 	 * 
@@ -181,6 +188,13 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	 * @param model
 	 */
 	public void setMetaProductGeneration(String metaProductGeneration);
+	
+	/**
+	 * sets the composition tool
+	 * @param compositionTool
+	 */
+	// TODO: change name
+	public void setCompositionTool(String compositionTool);
 	
 	/**
 	 * @return True if a source file, or the current configuration changed.
