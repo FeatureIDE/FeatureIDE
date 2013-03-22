@@ -200,7 +200,7 @@ public class ComposerExtensionProxy implements IComposerExtension {
 		return composerExtensionClass.hasMetaProductGeneration();
 	}
 
-	public boolean hasCompositionTools() {
-		return composerExtensionClass.hasCompositionTools();
+	public boolean hasCompositionMechanisms() {
+		return composerExtensionClass.hasCompositionMechanisms();
 	}
 }

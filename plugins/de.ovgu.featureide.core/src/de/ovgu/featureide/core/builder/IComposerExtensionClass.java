@@ -211,6 +211,5 @@ public interface IComposerExtensionClass {
 	/**
 	 * @return <code>true</code> if the composition tool supports different composition tools
 	 */
-	// TODO: change name
-	boolean hasCompositionTools();
+	boolean hasCompositionMechanisms();
 }

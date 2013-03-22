@@ -331,7 +331,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		return false;
 	}
 	
-	public boolean hasCompositionTools() {
+	public boolean hasCompositionMechanisms() {
 		return false;
 	}
 	

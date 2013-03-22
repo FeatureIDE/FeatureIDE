@@ -72,7 +72,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 	private Combo composerCombo;
 	private Combo contractCombo;
 	private Combo metaCombo;
-	private Combo toolCombo;
+	private Combo mechanismCombo;
 
 	private boolean canFinish = true;
 
@@ -123,9 +123,8 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		label.setText("&Meta Product Generation: "
 				+ featureProject.getMetaProductGeneration());
 		label = new Label(composite, SWT.NONE);
-		// TODO: change text
-		label.setText("Composition tool: " 
-				+ featureProject.getCompositionTool());
+		label.setText("Composition mechanism: " 
+				+ featureProject.getCompositionMechanism());
 		addCompositionGroup(composite);
 		return composite;
 	}
@@ -166,7 +165,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		addAllPathMember(compositionGroup);
 		addContractMember(compositionGroup);
 		addMetaProductMember(compositionGroup);
-		addCompositionToolMember(compositionGroup);
+		addCompositionMechanismMember(compositionGroup);
 	}
 
 	/**
@@ -267,29 +266,27 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		}
 	}
 	
-	// TODO: change name
-	private void addCompositionToolMember(Group group) {
+	private void addCompositionMechanismMember(Group group) {
 		Label label = new Label(group, SWT.NULL);
-		label.setText("Composition tool");
-		toolCombo = new Combo(group, SWT.READ_ONLY | SWT.DROP_DOWN);
-		toolCombo.setLayoutData(gd);
-		toolCombo.add(IFeatureProject.DEFAULT_COMPOSITION_TOOL);
-		toolCombo.add("Jampack");
-		String composer = featureProject.getCompositionTool();
-		refreshCompositionToolCombo(composer);
-		toolCombo.addModifyListener(listener);
+		label.setText("Composition mechanism");
+		mechanismCombo = new Combo(group, SWT.READ_ONLY | SWT.DROP_DOWN);
+		mechanismCombo.setLayoutData(gd);
+		mechanismCombo.add(IFeatureProject.DEFAULT_COMPOSITION_MECHANISM);
+		mechanismCombo.add("Jampack");
+		String composer = featureProject.getCompositionMechanism();
+		refreshCompositionMechanismCombo(composer);
+		mechanismCombo.addModifyListener(listener);
 	}
 	
-	// TODO: change name
-	private void refreshCompositionToolCombo(String compositionTool) {
-		if (!this.composer.hasCompositionTools()) {
-			toolCombo.setEnabled(false);
-			toolCombo.select(0);
+	private void refreshCompositionMechanismCombo(String compositionMechanism) {
+		if (!this.composer.hasCompositionMechanisms()) {
+			mechanismCombo.setEnabled(false);
+			mechanismCombo.select(0);
 		} else {
 			int i = 0;
-			for (String item : toolCombo.getItems()) {
-				if (item.equals(compositionTool)) {
-					toolCombo.select(i);
+			for (String item : mechanismCombo.getItems()) {
+				if (item.equals(compositionMechanism)) {
+					mechanismCombo.select(i);
 					break;
 				}
 				i++;
@@ -360,7 +357,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		setPaths();
 		setContractComposition();
 		setMetaProductGeneration();
-		setCompositionTool();
+		setCompositionMechanism();
 		try {
 			/* update the FeatureProject settings */
 			project.close(null);
@@ -403,21 +400,19 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 
 	}
 
-	// TODO: change name
-	private void setCompositionTool() {
-		if (!compositionToolChanged()) {
+	private void setCompositionMechanism() {
+		if (!compositionMechanismChanged()) {
 			return;
 		}
 
-		featureProject.setCompositionTool(toolCombo
-				.getItem(toolCombo.getSelectionIndex()));
+		featureProject.setCompositionMechanism(mechanismCombo
+				.getItem(mechanismCombo.getSelectionIndex()));
 
 	}
 
-	// TODO: change name
-	private boolean compositionToolChanged() {
-		return !featureProject.getCompositionTool().equals(
-				toolCombo.getText());
+	private boolean compositionMechanismChanged() {
+		return !featureProject.getCompositionMechanism().equals(
+				mechanismCombo.getText());
 
 	}
 	
@@ -452,7 +447,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 	 * @return <code>true</code> if the shown settings are equal to the old
 	 */
 	private boolean nothingChanged() {
-		return !composerChanged() && noPathChanged() && !contractChanged() && !metaProductChanged() && !compositionToolChanged();
+		return !composerChanged() && noPathChanged() && !contractChanged() && !metaProductChanged() && !compositionMechanismChanged();
 	}
 
 	/**
@@ -506,9 +501,9 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 			i++;
 		}
 		i = 0;
-		for (String item : toolCombo.getItems()) {
-			if (item.equals(featureProject.getCompositionTool())) {
-				toolCombo.select(i);
+		for (String item : mechanismCombo.getItems()) {
+			if (item.equals(featureProject.getCompositionMechanism())) {
+				mechanismCombo.select(i);
 				break;
 			}
 			i++;
@@ -523,7 +518,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 				.getProjectRelativePath().toOSString());
 		refreshContractCombo(composerCombo.getText());
 		refreshMetaCombo(metaCombo.getText());
-		refreshCompositionToolCombo(toolCombo.getText());
+		refreshCompositionMechanismCombo(mechanismCombo.getText());
 	}
 
 	/**

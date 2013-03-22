@@ -105,7 +105,7 @@ public class ComposerWrapper {
 		errorListeners = new LinkedList<AheadBuildErrorListener>();
 		this.featureProject = featureProject;
 		if (jakModelBuilder == null) {
-			if (featureProject.getCompositionTool().equals("Jampack")) {
+			if (featureProject.getCompositionMechanism().equals("Jampack")) {
 				jakModelBuilder = new JampackJakModelBuilder(featureProject);
 			} else {
 				jakModelBuilder = new MixinJakModelBuilder(featureProject);
@@ -308,7 +308,7 @@ public class ComposerWrapper {
 
 	public IFile[] compose() {
 		// decide method to call based on composition tool
-		if (featureProject.getCompositionTool().equals("Jampack")) {
+		if (featureProject.getCompositionMechanism().equals("Jampack")) {
 			AheadCorePlugin.getDefault().logInfo("compose with jampack");
 			composeJampackJakFiles(compositionFolder);
 		} else {

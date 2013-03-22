@@ -447,7 +447,7 @@ public class AheadComposer extends ComposerExtensionClass {
 	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#hasCompositionTools()
 	 */
 	@Override
-	public boolean hasCompositionTools() {
+	public boolean hasCompositionMechanisms() {
 		return true;
 	}
 
