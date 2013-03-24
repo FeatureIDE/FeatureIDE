@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel chosenLayoutAlgorithm="1">
+		<struct>
+			<and abstract="true" mandatory="true" name="Email">
+				<feature mandatory="true" name="Base"/>
+				<feature name="Keys"/>
+				<feature name="Encrypt"/>
+				<feature name="AutoResponder"/>
+				<feature name="Addressbook"/>
+				<feature name="Sign"/>
+				<feature name="Forward"/>
+				<feature name="Verify"/>
+				<feature name="Decrypt"/>
+			</and>
+		</struct>
+		<constraints>
+			<rule>
+				<eq>
+					<var>Encrypt</var>
+					<var>Decrypt</var>
+				</eq>
+			</rule>
+			<rule>
+				<eq>
+					<var>Sign</var>
+					<var>Verify</var>
+				</eq>
+			</rule>
+			<rule>
+				<imp>
+					<disj>
+						<var>Encrypt</var>
+						<var>Sign</var>
+					</disj>
+					<var>Keys</var>
+				</imp>
+			</rule>
+		</constraints>
+		<comments/>
+		<featureOrder userDefined="false"/>
+	</featureModel>
