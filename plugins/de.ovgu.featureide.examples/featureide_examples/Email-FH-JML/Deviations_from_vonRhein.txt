@@ -1,0 +1,31 @@
+Author: Thomas Thuem
+
+The project is based on an Email implementation by Alexander von Rhein:
+
+http://spl2go.cs.ovgu.de/projects/17
+
+Besides transforming aspects into JML, we made the following changes:
+
+* All references to JPF are removed to avoid that JPF is required to compile
+  this case study. (Putting these annotations into comments conflicts with the
+  current version of the FeatureHouse extension for JML composition.)
+
+* Method refinement for method Client.mail() added to feature Encrypt
+  to be able refine the contract
+  
+* Method refinement for method Client.incoming() added to feature Encrypt
+  to be able refine the contract
+  
+* Method refinement for method Client.incoming() added to feature Decrypt
+  to be able refine the contract
+  
+* Method refinement for method Client.verify() added to feature Sign
+  to be able refine the contract
+  
+* Method refinement for method Client.mail() added to feature Sign
+  to be able refine the contract
+  
+* Method refinement for method Client.mail() added to feature Verify
+  to be able refine the contract
+  
+  
