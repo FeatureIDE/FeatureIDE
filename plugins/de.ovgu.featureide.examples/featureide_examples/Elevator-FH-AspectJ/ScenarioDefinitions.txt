@@ -1,0 +1,15 @@
+"Specification1" 1 requiresFeature base
+"Specification2" 2 requiresFeature base
+"Specification3" 3 requiresFeature base
+
+"Specification8" 8 requiresFeature base
+
+"Specification9" 9 requiresFeature base
+
+"Specification10" 10 requiresFeature weight
+
+"Specification11" 11 requiresFeature weight
+
+"Specification13" 13 requiresFeature weight
+
+"Specification14" 14 requiresFeature executivefloor
