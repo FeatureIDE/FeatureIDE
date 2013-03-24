@@ -1,0 +1,23 @@
+* Writing contracts may require to change the design (i.e., we had to add
+  fields, parameters, and even new roles)
+  
+* Some specifications are much shorter than with AspectJ (e.g., Specification 8
+  is just simple ensures clause, while it requires several methods in AspectJ)
+  
+  One reason for that is the high expressiveness of JML introduced by the
+  keyword \old(). Another reason is that aspects require some effort to define
+  pointcuts, which is for free when annotating contracts directly with methods.
+  However, aspects could be the better choice if quantification is massively
+  used. But this was not the case in our case studies.
+
+* If a method refinement does not come with a contract, it should not modify
+  the contract at all. This is more convenient as programmers can omit many
+  contract refinements (that actually not refine the contract at all). A
+  similar argument holds if a contract only defines a postcondition and no
+  precondition or vice versa. Giving no precondition should be interpreted as
+  "requires \original;" rather than "requires \true;"
+  
+* For Specification 13 we introduced a pure method to simplify a contract and
+  to avoid specification clones.
+  
+  

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel chosenLayoutAlgorithm="1">
+		<struct>
+			<and abstract="true" mandatory="true" name="Elevator">
+				<feature mandatory="true" name="Base"/>
+				<feature name="Weight"/>
+				<feature name="Empty"/>
+				<feature name="ExecutiveFloor"/>
+				<feature name="TwoThirdsFull"/>
+				<feature name="Overloaded"/>
+			</and>
+		</struct>
+		<constraints>
+			<rule>
+				<imp>
+					<var>TwoThirdsFull</var>
+					<var>Weight</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>Overloaded</var>
+					<var>Weight</var>
+				</imp>
+			</rule>
+		</constraints>
+		<comments/>
+		<featureOrder userDefined="false"/>
+	</featureModel>

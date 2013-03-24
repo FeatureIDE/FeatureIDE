@@ -1,0 +1,43 @@
+Author: Thomas Thuem
+
+The project is based on an Elevator implementation by Alexander von Rhein:
+
+http://spl2go.cs.ovgu.de/projects/16
+
+Besides transforming aspects into JML, we made the following changes:
+
+* All references to JPF are removed to avoid that JPF is required to compile
+  this case study. (Putting these annotations into comments conflicts with the
+  current version of the FeatureHouse extension for JML composition.)
+
+* Signature of JUnit_Scenario_Tests.testFinished() changed to
+  JUnit_Scenario_Tests.testFinished(Environment env) in order to define a
+  contract referencing the environment
+  
+* Field "Environment env;" introduced in PL_Interface_impl, used in all methods
+  Specification1() to Specification14(), removed static keyword from method
+  randomSequenceOfActions() and modifiedrandomSequenceOfActions(); all changes
+  were made in order to reference the environment in method test()
+  
+* Field "Environment env;" introduced in Floor and added to constructor as
+  parameter; again to access the environment in contracts
+  
+* Method refinement for method timeshift() added to feature Empty to be able
+  refine the contract 
+
+* Method refinement for method pressInLiftFloorButton() added to feature Empty
+  to be able refine the contract
+  
+* New role for class JUnit_Scenario_Tests in feature Empty created for contract
+  refinement
+  
+* New role for class PL_Interface_impl in feature Empty created for contract
+  refinement
+
+* Method refinement for method timeshift() added to feature ExecutiveFloor to
+  be able refine the contract 
+
+* Method refinement for method continueInDirection() added to feature
+  TwoThirdsFull to be able refine the contract 
+
+  
