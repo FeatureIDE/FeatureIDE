@@ -42,6 +42,7 @@ import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
+import de.ovgu.featureide.core.fstmodel.FSTSpecCaseSeq;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
@@ -205,6 +206,12 @@ public class CollaborationModelBuilder {
 							}
 						}
 
+						LinkedList<FSTSpecCaseSeq> contracts = fstRole.getContracts();
+						if(contracts!=null) {
+							for (FSTSpecCaseSeq c : contracts){
+								role.contracts.add(c);
+							}
+						}
 						for (FSTDirective d : fstRole.getDirectives()) {
 							role.directives.add(d);
 						}

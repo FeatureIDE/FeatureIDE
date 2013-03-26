@@ -165,6 +165,9 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 					} else if (HASKELL_NODE_SIMPLE_TYPE.equals(terminal.getType())) {
 						ClassBuilder.getClassBuilder(currentFile, this)
 							.caseFieldDeclaration(terminal);
+					} else if (JML_SPEC_CASE_SEQ.equals(terminal.getType())) {
+						ClassBuilder.getClassBuilder(currentFile, this)
+						.caseJMLSpecCaseSeq(terminal);
 					}
 				} else if (child instanceof FSTNonTerminal) {
 					caseClassDeclaration(child);

@@ -36,10 +36,12 @@ public class FSTRole {
 	private LinkedList<FSTMethod> methods = new LinkedList<FSTMethod>();
 	private LinkedList<FSTField> fields = new LinkedList<FSTField>();
 	private LinkedList<FSTDirective> directives = new LinkedList<FSTDirective>();
+	private LinkedList<FSTSpecCaseSeq> contracts = new LinkedList<FSTSpecCaseSeq>();
 	private IFile file;
 	private FSTFeature feature;
 	private FSTClass fstClass;
-
+	
+	
 	public FSTRole(IFile file, FSTFeature feature, FSTClass fstClass) {
 		this.feature = feature;
 		this.fstClass = fstClass;
@@ -61,7 +63,7 @@ public class FSTRole {
 				}
 			}
 			methods.add((FSTMethod) element);
-		} else {
+		} else if (element instanceof FSTField){
 			for (FSTField f : fields) {
 				if (f.comparesTo(element)) {
 //					CorePlugin.getDefault().logWarning("Model already contains method " 
@@ -70,6 +72,8 @@ public class FSTRole {
 				}
 			}
 			fields.add((FSTField) element);
+		} else if(element instanceof FSTSpecCaseSeq){
+			contracts.add((FSTSpecCaseSeq) element);
 		}
 		element.setRole(this);
 	}
@@ -121,5 +125,12 @@ public class FSTRole {
 			builder.append("\n");
 		}
 		return builder.toString();
+	}
+
+	/**
+	 * @return
+	 */
+	public LinkedList<FSTSpecCaseSeq> getContracts() {
+		return contracts;
 	}
 }

@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.IPath;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
+import de.ovgu.featureide.core.fstmodel.FSTSpecCaseSeq;
 
 
 /**
@@ -42,6 +43,7 @@ public class Role {
 	private IPath path;
 	public LinkedList<FSTField> fields = new LinkedList<FSTField>();
 	public LinkedList<FSTMethod> methods = new LinkedList<FSTMethod>();	
+	public LinkedList<FSTSpecCaseSeq> contracts = new LinkedList<FSTSpecCaseSeq>();
 	public LinkedList<IFile> files = new LinkedList<IFile>();
 	public IFile file;
 	public String featureName = "";

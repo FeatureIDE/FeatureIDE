@@ -35,7 +35,10 @@ public interface FHNodeTypes {
 	static final String JAVA_NODE_CONSTRUCTOR = "ConstructorDecl";
 //	static final String COMPOSITION_RULE_NAME = "JavaMethodOverriding";
 	static final String JAVA_NODE_INNER_CLASS_TYPE = "InnerClassDecl";
-
+	
+	//JML specific node types
+	static final String JML_SPEC_CASE_SEQ = "SpecCaseSeq";
+	
 	// C specific node types
 	static final String C_NODE_SEQUENCE_CODEUNIT_TOPLEVEL = "Sequence_CodeUnit_TopLevel";
 	static final String C_NODE_FUNC = "Func";
@@ -57,4 +60,5 @@ public interface FHNodeTypes {
 	static final String HASKELL_NODE_DEFINITIONS = "definitions";
 	static final String HASKELL_NODE_DATA_DECLARATION = "datadecl";
 	static final String HASKELL_NODE_SIMPLE_TYPE = "simpletype";
+
 }

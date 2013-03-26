@@ -114,4 +114,12 @@ public class ClassBuilder {
 		modelBuilder.getCurrentRole().add(field);
 	}
 
+	
+	public void caseJMLSpecCaseSeq(FSTTerminal terminal) {
+		
+		
+	}
+
+	
+
 }

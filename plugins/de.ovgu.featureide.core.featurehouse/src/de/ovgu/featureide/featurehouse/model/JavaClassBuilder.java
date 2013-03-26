@@ -20,8 +20,10 @@ package de.ovgu.featureide.featurehouse.model;
 
 import java.util.LinkedList;
 
+import de.ovgu.cide.fstgen.ast.FSTNonTerminal;
 import de.ovgu.cide.fstgen.ast.FSTTerminal;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
+import de.ovgu.featureide.core.fstmodel.FSTSpecCaseSeq;
 
 /**
  * Builds Classes for the {@link FSTModel} for <code>FeatureHouse</code> Java files.
@@ -159,6 +161,47 @@ public class JavaClassBuilder extends ClassBuilder {
 
 		// add method
 		addMethod(name, getMethodParameter(terminal), returnType, modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine, false);
+	}
+
+	public void caseJMLSpecCaseSeq(FSTTerminal terminal) {
+		String methodName = getMethodNameFromSpecCaseSeq(terminal);
+		
+		addJMLSpecCaseSeq(methodName,terminal.getBody(),terminal.beginLine, terminal.endLine, isAlso(terminal.getBody()));
+		
+	}
+	
+	/**
+	 * returns true if body starts with keyword also
+	 * @param body
+	 * @return
+	 */
+	private boolean isAlso(String body) {
+		//TODO use regex
+		return body.trim().toLowerCase().startsWith("also");
+	
+	}
+
+	/**
+	 * @param methodName
+	 * @param beginLine
+	 * @param endLine
+	 */
+	private void addJMLSpecCaseSeq(String methodName,String body, int beginLine, int endLine, boolean isAlso) {
+			FSTSpecCaseSeq specCaseSeq= new FSTSpecCaseSeq(methodName,body, beginLine, endLine,isAlso);								
+			specCaseSeq.setAlso(isAlso);
+			specCaseSeq.setRefines(body.contains("\\original"));
+	
+			modelBuilder.getCurrentRole().add(specCaseSeq);
+		
+	}
+
+	/**
+	 * @return
+	 */
+	private String getMethodNameFromSpecCaseSeq(FSTTerminal specCaseSeq) {
+		FSTTerminal methodNode = (FSTTerminal) ((FSTNonTerminal)specCaseSeq.getParent().getParent().getParent()).getChildren().get(2);
+		String methodName = getMethodName(methodNode);
+		return methodName;
 	}
 
 	/**

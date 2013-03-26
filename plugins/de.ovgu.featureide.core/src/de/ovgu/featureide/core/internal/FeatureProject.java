@@ -1360,6 +1360,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		return contractComposition;
 	} 
 
+	
 	public void setContractComposition(String contractComposition) {
 		try {
 			project.setPersistentProperty(CONTRACT_COMPOSITION, contractComposition);
