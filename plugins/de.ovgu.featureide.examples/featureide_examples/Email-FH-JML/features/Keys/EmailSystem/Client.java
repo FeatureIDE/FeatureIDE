@@ -12,7 +12,7 @@ public class Client {
 		this.privateKey = privateKey;
 	}
 
-	public int getPrivateKey() {
+	public/*@pure@*/ int getPrivateKey() {
 		return privateKey;
 	}
 
@@ -31,7 +31,7 @@ public class Client {
 	 * Returns the public key of client, if it is saved in this keyring. If not
 	 * the method returns 0.
 	 */
-	public int getKeyringPublicKeyByClient(Client client) {
+	public /*@pure@*/ int getKeyringPublicKeyByClient(Client client) {
 		for (KeyringEntry e : keyring) {
 			if (e.getKeyOwner().equals(client)) {
 				return e.getPublicKey();
@@ -40,7 +40,7 @@ public class Client {
 		return 0;
 	}
 
-	public static boolean isKeyPairValid(int publicKey, int privateKey) {
+	public /*@pure@*/  static boolean isKeyPairValid(int publicKey, int privateKey) {
 		Util.prompt("keypair valid " + publicKey + " " + privateKey);
 		if (publicKey == 0 || privateKey == 0)
 			return false;

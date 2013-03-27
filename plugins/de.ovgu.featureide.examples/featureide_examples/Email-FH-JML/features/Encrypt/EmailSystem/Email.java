@@ -4,7 +4,7 @@ public class Email {
 	protected boolean isEncrypted;
 	protected int encryptionKey;
 	
-	boolean isReadable() {
+	/*@pure@*/ boolean  isReadable() {
 		if (!isEncrypted())
 			return original();
 		else
@@ -17,7 +17,7 @@ public class Email {
 		// Util.prompt("ENCRYPTION KEY  "+ msg.getEmailEncryptionKey());
 	}
 	
-	boolean isEncrypted() {
+	/*@pure@*/ boolean  isEncrypted() {
 		return isEncrypted;
 	}
 
@@ -30,7 +30,7 @@ public class Email {
 		this.encryptionKey = value;
 	}
 
-	int getEmailEncryptionKey() {
+	/*@pure@*/ int getEmailEncryptionKey() {
 		return encryptionKey;
 	}
 }

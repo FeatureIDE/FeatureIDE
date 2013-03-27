@@ -8,7 +8,7 @@ public class Email {
 		Util.prompt("SIGNATURE VERIFIED " + msg.isSignatureVerified());
 	}
 
-	boolean isSignatureVerified() {
+	/*@pure@*/ boolean isSignatureVerified() {
 		return isSignatureVerified;
 	}
 

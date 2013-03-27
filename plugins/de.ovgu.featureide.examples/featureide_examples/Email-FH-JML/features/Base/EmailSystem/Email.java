@@ -23,7 +23,7 @@ public class Email {
 		return msg;
 	}
 
-	boolean isReadable() {
+	/*@pure@*/ boolean   isReadable() {
 		return true;
 	}
 
@@ -44,7 +44,7 @@ public class Email {
 		}
 	}
 
-	Client getEmailFrom() {
+	/*@pure@*/ Client getEmailFrom() {
 		return from;
 	}
 

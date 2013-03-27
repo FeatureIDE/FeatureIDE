@@ -22,7 +22,7 @@ public class Email {
 		return signed;
 	}
 	
-	int getEmailSignKey() {
+	/*@pure@*/ int getEmailSignKey() {
 		return signkey;
 	}
 }
