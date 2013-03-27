@@ -7,11 +7,11 @@ public class Elevator {
 
 	int executiveFloor = 4;
 	
-	public boolean isExecutiveFloor(int floorID) {return floorID == executiveFloor; }
+	public /*@pure@*/  boolean isExecutiveFloor(int floorID) {return floorID == executiveFloor; }
 
 	//private boolean isExecutiveFloor(Floor floor) {return floor.getFloorID() == executiveFloor; }
 
-	public boolean isExecutiveFloorCalling() {
+	public /*@pure@*/  boolean isExecutiveFloorCalling() {
 		for (Floor f : env.floors) 
 			if (f.getFloorID() == executiveFloor && f.hasCall()) return true;
 		return false;

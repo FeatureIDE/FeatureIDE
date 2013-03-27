@@ -80,11 +80,11 @@ public class Elevator {
 	private void resetFloorButton(int floorID) {
 		floorButtons[floorID] = false;
 	}
-	public int getCurrentFloorID() {
+	public /*@pure@*/  int getCurrentFloorID() {
 		return currentFloorID;
 	}
 	
-	public boolean areDoorsOpen() {
+	public /*@pure@*/ boolean areDoorsOpen() {
 		return doors == DoorState.open;
 	}
 
@@ -193,11 +193,11 @@ public class Elevator {
 		return false;		
 	}
 
-	public boolean buttonForFloorIsPressed(int floorID) {
+	public /*@pure@*/  boolean buttonForFloorIsPressed(int floorID) {
 		return this.floorButtons[floorID];
 	}
 
-	public Direction getCurrentDirection() {
+	public /*@pure@*/  Direction getCurrentDirection() {
 		return currentHeading;
 	}
 	public Environment getEnv() {

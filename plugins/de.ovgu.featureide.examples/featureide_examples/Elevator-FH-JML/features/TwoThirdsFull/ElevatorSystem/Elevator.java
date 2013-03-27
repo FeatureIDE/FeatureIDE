@@ -38,7 +38,7 @@ public class Elevator {
 		original(dir);
 	}
 
-	private boolean existInLiftCallsInDirection(Direction d) {
+	private /*@pure@*/  boolean existInLiftCallsInDirection(Direction d) {
 		 if (d == Direction.up) {
 			 for (int i = getCurrentFloorID(); i < floorButtons.length; i++)
 				 if (buttonForFloorIsPressed(i)) return true;

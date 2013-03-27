@@ -34,7 +34,7 @@ public class Floor {
 		elevatorCall = false;
 	}
 	
-	public boolean hasCall() {
+	public /*@pure@*/  boolean hasCall() {
 		return elevatorCall;
 	}
 	
