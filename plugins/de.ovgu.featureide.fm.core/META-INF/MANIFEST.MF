@@ -22,6 +22,7 @@ Export-Package: Jakarta.DRAttributes,
  de.ovgu.featureide.fm.core.io.guidsl;uses:="org.prop4j,featureide.fm.core.model,org.eclipse.core.resources",
  de.ovgu.featureide.fm.core.io.splconquerer,
  de.ovgu.featureide.fm.core.io.sxfm,
+ de.ovgu.featureide.fm.core.io.velvet,
  de.ovgu.featureide.fm.core.io.xml,
  guidsl,
  org.prop4j,
@@ -43,7 +44,10 @@ Bundle-ClassPath: .,
  lib/guidsl.jar,
  lib/jakarta.jar,
  lib/org.sat4j.core.jar,
- lib/annotations.jar
+ lib/annotations.jar,
+ lib/guava-r09.jar,
+ lib/org.sat4j.pb.jar,
+ lib/antlr-3.4.jar
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Activator: de.ovgu.featureide.fm.core.FMCorePlugin
 Bundle-Vendor: University of Magdeburg

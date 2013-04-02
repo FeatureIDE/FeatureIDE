@@ -64,7 +64,6 @@ public class CreateLayerAction extends SingleSelectionAction {
 					.getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
-
 		}
 	}
 

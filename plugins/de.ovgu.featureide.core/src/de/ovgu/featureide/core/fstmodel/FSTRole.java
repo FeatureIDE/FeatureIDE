@@ -18,6 +18,7 @@
  */
 package de.ovgu.featureide.core.fstmodel;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 
 import javax.annotation.Nonnull;
@@ -41,7 +42,11 @@ public class FSTRole {
 	private FSTFeature feature;
 	private FSTClass fstClass;
 	
-	
+	private final HashSet<String> 
+		importList = new HashSet<String>(),
+		extendList = new HashSet<String>(),
+		implementList = new HashSet<String>();
+		
 	public FSTRole(IFile file, FSTFeature feature, FSTClass fstClass) {
 		this.feature = feature;
 		this.fstClass = fstClass;
@@ -82,7 +87,7 @@ public class FSTRole {
 		return fstClass;
 	}
 
-	public FSTFeature getFeture() {
+	public FSTFeature getFeature() {
 		return feature;
 	}
 
@@ -126,11 +131,47 @@ public class FSTRole {
 		}
 		return builder.toString();
 	}
-
+	
 	/**
 	 * @return
 	 */
 	public LinkedList<FSTSpecCaseSeq> getContracts() {
 		return contracts;
+	}
+	
+	public void addImport(String imp) {
+		importList.add(imp);
+	}
+	
+	public void addImplement(String implement) {
+		implementList.add(implement);
+	}
+
+	public void addExtend(String extend) {
+		extendList.add(extend);
+	}
+	
+	/**
+	 * will only be set if using 
+	 * the FeatureHouseComposer
+	 */
+	public HashSet<String> getImports() {
+		return importList;
+	}
+	
+	/**
+	 * will only be set if using 
+	 * the FeatureHouseComposer
+	 */
+	public HashSet<String> getExtends() {
+		return extendList;
+	}
+	
+	/**
+	 * will only be set if using 
+	 * the FeatureHouseComposer
+	 */
+	public HashSet<String> getImplements() {
+		return implementList;
 	}
 }

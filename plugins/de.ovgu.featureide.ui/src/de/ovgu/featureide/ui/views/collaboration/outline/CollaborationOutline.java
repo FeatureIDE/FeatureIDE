@@ -432,7 +432,7 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 								break;
 							}
 							if (r.getFile().equals(iFile)) {
-								toAppend = " - " + r.getFeture().getName();
+								toAppend = " - " + r.getFeature().getName();
 								break;
 							}
 						}

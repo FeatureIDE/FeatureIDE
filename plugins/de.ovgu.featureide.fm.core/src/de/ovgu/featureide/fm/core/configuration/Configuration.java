@@ -120,12 +120,9 @@ public class Configuration {
 						feature.setAutomatic(Selection.UNDEFINED);
 
 					}
-					
-									}
+				}
 			}
-
 		}
-
 	}
 
 	private void initFeatures(SelectableFeature sFeature, Feature feature) {
@@ -330,9 +327,6 @@ public class Configuration {
 		return featureModel;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -345,5 +339,28 @@ public class Configuration {
 		}
 		return builder.toString();
 	}
+	
+	public LinkedList<List<String>> getSolutions(int max) throws TimeoutException {
+		LinkedList<Node> children = new LinkedList<Node>();
 
+		for (Feature feature : getSelectedFeatures())
+			if (!feature.hasChildren()) {
+				children.add(new Literal(feature.getName(), true));
+			}
+
+		for (Feature feature : getUnSelectedFeatures())
+			if (!feature.hasChildren()) {
+				children.add(new Literal(feature.getName(), false));
+			}
+
+		Node node = new And(rootNode.clone(), new And(children));
+
+		LinkedList<List<String>> solutionList = new SatSolver(node, TIMEOUT).getSolutionFeatures(max);
+		
+		return solutionList;
+	}
+	
+	public ArrayList<SelectableFeature> getFeatures() {
+		return features;
+	}
 }

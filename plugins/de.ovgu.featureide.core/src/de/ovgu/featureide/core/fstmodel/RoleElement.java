@@ -126,11 +126,19 @@ public abstract class RoleElement {
 	}
 	
 	public abstract String getFullName();
+	
+	public String getType() {
+		return type;
+	}
 
 	public String getName() {
 		return name;
 	}
-	
+
+	public String getModifiers() {
+		return modifiers;
+	}
+
 	@Override
 	public String toString() {
 		return getName();

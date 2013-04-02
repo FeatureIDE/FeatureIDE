@@ -21,14 +21,6 @@ package de.ovgu.featureide.ahead.model;
 import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
-
-import de.ovgu.featureide.ahead.AheadCorePlugin;
-import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.fstmodel.FSTField;
-import de.ovgu.featureide.core.fstmodel.FSTMethod;
-import de.ovgu.featureide.core.fstmodel.FSTModel;
-import de.ovgu.featureide.core.fstmodel.FSTRole;
 
 /**
  * This builder builds the JakProjectModel, by extracting features, 

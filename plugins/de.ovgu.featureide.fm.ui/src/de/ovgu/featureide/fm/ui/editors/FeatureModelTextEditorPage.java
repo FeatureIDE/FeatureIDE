@@ -21,7 +21,6 @@ package de.ovgu.featureide.fm.ui.editors;
 import java.beans.PropertyChangeEvent;
 
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;

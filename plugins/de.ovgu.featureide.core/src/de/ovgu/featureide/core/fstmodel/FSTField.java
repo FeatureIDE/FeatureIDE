@@ -38,5 +38,4 @@ public class FSTField extends RoleElement {
 	public String getFullName() {
 		return name + " : " + type;
 	}
-
 }

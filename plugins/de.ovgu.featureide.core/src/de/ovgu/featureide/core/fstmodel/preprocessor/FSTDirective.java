@@ -33,6 +33,7 @@ import de.ovgu.featureide.core.fstmodel.FSTRole;
 public class FSTDirective {
 
 	private String expression;
+	private String featureName = null;
 	private FSTDirectiveCommand command;
 	private LinkedList<FSTDirective> children = new LinkedList<FSTDirective>();
 	private @CheckForNull FSTDirective parent;
@@ -40,6 +41,7 @@ public class FSTDirective {
 	private int startOffset;
 	private int endLine;
 	private int endLength;
+	private int id = -1;
 	private @CheckForNull FSTRole role;
 
 	public FSTDirective getParent() {
@@ -47,7 +49,6 @@ public class FSTDirective {
 	}
 
 	public FSTDirective() {
-		
 	}
 
 	public void setCommand(FSTDirectiveCommand command) {
@@ -69,7 +70,6 @@ public class FSTDirective {
 	public boolean hasChildren() {
 		return !children.isEmpty();
 	}
-
 
 	/**
 	 * @return the children
@@ -115,10 +115,7 @@ public class FSTDirective {
 	 * @return
 	 */
 	public String toDependencyString() {
-		if (parent != null) {
-			return parent.toDependencyString();
-		}
-		return toString(0);
+		return (parent != null) ? parent.toDependencyString() : toString(0);
 	}
 	
 	/**
@@ -167,9 +164,8 @@ public class FSTDirective {
 	}
 
 	public int getColor() {
-		if(getRole()!=null&&getRole().getFeture()!=null)
-		return getRole().getFeture().getColor();
-		else return -1;
+		return (getRole() != null && getRole().getFeature() != null)
+			? getRole().getFeature().getColor()	: -1;
 	}
 
 	public int getStartLine() {
@@ -179,11 +175,11 @@ public class FSTDirective {
 	public int getStartOffset() {
 		return startOffset;
 	}
-	
+
 	public int getEndLine() {
 		return endLine;
 	}
-	
+
 	public int getEndLength() {
 		return endLength;
 	}
@@ -201,12 +197,24 @@ public class FSTDirective {
 	public void setRole(FSTRole fstRole) {
 		this.role = fstRole;
 	}
-	
 
 	public FSTRole getRole() {
-		if (role == null&&parent!=null) {
-			return parent.getRole();
-		}
-		return role;
+		return (role == null && parent != null)	? parent.getRole() : role;
+	}
+
+	public String getFeatureName() {
+		return featureName;
+	}
+
+	public void setFeatureName(String featureName) {
+		this.featureName = featureName;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 }

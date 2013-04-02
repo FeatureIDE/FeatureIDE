@@ -7,5 +7,8 @@
 	<classpathentry exported="true" kind="lib" path="lib/jakarta.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.sat4j.core.jar"/>
 	<classpathentry kind="lib" path="lib/annotations.jar"/>
+	<classpathentry kind="lib" path="lib/guava-r09.jar"/>
+	<classpathentry kind="lib" path="lib/org.sat4j.pb.jar"/>
+	<classpathentry kind="lib" path="lib/antlr-3.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

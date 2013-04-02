@@ -99,15 +99,15 @@ public class PPModelBuilder {
 
 	private void addDirectivesToModel(LinkedList<FSTDirective> list, IFile res, String className) {
 		for (FSTDirective d : list) {
-			FSTRole role = model.addRole(getFeatureName(d.getExpression()), className, res);//addRole(getFeatureName(d.getExpression()), res.getName(), res);
+			FSTRole role = model.addRole(d.getFeatureName(), className, res);//addRole(getFeatureName(d.getExpression()), res.getName(), res);
 			role.add(d);
 			addDirectivesToModel(d.getChildrenList(), res, className);
 		}
 	}
 
-	private String getFeatureName(String expression) {
+	protected String getFeatureName(String expression) {
 		expression = expression.replaceAll("[(]", "");
-		return expression.replaceAll("[)]", "");
+		return expression.replaceAll("[)]", "").trim();
 	}
 
 	/**

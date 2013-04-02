@@ -286,6 +286,45 @@ public class SatSolver {
 		}
     	return out.toString();
 	}
+	
+	public LinkedList<List<String>> getSolutionFeatures(int number) throws TimeoutException {
+		if (contradiction)
+            return null;
+		
+		LinkedList<List<String>> solutionList = new LinkedList<List<String>>();
+
+        IProblem problem = new ModelIterator(solver);
+        int[] lastModel = null;
+    	for (int i = 0; i < number; i++) {
+    		List<String> featureList = new LinkedList<String>();
+    		
+			if (!problem.isSatisfiable(i > 0)) {
+				break;
+			}
+			
+			int[] model = problem.model();
+			if (lastModel != null) {
+				boolean same = true;
+				for (int j = 0; j < model.length; j++)
+					if (model[j] != lastModel[j])
+						same = false;
+				if (same) {
+					break;
+				}
+			}
+			
+			lastModel = model;
+			
+			for (int var : model) {
+				if (var > 0) {
+					featureList.add(intToVar.get(Math.abs(var)).toString());
+				}
+			}
+			
+    		solutionList.add(featureList);
+		}
+    	return solutionList;
+	}
 
 	public String getSolution() throws TimeoutException {
 		if (contradiction)

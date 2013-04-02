@@ -32,8 +32,7 @@ import org.eclipse.ui.texteditor.IAnnotationImageProvider;
  * 
  * @author Sebastian Krieter
  */
-public class ColorAnnotationImageProvider implements
-		IAnnotationImageProvider {
+public class ColorAnnotationImageProvider implements IAnnotationImageProvider {
 
 	private static final class ColorAnnotationDescriptor extends ImageDescriptor {
 		private final ImageData imgdata;

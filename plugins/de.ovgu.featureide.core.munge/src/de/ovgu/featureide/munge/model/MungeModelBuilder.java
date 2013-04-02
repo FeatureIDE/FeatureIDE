@@ -56,7 +56,7 @@ public class MungeModelBuilder extends PPModelBuilder{
 		boolean commentSection = false;
 		
 		Iterator<String> linesIt = lines.iterator();
-		int lineCount = 0;
+		int lineCount = 0, id = 0;
 		
 		while (linesIt.hasNext()) {
 			String line = linesIt.next();
@@ -97,8 +97,16 @@ public class MungeModelBuilder extends PPModelBuilder{
 						}
 						
 						directive.setCommand(command);
-						directive.setExpression(expression != null ? expression : "");				
+						if (expression != null) {
+							directive.setExpression(expression);
+							directive.setFeatureName(getFeatureName(expression));
+						} else {
+							directive.setExpression("");
+							directive.setFeatureName("");
+						}
+						
 						directive.setStartLine(lineCount, m.start(0)-MungePreprocessor.COMMENT_START.length());
+						directive.setId(id++);
 						
 						if(!directivesStack.isEmpty()){
 							FSTDirective top = directivesStack.peek();

@@ -50,18 +50,18 @@ public class FSTMethod extends RoleElement {
 
 	@Override
 	public String getFullName() {
-		StringBuilder name = new StringBuilder();
-		name.append(super.name);
-		name.append("(");
+		StringBuilder fullname = new StringBuilder();
+		fullname.append(name);
+		fullname.append("(");
 		for (int i = 0; i < parameterTypes.size(); i++) {
 			if (i > 0)
-				name.append(", ");
-			name.append(parameterTypes.get(i));
+				fullname.append(", ");
+			fullname.append(parameterTypes.get(i));
 		}
-		name.append(")");
+		fullname.append(")");
 		if (!"void".equals(type))
-			name.append(" : " + type);
-		return name.toString();
+			fullname.append(" : " + type);
+		return fullname.toString();
 	}
 	
 	public boolean isConstructor() {
@@ -79,5 +79,8 @@ public class FSTMethod extends RoleElement {
 	public void setRefines(boolean refines) {
 		this.refines = refines;
 	}
-
+	
+	public LinkedList<String> getParameter(){
+		return parameterTypes;
+	}
 }

@@ -56,12 +56,9 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 	private FeatureModel featureModel;
 
 	private FMPoint location = new FMPoint(0, 0);
-
+	
 	public Feature(FeatureModel featureModel) {
-		this.featureModel = featureModel;
-		name = "Unknown";
-		sourceConnections.add(parentConnection);
-		colorList = new ColorList(this);
+		this(featureModel, "Unknown");
 	}
 
 	public Feature(FeatureModel featureModel, String name) {

@@ -104,7 +104,7 @@ public abstract class AbstractImportAction implements IObjectActionDelegate {
 								inputFile = new File(fileDialog.open());
 							}
 
-							FeatureModel fm = new FeatureModel();
+							FeatureModel fm = createFeatureModel();
 							modelReader = setModelReader(fm);
 							modelReader.readFromFile(inputFile);
 							FeatureModelWriterIFileWrapper fmWriter = new FeatureModelWriterIFileWrapper(new XmlFeatureModelWriter(
@@ -127,6 +127,10 @@ public abstract class AbstractImportAction implements IObjectActionDelegate {
 				}
 			}
 		}
+	}
+
+	protected FeatureModel createFeatureModel() {
+		return new FeatureModel();
 	}
 
 	/**

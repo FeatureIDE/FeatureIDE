@@ -246,4 +246,41 @@ public class JavaClassBuilder extends ClassBuilder {
 		}
 		return parameterTypes;
 	}
+	
+	
+	/**
+	 * @param terminal
+	 */
+	@Override
+	public void caseClassDeclarationType(FSTTerminal terminal) {
+		modelBuilder.getCurrentRole().getFSTClass().setType(terminal.getBody());
+	}
+
+	@Override
+	public void casePackage(FSTTerminal terminal) {
+		modelBuilder.getCurrentRole().getFSTClass().setPackage(terminal.getBody().replace("package ", "").replace(";", ""));
+	}
+	
+	@Override
+	public void caseAddImport(FSTTerminal terminal) {
+		modelBuilder.getCurrentRole().addImport(terminal.getBody());
+	}
+
+	@Override
+	public void caseImplementsList(FSTTerminal terminal) {
+		String body = terminal.getBody().replace("implements ", "");
+		String[] classNames = body.split(", ");
+		for (String className : classNames) {
+			modelBuilder.getCurrentRole().addImplement(className);
+		}
+	}
+
+	@Override
+	public void caseExtendsList(FSTTerminal terminal) {
+		String body = terminal.getBody().replace("extends ", "");
+		String[] classNames = body.split(", ");
+		for (String className : classNames) {
+			modelBuilder.getCurrentRole().addExtend(className);
+		}
+	}
 }

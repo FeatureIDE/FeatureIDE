@@ -85,6 +85,8 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 public class ConfigurationEditor extends MultiPageEditorPart implements
 		GUIDefaults, PropertyConstants, PropertyChangeListener,
 		IResourceChangeListener {
+	
+	public static final String ID = FMUIPlugin.PLUGIN_ID + ".editors.configuration.ConfigurationEditor";
 
 	private static final QualifiedName MODEL_PATH = new QualifiedName(ConfigurationEditor.class.getName() + "#MODEL_PATH", ConfigurationEditor.class.getName() + "#MODEL_PATH");
 	

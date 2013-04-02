@@ -62,7 +62,7 @@ import de.ovgu.featureide.ui.UIPlugin;
  */
 public final class ColorAnnotationModel implements IAnnotationModel {
 
-	/** Key used to piggyback the model to the editor's model. */
+	/** Key used to piggyback the model to the editors model. */
 	private static final Object KEY = new Object();
 	
 	private static boolean highlighting = true;
@@ -70,9 +70,9 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 	/** List of current ColorAnnotations */
 	private List<ColorAnnotation> annotations = new ArrayList<ColorAnnotation>(32);
 	private HashMap<Integer, Position> annotatedPositions = new HashMap<Integer, Position>();
-	
-	/** Maps the directive expression with the feature color */
-	private HashMap<String, Integer> expressionMap = new HashMap<String, Integer>();
+
+	private HashMap<Integer, FSTDirective> directiveMap = new HashMap<Integer, FSTDirective>();
+	private LinkedList<FSTDirective> validDirectiveList = new LinkedList<FSTDirective>();
 
 	/** List of registered IAnnotationModelListener */
 	private List<IAnnotationModelListener> annotationModelListeners = new ArrayList<IAnnotationModelListener>(2);
@@ -80,9 +80,10 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 	private final IDocument document;
 	private final IFeatureProject project;
 	private final IComposerExtension composer;
+	private final IFile file;
 	
 	private int openConnections = 0;
-	private int docLines, docLength;	
+	private int docLines, docLength;
 
 	private IDocumentListener documentListener = new IDocumentListener() {
 		@Override
@@ -105,6 +106,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 	private ColorAnnotationModel(IDocument document, IFile file, IFeatureProject project, ITextEditor editor) {
 		this.document = document;
 		this.project = project;
+		this.file = file;
 		composer = project.getComposer();
 		composer.initialize(project);
 		
@@ -201,7 +203,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 	 * but the number of lines stays the same.
 	 * 
 	 * It updates the offset and length of annotations, 
-	 * which lay beyond the "change offset".
+	 * with an offset greater than the "change offset".
 	 *  
 	 *  @param offset the change offset
 	 *  @param newLength the length of the changed document
@@ -241,10 +243,12 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 		}
 		if (createNew) {
 			annotatedPositions = new HashMap<Integer, Position>(docLines);
-			createAnnotations(createDirectiveList());
-		} else if (!expressionMap.isEmpty()) {
+			createDirectiveList();
+			createAnnotations();
+		} else if (!directiveMap.isEmpty()) {
 			annotatedPositions.clear();
-			createAnnotations(updateDirectives());
+			updateDirectives();
+			createAnnotations();
 		}
 	}
 	
@@ -264,57 +268,39 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 	/**
 	 *  Builds the FSTModel of the feature project and
 	 *  creates a list of all directives with valid colors
-	 *  in preorder sequence.
 	 *  
 	 *  @return the directive list
 	 */
-	private LinkedList<FSTDirective> createDirectiveList() {
-	// TODO @Jens is this neccessary
-		composer.buildFSTModel();
-		
-		// TODO Use the FSTClass to find the FSTDirectives
-		LinkedList<FSTDirective> directiveList = new LinkedList<FSTDirective>();
+	private void createDirectiveList() {
+		directiveMap.clear();
+		validDirectiveList.clear();
 		FSTModel model = project.getFSTModel();
 		if (model == null) {
-			return directiveList;//TODO maybe the model should be build in this case
+			composer.buildFSTModel();
+			model = project.getFSTModel();
 		}
- 		
+		if (model == null) {
+			return;
+		}
+		
+		int index = 0;
 		for (FSTFeature fstFeature : model.getFeatures()) {
 			for (FSTRole role : fstFeature.getRoles()) {
-				directiveList.addAll(role.getDirectives());
-			}
-			
-//			for (FSTDirective dir : fstFeature.directives) {
-//				if (file.equals(dir.file)) {
-//					dir.setColor(color);
-//					if (!dir.hasParent()) {
-//						directiveList.offer(dir);
-//					}
-//				}
-//			}
-		}
-		
-//		FSTClass fstClass = project.getFSTModel().getClass(file);
-//		LinkedList<FSTDirective> directiveList = project.getFSTModel().getDirectives().get(fstClass.getName());
-		
-		
-		expressionMap.clear();
-		ListIterator<FSTDirective> it = directiveList.listIterator(0);
-		while (it.hasNext()) {
-			FSTDirective dir = it.next();
-			expressionMap.put(dir.getExpression(), dir.getColor());
-			if (!ColorList.isValidColor(dir.getColor())) {
-				it.remove();
-			}				
-			if (dir.hasChildren()) {
-				for (FSTDirective child : dir.getChildrenList()) {
-					it.add(child);
-					it.previous();
+				if (file.equals(role.getFile())) {
+					for (FSTDirective dir : role.getDirectives()) {
+						directiveMap.put(dir.getId(), dir);
+						index++;
+					}
 				}
 			}
 		}
-				
-		return directiveList;
+		
+		for (int i = 0; i < index; i++) {
+			FSTDirective dir = directiveMap.get(i);
+			if (dir != null && ColorList.isValidColor(dir.getColor())) {
+				validDirectiveList.add(dir);
+			}
+		}
 	}
 	
 	/**
@@ -323,32 +309,31 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 	 *  
 	 *  @return the directive list
 	 */
-	private LinkedList<FSTDirective> updateDirectives() {
-		LinkedList<FSTDirective> dirList = new LinkedList<FSTDirective>();
+	private void updateDirectives() {	
 		ListIterator<FSTDirective> newDirIt = getNewDirectives().listIterator(0);
 		
-		while (newDirIt.hasNext()) {
+		while(newDirIt.hasNext()) {
 			FSTDirective newDir = newDirIt.next();
+			FSTDirective oldDir = directiveMap.get(newDir.getId());
+				
+			if (oldDir != null &&
+					newDir.getCommand() == oldDir.getCommand() &&
+					newDir.getFeatureName().equals(oldDir.getFeatureName())) {
 			
-			if (expressionMap.containsKey(newDir.getExpression())) {
-				int color = expressionMap.get(newDir.getExpression());
-				if (ColorList.isValidColor(color)) {
-					if(newDir.getRole()!=null)newDir.getRole().getFeture().setColor(color);
-					dirList.offer(newDir);
-				}
-				if (newDir.hasChildren()) {
-					for (FSTDirective newDirChild : newDir.getChildrenList()) {
-						newDirIt.add(newDirChild);
-						newDirIt.previous();
-					}
-				}
+				oldDir.setStartLine(newDir.getStartLine(), newDir.getStartOffset());
+				oldDir.setEndLine(newDir.getEndLine(), newDir.getEndLength());
 			} else {
-				dirList.clear();
-				expressionMap.clear();
-				break;
+				directiveMap.clear();
+				return;
+			}
+			
+			if (newDir.hasChildren()) {
+				for (FSTDirective newDirChild : newDir.getChildrenList()) {
+					newDirIt.add(newDirChild);
+					newDirIt.previous();
+				}
 			}
 		}
-		return dirList;
 	}
 	
 	/**
@@ -371,10 +356,10 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 	/**
 	 *  Creates the color annotations from the FSTDirectives.
 	 */
-	private void createAnnotations(LinkedList<FSTDirective> dirList) {
+	private void createAnnotations() {
 		AnnotationModelEvent event = new AnnotationModelEvent(this);
 		
-		Iterator<FSTDirective> it = dirList.descendingIterator();
+		Iterator<FSTDirective> it = validDirectiveList.descendingIterator();
 		while (it.hasNext()) {
 			FSTDirective dir = it.next();
 			try {
@@ -412,7 +397,6 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 								annotations.add(ca);
 								event.annotationAdded(ca);
 							}
-							
 							
 							annotatedPositions.put(i, newPos);
 						} else if (highlighting) {

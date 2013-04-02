@@ -24,6 +24,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
@@ -156,47 +157,17 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	 * Updates the displayed feature list
 	 * @param feature
 	 */
-	@SuppressWarnings("unchecked")
 	public void updateOrderEditor() {
-		// This flag is true if a concrete feature was added or removed
-		boolean changed = false;
 		if (!hasFeatureOrder) {
 			return;
 		}
-		
-		// This list contains the actual features of the feature model
-		List<String> newFeatureNames = featureModelEditor.featureModel.getFeatureOrderList();
-		if (newFeatureNames.isEmpty()) {
-			newFeatureNames = (List<String>) featureModelEditor.featureModel.getConcreteFeatureNames().clone();
-		}
-		
-		// This list contains the displayed features before adding/removing features form the feature model
-		LinkedList<String> oldFeatureNames = new LinkedList<String>();
-		
-		// Update the names(rename) the displayed features
-		// and fill oldFeatureNames
-		for (int i = 0; i < featurelist.getItemCount(); i++) {
-			featurelist.setItem(i, featureModelEditor.featureModel.getNewName(featurelist.getItem(i)));
-			oldFeatureNames.add(featureModelEditor.featureModel.getNewName(featurelist.getItem(i)));
-		}
 
-		// Concrete feature removed
-		for (String oldFeature : oldFeatureNames)
-			if (!(newFeatureNames.contains(oldFeature))) {
-				featurelist.remove(oldFeature);
-				changed = true;
-			}
-		// Concrete feature added
-		for (String newFeature : newFeatureNames) {
-			if (!(oldFeatureNames.contains(newFeature))) {
-				featurelist.add(newFeature);
-				changed = true;
-			}
-		}
-		
+		// This flag is true if a concrete feature was added or removed
+		boolean changed = updateFeatureList();
 		updateFeatureOrderList();
 
-		if (changed && !oldFeatureNames.isEmpty()) {
+//		if (changed && !oldFeatureNames.isEmpty()) {
+		if (changed) {
 			dirty = true;
 			firePropertyChange(IEditorPart.PROP_DIRTY);
 		}
@@ -403,6 +374,37 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		if(featureModelEditor.featureModel!=null&&featureModelEditor.featureModel.getRoot()!=null)
 		for (String featureName : featureModelEditor.featureModel.getConcreteFeatureNames())
 			featurelist.add(featureName);
+	}
+	
+	/**
+	 * Applies changes of the feature model to the feature order list.
+	 * 
+	 * @return 
+	 * 		true if feature order list has changed
+	 * 		and was not empty before
+	 */
+	private boolean updateFeatureList() {
+		boolean changed = false;
+		if(featureModelEditor.featureModel != null && featureModelEditor.featureModel.getRoot() != null) {
+			HashSet<String> featureSet = new HashSet<String>(featureModelEditor.featureModel.getConcreteFeatureNames());
+			
+			int itemcount = featurelist.getItemCount();
+			for (int i = 0; i < itemcount; i++) {
+				if (!featureSet.remove(featurelist.getItem(i))) {
+					changed = true;
+					if (featureSet.remove(featureModelEditor.featureModel.getNewName(featurelist.getItem(i)))) {
+						featurelist.setItem(i, featureModelEditor.featureModel.getNewName(featurelist.getItem(i)));
+					} else {
+						featurelist.remove(i--);
+						itemcount--;
+					}
+				}
+			}
+			for (String newFeatureName : featureSet) {
+				featurelist.add(newFeatureName);
+			}
+		}
+		return changed;
 	}
 
 	/**

@@ -102,7 +102,7 @@ public class CollaborationOutlineLabelProvider implements ILabelProvider,GUIDefa
 					return  ((FSTClass)element).getName();
 				}
 				if (r.getFile().equals(file)) {
-					toAppend = " - " + r.getFeture().getName();
+					toAppend = " - " + r.getFeature().getName();
 				}
 			}
 			return  ((FSTClass)element).getName()+toAppend;
@@ -118,7 +118,7 @@ public class CollaborationOutlineLabelProvider implements ILabelProvider,GUIDefa
 			return ((FSTFeature)element).getName();
 		
 		if (element instanceof FSTRole)
-			return ((FSTRole)element).getFeture().getName();
+			return ((FSTRole)element).getFeature().getName();
 		
 		if (element instanceof FSTDirective) {
 			return ((FSTDirective)element).toString();

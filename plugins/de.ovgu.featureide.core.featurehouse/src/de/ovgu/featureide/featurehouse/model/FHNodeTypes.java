@@ -26,15 +26,22 @@ package de.ovgu.featureide.featurehouse.model;
 public interface FHNodeTypes {
 	static final String NODE_TYPE_FEATURE = "Feature";
 	static final String NODE_TYPE_CLASS = "EOF Marker";
+	static final String NODE_COMPILATIONUNIT = "CompilationUnit";
 
 	// Java specific node types
 	static final String JAVA_NODE_CLASS_DECLARATION = "ClassDeclaration";
+	static final String JAVA_NODE_DECLARATION_TYPE1 = "ClassOrInterface1";
+	static final String JAVA_NODE_DECLARATION_TYPE2 = "ClassOrInterface2";
 	static final String JAVA_NODE_FIELD = "FieldDecl";
 	static final String JVVA_NODE_FIELD_2 = "ModFieldDeclaration";
 	static final String JAVA_NODE_METHOD = "MethodDecl";
 	static final String JAVA_NODE_CONSTRUCTOR = "ConstructorDecl";
 //	static final String COMPOSITION_RULE_NAME = "JavaMethodOverriding";
 	static final String JAVA_NODE_INNER_CLASS_TYPE = "InnerClassDecl";
+	static final String JAVA_NODE_IMPORTDECLARATION = "ImportDeclaration";
+	static final String JAVA_NODE_PACKAGEDECLARATION = "PackageDeclaration";
+	static final String JAVA_NODE_IMPLEMENTATIONLIST = "ImplementsList";
+	static final String JAVA_NODE_EXTENDSLIST = "ExtendsList";
 	
 	//JML specific node types
 	static final String JML_SPEC_CASE_SEQ = "SpecCaseSeq";
@@ -60,5 +67,4 @@ public interface FHNodeTypes {
 	static final String HASKELL_NODE_DEFINITIONS = "definitions";
 	static final String HASKELL_NODE_DATA_DECLARATION = "datadecl";
 	static final String HASKELL_NODE_SIMPLE_TYPE = "simpletype";
-
 }

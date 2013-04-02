@@ -113,13 +113,16 @@ public class ClassBuilder {
 		FSTField field = new FSTField(fieldName, typeName, modifiers, body, beginLine, endLine);
 		modelBuilder.getCurrentRole().add(field);
 	}
-
 	
-	public void caseJMLSpecCaseSeq(FSTTerminal terminal) {
-		
-		
-	}
-
+	public void caseJMLSpecCaseSeq(FSTTerminal terminal) {}
 	
-
+	public void caseClassDeclarationType(FSTTerminal terminal) {}
+	
+	public void caseAddImport(FSTTerminal terminal) {}
+	
+	public void casePackage(FSTTerminal terminal) {}
+	
+	public void caseImplementsList(FSTTerminal terminal) {}
+	
+	public void caseExtendsList(FSTTerminal terminal) {}
 }

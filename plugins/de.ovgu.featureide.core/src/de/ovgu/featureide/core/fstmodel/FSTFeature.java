@@ -33,7 +33,7 @@ public class FSTFeature {
 
 	HashMap<String, FSTRole> roles;
 	String name;
-	int color;
+	int color = -1;
 
 	public FSTFeature(String name) {
 		this.name = name;
