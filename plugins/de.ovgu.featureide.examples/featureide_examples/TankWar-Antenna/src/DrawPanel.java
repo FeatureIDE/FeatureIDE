@@ -698,7 +698,7 @@ public class DrawPanel extends JPanel implements KeyListener, MouseListener, Mou
             if (key == KeyEvent.VK_SHIFT) current_Player.setSpeed(3);
             if (key == KeyEvent.VK_ENTER) if (current_Player.getSch().isIsActive()==false) changepl();
             if (key == KeyEvent.VK_F1) ls.createNewPlayer();
-          //#if(tar)
+          //#if (tar)
 //@            if (key == KeyEvent.VK_Q){
 //@               // current_Player.setRocket(true);
 //@               // sch = new Schuss((int)current_Player.getX(),(int)current_Player.getY());
