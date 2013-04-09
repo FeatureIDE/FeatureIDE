@@ -110,7 +110,7 @@ public class FeatureCppModelBuilder {
 
 	private IFile getFile(String className) {
 		return featureProject.getSourceFolder()
-			.getFolder(currentRole.getFeture().getName()).getFile(className);
+			.getFolder(currentRole.getFeature().getName()).getFile(className);
 	}
 
 	private LinkedList<String> getInfo(IFile file) {
