@@ -18,30 +18,58 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.operations.AbstractOperation;
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.FeatureModelLayout;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 
 /**
  * @author David Halm
  * @author Patrick Sulkowski
  */
-public class ShowHiddenFeaturesOperation extends AbstractFeatureModelOperation {
+public class ShowHiddenFeaturesOperation extends AbstractOperation {
+
+	private FeatureModel featureModel;
 
 	public ShowHiddenFeaturesOperation(FeatureModel featureModel) {
-		super(featureModel, "Show Hidden Features");
+		super("Show Hidden Features");
+		this.featureModel = featureModel;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.commands.operations.AbstractOperation#execute(org.eclipse.core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
+	 */
 	@Override
-	protected void redo() {
-		final FeatureModelLayout layout = featureModel.getLayout();
-		layout.showHiddenFeatures(!layout.showHiddenFeatures());		
-		FeatureUIHelper.showHiddenFeatures(layout.showHiddenFeatures(),featureModel);
+	public IStatus execute(IProgressMonitor monitor, IAdaptable info)
+			throws ExecutionException {
+		return redo(monitor, info);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.commands.operations.AbstractOperation#redo(org.eclipse.core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
+	 */
 	@Override
-	protected void undo() {
-		redo();
+	public IStatus redo(IProgressMonitor monitor, IAdaptable info)
+			throws ExecutionException {
+		featureModel.getLayout().showHiddenFeatures(!featureModel.getLayout().showHiddenFeatures());		
+		FeatureUIHelper.showHiddenFeatures(featureModel.getLayout().showHiddenFeatures(),featureModel);
+		featureModel.redrawDiagram();
+		featureModel.handleModelDataLoaded();
+		return Status.OK_STATUS;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.commands.operations.AbstractOperation#undo(org.eclipse.core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
+	 */
+	@Override
+	public IStatus undo(IProgressMonitor monitor, IAdaptable info)
+			throws ExecutionException {
+		return redo(monitor, info);
 	}
 
 }
