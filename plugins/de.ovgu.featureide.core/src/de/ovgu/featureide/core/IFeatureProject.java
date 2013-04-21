@@ -47,7 +47,7 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	public static final String DEFAULT_CONFIGS_PATH = "equations";
 	public static final String DEFAULT_BUILD_PATH = "build";
 	public static final String DEFAULT_CONTRACT_COMPOSITION= "None";
-	public static final String DEFAULT_META_PRODUCT_GENERATION= "KeY";
+	public static final String DEFAULT_META_PRODUCT_GENERATION= "Theorem Proving";
 	public static final String DEFAULT_COMPOSITION_MECHANISM = "Mixin";
 	public static final QualifiedName configConfigID = new QualifiedName("featureproject.configs", "currentEquation");
 	

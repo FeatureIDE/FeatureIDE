@@ -120,7 +120,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		label.setText("&Contract Composition: "
 				+ featureProject.getContractComposition());
 		label = new Label(composite, SWT.NONE);
-		label.setText("&Meta Product Generation: "
+		label.setText("&Metaproduct Generation: "
 				+ featureProject.getMetaProductGeneration());
 		label = new Label(composite, SWT.NONE);
 		label.setText("Composition mechanism: " 
@@ -240,11 +240,11 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 
 	private void addMetaProductMember(Group group) {
 		Label label = new Label(group, SWT.NULL);
-		label.setText("&Meta Product Generation");
+		label.setText("&Metaproduct Generation");
 		metaCombo = new Combo(group, SWT.READ_ONLY | SWT.DROP_DOWN);
 		metaCombo.setLayoutData(gd);
 		metaCombo.add(IFeatureProject.DEFAULT_META_PRODUCT_GENERATION);
-		metaCombo.add("Java Pathfinder");
+		metaCombo.add("Model Checking");
 		String composer = featureProject.getMetaProductGeneration();
 		refreshMetaCombo(composer);
 		metaCombo.addModifyListener(listener);

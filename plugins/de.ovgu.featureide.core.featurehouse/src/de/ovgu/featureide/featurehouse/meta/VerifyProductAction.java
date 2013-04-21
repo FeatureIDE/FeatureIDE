@@ -46,6 +46,7 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
  * Builds the meta product via FeatureHouse. 
  *
  * @author Jens Meinicke
+ * TODO remove when eclipse plug-in for KeY is available
  */
 public class VerifyProductAction implements IObjectActionDelegate {
 
@@ -70,8 +71,7 @@ public class VerifyProductAction implements IObjectActionDelegate {
 		command.add("-nosplash");
 //		command.add("-mtcontract"); // Method Treatment Contract
 	//	command.add("-nowindow");
-	//	command.add("-rounds");
-	//	command.add("10");
+//		command.add("-rounds");command.add("10");
 	//	command.add("-h");			// displays all commands
 		command.add("-bc");
 		command.add(getJavaRedux());

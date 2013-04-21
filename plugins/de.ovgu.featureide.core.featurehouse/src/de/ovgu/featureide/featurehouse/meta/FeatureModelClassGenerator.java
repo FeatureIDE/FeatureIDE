@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Locale;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -61,7 +62,7 @@ public class FeatureModelClassGenerator {
 	}
 	
 	/**
-	 * @return the stringBuilder
+	 * Only for test purpose.
 	 */
 	public StringBuilder getStringBuilder() {
 		return stringBuilder;
@@ -103,7 +104,7 @@ public class FeatureModelClassGenerator {
 		if (!KeY) {
 			stringBuilder.append("\t\tVerify.incrementCounter(0);\r\n\t\treturn true");
 		} else {
-			stringBuilder.append(getFormula2(model));
+			stringBuilder.append(getFormulaKeY(model));
 		}
 		
 		if (KeY) {
@@ -117,18 +118,16 @@ public class FeatureModelClassGenerator {
 		}
 	}
 
-	/**
-	 * @param model
-	 */
 	private void addGetters(FeatureModel model) {
 		ArrayList<Feature> features = new ArrayList<Feature>(model.getConcreteFeatures());
 		for (Feature f : features) {
-			String getter = "\tpublic static boolean " + f.toString().toLowerCase() + "() {\r\n";
-			getter += "\t\tif (" + f.toString().toLowerCase() + "_ == null) {\r\n";
-			getter += "\t\t\t" + f.toString().toLowerCase() + "_ = random();\r\n";
-			getter += "\t\t\tfm();\r\n";
+			String featureName = f.toString().toLowerCase(Locale.ENGLISH);
+			String getter = "\tpublic static boolean " + featureName + "() {\r\n";
+			getter += "\t\tif (" + featureName + "_ == null) {\r\n";
+			getter += "\t\t\t" + featureName + "_ = random();\r\n";
+			getter += "\t\t\tvalid();\r\n";
 			getter += "\t\t}\r\n";
-			getter += "\t\treturn " + f.toString().toLowerCase() + "_;\r\n";
+			getter += "\t\treturn " + featureName + "_;\r\n";
 			getter += "\t}\r\n\r\n";
 			stringBuilder.append(getter);
 		}
@@ -136,50 +135,43 @@ public class FeatureModelClassGenerator {
 
 
 	/**
-	 * @param model 
 	 * @return The current feature selection for Java Pathfinder.
 	 */
 	private void getSelection(FeatureModel model) {
 		ArrayList<Feature> features = new ArrayList<Feature>(model.getConcreteFeatures());
-		
 		stringBuilder.append("if (names) return ");
 		for (int i = 0;i < features.size();i++) {
 			if (i != 0) {
 				stringBuilder.append(" + ");	
 			}
 			String name = features.get(i).getName();
-			stringBuilder.append(" (" + name.toLowerCase()+"_ != null && " + name.toLowerCase() + "_ ? \"" + name + "\\r\\n\" : \"\") ");
+			String lowerName = name.toLowerCase(Locale.ENGLISH);
+			stringBuilder.append(" (" + lowerName+"_ != null && " + lowerName + "_ ? \"" + name + "\\r\\n\" : \"\") ");
 		}
 		stringBuilder.append(";\r\n\t\treturn ");
 		for (int i = 0;i < features.size();i++) {
 			if (i != 0) {
 				stringBuilder.append(" + \"|\" + ");	
 			}
-			String name = features.get(i).getName();
-			stringBuilder.append(name.toLowerCase() + "_");
+			stringBuilder.append(features.get(i).getName().toLowerCase(Locale.ENGLISH) + "_");
 		}
 		stringBuilder.append(";\r\n\t}\r\n");
 	}
 
-	/**
-	 * @param model
-	 * @return
-	 */
-	private String getFormula2(FeatureModel model) {
-		return "\t\treturn " + NodeCreator.createNodes(model.clone()).toCNF().toString(NodeWriter.javaSymbols).toLowerCase();
+	private String getFormulaKeY(FeatureModel model) {
+		return "\t\treturn " + NodeCreator.createNodes(model.clone()).toCNF().toString(NodeWriter.javaSymbols).toLowerCase(Locale.ENGLISH);
 	}
 	
-	private Node getFormula(FeatureModel model) {
+	private Node getFormulaJPF(FeatureModel model) {
 		return NodeCreator.createNodes(model.clone()).toCNF();
 	}
 
-	
 	private void addFeatures(FeatureModel model, boolean KeY) {
 		ArrayList<Feature> features = new ArrayList<Feature>(model.getFeatures());
 		deadFeatures = model.getAnalyser().getDeadFeatures();
 		coreFeatures = model.getAnalyser().getCoreFeatures();
 		for (int i = 0;i< features.size();i++) {
-			stringBuilder.append(features.get(i).toString().toLowerCase());
+			stringBuilder.append(features.get(i).toString().toLowerCase(Locale.ENGLISH));
 			if (i != features.size() - 1) {
 				if (KeY) {
 					stringBuilder.append(", ");
@@ -195,14 +187,14 @@ public class FeatureModelClassGenerator {
 			stringBuilder.append(";\n\n\t/**\r\n\t * Core features are set 'selected' and dead features 'unselected'.\r\n\t * All other features have unknown selection states.\r\n\t */\r\n\tstatic {\r\n");
 			for (int i = 0;i< features.size();i++) {
 				if (deadFeatures.contains(features.get(i))) {
-					stringBuilder.append("\t\t" + features.get(i).toString().toLowerCase()+(KeY ? "" : "_"));
+					stringBuilder.append("\t\t" + features.get(i).toString().toLowerCase(Locale.ENGLISH)+(KeY ? "" : "_"));
 					stringBuilder.append(" = false;\n");
 				} if (coreFeatures.contains(features.get(i))) {
-					stringBuilder.append("\t\t" + features.get(i).toString().toLowerCase()+(KeY ? "" : "_"));
+					stringBuilder.append("\t\t" + features.get(i).toString().toLowerCase(Locale.ENGLISH)+(KeY ? "" : "_"));
 					stringBuilder.append(" = true;\n");
 				} else {
 					if (KeY) {
-						stringBuilder.append("\t\t" + features.get(i).toString().toLowerCase()+(KeY ? "" : "_"));
+						stringBuilder.append("\t\t" + features.get(i).toString().toLowerCase(Locale.ENGLISH)+(KeY ? "" : "_"));
 						stringBuilder.append(" = random();\n");
 					} else {
 						//stringBuilder.append(" = null;\n");
@@ -214,12 +206,13 @@ public class FeatureModelClassGenerator {
 			stringBuilder.append(";\r\n");
 		}
 
-		stringBuilder.append("\t/**\r\n\t * This formula represents the validity of the current feature selection.\r\n\t */\r\n\tpublic /*@pure@*/ static boolean fm() {\r\n");
+		stringBuilder.append("\t/**\r\n\t * This formula represents the validity of the current feature selection.\r\n\t */\r\n\tpublic /*@pure@*/ static boolean valid() {\r\n");
 		if (!KeY) {
 			stringBuilder.append("\t\tVerify.resetCounter(0);\r\n");
-			stringBuilder.append("\t\tboolean " + model.getRoot().toString().toLowerCase() + " = true;\r\n");
+			Feature root = model.getRoot();
+			stringBuilder.append("\t\tboolean " + root.toString().toLowerCase(Locale.ENGLISH) + " = true;\r\n");
 			
-			Node formula = getFormula(model);
+			Node formula = getFormulaJPF(model);
 			ArrayList<Node> c = new ArrayList<Node>();
 			// remove base feature and the (true && !false) statements
 			for (Node child : formula.getChildren()) {
@@ -228,8 +221,8 @@ public class FeatureModelClassGenerator {
 				}
 			}
 			formula.setChildren(c.toArray());
-			addedFeatures.add(model.getRoot().toString().toLowerCase());
-			addFeature(model.getRoot(), formula);
+			addedFeatures.add(root.toString().toLowerCase(Locale.ENGLISH));
+			addFeature(root, formula);
 		}
 		
 	}
@@ -254,13 +247,13 @@ public class FeatureModelClassGenerator {
 	 */
 	private void addAnd(LinkedList<Feature> children, Node formula) {
 		for (Feature child : children) {
-			stringBuilder.append("\t\tboolean " +child.toString().toLowerCase() + " = ");
+			stringBuilder.append("\t\tboolean " +child.toString().toLowerCase(Locale.ENGLISH) + " = ");
 			if (child.isMandatory()) {
 				stringBuilder.append(getFeature(child) + ";\r\n");
 			} else {
 				stringBuilder.append(getFeature(child) + " ? random() : false;\r\n");
 			}
-			addedFeatures.add(child.toString().toLowerCase());
+			addedFeatures.add(child.toString().toLowerCase(Locale.ENGLISH));
 			stringBuilder.append(setFormula(formula));
 		}
 		for (Feature child : children) {
@@ -277,7 +270,7 @@ public class FeatureModelClassGenerator {
 		String set = "false";
 		int i = 0;
 		for (Feature child : children) {
-			stringBuilder.append("\t\tboolean " +child.toString().toLowerCase() + " = ");
+			stringBuilder.append("\t\tboolean " +child.toString().toLowerCase(Locale.ENGLISH) + " = ");
 			if (i == children.size() - 1) {
 				if (set.isEmpty()) {
 					stringBuilder.append(getFeature(child) + ";\r\n\t\tVerify.ignoreIf(Verify.getCounter(0) != 0);\r\n");
@@ -286,12 +279,12 @@ public class FeatureModelClassGenerator {
 				}
 			} else if (i == 0) {
 				stringBuilder.append(getFeature(child) + " ? random() : false;\r\n");
-				set = child.toString().toLowerCase();
+				set = child.toString().toLowerCase(Locale.ENGLISH);
 			} else {
 				stringBuilder.append(getFeature(child) + " ? random() : false;\r\n");
-				set += " ||" + child.toString().toLowerCase();
+				set += " ||" + child.toString().toLowerCase(Locale.ENGLISH);
 			}
-			addedFeatures.add(child.toString().toLowerCase());
+			addedFeatures.add(child.toString().toLowerCase(Locale.ENGLISH));
 			stringBuilder.append(setFormula(formula));
 			i++;
 		}
@@ -307,7 +300,7 @@ public class FeatureModelClassGenerator {
 		String set = "";
 		int i = 0;
 		for (Feature child : children) {
-			stringBuilder.append("\t\tboolean " + child.toString().toLowerCase() + " = ");
+			stringBuilder.append("\t\tboolean " + child.toString().toLowerCase(Locale.ENGLISH) + " = ");
 			 if (i == children.size() -1) {
 				 if (set.isEmpty()) {
 					 stringBuilder.append(getFeature(child) + ";\r\n");
@@ -316,12 +309,12 @@ public class FeatureModelClassGenerator {
 				 }
 			} else if (i == 0) {
 				stringBuilder.append(getFeature(child) + " ? random() : false;\r\n");
-				set = child.toString().toLowerCase();
+				set = child.toString().toLowerCase(Locale.ENGLISH);
 			} else {
 				stringBuilder.append(getFeature(child) + " ? " + set + "? false : random() : false;\r\n");
-				set = child.toString().toLowerCase() + " ||" + set;
+				set = child.toString().toLowerCase(Locale.ENGLISH) + " ||" + set;
 			}
-			addedFeatures.add(child.toString().toLowerCase());
+			addedFeatures.add(child.toString().toLowerCase(Locale.ENGLISH));
 			stringBuilder.append(setFormula(formula));
 			i++;
 		}
@@ -332,14 +325,15 @@ public class FeatureModelClassGenerator {
 	}
 	
 	private String getFeature(Feature f) {
-		String start = f.toString().toLowerCase() + "_ != null ? " + f.toString().toLowerCase() + "_ : ";  
+		String featureName = f.toString().toLowerCase(Locale.ENGLISH);
+		String start = featureName + "_ != null ? " + featureName + "_ : ";  
 		if (deadFeatures.contains(f.getParent())) {
 			return start + "false";
 		}
 		if (coreFeatures.contains(f.getParent())) {
 			return start + "true";
 		}
-		return start + f.getParent().toString().toLowerCase();
+		return start + f.getParent().toString().toLowerCase(Locale.ENGLISH);
 	}
 	
 	/**
@@ -352,7 +346,7 @@ public class FeatureModelClassGenerator {
 		for (Node child : formula.getChildren()) {
 			boolean allAdded = true;
 			for (Node feature : child.getChildren()) {
-				if (!addedFeatures.contains(feature.toString().toLowerCase().replaceFirst("-", ""))) {
+				if (!addedFeatures.contains(feature.toString().toLowerCase(Locale.ENGLISH).replaceFirst("-", ""))) {
 					allAdded = false;
 					break;
 				}
@@ -367,7 +361,7 @@ public class FeatureModelClassGenerator {
 		if (actualFormula.isEmpty()) {
 			return "";
 		}
-		return "\t\tVerify.ignoreIf(Verify.getCounter(0) != 0 || !(" + new And(actualFormula.toArray()).toString(NodeWriter.javaSymbols).toLowerCase() + "));\r\n";
+		return "\t\tVerify.ignoreIf(Verify.getCounter(0) != 0 || !(" + new And(actualFormula.toArray()).toString(NodeWriter.javaSymbols).toLowerCase(Locale.ENGLISH) + "));\r\n";
 	}
 
 }

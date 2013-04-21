@@ -151,24 +151,18 @@ public class AheadBuildErrorEvent {
 	 */
 	private void calculateJakLine() throws CoreException, IOException {
 		IFile composedJakFile = (IFile) this.file;
-		int composedJakLine = this.line;
-		
 		composedJakFile.refreshLocal(IResource.DEPTH_ZERO, null);
-		
 		String contentString = getString(composedJakFile);
-		int line = setSourceFile(contentString, composedJakLine);
-		
 		if (fileName == null) {
 			this.line = lookupImportInAllJakFiles(contentString, matcher);
-		}
-		else {
+		} else {
 			IFile jakFile = getJakFile(fileName);
 			if (jakFile != null) {
 				jakFile.refreshLocal(IResource.DEPTH_ZERO, null);
 				String jakContent = getString(jakFile);
-					
 				this.file = jakFile;
-				this.line = setSourceLine(composedJakLine, line, jakContent);
+				int line = setSourceFile(contentString, this.line);
+				this.line = setSourceLine(this.line, line, jakContent);
 			}
 		}
 	}

@@ -32,14 +32,11 @@ import org.eclipse.swt.widgets.Text;
 public class ConstraintContentAdapter extends TextContentAdapter {
 	public void insertControlContents(Control control, String text,
 			int cursorPosition) {
-
 		Point selection = ((Text) control).getSelection();
-		String constraintText = ((Text) control).getText();
-
 		int posMarker = selection.y - 1;
 		if (cursorPosition != 0) {
+			String constraintText = ((Text) control).getText();
 			while (posMarker >= 0 && (constraintText.charAt(posMarker) != ' '&&constraintText.charAt(posMarker)!=')'&&constraintText.charAt(posMarker)!='(')) {
-
 				posMarker--;
 			}
 		}

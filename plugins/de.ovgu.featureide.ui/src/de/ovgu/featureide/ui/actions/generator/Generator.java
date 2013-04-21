@@ -118,10 +118,11 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 								wait(1000);
 								if ((builder.configurations.isEmpty() && builder.finish) || 
 										builder.cancelGeneratorJobs) {
-									builder.generatorJobs.remove(this);
 									if (compiler != null) {
 										compiler.finish();
+										compiler.join();
 									}
+									builder.generatorJobs.remove(this);
 									return Status.OK_STATUS;
 								}
 							} catch (InterruptedException e) {
@@ -143,7 +144,6 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 						builder.featureProject.getComposer().buildConfiguration(builder.folder.getFolder(CONFIGURATION_NAME + name), 
 								c, CONFIGURATION_NAME + name);
 					}
-
 				} else {
 					if (builder.createNewProjects) {
 						buildConfiguration(builder.featureProject.getProjectName() + SEPARATOR_CONFIGURATION + name, c);
@@ -255,7 +255,10 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 						}
 					}
 					createLibFolder(p.getFile(path).getParent());
-					file.copy(p.getFile(e.getPath().removeFirstSegments(1)).getFullPath(), true, null);
+					IFile destination = p.getFile(e.getPath().removeFirstSegments(1));
+					if (!destination.exists()) {
+						file.copy(destination.getFullPath(), true, null);
+					}
 					entries[i] = new ClasspathEntry(e.getContentKind(), e.getEntryKind(), 
 							e.getPath().removeFirstSegments(1), e.getInclusionPatterns(), e.getExclusionPatterns(), 
 							e.getSourceAttachmentPath(), e.getSourceAttachmentRootPath(), null, 

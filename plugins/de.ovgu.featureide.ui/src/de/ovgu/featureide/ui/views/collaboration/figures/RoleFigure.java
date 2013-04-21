@@ -201,16 +201,14 @@ public class RoleFigure extends Figure implements GUIDefaults{
 	}
 
 	private void createContentForDefault() {
-		int fieldCount = 0;
-		int methodCount = 0;
 		int contractCount = 0;
 		Figure tooltipContent = new Figure();
 		FlowLayout contentsLayout = new FlowLayout();
 		tooltipContent.setLayoutManager(contentsLayout);
 		
 		if (role.files.size() == 0) {
-			fieldCount = getCountForFieldContentCreate(tooltipContent);
-			methodCount = getCountForMethodContentCreate(tooltipContent);
+			int fieldCount = getCountForFieldContentCreate(tooltipContent);
+			int methodCount = getCountForMethodContentCreate(tooltipContent);
 			contractCount = getCountForContractContentCreate(tooltipContent);
 			addLabel(new Label(getCountLabel(fieldCount, methodCount, contractCount)));
 		} else if (role.getName().startsWith("*.")) {
@@ -264,14 +262,14 @@ public class RoleFigure extends Figure implements GUIDefaults{
 	 * TODO description
 	 */
 	private void createContentForFieldMethodFilter() {
-		int fieldCount = 0;
-		int methodCount = 0;
 		int contractCount = 0;
 		Figure tooltipContent = new Figure();
 		GridLayout contentsLayout = new GridLayout(1,true);
 		tooltipContent.setLayoutManager(contentsLayout);
 		
 		if (role.directives.isEmpty() && role.files.isEmpty()) {
+			int fieldCount = 0;
+			int methodCount = 0;
 			if (showOnlyFields()) {
 				fieldCount = getCountForFieldContentCreate(tooltipContent);
 			}

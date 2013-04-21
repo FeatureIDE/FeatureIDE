@@ -16,7 +16,7 @@ public class NodeWriter {
 	/**
 	 * long textual representation
 	 */
-	public final static String[] textualSymbols = new String[] {"not", "and", "or", "implies", "iff", ", ", "choose", "atleast", "atmost"};
+	public final static String[] textualSymbols = new String[] {"not ", "and", "or", "implies", "iff", ", ", "choose", "atleast", "atmost"};
 	
 	/**
 	 * short textual representation

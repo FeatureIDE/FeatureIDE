@@ -361,9 +361,9 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	}
 
 	private void connectionEntrys(IMenuManager menu) {
-		boolean connectionSelected = alternativeAction.isConnectionSelected();
 		if (andAction.isEnabled() || orAction.isEnabled()
 				|| alternativeAction.isEnabled()) {
+			boolean connectionSelected = alternativeAction.isConnectionSelected();
 			if (andAction.isChecked()) {
 				andAction.setText("And");
 				if (connectionSelected)

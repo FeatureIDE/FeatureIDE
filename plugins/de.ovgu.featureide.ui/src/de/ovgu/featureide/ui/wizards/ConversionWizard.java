@@ -47,9 +47,8 @@ public class ConversionWizard extends Wizard implements INewWizard {
 
 		Object obj = selection.getFirstElement();
 		if (obj instanceof IResource) {
-			IResource res = (IResource) obj;
 			if (page.hasCompositionTool()) {
-				IProject project = res.getProject();
+				IProject project = ((IResource) obj).getProject();
 				if (project.isOpen()) {
 					CorePlugin.setupProject(project, page
 							.getCompositionTool().getId(), page.getSourcePath(),

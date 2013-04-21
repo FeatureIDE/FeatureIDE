@@ -137,8 +137,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 	 */
 	private FeatureModel getFeatureModel() {
 		Feature feature = getConnectionModel().getTarget();
-		FeatureModel featureModel = feature.getFeatureModel();
-		return featureModel;
+		return feature.getFeatureModel();
 	}
 
 	@Override
@@ -179,11 +178,11 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 	}
 
 	public void refreshTargetDecoration() {
-		Feature source = ((FeatureConnection) getModel()).getSource();
-		Feature target = ((FeatureConnection) getModel()).getTarget();
-
+		FeatureConnection connectionModel = (FeatureConnection) getModel();
+		Feature target = connectionModel.getTarget();
 		RotatableDecoration targetDecoration = null;
-		if (target.getChildrenCount() > 1 || HALF_ARC)
+		if (target.getChildrenCount() > 1 || HALF_ARC) {
+			Feature source = connectionModel.getSource();
 			if(FeatureUIHelper.hasVerticalLayout(getFeatureModel())){
 				if (!target.isAnd() && (target.getChildIndex(source) == (target.getChildrenCount()-1)))
 					targetDecoration = new RelationDecoration(target.isMultiple(),
@@ -193,6 +192,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 					targetDecoration = new RelationDecoration(target.isMultiple(),
 							target.getLastChild(), target.getChildren());
 			}
+		}
 		
 		PolylineConnection connection = (PolylineConnection) getConnectionFigure();
 		connection.setTargetDecoration(targetDecoration);

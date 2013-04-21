@@ -38,7 +38,7 @@
          <action
                class="de.ovgu.featureide.featurehouse.meta.BuildMetaProductAction"
                id="de.ovgu.featureide.featurehouse.meta.buildmetaproductaction"
-               label="Build Meta Product"
+               label="Build Metaproduct"
                menubarPath="de.ovgu.featureide.fm.ui.menu/featurehouse"
                style="toggle">
          </action>

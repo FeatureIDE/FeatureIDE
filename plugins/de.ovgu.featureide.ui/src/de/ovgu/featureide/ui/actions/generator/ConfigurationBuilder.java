@@ -148,6 +148,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 * Use <code>getConfiguration()</code> and <code>setConfiguration(c)</code> for synchronizing.
 	 */
 	LinkedList<BuilderConfiguration> configurations = new LinkedList<BuilderConfiguration>();
+
 	
 	/**
 	 * Gets the first entry of configurations or <code>null</code> if there is none.
@@ -203,7 +204,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			number.setPriority(Job.LONG);
 			number.schedule();
 		}
-			
+		
 		Job job = new Job(buildAllValidConfigurations ? JOB_TITLE : JOB_TITLE_CURRENT + "for " + featureProject.getProjectName()) {
 			public IStatus run(IProgressMonitor monitor) {
 				try {

@@ -371,10 +371,10 @@ public class CorePlugin extends AbstractCorePlugin {
 	public static void setupFeatureProject(final IProject project,
 			String compositionToolID, final String sourcePath,
 			final String configPath, final String buildPath, boolean addCompiler) {
-		IConfigurationElement[] config = Platform.getExtensionRegistry()
-				.getConfigurationElementsFor(COMPOSERS_ID);
 		if (addCompiler) {
 			try {
+				IConfigurationElement[] config = Platform.getExtensionRegistry()
+						.getConfigurationElementsFor(COMPOSERS_ID);
 				for (IConfigurationElement e : config) {
 					if (e.getAttribute("id").equals(compositionToolID)) {
 						final Object o = e.createExecutableExtension("class");

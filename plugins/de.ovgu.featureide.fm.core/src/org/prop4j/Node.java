@@ -47,8 +47,7 @@ public abstract class Node {
 		node = node.eliminate(Not.class);
 		node = node.eliminate(AtMost.class, AtLeast.class);
 		node = node.eliminate(Not.class);
-		node = node.clausify();
-		return node;
+		return node.clausify();
 	}
 
 	@SuppressWarnings("unchecked")

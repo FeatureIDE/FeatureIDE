@@ -85,10 +85,10 @@ public class CollaborationEditPart extends AbstractGraphicalEditPart implements 
 				 return;
 			 
 			 IWorkbenchWindow dw = UIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow();	 
-			 FileEditorInput fileEditorInput = new FileEditorInput(file);
 			 try {
 				 IWorkbenchPage page = dw.getActivePage();
 				 if (page != null) {
+					 FileEditorInput fileEditorInput = new FileEditorInput(file);
 					 page.openEditor(fileEditorInput, "de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor");
 				 }
 			 } catch (PartInitException e) {

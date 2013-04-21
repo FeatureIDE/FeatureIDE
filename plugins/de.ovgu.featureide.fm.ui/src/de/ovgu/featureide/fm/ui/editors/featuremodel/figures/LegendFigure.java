@@ -500,15 +500,14 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		Point p3 = new Point(GROUPTYPE_PADDING, ROW_HEIGHT * row + SYMBOL_SIZE
 				- LIFT);
 
-		RotatableDecoration sourceDecoration = new LegendRelationDecoration(
-				fill, p1);
 		PolylineConnection line = new PolylineConnection();
 		line.setForegroundColor(FMPropertyManager.getConnectionForgroundColor());
 
 		line.setEndpoints(p2, p3);
-
-		if (decoration)
+		if (decoration) {
+			RotatableDecoration sourceDecoration = new LegendRelationDecoration(fill, p1);
 			line.setSourceDecoration(sourceDecoration);
+		}
 		PolylineConnection line2 = new PolylineConnection();
 		line2.setForegroundColor(FMPropertyManager.getConnectionForgroundColor());
 

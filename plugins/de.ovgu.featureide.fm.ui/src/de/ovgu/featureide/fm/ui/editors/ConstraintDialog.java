@@ -469,21 +469,21 @@ public class ConstraintDialog implements GUIDefaults {
 
 			@Override
 			public void modifyText(ModifyEvent e) {
-				ViewerFilter searchFilter = new ViewerFilter() {
+				if (!FILTERTEXT.equalsIgnoreCase(searchFeatureText.getText())) {
+					ViewerFilter searchFilter = new ViewerFilter() {
 
-					@Override
-					public boolean select(Viewer viewer, Object parentElement,
-							Object element) {
-						return ((Feature) element)
-								.getName()
-								.toLowerCase(Locale.ENGLISH)
-								.contains(
-										searchFeatureText.getText()
-												.toLowerCase(Locale.ENGLISH));
-					}
+						@Override
+						public boolean select(Viewer viewer, Object parentElement,
+								Object element) {
+							return ((Feature) element)
+									.getName()
+									.toLowerCase(Locale.ENGLISH)
+									.contains(
+											searchFeatureText.getText()
+													.toLowerCase(Locale.ENGLISH));
+						}
 
-				};
-				if (!searchFeatureText.getText().equalsIgnoreCase(FILTERTEXT)) {
+					};
 					featureTableViewer.addFilter(searchFilter);
 
 				}
@@ -896,9 +896,9 @@ public class ConstraintDialog implements GUIDefaults {
 			printHeaderWarning("constraint is unsatisfiable");			
 		}
 		
-		int index = 0;
 		AbstractOperation op = null;
 		if (constraint != null && featureModel.getConstraints().contains(constraint)) {
+			int index = 0;
 			for (Constraint c : featureModel.getConstraints()) {
 				if (c == constraint) {
 					op = new ConstraintEditOperation(propNode, featureModel, index);

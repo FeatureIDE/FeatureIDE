@@ -200,7 +200,6 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	// TODO refactor into cases
 	public void performFullBuild(IFile config) {
 		assert (featureProject != null) : "Invalid project given";
-		
 		final String configPath = config.getRawLocation().toOSString();
 		final String basePath = featureProject.getSourcePath();
 		final String outputPath = featureProject.getBuildPath();
@@ -266,7 +265,6 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			}
 			fhModelBuilder.buildModel(composer.getFstnodes(), false);
 		}
-
 		if (verifyProduct()) {
 			(new VerifyProductAction()).runMonkey(featureProject.getProject());
 		}
