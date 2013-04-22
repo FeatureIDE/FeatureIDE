@@ -1,18 +1,20 @@
-/* FeatureIDE - An IDE to support feature-oriented software development
- * Copyright (C) 2005-2012  FeatureIDE team, University of Magdeburg
+/* FeatureIDE - A Framework for Feature-Oriented Software Development
+ * Copyright (C) 2005-2013  FeatureIDE team, University of Magdeburg, Germany
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * This file is part of FeatureIDE.
+ * 
+ * FeatureIDE is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
+ * 
+ * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see http://www.gnu.org/licenses/.
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
@@ -42,93 +44,86 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPar
  * @author Fabian Benduhn
  */
 public class ConstraintMoveEditPolicy extends NonResizableEditPolicy {
-	
-		
-
 
 	/**
-	 * Allows constraints to be moved at the feature diagram and provides a feedback
-	 * figure.
+	 * Allows constraints to be moved at the feature diagram and provides a
+	 * feedback figure.
 	 * 
 	 */
-	
+	private ConstraintEditPart editPart;
 
-		private ConstraintEditPart editPart;
+	private ModelLayoutEditPolicy superPolicy;
 
-		private ModelLayoutEditPolicy superPolicy;
+	public ConstraintMoveEditPolicy(ConstraintEditPart child,
+			ModelLayoutEditPolicy superPolicy) {
+		this.editPart = child;
+		this.superPolicy = superPolicy;
+	}
 
-		public ConstraintMoveEditPolicy(ConstraintEditPart child, ModelLayoutEditPolicy superPolicy) {
-			this.editPart = child;
-			this.superPolicy = superPolicy;
-		}
-		
-		private RectangleFigure r;
-		
-		private PolylineConnection c;
+	private RectangleFigure r;
 
-		@Override
-		protected IFigure createDragSourceFeedbackFigure() {
-		
-			r = new RectangleFigure();
-			FigureUtilities.makeGhostShape(r);
-			r.setLineStyle(Graphics.LINE_DOT);
-			r.setForegroundColor(ColorConstants.white);
-			r.setBounds(getInitialFeedbackBounds());
-			
-			Point s = FeatureUIHelper.getLocation(editPart.getConstraintModel()).getCopy();
-			getHostFigure().translateToAbsolute(s);
+	private PolylineConnection c;
 
-			c = new PolylineConnection();
-			c.setForegroundColor(ColorConstants.white);
-			c.setLineWidth(3);
-			FreeformLayer l = new FreeformLayer();
-			//l.add(r);
-			l.add(c);
-			
-			addFeedback(l);
-			return l;
-		}
-		
-		@Override
-		protected void showChangeBoundsFeedback(ChangeBoundsRequest request) {
-			
-			//call createDragSourceFeedbackFigure on start of the move
-			getDragSourceFeedbackFigure();
-			
-			PrecisionRectangle rect = new PrecisionRectangle(getInitialFeedbackBounds().getCopy());
-			getHostFigure().translateToAbsolute(rect);
-			rect.translate(request.getMoveDelta());
-			rect.resize(request.getSizeDelta());
-			r.translateToRelative(rect);
-			r.setBounds(rect);
-			
-		
+	@Override
+	protected IFigure createDragSourceFeedbackFigure() {
 
-			
-		
-					
-			if(superPolicy.getConstraintCommand()instanceof ConstraintDragAndDropCommand){
-				ConstraintDragAndDropCommand cmd = (ConstraintDragAndDropCommand)superPolicy.getConstraintCommand();
-		
-				if(cmd.canExecute()) {
-					c.setForegroundColor(ColorConstants.black);
-					Point l = cmd.getLeftPoint();
-					Point r = cmd.getRightPoint();
-					getHostFigure().translateToAbsolute(l);
-					getHostFigure().translateToAbsolute(r);
+		r = new RectangleFigure();
+		FigureUtilities.makeGhostShape(r);
+		r.setLineStyle(Graphics.LINE_DOT);
+		r.setForegroundColor(ColorConstants.white);
+		r.setBounds(getInitialFeedbackBounds());
+
+		Point s = FeatureUIHelper.getLocation(editPart.getConstraintModel())
+				.getCopy();
+		getHostFigure().translateToAbsolute(s);
+
+		c = new PolylineConnection();
+		c.setForegroundColor(ColorConstants.white);
+		c.setLineWidth(3);
+		FreeformLayer l = new FreeformLayer();
+		// l.add(r);
+		l.add(c);
+
+		addFeedback(l);
+		return l;
+	}
+
+	@Override
+	protected void showChangeBoundsFeedback(ChangeBoundsRequest request) {
+
+		// call createDragSourceFeedbackFigure on start of the move
+		getDragSourceFeedbackFigure();
+
+		PrecisionRectangle rect = new PrecisionRectangle(
+				getInitialFeedbackBounds().getCopy());
+		getHostFigure().translateToAbsolute(rect);
+		rect.translate(request.getMoveDelta());
+		rect.resize(request.getSizeDelta());
+		r.translateToRelative(rect);
+		r.setBounds(rect);
+
+		if (superPolicy.getConstraintCommand() instanceof ConstraintDragAndDropCommand) {
+			ConstraintDragAndDropCommand cmd = (ConstraintDragAndDropCommand) superPolicy
+					.getConstraintCommand();
+
+			if (cmd.canExecute()) {
+				c.setForegroundColor(ColorConstants.black);
+				Point l = cmd.getLeftPoint();
+				Point r = cmd.getRightPoint();
+				getHostFigure().translateToAbsolute(l);
+				getHostFigure().translateToAbsolute(r);
 				c.setSourceAnchor(new XYAnchor(l));
-			c.setTargetAnchor(new XYAnchor(r));			}
+				c.setTargetAnchor(new XYAnchor(r));
 			}
-			
-		}
-		
-		@Override
-		protected void eraseChangeBoundsFeedback(ChangeBoundsRequest request) {
-			super.eraseChangeBoundsFeedback(request);
-			r = null;
-			c = null;
 		}
 
 	}
 
+	@Override
+	protected void eraseChangeBoundsFeedback(ChangeBoundsRequest request) {
+		super.eraseChangeBoundsFeedback(request);
+		r = null;
+		c = null;
+	}
 
+}
