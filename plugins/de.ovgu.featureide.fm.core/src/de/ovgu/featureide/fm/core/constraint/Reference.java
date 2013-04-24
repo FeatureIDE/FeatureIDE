@@ -68,6 +68,10 @@ public class Reference {
 			sb.append("#.");
 			sb.append(attributeName);
 			break;
+		case FEATURE:
+			break;
+		default:
+			break;
 		}
 		
 		return sb.toString();

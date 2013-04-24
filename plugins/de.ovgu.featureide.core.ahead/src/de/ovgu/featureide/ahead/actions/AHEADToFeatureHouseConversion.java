@@ -51,7 +51,7 @@ public class AHEADToFeatureHouseConversion extends ComposerConversion {
 				" from AHEAD to FeatureHouse.");
 		Job job = new Job("Change composer.") {
 			protected IStatus run(IProgressMonitor monitor) {
-				start(featureProject);
+				startProjectConversion(featureProject);
 				return Status.OK_STATUS;
 			}
 		};

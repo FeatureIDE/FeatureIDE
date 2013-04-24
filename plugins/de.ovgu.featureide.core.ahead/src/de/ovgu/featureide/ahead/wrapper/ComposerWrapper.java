@@ -310,10 +310,8 @@ public class ComposerWrapper {
 	public IFile[] compose() {
 		// decide method to call based on composition tool
 		if (featureProject.getCompositionMechanism().equals("Jampack")) {
-			AheadCorePlugin.getDefault().logInfo("compose with jampack");
 			composeJampackJakFiles(compositionFolder);
 		} else {
-			AheadCorePlugin.getDefault().logInfo("compose with mixin");
 			composeMixinJakFiles(compositionFolder);
 		}
 		IFile[] composedFilesArray = new IFile[composedFiles.size()];

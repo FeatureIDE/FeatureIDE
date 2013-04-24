@@ -76,7 +76,7 @@ public class FeatureHouseToAHEADConversion extends ComposerConversion {
 					model = featureProject.getFSTModel();
 					monitor.worked(1);
 					monitor.subTask("Replace keywords.");
-					start(featureProject);
+					startProjectConversion(featureProject);
 					monitor.worked(1);
 				} finally {
 					monitor.done();

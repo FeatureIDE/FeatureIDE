@@ -23,6 +23,9 @@ package de.ovgu.featureide.ahead.actions;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.SWT;
+import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.ahead.AheadComposer;
 
@@ -39,6 +42,7 @@ public class ChangeComposerAction extends AbstractHandler {
 	 */
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
+		if (!openDialog()) return null;
 		if (ComposerPropertyTester.getFeatureProject().getComposerID()
 				.equals(AheadComposer.COMPOSER_ID)) {
 			new AHEADToFeatureHouseConversion(ComposerPropertyTester.getFeatureProject());
@@ -47,5 +51,16 @@ public class ChangeComposerAction extends AbstractHandler {
 		}
 		return null;
 	}
+
+	private boolean openDialog() {
+		return MessageDialog.open(MessageDialog.WARNING, PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+				"Composer Conversion", 
+				"Source files will be changed automatically. FeatureHouse suppors Java 5 and AHEAD Java 4, this can cause problems during converion. You should have a copy of this project.",
+				SWT.NONE);
+		
+				
+				
+	}
+	
 
 }

@@ -46,7 +46,7 @@ public abstract class ComposerConversion {
 	 * Starts the conversion.
 	 * @param project
 	 */
-	void start(IFeatureProject project) {
+	void startProjectConversion(IFeatureProject project) {
 		featureProject = project;
 		changeComposer(project);
 		changeFiles(project.getSourceFolder());
@@ -56,7 +56,6 @@ public abstract class ComposerConversion {
 		} catch (CoreException e) {
 			AheadCorePlugin.getDefault().logError(e);
 		}
-		
 	}
 	
 	/**
