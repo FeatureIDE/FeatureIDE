@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.featurehouse;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -99,7 +100,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 			@Override
 			public void parseErrorOccured(ParseException e) {
-					createBuilderProblemMarker(e.currentToken.next.endLine, e.getMessage());
+				createBuilderProblemMarker(e.currentToken.next.endLine, e.getMessage());
 			}
 		};
 	}
@@ -122,6 +123,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	 * @param message The message.
 	 */
 	protected void createBuilderProblemMarker(int line, String message) {
+		message = detruncateString(message);
 		try {
 			IMarker marker = getErrorFile().createMarker(FeatureHouseCorePlugin.BUILDER_PROBLEM_MARKER);
 			marker.setAttribute(IMarker.LINE_NUMBER, line);
@@ -130,7 +132,25 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		} catch (CoreException e) {
 			FeatureHouseCorePlugin.getDefault().logError(e);
 		}
-		
+
+	}
+
+	/**
+	 * @param message
+	 *            The message
+	 * @return A substring of message that is smaller than 65535 bytes.
+	 */
+	private static String detruncateString(String message) {
+		byte[] bytes;
+		try {
+			bytes = message.getBytes(("UTF-8"));
+			if (bytes.length > 65535)
+				message = message.substring(0, 65535 / 2);
+
+		} catch (UnsupportedEncodingException e) {
+			FeatureHouseCorePlugin.getDefault().logError(e);
+		}
+		return message;
 	}
 
 	/**
