@@ -1,0 +1,32 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: FeatureIDE UI Plug-in
+Bundle-SymbolicName: de.ovgu.featureide.ui;singleton:=true
+Bundle-Version: 2.6.5.qualifier
+Bundle-Activator: de.ovgu.featureide.ui.UIPlugin
+Bundle-Localization: 
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.ui.ide,
+ org.eclipse.debug.ui,
+ org.eclipse.jdt.debug.ui,
+ org.eclipse.gef,
+ de.ovgu.featureide.fm.core,
+ de.ovgu.featureide.core,
+ de.ovgu.featureide.fm.ui
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: .
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: University of Magdeburg
+Export-Package: 
+ de.ovgu.featureide.ui.views.collaboration.action,
+ de.ovgu.featureide.ui.wizards
+Import-Package: de.ovgu.featureide.ui.views.collaboration.action,
+ org.eclipse.jdt.core,
+ org.eclipse.jdt.internal.core,
+ org.eclipse.jdt.internal.ui.javaeditor,
+ org.eclipse.jface.text,
+ org.eclipse.jface.text.source,
+ org.eclipse.platform.internal,
+ org.eclipse.ui.editors.text,
+ org.eclipse.ui.texteditor
