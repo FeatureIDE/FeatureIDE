@@ -35,7 +35,7 @@ import de.ovgu.featureide.fm.core.io.xml.XmlColorModelReader;
 import de.ovgu.featureide.fm.core.io.xml.XmlColorModelWriter;
 
 /** 
- * Holds the colorscheme names for one feature model
+ * Holds the color scheme names for a {@link FeatureModel}.
  * 
  * @author Sebastian Krieter
  */

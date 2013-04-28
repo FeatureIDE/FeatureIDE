@@ -24,7 +24,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 
 /**
- * TODO description
+ * Provides a number of different colors for color annotations
  * 
  * @author Sebastian Krieter
  */

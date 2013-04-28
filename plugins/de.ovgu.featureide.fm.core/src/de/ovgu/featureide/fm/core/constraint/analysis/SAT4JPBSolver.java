@@ -36,7 +36,9 @@ import org.sat4j.specs.TimeoutException;
 import de.ovgu.featureide.fm.core.constraint.analysis.Restriction.Op;
 
 /**
- * TODO description
+ * Implementation of {@link PBSolver} using the sat4j library.
+ * 
+ * @author Sebastian Henneberg
  */
 public class SAT4JPBSolver implements PBSolver {
 

@@ -38,7 +38,7 @@ import com.google.common.collect.HashBiMap;
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.constraint.Attributes;
+import de.ovgu.featureide.fm.core.constraint.FeatureAttributeMap;
 import de.ovgu.featureide.fm.core.constraint.Equation;
 import de.ovgu.featureide.fm.core.constraint.Reference;
 import de.ovgu.featureide.fm.core.constraint.RelationOperator;
@@ -283,7 +283,7 @@ public class Translator {
 	 * @category equations
 	 */
 	public static <T> List<T> translateEquations(Map<String, Integer> map,
-			FeatureModel fm, Attributes<Integer> attributes, List<Equation> equations, 
+			FeatureModel fm, FeatureAttributeMap<Integer> attributes, List<Equation> equations, 
 			RestrictionFactory<T> factory) {
 		
 		List<T> rs = new ArrayList<T>();
@@ -307,7 +307,7 @@ public class Translator {
 	 * @category equations helper
 	 */
 	private static void transformVars(Map<String, Integer> map, FeatureModel fm,
-			Attributes<Integer> attributes, List<Term> terms, WeightedTerm term) {
+			FeatureAttributeMap<Integer> attributes, List<Term> terms, WeightedTerm term) {
 		
 		int coefficient = term.getWeight();
 		Reference ref = term.getReference();

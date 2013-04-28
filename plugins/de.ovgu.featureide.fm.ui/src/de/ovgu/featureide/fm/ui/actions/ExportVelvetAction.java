@@ -45,8 +45,8 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
- * writes the content of a feature model xml file 
- * to a velvet model file
+ * Writes the content of a feature model xml file 
+ * to a velvet model file.
  * 
  * @author Sebastian Krieter
  */

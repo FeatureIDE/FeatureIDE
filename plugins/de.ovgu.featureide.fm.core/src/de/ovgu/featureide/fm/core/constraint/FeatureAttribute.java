@@ -21,7 +21,7 @@
 package de.ovgu.featureide.fm.core.constraint;
 
 /**
- * TODO description
+ * Holds the value of a feature attribute.
  * 
  * @author Sebastian Krieter
  */

@@ -23,7 +23,7 @@ package de.ovgu.featureide.fm.core;
 import java.util.ArrayList;
 
 /**
- * Holds the colors for one feature
+ * Holds the colors for a feature.
  * 
  * @author Sebastian Krieter
  */

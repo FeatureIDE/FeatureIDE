@@ -22,19 +22,19 @@ package de.ovgu.featureide.fm.core;
 
 import java.util.LinkedList;
 
-import de.ovgu.featureide.fm.core.constraint.Attributes;
+import de.ovgu.featureide.fm.core.constraint.FeatureAttributeMap;
 import de.ovgu.featureide.fm.core.constraint.Equation;
 
 /**
- * Featuremodel with attributes and attributes-constraints
+ * Adds attributes and attribute constraints to a feature model. 
  * 
  * @author Sebastian Krieter
  */
 public class ExtendedFeatureModel extends FeatureModel {
 
-	protected Attributes<Integer> integerAttributes = new Attributes<Integer>();
-	protected Attributes<Boolean> booleanAttributes = new Attributes<Boolean>();
-	protected Attributes<String> stringAttributes = new Attributes<String>();
+	protected FeatureAttributeMap<Integer> integerAttributes = new FeatureAttributeMap<Integer>();
+	protected FeatureAttributeMap<Boolean> booleanAttributes = new FeatureAttributeMap<Boolean>();
+	protected FeatureAttributeMap<String> stringAttributes = new FeatureAttributeMap<String>();
 	
 	protected LinkedList<Equation> attributeConstraints = new LinkedList<Equation>();
 	
@@ -46,15 +46,15 @@ public class ExtendedFeatureModel extends FeatureModel {
 		return attributeConstraints;
 	}
 
-	public Attributes<Integer> getIntegerAttributes() {
+	public FeatureAttributeMap<Integer> getIntegerAttributes() {
 		return integerAttributes;
 	}
 
-	public Attributes<Boolean> getBooleanAttributes() {
+	public FeatureAttributeMap<Boolean> getBooleanAttributes() {
 		return booleanAttributes;
 	}
 
-	public Attributes<String> getStringAttributes() {
+	public FeatureAttributeMap<String> getStringAttributes() {
 		return stringAttributes;
 	}
 	

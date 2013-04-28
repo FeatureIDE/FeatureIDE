@@ -23,7 +23,9 @@ package de.ovgu.featureide.fm.core.constraint;
 import java.util.List;
 
 /**
- * TODO description
+ * Connects a sum of {@link WeightedTerm}s to an integer with a certain {@link RelationOperator}.
+ * 
+ * @author Sebastian Henneberg
  */
 public class Equation {
 

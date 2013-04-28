@@ -21,7 +21,10 @@
 package de.ovgu.featureide.fm.core.constraint;
 
 /**
- * TODO description
+ * Different relation operators.<br>
+ * {EQUAL, NOT_EQUAL, GREATER, LESS, GREATER_EQUAL, LESS_EQUAL}
+ * 
+ * @author Sebastian Henneberg
  */
 public enum RelationOperator {
 	EQUAL("=="),

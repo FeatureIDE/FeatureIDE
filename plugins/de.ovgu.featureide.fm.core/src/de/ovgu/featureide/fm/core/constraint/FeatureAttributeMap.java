@@ -25,9 +25,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * TODO description
+ * Maps a {@link FeatureAttribute} to its name and feature.
+ * 
+ * @author Sebastian Krieter
  */
-public class Attributes<T> {
+public class FeatureAttributeMap<T> {
 
 	private Map<String, Map<String, FeatureAttribute<T>>> attrs = new HashMap<String, Map<String, FeatureAttribute<T>>>();
 

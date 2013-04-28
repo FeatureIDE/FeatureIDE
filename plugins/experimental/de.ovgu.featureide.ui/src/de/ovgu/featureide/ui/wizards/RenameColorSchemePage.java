@@ -30,7 +30,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * TODO description
+ * Page for the {@link RenameColorSchemeWizard}.
  * 
  * @author Sebastian Krieter
  */
@@ -39,7 +39,7 @@ public class RenameColorSchemePage extends WizardPage {
 	private Text textColorSchemeName;
 
 	public RenameColorSchemePage() {
-		super("wizardPage");
+		super("Rename Colorscheme Page");
 		setTitle("Rename Colorscheme");
 		setDescription("Enter the name of the Colorscheme.");
 	}

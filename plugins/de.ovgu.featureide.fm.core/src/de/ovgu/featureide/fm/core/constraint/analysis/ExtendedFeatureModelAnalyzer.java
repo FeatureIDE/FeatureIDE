@@ -27,12 +27,11 @@ import org.sat4j.specs.TimeoutException;
 import com.google.common.collect.BiMap;
 
 import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
-import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 
 /**
- * TODO description
+ * Checks the {@link ExtendedFeatureModel} for validation.
  * 
  * @author Sebastian Krieter
  */
@@ -53,7 +52,6 @@ public class ExtendedFeatureModelAnalyzer extends FeatureModelAnalyzer  {
 		this.map = Translator.buildFeatureNameMap(efm, idGen);
 		this.deFactory = new DeRestrictionFactory();
 	}
-
 	
 	@Override
 	public boolean isValid() throws TimeoutException {		
@@ -65,7 +63,6 @@ public class ExtendedFeatureModelAnalyzer extends FeatureModelAnalyzer  {
 		
 		return solver.isSatisfiable();
 	}
-
 	
 	private void setUpDeRestrictions() {
 		this.deFm = Translator.translateFmTree(map, efm, deFactory);
@@ -73,56 +70,4 @@ public class ExtendedFeatureModelAnalyzer extends FeatureModelAnalyzer  {
 		this.deFm.addAll(Translator.translateEquations(map, efm, 
 				efm.getIntegerAttributes(), efm.getAttributConstraints(), deFactory));
 	}
-
-	
-	/**
-	 * @param atomicSets
-	 * @param feature
-	 * @category atomic set helper
-	 */
-	private static void newTreeAtomicSet(AtomicSets atomicSets, Feature feature) {
-		int newId = atomicSets.newSet(feature);
-		if (feature.hasChildren())
-			processAtomicSetsOfChildren(atomicSets, newId, feature);
-	}
-	
-	/**
-	 * @param atomicSets
-	 * @param newId
-	 * @param feature
-	 * @category atomic set helper
-	 */
-	private static void useTreeAtomicSet(AtomicSets atomicSets, int newId,
-			Feature feature) {
-
-		if (feature.isMandatory()) {
-			atomicSets.add(newId, feature);
-			if (feature.hasChildren())
-				processAtomicSetsOfChildren(atomicSets, newId, feature);
-		} else {
-			newTreeAtomicSet(atomicSets, feature);
-		}
-	}
-	
-
-	/**
-	 * @param atomicSets
-	 * @param newId
-	 * @param feature
-	 * @category atomic set helper
-	 */
-	private static void processAtomicSetsOfChildren(AtomicSets atomicSets, 
-			int newId, Feature feature) {
-
-		if (feature.isAnd()) {
-			for (Feature childFeature : feature.getChildren()) {
-				useTreeAtomicSet(atomicSets, newId, childFeature);
-			}
-		} else {
-			for (Feature childFeature : feature.getChildren()) {
-				newTreeAtomicSet(atomicSets, childFeature);
-			}
-		}
-	}
-
 }

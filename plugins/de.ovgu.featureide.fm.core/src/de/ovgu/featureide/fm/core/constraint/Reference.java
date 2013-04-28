@@ -21,7 +21,9 @@
 package de.ovgu.featureide.fm.core.constraint;
 
 /**
- * TODO description
+ * Reference to a feature.
+ * 
+ * @author Sebastian Henneberg
  */
 public class Reference {
 

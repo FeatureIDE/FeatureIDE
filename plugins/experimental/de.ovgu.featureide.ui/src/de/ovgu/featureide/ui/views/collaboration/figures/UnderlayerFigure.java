@@ -27,12 +27,13 @@ import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 import de.ovgu.featureide.ui.views.collaboration.model.Collaboration;
 
 /**
- * TODO description
+ * Background figure for a feature in the collaboration diagram.<br>
+ * Shows the feature color, if available.
  * 
  * @author Sebastian Krieter
  * @author Steffen Schulze
  */
-public class UnderlayerFigure extends Figure implements GUIDefaults{
+public class UnderlayerFigure extends Figure implements GUIDefaults {
 
 	private CollaborationFigure collaborationFigure;
 	
@@ -58,10 +59,7 @@ public class UnderlayerFigure extends Figure implements GUIDefaults{
 	public int getCollaborationFigureWidth() {
 		return collaborationFigure.getBounds().width;
 	}	
-	
-	/**
-	 * @return the collaborationFigure
-	 */
+
 	public CollaborationFigure getCollaborationFigure() {
 		return collaborationFigure;
 	}

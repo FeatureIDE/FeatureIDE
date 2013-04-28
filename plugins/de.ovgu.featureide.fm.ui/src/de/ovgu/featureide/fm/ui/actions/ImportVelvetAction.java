@@ -26,31 +26,19 @@ import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelReader;
 
 /**
- * TODO description
+ * Reads a velvet feature model.
  * 
  * @author Sebastian Krieter
  */
 public class ImportVelvetAction extends AbstractImportAction {
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ovgu.featureide.fm.ui.actions.AbstractImportAction#initModelReader
-	 * (de.ovgu.featureide.fm.core.FeatureModel)
-	 */
+	
 	@Override
 	IFeatureModelReader setModelReader(FeatureModel fm) {
 		return new VelvetFeatureModelReader(fm);
 	}
-
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.actions.AbstractImportAction#createFeatureModel()
-	 */
+	
 	@Override
 	protected FeatureModel createFeatureModel() {
 		return new ExtendedFeatureModel();
 	}
-	
-	
 }

@@ -26,7 +26,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
- * TODO description
+ * Wizard to add a new color scheme to the {@link FeatureModel}.
  * 
  * @author Sebastian Krieter
  */
@@ -39,27 +39,17 @@ public class NewColorSchemeWizard extends Wizard {
 	
 	private FeatureModel featureModel;
 
-	/**
-	 * Constructor for NewColorSchemeWizard.
-	 */
 	public NewColorSchemeWizard(FeatureModel featureModel) {
 		super();
 		setWindowTitle("New Colorscheme");
 		this.featureModel = featureModel;
 	}
 
-	/**
-	 * Adding the page to the wizard.
-	 */
 	public void addPages() {
 		page = new NewColorSchemePage();
 		addPage(page);
 	}
 
-	/**
-	 * This method is called when 'Finish' button is pressed in the wizard. We
-	 * will create an operation and run it using wizard as execution context.
-	 */
 	public boolean performFinish() {
 		final String csName = page.getColorSchemeName();
 		if (csName != null && !csName.isEmpty()) {

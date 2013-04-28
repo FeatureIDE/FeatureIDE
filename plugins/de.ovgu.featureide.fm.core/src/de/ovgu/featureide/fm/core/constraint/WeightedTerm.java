@@ -21,7 +21,9 @@
 package de.ovgu.featureide.fm.core.constraint;
 
 /**
- * TODO description
+ * Represents a mathematical term and holds a {@link Reference} to its feature.
+ * 
+ * @author Sebastian Henneberg
  */
 public class WeightedTerm {
 

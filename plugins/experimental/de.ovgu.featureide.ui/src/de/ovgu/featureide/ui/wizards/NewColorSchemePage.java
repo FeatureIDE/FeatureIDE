@@ -31,7 +31,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * TODO description
+ * Page for the {@link NewColorSchemeWizard}.
  * 
  * @author Sebastian Krieter
  */

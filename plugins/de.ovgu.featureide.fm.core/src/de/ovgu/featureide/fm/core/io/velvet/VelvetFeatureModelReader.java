@@ -405,7 +405,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 				}
 			}
 			Equation equation = new Equation(weightedTerms, relationOperator, degree);
-			FMCorePlugin.getDefault().logInfo(equation.toString());
+//			FMCorePlugin.getDefault().logInfo(equation.toString());
 			extFeatureModel.addAttributeConstraint(equation);
 		}
 	}

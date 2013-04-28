@@ -21,7 +21,10 @@
 package de.ovgu.featureide.fm.core.constraint;
 
 /**
- * TODO description
+ * Different reference types.<br>
+ * {FEATURE, ATTRIBUTE, ATTRIBUTE_SUM}
+ * 
+ * @author Sebastian Henneberg
  */
 public enum ReferenceType {
 	FEATURE,

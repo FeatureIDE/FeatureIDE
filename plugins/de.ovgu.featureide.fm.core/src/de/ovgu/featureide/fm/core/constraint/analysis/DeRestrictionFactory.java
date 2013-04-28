@@ -26,7 +26,9 @@ import java.util.List;
 import de.ovgu.featureide.fm.core.constraint.RelationOperator;
 
 /**
- * TODO description
+ * Constructs a new {@link DeRestriction} and adds it to a list of restriction.
+ * 
+ * @author Sebastian Henneberg
  */
 public class DeRestrictionFactory implements RestrictionFactory<DeRestriction> {
 
