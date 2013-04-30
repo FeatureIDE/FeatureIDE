@@ -1,0 +1,216 @@
+\settings {
+"#Proof-Settings-Config-File
+#Mon Jan 30 17:19:48 CET 2012
+[SimultaneousUpdateSimplifier]DeleteEffectLessLocations=true
+[DecisionProcedure]showSMTResDialog=false
+[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
+[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
+[Strategy]Timeout=-1
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
+[DecisionProcedure]ActiveRule=EMPTY_RULE
+[DecisionProcedure]multprovers=Z3\\=true\\:Simplify\\=true\\:Yices\\=true\\:CVC3\\=true
+[Choice]DefaultChoices=throughout-throughout\\:toutOff , transactions-transactions\\:transactionsOff , assertions-assertions\\:on , intRules-intRules\\:arithmeticSemanticsIgnoringOF , programRules-programRules\\:Java , initialisation-initialisation\\:disableStaticInitialisation , transactionAbort-transactionAbort\\:abortOff , rtsj-rtsj\\:off , nullPointerPolicy-nullPointerPolicy\\:nullCheck , stringRules-stringRules\\:withStringPool , memory-memory\\:off , javacard-javacard\\:jcOff
+[TacletTranslation]filename=
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_EXPAND
+[View]HideIntermediateProofsteps=false
+[SimultaneousUpdateSimplifier]EagerSimplification=true
+[View]HideClosedSubtrees=false
+[General]UseOCL=false
+[DecisionProcedure]WeakenSMTTranslation=false
+[View]ShowWholeTaclet=false
+[Strategy]ActiveStrategy=JavaCardDLStrategy
+[StrategyProperty]VBT_PHASE=VBT_SYM_EX
+[DecisionProcedure]savefile_path=
+[General]StupidMode=true
+[DecisionProcedure]SolverTimeout=60
+[General]UseJML=true
+[General]DnDDirectionSensitive=true
+[General]ProofAssistant=false
+[View]FontIndex=2
+[StrategyProperty]QUERY_OPTIONS_KEY=QUERY_NONE
+[DecisionProcedure]pd_mode=0
+[DecisionProcedure]Exec=Z3\\=z3 -smt -m %f\\:Simplify\\=simplify %f\\:Yices\\=yices -tc -e -smt %f\\:CVC3\\=cvc3 -lang smt +model %f
+[StrategyProperty]GOALCHOOSER_OPTIONS_KEY=GOALCHOOSER_DEFAULT
+[Strategy]MaximumNumberOfAutomaticApplications=1000
+[View]MaxTooltipLines=40
+[General]SoundNotification=false
+[DecisionProcedure]cache_goals=false
+[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
+[TacletTranslation]assignment=11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
+[Choice]Choices=throughout-throughout\\:toutOn-throughout\\:toutOff , transactions-transactions\\:transactionsOn-transactions\\:transactionsOff , assertions-assertions\\:on-assertions\\:off-assertions\\:safe , programRules-programRules\\:Java-programRules\\:ODL , intRules-intRules\\:javaSemantics-intRules\\:arithmeticSemanticsIgnoringOF-intRules\\:arithmeticSemanticsCheckingOF , initialisation-initialisation\\:enableStaticInitialisation-initialisation\\:disableStaticInitialisation , transactionAbort-transactionAbort\\:abortOn-transactionAbort\\:abortOff , rtsj-rtsj\\:on-rtsj\\:off , nullPointerPolicy-nullPointerPolicy\\:noNullCheck-nullPointerPolicy\\:nullCheck , stringRules-stringRules\\:withStringPool-stringRules\\:withoutStringPool , memory-memory\\:off-memory\\:on , javacard-javacard\\:jcOff-javacard\\:jcOn
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_NONE
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_INVARIANT
+[TacletTranslation]maxGeneric=3
+"
+}
+
+\javaSource "C:\\Users\\tthuem\\workspace3.7.1\\ExamDB-VarEnc\\src";
+
+
+
+\programVariables {
+java.lang.Throwable exc;
+java.lang.String _message;
+ExamDataBaseException self;
+java.lang.String message;
+}
+
+\functions {
+java.lang.String message_2(java.lang.Throwable);
+java.lang.String message_0(java.lang.Throwable);
+java.lang.String message_1(java.lang.Throwable);
+\nonRigid[Location] ExamDataBaseException selfAtPre_2;
+\nonRigid[Location] ExamDataBaseException selfAtPre_1;
+\nonRigid[Location] ExamDataBaseException selfAtPre_0;
+java.lang.Throwable cause_2(java.lang.Throwable);
+java.lang.Throwable cause_0(java.lang.Throwable);
+java.lang.Throwable cause_1(java.lang.Throwable);
+}
+
+\predicates {
+\nonRigid[HeapDependent]  anonHeapPred;
+\nonRigid[HeapDependent]  anonHeapPred_2;
+\nonRigid[HeapDependent]  anonHeapPred_1;
+\nonRigid[HeapDependent]  anonHeapPred_0;
+}
+
+\problem {
+     inReachableState
+   & (  self.<created>@(java.lang.Object) = TRUE
+      & !self = null)
+   & (  message.<created>@(java.lang.Object) = TRUE
+      | message = null)
+   & !message = null
+-> {_message:=message}
+     \<{
+         exc=null;try {
+           self.<init>(_message)@ExamDataBaseException;
+         }  catch (java.lang.Throwable e) {
+           exc=e;
+         }
+       }\> (    self.message@(java.lang.Throwable)
+              = message
+            & self.cause@(java.lang.Throwable) = null
+            & exc = null)
+
+}
+
+\proof {
+(keyLog "0" (keyUser "tthuem" ) (keyVersion "8f17586bc0e6cb241cbf74325630ac805cc661f6"))
+(keyLog "1" (keyUser "tthuem" ) (keyVersion "8f17586bc0e6cb241cbf74325630ac805cc661f6"))
+
+(autoModeTime "65")
+
+(branch "dummy ID"
+(rule "impRight" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "notLeft" (formula "3"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "2"))
+(rule "notLeft" (formula "3"))
+(rule "assignment_instance_field_of_this" (formula "6") (term "1"))
+(builtin "Update Simplification" (formula "6"))
+(rule "replace_known_right" (formula "3") (term "1") (ifseqformula "5"))
+(rule "concrete_or_4" (formula "3"))
+(rule "methodBodyExpand" (formula "6") (term "2"))
+(rule "methodCallSuper" (formula "6") (term "2"))
+(rule "variableDeclarationAssign" (formula "6") (term "2"))
+(rule "variableDeclaration" (formula "6") (term "2") (newnames "arg0"))
+(rule "assignment_instance_field_of_this" (formula "6") (term "2"))
+(builtin "Update Simplification" (formula "6"))
+(rule "methodBodyExpand" (formula "6") (term "2"))
+(rule "methodCallSuper" (formula "6") (term "2"))
+(rule "variableDeclarationAssign" (formula "6") (term "2"))
+(rule "variableDeclaration" (formula "6") (term "2") (newnames "arg0_1"))
+(rule "assignment_instance_field_of_this" (formula "6") (term "2"))
+(builtin "Update Simplification" (formula "6"))
+(rule "methodBodyExpand" (formula "6") (term "2"))
+(rule "methodCall" (formula "6") (term "2"))
+(branch " Normal Execution (this != null )"
+   (builtin "Update Simplification" (formula "6"))
+   (rule "variableDeclarationAssign" (formula "6") (term "2"))
+   (rule "variableDeclaration" (formula "6") (term "2") (newnames "arg0_2"))
+   (rule "assignment_instance_field_of_this" (formula "6") (term "2"))
+   (builtin "Update Simplification" (formula "6"))
+   (rule "variableDeclarationAssign" (formula "6") (term "2"))
+   (rule "variableDeclaration" (formula "6") (term "2") (newnames "arg1"))
+   (rule "assignment_instance_field_of_this" (formula "6") (term "2"))
+   (builtin "Update Simplification" (formula "6"))
+   (rule "ifElse" (formula "6") (term "3"))
+   (builtin "Update Simplification" (formula "6"))
+   (rule "replace_known_right" (formula "6") (term "0,0,0") (ifseqformula "4"))
+   (rule "ifthenelse_false" (formula "6") (term "0,0"))
+   (rule "instanceof_not_compatible" (formula "6") (term "0"))
+   (rule "replace_known_right" (formula "6") (term "0") (ifseqformula "4"))
+   (rule "ifthenelse_false_for" (formula "6"))
+   (rule "ifElse" (formula "6") (term "3"))
+   (builtin "Update Simplification" (formula "6"))
+   (rule "replace_known_right" (formula "6") (term "0,0,0") (ifseqformula "4"))
+   (rule "ifthenelse_false" (formula "6") (term "0,0"))
+   (rule "instanceof_not_compatible" (formula "6") (term "0"))
+   (rule "replace_known_right" (formula "6") (term "0") (ifseqformula "4"))
+   (rule "ifthenelse_false_for" (formula "6"))
+   (rule "ifElse" (formula "6") (term "3"))
+   (builtin "Update Simplification" (formula "6"))
+   (rule "replace_known_right" (formula "6") (term "0,0,0") (ifseqformula "4"))
+   (rule "ifthenelse_false" (formula "6") (term "0,0"))
+   (rule "instanceof_not_compatible" (formula "6") (term "0"))
+   (rule "replace_known_right" (formula "6") (term "0") (ifseqformula "4"))
+   (rule "ifthenelse_false_for" (formula "6"))
+   (rule "ifElse" (formula "6") (term "3"))
+   (builtin "Update Simplification" (formula "6"))
+   (rule "replace_known_right" (formula "6") (term "0,0,0") (ifseqformula "4"))
+   (rule "ifthenelse_false" (formula "6") (term "0,0"))
+   (rule "instanceof_static_type" (formula "6") (term "0,0"))
+   (rule "boolean_equal" (formula "6") (term "0"))
+   (rule "ifthenelse_true_for" (formula "6"))
+   (rule "methodBodyExpand" (formula "6") (term "3"))
+   (rule "methodCallSuper" (formula "6") (term "3"))
+   (rule "variableDeclarationAssign" (formula "6") (term "3"))
+   (rule "variableDeclaration" (formula "6") (term "3") (newnames "arg0_3"))
+   (rule "assignment_instance_field_of_this" (formula "6") (term "3"))
+   (builtin "Update Simplification" (formula "6"))
+   (rule "variableDeclarationAssign" (formula "6") (term "3"))
+   (rule "variableDeclaration" (formula "6") (term "3") (newnames "arg1_1"))
+   (rule "assignment_instance_field_of_this" (formula "6") (term "3"))
+   (builtin "Update Simplification" (formula "6"))
+   (rule "methodBodyExpand" (formula "6") (term "3"))
+   (rule "methodCallSuper" (formula "6") (term "3"))
+   (rule "methodBodyExpand" (formula "6") (term "3"))
+   (rule "methodCallEmpty" (formula "6") (term "3"))
+   (rule "blockEmpty" (formula "6") (term "3"))
+   (rule "assignment_instance_field_of_this" (formula "6") (term "3"))
+   (builtin "Update Simplification" (formula "6"))
+   (rule "assignment_instance_field_of_this" (formula "6") (term "5"))
+   (builtin "Update Simplification" (formula "6"))
+   (rule "set_assignment" (formula "6") (term "7"))
+   (builtin "Update Simplification" (formula "6"))
+   (rule "emptyStatement" (formula "6") (term "6"))
+   (rule "set_assignment" (formula "6") (term "6"))
+   (builtin "Update Simplification" (formula "6"))
+   (rule "emptyStatement" (formula "6") (term "5"))
+   (rule "methodCallEmpty" (formula "6") (term "5"))
+   (rule "methodCallEmpty" (formula "6") (term "5"))
+   (rule "methodCallEmpty" (formula "6") (term "5"))
+   (rule "methodCallEmpty" (formula "6") (term "5"))
+   (rule "methodCallEmpty" (formula "6") (term "5"))
+   (rule "tryEmpty" (formula "6") (term "5"))
+   (rule "emptyModality" (formula "6") (term "5"))
+   (builtin "Update Simplification" (formula "6"))
+   (rule "eq_and_2" (formula "6"))
+   (rule "eqClose" (formula "6") (term "0"))
+   (rule "eqClose" (formula "6") (term "1"))
+   (rule "concrete_and_1" (formula "6"))
+   (rule "closeTrue" (formula "6"))
+)
+(branch " Null Reference (this = null)"
+   (builtin "Update Simplification" (formula "7"))
+   (builtin "Update Simplification" (formula "1"))
+   (rule "close" (formula "5") (ifseqformula "1"))
+)
+)
+
+}

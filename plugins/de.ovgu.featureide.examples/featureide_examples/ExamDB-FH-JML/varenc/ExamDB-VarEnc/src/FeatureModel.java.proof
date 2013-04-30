@@ -1,0 +1,297 @@
+\settings {
+"#Proof-Settings-Config-File
+#Mon Jan 30 17:28:27 CET 2012
+[SimultaneousUpdateSimplifier]DeleteEffectLessLocations=true
+[DecisionProcedure]showSMTResDialog=false
+[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
+[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
+[Strategy]Timeout=-1
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
+[DecisionProcedure]ActiveRule=EMPTY_RULE
+[DecisionProcedure]multprovers=Z3\\=true\\:Simplify\\=true\\:Yices\\=true\\:CVC3\\=true
+[Choice]DefaultChoices=throughout-throughout\\:toutOff , transactions-transactions\\:transactionsOff , assertions-assertions\\:on , intRules-intRules\\:arithmeticSemanticsIgnoringOF , programRules-programRules\\:Java , initialisation-initialisation\\:disableStaticInitialisation , transactionAbort-transactionAbort\\:abortOff , rtsj-rtsj\\:off , nullPointerPolicy-nullPointerPolicy\\:nullCheck , stringRules-stringRules\\:withStringPool , memory-memory\\:off , javacard-javacard\\:jcOff
+[TacletTranslation]filename=
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_EXPAND
+[View]HideIntermediateProofsteps=false
+[SimultaneousUpdateSimplifier]EagerSimplification=true
+[View]HideClosedSubtrees=false
+[General]UseOCL=false
+[DecisionProcedure]WeakenSMTTranslation=false
+[View]ShowWholeTaclet=false
+[Strategy]ActiveStrategy=JavaCardDLStrategy
+[StrategyProperty]VBT_PHASE=VBT_SYM_EX
+[DecisionProcedure]savefile_path=
+[General]StupidMode=true
+[DecisionProcedure]SolverTimeout=60
+[General]UseJML=true
+[General]DnDDirectionSensitive=true
+[General]ProofAssistant=false
+[View]FontIndex=2
+[StrategyProperty]QUERY_OPTIONS_KEY=QUERY_NONE
+[DecisionProcedure]pd_mode=0
+[DecisionProcedure]Exec=Z3\\=z3 -smt -m %f\\:Simplify\\=simplify %f\\:Yices\\=yices -tc -e -smt %f\\:CVC3\\=cvc3 -lang smt +model %f
+[StrategyProperty]GOALCHOOSER_OPTIONS_KEY=GOALCHOOSER_DEFAULT
+[Strategy]MaximumNumberOfAutomaticApplications=1000
+[View]MaxTooltipLines=40
+[General]SoundNotification=false
+[DecisionProcedure]cache_goals=false
+[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
+[TacletTranslation]assignment=11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
+[Choice]Choices=throughout-throughout\\:toutOn-throughout\\:toutOff , transactions-transactions\\:transactionsOn-transactions\\:transactionsOff , assertions-assertions\\:on-assertions\\:off-assertions\\:safe , programRules-programRules\\:Java-programRules\\:ODL , intRules-intRules\\:javaSemantics-intRules\\:arithmeticSemanticsIgnoringOF-intRules\\:arithmeticSemanticsCheckingOF , initialisation-initialisation\\:enableStaticInitialisation-initialisation\\:disableStaticInitialisation , transactionAbort-transactionAbort\\:abortOn-transactionAbort\\:abortOff , rtsj-rtsj\\:on-rtsj\\:off , nullPointerPolicy-nullPointerPolicy\\:noNullCheck-nullPointerPolicy\\:nullCheck , stringRules-stringRules\\:withStringPool-stringRules\\:withoutStringPool , memory-memory\\:off-memory\\:on , javacard-javacard\\:jcOff-javacard\\:jcOn
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_NONE
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_INVARIANT
+[TacletTranslation]maxGeneric=3
+"
+}
+
+\javaSource "C:\\Users\\tthuem\\workspace3.7.1\\ExamDB-VarEnc\\src";
+
+
+
+\programVariables {
+java.lang.Throwable exc;
+FeatureModel self;
+int feature;
+int _feature;
+boolean result;
+}
+
+\functions {
+}
+
+\predicates {
+\nonRigid[HeapDependent]  anonHeapPred;
+\nonRigid[HeapDependent]  anonHeapPred_1;
+\nonRigid[HeapDependent]  anonHeapPred_0;
+}
+
+\problem {
+     inReachableState
+   & (  !FeatureModel.configuration = null
+      & FeatureModel.fm() = TRUE
+      & FeatureModel.fm() = TRUE)
+   & inInt(feature)
+-> {_feature:=feature}
+     \<{
+         exc=null;try {
+           result=FeatureModel.f(_feature)@FeatureModel;
+         }  catch (java.lang.Throwable e) {
+           exc=e;
+         }
+       }\> true
+
+}
+
+\proof {
+(keyLog "0" (keyUser "tthuem" ) (keyVersion "8f17586bc0e6cb241cbf74325630ac805cc661f6"))
+
+(autoModeTime "208")
+
+(branch "dummy ID"
+(rule "eq_and_2" (formula "1") (term "1,0,0"))
+(rule "inInt" (formula "1") (term "1,0"))
+(rule "concrete_and_3" (formula "1") (term "0"))
+(rule "impRight" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "2"))
+(rule "notLeft" (formula "2"))
+(rule "assignment" (formula "4") (term "1"))
+(builtin "Update Simplification" (formula "4"))
+(rule "methodBodyExpand" (formula "4") (term "2"))
+(rule "returnUnfold" (formula "4") (term "2") (inst "#v0=b"))
+(rule "variableDeclarationAssign" (formula "4") (term "2"))
+(rule "variableDeclaration" (formula "4") (term "2") (newnames "b"))
+(rule "eval_order_array_access4" (formula "4") (term "2") (inst "#v0=var"))
+(rule "variableDeclarationAssign" (formula "4") (term "2"))
+(rule "variableDeclaration" (formula "4") (term "2") (newnames "var"))
+(rule "activeUseStaticFieldReadAccess" (formula "4") (term "2"))
+(rule "assignment" (formula "4") (term "2"))
+(builtin "Update Simplification" (formula "4"))
+(rule "assignment_array2" (formula "4") (term "3"))
+(branch " Normal Execution (var != null)"
+   (builtin "Update Simplification" (formula "5"))
+   (builtin "Update Simplification" (formula "4"))
+   (rule "orRight" (formula "4"))
+   (rule "orRight" (formula "4"))
+   (rule "methodCallReturn" (formula "6") (term "2"))
+   (rule "assignment_instance_field_of_this" (formula "6") (term "2"))
+   (builtin "Update Simplification" (formula "6"))
+   (rule "methodCallEmpty" (formula "6") (term "1"))
+   (rule "tryEmpty" (formula "6") (term "1"))
+   (builtin "Update Simplification" (formula "6"))
+   (rule "inEqSimp_ltRight" (formula "5"))
+   (rule "times_zero_1" (formula "1") (term "0,0"))
+   (rule "add_zero_left" (formula "1") (term "0"))
+   (rule "inEqSimp_leqRight" (formula "5"))
+   (rule "polySimp_mulComm0" (formula "1") (term "1,0,0"))
+   (rule "inEqSimp_sepPosMonomial1" (formula "1"))
+   (rule "polySimp_mulComm0" (formula "1") (term "1"))
+   (rule "polySimp_rightDist" (formula "1") (term "1"))
+   (rule "mul_literals" (formula "1") (term "0,1"))
+   (rule "polySimp_mulLiterals" (formula "1") (term "1,1"))
+   (rule "polySimp_elimOne" (formula "1") (term "1,1"))
+   (rule "emptyModality" (formula "6"))
+   (rule "closeTrue" (formula "6"))
+)
+(branch " Null Reference (var = null)"
+   (builtin "Update Simplification" (formula "5"))
+   (builtin "Update Simplification" (formula "1"))
+   (rule "close" (formula "4") (ifseqformula "1"))
+)
+(branch " Index Out of Bounds (var != null, but _feature Out of Bounds!)"
+   (builtin "Update Simplification" (formula "5"))
+   (builtin "Update Simplification" (formula "1"))
+   (rule "andLeft" (formula "1"))
+   (rule "notLeft" (formula "1"))
+   (rule "inEqSimp_ltToLeq" (formula "1") (term "1"))
+   (rule "times_zero_1" (formula "1") (term "1,0,0,1"))
+   (rule "add_literals" (formula "1") (term "0,0,1"))
+   (rule "inEqSimp_sepPosMonomial0" (formula "1") (term "1"))
+   (rule "mul_literals" (formula "1") (term "1,1"))
+   (rule "static_fields_are_null_or_reference_created_objects" (formula "4") (ifseqformula "2"))
+   (rule "array_length_non_negative_3" (formula "2") (term "0,0") (ifseqformula "3") (ifseqformula "1") (ifseqformula "5"))
+   (rule "throwUnfold" (formula "7") (term "1") (inst "#v0=v_ArrayIndexOutOfBoundsException"))
+   (rule "variableDeclarationAssign" (formula "7") (term "1"))
+   (rule "variableDeclaration" (formula "7") (term "1") (newnames "v_ArrayIndexOutOfBoundsException"))
+   (rule "instanceCreationAssignment" (formula "7") (term "1") (inst "#v0=v_ArrayIndexOutOfBoundsException_1"))
+   (rule "variableDeclarationAssign" (formula "7") (term "1"))
+   (rule "variableDeclaration" (formula "7") (term "1") (newnames "v_ArrayIndexOutOfBoundsException_1"))
+   (rule "staticMethodCallStaticWithAssignmentViaTypereference" (formula "7") (term "1") (inst "#v0=v_ArrayIndexOutOfBoundsException_2"))
+   (rule "variableDeclaration" (formula "7") (term "1") (newnames "v_ArrayIndexOutOfBoundsException_2"))
+   (rule "methodBodyExpand" (formula "7") (term "1"))
+   (rule "variableDeclaration" (formula "7") (term "1") (newnames "__NEW__"))
+   (rule "staticMethodCallStaticWithAssignmentViaTypereference" (formula "7") (term "1") (inst "#v0=v_ArrayIndexOutOfBoundsException_3"))
+   (rule "variableDeclaration" (formula "7") (term "1") (newnames "v_ArrayIndexOutOfBoundsException_3"))
+   (rule "allocateInstance" (formula "7") (term "1") (inst "#v0=var"))
+   (builtin "Update Simplification" (formula "7"))
+   (rule "blockEmpty" (formula "7") (term "5"))
+   (rule "assignment" (formula "7") (term "5"))
+   (builtin "Update Simplification" (formula "7"))
+   (rule "polySimp_addComm0" (formula "7") (term "2"))
+   (rule "methodBodyExpand" (formula "7") (term "5"))
+   (rule "assignment_instance_field_of_this" (formula "7") (term "5"))
+   (builtin "Update Simplification" (formula "7"))
+   (rule "assignment_instance_field_of_this" (formula "7") (term "7"))
+   (builtin "Update Simplification" (formula "7"))
+   (rule "methodCallWithinClass" (formula "7") (term "9"))
+   (rule "methodBodyExpand" (formula "7") (term "9"))
+   (rule "methodCallSuper" (formula "7") (term "9"))
+   (rule "nextToCreate_non_negative" (formula "7") (term "0,5") (ifseqformula "4"))
+   (rule "methodBodyExpand" (formula "8") (term "9"))
+   (rule "methodCallSuper" (formula "8") (term "9"))
+   (rule "methodBodyExpand" (formula "8") (term "9"))
+   (rule "methodCallSuper" (formula "8") (term "9"))
+   (rule "methodBodyExpand" (formula "8") (term "9"))
+   (rule "methodCallSuper" (formula "8") (term "9"))
+   (rule "methodBodyExpand" (formula "8") (term "9"))
+   (rule "methodCallSuper" (formula "8") (term "9"))
+   (rule "methodBodyExpand" (formula "8") (term "9"))
+   (rule "methodCallEmpty" (formula "8") (term "9"))
+   (rule "blockEmpty" (formula "8") (term "9"))
+   (rule "assignment_instance_field_of_this" (formula "8") (term "9"))
+   (builtin "Update Simplification" (formula "8"))
+   (rule "assignment_instance_field_of_this" (formula "8") (term "11"))
+   (builtin "Update Simplification" (formula "8"))
+   (rule "methodCallEmpty" (formula "8") (term "13"))
+   (rule "methodCallEmpty" (formula "8") (term "13"))
+   (rule "methodCallEmpty" (formula "8") (term "13"))
+   (rule "methodCallEmpty" (formula "8") (term "13"))
+   (rule "methodCallEmpty" (formula "8") (term "13"))
+   (rule "blockEmpty" (formula "8") (term "13"))
+   (rule "methodCallReturnIgnoreResult" (formula "8") (term "13"))
+   (rule "methodCallReturn" (formula "8") (term "13"))
+   (rule "assignment" (formula "8") (term "13"))
+   (builtin "Update Simplification" (formula "8"))
+   (rule "methodCallEmpty" (formula "8") (term "13"))
+   (rule "blockEmpty" (formula "8") (term "13"))
+   (rule "assignment" (formula "8") (term "13"))
+   (builtin "Update Simplification" (formula "8"))
+   (rule "methodBodyExpand" (formula "8") (term "13"))
+   (rule "methodCallSuper" (formula "8") (term "13"))
+   (rule "methodBodyExpand" (formula "8") (term "13"))
+   (rule "methodCallSuper" (formula "8") (term "13"))
+   (rule "methodBodyExpand" (formula "8") (term "13"))
+   (rule "methodCallSuper" (formula "8") (term "13"))
+   (rule "methodBodyExpand" (formula "8") (term "13"))
+   (rule "methodCallSuper" (formula "8") (term "13"))
+   (rule "methodBodyExpand" (formula "8") (term "13"))
+   (rule "methodCallSuper" (formula "8") (term "13"))
+   (rule "methodBodyExpand" (formula "8") (term "13"))
+   (rule "methodCallEmpty" (formula "8") (term "13"))
+   (rule "blockEmpty" (formula "8") (term "13"))
+   (rule "assignment_instance_field_of_this" (formula "8") (term "13"))
+   (builtin "Update Simplification" (formula "8"))
+   (rule "assignment_instance_field_of_this" (formula "8") (term "13"))
+   (builtin "Update Simplification" (formula "8"))
+   (rule "methodCallEmpty" (formula "8") (term "13"))
+   (rule "methodCallEmpty" (formula "8") (term "13"))
+   (rule "methodCallEmpty" (formula "8") (term "13"))
+   (rule "methodCallEmpty" (formula "8") (term "13"))
+   (rule "methodCallEmpty" (formula "8") (term "13"))
+   (rule "blockEmpty" (formula "8") (term "13"))
+   (rule "assignment_write_attribute_primitive" (formula "8") (term "13"))
+   (branch " Normal Execution (v_ArrayIndexOutOfBoundsException_1 != null)"
+      (builtin "Update Simplification" (formula "9"))
+      (builtin "Update Simplification" (formula "8"))
+      (rule "repository_object_non_null" (formula "8"))
+      (rule "false_right" (formula "8"))
+      (rule "assignment_instance_field_of_this" (formula "8") (term "13"))
+      (builtin "Update Simplification" (formula "8"))
+      (rule "methodCallParamThrow" (formula "8") (term "13"))
+      (rule "tryCatchThrow" (formula "8") (term "13"))
+      (rule "ifElseUnfold" (formula "8") (term "13") (inst "#boolv=b"))
+      (rule "variableDeclaration" (formula "8") (term "13") (newnames "b_1"))
+      (rule "equality_comparison_new" (formula "8") (term "13"))
+      (builtin "Update Simplification" (formula "8"))
+      (rule "repository_object_non_null" (formula "8") (term "0,0"))
+      (rule "concrete_not_2" (formula "8") (term "0"))
+      (rule "ifthenelse_true_for" (formula "8"))
+      (rule "assignment_instance_field_of_this" (formula "8") (term "13"))
+      (builtin "Update Simplification" (formula "8"))
+      (rule "ifElseSplit" (formula "8"))
+      (branch " if b_1 true"
+         (builtin "Update Simplification" (formula "9"))
+         (builtin "Update Simplification" (formula "1"))
+         (rule "boolean_not_equal_2" (formula "1"))
+         (rule "closeFalse" (formula "1"))
+      )
+      (branch " if b_1 false"
+         (rule "false_to_not_true" (formula "1") (term "14"))
+         (builtin "Update Simplification" (formula "9"))
+         (builtin "Update Simplification" (formula "1"))
+         (rule "boolean_not_equal_2" (formula "1") (term "0"))
+         (rule "concrete_not_2" (formula "1"))
+         (rule "true_left" (formula "1"))
+         (rule "elim_double_block" (formula "8") (term "13"))
+         (rule "ifElse" (formula "8") (term "13"))
+         (builtin "Update Simplification" (formula "8"))
+         (rule "repository_object_non_null" (formula "8") (term "0,0,0"))
+         (rule "ifthenelse_false" (formula "8") (term "0,0"))
+         (rule "elim_double_block" (formula "8") (term "13,1"))
+         (rule "variableDeclaration" (formula "8") (term "13,1") (newnames "e"))
+         (rule "assignment" (formula "8") (term "13,1"))
+         (builtin "Update Simplification" (formula "8"))
+         (rule "assignment_instance_field_of_this" (formula "8") (term "13,1"))
+         (builtin "Update Simplification" (formula "8"))
+         (rule "blockThrow" (formula "8") (term "12,2"))
+         (rule "throwDiamond" (formula "8") (term "12,2"))
+         (builtin "Update Simplification" (formula "8"))
+         (rule "instanceof_static_type" (formula "8") (term "0,0"))
+         (rule "boolean_equal" (formula "8") (term "0"))
+         (rule "ifthenelse_true_for" (formula "8"))
+         (rule "emptyModality" (formula "8") (term "11"))
+         (builtin "Update Simplification" (formula "8"))
+         (rule "closeTrue" (formula "8"))
+      )
+   )
+   (branch " Null Reference (v_ArrayIndexOutOfBoundsException_1 = null)"
+      (builtin "Update Simplification" (formula "1"))
+      (rule "repository_object_non_null" (formula "1"))
+      (rule "closeFalse" (formula "1"))
+   )
+)
+)
+
+}

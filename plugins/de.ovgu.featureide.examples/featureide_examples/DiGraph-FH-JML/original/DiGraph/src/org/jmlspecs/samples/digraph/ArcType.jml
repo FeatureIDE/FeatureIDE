@@ -1,0 +1,61 @@
+// @(#)$Id: ArcType.jml,v 1.7 2005/12/23 17:02:06 chalin Exp $
+
+// Copyright (C) 1998, 1999 Iowa State University
+
+// This file is part of JML
+
+// JML is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2, or (at your option)
+// any later version.
+
+// JML is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with JML; see the file COPYING.  If not, write to
+// the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+
+
+package org.jmlspecs.samples.digraph;
+
+import org.jmlspecs.models.JMLType;
+
+/*@ pure @*/ public class ArcType implements JMLType {
+
+    //@ public model NodeType from;
+    //@ public model NodeType to;
+    //@ public invariant from != null && to != null;
+
+    /*@ public normal_behavior
+      @   requires from != null && to != null;
+      @   assignable this.from, this.to;
+      @   ensures this.from.equals(from)
+      @        && this.to.equals(to);
+      @*/
+    public ArcType(NodeType from, NodeType to);
+
+    /*@ also
+      @   public normal_behavior
+      @   {|
+      @     requires o instanceof ArcType;
+      @     ensures \result
+      @        <==> ((ArcType)o).from.equals(from)
+      @             && ((ArcType)o).to.equals(to);
+      @   also
+      @     requires !(o instanceof ArcType);
+      @     ensures \result == false;
+      @   |}
+      @*/
+    public boolean equals(/*@nullable@*/ Object o);
+
+    /*@ also
+      @   public normal_behavior
+      @     ensures \result instanceof ArcType
+      @          && ((ArcType)\result).equals(this);
+      @*/
+    public Object clone();
+}
+

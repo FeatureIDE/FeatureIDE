@@ -1,0 +1,137 @@
+// @(#)$Id: Digraph.jml,v 1.15 2007/07/01 13:35:50 chalin Exp $
+
+// Copyright (C) 1998, 1999 Iowa State University
+
+// This file is part of JML
+
+// JML is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2, or (at your option)
+// any later version.
+
+// JML is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with JML; see the file COPYING.  If not, write to
+// the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+
+
+package org.jmlspecs.samples.digraph;
+//@ model import org.jmlspecs.models.*;
+public class Digraph {
+ //@ public model JMLValueSet nodes;
+ //@ public model JMLValueSet arcs;
+ /*@ public invariant_redundantly nodes != null;
+   @ public invariant (\forall JMLType n; nodes.has(n);
+   @                          n instanceof NodeType);
+   @ public invariant_redundantly arcs != null;
+   @ public invariant (\forall JMLType a; arcs.has(a);
+   @                          a instanceof ArcType); 
+   @ public invariant
+   @      (\forall ArcType a; arcs.has(a);
+   @           nodes.has(a.from) && nodes.has(a.to));
+   @*/
+
+ /*@  public normal_behavior
+   @   assignable nodes, arcs;
+   @   ensures nodes.isEmpty() && arcs.isEmpty();
+   @*/
+ public Digraph();
+
+ /*@  public normal_behavior
+   @   requires_redundantly n != null;
+   @   assignable nodes;
+   @   ensures nodes.equals(\old(nodes.insert(n)));
+   @*/
+ public void addNode(NodeType n);
+ 
+ /*@  public normal_behavior
+   @   requires unconnected(n);
+   @   assignable nodes;
+   @   ensures nodes.equals(\old(nodes.remove(n)));
+   @*/
+ public void removeNode(NodeType n);
+ 
+ /*@  public normal_behavior
+   @   requires_redundantly inFrom != null && inTo != null;
+   @   requires nodes.has(inFrom) && nodes.has(inTo);
+   @   assignable arcs;
+   @   ensures arcs.equals(
+   @            \old(arcs).insert(new ArcType(inFrom, inTo)));
+   @*/
+ public void addArc(NodeType inFrom, NodeType inTo);
+ 
+ /*@  public normal_behavior
+   @   requires_redundantly inFrom != null && inTo != null;
+   @   requires nodes.has(inFrom) && nodes.has(inTo);
+   @   assignable arcs;
+   @   ensures arcs.equals(
+   @            \old(arcs).remove(new ArcType(inFrom, inTo)));
+   @*/
+ public void removeArc(NodeType inFrom, NodeType inTo);
+
+ /*@  public normal_behavior
+   @   assignable \nothing;
+   @   ensures \result == nodes.has(n);
+   @*/
+ public /*@ pure @*/ boolean isNode(NodeType n); 
+
+ /*@  public normal_behavior
+   @   requires_redundantly inFrom != null && inTo != null;
+   @   ensures \result == arcs.has(new ArcType(inFrom, inTo));
+   @
+   @*/
+ public /*@ pure @*/ boolean isArc(NodeType inFrom,
+                                   NodeType inTo); 
+
+ /*@  public normal_behavior
+   @   requires nodes.has(start) && nodes.has(end);
+   @   assignable \nothing;
+   @   ensures \result
+   @           == reachSet(new JMLValueSet(start)).has(end);
+   @*/
+ public /*@ pure @*/ boolean isAPath(NodeType start,
+                                     NodeType end);
+
+ /*@  public normal_behavior
+   @   assignable \nothing;
+   @   ensures \result <==>
+   @              !(\exists ArcType a; arcs.has(a);
+   @                     a.from.equals(n) || a.to.equals(n));
+   @*/
+ public /*@ pure @*/ boolean unconnected(NodeType n);
+
+ /*@  public normal_behavior
+   @   requires_redundantly nodeSet != null;
+   @   requires (\forall JMLType o; nodeSet.has(o);
+   @                o instanceof NodeType && nodes.has(o));
+   @   {|
+   @      assignable \nothing;
+   @    also
+   @      requires nodeSet.equals(OneMoreStep(nodeSet));
+   @      ensures \result != null && \result.equals(nodeSet);
+   @    also
+   @      requires !nodeSet.equals(OneMoreStep(nodeSet));
+   @      ensures \result != null
+   @         && \result.equals(reachSet(OneMoreStep(nodeSet)));
+   @   |}
+   @ public pure model JMLValueSet reachSet(JMLValueSet nodeSet);
+   @*/
+
+ /*@  public normal_behavior
+   @   requires_redundantly nodeSet != null;
+   @   requires (\forall JMLType o; nodeSet.has(o);
+   @              o instanceof NodeType && nodes.has(o));
+   @      assignable \nothing;
+   @   ensures_redundantly \result != null;
+   @   ensures \result.equals(nodeSet.union(
+   @        new JMLValueSet { NodeType n | nodes.has(n)
+   @          && (\exists ArcType a; a != null && arcs.has(a);
+   @                nodeSet.has(a.from) && n.equals(a.to))}));
+   @ public pure model
+   @ JMLValueSet OneMoreStep(JMLValueSet nodeSet);
+   @*/
+}

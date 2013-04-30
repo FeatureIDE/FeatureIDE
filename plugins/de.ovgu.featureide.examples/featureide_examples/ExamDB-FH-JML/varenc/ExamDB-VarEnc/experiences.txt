@@ -1,0 +1,63 @@
+* Core features brauchen nicht berücksichtigt werden (sind ja eh immer da)
+* Ansonsten hat unser FM leider keine Einschränkungen
+* Schwierig festzulegen, dass das FM fix aber beliebig und gültig ist
+* Methode zum Abfragen, ob Feature wahr ist muss pure sein, damit pure Methoden auch verfeinert werden können
+
+* Kontrakte von Methoden, die optional sind, aber nicht verfeinert werden:
+  - Vorbedingung v wird zu "f(Feature) && v" --> Methode darf nur aufgerufen werden, wenn Feature ausgewählt ist / alternativ mittels Type-Checking
+  - Nachbedingung bleibt identisch
+  - Methodenbody bleibt identisch, da Methode ja nur mit erfüllter Vorbedingung aufgerufen werden darf
+
+* Felder, die optional sind
+  - Zugriff verboten, wenn Feature nicht gewählt ist, kann mit Type-Checking überprüft werden
+  - Nur kompliziert durch Kontrakte auszudrücken, z.B. Feld-Zugriffe nur über Getter/Setter und dann Vorbedingung prüfen
+  
+* Methodenverfeinerungen ohne Kontrakte
+  - Es werden wie mit FeatureHouse mehrere Methoden generiert
+  - jede Verfeinerung enthält eine Zeile, die überprüft, ob das Feature da ist
+	  if (!FeatureModel.f(FeatureModel.BackOut))
+    		return validStudent__ExamDB(student);
+
+* Invariante, die optional ist
+  - Invariant i wird zu "!f(Feature) || i"
+  - muss also von allen Methoden erfüllt werden, aber i muss nur gelten, wenn Feature gewählt ist
+
+* Ina:
+  - Sieht man nicht in Key immer den Code?
+  - SpecificationExtraction, was ist das?
+
+* Fehler in Fallstudie:
+  - Konstruktor von Student kann ohne Vorbedingung die Invariante nicht garantieren
+  
+* Fehler in Key:
+  - Reload von RespectsModifies in Exception-Klasse für beide Konstruktoren
+  
+* Schwierigkeiten:
+  - Konstruktor von ExamDataBase erfüllt Invariante, die Feature enthält
+  - "X --> self = null" bei Methoden die Aufruf zu verfeinerter Methode enthalten
+
+##########################
+
+* Batch-modus für Key vielleicht nächste Woche
+
+
+  
+15 Seiten Springer
+
+Intro
+
+Background
+* FOP
+* JML+Key
+
+Specitifation of FOP
+
+Variability Encoding for Specification and Implementation (trennen?)
+
+Evaluation
+
+* ExamDataBase
+* BankAccount Example
+
+Conclusion
+

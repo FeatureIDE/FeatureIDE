@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<struct>
+			<and mandatory="true" name="Paycard">
+				<and name="Logging">
+					<feature name="MaximumRecord"/>
+				</and>
+				<feature name="LockOut"/>
+			</and>
+		</struct>
+		<constraints/>
+		<comments/>
+	</featureModel>

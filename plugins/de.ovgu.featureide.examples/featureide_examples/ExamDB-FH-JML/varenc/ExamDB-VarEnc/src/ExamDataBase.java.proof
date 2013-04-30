@@ -1,0 +1,96 @@
+\settings {
+"#Proof-Settings-Config-File
+#Mon Jan 30 17:44:23 CET 2012
+[SimultaneousUpdateSimplifier]DeleteEffectLessLocations=true
+[DecisionProcedure]showSMTResDialog=false
+[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
+[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
+[Strategy]Timeout=-1
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
+[DecisionProcedure]ActiveRule=EMPTY_RULE
+[DecisionProcedure]multprovers=Z3\\=true\\:Simplify\\=true\\:Yices\\=true\\:CVC3\\=true
+[Choice]DefaultChoices=throughout-throughout\\:toutOff , transactions-transactions\\:transactionsOff , assertions-assertions\\:on , intRules-intRules\\:arithmeticSemanticsIgnoringOF , programRules-programRules\\:Java , initialisation-initialisation\\:disableStaticInitialisation , transactionAbort-transactionAbort\\:abortOff , rtsj-rtsj\\:off , nullPointerPolicy-nullPointerPolicy\\:nullCheck , stringRules-stringRules\\:withStringPool , memory-memory\\:off , javacard-javacard\\:jcOff
+[TacletTranslation]filename=
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_EXPAND
+[View]HideIntermediateProofsteps=false
+[SimultaneousUpdateSimplifier]EagerSimplification=true
+[View]HideClosedSubtrees=false
+[General]UseOCL=false
+[DecisionProcedure]WeakenSMTTranslation=false
+[View]ShowWholeTaclet=false
+[Strategy]ActiveStrategy=JavaCardDLStrategy
+[StrategyProperty]VBT_PHASE=VBT_SYM_EX
+[DecisionProcedure]savefile_path=
+[General]StupidMode=true
+[DecisionProcedure]SolverTimeout=60
+[General]UseJML=true
+[General]DnDDirectionSensitive=true
+[General]ProofAssistant=false
+[View]FontIndex=2
+[StrategyProperty]QUERY_OPTIONS_KEY=QUERY_NONE
+[DecisionProcedure]pd_mode=0
+[DecisionProcedure]Exec=Z3\\=z3 -smt -m %f\\:Simplify\\=simplify %f\\:Yices\\=yices -tc -e -smt %f\\:CVC3\\=cvc3 -lang smt +model %f
+[StrategyProperty]GOALCHOOSER_OPTIONS_KEY=GOALCHOOSER_DEFAULT
+[Strategy]MaximumNumberOfAutomaticApplications=7000
+[View]MaxTooltipLines=40
+[General]SoundNotification=false
+[DecisionProcedure]cache_goals=false
+[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
+[TacletTranslation]assignment=11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
+[Choice]Choices=throughout-throughout\\:toutOn-throughout\\:toutOff , transactions-transactions\\:transactionsOn-transactions\\:transactionsOff , assertions-assertions\\:on-assertions\\:off-assertions\\:safe , programRules-programRules\\:Java-programRules\\:ODL , intRules-intRules\\:javaSemantics-intRules\\:arithmeticSemanticsIgnoringOF-intRules\\:arithmeticSemanticsCheckingOF , initialisation-initialisation\\:enableStaticInitialisation-initialisation\\:disableStaticInitialisation , transactionAbort-transactionAbort\\:abortOn-transactionAbort\\:abortOff , rtsj-rtsj\\:on-rtsj\\:off , nullPointerPolicy-nullPointerPolicy\\:noNullCheck-nullPointerPolicy\\:nullCheck , stringRules-stringRules\\:withStringPool-stringRules\\:withoutStringPool , memory-memory\\:off-memory\\:on , javacard-javacard\\:jcOff-javacard\\:jcOn
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_NONE
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_INVARIANT
+[TacletTranslation]maxGeneric=3
+"
+}
+
+\javaSource "C:\\Users\\tthuem\\workspace3.7.1\\ExamDB-VarEnc\\src";
+
+
+
+\programVariables {
+java.lang.Throwable exc;
+java.lang.String _message;
+ExamDataBaseException self;
+java.lang.String message;
+}
+
+\functions {
+}
+
+\predicates {
+}
+
+\problem {
+     inReachableState
+   & !message = null
+   & (  self.<created>@(java.lang.Object) = TRUE
+      & !self = null)
+   & (  message.<created>@(java.lang.Object) = TRUE
+      | message = null)
+-> {_message:=message}
+     \[{
+         exc=null;try {
+           self.<init>(_message)@ExamDataBaseException;
+         }  catch (java.lang.Throwable e) {
+           exc=e;
+         }
+       }\] true
+
+}
+
+\proof {
+(keyLog "0" (keyUser "tthuem" ) (keyVersion "8f17586bc0e6cb241cbf74325630ac805cc661f6"))
+
+(autoModeTime "3")
+
+(branch "dummy ID"
+(rule "box_true" (formula "1") (term "1,1"))
+(builtin "Update Simplification" (formula "1"))
+(rule "concrete_impl_4" (formula "1"))
+(rule "closeTrue" (formula "1"))
+)
+
+}

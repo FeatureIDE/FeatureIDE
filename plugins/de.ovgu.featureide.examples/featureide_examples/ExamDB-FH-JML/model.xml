@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<struct>
+			<and mandatory="true" name="ExamDB">
+				<feature name="BonusPoints"/>
+				<feature name="BackOut"/>
+				<feature name="Statistics"/>
+			</and>
+		</struct>
+		<constraints/>
+		<comments/>
+	</featureModel>
