@@ -43,6 +43,7 @@ import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
+import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -51,6 +52,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.osgi.service.prefs.BackingStoreException;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
@@ -1344,29 +1347,22 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		return new ArrayList<String>();
 	}
 
-	private static final QualifiedName CONTRACT_COMPOSITION = 
-			new QualifiedName(FeatureProject.class.getName() +"#ContractComposition", 
-					FeatureProject.class.getName() +"#ContractComposition");
-	
 	
 	public String getContractComposition() {
 		String contractComposition = null;
-		try {
-			contractComposition = project.getPersistentProperty(CONTRACT_COMPOSITION);
-		} catch (CoreException e) {
-			CorePlugin.getDefault().logError(e);
-		}
-		if (contractComposition == null) {
-			return DEFAULT_CONTRACT_COMPOSITION;
-		}
+		ProjectScope ps = new ProjectScope(project);
+		IEclipsePreferences prefs = ps.getNode("de.ovgu.featureide.core");
+		contractComposition = prefs.get("contract", DEFAULT_CONTRACT_COMPOSITION);
 		return contractComposition;
-	} 
+	}
 
-	
 	public void setContractComposition(String contractComposition) {
 		try {
-			project.setPersistentProperty(CONTRACT_COMPOSITION, contractComposition);
-		} catch (CoreException e) {
+			ProjectScope ps = new ProjectScope(project);
+			IEclipsePreferences prefs = ps.getNode("de.ovgu.featureide.core");
+			prefs.put("contract", contractComposition);
+			prefs.flush();
+		} catch (BackingStoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
 	}
