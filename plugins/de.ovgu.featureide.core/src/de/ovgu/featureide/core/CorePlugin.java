@@ -70,7 +70,7 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
  * @author Thomas Thuem
  */
 public class CorePlugin extends AbstractCorePlugin {
-
+	build shall fail!
 	public static final String PLUGIN_ID = "de.ovgu.featureide.core";
 
 	private static final String COMPOSERS_ID = PLUGIN_ID + ".composers";
