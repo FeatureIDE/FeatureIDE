@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>IntList-FH-JML</name>
+	<comment>
+	[description]
+	A feature-oriented implementation of a list structure for storing integer values and corresponding basic
+	operations. Based on the feature selection, the list behaves like a stack or a sorted list.
+	[/description]
+	</comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>de.ovgu.featureide.core.extensibleFeatureProjectBuilder</name>
+			<arguments>
+				<dictionary>
+					<key>build</key>
+					<value>src</value>
+				</dictionary>
+				<dictionary>
+					<key>composer</key>
+					<value>de.ovgu.featureide.composer.featurehouse</value>
+				</dictionary>
+				<dictionary>
+					<key>equations</key>
+					<value>configs</value>
+				</dictionary>
+				<dictionary>
+					<key>source</key>
+					<value>features</value>
+				</dictionary>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>org.eclipse.jdt.core.javabuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.eclipse.jdt.core.javanature</nature>
+		<nature>de.ovgu.featureide.core.featureProjectNature</nature>
+	</natures>
+</projectDescription>
