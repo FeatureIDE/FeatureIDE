@@ -102,13 +102,13 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 			CorePlugin.setupFeatureProject(getNewProject(), page.getCompositionTool().getId()
 					,page.getSourcePath(),page.getConfigPath(),page.getBuildPath(), true);
 			// enhance project depending on extension
-//			if(wizardExtension != null && wizardExtension.isFinished()) {
-//				try {
-//					wizardExtension.enhanceProject(getNewProject(),page.getSourcePath(),page.getConfigPath(),page.getBuildPath());
-//				} catch (CoreException e) {
-//					UIPlugin.getDefault().logError(e);
-//				}
-//			}
+			if(wizardExtension != null && wizardExtension.isFinished()) {
+				try {
+					wizardExtension.enhanceProject(getNewProject(),page.getSourcePath(),page.getConfigPath(),page.getBuildPath());
+				} catch (CoreException e) {
+					UIPlugin.getDefault().logError(e);
+				}
+			}
 			// open editor
 			UIPlugin.getDefault().openEditor(FeatureModelEditor.ID, getNewProject().getFile("model.xml"));
 		}

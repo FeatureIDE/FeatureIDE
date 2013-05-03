@@ -139,7 +139,6 @@ public class DeltaJNewProjectWizardExtension implements INewFeatureProjectWizard
 			modelFile.setContents(stream, true, false, null);
 		else
 			modelFile.create(stream, true, null);
-		// TODO nullpointer sometimes, has to wait until feature project is created
 		CorePlugin.getFeatureProject(modelFile).getFeatureModel().handleModelDataChanged();
 	}
 	
