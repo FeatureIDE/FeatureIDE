@@ -57,6 +57,7 @@ public class NewFeatureProjectPage extends WizardPage {
 	private GridLayout layout = new GridLayout();
 	protected Group pathGroup;
 	protected Label buildLabel;
+	private boolean canFlipToNextPage = true;
 	
 	protected NewFeatureProjectPage() {
 		super("");
@@ -249,8 +250,10 @@ public class NewFeatureProjectPage extends WizardPage {
 	protected boolean isPathEmpty(String path, String name) {
 		if (path.length() == 0) {
 			updateStatus(name + " Path must be specified.");
+			canFlipToNextPage  = false;
 			return true;
 		}
+		canFlipToNextPage  = true;
 		return false;
 	}
 	protected boolean isInvalidPath(String path, String name) {
@@ -295,4 +298,7 @@ public class NewFeatureProjectPage extends WizardPage {
 		return buildPath.isEnabled() ? buildPath.getText() : "";
 	}
 
+	public boolean canFlipToNextPage() {
+		return this.canFlipToNextPage;
+	}
 }

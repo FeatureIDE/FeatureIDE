@@ -1,0 +1,91 @@
+// This is the full listing of the Atm Spl. //
+
+delta DCash {
+	adds class Bank {
+		void withdrawCash(int amount) {/*...*/}
+	}
+
+	adds class Screen {
+		void print(String text) {/*...*/}
+		int askForAmount() {
+			// print message
+			Language language;
+			language = new Language();
+			this.print(language.getAskForAmountText());
+			
+			// return enteres amount
+			return 0;
+		}
+	}
+
+	adds class CashDispenser {
+		void dispense(int amount) {/*...*/}
+	}
+
+	adds class Controller {
+		Bank bank;
+		Screen screen;
+		CashDispenser cashDispenser;
+		void startExecution() {
+			this.executeWithdrawal();
+		}
+		void executeWithdrawal() {
+			int amount;
+			amount = this.screen.askForAmount();
+			this.bank.withdrawCash(amount);
+			this.cashDispenser.dispense(amount);
+		}
+	}
+}
+
+delta DBalance {
+	removes CashDispenser;
+	modifies Screen {
+		removesMethod askForAmount;
+		adds void printBalance(int balance) {
+			Language language;
+			language = new Language();
+			this.print(language.getBalanceText() + balance);
+		}
+	}
+	modifies Bank {
+		removesMethod withdrawCash;
+		adds int getBalance() {
+			return 0;
+		}
+	}
+	modifies Controller {
+		removesField cashDispenser;
+		removesMethod executeWithdrawal;
+		modifies void startExecution() {
+			this.printBalance();
+		}
+		adds void printBalance() {
+			int balance;
+			balance = this.bank.getBalance();
+			this.screen.printBalance(balance);
+		}
+	}
+}
+
+delta DEnglish { 
+	adds class Language {
+		String getAskForAmountText() {
+			return "Please enter the amount of money to withdraw.";
+		}
+		String getBalanceText() {
+			return "Your account balance is: ";
+		}
+	}
+}
+
+delta DGerman {
+	adds class Language {
+		String getAskForAmountText() {
+			return "Bitte geben Sie den Geldbetrag an, den Sie abheben wollen.";
+		}
+		String getBalanceText() {
+			return "Ihr Kontostand ist: ";
+		}
+	}
+}

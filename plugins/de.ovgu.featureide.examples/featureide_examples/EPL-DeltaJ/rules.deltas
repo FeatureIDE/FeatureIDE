@@ -1,0 +1,10 @@
+deltas
+	[DLitAddPrint,DNeg when Neg]
+	
+	[DremAdd when !Add]
+	
+	[DLitEval when Eval,
+		DAddEval when (Add && Eval),
+		DNegEval when (Neg && Eval),
+		DNegPrint when Neg,
+		DOptionalPrint when (Add && Neg)]

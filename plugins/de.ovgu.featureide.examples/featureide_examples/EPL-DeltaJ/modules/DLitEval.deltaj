@@ -1,0 +1,9 @@
+delta DLitEval {
+	modifies Exp {
+		adds int eval() { return 0; }
+	}
+	
+	modifies Lit {
+		adds int eval() { return this.value; }
+	}
+}

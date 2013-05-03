@@ -1,0 +1,6 @@
+delta DNeg {
+	adds class Neg extends Exp {
+		Exp expr;
+		Neg setNeg(Exp a) { this.expr = a; return this; }
+	}
+}

@@ -1,0 +1,22 @@
+delta DLitAddPrint {
+	adds class Exp { // only used as a type
+		String toString() { return ""; }
+	}
+	
+	adds class Lit extends Exp {
+		int value;
+		Lit setLit(int n) { value = n; return this; }
+		String toString() { return this.value + ""; }
+	}
+	
+	adds class Add extends Exp {
+		Exp expr1;
+		Exp expr2;
+		Add setAdd(Exp a, Exp b) { 
+			expr1 = a; expr2 = b; return this;
+		}
+		String toString() { 
+			return expr1.toString() + " + " + this.expr2.toString(); 
+		}
+	}
+}

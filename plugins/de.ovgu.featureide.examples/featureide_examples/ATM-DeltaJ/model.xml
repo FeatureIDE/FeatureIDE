@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel chosenLayoutAlgorithm="1">
+		<struct>
+			<and abstract="true" mandatory="true" name="ATM">
+				<alt abstract="true" mandatory="true" name="Feature">
+					<feature mandatory="true" name="Balance"/>
+					<feature mandatory="true" name="Cash"/>
+				</alt>
+				<alt abstract="true" mandatory="true" name="Language">
+					<feature mandatory="true" name="English"/>
+					<feature mandatory="true" name="German"/>
+				</alt>
+			</and>
+		</struct>
+		<constraints/>
+		<comments/>
+		<featureOrder userDefined="false"/>
+	</featureModel>
