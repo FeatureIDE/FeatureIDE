@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 import org.eclipse.draw2d.RotatableDecoration;
 import org.eclipse.draw2d.RoundedRectangle;
 import org.eclipse.draw2d.geometry.Point;
+import org.eclipse.swt.graphics.Color;
 
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
@@ -37,8 +38,9 @@ public class CircleDecoration extends RoundedRectangle implements
 
 	public CircleDecoration(boolean fill) {
 		super();
-		setForegroundColor(FMPropertyManager.getDecoratorForgroundColor());
-		setBackgroundColor(fill ? FMPropertyManager.getDecoratorForgroundColor() : FMPropertyManager.getDecoratorBackgroundColor());
+		Color decoratorForgroundColor = FMPropertyManager.getDecoratorForgroundColor();
+		setForegroundColor(decoratorForgroundColor);
+		setBackgroundColor(fill ? decoratorForgroundColor : FMPropertyManager.getDecoratorBackgroundColor());
 		setSize(SOURCE_ANCHOR_DIAMETER, SOURCE_ANCHOR_DIAMETER);
 
 	}

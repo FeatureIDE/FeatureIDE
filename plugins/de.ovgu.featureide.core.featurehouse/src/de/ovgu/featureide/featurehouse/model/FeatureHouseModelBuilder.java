@@ -107,10 +107,10 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 	private void caseCompileUnit(FSTNode node) {
 		node.accept(new FSTVisitor(){
 			 public boolean visit(FSTTerminal terminal){
-				 if (terminal.getType().equals(JAVA_NODE_IMPORTDECLARATION)) {
+				 if (JAVA_NODE_IMPORTDECLARATION.equals(terminal.getType())) {
 					ClassBuilder.getClassBuilder(FeatureHouseModelBuilder.this.currentFile, FeatureHouseModelBuilder.this)
 						.caseAddImport(terminal);
-				 } else if(terminal.getType().equals(JAVA_NODE_PACKAGEDECLARATION)){
+				 } else if(JAVA_NODE_PACKAGEDECLARATION.equals(terminal.getType())){
 					 ClassBuilder.getClassBuilder(FeatureHouseModelBuilder.this.currentFile, FeatureHouseModelBuilder.this)
 						.casePackage(terminal);
 				 }
@@ -157,7 +157,9 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 						classBuilder.caseImplementsList(terminal);
 					} else if (JAVA_NODE_FIELD.equals(type)) {
 						classBuilder.caseFieldDeclaration(terminal);
-					} else if (JVVA_NODE_FIELD_2.equals(type)) {
+					} else if (JAVA_NODE_FIELD_2.equals(type)) {
+						classBuilder.caseFieldDeclaration(terminal);
+					} else if (JAVA_NODE_FIELD_3.equals(type)) {
 						classBuilder.caseFieldDeclaration(terminal);
 					} else if (JAVA_NODE_METHOD.equals(type)) {
 						classBuilder.caseMethodDeclaration(terminal);

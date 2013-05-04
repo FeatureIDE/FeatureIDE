@@ -129,17 +129,17 @@ public class SXFMReader extends AbstractFeatureModelReader {
     private void buildFModelStep(Node n) throws UnsupportedModelException {
     	if (n.getNodeType() != Node.ELEMENT_NODE) return;
     	String tag = n.getNodeName();
-    	if (tag.equals("feature_tree")) {
+    	if ("feature_tree".equals(tag)) {
 			handleFeatureTree(n);
-    	} else if (tag.equals("feature_model")) {
+    	} else if ("feature_model".equals(tag)) {
     		line++;
     		return;
-    	} else if (tag.equals("constraints")) {
+    	} else if ("constraints".equals(tag)) {
     		line++;
     		handleConstraints(n);
-    	} else if (tag.equals("meta")) {
+    	} else if ("meta".equals(tag)) {
     	    	return;
-    	} else if(tag.equals("data") && n.getParentNode().getNodeName().equals("meta")) {
+    	} else if("data".equals(tag) && "meta".equals(n.getParentNode().getNodeName())) {
     	    return;
     	} else {
     		throw new UnsupportedModelException("Unknown Xml-Tag", line);
@@ -568,11 +568,11 @@ public class SXFMReader extends AbstractFeatureModelReader {
 			throws UnsupportedModelException {
 		String element;
 		if (list.isEmpty()) 
-			throw new UnsupportedModelException("Fehlendes Element", line);
+			throw new UnsupportedModelException("Missing element", line);
 		element = list.removeFirst();
-		if ((element.equals("(")) && (!list.isEmpty())) 
+		if (("(".equals(element)) && (!list.isEmpty())) 
 			element = list.removeFirst();
-		if (element.equals("~")) {
+		if ("~".equals(element)) {
 			return new Not(buildPropNode(list));
 		} else {
 			Feature feat = idTable.get(element);

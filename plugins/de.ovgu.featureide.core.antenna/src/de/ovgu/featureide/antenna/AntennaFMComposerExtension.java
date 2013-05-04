@@ -103,9 +103,10 @@ public class AntennaFMComposerExtension extends FMComposerExtension {
 				fileText.append(System.getProperty("line.separator"));
 			}
 			
-			String newText = replaceFeatureInText(fileText.toString(), oldName, newName);
+			String string = fileText.toString();
+			String newText = replaceFeatureInText(string, oldName, newName);
 			
-			if (fileText.toString().equals(newText)) {
+			if (string.equals(newText)) {
 				return;
 			}
 			

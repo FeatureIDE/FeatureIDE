@@ -22,6 +22,7 @@ package de.ovgu.featureide.ui.wizards;
 
 import org.eclipse.jface.wizard.Wizard;
 
+import de.ovgu.featureide.fm.core.ColorschemeTable;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.ui.UIPlugin;
 
@@ -63,9 +64,10 @@ public class NewColorSchemeWizard extends Wizard {
 	public boolean performFinish() {
 		final String csName = page.getColorSchemeName();
 		if (csName != null && !csName.isEmpty()) {
-			featureModel.getColorschemeTable().addColorscheme(csName);
+			ColorschemeTable colorschemeTable = featureModel.getColorschemeTable();
+			colorschemeTable.addColorscheme(csName);
 			if (page.isCurColorScheme()) {
-				featureModel.getColorschemeTable().setSelectedColorscheme(featureModel.getColorschemeTable().size());
+				colorschemeTable.setSelectedColorscheme(colorschemeTable.size());
 			}
 			return true;
 		} else {

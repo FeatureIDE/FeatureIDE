@@ -27,6 +27,7 @@ import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.RotatableDecoration;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
+import org.eclipse.swt.graphics.Color;
 
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -56,8 +57,9 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 		this.fill = fill;
 		this.children = children;
 		this.lastChild = lastChild;
-		setForegroundColor(FMPropertyManager.getDecoratorForgroundColor());
-		setBackgroundColor(FMPropertyManager.getDecoratorForgroundColor());
+		Color decoratorForgroundColor = FMPropertyManager.getDecoratorForgroundColor();
+		setForegroundColor(decoratorForgroundColor);
+		setBackgroundColor(decoratorForgroundColor);
 		int diameter = getTargetAnchorDiameter();
 		setSize(diameter, diameter/2);
 		if(lastChild!=null)featureModel=lastChild.getFeatureModel();

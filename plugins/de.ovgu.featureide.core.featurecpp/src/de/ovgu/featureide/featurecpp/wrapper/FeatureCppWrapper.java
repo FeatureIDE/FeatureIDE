@@ -76,7 +76,7 @@ public class FeatureCppWrapper {
 
 	public FeatureCppWrapper() {
 		String featureCppExecutable;
-		if (System.getProperty("os.name").equals("Linux")) {
+		if ("Linux".equals(System.getProperty("os.name"))) {
 			if (System.getProperty("os.arch").contains("64")) {
 				featureCppExecutable = EXE_LINUX_64BIT;
 				version = 0.6;
@@ -213,12 +213,12 @@ public class FeatureCppWrapper {
 	 * @deprecated is set automatically at constructor.
 	 */
 	private void openMessageBox(IOException e) {
-		if (e.getCause().toString().equals("java.io.IOException: java.io.IOException: error=13, Permission denied")) {
+		if ("java.io.IOException: java.io.IOException: error=13, Permission denied".equals(e.getCause().toString())) {
 			UIJob uiJob = new UIJob("") {
 				public IStatus runInUIThread(IProgressMonitor monitor) {
 					MessageBox d = new MessageBox(new Shell(), SWT.ICON_ERROR);
 					d.setMessage("FeatureC++ can not be executed. Allow the file to be executed.\n" +
-							"See " + (System.getProperty("os.name").equals("Linux") ? "Properties/Permissions of " : "") + "file:\n" +
+							"See " + ("Linux".equals(System.getProperty("os.name")) ? "Properties/Permissions of " : "") + "file:\n" +
 							"\t" + featureCppExecutableName);
 					d.setText("FeatureC++ can not be executed.");
 					d.open();
@@ -237,7 +237,7 @@ public class FeatureCppWrapper {
 		}
 		fileName = fileName.substring(sourceFolder.length() +1);
 		IFolder folder = source;
-		while (!fileName.equals("")) {
+		while (!"".equals(fileName)) {
 			if (!fileName.contains("\\")) {
 				if (fileName.endsWith(".h")) {
 					return folder.getFile(fileName);

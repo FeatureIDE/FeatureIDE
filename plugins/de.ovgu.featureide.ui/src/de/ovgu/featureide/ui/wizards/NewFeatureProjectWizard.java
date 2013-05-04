@@ -101,6 +101,7 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 			// create feature project
 			CorePlugin.setupFeatureProject(getNewProject(), page.getCompositionTool().getId()
 					,page.getSourcePath(),page.getConfigPath(),page.getBuildPath(), true);
+
 			// enhance project depending on extension
 			if(wizardExtension != null && wizardExtension.isFinished()) {
 				try {
@@ -111,6 +112,7 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 			}
 			// open editor
 			UIPlugin.getDefault().openEditor(FeatureModelEditor.ID, getNewProject().getFile("model.xml"));
+
 		}
 		return true;
 	}

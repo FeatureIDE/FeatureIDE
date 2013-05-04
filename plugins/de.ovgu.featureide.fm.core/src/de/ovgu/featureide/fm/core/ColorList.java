@@ -36,7 +36,7 @@ public class ColorList {
 	public ColorList(Feature feature) {
 		FeatureModel fm = feature.getFeatureModel();
 		if (fm != null) {
-			colorschemeTable = feature.getFeatureModel().getColorschemeTable();
+			colorschemeTable = fm.getColorschemeTable();
 			for (int i = 0; i < colorschemeTable.size() + 1; i++) {
 				colors.add(INVALID_COLOR);
 			}

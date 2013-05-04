@@ -70,8 +70,9 @@ public class Configuration {
 		this.featureModel = featureModel;
 		this.propagate = propagate;
 
-		root = new SelectableFeature(this, featureModel.getRoot());
-		initFeatures(root, featureModel.getRoot());
+		Feature root2 = featureModel.getRoot();
+		root = new SelectableFeature(this, root2);
+		initFeatures(root, root2);
 
 		rootNode = NodeCreator
 				.createNodes(featureModel, ignoreAbstractFeatures);
@@ -92,8 +93,9 @@ public class Configuration {
 		this.featureModel = featureModel;
 		this.propagate = false;
 
-		root = new SelectableFeature(this, featureModel.getRoot());
-		initFeatures(root, featureModel.getRoot());
+		Feature root2 = featureModel.getRoot();
+		root = new SelectableFeature(this, root2);
+		initFeatures(root, root2);
 
 		rootNode = NodeCreator
 				.createNodes(featureModel, false);

@@ -64,8 +64,9 @@ public class And extends Node {
 			collectChildren(children[i], nodes);
 		}
 		
-		if (nodes.size() != children.length) {
-			Node[] newChildren = nodes.toArray(new Node[nodes.size()]);
+		int size = nodes.size();
+		if (size != children.length) {
+			Node[] newChildren = nodes.toArray(new Node[size]);
 			setChildren(newChildren);
 		}
 		

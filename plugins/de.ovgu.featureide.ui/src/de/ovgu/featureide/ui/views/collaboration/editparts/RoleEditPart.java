@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.draw2d.FigureCanvas;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Panel;
+import org.eclipse.draw2d.Viewport;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.Request;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
@@ -214,12 +215,14 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 		FigureCanvas figureCanvas = (FigureCanvas)this.getViewer().getControl();
 		Point point = figureCanvas.toControl(display.getCursorLocation());
 		
-		org.eclipse.draw2d.geometry.Point location = figureCanvas.getViewport().getViewLocation();
+		Viewport viewport = figureCanvas.getViewport();
+		org.eclipse.draw2d.geometry.Point location = viewport.getViewLocation();
 		
 		int x = point.x + location.x;
 		int y = point.y + location.y;
-		if (point.x < 0) x += figureCanvas.getViewport().getBounds().width;
-		if (point.y < 0) y += figureCanvas.getViewport().getBounds().height;
+		Rectangle bounds = viewport.getBounds();
+		if (point.x < 0) x += bounds.width;
+		if (point.y < 0) y += bounds.height;
 		
 		return new Point(x,y);
 	}

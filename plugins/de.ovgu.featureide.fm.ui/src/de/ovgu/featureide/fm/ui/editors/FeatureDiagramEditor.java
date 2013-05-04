@@ -581,19 +581,19 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 
 	public void propertyChange(PropertyChangeEvent event) {
 		String prop = event.getPropertyName();
-		if (prop.equals(MODEL_DATA_CHANGED)) {
+		if (MODEL_DATA_CHANGED.equals(prop)) {
 			setContents(getFeatureModel());
 			refresh();
 			featureModelEditor.setPageModified(true);
-		} else if (prop.equals(MODEL_DATA_LOADED)) {
+		} else if (MODEL_DATA_LOADED.equals(prop)) {
 			refresh();
-		} else if (prop.equals(MODEL_LAYOUT_CHANGED)) {
+		} else if (MODEL_LAYOUT_CHANGED.equals(prop)) {
 			featureModelEditor.setPageModified(true);
-		} else if (prop.equals(REDRAW_DIAGRAM)) {
+		} else if (REDRAW_DIAGRAM.equals(prop)) {
 			featureModelEditor.textEditor.updateTextEditor();
 			featureModelEditor.textEditor.doSave(null);
 			featureModelEditor.textEditor.updateDiagram();
-		} else if (prop.equals(REFRESH_ACTIONS)) {
+		} else if (REFRESH_ACTIONS.equals(prop)) {
 			// additional actions can be refreshed here
 			// legendAction.refresh();
 			legendLayoutAction.refresh();

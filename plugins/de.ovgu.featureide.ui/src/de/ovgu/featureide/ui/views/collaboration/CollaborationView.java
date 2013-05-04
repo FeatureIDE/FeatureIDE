@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.draw2d.ConnectionLayer;
 import org.eclipse.draw2d.FigureCanvas;
 import org.eclipse.draw2d.Viewport;
+import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.EditDomain;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.GraphicalViewer;
@@ -183,13 +184,15 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		Display display = Display.getDefault();
 		FigureCanvas figureCanvas = (FigureCanvas) viewer.getControl();
 		Point point = figureCanvas.toControl(display.getCursorLocation());
-		org.eclipse.draw2d.geometry.Point location = figureCanvas.getViewport().getViewLocation();
-		figureCanvas.getViewport().setIgnoreScroll(true);
+		Viewport viewport = figureCanvas.getViewport();
+		org.eclipse.draw2d.geometry.Point location = viewport.getViewLocation();
+		viewport.setIgnoreScroll(true);
 		
 		int x = point.x + location.x;
 		int y = point.y + location.y;
-		if (point.x < 0) x += figureCanvas.getViewport().getBounds().width;
-		if (point.y < 0) y += figureCanvas.getViewport().getBounds().height;
+		Rectangle bounds = viewport.getBounds();
+		if (point.x < 0) x += bounds.width;
+		if (point.y < 0) y += bounds.height;
 		
 		this.cursorPosition = new Point(x,y);
 	}
@@ -300,7 +303,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				featureProject.getFeatureModel().addListener(new PropertyChangeListener() {
 					@Override
 					public void propertyChange(PropertyChangeEvent event) {
-						if (event.getPropertyName().equals(PropertyConstants.MODEL_DATA_LOADED)) {
+						if (PropertyConstants.MODEL_DATA_LOADED.equals(event.getPropertyName())) {
 							readColorsFromFile();
 						}
 					}

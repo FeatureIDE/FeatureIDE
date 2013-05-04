@@ -26,54 +26,54 @@ package de.ovgu.featureide.fm.core;
  * @author soenke
  */
 public class FeatureModelLayout {
-    private boolean autoLayoutLegend = true;
-    private boolean showHiddenFeatures = true;
-    private boolean hasVerticalLayout = true;
-    private FMPoint legendPos = new FMPoint(0, 0);
+	private boolean autoLayoutLegend = true;
+	private boolean showHiddenFeatures = true;
+	private boolean hasVerticalLayout = true;
+	private FMPoint legendPos = new FMPoint(0, 0);
 
-    private int selectedLayoutAlgorithm = 1;
+	private int selectedLayoutAlgorithm = 1;
 
-    public void setLegendAutoLayout(boolean b) {
-	autoLayoutLegend = b;
-    }
+	public void setLegendAutoLayout(boolean b) {
+		autoLayoutLegend = b;
+	}
 
-    public boolean hasLegendAutoLayout() {
-	return autoLayoutLegend;
-    }
+	public boolean hasLegendAutoLayout() {
+		return autoLayoutLegend;
+	}
 
-    public boolean showHiddenFeatures() {
-	return showHiddenFeatures;
-    }
+	public boolean showHiddenFeatures() {
+		return showHiddenFeatures;
+	}
 
-    public void showHiddenFeatures(boolean b) {
-	showHiddenFeatures = b;
-    }
+	public void showHiddenFeatures(boolean b) {
+		showHiddenFeatures = b;
+	}
 
-    public boolean verticalLayout() {
-	return hasVerticalLayout;
-    }
+	public boolean verticalLayout() {
+		return hasVerticalLayout;
+	}
 
-    public void verticalLayout(boolean b) {
-	hasVerticalLayout = b;
-    }
+	public void verticalLayout(boolean b) {
+		hasVerticalLayout = b;
+	}
 
-    public FMPoint getLegendPos() {
-	return legendPos;
-    }
+	public FMPoint getLegendPos() {
+		return legendPos;
+	}
 
-    public void setLegendPos(int x, int y) {
-	this.legendPos = new FMPoint(x, y);
-    }
+	public void setLegendPos(int x, int y) {
+		this.legendPos = new FMPoint(x, y);
+	}
 
-    public void setLayout(int newLayoutAlgorithm) {
-	selectedLayoutAlgorithm = newLayoutAlgorithm;
-    }
+	public void setLayout(int newLayoutAlgorithm) {
+		selectedLayoutAlgorithm = newLayoutAlgorithm;
+	}
 
-    public int getLayoutAlgorithm() {
-	return selectedLayoutAlgorithm;
-    }
+	public int getLayoutAlgorithm() {
+		return selectedLayoutAlgorithm;
+	}
 
-    public boolean hasFeaturesAutoLayout() {
-	return (selectedLayoutAlgorithm != 0);
-    }
+	public boolean hasFeaturesAutoLayout() {
+		return (selectedLayoutAlgorithm != 0);
+	}
 }

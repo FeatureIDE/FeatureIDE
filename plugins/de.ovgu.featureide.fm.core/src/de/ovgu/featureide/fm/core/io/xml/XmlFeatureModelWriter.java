@@ -52,7 +52,7 @@ import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
 /**
  * Prints a feature model in XML format.
  * 
- * @author Fabian Wielgorz -> OLD
+ * @author Fabian Wielgorz
  * @author Dariusz Krolikowski
  * @author Maik Lampe
  */
@@ -195,7 +195,7 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
     	String clss = node.getClass().getName();
     	Element op; 
     	
-    	if (clss.equals("org.prop4j.Literal")){
+    	if ("org.prop4j.Literal".equals(clss)){
     		op = doc.createElement("var");
     		xmlNode.appendChild(op);
     		Text text = doc.createTextNode(node.toString());
@@ -203,32 +203,25 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
     		return;
     	}
     	
-    	if (clss.equals("org.prop4j.And")){
+    	if ("org.prop4j.And".equals(clss)){
     		op = doc.createElement("conj");
     		xmlNode.appendChild(op);
-    	}
-    	else if (clss.equals("org.prop4j.Or")){
+    	} else if ("org.prop4j.Or".equals(clss)){
     		op = doc.createElement("disj");
     		xmlNode.appendChild(op);
-    	}
-    	else if (clss.equals("org.prop4j.Not")){
+    	} else if ("org.prop4j.Not".equals(clss)){
     		op = doc.createElement("not");
     		xmlNode.appendChild(op);
-    	}
-    	else if (clss.equals("org.prop4j.Equals")){
+    	} else if ("org.prop4j.Equals".equals(clss)){
     		op = doc.createElement("eq");
     		xmlNode.appendChild(op);
-    	}
-
-    	else if (clss.equals("org.prop4j.Implies")){
+    	} else if ("org.prop4j.Implies".equals(clss)){
     		op = doc.createElement("imp");
     		xmlNode.appendChild(op);
-    	}
-    	else if (clss.equals("org.prop4j.AtMost")){
+    	} else if ("org.prop4j.AtMost".equals(clss)){
     		op = doc.createElement("atmost1");
     		xmlNode.appendChild(op);
-    	}
-    	else{
+    	} else {
     		op = doc.createElement("unknown");
     		xmlNode.appendChild(op);
     	}

@@ -44,6 +44,7 @@ import org.sat4j.specs.TimeoutException;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 /**
@@ -126,7 +127,8 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		// get all concrete and abstract features and generate pattern
 		StringBuilder concreteFeatures = new StringBuilder();
 		StringBuilder abstractFeatures = new StringBuilder();
-		for (Feature feature : featureProject.getFeatureModel().getFeatures()) {
+		FeatureModel fm = featureProject.getFeatureModel();
+		for (Feature feature : fm.getFeatures()) {
 			if (feature.isConcrete()) {
 				concreteFeatures.append(feature.getName());
 				concreteFeatures.append("|");
@@ -142,9 +144,9 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		patternIsConcreteFeature = Pattern.compile(concreteFeatures.substring(0, concreteFeatures.length()-1));
 	
 		// create expression of feature model
-		featureModel = NodeCreator.createNodes(featureProject.getFeatureModel());
+		featureModel = NodeCreator.createNodes(fm);
 		
-		featureList = new ArrayList<String>(featureProject.getFeatureModel().getFeatureNames());
+		featureList = new ArrayList<String>(fm.getFeatureNames());
 		
 		return true;
 	}
@@ -239,8 +241,9 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		}
 
 		/** collect all used features **/
-		if (!usedFeatures.contains(ppExpression.toString())) {
-			usedFeatures.add(ppExpression.toString());
+		String string = ppExpression.toString();
+		if (!usedFeatures.contains(string)) {
+			usedFeatures.add(string);
 		}
 		
 		int result = isContradictionOrTautology(ppExpression.clone(), false, lineNumber, res);

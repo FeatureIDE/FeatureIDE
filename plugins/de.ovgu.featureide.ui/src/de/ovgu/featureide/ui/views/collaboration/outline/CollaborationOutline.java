@@ -52,6 +52,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IPropertyListener;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -190,33 +191,32 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 				} else if (selection instanceof FSTRole) {
 					FSTRole r = (FSTRole) selection;
 					if (r.getFile().isAccessible()) {
-						IWorkbenchWindow window = PlatformUI.getWorkbench()
-								.getActiveWorkbenchWindow();
+						IWorkbench workbench = PlatformUI
+								.getWorkbench();
+						IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
 						IWorkbenchPage page = window.getActivePage();
 						IContentType contentType = null;
 						try {
-							IContentDescription description = r.getFile()
+							iFile = r.getFile();
+							IContentDescription description = iFile
 									.getContentDescription();
 							if (description != null) {
 								contentType = description.getContentType();
 							}
 							IEditorDescriptor desc = null;
 							if (contentType != null) {
-								desc = PlatformUI
-										.getWorkbench()
-										.getEditorRegistry()
-										.getDefaultEditor(r.getFile().getName(), contentType);
+								desc = workbench.getEditorRegistry()
+										.getDefaultEditor(iFile.getName(), contentType);
 							} else {
-								desc = PlatformUI.getWorkbench().getEditorRegistry()
-										.getDefaultEditor(r.getFile().getName());
+								desc = workbench.getEditorRegistry()
+										.getDefaultEditor(iFile.getName());
 							}
-							iFile = r.getFile();
 							if (desc != null) {
-								page.openEditor(new FileEditorInput(r.getFile()),
+								page.openEditor(new FileEditorInput(iFile),
 										desc.getId());
 							} else {
 								// case: there is no default editor for the file
-								page.openEditor(new FileEditorInput(r.getFile()),
+								page.openEditor(new FileEditorInput(iFile),
 										"org.eclipse.ui.DefaultTextEditor");
 							}
 						} catch (CoreException e) {
@@ -281,13 +281,13 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 						// case: open editor
 						FileEditorInput inputFile = (FileEditorInput) part
 								.getEditorInput();
-						IFeatureProject featureProject = CorePlugin.getFeatureProject(inputFile
-								.getFile());
+						IFile file = inputFile.getFile();
+						IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
 	
 						if (featureProject != null) {
 							Control control = viewer.getControl();
 							if (control != null && !control.isDisposed()) {
-								update(inputFile.getFile());
+								update(file);
 							}
 							return;
 						}
@@ -303,20 +303,18 @@ public class CollaborationOutline extends ViewPart implements ICurrentBuildListe
 	public void createPartControl(Composite parent) {
 		viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		viewer.getControl().setEnabled(false);
-		getSite().getPage().addPartListener(editorListener);
+		IWorkbenchPage page = getSite().getPage();
+		page.addPartListener(editorListener);
 
 		viewer.setAutoExpandLevel(2);
 		addToolbar(getViewSite().getActionBars().getToolBarManager());
 
-		if (getSite().getPage().getActiveEditor() != null) {
-
-			FileEditorInput inputFile = (FileEditorInput) getSite().getPage()
-					.getActiveEditor().getEditorInput();
-
-			IFeatureProject featureProject = CorePlugin.getFeatureProject(inputFile.getFile());
-
+		IEditorPart activeEditor = page.getActiveEditor();
+		if (activeEditor != null) {
+			IFile inputFile = ((FileEditorInput) activeEditor.getEditorInput()).getFile();
+			IFeatureProject featureProject = CorePlugin.getFeatureProject(inputFile);
 			if (featureProject != null)
-				update(inputFile.getFile());
+				update(inputFile);
 		}
 
 		viewer.addTreeListener(treeListener);

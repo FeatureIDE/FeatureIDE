@@ -100,7 +100,7 @@ public class AHEADToFeatureHouseConversion extends ComposerConversion {
 	 */
 	@Override
 	boolean canConvert(String fileExtension) {
-		return fileExtension.equals("jak");
+		return "jak".equals(fileExtension);
 	}
 
 }

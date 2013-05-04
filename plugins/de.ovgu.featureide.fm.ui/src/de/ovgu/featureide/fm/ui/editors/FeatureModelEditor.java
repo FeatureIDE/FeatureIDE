@@ -56,6 +56,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -301,8 +302,9 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		printAction = new FMPrintAction((IWorkbenchPart)this);
 		selectAllAction = new SelectAllAction(this);
 
-		undoAction = new UndoActionHandler(this.getSite(), undoContext);
-		redoAction = new RedoActionHandler(this.getSite(), undoContext);
+		IWorkbenchPartSite site = this.getSite();
+		undoAction = new UndoActionHandler(site, undoContext);
+		redoAction = new RedoActionHandler(site, undoContext);
 	}
 
 	public IAction getDiagramAction(String workbenchActionID) {
@@ -659,12 +661,15 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		if ((event.getType() == IResourceChangeEvent.PRE_CLOSE) || closeEditor) {
 			Display.getDefault().asyncExec(new Runnable() {
 				public void run() {
-					if (getSite() == null)
+					IWorkbenchPartSite site = getSite();
+					if (site == null) {
 						return;
-					if (getSite().getWorkbenchWindow() == null)
+					}
+					IWorkbenchWindow workbenchWindow = site.getWorkbenchWindow();
+					if (workbenchWindow == null) {
 						return;
-					IWorkbenchPage[] pages = getSite().getWorkbenchWindow()
-							.getPages();
+					}
+					IWorkbenchPage[] pages = workbenchWindow.getPages();
 					for (int i = 0; i < pages.length; i++) {
 						if (jmolfile.getProject().equals(res)) {
 							IEditorPart editorPart = pages[i].findEditor(input);

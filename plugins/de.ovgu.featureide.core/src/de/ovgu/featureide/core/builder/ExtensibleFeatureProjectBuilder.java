@@ -23,6 +23,7 @@ package de.ovgu.featureide.core.builder;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -32,6 +33,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 
@@ -91,26 +93,29 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		featureProject.deleteBuilderMarkers(featureProject.getSourceFolder(),
 				IResource.DEPTH_INFINITE);
 		composerExtension.initialize(featureProject);
+		IProject project = featureProject.getProject();
 		if (!composerExtension.clean()) {
 			cleaned = false;
 			
-			featureProject.getProject().refreshLocal(IResource.DEPTH_INFINITE,
+			project.refreshLocal(IResource.DEPTH_INFINITE,
 					monitor);
 			return;
 		}
 		boolean hasOtherNature = true;
-		if (featureProject.getProject().getDescription().getNatureIds().length == 1
-				&& featureProject.getProject().hasNature(FeatureProjectNature.NATURE_ID)) {
+		if (project.getDescription().getNatureIds().length == 1
+				&& project.hasNature(FeatureProjectNature.NATURE_ID)) {
 			hasOtherNature = false;
 		}
 
-		if (featureProject.getBuildFolder() != null) {
-			featureProject.getBuildFolder().refreshLocal(IResource.DEPTH_INFINITE, monitor);
+		IFolder buildFolder = featureProject.getBuildFolder();
+		if (buildFolder != null) {
+			buildFolder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 		}
+		IFolder binFolder = featureProject.getBinFolder();
 		if (!hasOtherNature) {
-			if (featureProject.getBinFolder() != null && 
-					featureProject.getBinFolder().exists()) {
-				featureProject.getBinFolder().refreshLocal(IResource.DEPTH_INFINITE,
+			if (binFolder != null && 
+					binFolder.exists()) {
+				binFolder.refreshLocal(IResource.DEPTH_INFINITE,
 						monitor);
 			}
 		}
@@ -124,17 +129,17 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 			cleaned = true;
 		}
 		if (!hasOtherNature) {
-			for (IResource member : featureProject.getBinFolder().members())
+			for (IResource member : binFolder.members())
 				member.delete(true, monitor);
 		}
-		for (IResource member : featureProject.getBuildFolder().members()) {
+		for (IResource member : buildFolder.members()) {
 			member.delete(true, monitor);
 		}
 		
-		featureProject.getBuildFolder().refreshLocal(IResource.DEPTH_INFINITE,
+		buildFolder.refreshLocal(IResource.DEPTH_INFINITE,
 				monitor);
 		if (!hasOtherNature) {
-			featureProject.getBinFolder().refreshLocal(IResource.DEPTH_INFINITE,
+			binFolder.refreshLocal(IResource.DEPTH_INFINITE,
 				monitor);
 		}
 		cleanBuild = false;
@@ -167,7 +172,8 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		if (configFile == null) {
 			return null;
 		}
-		if(featureProject.getFeatureModel()==null||featureProject.getFeatureModel().getRoot()==null){
+		FeatureModel featureModel = featureProject.getFeatureModel();
+		if(featureModel==null||featureModel.getRoot()==null){
 			return null;
 		}
 		composerExtension.performFullBuild(configFile);
@@ -179,7 +185,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
-		Configuration c = new Configuration(featureProject.getFeatureModel());
+		Configuration c = new Configuration(featureModel);
 		ConfigurationReader reader = new ConfigurationReader(c);
 		try {
 			reader.readFromFile(configFile);

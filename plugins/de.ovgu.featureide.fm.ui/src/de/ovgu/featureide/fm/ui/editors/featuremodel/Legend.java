@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel;
 
 import org.eclipse.draw2d.geometry.Point;
 
+import de.ovgu.featureide.fm.core.FMPoint;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
 /**
@@ -35,7 +36,8 @@ public class Legend {
 
 	public Legend(FeatureModel model) {
 		this.model = model;
-		this.pos = new Point(model.getLayout().getLegendPos().x, model.getLayout().getLegendPos().y);
+		FMPoint legendPos = model.getLayout().getLegendPos();
+		this.pos = new Point(legendPos.x, legendPos.y);
 	}
 
 	public FeatureModel getModel(){

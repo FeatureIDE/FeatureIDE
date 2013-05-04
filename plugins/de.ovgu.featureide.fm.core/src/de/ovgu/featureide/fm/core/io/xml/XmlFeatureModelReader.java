@@ -65,12 +65,12 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 	}
 	
 	/**
-	 * A kind of mind for the hirachy of the xml model
+	 * A kind of mind for the hierarchy of the xml model
 	 */
 	private Stack<String[]> parentStack = new Stack<String[]>();
 
 	/**
-	 * A kind of mind for the hirachy of the xml contraint model
+	 * A kind of mind for the hierarchy of the xml constraint model
 	 */
 	private LinkedList<LinkedList<Node>> ruleTemp = new LinkedList<LinkedList<Node>>();
 	
@@ -505,7 +505,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 		 * Note: addChild DOESN'T ADD THE FEATURE!
 		 */
 		Feature feat = null;
-		if (parent.equals("root")) {
+		if ("root".equals(parent)) {
 			feat = featureModel.getFeature(featureName);
 			if (feat == null) {
 				FMCorePlugin.getDefault().reportBug(277);
@@ -519,9 +519,9 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 			feat.setHidden(isHidden);
 			
 			featureModel.addFeature(feat);
-			if (parentStack.peek()[0].equals("and")) {
+			if ("and".equals(parentStack.peek()[0])) {
 				featureModel.getFeature(parent).setAnd();
-			} else if (parentStack.peek()[0].equals("or")) {
+			} else if ("or".equals(parentStack.peek()[0])) {
 				featureModel.getFeature(parent).setOr();
 			} else {
 				featureModel.getFeature(parent).setAlternative();

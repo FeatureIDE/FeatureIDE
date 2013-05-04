@@ -168,7 +168,7 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 
 	private PropertyChangeListener modelListener = new PropertyChangeListener() {
 		public void propertyChange(PropertyChangeEvent evt) {
-			if(!evt.getPropertyName().equals(PropertyConstants.MODEL_LAYOUT_CHANGED))
+			if(!PropertyConstants.MODEL_LAYOUT_CHANGED.equals(evt.getPropertyName()))
 			refresh();
 		}
 	};

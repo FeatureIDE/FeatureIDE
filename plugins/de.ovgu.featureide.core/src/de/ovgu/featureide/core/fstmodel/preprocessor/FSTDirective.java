@@ -166,8 +166,9 @@ public class FSTDirective {
 	}
 
 	public int getColor() {
-		return (getRole() != null && getRole().getFeature() != null)
-			? getRole().getFeature().getColor()	: -1;
+		FSTRole role2 = getRole();
+		return (role2 != null && role2.getFeature() != null)
+			? role2.getFeature().getColor()	: -1;
 	}
 
 	public int getStartLine() {

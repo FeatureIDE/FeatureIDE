@@ -95,8 +95,9 @@ public class ProjectTree {
 	 *            the node that should be inserted
 	 */
 	public void insertProjectTreeNode(ProjectTreeNode node) {
-		node.setParent(projectTreeNodes.get(projectTreeNodes.size() - 1));
-		projectTreeNodes.get(projectTreeNodes.size() - 1).setChild(node);
+		ProjectTreeNode parent = projectTreeNodes.get(projectTreeNodes.size() - 1);
+		node.setParent(parent);
+		parent.setChild(node);
 		projectTreeNodes.add(node);
 	}
 

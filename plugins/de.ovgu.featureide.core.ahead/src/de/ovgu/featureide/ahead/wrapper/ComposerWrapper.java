@@ -106,7 +106,7 @@ public class ComposerWrapper {
 		errorListeners = new LinkedList<AheadBuildErrorListener>();
 		this.featureProject = featureProject;
 		if (jakModelBuilder == null) {
-			if (featureProject.getCompositionMechanism().equals("Jampack")) {
+			if ("Jampack".equals(featureProject.getCompositionMechanism())) {
 				jakModelBuilder = new JampackJakModelBuilder(featureProject);
 			} else {
 				jakModelBuilder = new MixinJakModelBuilder(featureProject);
@@ -309,7 +309,7 @@ public class ComposerWrapper {
 
 	public IFile[] compose() {
 		// decide method to call based on composition tool
-		if (featureProject.getCompositionMechanism().equals("Jampack")) {
+		if ("Jampack".equals(featureProject.getCompositionMechanism())) {
 			composeJampackJakFiles(compositionFolder);
 		} else {
 			composeMixinJakFiles(compositionFolder);
@@ -550,18 +550,20 @@ public class ComposerWrapper {
 	private void handleErrorMessage(mixin.ExtendedParseException e,
 			TreeMap<String, IFile> fileMap) {
 		IFile source = null;
-		if (fileMap != null && e.getFilename() != null && fileMap.containsKey(e.getFilename()))
-			source = fileMap.get(e.getFilename());
-		String message = source != null ? e.getShortMessage() : e
-				.getFullMessage();
+		String filename = e.getFilename();
+		if (fileMap != null && filename != null && fileMap.containsKey(filename)) {
+			source = fileMap.get(filename);
+		}
+		String message = source != null ? e.getShortMessage() : e.getFullMessage();
 		handleErrorMessage(source, message, e.getLineNumber());
 	}
 
 	private void handleErrorMessage(jampack.ExtendedParseException e,
 			TreeMap<String, IFile> fileMap) {
 		IFile source = null;
-		if (fileMap != null && e.getFilename() != null && fileMap.containsKey(e.getFilename()))
-			source = fileMap.get(e.getFilename());
+		String filename = e.getFilename();
+		if (fileMap != null && filename != null && fileMap.containsKey(filename))
+			source = fileMap.get(filename);
 		String message = source != null ? e.getShortMessage() : e
 				.getFullMessage();
 		handleErrorMessage(source, message, e.getLineNumber());

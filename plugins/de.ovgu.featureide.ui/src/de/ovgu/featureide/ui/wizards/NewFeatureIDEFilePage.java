@@ -27,6 +27,7 @@ import java.util.LinkedList;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -505,10 +506,11 @@ public class NewFeatureIDEFilePage extends WizardPage {
 	private void initComboProject() {
 		Object obj = selection.getFirstElement();
 		if (obj instanceof JavaProject) {
-			featureProject = CorePlugin.getFeatureProject(((JavaProject)obj).getProject());
+			IProject project = ((JavaProject)obj).getProject();
+			featureProject = CorePlugin.getFeatureProject(project);
 			if (featureProject != null) {
 				comboProject.setText(featureProject.getProjectName());
-				checkcontainer(featureProject, ((JavaProject)obj).getProject());
+				checkcontainer(featureProject, project);
 			}
 		} if (obj instanceof IResource) {
 			IResource resource = (IResource) obj;
@@ -742,12 +744,15 @@ public class NewFeatureIDEFilePage extends WizardPage {
 		if (packageName.contains("..") || packageName.replace('\\', '/').indexOf('/', 1) > 0) {
 			errorMessage = MESSAGE_PACKAGE_VALID;
 			valid = false;
-		} else if (packageName.length() != 0 && packageName.charAt(0) == '.') {
-			errorMessage = MESSAGE_PACKAGE_START;
-			valid = false;
-		} else if (packageName.length() > 1  &&  packageName.charAt(packageName.length() - 1) == '.') {
-			errorMessage = MESSAGE_PACKAGE_END;
-			valid = false;
+		} else {
+			int length = packageName.length();
+			if (length != 0 && packageName.charAt(0) == '.') {
+				errorMessage = MESSAGE_PACKAGE_START;
+				valid = false;
+			} else if (length > 1  &&  packageName.charAt(length - 1) == '.') {
+				errorMessage = MESSAGE_PACKAGE_END;
+				valid = false;
+			}
 		}
 		if (classDirty)
 			setErrorMessage(errorMessage);

@@ -33,7 +33,8 @@ public interface FHNodeTypes {
 	static final String JAVA_NODE_DECLARATION_TYPE1 = "ClassOrInterface1";
 	static final String JAVA_NODE_DECLARATION_TYPE2 = "ClassOrInterface2";
 	static final String JAVA_NODE_FIELD = "FieldDecl";
-	static final String JVVA_NODE_FIELD_2 = "ModFieldDeclaration";
+	static final String JAVA_NODE_FIELD_2 = "ModFieldDeclaration";
+	static final String JAVA_NODE_FIELD_3 = "FieldDeclaration";
 	static final String JAVA_NODE_METHOD = "MethodDecl";
 	static final String JAVA_NODE_CONSTRUCTOR = "ConstructorDecl";
 //	static final String COMPOSITION_RULE_NAME = "JavaMethodOverriding";

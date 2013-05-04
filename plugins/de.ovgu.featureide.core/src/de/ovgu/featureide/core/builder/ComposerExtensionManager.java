@@ -51,7 +51,7 @@ public class ComposerExtensionManager extends ExtensionPointManager<IComposerExt
 	@Override
 	protected IComposerExtension parseExtension(
 			IConfigurationElement configurationElement) {
-		if (!configurationElement.getName().equals(IComposerExtension.extensionID))
+		if (!IComposerExtension.extensionID.equals(configurationElement.getName()))
 			return null;
 		return new ComposerExtensionProxy(configurationElement);
 	}

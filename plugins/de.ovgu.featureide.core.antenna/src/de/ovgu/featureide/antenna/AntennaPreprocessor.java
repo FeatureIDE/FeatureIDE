@@ -78,10 +78,11 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 		preprocessor = new Preprocessor(new AntennaLogger(),
 				new AntennaLineFilter());
 
-		if (project.getProjectSourcePath() == null
-				|| project.getProjectSourcePath().equals("")) {
-			project.setPaths(project.getBuildPath(), project.getBuildPath(),
-					project.getConfigPath());
+		String projectSourcePath = project.getProjectSourcePath();
+		if (projectSourcePath == null
+				|| "".equals(projectSourcePath)) {
+			String buildPath = project.getBuildPath();
+			project.setPaths(buildPath, buildPath, project.getConfigPath());
 		}
 		return true;
 	}
@@ -109,8 +110,10 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 		for (String feature : activatedFeatures) {
 			featureList.append(feature + ",");
 		}
-		if(featureList.length()>0)
-		featureList.deleteCharAt(featureList.length()-1);
+		int length = featureList.length();
+		if(length>0) {
+			featureList.deleteCharAt(length-1);
+		}
 
 		// add source files
 		try {
@@ -123,8 +126,9 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 			AntennaCorePlugin.getDefault().logError(e);
 		}
 
-		if (antennaModelBuilder != null)
+		if (antennaModelBuilder != null) {
 			antennaModelBuilder.buildModel();
+		}
 	}
 
 	/*

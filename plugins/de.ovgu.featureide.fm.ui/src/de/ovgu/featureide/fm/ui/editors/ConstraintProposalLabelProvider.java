@@ -39,19 +39,9 @@ public class ConstraintProposalLabelProvider extends LabelProvider implements GU
 	@Override
 	public Image getImage(Object element) {
 		if(element instanceof ContentProposal){
-			if(((ContentProposal)element).getContent().equals("not")){
-				return OPERATOR_SYMBOL;
-			}
-			if(((ContentProposal)element).getContent().equals("or")){
-				return OPERATOR_SYMBOL;
-			}
-			if(((ContentProposal)element).getContent().equals("and")){
-				return OPERATOR_SYMBOL;
-			}
-			if(((ContentProposal)element).getContent().equals("iff")){
-				return OPERATOR_SYMBOL;
-			}
-			if(((ContentProposal)element).getContent().equals("implies")){
+			String content = ((ContentProposal)element).getContent();
+			if("not".equals(content) || "or".equals(content) || "and".equals(content)
+				|| "iff".equals(content) || "implies".equals(content)){
 				return OPERATOR_SYMBOL;
 			}	
 		}

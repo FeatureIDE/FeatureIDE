@@ -164,9 +164,9 @@ public class JavaClassBuilder extends ClassBuilder {
 	}
 
 	public void caseJMLSpecCaseSeq(FSTTerminal terminal) {
-		String methodName = getMethodNameFromSpecCaseSeq(terminal);
-		
-		addJMLSpecCaseSeq(methodName,terminal.getBody(),terminal.beginLine, terminal.endLine, isAlso(terminal.getBody()));
+		// TODO @ Fabian revise
+		//String methodName = getMethodNameFromSpecCaseSeq(terminal);
+		//addJMLSpecCaseSeq(methodName,terminal.getBody(),terminal.beginLine, terminal.endLine, isAlso(terminal.getBody()));
 		
 	}
 	
@@ -200,8 +200,7 @@ public class JavaClassBuilder extends ClassBuilder {
 	 */
 	private String getMethodNameFromSpecCaseSeq(FSTTerminal specCaseSeq) {
 		FSTTerminal methodNode = (FSTTerminal) ((FSTNonTerminal)specCaseSeq.getParent().getParent()).getChildren().get(2);
-		String methodName = getMethodName(methodNode);
-		return methodName;
+		return getMethodName(methodNode);
 	}
 
 	/**

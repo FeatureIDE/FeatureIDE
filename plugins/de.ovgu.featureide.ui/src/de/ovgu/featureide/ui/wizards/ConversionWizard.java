@@ -94,8 +94,8 @@ public class ConversionWizard extends Wizard implements INewWizard {
 		IProject p = null;
 		if (obj instanceof IResource) {
 			IResource res = (IResource) obj;
-			project = res.getProject().getName();
 			p = res.getProject();
+			project = p.getName();
 		}
 
 		page = new ConversionPage(" " + project, p);

@@ -203,7 +203,6 @@ public class RoleFigure extends Figure implements GUIDefaults{
 	}
 
 	private void createContentForDefault() {
-		int contractCount = 0;
 		Figure tooltipContent = new Figure();
 		FlowLayout contentsLayout = new FlowLayout();
 		tooltipContent.setLayoutManager(contentsLayout);
@@ -211,7 +210,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		if (role.files.size() == 0) {
 			int fieldCount = getCountForFieldContentCreate(tooltipContent);
 			int methodCount = getCountForMethodContentCreate(tooltipContent);
-			contractCount = getCountForContractContentCreate(tooltipContent);
+			int contractCount = getCountForContractContentCreate(tooltipContent);
 			addLabel(new Label(getCountLabel(fieldCount, methodCount, contractCount)));
 		} else if (role.getName().startsWith("*.")) {
 			setContentForFiles(new CompartmentFigure(), tooltipContent);
@@ -264,7 +263,6 @@ public class RoleFigure extends Figure implements GUIDefaults{
 	 * TODO description
 	 */
 	private void createContentForFieldMethodFilter() {
-		int contractCount = 0;
 		Figure tooltipContent = new Figure();
 		GridLayout contentsLayout = new GridLayout(1,true);
 		tooltipContent.setLayoutManager(contentsLayout);
@@ -280,9 +278,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 				methodCount = getCountForMethodContentCreate(tooltipContent);
 			}
 			
-			
-				contractCount = getCountForContractContentCreate(tooltipContent);
-			
+			int	contractCount = getCountForContractContentCreate(tooltipContent);
 			tooltipContent.add(new Label(getCountLabel(fieldCount, methodCount, contractCount)));
 
 			// draw separationline between fields and methods

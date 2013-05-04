@@ -323,8 +323,8 @@ public class CorePlugin extends AbstractCorePlugin {
 				project.getFolder(buildPath).deleteMarkers(null, true, IResource.DEPTH_INFINITE);
 			
 				IFolder source = project.getFolder(buildPath);
-				IFolder destination = !sourcePath.equals("") ? project.getFolder(sourcePath).getFolder(BASE_FEATURE): null;
-				if (!composer.postAddNature(source, destination) && !sourcePath.equals("")) {
+				IFolder destination = !"".equals(sourcePath) ? project.getFolder(sourcePath).getFolder(BASE_FEATURE): null;
+				if (!composer.postAddNature(source, destination) && !"".equals(sourcePath)) {
 					if (!composer.hasFeatureFolders()) {
 						/** if project does not use feature folders, use the source path directly **/
 						destination = project.getFolder(sourcePath);
@@ -438,7 +438,7 @@ public class CorePlugin extends AbstractCorePlugin {
 	}
 
 	public static IFolder createFolder(IProject project, String name) {
-		if (name.equals("")) {
+		if ("".equals(name)) {
 			return null;
 		}
 		String[] names = name.split("[/]");
@@ -475,7 +475,7 @@ public class CorePlugin extends AbstractCorePlugin {
 			/** just create the bin folder if project has only the FeatureIDE Nature **/
 			if (project.getDescription().getNatureIds().length == 1
 					&& project.hasNature(FeatureProjectNature.NATURE_ID)) {
-				if (buildPath.equals("") && sourcePath.equals("")) {
+				if ("".equals(buildPath) && "".equals(sourcePath)) {
 					createFolder(project, "bin");
 				}
 			}

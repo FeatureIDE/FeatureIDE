@@ -57,10 +57,10 @@ public class ExampleParent extends TreeParent implements GUIDefaults {
 		} else {
 			String imageName = added && !c.isImplied() ? "plus" : !added
 					&& !c.isImplies() ? "minus" : "zero";
-			lazy = !imageName.equals("zero");
+			lazy = !"zero".equals(imageName);
 
-			image = imageName.equals("plus") ? PLUS_IMAGE : imageName
-					.equals("minus") ? MINUS_IMAGE : ZERO_IMAGE;
+			image = "plus".equals(imageName) ? PLUS_IMAGE : "minus"
+					.equals(imageName) ? MINUS_IMAGE : ZERO_IMAGE;
 		}
 	}
 

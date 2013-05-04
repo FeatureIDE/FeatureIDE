@@ -81,31 +81,23 @@ public class ConstraintContentProposalProvider implements
 	 *  		complete string being edited
 	 * 
 	 */
-	private List<ContentProposal> getProposalList(String[] words, String contents) 
-	{
+	private List<ContentProposal> getProposalList(String[] words, String contents) {
 		List<ContentProposal> proposalList = new ArrayList<ContentProposal>();	
 			
 		boolean caught = false;
-		for (String feature: features)
-		{
-			if (Operator.isOperatorName(feature)||(feature.contains(" ") && feature.toLowerCase().startsWith(contents.substring(contents.lastIndexOf('"') + 1).toLowerCase())))
-			{
+		for (String feature: features) {
+			if (Operator.isOperatorName(feature)||(feature.contains(" ") && feature.toLowerCase().startsWith(contents.substring(contents.lastIndexOf('"') + 1).toLowerCase()))) {
 				proposalList.add(new ContentProposal("\"" + feature + "\""));
 				caught = true;
 			}
 		}
-		if (!caught)
-		{
-			if (words[CURRENT].equals("(") || words[CURRENT].equals(" ") || words[CURRENT].equals("")) 
-			{
-				proposalList = getProposalList(words[LAST], features);
-				
-			}else{
-				for (ContentProposal proposal : getProposalList(words[LAST], features)) 
-				{
+		if (!caught) {
+			if ("(".equals(words[CURRENT]) || " ".equals(words[CURRENT]) || "".equals(words[CURRENT])) {
+				proposalList = getProposalList(words[LAST], features);	
+			} else {
+				for (ContentProposal proposal : getProposalList(words[LAST], features)) {
 					if (proposal.getContent().length() > words[CURRENT].trim().length()
-							&& proposal.getContent().substring(0, words[CURRENT].trim().length()).equalsIgnoreCase(words[CURRENT].trim())) 
-					{
+							&& proposal.getContent().substring(0, words[CURRENT].trim().length()).equalsIgnoreCase(words[CURRENT].trim())) {
 						proposalList.add(proposal);
 					} 
 				}
@@ -199,13 +191,13 @@ public class ConstraintContentProposalProvider implements
 		Collections.sort(featureList, String.CASE_INSENSITIVE_ORDER);
 		
 		
-		if (wordBefore.equals(") ") || features.contains(wordBefore.trim()) || wordBefore.trim().endsWith("\"")) {
+		if (") ".equals(wordBefore) || features.contains(wordBefore.trim()) || wordBefore.trim().endsWith("\"")) {
 			proposals.add(new ContentProposal("and"));
 			proposals.add(new ContentProposal("iff"));
 			proposals.add(new ContentProposal("implies"));
 			proposals.add(new ContentProposal("or"));
 
-		} else if(!wordBefore.equals(")")){
+		} else if(!")".equals(wordBefore)){
 			proposals.add(new ContentProposal("not"));
 
 			for (String s : featureList) {

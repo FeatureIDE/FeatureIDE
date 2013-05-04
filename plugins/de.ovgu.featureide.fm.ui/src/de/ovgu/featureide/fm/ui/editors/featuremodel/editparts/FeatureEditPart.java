@@ -187,7 +187,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements
 	 */
 	public void propertyChange(PropertyChangeEvent event) {
 		String prop = event.getPropertyName();
-		if (prop.equals(LOCATION_CHANGED)) {
+		if (LOCATION_CHANGED.equals(prop)) {
 			getFeatureFigure().setLocation((Point) event.getNewValue());
 			for (FeatureConnection connection : getFeature()
 					.getTargetConnections()) {
@@ -200,7 +200,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements
 					connectionEditPart.refreshToolTip();
 				}
 			}
-		} else if (prop.equals(CHILDREN_CHANGED)) {
+		} else if (CHILDREN_CHANGED.equals(prop)) {
 			getFeatureFigure().setProperties();			
 			for (FeatureConnection connection : getFeature()
 					.getTargetConnections()) {
@@ -213,11 +213,11 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements
 					connectionEditPart.refreshToolTip();
 				}
 			}
-		} else if (prop.equals(NAME_CHANGED)) {
+		} else if (NAME_CHANGED.equals(prop)) {
 			getFeatureFigure().setName(getFeature().getName());
 			FeatureUIHelper.setSize(getFeature(), getFeatureFigure()
 					.getSize());
-		} else if (prop.equals(ATTRIBUTE_CHANGED)) {
+		} else if (ATTRIBUTE_CHANGED.equals(prop)) {
 			getFeatureFigure().setProperties();
 		}
 	}

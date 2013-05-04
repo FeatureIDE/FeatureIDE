@@ -615,7 +615,8 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		if (resource.getProject() != project)
 			return null;
 		IPath path = resource.getFullPath();
-		if (path.segment(1) != null && path.segment(1).equals(folder.getName())) {
+		String segment = path.segment(1);
+		if (segment != null && segment.equals(folder.getName())) {
 			return path.segment(2);
 		}
 		return null;

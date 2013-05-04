@@ -137,19 +137,19 @@ public class TreeBuilderFeatureHouse {
 			return null;
 		
 		String language = fstNodes.get(0).getName();
-		if (language.equalsIgnoreCase(".java"))
+		if (".java".equalsIgnoreCase(language))
 			return "java";
-		else if (language.equalsIgnoreCase(".cs"))
+		else if (".cs".equalsIgnoreCase(language))
 			return "c#";
-		else if (language.equalsIgnoreCase(".hs"))
+		else if (".hs".equalsIgnoreCase(language))
 			return "haskell";
-		else if (language.equalsIgnoreCase(".c"))
+		else if (".c".equalsIgnoreCase(language))
 			return "c";
-		else if (language.equalsIgnoreCase(".h"))
+		else if (".h".equalsIgnoreCase(language))
 			return "c";
-		else if (language.equalsIgnoreCase(".xml"))
+		else if (".xml".equalsIgnoreCase(language))
 			return "xml";
-		else if (language.equalsIgnoreCase(".xmi"))
+		else if (".xmi".equalsIgnoreCase(language))
 			return "xml";
 		return null;
 	}
@@ -283,7 +283,7 @@ public class TreeBuilderFeatureHouse {
 			NonTerminalNode parent, FSTNode node) {
 		NonTerminalNode nonTerminal = new NonTerminalNode(node.getType(), node
 				.getName(), null);
-		if (node.getName().equals("-")) {
+		if ("-".equals(node.getName())) {
 			nonTerminal.setName("no name");
 		}
 		tree.insertNonTerminal(nonTerminal, parent);

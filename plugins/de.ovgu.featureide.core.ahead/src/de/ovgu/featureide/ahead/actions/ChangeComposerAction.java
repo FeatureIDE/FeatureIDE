@@ -28,6 +28,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.ahead.AheadComposer;
+import de.ovgu.featureide.core.IFeatureProject;
 
 /**
  * 
@@ -43,11 +44,11 @@ public class ChangeComposerAction extends AbstractHandler {
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		if (!openDialog()) return null;
-		if (ComposerPropertyTester.getFeatureProject().getComposerID()
-				.equals(AheadComposer.COMPOSER_ID)) {
-			new AHEADToFeatureHouseConversion(ComposerPropertyTester.getFeatureProject());
+		IFeatureProject featureProject = ComposerPropertyTester.getFeatureProject();
+		if (AheadComposer.COMPOSER_ID.equals(featureProject.getComposerID())) {
+			new AHEADToFeatureHouseConversion(featureProject);
 		} else {
-			new FeatureHouseToAHEADConversion(ComposerPropertyTester.getFeatureProject());
+			new FeatureHouseToAHEADConversion(featureProject);
 		}
 		return null;
 	}

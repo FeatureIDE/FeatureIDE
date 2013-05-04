@@ -36,6 +36,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
+import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 
 
@@ -84,7 +85,8 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	}
 
 	public boolean initialize(IFeatureProject project) {
-		if(project.getFeatureModel()==null||project.getFeatureModel().getRoot()==null){
+		FeatureModel featureModel = project.getFeatureModel();
+		if(featureModel==null||featureModel.getRoot()==null){
 			return false;
 		}
 		loadComposerExtension();

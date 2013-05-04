@@ -454,8 +454,9 @@ public class ModelEditPart extends AbstractGraphicalEditPart implements GUIDefau
 	private void setHeightForClassFigure(int height, GraphicalEditPart editPart) {
 		Rectangle rect = getConstraintForEditPart(editPart);
 		rect.height= height;
-		this.setLayoutConstraint(this, editPart.getFigure(), rect);
-		editPart.getFigure().setBounds(rect);
+		IFigure figure2 = editPart.getFigure();
+		this.setLayoutConstraint(this, figure2, rect);
+		figure2.setBounds(rect);
 	}
 
 	private int getWidthForCollaborationFigures() {

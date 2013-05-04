@@ -189,7 +189,7 @@ public class CSClassBuilder extends ClassBuilder {
 		String parameter = terminal.getBody().substring(
 				terminal.getBody().indexOf('(') + 1, terminal.getBody().indexOf(')'));
 		LinkedList<String> parameterTypes = new LinkedList<String>();
-		if (!parameter.equals("") && !parameter.startsWith("{")) {
+		if (!"".equals(parameter) && !parameter.startsWith("{")) {
 			String[] p = parameter.split("[-]");
 			for (int i = 0; i < p.length; i+=2) {
 				parameterTypes.add(p[i]);

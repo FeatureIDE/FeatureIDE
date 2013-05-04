@@ -241,7 +241,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	}
 
 	public String replaceMarker(String text, List<String> list, String packageName) {
-		if (packageName.equals("")) {
+		if ("".equals(packageName)) {
 			return text.replace(PACKAGE_PATTERN, "");
 		} else {
 			return text.replace(PACKAGE_PATTERN, "package " + packageName + ";\r\n\r\n");

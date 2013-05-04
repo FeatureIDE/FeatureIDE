@@ -183,17 +183,18 @@ public class Munge {
      * @return
      */
     private IFile getFile(String inName) {
-        inName = inName.substring(inName.indexOf(featureProject.getProjectName() + "\\")
-                + featureProject.getProjectName().length() + 1);
-        inName = inName.substring(inName.indexOf(featureProject.getSourceFolder().getName() + "\\")
-                + featureProject.getSourceFolder().getName().length() + 1);
-
-        IFolder folder = featureProject.getSourceFolder();
+        String projectName = featureProject.getProjectName();
+		inName = inName.substring(inName.indexOf(projectName + "\\")
+                + projectName.length() + 1);
+		IFolder sourceFolder = featureProject.getSourceFolder();
+		String name = sourceFolder.getName();
+		inName = inName.substring(inName.indexOf(name + "\\")
+                + name.length() + 1);
+   
         while (inName.contains("\\")) {
-            folder = folder.getFolder(inName.substring(0, inName.indexOf('\\')));
+            sourceFolder = sourceFolder.getFolder(inName.substring(0, inName.indexOf('\\')));
         }
-
-        return folder.getFile(inName);
+        return sourceFolder.getFile(inName);
     }
 
     public void addMarker(final String text, final IFile file, final int line) {

@@ -133,9 +133,10 @@ public class AspectJComposer extends ComposerExtensionClass {
 			}
 		}
 		
-		setBuildpaths(config.getProject());
+		IProject project = config.getProject();
+		setBuildpaths(project);
 		try {
-			config.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
+			project.refreshLocal(IResource.DEPTH_INFINITE, null);
 			featureProject.getProject().build(IncrementalProjectBuilder.FULL_BUILD,	null);
 		} catch (CoreException e) {
 			AspectJCorePlugin.getDefault().logError(e);
@@ -225,14 +226,15 @@ public class AspectJComposer extends ComposerExtensionClass {
 
 	@Override
 	public boolean postAddNature(IFolder source, IFolder destination) {
-		CorePlugin.getDefault().addProject(source.getProject());
-		addNatures(source.getProject());
-		setClasspathFile(source.getProject());
+		IProject project = source.getProject();
+		CorePlugin.getDefault().addProject(project);
+		addNatures(project);
+		setClasspathFile(project);
 		if (hadAspectJNature) {
 			createFeatureModel(CorePlugin.getFeatureProject(source));
 		}
 		try {
-			source.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
+			project.refreshLocal(IResource.DEPTH_INFINITE, null);
 		} catch (CoreException e) {
 			AspectJCorePlugin.getDefault().logError(e);
 		}
@@ -255,8 +257,9 @@ public class AspectJComposer extends ComposerExtensionClass {
 				featureModel.setRoot(root);
 				featureModel.getRoot().setAbstract(false);
 				FeatureModelWriterIFileWrapper w = new FeatureModelWriterIFileWrapper(new XmlFeatureModelWriter(featureModel));
-				w.writeToFile(project.getProject().getFile("model.xml"));
-				project.getProject().getFile("model.xml").refreshLocal(IResource.DEPTH_ZERO, null);
+				IFile file = project.getProject().getFile("model.xml");
+				w.writeToFile(file);
+				file.refreshLocal(IResource.DEPTH_ZERO, null);
 			}
 		} catch (CoreException e) {
 			AspectJCorePlugin.getDefault().logError(e);
@@ -392,19 +395,20 @@ public class AspectJComposer extends ComposerExtensionClass {
 			description.setNatureIds(newNatures);
 			
 			/** the java builder has to be replaced with the AspectJ builder **/
-			if (description.getBuildSpec().length > 0) {
-				ICommand[] buildSpec = new ICommand[description.getBuildSpec().length];
+			ICommand[] buildSpec = description.getBuildSpec();
+			if (buildSpec.length > 0) {
+				ICommand[] newBuildSpec = new ICommand[buildSpec.length];
 				int k = 0;
-				for (ICommand c : description.getBuildSpec()) {
+				for (ICommand c : buildSpec) {
 					if (!c.getBuilderName().equals(BUILDER_JAVA)) {
-						buildSpec[k] = c;
+						newBuildSpec[k] = c;
 						k++;
 					} else {
 						c.setBuilderName(BUILDER_AJ);
-						buildSpec[k] = c;
+						newBuildSpec[k] = c;
 					}
 				}
-				description.setBuildSpec(buildSpec);
+				description.setBuildSpec(newBuildSpec);
 			}
 			
 			project.setDescription(description, null);

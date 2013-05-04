@@ -509,9 +509,9 @@ public class ConstraintDialog implements GUIDefaults {
 
 			@Override
 			public void handleEvent(Event event) {
-				if (searchFeatureText.getText().equals(FILTERTEXT))
-
+				if (FILTERTEXT.equals(searchFeatureText.getText())) {
 					searchFeatureText.setText("");
+				}
 				searchFeatureText.setForeground(shell.getDisplay()
 						.getSystemColor(SWT.COLOR_BLACK));
 			}
