@@ -199,7 +199,7 @@ public class JavaClassBuilder extends ClassBuilder {
 	 * @return
 	 */
 	private String getMethodNameFromSpecCaseSeq(FSTTerminal specCaseSeq) {
-		FSTTerminal methodNode = (FSTTerminal) ((FSTNonTerminal)specCaseSeq.getParent().getParent()).getChildren().get(2);
+		FSTTerminal methodNode = (FSTTerminal) ((FSTNonTerminal)specCaseSeq.getParent().getParent().getParent()).getChildren().get(2);
 		return getMethodName(methodNode);
 	}
 
@@ -257,11 +257,13 @@ public class JavaClassBuilder extends ClassBuilder {
 
 	@Override
 	public void casePackage(FSTTerminal terminal) {
+	if(modelBuilder.getCurrentRole()!=null)
 		modelBuilder.getCurrentRole().getFSTClass().setPackage(terminal.getBody().replace("package ", "").replace(";", ""));
 	}
 	
 	@Override
 	public void caseAddImport(FSTTerminal terminal) {
+	if(modelBuilder.getCurrentRole()!=null)
 		modelBuilder.getCurrentRole().addImport(terminal.getBody());
 	}
 
