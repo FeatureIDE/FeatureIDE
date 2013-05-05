@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel chosenLayoutAlgorithm="1">
+		<struct>
+			<and abstract="true" mandatory="true" name="PokerSPL">
+				<feature mandatory="true" name="Player"/>
+				<feature mandatory="true" name="Table"/>
+				<alt mandatory="true" name="Cards">
+					<feature mandatory="true" name="MaxPlayerCardsTwo"/>
+					<feature mandatory="true" name="MaxPlayerCardsFive"/>
+					<feature mandatory="true" name="MaxPlayerCardsSeven"/>
+				</alt>
+				<and name="Wager">
+					<and name="Blinds">
+						<feature name="IncreasingBlinds"/>
+					</and>
+					<feature name="Pot_Limit"/>
+				</and>
+			</and>
+		</struct>
+		<constraints/>
+		<comments/>
+		<featureOrder userDefined="false"/>
+	</featureModel>

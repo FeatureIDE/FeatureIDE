@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel chosenLayoutAlgorithm="1">
+		<struct>
+			<and abstract="true" mandatory="true" name="UnionFindSPL">
+				<alt mandatory="true" name="UnionFind">
+					<feature mandatory="true" name="QuickFind"/>
+					<and mandatory="true" name="QuickUnion">
+						<and name="QU_Weighted">
+							<alt abstract="true" name="QU_Weighted_Modifications">
+								<feature mandatory="true" name="WQU_Halfing"/>
+								<feature mandatory="true" name="WQU_ByHeight"/>
+								<feature mandatory="true" name="WQU_PathCompression"/>
+							</alt>
+						</and>
+					</and>
+				</alt>
+				<feature mandatory="true" name="Tests"/>
+			</and>
+		</struct>
+		<constraints/>
+		<comments/>
+		<featureOrder userDefined="false"/>
+	</featureModel>

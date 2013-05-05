@@ -1,0 +1,11 @@
+{
+	"features" : [
+		"DiGraph",
+		"Transposable",
+		"Searchable",
+		"Removal"
+	],
+	"roles": {
+	}
+
+}
