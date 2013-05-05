@@ -12,7 +12,7 @@ public class Client {
 		this.privateKey = privateKey;
 	}
 
-	public/*@pure@*/ int getPrivateKey() {
+	public /*@pure@*/ int getPrivateKey() {
 		return privateKey;
 	}
 

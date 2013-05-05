@@ -26,7 +26,7 @@ public class Floor {
 	  @ ensures env.calledAt_Spec1[floor.getFloorID()];
 	  @*/
 	public void callElevator() {
-		/*@ set env.calledAt_Spec1[floor.getFloorID()] = true; @*/
+		//@set env.calledAt_Spec1[floor.getFloorID()] = true; 
 		elevatorCall = true;
 	}
 	

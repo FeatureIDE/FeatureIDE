@@ -74,7 +74,7 @@ public class Elevator {
 	  @ ensures env.calledAt_Spec2[floorID];
 	  @*/
 	public void pressInLiftFloorButton(int floorID) {
-		/*@ set env.calledAt_Spec2[floorID] = true; @*/
+		//@ set env.calledAt_Spec2[floorID] = true; 
 		floorButtons[floorID] = true;
 	}
 	private void resetFloorButton(int floorID) {
@@ -130,7 +130,7 @@ public class Elevator {
 				continueInDirection(currentHeading);
 			}
 		}
-		/*@ set env.calledAt_Spec1[currentFloorID] = env.calledAt_Spec1[currentFloorID] && areDoorsOpen() ? false : env.calledAt_Spec1[currentFloorID] @*/
+		//@ set env.calledAt_Spec1[currentFloorID] = env.calledAt_Spec1[currentFloorID] && areDoorsOpen() ? false : env.calledAt_Spec1[currentFloorID]
 	}
 
 	private boolean stopRequestedAtCurrentFloor() {

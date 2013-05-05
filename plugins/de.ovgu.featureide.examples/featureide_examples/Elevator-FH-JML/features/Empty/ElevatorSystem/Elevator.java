@@ -32,7 +32,7 @@ public class Elevator {
 	  @ ensures env.calledAt_Spec9[floorID];
 	  @*/
 	public void pressInLiftFloorButton(int floorID) {
-		/*@ set env.calledAt_Spec9[floorID] = true; @*/
+		//@ set env.calledAt_Spec9[floorID] = true; 
 		original(floorID);
 	}
 }
