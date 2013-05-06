@@ -45,6 +45,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
+import de.ovgu.featureide.core.fstmodel.FSTSpecCaseSeq;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.figures.RoleFigure;
@@ -190,6 +191,17 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 							editor = openEditor(file);
 							if (editor != null)	{
 								CollaborationOutline.scrollToLine(editor, fstDirective.getStartLine(), fstDirective.getEndLine(), fstDirective.getStartOffset(), fstDirective.getEndLength());
+							}
+							return;
+						}
+					}
+					
+					LinkedList<FSTSpecCaseSeq> contracts = this.getRoleModel().contracts;
+					for (FSTSpecCaseSeq contract : contracts) {
+						if (contract.getName().equals(label.getElementName())) {
+							editor = openEditor(file);
+							if (editor != null)	{
+								CollaborationOutline.scrollToLine(editor, contract.getLine());
 							}
 							return;
 						}

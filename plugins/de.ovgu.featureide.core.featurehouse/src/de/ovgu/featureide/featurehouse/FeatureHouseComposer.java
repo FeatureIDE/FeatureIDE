@@ -315,7 +315,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		}
 		ArrayList<FSTNode> fstnodes = composer.getFstnodes();
 		if (fstnodes != null) {
-			fhModelBuilder.buildModel(fstnodes, false);
+			fhModelBuilder.buildModel(fstnodes, true);
 			TreeBuilderFeatureHouse fstparser = new TreeBuilderFeatureHouse(
 					featureProject.getProjectName());
 			fstparser.createProjectTree(fstnodes);

@@ -80,6 +80,13 @@ public class FSTRole {
 			}
 			fields.add((FSTField) element);
 		} else if(element instanceof FSTSpecCaseSeq){
+			for (FSTSpecCaseSeq c : contracts) {
+				if (c.comparesTo(element)) {
+//					CorePlugin.getDefault().logWarning("Model already contains method " 
+//					+ element.getFullName() + " @ " + feature.getName()+ "/" + fstClass.getName());
+					return;
+				}
+			}
 			contracts.add((FSTSpecCaseSeq) element);
 		}
 		element.setRole(this);

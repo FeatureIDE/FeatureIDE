@@ -42,15 +42,9 @@ public class FSTSpecCaseSeq extends RoleElement {
 		super(methodName, "contract", "", body, endLine, endLine);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.fstmodel.RoleElement#getFullName()
-	 */
 	@Override
 	public String getFullName() {
-		// TODO Auto-generated method stub
-		return null;
+		return name + " " + body;
 	}
 
 	/**
@@ -78,4 +72,5 @@ public class FSTSpecCaseSeq extends RoleElement {
 	public boolean refines() {
 		return this.refines;
 	}
+
 }
