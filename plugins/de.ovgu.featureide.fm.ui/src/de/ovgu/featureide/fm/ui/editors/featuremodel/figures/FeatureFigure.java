@@ -174,6 +174,11 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 			toolTip = VOID;
 		}
 		
+		String description = feature.getDescription();
+		if (description != null) {
+			toolTip += "\r\n\r\n" + description;
+		} 
+		
 		toolTip += getRelevantConstraints();
 		Figure toolTipContent = new Figure();
 		toolTipContent.setLayoutManager(gl);

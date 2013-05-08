@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.annotation.CheckForNull;
+
 /**
  * Provides all properties of a feature. This includes its connections to parent
  * and child features.
@@ -59,6 +61,24 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 
 	private FMPoint location = new FMPoint(0, 0);
 	
+	private String description = null;
+
+	/**
+	 * 
+	 * @return The description of the Feature.
+	 */
+	@CheckForNull
+	public String getDescription() {
+		return description;
+	}
+
+	/**
+	 * @param decription The description of the Feature.
+	 */
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
 	public Feature(FeatureModel featureModel) {
 		this(featureModel, "Unknown");
 	}

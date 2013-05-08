@@ -79,7 +79,12 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 	 */
 	private ArrayList<String> featureOrderList = new ArrayList<String>();
 
-	private static final String[] validTagsStruct = {"and", "or", "alt", "feature", "direct-alt", "direct-or"};
+	private boolean description = false;
+
+	private String attrName;
+	private Feature currentFeature;
+
+	private static final String[] validTagsStruct = {"and", "or", "alt", "feature", "direct-alt", "direct-or", "description"};
 
 	private static final String[] validTagsConst = {"var", "conj", "disj", "imp", "eq", "not", "atmost1", "rule"};
 	
@@ -135,96 +140,103 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 									+ currentTag + "' is not a valid tag in struct-section.",
 									event.getLocation().getLineNumber());	
 						}
-						// BEGIN XML-reader is reading information about the
-						// features
-						boolean isMandatory = false;
-						boolean isAbstract = false;
-						boolean isHidden = false;
 						
-						FMPoint featureLocation = null;
-						String attrName = "noname";
-						String parent = parentStack.peek()[1];
-
-						@SuppressWarnings("unchecked")
-						Iterator<Attribute> attributes = currentStartTag
-								.getAttributes();
-
-						// BEGIN read attributes from XML tag
-						while (attributes.hasNext()) {
-							Attribute attribute = attributes.next();
-							String curName = attribute.getName().getLocalPart();
-							String curValue = attribute.getValue();
-
-							if (curName == "name") {
-								attrName = curValue;
-							}
-							else if (curName == "mandatory") {
-								if (curValue.equals("true")) {
-									isMandatory = true;
-								} else {
-									isMandatory = false;
-								}
-							}
-							else if (curName == "abstract") {
-								if (curValue.equals("true")) {
-									isAbstract = true;
-								} else {
-									isAbstract = false;
-								}
-							}
-							else if (curName == "hidden") {
-								if (curValue.equals("true")) 
-									isHidden = true;
-								 else 
-									isHidden = false;
-							}
-							else if (curName == "coordinates"){
-								String subStringX = curValue.substring(0, curValue.indexOf(", "));
-								String subStringY = curValue.substring(curValue.indexOf(", ")+2);
-								try {
-									featureLocation = new FMPoint(Integer.parseInt (subStringX),
-											Integer.parseInt (subStringY));
-								} catch (Exception e) {
-									throw new UnsupportedModelException(e.getMessage()
-											+"is no valid Integer Value",
-											event.getLocation().getLineNumber());
-								}			
-								
-							}
-							else{
-								throw new UnsupportedModelException("'"
-										+ curName
-										+ "' is not a valid attribute.",
-										event.getLocation().getLineNumber());
-							}
-						}
-						// END read attributes from XML tag
-						if (!featureModel.getFeatureNames().contains(attrName)
-								&& featureModel.getFMComposerExtension().isValidFeatureName(attrName)) 
-						{
-							addFeature(attrName, isMandatory, isAbstract, isHidden,	parent, featureLocation);
+						if (currentTag.equals("description")) {
+							description  = true;
 						} else {
-							if (!featureModel.getFMComposerExtension().isValidFeatureName(attrName) ) {
-								throw new UnsupportedModelException("'"
-										+ attrName
-										+ "' is not a valid feature name",
-										event.getLocation().getLineNumber());
+												
+							// BEGIN XML-reader is reading information about the
+							// features
+							boolean isMandatory = false;
+							boolean isAbstract = false;
+							boolean isHidden = false;
+							
+							FMPoint featureLocation = null;
+							attrName = "noname";
+							String parent = parentStack.peek()[1];
+		
+							@SuppressWarnings("unchecked")
+							Iterator<Attribute> attributes = currentStartTag
+									.getAttributes();
+							
+							
+							// BEGIN read attributes from XML tag
+							while (attributes.hasNext()) {
+								Attribute attribute = attributes.next();
+								String curName = attribute.getName().getLocalPart();
+								String curValue = attribute.getValue();
+		
+								if (curName == "name") {
+									attrName = curValue;
+								}
+								else if (curName == "mandatory") {
+									if (curValue.equals("true")) {
+										isMandatory = true;
+									} else {
+										isMandatory = false;
+									}
+								}
+								else if (curName == "abstract") {
+									if (curValue.equals("true")) {
+										isAbstract = true;
+									} else {
+										isAbstract = false;
+									}
+								}
+								else if (curName == "hidden") {
+									if (curValue.equals("true")) 
+										isHidden = true;
+									 else 
+										isHidden = false;
+								}
+								else if (curName == "coordinates"){
+									String subStringX = curValue.substring(0, curValue.indexOf(", "));
+									String subStringY = curValue.substring(curValue.indexOf(", ")+2);
+									try {
+										featureLocation = new FMPoint(Integer.parseInt (subStringX),
+												Integer.parseInt (subStringY));
+									} catch (Exception e) {
+										throw new UnsupportedModelException(e.getMessage()
+												+"is no valid Integer Value",
+												event.getLocation().getLineNumber());
+									}			
+									
+								}
+								else{
+									throw new UnsupportedModelException("'"
+											+ curName
+											+ "' is not a valid attribute.",
+											event.getLocation().getLineNumber());
+								}
 							}
-							if (featureModel.getFeatureNames().contains(
-									attrName)) {
-								throw new UnsupportedModelException(
-										"Cannot redefine '" + attrName + "'",
-										event.getLocation().getLineNumber());
+						
+							// END read attributes from XML tag
+							if (!featureModel.getFeatureNames().contains(attrName)
+									&& featureModel.getFMComposerExtension().isValidFeatureName(attrName)) {
+								addFeature(attrName, isMandatory, isAbstract, isHidden,	parent, featureLocation);
+								currentFeature = featureModel.getFeature(attrName);
+							} else {
+								if (!featureModel.getFMComposerExtension().isValidFeatureName(attrName) ) {
+									throw new UnsupportedModelException("'"
+											+ attrName
+											+ "' is not a valid feature name",
+											event.getLocation().getLineNumber());
+								}
+								if (featureModel.getFeatureNames().contains(
+										attrName)) {
+									throw new UnsupportedModelException(
+											"Cannot redefine '" + attrName + "'",
+											event.getLocation().getLineNumber());
+								}
+							}
+		
+							if (currentTag != "feature") {
+								parentStack.push(new String[] { currentTag,
+										attrName });
+							// END XML-reader is reading information about the
+							// features
 							}
 						}
-
-						if (currentTag != "feature") {
-							parentStack.push(new String[] { currentTag,
-									attrName });
-						// END XML-reader is reading information about the
-						// features
-						}
-
 					} else if (mode == 2) {
 						if (!isInArray(currentTag,validTagsConst)){
 							throw new UnsupportedModelException("'"
@@ -381,8 +393,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 							mode = 4;
 						}
 					}
-				}
-				if (event.isEndElement()) {
+				} else if (event.isEndElement()) { 
 					EndElement endElement = event.asEndElement();
 
 					String currentTag = endElement.getName().getLocalPart();
@@ -390,7 +401,12 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 						if (!currentTag.equals("feature")) {
 							if (parentStack.peek()[0].equals(currentTag)) {
 								parentStack.pop();
+								
 							}
+							
+						}
+						if (!parentStack.isEmpty()) {
+							currentFeature = featureModel.getFeature(parentStack.peek()[1]);
 						}
 						if (currentTag.equals("struct")) {
 							mode = 0;
@@ -467,7 +483,15 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader {
 							mode = 0;
 						}
 					}
+				} else {
+					if (event.isCharacters()) {
+						if (description) {
+							currentFeature.setDescription(event.toString());
+							description = false;
+						}
+					}
 				}
+				
 			}
 			eventReader.close();
 		} catch (XMLStreamException e) {

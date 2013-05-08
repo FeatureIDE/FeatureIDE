@@ -56,6 +56,7 @@ import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
  * @author Dariusz Krolikowski
  * @author Maik Lampe
  */
+// TODO organize tags global with static fields
 public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
 	
 	/**
@@ -148,17 +149,29 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
     	children = feat.getChildren();
     	if (children.isEmpty()) {
     		fnod = doc.createElement("feature");
-    		
+    		String description = feat.getDescription();
+	    	if (description != null) {
+	    		Element descr = doc.createElement("description");
+	    		descr.setTextContent(description);
+	    		fnod.appendChild(descr);
+	    	}
     		writeAttributes(node, fnod, feat);
-    	}
-    	else{
+    	} else {
     		if (feat.isAnd()) {
     			fnod = doc.createElement("and");
     		} else if (feat.isOr()) {
     			fnod = doc.createElement("or");
     		} else if (feat.isAlternative()) {
     			fnod = doc.createElement("alt");
-	    	} else fnod = doc.createElement("unknown");//FMCorePlugin.getDefault().logInfo("creatXMlDockRec: Unexpected error!");
+	    	} else {
+	    		fnod = doc.createElement("unknown");//FMCorePlugin.getDefault().logInfo("creatXMlDockRec: Unexpected error!");
+	    	}
+    		String description = feat.getDescription();
+	    	if (description != null) {
+	    		Element descr = doc.createElement("description");
+	    		descr.setTextContent(description);
+	    		fnod.appendChild(descr);
+	    	}
 	    	
     		writeAttributes(node, fnod, feat);
 	    	
@@ -178,7 +191,6 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter {
     	if(!featureModel.getLayout().showHiddenFeatures() || !featureModel.getLayout().hasFeaturesAutoLayout()) 
     		fnod.setAttribute("coordinates", +feat.getLocation().x
     				+", "+feat.getLocation().y);
-    	
     	node.appendChild(fnod);
     }
   
