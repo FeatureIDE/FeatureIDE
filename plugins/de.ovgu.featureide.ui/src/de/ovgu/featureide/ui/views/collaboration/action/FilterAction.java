@@ -43,8 +43,6 @@ public class FilterAction extends Action {
 	private LinkedHashSet<String> featureFilter = new LinkedHashSet<String>();
 	private CollaborationView collaborationView;
 	
-	public boolean checked = false;
-	
 	public FilterAction(String text, GraphicalViewerImpl view, CollaborationView collaborationView) {
 		super(text);
 		this.collaborationView = collaborationView;
@@ -67,27 +65,29 @@ public class FilterAction extends Action {
 				super.setEnabled(true);
 			}
 		}
-		if (checked) 
+		boolean filterDefined = collaborationView.builder.isFilterDefined();
+		setChecked(filterDefined);
+		if (filterDefined) {
 			super.setEnabled(true);
+		}
 	}
 	
 	@SuppressWarnings("unchecked")
 	public void run() {
-		if (((classFilter.size() != 0 || featureFilter.size() != 0) && !checked) &&
-				collaborationView.builder.classFilter.size() == 0 &&
-				collaborationView.builder.featureFilter.size() == 0) {
+		if (((classFilter.size() != 0 || featureFilter.size() != 0)) &&
+				!collaborationView.builder.isFilterDefined()) {
 			setChecked(true);
-			checked = true;
-			collaborationView.builder.classFilter = (LinkedHashSet<String>) classFilter.clone();
-			collaborationView.builder.featureFilter = (LinkedHashSet<String>) featureFilter.clone();
+			collaborationView.builder.setClassFilter((LinkedHashSet<String>) classFilter.clone());
+			collaborationView.builder.setFeatureFilter((LinkedHashSet<String>) featureFilter.clone());
+			classFilter.clear();
+			featureFilter.clear();
 			collaborationView.refresh();
 		} else {
 			setChecked(false);
-			checked = false;
 			classFilter.clear();
 			featureFilter.clear();
-			collaborationView.builder.classFilter.clear();
-			collaborationView.builder.featureFilter.clear();
+			collaborationView.builder.getClassFilter().clear();
+			collaborationView.builder.getFeatureFilter().clear();
 			collaborationView.updateGuiAfterBuild(collaborationView.getFeatureProject(), null);
 		}
 	}

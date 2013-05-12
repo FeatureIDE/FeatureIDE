@@ -23,6 +23,7 @@ package de.ovgu.featureide.ui.views.collaboration.model;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -62,8 +63,11 @@ import de.ovgu.featureide.ui.UIPlugin;
 public class CollaborationModelBuilder {
 	private CollaborationModel model;
 
-	public LinkedHashSet<String> classFilter = new LinkedHashSet<String>();
-	public LinkedHashSet<String> featureFilter = new LinkedHashSet<String>();
+	/**
+	 * Every feature project has its own filter
+	 */
+	private HashMap<IFeatureProject, LinkedHashSet<String>> classFilter = new HashMap<IFeatureProject, LinkedHashSet<String>>();
+	private HashMap<IFeatureProject, LinkedHashSet<String>> featureFilter = new HashMap<IFeatureProject, LinkedHashSet<String>>();
 	
 	public IFile configuration = null;
 	
@@ -116,6 +120,51 @@ public class CollaborationModelBuilder {
 		return false;
 	}
 	
+	/**
+	 * @return The class filter for the current project
+	 */
+	public LinkedHashSet<String> getClassFilter() {
+		LinkedHashSet<String> filter = classFilter.get(project);
+		if (filter == null) {
+			return new LinkedHashSet<String>();
+		}
+		return filter;
+	}
+	
+	/**
+	 * 
+	 * @param filter The class filter for the current project
+	 */
+	public void setClassFilter(LinkedHashSet<String> filter) {
+		classFilter.put(project, filter);
+	}
+	
+	/**
+	 * @return The feature filter for the current project
+	 */
+	public LinkedHashSet<String> getFeatureFilter() {
+		LinkedHashSet<String> filter = featureFilter.get(project);
+		if (filter == null) {
+			return new LinkedHashSet<String>();
+		}
+		return filter;
+	}
+	
+	/**
+	 * 
+	 * @param filter The feature filter for the current project
+	 */
+	public void setFeatureFilter(LinkedHashSet<String> filter) {
+		featureFilter.put(project, filter);
+	}
+	
+	/**
+	 * @return <code>true</code> if a filter is defined for the current project.
+	 */
+	public boolean isFilterDefined() {
+		return !(getClassFilter().isEmpty() && getFeatureFilter().isEmpty());
+	}
+	
 	public CollaborationModelBuilder() {
 		model = new CollaborationModel();
 	}
@@ -152,7 +201,7 @@ public class CollaborationModelBuilder {
 		
 		IFolder path = project.getSourceFolder();
 		for (String layerName : layerNames) {
-			if (featureFilter.isEmpty() || featureFilter.contains(layerName)) {
+			if (getFeatureFilter().isEmpty() || getFeatureFilter().contains(layerName)) {
 				if (featureNames.contains(layerName)) {
 					addRoles(layerName, path);
 				} else {
@@ -174,7 +223,7 @@ public class CollaborationModelBuilder {
 			LinkedList<FSTRole> roles = fstFeature.getRoles();
 				for (FSTRole fstRole : roles) {
 					String className = fstRole.getFSTClass().getName();
-					if (classFilter.size() == 0 || classFilter.contains(className)) {
+					if (getClassFilter().size() == 0 || getClassFilter().contains(className)) {
 						if (collaboration == null) {
 							Feature feature = project.getFeatureModel().getFeature(fstFeature.getName());
 							if (feature != null) {
@@ -290,7 +339,7 @@ public class CollaborationModelBuilder {
 			for (String layerName : layerNames) {
 				if (selectedFeatureNames.contains(layerName)) {
 					//case: selected
-					if (featureFilter.size() == 0 || featureFilter.contains(layerName)) {
+					if (getFeatureFilter().size() == 0 || getFeatureFilter().contains(layerName)) {
 						collaboration = null;
 						IResource[] members = null;
 						IFolder folder = project.getSourceFolder().getFolder(layerName);
@@ -309,7 +358,7 @@ public class CollaborationModelBuilder {
 					}
 				} else {
 					//case: not selected
-					if (featureFilter.isEmpty() || featureFilter.contains(layerName)) {
+					if (getFeatureFilter().isEmpty() || getFeatureFilter().contains(layerName)) {
 						collaboration = null;
 						IResource[] members = null;
 						IFolder folder = project.getSourceFolder().getFolder(layerName);
@@ -447,9 +496,9 @@ public class CollaborationModelBuilder {
 		if (!(res instanceof IFolder)) {
 			String fileName = res.getName();
 			String fileExtension = res.getFileExtension();
-			if (classFilter.isEmpty() 
-					|| classFilter.contains("*." + fileExtension)
-					|| classFilter.contains(fileName)) {
+			if (getClassFilter().isEmpty() 
+					|| getClassFilter().contains("*." + fileExtension)
+					|| getClassFilter().contains(fileName)) {
 				
 				if (fSTModel == null || !extensions.contains(fileExtension) 
 						|| !featureNames.contains(featureName)) {
