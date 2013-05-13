@@ -60,9 +60,7 @@ public class FeatureDependencies {
      * @param fm
      */
     public FeatureDependencies(FeatureModel fm) {
-		this.fm = fm;
-		this.rootNode = createRootNode(fm);
-		calculateDependencies();
+		this(fm, true);
     }
     
     /**

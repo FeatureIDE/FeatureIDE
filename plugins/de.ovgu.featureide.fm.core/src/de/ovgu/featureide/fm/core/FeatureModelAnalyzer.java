@@ -72,8 +72,12 @@ public class FeatureModelAnalyzer {
 		this.fm = fm;
 	}
 
+	private FeatureDependencies dependencies;
 	public FeatureDependencies getDependencies() {
-		return new FeatureDependencies(fm);
+		if (dependencies == null) {
+			dependencies = new FeatureDependencies(fm);
+		}
+		return dependencies;
 	}
 
 	public boolean isValid() throws TimeoutException {
