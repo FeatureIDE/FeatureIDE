@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="de.ovgu.featureide.deltaj"
+      id="org.deltaj"
       label="FeatureIDE extension for DeltaJ (optional)"
-      version="2.6.4.qualifier"
+      version="2.6.5.qualifier"
       provider-name="University of Magdeburg">
 
    <description url="http://www.fosd.de/featureide/">
@@ -200,31 +200,31 @@ Library.
    </requires>
 
    <plugin
-         id="org.xtext.example.dj"
+         id="org.deltaj"
          download-size="0"
          install-size="0"
-         version="2.6.4.qualifier"
+         version="2.6.5.qualifier"
          unpack="false"/>
 
    <plugin
-         id="org.xtext.example.dj.generator"
+         id="org.deltaj.transformations"
          download-size="0"
          install-size="0"
-         version="2.6.4.qualifier"
+         version="2.6.5.qualifier"
          unpack="false"/>
 
    <plugin
-         id="org.xtext.example.dj.ui"
+         id="org.deltaj.transformations.ui"
          download-size="0"
          install-size="0"
-         version="2.6.4.qualifier"
+         version="2.6.5.qualifier"
          unpack="false"/>
 
    <plugin
-         id="de.ovgu.featureide.core.deltaj"
+         id="org.deltaj.ui"
          download-size="0"
          install-size="0"
-         version="2.6.4.qualifier"
+         version="2.6.5.qualifier"
          unpack="false"/>
 
 </feature>
