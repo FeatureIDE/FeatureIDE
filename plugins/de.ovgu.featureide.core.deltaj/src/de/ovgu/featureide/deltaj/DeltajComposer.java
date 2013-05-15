@@ -66,6 +66,11 @@ import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
  * @author Sven Schuster
  */
 public class DeltajComposer extends ComposerExtensionClass {
+	private static final String PLUGIN_ID_XTEXT = "org.eclipse.xtext";
+	private static final String PLUGIN_ID_XTYPES = "it.xtypes";
+	private static final String PLUGIN_WARNING_XTEXT = "The required bundle "+PLUGIN_ID_XTEXT+" is not installed.";
+	private static final String PLUGIN_WARNING_XTYPES = "The required bundle "+PLUGIN_ID_XTYPES+" is not installed.";
+
 	public static final String COMPOSER_ID = "de.ovgu.featureide.composer.deltaj";
 	public static final String JAVA_NATURE = "org.eclipse.jdt.core.javanature";
 	public static final String FILE_EXT = ".deltaj";
@@ -91,6 +96,14 @@ public class DeltajComposer extends ComposerExtensionClass {
 	
 	@Override
 	public void performFullBuild(IFile config) {
+		if(!isPluginInstalled(PLUGIN_ID_XTEXT)){
+			generateWarning(PLUGIN_WARNING_XTEXT);
+			return;
+		}
+		if(!isPluginInstalled(PLUGIN_ID_XTYPES)){
+			generateWarning(PLUGIN_WARNING_XTYPES);
+			return;
+		}
 		// init console
 		MessageConsole console = new MessageConsole("DeltaJ Error Log", null);
 		console.activate();
