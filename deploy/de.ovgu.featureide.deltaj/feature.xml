@@ -191,7 +191,6 @@ Library.
       <import plugin="org.eclipse.core.resources"/>
       <import plugin="de.ovgu.featureide.core"/>
       <import plugin="de.ovgu.featureide.fm.core"/>
-      <import plugin="org.xtext.example.dj.ui" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.junit"/>
       <import plugin="org.eclipse.xtext"/>
       <import plugin="org.eclipse.xtext.util"/>
