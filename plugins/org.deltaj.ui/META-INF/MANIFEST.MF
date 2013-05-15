@@ -5,11 +5,11 @@ Bundle-Vendor: My Company
 Bundle-Version: 1.0.0
 Bundle-SymbolicName: org.deltaj.ui; singleton:=true
 Bundle-ActivationPolicy: lazy
-Require-Bundle: org.deltaj;visibility:=reexport,
+Require-Bundle: org.deltaj,
  org.deltaj.transformations,
  org.eclipse.xtext.ui,
- org.eclipse.ui.editors;bundle-version="3.5.0",
- org.eclipse.ui.ide;bundle-version="3.5.0",
+ org.eclipse.ui.editors,
+ org.eclipse.ui.ide,
  org.eclipse.xtext.ui.shared,
  org.eclipse.ui,
  org.eclipse.xtext.builder,
@@ -23,7 +23,7 @@ Require-Bundle: org.deltaj;visibility:=reexport,
  org.eclipse.xpand
 Import-Package: org.apache.log4j,
  org.apache.commons.logging
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6,J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: org.deltaj.ui,
  org.deltaj.ui.contentassist,
  org.deltaj.ui.contentassist.antlr,

@@ -8,12 +8,9 @@ Bundle-ActivationPolicy: lazy
 Require-Bundle: org.deltaj,
  org.eclipse.core.runtime,
  org.eclipse.xtext,
- org.eclipse.xtext.junit4,
- org.eclipse.xtext.ui.junit,
  org.junit4,
- org.eclipse.ui.workbench;resolution:=optional,
- org.eclipse.xtext.xbase.lib;bundle-version="2.2.0",
- org.eclipse.xtend2.lib;bundle-version="2.2.0"
+ org.eclipse.ui.workbench,
+ org.eclipse.xtext.xbase.lib
 Import-Package: org.apache.log4j,
  org.apache.commons.logging
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

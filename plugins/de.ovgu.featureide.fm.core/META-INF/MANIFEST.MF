@@ -51,6 +51,4 @@ Bundle-ClassPath: .,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Activator: de.ovgu.featureide.fm.core.FMCorePlugin
 Bundle-Vendor: University of Magdeburg
-Import-Package: org.eclipse.draw2d,
- org.eclipse.swt.graphics
 
