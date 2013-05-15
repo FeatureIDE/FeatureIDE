@@ -192,21 +192,11 @@ Library.
       <import plugin="de.ovgu.featureide.core"/>
       <import plugin="de.ovgu.featureide.fm.core"/>
       <import plugin="org.junit"/>
-      <import plugin="org.eclipse.xtext"/>
-      <import plugin="org.eclipse.xtext.util"/>
       <import plugin="org.eclipse.emf.ecore"/>
       <import plugin="org.eclipse.emf.common"/>
-      <import plugin="org.antlr.runtime"/>
-      <import plugin="org.apache.log4j"/>
-      <import plugin="org.eclipse.xpand"/>
-      <import plugin="org.eclipse.xtend"/>
       <import plugin="org.eclipse.emf.mwe.utils"/>
-      <import plugin="org.eclipse.xtend.typesystem.emf"/>
-      <import plugin="org.eclipse.xtext.ui"/>
       <import plugin="org.eclipse.ui.editors" version="3.5.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.ide" version="3.5.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.xtext.ui.shared"/>
-      <import plugin="org.eclipse.xtext.builder"/>
    </requires>
 
    <plugin
