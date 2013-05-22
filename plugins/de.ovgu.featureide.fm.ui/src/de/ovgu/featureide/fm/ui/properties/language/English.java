@@ -21,17 +21,17 @@
 package de.ovgu.featureide.fm.ui.properties.language;
 
 /**
- * Class implementing the extension point 
- * <code>"de.ovgu.featureide.fm.core.language"</code> 
+ * Class implementing the extension point
+ * <code>"de.ovgu.featureide.fm.core.language"</code>
  * 
  * @author Jens Meinicke
  * @author Florian Proksch
  * @author Stefan Krueger
  */
 public class English implements ILanguage {
-	
-	public static final String name = "English";
-	
+
+	public static final String NAME = "English";
+
 	private static final String LEGEND = "Legend:";
 	private static final String MANDATORY = "Mandatory";
 	private static final String ABSTRACT = "Abstract";
@@ -47,36 +47,31 @@ public class English implements ILanguage {
 	private static final String DEAD_CONST = "Dead constraint";
 	private static final String UNSATISFIABLE_CONST = "Unsatisfiable constraint";
 	private static final String TAUTOLOGY_CONST = "Constraint is tautology";
-	private static final String VOID_MODEL_CONST = "Constraint makes the model void";	
-	
+	private static final String VOID_MODEL_CONST = "Constraint makes the model void";
+	private static final String FALSE_OPTIONAL_CONSTRAINT = "False optional constraint";	
 	
 	@Override
-	public String getRedundantConst()
-	{
+	public String getRedundantConst() {
 		return REDUNDANT;
 	}
-	
+
 	@Override
-	public String getDeadConst()
-	{
+	public String getDeadConst() {
 		return DEAD_CONST;
 	}
-	 
+
 	@Override
-	public String getUnsatisfiableConst()
-	{
+	public String getUnsatisfiableConst() {
 		return UNSATISFIABLE_CONST;
-	}	
-	
+	}
+
 	@Override
-	public String getTautologyConst()
-	{
+	public String getTautologyConst() {
 		return TAUTOLOGY_CONST;
 	}
-	 
+
 	@Override
-	public String getVoidModelConst()
-	{
+	public String getVoidModelConst() {
 		return VOID_MODEL_CONST;
 	}
 
@@ -84,13 +79,12 @@ public class English implements ILanguage {
 	public String getIndetHidden() {
 		return INDETHIDDEN;
 	}
-	
-	
+
 	@Override
 	public String getName() {
-		return name;
+		return NAME;
 	}
-	
+
 	@Override
 	public String getLagendTitle() {
 		return LEGEND;
@@ -125,7 +119,7 @@ public class English implements ILanguage {
 	public String getFalseOptional() {
 		return FALSE_OPTIONAL;
 	}
-	
+
 	@Override
 	public String getAlternative() {
 		return ALTERNATIVE;
@@ -140,5 +134,10 @@ public class English implements ILanguage {
 	public String getOptional() {
 		return OPTIONAL;
 	}
-	
+
+	@Override
+	public String getFalseOptionalConst() {
+		return FALSE_OPTIONAL_CONSTRAINT;
+	}
+
 }

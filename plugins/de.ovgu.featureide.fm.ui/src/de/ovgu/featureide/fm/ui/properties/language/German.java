@@ -30,7 +30,7 @@ package de.ovgu.featureide.fm.ui.properties.language;
  */
 public class German implements ILanguage {
 
-	public static final String name = "German";
+	public static final String NAME = "German";
 	
 	private static final String LEGEND = "Legende:";
 	private static final String MANDATORY = "Obligatorisch";
@@ -38,16 +38,17 @@ public class German implements ILanguage {
 	private static final String CONCRETE = "Konkret";
 	private static final String HIDDEN = "Versteckt";
 	private static final String DEAD = "Unwählbar";
-	private static final String FALSE_OPTIONAL ="falsch-optional";
+	private static final String FALSE_OPTIONAL ="Falsch-optional";
 	private static final String ALTERNATIVE = "Alternative";
 	private static final String OR = "Oder";
 	private static final String OPTIONAL = "Optional";
-	private static final String INDETHIDDEN = "versteckt & unbestimmbar";
-	private static final String REDUNDANT = "Redundant";
-	private static final String DEAD_CONST = "???";
-	private static final String UNSATISFIABLE_CONST = "Unerfüllbar";
-	private static final String TAUTOLOGY_CONST = "Tautologie";
-	private static final String VOID_MODEL_CONST = "???";	
+	private static final String INDETHIDDEN = "Unbestimmbar versteckt";
+	private static final String REDUNDANT = "Redundantes Constraint";
+	private static final String DEAD_CONST = "Constraint macht feature unerfüllbar";
+	private static final String UNSATISFIABLE_CONST = "Unerfüllbares constraint";
+	private static final String TAUTOLOGY_CONST = "Constraint ist Tautologie";
+	private static final String VOID_MODEL_CONST = "Constraint macht Produktlinie unerfüllbar";
+	private static final String FALSE_OPTIONAL_CONSTRAINT = "Falsch-otionales constraint";	
 	
 	
 	@Override
@@ -83,7 +84,7 @@ public class German implements ILanguage {
 	
 	@Override
 	public String getName() {
-		return name;
+		return NAME;
 	}
 	
 	@Override
@@ -134,5 +135,10 @@ public class German implements ILanguage {
 	@Override
 	public String getOptional() {
 		return OPTIONAL;
+	}
+
+	@Override
+	public String getFalseOptionalConst() {
+		return FALSE_OPTIONAL_CONSTRAINT;
 	}
 }

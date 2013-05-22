@@ -115,7 +115,7 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		for (ILanguage l : languages) {
 			languageCombo.add(l.getName());
 		}
-		languageCombo.setText(English.name);
+		languageCombo.setText(English.NAME);
 		int i = 0;
 		for (String language : languageCombo.getItems()) {
 			if (language.equals(FMPropertyManager.getLanguage().getName())) {
@@ -157,7 +157,7 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		selectorConnection = createSelectorEntry(colorGroup, COLOR_CONNECTION, FMPropertyManager.getConnectionForgroundColor().getRGB(), COLOR_CONNECTION_TIP);
 		selectorConstraint = createSelectorEntry(colorGroup, COLOR_CONSTRAINT, FMPropertyManager.getConstraintBackgroundColor().getRGB(), COLOR_CONSTRAINT_TIP);
 		selectorWarning = createSelectorEntry(colorGroup, COLOR_WARNING, FMPropertyManager.getWarningColor().getRGB(), COLOR_WARNING_TIP);
-		selectorDeadBackground = createSelectorEntry(colorGroup, COLOR_DEAD, FMPropertyManager.getDeadFeatureBackgroundColor().getRGB(), COLOR_DEAD_TIP);
+		selectorDeadBackground = createSelectorEntry(colorGroup, COLOR_ERROR, FMPropertyManager.getDeadFeatureBackgroundColor().getRGB(), COLOR_DEAD_TIP);
 	}
 	
 	/**
@@ -395,7 +395,7 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 	 */
 	private void updateLegendGroup() {
 		buttonHideLegend.setSelection(FMPropertyManager.isLegendHidden());
-		languageCombo.setText(English.name);
+		languageCombo.setText(English.NAME);
 		int i = 0;
 		for (String language : languageCombo.getItems()) {
 			if (language.equals(FMPropertyManager.getLanguage().getName())) {

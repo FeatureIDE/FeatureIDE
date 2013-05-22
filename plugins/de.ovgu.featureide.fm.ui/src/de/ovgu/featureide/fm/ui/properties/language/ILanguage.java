@@ -30,29 +30,40 @@ public interface ILanguage {
 	
 	
 	/**
-	 * @return The word for: "indeterminate hidden"
-	 */	public String getRedundantConst();
+	 * @return The translation for: "Redundant constraint"
+	 */	
+	public String getRedundantConst();
 	
 	/**
-	 * @return The word for: "indeterminate hidden"
-	 */	public String getDeadConst();
+	 * @return The translation for: "False optional constraint"
+	 */	
+	public String getFalseOptionalConst();
+	
+	/**
+	 * @return The translation for: "Dead constraint"
+	 */	
+	public String getDeadConst();
 	 
 	/**
- 	 * @return The word for: "indeterminate hidden"
-	 */	public String getUnsatisfiableConst();
+ 	 * @return The translation for: "Unsatisfiable constraint"
+	 */	
+	public String getUnsatisfiableConst();
 	 
 	/**
-	 * @return The word for: "indeterminate hidden"
-	 */	public String getTautologyConst();
+	 * @return The translation for: "Constraint is tautology"
+	 */	
+	public String getTautologyConst();
 	 
 	/**
-	 * @return The word for: "indeterminate hidden"
-	 */	public String getVoidModelConst();
+	 * @return The translation for: "Constraint makes the model void"
+	 */	
+	public String getVoidModelConst();
 	 
 	 
 	/**
-	 * @return The word for: "indeterminate hidden"
-	 */	public String getIndetHidden();
+	 * @return The translation for: "Indeterminate hidden"
+	 */	
+	public String getIndetHidden();
 	
 	/**
 	 * @return The title of the legend

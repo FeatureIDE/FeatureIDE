@@ -30,6 +30,7 @@ import java.util.List;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.NodeWriter;
+import org.prop4j.SatSolver;
 
 /**
  * Represents a propositional constraint below the feature diagram.
@@ -68,9 +69,32 @@ public class Constraint implements PropertyConstants {
 	
 	/**
 	 * Looks for all dead features if they ares caused dead by this constraint
-	 * @param fm The model
-	 * @param fmDeadFeatures The dead features of this model (This is calculated before, so the need to be generated only once)
+	 * @param solver 
+	 * @param fm The actual model
+	 * @param fmDeadFeatures The dead features the complete model
 	 * @return The dead features caused by this constraint
+	 */
+	public List<Feature> getDeadFeatures(SatSolver solver, FeatureModel fm, AbstractCollection<Feature> fmDeadFeatures) {
+		List<Feature> deadFeaturesBefore = new LinkedList<Feature>();		
+		Node propNode = this.getNode();
+		if (propNode != null) {
+			deadFeaturesBefore = fm.getAnalyser().getDeadFeatures(solver, propNode);
+		}
+
+		List<Feature> deadFeaturesAfter = new LinkedList<Feature>();
+		for (Feature l : fmDeadFeatures) {
+			Feature feature = fm.getFeature(l.getName());
+			// XXX why can the given feature not be found?
+			if (feature != null && contains(feature, deadFeaturesBefore)) {
+				deadFeaturesAfter.add(l);
+			}
+		}
+		fmDeadFeatures.removeAll(deadFeaturesAfter);
+		return deadFeaturesAfter;
+	}
+	
+	/**
+	 * Removes the constraints from the model, and looks for dead features.
 	 */
 	public List<Feature> getDeadFeatures(FeatureModel fm, AbstractCollection<Feature> fmDeadFeatures) {
 		List<Feature> deadFeaturesBefore = null;		
@@ -163,7 +187,14 @@ public class Constraint implements PropertyConstants {
 		return containedFeatureList;
 	}
 
-	public boolean setFalseOptionalFeatures(){
+	public boolean setFalseOptionalFeatures(FeatureModel clone, LinkedList<Feature> fmFalseOptionals){
+		falseOptionalFeatures.clear();
+		falseOptionalFeatures.addAll(clone.getAnalyser().getFalseOptionalFeatures(fmFalseOptionals));
+		fmFalseOptionals.removeAll(falseOptionalFeatures);
+		return !falseOptionalFeatures.isEmpty();
+	}
+	
+	public boolean setFalseOptionalFeatures() {
 		falseOptionalFeatures.clear();
 		boolean found=false;
 		FeatureModel clonedModel = featureModel.clone();

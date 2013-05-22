@@ -262,7 +262,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	}
 
 	public static ILanguage getLanguage() {
-		if (German.name.equals(getString(QN_LANGUAGE))) {
+		if (German.NAME.equals(getString(QN_LANGUAGE))) {
 			return new German();
 		}
 		return new English();

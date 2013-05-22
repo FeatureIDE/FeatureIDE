@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.FreeformLayout;
 import org.eclipse.draw2d.IFigure;
@@ -119,26 +122,39 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 		}
 		
 		StringBuilder toolTip = new StringBuilder(); 
-		if (constraintAttribute == ConstraintAttribute.DEAD){
+		if (!constraint.getDeadFeatures().isEmpty()){
 			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 			toolTip.append(DEAD_FEATURE);
+			ArrayList<String> deadFeatures = new ArrayList<String>(constraint.getDeadFeatures().size());
 			for (Feature dead : constraint.getDeadFeatures()) {
+				deadFeatures.add(dead.toString());
+			}
+			Collections.sort(deadFeatures, String.CASE_INSENSITIVE_ORDER);
+			
+			for (String dead : deadFeatures) {
 				toolTip.append("\n   ");
-				toolTip.append(dead.toString());
+				toolTip.append(dead);
 			}
 			setToolTip(new Label(toolTip.toString()));
 		}
 		
 		if (!constraint.getFalseOptional().isEmpty()) {
-			if (constraintAttribute != ConstraintAttribute.DEAD) {
+			if (constraint.getDeadFeatures().isEmpty()) {
 				setBackgroundColor(FMPropertyManager.getWarningColor());
 			} else {
 				toolTip.append("\n\n");
 			}
-			toolTip.append(FALSE_OPTIONAL);
+			
+			ArrayList<String> falseOptionalFeatures = new ArrayList<String>(constraint.getFalseOptional().size());
 			for (Feature feature : constraint.getFalseOptional()) {
+				falseOptionalFeatures.add(feature.toString());
+			}
+			Collections.sort(falseOptionalFeatures, String.CASE_INSENSITIVE_ORDER);
+			
+			toolTip.append(FALSE_OPTIONAL);
+			for (String feature : falseOptionalFeatures) {
 				toolTip.append("\n   ");
-				toolTip.append(feature.getName());
+				toolTip.append(feature);
 			}
 			setToolTip(new Label(toolTip.toString()));	
 			return;

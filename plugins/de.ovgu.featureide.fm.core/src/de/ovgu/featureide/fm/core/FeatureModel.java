@@ -703,7 +703,7 @@ public class FeatureModel implements PropertyConstants {
 		FeatureModel clone = new FeatureModel();
 		clone.root = root != null ? root.clone() : new Feature(clone, "Root");
 		List<Feature> list = new LinkedList<Feature>();
-		list.add(clone.root);
+		list.add(clone.root.clone());
 		while (!list.isEmpty()) {
 			Feature feature = list.remove(0);
 			clone.featureTable.put(feature.getName(), feature);
@@ -1188,6 +1188,7 @@ public class FeatureModel implements PropertyConstants {
 		return false;
 	}
 
+	@Deprecated
 	public boolean hasDead() {
 		return this.getDeadFeatures().size() > 0;
 	}
@@ -1232,7 +1233,7 @@ public class FeatureModel implements PropertyConstants {
 	}
 	
 	public boolean hasRedundantConst() {
-		for (Constraint c : this.constraints) {
+		for (Constraint c : constraints) {
 			if (c.getConstraintAttribute() == ConstraintAttribute.REDUNDANT)
 				return true;
 		}

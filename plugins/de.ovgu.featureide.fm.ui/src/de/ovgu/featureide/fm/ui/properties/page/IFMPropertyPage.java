@@ -77,8 +77,8 @@ public interface IFMPropertyPage {
 	static final String COLOR_CONCRETE_LABEL = "Concrete feature color:";
 	static final String COLOR_ABSTRACT_LABEL = "Abstract feature color:";
 //	static final String COLOR_HIDDEN = "Hidden feature background color:";
-	static final String COLOR_DEAD = "Dead feature color:";
-	static final String COLOR_CONSTRAINT = "Constraind color:";
+	static final String COLOR_ERROR = "Error color:";
+	static final String COLOR_CONSTRAINT = "Constraint color:";
 	static final String COLOR_WARNING = "Warning color:";
 	static final String COLOR_CONNECTION = "Connection color:";
 	
