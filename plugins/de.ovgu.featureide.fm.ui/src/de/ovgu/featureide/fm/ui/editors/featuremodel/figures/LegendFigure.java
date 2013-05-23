@@ -231,7 +231,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 	private void setWidth(String string) {
         int widthInPixels = createLabel(1, string, FMPropertyManager.getFeatureForgroundColor(), "")
-        		.getPreferredSize().width() + 40;
+        		.getPreferredSize().width + 40;
 		if (widthInPixels > width) {
 			width = widthInPixels;
 		}

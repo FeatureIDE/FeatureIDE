@@ -79,9 +79,9 @@ public class FMPrintAction extends PrintAction {
 			Feature f = featureIter.next();
 			Point p = FeatureUIHelper.getLocation(f);
 			if (p.x < minP.x)
-				minP.setX(p.x);
+				minP.x=p.x;
 			if (p.y < minP.y)
-				minP.setY(p.y);
+				minP.y=p.y;
 		}
 
 		moveFeatures(features, minP);
