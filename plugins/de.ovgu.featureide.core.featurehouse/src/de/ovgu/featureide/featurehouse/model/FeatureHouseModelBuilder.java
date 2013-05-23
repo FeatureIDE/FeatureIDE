@@ -1,18 +1,20 @@
-/* FeatureIDE - An IDE to support feature-oriented software development
- * Copyright (C) 2005-2012  FeatureIDE team, University of Magdeburg
+/* FeatureIDE - A Framework for Feature-Oriented Software Development
+ * Copyright (C) 2005-2013  FeatureIDE team, University of Magdeburg, Germany
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * This file is part of FeatureIDE.
+ * 
+ * FeatureIDE is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
+ * 
+ * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see http://www.gnu.org/licenses/.
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
@@ -20,6 +22,8 @@ package de.ovgu.featureide.featurehouse.model;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.Path;
@@ -29,6 +33,7 @@ import de.ovgu.cide.fstgen.ast.FSTNonTerminal;
 import de.ovgu.cide.fstgen.ast.FSTTerminal;
 import de.ovgu.cide.fstgen.ast.FSTVisitor;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.fstmodel.FSTClassFragment;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
@@ -45,7 +50,8 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 	private FSTModel model;
 
 	private IFeatureProject featureProject;
-	
+
+	private LinkedList<FSTClassFragment> classFragmentStack = new LinkedList<FSTClassFragment>();
 	private FSTRole currentRole = null;
 	private IFile currentFile = null;
 
@@ -68,6 +74,15 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 	
 	public FSTRole getCurrentRole() {
 		return currentRole;
+	}
+	
+	public FSTClassFragment getCurrentClassFragment() {
+		FSTClassFragment currentClassFragment =  classFragmentStack.peek();
+		return (currentClassFragment == null) ? currentRole : classFragmentStack.peek();
+	}
+	
+	public boolean hasCurrentClassFragment() {
+		return currentRole != null || classFragmentStack.peek() != null;
 	}
 
 	/**
@@ -132,6 +147,8 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 			return;
 		}
 		currentRole = model.addRole(currentFeature.getName(), className, currentFile);
+		classFragmentStack.clear();
+		classFragmentStack.push(currentRole);
 	}
 
 	private boolean canCompose() {
@@ -142,15 +159,18 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 
 	private void caseClassDeclaration(FSTNode node) {
 		if (node instanceof FSTNonTerminal && canCompose()) {
-			for (FSTNode child : ((FSTNonTerminal) node).getChildren()) {
+			List<FSTNode> children = ((FSTNonTerminal) node).getChildren();
+			for (FSTNode child : children) {
+				String type = child.getType();
+				ClassBuilder classBuilder = ClassBuilder.getClassBuilder(currentFile, this);
+				
 				if (child instanceof FSTTerminal) {
 					FSTTerminal terminal = (FSTTerminal) child;
-					String type = terminal.getType();
-					ClassBuilder classBuilder = ClassBuilder.getClassBuilder(currentFile, this);
-
 					if (JAVA_NODE_DECLARATION_TYPE1.equals(type)
 							|| JAVA_NODE_DECLARATION_TYPE2.equals(type)) {
 						classBuilder.caseClassDeclarationType(terminal);
+					} else if (JAVA_NODE_MODIFIERS.equals(type)) {
+						classBuilder.caseModifiers(terminal);
 					} else if (JAVA_NODE_EXTENDSLIST.equals(type)) {
 						classBuilder.caseExtendsList(terminal);
 					} else if (JAVA_NODE_IMPLEMENTATIONLIST.equals(type)) {
@@ -191,9 +211,20 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 						classBuilder.caseJMLSpecCaseSeq(terminal);
 					}
 				} else if (child instanceof FSTNonTerminal) {
+					if (JAVA_NODE_INNER_CLASS_TYPE.equals(type)) {
+						String name = child.getName();
+						String className = name.substring(name.lastIndexOf(File.separator) + 1);
+						
+						FSTClassFragment newFragment = new FSTClassFragment(className);
+						classFragmentStack.peek().add(newFragment);
+						classFragmentStack.push(newFragment);
+					} else {
+						classFragmentStack.push(classFragmentStack.peek());
+					}
 					caseClassDeclaration(child);
 				}
 			}
+			classFragmentStack.pop();
 		}
 	}
 

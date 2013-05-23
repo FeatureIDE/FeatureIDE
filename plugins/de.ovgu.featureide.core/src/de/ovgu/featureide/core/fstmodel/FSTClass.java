@@ -35,10 +35,7 @@ public class FSTClass {
 
 	private final HashMap<String, FSTRole> roles = new HashMap<String, FSTRole>();
 	private final String name;
-	
-	private String pckg;
-	private String type;
-	
+
 	public FSTClass(String name) {
 		this.name = name;
 	}
@@ -58,29 +55,5 @@ public class FSTClass {
 
 	public FSTRole getRole(String featureName) {
 		return roles.get(featureName);
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
-	public void setPackage(String pckg) {
-		this.pckg = pckg;
-	}
-
-	/**
-	 * will only be set if using 
-	 * the FeatureHouseComposer
-	 */
-	public String getType() {
-		return type;
-	}
-
-	/**
-	 * will only be set if using 
-	 * the FeatureHouseComposer
-	 */
-	public String getPackage() {
-		return pckg;
 	}
 }

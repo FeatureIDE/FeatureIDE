@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.core.fstmodel;
 
-import java.util.HashSet;
 import java.util.LinkedList;
 
 import javax.annotation.Nonnull;
@@ -34,62 +33,24 @@ import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
  * 
  * @author Jens Meinicke
  */
-public class FSTRole {
-
-	private LinkedList<FSTMethod> methods = new LinkedList<FSTMethod>();
-	private LinkedList<FSTField> fields = new LinkedList<FSTField>();
+public class FSTRole extends FSTClassFragment {
 	private LinkedList<FSTDirective> directives = new LinkedList<FSTDirective>();
-	private LinkedList<FSTSpecCaseSeq> contracts = new LinkedList<FSTSpecCaseSeq>();
-	private IFile file;
+	
 	private FSTFeature feature;
 	private FSTClass fstClass;
-	
-	private final HashSet<String> 
-		importList = new HashSet<String>(),
-		extendList = new HashSet<String>(),
-		implementList = new HashSet<String>();
+	private IFile file;
 		
 	public FSTRole(IFile file, FSTFeature feature, FSTClass fstClass) {
+		super(fstClass.getName());
 		this.feature = feature;
 		this.fstClass = fstClass;
 		this.file = file;
+		setRole(this);
 	}
 
 	public void add(FSTDirective directive) {
 		directives.add(directive);
 		directive.setRole(this);
-	}
-	
-	public void add(RoleElement element) {
-		if (element instanceof FSTMethod) {
-			for (FSTMethod m : methods) {
-				if (m.comparesTo(element)) {
-//					CorePlugin.getDefault().logWarning("Model already contains method " 
-//					+ element.getFullName() + " @ " + feature.getName()+ "/" + fstClass.getName());
-					return;
-				}
-			}
-			methods.add((FSTMethod) element);
-		} else if (element instanceof FSTField){
-			for (FSTField f : fields) {
-				if (f.comparesTo(element)) {
-//					CorePlugin.getDefault().logWarning("Model already contains method " 
-//					+ element.getFullName() + " @ " + feature.getName()+ "/" + fstClass.getName());
-					return;
-				}
-			}
-			fields.add((FSTField) element);
-		} else if(element instanceof FSTSpecCaseSeq){
-			for (FSTSpecCaseSeq c : contracts) {
-				if (c.comparesTo(element)) {
-//					CorePlugin.getDefault().logWarning("Model already contains method " 
-//					+ element.getFullName() + " @ " + feature.getName()+ "/" + fstClass.getName());
-					return;
-				}
-			}
-			contracts.add((FSTSpecCaseSeq) element);
-		}
-		element.setRole(this);
 	}
 	
 	public FSTClass getFSTClass() {
@@ -108,16 +69,6 @@ public class FSTRole {
 		this.file = file;
 	}
 
-	@Nonnull
-	public LinkedList<FSTField> getFields() {
-		return fields;
-	}
-
-	@Nonnull
-	public LinkedList<FSTMethod> getMethods() {
-		return methods;
-	}
-	
 	@Nonnull
 	public LinkedList<FSTDirective> getDirectives() {
 		return directives;
@@ -139,48 +90,5 @@ public class FSTRole {
 			builder.append("\n");
 		}
 		return builder.toString();
-	}
-	
-	/**
-	 * @return
-	 */
-	public LinkedList<FSTSpecCaseSeq> getContracts() {
-		return contracts;
-	}
-	
-	public void addImport(String imp) {
-		importList.add(imp);
-	}
-	
-	public void addImplement(String implement) {
-		implementList.add(implement);
-	}
-
-	public void addExtend(String extend) {
-		extendList.add(extend);
-	}
-	
-	/**
-	 * will only be set if using 
-	 * the FeatureHouseComposer
-	 */
-	public HashSet<String> getImports() {
-		return importList;
-	}
-	
-	/**
-	 * will only be set if using 
-	 * the FeatureHouseComposer
-	 */
-	public HashSet<String> getExtends() {
-		return extendList;
-	}
-	
-	/**
-	 * will only be set if using 
-	 * the FeatureHouseComposer
-	 */
-	public HashSet<String> getImplements() {
-		return implementList;
 	}
 }

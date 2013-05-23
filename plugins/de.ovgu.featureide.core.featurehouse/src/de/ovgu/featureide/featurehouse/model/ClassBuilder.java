@@ -1,18 +1,20 @@
-/* FeatureIDE - An IDE to support feature-oriented software development
- * Copyright (C) 2005-2012  FeatureIDE team, University of Magdeburg
+/* FeatureIDE - A Framework for Feature-Oriented Software Development
+ * Copyright (C) 2005-2013  FeatureIDE team, University of Magdeburg, Germany
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * This file is part of FeatureIDE.
+ * 
+ * FeatureIDE is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
+ * 
+ * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see http://www.gnu.org/licenses/.
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
@@ -65,6 +67,12 @@ public class ClassBuilder {
 	void caseConstructorDeclaration(FSTTerminal terminal) {}
 	
 	/**
+	 * Creates the entry for the given constructor.
+	 * @param terminal FSTTerminal containing the constructor
+	 */
+	void caseInnerClassDeclaration(FSTTerminal terminal) {}
+	
+	/**
 	 * Locks for the correct {@link ClassBuilder} of the given file.
 	 * @return <code>ClassBuilder</code> for the given file
 	 */
@@ -105,13 +113,13 @@ public class ClassBuilder {
 			body = body.replaceAll(" ", "");
 			method.setRefines(body.contains("original("));
 		}
-		modelBuilder.getCurrentRole().add(method);
+		modelBuilder.getCurrentClassFragment().add(method);
 	}
 	
 	protected void addField(String fieldName, String typeName, String modifiers,
 			String body, int beginLine, int endLine) {
 		FSTField field = new FSTField(fieldName, typeName, modifiers, body, beginLine, endLine);
-		modelBuilder.getCurrentRole().add(field);
+		modelBuilder.getCurrentClassFragment().add(field);
 	}
 	
 	public void caseJMLSpecCaseSeq(FSTTerminal terminal) {}
@@ -123,6 +131,8 @@ public class ClassBuilder {
 	public void casePackage(FSTTerminal terminal) {}
 	
 	public void caseImplementsList(FSTTerminal terminal) {}
-	
+
 	public void caseExtendsList(FSTTerminal terminal) {}
+	
+	public void caseModifiers(FSTTerminal terminal) {}
 }

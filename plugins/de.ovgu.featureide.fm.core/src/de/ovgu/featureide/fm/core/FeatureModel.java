@@ -1378,4 +1378,24 @@ public class FeatureModel implements PropertyConstants {
 		}
 		return x + " ] ";
 	}
+	
+	public LinkedList<String> getFeatureList(){
+		featureList.add(this.getRoot().getName());
+		getFeatureList(this.getRoot());
+		return featureList;
+	}
+	
+	private LinkedList<String> featureList = new LinkedList<String>();
+	private LinkedList<String> getFeatureList(Feature feature) {
+		for (Feature child : feature.getChildren()) {
+			featureList.add(child.getName());
+		}
+		
+		for (Feature child : feature.getChildren()) {	
+			getFeatureList(child);
+		}
+		return featureList;
+	}
+	
+	
 }

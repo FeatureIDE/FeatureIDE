@@ -43,7 +43,7 @@ public abstract class RoleElement {
 	protected int endLine;
 	protected int composedLine;
 	
-	private FSTRole role;
+	protected FSTRole role;
 
 	public RoleElement(String name, String type, String modifiers) {
 		this(name, type, modifiers, "", -1, -1);
@@ -153,5 +153,10 @@ public abstract class RoleElement {
 	public boolean comparesTo(RoleElement element) {
 		return getFullName().equals(element.getFullName()) && 
 			getClass().equals(element.getClass());
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return comparesTo((RoleElement)obj);
 	}
 }
