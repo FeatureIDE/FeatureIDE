@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <wizard
+            canFinishEarly="false"
+            category="de.ovgu.featureide.ui.category"
+            class="de.ovgu.featureide.ui.mpl.wizards.NewMultiFeatureProjectWizard"
+            hasPages="true"
+            icon="icons/NewFeatureProjectIcon.png"
+            id="de.ovgu.featureide.ui.mpl.wizards.MultiFeatureProjectWizard"
+            name="MultiFeatureIDE Project"
+            project="true">
+      </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            adaptable="true"
+            id="de.ovgu.featureide.ui.mpl.projectContribution"
+            objectClass="org.eclipse.core.resources.IProject">
+         <action
+               class="de.ovgu.featureide.ui.mpl.actions.BuildExtendedModulesAction"
+               id="de.ovgu.featureide.ui.mpl.ProjectAction"
+               label="Build Extended Modules"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces0"
+               style="push">
+         </action>
+         <action
+               class="de.ovgu.featureide.ui.mpl.actions.BuildWrapperInterfacesAction"
+               id="de.ovgu.featureide.ui.mpl.BuildWrapperInterfacesAction"
+               label="Build Wrapper Interfaces"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces1"
+               style="push">
+         </action>
+         <action
+               class="de.ovgu.featureide.ui.mpl.actions.BuildFeatureInterfacesAction"
+               id="de.ovgu.featureide.ui.mpl.BuildFeatureInterfacesAction"
+               label="Build Feature Interfaces"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces1"
+               style="push">
+         </action>
+         <action
+               class="de.ovgu.featureide.ui.mpl.actions.CompareInterfacesAction"
+               id="de.ovgu.featureide.ui.mpl.CompareInterfacesAction"
+               label="Compare Configuration Interfaces"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces2"
+               style="push">
+         </action>
+         <action
+               class="de.ovgu.featureide.ui.mpl.actions.BuildConfigurationInterfacesAction"
+               id="de.ovgu.featureide.ui.mpl.BuildConfigurationInterfacesAction"
+               label="Build Configuration Interfaces"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces2"
+               style="push">
+         </action>
+         <action
+               class="de.ovgu.featureide.ui.mpl.actions.ChangeViewTagAction"
+               id="de.ovgu.featureide.ui.mpl.ChangeViewTagAction"
+               label="Change View Tag"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces3"
+               style="push">
+         </action>
+         <action
+               class="de.ovgu.featureide.ui.mpl.actions.DeleteViewTagAction"
+               id="de.ovgu.featureide.ui.mpl.DeleteViewTagAction"
+               label="Delete View Tag"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces3"
+               style="push">
+         </action>
+         <action
+               class="de.ovgu.featureide.ui.mpl.actions.NewViewTagAction"
+               id="de.ovgu.featureide.ui.mpl.NewViewTagAction"
+               label="Add View Tag"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces3"
+               style="push">
+         </action>
+         <action
+               class="de.ovgu.featureide.ui.mpl.actions.RefreshAction"
+               id="de.ovgu.featureide.ui.mpl.RefreshAction"
+               label="Refresh"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces4"
+               style="push">
+         </action>
+         <visibility>
+            <objectState
+                  name="nature"
+                  value="de.ovgu.featureide.core.mpl.interfaceProjectNature">
+            </objectState>
+         </visibility>
+      </objectContribution>
+      <objectContribution
+            adaptable="true"
+            id="de.ovgu.featureide.ui.mpl.configContribution"
+            nameFilter="interface_*"
+            objectClass="org.eclipse.core.resources.IFolder">
+         <action
+               class="de.ovgu.featureide.ui.mpl.actions.BuildJavaProjectAction"
+               id="de.ovgu.featureide.ui.mpl.BuildJavaProjectAction"
+               label="Build Java Interface Project"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces"
+               style="push">
+         </action>
+         <visibility>
+            <objectState
+                  name="projectNature"
+                  value="de.ovgu.featureide.core.mpl.interfaceProjectNature">
+            </objectState>
+         </visibility>
+      </objectContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.decorators">
+      <decorator
+            adaptable="true"
+            class="de.ovgu.featureide.ui.mpl.InterfaceProjectDecorator"
+            icon="icons/FeatureProjectDecorator.png"
+            id="de.ovgu.featureide.ui.mpl.InterfaceProjectDecorator"
+            label="Interface Project Decorator"
+            lightweight="true"
+            state="true">
+         <enablement>
+            <objectClass
+                  name="org.eclipse.core.resources.IProject">
+            </objectClass>
+         </enablement>
+      </decorator>
+   </extension>
+
+</plugin>
