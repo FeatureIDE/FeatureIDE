@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="org.deltaj"
+      id="de.ovgu.featureide.deltaj"
       label="FeatureIDE extension for DeltaJ (optional)"
       version="2.6.5.qualifier"
       provider-name="University of Magdeburg">
