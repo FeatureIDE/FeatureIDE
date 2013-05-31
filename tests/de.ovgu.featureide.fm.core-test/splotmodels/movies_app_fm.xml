@@ -1,0 +1,34 @@
+<feature_model name="MoviesApp PL">
+<meta>
+<data name="description">A feature model of a simple movie system product line</data>
+<data name="creator">Carlos Parra et. al</data>
+<data name="email"></data>
+<data name="date">Aug 2009</data>
+<data name="department"></data>
+<data name="organization">INRIA Lille-Nord Europe</data>
+<data name="address">LIFL CNRS UMR 8022, Universit´e de Lille 1, France</data>
+<data name="phone"></data>
+<data name="website"></data>
+<data name="reference">Carlos Parra, Xavier Blanc, and Laurence Duchien, Context Awareness for Dynamic Service-Oriented Product Lines, SPLC 2009, San Francisco, USA</data>
+</meta>
+<feature_tree>
+:r Movies App
+	:m GUI
+		:g [1,1]
+			: Thin
+			: Rich
+	:m DB
+		:g [1,1]
+			: Local
+			: Remote
+				:m Cache Policy
+	:m Network
+		:g [1,1]
+			: Wifi
+			: Bluetooth
+	:o GPS
+		:o Built-In
+</feature_tree>
+<constraints>
+</constraints>
+</feature_model>

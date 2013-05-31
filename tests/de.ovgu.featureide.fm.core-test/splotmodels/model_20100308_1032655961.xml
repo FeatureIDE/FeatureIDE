@@ -1,0 +1,38 @@
+<!-- This model was created online using SPLOT's Feature Model Editor (http://www.splot-research.org) on Wed, Mar 10, 2010 - 5:51 AM  -->
+<feature_model name="Cell Phone">
+<meta>
+<data name="description">SPL of a cell phone</data>
+<data name="creator">Sebastian Oster</data>
+<data name="address"></data>
+<data name="email">Sebastan.Oster@es.tu-darmstadt.de</data>
+<data name="phone"></data>
+<data name="website"></data>
+<data name="organization">TU Darmstadt</data>
+<data name="department"></data>
+<data name="date">March 2010</data>
+<data name="reference"></data>
+</meta>
+<feature_tree>
+:r Cell phone(_r)
+	:m Basis Functions(_r_1)
+		:m Message(_r_1_2)
+			:m SMS(_r_1_2_4)
+			:o MMS(_r_1_2_5)
+		:m Voice Call(_r_1_3)
+	:o Communication(_r_6)
+		:o WLAN(_r_6_7)
+		:o Bluetooth(_r_6_8)
+		:o UMTS(_r_6_9)
+	:m Extras(_r_10)
+		:g (_r_10_11) [1,*] 
+			: MP3(_r_10_11_12)
+			: Camera(_r_10_11_15)
+				:g (_r_10_11_15_16) [1,1] 
+					: 3MP(_r_10_11_15_16_17)
+					: 8MP(_r_10_11_15_16_18)
+</feature_tree>
+<constraints>
+constraint_1:~_r_1_2_5 or _r_10_11_15
+constraint_2:~_r_6_8 or ~_r_10_11_12
+</constraints>
+</feature_model>

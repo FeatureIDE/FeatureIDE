@@ -172,7 +172,7 @@ abstract public class FeatureDiagramLayoutManager{
 		boolean botRight = true;
 		
 		/*
-		 * check of features would intersect with the legend on the edges
+		 * check if features would intersect with the legend on the edges
 		 */
 		for(Feature feature : LayoutableFeature.
 				convertFeatures(featureModel.getFeatures(), showHidden)){
@@ -201,7 +201,7 @@ abstract public class FeatureDiagramLayoutManager{
 			
 		}			
 		/*
-		 * check of constraints would intersect with the legend on the edges
+		 * check if constraints would intersect with the legend on the edges
 		 */
 		if(topRight||topLeft||botLeft||botRight){
 			for(Constraint constraint: featureModel.getConstraints()){
@@ -248,6 +248,5 @@ abstract public class FeatureDiagramLayoutManager{
 			 */
 			featureModel.getLayout().setLegendPos(max.x + FMPropertyManager.getFeatureSpaceX(), min.y);
 		}
-		
 	}
 }

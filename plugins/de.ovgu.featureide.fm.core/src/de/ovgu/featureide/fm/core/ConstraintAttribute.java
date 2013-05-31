@@ -26,6 +26,6 @@ package de.ovgu.featureide.fm.core;
  * @author Cyrill Meyer
  */
 public enum ConstraintAttribute {
-		NORMAL, TAUTOLOGY, UNSATISFIABLE, REDUNDANT, VOID_MODEL, DEAD
+		NORMAL, TAUTOLOGY, UNSATISFIABLE, REDUNDANT, VOID_MODEL, DEAD, FALSE_OPTIONAL
 
 }

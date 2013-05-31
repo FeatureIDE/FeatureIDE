@@ -1,0 +1,73 @@
+<feature_model name="Web_Portal">	
+<meta>
+<data name="description">This feature model describes the configurations of a web portal product line</data>
+<data name="creator">Marcilio Mendonca</data>
+<data name="email">marcilio dot mendonca at gmail dot com</data>
+<data name="date"></data>
+<data name="department">School of Computer Science</data>
+<data name="organization">University of Waterloo</data>
+<data name="address">200 University Ave. West, Waterloo, ON, Canada</data>
+<data name="phone">+1-519-883-7198</data>
+<data name="website">http://gsd.uwaterloo.ca/</data>
+<data name="reference">Marcilio Mendonca, Thiago Bartolomei, and Donald Cowan. Decision-making coordination in collaborative product con�guration. In 23rd Annual ACM Symposium on Applied Computing. ACM, March 2008.</data>
+</meta>
+<feature_tree>
+:r Web Portal (web_portal)
+	:o Additional Services (add_services)
+		:o Site Statistics (site_stats)
+			:m Basic (basic)
+			:o Advanced (advanced)
+		:o Site Search (site_search)
+			:o Images (images)
+			:o Text (text)
+				:m HTML (html)
+				:o Dynamic (dynamic)
+		:o Ad Server (ad_server)
+			:m Reports (reports)
+			:o Pop-ups (popups)
+			:m Banners (banners)
+				:m Image (ban_img)
+				:o Flash (ban_flash)
+			:o Keyword Support (keyword)
+	:m Web Server (web_server)
+		:o Logging (logging)
+			:g [1,1]
+				: DB (db)
+				: File (file)
+		:o Protocols (protocol)
+			:g [1,*]
+				: NTTP (nttp)
+				: FTP (ftp)
+				: HTTPS (https)
+		:m Content (cont)
+			:m Static (static)
+			:o Active (active)
+				:g [1,*]
+					: ASP (asp)
+					: PHP (php)
+					: JSP (jsp)
+					: CGI (cgi)
+	:o Persistence (persistence)
+		:g [1,1]
+			: XML (xml)
+			: Database (database)
+	:o Security (ri)
+		:g [1,*]
+			: Data Storage (data_storage)
+			: Data Transfer (data_transfer)
+			: User Authentication (user_auth)
+	:o Performance (performance)
+		:g [1,1]
+			: Ms (ms)
+			: Sec (sec)
+			: Min (min)
+</feature_tree>	
+<constraints>
+C1:~keyword or text
+C2:~dynamic or active
+C3:~db or database
+C4:~data_transfer or https
+C5: ~file or ftp 
+C6:~https or ~ms
+</constraints>
+</feature_model>

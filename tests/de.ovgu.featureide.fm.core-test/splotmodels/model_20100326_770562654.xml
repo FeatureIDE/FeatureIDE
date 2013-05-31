@@ -1,0 +1,53 @@
+<!-- This model was created online using SPLOT's Feature Model Editor (http://www.splot-research.org) on Fri, Mar 26, 2010 - 7:47 PM  -->
+<feature_model name="Bicycle feature model">
+<meta>
+<data name="description">Bicycle feature model</data>
+<data name="creator">Marcilio Mendonca</data>
+<data name="address"></data>
+<data name="email">marcilio.mendonca@gmail.com</data>
+<data name="phone"></data>
+<data name="website"></data>
+<data name="organization">University of Waterloo</data>
+<data name="department"></data>
+<data name="date">March 2010</data>
+<data name="reference"></data>
+</meta>
+<feature_tree>
+:r Bicycle(_r)
+	:m Frame(_r_1)
+		:g (_r_1_2) [1,1] 
+			: Iron(_r_1_2_3)
+			: Aluminum(_r_1_2_4)
+			: Carbon(_r_1_2_5)
+				:g (_r_1_2_5_6) [1,1] 
+					: White(_r_1_2_5_6_7)
+					: Red(_r_1_2_5_6_8)
+					: Black(_r_1_2_5_6_9)
+	:o Gears(_r_10)
+		:o Front(_r_10_11)
+		:o Rear(_r_10_12)
+	:m Wheels(_r_13)
+	:m Saddle(_r_14)
+	:m Color(_r_15)
+		:g (_r_15_16) [1,1] 
+			: Red(_r_15_16_17)
+			: Green(_r_15_16_18)
+			: Blue(_r_15_16_19)
+	:m Handle bars(_r_20)
+	:o Pedals(_r_21)
+	:o Warranty(_r_22)
+		:g (_r_22_23) [1,1] 
+			: 1 year(_r_22_23_24)
+			: 2 years(_r_22_23_25)
+			: 3 years(_r_22_23_26)
+	:o Maintenance plan(_r_29)
+		:g (_r_29_30) [1,1] 
+			: 2 years(_r_29_30_31)
+			: 3 years(_r_29_30_32)
+			: lifetime(_r_29_30_33)
+</feature_tree>
+<constraints>
+constraint_1:~_r_10_11 or _r_10_12
+constraint_3:~_r_1_2_5 or _r_15_16_17
+</constraints>
+</feature_model>

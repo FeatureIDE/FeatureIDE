@@ -103,6 +103,9 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 		}
 
 		ConstraintAttribute constraintAttribute = constraint.getConstraintAttribute();
+		if (constraintAttribute == ConstraintAttribute.NORMAL) {
+			return;
+		}
 		if (constraintAttribute == ConstraintAttribute.VOID_MODEL){
 			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 			setToolTip(VOID_LABEL);

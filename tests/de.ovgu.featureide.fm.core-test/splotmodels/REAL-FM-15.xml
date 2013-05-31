@@ -1,0 +1,53 @@
+<feature_model name="Key_Word_In_Context_index_systems">
+<meta>
+<data name="description">This feature model represents Parnas' Key Word in Context index system</data>
+<data name="creator">Jing Sun</data>
+<data name="email"></data>
+<data name="date"></data>
+<data name="department"></data>
+<data name="organization"></data>
+<data name="address"></data>
+<data name="phone"></data>
+<data name="website"></data>
+<data name="reference">Jing Sun, Hongyu Zhang, Yuan Fang, and Li Hai Wang. Formal semantics and verification for feature modeling. Engineering of Complex Computer Systems, 2005. ICECCS 2005. Proceedings of 10th IEEE International Conference on, pages 303–312, June 2005</data>
+</meta>
+<feature_tree>
+:r kwic
+	:m input_output
+		:g [1,*]
+			: file
+			: console
+	:m circular_shift
+		:m shift_data
+			:g [1,1]
+				: implicit
+				: explicit (explicit)
+		:o compression (compression)
+			:m shift_processing
+			:g [1,1]
+				: each_line
+				: all_lines (all_lines)
+			:o noise_words
+	:m alpha_sort
+		:m order
+			:g [1,1]
+				: descendant
+				: ascendant
+		:m case_sensitivity
+			:g [1,1]
+				: sensitive
+				: insensitive
+	:m arch_style
+		:g [1,1]
+			: shared_data
+			: adt
+			: implicit_invocation
+			: pipe_and_filter (pipe_and_filter)
+</feature_tree>
+<constraints>
+c1: ~compression or explicit
+c2: ~pipe_and_filter or all_lines
+c3: ~pipe_and_filter or explicit
+</constraints>
+</feature_model>
+

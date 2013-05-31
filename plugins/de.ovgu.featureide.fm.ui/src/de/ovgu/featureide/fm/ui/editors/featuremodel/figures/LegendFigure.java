@@ -136,9 +136,9 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		_abstract = featureModel.hasAbstract();
 		concrete = featureModel.hasConcrete();
 		hidden = featureModel.hasHidden();
-		dead = !featureModel.getCalculatedDeadFeatures().isEmpty(); // same color
+		dead = !featureModel.getCalculatedDeadFeatures().isEmpty();
 		showHidden = featureModel.getLayout().showHiddenFeatures();
-		falseoptional = featureModel.hasFalse();
+		falseoptional = featureModel.hasFalseOptionalFeatures();
 		indetHidden = featureModel.hasIndetHidden();
 		unsatisfiableConst = featureModel.hasUnsatisfiableConst();
 		tautologyConst = featureModel.hasTautologyConst();
@@ -178,8 +178,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			height = height + ROW_HEIGHT;
 			setWidth(language.getAlternative());
 		}
-		// if (and)
-		// height = height + ROW_HEIGHT;
 		if (_abstract && concrete) {
 			height = height + ROW_HEIGHT;
 			height = height + ROW_HEIGHT;

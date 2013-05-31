@@ -57,7 +57,6 @@ public class LegendEditPart extends AbstractGraphicalEditPart {
 	 */
 	@Override
 	protected void createEditPolicies() {
-
 		installEditPolicy(EditPolicy.DIRECT_EDIT_ROLE,
 				new NonResizableEditPolicy());
 

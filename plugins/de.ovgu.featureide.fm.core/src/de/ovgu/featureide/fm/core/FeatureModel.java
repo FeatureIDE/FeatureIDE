@@ -128,6 +128,24 @@ public class FeatureModel implements PropertyConstants {
 	private LinkedList<Feature> falseOptionalFeatures = new LinkedList<Feature>();
 	private LinkedList<Feature> deadFeatures = new LinkedList<Feature>();
 	
+	/**
+	 * Defines whether features should be included into calculations.
+	 * If features are not analyzed, then constraints a also NOT analyzed.
+	 */
+	public boolean calculateFeatures = true;
+	/**
+	 * Defines whether constraints should be included into calculations.
+	 */
+	public boolean calculateConstraints = true;
+	/**
+	 * Defines whether redundant constraints should be calculated.
+	 */
+	public boolean calculateRedundantConstraints = true;
+	/**
+	 * Defines whether analysis should be performed automatically.
+	 */
+	public boolean runCalculationAutomatically = true;
+	
 	/*
 	 * 
 	 * this should be done once at the constructor		
@@ -159,11 +177,7 @@ public class FeatureModel implements PropertyConstants {
 	public int getLayoutAlgorithm() {
 	    return layout.getLayoutAlgorithm();
 	}
-
-	public static void setFeatureLocation(FMPoint newLocation, Feature feature) {
-		feature.setNewLocation(newLocation);
-	}
-
+	
 	public void reset() {
 		if (root != null) {
 			while (root.hasChildren()) {
@@ -210,7 +224,7 @@ public class FeatureModel implements PropertyConstants {
 	 * 
 	 * Feature handling
 	 * 
-	 *#*****************************************************************/
+	 *******************************************************************/
 	public void setRoot(Feature root) {
 		this.root = root;
 	}
@@ -1218,8 +1232,9 @@ public class FeatureModel implements PropertyConstants {
 	}
 	public boolean hasDeadConst() {
 		for (Constraint c : constraints) {
-			if (c.getConstraintAttribute() == ConstraintAttribute.DEAD)
+			if (c.getConstraintAttribute() == ConstraintAttribute.DEAD || !c.getDeadFeatures().isEmpty()) {
 				return true;
+			}
 		}
 		return false;
 	}
@@ -1241,7 +1256,7 @@ public class FeatureModel implements PropertyConstants {
 	}
 
 
-	public boolean hasFalse() {
+	public boolean hasFalseOptionalFeatures() {
 		for (Feature f : featureTable.values()) {
 			if (f.getFeatureStatus() == FeatureStatus.FALSE_OPTIONAL)
 				return true;
@@ -1379,6 +1394,9 @@ public class FeatureModel implements PropertyConstants {
 		return x + " ] ";
 	}
 	
+	/** 
+	 * TODO seems to be duplicated entries for Features! 
+	 **/
 	public LinkedList<String> getFeatureList(){
 		featureList.add(this.getRoot().getName());
 		getFeatureList(this.getRoot());
@@ -1386,6 +1404,7 @@ public class FeatureModel implements PropertyConstants {
 	}
 	
 	private LinkedList<String> featureList = new LinkedList<String>();
+	
 	private LinkedList<String> getFeatureList(Feature feature) {
 		for (Feature child : feature.getChildren()) {
 			featureList.add(child.getName());

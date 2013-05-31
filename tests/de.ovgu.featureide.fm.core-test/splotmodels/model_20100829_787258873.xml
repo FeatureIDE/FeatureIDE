@@ -1,0 +1,85 @@
+<!-- This model was created online using SPLOT's Feature Model Editor (http://www.splot-research.org) on Fri, Sep 17, 2010 - 11:39 AM  -->
+<feature_model name="Plone Meeting">
+<meta>
+<data name="description">Feature model of the Plone Meeting</data>
+<data name="creator">Ebrahim Khalil Abbasi and Arnaud Hubaux</data>
+<data name="address"></data>
+<data name="email">ebrahim.abbasi@fundp.ac.be</data>
+<data name="phone"></data>
+<data name="website"></data>
+<data name="organization">PReCISE Research Centre, Faculty of Computer Science, University of Namur</data>
+<data name="department"></data>
+<data name="date">Aug 2010</data>
+<data name="reference"></data>
+</meta>
+<feature_tree>
+:r Meeting Config(_r)
+	:m General(_r_4)
+		:m Title(_r_4_5)
+		:m Institution ID(_r_4_6)
+		:o Assembly members(_r_4_7)
+	:m Data(_r_8)
+		:m Meeting attributes(_r_8_13)
+			:g (_r_8_13_14) [1,*] 
+				: Start time(_r_8_13_14_15)
+				: End time(_r_8_13_14_16)
+				: Attendees(_r_8_13_14_17)
+				: Place(_r_8_13_14_18)
+		:o Use groups as categories(_r_8_19)
+		:m Item insertion algorithm(_r_8_20)
+			:g (_r_8_20_21) [1,1] 
+				: At the end(_r_8_20_21_22)
+				: Category order(_r_8_20_21_23)
+				: Proposing group order(_r_8_20_21_24)
+	:m Workflow and security(_r_25)
+		:m Meeting workflow(_r_25_26)
+			:g (_r_25_26_27) [1,1] 
+				: Standard workflow(_r_25_26_27_28)
+				: College workflow(_r_25_26_27_29)
+				: Archive workflow(_r_25_26_27_30)
+		:o Zope 3 condition interfave(_r_25_58)
+		:o Zope 3 action interface(_r_25_59)
+	:m User interface(_r_33)
+		:m Meeting display status(_r_33_38)
+			:g (_r_33_38_39) [1,*] 
+				: Archived(_r_33_38_39_40)
+				: Created(_r_33_38_39_41)
+				: Decided(_r_33_38_39_42)
+				: Closed(_r_33_38_39_43)
+				: Published(_r_33_38_39_44)
+		:m Default view(_r_33_46)
+			:g (_r_33_46_49) [1,1] 
+				: My items(_r_33_46_49_50)
+				: All items(_r_33_46_49_51)
+				: Available meetings(_r_33_46_49_52)
+				: Decided meetings(_r_33_46_49_53)
+		:o Item duplication(_r_33_54)
+		:o Open annexes in separate window(_r_33_55)
+	:o Email notification(_r_38)
+	:m Tasks(_r_40)
+		:o Display macro(_r_40_41)
+		:o Task creator(_r_40_42)
+			:g (_r_40_42_43) [1,*] 
+				: Manager(_r_40_42_43_44)
+				: Meeting manager(_r_40_42_43_45)
+				: Owner(_r_40_42_43_46)
+	:m Votes(_r_47)
+		:o Enable voting(_r_47_48)
+		:o Vote encoder(_r_47_49)
+			:g (_r_47_49_50) [1,*] 
+				: Meeting manager(_r_47_49_50_51)
+				: Voter(_r_47_49_50_52)
+		:o Available vote values(_r_47_53)
+			:g (_r_47_53_54) [1,*] 
+				: Yes(_r_47_53_54_55)
+				: No(_r_47_53_54_56)
+				: Abstention(_r_47_53_54_57)
+		:o Default vote value(_r_47_58)
+			:g (_r_47_58_59) [1,1] 
+				: Yes(_r_47_58_59_60)
+				: No(_r_47_58_59_61)
+				: Abstention(_r_47_58_59_62)
+</feature_tree>
+<constraints>
+</constraints>
+</feature_model>

@@ -20,19 +20,12 @@
  */
 package de.ovgu.featureide.fm.core.io.xml;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Stack;
 
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.Attribute;
-import javax.xml.stream.events.EndElement;
-import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.prop4j.And;
 import org.prop4j.AtMost;
@@ -42,518 +35,352 @@ import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Not;
 import org.prop4j.Or;
-import org.prop4j.SatSolver;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
+import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FMPoint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
-import de.ovgu.featureide.fm.core.io.ModelWarning;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
 /**
- * Parses a FeatureModel from XML to the Editor
+ * Parses a FeatureModel from XML
  * 
- * @author Fabian Wielgorz first version
- * @author Maik Lampe & Dariusz Krolikowski optimized XML
+ * @author Jens Meinicke
  */
-public class XmlFeatureModelReader extends AbstractFeatureModelReader {
+public class XmlFeatureModelReader extends AbstractFeatureModelReader implements XMLFeatureModelTags {
 
 	public XmlFeatureModelReader(FeatureModel featureModel) {
 		setFeatureModel(featureModel);
 	}
-	
-	/**
-	 * A kind of mind for the hierarchy of the xml model
-	 */
-	private Stack<String[]> parentStack = new Stack<String[]>();
 
-	/**
-	 * A kind of mind for the hierarchy of the xml constraint model
-	 */
-	private LinkedList<LinkedList<Node>> ruleTemp = new LinkedList<LinkedList<Node>>();
-	
-	/**
-	 * A list which will be filled with the featureNames in their appropriate order
-	 */
-	private ArrayList<String> featureOrderList = new ArrayList<String>();
-
-	private boolean description = false;
-
-	private String attrName;
-	private Feature currentFeature;
-
-	private static final String[] validTagsStruct = {"and", "or", "alt", "feature", "direct-alt", "direct-or", "description"};
-
-	private static final String[] validTagsConst = {"var", "conj", "disj", "imp", "eq", "not", "atmost1", "rule"};
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader#parseInputStream
-	 * (java.io.InputStream)
-	 */
-	
-	protected boolean isInArray(String str, String[] arr){
-		for(int i=0; i<arr.length; i++){
-			if (arr[i].equals(str))
-				return true;
-		}
-		return false;
-	}
-	
-	/* 
-	 * synchronized should prevent the "NullPointer when saving the feature model" 
-	 * see ticket: #277 
-	 * */
 	@Override
-	protected synchronized void parseInputStream(InputStream inputStream)
+	protected synchronized void parseInputStream(final InputStream inputStream)
 			throws UnsupportedModelException {
-		featureOrderList.clear();
-
 		featureModel.reset();
-
+		featureModel.getLayout().showHiddenFeatures(true);
+		featureModel.getLayout().verticalLayout(false);
+		Document  doc = null;
 		try {
-			XMLInputFactory inputFactory = XMLInputFactory.newInstance();
-			XMLEventReader eventReader = inputFactory
-					.createXMLEventReader(inputStream);
-
-			// mode: 0 = start; 1 = struct; 2 = constraints; 3 = comments; 4 = featureOrder
-			int mode = 0;
-			ruleTemp.clear();
-			ruleTemp.add(new LinkedList<Node>());
-			FMPoint constraintLocation = null;
-			featureModel.getLayout().showHiddenFeatures(true);
-			featureModel.getLayout().verticalLayout(false);
-			
-			while (eventReader.hasNext()) {
-				XMLEvent event = eventReader.nextEvent();
-				if (event.isStartElement()) {
-					StartElement currentStartTag = event.asStartElement();
-					String currentTag = currentStartTag.getName().getLocalPart();
-					
-					if (mode == 1) {
-						if (!isInArray(currentTag,validTagsStruct)){
-							throw new UnsupportedModelException("'"
-									+ currentTag + "' is not a valid tag in struct-section.",
-									event.getLocation().getLineNumber());	
-						}
-						
-						if (currentTag.equals("description")) {
-							description  = true;
-						} else {
-												
-							// BEGIN XML-reader is reading information about the
-							// features
-							boolean isMandatory = false;
-							boolean isAbstract = false;
-							boolean isHidden = false;
-							
-							FMPoint featureLocation = null;
-							attrName = "noname";
-							String parent = parentStack.peek()[1];
-		
-							@SuppressWarnings("unchecked")
-							Iterator<Attribute> attributes = currentStartTag
-									.getAttributes();
-							
-							
-							// BEGIN read attributes from XML tag
-							while (attributes.hasNext()) {
-								Attribute attribute = attributes.next();
-								String curName = attribute.getName().getLocalPart();
-								String curValue = attribute.getValue();
-		
-								if (curName == "name") {
-									attrName = curValue;
-								}
-								else if (curName == "mandatory") {
-									if (curValue.equals("true")) {
-										isMandatory = true;
-									} else {
-										isMandatory = false;
-									}
-								}
-								else if (curName == "abstract") {
-									if (curValue.equals("true")) {
-										isAbstract = true;
-									} else {
-										isAbstract = false;
-									}
-								}
-								else if (curName == "hidden") {
-									if (curValue.equals("true")) 
-										isHidden = true;
-									 else 
-										isHidden = false;
-								}
-								else if (curName == "coordinates"){
-									String subStringX = curValue.substring(0, curValue.indexOf(", "));
-									String subStringY = curValue.substring(curValue.indexOf(", ")+2);
-									try {
-										featureLocation = new FMPoint(Integer.parseInt (subStringX),
-												Integer.parseInt (subStringY));
-									} catch (Exception e) {
-										throw new UnsupportedModelException(e.getMessage()
-												+"is no valid Integer Value",
-												event.getLocation().getLineNumber());
-									}			
-									
-								}
-								else{
-									throw new UnsupportedModelException("'"
-											+ curName
-											+ "' is not a valid attribute.",
-											event.getLocation().getLineNumber());
-								}
-							}
-						
-							// END read attributes from XML tag
-							if (!featureModel.getFeatureNames().contains(attrName)
-									&& featureModel.getFMComposerExtension().isValidFeatureName(attrName)) {
-								addFeature(attrName, isMandatory, isAbstract, isHidden,	parent, featureLocation);
-								currentFeature = featureModel.getFeature(attrName);
-							} else {
-								if (!featureModel.getFMComposerExtension().isValidFeatureName(attrName) ) {
-									throw new UnsupportedModelException("'"
-											+ attrName
-											+ "' is not a valid feature name",
-											event.getLocation().getLineNumber());
-								}
-								if (featureModel.getFeatureNames().contains(
-										attrName)) {
-									throw new UnsupportedModelException(
-											"Cannot redefine '" + attrName + "'",
-											event.getLocation().getLineNumber());
-								}
-							}
-		
-							if (currentTag != "feature") {
-								parentStack.push(new String[] { currentTag,
-										attrName });
-							// END XML-reader is reading information about the
-							// features
-							}
-						}
-					} else if (mode == 2) {
-						if (!isInArray(currentTag,validTagsConst)){
-							throw new UnsupportedModelException("'"
-									+ currentTag + "' is not a valid tag in constraints-section.",
-									event.getLocation().getLineNumber());	
-						}
-						if (currentTag.equals("rule")) {
-							
-							@SuppressWarnings("unchecked")
-							Iterator<Attribute> attributes = currentStartTag
-									.getAttributes();
-							
-							while (attributes.hasNext()) {
-								Attribute attribute = attributes.next();
-								String curName = attribute.getName().getLocalPart();
-								String curValue = attribute.getValue();
-								
-								if (curName == "coordinates"){
-									String subStringX = curValue.substring(0, curValue.indexOf(", "));
-									String subStringY = curValue.substring(curValue.indexOf(", ")+2);
-									try {
-										constraintLocation = new FMPoint(Integer.parseInt (subStringX),
-												Integer.parseInt (subStringY));
-									} catch (Exception e) {
-										throw new UnsupportedModelException(e.getMessage()
-												+"is no valid Integer Value",event.getLocation().getLineNumber());
-									}					
-								} else {
-									throw new UnsupportedModelException("'"
-											+ curName
-											+ "' is not a valid attribute.",
-											event.getLocation().getLineNumber());
-								}
-								
-							}
-						} else if (currentTag.equals("constraints")){
-							
-						} else if (currentTag.equals("var")) {
-							String literalName = eventReader.getElementText();
-
-							if (featureModel.getFeatureNames().contains(
-									literalName)) {
-								ruleTemp.getLast()
-										.add(new Literal(literalName));
-							} else {
-								throw new UnsupportedModelException("Feature '"
-										+ literalName + "' does not exist.",
-										event.getLocation().getLineNumber());
-							}
-						} else {
-							ruleTemp.add(new LinkedList<Node>());
-						}
-
-					} 
-					else if (mode == 3) {
-						if (currentTag.equals("c")){
-							featureModel.addComment(eventReader.getElementText()); 
-						}
-						else{
-							throw new UnsupportedModelException("'"
-										+ currentTag + "' is not a valid tag in comment-section.",
-										event.getLocation().getLineNumber());	
-						}
-					}else if (mode == 4){
-						if (currentTag.equals("feature")){
-							@SuppressWarnings("unchecked")
-							Iterator<Attribute> attributes = currentStartTag
-									.getAttributes();
-
-							// BEGIN read attributes from XML tag
-							while (attributes.hasNext()) {
-								Attribute attribute = attributes.next();
-								String curName = attribute.getName().getLocalPart();
-								String curValue = attribute.getValue();
-								
-								if (currentTag.equals("feature") && curName.equals("name") &&
-										featureModel.getFeatureNames().contains(curValue)){
-											featureOrderList.add(curValue);
-								}
-							}
-						} else {
-							throw new UnsupportedModelException("'"
-										+ currentTag + "' is not a valid tag in featureOrder-section.",
-										event.getLocation().getLineNumber());	
-						}
-					}
-					else {
-						if (currentTag.equals("featureModel")) {
-	
-							@SuppressWarnings("unchecked")
-							Iterator<Attribute> attributes = currentStartTag
-									.getAttributes();
-							boolean hasAttributes = false;
-							while (attributes.hasNext()) {
-								hasAttributes = true;
-								Attribute attribute = attributes.next();
-								String curName = attribute.getName().getLocalPart();
-								String curValue = attribute.getValue();
-								
-								if (curName == "chosenLayoutAlgorithm"){
-									try {
-										featureModel.getLayout().setLayout(Integer.parseInt(curValue));
-									} catch (Exception e) {
-										throw new UnsupportedModelException(e.getMessage()
-												+"is no valid Integer Value",
-												event.getLocation().getLineNumber());
-									}			
-								} else if (curName == "showHiddenFeatures"){
-									if(curValue.equals("false")){
-										featureModel.getLayout().showHiddenFeatures(false);
-									}
-								} else if (curName == "horizontalLayout"){
-									if(curValue.equals("true")){
-										featureModel.getLayout().verticalLayout(true);
-									}			
-								}else{
-									throw new UnsupportedModelException("'"
-											+ curName
-											+ "' is not a valid attribute.",
-											event.getLocation().getLineNumber());
-								}
-							}					
-							if(!hasAttributes) {
-								featureModel.getLayout().setLayout(1);
-							}
-						}
-						else if (currentTag.equals("struct")) {
-							parentStack.push(new String[] { currentTag, "root" });	
-							
-							mode = 1;
-						}
-						else if (currentTag.equals("constraints")) {
-							mode = 2;
-						}
-						else if (currentTag.equals("comments")) {
-							mode = 3;
-						}
-						else if (currentTag.equals("featureOrder")) {
-							featureModel.setFeatureOrderInXML(true);
-							
-							@SuppressWarnings("unchecked")
-							Iterator<Attribute> attributes = currentStartTag
-									.getAttributes();
-							// BEGIN read attributes from XML tag
-							while (attributes.hasNext()) {
-								Attribute attribute = attributes.next();
-								String curName = attribute.getName().getLocalPart();
-								String curValue = attribute.getValue();
-								if(currentTag.equals("featureOrder") && curName.equals("userDefined")){
-									featureModel.setFeatureOrderUserDefined(Boolean.parseBoolean(curValue));
-									break;
-								}
-							}
-							mode = 4;
-						}
-					}
-				} else if (event.isEndElement()) { 
-					EndElement endElement = event.asEndElement();
-
-					String currentTag = endElement.getName().getLocalPart();
-					if (mode == 1) {
-						if (!currentTag.equals("feature")) {
-							if (parentStack.peek()[0].equals(currentTag)) {
-								parentStack.pop();
-								
-							}
-							
-						}
-						if (!parentStack.isEmpty()) {
-							currentFeature = featureModel.getFeature(parentStack.peek()[1]);
-						}
-						if (currentTag.equals("struct")) {
-							mode = 0;
-						}
-					} else if (mode == 2) {
-						if (currentTag.equals("constraints")) {
-							mode = 0;
-						}
-						if (currentTag.equals("rule")) {
-							if (!ruleTemp.isEmpty()) {
-								if (!ruleTemp.getFirst().isEmpty()) {
-									Node node = ruleTemp.getFirst().getFirst();
-									try {
-										if (! new SatSolver(node.clone(), 250)
-												.isSatisfiable()) {
-											warnings.add(new ModelWarning("Constraint is unsatisfiable.", event.getLocation().getLineNumber()));
-										}
-										if (!new SatSolver(
-												new Not(node.clone()), 250)
-												.isSatisfiable()) {
-											warnings.add(new ModelWarning("Constraint is tautology.", event.getLocation().getLineNumber()));
-										}
-									} catch (Exception e) {
-										throw new UnsupportedModelException(e.getMessage(),event.getLocation().getLineNumber());
-									}
-
-									featureModel.addPropositionalNode(node);
-									featureModel.getConstraints().get(
-											featureModel.getConstraintCount()-1).setLocation(constraintLocation);
-									constraintLocation = null;
-									ruleTemp.clear();
-									ruleTemp.add(new LinkedList<Node>());
-								}
-							}
-
-						} else if (currentTag.equals("conj")) {
-							And node = new And();
-							node.setChildren(ruleTemp.getLast());
-							ruleTemp.removeLast();
-							ruleTemp.getLast().addLast(node);
-						} else if (currentTag.equals("atmost1")) {
-							AtMost node = new AtMost(1);
-							node.setChildren(ruleTemp.getLast());
-							ruleTemp.removeLast();
-							ruleTemp.getLast().addLast(node);
-						} else if (currentTag.equals("disj")) {
-							Or node = new Or();
-							node.setChildren(ruleTemp.getLast());
-							ruleTemp.removeLast();
-							ruleTemp.getLast().addLast(node);
-						} else if (currentTag.equals("imp")) {
-							Implies node = new Implies(ruleTemp.getLast()
-									.getFirst(), ruleTemp.getLast().getLast());
-							ruleTemp.removeLast();
-							ruleTemp.getLast().add(node);
-						} else if (currentTag.equals("eq")) {
-							Equals node = new Equals(ruleTemp.getLast()
-									.getFirst(), ruleTemp.getLast().getLast());
-							ruleTemp.removeLast();
-							ruleTemp.getLast().add(node);
-						} else if (currentTag.equals("not")) {
-							Not node = new Not(ruleTemp.getLast().getFirst());
-							ruleTemp.removeLast();
-							ruleTemp.getLast().add(node);
-						}
-					}
-					else if (mode == 3){
-						if (currentTag.equals("comments"))
-							mode = 0;
-					}
-					else if (mode == 4){
-						if (currentTag.equals("featureOrder")){
-							featureModel.setFeatureOrderList(featureOrderList);
-							mode = 0;
-						}
-					}
-				} else {
-					if (event.isCharacters()) {
-						if (description) {
-							currentFeature.setDescription(event.toString());
-							description = false;
-						}
-					}
-				}
-				
-			}
-			eventReader.close();
-		} catch (XMLStreamException e) {
-			throw new UnsupportedModelException(e.getMessage(), e.getLocation()
-					.getLineNumber());
+			doc = PositionalXMLReader.readXML(inputStream);
+		} catch (SAXParseException e) {
+			throw new UnsupportedModelException(e.getMessage(), e.getLineNumber());
+		} catch (IOException e) {
+			FMCorePlugin.getDefault().logError(e);
+		} catch (SAXException e) {
+			FMCorePlugin.getDefault().logError(e);
+		} catch (ParserConfigurationException e) {
+			FMCorePlugin.getDefault().logError(e);
 		}
-		// Update the FeatureModel in Editor
+		doc.getDocumentElement().normalize();
+		NodeList nList = doc.getElementsByTagName(FEATURE_MODEL);
+		for (int temp = 0; temp < nList.getLength(); temp++) {
+			org.w3c.dom.Node nNode = nList.item(temp);
+			if (nNode.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
+				Element eElement = (Element) nNode;
+				setFeatureModelAttributes(eElement);
+				parseStruct(eElement.getElementsByTagName(STRUCT));
+				parseConstraints(eElement.getElementsByTagName(CONSTRAINTS));
+				parseCalculations(eElement.getElementsByTagName(CALCULATIONS));
+				parseComments(eElement.getElementsByTagName(COMMENTS));
+				parseFeatureOrder(eElement.getElementsByTagName(FEATURE_ORDER));
+			}
+		}
+	
 		featureModel.handleModelDataLoaded();
 	}
 
 	/**
-	 * Create a new feature and add it to the featureModel.
-	 * 
-	 * @param featureName
-	 *            String with the name of the feature
-	 * @param isMandatory
-	 *            boolean, true it the feature is mandatory
-	 * @param isAbstract
-	 *            boolean, true if the feature is abstract
-	 * @param parent
-	 *            String with the name of the parent feature
+	 * Adds attributes to the feature model
 	 */
-	private void addFeature(String featureName, boolean isMandatory,
-			boolean isAbstract, boolean isHidden, String parent, FMPoint location) {
-		/*
-		 * HOWTO: add a child to the FeaturModel
-		 * 
-		 * first: create an Feature 
-		 * second: set flags like mandatory and
-		 * abstract 
-		 * third: add the Feature to the FeatureModel 
-		 * last: get the parent of the current Feature and add the current Feature as a child
-		 * of this parent (Feature)
-		 * 
-		 * Note: addChild DOESN'T ADD THE FEATURE!
-		 */
-		Feature feat = null;
-		if ("root".equals(parent)) {
-			feat = featureModel.getFeature(featureName);
-			if (feat == null) {
-				FMCorePlugin.getDefault().reportBug(277);
-			} else {
-				feat.setAbstract(isAbstract);
-			}
-		} else {
-			feat = new Feature(featureModel, featureName);
-			feat.setMandatory(isMandatory);
-			feat.setAbstract(isAbstract);
-			feat.setHidden(isHidden);
-			
-			featureModel.addFeature(feat);
-			if ("and".equals(parentStack.peek()[0])) {
-				featureModel.getFeature(parent).setAnd();
-			} else if ("or".equals(parentStack.peek()[0])) {
-				featureModel.getFeature(parent).setOr();
-			} else {
-				featureModel.getFeature(parent).setAlternative();
-			}
-			featureModel.getFeature(parent).addChild(feat);
+	private void setFeatureModelAttributes(Element eElement) {
+		String algorithm = eElement.getAttribute(CHOSEN_LAYOUT_ALGORITHM);
+		if (!algorithm.equals("")) {
+			featureModel.getLayout().setLayout(
+					Integer.parseInt(algorithm));
 		}
-		if(location != null && feat != null){
-			FeatureModel.setFeatureLocation(location, feat);
+		String layout = eElement.getAttribute(HORIZONTAL_LAYOUT);
+		if (layout.equals(TRUE)) {
+			featureModel.getLayout().verticalLayout(false);
+		} else if (layout.equals(FALSE)) {
+			featureModel.getLayout().verticalLayout(true);
+		}
+		String showHidden = eElement.getAttribute(SHOW_HIDDEN_FEATURES);
+		if (showHidden.equals(TRUE)) {
+			featureModel.getLayout().showHiddenFeatures(true);
+		} else if (showHidden.equals(FALSE)) {
+			featureModel.getLayout().showHiddenFeatures(false);
+		}
+	}
+
+	/**
+	 * Parse the struct section to add features to the model.
+	 * @throws UnsupportedModelException 
+	 */
+	private void parseStruct(NodeList struct) throws UnsupportedModelException {
+		for (int temp = 0; temp < struct.getLength(); temp++) {
+			org.w3c.dom.Node nNode = struct.item(temp);
+			if (nNode.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
+				Element eElement = (Element) nNode;
+				parseFeatures(eElement.getChildNodes(), null);
+			}
+		}
+	}
+	
+	private void parseFeatures(NodeList nodeList, Feature parent) throws UnsupportedModelException {
+		for (int count = 0; count < nodeList.getLength(); count++) {
+			org.w3c.dom.Node tempNode = nodeList.item(count);
+			if (tempNode.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
+				String nodeName = tempNode.getNodeName();
+				if (nodeName.equals(DESCRIPTION)) {
+					/* case: description */
+					String nodeValue = tempNode.getFirstChild().getNodeValue();
+					parent.setDescription(nodeValue);
+					continue;
+				}
+				boolean mandatory = false;
+				boolean _abstract = false;
+				boolean hidden = false;
+				String name = "";
+				FMPoint featureLocation = null;
+				if (tempNode.hasAttributes()) {
+					NamedNodeMap nodeMap = tempNode.getAttributes();
+					for (int i = 0; i < nodeMap.getLength(); i++) {
+						org.w3c.dom.Node node = nodeMap.item(i);
+						String attributeName = node.getNodeName();
+						String attributeValue = node.getNodeValue();
+						if (attributeName.equals(ABSTRACT)) {
+							_abstract = attributeValue.equals(TRUE);
+						} else if (attributeName.equals(MANDATORY)) {
+							mandatory = attributeValue.equals(TRUE);
+						} else if (attributeName.equals(NAME)) {
+							name = attributeValue;
+						} else if (attributeName.equals(HIDDEN)) {
+							hidden = attributeValue.equals(TRUE);
+						} else if (attributeName.equals(COORDINATES)) {
+							String subStringX = attributeValue.substring(0, attributeValue.indexOf(", "));
+							String subStringY = attributeValue.substring(attributeValue.indexOf(", ")+2);
+							featureLocation = new FMPoint(Integer.parseInt (subStringX),
+										Integer.parseInt (subStringY));
+						} else {
+							throw new UnsupportedModelException("Unknown feature attribute: " + attributeName, 
+									Integer.parseInt (tempNode.getUserData("lineNumber").toString()));
+						}
+
+					}
+				}
+				Feature f = new Feature(featureModel, name);
+				f.setMandatory(true);
+				if (nodeName.equals(AND)) {
+					f.setAnd();
+				} else if (nodeName.equals(ALT)) {
+					f.setAlternative();
+				} else if (nodeName.equals(OR)) {
+					f.setOr();
+				} else if (nodeName.equals(FEATURE)) {
+					
+				} else {
+					throw new UnsupportedModelException("Unknown feature type: " + nodeName, 
+							Integer.parseInt (tempNode.getUserData("lineNumber").toString()));
+				}
+				f.setAbstract(_abstract);
+				f.setMandatory(mandatory);
+				f.setHidden(hidden);
+				if (featureLocation != null) {
+					f.setNewLocation(featureLocation);
+				}
+				featureModel.addFeature(f);
+				if (parent == null) {
+					featureModel.setRoot(f);
+				} else {
+					parent.addChild(f);
+				}
+				if (tempNode.hasChildNodes()) {
+					parseFeatures(tempNode.getChildNodes(), f);
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Parses the constraint section.
+	 * @throws UnsupportedModelException 
+	 * 
+	 */
+	private void parseConstraints(NodeList nodeList) throws UnsupportedModelException {
+		for (int temp = 0; temp < nodeList.getLength(); temp++) {
+			org.w3c.dom.Node nNode = nodeList.item(temp);
+			if (nNode.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
+				Element eElement = (Element) nNode;
+				parseConstraints2(eElement.getChildNodes());
+			}
+		}
+	}
+	
+	private void parseConstraints2(NodeList nodeList) throws UnsupportedModelException {
+		for (int temp = 0; temp < nodeList.getLength(); temp++) {
+			org.w3c.dom.Node nNode = nodeList.item(temp);
+			if (nNode.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
+				Element eElement = (Element) nNode;
+				Constraint c = new Constraint(featureModel, (Node) parseConstraints3(eElement.getChildNodes()).getFirst());
+				if (eElement.hasAttributes()) {
+					NamedNodeMap nodeMap = eElement.getAttributes();
+					for (int i = 0; i < nodeMap.getLength(); i++) {
+						org.w3c.dom.Node node = nodeMap.item(i);
+						String attributeName = node.getNodeName();
+						String attributeValue = node.getNodeValue();
+						if (attributeName.equals(COORDINATES)) {
+							String subStringX = attributeValue.substring(0, attributeValue.indexOf(", "));
+							String subStringY = attributeValue.substring(attributeValue.indexOf(", ")+2);
+							c.setLocation(new FMPoint(Integer.parseInt (subStringX),
+										Integer.parseInt (subStringY)));
+						} else {
+							throw new UnsupportedModelException("Unknown constraint attribute: " + attributeName, 
+									Integer.parseInt (node.getUserData("lineNumber").toString()));
+						}
+					}
+				}
+				featureModel.addConstraint(c);
+			}
+		}
+	}
+
+	private LinkedList<Node> parseConstraints3(NodeList nodeList) throws UnsupportedModelException {
+		LinkedList<Node> nodes = new LinkedList<Node>();
+		for (int count = 0; count < nodeList.getLength(); count++) {
+			org.w3c.dom.Node tempNode = nodeList.item(count);
+			if (tempNode.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
+				String nodeName = tempNode.getNodeName();
+				if (nodeName.equals(DISJ)) {
+					nodes.add( new Or(parseConstraints3(tempNode.getChildNodes())));
+				} else if (nodeName.equals(CONJ)) {
+					nodes.add( new And(parseConstraints3(tempNode.getChildNodes())));
+				} else if (nodeName.equals(EQ)) {
+					LinkedList<Node> children = parseConstraints3(tempNode.getChildNodes());
+					nodes.add( new Equals(children.get(0), children.get(1)));
+				} else if (nodeName.equals(IMP)) {
+					LinkedList<Node> children = parseConstraints3(tempNode.getChildNodes());
+					nodes.add( new Implies(children.get(0), children.get(1)));
+				} else if (nodeName.equals(NOT)) {
+					nodes.add( new Not((parseConstraints3(tempNode.getChildNodes())).getFirst()));
+				} else if (nodeName.equals(ATMOST1)) {
+					nodes.add( new AtMost(1, parseConstraints3(tempNode.getChildNodes())));
+				} else if (nodeName.equals(VAR)) {
+					nodes.add(new Literal(tempNode.getTextContent()));
+				} else {
+					throw new UnsupportedModelException("Unknown constraint type: " + nodeName, 
+							Integer.parseInt (tempNode.getUserData("lineNumber").toString()));
+				}
+			}
+		}
+		return nodes;
+	}
+
+	/**
+	 * Parses the comment section.
+	 * @throws UnsupportedModelException 
+	 * 
+	 */
+	private void parseComments(NodeList nodeList) throws UnsupportedModelException {
+		for (int count = 0; count < nodeList.getLength(); count++) {
+			org.w3c.dom.Node tempNode = nodeList.item(count);
+			if (tempNode.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
+				if (tempNode.hasChildNodes()) {
+					parseComments2(tempNode.getChildNodes());
+				}
+			}
+		}
+	}
+
+	private void parseComments2(NodeList nodeList) throws UnsupportedModelException {
+		for (int count = 0; count < nodeList.getLength(); count++) {
+			org.w3c.dom.Node tempNode = nodeList.item(count);
+			if (tempNode.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
+				if (tempNode.getNodeName().equals(C)) {
+					featureModel.addComment(tempNode.getTextContent());
+				} else {
+					throw new UnsupportedModelException("Unknown comment attribute: " + tempNode.getNodeName(), 
+							Integer.parseInt (tempNode.getUserData("lineNumber").toString()));
+				}
+			}
+		}
+	}
+
+	/**
+	 * Parses the feature order section.
+	 * @throws UnsupportedModelException 
+	 * 
+	 */
+	private void parseFeatureOrder(NodeList nodeList) throws UnsupportedModelException {
+		ArrayList<String> order = new ArrayList<String>(featureModel.getFeatureTable().size());
+		for (int count = 0; count < nodeList.getLength(); count++) {
+			org.w3c.dom.Node tempNode = nodeList.item(count);
+			if (tempNode.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
+				if (tempNode.hasAttributes()) {
+					NamedNodeMap nodeMap = tempNode.getAttributes();
+					for (int i = 0; i < nodeMap.getLength(); i++) {
+						org.w3c.dom.Node node = nodeMap.item(i);
+						String attributeName = node.getNodeName();
+						String attributeValue = node.getNodeValue();
+						if (attributeName.equals(USER_DEFINED)) {
+							featureModel.setFeatureOrderUserDefined(node.getNodeValue().equals(TRUE));
+						} else if (attributeName.equals(NAME)){
+							order.add(attributeValue);
+						} else {
+							throw new UnsupportedModelException("Unknown feature order attribute: " + attributeName,
+									Integer.parseInt (tempNode.getUserData("lineNumber").toString()));
+						}
+
+					}
+				}
+				if (tempNode.hasChildNodes()) {
+					parseFeatureOrder(tempNode.getChildNodes());
+				}
+			}
+		}
+		if (!order.isEmpty()) {
+			featureModel.setFeatureOrderList(order);
+		}
+	}
+
+	/**
+	 * Parses the calculations.
+	 * @throws UnsupportedModelException 
+	 * 
+	 */
+	private void parseCalculations(NodeList nodeList) throws UnsupportedModelException {
+		for (int count = 0; count < nodeList.getLength(); count++) {
+			org.w3c.dom.Node tempNode = nodeList.item(count);
+			if (tempNode.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
+				if (tempNode.hasAttributes()) {
+					NamedNodeMap nodeMap = tempNode.getAttributes();
+					for (int i = 0; i < nodeMap.getLength(); i++) {
+						org.w3c.dom.Node node = nodeMap.item(i);
+						String nodeName = node.getNodeName();
+						boolean value = node.getNodeValue().equals(TRUE);
+						if (nodeName.equals(CALCULATE_AUTO)) {
+							featureModel.runCalculationAutomatically = value;
+						} else if (nodeName.equals(CALCULATE_CONSTRAINTS)) {
+							featureModel.calculateConstraints = value;
+						} else if (nodeName.equals(CALCULATE_REDUNDANT)) {
+							featureModel.calculateRedundantConstraints = value;
+						} else if (nodeName.equals(CALCULATE_FEATURES)) {
+							featureModel.calculateFeatures = value;
+						} else {
+							throw new UnsupportedModelException("Unknown calculations attribute: " + nodeName, 
+									Integer.parseInt (tempNode.getUserData("lineNumber").toString()));
+						}
+
+					}
+				}
+			}
 		}
 	}
 }

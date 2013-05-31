@@ -126,7 +126,7 @@ public class TFeatureModelAnalyzer {
 	
 	@Test
 	public void TFalseOptional_FM1_C1() {
-		assertEquals(FM1_DATA.get(FM1_C1), ConstraintAttribute.UNSATISFIABLE);
+		assertEquals(FM1_DATA.get(FM1_C1), ConstraintAttribute.FALSE_OPTIONAL);
 	}
 	
 	@Test
@@ -138,7 +138,6 @@ public class TFeatureModelAnalyzer {
 	public void TFalseOptional_FM1_C1_F2() {
 		assertTrue(FM1_C1.getFalseOptional().contains(FM1_F2));
 	}
-	
 	
 	@Test
 	public void TFalseOptional_FM2_F1() {
@@ -157,7 +156,7 @@ public class TFeatureModelAnalyzer {
 	
 	@Test
 	public void TFalseOptional_FM2_C1() {
-		assertEquals(FM2_DATA.get(FM2_C1), ConstraintAttribute.UNSATISFIABLE);
+		assertEquals(FM2_DATA.get(FM2_C1), ConstraintAttribute.FALSE_OPTIONAL);
 	}
 	
 	@Test

@@ -60,9 +60,11 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.progress.UIJob;
 
 import de.ovgu.featureide.fm.core.Constraint;
+import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.FeatureStatus;
 import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -85,6 +87,11 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.RenameAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ReverseOrderAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.SelectionAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ShowHiddenFeaturesAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.AutomatedCalculationsAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.ConstrainsCalculationsAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.FeaturesOnlyCalculationAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.RedundantConstrainsCalculationsAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.RunManualCalculationsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.GraphicalEditPartFactory;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutManager;
@@ -250,7 +257,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 
 		// legendAction = new LegendAction(this, featureModel);
 		legendLayoutAction = new LegendLayoutAction(this, featureModel);
-
+		//legendAction = new LegendAction(this, featureModel);
 		showHiddenFeaturesAction = new ShowHiddenFeaturesAction(this,
 				featureModel);
 
@@ -287,16 +294,23 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	}
 
 	private void fillContextMenu(IMenuManager menu) {
-		IMenuManager subMenu = new MenuManager("Set Layout");
-
+		IMenuManager subMenuCalculations = new MenuManager("Set Calculations");
+		subMenuCalculations.add(new AutomatedCalculationsAction(this, getFeatureModel()));
+		subMenuCalculations.add(new RunManualCalculationsAction(this, getFeatureModel()));
+		subMenuCalculations.add(new Separator());
+		subMenuCalculations.add(new FeaturesOnlyCalculationAction(this, getFeatureModel()));
+		subMenuCalculations.add(new ConstrainsCalculationsAction(this, getFeatureModel()));
+		subMenuCalculations.add(new RedundantConstrainsCalculationsAction(this, getFeatureModel()));
+		
 		showHiddenFeaturesAction.setChecked(getFeatureModel().getLayout()
 				.showHiddenFeatures());
 
+		IMenuManager subMenuLayout = new MenuManager("Set Layout");
 		for (int i = 0; i < setLayoutActions.size(); i++) {
-			subMenu.add(setLayoutActions.get(i));
+			subMenuLayout.add(setLayoutActions.get(i));
 			if (i == 0) {
-				subMenu.add(autoLayoutConstraintAction);
-				subMenu.add(new Separator());
+				subMenuLayout.add(autoLayoutConstraintAction);
+				subMenuLayout.add(new Separator());
 			}
 			boolean isChosen = (i == getFeatureModel().getLayout()
 					.getLayoutAlgorithm());
@@ -325,24 +339,29 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 			menu.add(abstractAction);
 			menu.add(hiddenAction);
 			menu.add(new Separator());
-			menu.add(subMenu);
+			menu.add(subMenuLayout);
+			menu.add(subMenuCalculations);
 			menu.add(new Separator());
 			menu.add(reverseOrderAction);
+			//menu.add(legendAction);
 		} else if (editConstraintAction.isEnabled() && !connectionSelected) {
 			menu.add(createConstraintAction);
 			menu.add(editConstraintAction);
 			menu.add(deleteAction);
 		} else if (legendLayoutAction.isEnabled()) {
 			menu.add(legendLayoutAction);
+			//menu.add(legendAction);
 		} else if (andAction.isEnabled() || orAction.isEnabled()
 				|| alternativeAction.isEnabled()) {
 			connectionEntrys(menu);
 		} else {
 			menu.add(createConstraintAction);
 			menu.add(new Separator());
-			menu.add(subMenu);
+			menu.add(subMenuLayout);
+			menu.add(subMenuCalculations);
 			menu.add(new Separator());
 			menu.add(reverseOrderAction);
+			//menu.add(legendAction);
 		}
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 		// menu.add(legendAction);
@@ -454,11 +473,12 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 			return;
 
 		internRefresh(false);
-
 		if (waiting) {
 			return;
 		}
 		waiting = true;
+		final boolean runAnalysis = featureModelEditor.getFeatureModel().runCalculationAutomatically 
+				&& featureModelEditor.getFeatureModel().calculateFeatures;
 		/**
 		 * This extra job is necessary, else the UI will stop.
 		 */
@@ -489,7 +509,30 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 						if (waiting) {
 							return Status.OK_STATUS;
 						}
+						
+						if (!runAnalysis) {
+							UIJob refreshGraphics = new UIJob(
+									"Updating feature model attributes") {
 
+								@Override
+								public IStatus runInUIThread(
+										IProgressMonitor monitor) {
+									for (Feature f : featureModelEditor.getFeatureModel().getFeatures()) {
+										f.setFeatureStatus(FeatureStatus.NORMAL, true);
+									}
+									for (Constraint c : featureModelEditor.getFeatureModel().getConstraints()) {
+										c.setConstraintAttribute(ConstraintAttribute.NORMAL, true);
+									}
+									getContents().refresh();
+									return Status.OK_STATUS;
+								}
+
+							};
+							refreshGraphics.setPriority(Job.SHORT);
+							refreshGraphics.schedule();
+							return Status.OK_STATUS;
+						}
+						
 						analyzer = getFeatureModel().getAnalyser();
 
 						final HashMap<Object, Object> changedAttributes = analyzer

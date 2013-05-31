@@ -377,16 +377,20 @@ public class FeatureModelAnalyzer {
 	 * benchmarks, see fm.core-test plug-in
 	 * think about performance (no unnecessary or redundant calculations)
 	 */
-	/*
-	 * Because most checks are independent they could be parallelized.
-	 */
 	public HashMap<Object, Object> analyzeFeatureModel(IProgressMonitor monitor) {
 		this.monitor = monitor;
-		beginTask(fm.getConstraintCount());
+		if (fm.calculateConstraints) {
+			beginTask(fm.getConstraintCount() + 2);
+		} else {
+			beginTask(2);
+		}
 		HashMap<Object, Object> oldAttributes = new HashMap<Object, Object>();
 		HashMap<Object, Object> changedAttributes = new HashMap<Object, Object>();
-		updateFeatures(oldAttributes, changedAttributes);
-		if (!canceled()) {
+		
+		if (fm.calculateFeatures) {
+			updateFeatures(oldAttributes, changedAttributes);
+		}
+		if (!canceled() && fm.calculateConstraints) {
 			updateConstraints(oldAttributes, changedAttributes);
 		}
 		// put root always in so it will be refreshed (void/non-void)
@@ -462,36 +466,37 @@ public class FeatureModelAnalyzer {
 			 * Add one constraint after another;
 			 * Add the NEW introduces errors/warnings to the constraint;
 			 */
-			setSubTask("Find redundant constraints");
-			/** Remove redundant constraints for further analysis **/
-			for (Constraint constraint : new ArrayList<Constraint>(fm.getConstraints())) {
-				if (canceled()) {
-					return;
-				}
-				
-				// tautology
-				SatSolver satsolverTAU = new SatSolver(new Not(constraint.getNode().clone()), 1000);
-				try {
-					if (!satsolverTAU.isSatisfiable()) {
-						if (oldAttributes.get(constraint) != ConstraintAttribute.TAUTOLOGY) {
-							changedAttributes.put(constraint, ConstraintAttribute.TAUTOLOGY);
-						}
-						constraint.setConstraintAttribute(ConstraintAttribute.TAUTOLOGY, false);
-						worked(1);
-						continue;
+			if (fm.calculateRedundantConstraints) {
+				setSubTask("Find redundant constraints");
+				/** Remove redundant constraints for further analysis **/
+				for (Constraint constraint : new ArrayList<Constraint>(fm.getConstraints())) {
+					if (canceled()) {
+						return;
 					}
-				} catch (TimeoutException e) {
-					FMCorePlugin.getDefault().logError(e);
+					
+					// tautology
+					SatSolver satsolverTAU = new SatSolver(new Not(constraint.getNode().clone()), 1000);
+					try {
+						if (!satsolverTAU.isSatisfiable()) {
+							if (oldAttributes.get(constraint) != ConstraintAttribute.TAUTOLOGY) {
+								changedAttributes.put(constraint, ConstraintAttribute.TAUTOLOGY);
+							}
+							constraint.setConstraintAttribute(ConstraintAttribute.TAUTOLOGY, false);
+							worked(1);
+							continue;
+						}
+					} catch (TimeoutException e) {
+						FMCorePlugin.getDefault().logError(e);
+					}
+					
+					findRedundantConstraints(clone, constraint, changedAttributes, oldAttributes);
+					if (changedAttributes.containsKey(constraint)) {						
+						worked(1);
+					}	
 				}
-				
-				findRedundantConstraints(clone, constraint, changedAttributes, oldAttributes);
-				if (changedAttributes.containsKey(constraint)) {						
-					worked(1);
-				}
-				
+				clone = fm.clone();
+				clone.constraints.clear();
 			}
-			clone = fm.clone();
-			clone.constraints.clear();
 			/** Look for dead and false optional features **/
 			for (Constraint constraint : new ArrayList<Constraint>(fm.getConstraints())) {
 				if (canceled()) {
@@ -521,9 +526,10 @@ public class FeatureModelAnalyzer {
 				if (fmFalseOptionals.isEmpty()) {
 					constraint.getFalseOptional().clear();
 				} else if (constraint.setFalseOptionalFeatures(clone, fmFalseOptionals)) {
-					changedAttributes.put(constraint, ConstraintAttribute.UNSATISFIABLE);
+					constraint.setConstraintAttribute(ConstraintAttribute.FALSE_OPTIONAL, false);
+					changedAttributes.put(constraint, ConstraintAttribute.FALSE_OPTIONAL);
 				}
-				constraint.setConstraintAttribute(ConstraintAttribute.NORMAL, false);
+				
 				if (!fmDeadFeatures.isEmpty()) {
 					List<Feature> deadFeatures = constraint.getDeadFeatures(solver, clone, fmDeadFeatures);
 					if (!deadFeatures.isEmpty()) {
@@ -535,6 +541,7 @@ public class FeatureModelAnalyzer {
 					constraint.getDeadFeatures().clear();
 				}
 				if (!changedAttributes.containsKey(constraint)) {
+					constraint.setConstraintAttribute(ConstraintAttribute.NORMAL, false);
 					changedAttributes.put(constraint, ConstraintAttribute.NORMAL);
 				}
 
@@ -594,9 +601,13 @@ public class FeatureModelAnalyzer {
 		}
 
 		try {
+			if (canceled()) {
+				return;
+			}
 			/**
 			 * here the saved dead features at the feature model are calculated and set
 			 */
+			setSubTask("Get Dead Features.");
 			LinkedList<Feature> fmDeadFeatures = fm.getCalculatedDeadFeatures();
 			fmDeadFeatures.clear();
 			
@@ -607,7 +618,7 @@ public class FeatureModelAnalyzer {
 				fmDeadFeatures.add(deadFeature);
 				deadFeature.setFeatureStatus(FeatureStatus.DEAD, false);
 			}
-			
+			worked(1);
 			if (canceled()) {
 				return;
 			}
@@ -618,7 +629,9 @@ public class FeatureModelAnalyzer {
 
 		try {
 			if (fm.valid) {
+				setSubTask("Get False Optional Features.");
 				getFalseOptionalFeature(oldAttributes, changedAttributes);
+				worked(1);
 			}
 		} catch (Exception e) {
 			FMCorePlugin.getDefault().logError(e);
