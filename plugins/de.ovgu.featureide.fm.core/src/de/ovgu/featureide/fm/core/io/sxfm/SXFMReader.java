@@ -298,7 +298,7 @@ public class SXFMReader extends AbstractFeatureModelReader {
 				addFeatureToModel(feat);
 
 				if (idTable.containsKey(featId)) throw 
-					new UnsupportedModelException("Id: " + featId + " occured" +
+					new UnsupportedModelException("Feature \"" + featId + "\" occured" +
 					" second time, but may only occur once", line);
 				idTable.put(featId, feat);
 				

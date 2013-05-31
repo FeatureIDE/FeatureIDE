@@ -23,7 +23,6 @@ package de.ovgu.featureide.fm.core.io.sxfm;
 import java.io.StringWriter;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Scanner;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -183,60 +182,64 @@ public class SXFMWriter extends AbstractFeatureModelWriter {
      * Inserts the tags concerning propositional constraints into the DOM 
      * document representation
      * @param doc
-     * @param FeatMod Parent node for the propositonal nodes
+     * @param FeatMod Parent node for the propositional nodes
      */
     private void createPropositionalConstraints(Document doc, Node FeatMod) {
-    	if (featureModel.getPropositionalNodes().isEmpty())
-			return;
+    	// add a node for constraints in any case
     	Node propConstr = doc.createElement("constraints");
-    	Node newNode; 
 		FeatMod.appendChild(propConstr);
-		newNode = doc.createTextNode("\n");
+		Node newNode = doc.createTextNode("\n");
 		propConstr.appendChild(newNode);
+		if (featureModel.getPropositionalNodes().isEmpty())
+			return;
+		// as before
 		int i = 1;
 		for (org.prop4j.Node node : featureModel.getPropositionalNodes()) {
 			String[] symbols =  new String[] {"~", " and ", " or ", 
 					" imp ", " biimp ", ", ", "choose", "atleast", "atmost"};
-			String nodeString = NodeWriter.nodeToString(node, symbols, true);
+			// avoid use of parenthesis from the beginning
+			String nodeString = NodeWriter.nodeToString(node, symbols, false);
+			// remove the external parenthesis
 			if ((nodeString.startsWith("(")) && (nodeString.endsWith(")"))) {
 				nodeString = nodeString.substring(1, nodeString.length() - 1);
 			}
-			nodeString = addBrackets(nodeString);
+			// replace the space before a variable
+			nodeString = nodeString.replace("~ ","~");
 			newNode = doc.createTextNode("C" + i + ":" + nodeString + "\n");			
 			propConstr.appendChild(newNode);
 			i++;
 		}
 	}
     
-    /**
-     * Adding Brackets around negated Literals
-     * @param original String describing propositional constraint
-     * @return
-     */
-    private String addBrackets (String original) {
-    	StringBuilder result = new StringBuilder();
-    	String newLine = original.replace("(", " ( ");
-		newLine = newLine.replace(")", " ) ");
-		newLine = newLine.replace("~", " ~ ");
-    	Scanner scan = new Scanner(newLine);		
-		while (scan.hasNext()) {
-			String token = scan.next();
-			if ((token.equals("~")) && scan.hasNext()) {
-				String token2 = scan.next();
-				if (!token2.equals("(")) {
-					result.append("( ~");
-					result.append(token2);
-					result.append(" )");
-				} else {
-					result.append("( ~(");					
-				}
-			} else {
-				result.append(token);
-			}
-			result.append(" ");
-		}
-		scan.close();
-    	return result.toString();
-    }
+//    /**
+//     * Adding Brackets around negated Literals
+//     * @param original String describing propositional constraint
+//     * @return
+//     */
+//    private String addBrackets (String original) {
+//    	StringBuilder result = new StringBuilder();
+//    	String newLine = original.replace("(", " ( ");
+//		newLine = newLine.replace(")", " ) ");
+//		newLine = newLine.replace("~", " ~ ");
+//    	Scanner scan = new Scanner(newLine);		
+//		while (scan.hasNext()) {
+//			String token = scan.next();
+//			if ((token.equals("~")) && scan.hasNext()) {
+//				String token2 = scan.next();
+//				if (!token2.equals("(")) {
+//					result.append("( ~");
+//					result.append(token2);
+//					result.append(" )");
+//				} else {
+//					result.append("( ~(");					
+//				}
+//			} else {
+//				result.append(token);
+//			}
+//			result.append(" ");
+//		}
+//		scan.close();
+//    	return result.toString();
+//    }
     
 }
