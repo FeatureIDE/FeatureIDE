@@ -7,4 +7,6 @@ Fragment-Host: de.ovgu.featureide.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: University of Magdeburg
 Require-Bundle: org.junit4;bundle-version="4.3.1"
-Bundle-ClassPath: .
+Bundle-ClassPath: .,
+ lib/javabdd.jar,
+ lib/splar.jar
