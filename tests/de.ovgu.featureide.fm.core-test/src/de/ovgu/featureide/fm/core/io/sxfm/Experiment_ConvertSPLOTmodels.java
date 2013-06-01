@@ -13,35 +13,45 @@ package de.ovgu.featureide.fm.core.io.sxfm;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.sxfm.SXFMReader;
-import de.ovgu.featureide.fm.core.io.sxfm.SXFMWriter;
 
 /**
- * convert all the splot models using the double conversion of featureide (read an write).
- * All the resulting models will be read by featureide
+ * convert all the splot models using the double conversion of FeatureIDE (read an write).
+ * All the resulting models will be read by FeatureIDE
+ * 
  * 
  * @author garganti
  * 
  */
+// TODO currently splot models support different attributes then featureIDE model.
+// 		replace System.err.println by assertions if a correct conversion is possible. 
+@RunWith(Parameterized.class)
 public class Experiment_ConvertSPLOTmodels extends Experiment_SPLOTmodels{
 	protected static File MODEL_FILE_FOLDER = new
 			 File("/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/splotmodels/");
+	private final static String DESTINATION = "splotmodels_new";
+	
+	private File modelFile;
 
-	@Test
-	public void testSplotModels() throws Exception {
+	public Experiment_ConvertSPLOTmodels(File modelFile) {
+		this.modelFile = modelFile;
+	}
+	
+	@Parameters
+	public static Collection<Object[]> getoModels() {
 		if (!MODEL_FILE_FOLDER.canRead()){
 			MODEL_FILE_FOLDER = new File("splotmodels");
 		}
-		testModelsIn();
-	}
-
-	private void testModelsIn() throws Exception {
 		Assert.assertTrue(MODEL_FILE_FOLDER.isDirectory());
 		File[] children = MODEL_FILE_FOLDER.listFiles(new FilenameFilter() {
 
@@ -50,30 +60,27 @@ public class Experiment_ConvertSPLOTmodels extends Experiment_SPLOTmodels{
 				return name.endsWith(".xml");
 			}
 		});
-		for (int i = 0; i < children.length; i++) {
-			// Get filename of file or directory
-			File filename = children[i];
-			boolean success = convertSPLOTmodel(filename.getAbsolutePath(), "splotmodels_new");
-			if (! success){
-				System.err.println("CONVERSION "+ filename + " has problems");
-			}
-			
+		Collection<Object[]> params = new ArrayList<Object[]>();
+		for (File f : children) {
+			params.add(new Object[]{f});
 		}
+		return params;
 	}
 
-	/** return true if successful, false if not done, exception if wrong
-	 * 
-	 * @param origin
-	 * @param destination directory where to save the converted file
-	 * @return
+	/**
+	 * Tests if conversion is equivalent.
 	 * @throws Exception
 	 */
-	public boolean convertSPLOTmodel(String origin, String destination)
+	@Test
+	public void convertSPLOTmodel()
 			throws Exception {
+		String origin = modelFile.getAbsolutePath();
+		
 		// preconditions
 		File modelFileOrigin = new File(origin);
 		assert modelFileOrigin.exists() && modelFileOrigin.isFile();
-		assert new File(destination).isDirectory();
+		assert new File(DESTINATION).isDirectory();
+		
 		//
 		// read the same SPLOT file using the FeatureiDE reader
 		FeatureModel fm_original = new FeatureModel();		
@@ -81,13 +88,14 @@ public class Experiment_ConvertSPLOTmodels extends Experiment_SPLOTmodels{
 		try {
 			reader.readFromFile(modelFileOrigin);
 		} catch (UnsupportedModelException e) {
-			System.err.println("SKIPPING " + origin + " cause :" + e.getMessage());
-			return false;
+			System.err.println("SKIPPING " + modelFile + " cause :" + e.getMessage());
+//			assertTrue("SKIPPING " + modelFile + " cause :" + e.getMessage(), false);
+			return;
 		}
 		// save with the same name in the other directory (same format sxfm)
 		// using the featureidewriter
 		SXFMWriter writer = new SXFMWriter(fm_original);
-		String newPath = destination + File.separator + modelFileOrigin.getName();
+		String newPath = DESTINATION + File.separator + modelFileOrigin.getName();
 		File newFile = new File(newPath);
 		try {
 			writer.writeToFile(newFile);
@@ -98,18 +106,19 @@ public class Experiment_ConvertSPLOTmodels extends Experiment_SPLOTmodels{
 			splar.core.fm.FeatureModel newSplotModel = getSplotModel(newPath);
 			// number of nodes (should be the same)
 			int nNodes = originalSplotModel.getNodes().size();
-			int nNodesP = newSplotModel.getNodes().size();
-			System.out.print(nNodes + " : " +  nNodesP + " ");	
-			if (nNodes !=  nNodesP) return false;
+			int nNodesP = newSplotModel.getNodes().size();	
+			if (nNodes !=  nNodesP) {
+				System.err.println("Nodes are not equivalent @ "+ modelFile + " " + nNodes + " : " +  nNodesP);
+			}
+//			assertTrue("Nodes are not equivalent @ "+ modelFile + " " + nNodes + " : " +  nNodesP + " ", nNodes ==  nNodesP);
 			// number of valid products
 			long splotModelNproducts = getNumberOfValidProducts(originalSplotModel);
 			long splotModelNproductsP = getNumberOfValidProducts(newSplotModel);
-			System.out.println(splotModelNproducts + " : " +  splotModelNproductsP);
-			
-			if (splotModelNproducts !=  splotModelNproductsP){
-				return false;
+			if (splotModelNproducts !=  splotModelNproductsP) {
+				System.err.println("Number of products are not equivalent @ "+ modelFile + " " + splotModelNproducts + " : " +  splotModelNproductsP);
 			}
-			return true;
+//			assertTrue("Number of products are not equivalent @ "+ modelFile + " " + splotModelNproducts + " : " +  splotModelNproductsP, 
+//					splotModelNproducts ==  splotModelNproductsP);
 		} finally {
 			newFile.delete();
 		}
