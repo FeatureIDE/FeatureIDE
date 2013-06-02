@@ -170,11 +170,16 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 							featureLocation = new FMPoint(Integer.parseInt (subStringX),
 										Integer.parseInt (subStringY));
 						} else {
-							throw new UnsupportedModelException("Unknown feature attribute: " + attributeName, 
-									Integer.parseInt (tempNode.getUserData("lineNumber").toString()));
+							throwError("Unknown feature attribute: " + attributeName, tempNode);
 						}
 
 					}
+				}
+				if (featureModel.getFeatureTable().containsKey(name)) {
+					throwError("Duplicate entry for feature: " + name, tempNode);
+				}
+				if (!featureModel.getFMComposerExtension().isValidFeatureName(name)) {
+					throwError(name + "is no valid feature name", tempNode);
 				}
 				Feature f = new Feature(featureModel, name);
 				f.setMandatory(true);
@@ -187,8 +192,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 				} else if (nodeName.equals(FEATURE)) {
 					
 				} else {
-					throw new UnsupportedModelException("Unknown feature type: " + nodeName, 
-							Integer.parseInt (tempNode.getUserData("lineNumber").toString()));
+					throwError("Unknown feature type: " + nodeName, tempNode);
 				}
 				f.setAbstract(_abstract);
 				f.setMandatory(mandatory);
@@ -208,7 +212,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 			}
 		}
 	}
-	
+
 	/**
 	 * Parses the constraint section.
 	 * @throws UnsupportedModelException 
@@ -242,8 +246,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 							c.setLocation(new FMPoint(Integer.parseInt (subStringX),
 										Integer.parseInt (subStringY)));
 						} else {
-							throw new UnsupportedModelException("Unknown constraint attribute: " + attributeName, 
-									Integer.parseInt (node.getUserData("lineNumber").toString()));
+							throwError("Unknown constraint attribute: " + attributeName, node);
 						}
 					}
 				}
@@ -275,8 +278,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 				} else if (nodeName.equals(VAR)) {
 					nodes.add(new Literal(tempNode.getTextContent()));
 				} else {
-					throw new UnsupportedModelException("Unknown constraint type: " + nodeName, 
-							Integer.parseInt (tempNode.getUserData("lineNumber").toString()));
+					throwError("Unknown constraint type: " + nodeName, tempNode);
 				}
 			}
 		}
@@ -306,8 +308,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 				if (tempNode.getNodeName().equals(C)) {
 					featureModel.addComment(tempNode.getTextContent());
 				} else {
-					throw new UnsupportedModelException("Unknown comment attribute: " + tempNode.getNodeName(), 
-							Integer.parseInt (tempNode.getUserData("lineNumber").toString()));
+					throwError("Unknown comment attribute: " + tempNode.getNodeName(), tempNode);
 				}
 			}
 		}
@@ -334,8 +335,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 						} else if (attributeName.equals(NAME)){
 							order.add(attributeValue);
 						} else {
-							throw new UnsupportedModelException("Unknown feature order attribute: " + attributeName,
-									Integer.parseInt (tempNode.getUserData("lineNumber").toString()));
+							throwError("Unknown feature order attribute: " + attributeName, tempNode);
 						}
 
 					}
@@ -374,13 +374,24 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 						} else if (nodeName.equals(CALCULATE_FEATURES)) {
 							featureModel.calculateFeatures = value;
 						} else {
-							throw new UnsupportedModelException("Unknown calculations attribute: " + nodeName, 
-									Integer.parseInt (tempNode.getUserData("lineNumber").toString()));
+							throwError("Unknown calculations attribute: " + nodeName, tempNode);
 						}
 
 					}
 				}
 			}
 		}
+	}
+	
+	
+	/**
+	 * @param string
+	 * @param tempNode
+	 * @throws UnsupportedModelException 
+	 * @throws NumberFormatException 
+	 */
+	private void throwError(String message, org.w3c.dom.Node node) throws UnsupportedModelException {
+		throw new UnsupportedModelException(message, 
+				Integer.parseInt (node.getUserData(PositionalXMLReader.LINE_NUMBER_KEY_NAME).toString()));
 	}
 }
