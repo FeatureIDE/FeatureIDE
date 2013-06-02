@@ -11,6 +11,8 @@
  ******************************************************************************/
 package de.ovgu.featureide.fm.core.io.sxfm;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
@@ -94,7 +96,7 @@ public class Experiment_ConvertSPLOTmodels extends Experiment_SPLOTmodels{
 			reader.readFromFile(modelFileOrigin);
 		} catch (UnsupportedModelException e) {
 			System.err.println("SKIPPING " + modelFile + " cause :" + e.getMessage());
-//			assertTrue("SKIPPING " + modelFile + " cause :" + e.getMessage(), false);
+			assertTrue("SKIPPING " + modelFile + " cause :" + e.getMessage(), false);
 			return;
 		}
 		// save with the same name in the other directory (same format sxfm)
@@ -115,15 +117,15 @@ public class Experiment_ConvertSPLOTmodels extends Experiment_SPLOTmodels{
 			if (nNodes !=  nNodesP) {
 				System.err.println("Nodes are not equivalent @ "+ modelFile + " " + nNodes + " : " +  nNodesP);
 			}
-//			assertTrue("Nodes are not equivalent @ "+ modelFile + " " + nNodes + " : " +  nNodesP + " ", nNodes ==  nNodesP);
+			assertTrue("Nodes are not equivalent @ "+ modelFile + " " + nNodes + " : " +  nNodesP + " ", nNodes ==  nNodesP);
 			// number of valid products
 			long splotModelNproducts = getNumberOfValidProducts(originalSplotModel);
 			long splotModelNproductsP = getNumberOfValidProducts(newSplotModel);
 			if (splotModelNproducts !=  splotModelNproductsP) {
 				System.err.println("Number of products are not equivalent @ "+ modelFile + " " + splotModelNproducts + " : " +  splotModelNproductsP);
 			}
-//			assertTrue("Number of products are not equivalent @ "+ modelFile + " " + splotModelNproducts + " : " +  splotModelNproductsP, 
-//					splotModelNproducts ==  splotModelNproductsP);
+			assertTrue("Number of products are not equivalent @ "+ modelFile + " " + splotModelNproducts + " : " +  splotModelNproductsP, 
+					splotModelNproducts ==  splotModelNproductsP);
 		} finally {
 			newFile.delete();
 		}
