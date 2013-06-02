@@ -253,7 +253,10 @@ public class FeatureModel implements PropertyConstants {
 		return new ArrayList<Feature>(featureTable.values());
 	}
 	
+	// TODO this seems to be a false implementation
+	//    	returns root instead of null
 	/**
+	 * 
 	 * @return The {@link Feature} with the given name or <code>null</code> there is no Feature with this name. 
 	 */
 	@CheckForNull

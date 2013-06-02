@@ -55,6 +55,7 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
  * 
  * @author Jens Meinicke
  */
+// TODO revise duplicate code
 public class XmlFeatureModelReader extends AbstractFeatureModelReader implements XMLFeatureModelTags {
 
 	public XmlFeatureModelReader(FeatureModel featureModel) {
@@ -167,8 +168,12 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 						} else if (attributeName.equals(COORDINATES)) {
 							String subStringX = attributeValue.substring(0, attributeValue.indexOf(", "));
 							String subStringY = attributeValue.substring(attributeValue.indexOf(", ")+2);
-							featureLocation = new FMPoint(Integer.parseInt (subStringX),
-										Integer.parseInt (subStringY));
+							try {
+								featureLocation = new FMPoint(Integer.parseInt (subStringX),
+											Integer.parseInt (subStringY));
+							} catch (NumberFormatException e) {
+								throwError(e.getMessage() + "is no valid Integer Value", tempNode);
+							}
 						} else {
 							throwError("Unknown feature attribute: " + attributeName, tempNode);
 						}
@@ -233,24 +238,33 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 			org.w3c.dom.Node nNode = nodeList.item(temp);
 			if (nNode.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
 				Element eElement = (Element) nNode;
-				Constraint c = new Constraint(featureModel, (Node) parseConstraints3(eElement.getChildNodes()).getFirst());
-				if (eElement.hasAttributes()) {
-					NamedNodeMap nodeMap = eElement.getAttributes();
-					for (int i = 0; i < nodeMap.getLength(); i++) {
-						org.w3c.dom.Node node = nodeMap.item(i);
-						String attributeName = node.getNodeName();
-						String attributeValue = node.getNodeValue();
-						if (attributeName.equals(COORDINATES)) {
-							String subStringX = attributeValue.substring(0, attributeValue.indexOf(", "));
-							String subStringY = attributeValue.substring(attributeValue.indexOf(", ")+2);
-							c.setLocation(new FMPoint(Integer.parseInt (subStringX),
-										Integer.parseInt (subStringY)));
-						} else {
-							throwError("Unknown constraint attribute: " + attributeName, node);
+				String nodeName = nNode.getNodeName();
+				if (nodeName.equals(RULE)) {
+					Constraint c = new Constraint(featureModel, (Node) parseConstraints3(eElement.getChildNodes()).getFirst());
+					if (eElement.hasAttributes()) {
+						NamedNodeMap nodeMap = eElement.getAttributes();
+						for (int i = 0; i < nodeMap.getLength(); i++) {
+							org.w3c.dom.Node node = nodeMap.item(i);
+							String attributeName = node.getNodeName();
+							String attributeValue = node.getNodeValue();
+							if (attributeName.equals(COORDINATES)) {
+								String subStringX = attributeValue.substring(0, attributeValue.indexOf(", "));
+								String subStringY = attributeValue.substring(attributeValue.indexOf(", ")+2);
+								try {
+									c.setLocation(new FMPoint(Integer.parseInt (subStringX),
+												Integer.parseInt (subStringY)));
+								} catch (NumberFormatException e) {
+									throwError(e.getMessage() + "is no valid Integer Value", nNode);
+								}
+							} else {
+								throwError("Unknown constraint attribute: " + attributeName, node);
+							}
 						}
 					}
+					featureModel.addConstraint(c);
+				} else {
+					throwError("Unknown constraint node: " + nodeName, nNode);
 				}
-				featureModel.addConstraint(c);
 			}
 		}
 	}
@@ -276,7 +290,12 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 				} else if (nodeName.equals(ATMOST1)) {
 					nodes.add( new AtMost(1, parseConstraints3(tempNode.getChildNodes())));
 				} else if (nodeName.equals(VAR)) {
-					nodes.add(new Literal(tempNode.getTextContent()));
+					String feature = tempNode.getTextContent();
+					if (featureModel.getFeatureTable().containsKey(feature)) {
+						nodes.add(new Literal(feature));
+					} else {
+						throwError("Feature \"" + feature + "\" does not exists", tempNode);
+					}
 				} else {
 					throwError("Unknown constraint type: " + nodeName, tempNode);
 				}
@@ -331,9 +350,13 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 						String attributeName = node.getNodeName();
 						String attributeValue = node.getNodeValue();
 						if (attributeName.equals(USER_DEFINED)) {
-							featureModel.setFeatureOrderUserDefined(node.getNodeValue().equals(TRUE));
+							featureModel.setFeatureOrderUserDefined(attributeValue.equals(TRUE));
 						} else if (attributeName.equals(NAME)){
-							order.add(attributeValue);
+							if (featureModel.getFeatureTable().containsKey(attributeValue)) {
+								order.add(attributeValue);
+							} else {
+								throwError("Feature \"" + attributeValue + "\" does not exists", tempNode);
+							}
 						} else {
 							throwError("Unknown feature order attribute: " + attributeName, tempNode);
 						}
@@ -385,10 +408,9 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 	
 	
 	/**
-	 * @param string
-	 * @param tempNode
-	 * @throws UnsupportedModelException 
-	 * @throws NumberFormatException 
+	 * Throws an error that will be used for error markers
+	 * @param message The error message
+	 * @param tempNode The node that causes the error. this node is used for positioning. 
 	 */
 	private void throwError(String message, org.w3c.dom.Node node) throws UnsupportedModelException {
 		throw new UnsupportedModelException(message, 
