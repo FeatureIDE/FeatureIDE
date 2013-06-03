@@ -157,6 +157,9 @@ public abstract class RoleElement {
 
 	@Override
 	public boolean equals(Object obj) {
-		return comparesTo((RoleElement)obj);
+		if (obj instanceof RoleElement) {
+			return comparesTo((RoleElement)obj);
+		}
+		return false;
 	}
 }
