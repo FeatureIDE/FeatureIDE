@@ -11,15 +11,12 @@
  ******************************************************************************/
 package de.ovgu.featureide.fm.core.io.sxfm;
 
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Collection;
 
 import org.junit.Assert;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -78,7 +75,7 @@ public class Experiment_ConvertSPLOTmodels extends Experiment_SPLOTmodels{
 	 * Tests if conversion is equivalent.
 	 * @throws Exception
 	 */
-	@Test
+//	@Test
 	public void convertSPLOTmodel()
 			throws Exception {
 		String origin = modelFile.getAbsolutePath();
