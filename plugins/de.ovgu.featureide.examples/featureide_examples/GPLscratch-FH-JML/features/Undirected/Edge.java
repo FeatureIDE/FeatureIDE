@@ -2,32 +2,38 @@
  * TODO description
  */
 public class Edge {
-
+	private Node first, second;
+	
 	/*@ CONJUNCTIVE 
-	 ensures this.first.equals(((Edge) ob).first)
-	 	&& this.second.equals(((Edge) ob).second)
-	 	|| this.first.equals(((Edge) ob).second)
-	 	&& this.second.equals(((Edge) ob).first));
+	 requires first != null && second != null; 
+	 ensures \result ==> first.equals(((Edge) ob).first)
+	 	&& second.equals(((Edge) ob).second)
+	 	|| first.equals(((Edge) ob).second)
+	 	&& second.equals(((Edge) ob).first));
 	 @*/				
 	@Override
 	public /*@pure@*/ boolean equals(Object ob) {
 		if (original(ob)) {
 			Edge edge = (Edge) ob;
-			if (this.first.equals(edge.first)
-					&& this.second.equals(edge.second)
-					|| this.first.equals(edge.second)
-					&& this.second.equals(edge.first))
+			if (first.equals(edge.first)
+					&& second.equals(edge.second)
+					|| first.equals(edge.second)
+					&& second.equals(edge.first))
 				return true;
 		}
 		return false;
 	}
 	
-	public boolean connects(Node from, Node to) {
-		if (this.first.equals(from)
-				&& this.second.equals(to)
-				|| this.first.equals(to)
-				&& this.second.equals(from))
+	/*@ EXPLICIT 
+	 requires first != null && second != null && from != null && to != null; 
+	 ensures \result ==> first.equals(from)	&& second.equals(to)
+	 	|| first.equals(to)	&& second.equals(from);
+	 @*/	
+	public /*@pure@*/ boolean connects(Node from, Node to) {
+		if (first.equals(from) && second.equals(to)
+				|| first.equals(to) && second.equals(from))
 			return true;
 		return false;
 	}
+
 }

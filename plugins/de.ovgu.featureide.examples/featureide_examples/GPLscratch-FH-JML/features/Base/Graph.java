@@ -22,7 +22,7 @@ public class Graph {
 			edges.add(edge);
 	}
 
-	/*@
+	/*@ EXPLICIT
 	 requires node != null;
 	 ensures nodes.contains(node);
 	 @*/
@@ -35,13 +35,9 @@ public class Graph {
 		// TODO Implement
 	}
 
-	// public void search(Node n) {
-	// System.out.println("Startknoten: " + nodes.get(0) + " Gesucht: " + n);
-	// }
-
 	/*@ PLAIN
-	 requires  edge != null;
-	 ensures \result =(\exist int i; 0 <= i && i < edges.size); edges.get(i).equals(edge));
+	 requires edge != null && edges != null;
+	 ensures \result == (\exists int i; 0 <= i && i < edges.size); edges.get(i).equals(edge));
 	 @*/
 	public /*@pure@*/ boolean hasEdge(Edge edge) {
 		for(Edge e : edges) {
@@ -51,11 +47,30 @@ public class Graph {
 		return false;
 	}
 	
+	/*@ PLAIN
+	 requires from != null && to != null && edges != null
+	 ensures result == (\exist int i; 0 <= i && < edges.size; edges.get(i).connects(from, to));
+	 @*/
 	public /*@pure@*/ boolean hasConnectingEdge(Node from, Node to) {
 		for(Edge e : edges) {
 			if(e.connects(from, to))
 				return true;
 		}
 		return false;
+	}
+	
+	/*@
+	 requires nodes != null && edges != null && from != null;
+	 ensures (\forall int i; 0 <= i && < \result.size(); edges.get(i).connects(from, to));
+	 @*/
+	public /*@pure@*/ List<Node> getDestinations(Node from) {
+		List<Node> destinations = new ArrayList<Node>();
+		for (Node n : nodes) {
+			for (Edge e : edges) {
+				if(e.connects(from, n))
+					destinations.add(n);
+			}
+		}
+		return destinations;
 	}
 }

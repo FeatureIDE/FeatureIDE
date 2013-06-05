@@ -10,10 +10,6 @@
 					<feature mandatory="true" name="Directed"/>
 					<feature mandatory="true" name="Undirected"/>
 				</alt>
-				<alt name="Search">
-					<feature mandatory="true" name="BFS"/>
-					<feature mandatory="true" name="DFS"/>
-				</alt>
 				<and abstract="true" name="Algorithm">
 					<and name="Connection">
 						<feature name="OptimalConnection"/>

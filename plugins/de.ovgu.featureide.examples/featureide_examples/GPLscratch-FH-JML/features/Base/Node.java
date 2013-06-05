@@ -8,7 +8,7 @@ public class Node {
 		this.name = name;
 	}
 
-	/*@
+	/*@ PLAIN
 	 requires name != null; 
 	 ensures \result == name; 
 	 @*/
@@ -16,20 +16,18 @@ public class Node {
 		return name;
 	}
 
-	/*@ REFINEABLE
-	 requires ob instanceof Edge && ob != null && 
-	 	this.name.equals(((Node) ob).getName());
-	 ensures this == ob;
-	 also
-	 ensures this != ob;
+	/*@ EXPLICIT
+	 requires ob != null; 
+	 ensures \result ==> ob instanceof Edge
+	 	&& name.equals(((Node) ob).getName());
 	 @*/
 	@Override
 	public /*@pure@*/ boolean equals(Object ob) {
-		return (ob != null && (ob instanceof Node) && this.name
+		return (ob != null && (ob instanceof Node) && name
 				.equals(((Node) ob).getName())) ? true : false;
 	}
 	
-	/*@
+	/*@ EXPLICIT
 	 requires name != null; 
 	 ensures \result == name; 
 	 @*/

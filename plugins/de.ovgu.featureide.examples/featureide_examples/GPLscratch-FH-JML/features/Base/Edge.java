@@ -9,16 +9,16 @@ public class Edge {
 		this.second = second;
 	}
 
-	/*@ REFINEABLE
+	/*@ CONUNCITVE
 	 requires ob != null;
-	 ensures ob instanceof Edge;
+	 ensures \result ==> ob instanceof Edge;
 	 @*/
 //	@Override
 	public /*@pure@*/ boolean equals(Object ob) {
 		return (ob instanceof Edge) ? true : false;
 	}
 
-	/*@ REFINEABLE
+	/*@ EXPLICIT
 	 requires first != null && second != null;
 	 @*/
 	@Override

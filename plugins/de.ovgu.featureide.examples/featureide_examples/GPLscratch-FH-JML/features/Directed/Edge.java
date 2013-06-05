@@ -2,27 +2,33 @@
  * TODO description
  */
 public class Edge {
+	private Node first, second;
+	
 	/*@ CONJUNCTIVE
-	 * requires ob != null 
-	 * ensures this.first.equals(((Edge) ob).first) &&
-	 	this.second.equals(((Edge) ob).second)); 
-	 * 
-	 * @
-	 */
+	 requires first != null && second != null; 
+	 ensures \result ==> first.equals(((Edge) ob).first) &&
+	 	second.equals(((Edge) ob).second)); 
+	 @*/
 	@Override
 	public/* @pure@ */boolean equals(Object ob) {
 		if (original(ob)) {
 			Edge edge = (Edge) ob;
-			if (this.first.equals(edge.first)
-					&& this.second.equals(edge.second))
+			if (first.equals(edge.first)
+					&& second.equals(edge.second))
 				return true;
 		}
 		return false;
 	}
 
-	public boolean connects(Node from, Node to) {
-		if (this.first.equals(from) && this.second.equals(to))
+	/*@ EXPLICIT
+	 requires first != null && second != null; 
+	 ensures \result ==> first.equals(from) &&
+	 	second.equals(to);
+	 @*/
+	public /*@pure@*/ boolean connects(Node from, Node to) {
+		if (first.equals(from) && second.equals(to))
 			return true;
 		return false;
 	}
+
 }

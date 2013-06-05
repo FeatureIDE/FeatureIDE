@@ -1,12 +1,19 @@
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * TODO description
  */
 public class Graph {
+	private List<Node> nodes;
+	private List<Edge> edges;
 	
-	// compute transitive closure the get to test if there is an edge
-	public boolean hasConnection(Node source, Node target) {
+	// compute transitive closure to test if there is an edge
+	/*@ PLAIN
+	 requires nodes != null && edges != null && source != null && target != null;
+	 ensures \result ==> TODO
+	 @*/
+	public /*@pure@*/ boolean hasConnection(Node source, Node target) {
 		Graph transitiveClosure = new Graph();
 		for(Edge edge : edges) {
 			transitiveClosure.addEdge(edge);
@@ -25,26 +32,57 @@ public class Graph {
 		return transitiveClosure.hasConnectingEdge(source, target) ? true : false;
 	}
 	
-	// DO DFS -> Memory efficient but not optimalSolution
-	public ArrayList<Node> getConnection(Node source, Node target) {
-		
-		return null;
-//		return doDFS();
+	/*@ PLAIN
+	 requires connection != null && source != null && target != null;
+	 ensures \result ==> (\forall int i; 0 <= i && i < connection.size() -1); 
+	 	hasConnection(connection.get(i), connection.get(i+1));
+	 @*/
+	public /*@pure@*/ boolean isConnection(ArrayList<Node> connection,Node source, Node target ){
+		for(int i = 0; i < connection.size()-1; i++) {
+			if (!hasConnection(connection.get(i), connection.get(i+1)))
+				return false;
+		}
+		return true;
 	}
 	
-	public static void main(String args[]) {
-		Graph g = new Graph();
-		Node a = new Node("a");
-		Node b = new Node("b");
-		Node c = new Node("c");
-		g.addNode(a);
-		g.addNode(b);
-		g.addNode(c);
-		Edge ab = new Edge(a,b);
-		Edge bc = new Edge(b,c);
-		bc.setWeight(12);
-		g.addEdge(ab);
-		g.addEdge(bc);
-		System.out.println(g.hasConnection(a, c));
+	// BFS oder DFS abhängig deren auswahl -> Shortest PATH als Verfeinerung
+	// DO DFS -> Memory efficient but not optimalSolution
+	/*@ PLAIN
+	 	requires source != null && target != null;
+	 	ensures hasConnection(source, target) ==> isConnection(\result, source, target);
+	 @*/
+	public ArrayList<Node> getConnection(Node source, Node target) {
+		setNodesUnvisited();
+		return doDFS(new ArrayList<Node>(), source, target);
+	}
+	
+	/*@
+	 requires path != null && source != null && target != null;
+	 ensures TODO;
+	 @*/
+	private ArrayList<Node> doDFS(ArrayList<Node> path, Node source, Node target) {
+		source.setVisited(true);
+		path.add(source);
+		if (source.equals(target))
+			return path;
+			
+		for (Node n : getDestinations(source)) {
+			if (!n.isVisited() && doDFS(path, n, target) != null)
+				return path;
+		}
+		
+		path.remove(source);
+		return null;
+	}
+	
+	/*@ EXPLICIT
+	 requires nodes != null;
+	 ensures (\forall int i; 0 <= i && i < nodes.size()); 
+	 	nodes.get(i).visible = false);
+	 @*/
+	private void setNodesUnvisited() {
+		for (Node n : nodes) {
+			n.setVisited(false);
+		}
 	}
 }

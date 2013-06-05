@@ -2,7 +2,7 @@
  * TODO description
  */
 public class Node {
-	boolean visited;
+	private boolean visited;
 
 	public boolean isVisited() {
 		return visited;
