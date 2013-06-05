@@ -3,19 +3,33 @@
 		<struct>
 			<and abstract="true" mandatory="true" name="GPLscratchFHJML">
 				<and mandatory="true" name="Base">
-					<feature name="Directed"/>
+					<feature name="Weighted"/>
+					<feature name="MaxEdges"/>
 				</and>
-				<alt abstract="true" mandatory="true" name="Weight">
-					<feature mandatory="true" name="Unweighted"/>
-					<feature mandatory="true" name="Weighted"/>
+				<alt abstract="true" mandatory="true" name="Direction">
+					<feature mandatory="true" name="Directed"/>
+					<feature mandatory="true" name="Undirected"/>
 				</alt>
-				<alt abstract="true" name="Search">
+				<alt name="Search">
 					<feature mandatory="true" name="BFS"/>
 					<feature mandatory="true" name="DFS"/>
 				</alt>
+				<and abstract="true" name="Algorithm">
+					<and name="Connection">
+						<feature name="OptimalConnection"/>
+						<feature name="ShortestConnection"/>
+					</and>
+				</and>
 			</and>
 		</struct>
-		<constraints/>
+		<constraints>
+			<rule>
+				<imp>
+					<var>ShortestConnection</var>
+					<var>Weighted</var>
+				</imp>
+			</rule>
+		</constraints>
 		<comments/>
 		<featureOrder userDefined="false"/>
 	</featureModel>

@@ -2,52 +2,27 @@
  * TODO description
  */
 public class Edge {
-	private Node source, dest;
-	private double weight;
+	private Node first, second;
 
-	public Edge(Node source, Node dest) {
-		this(source, dest, Double.POSITIVE_INFINITY);
+	public Edge(Node first, Node second) {
+		this.first = first;
+		this.second = second;
 	}
 
-	public Edge(Node source, Node dest, double weight) {
-		this.source = source;
-		this.dest = dest;
-		this.weight = weight;
-	}
-
+	/*@ REFINEABLE
+	 requires ob != null;
+	 ensures ob instanceof Edge;
+	 @*/
 //	@Override
-	/*
-	 * @ requires ob instanceof Edge && ob != null &&
-	 * this.source.equals(((Edge)ob).getSource()) &&
-	 * this.dest.equals(((Edge)ob).getDest())
-	 * ensures this == ob
-	 * also
-	 * ensures this != ob
-	 */
-	public boolean equals(Object ob) {
-		if (ob != null && (ob instanceof Edge)) {
-			Edge e = (Edge) ob;
-			if (this.source.equals(e.getSource())
-					&& this.dest.equals(e.getDest()))
-				return true;
-		}
-		return false;
+	public /*@pure@*/ boolean equals(Object ob) {
+		return (ob instanceof Edge) ? true : false;
 	}
 
+	/*@ REFINEABLE
+	 requires first != null && second != null;
+	 @*/
 	@Override
-	public String toString() {
-		return source + " -" + weight + "-> " + dest;
-	}
-
-	public Node getSource() {
-		return source;
-	}
-
-	public Node getDest() {
-		return dest;
-	}
-
-	public double getWeight() {
-		return weight;
+	public /*@pure@*/ String toString() {
+		return "Edge contains Node: " + first + " and Node " + second;
 	}
 }

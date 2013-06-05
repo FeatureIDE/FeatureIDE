@@ -6,56 +6,56 @@ import java.util.ArrayList;
  */
 public class Graph {
 	private List<Node> nodes;
+	private List<Edge> edges;
 
 	public Graph() {
 		nodes = new ArrayList<Node>();
+		edges = new ArrayList<Edge>();
 	}
 
-	public void print() {
-		for (Node n : nodes) {
-			System.out.println("# NODE " + n.getName()
-					+ " mit folgenden Kanten: ");
-			for (Edge e : n.getNeighbors()) {
-				System.out.println(e);
-			}
-		}
-	}
-	
-	public void search(Node n) {
-		System.out.println("Startknoten: " + nodes.get(0) + " Gesucht: " + n);
+	/*@ EXPLICIT
+	 requires edge!= null && nodes.contains(edge.first) && nodes.contains(edge.second);
+	 ensures hasEdge(edge);
+	 @*/
+	public void addEdge(Edge edge) {
+		if (!edges.contains(edge))
+			edges.add(edge);
 	}
 
-	// add Methods
-	public void addEdge(Node source, Node dest) {
-		addEdge(source, dest, Double.POSITIVE_INFINITY);
-	}
-
-	// TODO WEIGHT JA / NEIN?
 	/*@
-	 * requires !source.getNeighbors().contains(new Edge(source, dest, weight))
-	 * ensures source.getNeighbors().add(new Edge(source, dest, weight));
-	 * ensures addEdge(dest, source, weight)
-	 */
-	public void addEdge(Node source, Node dest, double weight) {
-		Edge s = new Edge(source, dest, weight);
-		if (!source.getNeighbors().contains(s)) {
-			source.getNeighbors().add(s);
-			//add Edge from src -> dest
-			addEdge(dest, source, weight);
-		}
-	}
-
-	
-	/*@
-	 * requires !nodes.contains(node)
-	 * ensures nodes.add(node)
-	 */
+	 requires node != null;
+	 ensures nodes.contains(node);
+	 @*/
 	public void addNode(Node node) {
 		if (!nodes.contains(node))
 			nodes.add(node);
 	}
 
-	public List<Node> getNodes() {
-		return nodes;
+	public void print() {
+		// TODO Implement
+	}
+
+	// public void search(Node n) {
+	// System.out.println("Startknoten: " + nodes.get(0) + " Gesucht: " + n);
+	// }
+
+	/*@ PLAIN
+	 requires  edge != null;
+	 ensures \result =(\exist int i; 0 <= i && i < edges.size); edges.get(i).equals(edge));
+	 @*/
+	public /*@pure@*/ boolean hasEdge(Edge edge) {
+		for(Edge e : edges) {
+			if(e.equals(edge))
+				return true;
+		}
+		return false;
+	}
+	
+	public /*@pure@*/ boolean hasConnectingEdge(Node from, Node to) {
+		for(Edge e : edges) {
+			if(e.connects(from, to))
+				return true;
+		}
+		return false;
 	}
 }

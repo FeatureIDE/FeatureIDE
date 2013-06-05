@@ -1,35 +1,40 @@
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * TODO description
  */
 public class Node {
 	private String name;
-	// adjazenzlist
-	private List<Edge> neighbors;
 
 	public Node(String name) {
 		this.name = name;
-		this.neighbors = new ArrayList<Edge>();
 	}
 
-	public String getName() {
+	/*@
+	 requires name != null; 
+	 ensures \result == name; 
+	 @*/
+	public /*@pure@*/ String getName() {
 		return name;
 	}
 
-	public List<Edge> getNeighbors() {
-		return neighbors;
-	}
-
+	/*@ REFINEABLE
+	 requires ob instanceof Edge && ob != null && 
+	 	this.name.equals(((Node) ob).getName());
+	 ensures this == ob;
+	 also
+	 ensures this != ob;
+	 @*/
 	@Override
-	public boolean equals(Object ob) {
+	public /*@pure@*/ boolean equals(Object ob) {
 		return (ob != null && (ob instanceof Node) && this.name
 				.equals(((Node) ob).getName())) ? true : false;
 	}
 	
+	/*@
+	 requires name != null; 
+	 ensures \result == name; 
+	 @*/
 	@Override
-	public String toString() {
+	public /*@pure@*/ String toString() {
 		return name;
 	}
 }

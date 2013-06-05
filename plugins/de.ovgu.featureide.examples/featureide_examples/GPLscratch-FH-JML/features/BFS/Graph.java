@@ -5,10 +5,10 @@ import java.util.LinkedList;
  */
 public class Graph {
 	
-	public void search(Node n) {
-		original(n);
-		BFS bfs = new BFS(this, n);
-		bfs.run();
-		
-	}
+//	public void search(Node n) {
+//		original(n);
+//		BFS bfs = new BFS(this, n);
+//		bfs.run();
+//		
+//	}
 }

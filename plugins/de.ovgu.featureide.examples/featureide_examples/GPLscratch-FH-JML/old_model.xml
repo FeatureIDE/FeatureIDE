@@ -9,6 +9,10 @@
 					<feature mandatory="true" name="Unweighted"/>
 					<feature mandatory="true" name="Weighted"/>
 				</alt>
+				<alt abstract="true" name="Search">
+					<feature mandatory="true" name="BFS"/>
+					<feature mandatory="true" name="DFS"/>
+				</alt>
 			</and>
 		</struct>
 		<constraints/>
