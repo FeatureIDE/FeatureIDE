@@ -15,7 +15,15 @@ public class Edge {
 		this.weight = weight;
 	}
 
-	@Override
+//	@Override
+	/*
+	 * @ requires ob instanceof Edge && ob != null &&
+	 * this.source.equals(((Edge)ob).getSource()) &&
+	 * this.dest.equals(((Edge)ob).getDest())
+	 * ensures this == ob
+	 * also
+	 * ensures this != ob
+	 */
 	public boolean equals(Object ob) {
 		if (ob != null && (ob instanceof Edge)) {
 			Edge e = (Edge) ob;

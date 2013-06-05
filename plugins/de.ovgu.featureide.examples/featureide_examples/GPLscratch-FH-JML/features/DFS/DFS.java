@@ -9,7 +9,8 @@ public class DFS {
 	Graph g;
 	Node start;
 	Node target;
-	String pre ="";
+	String pre = "";
+
 	public DFS(Graph g, Node n) {
 		this.g = g;
 		start = g.getNodes().get(0);
@@ -25,22 +26,22 @@ public class DFS {
 	}
 
 	private Node dfs(Node n) {
-		System.out.println(pre+"Expand: " + n);
-		pre+="\t";
+		System.out.println(pre + "Expand: " + n);
+		pre += "\t";
 		n.setVisited(true);
 		if (n.equals(target)) {
 			return n;
 		}
 		for (Edge e : n.getNeighbors()) {
 			if (!e.getDest().isVisited()) {
-				System.out.println(pre+"Nächster Knoten: " + e.getDest());
+				System.out.println(pre + "Nächster Knoten: " + e.getDest());
 				Node r = dfs(e.getDest());
 				if (r != null)
 					return r;
 			}
 		}
-		pre = pre.substring(0,pre.length()-1);
-		
+		pre = pre.substring(0, pre.length() - 1);
+
 		return null;
 
 	}

@@ -30,15 +30,26 @@ public class Graph {
 		addEdge(source, dest, Double.POSITIVE_INFINITY);
 	}
 
+	// TODO WEIGHT JA / NEIN?
+	/*@
+	 * requires !source.getNeighbors().contains(new Edge(source, dest, weight))
+	 * ensures source.getNeighbors().add(new Edge(source, dest, weight));
+	 * ensures addEdge(dest, source, weight)
+	 */
 	public void addEdge(Node source, Node dest, double weight) {
 		Edge s = new Edge(source, dest, weight);
-		if (!source.getNeighbors().contains(s))
+		if (!source.getNeighbors().contains(s)) {
 			source.getNeighbors().add(s);
-		Edge d = new Edge(dest, source, weight);
-		if (!dest.getNeighbors().contains(d))
-			dest.getNeighbors().add(d);
+			//add Edge from src -> dest
+			addEdge(dest, source, weight);
+		}
 	}
 
+	
+	/*@
+	 * requires !nodes.contains(node)
+	 * ensures nodes.add(node)
+	 */
 	public void addNode(Node node) {
 		if (!nodes.contains(node))
 			nodes.add(node);
