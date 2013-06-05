@@ -1,4 +1,4 @@
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -6,37 +6,30 @@ import java.util.List;
  */
 public class Node {
 	private String name;
+	// adjazenzlist
 	private List<Edge> neighbors;
-	
-	public Node(String name){
+
+	public Node(String name) {
 		this.name = name;
-		this.neighbors = new LinkedList<Edge>();
-	}
-	
-	public void addNeighbor(Node n) {
-		if (!hasNeighbor(n))
-			neighbors.add(new Edge(this, n));
+		this.neighbors = new ArrayList<Edge>();
 	}
 
-	public boolean hasNeighbor(Node n) {
-		if (getNeighborEdge(n) != null)
-			return true;
-		return false;
-	}
-
-	public Edge getNeighborEdge(Node n) {
-		for (Edge e : neighbors) {
-			if (e.getN2().getName().equals(n.getName()))
-				return e;
-		}
-		return null;
-	}
-	
 	public String getName() {
 		return name;
 	}
-	
-	public List<Edge> getNeighbors(){
+
+	public List<Edge> getNeighbors() {
 		return neighbors;
+	}
+
+	@Override
+	public boolean equals(Object ob) {
+		return (ob != null && (ob instanceof Node) && this.name
+				.equals(((Node) ob).getName())) ? true : false;
+	}
+	
+	@Override
+	public String toString() {
+		return name;
 	}
 }

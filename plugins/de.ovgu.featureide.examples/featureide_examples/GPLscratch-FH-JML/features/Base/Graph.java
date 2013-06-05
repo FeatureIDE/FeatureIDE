@@ -6,66 +6,42 @@ import java.util.ArrayList;
  */
 public class Graph {
 	private List<Node> nodes;
-	private List<Edge> edges;
 
 	public Graph() {
 		nodes = new ArrayList<Node>();
-		edges = new ArrayList<Edge>();
 	}
 
-	// print Methods
 	public void print() {
-		printNodes();
-		System.out.println();
-		printEdges();
-
-	}
-
-	public void printNodes() {
-		System.out.println("### NODES ###");
 		for (Node n : nodes) {
-			System.out.println(n.getName());
-			for(Edge e : n.getNeighbors()) {
-				System.out.println("Edge to: " + e.getN2().getName());
+			System.out.println("# NODE " + n.getName()
+					+ " mit folgenden Kanten: ");
+			for (Edge e : n.getNeighbors()) {
+				System.out.println(e);
 			}
 		}
 	}
-
-	public void printEdges() {
-		System.out.println("### EDGES ###");
-		for (Edge e : edges) {
-			printEdge(e);
-		}
-	}
-
-	private void printEdge(Edge e) {
-		System.out.println(e.getN1().getName() + " - " + e.getN2().getName());
-	}
-
-	public void addEdge(Node n1, Node n2) {
-		n1.addNeighbor(n2);
-		n2.addNeighbor(n1);
-	}
 	
-	// Node Methods
+	public void search(Node n) {
+		System.out.println("Startknoten: " + nodes.get(0) + " Gesucht: " + n);
+	}
+
+	// add Methods
+	public void addEdge(Node source, Node dest) {
+		addEdge(source, dest, Double.POSITIVE_INFINITY);
+	}
+
+	public void addEdge(Node source, Node dest, double weight) {
+		Edge s = new Edge(source, dest, weight);
+		if (!source.getNeighbors().contains(s))
+			source.getNeighbors().add(s);
+		Edge d = new Edge(dest, source, weight);
+		if (!dest.getNeighbors().contains(d))
+			dest.getNeighbors().add(d);
+	}
+
 	public void addNode(Node node) {
-		if (!hasNode(node)) {
+		if (!nodes.contains(node))
 			nodes.add(node);
-		}
-	}
-
-	public boolean hasNode(Node node) {
-		if (getNode(node.getName()) != null)
-			return true;
-		return false;
-	}
-
-	public Node getNode(String nodeName) {
-		for (Node n : nodes) {
-			if (n.getName().equals(nodeName))
-				return n;
-		}
-		return null;
 	}
 
 	public List<Node> getNodes() {

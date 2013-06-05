@@ -2,21 +2,44 @@
  * TODO description
  */
 public class Edge {
-	private Node n1, n2;
-	public boolean isEdge(Node n1, Node n2) {
-		if((this.n1.getName().equals(n1.getName())
-				|| this.n1.getName().equals(n2.getName()))
-				&& (this.n2.getName().equals(n1.getName())
-				|| this.n2.getName().equals(n2.getName())))
-			return true;
+	private Node source, dest;
+	private double weight;
+
+	public Edge(Node source, Node dest) {
+		this(source, dest, Double.POSITIVE_INFINITY);
+	}
+
+	public Edge(Node source, Node dest, double weight) {
+		this.source = source;
+		this.dest = dest;
+		this.weight = weight;
+	}
+
+	@Override
+	public boolean equals(Object ob) {
+		if (ob != null && (ob instanceof Edge)) {
+			Edge e = (Edge) ob;
+			if (this.source.equals(e.getSource())
+					&& this.dest.equals(e.getDest()))
+				return true;
+		}
 		return false;
 	}
-	
-	public Node getN1() {
-		return n1;
+
+	@Override
+	public String toString() {
+		return source + " -" + weight + "-> " + dest;
 	}
-	
-	public Node getN2() {
-		return n2;
+
+	public Node getSource() {
+		return source;
+	}
+
+	public Node getDest() {
+		return dest;
+	}
+
+	public double getWeight() {
+		return weight;
 	}
 }
