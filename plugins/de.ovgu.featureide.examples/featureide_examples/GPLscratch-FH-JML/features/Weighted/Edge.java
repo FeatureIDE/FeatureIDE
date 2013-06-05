@@ -25,4 +25,12 @@ public class Edge {
 	public void setWeight(Integer weight) {
 		this.weight = weight;
 	}
+	
+	/*@ EXPLICIT
+	 requires \original && weight != null;
+	 @*/
+//	@Override
+	public /*@pure@*/ String toString() {
+		return original() + "Weight " + weight  + ": ";
+	}
 }

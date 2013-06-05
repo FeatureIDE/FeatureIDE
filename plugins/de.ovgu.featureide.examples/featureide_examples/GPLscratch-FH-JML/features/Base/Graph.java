@@ -31,8 +31,17 @@ public class Graph {
 			nodes.add(node);
 	}
 
+	/*@ EXPLICIT TODO
+	 requires nodes != null;
+	 @*/
 	public void print() {
-		// TODO Implement
+		System.out.println("## NODES ##");
+		for (Node n : nodes) 
+			System.out.println("\t"+n);
+		
+		System.out.println("## EDGES ##");
+		for(Edge e : edges)
+			System.out.println("\t" + e);
 	}
 
 	/*@ PLAIN
@@ -59,18 +68,17 @@ public class Graph {
 		return false;
 	}
 	
-	/*@
-	 requires nodes != null && edges != null && from != null;
-	 ensures (\forall int i; 0 <= i && < \result.size(); edges.get(i).connects(from, to));
+	/*@PLAIN
+	 	ensures \result = nodes;
 	 @*/
-	public /*@pure@*/ List<Node> getDestinations(Node from) {
-		List<Node> destinations = new ArrayList<Node>();
-		for (Node n : nodes) {
-			for (Edge e : edges) {
-				if(e.connects(from, n))
-					destinations.add(n);
-			}
-		}
-		return destinations;
+	public /*@pure@*/ List<Node> getNodes() {
+		return nodes;
+	}
+	
+	/*@PLAIN
+ 		ensures \result = edges;
+ 	@*/
+	public /*@pure@*/ List<Edge> getEdges() {
+		return edges;
 	}
 }

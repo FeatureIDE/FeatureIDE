@@ -35,5 +35,13 @@ public class Edge {
 			return true;
 		return false;
 	}
+	
+	/*@ EXPLICIT
+	 requires \original;
+	 @*/
+//	@Override
+	public /*@pure@*/ String toString() {
+		return original()+ first + " -- " + second;
+	}
 
 }

@@ -9,10 +9,10 @@ public class Graph {
 	
 	/*@ EXPLICIT
 	 requires \original && MAXEDGES != null;
-	 ensures countEdges() <= MAXEDGES ==> \original;
+	 ensures countEdges() < MAXEDGES ==> \original;
 	 @*/
 	public void addEdge(Edge edge) {
-		if(countEdges() <= MAXEDGES)
+		if(countEdges() < MAXEDGES)
 			original(edge);
 	}
 	

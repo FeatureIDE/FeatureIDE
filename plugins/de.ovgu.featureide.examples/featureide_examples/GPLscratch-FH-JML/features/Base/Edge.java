@@ -21,8 +21,8 @@ public class Edge {
 	/*@ EXPLICIT
 	 requires first != null && second != null;
 	 @*/
-	@Override
+//	@Override
 	public /*@pure@*/ String toString() {
-		return "Edge contains Node: " + first + " and Node " + second;
+		return "Edge: ";
 	}
 }
