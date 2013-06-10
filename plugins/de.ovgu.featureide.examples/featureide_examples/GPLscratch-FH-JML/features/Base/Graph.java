@@ -1,13 +1,14 @@
-import java.util.List;
 import java.util.ArrayList;
-
+import java.util.Collection;
+import java.util.Collections;
 /**
  * Base is the implementation of a simple graph
  */
 public class Graph {
-	private List<Node> nodes;
-	private List<Edge> edges;
-
+	private Collection<Node> nodes;
+	private Collection<Edge> edges;
+	
+	// Base Implementation allowing multiple Edges / Nodes
 	public Graph() {
 		nodes = new ArrayList<Node>();
 		edges = new ArrayList<Edge>();
@@ -18,8 +19,7 @@ public class Graph {
 	 ensures hasEdge(edge);
 	 @*/
 	public void addEdge(Edge edge) {
-		if (!edges.contains(edge))
-			edges.add(edge);
+		edges.add(edge);
 	}
 
 	/*@ EXPLICIT
@@ -27,8 +27,7 @@ public class Graph {
 	 ensures nodes.contains(node);
 	 @*/
 	public void addNode(Node node) {
-		if (!nodes.contains(node))
-			nodes.add(node);
+		nodes.add(node);
 	}
 
 	/*@ EXPLICIT TODO
@@ -36,12 +35,35 @@ public class Graph {
 	 @*/
 	public void print() {
 		System.out.println("## NODES ##");
-		for (Node n : nodes) 
+		for (Node n : sortNodes(nodes)) 
 			System.out.println("\t"+n);
 		
 		System.out.println("## EDGES ##");
-		for(Edge e : edges)
+		for(Edge e : sortEdges(edges))
 			System.out.println("\t" + e);
+	}
+	
+	
+	/*@
+	 requires nodes != null && nodes instanceof List<Node>;
+	 ensures \result == (\forall int i; 0 <= i && i < nodes.size() -1;
+	  	nodes.toArray()[i].compareTo(nodes.toArray()[i+1]) = -1 );
+	 @*/
+	public Collection<Node> sortNodes(Collection<Node> nodes) {
+		List<Node> list = new ArrayList<Node>(nodes);
+		Collections.sort(list);
+		return list;
+	}
+	
+	/*@
+	 requires edges != null && edges instanceof List<Edge>;
+	 ensures \result == (\forall int i; 0 <= i && i < edges.size() -1;
+	  	edges.toArray()[i].compareTo(edges.toArray()[i+1]) = -1 );
+	 @*/
+	public Collection<Edge> sortEdges(Collection<Edge> edges) {
+		List<Edge> list = new ArrayList<Edge>(edges);
+		Collections.sort(list);
+		return list;
 	}
 
 	/*@ PLAIN
@@ -71,14 +93,14 @@ public class Graph {
 	/*@PLAIN
 	 	ensures \result = nodes;
 	 @*/
-	public /*@pure@*/ List<Node> getNodes() {
+	public /*@pure@*/ Collection<Node> getNodes() {
 		return nodes;
 	}
 	
 	/*@PLAIN
  		ensures \result = edges;
  	@*/
-	public /*@pure@*/ List<Edge> getEdges() {
+	public /*@pure@*/ Collection<Edge> getEdges() {
 		return edges;
 	}
 }

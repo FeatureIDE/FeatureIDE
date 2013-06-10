@@ -36,8 +36,8 @@ public class Test {
 //	
 	void addEdges() {
 		for (int j = 0; j < MAXEDGES; j++) {
-			graph.addEdge(new Edge(graph.getNodes().get(RANDOM.nextInt(MAX)),
-					graph.getNodes().get(RANDOM.nextInt(MAX))));
+			graph.addEdge(new Edge((Node)graph.getNodes().toArray()[RANDOM.nextInt(MAX)],
+					(Node)graph.getNodes().toArray()[RANDOM.nextInt(MAX)]));
 		}
 	}
 }

@@ -1,10 +1,11 @@
+import java.util.Collection;
 import java.util.List;
 
 /**
  * TODO description
  */
 public class Graph {
-	private List<Edge> edges;
+	private Collection<Edge> edges;
 	private final static Integer MAXEDGES = 10;
 	
 	/*@ EXPLICIT

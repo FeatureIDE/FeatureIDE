@@ -10,6 +10,10 @@
 					<feature mandatory="true" name="Directed"/>
 					<feature mandatory="true" name="Undirected"/>
 				</alt>
+				<or abstract="true" name="Unique">
+					<feature mandatory="true" name="UniqueEdges"/>
+					<feature mandatory="true" name="UniqueNodes"/>
+				</or>
 				<and abstract="true" name="Algorithm">
 					<and name="Connection">
 						<feature name="OptimalConnection"/>

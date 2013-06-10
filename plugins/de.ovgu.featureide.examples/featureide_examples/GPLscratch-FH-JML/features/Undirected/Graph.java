@@ -1,12 +1,13 @@
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
  * TODO description
  */
 public class Graph {
-	private List<Node> nodes;
-	private List<Edge> edges;
+	private Collection<Node> nodes;
+	private Collection<Edge> edges;
 	
 	/*@
 	 requires nodes != null && edges != null && from != null;

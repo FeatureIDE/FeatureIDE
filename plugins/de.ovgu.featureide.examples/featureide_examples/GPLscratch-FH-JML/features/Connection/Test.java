@@ -11,8 +11,8 @@ public class Test {
 	public void run() {
 		original();
 		
-		Node source = graph.getNodes().get(RANDOM.nextInt(graph.getNodes().size()));
-		Node target = graph.getNodes().get(RANDOM.nextInt(graph.getNodes().size()));
+		Node source = (Node) graph.getNodes().toArray()[RANDOM.nextInt(graph.getNodes().size())];
+		Node target = (Node) graph.getNodes().toArray()[RANDOM.nextInt(graph.getNodes().size())];
 		// Is there Path between source and target?
 		System.out.println("Gibt es eine Verbindung von " + source + " nach " + target + "?");
 		System.out.println("\t"+graph.hasConnection(source, target));

@@ -36,6 +36,19 @@ public class Edge {
 		return false;
 	}
 	
+	/*@
+	requires first != null && second != null;
+	ensures \result > 17;
+	 @*/
+	@Override
+	public int hashCode() {
+		int hash = 17;
+		int hashMultiplikator = 79;
+		hash = hashMultiplikator * hash
+				+ first.hashCode() + second.hashCode();
+		return hash;
+	}
+	
 	/*@ EXPLICIT
 	 requires \original;
 	 @*/
