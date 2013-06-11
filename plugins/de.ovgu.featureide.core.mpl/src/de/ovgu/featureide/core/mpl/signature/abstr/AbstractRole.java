@@ -1,7 +1,7 @@
 package de.ovgu.featureide.core.mpl.signature.abstr;
 
+import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.TreeMap;
 
 import de.ovgu.featureide.core.mpl.signature.ViewTag;
 
@@ -14,7 +14,7 @@ public abstract class AbstractRole extends AbstractClassFragment {
 		this.featureName = featureName;
 		
 		members = new LinkedList<AbstractSignature>();
-		innerClasses = new TreeMap<AbstractClassSignature, AbstractClassFragment>();
+		innerClasses = new HashMap<AbstractClassSignature, AbstractClassFragment>();
 	}
 	
 	protected AbstractRole(AbstractRole role, ViewTag viewTag) {

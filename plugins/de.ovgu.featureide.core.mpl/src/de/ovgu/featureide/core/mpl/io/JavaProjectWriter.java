@@ -72,7 +72,7 @@ public class JavaProjectWriter extends AbstractWriter {
 						IFolder sourceFolder = javaProject.getProject().getFolder(Path.fromPortableString("src"));
 						try {
 							IPackageFragment featurePackage = javaProject.getPackageFragmentRoot(sourceFolder).createPackageFragment(cls.getSignature().getPackage(), true, null);
-							featurePackage.createCompilationUnit(cls.getFullName() + ".java", cls.toString(), true, null);
+							featurePackage.createCompilationUnit(cls.getSignature().getName() + ".java", cls.toString(), true, null);
 						} catch (JavaModelException e) {
 							MPLPlugin.getDefault().logError(e);
 						} 

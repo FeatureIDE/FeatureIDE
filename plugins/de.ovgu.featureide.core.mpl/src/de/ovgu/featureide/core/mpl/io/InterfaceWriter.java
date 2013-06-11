@@ -393,9 +393,9 @@ public class InterfaceWriter extends AbstractWriter {
 								folder = CorePlugin.createFolder(interfaceProject.getProjectReference(), path);
 		
 								if (all) {
-									writeToFile(folder.getFile(role.getFullName() + IOConstants.EXTENSION_JAVA), role.toShortString());
+									writeToFile(folder.getFile(role.getSignature().getName() + IOConstants.EXTENSION_JAVA), role.toShortString());
 								} else {
-									writeToFile(folder.getFile(role.getFullName() + IOConstants.EXTENSION_JAVA), role.toString());
+									writeToFile(folder.getFile(role.getSignature().getName() + IOConstants.EXTENSION_JAVA), role.toString());
 								}
 								
 							}

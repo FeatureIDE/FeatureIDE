@@ -45,10 +45,6 @@ public abstract class AbstractClassFragment {
 	protected AbstractClassFragment(AbstractClassSignature signature) {
 		this.signature = signature;
 	}
-	
-	public String getFullName() {
-		return signature.getFullName();
-	}
 
 	public AbstractClassSignature getSignature() {
 		return signature;

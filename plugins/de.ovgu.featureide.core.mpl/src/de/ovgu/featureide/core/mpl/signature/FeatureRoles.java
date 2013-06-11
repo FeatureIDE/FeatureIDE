@@ -41,7 +41,7 @@ public class FeatureRoles extends LinkedList<AbstractRole> {
 	
 	public AbstractRole getByName(String className) {
 		for (AbstractRole curRole : this) {
-			if (curRole.getFullName().equals(className)) {
+			if (curRole.getSignature().getName().equals(className)) {
 				return curRole;
 			}
 		}

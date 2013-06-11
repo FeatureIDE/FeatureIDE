@@ -189,7 +189,7 @@ public class InterfaceParser extends AbstractLineReader<JavaRole> {
 							int index = memberElements.length - 1;
 							
 							String memberName = memberElements[index--];
-							isConstructor = memberName.equals(stack.peek().getFullName());
+							isConstructor = memberName.equals(stack.peek().getSignature().getName());
 							
 							if (isConstructor) {
 								type = null;
