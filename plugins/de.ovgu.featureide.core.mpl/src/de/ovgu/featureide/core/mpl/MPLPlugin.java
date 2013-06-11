@@ -38,14 +38,13 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.mpl.builder.InterfaceProjectNature;
 import de.ovgu.featureide.core.mpl.io.InterfaceWriter;
 import de.ovgu.featureide.core.mpl.io.JavaProjectWriter;
-import de.ovgu.featureide.core.mpl.io.JavaSignatureWriter;
 import de.ovgu.featureide.core.mpl.io.constants.IOConstants;
-import de.ovgu.featureide.core.mpl.signature.java.JavaFeatureSignature;
-import de.ovgu.featureide.core.mpl.signature.java.JavaRoleMap;
+import de.ovgu.featureide.core.mpl.signature.FeatureRoles;
+import de.ovgu.featureide.core.mpl.signature.RoleMap;
+import de.ovgu.featureide.core.mpl.util.ConfigurationChangeListener;
+import de.ovgu.featureide.core.mpl.util.EditorTracker;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
-import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
 
 /** 
  * Plug-in activator with miscellaneous function for an interface project.
@@ -91,7 +90,7 @@ public class MPLPlugin extends AbstractCorePlugin {
 		return interfaceProject;
 	}
 	
-	public JavaInterfaceProject getProject(String projectName) {
+	public JavaInterfaceProject getInterfaceProject(String projectName) {
 		JavaInterfaceProject interfaceProject = projectMap.get(projectName);
 		if (interfaceProject == null) {
 			IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
@@ -102,7 +101,7 @@ public class MPLPlugin extends AbstractCorePlugin {
 		return interfaceProject;
 	}
 	
-	public JavaInterfaceProject getProject(IProject project) {
+	public JavaInterfaceProject getInterfaceProject(IProject project) {
 		JavaInterfaceProject interfaceProject = projectMap.get(project.getName());
 		if (interfaceProject == null && isInterfaceProject(project)) {
 			interfaceProject = addProject(project);
@@ -119,28 +118,30 @@ public class MPLPlugin extends AbstractCorePlugin {
 		}
 	}
 	
-	public void setupMultiFeatureProject(Collection<IFeatureProject> fprojects) {
-		for (IFeatureProject fp : fprojects) {
-			String projectName = "_" + fp.getProjectName() + "_Interfaces";
+	public void setupMultiFeatureProject(Collection<IFeatureProject> featureProjects) {
+		for (IFeatureProject featureProject : featureProjects) {
+			String projectName = "_" + featureProject.getProjectName() + "_Interfaces";
+			
+			IProject newProject = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 			IProjectDescription description = ResourcesPlugin.getWorkspace().newProjectDescription(projectName);
 			description.setNatureIds(new String[]{InterfaceProjectNature.NATURE_ID});
-
-			IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+			
 			try {
-				project.create(description, null);
-				project.open(null);
+				newProject.create(description, null);
+				newProject.open(null);
 
 				//TODO lib ordner mitkopieren und im Java Projekt verlinken
-				project.getFile(new Path(IOConstants.FILENAME_MODEL)).create(fp.getModelFile().getContents(), true, null);
+				newProject.getFile(new Path(IOConstants.FILENAME_MODEL)).create(featureProject.getModelFile().getContents(), true, null);
 
 				InputStream stream = new ByteArrayInputStream("".getBytes());
-				project.getFile(new Path(IOConstants.FILENAME_CONFIG)).create(stream, true, null);
-				project.getFile(new Path(IOConstants.FILENAME_EXTCONFIG)).create(stream, true, null);
+				newProject.getFile(new Path(IOConstants.FILENAME_CONFIG)).create(stream, true, null);
+				newProject.getFile(new Path(IOConstants.FILENAME_EXTCONFIG)).create(stream, true, null);
 				stream.close();
 
-				JavaInterfaceProject interfaceProject = addProject(project);
+				JavaInterfaceProject interfaceProject = new JavaInterfaceProject(newProject, featureProject);
+				projectMap.put(projectName, interfaceProject);
 				
-				new JavaSignatureWriter(fp, interfaceProject).writeSignatures();
+//				new JavaSignatureWriter(featureProject, interfaceProject).writeSignatures();
 				interfaceProject.getRoleMap().addDefaultViewTag("view1");
 				refresh(interfaceProject);
 			} catch (Exception e) {
@@ -150,7 +151,7 @@ public class MPLPlugin extends AbstractCorePlugin {
 	}
 	
 	public void buildConfigurationInterfaces(String projectName, String viewName, int viewLevel, int configLimit) {
-		JavaInterfaceProject interfaceProject = getProject(projectName);
+		JavaInterfaceProject interfaceProject = getInterfaceProject(projectName);
 		if (interfaceProject != null) {
 			interfaceProject.refreshRoleMap();
 			interfaceProject.setConfigLimit(configLimit);
@@ -161,7 +162,7 @@ public class MPLPlugin extends AbstractCorePlugin {
 	}
 
 	public void buildFeatureInterfaces(String projectName, String folder, String viewName, int viewLevel, int configLimit) {
-		JavaInterfaceProject interfaceProject = getProject(projectName);
+		JavaInterfaceProject interfaceProject = getInterfaceProject(projectName);
 		if (interfaceProject != null) {
 			interfaceProject.refreshRoleMap();
 			interfaceProject.setConfigLimit(configLimit);
@@ -178,7 +179,7 @@ public class MPLPlugin extends AbstractCorePlugin {
 	}
 	
 	public void compareConfigurationInterfaces(String projectName, String viewName, int viewLevel, int configLimit) {
-		JavaInterfaceProject interfaceProject = getProject(projectName);
+		JavaInterfaceProject interfaceProject = getInterfaceProject(projectName);
 		if (interfaceProject != null) {
 			interfaceProject.refreshRoleMap();
 			interfaceProject.setConfigLimit(configLimit);
@@ -189,11 +190,11 @@ public class MPLPlugin extends AbstractCorePlugin {
 	}
 	
 	public void buildJavaProject(IFile featureListFile, String name) {
-		new JavaProjectWriter(getProject(featureListFile.getProject())).buildJavaProject(featureListFile, name);
+		new JavaProjectWriter(getInterfaceProject(featureListFile.getProject())).buildJavaProject(featureListFile, name);
 	}
 	
 	public void addViewTag(IProject project, String name) {
-		JavaInterfaceProject interfaceProject = getProject(project);
+		JavaInterfaceProject interfaceProject = getInterfaceProject(project);
 		if (interfaceProject != null) {
 			interfaceProject.getRoleMap().addDefaultViewTag(name);
 			refresh(interfaceProject);
@@ -201,7 +202,7 @@ public class MPLPlugin extends AbstractCorePlugin {
 	}
 	
 	public void scaleUpViewTag(IProject project, String name, int level) {
-		JavaInterfaceProject interfaceProject = getProject(project);
+		JavaInterfaceProject interfaceProject = getInterfaceProject(project);
 		if (interfaceProject != null) {
 			interfaceProject.scaleUpViewTag(name, level);
 			refresh(interfaceProject);
@@ -209,7 +210,7 @@ public class MPLPlugin extends AbstractCorePlugin {
 	}
 	
 	public void deleteViewTag(IProject project, String name) {
-		JavaInterfaceProject interfaceProject = getProject(project);
+		JavaInterfaceProject interfaceProject = getInterfaceProject(project);
 		if (interfaceProject != null) {
 			interfaceProject.removeViewTag(name);
 			refresh(interfaceProject);
@@ -217,7 +218,7 @@ public class MPLPlugin extends AbstractCorePlugin {
 	}
 	
 	public void refresh(IProject project) {
-		JavaInterfaceProject interfaceProject = getProject(project);
+		JavaInterfaceProject interfaceProject = getInterfaceProject(project);
 		if (interfaceProject != null) {
 			refresh(interfaceProject);
 		}
@@ -228,106 +229,108 @@ public class MPLPlugin extends AbstractCorePlugin {
 	}
 	
 	public void extendedModules(IProject project, String folder) {
-		JavaInterfaceProject interfaceProject = getProject(project);
-		if (interfaceProject != null) {
-			FeatureModel model = interfaceProject.getFeatureModel();
-			LinkedList<Feature> coreFeatures = model.getAnalyser().getCoreFeatures();
-
-			JavaRoleMap roleMap = interfaceProject.getRoleMap();
-//			JavaRoleMap roleMap = new JavaRoleMap(interfaceProject.getRoleMap());
-//			JavaFeatureSignature.init(interfaceProject);
-			
-			int rounds = 0;
-			
-			boolean somethingAdded = true;
-			while(somethingAdded){
-				somethingAdded = false;
-				
-				rounds++;
-				
-				//alles von Parent Feature zu den Kindern kopieren....
-				LinkedList<String> listFromRoot = model.getFeatureList();
-				for (String featureName : listFromRoot) {
-					Feature parentFeature = model.getFeature(featureName);
-					JavaFeatureSignature parentSig = roleMap.getRoles(parentFeature.getName());
-					LinkedList<JavaFeatureSignature> childrenSignature = new LinkedList<JavaFeatureSignature>();
-					for (Feature childFeature : parentFeature.getChildren()) {
-						childrenSignature.add(roleMap.getRoles(childFeature.getName()));
-					}
-					
-					if (JavaFeatureSignature.copyFromOnetoX(parentSig, childrenSignature)) {
-						somethingAdded = true;
-					}	
-				}
-				
-				//coreFeatures
-				LinkedList<JavaFeatureSignature> coreFeatureSig = new LinkedList<JavaFeatureSignature>();
-				for (Feature childFeature : coreFeatures) {
-					coreFeatureSig.add(roleMap.getRoles(childFeature.getName()));
-				}
-//				LinkedList<JavaFeatureSignature> coreFeatureSig = JavaFeatureSignature.getJavaFeaureSignatureOfFeature(coreFeatures);
-				if (JavaFeatureSignature.unionOfJavaFeatureSignature(coreFeatureSig)) {
-					somethingAdded = true;
-				}
-				
-				//Kinder zu Eltern
-				LinkedList<String> list = model.getFeatureList();
-				while(!list.getLast().equals(model.getRoot().getName())) {
-					String curFeature = list.getLast();
-					Feature parent = model.getFeature(curFeature).getParent();
-					if(parent.isAlternative() || parent.isOr()){
-						JavaFeatureSignature parentFeatureSig = roleMap.getRoles(parent.getName());
-						LinkedList<Feature> curChildren = parent.getChildren();
-						LinkedList<JavaFeatureSignature> sigsOfChilds = getChildFeatureSig(
-								roleMap, list, curChildren);
-						
-						if (JavaFeatureSignature.intersectionOfJavaFeatureSignature(sigsOfChilds, parentFeatureSig)) {
-							somethingAdded = true;
-						}
-					}
-					else if(parent.isAnd()){
-						LinkedList<Feature> children = parent.getChildren();
-						LinkedList<Feature> filteredChildren = new LinkedList<Feature>();
-						for (Feature feature : children) {
-							if(feature.isMandatory() || model.getAnalyser().getFalseOptionalFeatures().contains(feature)){
-								filteredChildren.add(feature);
-							}
-							list.remove(feature.getName());
-						}
-						if(filteredChildren.size() > 0){
-							LinkedList<JavaFeatureSignature> sigsOfChilds = getChildFeatureSig(roleMap, list, filteredChildren);
-						
-							//parent adden... da dieser gleich methoden/felder erhalten muss
-							JavaFeatureSignature featureSig = roleMap.getRoles(parent.getName());
-							sigsOfChilds.add(featureSig);
-							if (JavaFeatureSignature.unionOfJavaFeatureSignature(sigsOfChilds)) {
-								somethingAdded = true;
-							}
-						}
-					} else {
-						list.remove(curFeature);
-					}
-				}
-			}
-			FMCorePlugin.getDefault().logInfo("Rounds: " + rounds);
-				
-			InterfaceWriter interfaceWriter = new InterfaceWriter(interfaceProject);
-			interfaceWriter.buildAllFeatureInterfaces(folder);
-		}
-		
-		
+//		JavaInterfaceProject interfaceProject = getInterfaceProject(project);
+//		if (interfaceProject != null) {
+//			FeatureModel model = interfaceProject.getFeatureModel();
+//			LinkedList<Feature> coreFeatures = model.getAnalyser().getCoreFeatures();
+//
+//			JavaRoleMap roleMap = interfaceProject.getRoleMap();
+////			JavaRoleMap roleMap = new JavaRoleMap(interfaceProject.getRoleMap());
+////			JavaFeatureSignature.init(interfaceProject);
+//			
+//			int rounds = 0;
+//			
+//			boolean somethingAdded = true;
+//			while(somethingAdded){
+//				somethingAdded = false;
+//				
+//				rounds++;
+//				
+//				//alles von Parent Feature zu den Kindern kopieren....
+//				LinkedList<String> listFromRoot = model.getFeatureList();
+//				for (String featureName : listFromRoot) {
+//					Feature parentFeature = model.getFeature(featureName);
+//					JavaFeatureSignature parentSig = roleMap.getRoles(parentFeature.getName());
+//					LinkedList<JavaFeatureSignature> childrenSignature = new LinkedList<JavaFeatureSignature>();
+//					for (Feature childFeature : parentFeature.getChildren()) {
+//						childrenSignature.add(roleMap.getRoles(childFeature.getName()));
+//					}
+//					
+//					if (JavaFeatureSignature.copyFromOnetoX(parentSig, childrenSignature)) {
+//						somethingAdded = true;
+//					}	
+//				}
+//				
+//				//coreFeatures
+//				LinkedList<JavaFeatureSignature> coreFeatureSig = new LinkedList<JavaFeatureSignature>();
+//				for (Feature childFeature : coreFeatures) {
+//					coreFeatureSig.add(roleMap.getRoles(childFeature.getName()));
+//				}
+////				LinkedList<JavaFeatureSignature> coreFeatureSig = JavaFeatureSignature.getJavaFeaureSignatureOfFeature(coreFeatures);
+//				if (JavaFeatureSignature.unionOfJavaFeatureSignature(coreFeatureSig)) {
+//					somethingAdded = true;
+//				}
+//				
+//				//Kinder zu Eltern
+//				LinkedList<String> list = model.getFeatureList();
+//				while(!list.getLast().equals(model.getRoot().getName())) {
+//					String curFeature = list.getLast();
+//					Feature parent = model.getFeature(curFeature).getParent();
+//					if(parent.isAlternative() || parent.isOr()){
+//						JavaFeatureSignature parentFeatureSig = roleMap.getRoles(parent.getName());
+//						LinkedList<Feature> curChildren = parent.getChildren();
+//						LinkedList<JavaFeatureSignature> sigsOfChilds = getChildFeatureSig(
+//								roleMap, list, curChildren);
+//						
+//						if (JavaFeatureSignature.intersectionOfJavaFeatureSignature(sigsOfChilds, parentFeatureSig)) {
+//							somethingAdded = true;
+//						}
+//					}
+//					else if(parent.isAnd()){
+//						LinkedList<Feature> children = parent.getChildren();
+//						LinkedList<Feature> filteredChildren = new LinkedList<Feature>();
+//						for (Feature feature : children) {
+//							if(feature.isMandatory() || model.getAnalyser().getFalseOptionalFeatures().contains(feature)){
+//								filteredChildren.add(feature);
+//							}
+//							list.remove(feature.getName());
+//						}
+//						if(filteredChildren.size() > 0){
+//							LinkedList<JavaFeatureSignature> sigsOfChilds = getChildFeatureSig(roleMap, list, filteredChildren);
+//						
+//							//parent adden... da dieser gleich methoden/felder erhalten muss
+//							JavaFeatureSignature featureSig = roleMap.getRoles(parent.getName());
+//							sigsOfChilds.add(featureSig);
+//							if (JavaFeatureSignature.unionOfJavaFeatureSignature(sigsOfChilds)) {
+//								somethingAdded = true;
+//							}
+//						}
+//					} else {
+//						list.remove(curFeature);
+//					}
+//				}
+//			}
+//			FMCorePlugin.getDefault().logInfo("Rounds: " + rounds);
+//				
+//			InterfaceWriter interfaceWriter = new InterfaceWriter(interfaceProject);
+//			interfaceWriter.buildAllFeatureInterfaces(folder);
+//		}		
 	}
 
-	private LinkedList<JavaFeatureSignature> getChildFeatureSig(
-			JavaRoleMap roleMap, LinkedList<String> list,
+	private LinkedList<FeatureRoles> getChildFeatureSig(
+			RoleMap roleMap, LinkedList<String> list,
 			LinkedList<Feature> curChildren) {
-		LinkedList<JavaFeatureSignature> sigsOfChilds = new LinkedList<JavaFeatureSignature>();
+		LinkedList<FeatureRoles> sigsOfChilds = new LinkedList<FeatureRoles>();
 		for (Feature curChild : curChildren) {
 			//Kinder aus der Liste der zu behandelnden Features löschen
 			list.remove(curChild.getName());
-			JavaFeatureSignature featureSig = roleMap.getRoles(curChild.getName());
+			FeatureRoles featureSig = roleMap.getRoles(curChild.getName());
 			sigsOfChilds.add(featureSig);
 		}
 		return sigsOfChilds;
+	}
+	
+	public void extended(JavaInterfaceProject interfaceProject) {
+		
 	}
 }

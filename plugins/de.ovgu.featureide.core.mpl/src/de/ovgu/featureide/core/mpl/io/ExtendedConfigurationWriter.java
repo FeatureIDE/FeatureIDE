@@ -43,6 +43,6 @@ public class ExtendedConfigurationWriter extends AbstractWriter {
 			content.append(LINE_SEPARATOR);
 		}
 		
-		writeToFile(interfaceProject.getProject().getFile(IOConstants.FILENAME_EXTCONFIG), content.toString());
+		writeToFile(interfaceProject.getProjectReference().getFile(IOConstants.FILENAME_EXTCONFIG), content.toString());
 	}
 }

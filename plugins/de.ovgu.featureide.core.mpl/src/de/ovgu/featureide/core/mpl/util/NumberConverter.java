@@ -18,7 +18,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.core.mpl;
+package de.ovgu.featureide.core.mpl.util;
 
 /**
  * Converts an integer to a String and adds leading zeros.
@@ -31,7 +31,7 @@ public class NumberConverter {
 
 	public NumberConverter(int highestNumber) {
 		this.highestNumber = highestNumber;
-		int maxLength = (int)Math.floor(Math.log10(highestNumber));
+		int maxLength = (int)(Math.floor(Math.log10(highestNumber))) + 1;
 		char[] charArray = new char[maxLength];
 		for (int i = 0; i < maxLength; i++) {
 			charArray[i] = '0';
@@ -40,13 +40,11 @@ public class NumberConverter {
 	}
 	
 	public String convert(int number) {
-		if (number <= highestNumber) {
+		if (number <= highestNumber && number >= 0) {
 			String s = String.valueOf(number);
 			return zeros.substring(s.length()) + s;
 		} else {
 			return String.valueOf(number);
 		}
 	}
-	
-	
 }

@@ -22,7 +22,6 @@ package de.ovgu.featureide.core.mpl.io;
 
 import org.eclipse.core.resources.IFile;
 
-import de.ovgu.featureide.core.mpl.JavaInterfaceProject;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 
@@ -33,8 +32,8 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
  */
 public class FeatureModelWriter extends AbstractWriter {
 
-	public FeatureModelWriter(JavaInterfaceProject interfaceProject) {
-		super(interfaceProject);
+	public FeatureModelWriter() {
+		super(null);
 	}
 	
 	public void writeModel(FeatureModel fm, IFile saveFile) {

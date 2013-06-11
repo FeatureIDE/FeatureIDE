@@ -18,7 +18,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.core.mpl;
+package de.ovgu.featureide.core.mpl.util;
 
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IPropertyListener;
@@ -29,6 +29,7 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
+import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor;
 
 /**

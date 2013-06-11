@@ -20,24 +20,17 @@
  */
 package de.ovgu.featureide.core.mpl;
 
-import java.util.LinkedList;
-
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
 
-import de.ovgu.featureide.core.mpl.io.ExtendedConfigurationReader;
-import de.ovgu.featureide.core.mpl.io.constants.IOConstants;
-import de.ovgu.featureide.core.mpl.io.parser.InterfaceParser;
+import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.mpl.io.JavaSignatureWriter;
+import de.ovgu.featureide.core.mpl.io.LocalFileLoader;
+import de.ovgu.featureide.core.mpl.signature.FeatureRoles;
+import de.ovgu.featureide.core.mpl.signature.RoleMap;
 import de.ovgu.featureide.core.mpl.signature.ViewTag;
 import de.ovgu.featureide.core.mpl.signature.ViewTagPool;
-import de.ovgu.featureide.core.mpl.signature.java.JavaRoleMap;
-import de.ovgu.featureide.core.mpl.signature.java.JavaRoleSignature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 
 /**
  * Holds all relevant information about the interface project.
@@ -46,105 +39,60 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
  * @author Reimar Schroeter
  */
 public class JavaInterfaceProject {
-	private final IProject projectHandle;
+	private final IProject projectReference;
 	private final ViewTagPool viewTagPool = new ViewTagPool();
 	
 	private ViewTag filterViewTag = null;
 	private int configLimit = 1000;
 	
-	private JavaRoleMap roleMap = null;
-	private Configuration configuration = null;
-	private FeatureModel featureModel = null;
+	private RoleMap roleMap;
+	private Configuration configuration;
 
-	public JavaInterfaceProject(IProject projectHandle) {
-		this.projectHandle = projectHandle;
+	private final FeatureModel featureModel;
+	
+	public JavaInterfaceProject(IProject projectReference) {
+		this(projectReference, null);
 	}
 	
-	private void loadConfiguration() {
-		try {
-			ExtendedConfigurationReader exConfReader = new ExtendedConfigurationReader(this);
-			configuration = exConfReader.read();
-		} catch (Exception e) {
-			MPLPlugin.getDefault().logError(e);
-		}
-	}
-	
-	private void loadFeatureModel() {
-		try {
-			featureModel = new FeatureModel();
-			XmlFeatureModelReader reader = new XmlFeatureModelReader(featureModel);
-			reader.readFromFile(projectHandle.getFile(IOConstants.FILENAME_MODEL).getLocation().toFile());
-		} catch (Exception e) {
-			featureModel = null;
-			MPLPlugin.getDefault().logError(e);
-		}
-	}
-	
-	private void loadRoleMap() {		
-		roleMap = new JavaRoleMap(this);
-		try {
-			IFolder mainFolder = projectHandle.getFolder(IOConstants.FOLDERNAME_FEATURE_ROLES);
-			if (mainFolder.isAccessible()) {
-				InterfaceParser parser = new InterfaceParser(viewTagPool);
-				
-				for (IResource featureFolder : mainFolder.members()) {
-					if (featureFolder instanceof IFolder) {
-						for (IResource featureFolderMember : ((IFolder)featureFolder).members()) {
-							if (featureFolderMember instanceof IFolder) {
-								IFolder packageFolder = (IFolder) featureFolderMember;
-								parser.setFeatureName(featureFolder.getName());
-								for (IResource file : packageFolder.members()) {
-									parser.setFile((IFile)file);
-									roleMap.addRole(parser.read());
-								}
-							} else if (featureFolderMember instanceof IFile) {
-								parser.setFile((IFile) featureFolderMember);
-								roleMap.addRole(parser.read());
-							}
-						}	
-					}
-				}
-			}
-		} catch (CoreException e) {
-			MPLPlugin.getDefault().logError(e);
+	public JavaInterfaceProject(IProject projectReference, IFeatureProject featureProject) {
+		this.projectReference = projectReference;
+		featureModel = LocalFileLoader.loadFeatureModel(this);
+		if (featureProject == null) {
+			roleMap = LocalFileLoader.loadRoleMap(this);
+		} else {
+			roleMap = new JavaSignatureWriter(featureProject, this).writeSignatures();
 		}
 	}
 	
 	public void refreshRoleMap() {
-		loadRoleMap();
+		LocalFileLoader.loadRoleMap(this);
 	}
 	
-	public JavaRoleMap getRoleMap() {
-		if (roleMap == null) {
-			loadRoleMap();
-		}
+	public RoleMap getRoleMap() {
 		return roleMap;
 	}
 
-	public LinkedList<JavaRoleSignature> getRoles(String featurename) {
+	public FeatureRoles getRoles(String featurename) {
 		return roleMap.getRoles(featurename);
 	}
 
-	public IProject getProject() {
-		return projectHandle;
-	}
-
-	public Configuration getConfiguration() {
-		if (configuration == null) {
-			loadConfiguration();
-		}
-		return configuration;
+	public IProject getProjectReference() {
+		return projectReference;
 	}
 	
 	public FeatureModel getFeatureModel() {
-		if(featureModel == null){
-			loadFeatureModel();
-		}
 		return featureModel;
 	}
 	
 	public int getConfigLimit() {
 		return configLimit;
+	}
+	
+	public Configuration getConfiguration() {
+		if (configuration == null) {
+			configuration = LocalFileLoader.loadConfiguration(this);
+		}
+		return configuration;
 	}
 
 	public void setConfiguration(Configuration configuration) {
@@ -161,10 +109,6 @@ public class JavaInterfaceProject {
 
 	public void setConfigLimit(int configLimit) {
 		this.configLimit = configLimit;
-	}
-
-	public void setRoleMap(JavaRoleMap roleMap) {
-		this.roleMap = roleMap;
 	}
 	
 	public void setFilterViewTag(ViewTag filterViewTag) {

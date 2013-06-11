@@ -20,32 +20,37 @@
  */
 package de.ovgu.featureide.core.mpl.signature.java;
 
-import de.ovgu.featureide.core.mpl.signature.AbstractSignature;
+import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassSignature;
+import de.ovgu.featureide.core.mpl.signature.abstr.AbstractFieldSignature;
 
 /** 
  * Holds the java signature of a field.
  * 
  * @author Sebastian Krieter
  */
-public class JavaFieldSignature extends AbstractSignature {
+public class JavaFieldSignature extends AbstractFieldSignature {
 
-	public JavaFieldSignature(String name, String modifiers, String type) {
-		super(name, modifiers, type, null, false);
+	public JavaFieldSignature(AbstractClassSignature parent, String name, String modifiers, String type) {
+		super(parent, name, modifiers, type);
 	}
 
-	public JavaFieldSignature(JavaFieldSignature curField) {
-		this(curField, false);
+	public JavaFieldSignature(JavaFieldSignature orgSig) {
+		this(orgSig, false);
 	}
 	
-	private JavaFieldSignature(JavaFieldSignature curField, boolean ext) {
-		super(curField.name, curField.modifiers, curField.type,
-				curField.viewTags, ext || curField.ext);
+	private JavaFieldSignature(JavaFieldSignature orgSig, boolean ext) {
+		super(orgSig, ext);
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder signature = new StringBuilder(modifiers);
+		StringBuilder signature = new StringBuilder();
+		
+		signature.append(super.toString());
+		signature.append(LINE_SEPARATOR);
+		
 		if (!modifiers.isEmpty()) {
+			signature.append(modifiers);
 			signature.append(' ');
 		}
 		signature.append(type);
@@ -53,15 +58,6 @@ public class JavaFieldSignature extends AbstractSignature {
 		signature.append(name);
 		
 		return signature.toString();
-	}
-
-	@Override
-	public int hashCode() {
-		StringBuilder signature = new StringBuilder(modifiers);
-		signature.append(type);
-		signature.append(name);
-		
-		return signature.toString().hashCode();
 	}
 
 	@Override

@@ -22,47 +22,37 @@ package de.ovgu.featureide.core.mpl.signature.java;
 
 import java.util.LinkedList;
 
-import de.ovgu.featureide.core.mpl.signature.AbstractSignature;
+import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassSignature;
+import de.ovgu.featureide.core.mpl.signature.abstr.AbstractMethodSignature;
 
 /** 
  * Holds the java signature of a method.
  * 
  * @author Sebastian Krieter
  */
-public class JavaMethodSignature extends AbstractSignature {
-
-	protected final LinkedList<String> parameterTypes;
-	protected final boolean isConstructor;
+public class JavaMethodSignature extends AbstractMethodSignature {
 	
-	public JavaMethodSignature(String name, String modifier, String type, LinkedList<String> parameterTypes, boolean isConstructor, boolean ext) {
-		super(name, modifier, type, null, ext);
-		this.isConstructor = isConstructor;
-		this.parameterTypes = new LinkedList<String>(parameterTypes);
-	}
-
-	public JavaMethodSignature(JavaMethodSignature curMethod) {
-		this(curMethod, false);
+	public JavaMethodSignature(AbstractClassSignature parent, String name, String modifier, String type, LinkedList<String> parameterTypes, boolean isConstructor) {
+		super(parent, name, modifier, type, parameterTypes, isConstructor);
 	}
 	
-	private JavaMethodSignature(JavaMethodSignature curMethod, boolean ext) {
-		super(curMethod.name, curMethod.modifiers, curMethod.type, curMethod.viewTags, 
-				ext || curMethod.ext);
-		parameterTypes = curMethod.getParameterTypes();
-		isConstructor = curMethod.isConstructor();
+	public JavaMethodSignature(JavaMethodSignature orgSig) {
+		super(orgSig, false);
 	}
-
-	public LinkedList<String> getParameterTypes() {
-		return parameterTypes;
-	}
-
-	public boolean isConstructor() {
-		return isConstructor;
+	
+	private JavaMethodSignature(JavaMethodSignature orgSig, boolean ext) {
+		super(orgSig, ext);
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder signature = new StringBuilder(modifiers);
+		StringBuilder signature = new StringBuilder();
+		
+		signature.append(super.toString());
+		signature.append(LINE_SEPARATOR);
+		
 		if (!modifiers.isEmpty()) {
+			signature.append(modifiers);
 			signature.append(' ');
 		}
 		
@@ -82,45 +72,6 @@ public class JavaMethodSignature extends AbstractSignature {
 		signature.append(')');
 		
 		return signature.toString();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (!super.equals(obj)) {
-			return false;
-		}
-		
-		JavaMethodSignature otherSig = (JavaMethodSignature) obj;
-		
-		if (isConstructor != otherSig.isConstructor) {
-			return false;
-		}
-		if (parameterTypes.size() != otherSig.parameterTypes.size()) {
-			return false;
-		}
-		for (int i = 0; i < parameterTypes.size(); i++) {
-			if (!parameterTypes.get(i).equals(otherSig.parameterTypes.get(i))) {
-				return false;
-			}
-		}
-		
-		return true;
-	}
-
-	@Override
-	public int hashCode() {
-		StringBuilder signature = new StringBuilder(modifiers);
-		
-		if (!isConstructor) {
-			signature.append(type);
-		}
-		
-		signature.append(name);
-		for (int i = 0; i < parameterTypes.size(); i++) {
-			signature.append(parameterTypes.get(i));
-		}
-		
-		return signature.toString().hashCode();
 	}
 
 	@Override

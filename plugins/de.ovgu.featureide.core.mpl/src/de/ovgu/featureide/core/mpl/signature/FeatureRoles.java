@@ -18,34 +18,37 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.core.mpl;
+package de.ovgu.featureide.core.mpl.signature;
 
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IPropertyListener;
+import java.util.LinkedList;
 
-import de.ovgu.featureide.core.mpl.io.ExtendedConfigurationWriter;
-import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor;
+import de.ovgu.featureide.core.mpl.signature.abstr.AbstractRole;
+import de.ovgu.featureide.fm.core.Feature;
 
 /**
- * Only for the {@link ConfigurationEditor} <br>
- * taps the {@link Configuration} when the editor is saved.
+ * Contains the {@link JavaRoleSignature}s for a feature.
  * 
+ * @author Reimar Schroeter
  * @author Sebastian Krieter
  */
-public class ConfigurationChangeListener implements IPropertyListener {
-	@Override
-	public void propertyChanged(Object source, int propId) {
-		if (propId == IEditorPart.PROP_DIRTY) {
-			ConfigurationEditor confEditor = (ConfigurationEditor) source;
-			
-			if (!confEditor.isDirty()) {
-				JavaInterfaceProject interfaceProject = MPLPlugin.getDefault().getProject(confEditor.file.getProject());
-				
-				if (interfaceProject != null) {
-					interfaceProject.setConfiguration(confEditor.configuration);
-					(new ExtendedConfigurationWriter(interfaceProject)).writeConfiguration();
-				}
+public class FeatureRoles extends LinkedList<AbstractRole> {
+	private static final long serialVersionUID = 1L;
+	private final Feature feature;
+	
+	public FeatureRoles(Feature feature) {
+		this.feature = feature;
+	}
+	
+	public AbstractRole getByName(String className) {
+		for (AbstractRole curRole : this) {
+			if (curRole.getFullName().equals(className)) {
+				return curRole;
 			}
 		}
+		return null;
+	}
+
+	public Feature getFeature() {
+		return feature;
 	}
 }

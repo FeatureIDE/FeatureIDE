@@ -24,10 +24,12 @@ import java.util.LinkedList;
 
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.io.AbstractLineReader;
-import de.ovgu.featureide.core.mpl.signature.AbstractSignature;
+import de.ovgu.featureide.core.mpl.signature.RoleMap;
 import de.ovgu.featureide.core.mpl.signature.ViewTagPool;
+import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature;
 import de.ovgu.featureide.core.mpl.signature.java.JavaFieldSignature;
 import de.ovgu.featureide.core.mpl.signature.java.JavaMethodSignature;
+import de.ovgu.featureide.core.mpl.signature.java.JavaRole;
 import de.ovgu.featureide.core.mpl.signature.java.JavaRoleSignature;
 
 /**
@@ -35,25 +37,30 @@ import de.ovgu.featureide.core.mpl.signature.java.JavaRoleSignature;
  * 
  * @author Sebastian Krieter
  */
-public class InterfaceParser extends AbstractLineReader<JavaRoleSignature> {
+public class InterfaceParser extends AbstractLineReader<JavaRole> {
 	private static final String 
 		COMMENT = "//+",
 		SEP1 = ",",
 		SEP2 = ":";
-	
+
 	private final ViewTagPool viewTagPool;
-	
-	public InterfaceParser(ViewTagPool viewTagPool) {
+	private final RoleMap roleMap;
+
+	public InterfaceParser(ViewTagPool viewTagPool, RoleMap roleMap) {
 		super();
 		this.viewTagPool = viewTagPool;
+		this.roleMap = roleMap;
 	}
 
 	private String lastTagLine = null;
 	private int mode = 0;
 	
 	private String featureName, type, pckg, className, modifier;
-	private final LinkedList<String> imports = new LinkedList<String>();
-	private final LinkedList<JavaRoleSignature> stack = new LinkedList<JavaRoleSignature>();
+	private final LinkedList<JavaRole> stack = new LinkedList<JavaRole>();
+	private final LinkedList<String>
+			imports = new LinkedList<String>(),
+			implementList = new LinkedList<String>(),
+			extendList = new LinkedList<String>();
 
 	public void setFeatureName(String featureName) {
 		this.featureName = featureName;
@@ -70,11 +77,10 @@ public class InterfaceParser extends AbstractLineReader<JavaRoleSignature> {
 	protected boolean readLine(String line) {
 		line = line.trim();
 		if (!line.isEmpty()) {
-			
 			if (line.startsWith(COMMENT)) {
 				lastTagLine = line.substring(3);
-			}else if(line.startsWith("/*")){}
-				else {
+			} else if (line.startsWith("/*")){
+			} else {
 				switch (mode) {
 				case 0: if (line.startsWith("package ")) {
 							pckg = line.substring(8, line.length() - 1).trim();
@@ -82,20 +88,10 @@ public class InterfaceParser extends AbstractLineReader<JavaRoleSignature> {
 							break;
 						}
 				case 1: if (line.startsWith("import ")) {
-//							line.subSequence(7, line.length() - 1).trim();
+	//							line.subSequence(7, line.length() - 1).trim();
 							imports.add(line);
 						} else {
 							parseClass(line);
-							
-							infoObj = new JavaRoleSignature(className, modifier, type, pckg, featureName);
-							for (String imp : imports) {
-								infoObj.addImport(imp);
-							}
-							imports.clear();
-							
-							parseTags(infoObj);
-							stack.push(infoObj);
-							
 							mode = 2;
 						}
 						break;
@@ -106,7 +102,7 @@ public class InterfaceParser extends AbstractLineReader<JavaRoleSignature> {
 							}
 							String[] extendElements = line.substring(8).split(",");
 							for (int i = 0; i < extendElements.length; i++) {
-								stack.peek().addExtend(extendElements[i].trim());
+								extendList.add(extendElements[i].trim());
 							}
 							mode = 3;
 							break;
@@ -118,24 +114,64 @@ public class InterfaceParser extends AbstractLineReader<JavaRoleSignature> {
 							}
 							String[] implementElements = line.substring(11).split(",");
 							for (int i = 0; i < implementElements.length; i++) {
-								stack.peek().addImplement(implementElements[i].trim());
+								implementList.add(implementElements[i].trim());
 							}
 							mode = 4;
 							break;
 						}
-				case 4: if (line.matches("(.*\\s(class|interface)|(class|interface))\\s.*$")) {
+				case 4: JavaRoleSignature newRoleSig;
+						if (stack.isEmpty()) {
+							newRoleSig = new JavaRoleSignature(null,
+									className, modifier, type, pckg);
+						} else {
+							newRoleSig = new JavaRoleSignature(stack.peek().getSignature(),
+								className, modifier, type, null);
+						}
+				
+						for (String imp : imports) {
+							newRoleSig.addImport(imp);
+						}
+						for (String extend : extendList) {
+							newRoleSig.addExtend(extend);
+						}
+						for (String implement : implementList) {
+							newRoleSig.addImplement(implement);
+						}
+						imports.clear();
+						extendList.clear();
+						implementList.clear();
+						
+						parseTags(newRoleSig);
+						
+						JavaRoleSignature aSig = (JavaRoleSignature) roleMap
+								.getSignatureRef(newRoleSig);
+				
+						JavaRole newRole = new JavaRole(featureName, aSig);
+						aSig.addFeature(featureName);
+						stack.push(newRole);
+						
+						mode = 5;
+				case 5: if (line.matches("(.*\\s(class|interface)|(class|interface))\\s.*$")) {
 							parseClass(line);
 							
-							JavaRoleSignature innerClassSig = 
-									new JavaRoleSignature(className, modifier, type, null, null);
-							parseTags(innerClassSig);
-							stack.peek().addInnerClass(innerClassSig);
-							stack.push(innerClassSig);
+	//							JavaRoleSignature aSig = (JavaRoleSignature) interfaceProject.getRoleMap().getSignatureRef(
+	//									new JavaRoleSignature(className, pckg, modifier, type, null));
+	//							
+	//							JavaRole innerClass = new JavaRole(featureName, aSig);
+	//							
+	//							parseTags(aSig);
+	//							
+	//							stack.peek().addInnerClass(innerClass);
+	//							stack.push(innerClass);
 							
 							mode = 2;
-							break;
 						} else if (line.endsWith("}")) {
-							stack.pop();
+							JavaRole role = stack.pop();
+							if (stack.isEmpty()) {
+								infoObj = role;
+							} else {
+								stack.peek().addInnerClass(role);
+							}
 						} else if (line.endsWith(";")) {
 							line = line.substring(0, line.length() - 1).trim();
 							
@@ -153,7 +189,7 @@ public class InterfaceParser extends AbstractLineReader<JavaRoleSignature> {
 							int index = memberElements.length - 1;
 							
 							String memberName = memberElements[index--];
-							isConstructor = memberName.equals(stack.peek().getName());
+							isConstructor = memberName.equals(stack.peek().getFullName());
 							
 							if (isConstructor) {
 								type = null;
@@ -176,21 +212,29 @@ public class InterfaceParser extends AbstractLineReader<JavaRoleSignature> {
 											parameterType = parameterType.substring(0, parameterType.indexOf(' '));
 											parameterTypes.add(parameterType);
 										}
-									}
+									}									
 									
-									JavaMethodSignature sig = new JavaMethodSignature(memberName, modifier, type, parameterTypes, isConstructor, false);
-									stack.peek().addMethod(sig);
+									JavaMethodSignature sig = (JavaMethodSignature) roleMap
+											.getSignatureRef(new JavaMethodSignature(
+													stack.peek().getSignature(), memberName, modifier, 
+													type, parameterTypes, isConstructor));
+	
+									sig.addFeature(featureName);
+									stack.peek().addMember(sig);
 									parseTags(sig);
 								} else {
-									JavaFieldSignature sig = new JavaFieldSignature(memberName, modifier, type);
-									stack.peek().addField(sig);
+									JavaFieldSignature sig = (JavaFieldSignature) roleMap
+											.getSignatureRef(new JavaFieldSignature(
+													stack.peek().getSignature(), 
+													memberName,	modifier, type));
+									sig.addFeature(featureName);
+									stack.peek().addMember(sig);
 									parseTags(sig);
 								}	
 							} else {
 								lastTagLine = null;
 							}
-													
-						}
+					}
 				}
 			}
 		}

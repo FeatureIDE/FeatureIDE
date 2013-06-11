@@ -30,9 +30,11 @@ import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.mpl.JavaInterfaceProject;
 import de.ovgu.featureide.core.mpl.io.constants.IOConstants;
+import de.ovgu.featureide.core.mpl.signature.RoleMap;
+import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassSignature;
 import de.ovgu.featureide.core.mpl.signature.java.JavaFieldSignature;
 import de.ovgu.featureide.core.mpl.signature.java.JavaMethodSignature;
-import de.ovgu.featureide.core.mpl.signature.java.JavaRoleMap;
+import de.ovgu.featureide.core.mpl.signature.java.JavaRole;
 import de.ovgu.featureide.core.mpl.signature.java.JavaRoleSignature;
 
 /**
@@ -56,56 +58,65 @@ public class JavaSignatureWriter extends AbstractWriter {
 		this.fstmodel = fstmodel;
 	}
 	
-	public void writeSignatures() {
-		JavaRoleMap roleMap = new JavaRoleMap(interfaceProject);
-		interfaceProject.setRoleMap(roleMap);
+	public RoleMap writeSignatures() {
+		RoleMap roleMap = new RoleMap(interfaceProject);
 
 		for (FSTFeature feature : fstmodel.getFeatures()) {
+			String featureName = feature.getName();
 			for (FSTRole fstrole : feature.getRoles()) {
-				String classname = fstrole.getName();
+				String className = fstrole.getName();
 				if (fstrole.getName().endsWith(IOConstants.EXTENSION_JAVA)) {
-					classname = classname.substring(0, classname.length() - IOConstants.EXTENSION_JAVA.length());
+					className = className.substring(0, className.length() - IOConstants.EXTENSION_JAVA.length());
 					
-					JavaRoleSignature roleSig = new JavaRoleSignature(classname, fstrole.getModifiers(), 
-							fstrole.getType(), fstrole.getPackage(), feature.getName());
+					JavaRole role = getRole(roleMap, featureName, null, className, 
+							fstrole.getPackage(), fstrole);
 					
-					roleMap.addRole(roleSig);
-					writeClass(roleSig, fstrole);
+					roleMap.addRole(role);
 				}
 			}
 		}
+		return roleMap;
 	}
 	
-	private void writeClass(JavaRoleSignature classSig, FSTClassFragment classFragment) {
-		String classname = classFragment.getName();
-		
-		if (classname.endsWith(IOConstants.EXTENSION_JAVA)) {
-			classname = classname.substring(0, classname.length() - IOConstants.EXTENSION_JAVA.length());
-		}
+	private JavaRole getRole(RoleMap roleMap, String featureName, AbstractClassSignature parent, String name, String pckg, FSTClassFragment classFragment) {		
+		JavaRoleSignature newRoleSig = new JavaRoleSignature(null, name, classFragment.getModifiers(), classFragment.getType(), pckg);
 		
 		for (String imp : classFragment.getImports()) {
-			classSig.addImport(imp);
+			newRoleSig.addImport(imp);
 		}
 		for (String extend : classFragment.getExtends()) {
-			classSig.addExtend(extend);
+			newRoleSig.addExtend(extend);
 		}
 		for (String implement : classFragment.getImplements()) {
-			classSig.addImplement(implement);
+			newRoleSig.addImplement(implement);
 		}
+		
+		JavaRoleSignature aSig = (JavaRoleSignature) roleMap.getSignatureRef(newRoleSig);
+		aSig.addFeature(featureName);
+		
+		JavaRole newRole = new JavaRole(featureName, aSig);
+		writeRole(roleMap, newRole, classFragment, featureName);
+		
+		return newRole;
+	}
+	
+	private void writeRole(RoleMap roleMap, JavaRole role, FSTClassFragment classFragment, String featureName) {
 		for (FSTField field : classFragment.getFields()) {
-			classSig.addField(new JavaFieldSignature(field.getName(), 
+			role.addMember(new JavaFieldSignature(role.getSignature(), field.getName(),
 					field.getModifiers(), field.getType()));
 		}
 		for (FSTMethod method : classFragment.getMethods()) {
-			classSig.addMethod(new JavaMethodSignature(method.getName(), 
+			role.addMember(new JavaMethodSignature(role.getSignature(), method.getName(),
 					method.getModifiers(), method.getType(),
-					method.getParameter(), method.isConstructor(), false));
+					method.getParameter(), method.isConstructor()));
 		}
-		for (FSTClassFragment innerClass : classFragment.getInnerClasses()) {
-			JavaRoleSignature innerClassSig =
-				new JavaRoleSignature(innerClass.getName(), innerClass.getModifiers(), innerClass.getType(), null, null);
-			classSig.addInnerClass(innerClassSig);
-			writeClass(innerClassSig, innerClass);
+		for (FSTClassFragment innerClass : classFragment.getInnerClasses()) {			
+			JavaRole innerRole = getRole(roleMap, featureName, role.getSignature(), innerClass.getName(), 
+					null, innerClass);
+			
+			role.addInnerClass(innerRole);
 		}
 	}
+	
+
 }

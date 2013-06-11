@@ -18,42 +18,36 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.core.mpl.io;
+package de.ovgu.featureide.core.mpl.util;
+
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IPropertyListener;
 
 import de.ovgu.featureide.core.mpl.JavaInterfaceProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
-import de.ovgu.featureide.core.mpl.io.constants.IOConstants;
-import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.FeatureNotFoundException;
-import de.ovgu.featureide.fm.core.configuration.Selection;
+import de.ovgu.featureide.core.mpl.io.ExtendedConfigurationWriter;
+import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor;
 
 /**
- * Reads the extended config file.
+ * Only for the {@link ConfigurationEditor} <br>
+ * taps the {@link Configuration} when the editor is saved.
  * 
  * @author Sebastian Krieter
  */
-public class ExtendedConfigurationReader extends AbstractLineReader<Configuration> {
-	private final JavaInterfaceProject interfaceProject;
-	
-	public ExtendedConfigurationReader(JavaInterfaceProject interfaceProject) {
-		super(interfaceProject.getProjectReference().getFile(IOConstants.FILENAME_EXTCONFIG));
-		this.interfaceProject = interfaceProject;
-	}
-	
+public class ConfigurationChangeListener implements IPropertyListener {
 	@Override
-	protected boolean prepareRead() {
-		infoObj = new Configuration(interfaceProject.getFeatureModel(), true);
-		return true;
-	}
-
-	@Override
-	protected boolean readLine(String line) {
-		try {
-			infoObj.setManual(line, Selection.UNSELECTED);
-			return true;
-		} catch (FeatureNotFoundException e) {
-			MPLPlugin.getDefault().logError(e);
-			return false;
+	public void propertyChanged(Object source, int propId) {
+		if (propId == IEditorPart.PROP_DIRTY) {
+			ConfigurationEditor confEditor = (ConfigurationEditor) source;
+			
+			if (!confEditor.isDirty()) {
+				JavaInterfaceProject interfaceProject = MPLPlugin.getDefault().getInterfaceProject(confEditor.file.getProject());
+				
+				if (interfaceProject != null) {
+					interfaceProject.setConfiguration(confEditor.configuration);
+					(new ExtendedConfigurationWriter(interfaceProject)).writeConfiguration();
+				}
+			}
 		}
 	}
 }

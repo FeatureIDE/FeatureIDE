@@ -42,9 +42,9 @@ import org.eclipse.jdt.launching.LibraryLocation;
 
 import de.ovgu.featureide.core.mpl.JavaInterfaceProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
-import de.ovgu.featureide.core.mpl.signature.java.JavaClassSignature;
-import de.ovgu.featureide.core.mpl.signature.java.JavaRoleMap;
-import de.ovgu.featureide.core.mpl.signature.java.JavaSignature;
+import de.ovgu.featureide.core.mpl.signature.ProjectSignature;
+import de.ovgu.featureide.core.mpl.signature.RoleMap;
+import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassFragment;
 
 /**
  * Creates a new java project with only interfaces for one configuration.
@@ -61,18 +61,18 @@ public class JavaProjectWriter extends AbstractWriter {
 		if (interfaceProject != null) {
 			LinkedList<String> featureList = (new FeatureListReader(featureListFile)).read();
 			if (featureList != null) {
-				final JavaRoleMap roleMap = interfaceProject.getRoleMap();
+				final RoleMap roleMap = interfaceProject.getRoleMap();
 //				roleMap.setViewTag(interfaceProject.getViewTag());
 				// TODO richtig gespeicherten viewTag auslesen 
-				JavaSignature javaSig = roleMap.generateSignature(featureList, interfaceProject.getFilterViewTag());
+				ProjectSignature javaSig = roleMap.generateSignature(featureList, interfaceProject.getFilterViewTag());
 				
-				IJavaProject javaProject = createJavaProject(interfaceProject.getProject().getName() + "_java_" + name.substring(name.lastIndexOf('_') + 1));
+				IJavaProject javaProject = createJavaProject(interfaceProject.getProjectReference().getName() + "_java_" + name.substring(name.lastIndexOf('_') + 1));
 				if (javaProject != null) {					
-					for (JavaClassSignature cls : javaSig.getClasses()) {
+					for (AbstractClassFragment cls : javaSig.getClasses()) {
 						IFolder sourceFolder = javaProject.getProject().getFolder(Path.fromPortableString("src"));
 						try {
-							IPackageFragment featurePackage = javaProject.getPackageFragmentRoot(sourceFolder).createPackageFragment(cls.getPackage(), true, null);
-							featurePackage.createCompilationUnit(cls.getName() + ".java", cls.toString(), true, null);
+							IPackageFragment featurePackage = javaProject.getPackageFragmentRoot(sourceFolder).createPackageFragment(cls.getSignature().getPackage(), true, null);
+							featurePackage.createCompilationUnit(cls.getFullName() + ".java", cls.toString(), true, null);
 						} catch (JavaModelException e) {
 							MPLPlugin.getDefault().logError(e);
 						} 

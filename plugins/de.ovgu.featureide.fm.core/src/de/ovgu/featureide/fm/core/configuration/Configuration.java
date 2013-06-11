@@ -86,10 +86,10 @@ public class Configuration {
 	 * @param configuration The configuration to clone
 	 */
 	public Configuration(Configuration configuration) {
-		this(configuration, configuration.featureModel);
+		this(configuration, configuration.featureModel, false);
 	}
 	
-	public Configuration(Configuration configuration, FeatureModel featureModel) {
+	public Configuration(Configuration configuration, FeatureModel featureModel, boolean propagate) {
 		this.featureModel = featureModel;
 		this.propagate = false;
 
@@ -104,6 +104,7 @@ public class Configuration {
 		for (SelectableFeature f : configuration.features) {
 			setManual(f.getName(), f.getSelection());
 		}
+		this.propagate = propagate;
 	}
 
 	/**

@@ -42,11 +42,12 @@ import org.sat4j.specs.TimeoutException;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.mpl.JavaInterfaceProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
-import de.ovgu.featureide.core.mpl.NumberConverter;
 import de.ovgu.featureide.core.mpl.io.constants.IOConstants;
-import de.ovgu.featureide.core.mpl.signature.java.JavaRoleMap;
-import de.ovgu.featureide.core.mpl.signature.java.JavaRoleSignature;
-import de.ovgu.featureide.core.mpl.signature.java.JavaSignature;
+import de.ovgu.featureide.core.mpl.signature.FeatureRoles;
+import de.ovgu.featureide.core.mpl.signature.ProjectSignature;
+import de.ovgu.featureide.core.mpl.signature.RoleMap;
+import de.ovgu.featureide.core.mpl.signature.abstr.AbstractRole;
+import de.ovgu.featureide.core.mpl.util.NumberConverter;
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -131,17 +132,29 @@ public class InterfaceWriter extends AbstractWriter {
 		super(interfaceProject);
 	}
 	
+//	public void extendeModlues() {
+//		FeatureModel fm = interfaceProject.getFeatureModel();
+//		Configuration startConfiguration = new Configuration(fm);
+//		
+//		for (Feature feature : fm.getConcreteFeatures()) {
+//			String featureName = feature.getName();
+//			Configuration curConfiguration = new Configuration(startConfiguration, startConfiguration.getFeatureModel(), true);
+//			curConfiguration.setManual(featureName, Selection.SELECTED);
+//			for (Feature feature2 : curConfiguration.getSelectedFeatures()) {
+//				feature2.getName();
+//			}
+//		}
+//	}
+	
 	public void buildConfigurationInterfaces() {
 		new MonitorJob("Build Configuration Interfaces") {
 			@Override
 			protected boolean work() {
 				monitor.subTask("Calculate Solutions");
 				
-				final int configLimit = interfaceProject.getConfigLimit();
-				
 				final LinkedList<List<String>> solutionList;
 				try {
-					solutionList = interfaceProject.getConfiguration().getSolutions(configLimit);
+					solutionList = interfaceProject.getConfiguration().getSolutions(interfaceProject.getConfigLimit());
 				} catch (TimeoutException e) {
 					MPLPlugin.getDefault().logError(e);
 					return false;
@@ -150,7 +163,7 @@ public class InterfaceWriter extends AbstractWriter {
 				
 				monitor.subTask("Generate Signatures");
 				
-				IFolder interfaceFolder = interfaceProject.getProject().getFolder("configuration_interfaces");
+				IFolder interfaceFolder = interfaceProject.getProjectReference().getFolder("configuration_interfaces");
 				IFolder groupListFolder = interfaceFolder.getFolder("groups");
 				try {
 					if (interfaceFolder.exists()) {
@@ -163,8 +176,8 @@ public class InterfaceWriter extends AbstractWriter {
 					return false;
 				}
 
-				final HashMap<JavaSignature, SignatureGroup> signatureMap = new HashMap<JavaSignature, SignatureGroup>();
-				final NumberConverter converter = new NumberConverter(configLimit);
+				final HashMap<ProjectSignature, SignatureGroup> signatureMap = new HashMap<ProjectSignature, SignatureGroup>();
+				final NumberConverter converter = new NumberConverter(numberSolutions);
 				
 				int solutionId = 0, groupId = 0;
 				setMaxAbsoluteWork(numberSolutions);
@@ -172,7 +185,7 @@ public class InterfaceWriter extends AbstractWriter {
 				while (!solutionList.isEmpty()) {
 					List<String> featureList = solutionList.remove();
 					
-					JavaSignature sig = interfaceProject.getRoleMap().generateSignature(featureList, interfaceProject.getFilterViewTag());
+					ProjectSignature sig = interfaceProject.getRoleMap().generateSignature(featureList, interfaceProject.getFilterViewTag());
 					
 					SignatureGroup sigGroup = signatureMap.get(sig);
 					if (sigGroup == null) {
@@ -254,16 +267,16 @@ public class InterfaceWriter extends AbstractWriter {
 				
 				monitor.subTask("Generate Signatures");
 				
-				final HashSet<JavaSignature> signatures = new HashSet<JavaSignature>();
+				final HashSet<ProjectSignature> signatures = new HashSet<ProjectSignature>();
 				
-				final LinkedList<JavaSignature> signaturesList = new LinkedList<JavaSignature>();
+				final LinkedList<ProjectSignature> signaturesList = new LinkedList<ProjectSignature>();
 				final LinkedList<Integer> groupIdList = new LinkedList<Integer>();
 				
-				final NumberConverter converter = new NumberConverter(configLimit);
+				final NumberConverter converter = new NumberConverter(solutionList.size());
 				int groupId = 0;
 				
 				while (!solutionList.isEmpty()) {
-					JavaSignature sig = interfaceProject.getRoleMap().generateSignature(solutionList.remove(), interfaceProject.getFilterViewTag());
+					ProjectSignature sig = interfaceProject.getRoleMap().generateSignature(solutionList.remove(), interfaceProject.getFilterViewTag());
 					if (signatures.add(sig)) {
 						signaturesList.add(sig);
 						groupIdList.add(++groupId);
@@ -280,8 +293,8 @@ public class InterfaceWriter extends AbstractWriter {
 				int compareIndex = 0;
 				
 				while (!signaturesList.isEmpty()) {
-					JavaSignature sig = signaturesList.remove();
-					for (JavaSignature otherSig : signaturesList) {
+					ProjectSignature sig = signaturesList.remove();
+					for (ProjectSignature otherSig : signaturesList) {
 						compareValues[compareIndex++] = sig.similarityTo(otherSig);
 						worked();
 					}	
@@ -309,7 +322,7 @@ public class InterfaceWriter extends AbstractWriter {
 					similarityQString.deleteCharAt(similarityQString.length() - 1);
 					similarityQString.append(LINE_SEPARATOR);
 				}
-				writeToFile(interfaceProject.getProject().getFile(IOConstants.FILENAME_COMPARE_MATRIX), similarityQString.toString());
+				writeToFile(interfaceProject.getProjectReference().getFile(IOConstants.FILENAME_COMPARE_MATRIX), similarityQString.toString());
 				MPLPlugin.getDefault().logInfo("Compared " + numberSignatures + " different Interfaces");
 				return true;
 			}
@@ -346,15 +359,15 @@ public class InterfaceWriter extends AbstractWriter {
 	public void buildFeatureInterfaces(final boolean all, final String foldername, final boolean reduced) {
 		new MonitorJob("Build Feature Interfaces") {
 			protected boolean work() {
-				JavaRoleMap roleMap;
+				RoleMap roleMap;
 				if (reduced) {
-					roleMap = new JavaRoleMap(interfaceProject.getRoleMap(), interfaceProject.getFilterViewTag());
+					roleMap = new RoleMap(interfaceProject.getRoleMap(), interfaceProject.getFilterViewTag());
 				} else {
 					roleMap = interfaceProject.getRoleMap();
 				}
 				List<SelectableFeature> features = interfaceProject.getConfiguration().getFeatures();
 
-				IFolder folder = CorePlugin.createFolder(interfaceProject.getProject(),	foldername);
+				IFolder folder = CorePlugin.createFolder(interfaceProject.getProjectReference(),	foldername);
 				
 				try {
 					folder.delete(true, null);
@@ -367,22 +380,22 @@ public class InterfaceWriter extends AbstractWriter {
 				
 				for (SelectableFeature feature : features) {
 					if (all || feature.getSelection() != Selection.UNSELECTED) {
-						LinkedList<JavaRoleSignature> roles = roleMap.getRoles(feature.getName());
+						FeatureRoles roles = roleMap.getRoles(feature.getName());
 						if (roles != null) {
-							for (JavaRoleSignature role : roles) {
+							for (AbstractRole role : roles) {
 		
-								String packagename = role.getPackage();
+								String packagename = role.getSignature().getPackage();
 								
 								String path = foldername + "/" + feature.getName() +
 									(MPLPlugin.WRAPPER_INTERFACES ? "__Wrapper" : "") + 
 									(packagename.isEmpty() ? "" :"/" + packagename);
 								
-								folder = CorePlugin.createFolder(interfaceProject.getProject(), path);
+								folder = CorePlugin.createFolder(interfaceProject.getProjectReference(), path);
 		
 								if (all) {
-									writeToFile(folder.getFile(role.getName() + IOConstants.EXTENSION_JAVA), role.toShortString());
+									writeToFile(folder.getFile(role.getFullName() + IOConstants.EXTENSION_JAVA), role.toShortString());
 								} else {
-									writeToFile(folder.getFile(role.getName() + IOConstants.EXTENSION_JAVA), role.toString());
+									writeToFile(folder.getFile(role.getFullName() + IOConstants.EXTENSION_JAVA), role.toString());
 								}
 								
 							}
@@ -391,7 +404,7 @@ public class InterfaceWriter extends AbstractWriter {
 					worked();
 				}
 				if (MPLPlugin.WRAPPER_INTERFACES) {
-					dublicateFeatureModel(CorePlugin.createFolder(interfaceProject.getProject(), foldername));
+					dublicateFeatureModel(CorePlugin.createFolder(interfaceProject.getProjectReference(), foldername));
 					MPLPlugin.getDefault().logInfo("Built Wrapper Interfaces");
 					
 					MPLPlugin.PRIVATE_METHODS = false;
@@ -411,7 +424,8 @@ public class InterfaceWriter extends AbstractWriter {
 	}
 	
 	private void dublicateFeatureModel(IFolder folder) {		
-		FeatureModel fm = interfaceProject.getFeatureModel();
+		FeatureModel fm = LocalFileLoader.loadFeatureModel(interfaceProject);
+		fm.clone();
 		Feature root = fm.getRoot();
 		
 		Feature newRoot = new Feature(fm, "_Wrapper__Root_");
@@ -421,7 +435,7 @@ public class InterfaceWriter extends AbstractWriter {
 		
 		dublicateFeatureModel_rec(fm, root, newRoot);
 		
-		new FeatureModelWriter(interfaceProject).writeModel(fm, folder.getFile(IOConstants.FILENAME_MODEL));
+		new FeatureModelWriter().writeModel(fm, folder.getFile(IOConstants.FILENAME_MODEL));
 	}
 	
 	private void dublicateFeatureModel_rec(FeatureModel fm, Feature orginalFeature, Feature wrapperParent) {
