@@ -56,6 +56,7 @@ public class InterfaceParser extends AbstractLineReader<JavaRole> {
 	private int mode = 0;
 	
 	private String featureName, type, pckg, className, modifier;
+	private boolean hasClassDef = false;
 	private final LinkedList<JavaRole> stack = new LinkedList<JavaRole>();
 	private final LinkedList<String>
 			imports = new LinkedList<String>(),
@@ -78,8 +79,10 @@ public class InterfaceParser extends AbstractLineReader<JavaRole> {
 		line = line.trim();
 		if (!line.isEmpty()) {
 			if (line.startsWith(COMMENT)) {
+				createRole();
 				lastTagLine = line.substring(3);
-			} else if (line.startsWith("/*")){
+			} else if (line.startsWith("/*")) {
+				createRole();
 			} else {
 				switch (mode) {
 				case 0: if (line.startsWith("package ")) {
@@ -119,51 +122,9 @@ public class InterfaceParser extends AbstractLineReader<JavaRole> {
 							mode = 4;
 							break;
 						}
-				case 4: JavaClassSignature newRoleSig;
-						if (stack.isEmpty()) {
-							newRoleSig = new JavaClassSignature(null,
-									className, modifier, type, pckg);
-						} else {
-							newRoleSig = new JavaClassSignature(stack.peek().getSignature(),
-								className, modifier, type, null);
-						}
-				
-						for (String imp : imports) {
-							newRoleSig.addImport(imp);
-						}
-						for (String extend : extendList) {
-							newRoleSig.addExtend(extend);
-						}
-						for (String implement : implementList) {
-							newRoleSig.addImplement(implement);
-						}
-						imports.clear();
-						extendList.clear();
-						implementList.clear();
-						
-						
-						JavaClassSignature aSig = (JavaClassSignature) roleMap
-								.getSignatureRef(newRoleSig);
-						parseTags(aSig);
-				
-						JavaRole newRole = new JavaRole(featureName, aSig);
-						aSig.addFeature(featureName);
-						stack.push(newRole);
-						
-						mode = 5;
+				case 4: createRole();						
 				case 5: if (line.matches("(.*\\s(class|interface)|(class|interface))\\s.*$")) {
 							parseClass(line);
-							
-	//							JavaRoleSignature aSig = (JavaRoleSignature) interfaceProject.getRoleMap().getSignatureRef(
-	//									new JavaRoleSignature(className, pckg, modifier, type, null));
-	//							
-	//							JavaRole innerClass = new JavaRole(featureName, aSig);
-	//							
-	//							parseTags(aSig);
-	//							
-	//							stack.peek().addInnerClass(innerClass);
-	//							stack.push(innerClass);
-							
 							mode = 2;
 						} else if (line.endsWith("}")) {
 							JavaRole role = stack.pop();
@@ -241,7 +202,46 @@ public class InterfaceParser extends AbstractLineReader<JavaRole> {
 		return true;
 	}
 	
+	private void createRole() {
+		if (hasClassDef) {	
+			hasClassDef = false;
+			mode = 5;
+			
+			JavaClassSignature newRoleSig;
+			if (stack.isEmpty()) {
+				newRoleSig = new JavaClassSignature(null,
+						className, modifier, type, pckg);
+			} else {
+				newRoleSig = new JavaClassSignature(stack.peek().getSignature(),
+					className, modifier, type, null);
+			}
+	
+			for (String imp : imports) {
+				newRoleSig.addImport(imp);
+			}
+			for (String extend : extendList) {
+				newRoleSig.addExtend(extend);
+			}
+			for (String implement : implementList) {
+				newRoleSig.addImplement(implement);
+			}
+			imports.clear();
+			extendList.clear();
+			implementList.clear();
+			
+			
+			JavaClassSignature aSig = (JavaClassSignature) roleMap
+					.getSignatureRef(newRoleSig);
+			parseTags(aSig);
+	
+			JavaRole newRole = new JavaRole(featureName, aSig);
+			aSig.addFeature(featureName);
+			stack.push(newRole);
+		}
+	}
+	
 	private void parseClass(String line) {
+		hasClassDef = true;
 		modifier = "";
 		int index = line.lastIndexOf('{');
 		if (index > -1) {
@@ -265,8 +265,9 @@ public class InterfaceParser extends AbstractLineReader<JavaRole> {
 	private void parseTags(AbstractSignature sig) {
 		if (lastTagLine != null) {
 			String[] tags = lastTagLine.split(SEP1);
-			for (String token : tags) {
-				String[] tagElements = token.trim().split(SEP2);
+			lastTagLine = null;
+			for (String tag : tags) {
+				String[] tagElements = tag.trim().split(SEP2);
 				switch (tagElements.length) {
 				case 1: 
 					sig.addViewTag(viewTagPool.getViewTag(tagElements[0]));
@@ -276,10 +277,10 @@ public class InterfaceParser extends AbstractLineReader<JavaRole> {
 						int level = Integer.valueOf(tagElements[1]);
 						sig.addViewTag(viewTagPool.getViewTag(tagElements[0], level));
 					} catch (NumberFormatException e) {
+						return;
 					}
 				}
 			}
-			lastTagLine = null;
 		}
 	}
 }

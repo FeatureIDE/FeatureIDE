@@ -9,6 +9,6 @@ public abstract class AbstractClass extends AbstractClassFragment {
 		super(signature);
 		
 		members = new HashSet<AbstractSignature>();
-		innerClasses = new HashMap<AbstractClassSignature, AbstractClassFragment>();
+		innerClasses = new HashMap<String, AbstractClassFragment>();
 	}
 }

@@ -39,7 +39,7 @@ public abstract class AbstractClassFragment {
 	protected final AbstractClassSignature signature;
 
 	protected Collection<AbstractSignature> members;
-	protected Map<AbstractClassSignature, AbstractClassFragment> innerClasses;
+	protected Map<String, AbstractClassFragment> innerClasses;
 	
 	protected AbstractClassFragment(AbstractClassSignature signature) {
 		this.signature = signature;
@@ -53,12 +53,12 @@ public abstract class AbstractClassFragment {
 		return members;
 	}
 	
-	public Map<AbstractClassSignature, AbstractClassFragment> getInnerClasses() {
+	public Map<String, AbstractClassFragment> getInnerClasses() {
 		return innerClasses;
 	}
 	
-	public AbstractClassFragment getInnerClass(AbstractClassSignature classSignature) {
-		return innerClasses.get(classSignature);
+	public AbstractClassFragment getInnerClass(String classSignatureName) {
+		return innerClasses.get(classSignatureName);
 	}
 	
 	public int getMemberCount() {
@@ -75,9 +75,9 @@ public abstract class AbstractClassFragment {
 	}
 
 	public void addInnerClass(AbstractClassFragment innerClass) {
-		AbstractClassFragment orgInnerClass = innerClasses.get(innerClass.getSignature());
+		AbstractClassFragment orgInnerClass = innerClasses.get(innerClass.getSignature().getFullName());
 		if (orgInnerClass == null) {
-			innerClasses.put(innerClass.getSignature(), innerClass);
+			innerClasses.put(innerClass.getSignature().getFullName(), innerClass);
 		} else {
 			for (AbstractSignature member : innerClass.members) {
 				orgInnerClass.addMember(member);
@@ -135,7 +135,7 @@ public abstract class AbstractClassFragment {
 				return false;
 			}
 		}
-		for (Entry<AbstractClassSignature, AbstractClassFragment> entry : innerClasses.entrySet()) {
+		for (Entry<String, AbstractClassFragment> entry : innerClasses.entrySet()) {
 			AbstractClassFragment otherClassFragment = other.innerClasses.get(entry.getKey());
 			if (otherClassFragment == null
 					|| !otherClassFragment.equals(entry.getValue())) {

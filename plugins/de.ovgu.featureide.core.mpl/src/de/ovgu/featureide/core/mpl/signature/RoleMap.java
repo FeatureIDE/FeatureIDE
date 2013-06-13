@@ -22,19 +22,10 @@ package de.ovgu.featureide.core.mpl.signature;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Set;
-
-import org.prop4j.And;
-import org.prop4j.Literal;
-import org.prop4j.Node;
-import org.prop4j.SatSolver;
-import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.core.mpl.JavaInterfaceProject;
-import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassSignature;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractFieldSignature;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractMethodSignature;
@@ -42,9 +33,6 @@ import de.ovgu.featureide.core.mpl.signature.abstr.AbstractRole;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature;
 import de.ovgu.featureide.core.mpl.signature.java.JavaClassCreator;
 import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.Selection;
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 /** 
  * Maps the feature names to a list of role signatures.
@@ -57,8 +45,8 @@ public class RoleMap {
 	private final HashMap<String, FeatureRoles> 
 		featureRoleMap = new HashMap<String, FeatureRoles>();
 
-	private final LinkedList<AbstractSignature> 
-		childSignatures = new LinkedList<AbstractSignature>();
+//	private final LinkedList<AbstractSignature> 
+//		childSignatures = new LinkedList<AbstractSignature>();
 	
 	private final JavaInterfaceProject interfaceProject;
 	
@@ -100,7 +88,7 @@ public class RoleMap {
 		return ret;
 	}
 
-	public ProjectSignature generateSignature(List<String> featureList, ViewTag viewTag) {
+	public ProjectSignature generateSignature2(List<String> featureList, ViewTag viewTag) {
 		ProjectSignature javaSig = new ProjectSignature(viewTag);
 		
 		if (featureList == null) {
@@ -122,24 +110,24 @@ public class RoleMap {
 		return javaSig;
 	}
 	
-//	public ProjectSignature generateSignature() {
-//		return generateSignature(null, null);
-//	}
-//	
-//	public ProjectSignature generateSignature(List<String> featureList) {
-//		return generateSignature(featureList, null);
-//	}
-//	
-//	public ProjectSignature generateSignature(ViewTag viewTag) {
-//		return generateSignature(null, viewTag);
-//	}
+	public ProjectSignature generateSignature() {
+		return generateSignature(null, null);
+	}
 	
-	public ProjectSignature generateSignature2(List<String> featureList, ViewTag viewTag) {
+	public ProjectSignature generateSignature(List<String> featureList) {
+		return generateSignature(featureList, null);
+	}
+	
+	public ProjectSignature generateSignature(ViewTag viewTag) {
+		return generateSignature(null, viewTag);
+	}
+	
+	public ProjectSignature generateSignature(List<String> featureList, ViewTag viewTag) {
 		ProjectSignature javaSig = new ProjectSignature(viewTag);
 		javaSig.setaClassCreator(new JavaClassCreator());
 		
 		if (featureList == null) {
-			for (AbstractSignature sig : childSignatures) {
+			for (AbstractSignature sig : signatureSet.keySet()) {
 				javaSig.addSignature(sig);
 			}
 		} else {
@@ -153,55 +141,6 @@ public class RoleMap {
 			}
 		}
 		return javaSig;
-	}
-	
-	public ProjectSignature[] extendedSignature() {
-		Configuration conf; {
-			Configuration curConf = interfaceProject.getConfiguration();
-			conf = new Configuration(curConf, curConf.getFeatureModel(), true);
-		}
-		Set<Feature> unselectedFeatures = conf.getUnSelectedFeatures();
-		ProjectSignature[] extendedSignatures = new ProjectSignature[unselectedFeatures.size() + 1];
-		int i = 0;
-		for (Feature feature : unselectedFeatures) {
-			conf.setManual(feature.getName(), Selection.SELECTED);
-			extendedSignatures[i++] = ka(conf.getSelectedFeatures());
-			conf.setManual(feature.getName(), Selection.UNSELECTED);
-		}
-		extendedSignatures[i] = ka(conf.getSelectedFeatures());
-		return extendedSignatures;
-	}
-	
-	private ProjectSignature ka(Set<Feature> selectedFeatures) {
-		ProjectSignature projectSig = new ProjectSignature(null);
-		projectSig.setaClassCreator(new JavaClassCreator());
-		
-		Node[] fixClauses = new Node[selectedFeatures.size() + 1];
-		int i = 0;
-		for (Feature feature : selectedFeatures) {
-			fixClauses[i++] = new Literal(feature.getName(), true);
-		}
-		fixClauses[i] = NodeCreator.createNodes(interfaceProject.getFeatureModel());
-		
-		for (AbstractSignature sig : childSignatures) {
-			Node[] clauses = new Node[sig.getFeatures().size() + fixClauses.length];
-			int j = 0;
-			for (String featureName : sig.getFeatures()) {
-				clauses[j++] = new Literal(featureName, false);
-			}
-			System.arraycopy(fixClauses, 0, clauses, j, fixClauses.length);
-			
-			SatSolver solver = new SatSolver(new And(clauses), 1000);
-			try {
-				if (!solver.isSatisfiable()) {
-					projectSig.addSignature(sig);
-				}
-			} catch (TimeoutException e) {
-				MPLPlugin.getDefault().logError(e);
-			}
-			
-		}
-		return projectSig;
 	}
 
 	@Deprecated

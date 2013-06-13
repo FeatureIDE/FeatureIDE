@@ -53,11 +53,11 @@ public class ViewTag implements Comparable<ViewTag> {
 	}
 	
 	public boolean matches(ViewTag otherViewTag) {
-		return otherViewTag.level <= level && otherViewTag.name.equals(name);
+		return otherViewTag.level <= level && name.equals(otherViewTag.name);
 	}
 	
 	public boolean matches(String name, int level) {
-		return this.level <= level && this.name.equals(name);
+		return level <= this.level && this.name.equals(name);
 	}
 	
 	@Override

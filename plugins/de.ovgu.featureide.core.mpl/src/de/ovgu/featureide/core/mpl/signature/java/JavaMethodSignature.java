@@ -46,32 +46,32 @@ public class JavaMethodSignature extends AbstractMethodSignature {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder methodString = new StringBuilder();
 		
-		sb.append(super.toString());
-		sb.append(LINE_SEPARATOR);
+		methodString.append(super.toString());
+		methodString.append(LINE_SEPARATOR);
 		
 		if (!modifiers.isEmpty()) {
-			sb.append(modifiers);
-			sb.append(' ');
+			methodString.append(modifiers);
+			methodString.append(' ');
 		}
 		
 		if (!isConstructor) {
-			sb.append(type);
-			sb.append(' ');
+			methodString.append(type);
+			methodString.append(' ');
 		}
 		
-		sb.append(name);
-		sb.append('(');
+		methodString.append(name);
+		methodString.append('(');
 		for (int i = 0; i < parameterTypes.size(); i++) {
-			if (i > 0) sb.append(", ");
-			sb.append(parameterTypes.get(i));
-			sb.append(" arg");
-			sb.append(i);
+			if (i > 0) methodString.append(", ");
+			methodString.append(parameterTypes.get(i));
+			methodString.append(" arg");
+			methodString.append(i);
 		}
-		sb.append(')');
+		methodString.append(')');
 		
-		return sb.toString();
+		return methodString.toString();
 	}
 
 	@Override

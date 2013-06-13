@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -34,9 +35,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.prop4j.And;
 import org.prop4j.Implies;
 import org.prop4j.Literal;
 import org.prop4j.Node;
+import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.core.CorePlugin;
@@ -46,13 +49,19 @@ import de.ovgu.featureide.core.mpl.io.constants.IOConstants;
 import de.ovgu.featureide.core.mpl.signature.FeatureRoles;
 import de.ovgu.featureide.core.mpl.signature.ProjectSignature;
 import de.ovgu.featureide.core.mpl.signature.RoleMap;
+import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassFragment;
+import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassSignature;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractRole;
+import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature;
+import de.ovgu.featureide.core.mpl.signature.java.JavaClassCreator;
 import de.ovgu.featureide.core.mpl.util.NumberConverter;
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
+import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 /** 
  * Writes different types of interface files.
@@ -132,19 +141,80 @@ public class InterfaceWriter extends AbstractWriter {
 		super(interfaceProject);
 	}
 	
-//	public void extendeModlues() {
-//		FeatureModel fm = interfaceProject.getFeatureModel();
-//		Configuration startConfiguration = new Configuration(fm);
-//		
-//		for (Feature feature : fm.getConcreteFeatures()) {
-//			String featureName = feature.getName();
-//			Configuration curConfiguration = new Configuration(startConfiguration, startConfiguration.getFeatureModel(), true);
-//			curConfiguration.setManual(featureName, Selection.SELECTED);
-//			for (Feature feature2 : curConfiguration.getSelectedFeatures()) {
-//				feature2.getName();
-//			}
-//		}
-//	}
+	private void writeExtendedModule(ProjectSignature signature, String featureName, String folderName) {
+		for (AbstractClassFragment curClass : signature.getClasses()) {
+			AbstractClassSignature classSig = curClass.getSignature();
+			String packagename = classSig.getPackage();
+			
+			String path = folderName + "/" + featureName + (packagename.isEmpty() ? "" :"/" + packagename);
+			
+			IFolder folder = CorePlugin.createFolder(interfaceProject.getProjectReference(), path);
+			
+			writeToFile(folder.getFile(classSig.getName() + IOConstants.EXTENSION_JAVA), curClass.toShortString());
+		}
+	}
+	
+	public void createExtendedSignatures(final String folder) {
+		new MonitorJob("Build Extended Modules") {
+			protected boolean work() {
+				Configuration conf; {
+					Configuration curConf = interfaceProject.getConfiguration();
+					conf = new Configuration(curConf, curConf.getFeatureModel(), true);
+				}
+				LinkedList<String> allConcreteFeatures = new LinkedList<String>();
+				for (SelectableFeature feature : conf.getFeatures()) {
+					if (feature.getFeature().isConcrete() && !feature.getFeature().isHidden()) {
+						allConcreteFeatures.add(feature.getName());
+					}
+				}
+				setMaxAbsoluteWork(allConcreteFeatures.size());
+				
+				for (String featureName : allConcreteFeatures) {
+					try {
+						conf.setManual(featureName, Selection.SELECTED);
+						writeExtendedModule(buildSignature(conf.getSelectedFeatures()), featureName, folder);
+						conf.setManual(featureName, Selection.UNSELECTED);
+					} catch (Exception e) {
+					}
+					worked();
+				}
+				
+				MPLPlugin.getDefault().logInfo("Built Extended Modules");
+				return true;
+			}
+		};
+	}
+	
+	private ProjectSignature buildSignature(Set<Feature> selectedFeatures) {
+		ProjectSignature projectSig = new ProjectSignature(null);
+		projectSig.setaClassCreator(new JavaClassCreator());
+		
+		Node[] fixClauses = new Node[selectedFeatures.size() + 1];
+		int i = 0;
+		for (Feature feature : selectedFeatures) {
+			fixClauses[i++] = new Literal(feature.getName(), true);
+		}
+		fixClauses[i] = NodeCreator.createNodes(interfaceProject.getFeatureModel());
+		
+		for (AbstractSignature sig : interfaceProject.getRoleMap().getSignatures()) {
+			Node[] clauses = new Node[sig.getFeatures().size() + fixClauses.length];
+			int j = 0;
+			for (String featureName : sig.getFeatures()) {
+				clauses[j++] = new Literal(featureName, false);
+			}
+			System.arraycopy(fixClauses, 0, clauses, j, fixClauses.length);
+			
+			SatSolver solver = new SatSolver(new And(clauses), 1000);
+			try {
+				if (!solver.isSatisfiable()) {
+					projectSig.addSignature(sig);
+				}
+			} catch (TimeoutException e) {
+				MPLPlugin.getDefault().logError(e);
+			}
+		}
+		return projectSig;
+	}
 	
 	public void buildConfigurationInterfaces() {
 		new MonitorJob("Build Configuration Interfaces") {

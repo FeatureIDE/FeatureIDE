@@ -40,7 +40,7 @@ import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature;
  */
 public class ProjectSignature {
 
-	protected final HashMap<AbstractClassSignature, AbstractClassFragment> classList = new HashMap<AbstractClassSignature, AbstractClassFragment>();
+	protected final HashMap<String, AbstractClassFragment> classList = new HashMap<String, AbstractClassFragment>();
 	protected final ViewTag viewTag;
 	
 	protected int hashCode = 0;
@@ -58,7 +58,7 @@ public class ProjectSignature {
 		return viewTag;
 	}
 	
-	public AbstractClassFragment getClass(AbstractClassSignature id) {
+	public AbstractClassFragment getClass(String id) {
 		return classList.get(id);
 	}
 	
@@ -67,33 +67,8 @@ public class ProjectSignature {
 	}
 	
 	private void addClass(AbstractClassFragment classSig) {
-		classList.put(classSig.getSignature(), classSig);
+		classList.put(classSig.getSignature().getFullName(), classSig);
 	}
-	
-//	public void addRole(AbstractRole role) {
-//		AbstractClassSignature roleSig = role.getSignature();
-//		if (roleSig.hasViewTag(viewTag)) {
-//			hasHashCode = false;
-//			AbstractClassFragment aClass = getClass(roleSig);
-//			if (aClass == null) {
-//				aClass = role.toClass();
-//				addClass(aClass);
-//			}
-//			for (AbstractSignature member : role.getMembers()) {
-//				if (member.hasViewTag(viewTag)) {
-//					aClass.addMember(member);
-//				}
-//			}
-//			for (AbstractClassFragment innerClass : role.getInnerClasses().values()) {
-//				if (innerClass.getSignature().hasViewTag(viewTag)) {
-//					aClass.addInnerClass(innerClass, viewTag);
-//				}
-//			}
-//			for (String imp : role.getSignature().getImportList()) {
-//				aClass.getSignature().addImport(imp);
-//			}
-//		}
-//	}
 	
 	public void addRole(AbstractRole role) {
 		addRoleRec(role, null);
@@ -104,8 +79,8 @@ public class ProjectSignature {
 		if (roleSig.hasViewTag(viewTag)) {
 			hasHashCode = false;
 			AbstractClassFragment aClass = (parent == null)
-					? getClass(roleSig)
-					: parent.getInnerClass(roleSig);
+					? getClass(roleSig.getFullName())
+					: parent.getInnerClass(roleSig.getFullName());
 					
 			if (aClass == null) {
 				aClass = role.toClass();
@@ -123,9 +98,6 @@ public class ProjectSignature {
 			for (AbstractClassFragment innerClass : role.getInnerClasses().values()) {
 				addRoleRec((AbstractRole) innerClass, aClass);
 			}
-//			for (String imp : roleSig.getImportList()) {
-//				aClass.getSignature().addImport(imp);
-//			}
 		}
 	}
 
@@ -136,56 +108,60 @@ public class ProjectSignature {
 	}
 
 	public void addSignature(AbstractSignature sig) {
-//		if (sig.hasViewTag(viewTag)) {
-//			LinkedList<AbstractClassSignature> parents = new LinkedList<AbstractClassSignature>();
-//			AbstractClassSignature parent = sig.getParent();
-//			while (parent != null) {
-//				if (!parent.hasViewTag(viewTag)) {
-//					return;
-//				}
-//				parents.add(parent);
-//				parent = parent.getParent();
-//			}
-//			if (!parents.isEmpty()) {
-//				parent = parents.removeLast();
-//				AbstractClassFragment parentClass = getClass(parent);
-//				if (parentClass == null) {
-//					parentClass = aClassCreator.create(parent);
-//					addClass(parentClass);
-//				}
-//				for (AbstractClassSignature abstractClassSignature : parents) {
-//					AbstractClassFragment parentClass = (parent == null) getClass(parent);
-//					if (parentClass == null) {
-//						parentClass = aClassCreator.create(parent);
-//						addClass(parentClass);
-//					}
-//				}
-//			}
-//			
-//			if (sig instanceof AbstractClassSignature) {
-//				
-//			}
-//			classList.put(parent, parentClass);
-//			parentClass = aClassCreator.create(parent);
-//			
-//			AbstractClassSignature parent = sig.getParent();
-//			if (parent != null && parent.hasViewTag(viewTag)) {
-//				AbstractClassFragment parentClass = aClassCreator.create(parent);
-//				parentClass.addMember(sig);
-//				while (parent.getParent() != null) {
-//					AbstractClassSignature child = parent;
-//					parent = parent.getParent();
-//					if (!parent.hasViewTag(viewTag)) {
-//						return;
-//					}
-//					parentClass = aClassCreator.create(parent);
-//
-//					parentClass.addMember(child);
-//				}
-//				classList.put(parent, parentClass);
-//			}
-//		}
-		
+		if (sig.hasViewTag(viewTag)) {
+			LinkedList<AbstractClassSignature> parents = new LinkedList<AbstractClassSignature>();
+			AbstractClassSignature parent = sig.getParent();
+			while (parent != null) {
+				if (!parent.hasViewTag(viewTag)) {
+					return;
+				}
+				parents.addFirst(parent);
+				parent = parent.getParent();
+			}
+			boolean isMember = true;
+			if (sig instanceof AbstractClassSignature) {
+				parents.addFirst((AbstractClassSignature) sig);
+				isMember = false;
+			}
+
+			AbstractClassFragment parentClass = null;
+			
+			if (!parents.isEmpty()) {
+				parent = parents.removeFirst();
+				parentClass = getClass(parent.getFullName());
+				if (parentClass == null) {
+					parentClass = aClassCreator.create(parent);
+					addClass(parentClass);
+				} else {
+					for (String extend : parent.getExtendList()) {
+						parentClass.getSignature().addExtend(extend);
+					}
+					for (String implement : parent.getImplementList()) {
+						parentClass.getSignature().addImplement(implement);
+					}
+				}
+				for (AbstractClassSignature child : parents) {
+					AbstractClassFragment childClass = parentClass.getInnerClass(child.getFullName());
+					
+					if (childClass == null) {
+						childClass = aClassCreator.create(child);
+						parentClass.addInnerClass(childClass);
+					} else {
+						for (String extend : child.getExtendList()) {
+							parentClass.getSignature().addExtend(extend);
+						}
+						for (String implement : child.getImplementList()) {
+							parentClass.getSignature().addImplement(implement);
+						}
+					}
+					parentClass = childClass;
+				}
+			}
+			
+			if (isMember) {
+				parentClass.addMember(sig);
+			}
+		}
 	}
 
 	public boolean equals(Object obj) {
@@ -198,7 +174,7 @@ public class ProjectSignature {
 				|| classList.size() != otherSig.classList.size()) {
 			return false;
 		}
-		for (Entry<AbstractClassSignature, AbstractClassFragment> entrySet : classList.entrySet()) {
+		for (Entry<String, AbstractClassFragment> entrySet : classList.entrySet()) {
 			AbstractClassFragment otherClassSig = otherSig.classList.get(entrySet.getKey());
 			if (otherClassSig == null || !otherClassSig.equals(entrySet.getValue())) {
 				return false;
@@ -210,10 +186,8 @@ public class ProjectSignature {
 	@Override
 	public int hashCode() {
 		if (!hasHashCode) {
-//			final int prime = 31;
 			hashCode = 1;
 			for (AbstractClassFragment cls : classList.values()) {
-//				hashCode = prime * hashCode + cls.hashCode();
 				hashCode = hashCode + cls.hashCode();
 			}
 			hasHashCode = true;
@@ -240,15 +214,15 @@ public class ProjectSignature {
 		return (memberCount == 0) ? 1 : Math.floor(rf * eqMemberCount / memberCount) / rf;
 	}
 	
-	private int[] countEqMembers(Map<AbstractClassSignature, AbstractClassFragment> thisClassSigMap, Map<AbstractClassSignature, AbstractClassFragment> otherClassSigMap) {		
+	private int[] countEqMembers(Map<String, AbstractClassFragment> thisClassSigMap, Map<String, AbstractClassFragment> otherClassSigMap) {		
 		int memberCount = 0, eqMemberCount = 0;
 		
 		if (!thisClassSigMap.isEmpty() && !otherClassSigMap.isEmpty()) {
-			final HashSet<AbstractClassSignature> ids = new HashSet<AbstractClassSignature>(thisClassSigMap.keySet());
+			final HashSet<String> ids = new HashSet<String>(thisClassSigMap.keySet());
 			ids.addAll(otherClassSigMap.keySet());
 			memberCount += ids.size();
 			
-			for (AbstractClassSignature id : ids) {
+			for (String id : ids) {
 				final AbstractClassFragment 
 					thisClassSig = thisClassSigMap.get(id),
 					otherClassSig = otherClassSigMap.get(id);
@@ -276,7 +250,7 @@ public class ProjectSignature {
 				}
 			}
 		} else {
-			final Map<AbstractClassSignature, AbstractClassFragment> classSigMap;
+			final Map<String, AbstractClassFragment> classSigMap;
 			if (!thisClassSigMap.isEmpty()) {
 				classSigMap = thisClassSigMap;
 			} else if (!otherClassSigMap.isEmpty()) {
@@ -291,7 +265,6 @@ public class ProjectSignature {
 				}
 			}
 		}
-		
 		return new int[]{eqMemberCount, memberCount};
 	}
 }

@@ -39,7 +39,7 @@ public class BuildExtendedModulesAction extends AbstractProjectAction {
 		BuildExtendedModulesWizard wizard = new BuildExtendedModulesWizard("Folder of extended Modules");
 		WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
 		if (dialog.open() == Dialog.OK) {
-			MPLPlugin.getDefault().extendedModules(project, wizard.getFolderName());
+			MPLPlugin.getDefault().extendedModules(project.getName(), wizard.getFolderName());
 		}
 	}
 }

@@ -57,9 +57,6 @@ public abstract class AbstractLineReader<E> {
 	
 	public E read() {
 		if (file != null) {
-			if (file.getFullPath().toString().equals("/_GPL-FH-Java_Interfaces/features/Base/GPL/GPL.NeighborIfc.java")) {
-				System.out.println(file.getFullPath());
-			}
 			try {
 				BufferedReader br = new BufferedReader(new InputStreamReader(file.getContents()));
 				if (prepareRead()) {
@@ -68,11 +65,6 @@ public abstract class AbstractLineReader<E> {
 						if (!readLine(line)) {
 							return null;
 						}
-					}
-					if (infoObj == null) {
-						System.out.println(file.getFullPath());
-						System.out.println("-------------------------------------------------------------");
-						System.out.println(file.getContents());
 					}
 					return infoObj;
 				}

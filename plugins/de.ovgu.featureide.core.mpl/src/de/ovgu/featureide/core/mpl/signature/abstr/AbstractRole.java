@@ -14,7 +14,7 @@ public abstract class AbstractRole extends AbstractClassFragment {
 		this.featureName = featureName;
 		
 		members = new LinkedList<AbstractSignature>();
-		innerClasses = new HashMap<AbstractClassSignature, AbstractClassFragment>();
+		innerClasses = new HashMap<String, AbstractClassFragment>();
 	}
 	
 	protected AbstractRole(AbstractRole role, ViewTag viewTag) {
@@ -27,7 +27,7 @@ public abstract class AbstractRole extends AbstractClassFragment {
 		}
 		for (AbstractClassFragment innerClass : role.innerClasses.values()) {
 			if (innerClass.signature.hasViewTag(viewTag)) {
-				innerClasses.put(innerClass.getSignature(), 
+				innerClasses.put(innerClass.getSignature().getFullName(), 
 						((AbstractRole)innerClass).reduce(viewTag));
 			}
 		}
@@ -36,13 +36,6 @@ public abstract class AbstractRole extends AbstractClassFragment {
 	public String getFeatureName() {
 		return featureName;
 	}
-
-//	@Override
-//	public void addInnerClass(AbstractClassFragment innerClass) {
-////		if (innerClass instanceof AbstractRole) {
-//			super.addInnerClass(innerClass);
-////		}
-//	}
 
 	public abstract AbstractClass toClass();
 	public abstract AbstractRole reduce(ViewTag viewTag);

@@ -151,16 +151,15 @@ public class JavaClassBuilder extends ClassBuilder {
 		// get name
 		String name = getMethodName(terminal);
 		
+		String head = getHead(terminal.getBody(), name).replace("/*", "");
+		int index = head.trim().lastIndexOf(' ');
+		
 		// get return type
-		String head = getHead(terminal.getBody(), name);
-		String returnType = head.split("[ ]")[head.split("[ ]").length -1];
+		String returnType = head.substring(index + 1).trim();
 		
 		// get modifiers
-		String modifiers = "";
-		if (head.indexOf(returnType) != 0) {
-			modifiers = head.substring(0, head.indexOf(returnType)-1);
-		}
-
+		String modifiers = (index == -1) ? "" : head.substring(0, index);
+		
 		// add method
 		addMethod(name, getMethodParameter(terminal), returnType, modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine, false);
 	}
@@ -253,7 +252,8 @@ public class JavaClassBuilder extends ClassBuilder {
 	@Override
 	public void caseClassDeclarationType(FSTTerminal terminal) {
 		if (modelBuilder.hasCurrentClassFragment()) {
-			modelBuilder.getCurrentClassFragment().setType(terminal.getBody());
+			String body = terminal.getBody().replaceAll("\\W", "");
+			modelBuilder.getCurrentClassFragment().setType(body);
 		}
 	}
 
@@ -296,7 +296,8 @@ public class JavaClassBuilder extends ClassBuilder {
 	@Override
 	public void caseModifiers(FSTTerminal terminal) {
 		if (modelBuilder.hasCurrentClassFragment()) {
-			modelBuilder.getCurrentClassFragment().setModifiers(terminal.getBody());
+			String body = terminal.getBody().replaceAll("\\W", "");
+			modelBuilder.getCurrentClassFragment().setModifiers(body);
 		}
 	}
 }

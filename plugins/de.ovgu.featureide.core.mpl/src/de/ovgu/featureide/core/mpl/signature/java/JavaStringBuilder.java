@@ -78,7 +78,7 @@ public class JavaStringBuilder {
 		if (!cls.getMembers().isEmpty()) {
 			for (AbstractSignature member : cls.getMembers()) {
 				sb.append("\t");
-				sb.append(member.toString());
+				sb.append(member.toString().replace(LINE_SEPARATOR, LINE_SEPARATOR + '\t'));
 				if (member instanceof AbstractFieldSignature) {
 					AbstractFieldSignature field = (AbstractFieldSignature) member;
 					if (shortString || !field.getModifiers().contains("final")) {
@@ -92,6 +92,7 @@ public class JavaStringBuilder {
 						sb.append(';');
 					} else {
 						sb.append(" {");
+						sb.append(LINE_SEPARATOR);
 						
 						//TODO richtigen super aufruf hinzufügen 
 						if (method.isConstructor()) {
@@ -111,58 +112,14 @@ public class JavaStringBuilder {
 								sb.append("\t\t" + getReturnStatement(method));
 							}
 						}
-						
+
+						sb.append(LINE_SEPARATOR);
 						sb.append("\t}");
 					}
 				}
 			}
 			sb.append(LINE_SEPARATOR);
 		}
-
-//		if (!cls.getFields().isEmpty()) {
-//			for (JavaFieldSignature field : cls.getFields()) {
-//				sb.append("\t");
-//				sb.append(field.toString());
-//				if (shortString || !field.getModifiers().contains("final")) {
-//					sb.append(';');
-//				} else {
-//					sb.append(getFinalFieldInit(field));
-//				}
-//			}
-//			sb.append(LINE_SEPARATOR);
-//		}
-//
-//		for (JavaMethodSignature method : cls.getMethods()) {
-//			sb.append("\t");
-//			if (shortString || !"class".equals(cls.getSignature().getType())) {
-//				sb.append(method.toString());
-//				sb.append(';');
-//			} else {
-//				sb.append(method.toString());
-//				sb.append(" {");
-//				
-//				//TODO richtigen super aufruf hinzufügen 
-//				if (method.isConstructor()) {
-//					sb.append("\t\tsuper();");
-//				}
-//				if (MPLPlugin.WRAPPER_INTERFACES) {
-//					String original = "\t\t" +
-//							((method.isConstructor() || method.getType().equals("void")) ? "" : "return ") + 
-//							"original(";
-//					for (int i = 0; i < method.getParameterTypes().size(); i++) {
-//						if (i > 0) original += ", ";
-//						original += "arg" + i;
-//					}
-//					sb.append(original + ");");
-//				} else {
-//					if (!method.isConstructor()) {
-//						sb.append("\t\t" + getReturnStatement(method));
-//					}
-//				}
-//				
-//				sb.append("\t}");
-//			}
-//		}
 		sb.append(LINE_SEPARATOR);
 		sb.append('}');
 		

@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.core.mpl.signature.abstr;
 
-import java.util.LinkedList;
+import java.util.HashSet;
 
 /**
  * Abstract signature for one class.
@@ -31,48 +31,46 @@ public abstract class AbstractClassSignature extends AbstractSignature {
 
 	protected final String pckg;
 
-	protected final LinkedList<String> 
+	protected final HashSet<String> 
 		importList, extendList, implementList;
 	
 	protected AbstractClassSignature(AbstractClassSignature parent, String name, String modifiers, String type, String pckg) {
 		super(parent, name, modifiers, type, null);
 		this.pckg = pckg == null ? "" : pckg;
 		if (parent == null) {
-			setFullName(pckg);
+			setFullName(this.pckg);
 		}
-		importList = new LinkedList<String>();
-		extendList = new LinkedList<String>();
-		implementList = new LinkedList<String>();
+		importList = new HashSet<String>();
+		extendList = new HashSet<String>();
+		implementList = new HashSet<String>();
 	}
 	
 	protected AbstractClassSignature(AbstractClassSignature orgSig, boolean ext) {
 		super(orgSig, ext);
-		pckg =  orgSig.pckg;
-		importList = new LinkedList<String>(orgSig.importList);
-		extendList = new LinkedList<String>(orgSig.extendList);
-		implementList = new LinkedList<String>(orgSig.implementList);
+		pckg = orgSig.pckg;
+		importList = new HashSet<String>(orgSig.importList);
+		extendList = new HashSet<String>(orgSig.extendList);
+		implementList = new HashSet<String>(orgSig.implementList);
 	}
 
 	public String getPackage() {
 		return pckg;
 	}
 	
-	public LinkedList<String> getImportList() {
+	public HashSet<String> getImportList() {
 		return importList;
 	}
 
-	public LinkedList<String> getExtendList() {
+	public HashSet<String> getExtendList() {
 		return extendList;
 	}
 
-	public LinkedList<String> getImplementList() {
+	public HashSet<String> getImplementList() {
 		return implementList;
 	}
 
 	public void addImport(String imp) {
-		if (!importList.contains(imp)) {
-			importList.add(imp);
-		}
+		importList.add(imp);
 	}
 
 	public void addImplement(String implement) {

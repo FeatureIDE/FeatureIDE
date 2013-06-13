@@ -229,7 +229,7 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 			if (classFragmentStack.isEmpty() 
 					&& curClassFragment.getPackage() == null) {
 //				curClassFragment.setPackage(currentFile.getParent().getName());
-				FeatureHouseCorePlugin.getDefault().logWarning("No package defined for " + curClassFragment.getName() + "!");
+				FeatureHouseCorePlugin.getDefault().logWarning("No package defined for " + curClassFragment.getName());
 			}
 		}
 	}

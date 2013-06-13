@@ -24,7 +24,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -39,12 +38,9 @@ import de.ovgu.featureide.core.mpl.builder.InterfaceProjectNature;
 import de.ovgu.featureide.core.mpl.io.InterfaceWriter;
 import de.ovgu.featureide.core.mpl.io.JavaProjectWriter;
 import de.ovgu.featureide.core.mpl.io.constants.IOConstants;
-import de.ovgu.featureide.core.mpl.signature.FeatureRoles;
-import de.ovgu.featureide.core.mpl.signature.RoleMap;
 import de.ovgu.featureide.core.mpl.util.ConfigurationChangeListener;
 import de.ovgu.featureide.core.mpl.util.EditorTracker;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
-import de.ovgu.featureide.fm.core.Feature;
 
 /** 
  * Plug-in activator with miscellaneous function for an interface project.
@@ -141,7 +137,6 @@ public class MPLPlugin extends AbstractCorePlugin {
 				JavaInterfaceProject interfaceProject = new JavaInterfaceProject(newProject, featureProject);
 				projectMap.put(projectName, interfaceProject);
 				
-//				new JavaSignatureWriter(featureProject, interfaceProject).writeSignatures();
 				interfaceProject.getRoleMap().addDefaultViewTag("view1");
 				refresh(interfaceProject);
 			} catch (Exception e) {
@@ -168,26 +163,10 @@ public class MPLPlugin extends AbstractCorePlugin {
 	}
 	
 	public void buildConfigurationInterfaces(String projectName, String viewName, int viewLevel, int configLimit) {
-//		JavaInterfaceProject interfaceProject = getInterfaceProject(projectName);
-//		if (interfaceProject != null) {
-//			interfaceProject.refreshRoleMap();
-//			interfaceProject.setConfigLimit(configLimit);
-//			interfaceProject.setFilterViewTag(viewName, viewLevel);
-//			
-//			(new InterfaceWriter(interfaceProject)).buildConfigurationInterfaces();
-//		}
 		buildInterfaces(1, projectName, viewName, viewLevel, configLimit);
 	}
 	
 	public void compareConfigurationInterfaces(String projectName, String viewName, int viewLevel, int configLimit) {
-//		JavaInterfaceProject interfaceProject = getInterfaceProject(projectName);
-//		if (interfaceProject != null) {
-//			interfaceProject.refreshRoleMap();
-//			interfaceProject.setConfigLimit(configLimit);
-//			interfaceProject.setFilterViewTag(viewName, viewLevel);
-//			
-//			(new InterfaceWriter(interfaceProject)).compareConfigurationInterfaces();
-//		}
 		buildInterfaces(0, projectName, viewName, viewLevel, configLimit);
 	}
 	
@@ -248,7 +227,17 @@ public class MPLPlugin extends AbstractCorePlugin {
 		new InterfaceWriter(interfaceProject).buildAllFeatureInterfaces(false);
 	}
 	
-	public void extendedModules(IProject project, String folder) {
+
+	public void extendedModules(String projectName, String folder) {
+		JavaInterfaceProject interfaceProject = getInterfaceProject(projectName);
+		if (interfaceProject != null) {
+			interfaceProject.refreshRoleMap();
+			
+			new InterfaceWriter(interfaceProject).createExtendedSignatures(folder);
+		}
+	}
+	
+//	public void extendedModules(IProject project, String folder) {
 //		JavaInterfaceProject interfaceProject = getInterfaceProject(project);
 //		if (interfaceProject != null) {
 //			FeatureModel model = interfaceProject.getFeatureModel();
@@ -335,22 +324,18 @@ public class MPLPlugin extends AbstractCorePlugin {
 //			InterfaceWriter interfaceWriter = new InterfaceWriter(interfaceProject);
 //			interfaceWriter.buildAllFeatureInterfaces(folder);
 //		}		
-	}
-
-	private LinkedList<FeatureRoles> getChildFeatureSig(
-			RoleMap roleMap, LinkedList<String> list,
-			LinkedList<Feature> curChildren) {
-		LinkedList<FeatureRoles> sigsOfChilds = new LinkedList<FeatureRoles>();
-		for (Feature curChild : curChildren) {
-			//Kinder aus der Liste der zu behandelnden Features löschen
-			list.remove(curChild.getName());
-			FeatureRoles featureSig = roleMap.getRoles(curChild.getName());
-			sigsOfChilds.add(featureSig);
-		}
-		return sigsOfChilds;
-	}
-	
-	public void extended(JavaInterfaceProject interfaceProject) {
-		
-	}
+//	}
+//
+//	private LinkedList<FeatureRoles> getChildFeatureSig(
+//			RoleMap roleMap, LinkedList<String> list,
+//			LinkedList<Feature> curChildren) {
+//		LinkedList<FeatureRoles> sigsOfChilds = new LinkedList<FeatureRoles>();
+//		for (Feature curChild : curChildren) {
+//			//Kinder aus der Liste der zu behandelnden Features löschen
+//			list.remove(curChild.getName());
+//			FeatureRoles featureSig = roleMap.getRoles(curChild.getName());
+//			sigsOfChilds.add(featureSig);
+//		}
+//		return sigsOfChilds;
+//	}
 }
