@@ -35,7 +35,7 @@ import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassSignature;
 import de.ovgu.featureide.core.mpl.signature.java.JavaFieldSignature;
 import de.ovgu.featureide.core.mpl.signature.java.JavaMethodSignature;
 import de.ovgu.featureide.core.mpl.signature.java.JavaRole;
-import de.ovgu.featureide.core.mpl.signature.java.JavaRoleSignature;
+import de.ovgu.featureide.core.mpl.signature.java.JavaClassSignature;
 
 /**
  * Saves information from the {@link FSTModel}.
@@ -79,11 +79,8 @@ public class JavaSignatureWriter extends AbstractWriter {
 	}
 	
 	private JavaRole getRole(RoleMap roleMap, String featureName, AbstractClassSignature parent, String name, String pckg, FSTClassFragment classFragment) {		
-		JavaRoleSignature newRoleSig = new JavaRoleSignature(null, name, classFragment.getModifiers(), classFragment.getType(), pckg);
+		JavaClassSignature newRoleSig = new JavaClassSignature(null, name, classFragment.getModifiers(), classFragment.getType(), pckg);
 		
-		for (String imp : classFragment.getImports()) {
-			newRoleSig.addImport(imp);
-		}
 		for (String extend : classFragment.getExtends()) {
 			newRoleSig.addExtend(extend);
 		}
@@ -91,8 +88,12 @@ public class JavaSignatureWriter extends AbstractWriter {
 			newRoleSig.addImplement(implement);
 		}
 		
-		JavaRoleSignature aSig = (JavaRoleSignature) roleMap.getSignatureRef(newRoleSig);
+		JavaClassSignature aSig = (JavaClassSignature) roleMap.getSignatureRef(newRoleSig);
 		aSig.addFeature(featureName);
+		
+		for (String imp : classFragment.getImports()) {
+			aSig.addImport(imp);
+		}
 		
 		JavaRole newRole = new JavaRole(featureName, aSig);
 		writeRole(roleMap, newRole, classFragment, featureName);
@@ -102,13 +103,21 @@ public class JavaSignatureWriter extends AbstractWriter {
 	
 	private void writeRole(RoleMap roleMap, JavaRole role, FSTClassFragment classFragment, String featureName) {
 		for (FSTField field : classFragment.getFields()) {
-			role.addMember(new JavaFieldSignature(role.getSignature(), field.getName(),
-					field.getModifiers(), field.getType()));
+			JavaFieldSignature aSig = (JavaFieldSignature) roleMap.getSignatureRef(
+					new JavaFieldSignature(role.getSignature(), field.getName(),
+							field.getModifiers(), field.getType()));
+			aSig.addFeature(featureName);
+			
+			role.addMember(aSig);
 		}
 		for (FSTMethod method : classFragment.getMethods()) {
-			role.addMember(new JavaMethodSignature(role.getSignature(), method.getName(),
-					method.getModifiers(), method.getType(),
-					method.getParameter(), method.isConstructor()));
+			JavaMethodSignature aSig = (JavaMethodSignature) roleMap.getSignatureRef(
+					new JavaMethodSignature(role.getSignature(), method.getName(),
+							method.getModifiers(), method.getType(),
+							method.getParameter(), method.isConstructor()));
+			aSig.addFeature(featureName);
+			
+			role.addMember(aSig);
 		}
 		for (FSTClassFragment innerClass : classFragment.getInnerClasses()) {			
 			JavaRole innerRole = getRole(roleMap, featureName, role.getSignature(), innerClass.getName(), 

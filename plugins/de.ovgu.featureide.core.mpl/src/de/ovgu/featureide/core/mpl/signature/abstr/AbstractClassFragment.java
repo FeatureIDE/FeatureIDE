@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 
-
 /**
  * Abstract signature for one class.
  * 
@@ -56,6 +55,10 @@ public abstract class AbstractClassFragment {
 	
 	public Map<AbstractClassSignature, AbstractClassFragment> getInnerClasses() {
 		return innerClasses;
+	}
+	
+	public AbstractClassFragment getInnerClass(AbstractClassSignature classSignature) {
+		return innerClasses.get(classSignature);
 	}
 	
 	public int getMemberCount() {
@@ -101,11 +104,15 @@ public abstract class AbstractClassFragment {
 	protected void computeHashCode() {
 		hashCode = 1;
 		hashCode = hashCodePrime * hashCode + signature.hashCode();
+
+		hashCode *= hashCodePrime;
 		for (AbstractSignature member : members) {
-			hashCode = hashCodePrime * hashCode + member.hashCode();
+			hashCode += member.hashCode();
 		}
+		
+		hashCode *= hashCodePrime;
 		for (AbstractClassFragment innerClass : innerClasses.values()) {
-			hashCode = hashCodePrime * hashCode + innerClass.hashCode();
+			hashCode += innerClass.hashCode();
 		}
 	}
 

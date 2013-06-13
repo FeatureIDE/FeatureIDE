@@ -27,17 +27,17 @@ import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassSignature;
  * 
  * @author Sebastian Krieter
  */
-public class JavaRoleSignature extends AbstractClassSignature {
+public class JavaClassSignature extends AbstractClassSignature {
 	
-	public JavaRoleSignature(AbstractClassSignature parent, String name, String modifiers, String type, String pckg) {
+	public JavaClassSignature(AbstractClassSignature parent, String name, String modifiers, String type, String pckg) {
 		super(parent, name, modifiers, type, pckg);
 	}
 	
-	public JavaRoleSignature(JavaRoleSignature orgSig) {
+	public JavaClassSignature(JavaClassSignature orgSig) {
 		this(orgSig, false);
 	}
 	
-	private JavaRoleSignature(JavaRoleSignature orgSig, boolean ext) {
+	private JavaClassSignature(JavaClassSignature orgSig, boolean ext) {
 		super(orgSig, ext);
 	}
 	
@@ -60,7 +60,7 @@ public class JavaRoleSignature extends AbstractClassSignature {
 	}
 
 	@Override
-	public JavaRoleSignature createExtendedSignature() {
-		return new JavaRoleSignature(this, true);
+	public JavaClassSignature createExtendedSignature() {
+		return new JavaClassSignature(this, true);
 	}
 }

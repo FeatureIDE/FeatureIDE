@@ -38,6 +38,7 @@ import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.featurehouse.FeatureHouseComposer;
+import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
 
 /**
  * This builder builds the {@link FSTModel} for FeatureHouse projects, 
@@ -227,7 +228,8 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 			FSTClassFragment curClassFragment = classFragmentStack.pop();
 			if (classFragmentStack.isEmpty() 
 					&& curClassFragment.getPackage() == null) {
-				curClassFragment.setPackage(currentFile.getParent().getName());
+//				curClassFragment.setPackage(currentFile.getParent().getName());
+				FeatureHouseCorePlugin.getDefault().logWarning("No package defined for " + curClassFragment.getName() + "!");
 			}
 		}
 	}

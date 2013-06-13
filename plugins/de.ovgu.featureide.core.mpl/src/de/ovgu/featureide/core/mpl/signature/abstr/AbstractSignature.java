@@ -90,8 +90,8 @@ public abstract class AbstractSignature {
 	
 	public abstract AbstractSignature createExtendedSignature();
 	
-	protected void setFullName(String fullName) {
-		this.fullName = fullName + '.' + name;
+	protected void setFullName(String perfixName) {
+		this.fullName = perfixName + '.' + name;
 	}
 
 	public AbstractClassSignature getParent() {
@@ -196,10 +196,10 @@ public abstract class AbstractSignature {
 		if (obj == null || getClass() != obj.getClass())
 			return false;
 		
-		return equals((AbstractSignature) obj);
+		return sigEquals((AbstractSignature) obj);
 	}
 	
-	protected boolean equals(AbstractSignature otherSig) {
+	protected boolean sigEquals(AbstractSignature otherSig) {
 		if (!type.equals(otherSig.type) 
 				|| !fullName.equals(otherSig.fullName) 
 				|| !modifiers.equals(otherSig.modifiers)) {
@@ -211,6 +211,7 @@ public abstract class AbstractSignature {
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
+		sb.append(LINE_SEPARATOR);
 		sb.append("/* ext: ");
 		sb.append(ext);
 		sb.append(" */ ");

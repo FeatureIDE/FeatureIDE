@@ -343,7 +343,7 @@ public class InterfaceWriter extends AbstractWriter {
 	}
 
 	public void buildFeatureInterfaces() {
-		buildFeatureInterfaces(false, MPLPlugin.WRAPPER_INTERFACES 
+		buildFeatureInterfaces(true, MPLPlugin.WRAPPER_INTERFACES 
 				? IOConstants.FOLDERNAME_WRAPPER_INTERFACES 
 				: IOConstants.FOLDERNAME_FEATURE_INTERFACES, false);
 	}
@@ -367,7 +367,7 @@ public class InterfaceWriter extends AbstractWriter {
 				}
 				List<SelectableFeature> features = interfaceProject.getConfiguration().getFeatures();
 
-				IFolder folder = CorePlugin.createFolder(interfaceProject.getProjectReference(),	foldername);
+				IFolder folder = CorePlugin.createFolder(interfaceProject.getProjectReference(), foldername);
 				
 				try {
 					folder.delete(true, null);

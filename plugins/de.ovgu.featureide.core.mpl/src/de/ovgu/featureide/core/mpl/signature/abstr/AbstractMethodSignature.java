@@ -46,16 +46,17 @@ public abstract class AbstractMethodSignature extends AbstractSignature {
 		
 		AbstractMethodSignature otherSig = (AbstractMethodSignature) obj;
 		
-		if (!super.equals(otherSig)) 
+		if (!super.sigEquals(otherSig)) 
 			return false;
 		if (isConstructor != otherSig.isConstructor 
 				|| parameterTypes.size() != otherSig.parameterTypes.size()) {
 			return false;
 		}
-		
+
 		Iterator<String> otherParameterIt = otherSig.parameterTypes.iterator();
-		for (String thisParameter : parameterTypes) {
-			if (!thisParameter.equals(otherParameterIt.next())) {
+		Iterator<String> thisParameterIt = parameterTypes.iterator();
+		while (thisParameterIt.hasNext()) {
+			if (!thisParameterIt.next().equals(otherParameterIt.next())) {
 				return false;
 			}
 		}

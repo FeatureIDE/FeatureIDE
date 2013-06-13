@@ -35,6 +35,7 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.core.mpl.JavaInterfaceProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
+import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassSignature;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractFieldSignature;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractMethodSignature;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractRole;
@@ -121,17 +122,17 @@ public class RoleMap {
 		return javaSig;
 	}
 	
-	public ProjectSignature generateSignature() {
-		return generateSignature(null, null);
-	}
-	
-	public ProjectSignature generateSignature(List<String> featureList) {
-		return generateSignature(featureList, null);
-	}
-	
-	public ProjectSignature generateSignature(ViewTag viewTag) {
-		return generateSignature(null, viewTag);
-	}
+//	public ProjectSignature generateSignature() {
+//		return generateSignature(null, null);
+//	}
+//	
+//	public ProjectSignature generateSignature(List<String> featureList) {
+//		return generateSignature(featureList, null);
+//	}
+//	
+//	public ProjectSignature generateSignature(ViewTag viewTag) {
+//		return generateSignature(null, viewTag);
+//	}
 	
 	public ProjectSignature generateSignature2(List<String> featureList, ViewTag viewTag) {
 		ProjectSignature javaSig = new ProjectSignature(viewTag);
@@ -210,16 +211,13 @@ public class RoleMap {
 			methodViewTag = interfaceProject.getViewTagPool().getViewTag(name, 2),
 			fieldViewTag = interfaceProject.getViewTagPool().getViewTag(name, 1);
 		
-		for (FeatureRoles roles : featureRoleMap.values()) {
-			for (AbstractRole role : roles) {
-				role.getSignature().addViewTag(classViewTag);
-				for (AbstractSignature member : role.getMembers()) {
-					if (member instanceof AbstractFieldSignature) {
-						member.addViewTag(fieldViewTag);
-					} else if (member instanceof AbstractMethodSignature) {
-						member.addViewTag(methodViewTag);
-					}
-				}
+		for (AbstractSignature signature : signatureSet.keySet()) {
+			if (signature instanceof AbstractFieldSignature) {
+				signature.addViewTag(fieldViewTag);
+			} else if (signature instanceof AbstractMethodSignature) {
+				signature.addViewTag(methodViewTag);
+			} else if (signature instanceof AbstractClassSignature) {
+				signature.addViewTag(classViewTag);
 			}
 		}
 	}

@@ -37,12 +37,12 @@ public abstract class AbstractRole extends AbstractClassFragment {
 		return featureName;
 	}
 
-	@Override
-	public void addInnerClass(AbstractClassFragment innerClass) {
-		if (innerClass instanceof AbstractRole) {
-			super.addInnerClass(innerClass);
-		}
-	}
+//	@Override
+//	public void addInnerClass(AbstractClassFragment innerClass) {
+////		if (innerClass instanceof AbstractRole) {
+//			super.addInnerClass(innerClass);
+////		}
+//	}
 
 	public abstract AbstractClass toClass();
 	public abstract AbstractRole reduce(ViewTag viewTag);

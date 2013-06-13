@@ -150,17 +150,6 @@ public class MPLPlugin extends AbstractCorePlugin {
 		}
 	}
 	
-	public void buildConfigurationInterfaces(String projectName, String viewName, int viewLevel, int configLimit) {
-		JavaInterfaceProject interfaceProject = getInterfaceProject(projectName);
-		if (interfaceProject != null) {
-			interfaceProject.refreshRoleMap();
-			interfaceProject.setConfigLimit(configLimit);
-			interfaceProject.setFilterViewTag(viewName, viewLevel);
-			
-			new InterfaceWriter(interfaceProject).buildConfigurationInterfaces();
-		}
-	}
-
 	public void buildFeatureInterfaces(String projectName, String folder, String viewName, int viewLevel, int configLimit) {
 		JavaInterfaceProject interfaceProject = getInterfaceProject(projectName);
 		if (interfaceProject != null) {
@@ -178,14 +167,45 @@ public class MPLPlugin extends AbstractCorePlugin {
 		}
 	}
 	
+	public void buildConfigurationInterfaces(String projectName, String viewName, int viewLevel, int configLimit) {
+//		JavaInterfaceProject interfaceProject = getInterfaceProject(projectName);
+//		if (interfaceProject != null) {
+//			interfaceProject.refreshRoleMap();
+//			interfaceProject.setConfigLimit(configLimit);
+//			interfaceProject.setFilterViewTag(viewName, viewLevel);
+//			
+//			(new InterfaceWriter(interfaceProject)).buildConfigurationInterfaces();
+//		}
+		buildInterfaces(1, projectName, viewName, viewLevel, configLimit);
+	}
+	
 	public void compareConfigurationInterfaces(String projectName, String viewName, int viewLevel, int configLimit) {
+//		JavaInterfaceProject interfaceProject = getInterfaceProject(projectName);
+//		if (interfaceProject != null) {
+//			interfaceProject.refreshRoleMap();
+//			interfaceProject.setConfigLimit(configLimit);
+//			interfaceProject.setFilterViewTag(viewName, viewLevel);
+//			
+//			(new InterfaceWriter(interfaceProject)).compareConfigurationInterfaces();
+//		}
+		buildInterfaces(0, projectName, viewName, viewLevel, configLimit);
+	}
+	
+	private void buildInterfaces(int mode, String projectName, String viewName, int viewLevel, int configLimit) {
 		JavaInterfaceProject interfaceProject = getInterfaceProject(projectName);
 		if (interfaceProject != null) {
 			interfaceProject.refreshRoleMap();
 			interfaceProject.setConfigLimit(configLimit);
 			interfaceProject.setFilterViewTag(viewName, viewLevel);
 			
-			(new InterfaceWriter(interfaceProject)).compareConfigurationInterfaces();
+			switch (mode) {
+			case 0: 
+				(new InterfaceWriter(interfaceProject)).compareConfigurationInterfaces();
+				break;
+			case 1: 
+				(new InterfaceWriter(interfaceProject)).buildConfigurationInterfaces();
+				break;
+			}
 		}
 	}
 	

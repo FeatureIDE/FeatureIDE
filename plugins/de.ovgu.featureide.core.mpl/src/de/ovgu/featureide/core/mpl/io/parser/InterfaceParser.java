@@ -30,10 +30,10 @@ import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature;
 import de.ovgu.featureide.core.mpl.signature.java.JavaFieldSignature;
 import de.ovgu.featureide.core.mpl.signature.java.JavaMethodSignature;
 import de.ovgu.featureide.core.mpl.signature.java.JavaRole;
-import de.ovgu.featureide.core.mpl.signature.java.JavaRoleSignature;
+import de.ovgu.featureide.core.mpl.signature.java.JavaClassSignature;
 
 /**
- * Reads a java interfaces file to a {@link JavaRoleSignature}.
+ * Reads a java interfaces file to a {@link JavaClassSignature}.
  * 
  * @author Sebastian Krieter
  */
@@ -119,12 +119,12 @@ public class InterfaceParser extends AbstractLineReader<JavaRole> {
 							mode = 4;
 							break;
 						}
-				case 4: JavaRoleSignature newRoleSig;
+				case 4: JavaClassSignature newRoleSig;
 						if (stack.isEmpty()) {
-							newRoleSig = new JavaRoleSignature(null,
+							newRoleSig = new JavaClassSignature(null,
 									className, modifier, type, pckg);
 						} else {
-							newRoleSig = new JavaRoleSignature(stack.peek().getSignature(),
+							newRoleSig = new JavaClassSignature(stack.peek().getSignature(),
 								className, modifier, type, null);
 						}
 				
@@ -141,10 +141,10 @@ public class InterfaceParser extends AbstractLineReader<JavaRole> {
 						extendList.clear();
 						implementList.clear();
 						
-						parseTags(newRoleSig);
 						
-						JavaRoleSignature aSig = (JavaRoleSignature) roleMap
+						JavaClassSignature aSig = (JavaClassSignature) roleMap
 								.getSignatureRef(newRoleSig);
+						parseTags(aSig);
 				
 						JavaRole newRole = new JavaRole(featureName, aSig);
 						aSig.addFeature(featureName);

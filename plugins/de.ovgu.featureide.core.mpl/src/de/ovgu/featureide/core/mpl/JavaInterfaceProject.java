@@ -65,7 +65,7 @@ public class JavaInterfaceProject {
 	}
 	
 	public void refreshRoleMap() {
-		LocalFileLoader.loadRoleMap(this);
+		roleMap = LocalFileLoader.loadRoleMap(this);
 	}
 	
 	public RoleMap getRoleMap() {

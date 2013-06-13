@@ -5,7 +5,7 @@ import de.ovgu.featureide.core.mpl.signature.abstr.AbstractRole;
 
 public class JavaRole extends AbstractRole {
 	
-	public JavaRole(String featureName, JavaRoleSignature signature) {
+	public JavaRole(String featureName, JavaClassSignature signature) {
 		super(featureName, signature);
 	}
 	

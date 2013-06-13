@@ -88,11 +88,13 @@ public abstract class AbstractClassSignature extends AbstractSignature {
 	@Override
 	protected void computeHashCode() {
 		super.computeHashCode();
+		hashCode *= hashCodePrime;
 		for (String extend : extendList) {
-			hashCode = hashCodePrime * hashCode + extend.hashCode();
+			hashCode += extend.hashCode();
 		}
+		hashCode *= hashCodePrime;
 		for (String implement : implementList) {
-			hashCode = hashCodePrime * hashCode + implement.hashCode();
+			hashCode += implement.hashCode();
 		}
 	}
 
@@ -105,7 +107,7 @@ public abstract class AbstractClassSignature extends AbstractSignature {
 		
 		AbstractClassSignature otherSig = (AbstractClassSignature) obj;
 		
-		if (!super.equals(otherSig)) 
+		if (!super.sigEquals(otherSig)) 
 			return false;
 		if (extendList.size() != otherSig.extendList.size()
 				|| implementList.size() != otherSig.implementList.size()) {
