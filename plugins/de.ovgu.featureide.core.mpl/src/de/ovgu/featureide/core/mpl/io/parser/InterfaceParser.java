@@ -72,6 +72,7 @@ public class InterfaceParser extends AbstractLineReader<JavaRole> {
 		mode = 0;
 		stack.clear();
 		infoObj = null;
+		hasClassDef = false;		
 		return true;
 	}
 	
@@ -228,7 +229,6 @@ public class InterfaceParser extends AbstractLineReader<JavaRole> {
 			imports.clear();
 			extendList.clear();
 			implementList.clear();
-			
 			
 			JavaClassSignature aSig = (JavaClassSignature) roleMap
 					.getSignatureRef(newRoleSig);

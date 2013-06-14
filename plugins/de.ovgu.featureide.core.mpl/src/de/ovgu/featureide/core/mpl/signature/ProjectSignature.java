@@ -120,7 +120,7 @@ public class ProjectSignature {
 			}
 			boolean isMember = true;
 			if (sig instanceof AbstractClassSignature) {
-				parents.addFirst((AbstractClassSignature) sig);
+				parents.addLast((AbstractClassSignature) sig);
 				isMember = false;
 			}
 

@@ -26,7 +26,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -58,7 +57,6 @@ import de.ovgu.featureide.core.mpl.util.NumberConverter;
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
@@ -144,9 +142,8 @@ public class InterfaceWriter extends AbstractWriter {
 	private void writeExtendedModule(ProjectSignature signature, String featureName, String folderName) {
 		for (AbstractClassFragment curClass : signature.getClasses()) {
 			AbstractClassSignature classSig = curClass.getSignature();
-			String packagename = classSig.getPackage();
-			
-			String path = folderName + "/" + featureName + (packagename.isEmpty() ? "" :"/" + packagename);
+			final String packagename = classSig.getPackage();
+			final String path = folderName + "/" + featureName + (packagename.isEmpty() ? "" :"/" + packagename);
 			
 			IFolder folder = CorePlugin.createFolder(interfaceProject.getProjectReference(), path);
 			
@@ -154,28 +151,27 @@ public class InterfaceWriter extends AbstractWriter {
 		}
 	}
 	
-	public void createExtendedSignatures(final String folder) {
+	public void createExtendedSignatures(final String folderName) {
 		new MonitorJob("Build Extended Modules") {
 			protected boolean work() {
-				Configuration conf; {
-					Configuration curConf = interfaceProject.getConfiguration();
-					conf = new Configuration(curConf, curConf.getFeatureModel(), true);
+				IFolder folder = interfaceProject.getProjectReference().getFolder(folderName);
+				try {
+					if (folder.exists()) {
+						folder.delete(true, null);
+					}
+				} catch (CoreException e) {
+					MPLPlugin.getDefault().logError(e);
 				}
 				LinkedList<String> allConcreteFeatures = new LinkedList<String>();
-				for (SelectableFeature feature : conf.getFeatures()) {
-					if (feature.getFeature().isConcrete() && !feature.getFeature().isHidden()) {
+				for (Feature feature : interfaceProject.getFeatureModel().getConcreteFeatures()) {
+					if (!feature.isHidden()) {
 						allConcreteFeatures.add(feature.getName());
 					}
 				}
 				setMaxAbsoluteWork(allConcreteFeatures.size());
 				
 				for (String featureName : allConcreteFeatures) {
-					try {
-						conf.setManual(featureName, Selection.SELECTED);
-						writeExtendedModule(buildSignature(conf.getSelectedFeatures()), featureName, folder);
-						conf.setManual(featureName, Selection.UNSELECTED);
-					} catch (Exception e) {
-					}
+					writeExtendedModule(buildSignature(buildNodeForFeature(featureName)), featureName, folderName);
 					worked();
 				}
 				
@@ -185,16 +181,17 @@ public class InterfaceWriter extends AbstractWriter {
 		};
 	}
 	
-	private ProjectSignature buildSignature(Set<Feature> selectedFeatures) {
+	private Node[] buildNodeForFeature(String featureName) {
+		return new Node[] {new Literal(featureName, true)};		
+	}
+	
+	private ProjectSignature buildSignature(Node[] constraints) {
 		ProjectSignature projectSig = new ProjectSignature(null);
 		projectSig.setaClassCreator(new JavaClassCreator());
 		
-		Node[] fixClauses = new Node[selectedFeatures.size() + 1];
-		int i = 0;
-		for (Feature feature : selectedFeatures) {
-			fixClauses[i++] = new Literal(feature.getName(), true);
-		}
-		fixClauses[i] = NodeCreator.createNodes(interfaceProject.getFeatureModel());
+		Node[] fixClauses = new Node[constraints.length + 1];
+		fixClauses[0] = NodeCreator.createNodes(interfaceProject.getFeatureModel());
+		System.arraycopy(constraints, 0, fixClauses, 1, constraints.length);
 		
 		for (AbstractSignature sig : interfaceProject.getRoleMap().getSignatures()) {
 			Node[] clauses = new Node[sig.getFeatures().size() + fixClauses.length];
