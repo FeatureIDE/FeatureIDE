@@ -1,0 +1,16 @@
+{
+	"features" : [
+		"StringMatcher",
+		"Comparison"
+	],
+	"roles": {
+		"compare": {
+			"Comparison": "compare__wrappee__Comparison",
+			"Length": "compare__wrappee__Length",
+			"Substring_a_b": "compare__wrappee__Substring_a_b",
+			"Substring_b_a": "compare__wrappee__Comparison",
+			"Prefix_a_b": "compare"
+		}
+	}
+
+}
