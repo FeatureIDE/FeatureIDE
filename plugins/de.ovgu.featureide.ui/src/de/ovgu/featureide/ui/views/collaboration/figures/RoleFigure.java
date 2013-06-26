@@ -47,7 +47,6 @@ import org.eclipse.swt.graphics.Font;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
-import de.ovgu.featureide.core.fstmodel.FSTSpecCaseSeq;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
@@ -210,8 +209,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		if (role.files.size() == 0) {
 			int fieldCount = getCountForFieldContentCreate(tooltipContent);
 			int methodCount = getCountForMethodContentCreate(tooltipContent);
-			int contractCount = getCountForContractContentCreate(tooltipContent);
-			addLabel(new Label(getCountLabel(fieldCount, methodCount, contractCount)));
+				addLabel(new Label("Fields: " + fieldCount + " Methods: "	+ methodCount +" "));
 		} else if (role.getName().startsWith("*.")) {
 			setContentForFiles(new CompartmentFigure(), tooltipContent);
 		} else {
@@ -222,42 +220,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		setToolTip(tooltipContent);
 	}
 
-	/**
-	 * @param tooltipContent
-	 * @return
-	 */
-	private int getCountForContractContentCreate(Figure tooltipContent) {
-		CompartmentFigure contractFigure = new CompartmentFigure();
-		Label label = new Label("Contracts ", IMAGE_CLASS);
-		if(!role.contracts.isEmpty()) {
-			contractFigure.add(label);
-		} 
-		
-		int contractCount = 0;
-		for (FSTSpecCaseSeq c : role.contracts) {
-		
-			if (matchFilter(c)||!matchFilter(c)) {
-				Label contractLabel = createContractLabel(c);
-				contractFigure.add(contractLabel);
-				contractCount++;
-				
-				if (isContractFilterActive()) {
-					this.addLabel(contractLabel);
-				} else {
-					if (contractCount % 25 == 0) {
-						tooltipContent.add(contractFigure);
-						contractFigure = new CompartmentFigure();
-						contractFigure.add(new Label(""));
-					}
-				}
-			}
-		}
-		if (!isContractFilterActive()) {
-			addToToolTip(contractCount, contractFigure, tooltipContent);
-		}
-		return contractCount;
-		
-	}
+
 
 	/**
 	 * TODO description
@@ -278,8 +241,8 @@ public class RoleFigure extends Figure implements GUIDefaults{
 				methodCount = getCountForMethodContentCreate(tooltipContent);
 			}
 			
-			int	contractCount = getCountForContractContentCreate(tooltipContent);
-			tooltipContent.add(new Label(getCountLabel(fieldCount, methodCount, contractCount)));
+			
+			tooltipContent.add(new Label("Fields: " + fieldCount + " Methods: "	+ methodCount +" "));
 
 			// draw separationline between fields and methods
 			if ((fieldCount > 0) && (methodCount > 0)) {
@@ -293,19 +256,6 @@ public class RoleFigure extends Figure implements GUIDefaults{
 			setDirectivesContent(tooltipContent, getClassName());
 		}
 		setToolTip(tooltipContent);
-	}
-
-	/**
-	 * @param fieldCount
-	 * @param methodCount
-	 * @param contractCount
-	 * @return
-	 */
-	private String getCountLabel(int fieldCount, int methodCount,
-			int contractCount) {
-		//TODO show contracts iff contract composition is available
-		if(contractCount==0)return "Fields: " + fieldCount + " Methods: "	+ methodCount +" ";
-		return "Fields: " + fieldCount + " Methods: "	+ methodCount + " Contracts: " +contractCount+" ";
 	}
 
 	private int getCountForMethodContentCreate(Figure tooltipContent) {
@@ -485,10 +435,6 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		return SELECTED_FIELDS_METHOD[ShowFieldsMethodsAction.PRIVATE_FIELDSMETHODS];
 	}
 	
-	private boolean isContractFilterActive() {
-		return !role.contracts.isEmpty()&&isFieldMethodFilterActive();
-	}
-	
 	private boolean showOnlyFields() {
 		return SELECTED_FIELDS_METHOD[ShowFieldsMethodsAction.ONLY_FIELDS];
 	}
@@ -517,13 +463,6 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		        (!isFieldMethodFilterActive()));
 	}
 	
-	private boolean matchFilter(FSTSpecCaseSeq c) {
-		return ((c.isPrivate() && isPrivateFieldMethodFilterActive()) || 
-		        (c.isProtected() && isProtectedFieldMethodFilterActive()) ||
-		        (c.isPublic() && isPublicFieldMethodFilterActive()) ||
-		        (!c.isPrivate() && c.isProtected() && !c.isPublic() && isDefaultFieldMethodFilterActive()) ||
-		        (!isFieldMethodFilterActive()));
-	}
 	
 	private Label createMethodLabel(FSTMethod m) {
 		String name;
@@ -548,23 +487,6 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		return methodLabel;
 	}
 	
-	private Label createContractLabel(FSTSpecCaseSeq c) {
-		String name;
-		if (showOnlyNames()){
-			name = "Contract: "+c.getName();
-		} else {
-			name = "Contract: "+c.getName();
-		}
-		Label contractLabel = new RoleFigureLabel(name, c.getName());
-		if (c.refines()) {
-			contractLabel.setFont(FONT_BOLD);
-		}
-		
-		contractLabel.setIcon(IMAGE_HASH);
-	
-
-		return contractLabel;
-	}
 	
 	private Label createFieldLabel(FSTField f) {
 		String name;

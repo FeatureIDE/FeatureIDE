@@ -34,7 +34,7 @@ public class FSTClassFragment extends RoleElement {
 	protected final LinkedList<FSTMethod> methods = new LinkedList<FSTMethod>();
 	protected final LinkedList<FSTField> fields = new LinkedList<FSTField>();
 	protected final LinkedList<FSTClassFragment> innerClasses = new LinkedList<FSTClassFragment>();
-	protected final LinkedList<FSTSpecCaseSeq> contracts = new LinkedList<FSTSpecCaseSeq>();
+
 	
 	protected String pckg = null;
 
@@ -89,10 +89,7 @@ public class FSTClassFragment extends RoleElement {
 		return innerClasses;
 	}
 	
-	@Nonnull
-	public LinkedList<FSTSpecCaseSeq> getContracts() {
-		return contracts;
-	}
+
 	
 	public boolean add(RoleElement element) {
 		if (element instanceof FSTMethod) {
@@ -114,12 +111,7 @@ public class FSTClassFragment extends RoleElement {
 				return false;
 			}
 			innerClasses.add((FSTClassFragment) element);
-		} else if(element instanceof FSTSpecCaseSeq) {
-//			if (contracts.contains(element)) {
-//				return false;
-//			}
-			contracts.add((FSTSpecCaseSeq) element);
-		} else {
+		}  else {
 			return false;
 		}
 		element.setRole(role);
