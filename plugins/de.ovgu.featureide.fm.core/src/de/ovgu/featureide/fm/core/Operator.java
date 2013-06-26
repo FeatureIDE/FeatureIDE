@@ -21,7 +21,7 @@
 package de.ovgu.featureide.fm.core;
 
 /**
- * TODO @Fabian description
+ * Definition of valid operator names for constraint expressions.
  * 
  * @author Fabian Benduhn
  */

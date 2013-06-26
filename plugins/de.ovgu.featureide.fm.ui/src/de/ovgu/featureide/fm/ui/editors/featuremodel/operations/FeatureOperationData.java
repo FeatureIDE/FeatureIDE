@@ -23,7 +23,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 import de.ovgu.featureide.fm.core.Feature;
 
 /**
- * contains all information needed to execute commands that move features * @author
+ * Contains all information needed to execute commands that move features
  * 
  * @author Fabian Benduhn
  */

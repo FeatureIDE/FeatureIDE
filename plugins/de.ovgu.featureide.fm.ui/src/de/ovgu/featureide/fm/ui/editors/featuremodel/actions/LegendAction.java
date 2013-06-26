@@ -32,7 +32,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.LegendHideOperat
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
- * shows/hides the legend when executed
+ * Shows/hides the legend when executed.
  * 
  * @author Fabian Benduhn
  */

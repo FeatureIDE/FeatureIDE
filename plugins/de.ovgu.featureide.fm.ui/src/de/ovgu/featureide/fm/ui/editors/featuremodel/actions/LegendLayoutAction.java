@@ -30,7 +30,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
 
 /**
- * TODO description
+ * Switches auto-layout function for the feature model legend.
  *   
  * @author Fabian Benduhn
  */

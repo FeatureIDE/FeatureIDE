@@ -31,7 +31,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ShowHiddenFeaturesOperation;
 
 /**
- * TODO description
+ * Action to show/hide hidden features
  * 
  * @author David Halm
  * @author Patrick Sulkowski

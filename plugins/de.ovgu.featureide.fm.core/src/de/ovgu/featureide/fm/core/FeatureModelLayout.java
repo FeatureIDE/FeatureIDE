@@ -21,7 +21,7 @@
 package de.ovgu.featureide.fm.core;
 
 /**
- * TODO description
+ * Encapsulates layout functionality for the feature model.
  * 
  * @author soenke
  */

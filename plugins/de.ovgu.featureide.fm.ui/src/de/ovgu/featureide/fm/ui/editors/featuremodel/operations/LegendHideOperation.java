@@ -24,7 +24,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
- * TODO description
+ * Operation to hide/show the feature model legend.
  * 
  * @author Fabian Benduhn
  */

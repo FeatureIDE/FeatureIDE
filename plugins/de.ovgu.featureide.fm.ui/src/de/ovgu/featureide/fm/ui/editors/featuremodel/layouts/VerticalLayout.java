@@ -31,7 +31,7 @@ import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
- * ordering features from left to right without any intersections or overlapping
+ * Ordering features from left to right without any intersections or overlapping
  * 
  * @author David Halm
  * @author Patrick Sulkowski

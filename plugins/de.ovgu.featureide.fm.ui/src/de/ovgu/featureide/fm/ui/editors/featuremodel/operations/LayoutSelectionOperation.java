@@ -24,7 +24,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 
 /**
- * TODO description
+ * Operation to select the layout for the feature model editor.
  */
 public class LayoutSelectionOperation extends AbstractFeatureModelOperation {
 

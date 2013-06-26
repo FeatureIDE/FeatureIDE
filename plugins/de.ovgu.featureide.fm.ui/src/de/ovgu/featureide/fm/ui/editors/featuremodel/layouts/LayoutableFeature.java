@@ -26,7 +26,7 @@ import java.util.LinkedList;
 import de.ovgu.featureide.fm.core.Feature;
 
 /**
- * TODO description
+ * A feature representation for layout.
  * 
  * @author Patrick Sulkowski
  */

@@ -37,7 +37,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
 
 /**
- * TODO description
+ * Allows to move the legend.
  */
 public class LegendMoveEditPolicy extends NonResizableEditPolicy {
 

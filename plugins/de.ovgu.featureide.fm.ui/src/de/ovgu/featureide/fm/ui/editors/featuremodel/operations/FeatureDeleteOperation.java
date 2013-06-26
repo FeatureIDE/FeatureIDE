@@ -28,7 +28,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
- * TODO description
+ * Operation to delete a feature from the model.
  * 
  * @author Fabian Benduhn
  */

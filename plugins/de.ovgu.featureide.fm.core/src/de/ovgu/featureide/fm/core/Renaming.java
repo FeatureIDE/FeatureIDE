@@ -21,7 +21,7 @@
 package de.ovgu.featureide.fm.core;
 
 /**
- * TODO description
+ * Representation of a feature renaming.
  */
 public class Renaming {
 	

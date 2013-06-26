@@ -29,7 +29,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureSetHiddenOperation;
 
 /**
- * TODO description
+ * Action to mark a feature as hidden.
  */
 public class HiddenAction extends SingleSelectionAction {
 

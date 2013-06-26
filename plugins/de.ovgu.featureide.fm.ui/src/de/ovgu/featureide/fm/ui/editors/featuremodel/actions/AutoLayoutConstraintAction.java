@@ -35,7 +35,7 @@ import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AutoLayoutConstraintOperation;
 
 /**
- * 
+ * Action to switch auto-layout for contraints on/off.
  * @author David Halm
  * @author Patrick Sulkowski
  */

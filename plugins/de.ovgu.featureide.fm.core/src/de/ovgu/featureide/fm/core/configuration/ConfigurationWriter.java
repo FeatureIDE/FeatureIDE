@@ -33,7 +33,7 @@ import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
 /**
- * TODO description
+ * Writes a configuration into a file or String.
  */
 public class ConfigurationWriter {
 

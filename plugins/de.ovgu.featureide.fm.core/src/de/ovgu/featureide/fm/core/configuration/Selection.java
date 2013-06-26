@@ -21,7 +21,7 @@
 package de.ovgu.featureide.fm.core.configuration;
 
 /**
- * TODO description
+ * Defines Selection types Selected, Unselected, Undefined. These are needed for the configuration process.
  */
 public enum Selection {
 	SELECTED, UNSELECTED, UNDEFINED

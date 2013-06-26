@@ -33,7 +33,7 @@ import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ConstraintMoveOperation;
 
 /**
- * executed command when dragging and dropping constraints
+ * Executed command when dragging and dropping constraints
  * 
  * @author Fabian Benduhn
  * @author David Broneske

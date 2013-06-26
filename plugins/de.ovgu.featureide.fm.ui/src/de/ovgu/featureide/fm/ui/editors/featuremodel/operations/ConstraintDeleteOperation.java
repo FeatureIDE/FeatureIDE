@@ -25,7 +25,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 
 /**
- * TODO @Fabian description
+ * Operation to delete a constraint.
  * 
  * @author Fabian Benduhn
  */

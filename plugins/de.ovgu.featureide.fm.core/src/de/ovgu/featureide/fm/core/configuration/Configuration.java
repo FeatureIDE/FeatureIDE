@@ -39,7 +39,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 /**
- * TODO description
+ * Represents a configuration and provides operations for the configuration process.
  */
 public class Configuration {
 

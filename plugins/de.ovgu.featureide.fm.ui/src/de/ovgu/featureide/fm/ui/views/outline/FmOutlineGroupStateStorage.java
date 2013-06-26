@@ -23,7 +23,7 @@ package de.ovgu.featureide.fm.ui.views.outline;
 import de.ovgu.featureide.fm.core.Feature;
 
 /**
- * holds information for the GroupStates of features in outline views
+ * Holds information for the GroupStates of features in outline views
  * 
  * @author Jan Wedding
  */

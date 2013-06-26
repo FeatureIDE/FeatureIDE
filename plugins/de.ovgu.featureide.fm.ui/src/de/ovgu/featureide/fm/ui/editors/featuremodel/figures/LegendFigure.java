@@ -38,7 +38,7 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 import de.ovgu.featureide.fm.ui.properties.language.ILanguage;
 
 /**
- * represents a legend for the feature model
+ * Represents a legend for the feature model.
  * 
  * @author Fabian Benduhn
  * @author Florian Proksch

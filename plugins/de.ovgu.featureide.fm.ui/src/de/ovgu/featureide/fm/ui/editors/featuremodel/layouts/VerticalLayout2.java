@@ -29,7 +29,7 @@ import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
- * ordering features by breadth first search (with a round order)
+ * Ordering features by breadth first search (with a round order)
  * - can have intersections of features and connections
  * 		between features (due to differences in feature widths)
  * 

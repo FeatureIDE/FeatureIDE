@@ -29,7 +29,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureSetAbstractOperation;
 
 /**
- * TODO description
+ * Action to mark a feature as abstract.
  */
 public class AbstractAction extends SingleSelectionAction {
 

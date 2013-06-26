@@ -21,7 +21,7 @@
 package de.ovgu.featureide.fm.core.configuration;
 
 /**
- * TODO description
+ * Exception indicating that a feature with a given name was not found.
  */
 public class FeatureNotFoundException extends RuntimeException {
 

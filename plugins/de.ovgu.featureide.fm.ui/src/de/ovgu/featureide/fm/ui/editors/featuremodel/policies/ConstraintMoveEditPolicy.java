@@ -38,7 +38,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.ConstraintDragAndD
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 
 /**
- * editPart for constraint movements
+ * EditPart for constraint movements
  * 
  * @author David Broneske
  * @author Fabian Benduhn

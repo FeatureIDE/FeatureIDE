@@ -23,7 +23,7 @@ package de.ovgu.featureide.fm.core.configuration;
 import de.ovgu.featureide.fm.core.Feature;
 
 /**
- * TODO description
+ * A representation of a selectable feature for the configuration process.
  */
 public class SelectableFeature extends TreeElement {
 

@@ -23,7 +23,7 @@ package de.ovgu.featureide.fm.core.configuration;
 import java.util.ArrayList;
 
 /**
- * TODO description
+ * Basic implementation of a tree element for the configuration editor.
  */
 public class TreeElement {
 

@@ -31,7 +31,7 @@ import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
- * TODO description
+ * A helper class for the feature diagram layout.
  * 
  * @author David Halm
  * @author Patrick Sulkowski

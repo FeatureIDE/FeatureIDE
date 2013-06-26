@@ -32,7 +32,7 @@ import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
- * TODO description
+ * Operation to switch auto-layout for constraints on/off.
  * 
  * @author David Halm
  * @author Patrick Sulkowski

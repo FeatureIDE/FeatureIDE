@@ -32,7 +32,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayou
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.LayoutSelectionOperation;
 
 /**
- * TODO description
+ * Action to select the layout for the feature model.
  */
 public class LayoutSelectionAction extends Action {
 	

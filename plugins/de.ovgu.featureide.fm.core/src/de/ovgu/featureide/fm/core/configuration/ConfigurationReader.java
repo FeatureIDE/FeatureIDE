@@ -40,7 +40,7 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
 
 /**
- * TODO description
+ * Reads a configuration from file or String.
  */
 public class ConfigurationReader {
 
