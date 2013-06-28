@@ -181,8 +181,12 @@ public class InterfaceWriter extends AbstractWriter {
 		};
 	}
 	
-	private Node[] buildNodeForFeature(String featureName) {
+	private static Node[] buildNodeForFeature(String featureName) {
 		return new Node[] {new Literal(featureName, true)};		
+	}
+	
+	public static ProjectSignature buildSignature(FeatureModel model, RoleMap map, String featureName){
+		return buildSignature(model, map, buildNodeForFeature(featureName));
 	}
 	
 	private ProjectSignature buildSignature(Node[] constraints) {
@@ -212,6 +216,35 @@ public class InterfaceWriter extends AbstractWriter {
 		}
 		return projectSig;
 	}
+	
+	private static ProjectSignature buildSignature(FeatureModel model, RoleMap map, Node[] constraints) {
+		ProjectSignature projectSig = new ProjectSignature(null);
+		projectSig.setaClassCreator(new JavaClassCreator());
+		
+		Node[] fixClauses = new Node[constraints.length + 1];
+		fixClauses[0] = NodeCreator.createNodes(model);
+		System.arraycopy(constraints, 0, fixClauses, 1, constraints.length);
+		
+		for (AbstractSignature sig : map.getSignatures()) {
+			Node[] clauses = new Node[sig.getFeatures().size() + fixClauses.length];
+			int j = 0;
+			for (String featureName : sig.getFeatures()) {
+				clauses[j++] = new Literal(featureName, false);
+			}
+			System.arraycopy(fixClauses, 0, clauses, j, fixClauses.length);
+			
+			SatSolver solver = new SatSolver(new And(clauses), 1000);
+			try {
+				if (!solver.isSatisfiable()) {
+					projectSig.addSignature(sig);
+				}
+			} catch (TimeoutException e) {
+				MPLPlugin.getDefault().logError(e);
+			}
+		}
+		return projectSig;
+	}
+	
 	
 	public void buildConfigurationInterfaces() {
 		new MonitorJob("Build Configuration Interfaces") {

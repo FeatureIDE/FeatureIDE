@@ -33,6 +33,7 @@ import de.ovgu.featureide.core.mpl.signature.abstr.AbstractRole;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature;
 import de.ovgu.featureide.core.mpl.signature.java.JavaClassCreator;
 import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.FeatureModel;
 
 /** 
  * Maps the feature names to a list of role signatures.
@@ -50,8 +51,16 @@ public class RoleMap {
 	
 	private final JavaInterfaceProject interfaceProject;
 	
+	private final FeatureModel model;
+	
 	public RoleMap(JavaInterfaceProject interfaceProject) {
 		this.interfaceProject = interfaceProject;
+		this.model = interfaceProject.getFeatureModel();
+	}
+	
+	public RoleMap(FeatureModel model) {
+		this.interfaceProject = null;
+		this.model = model;
 	}
 	
 	public RoleMap(RoleMap roleMap, ViewTag viewTag) {
@@ -76,7 +85,7 @@ public class RoleMap {
 	}
 	
 	public FeatureRoles getRoles(String featurename) {
-		return getRoles(interfaceProject.getFeatureModel().getFeature(featurename));
+		return getRoles(model.getFeature(featurename));
 	}
 	
 	public FeatureRoles getRoles(Feature feature) {

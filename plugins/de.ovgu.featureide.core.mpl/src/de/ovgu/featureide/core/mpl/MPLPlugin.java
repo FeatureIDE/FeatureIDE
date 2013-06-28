@@ -22,8 +22,10 @@ package de.ovgu.featureide.core.mpl;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -31,13 +33,23 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.core.CompletionProposal;
+import org.eclipse.jdt.core.Flags;
+import org.eclipse.jdt.core.Signature;
 import org.osgi.framework.BundleContext;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.mpl.builder.InterfaceProjectNature;
 import de.ovgu.featureide.core.mpl.io.InterfaceWriter;
 import de.ovgu.featureide.core.mpl.io.JavaProjectWriter;
+import de.ovgu.featureide.core.mpl.io.JavaSignatureWriter;
 import de.ovgu.featureide.core.mpl.io.constants.IOConstants;
+import de.ovgu.featureide.core.mpl.signature.ProjectSignature;
+import de.ovgu.featureide.core.mpl.signature.RoleMap;
+import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassFragment;
+import de.ovgu.featureide.core.mpl.signature.abstr.AbstractFieldSignature;
+import de.ovgu.featureide.core.mpl.signature.abstr.AbstractMethodSignature;
+import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature;
 import de.ovgu.featureide.core.mpl.util.ConfigurationChangeListener;
 import de.ovgu.featureide.core.mpl.util.EditorTracker;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
@@ -235,6 +247,52 @@ public class MPLPlugin extends AbstractCorePlugin {
 			
 			new InterfaceWriter(interfaceProject).createExtendedSignatures(folder);
 		}
+	}
+
+	public List<CompletionProposal> extendedModules(IFeatureProject project, String featureName) {
+		RoleMap map = new JavaSignatureWriter(project, null).writeSignatures(project.getFeatureModel());
+		ProjectSignature sig = InterfaceWriter.buildSignature(project.getFeatureModel(), map, featureName);
+		Collection<AbstractClassFragment> frag = sig.getClasses();
+		
+		ArrayList<CompletionProposal> ret_List= new ArrayList<CompletionProposal>();
+		for (AbstractClassFragment cur : frag) {
+			CompletionProposal pr = org.eclipse.jdt.core.CompletionProposal.create(CompletionProposal.TYPE_REF,0);
+			pr.setCompletion(cur.getSignature().getName().toCharArray());
+			pr.setFlags(Flags.AccPublic);
+			pr.setSignature(Signature.createTypeSignature(cur.getSignature().getFullName(), true).toCharArray());
+			ret_List.add(pr);
+		}
+		
+		for (AbstractClassFragment cur : frag) {
+			Collection<AbstractSignature> memberFrag = cur.getMembers();
+			for (AbstractSignature curMember : memberFrag) {
+				if(curMember instanceof AbstractMethodSignature){
+					CompletionProposal pr = org.eclipse.jdt.core.CompletionProposal.create(CompletionProposal.METHOD_REF,0);
+					
+					pr.setDeclarationSignature(Signature.createTypeSignature(cur.getSignature().getFullName(), true).toCharArray());
+					pr.setFlags(Flags.AccPublic);
+					pr.setName(curMember.getName().toCharArray());
+					char[] t = new String("java.lang.String").toCharArray();
+//					pr.setSignature(Signature.createMethodSignature(new char[][]{curMember.getName().toCharArray()}, t));
+					pr.setSignature(Signature.createMethodSignature(new char[][]{{}}, new char[]{}));
+					pr.setCompletion(curMember.getName().toCharArray());
+				
+					ret_List.add(pr);
+				}
+				if(curMember instanceof AbstractFieldSignature){
+					CompletionProposal pr = org.eclipse.jdt.core.CompletionProposal.create(CompletionProposal.FIELD_REF,0);
+					
+					pr.setDeclarationSignature(Signature.createTypeSignature(cur.getSignature().getFullName(), true).toCharArray());
+					pr.setFlags(Flags.AccPublic);
+					pr.setName(curMember.getName().toCharArray());
+					pr.setCompletion(curMember.getName().toCharArray());
+				
+					ret_List.add(pr);
+				}
+			}
+		}
+		
+		return ret_List;
 	}
 	
 //	public void extendedModules(IProject project, String folder) {

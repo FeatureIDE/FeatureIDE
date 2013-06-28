@@ -36,6 +36,7 @@ import de.ovgu.featureide.core.mpl.signature.java.JavaFieldSignature;
 import de.ovgu.featureide.core.mpl.signature.java.JavaMethodSignature;
 import de.ovgu.featureide.core.mpl.signature.java.JavaRole;
 import de.ovgu.featureide.core.mpl.signature.java.JavaClassSignature;
+import de.ovgu.featureide.fm.core.FeatureModel;
 
 /**
  * Saves information from the {@link FSTModel}.
@@ -60,6 +61,26 @@ public class JavaSignatureWriter extends AbstractWriter {
 	
 	public RoleMap writeSignatures() {
 		RoleMap roleMap = new RoleMap(interfaceProject);
+
+		for (FSTFeature feature : fstmodel.getFeatures()) {
+			String featureName = feature.getName();
+			for (FSTRole fstrole : feature.getRoles()) {
+				String className = fstrole.getName();
+				if (fstrole.getName().endsWith(IOConstants.EXTENSION_JAVA)) {
+					className = className.substring(0, className.length() - IOConstants.EXTENSION_JAVA.length());
+					
+					JavaRole role = getRole(roleMap, featureName, null, className, 
+							fstrole.getPackage(), fstrole);
+					
+					roleMap.addRole(role);
+				}
+			}
+		}
+		return roleMap;
+	}
+	
+	public RoleMap writeSignatures(FeatureModel model) {
+		RoleMap roleMap = new RoleMap(model);
 
 		for (FSTFeature feature : fstmodel.getFeatures()) {
 			String featureName = feature.getName();

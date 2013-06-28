@@ -127,5 +127,16 @@
          </enablement>
       </decorator>
    </extension>
-
+	<extension
+   		id="de.ovgu.featureide.ui.editors.mycompletion"
+   		name="Context View Completion"
+         point="org.eclipse.jdt.ui.javaCompletionProposalComputer">
+         <javaCompletionProposalComputer
+         	activate="false"
+         	categoryID="textual_proposals"
+         	class=" de.ovgu.featureide.ui.editors.Completion">
+			<partition type="__dftl_partition_content_type"/>
+			<partition type="__java_string"/>
+         </javaCompletionProposalComputer>
+     </extension>
 </plugin>
