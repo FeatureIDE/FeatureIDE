@@ -720,7 +720,7 @@ public class FeatureModel implements PropertyConstants {
 		FeatureModel clone = new FeatureModel();
 		clone.root = root != null ? root.clone() : new Feature(clone, "Root");
 		List<Feature> list = new LinkedList<Feature>();
-		list.add(clone.root.clone());
+		list.add(clone.root);
 		while (!list.isEmpty()) {
 			Feature feature = list.remove(0);
 			clone.featureTable.put(feature.getName(), feature);
