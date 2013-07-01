@@ -2,7 +2,8 @@
 	<featureModel chosenLayoutAlgorithm="1">
 		<struct>
 			<and mandatory="true" name="StringMatcher">
-				<and mandatory="true" name="Comparison">
+				<feature hidden="true" name="Contains"/>
+				<and name="Comparison">
 					<feature name="Length"/>
 					<and name="Substring_a_b">
 						<feature name="Prefix_a_b"/>
@@ -35,6 +36,15 @@
 					</conj>
 					<var>Equals</var>
 				</imp>
+			</rule>
+			<rule>
+				<eq>
+					<var>Contains</var>
+					<disj>
+						<var>Substring_a_b</var>
+						<var>Substring_b_a</var>
+					</disj>
+				</eq>
 			</rule>
 		</constraints>
 		<comments/>

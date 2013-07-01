@@ -2,12 +2,15 @@ public  class   StringMatcher {
 	
 	/*@
 	  @ requires \original;
-	  @ ensures \original;
-	  @ ensures \result <==> b.contains(a);
+	  @ ensures \result ==> contains(a,b);
 	  @*/
 	public /*@pure@*/ boolean compare(String a, String b){
 		
-		return original(a,b) && b.contains(a);
+		return original(a,b) && contains(a,b);
+		
 	}
+	
+	
+
 	
 }
