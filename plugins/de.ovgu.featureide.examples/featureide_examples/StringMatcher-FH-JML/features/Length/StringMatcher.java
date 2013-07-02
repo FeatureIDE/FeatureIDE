@@ -2,12 +2,11 @@ public  class   StringMatcher {
 		
 	/*@
 	  @ requires \original;
-	  @ ensures  \result ==> a.length()==b.length();
 	  @ ensures \original;
-	  @ ensures a.length()!=b.length() ==> !\result;
 	  @*/
-	public /*@pure@*/ boolean compare(String a, String b){
-		
-		return  original(a,b) && a.length()==b.length();
+	public boolean compare(String a, String b){
+		boolean result = original(a,b) && a.length()==b.length();
+	//@ set compare = original(a,b) && a.length()==b.length();
+		return  result;
 	}
 }

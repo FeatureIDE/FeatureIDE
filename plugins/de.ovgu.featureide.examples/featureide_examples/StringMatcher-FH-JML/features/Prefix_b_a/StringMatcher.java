@@ -4,10 +4,11 @@ public  class   StringMatcher {
 	/*@
 	  @ requires \original;
 	  @ ensures \original;
-	  @ ensures \result ==> a.startsWith(b);
 	  @*/
-	public /*@pure@*/ boolean compare(String a, String b){
-		return original(a,b) &&   a.startsWith(b);
+	public boolean compare(String a, String b){
+		boolean result = original(a,b) &&   a.startsWith(b);
+		//@ set compare = original(a,b) && a.startsWith(b);
+		return result;
 	}
 	
 
