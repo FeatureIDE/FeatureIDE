@@ -50,8 +50,8 @@ public class JavaClassBuilder extends ClassBuilder {
 	/**
 	 * 
 	 * @param terminal body
-	 * @return list(0) field modifiers
-	 * 		   list(1) field type
+	 * @return list(0) field modifiers<br>
+	 * 		   list(1) field type<br>
 	 * 		   ... field names
 	 */
 	public LinkedList<String> getFields(String body) {
@@ -71,7 +71,7 @@ public class JavaClassBuilder extends ClassBuilder {
 		while (body.contains("  ")) {
 			body = body.replace("  ", " ");
 		}
-		
+		body = body.trim();
 		for (String s : body.split(" ")) {
 			if (s.contains("=")) {
 				if (!s.startsWith("=")) {

@@ -22,6 +22,8 @@ package de.ovgu.featureide.featurehouse.model;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.LinkedList;
+
 import org.junit.Test;
 
 /**
@@ -40,9 +42,10 @@ public class TCSClassBuilder {
 	
 	@Test
 	public void FieldTest1() {
-		assertEquals(EXPECTED_MODIFIER_FIELD_1, builder.getFields(TEST_FIELD_1).get(0));
-		assertEquals(EXPECTED_TYPE_FIELD_1, builder.getFields(TEST_FIELD_1).get(1));
-		assertEquals(EXPECTED_NAME_FIELD_1, builder.getFields(TEST_FIELD_1).get(2));
+		LinkedList<String> fields = builder.getFields(TEST_FIELD_1);
+		assertEquals(EXPECTED_MODIFIER_FIELD_1, fields.get(0));
+		assertEquals(EXPECTED_TYPE_FIELD_1, fields.get(1));
+		assertEquals(EXPECTED_NAME_FIELD_1, fields.get(2));
 	}
 
 	// TEST 2
@@ -54,10 +57,11 @@ public class TCSClassBuilder {
 	
 	@Test
 	public void FieldTest2() {
-		assertEquals(EXPECTED_MODIFIER_FIELD_2, builder.getFields(TEST_FIELD_2).get(0));
-		assertEquals(EXPECTED_TYPE_FIELD_2, builder.getFields(TEST_FIELD_2).get(1));
-		assertEquals(EXPECTED_NAME_FIELD_2_1, builder.getFields(TEST_FIELD_2).get(2));
-		assertEquals(EXPECTED_NAME_FIELD_2_2, builder.getFields(TEST_FIELD_2).get(3));
+		LinkedList<String> fields = builder.getFields(TEST_FIELD_2);
+		assertEquals(EXPECTED_MODIFIER_FIELD_2, fields.get(0));
+		assertEquals(EXPECTED_TYPE_FIELD_2, fields.get(1));
+		assertEquals(EXPECTED_NAME_FIELD_2_1, fields.get(2));
+		assertEquals(EXPECTED_NAME_FIELD_2_2, fields.get(3));
 	}
 	
 	// TEST 3
@@ -68,9 +72,10 @@ public class TCSClassBuilder {
 	
 	@Test
 	public void FieldTestModifiers3() {
-		assertEquals(EXPECTED_MODIFIER_FIELD_3, builder.getFields(TEST_FIELD_3).get(0));
-		assertEquals(EXPECTED_TYPE_FIELD_3, builder.getFields(TEST_FIELD_3).get(1));
-		assertEquals(EXPECTED_NAME_FIELD_3, builder.getFields(TEST_FIELD_3).get(2));
+		LinkedList<String> fields = builder.getFields(TEST_FIELD_3);
+		assertEquals(EXPECTED_MODIFIER_FIELD_3, fields.get(0));
+		assertEquals(EXPECTED_TYPE_FIELD_3, fields.get(1));
+		assertEquals(EXPECTED_NAME_FIELD_3, fields.get(2));
 	}
 	
 	// Test 4
@@ -81,8 +86,9 @@ public class TCSClassBuilder {
 
 	@Test
 	public void FieldTestModifiers4() {
-		assertEquals(EXPECTED_MODIFIER_FIELD_4, builder.getFields(TEST_FIELD_4).get(0));
-		assertEquals(EXPECTED_TYPE_FIELD_4, builder.getFields(TEST_FIELD_4).get(1));
-		assertEquals(EXPECTED_NAME_FIELD_4, builder.getFields(TEST_FIELD_4).get(2));
+		LinkedList<String> fields = builder.getFields(TEST_FIELD_4);
+		assertEquals(EXPECTED_MODIFIER_FIELD_4, fields.get(0));
+		assertEquals(EXPECTED_TYPE_FIELD_4, fields.get(1));
+		assertEquals(EXPECTED_NAME_FIELD_4, fields.get(2));
 	}
 }

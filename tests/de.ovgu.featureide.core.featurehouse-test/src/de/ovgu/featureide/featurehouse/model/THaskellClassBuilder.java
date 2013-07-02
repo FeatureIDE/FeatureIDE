@@ -20,6 +20,8 @@ package de.ovgu.featureide.featurehouse.model;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.LinkedList;
+
 import org.junit.Test;
 
 /**
@@ -37,7 +39,8 @@ public class THaskellClassBuilder {
 	
 	@Test
 	public void methodTest1() {
-		assertEquals(EXPECTED_NAME_METHOD_1, builder.getMethod(TEST_METHOD_1).get(0));
-		assertEquals(EXPECTED_PARAMETER_1_METHOD_1, builder.getMethod(TEST_METHOD_1).get(1));
+		LinkedList<String> method = builder.getMethod(TEST_METHOD_1);
+		assertEquals(EXPECTED_NAME_METHOD_1, method.get(0));
+		assertEquals(EXPECTED_PARAMETER_1_METHOD_1, method.get(1));
 	}
 }
