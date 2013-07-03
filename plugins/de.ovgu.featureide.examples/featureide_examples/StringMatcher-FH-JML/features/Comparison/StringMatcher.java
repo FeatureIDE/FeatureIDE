@@ -4,7 +4,7 @@ public  class  StringMatcher {
 	
 	/*@
 	  @ requires input != null;
-	  @ ensures \result <==> compare(input,text);
+	  @ ensures \result <==> compare;
 	  @*/
 	public boolean match(String input){
 		

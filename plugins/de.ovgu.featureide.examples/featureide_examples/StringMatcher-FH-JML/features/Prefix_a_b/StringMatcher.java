@@ -7,7 +7,7 @@ public  class   StringMatcher {
 	  @*/
 	public boolean compare(String a, String b){
 		boolean result = original(a,b) &&   b.startsWith(a);
-		//@ set compare = original(a,b) && b.startsWith(a);
+		//@ set compare = compare && b.startsWith(a);
 		return result;
 	}
 	

@@ -6,7 +6,7 @@ public  class   StringMatcher {
 	  @*/
 	public boolean compare(String a, String b){
 		boolean result = original(a,b) &&  contains(a,b);
-		//@ set compare = original(a,b) &&  contains(a,b);
+		//@ set compare = compare &&  contains(a,b);
 		return result;
 	}
 }
