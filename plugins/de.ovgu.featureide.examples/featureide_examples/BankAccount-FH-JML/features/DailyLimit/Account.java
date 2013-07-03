@@ -1,44 +1,61 @@
 class Account {
 
-	final static int DAILY_LIMIT = -1000;
+	private final static int DAILY_LIMIT = -1000;
 	
 	//@ invariant withdraw >= DAILY_LIMIT;
-	int withdraw = 0;
-
+	private int withdraw = 0;
+	
 	/*@
-	 @ ensures \original 
-	 @   && (!\result ==> withdraw == \old(withdraw)) 
-	 @   && (\result ==> withdraw <= \old(withdraw));
+	 @ ensures withdraw == 0;
 	 @*/
-	boolean update(int x) {
-		int newWithdraw = withdraw;
-		if (x < 0)  {
-			newWithdraw += x;
-			if (newWithdraw < DAILY_LIMIT) 
-				return false;
-		}
-		if (!original(x))
-			return false;
-		withdraw = newWithdraw;
-		return true;
+	public void resetWithdraw() {
+		withdraw = 0;
 	}
 	
 	/*@
-	 @ ensures \original 
-	 @   && (!\result ==> withdraw == \old(withdraw)) 
-	 @   && (\result ==> withdraw >= \old(withdraw));
+	 @ ensures \result == withdraw;
 	 @*/
-	boolean undoUpdate(int x) {
-		int newWithdraw = withdraw;
-		if (x < 0)  {
-			newWithdraw -= x;
-			if (newWithdraw < DAILY_LIMIT) 
-				return false;
-		}
-		if (!original(x))
-			return false;
-		withdraw = newWithdraw;
-		return true;
+	public int getWithdraw() {
+		return withdraw;
 	}
-		
+
+	/*@
+	 @ requires \original;
+	 @ ensures \original && x < 0 ==> withdraw == \old(withdraw) + x && withdraw <= \old(withdraw);
+	 @*/
+	private void update(int x) {
+		original(x);
+		if (x < 0) {
+			withdraw += x;
+		}
+	}
+	
+	/*@
+	 @ assignable canUpdate;
+	 @ ensures \original;
+	 @*/
+	private /*@ pure @*/ boolean canUpdate(int x) {
+		boolean res = original(x) && withdraw + x >= DAILY_LIMIT;
+		//@ set canUpdate = canUpdate && withdraw + x >= DAILY_LIMIT;
+		return res;
+	}
+	
+	/*@
+	 @ requires \original && withdraw - x < DAILY_LIMIT; 
+	 @ ensures \original;
+	 @*/
+	void undoUpdate(int x) {
+		if (x < 0)  {
+			withdraw -= x;
+		}
+		original(x);
+	}
+	
+	/*@
+	 @ requires \original;
+	 @ ensures \original && withdraw == \old(withdraw);
+	 @*/
+	private void undoUpdateTest(int x) {
+		original(x);
+	}
 }

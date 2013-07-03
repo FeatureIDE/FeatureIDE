@@ -1,6 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src/default"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="C:/Program Files/Java/jre7/lib/resources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://download.oracle.com/javase/7/docs/api/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/Program Files/Java/jre7/lib/rt.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://download.oracle.com/javase/7/docs/api/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/Program Files/Java/jre7/lib/jsse.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://download.oracle.com/javase/7/docs/api/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/Program Files/Java/jre7/lib/jce.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://download.oracle.com/javase/7/docs/api/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/Program Files/Java/jre7/lib/charsets.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://download.oracle.com/javase/7/docs/api/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/Program Files/Java/jre7/lib/jfr.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://download.oracle.com/javase/7/docs/api/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/Program Files/Java/jre7/lib/ext/access-bridge-64.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Java/jre7/lib/ext/dnsns.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Java/jre7/lib/ext/jaccess.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Java/jre7/lib/ext/localedata.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Java/jre7/lib/ext/sunec.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Java/jre7/lib/ext/sunjce_provider.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Java/jre7/lib/ext/sunmscapi.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Java/jre7/lib/ext/zipfs.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

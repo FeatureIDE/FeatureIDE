@@ -1,21 +1,22 @@
 public class Transaction {
 
-	/*@ requires destination != null && source != null;
-	  requires source != destination;
-	  ensures \result ==> (\old(destination.balance) + amount == destination.balance);
-	  ensures \result ==> (\old(source.balance) - amount == source.balance);
-	  ensures !\result ==> (\old(destination.balance) == destination.balance);
-	  ensures !\result ==> (\old(source.balance) == source.balance); @*/
+	/*@ 
+	  requires destination != null && source != null && source != destination;
+	  requires amount > 0;
+	  ensures \result ==> (\old(destination.getBalance()) + amount == destination.getBalance());
+	  ensures \result ==> (\old(source.getBalance()) - amount == source.getBalance());
+	  ensures !\result ==> (\old(destination.getBalance()) == destination.getBalance());
+	  ensures !\result ==> (\old(source.getBalance()) == source.getBalance()); @*/
 	public boolean transfer(Account source, Account destination, int amount) {
 		if (!lock(source, destination)) return false;
 		try {
 			if (amount <= 0) {
 				return false;
-			}
-			if (!source.update(amount * -1)) {
+			} 
+			if (!source.withdraw(amount)) {
 				return false;
 			}
-			if (!destination.update(amount)) {
+			if (!destination.deposit(amount)) {
 				source.undoUpdate(amount * -1);
 				return false;
 			}

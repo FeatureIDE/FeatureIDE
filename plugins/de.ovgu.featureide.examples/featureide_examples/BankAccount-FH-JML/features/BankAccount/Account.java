@@ -1,37 +1,98 @@
 public class Account {
-	final int OVERDRAFT_LIMIT = 0;
-
+	
+	private final int OVERDRAFT_LIMIT = 0;
+	//@ private ghost boolean canUpdate;
 	//@ invariant balance >= OVERDRAFT_LIMIT;
-	int balance = 0;
+	private int balance;
+	
+	/*@
+	 @ ensures \result == balance;
+	 @*/
+	/*@ pure @*/ int getBalance() {
+		return balance;
+	}
 	
 	/*@
 	 @ ensures balance == 0;
 	 @*/
-	Account() {
+	public Account() {
+		balance = 0;
 	}
 	
 	/*@
-	 @ ensures (!\result ==> balance == \old(balance)) 
-	 @   && (\result ==> balance == \old(balance) + x); 
+	 @ requires initialValue >= 0;
+	 @ ensures balance == initialValue;
 	 @*/
-	boolean update(int x) {
-		int newBalance = balance + x;
-		if (newBalance < OVERDRAFT_LIMIT)
-			return false;
-		balance = newBalance;
-		return true;
+	public Account(int initialValue) {
+		balance = initialValue;
+	}
+	
+	/*@ 
+	 @ requires money > 0; 
+	 @ ensures (!\result ==> balance == \old(balance)) 
+	 @   && (\result ==> balance == \old(balance) - money); 
+	 @*/
+	public boolean withdraw(int money) {
+		if (canUpdate(-1 * money)) {
+			update(-1 * money);
+			return true;
+		}
+		return false;
+	}
+	
+	/*@
+	 @ requires money > 0; 
+	 @ ensures (!\result ==> balance == \old(balance)) 
+	 @   && (\result ==> balance == \old(balance) + money);  
+	 @*/
+	public boolean deposit(int money) {
+		if (canUpdate(money)) {
+			update(money);
+			return true;
+		}
+		return false;
+	}
+	
+	/*@ 
+	 @ requires canUpdate(x); 
+	 @ ensures (balance == \old(balance) + x); 
+	 @*/
+	private void update(int x) {
+		balance = balance + x;
+	}
+	
+	/**
+	 * all proves are closed for using contracts if this method has no contract.
+	 */
+	/*@
+	 @ assignable canUpdate; 
+	 @ ensures \result <==> canUpdate;
+	 @*/
+	private /*@ pure @*/ boolean canUpdate(int x) {
+		//@ set canUpdate = balance + x >= OVERDRAFT_LIMIT; 
+		return balance + x >= OVERDRAFT_LIMIT;
 	}
 
+	/**
+	 * it is neccessary to undo an update and to set all fields to their original values 
+	 * when it undo is called, even if update(x) would not be possible
+	 * 
+	 * invariants must be defined @ requires clauses
+	 */
 	/*@
-	 @  ensures (!\result ==> balance == \old(balance)) 
-	 @   && (\result ==> balance == \old(balance) - x);
+	 @ requires balance - x >= OVERDRAFT_LIMIT;
+	 @ ensures balance == \old(balance) - x;
 	 @*/
-	boolean undoUpdate(int x) {
-		int newBalance = balance - x;
-		if (newBalance < OVERDRAFT_LIMIT)
-			return false;
-		balance = newBalance;
-		return true;
+	void undoUpdate(int x) { 
+		balance = balance - x;
 	}
 	
+	/*@
+	 @ requires canUpdate(x);
+	 @ ensures balance == \old(balance);
+	 @*/
+	private void undoUpdateTest(int x) {
+		update(x);
+		undoUpdate(x);
+	}
 }

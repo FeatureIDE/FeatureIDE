@@ -1,11 +1,11 @@
 class Application {
 	
 	/*@
-	 @ ensures account.withdraw == 0;
+	 @ ensures account.getWithdraw() == 0;
 	 @*/
 	void nextDay() {
 		original();
-		account.withdraw = 0;
+		account.resetWithdraw();
 	}
 
 }

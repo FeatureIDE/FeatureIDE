@@ -2,22 +2,21 @@ class Application {
 	
 	/*@
 	 @ ensures \original 
-	 @   && (account.balance >= 0 ==> account.interest >= \old(account.interest)) 
-	 @   && (account.balance <= 0 ==> account.interest <= \old(account.interest));
+	 @   && (account.getBalance() >= 0 ==> account.getInterest() >= \old(account.getInterest())) 
+	 @   && (account.getBalance() <= 0 ==> account.getInterest() <= \old(account.getInterest()));
 	 @*/
 	void nextDay() {
 		original();
-		account.interest += account.calculateInterest();
+		account.increaseInterrest();
 	}
 
-	/*@
-	 @ ensures account.balance == \old(account.balance) + \old(account.interest) 
-	 @   && account.interest == 0;
+	/*@ 
+	 @ ensures account.getBalance() == \old(account.getBalance()) + \old(account.getInterest()) 
+	 @   && account.getInterest() == 0;
 	 @*/
 	void nextYear() {
 		original();
-		account.balance += account.interest;
-		account.interest = 0;
+		account.applyInterrest();
 	}
 
 }
