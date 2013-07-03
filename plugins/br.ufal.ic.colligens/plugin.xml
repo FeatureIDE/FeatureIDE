@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            id="br.ufal.ic.colligens.commands.category"
+            name="Colligens">
+      </category>
+      <command
+            categoryId="br.ufal.ic.colligens.commands.category"
+            id="br.ufal.ic.colligens.commands.ColligensCommand"
+            name="Analyzer">
+      </command>
+      <command
+            categoryId="br.ufal.ic.colligens.commands.category"
+            id="br.ufal.ic.colligens.commands.ColligensViewClear"
+            name="Clear View">
+      </command>
+      <command
+            categoryId="br.ufal.ic.colligens.commands.category"
+            id="br.ufal.ic.colligens.commands.ColligensMetrics"
+            name="Metrics">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="br.ufal.ic.colligens.handler.ColligensPluginHandler"
+            commandId="br.ufal.ic.colligens.commands.ColligensCommand">
+      </handler>
+      <handler
+            class="br.ufal.ic.colligens.handler.ClearConfigurationsViewHandler"
+            commandId="br.ufal.ic.colligens.commands.ColligensViewClear">
+      </handler>
+      <handler
+            class="br.ufal.ic.colligens.handler.MetricsHandler"
+            commandId="br.ufal.ic.colligens.commands.ColligensMetrics">
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
+               id="br.ufal.ic.colligens.toolbars.sampleToolbar">
+            <command
+                  commandId="br.ufal.ic.colligens.commands.ColligensCommand"
+                  icon="icons/featured.png"
+                  tooltip="Colligens"
+                  id="br.ufal.ic.colligens.toolbars.ColligensCommand">
+            </command>
+         </toolbar>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:br.ufal.ic.colligens.views.InvalidConfigurationsView">
+         <command
+               commandId="br.ufal.ic.colligens.commands.ColligensCommand"
+               icon="icons/featured_run.png"
+               label="Analyse"
+               style="push">
+         </command>
+         <separator
+               name="br.ufal.ic.colligens.separator1"
+               visible="true">
+         </separator>
+         <command
+               commandId="br.ufal.ic.colligens.commands.ColligensViewClear"
+               icon="icons/featured_clear.png"
+               style="push">
+         </command>
+         <separator
+               name="br.ufal.ic.colligens.separator1"
+               visible="true">
+         </separator>
+         <command
+               commandId="br.ufal.ic.colligens.commands.ColligensMetrics"
+               icon="icons/featured_chart.png"
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:br.ufal.ic.colligens.views.MetricsView">
+                     <command
+               commandId="br.ufal.ic.colligens.commands.ColligensMetrics"
+               icon="icons/featured_chart.png"
+               style="push">
+         </command>
+      </menuContribution>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            name="Colligens"
+            id="br.ufal.ic.colligens">
+      </category>
+      <view
+            category="br.ufal.ic.colligens"
+            class="br.ufal.ic.colligens.views.InvalidConfigurationsView"
+            icon="icons/featured.png"
+            id="br.ufal.ic.colligens.views.InvalidConfigurationsView"
+            name="Invalid Configurations">
+      </view>
+      <view
+            category="br.ufal.ic.colligens"
+            class="br.ufal.ic.colligens.views.InvalidProductView"
+            icon="icons/invalidproduct.png"
+            id="br.ufal.ic.colligens.views.invalideproductview"
+            name="Invalid Products">
+      </view>
+      <view
+            category="br.ufal.ic.colligens"
+            class="br.ufal.ic.colligens.views.MetricsView"
+            icon="icons/featured_chart.png"
+            id="br.ufal.ic.colligens.views.MetricsView"
+            name="Metrics">
+      </view>
+   </extension>
+ 
+    <extension
+         point="org.eclipse.help.contexts">
+      <contexts
+            file="contexts.xml">
+      </contexts>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="br.ufal.ic.colligens.preferences.PreferencePage"
+            id="br.ufal.ic.colligens.preferences.PreferencePage"
+            name="Colligens">
+      </page>
+      <page
+            category="br.ufal.ic.colligens.preferences.PreferencePage"
+            class="br.ufal.ic.colligens.preferences.PreferenceGcc"
+            id="br.ufal.ic.colligens.preferences.PreferenceGcc"
+            name="GCC C Compiler Settings">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="br.ufal.ic.colligens.preferences.Initializer">
+      </initializer>
+   </extension>
+   	<extension
+id="br.ufal.ic.colligens.problem"
+name="Colligens"
+point="org.eclipse.core.resources.markers">
+<super type="org.eclipse.core.resources.problemmarker" />
+<persistent value="true" />
+</extension>
+   <extension
+         point="de.ovgu.featureide.core.composers">
+      <composer
+            class="br.ufal.ic.colligens.core.CPPComposer"
+            description="C composer to FeatureIDE"
+            id="br.ufal.ic.colligens.cppcomposer"
+            name="Colligens"
+            nature="FeatureIDE_Cnature">
+      </composer>
+   </extension>
+   <extension
+         point="de.ovgu.featureide.fm.core.FMComposer">
+      <fmComposer
+            class="br.ufal.ic.colligens.core.CPPFMComposerExtension"
+            composer="br.ufal.ic.colligens.cppcomposer"
+            id="br.ufal.ic.colligens.fmcppcomposer"
+            name="Colligens Feature Model">
+      </fmComposer>
+   </extension>
+   <extension
+         id="br.ufal.ic.colligens.invalidproduct"
+         name="Invalid Products"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+      <persistent
+            value="true">
+      </persistent>
+   </extension>
+</plugin>
