@@ -38,7 +38,6 @@ import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.featurehouse.FeatureHouseComposer;
-import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
 
 /**
  * This builder builds the {@link FSTModel} for FeatureHouse projects, 
