@@ -264,14 +264,14 @@ public abstract class TAbstractFeatureModelReaderWriter {
 				origFm.getAnnotations());
 	}
 
-	//TODO @Fabian @Test
+	// @Test // java.lang.AssertionError: (gpl_medium_model.xml) expected:<REFACTORING> but was:<SPECIALIZATION>
 	public void testIsRefactoring() throws FileNotFoundException,
 			UnsupportedModelException {
+		Comparison compare = new ModelComparator(1000).compare(origFm, newFm);
+		if (!compare.equals(Comparison.ARBITRARY)) {
+			assertEquals(failureMessage, Comparison.REFACTORING, compare);
+		}
 
-		ModelComparator mc = new ModelComparator(1000);
-
-		assertTrue(failureMessage,
-				mc.compare(origFm, newFm).equals(Comparison.REFACTORING));
 	}
 
 	private final FeatureModel writeAndReadModel()

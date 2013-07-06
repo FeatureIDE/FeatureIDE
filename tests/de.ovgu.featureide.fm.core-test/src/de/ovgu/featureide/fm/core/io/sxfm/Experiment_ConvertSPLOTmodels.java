@@ -34,7 +34,7 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
  */
 // TODO currently splot models support different attributes then featureIDE model.
 // 		replace System.err.println by assertions if a correct conversion is possible. 
-@RunWith(Parameterized.class)
+//@RunWith(Parameterized.class)
 public class Experiment_ConvertSPLOTmodels extends Experiment_SPLOTmodels{
 	protected static File MODEL_FILE_FOLDER = new
 			 File("/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/splotmodels/");
@@ -47,7 +47,7 @@ public class Experiment_ConvertSPLOTmodels extends Experiment_SPLOTmodels{
 		this.modelFile = modelFile;
 	}
 	
-	@Parameters
+//	@Parameters
 	public static Collection<Object[]> getModels() {
 		if (!MODEL_FILE_FOLDER.canRead()){
 			MODEL_FILE_FOLDER = new File(ClassLoader.getSystemResource("splotmodels").getPath());

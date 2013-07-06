@@ -198,7 +198,7 @@ public class SXFMWriter extends AbstractFeatureModelWriter {
 			String[] symbols =  new String[] {"~", " and ", " or ", 
 					" imp ", " biimp ", ", ", "choose", "atleast", "atmost"};
 			// avoid use of parenthesis from the beginning
-			String nodeString = NodeWriter.nodeToString(node, symbols, false);
+			String nodeString = NodeWriter.nodeToString(node.toCNF(), symbols, false);
 			// remove the external parenthesis
 			if ((nodeString.startsWith("(")) && (nodeString.endsWith(")"))) {
 				nodeString = nodeString.substring(1, nodeString.length() - 1);

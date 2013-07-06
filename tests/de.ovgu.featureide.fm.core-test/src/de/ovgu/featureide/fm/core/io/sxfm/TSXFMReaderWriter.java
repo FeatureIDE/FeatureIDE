@@ -20,6 +20,14 @@
  */
 package de.ovgu.featureide.fm.core.io.sxfm;
 
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
+import org.prop4j.Literal;
+import org.prop4j.Node;
+import org.prop4j.Not;
+import org.prop4j.Or;
+
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
@@ -62,5 +70,25 @@ public class TSXFMReaderWriter extends TAbstractFeatureModelReaderWriter{
 	public void testFeatureHidden(){
 		
 	}
-
+	
+	@Test
+	public void testPropNodes() {
+		for (Node n : newFm.getPropositionalNodes()) {
+			assertTrue(n + " is no Or Node",n instanceof Or);
+			isCnf(n);
+		}
+	}
+	
+	private void isCnf(Node node) {
+		for (Node n : node.getChildren()) {
+			if (n instanceof Not) {
+				assertTrue("Not statement has to much children", n.getChildren().length == 1);
+				assertTrue(n + "is not a Literal after Not",n.getChildren()[0] instanceof Literal);
+			} else if (n instanceof Or) { 
+				isCnf(n);
+			} else {
+				assertTrue(n + " is no Literal",n instanceof Literal);
+			}
+		}
+	}
 }
