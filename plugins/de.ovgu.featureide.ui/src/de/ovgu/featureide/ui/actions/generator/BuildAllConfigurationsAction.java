@@ -64,7 +64,7 @@ public class BuildAllConfigurationsAction implements IObjectActionDelegate,
 		}
 		MessageDialogWithToggle dialog = openDialog();
 		if (dialog.getReturnCode() == MessageDialogWithToggle.OK) {
-			new ConfigurationBuilder(featureProject, false,
+			new ConfigurationBuilder(featureProject, ConfigurationBuilder.BuildType.ALL_VALID,
 					dialog.getToggleState());
 		}
 		setToggleState(dialog.getToggleState());

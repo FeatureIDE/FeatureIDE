@@ -57,6 +57,8 @@ public interface IConfigurationBuilderBasics {
 	 */
 	final static String JOB_TITLE = "Build all valid configurations";
 	final static String JOB_TITLE_CURRENT = "Build all current configurations";
+	final static String JOB_TITLE_T_WISE = "Build t-wise configurations";
+	
 	final static String JOB_TITLE_COUNT_CONFIGURATIONS = "Count configurations";
 		
 	final static String CONFIGURATION_NAME = "Variant";
@@ -73,6 +75,7 @@ public interface IConfigurationBuilderBasics {
 	
 	final static Pattern errorMessagePattern = Pattern.compile("(.+):(\\d+):(.+)");
 	
-	final static String SEPARATOR_VARIANT = " v.";
-	final static String SEPARATOR_CONFIGURATION = " c.";
+	final static String SEPARATOR_VARIANT = "_v.";
+	final static String SEPARATOR_CONFIGURATION = "_c.";
+	final static String SEPARATOR_T_WISE = "_t.";
 }

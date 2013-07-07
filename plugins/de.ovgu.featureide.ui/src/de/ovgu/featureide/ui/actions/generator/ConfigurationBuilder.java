@@ -20,12 +20,18 @@
  */
 package de.ovgu.featureide.ui.actions.generator;
 
+import java.io.File;
 import java.io.IOException;
 import java.security.KeyStore.Builder;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import javax.annotation.CheckForNull;
+
+import no.sintef.ict.splcatool.CoveringArray;
+import no.sintef.ict.splcatool.SPLACAToolExtension;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -48,6 +54,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.Selection;
+import de.ovgu.featureide.fm.core.io.guidsl.GuidslWriter;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
@@ -57,6 +64,9 @@ import de.ovgu.featureide.ui.UIPlugin;
  */
 @SuppressWarnings("restriction")
 public class ConfigurationBuilder implements IConfigurationBuilderBasics {
+	
+	public static enum BuildType {ALL_VALID, ALL_CURRENT, T_WISE};
+	
 	IFeatureProject featureProject;
 	private FeatureModel featureModel;
 	
@@ -138,7 +148,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 * <code>true</code>: all valid configurations should be built.<br>
 	 * <code>false</code>: all configurations at the configurations folder should be built.
 	 */
-	boolean buildAllValidConfigurations;
+	BuildType buildType;
 	
 	/**
 	 * This list contains all {@link Generator} jobs.
@@ -183,36 +193,56 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 * @see BuildAllConfigurationsAction
 	 * @see BuildAllValidConfigurationsAction
 	 */
-	ConfigurationBuilder(final IFeatureProject featureProject, final boolean buildAllValidConfigurations,
+	ConfigurationBuilder(final IFeatureProject featureProject, final BuildType buildType,
 			final boolean createNewProjects) {
 		this.featureProject = featureProject;
 		this.createNewProjects = createNewProjects;
-		this.buildAllValidConfigurations = buildAllValidConfigurations;
+		this.buildType = buildType;
 		featureModel = featureProject.getFeatureModel();
-		if (!buildAllValidConfigurations) {
-			configurationNumber = countConfigurations(this.featureProject.getConfigFolder());
-		} else {
-			Job number = new Job(JOB_TITLE_COUNT_CONFIGURATIONS) {
-				public IStatus run(IProgressMonitor monitor) {
-					configurationNumber = new Configuration(featureModel, false, false).number(1000000);
-					if (configurationNumber < ((long)0)) {
-						UIPlugin.getDefault().logWarning("Satsolver overflow");
-						configurationNumber = Integer.MAX_VALUE;
+		
+		/** set number of configurations to build **/
+		switch (buildType) {
+			case ALL_CURRENT :
+				configurationNumber = countConfigurations(this.featureProject.getConfigFolder());
+				break;
+			case ALL_VALID :
+				Job number = new Job(JOB_TITLE_COUNT_CONFIGURATIONS) {
+					public IStatus run(IProgressMonitor monitor) {
+						configurationNumber = new Configuration(featureModel, false, false).number(1000000);
+						if (configurationNumber < ((long)0)) {
+							UIPlugin.getDefault().logWarning("Satsolver overflow");
+							configurationNumber = Integer.MAX_VALUE;
+						}
+						
+						return Status.OK_STATUS;
 					}
-					
-					return Status.OK_STATUS;
-				}
-			};
-			number.setPriority(Job.LONG);
-			number.schedule();
+				};
+				number.setPriority(Job.LONG);
+				number.schedule();
+				break;
+			case T_WISE :
+				break;
 		}
 		
-		Job job = new Job(buildAllValidConfigurations ? JOB_TITLE : JOB_TITLE_CURRENT + "for " + featureProject.getProjectName()) {
+		String jobName = "";
+		switch (buildType) {
+		case ALL_CURRENT:
+			jobName = JOB_TITLE;
+			break;
+		case ALL_VALID:
+			jobName = JOB_TITLE_CURRENT;
+			break;
+		case T_WISE:
+			jobName = JOB_TITLE_T_WISE;
+			break;
+		}
+		jobName += "for " + featureProject.getProjectName();
+		Job job = new Job(jobName) {
 			public IStatus run(IProgressMonitor monitor) {
 				try {
 					monitor.beginTask("" , 1);
 					
-					if (!init(monitor, buildAllValidConfigurations)) {
+					if (!init(monitor, buildType)) {
 						return Status.OK_STATUS;
 					}
 					
@@ -221,7 +251,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 					monitor.setTaskName(getTaskName());
 					
 					if (featureProject.getComposer().canGeneratInParallelJobs()) {
-						if (buildAllValidConfigurations) {
+						if (buildType != BuildType.ALL_CURRENT) {
 							newgeneratorJobs(Runtime.getRuntime().availableProcessors() * 2);
 						} else {
 							int contJobs = Runtime.getRuntime().availableProcessors() * 2;
@@ -234,10 +264,16 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 						newgeneratorJobs(1);
 					}
 					
-					if (buildAllValidConfigurations) {
+					switch (buildType) {
+					case ALL_CURRENT:
 						buildAll(featureModel.getRoot(), monitor);
-					} else {
-						buildActivConfigurations(featureProject, monitor);
+						break;
+					case ALL_VALID:
+						buildCurrentConfigurations(featureProject, monitor);
+						break;
+					case T_WISE:
+						buildTWiseConfigurations(featureProject, monitor);
+						break;
 					}
 					
 					finish();
@@ -301,7 +337,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 * @param buildAllValidConfigurations<code>true</code> if all possible valid configurations should be build<br>
 	 * <code>false</code> if all current configurations should be build
 	 */
-	private boolean init(IProgressMonitor monitor, boolean buildAllValidConfigurations) {
+	private boolean init(IProgressMonitor monitor, BuildType buildType) {
 		confs = 1;
 		
 		configuration = new Configuration(featureModel);
@@ -309,7 +345,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		featureProject.getComposer().initialize(featureProject);
 		
 		if (!createNewProjects) {
-			folder = featureProject.getProject().getFolder(buildAllValidConfigurations ? FOLDER_NAME : FOLDER_NAME_CURRENT);
+			folder = featureProject.getProject().getFolder(buildType != BuildType.ALL_CURRENT ? FOLDER_NAME : FOLDER_NAME_CURRENT);
 			if (!folder.exists()) {
 				try {
 					folder.create(true, true, null);
@@ -348,17 +384,26 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 				for (IResource res : ResourcesPlugin.getWorkspace().getRoot().members()) {
 					if (res instanceof IProject) {
 						IProject p = (IProject)res;
-						String projectName = p.getName(); 
-						if (buildAllValidConfigurations) {
-							if (projectName.startsWith(featureProject.getProjectName() + SEPARATOR_VARIANT)) {
-								monitor.setTaskName("Remove old products : " + projectName);
-								res.delete(true, null);
-							}
-						} else {
+						String projectName = p.getName();
+						switch (buildType) {
+						case ALL_CURRENT:
 							if (projectName.startsWith(featureProject.getProjectName() + SEPARATOR_CONFIGURATION)) {
 								monitor.setTaskName("Remove old products : " + projectName);
 								res.delete(true, null);
 							}
+							break;
+						case ALL_VALID:
+							if (projectName.startsWith(featureProject.getProjectName() + SEPARATOR_VARIANT)) {
+								monitor.setTaskName("Remove old products : " + projectName);
+								res.delete(true, null);
+							}
+							break;
+						case T_WISE:
+							if (projectName.startsWith(featureProject.getProjectName() + SEPARATOR_T_WISE)) {
+								monitor.setTaskName("Remove old products : " + projectName);
+								res.delete(true, null);
+							}
+							break;
 						}
 					}
 				}
@@ -399,7 +444,34 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 * @param featureProject The feature project
 	 * @param monitor 
 	 */
-	protected void buildActivConfigurations(IFeatureProject featureProject, IProgressMonitor monitor) {
+	protected void buildTWiseConfigurations(IFeatureProject featureProject, IProgressMonitor monitor) {
+		monitor.beginTask("" , (int) configurationNumber);
+		String modelFilePath = featureProject.getProject().getFile("model.m").getLocation().toOSString();
+		new GuidslWriter(featureModel).writeToFile(new File(modelFilePath));
+		
+		CoveringArray ca = (new SPLACAToolExtension()).mainObj2(new String[] {
+				"-t", "t_wise", 
+				"-a", "ICPL", 
+				"-fm", modelFilePath,
+				"-s", "2"});
+		Map<Integer, String> nrids = ca.getnrid();
+		List<List<Integer>> solutions = ca.getSolutionsAsList();
+		configurationNumber = solutions.size();
+		monitor.beginTask("" , (int) configurationNumber);
+		for (List<Integer> solution : solutions) {
+			String selectedFeatures = "";
+			for (Integer selection : solution) {
+				if (selection > 0) {
+					selectedFeatures += " " + nrids.get(selection);
+				}
+				
+			}	
+			reader.readFromString(selectedFeatures);
+			addConfiguration(new BuilderConfiguration(configuration, confs++));
+		}
+	}
+	
+	protected void buildCurrentConfigurations(IFeatureProject featureProject, IProgressMonitor monitor) {
 		monitor.beginTask("" , (int) configurationNumber);
 		try {
 			for (IResource configuration : featureProject.getConfigFolder().members()) {
@@ -577,7 +649,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			long h = duration/(60 * 60 * 1000);
 			t = " " + h + "h " + (min < 10 ? "0" + min : min) + "min " + (s < 10 ? "0" + s : s) + "s.";
 		}
-		long buffer = buildAllValidConfigurations ? configurations.size() : configurationNumber - built;
+		long buffer = buildType == BuildType.ALL_VALID ? configurations.size() : configurationNumber - built;
 		return "Built configutations: "+ built + "/" + (configurationNumber == 0 ? "counting..." : configurationNumber)
 				+ "(" + buffer + " buffered)" + " Expected time: " + t;
 	}

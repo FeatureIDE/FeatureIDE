@@ -139,22 +139,34 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 				}
 				monitor.setTaskName(generated + " produrcts generated. (Running)");
 				String name = c.getName();
-				if (builder.buildAllValidConfigurations) {
-					if (builder.createNewProjects) {
-						buildConfiguration(builder.featureProject.getProjectName() + SEPARATOR_VARIANT + name, c);
-					} else {
-						builder.featureProject.getComposer().buildConfiguration(builder.folder.getFolder(CONFIGURATION_NAME + name), 
-								c, CONFIGURATION_NAME + name);
-					}
-				} else {
+				switch (builder.buildType) {
+				case ALL_CURRENT:
 					if (builder.createNewProjects) {
 						buildConfiguration(builder.featureProject.getProjectName() + SEPARATOR_CONFIGURATION + name, c);
 					} else {
 						builder.featureProject.getComposer().buildConfiguration(builder.folder.getFolder(name), 
 								c, name);
 					}
+					break;
+				case ALL_VALID:
+					if (builder.createNewProjects) {
+						buildConfiguration(builder.featureProject.getProjectName() + SEPARATOR_VARIANT + name, c);
+					} else {
+						builder.featureProject.getComposer().buildConfiguration(builder.folder.getFolder(CONFIGURATION_NAME + name), 
+								c, CONFIGURATION_NAME + name);
+					}
+					break;
+				case T_WISE:
+					if (builder.createNewProjects) {
+						buildConfiguration(builder.featureProject.getProjectName() + SEPARATOR_T_WISE + name, c);
+					} else {
+						builder.featureProject.getComposer().buildConfiguration(builder.folder.getFolder(name), 
+								c, name);
+					}
+					break;
+
 				}
-				
+
 				addConfiguration(c);
 				builder.builtConfigurations++;
 

@@ -112,7 +112,7 @@ public class Compiler extends Job implements IConfigurationBuilderBasics {
 				continue;
 			}
 			monitor.setTaskName(compiled + " produrcts compiled. (Running)");
-			if (generator.builder.buildAllValidConfigurations) {
+			if (generator.builder.buildType == ConfigurationBuilder.BuildType.ALL_VALID) {
 				try {
 					generator.builder.folder.getFolder(CONFIGURATION_NAME + c.getName()).refreshLocal(IResource.DEPTH_INFINITE, null);
 				} catch (CoreException e) {
@@ -199,7 +199,7 @@ public class Compiler extends Job implements IConfigurationBuilderBasics {
 				}
 			}
 		} catch (IOException e) {
-			UIPlugin.getDefault().logError(e);
+//			UIPlugin.getDefault().logError(e);
 		} finally {
 			try {
 				if(input!=null)input.close();

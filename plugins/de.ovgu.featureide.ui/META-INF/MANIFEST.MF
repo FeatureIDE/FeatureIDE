@@ -13,9 +13,11 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.gef,
  de.ovgu.featureide.fm.core,
  de.ovgu.featureide.core,
- de.ovgu.featureide.fm.ui
+ de.ovgu.featureide.fm.ui,
+ org.apache.commons.math;bundle-version="2.1.0"
 Bundle-ActivationPolicy: lazy
-Bundle-ClassPath: .
+Bundle-ClassPath: lib/SPLACAT.jar,
+ .
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: University of Magdeburg
 Export-Package: 
