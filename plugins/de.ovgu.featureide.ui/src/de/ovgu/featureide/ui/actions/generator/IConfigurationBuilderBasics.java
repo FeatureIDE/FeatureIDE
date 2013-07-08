@@ -29,23 +29,28 @@ import de.ovgu.featureide.core.CorePlugin;
 /**
  * Defining static fields for the ConfigurationBuilder
  * @see ConfigurationBuilder
- * @see BuildAllConfigurationsAction
+ * @see BuildAllCurrentConfigurationsAction
  * @see BuildAllValidConfigurationsAction 
+ * @see BuildTWiseConfigurationsAction
  * 
  * @author Jens Meinicke
  */
 public interface IConfigurationBuilderBasics {
+	
+	public static enum BuildType {ALL_VALID, ALL_CURRENT, T_WISE};
 	
 	/**
 	 * Basics for the dialogs.
 	 */
 	final static String MESSAGE_TITLE_VALID = "Build all valid configurations";
 	final static String MESSAGE_TITLE_CURRENT = "Build all current configurations";
+	final static String MESSAGE_TITLE_T = "Build T-Wise configurations";
 	final static String MESSAGE_CURRENT = "Builds all current configurations";
 	final static String MESSAGE_START = "This could take a long time.\nThe current algorithm is inefficient, if your model contains many constraints.\n";
 	final static String TOGGLE_MESSAGE = "Create a new project for each variant";
 	
-	static final QualifiedName TOGGLE_STATE = new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#CreateNewProject", 
+	/** Saves the toggle state whether new projects should be generated for each configuration. **/
+	final static QualifiedName TOGGLE_STATE = new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#CreateNewProject", 
 			IConfigurationBuilderBasics.class.getName() + "#CreateNewProject");
 	final static String TRUE = "true";
 	final static String FALSE = "false";

@@ -21,34 +21,21 @@
 package de.ovgu.featureide.ui.actions.generator;
 
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ui.IObjectActionDelegate;
-import org.eclipse.ui.IWorkbenchPart;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.FMCorePlugin;
 
 /**
  * Builds all current configurations for a selected feature project.
  * 
  * @author Jens Meinicke
  */
-public class BuildAllConfigurationsAction implements IObjectActionDelegate,
-		IConfigurationBuilderBasics {
+public class BuildAllCurrentConfigurationsAction extends AbstractBuildConfigurationsAction {
 
-	private ISelection selection;
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
-	 */
 	@Override
 	public void run(IAction action) {
 		Object obj = ((IStructuredSelection) selection).getFirstElement();
@@ -64,7 +51,7 @@ public class BuildAllConfigurationsAction implements IObjectActionDelegate,
 		}
 		MessageDialogWithToggle dialog = openDialog();
 		if (dialog.getReturnCode() == MessageDialogWithToggle.OK) {
-			new ConfigurationBuilder(featureProject, ConfigurationBuilder.BuildType.ALL_VALID,
+			new ConfigurationBuilder(featureProject, ConfigurationBuilder.BuildType.ALL_CURRENT,
 					dialog.getToggleState());
 		}
 		setToggleState(dialog.getToggleState());
@@ -78,53 +65,6 @@ public class BuildAllConfigurationsAction implements IObjectActionDelegate,
 	private MessageDialogWithToggle openDialog() {
 		return MessageDialogWithToggle.openOkCancelConfirm(null, MESSAGE_TITLE_CURRENT,
 				MESSAGE_CURRENT, TOGGLE_MESSAGE, getToggleState(), null, "key");
-	}
-
-	/**
-	 * Gets the toggle state from persistent properties
-	 */
-	private static boolean getToggleState() {
-		try {
-			return TRUE.equals(ResourcesPlugin.getWorkspace().getRoot().getPersistentProperty(TOGGLE_STATE));
-		} catch (CoreException e) {
-			FMCorePlugin.getDefault().logError(e);
-		}
-		return false;
-	}
-
-	/**
-	 * Saves the toggle state of the dialog at persistent properties
-	 */
-	private static void setToggleState(boolean value) {
-		try {
-			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(TOGGLE_STATE, value ? TRUE : FALSE);
-		} catch (CoreException e) {
-			FMCorePlugin.getDefault().logError(e);
-		}
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action
-	 * .IAction, org.eclipse.jface.viewers.ISelection)
-	 */
-	@Override
-	public void selectionChanged(IAction action, ISelection selection) {
-		this.selection = selection;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface.
-	 * action.IAction, org.eclipse.ui.IWorkbenchPart)
-	 */
-	@Override
-	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
-
 	}
 
 }

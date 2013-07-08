@@ -83,7 +83,7 @@
                style="push">
          </action>
          <action
-               class="de.ovgu.featureide.ui.actions.generator.BuildAllConfigurationsAction"
+               class="de.ovgu.featureide.ui.actions.generator.BuildAllCurrentConfigurationsAction"
                id="de.ovgu.featureide.ui.actions.buildallconfigurationsaction"
                icon="icons/FeatureIconSmall.ico"
                label="Build All Current Configurations"

@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.ui.actions.generator;
 
+import javax.swing.JOptionPane;
+
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -39,16 +41,8 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
  * 
  * @author Jens Meinicke
  */
-public class BuildTWiseConfigurationsAction implements IObjectActionDelegate,
-		IConfigurationBuilderBasics {
+public class BuildTWiseConfigurationsAction extends AbstractBuildConfigurationsAction {
 
-	private ISelection selection;
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
-	 */
 	@Override
 	public void run(IAction action) {
 		Object obj = ((IStructuredSelection) selection).getFirstElement();
@@ -76,55 +70,10 @@ public class BuildTWiseConfigurationsAction implements IObjectActionDelegate,
 	 * @return true if all current configurations should be build.
 	 */
 	private MessageDialogWithToggle openDialog() {
-		return MessageDialogWithToggle.openOkCancelConfirm(null, MESSAGE_TITLE_CURRENT,
-				MESSAGE_CURRENT, TOGGLE_MESSAGE, getToggleState(), null, "key");
+		return MessageDialogWithToggle.openOkCancelConfirm(null, MESSAGE_TITLE_T,
+				MESSAGE_TITLE_T, TOGGLE_MESSAGE, getToggleState(), null, "key");
 	}
 
-	/**
-	 * Gets the toggle state from persistent properties
-	 */
-	private static boolean getToggleState() {
-		try {
-			return TRUE.equals(ResourcesPlugin.getWorkspace().getRoot().getPersistentProperty(TOGGLE_STATE));
-		} catch (CoreException e) {
-			FMCorePlugin.getDefault().logError(e);
-		}
-		return false;
-	}
-
-	/**
-	 * Saves the toggle state of the dialog at persistent properties
-	 */
-	private static void setToggleState(boolean value) {
-		try {
-			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(TOGGLE_STATE, value ? TRUE : FALSE);
-		} catch (CoreException e) {
-			FMCorePlugin.getDefault().logError(e);
-		}
-	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action
-	 * .IAction, org.eclipse.jface.viewers.ISelection)
-	 */
-	@Override
-	public void selectionChanged(IAction action, ISelection selection) {
-		this.selection = selection;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface.
-	 * action.IAction, org.eclipse.ui.IWorkbenchPart)
-	 */
-	@Override
-	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
-
-	}
 
 }

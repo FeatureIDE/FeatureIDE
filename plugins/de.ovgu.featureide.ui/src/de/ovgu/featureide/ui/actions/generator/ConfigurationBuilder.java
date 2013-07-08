@@ -64,9 +64,7 @@ import de.ovgu.featureide.ui.UIPlugin;
  */
 @SuppressWarnings("restriction")
 public class ConfigurationBuilder implements IConfigurationBuilderBasics {
-	
-	public static enum BuildType {ALL_VALID, ALL_CURRENT, T_WISE};
-	
+
 	IFeatureProject featureProject;
 	private FeatureModel featureModel;
 	
@@ -190,7 +188,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 * @param buildAllValidConfigurations <code>true</code> if all possible valid configurations should be build<br>
 	 * <code>false</code> if all current configurations should be build
 	 * @param createNewProjects <code>true</code> if the configurations should be built into separate projects
-	 * @see BuildAllConfigurationsAction
+	 * @see BuildAllCurrentConfigurationsAction
 	 * @see BuildAllValidConfigurationsAction
 	 */
 	ConfigurationBuilder(final IFeatureProject featureProject, final BuildType buildType,
@@ -265,10 +263,10 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 					}
 					
 					switch (buildType) {
-					case ALL_CURRENT:
+					case ALL_VALID:
 						buildAll(featureModel.getRoot(), monitor);
 						break;
-					case ALL_VALID:
+					case ALL_CURRENT:
 						buildCurrentConfigurations(featureProject, monitor);
 						break;
 					case T_WISE:

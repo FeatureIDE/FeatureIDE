@@ -17,9 +17,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.junit.Assert;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+//import org.junit.runner.RunWith;
+//import org.junit.runners.Parameterized;
+//import org.junit.runners.Parameterized.Parameters;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
