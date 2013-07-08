@@ -52,6 +52,8 @@ public interface IConfigurationBuilderBasics {
 	/** Saves the toggle state whether new projects should be generated for each configuration. **/
 	final static QualifiedName TOGGLE_STATE = new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#CreateNewProject", 
 			IConfigurationBuilderBasics.class.getName() + "#CreateNewProject");
+	final static QualifiedName T_WISE = new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#T-Wise", 
+			IConfigurationBuilderBasics.class.getName() + "#T-Wise");
 	final static String TRUE = "true";
 	final static String FALSE = "false";
 	
@@ -83,4 +85,14 @@ public interface IConfigurationBuilderBasics {
 	final static String SEPARATOR_VARIANT = "_v.";
 	final static String SEPARATOR_CONFIGURATION = "_c.";
 	final static String SEPARATOR_T_WISE = "_t.";
+	
+	/**
+	 * Basics for the SPLCATool.
+	 */
+	final static String CHVATAL = "Chvatal"; 
+	final static String ICPL = "ICPL";
+	final static String CASA = "CASA";
+	final static int CHVATAL_MAX = 4;
+	final static int ICPL_MAX = 3;
+	final static int CASA_MAX = 6;
 }

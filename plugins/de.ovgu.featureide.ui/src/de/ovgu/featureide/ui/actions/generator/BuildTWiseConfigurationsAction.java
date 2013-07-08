@@ -20,24 +20,17 @@
  */
 package de.ovgu.featureide.ui.actions.generator;
 
-import javax.swing.JOptionPane;
-
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.dialogs.MessageDialogWithToggle;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ui.IObjectActionDelegate;
-import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.FMCorePlugin;
 
 /**
- * Builds all current configurations for a selected feature project.
+ * Builds T-Wise configurations with SPLCATool for a selected feature project.
  * 
  * @author Jens Meinicke
  */
@@ -56,23 +49,16 @@ public class BuildTWiseConfigurationsAction extends AbstractBuildConfigurationsA
 		} else {
 			return;
 		}
-		MessageDialogWithToggle dialog = openDialog();
-		if (dialog.getReturnCode() == MessageDialogWithToggle.OK) {
-			new ConfigurationBuilder(featureProject, ConfigurationBuilder.BuildType.T_WISE,
-					dialog.getToggleState());
-		}
-		setToggleState(dialog.getToggleState());
+		
+		BuildTWiseWizard wizard = new BuildTWiseWizard(featureProject, getToggleState());
+		WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
+		dialog.create();
+		dialog.open();
+		
+		setToggleState(wizard.getToggleState());
 	}
 
-	/**
-	 * Opens a dialog before building all current configuration.
-	 * 
-	 * @return true if all current configurations should be build.
-	 */
-	private MessageDialogWithToggle openDialog() {
-		return MessageDialogWithToggle.openOkCancelConfirm(null, MESSAGE_TITLE_T,
-				MESSAGE_TITLE_T, TOGGLE_MESSAGE, getToggleState(), null, "key");
-	}
+
 
 	
 

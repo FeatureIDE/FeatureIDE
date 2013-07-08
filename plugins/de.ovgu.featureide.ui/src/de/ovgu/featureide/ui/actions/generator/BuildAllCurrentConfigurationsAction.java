@@ -23,7 +23,6 @@ package de.ovgu.featureide.ui.actions.generator;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 
 import de.ovgu.featureide.core.CorePlugin;
