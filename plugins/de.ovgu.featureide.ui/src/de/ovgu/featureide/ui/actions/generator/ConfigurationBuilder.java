@@ -55,7 +55,6 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslWriter;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
@@ -469,7 +468,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			for (String arg : args) {
 				argsString = argsString + arg + " ";
 			}
-			FMUIPlugin.getDefault().logError("SPLCATool fails with following arguments: " + argsString, e);
+			UIPlugin.getDefault().logError("SPLCATool fails with following arguments: " + argsString, e);
 			return;
 		}
 		Map<Integer, String> nrids = ca.getnrid();
