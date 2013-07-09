@@ -15,5 +15,7 @@ Require-Bundle: de.ovgu.featureide.core,
 Bundle-Activator: de.ovgu.featureide.core.mpl.MPLPlugin
 Bundle-Vendor: University of Magdeburg
 Export-Package: de.ovgu.featureide.core.mpl,
- de.ovgu.featureide.core.mpl.io.constants
+ de.ovgu.featureide.core.mpl.io.constants,
+ de.ovgu.featureide.core.mpl.signature,
+ de.ovgu.featureide.core.mpl.signature.abstr
 Bundle-ActivationPolicy: lazy

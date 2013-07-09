@@ -295,6 +295,14 @@ public class MPLPlugin extends AbstractCorePlugin {
 		return ret_List;
 	}
 	
+	
+	public ProjectSignature extendedModules_getSig(IFeatureProject project, String featureName) {
+		RoleMap map = new JavaSignatureWriter(project, null).writeSignatures(project.getFeatureModel());
+		ProjectSignature sig = InterfaceWriter.buildSignature(project.getFeatureModel(), map, featureName);
+		
+		return sig;
+	}
+	
 //	public void extendedModules(IProject project, String folder) {
 //		JavaInterfaceProject interfaceProject = getInterfaceProject(project);
 //		if (interfaceProject != null) {

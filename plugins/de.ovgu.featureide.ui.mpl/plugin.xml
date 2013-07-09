@@ -139,4 +139,15 @@
 			<partition type="__java_string"/>
          </javaCompletionProposalComputer>
      </extension>
+    <extension
+         point="org.eclipse.ui.views">
+      <view
+            category="FeatureIDE"
+            class="de.ovgu.featureide.ui.mpl.views.outline.CollOutline"
+            icon="icons/FeatureIconSmall.ico"
+            id="de.ovgu.mpl.ui.views.collaboration.outline.CollaborationOutline"
+            name="Context View"
+            restorable="true">
+      </view>
+   </extension>
 </plugin>
