@@ -49,18 +49,15 @@ import org.eclipse.jdt.internal.core.JavaProject;
 
 import cide.gparser.ParseException;
 import cide.gparser.TokenMgrError;
-
 import composer.CmdLineInterpreter;
 import composer.FSTGenComposer;
 import composer.FSTGenComposerExtension;
 import composer.IParseErrorListener;
-
 import de.ovgu.cide.fstgen.ast.FSTNode;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.featurehouse.errorpropagation.ErrorPropagation;
 import de.ovgu.featureide.featurehouse.meta.FeatureModelClassGenerator;
-import de.ovgu.featureide.featurehouse.meta.VerifyProductAction;
 import de.ovgu.featureide.featurehouse.model.FeatureHouseModelBuilder;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
@@ -219,7 +216,6 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		}
 	}
 
-	// TODO refactor into cases
 	public void performFullBuild(IFile config) {
 		assert (featureProject != null) : "Invalid project given";
 		final String configPath = config.getRawLocation().toOSString();
@@ -229,18 +225,9 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		if (configPath == null || basePath == null || outputPath == null)
 			return;
 
-		IFolder buildFolder = featureProject.getBuildFolder().getFolder(
-				config.getName().split("[.]")[0]);
-		if (!buildFolder.exists()) {
-			try {
-				buildFolder.create(true, true, null);
-				buildFolder.refreshLocal(IResource.DEPTH_ZERO, null);
-			} catch (CoreException e) {
-				FeatureHouseCorePlugin.getDefault().logError(e);
-			}
-		}
-		
+		createBuildFolder(config);
 		setJavaBuildPath(config.getName().split("[.]")[0]);
+		
 		if (buildMetaProduct()) {
 			new FeatureModelClassGenerator(featureProject);
 			FSTGenComposerExtension.key = IFeatureProject.DEFAULT_META_PRODUCT_GENERATION.equals(featureProject.getMetaProductGeneration());
@@ -262,13 +249,9 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			}
 			
 			try {
-				((FSTGenComposerExtension) composer).buildMetaProduct(new String[] {
-						CmdLineInterpreter.INPUT_OPTION_EQUATIONFILE, configPath,
-						CmdLineInterpreter.INPUT_OPTION_BASE_DIRECTORY, basePath,
-						CmdLineInterpreter.INPUT_OPTION_OUTPUT_DIRECTORY, outputPath + "/",
-						CmdLineInterpreter.INPUT_OPTION_CONTRACT_STYLE, CONTRACT_COMPOSITION_EXPLICIT_CONTRACTING
-				}, features);
-				fhModelBuilder.buildModel(composer.getFstnodes(), false);
+				((FSTGenComposerExtension) composer).buildMetaProduct(
+						getArguments(configPath, basePath, outputPath, CONTRACT_COMPOSITION_EXPLICIT_CONTRACTING)
+						, features);
 			} catch (TokenMgrError e) {
 			} catch (Error e) {
 				FeatureHouseCorePlugin.getDefault().logError(e);
@@ -276,99 +259,34 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		} else {
 			composer = new FSTGenComposer(false);
 			try {
-				composer.run(new String[] {
-						CmdLineInterpreter.INPUT_OPTION_EQUATIONFILE, configPath,
-						CmdLineInterpreter.INPUT_OPTION_BASE_DIRECTORY, basePath,
-						CmdLineInterpreter.INPUT_OPTION_OUTPUT_DIRECTORY, outputPath + "/",
-						CmdLineInterpreter.INPUT_OPTION_CONTRACT_STYLE, getContractParameter()
-				});
+				composer.run(getArguments(configPath, basePath, outputPath, getContractParameter()));
 			} catch (TokenMgrError e) {
 				
 			}
-			fhModelBuilder.buildModel(composer.getFstnodes(), false);
 		}
-		if (verifyProduct()) {
-			(new VerifyProductAction()).runMonkey(featureProject.getProject());
-		}
+		buildFSTModel(configPath, basePath, outputPath);
 		
-		composer = new FSTGenComposerExtension();
-		composer.addParseErrorListener(listener);
-		
-		List<String> featureOrderList = featureProject.getFeatureModel().getConcreteFeatureNames();
-		String[] features = new String[featureOrderList.size()];
-		int i = 0;
-		for (String f : featureOrderList) {
-			features[i++] = f;
-		}
-		
-		try {
-			((FSTGenComposerExtension)composer).buildFullFST(new String[] {
-					CmdLineInterpreter.INPUT_OPTION_EQUATIONFILE, configPath,
-					CmdLineInterpreter.INPUT_OPTION_BASE_DIRECTORY, basePath,
-					CmdLineInterpreter.INPUT_OPTION_OUTPUT_DIRECTORY, outputPath + "/", 
-					CmdLineInterpreter.INPUT_OPTION_CONTRACT_STYLE, getContractParameter()
-			}, features);
-		} catch (TokenMgrError e) {
-			createBuilderProblemMarker(getTokenMgrErrorLine(e.getMessage()), getTokenMgrErrorMessage(e.getMessage()));
-		} catch (Error e) {
-			FeatureHouseCorePlugin.getDefault().logError(e);
-		}
-		ArrayList<FSTNode> fstnodes = composer.getFstnodes();
-		if (fstnodes != null) {
-			fhModelBuilder.buildModel(fstnodes, true);
-			TreeBuilderFeatureHouse fstparser = new TreeBuilderFeatureHouse(
-					featureProject.getProjectName());
-			fstparser.createProjectTree(fstnodes);
-			featureProject.setProjectTree(fstparser.getProjectTree());
-		}
 		callCompiler();
 	}
-
-	private String getContractParameter() {
-		String contractComposition= featureProject.getContractComposition().toLowerCase(Locale.ENGLISH);
-		if(CONTRACT_COMPOSITION_NONE.equals(contractComposition)) {
-			return CONTRACT_COMPOSITION_NONE;
-		}
-		if(CONTRACT_COMPOSITION_PLAIN_CONTRACTING.equals(contractComposition)) {
-			return CONTRACT_COMPOSITION_PLAIN_CONTRACTING;
-		}
-		if(CONTRACT_COMPOSITION_CONTRACT_OVERRIDING.equals(contractComposition)) {
-			return CONTRACT_COMPOSITION_CONTRACT_OVERRIDING;
-		}
-		if(CONTRACT_COMPOSITION_EXPLICIT_CONTRACT_REFINEMENT.equals(contractComposition)) {
-			return CONTRACT_COMPOSITION_EXPLICIT_CONTRACTING;
-		}
-		if(CONTRACT_COMPOSITION_CONSECUTIVE_CONTRACT_REFINEMENT.equals(contractComposition)) {
-			return CONTRACT_COMPOSITION_CONSECUTIVE_CONTRACTING;
-		}
-		return CONTRACT_COMPOSITION_NONE;
-	}
-
+	
 	/**
-	 * This job calls the compiler by touching the .classpath file of the project.<br> 
-	 * This is necessary after calling <code>setAsCurrentConfiguration</code>.
+	 * Creates the folder at the source path named the configuration. 
+	 * 
+	 * @param config
 	 */
-	private void callCompiler() {
-		Job job = new Job("Call compiler") {
-			protected IStatus run(IProgressMonitor monitor) {
-				IFile iClasspathFile = featureProject.getProject()
-						.getFile(".classpath");
-				if (iClasspathFile.exists()) {
-					try {
-						iClasspathFile.touch(monitor);
-						iClasspathFile.refreshLocal(IResource.DEPTH_ZERO, monitor);
-					} catch (CoreException e) {
-						FeatureHouseCorePlugin.getDefault().logError(e);
-					}
-				}
-				return Status.OK_STATUS;
+	private void createBuildFolder(IFile config) {
+		IFolder buildFolder = featureProject.getBuildFolder().getFolder(
+				config.getName().split("[.]")[0]);
+		if (!buildFolder.exists()) {
+			try {
+				buildFolder.create(true, true, null);
+				buildFolder.refreshLocal(IResource.DEPTH_ZERO, null);
+			} catch (CoreException e) {
+				FeatureHouseCorePlugin.getDefault().logError(e);
 			}
-		};
-		job.setPriority(Job.DECORATE);
-		job.schedule();
-		
+		}
 	}
-
+	
 	/**
 	 * Sets the Java build path to the folder at the build folder, named like the current configuration.
 	 * @param buildPath The name of the current configuration
@@ -413,6 +331,110 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		} catch (JavaModelException e) {
 			FeatureHouseCorePlugin.getDefault().logError(e);
 		}
+	}
+
+	/**
+	 * Builds the fst model.
+	 * @param configPath
+	 * @param basePath
+	 * @param outputPath
+	 */
+	private void buildFSTModel(final String configPath, final String basePath,
+			final String outputPath) {
+		// build the fst model of the current product
+		 /** It is necessary to also build the model of the current product, because the line numbers of generated 
+		 *   elements (e.g., methods) are necessary for error propagation. **/
+		fhModelBuilder.buildModel(composer.getFstnodes(), false);
+		
+		// build the complete fst model
+		composer = new FSTGenComposerExtension();
+		composer.addParseErrorListener(listener);
+		List<String> featureOrder = featureProject.getFeatureModel().getConcreteFeatureNames();
+		String[] features = new String[featureOrder.size()];
+		int i = 0;
+		for (String f : featureOrder) {
+			features[i++] = f;
+		}
+		try {
+			((FSTGenComposerExtension)composer).buildFullFST(getArguments(configPath, basePath, outputPath, getContractParameter()), features);
+		} catch (TokenMgrError e) {
+			createBuilderProblemMarker(getTokenMgrErrorLine(e.getMessage()), getTokenMgrErrorMessage(e.getMessage()));
+		} catch (Error e) {
+			FeatureHouseCorePlugin.getDefault().logError(e);
+		}
+		ArrayList<FSTNode> fstnodes = composer.getFstnodes();
+		if (fstnodes != null) {
+			fhModelBuilder.buildModel(fstnodes, true);
+			TreeBuilderFeatureHouse fstparser = new TreeBuilderFeatureHouse(
+					featureProject.getProjectName());
+			fstparser.createProjectTree(fstnodes);
+			featureProject.setProjectTree(fstparser.getProjectTree());
+		}
+	}
+
+	/**
+	 * Returns the arguments for FeatureHouse Composer with the given arguments.
+	 * @param configPath
+	 * @param basePath
+	 * @param outputPath
+	 * @param contract 
+	 * @return
+	 */
+	private String[] getArguments(final String configPath,
+			final String basePath, final String outputPath, String contract) {
+		return new String[] {
+				CmdLineInterpreter.INPUT_OPTION_EQUATIONFILE, configPath,
+				CmdLineInterpreter.INPUT_OPTION_BASE_DIRECTORY, basePath,
+				CmdLineInterpreter.INPUT_OPTION_OUTPUT_DIRECTORY, outputPath + "/",
+				CmdLineInterpreter.INPUT_OPTION_CONTRACT_STYLE, contract
+		};
+	}
+	
+	
+
+	private String getContractParameter() {
+		String contractComposition= featureProject.getContractComposition().toLowerCase(Locale.ENGLISH);
+		if(CONTRACT_COMPOSITION_NONE.equals(contractComposition)) {
+			return CONTRACT_COMPOSITION_NONE;
+		}
+		if(CONTRACT_COMPOSITION_PLAIN_CONTRACTING.equals(contractComposition)) {
+			return CONTRACT_COMPOSITION_PLAIN_CONTRACTING;
+		}
+		if(CONTRACT_COMPOSITION_CONTRACT_OVERRIDING.equals(contractComposition)) {
+			return CONTRACT_COMPOSITION_CONTRACT_OVERRIDING;
+		}
+		if(CONTRACT_COMPOSITION_EXPLICIT_CONTRACT_REFINEMENT.equals(contractComposition)) {
+			return CONTRACT_COMPOSITION_EXPLICIT_CONTRACTING;
+		}
+		if(CONTRACT_COMPOSITION_CONSECUTIVE_CONTRACT_REFINEMENT.equals(contractComposition)) {
+			return CONTRACT_COMPOSITION_CONSECUTIVE_CONTRACTING;
+		}
+		return CONTRACT_COMPOSITION_NONE;
+	}
+
+	/**
+	 * This job calls the compiler by touching the .classpath file of the project.<br> 
+	 * This is necessary after calling <code>setAsCurrentConfiguration</code>.
+	 */
+	private void callCompiler() {
+		Job job = new Job("Call compiler") {
+			protected IStatus run(IProgressMonitor monitor) {
+				IFile iClasspathFile = featureProject.getProject()
+						.getFile(".classpath");
+				if (iClasspathFile.exists()) {
+					try {
+						iClasspathFile.touch(monitor);
+						iClasspathFile.refreshLocal(IResource.DEPTH_ZERO, monitor);
+					} catch (CoreException e) {
+						FeatureHouseCorePlugin.getDefault().logError(e);
+					}
+				}
+				return Status.OK_STATUS;
+			}
+		};
+		job.setPriority(Job.DECORATE);
+		job.schedule();
+		
 	}
 	
 	/**
@@ -539,12 +561,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		}
 		
 		try {
-			((FSTGenComposerExtension)composer).buildFullFST(new String[] {
-					CmdLineInterpreter.INPUT_OPTION_EQUATIONFILE, configPath,
-					CmdLineInterpreter.INPUT_OPTION_BASE_DIRECTORY, basePath,
-					CmdLineInterpreter.INPUT_OPTION_OUTPUT_DIRECTORY, outputPath + "/",
-					CmdLineInterpreter.INPUT_OPTION_CONTRACT_STYLE, getContractParameter()
-			}, features);
+			((FSTGenComposerExtension)composer).buildFullFST(getArguments(configPath, basePath, outputPath, getContractParameter()), features);
 		} catch (TokenMgrError e) {
 			createBuilderProblemMarker(getTokenMgrErrorLine(e.getMessage()), getTokenMgrErrorMessage(e.getMessage()));
 		} catch (Error e) {
@@ -565,12 +582,9 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		IFile configurationFile = folder.getFile(folderName + '.' + getConfigurationExtension());
 		FSTGenComposer composer = new FSTGenComposer(false);
 		composer.addParseErrorListener(createParseErrorListener());
-		composer.run(new String[]{
-				CmdLineInterpreter.INPUT_OPTION_EQUATIONFILE, configurationFile.getRawLocation().toOSString(),
-				CmdLineInterpreter.INPUT_OPTION_BASE_DIRECTORY, featureProject.getSourcePath(),
-				CmdLineInterpreter.INPUT_OPTION_OUTPUT_DIRECTORY, folder.getParent().getLocation().toOSString() + "/",
-				CmdLineInterpreter.INPUT_OPTION_CONTRACT_STYLE, getContractParameter()
-		}); 
+		composer.run(getArguments(configurationFile.getRawLocation().toOSString(), 
+				featureProject.getSourcePath(), folder.getParent().getLocation().toOSString(), 
+				getContractParameter()));
 		if (errorPropagation.job != null) {
 			/*
 			 * Waiting for the propagation job to finish, 
@@ -607,21 +621,11 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	public static final QualifiedName VERIFY_PRODUCT = 
 			new QualifiedName(FeatureHouseComposer.class.getName() +"#VerifyProduct", 
 							  FeatureHouseComposer.class.getName() +"#VerifyProduct");
-	
 	private static final String TRUE = "true";
 	
 	public final boolean buildMetaProduct() {
 		try {
 			return TRUE.equals(featureProject.getProject().getPersistentProperty(BUILD_META_PRODUCT));
-		} catch (CoreException e) {
-			FMCorePlugin.getDefault().logError(e);
-		}
-		return false;
-	}
-	
-	public final boolean verifyProduct() {
-		try {
-			return TRUE.equals(featureProject.getProject().getPersistentProperty(VERIFY_PRODUCT));
 		} catch (CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}

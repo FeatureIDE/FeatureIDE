@@ -22,6 +22,7 @@ package de.ovgu.featureide.ui.actions.generator;
 
 import javax.annotation.CheckForNull;
 
+import org.eclipse.core.internal.runtime.InternalPlatform;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -36,6 +37,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Text;
+import org.osgi.framework.Bundle;
 
 import de.ovgu.featureide.core.IFeatureProject;
 
@@ -44,9 +46,14 @@ import de.ovgu.featureide.core.IFeatureProject;
  * 
  * @author Jens Meinicke
  */
+@SuppressWarnings("restriction")
 public class BuildTWiseWizardPage extends WizardPage implements IConfigurationBuilderBasics {
 
 	private static final String INTERACTIONS = "&Interactions: ";
+
+	private static final String ID = "org.apache.commons.math";
+	private static final String ERROR_MESSAGE_MATH = "plugin " + ID + " not found but required for SPLCATool.\r\nCopy a " 
+			+ ID + "*.jar into the plugin folder of you eclipse installation.";
 
 	@CheckForNull
 	private IFeatureProject project;
@@ -89,7 +96,7 @@ public class BuildTWiseWizardPage extends WizardPage implements IConfigurationBu
 		comboLanguage.add(CASA);
 		comboLanguage.add(CHVATAL);
 		comboLanguage.add(ICPL);
-		comboLanguage.setText(algorithm); // TODO save selection for next call
+		comboLanguage.setText(algorithm);
 	
 		labelT = new Label(composite, SWT.NULL);
 		labelT.setText(INTERACTIONS);
@@ -108,14 +115,22 @@ public class BuildTWiseWizardPage extends WizardPage implements IConfigurationBu
 		
 		setPageComplete(false);
 		setControl(composite);
+		
+		
+		if (!isPluginInstalled(ID)) {
+			setErrorMessage(ERROR_MESSAGE_MATH);
+			return;
+		}
 		addListeners();
 		dialogChanged();
 	}
 
 	private void setScale() {
-//		System.out.println(" -t t_wise -a Chvatal -fm <feature_model> -s <strength, 1-4> (-startFrom <covering array>) (-limit <coverage limit>) (-sizelimit <rows>) (-onlyOnes) (-noAllZeros)");
-//		System.out.println(" -t t_wise -a ICPL -fm <feature_model> -s <strength, 1-3> (-startFrom <covering array>) (-onlyOnes) (-noAllZeros) [Inexact: (-sizelimit <rows>) (-limit <coverage limit>)] (for 3-wise, -eights <1-8>)");
-//		System.out.println(" -t t_wise -a CASA -fm <feature_model> -s <strength, 1-6>");
+		/** Help content of SPLCATool:
+		-t t_wise -a Chvatal -fm <feature_model> -s <strength, 1-4> (-startFrom <covering array>) (-limit <coverage limit>) (-sizelimit <rows>) (-onlyOnes) (-noAllZeros)
+		-t t_wise -a ICPL 	 -fm <feature_model> -s <strength, 1-3> (-startFrom <covering array>) (-onlyOnes) (-noAllZeros) [Inexact: (-sizelimit <rows>) (-limit <coverage limit>)] (for 3-wise, -eights <1-8>)
+		-t t_wise -a CASA 	 -fm <feature_model> -s <strength, 1-6>
+		**/
 		
 		String selection = comboLanguage.getText();
 		int lastSelection = scale.getSelection();
@@ -169,6 +184,14 @@ public class BuildTWiseWizardPage extends WizardPage implements IConfigurationBu
 	
 	int getT() {
 		return scale.getSelection();
+	}
+	
+	public boolean isPluginInstalled(String ID) {
+		for(Bundle b :InternalPlatform.getDefault().getBundleContext().getBundles()){
+			System.out.println(b.getSymbolicName());
+			if(b.getSymbolicName().startsWith(ID))return true;
+		}
+		return false;
 	}
 	
 }

@@ -564,6 +564,9 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		build(root, "", selectedFeatures2, monitor);
 	}
 
+	/*
+	 * TODO @Jens add partial checks 
+	 */
 	private void build(Feature currentFeature, String selected, LinkedList<Feature> selectedFeatures2, IProgressMonitor monitor) {
 		if (monitor.isCanceled()) {
 			cancelGenerationJobs();

@@ -79,14 +79,11 @@ public class BuildMetaProductAction implements IActionDelegate {
 		Job job = new Job("Build meta product for project \"" + featureProject.getProjectName() + "\".") {
 			@Override
 			public IStatus run(IProgressMonitor monitor) {
-				long time = System.currentTimeMillis();
 				try {
 					featureProject.getProject().build(IncrementalProjectBuilder.FULL_BUILD, null);
 				} catch (CoreException e) {
 					FeatureHouseCorePlugin.getDefault().logError(e);
 				}
-				time = System.currentTimeMillis() - time;
-				FeatureHouseCorePlugin.getDefault().logInfo("Meta product for \"" + featureProject.getProjectName() + "\" built in " + time + "ms.");
 				return Status.OK_STATUS;
 			}
 		};
