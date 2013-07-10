@@ -1,3 +1,4 @@
+
 public  class   StringMatcher {
 	
 
@@ -10,5 +11,7 @@ public  class   StringMatcher {
 		//@ set compare = compare && b.startsWith(a);
 		return result;
 	}
+
+
 	
 }

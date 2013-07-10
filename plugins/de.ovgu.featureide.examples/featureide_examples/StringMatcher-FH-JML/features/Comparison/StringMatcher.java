@@ -1,7 +1,7 @@
 public  class  StringMatcher {
 
-	/*@public ghost boolean compare;@*/
-	
+	//@public ghost boolean compare;
+	int bla;
 	/*@
 	  @ requires input != null;
 	  @ ensures \result <==> compare;

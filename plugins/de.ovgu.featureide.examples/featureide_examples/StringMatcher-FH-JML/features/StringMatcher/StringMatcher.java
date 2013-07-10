@@ -1,3 +1,4 @@
+
 public  class   StringMatcher {
 	//@public invariant text != null;
 	
@@ -13,5 +14,7 @@ public  class   StringMatcher {
 		this.text = mainText;
 	}
 	
+	
+
 	
 }
