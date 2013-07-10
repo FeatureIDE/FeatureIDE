@@ -1,7 +1,7 @@
 class Application {
 	
 	/*@
-	 @ ensures account.getWithdraw() == 0;
+	 @ ensures account.getWithdraw().getValue() == 0;
 	 @*/
 	void nextDay() {
 		original();

@@ -1,61 +1,56 @@
 class Account {
 
-	private final static int DAILY_LIMIT = -1000;
+	private final /*@ spec_public @*/ Money DAILY_LIMIT = new Money(-1000);
 	
-	//@ invariant withdraw >= DAILY_LIMIT;
-	private int withdraw = 0;
+	//@ public invariant withdraw.getValue() >= DAILY_LIMIT.getValue();
+	//@ public invariant withdraw != null;
+	private /*@ spec_public @*/ Money withdraw = new Money(0);
 	
 	/*@
-	 @ ensures withdraw == 0;
+	 @ ensures withdraw.getValue() == 0;
 	 @*/
 	public void resetWithdraw() {
-		withdraw = 0;
+		withdraw.setValue(0);
 	}
 	
 	/*@
 	 @ ensures \result == withdraw;
 	 @*/
-	public int getWithdraw() {
+	public Money getWithdraw() {
 		return withdraw;
 	}
 
 	/*@
 	 @ requires \original;
-	 @ ensures \original && x < 0 ==> withdraw == \old(withdraw) + x && withdraw <= \old(withdraw);
+	 @ ensures \original && value < 0 ==> withdraw.getValue() == \old(withdraw.getValue()) + value && withdraw.getValue() <= \old(withdraw.getValue());
 	 @*/
-	private void update(int x) {
-		original(x);
-		if (x < 0) {
-			withdraw += x;
+	private void update(int value) {
+		original(value);
+		if (value < 0) {
+			withdraw.updateValue(value);
 		}
+	}
+
+	private /*@ pure @*/ boolean canUpdate(int value) {
+		return original(value) && withdraw.getValue() + value >= DAILY_LIMIT.getValue();
 	}
 	
 	/*@
-	 @ assignable canUpdate;
+	 @ requires \original && withdraw.getValue() - value < DAILY_LIMIT.getValue(); 
 	 @ ensures \original;
 	 @*/
-	private /*@ pure @*/ boolean canUpdate(int x) {
-		boolean res = original(x) && withdraw + x >= DAILY_LIMIT;
-		//@ set canUpdate = canUpdate && withdraw + x >= DAILY_LIMIT;
-		return res;
-	}
-	
-	/*@
-	 @ requires \original && withdraw - x < DAILY_LIMIT; 
-	 @ ensures \original;
-	 @*/
-	void undoUpdate(int x) {
-		if (x < 0)  {
-			withdraw -= x;
+	void undoUpdate(int value) {
+		if (value < 0)  {
+			withdraw.updateValue(-value);
 		}
-		original(x);
+		original(value);
 	}
 	
 	/*@
 	 @ requires \original;
-	 @ ensures \original && withdraw == \old(withdraw);
+	 @ ensures \original && withdraw.getValue() == \old(withdraw.getValue());
 	 @*/
-	private void undoUpdateTest(int x) {
-		original(x);
+	private void undoUpdateTest(int value) {
+		original(value);
 	}
 }

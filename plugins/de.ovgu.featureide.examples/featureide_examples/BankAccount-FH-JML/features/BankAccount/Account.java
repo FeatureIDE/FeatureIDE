@@ -1,76 +1,68 @@
 public class Account {
 	
-	private final int OVERDRAFT_LIMIT = 0;
-	//@ private ghost boolean canUpdate;
-	//@ invariant balance >= OVERDRAFT_LIMIT;
-	private int balance;
+	private final /*@ spec_public @*/ Money OVERDRAFT_LIMIT = new Money(0);
+	//@ public invariant balance != null;
+	//@ public invariant balance.getValue() >= OVERDRAFT_LIMIT.getValue();
+	private /*@ spec_public @*/ Money balance;
 	
 	/*@
 	 @ ensures \result == balance;
 	 @*/
-	/*@ pure @*/ int getBalance() {
+	public /*@ pure @*/ Money getBalance() {
 		return balance;
 	}
 	
 	/*@
-	 @ ensures balance == 0;
+	 @ ensures balance.getValue() == 0;
 	 @*/
 	public Account() {
-		balance = 0;
+		this(0);
 	}
 	
 	/*@
-	 @ requires initialValue >= 0;
-	 @ ensures balance == initialValue;
+	 @ requires value >= 0;
+	 @ ensures balance.getValue() == value;
 	 @*/
-	public Account(int initialValue) {
-		balance = initialValue;
+	public Account(int value) {
+		balance = new Money(value);
 	}
 	
 	/*@ 
-	 @ requires money > 0; 
-	 @ ensures (!\result ==> balance == \old(balance)) 
-	 @   && (\result ==> balance == \old(balance) - money); 
+	 @ requires value > 0; 
+	 @ ensures (!\result ==> (balance.getValue() == \old(balance.getValue()))) 
+	 @   && (\result ==> (balance.getValue() == \old(balance.getValue()) - value)); 
 	 @*/
-	public boolean withdraw(int money) {
-		if (canUpdate(-1 * money)) {
-			update(-1 * money);
+	public boolean withdraw(int value) {
+		if (canUpdate(-1 * value)) {
+			update(-1 * value);
 			return true;
 		}
 		return false;
 	}
 	
 	/*@
-	 @ requires money > 0; 
-	 @ ensures (!\result ==> balance == \old(balance)) 
-	 @   && (\result ==> balance == \old(balance) + money);  
+	 @ requires value > 0; 
+	 @ ensures (!\result ==> balance.getValue() == \old(balance.getValue())) 
+	 @   && (\result ==> balance.getValue() == \old(balance.getValue()) + value);  
 	 @*/
-	public boolean deposit(int money) {
-		if (canUpdate(money)) {
-			update(money);
+	public boolean deposit(int value) {
+		if (canUpdate(value)) {
+			update(value);
 			return true;
 		}
 		return false;
 	}
 	
 	/*@ 
-	 @ requires canUpdate(x); 
-	 @ ensures (balance == \old(balance) + x); 
+	 @ requires canUpdate(value); 
+	 @ ensures (balance.getValue() == \old(balance.getValue()) + value); 
 	 @*/
-	private void update(int x) {
-		balance = balance + x;
+	private void update(int value) {
+		balance.updateValue(value);
 	}
 	
-	/**
-	 * all proves are closed for using contracts if this method has no contract.
-	 */
-	/*@
-	 @ assignable canUpdate; 
-	 @ ensures \result <==> canUpdate;
-	 @*/
-	private /*@ pure @*/ boolean canUpdate(int x) {
-		//@ set canUpdate = balance + x >= OVERDRAFT_LIMIT; 
-		return balance + x >= OVERDRAFT_LIMIT;
+	private /*@ pure @*/ boolean canUpdate(int value) {
+		return balance.getValue() + value >= OVERDRAFT_LIMIT.getValue();
 	}
 
 	/**
@@ -80,19 +72,19 @@ public class Account {
 	 * invariants must be defined @ requires clauses
 	 */
 	/*@
-	 @ requires balance - x >= OVERDRAFT_LIMIT;
-	 @ ensures balance == \old(balance) - x;
+	 @ requires balance.getValue() - value >= OVERDRAFT_LIMIT.getValue();
+	 @ ensures balance.getValue() == \old(balance.getValue()) - value;
 	 @*/
-	void undoUpdate(int x) { 
-		balance = balance - x;
+	void undoUpdate(int value) { 
+		balance.updateValue(-value);
 	}
 	
 	/*@
-	 @ requires canUpdate(x);
-	 @ ensures balance == \old(balance);
+	 @ requires canUpdate(value);
+	 @ ensures balance.getValue() == \old(balance.getValue());
 	 @*/
-	private void undoUpdateTest(int x) {
-		update(x);
-		undoUpdate(x);
+	private void undoUpdateTest(int value) {
+		update(value);
+		undoUpdate(value);
 	}
 }

@@ -1,12 +1,12 @@
 public class Transaction {
 
 	/*@ 
-	  requires destination != null && source != null && source != destination;
-	  requires amount > 0;
-	  ensures \result ==> (\old(destination.getBalance()) + amount == destination.getBalance());
-	  ensures \result ==> (\old(source.getBalance()) - amount == source.getBalance());
-	  ensures !\result ==> (\old(destination.getBalance()) == destination.getBalance());
-	  ensures !\result ==> (\old(source.getBalance()) == source.getBalance()); @*/
+	  requires destination != null && source != null && source != destination
+	  	&& amount > 0;
+	  ensures \result ==> (\old(destination.getBalance()) + amount == destination.getBalance())
+	  	&&     \result ==> (\old(source.getBalance()) - amount == source.getBalance())
+	    &&    !\result ==> (\old(destination.getBalance()) == destination.getBalance())
+	  	&&    !\result ==> (\old(source.getBalance()) == source.getBalance()); @*/
 	public boolean transfer(Account source, Account destination, int amount) {
 		if (!lock(source, destination)) return false;
 		try {
@@ -28,8 +28,7 @@ public class Transaction {
 	}
 
 	/*@
-	  requires destination != null && source != null;
-	  requires source != destination;
+	  requires destination != null && source != null && source != destination;
 	  ensures \result ==> source.isLocked() && destination.isLocked();
 	 @*/
 	private static synchronized boolean lock(Account source, Account destination) {
