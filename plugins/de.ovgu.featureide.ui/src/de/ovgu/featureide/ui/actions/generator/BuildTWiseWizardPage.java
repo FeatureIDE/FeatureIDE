@@ -38,7 +38,6 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Text;
 import org.osgi.framework.Bundle;
-
 import de.ovgu.featureide.core.IFeatureProject;
 
 /**
@@ -101,7 +100,7 @@ public class BuildTWiseWizardPage extends WizardPage implements IConfigurationBu
 		scale.setPageIncrement(1);
 		scale.setSelection(t);
 		setScale();
-
+		
 
 		Label labelRefines = new Label(composite, SWT.NULL);
 		labelRefines.setText("&Create new projects:");
