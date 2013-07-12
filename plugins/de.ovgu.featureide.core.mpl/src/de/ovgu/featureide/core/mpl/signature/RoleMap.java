@@ -154,17 +154,18 @@ public class RoleMap {
 	
 	public String getStatisticsString() {
 		final int[][] allCounters = new int[4][4];
+		HashMap<String, int[]> fs = new HashMap<String, int[]>();
 		
 		for (AbstractSignature signature : signatureSet.keySet()) {
 			if (signature instanceof AbstractFieldSignature) {
-				count(signature, allCounters[2]);
+				count(signature, allCounters[2], fs, 2);
 			} else if (signature instanceof AbstractMethodSignature) {
-				count(signature, allCounters[3]);
+				count(signature, allCounters[3], fs, 3);
 			} else if (signature instanceof AbstractClassSignature) {
 				if (signature.getParent() != null) {
-					count(signature, allCounters[1]);
+					count(signature, allCounters[1], fs, 1);
 				} else {
-					count(signature, allCounters[0]);
+					count(signature, allCounters[0], fs, 0);
 				}
 			}
 		}
@@ -176,7 +177,7 @@ public class RoleMap {
 			case 0: sb.append("#Classes: "); break;
 			case 1: sb.append("#InnerClasses: "); break;
 			case 2: sb.append("#Fields: "); break;
-			case 3: sb.append("#Metohds: "); break;
+			case 3: sb.append("#Methods: "); break;
 			}
 			sb.append(curCounter[0]);
 			sb.append("\n\t#Private: ");
@@ -185,12 +186,37 @@ public class RoleMap {
 			sb.append(curCounter[1]);
 			sb.append("\n\t\t#Private Definitions: ");
 			sb.append(curCounter[3]);
-			sb.append('\n');
+			sb.append("\n");
+		}
+		sb.append("\n\nPer Feature:");
+		for (Entry<String, int[]> entry : fs.entrySet()) {
+			sb.append("\n\t");
+			sb.append(entry.getKey());
+			sb.append("\n");
+			int[] x = entry.getValue();
+			for (int i = 0; i < x.length; i++) {
+				switch (i) {
+				case 0: sb.append("\t\t#Classes: "); break;
+				case 1: sb.append("\t\t#InnerClasses: "); break;
+				case 2: sb.append("\t\t#Fields: "); break;
+				case 3: sb.append("\t\t#Methods: "); break;
+				}
+				sb.append(x[i]);
+				sb.append("\n");
+			}
 		}
 		return sb.toString();
 	}
 	
-	private void count(AbstractSignature signature, int[] curCounter) {
+	private void count(AbstractSignature signature, int[] curCounter, HashMap<String, int[]> fs, int i) {
+		for (String feature : signature.getFeatures()) {
+			int[] x = fs.get(feature);
+			if (x == null) {
+				x = new int[4];
+				fs.put(feature, x);
+			}
+			x[i]++;
+		}
 		curCounter[0]++;
 		curCounter[1] += signature.getFeatures().size();
 		if (signature.isPrivate()) {

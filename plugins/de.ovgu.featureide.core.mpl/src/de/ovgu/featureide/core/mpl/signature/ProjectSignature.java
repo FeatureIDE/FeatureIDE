@@ -43,7 +43,7 @@ public class ProjectSignature {
 
 	protected final HashMap<String, AbstractClassFragment> classList = new HashMap<String, AbstractClassFragment>();
 	protected final ViewTag viewTag;
-	protected final boolean privateSignatures;
+	protected boolean privateSignatures;
 	
 	protected int hashCode = 0;
 	protected boolean hasHashCode = false;
@@ -279,21 +279,64 @@ public class ProjectSignature {
 		return new int[]{eqMemberCount, memberCount};
 	}
 	
+	public int[] getStatisticsNumbers() {
+		int[] counter = new int[2];
+		for (AbstractClassFragment curClass : classList.values()) {
+			statisticPerClass(curClass, counter);
+		}
+
+		int[] counter2 = new int[3];
+		counter2[0] = classList.size();
+		counter2[1] = counter[0];
+		counter2[2] = counter[1];
+		return counter2;
+	}
+	
 	public String getStatisticsString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("#Classes: ");
 		sb.append(classList.size());
 		sb.append('\n');
 		
+
+		StringBuilder sb2 = new StringBuilder();
+		int[] counter = new int[2];
 		for (AbstractClassFragment curClass : classList.values()) {
-			sb.append(statisticPerClass(curClass));
-			sb.append('\n');
+			sb2.append(statisticPerClass(curClass, counter));
+			sb2.append('\n');
 		}
+		sb.append("#Fields: ");
+		sb.append(counter[0]);
+		sb.append('\n');
+		sb.append("#Methods: ");
+		sb.append(counter[1]);
+		sb.append('\n');
+		sb.append(sb2.toString());
 		return sb.toString();
 	}
 	
-	private String statisticPerClass(AbstractClassFragment curClass) {
+	public String getStatisticsStringHeader() {
 		StringBuilder sb = new StringBuilder();
+		sb.append("#Classes: ");
+		sb.append(classList.size());
+		sb.append('\n');
+		
+		int[] counter = new int[2];
+		for (AbstractClassFragment curClass : classList.values()) {
+			statisticPerClass(curClass, counter);
+		}
+		sb.append("#Fields: ");
+		sb.append(counter[0]);
+		sb.append('\n');
+		sb.append("#Methods: ");
+		sb.append(counter[1]);
+		sb.append('\n');
+		return sb.toString();
+	}
+	
+	private String statisticPerClass(AbstractClassFragment curClass, int[] counter) {
+		StringBuilder sb = new StringBuilder();
+		privateSignatures = true;
 		
 		sb.append(curClass.getSignature().getFullName());
 		sb.append('\n');
@@ -309,6 +352,9 @@ public class ProjectSignature {
 				}
 			}
 		}
+
+		counter[0] += numberFields;
+		counter[1] += numberMethods;
 		
 		sb.append("\t#Fields: ");
 		sb.append(numberFields);
@@ -326,7 +372,7 @@ public class ProjectSignature {
 		if (!curClass.getInnerClasses().isEmpty()) {
 			for (AbstractClassFragment innerClass : curClass.getInnerClasses().values()) {
 				sb.append("\n\t");
-				sb.append(statisticPerClass(innerClass).replace("\n", "\n\t"));
+				sb.append(statisticPerClass(innerClass, counter).replace("\n", "\n\t"));
 			}
 		}
 		

@@ -141,7 +141,7 @@ public class InterfaceWriter extends AbstractWriter {
 		super(interfaceProject);
 	}
 	
-	private void writeExtendedModule(ProjectSignature signature, String featureName, String folderName) {
+	private String writeExtendedModule(ProjectSignature signature, String featureName, String folderName) {
 		for (AbstractClassFragment curClass : signature.getClasses()) {
 			AbstractClassSignature classSig = curClass.getSignature();
 			final String packagename = classSig.getPackage();
@@ -154,6 +154,7 @@ public class InterfaceWriter extends AbstractWriter {
 		
 		IFolder folder = CorePlugin.createFolder(interfaceProject.getProjectReference(), folderName + "/" + featureName);		
 		writeToFile(folder.getFile("statistics.txt"), signature.getStatisticsString());
+		return signature.getStatisticsStringHeader();
 	}
 	
 	public void createExtendedSignatures(final String folderName) {
@@ -175,13 +176,20 @@ public class InterfaceWriter extends AbstractWriter {
 				}
 				setMaxAbsoluteWork(allConcreteFeatures.size() + 1);
 				
-				writeExtendedModule(buildSignature(new Node[]{}), "_No_Constraints_", folderName);
+				StringBuilder sb = new StringBuilder();
+				sb.append("_No_Constraints_\n");
+				sb.append(writeExtendedModule(buildSignature(new Node[]{}), "_No_Constraints_", folderName));
 				worked();
 				
 				for (String featureName : allConcreteFeatures) {
-					writeExtendedModule(buildSignature(buildNodeForFeature(featureName)), featureName, folderName);
+					sb.append("\n");
+					sb.append(featureName);
+					sb.append("\n\n");
+					sb.append(writeExtendedModule(buildSignature(buildNodeForFeature(featureName)), featureName, folderName));
 					worked();
 				}
+				
+				writeToFile(folder.getFile("all_statistics.txt"), sb.toString());
 				
 				MPLPlugin.getDefault().logInfo("Built Extended Modules");
 				return true;
@@ -290,8 +298,14 @@ public class InterfaceWriter extends AbstractWriter {
 				int solutionId = 0, groupId = 0;
 				setMaxAbsoluteWork(numberSolutions);
 				
+				int[] minNumbers = new int[3];
+				int[] solutionIds = new int[3];
+				int[] groupIds = new int[3];
+				Arrays.fill(minNumbers, Integer.MAX_VALUE);
+				
 				while (!solutionList.isEmpty()) {
 					List<String> featureList = solutionList.remove();
+					solutionId++;
 					
 					ProjectSignature sig = interfaceProject.getRoleMap().generateSignature(featureList, interfaceProject.getFilterViewTag());
 					
@@ -314,9 +328,45 @@ public class InterfaceWriter extends AbstractWriter {
 						}
 					}
 					
-					writeSolutionList(featureList, groupFolder.getFile("featureList_" + converter.convert(++solutionId) + IOConstants.EXTENSION_SOLUTION));
+					int[] x = sig.getStatisticsNumbers();
+					for (int i = 0; i < x.length; i++) {
+						if (minNumbers[i] > x[i]) {
+							minNumbers[i] = x[i];
+							solutionIds[i] = solutionId;
+							groupIds[i] = sigGroup.id;
+						}
+					}
+					
+					writeSolutionList(featureList, groupFolder.getFile("featureList_" + converter.convert(solutionId) + IOConstants.EXTENSION_SOLUTION));
 					worked();
 				}
+				
+				StringBuilder sb2 = new StringBuilder();
+				sb2.append("Min #Classes: ");
+				sb2.append(minNumbers[0]);
+				sb2.append(" (Solution ");
+				sb2.append(converter.convert(solutionIds[0]));
+				sb2.append(" in Group ");
+				sb2.append(converter.convert(groupIds[0]));
+				sb2.append(")\n");
+
+				sb2.append("Min #Fields: ");
+				sb2.append(minNumbers[1]);
+				sb2.append(" (Solution ");
+				sb2.append(converter.convert(solutionIds[1]));
+				sb2.append(" in Group ");
+				sb2.append(converter.convert(groupIds[1]));
+				sb2.append(")\n");
+
+				sb2.append("Min #Methods: ");
+				sb2.append(minNumbers[2]);
+				sb2.append(" (Solution ");
+				sb2.append(converter.convert(solutionIds[2]));
+				sb2.append(" in Group ");
+				sb2.append(converter.convert(groupIds[2]));
+				sb2.append(")\n");
+				
+				writeToFile(interfaceFolder.getFile("Min_Statistics.txt"), sb2.toString());
 				
 				SignatureGroup[] signatureArray = new SignatureGroup[signatureMap.size()];
 				signatureMap.values().toArray(signatureArray);
