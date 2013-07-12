@@ -51,10 +51,6 @@ public class BuildTWiseWizardPage extends WizardPage implements IConfigurationBu
 
 	private static final String INTERACTIONS = "&Interactions: ";
 
-	private static final String ID = "org.apache.commons.math";
-	private static final String ERROR_MESSAGE_MATH = "plugin " + ID + " not found but required for SPLCATool.\r\nCopy a " 
-			+ ID + "*.jar into the plugin folder of you eclipse installation.";
-
 	@CheckForNull
 	private IFeatureProject project;
 
@@ -115,12 +111,6 @@ public class BuildTWiseWizardPage extends WizardPage implements IConfigurationBu
 		
 		setPageComplete(false);
 		setControl(composite);
-		
-		
-		if (!isPluginInstalled(ID)) {
-			setErrorMessage(ERROR_MESSAGE_MATH);
-			return;
-		}
 		addListeners();
 		dialogChanged();
 	}

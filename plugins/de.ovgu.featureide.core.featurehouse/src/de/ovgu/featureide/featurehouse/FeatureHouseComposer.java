@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.featurehouse;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -47,6 +49,9 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.core.ClasspathEntry;
 import org.eclipse.jdt.internal.core.JavaProject;
 
+import AST.ASTNode;
+import AST.Problem;
+import AST.Program;
 import cide.gparser.ParseException;
 import cide.gparser.TokenMgrError;
 import composer.CmdLineInterpreter;
@@ -63,6 +68,13 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import fuji.CompilerWarningException;
+import fuji.Composition;
+import fuji.FeatureDirNotFoundException;
+import fuji.Main;
+import fuji.SemanticErrorException;
+import fuji.SyntacticErrorException;
 
 /**
  * Composes files using FeatureHouse.
@@ -83,6 +95,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 	public static final String COMPOSER_ID = "de.ovgu.featureide.composer.featurehouse";
 
+	private static final String NEWLINE = System.getProperty("line.separator", "\n");
 	
 	private FSTGenComposer composer;
 
@@ -267,8 +280,125 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		buildFSTModel(configPath, basePath, outputPath);
 		
 		callCompiler();
+		
+		fuji();
 	}
 	
+	/**
+	 * Starts type checking with fuji in a background job.
+	 */
+	private void fuji() {
+		Job job = new Job("Type checking " + featureProject.getProjectName() + " with fuji") {
+			
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				runFuji(featureProject);
+				return Status.OK_STATUS;
+			}
+			
+			
+		};
+		job.schedule();
+	}
+	
+	/**
+	 * Runs the type checker fuji.
+	 * synchronized because fuji use static fields, and a parallel execution is not possible.
+	 * @param featureProject The feature project of the caller.
+	 */
+	private synchronized static void runFuji(IFeatureProject featureProject) {
+		String sourcePath = featureProject.getSourcePath();
+		String[] fujiOptions = new String[] { 
+				"-" + Main.OptionName.PROG_MODE, 
+	            "-" + Main.OptionName.COMPOSTION_STRATEGY, Main.OptionName.COMPOSTION_STRATEGY_ARG_FAMILY, 
+	            "-typechecker", 
+	            "-basedir", sourcePath };
+		try {
+			ASTNodeAccess.clearTypeAccess();
+			Main fuji = new Main(fujiOptions, featureProject.getFeatureModel(), 
+					featureProject.getFeatureModel().getConcreteFeatureNames());
+            Composition composition = fuji.getComposition(fuji);
+            Program ast = composition.composeAST();
+
+            // run type check
+            fuji.typecheckAST(ast);
+
+            // parsing warnings
+            for (Problem warn : fuji.getWarnings()) {
+            	createFujiMarker(warn.line(), warn.message(), warn.fileName(), IMarker.SEVERITY_WARNING, featureProject);
+            }
+
+            // parsing errors
+            for (Problem err : fuji.getErrors()) {
+            	String message = err.message();
+                if (err.line() == -1) {
+                	for(String fileName : err.fileName().split("[\n]")) {
+                		// currently bad workaround @ fuji, but seems to work
+	                	String file =  fileName.substring(0, fileName.lastIndexOf(":"));
+	                    int line = Integer.parseInt(fileName.substring(fileName.lastIndexOf(":")+1));
+	                    createFujiMarker(line, message, file, IMarker.SEVERITY_ERROR, featureProject);
+                	}
+                } else {
+                	createFujiMarker(err.line(), message, err.fileName(), IMarker.SEVERITY_ERROR, featureProject);
+                }
+                
+            }
+		} catch (IllegalArgumentException e) {
+			FeatureHouseCorePlugin.getDefault().logError(e);
+		} catch (org.apache.commons.cli.ParseException e) {
+			FeatureHouseCorePlugin.getDefault().logError(e);
+		} catch (IOException e) {
+			FeatureHouseCorePlugin.getDefault().logError(e);
+		} catch (FeatureDirNotFoundException e) {
+			FeatureHouseCorePlugin.getDefault().logError(e);
+		} catch (SyntacticErrorException e) {
+			FeatureHouseCorePlugin.getDefault().logError(e);
+		} catch (SemanticErrorException e) {
+			FeatureHouseCorePlugin.getDefault().logError(e);
+		} catch (CompilerWarningException e) {
+			FeatureHouseCorePlugin.getDefault().logError(e);
+		} catch (UnsupportedModelException e) {
+			FeatureHouseCorePlugin.getDefault().logError(e);
+		}
+	}
+	
+	/**
+	 * 
+	 * TODO remove this inner class if the bug is fixed  @ fuji
+	 * 
+	 * @author Jens Meinicke
+	 */
+	@SuppressWarnings("rawtypes")
+	private static class ASTNodeAccess extends ASTNode {
+		public static void clearTypeAccess() {
+			typeAccesses.clear();
+		}
+	}
+	
+	/**
+	 * Creates an marker for fuji type checks. 
+	 * @param line The line number
+	 * @param message The message to disply
+	 * @param file The file path
+	 * @param severity The severity of the marker (IMarker.SEVERITY_*)
+	 */
+	protected static void createFujiMarker(int line, String message, String file, int severity, IFeatureProject featureProject) {
+		IFile iFile = featureProject.getProject().getWorkspace().getRoot().findFilesForLocationURI(
+				new File(file).toURI())[0];
+		// TODO NEWLine does not work
+		message = message.replaceAll("\n", NEWLINE);
+		try {
+			IMarker marker = iFile.createMarker(FeatureHouseCorePlugin.BUILDER_PROBLEM_MARKER);
+			marker.setAttribute(IMarker.LINE_NUMBER, line);
+			marker.setAttribute(IMarker.MESSAGE, "fuji: " + message);
+			marker.setAttribute(IMarker.SEVERITY, severity);
+		} catch (CoreException e) {
+			FeatureHouseCorePlugin.getDefault().logError(e);
+		}
+
+	}
+	
+
 	/**
 	 * Creates the folder at the source path named the configuration. 
 	 * 
