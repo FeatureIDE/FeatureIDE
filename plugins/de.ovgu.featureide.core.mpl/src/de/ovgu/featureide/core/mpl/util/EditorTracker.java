@@ -75,12 +75,12 @@ public class EditorTracker {
 	private final IPropertyListener propertyListener;
 	
 	private void attachListener(IWorkbenchPartReference partref) {
-		MPLPlugin.getDefault().logInfo("Config Editor activated");
+//		MPLPlugin.getDefault().logInfo("Config Editor activated");
 		IWorkbenchPart part = partref.getPart(true);
 		if (part instanceof ConfigurationEditor) {
 			ConfigurationEditor confEditor = (ConfigurationEditor) partref.getPart(true);
 			if (MPLPlugin.getDefault().isInterfaceProject(confEditor.file.getProject())) {
-				MPLPlugin.getDefault().logInfo("Listener attached");
+//				MPLPlugin.getDefault().logInfo("Listener attached");
 				confEditor.addPropertyListener(propertyListener);
 			}
 		}

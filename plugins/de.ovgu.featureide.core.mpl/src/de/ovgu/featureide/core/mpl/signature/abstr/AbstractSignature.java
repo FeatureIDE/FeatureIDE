@@ -43,6 +43,7 @@ public abstract class AbstractSignature {
 	protected final String name;
 	protected final String modifiers;
 	protected final String type;
+	protected final boolean privateSignature;
 	
 	protected String fullName;
 	
@@ -68,6 +69,7 @@ public abstract class AbstractSignature {
 		} else {
 			this.modifiers = modifiers.trim();
 		}
+		this.privateSignature = this.modifiers.contains("private");
 		if (type == null) {
 			this.type = "";
 		} else {
@@ -85,6 +87,7 @@ public abstract class AbstractSignature {
 		this.ext = orgSig.ext || ext;
 		
 		modifiers =  orgSig.modifiers;
+		privateSignature =  orgSig.privateSignature;
 		type =  orgSig.type;
 	}
 	
@@ -159,6 +162,10 @@ public abstract class AbstractSignature {
 	
 	public String getType() {
 		return type;
+	}
+	
+	public boolean isPrivate() {
+		return privateSignature;
 	}
 
 	public boolean isExt() {

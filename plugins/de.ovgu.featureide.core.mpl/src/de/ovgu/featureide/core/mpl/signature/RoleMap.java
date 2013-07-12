@@ -97,27 +97,27 @@ public class RoleMap {
 		return ret;
 	}
 
-	public ProjectSignature generateSignature2(List<String> featureList, ViewTag viewTag) {
-		ProjectSignature javaSig = new ProjectSignature(viewTag);
-		
-		if (featureList == null) {
-			for (FeatureRoles roles : featureRoleMap.values()) {
-				for (AbstractRole role : roles) {
-					javaSig.addRole(role);
-				}
-			}
-		} else {
-			for (String featureName : featureList) {
-				FeatureRoles roles = featureRoleMap.get(featureName);
-				if (roles != null) {
-					for (AbstractRole role : roles) {
-						javaSig.addRole(role);
-					}
-				}
-			}
-		}
-		return javaSig;
-	}
+//	public ProjectSignature generateSignature2(List<String> featureList, ViewTag viewTag) {
+//		ProjectSignature javaSig = new ProjectSignature(viewTag);
+//		
+//		if (featureList == null) {
+//			for (FeatureRoles roles : featureRoleMap.values()) {
+//				for (AbstractRole role : roles) {
+//					javaSig.addRole(role);
+//				}
+//			}
+//		} else {
+//			for (String featureName : featureList) {
+//				FeatureRoles roles = featureRoleMap.get(featureName);
+//				if (roles != null) {
+//					for (AbstractRole role : roles) {
+//						javaSig.addRole(role);
+//					}
+//				}
+//			}
+//		}
+//		return javaSig;
+//	}
 	
 	public ProjectSignature generateSignature() {
 		return generateSignature(null, null);
@@ -132,7 +132,7 @@ public class RoleMap {
 	}
 	
 	public ProjectSignature generateSignature(List<String> featureList, ViewTag viewTag) {
-		ProjectSignature javaSig = new ProjectSignature(viewTag);
+		ProjectSignature javaSig = new ProjectSignature(viewTag, false);
 		javaSig.setaClassCreator(new JavaClassCreator());
 		
 		if (featureList == null) {
@@ -150,6 +150,53 @@ public class RoleMap {
 			}
 		}
 		return javaSig;
+	}
+	
+	public String getStatisticsString() {
+		final int[][] allCounters = new int[4][4];
+		
+		for (AbstractSignature signature : signatureSet.keySet()) {
+			if (signature instanceof AbstractFieldSignature) {
+				count(signature, allCounters[2]);
+			} else if (signature instanceof AbstractMethodSignature) {
+				count(signature, allCounters[3]);
+			} else if (signature instanceof AbstractClassSignature) {
+				if (signature.getParent() != null) {
+					count(signature, allCounters[1]);
+				} else {
+					count(signature, allCounters[0]);
+				}
+			}
+		}
+
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < allCounters.length; i++) {
+			int[] curCounter = allCounters[i];
+			switch (i) {
+			case 0: sb.append("#Classes: "); break;
+			case 1: sb.append("#InnerClasses: "); break;
+			case 2: sb.append("#Fields: "); break;
+			case 3: sb.append("#Metohds: "); break;
+			}
+			sb.append(curCounter[0]);
+			sb.append("\n\t#Private: ");
+			sb.append(curCounter[2]);
+			sb.append("\n\t#Definitions: ");
+			sb.append(curCounter[1]);
+			sb.append("\n\t\t#Private Definitions: ");
+			sb.append(curCounter[3]);
+			sb.append('\n');
+		}
+		return sb.toString();
+	}
+	
+	private void count(AbstractSignature signature, int[] curCounter) {
+		curCounter[0]++;
+		curCounter[1] += signature.getFeatures().size();
+		if (signature.isPrivate()) {
+			curCounter[2]++;
+			curCounter[3] += signature.getFeatures().size();
+		}
 	}
 
 	@Deprecated

@@ -30,7 +30,8 @@ import java.util.Map.Entry;
 import de.ovgu.featureide.core.mpl.signature.abstr.AClassCreator;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassFragment;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassSignature;
-import de.ovgu.featureide.core.mpl.signature.abstr.AbstractRole;
+import de.ovgu.featureide.core.mpl.signature.abstr.AbstractFieldSignature;
+import de.ovgu.featureide.core.mpl.signature.abstr.AbstractMethodSignature;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature;
 
 /** 
@@ -42,22 +43,28 @@ public class ProjectSignature {
 
 	protected final HashMap<String, AbstractClassFragment> classList = new HashMap<String, AbstractClassFragment>();
 	protected final ViewTag viewTag;
+	protected final boolean privateSignatures;
 	
 	protected int hashCode = 0;
 	protected boolean hasHashCode = false;
 
-	public ProjectSignature(ViewTag viewTag) {
+	public ProjectSignature(ViewTag viewTag, boolean privateSignatures) {
 		this.viewTag = viewTag;
+		this.privateSignatures = privateSignatures;
 	}
 	
 	public ProjectSignature() {
-		this(null);
+		this(null, false);
 	}
 
 	public ViewTag getViewTag() {
 		return viewTag;
 	}
 	
+	public boolean hasPrivateSignatures() {
+		return privateSignatures;
+	}
+
 	public AbstractClassFragment getClass(String id) {
 		return classList.get(id);
 	}
@@ -70,49 +77,53 @@ public class ProjectSignature {
 		classList.put(classSig.getSignature().getFullName(), classSig);
 	}
 	
-	public void addRole(AbstractRole role) {
-		addRoleRec(role, null);
-	}
-	
-	private void addRoleRec(AbstractRole role, AbstractClassFragment parent) {
-		AbstractClassSignature roleSig = role.getSignature();
-		if (roleSig.hasViewTag(viewTag)) {
-			hasHashCode = false;
-			AbstractClassFragment aClass = (parent == null)
-					? getClass(roleSig.getFullName())
-					: parent.getInnerClass(roleSig.getFullName());
-					
-			if (aClass == null) {
-				aClass = role.toClass();
-				if (parent == null) {
-					addClass(aClass);
-				} else {
-					parent.addInnerClass(aClass);
-				}
-			}
-			for (AbstractSignature member : role.getMembers()) {
-				if (member.hasViewTag(viewTag)) {
-					aClass.addMember(member);
-				}
-			}
-			for (AbstractClassFragment innerClass : role.getInnerClasses().values()) {
-				addRoleRec((AbstractRole) innerClass, aClass);
-			}
-		}
-	}
+//	public void addRole(AbstractRole role) {
+//		addRoleRec(role, null);
+//	}
+//	
+//	private void addRoleRec(AbstractRole role, AbstractClassFragment parent) {
+//		AbstractClassSignature roleSig = role.getSignature();
+//		if (roleSig.hasViewTag(viewTag) && (privateSignatures || !roleSig.isPrivate())) {
+//			hasHashCode = false;
+//			AbstractClassFragment aClass = (parent == null)
+//					? getClass(roleSig.getFullName())
+//					: parent.getInnerClass(roleSig.getFullName());
+//					
+//			if (aClass == null) {
+//				aClass = role.toClass();
+//				if (parent == null) {
+//					addClass(aClass);
+//				} else {
+//					parent.addInnerClass(aClass);
+//				}
+//			}
+//			for (AbstractSignature member : role.getMembers()) {
+//				if (member.hasViewTag(viewTag) && (privateSignatures || !member.isPrivate())) {
+//					aClass.addMember(member);
+//				}
+//			}
+//			for (AbstractClassFragment innerClass : role.getInnerClasses().values()) {
+//				addRoleRec((AbstractRole) innerClass, aClass);
+//			}
+//		}
+//	}
 
 	private AClassCreator aClassCreator = null;
 
 	public void setaClassCreator(AClassCreator aClassCreator) {
 		this.aClassCreator = aClassCreator;
 	}
+	
+	private boolean valid(AbstractSignature sig) {
+		return sig.hasViewTag(viewTag);
+	}
 
 	public void addSignature(AbstractSignature sig) {
-		if (sig.hasViewTag(viewTag)) {
+		if (valid(sig)) {
 			LinkedList<AbstractClassSignature> parents = new LinkedList<AbstractClassSignature>();
 			AbstractClassSignature parent = sig.getParent();
 			while (parent != null) {
-				if (!parent.hasViewTag(viewTag)) {
+				if (!valid(parent)) {
 					return;
 				}
 				parents.addFirst(parent);
@@ -266,5 +277,59 @@ public class ProjectSignature {
 			}
 		}
 		return new int[]{eqMemberCount, memberCount};
+	}
+	
+	public String getStatisticsString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("#Classes: ");
+		sb.append(classList.size());
+		sb.append('\n');
+		
+		for (AbstractClassFragment curClass : classList.values()) {
+			sb.append(statisticPerClass(curClass));
+			sb.append('\n');
+		}
+		return sb.toString();
+	}
+	
+	private String statisticPerClass(AbstractClassFragment curClass) {
+		StringBuilder sb = new StringBuilder();
+		
+		sb.append(curClass.getSignature().getFullName());
+		sb.append('\n');
+		
+		int numberFields = 0, numberMethods = 0;
+		
+		for (AbstractSignature memberSig : curClass.getMembers()) {
+			if (privateSignatures || !memberSig.isPrivate()) {
+				if (memberSig instanceof AbstractFieldSignature) {
+					numberFields++;
+				} else if (memberSig instanceof AbstractMethodSignature) {
+					numberMethods++;
+				}
+			}
+		}
+		
+		sb.append("\t#Fields: ");
+		sb.append(numberFields);
+		sb.append('\n');
+		
+		sb.append("\t#Methods: ");
+		sb.append(numberMethods);
+		sb.append('\n');
+		
+		sb.append("\t#Inner Classes: ");
+		sb.append(privateSignatures 
+				? curClass.getInnerClasses().size() 
+				: curClass.getNonPrivateInnerClassCount());
+		
+		if (!curClass.getInnerClasses().isEmpty()) {
+			for (AbstractClassFragment innerClass : curClass.getInnerClasses().values()) {
+				sb.append("\n\t");
+				sb.append(statisticPerClass(innerClass).replace("\n", "\n\t"));
+			}
+		}
+		
+		return sb.toString();
 	}
 }

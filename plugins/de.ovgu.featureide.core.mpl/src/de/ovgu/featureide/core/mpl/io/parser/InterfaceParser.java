@@ -164,7 +164,7 @@ public class InterfaceParser extends AbstractLineReader<JavaRole> {
 								modifier += memberElements[index] + " ";
 							}
 							
-							if (isConstructor || !modifier.contains("private") || MPLPlugin.PRIVATE_METHODS) {
+//							if (isConstructor || !modifier.contains("private") || MPLPlugin.PRIVATE_METHODS) {
 								if (parameterString != null) {
 									LinkedList<String> parameterTypes = new LinkedList<String>();
 									if (!parameterString.isEmpty()) {
@@ -193,9 +193,9 @@ public class InterfaceParser extends AbstractLineReader<JavaRole> {
 									stack.peek().addMember(sig);
 									parseTags(sig);
 								}	
-							} else {
-								lastTagLine = null;
-							}
+//							} else {
+//								lastTagLine = null;
+//							}
 					}
 				}
 			}

@@ -50,6 +50,8 @@ import de.ovgu.featureide.core.mpl.signature.ProjectSignature;
 import de.ovgu.featureide.core.mpl.signature.RoleMap;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassFragment;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassSignature;
+import de.ovgu.featureide.core.mpl.signature.abstr.AbstractFieldSignature;
+import de.ovgu.featureide.core.mpl.signature.abstr.AbstractMethodSignature;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractRole;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature;
 import de.ovgu.featureide.core.mpl.signature.java.JavaClassCreator;
@@ -149,6 +151,9 @@ public class InterfaceWriter extends AbstractWriter {
 			
 			writeToFile(folder.getFile(classSig.getName() + IOConstants.EXTENSION_JAVA), curClass.toShortString());
 		}
+		
+		IFolder folder = CorePlugin.createFolder(interfaceProject.getProjectReference(), folderName + "/" + featureName);		
+		writeToFile(folder.getFile("statistics.txt"), signature.getStatisticsString());
 	}
 	
 	public void createExtendedSignatures(final String folderName) {
@@ -168,7 +173,10 @@ public class InterfaceWriter extends AbstractWriter {
 						allConcreteFeatures.add(feature.getName());
 					}
 				}
-				setMaxAbsoluteWork(allConcreteFeatures.size());
+				setMaxAbsoluteWork(allConcreteFeatures.size() + 1);
+				
+				writeExtendedModule(buildSignature(new Node[]{}), "_No_Constraints_", folderName);
+				worked();
 				
 				for (String featureName : allConcreteFeatures) {
 					writeExtendedModule(buildSignature(buildNodeForFeature(featureName)), featureName, folderName);
@@ -190,7 +198,7 @@ public class InterfaceWriter extends AbstractWriter {
 	}
 	
 	private ProjectSignature buildSignature(Node[] constraints) {
-		ProjectSignature projectSig = new ProjectSignature(null);
+		ProjectSignature projectSig = new ProjectSignature(null, false);
 		projectSig.setaClassCreator(new JavaClassCreator());
 		
 		Node[] fixClauses = new Node[constraints.length + 1];
@@ -218,7 +226,7 @@ public class InterfaceWriter extends AbstractWriter {
 	}
 	
 	private static ProjectSignature buildSignature(FeatureModel model, RoleMap map, Node[] constraints) {
-		ProjectSignature projectSig = new ProjectSignature(null);
+		ProjectSignature projectSig = new ProjectSignature(null, false);
 		projectSig.setaClassCreator(new JavaClassCreator());
 		
 		Node[] fixClauses = new Node[constraints.length + 1];
@@ -299,6 +307,7 @@ public class InterfaceWriter extends AbstractWriter {
 					if (!groupFolder.exists()) {
 						try {
 							groupFolder.create(true, true, null);
+							writeToFile(groupFolder.getFile("statistics.txt"), sig.getStatisticsString());
 						} catch (CoreException e) {
 							MPLPlugin.getDefault().logError(e);
 							return false;
@@ -513,6 +522,8 @@ public class InterfaceWriter extends AbstractWriter {
 				} else {
 					if (all) {
 //						interfaceProject.refreshRoleMap();
+						writeToFile(interfaceProject.getProjectReference().getFile("SPL_Statistic.txt"), 
+								roleMap.getStatisticsString());
 					} else {
 						MPLPlugin.getDefault().logInfo("Built Feature Interfaces");
 					}

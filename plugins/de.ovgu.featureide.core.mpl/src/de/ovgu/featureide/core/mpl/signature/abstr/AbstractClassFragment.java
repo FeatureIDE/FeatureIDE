@@ -34,7 +34,7 @@ public abstract class AbstractClassFragment {
 	protected static final int hashCodePrime = 31;
 	
 	protected boolean hasHashCode = false;
-	protected int hashCode = 0;
+	protected int hashCode = 0, nonPrivateMemberCount = 0, nonPrivateInnerClassCount = 0;
 	
 	protected final AbstractClassSignature signature;
 
@@ -69,15 +69,29 @@ public abstract class AbstractClassFragment {
 		return members.size() + innerClasses.size()	+ innerMembers;
 	}
 	
+	public int getNonPrivateMemberCount() {
+		return nonPrivateMemberCount;
+	}
+
+	public int getNonPrivateInnerClassCount() {
+		return nonPrivateInnerClassCount;
+	}
+
 	public void addMember(AbstractSignature member) {
 		members.add(member);
-		hasHashCode = false;
+		if (!member.isPrivate()) {
+			nonPrivateMemberCount++;
+			hasHashCode = false;
+		}
 	}
 
 	public void addInnerClass(AbstractClassFragment innerClass) {
 		AbstractClassFragment orgInnerClass = innerClasses.get(innerClass.getSignature().getFullName());
 		if (orgInnerClass == null) {
 			innerClasses.put(innerClass.getSignature().getFullName(), innerClass);
+			if (!innerClass.getSignature().isPrivate()) {
+				nonPrivateInnerClassCount++;
+			}
 		} else {
 			for (AbstractSignature member : innerClass.members) {
 				orgInnerClass.addMember(member);
@@ -102,17 +116,20 @@ public abstract class AbstractClassFragment {
 	}
 	
 	protected void computeHashCode() {
-		hashCode = 1;
-		hashCode = hashCodePrime * hashCode + signature.hashCode();
+		hashCode = hashCodePrime + signature.hashCode();
 
 		hashCode *= hashCodePrime;
 		for (AbstractSignature member : members) {
-			hashCode += member.hashCode();
+			if (!member.isPrivate()) {
+				hashCode += member.hashCode();
+			}
 		}
 		
 		hashCode *= hashCodePrime;
 		for (AbstractClassFragment innerClass : innerClasses.values()) {
-			hashCode += innerClass.hashCode();
+			if (!innerClass.getSignature().isPrivate()) {
+				hashCode += innerClass.hashCode();
+			}
 		}
 	}
 
@@ -125,21 +142,23 @@ public abstract class AbstractClassFragment {
 		
 		AbstractClassFragment other = (AbstractClassFragment) obj;
 		
-		if (members.size() != other.members.size()
-				|| innerClasses.size() != other.innerClasses.size()
+		if (nonPrivateMemberCount != other.nonPrivateMemberCount
+				|| nonPrivateInnerClassCount != other.nonPrivateInnerClassCount
 				|| !signature.equals(other.signature)) {
 			return false;
 		}
 		for (AbstractSignature member : members) {
-			if (!other.members.contains(member)) {
+			if (!member.isPrivate() && !other.members.contains(member)) {
 				return false;
 			}
 		}
 		for (Entry<String, AbstractClassFragment> entry : innerClasses.entrySet()) {
-			AbstractClassFragment otherClassFragment = other.innerClasses.get(entry.getKey());
-			if (otherClassFragment == null
-					|| !otherClassFragment.equals(entry.getValue())) {
-				return false;
+			if (!entry.getValue().getSignature().isPrivate()) {
+				AbstractClassFragment otherClassFragment = other.innerClasses.get(entry.getKey());
+				if (otherClassFragment == null
+						|| !otherClassFragment.equals(entry.getValue())) {
+					return false;
+				}
 			}
 		}
 		return true;
