@@ -20,18 +20,18 @@
  */
 package de.ovgu.featureide.ui.actions.generator;
 
-import java.io.File;
 import java.io.IOException;
 import java.security.KeyStore.Builder;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.TimeoutException;
 
 import javax.annotation.CheckForNull;
 
 import no.sintef.ict.splcatool.CoveringArray;
-import no.sintef.ict.splcatool.SPLACAToolExtension;
+import no.sintef.ict.splcatool.CoveringArrayGenerationException;
+import no.sintef.ict.splcatool.GUIDSL;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -47,6 +47,7 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.core.JavaProject;
 
+import splar.core.fm.FeatureModelException;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.Feature;
@@ -54,7 +55,6 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.Selection;
-import de.ovgu.featureide.fm.core.io.guidsl.GuidslWriter;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
@@ -453,25 +453,21 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 */
 	protected void buildTWiseConfigurations(IFeatureProject featureProject, IProgressMonitor monitor) {
 		monitor.beginTask("" , (int) configurationNumber);
-		String modelFilePath = featureProject.getProject().getFile("model.m").getLocation().toOSString();
-		new GuidslWriter(featureModel).writeToFile(new File(modelFilePath));
-		String[] args = new String[] {
-				"-t", "t_wise", 
-				"-a", algorithm, 
-				"-fm", modelFilePath,
-				"-s", t + ""};
 		CoveringArray ca = null;
 		try {
-			ca = (new SPLACAToolExtension()).mainObj2(args);
-		} catch (Exception e){
-			String argsString = "";
-			for (String arg : args) {
-				argsString = argsString + arg + " ";
+			ca = new GUIDSL(featureModel).getSXFM().getCNF().getCoveringArrayGenerator(algorithm, t);
+			if (ca == null) {
+				UIPlugin.getDefault().logError("Bug @ SPLCATool for input: " + algorithm + " t="+t, null);
+				return;
 			}
-			UIPlugin.getDefault().logError("SPLCATool fails with following arguments: " + argsString, e);
-			return;
+			ca.generate();
+		} catch (FeatureModelException e) {
+			UIPlugin.getDefault().logError(e);
+		} catch (TimeoutException e) {
+			UIPlugin.getDefault().logError(e);
+		} catch (CoveringArrayGenerationException e) {
+			UIPlugin.getDefault().logError(e);
 		}
-		Map<Integer, String> nrids = ca.getnrid();
 		List<List<Integer>> solutions = ca.getSolutionsAsList();
 		configurationNumber = solutions.size();
 		monitor.beginTask("" , (int) configurationNumber);
@@ -479,7 +475,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			String selectedFeatures = "";
 			for (Integer selection : solution) {
 				if (selection > 0) {
-					selectedFeatures += " " + nrids.get(selection);
+					selectedFeatures += " " + ca.getId(selection);
 				}
 				
 			}	
