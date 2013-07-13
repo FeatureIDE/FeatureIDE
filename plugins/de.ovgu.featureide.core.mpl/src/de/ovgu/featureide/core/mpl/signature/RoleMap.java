@@ -152,6 +152,37 @@ public class RoleMap {
 		return javaSig;
 	}
 	
+	public HashMap<String, int[]> getStatisticNumbers() {
+		final int[][] allCounters = new int[4][4];
+		HashMap<String, int[]> fs = new HashMap<String, int[]>();
+		
+		for (AbstractSignature signature : signatureSet.keySet()) {
+			if (signature instanceof AbstractFieldSignature) {
+				count(signature, allCounters[2], fs, 2);
+			} else if (signature instanceof AbstractMethodSignature) {
+				count(signature, allCounters[3], fs, 3);
+			} else if (signature instanceof AbstractClassSignature) {
+				if (signature.getParent() != null) {
+					count(signature, allCounters[1], fs, 1);
+				} else {
+					count(signature, allCounters[0], fs, 0);
+				}
+			}
+		}
+		int[] spl = new int[3];
+		int[] iface = new int[3];
+		spl[0] = allCounters[0][1];
+		spl[1] = allCounters[2][1];
+		spl[2] = allCounters[3][1];
+		iface[0] = allCounters[0][0];
+		iface[1] = allCounters[2][0];
+		iface[2] = allCounters[3][0];
+		fs.put("$$SPL", spl);
+		fs.put("$$INTERFACE", iface);
+		
+		return fs;
+	}
+	
 	public String getStatisticsString() {
 		final int[][] allCounters = new int[4][4];
 		HashMap<String, int[]> fs = new HashMap<String, int[]>();
@@ -166,6 +197,7 @@ public class RoleMap {
 					count(signature, allCounters[1], fs, 1);
 				} else {
 					count(signature, allCounters[0], fs, 0);
+					System.out.println(signature.getFullName());
 				}
 			}
 		}
@@ -212,11 +244,12 @@ public class RoleMap {
 		for (String feature : signature.getFeatures()) {
 			int[] x = fs.get(feature);
 			if (x == null) {
-				x = new int[4];
+				x = new int[]{0,0,0,0};
 				fs.put(feature, x);
 			}
 			x[i]++;
 		}
+		
 		curCounter[0]++;
 		curCounter[1] += signature.getFeatures().size();
 		if (signature.isPrivate()) {

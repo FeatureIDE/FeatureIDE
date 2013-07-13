@@ -22,15 +22,14 @@ package de.ovgu.featureide.core.mpl.io.parser;
 
 import java.util.LinkedList;
 
-import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.io.AbstractLineReader;
 import de.ovgu.featureide.core.mpl.signature.RoleMap;
 import de.ovgu.featureide.core.mpl.signature.ViewTagPool;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature;
+import de.ovgu.featureide.core.mpl.signature.java.JavaClassSignature;
 import de.ovgu.featureide.core.mpl.signature.java.JavaFieldSignature;
 import de.ovgu.featureide.core.mpl.signature.java.JavaMethodSignature;
 import de.ovgu.featureide.core.mpl.signature.java.JavaRole;
-import de.ovgu.featureide.core.mpl.signature.java.JavaClassSignature;
 
 /**
  * Reads a java interfaces file to a {@link JavaClassSignature}.

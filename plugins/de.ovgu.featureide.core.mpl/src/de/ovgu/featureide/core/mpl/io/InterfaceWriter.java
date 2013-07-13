@@ -26,6 +26,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -50,8 +52,6 @@ import de.ovgu.featureide.core.mpl.signature.ProjectSignature;
 import de.ovgu.featureide.core.mpl.signature.RoleMap;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassFragment;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassSignature;
-import de.ovgu.featureide.core.mpl.signature.abstr.AbstractFieldSignature;
-import de.ovgu.featureide.core.mpl.signature.abstr.AbstractMethodSignature;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractRole;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature;
 import de.ovgu.featureide.core.mpl.signature.java.JavaClassCreator;
@@ -59,8 +59,10 @@ import de.ovgu.featureide.core.mpl.util.NumberConverter;
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
+import de.ovgu.featureide.fm.core.configuration.SelectionNotPossibleException;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 /** 
@@ -161,13 +163,8 @@ public class InterfaceWriter extends AbstractWriter {
 		new MonitorJob("Build Extended Modules") {
 			protected boolean work() {
 				IFolder folder = interfaceProject.getProjectReference().getFolder(folderName);
-				try {
-					if (folder.exists()) {
-						folder.delete(true, null);
-					}
-				} catch (CoreException e) {
-					MPLPlugin.getDefault().logError(e);
-				}
+				clearFolder(folder);
+				
 				LinkedList<String> allConcreteFeatures = new LinkedList<String>();
 				for (Feature feature : interfaceProject.getFeatureModel().getConcreteFeatures()) {
 					if (!feature.isHidden()) {
@@ -195,6 +192,81 @@ public class InterfaceWriter extends AbstractWriter {
 				return true;
 			}
 		};
+	}
+	
+	private void clearFolder(IFolder folder) {
+		try {
+			if (folder.exists()) {
+				folder.delete(true, null);
+			}
+			folder.create(false, true, null);
+		} catch (CoreException e) {
+			MPLPlugin.getDefault().logError(e);
+		}
+	}
+	
+	public void createStatistics(final String folderName) {
+		new MonitorJob("Build Extended Modules") {
+			protected boolean work() {
+				IFolder folder = interfaceProject.getProjectReference().getFolder(folderName);
+				clearFolder(folder);
+				
+				LinkedList<String> allConcreteFeatures = new LinkedList<String>();
+				for (Feature feature : interfaceProject.getFeatureModel().getConcreteFeatures()) {
+					if (!feature.isHidden()) {
+						allConcreteFeatures.add(feature.getName());
+					}
+				}
+				HashMap<String, int[]> featureStatistics = interfaceProject.getRoleMap().getStatisticNumbers();
+				Configuration defaultConf = new Configuration(interfaceProject.getFeatureModel());
+				Statistic stat = new Statistic();
+				SumStatistic sumStat = new SumStatistic();
+				
+				setMaxAbsoluteWork(allConcreteFeatures.size() + 1);
+
+				sumStat.set(featureStatistics.get("$$SPL"), SumStatistic.CONTEXT_SPL);
+				sumStat.set(featureStatistics.get("$$INTERFACE"), SumStatistic.CONTEXT_INTERFACE);
+				writeToFile(folder.getFile("sum_statistics.csv"), sumStat.toCSVString());
+				
+				stat.set(new int []{0,0,0}, "_No_Feature_", Statistic.CONTEXT_FEATURE);
+				stat.set(buildSignature(new Node[]{}).getStatisticsNumbers(), "_No_Feature_", Statistic.CONTEXT_CONTEXT);
+
+				int[][] st = xyz(defaultConf);
+				stat.set(st[0], "_No_Feature_", Statistic.CONTEXT_MIN_VARIANTE1);
+				stat.set(st[1], "_No_Feature_", Statistic.CONTEXT_MIN_VARIANTE2);
+				worked();
+				
+				for (String featureName : allConcreteFeatures) {
+					int[] fstat = featureStatistics.get(featureName);
+					int[] c = new int[]{0,0,0};
+					if (fstat != null) {
+						c[0] = fstat[0];
+						c[1] = fstat[2];
+						c[2] = fstat[3];
+					}
+					stat.set(c, featureName, Statistic.CONTEXT_FEATURE);
+					stat.set(buildSignature(buildNodeForFeature(featureName)).getStatisticsNumbers(), 
+							featureName, Statistic.CONTEXT_CONTEXT);
+					
+					Configuration conf = new Configuration(defaultConf, interfaceProject.getFeatureModel(), true);
+					try {
+						conf.setManual(featureName, Selection.SELECTED);
+					} catch(SelectionNotPossibleException e) {
+						conf.setAutomatic(featureName, Selection.SELECTED);
+					}
+					st = xyz(conf);
+					stat.set(st[0], featureName, Statistic.CONTEXT_MIN_VARIANTE1);
+					stat.set(st[1], featureName, Statistic.CONTEXT_MIN_VARIANTE2);
+					
+					worked();
+				}
+
+				writeToFile(folder.getFile("all_statistics.csv"), stat.toCSVString());
+				MPLPlugin.getDefault().logInfo("Printed Statistics");
+				return true;
+			}
+		};
+		System.gc();
 	}
 	
 	private static Node[] buildNodeForFeature(String featureName) {
@@ -261,6 +333,109 @@ public class InterfaceWriter extends AbstractWriter {
 		return projectSig;
 	}
 	
+	private class Statistic {
+		public static final int
+			//MEMBER_CLASS = 0, MEMBER_FIELD = 1, MEMBER_METHOD = 2,
+			CONTEXT_CONTEXT = 0, CONTEXT_MIN_VARIANTE1 = 1, CONTEXT_MIN_VARIANTE2 = 2, 
+			CONTEXT_FEATURE = 3;
+		private TreeMap<String, int[][]> sum = new TreeMap<String, int[][]>();
+		
+		public void set(int[] values, String feature, int context) {
+			int[][] x = sum.get(feature);
+			if (x == null) {
+				x = new int[4][];
+				sum.put(feature, x);
+			}
+			x[context] = values;
+		}
+		
+		public String toCSVString() {
+			StringBuilder sb = new StringBuilder();
+			sb.append("feature;context_class;context_field;context_method;" +
+					"minimum_class;minimum_field;minimum_method;" +
+					"minFeatures_class;minFeatures_field;minFeatures_method;" +
+					"feature_class;feature_field;feature_method\n");
+			for (Entry<String, int[][]> entry : sum.entrySet()) {
+				sb.append(entry.getKey());
+				int[][] ar = entry.getValue();
+				for (int i = 0; i < ar.length; i++) {
+					int[] ar2 = ar[i];
+					for (int j = 0; j < ar2.length; j++) {
+						sb.append(";");
+						sb.append(ar2[j]);
+					}
+				}
+				sb.append("\n");
+			}
+			return sb.toString();
+		}
+	}
+	
+	private class SumStatistic {
+		public static final int
+			//MEMBER_CLASS = 0, MEMBER_FIELD = 1, MEMBER_METHOD = 2,
+			CONTEXT_SPL = 0, CONTEXT_INTERFACE = 1;
+		private int[][] sum = new int[2][];
+		
+		public void set(int[] values, int context) {
+			sum[context] = values;
+		}
+		
+		public String toCSVString() {
+			StringBuilder sb = new StringBuilder();
+			sb.append("sum;class;field;method\nspl");
+			
+			int[] ar2 = sum[CONTEXT_SPL];
+			for (int j = 0; j < ar2.length; j++) {
+				sb.append(";");
+				sb.append(ar2[j]);
+			}
+			sb.append("\ninterface");
+			
+			ar2 = sum[CONTEXT_INTERFACE];
+			for (int j = 0; j < ar2.length; j++) {
+				sb.append(";");
+				sb.append(ar2[j]);
+			}
+			sb.append("\n");
+			
+			return sb.toString();
+		}
+	}
+	
+	private int[][] xyz(Configuration conf) {
+		LinkedList<List<String>> solutionList;
+		try {
+			solutionList = conf.getSolutions(interfaceProject.getConfigLimit());
+		} catch (TimeoutException e) {
+			MPLPlugin.getDefault().logError(e);
+			return null;
+		}
+		
+		int[][] minNumbers = new int[2][3];
+		int[] minFeatures = new int[3];
+		Arrays.fill(minNumbers[0], Integer.MAX_VALUE);
+		Arrays.fill(minNumbers[1], Integer.MAX_VALUE);
+		Arrays.fill(minFeatures, Integer.MAX_VALUE);
+		
+		while (!solutionList.isEmpty()) {
+			List<String> featureList = solutionList.remove();
+			
+			int[] x = interfaceProject.getRoleMap().generateSignature(featureList, null).getStatisticsNumbers();
+			for (int i = 0; i < x.length; i++) {
+				if (minNumbers[0][i] > x[i]) {
+					minNumbers[0][i] = x[i];
+				}
+				if (minFeatures[i] > featureList.size() 
+						|| (minFeatures[i] == featureList.size() 
+							&& minNumbers[1][i] > x[i])) {
+					minFeatures[i] = featureList.size();
+					minNumbers[1][i] = x[i];
+				}
+			}
+		}
+		return minNumbers;
+	}
 	
 	public void buildConfigurationInterfaces() {
 		new MonitorJob("Build Configuration Interfaces") {
@@ -298,10 +473,13 @@ public class InterfaceWriter extends AbstractWriter {
 				int solutionId = 0, groupId = 0;
 				setMaxAbsoluteWork(numberSolutions);
 				
-				int[] minNumbers = new int[3];
-				int[] solutionIds = new int[3];
-				int[] groupIds = new int[3];
-				Arrays.fill(minNumbers, Integer.MAX_VALUE);
+				int[][] minNumbers = new int[2][3];
+				int[][] solutionIds = new int[2][3];
+				int[][] groupIds = new int[2][3];
+				int[] minFeatures = new int[3];
+				Arrays.fill(minNumbers[0], Integer.MAX_VALUE);
+				Arrays.fill(minNumbers[1], Integer.MAX_VALUE);
+				Arrays.fill(minFeatures, Integer.MAX_VALUE);
 				
 				while (!solutionList.isEmpty()) {
 					List<String> featureList = solutionList.remove();
@@ -330,10 +508,18 @@ public class InterfaceWriter extends AbstractWriter {
 					
 					int[] x = sig.getStatisticsNumbers();
 					for (int i = 0; i < x.length; i++) {
-						if (minNumbers[i] > x[i]) {
-							minNumbers[i] = x[i];
-							solutionIds[i] = solutionId;
-							groupIds[i] = sigGroup.id;
+						if (minNumbers[0][i] > x[i]) {
+							minNumbers[0][i] = x[i];
+							solutionIds[0][i] = solutionId;
+							groupIds[0][i] = sigGroup.id;
+						}
+						if (minFeatures[i] > featureList.size() 
+								|| (minFeatures[i] == featureList.size() 
+									&& minNumbers[1][i] > x[i])) {
+							minFeatures[i] = featureList.size();
+							minNumbers[1][i] = x[i];
+							solutionIds[1][i] = solutionId;
+							groupIds[1][i] = sigGroup.id;
 						}
 					}
 					
@@ -343,27 +529,27 @@ public class InterfaceWriter extends AbstractWriter {
 				
 				StringBuilder sb2 = new StringBuilder();
 				sb2.append("Min #Classes: ");
-				sb2.append(minNumbers[0]);
+				sb2.append(minNumbers[0][0]);
 				sb2.append(" (Solution ");
-				sb2.append(converter.convert(solutionIds[0]));
+				sb2.append(converter.convert(solutionIds[0][0]));
 				sb2.append(" in Group ");
-				sb2.append(converter.convert(groupIds[0]));
+				sb2.append(converter.convert(groupIds[0][0]));
 				sb2.append(")\n");
 
 				sb2.append("Min #Fields: ");
-				sb2.append(minNumbers[1]);
+				sb2.append(minNumbers[0][1]);
 				sb2.append(" (Solution ");
-				sb2.append(converter.convert(solutionIds[1]));
+				sb2.append(converter.convert(solutionIds[0][1]));
 				sb2.append(" in Group ");
-				sb2.append(converter.convert(groupIds[1]));
+				sb2.append(converter.convert(groupIds[0][1]));
 				sb2.append(")\n");
 
 				sb2.append("Min #Methods: ");
-				sb2.append(minNumbers[2]);
+				sb2.append(minNumbers[0][2]);
 				sb2.append(" (Solution ");
-				sb2.append(converter.convert(solutionIds[2]));
+				sb2.append(converter.convert(solutionIds[0][2]));
 				sb2.append(" in Group ");
-				sb2.append(converter.convert(groupIds[2]));
+				sb2.append(converter.convert(groupIds[0][2]));
 				sb2.append(")\n");
 				
 				writeToFile(interfaceFolder.getFile("Min_Statistics.txt"), sb2.toString());
@@ -568,15 +754,19 @@ public class InterfaceWriter extends AbstractWriter {
 					
 					MPLPlugin.PRIVATE_METHODS = false;
 					MPLPlugin.WRAPPER_INTERFACES = false;
-					interfaceProject.refreshRoleMap();
 				} else {
 					if (all) {
-//						interfaceProject.refreshRoleMap();
-						writeToFile(interfaceProject.getProjectReference().getFile("SPL_Statistic.txt"), 
-								roleMap.getStatisticsString());
+//						writeToFile(interfaceProject.getProjectReference().getFile("SPL_Statistic.txt"), 
+//								roleMap.getStatisticsString());
 					} else {
 						MPLPlugin.getDefault().logInfo("Built Feature Interfaces");
 					}
+				}
+				interfaceProject.refreshRoleMap();
+				if (all) {
+					roleMap = interfaceProject.getRoleMap();
+					writeToFile(interfaceProject.getProjectReference().getFile("SPL_Statistic.txt"), 
+							roleMap.getStatisticsString());
 				}
 				
 				return true;

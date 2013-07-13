@@ -89,6 +89,13 @@
                   value="de.ovgu.featureide.core.mpl.interfaceProjectNature">
             </objectState>
          </visibility>
+         <action
+               class="de.ovgu.featureide.ui.mpl.actions.PrintStatisticsAction"
+               id="de.ovgu.featureide.ui.mpl.StatisticsAction"
+               label="Print Statistics"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces0"
+               style="push">
+         </action>
       </objectContribution>
       <objectContribution
             adaptable="true"
