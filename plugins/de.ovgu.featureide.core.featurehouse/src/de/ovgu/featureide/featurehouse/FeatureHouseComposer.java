@@ -315,7 +315,11 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	            "-basedir", sourcePath };
 		try {
 			ASTNodeAccess.clearTypeAccess();
-			Main fuji = new Main(fujiOptions, featureProject.getFeatureModel(), 
+			
+			FeatureModel fm = featureProject.getFeatureModel();
+			fm.getAnalyser().setDependencies();
+			
+			Main fuji = new Main(fujiOptions, fm, 
 					featureProject.getFeatureModel().getConcreteFeatureNames());
             Composition composition = fuji.getComposition(fuji);
             Program ast = composition.composeAST();

@@ -74,11 +74,25 @@ public class FeatureModelAnalyzer {
 
 	private FeatureDependencies dependencies;
 
+	/**
+	 * Returns the feature dependencies of the feature model. 
+	 * If the has model changed call {@link FeatureModelAnalyzer#setDependencies()} to calculate 
+	 * current dependencies.
+	 * @return
+	 */
 	public FeatureDependencies getDependencies() {
 		if (dependencies == null) {
 			dependencies = new FeatureDependencies(fm);
 		}
 		return dependencies;
+	}
+	
+	/**
+	 * Calculates new dependencies.
+	 * @return
+	 */
+	public void setDependencies() {
+		dependencies = new FeatureDependencies(fm);
 	}
 
 	public boolean isValid() throws TimeoutException {
