@@ -21,6 +21,7 @@
 package de.ovgu.featureide.ui.actions.generator;
 
 import java.io.IOException;
+import java.net.URL;
 import java.security.KeyStore.Builder;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -30,6 +31,7 @@ import java.util.concurrent.TimeoutException;
 import javax.annotation.CheckForNull;
 
 import no.sintef.ict.splcatool.CoveringArray;
+import no.sintef.ict.splcatool.CoveringArrayCASA;
 import no.sintef.ict.splcatool.CoveringArrayGenerationException;
 import no.sintef.ict.splcatool.GUIDSL;
 
@@ -39,13 +41,16 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.core.JavaProject;
+import org.eclipse.ui.internal.util.BundleUtility;
 
 import splar.core.fm.FeatureModelException;
 import de.ovgu.featureide.core.CorePlugin;
@@ -455,9 +460,19 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		monitor.beginTask("" , (int) configurationNumber);
 		CoveringArray ca = null;
 		try {
+			if (algorithm.equals(BuildTWiseWizardPage.CASA)) {
+				URL url = BundleUtility.find(UIPlugin.getDefault().getBundle(), "lib/cover.exe");
+				try {
+					url = FileLocator.toFileURL(url);
+				} catch (IOException e) {
+					UIPlugin.getDefault().logError(e);
+				}
+				Path path = new Path(url.getFile());
+				CoveringArrayCASA.CASA_PATH = path.toOSString();
+			}
+			
 			ca = new GUIDSL(featureModel).getSXFM().getCNF().getCoveringArrayGenerator(algorithm, t);
 			if (ca == null) {
-				UIPlugin.getDefault().logError("Bug @ SPLCATool for input: " + algorithm + " t="+t, null);
 				return;
 			}
 			ca.generate();
