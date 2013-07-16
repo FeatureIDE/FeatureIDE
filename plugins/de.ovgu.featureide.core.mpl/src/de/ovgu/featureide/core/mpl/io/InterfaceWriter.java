@@ -226,12 +226,12 @@ public class InterfaceWriter extends AbstractWriter {
 
 				sumStat.set(featureStatistics.get("$$SPL"), SumStatistic.CONTEXT_SPL);
 				sumStat.set(featureStatistics.get("$$INTERFACE"), SumStatistic.CONTEXT_INTERFACE);
-				writeToFile(folder.getFile("sum_statistics.csv"), sumStat.toCSVString());
+				writeToFile(folder.getFile("_sum_statistics.csv"), sumStat.toCSVString());
 				
 				stat.set(new int []{0,0,0}, "_No_Feature_", Statistic.CONTEXT_FEATURE);
 				stat.set(buildSignature(new Node[]{}).getStatisticsNumbers(), "_No_Feature_", Statistic.CONTEXT_CONTEXT);
 
-				int[][] st = xyz(defaultConf);
+				int[][] st = xyz(defaultConf, folder, "_No_Feature_");
 				stat.set(st[0], "_No_Feature_", Statistic.CONTEXT_MIN_VARIANTE1);
 				stat.set(st[1], "_No_Feature_", Statistic.CONTEXT_MIN_VARIANTE2);
 				worked();
@@ -254,14 +254,14 @@ public class InterfaceWriter extends AbstractWriter {
 					} catch(SelectionNotPossibleException e) {
 						conf.setAutomatic(featureName, Selection.SELECTED);
 					}
-					st = xyz(conf);
+					st = xyz(conf, folder, featureName);
 					stat.set(st[0], featureName, Statistic.CONTEXT_MIN_VARIANTE1);
 					stat.set(st[1], featureName, Statistic.CONTEXT_MIN_VARIANTE2);
 					
 					worked();
 				}
 
-				writeToFile(folder.getFile("all_statistics.csv"), stat.toCSVString());
+				writeToFile(folder.getFile("_all_statistics.csv"), stat.toCSVString());
 				MPLPlugin.getDefault().logInfo("Printed Statistics");
 				return true;
 			}
@@ -403,7 +403,7 @@ public class InterfaceWriter extends AbstractWriter {
 		}
 	}
 	
-	private int[][] xyz(Configuration conf) {
+	private int[][] xyz(Configuration conf, IFolder folder, String featureName) {
 		LinkedList<List<String>> solutionList;
 		try {
 			solutionList = conf.getSolutions(interfaceProject.getConfigLimit());
@@ -417,11 +417,21 @@ public class InterfaceWriter extends AbstractWriter {
 		Arrays.fill(minNumbers[0], Integer.MAX_VALUE);
 		Arrays.fill(minNumbers[1], Integer.MAX_VALUE);
 		Arrays.fill(minFeatures, Integer.MAX_VALUE);
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("variant;classes;fields;methods");
+		int count = 0;
 		
 		while (!solutionList.isEmpty()) {
 			List<String> featureList = solutionList.remove();
 			
 			int[] x = interfaceProject.getRoleMap().generateSignature(featureList, null).getStatisticsNumbers();
+			sb.append("\n");
+			sb.append(count++);
+			for (int i = 0; i < x.length; i++) {
+				sb.append(";");
+				sb.append(x[i]);
+			}
 			for (int i = 0; i < x.length; i++) {
 				if (minNumbers[0][i] > x[i]) {
 					minNumbers[0][i] = x[i];
@@ -434,6 +444,10 @@ public class InterfaceWriter extends AbstractWriter {
 				}
 			}
 		}
+//		IFolder featureFolder = folder.getFolder(featureName);
+//		clearFolder(featureFolder);
+		writeToFile(folder.getFile("variant_stats_" + featureName + ".csv"), sb.toString());
+		
 		return minNumbers;
 	}
 	
