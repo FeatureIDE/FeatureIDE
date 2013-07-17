@@ -90,7 +90,7 @@ public interface IConfigurationBuilderBasics {
 	 * Basics for the SPLCATool.
 	 */
 	final static String CHVATAL = "Chvatal"; 
-	final static String ICPL = "ICPL";
+	final static String ICPL = "ICPL (fastest)";
 	final static String CASA = "CASA";
 	final static int CHVATAL_MAX = 4;
 	final static int ICPL_MAX = 3;

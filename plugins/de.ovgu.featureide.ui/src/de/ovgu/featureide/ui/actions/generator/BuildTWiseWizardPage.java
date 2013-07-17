@@ -48,7 +48,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 @SuppressWarnings("restriction")
 public class BuildTWiseWizardPage extends WizardPage implements IConfigurationBuilderBasics {
 
-	private static final String INTERACTIONS = "&Interactions: ";
+	private static final String INTERACTIONS = "&Interactions: t=";
 
 	@CheckForNull
 	private IFeatureProject project;
@@ -168,7 +168,11 @@ public class BuildTWiseWizardPage extends WizardPage implements IConfigurationBu
 	}
 
 	String getAlgorithm() {
-		return comboLanguage.getText();
+		String text = comboLanguage.getText();
+		if (text.contains(" ")) {
+			return text.substring(0, text.indexOf(" "));			
+		}
+		return text;
 	}
 	
 	int getT() {
