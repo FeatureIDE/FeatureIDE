@@ -49,15 +49,16 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.core.ClasspathEntry;
 import org.eclipse.jdt.internal.core.JavaProject;
 
-import AST.ASTNode;
 import AST.Problem;
 import AST.Program;
 import cide.gparser.ParseException;
 import cide.gparser.TokenMgrError;
+
 import composer.CmdLineInterpreter;
 import composer.FSTGenComposer;
 import composer.FSTGenComposerExtension;
 import composer.IParseErrorListener;
+
 import de.ovgu.cide.fstgen.ast.FSTNode;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
@@ -313,9 +314,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	            "-" + Main.OptionName.COMPOSTION_STRATEGY, Main.OptionName.COMPOSTION_STRATEGY_ARG_FAMILY, 
 	            "-typechecker", 
 	            "-basedir", sourcePath };
-		try {
-			ASTNodeAccess.clearTypeAccess();
-			
+		try {			
 			FeatureModel fm = featureProject.getFeatureModel();
 			fm.getAnalyser().setDependencies();
 			
@@ -365,20 +364,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			FeatureHouseCorePlugin.getDefault().logError(e);
 		}
 	}
-	
-	/**
-	 * 
-	 * TODO remove this inner class if the bug is fixed  @ fuji
-	 * 
-	 * @author Jens Meinicke
-	 */
-	@SuppressWarnings("rawtypes")
-	private static class ASTNodeAccess extends ASTNode {
-		public static void clearTypeAccess() {
-			typeAccesses.clear();
-		}
-	}
-	
+
 	/**
 	 * Creates an marker for fuji type checks. 
 	 * @param line The line number
