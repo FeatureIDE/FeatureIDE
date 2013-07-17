@@ -205,6 +205,11 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		
 	ConfigurationBuilder(final IFeatureProject featureProject, final BuildType buildType,
 		final boolean createNewProjects, String algorithm, int t) {
+		
+		if (!featureProject.getComposer().preBuildConfiguration()) {
+			return;
+		}
+		
 		this.algorithm = algorithm;
 		this.t = t;
 		this.featureProject = featureProject;

@@ -285,12 +285,6 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		return CorePlugin.getDefault().getConfigurationExtensions().getFirst();
 	}
 	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#buildConfiguration(org.eclipse.core.resources.IFolder, de.ovgu.featureide.fm.core.configuration.Configuration)
-	 */
-	/**
-	 * Creates a configuration file at the given folder
-	 */
 	public void buildConfiguration(IFolder folder, Configuration configuration, String congurationName) {
 		try {
 			if (!folder.exists()) {
@@ -303,6 +297,10 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
+	}
+	
+	public boolean preBuildConfiguration() {
+		return true;
 	}
 	
 	public boolean hasSourceFolder() {

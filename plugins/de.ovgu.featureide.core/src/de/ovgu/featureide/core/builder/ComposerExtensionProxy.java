@@ -171,6 +171,10 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	public void buildConfiguration(IFolder folder, Configuration configuration, String congurationName) {
 		composerExtensionClass.buildConfiguration(folder, configuration, congurationName);
 	}
+	
+	public boolean preBuildConfiguration() {
+		return composerExtensionClass.preBuildConfiguration();
+	}
 
 	public boolean refines() {
 		return composerExtensionClass.refines();

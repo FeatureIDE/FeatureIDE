@@ -64,12 +64,20 @@ public interface IComposerExtensionClass {
 	void performFullBuild(IFile config);
 	
 	/**
-	 * Builds a configuration to the given folder
+	 * Builds a configuration to the given folder<br>
+	 * To call a method before the building process of all configurations is started see: {@link IComposerExtensionClass#preBuildConfiguration()}
+	 * 
 	 * @param folder The destination
 	 * @param configuration The configuration to build
 	 * @param congurationName The name of the configuration
 	 */
 	void buildConfiguration(IFolder folder, Configuration configuration, String congurationName);
+	
+	/**
+	 * Called before building all configurations is started.
+	 * @return <code>false</code> if the building process should be aborted.
+	 */
+	boolean preBuildConfiguration();
 	
 	/**
 	 * 
