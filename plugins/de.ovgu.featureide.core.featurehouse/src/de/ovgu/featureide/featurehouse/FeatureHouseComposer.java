@@ -55,11 +55,14 @@ import cide.gparser.ParseException;
 import cide.gparser.TokenMgrError;
 
 import composer.CmdLineInterpreter;
+import composer.CompositionException;
 import composer.FSTGenComposer;
 import composer.FSTGenComposerExtension;
+import composer.ICompositionErrorListener;
 import composer.IParseErrorListener;
 
 import de.ovgu.cide.fstgen.ast.FSTNode;
+import de.ovgu.cide.fstgen.ast.FSTTerminal;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.featurehouse.errorpropagation.ErrorPropagation;
@@ -92,6 +95,12 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	private static final String CONTRACT_COMPOSITION_PLAIN_CONTRACTING = "plain contracting";
 	private static final String CONTRACT_COMPOSITION_EXPLICIT_CONTRACTING = "explicit_contracting";
 	private static final String CONTRACT_COMPOSITION_CONSECUTIVE_CONTRACTING = "consecutive_contracting";
+	private static final String CONTRACT_COMPOSITION_CUMULATIVE_CONTRACT_REFINEMENT = "cumulative contract refinement";
+	private static final String CONTRACT_COMPOSITION_CUMULATIVE_CONTRACTING = "cumulative_contracting";
+	private static final String CONTRACT_COMPOSITION_CONJUNCTIVE_CONTRACT_REFINEMENT = "conjunctive contract refinement";
+	private static final String CONTRACT_COMPOSITION_CONJUNCTIVE_CONTRACTING = "conjunctive_contracting";
+	private static final String CONTRACT_COMPOSITION_METHOD_BASED_COMPOSITION = "method-based composition";
+	private static final String CONTRACT_COMPOSITION_METHOD_BASED = "method_based";
 	private static final String CONTRACT_COMPOSITION_NONE = "none";
 
 	public static final String COMPOSER_ID = "de.ovgu.featureide.composer.featurehouse";
@@ -112,6 +121,59 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			@Override
 			public void parseErrorOccured(ParseException e) {
 				createBuilderProblemMarker(e.currentToken.next.endLine, e.getMessage());
+			}
+		};
+	}
+	
+	private ICompositionErrorListener compositionErrorListener = createCompositionErrorListener();
+
+	/**
+	 * @return
+	 */
+	private ICompositionErrorListener createCompositionErrorListener() {
+		return new ICompositionErrorListener() {
+
+			@Override
+			public void parseErrorOccured(CompositionException e) {
+				FSTTerminal terminal = e.getTerminalB();
+				
+				if(e.getMessage().contains("\\original")) {
+					if(!e.getTerminalB().getBody().contains("\\original")) 
+						terminal = e.getTerminalA();
+				}
+
+
+				IFile file = null;
+				int lineFile = -1;
+				if (terminal != null) {
+					file = getFile(terminal);
+					lineFile = terminal.beginLine;
+				}
+				try {
+					IMarker marker = file
+							.createMarker(FeatureHouseCorePlugin.BUILDER_PROBLEM_MARKER);
+					marker.setAttribute(IMarker.LINE_NUMBER, lineFile);
+					marker.setAttribute(IMarker.MESSAGE, e.getMessage());
+					marker.setAttribute(IMarker.SEVERITY,
+							IMarker.SEVERITY_WARNING);
+				} catch (CoreException e2) {
+					FeatureHouseCorePlugin.getDefault().logError(e2);
+				}
+
+			}
+
+			private IFile getFile(FSTTerminal terminal) {
+				if (terminal == null) {
+					return null;
+				}
+				FSTNode fileNode = terminal.getParent();
+				while(fileNode != null && !fileNode.getName().endsWith(".java")) {
+					fileNode = fileNode.getParent();
+				}
+				FSTNode featureNode = fileNode.getParent();
+				return featureProject.getSourceFolder()
+						.getFolder(featureNode.getName())
+						.getFile(fileNode.getName());
 			}
 		};
 	}
@@ -246,6 +308,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			new FeatureModelClassGenerator(featureProject);
 			FSTGenComposerExtension.key = IFeatureProject.DEFAULT_META_PRODUCT_GENERATION.equals(featureProject.getMetaProductGeneration());
 			composer = new FSTGenComposerExtension();
+			composer.addCompositionErrorListener(compositionErrorListener);
 			FeatureModel featureModel = featureProject.getFeatureModel();
 			List<String> featureOrderList = featureModel.getConcreteFeatureNames();
 			// dead features should not be composed
@@ -272,6 +335,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			}
 		} else {
 			composer = new FSTGenComposer(false);
+			composer.addCompositionErrorListener(compositionErrorListener);
 			try {
 				composer.run(getArguments(configPath, basePath, outputPath, getContractParameter()));
 			} catch (TokenMgrError e) {
@@ -513,21 +577,31 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	
 
 	private String getContractParameter() {
-		String contractComposition= featureProject.getContractComposition().toLowerCase(Locale.ENGLISH);
-		if(CONTRACT_COMPOSITION_NONE.equals(contractComposition)) {
+		String contractComposition = featureProject.getContractComposition()
+				.toLowerCase(Locale.ENGLISH);
+		if (CONTRACT_COMPOSITION_NONE.equals(contractComposition)) {
 			return CONTRACT_COMPOSITION_NONE;
-		}
-		if(CONTRACT_COMPOSITION_PLAIN_CONTRACTING.equals(contractComposition)) {
+		} else if (CONTRACT_COMPOSITION_PLAIN_CONTRACTING
+				.equals(contractComposition)) {
 			return CONTRACT_COMPOSITION_PLAIN_CONTRACTING;
-		}
-		if(CONTRACT_COMPOSITION_CONTRACT_OVERRIDING.equals(contractComposition)) {
+		} else if (CONTRACT_COMPOSITION_CONTRACT_OVERRIDING
+				.equals(contractComposition)) {
 			return CONTRACT_COMPOSITION_CONTRACT_OVERRIDING;
-		}
-		if(CONTRACT_COMPOSITION_EXPLICIT_CONTRACT_REFINEMENT.equals(contractComposition)) {
+		} else if (CONTRACT_COMPOSITION_EXPLICIT_CONTRACT_REFINEMENT
+				.equals(contractComposition)) {
 			return CONTRACT_COMPOSITION_EXPLICIT_CONTRACTING;
-		}
-		if(CONTRACT_COMPOSITION_CONSECUTIVE_CONTRACT_REFINEMENT.equals(contractComposition)) {
+		} else if (CONTRACT_COMPOSITION_CONSECUTIVE_CONTRACT_REFINEMENT
+				.equals(contractComposition)) {
 			return CONTRACT_COMPOSITION_CONSECUTIVE_CONTRACTING;
+		} else if (CONTRACT_COMPOSITION_CUMULATIVE_CONTRACT_REFINEMENT
+				.equals(contractComposition)) {
+			return CONTRACT_COMPOSITION_CUMULATIVE_CONTRACTING;
+		} else if (CONTRACT_COMPOSITION_CONJUNCTIVE_CONTRACT_REFINEMENT
+				.equals(contractComposition)) {
+			return CONTRACT_COMPOSITION_CONJUNCTIVE_CONTRACTING;
+		} else if (CONTRACT_COMPOSITION_METHOD_BASED_COMPOSITION
+				.equals(contractComposition)) {
+			return CONTRACT_COMPOSITION_METHOD_BASED;
 		}
 		return CONTRACT_COMPOSITION_NONE;
 	}
@@ -702,6 +776,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		IFile configurationFile = folder.getFile(folderName + '.' + getConfigurationExtension());
 		FSTGenComposer composer = new FSTGenComposer(false);
 		composer.addParseErrorListener(createParseErrorListener());
+		composer.addCompositionErrorListener(createCompositionErrorListener());
 		composer.run(getArguments(configurationFile.getRawLocation().toOSString(), 
 				featureProject.getSourcePath(), folder.getParent().getLocation().toOSString(), 
 				getContractParameter()));
