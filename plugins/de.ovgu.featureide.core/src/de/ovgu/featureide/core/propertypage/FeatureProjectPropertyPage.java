@@ -268,21 +268,24 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		label.setText("&Metaproduct Generation");
 		metaCombo = new Combo(group, SWT.READ_ONLY | SWT.DROP_DOWN);
 		metaCombo.setLayoutData(gd);
-		metaCombo.add(IFeatureProject.DEFAULT_META_PRODUCT_GENERATION);
-		metaCombo.add("Model Checking");
-		String composer = featureProject.getMetaProductGeneration();
-		refreshMetaCombo(composer);
+		metaCombo.add(IFeatureProject.META_THEOREM_PROVING);
+		metaCombo.add(IFeatureProject.META_MODEL_CHECKING);
+		metaCombo.add(IFeatureProject.META_MODEL_CHECKING_BDD_JAVA);
+		// TODO reactivate this line if c metaproduct is supported
+//		metaCombo.add(IFeatureProject.META_MODEL_CHECKING_BDD_C);
+		String selection = featureProject.getMetaProductGeneration();
+		refreshMetaCombo(selection);
 		metaCombo.addModifyListener(listener);
 	}
 	
-	private void refreshMetaCombo(String composer) {
+	private void refreshMetaCombo(String selection) {
 		if (!this.composer.hasMetaProductGeneration()) {
 			metaCombo.setEnabled(false);
 			metaCombo.select(0);
 		} else {
 			int i = 0;
 			for (String item : metaCombo.getItems()) {
-				if (item.equals(composer)) {
+				if (item.equals(selection)) {
 					metaCombo.select(i);
 					break;
 				}

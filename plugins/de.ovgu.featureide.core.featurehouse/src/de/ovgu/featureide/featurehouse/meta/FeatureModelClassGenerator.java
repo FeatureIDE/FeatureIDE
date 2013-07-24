@@ -28,6 +28,7 @@ import java.util.LinkedList;
 import java.util.Locale;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
 import org.prop4j.And;
 import org.prop4j.Node;
@@ -71,8 +72,14 @@ public class FeatureModelClassGenerator {
 	
 	public FeatureModelClassGenerator(IFeatureProject featureProject) {
 		FeatureModel model = featureProject.getFeatureModel();
-		printModel(model, IFeatureProject.DEFAULT_META_PRODUCT_GENERATION.equals(featureProject.getMetaProductGeneration()));
-		saveToFile(featureProject.getBuildFolder().getFolder(featureProject.getCurrentConfiguration().getName().split("[.]")[0]).getFile("FeatureModel.java"));
+		printModel(model, IFeatureProject.META_THEOREM_PROVING.equals(featureProject.getMetaProductGeneration()));
+		IFolder FMFolder = featureProject.getBuildFolder().getFolder(featureProject.getCurrentConfiguration().getName().split("[.]")[0]).getFolder("FM");
+		try {
+			FMFolder.create(true, true, null);
+			saveToFile(FMFolder.getFile("FeatureModel.java"));
+		} catch (CoreException e) {
+			FeatureHouseCorePlugin.getDefault().logError(e);
+		}
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -92,6 +99,7 @@ public class FeatureModelClassGenerator {
 	}
 
 	private void printModel(FeatureModel model, boolean KeY) {
+		stringBuilder.append("package FM;\r\n\r\n");
 		if (!KeY) {
 			stringBuilder.append(head_JPF);
 		}

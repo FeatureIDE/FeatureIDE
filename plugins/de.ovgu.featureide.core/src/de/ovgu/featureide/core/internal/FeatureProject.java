@@ -1380,7 +1380,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			CorePlugin.getDefault().logError(e);
 		}
 		if (metaProductGeneration == null) {
-			return DEFAULT_META_PRODUCT_GENERATION;
+			return META_THEOREM_PROVING;
 		}
 		return metaProductGeneration;
 	}
