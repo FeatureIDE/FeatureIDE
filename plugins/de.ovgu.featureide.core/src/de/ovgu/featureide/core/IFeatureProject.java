@@ -50,9 +50,9 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	public static final String DEFAULT_BUILD_PATH = "build";
 	public static final String DEFAULT_CONTRACT_COMPOSITION= "None";
 	public static final String META_THEOREM_PROVING = "Theorem Proving";
-	public static final String META_MODEL_CHECKING = "Model Checking";
-	public static final String META_MODEL_CHECKING_BDD_JAVA = "Model Checking_BDD_JAVA";
-	public static final String META_MODEL_CHECKING_BDD_C = "Model Checking_BDD_C";
+	public static final String META_MODEL_CHECKING = "Model Checking (JPF-core)";
+	public static final String META_MODEL_CHECKING_BDD_JAVA = "Model Checking (JPF-BDD Java)";
+	public static final String META_MODEL_CHECKING_BDD_C = "Model Checking (JPF-BDD C)";
 	
 	public static final String DEFAULT_COMPOSITION_MECHANISM = "Mixin";
 	public static final QualifiedName configConfigID = new QualifiedName("featureproject.configs", "currentEquation");
