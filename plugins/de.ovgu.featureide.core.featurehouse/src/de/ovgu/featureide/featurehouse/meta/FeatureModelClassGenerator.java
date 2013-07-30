@@ -53,7 +53,7 @@ public class FeatureModelClassGenerator {
 	private LinkedList<Feature> deadFeatures;
 	private LinkedList<Feature> coreFeatures;
 	
-	private static final String head_JPF = "import gov.nasa.jpf.jvm.Verify;\r\n\r\n";
+	private static final String head_JPF = "import gov.nasa.jpf.vm.Verify;\r\n\r\n";
 	private final static String head_1 = "/**\r\n * Variability encoding of the feature model.\r\n * Auto-generated class.\r\n */\r\npublic class FeatureModel {\n\n\t";
 	private static final String bottom_1 = ";\r\n\t}\n\n\tprivate static boolean random() {\r\n\t\t return ";
 	private static final String bottom_KeY = ";\r\n\t}\r\n}";
