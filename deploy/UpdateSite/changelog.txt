@@ -7,6 +7,10 @@ https://faracvs.cs.uni-magdeburg.de/projects/tthuem-FeatureIDE/report/6
 
 Here, is a list of high-level enhancements.
 
+Release 2.6.6 (August 2013) coming soon
+* Family-based type checks of FeatureHouse projects fith fuji
+* T-wise product generation with splcatool
+
 Release 2.6.5 (May 2013)
 * New AHEAD version integrated
 * AHEAD projects can be composed with Jampack or Mixin (based on the settings
