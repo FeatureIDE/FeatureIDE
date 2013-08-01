@@ -8,22 +8,23 @@ public  class StringMatcherTest {
 	public void testCompare() {
 	//	if (verifyNoPropertyViolation()) {
 //			FeatureModel.prefix_a_b_ = true;
-		//@feature Prefix_a_b
+		//@feature Length
 			String expected ="abc";
-			
-			assertTrue(StringMatcher.compare("a", expected));
-			assertTrue(StringMatcher.compare("ab", expected));
 			assertTrue(StringMatcher.compare("abc", expected));
-			assertTrue(StringMatcher.compare("", expected));
+			assertTrue(StringMatcher.compare("abd", expected));
+			assertTrue(StringMatcher.compare("dab", expected));
+			
+			assertFalse(StringMatcher.compare("a", expected));
+			assertFalse(StringMatcher.compare("ab", expected));
+			assertFalse(StringMatcher.compare("", expected));
 			assertFalse(StringMatcher.compare(" ", expected));
 			assertFalse(StringMatcher.compare("d", expected));
 			assertFalse(StringMatcher.compare("abcd", expected));
-			assertFalse(StringMatcher.compare("abd", expected));
 			assertFalse(StringMatcher.compare("ad", expected));
 			assertFalse(StringMatcher.compare("dabc", expected));
-			assertFalse(StringMatcher.compare("dab", expected));
 			assertFalse(StringMatcher.compare("da", expected));
 
 			
 }
+	
 }

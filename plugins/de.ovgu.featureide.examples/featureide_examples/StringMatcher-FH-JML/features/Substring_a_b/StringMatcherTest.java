@@ -8,7 +8,7 @@ public  class StringMatcherTest {
 	public void testCompare() {
 	//	if (verifyNoPropertyViolation()) {
 //			FeatureModel.prefix_a_b_ = true;
-		//@feature Prefix_a_b
+		//@feature Substring_a_b
 			String expected ="abc";
 			
 			assertTrue(StringMatcher.compare("a", expected));
