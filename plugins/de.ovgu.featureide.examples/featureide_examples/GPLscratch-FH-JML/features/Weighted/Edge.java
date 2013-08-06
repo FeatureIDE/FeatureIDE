@@ -6,11 +6,10 @@ public class Edge {
 	private Integer weight = 0;
 
 
-	/*@ CONJUNCTIVE
-	 requires weight != null && ((Edge)ob).weight != null;
-	 ensures \result ==> weight == ((Edge)ob).weight;
+	/*@ \conjunctive_contract
+	 @ requires weight != null;
+	 @ ensures \result ==> weight == ((Edge)ob).weight;
 	 @*/
-//	@Override
 	public /*@pure@*/ boolean equals(Object ob) {
 		if (original(ob) && weight == ((Edge)ob).weight) {
 			return true;
@@ -18,16 +17,16 @@ public class Edge {
 		return false;
 	}
 	
-	/*@ PLAIN / EXPLICIT / CONJUNCTIVE / ...
-	 requires weight != null && weight >= 0;
-	 ensures this.weight = weight;
+	/*@ \final_method
+	 @ requires weight != null && weight >= 0;
+	 @ ensures this.weight = weight;
 	 @*/
 	public void setWeight(Integer weight) {
 		this.weight = weight;
 	}
 	
-	/*@ EXPLICIT
-	 requires \original && weight != null;
+	/*@ \final_contract
+	 @ requires weight != null;
 	 @*/
 //	@Override
 	public /*@pure@*/ String toString() {

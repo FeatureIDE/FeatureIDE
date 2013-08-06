@@ -4,22 +4,25 @@
 public class Node implements Comparable<Node>{
 	private String name;
 
+	/*@ \final_method
+	 @ 	requires name != null;
+	 @ 	ensures this.name = name;
+	 @*/
 	public Node(String name) {
 		this.name = name;
 	}
 
-	/*@ PLAIN
-	 requires name != null; 
-	 ensures \result == name; 
+	/*@ \final_method
+	 @ 	ensures \result == name; 
 	 @*/
 	public /*@pure@*/ String getName() {
 		return name;
 	}
 
-	/*@ EXPLICIT
-	 requires ob != null; 
-	 ensures \result ==> ob instanceof Edge
-	 	&& name.equals(((Node) ob).getName());
+	/*@ \final_method
+	 @ requires ob != null; 
+	 @ ensures \result ==> ob instanceof Edge
+	 @ 	&& name.equals(((Node) ob).getName());
 	 @*/
 	@Override
 	public /*@pure@*/ boolean equals(Object ob) {
@@ -28,18 +31,18 @@ public class Node implements Comparable<Node>{
 	}
 
 	
-	/*@ EXPLICIT
-	 requires name != null; 
-	 ensures \result == name; 
+	/*@ \final_method
+	 @ requires name != null; 
+	 @ ensures \result == name; 
 	 @*/
 	@Override
 	public /*@pure@*/ String toString() {
 		return name;
 	}
-	
-	/*@
-	 requires name != null;
-	 ensures \result > 17;
+	 
+	/*@ \final_method
+	 @ requires name != null;
+	 @ ensures \result > 17;
 	 @*/
 	@Override
 	public int hashCode() {

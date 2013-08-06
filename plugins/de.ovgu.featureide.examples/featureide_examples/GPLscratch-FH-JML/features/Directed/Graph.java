@@ -9,9 +9,9 @@ public class Graph {
 	private Collection<Node> nodes;
 	private Collection<Edge> edges;
 	
-	/*@ TODO
-	 requires nodes != null && edges != null && from != null;
-	 ensures (\forall int i; 0 <= i && < \result.size(); edges.get(i).connects(from, to));
+	/*@ \final_method
+	 @ requires nodes != null && edges != null && from != null;
+	 @ ensures (\forall int i; 0 <= i && i < \result.size(); edges.get(i).connects(from, to));
 	 @*/
 	public /*@pure@*/ List<Node> getDestinations(Node from) {
 		List<Node> destinations = new ArrayList<Node>();

@@ -10,9 +10,8 @@ public class Graph {
 	private Collection<Edge> edges;
 	
 	// compute transitive closure to test if there is an edge
-	/*@ PLAIN
-	 requires nodes != null && edges != null && source != null && target != null;
-	 ensures \result ==> TODO
+	/*@ \final_method
+	 @ requires nodes != null && edges != null && source != null && target != null;
 	 @*/
 	public /*@pure@*/ boolean hasConnection(Node source, Node target) {
 		Graph transitiveClosure = new Graph();
@@ -33,10 +32,10 @@ public class Graph {
 		return transitiveClosure.hasConnectingEdge(source, target) ? true : false;
 	}
 	
-	/*@ PLAIN
-	 requires connection != null && source != null && target != null;
-	 ensures \result ==> (\forall int i; 0 <= i && i < connection.size() -1); 
-	 	hasConnection(connection.get(i), connection.get(i+1));
+	/*@ \final_method
+	 @ requires connection != null && source != null && target != null;
+	 @ ensures \result ==> (\forall int i; 0 <= i && i < connection.size() -1; 
+	 @ 	hasConnection(connection.get(i), connection.get(i+1)));
 	 @*/
 	public /*@pure@*/ boolean isConnection(ArrayList<Node> connection,Node source, Node target ){
 		for(int i = 0; i < connection.size()-1; i++) {
@@ -48,18 +47,17 @@ public class Graph {
 	
 	// BFS oder DFS abhängig deren auswahl -> Shortest PATH als Verfeinerung
 	// DO DFS -> Memory efficient but not optimalSolution
-	/*@ PLAIN
-	 	requires source != null && target != null;
-	 	ensures hasConnection(source, target) ==> isConnection(\result, source, target);
+	/*@ \final_contract
+	 @ 	requires source != null && target != null;
+	 @ 	ensures hasConnection(source, target) ==> isConnection(\result, source, target);
 	 @*/
 	public ArrayList<Node> getConnection(Node source, Node target) {
 		setNodesUnvisited();
 		return doDFS(new ArrayList<Node>(), source, target);
 	}
 	
-	/*@
-	 requires path != null && source != null && target != null;
-	 ensures TODO;
+	/*@ \final_method
+	 @ requires path != null && source != null && target != null;
 	 @*/
 	private ArrayList<Node> doDFS(ArrayList<Node> path, Node source, Node target) {
 		source.setVisited(true);
@@ -76,10 +74,10 @@ public class Graph {
 		return null;
 	}
 	
-	/*@ EXPLICIT
-	 requires nodes != null;
-	 ensures (\forall int i; 0 <= i && i < nodes.size()); 
-	 	nodes.get(i).visible = false);
+	/*@  \final_method
+	 @ requires nodes != null;
+	 @ ensures (\forall int i; 0 <= i && i < nodes.size(); 
+	 @ 	nodes.get(i).visible = false);
 	 @*/
 	private void setNodesUnvisited() {
 		for (Node n : nodes) {

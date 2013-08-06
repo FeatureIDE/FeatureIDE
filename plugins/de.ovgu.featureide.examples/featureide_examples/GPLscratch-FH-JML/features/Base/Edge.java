@@ -1,27 +1,27 @@
-/**
- * TODO description
- */
 public class Edge implements Comparable<Edge>{
-	private Node first, second;
+	/*@ \conjunctive_contract
+	  @ requires ob != null;
+	  @ ensures \result ==> ob instanceof Edge;
+	  @*/
+	@Override
+	public /*@pure@*/ boolean equals(Object ob) {
+		return (ob instanceof Edge) ? true : false;
+	}
+	
+	private Node first;
+	private Node second;
 
 	public Edge(Node first, Node second) {
 		this.first = first;
 		this.second = second;
 	}
 
-	/*@ CONUNCITVE
-	 requires ob != null;
-	 ensures \result ==> ob instanceof Edge;
-	 @*/
-//	@Override
-	public /*@pure@*/ boolean equals(Object ob) {
-		return (ob instanceof Edge) ? true : false;
-	}
 
-	/*@ EXPLICIT
-	 requires first != null && second != null;
+
+	/*@ \conjunctive_contract
+	  @ requires first != null && second != null;
 	 @*/
-//	@Override
+	@Override
 	public /*@pure@*/ String toString() {
 		return "Edge: ";
 	}

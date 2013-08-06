@@ -8,18 +8,18 @@ public class Graph {
 	private Collection<Edge> edges;
 	private final static Integer MAXEDGES = 10;
 	
-	/*@ EXPLICIT
-	 requires \original && MAXEDGES != null;
-	 ensures countEdges() < MAXEDGES ==> \original;
+	/*@ \final_method
+	 @ requires \original && MAXEDGES != null;
+	 @ ensures countEdges() < MAXEDGES ==> \original;
 	 @*/
 	public void addEdge(Edge edge) {
 		if(countEdges() < MAXEDGES)
 			original(edge);
 	}
 	
-	/*@ PLAIN
-	 requires edges != null:
-	 ensures \result == edges.size();
+	/*@ \final_method
+	 @ requires edges != null;
+	 @ ensures \result == edges.size();
 	 @*/
 	private /*@pure@*/ int countEdges() {
 		return edges.size();

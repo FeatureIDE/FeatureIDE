@@ -14,24 +14,24 @@ public class Graph {
 		edges = new ArrayList<Edge>();
 	}
 
-	/*@ EXPLICIT
-	 requires edge!= null && nodes.contains(edge.first) && nodes.contains(edge.second);
-	 ensures hasEdge(edge);
+	/*@
+	 @ requires edge != null && nodes.contains(edge.first) && nodes.contains(edge.second);
+	 @ ensures hasEdge(edge);
 	 @*/
 	public void addEdge(Edge edge) {
 		edges.add(edge);
 	}
 
-	/*@ EXPLICIT
-	 requires node != null;
-	 ensures nodes.contains(node);
+	/*@ \final_method
+	 @ requires node != null;
+	 @ ensures nodes.contains(node);
 	 @*/
 	public void addNode(Node node) {
 		nodes.add(node);
 	}
 
-	/*@ EXPLICIT TODO
-	 requires nodes != null;
+	/*@ \final_method
+	 @ requires nodes != null;
 	 @*/
 	public void print() {
 		System.out.println("## NODES ##");
@@ -44,10 +44,12 @@ public class Graph {
 	}
 	
 	
-	/*@
-	 requires nodes != null && nodes instanceof List<Node>;
-	 ensures \result == (\forall int i; 0 <= i && i < nodes.size() -1;
-	  	nodes.toArray()[i].compareTo(nodes.toArray()[i+1]) = -1 );
+	/*@ \consecutive_contract
+	 @ requires nodes != null && nodes instanceof List<Node>;
+	 @ ensures \result ==> ((\forall int i; 0 <= i && i < nodes.size() -1;
+	 @ 	nodes.toArray()[i].compareTo(nodes.toArray()[i+1]) = -1 )
+	 @ || (\forall int i; 0 <= i && i < nodes.size() -1;
+	 @ 	nodes.toArray()[i].compareTo(nodes.toArray()[i+1]) = 0 ));
 	 @*/
 	public Collection<Node> sortNodes(Collection<Node> nodes) {
 		List<Node> list = new ArrayList<Node>(nodes);
@@ -55,10 +57,10 @@ public class Graph {
 		return list;
 	}
 	
-	/*@
-	 requires edges != null && edges instanceof List<Edge>;
-	 ensures \result == (\forall int i; 0 <= i && i < edges.size() -1;
-	  	edges.toArray()[i].compareTo(edges.toArray()[i+1]) = -1 );
+	/*@ \consecutive_contract
+	 @ requires edges != null && edges instanceof List<Edge>;
+	 @ ensures \result == (\forall int i; 0 <= i && i < edges.size() -1;
+	 @ 	edges.toArray()[i].compareTo(edges.toArray()[i+1]) = -1 );
 	 @*/
 	public Collection<Edge> sortEdges(Collection<Edge> edges) {
 		List<Edge> list = new ArrayList<Edge>(edges);
@@ -66,9 +68,9 @@ public class Graph {
 		return list;
 	}
 
-	/*@ PLAIN
-	 requires edge != null && edges != null;
-	 ensures \result == (\exists int i; 0 <= i && i < edges.size); edges.get(i).equals(edge));
+	/*@ \final_method
+	 @ requires edge != null && edges != null;
+	 @ ensures \result == (\exists int i; 0 <= i && i < edges.size(); edges.get(i).equals(edge));
 	 @*/
 	public /*@pure@*/ boolean hasEdge(Edge edge) {
 		for(Edge e : edges) {
@@ -78,9 +80,9 @@ public class Graph {
 		return false;
 	}
 	
-	/*@ PLAIN
-	 requires from != null && to != null && edges != null
-	 ensures result == (\exist int i; 0 <= i && < edges.size; edges.get(i).connects(from, to));
+	/*@ \final_method
+	 @ requires from != null && to != null && edges != null;
+	 @ ensures \result == (\exists int i; 0 <= i && i < edges.size(); edges.get(i).connects(from, to));
 	 @*/
 	public /*@pure@*/ boolean hasConnectingEdge(Node from, Node to) {
 		for(Edge e : edges) {
@@ -90,16 +92,16 @@ public class Graph {
 		return false;
 	}
 	
-	/*@PLAIN
-	 	ensures \result = nodes;
+	/*@ \final_method
+	 @ 	ensures \result = nodes;
 	 @*/
 	public /*@pure@*/ Collection<Node> getNodes() {
 		return nodes;
 	}
 	
-	/*@PLAIN
- 		ensures \result = edges;
- 	@*/
+	/*@ \final_method
+ 	 @ ensures \result = edges;
+ 	 @*/
 	public /*@pure@*/ Collection<Edge> getEdges() {
 		return edges;
 	}

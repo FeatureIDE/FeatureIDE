@@ -9,17 +9,13 @@ import java.util.Queue;
  */
 public class Graph {
 
-	/*@ PLAIN
-	 
-	 @*/
 	public ArrayList<Node> getConnection(Node source, Node target) {
 		setNodesUnvisited();
 		return doBFS(new ArrayList<Node>(), source, target);
 	}
 	
-	/*@
-	 requires path != null && source != null && target != null;
-	 ensures TODO;
+	/*@ \final_method
+	 @ requires path != null && source != null && target != null;
 	 @*/
 	// TODO Zeichen Zusätzlich den den Baum/ Bugfix 
 	private ArrayList<Node> doBFS(ArrayList<Node> path, Node source, Node target) {
@@ -45,9 +41,9 @@ public class Graph {
 		return path;
 	}
 	
-	/*@
-	 requires path != null && n != null;
-	 ensures path.contains(n);
+	/*@ \final_method
+	 @ requires path != null && n != null;
+	 @ ensures path.contains(n);
 	 @*/
 	private ArrayList<Node> traverseBackwards(ArrayList<Node> path, Node n){
 		path.add(n);
