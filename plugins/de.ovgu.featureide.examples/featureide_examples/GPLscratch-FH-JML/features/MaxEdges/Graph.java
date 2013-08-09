@@ -6,11 +6,11 @@ import java.util.List;
  */
 public class Graph {
 	private Collection<Edge> edges;
-	private final static Integer MAXEDGES = 10;
+	private static Integer MAXEDGES = new Integer(10);
 	
 	/*@ \final_method
 	 @ requires \original && MAXEDGES != null;
-	 @ ensures countEdges() < MAXEDGES ==> \original;
+	 @ ensures \old(countEdges()) < MAXEDGES ==> \original;
 	 @*/
 	public void addEdge(Edge edge) {
 		if(countEdges() < MAXEDGES)
