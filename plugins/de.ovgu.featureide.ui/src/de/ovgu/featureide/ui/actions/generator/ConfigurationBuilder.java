@@ -607,16 +607,19 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		}
 		
 		monitor.setTaskName(getTaskName());
-		children.clear(); 
-		for (String feature : selected.split("[ ]")) {
-			children.add(new Literal(feature, true));
-		}
-		try {
-			if (!(new SatSolver(new And(rootNode.clone(), new And(children)), 1000)).isSatisfiable()) {
-				return;
+		
+		if (featureModel.getConstraintCount() > 0) {
+			children.clear(); 
+			for (String feature : selected.split("[ ]")) {
+				children.add(new Literal(feature, true));
 			}
-		} catch (org.sat4j.specs.TimeoutException e) {
-			UIPlugin.getDefault().logError(e);
+			try {
+				if (!(new SatSolver(new And(rootNode.clone(), new And(children)), 1000)).isSatisfiable()) {
+					return;
+				}
+			} catch (org.sat4j.specs.TimeoutException e) {
+				UIPlugin.getDefault().logError(e);
+			}
 		}
 		
 		if (selectedFeatures2.isEmpty()) {
