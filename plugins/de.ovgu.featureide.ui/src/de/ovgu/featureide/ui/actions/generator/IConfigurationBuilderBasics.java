@@ -46,7 +46,7 @@ public interface IConfigurationBuilderBasics {
 	final static String MESSAGE_TITLE_CURRENT = "Build all current configurations";
 	final static String MESSAGE_TITLE_T = "Build T-Wise configurations";
 	final static String MESSAGE_CURRENT = "Builds all current configurations";
-	final static String MESSAGE_START = "This could take a long time.\nThe current algorithm is inefficient, if your model contains many constraints.\n";
+	final static String MESSAGE_START = "Build all valid program variants.";
 	final static String TOGGLE_MESSAGE = "Create a new project for each variant";
 	
 	/** Saves the toggle state whether new projects should be generated for each configuration. **/

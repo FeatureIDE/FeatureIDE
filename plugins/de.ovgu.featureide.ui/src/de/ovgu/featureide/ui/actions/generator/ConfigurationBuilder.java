@@ -51,6 +51,10 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.core.JavaProject;
 import org.eclipse.ui.internal.util.BundleUtility;
+import org.prop4j.And;
+import org.prop4j.Literal;
+import org.prop4j.Node;
+import org.prop4j.SatSolver;
 
 import splar.core.fm.FeatureModelException;
 import de.ovgu.featureide.core.CorePlugin;
@@ -60,6 +64,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.Selection;
+import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
@@ -165,6 +170,8 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	LinkedList<BuilderConfiguration> configurations = new LinkedList<BuilderConfiguration>();
 	private String algorithm;
 	private int t = 1;
+	private Node rootNode;
+	private LinkedList<Node> children;
 
 	
 	/**
@@ -244,10 +251,10 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		String jobName = "";
 		switch (buildType) {
 		case ALL_CURRENT:
-			jobName = JOB_TITLE;
+			jobName = JOB_TITLE_CURRENT;
 			break;
 		case ALL_VALID:
-			jobName = JOB_TITLE_CURRENT;
+			jobName = JOB_TITLE;
 			break;
 		case T_WISE:
 			jobName = JOB_TITLE_T_WISE;
@@ -576,12 +583,11 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	private void buildAll(Feature root, IProgressMonitor monitor) {
 		LinkedList<Feature> selectedFeatures2 = new LinkedList<Feature>();
 		selectedFeatures2.add(root);
+		rootNode = NodeCreator.createNodes(featureModel, false).toCNF();
+		children = new LinkedList<Node>();
 		build(root, "", selectedFeatures2, monitor);
 	}
 
-	/*
-	 * TODO @Jens add partial checks 
-	 */
 	private void build(Feature currentFeature, String selected, LinkedList<Feature> selectedFeatures2, IProgressMonitor monitor) {
 		if (monitor.isCanceled()) {
 			cancelGenerationJobs();
@@ -601,6 +607,17 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		}
 		
 		monitor.setTaskName(getTaskName());
+		children.clear(); 
+		for (String feature : selected.split("[ ]")) {
+			children.add(new Literal(feature, true));
+		}
+		try {
+			if (!(new SatSolver(new And(rootNode.clone(), new And(children)), 1000)).isSatisfiable()) {
+				return;
+			}
+		} catch (org.sat4j.specs.TimeoutException e) {
+			UIPlugin.getDefault().logError(e);
+		}
 		
 		if (selectedFeatures2.isEmpty()) {
 			if (reader.readFromString(selected)) {
