@@ -20,6 +20,7 @@ public  class  StringMatcher {
 	  @ ensures  \result <==> compare;
 	  @*/
 	public static boolean compare(String a, String b){
+	
 		//@ set compare=true;
 		return  true;
 	}

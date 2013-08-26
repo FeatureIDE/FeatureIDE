@@ -8,10 +8,12 @@ public class StringMatcherTest extends TestJPF {
 
 	
 	public void testCompare() {
-	//	if (verifyNoPropertyViolation()) {
-			 FeatureModel.length = true;
+		if (verifyNoPropertyViolation()) {
+			System.out.println("feature length");
+		 FeatureModel.length_ = true;
 			// @feature Length
 			String expected = "abc";
+			System.out.println("selection:\n "+FeatureModel.getSelection(true)+"\n----");
 			assertTrue(StringMatcher.compare("abc", expected));
 			assertTrue(StringMatcher.compare("abd", expected));
 			assertTrue(StringMatcher.compare("dab", expected));
@@ -19,13 +21,12 @@ public class StringMatcherTest extends TestJPF {
 			assertFalse(StringMatcher.compare("a", expected));
 			assertFalse(StringMatcher.compare("ab", expected));
 			assertFalse(StringMatcher.compare("", expected));
-			assertFalse(StringMatcher.compare(" ", expected));
 			assertFalse(StringMatcher.compare("d", expected));
 			assertFalse(StringMatcher.compare("abcd", expected));
 			assertFalse(StringMatcher.compare("ad", expected));
 			assertFalse(StringMatcher.compare("dabc", expected));
 			assertFalse(StringMatcher.compare("da", expected));
-
-	//	}
+			System.out.println(FeatureModel.getSelection(true));
+		}
 	}
 }

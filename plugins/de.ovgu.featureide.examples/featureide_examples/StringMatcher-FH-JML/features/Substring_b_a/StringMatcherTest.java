@@ -6,11 +6,12 @@ public class StringMatcherTest extends TestJPF {
 
 	
 	public void testCompare() {
+		System.out.println("feature substring b a");
 //		if (verifyNoPropertyViolation()) {
-			 FeatureModel.substring_b_a = true;
+//	 FeatureModel.substring_b_a_ = true;
 			// @feature Substring_b_a
 			String expected = "abc";
-
+			System.out.println("selection:\n "+FeatureModel.getSelection(true)+"\n----");
 			assertTrue(StringMatcher.compare(expected, "a"));
 			assertTrue(StringMatcher.compare(expected, "ab"));
 			assertTrue(StringMatcher.compare(expected, "abc"));
@@ -23,7 +24,6 @@ public class StringMatcherTest extends TestJPF {
 			assertFalse(StringMatcher.compare(expected, "dabc"));
 			assertFalse(StringMatcher.compare(expected, "dab"));
 			assertFalse(StringMatcher.compare(expected, "da"));
-
 	//	}
 	}
 }

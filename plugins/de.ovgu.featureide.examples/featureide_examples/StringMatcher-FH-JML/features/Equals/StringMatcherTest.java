@@ -9,9 +9,11 @@ public class StringMatcherTest extends TestJPF {
 	
 	public void testCompare() {
 	//	if (verifyNoPropertyViolation()) {
-			 FeatureModel.equals = true;
+		System.out.println("feature equals");
+	//		 FeatureModel.equals_ = true;
 			// @feature Equals
 			String expected = "abc";
+			System.out.println("selection:\n "+FeatureModel.getSelection(true)+"\n----");
 			assertTrue(StringMatcher.compare("abc", expected));
 			assertFalse(StringMatcher.compare("a", expected));
 			assertFalse(StringMatcher.compare("b", expected));

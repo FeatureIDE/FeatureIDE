@@ -3,7 +3,7 @@
 		<struct>
 			<and mandatory="true" name="StringMatcher">
 				<feature hidden="true" name="Contains"/>
-				<and name="Comparison">
+				<and mandatory="true" name="Comparison">
 					<feature name="Length"/>
 					<and name="Substring_a_b">
 						<feature name="Prefix_a_b"/>
@@ -45,6 +45,14 @@
 						<var>Substring_b_a</var>
 					</disj>
 				</eq>
+			</rule>
+			<rule>
+				<imp>
+					<var>Substring_a_b</var>
+					<not>
+						<var>Substring_b_a</var>
+					</not>
+				</imp>
 			</rule>
 		</constraints>
 		<comments/>

@@ -8,11 +8,12 @@ public  class StringMatcherTest   extends TestJPF {
 
 	
 	public void testCompare() {
+		System.out.println("feature substring a b");
 	//if (verifyNoPropertyViolation()) {
-	FeatureModel.substring_a_b = true;
+//	FeatureModel.substring_a_b_ = true;
 		//@feature Substring_a_b
 			String expected ="abc";
-			
+			System.out.println("selection:\n "+FeatureModel.getSelection(true)+"\n----");
 			assertTrue(StringMatcher.compare("a", expected));
 			assertTrue(StringMatcher.compare("ab", expected));
 			assertTrue(StringMatcher.compare("abc", expected));
