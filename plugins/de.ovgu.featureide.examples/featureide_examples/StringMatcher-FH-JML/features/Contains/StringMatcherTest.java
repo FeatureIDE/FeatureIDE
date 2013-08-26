@@ -2,13 +2,18 @@ import org.junit.Test;
 //import gov.nasa.jpf.util.test.TestJPF;
 import static org.junit.Assert.*;
 
-public  class StringMatcherTest {
-
+public  class StringMatcherTest extends TestJPF{
 	@Test
+	public void accountMC() {
+		if (verifyNoPropertyViolation()) {
+			testCompare();
+		}
+	}
+	
 	public void testContains() {
-	//	if (verifyNoPropertyViolation()) {
-//			FeatureModel.prefix_a_b_ = true;
-		//@Featre Contains
+	//if (verifyNoPropertyViolation()) {
+		FeatureModel.contains = true;
+		//@ Featre Contains
 			String expected ="abc";
 			
 			assertTrue(StringMatcher.contains(expected,"a"));
@@ -27,8 +32,8 @@ public  class StringMatcherTest {
 			
 			
 //				System.out.println(FeatureModel.getSelection(true));
-			}
+	//		}
 		}
-	//}
+	}
 	
 

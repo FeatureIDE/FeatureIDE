@@ -1,3 +1,5 @@
+import org.junit.Test;
+
 public  class  StringMatcher {
 
 	//@public ghost boolean compare;
@@ -11,6 +13,8 @@ public  class  StringMatcher {
 		return compare(input,text);
 	}
 
+
+	
 	/*@
 	  @ requires a != null && b != null; 
 	  @ ensures  \result <==> compare;

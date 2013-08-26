@@ -1,13 +1,15 @@
+import gov.nasa.jpf.util.test.TestJPF;
+
 import org.junit.Test;
 //import gov.nasa.jpf.util.test.TestJPF;
 import static org.junit.Assert.*;
 
-public  class StringMatcherTest {
+public  class StringMatcherTest   extends TestJPF {
 
-	@Test
+	
 	public void testCompare() {
-	//	if (verifyNoPropertyViolation()) {
-//			FeatureModel.prefix_a_b_ = true;
+	//if (verifyNoPropertyViolation()) {
+	FeatureModel.substring_a_b = true;
 		//@feature Substring_a_b
 			String expected ="abc";
 			
@@ -25,5 +27,5 @@ public  class StringMatcherTest {
 			assertFalse(StringMatcher.compare("da", expected));
 
 			
-}
-}
+//}
+}}
