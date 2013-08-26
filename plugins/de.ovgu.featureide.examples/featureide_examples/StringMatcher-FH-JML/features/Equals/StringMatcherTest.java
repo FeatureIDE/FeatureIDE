@@ -14,6 +14,7 @@ public class StringMatcherTest extends TestJPF {
 			// @feature Equals
 			String expected = "abc";
 			System.out.println("selection:\n "+FeatureModel.getSelection(true)+"\n----");
+			System.out.println("valid: "+ FeatureModel.valid());
 			assertTrue(StringMatcher.compare("abc", expected));
 			assertFalse(StringMatcher.compare("a", expected));
 			assertFalse(StringMatcher.compare("b", expected));

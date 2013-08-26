@@ -10,10 +10,12 @@ public class StringMatcherTest extends TestJPF {
 	public void testCompare() {
 		System.out.println("feature prefix b a");
 	//	if (verifyNoPropertyViolation()) {
-		//	 FeatureModel.prefix_b_a_ = true;
+			 FeatureModel.prefix_b_a_ = true;
+		 
 			// @feature Prefix_b_a
 			String expected = "abc";
 			System.out.println("selection:\n "+FeatureModel.getSelection(true)+"\n----");
+			System.out.println("valid: "+ FeatureModel.valid());
 			assertTrue(StringMatcher.compare(expected, "a"));
 			assertTrue(StringMatcher.compare(expected, "ab"));
 			assertTrue(StringMatcher.compare(expected, "abc"));

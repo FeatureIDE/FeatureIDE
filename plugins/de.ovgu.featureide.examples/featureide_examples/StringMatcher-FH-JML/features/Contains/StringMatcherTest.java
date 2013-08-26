@@ -6,20 +6,20 @@ public  class StringMatcherTest extends TestJPF{
 	@Test
 	public void accountMC() {
 		if (verifyNoPropertyViolation()) {
-		FeatureModel.comparison_ =  Verify.getBoolean();
-		FeatureModel.contains_ =  Verify.getBoolean();
-		FeatureModel.equals_ = Verify.getBoolean();
-		FeatureModel.length_ =  Verify.getBoolean();
-		FeatureModel.prefix_a_b_ =  Verify.getBoolean();
-		FeatureModel.prefix_b_a_ =  Verify.getBoolean();
-		FeatureModel.stringmatcher_ = Verify.getBoolean();
-		FeatureModel.substring_a_b_ = Verify.getBoolean();
-		FeatureModel.substring_b_a_ =  Verify.getBoolean();
-		
-			
-		
-		if(FeatureModel.valid())testCompare();
+//		FeatureModel.comparison_ =  Verify.getBoolean();
+//		FeatureModel.contains_ =  Verify.getBoolean();
+//		FeatureModel.equals_ = Verify.getBoolean();
+//		FeatureModel.length_ =  Verify.getBoolean();
+//		FeatureModel.prefix_a_b_ =  Verify.getBoolean();
+//		FeatureModel.prefix_b_a_ =  Verify.getBoolean();
+//		FeatureModel.stringmatcher_ = Verify.getBoolean();
+//		FeatureModel.substring_a_b_ = Verify.getBoolean();
+//		FeatureModel.substring_b_a_ =  Verify.getBoolean();
+//		if(FeatureModel.valid())testCompare();
+		FeatureModel.valid();
+		testCompare();
 		}
+		
 	}
 	
 	public void testContains() {
@@ -28,6 +28,7 @@ public  class StringMatcherTest extends TestJPF{
 		//@ Featre Contains
 			String expected ="abc";
 			System.out.println("selection:\n "+FeatureModel.getSelection(true)+"\n----");
+			System.out.println("valid: "+ FeatureModel.valid());
 			assertTrue(StringMatcher.contains(expected,"a"));
 			assertTrue(StringMatcher.contains(expected,"b"));
 			assertTrue(StringMatcher.contains(expected,"c"));
@@ -42,8 +43,7 @@ public  class StringMatcherTest extends TestJPF{
 			assertFalse(StringMatcher.contains(expected,"cd"));
 			assertFalse(StringMatcher.contains(expected,"dabc"));
 			
-			
-			System.out.println(FeatureModel.getSelection(true));
+		
 	//		}
 		}
 	}
