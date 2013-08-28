@@ -1,6 +1,6 @@
 public aspect Hello {
-
-	before(): call(void Main.print()) {
+	
+	after(): call(void Main.print()) {
 		System.out.print("Hello");
 	}
 
