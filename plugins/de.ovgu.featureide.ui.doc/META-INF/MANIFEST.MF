@@ -5,8 +5,7 @@ Bundle-SymbolicName: de.ovgu.featureide.ui.doc;singleton:=true
 Bundle-Version: 2.6.5.qualifier
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.eclipse.ui.cheatsheets,
- org.eclipse.ui.intro
+ org.eclipse.ui.cheatsheets
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: University of Magdeburg
 Import-Package: org.eclipse.platform.internal,
