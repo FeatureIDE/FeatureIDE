@@ -20,11 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.configuration;
 
-import org.eclipse.jface.viewers.ColumnLabelProvider;
-import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.graphics.Image;
 
 import de.ovgu.featureide.fm.core.configuration.Configuration;
@@ -85,14 +81,5 @@ public class AdvancedConfigurationLabelProvider extends LabelProvider implements
 //		IMAGE_ADESELECTED.dispose();
 		super.dispose();
 	}
-	
-	public String getToolTipText(Object element) 
-	{
-		if (element instanceof SelectableFeature) 
-		{
-			SelectableFeature feature = (SelectableFeature) element;
-			return feature.getFeature().getDescription() + feature.getFeature().getRelevantConstraints();
-		}
-		return "";
-	}
+
 }

@@ -27,16 +27,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.viewers.CellLabelProvider;
-import org.eclipse.jface.viewers.ColumnLabelProvider;
-import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ITreeSelection;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.ViewerCell;
-import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -92,12 +86,11 @@ public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 			}
 		}
 	};
-	
+
 	@Override
 	public void createPartControl(Composite parent) {
 		viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		viewer.addDoubleClickListener(listener);
-				
 		viewer.getTree().addKeyListener(new KeyListener() {
 
 			public void keyPressed(KeyEvent e) {
@@ -120,7 +113,7 @@ public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 		viewer.setContentProvider(new ConfigurationContentProvider());
 		viewer.setLabelProvider(new AdvancedConfigurationLabelProvider());
 		viewer.setInput(null);
-		viewer.expandAll();		
+		viewer.expandAll();
 	}
 
 	@Override
