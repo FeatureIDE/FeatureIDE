@@ -36,6 +36,7 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.prop4j.And;
 import org.prop4j.NodeWriter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -52,6 +53,8 @@ import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
  * @author Fabian Wielgorz
  */
 public class SXFMWriter extends AbstractFeatureModelWriter {
+	
+	private final static String[] symbols =  new String[] {"~", " and ", " or ", "", "", ", ", "", "", ""};
 	
 	/**
 	 * Creates a new writer and sets the feature model to write out.
@@ -195,19 +198,21 @@ public class SXFMWriter extends AbstractFeatureModelWriter {
 		// as before
 		int i = 1;
 		for (org.prop4j.Node node : featureModel.getPropositionalNodes()) {
-			String[] symbols =  new String[] {"~", " and ", " or ", 
-					" imp ", " biimp ", ", ", "choose", "atleast", "atmost"};
 			// avoid use of parenthesis from the beginning
-			String nodeString = NodeWriter.nodeToString(node.toCNF(), symbols, false);
-			// remove the external parenthesis
-			if ((nodeString.startsWith("(")) && (nodeString.endsWith(")"))) {
-				nodeString = nodeString.substring(1, nodeString.length() - 1);
+			And n = (And) node.clone().toCNF();
+			for (org.prop4j.Node child : ((And) n).getChildren()) {
+				String nodeString = NodeWriter.nodeToString(child, symbols, false);
+				// remove the external parenthesis
+				if ((nodeString.startsWith("(")) && (nodeString.endsWith(")"))) {
+					nodeString = nodeString.substring(1, nodeString.length() - 1);
+				}
+				// replace the space before a variable
+				nodeString = nodeString.replace("~ ","~");
+				newNode = doc.createTextNode("C" + i + ":" + nodeString + "\n");			
+				propConstr.appendChild(newNode);
+				i++;
 			}
-			// replace the space before a variable
-			nodeString = nodeString.replace("~ ","~");
-			newNode = doc.createTextNode("C" + i + ":" + nodeString + "\n");			
-			propConstr.appendChild(newNode);
-			i++;
+			
 		}
 	}
     

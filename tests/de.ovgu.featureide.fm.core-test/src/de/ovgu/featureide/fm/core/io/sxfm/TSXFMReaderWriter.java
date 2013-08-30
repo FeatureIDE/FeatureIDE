@@ -74,6 +74,17 @@ public class TSXFMReaderWriter extends TAbstractFeatureModelReaderWriter{
 	@Test
 	public void testPropNodes() {
 		for (Node n : newFm.getPropositionalNodes()) {
+			if (n instanceof Literal) {
+				// case: feature
+				continue;
+			}
+			if (n instanceof Not) {
+				// case: ~feature
+				if (n.getChildren().length == 1 && n.getChildren()[0] instanceof Literal) {
+					continue;
+				}
+			}
+			// case: feature1 or feature2 or feature3 ...
 			assertTrue(n + " is no Or Node",n instanceof Or);
 			isCnf(n);
 		}
