@@ -28,6 +28,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -97,6 +101,15 @@ public class ConfigurationPage extends ConfigurationEditorPage {
 	@Override
 	public void createPartControl(Composite parent) {		
 		tree = new Tree(parent, SWT.BORDER | SWT.CHECK);
+		
+		configurationEditor.configuration.getFeatures().get(1).getFeature().setDescription("TAOPSDJK");
+		configurationEditor.configuration.getFeatures().get(0).getFeature().setDescription("TAOPSDJK");
+		configurationEditor.configuration.getFeatures().get(2).getFeature().setDescription("TAOPSDJK");
+		
+		
+		TreeViewer TV = new TreeViewer(tree);	//
+		createTooltip(TV);						//
+		
 		tree.addSelectionListener(new SelectionListener() {
 
 			@Override
@@ -135,6 +148,57 @@ public class ConfigurationPage extends ConfigurationEditorPage {
 			}
 		});
 	}
+	
+	
+	//******************\\
+	public void createTooltip (TreeViewer viewer) {
+		
+		
+		ColumnViewerToolTipSupport.enableFor(viewer); 
+		
+		viewer.setLabelProvider(new /*CellLabelProvider*/ColumnLabelProvider() {
+			/*@Override
+			  public void update(ViewerCell cell) {
+				  System.out.println("AAAA");
+				  //cell.setText(getText(cell.getElement()));
+				  //cell.setImage(getImage(cell.getElement()));
+				  cell.setText(getID());
+			  }*/
+
+			  @Override
+			  public String getToolTipText(Object element) {
+			    //return "Tooltip (" + element + ")";
+				//  configurationEditor.configuration.getFeatures().get(0).getFeature().setDescription("TAOPSDJK");
+				//  return "HIER: " + configurationEditor.configuration.getFeatures().get(0).getFeature().getDescription();
+				  
+				  //System.out.println(element.getClass());
+				  
+				  if (element instanceof SelectableFeature || element instanceof Feature || element instanceof Tree || element instanceof TreeViewer || element instanceof TreeItem) 
+				  //if (element instanceof SelectableFeature == false)
+					{
+					    System.out.println("aba");
+					  
+						SelectableFeature feature = (SelectableFeature) element;
+						return feature.getFeature().getDescription() + " " + feature.getFeature().getRelevantConstraints();
+					}
+					return "";
+			  
+			  }
+
+			  @Override
+			  public int getToolTipDisplayDelayTime(Object object) {
+				  return 100; //msec
+			  }
+
+			  @Override
+			  public int getToolTipTimeDisplayed(Object object) {
+				  return 5000; //msec
+			  }
+		});		
+	}
+	//******************\\
+	
+	
 
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
