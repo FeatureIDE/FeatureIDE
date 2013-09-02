@@ -24,27 +24,55 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
 
+import org.junit.Test;
+
+import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.featurehouse.meta.featuremodel.FeatureModelClassGenerator;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 
 /**
- * TODO description
+ * Test for {@link FeatureModelClassGenerator}.
  * 
  * @author Jens Meinicke
  */
 public class FeatureModelClassGeneratorTest {
 
-//	@Test
+	@Test
 	public void testMetaJPF() {
 		FeatureModel model = init("model.xml");
-		System.out.println(new FeatureModelClassGenerator(model, false).getStringBuilder());
+		System.out.println();
+		System.out.println("------------------------- Test JPF  ---------------------");
+		System.out.println();
+		new FeatureModelClassGenerator(model, IFeatureProject.META_MODEL_CHECKING);
+		System.out.println();
+		System.out.println("------------------------- Test JPF  ---------------------");
+		System.out.println();
 	}
 	
-//	@Test
+	@Test
 	public void testMetaKeY() {
+		System.out.println();
+		System.out.println("------------------------- Test KEY  ---------------------");
+		System.out.println();
 		FeatureModel model = init("model.xml");
-		System.out.println(new FeatureModelClassGenerator(model, true).getStringBuilder());
+		new FeatureModelClassGenerator(model, IFeatureProject.META_THEOREM_PROVING);
+		System.out.println();
+		System.out.println("------------------------- Test KEY  ---------------------");
+		System.out.println();
+	}
+	
+	@Test
+	public void testMetaBDD() {
+		System.out.println();
+		System.out.println("------------------------- Test BDD  ---------------------");
+		System.out.println();
+		FeatureModel model = init("model.xml");
+		new FeatureModelClassGenerator(model, IFeatureProject.META_MODEL_CHECKING_BDD_JAVA_JML);
+		System.out.println();
+		System.out.println("------------------------- Test BDD  ---------------------");
+		System.out.println();
 	}
 	
 	protected static File MODEL_FILE_FOLDER = getFolder();
