@@ -7,7 +7,7 @@ https://faracvs.cs.uni-magdeburg.de/projects/tthuem-FeatureIDE/report/6
 
 Here, is a list of high-level enhancements.
 
-Release 2.6.6 (August 2013) coming soon
+Release 2.6.6 (September 2013)
 * Family-based type checks of FeatureHouse projects fith fuji
 * T-wise product generation with splcatool
 
