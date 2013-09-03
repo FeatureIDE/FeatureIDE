@@ -19,7 +19,7 @@ public  class  StringMatcher {
 	  @ requires a != null && b != null; 
 	  @ ensures  \result <==> compare;
 	  @*/
-	public static boolean compare(String a, String b){
+	public boolean compare(String a, String b){
 	
 		//@ set compare=true;
 		return  true;
