@@ -107,8 +107,6 @@ public class CoreController {
 					// Typechef checks performed at least one analysis
 					if (typeChef.isFinish()) {
 						// get list of error logs
-//						Object[] logs;
-//						logs = typeChef.getLogs();
 						List<FileProxy> logs;
 						logs = typeChef.getFilesLog();
 						// returns the list to view

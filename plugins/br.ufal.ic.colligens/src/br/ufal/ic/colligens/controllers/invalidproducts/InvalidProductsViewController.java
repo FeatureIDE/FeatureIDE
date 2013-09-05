@@ -45,6 +45,9 @@ public class InvalidProductsViewController extends ViewController {
 	}
 
 	public void clear() {
+		if (treeViewer == null) {
+			return;
+		}
 		treeViewer.setInput(null);
 		treeViewer.refresh();
 	}

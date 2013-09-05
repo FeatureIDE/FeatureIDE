@@ -1,6 +1,6 @@
 package br.ufal.ic.colligens.util.metrics;
 
-import br.ufal.ic.colligens.core.PluginException;
+import br.ufal.ic.colligens.controllers.core.PluginException;
 
 public class MetricsException extends PluginException {
 

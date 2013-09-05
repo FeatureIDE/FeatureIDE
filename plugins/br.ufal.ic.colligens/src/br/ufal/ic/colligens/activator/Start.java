@@ -14,8 +14,7 @@ public class Start {
 	 */
 	public void SystemClear() {
 		File file = new File(Colligens.getDefault().getConfigDir()
-				.getAbsolutePath()
-				+ File.separator + "projects");
+				.getAbsolutePath());
 		try {
 			delete(file);
 		} catch (IOException e) {

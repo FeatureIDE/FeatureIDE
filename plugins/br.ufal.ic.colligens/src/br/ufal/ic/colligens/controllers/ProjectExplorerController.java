@@ -40,6 +40,10 @@ public class ProjectExplorerController {
 		}
 	}
 
+	public void setSelection(IStructuredSelection selection) {
+		this.selection = selection;
+	}
+
 	public List<IResource> getList() {
 		return new LinkedList<IResource>(iResources);
 	}
@@ -68,11 +72,12 @@ public class ProjectExplorerController {
 	 * @throws ProjectExplorerException
 	 */
 	public List<IResource> start() throws ProjectExplorerException {
-		
+
 		iResources.clear();
-		
+
 		if (selection == null) {
-			throw new ProjectExplorerException("Select a valid file or directory.");
+			throw new ProjectExplorerException(
+					"Select a valid file or directory.");
 		}
 
 		List<IResource> iResources = new LinkedList<IResource>();
@@ -95,7 +100,8 @@ public class ProjectExplorerController {
 		}
 
 		if (iResources.isEmpty()) {
-			throw new ProjectExplorerException("Select a valid file or directory.");
+			throw new ProjectExplorerException(
+					"Select a valid file or directory.");
 		}
 
 		return iResources;
@@ -119,7 +125,7 @@ public class ProjectExplorerController {
 		List<String> resourcesAsString = new LinkedList<String>();
 		for (IResource resource : iResources) {
 			// adds .c and .h files only
-				resourcesAsString.add(resource.getLocation().toString());
+			resourcesAsString.add(resource.getLocation().toString());
 		}
 		return resourcesAsString;
 	}

@@ -115,7 +115,7 @@ public class Log {
 				BufferedReader parserFileRead = new BufferedReader(
 						new FileReader(parserFile));
 
-				for (int i = 1, k = line - 16; (parserFileRead.readLine() != null)
+				for (int i = 1, k = line - 1; (parserFileRead.readLine() != null)
 						&& (i < k); i++)
 					;
 
@@ -190,7 +190,7 @@ public class Log {
 					}
 				}
 
-				correctLine -= nextLineNumber - 15;
+				correctLine -= nextLineNumber;
 
 				parserFileRead.close();
 				fileReader.close();

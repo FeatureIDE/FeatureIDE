@@ -15,6 +15,7 @@ public class InvalidProductView extends ViewPart {
 	public InvalidProductView() {
 		controller = InvalidProductsViewController.getInstance();
 		controller.setView(this);
+		this.setTitleToolTip("Invalid Products - Colligens");
 	}
 
 	@Override

@@ -37,7 +37,7 @@ public class FileProxy {
 		}
 
 		if (!Colligens.getDefault().getPreferenceStore()
-				.getBoolean("GLOBAL_ANALYZE")) {
+				.getBoolean("USE_INCLUDES")) {
 			try {
 				generate();
 			} catch (IOException e) {
@@ -78,7 +78,7 @@ public class FileProxy {
 	 */
 	public String getFileToAnalyse() {
 		if (Colligens.getDefault().getPreferenceStore()
-				.getBoolean("GLOBAL_ANALYZE")) {
+				.getBoolean("USE_INCLUDES")) {
 			return getFileReal();
 		}
 		return Colligens.getDefault().getConfigDir().getAbsolutePath()
@@ -130,7 +130,7 @@ public class FileProxy {
 
 		in.close();
 		out.close();
-
+		
 		File tempFile = new File(getFileToAnalyse());
 
 		tempFile.deleteOnExit();
