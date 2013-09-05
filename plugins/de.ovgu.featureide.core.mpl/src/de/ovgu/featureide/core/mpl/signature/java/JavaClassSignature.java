@@ -33,13 +33,13 @@ public class JavaClassSignature extends AbstractClassSignature {
 		super(parent, name, modifiers, type, pckg);
 	}
 	
-	public JavaClassSignature(JavaClassSignature orgSig) {
-		this(orgSig, false);
-	}
-	
-	private JavaClassSignature(JavaClassSignature orgSig, boolean ext) {
-		super(orgSig, ext);
-	}
+//	public JavaClassSignature(JavaClassSignature orgSig) {
+//		this(orgSig, false);
+//	}
+//	
+//	private JavaClassSignature(JavaClassSignature orgSig, boolean ext) {
+//		super(orgSig, ext);
+//	}
 	
 	@Override
 	public String toString() {		
@@ -48,9 +48,11 @@ public class JavaClassSignature extends AbstractClassSignature {
 		sb.append(super.toString());
 		sb.append(LINE_SEPARATOR);
 		
-		if (!modifiers.isEmpty()) {
-			sb.append(modifiers);
-			sb.append(' ');
+		if (modifiers.length > 0) {
+			for (String modifier : modifiers) {
+				sb.append(modifier);
+				sb.append(' ');
+			}
 		}
 		sb.append(type);
 		sb.append(' ');
@@ -59,8 +61,8 @@ public class JavaClassSignature extends AbstractClassSignature {
 		return sb.toString();
 	}
 
-	@Override
-	public JavaClassSignature createExtendedSignature() {
-		return new JavaClassSignature(this, true);
-	}
+//	@Override
+//	public JavaClassSignature createExtendedSignature() {
+//		return new JavaClassSignature(this, true);
+//	}
 }

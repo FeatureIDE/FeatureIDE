@@ -36,13 +36,13 @@ public class JavaMethodSignature extends AbstractMethodSignature {
 		super(parent, name, modifier, type, parameterTypes, isConstructor);
 	}
 	
-	public JavaMethodSignature(JavaMethodSignature orgSig) {
-		super(orgSig, false);
-	}
-	
-	private JavaMethodSignature(JavaMethodSignature orgSig, boolean ext) {
-		super(orgSig, ext);
-	}
+//	public JavaMethodSignature(JavaMethodSignature orgSig) {
+//		super(orgSig, false);
+//	}
+//	
+//	private JavaMethodSignature(JavaMethodSignature orgSig, boolean ext) {
+//		super(orgSig, ext);
+//	}
 
 	@Override
 	public String toString() {
@@ -51,9 +51,11 @@ public class JavaMethodSignature extends AbstractMethodSignature {
 		methodString.append(super.toString());
 		methodString.append(LINE_SEPARATOR);
 		
-		if (!modifiers.isEmpty()) {
-			methodString.append(modifiers);
-			methodString.append(' ');
+		if (modifiers.length > 0) {
+			for (String modifier : modifiers) {
+				methodString.append(modifier);
+				methodString.append(' ');
+			}
 		}
 		
 		if (!isConstructor) {
@@ -74,8 +76,8 @@ public class JavaMethodSignature extends AbstractMethodSignature {
 		return methodString.toString();
 	}
 
-	@Override
-	public JavaMethodSignature createExtendedSignature() {
-		return new JavaMethodSignature(this, true);
-	}
+//	@Override
+//	public JavaMethodSignature createExtendedSignature() {
+//		return new JavaMethodSignature(this, true);
+//	}
 }

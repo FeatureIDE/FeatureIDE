@@ -23,8 +23,7 @@ package de.ovgu.featureide.core.mpl;
 import org.eclipse.core.resources.IProject;
 
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.mpl.io.JavaSignatureWriter;
-import de.ovgu.featureide.core.mpl.io.LocalFileLoader;
+import de.ovgu.featureide.core.mpl.io.FileLoader;
 import de.ovgu.featureide.core.mpl.signature.FeatureRoles;
 import de.ovgu.featureide.core.mpl.signature.RoleMap;
 import de.ovgu.featureide.core.mpl.signature.ViewTag;
@@ -49,6 +48,7 @@ public class JavaInterfaceProject {
 	private Configuration configuration;
 
 	private final FeatureModel featureModel;
+	private final IFeatureProject featureProject;
 	
 	public JavaInterfaceProject(IProject projectReference) {
 		this(projectReference, null);
@@ -56,16 +56,23 @@ public class JavaInterfaceProject {
 	
 	public JavaInterfaceProject(IProject projectReference, IFeatureProject featureProject) {
 		this.projectReference = projectReference;
-		featureModel = LocalFileLoader.loadFeatureModel(this);
-		if (featureProject == null) {
-			roleMap = LocalFileLoader.loadRoleMap(this);
-		} else {
-			roleMap = new JavaSignatureWriter(featureProject, this).writeSignatures();
-		}
+		this.featureProject = featureProject;
+		featureModel = FileLoader.loadFeatureModel(this);
+		refreshRoleMap();
 	}
 	
+	
+	// TODO FujiTest
 	public void refreshRoleMap() {
-		roleMap = LocalFileLoader.loadRoleMap(this);
+		if (featureProject == null) {
+			MPLPlugin.getDefault().logInfo("Try to load RoleMap from local files...");
+			roleMap = FileLoader.loadRoleMap(this);
+		} else {
+			// TODO FujiTest
+//			roleMap = new JavaSignatureWriter(featureProject, this).writeSignatures();
+			MPLPlugin.getDefault().logInfo("Try to load RoleMap from fuji...");
+			roleMap = FileLoader.fuijTest(this, featureProject);
+		}
 	}
 	
 	public RoleMap getRoleMap() {
@@ -90,7 +97,7 @@ public class JavaInterfaceProject {
 	
 	public Configuration getConfiguration() {
 		if (configuration == null) {
-			configuration = LocalFileLoader.loadConfiguration(this);
+			configuration = FileLoader.loadConfiguration(this);
 		}
 		return configuration;
 	}

@@ -34,13 +34,13 @@ public class JavaFieldSignature extends AbstractFieldSignature {
 		super(parent, name, modifiers, type);
 	}
 
-	public JavaFieldSignature(JavaFieldSignature orgSig) {
-		this(orgSig, false);
-	}
-	
-	private JavaFieldSignature(JavaFieldSignature orgSig, boolean ext) {
-		super(orgSig, ext);
-	}
+//	public JavaFieldSignature(JavaFieldSignature orgSig) {
+//		this(orgSig, false);
+//	}
+//	
+//	private JavaFieldSignature(JavaFieldSignature orgSig, boolean ext) {
+//		super(orgSig, ext);
+//	}
 
 	@Override
 	public String toString() {
@@ -49,9 +49,11 @@ public class JavaFieldSignature extends AbstractFieldSignature {
 		signature.append(super.toString());
 		signature.append(LINE_SEPARATOR);
 		
-		if (!modifiers.isEmpty()) {
-			signature.append(modifiers);
-			signature.append(' ');
+		if (modifiers.length > 0) {
+			for (String modifier : modifiers) {
+				signature.append(modifier);
+				signature.append(' ');
+			}
 		}
 		signature.append(type);
 		signature.append(' ');
@@ -60,8 +62,8 @@ public class JavaFieldSignature extends AbstractFieldSignature {
 		return signature.toString();
 	}
 
-	@Override
-	public JavaFieldSignature createExtendedSignature() {
-		return new JavaFieldSignature(this, true);
-	}
+//	@Override
+//	public JavaFieldSignature createExtendedSignature() {
+//		return new JavaFieldSignature(this, true);
+//	}
 }

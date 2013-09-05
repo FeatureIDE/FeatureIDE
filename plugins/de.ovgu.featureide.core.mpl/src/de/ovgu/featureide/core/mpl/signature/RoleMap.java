@@ -31,7 +31,7 @@ import de.ovgu.featureide.core.mpl.signature.abstr.AbstractFieldSignature;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractMethodSignature;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractRole;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature;
-import de.ovgu.featureide.core.mpl.signature.java.JavaClassCreator;
+import de.ovgu.featureide.core.mpl.signature.fuji.FujiClassCreator;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
@@ -133,7 +133,9 @@ public class RoleMap {
 	
 	public ProjectSignature generateSignature(List<String> featureList, ViewTag viewTag) {
 		ProjectSignature javaSig = new ProjectSignature(viewTag, false);
-		javaSig.setaClassCreator(new JavaClassCreator());
+		//TODO FujiTest
+//		javaSig.setaClassCreator(new JavaClassCreator());
+		javaSig.setaClassCreator(new FujiClassCreator());
 		
 		if (featureList == null) {
 			for (AbstractSignature sig : signatureSet.keySet()) {

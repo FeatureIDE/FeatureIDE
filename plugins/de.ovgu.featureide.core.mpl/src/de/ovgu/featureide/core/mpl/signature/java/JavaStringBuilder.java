@@ -81,7 +81,7 @@ public class JavaStringBuilder {
 				sb.append(member.toString().replace(LINE_SEPARATOR, LINE_SEPARATOR + '\t'));
 				if (member instanceof AbstractFieldSignature) {
 					AbstractFieldSignature field = (AbstractFieldSignature) member;
-					if (shortString || !field.getModifiers().contains("final")) {
+					if (shortString || !field.isFinal()) {
 						sb.append(';');
 					} else {
 						sb.append(getFinalFieldInit(field));

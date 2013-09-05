@@ -23,10 +23,10 @@ public class JavaRole extends AbstractRole {
 		return JavaStringBuilder.getClassString(this, true);
 	}
 
-	@Override
-	public JavaClass toClass() {
-		return new JavaClass(signature);
-	}
+//	@Override
+//	public JavaClass toClass() {
+//		return new JavaClass(signature);
+//	}
 
 	@Override
 	public JavaRole reduce(ViewTag viewTag) {

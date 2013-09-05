@@ -9,16 +9,16 @@ public abstract class AbstractMethodSignature extends AbstractSignature {
 	protected final boolean isConstructor;
 	
 	protected AbstractMethodSignature(AbstractClassSignature parent, String name, String modifier, String type, LinkedList<String> parameterTypes, boolean isConstructor) {
-		super(parent, name, modifier, type, null);
+		super(parent, name, modifier, type);
 		this.isConstructor = isConstructor;
 		this.parameterTypes = parameterTypes;
 	}
 	
-	protected AbstractMethodSignature(AbstractMethodSignature orgSig, boolean ext) {
-		super(orgSig, ext);
-		isConstructor = orgSig.isConstructor;
-		parameterTypes = new LinkedList<String>(orgSig.parameterTypes);
-	}
+//	protected AbstractMethodSignature(AbstractMethodSignature orgSig, boolean ext) {
+//		super(orgSig, ext);
+//		isConstructor = orgSig.isConstructor;
+//		parameterTypes = new LinkedList<String>(orgSig.parameterTypes);
+//	}
 
 	public LinkedList<String> getParameterTypes() {
 		return parameterTypes;

@@ -789,7 +789,7 @@ public class InterfaceWriter extends AbstractWriter {
 	}
 	
 	private void dublicateFeatureModel(IFolder folder) {		
-		FeatureModel fm = LocalFileLoader.loadFeatureModel(interfaceProject);
+		FeatureModel fm = FileLoader.loadFeatureModel(interfaceProject);
 		fm.clone();
 		Feature root = fm.getRoot();
 		

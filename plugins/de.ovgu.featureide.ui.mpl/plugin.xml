@@ -149,6 +149,7 @@
     <extension
          point="org.eclipse.ui.views">
       <view
+            allowMultiple="false"
             category="FeatureIDE"
             class="de.ovgu.featureide.ui.mpl.views.outline.CollOutline"
             icon="icons/FeatureIconSmall.ico"

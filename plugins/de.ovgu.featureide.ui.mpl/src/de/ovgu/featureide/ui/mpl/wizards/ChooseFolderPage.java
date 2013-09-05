@@ -40,14 +40,18 @@ public class ChooseFolderPage extends WizardPage {
 
 	private Text folderName;
 	private Label folderLabel;
-	
-	
-	private String folderNameString = null;
-	
+
+	private String folderNameString;
+
 	protected ChooseFolderPage() {
-		super("");
+		this("folder");
+	}
+
+	protected ChooseFolderPage(String defaultFolderName) {
+		super("Choose Folder");
 		setTitle("Choose Folder");
 		setDescription("Choose a Folder for Extended Modules");
+		this.folderNameString = defaultFolderName;
 	}
 
 	public void createControl(Composite parent) {
@@ -56,40 +60,40 @@ public class ChooseFolderPage extends WizardPage {
 		gridLayout.numColumns = 1;
 		container.setLayout(gridLayout);
 		setControl(container);
-		
+
 		GridLayout projGridLayout = new GridLayout();
 		projGridLayout.numColumns = 2;
-		
+
 		Group configGroup = new Group(container, SWT.NONE);
 		configGroup.setText("");
 		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.horizontalSpan = 2;
 		gridData.verticalSpan = 1;
-		
+
 		configGroup.setLayoutData(gridData);
 		configGroup.setLayout(projGridLayout);
-		
+
 		GridData gridData2 = new GridData(GridData.FILL_HORIZONTAL);
 		gridData2.horizontalSpan = 1;
 		gridData2.verticalSpan = 1;
-		
+
 		folderLabel = new Label(configGroup, 0);
 		folderLabel.setText("Name of Folder: ");
 		folderName = new Text(configGroup, SWT.BORDER | SWT.SINGLE);
-		folderName.setText("folder");
+		folderName.setText(folderNameString);
 		folderName.setLayoutData(gridData2);
 		addListeners();
 		dialogChanged();
 	}
-	
+
 	public String getFolderName() {
 		return folderNameString;
 	}
 
-	private void addListeners() {		
+	private void addListeners() {
 		folderName.addKeyListener(new KeyPressedListener());
 	}
-	
+
 	private class KeyPressedListener implements KeyListener {
 		@Override
 		public void keyPressed(KeyEvent e) {
@@ -109,7 +113,7 @@ public class ChooseFolderPage extends WizardPage {
 			updateStatus(null);
 		}
 	}
-	
+
 	protected void updateStatus(String message) {
 		setErrorMessage(message);
 		setPageComplete(message == null);

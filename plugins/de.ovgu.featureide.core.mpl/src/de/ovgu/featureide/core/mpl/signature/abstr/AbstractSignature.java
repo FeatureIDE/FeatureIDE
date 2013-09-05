@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.core.mpl.signature.abstr;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -41,18 +42,19 @@ public abstract class AbstractSignature {
 	protected final AbstractClassSignature parent;
 	
 	protected final String name;
-	protected final String modifiers;
+	protected final String[] modifiers;
 	protected final String type;
-	protected final boolean privateSignature;
+	protected final boolean privateSignature, finalSignature;
 	
 	protected String fullName;
 	
 	protected final boolean ext;
 	
 	protected LinkedList<ViewTag> viewTags;
-	protected HashSet<String> features = new HashSet<String>();
+	protected final HashSet<String> features = new HashSet<String>();
+	protected final HashSet<Integer> featureIDs = new HashSet<Integer>();
 	
-	protected AbstractSignature(AbstractClassSignature parent, String name, String modifiers, String type, LinkedList<ViewTag> viewTags) {
+	protected AbstractSignature(AbstractClassSignature parent, String name, String modifierString, String type) {
 		this.parent = parent;
 		this.name = name;
 		if (parent != null) {
@@ -60,16 +62,19 @@ public abstract class AbstractSignature {
 		} else {
 			this.fullName = '.' + name;
 		}
-		
-		this.viewTags = viewTags; 
+
+//		this.viewTags = viewTags; 
+		this.viewTags = null; 
 		this.ext = false;
 		
-		if (modifiers == null) {
-			this.modifiers = "";
+		if (modifierString == null) {
+			this.modifiers = new String[0];
 		} else {
-			this.modifiers = modifiers.trim();
+			this.modifiers = modifierString.trim().split(" ");
 		}
-		this.privateSignature = this.modifiers.contains("private");
+		Arrays.sort(this.modifiers);
+		this.privateSignature = Arrays.binarySearch(this.modifiers, "private") >= 0;
+		this.finalSignature = Arrays.binarySearch(this.modifiers, "final") >= 0;
 		if (type == null) {
 			this.type = "";
 		} else {
@@ -77,21 +82,24 @@ public abstract class AbstractSignature {
 		}
 	}
 	
-	protected AbstractSignature(AbstractSignature orgSig, boolean ext) {
-		parent = orgSig.parent;
-		fullName = orgSig.fullName;
-		name = orgSig.name;
-//				fullName.substring(fullName.lastIndexOf('.') + 1);
-		
-		viewTags = new LinkedList<ViewTag>(orgSig.viewTags); 
-		this.ext = orgSig.ext || ext;
-		
-		modifiers =  orgSig.modifiers;
-		privateSignature =  orgSig.privateSignature;
-		type =  orgSig.type;
-	}
+//	protected AbstractSignature(AbstractSignature orgSig, boolean ext) {
+//		parent = orgSig.parent;
+//		fullName = orgSig.fullName;
+//		name = orgSig.name;
+////				fullName.substring(fullName.lastIndexOf('.') + 1);
+//		
+//		viewTags = new LinkedList<ViewTag>(orgSig.viewTags); 
+//		this.ext = orgSig.ext || ext;
+//		
+//		modifiers = new String[orgSig.modifiers.length];
+//		System.arraycopy(orgSig.modifiers, 0, modifiers, 0, modifiers.length);
+//
+//		privateSignature =  orgSig.privateSignature;
+//		finalSignature =  orgSig.finalSignature;
+//		type =  orgSig.type;
+//	}
 	
-	public abstract AbstractSignature createExtendedSignature();
+//	public abstract AbstractSignature createExtendedSignature();
 	
 	protected void setFullName(String perfixName) {
 		this.fullName = perfixName + '.' + name;
@@ -156,7 +164,7 @@ public abstract class AbstractSignature {
 		return fullName;
 	}
 	
-	public String getModifiers() {
+	public String[] getModifiers() {
 		return modifiers;
 	}
 	
@@ -166,6 +174,10 @@ public abstract class AbstractSignature {
 	
 	public boolean isPrivate() {
 		return privateSignature;
+	}
+	
+	public boolean isFinal() {
+		return finalSignature;
 	}
 
 	public boolean isExt() {
@@ -178,6 +190,14 @@ public abstract class AbstractSignature {
 
 	public void addFeature(String feature) {
 		features.add(feature);
+	}
+	
+	public HashSet<Integer> getFeatureIDs() {
+		return featureIDs;
+	}
+
+	public void addFeatureID(int id) {
+		featureIDs.add(id);
 	}
 
 	@Override
@@ -192,7 +212,7 @@ public abstract class AbstractSignature {
 	protected void computeHashCode() {
 		hashCode = 1;
 		hashCode = hashCodePrime * hashCode + fullName.hashCode();
-		hashCode = hashCodePrime * hashCode + modifiers.hashCode();
+		hashCode = hashCodePrime * hashCode + Arrays.hashCode(modifiers);
 		hashCode = hashCodePrime * hashCode + type.hashCode();
 	}
 
@@ -209,7 +229,7 @@ public abstract class AbstractSignature {
 	protected boolean sigEquals(AbstractSignature otherSig) {
 		if (!type.equals(otherSig.type) 
 				|| !fullName.equals(otherSig.fullName) 
-				|| !modifiers.equals(otherSig.modifiers)) {
+				|| !Arrays.deepEquals(modifiers, otherSig.modifiers)) {
 			return false;
 		}
 		return true;

@@ -26,7 +26,7 @@ import de.ovgu.featureide.core.mpl.signature.abstr.AbstractRole;
 import de.ovgu.featureide.fm.core.Feature;
 
 /**
- * Contains the {@link JavaClassSignature}s for a feature.
+ * Contains the {@link FujiClassSignature}s for a feature.
  * 
  * @author Reimar Schroeter
  * @author Sebastian Krieter

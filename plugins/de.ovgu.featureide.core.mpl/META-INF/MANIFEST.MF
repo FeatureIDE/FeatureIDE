@@ -14,8 +14,12 @@ Require-Bundle: de.ovgu.featureide.core,
  org.eclipse.ui
 Bundle-Activator: de.ovgu.featureide.core.mpl.MPLPlugin
 Bundle-Vendor: University of Magdeburg
+Import-Package: org.eclipse.core.expressions,
+ org.eclipse.jdt.internal.core
 Export-Package: de.ovgu.featureide.core.mpl,
  de.ovgu.featureide.core.mpl.io.constants,
  de.ovgu.featureide.core.mpl.signature,
  de.ovgu.featureide.core.mpl.signature.abstr
 Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: lib/fuji.jar,
+ .

@@ -112,26 +112,27 @@ public class CollOutline extends ViewPart implements ICurrentBuildListener {
 	private IPartListener editorListener = new IPartListener() {
 
 		public void partOpened(IWorkbenchPart part) {
-			if (part instanceof IEditorPart)
+			if (part instanceof IEditorPart) {
 				setEditorActions(part);
+			}
 		}
 
 		public void partDeactivated(IWorkbenchPart part) {
-
 		}
 
 		public void partClosed(IWorkbenchPart part) {
-
 		}
 
 		public void partBroughtToTop(IWorkbenchPart part) {
-			if (part instanceof IEditorPart)
+			if (part instanceof IEditorPart) {
 				setEditorActions(part);
+			}
 		}
 
 		public void partActivated(IWorkbenchPart part) {
-			if (part instanceof IEditorPart || part instanceof ViewPart)
+			if (part instanceof IEditorPart || part instanceof ViewPart) {
 				setEditorActions(part);
+			}
 		}
 
 	};
@@ -223,7 +224,6 @@ public class CollOutline extends ViewPart implements ICurrentBuildListener {
 					}
 				}
 			}
-
 		}
 
 		// TODO refactor into FSTModel
@@ -332,7 +332,7 @@ public class CollOutline extends ViewPart implements ICurrentBuildListener {
 
 		IFeatureProject featureProject = CorePlugin.getFeatureProject(iFile2);
 		
-		if(featureProject ==  null || !MPLPlugin.getDefault().isInterfaceProject(iFile2.getProject()))
+		if(featureProject ==  null || MPLPlugin.getDefault().isInterfaceProject(iFile2.getProject()))
 			return;
 			
 		if (viewer != null) {
@@ -506,7 +506,7 @@ public class CollOutline extends ViewPart implements ICurrentBuildListener {
 		}
 	}
 
-	ProjectSignature l=  null;
+	ProjectSignature l = null;
 	String oldFeature = null;
 	//TODO
 	private void setForeground(TreeItem item) {
@@ -532,7 +532,8 @@ public class CollOutline extends ViewPart implements ICurrentBuildListener {
 		if (element instanceof FSTMethod) {
 			FSTClass cl =  element.getRole().getFSTClass();
 			if(cl instanceof FSTClass){
-				AbstractClassFragment frag = l.getClass(cl.getRoles().get(0).getPackage() + "." + cl.getName().replace(".java", ""));
+				String classID = cl.getRoles().get(0).getPackage() + "." + cl.getName().replace(".java", "");
+				AbstractClassFragment frag = l.getClass(classID);
 				for (AbstractSignature curSig : frag.getMembers()) {
 					if(curSig.getName().compareTo(element.getName()) == 0){
 						//TODO Parameter testen

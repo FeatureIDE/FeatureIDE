@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.core.mpl.signature.abstr;
 
+import java.util.Arrays;
 import java.util.HashSet;
 
 /**
@@ -35,7 +36,7 @@ public abstract class AbstractClassSignature extends AbstractSignature {
 		importList, extendList, implementList;
 	
 	protected AbstractClassSignature(AbstractClassSignature parent, String name, String modifiers, String type, String pckg) {
-		super(parent, name, modifiers, type, null);
+		super(parent, name, modifiers, type);
 		this.pckg = pckg == null ? "" : pckg;
 		if (parent == null) {
 			setFullName(this.pckg);
@@ -45,13 +46,13 @@ public abstract class AbstractClassSignature extends AbstractSignature {
 		implementList = new HashSet<String>();
 	}
 	
-	protected AbstractClassSignature(AbstractClassSignature orgSig, boolean ext) {
-		super(orgSig, ext);
-		pckg = orgSig.pckg;
-		importList = new HashSet<String>(orgSig.importList);
-		extendList = new HashSet<String>(orgSig.extendList);
-		implementList = new HashSet<String>(orgSig.implementList);
-	}
+//	protected AbstractClassSignature(AbstractClassSignature orgSig, boolean ext) {
+//		super(orgSig, ext);
+//		pckg = orgSig.pckg;
+//		importList = new HashSet<String>(orgSig.importList);
+//		extendList = new HashSet<String>(orgSig.extendList);
+//		implementList = new HashSet<String>(orgSig.implementList);
+//	}
 
 	public String getPackage() {
 		return pckg;
@@ -85,7 +86,11 @@ public abstract class AbstractClassSignature extends AbstractSignature {
 
 	@Override
 	protected void computeHashCode() {
-		super.computeHashCode();
+		hashCode = 1;
+		hashCode = hashCodePrime * hashCode + fullName.hashCode();
+		hashCode = hashCodePrime * hashCode + Arrays.hashCode(modifiers);
+		hashCode = hashCodePrime * hashCode + type.hashCode();
+		
 		hashCode *= hashCodePrime;
 		for (String extend : extendList) {
 			hashCode += extend.hashCode();

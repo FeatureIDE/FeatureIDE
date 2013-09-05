@@ -108,7 +108,6 @@ public class CollaborationOutlineTreeContentProvider implements
 		if (featureProject != null) {
 			if (model != null) {
 				//TODO alle Klassen
-				
 //				
 				String featureName = featureProject.getFeatureName((IFile) inputElement);	
 				

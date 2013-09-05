@@ -38,8 +38,10 @@ import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.Signature;
 import org.osgi.framework.BundleContext;
 
+import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.mpl.builder.InterfaceProjectNature;
+import de.ovgu.featureide.core.mpl.io.FileLoader;
 import de.ovgu.featureide.core.mpl.io.InterfaceWriter;
 import de.ovgu.featureide.core.mpl.io.JavaProjectWriter;
 import de.ovgu.featureide.core.mpl.io.JavaSignatureWriter;
@@ -93,7 +95,16 @@ public class MPLPlugin extends AbstractCorePlugin {
 	}
 	
 	private JavaInterfaceProject addProject(IProject project) {
-		JavaInterfaceProject interfaceProject = new JavaInterfaceProject(project);
+		JavaInterfaceProject interfaceProject = null;
+		for (IFeatureProject fp : CorePlugin.getFeatureProjects()) {
+			if (constructInterfaceProjectName(fp.getProjectName()).equals(project.getName())) {
+				interfaceProject = new JavaInterfaceProject(project, fp);
+				break;
+			}
+		}
+		if (interfaceProject == null) {
+			interfaceProject = new JavaInterfaceProject(project);
+		}
 		projectMap.put(project.getName(), interfaceProject);
 		return interfaceProject;
 	}
@@ -126,14 +137,17 @@ public class MPLPlugin extends AbstractCorePlugin {
 		}
 	}
 	
+	private static String constructInterfaceProjectName(String featureProjektName) {
+		return "_" + featureProjektName + "_Interfaces";
+	}
+	
 	public void setupMultiFeatureProject(Collection<IFeatureProject> featureProjects) {
-		for (IFeatureProject featureProject : featureProjects) {
-			String projectName = "_" + featureProject.getProjectName() + "_Interfaces";
+		for (IFeatureProject featureProject : featureProjects) {			
+			String projectName = constructInterfaceProjectName(featureProject.getProjectName());
 			
 			IProject newProject = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 			IProjectDescription description = ResourcesPlugin.getWorkspace().newProjectDescription(projectName);
-			description.setNatureIds(new String[]{InterfaceProjectNature.NATURE_ID});
-			
+			description.setNatureIds(new String[]{InterfaceProjectNature.NATURE_ID});			
 			try {
 				newProject.create(description, null);
 				newProject.open(null);
@@ -188,6 +202,8 @@ public class MPLPlugin extends AbstractCorePlugin {
 			interfaceProject.refreshRoleMap();
 			interfaceProject.setConfigLimit(configLimit);
 			interfaceProject.setFilterViewTag(viewName, viewLevel);
+			//TODO FujiTest
+			interfaceProject.clearFilterViewTag();
 			
 			switch (mode) {
 			case 0: 
@@ -281,7 +297,7 @@ public class MPLPlugin extends AbstractCorePlugin {
 					pr.setDeclarationSignature(Signature.createTypeSignature(cur.getSignature().getFullName(), true).toCharArray());
 					pr.setFlags(Flags.AccPublic);
 					pr.setName(curMember.getName().toCharArray());
-					char[] t = new String("java.lang.String").toCharArray();
+//					char[] t = new String("java.lang.String").toCharArray();
 //					pr.setSignature(Signature.createMethodSignature(new char[][]{curMember.getName().toCharArray()}, t));
 					pr.setSignature(Signature.createMethodSignature(new char[][]{{}}, new char[]{}));
 					pr.setCompletion(curMember.getName().toCharArray());
@@ -306,7 +322,9 @@ public class MPLPlugin extends AbstractCorePlugin {
 	
 	
 	public ProjectSignature extendedModules_getSig(IFeatureProject project, String featureName) {
-		RoleMap map = new JavaSignatureWriter(project, null).writeSignatures(project.getFeatureModel());
+//		RoleMap map = new JavaSignatureWriter(project, null).writeSignatures(project.getFeatureModel());
+		//TODO FujiTest
+		RoleMap map = FileLoader.fuijTest(null, project);
 		ProjectSignature sig = InterfaceWriter.buildSignature(project.getFeatureModel(), map, featureName);
 		
 		return sig;
