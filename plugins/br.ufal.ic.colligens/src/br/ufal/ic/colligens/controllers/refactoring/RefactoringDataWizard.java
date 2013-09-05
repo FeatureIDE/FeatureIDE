@@ -6,14 +6,15 @@ public class RefactoringDataWizard extends RefactoringWizard {
 
 	public RefactoringDataWizard(RefactoringController refactoring,
 			String pageTitle) {
-		super(refactoring, DIALOG_BASED_USER_INTERFACE
-				| PREVIEW_EXPAND_FIRST_NODE);
+		super(refactoring, 
+				 PREVIEW_EXPAND_FIRST_NODE);
 		setDefaultPageTitle(pageTitle);
+		setForcePreviousAndNextButtons(true);
 	}
 
 	@Override
 	protected void addUserInputPages() {
-		addPage(new RefactoringDataInputPage("IntroduceIndirectionInputPage"));
+//		addPage(new RefactoringDataInputPage("IntroduceIndirectionInputPage"));
 	}
 
 }

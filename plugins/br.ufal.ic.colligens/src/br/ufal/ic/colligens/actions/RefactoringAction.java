@@ -9,21 +9,20 @@ import br.ufal.ic.colligens.controllers.refactoring.RefactoringController;
 import br.ufal.ic.colligens.controllers.refactoring.RefactoringDataWizard;
 
 public class RefactoringAction extends PluginActions {
-	private final String WIZARD_NAME = "Refactoring";
+	private final String WIZARD_NAME = "Refactoring - Colligens";
 
 	@Override
 	public void run(IAction action) {
 		RefactoringController refactoringController = new RefactoringController();
 		refactoringController.setSelection(super.selection);
-		run(new RefactoringDataWizard(refactoringController, WIZARD_NAME), super.window.getShell(),
-				WIZARD_NAME);
+		run(new RefactoringDataWizard(refactoringController, WIZARD_NAME), super.window.getShell());
 	}
 
-	public void run(RefactoringWizard wizard, Shell parent, String dialogTitle) {
+	public void run(RefactoringWizard wizard, Shell parent) {
 		try {
 			RefactoringWizardOpenOperation operation = new RefactoringWizardOpenOperation(
 					wizard);
-			operation.run(parent, dialogTitle);
+			operation.run(parent, WIZARD_NAME);
 		} catch (InterruptedException exception) {
 			// Do nothing
 		}

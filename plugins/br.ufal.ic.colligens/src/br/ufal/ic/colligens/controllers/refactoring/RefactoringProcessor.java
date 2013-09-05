@@ -1,5 +1,6 @@
 package br.ufal.ic.colligens.controllers.refactoring;
 
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -32,18 +33,14 @@ public class RefactoringProcessor {
 	public List<Change> process(IProgressMonitor monitor) throws CoreException {
 
 		for (IResource resource : iResources) {
-			ITranslationUnit tu = (ITranslationUnit) CoreModel.getDefault()
-					.create((IFile) resource);
-
 			MultiTextEdit edit = new MultiTextEdit();
 
 			// edit.addChild(new ReplaceEdit(0, 50,"novo texto"));
 			edit.addChild(new InsertEdit(0, "/*"));
 			edit.addChild(new InsertEdit(0, " Refactoring Colligens "));
-
-			String name = tu.getElementName();
-			IFile ifile2 = (IFile) tu.getResource();
-			TextFileChange change = new TextFileChange(name, ifile2);
+			
+			TextFileChange change = new TextFileChange(resource.getName(),
+					(IFile) resource);
 
 			change.setTextType("c");
 			change.setEdit(edit);
