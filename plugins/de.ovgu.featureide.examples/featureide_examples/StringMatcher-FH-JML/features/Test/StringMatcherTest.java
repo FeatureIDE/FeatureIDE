@@ -8,7 +8,7 @@ public  class StringMatcherTest extends TestJPF{
 		if (verifyNoPropertyViolation()) {
 			StringMatcher matcher = new StringMatcher("abc");
 			matcher.compare("abc", "b");
-		}
+	}
 		
 	}
 		}

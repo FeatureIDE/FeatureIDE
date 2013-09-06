@@ -36,16 +36,10 @@
 			<arguments>
 			</arguments>
 		</buildCommand>
-		<buildCommand>
-			<name>org.jmlspecs.OpenJMLUI.JMLBuilder</name>
-			<arguments>
-			</arguments>
-		</buildCommand>
 	</buildSpec>
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>de.ovgu.featureide.core.featureProjectNature</nature>
 		<nature>org.key_project.key4eclipse.resources.KeYProjectNature</nature>
-		<nature>org.jmlspecs.OpenJMLUI.JMLNatureID</nature>
 	</natures>
 </projectDescription>

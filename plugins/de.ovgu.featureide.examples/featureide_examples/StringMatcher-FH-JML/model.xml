@@ -15,6 +15,7 @@
 						</and>
 					</alt>
 				</alt>
+				<feature name="Test"/>
 			</and>
 		</struct>
 		<constraints>
@@ -28,6 +29,7 @@
 				</eq>
 			</rule>
 		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true"/>
 		<comments/>
 		<featureOrder userDefined="false"/>
 	</featureModel>
