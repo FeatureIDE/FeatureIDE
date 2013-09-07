@@ -5,8 +5,8 @@ public  class   StringMatcher {
 	  @ ensures \original;
 	  @*/
 	public boolean compare(String a, String b){
-		boolean result = original(a,b) &&  contains(b,a);
-		//@ set compare = compare &&  contains(b,a);
+		boolean result = original(a,b) &&  b.indexOf(a);
+		//@ set compare = compare &&  b.indexOf(a);
 		return result;
 	}
 	
