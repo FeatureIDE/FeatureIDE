@@ -76,6 +76,29 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	private volatile static Integer CURRENT_LAYOUT_MARGIN_Y = null;
 	private volatile static Integer CURRENT_LAYOUT_MARGIN_X = null;
 	
+	public static void reset() {
+		CURRENT_HIDE_LEGEND = null;
+		CURRENT_LEGEND_FORGOUND = null;
+		CURRENT_LEGEND_BACKGROUND = null;
+		CURRENT_DECORATOR_FORGROUND_COLOR = null;
+		CURRENT_FEATURE_FOREGROUND = null;
+		CURRENT_CONCRETE_BACKGROUND = null;
+		CURRENT_ABSTRACT_BACKGROUND = null;
+		CURRENT_CONNECTION_FOREGROUND = null;
+		CURRENT_DIAGRAM_BACKGROUND = null;
+		CURRENT_LEGEND_BORDER_COLOR = null;
+		CURRENT_HIDDEN_FOREGROUND = null;
+		CURRENT_HIDDEN_BACKGROUND = null;
+		CURRENT_DEAD_BACKGROUND = null;
+		CURRENT_FEATURE_DEAD = null;
+		CURRENT_CONSTRAINT_BACKGROUND = null;
+		CURRENT_WARNING_BACKGROUND = null;
+		CURRENT_CONSTRAINT_SPACE_Y = null;
+		CURRENT_FEATURE_SPACE_Y = null;
+		CURRENT_FEATURE_SPACE_X = null;
+		CURRENT_LAYOUT_MARGIN_Y = null;
+		CURRENT_LAYOUT_MARGIN_X = null;
+	}
 	public static void setHideLegend(boolean value) {
 		CURRENT_HIDE_LEGEND = value;
 		setBoolean(QN_HIDE_LEGEND, value);

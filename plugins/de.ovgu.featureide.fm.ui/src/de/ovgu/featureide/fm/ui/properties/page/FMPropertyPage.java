@@ -213,6 +213,7 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 	}
 	
 	private void performExport() {
+		applySettings();
 		FileDialog x = new FileDialog(new Shell(),SWT.SAVE);
 		x.setFilterPath(FMPropertyManager.workspaceRoot.getLocation().toOSString());
 		x.setFilterIndex(0);
@@ -281,10 +282,21 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 
 	@Override
 	public boolean performOk() {
+		applySettings();
+		return super.performOk();
+	}
+	
+	@Override
+	protected void performApply() {
+		applySettings();
+		super.performApply();
+	}
+	
+	private void applySettings() {
+		FMPropertyManager.reset();
 		performLegendGroup();
 		performSpecesGroup();
 		performFeatureGroup();
-		return super.performOk();
 	}
 
 	/**

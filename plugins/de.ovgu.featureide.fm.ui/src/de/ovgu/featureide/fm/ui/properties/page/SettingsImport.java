@@ -47,6 +47,7 @@ public class SettingsImport {
 			return;
 		}
 		importSettings(file);
+		FMPropertyManager.reset();
 	}
 
 	/**
@@ -54,11 +55,14 @@ public class SettingsImport {
 	 * @param persitentProperties
 	 */
 	private void importSettings(File settingsFile) {
-		String[] settings = getContents(settingsFile).split("[\r\n]");
+		String content = getContents(settingsFile);
+		String[] settings = content.split("\r\n");
 		for (String s : settings) {
 			try {
-				if (s.contains("=") && !"null".equals(s.split("[=]")[1])) {
-					FMPropertyManager.workspaceRoot.setPersistentProperty(new QualifiedName(s.split("[=]")[0], (s.split("[=]")[0])), s.split("[=]")[1]);
+				String value = s.split("[=]")[1];
+				if (s.contains("=") && !"null".equals(value)) {
+					String qualifier = s.split("[=]")[0];
+					FMPropertyManager.workspaceRoot.setPersistentProperty(new QualifiedName(qualifier, qualifier), value);
 				}
 			} catch (CoreException e) {
 				FMUIPlugin.getDefault().logError(e);
