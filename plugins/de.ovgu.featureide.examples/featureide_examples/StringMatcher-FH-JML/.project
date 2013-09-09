@@ -27,11 +27,6 @@
 			</arguments>
 		</buildCommand>
 		<buildCommand>
-			<name>org.eclipse.jdt.core.javabuilder</name>
-			<arguments>
-			</arguments>
-		</buildCommand>
-		<buildCommand>
 			<name>org.key_project.key4eclipse.resources.KeYProjectBuilder</name>
 			<arguments>
 			</arguments>
