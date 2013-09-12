@@ -37,6 +37,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.featurehouse.FeatureHouseComposer;
 import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.StoppableJob;
 
 /**
  * Builds the meta product via FeatureHouse. 
@@ -76,9 +77,9 @@ public class BuildMetaProductAction implements IActionDelegate {
 			return;
 		}
 		buildMetaProduct(!getBuildMetaProduct(), featureProject.getProject());
-		Job job = new Job("Build meta product for project \"" + featureProject.getProjectName() + "\".") {
+		Job job = new StoppableJob("Build meta product for project \"" + featureProject.getProjectName() + "\".") {
 			@Override
-			public IStatus run(IProgressMonitor monitor) {
+			public IStatus execute(IProgressMonitor monitor) {
 				try {
 					featureProject.getProject().build(IncrementalProjectBuilder.FULL_BUILD, null);
 				} catch (CoreException e) {

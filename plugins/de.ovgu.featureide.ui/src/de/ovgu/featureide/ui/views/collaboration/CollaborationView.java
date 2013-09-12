@@ -79,6 +79,7 @@ import de.ovgu.featureide.fm.core.ColorschemeTable;
 import de.ovgu.featureide.fm.core.ColorList;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.StoppableJob;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GEFImageWriter;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.editors.annotation.ColorPalette;
@@ -479,8 +480,8 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	private void makeActions() {
 		toolbarAction = new Action() {
 			public void run() {
-				Job job = new Job("Refresh Collaboration View") {
-					protected IStatus run(IProgressMonitor monitor) {
+				Job job = new StoppableJob("Refresh Collaboration View") {
+					protected IStatus execute(IProgressMonitor monitor) {
 						if (!toolbarAction.isEnabled())
 							return Status.OK_STATUS;
 						toolbarAction.setEnabled(false);
@@ -509,9 +510,9 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	 */
 	public void updateGuiAfterBuild(final IFeatureProject project, final IFile configurationFile) {
 		if (featureProject != null && featureProject.equals(project)) {
-			Job job = new Job("Build Collaboration Model") {
+			Job job = new StoppableJob("Build Collaboration Model") {
 
-				public IStatus run(IProgressMonitor monitor) {
+				public IStatus execute(IProgressMonitor monitor) {
 					if (built) {
 						built = false;
 						if (configurationFile != null && builder.editorFile != null) {
@@ -547,8 +548,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	}
 	
 	@Override
-	public void doSaveAs() 
-	{
+	public void doSaveAs() {
 		FileDialog fileDialog = new FileDialog(this.getSite().getShell(),
 				SWT.SAVE);
 		

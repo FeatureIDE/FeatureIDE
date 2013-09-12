@@ -708,4 +708,9 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		setActivePage(index);
 	}
 
+	@Override
+	public void dispose() {
+		diagramEditor.dispose();
+		super.dispose();
+	}
 }

@@ -20,8 +20,10 @@
  */
 package de.ovgu.featureide.featurehouse.errorpropagation;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.AbstractCollection;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
@@ -45,6 +47,7 @@ import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
+import de.ovgu.featureide.fm.core.Feature;
 
 /**
  * Propagates error markers for composed files to sources files.
@@ -83,6 +86,8 @@ public class ErrorPropagation {
 	 * The main background job calling the corresponding error propagation class for each file. 
 	 */
 	public Job job = null;
+
+	private int composedFilesSize = 0;
 	
 	/**
 	 * Propagates error markers for composed files to sources files.<br>
@@ -99,6 +104,7 @@ public class ErrorPropagation {
 	 * @param sourceFile The composed file
 	 */
 	public void addFile(IFile sourceFile) {
+		
 		String fileExtension = sourceFile.getFileExtension();
 		if (fileExtension == null) {
 			return;
@@ -107,12 +113,13 @@ public class ErrorPropagation {
 				"h".equals(fileExtension)) {
 			if (!composedFiles.contains(sourceFile)) {
 				addComposedFile(sourceFile);
+				composedFilesSize++;
 			}
 			if (job == null) {
-				job = new Job("Propagate problem markers") {
+				job = new Job("Propagate problem markers for " + CorePlugin.getFeatureProject(sourceFile)) {
 					@Override
 					public IStatus run(IProgressMonitor monitor) {
-						propagateMarkers();
+						propagateMarkers(monitor);
 						return Status.OK_STATUS;
 					}
 				};
@@ -129,14 +136,31 @@ public class ErrorPropagation {
 	/**
 	 * Calls the corresponding propagation for all files at <code>composedFiles</code>.
 	 */
-	protected void propagateMarkers() {
+	protected void propagateMarkers(IProgressMonitor monitor) {
 		if (composedFiles.isEmpty()) {
 			return;
-		}
-		
+		} 
+		int worked = 0;
+		int lastSize = composedFilesSize;
+		monitor.beginTask("Propagate markers for", composedFilesSize);
 		try {
 			while (!composedFiles.isEmpty()) {
+				if (monitor.isCanceled()) {
+					break;
+				}
+				
+				worked++;
+				if (composedFilesSize == lastSize) {
+					monitor.worked(1);
+				} else {
+					lastSize = composedFilesSize;
+					monitor.beginTask("Propagate markers for", composedFilesSize);
+					monitor.worked(worked);
+				}
+				
 				IFile file = getComposedFile();
+				monitor.subTask(file.getName());
+				
 				if (file != null) {
 					ErrorPropagation prop = getErrorPropagation(file);
 					if (prop != null) {
@@ -144,6 +168,7 @@ public class ErrorPropagation {
 					}
 				}
 			}
+			composedFilesSize = 0;
 		} catch (NoSuchElementException e) {
 			FeatureHouseCorePlugin.getDefault().logError(e);
 		}
@@ -242,7 +267,11 @@ public class ErrorPropagation {
 			return;
 		}
 		
+		LinkedList<String> selectedFeatures = getSelectedFeatures(CorePlugin.getFeatureProject(file));
 		for (FSTRole role : fstClass.getRoles()) {
+			if (!selectedFeatures.contains(role.getFeature())) {
+				continue;
+			}
 			for (FSTField field : role.getFields()) {
 				fields.add(field);
 			}
@@ -305,6 +334,60 @@ public class ErrorPropagation {
 			}
 			
 			propagateUnsupportedMarker(marker, file);
+		}
+	}
+	
+	// TODO refactor all occurrences of reading features of configurations
+	private LinkedList<String> getSelectedFeatures(IFeatureProject featureProject) {
+		if (featureProject == null)
+			return null;
+
+		final IFile iFile;
+		LinkedList<String> list = new LinkedList<String>();
+		iFile = featureProject.getCurrentConfiguration();
+		
+		if (iFile == null || !iFile.exists()) {
+			return null;
+		}
+		
+		File file = iFile.getRawLocation().toFile();
+		LinkedList<String> configurationFeatures = readFeaturesfromConfigurationFile(file);
+		if (configurationFeatures == null)
+			return null;
+		
+		Collection<Feature> features = featureProject.getFeatureModel().getFeatures();
+		for (String confFeature : configurationFeatures) {
+			for (Feature feature : features) {
+				if (feature.getName().equals(confFeature)) {
+					list.add(feature.getName());
+				}
+			}
+		}
+		return list;
+	}
+	
+	private LinkedList<String> readFeaturesfromConfigurationFile(File file) {
+		LinkedList<String> list;
+		Scanner scanner = null;
+		if (!file.exists())
+			return null;
+		
+		try {
+			scanner = new Scanner(file, "UTF-8");
+		} catch (FileNotFoundException e) {
+			FeatureHouseCorePlugin.getDefault().logError(e);
+		}
+
+		if (scanner.hasNext()) {
+			list = new LinkedList<String>();
+			while (scanner.hasNext()) {
+				list.add(scanner.next());
+			}
+			scanner.close();
+			return list;
+		} else {
+			scanner.close();
+			return null;
 		}
 	}
 

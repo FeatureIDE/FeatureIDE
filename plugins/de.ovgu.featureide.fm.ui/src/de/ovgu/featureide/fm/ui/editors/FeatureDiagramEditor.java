@@ -65,6 +65,7 @@ import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.FeatureStatus;
+import de.ovgu.featureide.fm.core.StoppableJob;
 import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -502,10 +503,10 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 					}
 					waiting = false;
 				}
-				analyzeJob = new Job("Analyze feature model") {
+				analyzeJob = new StoppableJob("Analyze feature model") {
 
 					@Override
-					protected IStatus run(IProgressMonitor monitor) {
+					protected IStatus execute(IProgressMonitor monitor) {
 						if (waiting) {
 							return Status.OK_STATUS;
 						}
@@ -757,6 +758,15 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	@Override
 	public String getID() {
 		return ID;
+	}
+
+	/**
+	 * Stops the analyzing job when the editor is closed.
+	 */
+	public void dispose() {
+		if (analyzeJob != null) {
+			analyzeJob.cancel();
+		}
 	}
 
 }

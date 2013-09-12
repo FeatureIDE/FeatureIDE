@@ -74,13 +74,12 @@ public class AheadBuildErrorEvent {
 		if (type == AheadBuildErrorType.COMPOSER_ERROR) {
 			this.message = "Composer: " + message;
 			//nothing else to do, because its already the position at the source jak file
-		}
-		else if (type == AheadBuildErrorType.JAVAC_ERROR) {
+		} else if (type == AheadBuildErrorType.JAVAC_ERROR) {
 			this.message = "Javac: " + message;
 			initJavacErrorEvent();
-		}
-		else
+		} else {
 			throw new RuntimeException("Unknown AheadBuildErrorType \"" + type + "\"!");
+		}
 	}
 	
 	private void initJavacErrorEvent() {
@@ -152,27 +151,34 @@ public class AheadBuildErrorEvent {
 	 */
 	private void calculateJakLine() throws CoreException, IOException {
 		IFile composedJakFile = (IFile) this.file;
+		int composedJakLine = this.line;
+		
 		composedJakFile.refreshLocal(IResource.DEPTH_ZERO, null);
+		
 		String contentString = getString(composedJakFile);
+		int line = setSourceFile(contentString, composedJakLine);
+		
 		if (fileName == null) {
 			this.line = lookupImportInAllJakFiles(contentString, matcher);
-		} else {
+		}
+		else {
 			IFile jakFile = getJakFile(fileName);
 			if (jakFile != null) {
 				jakFile.refreshLocal(IResource.DEPTH_ZERO, null);
 				String jakContent = getString(jakFile);
+					
 				this.file = jakFile;
-				int line = setSourceFile(contentString, this.line);
-				this.line = setSourceLine(this.line, line, jakContent);
+				this.line = setSourceLine(composedJakLine, line, jakContent);
 			}
 		}
 	}
 
 	/**
-	 * TODO description / rename
+	 * Initializes {@link AheadBuildErrorEvent#matcher} and {@link AheadBuildErrorEvent#fileName}.
+	 * 
 	 * @param contentString
 	 * @param composedJakLine 
-	 * @return
+	 * @return TODO
 	 */
 	public int setSourceFile(String contentString, int composedJakLine) {
 		PosString content = new PosString(contentString);

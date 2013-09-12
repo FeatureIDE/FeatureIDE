@@ -55,26 +55,17 @@ public abstract class FeatureModelEditorPage extends EditorPart implements IFeat
 		this.featureModelEditor = featureModelEditor;
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.part.EditorPart#doSave(org.eclipse.core.runtime.IProgressMonitor)
-	 */
 	@Override
 	public void doSave(IProgressMonitor monitor) {
 		dirty = false;
 		firePropertyChange(IEditorPart.PROP_DIRTY);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.part.EditorPart#doSaveAs()
-	 */
 	@Override
 	public void doSaveAs() {
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.part.EditorPart#init(org.eclipse.ui.IEditorSite, org.eclipse.ui.IEditorInput)
-	 */
 	@Override
 	public void init(IEditorSite site, IEditorInput input)
 			throws PartInitException {
@@ -82,49 +73,31 @@ public abstract class FeatureModelEditorPage extends EditorPart implements IFeat
 		this.site = site; 
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.part.EditorPart#isDirty()
-	 */
 	@Override
 	public boolean isDirty() {
 		return dirty;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.part.EditorPart#isSaveAsAllowed()
-	 */
 	@Override
 	public boolean isSaveAsAllowed() {
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
-	 */
 	@Override
 	public void createPartControl(Composite parent) {
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
-	 */
 	@Override
 	public void setFocus() {
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#getIndex()
-	 */
 	@Override
 	public int getIndex() {
 		return index;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#setIndex(int)
-	 */
 	@Override
 	public void setIndex(int index) {
 		this.index = index;
@@ -134,48 +107,30 @@ public abstract class FeatureModelEditorPage extends EditorPart implements IFeat
 		return site;
 	}
 	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#initEditor()
-	 */
 	@Override
 	public void initEditor() {
 	}
 	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#getPage()
-	 */
 	@Override
 	public IFeatureModelEditorPage getPage(Composite container) {
 		return this;
 	}
 	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#getControl1()
-	 */
 	@Override
 	public Control getControl() {
 		return null;
 	}
 	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#propertyChange(java.beans.PropertyChangeEvent)
-	 */
 	@Override
 	public void propertyChange(PropertyChangeEvent event) {
 		
 	}
 	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#pageChangeFrom(int)
-	 */
 	@Override
 	public void pageChangeFrom(int newPage) {
 
 	}
 	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#pageChangeTo(int)
-	 */
 	@Override
 	public void pageChangeTo(int oldPage) {
 	

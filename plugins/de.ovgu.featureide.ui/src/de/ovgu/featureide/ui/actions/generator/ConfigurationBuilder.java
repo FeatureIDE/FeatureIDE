@@ -61,6 +61,7 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.StoppableJob;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.Selection;
@@ -230,8 +231,8 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 				configurationNumber = countConfigurations(this.featureProject.getConfigFolder());
 				break;
 			case ALL_VALID :
-				Job number = new Job(JOB_TITLE_COUNT_CONFIGURATIONS) {
-					public IStatus run(IProgressMonitor monitor) {
+				Job number = new StoppableJob(JOB_TITLE_COUNT_CONFIGURATIONS) {
+					public IStatus execute(IProgressMonitor monitor) {
 						configurationNumber = new Configuration(featureModel, false, false).number(1000000);
 						if (configurationNumber < ((long)0)) {
 							UIPlugin.getDefault().logWarning("Satsolver overflow");

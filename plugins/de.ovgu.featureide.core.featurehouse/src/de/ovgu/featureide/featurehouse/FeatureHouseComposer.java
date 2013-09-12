@@ -59,14 +59,12 @@ import AST.Problem;
 import AST.Program;
 import cide.gparser.ParseException;
 import cide.gparser.TokenMgrError;
-
 import composer.CmdLineInterpreter;
 import composer.CompositionException;
 import composer.FSTGenComposer;
 import composer.FSTGenComposerExtension;
 import composer.ICompositionErrorListener;
 import composer.IParseErrorListener;
-
 import de.ovgu.cide.fstgen.ast.FSTNode;
 import de.ovgu.cide.fstgen.ast.FSTTerminal;
 import de.ovgu.featureide.core.IFeatureProject;
@@ -77,6 +75,7 @@ import de.ovgu.featureide.featurehouse.model.FeatureHouseModelBuilder;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.StoppableJob;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -133,6 +132,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	}
 	
 	private ICompositionErrorListener compositionErrorListener = createCompositionErrorListener();
+	private StoppableJob fuji;
 
 	/**
 	 * @return
@@ -308,9 +308,14 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		if (configPath == null || basePath == null || outputPath == null)
 			return;
 
+		/**
+		 * Run fuji parallel to the build process.
+		 */
+		fuji();
+		
 		createBuildFolder(config);
 		setJavaBuildPath(config.getName().split("[.]")[0]);
-		
+				
 		if (buildMetaProduct()) {
 			if (IFeatureProject.META_MODEL_CHECKING_BDD_JAVA_JML.equals(featureProject.getMetaProductGeneration())) {
 				buildDefaultMetaProduct(configPath, basePath, outputPath);
@@ -333,8 +338,6 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		buildFSTModel(configPath, basePath, outputPath);
 		
 		callCompiler();
-		
-		fuji();
 	}
 
 	/**
@@ -459,17 +462,26 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	 * Starts type checking with fuji in a background job.
 	 */
 	private void fuji() {
-		Job job = new Job("Type checking " + featureProject.getProjectName() + " with fuji") {
-			
+		if (fuji != null) {
+			fuji.cancel();
+			try {
+				fuji.join();
+			} catch (InterruptedException e) {
+				FMCorePlugin.getDefault().logError(e);
+			}
+		}
+		fuji = new StoppableJob("Type checking " + featureProject.getProjectName() + " with fuji") {
 			@Override
-			protected IStatus run(IProgressMonitor monitor) {
-				runFuji(featureProject);
+			protected IStatus execute(IProgressMonitor monitor) {
+				try {
+					runFuji(featureProject);
+				} catch (CompositionException e) {
+					FMCorePlugin.getDefault().logError(e);
+				} 
 				return Status.OK_STATUS;
 			}
-			
-			
 		};
-		job.schedule();
+		fuji.schedule();
 	}
 	
 	/**
@@ -477,7 +489,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	 * synchronized because fuji use static fields, and a parallel execution is not possible.
 	 * @param featureProject The feature project of the caller.
 	 */
-	private synchronized static void runFuji(IFeatureProject featureProject) {
+	private synchronized static void runFuji(IFeatureProject featureProject) throws CompositionException {
 		String sourcePath = featureProject.getSourcePath();
 		String[] fujiOptions = new String[] {
 				"-" + Main.OptionName.CLASSPATH, getClassPaths(featureProject),

@@ -267,7 +267,7 @@ public class FeatureCppWrapper {
 	}
 
 	private void addMarker(final IFile file, final String message, final int line) {
-		Job job = new Job("Propagate problem markers") {
+		Job job = new Job("Propagate problem markers for " + CorePlugin.getFeatureProject(file)) {
 			@Override
 			public IStatus run(IProgressMonitor monitor) {
 				try {

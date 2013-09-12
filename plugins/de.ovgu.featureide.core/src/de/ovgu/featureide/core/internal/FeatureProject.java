@@ -68,6 +68,7 @@ import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelFile;
 import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.StoppableJob;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.FeatureOrderReader;
@@ -483,8 +484,8 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		// there are possibly no resource build yet or they are not up-to-date.
 		// Eclipse calls builders, if a resource as changed, but in this case
 		// actually no resource in the file system changes.
-		Job job = new Job("Performing full build") {
-			protected IStatus run(IProgressMonitor monitor) {
+		Job job = new StoppableJob("Performing full build") {
+			protected IStatus execute(IProgressMonitor monitor) {
 				buildRelevantChanges = true;
 				try {
 					project.build(IncrementalProjectBuilder.FULL_BUILD, null);
@@ -494,7 +495,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 				return Status.OK_STATUS;
 			}
 		};
-		job.setPriority(Job.SHORT);
+		job.setPriority(Job.BUILD);
 		job.schedule();
 	}
 

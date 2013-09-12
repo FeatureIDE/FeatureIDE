@@ -360,7 +360,7 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 	@Override
 	public void postCompile(IResourceDelta delta, final IFile file) {
 		super.postCompile(delta, file);
-		Job job = new Job("Propagate problem markers") {
+		Job job = new Job("Propagate problem markers for " + CorePlugin.getFeatureProject(file)) {
 			@Override
 			public IStatus run(IProgressMonitor monitor) {
 				try {
