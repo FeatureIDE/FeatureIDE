@@ -273,6 +273,14 @@ public abstract class TAbstractFeatureModelReaderWriter {
 		}
 
 	}
+	
+	@Test
+	public void testDescription() {
+		for (Feature origFeature : origFm.getFeatures()) {
+			Feature newFeature = newFm.getFeature(origFeature.getName());
+			assertEquals(origFeature.getDescription(), newFeature.getDescription());
+		}
+	}
 
 	private final FeatureModel writeAndReadModel()
 			throws UnsupportedModelException {
@@ -281,8 +289,9 @@ public abstract class TAbstractFeatureModelReaderWriter {
 		IFeatureModelReader reader = getReader(newFm);
 		reader.readFromString(writer.writeToString());
 		return newFm;
-
 	}
+
+	
 
 	private final static FileFilter getFileFilter(final String s) {
 		FileFilter filter = new FileFilter() {
