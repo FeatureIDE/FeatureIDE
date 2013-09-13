@@ -2,6 +2,7 @@ package br.ufal.ic.colligens.controllers;
 
 import java.util.List;
 
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -17,7 +18,6 @@ import br.ufal.ic.colligens.models.TypeChef;
 import br.ufal.ic.colligens.models.TypeChefException;
 import br.ufal.ic.colligens.views.InvalidConfigurationsView;
 
-
 /**
  * @author Thiago Emmanuel
  */
@@ -25,7 +25,6 @@ public class CoreController {
 	private ProjectExplorerController projectExplorerController;
 	private TypeChef typeChef;
 	private static IWorkbenchWindow window;
-	private static IProgressMonitor monitor;
 
 	public CoreController() {
 		projectExplorerController = new ProjectExplorerController();
@@ -53,7 +52,7 @@ public class CoreController {
 			 */
 			protected IStatus run(IProgressMonitor monitor) {
 
-				CoreController.monitor = monitor;
+				typeChef.setMonitor(monitor);
 
 				if (monitor.isCanceled())
 					return Status.CANCEL_STATUS;
@@ -64,8 +63,13 @@ public class CoreController {
 
 					if (monitor.isCanceled())
 						return Status.CANCEL_STATUS;
-					// get files to analyze e run
-					typeChef.run(projectExplorerController.getList());
+
+					List<IResource> list = projectExplorerController.getList();
+
+					monitor.beginTask("Analyzing selected files", list.size() + 2);
+
+					// get files to analyze e run;
+					typeChef.run(list);
 
 					// returns the result to view
 					syncWithPluginView();
@@ -79,7 +83,6 @@ public class CoreController {
 				} finally {
 
 					monitor.done();
-					CoreController.monitor = null;
 
 				}
 
@@ -125,27 +128,5 @@ public class CoreController {
 
 	public static IWorkbenchWindow getWindow() {
 		return window;
-	}
-
-	public static boolean isCanceled() {
-		return monitor != null ? CoreController.monitor.isCanceled() : false;
-	}
-
-	public static void monitorWorked(int value) {
-		if (monitor == null)
-			return;
-		monitor.worked(value);
-	}
-
-	public static void monitorSubTask(String label) {
-		if (monitor == null)
-			return;
-		monitor.subTask(label);
-	}
-
-	public static void monitorBeginTask(String label, int value) {
-		if (monitor == null)
-			return;
-		monitor.beginTask(label, value);
 	}
 }

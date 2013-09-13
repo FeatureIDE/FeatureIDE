@@ -5,7 +5,7 @@ import org.eclipse.ltk.ui.refactoring.RefactoringWizard;
 import org.eclipse.ltk.ui.refactoring.RefactoringWizardOpenOperation;
 import org.eclipse.swt.widgets.Shell;
 
-import br.ufal.ic.colligens.controllers.refactoring.RefactoringController;
+import br.ufal.ic.colligens.controllers.refactoring.RefactoringFileController;
 import br.ufal.ic.colligens.controllers.refactoring.RefactoringDataWizard;
 
 public class RefactoringAction extends PluginActions {
@@ -13,7 +13,7 @@ public class RefactoringAction extends PluginActions {
 
 	@Override
 	public void run(IAction action) {
-		RefactoringController refactoringController = new RefactoringController();
+		RefactoringFileController refactoringController = new RefactoringFileController();
 		refactoringController.setSelection(super.selection);
 		run(new RefactoringDataWizard(refactoringController, WIZARD_NAME), super.window.getShell());
 	}

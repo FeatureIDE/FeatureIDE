@@ -29,6 +29,11 @@
             id="br.ufal.ic.colligens.commands.ColligensRefactoring"
             name="Refactoring">
       </command>
+      <command
+            categoryId="br.ufal.ic.colligens.commands.category"
+            id="br.ufal.ic.colligens.commands.RefactoringSelect"
+            name="Refactoring Select">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -38,7 +43,7 @@
          <command
                commandId="br.ufal.ic.colligens.commands.ColligensCommand"
                icon="icons/featured_run.png"
-               label="Analyse"
+               label="Code Analysis"
                style="push">
          </command>
          <separator
@@ -173,7 +178,7 @@ point="org.eclipse.core.resources.markers">
                definitionId="br.ufal.ic.colligens.commands.ColligensCommand"
                icon="icons/featured_run.png"
                id="br.ufal.ic.colligens.AnalyzerAction"
-               label="Colligens Analyze"
+               label="Code Analysis"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/reorgGroup"
                toolbarPath="org.eclipse.debug.ui.main.toolbar?after=additions">
          </action>
@@ -199,12 +204,20 @@ point="org.eclipse.core.resources.markers">
                label="Refactoring"
                toolbarPath="org.eclipse.debug.ui.main.toolbar?after=additions">
          </action>
+         <action
+               class="br.ufal.ic.colligens.actions.RefactoringSelectionAction"
+               definitionId="br.ufal.ic.colligens.commands.RefactoringSelect"
+               icon="icons/featured.png"
+               id="br.ufal.ic.colligens.action2"
+               label="Refactoring Selection"
+               toolbarPath="org.eclipse.debug.ui.main.toolbar?after=additions">
+         </action>
       </actionSet>
    </extension>
    <extension
          point="org.eclipse.ltk.core.refactoring.refactoringContributions">
       <contribution
-            class="br.ufal.ic.colligens.controllers.refactoring.RefactoringCon"
+            class="br.ufal.ic.colligens.controllers.refactoring.RefactoringContribut"
             id="br.ufal.ic.colligens.RefactoringController">
       </contribution>
    </extension>

@@ -10,6 +10,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -22,8 +23,7 @@ public abstract class PluginActions implements IWorkbenchWindowActionDelegate {
 
 	@Override
 	public void selectionChanged(IAction action, ISelection selection) {
-		// TODO Auto-generated method stub
-
+		action.setEnabled(false);
 		try {
 			if (selection instanceof IStructuredSelection) {
 				IStructuredSelection extended = (IStructuredSelection) selection;
@@ -37,8 +37,6 @@ public abstract class PluginActions implements IWorkbenchWindowActionDelegate {
 					action.setEnabled(true);
 				} else if (object instanceof IFile || object instanceof IFolder) {
 					action.setEnabled(isResource((IResource) object));
-				} else {
-					action.setEnabled(false);
 				}
 			}
 		} catch (Exception e) {

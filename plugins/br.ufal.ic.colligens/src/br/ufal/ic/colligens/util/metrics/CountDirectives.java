@@ -75,6 +75,10 @@ public class CountDirectives {
 			// strLine =
 			// strLine.replaceAll("(?:(/)?\\*(?:[^*]|(?:\\*+[^*/]))*(\\*+/)*)|(?://.*)",
 			// "");
+			if (strLine == null) {
+				continue;
+			}
+
 			strLine = strLine.trim();
 			if (!strLine.isEmpty()) {
 				numberLine++;

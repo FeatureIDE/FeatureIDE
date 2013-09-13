@@ -1,0 +1,110 @@
+package br.ufal.ic.colligens.controllers.refactoring;
+
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.jface.text.TextSelection;
+import org.eclipse.ltk.core.refactoring.Change;
+import org.eclipse.ltk.core.refactoring.CompositeChange;
+import org.eclipse.ltk.core.refactoring.Refactoring;
+import org.eclipse.ltk.core.refactoring.RefactoringStatus;
+
+import de.fosd.typechef.lexer.LexerException;
+import de.fosd.typechef.lexer.options.OptionException;
+
+public class RefactoringSelectionController extends Refactoring {
+	private TextSelection textSelection = null;
+	private IFile file = null;
+	private RefactoringSelectionProcessor processor;
+	protected List<Change> changes = new LinkedList<Change>();
+
+	public RefactoringSelectionController() {
+		processor = new RefactoringSelectionProcessor();
+	}
+
+	@Override
+	public String getName() {
+		return "Refactoring Undisciplined";
+	}
+
+	@Override
+	public RefactoringStatus checkInitialConditions(IProgressMonitor monitor)
+			throws CoreException, OperationCanceledException {
+		RefactoringStatus status = new RefactoringStatus();
+
+		monitor.beginTask("Checking preconditions...", 2);
+
+		try {
+
+			processor.selectToFile(textSelection);
+
+		} catch (LexerException e) {
+			status.addFatalError("Was not possible to refactor the selected part.");
+			e.printStackTrace();
+		} catch (OptionException e) {
+			status.addFatalError("Was not possible to refactor. Try again.");
+			e.printStackTrace();
+
+		} catch (IOException e) {
+			status.addFatalError("Was not possible to refactor the selected part. Try again.");
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NullPointerException e) {
+			status.addFatalError("Was not possible to refactor the selected part.");
+			e.printStackTrace();
+		}
+
+		monitor.done();
+
+		return status;
+	}
+
+	@Override
+	public RefactoringStatus checkFinalConditions(IProgressMonitor monitor)
+			throws CoreException, OperationCanceledException {
+		RefactoringStatus status = new RefactoringStatus();
+
+		monitor.beginTask("Checking checkFinalConditions...", 2);
+
+		try {
+			changes = processor.process(file,textSelection, monitor);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			status.addFatalError(e.getMessage());
+			e.printStackTrace();
+		}
+
+		return status;
+	}
+
+	@Override
+	public Change createChange(IProgressMonitor pm) throws CoreException,
+			OperationCanceledException {
+		try {
+			pm.beginTask("Creating change...", 1);
+			try {
+				Thread.sleep(4000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			//
+			Change[] changeArray = changes.toArray(new Change[] {});
+			//
+			return new CompositeChange(getName(), changeArray);
+		} finally {
+			pm.done();
+		}
+	}
+
+	public void setSelection(IFile file, TextSelection selection) {
+		this.textSelection = selection;
+		this.file = file;
+	}
+
+}

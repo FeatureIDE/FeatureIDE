@@ -21,13 +21,13 @@ import org.eclipse.cdt.core.model.IIncludeReference;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ui.internal.util.BundleUtility;
 import org.prop4j.Node;
 import org.prop4j.NodeWriter;
 
 import br.ufal.ic.colligens.activator.Colligens;
-import br.ufal.ic.colligens.controllers.CoreController;
 import br.ufal.ic.colligens.controllers.core.PlatformException;
 import br.ufal.ic.colligens.controllers.core.PlatformHeader;
 import de.fosd.typechef.Frontend;
@@ -48,6 +48,8 @@ public class TypeChef {
 	private FrontendOptions fo;
 	private boolean isFinish;
 	private List<FileProxy> fileProxies;
+
+	private IProgressMonitor monitor = null;
 
 	private final String outputFilePath;
 
@@ -125,12 +127,6 @@ public class TypeChef {
 				+ System.getProperty("file.separator") + "lexOutput.c");
 		paramters.add(typeChefPreference);
 
-		paramters.add("-h");
-		paramters.add(Colligens.getDefault().getConfigDir().getAbsolutePath()
-				+ System.getProperty("file.separator") + "projects"
-				+ System.getProperty("file.separator")
-				+ project.getProject().getName() + "_platform.h");
-
 		if (Colligens.getDefault().getPreferenceStore()
 				.getBoolean("USE_INCLUDES")) {
 			// Project C includes
@@ -151,6 +147,15 @@ public class TypeChef {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+
+			paramters.add("-h");
+			paramters.add(Colligens.getDefault().getConfigDir()
+					.getAbsolutePath()
+					+ System.getProperty("file.separator")
+					+ "projects"
+					+ System.getProperty("file.separator")
+					+ project.getProject().getName() + "_platform.h");
+
 		} else {
 			paramters.add("-h");
 			paramters.add(Colligens.getDefault().getConfigDir()
@@ -199,31 +204,30 @@ public class TypeChef {
 		fileProxies = resourceToFileProxy(resourceList);
 
 		PlatformHeader platformHeader = new PlatformHeader();
-		//
-		CoreController.monitorBeginTask("Analyzing selected files",
-				fileProxies.size() + 1);
+	
 		try {
 			if (fileProxies.isEmpty()) {
+				monitor = null;
 				throw new TypeChefException("Not a valid file found C");
 			}
 
-			platformHeader.plarform(fileProxies.get(0).getFileIResource()
-					.getProject().getName());
+			if (!Colligens.getDefault().getPreferenceStore()
+					.getBoolean("USE_INCLUDES")) {
+				// Monitor Update
+				monitorSubTask("Generating stubs...");
+				platformHeader.stubs(fileProxies.get(0).getFileIResource()
+						.getProject().getName());
+			} else {
+				platformHeader.plarform(fileProxies.get(0).getFileIResource()
+						.getProject().getName());
+			}
 
 			for (FileProxy file : fileProxies) {
-				if (!Colligens.getDefault().getPreferenceStore()
-						.getBoolean("USE_INCLUDES")) {
-					// Monitor Update
-					CoreController.monitorSubTask("Generating stubs...");
-					platformHeader.stubs(fileProxies.get(0).getFileIResource()
-							.getProject().getName());
-				}
-
 				// Monitor Update
-				CoreController.monitorWorked(1);
-				CoreController.monitorSubTask(file.getFullPath());
+				monitorWorked(1);
+				monitorSubTask(file.getFullPath());
 				// end Monitor
-				if (CoreController.isCanceled()) {
+				if (monitorIsCanceled()) {
 					this.isFinish = true;
 					break;
 				}
@@ -249,11 +253,12 @@ public class TypeChef {
 
 			}
 		} catch (PlatformException e1) {
+			monitor = null;
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 			Colligens.getDefault().logError(e1);
 		}
-
+		monitor = null;
 	}
 
 	/**
@@ -432,4 +437,36 @@ public class TypeChef {
 			}
 		}
 	}
+
+	public void setMonitor(IProgressMonitor monitor) {
+		this.monitor = monitor;
+	}
+	
+	private boolean monitorIsCanceled() {
+		return monitor != null ? monitor.isCanceled() : false;
+	}
+
+	private void monitorWorked(int value) {
+		if (monitor == null)
+			return;
+		monitor.worked(value);
+	}
+
+	private void monitorSubTask(String label) {
+		if (monitor == null)
+			return;
+		monitor.subTask(label);
+	}
+
+//	private void monitorBeginTask(String label, int value) {
+//		if (monitor == null)
+//			return;
+//		monitor.beginTask(label, value);
+//	}
+//
+//	private void setTaskName(String label) {
+//		if (monitor == null)
+//			return;
+//		monitor.setTaskName(label);
+//	}
 }
