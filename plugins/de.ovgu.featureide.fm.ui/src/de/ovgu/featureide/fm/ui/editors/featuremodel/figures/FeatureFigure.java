@@ -128,13 +128,13 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		
 		label.setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
 		setBackgroundColor(FMPropertyManager.getConcreteFeatureBackgroundColor());
-		setBorder(FMPropertyManager.getConcreteFeatureBorder(feature.isConstraintSelected()));
+		setBorder(FMPropertyManager.getFeatureBorder());
 		
 		if (feature.isConcrete()) toolTip += CONCRETE;
 		
 		if (feature.isAbstract()){
 			setBackgroundColor(FMPropertyManager.getAbstractFeatureBackgroundColor());
-			setBorder(FMPropertyManager.getAbsteactFeatureBorder(feature.isConstraintSelected()));
+			setBorder(FMPropertyManager.getFeatureBorder());
 			if (feature.isRoot()){
 				toolTip += ROOT;
 			} else {
@@ -175,9 +175,9 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		}
 		
 		String description = feature.getDescription();
-		if (description != null) {
-			toolTip += "\r\n\r\n" + description;
-		} 
+		if (description != null && !description.equals(" ")) {
+			toolTip += "\r\n\r\n" + "Description:\r\n" + description;
+		}
 		
 		toolTip += getRelevantConstraints();
 		Figure toolTipContent = new Figure();
@@ -197,13 +197,22 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		StringBuilder relevant = new StringBuilder();
 		for (Constraint constraint : featureModel.getConstraints()) {
 			String node = constraint.getNode().toString(NodeWriter.logicalSymbols);
-			if (node.contains(feature.getName()))
-				relevant.append("\n " + node + " ");
+			
+			String[] constraints = node.split(" ");
+			for (String s : constraints) {
+				if (s.equals(feature.getName())) {
+					relevant.append("\n " + node + " ");
+				}
+			}			
 		}
 		if (relevant.length() > 0) {
 			return "\n" + relevant.toString();
 		}
 		return "";
+	}
+	
+	public String getFeatureModelConstraints() {
+		return getRelevantConstraints();
 	}
 
 	public ConnectionAnchor getSourceAnchor() {

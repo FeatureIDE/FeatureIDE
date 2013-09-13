@@ -163,7 +163,7 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter implements
     		String description = feat.getDescription();
 	    	if (description != null) {
 	    		Element descr = doc.createElement(DESCRIPTION);
-	    		descr.setTextContent(description);
+	    		descr.setTextContent("\n" + description.replace("\r", "") + "\n");
 	    		fnod.appendChild(descr);
 	    	}
     		writeAttributes(node, fnod, feat);
@@ -180,7 +180,7 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter implements
     		String description = feat.getDescription();
 	    	if (description != null) {
 	    		Element descr = doc.createElement(DESCRIPTION);
-	    		descr.setTextContent(description);
+	    		descr.setTextContent("\n" + description.replace("\r", "") + "\n");
 	    		fnod.appendChild(descr);
 	    	}
 	    	

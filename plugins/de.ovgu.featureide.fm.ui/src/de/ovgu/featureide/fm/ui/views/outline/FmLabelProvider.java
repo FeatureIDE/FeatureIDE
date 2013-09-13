@@ -24,6 +24,7 @@ import org.eclipse.jface.viewers.IFontProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.prop4j.NodeWriter;
 
@@ -96,9 +97,22 @@ public class FmLabelProvider implements ILabelProvider,IFontProvider, GUIDefault
 			if (((Feature) element).getParent().isAlternative() ||((Feature) element).getParent().isOr())
 				return null;
 			if (((Feature) element).isMandatory()) {
-				return IMG_MANDATORY;
+				
+				Image image = IMG_MANDATORY;
+				Image reDraw = new Image(image.getDevice(), image.getImageData().width, image.getImageData().height);
+				GC gc = new GC(reDraw);
+				gc.drawImage(image, 0, 0, image.getImageData().width, image.getImageData().height, 3, 3, image.getImageData().width, image.getImageData().height);
+				gc.dispose();
+				
+				return reDraw;
 			} else {
-				return IMG_OPTIONAL;
+				Image image = IMG_OPTIONAL;
+				Image reDraw = new Image(image.getDevice(), image.getImageData().width, image.getImageData().height);
+				GC gc = new GC(reDraw);
+				gc.drawImage(image, 0, 0, image.getImageData().width, image.getImageData().height, 3, 3, image.getImageData().width, image.getImageData().height);
+				gc.dispose();
+				
+				return reDraw;
 			}
 		} else if (element instanceof FmOutlineGroupStateStorage) {
 			if (((FmOutlineGroupStateStorage)element).isOrGroup()) {

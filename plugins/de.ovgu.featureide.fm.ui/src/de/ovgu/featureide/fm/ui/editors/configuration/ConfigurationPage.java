@@ -88,7 +88,7 @@ public class ConfigurationPage extends ConfigurationEditorPage {
 	private boolean initialized = false;
 	
 	private LinkedList<String> hiddenFeatures;
-	
+		
 	public void updateTree(){
 		if (errorMessage())
 			refreshTree();

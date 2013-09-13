@@ -645,7 +645,7 @@ public class FeatureModel implements PropertyConstants {
 	public void removeListener(PropertyChangeListener listener) {
 		listenerList.remove(listener);
 	}
-
+	
 	public void handleModelDataLoaded() {
 		PropertyChangeEvent event = new PropertyChangeEvent(this,
 				MODEL_DATA_LOADED, Boolean.FALSE, Boolean.TRUE);

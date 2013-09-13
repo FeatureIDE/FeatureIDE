@@ -145,6 +145,11 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 			if (nodeName.equals(DESCRIPTION)) {
 				/* case: description */
 				String nodeValue = e.getFirstChild().getNodeValue();
+				if (nodeValue != null) { 
+					nodeValue = nodeValue.replace("\t", ""); 
+					nodeValue = nodeValue.substring(1, nodeValue.length() - 1);
+					nodeValue = nodeValue.trim(); 
+				} 
 				parent.setDescription(nodeValue);
 				continue;
 			}

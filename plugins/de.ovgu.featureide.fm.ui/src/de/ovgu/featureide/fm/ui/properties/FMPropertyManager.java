@@ -55,6 +55,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	 * current values
 	 ******************************************************/
 	private volatile static Boolean CURRENT_HIDE_LEGEND = null;
+	private volatile static Boolean CURRENT_HIDE_BORDER_COLOR = null;
 	private volatile static Color CURRENT_LEGEND_FORGOUND = null;
 	private volatile static Color CURRENT_LEGEND_BACKGROUND = null;
 	private volatile static Color CURRENT_DECORATOR_FORGROUND_COLOR = null;
@@ -70,12 +71,14 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	private volatile static Color CURRENT_FEATURE_DEAD = null;
 	private volatile static Color CURRENT_CONSTRAINT_BACKGROUND = null;
 	private volatile static Color CURRENT_WARNING_BACKGROUND = null;
+	private volatile static Color CURRENT_FEATURE_BORDER = null;
+	private volatile static Color FEATURE_BORDER_SAVE = GUIBasics.createBorderColor(CONCRETE_BACKGROUND);
 	private volatile static Integer CURRENT_CONSTRAINT_SPACE_Y = null;
 	private volatile static Integer CURRENT_FEATURE_SPACE_Y = null;
 	private volatile static Integer CURRENT_FEATURE_SPACE_X = null;
 	private volatile static Integer CURRENT_LAYOUT_MARGIN_Y = null;
 	private volatile static Integer CURRENT_LAYOUT_MARGIN_X = null;
-	
+		
 	public static void reset() {
 		CURRENT_HIDE_LEGEND = null;
 		CURRENT_LEGEND_FORGOUND = null;
@@ -98,7 +101,10 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		CURRENT_FEATURE_SPACE_X = null;
 		CURRENT_LAYOUT_MARGIN_Y = null;
 		CURRENT_LAYOUT_MARGIN_X = null;
+		CURRENT_HIDE_BORDER_COLOR = null;
+		CURRENT_FEATURE_BORDER = null;
 	}
+
 	public static void setHideLegend(boolean value) {
 		CURRENT_HIDE_LEGEND = value;
 		setBoolean(QN_HIDE_LEGEND, value);
@@ -109,6 +115,18 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 			CURRENT_HIDE_LEGEND = getBoolean(QN_HIDE_LEGEND);
 		}
 		return CURRENT_HIDE_LEGEND;
+	}
+	
+	public static void setHideBorderColor(boolean value) {
+		CURRENT_HIDE_BORDER_COLOR = value;
+		setBoolean(QN_HIDE_BORDER_COLOR, value);
+	}
+
+	public static boolean isBorderColorHidden() {
+		if (CURRENT_HIDE_BORDER_COLOR == null) {
+			CURRENT_HIDE_BORDER_COLOR = getBoolean(QN_HIDE_BORDER_COLOR);
+		}
+		return CURRENT_HIDE_BORDER_COLOR;
 	}
 
 	public static void setLegendForgroundColor(Color color) {
@@ -279,6 +297,26 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		CURRENT_WARNING_BACKGROUND = color;
 		setColor(QN_WARNING, color);
 	}
+	
+	public static Color getFeatureBorderColor() {
+		if (CURRENT_FEATURE_BORDER == null) {
+			CURRENT_FEATURE_BORDER = getColor(QN_FEATURE_BORDER, CONCRETE_BORDER_COLOR);
+		}
+		return CURRENT_FEATURE_BORDER;
+	}
+
+	public static void setFeatureBorderColor(Color color) {
+		CURRENT_FEATURE_BORDER = color;
+		setColor(QN_FEATURE_BORDER, color);
+	}
+	
+	public static Color getFeatureBorderColorSave() {
+		return FEATURE_BORDER_SAVE;
+	}
+	
+	public static void setFeatureBorderColorSave(Color color) {
+		FEATURE_BORDER_SAVE = color;
+	}
 
 	public static void setLanguage(String text) {
 		setString(QN_LANGUAGE, text);
@@ -397,7 +435,11 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		}
 		return GUIBasics.createLineBorder(getConcreteBorderColor(), 1);
 	}
-
+	
+	public static Border getFeatureBorder() {
+		return GUIBasics.createLineBorder(getFeatureBorderColor(), 1);
+	}
+	
 	private static Color getConcreteBorderColor() {
 		return GUIBasics.createBorderColor(getConcreteFeatureBackgroundColor());
 	}
@@ -582,6 +624,8 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		names.add(QN_FEATURE_X);
 		names.add(QN_FEATURE_Y);
 		names.add(QN_CONSTRAINT_SPACE);
+		names.add(QN_HIDE_BORDER_COLOR);
+		names.add(QN_FEATURE_BORDER);
 		return names;
 	}
 

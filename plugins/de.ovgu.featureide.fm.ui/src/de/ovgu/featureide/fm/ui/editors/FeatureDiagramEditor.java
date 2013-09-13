@@ -88,6 +88,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.RenameAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ReverseOrderAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.SelectionAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ShowHiddenFeaturesAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ChangeFeatureDescriptionAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.AutomatedCalculationsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.ConstrainsCalculationsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.FeaturesOnlyCalculationAction;
@@ -129,7 +130,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	private OrAction orAction;
 	private AlternativeAction alternativeAction;
 	private RenameAction renameAction;
-
+	private ChangeFeatureDescriptionAction changeFeatureDescriptionAction;
+	
 	private ShowHiddenFeaturesAction showHiddenFeaturesAction;
 
 	private ZoomInAction zoomIn;
@@ -245,6 +247,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		hiddenAction = new HiddenAction(this, featureModel);
 		abstractAction = new AbstractAction(this, featureModel,
 				(ObjectUndoContext) featureModel.getUndoContext());
+		changeFeatureDescriptionAction = new ChangeFeatureDescriptionAction(this, featureModel, null);
 		andAction = new AndAction(this, featureModel);
 		orAction = new OrAction(this, featureModel);
 		alternativeAction = new AlternativeAction(this, featureModel);
@@ -339,6 +342,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 			menu.add(mandatoryAction);
 			menu.add(abstractAction);
 			menu.add(hiddenAction);
+			menu.add(changeFeatureDescriptionAction);
 			menu.add(new Separator());
 			menu.add(subMenuLayout);
 			menu.add(subMenuCalculations);

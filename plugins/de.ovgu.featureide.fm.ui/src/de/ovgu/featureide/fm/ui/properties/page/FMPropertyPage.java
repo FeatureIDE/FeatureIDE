@@ -30,6 +30,7 @@ import org.eclipse.jface.preference.ColorSelector;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
@@ -48,6 +49,7 @@ import org.eclipse.ui.dialogs.PropertyPage;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIBasics;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 import de.ovgu.featureide.fm.ui.properties.language.English;
@@ -73,7 +75,9 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		selectorDeadBackground, selectorLegendBorder, selectorDiagramBackground, selectorConstraint, selectorConnection,
 		selectorWarning;
 	//selectorHiddenBackground
-
+	static ColorSelector selectorFeatureBorder;
+	Button buttonHideBorderColor;
+	
 	public FMPropertyPage() {
 
 	}
@@ -153,11 +157,48 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		selectorDiagramBackground = createSelectorEntry(colorGroup, COLOR_DIAGRAM_LABEL,FMPropertyManager.getDiagramBackgroundColor().getRGB(), COLOR_BACKGROUND_TIP);
 		selectorConcreteBackground = createSelectorEntry(colorGroup, COLOR_CONCRETE_LABEL, FMPropertyManager.getConcreteFeatureBackgroundColor().getRGB(), COLOR_CONCRETE_TIP);
 		selectorAbstractBackground = createSelectorEntry(colorGroup, COLOR_ABSTRACT_LABEL, FMPropertyManager.getAbstractFeatureBackgroundColor().getRGB(), COLOR_ABSTRACT_TIP);
+		
+		Label label = new Label(colorGroup, SWT.NULL);
+		label.setText(HIDE_BORDER_COLOR);
+		label.setToolTipText(COLOR_CHECKBOX_TIP);
+		buttonHideBorderColor = new Button(colorGroup, SWT.CHECK);
+		GridData gd = new GridData(GridData.BEGINNING);
+		buttonHideBorderColor.setLayoutData(gd);
+		buttonHideBorderColor.setSelection(FMPropertyManager.isBorderColorHidden());
+		
+		selectorFeatureBorder = createSelectorEntry(colorGroup, COLOR_BORDER, FMPropertyManager.getFeatureBorderColor().getRGB(), COLOR_BORDER_TIP);
 //		selectorHiddenBackground = createSelectorEntry(colorGroup, COLOR_HIDDEN, PersistentPropertyManager.getHiddenFeatureBackgroundColor().getRGB(), COLOR_HIDDEN_TIP);
 		selectorConnection = createSelectorEntry(colorGroup, COLOR_CONNECTION, FMPropertyManager.getConnectionForgroundColor().getRGB(), COLOR_CONNECTION_TIP);
 		selectorConstraint = createSelectorEntry(colorGroup, COLOR_CONSTRAINT, FMPropertyManager.getConstraintBackgroundColor().getRGB(), COLOR_CONSTRAINT_TIP);
 		selectorWarning = createSelectorEntry(colorGroup, COLOR_WARNING, FMPropertyManager.getWarningColor().getRGB(), COLOR_WARNING_TIP);
 		selectorDeadBackground = createSelectorEntry(colorGroup, COLOR_ERROR, FMPropertyManager.getDeadFeatureBackgroundColor().getRGB(), COLOR_DEAD_TIP);
+		
+		if (buttonHideBorderColor.getSelection()) {
+			selectorFeatureBorder.setEnabled(true);
+		} else {
+			selectorFeatureBorder.setEnabled(false);
+		}
+		
+		buttonHideBorderColor.addSelectionListener(new SelectionListener() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (buttonHideBorderColor.getSelection()) {
+					selectorFeatureBorder.setColorValue(FMPropertyManager.getFeatureBorderColorSave().getRGB());
+					selectorFeatureBorder.setEnabled(true);
+				} else {
+					FMPropertyManager.setFeatureBorderColorSave(GUIBasics.createColor(selectorFeatureBorder.getColorValue().red, selectorFeatureBorder.getColorValue().green, selectorFeatureBorder.getColorValue().blue));
+					selectorFeatureBorder.setEnabled(false);
+					selectorFeatureBorder.setColorValue(GUIDefaults.CONCRETE_BORDER_COLOR.getRGB());
+				}
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+				
+			}
+			
+		});
 	}
 	
 	/**
@@ -208,8 +249,15 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		String fileName = x.getFileName();
 		File file = new File(path + "\\" + fileName);
 		new SettingsImport(file);
-		update();
 		
+		if (FMPropertyManager.isBorderColorHidden()) {
+			selectorFeatureBorder.setEnabled(true);
+		}
+		else{
+			selectorFeatureBorder.setEnabled(false);
+		}
+		
+		update();
 	}
 	
 	private void performExport() {
@@ -332,6 +380,8 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		FMPropertyManager.setConstraintBackgroundColor(new Color(null, selectorConstraint.getColorValue()));
 		FMPropertyManager.setConnectionForgroundColor(new Color(null, selectorConnection.getColorValue()));
 		FMPropertyManager.setWarningColor(new Color(null, selectorWarning.getColorValue()));
+		FMPropertyManager.setFeatureBorderColor(new Color(null, selectorFeatureBorder.getColorValue()));
+		FMPropertyManager.setHideBorderColor(buttonHideBorderColor.getSelection());
 	}
 
 	@Override
@@ -375,6 +425,9 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		selectorConstraint.setColorValue(CONSTRAINT_BACKGROUND.getRGB());
 		selectorConnection.setColorValue(CONNECTION_FOREGROUND.getRGB());
 		selectorWarning.setColorValue(WARNING_BACKGROUND.getRGB());
+		selectorFeatureBorder.setColorValue(CONCRETE_BORDER_COLOR.getRGB());
+		selectorFeatureBorder.setEnabled(false);
+		buttonHideBorderColor.setSelection(false);
 	}
 	
 	/**
@@ -443,5 +496,7 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		selectorConstraint.setColorValue(FMPropertyManager.getConstraintBackgroundColor().getRGB());
 		selectorConnection.setColorValue(FMPropertyManager.getConnectionForgroundColor().getRGB());
 		selectorWarning.setColorValue(FMPropertyManager.getWarningColor().getRGB());
+		selectorFeatureBorder.setColorValue(FMPropertyManager.getFeatureBorderColor().getRGB());
+		buttonHideBorderColor.setSelection(FMPropertyManager.isBorderColorHidden());
 	}
 }

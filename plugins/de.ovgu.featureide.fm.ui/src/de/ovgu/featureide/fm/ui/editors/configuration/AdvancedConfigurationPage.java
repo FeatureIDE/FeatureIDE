@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ITreeSelection;
@@ -110,10 +111,12 @@ public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 			public void keyReleased(KeyEvent e) {
 			}
 		});
+		
 		viewer.setContentProvider(new ConfigurationContentProvider());
 		viewer.setLabelProvider(new AdvancedConfigurationLabelProvider());
 		viewer.setInput(null);
 		viewer.expandAll();
+		ColumnViewerToolTipSupport.enableFor(viewer);
 	}
 
 	@Override

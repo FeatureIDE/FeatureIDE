@@ -34,8 +34,8 @@ public interface IFMPropertyPage {
 	 **************************************************************/
 	/* legend group labels: */
 	static final String LEGEND_GROUP_TEXT = "Legend";
-	static final String LEGEND_HIDE_LABEL = "Hide legend";
-	static final String LEGEND_LANGUAGE_LABEL = "Language";
+	static final String LEGEND_HIDE_LABEL = "Hide legend:";
+	static final String LEGEND_LANGUAGE_LABEL = "Language:";
 	static final String LEGEND_BORDER_LABEL = "Border color:";
 	static final String LEGEND_BACKGROUND_LABEL = "Background color:";
 
@@ -81,6 +81,8 @@ public interface IFMPropertyPage {
 	static final String COLOR_CONSTRAINT = "Constraint color:";
 	static final String COLOR_WARNING = "Warning color:";
 	static final String COLOR_CONNECTION = "Connection color:";
+	static final String HIDE_BORDER_COLOR = "Custom border color";
+	static final String COLOR_BORDER = "Feature border color:";
 	
 	/* color group tool tips: */ // TODO @Jens: tool tips
 //	static final String COLOR_HIDDEN_TIP = "";
@@ -91,6 +93,8 @@ public interface IFMPropertyPage {
 	static final String COLOR_BACKGROUND_TIP = "";
 	static final String COLOR_CONCRETE_TIP = "";
 	static final String COLOR_ABSTRACT_TIP = "";
+	static final String COLOR_CHECKBOX_TIP = "enabled: custom color selectable\ndisabled: standard color";
+	static final String COLOR_BORDER_TIP = "";
 	
 	/************************************************************** 
 	 * extensions group elements:                                 *
