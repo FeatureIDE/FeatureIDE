@@ -49,6 +49,7 @@ import de.ovgu.featureide.ahead.wrapper.AheadWrapper;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
+import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 
 
@@ -445,12 +446,14 @@ public class AheadComposer extends ComposerExtensionClass {
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#hasCompositionTools()
-	 */
 	@Override
 	public boolean hasCompositionMechanisms() {
 		return true;
+	}
+
+	@Override
+	public Mechanism getGenerationMechanism() {
+    		return IComposerExtensionClass.Mechanism.FEATURE_ORIENTED_PROGRAMMING;
 	}
 
 

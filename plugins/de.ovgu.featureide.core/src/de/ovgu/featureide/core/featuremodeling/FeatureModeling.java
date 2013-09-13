@@ -70,4 +70,8 @@ public class FeatureModeling extends ComposerExtensionClass {
 	
 	}
 
+	public Mechanism getGenerationMechanism() {
+	    return null;
+	}
+
 }

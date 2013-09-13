@@ -22,6 +22,7 @@ package de.ovgu.featureide.core.fstmodel;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.annotation.Nonnull;
 
@@ -31,14 +32,15 @@ import de.ovgu.featureide.core.IFeatureProject;
 
 /**
  * The FSTModel represents the projects structure.<br>
- * {@link FSTClass}es and {@link FSTFeature}s can have a shared {@link FSTRole}s.<br>
+ * {@link FSTClass}es and {@link FSTFeature}s can have a shared {@link FSTRole}
+ * s.<br>
  * For a visualization of the FSTModels structure see <i>lib/FSTModel.jpg<i>.
  * 
  * @author Jens Meinicke
  */
 
 public class FSTModel {
-	
+
 	private HashMap<String, FSTClass> classes = new HashMap<String, FSTClass>();
 	private HashMap<String, FSTFeature> features = new HashMap<String, FSTFeature>();
 	private IFeatureProject featurProject;
@@ -51,18 +53,19 @@ public class FSTModel {
 		classes.clear();
 		features.clear();
 	}
-	
+
 	@Nonnull
 	public LinkedList<FSTFeature> getFeatures() {
 		return new LinkedList<FSTFeature>(features.values());
 	}
-	
+
 	public FSTFeature getFeature(String name) {
 		return features.get(name);
 	}
 
 	/**
-	 * It is recommended {@link #addRole(String, String, IFile)} to generate a FST.
+	 * It is recommended {@link #addRole(String, String, IFile)} to generate a
+	 * FST.
 	 */
 	public FSTFeature addFeature(String name) {
 		FSTFeature feature = getFeature(name);
@@ -73,7 +76,7 @@ public class FSTModel {
 		features.put(name, feature);
 		return feature;
 	}
-	
+
 	public FSTRole addRole(String featureName, String className, IFile file) {
 		FSTRole role = getRole(featureName, className);
 		if (role != null) {
@@ -101,6 +104,10 @@ public class FSTModel {
 
 	public FSTClass getClass(String fileName) {
 		return classes.get(fileName);
+	}
+
+	public List<FSTClass> getClasses() {
+		return new LinkedList<FSTClass>(classes.values());
 	}
 
 	public IFeatureProject getFeatureProject() {

@@ -54,6 +54,7 @@ import org.eclipse.xtext.validation.Issue;
 import com.google.inject.Injector;
 
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
+import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
@@ -314,5 +315,10 @@ public class DeltajComposer extends ComposerExtensionClass {
 		 ArrayList<String[]> list = new  ArrayList<String[]>(8);
 		 list.add(new String[]{"DeltaJ", "deltaj", "delta " + CLASS_NAME_PATTERN + " {\n\t\n}"});
 		 return list;
+	}
+
+	@Override
+	public Mechanism getGenerationMechanism() {
+	    return IComposerExtensionClass.Mechanism.DELTA_ORIENTED_PROGRAMMING;
 	}
 }

@@ -38,6 +38,7 @@ import org.eclipse.core.runtime.CoreException;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
+import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.featurecpp.model.FeatureCppModelBuilder;
 import de.ovgu.featureide.featurecpp.wrapper.FeatureCppWrapper;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
@@ -280,10 +281,7 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 			featureCppModelBuilder.buildModel();
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.ComposerExtensionClass#buildConfiguration(org.eclipse.core.resources.IFolder, de.ovgu.featureide.fm.core.configuration.Configuration)
-	 */
+
 	@Override
 	public void buildConfiguration(IFolder folder, Configuration configuration, String congurationName) {
 		super.buildConfiguration(folder, configuration, congurationName);
@@ -297,5 +295,10 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 		} catch (CoreException e) {
 			FeatureCppCorePlugin.getDefault().logError(e);
 		}
+	}
+
+	@Override
+	public Mechanism getGenerationMechanism() {
+	    return IComposerExtensionClass.Mechanism.FEATURE_ORIENTED_PROGRAMMING;
 	}
 }

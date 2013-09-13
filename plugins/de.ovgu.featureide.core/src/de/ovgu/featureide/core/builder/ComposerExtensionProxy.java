@@ -211,4 +211,8 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	public boolean hasCompositionMechanisms() {
 		return composerExtensionClass.hasCompositionMechanisms();
 	}
+
+	public Mechanism getGenerationMechanism() {
+	    return composerExtensionClass.getGenerationMechanism();
+	}
 }

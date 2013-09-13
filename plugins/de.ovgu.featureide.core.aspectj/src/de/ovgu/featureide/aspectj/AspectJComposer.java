@@ -52,6 +52,7 @@ import org.osgi.framework.Bundle;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
+import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
@@ -538,6 +539,11 @@ public class AspectJComposer extends ComposerExtensionClass {
 	@Override
 	public boolean hasFeatureFolder() {
 		return false;
+	}
+
+	@Override
+	public Mechanism getGenerationMechanism() {
+	    return IComposerExtensionClass.Mechanism.ASPECT_ORIENTED_PROGRAMMING;
 	}
 
 }

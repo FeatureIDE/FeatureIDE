@@ -53,6 +53,9 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
  * @author Tom Brosch
  */
 public interface IComposerExtensionClass {
+    
+	/** Defines the product-line implementation-mechanism of the composition tool **/
+    static enum  Mechanism {FEATURE_ORIENTED_PROGRAMMING, ASPECT_ORIENTED_PROGRAMMING, DELTA_ORIENTED_PROGRAMMING, PREPROCESSOR};
 	
 	final static String PACKAGE_PATTERN = "#package#";
 	final static String REFINES_PATTERN = "#refines#";
@@ -222,4 +225,9 @@ public interface IComposerExtensionClass {
 	 * @return <code>true</code> if the composition tool supports different composition tools
 	 */
 	boolean hasCompositionMechanisms();
+	
+	/**
+	 * @return The generation mechanism of the generation tool, or null. 
+	 */
+	Mechanism getGenerationMechanism();
 }

@@ -45,6 +45,7 @@ import br.ufal.ic.colligens.util.InvalidProductViewLog;
 import br.ufal.ic.colligens.util.ProjectConfigurationErrorLogger;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.builder.preprocessor.PPComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.Feature;
@@ -713,6 +714,11 @@ public class CPPComposer extends PPComposerExtensionClass {
 	@Override
 	public boolean canGeneratInParallelJobs() {
 		return true;
+	}
+
+	@Override
+	public Mechanism getGenerationMechanism() {
+		return IComposerExtensionClass.Mechanism.PREPROCESSOR;
 	}
 
 }

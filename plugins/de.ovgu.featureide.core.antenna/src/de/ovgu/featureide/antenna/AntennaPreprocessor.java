@@ -45,6 +45,7 @@ import antenna.preprocessor.v3.PPException;
 import antenna.preprocessor.v3.Preprocessor;
 import de.ovgu.featureide.antenna.model.AntennaModelBuilder;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.builder.preprocessor.PPComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
@@ -429,6 +430,11 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	@Override
 	public boolean needColor() {
 		return true;
+	}
+
+	@Override
+	public Mechanism getGenerationMechanism() {
+	    return IComposerExtensionClass.Mechanism.PREPROCESSOR;
 	}
 
 }

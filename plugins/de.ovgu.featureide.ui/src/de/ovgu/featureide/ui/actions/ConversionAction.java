@@ -36,15 +36,11 @@ import de.ovgu.featureide.ui.wizards.ConversionWizard;
  * @author Jens Meinicke
  */
 public class ConversionAction implements IObjectActionDelegate {
-
+	
 	private ISelection selection;
 	
-	public ConversionAction() {
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
-	 */
+	public ConversionAction() {}
+
 	@Override
 	public void run(IAction action) {
 		ConversionWizard wizard = new ConversionWizard();
@@ -53,21 +49,14 @@ public class ConversionAction implements IObjectActionDelegate {
 		dialog.open();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction, org.eclipse.jface.viewers.ISelection)
-	 */
 	@Override
 	public void selectionChanged(IAction action, ISelection selection) {
-		this.selection = selection; 
+		this.selection = selection;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface.action.IAction, org.eclipse.ui.IWorkbenchPart)
-	 */
 	@Override
 	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
-
+		
 	}
-
-
+	
 }

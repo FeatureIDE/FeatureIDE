@@ -69,6 +69,7 @@ import de.ovgu.cide.fstgen.ast.FSTNode;
 import de.ovgu.cide.fstgen.ast.FSTTerminal;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
+import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.featurehouse.errorpropagation.ErrorPropagation;
 import de.ovgu.featureide.featurehouse.meta.featuremodel.FeatureModelClassGenerator;
 import de.ovgu.featureide.featurehouse.model.FeatureHouseModelBuilder;
@@ -993,6 +994,11 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			super.copyNotComposedFiles(config, destination);
 		}
 
+	}
+
+	@Override
+	public Mechanism getGenerationMechanism() {
+	    return IComposerExtensionClass.Mechanism.FEATURE_ORIENTED_PROGRAMMING;
 	}
 	
 }
