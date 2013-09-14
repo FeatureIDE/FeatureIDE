@@ -48,7 +48,6 @@ import de.ovgu.featureide.fm.ui.views.FeatureModelEditView;
  * 
  * @author Thomas Thuem
  */
-// TODO differences should be highlighted
 public class ViewContentProvider implements IStructuredContentProvider,
 		ITreeContentProvider, GUIDefaults {
 

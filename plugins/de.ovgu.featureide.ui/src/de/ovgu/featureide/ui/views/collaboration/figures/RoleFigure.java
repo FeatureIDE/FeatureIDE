@@ -220,11 +220,6 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		setToolTip(tooltipContent);
 	}
 
-
-
-	/**
-	 * TODO description
-	 */
 	private void createContentForFieldMethodFilter() {
 		Figure tooltipContent = new Figure();
 		GridLayout contentsLayout = new GridLayout(1,true);

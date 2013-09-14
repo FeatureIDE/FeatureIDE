@@ -176,9 +176,6 @@ public class AheadBuildErrorEvent {
 	/**
 	 * Initializes {@link AheadBuildErrorEvent#matcher} and {@link AheadBuildErrorEvent#fileName}.
 	 * 
-	 * @param contentString
-	 * @param composedJakLine 
-	 * @return TODO
 	 */
 	public int setSourceFile(String contentString, int composedJakLine) {
 		PosString content = new PosString(contentString);

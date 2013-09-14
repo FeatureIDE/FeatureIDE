@@ -2,6 +2,19 @@
 	<featureModel chosenLayoutAlgorithm="1">
 		<struct>
 			<or mandatory="true" name="A1">
+				<description>
+					Rooooooooot
+					1
+					2
+					3
+					4
+					5
+					6
+					7
+					8
+					9
+					0
+				</description>
 				<and mandatory="true" name="A2">
 					<and mandatory="true" name="A3">
 						<feature mandatory="true" name="C23"/>
@@ -245,9 +258,20 @@
 					</and>
 					<feature mandatory="true" name="C6"/>
 					<and mandatory="true" name="A7">
-						<feature mandatory="true" name="C17"/>
+						<feature mandatory="true" name="C17">
+							<description>
+								Description 1
+								
+								Test
+								
+								Test   Test
+							</description>
+						</feature>
 						<feature mandatory="true" name="C18"/>
 						<alt name="A19">
+							<description>
+								Description -.,1234567890
+							</description>
 							<feature mandatory="true" name="C99"/>
 							<and mandatory="true" name="A100">
 								<feature mandatory="true" name="C135"/>

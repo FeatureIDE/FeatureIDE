@@ -10,6 +10,7 @@ import org.eclipse.swt.graphics.Image;
 
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.ui.UIPlugin;
+import de.ovgu.featureide.ui.statistics.core.StatisticsIds;
 import de.ovgu.featureide.ui.statistics.ui.FeatureStatisticsView;
 import de.ovgu.featureide.ui.statistics.ui.helper.TreeLabelProvider;
 

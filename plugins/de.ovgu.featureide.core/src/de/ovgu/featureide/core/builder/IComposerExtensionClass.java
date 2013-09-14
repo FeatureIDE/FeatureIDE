@@ -41,7 +41,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 /**
  * @brief Base interface of all composition tool classes.
  * 
- * Every plugin which extends the de.ovgu.featureide.core.composers needs to provide a class,
+ * Every plug-in which extends the de.ovgu.featureide.core.composers needs to provide a class,
  * which implements this interface. Implementing this interface ensures that a given
  * composition tool meets the requirements for composition tools, which are used by the
  * @c ExtensibleFeatureProjectBuilder. This requirements are:
@@ -227,7 +227,7 @@ public interface IComposerExtensionClass {
 	boolean hasCompositionMechanisms();
 	
 	/**
-	 * @return The generation mechanism of the generation tool, or null. 
+	 * @return The generation {@link Mechanism} of the generation tool, or null. 
 	 */
 	Mechanism getGenerationMechanism();
 }

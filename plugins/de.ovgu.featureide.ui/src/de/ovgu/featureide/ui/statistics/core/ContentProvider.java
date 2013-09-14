@@ -18,7 +18,6 @@ import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
-import de.ovgu.featureide.ui.statistics.core.composite.StatisticsIds;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.ConfigParentNode;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.DirectivesNode;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.StatisticsFeatureComplexity;
@@ -35,7 +34,8 @@ import de.ovgu.featureide.ui.statistics.ui.helper.JobDoneListener;
  * @author Patrick Haese
  */
 public class ContentProvider implements ITreeContentProvider, StatisticsIds {
-	private static final Parent DEFAULT_TEXT = new Parent("Please open a file from a FeatureIDE project", null);
+	
+	private static final Parent DEFAULT_TEXT = new Parent(OPEN_FILE, null);
 	private TreeViewer viewer;
 	public Parent godfather = new Parent("godfather", null);
 	private IFeatureProject project;
@@ -56,9 +56,7 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 	
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-		/**
-		 * Currently no reason to have code here.
-		 */
+
 	}
 	
 	public ContentProvider(TreeViewer viewer) {
@@ -100,7 +98,7 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 	
 	/**
 	 * Calculates content to be shown. If the current editor is not editing a
-	 * file out of a featureproject a default message is being displayed. Every
+	 * file out of a feature project a default message is being displayed. Every
 	 * node is responsible for its own content. So for further information see
 	 * the classes in "lazyimplementations"-package.
 	 * 
@@ -132,26 +130,22 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 		String composerName = composer.getName();
 		Parent composerParent = new Parent(DESC_COMPOSER_NAME, composerName);
 		
-		godfather.addChild(new Parent("Project Name", project.getProjectName()));
+		godfather.addChild(new Parent(PROJECT_NAME, project.getProjectName()));
 		godfather.addChild(composerParent);
-		Parent featureModelStatistics = new Parent("Statistics of the feature model");
-		featureModelStatistics.addChild(new StatisticsFeatureComplexity("Number of feature", featModel));
-		featureModelStatistics.addChild(new ConfigParentNode("Valid configurations of the feature model", featModel));
+		Parent featureModelStatistics = new Parent(STATISTICS_OF_THE_FEATURE_MODEL);
+		featureModelStatistics.addChild(new StatisticsFeatureComplexity(NUMBER_OF_FEATURE, featModel));
+		featureModelStatistics.addChild(new ConfigParentNode(VALID_CONFIGURATIONS, featModel));
 		godfather.addChild(featureModelStatistics);
 		
 		if (composer.getGenerationMechanism() == IComposerExtensionClass.Mechanism.FEATURE_ORIENTED_PROGRAMMING) {
-			godfather.addChild(new StatisticsProgrammSize("Statistics of the product-line implementation", fstModel));
+			godfather.addChild(new StatisticsProgrammSize(PRODUCT_LINE_IMPLEMENTATION, fstModel));
 		}
 		if (composer.getGenerationMechanism() == IComposerExtensionClass.Mechanism.PREPROCESSOR) {
-			godfather.addChild(new DirectivesNode("Statistics of the product-line implementation", fstModel));
+			godfather.addChild(new DirectivesNode(PRODUCT_LINE_IMPLEMENTATION, fstModel));
 		}
 		refresh();
 	}
 	
-	/**
-	 * FIXME sometimes the classes and features of the fstmodel are
-	 * null. actually we avoid crashing by rebuilding the fstmodel everytime.
-	 */
 	private FSTModel getFSTModel(IComposerExtension composer) {
 		FSTModel fstModel = project.getFSTModel();
 		if (fstModel == null || fstModel.getClasses().isEmpty() || fstModel.getFeatures().isEmpty()) {
@@ -163,7 +157,7 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 	}
 	
 	/**
-	 * Prints a default message when the plugin can't find necessary
+	 * Prints a default message when the plug-in can't find necessary
 	 * information.
 	 */
 	public void defaultContent() {

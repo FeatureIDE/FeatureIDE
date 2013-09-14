@@ -26,7 +26,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
- * TODO description
+ * TODO @Krieter description
  * 
  * @author Sebastian Krieter
  */

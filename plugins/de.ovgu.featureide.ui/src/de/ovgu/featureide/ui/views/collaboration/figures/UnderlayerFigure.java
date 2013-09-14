@@ -27,7 +27,7 @@ import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 import de.ovgu.featureide.ui.views.collaboration.model.Collaboration;
 
 /**
- * TODO description
+ * TODO @Krieter description
  * 
  * @author Sebastian Krieter
  * @author Steffen Schulze

@@ -30,7 +30,7 @@ import de.ovgu.featureide.ui.statistics.ui.helper.TreeClickListener;
 
 /**
  * Implements a second sorting-order. If
- * {@link AbstractSortModeNode#sortByValue} is true, the imminent childnodes are
+ * {@link AbstractSortModeNode#sortByValue} is true, the imminent child nodes are
  * sorted by their value instead of being sorted alphabetically. In this
  * implementation the {@link TreeClickListener} is responsible for changing
  * this.

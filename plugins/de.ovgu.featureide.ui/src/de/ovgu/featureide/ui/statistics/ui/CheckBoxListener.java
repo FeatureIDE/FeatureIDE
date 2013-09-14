@@ -37,19 +37,15 @@ import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 
 /**
- * TODO description 
+ * Handles the check boxes of the export dialog of the statistics view.
  * 
  * @author Dominik Hamann
  * @author Haese Patrick
  */
 public class CheckBoxListener implements ICheckStateListener {
+
 	private CheckboxTreeViewer viewer;
 
-	/**
-	 * 
-	 * 
-	 * @param viewer
-	 */
 	public CheckBoxListener(final CheckboxTreeViewer viewer) {
 		super();
 		this.viewer = viewer;
@@ -96,43 +92,9 @@ public class CheckBoxListener implements ICheckStateListener {
 
 	@Override
 	public void checkStateChanged(CheckStateChangedEvent event) {
-		// Object element = event.getElement();
-		// if(element instanceof Parent){
-		// ((Parent) element).getParent();
-		// }
-		// refreshViewer();
+		
 	}
-
-	// /**
-	// * @param element
-	// * @return true, if the element has at least one child-element, which is
-	// * checked but not grayed. False otherwise.
-	// */
-	// private boolean hasCheckedChild(Object element) {
-	// boolean hasCheckedChild = false;
-	// if (element instanceof Parent) {
-	// Parent parent = (Parent) element;
-	// if (parent.hasChildren() && (!(parent instanceof LazyParent) || (parent
-	// instanceof LazyParent && !((LazyParent) parent).isLazy()))) {
-	// for (Parent child : parent.getChildren()) {
-	// if (isOnlyChecked(child)) {
-	// hasCheckedChild = true;
-	// break;
-	// }
-	// }
-	// }
-	// }
-	// return hasCheckedChild;
-	// }
-
-	/**
-	 * @param element
-	 * @return true if the element is checked but not grayed.
-	 */
-	private boolean isOnlyChecked(Object element) {
-		return viewer.getChecked(element) && !viewer.getGrayed(element);
-	}
-
+	
 	/**
 	 * @param element
 	 * @return
@@ -149,7 +111,7 @@ public class CheckBoxListener implements ICheckStateListener {
 	}
 
 	private void refreshViewer() {
-		UIJob job = new UIJob("refresh dialog - treeviewer") {
+		UIJob job = new UIJob("Refresh export dialog") {
 
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {

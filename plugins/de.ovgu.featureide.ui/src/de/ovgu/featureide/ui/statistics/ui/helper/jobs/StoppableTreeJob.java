@@ -24,7 +24,7 @@ import de.ovgu.featureide.fm.core.StoppableJob;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 
 /**
- * TODO description
+ * A internal job for the statistics view.
  * 
  * @author Dominik Hamann
  */

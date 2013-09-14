@@ -69,14 +69,10 @@ public class CsvExporter {
 	
 	public void export(final Object[] export) {
 		
-		UIJob uiJob = new UIJob("choose file") {
+		UIJob uiJob = new UIJob("") {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
-				
-				visibleExpandedElements = export;
-				// CheckboxTreeViewer tree;
-				// visibleExpandedElements = view.getVisibleExpandedElements();
-				
+				visibleExpandedElements = export;				
 				FileDialog dialog = new FileDialog(shell);
 				dialog.setFilterExtensions(new String[] { "*.csv" });
 				dialog.setText("choose wisely");
@@ -123,7 +119,7 @@ public class CsvExporter {
 	 * 
 	 */
 	private void actualExport() {
-		Job job = new Job("export statistics to csv") {
+		Job job = new Job("Export statistics into csv") {
 			
 			private StringBuilder firstBuffer;
 			private StringBuilder secondBuffer;

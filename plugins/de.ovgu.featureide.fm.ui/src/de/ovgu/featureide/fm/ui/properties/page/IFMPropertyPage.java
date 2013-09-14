@@ -84,7 +84,7 @@ public interface IFMPropertyPage {
 	static final String HIDE_BORDER_COLOR = "Custom border color";
 	static final String COLOR_BORDER = "Feature border color:";
 	
-	/* color group tool tips: */ // TODO @Jens: tool tips
+	/* color group tool tips: */ 
 //	static final String COLOR_HIDDEN_TIP = "";
 	static final String COLOR_DEAD_TIP = "";
 	static final String COLOR_CONNECTION_TIP = "";

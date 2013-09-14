@@ -1,6 +1,8 @@
-package de.ovgu.featureide.ui.statistics.core.composite;
+package de.ovgu.featureide.ui.statistics.core;
 
 import org.eclipse.jface.viewers.TreeViewer;
+
+import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 
 /**
  * Defines descriptions for nodes in the TreeViewer in order to keep everything
@@ -14,6 +16,13 @@ import org.eclipse.jface.viewers.TreeViewer;
  */
 public interface StatisticsIds {
 	
+	public static final String OPEN_FILE = "Please open a file from a FeatureIDE project";
+	public static final String PRODUCT_LINE_IMPLEMENTATION = "Statistics of product-line implementation";
+	public static final String VALID_CONFIGURATIONS = "Valid configurations of the feature model";
+	public static final String NUMBER_OF_FEATURE = "Feature statistics";
+	public static final String STATISTICS_OF_THE_FEATURE_MODEL = "Statistics of the feature model";
+	public static final String PROJECT_NAME = "Project Name";
+
 	public static final String SEPARATOR = ": ";
 	public static final String NUMBER_FEATURES = "Number of features";
 	public static final String NUMBER_CONCRETE = "Number of concrete features";

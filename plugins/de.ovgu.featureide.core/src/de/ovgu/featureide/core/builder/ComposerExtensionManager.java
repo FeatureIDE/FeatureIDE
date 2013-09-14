@@ -44,10 +44,7 @@ public class ComposerExtensionManager extends ExtensionPointManager<IComposerExt
 	public static ComposerExtensionManager getInstance() {
 		return instance;
 	}
-	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.ExtensionPointManager#parseExtension(org.eclipse.core.runtime.IConfigurationElement)
-	 */
+
 	@Override
 	protected IComposerExtension parseExtension(
 			IConfigurationElement configurationElement) {

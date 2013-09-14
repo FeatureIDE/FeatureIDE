@@ -102,4 +102,9 @@ public class TSXFMReaderWriter extends TAbstractFeatureModelReaderWriter{
 			}
 		}
 	}
+	
+	@Override
+	public void testDescription() {
+		// description not implemented
+	}
 }

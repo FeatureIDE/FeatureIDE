@@ -74,5 +74,9 @@ public class TGuidslReaderWriter extends TAbstractFeatureModelReaderWriter{
 		}
 	}
 
+	@Override
+	public void testDescription() {
+		// description not implemented
+	}
 	
 }

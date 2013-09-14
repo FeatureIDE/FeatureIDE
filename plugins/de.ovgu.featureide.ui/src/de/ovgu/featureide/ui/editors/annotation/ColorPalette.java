@@ -24,7 +24,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 
 /**
- * TODO description
+ * TODO @Krieter description
  * 
  * @author Sebastian Krieter
  */

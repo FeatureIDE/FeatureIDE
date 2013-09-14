@@ -35,7 +35,8 @@ import de.ovgu.featureide.core.listeners.IFeatureFolderListener;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
- * TODO description
+ * TODO description / is this class used?
+ * 
  */
 public class FeatureFolderDecorator implements ILightweightLabelDecorator, IFeatureFolderListener {
 	

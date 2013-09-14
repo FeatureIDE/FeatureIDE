@@ -30,7 +30,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * TODO description
+ * TODO @Krieter description
  * 
  * @author Sebastian Krieter
  */
