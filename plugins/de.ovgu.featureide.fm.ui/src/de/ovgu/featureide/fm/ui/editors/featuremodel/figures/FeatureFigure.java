@@ -28,9 +28,7 @@ import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
-import org.prop4j.NodeWriter;
 
-import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureStatus;
@@ -179,7 +177,10 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 			toolTip += "\r\n\r\n" + "Description:\r\n" + description;
 		}
 		
-		toolTip += getRelevantConstraints();
+		String contraints = feature.getRelevantConstraintsString();
+		if (!contraints.isEmpty()) {
+			toolTip += "\n\nConstraints:\n" + contraints;
+		}
 		Figure toolTipContent = new Figure();
 		toolTipContent.setLayoutManager(gl);
 		toolTipContent.setFont(DEFAULT_FONT);
@@ -193,28 +194,6 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		setToolTip(toolTipContent);
 	}
 	
-	private String getRelevantConstraints() {
-		StringBuilder relevant = new StringBuilder();
-		for (Constraint constraint : featureModel.getConstraints()) {
-			String node = constraint.getNode().toString(NodeWriter.logicalSymbols);
-			
-			String[] constraints = node.split(" ");
-			for (String s : constraints) {
-				if (s.equals(feature.getName())) {
-					relevant.append("\n " + node + " ");
-				}
-			}			
-		}
-		if (relevant.length() > 0) {
-			return "\n" + relevant.toString();
-		}
-		return "";
-	}
-	
-	public String getFeatureModelConstraints() {
-		return getRelevantConstraints();
-	}
-
 	public ConnectionAnchor getSourceAnchor() {
 		return sourceAnchor;
 	}

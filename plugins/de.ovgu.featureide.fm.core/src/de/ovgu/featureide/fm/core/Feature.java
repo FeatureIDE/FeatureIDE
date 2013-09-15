@@ -28,6 +28,8 @@ import java.util.List;
 
 import javax.annotation.CheckForNull;
 
+import org.prop4j.NodeWriter;
+
 /**
  * Provides all properties of a feature. This includes its connections to parent
  * and child features.
@@ -172,6 +174,25 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 
 	public List<Constraint> getRelevantConstraints() {
 		return partOfConstraints;
+	}
+	
+	/**
+	 * 
+	 * @return all constraints containing this feature.
+	 */
+	public String getRelevantConstraintsString() {
+		StringBuilder relevant = new StringBuilder();
+		for (Constraint constraint : featureModel.getConstraints()) {
+			String node = constraint.getNode().toString(NodeWriter.logicalSymbols);
+			List<Feature> containedFeatures = constraint.getContainedFeatures();
+			for (Feature f : containedFeatures) {
+				if (f.getName().equals(getName())) {
+					relevant.append((relevant.length() == 0 ? " " : "\n ") + node + " ");
+					break;
+				}
+			}			
+		} 
+		return relevant.toString();
 	}
 
 	public void setRelevantConstraints() {

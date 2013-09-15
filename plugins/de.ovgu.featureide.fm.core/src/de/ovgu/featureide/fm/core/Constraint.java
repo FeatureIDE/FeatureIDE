@@ -184,6 +184,9 @@ public class Constraint implements PropertyConstants {
 	 * @return All {@link Feature}s contained at this {@link Constraint}.
 	 */
 	public List<Feature> getContainedFeatures(){
+		if (containedFeatureList.isEmpty()) {
+			setContainedFeatures();
+		}
 		return containedFeatureList;
 	}
 

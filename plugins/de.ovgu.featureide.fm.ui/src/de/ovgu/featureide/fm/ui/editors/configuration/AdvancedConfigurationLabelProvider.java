@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.ui.editors.configuration;
 
 import java.util.HashMap;
+
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -31,7 +32,6 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.FeatureFigure;
 
 /**
  * Provides labels and images for the configuration tree view.
@@ -78,8 +78,8 @@ public class AdvancedConfigurationLabelProvider extends ColumnLabelProvider
 		SelectableFeature selFeature = (SelectableFeature) o;
 		Feature feature = selFeature.getFeature();
 
-		image1 = getFirstImage(feature);
-		image2 = getSecondImage(selFeature);
+		image1 = getConnectionImage(feature);
+		image2 = getSelectionImage(selFeature);
 
 		ImageData imageData1 = image1.getImageData();
 		ImageData imageData2 = image2.getImageData();
@@ -117,8 +117,7 @@ public class AdvancedConfigurationLabelProvider extends ColumnLabelProvider
 		return combinedImages.get(image1ToString + image2ToString);
 	}
 
-	private Image getFirstImage(Feature feature) {
-
+	private Image getConnectionImage(Feature feature) {
 		if (!feature.isRoot()) {
 			if (feature.getParent() != null) {
 				if (feature.getParent().isOr()) {
@@ -139,7 +138,7 @@ public class AdvancedConfigurationLabelProvider extends ColumnLabelProvider
 		return i;
 	}
 
-	private Image getSecondImage(SelectableFeature feat) {
+	private Image getSelectionImage(SelectableFeature feat) {
 		if (feat.getAutomatic() != Selection.UNDEFINED)
 			return feat.getAutomatic() == Selection.SELECTED ? IMAGE_ASELECTED
 					: IMAGE_ADESELECTED;
@@ -159,21 +158,18 @@ public class AdvancedConfigurationLabelProvider extends ColumnLabelProvider
 		if (element instanceof SelectableFeature) {
 			SelectableFeature feature = (SelectableFeature) element;
 
-			FeatureFigure featureFigure = new FeatureFigure(
-					feature.getFeature(), feature.getFeature()
-							.getFeatureModel());
-			String relConst = featureFigure.getFeatureModelConstraints();
+			String relConst = feature.getFeature().getRelevantConstraintsString();
 			String describ = feature.getFeature().getDescription();
 
 			if (describ != null && !relConst.equals("")) {
-				return "Description:\n" + describ + "\nConstraint:\n"
-						+ relConst.substring(2);
+				return "Description:\n" + describ + "\n\nConstraints:\n"
+						+ relConst;
 			}
 			if (describ != null && relConst.equals("")) {
 				return "Description:\n" + describ;
 			}
 			if (describ == null && !relConst.equals("")) {
-				return "Constraint:\n" + relConst.substring(2);
+				return "Constraints:\n" + relConst;
 			}
 		}
 		return null;
