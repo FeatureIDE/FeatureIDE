@@ -243,32 +243,21 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 	}
 
 	private void performImport() {
-		FileDialog x = new FileDialog(new Shell(),SWT.OPEN);
-		x.open();
-		String path = x.getFilterPath();
-		String fileName = x.getFileName();
-		File file = new File(path + "\\" + fileName);
-		new SettingsImport(file);
-		
-		if (FMPropertyManager.isBorderColorHidden()) {
-			selectorFeatureBorder.setEnabled(true);
+		FileDialog importDialog = new FileDialog(new Shell(),SWT.OPEN);
+		if (importDialog.open() != null) {
+			new SettingsImport(new File(importDialog.getFilterPath() + "\\" + importDialog.getFileName()));
+			update();
 		}
-		else{
-			selectorFeatureBorder.setEnabled(false);
-		}
-		
-		update();
 	}
 	
 	private void performExport() {
 		applySettings();
-		FileDialog x = new FileDialog(new Shell(),SWT.SAVE);
-		x.setFilterPath(FMPropertyManager.workspaceRoot.getLocation().toOSString());
-		x.setFilterIndex(0);
-		x.open();
-		String path = x.getFilterPath();
-		String fileName = x.getFileName();
-		new SettingsExport(new File(path + "\\" + fileName));
+		FileDialog exportDialog = new FileDialog(new Shell(),SWT.SAVE);
+		exportDialog.setFilterPath(FMPropertyManager.workspaceRoot.getLocation().toOSString());
+		exportDialog.setFilterIndex(0);
+		if (exportDialog.open() != null) {
+			new SettingsExport(new File(exportDialog.getFilterPath() + "\\" + exportDialog.getFileName()));
+		}
 	}
 	
 	/**
@@ -496,6 +485,7 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		selectorConstraint.setColorValue(FMPropertyManager.getConstraintBackgroundColor().getRGB());
 		selectorConnection.setColorValue(FMPropertyManager.getConnectionForgroundColor().getRGB());
 		selectorWarning.setColorValue(FMPropertyManager.getWarningColor().getRGB());
+		selectorFeatureBorder.setEnabled(FMPropertyManager.isBorderColorHidden());
 		selectorFeatureBorder.setColorValue(FMPropertyManager.getFeatureBorderColor().getRGB());
 		buttonHideBorderColor.setSelection(FMPropertyManager.isBorderColorHidden());
 	}

@@ -183,11 +183,9 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 	public String getRelevantConstraintsString() {
 		StringBuilder relevant = new StringBuilder();
 		for (Constraint constraint : featureModel.getConstraints()) {
-			String node = constraint.getNode().toString(NodeWriter.logicalSymbols);
-			List<Feature> containedFeatures = constraint.getContainedFeatures();
-			for (Feature f : containedFeatures) {
+			for (Feature f : constraint.getContainedFeatures()) {
 				if (f.getName().equals(getName())) {
-					relevant.append((relevant.length() == 0 ? " " : "\n ") + node + " ");
+					relevant.append((relevant.length() == 0 ? " " : "\n ") + constraint.getNode().toString(NodeWriter.logicalSymbols) + " ");
 					break;
 				}
 			}			
@@ -197,13 +195,15 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 
 	public void setRelevantConstraints() {
 		List<Constraint> constraintList = new ArrayList<Constraint>();
-
 		for (Constraint constraint : featureModel.getConstraints()) {
-			if (constraint.toString().contains(this.getName()))
-				constraintList.add(constraint);
-		}
-
-		this.partOfConstraints = constraintList;
+			for (Feature f : constraint.getContainedFeatures()) {
+				if (f.getName().equals(getName())) {
+					constraintList.add(constraint);
+					break;
+				}
+			}			
+		} 
+		partOfConstraints = constraintList;
 	}
 
 	public FeatureStatus getFeatureStatus() {
