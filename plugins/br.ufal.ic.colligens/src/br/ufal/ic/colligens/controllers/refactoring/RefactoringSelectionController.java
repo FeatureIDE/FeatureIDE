@@ -45,18 +45,18 @@ public class RefactoringSelectionController extends Refactoring {
 
 		} catch (LexerException e) {
 			status.addFatalError("Was not possible to refactor the selected part.");
-			e.printStackTrace();
+
 		} catch (OptionException e) {
 			status.addFatalError("Was not possible to refactor. Try again.");
-			e.printStackTrace();
 
 		} catch (IOException e) {
 			status.addFatalError("Was not possible to refactor the selected part. Try again.");
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+
 		} catch (NullPointerException e) {
 			status.addFatalError("Was not possible to refactor the selected part.");
-			e.printStackTrace();
+
+		} catch (RefactorignException e) {
+			status.addFatalError("The selected part contains no errors.");
 		}
 
 		monitor.done();
@@ -72,7 +72,7 @@ public class RefactoringSelectionController extends Refactoring {
 		monitor.beginTask("Checking checkFinalConditions...", 2);
 
 		try {
-			changes = processor.process(file,textSelection, monitor);
+			changes = processor.process(file, textSelection, monitor);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			status.addFatalError(e.getMessage());
@@ -87,13 +87,6 @@ public class RefactoringSelectionController extends Refactoring {
 			OperationCanceledException {
 		try {
 			pm.beginTask("Creating change...", 1);
-			try {
-				Thread.sleep(4000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			//
 			Change[] changeArray = changes.toArray(new Change[] {});
 			//
 			return new CompositeChange(getName(), changeArray);

@@ -23,6 +23,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.internal.util.BundleUtility;
 import org.prop4j.Node;
 import org.prop4j.NodeWriter;
@@ -156,7 +157,8 @@ public class TypeChef {
 					+ System.getProperty("file.separator")
 					+ project.getProject().getName() + "_platform.h");
 
-		} else {
+		}
+		if (Colligens.getDefault().getPreferenceStore().getBoolean("USE_STUBS")) {
 			paramters.add("-h");
 			paramters.add(Colligens.getDefault().getConfigDir()
 					.getAbsolutePath()
@@ -203,22 +205,25 @@ public class TypeChef {
 
 		fileProxies = resourceToFileProxy(resourceList);
 
+		this.platform();
 		PlatformHeader platformHeader = new PlatformHeader();
-	
+
 		try {
 			if (fileProxies.isEmpty()) {
 				monitor = null;
 				throw new TypeChefException("Not a valid file found C");
 			}
 
-			if (!Colligens.getDefault().getPreferenceStore()
+			if (Colligens.getDefault().getPreferenceStore()
 					.getBoolean("USE_INCLUDES")) {
+				platformHeader.plarform(fileProxies.get(0).getFileIResource()
+						.getProject().getName());
+			}
+			if (Colligens.getDefault().getPreferenceStore()
+					.getBoolean("USE_STUBS")) {
 				// Monitor Update
 				monitorSubTask("Generating stubs...");
 				platformHeader.stubs(fileProxies.get(0).getFileIResource()
-						.getProject().getName());
-			} else {
-				platformHeader.plarform(fileProxies.get(0).getFileIResource()
 						.getProject().getName());
 			}
 
@@ -441,7 +446,7 @@ public class TypeChef {
 	public void setMonitor(IProgressMonitor monitor) {
 		this.monitor = monitor;
 	}
-	
+
 	private boolean monitorIsCanceled() {
 		return monitor != null ? monitor.isCanceled() : false;
 	}
@@ -458,15 +463,22 @@ public class TypeChef {
 		monitor.subTask(label);
 	}
 
-//	private void monitorBeginTask(String label, int value) {
-//		if (monitor == null)
-//			return;
-//		monitor.beginTask(label, value);
-//	}
-//
-//	private void setTaskName(String label) {
-//		if (monitor == null)
-//			return;
-//		monitor.setTaskName(label);
-//	}
+	private void platform() {
+		IPreferenceStore store = Colligens.getDefault().getPreferenceStore();
+		if (!store.getBoolean("USE_INCLUDES") && !store.getBoolean("USE_STUBS")) {
+			store.setValue("USE_STUBS", true);
+		}
+	}
+
+	// private void monitorBeginTask(String label, int value) {
+	// if (monitor == null)
+	// return;
+	// monitor.beginTask(label, value);
+	// }
+	//
+	// private void setTaskName(String label) {
+	// if (monitor == null)
+	// return;
+	// monitor.setTaskName(label);
+	// }
 }

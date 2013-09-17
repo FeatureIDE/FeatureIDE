@@ -27,7 +27,7 @@ import br.ufal.ic.colligens.util.ProjectConfigurationErrorLogger;
  * 
  */
 public class CPPWrapper {
-	private final static String GCC_PATH = Colligens.getDefault()
+	private String GCC_PATH = Colligens.getDefault()
 			.getPreferenceStore().getString("GCC");
 	private MessageConsole console;
 

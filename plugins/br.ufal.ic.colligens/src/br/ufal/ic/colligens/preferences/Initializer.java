@@ -9,11 +9,11 @@ public class Initializer extends AbstractPreferenceInitializer {
 
 	@Override
 	public void initializeDefaultPreferences() {
-		IPreferenceStore store = Colligens.getDefault()
-				.getPreferenceStore();
-		
+		IPreferenceStore store = Colligens.getDefault().getPreferenceStore();
+
 		store.setDefault("FEATURE_MODEL", true);
-		store.setDefault("USE_INCLUDES", true);
+		store.setDefault("USE_INCLUDES", false);
+		store.setDefault("USE_STUBS", true);
 		store.setDefault("TypeChefPreference", "--parse");
 
 		store.setDefault("GCC", "gcc");

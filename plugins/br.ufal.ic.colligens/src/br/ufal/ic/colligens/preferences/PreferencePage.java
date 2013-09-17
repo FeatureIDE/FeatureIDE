@@ -26,6 +26,9 @@ public class PreferencePage extends FieldEditorPreferencePage implements
 
 		addField(new BooleanFieldEditor("USE_INCLUDES",
 				"U&se #includes (slower)", getFieldEditorParent()));
+		
+		addField(new BooleanFieldEditor("USE_STUBS",
+				"Us&e stubs", getFieldEditorParent()));
 
 		addField(new RadioGroupFieldEditor("TypeChefPreference",
 				"TypeChef Preference ", 1, new String[][] {

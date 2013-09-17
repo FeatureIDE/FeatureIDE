@@ -18,7 +18,7 @@ import org.eclipse.ltk.core.refactoring.TextFileChange;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 
-import test.TestTypeChef;
+import core.RefactoringsFrondEnd;
 import de.fosd.typechef.lexer.LexerException;
 import de.fosd.typechef.lexer.options.OptionException;
 
@@ -28,7 +28,7 @@ public class RefactoringSelectionProcessor {
 	protected List<Change> changes = new LinkedList<Change>();
 
 	public void selectToFile(TextSelection textSelection) throws IOException,
-			LexerException, OptionException {
+			LexerException, OptionException, RefactorignException {
 		filePath = System.getProperty("java.io.tmpdir") + "/" + this.hashCode()
 				+ ".c";
 		RandomAccessFile arq = new RandomAccessFile(filePath, "rw");
@@ -44,10 +44,14 @@ public class RefactoringSelectionProcessor {
 
 		buffW.close();
 
-		//
-		TestTypeChef typeChef = new TestTypeChef();
+		// Class from Refactorigns.jar
+		RefactoringsFrondEnd refactoring = new RefactoringsFrondEnd();
 
-		filePath = typeChef.refactoringFile(filePath);
+		filePath = refactoring.refactoringFile(filePath);
+
+		if (filePath == null) {
+			throw new RefactorignException();
+		}
 
 	}
 
@@ -73,8 +77,7 @@ public class RefactoringSelectionProcessor {
 		edit.addChild(new ReplaceEdit(textSelection.getOffset(), textSelection
 				.getLength(), sourceOut));
 
-		 TextFileChange change = new TextFileChange(ifile.getName(),
-		 ifile);
+		TextFileChange change = new TextFileChange(ifile.getName(), ifile);
 
 		change.setTextType("c");
 		change.setEdit(edit);

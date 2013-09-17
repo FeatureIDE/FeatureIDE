@@ -32,7 +32,7 @@ public class RefactoringFileController extends Refactoring {
 	@Override
 	public String getName() {
 		return "Refactoring Undisciplined";
-	} 
+	}
 
 	@Override
 	public RefactoringStatus checkInitialConditions(IProgressMonitor monitor)
@@ -68,7 +68,6 @@ public class RefactoringFileController extends Refactoring {
 		} catch (TypeChefException e) {
 			status.addFatalError(e.getMessage());
 		} catch (ProjectExplorerException e) {
-			// TODO Auto-generated catch block
 			status.addFatalError(e.getMessage());
 		} finally {
 			monitor.done();
@@ -89,8 +88,9 @@ public class RefactoringFileController extends Refactoring {
 		try {
 			changes = processor.process(monitor);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			status.addFatalError(e.getMessage());
+		} catch (RefactorignException e) {
+			status.addFatalError("The selected part contains no errors.");
 		}
 
 		return status;

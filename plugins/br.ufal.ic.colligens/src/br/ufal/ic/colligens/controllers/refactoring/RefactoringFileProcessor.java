@@ -20,7 +20,7 @@ import org.eclipse.ltk.core.refactoring.TextFileChange;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 
-import test.TestTypeChef;
+import core.RefactoringsFrondEnd;
 import de.fosd.typechef.lexer.LexerException;
 import de.fosd.typechef.lexer.options.OptionException;
 
@@ -38,9 +38,9 @@ public class RefactoringFileProcessor {
 	}
 
 	public List<Change> process(IProgressMonitor monitor) throws CoreException,
-			IOException {
-		// Class from
-		TestTypeChef chef = new TestTypeChef();
+			IOException, RefactorignException {
+		// Class from Refactorigns.jar
+		RefactoringsFrondEnd refactoring = new RefactoringsFrondEnd();
 
 		for (IResource resource : iResources) {
 			ITextFileBufferManager.DEFAULT.connect(resource.getFullPath(),
@@ -53,7 +53,7 @@ public class RefactoringFileProcessor {
 			String outFilePath = null;
 			try {
 
-				outFilePath = chef.refactoringFile(resource.getLocation()
+				outFilePath = refactoring.refactoringFile(resource.getLocation()
 						.toOSString());
 
 			} catch (LexerException e) {
@@ -62,6 +62,10 @@ public class RefactoringFileProcessor {
 			} catch (OptionException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+			}
+			
+			if (outFilePath == null) {
+				throw new RefactorignException();
 			}
 
 			File file = new File(outFilePath);
