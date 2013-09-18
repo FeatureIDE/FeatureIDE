@@ -1,0 +1,1027 @@
+0001:2,849
+  running jpf with args:
+JavaPathfinder v7.0 (rev 1107+) - (C) RIACS/NASA Ames Research Center
+
+
+====================================================== system under test
+StringMatcherTest.runTestMethod()
+
+====================================================== search started: 10.09.13 19:37
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:49: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:68: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:49: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:68: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:116: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:136: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:49: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:68: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:49: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:68: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:49: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:68: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:49: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:68: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:49: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:68: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:49: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:68: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:49: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:68: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:111: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:141: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:49: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:68: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:111: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:141: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:49: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:68: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:111: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:141: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:49: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:68: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:49: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:68: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:49: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:68: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:49: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:68: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:49: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:68: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:70: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:88: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:115: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:137: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:67: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:91: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:112: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:140: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:67: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:91: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:112: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:140: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:67: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:91: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:112: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:140: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:32: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:48: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:69: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:89: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:114: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0001/src/prefix_b_a/StringMatcher.java:138: JML postcondition is false
+
+====================================================== results
+no errors detected
+
+====================================================== search finished: 10.09.13 19:37
+
+0002:0,994
+  running jpf with args:
+JavaPathfinder v7.0 (rev 1107+) - (C) RIACS/NASA Ames Research Center
+
+
+====================================================== system under test
+StringMatcherTest.runTestMethod()
+
+====================================================== search started: 10.09.13 19:38
+
+====================================================== results
+no errors detected
+
+====================================================== search finished: 10.09.13 19:38
+0003:2,854
+   running jpf with args:
+JavaPathfinder v7.0 (rev 1107+) - (C) RIACS/NASA Ames Research Center
+
+
+====================================================== system under test
+StringMatcherTest.runTestMethod()
+
+====================================================== search started: 10.09.13 19:40
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:49: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:68: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:49: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:68: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:116: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:136: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:49: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:68: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:49: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:68: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:49: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:68: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:49: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:68: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:49: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:68: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:49: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:68: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:49: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:68: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:111: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:141: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:49: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:68: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:111: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:141: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:49: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:68: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:111: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:141: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:49: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:68: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:49: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:68: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:49: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:68: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:49: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:68: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:49: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:68: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:70: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:88: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:115: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:137: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:67: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:91: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:112: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:140: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:67: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:91: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:112: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:140: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:67: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:91: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:112: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:140: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:31: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:18: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:32: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:48: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:69: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:89: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:114: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0003/src/prefix_b_a/StringMatcher.java:138: JML postcondition is false
+
+====================================================== results
+no errors detected
+
+====================================================== search finished: 10.09.13 19:40
+
+0004:2,748
+  running jpf with args:
+JavaPathfinder v7.0 (rev 1107+) - (C) RIACS/NASA Ames Research Center
+
+
+====================================================== system under test
+StringMatcherTest.runTestMethod()
+
+====================================================== search started: 10.09.13 19:42
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0004/src/prefix_b_a/StringMatcher.java:142: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0004/src/prefix_b_a/StringMatcher.java:142: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0004/src/prefix_b_a/StringMatcher.java:142: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0004/src/prefix_b_a/StringMatcher.java:142: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0004/src/prefix_b_a/StringMatcher.java:142: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0004/src/prefix_b_a/StringMatcher.java:142: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0004/src/prefix_b_a/StringMatcher.java:142: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0004/src/prefix_b_a/StringMatcher.java:142: JML postcondition is false
+
+====================================================== results
+no errors detected
+
+====================================================== search finished: 10.09.13 19:42
+
+0005:0,727
+    running jpf with args:
+JavaPathfinder v7.0 (rev 1107+) - (C) RIACS/NASA Ames Research Center
+
+
+====================================================== system under test
+StringMatcherTest.runTestMethod()
+
+====================================================== search started: 10.09.13 19:43
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:32: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:48: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:69: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:89: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:114: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:138: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:32: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:48: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:69: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:89: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:114: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:138: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:32: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:48: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:69: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:89: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:114: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:138: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:32: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:48: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:69: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:89: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:114: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:138: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:32: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:48: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:69: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:89: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:114: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:138: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:32: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:48: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:69: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:89: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:114: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:138: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:32: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:48: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:69: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:89: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:114: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0005/src/prefix_b_a/StringMatcher.java:138: JML postcondition is false
+
+====================================================== results
+no errors detected
+
+====================================================== search finished: 10.09.13 19:43
+0006:2,774
+  running jpf with args:
+JavaPathfinder v7.0 (rev 1107+) - (C) RIACS/NASA Ames Research Center
+
+
+====================================================== system under test
+StringMatcherTest.runTestMethod()
+
+====================================================== search started: 10.09.13 19:43
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:32: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:48: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:69: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:89: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:114: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:138: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:32: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:48: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:69: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:89: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:114: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:138: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:32: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:48: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:69: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:89: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:114: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:138: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:32: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:48: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:69: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:89: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:114: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:138: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:32: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:48: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:69: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:89: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:114: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:138: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:32: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:48: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:69: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:89: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:114: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:138: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:32: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:48: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:69: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:89: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:114: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:138: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:32: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:48: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:69: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:89: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:114: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0006/src/prefix_b_a/StringMatcher.java:138: JML postcondition is false
+
+====================================================== results
+no errors detected
+
+====================================================== search finished: 10.09.13 19:43
+0007:2,761
+  running jpf with args:
+JavaPathfinder v7.0 (rev 1107+) - (C) RIACS/NASA Ames Research Center
+
+
+====================================================== system under test
+StringMatcherTest.runTestMethod()
+
+====================================================== search started: 10.09.13 19:45
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0007/src/prefix_b_a/StringMatcher.java:70: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0007/src/prefix_b_a/StringMatcher.java:88: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0007/src/prefix_b_a/StringMatcher.java:115: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0007/src/prefix_b_a/StringMatcher.java:137: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0007/src/prefix_b_a/StringMatcher.java:70: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0007/src/prefix_b_a/StringMatcher.java:88: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0007/src/prefix_b_a/StringMatcher.java:115: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0007/src/prefix_b_a/StringMatcher.java:137: JML postcondition is false
+
+====================================================== results
+no errors detected
+
+====================================================== search finished: 10.09.13 19:45
+
+0008:2,746
+  running jpf with args:
+JavaPathfinder v7.0 (rev 1107+) - (C) RIACS/NASA Ames Research Center
+
+
+====================================================== system under test
+StringMatcherTest.runTestMethod()
+
+====================================================== search started: 10.09.13 19:46
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0008/src/prefix_b_a/StringMatcher.java:70: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0008/src/prefix_b_a/StringMatcher.java:88: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0008/src/prefix_b_a/StringMatcher.java:115: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0008/src/prefix_b_a/StringMatcher.java:137: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0008/src/prefix_b_a/StringMatcher.java:70: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0008/src/prefix_b_a/StringMatcher.java:88: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0008/src/prefix_b_a/StringMatcher.java:115: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0008/src/prefix_b_a/StringMatcher.java:137: JML postcondition is false
+
+====================================================== results
+no errors detected
+
+====================================================== search finished: 10.09.13 19:46
+
+0009: 2,752
+  running jpf with args:
+JavaPathfinder v7.0 (rev 1107+) - (C) RIACS/NASA Ames Research Center
+
+
+====================================================== system under test
+StringMatcherTest.runTestMethod()
+
+====================================================== search started: 10.09.13 19:46
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0009/src/prefix_b_a/StringMatcher.java:116: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0009/src/prefix_b_a/StringMatcher.java:136: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0009/src/prefix_b_a/StringMatcher.java:116: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0009/src/prefix_b_a/StringMatcher.java:136: JML postcondition is false
+
+====================================================== results
+no errors detected
+
+====================================================== search finished: 10.09.13 19:47
+
+0010:2,802
+  running jpf with args:
+JavaPathfinder v7.0 (rev 1107+) - (C) RIACS/NASA Ames Research Center
+
+
+====================================================== system under test
+StringMatcherTest.runTestMethod()
+
+====================================================== search started: 10.09.13 19:48
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0010/src/prefix_b_a/StringMatcher.java:116: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0010/src/prefix_b_a/StringMatcher.java:136: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0010/src/prefix_b_a/StringMatcher.java:116: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0010/src/prefix_b_a/StringMatcher.java:136: JML postcondition is false
+
+====================================================== results
+no errors detected
+
+====================================================== search finished: 10.09.13 19:48
+
+0011:2,790
+  running jpf with args:
+JavaPathfinder v7.0 (rev 1107+) - (C) RIACS/NASA Ames Research Center
+
+
+====================================================== system under test
+StringMatcherTest.runTestMethod()
+
+====================================================== search started: 10.09.13 19:49
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0011/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0011/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0011/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0011/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0011/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0011/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0011/src/prefix_b_a/StringMatcher.java:67: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0011/src/prefix_b_a/StringMatcher.java:91: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0011/src/prefix_b_a/StringMatcher.java:112: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0011/src/prefix_b_a/StringMatcher.java:140: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0011/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0011/src/prefix_b_a/StringMatcher.java:67: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0011/src/prefix_b_a/StringMatcher.java:91: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0011/src/prefix_b_a/StringMatcher.java:112: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0011/src/prefix_b_a/StringMatcher.java:140: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0011/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0011/src/prefix_b_a/StringMatcher.java:67: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0011/src/prefix_b_a/StringMatcher.java:91: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0011/src/prefix_b_a/StringMatcher.java:112: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0011/src/prefix_b_a/StringMatcher.java:140: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0011/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0011/src/prefix_b_a/StringMatcher.java:67: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0011/src/prefix_b_a/StringMatcher.java:91: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0011/src/prefix_b_a/StringMatcher.java:112: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0011/src/prefix_b_a/StringMatcher.java:140: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0011/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0011/src/prefix_b_a/StringMatcher.java:67: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0011/src/prefix_b_a/StringMatcher.java:91: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0011/src/prefix_b_a/StringMatcher.java:112: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0011/src/prefix_b_a/StringMatcher.java:140: JML postcondition is false
+
+====================================================== results
+no errors detected
+
+====================================================== search finished: 10.09.13 19:49
+
+0012:2,825
+  running jpf with args:
+JavaPathfinder v7.0 (rev 1107+) - (C) RIACS/NASA Ames Research Center
+
+
+====================================================== system under test
+StringMatcherTest.runTestMethod()
+
+====================================================== search started: 10.09.13 19:50
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0012/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0012/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0012/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0012/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0012/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0012/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0012/src/prefix_b_a/StringMatcher.java:67: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0012/src/prefix_b_a/StringMatcher.java:91: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0012/src/prefix_b_a/StringMatcher.java:112: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0012/src/prefix_b_a/StringMatcher.java:140: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0012/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0012/src/prefix_b_a/StringMatcher.java:67: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0012/src/prefix_b_a/StringMatcher.java:91: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0012/src/prefix_b_a/StringMatcher.java:112: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0012/src/prefix_b_a/StringMatcher.java:140: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0012/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0012/src/prefix_b_a/StringMatcher.java:67: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0012/src/prefix_b_a/StringMatcher.java:91: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0012/src/prefix_b_a/StringMatcher.java:112: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0012/src/prefix_b_a/StringMatcher.java:140: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0012/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0012/src/prefix_b_a/StringMatcher.java:67: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0012/src/prefix_b_a/StringMatcher.java:91: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0012/src/prefix_b_a/StringMatcher.java:112: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0012/src/prefix_b_a/StringMatcher.java:140: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0012/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0012/src/prefix_b_a/StringMatcher.java:67: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0012/src/prefix_b_a/StringMatcher.java:91: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0012/src/prefix_b_a/StringMatcher.java:112: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0012/src/prefix_b_a/StringMatcher.java:140: JML postcondition is false
+
+====================================================== results
+no errors detected
+
+====================================================== search finished: 10.09.13 19:50
+
+0013:2,831
+  running jpf with args:
+JavaPathfinder v7.0 (rev 1107+) - (C) RIACS/NASA Ames Research Center
+
+
+====================================================== system under test
+StringMatcherTest.runTestMethod()
+
+====================================================== search started: 10.09.13 19:51
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:70: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:88: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:115: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:137: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:67: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:91: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:112: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:140: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:67: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:91: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:112: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:140: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:67: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:91: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:112: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:140: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:67: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:91: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:112: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:140: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:67: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:91: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:112: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:140: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:67: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:91: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:112: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:140: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:67: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:91: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:112: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:140: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:67: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:91: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:112: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0013/src/prefix_b_a/StringMatcher.java:140: JML postcondition is false
+
+====================================================== results
+no errors detected
+
+====================================================== search finished: 10.09.13 19:51
+
+0014:2,816
+  running jpf with args:
+JavaPathfinder v7.0 (rev 1107+) - (C) RIACS/NASA Ames Research Center
+
+
+====================================================== system under test
+StringMatcherTest.runTestMethod()
+
+====================================================== search started: 10.09.13 19:52
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:70: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:88: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:115: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:137: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:67: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:91: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:112: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:140: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:67: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:91: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:112: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:140: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:67: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:91: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:112: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:140: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:67: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:91: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:112: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:140: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:67: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:91: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:112: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:140: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:67: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:91: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:112: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:140: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:67: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:91: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:112: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:140: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:67: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:91: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:112: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0014/src/prefix_b_a/StringMatcher.java:140: JML postcondition is false
+
+====================================================== results
+no errors detected
+
+====================================================== search finished: 10.09.13 19:52
+
+0015:
+  running jpf with args:
+JavaPathfinder v7.0 (rev 1107+) - (C) RIACS/NASA Ames Research Center
+
+
+====================================================== system under test
+StringMatcherTest.runTestMethod()
+
+====================================================== search started: 10.09.13 19:53
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:111: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:141: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:111: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:141: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:111: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:141: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:111: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:141: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:111: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:141: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:67: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:91: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:112: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:140: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:67: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:91: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:112: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:140: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:67: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:91: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:112: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:140: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:67: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:91: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:112: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:140: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:50: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:67: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:91: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:112: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0015/src/prefix_b_a/StringMatcher.java:140: JML postcondition is false
+
+====================================================== results
+no errors detected
+
+====================================================== search finished: 10.09.13 19:53
+
+0016:2,784
+  running jpf with args:
+JavaPathfinder v7.0 (rev 1107+) - (C) RIACS/NASA Ames Research Center
+
+
+====================================================== system under test
+StringMatcherTest.runTestMethod()
+
+====================================================== search started: 10.09.13 19:57
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0016/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0016/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0016/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0016/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0016/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0016/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0016/src/prefix_b_a/StringMatcher.java:111: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0016/src/prefix_b_a/StringMatcher.java:141: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0016/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0016/src/prefix_b_a/StringMatcher.java:111: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0016/src/prefix_b_a/StringMatcher.java:141: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0016/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0016/src/prefix_b_a/StringMatcher.java:111: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0016/src/prefix_b_a/StringMatcher.java:141: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0016/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0016/src/prefix_b_a/StringMatcher.java:111: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0016/src/prefix_b_a/StringMatcher.java:141: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0016/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0016/src/prefix_b_a/StringMatcher.java:111: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0016/src/prefix_b_a/StringMatcher.java:141: JML postcondition is false
+
+====================================================== results
+no errors detected
+
+====================================================== search finished: 10.09.13 19:57
+
+0017:2,784
+  running jpf with args:
+JavaPathfinder v7.0 (rev 1107+) - (C) RIACS/NASA Ames Research Center
+
+
+====================================================== system under test
+StringMatcherTest.runTestMethod()
+
+====================================================== search started: 10.09.13 19:57
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0016/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0016/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0016/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0016/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0016/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0016/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0016/src/prefix_b_a/StringMatcher.java:111: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0016/src/prefix_b_a/StringMatcher.java:141: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0016/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0016/src/prefix_b_a/StringMatcher.java:111: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0016/src/prefix_b_a/StringMatcher.java:141: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0016/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0016/src/prefix_b_a/StringMatcher.java:111: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0016/src/prefix_b_a/StringMatcher.java:141: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0016/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0016/src/prefix_b_a/StringMatcher.java:111: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0016/src/prefix_b_a/StringMatcher.java:141: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0016/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0016/src/prefix_b_a/StringMatcher.java:111: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0016/src/prefix_b_a/StringMatcher.java:141: JML postcondition is false
+
+====================================================== results
+no errors detected
+
+====================================================== search finished: 10.09.13 19:57
+
+
+0018:2,777
+  running jpf with args:
+JavaPathfinder v7.0 (rev 1107+) - (C) RIACS/NASA Ames Research Center
+
+
+====================================================== system under test
+StringMatcherTest.runTestMethod()
+
+====================================================== search started: 10.09.13 19:59
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0018/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0018/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0018/src/prefix_b_a/StringMatcher.java:116: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0018/src/prefix_b_a/StringMatcher.java:136: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0018/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0018/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0018/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0018/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0018/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0018/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0018/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0018/src/prefix_b_a/StringMatcher.java:111: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0018/src/prefix_b_a/StringMatcher.java:141: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0018/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0018/src/prefix_b_a/StringMatcher.java:111: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0018/src/prefix_b_a/StringMatcher.java:141: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0018/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0018/src/prefix_b_a/StringMatcher.java:111: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0018/src/prefix_b_a/StringMatcher.java:141: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0018/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0018/src/prefix_b_a/StringMatcher.java:111: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0018/src/prefix_b_a/StringMatcher.java:141: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0018/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0018/src/prefix_b_a/StringMatcher.java:111: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0018/src/prefix_b_a/StringMatcher.java:141: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0018/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0018/src/prefix_b_a/StringMatcher.java:111: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0018/src/prefix_b_a/StringMatcher.java:141: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0018/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0018/src/prefix_b_a/StringMatcher.java:111: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0018/src/prefix_b_a/StringMatcher.java:141: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0018/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0018/src/prefix_b_a/StringMatcher.java:111: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0018/src/prefix_b_a/StringMatcher.java:141: JML postcondition is false
+
+====================================================== results
+no errors detected
+
+====================================================== search finished: 10.09.13 19:59
+
+0019:0,786
+  running jpf with args:
+JavaPathfinder v7.0 (rev 1107+) - (C) RIACS/NASA Ames Research Center
+
+
+====================================================== system under test
+StringMatcherTest.runTestMethod()
+
+====================================================== search started: 10.09.13 19:59
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0004/src/prefix_b_a/StringMatcher.java:148: JML precondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0004/src/prefix_b_a/StringMatcher.java:121: JML precondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0004/src/prefix_b_a/StringMatcher.java:96: JML precondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0004/src/prefix_b_a/StringMatcher.java:73: JML precondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0004/src/prefix_b_a/StringMatcher.java:53: JML precondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0004/src/prefix_b_a/StringMatcher.java:34: JML precondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0004/src/prefix_b_a/StringMatcher.java:19: JML precondition is false
+
+====================================================== results
+no errors detected
+
+====================================================== search finished: 10.09.13 19:59
+
+0020:2,789
+  running jpf with args:
+JavaPathfinder v7.0 (rev 1107+) - (C) RIACS/NASA Ames Research Center
+
+
+====================================================== system under test
+StringMatcherTest.runTestMethod()
+
+====================================================== search started: 10.09.13 20:00
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0020/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0020/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0020/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0020/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0020/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0020/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0020/src/prefix_b_a/StringMatcher.java:111: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0020/src/prefix_b_a/StringMatcher.java:141: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0020/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0020/src/prefix_b_a/StringMatcher.java:111: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0020/src/prefix_b_a/StringMatcher.java:141: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0020/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0020/src/prefix_b_a/StringMatcher.java:111: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0020/src/prefix_b_a/StringMatcher.java:141: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0020/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0020/src/prefix_b_a/StringMatcher.java:111: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0020/src/prefix_b_a/StringMatcher.java:141: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0020/src/prefix_b_a/StringMatcher.java:92: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0020/src/prefix_b_a/StringMatcher.java:111: JML postcondition is false
+/home/fabian/workspace/StringMatcher-FH-JML_mutation_0020/src/prefix_b_a/StringMatcher.java:141: JML postcondition is false
+
+====================================================== results
+no errors detected
+
+====================================================== search finished: 10.09.13 20:00
+

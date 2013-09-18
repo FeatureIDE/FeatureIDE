@@ -1,0 +1,100 @@
+0001
+Feature Comparison
+StringMatcher.java
+17, true-->false
+
+0002
+Feature Comparison
+StringMatcher.java
+11, precondition, a!=null-->a==null
+
+0003
+Feature Comparison
+StringMatcher.java
+12, postcondition, compare-->false
+
+
+0004
+Feature Equals
+StringMatcher.java
+9, return a.equals(b)-->return true;
+
+0005
+Feature Length
+StringMatcher.java
+8, &&-->||
+
+0006
+Feature Length
+StringMatcher.java
+8, ==-->!=
+
+0007
+Feature Prefix_a_b
+StringMatcher.java
+10, &&-->||
+
+0008
+Feature Prefix_a_b
+StringMatcher.java
+11, &&-->||
+
+0009
+Feature Prefix_b_a
+StringMatcher.java
+9, &&-->||
+
+0010
+Feature Prefix_b_a
+StringMatcher.java
+10, &&-->||
+
+0011
+Feature Substring_a_b
+StringMatcher.java
+8, &&-->||
+
+0012
+Feature Substring_a_b
+StringMatcher.java
+9, &&-->||
+
+0013
+Feature Substring_a_b
+StringMatcher.java
+8, !=-->==
+
+0014
+Feature Substring_a_b
+StringMatcher.java
+9, !=-->==
+
+0015
+Feature Substring_a_b
+StringMatcher.java
+8, -1-->-2
+
+0016
+Feature Substring_a_b
+StringMatcher.java
+8, &&-->||
+
+0017
+Feature Substring_a_b
+StringMatcher.java
+9, &&-->||
+
+0018
+Feature Substring_a_b
+StringMatcher.java
+8, !=-->==
+
+0019
+Feature Substring_a_b
+StringMatcher.java
+9, !=-->==
+
+0020
+Feature Substring_a_b
+StringMatcher.java
+8, -1-->-2
