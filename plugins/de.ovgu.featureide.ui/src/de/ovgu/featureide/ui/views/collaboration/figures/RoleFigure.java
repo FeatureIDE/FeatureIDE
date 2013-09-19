@@ -491,6 +491,9 @@ public class RoleFigure extends Figure implements GUIDefaults{
 			name = f.getFullName();
 		}
 		Label fieldLabel = new RoleFigureLabel(name, f.getFullName());
+		if (f.inRefinementGroup()) {
+			fieldLabel.setFont(FONT_BOLD);
+		}
 		if (!selected)
 		fieldLabel.setForegroundColor(ROLE_FOREGROUND_UNSELECTED);
 		if (f.isPrivate())

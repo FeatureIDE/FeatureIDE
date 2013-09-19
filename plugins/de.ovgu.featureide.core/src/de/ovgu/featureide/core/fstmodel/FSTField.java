@@ -40,4 +40,18 @@ public class FSTField extends RoleElement {
 	public String getFullName() {
 		return name + " : " + type;
 	}
+	
+	public boolean inRefinementGroup() {
+		for (FSTRole role : getRole().getFSTClass().getRoles()) {
+			if (role.getFeature().equals(getRole().getFeature())) {
+				continue;
+			}
+			for (FSTField field : role.getFields()) {
+				if (field.getName().equals(getName())) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 }
