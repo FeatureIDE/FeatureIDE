@@ -467,7 +467,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 			name = m.getFullName();
 		}
 		Label methodLabel = new RoleFigureLabel(name, m.getFullName());
-		if (m.refines()) {
+		if (m.inRefinementGroup()) {
 			methodLabel.setFont(FONT_BOLD);
 		}
 		if (m.isPrivate())

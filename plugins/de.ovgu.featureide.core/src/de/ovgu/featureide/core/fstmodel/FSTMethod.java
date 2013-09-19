@@ -85,4 +85,22 @@ public class FSTMethod extends RoleElement {
 	public LinkedList<String> getParameter(){
 		return parameterTypes;
 	}
+	
+	/**
+	 * 
+	 * @return <code>true</code> if an equivalent method exists in an other role of the same class.
+	 */
+	public boolean inRefinementGroup() {
+		for (FSTRole role : getRole().getFSTClass().getRoles()) {
+			if (role.getFeature().equals(getRole().getFeature())) {
+				continue;
+			}
+			for (FSTMethod method : role.getMethods()) {
+				if (method.getName().equals(getName()) && method.getParameter().equals(getParameter())) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 }

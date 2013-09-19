@@ -94,15 +94,11 @@ public class FSTClassFragment extends RoleElement {
 	public boolean add(RoleElement element) {
 		if (element instanceof FSTMethod) {
 			if (methods.contains(element)) {
-//				CorePlugin.getDefault().logWarning("Model already contains method " 
-//				+ element.getFullName() + " @ " + feature.getName()+ "/" + fstClass.getName());
 				return false;
 			}
 			methods.add((FSTMethod) element);
 		} else if (element instanceof FSTField) {
 			if (fields.contains(element)) {
-//				CorePlugin.getDefault().logWarning("Model already contains method " 
-//				+ element.getFullName() + " @ " + feature.getName()+ "/" + fstClass.getName());
 				return false;
 			}
 			fields.add((FSTField) element);
