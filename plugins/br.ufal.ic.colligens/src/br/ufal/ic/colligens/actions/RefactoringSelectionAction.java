@@ -59,6 +59,8 @@ public class RefactoringSelectionAction extends PluginActions {
 					}
 				}
 			}
+
 		}
 	}
+
 }

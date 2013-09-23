@@ -209,8 +209,7 @@ point="org.eclipse.core.resources.markers">
                definitionId="br.ufal.ic.colligens.commands.RefactoringSelect"
                icon="icons/featured.png"
                id="br.ufal.ic.colligens.action2"
-               label="Refactoring Selection"
-               toolbarPath="org.eclipse.debug.ui.main.toolbar?after=additions">
+               label="Refactoring Selection">
          </action>
       </actionSet>
    </extension>
@@ -220,5 +219,20 @@ point="org.eclipse.core.resources.markers">
             class="br.ufal.ic.colligens.controllers.refactoring.RefactoringContribut"
             id="br.ufal.ic.colligens.RefactoringController">
       </contribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            id="br.ufal.ic.colligens.contribution1"
+            objectClass="org.eclipse.ui.IEditorInput">
+         <action
+               class="br.ufal.ic.colligens.actions.popup.RefactorSelectionAction"
+               enablesFor="1"
+               icon="icons/featured.png"
+               id="br.ufal.ic.colligens.newAction"
+               label="Colligens Refactoring"
+               menubarPath="org.eclipse.cdt.ui.refactoring.menu/reorgGroup">
+         </action>
+      </objectContribution>
    </extension>
 </plugin>
