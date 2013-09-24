@@ -56,7 +56,7 @@ public class RefactoringSelectionController extends Refactoring {
 			status.addFatalError("Was not possible to refactor the selected part.");
 
 		} catch (RefactorignException e) {
-			status.addFatalError("The selected part contains no errors.");
+			status.addFatalError("The selected part contains errors.");
 		}
 
 		monitor.done();

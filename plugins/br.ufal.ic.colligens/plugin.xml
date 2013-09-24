@@ -204,13 +204,6 @@ point="org.eclipse.core.resources.markers">
                label="Refactoring"
                toolbarPath="org.eclipse.debug.ui.main.toolbar?after=additions">
          </action>
-         <action
-               class="br.ufal.ic.colligens.actions.RefactoringSelectionAction"
-               definitionId="br.ufal.ic.colligens.commands.RefactoringSelect"
-               icon="icons/featured.png"
-               id="br.ufal.ic.colligens.action2"
-               label="Refactoring Selection">
-         </action>
       </actionSet>
    </extension>
    <extension
