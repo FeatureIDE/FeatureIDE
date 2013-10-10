@@ -3,6 +3,7 @@ package br.ufal.ic.colligens.actions;
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.internal.core.model.CContainer;
 import org.eclipse.cdt.internal.core.model.SourceRoot;
+import org.eclipse.core.internal.resources.Project;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
@@ -10,30 +11,45 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.text.ITextSelection;
+import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.ide.IDE;
+import org.eclipse.ui.part.FileEditorInput;
 
 public abstract class PluginActions implements IWorkbenchWindowActionDelegate {
 	protected IWorkbenchWindow window;
 	protected IStructuredSelection selection;
 
+	@SuppressWarnings("restriction")
 	@Override
 	public void selectionChanged(IAction action, ISelection selection) {
 		action.setEnabled(false);
 		try {
-			if (selection instanceof IStructuredSelection) {
+			if (selection instanceof TextSelection) {
+				FileEditorInput fileEditorInput = (FileEditorInput) window
+						.getActivePage().getActiveEditor().getEditorInput();
+				if (fileEditorInput != null
+						&& (fileEditorInput.getFile().getFileExtension()
+								.equals("h") || fileEditorInput.getFile()
+								.getFileExtension().equals("c"))) {
+					action.setEnabled(true);
+				}
+
+			} else if (selection instanceof IStructuredSelection) {
 				IStructuredSelection extended = (IStructuredSelection) selection;
 				this.selection = extended;
 				Object object = extended.getFirstElement();
-				if (object instanceof SourceRoot) {
-					action.setEnabled(true);
-				} else if (object instanceof CContainer) {
-					action.setEnabled(true);
-				} else if (object instanceof ITranslationUnit) {
+
+				if (object instanceof Project) {
+					if (((Project) object).isOpen()) {
+						action.setEnabled(true);
+					}
+				} else if (object instanceof SourceRoot
+						|| object instanceof CContainer
+						|| object instanceof ITranslationUnit) {
 					action.setEnabled(true);
 				} else if (object instanceof IFile || object instanceof IFolder) {
 					action.setEnabled(isResource((IResource) object));

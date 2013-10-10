@@ -46,6 +46,7 @@ public class InvalidConfigurationsViewController extends ViewController {
 		}
 		return INSTANCE;
 	}
+
 	/**
 	 * Update view
 	 * 
@@ -60,6 +61,16 @@ public class InvalidConfigurationsViewController extends ViewController {
 		if (treeViewer == null) {
 			return;
 		}
+
+		Object object = treeViewer.getInput();
+		if (object != null && object instanceof List) {
+			List<FileProxy> fileProxies = (List<FileProxy>) object;
+			for (FileProxy fileProxy : fileProxies) {
+				fileProxy.deleteMarkers();
+			}
+			
+		}
+
 		treeViewer.setInput(null);
 		treeViewer.refresh();
 	}

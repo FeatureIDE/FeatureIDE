@@ -201,8 +201,7 @@ point="org.eclipse.core.resources.markers">
                definitionId="br.ufal.ic.colligens.commands.ColligensRefactoring"
                icon="icons/featured.png"
                id="br.ufal.ic.colligens.action1"
-               label="Refactoring"
-               toolbarPath="org.eclipse.debug.ui.main.toolbar?after=additions">
+               label="Refactoring">
          </action>
       </actionSet>
    </extension>

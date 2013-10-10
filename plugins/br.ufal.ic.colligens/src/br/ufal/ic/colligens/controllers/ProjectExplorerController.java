@@ -5,15 +5,23 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.cdt.core.model.CModelException;
+import org.eclipse.cdt.core.model.CoreModel;
+import org.eclipse.cdt.core.model.ICProject;
+import org.eclipse.cdt.core.model.ISourceRoot;
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.internal.core.model.CContainer;
 import org.eclipse.cdt.internal.core.model.SourceRoot;
+import org.eclipse.core.internal.resources.Project;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.text.TextSelection;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.part.FileEditorInput;
 
 import br.ufal.ic.colligens.activator.Colligens;
 
@@ -22,49 +30,12 @@ import br.ufal.ic.colligens.activator.Colligens;
  */
 @SuppressWarnings("restriction")
 public class ProjectExplorerController {
-	private IStructuredSelection selection;
+	private ISelection iSelection;
 	private Set<IResource> iResources;
+	private IWorkbenchWindow window;
 
 	public ProjectExplorerController() {
 		iResources = new HashSet<IResource>();
-	}
-
-	public void setWindow(IWorkbenchWindow window) {
-		//
-		this.selection = (IStructuredSelection) window.getSelectionService()
-				.getSelection("org.eclipse.ui.navigator.ProjectExplorer");
-		if (this.selection == null) {
-			this.selection = (IStructuredSelection) window
-					.getSelectionService().getSelection(
-							"org.eclipse.jdt.ui.PackageExplorer");
-		}
-	}
-
-	public void setSelection(IStructuredSelection selection) {
-		this.selection = selection;
-	}
-
-	public List<IResource> getList() {
-		return new LinkedList<IResource>(iResources);
-	}
-
-	public void addResource(IResource iResource) {
-		if (iResource instanceof IFile) {
-			// adds .c and .h files only
-			if (iResource.getLocation().toString().trim().endsWith(".c")
-					|| iResource.getLocation().toString().trim().endsWith(".h")) {
-				iResources.add(iResource);
-			}
-		} else if (iResource instanceof IFolder) {
-			try {
-				for (IResource res : ((IFolder) iResource).members()) {
-					addResource(res);
-				}
-			} catch (CoreException e) {
-				Colligens.getDefault().logError(e);
-				e.printStackTrace();
-			}
-		}
 	}
 
 	/**
@@ -72,30 +43,52 @@ public class ProjectExplorerController {
 	 * @throws ProjectExplorerException
 	 */
 	public List<IResource> start() throws ProjectExplorerException {
-
 		iResources.clear();
-
-		if (selection == null) {
-			throw new ProjectExplorerException(
-					"Select a valid file or directory.");
-		}
 
 		List<IResource> iResources = new LinkedList<IResource>();
 
-		@SuppressWarnings("unchecked")
-		List<Object> list = selection.toList();
+		if (iSelection instanceof IStructuredSelection) {
 
-		for (Object object : list) {
-			if (object instanceof SourceRoot) {
-				iResources.add(((SourceRoot) object).getResource());
-			} else if (object instanceof CContainer) {
-				iResources.add(((CContainer) object).getResource());
-			} else if (object instanceof ITranslationUnit) {
-				iResources.add(((ITranslationUnit) object).getResource());
-			} else if (object instanceof IFile) {
-				iResources.add((IResource) object);
-			} else if (object instanceof IFolder) {
-				iResources.add((IResource) object);
+			IStructuredSelection selection = (IStructuredSelection) iSelection;
+
+			@SuppressWarnings("unchecked")
+			List<Object> list = selection.toList();
+
+			for (Object object : list) {
+				if (object instanceof Project) {
+					ICProject project = CoreModel.getDefault().getCModel()
+							.getCProject(((Project) object).getName());
+					if (project != null) {
+						try {
+							ISourceRoot iSourceRoots[] = project
+									.getSourceRoots();
+
+							for (ISourceRoot iSourceRoot : iSourceRoots) {
+								iResources.add(iSourceRoot.getResource());
+							}
+
+						} catch (CModelException e) {
+
+						}
+					}
+				} else if (object instanceof SourceRoot) {
+					iResources.add(((SourceRoot) object).getResource());
+				} else if (object instanceof CContainer) {
+					iResources.add(((CContainer) object).getResource());
+				} else if (object instanceof ITranslationUnit) {
+					iResources.add(((ITranslationUnit) object).getResource());
+				} else if (object instanceof IFile) {
+					iResources.add((IResource) object);
+				} else if (object instanceof IFolder) {
+					iResources.add((IResource) object);
+				}
+			}
+
+		} else if (iSelection instanceof TextSelection) {
+			FileEditorInput fileEditorInput = (FileEditorInput) window
+					.getActivePage().getActiveEditor().getEditorInput();
+			if (fileEditorInput != null) {
+				iResources.add((IResource) fileEditorInput.getFile());
 			}
 		}
 
@@ -128,5 +121,37 @@ public class ProjectExplorerController {
 			resourcesAsString.add(resource.getLocation().toString());
 		}
 		return resourcesAsString;
+	}
+
+	public void setWindow(IWorkbenchWindow window) {
+		this.window = window;
+		this.iSelection = window.getSelectionService().getSelection();
+	}
+
+	public void setSelection(ISelection selection) {
+		this.iSelection = selection;
+	}
+
+	public List<IResource> getList() {
+		return new LinkedList<IResource>(iResources);
+	}
+
+	public void addResource(IResource iResource) {
+		if (iResource instanceof IFile) {
+			// adds .c and .h files only
+			if (iResource.getLocation().toString().trim().endsWith(".c")
+					|| iResource.getLocation().toString().trim().endsWith(".h")) {
+				iResources.add(iResource);
+			}
+		} else if (iResource instanceof IFolder) {
+			try {
+				for (IResource res : ((IFolder) iResource).members()) {
+					addResource(res);
+				}
+			} catch (CoreException e) {
+				Colligens.getDefault().logError(e);
+				e.printStackTrace();
+			}
+		}
 	}
 }
