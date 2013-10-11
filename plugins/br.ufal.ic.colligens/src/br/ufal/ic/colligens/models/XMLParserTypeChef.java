@@ -73,10 +73,11 @@ public class XMLParserTypeChef {
 			// compare with the log file that was analyzed
 			if (file.contains(fileProxie.getFileToAnalyse())) {
 
-				Log log = new Log(fileProxie, node.getChild("position")
-						.getChildText("line"), node.getChildText("featurestr"),
+				Log log = new Log(fileProxie, Integer.parseInt(node
+						.getChild("position").getChildText("line").trim()),
+						node.getChildText("featurestr"),
 						node.getChildText("severity"), node.getChildText("msg"));
-				
+
 				fileProxie.getLogs().add(log);
 
 			}

@@ -146,7 +146,7 @@ public class InvalidConfigurationsViewController extends ViewController {
 							try {
 
 								IDE.openEditor(getView().getSite().getPage(),
-										(IFile) fileProxy.getFileIResource());
+										(IFile) fileProxy.getResource());
 
 							} catch (PartInitException e) {
 								// TODO Auto-generated catch block

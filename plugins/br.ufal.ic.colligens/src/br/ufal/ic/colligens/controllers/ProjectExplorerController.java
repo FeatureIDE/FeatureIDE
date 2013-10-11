@@ -96,7 +96,7 @@ public class ProjectExplorerController {
 			throw new ProjectExplorerException(
 					"Select a valid file or directory.");
 		}
-
+		
 		return iResources;
 	}
 

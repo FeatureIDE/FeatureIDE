@@ -41,41 +41,8 @@
             allPopups="false"
             locationURI="toolbar:br.ufal.ic.colligens.views.InvalidConfigurationsView">
          <command
-               commandId="br.ufal.ic.colligens.commands.ColligensCommand"
-               icon="icons/featured_run.png"
-               label="Code Analysis"
-               style="push">
-         </command>
-         <separator
-               name="br.ufal.ic.colligens.separator1"
-               visible="true">
-         </separator>
-         <command
                commandId="br.ufal.ic.colligens.commands.ColligensViewClear"
                icon="icons/featured_clear.png"
-               style="push">
-         </command>
-         <separator
-               name="br.ufal.ic.colligens.separator1"
-               visible="true">
-         </separator>
-         <command
-               commandId="br.ufal.ic.colligens.commands.ColligensMetrics"
-               icon="icons/featured_chart.png"
-               style="push">
-         </command>
-         <command
-               commandId="br.ufal.ic.colligens.commands.ColligensRefactoring"
-               icon="icons/featured.png"
-               style="push">
-         </command>
-      </menuContribution>
-      <menuContribution
-            allPopups="false"
-            locationURI="toolbar:br.ufal.ic.colligens.views.MetricsView">
-                     <command
-               commandId="br.ufal.ic.colligens.commands.ColligensMetrics"
-               icon="icons/featured_chart.png"
                style="push">
          </command>
       </menuContribution>
@@ -174,6 +141,14 @@ point="org.eclipse.core.resources.markers">
             label="Colligens"
             visible="true">
          <action
+               class="br.ufal.ic.colligens.actions.MetricsAction"
+               definitionId="br.ufal.ic.colligens.commands.ColligensMetrics"
+               icon="icons/featured_chart.png"
+               id="br.ufal.ic.colligens.MetricsAction"
+               label="Metrics"
+               toolbarPath="org.eclipse.debug.ui.main.toolbar?after=additions">
+         </action>
+         <action
                class="br.ufal.ic.colligens.actions.ColligensPluginAction"
                definitionId="br.ufal.ic.colligens.commands.ColligensCommand"
                icon="icons/featured_run.png"
@@ -181,13 +156,6 @@ point="org.eclipse.core.resources.markers">
                label="Code Analysis"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/reorgGroup"
                toolbarPath="org.eclipse.debug.ui.main.toolbar?after=additions">
-         </action>
-         <action
-               class="br.ufal.ic.colligens.actions.MetricsAction"
-               definitionId="br.ufal.ic.colligens.commands.ColligensMetrics"
-               icon="icons/featured_chart.png"
-               id="br.ufal.ic.colligens.MetricsAction"
-               label="Metrics">
          </action>
          <action
                class="br.ufal.ic.colligens.actions.ClearConfigurationsViewAction"

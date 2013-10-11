@@ -8,6 +8,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -33,6 +34,10 @@ public class CoreController {
 	public void setWindow(IWorkbenchWindow window) {
 		CoreController.window = window;
 		projectExplorerController.setWindow(window);
+	}
+	
+	public void setSelection(ISelection selection) {
+		projectExplorerController.setSelection(selection);
 	}
 
 	/**

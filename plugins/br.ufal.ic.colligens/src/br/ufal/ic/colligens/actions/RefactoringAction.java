@@ -1,6 +1,7 @@
 package br.ufal.ic.colligens.actions;
 
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ltk.ui.refactoring.RefactoringWizard;
 import org.eclipse.ltk.ui.refactoring.RefactoringWizardOpenOperation;
 import org.eclipse.swt.widgets.Shell;
@@ -14,7 +15,7 @@ public class RefactoringAction extends PluginActions {
 	@Override
 	public void run(IAction action) {
 		RefactoringFileController refactoringController = new RefactoringFileController();
-		refactoringController.setSelection(super.selection);
+		refactoringController.setSelection((IStructuredSelection)super.selection);
 		run(new RefactoringDataWizard(refactoringController, WIZARD_NAME), super.window.getShell());
 	}
 
@@ -27,5 +28,6 @@ public class RefactoringAction extends PluginActions {
 			// Do nothing
 		}
 	}
+
 
 }

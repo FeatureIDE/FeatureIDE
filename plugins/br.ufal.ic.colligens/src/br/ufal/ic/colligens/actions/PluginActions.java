@@ -21,7 +21,7 @@ import org.eclipse.ui.part.FileEditorInput;
 
 public abstract class PluginActions implements IWorkbenchWindowActionDelegate {
 	protected IWorkbenchWindow window;
-	protected IStructuredSelection selection;
+	protected ISelection selection;
 
 	@SuppressWarnings("restriction")
 	@Override
@@ -36,6 +36,7 @@ public abstract class PluginActions implements IWorkbenchWindowActionDelegate {
 								.equals("h") || fileEditorInput.getFile()
 								.getFileExtension().equals("c"))) {
 					action.setEnabled(true);
+					this.selection = selection;
 				}
 
 			} else if (selection instanceof IStructuredSelection) {
@@ -62,7 +63,6 @@ public abstract class PluginActions implements IWorkbenchWindowActionDelegate {
 
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
 
 	}
 

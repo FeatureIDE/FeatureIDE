@@ -15,12 +15,12 @@ public class ColligensPluginAction extends PluginActions {
 
 	@Override
 	public void run(IAction action) {
-
 		if (controller == null) {
 			controller = new CoreController();
 		}
 
 		controller.setWindow(super.window);
+		controller.setSelection(super.selection);
 
 		if (saveAll()) {
 			IWorkbenchPage page = super.window.getActivePage();

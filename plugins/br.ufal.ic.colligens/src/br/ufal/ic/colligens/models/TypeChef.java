@@ -31,9 +31,9 @@ import org.prop4j.NodeWriter;
 import br.ufal.ic.colligens.activator.Colligens;
 import br.ufal.ic.colligens.controllers.core.PlatformException;
 import br.ufal.ic.colligens.controllers.core.PlatformHeader;
-import de.fosd.typechef.Frontend;
 import de.fosd.typechef.FrontendOptions;
 import de.fosd.typechef.FrontendOptionsWithConfigFiles;
+import de.fosd.typechef.FrontendTypeChef;
 import de.fosd.typechef.lexer.options.OptionException;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
@@ -78,7 +78,7 @@ public class TypeChef {
 				+ System.getProperty("file.separator") + "model.xml");
 		File outputFile = new File(Colligens.getDefault().getConfigDir()
 				.getAbsolutePath()
-				+ System.getProperty("file.separator") + "cnf.txt");
+				+ System.getProperty("file.separator") + "cnf.fm");
 		BufferedWriter print = null;
 		try {
 			print = new BufferedWriter(new FileWriter(outputFile));
@@ -121,6 +121,7 @@ public class TypeChef {
 				.getString("TypeChefPreference");
 
 		ArrayList<String> paramters = new ArrayList<String>();
+
 		paramters.add("--errorXML");
 		paramters.add(outputFilePath);
 		paramters.add("--lexOutput");
@@ -169,13 +170,13 @@ public class TypeChef {
 		}
 
 		paramters.add("-w");
-
+		
 		if (Colligens.getDefault().getPreferenceStore()
 				.getBoolean("FEATURE_MODEL")) {
 			paramters.add("--featureModelFExpr");
 			paramters.add(Colligens.getDefault().getConfigDir()
 					.getAbsolutePath()
-					+ System.getProperty("file.separator") + "cnf.txt");
+					+ System.getProperty("file.separator") + "cnf.fm");
 		}
 
 		fo = new FrontendOptionsWithConfigFiles();
@@ -185,8 +186,7 @@ public class TypeChef {
 				.size()]));
 
 		fo.getFiles().add(fileProxy.getFileToAnalyse());
-		fo.setPrintToStdOutput(false);
-
+		fo.setPrintToStdOutput(true);
 	}
 
 	/**
@@ -216,14 +216,14 @@ public class TypeChef {
 
 			if (Colligens.getDefault().getPreferenceStore()
 					.getBoolean("USE_INCLUDES")) {
-				platformHeader.plarform(fileProxies.get(0).getFileIResource()
+				platformHeader.plarform(fileProxies.get(0).getResource()
 						.getProject().getName());
 			}
 			if (Colligens.getDefault().getPreferenceStore()
 					.getBoolean("USE_STUBS")) {
 				// Monitor Update
 				monitorSubTask("Generating stubs...");
-				platformHeader.stubs(fileProxies.get(0).getFileIResource()
+				platformHeader.stubs(fileProxies.get(0).getResource()
 						.getProject().getName());
 			}
 
@@ -240,14 +240,18 @@ public class TypeChef {
 				try {
 
 					start(file);
-					Frontend.processFile(fo);
+					// Frontend.processFile(fo);
 
-					xmlParser.setXMLFile(fo.getErrorXMLFile());
-					xmlParser.setFile(file);
-					xmlParser.processFile();
+					FrontendTypeChef chef = new FrontendTypeChef();
+					chef.processFile(fo,file);
+
+					// xmlParser.setXMLFile(fo.getErrorXMLFile());
+					// xmlParser.setFile(file);
+					// xmlParser.processFile();
 					//
 					this.isFinish = true;
 				} catch (Exception e) {
+					e.printStackTrace();
 					// If the analysis is not performed correctly,
 					// and the analysis made ​​from the command line
 					startCommandLineMode(file);

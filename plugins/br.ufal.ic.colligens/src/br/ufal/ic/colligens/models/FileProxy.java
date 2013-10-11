@@ -65,7 +65,7 @@ public class FileProxy {
 		return iResource.getLocation().toString();
 	}
 
-	public IResource getFileIResource() {
+	public IResource getResource() {
 		return iResource;
 	}
 
@@ -148,7 +148,7 @@ public class FileProxy {
 	public void deleteMarkers() {
 		// remove markers
 		try {
-			this.getFileIResource().deleteMarkers(Log.MARKER_TYPE, false,
+			this.getResource().deleteMarkers(Log.MARKER_TYPE, false,
 					IResource.DEPTH_ZERO);
 		} catch (CoreException e) {
 			// e.printStackTrace();

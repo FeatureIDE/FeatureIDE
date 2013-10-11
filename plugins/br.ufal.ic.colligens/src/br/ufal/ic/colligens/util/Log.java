@@ -36,11 +36,11 @@ public class Log {
 
 	public static final String MARKER_TYPE = Colligens.PLUGIN_ID + ".problem";
 
-	public Log(FileProxy fileProxy, String line, String feature,
+	public Log(FileProxy fileProxy, int line, String feature,
 			String severity, String message) {
 		this.fileProxy = fileProxy;
 
-		this.line = Integer.parseInt(line.trim());
+		this.line = line;
 		
 		this.feature = feature.trim();
 
@@ -89,7 +89,7 @@ public class Log {
 	}
 
 	public IFile getFile() {
-		return (IFile) fileProxy.getFileIResource();
+		return (IFile) fileProxy.getResource();
 	}
 
 	public FileProxy getFileProxy() {

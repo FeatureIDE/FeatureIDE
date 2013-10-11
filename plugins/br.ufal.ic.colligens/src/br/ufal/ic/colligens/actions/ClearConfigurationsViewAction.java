@@ -25,4 +25,5 @@ public class ClearConfigurationsViewAction extends PluginActions {
 		action.setEnabled(!analyzerViewController.isEmpty());
 	}
 
+
 }

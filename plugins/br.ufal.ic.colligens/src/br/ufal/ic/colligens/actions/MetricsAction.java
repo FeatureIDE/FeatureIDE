@@ -7,7 +7,6 @@ import org.eclipse.ui.PartInitException;
 
 import br.ufal.ic.colligens.activator.Colligens;
 import br.ufal.ic.colligens.controllers.MetricsController;
-import br.ufal.ic.colligens.util.metrics.MetricsException;
 import br.ufal.ic.colligens.views.MetricsView;
 
 public class MetricsAction extends PluginActions {
@@ -20,28 +19,23 @@ public class MetricsAction extends PluginActions {
 		}
 
 		controller.setWindow(super.window);
+		controller.setSelection(super.selection);
 
-		// Open and active the Analyzer view
-		IWorkbenchPage page = super.window.getActivePage();
-		try {
-			page.showView(MetricsView.ID);
-		} catch (PartInitException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		try {
-			if (saveAll()) {
-				controller.run();
-			} else {
-				MessageDialog.openError(window.getShell(),
-						Colligens.PLUGIN_NAME,
-						"Please save all files before proceeding.");
+		if (saveAll()) {
+			// Open and active the Analyzer view
+			IWorkbenchPage page = super.window.getActivePage();
+			try {
+				page.showView(MetricsView.ID);
+			} catch (PartInitException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-		} catch (MetricsException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+			controller.run();
 
+		} else {
+			MessageDialog.openError(window.getShell(), Colligens.PLUGIN_NAME,
+					"Please save all files before proceeding.");
+		}
+
+	}
 }

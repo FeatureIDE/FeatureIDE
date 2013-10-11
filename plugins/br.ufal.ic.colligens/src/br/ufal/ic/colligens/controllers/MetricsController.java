@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IWorkbenchWindow;
 
 import br.ufal.ic.colligens.controllers.metrics.MetricsViewController;
@@ -22,10 +23,15 @@ public class MetricsController {
 		pkgExplorerController.setWindow(window);
 	}
 
+	public void setSelection(ISelection selection) {
+		pkgExplorerController.setSelection(selection);
+	}
+
 	/**
 	 * @throws MetricsException
 	 */
-	public void run() throws MetricsException {
+	public void run() {
+
 		try {
 			pkgExplorerController.run();
 
@@ -61,9 +67,7 @@ public class MetricsController {
 								.addAll(countDirective.directives);
 					}
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					throw new MetricsException("unexpected error!");
+
 				}
 			}
 
@@ -94,9 +98,10 @@ public class MetricsController {
 					.getInstance();
 
 			statisticsViewController.setInput(list);
-			
+
 		} catch (ProjectExplorerException e) {
-			return;
+
 		}
+
 	}
 }
