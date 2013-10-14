@@ -543,43 +543,13 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 						final HashMap<Object, Object> changedAttributes = analyzer
 								.analyzeFeatureModel(monitor);
 
-						UIJob refreshGraphics = new UIJob(
-								"Updating feature model attributes") {
-
-							@Override
-							public IStatus runInUIThread(
-									IProgressMonitor monitor) {
-								for (Object f : changedAttributes.keySet()) {
-									if (f instanceof Feature) {
-										((Feature) f)
-												.fire(new PropertyChangeEvent(
-														this,
-														ATTRIBUTE_CHANGED,
-														false, true));
-									} else if (f instanceof Constraint) {
-										((Constraint) f)
-												.fire(new PropertyChangeEvent(
-														this,
-														ATTRIBUTE_CHANGED,
-														false, true));
-									}
-								}
-
-								// call refresh to redraw legend
-								getContents().refresh();
-								return Status.OK_STATUS;
-							}
-
-						};
-						refreshGraphics.setPriority(Job.SHORT);
-						refreshGraphics.schedule();
+						refreshGraphics(changedAttributes);
 
 						monitor.subTask(null);
 						monitor.done();
 						monitor.setCanceled(true);
 						return Status.OK_STATUS;
-					};
-
+					}
 				};
 				analyzeJob.setPriority(Job.LONG);
 				analyzeJob.schedule();
@@ -588,6 +558,44 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		};
 		waiter.setPriority(Job.DECORATE);
 		waiter.schedule();
+	}
+	
+	/**
+	 * Refreshes the colors of the feature model.
+	 * @param changedAttributes Result of analyis to only refresh special features, or null if all features should be refreshed.
+	 */
+	private void refreshGraphics(final HashMap<Object, Object> changedAttributes) {
+		UIJob refreshGraphics = new UIJob(
+				"Updating feature model attributes") {
+
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				if (changedAttributes == null) {
+					for (Feature f : featureModelEditor.getFeatureModel().getFeatures()) {
+						f.fire(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED,	false, true));
+					}
+					for (Constraint c : featureModelEditor.getFeatureModel().getConstraints()) {
+						c.fire(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, false, true));
+					}
+				} else {				
+					for (Object f : changedAttributes.keySet()) {
+						if (f instanceof Feature) {
+							((Feature) f)
+									.fire(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, false, true));
+						} else if (f instanceof Constraint) {
+							((Constraint) f) .fire(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, false, true));
+						}
+					}
+				}
+
+				// call refresh to redraw legend
+				getContents().refresh();
+				return Status.OK_STATUS;
+			}
+
+		};
+		refreshGraphics.setPriority(Job.SHORT);
+		refreshGraphics.schedule();
 	}
 
 	public void setLayout() {
@@ -641,7 +649,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 			getControl().setBackground(
 					FMPropertyManager.getDiagramBackgroundColor());
 			setContents(getFeatureModel());
-			refresh();
+			refreshGraphics(null);
 		} else if (REFRESH_ACTIONS.equals(prop)) {
 			// additional actions can be refreshed here
 			// legendAction.refresh();
