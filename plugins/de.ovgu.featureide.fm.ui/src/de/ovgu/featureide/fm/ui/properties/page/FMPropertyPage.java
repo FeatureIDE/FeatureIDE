@@ -334,6 +334,7 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		performLegendGroup();
 		performSpecesGroup();
 		performFeatureGroup();
+		FMPropertyManager.updateEditors();
 	}
 
 	/**

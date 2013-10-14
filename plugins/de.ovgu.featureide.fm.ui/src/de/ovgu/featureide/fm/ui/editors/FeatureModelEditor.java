@@ -84,6 +84,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.FeatureModelEditorContributor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GEFImageWriter;
+import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePage;
 
 /**
@@ -164,6 +165,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 				.getLayout().verticalLayout(),featureModel);
 		
 		getExtensions();
+		
+		FMPropertyManager.registerEditor(featureModel);
 	}
 
 	/**
@@ -710,6 +713,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 
 	@Override
 	public void dispose() {
+		FMPropertyManager.unregisterEditor(featureModel);
 		diagramEditor.dispose();
 		super.dispose();
 	}

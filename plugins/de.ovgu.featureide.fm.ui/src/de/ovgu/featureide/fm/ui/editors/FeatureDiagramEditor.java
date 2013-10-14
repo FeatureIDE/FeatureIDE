@@ -638,9 +638,10 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		} else if (MODEL_LAYOUT_CHANGED.equals(prop)) {
 			featureModelEditor.setPageModified(true);
 		} else if (REDRAW_DIAGRAM.equals(prop)) {
-			featureModelEditor.textEditor.updateTextEditor();
-			featureModelEditor.textEditor.doSave(null);
-			featureModelEditor.textEditor.updateDiagram();
+			getControl().setBackground(
+					FMPropertyManager.getDiagramBackgroundColor());
+			setContents(getFeatureModel());
+			refresh();
 		} else if (REFRESH_ACTIONS.equals(prop)) {
 			// additional actions can be refreshed here
 			// legendAction.refresh();

@@ -27,9 +27,11 @@ import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.FreeformLayout;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
+import org.eclipse.draw2d.LineBorder;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
+import org.eclipse.swt.graphics.Color;
 import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.Constraint;
@@ -169,6 +171,12 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 			return;
 		}
 
+	}
+
+	@Override
+	public void setBackgroundColor(Color bg) {
+		super.setBorder(new LineBorder(bg));
+		super.setBackgroundColor(bg);
 	}
 	
 	private String getConstraintText(Constraint constraint) {

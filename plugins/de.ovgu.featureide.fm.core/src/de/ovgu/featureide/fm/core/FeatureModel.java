@@ -674,9 +674,8 @@ public class FeatureModel implements PropertyConstants {
 			listener.propertyChange(event);
 	}
 	/**
-	 * Use {@link FeatureModel#handleModelDataChanged()} instead to refresh the diagram.
+	 * Refreshes the diagram colors.
 	 */
-	@Deprecated
 	public void redrawDiagram() {
 		PropertyChangeEvent event = new PropertyChangeEvent(this,
 				REDRAW_DIAGRAM, Boolean.FALSE, Boolean.TRUE);
