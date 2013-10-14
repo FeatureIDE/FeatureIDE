@@ -48,7 +48,9 @@ abstract public class FeatureDiagramLayoutManager{
 		showHidden = featureModel.getLayout().showHiddenFeatures();
 		FeatureUIHelper.showHiddenFeatures(showHidden,featureModel);		
 		layoutFeatureModel(featureModel);
-		if(featureModel.getLayout().hasLegendAutoLayout())layoutLegend(featureModel, showHidden);
+		if(!FMPropertyManager.isLegendHidden() && featureModel.getLayout().hasLegendAutoLayout()) {
+			layoutLegend(featureModel, showHidden);
+		}
 		layoutHidden(featureModel);
 	}
 	

@@ -61,9 +61,7 @@ public class LegendAction extends Action {
 					.getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
-
 		}
-
 	}
 
 	public void refresh() {
@@ -72,6 +70,5 @@ public class LegendAction extends Action {
 		} else {
 			this.setText("Show Legend");
 		}
-
 	}
 }

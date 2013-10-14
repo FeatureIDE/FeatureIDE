@@ -65,14 +65,15 @@ import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.FeatureStatus;
-import de.ovgu.featureide.fm.core.StoppableJob;
 import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.StoppableJob;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AlternativeAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AndAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AutoLayoutConstraintAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ChangeFeatureDescriptionAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateCompoundAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateLayerAction;
@@ -81,6 +82,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAllAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.EditConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.HiddenAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LayoutSelectionAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LegendAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LegendLayoutAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.MandatoryAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
@@ -88,7 +90,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.RenameAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ReverseOrderAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.SelectionAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ShowHiddenFeaturesAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ChangeFeatureDescriptionAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.AutomatedCalculationsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.ConstrainsCalculationsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.FeaturesOnlyCalculationAction;
@@ -138,7 +139,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	private ZoomOutAction zoomOut;
 
 	// legend action replaced with property page
-	// private LegendAction legendAction;
+	private LegendAction legendAction;
 	private LegendLayoutAction legendLayoutAction;
 
 	private EditConstraintAction editConstraintAction;
@@ -173,11 +174,11 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	void initializeGraphicalViewer() {
 		getControl().addControlListener(new ControlListener() {
 			
-				@Override
-				/**
-				 * used to remove the feature model when resizing the window
-				 */
-				public void controlResized(ControlEvent e) {
+			@Override
+			/**
+			 * used to remove the feature model when resizing the window
+			 */
+			public void controlResized(ControlEvent e) {
 				// checks for null are necessary because we cannot prevent this
 				// method may be called before the model is loaded correctly
 				// (including positions in FeatureUIHelper)
@@ -196,7 +197,10 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 				if (newLoc == null)
 					return;
 				int difX = newLoc.x - oldLoc.x;
-				moveLegend(fm, difX);
+				
+				if (!FMPropertyManager.isLegendHidden()) {
+					moveLegend(fm, difX);
+				}
 
 			}
 
@@ -261,7 +265,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 
 		// legendAction = new LegendAction(this, featureModel);
 		legendLayoutAction = new LegendLayoutAction(this, featureModel);
-		//legendAction = new LegendAction(this, featureModel);
+		legendAction = new LegendAction(this, featureModel);
 		showHiddenFeaturesAction = new ShowHiddenFeaturesAction(this,
 				featureModel);
 
@@ -348,14 +352,14 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 			menu.add(subMenuCalculations);
 			menu.add(new Separator());
 			menu.add(reverseOrderAction);
-			//menu.add(legendAction);
+			menu.add(legendAction);
 		} else if (editConstraintAction.isEnabled() && !connectionSelected) {
 			menu.add(createConstraintAction);
 			menu.add(editConstraintAction);
 			menu.add(deleteAction);
 		} else if (legendLayoutAction.isEnabled()) {
 			menu.add(legendLayoutAction);
-			//menu.add(legendAction);
+			menu.add(legendAction);
 		} else if (andAction.isEnabled() || orAction.isEnabled()
 				|| alternativeAction.isEnabled()) {
 			connectionEntrys(menu);
@@ -366,10 +370,9 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 			menu.add(subMenuCalculations);
 			menu.add(new Separator());
 			menu.add(reverseOrderAction);
-			//menu.add(legendAction);
+			menu.add(legendAction);
 		}
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-		// menu.add(legendAction);
 		if (featureModelEditor.getFeatureModel().hasHidden()) {
 			menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 			menu.add(showHiddenFeaturesAction);
