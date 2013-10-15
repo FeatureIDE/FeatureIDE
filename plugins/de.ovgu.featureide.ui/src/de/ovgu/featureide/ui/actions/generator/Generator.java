@@ -57,6 +57,8 @@ import de.ovgu.featureide.ui.UIPlugin;
 @SuppressWarnings("restriction")
 public class Generator extends Job implements IConfigurationBuilderBasics {
 	
+	protected static final String JAVA_NATURE = "org.eclipse.jdt.core.javanature";
+	
 	/**
 	 * A counter that shows how many configurations are built by this job
 	 */
@@ -223,8 +225,13 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 		} catch (CoreException e) {
 			UIPlugin.getDefault().logError(e);
 		}
-		
-		setClassPath(project);
+		try {
+			if (project.hasNature(JAVA_NATURE)) {
+				setClassPath(project);
+			}
+		} catch (CoreException e) {
+			UIPlugin.getDefault().logError(e);
+		}
 			
 		builder.featureProject.getComposer().buildConfiguration(project.getFolder("src"), configuration, name);
 		try {
