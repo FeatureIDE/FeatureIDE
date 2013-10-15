@@ -48,6 +48,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.builder.preprocessor.PPComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
+import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
@@ -435,6 +436,100 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	@Override
 	public Mechanism getGenerationMechanism() {
 	    return IComposerExtensionClass.Mechanism.PREPROCESSOR;
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.ComposerExtensionClass#buildConfiguration(org.eclipse.core.resources.IFolder, de.ovgu.featureide.fm.core.configuration.Configuration, java.lang.String)
+	 */
+	@Override
+	public void buildConfiguration(IFolder folder, Configuration configuration,
+			String congurationName) {
+		super.buildConfiguration(folder, configuration, congurationName);
+		try {
+			for (IResource res : featureProject.getBuildFolder().members()) {
+				res.copy(folder.getFile(res.getName()).getFullPath(), true, null);
+			}
+		} catch (CoreException e) {
+			AntennaCorePlugin.getDefault().logError(e);
+		}
+		
+		ArrayList<String> activatedFeatures = new ArrayList<String>();
+		for (Feature f : configuration.getSelectedFeatures()) {
+			activatedFeatures.add(f.getName());
+		}
+		// generate comma separated string of activated features
+		StringBuilder featureList = new StringBuilder();
+		for (String feature : activatedFeatures) {
+			featureList.append(feature + ",");
+		}
+		int length = featureList.length();
+		if(length>0) {
+			featureList.deleteCharAt(length-1);
+		}
+		// add source files
+		try {
+			// add activated features as definitions to preprocessor
+			Preprocessor preprocessor = new Preprocessor(new AntennaLogger(),
+					new AntennaLineFilter());
+			preprocessor.addDefines(featureList.toString());
+			// preprocess for all files in source folder
+			preprocessSourceFiles(folder, preprocessor, congurationName);
+		} catch (Exception e) {
+			AntennaCorePlugin.getDefault().logError(e);
+		}
+	}
+	
+	/**
+	 * Customized build for buildConfiguration().
+	 */
+	private void preprocessSourceFiles(IFolder sourceFolder, Preprocessor preprocessor, String congurationName) throws CoreException,
+		FileNotFoundException, IOException {
+		for (final IResource res : sourceFolder.members()) {
+			if (res instanceof IFolder) {
+				// for folders do recursively 
+				preprocessSourceFiles((IFolder) res, preprocessor, null);
+			} else if (res instanceof IFile) {
+				if(res.getName().equals(congurationName + getConfigurationExtension())) {
+					continue;
+				}
+				// get all lines from file
+				final Vector<String> lines = loadStringsFromFile((IFile) res);
+				
+				// do checking and some stuff
+				processLinesOfFile(lines, (IFile) res);
+				boolean changed = false;	
+				try {
+					// run antenna preprocessor
+					changed = preprocessor.preprocess(lines, ((IFile) res).getCharset());
+
+				} catch (PPException e) {
+					featureProject.createBuilderMarker(
+							res,
+							e.getMessage().replace(
+									"Line #" + e.getLineNumber() + " :",
+									"Antenna:"), e.getLineNumber() + 1,
+							IMarker.SEVERITY_ERROR);
+					AntennaCorePlugin.getDefault().logError(e);
+				}
+		
+				// if preprocessor changed file: save & refresh
+				if (changed) {
+					FileOutputStream ostr = null;
+					try {
+						ostr = new FileOutputStream(res.getRawLocation().toOSString());
+						Preprocessor.saveStrings(lines, ostr,
+								((IFile) res).getCharset());
+					} finally {
+						if (ostr != null) {
+							ostr.close();
+						}
+					}
+					// use touch to support e.g. linux
+					res.touch(null);
+					res.refreshLocal(IResource.DEPTH_ZERO, null);
+				}
+			}
+		}
 	}
 
 }
