@@ -71,6 +71,8 @@ import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
+import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
+import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -519,9 +521,17 @@ public class ConfigurationEditor extends MultiPageEditorPart implements
 
 		if (oldPageIndex != -1) {
 			if (newPageIndex == configurationPage.getIndex()){
-				if (configurationPageUsed)
+				// reset the deselection of advanced page to undefined selection
+				for (SelectableFeature feature : configuration.getFeatures()) {
+					if (feature.getAutomatic() == Selection.UNDEFINED) {
+						if (feature.getManual() == Selection.UNSELECTED) {
+							configuration.setManual(feature, Selection.UNDEFINED);
+						}
+					}
+				}
+				if (configurationPageUsed) {
 					configurationPage.updateTree();
-				else {
+				} else {
 					configurationPage.propertyChange(null);
 					configurationPageUsed = true;
 				}
