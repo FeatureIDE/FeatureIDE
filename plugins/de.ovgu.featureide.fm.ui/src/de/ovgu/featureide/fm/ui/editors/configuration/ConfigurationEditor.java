@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.annotation.CheckForNull;
@@ -522,10 +523,19 @@ public class ConfigurationEditor extends MultiPageEditorPart implements
 		if (oldPageIndex != -1) {
 			if (newPageIndex == configurationPage.getIndex()){
 				// reset the deselection of advanced page to undefined selection
+				Set<Feature> selectedFeatures = configuration.getSelectedFeatures();
 				for (SelectableFeature feature : configuration.getFeatures()) {
 					if (feature.getAutomatic() == Selection.UNDEFINED) {
 						if (feature.getManual() == Selection.UNSELECTED) {
 							configuration.setManual(feature, Selection.UNDEFINED);
+						}
+					}
+				}
+				// reselect implied features
+				for (SelectableFeature feature : configuration.getFeatures()) {
+					if (selectedFeatures.contains(feature.getFeature())) {
+						if (feature.getSelection() != Selection.SELECTED) {
+							configuration.setManual(feature, Selection.SELECTED);
 						}
 					}
 				}
