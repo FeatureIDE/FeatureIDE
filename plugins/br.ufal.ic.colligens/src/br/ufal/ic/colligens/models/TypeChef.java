@@ -42,6 +42,7 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
+@SuppressWarnings("restriction")
 public class TypeChef {
 
 	private XMLParserTypeChef xmlParser;
@@ -323,7 +324,6 @@ public class TypeChef {
 		String typeChefPreference = Colligens.getDefault().getPreferenceStore()
 				.getString("TypeChefPreference");
 
-		@SuppressWarnings("restriction")
 		URL url = BundleUtility.find(Colligens.getDefault().getBundle(), "lib/"
 				+ "TypeChef-0.3.5.jar");
 		try {

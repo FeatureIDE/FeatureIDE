@@ -64,6 +64,7 @@ public class InvalidConfigurationsViewController extends ViewController {
 
 		Object object = treeViewer.getInput();
 		if (object != null && object instanceof List) {
+			@SuppressWarnings("unchecked")
 			List<FileProxy> fileProxies = (List<FileProxy>) object;
 			for (FileProxy fileProxy : fileProxies) {
 				fileProxy.deleteMarkers();

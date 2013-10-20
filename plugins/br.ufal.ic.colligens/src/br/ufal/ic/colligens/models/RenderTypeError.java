@@ -5,7 +5,9 @@ import scala.collection.Iterator;
 import scala.collection.immutable.*;
 import de.fosd.typechef.typesystem.TypeError;
 
+@SuppressWarnings("rawtypes")
 public class RenderTypeError {
+
 	private List errors;
 	private FileProxy fileProxie;
 

@@ -7,6 +7,7 @@ import org.eclipse.ltk.core.refactoring.RefactoringDescriptor;
 
 public class RefactoringContribut extends RefactoringContribution{
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public RefactoringDescriptor createDescriptor(String id, String project,
 			String description, String comment, Map arguments, int flags)

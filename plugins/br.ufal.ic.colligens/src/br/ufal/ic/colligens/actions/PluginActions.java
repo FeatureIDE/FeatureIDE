@@ -19,11 +19,11 @@ import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.FileEditorInput;
 
+@SuppressWarnings("restriction")
 public abstract class PluginActions implements IWorkbenchWindowActionDelegate {
 	protected IWorkbenchWindow window;
 	protected ISelection selection;
 
-	@SuppressWarnings("restriction")
 	@Override
 	public void selectionChanged(IAction action, ISelection selection) {
 		action.setEnabled(false);
