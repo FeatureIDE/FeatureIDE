@@ -27,12 +27,12 @@ import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 import de.ovgu.featureide.ui.views.collaboration.model.Collaboration;
 
 /**
- * TODO @Krieter description
+ * A graphical element which holds a {@link CollaborationFigure}.
  * 
  * @author Sebastian Krieter
  * @author Steffen Schulze
  */
-public class UnderlayerFigure extends Figure implements GUIDefaults{
+public class UnderlayerFigure extends Figure implements GUIDefaults {
 
 	private CollaborationFigure collaborationFigure;
 	

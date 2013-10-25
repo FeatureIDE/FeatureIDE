@@ -50,7 +50,7 @@ import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.figures.RoleFigure;
 import de.ovgu.featureide.ui.views.collaboration.figures.RoleFigureLabel;
 import de.ovgu.featureide.ui.views.collaboration.model.Role;
-import de.ovgu.featureide.ui.views.collaboration.outline.CollaborationOutline;
+import de.ovgu.featureide.ui.views.collaboration.outline.Outline;
 
 /**
  * EditPart for Roles.
@@ -167,7 +167,7 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 						if (fstField.getFullName().equals(label.getElementName())) {
 							editor = openEditor(file);
 							if (editor != null) {
-								CollaborationOutline.scrollToLine(editor,fstField.getLine());
+								Outline.scrollToLine(editor,fstField.getLine());
 							}
 							return;
 						}
@@ -178,7 +178,7 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 						if (fstMethod.getFullName().equals(label.getElementName())) {
 							editor = openEditor(file);
 							if (editor != null)	{
-								CollaborationOutline.scrollToLine(editor,fstMethod.getLine());
+								Outline.scrollToLine(editor,fstMethod.getLine());
 							}
 							return;
 						}
@@ -189,7 +189,7 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 						if (fstDirective.toDependencyString().equals(label.getElementName())) {
 							editor = openEditor(file);
 							if (editor != null)	{
-								CollaborationOutline.scrollToLine(editor, fstDirective.getStartLine(), fstDirective.getEndLine(), fstDirective.getStartOffset(), fstDirective.getEndLength());
+								Outline.scrollToLine(editor, fstDirective.getStartLine(), fstDirective.getEndLine(), fstDirective.getStartOffset(), fstDirective.getEndLength());
 							}
 							return;
 						}

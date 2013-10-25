@@ -37,15 +37,17 @@ public class BuildExtendedModulesWizard extends Wizard implements IWorkbenchWiza
 	public static final String ID = MPLUIPlugin.PLUGIN_ID + ".wizards.BuildExtendedModulesWizard";
 
 	private ChooseFolderPage page;
+	private final String defaultFolderString;
 	
-	public BuildExtendedModulesWizard(String title) {
+	public BuildExtendedModulesWizard(String title, String defaultFolderString) {
 		super();
 		setWindowTitle(title);
+		this.defaultFolderString = (defaultFolderString != null) ? defaultFolderString : "";
 	}
 
 	@Override
 	public void addPages() {
-		page = new ChooseFolderPage();
+		page = new ChooseFolderPage(defaultFolderString);
 		addPage(page);
 		super.addPages();
 	}

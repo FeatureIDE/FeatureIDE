@@ -1,0 +1,255 @@
+package de.ovgu.featureide.core.mpl.signature;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Map.Entry;
+
+import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassSignature;
+import de.ovgu.featureide.core.mpl.signature.abstr.AbstractFieldSignature;
+import de.ovgu.featureide.core.mpl.signature.abstr.AbstractMethodSignature;
+import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature;
+import de.ovgu.featureide.core.mpl.signature.filter.ISignatureFilter;
+
+public class ProjectSignatures {
+//	private final HashMap<AbstractSignature, AbstractSignature> 
+//		signatureSet = new HashMap<AbstractSignature, AbstractSignature>();
+	
+	public final class SignatureIterator implements Iterator<AbstractSignature> {
+		private final LinkedList<ISignatureFilter> filter = new LinkedList<ISignatureFilter>();
+		private int count = 0;
+		private boolean nextAvailable = false;
+		
+//		public SignatureIterator(ISignatureFilter filter) {
+//			this.filter = new ISignatureFilter[]{filter};
+//		}
+		
+//		public SignatureIterator(List<ISignatureFilter> filter) {
+//			this.filter = new ISignatureFilter[filter.size()];
+//			filter.toArray(this.filter);
+//		}
+		
+//		public SignatureIterator(ISignatureFilter... filter) {
+//			this.filter = filter;
+//		}
+		
+		public void addFilter(ISignatureFilter filter) {
+			this.filter.add(filter);
+		}
+		
+		public void clearFilter() {
+			this.filter.clear();
+		}
+		
+		public void reset() {
+			count = 0;
+			nextAvailable = false;
+		}
+		
+		private boolean findNext() {
+			if (filter == null && count < signatureArray.length) {
+				nextAvailable = true;
+				return true;
+			} else {
+				for (; count < signatureArray.length; ++count) {
+					if (isValid(signatureArray[count])) {
+						nextAvailable = true;
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+		
+//		private boolean isValid(AbstractSignature sig) {
+//			for (int i = 0; i < filter.length; ++i) {
+//				if (!filter[i].isValid(sig)) {
+//					return false;
+//				}
+//			}
+//			return true;
+//		}
+		
+		private boolean isValid(AbstractSignature sig) {
+			for (ISignatureFilter curFilter : filter) {
+				if (!curFilter.isValid(sig)) {
+					return false;
+				}
+			}
+			return true;
+		}
+
+		@Override
+		public boolean hasNext() {
+			return nextAvailable || findNext();
+		}
+		
+		@Override
+		public AbstractSignature next() {
+			if (!nextAvailable && !findNext()) {
+				return null;
+			} else {
+				nextAvailable = false;
+				return signatureArray[count++];
+			}
+		}
+
+		@Override
+		public void remove() {}
+	}
+	
+	private AbstractSignature[] signatureArray;
+	
+	private int hashCode = 0;
+	private boolean hasHashCode = false;
+	
+//	public SignatureIterator getIterator(ISignatureFilter filter) {
+//		return new SignatureIterator(filter);
+//	}
+	
+	public SignatureIterator createIterator() {
+		return new SignatureIterator();
+//		return getIterator(null);
+	}
+	
+//	public ProjectStructure toProjectStructure() {
+//		return new ProjectStructure(getIterator(), new FujiClassCreator());
+//	}
+//	
+//	public ProjectStructure toProjectStructure(ISignatureFilter filter) {
+//		return new ProjectStructure(getIterator(filter), new FujiClassCreator());
+//	}
+	
+	public void setSignatureArray(AbstractSignature[] signatureArray) {
+		this.signatureArray = signatureArray;
+	}
+	
+	public HashMap<Integer, int[]> getStatisticNumbers() {
+		final int[][] allCounters = new int[4][4];
+		HashMap<Integer, int[]> fs = new HashMap<Integer, int[]>();
+
+		for (int i = 0; i < signatureArray.length; ++i) {
+			AbstractSignature signature = signatureArray[i];
+			if (signature instanceof AbstractFieldSignature) {
+				count(signature, allCounters[2], fs, 2);
+			} else if (signature instanceof AbstractMethodSignature) {
+				count(signature, allCounters[3], fs, 3);
+			} else if (signature instanceof AbstractClassSignature) {
+				if (signature.getParent() != null) {
+					count(signature, allCounters[1], fs, 1);
+				} else {
+					count(signature, allCounters[0], fs, 0);
+				}
+			}
+		}
+		int[] spl = new int[3];
+		int[] iface = new int[3];
+		spl[0] = allCounters[0][1];
+		spl[1] = allCounters[2][1];
+		spl[2] = allCounters[3][1];
+		iface[0] = allCounters[0][0];
+		iface[1] = allCounters[2][0];
+		iface[2] = allCounters[3][0];
+		fs.put(-2, spl);
+		fs.put(-3, iface);
+
+		return fs;
+	}
+	
+	private void count(AbstractSignature signature, int[] curCounter, HashMap<Integer, int[]> fs, int i) {
+		for (int feature : signature.getFeatureIDs()) {
+			int[] x = fs.get(feature);
+			if (x == null) {
+				x = new int[]{0,0,0,0};
+				fs.put(feature, x);
+			}
+			x[i]++;
+		}
+
+		curCounter[0]++;
+		curCounter[1] += signature.getFeatureIDs().length;
+		if (signature.isPrivate()) {
+			curCounter[2]++;
+			curCounter[3] += signature.getFeatureIDs().length;
+		}
+	}
+	
+	public String getStatisticsString() {
+		final int[][] allCounters = new int[4][4];
+		HashMap<Integer, int[]> fs = new HashMap<Integer, int[]>();
+
+		for (int i = 0; i < signatureArray.length; ++i) {
+			AbstractSignature signature = signatureArray[i];
+			if (signature instanceof AbstractFieldSignature) {
+				count(signature, allCounters[2], fs, 2);
+			} else if (signature instanceof AbstractMethodSignature) {
+				count(signature, allCounters[3], fs, 3);
+			} else if (signature instanceof AbstractClassSignature) {
+				if (signature.getParent() != null) {
+					count(signature, allCounters[1], fs, 1);
+				} else {
+					count(signature, allCounters[0], fs, 0);
+					System.out.println(signature.getFullName());
+				}
+			}
+		}
+
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < allCounters.length; i++) {
+			int[] curCounter = allCounters[i];
+			switch (i) {
+			case 0: sb.append("#Classes: "); break;
+			case 1: sb.append("#InnerClasses: "); break;
+			case 2: sb.append("#Fields: "); break;
+			case 3: sb.append("#Methods: "); break;
+			}
+			sb.append(curCounter[0]);
+			sb.append("\n\t#Private: ");
+			sb.append(curCounter[2]);
+			sb.append("\n\t#Definitions: ");
+			sb.append(curCounter[1]);
+			sb.append("\n\t\t#Private Definitions: ");
+			sb.append(curCounter[3]);
+			sb.append("\n");
+		}
+		sb.append("\n\nPer Feature:");
+		for (Entry<Integer, int[]> entry : fs.entrySet()) {
+			sb.append("\n\t");
+			sb.append(entry.getKey());
+			sb.append("\n");
+			int[] x = entry.getValue();
+			for (int i = 0; i < x.length; i++) {
+				switch (i) {
+				case 0: sb.append("\t\t#Classes: "); break;
+				case 1: sb.append("\t\t#InnerClasses: "); break;
+				case 2: sb.append("\t\t#Fields: "); break;
+				case 3: sb.append("\t\t#Methods: "); break;
+				}
+				sb.append(x[i]);
+				sb.append("\n");
+			}
+		}
+		return sb.toString();
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		return Arrays.equals(signatureArray, ((ProjectSignatures) obj).signatureArray);
+//		return signatureSet.keySet().equals(((ProjectSignatures) obj).signatureSet.keySet());
+	}
+
+	@Override
+	public int hashCode() {
+		if (!hasHashCode) {
+			hashCode = 1;
+			hashCode += Arrays.hashCode(signatureArray);
+//			for (int i = 0; i < signatureArray.length; ++i) {
+//				AbstractSignature signature = signatureArray[i];
+//				hashCode = hashCode + member.hashCode();
+//			}
+			hasHashCode = true;
+		}
+		return hashCode;
+	}
+}

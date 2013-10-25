@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.ui.mpl.actions;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Display;
@@ -34,15 +33,19 @@ import de.ovgu.featureide.ui.mpl.wizards.FeatureInterfaceWizard;
  * @author Sebastian Krieter
  * @author Reimar Schroeter
  */
-public class BuildFeatureInterfacesAction extends AbstractProjectAction {
+public class BuildFeatureInterfacesAction extends AProjectJobAction {	
+	private FeatureInterfaceWizard wizard;
+	
 	@Override
-	protected void action(IProject project) {
-		FeatureInterfaceWizard wizard = new FeatureInterfaceWizard("Build Feature Interfaces");
-		
+	protected boolean startAction() {
+		wizard = new FeatureInterfaceWizard("Build Feature Interfaces");
 		WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
-		if (dialog.open() == Dialog.OK) {
-			MPLPlugin.getDefault().buildFeatureInterfaces(project.getName(), wizard.getFolderName(), wizard.getViewName(), 
-					wizard.getViewLevel(), wizard.getConfigLimit());
-		}
+		return (dialog.open() == Dialog.OK);
+	}
+	
+	@Override
+	protected void endAction() {
+		MPLPlugin.getDefault().buildFeatureInterfaces(projects, wizard.getFolderName(), 
+				wizard.getViewName(), wizard.getViewLevel(), wizard.getConfigLimit());
 	}
 }

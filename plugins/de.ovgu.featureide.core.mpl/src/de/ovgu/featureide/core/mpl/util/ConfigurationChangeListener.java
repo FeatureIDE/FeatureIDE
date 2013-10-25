@@ -23,9 +23,9 @@ package de.ovgu.featureide.core.mpl.util;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPropertyListener;
 
-import de.ovgu.featureide.core.mpl.JavaInterfaceProject;
+import de.ovgu.featureide.core.mpl.InterfaceProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
-import de.ovgu.featureide.core.mpl.io.ExtendedConfigurationWriter;
+import de.ovgu.featureide.core.mpl.io.writer.ExtendedConfigurationWriter;
 import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor;
 
 /**
@@ -41,7 +41,7 @@ public class ConfigurationChangeListener implements IPropertyListener {
 			ConfigurationEditor confEditor = (ConfigurationEditor) source;
 			
 			if (!confEditor.isDirty()) {
-				JavaInterfaceProject interfaceProject = MPLPlugin.getDefault().getInterfaceProject(confEditor.file.getProject());
+				InterfaceProject interfaceProject = MPLPlugin.getDefault().getInterfaceProject(confEditor.file.getProject());
 				
 				if (interfaceProject != null) {
 					interfaceProject.setConfiguration(confEditor.configuration);

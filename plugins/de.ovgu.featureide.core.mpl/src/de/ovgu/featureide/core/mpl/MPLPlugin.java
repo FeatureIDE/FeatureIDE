@@ -20,11 +20,13 @@
  */
 package de.ovgu.featureide.core.mpl;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -40,21 +42,28 @@ import org.osgi.framework.BundleContext;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.builder.FeatureProjectNature;
 import de.ovgu.featureide.core.mpl.builder.InterfaceProjectNature;
-import de.ovgu.featureide.core.mpl.io.FileLoader;
-import de.ovgu.featureide.core.mpl.io.InterfaceWriter;
-import de.ovgu.featureide.core.mpl.io.JavaProjectWriter;
-import de.ovgu.featureide.core.mpl.io.JavaSignatureWriter;
-import de.ovgu.featureide.core.mpl.io.constants.IOConstants;
-import de.ovgu.featureide.core.mpl.signature.ProjectSignature;
-import de.ovgu.featureide.core.mpl.signature.RoleMap;
-import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassFragment;
+import de.ovgu.featureide.core.mpl.io.IOConstants;
+import de.ovgu.featureide.core.mpl.io.writer.JavaProjectWriter;
+import de.ovgu.featureide.core.mpl.job.AChainJob;
+import de.ovgu.featureide.core.mpl.job.BuildExtendedSignatureJob;
+import de.ovgu.featureide.core.mpl.job.BuildFeatureInterfaces;
+import de.ovgu.featureide.core.mpl.job.BuildStatisticsJob;
+import de.ovgu.featureide.core.mpl.job.CompareConfigInterfaces;
+import de.ovgu.featureide.core.mpl.job.StartJob;
+import de.ovgu.featureide.core.mpl.signature.ProjectSignatures;
+import de.ovgu.featureide.core.mpl.signature.ProjectSignatures.SignatureIterator;
+import de.ovgu.featureide.core.mpl.signature.ProjectStructure;
+import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassSignature;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractFieldSignature;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractMethodSignature;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature;
+import de.ovgu.featureide.core.mpl.signature.filter.ContextFilter;
 import de.ovgu.featureide.core.mpl.util.ConfigurationChangeListener;
 import de.ovgu.featureide.core.mpl.util.EditorTracker;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
+import de.ovgu.featureide.fm.core.PropertyConstants;
 
 /** 
  * Plug-in activator with miscellaneous function for an interface project.
@@ -63,13 +72,10 @@ import de.ovgu.featureide.fm.core.AbstractCorePlugin;
  * @author Reimar Schroeter
  */
 public class MPLPlugin extends AbstractCorePlugin {
-
 	public static final String PLUGIN_ID = "de.ovgu.featureide.core.mpl";
-	public static boolean WRAPPER_INTERFACES = false;
-	public static boolean PRIVATE_METHODS = false;
 
 	private static MPLPlugin plugin;
-	private HashMap<String, JavaInterfaceProject> projectMap = new HashMap<String, JavaInterfaceProject>();
+	private final HashMap<String, InterfaceProject> projectMap = new HashMap<String, InterfaceProject>();
 
 	@Override
 	public String getID() {
@@ -94,23 +100,78 @@ public class MPLPlugin extends AbstractCorePlugin {
 		EditorTracker.dispose();
 	}
 	
-	private JavaInterfaceProject addProject(IProject project) {
-		JavaInterfaceProject interfaceProject = null;
-		for (IFeatureProject fp : CorePlugin.getFeatureProjects()) {
-			if (constructInterfaceProjectName(fp.getProjectName()).equals(project.getName())) {
-				interfaceProject = new JavaInterfaceProject(project, fp);
-				break;
+	public void addInterfaceNature(IProject project) {
+		IFeatureProject curFeatureProject = CorePlugin.getFeatureProject(project);
+		// TODO MPL: workaround: only for feature house projects
+		if (curFeatureProject != null
+				&& "de.ovgu.featureide.composer.featurehouse"
+						.equals(curFeatureProject.getComposerID())) {
+			try {
+				IProjectDescription description = project.getDescription();
+				String[] natures = description.getNatureIds();
+				String[] newNatures = new String[natures.length + 1];
+				System.arraycopy(natures, 0, newNatures, 0, natures.length);
+				newNatures[natures.length] = InterfaceProjectNature.NATURE_ID;
+				description.setNatureIds(newNatures);
+				project.setDescription(description, null);
+			} catch (CoreException e) {
+				logError(e);
 			}
 		}
-		if (interfaceProject == null) {
-			interfaceProject = new JavaInterfaceProject(project);
+	}
+	
+	public void removeInterfaceNature(IProject project) {
+		try {
+			IProjectDescription description = project.getDescription();
+			String[] natures = description.getNatureIds();
+			String[] newNatures = new String[natures.length - 1];
+			int i = 0;
+			for (String nature : natures) {
+				if (!nature.equals(InterfaceProjectNature.NATURE_ID)) {
+					newNatures[i++] = nature;
+				}
+			}
+			description.setNatureIds(newNatures);
+			project.setDescription(description, null);
+		} catch (CoreException e) {
+			logError(e);
 		}
+	}
+	
+	private InterfaceProject addProject(IProject project) {
+		IFeatureProject curFeatureProject = null;
+		try {
+			if (project.hasNature(FeatureProjectNature.NATURE_ID)) {
+				curFeatureProject = CorePlugin.getFeatureProject(project);
+			} else {
+				for (IFeatureProject fp : CorePlugin.getFeatureProjects()) {
+					if (constructInterfaceProjectName(fp.getProjectName()).equals(project.getName())) {
+						curFeatureProject = fp;
+						break;
+					}
+				}
+			}
+		} catch (CoreException e) {
+			logError(e);
+		}
+		final InterfaceProject interfaceProject = new InterfaceProject(project, curFeatureProject);
+		
 		projectMap.put(project.getName(), interfaceProject);
+		interfaceProject.getFeatureModel().addListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				if (PropertyConstants.MODEL_DATA_CHANGED.equals(evt.getPropertyName())) {
+//					interfaceProject.loadSignatures(true);
+				} else if (PropertyConstants.MODEL_LAYOUT_CHANGED.equals(evt.getPropertyName())) {
+//					interfaceProject.loadSignatures(true);
+				}
+			}
+		});
 		return interfaceProject;
 	}
 	
-	public JavaInterfaceProject getInterfaceProject(String projectName) {
-		JavaInterfaceProject interfaceProject = projectMap.get(projectName);
+	public InterfaceProject getInterfaceProject(String projectName) {
+		InterfaceProject interfaceProject = projectMap.get(projectName);
 		if (interfaceProject == null) {
 			IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 			if (isInterfaceProject(project)) {
@@ -120,8 +181,8 @@ public class MPLPlugin extends AbstractCorePlugin {
 		return interfaceProject;
 	}
 	
-	public JavaInterfaceProject getInterfaceProject(IProject project) {
-		JavaInterfaceProject interfaceProject = projectMap.get(project.getName());
+	public InterfaceProject getInterfaceProject(IProject project) {
+		InterfaceProject interfaceProject = projectMap.get(project.getName());
 		if (interfaceProject == null && isInterfaceProject(project)) {
 			interfaceProject = addProject(project);
 		}
@@ -130,7 +191,7 @@ public class MPLPlugin extends AbstractCorePlugin {
 	
 	public boolean isInterfaceProject(IProject project) {
 		try {
-			return project.getNature(InterfaceProjectNature.NATURE_ID) != null;
+			return project.hasNature(InterfaceProjectNature.NATURE_ID);
 		} catch (CoreException e) {
 			logError(e);
 			return false;
@@ -151,8 +212,7 @@ public class MPLPlugin extends AbstractCorePlugin {
 			try {
 				newProject.create(description, null);
 				newProject.open(null);
-
-				//TODO lib ordner mitkopieren und im Java Projekt verlinken
+				
 				newProject.getFile(new Path(IOConstants.FILENAME_MODEL)).create(featureProject.getModelFile().getContents(), true, null);
 
 				InputStream stream = new ByteArrayInputStream("".getBytes());
@@ -160,58 +220,10 @@ public class MPLPlugin extends AbstractCorePlugin {
 				newProject.getFile(new Path(IOConstants.FILENAME_EXTCONFIG)).create(stream, true, null);
 				stream.close();
 
-				JavaInterfaceProject interfaceProject = new JavaInterfaceProject(newProject, featureProject);
+				InterfaceProject interfaceProject = new InterfaceProject(newProject, featureProject);
 				projectMap.put(projectName, interfaceProject);
-				
-				interfaceProject.getRoleMap().addDefaultViewTag("view1");
-				refresh(interfaceProject);
 			} catch (Exception e) {
 				logError(e);
-			}
-		}
-	}
-	
-	public void buildFeatureInterfaces(String projectName, String folder, String viewName, int viewLevel, int configLimit) {
-		JavaInterfaceProject interfaceProject = getInterfaceProject(projectName);
-		if (interfaceProject != null) {
-			interfaceProject.refreshRoleMap();
-			interfaceProject.setConfigLimit(configLimit);
-			interfaceProject.setFilterViewTag(viewName, viewLevel);
-			
-			if (PRIVATE_METHODS) {
-//				refresh(interfaceProject);
-				new InterfaceWriter(interfaceProject).buildFeatureInterfaces();
-				return;
-			}
-			
-			new InterfaceWriter(interfaceProject).buildFeatureInterfaces(false, folder, true);
-		}
-	}
-	
-	public void buildConfigurationInterfaces(String projectName, String viewName, int viewLevel, int configLimit) {
-		buildInterfaces(1, projectName, viewName, viewLevel, configLimit);
-	}
-	
-	public void compareConfigurationInterfaces(String projectName, String viewName, int viewLevel, int configLimit) {
-		buildInterfaces(0, projectName, viewName, viewLevel, configLimit);
-	}
-	
-	private void buildInterfaces(int mode, String projectName, String viewName, int viewLevel, int configLimit) {
-		JavaInterfaceProject interfaceProject = getInterfaceProject(projectName);
-		if (interfaceProject != null) {
-			interfaceProject.refreshRoleMap();
-			interfaceProject.setConfigLimit(configLimit);
-			interfaceProject.setFilterViewTag(viewName, viewLevel);
-			//TODO FujiTest
-			interfaceProject.clearFilterViewTag();
-			
-			switch (mode) {
-			case 0: 
-				(new InterfaceWriter(interfaceProject)).compareConfigurationInterfaces();
-				break;
-			case 1: 
-				(new InterfaceWriter(interfaceProject)).buildConfigurationInterfaces();
-				break;
 			}
 		}
 	}
@@ -221,214 +233,194 @@ public class MPLPlugin extends AbstractCorePlugin {
 	}
 	
 	public void addViewTag(IProject project, String name) {
-		JavaInterfaceProject interfaceProject = getInterfaceProject(project);
+		InterfaceProject interfaceProject = getInterfaceProject(project);
 		if (interfaceProject != null) {
-			interfaceProject.getRoleMap().addDefaultViewTag(name);
-			refresh(interfaceProject);
+//			interfaceProject.getRoleMap().addDefaultViewTag(name);
+//			refresh(interfaceProject);
 		}
 	}
 	
 	public void scaleUpViewTag(IProject project, String name, int level) {
-		JavaInterfaceProject interfaceProject = getInterfaceProject(project);
+		InterfaceProject interfaceProject = getInterfaceProject(project);
 		if (interfaceProject != null) {
-			interfaceProject.scaleUpViewTag(name, level);
-			refresh(interfaceProject);
+//			interfaceProject.scaleUpViewTag(name, level);
+//			refresh(interfaceProject);
 		}
 	}
 	
 	public void deleteViewTag(IProject project, String name) {
-		JavaInterfaceProject interfaceProject = getInterfaceProject(project);
+		InterfaceProject interfaceProject = getInterfaceProject(project);
 		if (interfaceProject != null) {
-			interfaceProject.removeViewTag(name);
-			refresh(interfaceProject);
+//			interfaceProject.removeViewTag(name);
+//			refresh(interfaceProject);
 		}
 	}
 	
 	public void refresh(IProject project) {
-		JavaInterfaceProject interfaceProject = getInterfaceProject(project);
+		InterfaceProject interfaceProject = getInterfaceProject(project);
 		if (interfaceProject != null) {
-			refresh(interfaceProject);
+			interfaceProject.loadSignatures(true);
+//			interfaceProject.loadSignaturesJob(true);
 		}
 	}
 	
-	private void refresh(JavaInterfaceProject interfaceProject) {
-		new InterfaceWriter(interfaceProject).buildAllFeatureInterfaces(false);
+	public void buildFeatureInterfaces(LinkedList<IProject> projects, String folder, String viewName, int viewLevel, int configLimit) {
+		final AChainJob[] jobs = new AChainJob[projects.size()];
+		for (int i = 0; i < jobs.length; i++) {
+			jobs[i] = new BuildFeatureInterfaces(folder);
+		}
+		startJobs(projects, jobs);
 	}
 	
-
-	public void extendedModules(String projectName, String folder) {
-		JavaInterfaceProject interfaceProject = getInterfaceProject(projectName);
-		if (interfaceProject != null) {
-			interfaceProject.refreshRoleMap();
-			
-			new InterfaceWriter(interfaceProject).createExtendedSignatures(folder);
+	public void buildConfigurationInterfaces(LinkedList<IProject> projects, String viewName, int viewLevel, int configLimit) {
+		final AChainJob[] jobs = new AChainJob[projects.size()];
+		for (int i = 0; i < jobs.length; i++) {
+			jobs[i] = new CompareConfigInterfaces();
 		}
+		startJobs(projects, jobs);
 	}
 	
-	public void generateStatistics(String projectName, String folder) {
-		JavaInterfaceProject interfaceProject = getInterfaceProject(projectName);
-		if (interfaceProject != null) {
-			interfaceProject.refreshRoleMap();
-			
-			new InterfaceWriter(interfaceProject).createStatistics(folder);
+	public void compareConfigurationInterfaces(LinkedList<IProject> projects, String viewName, int viewLevel, int configLimit) {
+		final AChainJob[] jobs = new AChainJob[projects.size()];
+		for (int i = 0; i < jobs.length; i++) {
+			jobs[i] = new CompareConfigInterfaces();
 		}
+		startJobs(projects, jobs);
 	}
-
-	public List<CompletionProposal> extendedModules(IFeatureProject project, String featureName) {
-		RoleMap map = new JavaSignatureWriter(project, null).writeSignatures(project.getFeatureModel());
-		ProjectSignature sig = InterfaceWriter.buildSignature(project.getFeatureModel(), map, featureName);
-		Collection<AbstractClassFragment> frag = sig.getClasses();
-		
-		ArrayList<CompletionProposal> ret_List= new ArrayList<CompletionProposal>();
-		for (AbstractClassFragment cur : frag) {
-			CompletionProposal pr = org.eclipse.jdt.core.CompletionProposal.create(CompletionProposal.TYPE_REF,0);
-			pr.setCompletion(cur.getSignature().getName().toCharArray());
-			pr.setFlags(Flags.AccPublic);
-			pr.setSignature(Signature.createTypeSignature(cur.getSignature().getFullName(), true).toCharArray());
-			ret_List.add(pr);
+	
+//	public void extendedModules(String projectName, String folder) {
+//		addJob(projectName, new BuildExtendedSignatureJob(folder));
+//	}
+	
+	public void buildExtendedModules(LinkedList<IProject> projects, String folder) {
+		final AChainJob[] jobs = new AChainJob[projects.size()];
+		for (int i = 0; i < jobs.length; i++) {
+			jobs[i] = new BuildExtendedSignatureJob(folder);
 		}
-		
-		for (AbstractClassFragment cur : frag) {
-			Collection<AbstractSignature> memberFrag = cur.getMembers();
-			for (AbstractSignature curMember : memberFrag) {
-				if(curMember instanceof AbstractMethodSignature){
-					CompletionProposal pr = org.eclipse.jdt.core.CompletionProposal.create(CompletionProposal.METHOD_REF,0);
-					
-					pr.setDeclarationSignature(Signature.createTypeSignature(cur.getSignature().getFullName(), true).toCharArray());
-					pr.setFlags(Flags.AccPublic);
-					pr.setName(curMember.getName().toCharArray());
-//					char[] t = new String("java.lang.String").toCharArray();
-//					pr.setSignature(Signature.createMethodSignature(new char[][]{curMember.getName().toCharArray()}, t));
-					pr.setSignature(Signature.createMethodSignature(new char[][]{{}}, new char[]{}));
-					pr.setCompletion(curMember.getName().toCharArray());
-				
-					ret_List.add(pr);
-				}
-				if(curMember instanceof AbstractFieldSignature){
-					CompletionProposal pr = org.eclipse.jdt.core.CompletionProposal.create(CompletionProposal.FIELD_REF,0);
-					
-					pr.setDeclarationSignature(Signature.createTypeSignature(cur.getSignature().getFullName(), true).toCharArray());
-					pr.setFlags(Flags.AccPublic);
-					pr.setName(curMember.getName().toCharArray());
-					pr.setCompletion(curMember.getName().toCharArray());
-				
-					ret_List.add(pr);
-				}
+		startJobs(projects, jobs);
+	}
+	
+	public void printStatistics(LinkedList<IProject> projects, String folder) {
+		final AChainJob[] jobs = new AChainJob[projects.size()];
+		for (int i = 0; i < jobs.length; i++) {
+			jobs[i] = new BuildStatisticsJob(folder);
+		}
+		startJobs(projects, jobs);
+	}
+	
+//	private void addJob(String projectName, AChainJob job) {
+//		InterfaceProject interfaceProject = getInterfaceProject(projectName);
+//		if (interfaceProject != null) {			
+//			interfaceProject.loadSignaturesJob(false);
+//			job.setInterfaceProject(interfaceProject);
+//			interfaceProject.addJob(job);
+//		}
+//	}
+	
+	private void startJobs(LinkedList<IProject> projects, AChainJob[] jobs) {
+		final InterfaceProject[] interfaceProjects = new InterfaceProject[projects.size()];
+		int i = 0;
+		for (IProject p : projects) {
+			InterfaceProject interfaceProject = getInterfaceProject(p.getName());
+			if (interfaceProject != null) {
+				interfaceProjects[i] = interfaceProject;
+				jobs[i++].setInterfaceProject(interfaceProject);
 			}
 		}
-		
-		return ret_List;
+		StartJob startJob = new StartJob(jobs);
+		startJob.schedule();
 	}
 	
-	
-	public ProjectSignature extendedModules_getSig(IFeatureProject project, String featureName) {
-//		RoleMap map = new JavaSignatureWriter(project, null).writeSignatures(project.getFeatureModel());
-		//TODO FujiTest
-		RoleMap map = FileLoader.fuijTest(null, project);
-		ProjectSignature sig = InterfaceWriter.buildSignature(project.getFeatureModel(), map, featureName);
-		
-		return sig;
-	}
-	
-//	public void extendedModules(IProject project, String folder) {
-//		JavaInterfaceProject interfaceProject = getInterfaceProject(project);
-//		if (interfaceProject != null) {
-//			FeatureModel model = interfaceProject.getFeatureModel();
-//			LinkedList<Feature> coreFeatures = model.getAnalyser().getCoreFeatures();
-//
-//			JavaRoleMap roleMap = interfaceProject.getRoleMap();
-////			JavaRoleMap roleMap = new JavaRoleMap(interfaceProject.getRoleMap());
-////			JavaFeatureSignature.init(interfaceProject);
+//	public List<CompletionProposal> extendedModules(ProjectStructure projectSignature) {
+//		ArrayList<CompletionProposal> ret_List = new ArrayList<CompletionProposal>();
+//		
+//		Collection<AbstractClassFragment> frag = projectSignature.getClasses();
+//		
+//		for (AbstractClassFragment cur : frag) {
+//			CompletionProposal pr = CompletionProposal.create(CompletionProposal.TYPE_REF,0);
+//			pr.setCompletion(cur.getSignature().getName().toCharArray());
+//			pr.setFlags(Flags.AccPublic);
+//			pr.setSignature(Signature.createTypeSignature(cur.getSignature().getFullName(), true).toCharArray());
+//			ret_List.add(pr);
 //			
-//			int rounds = 0;
-//			
-//			boolean somethingAdded = true;
-//			while(somethingAdded){
-//				somethingAdded = false;
-//				
-//				rounds++;
-//				
-//				//alles von Parent Feature zu den Kindern kopieren....
-//				LinkedList<String> listFromRoot = model.getFeatureList();
-//				for (String featureName : listFromRoot) {
-//					Feature parentFeature = model.getFeature(featureName);
-//					JavaFeatureSignature parentSig = roleMap.getRoles(parentFeature.getName());
-//					LinkedList<JavaFeatureSignature> childrenSignature = new LinkedList<JavaFeatureSignature>();
-//					for (Feature childFeature : parentFeature.getChildren()) {
-//						childrenSignature.add(roleMap.getRoles(childFeature.getName()));
-//					}
+//			Collection<AbstractSignature> memberFrag = cur.getMembers();
+//			for (AbstractSignature curMember : memberFrag) {
+//				CompletionProposal pr2 = null;
+//				if (curMember instanceof AbstractMethodSignature) {
+//					pr2 = CompletionProposal.create(CompletionProposal.METHOD_REF, 0);
+//					pr2.setSignature(Signature.createMethodSignature(new char[][]{{}}, new char[]{}));
+//				} else if (curMember instanceof AbstractFieldSignature) {
+//					pr2 = CompletionProposal.create(CompletionProposal.FIELD_REF, 0);
+//					pr2.setDeclarationSignature(Signature.createTypeSignature(cur.getSignature().getFullName(), true).toCharArray());
+//				}
+//				if (pr2 != null) {
+////					pr2.setDeclarationSignature(Signature.createTypeSignature(cur.getSignature().getFullName(), true).toCharArray());
+//					pr2.setFlags(Flags.AccPublic);
+//					pr2.setName(curMember.getName().toCharArray());
+//					pr2.setCompletion(curMember.getName().toCharArray());
 //					
-//					if (JavaFeatureSignature.copyFromOnetoX(parentSig, childrenSignature)) {
-//						somethingAdded = true;
-//					}	
-//				}
-//				
-//				//coreFeatures
-//				LinkedList<JavaFeatureSignature> coreFeatureSig = new LinkedList<JavaFeatureSignature>();
-//				for (Feature childFeature : coreFeatures) {
-//					coreFeatureSig.add(roleMap.getRoles(childFeature.getName()));
-//				}
-////				LinkedList<JavaFeatureSignature> coreFeatureSig = JavaFeatureSignature.getJavaFeaureSignatureOfFeature(coreFeatures);
-//				if (JavaFeatureSignature.unionOfJavaFeatureSignature(coreFeatureSig)) {
-//					somethingAdded = true;
-//				}
-//				
-//				//Kinder zu Eltern
-//				LinkedList<String> list = model.getFeatureList();
-//				while(!list.getLast().equals(model.getRoot().getName())) {
-//					String curFeature = list.getLast();
-//					Feature parent = model.getFeature(curFeature).getParent();
-//					if(parent.isAlternative() || parent.isOr()){
-//						JavaFeatureSignature parentFeatureSig = roleMap.getRoles(parent.getName());
-//						LinkedList<Feature> curChildren = parent.getChildren();
-//						LinkedList<JavaFeatureSignature> sigsOfChilds = getChildFeatureSig(
-//								roleMap, list, curChildren);
-//						
-//						if (JavaFeatureSignature.intersectionOfJavaFeatureSignature(sigsOfChilds, parentFeatureSig)) {
-//							somethingAdded = true;
-//						}
-//					}
-//					else if(parent.isAnd()){
-//						LinkedList<Feature> children = parent.getChildren();
-//						LinkedList<Feature> filteredChildren = new LinkedList<Feature>();
-//						for (Feature feature : children) {
-//							if(feature.isMandatory() || model.getAnalyser().getFalseOptionalFeatures().contains(feature)){
-//								filteredChildren.add(feature);
-//							}
-//							list.remove(feature.getName());
-//						}
-//						if(filteredChildren.size() > 0){
-//							LinkedList<JavaFeatureSignature> sigsOfChilds = getChildFeatureSig(roleMap, list, filteredChildren);
-//						
-//							//parent adden... da dieser gleich methoden/felder erhalten muss
-//							JavaFeatureSignature featureSig = roleMap.getRoles(parent.getName());
-//							sigsOfChilds.add(featureSig);
-//							if (JavaFeatureSignature.unionOfJavaFeatureSignature(sigsOfChilds)) {
-//								somethingAdded = true;
-//							}
-//						}
-//					} else {
-//						list.remove(curFeature);
-//					}
+//					ret_List.add(pr2);
 //				}
 //			}
-//			FMCorePlugin.getDefault().logInfo("Rounds: " + rounds);
-//				
-//			InterfaceWriter interfaceWriter = new InterfaceWriter(interfaceProject);
-//			interfaceWriter.buildAllFeatureInterfaces(folder);
-//		}		
-//	}
-//
-//	private LinkedList<FeatureRoles> getChildFeatureSig(
-//			RoleMap roleMap, LinkedList<String> list,
-//			LinkedList<Feature> curChildren) {
-//		LinkedList<FeatureRoles> sigsOfChilds = new LinkedList<FeatureRoles>();
-//		for (Feature curChild : curChildren) {
-//			//Kinder aus der Liste der zu behandelnden Features löschen
-//			list.remove(curChild.getName());
-//			FeatureRoles featureSig = roleMap.getRoles(curChild.getName());
-//			sigsOfChilds.add(featureSig);
 //		}
-//		return sigsOfChilds;
+//		return ret_List;
 //	}
+	
+	//TODO MPL: use Fuji
+	public List<CompletionProposal> extendedModules_getCompl(IFeatureProject project, String featureName) {
+		final LinkedList<CompletionProposal> ret_List = new LinkedList<CompletionProposal>();
+		
+		InterfaceProject interfaceProject = getInterfaceProject(project.getProject());
+		if (interfaceProject != null) {	
+			final ProjectSignatures signatures = interfaceProject.getProjectSignatures();
+			if (signatures != null) {
+				SignatureIterator it = signatures.createIterator();
+				it.addFilter(new ContextFilter(featureName, interfaceProject));
+//				Iterator<AbstractSignature> it = signatures.getIterator(new ContextFilter(featureName, interfaceProject));
+				
+				while (it.hasNext()) {
+					AbstractSignature curMember = it.next();
+					CompletionProposal pr = null;
+					
+					if (curMember instanceof AbstractMethodSignature) {
+						pr = CompletionProposal.create(CompletionProposal.METHOD_REF, 0);
+						pr.setSignature(Signature.createMethodSignature(new char[][]{{}}, new char[]{}));
+					} else if (curMember instanceof AbstractFieldSignature) {
+						pr = CompletionProposal.create(CompletionProposal.FIELD_REF, 0);
+//						pr.setDeclarationSignature(Signature.createTypeSignature(cur.getSignature().getFullName(), true).toCharArray());
+					} else if (curMember instanceof AbstractClassSignature) {
+						pr = CompletionProposal.create(CompletionProposal.TYPE_REF,0);
+						pr.setSignature(Signature.createTypeSignature(curMember.getFullName(), true).toCharArray());
+					}
+					
+					if (pr != null) {
+//						pr2.setDeclarationSignature(Signature.createTypeSignature(cur.getSignature().getFullName(), true).toCharArray());
+						pr.setFlags(Flags.AccPublic);
+						pr.setName(curMember.getName().toCharArray());
+						pr.setCompletion(curMember.getName().toCharArray());
+						
+						ret_List.add(pr);
+					}
+				}
+			} else {
+				interfaceProject.loadSignatures(false);
+			}
+		}
+		return ret_List;
+	}
+
+	public ProjectStructure extendedModules_getStruct(final IFeatureProject project, final String featureName) {
+		InterfaceProject interfaceProject = getInterfaceProject(project.getProject());
+		if (interfaceProject != null) {	
+			final ProjectSignatures signatures = interfaceProject.getProjectSignatures();
+			if (signatures != null) {
+				SignatureIterator it = signatures.createIterator();
+				it.addFilter(new ContextFilter(featureName, interfaceProject));
+				return new ProjectStructure(it);
+			} else {
+				interfaceProject.loadSignatures(false);
+			}
+		}
+		return null;
+	}
 }

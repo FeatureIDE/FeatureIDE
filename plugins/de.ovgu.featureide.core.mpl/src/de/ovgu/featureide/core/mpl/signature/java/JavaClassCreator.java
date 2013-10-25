@@ -8,5 +8,4 @@ public class JavaClassCreator extends AClassCreator {
 	public JavaClass create(AbstractClassSignature sig) {
 		return new JavaClass(sig);
 	}
-
 }

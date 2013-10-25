@@ -36,12 +36,12 @@ public class JavaClass extends AbstractClass {
 	
 	@Override
 	public String toString() {
-		return JavaStringBuilder.getClassString(this, false);
+		return JavaStringProvider.getClassString2(this, false);
 	}
 
 	@Override
 	public String toShortString() {
-		return JavaStringBuilder.getClassString(this, true);
+		return JavaStringProvider.getClassString2(this, true);
 	}
 		
 //	public LinkedList<String> getLines2(boolean shortString) {
@@ -124,7 +124,6 @@ public class JavaClass extends AbstractClass {
 //				lines.add("\t" + method.toString() + ";");
 //			} else {
 //				lines.add("\t" + method.toString() + " {");
-//				//TODO richtigen super aufruf hinzufügen 
 //				if (method.isConstructor()) {
 //					lines.add("\t\tsuper();");
 //				}

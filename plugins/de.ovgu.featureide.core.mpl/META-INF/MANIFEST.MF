@@ -17,7 +17,8 @@ Bundle-Vendor: University of Magdeburg
 Import-Package: org.eclipse.core.expressions,
  org.eclipse.jdt.internal.core
 Export-Package: de.ovgu.featureide.core.mpl,
- de.ovgu.featureide.core.mpl.io.constants,
+ de.ovgu.featureide.core.mpl.builder,
+ de.ovgu.featureide.core.mpl.io,
  de.ovgu.featureide.core.mpl.signature,
  de.ovgu.featureide.core.mpl.signature.abstr
 Bundle-ActivationPolicy: lazy

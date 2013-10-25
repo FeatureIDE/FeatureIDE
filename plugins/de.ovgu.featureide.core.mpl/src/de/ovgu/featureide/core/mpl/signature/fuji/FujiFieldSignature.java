@@ -26,7 +26,7 @@ import AST.TypeDecl;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassSignature;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractFieldSignature;
 
-/** 
+/**
  * Holds the java signature of a field.
  * 
  * @author Sebastian Krieter
@@ -34,44 +34,47 @@ import de.ovgu.featureide.core.mpl.signature.abstr.AbstractFieldSignature;
 public class FujiFieldSignature extends AbstractFieldSignature {
 
 	protected TypeDecl returnType;
-	
-	public FujiFieldSignature(AbstractClassSignature parent, String name, String modifiers, TypeDecl returnType) {
+
+	public FujiFieldSignature(AbstractClassSignature parent, String name,
+			String modifiers, TypeDecl returnType) {
 		super(parent, name, modifiers, returnType.name());
 		this.returnType = returnType;
 	}
 
-//	public FujiFieldSignature(FujiFieldSignature orgSig) {
-//		this(orgSig, false);
-//	}
-//	
-//	private FujiFieldSignature(FujiFieldSignature orgSig, boolean ext) {
-//		super(orgSig, ext);
-//	}
+	// public FujiFieldSignature(FujiFieldSignature orgSig) {
+	// this(orgSig, false);
+	// }
+	//
+	// private FujiFieldSignature(FujiFieldSignature orgSig, boolean ext) {
+	// super(orgSig, ext);
+	// }
 
 	@Override
 	public String toString() {
-		StringBuilder signature = new StringBuilder();
-		
-		signature.append(super.toString());
-		signature.append(LINE_SEPARATOR);
-		
+		StringBuilder fieldString = new StringBuilder();
+
+		fieldString.append(super.toString());
+		if (fieldString.length() > 0) {
+			fieldString.append(LINE_SEPARATOR);
+		}
+
 		if (modifiers.length > 0) {
 			for (String modifier : modifiers) {
-				signature.append(modifier);
-				signature.append(' ');
+				fieldString.append(modifier);
+				fieldString.append(' ');
 			}
 		}
-		signature.append(type);
-		signature.append(' ');
-		signature.append(name);
-		
-		return signature.toString();
+		fieldString.append(type);
+		fieldString.append(' ');
+		fieldString.append(name);
+
+		return fieldString.toString();
 	}
 
-//	@Override
-//	public FujiFieldSignature createExtendedSignature() {
-//		return new FujiFieldSignature(this, true);
-//	}
+	// @Override
+	// public FujiFieldSignature createExtendedSignature() {
+	// return new FujiFieldSignature(this, true);
+	// }
 
 	@Override
 	protected void computeHashCode() {
@@ -87,11 +90,12 @@ public class FujiFieldSignature extends AbstractFieldSignature {
 			return true;
 		if (obj == null || getClass() != obj.getClass())
 			return false;
-		
+
 		FujiFieldSignature otherSig = (FujiFieldSignature) obj;
-		
+
 		if (!super.sigEquals(otherSig)
-				|| !returnType.sameStructure(otherSig.returnType)) {
+		// || !returnType.sameStructure(otherSig.returnType)) {
+				|| returnType != otherSig.returnType) {
 			return false;
 		}
 		return true;

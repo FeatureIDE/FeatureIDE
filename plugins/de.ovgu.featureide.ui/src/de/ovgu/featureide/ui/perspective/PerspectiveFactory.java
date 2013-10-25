@@ -29,7 +29,7 @@ import de.ovgu.featureide.fm.ui.wizards.NewFeatureModelWizard;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.statistics.ui.FeatureStatisticsView;
 import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
-import de.ovgu.featureide.ui.views.collaboration.outline.CollaborationOutline;
+import de.ovgu.featureide.ui.views.collaboration.outline.Outline;
 import de.ovgu.featureide.ui.wizards.NewConfigurationFileWizard;
 import de.ovgu.featureide.ui.wizards.NewFeatureIDEFileWizard;
 import de.ovgu.featureide.ui.wizards.NewFeatureProjectWizard;
@@ -66,7 +66,7 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 		down.addView(IPageLayout.ID_PROBLEM_VIEW);
 		down.addView("org.eclipse.ui.console.ConsoleView");
 		
-		right.addView(CollaborationOutline.ID);
+		right.addView(Outline.ID);
 		right.addView(IPageLayout.ID_OUTLINE);
 		
 		left.addView("org.eclipse.jdt.ui.PackageExplorer");
@@ -74,7 +74,7 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 		layout.addShowViewShortcut(FeatureStatisticsView.ID);
 		layout.addShowViewShortcut(FeatureModelEditView.ID);
 		layout.addShowViewShortcut(CollaborationView.ID);
-		layout.addShowViewShortcut(CollaborationOutline.ID);
+		layout.addShowViewShortcut(Outline.ID);
 		layout.addShowViewShortcut(IPageLayout.ID_RES_NAV);
 		layout.addShowViewShortcut(IPageLayout.ID_OUTLINE);
 		layout.addShowViewShortcut(IPageLayout.ID_TASK_LIST);

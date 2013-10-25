@@ -351,19 +351,17 @@ public class Configuration {
 	public LinkedList<List<String>> getSolutions(int max) throws TimeoutException {
 		LinkedList<Node> children = new LinkedList<Node>();
 
-		for (Feature feature : getSelectedFeatures())
-			if (!feature.hasChildren()) {
-				children.add(new Literal(feature.getName(), true));
-			}
-
-		for (Feature feature : getUnSelectedFeatures())
-			if (!feature.hasChildren()) {
-				children.add(new Literal(feature.getName(), false));
-			}
+		for (Feature feature : getSelectedFeatures()) {
+			children.add(new Literal(feature.getName(), true));
+		}
+		
+		for (Feature feature : getUnSelectedFeatures()) {
+			children.add(new Literal(feature.getName(), false));
+		}
 
 		Node node = new And(rootNode.clone(), new And(children));
 
-		LinkedList<List<String>> solutionList = new SatSolver(node, TIMEOUT).getSolutionFeatures(max);
+		LinkedList<List<String>> solutionList = new SatSolver(node, 2002).getSolutionFeatures(max);
 		
 		return solutionList;
 	}

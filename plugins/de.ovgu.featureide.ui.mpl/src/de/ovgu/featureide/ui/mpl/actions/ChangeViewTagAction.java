@@ -33,10 +33,10 @@ import de.ovgu.featureide.ui.mpl.wizards.ChangeViewTagWizard;
  * 
  * @author Sebastian Krieter
  */
-public class ChangeViewTagAction extends AbstractProjectAction {
+public class ChangeViewTagAction extends AProjectAction {
 
 	@Override
-	protected void action(IProject project) {
+	protected void singleAction(IProject project) {
 		ChangeViewTagWizard wizard = new ChangeViewTagWizard("Change a view tag");
 		WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
 		if (dialog.open() == Dialog.OK) {

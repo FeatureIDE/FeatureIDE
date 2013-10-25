@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension
+<!--   <extension
          point="org.eclipse.ui.newWizards">
       <wizard
             canFinishEarly="false"
@@ -13,9 +13,34 @@
             name="MultiFeatureIDE Project"
             project="true">
       </wizard>
-   </extension>
+   </extension> -->
    <extension
          point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            adaptable="true"
+            id="de.ovgu.featureide.ui.mpl.projectContribution2"
+            objectClass="org.eclipse.core.resources.IProject">
+         <action
+               class="de.ovgu.featureide.ui.mpl.actions.AddInterfaceNatureAction"
+               id="de.ovgu.featureide.ui.mpl.AddNature"
+               label="Add Interface Nature"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces3"
+               style="push">
+         </action>
+         <visibility>
+            <and>
+               <objectState
+                     name="nature"
+                     value="de.ovgu.featureide.core.featureProjectNature">
+               </objectState>
+               <not>
+                  <objectState
+                        name="nature"
+                        value="de.ovgu.featureide.core.mpl.interfaceProjectNature">
+                  </objectState></not>
+            </and>
+         </visibility>
+      </objectContribution>
       <objectContribution
             adaptable="true"
             id="de.ovgu.featureide.ui.mpl.projectContribution"
@@ -28,9 +53,9 @@
                style="push">
          </action>
          <action
-               class="de.ovgu.featureide.ui.mpl.actions.BuildWrapperInterfacesAction"
-               id="de.ovgu.featureide.ui.mpl.BuildWrapperInterfacesAction"
-               label="Build Wrapper Interfaces"
+               class="de.ovgu.featureide.ui.mpl.actions.BuildConfigurationInterfacesAction"
+               id="de.ovgu.featureide.ui.mpl.BuildConfigurationInterfacesAction"
+               label="Build Configuration Interfaces"
                menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces1"
                style="push">
          </action>
@@ -45,42 +70,14 @@
                class="de.ovgu.featureide.ui.mpl.actions.CompareInterfacesAction"
                id="de.ovgu.featureide.ui.mpl.CompareInterfacesAction"
                label="Compare Configuration Interfaces"
-               menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces2"
-               style="push">
-         </action>
-         <action
-               class="de.ovgu.featureide.ui.mpl.actions.BuildConfigurationInterfacesAction"
-               id="de.ovgu.featureide.ui.mpl.BuildConfigurationInterfacesAction"
-               label="Build Configuration Interfaces"
-               menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces2"
-               style="push">
-         </action>
-         <action
-               class="de.ovgu.featureide.ui.mpl.actions.ChangeViewTagAction"
-               id="de.ovgu.featureide.ui.mpl.ChangeViewTagAction"
-               label="Change View Tag"
-               menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces3"
-               style="push">
-         </action>
-         <action
-               class="de.ovgu.featureide.ui.mpl.actions.DeleteViewTagAction"
-               id="de.ovgu.featureide.ui.mpl.DeleteViewTagAction"
-               label="Delete View Tag"
-               menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces3"
-               style="push">
-         </action>
-         <action
-               class="de.ovgu.featureide.ui.mpl.actions.NewViewTagAction"
-               id="de.ovgu.featureide.ui.mpl.NewViewTagAction"
-               label="Add View Tag"
-               menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces3"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces1"
                style="push">
          </action>
          <action
                class="de.ovgu.featureide.ui.mpl.actions.RefreshAction"
                id="de.ovgu.featureide.ui.mpl.RefreshAction"
                label="Refresh"
-               menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces4"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces2"
                style="push">
          </action>
          <visibility>
@@ -89,13 +86,6 @@
                   value="de.ovgu.featureide.core.mpl.interfaceProjectNature">
             </objectState>
          </visibility>
-         <action
-               class="de.ovgu.featureide.ui.mpl.actions.PrintStatisticsAction"
-               id="de.ovgu.featureide.ui.mpl.StatisticsAction"
-               label="Print Statistics"
-               menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces0"
-               style="push">
-         </action>
       </objectContribution>
       <objectContribution
             adaptable="true"
@@ -114,6 +104,69 @@
                   name="projectNature"
                   value="de.ovgu.featureide.core.mpl.interfaceProjectNature">
             </objectState>
+         </visibility>
+      </objectContribution>
+      <objectContribution
+            adaptable="true"
+            id="de.ovgu.featureide.ui.mpl.projectContribution1"
+            objectClass="org.eclipse.core.resources.IProject">
+         <action
+               class="de.ovgu.featureide.ui.mpl.actions.NewViewTagAction"
+               id="de.ovgu.featureide.ui.mpl.NewViewTagAction"
+               label="Add View Tag"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces2"
+               style="push">
+         </action>
+         <action
+               class="de.ovgu.featureide.ui.mpl.actions.DeleteViewTagAction"
+               id="de.ovgu.featureide.ui.mpl.DeleteViewTagAction"
+               label="Delete View Tag"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces2"
+               style="push">
+         </action>
+         <action
+               class="de.ovgu.featureide.ui.mpl.actions.ChangeViewTagAction"
+               id="de.ovgu.featureide.ui.mpl.ChangeViewTagAction"
+               label="Change View Tag"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces2"
+               style="push">
+         </action>
+         <action
+               class="de.ovgu.featureide.ui.mpl.actions.PrintAllStatisticsAction"
+               id="de.ovgu.featureide.ui.mpl.AllStatisticsAction"
+               label="Print Statistics"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces0"
+               style="push">
+         </action>
+         <visibility>
+            <objectState
+                  name="projectNature"
+                  value="de.ovgu.featureide.core.mpl.MPLExperimentalNature">
+            </objectState>
+         </visibility>
+      </objectContribution>
+      <objectContribution
+            adaptable="true"
+            id="de.ovgu.featureide.ui.mpl.projectContribution3"
+            objectClass="org.eclipse.core.resources.IProject">
+         <action
+               class="de.ovgu.featureide.ui.mpl.actions.RemoveInterfaceNatureAction"
+               id="de.ovgu.featureide.ui.mpl.RemoveNature"
+               label="Remove Interface Nature"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces3"
+               style="push">
+         </action>
+         <visibility>
+            <and>
+               <objectState
+                     name="nature"
+                     value="de.ovgu.featureide.core.featureProjectNature">
+               </objectState>
+               <objectState
+                     name="nature"
+                     value="de.ovgu.featureide.core.mpl.interfaceProjectNature">
+               </objectState>
+            </and>
          </visibility>
       </objectContribution>
    </extension>
@@ -135,27 +188,22 @@
       </decorator>
    </extension>
 	<extension
-   		id="de.ovgu.featureide.ui.editors.mycompletion"
+   		id="de.ovgu.featureide.ui.editors.contextCompletion"
    		name="Context View Completion"
          point="org.eclipse.jdt.ui.javaCompletionProposalComputer">
          <javaCompletionProposalComputer
          	activate="false"
          	categoryID="textual_proposals"
-         	class=" de.ovgu.featureide.ui.editors.Completion">
+         	class="de.ovgu.featureide.ui.editors.Completion">
 			<partition type="__dftl_partition_content_type"/>
 			<partition type="__java_string"/>
          </javaCompletionProposalComputer>
      </extension>
     <extension
-         point="org.eclipse.ui.views">
-      <view
-            allowMultiple="false"
-            category="FeatureIDE"
-            class="de.ovgu.featureide.ui.mpl.views.outline.CollOutline"
-            icon="icons/FeatureIconSmall.ico"
-            id="de.ovgu.mpl.ui.views.collaboration.outline.CollaborationOutline"
-            name="Context View"
-            restorable="true">
-      </view>
-   </extension>
+          point="de.ovgu.featureide.ui.views.outline">
+       <outline
+       		contentProvider="de.ovgu.featureide.ui.mpl.views.outline.ContextOutlineTreeContentProvider"
+            labelProvider="de.ovgu.featureide.ui.mpl.views.outline.ContextOutlineLabelProvider">
+       </outline>
+    </extension>
 </plugin>

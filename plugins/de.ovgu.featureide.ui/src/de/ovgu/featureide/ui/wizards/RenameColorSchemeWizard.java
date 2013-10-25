@@ -26,7 +26,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
- * TODO @Krieter description
+ * A wizard for renaming an existing color scheme.
  * 
  * @author Sebastian Krieter
  */

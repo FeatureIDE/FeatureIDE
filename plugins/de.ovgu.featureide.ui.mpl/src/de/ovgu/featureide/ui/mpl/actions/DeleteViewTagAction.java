@@ -33,10 +33,10 @@ import de.ovgu.featureide.ui.mpl.wizards.NewViewTagWizard;
  * 
  * @author Sebastian Krieter
  */
-public class DeleteViewTagAction extends AbstractProjectAction {
+public class DeleteViewTagAction extends AProjectAction {
 
 	@Override
-	protected void action(IProject project) {
+	protected void singleAction(IProject project) {
 		NewViewTagWizard wizard = new NewViewTagWizard("Delete a view tag");
 		WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
 		if (dialog.open() == Dialog.OK) {

@@ -27,7 +27,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 
 import de.ovgu.featureide.core.mpl.MPLPlugin;
-import de.ovgu.featureide.core.mpl.io.constants.IOConstants;
+import de.ovgu.featureide.core.mpl.io.IOConstants;
 import de.ovgu.featureide.ui.mpl.MPLUIPlugin;
 
 /**
@@ -35,9 +35,9 @@ import de.ovgu.featureide.ui.mpl.MPLUIPlugin;
  * 
  * @author Sebastian Krieter
  */
-public class BuildJavaProjectAction extends AbstractAction  {
+public class BuildJavaProjectAction extends AAction  {
 	@Override
-	protected void action(Object element) {
+	protected void singleAction(Object element) {
 		IFolder folder = null;
 		if (element instanceof IFolder) {
 			folder = (IFolder) element;

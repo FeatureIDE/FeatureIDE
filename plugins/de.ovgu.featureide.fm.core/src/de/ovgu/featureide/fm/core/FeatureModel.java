@@ -1182,10 +1182,64 @@ public class FeatureModel implements PropertyConstants {
 
 	public boolean hasConcrete() {
 		for (Feature f : featureTable.values()) {
-			if (!(f.isAbstract()))
+			if (f.isConcrete())
 				return true;
 		}
 		return false;
+	}
+	
+	/**
+	 * @return number of or groups contained in the feature model
+	 */
+	public int numOrGroup() {
+		int count = 0;
+		for (Feature f : featureTable.values()) {
+			if (f.getChildrenCount() > 1 && f.isOr()) {
+				count++;
+			}
+		}
+		return count;
+	}
+	
+	public int numAlternativeGroup() {
+		int count = 0;
+		for (Feature f : featureTable.values()) {
+			if (f.getChildrenCount() > 1 && f.isAlternative()) {
+				count++;
+			}
+		}
+		return count;
+	}
+	
+	public int[] getStatisticNumbers() {
+		int cAbstract = 0, cConcrete = 0, cMandatory = 0, cOptional = 0, cAnd = 0, cOr = 0, cOrChildren = 0, cAlt = 0, cAltChildren = 0;
+		for (Feature f : featureTable.values()) {
+			if (f.isConcrete()) {
+				cConcrete++;
+			} else {
+				cAbstract++;
+			}
+			if (f.isMandatorySet()) {
+				if (f.getParent() == null || f.getParent().isAnd() || f.getParent().getChildrenCount() == 1) {
+					cMandatory++;
+				}
+			} else if (f.getParent() != null && f.getParent().isAnd()) {
+				cOptional++;
+			}
+			int cChildren = f.getChildrenCount();
+			if (cChildren > 1) {
+				if (f.isAlternative()) {
+					cAlt++;
+					cAltChildren += cChildren;
+				} else if (f.isOr()) {
+					cOr++;
+					cOrChildren += cChildren;
+				} else if (f.isAnd()) {
+					cAnd++;
+				}
+			}
+		}
+		return new int[]{featureTable.size(), cAbstract, cConcrete, cAnd, cOr, cAlt, cMandatory, cOptional, cOrChildren, cAltChildren};
 	}
 
 	/**

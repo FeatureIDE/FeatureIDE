@@ -101,7 +101,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 					evt.getPropertyName())) {
 				String oldName = (String) evt.getOldValue();
 				String newName = (String) evt.getNewValue();
-
+				
 				FeatureProject.this.renameFeature(oldName, newName);
 				CorePlugin.getDefault().fireFeatureFolderChanged(
 						FeatureProject.this.getSourceFolder());

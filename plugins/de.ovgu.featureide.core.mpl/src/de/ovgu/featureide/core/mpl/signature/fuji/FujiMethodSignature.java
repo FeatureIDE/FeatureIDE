@@ -21,6 +21,7 @@
 package de.ovgu.featureide.core.mpl.signature.fuji;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 import AST.Access;
@@ -51,6 +52,9 @@ public class FujiMethodSignature extends AbstractMethodSignature {
 		this.parameterList = parameterList;
 		this.exceptionList = exceptionList;
 //		this.isConstructor = isConstructor;
+		for (ParameterDeclaration parameter : parameterList) {
+			parameterTypes.add(parameter.type().name());
+		}
 	}
 
 //	public FujiMethodSignature(FujiMethodSignature orgSig) {
@@ -67,7 +71,9 @@ public class FujiMethodSignature extends AbstractMethodSignature {
 		final StringBuilder methodString = new StringBuilder();
 
 		methodString.append(super.toString());
-		methodString.append(LINE_SEPARATOR);
+		if (methodString.length() > 0) {
+			methodString.append(LINE_SEPARATOR);
+		}
 
 		if (modifiers.length > 0) {
 			for (String modifier : modifiers) {
@@ -124,18 +130,26 @@ public class FujiMethodSignature extends AbstractMethodSignature {
 		
 		if (!super.sigEquals(otherSig)) 
 			return false;
-		if (isConstructor != otherSig.isConstructor 
-				|| !returnType.sameStructure(otherSig.returnType)
-				|| parameterList.getNumChild() != otherSig.parameterList.getNumChild()) {
+		if (isConstructor != otherSig.isConstructor) {
 			return false;
 		}
 		
-		for (int i = 0; i < parameterList.getNumChild(); i++) {
-			if (!parameterList.getChild(i).type().sameStructure(
-					otherSig.parameterList.getChild(i).type())) {
+		if (returnType != otherSig.returnType) {
+			return false;
+		}
+		
+		if (parameterList.getNumChild() != otherSig.parameterList.getNumChild()) {
+			return false;
+		}
+		
+		Iterator<ParameterDeclaration> thisIt = parameterList.iterator();
+		Iterator<ParameterDeclaration> otherIt = otherSig.parameterList.iterator();
+		while (thisIt.hasNext()) {
+			if (thisIt.next().type() != otherIt.next().type()) {
 				return false;
 			}
 		}
+		
 		return true;
 	}
 

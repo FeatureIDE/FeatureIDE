@@ -2,6 +2,7 @@
 <?eclipse version="3.2"?>
 <plugin>
    <extension-point id="wizard" name="Wizard" schema="schema/wizard.exsd"/>
+   <extension-point id="de.ovgu.featureide.ui.views.outline" name="Outline" schema="schema/de.ovgu.featureide.ui.views.outline.exsd"/>
 
    <extension
          point="org.eclipse.ui.newWizards">
@@ -229,7 +230,7 @@
       </view>
       <view
             category="FeatureIDE"
-            class="de.ovgu.featureide.ui.views.collaboration.outline.CollaborationOutline"
+            class="de.ovgu.featureide.ui.views.collaboration.outline.Outline"
             icon="icons/FeatureIconSmall.ico"
             id="de.ovgu.featureide.ui.views.collaboration.outline.CollaborationOutline"
             name="Collaboration Outline"

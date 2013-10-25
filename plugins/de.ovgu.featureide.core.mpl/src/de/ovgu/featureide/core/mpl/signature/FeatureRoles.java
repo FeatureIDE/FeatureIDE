@@ -23,21 +23,25 @@ package de.ovgu.featureide.core.mpl.signature;
 import java.util.LinkedList;
 
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractRole;
-import de.ovgu.featureide.fm.core.Feature;
 
 /**
- * Contains the {@link FujiClassSignature}s for a feature.
+ * Contains the {@link AbstractRole}s for a feature.
  * 
  * @author Reimar Schroeter
  * @author Sebastian Krieter
  */
 public class FeatureRoles extends LinkedList<AbstractRole> {
 	private static final long serialVersionUID = 1L;
-	private final Feature feature;
+//	private final Feature feature;
+//	private final String featureName;
 	
-	public FeatureRoles(Feature feature) {
-		this.feature = feature;
-	}
+//	public FeatureRoles(Feature feature) {
+//		this.feature = feature;
+//	}
+	
+//	public FeatureRoles(String featureName) {
+//		this.featureName = featureName;
+//	}
 	
 	public AbstractRole getByName(String className) {
 		for (AbstractRole curRole : this) {
@@ -48,7 +52,7 @@ public class FeatureRoles extends LinkedList<AbstractRole> {
 		return null;
 	}
 
-	public Feature getFeature() {
-		return feature;
-	}
+//	public Feature getFeature() {
+//		return feature;
+//	}
 }

@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.ui.mpl.actions;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Display;
@@ -33,13 +32,18 @@ import de.ovgu.featureide.ui.mpl.wizards.BuildExtendedModulesWizard;
  * 
  * @author Reimar Schroeter
  */
-public class BuildExtendedModulesAction extends AbstractProjectAction {
+public class BuildExtendedModulesAction extends AProjectJobAction {
+	private BuildExtendedModulesWizard wizard;
+	
 	@Override
-	protected void action(IProject project) {
-		BuildExtendedModulesWizard wizard = new BuildExtendedModulesWizard("Folder of extended Modules");
+	protected boolean startAction() {
+		wizard = new BuildExtendedModulesWizard("Folder of extended modules", "ExtendedModules");
 		WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
-		if (dialog.open() == Dialog.OK) {
-			MPLPlugin.getDefault().extendedModules(project.getName(), wizard.getFolderName());
-		}
+		return (dialog.open() == Dialog.OK);
+	}
+	
+	@Override
+	protected void endAction() {
+		MPLPlugin.getDefault().buildExtendedModules(projects, wizard.getFolderName());
 	}
 }

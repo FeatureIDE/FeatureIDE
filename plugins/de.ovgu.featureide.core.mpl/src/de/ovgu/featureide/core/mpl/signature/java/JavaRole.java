@@ -15,12 +15,12 @@ public class JavaRole extends AbstractRole {
 
 	@Override
 	public String toString() {
-		return JavaStringBuilder.getClassString(this, false);
+		return JavaStringProvider.getClassString2(this, false);
 	}
 
 	@Override
 	public String toShortString() {
-		return JavaStringBuilder.getClassString(this, true);
+		return JavaStringProvider.getClassString2(this, true);
 	}
 
 //	@Override

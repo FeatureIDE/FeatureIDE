@@ -1,6 +1,5 @@
 package de.ovgu.featureide.core.mpl.signature.fuji;
 
-import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassFragment;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractFieldSignature;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractMethodSignature;
@@ -94,29 +93,19 @@ public class FujiStringBuilder {
 						sb.append(" {");
 						sb.append(LINE_SEPARATOR);
 						
-						//TODO richtigen super aufruf hinzufügen 
+						//TODO MPL: use Fuji
 						if (method.isConstructor()) {
 							sb.append("\t\tsuper();");
 						}
-						if (MPLPlugin.WRAPPER_INTERFACES) {
-							String original = "\t\t" +
-									((method.isConstructor() || method.getType().equals("void")) ? "" : "return ") + 
-									"original(";
-							for (int i = 0; i < method.getParameterTypes().size(); i++) {
-								if (i > 0) original += ", ";
-								original += "arg" + i;
-							}
-							sb.append(original + ");");
-						} else {
-							if (!method.isConstructor()) {
-								sb.append("\t\t" + getReturnStatement(method));
-							}
+						if (!method.isConstructor()) {
+							sb.append("\t\t" + getReturnStatement(method));
 						}
 
 						sb.append(LINE_SEPARATOR);
 						sb.append("\t}");
 					}
 				}
+				sb.append(LINE_SEPARATOR);
 			}
 			sb.append(LINE_SEPARATOR);
 		}

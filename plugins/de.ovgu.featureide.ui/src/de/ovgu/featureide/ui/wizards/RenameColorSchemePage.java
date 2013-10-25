@@ -30,7 +30,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * TODO @Krieter description
+ * A page for the {@link RenameColorSchemeWizard}.
  * 
  * @author Sebastian Krieter
  */

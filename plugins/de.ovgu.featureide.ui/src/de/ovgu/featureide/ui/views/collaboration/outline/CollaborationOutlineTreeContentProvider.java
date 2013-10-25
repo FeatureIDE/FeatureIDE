@@ -1,3 +1,4 @@
+package de.ovgu.featureide.ui.views.collaboration.outline;
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
  * Copyright (C) 2005-2013  FeatureIDE team, University of Magdeburg, Germany
  *
@@ -18,7 +19,6 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.ui.views.collaboration.outline;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -47,7 +47,7 @@ import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 public class CollaborationOutlineTreeContentProvider implements
 		ITreeContentProvider {
 
-	private FSTModel model;
+	protected FSTModel model;
 //	private CollaborationModelBuilder builder = new CollaborationModelBuilder();
 	
 	private Comparator<? super FSTMethod> methodComparator = new Comparator<FSTMethod>() {

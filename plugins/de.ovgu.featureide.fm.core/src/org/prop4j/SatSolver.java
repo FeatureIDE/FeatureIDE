@@ -308,8 +308,9 @@ public class SatSolver {
 	}
 	
 	public LinkedList<List<String>> getSolutionFeatures(int number) throws TimeoutException {
-		if (contradiction)
+		if (contradiction) {
             return null;
+		}
 		
 		LinkedList<List<String>> solutionList = new LinkedList<List<String>>();
 
@@ -340,7 +341,6 @@ public class SatSolver {
 					featureList.add(intToVar.get(Math.abs(var)).toString());
 				}
 			}
-			
     		solutionList.add(featureList);
 		}
     	return solutionList;

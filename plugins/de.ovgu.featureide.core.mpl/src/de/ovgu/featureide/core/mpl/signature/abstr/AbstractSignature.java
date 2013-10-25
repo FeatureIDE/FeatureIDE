@@ -21,7 +21,6 @@
 package de.ovgu.featureide.core.mpl.signature.abstr;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -35,6 +34,11 @@ import de.ovgu.featureide.core.mpl.signature.ViewTag;
 public abstract class AbstractSignature {
 	protected static final String LINE_SEPARATOR = System.getProperty("line.separator");
 	protected static final int hashCodePrime = 31;
+	public static final byte 
+		VISIBILITY_DEFAULT = 0,
+		VISIBILITY_PRIVATE = 1,
+		VISIBILITY_PROTECTED = 2,
+		VISIBILITY_PUBLIC = 3;
 	
 	protected boolean hasHashCode = false;
 	protected int hashCode = 0;
@@ -44,15 +48,19 @@ public abstract class AbstractSignature {
 	protected final String name;
 	protected final String[] modifiers;
 	protected final String type;
-	protected final boolean privateSignature, finalSignature;
+	
+	protected final boolean finalSignature;
+	protected final byte visibility;
 	
 	protected String fullName;
 	
-	protected final boolean ext;
+//	protected final boolean ext;
 	
 	protected LinkedList<ViewTag> viewTags;
-	protected final HashSet<String> features = new HashSet<String>();
-	protected final HashSet<Integer> featureIDs = new HashSet<Integer>();
+//	protected final HashSet<String> features = new HashSet<String>();
+//	protected final FeatureList features = new FeatureList();
+	
+	protected int[] featureIDs;
 	
 	protected AbstractSignature(AbstractClassSignature parent, String name, String modifierString, String type) {
 		this.parent = parent;
@@ -65,7 +73,7 @@ public abstract class AbstractSignature {
 
 //		this.viewTags = viewTags; 
 		this.viewTags = null; 
-		this.ext = false;
+//		this.ext = false;
 		
 		if (modifierString == null) {
 			this.modifiers = new String[0];
@@ -73,10 +81,20 @@ public abstract class AbstractSignature {
 			this.modifiers = modifierString.trim().split(" ");
 		}
 		Arrays.sort(this.modifiers);
-		this.privateSignature = Arrays.binarySearch(this.modifiers, "private") >= 0;
+//		this.privateSignature = Arrays.binarySearch(this.modifiers, "private") >= 0;
+		if (Arrays.binarySearch(this.modifiers, "private") >= 0) {
+			this.visibility = VISIBILITY_PRIVATE;
+		} else if (Arrays.binarySearch(this.modifiers, "protected") >= 0) {
+			this.visibility = VISIBILITY_PROTECTED;
+		} else if (Arrays.binarySearch(this.modifiers, "public") >= 0) {
+			this.visibility = VISIBILITY_PUBLIC;
+		} else {
+			this.visibility = VISIBILITY_DEFAULT;
+		}
+		
 		this.finalSignature = Arrays.binarySearch(this.modifiers, "final") >= 0;
 		if (type == null) {
-			this.type = "";
+			this.type = "void";
 		} else {
 			this.type = type;
 		}
@@ -172,33 +190,93 @@ public abstract class AbstractSignature {
 		return type;
 	}
 	
+	public byte getVisibilty() {
+		return visibility;
+	}
+	
 	public boolean isPrivate() {
-		return privateSignature;
+		return visibility == VISIBILITY_PRIVATE;
+	}
+	
+	public boolean isProtected() {
+		return visibility == VISIBILITY_PROTECTED;
+	}
+	
+	public boolean isPublic() {
+		return visibility == VISIBILITY_PUBLIC;
+	}
+	
+	public boolean isDefault() {
+		return visibility == VISIBILITY_DEFAULT;
 	}
 	
 	public boolean isFinal() {
 		return finalSignature;
 	}
 
-	public boolean isExt() {
-		return ext;
-	}
+//	public boolean isExt() {
+//		return ext;
+//	}
 
-	public HashSet<String> getFeatures() {
-		return features;
-	}
+//	public FeatureList getFeatures() {
+//		return features;
+//	}
 
-	public void addFeature(String feature) {
-		features.add(feature);
-	}
-	
-	public HashSet<Integer> getFeatureIDs() {
+	public int[] getFeatureIDs() {
 		return featureIDs;
 	}
-
-	public void addFeatureID(int id) {
-		featureIDs.add(id);
+	
+	public void setFeatureIDs(int[] featureIDs) {
+		this.featureIDs = featureIDs;
 	}
+
+//	public void addFeature(String feature) {
+//		features.add(feature);
+//	}
+	
+	public boolean hasFeature(int id) {
+		for (int j = 0; j < featureIDs.length; j++) {
+			if (id == featureIDs[j]) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean hasFeature(int[] idArray) {
+		if (idArray == null) {
+			return true;
+		}
+		for (int i = 0; i < idArray.length; i++) {
+			int curId = idArray[i];
+			for (int j = 0; j < featureIDs.length; j++) {
+				if (curId == featureIDs[j]) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+//	public boolean hasFeature(List<String> featureList) {
+//		if (featureList == null) {
+//			return true;
+//		}
+//		for (String feature : featureList) {
+//			if (features.contains(feature)) {
+//				return true;
+//			}
+//		}
+//		return false;
+//	}
+	
+//	public HashSet<Integer> getFeatureIDs() {
+//		return featureIDs;
+//	}
+//
+//	public void addFeatureID(int id) {
+//		featureIDs.add(id);
+//	}
 
 	@Override
 	public final int hashCode() {
@@ -227,9 +305,9 @@ public abstract class AbstractSignature {
 	}
 	
 	protected boolean sigEquals(AbstractSignature otherSig) {
-		if (!type.equals(otherSig.type) 
-				|| !fullName.equals(otherSig.fullName) 
-				|| !Arrays.deepEquals(modifiers, otherSig.modifiers)) {
+		if (!fullName.equals(otherSig.fullName) 
+//				|| !type.equals(otherSig.type) 
+				|| !Arrays.equals(modifiers, otherSig.modifiers)) {
 			return false;
 		}
 		return true;
@@ -238,11 +316,11 @@ public abstract class AbstractSignature {
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
-		sb.append(LINE_SEPARATOR);
-		sb.append("/* ext: ");
-		sb.append(ext);
-		sb.append(" */ ");
-		sb.append(LINE_SEPARATOR);
+//		sb.append(LINE_SEPARATOR);
+//		sb.append("/* ext: ");
+//		sb.append(ext);
+//		sb.append(" */ ");
+//		sb.append(LINE_SEPARATOR);
 		if (hasViewTags()) {
 			sb.append("//+ ");
 			for (ViewTag viewTag : viewTags) {

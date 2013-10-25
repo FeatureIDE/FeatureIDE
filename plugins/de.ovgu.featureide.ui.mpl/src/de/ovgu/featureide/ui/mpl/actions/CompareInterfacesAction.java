@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.ui.mpl.actions;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Display;
@@ -33,17 +32,20 @@ import de.ovgu.featureide.ui.mpl.wizards.InterfaceWizard;
  * 
  * @author Sebastian Krieter
  */
-public class CompareInterfacesAction extends AbstractProjectAction {
+public class CompareInterfacesAction extends AProjectJobAction {
+	private InterfaceWizard wizard;
 
 	@Override
-	protected void action(IProject project) {
-		InterfaceWizard wizard = new InterfaceWizard("Compare Configuration Interfaces");
+	protected boolean startAction() {
+		wizard = new InterfaceWizard("Compare Configuration Interfaces");
 		WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
-		if (dialog.open() == Dialog.OK) {
-			MPLPlugin.getDefault().compareConfigurationInterfaces(
-					project.getName(), wizard.getViewName(), 
-					wizard.getViewLevel(), wizard.getConfigLimit());
-		}
+		return dialog.open() == Dialog.OK;
+	}
+	
+	@Override
+	protected void endAction() {
+		MPLPlugin.getDefault().compareConfigurationInterfaces(
+				projects, wizard.getViewName(), wizard.getViewLevel(), wizard.getConfigLimit());
 	}
 
 }

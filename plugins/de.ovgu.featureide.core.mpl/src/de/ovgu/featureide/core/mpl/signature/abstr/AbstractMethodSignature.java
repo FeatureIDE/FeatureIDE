@@ -5,7 +5,7 @@ import java.util.LinkedList;
 
 public abstract class AbstractMethodSignature extends AbstractSignature {
 	
-	protected final LinkedList<String> parameterTypes;
+	protected LinkedList<String> parameterTypes;
 	protected final boolean isConstructor;
 	
 	protected AbstractMethodSignature(AbstractClassSignature parent, String name, String modifier, String type, LinkedList<String> parameterTypes, boolean isConstructor) {

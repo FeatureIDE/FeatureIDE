@@ -20,7 +20,12 @@
  */
 package de.ovgu.featureide.core.mpl.signature.fuji;
 
+import java.util.LinkedList;
+
+import AST.Access;
+import AST.ClassDecl;
 import AST.ImportDecl;
+import AST.InterfaceDecl;
 import AST.List;
 import AST.TypeDecl;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassSignature;
@@ -35,11 +40,51 @@ public class FujiClassSignature extends AbstractClassSignature {
 	protected final TypeDecl typeDecl;
 	protected final List<ImportDecl> importList;
 	
+	protected final LinkedList<TypeDecl> superTypes;
+	
 	public FujiClassSignature(AbstractClassSignature parent, String name, String modifiers, 
 			String type, String pckg, TypeDecl typeDecl, List<ImportDecl> importList) {
 		super(parent, name, modifiers, type, pckg);
 		this.typeDecl = typeDecl;
 		this.importList = importList;
+		
+		superTypes = new LinkedList<TypeDecl>();
+		if (typeDecl instanceof ClassDecl) {
+			ClassDecl classDecl = (ClassDecl) typeDecl;
+			
+			for (Access access : classDecl.getImplementsList()) {
+				boolean contains = false;
+				for (TypeDecl superType : superTypes) {
+					if (access.type() == superType) {
+						contains = true;
+						break;
+					}
+				}
+				if (!contains) {
+					superTypes.add(access.type());
+				}
+			}
+			
+			TypeDecl superClass = classDecl.superclass();
+			if (superClass != null) {
+				superTypes.add(superClass);
+			}
+		} else if (typeDecl instanceof InterfaceDecl) {
+			InterfaceDecl interfaceDecl = (InterfaceDecl) typeDecl;
+			List<Access> superInterfaces = interfaceDecl.getSuperInterfaceIdList();
+			for (Access access : superInterfaces) {
+				boolean contains = false;
+				for (TypeDecl otherSuperType : superTypes) {
+					if (access.type() == otherSuperType) {
+						contains = true;
+						break;
+					}
+				}
+				if (!contains) {
+					superTypes.add(access.type());
+				}
+			}
+		}
 	}
 	
 //	public FujiClassSignature(FujiClassSignature orgSig) {
@@ -102,9 +147,31 @@ public class FujiClassSignature extends AbstractClassSignature {
 		if (!super.sigEquals(otherSig)) 
 			return false;
 		
-		if (!typeDecl.sameStructure(otherSig.typeDecl)) {
+//		if (!typeDecl.sameSignature(otherSig.typeDecl)) {
+//			return false;
+//		}
+		
+//		if (typeDecl != otherSig.typeDecl) {
+//			return false;
+//		}
+		
+		if (superTypes.size() != otherSig.superTypes.size()) {
 			return false;
 		}
+		
+		for (TypeDecl thisSuperType : superTypes) {
+			boolean contains = false;
+			for (TypeDecl otherSuperType : otherSig.superTypes) {
+				if (thisSuperType == otherSuperType) {
+					contains = true;
+					break;
+				}
+			}
+			if (!contains) {
+				return false;
+			}
+		}
+		
 		
 //		if (extendList.size() != otherSig.extendList.size()
 //				|| implementList.size() != otherSig.implementList.size()) {
