@@ -7,6 +7,16 @@ https://faracvs.cs.uni-magdeburg.de/projects/tthuem-FeatureIDE/report/6
 
 Here, is a list of high-level enhancements.
 
+Release 2.6.7 (October 2013)
+* New view calculating statistics on FeatureIDE projects
+* New outline and content assist for FeatureHouse projects added
+* Colligens supports development with CPP (integrates TypeChef)
+* Feature model editor improved
+  * Feature descriptions can be edited using a new dialog
+  * Automated analyses optimized
+* Configuration editor improved
+  * Icons and tool tips added giving relevant information on the feature model
+
 Release 2.6.6 (September 2013)
 * Family-based type checks of FeatureHouse projects fith fuji
 * T-wise product generation with splcatool

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<cheatsheet title="Feature Model" id="de.ovgu.featureide.ui.doc.cheatsheet.model">
+	<intro
+       href="/de.ovgu.featureide.ui.doc/html/fosd.html">
+		<description>
+
+In this part of the tutorial you will create your first feature model.
+</description>
+</intro>
+
+ <item
+         href="/de.ovgu.featureide.ui.doc/html/featuremodel.html"
+         title="Edit the feature model">
+    <description>
+       Now its time to create a feature model specifying the features and their valid combinations.
+    </description>
+    <subitem
+          label="After creation of the project, FeatureIDE opens the model.xml file. You will see a graphical editor where you can edit the feature model of your software product line.">
+    </subitem>
+      <subitem
+            label="First, create two additional layers under your root feature. Right click on the root feature and select &quot;Create Feature (below)&quot; twice. Rename the first new feature to &quot;Hello&quot;, and the second to &quot;World&quot;. You can rename features using F2, a single click on a selected feature, or using a right click with the option at the context menu."
+            skip="false">
+      </subitem>
+      <subitem
+            label="Rename the feature (Base) to &gt;Beautiful&gt; and move it between the features (Hello) and (World). Now, create a feature (Wonderful) and move it between the features (Beautiful) and (World).">
+      </subitem>
+      <subitem
+            label="Now, we want to make the features (Beautiful) and (Wonderful) exclusive to each other. Select both features, create a new compound above using right click menu, and name it (Feature). As this feature has no according implementation mark it as abstract using the context menu.">
+      </subitem>
+      <subitem
+            label="Connections between feature and its group of children are distinguished as And- (no arc), Or- (filled ar) and Alternative-groups (unfilled arc). The children of And-groups can either be mandatory (filled circle) or optional (unfilled circle)."
+            skip="true">
+      </subitem>
+      <subitem
+            label="Double click on the connection below the feature (Feature) to change it to an Or-group and again to change it to an Alternative-group. Then double click on the features (Hello) and (World) to mark them as mandatory. Click on the help button, to see how your feature model should look like.">
+      </subitem>
+ </item>
+ 
+</cheatsheet>
