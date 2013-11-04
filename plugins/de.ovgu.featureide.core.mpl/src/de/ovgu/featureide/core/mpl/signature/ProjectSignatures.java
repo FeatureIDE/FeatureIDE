@@ -32,6 +32,11 @@ import de.ovgu.featureide.core.mpl.signature.abstr.AbstractMethodSignature;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature;
 import de.ovgu.featureide.core.mpl.signature.filter.ISignatureFilter;
 
+/** 
+ * Holds the signature information for a whole java project.
+ * 
+ * @author Sebastian Krieter
+ */
 public class ProjectSignatures {
 //	private final HashMap<AbstractSignature, AbstractSignature> 
 //		signatureSet = new HashMap<AbstractSignature, AbstractSignature>();
