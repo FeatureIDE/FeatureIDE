@@ -29,9 +29,11 @@ Import-Package: org.eclipse.cdt.core.model,
 Bundle-ClassPath: .,
  lib/jdom-2.0.4.jar,
  lib/TypeChef-0.3.5.jar,
- lib/Refactoring.jar
+ lib/cloning-1.8.5.jar,
+ lib/objenesis-1.2.jar
 Bundle-Vendor: Ufal
 Export-Package: br.ufal.ic.colligens.actions;uses:="org.eclipse.core.commands",
+ br.ufal.ic.colligens.actions.popup,
  br.ufal.ic.colligens.activator;uses:="org.eclipse.jface.resource,de.ovgu.featureide.fm.ui,org.osgi.framework",
  br.ufal.ic.colligens.controllers;uses:="org.eclipse.ui,org.eclipse.core.resources",
  br.ufal.ic.colligens.controllers.core;
@@ -59,6 +61,9 @@ Export-Package: br.ufal.ic.colligens.actions;uses:="org.eclipse.core.commands",
  br.ufal.ic.colligens.controllers.refactoring,
  br.ufal.ic.colligens.models,
  br.ufal.ic.colligens.preferences;uses:="org.eclipse.jface.preference,org.eclipse.ui,org.eclipse.core.runtime.preferences",
+ br.ufal.ic.colligens.refactoring.core,
+ br.ufal.ic.colligens.refactoring.tree,
+ br.ufal.ic.colligens.refactoring.tree.visitor,
  br.ufal.ic.colligens.util;uses:="org.eclipse.jface.text,org.eclipse.core.resources",
  br.ufal.ic.colligens.util.metrics,
  br.ufal.ic.colligens.views;uses:="org.eclipse.ui.part,org.eclipse.swt.widgets",

@@ -28,13 +28,17 @@ import org.eclipse.ui.internal.util.BundleUtility;
 import org.prop4j.Node;
 import org.prop4j.NodeWriter;
 
+import scala.Function3;
+
 import br.ufal.ic.colligens.activator.Colligens;
 import br.ufal.ic.colligens.controllers.core.PlatformException;
 import br.ufal.ic.colligens.controllers.core.PlatformHeader;
+import de.fosd.typechef.Frontend;
 import de.fosd.typechef.FrontendOptions;
 import de.fosd.typechef.FrontendOptionsWithConfigFiles;
-import de.fosd.typechef.FrontendTypeChef;
+import de.fosd.typechef.featureexpr.FeatureExpr;
 import de.fosd.typechef.lexer.options.OptionException;
+import de.fosd.typechef.parser.Position;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
@@ -113,11 +117,6 @@ public class TypeChef {
 	 * @throws OptionException
 	 */
 	private void start(FileProxy fileProxy) throws OptionException {
-		if (Colligens.getDefault().getPreferenceStore()
-				.getBoolean("FEATURE_MODEL")) {
-			prepareFeatureModel(); // General processing options String
-		}
-
 		String typeChefPreference = Colligens.getDefault().getPreferenceStore()
 				.getString("TypeChefPreference");
 
@@ -174,6 +173,7 @@ public class TypeChef {
 		
 		if (Colligens.getDefault().getPreferenceStore()
 				.getBoolean("FEATURE_MODEL")) {
+			prepareFeatureModel(); // General processing options String
 			paramters.add("--featureModelFExpr");
 			paramters.add(Colligens.getDefault().getConfigDir()
 					.getAbsolutePath()
@@ -241,14 +241,21 @@ public class TypeChef {
 				try {
 
 					start(file);
-					// Frontend.processFile(fo);
+					
 
-					FrontendTypeChef chef = new FrontendTypeChef();
-					chef.processFile(fo,file);
+					RenderParserError renderParserError = new RenderParserError();
+					renderParserError.setFile(file);
 
-					// xmlParser.setXMLFile(fo.getErrorXMLFile());
-					// xmlParser.setFile(file);
-					// xmlParser.processFile();
+					fo.setRenderParserError((Function3<FeatureExpr, String, Position, Object>) renderParserError);
+					
+					 Frontend.processFile(fo);
+
+//					FrontendTypeChef chef = new FrontendTypeChef();
+//					chef.processFile(fo,file);
+
+					 xmlParser.setXMLFile(fo.getErrorXMLFile());
+					 xmlParser.setFile(file);
+					 xmlParser.processFile();
 					//
 					this.isFinish = true;
 				} catch (Exception e) {
@@ -336,7 +343,7 @@ public class TypeChef {
 		if (Colligens.getDefault().getPreferenceStore()
 				.getBoolean("FEATURE_MODEL")) {
 			args.add(0, Colligens.getDefault().getConfigDir().getAbsolutePath()
-					+ System.getProperty("file.separator") + "cnf.txt");
+					+ System.getProperty("file.separator") + "cnf.fm");
 			args.add(0, "--featureModelFExpr");
 		}
 
@@ -474,15 +481,4 @@ public class TypeChef {
 		}
 	}
 
-	// private void monitorBeginTask(String label, int value) {
-	// if (monitor == null)
-	// return;
-	// monitor.beginTask(label, value);
-	// }
-	//
-	// private void setTaskName(String label) {
-	// if (monitor == null)
-	// return;
-	// monitor.setTaskName(label);
-	// }
 }

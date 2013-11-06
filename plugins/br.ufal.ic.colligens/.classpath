@@ -5,6 +5,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry exported="true" kind="lib" path="lib/jdom-2.0.4.jar"/>
 	<classpathentry kind="lib" path="lib/TypeChef-0.3.5.jar"/>
-	<classpathentry kind="lib" path="lib/Refactoring.jar"/>
+	<classpathentry kind="lib" path="lib/cloning-1.8.5.jar"/>
+	<classpathentry kind="lib" path="lib/objenesis-1.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

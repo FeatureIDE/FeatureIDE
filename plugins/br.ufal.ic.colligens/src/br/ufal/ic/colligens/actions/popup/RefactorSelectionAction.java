@@ -67,14 +67,18 @@ public class RefactorSelectionAction implements IObjectActionDelegate {
 	 */
 	public void selectionChanged(IAction action, ISelection selection) {
 		action.setEnabled(false);
-
-		IEditorPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-				.getActivePage().getActiveEditor();
+		IEditorPart part = null;
+		try {
+			part = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+					.getActivePage().getActiveEditor();
+		} catch (NullPointerException e) {
+			return;
+		}
 
 		if (part instanceof ITextEditor) {
 			ITextEditor editor = (ITextEditor) part;
-			this.textSelection = (TextSelection) editor
-					.getSelectionProvider().getSelection();
+			this.textSelection = (TextSelection) editor.getSelectionProvider()
+					.getSelection();
 
 			String line = textSelection.getText();
 			if (line.contains("#")) {

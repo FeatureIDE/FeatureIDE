@@ -20,7 +20,7 @@ import org.eclipse.ltk.core.refactoring.TextFileChange;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 
-import core.RefactoringsFrondEnd;
+import br.ufal.ic.colligens.refactoring.core.RefactoringsFrondEnd;
 import de.fosd.typechef.lexer.LexerException;
 import de.fosd.typechef.lexer.options.OptionException;
 
