@@ -331,41 +331,6 @@ public class MPLPlugin extends AbstractCorePlugin {
 		startJob.schedule();
 	}
 	
-//	public List<CompletionProposal> extendedModules(ProjectStructure projectSignature) {
-//		ArrayList<CompletionProposal> ret_List = new ArrayList<CompletionProposal>();
-//		
-//		Collection<AbstractClassFragment> frag = projectSignature.getClasses();
-//		
-//		for (AbstractClassFragment cur : frag) {
-//			CompletionProposal pr = CompletionProposal.create(CompletionProposal.TYPE_REF,0);
-//			pr.setCompletion(cur.getSignature().getName().toCharArray());
-//			pr.setFlags(Flags.AccPublic);
-//			pr.setSignature(Signature.createTypeSignature(cur.getSignature().getFullName(), true).toCharArray());
-//			ret_List.add(pr);
-//			
-//			Collection<AbstractSignature> memberFrag = cur.getMembers();
-//			for (AbstractSignature curMember : memberFrag) {
-//				CompletionProposal pr2 = null;
-//				if (curMember instanceof AbstractMethodSignature) {
-//					pr2 = CompletionProposal.create(CompletionProposal.METHOD_REF, 0);
-//					pr2.setSignature(Signature.createMethodSignature(new char[][]{{}}, new char[]{}));
-//				} else if (curMember instanceof AbstractFieldSignature) {
-//					pr2 = CompletionProposal.create(CompletionProposal.FIELD_REF, 0);
-//					pr2.setDeclarationSignature(Signature.createTypeSignature(cur.getSignature().getFullName(), true).toCharArray());
-//				}
-//				if (pr2 != null) {
-////					pr2.setDeclarationSignature(Signature.createTypeSignature(cur.getSignature().getFullName(), true).toCharArray());
-//					pr2.setFlags(Flags.AccPublic);
-//					pr2.setName(curMember.getName().toCharArray());
-//					pr2.setCompletion(curMember.getName().toCharArray());
-//					
-//					ret_List.add(pr2);
-//				}
-//			}
-//		}
-//		return ret_List;
-//	}
-	
 	//TODO MPL: use Fuji
 	public List<CompletionProposal> extendedModules_getCompl(IFeatureProject project, String featureName) {
 		final LinkedList<CompletionProposal> ret_List = new LinkedList<CompletionProposal>();

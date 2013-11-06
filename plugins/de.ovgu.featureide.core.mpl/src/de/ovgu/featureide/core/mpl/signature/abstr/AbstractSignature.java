@@ -27,7 +27,7 @@ import java.util.LinkedList;
 import de.ovgu.featureide.core.mpl.signature.ViewTag;
 
 /** 
- * Abstract signature for class member.
+ * Abstract signature for a class member.
  * 
  * @author Sebastian Krieter
  */

@@ -37,7 +37,7 @@ import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature;
 import de.ovgu.featureide.core.mpl.signature.fuji.FujiClassCreator;
 
 /** 
- * Holds the signature information for a whole java project.
+ * Representation of {@link ProjectSignatures} as a list of classes.
  * 
  * @author Sebastian Krieter
  */
