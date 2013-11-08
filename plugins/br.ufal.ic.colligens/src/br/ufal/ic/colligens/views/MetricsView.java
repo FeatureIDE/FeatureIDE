@@ -7,7 +7,7 @@ import org.eclipse.ui.part.ViewPart;
 
 import br.ufal.ic.colligens.activator.Colligens;
 import br.ufal.ic.colligens.controllers.metrics.MetricsViewController;
-import br.ufal.ic.colligens.util.Statistics;
+import br.ufal.ic.colligens.util.metrics.Metrics;
 
 public class MetricsView extends ViewPart{
 
@@ -24,7 +24,7 @@ public class MetricsView extends ViewPart{
 		viewController.createPartControl(parent);
 	}
 	
-	public void setInput(List<Statistics> list) {
+	public void setInput(List<Metrics> list) {
 		viewController.setInput(list);
 	}
 	

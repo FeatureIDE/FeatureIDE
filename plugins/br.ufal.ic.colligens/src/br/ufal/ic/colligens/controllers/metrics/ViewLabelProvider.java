@@ -4,7 +4,7 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 
-import br.ufal.ic.colligens.util.Statistics;
+import br.ufal.ic.colligens.util.metrics.Metrics;
 
 class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
 
@@ -12,11 +12,11 @@ class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
 	public String getColumnText(Object obj, int index) {
 		switch (index) {
 		case 0:
-			if (obj instanceof Statistics)
-				return ((Statistics) obj).getName();
+			if (obj instanceof Metrics)
+				return ((Metrics) obj).getName();
 		case 1:
-			if (obj instanceof Statistics)
-				return ((Statistics) obj).getValue();
+			if (obj instanceof Metrics)
+				return ((Metrics) obj).getValue();
 		default:
 			return "";
 		}

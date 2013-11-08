@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import scala.Product;
+import br.ufal.ic.colligens.models.FileProxy;
+import br.ufal.ic.colligens.models.RenderParserError;
 import br.ufal.ic.colligens.refactoring.tree.TranslationUnit;
 import br.ufal.ic.colligens.refactoring.tree.visitor.VisitorAntiPatterns;
 import br.ufal.ic.colligens.refactoring.tree.visitor.VisitorOrganizeMyAST;
@@ -38,16 +40,20 @@ public class RefactoringsFrondEnd {
 		}
 	}
 
-	public String refactoringFile(String filePath) throws IOException,
+	public void refactoringFile(FileProxy fileProxy) throws IOException,
 			LexerException, OptionException {
 		ParserOptions myParserOptions = new MyParserOptions();
+
+		((RenderParserError) myParserOptions.renderParserError())
+				.setFile(fileProxy);
 
 		ParserMain parser = new ParserMain(new CParser(null, false));
 
 		List<String> includes = new ArrayList<String>();
 
 		// FASTER
-		AST ast = parser.parserMain(filePath, includes, myParserOptions);
+		AST ast = parser.parserMain(fileProxy.getFileToAnalyse(), includes,
+				myParserOptions);
 
 		br.ufal.ic.colligens.refactoring.tree.Node myAst = new TranslationUnit();
 		// t.generateMyAST(ast, myAst);
@@ -60,9 +66,9 @@ public class RefactoringsFrondEnd {
 
 		myAst.accept(visitorAntiPatterns);
 
-//		if (Refactor.isEmpty()) {
-//			return null;
-//		}
+		// if (Refactor.isEmpty()) {
+		// return null;
+		// }
 
 		myAst.accept(new VisitorOrganizeMyAST());
 
@@ -77,6 +83,7 @@ public class RefactoringsFrondEnd {
 
 		new OrganizeCode().organize(filePathOut);
 
-		return filePathOut;
+		fileProxy.setFileToAnalyse(filePathOut);
+
 	}
 }

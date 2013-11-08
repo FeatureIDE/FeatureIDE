@@ -28,7 +28,7 @@ public class RefactorSelectionAction implements IObjectActionDelegate {
 	private Shell shell;
 
 	/**
-	 * Constructor for Action1.
+	 * Constructor for Action
 	 */
 	public RefactorSelectionAction() {
 		super();

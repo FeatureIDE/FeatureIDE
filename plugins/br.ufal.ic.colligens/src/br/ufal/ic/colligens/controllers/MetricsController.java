@@ -8,8 +8,8 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IWorkbenchWindow;
 
 import br.ufal.ic.colligens.controllers.metrics.MetricsViewController;
-import br.ufal.ic.colligens.util.Statistics;
 import br.ufal.ic.colligens.util.metrics.CountDirectives;
+import br.ufal.ic.colligens.util.metrics.Metrics;
 import br.ufal.ic.colligens.util.metrics.MetricsException;
 
 public class MetricsController {
@@ -71,27 +71,27 @@ public class MetricsController {
 				}
 			}
 
-			LinkedList<Statistics> list = new LinkedList<Statistics>();
+			LinkedList<Metrics> list = new LinkedList<Metrics>();
 
-			Statistics statistics = new Statistics("Number of directives", ""
+			Metrics statistics = new Metrics("Number of directives", ""
 					+ countDirectives.directives.size());
 			list.add(statistics);
 
 			// statistics = new Statistics("Number of products", "32");
 			// list.add(statistics);
 
-			statistics = new Statistics("Number of files", "" + numberFiles);
+			statistics = new Metrics("Number of files", "" + numberFiles);
 			list.add(statistics);
 
-			statistics = new Statistics("Number of files with directives", ""
+			statistics = new Metrics("Number of files with directives", ""
 					+ numberFilesWithDirec);
 			list.add(statistics);
 
-			statistics = new Statistics("Directives per file (median)", ""
+			statistics = new Metrics("Directives per file (median)", ""
 					+ (directivesPerFile));
 			list.add(statistics);
 
-			statistics = new Statistics("LOC", "" + LOC);
+			statistics = new Metrics("LOC", "" + LOC);
 			list.add(statistics);
 
 			MetricsViewController statisticsViewController = MetricsViewController

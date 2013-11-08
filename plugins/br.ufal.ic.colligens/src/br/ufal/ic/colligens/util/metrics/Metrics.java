@@ -1,10 +1,10 @@
-package br.ufal.ic.colligens.util;
+package br.ufal.ic.colligens.util.metrics;
 
-public class Statistics {
+public class Metrics {
 	private String Name;
 	private String value;
 
-	public Statistics(String name, String value) {
+	public Metrics(String name, String value) {
 		super();
 		Name = name;
 		this.value = value;

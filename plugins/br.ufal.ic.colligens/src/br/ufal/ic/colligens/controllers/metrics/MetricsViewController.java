@@ -11,7 +11,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.PlatformUI;
 
 import br.ufal.ic.colligens.controllers.ViewController;
-import br.ufal.ic.colligens.util.Statistics;
+import br.ufal.ic.colligens.util.metrics.Metrics;
 import br.ufal.ic.colligens.views.MetricsView;
 
 public class MetricsViewController extends ViewController {
@@ -50,7 +50,7 @@ public class MetricsViewController extends ViewController {
 		this.view = view;
 	}
 
-	public void setInput(List<Statistics> list) {
+	public void setInput(List<Metrics> list) {
 		tableViewer.setInput(list);
 		tableViewer.refresh();
 	}

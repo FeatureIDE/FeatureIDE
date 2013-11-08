@@ -1,4 +1,4 @@
-package br.ufal.ic.colligens.controllers.core;
+package br.ufal.ic.colligens.models;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -31,6 +31,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.preference.IPreferenceStore;
 
 import br.ufal.ic.colligens.activator.Colligens;
 import br.ufal.ic.colligens.controllers.ProjectExplorerController;
@@ -51,6 +52,13 @@ public class PlatformHeader {
 	private ICProject project;
 
 	private List<String> listFiles;
+
+	public PlatformHeader() {
+		IPreferenceStore store = Colligens.getDefault().getPreferenceStore();
+		if (!store.getBoolean("USE_INCLUDES") && !store.getBoolean("USE_STUBS")) {
+			store.setValue("USE_STUBS", true);
+		}
+	}
 
 	public void stubs(String projectName) throws PlatformException {
 

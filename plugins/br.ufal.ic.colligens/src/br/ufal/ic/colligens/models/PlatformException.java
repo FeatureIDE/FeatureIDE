@@ -1,4 +1,6 @@
-package br.ufal.ic.colligens.controllers.core;
+package br.ufal.ic.colligens.models;
+
+import br.ufal.ic.colligens.controllers.core.PluginException;
 
 
 
