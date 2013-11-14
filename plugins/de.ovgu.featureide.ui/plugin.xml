@@ -22,7 +22,7 @@
             hasPages="true"
             icon="icons/NewFeatureProjectIcon.png"
             id="de.ovgu.featureide.ui.wizards.NewFeatureIDEFileWizard"
-            name="FeatureIDE File"
+            name="FeatureIDE Source File"
             project="false">
       </wizard>
       <wizard
