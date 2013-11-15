@@ -65,8 +65,8 @@ import de.ovgu.featureide.ui.UIPlugin;
  */
 @SuppressWarnings("restriction")
 public class NewFeatureIDEFilePage extends WizardPage {
-	private static final String PAGE_DESCRIPTION = "Creates a new language specific FeatureIDE File.";
-	private static final String PAGE_TITLE = "New FeatureIDE File";
+	private static final String PAGE_DESCRIPTION = "Creates a new language specific FeatureIDE Source File.";
+	private static final String PAGE_TITLE = "New FeatureIDE Source File";
 	
 	private static final String MESSAGE_PACKAGE_VALID = "Package name must be valid";
 	private static final String MESSAGE_PACKAGE_START = "Package name must not start with \".\"";
