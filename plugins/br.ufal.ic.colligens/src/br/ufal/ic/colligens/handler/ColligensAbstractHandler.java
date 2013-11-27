@@ -1,8 +1,9 @@
-package br.ufal.ic.colligens.actions;
+package br.ufal.ic.colligens.handler;
 
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.internal.core.model.CContainer;
 import org.eclipse.cdt.internal.core.model.SourceRoot;
+import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.internal.resources.Project;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -10,65 +11,67 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.IWorkbenchWindowActionDelegate;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.FileEditorInput;
 
 @SuppressWarnings("restriction")
-public abstract class PluginActions implements IWorkbenchWindowActionDelegate {
-	protected IWorkbenchWindow window;
-	protected ISelection selection;
+public abstract class ColligensAbstractHandler extends AbstractHandler {
+	private ISelection selection = null;
+	private boolean enabled = false;
 
 	@Override
-	public void selectionChanged(IAction action, ISelection selection) {
-		action.setEnabled(false);
+	public boolean isEnabled() {
+		ISelection selection = null;
 		try {
+			selection = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+					.getActivePage().getSelection();
+
+			if (this.selection != null & !selection.equals(selection)) {
+				return enabled;
+			}
+
 			if (selection instanceof TextSelection) {
-				FileEditorInput fileEditorInput = (FileEditorInput) window
+				this.selection = selection;
+				FileEditorInput fileEditorInput = (FileEditorInput) PlatformUI
+						.getWorkbench().getActiveWorkbenchWindow()
 						.getActivePage().getActiveEditor().getEditorInput();
 				if (fileEditorInput != null
 						&& (fileEditorInput.getFile().getFileExtension()
 								.equals("h") || fileEditorInput.getFile()
 								.getFileExtension().equals("c"))) {
-					action.setEnabled(true);
-					this.selection = selection;
+					enabled = true;
+					return enabled;
 				}
 
 			} else if (selection instanceof IStructuredSelection) {
+				this.selection = selection;
 				IStructuredSelection extended = (IStructuredSelection) selection;
-				this.selection = extended;
 				Object object = extended.getFirstElement();
 
 				if (object instanceof Project) {
 					if (((Project) object).isOpen()) {
-						action.setEnabled(true);
+						enabled = true;
+						return enabled;
 					}
 				} else if (object instanceof SourceRoot
 						|| object instanceof CContainer
 						|| object instanceof ITranslationUnit) {
-					action.setEnabled(true);
+					enabled = true;
+					return enabled;
 				} else if (object instanceof IFile || object instanceof IFolder) {
-					action.setEnabled(isResource((IResource) object));
+					return isResource((IResource) object);
 				}
 			}
 		} catch (Exception e) {
-			// TODO: handle exception
+			enabled = false;
+			return enabled;
 		}
-	}
-
-	@Override
-	public void dispose() {
-
-	}
-
-	@Override
-	public void init(IWorkbenchWindow window) {
-		this.window = window;
+		enabled = false;
+		return enabled;
 	}
 
 	private boolean isResource(IResource iResource) {
@@ -93,7 +96,7 @@ public abstract class PluginActions implements IWorkbenchWindowActionDelegate {
 		return false;
 	}
 
-	protected static boolean saveAll() {
+	protected static final boolean saveAll() {
 		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 		return IDE.saveAllEditors(new IResource[] { workspaceRoot }, true);
 	}

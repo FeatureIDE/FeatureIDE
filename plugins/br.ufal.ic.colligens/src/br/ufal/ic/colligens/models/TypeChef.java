@@ -118,8 +118,8 @@ public class TypeChef {
 
 			try {
 				IIncludeReference includes[] = project.getIncludeReferences();
+				paramters.add("-I");
 				for (int i = 0; i < includes.length; i++) {
-					paramters.add("-I");
 					paramters.add(includes[i].getElementName());
 				}
 			} catch (CModelException e) {
@@ -159,11 +159,13 @@ public class TypeChef {
 		}
 
 		frontendOptions = new FrontendOptionsWithConfigFiles();
+		frontendOptions.getFiles().clear();
 
 		frontendOptions.parseOptions((String[]) paramters
 				.toArray(new String[paramters.size()]));
 
 		frontendOptions.setPrintToStdOutput(false);
+
 	}
 
 	/**

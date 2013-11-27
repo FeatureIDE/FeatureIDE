@@ -66,6 +66,8 @@ public class RefactorSelectionAction implements IObjectActionDelegate {
 	 * @see IActionDelegate#selectionChanged(IAction, ISelection)
 	 */
 	public void selectionChanged(IAction action, ISelection selection) {
+		
+		System.out.println(selection.getClass());
 		action.setEnabled(false);
 		IEditorPart part = null;
 		try {

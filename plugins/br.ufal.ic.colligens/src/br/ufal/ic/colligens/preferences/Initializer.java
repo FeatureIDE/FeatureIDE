@@ -21,5 +21,4 @@ public class Initializer extends AbstractPreferenceInitializer {
 		store.setDefault("SystemRoot", "/");
 		store.setDefault("SystemIncludes", "/usr/include");
 	}
-
 }
