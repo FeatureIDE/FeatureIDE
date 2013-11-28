@@ -13,13 +13,14 @@ import de.ovgu.featureide.fm.ui.AbstractUIPlugin;
 /**
  * The activator class controls the plug-in life cycle
  */
-/** fzddaeaeae
+/**
+ * 
  * 
  * @author Dalton
- *
- *
- */
- /**/
+ * 
+ * 
+ * 
+ **/
 
 public class Colligens extends AbstractUIPlugin {
 
@@ -55,6 +56,9 @@ public class Colligens extends AbstractUIPlugin {
 	 */
 	@Override
 	public void stop(BundleContext context) throws Exception {
+		Start inicialize = new Start();
+		inicialize.SystemClear();
+
 		plugin = null;
 		super.stop(context);
 	}

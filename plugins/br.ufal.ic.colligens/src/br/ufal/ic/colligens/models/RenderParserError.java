@@ -27,6 +27,7 @@ public class RenderParserError implements
 
 			fileProxie.getLogs().add(log);
 		}
+		// System.out.println("parser error " + fileProxie.getLogs().size());
 		return null;
 	}
 

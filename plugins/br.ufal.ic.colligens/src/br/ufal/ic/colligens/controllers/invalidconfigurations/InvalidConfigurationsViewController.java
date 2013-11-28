@@ -1,9 +1,12 @@
 package br.ufal.ic.colligens.controllers.invalidconfigurations;
 
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -69,7 +72,7 @@ public class InvalidConfigurationsViewController extends ViewController {
 			for (FileProxy fileProxy : fileProxies) {
 				fileProxy.deleteMarkers();
 			}
-			
+
 		}
 
 		treeViewer.setInput(null);
@@ -134,6 +137,15 @@ public class InvalidConfigurationsViewController extends ViewController {
 										.setSelection(log.selection());
 
 							} catch (PartInitException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (CoreException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (BadLocationException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}

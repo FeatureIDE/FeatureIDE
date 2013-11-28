@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Colligens
 Bundle-SymbolicName: br.ufal.ic.colligens;singleton:=true
-Bundle-Version: 1.2.2.qualifier
+Bundle-Version: 1.2.3.qualifier
 Bundle-Activator: br.ufal.ic.colligens.activator.Colligens
 Require-Bundle: org.eclipse.core.runtime;bundle-version="3.8.0",
  org.eclipse.core.resources,
@@ -27,39 +27,74 @@ Import-Package: org.eclipse.cdt.core.model,
  org.eclipse.cdt.internal.core.model,
  org.eclipse.cdt.ui
 Bundle-ClassPath: .,
- lib/jdom-2.0.4.jar,
  lib/TypeChef-0.3.5.jar,
- lib/Refactoring.jar
-Bundle-Vendor: Ufal
-Export-Package: br.ufal.ic.colligens.actions;uses:="org.eclipse.core.commands",
+ lib/jdom-2.0.4.jar,
+ lib/cloning-1.8.5.jar,
+ lib/objenesis-1.2.jar
+Bundle-Vendor: Federal University of Alagoas , Brazil
+Export-Package: br.ufal.ic.colligens.actions.popup;
+  uses:="org.eclipse.jface.action,
+   org.eclipse.ui,
+   org.eclipse.jface.viewers,
+   org.eclipse.swt.widgets,
+   org.eclipse.ltk.ui.refactoring",
  br.ufal.ic.colligens.activator;uses:="org.eclipse.jface.resource,de.ovgu.featureide.fm.ui,org.osgi.framework",
- br.ufal.ic.colligens.controllers;uses:="org.eclipse.ui,org.eclipse.core.resources",
+ br.ufal.ic.colligens.controllers;
+  uses:="org.eclipse.ui,
+   org.eclipse.core.resources,
+   br.ufal.ic.colligens.controllers.core,
+   org.eclipse.jface.viewers,
+   org.eclipse.ui.part",
  br.ufal.ic.colligens.controllers.core;
   uses:="de.ovgu.featureide.fm.core.configuration,
    de.ovgu.featureide.core,
    org.eclipse.core.resources,
    de.ovgu.featureide.core.fstmodel.preprocessor,
    de.ovgu.featureide.core.builder.preprocessor,
-   de.ovgu.featureide.fm.core",
+   de.ovgu.featureide.fm.core,
+   de.ovgu.featureide.core.builder",
  br.ufal.ic.colligens.controllers.invalidconfigurations;
-  uses:="de.ovgu.featureide.fm.core.configuration,
-   de.ovgu.featureide.core,
-   org.eclipse.core.resources,
-   de.ovgu.featureide.core.fstmodel.preprocessor,
-   de.ovgu.featureide.core.builder.preprocessor,
-   de.ovgu.featureide.fm.core",
+  uses:="br.ufal.ic.colligens.controllers,
+   org.eclipse.jface.viewers,
+   org.eclipse.swt.graphics,
+   org.eclipse.swt.widgets",
  br.ufal.ic.colligens.controllers.invalidproducts;
-  uses:="de.ovgu.featureide.fm.core.configuration,
-   de.ovgu.featureide.core,
+  uses:="br.ufal.ic.colligens.controllers,
+   org.eclipse.swt.graphics,
+   org.eclipse.jface.viewers,
+   org.eclipse.swt.widgets",
+ br.ufal.ic.colligens.controllers.metrics;
+  uses:="br.ufal.ic.colligens.controllers,
+   br.ufal.ic.colligens.views,
+   org.eclipse.jface.viewers,
+   org.eclipse.swt.graphics,
+   org.eclipse.swt.widgets",
+ br.ufal.ic.colligens.controllers.refactoring;
+  uses:="org.eclipse.jface.text,
+   org.eclipse.core.runtime,
+   br.ufal.ic.colligens.models,
    org.eclipse.core.resources,
-   de.ovgu.featureide.core.fstmodel.preprocessor,
-   de.ovgu.featureide.core.builder.preprocessor,
-   de.ovgu.featureide.fm.core",
- br.ufal.ic.colligens.controllers.metrics,
- br.ufal.ic.colligens.controllers.refactoring,
- br.ufal.ic.colligens.models,
+   org.eclipse.ltk.core.refactoring,
+   org.eclipse.swt.widgets,
+   org.eclipse.ltk.ui.refactoring",
+ br.ufal.ic.colligens.models;
+  uses:="de.fosd.typechef.featureexpr,
+   org.eclipse.core.runtime,
+   de.fosd.typechef.typesystem,
+   org.eclipse.core.resources,
+   de.fosd.typechef.parser,
+   br.ufal.ic.colligens.controllers.core,
+   scala",
  br.ufal.ic.colligens.preferences;uses:="org.eclipse.jface.preference,org.eclipse.ui,org.eclipse.core.runtime.preferences",
- br.ufal.ic.colligens.util;uses:="org.eclipse.jface.text,org.eclipse.core.resources",
- br.ufal.ic.colligens.util.metrics,
+ br.ufal.ic.colligens.refactoring.core;
+  uses:="de.fosd.typechef.parser.c,
+   de.fosd.typechef.featureexpr,
+   br.ufal.ic.colligens.models,
+   br.ufal.ic.colligens.refactoring.tree,
+   scala",
+ br.ufal.ic.colligens.refactoring.tree;uses:="de.fosd.typechef.featureexpr,br.ufal.ic.colligens.refactoring.tree.visitor",
+ br.ufal.ic.colligens.refactoring.tree.visitor;uses:="de.fosd.typechef.featureexpr,br.ufal.ic.colligens.refactoring.tree",
+ br.ufal.ic.colligens.util;uses:="org.eclipse.jface.text,br.ufal.ic.colligens.models,org.eclipse.core.resources",
+ br.ufal.ic.colligens.util.metrics;uses:="br.ufal.ic.colligens.controllers.core",
  br.ufal.ic.colligens.views;uses:="org.eclipse.ui.part,org.eclipse.swt.widgets",
- de.fosd.typechef
+ de.fosd.typechef;uses:="br.ufal.ic.colligens.models,de.fosd.typechef.parser"

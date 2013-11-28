@@ -74,7 +74,7 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 	public NewFeatureIDEFileWizard() {
 		super();
 		setNeedsProgressMonitor(true);
-		setWindowTitle("New FeatureIDE File");
+		setWindowTitle("New FeatureIDE Source File");
 	}
 	
 	/**

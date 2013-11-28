@@ -23,6 +23,8 @@ import br.ufal.ic.colligens.util.Log;
  */
 public class FileProxy {
 	private String path;
+	// temporary path defined by the user.
+	private String newFilepath = null;
 	private IResource iResource;
 	private List<Log> logs;
 
@@ -39,11 +41,13 @@ public class FileProxy {
 		if (!Colligens.getDefault().getPreferenceStore()
 				.getBoolean("USE_INCLUDES")) {
 			try {
-				generate();
+				// Create temporary file.
+				this.generate();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
+
 		this.logs = new LinkedList<Log>();
 
 		this.deleteMarkers();
@@ -77,13 +81,22 @@ public class FileProxy {
 	 * @return full path of the file to analysis
 	 */
 	public String getFileToAnalyse() {
+		if (newFilepath != null) {
+			return newFilepath;
+		}
+
 		if (Colligens.getDefault().getPreferenceStore()
 				.getBoolean("USE_INCLUDES")) {
 			return getFileReal();
 		}
+
 		return Colligens.getDefault().getConfigDir().getAbsolutePath()
 				+ System.getProperty("file.separator") + "projects" + path
 				+ getFileName();
+	}
+
+	public void setFileToAnalyse(String path) {
+		newFilepath = path;
 	}
 
 	/**
@@ -130,7 +143,7 @@ public class FileProxy {
 
 		in.close();
 		out.close();
-		
+
 		File tempFile = new File(getFileToAnalyse());
 
 		tempFile.deleteOnExit();
@@ -151,7 +164,7 @@ public class FileProxy {
 			this.getResource().deleteMarkers(Log.MARKER_TYPE, false,
 					IResource.DEPTH_ZERO);
 		} catch (CoreException e) {
-			// e.printStackTrace();
+			// nothing
 		}
 	}
 }

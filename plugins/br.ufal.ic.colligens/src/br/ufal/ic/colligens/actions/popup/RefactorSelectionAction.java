@@ -28,7 +28,7 @@ public class RefactorSelectionAction implements IObjectActionDelegate {
 	private Shell shell;
 
 	/**
-	 * Constructor for Action1.
+	 * Constructor for Action
 	 */
 	public RefactorSelectionAction() {
 		super();
@@ -66,15 +66,21 @@ public class RefactorSelectionAction implements IObjectActionDelegate {
 	 * @see IActionDelegate#selectionChanged(IAction, ISelection)
 	 */
 	public void selectionChanged(IAction action, ISelection selection) {
+		
+		System.out.println(selection.getClass());
 		action.setEnabled(false);
-
-		IEditorPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-				.getActivePage().getActiveEditor();
+		IEditorPart part = null;
+		try {
+			part = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+					.getActivePage().getActiveEditor();
+		} catch (NullPointerException e) {
+			return;
+		}
 
 		if (part instanceof ITextEditor) {
 			ITextEditor editor = (ITextEditor) part;
-			this.textSelection = (TextSelection) editor
-					.getSelectionProvider().getSelection();
+			this.textSelection = (TextSelection) editor.getSelectionProvider()
+					.getSelection();
 
 			String line = textSelection.getText();
 			if (line.contains("#")) {
