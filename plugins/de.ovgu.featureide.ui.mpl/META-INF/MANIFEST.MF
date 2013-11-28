@@ -13,11 +13,11 @@ Require-Bundle: de.ovgu.featureide.core,
  org.eclipse.core.resources,
  org.eclipse.ui,
  org.eclipse.ui.ide,
- org.eclipse.jdt.core;bundle-version="3.8.3",
- org.eclipse.jdt.ui;bundle-version="3.8.2",
- org.eclipse.jface.text;bundle-version="3.8.2",
- org.eclipse.draw2d;bundle-version="3.8.1",
- org.eclipse.ui.editors;bundle-version="3.8.0"
+ org.eclipse.jdt.core,
+ org.eclipse.jdt.ui,
+ org.eclipse.jface.text,
+ org.eclipse.draw2d,
+ org.eclipse.ui.editors
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: University of Magdeburg
 Bundle-Activator: de.ovgu.featureide.ui.mpl.MPLUIPlugin
