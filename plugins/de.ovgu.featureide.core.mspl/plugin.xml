@@ -1,5 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension id="msplNature" name="Multi Software Product Line Nature" point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run class="de.ovgu.featureide.core.mspl.msplNature">
+         </run>
+      </runtime>
+   </extension>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            id="de.ovgu.featureide.core.mspl.contribution1"
+            objectClass="org.eclipse.core.resources.IProject">
+         <menu
+               id="de.ovgu.featureide.core.mspl.menu1"
+               label="MSPL"
+               path="additions">
+            <separator
+                  name="group1">
+            </separator>
+         </menu>
+         <action
+               class="de.ovgu.featureide.core.mspl.popup.actions.AddNatureAction"
+               enablesFor="1"
+               id="de.ovgu.featureide.core.mspl.newAction"
+               label="Convert to MSPL"
+               menubarPath="de.ovgu.featureide.core.mspl.menu1/group1">
+         </action>
+      </objectContribution>
+   </extension>
 
 </plugin>
