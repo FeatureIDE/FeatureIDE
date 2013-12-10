@@ -33,6 +33,7 @@ import org.eclipse.swt.widgets.TreeItem;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.FeatureModel;
 
 /**
  * A Wizard Page to select the features from the other project to create the
@@ -145,6 +146,45 @@ public class SelectFeaturesWizardPage extends WizardPage implements
 		}
 
 		return false;
+	}
+
+	/**
+	 * Create feature model from selected features.
+	 * 
+	 * @return feature model with selected features
+	 */
+	public FeatureModel createFeatureModel() {
+		FeatureModel fm = new FeatureModel();
+		createFeatureModel(fm, null, featuresTree.getItems());
+		return fm;
+	}
+
+	/**
+	 * Create feature model from selected features.
+	 * 
+	 * @param fm
+	 *            feature model
+	 * @param parentFeature
+	 *            parent feature to add the children features. If null no parent
+	 *            is used.
+	 * @param items
+	 *            The items from tree to check and add to feature model.
+	 */
+	static protected void createFeatureModel(FeatureModel fm,
+			Feature parentFeature, TreeItem[] items) {
+		for (TreeItem item : items) {
+			if (item.getChecked()) {
+				Feature f = new Feature(fm, item.getText());
+
+				if (parentFeature == null) {
+					fm.setRoot(f);
+				} else {
+					parentFeature.addChild(f);
+				}
+
+				createFeatureModel(fm, f, item.getItems());
+			}
+		}
 	}
 
 	@Override

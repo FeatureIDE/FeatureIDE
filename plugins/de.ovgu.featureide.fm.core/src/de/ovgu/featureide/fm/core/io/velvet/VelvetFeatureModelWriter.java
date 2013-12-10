@@ -32,23 +32,38 @@ import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
  */
 public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 
-	private static final String[] SYMBOLS = {"!", "&&", "||", "->", "<->", ", ", "choose", "atleast", "atmost"};
+	private static final String[] SYMBOLS = { "!", "&&", "||", "->", "<->",
+			", ", "choose", "atleast", "atmost" };
 	private static final String NEWLINE = System.getProperty("line.separator");
 	private StringBuilder sb = new StringBuilder();
-	
+
+	/**
+	 * If true an interface will be created. Otherwise it is named "concept"
+	 */
+	private boolean isInterface = false;
+
 	public VelvetFeatureModelWriter(FeatureModel featureModel) {
 		setFeatureModel(featureModel);
+	}
+
+	public VelvetFeatureModelWriter(FeatureModel featureModel,
+			boolean isInterface) {
+		this(featureModel);
+		this.isInterface = true;
 	}
 
 	@Override
 	public String writeToString() {
 		Feature root = featureModel.getRoot();
-		
-		sb.append("concept ");
+
+		if (isInterface)
+			sb.append("interface ");
+		else
+			sb.append("concept ");
 		sb.append(root.getName());
 		sb.append(" {");
 		sb.append(NEWLINE);
-		
+
 		for (Feature feature : root.getChildren()) {
 			writeFeature(feature, 1);
 		}
@@ -59,10 +74,10 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 			sb.append(NEWLINE);
 		}
 		sb.append("}");
-		
+
 		return sb.toString();
 	}
-	
+
 	private void writeFeature(Feature root, int depth) {
 		writeTab(depth);
 		if (root.isAbstract()) {
@@ -73,13 +88,13 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 		}
 		sb.append("feature ");
 		sb.append(root.getName());
-		
+
 		if (root.getChildrenCount() == 0) {
 			sb.append(";");
 		} else {
 			sb.append(" {");
 			sb.append(NEWLINE);
-			
+
 			if (root.isAnd()) {
 				for (Feature feature : root.getChildren()) {
 					writeFeature(feature, depth + 1);
@@ -109,7 +124,7 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 		}
 		sb.append(NEWLINE);
 	}
-	
+
 	private void writeTab(int times) {
 		for (int i = 0; i < times; i++) {
 			sb.append('\t');

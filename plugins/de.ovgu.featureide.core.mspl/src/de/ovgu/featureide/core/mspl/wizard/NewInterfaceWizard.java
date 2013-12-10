@@ -20,12 +20,26 @@
  */
 package de.ovgu.featureide.core.mspl.wizard;
 
+import java.io.ByteArrayInputStream;
+
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.wizard.Wizard;
+
+import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelWriter;
 
 public class NewInterfaceWizard extends Wizard {
 
 	protected SelectProjectWizardPage selectProject;
 	protected SelectFeaturesWizardPage selectFeatures;
+
+	protected IProject project;
+
+	public NewInterfaceWizard(IProject project) {
+		super();
+		this.project = project;
+	}
 
 	@Override
 	public void addPages() {
@@ -37,8 +51,23 @@ public class NewInterfaceWizard extends Wizard {
 
 	@Override
 	public boolean performFinish() {
-		// TODO: generate interface
-		return false;
+		FeatureModel fm = selectFeatures.createFeatureModel();
+
+		VelvetFeatureModelWriter modelWriter = new VelvetFeatureModelWriter(fm,
+				true);
+		String interfaceContent = modelWriter.writeToString();
+
+		ByteArrayInputStream interfaceContentStream = new ByteArrayInputStream(
+				interfaceContent.getBytes());
+
+		try {
+			project.getFolder("MPL").getFile(fm.getRoot().getName() + ".velvet")
+					.create(interfaceContentStream, true, null);
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+
+		return true;
 	}
 
 }

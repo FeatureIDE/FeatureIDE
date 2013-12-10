@@ -27,7 +27,6 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
@@ -61,13 +60,9 @@ public class NewInterfaceAction implements IObjectActionDelegate {
 					if (project != null) {
 						WizardDialog wizardDialog = new WizardDialog(
 								workbenchPart.getSite().getShell(),
-								new NewInterfaceWizard());
+								new NewInterfaceWizard(project));
 
-						if (wizardDialog.open() == Window.OK) {
-							System.out.println("Ok pressed");
-						} else {
-							System.out.println("Cancel pressed");
-						}
+						wizardDialog.open();
 					}
 				}
 			}
