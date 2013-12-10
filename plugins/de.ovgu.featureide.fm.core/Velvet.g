@@ -58,6 +58,8 @@ tokens {
 	ATTR;
 	UNARYOP;
 	OPERAND;
+	
+	INTER;
 }
 
 @lexer::header {package de.ovgu.featureide.fm.core.io.velvet;}
@@ -81,7 +83,10 @@ imports : (IMPORT name SEMI)+
 	-> ^(IMP name+)
 	;
 	
-concept : REFINES? CONCEPT ID  (COLON conceptBaseExt)? definitions 
+concept 
+	: REFINES? CONCEPT ID  (COLON conceptBaseExt)? (
+		START_R conceptInterExt (COMMA conceptInterExt)* END_R
+		)? definitions 
 	-> ^(CONCEPT ID REFINES? conceptBaseExt? definitions)
 	;
 	
@@ -89,7 +94,14 @@ conceptBaseExt
 	: ID (COMMA ID)* 
 	-> ^(BASEEXT ID+)
 	;
-	
+
+conceptInterExt
+	: interfaceclass ID
+	;
+
+interfaceclass : ID
+	;
+
 interfaceg : REFINES? INTERFACEG ID  (COLON interfaceBaseExt)? definitions 
 	-> ^(INTERFACEG ID REFINES? interfaceBaseExt? definitions)
 	;
