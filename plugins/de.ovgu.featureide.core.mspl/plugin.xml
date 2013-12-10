@@ -35,6 +35,30 @@
            </and>
          </visibility>
       </objectContribution>
+      <objectContribution
+            adaptable="true"
+            id="de.ovgu.featureide.core.mspl.contribution2"
+            objectClass="org.eclipse.core.resources.IProject">
+         <action
+               class="de.ovgu.featureide.core.mspl.popup.actions.NewInterfaceAction"
+               enablesFor="1"
+               id="de.ovgu.featureide.core.mspl.NewInterfaceAction"
+               label="Create new Interface"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces3">
+         </action>
+         <visibility>
+           <and>
+             <objectState
+                  name="nature"
+                  value="de.ovgu.featureide.core.featureProjectNature">
+             </objectState>
+	         <objectState
+	              name="nature"
+	              value="de.ovgu.featureide.core.mspl.msplNature">
+	         </objectState>
+           </and>
+         </visibility>
+      </objectContribution>
    </extension>
 
 </plugin>
