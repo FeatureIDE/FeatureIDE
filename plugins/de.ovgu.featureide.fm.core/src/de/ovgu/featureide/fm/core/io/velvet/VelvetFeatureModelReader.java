@@ -87,7 +87,6 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		extFeatureModel.getLayout().verticalLayout(false);
 
 		LinkedList<Tree> nodeList = getChildren(root);
-
 		while (!nodeList.isEmpty()) {
 			Tree curNode = nodeList.poll();
 
@@ -95,6 +94,9 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 			case VelvetParser.IMP:
 				break;
 			case VelvetParser.CONCEPT:
+				parseConcept(curNode);
+				break;
+			case VelvetParser.INTERFACEG:
 				parseConcept(curNode);
 				break;
 			}
