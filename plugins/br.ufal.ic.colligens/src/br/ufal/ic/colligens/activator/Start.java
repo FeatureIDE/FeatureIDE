@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * @author thiago
+ * @author Thiago Emmanuel
  * 
  */
 public class Start {
