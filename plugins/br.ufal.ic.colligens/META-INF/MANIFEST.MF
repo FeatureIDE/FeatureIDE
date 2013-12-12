@@ -32,7 +32,7 @@ Bundle-ClassPath: .,
  lib/cloning-1.8.5.jar,
  lib/objenesis-1.2.jar
 Bundle-Vendor: Federal University of Alagoas , Brazil
-Export-Package: br.ufal.ic.colligens.actions.popup;
+Export-Package: br.ufal.ic.colligens.handler;
   uses:="org.eclipse.jface.action,
    org.eclipse.ui,
    org.eclipse.jface.viewers,

@@ -5,7 +5,7 @@ import java.util.Map;
 import org.eclipse.ltk.core.refactoring.RefactoringContribution;
 import org.eclipse.ltk.core.refactoring.RefactoringDescriptor;
 
-public class RefactoringContribut extends RefactoringContribution{
+public class RefactorContribut extends RefactoringContribution{
 
 	@SuppressWarnings("rawtypes")
 	@Override

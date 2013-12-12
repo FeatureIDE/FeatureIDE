@@ -3,9 +3,9 @@ package br.ufal.ic.colligens.controllers.refactoring;
 import org.eclipse.ltk.core.refactoring.Refactoring;
 import org.eclipse.ltk.ui.refactoring.RefactoringWizard;
 
-public class RefactoringDataWizard extends RefactoringWizard {
+public class RefactorDataWizard extends RefactoringWizard {
 
-	public RefactoringDataWizard(Refactoring refactoring,
+	public RefactorDataWizard(Refactoring refactoring,
 			String pageTitle) {
 		super(refactoring, PREVIEW_EXPAND_FIRST_NODE);
 		setDefaultPageTitle(pageTitle);

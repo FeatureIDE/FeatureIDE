@@ -94,13 +94,23 @@ public class TypeChef {
 
 		ArrayList<String> paramters = new ArrayList<String>();
 
-		paramters.add(fileProxy.getFileToAnalyse());
-
-		paramters.add("--parserstatistics");
+//		paramters.add("--parserstatistics");
+		
+		paramters.add("-w");
+		paramters.add("--lexNoStdout");
 		paramters.add("--lexOutput");
 		paramters.add(Colligens.getDefault().getConfigDir().getAbsolutePath()
 				+ System.getProperty("file.separator") + "lexOutput.c");
 
+		if (Colligens.getDefault().getPreferenceStore()
+				.getBoolean("FEATURE_MODEL")) {
+			prepareFeatureModel(); // General processing options String
+			paramters.add("--featureModelFExpr");
+			paramters.add(Colligens.getDefault().getConfigDir()
+					.getAbsolutePath()
+					+ System.getProperty("file.separator") + "cnf.fm");
+		}
+		
 		String typeChefPreference = Colligens.getDefault().getPreferenceStore()
 				.getString("TypeChefPreference");
 
@@ -118,8 +128,8 @@ public class TypeChef {
 
 			try {
 				IIncludeReference includes[] = project.getIncludeReferences();
-				paramters.add("-I");
 				for (int i = 0; i < includes.length; i++) {
+					paramters.add("-I");
 					paramters.add(includes[i].getElementName());
 				}
 			} catch (CModelException e) {
@@ -147,22 +157,16 @@ public class TypeChef {
 					+ project.getProject().getName() + "_stubs.h");
 		}
 
-		paramters.add("-w");
+		
+		paramters.add(fileProxy.getFileToAnalyse());
 
-		if (Colligens.getDefault().getPreferenceStore()
-				.getBoolean("FEATURE_MODEL")) {
-			prepareFeatureModel(); // General processing options String
-			paramters.add("--featureModelFExpr");
-			paramters.add(Colligens.getDefault().getConfigDir()
-					.getAbsolutePath()
-					+ System.getProperty("file.separator") + "cnf.fm");
-		}
 
 		frontendOptions = new FrontendOptionsWithConfigFiles();
-		frontendOptions.getFiles().clear();
 
-		frontendOptions.parseOptions((String[]) paramters
-				.toArray(new String[paramters.size()]));
+		String[] paramterArray = (String[]) paramters
+				.toArray(new String[paramters.size()]);
+		
+		frontendOptions.parseOptions(paramterArray);
 
 		frontendOptions.setPrintToStdOutput(false);
 

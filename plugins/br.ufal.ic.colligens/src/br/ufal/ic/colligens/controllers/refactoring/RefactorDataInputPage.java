@@ -7,9 +7,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
-public class RefactoringDataInputPage extends UserInputWizardPage {
+public class RefactorDataInputPage extends UserInputWizardPage {
 
-	public RefactoringDataInputPage(String name) {
+	public RefactorDataInputPage(String name) {
 		super(name);
 	}
 
