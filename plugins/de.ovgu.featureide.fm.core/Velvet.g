@@ -58,6 +58,7 @@ tokens {
 	ATTR;
 	UNARYOP;
 	OPERAND;
+	BASEPARAM;
 	
 	INTER;
 }
@@ -87,7 +88,7 @@ concept
 	: REFINES? CONCEPT ID  (COLON conceptBaseExt)? (
 		START_R conceptInterExt (COMMA conceptInterExt)* END_R
 		)? definitions 
-	-> ^(CONCEPT ID REFINES? conceptBaseExt? definitions)
+	-> ^(CONCEPT ID REFINES? conceptBaseExt? conceptInterExt* definitions)
 	;
 	
 conceptBaseExt
@@ -96,11 +97,10 @@ conceptBaseExt
 	;
 
 conceptInterExt
-	: interfaceclass ID
+	: ID name
+	-> ^(BASEPARAM ID name)
 	;
 
-interfaceclass : ID
-	;
 
 interfaceg : REFINES? INTERFACEG ID  (COLON interfaceBaseExt)? definitions 
 	-> ^(INTERFACEG ID REFINES? interfaceBaseExt? definitions)

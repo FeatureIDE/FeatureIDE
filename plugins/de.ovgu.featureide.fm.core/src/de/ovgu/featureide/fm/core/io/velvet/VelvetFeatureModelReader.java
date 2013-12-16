@@ -108,7 +108,6 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 
 		String name = null;
 		// boolean refines = false;
-
 		while (!nodeList.isEmpty()) {
 			Tree curNode = nodeList.poll();
 
@@ -121,6 +120,9 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 				break;
 			case VelvetParser.BASEEXT:
 				break;
+			case VelvetParser.BASEPARAM:
+				parseParam(curNode);
+				break;
 			case VelvetParser.DEF:
 				Feature rootFeatrue = new Feature(extFeatureModel, name);
 				extFeatureModel.addFeature(rootFeatrue);
@@ -132,6 +134,22 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		}
 	}
 
+	private void parseParam(final Tree root) {
+		LinkedList<Tree> nodeList = getChildren(root);
+		
+		System.out.println("parsePARAM: " + nodeList.toString());
+		while (!nodeList.isEmpty()) {
+			final Tree curNode = nodeList.poll();
+			
+			final String interfaceClazz = curNode.getText();
+			final String interfaceVar = nodeList.poll().getText();
+			
+			if (!extFeatureModel.addParameter(interfaceClazz, interfaceVar)) {
+				//TODO Matthias log an error
+			}
+		}
+	}
+	
 	private void parseDefinitions(Tree root) {
 		LinkedList<Tree> nodeList = getChildren(root);
 
@@ -458,12 +476,15 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 				parseAttributeConstraints();
 				
 				ExtendedFeatureModelAnalyzer analyzer = new ExtendedFeatureModelAnalyzer(extFeatureModel);
-				FMCorePlugin.getDefault().logInfo("Velvet-Featuremodel imported");
-				
-				try {
-					FMCorePlugin.getDefault().logInfo(analyzer.isValid() ? "valid" : "invalid");
-				} catch (TimeoutException e) {
-					FMCorePlugin.getDefault().logError(e);
+				// TODO MATTHIAS REMOVE IF WHEN TESTING IS DONE
+				if (null != FMCorePlugin.getDefault()) {
+					FMCorePlugin.getDefault().logInfo("Velvet-Featuremodel imported");
+					
+					try {
+						FMCorePlugin.getDefault().logInfo(analyzer.isValid() ? "valid" : "invalid");
+					} catch (TimeoutException e) {
+						FMCorePlugin.getDefault().logError(e);
+					}
 				}
 				// Update the FeatureModel in Editor
 				extFeatureModel.handleModelDataLoaded();

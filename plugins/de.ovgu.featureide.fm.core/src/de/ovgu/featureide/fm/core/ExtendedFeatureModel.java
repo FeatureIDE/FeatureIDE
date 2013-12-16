@@ -20,7 +20,9 @@
  */
 package de.ovgu.featureide.fm.core;
 
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 import de.ovgu.featureide.fm.core.constraint.FeatureAttributeMap;
 import de.ovgu.featureide.fm.core.constraint.Equation;
@@ -35,6 +37,8 @@ public class ExtendedFeatureModel extends FeatureModel {
 	protected FeatureAttributeMap<Integer> integerAttributes = new FeatureAttributeMap<Integer>();
 	protected FeatureAttributeMap<Boolean> booleanAttributes = new FeatureAttributeMap<Boolean>();
 	protected FeatureAttributeMap<String> stringAttributes = new FeatureAttributeMap<String>();
+	protected Map<String, String> parameters = new HashMap<String, String>(); 
+	protected boolean hasParameters = false;
 	
 	protected LinkedList<Equation> attributeConstraints = new LinkedList<Equation>();
 	
@@ -68,5 +72,44 @@ public class ExtendedFeatureModel extends FeatureModel {
 
 	public void addAttribute(String featureName, String attributeName, String value) {
 		stringAttributes.setAttribute(featureName, attributeName, value);
+	}
+	
+	/**
+	 * Adds a parameter to the available parameters of the model
+	 * 
+	 * @param interfaceClazz the name of the interface that shall be bound to the variable
+	 * @param varName the name of the variable an interface shall be bound to
+	 * @return true if the parameter could be added to the parameters. False the variable name was already bound to another interface.
+	 */
+	public boolean addParameter(final String interfaceClazz, final String varName) {
+		if (!hasParameters) {
+			hasParameters = true;
+		}
+		
+		if (parameters.containsKey(varName)) {
+			return false;
+		} 
+		
+		parameters.put(varName, interfaceClazz);
+		return true;
+	}
+	
+	/**
+	 * The result is not supposed to be edited, since only a copy of the original Map is returned
+	 * 
+	 * @return a copy of the internal collection of parameters. The returned value is not supposed to be edited.
+	 */
+	public Map<String, String> getParameters(){
+		return new HashMap<String, String>(parameters);
+	}
+	
+	/**
+	 * This method is used by the mspl plugin to determine if a model uses interfaces.
+	 * The first parameter that is added will set hasParameters to true.
+	 * 
+	 * @return if the model has interface parameters specified
+	 */
+	public boolean hasParameters() {
+		return this.hasParameters;
 	}
 }
