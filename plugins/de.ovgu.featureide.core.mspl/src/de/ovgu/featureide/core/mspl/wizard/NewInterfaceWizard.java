@@ -22,10 +22,14 @@ package de.ovgu.featureide.core.mspl.wizard;
 
 import java.io.ByteArrayInputStream;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.wizard.Wizard;
 
+import de.ovgu.featureide.core.mspl.InterfaceProject;
+import de.ovgu.featureide.core.mspl.MSPLPlugin;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelWriter;
 
@@ -61,13 +65,23 @@ public class NewInterfaceWizard extends Wizard {
 				interfaceContent.getBytes());
 
 		try {
-			project.getFolder("MPL").getFile(fm.getRoot().getName() + ".velvet")
-					.create(interfaceContentStream, true, null);
+			IFolder mplFolder = project.getFolder("MPL");
+			if (!mplFolder.exists())
+				mplFolder.create(true, true, null);
+
+			IFile interfaceFile = mplFolder.getFile(fm.getRoot().getName()
+					+ ".velvet");
+
+			if (!mplFolder.exists())
+				interfaceFile.create(interfaceContentStream, true, null);
+
+			MSPLPlugin.addProject(project,
+					new InterfaceProject(selectProject.getSelectedProject(),
+							interfaceFile));
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
 
 		return true;
 	}
-
 }

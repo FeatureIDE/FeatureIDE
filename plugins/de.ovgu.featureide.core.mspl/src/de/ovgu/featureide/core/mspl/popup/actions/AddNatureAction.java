@@ -20,8 +20,12 @@
  */
 package de.ovgu.featureide.core.mspl.popup.actions;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.Iterator;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
@@ -60,44 +64,60 @@ public class AddNatureAction implements IObjectActionDelegate {
 		ISelection selection = workbenchPart.getSite().getSelectionProvider()
 				.getSelection();
 
-		if (selection instanceof IStructuredSelection) {
-			IStructuredSelection structuredSelection = (IStructuredSelection) selection;
+		if (!(selection instanceof IStructuredSelection)) {
+			return;
+		}
 
-			for (Iterator<?> iter = structuredSelection.iterator(); iter
-					.hasNext();) {
-				Object obj = iter.next();
+		IStructuredSelection structuredSelection = (IStructuredSelection) selection;
 
-				if (obj instanceof IAdaptable) {
-					IProject project = (IProject) ((IAdaptable) obj)
-							.getAdapter(IProject.class);
+		for (Iterator<?> iter = structuredSelection.iterator(); iter.hasNext();) {
+			Object obj = iter.next();
 
-					if (project != null) {
-						try {
-							// Add MSPLNature to selected projects (should be
-							// only one), from:
-							// http://help.eclipse.org/indigo/index.jsp?topic=%2Forg.eclipse.platform.doc.isv%2Fguide%2FresAdv_natures.htm
-							IProjectDescription description = project
-									.getDescription();
-							String[] natures = description.getNatureIds();
-							String[] newNatures = new String[natures.length + 1];
-							System.arraycopy(natures, 0, newNatures, 0,
-									natures.length);
-							newNatures[natures.length] = MSPLNature.NATURE_ID;
-							description.setNatureIds(newNatures);
-							project.setDescription(description, null);
-
-							// create directories for MPL
-							project.getFolder("MPL").create(true, true, null);
-							project.getFolder("Import")
-									.create(true, true, null);
-
-							// TODO: create mpl.velvet
-						} catch (CoreException e) {
-							e.printStackTrace();
-						}
-					}
-				}
+			if (!(obj instanceof IAdaptable)) {
+				continue;
 			}
+
+			IProject project = (IProject) ((IAdaptable) obj)
+					.getAdapter(IProject.class);
+
+			if (project == null) {
+				continue;
+			}
+
+			try {
+				// Add MSPLNature to selected projects (should be
+				// only one), from:
+				// http://help.eclipse.org/indigo/index.jsp?topic=%2Forg.eclipse.platform.doc.isv%2Fguide%2FresAdv_natures.htm
+				IProjectDescription description = project.getDescription();
+				String[] natures = description.getNatureIds();
+				String[] newNatures = new String[natures.length + 1];
+				System.arraycopy(natures, 0, newNatures, 0, natures.length);
+				newNatures[natures.length] = MSPLNature.NATURE_ID;
+				description.setNatureIds(newNatures);
+				project.setDescription(description, null);
+
+				// create directories for MPL
+				IFolder mplFolder = project.getFolder("MPL");
+				if (!mplFolder.exists())
+					mplFolder.create(true, true, null);
+				IFolder importFolder = project.getFolder("Import");
+				if (!importFolder.exists())
+					importFolder.create(true, true, null);
+
+				// create interfaces mapping file
+				IFile interfacesFile = mplFolder.getFile(".interfaces");
+				if (!interfacesFile.exists()) {
+					// IFile.create() needs an source
+					byte[] bytes = "".getBytes();
+					InputStream source = new ByteArrayInputStream(bytes);
+					interfacesFile.create(source, true, null);
+				}
+
+				// TODO: create mpl.velvet
+			} catch (CoreException e) {
+				e.printStackTrace();
+			}
+
 		}
 
 	}
