@@ -23,14 +23,14 @@ import br.ufal.ic.colligens.views.InvalidConfigurationsView;
 import de.fosd.typechef.lexer.LexerException;
 import de.fosd.typechef.lexer.options.OptionException;
 
-public class RefactoringSelectionController extends Refactoring {
+public class RefactorSelectionController extends Refactoring {
 	private TextSelection textSelection = null;
 	private IFile file = null;
-	private RefactoringSelectionProcessor processor;
+	private RefactorSelectionProcessor processor;
 	protected List<Change> changes = new LinkedList<Change>();
 
-	public RefactoringSelectionController() {
-		processor = new RefactoringSelectionProcessor();
+	public RefactorSelectionController() {
+		processor = new RefactorSelectionProcessor();
 	}
 
 	@Override
@@ -61,7 +61,7 @@ public class RefactoringSelectionController extends Refactoring {
 		} catch (NullPointerException e) {
 			status.addFatalError("Was not possible to refactor the selected part.");
 
-		} catch (RefactorignException e) {
+		} catch (RefactorException e) {
 			status.addFatalError("The selected part contains errors.");
 		} finally {
 			if (processor.fileProxy != null
