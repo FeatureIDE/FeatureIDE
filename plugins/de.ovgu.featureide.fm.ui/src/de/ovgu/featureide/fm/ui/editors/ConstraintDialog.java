@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.ui.editors;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
@@ -623,9 +624,7 @@ public class ConstraintDialog implements GUIDefaults {
 		FeatureModel clonedModel = model.clone();
 		NodeReader nodeReader = new NodeReader();
 
-		List<String> featureList = new ArrayList<String>(
-				clonedModel.getFeatureNames());
-		Node propNode = nodeReader.stringToNode(input, featureList);
+		Node propNode = nodeReader.stringToNode(input, clonedModel.getFeatureNames());
 		if (propNode != null) {
 			if (constraint != null) {
 				clonedModel.removeConstraint(constraint);
@@ -650,14 +649,12 @@ public class ConstraintDialog implements GUIDefaults {
 	 *         dead
 	 */
 	public List<Feature> getDeadFeatures(String input, FeatureModel model) {
-		List<Feature> deadFeaturesBefore = null;
+		Collection<Feature> deadFeaturesBefore = null;
 		FeatureModel clonedModel = model.clone();
 
 		NodeReader nodeReader = new NodeReader();
 
-		List<String> featureList = new ArrayList<String>(
-				clonedModel.getFeatureNames());
-		Node propNode = nodeReader.stringToNode(input, featureList);
+		Node propNode = nodeReader.stringToNode(input, clonedModel.getFeatureNames());
 
 		if (propNode != null) {
 			if (constraint != null) {
@@ -684,9 +681,7 @@ public class ConstraintDialog implements GUIDefaults {
 
 		NodeReader nodeReader = new NodeReader();
 
-		List<String> featureList = new ArrayList<String>(
-				clonedModel.getFeatureNames());
-		Node propNode = nodeReader.stringToNode(input, featureList);
+		Node propNode = nodeReader.stringToNode(input, clonedModel.getFeatureNames());
 		
 		for (Feature feature : model.getFeatures()){
 			if (input.contains(feature.getName())){
@@ -716,8 +711,7 @@ public class ConstraintDialog implements GUIDefaults {
 	private boolean validate() {
 		NodeReader nodereader = new NodeReader();
 		String con = constraintText.getText().trim();
-		boolean isWellformed = nodereader.isWellFormed(con,
-				new ArrayList<String>(featureModel.getFeatureNames()));
+		boolean isWellformed = nodereader.isWellFormed(con, featureModel.getFeatureNames());
 
 		if (!isWellformed) {
 			printHeaderError(nodereader.getErrorMessage());
@@ -780,9 +774,7 @@ public class ConstraintDialog implements GUIDefaults {
 			return false;
 		}
 		FeatureModel clonedModel = featureModel.clone();
-		List<String> featureList = new ArrayList<String>(
-				clonedModel.getFeatureNames());
-		Node propNode = new NodeReader().stringToNode(constraint, featureList);
+		Node propNode = new NodeReader().stringToNode(constraint, clonedModel.getFeatureNames());
 		clonedModel.addPropositionalNode(propNode);
 		if (new ModelComparator(20000).compare(featureModel, clonedModel) == Comparison.REFACTORING) {
 			return true;
@@ -884,10 +876,7 @@ public class ConstraintDialog implements GUIDefaults {
 			return;
 		}
 
-		List<String> featureList = new ArrayList<String>(
-				featureModel.getFeatureNames());
-		Node propNode = nodeReader.stringToNode(input, featureList);
-		
+		Node propNode = nodeReader.stringToNode(input, featureModel.getFeatureNames());		
 		
 		if (propNode == null) {
 			printHeaderError(nodeReader.getErrorMessage());

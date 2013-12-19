@@ -26,7 +26,7 @@ import org.eclipse.jface.action.Action;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
 /**
- * 
+ * TODO description
  * @author Jens Meinicke
  */
 public class RedundantConstrainsCalculationsAction extends Action {
@@ -36,17 +36,17 @@ public class RedundantConstrainsCalculationsAction extends Action {
 	public RedundantConstrainsCalculationsAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
 		super("Calculate Redundant Constraints");
 		this.featureModel = featureModel;	
-		setChecked(featureModel.calculateRedundantConstraints);
+		setChecked(featureModel.getAnalyser().calculateRedundantConstraints);
 	}
 
 	@Override
 	public void run() {
-		if (featureModel.calculateRedundantConstraints) {
-			featureModel.calculateRedundantConstraints = false;
+		if (featureModel.getAnalyser().calculateRedundantConstraints) {
+			featureModel.getAnalyser().calculateRedundantConstraints = false;
 		} else {
-			featureModel.calculateRedundantConstraints = true;
-			featureModel.calculateFeatures = true;
-			featureModel.calculateConstraints = true;
+			featureModel.getAnalyser().calculateRedundantConstraints = true;
+			featureModel.getAnalyser().calculateFeatures = true;
+			featureModel.getAnalyser().calculateConstraints = true;
 		}
 		featureModel.handleModelDataChanged();
 	}

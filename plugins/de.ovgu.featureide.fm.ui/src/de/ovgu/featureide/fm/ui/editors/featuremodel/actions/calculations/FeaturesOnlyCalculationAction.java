@@ -26,7 +26,7 @@ import org.eclipse.jface.action.Action;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
 /**
- * 
+ * TODO description
  * @author Jens Meinicke
  */
 public class FeaturesOnlyCalculationAction extends Action {
@@ -36,17 +36,17 @@ public class FeaturesOnlyCalculationAction extends Action {
 	public FeaturesOnlyCalculationAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
 		super("Calculate Features");
 		this.featureModel = featureModel;	
-		setChecked(featureModel.calculateFeatures);
+		setChecked(featureModel.getAnalyser().calculateFeatures);
 	}
 
 	@Override
 	public void run() {
-		if (featureModel.calculateFeatures) {
-			featureModel.calculateFeatures = false;
-			featureModel.calculateConstraints = false;
-			featureModel.calculateRedundantConstraints = false;
+		if (featureModel.getAnalyser().calculateFeatures) {
+			featureModel.getAnalyser().calculateFeatures = false;
+			featureModel.getAnalyser().calculateConstraints = false;
+			featureModel.getAnalyser().calculateRedundantConstraints = false;
 		} else {
-			featureModel.calculateFeatures = true;
+			featureModel.getAnalyser().calculateFeatures = true;
 		}
 		featureModel.handleModelDataChanged();
 	}

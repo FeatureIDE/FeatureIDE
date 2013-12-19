@@ -42,21 +42,21 @@ public class AutomatedCalculationsAction extends Action {
 	public AutomatedCalculationsAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
 		super("Automated Calculations");
 		this.featureModel = featureModel;	
-		setChecked(featureModel.runCalculationAutomatically);
+		setChecked(featureModel.getAnalyser().runCalculationAutomatically);
 	}
 
 	@Override
 	public void run() {
-		if (featureModel.runCalculationAutomatically) {
+		if (featureModel.getAnalyser().runCalculationAutomatically) {
 			for (Feature f : featureModel.getFeatures()) {
 				f.setFeatureStatus(FeatureStatus.NORMAL, false);
 			}
 			for (Constraint c : featureModel.getConstraints()) {
 				c.setConstraintAttribute(ConstraintAttribute.NORMAL, false);
 			}
-			featureModel.runCalculationAutomatically = false;
+			featureModel.getAnalyser().runCalculationAutomatically = false;
 		} else {
-			featureModel.runCalculationAutomatically = true;
+			featureModel.getAnalyser().runCalculationAutomatically = true;
 		}
 		featureModel.handleModelDataChanged();
 	}
