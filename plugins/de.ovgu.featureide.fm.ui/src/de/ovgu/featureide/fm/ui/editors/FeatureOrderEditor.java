@@ -183,8 +183,9 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	 */
 	@Override
 	public void createPartControl(Composite parent) {
+		IProject project = ((IFile) input.getAdapter(IFile.class)).getProject();
 		hasFeatureOrder = featureModelEditor.featureModel.initFMComposerExtension(
-				((IFile) input.getAdapter(IFile.class)).getProject())
+				project)
 				.hasFeaureOrder();
 		comp = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
@@ -192,7 +193,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		Label label = new Label(comp, SWT.NONE);
 		if (!hasFeatureOrder) {
 			layout.numColumns = 1;
-			label.setText(featureModelEditor.featureModel.getFMComposerExtension().getOrderPageMessage());
+			label.setText(featureModelEditor.featureModel.initFMComposerExtension(project).getOrderPageMessage());
 			featurelist = new org.eclipse.swt.widgets.List(comp, SWT.NONE | SWT.BORDER | SWT.V_SCROLL | SWT.MULTI);
 			featurelist.setVisible(false);
 		} else {
@@ -393,8 +394,8 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 			for (int i = 0; i < itemcount; i++) {
 				if (!featureSet.remove(featurelist.getItem(i))) {
 					changed = true;
-					if (featureSet.remove(featureModelEditor.featureModel.getNewName(featurelist.getItem(i)))) {
-						featurelist.setItem(i, featureModelEditor.featureModel.getNewName(featurelist.getItem(i)));
+					if (featureSet.remove(featureModelEditor.featureModel.getRenamingsManager().getNewName(featurelist.getItem(i)))) {
+						featurelist.setItem(i, featureModelEditor.featureModel.getRenamingsManager().getNewName(featurelist.getItem(i)));
 					} else {
 						featurelist.remove(i--);
 						itemcount--;
@@ -517,7 +518,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		try {
 			scanner = new Scanner(file, "UTF-8");
 			while (scanner.hasNext()) {
-				list.add(featureModelEditor.featureModel.getNewName(scanner.next()));
+				list.add(featureModelEditor.featureModel.getRenamingsManager().getNewName(scanner.next()));
 			}
 		} catch (FileNotFoundException e) {
 			FMUIPlugin.getDefault().logError(e);
@@ -571,7 +572,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		}
 		
 		for (int i = 0; i < oldConfiguration.size();i++) {
-			String x = featureModelEditor.featureModel.getNewName(oldConfiguration.get(i));
+			String x = featureModelEditor.featureModel.getRenamingsManager().getNewName(oldConfiguration.get(i));
 			oldConfiguration.set(i,x);
 		}
 		
@@ -605,7 +606,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 			int i = 0;
 			boolean equal = true;
 			for (String layer : configuration)
-				if (!featureModelEditor.featureModel.getOldName(newConfiguration.get(i++)).equals(layer)) {
+				if (!featureModelEditor.featureModel.getRenamingsManager().getOldName(newConfiguration.get(i++)).equals(layer)) {
 					equal = false;
 					break;
 				}
