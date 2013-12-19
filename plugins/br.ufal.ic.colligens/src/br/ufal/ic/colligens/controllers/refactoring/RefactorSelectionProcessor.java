@@ -23,14 +23,15 @@ import br.ufal.ic.colligens.refactoring.core.RefactoringsFrondEnd;
 import de.fosd.typechef.lexer.LexerException;
 import de.fosd.typechef.lexer.options.OptionException;
 
-public class RefactoringSelectionProcessor {
+//TODO 
+public class RefactorSelectionProcessor {
 	protected FileProxy fileProxy = null;
 	// List of change perform on the code
 	protected List<Change> changes = new LinkedList<Change>();
 
 	public void selectToFile(IFile ifile, TextSelection textSelection)
 			throws IOException, LexerException, OptionException,
-			RefactorignException {
+			RefactorException {
 
 		fileProxy = new FileProxy(ifile);
 

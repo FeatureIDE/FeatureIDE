@@ -1,6 +1,6 @@
 package br.ufal.ic.colligens.controllers.refactoring;
 
-public class RefactorignException extends Exception {
+public class RefactorException extends Exception {
 
 	/**
 	 * 
