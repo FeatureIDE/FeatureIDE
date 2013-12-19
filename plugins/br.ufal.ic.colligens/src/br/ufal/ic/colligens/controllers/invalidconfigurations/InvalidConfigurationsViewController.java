@@ -137,16 +137,16 @@ public class InvalidConfigurationsViewController extends ViewController {
 										.setSelection(log.selection());
 
 							} catch (PartInitException e) {
-								// TODO Auto-generated catch block
+								
 								e.printStackTrace();
 							} catch (IOException e) {
-								// TODO Auto-generated catch block
+								
 								e.printStackTrace();
 							} catch (CoreException e) {
-								// TODO Auto-generated catch block
+								
 								e.printStackTrace();
 							} catch (BadLocationException e) {
-								// TODO Auto-generated catch block
+								
 								e.printStackTrace();
 							}
 						}
@@ -162,7 +162,7 @@ public class InvalidConfigurationsViewController extends ViewController {
 										(IFile) fileProxy.getResource());
 
 							} catch (PartInitException e) {
-								// TODO Auto-generated catch block
+								
 								e.printStackTrace();
 							}
 						}

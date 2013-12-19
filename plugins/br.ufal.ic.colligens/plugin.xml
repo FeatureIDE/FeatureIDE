@@ -27,8 +27,13 @@
       </command>
       <command
             categoryId="br.ufal.ic.colligens.commands.ColligensCategory"
-            id="br.ufal.ic.colligens.commands.ColligensRefactorCommand"
+            id="br.ufal.ic.colligens.commands.RefactorCommand"
             name="Refactor">
+         <commandParameter
+               id="br.ufal.ic.colligens.RefactorParameter"
+               name="type"
+               optional="true">
+         </commandParameter>
       </command>
    </extension>
    <extension
@@ -47,7 +52,7 @@
       </handler>
       <handler
             class="br.ufal.ic.colligens.handler.RefactorSelectionHandler"
-            commandId="br.ufal.ic.colligens.commands.ColligensRefactorCommand">
+            commandId="br.ufal.ic.colligens.commands.RefactorCommand">
       </handler>
    </extension>
    <extension
@@ -63,12 +68,6 @@
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+7">
-      </key>
-      <key
-            commandId="br.ufal.ic.colligens.commands.ColligensRefactorCommand"
-            contextId="org.eclipse.ui.contexts.window"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+8">
       </key>
    </extension>
    <extension
@@ -90,13 +89,14 @@
                label="Code Analyze"
                style="push">
             <visibleWhen
-                  checkEnabled="false">
+                  checkEnabled="true">
                <iterate
                      operator="and">
                   <with
                         variable="activeWorkbenchWindow.activePerspective">
                      <equals
-                           value="org.eclipse.cdt.ui.CPerspective"/>
+                           value="org.eclipse.cdt.ui.CPerspective">
+                     </equals>
                   </with>
                </iterate>
             </visibleWhen>
@@ -121,17 +121,43 @@
          </command>
       </menuContribution>
       <menuContribution
-            locationURI="popup:org.eclipse.cdt.ui.refactoring.menu?after=reorgGroup">
+            locationURI="popup:org.eclipse.cdt.ui.editor.CEditor.EditorContext?before=additions">
          <menu
-               label="Colligens Refactor">
+               icon="icons/featured.png"
+               id="br.ic.ufal.colligens.popmenu"
+               label="Colligens">
             <command
-                  commandId="br.ufal.ic.colligens.commands.ColligensRefactorCommand"
-                  icon="icons/featured.png"
-                  id="br.ufal.ic.colligens.menu.refactor"
-                  label="Colligens Refactor"
-                  mnemonic="C"
+                  commandId="br.ufal.ic.colligens.commands.MetricsCommand"
+                  icon="icons/featured_chart.png"
+                  label="Metrics"
                   style="push">
             </command>
+            <command
+                  commandId="br.ufal.ic.colligens.commands.CodeAnalyzeCommand"
+                  icon="icons/featured_run.png"
+                  label="Code Analyze"
+                  style="push">
+            </command>
+            <visibleWhen
+                  checkEnabled="false">
+               <iterate
+                     operator="or">
+                  <with
+                        variable="activeWorkbenchWindow.activePerspective">
+                     <equals
+                           value="org.eclipse.cdt.ui.CPerspective">
+                     </equals>
+                  </with>
+               </iterate>
+            </visibleWhen>
+            <menu
+                  label="Refactor"
+                  mnemonic="R">
+               <dynamic
+                     class="br.ufal.ic.colligens.handler.RefactorContributionItems"
+                     id="br.ufal.ic.colligens.RefactorContributionItems">
+               </dynamic>
+            </menu>
          </menu>
       </menuContribution>
    </extension>
