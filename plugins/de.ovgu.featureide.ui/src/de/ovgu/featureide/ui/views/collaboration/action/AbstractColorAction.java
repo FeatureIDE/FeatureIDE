@@ -24,10 +24,11 @@ import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.IStructuredSelection;
 
+import de.ovgu.featureide.core.fstmodel.FSTConfiguration;
+import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
 import de.ovgu.featureide.ui.views.collaboration.editparts.CollaborationEditPart;
-import de.ovgu.featureide.ui.views.collaboration.model.Collaboration;
 
 /**
  * The superclass for all actions in the color contextmenu
@@ -58,8 +59,8 @@ public abstract class AbstractColorAction extends Action {
 		Object selectedItem = ((IStructuredSelection) viewer.getSelection()).getFirstElement();
 
 		if (selectedItem instanceof CollaborationEditPart) {
-			Collaboration coll = ((CollaborationEditPart) selectedItem).getCollaborationModel();
-			if (coll.hasFeature()) {
+			FSTFeature coll = ((CollaborationEditPart) selectedItem).getCollaborationModel();
+			if (!(coll instanceof FSTConfiguration)) {
 				FeatureModel fm = collaborationView.getFeatureProject().getFeatureModel();
 				
 				boolean refresh = action(fm, coll.getName());

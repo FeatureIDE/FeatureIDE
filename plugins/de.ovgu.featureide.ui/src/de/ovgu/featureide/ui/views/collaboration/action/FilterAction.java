@@ -20,7 +20,8 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.action;
 
-import java.util.LinkedHashSet;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
@@ -30,6 +31,7 @@ import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
 import de.ovgu.featureide.ui.views.collaboration.editparts.ClassEditPart;
 import de.ovgu.featureide.ui.views.collaboration.editparts.CollaborationEditPart;
 import de.ovgu.featureide.ui.views.collaboration.editparts.RoleEditPart;
+import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModelBuilder;
 
 /**
  * Filters the collaboration model
@@ -38,10 +40,11 @@ import de.ovgu.featureide.ui.views.collaboration.editparts.RoleEditPart;
  */
 public class FilterAction extends Action {
 
-	private GraphicalViewerImpl viewer;
-	private LinkedHashSet<String> classFilter = new LinkedHashSet<String>(); 
-	private LinkedHashSet<String> featureFilter = new LinkedHashSet<String>();
-	private CollaborationView collaborationView;
+	private final GraphicalViewerImpl viewer;
+	private final CollaborationView collaborationView;
+	
+	private final Set<String> classFilter = new HashSet<String>(); 
+	private final Set<String> featureFilter = new HashSet<String>();
 	
 	public FilterAction(String text, GraphicalViewerImpl view, CollaborationView collaborationView) {
 		super(text);
@@ -65,20 +68,19 @@ public class FilterAction extends Action {
 				super.setEnabled(true);
 			}
 		}
-		boolean filterDefined = collaborationView.builder.isFilterDefined();
+		boolean filterDefined = CollaborationModelBuilder.isFilterDefined();
 		setChecked(filterDefined);
 		if (filterDefined) {
 			super.setEnabled(true);
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void run() {
-		if (((classFilter.size() != 0 || featureFilter.size() != 0)) &&
-				!collaborationView.builder.isFilterDefined()) {
+		if ((!classFilter.isEmpty() || !featureFilter.isEmpty()) &&
+				!CollaborationModelBuilder.isFilterDefined()) {
 			setChecked(true);
-			collaborationView.builder.setClassFilter((LinkedHashSet<String>) classFilter.clone());
-			collaborationView.builder.setFeatureFilter((LinkedHashSet<String>) featureFilter.clone());
+			CollaborationModelBuilder.setClassFilter(new HashSet<String>(classFilter));
+			CollaborationModelBuilder.setFeatureFilter(new HashSet<String>(featureFilter));
 			classFilter.clear();
 			featureFilter.clear();
 			collaborationView.refresh();
@@ -86,8 +88,8 @@ public class FilterAction extends Action {
 			setChecked(false);
 			classFilter.clear();
 			featureFilter.clear();
-			collaborationView.builder.getClassFilter().clear();
-			collaborationView.builder.getFeatureFilter().clear();
+			CollaborationModelBuilder.getClassFilter().clear();
+			CollaborationModelBuilder.getFeatureFilter().clear();
 			collaborationView.updateGuiAfterBuild(collaborationView.getFeatureProject(), null);
 		}
 	}
