@@ -21,6 +21,7 @@
 package de.ovgu.featureide.featurehouse.meta.featuremodel;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Locale;
 
@@ -43,8 +44,8 @@ public class FeatureModelJPFCore implements IFeatureModelClass {
 	private final static String HEAD = "/**\r\n * Variability encoding of the feature model for JPF.\r\n * Auto-generated class.\r\n */\r\npublic class FeatureModel {\n\n";
 	private final static String FIELD_MODIFIER = "\tpublic static Boolean ";
 	private StringBuilder stringBuilder;
-	private LinkedList<Feature> deadFeatures;
-	private LinkedList<Feature> coreFeatures;
+	private Collection<Feature> deadFeatures;
+	private Collection<Feature> coreFeatures;
 	private FeatureModel featureModel;
 
 	public FeatureModelJPFCore(FeatureModel featureModel) {
@@ -73,10 +74,8 @@ public class FeatureModelJPFCore implements IFeatureModelClass {
 
 		ArrayList<Feature> features = new ArrayList<Feature>(
 				featureModel.getFeatures());
-		deadFeatures = featureModel.getAnalyser()
-				.getDeadFeatures();
-		coreFeatures = featureModel.getAnalyser()
-				.getCoreFeatures();
+		deadFeatures = featureModel.getAnalyser().getDeadFeatures();
+		coreFeatures = featureModel.getAnalyser().getCoreFeatures();
 		fields.append("\r\n\t/**\r\n\t * Core features are set 'selected' and dead features 'unselected'.\r\n\t * All other features have unknown selection states.\r\n\t */\r\n\tstatic {\r\n");
 		for (Feature f : features) {
 			if (deadFeatures.contains(f)) {

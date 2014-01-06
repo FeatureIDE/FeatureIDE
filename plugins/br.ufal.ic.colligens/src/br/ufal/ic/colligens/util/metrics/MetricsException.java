@@ -11,7 +11,7 @@ public class MetricsException extends PluginException {
 
 	public MetricsException(String message) {
 		super(message);
-		// TODO Auto-generated constructor stub
+
 	}
 
 }

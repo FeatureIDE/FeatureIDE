@@ -136,7 +136,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		_abstract = featureModel.hasAbstract();
 		concrete = featureModel.hasConcrete();
 		hidden = featureModel.hasHidden();
-		dead = !featureModel.getCalculatedDeadFeatures().isEmpty();
+		dead = !featureModel.getAnalyser().getCachedDeadFeatures().isEmpty();
 		showHidden = featureModel.getLayout().showHiddenFeatures();
 		falseoptional = featureModel.hasFalseOptionalFeatures();
 		indetHidden = featureModel.hasIndetHidden();

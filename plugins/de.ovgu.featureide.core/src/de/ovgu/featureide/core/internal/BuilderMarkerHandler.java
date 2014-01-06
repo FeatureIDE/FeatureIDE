@@ -132,9 +132,9 @@ public class BuilderMarkerHandler implements IBuilderMarkerHandler {
 			IMarker marker = resource.createMarker(CONFIGURATION_MARKER);
 			marker.setAttribute(IMarker.MESSAGE, message);
 			marker.setAttribute(IMarker.SEVERITY, severity);
-			if (lineNumber == -1) {
-				lineNumber = 1;
-			}
+//			if (lineNumber == -1) {
+//				lineNumber = 1;
+//			}
 			marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
@@ -147,14 +147,18 @@ public class BuilderMarkerHandler implements IBuilderMarkerHandler {
 	 * @param lineNumber
 	 * @return
 	 */
-	private boolean hasMarker(IResource resource, String message, int lineNumber) {
+	private boolean hasMarker(final IResource resource, final String message, final int lineNumber) {
 		try {
-			IMarker[] marker = resource.findMarkers(CONFIGURATION_MARKER, false, IResource.DEPTH_ZERO);
+			final IMarker[] marker = resource.findMarkers(CONFIGURATION_MARKER, false, IResource.DEPTH_ZERO);
 			if (marker != null) {
-				for (IMarker m : marker) {
-					if (m.getAttribute(IMarker.MESSAGE).equals(message) &&
-							m.getAttribute(IMarker.LINE_NUMBER).equals(lineNumber)) {
-						return true;
+				for (final IMarker m : marker) {
+					if (m != null) {
+						final Object markerMessage = m.getAttribute(IMarker.MESSAGE);
+						final Object markerLine = m.getAttribute(IMarker.LINE_NUMBER);
+						if (markerMessage != null && markerMessage.equals(message) &&
+							markerLine != null && markerLine.equals(lineNumber)) {
+							return true;
+						}
 					}
 				}
 			}

@@ -67,7 +67,7 @@ public abstract class Generator {
 		while (count < numberOfFeatures) {
 			int parentIndex = random.nextInt(leaves.size());
 			Feature parent = leaves.remove(parentIndex);
-			fm.renameFeature(parent.getName(), "A" + parent.getName().substring(1));
+			fm.getRenamingsManager().renameFeature(parent.getName(), "A" + parent.getName().substring(1));
 			int childrenCount = random.nextInt(maxChildren) + 1;
 			childrenCount = Math.min(childrenCount, numberOfFeatures - count);
 			for (int i = 1; i <= childrenCount; i++) {
@@ -85,7 +85,7 @@ public abstract class Generator {
 				parent.changeToOr();
 			count += childrenCount;
 		}
-		fm.performRenamings();
+		fm.getRenamingsManager().performRenamings();
 		return fm;
 	}
 	
@@ -98,7 +98,7 @@ public abstract class Generator {
 		} catch (TimeoutException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
-		Object[] names = fm.getOldFeatureNames().toArray();
+		Object[] names = fm.getRenamingsManager().getOldFeatureNames().toArray();
 		int k = 0;
 		for (int i = 0; i < numberOfConstraints;) {
 			Node node = getRandomLiteral(names, random);

@@ -361,13 +361,13 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 					String nodeName = node.getNodeName();
 					boolean value = node.getNodeValue().equals(TRUE);
 					if (nodeName.equals(CALCULATE_AUTO)) {
-						featureModel.runCalculationAutomatically = value;
+						featureModel.getAnalyser().runCalculationAutomatically = value;
 					} else if (nodeName.equals(CALCULATE_CONSTRAINTS)) {
-						featureModel.calculateConstraints = value;
+						featureModel.getAnalyser().calculateConstraints = value;
 					} else if (nodeName.equals(CALCULATE_REDUNDANT)) {
-						featureModel.calculateRedundantConstraints = value;
+						featureModel.getAnalyser().calculateRedundantConstraints = value;
 					} else if (nodeName.equals(CALCULATE_FEATURES)) {
-						featureModel.calculateFeatures = value;
+						featureModel.getAnalyser().calculateFeatures = value;
 					} else {
 						throwError("Unknown calculations attribute: " + nodeName, e);
 					}

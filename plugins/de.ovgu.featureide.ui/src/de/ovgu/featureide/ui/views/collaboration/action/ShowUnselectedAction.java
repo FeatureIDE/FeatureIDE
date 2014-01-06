@@ -21,7 +21,9 @@
 package de.ovgu.featureide.ui.views.collaboration.action;
 
 import org.eclipse.jface.action.Action;
+
 import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
+import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModelBuilder;
 
 /**
  * Shows unselected features at collaboration model
@@ -37,12 +39,12 @@ public class ShowUnselectedAction extends Action {
 	}
 
 	public void setEnabled(boolean enabled) {
-		super.setChecked(collaborationView.builder.showUnselectedFeatures);
+		super.setChecked(CollaborationModelBuilder.showUnselectedFeatures());
 		super.setEnabled(true);
 	}
 	
 	public void run() {
-		collaborationView.builder.showUnselectedFeatures(!collaborationView.builder.showUnselectedFeatures);
+		CollaborationModelBuilder.showUnselectedFeatures(!CollaborationModelBuilder.showUnselectedFeatures());
 		collaborationView.refresh();
 	}
 }

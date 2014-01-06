@@ -21,6 +21,7 @@
 package de.ovgu.featureide.ahead.model;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import mixin.AST_Modifiers;
 import mixin.AST_ParList;
@@ -41,7 +42,6 @@ import de.ovgu.featureide.ahead.AheadCorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
-import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 
 /**
@@ -55,15 +55,8 @@ import de.ovgu.featureide.core.fstmodel.FSTRole;
  */
 public class MixinJakModelBuilder extends AbstractJakModelBuilder<AST_Program>{
 
-	private FSTModel model;
-	
-	private IFolder sourceFolder;
-
 	public MixinJakModelBuilder(IFeatureProject featureProject) {
-		if (featureProject != null) {
-			model = new FSTModel(featureProject);
-			featureProject.setFSTModel(model);
-		}
+		super(featureProject);
 	}
 	
 	@Override
@@ -84,7 +77,7 @@ public class MixinJakModelBuilder extends AbstractJakModelBuilder<AST_Program>{
 	 *            ahead ASTs of each source file without composing
 	 */
 	@Override
-	public void addClass(String className, LinkedList<IFile> sources,
+	public void addClass(String className, List<IFile> sources,
 			AST_Program[] composedASTs, AST_Program[] ownASTs) {
 		sourceFolder = model.getFeatureProject().getSourceFolder();
 		try {
@@ -95,7 +88,7 @@ public class MixinJakModelBuilder extends AbstractJakModelBuilder<AST_Program>{
 	}
 	
 	@Override
-	public void updateAst(String currentClass, LinkedList<IFile> sources,
+	public void updateAst(String currentClass, List<IFile> sources,
 			AST_Program[] composedASTs, AST_Program[] ownASTs) {
 		IFile currentFile = null;
 		AstCursor c = new AstCursor();

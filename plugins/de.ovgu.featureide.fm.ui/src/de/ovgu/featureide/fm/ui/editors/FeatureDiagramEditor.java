@@ -477,16 +477,17 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	private FeatureModelAnalyzer analyzer;
 
 	public void refresh() {
-		if (getFeatureModel() == null || getFeatureModel().getRoot() == null||getContents()==null)
+		if (getFeatureModel() == null || getFeatureModel().getRoot() == null||getContents()==null) {
 			return;
+		}
 
 		internRefresh(false);
 		if (waiting) {
 			return;
 		}
 		waiting = true;
-		final boolean runAnalysis = featureModelEditor.getFeatureModel().runCalculationAutomatically 
-				&& featureModelEditor.getFeatureModel().calculateFeatures;
+		final boolean runAnalysis = featureModelEditor.getFeatureModel().getAnalyser().runCalculationAutomatically 
+				&& featureModelEditor.getFeatureModel().getAnalyser().calculateFeatures;
 		/**
 		 * This extra job is necessary, else the UI will stop.
 		 */
