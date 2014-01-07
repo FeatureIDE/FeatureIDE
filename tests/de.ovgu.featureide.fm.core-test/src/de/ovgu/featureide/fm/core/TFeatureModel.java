@@ -34,14 +34,14 @@ public class TFeatureModel {
 	@Test
     public void testGetFeatureName(){
         FeatureModel fm = new FeatureModel();
-        Feature feature = new Feature(fm, "test_root");
+        Feature feature = new Feature(fm, "root");
         fm.addFeature(feature);
         fm.setRoot(feature);
-        Feature root = fm.getFeature("test_root");
+        Feature root = fm.getFeature("root");
         assertSame(root, fm.getRoot());
 
-        FeatureModel clonedModel = fm.clone();
-        Feature root2 = clonedModel.getFeature("test_root");
-        assertSame(root2, clonedModel.getRoot());
-	}
+        FeatureModel fm2 = fm.clone();
+        Feature root2 = fm2.getFeature("root");
+        assertSame(root2, fm2.getRoot());
+    }
 }

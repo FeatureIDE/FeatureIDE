@@ -83,15 +83,16 @@ public abstract class ColligensAbstractHandler extends AbstractHandler {
 			isvalid = project.isOpen();
 		} else if (object instanceof SourceRoot) {
 			project = ((SourceRoot) object).getCProject().getProject();
-			isvalid = true;
+			return project
+					.hasNature("de.ovgu.featureide.core.featureProjectNature");
 		} else if (object instanceof CContainer) {
 			project = ((CContainer) object).getCProject().getProject();
 			IResource resource = ((CContainer) object).getResource();
 			isvalid = isResource(resource);
 		} else if (object instanceof ITranslationUnit) {
 			ITranslationUnit iTranslationUnit = (ITranslationUnit) object;
-			project = iTranslationUnit.getCProject().getProject();
 			isvalid = isResource(iTranslationUnit.getResource());
+
 		}
 
 		if (project != null) {

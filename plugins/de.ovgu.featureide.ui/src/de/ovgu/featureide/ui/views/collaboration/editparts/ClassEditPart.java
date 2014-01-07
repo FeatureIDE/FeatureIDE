@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.editparts;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -39,14 +38,10 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 
-import de.ovgu.featureide.core.CorePlugin;
-import de.ovgu.featureide.core.fstmodel.FSTClass;
-import de.ovgu.featureide.core.fstmodel.FSTFeature;
-import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 import de.ovgu.featureide.ui.views.collaboration.figures.ClassFigure;
-import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModelBuilder;
+import de.ovgu.featureide.ui.views.collaboration.model.Class;
 import de.ovgu.featureide.ui.views.collaboration.policy.ClassXYLayoutPolicy;
 
 /**
@@ -56,13 +51,13 @@ import de.ovgu.featureide.ui.views.collaboration.policy.ClassXYLayoutPolicy;
  */
 public class ClassEditPart extends AbstractGraphicalEditPart {
 
-	public ClassEditPart(FSTClass c) {
+	public ClassEditPart(Class c) {
 		super();
 		setModel(c);
 	}
 
-	public FSTClass getClassModel() {
-		return (FSTClass) getModel();
+	public Class getClassModel() {
+		return (Class) getModel();
 	}
 
 	/*
@@ -87,19 +82,9 @@ public class ClassEditPart extends AbstractGraphicalEditPart {
 
 	@Override
 	protected List<?> getModelChildren() {
-		List<FSTRole> roles = new LinkedList<FSTRole>();
-		for (FSTRole role : getClassModel().getRoles()) {
-			if (addFeature(role.getFeature())) {
-				roles.add(role);
-			}
-		}
-		return roles;
+		return getClassModel().getRoles();
 	}
 	
-	private boolean addFeature(final FSTFeature feature) {
-		return CollaborationModelBuilder.showFeature(feature);
-	}
-
 	/**
 	 * {@link ModelEditPart#refreshVisuals()}
 	 */
@@ -113,13 +98,14 @@ public class ClassEditPart extends AbstractGraphicalEditPart {
 	 */
 	public void performRequest(Request request) {
 		if (REQ_OPEN.equals(request.getType())) {
-			FSTClass classModel = getClassModel();
+			Class classModel = getClassModel();
 			String fileName = classModel.getName();
 			if (fileName.contains("*"))
 				return;
 
-			IFolder buildFolder = CorePlugin.getFeatureProject(classModel.getRoles().getFirst().getFile()).getBuildFolder();
-			IFile file = buildFolder.getFile(fileName);
+			IFolder buildFolder = classModel.project.getBuildFolder();
+			IFile file = buildFolder.getFile(
+					fileName);
 			try {
 				if (!file.exists())
 					file = getBuildFile(fileName, buildFolder);

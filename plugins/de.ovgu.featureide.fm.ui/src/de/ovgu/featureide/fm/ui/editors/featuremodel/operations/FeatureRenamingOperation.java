@@ -43,12 +43,12 @@ public class FeatureRenamingOperation extends AbstractFeatureModelOperation {
 
 	@Override
 	protected void redo() {
-		featureModel.getRenamingsManager().renameFeature(oldName, newName);
+		featureModel.renameFeature(oldName, newName);
 	}
 
 	@Override
 	protected void undo() {
-		featureModel.getRenamingsManager().renameFeature(newName, oldName);
+		featureModel.renameFeature(newName, oldName);
 	}
 
 }

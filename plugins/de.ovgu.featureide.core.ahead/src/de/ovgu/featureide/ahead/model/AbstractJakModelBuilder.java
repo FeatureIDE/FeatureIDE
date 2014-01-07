@@ -20,17 +20,9 @@
  */
 package de.ovgu.featureide.ahead.model;
 
-import java.util.List;
+import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
-
-import de.ovgu.featureide.ahead.AheadCorePlugin;
-import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.fstmodel.FSTFeature;
-import de.ovgu.featureide.core.fstmodel.FSTModel;
 
 /**
  * This builder builds the JakProjectModel, by extracting features, 
@@ -47,19 +39,6 @@ import de.ovgu.featureide.core.fstmodel.FSTModel;
  * @author Felix Rieger
  */
 public abstract class AbstractJakModelBuilder<AST_Program_Type> {
-	
-	protected FSTModel model;
-	protected IFolder sourceFolder;
-	protected IFeatureProject featureProject;
-
-	public AbstractJakModelBuilder(final IFeatureProject featureProject) {
-		if (featureProject != null) {
-			this.featureProject = featureProject;
-			model = new FSTModel(featureProject);
-			featureProject.setFSTModel(model);
-		}
-	}
-	
 	/**
 	 * Adds a class to the jak project model
 	 * 
@@ -72,37 +51,13 @@ public abstract class AbstractJakModelBuilder<AST_Program_Type> {
 	 * @param ownASTs
 	 *            ahead ASTs of each source file without composing
 	 */
-	public abstract void addClass(String className, List<IFile> sources,
+	public abstract void addClass(String className, LinkedList<IFile> sources,
 			AST_Program_Type[] composedASTs, AST_Program_Type[] ownASTs);
 
-	public abstract void updateAst(String currentClass, List<IFile> sources,
+	public abstract void updateAst(String currentClass, LinkedList<IFile> sources,
 			AST_Program_Type[] composedASTs, AST_Program_Type[] ownASTs);
 
 	public abstract void reset();
-
-	public void addArbitraryFiles() {
-		IFolder folder = featureProject.getSourceFolder();
-		for (FSTFeature feature : model.getFeatures()) {
-			IFolder featureFolder = folder.getFolder(feature.getName());
-			addArbitraryFiles(featureFolder, feature);
-		}
-	}
-
-	private void addArbitraryFiles(IFolder featureFolder, FSTFeature feature) {
-		try {
-			for (IResource res : featureFolder.members()) {
-				if (res instanceof IFolder) {
-					addArbitraryFiles((IFolder)res, feature);
-				} else if (res instanceof IFile) {
-					if (!featureProject.getComposer().extensions().contains(res.getFileExtension())) {
-						model.addArbitraryFile(feature.getName(), (IFile) res);
-					}
-				}
-			}
-		} catch (CoreException e) {
-			AheadCorePlugin.getDefault().logError(e);
-		}
-	}
 }
 
 

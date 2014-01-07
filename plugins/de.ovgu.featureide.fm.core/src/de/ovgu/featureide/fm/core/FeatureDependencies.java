@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.core;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -113,13 +112,13 @@ public class FeatureDependencies {
      * @param feature
      * @return all implied features
      */
-    public Collection<Feature> getImpliedFeatures(Feature feature) {
+    public Set<Feature> getImpliedFeatures(Feature feature) {
     	if (always.containsKey(feature)) {
     		return always.get(feature);
     	}
     	always.put(feature, new HashSet<Feature>());
     	Node nodeSel = new And(rootNode, new Literal(feature.getName()));
-    	Collection<Feature> impliedFeatures = always.get(feature);
+    	Set<Feature> impliedFeatures = always.get(feature);
     	try {
     		for (Feature f : fm.getFeatures()) {
     			if (!f.equals(feature)) {

@@ -36,17 +36,17 @@ public class ConstrainsCalculationsAction extends Action {
 	public ConstrainsCalculationsAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
 		super("Calculate Constraint Errors");
 		this.featureModel = featureModel;	
-		setChecked(featureModel.getAnalyser().calculateConstraints);
+		setChecked(featureModel.calculateConstraints);
 	}
 
 	@Override
 	public void run() {
-		if (featureModel.getAnalyser().calculateConstraints) {
-			featureModel.getAnalyser().calculateConstraints = false;
-			featureModel.getAnalyser().calculateRedundantConstraints = false;
+		if (featureModel.calculateConstraints) {
+			featureModel.calculateConstraints = false;
+			featureModel.calculateRedundantConstraints = false;
 		} else {
-			featureModel.getAnalyser().calculateConstraints = true;
-			featureModel.getAnalyser().calculateFeatures = true;
+			featureModel.calculateConstraints = true;
+			featureModel.calculateFeatures = true;
 		}
 		featureModel.handleModelDataChanged();		
 	}

@@ -21,7 +21,6 @@
 package de.ovgu.featureide.core.builder.preprocessor;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.Stack;
@@ -77,7 +76,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	protected ArrayList<String> activatedFeatures;
 	
 	/** List of all features from model as ArrayList. List will be generated in {@link #prepareFullBuild(IFile)}. */
-	protected Collection<String> featureList;
+	protected ArrayList<String> featureList;
 	
 	/** Pattern for checking of concrete feature: "feature1|feature2|feature3|...". */
 	protected Pattern patternIsConcreteFeature;
@@ -147,7 +146,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		// create expression of feature model
 		featureModel = NodeCreator.createNodes(fm);
 		
-		featureList = fm.getFeatureNames();
+		featureList = new ArrayList<String>(fm.getFeatureNames());
 		
 		return true;
 	}

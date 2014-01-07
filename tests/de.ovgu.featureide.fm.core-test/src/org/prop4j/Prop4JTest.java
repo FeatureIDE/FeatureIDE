@@ -25,8 +25,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Arrays;
 
 import junit.framework.JUnit4TestAdapter;
 
@@ -644,11 +643,7 @@ public class Prop4JTest {
 	private boolean testValidatorWithFeatureNames(String constraint,
 			String[] featureNames) {
 		NodeReader n = new NodeReader();
-		Set<String> featureSet = new HashSet<String>(featureNames.length);
-		for (String feature : featureNames) {
-			featureSet.add(feature);
-		}
-		return n.isWellFormed(constraint, featureSet);
+		return n.isWellFormed(constraint, Arrays.asList(featureNames));
 	}
 
 	private boolean testValidatorWithoutFeatureNames(String constraint) {

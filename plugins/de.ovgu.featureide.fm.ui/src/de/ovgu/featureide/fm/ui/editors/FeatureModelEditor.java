@@ -434,7 +434,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		if (!saveEditors())
 			return;
 		featureOrderEditor.doSave(monitor);
-		featureModel.getRenamingsManager().performRenamings(file);
+		featureModel.performRenamings(file);
 		for (IFeatureModelEditorPage page : extensionPages) {
 			page.doSave(monitor);
 		}

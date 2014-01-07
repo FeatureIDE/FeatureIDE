@@ -159,7 +159,7 @@ public class FeatureModelTextEditorPage extends TextEditor implements
 			updateTextEditor();
 		}
 			
-		if (featureModelEditor.featureModel.getRenamingsManager().isRenamed()) {
+		if (featureModelEditor.featureModel.isRenamed()) {
 			featureModelEditor.saveModelForConsistentRenamings();
 		}
 	}

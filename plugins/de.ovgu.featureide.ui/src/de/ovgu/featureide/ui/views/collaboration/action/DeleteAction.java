@@ -30,13 +30,13 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.core.fstmodel.FSTClass;
-import de.ovgu.featureide.core.fstmodel.FSTFeature;
-import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.editparts.ClassEditPart;
 import de.ovgu.featureide.ui.views.collaboration.editparts.CollaborationEditPart;
 import de.ovgu.featureide.ui.views.collaboration.editparts.RoleEditPart;
+import de.ovgu.featureide.ui.views.collaboration.model.Class;
+import de.ovgu.featureide.ui.views.collaboration.model.Collaboration;
+import de.ovgu.featureide.ui.views.collaboration.model.Role;
 
 /**
  * Deletes an object from the collaboration diagramm.
@@ -45,7 +45,7 @@ import de.ovgu.featureide.ui.views.collaboration.editparts.RoleEditPart;
  * @author Stephan Besecke
  */
 public class DeleteAction extends Action {
-
+	
 	private GraphicalViewerImpl viewer;
 	private Object part;
 	private String text;
@@ -54,11 +54,13 @@ public class DeleteAction extends Action {
 		this.text = text;
 		viewer = view;
 	}
-
+	
 	public void setEnabled(boolean enable) {
 		IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
 		part = selection.getFirstElement();
-		if (!(part instanceof RoleEditPart || part instanceof ClassEditPart || part instanceof CollaborationEditPart)) {
+		if (!(part instanceof RoleEditPart || 
+				  part instanceof ClassEditPart || 
+			      part instanceof CollaborationEditPart)) {
 			super.setText(text);
 			super.setEnabled(false);
 		} else {
@@ -70,63 +72,70 @@ public class DeleteAction extends Action {
 				super.setText(text + " Feature");
 			super.setEnabled(true);
 		}
-
-		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_ETOOL_DELETE));
-
+		
+		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
+				.getImageDescriptor(ISharedImages.IMG_ETOOL_DELETE));
+		
 	}
 
 	public void run() {
-		MessageDialog messageDialog = new MessageDialog(null, "Delete Resources", null, "Are you sure you want to remove "
-				+ getDialogText(), MessageDialog.INFORMATION, new String[] { "OK", "Cancel" }, 0);
+		MessageDialog messageDialog = new MessageDialog(null, "Delete Resources", null, 
+				"Are you sure you want to remove " +  getDialogText(), 
+				MessageDialog.INFORMATION, new String[]{"OK", "Cancel"}, 0);
 		if (messageDialog.open() != 0) {
 			return;
 		}
-		if (part instanceof RoleEditPart) {
-			FSTRole role = ((RoleEditPart) part).getRoleModel();
-			try {
-				role.getFile().delete(true, null);
+		if (part instanceof RoleEditPart){
+			Role role = ((RoleEditPart) part).getRoleModel();
+		try {
+			role.getRoleFile().delete(true,null);
 			} catch (CoreException e) {
 				UIPlugin.getDefault().logError(e);
-			}
-		} else if (part instanceof ClassEditPart) {
-			FSTClass c = ((ClassEditPart) part).getClassModel();
-			List<FSTRole> roles = c.getRoles();
-			for (FSTRole role : roles) {
-				try {
-					role.getFile().delete(true, null);
-				} catch (CoreException e) {
-					UIPlugin.getDefault().logError(e);
 				}
 			}
+		else if (part instanceof ClassEditPart){
+			Class c = ((ClassEditPart) part).getClassModel();
+			List<Role> roles = c.getRoles();
+			for (Role role : roles){
+				//if (part != null)
+					try {
+						role.getRoleFile().delete(true, null);
+					} catch (CoreException e) {
+						UIPlugin.getDefault().logError(e);
+					}
+			}
 
-		} else if (part instanceof CollaborationEditPart) {
-			FSTFeature coll = ((CollaborationEditPart) part).getCollaborationModel();
-			for (FSTRole role : coll.getRoles()) {
+		}
+		else if (part instanceof CollaborationEditPart){
+			Collaboration coll = ((CollaborationEditPart) part).getCollaborationModel();
+			for (Role role : coll.getRoles()){
 				try {
-					role.getFile().delete(true, null);
+					role.getRoleFile().delete(true, null);
 				} catch (CoreException e) {
 					UIPlugin.getDefault().logError(e);
 				}
 			}
 		}
-
+			
 	}
 
 	/**
 	 * @return A part specific message
 	 */
 	private String getDialogText() {
-		if (part instanceof RoleEditPart) {
-			FSTRole role = ((RoleEditPart) part).getRoleModel();
-			return "the role of class '" + role.getName() + "' at feature '" + role.getFeature().getName() + "'";
-		} else if (part instanceof ClassEditPart) {
-			FSTClass c = ((ClassEditPart) part).getClassModel();
+		if (part instanceof RoleEditPart){
+			Role role = ((RoleEditPart) part).getRoleModel();
+			return "the role of class '" + role.getName() + "' at feature '" + role.getCollaboration().getName() + "'";
+			}
+		else if (part instanceof ClassEditPart){
+			Class c = ((ClassEditPart) part).getClassModel();
 			return "all files of class '" + c.getName() + "'?";
-		} else if (part instanceof CollaborationEditPart) {
-			FSTFeature coll = ((CollaborationEditPart) part).getCollaborationModel();
+		}
+		else if (part instanceof CollaborationEditPart){
+			Collaboration coll = ((CollaborationEditPart) part).getCollaborationModel();
 			return " all files of feature '" + coll.getName() + "'?";
 		}
 		return null;
-	}
-
+	}	
+		
 }

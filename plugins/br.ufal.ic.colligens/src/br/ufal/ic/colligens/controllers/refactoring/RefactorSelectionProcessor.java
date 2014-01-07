@@ -1,8 +1,12 @@
 package br.ufal.ic.colligens.controllers.refactoring;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -14,64 +18,72 @@ import org.eclipse.ltk.core.refactoring.TextFileChange;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 
-import br.ufal.ic.colligens.activator.Colligens;
-import br.ufal.ic.colligens.models.PlatformException;
-import br.ufal.ic.colligens.models.PlatformHeader;
-import core.RefactoringFrontend;
-import core.RefactoringType;
+import br.ufal.ic.colligens.models.FileProxy;
+import br.ufal.ic.colligens.refactoring.core.RefactoringsFrondEnd;
 import de.fosd.typechef.lexer.LexerException;
 import de.fosd.typechef.lexer.options.OptionException;
 
+//TODO 
 public class RefactorSelectionProcessor {
-	private String sourceOutRefactor;
-	private TextSelection textSelection = null;
-	private IFile file = null;
+	protected FileProxy fileProxy = null;
 	// List of change perform on the code
 	protected List<Change> changes = new LinkedList<Change>();
 
-	public void selectToFile(IFile file, TextSelection textSelection,
-			RefactoringType refactoringType) throws IOException,
-			LexerException, OptionException, RefactorException {
+	public void selectToFile(IFile ifile, TextSelection textSelection)
+			throws IOException, LexerException, OptionException,
+			RefactorException {
 
-		this.textSelection = textSelection;
-		this.file = file;
+		fileProxy = new FileProxy(ifile);
 
-		PlatformHeader platformHeader = new PlatformHeader();
+		String filePath = System.getProperty("java.io.tmpdir") + "/"
+				+ this.hashCode() + ".c";
+		RandomAccessFile arq = new RandomAccessFile(filePath, "rw");
 
-		try {
-			platformHeader.stubs(file.getProject().getName());
-		} catch (PlatformException e) {
-			e.printStackTrace();
-			throw new RefactorException();
-		}
+		arq.close();
 
-		RefactoringFrontend refactoring = new RefactoringFrontend();
+		File file = new File(filePath);
 
-		this.sourceOutRefactor = refactoring.refactorCode(
-				textSelection.getText(), Colligens.getDefault().getConfigDir()
-						.getAbsolutePath()
-						+ System.getProperty("file.separator")
-						+ "projects"
-						+ System.getProperty("file.separator")
-						+ file.getProject().getName() + "_stubs.h",
-				refactoringType);
+		FileWriter fileW = new FileWriter(file);
+		BufferedWriter buffW = new BufferedWriter(fileW);
 
-		this.removeStubs();
+		buffW.write(textSelection.getText());
 
-		if (sourceOutRefactor == null) {
-			throw new RefactorException();
-		}
+		buffW.close();
+		fileW.close();
+
+		RefactoringsFrondEnd refactoring = new RefactoringsFrondEnd();
+
+		fileProxy.setFileToAnalyse(filePath);
+
+		refactoring.refactoringFile(fileProxy);
 
 	}
 
-	public List<Change> process(IProgressMonitor monitor) throws IOException {
+	public List<Change> process(TextSelection textSelection,
+			IProgressMonitor monitor) throws IOException {
+
+		File file = new File(fileProxy.getFileToAnalyse());
+
+		String sourceOut = "";
+
+		FileReader fileR = new FileReader(file);
+		BufferedReader buffR = new BufferedReader(fileR);
+
+		String line;
+		while ((line = buffR.readLine()) != null) {
+			sourceOut = sourceOut + line + "\n";
+		}
+
+		buffR.close();
+		fileR.close();
 
 		MultiTextEdit edit = new MultiTextEdit();
 
 		edit.addChild(new ReplaceEdit(textSelection.getOffset(), textSelection
-				.getLength(), sourceOutRefactor));
+				.getLength(), sourceOut));
 
-		TextFileChange change = new TextFileChange(file.getName(), file);
+		TextFileChange change = new TextFileChange(fileProxy.getFileName(),
+				(IFile) fileProxy.getResource());
 
 		change.setTextType("c");
 		change.setEdit(edit);
@@ -80,22 +92,4 @@ public class RefactorSelectionProcessor {
 		return changes;
 	}
 
-	public void removeStubs() throws IOException {
-
-		BufferedReader br = new BufferedReader(new FileReader(Colligens
-				.getDefault().getConfigDir().getAbsolutePath()
-				+ System.getProperty("file.separator")
-				+ "projects"
-				+ System.getProperty("file.separator")
-				+ file.getProject().getName() + "_stubs.h"));
-		try {
-			String line = br.readLine();
-			while (line != null) {
-				sourceOutRefactor = sourceOutRefactor.replace(line + "\n", "");
-				line = br.readLine();
-			}
-		} finally {
-			br.close();
-		}
-	}
 }

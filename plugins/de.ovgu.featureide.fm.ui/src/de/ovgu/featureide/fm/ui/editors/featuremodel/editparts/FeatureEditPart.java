@@ -130,8 +130,11 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements
 
 			featureModel.handleModelDataChanged();
 		} else if (request.getType() == RequestConstants.REQ_SELECTION) {
-			for (Constraint partOf : getFeature().getRelevantConstraints()){
-				partOf.setFeatureSelected(true);
+			List<Constraint> relevantConstraints = getFeature().getRelevantConstraints();
+			if (!relevantConstraints.isEmpty()){
+				for (Constraint partOf : relevantConstraints){
+					partOf.setFeatureSelected(true);
+				}
 			}
 		}
 	}

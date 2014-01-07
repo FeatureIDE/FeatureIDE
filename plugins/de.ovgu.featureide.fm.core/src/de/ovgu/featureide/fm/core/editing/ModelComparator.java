@@ -153,9 +153,9 @@ public class ModelComparator {
 		Set<String> addedFeatures = new HashSet<String>();
 		for (Feature feature : newModel.getFeatures())
 			if (feature.isConcrete()) {
-				String name = newModel.getRenamingsManager().getOldName(feature.getName());
+				String name = newModel.getOldName(feature.getName());
 				Feature associatedFeature = oldModel.getFeature(oldModel
-						.getRenamingsManager().getNewName(name));
+						.getNewName(name));
 				if (associatedFeature == null || associatedFeature.isAbstract())
 					addedFeatures.add(name);
 			}

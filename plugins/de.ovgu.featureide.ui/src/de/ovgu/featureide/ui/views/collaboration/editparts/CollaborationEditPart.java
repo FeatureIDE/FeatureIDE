@@ -29,11 +29,10 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.FileEditorInput;
 
-import de.ovgu.featureide.core.fstmodel.FSTConfiguration;
-import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 import de.ovgu.featureide.ui.views.collaboration.figures.UnderlayerFigure;
+import de.ovgu.featureide.ui.views.collaboration.model.Collaboration;
 
 /**
  * An EditPart for the collaboration.
@@ -42,13 +41,13 @@ import de.ovgu.featureide.ui.views.collaboration.figures.UnderlayerFigure;
  */
 public class CollaborationEditPart extends AbstractGraphicalEditPart implements GUIDefaults {
 	
-	public CollaborationEditPart(FSTFeature coll){
+	public CollaborationEditPart(Collaboration coll){
 		super();
 		setModel(coll);
 	}
 	
-	public FSTFeature getCollaborationModel(){
-		return (FSTFeature) getModel();
+	public Collaboration getCollaborationModel(){
+		return (Collaboration) getModel();
 	}
 
 	/* (non-Javadoc)
@@ -80,23 +79,23 @@ public class CollaborationEditPart extends AbstractGraphicalEditPart implements 
 	 */
 	public void performRequest(Request request) {
 		if (REQ_OPEN.equals(request.getType())) {
-			if (getCollaborationModel() instanceof FSTConfiguration) {
-				IFile file = ((FSTConfiguration) getCollaborationModel()).getFile();
-				
-				 if (file == null)
-					 return;
-				 
-				 IWorkbenchWindow dw = UIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow();	 
-				 try {
-					 IWorkbenchPage page = dw.getActivePage();
-					 if (page != null) {
-						 FileEditorInput fileEditorInput = new FileEditorInput(file);
-						 page.openEditor(fileEditorInput, "de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor");
-					 }
-				 } catch (PartInitException e) {
-					 UIPlugin.getDefault().logError(e);
+			 if (!this.getCollaborationModel().isConfiguration)
+				 return;
+			 
+			 IFile file = this.getCollaborationModel().configurationFile;
+			 if (file == null)
+				 return;
+			 
+			 IWorkbenchWindow dw = UIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow();	 
+			 try {
+				 IWorkbenchPage page = dw.getActivePage();
+				 if (page != null) {
+					 FileEditorInput fileEditorInput = new FileEditorInput(file);
+					 page.openEditor(fileEditorInput, "de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor");
 				 }
-			}
+			 } catch (PartInitException e) {
+				 UIPlugin.getDefault().logError(e);
+			 }
 	
 		}
 		super.performRequest(request);

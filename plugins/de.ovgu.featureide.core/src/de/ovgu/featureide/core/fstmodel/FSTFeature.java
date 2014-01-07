@@ -33,22 +33,13 @@ import javax.annotation.Nonnull;
  */
 public class FSTFeature {
 
-	private final HashMap<String, FSTRole> roles = new HashMap<String, FSTRole>();
-	protected String name;
-	private int color = -1;
-	private final FSTModel model;
+	HashMap<String, FSTRole> roles;
+	String name;
+	int color = -1;
 
-	public FSTFeature(String name, final FSTModel model) {
+	public FSTFeature(String name) {
 		this.name = name;
-		this.model = model;
-	}
-	
-	public boolean isSelected() {
-		FSTConfiguration config = model.getConfiguration();
-		if (config != null) {
-			return config.getSelectedFeatures().contains(name);
-		}
-		return false;
+		roles = new HashMap<String, FSTRole>();
 	}
 
 	public void setColor(int color) {
@@ -70,21 +61,5 @@ public class FSTFeature {
 
 	public FSTRole getRole(String className) {
 		return roles.get(className);
-	}
-	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		return name;
-	}
-
-	/**
-	 * @param className
-	 * @param role
-	 */
-	public void addRole(String className, FSTRole role) {
-		roles.put(className, role);
 	}
 }

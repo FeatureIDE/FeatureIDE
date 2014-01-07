@@ -115,10 +115,10 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter implements
     	}
     	
     	root.appendChild(calculations);
-    	calculations.setAttribute(CALCULATE_AUTO, "" + featureModel.getAnalyser().runCalculationAutomatically);
-    	calculations.setAttribute(CALCULATE_FEATURES, "" + featureModel.getAnalyser().calculateFeatures);
-    	calculations.setAttribute(CALCULATE_CONSTRAINTS, "" + featureModel.getAnalyser().calculateConstraints);
-    	calculations.setAttribute(CALCULATE_REDUNDANT, "" + featureModel.getAnalyser().calculateRedundantConstraints);
+    	calculations.setAttribute(CALCULATE_AUTO, "" + featureModel.runCalculationAutomatically);
+    	calculations.setAttribute(CALCULATE_FEATURES, "" + featureModel.calculateFeatures);
+    	calculations.setAttribute(CALCULATE_CONSTRAINTS, "" + featureModel.calculateConstraints);
+    	calculations.setAttribute(CALCULATE_REDUNDANT, "" + featureModel.calculateRedundantConstraints);
 
     	root.appendChild(comments);
     	for(int i=0; i<featureModel.getComments().size(); i++){

@@ -45,14 +45,13 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 
 import de.ovgu.featureide.core.CorePlugin;
-import de.ovgu.featureide.core.fstmodel.FSTArbitraryRole;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
-import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 import de.ovgu.featureide.ui.views.collaboration.action.ShowFieldsMethodsAction;
+import de.ovgu.featureide.ui.views.collaboration.model.Role;
 
 /**
  * <code>RoleFigure</code> represents the graphical representation of a 
@@ -69,7 +68,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 	private boolean selected = false;
 	
 	private IFolder featureFolder;
-	private FSTRole role;
+	private Role role;
 
 	/**
 	 * This array describes the selection status of the method and field filter.
@@ -167,15 +166,15 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		return selected;
 	}
 	
-	public FSTRole getRole() {
+	public Role getRole() {
 		return role;
 	}
 
-	public RoleFigure(FSTRole role) {
+	public RoleFigure(Role role) {
 		super();
 		
 		this.role = role;
-		selected = role.getFeature().isSelected();
+		selected = role.selected;
 		GridLayout gridLayout = new GridLayout(1, true);
 		gridLayout.verticalSpacing = GRIDLAYOUT_VERTICAL_SPACING;
 		gridLayout.marginHeight = GRIDLAYOUT_MARGIN_HEIGHT;
@@ -207,7 +206,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		FlowLayout contentsLayout = new FlowLayout();
 		tooltipContent.setLayoutManager(contentsLayout);
 		
-		if (!(role instanceof FSTArbitraryRole)) {
+		if (role.files.size() == 0) {
 			int fieldCount = getCountForFieldContentCreate(tooltipContent);
 			int methodCount = getCountForMethodContentCreate(tooltipContent);
 				addLabel(new Label("Fields: " + fieldCount + " Methods: "	+ methodCount +" "));
@@ -226,7 +225,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		GridLayout contentsLayout = new GridLayout(1,true);
 		tooltipContent.setLayoutManager(contentsLayout);
 		
-		if (role.getDirectives().isEmpty() && role.getFile() != null) {
+		if (role.directives.isEmpty() && role.files.isEmpty()) {
 			int fieldCount = 0;
 			int methodCount = 0;
 			if (showOnlyFields()) {
@@ -257,7 +256,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 	private int getCountForMethodContentCreate(Figure tooltipContent) {
 		
 		CompartmentFigure methodFigure = new CompartmentFigure();
-		Label label = new Label(role.getFeature() + " ", IMAGE_FEATURE);
+		Label label = new Label(role.featureName + " ", IMAGE_FEATURE);
 		
 		if (isFieldMethodFilterActive()) {
 			tooltipContent.add(label);
@@ -266,7 +265,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		}
 		
 		int methodCount = 0;
-		for (FSTMethod m : role.getMethods()) {
+		for (FSTMethod m : role.methods) {
 			Label methodLabel = createMethodLabel(m);
 
 			if (matchFilter(m)) {
@@ -306,7 +305,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		}
 		
 		int fieldCount = 0;
-		for (FSTField f : role.getFields()) {
+		for (FSTField f : role.fields) {
 			if (matchFilter(f)) {
 				Label fieldLabel = createFieldLabel(f);
 				fieldFigure.add(fieldLabel);
@@ -343,13 +342,12 @@ public class RoleFigure extends Figure implements GUIDefaults{
 	
 	private void setContentForFiles(Figure contentContainer, Figure tooltipContent){
 		// TODO open selected file like at method and fields
-		FSTArbitraryRole role = (FSTArbitraryRole) this.role;
-		featureFolder = CorePlugin.getFeatureProject(role.getFiles().get(0)).getSourceFolder()
-				.getFolder(role.getFeature().getName());
-		contentContainer.add(new Label(role.getFeature() + " ", IMAGE_FEATURE));
+		featureFolder = CorePlugin.getFeatureProject(role.files.getFirst()).getSourceFolder()
+				.getFolder(role.getCollaboration().getName());
+		contentContainer.add(new Label(role.featureName + " ", IMAGE_FEATURE));
 		int fileCount = 0;
 		long size = 0;
-		for (IFile file : role.getFiles()) {
+		for (IFile file : role.files) {
 			long currentSize = file.getRawLocation().toFile().length();
 			size += currentSize;
 			Label fieldLabel;
@@ -393,10 +391,10 @@ public class RoleFigure extends Figure implements GUIDefaults{
 	private void setDirectivesContent(Figure tooltipContent, String className) {
 		LinkedList<String> duplicates = new LinkedList<String>();
 		tooltipContent.add(new Label(className + " ", IMAGE_CLASS));
-		tooltipContent.add(new Label(role.getFeature() + " ", IMAGE_FEATURE));
+		tooltipContent.add(new Label(role.featureName + " ", IMAGE_FEATURE));
 		this.setToolTip(tooltipContent);
 		
-		for (FSTDirective d : role.getDirectives()) {
+		for (FSTDirective d : role.directives) {
 			if (!duplicates.contains(d.toDependencyString())) {
 				duplicates.add(d.toDependencyString());
 				Label partLabel = new RoleFigureLabel(d.toDependencyString(), IMAGE_HASH, d.toDependencyString());

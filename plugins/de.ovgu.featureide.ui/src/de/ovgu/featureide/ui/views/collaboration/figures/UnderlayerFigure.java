@@ -22,9 +22,9 @@ package de.ovgu.featureide.ui.views.collaboration.figures;
 
 import org.eclipse.draw2d.Figure;
 
-import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.ui.editors.annotation.ColorPalette;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
+import de.ovgu.featureide.ui.views.collaboration.model.Collaboration;
 
 /**
  * A graphical element which holds a {@link CollaborationFigure}.
@@ -36,7 +36,7 @@ public class UnderlayerFigure extends Figure implements GUIDefaults {
 
 	private CollaborationFigure collaborationFigure;
 	
-	public UnderlayerFigure(FSTFeature coll) {
+	public UnderlayerFigure(Collaboration coll) {
 		super();
 		collaborationFigure = new CollaborationFigure(coll);
 		this.add(collaborationFigure);
@@ -44,8 +44,8 @@ public class UnderlayerFigure extends Figure implements GUIDefaults {
 		collaborationFigure.setLocation(COLLFIGURE_LOCATION);
 		this.setSize(0, DEFAULT_UNDERLAYER_HEIGHT);
 
-		if (coll.getColor() != -1) {
-			this.setBackgroundColor(ColorPalette.getColor(coll.getColor(), 0.4f));
+		if (coll.hasFeature() && coll.hasFeatureColor()) {
+			this.setBackgroundColor(ColorPalette.getColor(coll.getFeatureColor(), 0.4f));
 		}
 		
 		this.setOpaque(true);

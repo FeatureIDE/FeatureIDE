@@ -22,20 +22,32 @@ package de.ovgu.featureide.fm.core;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
+import org.eclipse.core.resources.ICommand;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.QualifiedName;
+import org.prop4j.Literal;
 import org.prop4j.Node;
+import org.sat4j.specs.TimeoutException;
 
 /**
  * The model representation of the feature tree that notifies listeners of
@@ -46,104 +58,138 @@ import org.prop4j.Node;
  * @author Stefan Krueger
  * 
  */
-public class FeatureModel extends DeprecatedFeatureModel implements PropertyConstants {
-	
-	private Feature rootFeature;
-	
+// TODO #459 remove unnecessary initializations/calculations especially after clone()
+public class FeatureModel implements PropertyConstants {
+
+	public static final String COMPOSER_KEY = "composer";
+	public static final QualifiedName composerConfigID = new QualifiedName(
+			"featureproject.configs", "composer");
+	public static final QualifiedName sourceFolderConfigID = new QualifiedName(
+			"featureproject.configs", "source");
+	public static final String SOURCE_ARGUMENT = "source";
+	public static final String DEFAULT_SOURCE_PATH = "src";
+	public static final String BUILDER_ID = "de.ovgu.featureide.core"
+			+ ".extensibleFeatureProjectBuilder";
+	/**
+	 * the root feature
+	 */
+	protected Feature root;
+//	private boolean autoLayoutLegend = true;
+//	private boolean showHiddenFeatures = true;
+//	private boolean hasVerticalLayout = true;
+//	private FMPoint legendPos = new FMPoint(0, 0);
 	/**
 	 * a {@link Hashtable} containing all features
 	 */
-	private final Map<String, Feature> featureTable = new ConcurrentHashMap<String, Feature>();
+	protected Hashtable<String, Feature> featureTable = new Hashtable<String, Feature>();
 
-	protected final List<Constraint> constraints = new LinkedList<Constraint>();
-	
 	/**
-	 * All comment lines from the model file without line number at which they
+	 * all comment lines from the model file without line number at which they
 	 * occur
 	 */
-	private final List<String> comments = new LinkedList<String>();
+
+//	private int selectedLayoutAlgorithm = 1;
+
+	protected LinkedList<String> comments = new LinkedList<String>();
+
+	protected LinkedList<Constraint> constraints = new LinkedList<Constraint>();
 
 	/**
-	 * Saves the annotations from the model file as they were read,
+	 * This string saves the annotations from the model file as they were read,
 	 * because they were not yet used.
 	 */
-	private final List<String> annotations = new LinkedList<String>();
+	protected LinkedList<String> annotations = new LinkedList<String>();
 
 	/**
-	 * A list containing the feature names in their specified order will be
-	 * initialized in XmlFeatureModelReader.
+	 * a list containing all renamings since the last save
 	 */
-	private final List<String> featureOrderList = new LinkedList<String>();
-	
+	private LinkedList<Renaming> renamings = new LinkedList<Renaming>();
+
+	/**
+	 * a list containing the feature names in their specified order will be
+	 * initialized in XmlFeatureModelReader
+	 */
+	private List<String> featureOrderList = new LinkedList<String>();
 	private boolean featureOrderUserDefined = false;
-	
 	private boolean featureOrderInXML = false;
+
+	private IFolder sourceFolder;
+
+	private IFMComposerExtension fmComposerExtension = new FMComposerExtension();
+	private String COMPOSER_ID;
 	
 	private Object undoContext;
 
-	private final List<PropertyChangeListener> listenerList = new LinkedList<PropertyChangeListener>();
-	
-	private ColorschemeTable colorschemeTable = new ColorschemeTable(this);
-
-	private FMComposerManager fmComposerManager;
-	
-	private final FeatureModelAnalyzer analyser = new FeatureModelAnalyzer(this);
-	
-	private final FeatureModelLayout layout = new FeatureModelLayout();
-	
-	private final RenamingsManager renamingsManager = new RenamingsManager(this);
+	private final LinkedList<PropertyChangeListener> listenerList = new LinkedList<PropertyChangeListener>();
+	protected ColorschemeTable colorschemeTable = new ColorschemeTable(this);
+	protected boolean valid = true;
+    private FeatureModelAnalyzer analyser = new FeatureModelAnalyzer(this);
+    private FeatureModelLayout layout = new FeatureModelLayout();
+	private LinkedList<Feature> falseOptionalFeatures = new LinkedList<Feature>();
+	private LinkedList<Feature> deadFeatures = new LinkedList<Feature>();
 	
 	/**
-	 * Returns the {@link FeatureModelAnalyzer} which should be used for all calculation 
-	 * on the {@link FeatureModel}.
+	 * Defines whether features should be included into calculations.
+	 * If features are not analyzed, then constraints a also NOT analyzed.
 	 */
-	@Override
-    public FeatureModelAnalyzer getAnalyser() {
-    	return analyser;
-    }
-
-	@Override
-    public FeatureModelLayout getLayout() {
-		return layout;
-    }
-
-	public ColorschemeTable getColorschemeTable() {
-		return colorschemeTable;
-	}
+	public boolean calculateFeatures = true;
+	/**
+	 * Defines whether constraints should be included into calculations.
+	 */
+	public boolean calculateConstraints = true;
+	/**
+	 * Defines whether redundant constraints should be calculated.
+	 */
+	public boolean calculateRedundantConstraints = true;
+	/**
+	 * Defines whether analysis should be performed automatically.
+	 */
+	public boolean runCalculationAutomatically = true;
 	
-	@Override
-	public FMComposerManager getFMComposerManager(final IProject project) {
-		if (fmComposerManager == null) {
-			fmComposerManager = new FMComposerManager(project);
-		}
-		return fmComposerManager;
-	}
-
-	public IFMComposerExtension initFMComposerExtension(final IProject project) {
-		return getFMComposerManager(project);
+	/*
+	 * 
+	 * this should be done once at the constructor		
+	 * 
+	 * @return the fMComposerExtension
+	 */
+	public IFMComposerExtension initFMComposerExtension(IProject project) {
+		setComposerID(project);
+		setComposer();
+		return fmComposerExtension;
 	}
 
 	public IFMComposerExtension getFMComposerExtension() {
-		return getFMComposerManager(null).getFMComposerExtension();
+		return fmComposerExtension;
 	}
-	
-	@Override
-	public RenamingsManager getRenamingsManager() {
-		return renamingsManager;
+
+	/**
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelLayout#setLayout(int)} instead.
+	 */
+	@Deprecated
+	public void setLayout(int newLayoutAlgorithm) {
+	    layout.setLayout(newLayoutAlgorithm);
+	}
+
+	/**
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelLayout#getLayoutAlgorithm()} instead.
+	 */
+	@Deprecated
+	public int getLayoutAlgorithm() {
+	    return layout.getLayoutAlgorithm();
 	}
 	
 	public void reset() {
-		if (rootFeature != null) {
-			while (rootFeature.hasChildren()) {
-				Feature child = rootFeature.getLastChild();
+		if (root != null) {
+			while (root.hasChildren()) {
+				Feature child = root.getLastChild();
 				deleteChildFeatures(child);
-				rootFeature.removeChild(child);
+				root.removeChild(child);
 				featureTable.remove(child.getName());
 			}
-			rootFeature = null;
+			root = null;
 		}
 		featureTable.clear();
-		renamingsManager.clear();
+		renamings.clear();
 		constraints.clear();
 		comments.clear();
 		annotations.clear();
@@ -160,11 +206,6 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		}
 	}
 	
-	/**
-	 * Creates a default {@link FeatureModel} with a root feature named as the project and a
-	 * child feature named base.
-	 * @param projectName The name of the project
-	 */
 	public void createDefaultValues(String projectName) {
 		String rootName = getValidJavaIdentifier(projectName);
 		Feature root;
@@ -178,27 +219,6 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		root.addChild(feature);
 		addFeature(feature);
 	}
-	
-	/**
-	 * Removes all invalid java identifiers form a given string.
-	 */
-	private String getValidJavaIdentifier(String s) {
-		StringBuilder stringBuilder = new StringBuilder();
-		int i = 0;
-		for (; i < s.length(); i++) {
-			if (Character.isJavaIdentifierStart(s.charAt(i))) {
-				stringBuilder.append(s.charAt(i));
-				i++;
-				break;
-			}
-		}
-		for (; i < s.length(); i++) {
-			if (Character.isJavaIdentifierPart(s.charAt(i))) {
-				stringBuilder.append(s.charAt(i));
-			}
-		}
-		return stringBuilder.toString();
-	}
 
 	/* *****************************************************************
 	 * 
@@ -206,20 +226,19 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	 * 
 	 *******************************************************************/
 	public void setRoot(Feature root) {
-		this.rootFeature = root;
+		this.root = root;
 	}
 	
 	public Feature getRoot() {
-		return rootFeature;
+		return root;
 	}
 
 	/**
 	 * @param featureTable
 	 *            the featureTable to set
 	 */
-	public void setFeatureTable(final Hashtable<String, Feature> featureTable) {
-		this.featureTable.clear();
-		this.featureTable.putAll(featureTable);
+	public void setFeatureTable(Hashtable<String, Feature> featureTable) {
+		this.featureTable = featureTable;
 	}
 	
 	public boolean addFeature(Feature feature) {
@@ -231,7 +250,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	}
 	
 	public Collection<Feature> getFeatures() {
-		return Collections.unmodifiableCollection(featureTable.values());
+		return new ArrayList<Feature>(featureTable.values());
 	}
 	
 	// TODO this seems to be a false implementation
@@ -244,9 +263,9 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	public Feature getFeature(String name) {
 		if (featureTable.isEmpty()) {
 			// create the root feature (it is the only one without a reference)
-			rootFeature = new Feature(this, name);
-			addFeature(rootFeature);
-			return rootFeature;
+			root = new Feature(this, name);
+			addFeature(root);
+			return root;
 		}
 		return featureTable.get(name);
 	}
@@ -257,14 +276,14 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	 */
 	@Nonnull
 	public Collection<Feature> getConcreteFeatures() {
-		List<Feature> concreteFeatures = new LinkedList<Feature>();
-		if (rootFeature != null) {
-			getConcreteFeatures(rootFeature, concreteFeatures);
+		LinkedList<Feature> concreteFeatures = new LinkedList<Feature>();
+		if (root != null) {
+			getConcreteFeatures(root, concreteFeatures);
 		}
 		return Collections.unmodifiableCollection(concreteFeatures);
 	}
 
-	private void getConcreteFeatures(Feature feature, List<Feature> concreteFeatures) {
+	private void getConcreteFeatures(Feature feature, LinkedList<Feature> concreteFeatures) {
 		if (feature.isConcrete()) {
 			concreteFeatures.add(feature);
 		}
@@ -278,8 +297,8 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	 * @return A list of all concrete feature names. This list is in preorder of the tree. 
 	 */
 	@Nonnull
-	public List<String> getConcreteFeatureNames() {
-		List<String> concreteFeatureNames = new LinkedList<String>();
+	public LinkedList<String> getConcreteFeatureNames() {
+		LinkedList<String> concreteFeatureNames = new LinkedList<String>();
 		for (Feature f : getConcreteFeatures()) {
 			concreteFeatureNames.add(f.getName());
 		}
@@ -297,7 +316,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	/**
 	 * @return the featureTable
 	 */
-	public Map<String, Feature> getFeatureTable() {
+	public Hashtable<String, Feature> getFeatureTable() {
 		return featureTable;
 	}
 	
@@ -315,45 +334,48 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 
 	public boolean deleteFeature(Feature feature) {
 		// the root can not be deleted
-		if (feature == rootFeature) {
+		if (feature == root)
 			return false;
-		}
 
 		// check if it exists
 		String name = feature.getName();
-		if (!featureTable.containsKey(name)) {
+		if (!featureTable.containsKey(name))
 			return false;
-		}
 
 		// use the group type of the feature to delete
 		Feature parent = feature.getParent();
 
 		if (parent.getChildrenCount() == 1) {
-			if (feature.isAnd()) {
+			if (feature.isAnd())
 				parent.setAnd();
-			} else if (feature.isAlternative()) {
+			else if (feature.isAlternative())
 				parent.setAlternative();
-			} else {
+			else
 				parent.setOr();
-			}
 		}
 
 		// add children to parent
 		int index = parent.getChildIndex(feature);
-		while (feature.hasChildren()) {
+		while (feature.hasChildren())
 			parent.addChildAtPosition(index, feature.removeLastChild());
-		}
 
 		// delete feature
 		parent.removeChild(feature);
 		featureTable.remove(name);
-		featureOrderList.remove(name);
+		
+		// remove feature from order list
+		for (int i = 0;i < featureOrderList.size();i++) {
+			if (featureOrderList.get(i).equals(name)) {
+				featureOrderList.remove(i);
+				break;
+			}
+		}
 		return true;
 	}
 	
 	public void replaceRoot(Feature feature) {
-		featureTable.remove(rootFeature.getName());
-		rootFeature = feature;
+		featureTable.remove(root.getName());
+		root = feature;
 	}
 
 	/* *****************************************************************
@@ -361,9 +383,8 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	 * Constraint handling
 	 * 
 	 *#*****************************************************************/
-	public void setConstraints(final LinkedList<Constraint> constraints) {
-		this.constraints.clear();
-		this.constraints.addAll(constraints);
+	public void setConstraints(LinkedList<Constraint> constraints) {
+		this.constraints = constraints;
 	}
 	
 	public void addPropositionalNode(Node node) {
@@ -393,7 +414,6 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	public Node getConstraint(int index) {
 		return constraints.get(index).getNode();
 	}
-	
 	public List<Constraint> getConstraints() {
 		return Collections.unmodifiableList(constraints);
 	}
@@ -440,6 +460,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	public int getConstraintCount() {
 		return constraints.size();
 	}
+	/* ************************************************************/
 	
 	public List<String> getAnnotations() {
 		return Collections.unmodifiableList(annotations);
@@ -457,10 +478,168 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		comments.add(comment);
 	}
 	
-	public void addListener(PropertyChangeListener listener) {
-		if (!listenerList.contains(listener)) {
-			listenerList.add(listener);
+	/* *****************************************************************
+	 * 
+	 * Renaming
+	 * 
+	 *#*****************************************************************/
+	public boolean renameFeature(String oldName, String newName) {
+		if (!featureTable.containsKey(oldName)
+				|| featureTable.containsKey(newName))
+			return false;
+		Feature feature = featureTable.remove(oldName);
+		feature.setName(newName);
+		featureTable.put(newName, feature);
+		renamings.add(new Renaming(oldName, newName));
+		for (Constraint c : constraints) {
+			renameVariables(c.getNode(), oldName, newName);
 		}
+		
+		// update the feature order list
+		for (int i = 0;i < featureOrderList.size();i++) {
+			if (featureOrderList.get(i).equals(oldName)) {
+				featureOrderList.set(i, newName);
+				break;
+			}
+		}
+		return true;
+	}
+	
+	public boolean isRenamed() {
+		return (renamings.size() != 0);
+	}
+
+	public void performRenamings() {
+		for (Renaming renaming : renamings) {
+			for (Constraint c : constraints)
+				renameVariables(c.getNode(), renaming.oldName, renaming.newName);
+		}
+		renamings.clear();
+	};
+
+	public void performRenamings(IFile file) {
+		IProject project = ((IResource) file.getAdapter(IFile.class))
+				.getProject();
+		String sourceName = getProjectConfigurationPath(project);
+		if (!"".equals(sourceName)) {
+			sourceFolder = project.getFolder(sourceName);
+		}
+		for (Renaming renaming : renamings) {
+			if (!performComposerRenamings(renaming.oldName, renaming.newName,
+					project)) {
+				moveFolder(renaming.oldName, renaming.newName);
+			}
+		}
+		if (colorschemeTable.getColorFile(project).exists()) {
+			colorschemeTable.readColorsFromFile(project);
+			colorschemeTable.saveColorsToFile(project);
+		}
+		renamings.clear();
+	}
+
+	private boolean performComposerRenamings(final String oldName,
+			final String newName, final IProject project) {
+		return initFMComposerExtension(project).performRenaming(oldName,	newName, project);
+	}
+
+	public void moveFolder(String oldName, String newName) {
+		try {
+			IFolder folder = sourceFolder.getFolder(oldName);
+			if (folder.exists()) {
+				if (!sourceFolder.getFolder(newName).exists()) {
+					IPath newPath = sourceFolder.getFolder(newName)
+							.getFullPath();
+					folder.move(newPath, true, null);
+				} else {
+					move(folder, oldName, newName);
+				}
+			}
+		} catch (CoreException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+	}
+
+	/**
+	 * @param folder
+	 * @param oldName
+	 * @param newName
+	 * @throws CoreException
+	 */
+	private void move(IFolder folder, String oldName, String newName)
+			throws CoreException {
+		for (IResource res : folder.members()) {
+			if (res instanceof IFile) {
+				IFile newfile = sourceFolder.getFolder(newName).getFile(
+						res.getName());
+				if (!newfile.exists()) {
+					res.move(newfile.getRawLocation(), true, null);
+				}
+			}
+			if (res instanceof IFolder) {
+				IFolder newfile = sourceFolder.getFolder(newName).getFolder(
+						res.getName());
+				if (!newfile.exists()) {
+					res.move(newfile.getRawLocation(), true, null);
+				}
+			}
+		}
+	}
+
+	private void renameVariables(Node node, String oldName, String newName) {
+		if (node instanceof Literal) {
+			if (oldName.equals(((Literal) node).var))
+				((Literal) node).var = newName;
+			return;
+		}
+
+		for (Node child : node.getChildren())
+			renameVariables(child, oldName, newName);
+	}
+	
+	/**
+	 * Returns the current name of a feature given its name at the last save.
+	 * 
+	 * @param name
+	 *            name when last saved
+	 * @return current name of this feature
+	 */
+	public String getNewName(String name) {
+		for (Renaming renaming : renamings)
+			if (renaming.oldName.equals(name))
+				name = renaming.newName;
+		return name;
+	}
+
+	/**
+	 * Returns the name of a feature at the time of the last save given its
+	 * current name.
+	 * 
+	 * @param name
+	 *            current name of a feature
+	 * @return name when last saved
+	 */
+	public String getOldName(String name) {
+		for (int i = renamings.size() - 1; i >= 0; i--)
+			if (renamings.get(i).newName.equals(name))
+				name = renamings.get(i).oldName;
+		return name;
+	}
+
+	public Set<String> getOldFeatureNames() {
+		Set<String> names = new HashSet<String>(featureTable.keySet());
+		for (int i = renamings.size() - 1; i >= 0; i--) {
+			Renaming renaming = renamings.get(i);
+			names.remove(renaming.newName);
+			names.add(renaming.oldName);
+		}
+		return Collections.unmodifiableSet(names);
+	}
+	
+	/* ************************************************************/
+
+	public void addListener(PropertyChangeListener listener) {
+		if (!listenerList.contains(listener))
+			listenerList.add(listener);
 	}
 
 	public void removeListener(PropertyChangeListener listener) {
@@ -468,50 +647,472 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	}
 	
 	public void handleModelDataLoaded() {
-		fireEvent(MODEL_DATA_LOADED);
+		PropertyChangeEvent event = new PropertyChangeEvent(this,
+				MODEL_DATA_LOADED, Boolean.FALSE, Boolean.TRUE);
+		for (PropertyChangeListener listener : listenerList)
+			listener.propertyChange(event);
 	}
 
 	public void handleModelDataChanged() {
-		fireEvent(MODEL_DATA_CHANGED);
+		PropertyChangeEvent event = new PropertyChangeEvent(this,
+				MODEL_DATA_CHANGED, Boolean.FALSE, Boolean.TRUE);
+		for (PropertyChangeListener listener : listenerList)
+			listener.propertyChange(event);
 	}
 	
 	public void handleModelLayoutChanged() {
-		fireEvent(MODEL_LAYOUT_CHANGED);
+		PropertyChangeEvent event = new PropertyChangeEvent(this,
+				MODEL_LAYOUT_CHANGED, Boolean.FALSE, Boolean.TRUE);
+		for (PropertyChangeListener listener : listenerList)
+			listener.propertyChange(event);
 	}
 	
 	public void refreshContextMenu() {
-		fireEvent(REFRESH_ACTIONS);
+		PropertyChangeEvent event = new PropertyChangeEvent(this,
+				REFRESH_ACTIONS, Boolean.FALSE, Boolean.TRUE);
+		for (PropertyChangeListener listener : listenerList)
+			listener.propertyChange(event);
 	}
 	/**
 	 * Refreshes the diagram colors.
 	 */
 	public void redrawDiagram() {
-		fireEvent(REDRAW_DIAGRAM);
+		PropertyChangeEvent event = new PropertyChangeEvent(this,
+				REDRAW_DIAGRAM, Boolean.FALSE, Boolean.TRUE);
+		for (PropertyChangeListener listener : listenerList)
+			listener.propertyChange(event);
 	}
 	
-	private final void fireEvent(final String action) {
-		final PropertyChangeEvent event = new PropertyChangeEvent(this,
-				action, Boolean.FALSE, Boolean.TRUE);
-		for (PropertyChangeListener listener : listenerList) {
-			listener.propertyChange(event);
-		}
+//	public void handleFeatureNameChanged() {
+//		PropertyChangeEvent event = new PropertyChangeEvent(this,
+//				FEATURE_NAME_CHANGED, Boolean.FALSE, Boolean.TRUE);
+//		for (PropertyChangeListener listener : listenerList)
+//			listener.propertyChange(event);
+//	}
+
+	/**
+	 * Returns the value calculated during the last call of
+	 * updateFeatureModel().
+	 * 
+	 * @return cached value
+	 */
+	public boolean valid() {
+		return valid;
 	}
+	
+    /**
+     * 
+     * @return Hashmap: key entry is Feature/Constraint, value usually indicating the kind of attribute
+     * 
+     * 	if Feature 
+     * 
+     * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#analyzeFeatureModel()} instead. 
+     */
+	@Deprecated
+	public HashMap<Object, Object> analyzeFeatureModel() {
+	    return analyser.analyzeFeatureModel(null);
+	}
+
+	@SuppressWarnings("unchecked")
 	@Override
 	public FeatureModel clone() {
-		final FeatureModel clone = new FeatureModel();
-		clone.featureTable.putAll(featureTable);
-		if (rootFeature == null) {
-			clone.rootFeature = new Feature(clone, "Root");
-			clone.featureTable.put("root", clone.rootFeature);
-		} else {
-			// TODO this should never happen
-			clone.rootFeature = clone.getFeature(rootFeature.getName());
+		FeatureModel clone = new FeatureModel();
+		clone.root = root != null ? root.clone() : new Feature(clone, "Root");
+		List<Feature> list = new LinkedList<Feature>();
+		list.add(clone.root);
+		while (!list.isEmpty()) {
+			Feature feature = list.remove(0);
+			clone.featureTable.put(feature.getName(), feature);
+			for (Feature child : feature.getChildren())
+				list.add(child);
 		}
-		clone.constraints.addAll(constraints);
-		clone.annotations.addAll(annotations);
-		clone.comments.addAll(comments);
+		clone.constraints = (LinkedList<Constraint>) constraints.clone();
+		for (int i = 0; i < annotations.size(); i++)
+			clone.annotations.add(annotations.get(i));
+		for (int i = 0; i < comments.size(); i++)
+			clone.comments.add(comments.get(i));
 		clone.colorschemeTable = colorschemeTable.clone(clone);
 		return clone;
+	}
+
+	/**
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#isValid()} instead.
+	 */
+	@Deprecated
+	public boolean isValid() throws TimeoutException {
+	    return analyser.isValid();
+	}
+
+	/**
+	 * checks whether A implies B for the current feature model.
+	 * 
+	 * in detail the following condition should be checked whether
+	 * 
+	 * FM => ((A1 and A2 and ... and An) => (B1 and B2 and ... and Bn))
+	 * 
+	 * is true for all values
+	 * 
+	 * @param A
+	 *            set of features that form a conjunction
+	 * @param B
+	 *            set of features that form a conjunction
+	 * @return
+	 * @throws TimeoutException
+	 * 
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#checkImplies(Set, Set)} instead.
+	 */
+	@Deprecated
+	public boolean checkImplies(Set<Feature> a, Set<Feature> b)
+			throws TimeoutException {
+	    	return analyser.checkImplies(a, b);
+	}
+
+	/**
+	 * checks some condition against the feature model. use only if you know
+	 * what you are doing!
+	 * 
+	 * @return
+	 * @throws TimeoutException
+	 * 
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#checkCondition(Node)} instead.
+	 */
+	@Deprecated
+	public boolean checkCondition(Node condition) {
+	    	return analyser.checkCondition(condition);
+	}
+
+	/**
+	 * Checks whether the given featureSets are mutually exclusive in the given
+	 * context and for the current feature model.
+	 * 
+	 * In detail it is checked whether FM => (context => (at most one of the
+	 * featureSets are present)) is a tautology.
+	 * 
+	 * Here is an example for a truth table of
+	 * "at most one the featureSets are present" for three feature sets A, B and
+	 * C:
+	 * 
+	 * A B C result ------------------------ T T T F T T F F T F T F T F F T F T
+	 * T F F T F T F F T T F F F T
+	 * 
+	 * If you want to check XOR(featureSet_1, ..., featureSet_n) you can call
+	 * areMutualExclusive() && !mayBeMissing().
+	 * 
+	 * @param context
+	 *            context in which everything is checked
+	 * @param featureSets
+	 *            list of feature sets that are checked to be mutually exclusive
+	 *            in the given context and for the current feature model
+	 * 
+	 * @return true, if the feature sets are mutually exclusive || false,
+	 *         otherwise
+	 * @throws TimeoutException
+	 * 
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#areMutualExclusive(Set, List)} instead.
+	 */
+	@Deprecated
+	public boolean areMutualExclusive(Set<Feature> context,
+			List<Set<Feature>> featureSets) throws TimeoutException {
+	    	return analyser.areMutualExclusive(context, featureSets);
+	}
+
+	/**
+	 * Checks whether there exists a set of features that is valid within the
+	 * feature model and the given context, so that none of the given feature
+	 * sets are present, i.e. evaluate to true.
+	 * 
+	 * In detail it is checked whether there exists a set F of features so that
+	 * eval(FM, F) AND eval(context, F) AND NOT(eval(featureSet_1, F)) AND ...
+	 * AND NOT(eval(featureSet_n, F)) is true.
+	 * 
+	 * If you want to check XOR(featureSet_1, ..., featureSet_n) you can call
+	 * areMutualExclusive() && !mayBeMissing().
+	 * 
+	 * @param context
+	 *            context in which everything is checked
+	 * @param featureSets
+	 *            list of feature sets
+	 * 
+	 * @return true, if there exists such a set of features, i.e. if the
+	 *         code-fragment may be missing || false, otherwise
+	 * @throws TimeoutException
+	 * 
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#mayBeMissing(Set, List)} instead.
+	 */
+	@Deprecated
+	public boolean mayBeMissing(Set<Feature> context,
+			List<Set<Feature>> featureSets) throws TimeoutException {
+		return analyser.mayBeMissing(context, featureSets);
+	}
+
+	/**
+	 * Checks whether there exists a set of features that is valid within the
+	 * feature model, so that all given features are present.
+	 * 
+	 * In detail it is checked whether there exists a set F of features so that
+	 * eval(FM, F) AND eval(feature_1, F) AND eval(feature_n, F) is true.
+	 * 
+	 * @param features
+	 * 
+	 * @return true if there exists such a set of features || false, otherwise
+	 * @throws TimeoutException
+	 * 
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#exists(Set)} instead.
+	 */
+	@Deprecated
+	public boolean exists(Set<Feature> features) throws TimeoutException {
+	    	return analyser.exists(features);
+	}
+
+	/**
+	 * 
+	 * @param b
+	 * @return
+	 * 
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#conjunct(Set)} instead.
+	 */
+	@Deprecated
+	public Node conjunct(Set<Feature> b) {
+	    	return analyser.conjunct(b);
+	}
+
+	/**
+	 * 
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#countConcreteFeatures()} instead.
+	 */
+	@Deprecated
+	public int countConcreteFeatures() {
+	    return analyser.countConcreteFeatures();
+	}
+
+	/**
+	 * 
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#countHiddenFeatures()} instead.
+	 */
+	@Deprecated
+	public int countHiddenFeatures() {
+	    return analyser.countHiddenFeatures();
+	}
+
+	/**
+	 * 
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#countTerminalFeatures()} instead.
+	 */
+	@Deprecated
+	public int countTerminalFeatures() {
+	    return analyser.countTerminalFeatures();
+	}
+
+	/**
+	 * Returns the list of features that occur in all variants, where one of the
+	 * given features is selected. If the given list of features is empty, this
+	 * method will calculate the features that are present in all variants
+	 * specified by the feature model.
+	 * 
+	 * @param timeout
+	 *            in milliseconds
+	 * @param selectedFeatures
+	 *            a list of feature names for which
+	 * @return a list of features that is common to all variants
+	 * 
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#commonFeatures(long, Object...)} instead.
+	 */
+	@Deprecated
+	public LinkedList<String> commonFeatures(long timeout,
+			Object... selectedFeatures) {
+	    	return analyser.commonFeatures(timeout, selectedFeatures);
+	}
+
+	/**
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#getDeadFeatures()} instead.
+	 */
+	@Deprecated
+	public LinkedList<Feature> getDeadFeatures() {
+	    	return analyser.getDeadFeatures();
+	}
+	
+	/**
+	 * Removes all invalid java identifiers form a given string.
+	 */
+	private String getValidJavaIdentifier(String s) {
+		StringBuilder stringBuilder = new StringBuilder();
+		int i = 0;
+		for (; i < s.length(); i++) {
+			if (Character.isJavaIdentifierStart(s.charAt(i))) {
+				stringBuilder.append(s.charAt(i));
+				i++;
+				break;
+			}
+		}
+		for (; i < s.length(); i++) {
+			if (Character.isJavaIdentifierPart(s.charAt(i))) {
+				stringBuilder.append(s.charAt(i));
+			}
+		}
+		return stringBuilder.toString();
+	}
+
+	public String getProjectConfigurationPath(IProject project) {
+		try {
+			String path = project.getPersistentProperty(sourceFolderConfigID);
+			if (path != null)
+				return path;
+
+			path = getPath(project, SOURCE_ARGUMENT);
+			if (path == null)
+				return DEFAULT_SOURCE_PATH;
+			return path;
+		} catch (Exception e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+		return DEFAULT_SOURCE_PATH;
+	}
+
+	private String getPath(IProject project, String argument) {
+		try {
+			for (ICommand command : project.getDescription().getBuildSpec()) {
+				if (BUILDER_ID.equals(command.getBuilderName())) {
+					return (String) command.getArguments().get(argument);
+				}
+			}
+		} catch (CoreException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+		return null;
+	}
+
+	/**
+	 * for unit testing purposes only
+	 * @param s
+	 */
+	public void setComposerID(String s, Object o) {
+		COMPOSER_ID = s;
+		fmComposerExtension = (IFMComposerExtension)o;
+		/*final FeatureModelingFMExtension f;// = new FMComposerExtension();
+		fmComposerExtension =  (IFMComposerExtension)f;*/
+		//setComposer();
+	}
+	
+	
+	private void setComposerID(IProject project) {
+		if(project==null)return;
+		try {
+			String id = project.getPersistentProperty(composerConfigID);
+			if (id != null) {
+				COMPOSER_ID = id;
+				return;
+			}
+			
+			
+			for (ICommand command : project.getDescription().getBuildSpec()) {
+				if (BUILDER_ID.equals(command.getBuilderName())) {
+					id = (String) command.getArguments().get(COMPOSER_KEY);
+					if (id != null) {
+						COMPOSER_ID = id;
+						return;
+					}
+				}
+			}
+
+		} catch (CoreException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+		COMPOSER_ID = null;
+	}
+
+	private void setComposer() {
+		if (COMPOSER_ID == null) {
+			return;
+		}
+		
+		IConfigurationElement[] config = Platform.getExtensionRegistry()
+				.getConfigurationElementsFor(
+						FMCorePlugin.PLUGIN_ID + ".FMComposer");
+		try {
+			for (IConfigurationElement e : config) {
+				if (e.getAttribute("composer").equals(COMPOSER_ID)) {
+					final Object o = e.createExecutableExtension("class");
+					if (o instanceof IFMComposerExtension) {
+						fmComposerExtension = (IFMComposerExtension) o;
+					}
+				}
+			}
+			fmComposerExtension.hasComposer(true);
+		} catch (Exception e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+	}
+
+	/**
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelLayout#getLegendPos()} instead.
+	 */
+	@Deprecated
+	public FMPoint getLegendPos() {
+	    return layout.getLegendPos();
+	}
+
+	/**
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelLayout#setLegendPos(int, int)} instead.
+	 */
+	@Deprecated
+	public void setLegendPos(int x, int y) {
+	    layout.setLegendPos(x, y);
+	}
+
+	/**
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelLayout#setLegendAutoLayout(boolean)} instead.
+	 */
+	@Deprecated
+	public void setLegendAutoLayout(boolean b) {
+	    layout.setLegendAutoLayout(b);
+	}
+
+	/**
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelLayout#hasLegendAutoLayout()} instead.
+	 */
+	@Deprecated
+	public boolean hasLegendAutoLayout() {
+	    return layout.hasLegendAutoLayout();
+	}
+
+	/**
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelLayout#hasFeaturesAutoLayout()} instead.
+	 */
+	@Deprecated
+	public boolean hasFeaturesAutoLayout() {
+	    return layout.hasFeaturesAutoLayout();
+	}
+
+	/**
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelLayout#showHiddenFeatures()} instead.
+	 */
+	@Deprecated
+	public boolean showHiddenFeatures() {
+	    return layout.showHiddenFeatures();
+	}
+
+	/**
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelLayout#showHiddenFeatures(boolean)} instead.
+	 */
+	@Deprecated
+	public void showHiddenFeatures(boolean b) {
+	    layout.showHiddenFeatures(b);
+	}
+
+	/**
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelLayout#verticalLayout()} instead.
+	 */
+	@Deprecated
+	public boolean verticalLayout() {
+	    return layout.verticalLayout();
+	}
+
+	/**
+	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelLayout#verticalLayout(boolean)} instead.
+	 */
+	@Deprecated
+	public void verticalLayout(boolean b) {
+	    layout.verticalLayout(b);
 	}
 
 	/**
@@ -531,7 +1132,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	 */
 	public boolean hasOptionalFeatures() {
 		for (Feature f : featureTable.values()) {
-			if (!f.equals(rootFeature) && f.getParent().isAnd()
+			if (!f.equals(root) && f.getParent().isAnd()
 					&& !f.isMandatory())
 				return true;
 		}
@@ -610,42 +1211,78 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		return count;
 	}
 	
+	public int[] getStatisticNumbers() {
+		int cAbstract = 0, cConcrete = 0, cMandatory = 0, cOptional = 0, cAnd = 0, cOr = 0, cOrChildren = 0, cAlt = 0, cAltChildren = 0;
+		for (Feature f : featureTable.values()) {
+			if (f.isConcrete()) {
+				cConcrete++;
+			} else {
+				cAbstract++;
+			}
+			if (f.isMandatorySet()) {
+				if (f.getParent() == null || f.getParent().isAnd() || f.getParent().getChildrenCount() == 1) {
+					cMandatory++;
+				}
+			} else if (f.getParent() != null && f.getParent().isAnd()) {
+				cOptional++;
+			}
+			int cChildren = f.getChildrenCount();
+			if (cChildren > 1) {
+				if (f.isAlternative()) {
+					cAlt++;
+					cAltChildren += cChildren;
+				} else if (f.isOr()) {
+					cOr++;
+					cOrChildren += cChildren;
+				} else if (f.isAnd()) {
+					cAnd++;
+				}
+			}
+		}
+		return new int[]{featureTable.size(), cAbstract, cConcrete, cAnd, cOr, cAlt, cMandatory, cOptional, cOrChildren, cAltChildren};
+	}
+
 	/**
 	 * 
 	 * @return <code>true</code> if the feature model contains a hidden feature
 	 */
+	/*
+	 * TODO sometimes this method returns false while the model has hidden features 	
+	 * 		the model seems to be initialized wrong 
+	 */
 	public boolean hasHidden() {
-		for (Feature f : featureTable.values()) {
-			if (f.isHidden()) {
+		for (Feature f : new ArrayList<Feature>(featureTable.values())) {
+			if (f.isHidden())
 				return true;
-			}
 		}
 		return false;
 	}
 
+	@Deprecated
+	public boolean hasDead() {
+		return this.getDeadFeatures().size() > 0;
+	}
+	
 	public boolean hasIndetHidden() {
 		for (Feature f : featureTable.values()) {
-			if (f.getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN) {
+			if (f.getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN)
 				return true;
-			}
 		}
 		return false;
 	}
 	
 	public boolean hasUnsatisfiableConst() {
 		for (Constraint c : constraints) {
-			if (c.getConstraintAttribute() == ConstraintAttribute.UNSATISFIABLE) {
+			if (c.getConstraintAttribute() == ConstraintAttribute.UNSATISFIABLE)
 				return true;
-			}
 		}
 		return false;
 	}
 	
 	public boolean hasTautologyConst() {
 		for (Constraint c : constraints) {
-			if (c.getConstraintAttribute() == ConstraintAttribute.TAUTOLOGY) {
+			if (c.getConstraintAttribute() == ConstraintAttribute.TAUTOLOGY)
 				return true;
-			}
 		}
 		return false;
 	}
@@ -668,9 +1305,8 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	
 	public boolean hasRedundantConst() {
 		for (Constraint c : constraints) {
-			if (c.getConstraintAttribute() == ConstraintAttribute.REDUNDANT) {
+			if (c.getConstraintAttribute() == ConstraintAttribute.REDUNDANT)
 				return true;
-			}
 		}
 		return false;
 	}
@@ -678,9 +1314,8 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 
 	public boolean hasFalseOptionalFeatures() {
 		for (Feature f : featureTable.values()) {
-			if (f.getFeatureStatus() == FeatureStatus.FALSE_OPTIONAL) {
+			if (f.getFeatureStatus() == FeatureStatus.FALSE_OPTIONAL)
 				return true;
-			}
 		}
 		return false;
 	}
@@ -688,49 +1323,102 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	public void setUndoContext(Object undoContext) {
 		this.undoContext = undoContext;
 	}
-
+	
+	/**
+	 * @return
+	 */
 	public Object getUndoContext() {
 		return undoContext;
 	}
-
+	
+	/**
+	 * @return the featureOrderList
+	 */
 	public List<String> getFeatureOrderList() {
-		if (featureOrderList.isEmpty()) {
-			return getConcreteFeatureNames();
-		}
 		return featureOrderList;
 	}
 
-	public void setFeatureOrderList(final List<String> featureOrderList) {
-		this.featureOrderList.clear();
-		this.featureOrderList.addAll(featureOrderList);
+	/**
+	 * @param featureOrderList
+	 *            the featureOrderList to set
+	 */
+	public void setFeatureOrderList(List<String> featureOrderList) {
+		this.featureOrderList = featureOrderList;
 	}
 
+	/**
+	 * @return the featureOrderUserDefined
+	 */
 	public boolean isFeatureOrderUserDefined() {
 		return featureOrderUserDefined;
 	}
 
+	/**
+	 * @param featureOrderUserDefined
+	 *            the featureOrderUserDefined to set
+	 */
 	public void setFeatureOrderUserDefined(boolean featureOrderUserDefined) {
 		this.featureOrderUserDefined = featureOrderUserDefined;
 	}
 
+	/**
+	 * @return the featureOrderInXML
+	 */
 	public boolean isFeatureOrderInXML() {
 		return featureOrderInXML;
 	}
 
+	/**
+	 * @param featureOrderInXML
+	 *            the featureOrderInXML to set
+	 */
 	public void setFeatureOrderInXML(boolean featureOrderInXML) {
 		this.featureOrderInXML = featureOrderInXML;
 	}
 	
+    public FeatureModelAnalyzer getAnalyser() {
+    	return analyser;
+    }
+
+	/**
+	 * @return the falseOptionalFeatures
+	 */
+	public LinkedList<Feature> getFalseOptionalFeatures() {
+		return falseOptionalFeatures;
+	}
+
+    public FeatureModelLayout getLayout() {
+    	return layout;
+    }
+
+	/**
+	 * @return the dead features
+	 */
+	public LinkedList<Feature> getCalculatedDeadFeatures() {
+		return deadFeatures;
+	}
+
+	/**
+	 * @return the colorschemeTable
+	 */
+	public ColorschemeTable getColorschemeTable() {
+		return colorschemeTable;
+	}
+	
 	@Override
 	public String toString() {
-		String x = toString(getRoot());
-		for (Constraint c : getConstraints()) {
+		return print(this);
+	}
+	
+	private String print(FeatureModel fm) {
+		String x = printFeatures(fm.getRoot());
+		for (Constraint c : fm.getConstraints()) {
 			x +=c.toString() + " ";
 		}
 		return x;
 	}
-	
-	private String toString(Feature feature) {
+
+	private String printFeatures(Feature feature) {
 		String x = feature.getName();
 		if (!feature.hasChildren()) {
 			return x;
@@ -754,12 +1442,35 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 			}
 			
 			if (child.hasChildren()) {
-				x += toString(child);
+				x += printFeatures(child);
 			} else {
 				x += child.getName();
 			}
 		}
 		return x + " ] ";
 	}
-
+	
+	/** 
+	 * TODO seems to be duplicated entries for Features! 
+	 **/
+	public LinkedList<String> getFeatureList(){
+		featureList.add(this.getRoot().getName());
+		getFeatureList(this.getRoot());
+		return featureList;
+	}
+	
+	private LinkedList<String> featureList = new LinkedList<String>();
+	
+	private LinkedList<String> getFeatureList(Feature feature) {
+		for (Feature child : feature.getChildren()) {
+			featureList.add(child.getName());
+		}
+		
+		for (Feature child : feature.getChildren()) {	
+			getFeatureList(child);
+		}
+		return featureList;
+	}
+	
+	
 }

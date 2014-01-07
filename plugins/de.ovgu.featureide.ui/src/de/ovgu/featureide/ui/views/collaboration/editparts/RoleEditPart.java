@@ -45,11 +45,11 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
-import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.figures.RoleFigure;
 import de.ovgu.featureide.ui.views.collaboration.figures.RoleFigureLabel;
+import de.ovgu.featureide.ui.views.collaboration.model.Role;
 import de.ovgu.featureide.ui.views.collaboration.outline.Outline;
 
 /**
@@ -59,13 +59,13 @@ import de.ovgu.featureide.ui.views.collaboration.outline.Outline;
  */
 public class RoleEditPart extends AbstractGraphicalEditPart {
 
-	public RoleEditPart(FSTRole role) {
+	public RoleEditPart(Role role) {
 		super();
 		setModel(role);
 	}
 
-	public FSTRole getRoleModel() {
-		return (FSTRole) getModel();
+	public Role getRoleModel() {
+		return (Role) getModel();
 	}
 
 	@Override
@@ -89,7 +89,7 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 	 */
 	public void performRequest(Request request) {
 		if (REQ_OPEN.equals(request.getType())) {
-			IFile file = this.getRoleModel().getFile();
+			IFile file = this.getRoleModel().getRoleFile();
 			if (file == null)
 				return;
 
@@ -162,7 +162,7 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 				Rectangle rect = label.getBounds();
 				int y = rect.y;
 				if (point.y >= y && point.y <= (y + rect.height)) {
-					LinkedList<FSTField> fields = this.getRoleModel().getFields();
+					LinkedList<FSTField> fields = this.getRoleModel().fields;
 					for (FSTField fstField : fields) {
 						if (fstField.getFullName().equals(label.getElementName())) {
 							editor = openEditor(file);
@@ -173,7 +173,7 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 						}
 					}
 					
-					LinkedList<FSTMethod> methods = this.getRoleModel().getMethods();
+					LinkedList<FSTMethod> methods = this.getRoleModel().methods;
 					for (FSTMethod fstMethod : methods) {
 						if (fstMethod.getFullName().equals(label.getElementName())) {
 							editor = openEditor(file);
@@ -184,13 +184,23 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 						}
 					}
 
-					LinkedList<FSTDirective> directives = this.getRoleModel().getDirectives();
+					LinkedList<FSTDirective> directives = this.getRoleModel().directives;
 					for (FSTDirective fstDirective : directives) {
 						if (fstDirective.toDependencyString().equals(label.getElementName())) {
 							editor = openEditor(file);
 							if (editor != null)	{
 								Outline.scrollToLine(editor, fstDirective.getStartLine(), fstDirective.getEndLine(), fstDirective.getStartOffset(), fstDirective.getEndLength());
 							}
+							return;
+						}
+					}
+					
+	
+					
+					LinkedList<IFile> files = this.getRoleModel().files;
+					for (IFile iFile : files) {
+						if (iFile.getName().equals(label.getElementName())) {
+							openEditor(iFile);
 							return;
 						}
 					}

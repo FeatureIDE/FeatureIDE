@@ -22,7 +22,7 @@ package de.ovgu.featureide.fm.core;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -55,7 +55,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 
 	private ColorList colorList;
 
-	private List<Constraint> partOfConstraints = new LinkedList<Constraint>();
+	private List<Constraint> partOfConstraints = new ArrayList<Constraint>();
 
 	private FeatureStatus status = FeatureStatus.NORMAL;
 
@@ -172,7 +172,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 		fireChildrenChanged();
 	}
 
-	public Collection<Constraint> getRelevantConstraints() {
+	public List<Constraint> getRelevantConstraints() {
 		return partOfConstraints;
 	}
 	
@@ -194,7 +194,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 	}
 
 	public void setRelevantConstraints() {
-		List<Constraint> constraintList = new LinkedList<Constraint>();
+		List<Constraint> constraintList = new ArrayList<Constraint>();
 		for (Constraint constraint : featureModel.getConstraints()) {
 			for (Feature f : constraint.getContainedFeatures()) {
 				if (f.getName().equals(getName())) {
@@ -633,8 +633,5 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 	 * (parent == null) { if (other.parent != null) return false; } else if
 	 * (!parent.equals(other.parent)) return false; return true; }
 	 */
-	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
+
 }

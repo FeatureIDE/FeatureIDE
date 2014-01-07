@@ -49,7 +49,7 @@ public class MetricsHandler extends ColligensAbstractHandler {
 			try {
 				page.showView(MetricsView.ID);
 			} catch (PartInitException e) {
-				
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			controller.run();

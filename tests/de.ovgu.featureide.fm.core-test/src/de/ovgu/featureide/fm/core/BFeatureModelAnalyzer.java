@@ -40,18 +40,53 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
  * @author Jens Meinicke
  */
 public class BFeatureModelAnalyzer {
-
+	
 	private static final FileFilter filter = new FileFilter() {
 		@Override
-		public boolean accept(final File pathname) {
+		public boolean accept(File pathname) {
 			return pathname.getName().endsWith(".xml");
 		}
 	};
 	
-	private final FeatureModel init(final String name) {
+	private FeatureModel berkeley_1 = init("berkeley_db_model.xml");
+	
+	/** The same model without the dead causing constraint */
+	private FeatureModel berkeley_2 = init("berkeley_db_model2.xml");
+	
+	/** 
+	 * A great model with 10000 Features and many constraints
+	 * This model seems to be to large for analysis 
+	 */
+	private FeatureModel fm10000_100 = init("10000-100.xml");
+
+	private FeatureModel fm1000_100 = init("1000-100.xml");
+	
+	private FeatureModel fm500_100 = init("500-100.xml");
+	
+	private FeatureModel fm200_100 = init("200-100.xml");
+	
+	/**
+	 * A copy if 200-100.xml with some random hidden features.
+	 */
+	private FeatureModel fm200_100_hidden = init("200-100-hidden.xml");
+	
+	private FeatureModel fm100_100 = init("100-100.xml");
+	
+	private FeatureModel fm50_100 = init("50-100.xml");
+	
+	private FeatureModel fm20_100 = init("20-100.xml");
+
+	/**
+	 * A copy if 20-100.xml with some random hidden features.
+	 */
+	private FeatureModel fm20_100_hidden = init("20-100-hidden.xml");
+	
+	private FeatureModel fm10_100 = init("10-100.xml");
+	
+	private final FeatureModel init(String name) {
 		FeatureModel fm = new FeatureModel();
-		File modelFileFolder = getFolder();
-		for (File f : modelFileFolder.listFiles(filter)) {
+		File MODEL_FILE_FOLDER = getFolder();
+		for (File f : MODEL_FILE_FOLDER.listFiles(filter)) {
 			if (f.getName().equals(name)) {
 				try {
 					new XmlFeatureModelReader(fm).readFromFile(f);
@@ -77,216 +112,227 @@ public class BFeatureModelAnalyzer {
 	/************************************************************
 	 * Analyzes the model completely.
 	 */
-	private void analyze(final int i) {
+	private void analyze(int i) {
 		getFM(i).getAnalyser().analyzeFeatureModel(null);
 	}
 
-	@Test (timeout=6000) // 0.749s @ i5(3,3GHz)
-	public final void BAnalyzeFeatureModel1() {
+	@Test (timeout=6000) // 1,378s @ i5(3,3GHz)
+	public void BAnalyzeFeatureModel1() {
 		analyze(1);
 	}
 
-	@Test (timeout=2500) // 0.385s @ i5(3,3GHz)
-	public final void BAnalyzeFeatureModel2() {
+	@Test (timeout=2500) // 0,446s @ i5(3,3GHz)
+	public void BAnalyzeFeatureModel2() {
 		analyze(2);
 	}
 	
-	@Test (timeout=100) // 0.007 @ i5(3,3GHz)
-	public final void BAnalyzeFeatureModel10() {
+	@Test (timeout=1000) // 0,055s @ i5(3,3GHz)
+	public void BAnalyzeFeatureModel10() {
 		analyze(10);
 	}
 	
-	@Test (timeout=100) // 0.006s @ i5(3,3GHz)
-	public final void BAnalyzeFeatureModel20() {
+	@Test (timeout=1000) // 0,056s @ i5(3,3GHz)
+	public void BAnalyzeFeatureModel20() {
 		analyze(20);
 	}
 	
-	@Test (timeout=100) // 0.020s @ i5(3,3GHz)
-	public final void BAnalyzeFeatureModel21() {
+	@Test (timeout=1000) // 0,070s @ i5(3,3GHz)
+	public void BAnalyzeFeatureModel21() {
 		analyze(21);
 	}
 	
-	@Test (timeout=200) // 0.036 @ i5(3,3GHz)
-	public final void BAnalyzeFeatureModel50() {
+	@Test (timeout=1000) // 0,086s @ i5(3,3GHz)
+	public void BAnalyzeFeatureModel50() {
 		analyze(50);
 	}
 	
-	@Test (timeout=1000) // 0.142s @ i5(3,3GHz)
-	public final void BAnalyzeFeatureModel100() {
+	@Test (timeout=2000) // 0,227s @ i5(3,3GHz)
+	public void BAnalyzeFeatureModel100() {
 		analyze(100);
 	}
 	
-	@Test (timeout=4000) // 0.886s @ i5(3,3GHz)
-	public final void BAnalyzeFeatureModel200() {
+	@Test (timeout=4500) // 1,001s @ i5(3,3GHz)
+	public void BAnalyzeFeatureModel200() {
 		analyze(200);
 	}
 	
-	@Test (timeout=22000) // 5.519s @ i5(3,3GHz)
-	public final void BAnalyzeFeatureModel201() {
+	@Test (timeout=22000) // 4,380s @ i5(3,3GHz)
+	public void BAnalyzeFeatureModel201() {
 		analyze(201);
 	}
 	
-	@Test (timeout=30000) // 6.147s @ i5(3,3GHz)
-	public final void BAnalyzeFeatureModel500() {
+	@Test (timeout=36000) // 8,172s @ i5(3,3GHz)
+	public void BAnalyzeFeatureModel500() {
 		analyze(500);
 	}
 	
-//	@Test (timeout=300000) // 75.904s @ i5(3,3GHz)
-//	public void BAnalyzeFeatureModel1000() {
-//		analyze(1000);
-//	}
+//	@Test (timeout=300000) // 86,968s @ i5(3,3GHz)
+	public void BAnalyzeFeatureModel1000() {
+		analyze(1000);
+	}
+	
+//	@Test //(timeout=1000000) // ?s @ i5(3,3GHz)
+	public void BAnalyzeFeatureModel10000() {
+		analyze(10000);
+	}
 	
 	/************************************************************
 	 * Analyzes constraints only
 	 */
-	private void BUpdateConstraints(final int i) {
+	private void BUpdateConstraints(int i) {
 		getFM(i).getAnalyser().updateConstraints(new HashMap<Object, Object>(), new HashMap<Object, Object>());
 	}
 	
-	@Test (timeout=2500) // 0.509 @ i5(3,3GHz)
-	public final void BUpdateConstraints1() {
+	@Test (timeout=2000) // 0,367s @ i5(3,3GHz)
+	public void BUpdateConstraints1() {
 		BUpdateConstraints(1);
 	}
 	
-	@Test (timeout=1500) // 0.328 @ i5(3,3GHz)
-	public final void BUpdateConstraints2() {
+	@Test (timeout=2000) // 0,342s @ i5(3,3GHz)
+	public void BUpdateConstraints2() {
 		BUpdateConstraints(2);
 	}
 	
-	@Test (timeout=100) // 0.004s @ i5(3,3GHz)
-	public final void BUpdateConstraints10() {
+	@Test (timeout=800) // 0,050s @ i5(3,3GHz)
+	public void BUpdateConstraints10() {
 		BUpdateConstraints(10);
 	}
 	
-	@Test (timeout=100) // 0.005s @ i5(3,3GHz)
-	public final void BUpdateConstraints20() {
+	@Test (timeout=800) // 0,049s @ i5(3,3GHz)
+	public void BUpdateConstraints20() {
 		BUpdateConstraints(20);
 	}
 	
-	@Test (timeout=100) // 0.004s @ i5(3,3GHz)
-	public final void BUpdateConstraints21() {
+	@Test (timeout=800) // 0,050s @ i5(3,3GHz)
+	public void BUpdateConstraints21() {
 		BUpdateConstraints(21);
 	}
 	
-	@Test (timeout=100) // 0.011s @ i5(3,3GHz)
-	public final void BUpdateConstraints50() {
+	@Test (timeout=1000) // 0,055s @ i5(3,3GHz)
+	public void BUpdateConstraints50() {
 		BUpdateConstraints(50);
 	}
 	
-	@Test (timeout=250) // 0.051s @ i5(3,3GHz)
-	public final void BUpdateConstraints100() {
+	@Test (timeout=1000) // 0,092s @ i5(3,3GHz)
+	public void BUpdateConstraints100() {
 		BUpdateConstraints(100);
 	}
 	
-	@Test (timeout=1500) // 0.233s @ i5(3,3GHz)
-	public final void BUpdateConstraints200() {
+	@Test (timeout=1600) // 0,254s @ i5(3,3GHz)
+	public void BUpdateConstraints200() {
 		BUpdateConstraints(201);
 	}
 	
-	@Test (timeout=1500) // 0.232s @ i5(3,3GHz)
-	public final void BUpdateConstraints201() {
+	@Test (timeout=1600) // 0,290s @ i5(3,3GHz)
+	public void BUpdateConstraints201() {
 		BUpdateConstraints(201);
 	}
 	
-	@Test (timeout=10000) // 1.809s @ i5(3,3GHz)
-	public final void BUpdateConstraints500() {
+	@Test (timeout=16000) // 3,739s @ i5(3,3GHz)
+	public void BUpdateConstraints500() {
 		BUpdateConstraints(500);
 	}
 	
-//	@Test (timeout=140000) //  @ i5(3,3GHz)
-	public final void BUpdateConstraints1000() {
+//	@Test (timeout=140000) // 29,846s @ i5(3,3GHz)
+	public void BUpdateConstraints1000() {
 		BUpdateConstraints(1000);
 	}
 	
 	/************************************************************
 	 * Analyzes features only
 	 */
-	private void BUpdateFeatures(final int i) {
+	private void BUpdateFeatures(int i) {
 		getFM(i).getAnalyser().updateFeatures(new HashMap<Object, Object>(), new HashMap<Object, Object>());
 	}
 	
-	@Test (timeout=500) // 0.053s @ i5(3,3GHz)
-	public final void BUpdateFeatures1() {
+	@Test (timeout=1000) // 0,098 @ i5(3,3GHz)
+	public void BUpdateFeaturess1() {
 		BUpdateFeatures(1);
 	}
 	
-	@Test (timeout=500) // 0.056s @ i5(3,3GHz)
-	public final void BUpdateFeatures2() {
+	@Test (timeout=1000) // 0,098s @ i5(3,3GHz)
+	public void BUpdateFeatures2() {
 		BUpdateFeatures(2);
 	}
 	
-	@Test (timeout=100) // 0.005s @ i5(3,3GHz)
-	public final void BUpdateFeatures10() {
+	@Test (timeout=800) // 0,048s @ i5(3,3GHz)
+	public void BUpdateFeatures10() {
 		BUpdateFeatures(10);
 	}
 	
-	@Test (timeout=100) // 0.005s @ i5(3,3GHz)
-	public final void BUpdateFeatures20() {
+	@Test (timeout=800) // 0,049s @ i5(3,3GHz)
+	public void BUpdateFeatures20() {
 		BUpdateFeatures(20);
 	}
 	
-	@Test (timeout=200) // 0.020s @ i5(3,3GHz)
-	public final void BUpdateFeatures21() {
+	@Test (timeout=800) // 0,061s @ i5(3,3GHz)
+	public void BUpdateFeatures21() {
 		BUpdateFeatures(21);
 	}
 	
-	@Test (timeout=100) // 0.012s @ i5(3,3GHz)
-	public final void BUpdateFeatures50() {
+	@Test (timeout=800) // 0,054s @ i5(3,3GHz)
+	public void BUpdateFeatures50() {
 		BUpdateFeatures(50);
 	}
 	
-	@Test (timeout=200) // 0.027s @ i5(3,3GHz)
-	public final void BUpdateFeatures100() {
+	@Test (timeout=800) // 0,071s @ i5(3,3GHz)
+	public void BUpdateFeatures100() {
 		BUpdateFeatures(100);
 	}
 	
-	@Test (timeout=500) // 0.092s @ i5(3,3GHz)
-	public final void BUpdateFeatures200() {
+	@Test (timeout=1200) // 0,143s @ i5(3,3GHz)
+	public void BUpdateFeatures200() {
 		BUpdateFeatures(200);
 	}
 	
-	@Test (timeout=16000) // 5.446s @ i5(3,3GHz)
-	public final void BUpdateFeatures201() {
+	@Test (timeout=16000) // 3718s @ i5(3,3GHz)
+	public void BUpdateFeatures201() {
 		BUpdateFeatures(201);
 	}
 	
-	@Test (timeout=2500) // 0,465s @ i5(3,3GHz)
-	public final void BUpdateFeatures500() {
+	@Test (timeout=2800) // 0,474s @ i5(3,3GHz)
+	public void BUpdateFeatures500() {
 		BUpdateFeatures(500);
 	}
 	
-	@Test (timeout=10000) // 2,925s @ i5(3,3GHz)
-	public final void BUpdateFeatures1000() {
+	@Test (timeout=10000) // 2,121s @ i5(3,3GHz)
+	public void BUpdateFeatures1000() {
 		BUpdateFeatures(1000);
 	}
-	
-	private FeatureModel getFM(final int i) {
+
+	/**
+	 * @param i
+	 * @return
+	 */
+	private FeatureModel getFM(int i) {
 		switch (i) {
 		case 1:
-			return init("berkeley_db_model.xml");
+			return berkeley_1;
 		case 2 :
-			return init("berkeley_db_model2.xml");
-		case 1000 :
-			return init("1000-100.xml");
-		case 500 :
-			return init("500-101.xml");
-		case 200 :
-			return init("200-100.xml");
-		case 201 :
-			return init("200-100-hidden.xml");
-		case 100 :
-			return init("100-100.xml");
-		case 50 :
-			return init("50-100.xml");
-		case 20 :
-			return init("20-100.xml");
-		case 21 :
-			return init("20-100-hidden.xml");
+			return berkeley_2;
 		case 10 :
-			return init("10-100.xml");
+			return fm10_100;
+		case 20 :
+			return fm20_100;
+		case 21 :
+			return fm20_100_hidden;
+		case 50 :
+			return fm50_100;
+		case 100 :
+			return fm100_100;
+		case 200 :
+			return fm200_100;
+		case 201 :
+			return fm200_100_hidden;
+		case 500 :
+			return fm500_100;
+		case 1000 :
+			return fm1000_100;
+		case 10000 :
+			return fm10000_100;
 		default:
 			System.err.println("NO FM");
-			return init("10-100.xml");
+			return fm10_100;
 		}
 	}
 	

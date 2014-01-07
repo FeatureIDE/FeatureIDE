@@ -19,37 +19,18 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 import br.ufal.ic.colligens.controllers.refactoring.RefactorDataWizard;
 import br.ufal.ic.colligens.controllers.refactoring.RefactorSelectionController;
-import core.RefactoringType;
 
 /**
  * @author Thiago Emmanuel
  * 
  */
 public class RefactorSelectionHandler extends ColligensAbstractHandler {
-	public static String PARM_ID = "br.ufal.ic.colligens.RefactorParameter";
-	public static String COMMAND_ID = "br.ufal.ic.colligens.commands.RefactorCommand";
 	private final String WIZARD_NAME = "Refactoring - Colligens";
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-
-		if (event.getParameter(RefactorSelectionHandler.PARM_ID) != null) {
-			IWorkbenchWindow window = HandlerUtil
-					.getActiveWorkbenchWindow(event);
-
-			this.run(window,
-					event.getParameter(RefactorSelectionHandler.PARM_ID));
-
-		}
-
-		return null;
-	}
-
-	private void run(IWorkbenchWindow window, String type) {
-
-		RefactoringType refactoringType = RefactoringType.valueOf(type);
-
 		ISelection selection = null;
+		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
 		selection = window.getActivePage().getSelection();
 
 		if (selection instanceof TextSelection) {
@@ -65,11 +46,11 @@ public class RefactorSelectionHandler extends ColligensAbstractHandler {
 
 			IFile file = fileEditorInput.getFile();
 
-			refactoringController.setSelection(file, textSelection,
-					refactoringType);
+			refactoringController.setSelection(file, textSelection);
 
 			RefactorDataWizard wizard = new RefactorDataWizard(
 					refactoringController, WIZARD_NAME);
+
 			try {
 				RefactoringWizardOpenOperation operation = new RefactoringWizardOpenOperation(
 						wizard);
@@ -80,6 +61,7 @@ public class RefactorSelectionHandler extends ColligensAbstractHandler {
 				// Do nothing
 			}
 		}
+		return null;
 	}
 
 	@Override

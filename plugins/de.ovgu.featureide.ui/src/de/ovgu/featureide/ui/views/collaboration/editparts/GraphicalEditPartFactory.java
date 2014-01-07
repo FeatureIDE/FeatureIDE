@@ -23,11 +23,10 @@ package de.ovgu.featureide.ui.views.collaboration.editparts;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPartFactory;
 
-import de.ovgu.featureide.core.fstmodel.FSTClass;
-import de.ovgu.featureide.core.fstmodel.FSTFeature;
-import de.ovgu.featureide.core.fstmodel.FSTModel;
-import de.ovgu.featureide.core.fstmodel.FSTRole;
-
+import de.ovgu.featureide.ui.views.collaboration.model.Class;
+import de.ovgu.featureide.ui.views.collaboration.model.Collaboration;
+import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModel;
+import de.ovgu.featureide.ui.views.collaboration.model.Role;
 
 /**
  * Creates editparts for given models.
@@ -39,20 +38,16 @@ public class GraphicalEditPartFactory implements EditPartFactory {
 	/* (non-Javadoc)
 	 * @see org.eclipse.gef.EditPartFactory#createEditPart(org.eclipse.gef.EditPart, java.lang.Object)
 	 */
-	@Override
+	//@Override
 	public EditPart createEditPart(EditPart editPart, Object model) {
-		if (model instanceof FSTModel) {
-			return new ModelEditPart((FSTModel) model);
-		}
-		if (model instanceof FSTRole) {
-			return new RoleEditPart((FSTRole) model);
-		}
-		if (model instanceof FSTClass) {
-			return new ClassEditPart((FSTClass) model);
-		}
-		if (model instanceof FSTFeature) {
-			return new CollaborationEditPart((FSTFeature) model);
-		}
+		if (model instanceof CollaborationModel)
+			return new ModelEditPart((CollaborationModel) model);
+		if (model instanceof Role)
+			return new RoleEditPart((Role) model);
+		if (model instanceof Class)
+			return new ClassEditPart((Class) model);
+		if (model instanceof Collaboration)
+			return new CollaborationEditPart((Collaboration) model);
 		return null;
 	}
 

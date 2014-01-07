@@ -27,11 +27,11 @@ import br.ufal.ic.colligens.models.FileProxy;
  */
 public class Log {
 
-	private final String feature;
+	private String feature;
 	private String severity;
-	private final String message;
-	private final FileProxy fileProxy;
-	private final int line;
+	private String message;
+	private FileProxy fileProxy;
+	private int line;
 	private ITextSelection iTextSelection;
 
 	public static final String MARKER_TYPE = Colligens.PLUGIN_ID + ".problem";
@@ -63,8 +63,10 @@ public class Log {
 		} catch (FileNotFoundException e) {
 			// e.printStackTrace();
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			// e.printStackTrace();
 		} catch (BadLocationException e) {
+			// TODO Auto-generated catch block
 			// e.printStackTrace();
 		}
 	}

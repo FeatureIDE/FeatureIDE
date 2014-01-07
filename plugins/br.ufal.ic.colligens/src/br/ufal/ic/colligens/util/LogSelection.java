@@ -16,7 +16,7 @@ public class LogSelection implements ITextSelection {
 
 	@Override
 	public boolean isEmpty() {
-		
+		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -27,25 +27,25 @@ public class LogSelection implements ITextSelection {
 
 	@Override
 	public int getLength() {
-		
+		// TODO Auto-generated method stub
 		return column;
 	}
 
 	@Override
 	public int getStartLine() {
-		
+		// TODO Auto-generated method stub
 		return line;
 	}
 
 	@Override
 	public int getEndLine() {
-		
+		// TODO Auto-generated method stub
 		return line+1;
 	}
 
 	@Override
 	public String getText() {
-		
+		// TODO Auto-generated method stub
 		return null;
 	}
 

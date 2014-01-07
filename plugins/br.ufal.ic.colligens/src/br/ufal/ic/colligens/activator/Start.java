@@ -18,7 +18,7 @@ public class Start {
 		try {
 			delete(file);
 		} catch (IOException e) {
-			
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

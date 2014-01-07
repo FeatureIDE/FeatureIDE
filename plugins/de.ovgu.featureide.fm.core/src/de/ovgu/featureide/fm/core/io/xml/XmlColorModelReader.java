@@ -99,7 +99,7 @@ public class XmlColorModelReader extends XmlFeatureModelReader {
 					} else if (mode == 3 && currentTag.equals("feature")) {
 						Attribute attribute = (Attribute) currentStartTag.getAttributes().next();
 						if (attribute.getName().getLocalPart().equals("name")) {
-							Feature feat = featureModel.getFeature(featureModel.getRenamingsManager().getNewName(attribute.getValue()));
+							Feature feat = featureModel.getFeature(featureModel.getNewName(attribute.getValue()));
 							if (feat != null) {
 								colors = feat.getColorList();
 								mode = 1;

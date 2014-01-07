@@ -27,9 +27,8 @@ import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 
-import de.ovgu.featureide.core.fstmodel.FSTConfiguration;
-import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
+import de.ovgu.featureide.ui.views.collaboration.model.Collaboration;
 
 /**
  * An instance of this class represents the graphical representation of the 
@@ -37,17 +36,16 @@ import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
  * 
  * @author Constanze Adler
  */
-public class CollaborationFigure extends Figure implements GUIDefaults {
+public class CollaborationFigure extends Figure implements GUIDefaults{
 
 	private final Label label = new Label();
 	public boolean selected = true;
 	public boolean isConfiguration = false;
 	
-	public CollaborationFigure(FSTFeature coll) {
+	public CollaborationFigure(Collaboration coll) {
 		super();
-		
-		selected = coll.isSelected();
-		isConfiguration = coll instanceof FSTConfiguration;
+		selected = coll.selected;
+		isConfiguration = coll.isConfiguration;
 		GridLayout gridLayout = new GridLayout(1, true);
 		gridLayout.verticalSpacing = GRIDLAYOUT_VERTICAL_SPACING;
 		gridLayout.marginHeight = GRIDLAYOUT_MARGIN_HEIGHT - 1;
@@ -60,13 +58,12 @@ public class CollaborationFigure extends Figure implements GUIDefaults {
 		} else {
 			this.setBorder(COLL_BORDER_UNSELECTED);
 		}
-		if (isConfiguration) {
-			if (((FSTConfiguration) coll).isSelected()) {
+		if (isConfiguration)
+			if (selected)
 				label.setIcon(IMAGE_CURRENT_CONFIGURATION);
-			} else {
+			else
 				label.setIcon(IMAGE_CONFIGURATION);
-			}
-		}
+		
 		label.setFont(DEFAULT_FONT);
 		label.setLocation(new Point(COLLABORATION_INSETS.left, COLLABORATION_INSETS.top));
 		

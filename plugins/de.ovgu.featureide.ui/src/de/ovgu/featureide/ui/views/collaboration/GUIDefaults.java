@@ -41,98 +41,97 @@ import de.ovgu.featureide.ui.UIPlugin;
  */
 public interface GUIDefaults {
 	
-	Insets ROLE_INSETS2 			 	  = new Insets(1, 6, 1, 6);
-	Insets ROLE_INSETS 			 	  	  = new Insets(3, 6, 3, 6);
-	Insets COLLABORATION_INSETS 		  = new Insets(4, 6, 4, 6);
-	Insets CLASS_INSETS 		     	  = new Insets(10, 20, 10, 20);
+	public static Insets ROLE_INSETS2 			 	  = new Insets(1, 6, 1, 6);
+	public static Insets ROLE_INSETS 			 	  = new Insets(3, 6, 3, 6);
+	public static Insets COLLABORATION_INSETS 		  = new Insets(4, 6, 4, 6);
+	public static Insets CLASS_INSETS 		     	  = new Insets(10, 20, 10, 20);
 	
-	int DEFAULT_CLASS_WIDTH = 100;
-	int GENERAL_DISTANCE             	 =  8;
-	int ROLE_PREFERED_SIZE         		 = 16;
-	int GRIDLAYOUT_MARGIN_HEIGHT    	 =  3; 
-	int GRIDLAYOUT_VERTICAL_SPACING 	 =  1; 
-	int DEFAULT_UNDERLAYER_HEIGHT	 	 = 35;
+	public static final int GENERAL_DISTANCE             	 =  8;
+	public static final int ROLE_PREFERED_SIZE         		 = 16;
+	public static final int GRIDLAYOUT_MARGIN_HEIGHT    	 =  3; 
+	public static final int GRIDLAYOUT_VERTICAL_SPACING 	 =  1; 
+	public static final int DEFAULT_UNDERLAYER_HEIGHT	 	 = 35;
 	
-	Point COLLFIGURE_LOCATION				= new Point(16, 16);
+	public static final Point COLLFIGURE_LOCATION		= new Point(16, 16);
 	
-	int DEFAULT_INSET_TO_EDGE	  = 10;
+	public static final int DEFAULT_INSET_TO_EDGE	  = 10;
 	
-	Color FOREGROUND    		  	 	  = ColorConstants.black;
-	Font DEFAULT_FONT 			 	  = new Font(null, new FontData("Arial Unicode MS", 8, SWT.NORMAL));
+	public static Color FOREGROUND    		  	 	  = ColorConstants.black;
+	public static Font DEFAULT_FONT 			 	  = new Font(null, new FontData("Arial Unicode MS", 8, SWT.NORMAL));
 	
-	Color DIAGRAM_BACKGROUND 		 	  = ColorConstants.white;
+	public static Color DIAGRAM_BACKGROUND 		 	  = ColorConstants.white;
 	
-	Color CLASS_BACKGROUND   		 	  = GUIBasics.createColor(247, 245, 255);
-	Color CLASS_BORDER_COLOR	  		  = GUIBasics.createBorderColor(CLASS_BACKGROUND);
-	Border CLASS_BORDER				  = new LineBorder(CLASS_BORDER_COLOR, 1);
+	public static Color CLASS_BACKGROUND   		 	  = GUIBasics.createColor(247, 245, 255);
+	public static Color CLASS_BORDER_COLOR	  		  = GUIBasics.createBorderColor(CLASS_BACKGROUND);
+	public static Border CLASS_BORDER				  = new LineBorder(CLASS_BORDER_COLOR, 1);
 
 	/**
 	 * This color highlights the class representing the file at the open editor.
 	 */
-	Color OPEN_CLASS_BACKGROUND   	  = GUIBasics.createColor(235, 230, 255);
-	Color OPEN_CLASS_BORDER_COLOR	  	  = GUIBasics.createBorderColor(OPEN_CLASS_BACKGROUND);
-	Border OPEN_CLASS_BORDER			  = new LineBorder(OPEN_CLASS_BORDER_COLOR, 1);
+	public static Color OPEN_CLASS_BACKGROUND   	  = GUIBasics.createColor(235, 230, 255);
+	public static Color OPEN_CLASS_BORDER_COLOR	  	  = GUIBasics.createBorderColor(OPEN_CLASS_BACKGROUND);
+	public static Border OPEN_CLASS_BORDER			  = new LineBorder(OPEN_CLASS_BORDER_COLOR, 1);
 	
-	Color COLL_BACKGROUND_SELECTED 	  = GUIBasics.createColor(0.8, 0.8, 1.0);
-	Color COLL_BORDER_COLOR_SELECTED	  = ColorConstants.black;
-	Border COLL_BORDER_SELECTED	 	  = new LineBorder(COLL_BORDER_COLOR_SELECTED, 2);
+	public static Color COLL_BACKGROUND_SELECTED 	  = GUIBasics.createColor(0.8, 0.8, 1.0);
+	public static Color COLL_BORDER_COLOR_SELECTED	  = ColorConstants.black;
+	public static Border COLL_BORDER_SELECTED	 	  = new LineBorder(COLL_BORDER_COLOR_SELECTED, 2);
 	
-	Color COLL_BACKGROUND_UNSELECTED 	  = GUIBasics.createColor(247, 245, 255);
-	Color COLL_BORDER_COLOR_UNSELECTED  = ColorConstants.black;
-	Border COLL_BORDER_UNSELECTED	 	  = new LineBorder(COLL_BORDER_COLOR_UNSELECTED, 1);
+	public static Color COLL_BACKGROUND_UNSELECTED 	  = GUIBasics.createColor(247, 245, 255);
+	public static Color COLL_BORDER_COLOR_UNSELECTED  = ColorConstants.black;
+	public static Border COLL_BORDER_UNSELECTED	 	  = new LineBorder(COLL_BORDER_COLOR_UNSELECTED, 1);
+		
+	public static Color ROLE_BACKGROUND_SELECTED	  = COLL_BACKGROUND_SELECTED;
+	public static Color ROLE_BORDER_COLOR_SELECTED	  = GUIBasics.createBorderColor(ROLE_BACKGROUND_SELECTED);
+	public static Border ROLE_BORDER_SELECTED		  = new LineBorder(ROLE_BORDER_COLOR_SELECTED, 1);
 	
-	Color ROLE_BACKGROUND_SELECTED	  = COLL_BACKGROUND_SELECTED;
-	Color ROLE_BORDER_COLOR_SELECTED	  = GUIBasics.createBorderColor(ROLE_BACKGROUND_SELECTED);
-	Border ROLE_BORDER_SELECTED		  = new LineBorder(ROLE_BORDER_COLOR_SELECTED, 1);
+	public static Color ROLE_BACKGROUND_UNSELECTED    = GUIBasics.createColor(237, 235, 245);
+	public static Color ROLE_BORDER_COLOR_UNSELECTED  = GUIBasics.createBorderColor(ROLE_BACKGROUND_UNSELECTED);
+	public static Border ROLE_BORDER_UNSELECTED	 	  = new LineBorder(ROLE_BORDER_COLOR_UNSELECTED, 1);
 	
-	Color ROLE_BACKGROUND_UNSELECTED    = GUIBasics.createColor(237, 235, 245);
-	Color ROLE_BORDER_COLOR_UNSELECTED  = GUIBasics.createBorderColor(ROLE_BACKGROUND_UNSELECTED);
-	Border ROLE_BORDER_UNSELECTED	 	  = new LineBorder(ROLE_BORDER_COLOR_UNSELECTED, 1);
+	public static Color ROLE_FOREGROUND_UNSELECTED    = GUIBasics.createColor(41, 41, 41);
+	public static Color ROLE_BACKGROUND    			  = GUIBasics.createColor(241, 241, 241);
 	
-	Color ROLE_FOREGROUND_UNSELECTED    = GUIBasics.createColor(41, 41, 41);
-	Color ROLE_BACKGROUND    			  = GUIBasics.createColor(241, 241, 241);
+	public static Color DEFAULT_UNDERLAYING_COLOR_1   = GUIBasics.createColor(253, 253, 253);
+	public static Color DEFAULT_UNDERLAYING_COLOR_2   = GUIBasics.createColor(238, 238, 238);
 	
-	Color DEFAULT_UNDERLAYING_COLOR_1   = GUIBasics.createColor(253, 253, 253);
-	Color DEFAULT_UNDERLAYING_COLOR_2   = GUIBasics.createColor(238, 238, 238);
-	
-	Color  CLASS_BORDER_COLOR_SELECTED  = ColorConstants.darkBlue;
-	Border CLASS_BORDER_SELECTED	 	  = new LineBorder(CLASS_BORDER_COLOR_SELECTED, 2);
+	public static Color  CLASS_BORDER_COLOR_SELECTED  = ColorConstants.darkBlue;
+	public static Border CLASS_BORDER_SELECTED	 	  = new LineBorder(CLASS_BORDER_COLOR_SELECTED, 2);
 	
 	
 
 	/**
 	 * This color highlights the role(selected) representing the file at the open editor.
 	 */
-	Color OPEN_ROLE_BACKGROUND_SELECTED	= ROLE_BACKGROUND_SELECTED; 
+	public static Color OPEN_ROLE_BACKGROUND_SELECTED	= ROLE_BACKGROUND_SELECTED; 
 			//GUIBasics.createColor(180, 180, 255);
-	Color OPEN_ROLE_BORDER_COLOR_SELECTED	= GUIBasics.createBorderColor(OPEN_ROLE_BACKGROUND_SELECTED);
-	Border OPEN_ROLE_BORDER_SELECTED		= new LineBorder(OPEN_ROLE_BORDER_COLOR_SELECTED, 1);
+	public static Color OPEN_ROLE_BORDER_COLOR_SELECTED	= GUIBasics.createBorderColor(OPEN_ROLE_BACKGROUND_SELECTED);
+	public static Border OPEN_ROLE_BORDER_SELECTED		= new LineBorder(OPEN_ROLE_BORDER_COLOR_SELECTED, 1);
 	
 	/**
 	 * This color highlights the role(selected) representing the file at the open editor.
 	 */
-	Color OPEN_ROLE_BACKGROUND_UNSELECTED		= ROLE_BACKGROUND_UNSELECTED; 
+	public static Color OPEN_ROLE_BACKGROUND_UNSELECTED		= ROLE_BACKGROUND_UNSELECTED; 
 			//GUIBasics.createColor(242, 242, 255);
-	Color OPEN_ROLE_BORDER_COLOR_UNSELECTED	= GUIBasics.createBorderColor(OPEN_ROLE_BACKGROUND_UNSELECTED);
-	Border OPEN_ROLE_BORDER_UNSELECTED		= new LineBorder(OPEN_ROLE_BORDER_COLOR_UNSELECTED, 1);
+	public static Color OPEN_ROLE_BORDER_COLOR_UNSELECTED	= GUIBasics.createBorderColor(OPEN_ROLE_BACKGROUND_UNSELECTED);
+	public static Border OPEN_ROLE_BORDER_UNSELECTED		= new LineBorder(OPEN_ROLE_BORDER_COLOR_UNSELECTED, 1);
 		
 	/*
 	 * All images should be declared here, so an image can not be created twice.
 	 */
-	Image IMAGE_CURRENT_CONFIGURATION = UIPlugin.getImage("currentconfiguration.gif");
-	Image IMAGE_CONFIGURATION = UIPlugin.getImage("ConfigurationIcon.png");
-	Image REFESH_TAB_IMAGE = UIPlugin.getImage("refresh_tab.gif");
+	public static final Image IMAGE_CURRENT_CONFIGURATION = UIPlugin.getImage("currentconfiguration.gif");
+	public static final Image IMAGE_CONFIGURATION = UIPlugin.getImage("ConfigurationIcon.png");
+	public static final Image REFESH_TAB_IMAGE = UIPlugin.getImage("refresh_tab.gif");
 
 	// Collaboration Diagram 
-	Image IMAGE_FIELD_PRIVATE = UIPlugin.getImage("field_private_obj.gif");
-	Image IMAGE_FIELD_PROTECTED = UIPlugin.getImage("field_protected_obj.gif");
-	Image IMAGE_FIELD_PUBLIC = UIPlugin.getImage("field_public_obj.gif");
-	Image IMAGE_FIELD_DEFAULT = UIPlugin.getImage("field_default_obj.gif");
-	Image IMAGE_METHODE_PRIVATE = UIPlugin.getImage("private_co.gif");
-	Image IMAGE_METHODE_PROTECTED = UIPlugin.getImage("protected_co.gif");
-	Image IMAGE_METHODE_PUBLIC = UIPlugin.getImage("public_co.gif");
-	Image IMAGE_METHODE_DEFAULT =  UIPlugin.getImage("default_co.gif");
-	Image IMAGE_CLASS = UIPlugin.getImage("class_obj.gif");
-	Image IMAGE_FEATURE = UIPlugin.getImage("FeatureIconSmall.ico");
-	Image IMAGE_HASH = UIPlugin.getImage("hash.png");
+	public static final Image IMAGE_FIELD_PRIVATE = UIPlugin.getImage("field_private_obj.gif");
+	public static final Image IMAGE_FIELD_PROTECTED = UIPlugin.getImage("field_protected_obj.gif");
+	public static final Image IMAGE_FIELD_PUBLIC = UIPlugin.getImage("field_public_obj.gif");
+	public static final Image IMAGE_FIELD_DEFAULT = UIPlugin.getImage("field_default_obj.gif");
+	public static final Image IMAGE_METHODE_PRIVATE = UIPlugin.getImage("private_co.gif");
+	public static final Image IMAGE_METHODE_PROTECTED = UIPlugin.getImage("protected_co.gif");
+	public static final Image IMAGE_METHODE_PUBLIC = UIPlugin.getImage("public_co.gif");
+	public static final Image IMAGE_METHODE_DEFAULT =  UIPlugin.getImage("default_co.gif");
+	public static final Image IMAGE_CLASS = UIPlugin.getImage("class_obj.gif");
+	public static final Image IMAGE_FEATURE = UIPlugin.getImage("FeatureIconSmall.ico");
+	public static final Image IMAGE_HASH = UIPlugin.getImage("hash.png");
 }

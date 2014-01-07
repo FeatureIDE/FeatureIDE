@@ -5,13 +5,14 @@ import java.util.Map;
 import org.eclipse.ltk.core.refactoring.RefactoringContribution;
 import org.eclipse.ltk.core.refactoring.RefactoringDescriptor;
 
-public class RefactorContribut extends RefactoringContribution {
+public class RefactorContribut extends RefactoringContribution{
 
 	@SuppressWarnings("rawtypes")
 	@Override
 	public RefactoringDescriptor createDescriptor(String id, String project,
 			String description, String comment, Map arguments, int flags)
 			throws IllegalArgumentException {
+		// TODO Auto-generated method stub
 		return null;
 	}
 

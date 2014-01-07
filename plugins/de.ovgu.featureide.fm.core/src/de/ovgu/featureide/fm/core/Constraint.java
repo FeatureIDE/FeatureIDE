@@ -22,8 +22,10 @@ package de.ovgu.featureide.fm.core;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Collection;
+import java.util.AbstractCollection;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.prop4j.Literal;
 import org.prop4j.Node;
@@ -43,10 +45,10 @@ public class Constraint implements PropertyConstants {
 	private Node propNode;
 	private FMPoint location = new FMPoint(0,0);
 	private boolean featureSelected = false;
-	private Collection<Feature> containedFeatureList = new LinkedList<Feature>();
-	private Collection<Feature> falseOptionalFeatures = new LinkedList<Feature>();
+	private List<Feature> containedFeatureList = new LinkedList<Feature>();
+	private List<Feature> falseOptionalFeatures = new LinkedList<Feature>();
  	private ConstraintAttribute attribute = ConstraintAttribute.NORMAL;
-	private Collection<Feature> deadFeatures = new LinkedList<Feature>();
+	private List<Feature> deadFeatures = new ArrayList<Feature>();
 	
 	public Constraint(FeatureModel featureModel, Node propNode) {
 		this.featureModel = featureModel;
@@ -72,19 +74,18 @@ public class Constraint implements PropertyConstants {
 	 * @param fmDeadFeatures The dead features the complete model
 	 * @return The dead features caused by this constraint
 	 */
-	public Collection<Feature> getDeadFeatures(SatSolver solver, FeatureModel fm, Collection<Feature> fmDeadFeatures) {
-		Collection<Feature> deadFeaturesBefore;		
+	public List<Feature> getDeadFeatures(SatSolver solver, FeatureModel fm, AbstractCollection<Feature> fmDeadFeatures) {
+		List<Feature> deadFeaturesBefore = new LinkedList<Feature>();		
 		Node propNode = this.getNode();
 		if (propNode != null) {
 			deadFeaturesBefore = fm.getAnalyser().getDeadFeatures(solver, propNode);
-		} else {
-			deadFeaturesBefore = new LinkedList<Feature>();
 		}
 
-		Collection<Feature> deadFeaturesAfter = new LinkedList<Feature>();
+		List<Feature> deadFeaturesAfter = new LinkedList<Feature>();
 		for (Feature l : fmDeadFeatures) {
 			Feature feature = fm.getFeature(l.getName());
-			if (feature != null && deadFeaturesBefore.contains(feature)) {
+			// XXX why can the given feature not be found?
+			if (feature != null && contains(feature, deadFeaturesBefore)) {
 				deadFeaturesAfter.add(l);
 			}
 		}
@@ -95,8 +96,8 @@ public class Constraint implements PropertyConstants {
 	/**
 	 * Removes the constraints from the model, and looks for dead features.
 	 */
-	public Collection<Feature> getDeadFeatures(FeatureModel fm, Collection<Feature> fmDeadFeatures) {
-		Collection<Feature> deadFeaturesBefore = null;		
+	public List<Feature> getDeadFeatures(FeatureModel fm, AbstractCollection<Feature> fmDeadFeatures) {
+		List<Feature> deadFeaturesBefore = null;		
 		Node propNode = this.getNode();
 		if (propNode != null) {
 			if (this != null) {
@@ -107,15 +108,35 @@ public class Constraint implements PropertyConstants {
 			fm.handleModelDataChanged();
 		}
 
-		Collection<Feature> deadFeaturesAfter = new LinkedList<Feature>();
-		for (Feature f : fmDeadFeatures) {
-			Feature feature = fm.getFeature(f.getName());
+		List<Feature> deadFeaturesAfter = new LinkedList<Feature>();
+		for (Feature l : fmDeadFeatures) {
+			Feature feature = fm.getFeature(l.getName());
 			// XXX why can the given feature not be found?
-			if (feature != null && !deadFeaturesBefore.contains(feature)) {
-				deadFeaturesAfter.add(f);
+			if (feature != null && !contains(feature, deadFeaturesBefore) &&
+					!contains(feature, deadFeaturesAfter)) {
+				deadFeaturesAfter.add(l);
 			}
 		}
 		return deadFeaturesAfter;
+	}
+	
+	/**
+	 * Checks if the given list contains a Feature with the same name.<br>
+	 * 
+	 * @param feature The feature to check
+	 * @param fetureList The list
+	 * @return <code>true</code> if the list contains a feature with the same name.
+	 * @see List#contains(Object)
+	 */
+	// This is necessary because the methods work with copies and not the original objects. 
+	// Maybe .equals should be implemented, so this could be replaced with standard .contains(Object)
+	private boolean contains(Feature feature, List<Feature> fetureList) {
+		for (Feature f : fetureList) {
+			if (f != null && f.getName().equals(feature.getName())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public void setConstraintAttribute(ConstraintAttribute attri, boolean fire){
@@ -162,14 +183,14 @@ public class Constraint implements PropertyConstants {
 	 * 
 	 * @return All {@link Feature}s contained at this {@link Constraint}.
 	 */
-	public Collection<Feature> getContainedFeatures(){
+	public List<Feature> getContainedFeatures(){
 		if (containedFeatureList.isEmpty()) {
 			setContainedFeatures();
 		}
 		return containedFeatureList;
 	}
 
-	public boolean setFalseOptionalFeatures(FeatureModel clone, Collection<Feature> fmFalseOptionals){
+	public boolean setFalseOptionalFeatures(FeatureModel clone, LinkedList<Feature> fmFalseOptionals){
 		falseOptionalFeatures.clear();
 		falseOptionalFeatures.addAll(clone.getAnalyser().getFalseOptionalFeatures(fmFalseOptionals));
 		fmFalseOptionals.removeAll(falseOptionalFeatures);
@@ -181,8 +202,8 @@ public class Constraint implements PropertyConstants {
 		boolean found=false;
 		FeatureModel clonedModel = featureModel.clone();
 		clonedModel.removeConstraint(this);
-		Collection<Feature> foFeatures = clonedModel.getAnalyser().getFalseOptionalFeatures();
-		for (Feature feature : featureModel.getAnalyser().getFalseOptionalFeatures()) {
+		LinkedList<Feature> foFeatures = clonedModel.getAnalyser().getFalseOptionalFeatures();
+		for (Feature feature : featureModel.getFalseOptionalFeatures()) {
 			if (!foFeatures.contains(clonedModel.getFeature(feature.getName())) && !falseOptionalFeatures.contains(feature)) {
 				falseOptionalFeatures.add(feature);
 				found = true;
@@ -191,11 +212,11 @@ public class Constraint implements PropertyConstants {
 		return found;
 	}
 	
-	public Collection<Feature> getFalseOptional(){
+	public List<Feature> getFalseOptional(){
 		return falseOptionalFeatures;
 	}
 	
-	private Collection<PropertyChangeListener> listenerList = new LinkedList<PropertyChangeListener>();
+	private LinkedList<PropertyChangeListener> listenerList = new LinkedList<PropertyChangeListener>();
 
 	public void addListener(PropertyChangeListener listener) {
 		if (!listenerList.contains(listener))
@@ -245,15 +266,15 @@ public class Constraint implements PropertyConstants {
 	 * Set the dead features of this constraint
 	 * @param deadFeatures
 	 */
-	public void setDeadFeatures(Collection<Feature> deadFeatures) {
-		this.deadFeatures = deadFeatures; 
+	public void setDeadFeatures(List<Feature> deadFeatures) {
+		this.deadFeatures  = deadFeatures; 
 	}
 	
 	/**
 	 * Gets the dead features of this constraint without new calculation
 	 * @return The dead features
 	 */
-	public Collection<Feature> getDeadFeatures() {
+	public List<Feature> getDeadFeatures() {
 		return deadFeatures;
 	}
 
