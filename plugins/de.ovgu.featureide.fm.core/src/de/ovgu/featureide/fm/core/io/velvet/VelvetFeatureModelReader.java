@@ -143,7 +143,6 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 	private void parseParam(final Tree root) {
 		LinkedList<Tree> nodeList = getChildren(root);
 		
-		System.out.println("parsePARAM: " + nodeList.toString());
 		while (!nodeList.isEmpty()) {
 			final Tree curNode = nodeList.poll();
 			
@@ -162,6 +161,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		while (!nodeList.isEmpty()) {
 			final Tree curNode = nodeList.poll();
 			final String parentModelName = curNode.getText();
+			extFeatureModel.addParent(parentModelName);
 			
 			IProject parent = ResourcesPlugin.getWorkspace().getRoot().getProject(parentModelName);
 			FeatureModel fm = FileLoader.loadFeatureModel(parent);

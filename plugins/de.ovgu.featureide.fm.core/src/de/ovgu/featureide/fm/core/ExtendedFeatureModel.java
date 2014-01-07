@@ -42,6 +42,7 @@ public class ExtendedFeatureModel extends FeatureModel {
 	protected FeatureAttributeMap<String> stringAttributes = new FeatureAttributeMap<String>();
 	protected Map<String, String> parameters = new HashMap<String, String>();
 	protected Set<Feature> importedFeatures = new HashSet<Feature>();
+	protected Set<String> parents = new HashSet<String>();
 	protected boolean hasParameters = false;
 	
 	protected LinkedList<Equation> attributeConstraints = new LinkedList<Equation>();
@@ -134,5 +135,32 @@ public class ExtendedFeatureModel extends FeatureModel {
 	 */
 	public boolean isImported(Feature imported){
 		return importedFeatures.contains(imported);
+	}
+
+	/**
+	 * Adds the name of a Model as a parent of the current model.
+	 * 
+	 * @param parentModelName the name of the parent model
+	 */
+	public void addParent(final String parentModelName) {
+		parents.add(parentModelName);
+	}
+	
+	/**
+	 * returns a set containing the parentmodels of the current model.
+	 * 
+	 * @return a copy of the parents of the model
+	 */
+	public Set<String> getParents() {
+		return new HashSet<String>(parents);
+	}
+	
+	/**
+	 * Returns the name of the implemented interface or an empty String if no interfaces are implemented.
+	 * 
+	 * @return the name of the implemented interface or an empty String if no interfaces are implemented.
+	 */
+	public String implementsInterface() {
+		return "";
 	}
 }
