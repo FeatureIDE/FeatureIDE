@@ -21,8 +21,10 @@
 package de.ovgu.featureide.fm.core;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Set;
 
 import de.ovgu.featureide.fm.core.constraint.FeatureAttributeMap;
 import de.ovgu.featureide.fm.core.constraint.Equation;
@@ -31,13 +33,15 @@ import de.ovgu.featureide.fm.core.constraint.Equation;
  * Adds attributes and attribute constraints to a feature model. 
  * 
  * @author Sebastian Krieter
+ * @author Matthias Strauss
  */
 public class ExtendedFeatureModel extends FeatureModel {
 
 	protected FeatureAttributeMap<Integer> integerAttributes = new FeatureAttributeMap<Integer>();
 	protected FeatureAttributeMap<Boolean> booleanAttributes = new FeatureAttributeMap<Boolean>();
 	protected FeatureAttributeMap<String> stringAttributes = new FeatureAttributeMap<String>();
-	protected Map<String, String> parameters = new HashMap<String, String>(); 
+	protected Map<String, String> parameters = new HashMap<String, String>();
+	protected Set<Feature> importedFeatures = new HashSet<Feature>();
 	protected boolean hasParameters = false;
 	
 	protected LinkedList<Equation> attributeConstraints = new LinkedList<Equation>();
@@ -79,16 +83,16 @@ public class ExtendedFeatureModel extends FeatureModel {
 	 * 
 	 * @param interfaceClazz the name of the interface that shall be bound to the variable
 	 * @param varName the name of the variable an interface shall be bound to
-	 * @return true if the parameter could be added to the parameters. False the variable name was already bound to another interface.
+	 * @return true if the parameter could be added to the parameters. False if the variable name was already bound to another interface.
 	 */
 	public boolean addParameter(final String interfaceClazz, final String varName) {
-		if (!hasParameters) {
-			hasParameters = true;
-		}
-		
 		if (parameters.containsKey(varName)) {
 			return false;
 		} 
+		
+		if (!hasParameters) {
+			hasParameters = true;
+		}
 		
 		parameters.put(varName, interfaceClazz);
 		return true;
@@ -111,5 +115,24 @@ public class ExtendedFeatureModel extends FeatureModel {
 	 */
 	public boolean hasParameters() {
 		return this.hasParameters;
+	}
+
+	/**
+	 * This method stores imported features.
+	 * 
+	 * @param imported the exact feature, that was added to the featuremodel previously
+	 */
+	public void setFeatureImported(Feature imported) {
+		importedFeatures.add(imported);
+	}
+	
+	/**
+	 * Checks if a given Feature in this model was imported.
+	 * 
+	 * @param imported the feature for which it will be checked if it is imported
+	 * @return true if and only if the feature was imported
+	 */
+	public boolean isImported(Feature imported){
+		return importedFeatures.contains(imported);
 	}
 }

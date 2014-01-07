@@ -30,6 +30,8 @@ import org.antlr.runtime.ANTLRInputStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.Tree;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.prop4j.And;
 import org.prop4j.Choose;
 import org.prop4j.Equals;
@@ -53,12 +55,15 @@ import de.ovgu.featureide.fm.core.constraint.RelationOperator;
 import de.ovgu.featureide.fm.core.constraint.WeightedTerm;
 import de.ovgu.featureide.fm.core.constraint.analysis.ExtendedFeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
+import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.core.mpl.io.FileLoader;
 
 /**
  * Parses a feature model in Velvet syntax.
  * 
  * @author Sebastian Krieter
+ * @author Matthias Strauss
  */
 public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 	
@@ -119,6 +124,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 				// refines = true;
 				break;
 			case VelvetParser.BASEEXT:
+				parseInheritance(curNode);
 				break;
 			case VelvetParser.BASEPARAM:
 				parseParam(curNode);
@@ -150,6 +156,39 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		}
 	}
 	
+	private void parseInheritance(Tree root){
+		LinkedList<Tree> nodeList = getChildren(root);
+		
+		while (!nodeList.isEmpty()) {
+			final Tree curNode = nodeList.poll();
+			final String parentModelName = curNode.getText();
+			
+			IProject parent = ResourcesPlugin.getWorkspace().getRoot().getProject(parentModelName);
+			FeatureModel fm = FileLoader.loadFeatureModel(parent);
+			
+			copyModel(fm);
+		}
+	}
+	
+	private void copyModel(FeatureModel parent){
+		Feature root = parent.getRoot();
+		copyChildnodes(getFeatureModel().getRoot(), root.getChildren());
+	}
+	
+	private void copyChildnodes(Feature parentNode, LinkedList<Feature> children) {
+		for (Feature child : children) {
+			Feature imported = addFeature(getFeatureModel().getRoot(), child.getName(),
+										  child.isMandatory(), child.isAbstract(), child.isHidden()
+										  );
+			// save imported feature into mapping to store imported status
+			extFeatureModel.setFeatureImported(imported);
+			
+			if (child.hasChildren()) {
+				copyChildnodes(imported, child.getChildren());
+			}
+		}
+	}
+
 	private void parseDefinitions(Tree root) {
 		LinkedList<Tree> nodeList = getChildren(root);
 
