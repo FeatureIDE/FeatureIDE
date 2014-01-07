@@ -20,22 +20,17 @@
  */
 package de.ovgu.featureide.core.mspl;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map.Entry;
-import java.util.Properties;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
-
-import de.ovgu.featureide.core.CorePlugin;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -51,7 +46,7 @@ public class MSPLPlugin extends AbstractUIPlugin {
 	/**
 	 * all interface projects
 	 */
-	protected final HashMap<IProject, ArrayList<InterfaceProject>> projectMap = new HashMap<IProject, ArrayList<InterfaceProject>>();
+	protected final HashMap<IProject, ArrayList<ImportProject>> projectMap = new HashMap<IProject, ArrayList<ImportProject>>();
 
 	/**
 	 * The constructor
@@ -70,7 +65,7 @@ public class MSPLPlugin extends AbstractUIPlugin {
 		super.start(context);
 		plugin = this;
 
-		initializeInterfaces();
+		initializeImports();
 	}
 
 	/*
@@ -104,14 +99,14 @@ public class MSPLPlugin extends AbstractUIPlugin {
 	 * @return Returns true if the plugin is loaded.
 	 */
 	public static boolean addProject(IProject project,
-			InterfaceProject interfaceProject) {
+			ImportProject interfaceProject) {
 		if (plugin == null)
 			return false;
 
-		ArrayList<InterfaceProject> interfaces = plugin.projectMap.get(project);
+		ArrayList<ImportProject> interfaces = plugin.projectMap.get(project);
 
 		if (interfaces == null) {
-			interfaces = new ArrayList<InterfaceProject>();
+			interfaces = new ArrayList<ImportProject>();
 			plugin.projectMap.put(project, interfaces);
 		}
 
@@ -122,30 +117,29 @@ public class MSPLPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Creates for each project the interfaces objects.
+	 * Creates for each project the ImportProject objects.
 	 * 
-	 * @see MSPLPlugin#initializeInterfacesOfProject(IProject)
+	 * @see MSPLPlugin#initializeImportsOfProject(IProject)
 	 */
-	public void initializeInterfaces() {
+	public void initializeImports() {
 		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot()
 				.getProjects();
 
 		for (IProject project : projects) {
-			initializeInterfacesOfProject(project);
-
+			initializeImportsOfProject(project);
 		}
 	}
 
 	/**
-	 * Creates for one project the interfaces objects and add them to the
+	 * Creates for one project the ImportProject objects and add them to the
 	 * projectMap.
 	 * 
-	 * @see MSPLPlugin#readInterfacesFile(IProject)
+	 * @see MSPLPlugin#getImports(IProject)
 	 * 
 	 * @param project
 	 *            Project to initialize.
 	 */
-	public void initializeInterfacesOfProject(IProject project) {
+	public void initializeImportsOfProject(IProject project) {
 		try {
 			if (!project.isNatureEnabled(MSPLNature.NATURE_ID))
 				return;
@@ -153,82 +147,62 @@ public class MSPLPlugin extends AbstractUIPlugin {
 			e.printStackTrace();
 		}
 
-		ArrayList<InterfaceProject> interfaceProjects = new ArrayList<InterfaceProject>();
+		ArrayList<ImportProject> importProjects = getImports(project);
 
-		HashMap<IFile, IProject> interfaces = readInterfacesFile(project);
-
-		for (IFile file : interfaces.keySet()) {
-			IProject interfaceProject = interfaces.get(file);
-			interfaceProjects.add(new InterfaceProject(interfaceProject,
-					CorePlugin.getFeatureProject(interfaceProject), file));
-		}
-
-		projectMap.put(project, interfaceProjects);
+		projectMap.put(project, importProjects);
 	}
 
 	/**
-	 * Reads the MPL/.interfaces file returns the interfaces as file and project
-	 * objects.
+	 * Create for each Import/.velvet an ImportProject object and return them in
+	 * a list.
 	 * 
 	 * @param project
-	 *            The project with MSPL nature and MPL/.interfaces file. If the
-	 *            project has no active MSPL nature or the .interfaces file or
-	 *            rather the MPL folder doesn't exists an empty HashMap will be
+	 *            The project with MSPL nature and Import/.velvet files. If the
+	 *            project has no active MSPL nature or no .velvet files or
+	 *            rather the Import folder doesn't exists an empty list will be
 	 *            returned.
-	 * @return HashMap of IFile object of an existing velvet interface and the
-	 *         existing IProject object of corresponding project.
+	 * @return A list of created ImportProject objects.
 	 */
-	public static HashMap<IFile, IProject> readInterfacesFile(IProject project) {
-		HashMap<IFile, IProject> interfaces = new HashMap<IFile, IProject>();
+	public static ArrayList<ImportProject> getImports(IProject project) {
+		ArrayList<ImportProject> projects = new ArrayList<ImportProject>();
 
 		try {
 			if (!project.isNatureEnabled(MSPLNature.NATURE_ID))
-				return interfaces;
+				return projects;
 		} catch (CoreException e1) {
-			return interfaces;
+			return projects;
 		}
 
-		IFolder mplFolder = project.getFolder("MPL");
-		if (!mplFolder.exists() || !mplFolder.isAccessible())
-			return interfaces;
+		IFolder importFolder = project.getFolder("Import");
+		if (!importFolder.exists() || !importFolder.isAccessible())
+			return projects;
 
-		IFile interfacesFile = mplFolder.getFile(".interfaces");
-		if (!interfacesFile.exists() || !interfacesFile.isAccessible())
-			return interfaces;
-
-		Properties props = new Properties();
 		try {
-			InputStream in = interfacesFile.getContents();
-			props.load(in);
-			in.close();
-		} catch (CoreException e) {
-			return interfaces;
-		} catch (IOException e) {
-			return interfaces;
-		}
-
-		for (Entry<Object, Object> entry : props.entrySet()) {
-			if (entry.getKey() instanceof String
-					&& entry.getValue() instanceof String) {
-
-				IFile interfaceFile = mplFolder
-						.getFile((String) entry.getKey());
-
-				if (!interfaceFile.exists() || !interfaceFile.isAccessible())
+			for (IResource res : importFolder.members(false)) {
+				if (!(res instanceof IFile) || !res.isAccessible()
+						|| !res.getName().endsWith(".velvet"))
 					continue;
 
-				IProject interfaceProject = ResourcesPlugin.getWorkspace()
-						.getRoot().getProject((String) entry.getValue());
+				IFile importFile = (IFile) res;
 
-				if (!interfaceProject.exists()
-						|| !interfaceProject.isAccessible())
+				// TODO: parse file and get inherited project and interface
+				IFile interfaceFile = null;
+				String projectName = "";
+
+				IProject importProject = ResourcesPlugin.getWorkspace()
+						.getRoot().getProject(projectName);
+
+				if (!importProject.exists() || !importProject.isAccessible())
 					continue;
 
-				interfaces.put(interfaceFile, interfaceProject);
+				projects.add(new ImportProject(importProject, importFile,
+						interfaceFile));
 			}
+		} catch (CoreException e) {
+			e.printStackTrace();
 		}
 
-		return interfaces;
+		return projects;
 	}
 
 }

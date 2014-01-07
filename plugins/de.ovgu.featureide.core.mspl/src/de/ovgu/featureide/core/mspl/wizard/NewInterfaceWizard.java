@@ -21,6 +21,7 @@
 package de.ovgu.featureide.core.mspl.wizard;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -28,7 +29,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.wizard.Wizard;
 
-import de.ovgu.featureide.core.mspl.InterfaceProject;
+import de.ovgu.featureide.core.mspl.ImportProject;
 import de.ovgu.featureide.core.mspl.MSPLPlugin;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelWriter;
@@ -57,28 +58,59 @@ public class NewInterfaceWizard extends Wizard {
 	public boolean performFinish() {
 		FeatureModel fm = selectFeatures.createFeatureModel();
 
+		String projectName = fm.getRoot().getName();
+		String interfaceName = "I" + projectName;
+
+		fm.getRoot().setName(interfaceName);
+
 		VelvetFeatureModelWriter modelWriter = new VelvetFeatureModelWriter(fm,
 				true);
 		String interfaceContent = modelWriter.writeToString();
 
-		ByteArrayInputStream interfaceContentStream = new ByteArrayInputStream(
-				interfaceContent.getBytes());
+		String importContent = String.format(
+				"concept %s : %s implements %s {\n}", projectName, projectName,
+				interfaceName);
 
 		try {
+			// create interface
+
 			IFolder mplFolder = project.getFolder("MPL");
 			if (!mplFolder.exists())
 				mplFolder.create(true, true, null);
 
-			IFile interfaceFile = mplFolder.getFile(fm.getRoot().getName()
-					+ ".velvet");
+			IFile interfaceFile = mplFolder.getFile(interfaceName + ".velvet");
 
-			if (!mplFolder.exists())
+			// TODO: warning for existing interface file
+			if (!interfaceFile.exists()) {
+				ByteArrayInputStream interfaceContentStream = new ByteArrayInputStream(
+						interfaceContent.getBytes());
 				interfaceFile.create(interfaceContentStream, true, null);
+				interfaceContentStream.close();
+			}
 
+			// create import velvet
+
+			IFolder importFolder = project.getFolder("Import");
+			if (!importFolder.exists())
+				importFolder.create(true, true, null);
+
+			IFile importFile = importFolder.getFile(projectName + ".velvet");
+
+			// TODO: warning for existing import file
+			if (!importFile.exists()) {
+				ByteArrayInputStream importContentStream = new ByteArrayInputStream(
+						importContent.getBytes());
+				importFile.create(importContentStream, true, null);
+				importContentStream.close();
+			}
+
+			// add new imported project to the list
 			MSPLPlugin.addProject(project,
-					new InterfaceProject(selectProject.getSelectedProject(),
-							interfaceFile));
+					new ImportProject(selectProject.getSelectedProject(),
+							importFile, interfaceFile));
 		} catch (CoreException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
