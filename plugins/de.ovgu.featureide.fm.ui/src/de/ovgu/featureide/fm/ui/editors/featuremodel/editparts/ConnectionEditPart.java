@@ -38,8 +38,10 @@ import org.eclipse.gef.commands.Command;
 import org.eclipse.gef.editparts.AbstractConnectionEditPart;
 import org.eclipse.gef.editpolicies.DirectEditPolicy;
 import org.eclipse.gef.requests.DirectEditRequest;
+import org.eclipse.swt.SWT;
 import org.eclipse.ui.PlatformUI;
 
+import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureConnection;
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -77,6 +79,14 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 	protected IFigure createFigure() {
 		PolylineConnection figure = new PolylineConnection();
 		figure.setForegroundColor(FMPropertyManager.getConnectionForgroundColor());
+
+		FeatureModel fm = getConnectionModel().getTarget().getFeatureModel();
+		if (fm instanceof ExtendedFeatureModel) {
+			if (((ExtendedFeatureModel) fm).isImported(getConnectionModel().getTarget())) {
+				figure.setLineStyle(SWT.LINE_DASH);
+			}
+		}
+
 		return figure;
 	}
 
