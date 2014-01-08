@@ -161,6 +161,8 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 			final Tree curNode = nodeList.poll();
 			final String parentModelName = curNode.getText();
 
+			extFeatureModel.addParent(parentModelName);
+			
 			IProject parent = ResourcesPlugin.getWorkspace().getRoot()
 					.getProject(parentModelName);
 			FeatureModel fm = FileLoader.loadFeatureModel(parent);
