@@ -64,7 +64,9 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
  * @author Sebastian Krieter
  * @author Matthias Strauss
  */
-public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
+public class VelvetFeatureModelReader
+	extends
+		AbstractFeatureModelReader {
 
 	protected ExtendedFeatureModel extFeatureModel;
 
@@ -95,16 +97,29 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 			Tree curNode = nodeList.poll();
 
 			switch (curNode.getType()) {
-			case VelvetParser.IMP:
-				break;
-			case VelvetParser.CONCEPT:
-				parseConcept(curNode);
-				break;
-			case VelvetParser.CINTERFACE:
-				parseConcept(curNode);
-				break;
+				case VelvetParser.IMP:
+					break;
+				case VelvetParser.INSTANCEDEF:
+					parseInstance(curNode);
+				case VelvetParser.CONCEPT:
+					parseConcept(curNode);
+					break;
+				case VelvetParser.CINTERFACE:
+					parseConcept(curNode);
+					break;
 			}
 		}
+	}
+
+	/**
+	 * @param curNode
+	 */
+	private void parseInstance(Tree root) {
+		LinkedList<Tree> nodeList = getChildren(root);
+		final String model = nodeList.poll().getText();
+		final String name = nodeList.poll().getText();	
+		
+		extFeatureModel.addInstanceMapping(name, model);
 	}
 
 	private void parseConcept(Tree root) {
@@ -116,25 +131,25 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 			Tree curNode = nodeList.poll();
 
 			switch (curNode.getType()) {
-			case VelvetParser.ID:
-				name = curNode.getText();
-				break;
-			case VelvetParser.REFINES:
-				// refines = true;
-				break;
-			case VelvetParser.BASEEXT:
-				parseInheritance(curNode);
-				break;
-			case VelvetParser.BASEPARAM:
-				parseParam(curNode);
-				break;
-			case VelvetParser.DEF:
-				Feature rootFeatrue = new Feature(extFeatureModel, name);
-				extFeatureModel.addFeature(rootFeatrue);
-				extFeatureModel.setRoot(rootFeatrue);
-				parentStack.push(rootFeatrue);
-				parseDefinitions(curNode);
-				break;
+				case VelvetParser.ID:
+					name = curNode.getText();
+					break;
+				case VelvetParser.REFINES:
+					// refines = true;
+					break;
+				case VelvetParser.BASEEXT:
+					parseInheritance(curNode);
+					break;
+				case VelvetParser.BASEPARAM:
+					parseParam(curNode);
+					break;
+				case VelvetParser.DEF:
+					Feature rootFeatrue = new Feature(extFeatureModel, name);
+					extFeatureModel.addFeature(rootFeatrue);
+					extFeatureModel.setRoot(rootFeatrue);
+					parentStack.push(rootFeatrue);
+					parseDefinitions(curNode);
+					break;
 			}
 		}
 	}
@@ -166,9 +181,8 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 			final String parentModelName = curNode.getText();
 
 			extFeatureModel.addParent(parentModelName);
-			
-			IProject parent = ResourcesPlugin.getWorkspace().getRoot()
-					.getProject(parentModelName);
+
+			IProject parent = ResourcesPlugin.getWorkspace().getRoot().getProject(parentModelName);
 			FeatureModel fm = FileLoader.loadFeatureModel(parent);
 
 			copyModel(fm);
@@ -182,8 +196,8 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 
 	private void copyChildnodes(Feature parentNode, LinkedList<Feature> children) {
 		for (Feature child : children) {
-			Feature imported = addFeature(getFeatureModel().getRoot(),
-					child.getName(), child.isMandatory(), child.isAbstract(),
+			Feature imported =
+				addFeature(getFeatureModel().getRoot(), child.getName(), child.isMandatory(), child.isAbstract(),
 					child.isHidden());
 			// save imported feature into mapping to store imported status
 			extFeatureModel.setFeatureImported(imported);
@@ -205,24 +219,24 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 
 			switch (curNode.getType()) {
 			// Feature
-			case VelvetParser.FEAT:
-				parseFeature(curNode, parentFeature);
-				break;
-			// Feature-Group
-			case VelvetParser.GROUP:
-				parseFeatureGroup(curNode, parentFeature);
-				break;
-			// Constraint
-			case VelvetParser.CONSTRAINT:
-				parseConstraint(curNode, parentFeature);
-				break;
-			// Instance
-			case VelvetParser.INSTANCE:
-				break;
-			// Attribute
-			case VelvetParser.ATTR:
-				parseAttribute(curNode, parentFeature);
-				break;
+				case VelvetParser.FEAT:
+					parseFeature(curNode, parentFeature);
+					break;
+				// Feature-Group
+				case VelvetParser.GROUP:
+					parseFeatureGroup(curNode, parentFeature);
+					break;
+				// Constraint
+				case VelvetParser.CONSTRAINT:
+					parseConstraint(curNode, parentFeature);
+					break;
+				// Instance
+				case VelvetParser.INSTANCE:
+					break;
+				// Attribute
+				case VelvetParser.ATTR:
+					parseAttribute(curNode, parentFeature);
+					break;
 			}
 		}
 
@@ -235,15 +249,15 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 			Tree curNode = nodeList.poll();
 
 			switch (curNode.getType()) {
-			case VelvetParser.SOMEOF:
-				parent.setOr();
-				break;
-			case VelvetParser.ONEOF:
-				parent.setAlternative();
-				break;
-			case VelvetParser.FEAT:
-				parseFeature(curNode, parent);
-				break;
+				case VelvetParser.SOMEOF:
+					parent.setOr();
+					break;
+				case VelvetParser.ONEOF:
+					parent.setAlternative();
+					break;
+				case VelvetParser.FEAT:
+					parseFeature(curNode, parent);
+					break;
 			}
 		}
 	}
@@ -254,32 +268,31 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		boolean isMandatory = false, isAbstract = false, moreDefinitions = false;
 
 		// TODO need good .equals() and .hashCode()
-		for (Feature feat : parent.getChildren()){
+		for (Feature feat : parent.getChildren()) {
 			if (feat.getName().equals(featureName)) {
 				// TODO @Matthias handle overwrite
 				break;
 			}
 		}
-		
+
 		extFeatureModel.getFeature("");
 		Tree childNode = null;
 		while (!childList.isEmpty() && !moreDefinitions) {
 			childNode = childList.poll();
 
 			switch (childNode.getType()) {
-			case VelvetParser.MANDATORY:
-				isMandatory = true;
-				break;
-			case VelvetParser.ABSTRACT:
-				isAbstract = true;
-				break;
-			case VelvetParser.DEF:
-				moreDefinitions = true;
+				case VelvetParser.MANDATORY:
+					isMandatory = true;
+					break;
+				case VelvetParser.ABSTRACT:
+					isAbstract = true;
+					break;
+				case VelvetParser.DEF:
+					moreDefinitions = true;
 			}
 		}
 
-		Feature newFeature = addFeature(parent, featureName, isMandatory,
-				isAbstract, false);
+		Feature newFeature = addFeature(parent, featureName, isMandatory, isAbstract, false);
 		if (moreDefinitions) {
 			parentStack.push(newFeature);
 			parseDefinitions(childNode);
@@ -293,23 +306,21 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 			Tree curNode = nodeList.poll();
 
 			switch (curNode.getType()) {
-			case VelvetParser.ID:
-				// name = curNode.getText();
-				break;
-			case VelvetParser.CONSTR:
-				extFeatureModel.addConstraint(new Constraint(extFeatureModel,
-						parseConstraint_rec(curNode)));
-				break;
-			case VelvetParser.ACONSTR:
-				atrributeConstraintNodes.add(curNode);
-				break;
+				case VelvetParser.ID:
+					// name = curNode.getText();
+					break;
+				case VelvetParser.CONSTR:
+					extFeatureModel.addConstraint(new Constraint(extFeatureModel, parseConstraint_rec(curNode)));
+					break;
+				case VelvetParser.ACONSTR:
+					atrributeConstraintNodes.add(curNode);
+					break;
 			}
 		}
 	}
 
-	private static final int[] binaryOperators = { VelvetParser.OP_OR,
-			VelvetParser.OP_AND, VelvetParser.OP_XOR, VelvetParser.OP_IMPLIES,
-			VelvetParser.OP_EQUIVALENT };
+	private static final int[] binaryOperators = {VelvetParser.OP_OR, VelvetParser.OP_AND, VelvetParser.OP_XOR,
+		VelvetParser.OP_IMPLIES, VelvetParser.OP_EQUIVALENT};
 
 	private Node parseConstraint_rec(Tree root) {
 		LinkedList<Tree> nodeList = getChildren(root);
@@ -323,24 +334,24 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 			Tree curNode = nodeList.poll();
 
 			switch (curNode.getType()) {
-			case VelvetParser.UNARYOP:
-				unaryOp.push(curNode.getChild(0).getType());
-				break;
-			case VelvetParser.CONSTR:
-				n = parseConstraint_rec(curNode);
-				break;
-			case VelvetParser.OPERAND:
-				n = new Literal(curNode.getChild(0).getText());
-				break;
-			default:
-				operators.add(curNode.getType());
+				case VelvetParser.UNARYOP:
+					unaryOp.push(curNode.getChild(0).getType());
+					break;
+				case VelvetParser.CONSTR:
+					n = parseConstraint_rec(curNode);
+					break;
+				case VelvetParser.OPERAND:
+					n = new Literal(curNode.getChild(0).getText());
+					break;
+				default:
+					operators.add(curNode.getType());
 			}
 
 			if (n != null) {
 				while (!unaryOp.isEmpty()) {
 					switch (unaryOp.pop()) {
-					case VelvetParser.OP_NOT:
-						n = new Not(n);
+						case VelvetParser.OP_NOT:
+							n = new Not(n);
 					}
 				}
 				nodes.add(n);
@@ -351,29 +362,28 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 			for (int i = 0; i < binaryOperators.length; i++) {
 				ListIterator<Node> nodesIt = nodes.listIterator();
 				int operator = binaryOperators[i];
-				for (ListIterator<Integer> opIt = operators.listIterator(); opIt
-						.hasNext();) {
+				for (ListIterator<Integer> opIt = operators.listIterator(); opIt.hasNext();) {
 					Node operand1 = nodesIt.next();
 					if (opIt.next() == operator) {
 						opIt.remove();
 						nodesIt.remove();
 						Node operand2 = nodesIt.next();
 						switch (operator) {
-						case VelvetParser.OP_AND:
-							nodesIt.set(new And(operand1, operand2));
-							break;
-						case VelvetParser.OP_OR:
-							nodesIt.set(new Or(operand1, operand2));
-							break;
-						case VelvetParser.OP_XOR:
-							nodesIt.set(new Choose(1, operand1, operand2));
-							break;
-						case VelvetParser.OP_IMPLIES:
-							nodesIt.set(new Implies(operand1, operand2));
-							break;
-						case VelvetParser.OP_EQUIVALENT:
-							nodesIt.set(new Equals(operand1, operand2));
-							break;
+							case VelvetParser.OP_AND:
+								nodesIt.set(new And(operand1, operand2));
+								break;
+							case VelvetParser.OP_OR:
+								nodesIt.set(new Or(operand1, operand2));
+								break;
+							case VelvetParser.OP_XOR:
+								nodesIt.set(new Choose(1, operand1, operand2));
+								break;
+							case VelvetParser.OP_IMPLIES:
+								nodesIt.set(new Implies(operand1, operand2));
+								break;
+							case VelvetParser.OP_EQUIVALENT:
+								nodesIt.set(new Equals(operand1, operand2));
+								break;
 						}
 						nodesIt.previous();
 					}
@@ -393,27 +403,24 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		Tree valueNode = nodeList.poll();
 
 		switch (valueNode.getType()) {
-		case VelvetParser.FLOAT:
-			break;
-		case VelvetParser.INT:
-			extFeatureModel.addAttribute(parent.getName(), name,
-					Integer.parseInt(valueNode.getText()));
-			break;
-		case VelvetParser.BOOLEAN:
-			extFeatureModel.addAttribute(parent.getName(), name,
-					Boolean.parseBoolean(valueNode.getText()));
-			break;
-		case VelvetParser.STRING:
-			extFeatureModel.addAttribute(parent.getName(), name,
-					valueNode.getText());
-			break;
+			case VelvetParser.FLOAT:
+				break;
+			case VelvetParser.INT:
+				extFeatureModel.addAttribute(parent.getName(), name, Integer.parseInt(valueNode.getText()));
+				break;
+			case VelvetParser.BOOLEAN:
+				extFeatureModel.addAttribute(parent.getName(), name, Boolean.parseBoolean(valueNode.getText()));
+				break;
+			case VelvetParser.STRING:
+				extFeatureModel.addAttribute(parent.getName(), name, valueNode.getText());
+				break;
 		}
 	}
 
-	private void parseAttributeConstraints() throws UnsupportedModelException {
+	private void parseAttributeConstraints()
+		throws UnsupportedModelException {
 		while (!atrributeConstraintNodes.isEmpty()) {
-			LinkedList<Tree> nodeList = getChildren(atrributeConstraintNodes
-					.poll());
+			LinkedList<Tree> nodeList = getChildren(atrributeConstraintNodes.poll());
 
 			LinkedList<WeightedTerm> weightedTerms = new LinkedList<WeightedTerm>();
 			RelationOperator relationOperator = null;
@@ -424,74 +431,69 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 				Tree curNode = nodeList.poll();
 
 				switch (curNode.getType()) {
-				case VelvetParser.ID:
-				case VelvetParser.IDPath:
-					String attributeName = curNode.getText();
+					case VelvetParser.ID:
+					case VelvetParser.IDPath:
+						String attributeName = curNode.getText();
 
-					Collection<FeatureAttribute<Integer>> attributes = extFeatureModel
-							.getIntegerAttributes()
-							.getAttributes(attributeName);
+						Collection<FeatureAttribute<Integer>> attributes =
+							extFeatureModel.getIntegerAttributes().getAttributes(attributeName);
 
-					if (attributes == null) {
-						throw new UnsupportedModelException(curNode.getLine()
-								+ ":" + curNode.getCharPositionInLine()
-								+ " no such attribute defined.",
-								curNode.getLine());
-					}
+						if (attributes == null) {
+							throw new UnsupportedModelException(curNode.getLine()
+								+ ":"
+								+ curNode.getCharPositionInLine()
+								+ " no such attribute defined.", curNode.getLine());
+						}
 
-					for (FeatureAttribute<Integer> attr : attributes) {
-						weightedTerms.add(createTerm(attr.getValue(),
-								relationOperator != null, minus, new Reference(
-										attr.getFeatureName(),
-										ReferenceType.FEATURE, attributeName)));
-					}
+						for (FeatureAttribute<Integer> attr : attributes) {
+							weightedTerms.add(createTerm(attr.getValue(), relationOperator != null, minus,
+								new Reference(attr.getFeatureName(), ReferenceType.FEATURE, attributeName)));
+						}
 
-					break;
-				// case VelvetParser.FLOAT:
-				// break;
-				case VelvetParser.INT:
-					int value = Integer.parseInt(curNode.getText());
-					if (relationOperator == null ^ minus) {
-						degree -= value;
-					} else {
-						degree += value;
-					}
-					break;
-				case VelvetParser.PLUS:
-					minus = false;
-					break;
-				case VelvetParser.MINUS:
-					minus = true;
-					break;
-				case VelvetParser.ATTR_OP_EQUALS:
-					relationOperator = RelationOperator.EQUAL;
-					break;
-				case VelvetParser.ATTR_OP_NOT_EQUALS:
-					relationOperator = RelationOperator.NOT_EQUAL;
-					break;
-				case VelvetParser.ATTR_OP_GREATER:
-					relationOperator = RelationOperator.GREATER;
-					break;
-				case VelvetParser.ATTR_OP_GREATER_EQ:
-					relationOperator = RelationOperator.GREATER_EQUAL;
-					break;
-				case VelvetParser.ATTR_OP_LESS:
-					relationOperator = RelationOperator.LESS;
-					break;
-				case VelvetParser.ATTR_OP_LESS_EQ:
-					relationOperator = RelationOperator.LESS_EQUAL;
-					break;
+						break;
+					// case VelvetParser.FLOAT:
+					// break;
+					case VelvetParser.INT:
+						int value = Integer.parseInt(curNode.getText());
+						if (relationOperator == null ^ minus) {
+							degree -= value;
+						} else {
+							degree += value;
+						}
+						break;
+					case VelvetParser.PLUS:
+						minus = false;
+						break;
+					case VelvetParser.MINUS:
+						minus = true;
+						break;
+					case VelvetParser.ATTR_OP_EQUALS:
+						relationOperator = RelationOperator.EQUAL;
+						break;
+					case VelvetParser.ATTR_OP_NOT_EQUALS:
+						relationOperator = RelationOperator.NOT_EQUAL;
+						break;
+					case VelvetParser.ATTR_OP_GREATER:
+						relationOperator = RelationOperator.GREATER;
+						break;
+					case VelvetParser.ATTR_OP_GREATER_EQ:
+						relationOperator = RelationOperator.GREATER_EQUAL;
+						break;
+					case VelvetParser.ATTR_OP_LESS:
+						relationOperator = RelationOperator.LESS;
+						break;
+					case VelvetParser.ATTR_OP_LESS_EQ:
+						relationOperator = RelationOperator.LESS_EQUAL;
+						break;
 				}
 			}
-			Equation equation = new Equation(weightedTerms, relationOperator,
-					degree);
+			Equation equation = new Equation(weightedTerms, relationOperator, degree);
 			// FMCorePlugin.getDefault().logInfo(equation.toString());
 			extFeatureModel.addAttributeConstraint(equation);
 		}
 	}
 
-	private WeightedTerm createTerm(int weight, boolean rightSide,
-			boolean minus, Reference reference) {
+	private WeightedTerm createTerm(int weight, boolean rightSide, boolean minus, Reference reference) {
 		boolean positive = weight >= 0;
 		if (rightSide ^ minus) {
 			positive = !positive;
@@ -499,8 +501,11 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		return new WeightedTerm(Math.abs(weight), positive, reference);
 	}
 
-	private Feature addFeature(Feature parent, String featureName,
-			boolean isMandatory, boolean isAbstract, boolean isHidden) {
+	private Feature addFeature(Feature parent,
+			String featureName,
+			boolean isMandatory,
+			boolean isAbstract,
+			boolean isHidden) {
 		Feature newFeature = new Feature(extFeatureModel, featureName);
 		newFeature.setMandatory(isMandatory);
 		newFeature.setAbstract(isAbstract);
@@ -514,20 +519,19 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 
 	@Override
 	protected synchronized void parseInputStream(InputStream inputStream)
-			throws UnsupportedModelException {
+		throws UnsupportedModelException {
 		ANTLRInputStream antlrInputStream = null;
 		try {
 			antlrInputStream = new ANTLRInputStream(inputStream);
-		} catch (IOException e) {
+		} catch ( IOException e ) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 		if (antlrInputStream != null) {
-			VelvetParser parser = new VelvetParser(new CommonTokenStream(
-					new VelvetLexer(antlrInputStream)));
+			VelvetParser parser = new VelvetParser(new CommonTokenStream(new VelvetLexer(antlrInputStream)));
 			Tree root = null;
 			try {
 				root = (Tree) parser.velvetModel().getTree();
-			} catch (RecognitionException e) {
+			} catch ( RecognitionException e ) {
 				throw new UnsupportedModelException(e.getMessage(), e.line);
 			}
 
@@ -536,17 +540,14 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 				parseModel(root);
 				parseAttributeConstraints();
 
-				ExtendedFeatureModelAnalyzer analyzer = new ExtendedFeatureModelAnalyzer(
-						extFeatureModel);
+				ExtendedFeatureModelAnalyzer analyzer = new ExtendedFeatureModelAnalyzer(extFeatureModel);
 				// TODO @Matthias REMOVE IF WHEN TESTING IS DONE
 				if (null != FMCorePlugin.getDefault()) {
-					FMCorePlugin.getDefault().logInfo(
-							"Velvet-Featuremodel imported");
+					FMCorePlugin.getDefault().logInfo("Velvet-Featuremodel imported");
 
 					try {
-						FMCorePlugin.getDefault().logInfo(
-								analyzer.isValid() ? "valid" : "invalid");
-					} catch (TimeoutException e) {
+						FMCorePlugin.getDefault().logInfo(analyzer.isValid() ? "valid" : "invalid");
+					} catch ( TimeoutException e ) {
 						FMCorePlugin.getDefault().logError(e);
 					}
 				}

@@ -1,4 +1,4 @@
-// $ANTLR 3.4 Velvet.g 2014-01-08 19:57:12
+// $ANTLR 3.4 Velvet.g 2014-01-08 20:51:08
 package de.ovgu.featureide.fm.core.io.velvet;
 
 import org.antlr.runtime.*;
@@ -43,33 +43,34 @@ public class VelvetLexer extends Lexer {
     public static final int IMP=35;
     public static final int IMPORT=36;
     public static final int INSTANCE=37;
-    public static final int INT=38;
-    public static final int INTER=39;
-    public static final int MANDATORY=40;
-    public static final int MINUS=41;
-    public static final int OCTAL_ESC=42;
-    public static final int ONEOF=43;
-    public static final int OPERAND=44;
-    public static final int OP_AND=45;
-    public static final int OP_EQUIVALENT=46;
-    public static final int OP_IMPLIES=47;
-    public static final int OP_NOT=48;
-    public static final int OP_OR=49;
-    public static final int OP_XOR=50;
-    public static final int PLUS=51;
-    public static final int REFINES=52;
-    public static final int SEMI=53;
-    public static final int SOMEOF=54;
-    public static final int START_C=55;
-    public static final int START_R=56;
-    public static final int STRING=57;
-    public static final int UNARYOP=58;
-    public static final int UNICODE_ESC=59;
-    public static final int VAR_BOOL=60;
-    public static final int VAR_FLOAT=61;
-    public static final int VAR_INT=62;
-    public static final int VAR_STRING=63;
-    public static final int WS=64;
+    public static final int INSTANCEDEF=38;
+    public static final int INT=39;
+    public static final int INTER=40;
+    public static final int MANDATORY=41;
+    public static final int MINUS=42;
+    public static final int OCTAL_ESC=43;
+    public static final int ONEOF=44;
+    public static final int OPERAND=45;
+    public static final int OP_AND=46;
+    public static final int OP_EQUIVALENT=47;
+    public static final int OP_IMPLIES=48;
+    public static final int OP_NOT=49;
+    public static final int OP_OR=50;
+    public static final int OP_XOR=51;
+    public static final int PLUS=52;
+    public static final int REFINES=53;
+    public static final int SEMI=54;
+    public static final int SOMEOF=55;
+    public static final int START_C=56;
+    public static final int START_R=57;
+    public static final int STRING=58;
+    public static final int UNARYOP=59;
+    public static final int UNICODE_ESC=60;
+    public static final int VAR_BOOL=61;
+    public static final int VAR_FLOAT=62;
+    public static final int VAR_INT=63;
+    public static final int VAR_STRING=64;
+    public static final int WS=65;
 
     // delegates
     // delegators
@@ -893,7 +894,7 @@ public class VelvetLexer extends Lexer {
         try {
             int _type = BOOLEAN;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Velvet.g:220:9: ( 'true' | 'false' )
+            // Velvet.g:226:9: ( 'true' | 'false' )
             int alt1=2;
             int LA1_0 = input.LA(1);
 
@@ -912,7 +913,7 @@ public class VelvetLexer extends Lexer {
             }
             switch (alt1) {
                 case 1 :
-                    // Velvet.g:220:11: 'true'
+                    // Velvet.g:226:11: 'true'
                     {
                     match("true"); 
 
@@ -921,7 +922,7 @@ public class VelvetLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // Velvet.g:221:4: 'false'
+                    // Velvet.g:227:4: 'false'
                     {
                     match("false"); 
 
@@ -945,8 +946,8 @@ public class VelvetLexer extends Lexer {
         try {
             int _type = ID;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Velvet.g:224:5: ( ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )* )
-            // Velvet.g:224:7: ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )*
+            // Velvet.g:230:5: ( ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )* )
+            // Velvet.g:230:7: ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )*
             {
             if ( (input.LA(1) >= 'A' && input.LA(1) <= 'Z')||input.LA(1)=='_'||(input.LA(1) >= 'a' && input.LA(1) <= 'z') ) {
                 input.consume();
@@ -958,7 +959,7 @@ public class VelvetLexer extends Lexer {
             }
 
 
-            // Velvet.g:224:31: ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )*
+            // Velvet.g:230:31: ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )*
             loop2:
             do {
                 int alt2=2;
@@ -1008,13 +1009,13 @@ public class VelvetLexer extends Lexer {
         try {
             int _type = IDPath;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Velvet.g:227:8: ( ID ( '.' ID )+ )
-            // Velvet.g:227:10: ID ( '.' ID )+
+            // Velvet.g:233:8: ( ID ( '.' ID )+ )
+            // Velvet.g:233:10: ID ( '.' ID )+
             {
             mID(); 
 
 
-            // Velvet.g:227:13: ( '.' ID )+
+            // Velvet.g:233:13: ( '.' ID )+
             int cnt3=0;
             loop3:
             do {
@@ -1028,7 +1029,7 @@ public class VelvetLexer extends Lexer {
 
                 switch (alt3) {
             	case 1 :
-            	    // Velvet.g:227:14: '.' ID
+            	    // Velvet.g:233:14: '.' ID
             	    {
             	    match('.'); 
 
@@ -1064,10 +1065,10 @@ public class VelvetLexer extends Lexer {
         try {
             int _type = INT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Velvet.g:230:5: ( ( '0' .. '9' )+ )
-            // Velvet.g:230:7: ( '0' .. '9' )+
+            // Velvet.g:236:5: ( ( '0' .. '9' )+ )
+            // Velvet.g:236:7: ( '0' .. '9' )+
             {
-            // Velvet.g:230:7: ( '0' .. '9' )+
+            // Velvet.g:236:7: ( '0' .. '9' )+
             int cnt4=0;
             loop4:
             do {
@@ -1122,14 +1123,14 @@ public class VelvetLexer extends Lexer {
         try {
             int _type = FLOAT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Velvet.g:234:5: ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( EXPONENT )? | '.' ( '0' .. '9' )+ ( EXPONENT )? | ( '0' .. '9' )+ EXPONENT )
+            // Velvet.g:240:5: ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( EXPONENT )? | '.' ( '0' .. '9' )+ ( EXPONENT )? | ( '0' .. '9' )+ EXPONENT )
             int alt11=3;
             alt11 = dfa11.predict(input);
             switch (alt11) {
                 case 1 :
-                    // Velvet.g:234:9: ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( EXPONENT )?
+                    // Velvet.g:240:9: ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( EXPONENT )?
                     {
-                    // Velvet.g:234:9: ( '0' .. '9' )+
+                    // Velvet.g:240:9: ( '0' .. '9' )+
                     int cnt5=0;
                     loop5:
                     do {
@@ -1170,7 +1171,7 @@ public class VelvetLexer extends Lexer {
 
                     match('.'); 
 
-                    // Velvet.g:234:25: ( '0' .. '9' )*
+                    // Velvet.g:240:25: ( '0' .. '9' )*
                     loop6:
                     do {
                         int alt6=2;
@@ -1204,7 +1205,7 @@ public class VelvetLexer extends Lexer {
                     } while (true);
 
 
-                    // Velvet.g:234:37: ( EXPONENT )?
+                    // Velvet.g:240:37: ( EXPONENT )?
                     int alt7=2;
                     int LA7_0 = input.LA(1);
 
@@ -1213,7 +1214,7 @@ public class VelvetLexer extends Lexer {
                     }
                     switch (alt7) {
                         case 1 :
-                            // Velvet.g:234:37: EXPONENT
+                            // Velvet.g:240:37: EXPONENT
                             {
                             mEXPONENT(); 
 
@@ -1227,11 +1228,11 @@ public class VelvetLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // Velvet.g:235:9: '.' ( '0' .. '9' )+ ( EXPONENT )?
+                    // Velvet.g:241:9: '.' ( '0' .. '9' )+ ( EXPONENT )?
                     {
                     match('.'); 
 
-                    // Velvet.g:235:13: ( '0' .. '9' )+
+                    // Velvet.g:241:13: ( '0' .. '9' )+
                     int cnt8=0;
                     loop8:
                     do {
@@ -1270,7 +1271,7 @@ public class VelvetLexer extends Lexer {
                     } while (true);
 
 
-                    // Velvet.g:235:25: ( EXPONENT )?
+                    // Velvet.g:241:25: ( EXPONENT )?
                     int alt9=2;
                     int LA9_0 = input.LA(1);
 
@@ -1279,7 +1280,7 @@ public class VelvetLexer extends Lexer {
                     }
                     switch (alt9) {
                         case 1 :
-                            // Velvet.g:235:25: EXPONENT
+                            // Velvet.g:241:25: EXPONENT
                             {
                             mEXPONENT(); 
 
@@ -1293,9 +1294,9 @@ public class VelvetLexer extends Lexer {
                     }
                     break;
                 case 3 :
-                    // Velvet.g:236:9: ( '0' .. '9' )+ EXPONENT
+                    // Velvet.g:242:9: ( '0' .. '9' )+ EXPONENT
                     {
-                    // Velvet.g:236:9: ( '0' .. '9' )+
+                    // Velvet.g:242:9: ( '0' .. '9' )+
                     int cnt10=0;
                     loop10:
                     do {
@@ -1355,12 +1356,12 @@ public class VelvetLexer extends Lexer {
         try {
             int _type = STRING;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Velvet.g:240:5: ( '\"' ( ESC_SEQ |~ ( '\\\\' | '\"' ) )* '\"' )
-            // Velvet.g:240:8: '\"' ( ESC_SEQ |~ ( '\\\\' | '\"' ) )* '\"'
+            // Velvet.g:246:5: ( '\"' ( ESC_SEQ |~ ( '\\\\' | '\"' ) )* '\"' )
+            // Velvet.g:246:8: '\"' ( ESC_SEQ |~ ( '\\\\' | '\"' ) )* '\"'
             {
             match('\"'); 
 
-            // Velvet.g:240:12: ( ESC_SEQ |~ ( '\\\\' | '\"' ) )*
+            // Velvet.g:246:12: ( ESC_SEQ |~ ( '\\\\' | '\"' ) )*
             loop12:
             do {
                 int alt12=3;
@@ -1376,7 +1377,7 @@ public class VelvetLexer extends Lexer {
 
                 switch (alt12) {
             	case 1 :
-            	    // Velvet.g:240:14: ESC_SEQ
+            	    // Velvet.g:246:14: ESC_SEQ
             	    {
             	    mESC_SEQ(); 
 
@@ -1384,7 +1385,7 @@ public class VelvetLexer extends Lexer {
             	    }
             	    break;
             	case 2 :
-            	    // Velvet.g:240:24: ~ ( '\\\\' | '\"' )
+            	    // Velvet.g:246:24: ~ ( '\\\\' | '\"' )
             	    {
             	    if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '!')||(input.LA(1) >= '#' && input.LA(1) <= '[')||(input.LA(1) >= ']' && input.LA(1) <= '\uFFFF') ) {
             	        input.consume();
@@ -1421,8 +1422,8 @@ public class VelvetLexer extends Lexer {
     // $ANTLR start "EXPONENT"
     public final void mEXPONENT() throws RecognitionException {
         try {
-            // Velvet.g:245:10: ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )
-            // Velvet.g:245:12: ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+
+            // Velvet.g:251:10: ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )
+            // Velvet.g:251:12: ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+
             {
             if ( input.LA(1)=='E'||input.LA(1)=='e' ) {
                 input.consume();
@@ -1434,7 +1435,7 @@ public class VelvetLexer extends Lexer {
             }
 
 
-            // Velvet.g:245:22: ( '+' | '-' )?
+            // Velvet.g:251:22: ( '+' | '-' )?
             int alt13=2;
             int LA13_0 = input.LA(1);
 
@@ -1461,7 +1462,7 @@ public class VelvetLexer extends Lexer {
             }
 
 
-            // Velvet.g:245:33: ( '0' .. '9' )+
+            // Velvet.g:251:33: ( '0' .. '9' )+
             int cnt14=0;
             loop14:
             do {
@@ -1513,7 +1514,7 @@ public class VelvetLexer extends Lexer {
     // $ANTLR start "HEX_DIGIT"
     public final void mHEX_DIGIT() throws RecognitionException {
         try {
-            // Velvet.g:248:11: ( ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' ) )
+            // Velvet.g:254:11: ( ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' ) )
             // Velvet.g:
             {
             if ( (input.LA(1) >= '0' && input.LA(1) <= '9')||(input.LA(1) >= 'A' && input.LA(1) <= 'F')||(input.LA(1) >= 'a' && input.LA(1) <= 'f') ) {
@@ -1539,7 +1540,7 @@ public class VelvetLexer extends Lexer {
     // $ANTLR start "ESC_SEQ"
     public final void mESC_SEQ() throws RecognitionException {
         try {
-            // Velvet.g:252:5: ( '\\\\' ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' ) | UNICODE_ESC | OCTAL_ESC )
+            // Velvet.g:258:5: ( '\\\\' ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' ) | UNICODE_ESC | OCTAL_ESC )
             int alt15=3;
             int LA15_0 = input.LA(1);
 
@@ -1592,7 +1593,7 @@ public class VelvetLexer extends Lexer {
             }
             switch (alt15) {
                 case 1 :
-                    // Velvet.g:252:9: '\\\\' ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' )
+                    // Velvet.g:258:9: '\\\\' ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' )
                     {
                     match('\\'); 
 
@@ -1609,7 +1610,7 @@ public class VelvetLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // Velvet.g:253:9: UNICODE_ESC
+                    // Velvet.g:259:9: UNICODE_ESC
                     {
                     mUNICODE_ESC(); 
 
@@ -1617,7 +1618,7 @@ public class VelvetLexer extends Lexer {
                     }
                     break;
                 case 3 :
-                    // Velvet.g:254:9: OCTAL_ESC
+                    // Velvet.g:260:9: OCTAL_ESC
                     {
                     mOCTAL_ESC(); 
 
@@ -1637,7 +1638,7 @@ public class VelvetLexer extends Lexer {
     // $ANTLR start "OCTAL_ESC"
     public final void mOCTAL_ESC() throws RecognitionException {
         try {
-            // Velvet.g:259:5: ( '\\\\' ( '0' .. '3' ) ( '0' .. '7' ) ( '0' .. '7' ) | '\\\\' ( '0' .. '7' ) ( '0' .. '7' ) | '\\\\' ( '0' .. '7' ) )
+            // Velvet.g:265:5: ( '\\\\' ( '0' .. '3' ) ( '0' .. '7' ) ( '0' .. '7' ) | '\\\\' ( '0' .. '7' ) ( '0' .. '7' ) | '\\\\' ( '0' .. '7' ) )
             int alt16=3;
             int LA16_0 = input.LA(1);
 
@@ -1688,7 +1689,7 @@ public class VelvetLexer extends Lexer {
             }
             switch (alt16) {
                 case 1 :
-                    // Velvet.g:259:9: '\\\\' ( '0' .. '3' ) ( '0' .. '7' ) ( '0' .. '7' )
+                    // Velvet.g:265:9: '\\\\' ( '0' .. '3' ) ( '0' .. '7' ) ( '0' .. '7' )
                     {
                     match('\\'); 
 
@@ -1725,7 +1726,7 @@ public class VelvetLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // Velvet.g:260:9: '\\\\' ( '0' .. '7' ) ( '0' .. '7' )
+                    // Velvet.g:266:9: '\\\\' ( '0' .. '7' ) ( '0' .. '7' )
                     {
                     match('\\'); 
 
@@ -1752,7 +1753,7 @@ public class VelvetLexer extends Lexer {
                     }
                     break;
                 case 3 :
-                    // Velvet.g:261:9: '\\\\' ( '0' .. '7' )
+                    // Velvet.g:267:9: '\\\\' ( '0' .. '7' )
                     {
                     match('\\'); 
 
@@ -1781,8 +1782,8 @@ public class VelvetLexer extends Lexer {
     // $ANTLR start "UNICODE_ESC"
     public final void mUNICODE_ESC() throws RecognitionException {
         try {
-            // Velvet.g:266:5: ( '\\\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT )
-            // Velvet.g:266:9: '\\\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
+            // Velvet.g:272:5: ( '\\\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT )
+            // Velvet.g:272:9: '\\\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
             {
             match('\\'); 
 
@@ -1815,8 +1816,8 @@ public class VelvetLexer extends Lexer {
         try {
             int _type = WS;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Velvet.g:268:5: ( ( ' ' | '\\t' | '\\r' | '\\n' ) )
-            // Velvet.g:268:7: ( ' ' | '\\t' | '\\r' | '\\n' )
+            // Velvet.g:274:5: ( ( ' ' | '\\t' | '\\r' | '\\n' ) )
+            // Velvet.g:274:7: ( ' ' | '\\t' | '\\r' | '\\n' )
             {
             if ( (input.LA(1) >= '\t' && input.LA(1) <= '\n')||input.LA(1)=='\r'||input.LA(1)==' ' ) {
                 input.consume();
@@ -2248,7 +2249,7 @@ public class VelvetLexer extends Lexer {
             this.transition = DFA11_transition;
         }
         public String getDescription() {
-            return "233:1: FLOAT : ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( EXPONENT )? | '.' ( '0' .. '9' )+ ( EXPONENT )? | ( '0' .. '9' )+ EXPONENT );";
+            return "239:1: FLOAT : ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( EXPONENT )? | '.' ( '0' .. '9' )+ ( EXPONENT )? | ( '0' .. '9' )+ EXPONENT );";
         }
     }
     static final String DFA17_eotS =

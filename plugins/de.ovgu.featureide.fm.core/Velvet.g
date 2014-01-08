@@ -55,6 +55,7 @@ tokens {
 	FEAT;
 	GROUP;
 	INSTANCE;
+	INSTANCEDEF;
 	ATTR;
 	UNARYOP;
 	OPERAND;
@@ -77,9 +78,14 @@ public void emitErrorMessage(String msg) {
 }
 
 velvetModel
-	: imports? (concept|cinterface) EOF
+	: imports? instancedef* (concept|cinterface) EOF
 	;
-	
+
+instancedef 
+	: ID name SEMI
+	-> ^(INSTANCEDEF ID name)
+	;
+
 imports : (IMPORT name SEMI)+
 	-> ^(IMP name+)
 	;

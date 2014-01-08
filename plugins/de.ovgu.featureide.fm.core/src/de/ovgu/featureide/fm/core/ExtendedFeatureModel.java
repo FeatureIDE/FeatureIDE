@@ -26,8 +26,8 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
-import de.ovgu.featureide.fm.core.constraint.FeatureAttributeMap;
 import de.ovgu.featureide.fm.core.constraint.Equation;
+import de.ovgu.featureide.fm.core.constraint.FeatureAttributeMap;
 
 /**
  * Adds attributes and attribute constraints to a feature model.
@@ -45,40 +45,35 @@ public class ExtendedFeatureModel
 	protected Map<String, String> parameters = new HashMap<String, String>();
 	protected Set<Feature> importedFeatures = new HashSet<Feature>();
 	protected Set<String> parents = new HashSet<String>();
+	protected Map<String, String> instances = new HashMap<String, String>();
 	protected boolean hasParameters = false;
 
 	protected LinkedList<Equation> attributeConstraints = new LinkedList<Equation>();
 
-	public void addAttributeConstraint(Equation constraint) {
-		attributeConstraints.add(constraint);
+	public void addAttribute(final String featureName, final String attributeName, final Boolean value) {
+		this.booleanAttributes.setAttribute(featureName, attributeName, value);
 	}
 
-	public LinkedList<Equation> getAttributConstraints() {
-		return attributeConstraints;
+	public void addAttribute(final String featureName, final String attributeName, final Integer value) {
+		this.integerAttributes.setAttribute(featureName, attributeName, value);
 	}
 
-	public FeatureAttributeMap<Integer> getIntegerAttributes() {
-		return integerAttributes;
+	public void addAttribute(final String featureName, final String attributeName, final String value) {
+		this.stringAttributes.setAttribute(featureName, attributeName, value);
 	}
 
-	public FeatureAttributeMap<Boolean> getBooleanAttributes() {
-		return booleanAttributes;
+	public void addAttributeConstraint(final Equation constraint) {
+		this.attributeConstraints.add(constraint);
 	}
 
-	public FeatureAttributeMap<String> getStringAttributes() {
-		return stringAttributes;
-	}
-
-	public void addAttribute(String featureName, String attributeName, Integer value) {
-		integerAttributes.setAttribute(featureName, attributeName, value);
-	}
-
-	public void addAttribute(String featureName, String attributeName, Boolean value) {
-		booleanAttributes.setAttribute(featureName, attributeName, value);
-	}
-
-	public void addAttribute(String featureName, String attributeName, String value) {
-		stringAttributes.setAttribute(featureName, attributeName, value);
+	/**
+	 * Adds a mapping for an instancename to the model which it will be bound to
+	 * 
+	 * @param name the name of the variable
+	 * @param model the model that the variable is bound to
+	 */
+	public void addInstanceMapping(final String name, final String model) {
+		this.instances.put(name, model);
 	}
 
 	/**
@@ -91,16 +86,46 @@ public class ExtendedFeatureModel
 	 *         the variable name was already bound to another interface.
 	 */
 	public boolean addParameter(final String interfaceClazz, final String varName) {
-		if (parameters.containsKey(varName)) {
+		if (this.parameters.containsKey(varName)) {
 			return false;
 		}
 
-		if (!hasParameters) {
-			hasParameters = true;
+		if (!this.hasParameters) {
+			this.hasParameters = true;
 		}
 
-		parameters.put(varName, interfaceClazz);
+		this.parameters.put(varName, interfaceClazz);
 		return true;
+	}
+
+	/**
+	 * Adds the name of a Model as a parent of the current model.
+	 * 
+	 * @param parentModelName the name of the parent model
+	 */
+	public void addParent(final String parentModelName) {
+		this.parents.add(parentModelName);
+	}
+
+	public LinkedList<Equation> getAttributConstraints() {
+		return this.attributeConstraints;
+	}
+
+	public FeatureAttributeMap<Boolean> getBooleanAttributes() {
+		return this.booleanAttributes;
+	}
+
+	/**
+	 * returns a copy of the internal mappings of instances and their names.
+	 * 
+	 * @return a copy of the internal mappings of instances and their names.
+	 */
+	public Map<String, String> getInstanceMappings() {
+		return new HashMap<String, String>(this.instances);
+	}
+
+	public FeatureAttributeMap<Integer> getIntegerAttributes() {
+		return this.integerAttributes;
 	}
 
 	/**
@@ -111,7 +136,20 @@ public class ExtendedFeatureModel
 	 *         value is not supposed to be edited.
 	 */
 	public Map<String, String> getParameters() {
-		return new HashMap<String, String>(parameters);
+		return new HashMap<String, String>(this.parameters);
+	}
+
+	/**
+	 * returns a set containing the parentmodels of the current model.
+	 * 
+	 * @return a copy of the parents of the model
+	 */
+	public Set<String> getParents() {
+		return new HashSet<String>(this.parents);
+	}
+
+	public FeatureAttributeMap<String> getStringAttributes() {
+		return this.stringAttributes;
 	}
 
 	/**
@@ -126,13 +164,14 @@ public class ExtendedFeatureModel
 	}
 
 	/**
-	 * This method stores imported features.
+	 * Returns the name of the implemented interface or an empty String if no
+	 * interfaces are implemented.
 	 * 
-	 * @param imported the exact feature, that was added to the featuremodel
-	 *            previously
+	 * @return the name of the implemented interface or an empty String if no
+	 *         interfaces are implemented.
 	 */
-	public void setFeatureImported(Feature imported) {
-		importedFeatures.add(imported);
+	public String implementsInterface() {
+		return "";
 	}
 
 	/**
@@ -142,36 +181,17 @@ public class ExtendedFeatureModel
 	 *            imported
 	 * @return true if and only if the feature was imported
 	 */
-	public boolean isImported(Feature imported) {
-		return importedFeatures.contains(imported);
+	public boolean isImported(final Feature imported) {
+		return this.importedFeatures.contains(imported);
 	}
 
 	/**
-	 * Adds the name of a Model as a parent of the current model.
+	 * This method stores imported features.
 	 * 
-	 * @param parentModelName the name of the parent model
+	 * @param imported the exact feature, that was added to the featuremodel
+	 *            previously
 	 */
-	public void addParent(final String parentModelName) {
-		parents.add(parentModelName);
-	}
-
-	/**
-	 * returns a set containing the parentmodels of the current model.
-	 * 
-	 * @return a copy of the parents of the model
-	 */
-	public Set<String> getParents() {
-		return new HashSet<String>(parents);
-	}
-
-	/**
-	 * Returns the name of the implemented interface or an empty String if no
-	 * interfaces are implemented.
-	 * 
-	 * @return the name of the implemented interface or an empty String if no
-	 *         interfaces are implemented.
-	 */
-	public String implementsInterface() {
-		return "";
+	public void setFeatureImported(final Feature imported) {
+		this.importedFeatures.add(imported);
 	}
 }
