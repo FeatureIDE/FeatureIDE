@@ -13,7 +13,7 @@ tokens {
 	IMPORT 		='import';
 	REFINES 	='refines';
 	CONCEPT 	='concept';
-	INTERFACEG	='interfaceg';
+	CINTERFACE	='cinterface';
 	CONSTRAINT 	='constraint';
 	FEATURE 	='feature';
 
@@ -77,7 +77,7 @@ public void emitErrorMessage(String msg) {
 }
 
 velvetModel
-	: imports? (concept|interfaceg) EOF
+	: imports? (concept|cinterface) EOF
 	;
 	
 imports : (IMPORT name SEMI)+
@@ -102,8 +102,8 @@ conceptInterExt
 	;
 
 
-interfaceg : REFINES? INTERFACEG ID  (COLON interfaceBaseExt)? definitions 
-	-> ^(INTERFACEG ID REFINES? interfaceBaseExt? definitions)
+cinterface : REFINES? CINTERFACE ID  (COLON interfaceBaseExt)? definitions 
+	-> ^(CINTERFACE ID REFINES? interfaceBaseExt? definitions)
 	;
 	
 interfaceBaseExt

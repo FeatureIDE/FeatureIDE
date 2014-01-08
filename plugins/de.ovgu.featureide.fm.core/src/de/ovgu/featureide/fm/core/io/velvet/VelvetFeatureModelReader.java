@@ -100,7 +100,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 			case VelvetParser.CONCEPT:
 				parseConcept(curNode);
 				break;
-			case VelvetParser.INTERFACEG:
+			case VelvetParser.CINTERFACE:
 				parseConcept(curNode);
 				break;
 			}
@@ -149,12 +149,16 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 			final String interfaceVar = nodeList.poll().getText();
 
 			if (!extFeatureModel.addParameter(interfaceClazz, interfaceVar)) {
-				// TODO Matthias log an error
+				// TODO @Matthias log an error
 			}
 		}
 	}
 
 	private void parseInheritance(Tree root) {
+		// TODO maybe add a search path for imports.
+		// it can only be inherited from model.xml's of other projects in the
+		// same workspace and only if the modelname corresponds to the project
+		// name
 		LinkedList<Tree> nodeList = getChildren(root);
 
 		while (!nodeList.isEmpty()) {
@@ -249,6 +253,15 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		String featureName = childList.poll().getText();
 		boolean isMandatory = false, isAbstract = false, moreDefinitions = false;
 
+		// TODO need good .equals() and .hashCode()
+		for (Feature feat : parent.getChildren()){
+			if (feat.getName().equals(featureName)) {
+				// TODO @Matthias handle overwrite
+				break;
+			}
+		}
+		
+		extFeatureModel.getFeature("");
 		Tree childNode = null;
 		while (!childList.isEmpty() && !moreDefinitions) {
 			childNode = childList.poll();
@@ -525,7 +538,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 
 				ExtendedFeatureModelAnalyzer analyzer = new ExtendedFeatureModelAnalyzer(
 						extFeatureModel);
-				// TODO MATTHIAS REMOVE IF WHEN TESTING IS DONE
+				// TODO @Matthias REMOVE IF WHEN TESTING IS DONE
 				if (null != FMCorePlugin.getDefault()) {
 					FMCorePlugin.getDefault().logInfo(
 							"Velvet-Featuremodel imported");

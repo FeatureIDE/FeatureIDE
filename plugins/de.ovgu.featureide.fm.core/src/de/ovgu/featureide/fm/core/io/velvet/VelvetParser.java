@@ -1,4 +1,4 @@
-// $ANTLR 3.4 Velvet.g 2013-12-16 23:02:10
+// $ANTLR 3.4 Velvet.g 2014-01-08 19:57:12
 
 package de.ovgu.featureide.fm.core.io.velvet;
 
@@ -15,7 +15,7 @@ import org.antlr.runtime.tree.*;
 @SuppressWarnings({"all", "warnings", "unchecked"})
 public class VelvetParser extends Parser {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "ABSTRACT", "ACONSTR", "ATTR", "ATTR_OP_EQUALS", "ATTR_OP_GREATER", "ATTR_OP_GREATER_EQ", "ATTR_OP_LESS", "ATTR_OP_LESS_EQ", "ATTR_OP_NOT_EQUALS", "BASEEXT", "BASEPARAM", "BOOLEAN", "COLON", "COMMA", "CONCEPT", "CONSTR", "CONSTRAINT", "DEF", "END_C", "END_R", "EQ", "ESC_SEQ", "EXPONENT", "FEAT", "FEATURE", "FLOAT", "GROUP", "HEX_DIGIT", "ID", "IDPath", "IMP", "IMPORT", "INSTANCE", "INT", "INTER", "INTERFACEG", "MANDATORY", "MINUS", "OCTAL_ESC", "ONEOF", "OPERAND", "OP_AND", "OP_EQUIVALENT", "OP_IMPLIES", "OP_NOT", "OP_OR", "OP_XOR", "PLUS", "REFINES", "SEMI", "SOMEOF", "START_C", "START_R", "STRING", "UNARYOP", "UNICODE_ESC", "VAR_BOOL", "VAR_FLOAT", "VAR_INT", "VAR_STRING", "WS"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "ABSTRACT", "ACONSTR", "ATTR", "ATTR_OP_EQUALS", "ATTR_OP_GREATER", "ATTR_OP_GREATER_EQ", "ATTR_OP_LESS", "ATTR_OP_LESS_EQ", "ATTR_OP_NOT_EQUALS", "BASEEXT", "BASEPARAM", "BOOLEAN", "CINTERFACE", "COLON", "COMMA", "CONCEPT", "CONSTR", "CONSTRAINT", "DEF", "END_C", "END_R", "EQ", "ESC_SEQ", "EXPONENT", "FEAT", "FEATURE", "FLOAT", "GROUP", "HEX_DIGIT", "ID", "IDPath", "IMP", "IMPORT", "INSTANCE", "INT", "INTER", "MANDATORY", "MINUS", "OCTAL_ESC", "ONEOF", "OPERAND", "OP_AND", "OP_EQUIVALENT", "OP_IMPLIES", "OP_NOT", "OP_OR", "OP_XOR", "PLUS", "REFINES", "SEMI", "SOMEOF", "START_C", "START_R", "STRING", "UNARYOP", "UNICODE_ESC", "VAR_BOOL", "VAR_FLOAT", "VAR_INT", "VAR_STRING", "WS"
     };
 
     public static final int EOF=-1;
@@ -31,30 +31,30 @@ public class VelvetParser extends Parser {
     public static final int BASEEXT=13;
     public static final int BASEPARAM=14;
     public static final int BOOLEAN=15;
-    public static final int COLON=16;
-    public static final int COMMA=17;
-    public static final int CONCEPT=18;
-    public static final int CONSTR=19;
-    public static final int CONSTRAINT=20;
-    public static final int DEF=21;
-    public static final int END_C=22;
-    public static final int END_R=23;
-    public static final int EQ=24;
-    public static final int ESC_SEQ=25;
-    public static final int EXPONENT=26;
-    public static final int FEAT=27;
-    public static final int FEATURE=28;
-    public static final int FLOAT=29;
-    public static final int GROUP=30;
-    public static final int HEX_DIGIT=31;
-    public static final int ID=32;
-    public static final int IDPath=33;
-    public static final int IMP=34;
-    public static final int IMPORT=35;
-    public static final int INSTANCE=36;
-    public static final int INT=37;
-    public static final int INTER=38;
-    public static final int INTERFACEG=39;
+    public static final int CINTERFACE=16;
+    public static final int COLON=17;
+    public static final int COMMA=18;
+    public static final int CONCEPT=19;
+    public static final int CONSTR=20;
+    public static final int CONSTRAINT=21;
+    public static final int DEF=22;
+    public static final int END_C=23;
+    public static final int END_R=24;
+    public static final int EQ=25;
+    public static final int ESC_SEQ=26;
+    public static final int EXPONENT=27;
+    public static final int FEAT=28;
+    public static final int FEATURE=29;
+    public static final int FLOAT=30;
+    public static final int GROUP=31;
+    public static final int HEX_DIGIT=32;
+    public static final int ID=33;
+    public static final int IDPath=34;
+    public static final int IMP=35;
+    public static final int IMPORT=36;
+    public static final int INSTANCE=37;
+    public static final int INT=38;
+    public static final int INTER=39;
     public static final int MANDATORY=40;
     public static final int MINUS=41;
     public static final int OCTAL_ESC=42;
@@ -121,7 +121,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "velvetModel"
-    // Velvet.g:79:1: velvetModel : ( imports )? ( concept | interfaceg ) EOF ;
+    // Velvet.g:79:1: velvetModel : ( imports )? ( concept | cinterface ) EOF ;
     public final VelvetParser.velvetModel_return velvetModel() throws RecognitionException {
         VelvetParser.velvetModel_return retval = new VelvetParser.velvetModel_return();
         retval.start = input.LT(1);
@@ -134,14 +134,14 @@ public TreeAdaptor getTreeAdaptor() {
 
         VelvetParser.concept_return concept2 =null;
 
-        VelvetParser.interfaceg_return interfaceg3 =null;
+        VelvetParser.cinterface_return cinterface3 =null;
 
 
         Tree EOF4_tree=null;
 
         try {
-            // Velvet.g:80:2: ( ( imports )? ( concept | interfaceg ) EOF )
-            // Velvet.g:80:4: ( imports )? ( concept | interfaceg ) EOF
+            // Velvet.g:80:2: ( ( imports )? ( concept | cinterface ) EOF )
+            // Velvet.g:80:4: ( imports )? ( concept | cinterface ) EOF
             {
             root_0 = (Tree)adaptor.nil();
 
@@ -170,7 +170,7 @@ public TreeAdaptor getTreeAdaptor() {
             }
 
 
-            // Velvet.g:80:13: ( concept | interfaceg )
+            // Velvet.g:80:13: ( concept | cinterface )
             int alt2=2;
             switch ( input.LA(1) ) {
             case REFINES:
@@ -180,7 +180,7 @@ public TreeAdaptor getTreeAdaptor() {
                 if ( (LA2_1==CONCEPT) ) {
                     alt2=1;
                 }
-                else if ( (LA2_1==INTERFACEG) ) {
+                else if ( (LA2_1==CINTERFACE) ) {
                     alt2=2;
                 }
                 else {
@@ -197,7 +197,7 @@ public TreeAdaptor getTreeAdaptor() {
                 alt2=1;
                 }
                 break;
-            case INTERFACEG:
+            case CINTERFACE:
                 {
                 alt2=2;
                 }
@@ -224,14 +224,14 @@ public TreeAdaptor getTreeAdaptor() {
                     }
                     break;
                 case 2 :
-                    // Velvet.g:80:22: interfaceg
+                    // Velvet.g:80:22: cinterface
                     {
-                    pushFollow(FOLLOW_interfaceg_in_velvetModel461);
-                    interfaceg3=interfaceg();
+                    pushFollow(FOLLOW_cinterface_in_velvetModel461);
+                    cinterface3=cinterface();
 
                     state._fsp--;
 
-                    adaptor.addChild(root_0, interfaceg3.getTree());
+                    adaptor.addChild(root_0, cinterface3.getTree());
 
                     }
                     break;
@@ -891,23 +891,23 @@ public TreeAdaptor getTreeAdaptor() {
     // $ANTLR end "conceptInterExt"
 
 
-    public static class interfaceg_return extends ParserRuleReturnScope {
+    public static class cinterface_return extends ParserRuleReturnScope {
         Tree tree;
         public Object getTree() { return tree; }
     };
 
 
-    // $ANTLR start "interfaceg"
-    // Velvet.g:105:1: interfaceg : ( REFINES )? INTERFACEG ID ( COLON interfaceBaseExt )? definitions -> ^( INTERFACEG ID ( REFINES )? ( interfaceBaseExt )? definitions ) ;
-    public final VelvetParser.interfaceg_return interfaceg() throws RecognitionException {
-        VelvetParser.interfaceg_return retval = new VelvetParser.interfaceg_return();
+    // $ANTLR start "cinterface"
+    // Velvet.g:105:1: cinterface : ( REFINES )? CINTERFACE ID ( COLON interfaceBaseExt )? definitions -> ^( CINTERFACE ID ( REFINES )? ( interfaceBaseExt )? definitions ) ;
+    public final VelvetParser.cinterface_return cinterface() throws RecognitionException {
+        VelvetParser.cinterface_return retval = new VelvetParser.cinterface_return();
         retval.start = input.LT(1);
 
 
         Tree root_0 = null;
 
         Token REFINES24=null;
-        Token INTERFACEG25=null;
+        Token CINTERFACE25=null;
         Token ID26=null;
         Token COLON27=null;
         VelvetParser.interfaceBaseExt_return interfaceBaseExt28 =null;
@@ -916,18 +916,18 @@ public TreeAdaptor getTreeAdaptor() {
 
 
         Tree REFINES24_tree=null;
-        Tree INTERFACEG25_tree=null;
+        Tree CINTERFACE25_tree=null;
         Tree ID26_tree=null;
         Tree COLON27_tree=null;
         RewriteRuleTokenStream stream_COLON=new RewriteRuleTokenStream(adaptor,"token COLON");
-        RewriteRuleTokenStream stream_INTERFACEG=new RewriteRuleTokenStream(adaptor,"token INTERFACEG");
         RewriteRuleTokenStream stream_REFINES=new RewriteRuleTokenStream(adaptor,"token REFINES");
         RewriteRuleTokenStream stream_ID=new RewriteRuleTokenStream(adaptor,"token ID");
+        RewriteRuleTokenStream stream_CINTERFACE=new RewriteRuleTokenStream(adaptor,"token CINTERFACE");
         RewriteRuleSubtreeStream stream_definitions=new RewriteRuleSubtreeStream(adaptor,"rule definitions");
         RewriteRuleSubtreeStream stream_interfaceBaseExt=new RewriteRuleSubtreeStream(adaptor,"rule interfaceBaseExt");
         try {
-            // Velvet.g:105:12: ( ( REFINES )? INTERFACEG ID ( COLON interfaceBaseExt )? definitions -> ^( INTERFACEG ID ( REFINES )? ( interfaceBaseExt )? definitions ) )
-            // Velvet.g:105:14: ( REFINES )? INTERFACEG ID ( COLON interfaceBaseExt )? definitions
+            // Velvet.g:105:12: ( ( REFINES )? CINTERFACE ID ( COLON interfaceBaseExt )? definitions -> ^( CINTERFACE ID ( REFINES )? ( interfaceBaseExt )? definitions ) )
+            // Velvet.g:105:14: ( REFINES )? CINTERFACE ID ( COLON interfaceBaseExt )? definitions
             {
             // Velvet.g:105:14: ( REFINES )?
             int alt9=2;
@@ -940,7 +940,7 @@ public TreeAdaptor getTreeAdaptor() {
                 case 1 :
                     // Velvet.g:105:14: REFINES
                     {
-                    REFINES24=(Token)match(input,REFINES,FOLLOW_REFINES_in_interfaceg628);  
+                    REFINES24=(Token)match(input,REFINES,FOLLOW_REFINES_in_cinterface628);  
                     stream_REFINES.add(REFINES24);
 
 
@@ -950,11 +950,11 @@ public TreeAdaptor getTreeAdaptor() {
             }
 
 
-            INTERFACEG25=(Token)match(input,INTERFACEG,FOLLOW_INTERFACEG_in_interfaceg631);  
-            stream_INTERFACEG.add(INTERFACEG25);
+            CINTERFACE25=(Token)match(input,CINTERFACE,FOLLOW_CINTERFACE_in_cinterface631);  
+            stream_CINTERFACE.add(CINTERFACE25);
 
 
-            ID26=(Token)match(input,ID,FOLLOW_ID_in_interfaceg633);  
+            ID26=(Token)match(input,ID,FOLLOW_ID_in_cinterface633);  
             stream_ID.add(ID26);
 
 
@@ -969,11 +969,11 @@ public TreeAdaptor getTreeAdaptor() {
                 case 1 :
                     // Velvet.g:105:39: COLON interfaceBaseExt
                     {
-                    COLON27=(Token)match(input,COLON,FOLLOW_COLON_in_interfaceg637);  
+                    COLON27=(Token)match(input,COLON,FOLLOW_COLON_in_cinterface637);  
                     stream_COLON.add(COLON27);
 
 
-                    pushFollow(FOLLOW_interfaceBaseExt_in_interfaceg639);
+                    pushFollow(FOLLOW_interfaceBaseExt_in_cinterface639);
                     interfaceBaseExt28=interfaceBaseExt();
 
                     state._fsp--;
@@ -986,7 +986,7 @@ public TreeAdaptor getTreeAdaptor() {
             }
 
 
-            pushFollow(FOLLOW_definitions_in_interfaceg643);
+            pushFollow(FOLLOW_definitions_in_cinterface643);
             definitions29=definitions();
 
             state._fsp--;
@@ -994,7 +994,7 @@ public TreeAdaptor getTreeAdaptor() {
             stream_definitions.add(definitions29.getTree());
 
             // AST REWRITE
-            // elements: interfaceBaseExt, ID, INTERFACEG, definitions, REFINES
+            // elements: interfaceBaseExt, ID, CINTERFACE, definitions, REFINES
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -1004,13 +1004,13 @@ public TreeAdaptor getTreeAdaptor() {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (Tree)adaptor.nil();
-            // 106:2: -> ^( INTERFACEG ID ( REFINES )? ( interfaceBaseExt )? definitions )
+            // 106:2: -> ^( CINTERFACE ID ( REFINES )? ( interfaceBaseExt )? definitions )
             {
-                // Velvet.g:106:5: ^( INTERFACEG ID ( REFINES )? ( interfaceBaseExt )? definitions )
+                // Velvet.g:106:5: ^( CINTERFACE ID ( REFINES )? ( interfaceBaseExt )? definitions )
                 {
                 Tree root_1 = (Tree)adaptor.nil();
                 root_1 = (Tree)adaptor.becomeRoot(
-                stream_INTERFACEG.nextNode()
+                stream_CINTERFACE.nextNode()
                 , root_1);
 
                 adaptor.addChild(root_1, 
@@ -1064,7 +1064,7 @@ public TreeAdaptor getTreeAdaptor() {
         }
         return retval;
     }
-    // $ANTLR end "interfaceg"
+    // $ANTLR end "cinterface"
 
 
     public static class interfaceBaseExt_return extends ParserRuleReturnScope {
@@ -3944,89 +3944,89 @@ public TreeAdaptor getTreeAdaptor() {
 
  
 
-    public static final BitSet FOLLOW_imports_in_velvetModel455 = new BitSet(new long[]{0x0010008000040000L});
+    public static final BitSet FOLLOW_imports_in_velvetModel455 = new BitSet(new long[]{0x0010000000090000L});
     public static final BitSet FOLLOW_concept_in_velvetModel459 = new BitSet(new long[]{0x0000000000000000L});
-    public static final BitSet FOLLOW_interfaceg_in_velvetModel461 = new BitSet(new long[]{0x0000000000000000L});
+    public static final BitSet FOLLOW_cinterface_in_velvetModel461 = new BitSet(new long[]{0x0000000000000000L});
     public static final BitSet FOLLOW_EOF_in_velvetModel464 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_IMPORT_in_imports476 = new BitSet(new long[]{0x0000000300000000L});
+    public static final BitSet FOLLOW_IMPORT_in_imports476 = new BitSet(new long[]{0x0000000600000000L});
     public static final BitSet FOLLOW_name_in_imports478 = new BitSet(new long[]{0x0020000000000000L});
-    public static final BitSet FOLLOW_SEMI_in_imports480 = new BitSet(new long[]{0x0000000800000002L});
-    public static final BitSet FOLLOW_REFINES_in_concept505 = new BitSet(new long[]{0x0000000000040000L});
-    public static final BitSet FOLLOW_CONCEPT_in_concept508 = new BitSet(new long[]{0x0000000100000000L});
-    public static final BitSet FOLLOW_ID_in_concept510 = new BitSet(new long[]{0x0180000000010000L});
-    public static final BitSet FOLLOW_COLON_in_concept514 = new BitSet(new long[]{0x0000000100000000L});
+    public static final BitSet FOLLOW_SEMI_in_imports480 = new BitSet(new long[]{0x0000001000000002L});
+    public static final BitSet FOLLOW_REFINES_in_concept505 = new BitSet(new long[]{0x0000000000080000L});
+    public static final BitSet FOLLOW_CONCEPT_in_concept508 = new BitSet(new long[]{0x0000000200000000L});
+    public static final BitSet FOLLOW_ID_in_concept510 = new BitSet(new long[]{0x0180000000020000L});
+    public static final BitSet FOLLOW_COLON_in_concept514 = new BitSet(new long[]{0x0000000200000000L});
     public static final BitSet FOLLOW_conceptBaseExt_in_concept516 = new BitSet(new long[]{0x0180000000000000L});
-    public static final BitSet FOLLOW_START_R_in_concept524 = new BitSet(new long[]{0x0000000100000000L});
-    public static final BitSet FOLLOW_conceptInterExt_in_concept526 = new BitSet(new long[]{0x0000000000820000L});
-    public static final BitSet FOLLOW_COMMA_in_concept529 = new BitSet(new long[]{0x0000000100000000L});
-    public static final BitSet FOLLOW_conceptInterExt_in_concept531 = new BitSet(new long[]{0x0000000000820000L});
+    public static final BitSet FOLLOW_START_R_in_concept524 = new BitSet(new long[]{0x0000000200000000L});
+    public static final BitSet FOLLOW_conceptInterExt_in_concept526 = new BitSet(new long[]{0x0000000001040000L});
+    public static final BitSet FOLLOW_COMMA_in_concept529 = new BitSet(new long[]{0x0000000200000000L});
+    public static final BitSet FOLLOW_conceptInterExt_in_concept531 = new BitSet(new long[]{0x0000000001040000L});
     public static final BitSet FOLLOW_END_R_in_concept535 = new BitSet(new long[]{0x0080000000000000L});
     public static final BitSet FOLLOW_definitions_in_concept542 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ID_in_conceptBaseExt575 = new BitSet(new long[]{0x0000000000020002L});
-    public static final BitSet FOLLOW_COMMA_in_conceptBaseExt578 = new BitSet(new long[]{0x0000000100000000L});
-    public static final BitSet FOLLOW_ID_in_conceptBaseExt580 = new BitSet(new long[]{0x0000000000020002L});
-    public static final BitSet FOLLOW_ID_in_conceptInterExt604 = new BitSet(new long[]{0x0000000300000000L});
+    public static final BitSet FOLLOW_ID_in_conceptBaseExt575 = new BitSet(new long[]{0x0000000000040002L});
+    public static final BitSet FOLLOW_COMMA_in_conceptBaseExt578 = new BitSet(new long[]{0x0000000200000000L});
+    public static final BitSet FOLLOW_ID_in_conceptBaseExt580 = new BitSet(new long[]{0x0000000000040002L});
+    public static final BitSet FOLLOW_ID_in_conceptInterExt604 = new BitSet(new long[]{0x0000000600000000L});
     public static final BitSet FOLLOW_name_in_conceptInterExt606 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_REFINES_in_interfaceg628 = new BitSet(new long[]{0x0000008000000000L});
-    public static final BitSet FOLLOW_INTERFACEG_in_interfaceg631 = new BitSet(new long[]{0x0000000100000000L});
-    public static final BitSet FOLLOW_ID_in_interfaceg633 = new BitSet(new long[]{0x0080000000010000L});
-    public static final BitSet FOLLOW_COLON_in_interfaceg637 = new BitSet(new long[]{0x0000000100000000L});
-    public static final BitSet FOLLOW_interfaceBaseExt_in_interfaceg639 = new BitSet(new long[]{0x0080000000000000L});
-    public static final BitSet FOLLOW_definitions_in_interfaceg643 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ID_in_interfaceBaseExt673 = new BitSet(new long[]{0x0000000000020002L});
-    public static final BitSet FOLLOW_COMMA_in_interfaceBaseExt676 = new BitSet(new long[]{0x0000000100000000L});
-    public static final BitSet FOLLOW_ID_in_interfaceBaseExt678 = new BitSet(new long[]{0x0000000000020002L});
-    public static final BitSet FOLLOW_START_C_in_definitions718 = new BitSet(new long[]{0xF040090110500010L});
-    public static final BitSet FOLLOW_def_in_definitions720 = new BitSet(new long[]{0x0000000000400000L});
+    public static final BitSet FOLLOW_REFINES_in_cinterface628 = new BitSet(new long[]{0x0000000000010000L});
+    public static final BitSet FOLLOW_CINTERFACE_in_cinterface631 = new BitSet(new long[]{0x0000000200000000L});
+    public static final BitSet FOLLOW_ID_in_cinterface633 = new BitSet(new long[]{0x0080000000020000L});
+    public static final BitSet FOLLOW_COLON_in_cinterface637 = new BitSet(new long[]{0x0000000200000000L});
+    public static final BitSet FOLLOW_interfaceBaseExt_in_cinterface639 = new BitSet(new long[]{0x0080000000000000L});
+    public static final BitSet FOLLOW_definitions_in_cinterface643 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ID_in_interfaceBaseExt673 = new BitSet(new long[]{0x0000000000040002L});
+    public static final BitSet FOLLOW_COMMA_in_interfaceBaseExt676 = new BitSet(new long[]{0x0000000200000000L});
+    public static final BitSet FOLLOW_ID_in_interfaceBaseExt678 = new BitSet(new long[]{0x0000000000040002L});
+    public static final BitSet FOLLOW_START_C_in_definitions718 = new BitSet(new long[]{0xF040090220A00010L});
+    public static final BitSet FOLLOW_def_in_definitions720 = new BitSet(new long[]{0x0000000000800000L});
     public static final BitSet FOLLOW_END_C_in_definitions722 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_nonFeatureDefinition_in_def741 = new BitSet(new long[]{0xF040090110100012L});
-    public static final BitSet FOLLOW_featureGroup_in_def749 = new BitSet(new long[]{0xF000000100100002L});
-    public static final BitSet FOLLOW_nonFeatureDefinition_in_def751 = new BitSet(new long[]{0xF000000100100002L});
-    public static final BitSet FOLLOW_feature_in_def760 = new BitSet(new long[]{0xF000010110100012L});
-    public static final BitSet FOLLOW_feature_in_def763 = new BitSet(new long[]{0xF000010110100012L});
-    public static final BitSet FOLLOW_nonFeatureDefinition_in_def767 = new BitSet(new long[]{0xF000010110100012L});
+    public static final BitSet FOLLOW_nonFeatureDefinition_in_def741 = new BitSet(new long[]{0xF040090220200012L});
+    public static final BitSet FOLLOW_featureGroup_in_def749 = new BitSet(new long[]{0xF000000200200002L});
+    public static final BitSet FOLLOW_nonFeatureDefinition_in_def751 = new BitSet(new long[]{0xF000000200200002L});
+    public static final BitSet FOLLOW_feature_in_def760 = new BitSet(new long[]{0xF000010220200012L});
+    public static final BitSet FOLLOW_feature_in_def763 = new BitSet(new long[]{0xF000010220200012L});
+    public static final BitSet FOLLOW_nonFeatureDefinition_in_def767 = new BitSet(new long[]{0xF000010220200012L});
     public static final BitSet FOLLOW_constraint_in_nonFeatureDefinition787 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_instance_in_nonFeatureDefinition793 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_attribute_in_nonFeatureDefinition799 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ID_in_instance810 = new BitSet(new long[]{0x0000000300000000L});
+    public static final BitSet FOLLOW_ID_in_instance810 = new BitSet(new long[]{0x0000000600000000L});
     public static final BitSet FOLLOW_name_in_instance812 = new BitSet(new long[]{0x0020000000000000L});
     public static final BitSet FOLLOW_SEMI_in_instance814 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_MANDATORY_in_feature836 = new BitSet(new long[]{0x0000000000000010L});
-    public static final BitSet FOLLOW_ABSTRACT_in_feature838 = new BitSet(new long[]{0x0000000010000000L});
+    public static final BitSet FOLLOW_ABSTRACT_in_feature838 = new BitSet(new long[]{0x0000000020000000L});
     public static final BitSet FOLLOW_ABSTRACT_in_feature842 = new BitSet(new long[]{0x0000010000000000L});
-    public static final BitSet FOLLOW_MANDATORY_in_feature844 = new BitSet(new long[]{0x0000000010000000L});
-    public static final BitSet FOLLOW_MANDATORY_in_feature848 = new BitSet(new long[]{0x0000000010000000L});
-    public static final BitSet FOLLOW_ABSTRACT_in_feature852 = new BitSet(new long[]{0x0000000010000000L});
-    public static final BitSet FOLLOW_FEATURE_in_feature859 = new BitSet(new long[]{0x0000000300000000L});
+    public static final BitSet FOLLOW_MANDATORY_in_feature844 = new BitSet(new long[]{0x0000000020000000L});
+    public static final BitSet FOLLOW_MANDATORY_in_feature848 = new BitSet(new long[]{0x0000000020000000L});
+    public static final BitSet FOLLOW_ABSTRACT_in_feature852 = new BitSet(new long[]{0x0000000020000000L});
+    public static final BitSet FOLLOW_FEATURE_in_feature859 = new BitSet(new long[]{0x0000000600000000L});
     public static final BitSet FOLLOW_name_in_feature861 = new BitSet(new long[]{0x00A0000000000000L});
     public static final BitSet FOLLOW_definitions_in_feature864 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_SEMI_in_feature868 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_groupType_in_featureGroup899 = new BitSet(new long[]{0x0080000000000000L});
-    public static final BitSet FOLLOW_START_C_in_featureGroup901 = new BitSet(new long[]{0x0000010010000010L});
-    public static final BitSet FOLLOW_feature_in_featureGroup903 = new BitSet(new long[]{0x0000010010000010L});
-    public static final BitSet FOLLOW_feature_in_featureGroup905 = new BitSet(new long[]{0x0000010010400010L});
+    public static final BitSet FOLLOW_START_C_in_featureGroup901 = new BitSet(new long[]{0x0000010020000010L});
+    public static final BitSet FOLLOW_feature_in_featureGroup903 = new BitSet(new long[]{0x0000010020000010L});
+    public static final BitSet FOLLOW_feature_in_featureGroup905 = new BitSet(new long[]{0x0000010020800010L});
     public static final BitSet FOLLOW_END_C_in_featureGroup908 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_CONSTRAINT_in_constraint951 = new BitSet(new long[]{0x0101002300000000L});
-    public static final BitSet FOLLOW_ID_in_constraint955 = new BitSet(new long[]{0x0000000001000000L});
-    public static final BitSet FOLLOW_EQ_in_constraint957 = new BitSet(new long[]{0x0101002300000000L});
+    public static final BitSet FOLLOW_CONSTRAINT_in_constraint951 = new BitSet(new long[]{0x0101004600000000L});
+    public static final BitSet FOLLOW_ID_in_constraint955 = new BitSet(new long[]{0x0000000002000000L});
+    public static final BitSet FOLLOW_EQ_in_constraint957 = new BitSet(new long[]{0x0101004600000000L});
     public static final BitSet FOLLOW_constraintDefinition_in_constraint963 = new BitSet(new long[]{0x0020000000000000L});
     public static final BitSet FOLLOW_attributeConstraint_in_constraint967 = new BitSet(new long[]{0x0020000000000000L});
     public static final BitSet FOLLOW_SEMI_in_constraint970 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_constraintOperand_in_constraintDefinition983 = new BitSet(new long[]{0x0006E00000000002L});
-    public static final BitSet FOLLOW_binaryOp_in_constraintDefinition986 = new BitSet(new long[]{0x0101000300000000L});
+    public static final BitSet FOLLOW_binaryOp_in_constraintDefinition986 = new BitSet(new long[]{0x0101000600000000L});
     public static final BitSet FOLLOW_constraintOperand_in_constraintDefinition988 = new BitSet(new long[]{0x0006E00000000002L});
-    public static final BitSet FOLLOW_unaryOp_in_constraintOperand1015 = new BitSet(new long[]{0x0101000300000000L});
-    public static final BitSet FOLLOW_START_R_in_constraintOperand1019 = new BitSet(new long[]{0x0101000300000000L});
-    public static final BitSet FOLLOW_constraintDefinition_in_constraintOperand1021 = new BitSet(new long[]{0x0000000000800000L});
+    public static final BitSet FOLLOW_unaryOp_in_constraintOperand1015 = new BitSet(new long[]{0x0101000600000000L});
+    public static final BitSet FOLLOW_START_R_in_constraintOperand1019 = new BitSet(new long[]{0x0101000600000000L});
+    public static final BitSet FOLLOW_constraintDefinition_in_constraintOperand1021 = new BitSet(new long[]{0x0000000001000000L});
     public static final BitSet FOLLOW_END_R_in_constraintOperand1023 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_name_in_constraintOperand1027 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_attribConstraint_in_attributeConstraint1062 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_attribNumInstance_in_attribConstraint1082 = new BitSet(new long[]{0x0008020000000A80L});
-    public static final BitSet FOLLOW_attribOperator_in_attribConstraint1085 = new BitSet(new long[]{0x0000002300000000L});
+    public static final BitSet FOLLOW_attribOperator_in_attribConstraint1085 = new BitSet(new long[]{0x0000004600000000L});
     public static final BitSet FOLLOW_attribNumInstance_in_attribConstraint1087 = new BitSet(new long[]{0x0008020000000A80L});
-    public static final BitSet FOLLOW_attribRelation_in_attribConstraint1095 = new BitSet(new long[]{0x0000002300000000L});
+    public static final BitSet FOLLOW_attribRelation_in_attribConstraint1095 = new BitSet(new long[]{0x0000004600000000L});
     public static final BitSet FOLLOW_attribNumInstance_in_attribConstraint1101 = new BitSet(new long[]{0x0008020000000002L});
-    public static final BitSet FOLLOW_attribOperator_in_attribConstraint1104 = new BitSet(new long[]{0x0000002300000000L});
+    public static final BitSet FOLLOW_attribOperator_in_attribConstraint1104 = new BitSet(new long[]{0x0000004600000000L});
     public static final BitSet FOLLOW_attribNumInstance_in_attribConstraint1106 = new BitSet(new long[]{0x0008020000000002L});
     public static final BitSet FOLLOW_INT_in_attribNumInstance1138 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_name_in_attribNumInstance1145 = new BitSet(new long[]{0x0000000000000002L});
@@ -4035,20 +4035,20 @@ public TreeAdaptor getTreeAdaptor() {
     public static final BitSet FOLLOW_stringAttribute_in_attribute1165 = new BitSet(new long[]{0x0020000000000000L});
     public static final BitSet FOLLOW_boolAttribute_in_attribute1169 = new BitSet(new long[]{0x0020000000000000L});
     public static final BitSet FOLLOW_SEMI_in_attribute1172 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_VAR_INT_in_intAttribute1201 = new BitSet(new long[]{0x0000000300000000L});
-    public static final BitSet FOLLOW_name_in_intAttribute1204 = new BitSet(new long[]{0x0000000001000002L});
-    public static final BitSet FOLLOW_EQ_in_intAttribute1207 = new BitSet(new long[]{0x0000002000000000L});
+    public static final BitSet FOLLOW_VAR_INT_in_intAttribute1201 = new BitSet(new long[]{0x0000000600000000L});
+    public static final BitSet FOLLOW_name_in_intAttribute1204 = new BitSet(new long[]{0x0000000002000002L});
+    public static final BitSet FOLLOW_EQ_in_intAttribute1207 = new BitSet(new long[]{0x0000004000000000L});
     public static final BitSet FOLLOW_INT_in_intAttribute1210 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_VAR_FLOAT_in_floatAttribute1219 = new BitSet(new long[]{0x0000000300000000L});
-    public static final BitSet FOLLOW_name_in_floatAttribute1222 = new BitSet(new long[]{0x0000000001000002L});
-    public static final BitSet FOLLOW_EQ_in_floatAttribute1225 = new BitSet(new long[]{0x0000000020000000L});
+    public static final BitSet FOLLOW_VAR_FLOAT_in_floatAttribute1219 = new BitSet(new long[]{0x0000000600000000L});
+    public static final BitSet FOLLOW_name_in_floatAttribute1222 = new BitSet(new long[]{0x0000000002000002L});
+    public static final BitSet FOLLOW_EQ_in_floatAttribute1225 = new BitSet(new long[]{0x0000000040000000L});
     public static final BitSet FOLLOW_FLOAT_in_floatAttribute1228 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_VAR_STRING_in_stringAttribute1236 = new BitSet(new long[]{0x0000000300000000L});
-    public static final BitSet FOLLOW_name_in_stringAttribute1239 = new BitSet(new long[]{0x0000000001000002L});
+    public static final BitSet FOLLOW_VAR_STRING_in_stringAttribute1236 = new BitSet(new long[]{0x0000000600000000L});
+    public static final BitSet FOLLOW_name_in_stringAttribute1239 = new BitSet(new long[]{0x0000000002000002L});
     public static final BitSet FOLLOW_EQ_in_stringAttribute1242 = new BitSet(new long[]{0x0200000000000000L});
     public static final BitSet FOLLOW_STRING_in_stringAttribute1245 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_VAR_BOOL_in_boolAttribute1254 = new BitSet(new long[]{0x0000000300000000L});
-    public static final BitSet FOLLOW_name_in_boolAttribute1257 = new BitSet(new long[]{0x0000000001000002L});
+    public static final BitSet FOLLOW_VAR_BOOL_in_boolAttribute1254 = new BitSet(new long[]{0x0000000600000000L});
+    public static final BitSet FOLLOW_name_in_boolAttribute1257 = new BitSet(new long[]{0x0000000002000002L});
     public static final BitSet FOLLOW_EQ_in_boolAttribute1260 = new BitSet(new long[]{0x0000000000008000L});
     public static final BitSet FOLLOW_BOOLEAN_in_boolAttribute1263 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_OP_NOT_in_unaryOp1275 = new BitSet(new long[]{0x0000000000000002L});
