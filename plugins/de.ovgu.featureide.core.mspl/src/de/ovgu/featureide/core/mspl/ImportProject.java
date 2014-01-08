@@ -33,20 +33,24 @@ import de.ovgu.featureide.core.IFeatureProject;
  * 
  * @author Christoph Giesel
  */
-public class InterfaceProject {
-	protected final IProject interfaceProject;
+public class ImportProject {
+	protected final IProject importProject;
 	protected final IFeatureProject featureProject;
+	protected IFile importFile;
 	protected IFile interfaceFile;
 
-	public InterfaceProject(IProject interfaceProject, IFile interfaceFile) {
+	public ImportProject(IProject interfaceProject, IFile importFile,
+			IFile interfaceFile) {
 		this(interfaceProject, CorePlugin.getFeatureProject(interfaceProject),
-				interfaceFile);
+				importFile, interfaceFile);
 	}
 
-	public InterfaceProject(IProject interfaceProject,
-			IFeatureProject featureProject, IFile interfaceFile) {
-		this.interfaceProject = interfaceProject;
+	public ImportProject(IProject interfaceProject,
+			IFeatureProject featureProject, IFile importFile,
+			IFile interfaceFile) {
+		this.importProject = interfaceProject;
 		this.featureProject = featureProject;
+		this.importFile = importFile;
 		this.interfaceFile = interfaceFile;
 	}
 
@@ -56,7 +60,7 @@ public class InterfaceProject {
 			IProject[] oldProjects = description.getReferencedProjects();
 			IProject[] newProjects = new IProject[oldProjects.length + 1];
 			System.arraycopy(oldProjects, 0, newProjects, 0, oldProjects.length);
-			newProjects[newProjects.length - 1] = interfaceProject;
+			newProjects[newProjects.length - 1] = importProject;
 			description.setReferencedProjects(newProjects);
 			project.setDescription(description, null);
 		} catch (CoreException e) {
@@ -64,12 +68,20 @@ public class InterfaceProject {
 		}
 	}
 
-	public IProject getInterfaceProject() {
-		return interfaceProject;
+	public IProject getImportProject() {
+		return importProject;
 	}
 
 	public IFeatureProject getFeatureProject() {
 		return featureProject;
+	}
+
+	public IFile getImportFile() {
+		return importFile;
+	}
+
+	public void setImportFile(IFile importFile) {
+		this.importFile = importFile;
 	}
 
 	public IFile getInterfaceFile() {
