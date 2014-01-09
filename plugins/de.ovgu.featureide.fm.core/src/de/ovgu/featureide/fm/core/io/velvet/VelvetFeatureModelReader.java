@@ -542,7 +542,6 @@ public class VelvetFeatureModelReader
 					break;
 				case VelvetParser.EOF:
 					// TODO @Matthias check if a model was created?
-					break;
 				default:
 					// TODO @Matthias throw an exception that no valid start was found
 					System.out.println(curNode.getText());
