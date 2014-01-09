@@ -103,6 +103,11 @@ public class VelvetFeatureModelReader
 				addFeature(parentNode, child.getName(), child.isMandatory(), child.isAbstract(),
 					child.isHidden());
 			// save imported feature into mapping to store imported status
+			imported.setAND(child.isAnd());
+			imported.setMultiple(child.isMultiple());
+			if (child.isOr()) {
+				imported.setOr();
+			}
 			this.extFeatureModel.setFeatureImported(imported);
 
 			if (child.hasChildren()) {
@@ -115,6 +120,9 @@ public class VelvetFeatureModelReader
 		Feature root = parent.getRoot();
 
 		copyChildnodes(getFeatureModel().getRoot(), root.getChildren());
+		for ( Constraint constraint : parent.getConstraints()) {
+			getFeatureModel().addConstraint(constraint);
+		}
 	}
 
 	private WeightedTerm createTerm(final int weight,
