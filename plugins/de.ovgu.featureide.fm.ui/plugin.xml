@@ -99,6 +99,11 @@
          </parameter>
       </describer>
    </content-type>
+   <content-type file-extensions="velvet"
+                 id="de.ovgu.featureide.fm.ui.featureModel"
+                 name="Feature Model"
+                 priority="high">
+   </content-type>
 </extension>  
 	<extension
          point="org.eclipse.ui.views">

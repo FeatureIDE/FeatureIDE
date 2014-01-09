@@ -57,7 +57,7 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 		Feature root = featureModel.getRoot();
 
 		if (isInterface)
-			sb.append("interface ");
+			sb.append("cinterface ");
 		else
 			sb.append("concept ");
 		sb.append(root.getName());
