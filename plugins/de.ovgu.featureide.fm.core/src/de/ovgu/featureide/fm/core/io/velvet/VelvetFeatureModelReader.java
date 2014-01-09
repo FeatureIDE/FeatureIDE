@@ -256,6 +256,7 @@ public class VelvetFeatureModelReader
 					parseParam(curNode);
 					break;
 				case VelvetParser.DEF:
+					System.out.println("parsing def");
 					final Feature rootFeatrue = new Feature(this.extFeatureModel, name);
 					this.extFeatureModel.addFeature(rootFeatrue);
 					this.extFeatureModel.setRoot(rootFeatrue);
@@ -538,6 +539,15 @@ public class VelvetFeatureModelReader
 					break;
 				case VelvetParser.CINTERFACE:
 					parseConcept(curNode);
+					break;
+				case VelvetParser.EOF:
+					// TODO @Matthias check if a model was created?
+					break;
+				default:
+					// TODO @Matthias throw an exception that no valid start was found
+					System.out.println(curNode.getText());
+					System.out.println(curNode.getType());
+					System.err.println("ERROR");
 					break;
 			}
 		}
