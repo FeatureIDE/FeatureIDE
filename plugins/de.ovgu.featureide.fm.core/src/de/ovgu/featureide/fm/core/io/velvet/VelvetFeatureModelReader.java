@@ -100,7 +100,7 @@ public class VelvetFeatureModelReader
 	private void copyChildnodes(final Feature parentNode, final LinkedList<Feature> children) {
 		for (final Feature child : children) {
 			final Feature imported =
-				addFeature(getFeatureModel().getRoot(), child.getName(), child.isMandatory(), child.isAbstract(),
+				addFeature(parentNode, child.getName(), child.isMandatory(), child.isAbstract(),
 					child.isHidden());
 			// save imported feature into mapping to store imported status
 			this.extFeatureModel.setFeatureImported(imported);
