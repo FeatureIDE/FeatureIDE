@@ -112,7 +112,8 @@ public class VelvetFeatureModelReader
 	}
 
 	private void copyModel(final FeatureModel parent) {
-		final Feature root = parent.getRoot();
+		Feature root = parent.getRoot();
+
 		copyChildnodes(getFeatureModel().getRoot(), root.getChildren());
 	}
 
@@ -236,6 +237,11 @@ public class VelvetFeatureModelReader
 
 	private void parseConcept(final Tree root) {
 		final LinkedList<Tree> nodeList = getChildren(root);
+		
+		final Feature rootFeature = new Feature(this.extFeatureModel, "");
+		this.extFeatureModel.addFeature(rootFeature);
+		this.extFeatureModel.setRoot(rootFeature);
+		this.parentStack.push(rootFeature);
 
 		String name = null;
 		// boolean refines = false;
@@ -256,11 +262,8 @@ public class VelvetFeatureModelReader
 					parseParam(curNode);
 					break;
 				case VelvetParser.DEF:
-					System.out.println("parsing def");
-					final Feature rootFeatrue = new Feature(this.extFeatureModel, name);
-					this.extFeatureModel.addFeature(rootFeatrue);
-					this.extFeatureModel.setRoot(rootFeatrue);
-					this.parentStack.push(rootFeatrue);
+					// TODO @Matthias Checkme!!
+					rootFeature.setName(name);
 					parseDefinitions(curNode);
 					break;
 			}
@@ -466,9 +469,12 @@ public class VelvetFeatureModelReader
 
 			this.extFeatureModel.addParent(parentModelName);
 
+			// TODO @Matthias check if project exists
 			final IProject parent = ResourcesPlugin.getWorkspace().getRoot().getProject(parentModelName);
+			System.err.println("final IProject parent = ResourcesPlugin.getWorkspace().getRoot().getProject(parentModelName); ---> " + parent);
 			final FeatureModel fm = FileLoader.loadFeatureModel(parent);
-
+			System.err.println("final FeatureModel fm = FileLoader.loadFeatureModel(parent);" + fm);
+			
 			copyModel(fm);
 		}
 	}

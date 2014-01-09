@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.io;
 
+import java.io.FileNotFoundException;
+
 import org.eclipse.core.resources.IProject;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
@@ -34,14 +36,19 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 public final class FileLoader {
 
 	public static FeatureModel loadFeatureModel(IProject project) {
+		FeatureModel featureModel = new FeatureModel();
+		XmlFeatureModelReader reader = new XmlFeatureModelReader(
+				featureModel);
 		try {
-			FeatureModel featureModel = new FeatureModel();
-			XmlFeatureModelReader reader = new XmlFeatureModelReader(
-					featureModel);
 			reader.readFromFile(project.getFile("model.xml").getLocation()
 					.toFile());
 			return featureModel;
-		} catch (Exception e) {
+		} catch ( FileNotFoundException e ) {
+			System.err.println("FNF");
+			FMCorePlugin.getDefault().logError(e);
+			return null;
+		} catch ( UnsupportedModelException e ) {
+			System.err.println("Unsupp Model");
 			FMCorePlugin.getDefault().logError(e);
 			return null;
 		}
