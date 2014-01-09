@@ -44,7 +44,6 @@ import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
-import de.ovgu.featureide.core.fstmodel.FSTConfiguration;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
@@ -67,6 +66,9 @@ public class ModelEditPart extends AbstractGraphicalEditPart implements GUIDefau
 	private final LinkedList<CollaborationEditPart> collaborationEditPartList = new LinkedList<CollaborationEditPart>();
 	private final LinkedList<ClassEditPart> classEditPartList = new LinkedList<ClassEditPart>();
 	
+	/**
+	 * Defines the order of classes displayed at the collaboration view.
+	 */
 	private static final Comparator<? super FSTClass> CLASS_COMPARATOR = 
 			new Comparator<FSTClass>(){
 
@@ -76,9 +78,17 @@ public class ModelEditPart extends AbstractGraphicalEditPart implements GUIDefau
 					final boolean isArbitrary1 = name1.startsWith("*");
 					final String name2 = class2.getName();
 					final boolean isArbitrary2 = name2.startsWith("*");
-					if ((!isArbitrary1 && !isArbitrary2) ||
-			    		(isArbitrary1 && isArbitrary2)) {
-			    		return name1.compareToIgnoreCase(name2);
+					if (!isArbitrary1 && !isArbitrary2) {
+						boolean class1Empty = class1.getRoles().isEmpty();
+						boolean class2Empty = class2.getRoles().isEmpty();
+						if (class1Empty && !class2Empty) {
+							return 1;
+						} else if (!class1Empty && class2Empty) {
+							return -1;
+						}
+						return name1.compareToIgnoreCase(name2);
+					} else if (isArbitrary1 && isArbitrary2) {
+						return name1.compareToIgnoreCase(name2);
 			    	} else {
 			    		if (isArbitrary1) {
 			    			return 1;
