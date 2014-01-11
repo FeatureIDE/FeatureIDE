@@ -245,8 +245,9 @@ public class VelvetFeatureModelReader
 
 	private void parseConcept(final Tree root) {
 		final LinkedList<Tree> nodeList = getChildren(root);
+		final String tmpName = "tmp";
+		final Feature rootFeature = new Feature(this.extFeatureModel, tmpName);
 		
-		final Feature rootFeature = new Feature(this.extFeatureModel, "");
 		this.extFeatureModel.addFeature(rootFeature);
 		this.extFeatureModel.setRoot(rootFeature);
 		this.parentStack.push(rootFeature);
@@ -272,6 +273,7 @@ public class VelvetFeatureModelReader
 				case VelvetParser.DEF:
 					// TODO @Matthias Checkme!!
 					rootFeature.setName(name);
+					extFeatureModel.renameFeature(tmpName, name);
 					parseDefinitions(curNode);
 					break;
 			}

@@ -44,11 +44,9 @@ public final class FileLoader {
 					.toFile());
 			return featureModel;
 		} catch ( FileNotFoundException e ) {
-			System.err.println("FNF");
 			FMCorePlugin.getDefault().logError(e);
 			return null;
 		} catch ( UnsupportedModelException e ) {
-			System.err.println("Unsupp Model");
 			FMCorePlugin.getDefault().logError(e);
 			return null;
 		}
