@@ -207,10 +207,10 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		FlowLayout contentsLayout = new FlowLayout();
 		tooltipContent.setLayoutManager(contentsLayout);
 		
-		if (!(role instanceof FSTArbitraryRole)) {
+		if (!(role instanceof FSTArbitraryRole) && role.getDirectives().isEmpty()) {
 			int fieldCount = getCountForFieldContentCreate(tooltipContent);
 			int methodCount = getCountForMethodContentCreate(tooltipContent);
-				addLabel(new Label("Fields: " + fieldCount + " Methods: "	+ methodCount +" "));
+			addLabel(new Label("Fields: " + fieldCount + " Methods: "	+ methodCount +" "));
 		} else if (role.getName().startsWith("*.")) {
 			setContentForFiles(new CompartmentFigure(), tooltipContent);
 		} else {
