@@ -67,7 +67,10 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 		if (featureProject == null) {
 			return;
 		}
-		model = new FSTModel(featureProject);
+		model = featureProject.getFSTModel();
+		if (model == null) {
+			model = new FSTModel(featureProject);
+		}
 		featureProject.setFSTModel(model);
 		this.featureProject = featureProject;
 	}
@@ -127,20 +130,20 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 	
 	private void addArbitraryFiles() {
 		IFolder folder = featureProject.getSourceFolder();
-		for (FSTFeature feature : model.getFeatures()) {
-			IFolder featureFolder = folder.getFolder(feature.getName());
+		for (String feature : featureProject.getFeatureModel().getConcreteFeatureNames()) {
+			IFolder featureFolder = folder.getFolder(feature);
 			addArbitraryFiles(featureFolder, feature);
 		}
 	}
 
-	private void addArbitraryFiles(IFolder featureFolder, FSTFeature feature) {
+	private void addArbitraryFiles(IFolder featureFolder, String feature) {
 		try {
 			for (IResource res : featureFolder.members()) {
 				if (res instanceof IFolder) {
 					addArbitraryFiles((IFolder)res, feature);
 				} else if (res instanceof IFile) {
 					if (!featureProject.getComposer().extensions().contains(res.getFileExtension())) {
-						model.addArbitraryFile(feature.getName(), (IFile) res);
+						model.addArbitraryFile(feature, (IFile) res);
 					}
 				}
 			}
@@ -254,11 +257,13 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 					caseClassDeclaration(child);
 				}
 			}
+			
 			if (!classFragmentStack.isEmpty()) {
-				FSTClassFragment curClassFragment = classFragmentStack.pop();
-				if (classFragmentStack.isEmpty() && curClassFragment.getPackage() == null) {
-	//				curClassFragment.setPackage(currentFile.getParent().getName());
-				}
+//				FSTClassFragment curClassFragment = 
+					classFragmentStack.pop();
+//				if (classFragmentStack.isEmpty() && curClassFragment.getPackage() == null) {
+//	//				curClassFragment.setPackage(currentFile.getParent().getName());
+//				}
 			}
 		}
 	}

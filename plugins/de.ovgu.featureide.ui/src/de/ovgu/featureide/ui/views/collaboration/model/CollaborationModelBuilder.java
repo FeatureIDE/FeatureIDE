@@ -220,7 +220,7 @@ public class CollaborationModelBuilder {
 		return !(getClassFilter().isEmpty() && getFeatureFilter().isEmpty());
 	}
 	
-	public FSTModel buildCollaborationModel(final IFeatureProject featureProject) {
+	public synchronized FSTModel buildCollaborationModel(final IFeatureProject featureProject) {
 		if (!initilize(featureProject)) {
 			return null;
 		}

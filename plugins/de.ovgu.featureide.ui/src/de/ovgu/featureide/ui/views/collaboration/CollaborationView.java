@@ -24,6 +24,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.List;
+import java.util.Vector;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -83,6 +84,7 @@ import de.ovgu.featureide.fm.core.ColorschemeTable;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.StoppableJob;
+import de.ovgu.featureide.fm.core.WaitingJob;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GEFImageWriter;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.editors.annotation.ColorPalette;
@@ -152,6 +154,50 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	
 	private SetColorAction[] setColorActions = new SetColorAction[ColorPalette.COLOR_COUNT];
 	private ShowFieldsMethodsAction[] setFieldsMethodsActions = new ShowFieldsMethodsAction[FIELD_METHOD_LABEL_NAMES.length];
+
+	private final Vector<IFile> configurations = new Vector<IFile>();
+	private final Job updateGUIJob = new WaitingJob(UPDATE_COLLABORATION_VIEW) {
+		
+		public IStatus execute(IProgressMonitor monitor) {
+			if (configurations.isEmpty()) {
+				toolbarAction.setEnabled(true);
+				return Status.OK_STATUS;
+			}
+			IFile configurationFile = configurations.lastElement();
+			configurations.clear();
+			if (configurationFile != null && CollaborationModelBuilder.editorFile != null) {
+				builder.configuration = configurationFile;
+			}
+			final FSTModel model = builder.buildCollaborationModel(CorePlugin.getFeatureProject(configurationFile));
+			if (model == null) {
+				toolbarAction.setEnabled(true);
+				return Status.OK_STATUS;
+			}
+			
+			if (!configurations.isEmpty()) {
+				return Status.OK_STATUS;
+			}
+			UIJob uiJob = new UIJob(UPDATE_COLLABORATION_VIEW) {
+				public IStatus runInUIThread(IProgressMonitor monitor) {
+					viewer.setContents(model);
+					EditPart part = viewer.getContents();
+					if (part != null) {
+						part.refresh();
+					}
+					toolbarAction.setEnabled(true);
+					return Status.OK_STATUS;
+				}
+			};
+			uiJob.setPriority(Job.SHORT);
+			uiJob.schedule();
+			try {
+				uiJob.join();
+			} catch (InterruptedException e) {
+				UIPlugin.getDefault().logError(e);
+			}
+			return Status.OK_STATUS;
+		}
+	};
 	
 	private IFeatureProject featureProject;
 	
@@ -467,7 +513,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 						if (!toolbarAction.isEnabled())
 							return Status.OK_STATUS;
 						toolbarAction.setEnabled(false);
-						built = true;
 						if (featureProject != null) {
 							IComposerExtension composer = featureProject.getComposer();
 							if (composer != null) {
@@ -484,8 +529,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		};
 	}
 	
-	private boolean built = true;
-	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -495,40 +538,13 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	 */
 	public void updateGuiAfterBuild(final IFeatureProject project, final IFile configurationFile) {
 		if (featureProject != null && featureProject.equals(project)) {
-			Job job = new StoppableJob(UPDATE_COLLABORATION_VIEW) {
-				
-				public IStatus execute(IProgressMonitor monitor) {
-					if (built) {
-						built = false;
-						if (configurationFile != null && CollaborationModelBuilder.editorFile != null) {
-							builder.configuration = configurationFile;
-						}
-						final FSTModel model = builder.buildCollaborationModel(project);
-						built = true;
-						if (model == null) {
-							toolbarAction.setEnabled(true);
-							return Status.OK_STATUS;
-						}
-						
-						UIJob uiJob = new UIJob(UPDATE_COLLABORATION_VIEW) {
-							public IStatus runInUIThread(IProgressMonitor monitor) {
-								viewer.setContents(model);
-								EditPart part = viewer.getContents();
-								if (part != null) {
-									part.refresh();
-								}
-								toolbarAction.setEnabled(true);
-								return Status.OK_STATUS;
-							}
-						};
-						uiJob.setPriority(Job.DECORATE);
-						uiJob.schedule();
-					}
-					return Status.OK_STATUS;
-				}
-			};
-			job.setPriority(Job.DECORATE);
-			job.schedule();
+			if (configurationFile == null) {
+				configurations.add(project.getCurrentConfiguration());
+			} else {
+				configurations.add(configurationFile);
+			}
+			updateGUIJob.setPriority(Job.LONG);
+			updateGUIJob.schedule();
 		}
 	}
 	
@@ -573,7 +589,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	}
 	
 	public void refresh() {
-		final FSTModel model = this.builder.buildCollaborationModel(featureProject);
+		final FSTModel model = builder.buildCollaborationModel(featureProject);
 		if (model == null) {
 			UIPlugin.getDefault().logWarning("model loading error");
 			return;

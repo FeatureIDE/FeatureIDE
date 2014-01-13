@@ -402,6 +402,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 				Label partLabel = new RoleFigureLabel(d.toDependencyString(), IMAGE_HASH, d.toDependencyString());
 				addLabel(partLabel);
 			}
+			// TODO draw separationline between fields and methods
 		}
 	}
 

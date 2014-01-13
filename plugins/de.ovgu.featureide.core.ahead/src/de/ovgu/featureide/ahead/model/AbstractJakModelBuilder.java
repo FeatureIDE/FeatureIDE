@@ -55,8 +55,11 @@ public abstract class AbstractJakModelBuilder<AST_Program_Type> {
 	public AbstractJakModelBuilder(final IFeatureProject featureProject) {
 		if (featureProject != null) {
 			this.featureProject = featureProject;
-			model = new FSTModel(featureProject);
-			featureProject.setFSTModel(model);
+			model = featureProject.getFSTModel();
+			if (model == null) {
+				model = new FSTModel(featureProject);
+				featureProject.setFSTModel(model);
+			}
 		}
 	}
 	
