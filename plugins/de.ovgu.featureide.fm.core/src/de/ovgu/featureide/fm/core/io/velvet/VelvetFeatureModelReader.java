@@ -274,6 +274,7 @@ public class VelvetFeatureModelReader
 					// TODO @Matthias Checkme!!
 					rootFeature.setName(name);
 					extFeatureModel.renameFeature(tmpName, name);
+					extFeatureModel.performRenamings();
 					parseDefinitions(curNode);
 					break;
 			}
@@ -414,7 +415,6 @@ public class VelvetFeatureModelReader
 		final String featureName = childList.poll().getText();
 		boolean isMandatory = false, isAbstract = false, moreDefinitions = false;
 
-		// TODO need good .equals() and .hashCode()
 		for (final Feature feat : parent.getChildren()) {
 			if (feat.getName().equals(featureName)) {
 				// TODO @Matthias handle overwrite
@@ -560,8 +560,8 @@ public class VelvetFeatureModelReader
 					// TODO @Matthias check if a model was created?
 				default:
 					// TODO @Matthias throw an exception that no valid start was found
-					System.out.println(curNode.getText());
-					System.out.println(curNode.getType());
+					System.err.println(curNode);
+					System.err.println(curNode.getType());
 					System.err.println("ERROR");
 					break;
 			}
