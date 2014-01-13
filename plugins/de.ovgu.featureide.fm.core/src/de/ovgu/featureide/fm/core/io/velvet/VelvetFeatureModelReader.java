@@ -108,7 +108,7 @@ public class VelvetFeatureModelReader
 			if (child.isOr()) {
 				imported.setOr();
 			}
-			this.extFeatureModel.setFeatureImported(imported);
+			this.extFeatureModel.setFeatureInherited(imported);
 
 			if (child.hasChildren()) {
 				copyChildnodes(imported, child.getChildren());

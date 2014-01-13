@@ -43,7 +43,7 @@ public class ExtendedFeatureModel
 	protected FeatureAttributeMap<Boolean> booleanAttributes = new FeatureAttributeMap<Boolean>();
 	protected FeatureAttributeMap<String> stringAttributes = new FeatureAttributeMap<String>();
 	protected Map<String, String> parameters = new HashMap<String, String>();
-	protected Set<Feature> importedFeatures = new HashSet<Feature>();
+	protected Set<Feature> inheritedFeatures = new HashSet<Feature>();
 	protected Set<String> parents = new HashSet<String>();
 	protected Map<String, String> instances = new HashMap<String, String>();
 	protected boolean hasParameters = false;
@@ -175,23 +175,23 @@ public class ExtendedFeatureModel
 	}
 
 	/**
-	 * Checks if a given Feature in this model was imported.
+	 * Checks if a given Feature in this model was inherited.
 	 * 
-	 * @param imported the feature for which it will be checked if it is
-	 *            imported
-	 * @return true if and only if the feature was imported
+	 * @param inherited the feature for which it will be checked if it is
+	 *            inherited
+	 * @return true if and only if the feature was inherited
 	 */
-	public boolean isImported(final Feature imported) {
-		return this.importedFeatures.contains(imported);
+	public boolean isInherited(final Feature inherited) {
+		return this.inheritedFeatures.contains(inherited);
 	}
 
 	/**
-	 * This method stores imported features.
+	 * This method stores inherited features.
 	 * 
-	 * @param imported the exact feature, that was added to the featuremodel
+	 * @param inherited the exact feature, that was added to the featuremodel
 	 *            previously
 	 */
-	public void setFeatureImported(final Feature imported) {
-		this.importedFeatures.add(imported);
+	public void setFeatureInherited(final Feature inherited) {
+		this.inheritedFeatures.add(inherited);
 	}
 }
