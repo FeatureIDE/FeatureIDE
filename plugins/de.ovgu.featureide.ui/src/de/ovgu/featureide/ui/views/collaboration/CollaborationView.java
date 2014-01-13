@@ -301,7 +301,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				if (CorePlugin.getDefault().getConfigurationExtensions().contains(inputFile.getFileExtension())) {
 					// case: open configuration editor
 					CollaborationModelBuilder.editorFile = null;
-					if (builder.configuration != null && builder.configuration.equals(inputFile) && featureProject.equals(builder.project)) {
+					if (builder.configuration != null && builder.configuration.equals(inputFile) && featureProject.equals(CollaborationModelBuilder.project)) {
 						return;
 					} else {
 						builder.configuration = inputFile;
@@ -575,7 +575,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	public void refresh() {
 		final FSTModel model = this.builder.buildCollaborationModel(featureProject);
 		if (model == null) {
-			UIPlugin.getDefault().logInfo("model loading error");
+			UIPlugin.getDefault().logWarning("model loading error");
 			return;
 		}
 		Display.getDefault().syncExec(new Runnable() {

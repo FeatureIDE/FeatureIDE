@@ -20,9 +20,6 @@
  */
 package de.ovgu.featureide.ahead.model;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import jampack.AST_Modifiers;
 import jampack.AST_ParList;
 import jampack.AST_Program;
@@ -35,6 +32,9 @@ import jampack.FldVarDec;
 import jampack.MethodDcl;
 import jampack.MthDector;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 
@@ -42,7 +42,6 @@ import de.ovgu.featureide.ahead.AheadCorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
-import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 
 /**
