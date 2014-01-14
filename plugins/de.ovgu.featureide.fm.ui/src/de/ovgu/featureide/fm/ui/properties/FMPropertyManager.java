@@ -471,7 +471,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	}
 
 	public static Border getInheritedFeatureBorder() {
-		return GUIBasics.createLineBorder(getInheritedFeatureBorderColor(), 1);
+		return GUIBasics.createLineBorder(getInheritedFeatureBorderColor(), 2);
 	}
 
 	public static Color getInheritedFeatureBorderColor() {
@@ -487,7 +487,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	}
 
 	public static Border getImportedFeatureBorder() {
-		return GUIBasics.createLineBorder(getImportedFeatureBorderColor(), 1);
+		return GUIBasics.createLineBorder(getImportedFeatureBorderColor(), 2);
 	}
 
 	public static Color getImportedFeatureBorderColor() {

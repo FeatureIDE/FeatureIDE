@@ -88,7 +88,7 @@ public interface GUIDefaults {
 	public static final Border DEAD_BORDER = new LineBorder(DEAD_BORDER_COLOR, 1);
 	public static final Border DEAD_SELECTED_BORDER = new LineBorder(DEAD_BORDER_COLOR, 3);
 	
-	public static final Color INHERITED_BORDER_COLOR = GUIBasics.createColor(0, 0, 255);
+	public static final Color INHERITED_BORDER_COLOR = GUIBasics.createColor(107, 228, 0);
 	public static final Color IMPORTED_BORDER_COLOR = GUIBasics.createColor(0, 255, 0);
 
 	//connections and decorators
