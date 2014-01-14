@@ -20,11 +20,14 @@
  */
 package de.ovgu.featureide.fm.core;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
+
+import com.google.common.collect.BiMap;
 
 import de.ovgu.featureide.fm.core.constraint.Equation;
 import de.ovgu.featureide.fm.core.constraint.FeatureAttributeMap;
@@ -41,9 +44,11 @@ public class ExtendedFeatureModel extends FeatureModel {
 	protected FeatureAttributeMap<Boolean> booleanAttributes = new FeatureAttributeMap<Boolean>();
 	protected FeatureAttributeMap<String> stringAttributes = new FeatureAttributeMap<String>();
 	protected Map<String, String> parameters = new HashMap<String, String>();
-	protected Set<Feature> inheritedFeatures = new HashSet<Feature>();
-	protected Set<String> parents = new HashSet<String>();
+	protected Collection<Feature> inheritedFeatures = new LinkedList<Feature>();
+	protected Collection<Feature> importedFeatures = new LinkedList<Feature>();
+	protected Set<String> parentModels = new HashSet<String>();
 	protected Map<String, String> instances = new HashMap<String, String>();
+	protected Map<Feature, String> parentsOfFeatures = new HashMap<Feature, String>();
 	protected boolean hasParameters = false;
 
 	protected LinkedList<Equation> attributeConstraints = new LinkedList<Equation>();
@@ -110,7 +115,7 @@ public class ExtendedFeatureModel extends FeatureModel {
 	 *            the name of the parent model
 	 */
 	public void addParent(final String parentModelName) {
-		this.parents.add(parentModelName);
+		this.parentModels.add(parentModelName);
 	}
 
 	public LinkedList<Equation> getAttributConstraints() {
@@ -151,7 +156,7 @@ public class ExtendedFeatureModel extends FeatureModel {
 	 * @return a copy of the parents of the model
 	 */
 	public Set<String> getParents() {
-		return new HashSet<String>(this.parents);
+		return new HashSet<String>(this.parentModels);
 	}
 
 	public FeatureAttributeMap<String> getStringAttributes() {
@@ -164,8 +169,7 @@ public class ExtendedFeatureModel extends FeatureModel {
 	 * @return true if imported features exists
 	 */
 	public boolean hasImported() {
-		// TODO @Matthias implement function
-		return false;
+		return !this.importedFeatures.isEmpty();
 	}
 
 	/**
@@ -207,8 +211,7 @@ public class ExtendedFeatureModel extends FeatureModel {
 	 * @return true if and only if the feature was imported
 	 */
 	public boolean isImported(final Feature imported) {
-		// TODO @Matthias implement function
-		return false;
+		return this.importedFeatures.contains(imported);
 	}
 
 	/**
@@ -229,7 +232,23 @@ public class ExtendedFeatureModel extends FeatureModel {
 	 *            the exact feature, that was added to the featuremodel
 	 *            previously
 	 */
-	public void setFeatureInherited(final Feature inherited) {
+	public void setFeatureInherited(final Feature inherited, final String parent) {
 		this.inheritedFeatures.add(inherited);
+		this.parentsOfFeatures.put(inherited, parent);
+	}
+
+	/**
+	 * TODO @Matthias document
+	 * 
+	 * @param connector
+	 * @param instancename
+	 */
+	public void setFeaturefromInstance(Feature fromInstance, String instanceName) {
+		this.importedFeatures.add(fromInstance);
+		this.parentsOfFeatures.put(fromInstance, instanceName);
+	}
+	
+	public String getParent(Feature child) {
+		return parentsOfFeatures.get(child);
 	}
 }

@@ -28,6 +28,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
+import javax.annotation.Nonnull;
+
 import org.antlr.runtime.ANTLRInputStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
@@ -59,6 +61,7 @@ import de.ovgu.featureide.fm.core.constraint.analysis.ExtendedFeatureModelAnalyz
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.FileLoader;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
  * Parses a feature model in Velvet syntax.
@@ -73,6 +76,10 @@ public class VelvetFeatureModelReader
 	protected ExtendedFeatureModel extFeatureModel;
 
 	private final LinkedList<Feature> parentStack = new LinkedList<Feature>();
+	private enum FeatureInheritanceModes {
+		INHERITANCE,
+		INSTANCE;
+	};
 
 	private final LinkedList<Tree> atrributeConstraintNodes = new LinkedList<Tree>();
 	private static final int[] binaryOperators = {VelvetParser.OP_OR, VelvetParser.OP_AND, VelvetParser.OP_XOR,
@@ -99,29 +106,36 @@ public class VelvetFeatureModelReader
 		return newFeature;
 	}
 
-	private void copyChildnodes(final Feature parentNode, final LinkedList<Feature> children) {
+	private void copyChildnodes(final Feature parentNode, final LinkedList<Feature> children, final String parent, FeatureInheritanceModes mode) {
 		for (final Feature child : children) {
-			final Feature imported =
+			final Feature feature =
 				addFeature(parentNode, child.getName(), child.isMandatory(), child.isAbstract(),
 					child.isHidden());
 			// save imported feature into mapping to store imported status
-			imported.setAND(child.isAnd());
-			imported.setMultiple(child.isMultiple());
+			feature.setAND(child.isAnd());
+			feature.setMultiple(child.isMultiple());
 			if (child.isOr()) {
-				imported.setOr();
+				feature.setOr();
 			}
-			this.extFeatureModel.setFeatureInherited(imported);
+			switch (mode) {
+				case INHERITANCE:
+					this.extFeatureModel.setFeatureInherited(feature, parent);
+					break;
+				case INSTANCE:
+					this.extFeatureModel.setFeaturefromInstance(feature, parent);
+					break;
+			}
 
 			if (child.hasChildren()) {
-				copyChildnodes(imported, child.getChildren());
+				copyChildnodes(feature, child.getChildren(), parent, mode);
 			}
 		}
 	}
 
-	private void copyModel(final FeatureModel parent) {
+	private void copyModel(final FeatureModel parent, final String parentModelName) {
 		Feature root = parent.getRoot();
 
-		copyChildnodes(getFeatureModel().getRoot(), root.getChildren());
+		copyChildnodes(getFeatureModel().getRoot(), root.getChildren(), parentModelName, FeatureInheritanceModes.INHERITANCE);
 		for ( Constraint constraint : parent.getConstraints()) {
 			getFeatureModel().addConstraint(constraint);
 		}
@@ -402,6 +416,7 @@ public class VelvetFeatureModelReader
 					break;
 				// Instance
 				case VelvetParser.INSTANCE:
+					parseInstance(curNode, parentFeature);
 					break;
 				// Attribute
 				case VelvetParser.ATTR:
@@ -489,8 +504,7 @@ public class VelvetFeatureModelReader
 			}
 			
 			final FeatureModel fm = FileLoader.loadFeatureModel(parent);
-			
-			copyModel(fm);
+			copyModel(fm, parentModelName);
 		}
 	}
 
@@ -518,15 +532,12 @@ public class VelvetFeatureModelReader
 				parseAttributeConstraints();
 
 				final ExtendedFeatureModelAnalyzer analyzer = new ExtendedFeatureModelAnalyzer(this.extFeatureModel);
-				// TODO @Matthias REMOVE IF WHEN TESTING IS DONE
-				if (null != FMCorePlugin.getDefault()) {
-					FMCorePlugin.getDefault().logInfo("Velvet-Featuremodel imported");
-
-					try {
-						FMCorePlugin.getDefault().logInfo(analyzer.isValid() ? "valid" : "invalid");
-					} catch ( final TimeoutException e ) {
-						FMCorePlugin.getDefault().logError(e);
-					}
+				FMCorePlugin.getDefault().logInfo("Velvet-Featuremodel imported");
+	
+				try {
+					FMCorePlugin.getDefault().logInfo(analyzer.isValid() ? "valid" : "invalid");
+				} catch ( final TimeoutException e ) {
+					FMCorePlugin.getDefault().logError(e);
 				}
 				// Update the FeatureModel in Editor
 				this.extFeatureModel.handleModelDataLoaded();
@@ -534,7 +545,7 @@ public class VelvetFeatureModelReader
 		}
 	}
 
-	private void parseInstance(final Tree root) {
+	private void parseInstanceHeader(final Tree root) {
 		final LinkedList<Tree> nodeList = getChildren(root);
 		final String model = nodeList.poll().getText();
 		final String name = nodeList.poll().getText();
@@ -554,7 +565,7 @@ public class VelvetFeatureModelReader
 				case VelvetParser.IMP:
 					break;
 				case VelvetParser.INSTANCEDEF:
-					parseInstance(curNode);
+					parseInstanceHeader(curNode);
 				case VelvetParser.CONCEPT:
 					parseConcept(curNode);
 					break;
@@ -568,6 +579,49 @@ public class VelvetFeatureModelReader
 					FMCorePlugin.getDefault().logError(new UnsupportedModelException("Model contains invalid tokens in before beginning of concept or interface definition. (Line Number in velvet not available)", 0));
 					break;
 			}
+		}
+	}
+
+	private void parseInstance(final Tree root, final Feature parentFeature) {
+		final LinkedList<Tree> nodeList = getChildren(root);
+		
+		final String name = nodeList.poll().getText();
+		final String var = nodeList.poll().getText();
+		
+		// TODO remove assumption that name == projectname
+		// this.extFeatureModel.addInstance(parentModelName);
+
+		final IProject parent = ResourcesPlugin.getWorkspace().getRoot().getProject(name);
+		
+		if (!parent.exists()) {
+			FMCorePlugin.getDefault().logWarning(format("Project %s is missing.", name));
+			return;
+		}
+		
+		final FeatureModel fm = FileLoader.loadFeatureModel(parent);
+		insertInstance(fm, var, parentFeature);
+	}
+	
+	/**
+	 * TODO @Matthias create documentation
+	 * 
+	 * @param fm
+	 * @param name
+	 * @param instance
+	 */
+	private void insertInstance(FeatureModel instance, String instancename, final Feature parent) {
+		Feature instanceRoot = instance.getRoot();
+		
+		Feature connector = addFeature(parent, instancename, instanceRoot.isMandatory(),
+									   instanceRoot.isAbstract(), instanceRoot.isHidden());
+		this.extFeatureModel.setFeaturefromInstance(connector, instancename);
+		if (instanceRoot.isAlternative()) {
+			connector.setAlternative();
+		}
+		
+		copyChildnodes(connector, instanceRoot.getChildren(), instancename, FeatureInheritanceModes.INSTANCE);
+		for ( Constraint constraint : instance.getConstraints()) {
+			getFeatureModel().addConstraint(constraint);
 		}
 	}
 
