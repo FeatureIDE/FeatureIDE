@@ -82,7 +82,11 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 
 		FeatureModel fm = getConnectionModel().getTarget().getFeatureModel();
 		if (fm instanceof ExtendedFeatureModel) {
-			if (((ExtendedFeatureModel) fm).isInherited(getConnectionModel().getTarget())) {
+			ExtendedFeatureModel exfm = (ExtendedFeatureModel) fm;
+			if ((exfm.isInherited(getConnectionModel().getSource()) && !exfm
+					.isInherited(getConnectionModel().getTarget()))
+					|| (exfm.isImported(getConnectionModel().getSource()) && !exfm
+							.isImported(getConnectionModel().getTarget()))) {
 				figure.setLineStyle(SWT.LINE_DASH);
 			}
 		}

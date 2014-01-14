@@ -52,6 +52,8 @@ public class FMPropertyManagerDefaults {
 	static final QualifiedName QN_WARNING = createName("warning");
 	static final QualifiedName QN_HIDE_BORDER_COLOR = createName("hideBorderColor");
 	static final QualifiedName QN_FEATURE_BORDER = createName("featureborder");
+	static final QualifiedName QN_INHERITED_FEATURE_BORDER = createName("inheritedFeatureborder");
+	static final QualifiedName QN_IMPORTED_FEATURE_BORDER = createName("inheritedFeatureborder");
 
 	static final QualifiedName QN_LAYOUT_MARGIN_X = createName("margin_x");
 	static final QualifiedName QN_LAYOUT_MARGIN_Y = createName("margin_y");

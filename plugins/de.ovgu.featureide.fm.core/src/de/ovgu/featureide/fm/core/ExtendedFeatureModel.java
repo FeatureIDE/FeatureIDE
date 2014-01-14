@@ -35,9 +35,7 @@ import de.ovgu.featureide.fm.core.constraint.FeatureAttributeMap;
  * @author Sebastian Krieter
  * @author Matthias Strauss
  */
-public class ExtendedFeatureModel
-	extends
-		FeatureModel {
+public class ExtendedFeatureModel extends FeatureModel {
 
 	protected FeatureAttributeMap<Integer> integerAttributes = new FeatureAttributeMap<Integer>();
 	protected FeatureAttributeMap<Boolean> booleanAttributes = new FeatureAttributeMap<Boolean>();
@@ -50,15 +48,18 @@ public class ExtendedFeatureModel
 
 	protected LinkedList<Equation> attributeConstraints = new LinkedList<Equation>();
 
-	public void addAttribute(final String featureName, final String attributeName, final Boolean value) {
+	public void addAttribute(final String featureName,
+			final String attributeName, final Boolean value) {
 		this.booleanAttributes.setAttribute(featureName, attributeName, value);
 	}
 
-	public void addAttribute(final String featureName, final String attributeName, final Integer value) {
+	public void addAttribute(final String featureName,
+			final String attributeName, final Integer value) {
 		this.integerAttributes.setAttribute(featureName, attributeName, value);
 	}
 
-	public void addAttribute(final String featureName, final String attributeName, final String value) {
+	public void addAttribute(final String featureName,
+			final String attributeName, final String value) {
 		this.stringAttributes.setAttribute(featureName, attributeName, value);
 	}
 
@@ -69,8 +70,10 @@ public class ExtendedFeatureModel
 	/**
 	 * Adds a mapping for an instancename to the model which it will be bound to
 	 * 
-	 * @param name the name of the variable
-	 * @param model the model that the variable is bound to
+	 * @param name
+	 *            the name of the variable
+	 * @param model
+	 *            the model that the variable is bound to
 	 */
 	public void addInstanceMapping(final String name, final String model) {
 		this.instances.put(name, model);
@@ -79,13 +82,15 @@ public class ExtendedFeatureModel
 	/**
 	 * Adds a parameter to the available parameters of the model
 	 * 
-	 * @param interfaceClazz the name of the interface that shall be bound to
-	 *            the variable
-	 * @param varName the name of the variable an interface shall be bound to
+	 * @param interfaceClazz
+	 *            the name of the interface that shall be bound to the variable
+	 * @param varName
+	 *            the name of the variable an interface shall be bound to
 	 * @return true if the parameter could be added to the parameters. False if
 	 *         the variable name was already bound to another interface.
 	 */
-	public boolean addParameter(final String interfaceClazz, final String varName) {
+	public boolean addParameter(final String interfaceClazz,
+			final String varName) {
 		if (this.parameters.containsKey(varName)) {
 			return false;
 		}
@@ -101,7 +106,8 @@ public class ExtendedFeatureModel
 	/**
 	 * Adds the name of a Model as a parent of the current model.
 	 * 
-	 * @param parentModelName the name of the parent model
+	 * @param parentModelName
+	 *            the name of the parent model
 	 */
 	public void addParent(final String parentModelName) {
 		this.parents.add(parentModelName);
@@ -153,6 +159,25 @@ public class ExtendedFeatureModel
 	}
 
 	/**
+	 * Check if the feature model contains imported features.
+	 * 
+	 * @return true if imported features exists
+	 */
+	public boolean hasImported() {
+		// TODO @Matthias implement function
+		return false;
+	}
+
+	/**
+	 * Check if the feature model contains imherited features.
+	 * 
+	 * @return true if inherited features exists
+	 */
+	public boolean hasInherited() {
+		return !this.inheritedFeatures.isEmpty();
+	}
+
+	/**
 	 * This method is used by the mspl plugin to determine if a model uses
 	 * interfaces. The first parameter that is added will set hasParameters to
 	 * true.
@@ -175,10 +200,22 @@ public class ExtendedFeatureModel
 	}
 
 	/**
+	 * Checks if a given Feature in this model was imported with a instance.
+	 * 
+	 * @param imported
+	 *            the feature for which it will be checked if it is imported
+	 * @return true if and only if the feature was imported
+	 */
+	public boolean isImported(final Feature imported) {
+		// TODO @Matthias implement function
+		return false;
+	}
+
+	/**
 	 * Checks if a given Feature in this model was inherited.
 	 * 
-	 * @param inherited the feature for which it will be checked if it is
-	 *            inherited
+	 * @param inherited
+	 *            the feature for which it will be checked if it is inherited
 	 * @return true if and only if the feature was inherited
 	 */
 	public boolean isInherited(final Feature inherited) {
@@ -188,7 +225,8 @@ public class ExtendedFeatureModel
 	/**
 	 * This method stores inherited features.
 	 * 
-	 * @param inherited the exact feature, that was added to the featuremodel
+	 * @param inherited
+	 *            the exact feature, that was added to the featuremodel
 	 *            previously
 	 */
 	public void setFeatureInherited(final Feature inherited) {

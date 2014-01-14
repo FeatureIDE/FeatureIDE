@@ -31,6 +31,7 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.graphics.Color;
 
+import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -80,6 +81,8 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private static final String OPTIONAL_TOOLTIP = "Optional feature:\n\nThis feature does not have to be selected.";
 	private static final String MANDATORY_TOOLTIP = "Mandatory feature:\n\nThis feature must be selected whenever its parent is selected.";
 	private static final String ABSTRACT_TOOLTIP = "Abstract feature:\n\nThis feature does not has any impact at implementation level.";
+	private static final String IMPORTED_TOOLTIP = "Imported feature:\n\nThis feature is imported from another feature model.";
+	private static final String INHERITED_TOOLTIP = "Inherited feature:\n\nThis feature is inherited from a parent feature model.";
 	private static final String CONCRETE_TOOLTIP = "Concrete feature:\n\nThis feature has impact at implementation level.";
 	private static final String HIDDEN_TOOLTIP = "Hidden feature:\n\nThis feature will not be shown in the configuration editor.\n Non-hidden features should determine when to select the feature automatically.";
 	private static final String DEAD_TOOLTIP = "Dead feature:\n\nThis feature cannot be selected in any valid configuration.";
@@ -100,6 +103,8 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private static final int OR = 5;
 	private static final int ALTERNATIVE = 6;
 	private static final int FALSE_OPT = 7;
+	private static final int IMPORTED = 8;
+	private static final int INHERITED = 9;
 
 	private final XYLayout layout = new XYLayout();
 	public Point newPos;
@@ -121,6 +126,8 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private boolean deadConst;
 	private boolean voidModelConst;
 	private boolean redundantConst;
+	private boolean imported = false;
+	private boolean inherited = false;
 
 	@Override
 	public boolean useLocalCoordinates() {
@@ -145,6 +152,13 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		deadConst = featureModel.hasDeadConst();
 		voidModelConst = featureModel.hasVoidModelConst();
 		redundantConst = featureModel.hasRedundantConst();
+
+		if (featureModel instanceof ExtendedFeatureModel) {
+			ExtendedFeatureModel extendedFeatureModel = (ExtendedFeatureModel) featureModel;
+			imported = extendedFeatureModel.hasImported();
+			inherited = extendedFeatureModel.hasInherited();
+		}
+
 		language = FMPropertyManager.getLanguage();
 		setLocation(pos);
 		setLayoutManager(layout);
@@ -183,6 +197,14 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			height = height + ROW_HEIGHT;
 			setWidth(language.getAbstract());
 			setWidth(language.getConcrete());
+		}
+		if (imported) {
+			height = height + ROW_HEIGHT;
+			setWidth(language.getImported());
+		}
+		if (inherited) {
+			height = height + ROW_HEIGHT;
+			setWidth(language.getInherited());
 		}
 		if (hidden && showHidden) {
 			height = height + ROW_HEIGHT;
@@ -253,6 +275,12 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		if (_abstract && concrete) {
 			createRowAbstract(row++);
 			createRowConcrete(row++);
+		}
+		if (imported) {
+			createRowImported(row++);
+		}
+		if (inherited) {
+			createRowInherited(row++);
 		}
 		if (hidden && showHidden) {
 			createRowHidden(row++);
@@ -401,6 +429,20 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		Label labelAbstract = createLabel(row, language.getAbstract(),
 				FMPropertyManager.getFeatureForgroundColor(), ABSTRACT_TOOLTIP);
 		add(labelAbstract);
+	}
+
+	private void createRowImported(int row) {
+		createSymbol(row, IMPORTED, true, IMPORTED_TOOLTIP);
+		Label labelImported = createLabel(row, language.getImported(),
+				FMPropertyManager.getFeatureForgroundColor(), IMPORTED_TOOLTIP);
+		add(labelImported);
+	}
+
+	private void createRowInherited(int row) {
+		createSymbol(row, INHERITED, true, INHERITED_TOOLTIP);
+		Label labelInherited = createLabel(row, language.getInherited(),
+				FMPropertyManager.getFeatureForgroundColor(), INHERITED_TOOLTIP);
+		add(labelInherited);
 	}
 
 	private void createRowConcrete(int row) {
@@ -567,6 +609,12 @@ public class LegendFigure extends Figure implements GUIDefaults {
 				rect.setBorder(FMPropertyManager.getConstraintBorder(false));
 			}
 			rect.setBackgroundColor(FMPropertyManager.getWarningColor());
+			break;
+		case (IMPORTED):
+			rect.setBorder(FMPropertyManager.getImportedFeatureBorder());
+			break;
+		case (INHERITED):
+			rect.setBorder(FMPropertyManager.getInheritedFeatureBorder());
 			break;
 		}
 		rect.setSize(x2 - x1, y2 - y1);
