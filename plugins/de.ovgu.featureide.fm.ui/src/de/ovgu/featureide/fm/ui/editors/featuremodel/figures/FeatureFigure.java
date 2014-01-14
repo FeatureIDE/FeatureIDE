@@ -172,9 +172,13 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 			setBorder(FMPropertyManager.getDeadFeatureBorder(feature.isConstraintSelected()));
 			toolTip = VOID;
 		}
-		
+
 		if (featureModel instanceof ExtendedFeatureModel) {
 			ExtendedFeatureModel extendedFeatureModel = (ExtendedFeatureModel) featureModel;
+
+			if (extendedFeatureModel.isImported(feature)) {
+				setBorder(FMPropertyManager.getImportedFeatureBorder());
+			}
 
 			if (extendedFeatureModel.isInherited(feature)) {
 				setBorder(FMPropertyManager.getInheritedFeatureBorder());
