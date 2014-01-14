@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.io.velvet;
 
+import static java.lang.String.format;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
@@ -479,11 +481,14 @@ public class VelvetFeatureModelReader
 
 			this.extFeatureModel.addParent(parentModelName);
 
-			// TODO @Matthias check if project exists
 			final IProject parent = ResourcesPlugin.getWorkspace().getRoot().getProject(parentModelName);
-			System.err.println("final IProject parent = ResourcesPlugin.getWorkspace().getRoot().getProject(parentModelName); ---> " + parent);
+			
+			if (!parent.exists()) {
+				FMCorePlugin.getDefault().logWarning(format("Project %s is missing.", parentModelName));
+				return;
+			}
+			
 			final FeatureModel fm = FileLoader.loadFeatureModel(parent);
-			System.err.println("final FeatureModel fm = FileLoader.loadFeatureModel(parent);" + fm);
 			
 			copyModel(fm);
 		}
@@ -558,11 +563,9 @@ public class VelvetFeatureModelReader
 					break;
 				case VelvetParser.EOF:
 					// TODO @Matthias check if a model was created?
+					break;
 				default:
-					// TODO @Matthias throw an exception that no valid start was found
-					System.err.println(curNode);
-					System.err.println(curNode.getType());
-					System.err.println("ERROR");
+					FMCorePlugin.getDefault().logError(new UnsupportedModelException("Model contains invalid tokens in before beginning of concept or interface definition. (Line Number in velvet not available)", 0));
 					break;
 			}
 		}
