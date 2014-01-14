@@ -1,4 +1,4 @@
-// $ANTLR 3.4 Velvet.g 2014-01-08 20:51:08
+// $ANTLR 3.4 Velvet.g 2014-01-14 18:29:44
 
 package de.ovgu.featureide.fm.core.io.velvet;
 
@@ -349,7 +349,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
             // AST REWRITE
-            // elements: ID, name
+            // elements: name, ID
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -724,7 +724,7 @@ public TreeAdaptor getTreeAdaptor() {
             stream_definitions.add(definitions22.getTree());
 
             // AST REWRITE
-            // elements: conceptBaseExt, conceptInterExt, REFINES, CONCEPT, definitions, ID
+            // elements: ID, conceptBaseExt, CONCEPT, conceptInterExt, REFINES, definitions
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -970,7 +970,7 @@ public TreeAdaptor getTreeAdaptor() {
             stream_name.add(name27.getTree());
 
             // AST REWRITE
-            // elements: ID, name
+            // elements: name, ID
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -1130,7 +1130,7 @@ public TreeAdaptor getTreeAdaptor() {
             stream_definitions.add(definitions33.getTree());
 
             // AST REWRITE
-            // elements: ID, definitions, CINTERFACE, interfaceBaseExt, REFINES
+            // elements: CINTERFACE, REFINES, ID, definitions, interfaceBaseExt
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -1843,7 +1843,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "instance"
-    // Velvet.g:140:1: instance : ID name SEMI -> INSTANCE ID name ;
+    // Velvet.g:140:1: instance : ID name SEMI -> ^( INSTANCE ID name ) ;
     public final VelvetParser.instance_return instance() throws RecognitionException {
         VelvetParser.instance_return retval = new VelvetParser.instance_return();
         retval.start = input.LT(1);
@@ -1862,7 +1862,7 @@ public TreeAdaptor getTreeAdaptor() {
         RewriteRuleTokenStream stream_SEMI=new RewriteRuleTokenStream(adaptor,"token SEMI");
         RewriteRuleSubtreeStream stream_name=new RewriteRuleSubtreeStream(adaptor,"rule name");
         try {
-            // Velvet.g:140:9: ( ID name SEMI -> INSTANCE ID name )
+            // Velvet.g:140:9: ( ID name SEMI -> ^( INSTANCE ID name ) )
             // Velvet.g:140:11: ID name SEMI
             {
             ID50=(Token)match(input,ID,FOLLOW_ID_in_instance843);  
@@ -1891,17 +1891,23 @@ public TreeAdaptor getTreeAdaptor() {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (Tree)adaptor.nil();
-            // 141:2: -> INSTANCE ID name
+            // 141:2: -> ^( INSTANCE ID name )
             {
-                adaptor.addChild(root_0, 
+                // Velvet.g:141:5: ^( INSTANCE ID name )
+                {
+                Tree root_1 = (Tree)adaptor.nil();
+                root_1 = (Tree)adaptor.becomeRoot(
                 (Tree)adaptor.create(INSTANCE, "INSTANCE")
-                );
+                , root_1);
 
-                adaptor.addChild(root_0, 
+                adaptor.addChild(root_1, 
                 stream_ID.nextNode()
                 );
 
-                adaptor.addChild(root_0, stream_name.nextTree());
+                adaptor.addChild(root_1, stream_name.nextTree());
+
+                adaptor.addChild(root_0, root_1);
+                }
 
             }
 
@@ -2006,11 +2012,11 @@ public TreeAdaptor getTreeAdaptor() {
                 case 1 :
                     // Velvet.g:145:5: MANDATORY ABSTRACT
                     {
-                    MANDATORY53=(Token)match(input,MANDATORY,FOLLOW_MANDATORY_in_feature869);  
+                    MANDATORY53=(Token)match(input,MANDATORY,FOLLOW_MANDATORY_in_feature871);  
                     stream_MANDATORY.add(MANDATORY53);
 
 
-                    ABSTRACT54=(Token)match(input,ABSTRACT,FOLLOW_ABSTRACT_in_feature871);  
+                    ABSTRACT54=(Token)match(input,ABSTRACT,FOLLOW_ABSTRACT_in_feature873);  
                     stream_ABSTRACT.add(ABSTRACT54);
 
 
@@ -2019,11 +2025,11 @@ public TreeAdaptor getTreeAdaptor() {
                 case 2 :
                     // Velvet.g:145:26: ABSTRACT MANDATORY
                     {
-                    ABSTRACT55=(Token)match(input,ABSTRACT,FOLLOW_ABSTRACT_in_feature875);  
+                    ABSTRACT55=(Token)match(input,ABSTRACT,FOLLOW_ABSTRACT_in_feature877);  
                     stream_ABSTRACT.add(ABSTRACT55);
 
 
-                    MANDATORY56=(Token)match(input,MANDATORY,FOLLOW_MANDATORY_in_feature877);  
+                    MANDATORY56=(Token)match(input,MANDATORY,FOLLOW_MANDATORY_in_feature879);  
                     stream_MANDATORY.add(MANDATORY56);
 
 
@@ -2032,7 +2038,7 @@ public TreeAdaptor getTreeAdaptor() {
                 case 3 :
                     // Velvet.g:145:47: MANDATORY
                     {
-                    MANDATORY57=(Token)match(input,MANDATORY,FOLLOW_MANDATORY_in_feature881);  
+                    MANDATORY57=(Token)match(input,MANDATORY,FOLLOW_MANDATORY_in_feature883);  
                     stream_MANDATORY.add(MANDATORY57);
 
 
@@ -2041,7 +2047,7 @@ public TreeAdaptor getTreeAdaptor() {
                 case 4 :
                     // Velvet.g:145:59: ABSTRACT
                     {
-                    ABSTRACT58=(Token)match(input,ABSTRACT,FOLLOW_ABSTRACT_in_feature885);  
+                    ABSTRACT58=(Token)match(input,ABSTRACT,FOLLOW_ABSTRACT_in_feature887);  
                     stream_ABSTRACT.add(ABSTRACT58);
 
 
@@ -2051,11 +2057,11 @@ public TreeAdaptor getTreeAdaptor() {
             }
 
 
-            FEATURE59=(Token)match(input,FEATURE,FOLLOW_FEATURE_in_feature892);  
+            FEATURE59=(Token)match(input,FEATURE,FOLLOW_FEATURE_in_feature894);  
             stream_FEATURE.add(FEATURE59);
 
 
-            pushFollow(FOLLOW_name_in_feature894);
+            pushFollow(FOLLOW_name_in_feature896);
             name60=name();
 
             state._fsp--;
@@ -2083,7 +2089,7 @@ public TreeAdaptor getTreeAdaptor() {
                 case 1 :
                     // Velvet.g:146:18: definitions
                     {
-                    pushFollow(FOLLOW_definitions_in_feature897);
+                    pushFollow(FOLLOW_definitions_in_feature899);
                     definitions61=definitions();
 
                     state._fsp--;
@@ -2095,7 +2101,7 @@ public TreeAdaptor getTreeAdaptor() {
                 case 2 :
                     // Velvet.g:146:32: SEMI
                     {
-                    SEMI62=(Token)match(input,SEMI,FOLLOW_SEMI_in_feature901);  
+                    SEMI62=(Token)match(input,SEMI,FOLLOW_SEMI_in_feature903);  
                     stream_SEMI.add(SEMI62);
 
 
@@ -2106,7 +2112,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
             // AST REWRITE
-            // elements: ABSTRACT, name, definitions, MANDATORY
+            // elements: MANDATORY, definitions, name, ABSTRACT
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -2218,18 +2224,18 @@ public TreeAdaptor getTreeAdaptor() {
             // Velvet.g:151:2: ( groupType START_C feature ( feature )+ END_C -> ^( GROUP groupType feature ( feature )+ ) )
             // Velvet.g:151:4: groupType START_C feature ( feature )+ END_C
             {
-            pushFollow(FOLLOW_groupType_in_featureGroup932);
+            pushFollow(FOLLOW_groupType_in_featureGroup934);
             groupType63=groupType();
 
             state._fsp--;
 
             stream_groupType.add(groupType63.getTree());
 
-            START_C64=(Token)match(input,START_C,FOLLOW_START_C_in_featureGroup934);  
+            START_C64=(Token)match(input,START_C,FOLLOW_START_C_in_featureGroup936);  
             stream_START_C.add(START_C64);
 
 
-            pushFollow(FOLLOW_feature_in_featureGroup936);
+            pushFollow(FOLLOW_feature_in_featureGroup938);
             feature65=feature();
 
             state._fsp--;
@@ -2252,7 +2258,7 @@ public TreeAdaptor getTreeAdaptor() {
             	case 1 :
             	    // Velvet.g:151:30: feature
             	    {
-            	    pushFollow(FOLLOW_feature_in_featureGroup938);
+            	    pushFollow(FOLLOW_feature_in_featureGroup940);
             	    feature66=feature();
 
             	    state._fsp--;
@@ -2272,7 +2278,7 @@ public TreeAdaptor getTreeAdaptor() {
             } while (true);
 
 
-            END_C67=(Token)match(input,END_C,FOLLOW_END_C_in_featureGroup941);  
+            END_C67=(Token)match(input,END_C,FOLLOW_END_C_in_featureGroup943);  
             stream_END_C.add(END_C67);
 
 
@@ -2442,7 +2448,7 @@ public TreeAdaptor getTreeAdaptor() {
             root_0 = (Tree)adaptor.nil();
 
 
-            CONSTRAINT69=(Token)match(input,CONSTRAINT,FOLLOW_CONSTRAINT_in_constraint984); 
+            CONSTRAINT69=(Token)match(input,CONSTRAINT,FOLLOW_CONSTRAINT_in_constraint986); 
             CONSTRAINT69_tree = 
             (Tree)adaptor.create(CONSTRAINT69)
             ;
@@ -2464,14 +2470,14 @@ public TreeAdaptor getTreeAdaptor() {
                 case 1 :
                     // Velvet.g:161:17: ID EQ !
                     {
-                    ID70=(Token)match(input,ID,FOLLOW_ID_in_constraint988); 
+                    ID70=(Token)match(input,ID,FOLLOW_ID_in_constraint990); 
                     ID70_tree = 
                     (Tree)adaptor.create(ID70)
                     ;
                     adaptor.addChild(root_0, ID70_tree);
 
 
-                    EQ71=(Token)match(input,EQ,FOLLOW_EQ_in_constraint990); 
+                    EQ71=(Token)match(input,EQ,FOLLOW_EQ_in_constraint992); 
 
                     }
                     break;
@@ -2525,7 +2531,7 @@ public TreeAdaptor getTreeAdaptor() {
                 case 1 :
                     // Velvet.g:161:27: constraintDefinition
                     {
-                    pushFollow(FOLLOW_constraintDefinition_in_constraint996);
+                    pushFollow(FOLLOW_constraintDefinition_in_constraint998);
                     constraintDefinition72=constraintDefinition();
 
                     state._fsp--;
@@ -2537,7 +2543,7 @@ public TreeAdaptor getTreeAdaptor() {
                 case 2 :
                     // Velvet.g:161:50: attributeConstraint
                     {
-                    pushFollow(FOLLOW_attributeConstraint_in_constraint1000);
+                    pushFollow(FOLLOW_attributeConstraint_in_constraint1002);
                     attributeConstraint73=attributeConstraint();
 
                     state._fsp--;
@@ -2550,7 +2556,7 @@ public TreeAdaptor getTreeAdaptor() {
             }
 
 
-            SEMI74=(Token)match(input,SEMI,FOLLOW_SEMI_in_constraint1003); 
+            SEMI74=(Token)match(input,SEMI,FOLLOW_SEMI_in_constraint1005); 
 
             }
 
@@ -2604,7 +2610,7 @@ public TreeAdaptor getTreeAdaptor() {
             // Velvet.g:165:2: ( constraintOperand ( binaryOp constraintOperand )* -> ^( CONSTR ( constraintOperand )+ ( binaryOp )* ) )
             // Velvet.g:165:4: constraintOperand ( binaryOp constraintOperand )*
             {
-            pushFollow(FOLLOW_constraintOperand_in_constraintDefinition1016);
+            pushFollow(FOLLOW_constraintOperand_in_constraintDefinition1018);
             constraintOperand75=constraintOperand();
 
             state._fsp--;
@@ -2626,14 +2632,14 @@ public TreeAdaptor getTreeAdaptor() {
             	case 1 :
             	    // Velvet.g:165:23: binaryOp constraintOperand
             	    {
-            	    pushFollow(FOLLOW_binaryOp_in_constraintDefinition1019);
+            	    pushFollow(FOLLOW_binaryOp_in_constraintDefinition1021);
             	    binaryOp76=binaryOp();
 
             	    state._fsp--;
 
             	    stream_binaryOp.add(binaryOp76.getTree());
 
-            	    pushFollow(FOLLOW_constraintOperand_in_constraintDefinition1021);
+            	    pushFollow(FOLLOW_constraintOperand_in_constraintDefinition1023);
             	    constraintOperand77=constraintOperand();
 
             	    state._fsp--;
@@ -2767,7 +2773,7 @@ public TreeAdaptor getTreeAdaptor() {
             	case 1 :
             	    // Velvet.g:169:21: unaryOp
             	    {
-            	    pushFollow(FOLLOW_unaryOp_in_constraintOperand1048);
+            	    pushFollow(FOLLOW_unaryOp_in_constraintOperand1050);
             	    unaryOp78=unaryOp();
 
             	    state._fsp--;
@@ -2804,18 +2810,18 @@ public TreeAdaptor getTreeAdaptor() {
                 case 1 :
                     // Velvet.g:169:31: START_R constraintDefinition END_R
                     {
-                    START_R79=(Token)match(input,START_R,FOLLOW_START_R_in_constraintOperand1052);  
+                    START_R79=(Token)match(input,START_R,FOLLOW_START_R_in_constraintOperand1054);  
                     stream_START_R.add(START_R79);
 
 
-                    pushFollow(FOLLOW_constraintDefinition_in_constraintOperand1054);
+                    pushFollow(FOLLOW_constraintDefinition_in_constraintOperand1056);
                     constraintDefinition80=constraintDefinition();
 
                     state._fsp--;
 
                     stream_constraintDefinition.add(constraintDefinition80.getTree());
 
-                    END_R81=(Token)match(input,END_R,FOLLOW_END_R_in_constraintOperand1056);  
+                    END_R81=(Token)match(input,END_R,FOLLOW_END_R_in_constraintOperand1058);  
                     stream_END_R.add(END_R81);
 
 
@@ -2824,7 +2830,7 @@ public TreeAdaptor getTreeAdaptor() {
                 case 2 :
                     // Velvet.g:169:68: name
                     {
-                    pushFollow(FOLLOW_name_in_constraintOperand1060);
+                    pushFollow(FOLLOW_name_in_constraintOperand1062);
                     name82=name();
 
                     state._fsp--;
@@ -2838,7 +2844,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
             // AST REWRITE
-            // elements: name, constraintDefinition, unaryOp
+            // elements: name, unaryOp, constraintDefinition
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -2943,7 +2949,7 @@ public TreeAdaptor getTreeAdaptor() {
             // Velvet.g:174:2: ( attribConstraint -> ^( ACONSTR attribConstraint ) )
             // Velvet.g:174:4: attribConstraint
             {
-            pushFollow(FOLLOW_attribConstraint_in_attributeConstraint1095);
+            pushFollow(FOLLOW_attribConstraint_in_attributeConstraint1097);
             attribConstraint83=attribConstraint();
 
             state._fsp--;
@@ -3042,7 +3048,7 @@ public TreeAdaptor getTreeAdaptor() {
             root_0 = (Tree)adaptor.nil();
 
 
-            pushFollow(FOLLOW_attribNumInstance_in_attribConstraint1115);
+            pushFollow(FOLLOW_attribNumInstance_in_attribConstraint1117);
             attribNumInstance84=attribNumInstance();
 
             state._fsp--;
@@ -3064,14 +3070,14 @@ public TreeAdaptor getTreeAdaptor() {
             	case 1 :
             	    // Velvet.g:179:23: attribOperator attribNumInstance
             	    {
-            	    pushFollow(FOLLOW_attribOperator_in_attribConstraint1118);
+            	    pushFollow(FOLLOW_attribOperator_in_attribConstraint1120);
             	    attribOperator85=attribOperator();
 
             	    state._fsp--;
 
             	    adaptor.addChild(root_0, attribOperator85.getTree());
 
-            	    pushFollow(FOLLOW_attribNumInstance_in_attribConstraint1120);
+            	    pushFollow(FOLLOW_attribNumInstance_in_attribConstraint1122);
             	    attribNumInstance86=attribNumInstance();
 
             	    state._fsp--;
@@ -3087,14 +3093,14 @@ public TreeAdaptor getTreeAdaptor() {
             } while (true);
 
 
-            pushFollow(FOLLOW_attribRelation_in_attribConstraint1128);
+            pushFollow(FOLLOW_attribRelation_in_attribConstraint1130);
             attribRelation87=attribRelation();
 
             state._fsp--;
 
             adaptor.addChild(root_0, attribRelation87.getTree());
 
-            pushFollow(FOLLOW_attribNumInstance_in_attribConstraint1134);
+            pushFollow(FOLLOW_attribNumInstance_in_attribConstraint1136);
             attribNumInstance88=attribNumInstance();
 
             state._fsp--;
@@ -3116,14 +3122,14 @@ public TreeAdaptor getTreeAdaptor() {
             	case 1 :
             	    // Velvet.g:181:23: attribOperator attribNumInstance
             	    {
-            	    pushFollow(FOLLOW_attribOperator_in_attribConstraint1137);
+            	    pushFollow(FOLLOW_attribOperator_in_attribConstraint1139);
             	    attribOperator89=attribOperator();
 
             	    state._fsp--;
 
             	    adaptor.addChild(root_0, attribOperator89.getTree());
 
-            	    pushFollow(FOLLOW_attribNumInstance_in_attribConstraint1139);
+            	    pushFollow(FOLLOW_attribNumInstance_in_attribConstraint1141);
             	    attribNumInstance90=attribNumInstance();
 
             	    state._fsp--;
@@ -3274,7 +3280,7 @@ public TreeAdaptor getTreeAdaptor() {
                     root_0 = (Tree)adaptor.nil();
 
 
-                    INT92=(Token)match(input,INT,FOLLOW_INT_in_attribNumInstance1171); 
+                    INT92=(Token)match(input,INT,FOLLOW_INT_in_attribNumInstance1173); 
                     INT92_tree = 
                     (Tree)adaptor.create(INT92)
                     ;
@@ -3289,7 +3295,7 @@ public TreeAdaptor getTreeAdaptor() {
                     root_0 = (Tree)adaptor.nil();
 
 
-                    pushFollow(FOLLOW_name_in_attribNumInstance1178);
+                    pushFollow(FOLLOW_name_in_attribNumInstance1180);
                     name93=name();
 
                     state._fsp--;
@@ -3392,7 +3398,7 @@ public TreeAdaptor getTreeAdaptor() {
                 case 1 :
                     // Velvet.g:196:5: intAttribute
                     {
-                    pushFollow(FOLLOW_intAttribute_in_attribute1190);
+                    pushFollow(FOLLOW_intAttribute_in_attribute1192);
                     intAttribute94=intAttribute();
 
                     state._fsp--;
@@ -3404,7 +3410,7 @@ public TreeAdaptor getTreeAdaptor() {
                 case 2 :
                     // Velvet.g:196:20: floatAttribute
                     {
-                    pushFollow(FOLLOW_floatAttribute_in_attribute1194);
+                    pushFollow(FOLLOW_floatAttribute_in_attribute1196);
                     floatAttribute95=floatAttribute();
 
                     state._fsp--;
@@ -3416,7 +3422,7 @@ public TreeAdaptor getTreeAdaptor() {
                 case 3 :
                     // Velvet.g:196:37: stringAttribute
                     {
-                    pushFollow(FOLLOW_stringAttribute_in_attribute1198);
+                    pushFollow(FOLLOW_stringAttribute_in_attribute1200);
                     stringAttribute96=stringAttribute();
 
                     state._fsp--;
@@ -3428,7 +3434,7 @@ public TreeAdaptor getTreeAdaptor() {
                 case 4 :
                     // Velvet.g:196:55: boolAttribute
                     {
-                    pushFollow(FOLLOW_boolAttribute_in_attribute1202);
+                    pushFollow(FOLLOW_boolAttribute_in_attribute1204);
                     boolAttribute97=boolAttribute();
 
                     state._fsp--;
@@ -3441,12 +3447,12 @@ public TreeAdaptor getTreeAdaptor() {
             }
 
 
-            SEMI98=(Token)match(input,SEMI,FOLLOW_SEMI_in_attribute1205);  
+            SEMI98=(Token)match(input,SEMI,FOLLOW_SEMI_in_attribute1207);  
             stream_SEMI.add(SEMI98);
 
 
             // AST REWRITE
-            // elements: floatAttribute, boolAttribute, stringAttribute, intAttribute
+            // elements: intAttribute, floatAttribute, boolAttribute, stringAttribute
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -3557,9 +3563,9 @@ public TreeAdaptor getTreeAdaptor() {
             root_0 = (Tree)adaptor.nil();
 
 
-            VAR_INT99=(Token)match(input,VAR_INT,FOLLOW_VAR_INT_in_intAttribute1234); 
+            VAR_INT99=(Token)match(input,VAR_INT,FOLLOW_VAR_INT_in_intAttribute1236); 
 
-            pushFollow(FOLLOW_name_in_intAttribute1237);
+            pushFollow(FOLLOW_name_in_intAttribute1239);
             name100=name();
 
             state._fsp--;
@@ -3577,9 +3583,9 @@ public TreeAdaptor getTreeAdaptor() {
                 case 1 :
                     // Velvet.g:200:31: EQ ! INT
                     {
-                    EQ101=(Token)match(input,EQ,FOLLOW_EQ_in_intAttribute1240); 
+                    EQ101=(Token)match(input,EQ,FOLLOW_EQ_in_intAttribute1242); 
 
-                    INT102=(Token)match(input,INT,FOLLOW_INT_in_intAttribute1243); 
+                    INT102=(Token)match(input,INT,FOLLOW_INT_in_intAttribute1245); 
                     INT102_tree = 
                     (Tree)adaptor.create(INT102)
                     ;
@@ -3648,9 +3654,9 @@ public TreeAdaptor getTreeAdaptor() {
             root_0 = (Tree)adaptor.nil();
 
 
-            VAR_FLOAT103=(Token)match(input,VAR_FLOAT,FOLLOW_VAR_FLOAT_in_floatAttribute1252); 
+            VAR_FLOAT103=(Token)match(input,VAR_FLOAT,FOLLOW_VAR_FLOAT_in_floatAttribute1254); 
 
-            pushFollow(FOLLOW_name_in_floatAttribute1255);
+            pushFollow(FOLLOW_name_in_floatAttribute1257);
             name104=name();
 
             state._fsp--;
@@ -3668,9 +3674,9 @@ public TreeAdaptor getTreeAdaptor() {
                 case 1 :
                     // Velvet.g:201:35: EQ ! FLOAT
                     {
-                    EQ105=(Token)match(input,EQ,FOLLOW_EQ_in_floatAttribute1258); 
+                    EQ105=(Token)match(input,EQ,FOLLOW_EQ_in_floatAttribute1260); 
 
-                    FLOAT106=(Token)match(input,FLOAT,FOLLOW_FLOAT_in_floatAttribute1261); 
+                    FLOAT106=(Token)match(input,FLOAT,FOLLOW_FLOAT_in_floatAttribute1263); 
                     FLOAT106_tree = 
                     (Tree)adaptor.create(FLOAT106)
                     ;
@@ -3739,9 +3745,9 @@ public TreeAdaptor getTreeAdaptor() {
             root_0 = (Tree)adaptor.nil();
 
 
-            VAR_STRING107=(Token)match(input,VAR_STRING,FOLLOW_VAR_STRING_in_stringAttribute1269); 
+            VAR_STRING107=(Token)match(input,VAR_STRING,FOLLOW_VAR_STRING_in_stringAttribute1271); 
 
-            pushFollow(FOLLOW_name_in_stringAttribute1272);
+            pushFollow(FOLLOW_name_in_stringAttribute1274);
             name108=name();
 
             state._fsp--;
@@ -3759,9 +3765,9 @@ public TreeAdaptor getTreeAdaptor() {
                 case 1 :
                     // Velvet.g:202:36: EQ ! STRING
                     {
-                    EQ109=(Token)match(input,EQ,FOLLOW_EQ_in_stringAttribute1275); 
+                    EQ109=(Token)match(input,EQ,FOLLOW_EQ_in_stringAttribute1277); 
 
-                    STRING110=(Token)match(input,STRING,FOLLOW_STRING_in_stringAttribute1278); 
+                    STRING110=(Token)match(input,STRING,FOLLOW_STRING_in_stringAttribute1280); 
                     STRING110_tree = 
                     (Tree)adaptor.create(STRING110)
                     ;
@@ -3830,9 +3836,9 @@ public TreeAdaptor getTreeAdaptor() {
             root_0 = (Tree)adaptor.nil();
 
 
-            VAR_BOOL111=(Token)match(input,VAR_BOOL,FOLLOW_VAR_BOOL_in_boolAttribute1287); 
+            VAR_BOOL111=(Token)match(input,VAR_BOOL,FOLLOW_VAR_BOOL_in_boolAttribute1289); 
 
-            pushFollow(FOLLOW_name_in_boolAttribute1290);
+            pushFollow(FOLLOW_name_in_boolAttribute1292);
             name112=name();
 
             state._fsp--;
@@ -3850,9 +3856,9 @@ public TreeAdaptor getTreeAdaptor() {
                 case 1 :
                     // Velvet.g:203:33: EQ ! BOOLEAN
                     {
-                    EQ113=(Token)match(input,EQ,FOLLOW_EQ_in_boolAttribute1293); 
+                    EQ113=(Token)match(input,EQ,FOLLOW_EQ_in_boolAttribute1295); 
 
-                    BOOLEAN114=(Token)match(input,BOOLEAN,FOLLOW_BOOLEAN_in_boolAttribute1296); 
+                    BOOLEAN114=(Token)match(input,BOOLEAN,FOLLOW_BOOLEAN_in_boolAttribute1298); 
                     BOOLEAN114_tree = 
                     (Tree)adaptor.create(BOOLEAN114)
                     ;
@@ -3915,7 +3921,7 @@ public TreeAdaptor getTreeAdaptor() {
             root_0 = (Tree)adaptor.nil();
 
 
-            OP_NOT115=(Token)match(input,OP_NOT,FOLLOW_OP_NOT_in_unaryOp1308); 
+            OP_NOT115=(Token)match(input,OP_NOT,FOLLOW_OP_NOT_in_unaryOp1310); 
             OP_NOT115_tree = 
             (Tree)adaptor.create(OP_NOT115)
             ;
@@ -4131,66 +4137,66 @@ public TreeAdaptor getTreeAdaptor() {
     public static final BitSet FOLLOW_ID_in_instance843 = new BitSet(new long[]{0x0000000600000000L});
     public static final BitSet FOLLOW_name_in_instance845 = new BitSet(new long[]{0x0040000000000000L});
     public static final BitSet FOLLOW_SEMI_in_instance847 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_MANDATORY_in_feature869 = new BitSet(new long[]{0x0000000000000010L});
-    public static final BitSet FOLLOW_ABSTRACT_in_feature871 = new BitSet(new long[]{0x0000000020000000L});
-    public static final BitSet FOLLOW_ABSTRACT_in_feature875 = new BitSet(new long[]{0x0000020000000000L});
-    public static final BitSet FOLLOW_MANDATORY_in_feature877 = new BitSet(new long[]{0x0000000020000000L});
-    public static final BitSet FOLLOW_MANDATORY_in_feature881 = new BitSet(new long[]{0x0000000020000000L});
-    public static final BitSet FOLLOW_ABSTRACT_in_feature885 = new BitSet(new long[]{0x0000000020000000L});
-    public static final BitSet FOLLOW_FEATURE_in_feature892 = new BitSet(new long[]{0x0000000600000000L});
-    public static final BitSet FOLLOW_name_in_feature894 = new BitSet(new long[]{0x0140000000000000L});
-    public static final BitSet FOLLOW_definitions_in_feature897 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_SEMI_in_feature901 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_groupType_in_featureGroup932 = new BitSet(new long[]{0x0100000000000000L});
-    public static final BitSet FOLLOW_START_C_in_featureGroup934 = new BitSet(new long[]{0x0000020020000010L});
-    public static final BitSet FOLLOW_feature_in_featureGroup936 = new BitSet(new long[]{0x0000020020000010L});
-    public static final BitSet FOLLOW_feature_in_featureGroup938 = new BitSet(new long[]{0x0000020020800010L});
-    public static final BitSet FOLLOW_END_C_in_featureGroup941 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_CONSTRAINT_in_constraint984 = new BitSet(new long[]{0x0202008600000000L});
-    public static final BitSet FOLLOW_ID_in_constraint988 = new BitSet(new long[]{0x0000000002000000L});
-    public static final BitSet FOLLOW_EQ_in_constraint990 = new BitSet(new long[]{0x0202008600000000L});
-    public static final BitSet FOLLOW_constraintDefinition_in_constraint996 = new BitSet(new long[]{0x0040000000000000L});
-    public static final BitSet FOLLOW_attributeConstraint_in_constraint1000 = new BitSet(new long[]{0x0040000000000000L});
-    public static final BitSet FOLLOW_SEMI_in_constraint1003 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_constraintOperand_in_constraintDefinition1016 = new BitSet(new long[]{0x000DC00000000002L});
-    public static final BitSet FOLLOW_binaryOp_in_constraintDefinition1019 = new BitSet(new long[]{0x0202000600000000L});
-    public static final BitSet FOLLOW_constraintOperand_in_constraintDefinition1021 = new BitSet(new long[]{0x000DC00000000002L});
-    public static final BitSet FOLLOW_unaryOp_in_constraintOperand1048 = new BitSet(new long[]{0x0202000600000000L});
-    public static final BitSet FOLLOW_START_R_in_constraintOperand1052 = new BitSet(new long[]{0x0202000600000000L});
-    public static final BitSet FOLLOW_constraintDefinition_in_constraintOperand1054 = new BitSet(new long[]{0x0000000001000000L});
-    public static final BitSet FOLLOW_END_R_in_constraintOperand1056 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_name_in_constraintOperand1060 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_attribConstraint_in_attributeConstraint1095 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_attribNumInstance_in_attribConstraint1115 = new BitSet(new long[]{0x0010040000000A80L});
-    public static final BitSet FOLLOW_attribOperator_in_attribConstraint1118 = new BitSet(new long[]{0x0000008600000000L});
-    public static final BitSet FOLLOW_attribNumInstance_in_attribConstraint1120 = new BitSet(new long[]{0x0010040000000A80L});
-    public static final BitSet FOLLOW_attribRelation_in_attribConstraint1128 = new BitSet(new long[]{0x0000008600000000L});
-    public static final BitSet FOLLOW_attribNumInstance_in_attribConstraint1134 = new BitSet(new long[]{0x0010040000000002L});
-    public static final BitSet FOLLOW_attribOperator_in_attribConstraint1137 = new BitSet(new long[]{0x0000008600000000L});
-    public static final BitSet FOLLOW_attribNumInstance_in_attribConstraint1139 = new BitSet(new long[]{0x0010040000000002L});
-    public static final BitSet FOLLOW_INT_in_attribNumInstance1171 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_name_in_attribNumInstance1178 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_intAttribute_in_attribute1190 = new BitSet(new long[]{0x0040000000000000L});
-    public static final BitSet FOLLOW_floatAttribute_in_attribute1194 = new BitSet(new long[]{0x0040000000000000L});
-    public static final BitSet FOLLOW_stringAttribute_in_attribute1198 = new BitSet(new long[]{0x0040000000000000L});
-    public static final BitSet FOLLOW_boolAttribute_in_attribute1202 = new BitSet(new long[]{0x0040000000000000L});
-    public static final BitSet FOLLOW_SEMI_in_attribute1205 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_VAR_INT_in_intAttribute1234 = new BitSet(new long[]{0x0000000600000000L});
-    public static final BitSet FOLLOW_name_in_intAttribute1237 = new BitSet(new long[]{0x0000000002000002L});
-    public static final BitSet FOLLOW_EQ_in_intAttribute1240 = new BitSet(new long[]{0x0000008000000000L});
-    public static final BitSet FOLLOW_INT_in_intAttribute1243 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_VAR_FLOAT_in_floatAttribute1252 = new BitSet(new long[]{0x0000000600000000L});
-    public static final BitSet FOLLOW_name_in_floatAttribute1255 = new BitSet(new long[]{0x0000000002000002L});
-    public static final BitSet FOLLOW_EQ_in_floatAttribute1258 = new BitSet(new long[]{0x0000000040000000L});
-    public static final BitSet FOLLOW_FLOAT_in_floatAttribute1261 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_VAR_STRING_in_stringAttribute1269 = new BitSet(new long[]{0x0000000600000000L});
-    public static final BitSet FOLLOW_name_in_stringAttribute1272 = new BitSet(new long[]{0x0000000002000002L});
-    public static final BitSet FOLLOW_EQ_in_stringAttribute1275 = new BitSet(new long[]{0x0400000000000000L});
-    public static final BitSet FOLLOW_STRING_in_stringAttribute1278 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_VAR_BOOL_in_boolAttribute1287 = new BitSet(new long[]{0x0000000600000000L});
-    public static final BitSet FOLLOW_name_in_boolAttribute1290 = new BitSet(new long[]{0x0000000002000002L});
-    public static final BitSet FOLLOW_EQ_in_boolAttribute1293 = new BitSet(new long[]{0x0000000000008000L});
-    public static final BitSet FOLLOW_BOOLEAN_in_boolAttribute1296 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_OP_NOT_in_unaryOp1308 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_MANDATORY_in_feature871 = new BitSet(new long[]{0x0000000000000010L});
+    public static final BitSet FOLLOW_ABSTRACT_in_feature873 = new BitSet(new long[]{0x0000000020000000L});
+    public static final BitSet FOLLOW_ABSTRACT_in_feature877 = new BitSet(new long[]{0x0000020000000000L});
+    public static final BitSet FOLLOW_MANDATORY_in_feature879 = new BitSet(new long[]{0x0000000020000000L});
+    public static final BitSet FOLLOW_MANDATORY_in_feature883 = new BitSet(new long[]{0x0000000020000000L});
+    public static final BitSet FOLLOW_ABSTRACT_in_feature887 = new BitSet(new long[]{0x0000000020000000L});
+    public static final BitSet FOLLOW_FEATURE_in_feature894 = new BitSet(new long[]{0x0000000600000000L});
+    public static final BitSet FOLLOW_name_in_feature896 = new BitSet(new long[]{0x0140000000000000L});
+    public static final BitSet FOLLOW_definitions_in_feature899 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_SEMI_in_feature903 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_groupType_in_featureGroup934 = new BitSet(new long[]{0x0100000000000000L});
+    public static final BitSet FOLLOW_START_C_in_featureGroup936 = new BitSet(new long[]{0x0000020020000010L});
+    public static final BitSet FOLLOW_feature_in_featureGroup938 = new BitSet(new long[]{0x0000020020000010L});
+    public static final BitSet FOLLOW_feature_in_featureGroup940 = new BitSet(new long[]{0x0000020020800010L});
+    public static final BitSet FOLLOW_END_C_in_featureGroup943 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_CONSTRAINT_in_constraint986 = new BitSet(new long[]{0x0202008600000000L});
+    public static final BitSet FOLLOW_ID_in_constraint990 = new BitSet(new long[]{0x0000000002000000L});
+    public static final BitSet FOLLOW_EQ_in_constraint992 = new BitSet(new long[]{0x0202008600000000L});
+    public static final BitSet FOLLOW_constraintDefinition_in_constraint998 = new BitSet(new long[]{0x0040000000000000L});
+    public static final BitSet FOLLOW_attributeConstraint_in_constraint1002 = new BitSet(new long[]{0x0040000000000000L});
+    public static final BitSet FOLLOW_SEMI_in_constraint1005 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_constraintOperand_in_constraintDefinition1018 = new BitSet(new long[]{0x000DC00000000002L});
+    public static final BitSet FOLLOW_binaryOp_in_constraintDefinition1021 = new BitSet(new long[]{0x0202000600000000L});
+    public static final BitSet FOLLOW_constraintOperand_in_constraintDefinition1023 = new BitSet(new long[]{0x000DC00000000002L});
+    public static final BitSet FOLLOW_unaryOp_in_constraintOperand1050 = new BitSet(new long[]{0x0202000600000000L});
+    public static final BitSet FOLLOW_START_R_in_constraintOperand1054 = new BitSet(new long[]{0x0202000600000000L});
+    public static final BitSet FOLLOW_constraintDefinition_in_constraintOperand1056 = new BitSet(new long[]{0x0000000001000000L});
+    public static final BitSet FOLLOW_END_R_in_constraintOperand1058 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_name_in_constraintOperand1062 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_attribConstraint_in_attributeConstraint1097 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_attribNumInstance_in_attribConstraint1117 = new BitSet(new long[]{0x0010040000000A80L});
+    public static final BitSet FOLLOW_attribOperator_in_attribConstraint1120 = new BitSet(new long[]{0x0000008600000000L});
+    public static final BitSet FOLLOW_attribNumInstance_in_attribConstraint1122 = new BitSet(new long[]{0x0010040000000A80L});
+    public static final BitSet FOLLOW_attribRelation_in_attribConstraint1130 = new BitSet(new long[]{0x0000008600000000L});
+    public static final BitSet FOLLOW_attribNumInstance_in_attribConstraint1136 = new BitSet(new long[]{0x0010040000000002L});
+    public static final BitSet FOLLOW_attribOperator_in_attribConstraint1139 = new BitSet(new long[]{0x0000008600000000L});
+    public static final BitSet FOLLOW_attribNumInstance_in_attribConstraint1141 = new BitSet(new long[]{0x0010040000000002L});
+    public static final BitSet FOLLOW_INT_in_attribNumInstance1173 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_name_in_attribNumInstance1180 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_intAttribute_in_attribute1192 = new BitSet(new long[]{0x0040000000000000L});
+    public static final BitSet FOLLOW_floatAttribute_in_attribute1196 = new BitSet(new long[]{0x0040000000000000L});
+    public static final BitSet FOLLOW_stringAttribute_in_attribute1200 = new BitSet(new long[]{0x0040000000000000L});
+    public static final BitSet FOLLOW_boolAttribute_in_attribute1204 = new BitSet(new long[]{0x0040000000000000L});
+    public static final BitSet FOLLOW_SEMI_in_attribute1207 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_VAR_INT_in_intAttribute1236 = new BitSet(new long[]{0x0000000600000000L});
+    public static final BitSet FOLLOW_name_in_intAttribute1239 = new BitSet(new long[]{0x0000000002000002L});
+    public static final BitSet FOLLOW_EQ_in_intAttribute1242 = new BitSet(new long[]{0x0000008000000000L});
+    public static final BitSet FOLLOW_INT_in_intAttribute1245 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_VAR_FLOAT_in_floatAttribute1254 = new BitSet(new long[]{0x0000000600000000L});
+    public static final BitSet FOLLOW_name_in_floatAttribute1257 = new BitSet(new long[]{0x0000000002000002L});
+    public static final BitSet FOLLOW_EQ_in_floatAttribute1260 = new BitSet(new long[]{0x0000000040000000L});
+    public static final BitSet FOLLOW_FLOAT_in_floatAttribute1263 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_VAR_STRING_in_stringAttribute1271 = new BitSet(new long[]{0x0000000600000000L});
+    public static final BitSet FOLLOW_name_in_stringAttribute1274 = new BitSet(new long[]{0x0000000002000002L});
+    public static final BitSet FOLLOW_EQ_in_stringAttribute1277 = new BitSet(new long[]{0x0400000000000000L});
+    public static final BitSet FOLLOW_STRING_in_stringAttribute1280 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_VAR_BOOL_in_boolAttribute1289 = new BitSet(new long[]{0x0000000600000000L});
+    public static final BitSet FOLLOW_name_in_boolAttribute1292 = new BitSet(new long[]{0x0000000002000002L});
+    public static final BitSet FOLLOW_EQ_in_boolAttribute1295 = new BitSet(new long[]{0x0000000000008000L});
+    public static final BitSet FOLLOW_BOOLEAN_in_boolAttribute1298 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_OP_NOT_in_unaryOp1310 = new BitSet(new long[]{0x0000000000000002L});
 
 }

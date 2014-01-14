@@ -138,7 +138,7 @@ nonFeatureDefinition
 	;
 	
 instance: ID name SEMI //conceptName
-	-> INSTANCE ID name
+	-> ^(INSTANCE ID name)
 	;
 
 feature
@@ -227,7 +227,7 @@ BOOLEAN	: 'true'
 	| 'false'
 	;
 	
-ID  :	('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
+ID  :	('a'..'z'|'A'..'Z'|'_'|'-') ('a'..'z'|'A'..'Z'|'0'..'9'|'_'|'-')*
     ;
 	
 IDPath	: ID ('.' ID)+
