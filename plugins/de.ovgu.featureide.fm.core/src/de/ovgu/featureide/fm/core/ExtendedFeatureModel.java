@@ -204,6 +204,20 @@ public class ExtendedFeatureModel extends FeatureModel {
 	}
 
 	/**
+	 * Checks if a given Feature in this model was integrated from another
+	 * feature model.
+	 * 
+	 * Combines {@link #isImported(Feature)} and {@link #isInherited(Feature)}.
+	 * 
+	 * @param feature
+	 *            the feature for which it will be checked it is from extern
+	 * @return true if and only if the feature was integrated from extern
+	 */
+	public boolean isFromExtern(final Feature feature) {
+		return isImported(feature) || isInherited(feature);
+	}
+
+	/**
 	 * Checks if a given Feature in this model was imported with a instance.
 	 * 
 	 * @param imported
