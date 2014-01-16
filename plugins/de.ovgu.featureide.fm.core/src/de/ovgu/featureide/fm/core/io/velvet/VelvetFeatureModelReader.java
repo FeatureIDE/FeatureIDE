@@ -516,8 +516,11 @@ public class VelvetFeatureModelReader
 		if (null == this.extFeatureModel.implementsInterface()) {
 			// we parsed no interface. Therefore we can copy shadow model to the
 			// original
-			if (null != extFeatureModel.getShadowModel()){
+			if (null == this.extFeatureModel.implementsInterface()
+					&& null != extFeatureModel.getShadowModel()
+					&& !this.copiedShadowModel){
 				copyShadowModel();
+				copiedShadowModel = true;
 			}
 			
 			writeModel = this.extFeatureModel;
@@ -535,9 +538,11 @@ public class VelvetFeatureModelReader
 			 * 
 			 * This approach could lead to errors if nested features are introduced into the shadow model this way.
 			 */
-			parent = writeModel.getFeature(parent.getName());
 			if (parent.equals(extFeatureModel.getRoot())) {
-				parent = writeModel.getRoot();
+				parent = writeModel.getFeature(parent.getName());
+				if (null == parent) {
+					parent = writeModel.getRoot();
+				}
 			}
 		}
 
