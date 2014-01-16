@@ -31,6 +31,7 @@ import org.eclipse.gef.requests.ChangeBoundsRequest;
 import org.eclipse.gef.requests.CreateRequest;
 
 import de.ovgu.featureide.fm.core.Constraint;
+import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
@@ -63,8 +64,16 @@ public class ModelLayoutEditPolicy extends LayoutEditPolicy {
 		if (child instanceof ConstraintEditPart)
 			return new ConstraintMoveEditPolicy((ConstraintEditPart) child,
 					this);
-		if (child instanceof FeatureEditPart)
+		if (child instanceof FeatureEditPart) {
+			if (featureModel instanceof ExtendedFeatureModel) {
+				ExtendedFeatureModel extendedFeatureModel = (ExtendedFeatureModel) featureModel;
+				Feature feature = ((FeatureEditPart) child).getFeature();
+				if (extendedFeatureModel.isFromExtern(feature))
+					return null;
+			}
+
 			return new FeatureMoveEditPolicy((FeatureEditPart) child, this);
+		}
 		if (child instanceof LegendEditPart)
 			return new LegendMoveEditPolicy((LegendEditPart) child, this);
 		return null;

@@ -83,10 +83,8 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 		FeatureModel fm = getConnectionModel().getTarget().getFeatureModel();
 		if (fm instanceof ExtendedFeatureModel) {
 			ExtendedFeatureModel exfm = (ExtendedFeatureModel) fm;
-			if ((exfm.isInherited(getConnectionModel().getSource()) && !exfm
-					.isInherited(getConnectionModel().getTarget()))
-					|| (exfm.isImported(getConnectionModel().getSource()) && !exfm
-							.isImported(getConnectionModel().getTarget()))) {
+			if (exfm.isFromExtern(getConnectionModel().getSource())
+					&& !exfm.isFromExtern(getConnectionModel().getTarget())) {
 				figure.setLineStyle(SWT.LINE_DASH);
 			}
 		}
@@ -96,6 +94,10 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 
 	@Override
 	protected void createEditPolicies() {
+		if (connectsExternFeatures()) {
+			return;
+		}
+
 		installEditPolicy(EditPolicy.DIRECT_EDIT_ROLE, new RoleDirectEditPolicy());
 	}
 
@@ -117,6 +119,10 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 	}
 
 	private void changeConnectionType() {
+		if (connectsExternFeatures()) {
+			return;
+		}
+
 		Feature feature = getConnectionModel().getTarget();
 		FeatureModel featureModel = feature.getFeatureModel();
 			
@@ -255,6 +261,25 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 		} else if (MANDATORY_CHANGED.equals(prop)) {
 			refreshSourceDecoration();
 		}
+	}
+
+	/**
+	 * Checks if the target and source features are from an external feature
+	 * model.
+	 * 
+	 * @return true if both features are from an external feature model
+	 */
+	private boolean connectsExternFeatures() {
+		FeatureModel fm = getConnectionModel().getTarget().getFeatureModel();
+		if (fm instanceof ExtendedFeatureModel) {
+			ExtendedFeatureModel exfm = (ExtendedFeatureModel) fm;
+			if (exfm.isFromExtern(getConnectionModel().getSource())
+					&& exfm.isFromExtern(getConnectionModel().getTarget())) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 }

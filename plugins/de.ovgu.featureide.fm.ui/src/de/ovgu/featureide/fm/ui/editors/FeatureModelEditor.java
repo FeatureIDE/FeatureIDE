@@ -119,8 +119,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 	IFeatureModelReader featureModelReader;
 	IFeatureModelWriter featureModelWriter;
 
-	private Class<?> featureModelReaderclass;
-	private Class<?> featureModelWriterclass;
+	private Class<? extends AbstractFeatureModelReader> featureModelReaderclass;
+	private Class<? extends AbstractFeatureModelWriter> featureModelWriterclass;
 
 	FeatureModelFile fmFile;
 	private IFile file;

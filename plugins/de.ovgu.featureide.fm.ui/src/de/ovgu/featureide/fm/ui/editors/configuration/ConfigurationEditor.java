@@ -65,6 +65,7 @@ import org.eclipse.ui.part.MultiPageEditorPart;
 import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
+import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -74,7 +75,9 @@ import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
+import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -165,7 +168,14 @@ public class ConfigurationEditor extends MultiPageEditorPart implements
 		super.setInput(input);
 		getSite().getPage().addPartListener(iPartListener);
 		IProject project = file.getProject();
-		IResource res = project.findMember("model.xml");
+
+		// if mpl.velvet exists then it is a multi product line
+		IResource res = project.findMember("mpl.velvet");
+		if (res != null && res instanceof IFile)
+			featureModel = new ExtendedFeatureModel();
+		else
+			res = project.findMember("model.xml");
+
 		if (res instanceof IFile) {
 			modelFile = ((IFile)res).getLocation().toFile();
 		}
@@ -237,8 +247,8 @@ public class ConfigurationEditor extends MultiPageEditorPart implements
 				.getWorkbenchWindow().getShell(), SWT.MULTI);
 		dialog.setText("Select the corresponding Featuremodel.");
 		dialog.setFileName("model.xml");
-		dialog.setFilterExtensions(new String [] {"*.xml"});
-		dialog.setFilterNames(new String[]{ "XML *.xml"});
+		dialog.setFilterExtensions(new String [] {"*.xml", "*.velvet"});
+		dialog.setFilterNames(new String[]{ "XML *.xml", "VELVET *.velvet"});
 		dialog.setFilterPath(file.getProject().getLocation().toOSString());
 		return dialog.open();
 	}
@@ -417,7 +427,14 @@ public class ConfigurationEditor extends MultiPageEditorPart implements
 	 */
 	private void readFeatureModel() {
 		featureModel.initFMComposerExtension(file.getProject());
-		XmlFeatureModelReader reader = new XmlFeatureModelReader(featureModel);
+
+		AbstractFeatureModelReader reader;
+
+		if (modelFile.getName().endsWith(".velvet"))
+			reader = new VelvetFeatureModelReader(featureModel);
+		else
+			reader = new XmlFeatureModelReader(featureModel);
+
 		try {
 			reader.readFromFile(modelFile);
 		} catch (FileNotFoundException e) {
