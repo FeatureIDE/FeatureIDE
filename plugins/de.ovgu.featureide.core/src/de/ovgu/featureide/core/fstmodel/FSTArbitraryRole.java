@@ -27,7 +27,7 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 
 /**
- * TODO description
+ * Represents arbitrary files.
  * 
  * @author Jens Meinicke
  */
@@ -45,7 +45,9 @@ public class FSTArbitraryRole extends FSTRole {
 	}
 	
 	void addFile(final IFile file) {
-		files.add(file);
+		if (!files.contains(file)) {
+			files.add(file);
+		}
 	}
 	
 	/**

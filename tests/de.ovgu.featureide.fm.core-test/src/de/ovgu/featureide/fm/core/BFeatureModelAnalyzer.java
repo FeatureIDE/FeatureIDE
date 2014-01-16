@@ -67,7 +67,7 @@ public class BFeatureModelAnalyzer {
 	}
 	
 	private static File getFolder() { 
-		File folder =  new File("/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/benchmarkFeatureModels/"); 
+		File folder =  new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/benchmarkFeatureModels/"); 
 		if (!folder.canRead()) { 
 			folder = new File(ClassLoader.getSystemResource("benchmarkFeatureModels").getPath()); 
 		} 

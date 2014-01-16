@@ -63,7 +63,7 @@ public abstract class TAbstractFeatureModelReaderWriter {
 	// GuidslReader which tests the resulting FeatureModel directly
 
 	 protected static File MODEL_FILE_FOLDER = new
-	 File("/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/testFeatureModels/");
+	 File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/testFeatureModels/");
 
 
 	static boolean online = false;
