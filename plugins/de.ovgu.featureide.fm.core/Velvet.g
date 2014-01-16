@@ -16,6 +16,7 @@ tokens {
 	CINTERFACE	='cinterface';
 	CONSTRAINT 	='constraint';
 	FEATURE 	='feature';
+	IMPL		='impl';
 
 	VAR_INT 	='int';
 	VAR_FLOAT 	='float';
@@ -60,6 +61,7 @@ tokens {
 	UNARYOP;
 	OPERAND;
 	BASEPARAM;
+	IMPLEMENT;
 	
 	INTER;
 }
@@ -91,12 +93,18 @@ imports : (IMPORT name SEMI)+
 	;
 	
 concept 
-	: REFINES? CONCEPT ID  (COLON conceptBaseExt)? (
-		START_R conceptInterExt (COMMA conceptInterExt)* END_R
-		)? definitions 
-	-> ^(CONCEPT ID REFINES? conceptBaseExt? conceptInterExt* definitions)
+	: REFINES? CONCEPT ID  
+		(COLON conceptBaseExt)? 
+		(START_R conceptInterExt (COMMA conceptInterExt)* END_R)? 
+		(IMPL implExt)? 
+		definitions 
+	-> ^(CONCEPT ID REFINES? conceptBaseExt? conceptInterExt* implExt? definitions)
 	;
 	
+implExt : ID
+	-> ^(IMPLEMENT ID)
+	;
+
 conceptBaseExt
 	: ID (COMMA ID)* 
 	-> ^(BASEEXT ID+)

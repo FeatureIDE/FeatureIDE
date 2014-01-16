@@ -27,8 +27,6 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.collect.BiMap;
-
 import de.ovgu.featureide.fm.core.constraint.Equation;
 import de.ovgu.featureide.fm.core.constraint.FeatureAttributeMap;
 
@@ -38,7 +36,9 @@ import de.ovgu.featureide.fm.core.constraint.FeatureAttributeMap;
  * @author Sebastian Krieter
  * @author Matthias Strauss
  */
-public class ExtendedFeatureModel extends FeatureModel {
+public class ExtendedFeatureModel
+	extends
+		FeatureModel {
 
 	protected FeatureAttributeMap<Integer> integerAttributes = new FeatureAttributeMap<Integer>();
 	protected FeatureAttributeMap<Boolean> booleanAttributes = new FeatureAttributeMap<Boolean>();
@@ -46,25 +46,26 @@ public class ExtendedFeatureModel extends FeatureModel {
 	protected Map<String, String> parameters = new HashMap<String, String>();
 	protected Collection<Feature> inheritedFeatures = new LinkedList<Feature>();
 	protected Collection<Feature> importedFeatures = new LinkedList<Feature>();
+	protected Collection<Feature> interfaceFeatures = new LinkedList<Feature>();
 	protected Set<String> parentModels = new HashSet<String>();
 	protected Map<String, String> instances = new HashMap<String, String>();
 	protected Map<Feature, String> parentsOfFeatures = new HashMap<Feature, String>();
+	protected ExtendedFeatureModel shadowModel = null;
 	protected boolean hasParameters = false;
+	// This is null on purpose
+	protected String interfaceName = null;
 
 	protected LinkedList<Equation> attributeConstraints = new LinkedList<Equation>();
 
-	public void addAttribute(final String featureName,
-			final String attributeName, final Boolean value) {
+	public void addAttribute(final String featureName, final String attributeName, final Boolean value) {
 		this.booleanAttributes.setAttribute(featureName, attributeName, value);
 	}
 
-	public void addAttribute(final String featureName,
-			final String attributeName, final Integer value) {
+	public void addAttribute(final String featureName, final String attributeName, final Integer value) {
 		this.integerAttributes.setAttribute(featureName, attributeName, value);
 	}
 
-	public void addAttribute(final String featureName,
-			final String attributeName, final String value) {
+	public void addAttribute(final String featureName, final String attributeName, final String value) {
 		this.stringAttributes.setAttribute(featureName, attributeName, value);
 	}
 
@@ -75,10 +76,8 @@ public class ExtendedFeatureModel extends FeatureModel {
 	/**
 	 * Adds a mapping for an instancename to the model which it will be bound to
 	 * 
-	 * @param name
-	 *            the name of the variable
-	 * @param model
-	 *            the model that the variable is bound to
+	 * @param name the name of the variable
+	 * @param model the model that the variable is bound to
 	 */
 	public void addInstanceMapping(final String name, final String model) {
 		this.instances.put(name, model);
@@ -87,15 +86,13 @@ public class ExtendedFeatureModel extends FeatureModel {
 	/**
 	 * Adds a parameter to the available parameters of the model
 	 * 
-	 * @param interfaceClazz
-	 *            the name of the interface that shall be bound to the variable
-	 * @param varName
-	 *            the name of the variable an interface shall be bound to
+	 * @param interfaceClazz the name of the interface that shall be bound to
+	 *            the variable
+	 * @param varName the name of the variable an interface shall be bound to
 	 * @return true if the parameter could be added to the parameters. False if
 	 *         the variable name was already bound to another interface.
 	 */
-	public boolean addParameter(final String interfaceClazz,
-			final String varName) {
+	public boolean addParameter(final String interfaceClazz, final String varName) {
 		if (this.parameters.containsKey(varName)) {
 			return false;
 		}
@@ -111,11 +108,17 @@ public class ExtendedFeatureModel extends FeatureModel {
 	/**
 	 * Adds the name of a Model as a parent of the current model.
 	 * 
-	 * @param parentModelName
-	 *            the name of the parent model
+	 * @param parentModelName the name of the parent model
 	 */
 	public void addParent(final String parentModelName) {
 		this.parentModels.add(parentModelName);
+	}
+
+	public void createShadowModel() {
+		this.shadowModel = new ExtendedFeatureModel();
+		final Feature tmpRoot = new Feature(this.shadowModel, "ShadowModelRoot");
+		this.shadowModel.addFeature(tmpRoot);
+		this.shadowModel.setRoot(tmpRoot);
 	}
 
 	public LinkedList<Equation> getAttributConstraints() {
@@ -150,6 +153,10 @@ public class ExtendedFeatureModel extends FeatureModel {
 		return new HashMap<String, String>(this.parameters);
 	}
 
+	public String getParent(final Feature child) {
+		return this.parentsOfFeatures.get(child);
+	}
+
 	/**
 	 * returns a set containing the parentmodels of the current model.
 	 * 
@@ -157,6 +164,10 @@ public class ExtendedFeatureModel extends FeatureModel {
 	 */
 	public Set<String> getParents() {
 		return new HashSet<String>(this.parentModels);
+	}
+
+	public ExtendedFeatureModel getShadowModel() {
+		return this.shadowModel;
 	}
 
 	public FeatureAttributeMap<String> getStringAttributes() {
@@ -200,14 +211,14 @@ public class ExtendedFeatureModel extends FeatureModel {
 	 *         interfaces are implemented.
 	 */
 	public String implementsInterface() {
-		return "";
+		return this.interfaceName;
 	}
 
 	/**
 	 * Checks if a given Feature in this model was imported with a instance.
 	 * 
-	 * @param imported
-	 *            the feature for which it will be checked if it is imported
+	 * @param imported the feature for which it will be checked if it is
+	 *            imported
 	 * @return true if and only if the feature was imported
 	 */
 	public boolean isImported(final Feature imported) {
@@ -217,24 +228,27 @@ public class ExtendedFeatureModel extends FeatureModel {
 	/**
 	 * Checks if a given Feature in this model was inherited.
 	 * 
-	 * @param inherited
-	 *            the feature for which it will be checked if it is inherited
+	 * @param inherited the feature for which it will be checked if it is
+	 *            inherited
 	 * @return true if and only if the feature was inherited
 	 */
 	public boolean isInherited(final Feature inherited) {
 		return this.inheritedFeatures.contains(inherited);
 	}
 
-	/**
-	 * This method stores inherited features.
-	 * 
-	 * @param inherited
-	 *            the exact feature, that was added to the featuremodel
-	 *            previously
-	 */
-	public void setFeatureInherited(final Feature inherited, final String parent) {
-		this.inheritedFeatures.add(inherited);
-		this.parentsOfFeatures.put(inherited, parent);
+	@Override
+	public void reset() {
+		super.reset();
+		this.interfaceFeatures.clear();
+		this.importedFeatures.clear();
+		this.inheritedFeatures.clear();
+		this.parameters.clear();
+		this.parentModels.clear();
+		this.instances.clear();
+		this.parentsOfFeatures.clear();
+		this.shadowModel = null;
+		this.hasParameters = false;
+		this.interfaceName = null;
 	}
 
 	/**
@@ -243,12 +257,28 @@ public class ExtendedFeatureModel extends FeatureModel {
 	 * @param connector
 	 * @param instancename
 	 */
-	public void setFeaturefromInstance(Feature fromInstance, String instanceName) {
+	public void setFeaturefromInstance(final Feature fromInstance, final String instanceName) {
 		this.importedFeatures.add(fromInstance);
 		this.parentsOfFeatures.put(fromInstance, instanceName);
 	}
-	
-	public String getParent(Feature child) {
-		return parentsOfFeatures.get(child);
+
+	/**
+	 * This method stores inherited features.
+	 * 
+	 * @param inherited the exact feature, that was added to the featuremodel
+	 *            previously
+	 */
+	public void setFeatureInherited(final Feature inherited, final String parent) {
+		this.inheritedFeatures.add(inherited);
+		this.parentsOfFeatures.put(inherited, parent);
+	}
+
+	public void setFeatureInterface(final Feature fromInterface, final String interfaceName) {
+		this.interfaceFeatures.add(fromInterface);
+		this.parentsOfFeatures.put(fromInterface, interfaceName);
+	}
+
+	public void setInterface(final String interfaceName) {
+		this.interfaceName = interfaceName;
 	}
 }

@@ -1,4 +1,4 @@
-// $ANTLR 3.4 Velvet.g 2014-01-14 18:29:45
+// $ANTLR 3.4 Velvet.g 2014-01-15 21:44:56
 package de.ovgu.featureide.fm.core.io.velvet;
 
 import org.antlr.runtime.*;
@@ -41,36 +41,38 @@ public class VelvetLexer extends Lexer {
     public static final int ID=33;
     public static final int IDPath=34;
     public static final int IMP=35;
-    public static final int IMPORT=36;
-    public static final int INSTANCE=37;
-    public static final int INSTANCEDEF=38;
-    public static final int INT=39;
-    public static final int INTER=40;
-    public static final int MANDATORY=41;
-    public static final int MINUS=42;
-    public static final int OCTAL_ESC=43;
-    public static final int ONEOF=44;
-    public static final int OPERAND=45;
-    public static final int OP_AND=46;
-    public static final int OP_EQUIVALENT=47;
-    public static final int OP_IMPLIES=48;
-    public static final int OP_NOT=49;
-    public static final int OP_OR=50;
-    public static final int OP_XOR=51;
-    public static final int PLUS=52;
-    public static final int REFINES=53;
-    public static final int SEMI=54;
-    public static final int SOMEOF=55;
-    public static final int START_C=56;
-    public static final int START_R=57;
-    public static final int STRING=58;
-    public static final int UNARYOP=59;
-    public static final int UNICODE_ESC=60;
-    public static final int VAR_BOOL=61;
-    public static final int VAR_FLOAT=62;
-    public static final int VAR_INT=63;
-    public static final int VAR_STRING=64;
-    public static final int WS=65;
+    public static final int IMPL=36;
+    public static final int IMPLEMENT=37;
+    public static final int IMPORT=38;
+    public static final int INSTANCE=39;
+    public static final int INSTANCEDEF=40;
+    public static final int INT=41;
+    public static final int INTER=42;
+    public static final int MANDATORY=43;
+    public static final int MINUS=44;
+    public static final int OCTAL_ESC=45;
+    public static final int ONEOF=46;
+    public static final int OPERAND=47;
+    public static final int OP_AND=48;
+    public static final int OP_EQUIVALENT=49;
+    public static final int OP_IMPLIES=50;
+    public static final int OP_NOT=51;
+    public static final int OP_OR=52;
+    public static final int OP_XOR=53;
+    public static final int PLUS=54;
+    public static final int REFINES=55;
+    public static final int SEMI=56;
+    public static final int SOMEOF=57;
+    public static final int START_C=58;
+    public static final int START_R=59;
+    public static final int STRING=60;
+    public static final int UNARYOP=61;
+    public static final int UNICODE_ESC=62;
+    public static final int VAR_BOOL=63;
+    public static final int VAR_FLOAT=64;
+    public static final int VAR_INT=65;
+    public static final int VAR_STRING=66;
+    public static final int WS=67;
 
     // delegates
     // delegators
@@ -441,13 +443,36 @@ public class VelvetLexer extends Lexer {
     }
     // $ANTLR end "FEATURE"
 
+    // $ANTLR start "IMPL"
+    public final void mIMPL() throws RecognitionException {
+        try {
+            int _type = IMPL;
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // Velvet.g:20:6: ( 'impl' )
+            // Velvet.g:20:8: 'impl'
+            {
+            match("impl"); 
+
+
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally {
+        	// do for sure before leaving
+        }
+    }
+    // $ANTLR end "IMPL"
+
     // $ANTLR start "IMPORT"
     public final void mIMPORT() throws RecognitionException {
         try {
             int _type = IMPORT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Velvet.g:20:8: ( 'import' )
-            // Velvet.g:20:10: 'import'
+            // Velvet.g:21:8: ( 'import' )
+            // Velvet.g:21:10: 'import'
             {
             match("import"); 
 
@@ -469,8 +494,8 @@ public class VelvetLexer extends Lexer {
         try {
             int _type = MANDATORY;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Velvet.g:21:11: ( 'mandatory' )
-            // Velvet.g:21:13: 'mandatory'
+            // Velvet.g:22:11: ( 'mandatory' )
+            // Velvet.g:22:13: 'mandatory'
             {
             match("mandatory"); 
 
@@ -492,8 +517,8 @@ public class VelvetLexer extends Lexer {
         try {
             int _type = MINUS;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Velvet.g:22:7: ( '-' )
-            // Velvet.g:22:9: '-'
+            // Velvet.g:23:7: ( '-' )
+            // Velvet.g:23:9: '-'
             {
             match('-'); 
 
@@ -513,8 +538,8 @@ public class VelvetLexer extends Lexer {
         try {
             int _type = ONEOF;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Velvet.g:23:7: ( 'oneOf' )
-            // Velvet.g:23:9: 'oneOf'
+            // Velvet.g:24:7: ( 'oneOf' )
+            // Velvet.g:24:9: 'oneOf'
             {
             match("oneOf"); 
 
@@ -536,8 +561,8 @@ public class VelvetLexer extends Lexer {
         try {
             int _type = OP_AND;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Velvet.g:24:8: ( '&&' )
-            // Velvet.g:24:10: '&&'
+            // Velvet.g:25:8: ( '&&' )
+            // Velvet.g:25:10: '&&'
             {
             match("&&"); 
 
@@ -559,8 +584,8 @@ public class VelvetLexer extends Lexer {
         try {
             int _type = OP_EQUIVALENT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Velvet.g:25:15: ( '<->' )
-            // Velvet.g:25:17: '<->'
+            // Velvet.g:26:15: ( '<->' )
+            // Velvet.g:26:17: '<->'
             {
             match("<->"); 
 
@@ -582,8 +607,8 @@ public class VelvetLexer extends Lexer {
         try {
             int _type = OP_IMPLIES;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Velvet.g:26:12: ( '->' )
-            // Velvet.g:26:14: '->'
+            // Velvet.g:27:12: ( '->' )
+            // Velvet.g:27:14: '->'
             {
             match("->"); 
 
@@ -605,8 +630,8 @@ public class VelvetLexer extends Lexer {
         try {
             int _type = OP_NOT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Velvet.g:27:8: ( '!' )
-            // Velvet.g:27:10: '!'
+            // Velvet.g:28:8: ( '!' )
+            // Velvet.g:28:10: '!'
             {
             match('!'); 
 
@@ -626,8 +651,8 @@ public class VelvetLexer extends Lexer {
         try {
             int _type = OP_OR;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Velvet.g:28:7: ( '||' )
-            // Velvet.g:28:9: '||'
+            // Velvet.g:29:7: ( '||' )
+            // Velvet.g:29:9: '||'
             {
             match("||"); 
 
@@ -649,8 +674,8 @@ public class VelvetLexer extends Lexer {
         try {
             int _type = OP_XOR;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Velvet.g:29:8: ( 'xor' )
-            // Velvet.g:29:10: 'xor'
+            // Velvet.g:30:8: ( 'xor' )
+            // Velvet.g:30:10: 'xor'
             {
             match("xor"); 
 
@@ -672,8 +697,8 @@ public class VelvetLexer extends Lexer {
         try {
             int _type = PLUS;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Velvet.g:30:6: ( '+' )
-            // Velvet.g:30:8: '+'
+            // Velvet.g:31:6: ( '+' )
+            // Velvet.g:31:8: '+'
             {
             match('+'); 
 
@@ -693,8 +718,8 @@ public class VelvetLexer extends Lexer {
         try {
             int _type = REFINES;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Velvet.g:31:9: ( 'refines' )
-            // Velvet.g:31:11: 'refines'
+            // Velvet.g:32:9: ( 'refines' )
+            // Velvet.g:32:11: 'refines'
             {
             match("refines"); 
 
@@ -716,8 +741,8 @@ public class VelvetLexer extends Lexer {
         try {
             int _type = SEMI;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Velvet.g:32:6: ( ';' )
-            // Velvet.g:32:8: ';'
+            // Velvet.g:33:6: ( ';' )
+            // Velvet.g:33:8: ';'
             {
             match(';'); 
 
@@ -737,8 +762,8 @@ public class VelvetLexer extends Lexer {
         try {
             int _type = SOMEOF;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Velvet.g:33:8: ( 'someOf' )
-            // Velvet.g:33:10: 'someOf'
+            // Velvet.g:34:8: ( 'someOf' )
+            // Velvet.g:34:10: 'someOf'
             {
             match("someOf"); 
 
@@ -760,8 +785,8 @@ public class VelvetLexer extends Lexer {
         try {
             int _type = START_C;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Velvet.g:34:9: ( '{' )
-            // Velvet.g:34:11: '{'
+            // Velvet.g:35:9: ( '{' )
+            // Velvet.g:35:11: '{'
             {
             match('{'); 
 
@@ -781,8 +806,8 @@ public class VelvetLexer extends Lexer {
         try {
             int _type = START_R;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Velvet.g:35:9: ( '(' )
-            // Velvet.g:35:11: '('
+            // Velvet.g:36:9: ( '(' )
+            // Velvet.g:36:11: '('
             {
             match('('); 
 
@@ -802,8 +827,8 @@ public class VelvetLexer extends Lexer {
         try {
             int _type = VAR_BOOL;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Velvet.g:36:10: ( 'bool' )
-            // Velvet.g:36:12: 'bool'
+            // Velvet.g:37:10: ( 'bool' )
+            // Velvet.g:37:12: 'bool'
             {
             match("bool"); 
 
@@ -825,8 +850,8 @@ public class VelvetLexer extends Lexer {
         try {
             int _type = VAR_FLOAT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Velvet.g:37:11: ( 'float' )
-            // Velvet.g:37:13: 'float'
+            // Velvet.g:38:11: ( 'float' )
+            // Velvet.g:38:13: 'float'
             {
             match("float"); 
 
@@ -848,8 +873,8 @@ public class VelvetLexer extends Lexer {
         try {
             int _type = VAR_INT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Velvet.g:38:9: ( 'int' )
-            // Velvet.g:38:11: 'int'
+            // Velvet.g:39:9: ( 'int' )
+            // Velvet.g:39:11: 'int'
             {
             match("int"); 
 
@@ -871,8 +896,8 @@ public class VelvetLexer extends Lexer {
         try {
             int _type = VAR_STRING;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Velvet.g:39:12: ( 'string' )
-            // Velvet.g:39:14: 'string'
+            // Velvet.g:40:12: ( 'string' )
+            // Velvet.g:40:14: 'string'
             {
             match("string"); 
 
@@ -894,7 +919,7 @@ public class VelvetLexer extends Lexer {
         try {
             int _type = BOOLEAN;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Velvet.g:226:9: ( 'true' | 'false' )
+            // Velvet.g:234:9: ( 'true' | 'false' )
             int alt1=2;
             int LA1_0 = input.LA(1);
 
@@ -913,7 +938,7 @@ public class VelvetLexer extends Lexer {
             }
             switch (alt1) {
                 case 1 :
-                    // Velvet.g:226:11: 'true'
+                    // Velvet.g:234:11: 'true'
                     {
                     match("true"); 
 
@@ -922,7 +947,7 @@ public class VelvetLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // Velvet.g:227:4: 'false'
+                    // Velvet.g:235:4: 'false'
                     {
                     match("false"); 
 
@@ -946,8 +971,8 @@ public class VelvetLexer extends Lexer {
         try {
             int _type = ID;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Velvet.g:230:5: ( ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '-' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' | '-' )* )
-            // Velvet.g:230:7: ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '-' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' | '-' )*
+            // Velvet.g:238:5: ( ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '-' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' | '-' )* )
+            // Velvet.g:238:7: ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '-' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' | '-' )*
             {
             if ( input.LA(1)=='-'||(input.LA(1) >= 'A' && input.LA(1) <= 'Z')||input.LA(1)=='_'||(input.LA(1) >= 'a' && input.LA(1) <= 'z') ) {
                 input.consume();
@@ -959,7 +984,7 @@ public class VelvetLexer extends Lexer {
             }
 
 
-            // Velvet.g:230:35: ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' | '-' )*
+            // Velvet.g:238:35: ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' | '-' )*
             loop2:
             do {
                 int alt2=2;
@@ -1009,13 +1034,13 @@ public class VelvetLexer extends Lexer {
         try {
             int _type = IDPath;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Velvet.g:233:8: ( ID ( '.' ID )+ )
-            // Velvet.g:233:10: ID ( '.' ID )+
+            // Velvet.g:241:8: ( ID ( '.' ID )+ )
+            // Velvet.g:241:10: ID ( '.' ID )+
             {
             mID(); 
 
 
-            // Velvet.g:233:13: ( '.' ID )+
+            // Velvet.g:241:13: ( '.' ID )+
             int cnt3=0;
             loop3:
             do {
@@ -1029,7 +1054,7 @@ public class VelvetLexer extends Lexer {
 
                 switch (alt3) {
             	case 1 :
-            	    // Velvet.g:233:14: '.' ID
+            	    // Velvet.g:241:14: '.' ID
             	    {
             	    match('.'); 
 
@@ -1065,10 +1090,10 @@ public class VelvetLexer extends Lexer {
         try {
             int _type = INT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Velvet.g:236:5: ( ( '0' .. '9' )+ )
-            // Velvet.g:236:7: ( '0' .. '9' )+
+            // Velvet.g:244:5: ( ( '0' .. '9' )+ )
+            // Velvet.g:244:7: ( '0' .. '9' )+
             {
-            // Velvet.g:236:7: ( '0' .. '9' )+
+            // Velvet.g:244:7: ( '0' .. '9' )+
             int cnt4=0;
             loop4:
             do {
@@ -1123,14 +1148,14 @@ public class VelvetLexer extends Lexer {
         try {
             int _type = FLOAT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Velvet.g:240:5: ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( EXPONENT )? | '.' ( '0' .. '9' )+ ( EXPONENT )? | ( '0' .. '9' )+ EXPONENT )
+            // Velvet.g:248:5: ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( EXPONENT )? | '.' ( '0' .. '9' )+ ( EXPONENT )? | ( '0' .. '9' )+ EXPONENT )
             int alt11=3;
             alt11 = dfa11.predict(input);
             switch (alt11) {
                 case 1 :
-                    // Velvet.g:240:9: ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( EXPONENT )?
+                    // Velvet.g:248:9: ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( EXPONENT )?
                     {
-                    // Velvet.g:240:9: ( '0' .. '9' )+
+                    // Velvet.g:248:9: ( '0' .. '9' )+
                     int cnt5=0;
                     loop5:
                     do {
@@ -1171,7 +1196,7 @@ public class VelvetLexer extends Lexer {
 
                     match('.'); 
 
-                    // Velvet.g:240:25: ( '0' .. '9' )*
+                    // Velvet.g:248:25: ( '0' .. '9' )*
                     loop6:
                     do {
                         int alt6=2;
@@ -1205,7 +1230,7 @@ public class VelvetLexer extends Lexer {
                     } while (true);
 
 
-                    // Velvet.g:240:37: ( EXPONENT )?
+                    // Velvet.g:248:37: ( EXPONENT )?
                     int alt7=2;
                     int LA7_0 = input.LA(1);
 
@@ -1214,7 +1239,7 @@ public class VelvetLexer extends Lexer {
                     }
                     switch (alt7) {
                         case 1 :
-                            // Velvet.g:240:37: EXPONENT
+                            // Velvet.g:248:37: EXPONENT
                             {
                             mEXPONENT(); 
 
@@ -1228,11 +1253,11 @@ public class VelvetLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // Velvet.g:241:9: '.' ( '0' .. '9' )+ ( EXPONENT )?
+                    // Velvet.g:249:9: '.' ( '0' .. '9' )+ ( EXPONENT )?
                     {
                     match('.'); 
 
-                    // Velvet.g:241:13: ( '0' .. '9' )+
+                    // Velvet.g:249:13: ( '0' .. '9' )+
                     int cnt8=0;
                     loop8:
                     do {
@@ -1271,7 +1296,7 @@ public class VelvetLexer extends Lexer {
                     } while (true);
 
 
-                    // Velvet.g:241:25: ( EXPONENT )?
+                    // Velvet.g:249:25: ( EXPONENT )?
                     int alt9=2;
                     int LA9_0 = input.LA(1);
 
@@ -1280,7 +1305,7 @@ public class VelvetLexer extends Lexer {
                     }
                     switch (alt9) {
                         case 1 :
-                            // Velvet.g:241:25: EXPONENT
+                            // Velvet.g:249:25: EXPONENT
                             {
                             mEXPONENT(); 
 
@@ -1294,9 +1319,9 @@ public class VelvetLexer extends Lexer {
                     }
                     break;
                 case 3 :
-                    // Velvet.g:242:9: ( '0' .. '9' )+ EXPONENT
+                    // Velvet.g:250:9: ( '0' .. '9' )+ EXPONENT
                     {
-                    // Velvet.g:242:9: ( '0' .. '9' )+
+                    // Velvet.g:250:9: ( '0' .. '9' )+
                     int cnt10=0;
                     loop10:
                     do {
@@ -1356,12 +1381,12 @@ public class VelvetLexer extends Lexer {
         try {
             int _type = STRING;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Velvet.g:246:5: ( '\"' ( ESC_SEQ |~ ( '\\\\' | '\"' ) )* '\"' )
-            // Velvet.g:246:8: '\"' ( ESC_SEQ |~ ( '\\\\' | '\"' ) )* '\"'
+            // Velvet.g:254:5: ( '\"' ( ESC_SEQ |~ ( '\\\\' | '\"' ) )* '\"' )
+            // Velvet.g:254:8: '\"' ( ESC_SEQ |~ ( '\\\\' | '\"' ) )* '\"'
             {
             match('\"'); 
 
-            // Velvet.g:246:12: ( ESC_SEQ |~ ( '\\\\' | '\"' ) )*
+            // Velvet.g:254:12: ( ESC_SEQ |~ ( '\\\\' | '\"' ) )*
             loop12:
             do {
                 int alt12=3;
@@ -1377,7 +1402,7 @@ public class VelvetLexer extends Lexer {
 
                 switch (alt12) {
             	case 1 :
-            	    // Velvet.g:246:14: ESC_SEQ
+            	    // Velvet.g:254:14: ESC_SEQ
             	    {
             	    mESC_SEQ(); 
 
@@ -1385,7 +1410,7 @@ public class VelvetLexer extends Lexer {
             	    }
             	    break;
             	case 2 :
-            	    // Velvet.g:246:24: ~ ( '\\\\' | '\"' )
+            	    // Velvet.g:254:24: ~ ( '\\\\' | '\"' )
             	    {
             	    if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '!')||(input.LA(1) >= '#' && input.LA(1) <= '[')||(input.LA(1) >= ']' && input.LA(1) <= '\uFFFF') ) {
             	        input.consume();
@@ -1422,8 +1447,8 @@ public class VelvetLexer extends Lexer {
     // $ANTLR start "EXPONENT"
     public final void mEXPONENT() throws RecognitionException {
         try {
-            // Velvet.g:251:10: ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )
-            // Velvet.g:251:12: ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+
+            // Velvet.g:259:10: ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )
+            // Velvet.g:259:12: ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+
             {
             if ( input.LA(1)=='E'||input.LA(1)=='e' ) {
                 input.consume();
@@ -1435,7 +1460,7 @@ public class VelvetLexer extends Lexer {
             }
 
 
-            // Velvet.g:251:22: ( '+' | '-' )?
+            // Velvet.g:259:22: ( '+' | '-' )?
             int alt13=2;
             int LA13_0 = input.LA(1);
 
@@ -1462,7 +1487,7 @@ public class VelvetLexer extends Lexer {
             }
 
 
-            // Velvet.g:251:33: ( '0' .. '9' )+
+            // Velvet.g:259:33: ( '0' .. '9' )+
             int cnt14=0;
             loop14:
             do {
@@ -1514,7 +1539,7 @@ public class VelvetLexer extends Lexer {
     // $ANTLR start "HEX_DIGIT"
     public final void mHEX_DIGIT() throws RecognitionException {
         try {
-            // Velvet.g:254:11: ( ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' ) )
+            // Velvet.g:262:11: ( ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' ) )
             // Velvet.g:
             {
             if ( (input.LA(1) >= '0' && input.LA(1) <= '9')||(input.LA(1) >= 'A' && input.LA(1) <= 'F')||(input.LA(1) >= 'a' && input.LA(1) <= 'f') ) {
@@ -1540,7 +1565,7 @@ public class VelvetLexer extends Lexer {
     // $ANTLR start "ESC_SEQ"
     public final void mESC_SEQ() throws RecognitionException {
         try {
-            // Velvet.g:258:5: ( '\\\\' ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' ) | UNICODE_ESC | OCTAL_ESC )
+            // Velvet.g:266:5: ( '\\\\' ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' ) | UNICODE_ESC | OCTAL_ESC )
             int alt15=3;
             int LA15_0 = input.LA(1);
 
@@ -1593,7 +1618,7 @@ public class VelvetLexer extends Lexer {
             }
             switch (alt15) {
                 case 1 :
-                    // Velvet.g:258:9: '\\\\' ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' )
+                    // Velvet.g:266:9: '\\\\' ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' )
                     {
                     match('\\'); 
 
@@ -1610,7 +1635,7 @@ public class VelvetLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // Velvet.g:259:9: UNICODE_ESC
+                    // Velvet.g:267:9: UNICODE_ESC
                     {
                     mUNICODE_ESC(); 
 
@@ -1618,7 +1643,7 @@ public class VelvetLexer extends Lexer {
                     }
                     break;
                 case 3 :
-                    // Velvet.g:260:9: OCTAL_ESC
+                    // Velvet.g:268:9: OCTAL_ESC
                     {
                     mOCTAL_ESC(); 
 
@@ -1638,7 +1663,7 @@ public class VelvetLexer extends Lexer {
     // $ANTLR start "OCTAL_ESC"
     public final void mOCTAL_ESC() throws RecognitionException {
         try {
-            // Velvet.g:265:5: ( '\\\\' ( '0' .. '3' ) ( '0' .. '7' ) ( '0' .. '7' ) | '\\\\' ( '0' .. '7' ) ( '0' .. '7' ) | '\\\\' ( '0' .. '7' ) )
+            // Velvet.g:273:5: ( '\\\\' ( '0' .. '3' ) ( '0' .. '7' ) ( '0' .. '7' ) | '\\\\' ( '0' .. '7' ) ( '0' .. '7' ) | '\\\\' ( '0' .. '7' ) )
             int alt16=3;
             int LA16_0 = input.LA(1);
 
@@ -1689,7 +1714,7 @@ public class VelvetLexer extends Lexer {
             }
             switch (alt16) {
                 case 1 :
-                    // Velvet.g:265:9: '\\\\' ( '0' .. '3' ) ( '0' .. '7' ) ( '0' .. '7' )
+                    // Velvet.g:273:9: '\\\\' ( '0' .. '3' ) ( '0' .. '7' ) ( '0' .. '7' )
                     {
                     match('\\'); 
 
@@ -1726,7 +1751,7 @@ public class VelvetLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // Velvet.g:266:9: '\\\\' ( '0' .. '7' ) ( '0' .. '7' )
+                    // Velvet.g:274:9: '\\\\' ( '0' .. '7' ) ( '0' .. '7' )
                     {
                     match('\\'); 
 
@@ -1753,7 +1778,7 @@ public class VelvetLexer extends Lexer {
                     }
                     break;
                 case 3 :
-                    // Velvet.g:267:9: '\\\\' ( '0' .. '7' )
+                    // Velvet.g:275:9: '\\\\' ( '0' .. '7' )
                     {
                     match('\\'); 
 
@@ -1782,8 +1807,8 @@ public class VelvetLexer extends Lexer {
     // $ANTLR start "UNICODE_ESC"
     public final void mUNICODE_ESC() throws RecognitionException {
         try {
-            // Velvet.g:272:5: ( '\\\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT )
-            // Velvet.g:272:9: '\\\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
+            // Velvet.g:280:5: ( '\\\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT )
+            // Velvet.g:280:9: '\\\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
             {
             match('\\'); 
 
@@ -1816,8 +1841,8 @@ public class VelvetLexer extends Lexer {
         try {
             int _type = WS;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Velvet.g:274:5: ( ( ' ' | '\\t' | '\\r' | '\\n' ) )
-            // Velvet.g:274:7: ( ' ' | '\\t' | '\\r' | '\\n' )
+            // Velvet.g:282:5: ( ( ' ' | '\\t' | '\\r' | '\\n' ) )
+            // Velvet.g:282:7: ( ' ' | '\\t' | '\\r' | '\\n' )
             {
             if ( (input.LA(1) >= '\t' && input.LA(1) <= '\n')||input.LA(1)=='\r'||input.LA(1)==' ' ) {
                 input.consume();
@@ -1843,8 +1868,8 @@ public class VelvetLexer extends Lexer {
     // $ANTLR end "WS"
 
     public void mTokens() throws RecognitionException {
-        // Velvet.g:1:8: ( ABSTRACT | ATTR_OP_EQUALS | ATTR_OP_GREATER | ATTR_OP_GREATER_EQ | ATTR_OP_LESS | ATTR_OP_LESS_EQ | ATTR_OP_NOT_EQUALS | CINTERFACE | COLON | COMMA | CONCEPT | CONSTRAINT | END_C | END_R | EQ | FEATURE | IMPORT | MANDATORY | MINUS | ONEOF | OP_AND | OP_EQUIVALENT | OP_IMPLIES | OP_NOT | OP_OR | OP_XOR | PLUS | REFINES | SEMI | SOMEOF | START_C | START_R | VAR_BOOL | VAR_FLOAT | VAR_INT | VAR_STRING | BOOLEAN | ID | IDPath | INT | FLOAT | STRING | WS )
-        int alt17=43;
+        // Velvet.g:1:8: ( ABSTRACT | ATTR_OP_EQUALS | ATTR_OP_GREATER | ATTR_OP_GREATER_EQ | ATTR_OP_LESS | ATTR_OP_LESS_EQ | ATTR_OP_NOT_EQUALS | CINTERFACE | COLON | COMMA | CONCEPT | CONSTRAINT | END_C | END_R | EQ | FEATURE | IMPL | IMPORT | MANDATORY | MINUS | ONEOF | OP_AND | OP_EQUIVALENT | OP_IMPLIES | OP_NOT | OP_OR | OP_XOR | PLUS | REFINES | SEMI | SOMEOF | START_C | START_R | VAR_BOOL | VAR_FLOAT | VAR_INT | VAR_STRING | BOOLEAN | ID | IDPath | INT | FLOAT | STRING | WS )
+        int alt17=44;
         alt17 = dfa17.predict(input);
         switch (alt17) {
             case 1 :
@@ -1976,215 +2001,223 @@ public class VelvetLexer extends Lexer {
                 }
                 break;
             case 17 :
-                // Velvet.g:1:182: IMPORT
+                // Velvet.g:1:182: IMPL
+                {
+                mIMPL(); 
+
+
+                }
+                break;
+            case 18 :
+                // Velvet.g:1:187: IMPORT
                 {
                 mIMPORT(); 
 
 
                 }
                 break;
-            case 18 :
-                // Velvet.g:1:189: MANDATORY
+            case 19 :
+                // Velvet.g:1:194: MANDATORY
                 {
                 mMANDATORY(); 
 
 
                 }
                 break;
-            case 19 :
-                // Velvet.g:1:199: MINUS
+            case 20 :
+                // Velvet.g:1:204: MINUS
                 {
                 mMINUS(); 
 
 
                 }
                 break;
-            case 20 :
-                // Velvet.g:1:205: ONEOF
+            case 21 :
+                // Velvet.g:1:210: ONEOF
                 {
                 mONEOF(); 
 
 
                 }
                 break;
-            case 21 :
-                // Velvet.g:1:211: OP_AND
+            case 22 :
+                // Velvet.g:1:216: OP_AND
                 {
                 mOP_AND(); 
 
 
                 }
                 break;
-            case 22 :
-                // Velvet.g:1:218: OP_EQUIVALENT
+            case 23 :
+                // Velvet.g:1:223: OP_EQUIVALENT
                 {
                 mOP_EQUIVALENT(); 
 
 
                 }
                 break;
-            case 23 :
-                // Velvet.g:1:232: OP_IMPLIES
+            case 24 :
+                // Velvet.g:1:237: OP_IMPLIES
                 {
                 mOP_IMPLIES(); 
 
 
                 }
                 break;
-            case 24 :
-                // Velvet.g:1:243: OP_NOT
+            case 25 :
+                // Velvet.g:1:248: OP_NOT
                 {
                 mOP_NOT(); 
 
 
                 }
                 break;
-            case 25 :
-                // Velvet.g:1:250: OP_OR
+            case 26 :
+                // Velvet.g:1:255: OP_OR
                 {
                 mOP_OR(); 
 
 
                 }
                 break;
-            case 26 :
-                // Velvet.g:1:256: OP_XOR
+            case 27 :
+                // Velvet.g:1:261: OP_XOR
                 {
                 mOP_XOR(); 
 
 
                 }
                 break;
-            case 27 :
-                // Velvet.g:1:263: PLUS
+            case 28 :
+                // Velvet.g:1:268: PLUS
                 {
                 mPLUS(); 
 
 
                 }
                 break;
-            case 28 :
-                // Velvet.g:1:268: REFINES
+            case 29 :
+                // Velvet.g:1:273: REFINES
                 {
                 mREFINES(); 
 
 
                 }
                 break;
-            case 29 :
-                // Velvet.g:1:276: SEMI
+            case 30 :
+                // Velvet.g:1:281: SEMI
                 {
                 mSEMI(); 
 
 
                 }
                 break;
-            case 30 :
-                // Velvet.g:1:281: SOMEOF
+            case 31 :
+                // Velvet.g:1:286: SOMEOF
                 {
                 mSOMEOF(); 
 
 
                 }
                 break;
-            case 31 :
-                // Velvet.g:1:288: START_C
+            case 32 :
+                // Velvet.g:1:293: START_C
                 {
                 mSTART_C(); 
 
 
                 }
                 break;
-            case 32 :
-                // Velvet.g:1:296: START_R
+            case 33 :
+                // Velvet.g:1:301: START_R
                 {
                 mSTART_R(); 
 
 
                 }
                 break;
-            case 33 :
-                // Velvet.g:1:304: VAR_BOOL
+            case 34 :
+                // Velvet.g:1:309: VAR_BOOL
                 {
                 mVAR_BOOL(); 
 
 
                 }
                 break;
-            case 34 :
-                // Velvet.g:1:313: VAR_FLOAT
+            case 35 :
+                // Velvet.g:1:318: VAR_FLOAT
                 {
                 mVAR_FLOAT(); 
 
 
                 }
                 break;
-            case 35 :
-                // Velvet.g:1:323: VAR_INT
+            case 36 :
+                // Velvet.g:1:328: VAR_INT
                 {
                 mVAR_INT(); 
 
 
                 }
                 break;
-            case 36 :
-                // Velvet.g:1:331: VAR_STRING
+            case 37 :
+                // Velvet.g:1:336: VAR_STRING
                 {
                 mVAR_STRING(); 
 
 
                 }
                 break;
-            case 37 :
-                // Velvet.g:1:342: BOOLEAN
+            case 38 :
+                // Velvet.g:1:347: BOOLEAN
                 {
                 mBOOLEAN(); 
 
 
                 }
                 break;
-            case 38 :
-                // Velvet.g:1:350: ID
+            case 39 :
+                // Velvet.g:1:355: ID
                 {
                 mID(); 
 
 
                 }
                 break;
-            case 39 :
-                // Velvet.g:1:353: IDPath
+            case 40 :
+                // Velvet.g:1:358: IDPath
                 {
                 mIDPath(); 
 
 
                 }
                 break;
-            case 40 :
-                // Velvet.g:1:360: INT
+            case 41 :
+                // Velvet.g:1:365: INT
                 {
                 mINT(); 
 
 
                 }
                 break;
-            case 41 :
-                // Velvet.g:1:364: FLOAT
+            case 42 :
+                // Velvet.g:1:369: FLOAT
                 {
                 mFLOAT(); 
 
 
                 }
                 break;
-            case 42 :
-                // Velvet.g:1:370: STRING
+            case 43 :
+                // Velvet.g:1:375: STRING
                 {
                 mSTRING(); 
 
 
                 }
                 break;
-            case 43 :
-                // Velvet.g:1:377: WS
+            case 44 :
+                // Velvet.g:1:382: WS
                 {
                 mWS(); 
 
@@ -2249,41 +2282,41 @@ public class VelvetLexer extends Lexer {
             this.transition = DFA11_transition;
         }
         public String getDescription() {
-            return "239:1: FLOAT : ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( EXPONENT )? | '.' ( '0' .. '9' )+ ( EXPONENT )? | ( '0' .. '9' )+ EXPONENT );";
+            return "247:1: FLOAT : ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( EXPONENT )? | '.' ( '0' .. '9' )+ ( EXPONENT )? | ( '0' .. '9' )+ EXPONENT );";
         }
     }
     static final String DFA17_eotS =
         "\1\uffff\1\42\1\45\1\47\1\52\1\54\1\42\4\uffff\3\42\1\66\1\42\2"+
         "\uffff\1\42\1\uffff\1\42\1\uffff\1\42\2\uffff\3\42\1\76\3\uffff"+
-        "\2\42\13\uffff\10\42\2\uffff\7\42\1\uffff\7\42\1\127\2\42\1\132"+
-        "\15\42\1\uffff\2\42\1\uffff\3\42\1\155\1\156\5\42\1\164\1\156\2"+
-        "\42\1\167\3\42\2\uffff\5\42\1\uffff\1\u0080\1\42\1\uffff\1\42\1"+
-        "\u0083\1\u0084\2\42\1\u0087\1\42\1\u0089\1\uffff\1\42\1\u008b\2"+
-        "\uffff\1\u008c\1\42\1\uffff\1\42\1\uffff\1\42\2\uffff\2\42\1\u0092"+
-        "\1\u0093\1\u0094\3\uffff";
+        "\2\42\13\uffff\10\42\2\uffff\7\42\1\uffff\7\42\1\130\2\42\1\133"+
+        "\14\42\1\150\1\42\1\uffff\2\42\1\uffff\3\42\1\157\1\160\5\42\1\166"+
+        "\1\160\1\uffff\2\42\1\171\3\42\2\uffff\5\42\1\uffff\1\u0082\1\42"+
+        "\1\uffff\1\42\1\u0085\1\u0086\2\42\1\u0089\1\42\1\u008b\1\uffff"+
+        "\1\42\1\u008d\2\uffff\1\u008e\1\42\1\uffff\1\42\1\uffff\1\42\2\uffff"+
+        "\2\42\1\u0094\1\u0095\1\u0096\3\uffff";
     static final String DFA17_eofS =
-        "\u0095\uffff";
+        "\u0097\uffff";
     static final String DFA17_minS =
         "\1\11\1\55\2\75\1\55\1\75\1\55\4\uffff\5\55\2\uffff\1\55\1\uffff"+
         "\1\55\1\uffff\1\55\2\uffff\3\55\1\56\3\uffff\2\55\13\uffff\10\55"+
-        "\2\uffff\7\55\1\uffff\30\55\1\uffff\2\55\1\uffff\22\55\2\uffff\5"+
-        "\55\1\uffff\2\55\1\uffff\10\55\1\uffff\2\55\2\uffff\2\55\1\uffff"+
-        "\1\55\1\uffff\1\55\2\uffff\5\55\3\uffff";
+        "\2\uffff\7\55\1\uffff\31\55\1\uffff\2\55\1\uffff\14\55\1\uffff\6"+
+        "\55\2\uffff\5\55\1\uffff\2\55\1\uffff\10\55\1\uffff\2\55\2\uffff"+
+        "\2\55\1\uffff\1\55\1\uffff\1\55\2\uffff\5\55\3\uffff";
     static final String DFA17_maxS =
         "\1\175\1\172\4\75\1\172\4\uffff\5\172\2\uffff\1\172\1\uffff\1\172"+
         "\1\uffff\1\172\2\uffff\3\172\1\145\3\uffff\2\172\13\uffff\10\172"+
-        "\2\uffff\7\172\1\uffff\30\172\1\uffff\2\172\1\uffff\22\172\2\uffff"+
-        "\5\172\1\uffff\2\172\1\uffff\10\172\1\uffff\2\172\2\uffff\2\172"+
-        "\1\uffff\1\172\1\uffff\1\172\2\uffff\5\172\3\uffff";
+        "\2\uffff\7\172\1\uffff\31\172\1\uffff\2\172\1\uffff\14\172\1\uffff"+
+        "\6\172\2\uffff\5\172\1\uffff\2\172\1\uffff\10\172\1\uffff\2\172"+
+        "\2\uffff\2\172\1\uffff\1\172\1\uffff\1\172\2\uffff\5\172\3\uffff";
     static final String DFA17_acceptS =
-        "\7\uffff\1\11\1\12\1\15\1\16\5\uffff\1\25\1\31\1\uffff\1\33\1\uffff"+
-        "\1\35\1\uffff\1\37\1\40\4\uffff\1\51\1\52\1\53\2\uffff\1\46\1\47"+
-        "\1\2\1\17\1\4\1\3\1\6\1\26\1\5\1\7\1\30\10\uffff\1\27\1\23\7\uffff"+
-        "\1\50\30\uffff\1\43\2\uffff\1\32\22\uffff\1\41\1\45\5\uffff\1\42"+
-        "\2\uffff\1\24\10\uffff\1\21\2\uffff\1\36\1\44\2\uffff\1\13\1\uffff"+
-        "\1\20\1\uffff\1\34\1\1\5\uffff\1\22\1\10\1\14";
+        "\7\uffff\1\11\1\12\1\15\1\16\5\uffff\1\26\1\32\1\uffff\1\34\1\uffff"+
+        "\1\36\1\uffff\1\40\1\41\4\uffff\1\52\1\53\1\54\2\uffff\1\47\1\50"+
+        "\1\2\1\17\1\4\1\3\1\6\1\27\1\5\1\7\1\31\10\uffff\1\30\1\24\7\uffff"+
+        "\1\51\31\uffff\1\44\2\uffff\1\33\14\uffff\1\21\6\uffff\1\42\1\46"+
+        "\5\uffff\1\43\2\uffff\1\25\10\uffff\1\22\2\uffff\1\37\1\45\2\uffff"+
+        "\1\13\1\uffff\1\20\1\uffff\1\35\1\1\5\uffff\1\23\1\10\1\14";
     static final String DFA17_specialS =
-        "\u0095\uffff}>";
+        "\u0097\uffff}>";
     static final String[] DFA17_transitionS = {
             "\2\37\2\uffff\1\37\22\uffff\1\37\1\5\1\36\3\uffff\1\20\1\uffff"+
             "\1\30\1\12\1\uffff\1\23\1\10\1\16\1\35\1\uffff\12\34\1\7\1\25"+
@@ -2395,120 +2428,123 @@ public class VelvetLexer extends Lexer {
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
             "\22\41\1\125\7\41",
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\16\41\1\126\13\41",
+            "\13\41\1\126\2\41\1\127\13\41",
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
             "\32\41",
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\3\41\1\130\26\41",
-            "\1\41\1\43\1\uffff\12\41\7\uffff\16\41\1\131\13\41\4\uffff"+
+            "\3\41\1\131\26\41",
+            "\1\41\1\43\1\uffff\12\41\7\uffff\16\41\1\132\13\41\4\uffff"+
             "\1\41\1\uffff\32\41",
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
             "\32\41",
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\10\41\1\133\21\41",
+            "\10\41\1\134\21\41",
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\4\41\1\134\25\41",
+            "\4\41\1\135\25\41",
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\10\41\1\135\21\41",
+            "\10\41\1\136\21\41",
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\13\41\1\136\16\41",
+            "\13\41\1\137\16\41",
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\4\41\1\137\25\41",
+            "\4\41\1\140\25\41",
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\21\41\1\140\10\41",
-            "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\4\41\1\141\25\41",
+            "\21\41\1\141\10\41",
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
             "\4\41\1\142\25\41",
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\23\41\1\143\6\41",
+            "\4\41\1\143\25\41",
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\24\41\1\144\5\41",
+            "\23\41\1\144\6\41",
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\23\41\1\145\6\41",
+            "\24\41\1\145\5\41",
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\4\41\1\146\25\41",
+            "\23\41\1\146\6\41",
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\21\41\1\147\10\41",
+            "\4\41\1\147\25\41",
+            "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
+            "\32\41",
+            "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
+            "\21\41\1\151\10\41",
             "",
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\1\150\31\41",
+            "\1\152\31\41",
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\5\41\1\151\24\41",
+            "\5\41\1\153\24\41",
             "",
-            "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\15\41\1\152\14\41",
-            "\1\41\1\43\1\uffff\12\41\7\uffff\16\41\1\153\13\41\4\uffff"+
-            "\1\41\1\uffff\32\41",
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
             "\15\41\1\154\14\41",
+            "\1\41\1\43\1\uffff\12\41\7\uffff\16\41\1\155\13\41\4\uffff"+
+            "\1\41\1\uffff\32\41",
+            "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
+            "\15\41\1\156\14\41",
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
             "\32\41",
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
             "\32\41",
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\1\157\31\41",
-            "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\21\41\1\160\10\41",
-            "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\17\41\1\161\12\41",
+            "\1\161\31\41",
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
             "\21\41\1\162\10\41",
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\21\41\1\163\10\41",
+            "\17\41\1\163\12\41",
+            "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
+            "\21\41\1\164\10\41",
+            "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
+            "\21\41\1\165\10\41",
+            "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
+            "\32\41",
+            "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
+            "\32\41",
+            "",
+            "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
+            "\23\41\1\167\6\41",
+            "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
+            "\23\41\1\170\6\41",
+            "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
+            "\32\41",
+            "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
+            "\4\41\1\172\25\41",
+            "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
+            "\5\41\1\173\24\41",
+            "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
+            "\6\41\1\174\23\41",
+            "",
+            "",
+            "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
+            "\2\41\1\175\27\41",
+            "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
+            "\5\41\1\176\24\41",
+            "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
+            "\23\41\1\177\6\41",
+            "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
+            "\1\u0080\31\41",
+            "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
+            "\4\41\1\u0081\25\41",
+            "",
+            "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
+            "\32\41",
+            "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
+            "\16\41\1\u0083\13\41",
+            "",
+            "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
+            "\22\41\1\u0084\7\41",
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
             "\32\41",
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
             "\32\41",
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\23\41\1\165\6\41",
+            "\23\41\1\u0087\6\41",
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\23\41\1\166\6\41",
-            "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\32\41",
-            "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\4\41\1\170\25\41",
-            "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\5\41\1\171\24\41",
-            "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\6\41\1\172\23\41",
-            "",
-            "",
-            "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\2\41\1\173\27\41",
-            "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\5\41\1\174\24\41",
-            "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\23\41\1\175\6\41",
-            "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\1\176\31\41",
-            "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\4\41\1\177\25\41",
-            "",
+            "\1\u0088\31\41",
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
             "\32\41",
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\16\41\1\u0081\13\41",
-            "",
-            "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\22\41\1\u0082\7\41",
-            "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\32\41",
-            "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\32\41",
-            "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\23\41\1\u0085\6\41",
-            "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\1\u0086\31\41",
-            "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\32\41",
-            "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\10\41\1\u0088\21\41",
+            "\10\41\1\u008a\21\41",
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
             "\32\41",
             "",
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\21\41\1\u008a\10\41",
+            "\21\41\1\u008c\10\41",
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
             "\32\41",
             "",
@@ -2516,19 +2552,19 @@ public class VelvetLexer extends Lexer {
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
             "\32\41",
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\2\41\1\u008d\27\41",
+            "\2\41\1\u008f\27\41",
             "",
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\15\41\1\u008e\14\41",
+            "\15\41\1\u0090\14\41",
             "",
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\30\41\1\u008f\1\41",
+            "\30\41\1\u0091\1\41",
             "",
             "",
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\4\41\1\u0090\25\41",
+            "\4\41\1\u0092\25\41",
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
-            "\23\41\1\u0091\6\41",
+            "\23\41\1\u0093\6\41",
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
             "\32\41",
             "\1\41\1\43\1\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff"+
@@ -2570,7 +2606,7 @@ public class VelvetLexer extends Lexer {
             this.transition = DFA17_transition;
         }
         public String getDescription() {
-            return "1:1: Tokens : ( ABSTRACT | ATTR_OP_EQUALS | ATTR_OP_GREATER | ATTR_OP_GREATER_EQ | ATTR_OP_LESS | ATTR_OP_LESS_EQ | ATTR_OP_NOT_EQUALS | CINTERFACE | COLON | COMMA | CONCEPT | CONSTRAINT | END_C | END_R | EQ | FEATURE | IMPORT | MANDATORY | MINUS | ONEOF | OP_AND | OP_EQUIVALENT | OP_IMPLIES | OP_NOT | OP_OR | OP_XOR | PLUS | REFINES | SEMI | SOMEOF | START_C | START_R | VAR_BOOL | VAR_FLOAT | VAR_INT | VAR_STRING | BOOLEAN | ID | IDPath | INT | FLOAT | STRING | WS );";
+            return "1:1: Tokens : ( ABSTRACT | ATTR_OP_EQUALS | ATTR_OP_GREATER | ATTR_OP_GREATER_EQ | ATTR_OP_LESS | ATTR_OP_LESS_EQ | ATTR_OP_NOT_EQUALS | CINTERFACE | COLON | COMMA | CONCEPT | CONSTRAINT | END_C | END_R | EQ | FEATURE | IMPL | IMPORT | MANDATORY | MINUS | ONEOF | OP_AND | OP_EQUIVALENT | OP_IMPLIES | OP_NOT | OP_OR | OP_XOR | PLUS | REFINES | SEMI | SOMEOF | START_C | START_R | VAR_BOOL | VAR_FLOAT | VAR_INT | VAR_STRING | BOOLEAN | ID | IDPath | INT | FLOAT | STRING | WS );";
         }
     }
  
