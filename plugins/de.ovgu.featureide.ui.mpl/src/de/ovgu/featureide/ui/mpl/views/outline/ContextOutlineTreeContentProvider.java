@@ -21,7 +21,9 @@
 package de.ovgu.featureide.ui.mpl.views.outline;
 
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -30,6 +32,7 @@ import org.eclipse.jface.viewers.Viewer;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.mpl.InterfaceProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.signature.ProjectStructure;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassFragment;
@@ -45,11 +48,9 @@ import de.ovgu.featureide.core.mpl.signature.abstr.SignatureComparator;
  * @author Sebastian Krieter
  */
 public class ContextOutlineTreeContentProvider implements ITreeContentProvider {
-
-
 	ProjectStructure projectStructure = null;
-//	String oldFeature = null;
-//	
+	IFeatureProject featureProject = null;
+
 	@Override
 	public Object[] getElements(Object inputElement) {
 		if (inputElement == null || !(inputElement instanceof IFile)) {
@@ -58,6 +59,7 @@ public class ContextOutlineTreeContentProvider implements ITreeContentProvider {
 
 		IFeatureProject featureProject = CorePlugin
 				.getFeatureProject((IFile) inputElement);
+		this.featureProject = featureProject;
 
 		if (featureProject != null) {
 			if (!MPLPlugin.getDefault().isInterfaceProject(featureProject.getProject())) {
@@ -109,6 +111,7 @@ public class ContextOutlineTreeContentProvider implements ITreeContentProvider {
 
 		if (parentElement instanceof AbstractClassFragment){
 			AbstractClassFragment frag = (AbstractClassFragment) parentElement;
+			
 			Object[] ret = new Object[frag.getMembers().size() + frag.getInnerClasses().size()];
 			int i = 0;
 			for (AbstractSignature curMember : frag.getMembers()) {
@@ -118,10 +121,20 @@ public class ContextOutlineTreeContentProvider implements ITreeContentProvider {
 				ret[i++] = curMember;
 			}
 			Arrays.sort(ret, new SignatureComparator());
-			
 			return ret;
 		}if(parentElement instanceof AbstractMethodSignature){
-			
+				AbstractMethodSignature sig = (AbstractMethodSignature) parentElement;
+				InterfaceProject intp = MPLPlugin.getDefault().getInterfaceProject(featureProject.getProject());
+				if(intp != null){
+					List<String> l = new ArrayList<String>();
+				
+					for(int i : sig.getFeatureIDs() ){
+						if(!l.contains(intp.getFeatureName(i))){
+							l.add(intp.getFeatureName(i));
+						}
+					}
+					return l.toArray();
+				}
 		}
 		
 		return new Object[]{"No Children"};
@@ -137,6 +150,9 @@ public class ContextOutlineTreeContentProvider implements ITreeContentProvider {
 		if(element instanceof AbstractClassFragment){
 			AbstractClassFragment frag = (AbstractClassFragment) element;
 			return frag.getMemberCount() > 0;
+		}else if(element instanceof AbstractMethodSignature){
+			AbstractMethodSignature sig = (AbstractMethodSignature) element;
+			return sig.getFeatureIDs().length > 0;
 		}
 		return false;
 	}

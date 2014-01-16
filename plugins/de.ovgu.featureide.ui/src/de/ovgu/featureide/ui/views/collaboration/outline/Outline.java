@@ -127,6 +127,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 			+ ".views.collaboration.outline.CollaborationOutline";
 	
 	private ArrayList<IAction> actionOfProv = new ArrayList<IAction>();
+	private boolean providerChanged = false;
 
 	private IPartListener editorListener = new IPartListener() {
 
@@ -305,9 +306,12 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 
 		ProviderAction provAct = new ProviderAction(labelProv.getLabelProvName(), labelProv.getOutlineType(), contentProv, labelProv) {
 			public void run(){
-				curContentProvider = this.getTreeContentProvider();
-				curClabel = this.getLabelProvider();
-//				update(iFile);
+				if(curContentProvider != this.getTreeContentProvider() || curClabel != this.getLabelProvider()){		
+					curContentProvider = this.getTreeContentProvider();
+					curClabel = this.getLabelProvider();
+					providerChanged = true;
+					update(iFile);
+				}
 			}
 		};
 		actionOfProv.add(provAct);
@@ -475,9 +479,12 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 			Control control = viewer.getControl();
 			if (control != null && !control.isDisposed()) {
 
-				if (refreshContent(iFile, iFile2)) {
+				if (!providerChanged && refreshContent(iFile, iFile2)) {
 					return;
+				}else{
+					providerChanged = false;
 				}
+				
 				iFile = iFile2;
 
 				if (uiJob == null || uiJob.getState() == Job.NONE) {
