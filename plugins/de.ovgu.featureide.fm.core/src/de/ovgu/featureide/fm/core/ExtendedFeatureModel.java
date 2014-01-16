@@ -191,6 +191,10 @@ public class ExtendedFeatureModel
 	public boolean hasInherited() {
 		return !this.inheritedFeatures.isEmpty();
 	}
+	
+	public boolean hasInterface() {
+		return !this.interfaceFeatures.isEmpty();
+	}
 
 	/**
 	 * This method is used by the mspl plugin to determine if a model uses
@@ -225,7 +229,11 @@ public class ExtendedFeatureModel
 	 * @return true if and only if the feature was integrated from extern
 	 */
 	public boolean isFromExtern(final Feature feature) {
-		return isImported(feature) || isInherited(feature);
+		return isImported(feature) || isInherited(feature) || isFromInterface(feature);
+	}
+
+	public boolean isFromInterface(Feature feature) {
+		return this.interfaceFeatures.contains(feature);
 	}
 
 	/**
@@ -294,5 +302,16 @@ public class ExtendedFeatureModel
 
 	public void setInterface(final String interfaceName) {
 		this.interfaceName = interfaceName;
+	}
+	
+	@Override
+	public boolean deleteFeature(Feature feature) {
+		if (super.deleteFeature(feature)){
+			this.interfaceFeatures.remove(feature);
+			this.importedFeatures.remove(feature);
+			this.inheritedFeatures.remove(feature);
+			return true;
+		}
+		return false;
 	}
 }

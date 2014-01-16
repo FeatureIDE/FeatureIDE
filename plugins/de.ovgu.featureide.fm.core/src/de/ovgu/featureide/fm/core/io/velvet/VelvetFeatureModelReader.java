@@ -132,7 +132,7 @@ public class VelvetFeatureModelReader
 					model.setFeaturefromInstance(feature, parent);
 					break;
 				case INTERFACE:
-					// TODO @Matthias
+					model.setFeatureInterface(feature, parent);
 					break;
 			}
 
