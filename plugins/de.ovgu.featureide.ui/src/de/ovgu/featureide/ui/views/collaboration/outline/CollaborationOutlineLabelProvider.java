@@ -20,12 +20,16 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.outline;
 
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.TreeItem;
 
+import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTField;
@@ -33,6 +37,7 @@ import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.RoleElement;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
+import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 
 /**
@@ -97,7 +102,7 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 				if (!r.getDirectives().isEmpty()) {
 					return fstclass.getName();
 				}
-				if (r.getFile().equals(file)) {
+				if (viewer != null && viewer.getInput() != null && r.getFile().equals(viewer.getInput())) {
 					toAppend = " - " + r.getFeature().getName();
 				}
 			}
@@ -127,11 +132,22 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 	}
 	
 	
-	public void colorizeItems(TreeItem[] treeItems) {
+		
+	public String getLabelProvName(){
+		return "Collaboration Outline";
+	}
+
+	@Override
+	public int getOutlineType() {
+		return OutlineLabelProvider.OUTLINE_CODE;
+	}
+
+	public void colorizeItems(TreeItem[] treeItems, IFile file) {
 		for (int i = 0; i < treeItems.length; i++) {
+			Object o = treeItems[i].getData();
 			if (treeItems[i].getData() instanceof RoleElement) {
-				setForeground(treeItems[i]);
-			} else if (treeItems[i].getData() instanceof FSTRole) {
+				setForeground(treeItems[i], file);
+			} if (treeItems[i].getData() instanceof FSTRole) {
 				if (((FSTRole) treeItems[i].getData()).getFile().equals(file)) {
 					// get old Font and simply make it bold
 					treeItems[i].setFont(new Font(treeItems[i].getDisplay(),
@@ -144,26 +160,81 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 					treeItems[i].setFont(new Font(treeItems[i].getDisplay(),
 						treeItems[i].getFont().getFontData()[0].getName(), 
 						treeItems[i].getFont().getFontData()[0].getHeight(),
-									0));
+						SWT.NORMAL));
 				}
 			}
 			if (treeItems[i].getItems().length > 0) {
-				colorizeItems(treeItems[i].getItems());
+				colorizeItems(treeItems[i].getItems(), file);
 			}
 		}
 	}
 
-	public void setForeground(TreeItem item) {
+	/**
+	 * @return <code>true</code> if the new input does not change the old content.
+	 */
+	private boolean hasSameClass(FSTClass Class, IFile oldFile, IFile currentFile) {
+		if(Class == null){
+			UIPlugin.getDefault().logWarning("class war null" );
+		}
+		if(currentFile == null){
+			UIPlugin.getDefault().logWarning("file war null");
+		}
+		if (!currentFile.getProject().equals(oldFile.getProject())) {
+			return false;
+		}
+		if (isBuildFile(currentFile.getParent(), 
+				CorePlugin.getFeatureProject(currentFile).getBuildFolder())) {
+			return true;
+		}
+		if (isBuildFile(oldFile.getParent(), 
+				CorePlugin.getFeatureProject(oldFile).getBuildFolder())) {
+			return true;
+		}
+		
+		if (currentFile.equals(oldFile)) {
+			return true;
+		}
+		boolean i = false;
+		boolean j = false;
+		for (FSTRole role : Class.getRoles()) {
+			if (role.getFile().equals(oldFile)) {
+				i = true;
+			} else if (role.getFile().equals(currentFile)) {
+				j = true;
+			}
+		}
+		return j && i;
+	}
+
+	/**
+	 * @param parent
+	 * @param buildFolder
+	 * @return <code>true</code> if the build folder contains the given folder
+	 */
+	private boolean isBuildFile(IContainer parent, IFolder buildFolder) {
+		if (parent == null) {
+			return false;
+		}
+		if (parent instanceof IFolder) {
+			if (parent.equals(buildFolder)) {
+				return true;
+			}
+			return isBuildFile(parent.getParent(), buildFolder);
+		}
+		return false;
+	}
+	
+	public void setForeground(TreeItem item, IFile iFile) {
 		RoleElement element = (RoleElement) item.getData();
 		
 		for (FSTRole role : element.getRole().getFSTClass().getRoles()) {
-			if (!role.getFile().equals(file)) {
+			if (!role.getFile().equals(iFile)) {
 				continue;
 			}
 			if (element instanceof FSTMethod) {
 				for (FSTMethod method : role.getMethods()) {
 					if (method.comparesTo(element)) {
-						item.setForeground(item.getDisplay()
+						item.setForeground(viewer.getControl().getDisplay()
 								.getSystemColor(SWT.DEFAULT));
 						return;
 					}
@@ -172,111 +243,53 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 			if (element instanceof FSTField) {
 				for (FSTField field : role.getFields()) {
 					if (field.comparesTo(element)) {
-						item.setForeground(item.getDisplay()
+						item.setForeground(viewer.getControl().getDisplay()
 								.getSystemColor(SWT.DEFAULT));
 						return;
 					}
 				}
 			}
 		}
-		item.setForeground(item.getDisplay().getSystemColor(SWT.COLOR_GRAY));
-	}
-	
-	public String getLabelProvName(){
-		return "Collaboration Outline";
+		item.setForeground(viewer.getControl().getDisplay().getSystemColor(SWT.COLOR_GRAY));
 	}
 
+
+	public boolean refreshContent(TreeItem[] items, IFile oldFile, IFile currentFile) {
+	if (currentFile != null && oldFile != null) {
+		/** only set the colors of the tree if the content is the same **/
+		if (currentFile.getName().equals(oldFile.getName()) && items.length > 0) {
+			TreeItem item = items[0];
+			if (item != null) {
+				if (item.getData() instanceof FSTClass) {
+					if (!hasSameClass((FSTClass) item.getData(), oldFile, currentFile)) {
+						return false;
+					}
+					oldFile = currentFile;
+					String toAppend = " - Composed class"; 
+					for (FSTRole r : ((FSTClass)item.getData()).getRoles()) {
+						if (!r.getDirectives().isEmpty()) {
+							toAppend =  "";
+							break;
+						}
+						if (r.getFile().equals(oldFile)) {
+							toAppend = " - " + r.getFeature().getName();
+							break;
+						}
+					}
+					item.setText(((FSTClass)item.getData()).getName()+toAppend);
+					colorizeItems(items, oldFile);
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.ui.views.collaboration.outline.OutlineLabelProvider#init()
+	 */
 	@Override
-	public int getOutlineType() {
-		return OutlineLabelProvider.OUTLINE_CODE;
+	public void init() {
 	}
-	
-
-//	/**
-//	 * This method only updates the root and colors
-//	 * @return <code>false</code> if the content needs to be replaced
-//	 */
-//	private boolean refreshContent(IFile iFile2) {
-//		if (iFile2 != null && iFile != null) {
-//			/** only set the colors of the tree if the content is the same **/
-//			TreeItem[] items = viewer.getTree().getItems();
-//			if (iFile2.getName().equals(iFile.getName()) && items.length > 0) {
-//				TreeItem item = items[0];
-//				if (item != null) {
-//					if (item.getData() instanceof FSTClass) {
-//						if (!hasSameClass((FSTClass) item.getData(), iFile2)) {
-//							return false;
-//						}
-//						iFile = iFile2;
-//						String toAppend = " - Composed class"; 
-//						for (FSTRole r : ((FSTClass)item.getData()).getRoles()) {
-//							if (!r.getDirectives().isEmpty()) {
-//								toAppend =  "";
-//								break;
-//							}
-//							if (r.getFile().equals(iFile)) {
-//								toAppend = " - " + r.getFeature().getName();
-//								break;
-//							}
-//						}
-//						item.setText(((FSTClass)item.getData()).getName()+toAppend);
-//						clabel.colorizeItems(viewer.getTree().getItems());
-//						return true;
-//					}
-//				}
-//			}
-//		}
-//		return false;
-//	}
-
-//	/**
-//	 * @return <code>true</code> if the new input does not change the old content.
-//	 */
-//	private boolean hasSameClass(FSTClass Class, IFile iFile2) {
-//		if (!iFile2.getProject().equals(iFile.getProject())) {
-//			return false;
-//		}
-//		if (isBuildFile(iFile2.getParent(), 
-//				CorePlugin.getFeatureProject(iFile2).getBuildFolder())) {
-//			return true;
-//		}
-//		if (isBuildFile(iFile.getParent(), 
-//				CorePlugin.getFeatureProject(iFile).getBuildFolder())) {
-//			return true;
-//		}
-//		
-//		if (iFile2.equals(iFile)) {
-//			return true;
-//		}
-//		boolean i = false;
-//		boolean j = false;
-//		for (FSTRole role : Class.getRoles()) {
-//			if (role.getFile().equals(iFile)) {
-//				i = true;
-//			} else if (role.getFile().equals(iFile2)) {
-//				j = true;
-//			}
-//		}
-//		return j && i;
-//	}
-
-//	/**
-//	 * @param parent
-//	 * @param buildFolder
-//	 * @return <code>true</code> if the build folder contains the given folder
-//	 */
-//	private boolean isBuildFile(IContainer parent, IFolder buildFolder) {
-//		if (parent == null) {
-//			return false;
-//		}
-//		if (parent instanceof IFolder) {
-//			if (parent.equals(buildFolder)) {
-//				return true;
-//			}
-//			return isBuildFile(parent.getParent(), buildFolder);
-//		}
-//		return false;
-//	}
-	
-
 }

@@ -190,4 +190,9 @@ public class FujiClassSignature extends AbstractClassSignature {
 //		}
 		return true;
 	}
+
+	@Override
+	public int getLine() {
+		return 0;
+	}
 }

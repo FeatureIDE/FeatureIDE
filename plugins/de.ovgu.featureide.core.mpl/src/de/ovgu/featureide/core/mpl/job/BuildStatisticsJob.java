@@ -157,7 +157,7 @@ public class BuildStatisticsJob extends AMonitorJob {
 		setMaxAbsoluteWork(allConcreteFeatures.size() + 2);
 		
 		StringBuilder fmSb = new StringBuilder("NumFeatures;Abstract;Concrete;And;Or;Alt;Mandatory;Optional;OrChildren;AltChildren\n");
-		int[] fmStatNumbers = fm.getStatisticNumbers();
+		int[] fmStatNumbers = {}; //fm.getStatisticNumbers();
 		fmSb.append(fmStatNumbers[0]);
 		for (int i = 1; i < fmStatNumbers.length; i++) {
 			fmSb.append(';');
