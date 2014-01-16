@@ -46,7 +46,7 @@ import de.ovgu.featureide.core.CorePlugin;
 public class TAheadErrorPropagation {
 
 	protected static File FILE_FOLDER = new File(
-			"/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.core.ahead-test/src/testcases/");
+			"/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.core.ahead-test/src/testcases/");
 
 	AheadBuildErrorEvent event = new AheadBuildErrorEvent();
 
@@ -65,8 +65,7 @@ public class TAheadErrorPropagation {
 		// local location
 		if (!FILE_FOLDER.canRead()) {
 			FILE_FOLDER = new File(ClassLoader.getSystemResource(
-					"testcases")
-					.getPath());
+					"testcases").getPath());
 		}
 		File folder = FILE_FOLDER.listFiles(getFileFilter(project))[0];
 		return folder.listFiles(getFileFilter(name))[0];
