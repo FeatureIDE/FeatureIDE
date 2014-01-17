@@ -20,6 +20,7 @@
  */
 package org.prop4j;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -44,7 +45,7 @@ public class NodeReader {
 	public final static String[] logicalSymbols = new String[] { "\u21D4",
 			"\u21D2", "\u2228", "\u2227", "\u00AC" };
 
-	private List<String> featureNames;
+	private Collection<String> featureNames;
 
 	private String errorMessage = "";
 
@@ -68,7 +69,7 @@ public class NodeReader {
 		return stringToNode(constraint, null);
 	}
 
-	public Node stringToNode(String constraint, List<String> featureNames) {
+	public Node stringToNode(String constraint, Collection<String> featureNames) {
 		this.featureNames = featureNames;
 		errorMessage = "";
 		constraint = constraint.trim();
@@ -233,8 +234,8 @@ public class NodeReader {
 	 *            list of feature names
 	 * @return true if constraint is well formed
 	 */
-	public boolean isWellFormed(String constraint, List<String> _featureNames) {
-		this.featureNames = _featureNames;
+	public boolean isWellFormed(String constraint, final Collection<String> featureNames) {
+		this.featureNames = featureNames;
 
 		if (!constraint.trim().isEmpty()) {
 			// Check constraint if brackets set correctly
@@ -367,7 +368,7 @@ public class NodeReader {
 	 *            list of substituted bracket expressions
 	 * @return
 	 */
-	private Node stringToNodeRec(String string, LinkedList<String> list) {
+	private Node stringToNodeRec(String string, List<String> list) {
 		string = " " + string.trim() + " ";
 		// traverse all symbols
 		for (int i = 0; i < symbols.length; i++) {

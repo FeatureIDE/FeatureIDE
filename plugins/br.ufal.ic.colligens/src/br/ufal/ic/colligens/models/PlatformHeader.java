@@ -40,14 +40,14 @@ import br.ufal.ic.colligens.util.metrics.CountDirectives;
 @SuppressWarnings("restriction")
 public class PlatformHeader {
 	// It keeps the C types.
-	private HashSet<String> types = new HashSet<String>();
+	private final HashSet<String> types = new HashSet<String>();
 
 	// It keeps the macros defined.
-	private HashSet<String> macros = new HashSet<String>();
+	private final HashSet<String> macros = new HashSet<String>();
 
 	private CountDirectives countDirectives;
 
-	private HashSet<String> listFilesCDT = new HashSet<String>();
+	private final HashSet<String> listFilesCDT = new HashSet<String>();
 
 	private ICProject project;
 
@@ -72,6 +72,9 @@ public class PlatformHeader {
 
 		if (stubs.exists())
 			return;
+
+		new File(Colligens.getDefault().getConfigDir().getAbsolutePath()
+				+ System.getProperty("file.separator") + "projects").mkdirs();
 
 		project = CoreModel.getDefault().getCModel().getCProject(projectName);
 
@@ -127,7 +130,7 @@ public class PlatformHeader {
 				list.add(0, "-I" + includes[i].getElementName());
 			}
 		} catch (CModelException e) {
-			// TODO Auto-generated catch block
+
 			e.printStackTrace();
 		}
 
@@ -281,11 +284,11 @@ public class PlatformHeader {
 
 		for (Iterator<String> iterator = listFiles.iterator(); iterator
 				.hasNext();) {
-			String file = (String) iterator.next();
+			String file = iterator.next();
 			try {
 				countDirectives.count(file);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
+
 				e.printStackTrace();
 				throw new PlatformException("unexpected error!");
 			}
@@ -306,6 +309,7 @@ public class PlatformHeader {
 
 			ITranslationUnit tu = (ITranslationUnit) CoreModel.getDefault()
 					.create(getFile(file));
+
 			IASTTranslationUnit ast = null;
 			try {
 				IIndex index = CCorePlugin.getIndexManager().getIndex(project);
@@ -315,7 +319,7 @@ public class PlatformHeader {
 				this.setTypes(ast);
 				this.setMacros(ast);
 			} catch (CoreException e1) {
-				// TODO Auto-generated catch block
+
 				throw new PlatformException(
 						"Was not possible to generate the stubs");
 			}
@@ -378,11 +382,11 @@ public class PlatformHeader {
 		try {
 			FileWriter writer = new FileWriter(platformTemp);
 			for (Iterator<String> i = this.types.iterator(); i.hasNext();) {
-				String type = (String) i.next();
+				String type = i.next();
 				if (countDirectives.directives.contains(type)) {
 					// System.out.println(type);
 				} else {
-					writer.write("typedef struct {} " + type + ";\n");
+					writer.write("typedef struct " + type + ";\n");
 				}
 			}
 

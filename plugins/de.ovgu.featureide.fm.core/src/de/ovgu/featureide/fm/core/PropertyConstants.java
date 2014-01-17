@@ -28,34 +28,19 @@ package de.ovgu.featureide.fm.core;
  */
 public interface PropertyConstants {
 
-	public final static String MODEL_DATA_LOADED = "MODEL_DATA_LOADED";
-	public final static String REDRAW_DIAGRAM = "REDRAW_DIAGRAM";
-	public final static String MODEL_DATA_CHANGED = "MODEL_DATA_CHANGED";
-	public final static String MODEL_LAYOUT_CHANGED = "MODEL_LAYOUT_CHANGED";
-	public final static String REFRESH_ACTIONS = "REFRESH_ACTIONS";
-	public final static String NAME_CHANGED = "NAME_CHANGED";
-	
-
-	public final static String LOCATION_CHANGED = "LOCATION_CHANGED";// should
-																		// not
-																		// occur
-																		// in
-																		// CORE
-																		// feature.
-
-	public final static String COLOR_CHANGED = "COLOR_CHANGED";
-	
-	public final static String MANDATORY_CHANGED = "MANDATORY_CHANGED";
-	
-	public final static String HIDDEN_CHANGED = "HIDDEN_CHANGED";
-
-	public final static String PARENT_CHANGED = "PARENT_CHANGED";
-
-	public final static String CHILDREN_CHANGED = "CHILDREN_CHANGED";
-
-	public final static String FEATURE_NAME_CHANGED = "NAME_CHANGED";// oldname->newname
-	
-	public final static String ATTRIBUTE_CHANGED = "ATTRIBUTE_CHANGED"; //changed Color Settings
-
-	public final static String CONSTRAINT_SELECTED = "CONSTRAINT_SELECTED";
+	String MODEL_DATA_LOADED = "MODEL_DATA_LOADED";
+	String REDRAW_DIAGRAM = "REDRAW_DIAGRAM";
+	String MODEL_DATA_CHANGED = "MODEL_DATA_CHANGED";
+	String MODEL_LAYOUT_CHANGED = "MODEL_LAYOUT_CHANGED";
+	String REFRESH_ACTIONS = "REFRESH_ACTIONS";
+	String NAME_CHANGED = "NAME_CHANGED";
+	String LOCATION_CHANGED = "LOCATION_CHANGED";
+	String COLOR_CHANGED = "COLOR_CHANGED";
+	String MANDATORY_CHANGED = "MANDATORY_CHANGED";
+	String HIDDEN_CHANGED = "HIDDEN_CHANGED";
+	String PARENT_CHANGED = "PARENT_CHANGED";
+	String CHILDREN_CHANGED = "CHILDREN_CHANGED";
+	String FEATURE_NAME_CHANGED = "NAME_CHANGED";
+	String ATTRIBUTE_CHANGED = "ATTRIBUTE_CHANGED";
+	String CONSTRAINT_SELECTED = "CONSTRAINT_SELECTED";
 }

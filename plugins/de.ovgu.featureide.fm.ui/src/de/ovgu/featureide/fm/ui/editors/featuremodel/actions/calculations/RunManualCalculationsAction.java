@@ -26,7 +26,7 @@ import org.eclipse.jface.action.Action;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
 /**
- * 
+ * TODO description
  * @author Jens Meinicke
  */
 public class RunManualCalculationsAction extends Action {
@@ -40,10 +40,10 @@ public class RunManualCalculationsAction extends Action {
 
 	@Override
 	public void run() {
-		boolean oldValue = featureModel.runCalculationAutomatically;
-		featureModel.runCalculationAutomatically = true;
+		boolean oldValue = featureModel.getAnalyser().runCalculationAutomatically;
+		featureModel.getAnalyser().runCalculationAutomatically = true;
 		featureModel.handleModelDataLoaded();
-		featureModel.runCalculationAutomatically = oldValue;
+		featureModel.getAnalyser().runCalculationAutomatically = oldValue;
 	}
 
 }

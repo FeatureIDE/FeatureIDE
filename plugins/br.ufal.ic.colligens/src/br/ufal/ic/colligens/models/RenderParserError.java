@@ -33,13 +33,11 @@ public class RenderParserError implements
 
 	@Override
 	public Function1<FeatureExpr, Function1<String, Function1<Position, Object>>> curried() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public Function1<Tuple3<FeatureExpr, String, Position>, Object> tupled() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

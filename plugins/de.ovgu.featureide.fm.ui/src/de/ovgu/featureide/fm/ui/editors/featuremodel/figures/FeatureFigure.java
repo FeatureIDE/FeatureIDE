@@ -123,7 +123,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 	public void setProperties() {
 	
 		String toolTip = "";
-		boolean modelIsValid = featureModel.valid();
+		boolean modelIsValid = featureModel.getAnalyser().valid();
 		
 		label.setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
 		setBackgroundColor(FMPropertyManager.getConcreteFeatureBackgroundColor());

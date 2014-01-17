@@ -13,20 +13,16 @@ import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.Refactoring;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.PlatformUI;
 
-import br.ufal.ic.colligens.models.FileProxy;
-import br.ufal.ic.colligens.util.Log;
-import br.ufal.ic.colligens.views.InvalidConfigurationsView;
+import core.RefactoringType;
 import de.fosd.typechef.lexer.LexerException;
 import de.fosd.typechef.lexer.options.OptionException;
 
 public class RefactorSelectionController extends Refactoring {
 	private TextSelection textSelection = null;
 	private IFile file = null;
-	private RefactorSelectionProcessor processor;
+	private RefactoringType refactoringType;
+	private final RefactorSelectionProcessor processor;
 	protected List<Change> changes = new LinkedList<Change>();
 
 	public RefactorSelectionController() {
@@ -35,7 +31,7 @@ public class RefactorSelectionController extends Refactoring {
 
 	@Override
 	public String getName() {
-		return "Refactoring Undisciplined";
+		return "Refactoring " + refactoringType.getLabel();
 	}
 
 	@Override
@@ -47,7 +43,7 @@ public class RefactorSelectionController extends Refactoring {
 
 		try {
 
-			processor.selectToFile(file, textSelection);
+			processor.selectToFile(file, textSelection, refactoringType);
 
 		} catch (LexerException e) {
 			status.addFatalError("Was not possible to refactor the selected part.");
@@ -64,36 +60,8 @@ public class RefactorSelectionController extends Refactoring {
 		} catch (RefactorException e) {
 			status.addFatalError("The selected part contains errors.");
 		} finally {
-			if (processor.fileProxy != null
-					&& !processor.fileProxy.getLogs().isEmpty()) {
-
-				Display.getDefault().asyncExec(new Runnable() {
-					public void run() {
-
-						IViewPart view = PlatformUI.getWorkbench()
-								.getActiveWorkbenchWindow().getActivePage()
-								.findView(InvalidConfigurationsView.ID);
-						if (view instanceof InvalidConfigurationsView) {
-							final InvalidConfigurationsView analyzerView = (InvalidConfigurationsView) view;
-
-							List<FileProxy> list = new LinkedList<FileProxy>();
-
-							for (Log log : processor.fileProxy.getLogs()) {
-								log.setSelection(textSelection);
-							}
-
-							list.add(processor.fileProxy);
-							// returns the list to view
-							analyzerView.setInput(list);
-
-						}
-					}
-				});
-			}
+			monitor.done();
 		}
-
-		monitor.done();
-
 		return status;
 	}
 
@@ -105,9 +73,9 @@ public class RefactorSelectionController extends Refactoring {
 		monitor.beginTask("Checking checkFinalConditions...", 2);
 
 		try {
-			changes = processor.process(textSelection, monitor);
+			changes = processor.process(monitor);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+
 			status.addFatalError(e.getMessage());
 			e.printStackTrace();
 		}
@@ -128,9 +96,11 @@ public class RefactorSelectionController extends Refactoring {
 		}
 	}
 
-	public void setSelection(IFile file, TextSelection selection) {
+	public void setSelection(IFile file, TextSelection selection,
+			RefactoringType refactoringType) {
 		this.textSelection = selection;
 		this.file = file;
+		this.refactoringType = refactoringType;
 	}
 
 }
