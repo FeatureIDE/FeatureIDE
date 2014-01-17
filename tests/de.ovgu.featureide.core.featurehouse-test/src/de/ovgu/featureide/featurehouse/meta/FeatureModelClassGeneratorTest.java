@@ -85,7 +85,7 @@ public class FeatureModelClassGeneratorTest {
 	};
 	
 	private static File getFolder() { 
-		File folder =  new File("/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.core.featurehouse-test/src/metafeaturemodels/"); 
+		File folder =  new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.core.featurehouse-test/src/metafeaturemodels/"); 
 		if (!folder.canRead()) { 
 			folder =  new File(ClassLoader.getSystemResource("metafeaturemodels").getPath()); 
 		}

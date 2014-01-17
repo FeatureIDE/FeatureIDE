@@ -43,9 +43,9 @@ import de.ovgu.featureide.core.IFeatureProject;
 
 public class FSTModel {
 
-	private HashMap<String, FSTClass> classes = new HashMap<String, FSTClass>();
-	private Map<String, FSTFeature> features = new HashMap<String, FSTFeature>();
-	private IFeatureProject featurProject;
+	private final Map<String, FSTClass> classes = new HashMap<String, FSTClass>();
+	private final Map<String, FSTFeature> features = new HashMap<String, FSTFeature>();
+	private final IFeatureProject featurProject;
 	private FSTConfiguration configuration;
 
 	public FSTModel(IFeatureProject featureProject) {
@@ -81,7 +81,15 @@ public class FSTModel {
 	}
 	
 	public void addFeature(final FSTFeature feature) {
-		features.put(feature.getName(), feature);
+		if (!features.containsValue(feature)) {
+			features.put(feature.getName(), feature);
+		}
+	}
+	
+	public void addClass(final FSTClass c) {
+		if (!classes.containsValue(c)) {
+			classes.put(c.getName(), c);
+		}
 	}
 
 	public FSTRole addRole(String featureName, String className, IFile file) {

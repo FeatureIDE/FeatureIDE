@@ -48,7 +48,10 @@ public class CollaborationOutlineTreeContentProvider implements
 		ITreeContentProvider {
 
 	protected FSTModel model;
-//	private CollaborationModelBuilder builder = new CollaborationModelBuilder();
+	
+	public CollaborationOutlineTreeContentProvider(){
+	}
+	
 	
 	private Comparator<? super FSTMethod> methodComparator = new Comparator<FSTMethod>() {
 
@@ -98,22 +101,15 @@ public class CollaborationOutlineTreeContentProvider implements
 
 		IFeatureProject featureProject = CorePlugin
 				.getFeatureProject((IFile) inputElement);
-		if (featureProject != null) {
-			if (model != null) {
-				FSTClass c = model.getClass(((IFile) inputElement).getName());
-				if (c != null) { 
-					return new Object[] { c };
-				} else {
-					return new String[] { "An outline is not available." };
-				}
-			} else {
-				return new String[] { "Collaboration Model not found" };
+		model = featureProject.getFSTModel();
+
+		if (model != null) {
+			FSTClass c = model.getClass(((IFile) inputElement).getName());
+			if (c != null) {
+				return new Object[] { c };
 			}
-		} else {
-			return new String[] { "This is no feature project" };
 		}
-		
-		
+		return new String[] { "Collaboration Model not found" };
 	}
 
 	@Override
@@ -267,5 +263,4 @@ public class CollaborationOutlineTreeContentProvider implements
 
 		return false;
 	}
-
 }

@@ -22,6 +22,7 @@ package de.ovgu.featureide.ui.views.collaboration.outline;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.TreeItem;
 
 /**
@@ -30,16 +31,19 @@ import org.eclipse.swt.widgets.TreeItem;
  * @author Reimar Schröter
  */
 public abstract class OutlineLabelProvider  implements ILabelProvider{
-
-	protected IFile file;
-	
 	public static final int OUTLINE_NOT_AVAILABLE = -1 ;
 	public static final int OUTLINE_FEATURE_MODEL = 0 ;
 	public static final int OUTLINE_CODE = 1;
-		
-	public void setFile(IFile file) {
-		this.file = file;
+	
+	protected TreeViewer viewer;
+	
+	
+	public void initTreeViewer(TreeViewer viewer) {
+		this.viewer = viewer;
+		init();
 	}
+	
+	public abstract void init();
 	
 	public abstract int getOutlineType();
 	
@@ -51,10 +55,13 @@ public abstract class OutlineLabelProvider  implements ILabelProvider{
 	 * 
 	 * @param treeItems
 	 *            the items that should be colored
+	 * @param file 
 	 */
-	public abstract void colorizeItems(TreeItem[] treeItems) ;
+	public abstract void colorizeItems(TreeItem[] treeItems, IFile file) ;
 
-	public abstract void setForeground(TreeItem item) ;
+	public abstract void setForeground(TreeItem item, IFile file) ;
 	
 	public abstract String getLabelProvName();
+	
+	public abstract boolean refreshContent(TreeItem[] items, IFile oldFile, IFile currentFile);
 }

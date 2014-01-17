@@ -33,6 +33,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.signature.ProjectStructure;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassFragment;
+import de.ovgu.featureide.core.mpl.signature.abstr.AbstractMethodSignature;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature;
 import de.ovgu.featureide.core.mpl.signature.abstr.ClassFragmentComparator;
 import de.ovgu.featureide.core.mpl.signature.abstr.SignatureComparator;
@@ -105,6 +106,7 @@ public class ContextOutlineTreeContentProvider implements ITreeContentProvider {
 
 	@Override
 	public Object[] getChildren(Object parentElement) {
+
 		if (parentElement instanceof AbstractClassFragment){
 			AbstractClassFragment frag = (AbstractClassFragment) parentElement;
 			Object[] ret = new Object[frag.getMembers().size() + frag.getInnerClasses().size()];
@@ -118,6 +120,8 @@ public class ContextOutlineTreeContentProvider implements ITreeContentProvider {
 			Arrays.sort(ret, new SignatureComparator());
 			
 			return ret;
+		}if(parentElement instanceof AbstractMethodSignature){
+			
 		}
 		
 		return new Object[]{"No Children"};

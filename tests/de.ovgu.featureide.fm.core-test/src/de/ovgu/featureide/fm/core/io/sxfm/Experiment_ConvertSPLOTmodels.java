@@ -37,9 +37,9 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 //@RunWith(Parameterized.class)
 public class Experiment_ConvertSPLOTmodels extends Experiment_SPLOTmodels{
 	protected static File MODEL_FILE_FOLDER = new
-			 File("/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/splotmodels/");
+			 File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/splotmodels/");
 	private static File DESTINATION = new
-			 File("/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/splotmodels_new/");
+			 File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/splotmodels_new/");
 	
 	private File modelFile;
 

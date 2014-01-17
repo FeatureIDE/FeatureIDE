@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.outline;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.TreeItem;
@@ -32,6 +33,7 @@ import de.ovgu.featureide.fm.ui.views.outline.FmLabelProvider;
  * @author Reimar Schröter
  */
 public class FMOutlineLabelProviderWrapper extends OutlineLabelProvider{
+
 	private final FmLabelProvider prov = new FmLabelProvider();
 
 	@Override
@@ -65,10 +67,10 @@ public class FMOutlineLabelProviderWrapper extends OutlineLabelProvider{
 	}
 
 	@Override
-	public void colorizeItems(TreeItem[] treeItems) {}
+	public void colorizeItems(TreeItem[] treeItems, IFile file) {}
 
 	@Override
-	public void setForeground(TreeItem item) {}
+	public void setForeground(TreeItem item, IFile file) {}
 
 	@Override
 	public String getLabelProvName() {
@@ -78,6 +80,21 @@ public class FMOutlineLabelProviderWrapper extends OutlineLabelProvider{
 	@Override
 	public int getOutlineType() {
 		return OutlineLabelProvider.OUTLINE_FEATURE_MODEL;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.ui.views.collaboration.outline.OutlineLabelProvider#refreshContent(org.eclipse.core.resources.IFile, org.eclipse.core.resources.IFile)
+	 */
+	@Override
+	public boolean refreshContent(TreeItem[] items, IFile oldFile, IFile currentFile) {
+		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.ui.views.collaboration.outline.OutlineLabelProvider#init()
+	 */
+	@Override
+	public void init() {
 	}
 
 }
