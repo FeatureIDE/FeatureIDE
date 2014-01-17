@@ -82,4 +82,12 @@ public interface IFeatureModelReader {
 	 */
 	public List<ModelWarning> getWarnings();
 
+	/**
+	 * Set the source file of the textual representation of the feature model.
+	 * 
+	 * @param featureModelFile
+	 *            the source file
+	 */
+	public void setFile(File featureModelFile);
+
 }
