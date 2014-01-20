@@ -75,7 +75,7 @@ public class ZipStructureProvider implements IImportStructureProvider  {
 	 * @return The element represented by this pathname (it may have already existed)
 	 */
 	protected ZipEntry createContainer(IPath pathname) {
-		ZipEntry existingEntry = (ZipEntry) directoryEntryCache.get(pathname);
+		ZipEntry existingEntry = directoryEntryCache.get(pathname);
 		if (existingEntry != null) {
 			return existingEntry;
 		}
@@ -91,7 +91,7 @@ public class ZipStructureProvider implements IImportStructureProvider  {
 		List<ZipEntry> childList = new ArrayList<ZipEntry>();
 		children.put(newEntry, childList);
 
-		List<ZipEntry> parentChildList = (List<ZipEntry>)children.get(parent);
+		List<ZipEntry> parentChildList = children.get(parent);
 		parentChildList.add(newEntry);
 		return newEntry;
 	}
@@ -105,11 +105,11 @@ public class ZipStructureProvider implements IImportStructureProvider  {
 		if (pathname.segmentCount() == 1) {
 			parent = root;
 		} else {
-			parent = (ZipEntry) directoryEntryCache.get(pathname
+			parent = directoryEntryCache.get(pathname
 					.removeLastSegments(1));
 		}
 
-		List<ZipEntry>  childList = (List<ZipEntry>) children.get(parent);
+		List<ZipEntry>  childList = children.get(parent);
 		childList.add(entry);
 	}
 
@@ -121,7 +121,7 @@ public class ZipStructureProvider implements IImportStructureProvider  {
 			initialize();
 		}
 
-		return ((List<ZipEntry>) children.get(element));
+		return (children.get(element));
 	}
 
 	/*

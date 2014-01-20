@@ -62,7 +62,7 @@ public class TreeElement {
 	}
 
 	public TreeElement[] getChildren() {
-		return (TreeElement[]) children.toArray(new TreeElement[children.size()]);
+		return children.toArray(new TreeElement[children.size()]);
 	}
 
 	public boolean hasChildren() {

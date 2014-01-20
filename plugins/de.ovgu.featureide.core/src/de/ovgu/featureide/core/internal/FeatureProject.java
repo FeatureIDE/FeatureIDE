@@ -1245,7 +1245,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			for (ICommand command : project.getDescription().getBuildSpec()) {
 				if (ExtensibleFeatureProjectBuilder.BUILDER_ID.equals(
 						command.getBuilderName())) {
-					return (String) command.getArguments().get(argument);
+					return command.getArguments().get(argument);
 				}
 			}
 		} catch (CoreException e) {
@@ -1268,7 +1268,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			for (ICommand command : project.getDescription().getBuildSpec()) {
 				if (command.getBuilderName().equals(
 						ExtensibleFeatureProjectBuilder.BUILDER_ID)) {
-					id = (String) command.getArguments().get(
+					id = command.getArguments().get(
 							ExtensibleFeatureProjectBuilder.COMPOSER_KEY);
 					if (id != null)
 						return id;

@@ -161,11 +161,9 @@ public class ErrorPropagation {
 				IFile file = getComposedFile();
 				monitor.subTask(file.getName());
 				
-				if (file != null) {
-					ErrorPropagation prop = getErrorPropagation(file);
-					if (prop != null) {
-						prop.propagateMarkers(file);
-					}
+				ErrorPropagation prop = getErrorPropagation(file);
+				if (prop != null) {
+					prop.propagateMarkers(file);
 				}
 			}
 			composedFilesSize = 0;

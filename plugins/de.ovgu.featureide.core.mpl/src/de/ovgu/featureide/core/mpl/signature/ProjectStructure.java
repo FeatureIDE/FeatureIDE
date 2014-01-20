@@ -163,8 +163,8 @@ public class ProjectStructure {
 	
 	public double similarityTo(ProjectStructure otherSig) {
 		int[] countedMembers = countEqMembers(classList, otherSig.classList);
-		double eqMemberCount = (double) countedMembers[0];
-		double memberCount = (double) countedMembers[1];
+		double eqMemberCount = countedMembers[0];
+		double memberCount = countedMembers[1];
 		
 		final int rf = 1000;
 

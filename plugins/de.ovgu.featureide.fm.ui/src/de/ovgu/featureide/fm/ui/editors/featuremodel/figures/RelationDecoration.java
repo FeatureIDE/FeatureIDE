@@ -129,7 +129,7 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 			if (vertical){
 				r.shrink(1,1);
 				if(highestAngle2<270)
-					graphics.fillArc(r.x-20,r.y+10,r.width,r.height,(int) 270, (int) (180));
+					graphics.fillArc(r.x-20,r.y+10,r.width,r.height,270, (180));
 				else
 					graphics.fillArc(r.x-20,r.y+10,r.width,r.height,(int) highestAngle1, (int) (highestAngle2 - highestAngle1));	
 			} else { 
@@ -189,7 +189,7 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 			if (vertical){
 				r.shrink(2,2);
 				if(highestAngle2<270)
-					graphics.drawArc(r.x-20,r.y,r.width,r.height,(int) 270, (int) (180));
+					graphics.drawArc(r.x-20,r.y,r.width,r.height,270, (180));
 				else
 				    graphics.drawArc(r.x-20,r.y,r.width,r.height,(int) highestAngle1, (int) (highestAngle2 - highestAngle1));
 			} else {  if(highestAngle1>360)

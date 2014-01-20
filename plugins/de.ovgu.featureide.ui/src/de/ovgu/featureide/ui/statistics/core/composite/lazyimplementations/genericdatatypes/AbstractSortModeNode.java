@@ -78,9 +78,8 @@ public abstract class AbstractSortModeNode extends LazyParent implements IToolTi
 		if (hasChildren()) {
 			if (sortByValue) {
 				return "Double-click to sort in alphabetical order";
-			} else {
-				return "Double-click to sort by value in descending order";
 			}
+			return "Double-click to sort by value in descending order";
 		}
 		return null;
 	}
