@@ -278,7 +278,7 @@ public class Munge {
 
     private void checkNesting() {
         if (stack.size() > 1) {
-            printing = (Boolean) stack.peek() && printing;
+            printing = stack.peek() && printing;
         }
     }
 
@@ -308,7 +308,7 @@ public class Munge {
     }
 
     void cmd_end() throws EmptyStackException {
-        Boolean b = (Boolean)stack.pop();
+        Boolean b = stack.pop();
         printing = b.booleanValue();
     }
 
@@ -443,8 +443,8 @@ public class Munge {
 
     void substitute() {
         for (int i = 0; i < oldTextStrings.size(); i++) {
-            String oldText = (String)oldTextStrings.elementAt(i);
-            String newText = (String)newTextStrings.elementAt(i);
+            String oldText = oldTextStrings.elementAt(i);
+            String newText = newTextStrings.elementAt(i);
             int n;
             while ((n = source.indexOf(oldText)) >= 0) {
                 source = source.substring(0, n) + newText + 

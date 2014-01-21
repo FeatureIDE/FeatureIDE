@@ -76,7 +76,7 @@ public class AddRoleAction extends Action {
 		}
 
 		NewFeatureIDEFileWizard wizard = new NewFeatureIDEFileWizard();
-		wizard.init(PlatformUI.getWorkbench(), (IStructuredSelection) selection, feature, clss);
+		wizard.init(PlatformUI.getWorkbench(), selection, feature, clss);
 
 		WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
 		dialog.create();

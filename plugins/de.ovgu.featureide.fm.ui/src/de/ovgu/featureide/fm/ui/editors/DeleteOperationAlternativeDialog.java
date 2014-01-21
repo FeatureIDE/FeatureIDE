@@ -313,11 +313,11 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 			@Override
 			public void handleEvent(Event event) {				
 				final Collection<Feature> l = new ArrayList<Feature>();
-				l.addAll(featureMap.get((Feature)(alternativefeatureTable.getSelection()[0]).getData()));
+				l.addAll(featureMap.get((alternativefeatureTable.getSelection()[0]).getData()));
 				for (int i = 0; i < alternativefeatureTable.getSelectionCount(); i++ ) {
 					
-					if (!featureMap.get((Feature)(alternativefeatureTable.getSelection()[0]).getData()).equals(
-							featureMap.get((Feature)(alternativefeatureTable.getSelection()[i]).getData()))) {
+					if (!featureMap.get((alternativefeatureTable.getSelection()[0]).getData()).equals(
+							featureMap.get((alternativefeatureTable.getSelection()[i]).getData()))) {
 						l.clear();
 						break;
 					}

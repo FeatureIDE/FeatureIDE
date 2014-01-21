@@ -98,7 +98,7 @@ public class FmTreeContentProvider implements ITreeContentProvider {
 			return null;
 
 		// we have a String as parent of constraints
-		if (parentElement instanceof String && "Constraints".equals((String)parentElement)) {
+		if (parentElement instanceof String && "Constraints".equals(parentElement)) {
 			Object[] elements = new Object[fModel.getConstraintCount()];
 			List<Constraint> cList = fModel.getConstraints();
 			for (int i = 0; i < fModel.getConstraintCount(); i++) {
@@ -177,7 +177,7 @@ public class FmTreeContentProvider implements ITreeContentProvider {
 		else if (element instanceof FmOutlineGroupStateStorage)
 			return true;
 		else if (element instanceof String)
-			if ("Constraints".equals((String) element))
+			if ("Constraints".equals(element))
 				return fModel.getConstraintCount() > 0;
 
 		return false;

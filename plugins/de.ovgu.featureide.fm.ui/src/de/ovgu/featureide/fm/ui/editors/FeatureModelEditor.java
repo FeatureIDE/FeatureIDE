@@ -302,7 +302,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		ObjectUndoContext undoContext = new ObjectUndoContext(this);
 		featureModel.setUndoContext(undoContext);
 
-		printAction = new FMPrintAction((IWorkbenchPart)this);
+		printAction = new FMPrintAction(this);
 		selectAllAction = new SelectAllAction(this);
 
 		IWorkbenchPartSite site = this.getSite();

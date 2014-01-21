@@ -98,7 +98,7 @@ public class Parent implements StatisticsIds, GUIDefaults {
 		if (sorted) {
 			sortChildren();
 		}
-		return (Parent[]) children.toArray(new Parent[children.size()]);
+		return children.toArray(new Parent[children.size()]);
 	}
 	
 	protected void sortChildren() {

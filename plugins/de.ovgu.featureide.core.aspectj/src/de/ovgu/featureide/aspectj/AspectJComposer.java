@@ -486,14 +486,13 @@ public class AspectJComposer extends ComposerExtensionClass {
 				aspectPackage = aspectPackage + "." + text;
 			}
 			return getAspectFile(aspect.substring(text.length() + 1), aspectPackage, folder.getFolder(text));
-		} else {
-			try {
-				createFolder(folder);
-			} catch (CoreException e) {
-				AspectJCorePlugin.getDefault().logError(e);
-			}
-			return folder.getFile(text + ".aj");
 		}
+		try {
+			createFolder(folder);
+		} catch (CoreException e) {
+			AspectJCorePlugin.getDefault().logError(e);
+		}
+		return folder.getFile(text + ".aj");
 	}
  
 	private void createAspect(String aspect, IFolder folder, String aspectPackage) {

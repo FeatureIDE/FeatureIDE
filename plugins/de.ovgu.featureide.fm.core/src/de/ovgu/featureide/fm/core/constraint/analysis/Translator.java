@@ -229,7 +229,7 @@ public class Translator {
 		
 		for (Constraint fmConstraint : fmConstraints) {
 			
-			Node cnfNode = ((Node) fmConstraint.getNode().clone()).toCNF();
+			Node cnfNode = fmConstraint.getNode().clone().toCNF();
 				
 			if (cnfNode instanceof Literal) {
 				literal2Constraint(map, rs, (Literal) cnfNode, factory);

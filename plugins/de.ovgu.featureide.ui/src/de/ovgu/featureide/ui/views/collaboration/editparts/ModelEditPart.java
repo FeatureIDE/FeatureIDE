@@ -156,9 +156,9 @@ public class ModelEditPart extends AbstractGraphicalEditPart implements GUIDefau
 	protected void removeChildVisual(EditPart childEditPart) {
 		super.removeChildVisual(childEditPart);
 		if (childEditPart instanceof CollaborationEditPart) {
-			collaborationEditPartList.remove((CollaborationEditPart) childEditPart);
+			collaborationEditPartList.remove(childEditPart);
 		} else if (childEditPart instanceof ClassEditPart) {
-			classEditPartList.remove((ClassEditPart) childEditPart);
+			classEditPartList.remove(childEditPart);
 		}
 	}
 
@@ -260,7 +260,7 @@ public class ModelEditPart extends AbstractGraphicalEditPart implements GUIDefau
 	private void setHeightForCollaborationFigures(Map<String, Integer> heightMap, CollaborationEditPart collaborationEditPart,
 			CollaborationEditPart lastCollaborationEditPart) {
 		if (lastCollaborationEditPart != null) {
-			Rectangle constraint = getConstraintForEditPart((GraphicalEditPart) lastCollaborationEditPart);
+			Rectangle constraint = getConstraintForEditPart(lastCollaborationEditPart);
 			String name = ((FSTFeature) lastCollaborationEditPart.getModel()).getName();
 			Rectangle rect = new Rectangle(constraint);
 
@@ -284,7 +284,7 @@ public class ModelEditPart extends AbstractGraphicalEditPart implements GUIDefau
 			}
 			rect.height = height;
 
-			this.setLayoutConstraint(((CollaborationEditPart) collaborationEditPart), collaborationEditPart.getFigure(), rect);
+			this.setLayoutConstraint(collaborationEditPart, collaborationEditPart.getFigure(), rect);
 		}
 	}
 

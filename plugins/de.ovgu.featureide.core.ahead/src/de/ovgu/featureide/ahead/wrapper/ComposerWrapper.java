@@ -502,7 +502,7 @@ public class ComposerWrapper {
 	}
 
 	private boolean isSelectedFeature(IFolder folder) {
-		if (featureProject.getSourceFolder().equals((IFolder)folder.getParent())) {
+		if (featureProject.getSourceFolder().equals(folder.getParent())) {
 			if (featureFolders.contains(folder)) {
 				return true;
 			}

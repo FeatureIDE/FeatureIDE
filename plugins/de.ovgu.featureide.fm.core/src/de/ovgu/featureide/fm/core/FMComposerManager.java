@@ -76,7 +76,7 @@ public class FMComposerManager implements IFMComposerExtension {
 		try {
 			for (ICommand command : project.getDescription().getBuildSpec()) {
 				if (BUILDER_ID.equals(command.getBuilderName())) {
-					return (String) command.getArguments().get(argument);
+					return command.getArguments().get(argument);
 				}
 			}
 		} catch (CoreException e) {
@@ -97,7 +97,7 @@ public class FMComposerManager implements IFMComposerExtension {
 			
 			for (ICommand command : project.getDescription().getBuildSpec()) {
 				if (BUILDER_ID.equals(command.getBuilderName())) {
-					id = (String) command.getArguments().get(COMPOSER_KEY);
+					id = command.getArguments().get(COMPOSER_KEY);
 					if (id != null) {
 						composerId = id;
 						return;
