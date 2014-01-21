@@ -61,7 +61,7 @@ protected static File MODEL_FILE_FOLDER = getFolder();
 	
 	
 	private static File getFolder() { 
-		File folder =  new File("/vol1/teamcity_itidb/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/analyzefeaturemodels/"); 
+		File folder =  new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/analyzefeaturemodels/"); 
 		if (!folder.canRead()) { 
 			folder =  new File(ClassLoader.getSystemResource("analyzefeaturemodels").getPath()); 
 		} 
@@ -72,7 +72,7 @@ protected static File MODEL_FILE_FOLDER = getFolder();
 	private final FeatureModel init(String name) {
 		FeatureModel fm = new FeatureModel();
 		FeatureModelingFMExtension comp = new FeatureModelingFMExtension();
-		fm.setComposerID("de.ovgu.featureide.core.FeatureModeling", comp);
+		fm.getFMComposerManager(null).setComposerID("de.ovgu.featureide.core.FeatureModeling", comp);
 		for (File f : MODEL_FILE_FOLDER.listFiles(filter)) {
 			if (f.getName().equals(name)) {
 				try {

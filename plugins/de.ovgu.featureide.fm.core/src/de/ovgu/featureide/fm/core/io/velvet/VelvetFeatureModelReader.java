@@ -36,7 +36,10 @@ import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.Tree;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.prop4j.And;
 import org.prop4j.Choose;
 import org.prop4j.Equals;
@@ -175,6 +178,21 @@ public class VelvetFeatureModelReader
 			children.add(root.getChild(i));
 		}
 		return children;
+	}
+
+	/**
+	 * Returns the eclipse project of the file with the textual representation
+	 * of the feature model
+	 * 
+	 * @return the project of the file or null if not known
+	 */
+	protected IProject getProject() {
+		if (featureModelFile == null)
+			return null;
+
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IPath filePath = Path.fromOSString(featureModelFile.getAbsolutePath());
+		return workspace.getRoot().getFile(filePath).getProject();
 	}
 
 	/**
@@ -582,9 +600,7 @@ public class VelvetFeatureModelReader
 		final ExtendedFeatureModel interf = new ExtendedFeatureModel();
 		final VelvetFeatureModelReader interfaceReader = new VelvetFeatureModelReader(interf);
 
-		// FIXME hardcodet project name
-		final String projectname = "test";
-		final IProject parent = ResourcesPlugin.getWorkspace().getRoot().getProject(projectname);
+		final IProject parent = getProject();
 		final IResource res = parent.findMember(format("MPL/%s.velvet", interfaceName));
 		final File file = res.getLocation().toFile();
 

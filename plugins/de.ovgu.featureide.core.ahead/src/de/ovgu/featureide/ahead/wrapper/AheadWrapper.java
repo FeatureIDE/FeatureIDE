@@ -156,11 +156,14 @@ public class AheadWrapper {
 										} else {
 											AheadBuildErrorEvent buildError = new AheadBuildErrorEvent(file, marker.getAttribute(IMarker.MESSAGE).toString(), AheadBuildErrorType.JAVAC_ERROR, (Integer)marker.getAttribute(IMarker.LINE_NUMBER));
 											if (!hasMarker(buildError)) {
-												IMarker newMarker = buildError.getResource().createMarker(BUILDER_PROBLEM_MARKER);
-												if (newMarker.exists()) {
-													newMarker.setAttribute(IMarker.LINE_NUMBER, buildError.getLine());
-													newMarker.setAttribute(IMarker.MESSAGE, buildError.getMessage());
-													newMarker.setAttribute(IMarker.SEVERITY, marker.getAttribute(IMarker.SEVERITY));
+												IResource res = buildError.getResource();
+												if (res.exists()) {
+													IMarker newMarker = res.createMarker(BUILDER_PROBLEM_MARKER);
+													if (newMarker.exists()) {
+														newMarker.setAttribute(IMarker.LINE_NUMBER, buildError.getLine());
+														newMarker.setAttribute(IMarker.MESSAGE, buildError.getMessage());
+														newMarker.setAttribute(IMarker.SEVERITY, marker.getAttribute(IMarker.SEVERITY));
+													}
 												}
 											}
 										}

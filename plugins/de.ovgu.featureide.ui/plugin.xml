@@ -1102,4 +1102,9 @@
             content="Intro_Extension/tutorial_page.xml">
       </configExtension>
      </extension>
+	<extension point="org.eclipse.ui.ide.markerResolution">
+      <markerResolutionGenerator
+         markerType="de.ovgu.featureide.core.configurationProblemMarker"
+         class="de.ovgu.featureide.ui.quickfix.ConfigurationQuickFixHandler"/>
+    </extension>
 </plugin>

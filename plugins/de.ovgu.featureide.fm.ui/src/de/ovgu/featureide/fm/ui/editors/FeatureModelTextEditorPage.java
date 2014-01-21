@@ -22,11 +22,14 @@ package de.ovgu.featureide.fm.ui.editors;
 
 import java.beans.PropertyChangeEvent;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.editors.text.TextEditor;
+import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.sat4j.specs.TimeoutException;
 
@@ -94,6 +97,13 @@ public class FeatureModelTextEditorPage extends TextEditor implements
 		String text = document.get();
 		featureModelEditor.fmFile.deleteAllModelMarkers();
 		try {
+			IEditorInput input = getEditorInput();
+			if (input instanceof FileEditorInput) {
+				IFile file = ((FileEditorInput) input).getFile();
+				featureModelEditor.featureModelReader.setFile(file
+						.getFullPath().toFile());
+			}
+
 			featureModelEditor.featureModelReader.readFromString(text);
 			for (ModelWarning warning : featureModelEditor.featureModelReader.getWarnings())
 				featureModelEditor.fmFile.createModelMarker(warning.message,
@@ -159,7 +169,7 @@ public class FeatureModelTextEditorPage extends TextEditor implements
 			updateTextEditor();
 		}
 			
-		if (featureModelEditor.featureModel.isRenamed()) {
+		if (featureModelEditor.featureModel.getRenamingsManager().isRenamed()) {
 			featureModelEditor.saveModelForConsistentRenamings();
 		}
 	}

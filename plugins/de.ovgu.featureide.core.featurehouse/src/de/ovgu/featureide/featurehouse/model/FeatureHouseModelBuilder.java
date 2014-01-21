@@ -26,6 +26,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 
 import de.ovgu.cide.fstgen.ast.FSTNode;
@@ -38,6 +41,7 @@ import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.featurehouse.FeatureHouseComposer;
+import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
 
 /**
  * This builder builds the {@link FSTModel} for FeatureHouse projects, 
@@ -63,7 +67,10 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 		if (featureProject == null) {
 			return;
 		}
-		model = new FSTModel(featureProject);
+		model = featureProject.getFSTModel();
+		if (model == null) {
+			model = new FSTModel(featureProject);
+		}
 		featureProject.setFSTModel(model);
 		this.featureProject = featureProject;
 	}
@@ -117,8 +124,34 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 				caseClassDeclaration(node);
 			}
 		}
+		
+		addArbitraryFiles();
 	}
 	
+	private void addArbitraryFiles() {
+		IFolder folder = featureProject.getSourceFolder();
+		for (String feature : featureProject.getFeatureModel().getConcreteFeatureNames()) {
+			IFolder featureFolder = folder.getFolder(feature);
+			addArbitraryFiles(featureFolder, feature);
+		}
+	}
+
+	private void addArbitraryFiles(IFolder featureFolder, String feature) {
+		try {
+			for (IResource res : featureFolder.members()) {
+				if (res instanceof IFolder) {
+					addArbitraryFiles((IFolder)res, feature);
+				} else if (res instanceof IFile) {
+					if (!featureProject.getComposer().extensions().contains(res.getFileExtension())) {
+						model.addArbitraryFile(feature, (IFile) res);
+					}
+				}
+			}
+		} catch (CoreException e) {
+			FeatureHouseCorePlugin.getDefault().logError(e);
+		}
+	}
+
 	private void caseCompileUnit(FSTNode node) {
 		node.accept(new FSTVisitor(){
 			 public boolean visit(FSTTerminal terminal){
@@ -224,10 +257,13 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 					caseClassDeclaration(child);
 				}
 			}
-			FSTClassFragment curClassFragment = classFragmentStack.pop();
-			if (classFragmentStack.isEmpty() 
-					&& curClassFragment.getPackage() == null) {
-//				curClassFragment.setPackage(currentFile.getParent().getName());
+			
+			if (!classFragmentStack.isEmpty()) {
+//				FSTClassFragment curClassFragment = 
+					classFragmentStack.pop();
+//				if (classFragmentStack.isEmpty() && curClassFragment.getPackage() == null) {
+//	//				curClassFragment.setPackage(currentFile.getParent().getName());
+//				}
 			}
 		}
 	}

@@ -1,3 +1,5 @@
+package GPL;
+
 public class Vertex {
     public void addWeight( Vertex end, int theWeight ) 
     {

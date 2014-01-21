@@ -22,10 +22,12 @@ package de.ovgu.featureide.ui.editors.annotation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Set;
 import java.util.Vector;
 
 import org.eclipse.core.resources.IFile;
@@ -77,7 +79,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 	private LinkedList<FSTDirective> validDirectiveList = new LinkedList<FSTDirective>();
 
 	/** List of registered IAnnotationModelListener */
-	private List<IAnnotationModelListener> annotationModelListeners = new ArrayList<IAnnotationModelListener>(2);
+	private Set<IAnnotationModelListener> annotationModelListeners = new HashSet<IAnnotationModelListener>(2);
 
 	private final IDocument document;
 	private final IFeatureProject project;

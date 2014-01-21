@@ -157,7 +157,7 @@ public class BuildStatisticsJob extends AMonitorJob {
 		setMaxAbsoluteWork(allConcreteFeatures.size() + 2);
 		
 		StringBuilder fmSb = new StringBuilder("NumFeatures;Abstract;Concrete;And;Or;Alt;Mandatory;Optional;OrChildren;AltChildren\n");
-		int[] fmStatNumbers = fm.getStatisticNumbers();
+		int[] fmStatNumbers = getStatisticNumbers(fm);
 		fmSb.append(fmStatNumbers[0]);
 		for (int i = 1; i < fmStatNumbers.length; i++) {
 			fmSb.append(';');
@@ -422,5 +422,36 @@ public class BuildStatisticsJob extends AMonitorJob {
 			}
 		}
 		return new LinkedList[]{new LinkedList<AbstractSignature>(testSet), otherMembers};
+	}
+	
+	public int[] getStatisticNumbers(FeatureModel fm) {
+		int cAbstract = 0, cConcrete = 0, cMandatory = 0, cOptional = 0, cAnd = 0, cOr = 0, cOrChildren = 0, cAlt = 0, cAltChildren = 0;
+		for (Feature f : fm.getFeatures()) {
+			if (f.isConcrete()) {
+				cConcrete++;
+			} else {
+				cAbstract++;
+			}
+			if (f.isMandatorySet()) {
+				if (f.getParent() == null || f.getParent().isAnd() || f.getParent().getChildrenCount() == 1) {
+					cMandatory++;
+				}
+			} else if (f.getParent() != null && f.getParent().isAnd()) {
+				cOptional++;
+			}
+			int cChildren = f.getChildrenCount();
+			if (cChildren > 1) {
+				if (f.isAlternative()) {
+					cAlt++;
+					cAltChildren += cChildren;
+				} else if (f.isOr()) {
+					cOr++;
+					cOrChildren += cChildren;
+				} else if (f.isAnd()) {
+					cAnd++;
+				}
+			}
+		}
+		return new int[]{fm.getFeatures().size(), cAbstract, cConcrete, cAnd, cOr, cAlt, cMandatory, cOptional, cOrChildren, cAltChildren};
 	}
 }

@@ -29,6 +29,8 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.core.JavaProject;
 
+import beaver.Symbol;
+
 import AST.ASTNode;
 import AST.Access;
 import AST.BodyDecl;
@@ -243,7 +245,7 @@ public class FujiJob extends AMonitorJob {
 							featurename = getFeatureName(bodyDecl);
 							addFeatureID(new FujiMethodSignature(curClassSig,
 									name, modifierString, type, false,
-									parameterList, exceptionList),
+									parameterList, exceptionList, Symbol.getLine(method.getStart())),
 									interfaceProject.getFeatureID(featurename));
 
 						} else if (bodyDecl instanceof FieldDeclaration) {
@@ -275,7 +277,7 @@ public class FujiJob extends AMonitorJob {
 								addFeatureID(new FujiMethodSignature(
 										curClassSig, name, modifierString,
 										type, true, parameterList,
-										exceptionList),
+										exceptionList, 100),
 										interfaceProject
 												.getFeatureID(featurename));
 							}

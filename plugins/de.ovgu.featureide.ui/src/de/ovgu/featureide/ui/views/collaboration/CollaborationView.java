@@ -24,6 +24,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.List;
+import java.util.Vector;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -74,12 +75,16 @@ import org.eclipse.ui.progress.UIJob;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtension;
+import de.ovgu.featureide.core.fstmodel.FSTConfiguration;
+import de.ovgu.featureide.core.fstmodel.FSTFeature;
+import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.listeners.ICurrentBuildListener;
 import de.ovgu.featureide.fm.core.ColorList;
 import de.ovgu.featureide.fm.core.ColorschemeTable;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.StoppableJob;
+import de.ovgu.featureide.fm.core.WaitingJob;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GEFImageWriter;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.editors.annotation.ColorPalette;
@@ -95,8 +100,6 @@ import de.ovgu.featureide.ui.views.collaboration.action.ShowFieldsMethodsAction;
 import de.ovgu.featureide.ui.views.collaboration.action.ShowUnselectedAction;
 import de.ovgu.featureide.ui.views.collaboration.editparts.CollaborationEditPart;
 import de.ovgu.featureide.ui.views.collaboration.editparts.GraphicalEditPartFactory;
-import de.ovgu.featureide.ui.views.collaboration.model.Collaboration;
-import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModel;
 import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModelBuilder;
 
 /**
@@ -111,12 +114,12 @@ import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModelBuilder
  */
 public class CollaborationView extends ViewPart implements GUIDefaults, ICurrentBuildListener, ISaveablePart {
 
+	private static final String UPDATE_COLLABORATION_VIEW = "Update Collaboration View";
+
 	public static final String ID = UIPlugin.PLUGIN_ID + ".views.collaboration.Collaboration";
 	
 	private static final String OPEN_MESSAGE = "Open a file from a FeatureIDE project";
-	// private static final String CONFIGURATION_MESSAGE =
-	// "Please create a new configuration file";
-	
+
 	private static final String ADD_LABEL = "Add new Class / Role";
 	private static final String DELETE_LABEL = "Delete";
 	private static final String FILTER_LABEL = "Filter";
@@ -130,12 +133,11 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	private static final Image[] FIELD_METHOD_IMAGES = { null, null, null, IMAGE_METHODE_PUBLIC, IMAGE_METHODE_PROTECTED, IMAGE_METHODE_DEFAULT,
 			IMAGE_METHODE_PRIVATE, null, null };
 	
-	private static final String[] extensions = { "*.png", "*.jpg", "*.bmp" };
-	private static final String[] filterNames = { "Portable Network Graphics *.png", "JPEG *.jpg", "Windows Bitmap *.bmp" };
+	private static final String[] EXPORT_EXTENSIONS = { "*.png", "*.jpg", "*.bmp" };
+	private static final String[] FILDER_NAMES = { "Portable Network Graphics *.png", "JPEG *.jpg", "Windows Bitmap *.bmp" };
 	
 	private GraphicalViewerImpl viewer;
-	public CollaborationModelBuilder builder = new CollaborationModelBuilder();
-	private CollaborationModel model = new CollaborationModel();
+	private CollaborationModelBuilder builder = new CollaborationModelBuilder();
 	
 	private AddRoleAction addRoleAction;
 	private DeleteAction delAction;
@@ -152,6 +154,50 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	
 	private SetColorAction[] setColorActions = new SetColorAction[ColorPalette.COLOR_COUNT];
 	private ShowFieldsMethodsAction[] setFieldsMethodsActions = new ShowFieldsMethodsAction[FIELD_METHOD_LABEL_NAMES.length];
+
+	private final Vector<IFile> configurations = new Vector<IFile>();
+	private final Job updateGUIJob = new WaitingJob(UPDATE_COLLABORATION_VIEW) {
+		
+		public IStatus execute(IProgressMonitor monitor) {
+			if (configurations.isEmpty()) {
+				toolbarAction.setEnabled(true);
+				return Status.OK_STATUS;
+			}
+			IFile configurationFile = configurations.lastElement();
+			configurations.clear();
+			if (configurationFile != null && CollaborationModelBuilder.editorFile != null) {
+				builder.configuration = configurationFile;
+			}
+			final FSTModel model = builder.buildCollaborationModel(CorePlugin.getFeatureProject(configurationFile));
+			if (model == null) {
+				toolbarAction.setEnabled(true);
+				return Status.OK_STATUS;
+			}
+			
+			if (!configurations.isEmpty()) {
+				return Status.OK_STATUS;
+			}
+			UIJob uiJob = new UIJob(UPDATE_COLLABORATION_VIEW) {
+				public IStatus runInUIThread(IProgressMonitor monitor) {
+					viewer.setContents(model);
+					EditPart part = viewer.getContents();
+					if (part != null) {
+						part.refresh();
+					}
+					toolbarAction.setEnabled(true);
+					return Status.OK_STATUS;
+				}
+			};
+			uiJob.setPriority(Job.SHORT);
+			uiJob.schedule();
+			try {
+				uiJob.join();
+			} catch (InterruptedException e) {
+				UIPlugin.getDefault().logError(e);
+			}
+			return Status.OK_STATUS;
+		}
+	};
 	
 	private IFeatureProject featureProject;
 	
@@ -231,9 +277,8 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		getSite().getPage().addPartListener(editorListener); // EditorListener
 		CorePlugin.getDefault().addCurrentBuildListener(this); // BuildListener
 		
-		ScalableFreeformRootEditPart rootEditPart = new ScalableFreeformRootEditPart(); // required
-		// for
-		// borders
+		// required for borders
+		ScalableFreeformRootEditPart rootEditPart = new ScalableFreeformRootEditPart();
 		((ConnectionLayer) rootEditPart.getLayer(LayerConstants.CONNECTION_LAYER)).setAntialias(SWT.ON);
 		
 		viewer.setRootEditPart(rootEditPart);
@@ -301,28 +346,32 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				
 				if (CorePlugin.getDefault().getConfigurationExtensions().contains(inputFile.getFileExtension())) {
 					// case: open configuration editor
-					builder.editorFile = null;
-					if (builder.configuration != null && builder.configuration.equals(inputFile) && featureProject.equals(builder.project)) {
+					CollaborationModelBuilder.editorFile = null;
+					if (builder.configuration != null && builder.configuration.equals(inputFile) && featureProject.equals(CollaborationModelBuilder.project)) {
 						return;
 					} else {
 						builder.configuration = inputFile;
 					}
 				} else {
 					// case: open editor is no configuration editor
-					if (builder.editorFile != null && builder.editorFile.getName().equals(inputFile.getName())
-							&& featureProject.getProject().equals(builder.editorFile.getProject())) {
+					if (CollaborationModelBuilder.editorFile != null && CollaborationModelBuilder.editorFile.getName().equals(inputFile.getName())
+							&& featureProject.getProject().equals(CollaborationModelBuilder.editorFile.getProject())) {
 						return;
 					}
-					builder.editorFile = inputFile;
+					CollaborationModelBuilder.editorFile = inputFile;
 					builder.configuration = featureProject.getCurrentConfiguration();
 				}
 			}
 		}
 		
 		if (featureProject == null) {
-			model = new CollaborationModel();
-			model.collaborations.add(new Collaboration(OPEN_MESSAGE));
+			FSTModel model = new FSTModel(null);
+			model.setConfiguration(new FSTConfiguration(OPEN_MESSAGE, null, false));
 			viewer.setContents(model);
+			EditPart content = viewer.getContents();
+			if (content != null) {
+				content.refresh();
+			}
 		} else {
 			updateGuiAfterBuild(featureProject, null);
 		}
@@ -347,6 +396,9 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	}
 	
 	private void fillContextMenu(IMenuManager menuMgr) {
+		if (featureProject == null) {
+			return;
+		}
 		boolean isNotEmpty = !viewer.getSelection().isEmpty();
 		addRoleAction.setEnabled(isNotEmpty);
 		filterAction.setEnabled(isNotEmpty);
@@ -377,8 +429,8 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		
 		Object selection = ((IStructuredSelection) viewer.getSelection()).getFirstElement();
 		if (selection instanceof CollaborationEditPart) {
-			Collaboration coll = ((CollaborationEditPart) selection).getCollaborationModel();
-			if (!coll.isConfiguration) {
+			FSTFeature coll = ((CollaborationEditPart) selection).getCollaborationModel();
+			if (!(coll instanceof FSTConfiguration)) {
 				FeatureModel fm = featureProject.getFeatureModel();
 				ColorschemeTable colorschemeTable = fm.getColorschemeTable();
 				List<String> csNames = colorschemeTable.getColorschemeNames();
@@ -405,7 +457,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				colorSchemeSubMenu.add(addColorSchemeAction);
 				colorSchemeSubMenu.add(renameColorSchemeAction);
 				colorSchemeSubMenu.add(deleteColorSchemeAction);
-				
+				colorSubMenu.removeAll();
 				colorSubMenu.add(colorSchemeSubMenu);
 				colorSubMenu.add(new Separator());
 				
@@ -416,11 +468,9 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 					colorSubMenu.add(setColorActions[i]);
 				}
 				
-				if (coll.hasFeature()) {
-					int color = fm.getFeature(coll.getName()).getColorList().getColor();
-					if (ColorList.isValidColor(color)) {
-						setColorActions[color].setChecked(true);
-					}
+				int color = fm.getFeature(coll.getName()).getColorList().getColor();
+				if (ColorList.isValidColor(color)) {
+					setColorActions[color].setChecked(true);
 				}
 				
 				menuMgr.add(colorSubMenu);
@@ -463,9 +513,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 						if (!toolbarAction.isEnabled())
 							return Status.OK_STATUS;
 						toolbarAction.setEnabled(false);
-						built = true;
 						if (featureProject != null) {
-							// TODO @Jens check this method
 							IComposerExtension composer = featureProject.getComposer();
 							if (composer != null) {
 								composer.buildFSTModel();
@@ -481,8 +529,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		};
 	}
 	
-	private boolean built = true;
-	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -492,48 +538,21 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	 */
 	public void updateGuiAfterBuild(final IFeatureProject project, final IFile configurationFile) {
 		if (featureProject != null && featureProject.equals(project)) {
-			Job job = new StoppableJob("Build Collaboration Model") {
-				
-				public IStatus execute(IProgressMonitor monitor) {
-					if (built) {
-						built = false;
-						if (configurationFile != null && builder.editorFile != null) {
-							builder.configuration = configurationFile;
-						}
-						model = builder.buildCollaborationModel(project);
-						built = true;
-						if (model == null) {
-							toolbarAction.setEnabled(true);
-							return Status.OK_STATUS;
-						}
-						
-						UIJob uiJob = new UIJob("Update Collaboration View") {
-							public IStatus runInUIThread(IProgressMonitor monitor) {
-								viewer.setContents(model);
-								EditPart part = viewer.getContents();
-								if (part != null) {
-									part.refresh();
-								}
-								toolbarAction.setEnabled(true);
-								return Status.OK_STATUS;
-							}
-						};
-						uiJob.setPriority(Job.DECORATE);
-						uiJob.schedule();
-					}
-					return Status.OK_STATUS;
-				}
-			};
-			job.setPriority(Job.DECORATE);
-			job.schedule();
+			if (configurationFile == null) {
+				configurations.add(project.getCurrentConfiguration());
+			} else {
+				configurations.add(configurationFile);
+			}
+			updateGUIJob.setPriority(Job.LONG);
+			updateGUIJob.schedule();
 		}
 	}
 	
 	@Override
 	public void doSaveAs() {
 		FileDialog fileDialog = new FileDialog(this.getSite().getShell(), SWT.SAVE);
-		fileDialog.setFilterExtensions(extensions);
-		fileDialog.setFilterNames(filterNames);
+		fileDialog.setFilterExtensions(EXPORT_EXTENSIONS);
+		fileDialog.setFilterNames(FILDER_NAMES);
 		fileDialog.setOverwrite(true);
 		String filePath = fileDialog.open();
 		if (filePath == null)
@@ -570,9 +589,9 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	}
 	
 	public void refresh() {
-		model = this.builder.buildCollaborationModel(featureProject);
+		final FSTModel model = builder.buildCollaborationModel(featureProject);
 		if (model == null) {
-			UIPlugin.getDefault().logInfo("model loading error");
+			UIPlugin.getDefault().logWarning("model loading error");
 			return;
 		}
 		Display.getDefault().syncExec(new Runnable() {

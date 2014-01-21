@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.figures;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.FreeformLayout;
 import org.eclipse.draw2d.Label;
@@ -27,8 +28,9 @@ import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 
+import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
-import de.ovgu.featureide.ui.views.collaboration.model.Class;
+import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModelBuilder;
 
 /**
  * An instance of this class represents the graphical representation of the 
@@ -36,26 +38,27 @@ import de.ovgu.featureide.ui.views.collaboration.model.Class;
  * 
  * @author Constanze Adler
  */
-public class ClassFigure extends Figure implements GUIDefaults{
+public class ClassFigure extends Figure implements GUIDefaults {
 	
 	private final Label label = new Label();
-	private static int DEFAULT_WIDTH = 100;
 	private int height;
 
 	
-	public ClassFigure(Class c, int height) {
+	public ClassFigure(FSTClass c, int height) {
 		
 		super();
 		
 		this.setLayoutManager(new FreeformLayout());
 
-		if (c.isOpenEditor) {
+		IFile editorFile = CollaborationModelBuilder.editorFile;
+		
+		if (editorFile != null && c.getName().equals(editorFile.getName())) {
 			setBackgroundColor(OPEN_CLASS_BACKGROUND);
 			setBorder(CLASS_BORDER_SELECTED);
 		} else {
 			setBackgroundColor(CLASS_BACKGROUND);
 			setBorder(CLASS_BORDER);
-			
+	
 		}
 		
 		label.setForegroundColor(FOREGROUND);
@@ -73,8 +76,8 @@ public class ClassFigure extends Figure implements GUIDefaults{
 		label.setText(name);
 		Dimension labelSize = label.getPreferredSize();
 		
-		if (labelSize.width < DEFAULT_WIDTH)
-			labelSize.width = DEFAULT_WIDTH;
+		if (labelSize.width < DEFAULT_CLASS_WIDTH)
+			labelSize.width = DEFAULT_CLASS_WIDTH;
 		
 		if (labelSize.equals(label.getSize()))
 			return;

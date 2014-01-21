@@ -82,6 +82,7 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import fuji.CompilerWarningException;
 import fuji.Composition;
+import fuji.CompositionErrorException;
 import fuji.FeatureDirNotFoundException;
 import fuji.Main;
 import fuji.SemanticErrorException;
@@ -96,6 +97,7 @@ import fuji.SyntacticErrorException;
 @SuppressWarnings("restriction")
 public class FeatureHouseComposer extends ComposerExtensionClass {
 
+	private static final FeatureHouseCorePlugin LOGGER = FeatureHouseCorePlugin.getDefault();
 	private static final String CONTRACT_COMPOSITION_CONSECUTIVE_CONTRACT_REFINEMENT = "consecutive contract refinement";
 	private static final String CONTRACT_COMPOSITION_EXPLICIT_CONTRACT_REFINEMENT = "explicit contract refinement";
 	private static final String CONTRACT_COMPOSITION_CONTRACT_OVERRIDING = "contract overriding";
@@ -165,7 +167,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 					marker.setAttribute(IMarker.SEVERITY,
 							IMarker.SEVERITY_WARNING);
 				} catch (CoreException e2) {
-					FeatureHouseCorePlugin.getDefault().logError(e2);
+					LOGGER.logError(e2);
 				}
 
 			}
@@ -211,7 +213,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			marker.setAttribute(IMarker.MESSAGE, message);
 			marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
 		} catch (CoreException e) {
-			FeatureHouseCorePlugin.getDefault().logError(e);
+			LOGGER.logError(e);
 		}
 
 	}
@@ -229,7 +231,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 				message = message.substring(0, 65535 / 2);
 
 		} catch (UnsupportedEncodingException e) {
-			FeatureHouseCorePlugin.getDefault().logError(e);
+			LOGGER.logError(e);
 		}
 		return message;
 	}
@@ -279,7 +281,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 					try {
 						sourcefolder.create(true, true, null);
 					} catch (CoreException e) {
-						FeatureHouseCorePlugin.getDefault().logError(e);
+						LOGGER.logError(e);
 					}
 				}
 				IFile conf = featureProject.getCurrentConfiguration();
@@ -290,7 +292,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 						try {
 							sourcefolder.create(true, true, null);
 						} catch (CoreException e) {
-							FeatureHouseCorePlugin.getDefault().logError(e);
+							LOGGER.logError(e);
 						}
 						callCompiler();
 					}
@@ -375,7 +377,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 					, features);
 		} catch (TokenMgrError e) {
 		} catch (Error e) {
-			FeatureHouseCorePlugin.getDefault().logError(e);
+			LOGGER.logError(e);
 		}
 	}
 
@@ -417,7 +419,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 				}
 				cnfFile.setDerived(true);
 			} catch (CoreException e) {
-				FeatureHouseCorePlugin.getDefault().logError(e);
+				LOGGER.logError(e);
 			}
 			
 			String [] arguments = getArguments(configPath, basePath, outputPath, getContractParameter());
@@ -449,13 +451,13 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 				}
 				sPLModelCheckerFile.setDerived(true);
 			} catch (CoreException e) {
-				FeatureHouseCorePlugin.getDefault().logError(e);
+				LOGGER.logError(e);
 			}
 			
 		} catch (TokenMgrError e) {
 			
 		} catch (CoreException e) {
-			FeatureHouseCorePlugin.getDefault().logError(e);
+			LOGGER.logError(e);
 		}
 	}
 	
@@ -530,22 +532,24 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
                 }
                 
             }
+		} catch (CompositionErrorException e) {
+			createFujiMarker(-1, e.getMessage(), featureProject.getSourceFolder(), IMarker.SEVERITY_ERROR, featureProject);
 		} catch (IllegalArgumentException e) {
-			FeatureHouseCorePlugin.getDefault().logError(e);
+			LOGGER.logError(e);
 		} catch (org.apache.commons.cli.ParseException e) {
-			FeatureHouseCorePlugin.getDefault().logError(e);
+			LOGGER.logError(e);
 		} catch (IOException e) {
-			FeatureHouseCorePlugin.getDefault().logError(e);
+			LOGGER.logError(e);
 		} catch (FeatureDirNotFoundException e) {
-			FeatureHouseCorePlugin.getDefault().logError(e);
+			LOGGER.logError(e);
 		} catch (SyntacticErrorException e) {
-			FeatureHouseCorePlugin.getDefault().logError(e);
+			LOGGER.logError(e);
 		} catch (SemanticErrorException e) {
-			FeatureHouseCorePlugin.getDefault().logError(e);
+			LOGGER.logError(e);
 		} catch (CompilerWarningException e) {
-			FeatureHouseCorePlugin.getDefault().logError(e);
+			LOGGER.logError(e);
 		} catch (UnsupportedModelException e) {
-			FeatureHouseCorePlugin.getDefault().logError(e);
+			LOGGER.logError(e);
 		}
 	}
 
@@ -586,17 +590,28 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	protected static void createFujiMarker(int line, String message, String file, int severity, IFeatureProject featureProject) {
 		IFile iFile = featureProject.getProject().getWorkspace().getRoot().findFilesForLocationURI(
 				new File(file).toURI())[0];
+		createFujiMarker(line, message, iFile, severity, featureProject);
+	}
+	
+	/**
+	 * Creates an marker for fuji type checks. 
+	 * @param line The line number
+	 * @param message The message to disply
+	 * @param file The file
+	 * @param severity The severity of the marker (IMarker.SEVERITY_*)
+	 */
+	private static void createFujiMarker(int line, String message, IResource file, int severity, IFeatureProject featureProject) {
 		// TODO NEWLine does not work
 		message = message.replaceAll("\n", NEWLINE);
 		try {
-			IMarker marker = iFile.createMarker(FeatureHouseCorePlugin.BUILDER_PROBLEM_MARKER);
+			IMarker marker = file.createMarker(FeatureHouseCorePlugin.BUILDER_PROBLEM_MARKER);
 			marker.setAttribute(IMarker.LINE_NUMBER, line);
 			marker.setAttribute(IMarker.MESSAGE, "fuji: " + message);
 			marker.setAttribute(IMarker.SEVERITY, severity);
 		} catch (CoreException e) {
-			FeatureHouseCorePlugin.getDefault().logError(e);
+			LOGGER.logError(e);
 		}
-
+		
 	}
 	
 
@@ -613,7 +628,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 				buildFolder.create(true, true, null);
 				buildFolder.refreshLocal(IResource.DEPTH_ZERO, null);
 			} catch (CoreException e) {
-				FeatureHouseCorePlugin.getDefault().logError(e);
+				LOGGER.logError(e);
 			}
 		}
 	}
@@ -660,7 +675,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			newEntrys[newEntrys.length - 1] = sourceEntry;
 			javaProject.setRawClasspath(newEntrys, null);
 		} catch (JavaModelException e) {
-			FeatureHouseCorePlugin.getDefault().logError(e);
+			LOGGER.logError(e);
 		}
 	}
 
@@ -691,7 +706,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		} catch (TokenMgrError e) {
 			createBuilderProblemMarker(getTokenMgrErrorLine(e.getMessage()), getTokenMgrErrorMessage(e.getMessage()));
 		} catch (Error e) {
-			FeatureHouseCorePlugin.getDefault().logError(e);
+			LOGGER.logError(e);
 		}
 		ArrayList<FSTNode> fstnodes = composer.getFstnodes();
 		if (fstnodes != null) {
@@ -767,7 +782,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 						iClasspathFile.touch(monitor);
 						iClasspathFile.refreshLocal(IResource.DEPTH_ZERO, monitor);
 					} catch (CoreException e) {
-						FeatureHouseCorePlugin.getDefault().logError(e);
+						LOGGER.logError(e);
 					}
 				}
 				return Status.OK_STATUS;
@@ -808,7 +823,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 				}
 			}
 		} catch (CoreException e) {
-			FeatureHouseCorePlugin.getDefault().logError(e);
+			LOGGER.logError(e);
 		}
 		return false;
 	}
@@ -865,7 +880,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			}
 			errorPropagation.addFile(file);
 		} catch (CoreException e) {
-			FeatureHouseCorePlugin.getDefault().logError(e);
+			LOGGER.logError(e);
 		}
 	}
 
@@ -906,7 +921,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		} catch (TokenMgrError e) {
 			createBuilderProblemMarker(getTokenMgrErrorLine(e.getMessage()), getTokenMgrErrorMessage(e.getMessage()));
 		} catch (Error e) {
-			FeatureHouseCorePlugin.getDefault().logError(e);
+			LOGGER.logError(e);
 		}
 		
 		ArrayList<FSTNode> fstnodes = composer.getFstnodes();
@@ -936,7 +951,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			try {
 				errorPropagation.job.join();
 			} catch (InterruptedException e) {
-				FeatureHouseCorePlugin.getDefault().logError(e);
+				LOGGER.logError(e);
 			}
 		}
 		fhModelBuilder.buildModel(composer.getFstnodes(), false);
@@ -944,7 +959,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			try {
 				configurationFile.move(((IFolder)configurationFile.getParent()).getFile(congurationName + '.' + getConfigurationExtension()).getFullPath(), true, null);
 			} catch (CoreException e) {
-				FeatureHouseCorePlugin.getDefault().logError(e);
+				LOGGER.logError(e);
 			}
 		}
 	}

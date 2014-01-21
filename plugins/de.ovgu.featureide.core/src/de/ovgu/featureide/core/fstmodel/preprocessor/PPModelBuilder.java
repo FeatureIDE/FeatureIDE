@@ -23,6 +23,7 @@ package de.ovgu.featureide.core.fstmodel.preprocessor;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.Vector;
 
@@ -34,6 +35,7 @@ import org.eclipse.core.runtime.CoreException;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.preprocessor.PPComposerExtensionClass;
+import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
@@ -48,7 +50,7 @@ public class PPModelBuilder {
 
 	protected FSTModel model;
 	private IFeatureProject featureProject;
-	private LinkedList<String> featureNames = new LinkedList<String>();
+	private List<String> featureNames = new LinkedList<String>();
 	
 	public PPModelBuilder(IFeatureProject featureProject) {
 		model = new FSTModel(featureProject);
@@ -87,14 +89,20 @@ public class PPModelBuilder {
 				String className = packageName.isEmpty() ? res.getName() : packageName + "/" + res.getName();
 	
 				Vector<String> lines = PPComposerExtensionClass.loadStringsFromFile((IFile) res);
+				boolean classAdded = false;
 				for (String feature : featureNames) {
 					if (containsFeature(text, feature)) {
 						model.addRole(feature, className, (IFile) res);
+						classAdded = true;
 					}
 				}
-				
-				LinkedList<FSTDirective> directives = buildModelDirectivesForFile(lines);
-				addDirectivesToModel(directives, (IFile)res, className);
+				if (classAdded) {
+					LinkedList<FSTDirective> directives = buildModelDirectivesForFile(lines);
+					addDirectivesToModel(directives, (IFile)res, className);
+				} else {
+					// add class without annotations
+					model.addClass(new FSTClass(className));
+				}
 			}
 		}
 	}

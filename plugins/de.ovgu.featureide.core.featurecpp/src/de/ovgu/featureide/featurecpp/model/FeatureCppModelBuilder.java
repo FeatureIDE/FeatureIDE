@@ -30,6 +30,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
@@ -72,6 +73,7 @@ public class FeatureCppModelBuilder {
 		for (IFile file : infoFiles) {
 			buildModel(file);
 		}
+		addArbitraryFiles();
 		return true;
 	}
 	
@@ -79,7 +81,7 @@ public class FeatureCppModelBuilder {
 	 * adds the informations of this class to the FSTModel
 	 * @param file
 	 */
-	public void buildModel(IFile file) {
+	private void buildModel(IFile file) {
 		LinkedList<String> infos = getInfo(file);
 		String className = infos.getFirst().split("[;]")[2] + ".h";
 		for (String info : infos) {
@@ -153,5 +155,29 @@ public class FeatureCppModelBuilder {
 			FeatureCppCorePlugin.getDefault().logError(e);
 		}
 		return files;
+	}
+	
+	private void addArbitraryFiles() {
+		IFolder folder = featureProject.getSourceFolder();
+		for (FSTFeature feature : model.getFeatures()) {
+			IFolder featureFolder = folder.getFolder(feature.getName());
+			addArbitraryFiles(featureFolder, feature);
+		}
+	}
+
+	private void addArbitraryFiles(IFolder featureFolder, FSTFeature feature) {
+		try {
+			for (IResource res : featureFolder.members()) {
+				if (res instanceof IFolder) {
+					addArbitraryFiles((IFolder)res, feature);
+				} else if (res instanceof IFile) {
+					if (!featureProject.getComposer().extensions().contains(res.getFileExtension())) {
+						model.addArbitraryFile(feature.getName(), (IFile) res);
+					}
+				}
+			}
+		} catch (CoreException e) {
+			FeatureCppCorePlugin.getDefault().logError(e);
+		}
 	}
 }

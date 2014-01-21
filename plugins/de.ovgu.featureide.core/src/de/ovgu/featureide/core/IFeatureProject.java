@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.core;
 
+import java.util.Collection;
+import java.util.List;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -34,36 +37,39 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 
 public interface IFeatureProject extends IBuilderMarkerHandler {
 
-	public static final QualifiedName composerConfigID = new QualifiedName("featureproject.configs", "composer");
+	QualifiedName composerConfigID = new QualifiedName("featureproject.configs", "composer");
 	
-	public static final QualifiedName buildFolderConfigID = new QualifiedName("featureproject.configs", "build");
-	public static final QualifiedName configFolderConfigID = new QualifiedName("featureproject.configs", "equations");
-	public static final QualifiedName sourceFolderConfigID = new QualifiedName("featureproject.configs", "source");
-	public static final QualifiedName compositionMechanismConfigID = new QualifiedName("featureproject.configs", "compositionmechanism");
+	QualifiedName buildFolderConfigID = new QualifiedName("featureproject.configs", "build");
+	QualifiedName configFolderConfigID = new QualifiedName("featureproject.configs", "equations");
+	QualifiedName sourceFolderConfigID = new QualifiedName("featureproject.configs", "source");
+	QualifiedName compositionMechanismConfigID = new QualifiedName("featureproject.configs", "compositionmechanism");
 	
-	public static final String SOURCE_ARGUMENT = "source";
-	public static final String CONFIGS_ARGUMENT = "equations";
-	public static final String BUILD_ARGUMENT = "build";
+	String SOURCE_ARGUMENT = "source";
+	String CONFIGS_ARGUMENT = "equations";
+	String BUILD_ARGUMENT = "build";
 	
-	public static final String DEFAULT_SOURCE_PATH = "src";
-	public static final String DEFAULT_CONFIGS_PATH = "equations";
-	public static final String DEFAULT_BUILD_PATH = "build";
-	public static final String DEFAULT_CONTRACT_COMPOSITION= "None";
+	String DEFAULT_SOURCE_PATH = "src";
+	String DEFAULT_CONFIGS_PATH = "equations";
+	String DEFAULT_BUILD_PATH = "build";
+	String DEFAULT_CONTRACT_COMPOSITION= "None";
 	
-	public static final String META_THEOREM_PROVING = "Theorem Proving";
-	public static final String META_MODEL_CHECKING = "Model Checking (JPF-core)";
-	public static final String META_MODEL_CHECKING_BDD_JAVA_JML = "Model Checking (JPF-BDD Java JML)";
-	public static final String META_MODEL_CHECKING_BDD_JAVA = "Model Checking (JPF-BDD Java)";
-	public static final String META_MODEL_CHECKING_BDD_C = "Model Checking (JPF-BDD C)";
+	String META_THEOREM_PROVING = "Theorem Proving";
+	String META_MODEL_CHECKING = "Model Checking (JPF-core)";
+	String META_MODEL_CHECKING_BDD_JAVA_JML = "Model Checking (JPF-BDD Java JML)";
+	String META_MODEL_CHECKING_BDD_JAVA = "Model Checking (JPF-BDD Java)";
+	String META_MODEL_CHECKING_BDD_C = "Model Checking (JPF-BDD C)";
 	
-	public static final String DEFAULT_COMPOSITION_MECHANISM = "Mixin";
-	public static final QualifiedName configConfigID = new QualifiedName("featureproject.configs", "currentEquation");
+	String DEFAULT_COMPOSITION_MECHANISM = "Mixin";
+	QualifiedName configConfigID = new QualifiedName("featureproject.configs", "currentEquation");
 	
-	public static final QualifiedName javaClassPathID = new QualifiedName("featureproject.configs", "javaClassPath");
-	public static final QualifiedName contractCompositionID = new QualifiedName(IFeatureProject.class.getName() + "#ContractComposition",
-			IFeatureProject.class.getName() + "#ContractComposition");
+	QualifiedName javaClassPathID = new QualifiedName("featureproject.configs", "javaClassPath");
+	QualifiedName contractCompositionID = new QualifiedName(IFeatureProject.class.getName() + "#ContractComposition",
+	IFeatureProject.class.getName() + "#ContractComposition");
+	
+	String MARKER_UNUSED = "Unused: ";
+	String MARKER_FALSE_OPTIONAL = "False optional: ";
 
-	public void dispose();
+	void dispose();
 
 	/**
 	 * Renames the feature folder or creates a new one if the old folder
@@ -72,92 +78,92 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	 * @param oldName the current name of the feature folder
 	 * @param newName the future name of the feature folder
 	 */
-	public void renameFeature(String oldName, String newName);
+	void renameFeature(String oldName, String newName);
 
-	public String getProjectName();
+	String getProjectName();
 
 	/**
 	 * 
 	 * @return The current configuration file or <code>null</code> if there is none.
 	 */
-	public IFile getCurrentConfiguration();
+	IFile getCurrentConfiguration();
 
-	public void setCurrentConfiguration(IFile file);
+	void setCurrentConfiguration(IFile file);
 
-	public String getBuildPath();
+	String getBuildPath();
 
-	public IFolder getBinFolder();
+	IFolder getBinFolder();
 
-	public IFolder getLibFolder();
+	IFolder getLibFolder();
 
-	public IFolder getBuildFolder();
+	IFolder getBuildFolder();
 
-	public IFolder getConfigFolder();
+	IFolder getConfigFolder();
 
-	public IFolder getSourceFolder();
+	IFolder getSourceFolder();
 
-	public String getBinPath();
+	String getBinPath();
 
-	public String getConfigPath();
+	String getConfigPath();
 
-	public String getSourcePath();
+	String getSourcePath();
 	
-	public String[] getJavaClassPath();
+	String[] getJavaClassPath();
 	
-	public String getContractComposition();
+	String getContractComposition();
 	
-	public String getMetaProductGeneration();
+	String getMetaProductGeneration();
 	
-	public String getCompositionMechanism();
+	String getCompositionMechanism();
 	
 	/**
 	 * Gets the java class path without the default paths
 	 * 
 	 * @return The java class path without default paths
 	 */
-	public String[] getAdditionalJavaClassPath();
+	String[] getAdditionalJavaClassPath();
 
 	/**
 	 * Returns the name of the feature this resource belongs to, or <code>null</code> if the resource
 	 * does not belong to any feature in this project
 	 */
-	public String getFeatureName(IResource resource);
+	String getFeatureName(IResource resource);
 
-	public String getConfigName(IResource resource);
+	String getConfigName(IResource resource);
 
-	public String getFolderName(IResource resource, IFolder folder);
+	String getFolderName(IResource resource, IFolder folder);
 
-	public IProject getProject();
+	IProject getProject();
 
-	public FSTModel getFSTModel();
+	FSTModel getFSTModel();
 
-	public FeatureModel getFeatureModel();
+	FeatureModel getFeatureModel();
 	
-	public IFile getModelFile();
+	IFile getModelFile();
 	
 	/**
 	 * Gets the Project Tree for this FeatureIDE Project
 	 * @return the Project Tree representing this Feature Project
 	 */
-	public ProjectTree getProjectTree();
+	ProjectTree getProjectTree();
 	
 	/**
 	 * Sets the Project Tree for this FeatureIDE Project
 	 */
-	public void setProjectTree(ProjectTree projectTree);
+	void setProjectTree(ProjectTree projectTree);
 	
 	/**
 	 * Returns the ID of the assigned composer
 	 * 
 	 * @return The ID of the assigned composer or @code null if no composer has been assigned.
 	 */
-	public String getComposerID();
+	String getComposerID();
 	
 	/**
 	 * Sets the ID of the assigned composer
 	 * 
 	 */
-	public void setComposerID(String composerID);
+	void setComposerID(String composerID);
 	
 	/**
 	 * Gets the current composer.
@@ -168,51 +174,57 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	 *   specified by the nature or builder (every project has the same nature
 	 *   and builder, which can be extended by other eclipse plug-ins)
 	 */
-	public IComposerExtension getComposer();
+	IComposerExtension getComposer();
 	
 	/**
 	 * Sets the JAVA class path that is in order to build the project
 	 * 
 	 * @param paths An array of paths that will be added to the JAVA class path
 	 */
-	public void setAdditionalJavaClassPath(String[] paths);
+	void setAdditionalJavaClassPath(String[] paths);
 
 	/** 
 	 * @param model
 	 */
-	public void setFSTModel(FSTModel model);
+	void setFSTModel(FSTModel model);
 	
 	/**
 	 * sets the contract composition mechanism
 	 * @param model
 	 */
-	public void setContractComposition(String contractComposition);
+	void setContractComposition(String contractComposition);
 	
 	
 	/**
 	 * sets the meta product generation mechanism.
 	 * @param model
 	 */
-	public void setMetaProductGeneration(String metaProductGeneration);
+	void setMetaProductGeneration(String metaProductGeneration);
 	
 	/**
 	 * sets the composition mechanism
 	 * @param compositionMechanism
 	 */
-	public void setCompositionMechanism(String compositionMechanism);
+	void setCompositionMechanism(String compositionMechanism);
 	
 	/**
 	 * @return True if a source file, or the current configuration changed.
 	 */
-	public boolean buildRelavantChanges();
+	boolean buildRelavantChanges();
 	
-	public void built();
+	void built();
 
-	public String getProjectConfigurationPath();
+	String getProjectConfigurationPath();
 	
-	public String getProjectBuildPath();
+	String getProjectBuildPath();
 	
-	public String getProjectSourcePath();
+	String getProjectSourcePath();
 	
-	public void setPaths(String feature, String src, String configuration);
+	void setPaths(String feature, String src, String configuration);
+
+	List<IFile> getAllConfigurations();
+	
+	Collection<String> getFalseOptionalConfigurationFeatures();
+	
+	Collection<String> getUnusedConfigurationFeatures();
 }

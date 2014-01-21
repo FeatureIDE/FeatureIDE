@@ -133,7 +133,7 @@ public class TypeChef {
 					paramters.add(includes[i].getElementName());
 				}
 			} catch (CModelException e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			}
 
@@ -329,7 +329,7 @@ public class TypeChef {
 					args.add(0, "-I");
 				}
 			} catch (CModelException e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			}
 			args.add(0, Colligens.getDefault().getConfigDir().getAbsolutePath()
