@@ -30,7 +30,6 @@ import java.util.Vector;
 import org.eclipse.core.internal.runtime.InternalPlatform;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
@@ -334,15 +333,12 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		return false;
 	}
 	
-	
 	protected boolean isPluginInstalled(String ID) {
 		for(Bundle b :InternalPlatform.getDefault().getBundleContext().getBundles()){
-			if(b.getSymbolicName().startsWith(ID))return true;
+			if(b.getSymbolicName().startsWith(ID)) {
+				return true;
+			}
 		}
 		return false;
-	}
-	protected void generateWarning(String Warning) {
-		this.featureProject.createBuilderMarker(featureProject
-				.getProject(), Warning, 0, IMarker.SEVERITY_WARNING);
 	}
 }

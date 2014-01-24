@@ -33,6 +33,7 @@ import org.eclipse.core.internal.runtime.InternalPlatform;
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
@@ -84,7 +85,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 	private FeatureModel featureModel;
 	private boolean hadAspectJNature;
 	
-	private static final LinkedHashSet<String> EXTENSIONS = createExtensions(); 
+	private static final LinkedHashSet<String> EXTENSIONS = createExtensions();
 	
 	private static LinkedHashSet<String> createExtensions() {
 		LinkedHashSet<String> extensions = new LinkedHashSet<String>();
@@ -104,7 +105,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 		}
 		assert(featureProject != null) : "Invalid project given";
 		if(!isPluginInstalled(PLUGIN_ID)){
-			generateWarning(PLUGIN_WARNING);	
+			featureProject.createBuilderMarker(featureProject.getProject(), PLUGIN_WARNING, -1, IMarker.SEVERITY_ERROR);
 		}
 		
 		final String configPath =  config.getRawLocation().toOSString();

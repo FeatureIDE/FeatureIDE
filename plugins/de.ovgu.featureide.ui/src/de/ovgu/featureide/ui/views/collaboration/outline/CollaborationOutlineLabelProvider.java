@@ -144,7 +144,6 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 
 	public void colorizeItems(TreeItem[] treeItems, IFile file) {
 		for (int i = 0; i < treeItems.length; i++) {
-			Object o = treeItems[i].getData();
 			if (treeItems[i].getData() instanceof RoleElement) {
 				setForeground(treeItems[i], file);
 			} if (treeItems[i].getData() instanceof FSTRole) {
