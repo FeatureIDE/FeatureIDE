@@ -68,13 +68,13 @@ public class NewInterfaceWizard extends Wizard {
 		String interfaceContent = modelWriter.writeToString();
 
 		String importContent = String.format(
-				"concept %s : %s implements %s {\n}", projectName, projectName,
+				"concept %s : %s impl %s", projectName, projectName,
 				interfaceName);
 
 		try {
 			// create interface
 
-			IFolder mplFolder = project.getFolder("MPL");
+			IFolder mplFolder = project.getFolder("Interfaces");
 			if (!mplFolder.exists())
 				mplFolder.create(true, true, null);
 
@@ -90,7 +90,7 @@ public class NewInterfaceWizard extends Wizard {
 
 			// create import velvet
 
-			IFolder importFolder = project.getFolder("Import");
+			IFolder importFolder = project.getFolder("MPL");
 			if (!importFolder.exists())
 				importFolder.create(true, true, null);
 

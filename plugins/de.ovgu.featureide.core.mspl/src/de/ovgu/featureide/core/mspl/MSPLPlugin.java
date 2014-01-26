@@ -173,7 +173,7 @@ public class MSPLPlugin extends AbstractUIPlugin {
 			return projects;
 		}
 
-		IFolder importFolder = project.getFolder("Import");
+		IFolder importFolder = project.getFolder("MPL");
 		if (!importFolder.exists() || !importFolder.isAccessible())
 			return projects;
 

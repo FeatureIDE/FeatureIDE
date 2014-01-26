@@ -430,7 +430,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements
 
 		AbstractFeatureModelReader reader;
 
-		if (modelFile.getName().endsWith(".velvet"))
+		if (featureModel instanceof ExtendedFeatureModel)
 			reader = new VelvetFeatureModelReader(featureModel);
 		else
 			reader = new XmlFeatureModelReader(featureModel);

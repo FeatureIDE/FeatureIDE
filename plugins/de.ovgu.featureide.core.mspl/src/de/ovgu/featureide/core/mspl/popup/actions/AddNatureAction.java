@@ -97,23 +97,22 @@ public class AddNatureAction implements IObjectActionDelegate {
 				project.setDescription(description, null);
 
 				// create directories for MPL
-				IFolder mplFolder = project.getFolder("MPL");
+				IFolder mplFolder = project.getFolder("Interfaces");
 				if (!mplFolder.exists())
 					mplFolder.create(true, true, null);
-				IFolder importFolder = project.getFolder("Import");
+				IFolder importFolder = project.getFolder("MPL");
 				if (!importFolder.exists())
 					importFolder.create(true, true, null);
 
 				// create interfaces mapping file
-				IFile interfacesFile = mplFolder.getFile(".interfaces");
-				if (!interfacesFile.exists()) {
+				IFile mplVelvet = project.getFile("mpl.velvet");
+				if (!mplVelvet.exists()) {
 					// IFile.create() needs an source
-					byte[] bytes = "".getBytes();
+					byte[] bytes = ("concept " + project.getName() + " : "
+							+ project.getName()).getBytes();
 					InputStream source = new ByteArrayInputStream(bytes);
-					interfacesFile.create(source, true, null);
+					mplVelvet.create(source, true, null);
 				}
-
-				// TODO: create mpl.velvet
 			} catch (CoreException e) {
 				e.printStackTrace();
 			}
