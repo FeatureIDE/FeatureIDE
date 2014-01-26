@@ -273,12 +273,6 @@ public class ExtendedFeatureModel
 		this.interfaceName = null;
 	}
 
-	/**
-	 * TODO @Matthias document
-	 * 
-	 * @param connector
-	 * @param instancename
-	 */
 	public void setFeaturefromInstance(final Feature fromInstance, final String instanceName) {
 		this.importedFeatures.add(fromInstance);
 		this.parentsOfFeatures.put(fromInstance, instanceName);

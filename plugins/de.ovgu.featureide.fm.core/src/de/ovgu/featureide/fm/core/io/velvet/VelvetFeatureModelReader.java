@@ -156,8 +156,13 @@ public class VelvetFeatureModelReader
 	}
 
 	private void copyShadowModel() {
-		copyChildnodes(this.extFeatureModel, this.extFeatureModel.getRoot(), this.extFeatureModel.getShadowModel()
-			.getRoot().getChildren(), "", FeatureInheritanceModes.INTERFACE);
+		if (null == this.extFeatureModel.implementsInterface() &&
+			null != this.extFeatureModel.getShadowModel() &&
+			!this.copiedShadowModel) {
+			copyChildnodes(this.extFeatureModel, this.extFeatureModel.getRoot(), this.extFeatureModel.getShadowModel()
+				.getRoot().getChildren(), "", FeatureInheritanceModes.INTERFACE);
+			this.copiedShadowModel = true;
+		}
 	}
 
 	private WeightedTerm createTerm(final int weight,
@@ -192,20 +197,24 @@ public class VelvetFeatureModelReader
 			return null;
 
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IPath filePath = Path.fromOSString(featureModelFile.getAbsolutePath());
-		IFile file = workspace.getRoot().getFileForLocation(filePath);
-		if (file == null)
-			return null;
+		IPath filePath;
+		try {
+			filePath = Path.fromOSString(featureModelFile.getCanonicalPath());
+			IFile file = workspace.getRoot().getFileForLocation(filePath);
+			if (null == file || !file.exists()){
+				return workspace.getRoot().getFile(filePath).getProject();
+			}
 
-		return file.getProject();
+			return file.getProject();
+		} catch ( IOException e ) {
+			FMCorePlugin.getDefault().logError(e);
+			return null;
+		}
 	}
 
 	/**
-	 * TODO @Matthias create documentation
+	 * inserts an instance at a given position
 	 * 
-	 * @param fm
-	 * @param name
-	 * @param instance
 	 */
 	private void insertInstance(final FeatureModel instance, final String instancename, final Feature parent) {
 		final Feature instanceRoot = instance.getRoot();
@@ -358,12 +367,8 @@ public class VelvetFeatureModelReader
 					parseImplements(curNode);
 					break;
 				case VelvetParser.DEF:
-					if (null == this.extFeatureModel.implementsInterface()
-						&& null != this.extFeatureModel.getShadowModel()
-						&& !this.copiedShadowModel) {
-						copyShadowModel();
-						this.copiedShadowModel = true;
-					}
+					copyShadowModel();
+
 					parseDefinitions(curNode);
 					break;
 				default:
@@ -374,12 +379,7 @@ public class VelvetFeatureModelReader
 			
 			// if model contained no definitions we need to copy the shadow model
 			// because the section were this is done usuallly was skipped
-			if (null == this.extFeatureModel.implementsInterface() &&
-				null != this.extFeatureModel.getShadowModel() &&
-				!this.copiedShadowModel) {
-				copyShadowModel();
-				this.copiedShadowModel = true;
-			}
+			copyShadowModel();
 		}
 		
 		rootFeature.setName(name);
@@ -552,12 +552,7 @@ public class VelvetFeatureModelReader
 		if (null == this.extFeatureModel.implementsInterface()) {
 			// we parsed no interface. Therefore we can copy shadow model to the
 			// original
-			if (null == this.extFeatureModel.implementsInterface()
-					&& null != extFeatureModel.getShadowModel()
-					&& !this.copiedShadowModel){
-				copyShadowModel();
-				copiedShadowModel = true;
-			}
+			copyShadowModel();
 			
 			writeModel = this.extFeatureModel;
 		} else {
@@ -621,15 +616,16 @@ public class VelvetFeatureModelReader
 		final IProject parent = getProject();
 
 		if (parent == null) {
-			FMCorePlugin.getDefault().logWarning(
-					"Could not get current project of feature model.");
+			System.err.println("NULULLLULULULUL");
+			FMCorePlugin.getDefault().logError(
+				new FileNotFoundException("Could not get current project of feature model."));
 			return;
 		}
 
 		final IResource res = parent.findMember(format("Interfaces/%s.velvet", interfaceName));
 		final File file = res.getLocation().toFile();
-		System.err.println(file);
 
+		System.err.println(file);
 		try {
 			interfaceReader.readFromFile(file);
 			// copy interface into model
@@ -690,7 +686,7 @@ public class VelvetFeatureModelReader
 			if (root != null) {
 				this.extFeatureModel.reset();
 				this.copiedShadowModel = false;
-				
+				System.err.println();
 				parseModel(root);
 				parseAttributeConstraints();
 
@@ -738,13 +734,15 @@ public class VelvetFeatureModelReader
 
 	private void parseModel(final Tree root)
 		throws UnsupportedModelException {
+		System.err.println("parse Model");
 		this.extFeatureModel.getLayout().showHiddenFeatures(true);
 		this.extFeatureModel.getLayout().verticalLayout(false);
 
 		final LinkedList<Tree> nodeList = getChildren(root);
+		System.err.println(root);
+		System.err.println(nodeList.isEmpty());
 		while (!nodeList.isEmpty()) {
 			final Tree curNode = nodeList.poll();
-
 			switch (curNode.getType()) {
 				case VelvetParser.IMP:
 					break;
@@ -757,7 +755,8 @@ public class VelvetFeatureModelReader
 					parseConcept(curNode);
 					break;
 				case VelvetParser.EOF:
-					// TODO @Matthias check if a model was created?
+					System.err.println("EOF");
+					// TODO check if a model was created?
 					break;
 				default:
 					FMCorePlugin
