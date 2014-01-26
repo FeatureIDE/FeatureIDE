@@ -191,8 +191,15 @@ public class VelvetFeatureModelReader
 			return null;
 
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IPath filePath = Path.fromOSString(featureModelFile.getAbsolutePath());
-		return workspace.getRoot().getFile(filePath).getProject();
+		IPath filePath;
+		try {
+			filePath = Path.fromOSString(featureModelFile.getCanonicalPath());
+			return workspace.getRoot().getFile(filePath).getProject();
+		} catch ( IOException e ) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	/**
@@ -351,11 +358,6 @@ public class VelvetFeatureModelReader
 					parseImplements(curNode);
 					break;
 				case VelvetParser.DEF:
-					// TODO @Matthias Checkme!!
-					rootFeature.setName(name);
-					this.extFeatureModel.renameFeature(tmpName, name);
-					this.extFeatureModel.performRenamings();
-
 					if (null == this.extFeatureModel.implementsInterface()
 						&& null != this.extFeatureModel.getShadowModel()
 						&& !this.copiedShadowModel) {
@@ -369,7 +371,20 @@ public class VelvetFeatureModelReader
 						new UnsupportedModelException(format("Illegal marker in concept header \"%s\"",
 							curNode.getText()), 0));
 			}
+			
+			// if model contained no definitions we need to copy the shadow model
+			// because the section were this is done usuallly was skipped
+			if (null == this.extFeatureModel.implementsInterface() &&
+				null != this.extFeatureModel.getShadowModel() &&
+				!this.copiedShadowModel) {
+				copyShadowModel();
+				this.copiedShadowModel = true;
+			}
 		}
+		
+		rootFeature.setName(name);
+		this.extFeatureModel.renameFeature(tmpName, name);
+		this.extFeatureModel.performRenamings();
 	}
 
 	private void parseConstraint(final Tree root, final Feature parent) {
@@ -601,8 +616,10 @@ public class VelvetFeatureModelReader
 		final VelvetFeatureModelReader interfaceReader = new VelvetFeatureModelReader(interf);
 
 		final IProject parent = getProject();
+		System.err.println(parent);
 		final IResource res = parent.findMember(format("MPL/%s.velvet", interfaceName));
 		final File file = res.getLocation().toFile();
+		System.err.println(file);
 
 		try {
 			interfaceReader.readFromFile(file);
