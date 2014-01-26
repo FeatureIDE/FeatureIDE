@@ -616,6 +616,13 @@ public class VelvetFeatureModelReader
 		final VelvetFeatureModelReader interfaceReader = new VelvetFeatureModelReader(interf);
 
 		final IProject parent = getProject();
+
+		if (parent == null) {
+			FMCorePlugin.getDefault().logWarning(
+					"Could not get current project of feature model.");
+			return;
+		}
+
 		final IResource res = parent.findMember(format("Interfaces/%s.velvet", interfaceName));
 		final File file = res.getLocation().toFile();
 		System.err.println(file);
