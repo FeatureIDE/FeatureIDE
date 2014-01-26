@@ -167,6 +167,9 @@ public class ExtendedFeatureModel
 	}
 
 	public ExtendedFeatureModel getShadowModel() {
+		if (null == shadowModel) {
+			createShadowModel();
+		}
 		return this.shadowModel;
 	}
 

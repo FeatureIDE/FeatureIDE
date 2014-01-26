@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.ListIterator;
+import java.util.Map;
 
 import org.antlr.runtime.ANTLRInputStream;
 import org.antlr.runtime.CommonTokenStream;
@@ -219,18 +220,20 @@ public class VelvetFeatureModelReader
 	private void insertInstance(final FeatureModel instance, final String instancename, final Feature parent) {
 		final Feature instanceRoot = instance.getRoot();
 
+		
+		
 		final Feature connector =
-			addFeature(this.extFeatureModel.getShadowModel(), parent, instancename, false,
+			addFeature(this.extFeatureModel, parent, instancename, false,
 				instanceRoot.isAbstract(), instanceRoot.isHidden());
 		this.extFeatureModel.setFeaturefromInstance(connector, instancename);
 		if (instanceRoot.isAlternative()) {
 			connector.setAlternative();
 		}
 
-		copyChildnodes(this.extFeatureModel.getShadowModel(), connector, instanceRoot.getChildren(), instancename,
+		copyChildnodes(this.extFeatureModel, connector, instanceRoot.getChildren(), instancename,
 			FeatureInheritanceModes.INSTANCE);
 		for (final Constraint constraint : instance.getConstraints()) {
-			this.extFeatureModel.getShadowModel().addConstraint(constraint);
+			this.extFeatureModel.addConstraint(constraint);
 		}
 	}
 
@@ -513,11 +516,49 @@ public class VelvetFeatureModelReader
 					parseAttribute(curNode, parentFeature);
 					break;
 				case VelvetParser.USES:
-					System.err.println("USES");
+					parseUse(curNode, parentFeature);
 					break;
 			}
 		}
 
+	}
+
+	private void parseUse(Tree root, Feature parent) {
+		final LinkedList<Tree> childList = getChildren(root);
+		final String instanceName = childList.poll().getText();
+		Map<String, String> parameters = extFeatureModel.getParameters();
+		String instance = parameters.get(instanceName);
+		System.err.println(instance);
+		
+		// read interface 
+		final ExtendedFeatureModel interf = new ExtendedFeatureModel();
+		final VelvetFeatureModelReader interfaceReader = new VelvetFeatureModelReader(interf);
+
+		final IProject parentP = getProject();
+
+		if (parentP == null) {
+			FMCorePlugin.getDefault().logError(
+				new FileNotFoundException("Could not get current project of feature model."));
+			return;
+		}
+
+		final IResource res = parentP.findMember(format("Interfaces/%s.velvet", instance));
+		final File file = res.getLocation().toFile();
+
+		try {
+			interfaceReader.readFromFile(file);
+			// copy interface into model
+			insertInstance(interf, instanceName, parent);
+//			copyChildnodes(this.extFeatureModel, this.extFeatureModel.getRoot(), interf.getRoot().getChildren(),
+//				instanceName, FeatureInheritanceModes.INSTANCE);
+		} catch ( final FileNotFoundException e ) {
+			FMCorePlugin.getDefault().logError(e);
+		} catch ( final UnsupportedModelException e ) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+		
+		
+		
 	}
 
 	private void parseFeature(final Tree root, Feature parent) {
@@ -616,7 +657,6 @@ public class VelvetFeatureModelReader
 		final IProject parent = getProject();
 
 		if (parent == null) {
-			System.err.println("NULULLLULULULUL");
 			FMCorePlugin.getDefault().logError(
 				new FileNotFoundException("Could not get current project of feature model."));
 			return;
@@ -625,7 +665,6 @@ public class VelvetFeatureModelReader
 		final IResource res = parent.findMember(format("Interfaces/%s.velvet", interfaceName));
 		final File file = res.getLocation().toFile();
 
-		System.err.println(file);
 		try {
 			interfaceReader.readFromFile(file);
 			// copy interface into model
@@ -686,7 +725,6 @@ public class VelvetFeatureModelReader
 			if (root != null) {
 				this.extFeatureModel.reset();
 				this.copiedShadowModel = false;
-				System.err.println();
 				parseModel(root);
 				parseAttributeConstraints();
 
@@ -734,13 +772,10 @@ public class VelvetFeatureModelReader
 
 	private void parseModel(final Tree root)
 		throws UnsupportedModelException {
-		System.err.println("parse Model");
 		this.extFeatureModel.getLayout().showHiddenFeatures(true);
 		this.extFeatureModel.getLayout().verticalLayout(false);
 
 		final LinkedList<Tree> nodeList = getChildren(root);
-		System.err.println(root);
-		System.err.println(nodeList.isEmpty());
 		while (!nodeList.isEmpty()) {
 			final Tree curNode = nodeList.poll();
 			switch (curNode.getType()) {
@@ -755,7 +790,6 @@ public class VelvetFeatureModelReader
 					parseConcept(curNode);
 					break;
 				case VelvetParser.EOF:
-					System.err.println("EOF");
 					// TODO check if a model was created?
 					break;
 				default:

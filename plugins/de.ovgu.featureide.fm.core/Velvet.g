@@ -138,17 +138,17 @@ definitions
 
 def	: nonFeatureDefinition* (
 		(featureGroup nonFeatureDefinition*) |
-		(USE use) |
 		(feature (feature | nonFeatureDefinition)*))?
 	;			
 	
 nonFeatureDefinition
 	: constraint 
 	| instance 
+	| use
 	| attribute 
 	;
 	
-use : ID SEMI
+use : USE ID SEMI
 	-> ^(USES ID)
 	;
 	
