@@ -210,6 +210,10 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			height = height + ROW_HEIGHT;
 			setWidth(language.getInherited());
 		}
+		if (interfaced) {
+			height = height + ROW_HEIGHT;
+			setWidth(language.getInterfaced());
+		}
 		if (hidden && showHidden) {
 			height = height + ROW_HEIGHT;
 			setWidth(language.getHidden());
