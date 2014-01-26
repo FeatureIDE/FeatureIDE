@@ -56,12 +56,25 @@ public abstract class QuickFixMissingConfigurations implements IMarkerResolution
 	}
 
 	public QuickFixMissingConfigurations(final IMarker marker) {
-		project = CorePlugin.getFeatureProject(marker.getResource());
-		if (project == null) {
-			featureModel = null;
+		if (marker != null) {
+			project = CorePlugin.getFeatureProject(marker.getResource());
+			if (project == null) {
+				featureModel = null;
+			} else {
+				featureModel = project.getFeatureModel();
+			}
 		} else {
-			featureModel = project.getFeatureModel();
+			featureModel = null;
+			project = null;
 		}
+	}
+
+	/**
+	 * @param model
+	 */
+	public QuickFixMissingConfigurations(FeatureModel model) {
+		featureModel = model;
+		project = null;
 	}
 
 	protected void writeConfigurations(final Collection<Configuration> confs) {

@@ -1149,7 +1149,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		for (final Feature feature : featureModel.getAnalyser().getCoreFeatures()) {
 			concreteFeatures.remove(feature.getName());
 		}
-		for (final Feature feature : featureModel.getAnalyser().getCachedDeadFeatures()) {
+		for (final Feature feature : featureModel.getAnalyser().getDeadFeatures()) {
 			concreteFeatures.remove(feature.getName());
 		}
 		return concreteFeatures;
