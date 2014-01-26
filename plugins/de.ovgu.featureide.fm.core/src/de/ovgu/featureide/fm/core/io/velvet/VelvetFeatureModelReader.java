@@ -376,12 +376,12 @@ public class VelvetFeatureModelReader
 						new UnsupportedModelException(format("Illegal marker in concept header \"%s\"",
 							curNode.getText()), 0));
 			}
+		}
 			
 			// if model contained no definitions we need to copy the shadow model
 			// because the section were this is done usuallly was skipped
-			copyShadowModel();
-		}
-		
+		copyShadowModel();
+			
 		rootFeature.setName(name);
 		this.extFeatureModel.renameFeature(tmpName, name);
 		this.extFeatureModel.performRenamings();
