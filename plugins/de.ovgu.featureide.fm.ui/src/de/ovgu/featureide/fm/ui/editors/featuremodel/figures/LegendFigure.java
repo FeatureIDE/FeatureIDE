@@ -83,6 +83,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private static final String ABSTRACT_TOOLTIP = "Abstract feature:\n\nThis feature does not has any impact at implementation level.";
 	private static final String IMPORTED_TOOLTIP = "Imported feature:\n\nThis feature is imported from another feature model.";
 	private static final String INHERITED_TOOLTIP = "Inherited feature:\n\nThis feature is inherited from a parent feature model.";
+	private static final String INTERFACED_TOOLTIP = "Interface feature:\n\nThis feature is a feature from an interface.";
 	private static final String CONCRETE_TOOLTIP = "Concrete feature:\n\nThis feature has impact at implementation level.";
 	private static final String HIDDEN_TOOLTIP = "Hidden feature:\n\nThis feature will not be shown in the configuration editor.\n Non-hidden features should determine when to select the feature automatically.";
 	private static final String DEAD_TOOLTIP = "Dead feature:\n\nThis feature cannot be selected in any valid configuration.";
@@ -105,6 +106,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private static final int FALSE_OPT = 7;
 	private static final int IMPORTED = 8;
 	private static final int INHERITED = 9;
+	private static final int INTERFACED = 10;
 
 	private final XYLayout layout = new XYLayout();
 	public Point newPos;
@@ -128,6 +130,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private boolean redundantConst;
 	private boolean imported = false;
 	private boolean inherited = false;
+	private boolean interfaced = false;
 
 	@Override
 	public boolean useLocalCoordinates() {
@@ -157,6 +160,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			ExtendedFeatureModel extendedFeatureModel = (ExtendedFeatureModel) featureModel;
 			imported = extendedFeatureModel.hasImported();
 			inherited = extendedFeatureModel.hasInherited();
+			interfaced = extendedFeatureModel.hasInterface();
 		}
 
 		language = FMPropertyManager.getLanguage();
@@ -281,6 +285,9 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		}
 		if (inherited) {
 			createRowInherited(row++);
+		}
+		if (interfaced) {
+			createRowInterfaced(row++);
 		}
 		if (hidden && showHidden) {
 			createRowHidden(row++);
@@ -443,6 +450,13 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		Label labelInherited = createLabel(row, language.getInherited(),
 				FMPropertyManager.getFeatureForgroundColor(), INHERITED_TOOLTIP);
 		add(labelInherited);
+	}
+
+	private void createRowInterfaced(int row) {
+		createSymbol(row, INTERFACED, true, INTERFACED_TOOLTIP);
+		Label labelInterfaced = createLabel(row, language.getInterfaced(),
+				FMPropertyManager.getFeatureForgroundColor(), INTERFACED_TOOLTIP);
+		add(labelInterfaced);
 	}
 
 	private void createRowConcrete(int row) {
@@ -615,6 +629,9 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			break;
 		case (INHERITED):
 			rect.setBorder(FMPropertyManager.getInheritedFeatureBorder());
+			break;
+		case (INTERFACED):
+			rect.setBorder(FMPropertyManager.getInterfacedFeatureBorder());
 			break;
 		}
 		rect.setSize(x2 - x1, y2 - y1);

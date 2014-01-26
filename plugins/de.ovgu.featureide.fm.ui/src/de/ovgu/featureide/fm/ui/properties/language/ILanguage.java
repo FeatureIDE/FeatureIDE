@@ -96,6 +96,11 @@ public interface ILanguage {
 	public String getInherited();
 	
 	/**
+	 * @return The word for: "interfaced"
+	 */
+	public String getInterfaced();
+	
+	/**
 	 * @return The word for: "concrete"
 	 */
 	public String getConcrete();

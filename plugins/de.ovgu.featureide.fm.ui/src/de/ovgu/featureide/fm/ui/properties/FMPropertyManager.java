@@ -75,6 +75,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	private volatile static Color CURRENT_FEATURE_BORDER = null;
 	private volatile static Color CURRENT_INHERITED_FEATURE_BORDER = null;
 	private volatile static Color CURRENT_IMPORTED_FEATURE_BORDER = null;
+	private volatile static Color CURRENT_INTERFACED_FEATURE_BORDER = null;
 	private volatile static Color FEATURE_BORDER_SAVE = GUIBasics.createBorderColor(CONCRETE_BACKGROUND);
 	private volatile static Integer CURRENT_CONSTRAINT_SPACE_Y = null;
 	private volatile static Integer CURRENT_FEATURE_SPACE_Y = null;
@@ -500,6 +501,22 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	public static void setImportedFeatureBorderColor(Color color) {
 		CURRENT_IMPORTED_FEATURE_BORDER = color;
 		setColor(QN_IMPORTED_FEATURE_BORDER, color);
+	}
+
+	public static Border getInterfacedFeatureBorder() {
+		return GUIBasics.createLineBorder(getInterfacedFeatureBorderColor(), 2);
+	}
+
+	public static Color getInterfacedFeatureBorderColor() {
+		if (CURRENT_INTERFACED_FEATURE_BORDER == null) {
+			CURRENT_INTERFACED_FEATURE_BORDER = getColor(QN_INTERFACED_FEATURE_BORDER, INTERFACED_BORDER_COLOR);
+		}
+		return CURRENT_INTERFACED_FEATURE_BORDER;
+	}
+
+	public static void setInterfacedFeatureBorderColor(Color color) {
+		CURRENT_INTERFACED_FEATURE_BORDER = color;
+		setColor(QN_INTERFACED_FEATURE_BORDER, color);
 	}
 
 	private static Color getConcreteBorderColor() {

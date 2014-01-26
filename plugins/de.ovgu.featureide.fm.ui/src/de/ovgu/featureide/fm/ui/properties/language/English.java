@@ -37,6 +37,7 @@ public class English implements ILanguage {
 	private static final String ABSTRACT = "Abstract";
 	private static final String IMPORTED = "Imported";
 	private static final String INHERITED = "Inherited";
+	private static final String INTERFACED = "from Interface";
 	private static final String CONCRETE = "Concrete";
 	private static final String HIDDEN = "Hidden";
 	private static final String DEAD = "Dead feature";
@@ -110,6 +111,11 @@ public class English implements ILanguage {
 	@Override
 	public String getInherited() {
 		return INHERITED;
+	}
+
+	@Override
+	public String getInterfaced() {
+		return INTERFACED;
 	}
 
 	@Override
