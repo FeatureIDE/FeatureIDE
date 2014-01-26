@@ -118,8 +118,16 @@ public class VelvetFeatureModelReader
 			final Feature parentNode,
 			final LinkedList<Feature> children,
 			final String parent,
-			final FeatureInheritanceModes mode) {
+			FeatureInheritanceModes mode) {
 		for (final Feature child : children) {
+			if (extFeatureModel.isImported(child)){
+				mode = FeatureInheritanceModes.INTERFACE;
+			} else if (extFeatureModel.isInherited(child)) {
+				mode = FeatureInheritanceModes.INHERITANCE;
+			} else if (extFeatureModel.isFromInterface(child)){
+				mode = FeatureInheritanceModes.INTERFACE;
+			}
+			
 			final Feature feature =
 				addFeature(model, parentNode, child.getName(), child.isMandatory(), child.isAbstract(),
 					child.isHidden());
@@ -131,13 +139,13 @@ public class VelvetFeatureModelReader
 			}
 			switch (mode) {
 				case INHERITANCE:
-					model.setFeatureInherited(feature, parent);
+					extFeatureModel.setFeatureInherited(feature, parent);
 					break;
 				case INSTANCE:
-					model.setFeaturefromInstance(feature, parent);
+					extFeatureModel.setFeaturefromInstance(feature, parent);
 					break;
 				case INTERFACE:
-					model.setFeatureInterface(feature, parent);
+					extFeatureModel.setFeatureInterface(feature, parent);
 					break;
 			}
 
@@ -159,7 +167,7 @@ public class VelvetFeatureModelReader
 	private void copyShadowModel() {
 		if (null == this.extFeatureModel.implementsInterface() &&
 			null != this.extFeatureModel.getShadowModel() &&
-			!this.copiedShadowModel) {
+			!this.copiedShadowModel) {			
 			copyChildnodes(this.extFeatureModel, this.extFeatureModel.getRoot(), this.extFeatureModel.getShadowModel()
 				.getRoot().getChildren(), "", FeatureInheritanceModes.INTERFACE);
 			this.copiedShadowModel = true;
