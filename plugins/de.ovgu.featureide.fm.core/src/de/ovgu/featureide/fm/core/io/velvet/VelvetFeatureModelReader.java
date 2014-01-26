@@ -512,6 +512,9 @@ public class VelvetFeatureModelReader
 				case VelvetParser.ATTR:
 					parseAttribute(curNode, parentFeature);
 					break;
+				case VelvetParser.USES:
+					System.err.println("USES");
+					break;
 			}
 		}
 

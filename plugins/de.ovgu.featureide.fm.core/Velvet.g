@@ -17,6 +17,7 @@ tokens {
 	CONSTRAINT 	='constraint';
 	FEATURE 	='feature';
 	IMPL		='impl';
+	USE			='use';
 
 	VAR_INT 	='int';
 	VAR_FLOAT 	='float';
@@ -62,6 +63,7 @@ tokens {
 	OPERAND;
 	BASEPARAM;
 	IMPLEMENT;
+	USES;
 	
 	INTER;
 }
@@ -136,6 +138,7 @@ definitions
 
 def	: nonFeatureDefinition* (
 		(featureGroup nonFeatureDefinition*) |
+		(USE use) |
 		(feature (feature | nonFeatureDefinition)*))?
 	;			
 	
@@ -143,6 +146,10 @@ nonFeatureDefinition
 	: constraint 
 	| instance 
 	| attribute 
+	;
+	
+use : ID SEMI
+	-> ^(USES ID)
 	;
 	
 instance: ID name SEMI //conceptName
