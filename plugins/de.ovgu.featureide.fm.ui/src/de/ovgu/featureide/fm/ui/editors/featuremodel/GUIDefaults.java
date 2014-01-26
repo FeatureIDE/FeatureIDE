@@ -90,6 +90,7 @@ public interface GUIDefaults {
 	
 	public static final Color INHERITED_BORDER_COLOR = GUIBasics.createColor(107, 228, 0);
 	public static final Color IMPORTED_BORDER_COLOR = GUIBasics.createColor(0, 255, 0);
+	public static final Color INTERFACED_BORDER_COLOR = GUIBasics.createColor(0, 191, 255);
 
 	//connections and decorators
 	

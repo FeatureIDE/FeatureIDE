@@ -37,6 +37,7 @@ public class German implements ILanguage {
 	private static final String ABSTRACT = "Abstrakt";
 	private static final String IMPORTED = "Importiert";
 	private static final String INHERITED = "Geerbt";
+	private static final String INTERFACED = "von Interface";
 	private static final String CONCRETE = "Konkret";
 	private static final String HIDDEN = "Versteckt";
 	private static final String DEAD = "Unw�hlbar";
@@ -112,6 +113,11 @@ public class German implements ILanguage {
 	@Override
 	public String getInherited() {
 		return INHERITED;
+	}
+
+	@Override
+	public String getInterfaced() {
+		return INTERFACED;
 	}
 
 	@Override

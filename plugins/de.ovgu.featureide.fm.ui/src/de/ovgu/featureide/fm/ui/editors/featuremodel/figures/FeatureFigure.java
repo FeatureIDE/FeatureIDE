@@ -183,6 +183,10 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 			if (extendedFeatureModel.isInherited(feature)) {
 				setBorder(FMPropertyManager.getInheritedFeatureBorder());
 			}
+
+			if (extendedFeatureModel.isFromInterface(feature)) {
+				setBorder(FMPropertyManager.getInterfacedFeatureBorder());
+			}
 		}
 
 		String description = feature.getDescription();
