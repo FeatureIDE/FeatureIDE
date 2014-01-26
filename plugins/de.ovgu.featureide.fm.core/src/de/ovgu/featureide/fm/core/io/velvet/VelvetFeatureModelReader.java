@@ -34,6 +34,7 @@ import org.antlr.runtime.ANTLRInputStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.Tree;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
@@ -192,7 +193,11 @@ public class VelvetFeatureModelReader
 
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		IPath filePath = Path.fromOSString(featureModelFile.getAbsolutePath());
-		return workspace.getRoot().getFile(filePath).getProject();
+		IFile file = workspace.getRoot().getFileForLocation(filePath);
+		if (file == null)
+			return null;
+
+		return file.getProject();
 	}
 
 	/**
@@ -206,7 +211,7 @@ public class VelvetFeatureModelReader
 		final Feature instanceRoot = instance.getRoot();
 
 		final Feature connector =
-			addFeature(this.extFeatureModel.getShadowModel(), parent, instancename, instanceRoot.isMandatory(),
+			addFeature(this.extFeatureModel.getShadowModel(), parent, instancename, false,
 				instanceRoot.isAbstract(), instanceRoot.isHidden());
 		this.extFeatureModel.setFeaturefromInstance(connector, instancename);
 		if (instanceRoot.isAlternative()) {
@@ -323,6 +328,8 @@ public class VelvetFeatureModelReader
 		final LinkedList<Tree> nodeList = getChildren(root);
 		final String tmpName = "tmp";
 		final Feature rootFeature = new Feature(this.extFeatureModel, tmpName);
+		rootFeature.setAbstract(true);
+		rootFeature.setMandatory(true);
 
 		this.extFeatureModel.addFeature(rootFeature);
 		this.extFeatureModel.setRoot(rootFeature);
@@ -601,7 +608,7 @@ public class VelvetFeatureModelReader
 		final VelvetFeatureModelReader interfaceReader = new VelvetFeatureModelReader(interf);
 
 		final IProject parent = getProject();
-		final IResource res = parent.findMember(format("MPL/%s.velvet", interfaceName));
+		final IResource res = parent.findMember(format("Interfaces/%s.velvet", interfaceName));
 		final File file = res.getLocation().toFile();
 
 		try {
