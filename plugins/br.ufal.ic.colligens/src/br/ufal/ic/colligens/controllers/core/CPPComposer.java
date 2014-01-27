@@ -462,14 +462,14 @@ public class CPPComposer extends PPComposerExtensionClass {
 	 */
 	private void runTypeChefAnalyzes(IFolder folder) {
 		ProjectExplorerController prjController = new ProjectExplorerController();
-		System.out.println(folder);
+
 		prjController.addResource(folder);
 
 		final TypeChef typeChef = new TypeChef();
 		try {
 			for (Iterator<IResource> iterator = prjController.getList()
 					.iterator(); iterator.hasNext();) {
-				IResource type = (IResource) iterator.next();
+				IResource type = iterator.next();
 				System.out.println(type.getLocation().toOSString());
 			}
 			typeChef.run(prjController.getList());
@@ -480,6 +480,7 @@ public class CPPComposer extends PPComposerExtensionClass {
 			}
 
 			display.syncExec(new Runnable() {
+				@Override
 				public void run() {
 					InvalidConfigurationsViewController viewController = InvalidConfigurationsViewController
 							.getInstance();
@@ -502,7 +503,7 @@ public class CPPComposer extends PPComposerExtensionClass {
 			});
 
 		} catch (TypeChefException e) {
-			
+
 			e.printStackTrace();
 		}
 	}
@@ -636,6 +637,7 @@ public class CPPComposer extends PPComposerExtensionClass {
 	 * Show variants with errors
 	 */
 	private synchronized void verifyVariantsWithProblems() {
+		System.out.println("akkkkkkk");
 		threadInExecId.remove(Thread.currentThread().getId());
 		if (threadInExecId.isEmpty()) {
 			final Display display = Display.getDefault();
@@ -643,6 +645,7 @@ public class CPPComposer extends PPComposerExtensionClass {
 				throw new NullPointerException("Display is null");
 			}
 			display.syncExec(new Runnable() {
+				@Override
 				public void run() {
 					InvalidProductsViewController invalidProductViewController = InvalidProductsViewController
 							.getInstance();
@@ -659,7 +662,7 @@ public class CPPComposer extends PPComposerExtensionClass {
 						invalidProductViewController.setInput(logs);
 					} else {
 						// Clear view
-						invalidProductViewController.clear();
+						// invalidProductViewController.clear();
 						MessageDialog.openInformation(new Shell(),
 								Colligens.PLUGIN_NAME,
 								"The products generated successfully!");

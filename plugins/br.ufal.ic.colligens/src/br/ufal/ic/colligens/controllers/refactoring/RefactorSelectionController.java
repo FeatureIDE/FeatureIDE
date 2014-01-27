@@ -88,9 +88,9 @@ public class RefactorSelectionController extends Refactoring {
 			OperationCanceledException {
 		try {
 			pm.beginTask("Creating change...", 1);
-			Change[] changeArray = changes.toArray(new Change[] {});
 			//
-			return new CompositeChange(getName(), changeArray);
+			return new CompositeChange(getName(),
+					changes.toArray(new Change[] {}));
 		} finally {
 			pm.done();
 		}

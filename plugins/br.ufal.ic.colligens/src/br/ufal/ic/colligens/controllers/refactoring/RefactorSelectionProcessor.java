@@ -14,7 +14,6 @@ import org.eclipse.ltk.core.refactoring.TextFileChange;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 
-import br.ufal.ic.colligens.activator.Colligens;
 import br.ufal.ic.colligens.models.PlatformException;
 import br.ufal.ic.colligens.models.PlatformHeader;
 import core.RefactoringFrontend;
@@ -26,6 +25,7 @@ public class RefactorSelectionProcessor {
 	private String sourceOutRefactor;
 	private TextSelection textSelection = null;
 	private IFile file = null;
+	private PlatformHeader platformHeader;
 	// List of change perform on the code
 	protected List<Change> changes = new LinkedList<Change>();
 
@@ -36,10 +36,11 @@ public class RefactorSelectionProcessor {
 		this.textSelection = textSelection;
 		this.file = file;
 
-		PlatformHeader platformHeader = new PlatformHeader();
+		platformHeader = new PlatformHeader();
 
 		try {
-			platformHeader.stubs(file.getProject().getName());
+			platformHeader.setProject(file.getProject().getName());
+			platformHeader.stubs();
 		} catch (PlatformException e) {
 			e.printStackTrace();
 			throw new RefactorException();
@@ -48,12 +49,7 @@ public class RefactorSelectionProcessor {
 		RefactoringFrontend refactoring = new RefactoringFrontend();
 
 		this.sourceOutRefactor = refactoring.refactorCode(
-				textSelection.getText(), Colligens.getDefault().getConfigDir()
-						.getAbsolutePath()
-						+ System.getProperty("file.separator")
-						+ "projects"
-						+ System.getProperty("file.separator")
-						+ file.getProject().getName() + "_stubs.h",
+				textSelection.getText(), platformHeader.stubsAbsolutePath(),
 				refactoringType);
 
 		this.removeStubs();
@@ -82,15 +78,11 @@ public class RefactorSelectionProcessor {
 
 	public void removeStubs() throws IOException {
 
-		BufferedReader br = new BufferedReader(new FileReader(Colligens
-				.getDefault().getConfigDir().getAbsolutePath()
-				+ System.getProperty("file.separator")
-				+ "projects"
-				+ System.getProperty("file.separator")
-				+ file.getProject().getName() + "_stubs.h"));
+		BufferedReader br = new BufferedReader(new FileReader(
+				platformHeader.stubsAbsolutePath()));
 		try {
 			String line = br.readLine();
-			while (line != null) {
+			while (line != null && line.contains("typedef")) {
 				sourceOutRefactor = sourceOutRefactor.replace(line + "\n", "");
 				line = br.readLine();
 			}
