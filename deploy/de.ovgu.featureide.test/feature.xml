@@ -239,14 +239,6 @@ Library.
          unpack="false"/>
 
    <plugin
-         id="de.ovgu.featureide.core.deltaj_test"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
          id="de.ovgu.featureide.ui_test"
          download-size="0"
          install-size="0"
