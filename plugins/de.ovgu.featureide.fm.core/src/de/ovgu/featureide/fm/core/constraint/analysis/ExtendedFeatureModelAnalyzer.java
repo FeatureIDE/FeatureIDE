@@ -20,16 +20,25 @@
  */
 package de.ovgu.featureide.fm.core.constraint.analysis;
 
+import static java.lang.String.format;
+
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.List;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.sat4j.specs.TimeoutException;
 
 import com.google.common.collect.BiMap;
 
 import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelReader;
 
 /**
  * Checks the {@link ExtendedFeatureModel} for validation.
@@ -41,12 +50,15 @@ public class ExtendedFeatureModelAnalyzer extends FeatureModelAnalyzer  {
 	private ExtendedFeatureModel efm;
 	private BiMap<String, Integer> map;
 	private List<DeRestriction> deFm;
+	private IProject project;
 	
 	private UniqueId idGen;
 	private RestrictionFactory<DeRestriction> deFactory;
 
-	public ExtendedFeatureModelAnalyzer(FeatureModel fm) {
+	public ExtendedFeatureModelAnalyzer(FeatureModel fm, IProject project) {
 		super(fm);
+		
+		this.project = project;
 
 		this.efm = (ExtendedFeatureModel) fm;
 		this.idGen = new UniqueId();
@@ -85,7 +97,36 @@ public class ExtendedFeatureModelAnalyzer extends FeatureModelAnalyzer  {
 					return false;
 				}
 			}
-		}		
+		}
+		
+		if (efm.hasParameters()) {
+			// check if parameter models are contained in the shadowmodel at the correct position
+			for (String key : efm.getParameters().keySet()){
+				String interfaceName = efm.getParameters().get(key);
+				String modelName = efm.getInstanceMappings().get(key);
+
+				final ExtendedFeatureModel implementor = new ExtendedFeatureModel();
+				final VelvetFeatureModelReader implementorReader = new VelvetFeatureModelReader(implementor);
+				final IResource res = project.findMember(format("MPL/%s.velvet", modelName));
+				final File file = res.getLocation().toFile();
+
+				try {
+					implementorReader.readFromFile(file);
+					final ExtendedFeatureModelAnalyzer analyzer = new ExtendedFeatureModelAnalyzer(implementor, project);
+					
+					if (!(interfaceName.equals(implementor.implementsInterface()) &&
+							analyzer.isValid())) {
+						return false;
+					}
+				} catch ( final FileNotFoundException e ) {
+					FMCorePlugin.getDefault().logError(e);
+				} catch ( final UnsupportedModelException e ) {
+					FMCorePlugin.getDefault().logError(e);
+				} catch ( TimeoutException e ) {
+					FMCorePlugin.getDefault().logError(e);
+				}
+			}
+		}
 		return true;
 	}
 	

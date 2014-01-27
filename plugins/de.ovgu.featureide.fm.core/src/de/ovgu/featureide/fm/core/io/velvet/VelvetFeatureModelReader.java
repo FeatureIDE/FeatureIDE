@@ -757,7 +757,7 @@ public class VelvetFeatureModelReader
 				parseModel(root);
 				parseAttributeConstraints();
 
-				final ExtendedFeatureModelAnalyzer analyzer = new ExtendedFeatureModelAnalyzer(this.extFeatureModel);
+				final ExtendedFeatureModelAnalyzer analyzer = new ExtendedFeatureModelAnalyzer(this.extFeatureModel, getProject());
 				FMCorePlugin.getDefault().logInfo("Velvet-Featuremodel imported");
 
 				try {
