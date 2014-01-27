@@ -136,7 +136,7 @@ public abstract class Generator {
 	}
 
 	public static FeatureModel refactoring(FeatureModel originalFM, long id, int numberOfEdits) {
-		FeatureModel fm = (FeatureModel) originalFM.clone();
+		FeatureModel fm = originalFM.clone();
 		Random random = new Random(id);
 		
 		for (int i = 0; i < numberOfEdits; i++) {
@@ -187,7 +187,7 @@ public abstract class Generator {
 	}
 
 	public static FeatureModel generalization(FeatureModel originalFM, long id, int numberOfEdits) {
-		FeatureModel fm = (FeatureModel) originalFM.clone();
+		FeatureModel fm = originalFM.clone();
 		Random random = new Random(id);
 		
 		for (int i = 0; i < numberOfEdits; i++) {
@@ -314,7 +314,7 @@ public abstract class Generator {
 		} catch (TimeoutException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
-		FeatureModel fm = (FeatureModel) originalFM.clone();
+		FeatureModel fm = originalFM.clone();
 		Random random = new Random(id);
 		
 		for (int i = 0; i < numberOfEdits; i++) {

@@ -55,7 +55,6 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
@@ -302,7 +301,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		ObjectUndoContext undoContext = new ObjectUndoContext(this);
 		featureModel.setUndoContext(undoContext);
 
-		printAction = new FMPrintAction((IWorkbenchPart)this);
+		printAction = new FMPrintAction(this);
 		selectAllAction = new SelectAllAction(this);
 
 		IWorkbenchPartSite site = this.getSite();

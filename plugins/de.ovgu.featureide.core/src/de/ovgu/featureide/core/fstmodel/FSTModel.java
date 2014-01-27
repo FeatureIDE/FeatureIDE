@@ -20,9 +20,11 @@
  */
 package de.ovgu.featureide.core.fstmodel;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
 
@@ -41,9 +43,10 @@ import de.ovgu.featureide.core.IFeatureProject;
 
 public class FSTModel {
 
-	private HashMap<String, FSTClass> classes = new HashMap<String, FSTClass>();
-	private HashMap<String, FSTFeature> features = new HashMap<String, FSTFeature>();
-	private IFeatureProject featurProject;
+	private final Map<String, FSTClass> classes = new HashMap<String, FSTClass>();
+	private final Map<String, FSTFeature> features = new HashMap<String, FSTFeature>();
+	private final IFeatureProject featurProject;
+	private FSTConfiguration configuration;
 
 	public FSTModel(IFeatureProject featureProject) {
 		this.featurProject = featureProject;
@@ -55,8 +58,8 @@ public class FSTModel {
 	}
 
 	@Nonnull
-	public LinkedList<FSTFeature> getFeatures() {
-		return new LinkedList<FSTFeature>(features.values());
+	public Collection<FSTFeature> getFeatures() {
+		return features.values();
 	}
 
 	public FSTFeature getFeature(String name) {
@@ -72,9 +75,21 @@ public class FSTModel {
 		if (feature != null) {
 			return feature;
 		}
-		feature = new FSTFeature(name);
+		feature = new FSTFeature(name, this);
 		features.put(name, feature);
 		return feature;
+	}
+	
+	public void addFeature(final FSTFeature feature) {
+		if (!features.containsValue(feature)) {
+			features.put(feature.getName(), feature);
+		}
+	}
+	
+	public void addClass(final FSTClass c) {
+		if (!classes.containsValue(c)) {
+			classes.put(c.getName(), c);
+		}
 	}
 
 	public FSTRole addRole(String featureName, String className, IFile file) {
@@ -90,7 +105,7 @@ public class FSTModel {
 		FSTFeature feature = addFeature(featureName);
 		role = new FSTRole(file, feature, c);
 		c.addRole(featureName, role);
-		feature.roles.put(className, role);
+		feature.addRole(className, role);
 		return role;
 	}
 
@@ -112,5 +127,47 @@ public class FSTModel {
 
 	public IFeatureProject getFeatureProject() {
 		return featurProject;
+	}
+	
+	/**
+	 * @param configuration the configuration to set
+	 */
+	public void setConfiguration(FSTConfiguration configuration) {
+		this.configuration = configuration;
+	}
+	
+	/**
+	 * @return the configuration
+	 */
+	public FSTConfiguration getConfiguration() {
+		return configuration;
+	}
+	
+	public FSTRole addArbitraryFile(final String featureName, final IFile file) {
+		final String fileExtension = file.getFileExtension();
+		final String className;
+		if (fileExtension == null) {
+			className = "*.";
+		} else {
+			className = "*." + file.getFileExtension();
+		}
+		FSTRole role = getRole(featureName, className);
+		if (role != null) {
+			if (role instanceof FSTArbitraryRole) {
+				((FSTArbitraryRole) role).addFile(file);
+			}
+			return role;
+		}
+		FSTClass c = classes.get(className);
+		if (c == null) {
+			c = new FSTClass(className);
+			classes.put(className, c);
+		}
+		FSTFeature feature = addFeature(featureName);
+		FSTArbitraryRole arbitraryRole = new FSTArbitraryRole(feature, c);
+		arbitraryRole.addFile(file);
+		c.addRole(featureName, arbitraryRole);
+		feature.addRole(className, arbitraryRole);
+		return role;
 	}
 }

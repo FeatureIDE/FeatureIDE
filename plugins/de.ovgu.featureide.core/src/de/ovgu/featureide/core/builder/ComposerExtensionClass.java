@@ -68,7 +68,6 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	protected final static String[] JAVA_TEMPLATE = new String[]{"Java", "java", PACKAGE_PATTERN + "/**\r\n * TODO description\r\n */\r\npublic class " + CLASS_NAME_PATTERN +" {\n\n}"};
 	
 	public boolean initialize(IFeatureProject project) {
-	
 		assert (project != null) : "Invalid project given";
 		featureProject = project;
 		return true;
@@ -335,13 +334,15 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		return false;
 	}
 	
-	
 	protected boolean isPluginInstalled(String ID) {
 		for(Bundle b :InternalPlatform.getDefault().getBundleContext().getBundles()){
-			if(b.getSymbolicName().startsWith(ID))return true;
+			if(b.getSymbolicName().startsWith(ID)) {
+				return true;
+			}
 		}
 		return false;
 	}
+	
 	protected void generateWarning(String Warning) {
 		this.featureProject.createBuilderMarker(featureProject
 				.getProject(), Warning, 0, IMarker.SEVERITY_WARNING);

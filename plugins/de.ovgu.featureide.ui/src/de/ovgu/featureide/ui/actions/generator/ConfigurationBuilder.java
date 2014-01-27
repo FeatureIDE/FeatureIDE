@@ -234,7 +234,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 				Job number = new StoppableJob(JOB_TITLE_COUNT_CONFIGURATIONS) {
 					public IStatus execute(IProgressMonitor monitor) {
 						configurationNumber = new Configuration(featureModel, false, false).number(1000000);
-						if (configurationNumber < ((long)0)) {
+						if (configurationNumber < (0)) {
 							UIPlugin.getDefault().logWarning("Satsolver overflow");
 							configurationNumber = Integer.MAX_VALUE;
 						}
@@ -671,7 +671,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 					if (counting && configurationNumber != 0) {
 						counting = false;
 						monitor.beginTask("" , (int) configurationNumber);
-						monitor.worked((int)builtConfigurations);
+						monitor.worked(builtConfigurations);
 						built = builtConfigurations;
 						builtConfigurations = 0;
 					} else if (configurationNumber != 0) {

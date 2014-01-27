@@ -200,7 +200,7 @@ public class SXFMWriter extends AbstractFeatureModelWriter {
 		for (org.prop4j.Node node : featureModel.getPropositionalNodes()) {
 			// avoid use of parenthesis from the beginning
 			And n = (And) node.clone().toCNF();
-			for (org.prop4j.Node child : ((And) n).getChildren()) {
+			for (org.prop4j.Node child : n.getChildren()) {
 				String nodeString = NodeWriter.nodeToString(child, symbols, false);
 				// remove the external parenthesis
 				if ((nodeString.startsWith("(")) && (nodeString.endsWith(")"))) {

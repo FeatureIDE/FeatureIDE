@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.ahead.model;
 
-import java.util.LinkedList;
-
 import jampack.AST_Modifiers;
 import jampack.AST_ParList;
 import jampack.AST_Program;
@@ -34,6 +32,9 @@ import jampack.FldVarDec;
 import jampack.MethodDcl;
 import jampack.MthDector;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 
@@ -41,7 +42,6 @@ import de.ovgu.featureide.ahead.AheadCorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
-import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 
 /**
@@ -55,17 +55,13 @@ import de.ovgu.featureide.core.fstmodel.FSTRole;
  */
 public class JampackJakModelBuilder extends AbstractJakModelBuilder<AST_Program>{
 
-	private FSTModel model;
-	
-	private IFolder sourceFolder;
-
+	/**
+	 * @param featureProject
+	 */
 	public JampackJakModelBuilder(IFeatureProject featureProject) {
-		if (featureProject != null) {
-			model = new FSTModel(featureProject);
-			featureProject.setFSTModel(model);
-		}
+		super(featureProject);
 	}
-	
+
 	@Override
 	public void reset() {
 		model.reset();
@@ -83,7 +79,8 @@ public class JampackJakModelBuilder extends AbstractJakModelBuilder<AST_Program>
 	 * @param ownASTs
 	 *            ahead ASTs of each source file without composing
 	 */
-	public void addClass(String className, LinkedList<IFile> sources,
+	@Override
+	public void addClass(String className, List<IFile> sources, 
 			AST_Program[] composedASTs, AST_Program[] ownASTs) {
 		sourceFolder = model.getFeatureProject().getSourceFolder();
 		try {
@@ -93,7 +90,8 @@ public class JampackJakModelBuilder extends AbstractJakModelBuilder<AST_Program>
 		}
 	}
 
-	public void updateAst(String currentClass, LinkedList<IFile> sources,
+	@Override
+	public void updateAst(String currentClass, List<IFile> sources, 
 			AST_Program[] composedASTs, AST_Program[] ownASTs) {
 		IFile currentFile = null;
 		AstCursor c = new AstCursor();
@@ -225,5 +223,4 @@ public class JampackJakModelBuilder extends AbstractJakModelBuilder<AST_Program>
 			return folder.getName();
 		return getFeature((IFolder)folder.getParent());
 	}
-
 }

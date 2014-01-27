@@ -694,6 +694,9 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	}
 
 	public List<String> getFeatureOrderList() {
+		if (featureOrderList.isEmpty()) {
+			return getConcreteFeatureNames();
+		}
 		return featureOrderList;
 	}
 

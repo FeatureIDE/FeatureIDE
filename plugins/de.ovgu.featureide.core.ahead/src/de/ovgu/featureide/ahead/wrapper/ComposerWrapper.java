@@ -314,6 +314,7 @@ public class ComposerWrapper {
 		} else {
 			composeMixinJakFiles(compositionFolder);
 		}
+		jakModelBuilder.addArbitraryFiles();
 		IFile[] composedFilesArray = new IFile[composedFiles.size()];
 		for (int i = 0; i < composedFilesArray.length; i++) {
 			composedFilesArray[i] = composedFiles.get(i);
@@ -370,21 +371,6 @@ public class ComposerWrapper {
 						"Unexpected error while parsing "
 								+ newJakIFile.getName(), 0);
 			}
-
-//			try {
-//				newJakIFile.refreshLocal(IResource.DEPTH_ZERO, null);
-//				if (newJakIFile.exists()) {
-//					newJakIFile.setDerived(true);
-//					ResourceAttributes attr = newJakIFile
-//							.getResourceAttributes();
-//					if (attr != null) {
-//						attr.setReadOnly(false);
-//						newJakIFile.setResourceAttributes(attr);
-//					}
-//				}
-//			} catch (CoreException e) {
-//				AheadCorePlugin.getDefault().logError(e);
-//			}
 		}
 	}
 
@@ -516,7 +502,7 @@ public class ComposerWrapper {
 	}
 
 	private boolean isSelectedFeature(IFolder folder) {
-		if (featureProject.getSourceFolder().equals((IFolder)folder.getParent())) {
+		if (featureProject.getSourceFolder().equals(folder.getParent())) {
 			if (featureFolders.contains(folder)) {
 				return true;
 			}

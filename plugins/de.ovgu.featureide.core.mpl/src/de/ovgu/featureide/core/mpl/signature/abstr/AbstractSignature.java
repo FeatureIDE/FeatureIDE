@@ -62,6 +62,8 @@ public abstract class AbstractSignature {
 	
 	protected int[] featureIDs;
 	
+	public abstract int getLine();
+	
 	protected AbstractSignature(AbstractClassSignature parent, String name, String modifierString, String type) {
 		this.parent = parent;
 		this.name = name;

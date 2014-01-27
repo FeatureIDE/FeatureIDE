@@ -90,7 +90,7 @@ public class AheadComposer extends ComposerExtensionClass {
 			return true;
 		} catch (IOException e) {
 			featureProject.createBuilderMarker(featureProject.getProject(),
-					e.getMessage(), 0, IMarker.SEVERITY_ERROR);
+					e.getMessage(), -1, IMarker.SEVERITY_ERROR);
 			return false;
 		}
 		

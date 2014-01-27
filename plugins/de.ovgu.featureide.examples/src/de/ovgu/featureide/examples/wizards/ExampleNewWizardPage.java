@@ -353,7 +353,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 						monitor.worked(50);
 						monitor.subTask("Processing results");
 						while (filesIterator.hasNext()) {
-							selectedProjects[index++] = (ProjectRecord) filesIterator
+							selectedProjects[index++] = filesIterator
 									.next();
 						}
 					}
@@ -371,7 +371,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 						monitor.worked(50);
 						monitor.subTask("Processing results");
 						while (filesIterator.hasNext()) {
-							selectedProjects[index++] = (ProjectRecord) filesIterator
+							selectedProjects[index++] = filesIterator
 									.next();
 						}
 					} else {

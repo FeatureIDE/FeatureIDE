@@ -77,7 +77,7 @@ public class NodeCreator {
 		And and = new And(nodes);
 		and = (And) replaceAbstractVariables(and, replacingMap, false);
 		and = eliminateAbstractVariables(and, replacingMap, featureModel);
-		return (And)replaceNames(and,featureModel);
+		return replaceNames(and,featureModel);
 	}
 
 	/**

@@ -119,14 +119,14 @@ public class CommentParser {
 		Map<String, String> requirements;
 
 		while (i.hasNext()) {
-			reqGroup = (String) i.next();
+			reqGroup = i.next();
 			catName = getTextInTag(REQUIREMENT_CATEGORY_NAME_TAG, reqGroup);
 			requirements = new HashMap<String, String>();
 			List<String> reqs = getElements(REQUIREMENT_TAG, reqGroup, 0);
 			Iterator<String> j = reqs.iterator();
 
 			while (j.hasNext()) {
-				curReq = (String) j.next();
+				curReq = j.next();
 				requirements.put(getTextInTag(PLUGIN_ID_TAG, curReq),
 						getTextInTag(PLUGIN_MISSING_MSG_TAG, curReq));
 
