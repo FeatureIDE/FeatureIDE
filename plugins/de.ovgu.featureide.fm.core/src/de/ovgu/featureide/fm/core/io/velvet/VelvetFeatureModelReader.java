@@ -536,7 +536,11 @@ public class VelvetFeatureModelReader
 		final String instanceName = childList.poll().getText();
 		Map<String, String> parameters = extFeatureModel.getParameters();
 		String instance = parameters.get(instanceName);
-		System.err.println(instance);
+		if (null == instance){
+			FMCorePlugin.getDefault().logError(
+				new UnsupportedModelException(format("An interface named %s is used, but no parameter with the "
+					+ "respective Model is given.", instance), 0));
+		}
 		
 		// read interface 
 		final ExtendedFeatureModel interf = new ExtendedFeatureModel();
