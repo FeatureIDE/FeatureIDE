@@ -117,6 +117,9 @@ public class ExtendedFeatureModel
 	public void createShadowModel() {
 		this.shadowModel = new ExtendedFeatureModel();
 		final Feature tmpRoot = new Feature(this.shadowModel, "ShadowModelRoot");
+		tmpRoot.setAbstract(true);
+		tmpRoot.setMandatory(true);
+		
 		this.shadowModel.addFeature(tmpRoot);
 		this.shadowModel.setRoot(tmpRoot);
 	}

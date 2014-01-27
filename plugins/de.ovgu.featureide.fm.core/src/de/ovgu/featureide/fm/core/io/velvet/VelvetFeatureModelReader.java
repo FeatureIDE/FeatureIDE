@@ -131,12 +131,12 @@ public class VelvetFeatureModelReader
 			final Feature feature =
 				addFeature(model, parentNode, child.getName(), child.isMandatory(), child.isAbstract(),
 					child.isHidden());
-			// save imported feature into mapping to store imported status
 			feature.setAND(child.isAnd());
 			feature.setMultiple(child.isMultiple());
 			if (child.isOr()) {
 				feature.setOr();
 			}
+			// save imported feature into mapping to store imported status
 			switch (mode) {
 				case INHERITANCE:
 					extFeatureModel.setFeatureInherited(feature, parent);
@@ -225,20 +225,37 @@ public class VelvetFeatureModelReader
 	 * inserts an instance at a given position
 	 * 
 	 */
-	private void insertInstance(final FeatureModel instance, final String instancename, final Feature parent) {
+	private void insertInstance(final FeatureModel instance, final String instancename, Feature parent) {
 		final Feature instanceRoot = instance.getRoot();
 
+		ExtendedFeatureModel writeModel;
 		
+		if (null == this.extFeatureModel.implementsInterface()) {
+			// we parsed no interface. Therefore we can copy shadow model to the
+			// original
+			copyShadowModel();
+			
+			writeModel = this.extFeatureModel;
+		} else {
+			writeModel = this.extFeatureModel.getShadowModel();
+			
+			if (parent.equals(extFeatureModel.getRoot())) {
+				parent = writeModel.getFeature(parent.getName());
+				if (null == parent) {
+					parent = writeModel.getRoot();
+				}
+			}
+		}
 		
 		final Feature connector =
-			addFeature(this.extFeatureModel, parent, instancename, false,
-				instanceRoot.isAbstract(), instanceRoot.isHidden());
+			addFeature(writeModel, parent, instancename, false,
+				true, instanceRoot.isHidden());
 		this.extFeatureModel.setFeaturefromInstance(connector, instancename);
 		if (instanceRoot.isAlternative()) {
 			connector.setAlternative();
 		}
 
-		copyChildnodes(this.extFeatureModel, connector, instanceRoot.getChildren(), instancename,
+		copyChildnodes(writeModel, connector, instanceRoot.getChildren(), instancename,
 			FeatureInheritanceModes.INSTANCE);
 		for (final Constraint constraint : instance.getConstraints()) {
 			this.extFeatureModel.addConstraint(constraint);
@@ -600,7 +617,7 @@ public class VelvetFeatureModelReader
 					moreDefinitions = true;
 			}
 		}
-
+		
 		ExtendedFeatureModel writeModel;
 		if (null == this.extFeatureModel.implementsInterface()) {
 			// we parsed no interface. Therefore we can copy shadow model to the
