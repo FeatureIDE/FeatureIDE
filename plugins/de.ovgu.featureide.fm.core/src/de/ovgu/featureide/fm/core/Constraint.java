@@ -99,9 +99,7 @@ public class Constraint implements PropertyConstants {
 		Collection<Feature> deadFeaturesBefore = null;		
 		Node propNode = this.getNode();
 		if (propNode != null) {
-			if (this != null) {
-				fm.removeConstraint(this);
-			}
+			fm.removeConstraint(this);
 			deadFeaturesBefore = fm.getAnalyser().getDeadFeatures();
 			fm.addPropositionalNode(propNode);
 			fm.handleModelDataChanged();

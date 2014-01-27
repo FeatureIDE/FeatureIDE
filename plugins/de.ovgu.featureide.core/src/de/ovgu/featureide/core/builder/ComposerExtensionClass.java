@@ -334,13 +334,15 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		return false;
 	}
 	
-	
 	protected boolean isPluginInstalled(String ID) {
 		for(Bundle b :InternalPlatform.getDefault().getBundleContext().getBundles()){
-			if(b.getSymbolicName().startsWith(ID))return true;
+			if(b.getSymbolicName().startsWith(ID)) {
+				return true;
+			}
 		}
 		return false;
 	}
+	
 	protected void generateWarning(String Warning) {
 		this.featureProject.createBuilderMarker(featureProject
 				.getProject(), Warning, 0, IMarker.SEVERITY_WARNING);

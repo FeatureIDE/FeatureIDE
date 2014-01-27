@@ -115,7 +115,7 @@ public class DirectivesNode extends LazyParent {
 					average += i;
 				}
 				if (list.size() != 0) {
-					average /= (double) list.size();
+					average /= list.size();
 					average *= 10;
 					long rounded = Math.round(average);
 					average = ((double) rounded) / 10;
@@ -164,7 +164,7 @@ public class DirectivesNode extends LazyParent {
 			
 			Integer numberOfChildren = parent.getChildren().length;
 			
-			double average = (double) numberOfDirectives;
+			double average = numberOfDirectives;
 			
 			average /= (double) numberOfChildren;
 			average *= 10;

@@ -648,7 +648,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		try {
 			for (ICommand command : project.getDescription().getBuildSpec()) {
 				if (BUILDER_ID.equals(command.getBuilderName())) {
-					return (String) command.getArguments().get(argument);
+					return command.getArguments().get(argument);
 				}
 			}
 		} catch (CoreException e) {

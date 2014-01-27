@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
@@ -127,7 +128,7 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 
 	public void performFullBuild(IFile config) {
 		if(!isPluginInstalled(PLUGIN_ID)){
-			generateWarning(PLUGIN_WARNING);
+			featureProject.createBuilderMarker(featureProject.getProject(), PLUGIN_WARNING, -1, IMarker.SEVERITY_ERROR);
 		}
 		initialize(CorePlugin.getFeatureProject(config));
 		featureCpp.compose(config);

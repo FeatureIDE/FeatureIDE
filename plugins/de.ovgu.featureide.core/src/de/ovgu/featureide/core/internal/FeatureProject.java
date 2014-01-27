@@ -1107,13 +1107,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		if (selections.length == 0) {
 			return Collections.emptyList();
 		}
-		final List<String> concreteFeatures = featureModel.getConcreteFeatureNames();
-		for (final Feature feature : featureModel.getAnalyser().getCoreFeatures()) {
-			concreteFeatures.remove(feature.getName());
-		}
-		for (final Feature feature : featureModel.getAnalyser().getCachedDeadFeatures()) {
-			concreteFeatures.remove(feature.getName());
-		}
+		final List<String> concreteFeatures = getOptionalConcreteFeatures();
 		final List<String> falseOptionalFeatures = new LinkedList<String>();
 		if (selections.length != 0) {
 			for (int collumn = 0; collumn < concreteFeatures.size(); collumn++) {
@@ -1134,13 +1128,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 
 	private boolean[][] getSelectionMatrix() {
 		final List<IFile> configurations = getAllConfigurations();
-		final List<String> concreteFeatures = featureModel.getConcreteFeatureNames();
-		for (final Feature feature : featureModel.getAnalyser().getCoreFeatures()) {
-			concreteFeatures.remove(feature.getName());
-		}
-		for (final Feature feature : featureModel.getAnalyser().getCachedDeadFeatures()) {
-			concreteFeatures.remove(feature.getName());
-		}
+		final List<String> concreteFeatures = getOptionalConcreteFeatures();
 		
 		boolean[][] selections = new boolean[configurations.size()][concreteFeatures.size()];
 		int row = 0;
@@ -1154,6 +1142,17 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			row++;
 		}
 		return selections;
+	}
+
+	private List<String> getOptionalConcreteFeatures() {
+		final List<String> concreteFeatures = featureModel.getConcreteFeatureNames();
+		for (final Feature feature : featureModel.getAnalyser().getCoreFeatures()) {
+			concreteFeatures.remove(feature.getName());
+		}
+		for (final Feature feature : featureModel.getAnalyser().getDeadFeatures()) {
+			concreteFeatures.remove(feature.getName());
+		}
+		return concreteFeatures;
 	}
 
 	public ProjectTree getProjectTree() {
@@ -1245,7 +1244,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			for (ICommand command : project.getDescription().getBuildSpec()) {
 				if (ExtensibleFeatureProjectBuilder.BUILDER_ID.equals(
 						command.getBuilderName())) {
-					return (String) command.getArguments().get(argument);
+					return command.getArguments().get(argument);
 				}
 			}
 		} catch (CoreException e) {
@@ -1268,7 +1267,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			for (ICommand command : project.getDescription().getBuildSpec()) {
 				if (command.getBuilderName().equals(
 						ExtensibleFeatureProjectBuilder.BUILDER_ID)) {
-					id = (String) command.getArguments().get(
+					id = command.getArguments().get(
 							ExtensibleFeatureProjectBuilder.COMPOSER_KEY);
 					if (id != null)
 						return id;

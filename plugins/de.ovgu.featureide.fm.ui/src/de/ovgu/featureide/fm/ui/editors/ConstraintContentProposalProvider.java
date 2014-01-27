@@ -68,7 +68,7 @@ public class ConstraintContentProposalProvider implements
 		List<ContentProposal> proposalList = getProposalList(words, contents);
 
 
-		return (IContentProposal[]) proposalList
+		return proposalList
 				.toArray(new IContentProposal[proposalList.size()]);
 
 	}

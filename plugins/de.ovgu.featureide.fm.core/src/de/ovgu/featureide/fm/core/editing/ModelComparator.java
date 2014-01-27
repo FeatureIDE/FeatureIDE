@@ -185,7 +185,7 @@ public class ModelComparator {
 			return node;
 		LinkedList<Node> children = new LinkedList<Node>();
 		for (Object var : addedFeatures)
-			children.add(new Literal((String) var, false));
+			children.add(new Literal(var, false));
 		return new And(node, new And(children));
 	}
 

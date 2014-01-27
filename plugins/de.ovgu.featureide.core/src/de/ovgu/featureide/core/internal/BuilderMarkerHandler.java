@@ -42,11 +42,12 @@ public class BuilderMarkerHandler implements IBuilderMarkerHandler {
 	private static final String CONFIGURATION_MARKER = CorePlugin.PLUGIN_ID
 			+ ".configurationProblemMarker";
 
+	protected final IProject project;
+	
 	public BuilderMarkerHandler(IProject project) {
 		this.project = project;
 	}
 
-	protected final IProject project;
 
 	/*
 	 * (non-Javadoc)
@@ -132,9 +133,6 @@ public class BuilderMarkerHandler implements IBuilderMarkerHandler {
 			IMarker marker = resource.createMarker(CONFIGURATION_MARKER);
 			marker.setAttribute(IMarker.MESSAGE, message);
 			marker.setAttribute(IMarker.SEVERITY, severity);
-//			if (lineNumber == -1) {
-//				lineNumber = 1;
-//			}
 			marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);

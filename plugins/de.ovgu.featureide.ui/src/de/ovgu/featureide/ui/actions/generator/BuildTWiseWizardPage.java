@@ -22,7 +22,6 @@ package de.ovgu.featureide.ui.actions.generator;
 
 import javax.annotation.CheckForNull;
 
-import org.eclipse.core.internal.runtime.InternalPlatform;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -37,7 +36,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Text;
-import org.osgi.framework.Bundle;
+
 import de.ovgu.featureide.core.IFeatureProject;
 
 /**
@@ -45,7 +44,6 @@ import de.ovgu.featureide.core.IFeatureProject;
  * 
  * @author Jens Meinicke
  */
-@SuppressWarnings("restriction")
 public class BuildTWiseWizardPage extends WizardPage implements IConfigurationBuilderBasics {
 
 	private static final String INTERACTIONS = "&Interactions: t=";
@@ -177,14 +175,6 @@ public class BuildTWiseWizardPage extends WizardPage implements IConfigurationBu
 	
 	int getT() {
 		return scale.getSelection();
-	}
-	
-	public boolean isPluginInstalled(String ID) {
-		for(Bundle b :InternalPlatform.getDefault().getBundleContext().getBundles()){
-			System.out.println(b.getSymbolicName());
-			if(b.getSymbolicName().startsWith(ID))return true;
-		}
-		return false;
 	}
 	
 }
