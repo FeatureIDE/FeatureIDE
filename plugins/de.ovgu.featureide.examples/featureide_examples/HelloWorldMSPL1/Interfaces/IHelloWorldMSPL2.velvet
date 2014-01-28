@@ -1,0 +1,6 @@
+cinterface IHelloWorldMSPL2 {
+	feature Feature2 {
+		feature Wonderful2;
+	}
+	feature World2;
+}

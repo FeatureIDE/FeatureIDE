@@ -1,0 +1,5 @@
+HelloWorldMSPL2 hw;
+
+concept HelloWorld-MSPL1 : HelloWorld-MSPL1 (IHelloWorldMSPL2 hw) {
+	use hw;
+}
