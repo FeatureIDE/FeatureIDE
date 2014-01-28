@@ -20,8 +20,12 @@
  */
 package de.ovgu.featureide.core.mspl;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -31,6 +35,16 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
+
+import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
+import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
+import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelReader;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -65,7 +79,9 @@ public class MSPLPlugin extends AbstractUIPlugin {
 		super.start(context);
 		plugin = this;
 
-		initializeImports();
+		// initializeImports();
+
+		CorePlugin.getDefault().logInfo("MSPLPlugin: start");
 	}
 
 	/*
@@ -205,4 +221,97 @@ public class MSPLPlugin extends AbstractUIPlugin {
 		return projects;
 	}
 
+	public void createLinksForExternFeatures() {
+		CorePlugin.getDefault().logInfo(
+				"MSPLPlugin: createLinksForExternFeatures");
+
+		for (IFeatureProject project : CorePlugin.getFeatureProjects()) {
+			createLinksForExternFeatures(project);
+		}
+	}
+
+	public void createLinksForExternFeatures(IFeatureProject project) {
+		FeatureModel fm = project.getFeatureModel();
+
+		if (!(fm instanceof ExtendedFeatureModel))
+			return;
+
+		ExtendedFeatureModel efm = (ExtendedFeatureModel) fm;
+
+		CorePlugin.getDefault().logInfo(
+				String.format("MSPLPlugin: analyze project %s",
+						project.getProjectName()));
+
+		// get imported features
+		HashMap<String, LinkedList<Feature>> instanceFeatures = new HashMap<String, LinkedList<Feature>>();
+		for (Feature feature : fm.getFeatures()) {
+			if (!efm.isImported(feature))
+				continue;
+
+			String instanceVar = efm.getParent(feature);
+			if (!instanceFeatures.containsKey(instanceVar))
+				instanceFeatures.put(instanceVar, new LinkedList<Feature>());
+
+			instanceFeatures.get(instanceVar).add(feature);
+		}
+
+		CorePlugin.getDefault()
+				.logInfo(
+						String.format("MSPLPlugin: map: "
+								+ instanceFeatures.toString()));
+
+		Map<String, String> instanceMapping = efm.getInstanceMappings();
+		for (String instanceVar : instanceFeatures.keySet()) {
+			if (!instanceMapping.containsKey(instanceVar)) {
+				CorePlugin
+						.getDefault()
+						.logWarning(
+								String.format(
+										"MSPL: No instance exists for the instance variable '%s'",
+										instanceVar));
+				return;
+			}
+
+			String mappingModelName = instanceMapping.get(instanceVar);
+			String mappingModelFileName = String.format("MPL/%s.velvet",
+					mappingModelName);
+			IFile mappingModelFile = project.getProject().getFile(
+					mappingModelFileName);
+
+			if (!mappingModelFile.exists()) {
+				CorePlugin.getDefault().logWarning(
+						String.format(
+								"MSPL: Mapping file '%s' does not exists.",
+								mappingModelFileName));
+				return;
+			}
+
+			ExtendedFeatureModel mappingModel = new ExtendedFeatureModel();
+			FeatureModelReaderIFileWrapper reader = new FeatureModelReaderIFileWrapper(
+					new VelvetFeatureModelReader(mappingModel));
+			try {
+				reader.readFromFile(mappingModelFile);
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return;
+			} catch (UnsupportedModelException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return;
+			}
+
+			ExtendedFeatureModel shadowModel = mappingModel.getShadowModel();
+
+			FeatureModelAnalyzer fmAnalyzer = shadowModel.getAnalyser();
+			Collection<String> featureToImport = fmAnalyzer.commonFeatures(
+					5000, instanceFeatures.get(instanceVar));
+
+			CorePlugin.getDefault().logInfo(
+					String.format("MSPLPlugin: common features of %s: %s",
+							project.getProjectName(),
+							featureToImport.toString()));
+		}
+
+	}
 }

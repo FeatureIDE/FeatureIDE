@@ -32,7 +32,7 @@ public class MSPLNature implements IProjectNature {
 
 	@Override
 	public void configure() throws CoreException {
-		// TODO Auto-generated method stub
+		MSPLPlugin.getDefault().createLinksForExternFeatures();
 	}
 
 	@Override
