@@ -84,7 +84,7 @@ public class AspectJFMCompserExtension extends FMComposerExtension {
 		for (IResource res : folder.members()) {
 			if (res instanceof IFolder) {
 				renameAspect((IFolder) res, oldName, newName);
-			} else if (res instanceof IFile) {
+			} else if (res instanceof IFile && res.getFileExtension().equals("aj")) {
 				renameAspect((IFile) res, oldName, newName);
 			}
 		}
@@ -146,7 +146,7 @@ public class AspectJFMCompserExtension extends FMComposerExtension {
 	public String changeFileContent(String content, String oldName, String newName, boolean isAspectFile) {
 		String packageName = getPackege(newName);
 		
-		if (isAspectFile && content.contains("package \\w*;")) {
+		if (isAspectFile && content.matches("[\\w*,\\W*]*package\\s+\\w*;[\\w,\\W]*")) {
 			if (packageName != null) {
 				content = content.replaceFirst("package\\s+\\w*;", "package " + packageName + ";");
 			}
@@ -165,12 +165,7 @@ public class AspectJFMCompserExtension extends FMComposerExtension {
 		content = content.replaceAll(":\\s*" + getAspect(oldName) + "s*;", ": " + getAspect(newName) + ";");
 		content = content.replaceAll(",\\s*" + getAspect(oldName) + "s*,", ", " + getAspect(newName) + ",");
 		content = content.replaceAll(",\\s*" + getAspect(oldName) + "s*;", ", " + getAspect(newName) + ";");
-		
-		if (packageName != null
-				&& !content.contains("package " + packageName + ";")) {
-			content = "package " + packageName + ";\r\n"
-					+ content;
-		}
+
 		return content;
 	}
 

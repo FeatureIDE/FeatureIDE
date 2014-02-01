@@ -55,8 +55,15 @@ public class FMComposerManager implements IFMComposerExtension {
 		setComposer();
 	}
 	
-	
+	/**
+	 * RENAMED to {@link #getProjectSourcePath()}
+	 */
+	@Deprecated
 	String getProjectConfigurationPath() {
+		return getProjectSourcePath();
+	}
+	
+	String getProjectSourcePath() {
 		try {
 			String path = project.getPersistentProperty(SOURCE_FOLDER_CONFIG_ID);
 			if (path != null)

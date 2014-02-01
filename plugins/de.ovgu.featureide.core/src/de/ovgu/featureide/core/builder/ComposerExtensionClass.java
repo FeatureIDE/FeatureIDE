@@ -23,7 +23,6 @@ package de.ovgu.featureide.core.builder;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
@@ -239,11 +238,11 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		return null;
 	}
 
-	public String replaceMarker(String text, List<String> list, String packageName) {
-		if ("".equals(packageName)) {
-			return text.replace(PACKAGE_PATTERN, "");
+	public String replaceSourceContentMarker(String fileContent,  boolean refines, String packageName) {
+		if (packageName.isEmpty()) {
+			return fileContent.replace(PACKAGE_PATTERN, "");
 		} else {
-			return text.replace(PACKAGE_PATTERN, "package " + packageName + ";\r\n\r\n");
+			return fileContent.replace(PACKAGE_PATTERN, "package " + packageName + ";\r\n\r\n");
 		}
 	}
 

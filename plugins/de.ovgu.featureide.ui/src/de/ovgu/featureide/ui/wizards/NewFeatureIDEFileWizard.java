@@ -25,8 +25,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -185,21 +183,13 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 		});
 		monitor.worked(1);
 	}
-
+	
+	// TODO Rename, method name does not describe the functionality
 	private InputStream openContentStream(String featurename,IContainer container, String classname, String template, IComposerExtension composer, boolean refines, String packageName) {
 		String contents = template;
-		List<String> list = new LinkedList<String>();
-		
-		if (refines) {
-			list.add("refines");
-		}
-		
-		
-		contents = composer.replaceMarker(contents, list, packageName);
+		contents = composer.replaceSourceContentMarker(contents, refines, packageName);
 		contents = contents.replaceAll(IComposerExtensionClass.CLASS_NAME_PATTERN, classname);
 		contents = contents.replaceAll(IComposerExtensionClass.FEATUE_PATTER, featurename);
-		
-		
 		return new ByteArrayInputStream(contents.getBytes(Charset.availableCharsets().get("UTF-8")));
 	}
 

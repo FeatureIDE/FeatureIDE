@@ -25,7 +25,6 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
-import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -205,12 +204,12 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 	 * @see de.ovgu.featureide.core.builder.ComposerExtensionClass#replaceMarker(java.lang.String, java.util.List)
 	 */
 	@Override
-	public String replaceMarker(String text, List<String> list, String packageName) {
-		if (list != null && list.contains("refines"))
+	public String replaceSourceContentMarker(String text,  boolean refines, String packageName) {
+		if (refines)
 			text = text.replace(REFINES_PATTERN, "refines");
 		else
 			text = text.replace(REFINES_PATTERN + " ", "");
-		return text;
+		return super.replaceSourceContentMarker(text, refines, packageName);
 	}
 	
 	/* (non-Javadoc)

@@ -171,5 +171,48 @@ public class TAspectjFMComposerExtension {
 	public void performRenamingsTest_2_3() {
 		assertEquals(fmComposerExtension.changeFileContent(CONTENT_2, OLD_NAME_2_3, NEW_NAME_2_3, true), CONTENT_2_3);
 	}
+	
+	private static final String PACKAGE_CONTENT =
+			  "/* HEADER */\r\n"
+			+ "package P;\r\n"
+			+ "public aspect Main {\r\n"
+			+ "public Main() {\r\n"
+			+ "}\r\n"
+			+ "}";
+	
+	private static final String OLD_PACKAGE_CONTENT =
+			  "/* HEADER */\r\n"
+			+ "package P;\r\n"
+			+ "public aspect OLD {\r\n"
+			+ "public Main() {\r\n"
+			+ "}\r\n"
+			+ "}";
+	
+	private static final String NEW_PACKAGE_CONTENT =
+			  "/* HEADER */\r\n"
+			+ "package P2;\r\n"
+			+ "public aspect NEW {\r\n"
+			+ "public Main() {\r\n"
+			+ "}\r\n"
+			+ "}";
+	
+	private static final String OLD_NAME_PACKAGE = "OLD";
+	private static final String NEW_NAME_PACKAGE = "P2_NEW";
+	
+	@Test
+	public void performRenamingsPackageTest() {
+		assertEquals(PACKAGE_CONTENT, fmComposerExtension.changeFileContent(PACKAGE_CONTENT, OLD_NAME_PACKAGE, NEW_NAME_PACKAGE, false));
+	}
+	
+	@Test
+	public void performRenamingsPackageTest_2() {
+		assertEquals(NEW_PACKAGE_CONTENT, fmComposerExtension.changeFileContent(OLD_PACKAGE_CONTENT, OLD_NAME_PACKAGE, NEW_NAME_PACKAGE, true));
+	}
+	
+	public static void main(String[] args) {
+		System.out.println(OLD_PACKAGE_CONTENT.contains("package P;"));
+		System.out.println(OLD_PACKAGE_CONTENT.matches("[\\w*,\\W*]*package\\s+\\w*;[\\w,\\W]*"));
+		System.out.println(OLD_PACKAGE_CONTENT.matches("[\\w*,\\W*]*packag\\s+\\w*;[\\w,\\W]*"));
+	}
 
 }
