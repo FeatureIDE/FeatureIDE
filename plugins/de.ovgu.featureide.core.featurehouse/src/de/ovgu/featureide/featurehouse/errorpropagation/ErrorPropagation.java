@@ -270,10 +270,10 @@ public class ErrorPropagation {
 			if (!selectedFeatures.contains(role.getFeature())) {
 				continue;
 			}
-			for (FSTField field : role.getFields()) {
+			for (FSTField field : role.getClassFragment().getFields()) {
 				fields.add(field);
 			}
-			for (FSTMethod method : role.getMethods()) {
+			for (FSTMethod method : role.getClassFragment().getMethods()) {
 				methods.add(method);
 			}
 		}

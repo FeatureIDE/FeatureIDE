@@ -95,7 +95,7 @@ public class FSTMethod extends RoleElement {
 			if (role.getFeature().equals(getRole().getFeature())) {
 				continue;
 			}
-			for (FSTMethod method : role.getMethods()) {
+			for (FSTMethod method : role.getClassFragment().getMethods()) {
 				if (method.getName().equals(getName()) && method.getParameter().equals(getParameter())) {
 					return true;
 				}

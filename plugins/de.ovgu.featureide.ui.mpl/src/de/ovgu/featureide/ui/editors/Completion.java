@@ -42,6 +42,7 @@ import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.mpl.InterfaceProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 
 /**
@@ -90,12 +91,18 @@ public class Completion implements IJavaCompletionProposalComputer {
 			ContentAssistInvocationContext arg0, IProgressMonitor arg1) {
 
 		final IFile file = ((IFileEditorInput) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput()).getFile();
-		final IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
+		
+		final InterfaceProject interfaceProject = MPLPlugin.getDefault().getInterfaceProject(file.getProject());
 		final ArrayList<ICompletionProposal> list = new ArrayList<ICompletionProposal>();
+		
+		if (interfaceProject == null)
+			return list;
+
+		final IFeatureProject featureProject = interfaceProject.getFeatureProjectReference();
 		
 		if (featureProject == null)
 			return list;
-
+		
 		String featureName = featureProject.getFeatureName(file);
 		JavaContentAssistInvocationContext context = (JavaContentAssistInvocationContext) arg0;
 
@@ -106,7 +113,7 @@ public class Completion implements IJavaCompletionProposalComputer {
 //			return list;
 //		}
 //		List<CompletionProposal> l = MPLPlugin.getDefault().extendedModules(projectStructure);
-		List<CompletionProposal> l = MPLPlugin.getDefault().extendedModules_getCompl(featureProject, featureName);
+		List<CompletionProposal> l = MPLPlugin.getDefault().extendedModules_getCompl(interfaceProject, featureName);	
 
 		for (CompletionProposal curProp : l) {
 			curProp.setReplaceRange(context.getInvocationOffset()

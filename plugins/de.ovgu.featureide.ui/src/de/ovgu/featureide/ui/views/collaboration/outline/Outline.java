@@ -242,7 +242,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		private int getFieldLine(IFile iFile, FSTField field) {
 			for (FSTRole r : field.getRole().getFSTClass().getRoles()) {
 				if (r.getFile().equals(iFile)) {
-					for (FSTField f : r.getFields()) {
+					for (FSTField f : r.getClassFragment().getFields()) {
 						if (f.comparesTo(field)) {
 							return f.getLine();
 						}
@@ -255,7 +255,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		private int getMethodLine(IFile iFile, FSTMethod meth) {
 			for (FSTRole r : meth.getRole().getFSTClass().getRoles()) {
 				if (r.getFile().equals(iFile)) {
-					for (FSTMethod m : r.getMethods()) {
+					for (FSTMethod m : r.getClassFragment().getMethods()) {
 						if (m.comparesTo(meth)) {
 							return m.getLine();
 						}

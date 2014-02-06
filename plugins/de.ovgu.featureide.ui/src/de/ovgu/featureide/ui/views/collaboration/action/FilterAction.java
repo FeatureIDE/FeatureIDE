@@ -58,7 +58,7 @@ public class FilterAction extends Action {
 		
 		for (Object part : selection.toList()) {
 			if (part instanceof RoleEditPart) { 
-				classFilter.add(((RoleEditPart) part).getRoleModel().getName());
+				classFilter.add(((RoleEditPart) part).getRoleModel().getClassFragment().getName());
 				super.setEnabled(true);
 			} else if (part instanceof ClassEditPart) {
 				classFilter.add(((ClassEditPart) part).getClassModel().getName());

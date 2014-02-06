@@ -331,45 +331,41 @@ public class MPLPlugin extends AbstractCorePlugin {
 		startJob.schedule();
 	}
 	
-	//TODO MPL: use Fuji
-	public List<CompletionProposal> extendedModules_getCompl(IFeatureProject project, String featureName) {
+	public List<CompletionProposal> extendedModules_getCompl(InterfaceProject interfaceProject, String featureName) {
 		final LinkedList<CompletionProposal> ret_List = new LinkedList<CompletionProposal>();
+		final ProjectSignatures signatures = interfaceProject.getProjectSignatures();
 		
-		InterfaceProject interfaceProject = getInterfaceProject(project.getProject());
-		if (interfaceProject != null) {	
-			final ProjectSignatures signatures = interfaceProject.getProjectSignatures();
-			if (signatures != null) {
-				SignatureIterator it = signatures.createIterator();
-				it.addFilter(new ContextFilter(featureName, interfaceProject));
+		if (signatures != null) {
+			SignatureIterator it = signatures.createIterator();
+			it.addFilter(new ContextFilter(featureName, interfaceProject));
 //				Iterator<AbstractSignature> it = signatures.getIterator(new ContextFilter(featureName, interfaceProject));
+			
+			while (it.hasNext()) {
+				AbstractSignature curMember = it.next();
+				CompletionProposal pr = null;
 				
-				while (it.hasNext()) {
-					AbstractSignature curMember = it.next();
-					CompletionProposal pr = null;
-					
-					if (curMember instanceof AbstractMethodSignature) {
-						pr = CompletionProposal.create(CompletionProposal.METHOD_REF, 0);
-						pr.setSignature(Signature.createMethodSignature(new char[][]{{}}, new char[]{}));
-					} else if (curMember instanceof AbstractFieldSignature) {
-						pr = CompletionProposal.create(CompletionProposal.FIELD_REF, 0);
+				if (curMember instanceof AbstractMethodSignature) {
+					pr = CompletionProposal.create(CompletionProposal.METHOD_REF, 0);
+					pr.setSignature(Signature.createMethodSignature(new char[][]{{}}, new char[]{}));
+				} else if (curMember instanceof AbstractFieldSignature) {
+					pr = CompletionProposal.create(CompletionProposal.FIELD_REF, 0);
 //						pr.setDeclarationSignature(Signature.createTypeSignature(cur.getSignature().getFullName(), true).toCharArray());
-					} else if (curMember instanceof AbstractClassSignature) {
-						pr = CompletionProposal.create(CompletionProposal.TYPE_REF,0);
-						pr.setSignature(Signature.createTypeSignature(curMember.getFullName(), true).toCharArray());
-					}
-					
-					if (pr != null) {
-//						pr2.setDeclarationSignature(Signature.createTypeSignature(cur.getSignature().getFullName(), true).toCharArray());
-						pr.setFlags(Flags.AccPublic);
-						pr.setName(curMember.getName().toCharArray());
-						pr.setCompletion(curMember.getName().toCharArray());
-						
-						ret_List.add(pr);
-					}
+				} else if (curMember instanceof AbstractClassSignature) {
+					pr = CompletionProposal.create(CompletionProposal.TYPE_REF,0);
+					pr.setSignature(Signature.createTypeSignature(curMember.getFullName(), true).toCharArray());
 				}
-			} else {
-				interfaceProject.loadSignatures(false);
+				
+				if (pr != null) {
+//						pr2.setDeclarationSignature(Signature.createTypeSignature(cur.getSignature().getFullName(), true).toCharArray());
+					pr.setFlags(Flags.AccPublic);
+					pr.setName(curMember.getName().toCharArray());
+					pr.setCompletion(curMember.getName().toCharArray());
+					
+					ret_List.add(pr);
+				}
 			}
+		} else {
+			interfaceProject.loadSignatures(false);
 		}
 		return ret_List;
 	}

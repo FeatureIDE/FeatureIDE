@@ -118,7 +118,7 @@ public class DeleteAction extends Action {
 	private String getDialogText() {
 		if (part instanceof RoleEditPart) {
 			FSTRole role = ((RoleEditPart) part).getRoleModel();
-			return "the role of class '" + role.getName() + "' at feature '" + role.getFeature().getName() + "'";
+			return "the role of class '" + role.getClassFragment().getName() + "' at feature '" + role.getFeature().getName() + "'";
 		} else if (part instanceof ClassEditPart) {
 			FSTClass c = ((ClassEditPart) part).getClassModel();
 			return "all files of class '" + c.getName() + "'?";

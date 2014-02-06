@@ -46,7 +46,7 @@ public class FSTField extends RoleElement {
 			if (role.getFeature().equals(getRole().getFeature())) {
 				continue;
 			}
-			for (FSTField field : role.getFields()) {
+			for (FSTField field : role.getClassFragment().getFields()) {
 				if (field.getName().equals(getName())) {
 					return true;
 				}
