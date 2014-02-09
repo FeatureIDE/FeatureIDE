@@ -26,6 +26,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -341,6 +342,7 @@ public class MPLPlugin extends AbstractCorePlugin {
 			if (signatures != null) {
 				SignatureIterator it = signatures.createIterator();
 				it.addFilter(new ContextFilter(featureName, interfaceProject));
+				
 //				Iterator<AbstractSignature> it = signatures.getIterator(new ContextFilter(featureName, interfaceProject));
 				
 				while (it.hasNext()) {
@@ -349,22 +351,50 @@ public class MPLPlugin extends AbstractCorePlugin {
 					
 					if (curMember instanceof AbstractMethodSignature) {
 						pr = CompletionProposal.create(CompletionProposal.METHOD_REF, 0);
-						pr.setSignature(Signature.createMethodSignature(new char[][]{{}}, new char[]{}));
+						
+						
+						AbstractMethodSignature methSig = (AbstractMethodSignature) curMember; 
+						
+						LinkedList<String> sig = methSig.getParameterTypes();
+						
+						
+						//TODO eigentlich ist eine Fallunterscheidung nach Typen notwendig!
+						char[][] c = new char[][]{{}};
+						if(sig.size()>0){
+							c = new char[sig.size()][];
+							int i = 0;
+							for (String parameterType : sig) {
+								String parameterTypeToChar = "L" + parameterType + ";";
+								c[i++] =  parameterTypeToChar.toCharArray() ;
+							}
+						}
+						
+						String returnType = "L" + methSig.getReturnType() + ";";
+						
+						
+						
+						pr.setSignature(Signature.createMethodSignature(c, returnType.toCharArray()));
+						
+						
+						String declType = "L" + methSig.getFullName().replaceAll("." + methSig.getName(),"") + ";";
+						pr.setDeclarationSignature(declType.toCharArray());
+//						((FeatureReadyCompletionProposal)pr).setFeature("feature");;
+//						pr.findParameterNames(new ProgressMonitor(arg0, arg1, arg2, arg3, arg4))
 					} else if (curMember instanceof AbstractFieldSignature) {
 						pr = CompletionProposal.create(CompletionProposal.FIELD_REF, 0);
-//						pr.setDeclarationSignature(Signature.createTypeSignature(cur.getSignature().getFullName(), true).toCharArray());
 					} else if (curMember instanceof AbstractClassSignature) {
 						pr = CompletionProposal.create(CompletionProposal.TYPE_REF,0);
 						pr.setSignature(Signature.createTypeSignature(curMember.getFullName(), true).toCharArray());
 					}
 					
 					if (pr != null) {
-//						pr2.setDeclarationSignature(Signature.createTypeSignature(cur.getSignature().getFullName(), true).toCharArray());
-						pr.setFlags(Flags.AccPublic);
+						pr.setFlags(getFlagOfSignature(curMember));
 						pr.setName(curMember.getName().toCharArray());
 						pr.setCompletion(curMember.getName().toCharArray());
 						
+						
 						ret_List.add(pr);
+						
 					}
 				}
 			} else {
@@ -373,6 +403,32 @@ public class MPLPlugin extends AbstractCorePlugin {
 		}
 		return ret_List;
 	}
+	
+	public int getFlagOfSignature(AbstractSignature element){
+//		if (element instanceof AbstractClassFragment) {
+//			return 0;//GUIDefaults.IMAGE_CLASS;
+//		} else 
+			if (element instanceof AbstractMethodSignature) {
+			//TODO MPL: constructor icon
+			switch (((AbstractMethodSignature) element).getVisibilty()) {
+			case AbstractSignature.VISIBILITY_DEFAULT: return Flags.AccDefault;
+			case AbstractSignature.VISIBILITY_PRIVATE: return Flags.AccPrivate;
+			case AbstractSignature.VISIBILITY_PROTECTED: return Flags.AccProtected;
+			case AbstractSignature.VISIBILITY_PUBLIC: return Flags.AccPublic;
+			}
+		} else if (element instanceof AbstractFieldSignature) {
+			switch (((AbstractFieldSignature) element).getVisibilty()) {
+			case AbstractSignature.VISIBILITY_DEFAULT: return Flags.AccDefault;
+			case AbstractSignature.VISIBILITY_PRIVATE: return Flags.AccPrivate;
+			case AbstractSignature.VISIBILITY_PROTECTED: return Flags.AccProtected;
+			case AbstractSignature.VISIBILITY_PUBLIC: return Flags.AccPublic;
+			}
+		} 
+//		else if (element instanceof AbstractClassSignature) {
+//			return F;//GUIDefaults.IMAGE_CLASS;
+//		}
+		return 0;
+	}
 
 	public ProjectStructure extendedModules_getStruct(final IFeatureProject project, final String featureName) {
 		InterfaceProject interfaceProject = getInterfaceProject(project.getProject());
@@ -380,7 +436,10 @@ public class MPLPlugin extends AbstractCorePlugin {
 			final ProjectSignatures signatures = interfaceProject.getProjectSignatures();
 			if (signatures != null) {
 				SignatureIterator it = signatures.createIterator();
-				it.addFilter(new ContextFilter(featureName, interfaceProject));
+				//TODO check
+				if(featureName != null){
+					it.addFilter(new ContextFilter(featureName, interfaceProject));
+				}
 				return new ProjectStructure(it);
 			} else {
 				interfaceProject.loadSignatures(false);

@@ -159,6 +159,11 @@ public class FujiMethodSignature extends AbstractMethodSignature {
 		return true;
 	}
 
+	@Override
+	public String getReturnType() {
+		return returnType.name();
+	}
+
 //	public static FujiMethodSignature superSignature(
 //			LinkedList<FujiMethodSignature> sigs) {
 //		return null;

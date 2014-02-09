@@ -39,6 +39,8 @@ public abstract class AbstractMethodSignature extends AbstractSignature {
 //		isConstructor = orgSig.isConstructor;
 //		parameterTypes = new LinkedList<String>(orgSig.parameterTypes);
 //	}
+	
+	public abstract String getReturnType();
 
 	public LinkedList<String> getParameterTypes() {
 		return parameterTypes;

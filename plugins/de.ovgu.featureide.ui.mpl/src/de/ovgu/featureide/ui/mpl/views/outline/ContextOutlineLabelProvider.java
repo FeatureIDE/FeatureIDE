@@ -21,6 +21,10 @@
 package de.ovgu.featureide.ui.mpl.views.outline;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.content.IContentDescription;
+import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -29,15 +33,27 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.ui.IEditorDescriptor;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.part.FileEditorInput;
 
+import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
+import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassFragment;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassSignature;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractFieldSignature;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractMethodSignature;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature;
+import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 import de.ovgu.featureide.ui.views.collaboration.outline.OutlineLabelProvider;
 
@@ -203,14 +219,61 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 		public void selectionChanged(SelectionChangedEvent event) {
 			if (viewer.getInput() != null) {
 				Object selection = ((IStructuredSelection) viewer.getSelection()).getFirstElement();
-				System.out.println();
 				
 				if(selection instanceof AbstractSignature){
 					AbstractSignature ms = (AbstractSignature) selection;
 					int i = ms.getLine();
 					MessageDialog.openConfirm(null, "Line", "" + i);
-					System.out.println();
+				}else if(((IStructuredSelection)event.getSelection()).getFirstElement() instanceof Feature){
+					Feature ob = (Feature) ((IStructuredSelection)event.getSelection()).getFirstElement();
+
+					IFeatureProject pro = CorePlugin.getFeatureProject((IResource)viewer.getInput());
+					FSTModel model = pro.getFSTModel();
+					
+					if(model != null){
+						FSTFeature fstFeature = model.getFeature(ob.getName());
+						TreeItem item = viewer.getTree().getSelection()[0].getParentItem().getParentItem();
+						
+
+					FSTRole r = fstFeature.getRole(item.getText()+".java");
+							;
+					if (r.getFile().isAccessible()) {
+						IWorkbench workbench = PlatformUI
+								.getWorkbench();
+						IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
+						IWorkbenchPage page = window.getActivePage();
+						IContentType contentType = null;
+						try {
+							IFile iFile = r.getFile();
+							IContentDescription description = iFile
+									.getContentDescription();
+							if (description != null) {
+								contentType = description.getContentType();
+							}
+							IEditorDescriptor desc = null;
+							if (contentType != null) {
+								desc = workbench.getEditorRegistry()
+										.getDefaultEditor(iFile.getName(), contentType);
+							} else {
+								desc = workbench.getEditorRegistry()
+										.getDefaultEditor(iFile.getName());
+							}
+							if (desc != null) {
+								page.openEditor(new FileEditorInput(iFile),
+										desc.getId());
+							} else {
+								// case: there is no default editor for the file
+								page.openEditor(new FileEditorInput(iFile),
+										"org.eclipse.ui.DefaultTextEditor");
+							}
+//							viewer.refresh();
+						} catch (CoreException e) {
+							UIPlugin.getDefault().logError(e);
+						}
+					}
+					}
 				}
+			
 				
 				
 				

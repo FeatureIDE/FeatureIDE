@@ -22,17 +22,22 @@ package de.ovgu.featureide.ui.editors;
 
 import java.text.Collator;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.CompletionProposal;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.internal.ui.text.java.LazyJavaCompletionProposal;
+import org.eclipse.jdt.ui.text.java.CompletionProposalCollector;
 import org.eclipse.jdt.ui.text.java.ContentAssistInvocationContext;
+import org.eclipse.jdt.ui.text.java.IJavaCompletionProposal;
 import org.eclipse.jdt.ui.text.java.IJavaCompletionProposalComputer;
 import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
 import org.eclipse.jface.preference.JFacePreferences;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.viewers.StyledString;
@@ -52,63 +57,62 @@ import de.ovgu.featureide.core.mpl.MPLPlugin;
 @SuppressWarnings("restriction")
 public class Completion implements IJavaCompletionProposalComputer {
 
-	private Collator col = Collator.getInstance();
+	
+//	private Collator col = Collator.getInstance();
 
 	public Completion() {
-		col.setStrength(Collator.SECONDARY);
+//		col.setStrength(Collator.FULL_DECOMPOSITION);
 	}
 
 	@Override
 	public List<IContextInformation> computeContextInformation(
 			ContentAssistInvocationContext arg0, IProgressMonitor arg1) {
-		List<IContextInformation> list = new ArrayList<IContextInformation>();
-		return list;
+		return Collections.emptyList();
 	}
 
 	@Override
 	public String getErrorMessage() {
-		System.out.println();
 		return null;
 	}
 
 	@Override
 	public void sessionEnded() {
-		System.out.println();
 
 	}
 
 	@Override
 	public void sessionStarted() {
-		System.out.println();
-
 	}
-
-//	private ProjectStructure projectStructure = null;
 
 	@Override
 	public List<ICompletionProposal> computeCompletionProposals(
 			ContentAssistInvocationContext arg0, IProgressMonitor arg1) {
-
+		
+		JavaContentAssistInvocationContext context = null;
+		if(arg0 instanceof JavaContentAssistInvocationContext){
+			context = (JavaContentAssistInvocationContext) arg0;
+		}
+		
 		final IFile file = ((IFileEditorInput) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput()).getFile();
 		final IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
-		final ArrayList<ICompletionProposal> list = new ArrayList<ICompletionProposal>();
 		
-		if (featureProject == null)
-			return list;
-
+		if(context == null || featureProject == null){
+			return Collections.emptyList();
+		}
+		
 		String featureName = featureProject.getFeatureName(file);
-		JavaContentAssistInvocationContext context = (JavaContentAssistInvocationContext) arg0;
+		
+		final ArrayList<ICompletionProposal> list = new ArrayList<ICompletionProposal>();
+		String prefix = "";
+		try {
+			prefix = ((JavaContentAssistInvocationContext) arg0).computeIdentifierPrefix().toString();
+		} catch (BadLocationException e1) {
+			e1.printStackTrace();
+		}
 
-		String prefix = new String(context.getCoreContext().getToken());
+		List<CompletionProposal> completionProp = MPLPlugin.getDefault().extendedModules_getCompl(featureProject, featureName);
 
-//		projectStructure = MPLPlugin.getDefault().extendedModules_getStruct(featureProject, featureName);
-//		if (projectStructure == null) {
-//			return list;
-//		}
-//		List<CompletionProposal> l = MPLPlugin.getDefault().extendedModules(projectStructure);
-		List<CompletionProposal> l = MPLPlugin.getDefault().extendedModules_getCompl(featureProject, featureName);
-
-		for (CompletionProposal curProp : l) {
+		for (CompletionProposal curProp : completionProp) {
 			curProp.setReplaceRange(context.getInvocationOffset()
 					- context.getCoreContext().getToken().length,
 					context.getInvocationOffset());
@@ -131,11 +135,17 @@ public class Completion implements IJavaCompletionProposalComputer {
 
 				String displayString = new String(curProp.getCompletion());
 				displayString = displayString.concat("(");
-				int paramNr = Signature.getParameterCount(curProp
-						.getSignature());
+				int paramNr = 0;
+				try{
+					paramNr = Signature.getParameterCount(curProp.getSignature());	
+				}catch(IllegalArgumentException e){
+					e.printStackTrace();
+				}
+
 				for (int i = 0; i < paramNr; i++) {
-					displayString = displayString.concat(Signature
-							.getParameterTypes(curProp.getSignature())
+					String paramName = new String(Signature.getParameterTypes(curProp.getSignature())[i]);
+					paramName = normalize(paramName);
+					displayString = displayString.concat(paramName
 							+ " arg"
 							+ i);
 					if (i + 1 < paramNr) {
@@ -143,8 +153,8 @@ public class Completion implements IJavaCompletionProposalComputer {
 					}
 				}
 				displayString = displayString.concat(") : ");
-				// displayString = displayString.concat(new
-				// String(Signature.getReturnType(curProp.getSignature())));
+				
+				displayString = displayString.concat(normalize(new String(Signature.getReturnType(curProp.getSignature()))));
 
 				StyledString methString = new StyledString(displayString);
 				Styler styler = StyledString.createColorRegistryStyler(
@@ -156,8 +166,8 @@ public class Completion implements IJavaCompletionProposalComputer {
 				// 10)),JFaceResources.getResources().createColor(new
 				// RGB(0,0,0)));
 				// styler.applyStyles(style);
-				StyledString infoString = new StyledString(new String(" - "
-						+ new String(curProp.getName()) + " " + featureName),
+				StyledString infoString = new StyledString(new String(" - " +
+					normalize(new String(curProp.getDeclarationSignature())) +" "	+ featureName),
 						styler);
 				methString.append(infoString);
 				meth.setStyledDisplayString(methString);
@@ -192,6 +202,15 @@ public class Completion implements IJavaCompletionProposalComputer {
 			}
 		}
 		return list;
+	}
+
+	private String normalize(String paramName) {
+		int firstIDX = paramName.lastIndexOf('.');
+		if(firstIDX <= 0){
+			firstIDX = 1;
+		}
+		paramName = paramName.substring(firstIDX, paramName.length()-1);
+		return paramName;
 	}
 
 }

@@ -23,6 +23,7 @@ package de.ovgu.featureide.ui.mpl.views.outline;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -40,6 +41,7 @@ import de.ovgu.featureide.core.mpl.signature.abstr.AbstractMethodSignature;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature;
 import de.ovgu.featureide.core.mpl.signature.abstr.ClassFragmentComparator;
 import de.ovgu.featureide.core.mpl.signature.abstr.SignatureComparator;
+import de.ovgu.featureide.fm.core.Feature;
 
 /**
  * Provides the content for the collaboration outline.
@@ -111,7 +113,6 @@ public class ContextOutlineTreeContentProvider implements ITreeContentProvider {
 
 		if (parentElement instanceof AbstractClassFragment){
 			AbstractClassFragment frag = (AbstractClassFragment) parentElement;
-			
 			Object[] ret = new Object[frag.getMembers().size() + frag.getInnerClasses().size()];
 			int i = 0;
 			for (AbstractSignature curMember : frag.getMembers()) {
@@ -121,19 +122,22 @@ public class ContextOutlineTreeContentProvider implements ITreeContentProvider {
 				ret[i++] = curMember;
 			}
 			Arrays.sort(ret, new SignatureComparator());
+			
 			return ret;
 		}if(parentElement instanceof AbstractMethodSignature){
 				AbstractMethodSignature sig = (AbstractMethodSignature) parentElement;
 				InterfaceProject intp = MPLPlugin.getDefault().getInterfaceProject(featureProject.getProject());
+
 				if(intp != null){
-					List<String> l = new ArrayList<String>();
-				
+					HashMap<String, Feature> l2 = new HashMap<String, Feature>();
+					
 					for(int i : sig.getFeatureIDs() ){
-						if(!l.contains(intp.getFeatureName(i))){
-							l.add(intp.getFeatureName(i));
+						Feature feature = featureProject.getFeatureModel().getFeature(intp.getFeatureName(i));
+						if(!l2.containsKey(feature.getName())){
+							l2.put(feature.getName(), feature);
 						}
 					}
-					return l.toArray();
+					return  l2.values().toArray();
 				}
 		}
 		
