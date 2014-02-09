@@ -198,7 +198,7 @@ public class FeatureHouseToAHEADConversion extends ComposerConversion {
 		if (model != null && model.getClass(name) !=  null) {
 			LinkedList<FSTMethod> methods = new LinkedList<FSTMethod>();
 			for (FSTRole role : model.getClass(name).getRoles()) {
-				methods.addAll(role.getMethods());
+				methods.addAll(role.getClassFragment().getMethods());
 			}
 			for (FSTMethod method : methods) {
 				if (method.getLine() <= line && method.getEndLine() >= line) {

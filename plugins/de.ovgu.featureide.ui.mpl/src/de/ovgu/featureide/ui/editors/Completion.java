@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.CompletionProposal;
 import org.eclipse.jdt.core.JavaModelException;
@@ -47,6 +48,7 @@ import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.mpl.InterfaceProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 
 /**
@@ -96,7 +98,7 @@ public class Completion implements IJavaCompletionProposalComputer {
 		final IFile file = ((IFileEditorInput) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput()).getFile();
 		final IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
 		
-		if(context == null || featureProject == null){
+		if(context == null || featureProject == null || !MPLPlugin.getDefault().isInterfaceProject((IProject)featureProject.getProject())){
 			return Collections.emptyList();
 		}
 		
@@ -109,8 +111,9 @@ public class Completion implements IJavaCompletionProposalComputer {
 		} catch (BadLocationException e1) {
 			e1.printStackTrace();
 		}
-
-		List<CompletionProposal> completionProp = MPLPlugin.getDefault().extendedModules_getCompl(featureProject, featureName);
+ 
+		
+		List<CompletionProposal> completionProp  = MPLPlugin.getDefault().extendedModules_getCompl(MPLPlugin.getDefault().getInterfaceProject(featureProject.getProject().getName()), featureName);		
 
 		for (CompletionProposal curProp : completionProp) {
 			curProp.setReplaceRange(context.getInvocationOffset()
@@ -212,5 +215,4 @@ public class Completion implements IJavaCompletionProposalComputer {
 		paramName = paramName.substring(firstIDX, paramName.length()-1);
 		return paramName;
 	}
-
 }

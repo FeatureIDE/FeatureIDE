@@ -118,7 +118,7 @@ public class CollaborationOutlineTreeContentProvider implements
 			// get all fields and methods
 			HashMap<String, FSTMethod> methods = new HashMap<String, FSTMethod>();
 			for (FSTRole role : ((FSTClass) parentElement).getRoles()) {
-				for (FSTMethod m : role.getMethods()) {
+				for (FSTMethod m : role.getClassFragment().getMethods()) {
 					String methodName = m.getFullName();
 					if (!methods.containsKey(methodName)) {
 						methods.put(methodName, m);
@@ -137,7 +137,7 @@ public class CollaborationOutlineTreeContentProvider implements
 			
 			HashMap<String, FSTField> fields = new HashMap<String, FSTField>();
 			for (FSTRole role : ((FSTClass) parentElement).getRoles()) {
-				for (FSTField f : role.getFields()) {
+				for (FSTField f : role.getClassFragment().getFields()) {
 					String fieldName = f.getFullName();
 					if (!fields.containsKey(fieldName)) {
 						fields.put(fieldName, f);
@@ -193,7 +193,7 @@ public class CollaborationOutlineTreeContentProvider implements
 			LinkedList<FSTRole> roleList = new LinkedList<FSTRole>();
 //			List<FSTRole> roles = model.getClass(fileName).getRoles();
 			for (FSTRole role : ((FSTMethod) parentElement).getRole().getFSTClass().getRoles()) {
-				for (FSTMethod m : role.getMethods()) {
+				for (FSTMethod m : role.getClassFragment().getMethods()) {
 					if (//m.isOwn(role.file) && ((FSTMethod)parentElement).isOwn(role.file) &&
 							m.getFullName().equals(((FSTMethod)parentElement).getFullName())) {
 						roleList.add(role);
@@ -211,7 +211,7 @@ public class CollaborationOutlineTreeContentProvider implements
 			// get all the roles that belong to a field
 			LinkedList<FSTRole> roleList = new LinkedList<FSTRole>();
 			for (FSTRole role : ((FSTField) parentElement).getRole().getFSTClass().getRoles()) {
-				for (FSTField f : role.getFields()) {
+				for (FSTField f : role.getClassFragment().getFields()) {
 					if (
 							f.getFullName().equals(((FSTField)parentElement).getFullName())) {
 						roleList.add(role);
@@ -243,7 +243,7 @@ public class CollaborationOutlineTreeContentProvider implements
 	public boolean hasChildren(Object element) {
 		if (element instanceof FSTClass) {
 			for (FSTRole role :((FSTClass) element).getRoles()) {
-				if (!role.getMethods().isEmpty() || !role.getFields().isEmpty() ||
+				if (!role.getClassFragment().getMethods().isEmpty() || !role.getClassFragment().getFields().isEmpty() ||
 						!role.getDirectives().isEmpty()) {
 					return true;
 				}

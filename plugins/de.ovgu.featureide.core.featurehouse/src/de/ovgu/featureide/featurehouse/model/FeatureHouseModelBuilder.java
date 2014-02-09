@@ -85,7 +85,7 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 	
 	public FSTClassFragment getCurrentClassFragment() {
 		FSTClassFragment currentClassFragment =  classFragmentStack.peek();
-		return (currentClassFragment == null) ? currentRole : classFragmentStack.peek();
+		return (currentClassFragment == null) ? currentRole.getClassFragment() : classFragmentStack.peek();
 	}
 	
 	public boolean hasCurrentClassFragment() {
@@ -181,7 +181,7 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 		}
 		currentRole = model.addRole(currentFeature.getName(), className, currentFile);
 		classFragmentStack.clear();
-		classFragmentStack.push(currentRole);
+		classFragmentStack.push(currentRole.getClassFragment());
 	}
 
 	private boolean canCompose() {

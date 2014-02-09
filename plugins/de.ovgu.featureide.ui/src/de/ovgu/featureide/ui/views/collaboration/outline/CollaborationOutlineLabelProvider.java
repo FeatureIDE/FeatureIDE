@@ -144,7 +144,6 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 
 	public void colorizeItems(TreeItem[] treeItems, IFile file) {
 		for (int i = 0; i < treeItems.length; i++) {
-			Object o = treeItems[i].getData();
 			if (treeItems[i].getData() instanceof RoleElement) {
 				setForeground(treeItems[i], file);
 			} if (treeItems[i].getData() instanceof FSTRole) {
@@ -232,7 +231,7 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 				continue;
 			}
 			if (element instanceof FSTMethod) {
-				for (FSTMethod method : role.getMethods()) {
+				for (FSTMethod method : role.getClassFragment().getMethods()) {
 					if (method.comparesTo(element)) {
 						item.setForeground(viewer.getControl().getDisplay()
 								.getSystemColor(SWT.DEFAULT));
@@ -241,7 +240,7 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 				}
 			}
 			if (element instanceof FSTField) {
-				for (FSTField field : role.getFields()) {
+				for (FSTField field : role.getClassFragment().getFields()) {
 					if (field.comparesTo(element)) {
 						item.setForeground(viewer.getControl().getDisplay()
 								.getSystemColor(SWT.DEFAULT));

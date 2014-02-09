@@ -30,6 +30,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
+import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.StoppableJob;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
@@ -64,7 +66,17 @@ public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations
 	}
 	
 	private List<Configuration> createConfigurations(final Collection<String> falseOptionalFeatures, final IProgressMonitor monitor) {
-		monitor.beginTask("Create configurations", falseOptionalFeatures.size());
+		return createConfigurations(falseOptionalFeatures, featureModel, monitor);
+	}
+		
+	List<Configuration> createConfigurations(final Collection<String> falseOptionalFeatures, FeatureModel featureModel, final IProgressMonitor monitor) {
+		if (monitor != null) {
+			monitor.beginTask("Create configurations", falseOptionalFeatures.size());
+		}
+		for (Feature dead : featureModel.getAnalyser().getDeadFeatures()) {
+			falseOptionalFeatures.remove(dead.getName());
+		}
+		
 		final List<Configuration> confs = new LinkedList<Configuration>();
 		while (!falseOptionalFeatures.isEmpty()) {
 			final Configuration configuration = new Configuration(featureModel, true);
@@ -73,7 +85,9 @@ public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations
 				if (configuration.getSelectablefeature(feature).getSelection() == Selection.UNDEFINED) {
 					configuration.setManual(feature, Selection.UNSELECTED);
 					deselected.add(feature);
-					monitor.worked(1);
+					if (monitor != null) {
+						monitor.worked(1);
+					}
 				}
 			}
 			

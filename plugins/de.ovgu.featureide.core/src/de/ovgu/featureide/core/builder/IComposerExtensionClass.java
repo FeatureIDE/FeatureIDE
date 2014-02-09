@@ -23,7 +23,6 @@ package de.ovgu.featureide.core.builder;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Vector;
 
 import javax.annotation.Nonnull;
@@ -128,12 +127,12 @@ public interface IComposerExtensionClass {
 	
 	/**
 	 * Replaces all markers in the template.
-	 * @param text - String, where markers shall be replaced
-	 * @param list - List of markers, which depend on user input
-	 * @param packageName 
-	 * @return template with replaced markers
+	 * @param fileContent the file's content where markers shall be replaced
+	 * @param refines defines wheather the refines checkbos is selected.
+	 * @param packageName The package name 
+	 * @return the new file content
 	 */
-	String replaceMarker(String text, List<String> list, String packageName);
+	String replaceSourceContentMarker(String fileContent, boolean refines, String packageName);
 	
 	/**
 	 * Defines if a refining class differs from a common one and <code>replaceMarker()</code>

@@ -23,7 +23,6 @@ package de.ovgu.featureide.core.builder;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
@@ -239,11 +238,11 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		return null;
 	}
 
-	public String replaceMarker(String text, List<String> list, String packageName) {
-		if ("".equals(packageName)) {
-			return text.replace(PACKAGE_PATTERN, "");
+	public String replaceSourceContentMarker(String fileContent,  boolean refines, String packageName) {
+		if (packageName.isEmpty()) {
+			return fileContent.replace(PACKAGE_PATTERN, "");
 		} else {
-			return text.replace(PACKAGE_PATTERN, "package " + packageName + ";\r\n\r\n");
+			return fileContent.replace(PACKAGE_PATTERN, "package " + packageName + ";\r\n\r\n");
 		}
 	}
 
@@ -334,13 +333,15 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		return false;
 	}
 	
-	
 	protected boolean isPluginInstalled(String ID) {
 		for(Bundle b :InternalPlatform.getDefault().getBundleContext().getBundles()){
-			if(b.getSymbolicName().startsWith(ID))return true;
+			if(b.getSymbolicName().startsWith(ID)) {
+				return true;
+			}
 		}
 		return false;
 	}
+	
 	protected void generateWarning(String Warning) {
 		this.featureProject.createBuilderMarker(featureProject
 				.getProject(), Warning, 0, IMarker.SEVERITY_WARNING);

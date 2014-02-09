@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: UI Test Fragment
+Bundle-SymbolicName: de.ovgu.featureide.ui_test;singleton:=true
+Bundle-Version: 2.2.4.qualifier
+Fragment-Host: de.ovgu.featureide.ui
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: University of Magdeburg
+Require-Bundle: org.junit

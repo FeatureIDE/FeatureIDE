@@ -97,11 +97,11 @@ public class FeatureCppModelBuilder {
 	}
 
 	private void addField(String[] array) {
-		currentRole.add(new FSTField(array[4], array[5], array[6]));
+		currentRole.getClassFragment().add(new FSTField(array[4], array[5], array[6]));
 	}
 
 	private void addMethod(String[] array) {
-		currentRole.add(new FSTMethod(array[4], getParameter(array), array[5], array[6]));
+		currentRole.getClassFragment().add(new FSTMethod(array[4], getParameter(array), array[5], array[6]));
 	}
 
 	private LinkedList<String> getParameter(String... array) {

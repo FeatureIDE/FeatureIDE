@@ -73,9 +73,9 @@ public class DirectivesNode extends LazyParent {
 			
 			FSTRole role = clazz.getRoles().get(0);
 			
-			String packageName = role.getPackage();
+			String packageName = role.getClassFragment().getPackage();
 			String qualifiedPackageName = (packageName == null) ? "(default package)" : packageName;
-			className = qualifiedPackageName + "." + role.getName();
+			className = qualifiedPackageName + "." + role.getClassFragment().getName();
 			
 			Parent classNode = new Parent(className);
 			aggProject.process(clazz.getRoles(), classNode);

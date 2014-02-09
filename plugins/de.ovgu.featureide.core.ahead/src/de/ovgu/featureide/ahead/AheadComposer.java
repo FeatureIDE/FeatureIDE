@@ -30,7 +30,6 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Scanner;
 
 import org.eclipse.core.resources.ICommand;
@@ -90,7 +89,7 @@ public class AheadComposer extends ComposerExtensionClass {
 			return true;
 		} catch (IOException e) {
 			featureProject.createBuilderMarker(featureProject.getProject(),
-					e.getMessage(), 0, IMarker.SEVERITY_ERROR);
+					e.getMessage(), -1, IMarker.SEVERITY_ERROR);
 			return false;
 		}
 		
@@ -328,12 +327,12 @@ public class AheadComposer extends ComposerExtensionClass {
 	}
 	
 	@Override
-	public String replaceMarker(String text, List<String> list, String packageName) {
-		if (list != null && list.contains("refines"))
+	public String replaceSourceContentMarker(String text,  boolean refines, String packageName) {
+		if (refines)
 			text = text.replace(REFINES_PATTERN, "refines");
 		else
 			text = text.replace(REFINES_PATTERN + " ", "");
-		return text;
+		return super.replaceSourceContentMarker(text, refines, packageName);
 	}
 	
 	/* (non-Javadoc)

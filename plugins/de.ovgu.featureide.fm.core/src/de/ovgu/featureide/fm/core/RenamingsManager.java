@@ -101,11 +101,10 @@ public class RenamingsManager {
 	public void performRenamings(IFile file) {
 		IProject project = ((IResource) file.getAdapter(IFile.class))
 				.getProject();
-		String sourceName = model.getFMComposerManager(project).getProjectConfigurationPath();
+		String sourceName = model.getFMComposerManager(project).getProjectSourcePath();
 		sourceFolder = project.getFolder(sourceName);
 		for (Renaming renaming : renamings) {
-			if (!performComposerRenamings(renaming.oldName, renaming.newName,
-					project)) {
+			if (!performComposerRenamings(renaming.oldName, renaming.newName, project)) {
 				moveFolder(renaming.oldName, renaming.newName);
 			}
 		}

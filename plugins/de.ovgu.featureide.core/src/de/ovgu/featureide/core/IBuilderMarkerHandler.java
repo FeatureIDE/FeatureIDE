@@ -23,7 +23,7 @@ package de.ovgu.featureide.core;
 import org.eclipse.core.resources.IResource;
 
 /**
- * 
+ * A MarkerHandler encapsulates creating and removing markers.
  * 
  * @author Thomas Thuem
  */

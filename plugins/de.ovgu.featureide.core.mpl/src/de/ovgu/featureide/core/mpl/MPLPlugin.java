@@ -332,13 +332,10 @@ public class MPLPlugin extends AbstractCorePlugin {
 		startJob.schedule();
 	}
 	
-	//TODO MPL: use Fuji
-	public List<CompletionProposal> extendedModules_getCompl(IFeatureProject project, String featureName) {
+	public List<CompletionProposal> extendedModules_getCompl(InterfaceProject interfaceProject, String featureName) {
 		final LinkedList<CompletionProposal> ret_List = new LinkedList<CompletionProposal>();
+		final ProjectSignatures signatures = interfaceProject.getProjectSignatures();
 		
-		InterfaceProject interfaceProject = getInterfaceProject(project.getProject());
-		if (interfaceProject != null) {	
-			final ProjectSignatures signatures = interfaceProject.getProjectSignatures();
 			if (signatures != null) {
 				SignatureIterator it = signatures.createIterator();
 				it.addFilter(new ContextFilter(featureName, interfaceProject));
@@ -400,7 +397,6 @@ public class MPLPlugin extends AbstractCorePlugin {
 			} else {
 				interfaceProject.loadSignatures(false);
 			}
-		}
 		return ret_List;
 	}
 	

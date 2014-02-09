@@ -27,12 +27,12 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.List;
 
 import org.eclipse.core.internal.runtime.InternalPlatform;
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
@@ -84,7 +84,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 	private FeatureModel featureModel;
 	private boolean hadAspectJNature;
 	
-	private static final LinkedHashSet<String> EXTENSIONS = createExtensions(); 
+	private static final LinkedHashSet<String> EXTENSIONS = createExtensions();
 	
 	private static LinkedHashSet<String> createExtensions() {
 		LinkedHashSet<String> extensions = new LinkedHashSet<String>();
@@ -104,7 +104,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 		}
 		assert(featureProject != null) : "Invalid project given";
 		if(!isPluginInstalled(PLUGIN_ID)){
-			generateWarning(PLUGIN_WARNING);	
+			featureProject.createBuilderMarker(featureProject.getProject(), PLUGIN_WARNING, -1, IMarker.SEVERITY_ERROR);
 		}
 		
 		final String configPath =  config.getRawLocation().toOSString();
@@ -431,15 +431,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 		 list.add(JAVA_TEMPLATE);
 		 return list;
 	}
-	
-	@Override
-	public String replaceMarker(String text, List<String> list, String packageName) {
-		if (list != null && list.contains("refines"))
-			text = text.replace(REFINES_PATTERN, "refines");
-		else
-			text = text.replace(REFINES_PATTERN + " ", "");
-		return text;
-	}
+
 	@Override
 	public boolean hasFeatureFolders() {
 		return false;

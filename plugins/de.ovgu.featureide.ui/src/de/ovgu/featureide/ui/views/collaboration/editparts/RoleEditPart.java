@@ -162,7 +162,7 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 				Rectangle rect = label.getBounds();
 				int y = rect.y;
 				if (point.y >= y && point.y <= (y + rect.height)) {
-					LinkedList<FSTField> fields = this.getRoleModel().getFields();
+					LinkedList<FSTField> fields = this.getRoleModel().getClassFragment().getFields();
 					for (FSTField fstField : fields) {
 						if (fstField.getFullName().equals(label.getElementName())) {
 							editor = openEditor(file);
@@ -173,7 +173,7 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 						}
 					}
 					
-					LinkedList<FSTMethod> methods = this.getRoleModel().getMethods();
+					LinkedList<FSTMethod> methods = this.getRoleModel().getClassFragment().getMethods();
 					for (FSTMethod fstMethod : methods) {
 						if (fstMethod.getFullName().equals(label.getElementName())) {
 							editor = openEditor(file);

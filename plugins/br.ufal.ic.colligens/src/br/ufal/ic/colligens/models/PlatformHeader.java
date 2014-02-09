@@ -60,27 +60,32 @@ public class PlatformHeader {
 		}
 	}
 
-	public void stubs(String projectName) throws PlatformException {
+	public void setProject(String projectName) throws PlatformException {
+		project = CoreModel.getDefault().getCModel().getCProject(projectName);
+
+		if (project == null) {
+			throw new PlatformException("Not a valid file C in " + projectName);
+		}
+	}
+
+	public String stubsAbsolutePath() {
+		return "";
+	}
+
+	public void stubs() throws PlatformException {
 
 		File stubs = new File(Colligens.getDefault().getConfigDir()
 				.getAbsolutePath()
 				+ System.getProperty("file.separator")
 				+ "projects"
 				+ System.getProperty("file.separator")
-				+ projectName
-				+ "_stubs.h");
+				+ project.getProject().getName() + "_stubs.h");
 
 		if (stubs.exists())
 			return;
 
 		new File(Colligens.getDefault().getConfigDir().getAbsolutePath()
 				+ System.getProperty("file.separator") + "projects").mkdirs();
-
-		project = CoreModel.getDefault().getCModel().getCProject(projectName);
-
-		if (project == null) {
-			throw new PlatformException("Not a valid file C in " + projectName);
-		}
 
 		this.listFilesCDT.clear();
 
@@ -90,57 +95,85 @@ public class PlatformHeader {
 
 		addFiles(new File(ResourcesPlugin.getWorkspace().getRoot()
 				.getLocation().toString()
-				+ System.getProperty("file.separator") + projectName));
+				+ System.getProperty("file.separator")
+				+ project.getProject().getName()));
 
 		generateTypes(listFiles);
 	}
 
-	public void plarform(String projectName) throws PlatformException {
-
-		File platform = new File(Colligens.getDefault().getConfigDir()
-				.getAbsolutePath()
-				+ System.getProperty("file.separator")
-				+ "projects"
-				+ System.getProperty("file.separator")
-				+ projectName
-				+ "_platform.h");
-
-		if (platform.exists())
-			return;
-
-		project = CoreModel.getDefault().getCModel().getCProject(projectName);
-
-		if (project == null) {
-			throw new PlatformException("Not a valid file C in " + projectName);
+	public String plarformAbsolutePath() {
+		if (Colligens.getDefault().getPreferenceStore().getBoolean("USE_STUBS")) {
+			return Colligens.getDefault().getConfigDir().getAbsolutePath()
+					+ System.getProperty("file.separator") + "projects"
+					+ System.getProperty("file.separator")
+					+ project.getProject().getName() + "_platform.h";
+		} else {
+			return Colligens.getDefault().getConfigDir().getAbsolutePath()
+					+ System.getProperty("file.separator") + "platform.h";
 		}
+	}
 
+	public void plarform() throws PlatformException {
 		new File(Colligens.getDefault().getConfigDir().getAbsolutePath()
 				+ System.getProperty("file.separator") + "projects").mkdirs();
+
+		project = CoreModel.getDefault().getCModel()
+				.getCProject(project.getProject().getName());
+
+		if (project == null) {
+			throw new PlatformException("Not a valid file C in "
+					+ project.getProject().getName());
+		}
 
 		if (listFiles == null) {
 			listFiles = filesAllProject();
 		}
 
-		List<String> list = new ArrayList<String>(listFiles);
+		List<String> list;
+		File platform;
 
-		try {
-			IIncludeReference includes[] = project.getIncludeReferences();
-			for (int i = 0; i < includes.length; i++) {
-				// System.out.println(includes[i].getElementName());
-				list.add(0, "-I" + includes[i].getElementName());
+		platform = new File(plarformAbsolutePath());
+
+		if (platform.exists())
+			return;
+
+		if (!Colligens.getDefault().getPreferenceStore()
+				.getBoolean("USE_STUBS")) {
+
+			list = new ArrayList<String>(listFiles);
+
+			try {
+				IIncludeReference includes[] = project.getIncludeReferences();
+				for (int i = 0; i < includes.length; i++) {
+					// System.out.println(includes[i].getElementName());
+					list.add(0, "-I" + includes[i].getElementName());
+				}
+			} catch (CModelException e) {
+
+				e.printStackTrace();
 			}
-		} catch (CModelException e) {
 
-			e.printStackTrace();
-		}
+			if (!Colligens.getDefault().getPreferenceStore().getString("LIBS")
+					.contentEquals("")) {
+				list.add(0, Colligens.getDefault().getPreferenceStore()
+						.getString("LIBS"));
+			}
+		} else {
 
-		if (!Colligens.getDefault().getPreferenceStore().getString("LIBS")
-				.contentEquals("")) {
-			list.add(
-					0,
-					Colligens.getDefault().getPreferenceStore()
-							.getString("LIBS"));
+			try {
+				platform.createNewFile();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			list = new ArrayList<String>();
+
+			list.add(Colligens.getDefault().getConfigDir().getAbsolutePath()
+					+ System.getProperty("file.separator") + "platform.h");
+
 		}
+		list.add(0, "-Wfatal-errors");
 		list.add(0, "-std=gnu99");
 		list.add(0, "-E");
 		list.add(0, "-dM");
@@ -356,6 +389,7 @@ public class PlatformHeader {
 				this.types.add(type);
 			}
 		}
+
 		for (int i = 0; i < nodes.length; i++) {
 			this.setTypes(nodes[i]);
 		}
@@ -383,9 +417,9 @@ public class PlatformHeader {
 			FileWriter writer = new FileWriter(platformTemp);
 			for (Iterator<String> i = this.types.iterator(); i.hasNext();) {
 				String type = i.next();
-				if (countDirectives.directives.contains(type)) {
+				if (!countDirectives.directives.contains(type)) {
 					// System.out.println(type);
-				} else {
+					// writer.write(type + "\n");
 					writer.write("typedef struct " + type + ";\n");
 				}
 			}

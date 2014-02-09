@@ -211,7 +211,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 			int fieldCount = getCountForFieldContentCreate(tooltipContent);
 			int methodCount = getCountForMethodContentCreate(tooltipContent);
 			addLabel(new Label("Fields: " + fieldCount + " Methods: "	+ methodCount +" "));
-		} else if (role.getName().startsWith("*.")) {
+		} else if (role.getClassFragment().getName().startsWith("*.")) {
 			setContentForFiles(new CompartmentFigure(), tooltipContent);
 		} else {
 			setDirectivesContent(tooltipContent, getClassName());
@@ -246,7 +246,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 				panel.setBorder(new RoleFigureBorder(xyValue, xyValue));
 			}
 
-		} else if (role.getName().startsWith("*.")) {
+		} else if (role.getClassFragment().getName().startsWith("*.")) {
 			setContentForFiles(tooltipContent, null);
 		} else {
 			setDirectivesContent(tooltipContent, getClassName());
@@ -266,7 +266,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		}
 		
 		int methodCount = 0;
-		for (FSTMethod m : role.getMethods()) {
+		for (FSTMethod m : role.getClassFragment().getMethods()) {
 			Label methodLabel = createMethodLabel(m);
 
 			if (matchFilter(m)) {
@@ -292,7 +292,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 	}
 	
 	private String getClassName() {
-		return role.getName().split("[.]")[0];
+		return role.getClassFragment().getName().split("[.]")[0];
 	}
 
 	private int getCountForFieldContentCreate(Figure tooltipContent) {
@@ -306,7 +306,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		}
 		
 		int fieldCount = 0;
-		for (FSTField f : role.getFields()) {
+		for (FSTField f : role.getClassFragment().getFields()) {
 			if (matchFilter(f)) {
 				Label fieldLabel = createFieldLabel(f);
 				fieldFigure.add(fieldLabel);

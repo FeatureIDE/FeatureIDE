@@ -235,6 +235,10 @@ public class InterfaceProject {
 	public void clearFilterViewTag() {
 		this.filterViewTag = null;
 	}
+
+	public IFeatureProject getFeatureProjectReference() {
+		return featureProject;
+	}
 	
 //	public void scaleUpViewTag(String name, int level) {
 //		viewTagPool.scaleUpViewTags(name, level);

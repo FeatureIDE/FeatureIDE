@@ -35,6 +35,11 @@
                optional="true">
          </commandParameter>
       </command>
+      <command
+            categoryId="br.ufal.ic.colligens.commands.ColligensCategory"
+            id="br.ufal.ic.colligens.commands.PresenceCondition"
+            name="Presence Condition">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -53,6 +58,10 @@
       <handler
             class="br.ufal.ic.colligens.handler.RefactorSelectionHandler"
             commandId="br.ufal.ic.colligens.commands.RefactorCommand">
+      </handler>
+      <handler
+            class="br.ufal.ic.colligens.handler.PresenceConditionHandler"
+            commandId="br.ufal.ic.colligens.commands.PresenceCondition">
       </handler>
    </extension>
    <extension
@@ -127,15 +136,20 @@
                id="br.ic.ufal.colligens.popmenu"
                label="Colligens">
             <command
+                  commandId="br.ufal.ic.colligens.commands.CodeAnalyzeCommand"
+                  icon="icons/featured_run.png"
+                  label="Code Analyze"
+                  style="push">
+            </command>
+            <command
                   commandId="br.ufal.ic.colligens.commands.MetricsCommand"
                   icon="icons/featured_chart.png"
                   label="Metrics"
                   style="push">
             </command>
             <command
-                  commandId="br.ufal.ic.colligens.commands.CodeAnalyzeCommand"
-                  icon="icons/featured_run.png"
-                  label="Code Analyze"
+                  commandId="br.ufal.ic.colligens.commands.PresenceCondition"
+                  label="Presence Condition"
                   style="push">
             </command>
             <visibleWhen
@@ -217,8 +231,30 @@ id="br.ufal.ic.colligens.problem"
 name="Colligens"
 point="org.eclipse.core.resources.markers">
 <super type="org.eclipse.core.resources.problemmarker" />
-<persistent value="true" />
+<persistent value="false" />
 </extension>
+   <extension
+         id="br.ufal.ic.colligens.invalidproduct"
+         name="Invalid Products"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+      <persistent
+            value="true">
+      </persistent>
+   </extension>
+   <extension
+         id="br.ufal.ic.colligens.presencecondition"
+         name="Presence Condition"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+      <persistent
+            value="false">
+      </persistent>
+   </extension>
    <extension
          point="de.ovgu.featureide.core.composers">
       <composer
@@ -237,17 +273,6 @@ point="org.eclipse.core.resources.markers">
             id="br.ufal.ic.colligens.fmcppcomposer"
             name="Colligens Feature Model">
       </fmComposer>
-   </extension>
-   <extension
-         id="br.ufal.ic.colligens.invalidproduct"
-         name="Invalid Products"
-         point="org.eclipse.core.resources.markers">
-      <super
-            type="org.eclipse.core.resources.problemmarker">
-      </super>
-      <persistent
-            value="true">
-      </persistent>
    </extension>
    <extension
          point="org.eclipse.ltk.core.refactoring.refactoringContributions">
