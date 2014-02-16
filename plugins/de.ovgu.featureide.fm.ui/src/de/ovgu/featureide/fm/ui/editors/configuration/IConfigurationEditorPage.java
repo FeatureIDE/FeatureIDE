@@ -50,7 +50,7 @@ public interface IConfigurationEditorPage extends IEditorPart {
 	/**
 	 * @param the configuration editor containing the page.
 	 */
-	public void setConfigurationEditor(ConfigurationEditor configurationEditor);
+	public void setConfigurationEditor(IConfigurationEditor configurationEditor);
 	
 	/**
 	 * @return The Name of this page.

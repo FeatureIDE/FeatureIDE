@@ -92,7 +92,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  */
 public class ConfigurationEditor extends MultiPageEditorPart implements
 		GUIDefaults, PropertyConstants, PropertyChangeListener,
-		IResourceChangeListener {
+		IResourceChangeListener, IConfigurationEditor {
 	
 	public static final String ID = FMUIPlugin.PLUGIN_ID + ".editors.configuration.ConfigurationEditor";
 
@@ -711,5 +711,20 @@ public class ConfigurationEditor extends MultiPageEditorPart implements
 				}
 			});
 		}
+	}
+
+	@Override
+	public Configuration getConfiguration() {
+		return configuration;
+	}
+
+	@Override
+	public IFile getFile() {
+		return file;
+	}
+
+	@Override
+	public File getModelFile() {
+		return modelFile;
 	}
 }

@@ -37,7 +37,7 @@ import org.eclipse.ui.part.EditorPart;
  */
 public abstract class ConfigurationEditorPage extends EditorPart implements IConfigurationEditorPage {
 
-	protected ConfigurationEditor configurationEditor = null;
+	protected IConfigurationEditor configurationEditor = null;
 	
 	private int index;
 	
@@ -63,7 +63,7 @@ public abstract class ConfigurationEditorPage extends EditorPart implements ICon
 	 * @see de.ovgu.featureide.ui.editors.IConfigurationEditorPage#setConfigurationEditor(de.ovgu.featureide.ui.editors.ConfigurationEditor)
 	 */
 	@Override
-	public void setConfigurationEditor(ConfigurationEditor configurationEditor) {
+	public void setConfigurationEditor(IConfigurationEditor configurationEditor) {
 		this.configurationEditor = configurationEditor;
 	}
 	/* (non-Javadoc)
