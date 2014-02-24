@@ -25,7 +25,9 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
-import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -34,19 +36,15 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IEditorDescriptor;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
+import org.eclipse.ui.texteditor.ITextEditor;
 
-import de.ovgu.featureide.core.CorePlugin;
-import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.fstmodel.FSTFeature;
-import de.ovgu.featureide.core.fstmodel.FSTField;
-import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
-import de.ovgu.featureide.core.fstmodel.FSTRole;
+import de.ovgu.featureide.core.mpl.InterfaceProject;
+import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassFragment;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassSignature;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractFieldSignature;
@@ -65,10 +63,12 @@ import de.ovgu.featureide.ui.views.collaboration.outline.OutlineLabelProvider;
 public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 
 	@Override
-	public void addListener(ILabelProviderListener listener) {}
+	public void addListener(ILabelProviderListener listener) {
+	}
 
 	@Override
-	public void dispose() {}
+	public void dispose() {
+	}
 
 	@Override
 	public boolean isLabelProperty(Object element, String property) {
@@ -76,26 +76,35 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 	}
 
 	@Override
-	public void removeListener(ILabelProviderListener listener) {}
+	public void removeListener(ILabelProviderListener listener) {
+	}
 
 	@Override
 	public Image getImage(Object element) {
 		if (element instanceof AbstractClassFragment) {
 			return GUIDefaults.IMAGE_CLASS;
 		} else if (element instanceof AbstractMethodSignature) {
-			//TODO MPL: constructor icon
+			// TODO MPL: constructor icon
 			switch (((AbstractMethodSignature) element).getVisibilty()) {
-			case AbstractSignature.VISIBILITY_DEFAULT: return GUIDefaults.IMAGE_METHODE_DEFAULT;
-			case AbstractSignature.VISIBILITY_PRIVATE: return GUIDefaults.IMAGE_METHODE_PRIVATE;
-			case AbstractSignature.VISIBILITY_PROTECTED: return GUIDefaults.IMAGE_METHODE_PROTECTED;
-			case AbstractSignature.VISIBILITY_PUBLIC: return GUIDefaults.IMAGE_METHODE_PUBLIC;
+			case AbstractSignature.VISIBILITY_DEFAULT:
+				return GUIDefaults.IMAGE_METHODE_DEFAULT;
+			case AbstractSignature.VISIBILITY_PRIVATE:
+				return GUIDefaults.IMAGE_METHODE_PRIVATE;
+			case AbstractSignature.VISIBILITY_PROTECTED:
+				return GUIDefaults.IMAGE_METHODE_PROTECTED;
+			case AbstractSignature.VISIBILITY_PUBLIC:
+				return GUIDefaults.IMAGE_METHODE_PUBLIC;
 			}
 		} else if (element instanceof AbstractFieldSignature) {
 			switch (((AbstractFieldSignature) element).getVisibilty()) {
-			case AbstractSignature.VISIBILITY_DEFAULT: return GUIDefaults.IMAGE_FIELD_DEFAULT;
-			case AbstractSignature.VISIBILITY_PRIVATE: return GUIDefaults.IMAGE_FIELD_PRIVATE;
-			case AbstractSignature.VISIBILITY_PROTECTED: return GUIDefaults.IMAGE_FIELD_PROTECTED;
-			case AbstractSignature.VISIBILITY_PUBLIC: return GUIDefaults.IMAGE_FIELD_PUBLIC;
+			case AbstractSignature.VISIBILITY_DEFAULT:
+				return GUIDefaults.IMAGE_FIELD_DEFAULT;
+			case AbstractSignature.VISIBILITY_PRIVATE:
+				return GUIDefaults.IMAGE_FIELD_PRIVATE;
+			case AbstractSignature.VISIBILITY_PROTECTED:
+				return GUIDefaults.IMAGE_FIELD_PROTECTED;
+			case AbstractSignature.VISIBILITY_PUBLIC:
+				return GUIDefaults.IMAGE_FIELD_PUBLIC;
 			}
 		} else if (element instanceof AbstractClassSignature) {
 			return GUIDefaults.IMAGE_CLASS;
@@ -105,8 +114,8 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 
 	@Override
 	public String getText(Object element) {
-		if (element instanceof  AbstractClassFragment) {
-			return ((AbstractClassFragment) element).getSignature().getName(); 
+		if (element instanceof AbstractClassFragment) {
+			return ((AbstractClassFragment) element).getSignature().getName();
 		} else if (element instanceof AbstractMethodSignature) {
 			AbstractMethodSignature method = (AbstractMethodSignature) element;
 			StringBuilder sb = new StringBuilder();
@@ -124,7 +133,7 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 				sb.append(" : ");
 				sb.append(method.getType());
 			}
-			
+
 			return sb.toString();
 		} else if (element instanceof AbstractFieldSignature) {
 			AbstractFieldSignature field = (AbstractFieldSignature) element;
@@ -134,40 +143,40 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 		}
 		return element.toString();
 	}
-	
+
 	@Override
 	public void colorizeItems(TreeItem[] treeItems, IFile file) {
-//		for (int i = 0; i < treeItems.length; i++) {
-//			
-//			if (treeItems[i].getData() instanceof AbstractClassFragment) {
-//				treeItems[i].setForeground(treeItems[i].getDisplay()
-//						.getSystemColor(SWT.DEFAULT));
-//				setForeground(treeItems[i], null);
-//			} else{ //if (treeItems[i].getData() instanceof FSTRole) {
-//				
-//					// get old Font and simply make it bold
-////					treeItems[i].setFont(new Font(treeItems[i].getDisplay(),
-////									treeItems[i].getFont().getFontData()[0]
-////											.getName(), treeItems[i].getFont()
-////											.getFontData()[0].getHeight(),
-////									SWT.BOLD));
-////					
-////					treeItems[i].setForeground(treeItems[i].getDisplay()
-////							.getSystemColor(SWT.DEFAULT));
-//			}
-//			if (treeItems[i].getItems().length > 0) {
-//				colorizeItems(treeItems[i].getItems(), file);
-//			}
-//		}
+		// for (int i = 0; i < treeItems.length; i++) {
+		//
+		// if (treeItems[i].getData() instanceof AbstractClassFragment) {
+		// treeItems[i].setForeground(treeItems[i].getDisplay()
+		// .getSystemColor(SWT.DEFAULT));
+		// setForeground(treeItems[i], null);
+		// } else{ //if (treeItems[i].getData() instanceof FSTRole) {
+		//
+		// // get old Font and simply make it bold
+		// // treeItems[i].setFont(new Font(treeItems[i].getDisplay(),
+		// // treeItems[i].getFont().getFontData()[0]
+		// // .getName(), treeItems[i].getFont()
+		// // .getFontData()[0].getHeight(),
+		// // SWT.BOLD));
+		// //
+		// // treeItems[i].setForeground(treeItems[i].getDisplay()
+		// // .getSystemColor(SWT.DEFAULT));
+		// }
+		// if (treeItems[i].getItems().length > 0) {
+		// colorizeItems(treeItems[i].getItems(), file);
+		// }
+		// }
 	}
-	
+
 	@Override
 	public void setForeground(TreeItem item, IFile file) {
 		item.setForeground(item.getDisplay().getSystemColor(SWT.COLOR_GRAY));
 	}
-	
+
 	@Override
-	public String getLabelProvName(){
+	public String getLabelProvName() {
 		return "Feature Context Outline";
 	}
 
@@ -177,7 +186,7 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 	}
 
 	@Override
-	public boolean refreshContent(TreeItem[] items, IFile oldFile, IFile currentFile) {
+	public boolean refreshContent(IFile oldFile, IFile currentFile) {
 		return false;
 	}
 
@@ -185,156 +194,196 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 	public void init() {
 		viewer.addSelectionChangedListener(sListner);
 	}
+
+	/**
+	 * Jumps to a line in the given editor
+	 * 
+	 * @param editorPart
+	 * @param lineNumber
+	 */
+	public static void scrollToLine(IEditorPart editorPart, int lineNumber) {
+		if (!(editorPart instanceof ITextEditor) || lineNumber <= 0) {
+			return;
+		}
+		ITextEditor editor = (ITextEditor) editorPart;
+		IDocument document = editor.getDocumentProvider().getDocument(
+				editor.getEditorInput());
+		if (document != null) {
+			IRegion lineInfo = null;
+			try {
+				lineInfo = document.getLineInformation(lineNumber - 1);
+			} catch (BadLocationException e) {
+			}
+			if (lineInfo != null) {
+				editor.selectAndReveal(lineInfo.getOffset(), lineInfo.getLength());
+			}
+		}
+	}
 	
 	ISelectionChangedListener sListner = new ISelectionChangedListener() {
-		
-		// TODO refactor into FSTModel
-		private int getFieldLine(IFile iFile, FSTField field) {
-			for (FSTRole r : field.getRole().getFSTClass().getRoles()) {
-				if (r.getFile().equals(iFile)) {
-					for (FSTField f : r.getClassFragment().getFields()) {
-						if (f.comparesTo(field)) {
-							return f.getLine();
-						}
-					}
-				}
-			}
-			return -1;
-		}
 
-		private int getMethodLine(IFile iFile, FSTMethod meth) {
-			for (FSTRole r : meth.getRole().getFSTClass().getRoles()) {
-				if (r.getFile().equals(iFile)) {
-					for (FSTMethod m : r.getClassFragment().getMethods()) {
-						if (m.comparesTo(meth)) {
-							return m.getLine();
-						}
-					}
-				}
-			}
-			return -1;
-		}
+		// TODO refactor into FSTModel
+		// private int getFieldLine(IFile iFile, FSTField field) {
+		// for (FSTRole r : field.getRole().getFSTClass().getRoles()) {
+		// if (r.getFile().equals(iFile)) {
+		// for (FSTField f : r.getClassFragment().getFields()) {
+		// if (f.comparesTo(field)) {
+		// return f.getLine();
+		// }
+		// }
+		// }
+		// }
+		// return -1;
+		// }
+		//
+		// private int getMethodLine(IFile iFile, FSTMethod meth) {
+		// for (FSTRole r : meth.getRole().getFSTClass().getRoles()) {
+		// if (r.getFile().equals(iFile)) {
+		// for (FSTMethod m : r.getClassFragment().getMethods()) {
+		// if (m.comparesTo(meth)) {
+		// return m.getLine();
+		// }
+		// }
+		// }
+		// }
+		// return -1;
+		// }
 		
 		@Override
 		public void selectionChanged(SelectionChangedEvent event) {
 			if (viewer.getInput() != null) {
 				Object selection = ((IStructuredSelection) viewer.getSelection()).getFirstElement();
 				
-				if(selection instanceof AbstractSignature){
-					AbstractSignature ms = (AbstractSignature) selection;
-					int i = ms.getLine();
-					MessageDialog.openConfirm(null, "Line", "" + i);
-				}else if(((IStructuredSelection)event.getSelection()).getFirstElement() instanceof Feature){
-					Feature ob = (Feature) ((IStructuredSelection)event.getSelection()).getFirstElement();
+//				Object sele((IStructuredSelection) event.getSelection()).getFirstElement()
 
-					IFeatureProject pro = CorePlugin.getFeatureProject((IResource)viewer.getInput());
-					FSTModel model = pro.getFSTModel();
-					
-					if(model != null){
-						FSTFeature fstFeature = model.getFeature(ob.getName());
-						TreeItem item = viewer.getTree().getSelection()[0].getParentItem().getParentItem();
+				if (selection instanceof AbstractSignature) {
+//					AbstractSignature ms = (AbstractSignature) selection;
+//					int i = ms.getLine();
+//					scrollToLine(editorPart, 5);
+//					MessageDialog.openConfirm(null, "Line", "" + i);
+					TreeItem decl = viewer.getTree().getSelection()[0];
+					if (decl.getItemCount() > 0) {						
+						AbstractSignature sig = (AbstractSignature) decl.getData();
 						
-
-					FSTRole r = fstFeature.getRole(item.getText()+".java");
-							;
-					if (r.getFile().isAccessible()) {
-						IWorkbench workbench = PlatformUI
-								.getWorkbench();
-						IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
-						IWorkbenchPage page = window.getActivePage();
-						IContentType contentType = null;
-						try {
-							IFile iFile = r.getFile();
-							IContentDescription description = iFile
-									.getContentDescription();
-							if (description != null) {
-								contentType = description.getContentType();
+						InterfaceProject interfaceProject = MPLPlugin.getDefault().getInterfaceProject(((IResource) viewer.getInput()).getProject());				
+						FSTModel model = interfaceProject.getFeatureProjectReference().getFSTModel();
+						if (model != null) {
+							IFile iFile = model.getFeature(interfaceProject.getFeatureName(sig.getFeatureData()[0].getId())).getRole(decl.getParentItem().getText() + ".java").getFile();
+							
+							if (iFile.isAccessible()) {
+								IWorkbench workbench = PlatformUI.getWorkbench();
+								try {
+									IContentType contentType = null;
+									IContentDescription description = iFile.getContentDescription();
+									if (description != null) {
+										contentType = description.getContentType();
+									}
+									IEditorDescriptor desc = workbench.getEditorRegistry().getDefaultEditor(iFile.getName(), contentType);
+									IEditorPart editorPart = workbench.getActiveWorkbenchWindow().getActivePage().openEditor(
+											new FileEditorInput(iFile), 
+											(desc != null) ? desc.getId() : "org.eclipse.ui.DefaultTextEditor");
+									
+									
+									int linenumber = sig.getFeatureData()[0].getLineNumber();
+									scrollToLine(editorPart, linenumber);
+								} catch (CoreException e) {
+									UIPlugin.getDefault().logError(e);
+								}
 							}
-							IEditorDescriptor desc = null;
-							if (contentType != null) {
-								desc = workbench.getEditorRegistry()
-										.getDefaultEditor(iFile.getName(), contentType);
-							} else {
-								desc = workbench.getEditorRegistry()
-										.getDefaultEditor(iFile.getName());
-							}
-							if (desc != null) {
-								page.openEditor(new FileEditorInput(iFile),
-										desc.getId());
-							} else {
-								// case: there is no default editor for the file
-								page.openEditor(new FileEditorInput(iFile),
-										"org.eclipse.ui.DefaultTextEditor");
-							}
-//							viewer.refresh();
-						} catch (CoreException e) {
-							UIPlugin.getDefault().logError(e);
 						}
 					}
+					
+				} else if (selection instanceof Feature) {
+					TreeItem decl = viewer.getTree().getSelection()[0].getParentItem();
+					String featureName = ((Feature) selection).getName();
+					
+					InterfaceProject interfaceProject = MPLPlugin.getDefault().getInterfaceProject(((IResource) viewer.getInput()).getProject());				
+					FSTModel model = interfaceProject.getFeatureProjectReference().getFSTModel();
+					if (model != null) {
+						IFile iFile = model.getFeature(featureName).getRole(decl.getParentItem().getText() + ".java").getFile();
+						
+						if (iFile.isAccessible()) {
+							IWorkbench workbench = PlatformUI.getWorkbench();
+							try {
+								IContentType contentType = null;
+								IContentDescription description = iFile.getContentDescription();
+								if (description != null) {
+									contentType = description.getContentType();
+								}
+								IEditorDescriptor desc = workbench.getEditorRegistry().getDefaultEditor(iFile.getName(), contentType);
+								IEditorPart editorPart = workbench.getActiveWorkbenchWindow().getActivePage().openEditor(
+										new FileEditorInput(iFile), 
+										(desc != null) ? desc.getId() : "org.eclipse.ui.DefaultTextEditor");
+								
+
+								AbstractSignature sig = (AbstractSignature) decl.getData();
+								int linenumber = sig.getFeatureData()[sig.hasFeature(interfaceProject.getFeatureID(featureName))].getLineNumber();
+								scrollToLine(editorPart, linenumber);
+							} catch (CoreException e) {
+								UIPlugin.getDefault().logError(e);
+							}
+						}
 					}
 				}
-			
-				
-				
-				
-//				if (selection instanceof FSTMethod) {
-//					FSTMethod meth = (FSTMethod) selection;
-//					int line = getMethodLine(iFile, meth);
-//					if (line != -1) {
-//						scrollToLine(active_editor, line);
-//					}
-//				} else if (selection instanceof FSTField) {
-//					FSTField field = (FSTField) selection;
-//					int line = getFieldLine(iFile, field);
-//					if (line != -1) {
-//						scrollToLine(active_editor, line);
-//					}
-//				}
-				
-				
-				
-//				} else if (selection instanceof FSTDirective) {
-//					FSTDirective directive = (FSTDirective) selection;
-//					scrollToLine(active_editor, directive.getStartLine(), directive.getEndLine(), 
-//							directive.getStartOffset(), directive.getEndLength());
-//				} else if (selection instanceof FSTRole) {
-//					FSTRole r = (FSTRole) selection;
-//					if (r.getFile().isAccessible()) {
-//						IWorkbench workbench = PlatformUI
-//								.getWorkbench();
-//						IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
-//						IWorkbenchPage page = window.getActivePage();
-//						IContentType contentType = null;
-//						try {
-//							iFile = r.getFile();
-//							IContentDescription description = iFile
-//									.getContentDescription();
-//							if (description != null) {
-//								contentType = description.getContentType();
-//							}
-//							IEditorDescriptor desc = null;
-//							if (contentType != null) {
-//								desc = workbench.getEditorRegistry()
-//										.getDefaultEditor(iFile.getName(), contentType);
-//							} else {
-//								desc = workbench.getEditorRegistry()
-//										.getDefaultEditor(iFile.getName());
-//							}
-//							if (desc != null) {
-//								page.openEditor(new FileEditorInput(iFile),
-//										desc.getId());
-//							} else {
-//								// case: there is no default editor for the file
-//								page.openEditor(new FileEditorInput(iFile),
-//										"org.eclipse.ui.DefaultTextEditor");
-//							}
-//						} catch (CoreException e) {
-//							UIPlugin.getDefault().logError(e);
-//						}
-//					}
-//				}
+
+				// if (selection instanceof FSTMethod) {
+				// FSTMethod meth = (FSTMethod) selection;
+				// int line = getMethodLine(iFile, meth);
+				// if (line != -1) {
+				// scrollToLine(active_editor, line);
+				// }
+				// } else if (selection instanceof FSTField) {
+				// FSTField field = (FSTField) selection;
+				// int line = getFieldLine(iFile, field);
+				// if (line != -1) {
+				// scrollToLine(active_editor, line);
+				// }
+				// }
+
+				// } else if (selection instanceof FSTDirective) {
+				// FSTDirective directive = (FSTDirective) selection;
+				// scrollToLine(active_editor, directive.getStartLine(),
+				// directive.getEndLine(),
+				// directive.getStartOffset(), directive.getEndLength());
+				// } else if (selection instanceof FSTRole) {
+				// FSTRole r = (FSTRole) selection;
+				// if (r.getFile().isAccessible()) {
+				// IWorkbench workbench = PlatformUI
+				// .getWorkbench();
+				// IWorkbenchWindow window =
+				// workbench.getActiveWorkbenchWindow();
+				// IWorkbenchPage page = window.getActivePage();
+				// IContentType contentType = null;
+				// try {
+				// iFile = r.getFile();
+				// IContentDescription description = iFile
+				// .getContentDescription();
+				// if (description != null) {
+				// contentType = description.getContentType();
+				// }
+				// IEditorDescriptor desc = null;
+				// if (contentType != null) {
+				// desc = workbench.getEditorRegistry()
+				// .getDefaultEditor(iFile.getName(), contentType);
+				// } else {
+				// desc = workbench.getEditorRegistry()
+				// .getDefaultEditor(iFile.getName());
+				// }
+				// if (desc != null) {
+				// page.openEditor(new FileEditorInput(iFile),
+				// desc.getId());
+				// } else {
+				// // case: there is no default editor for the file
+				// page.openEditor(new FileEditorInput(iFile),
+				// "org.eclipse.ui.DefaultTextEditor");
+				// }
+				// } catch (CoreException e) {
+				// UIPlugin.getDefault().logError(e);
+				// }
+				// }
+				// }
 			}
-			
+
 		}
 	};
 

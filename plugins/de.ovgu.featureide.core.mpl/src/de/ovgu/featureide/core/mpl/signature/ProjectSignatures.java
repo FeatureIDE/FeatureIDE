@@ -30,6 +30,7 @@ import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassSignature;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractFieldSignature;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractMethodSignature;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature;
+import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature.FeatureData;
 import de.ovgu.featureide.core.mpl.signature.filter.ISignatureFilter;
 
 /** 
@@ -183,20 +184,20 @@ public class ProjectSignatures {
 	}
 	
 	private void count(AbstractSignature signature, int[] curCounter, HashMap<Integer, int[]> fs, int i) {
-		for (int feature : signature.getFeatureIDs()) {
+		for (FeatureData feature : signature.getFeatureData()) {
 			int[] x = fs.get(feature);
 			if (x == null) {
 				x = new int[]{0,0,0,0};
-				fs.put(feature, x);
+				fs.put(feature.getId(), x);
 			}
 			x[i]++;
 		}
 
 		curCounter[0]++;
-		curCounter[1] += signature.getFeatureIDs().length;
+		curCounter[1] += signature.getFeatureData().length;
 		if (signature.isPrivate()) {
 			curCounter[2]++;
-			curCounter[3] += signature.getFeatureIDs().length;
+			curCounter[3] += signature.getFeatureData().length;
 		}
 	}
 	

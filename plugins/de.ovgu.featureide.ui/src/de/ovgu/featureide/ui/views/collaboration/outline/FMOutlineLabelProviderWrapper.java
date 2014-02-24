@@ -86,7 +86,7 @@ public class FMOutlineLabelProviderWrapper extends OutlineLabelProvider{
 	 * @see de.ovgu.featureide.ui.views.collaboration.outline.OutlineLabelProvider#refreshContent(org.eclipse.core.resources.IFile, org.eclipse.core.resources.IFile)
 	 */
 	@Override
-	public boolean refreshContent(TreeItem[] items, IFile oldFile, IFile currentFile) {
+	public boolean refreshContent(IFile oldFile, IFile currentFile) {
 		return false;
 	}
 

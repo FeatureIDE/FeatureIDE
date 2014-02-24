@@ -30,7 +30,6 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.core.JavaProject;
 
 import beaver.Symbol;
-
 import AST.ASTNode;
 import AST.Access;
 import AST.BodyDecl;
@@ -52,6 +51,7 @@ import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.signature.ProjectSignatures;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassSignature;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature;
+import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature.FeatureData;
 import de.ovgu.featureide.core.mpl.signature.fuji.FujiClassSignature;
 import de.ovgu.featureide.core.mpl.signature.fuji.FujiFieldSignature;
 import de.ovgu.featureide.core.mpl.signature.fuji.FujiMethodSignature;
@@ -68,24 +68,35 @@ import fuji.SPLStructure;
 @SuppressWarnings("restriction")
 public class FujiJob extends AMonitorJob {
 	private final class SignatureReference {
-		private final LinkedList<Integer> ids = new LinkedList<Integer>();
+		private final HashMap<Integer, FeatureData> ids = new HashMap<Integer, FeatureData>();
 		private final AbstractSignature sig;
 
 		public SignatureReference(AbstractSignature sig) {
 			this.sig = sig;
 		}
 
-		public final int[] getIDs() {
-			int[] ret = new int[ids.size()];
+//		public final int[] getIDs() {
+//			int[] ret = new int[ids.size()];
+//			int i = -1;
+//			for (int id : ids) {
+//				ret[++i] = id;
+//			}
+//			return ret;
+//		}
+		
+		public final FeatureData[] getFeatureData() {
+			FeatureData[] ret = new FeatureData[ids.size()];
 			int i = -1;
-			for (int id : ids) {
+			for (FeatureData id : ids.values()) {
 				ret[++i] = id;
 			}
 			return ret;
 		}
 
-		public final void addID(int id) {
-			ids.add(id);
+		public final void addID(FeatureData featureData) {
+			if (!ids.containsKey(featureData.getId())) {
+				ids.put(featureData.getId(), featureData);
+			}
 		}
 
 		public final AbstractSignature getSig() {
@@ -106,13 +117,13 @@ public class FujiJob extends AMonitorJob {
 		setPriority(BUILD);
 	}
 
-	private AbstractSignature addFeatureID(AbstractSignature sig, int featureID) {
+	private AbstractSignature addFeatureID(AbstractSignature sig, int featureID, int line) {
 		SignatureReference sigRef = signatureSet.get(sig);
 		if (sigRef == null) {
 			sigRef = new SignatureReference(sig);
 			signatureSet.put(sig, sigRef);
 		}
-		sigRef.addID(featureID);
+		sigRef.addID(new FeatureData(featureID, line));
 		return sigRef.getSig();
 	}
 
@@ -225,7 +236,7 @@ public class FujiJob extends AMonitorJob {
 							new FujiClassSignature(parent, name,
 									modifierString, typeString, pckg, typeDecl,
 									importList),
-							interfaceProject.getFeatureID(featurename));
+							interfaceProject.getFeatureID(featurename), 1);
 					// curClassSig.addFeature(featurename);
 
 					for (BodyDecl bodyDecl : typeDecl.getBodyDeclList()) {
@@ -245,8 +256,8 @@ public class FujiJob extends AMonitorJob {
 							featurename = getFeatureName(bodyDecl);
 							addFeatureID(new FujiMethodSignature(curClassSig,
 									name, modifierString, type, false,
-									parameterList, exceptionList, Symbol.getLine(method.getStart())),
-									interfaceProject.getFeatureID(featurename));
+									parameterList, exceptionList), 
+									interfaceProject.getFeatureID(featurename), Symbol.getLine(method.getStart()));
 
 						} else if (bodyDecl instanceof FieldDeclaration) {
 							FieldDeclaration field = (FieldDeclaration) bodyDecl;
@@ -258,7 +269,7 @@ public class FujiJob extends AMonitorJob {
 							featurename = getFeatureName(bodyDecl);
 							addFeatureID(new FujiFieldSignature(curClassSig,
 									name, modifierString, type),
-									interfaceProject.getFeatureID(featurename));
+									interfaceProject.getFeatureID(featurename), Symbol.getLine(field.getStart()));
 
 						} else if (bodyDecl instanceof ConstructorDecl) {
 							ConstructorDecl constructor = (ConstructorDecl) bodyDecl;
@@ -277,9 +288,8 @@ public class FujiJob extends AMonitorJob {
 								addFeatureID(new FujiMethodSignature(
 										curClassSig, name, modifierString,
 										type, true, parameterList,
-										exceptionList, 100),
-										interfaceProject
-												.getFeatureID(featurename));
+										exceptionList),
+										interfaceProject.getFeatureID(featurename), Symbol.getLine(constructor.getStart()));
 							}
 							
 						} else if (bodyDecl instanceof MemberClassDecl) {
@@ -302,7 +312,8 @@ public class FujiJob extends AMonitorJob {
 		int i = -1;
 		for (SignatureReference sigRef : signatureSet.values()) {
 			AbstractSignature sig = sigRef.getSig();
-			sig.setFeatureIDs(sigRef.getIDs());
+			sig.setFeatureData(sigRef.getFeatureData());
+//			sig.setFeatureIDs(sigRef.getIDs());
 			sigArray[++i] = sig;
 		}
 		projectSignatures.setSignatureArray(sigArray);

@@ -41,26 +41,20 @@ public class FujiMethodSignature extends AbstractMethodSignature {
 	protected TypeDecl returnType;
 	protected List<ParameterDeclaration> parameterList;
 	protected List<Access> exceptionList;
-	protected int line = 0;
 //	protected final boolean isConstructor;
 
 	public FujiMethodSignature(AbstractClassSignature parent, String name, 
 			String modifier, TypeDecl returnType, boolean isConstructor,
-			List<ParameterDeclaration> parameterList, List<Access> exceptionList, int line) {
+			List<ParameterDeclaration> parameterList, List<Access> exceptionList) {
 //		super(parent, name, modifier, returnType.name());
 		super(parent, name, modifier, returnType.name(), new LinkedList<String>(), isConstructor);
 		this.returnType = returnType;
 		this.parameterList = parameterList;
 		this.exceptionList = exceptionList;
-		this.line = line;
 //		this.isConstructor = isConstructor;
 		for (ParameterDeclaration parameter : parameterList) {
 			parameterTypes.add(parameter.type().name());
 		}
-	}
-	
-	public int getLine(){
-		return line;
 	}
 
 //	public FujiMethodSignature(FujiMethodSignature orgSig) {

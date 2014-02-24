@@ -152,12 +152,12 @@ public class InterfaceProject {
 		return featureNames[id];
 	}
 	
-	public void loadSignatures(boolean again) {
+	public void loadSignatures(boolean force) {
 		if (loadJob == null) {
 			loadJob = new FujiJob(featureProject);
 			loadJob.setInterfaceProject(this);
 			loadJob.schedule();
-		} else if (again) {
+		} else if (force) {
 			loadAgain = true;
 		}
 	}

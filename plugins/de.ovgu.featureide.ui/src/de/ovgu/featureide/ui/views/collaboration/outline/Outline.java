@@ -565,7 +565,8 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 	 */
 	private boolean refreshContent(IFile oldFile, IFile currentFile) {
 		if(viewer.getLabelProvider() instanceof OutlineLabelProvider){
-			return ((OutlineLabelProvider) viewer.getLabelProvider()).refreshContent(viewer.getTree().getItems(), oldFile, currentFile);
+			OutlineLabelProvider lp = (OutlineLabelProvider) viewer.getLabelProvider();
+			return lp.refreshContent(oldFile, currentFile);
 		}
 		return false;
 	}
@@ -742,7 +743,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		}
 
 		@Override
-		public boolean refreshContent(TreeItem[] items, IFile oldFile, IFile currentFile) {
+		public boolean refreshContent(IFile oldFile, IFile currentFile) {
 			return false;
 		}
 

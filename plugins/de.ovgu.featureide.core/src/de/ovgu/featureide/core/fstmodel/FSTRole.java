@@ -40,9 +40,8 @@ public class FSTRole {
 	private FSTFeature feature;
 	private FSTClass fstClass;
 	private IFile file;
-		
+	
 	public FSTRole(IFile file, FSTFeature feature, FSTClass fstClass) {
-
 		this.feature = feature;
 		this.fstClass = fstClass;
 		this.file = file;

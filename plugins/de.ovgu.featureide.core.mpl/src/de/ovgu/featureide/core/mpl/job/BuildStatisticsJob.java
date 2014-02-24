@@ -228,7 +228,7 @@ public class BuildStatisticsJob extends AMonitorJob {
 				ISignatureFilter featureFilter = new ISignatureFilter() {
 					@Override
 					public boolean isValid(AbstractSignature signature) {
-						return (signature.hasFeature(curFeatureID));
+						return (signature.hasFeature(curFeatureID) > -1);
 					}
 				};
 //				LinkedList<AbstractSignature> members = new LinkedList<AbstractSignature>();

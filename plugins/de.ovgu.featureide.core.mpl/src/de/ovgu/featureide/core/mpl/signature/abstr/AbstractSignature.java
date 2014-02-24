@@ -32,6 +32,38 @@ import de.ovgu.featureide.core.mpl.signature.ViewTag;
  * @author Sebastian Krieter
  */
 public abstract class AbstractSignature {
+	
+	public static final class FeatureData {
+		private final int id, lineNumber;
+		private String comment;
+		
+		public FeatureData(int id, int lineNumber, String comment) {
+			this.id = id;
+			this.lineNumber = lineNumber;
+			this.comment = comment;
+		}
+		
+		public FeatureData(int id, int lineNumber) {
+			this(id, lineNumber, null);
+		}
+		
+		public int getId() {
+			return id;
+		}
+		
+		public int getLineNumber() {
+			return lineNumber;
+		}
+		
+		public String getComment() {
+			return comment;
+		}
+		
+		public void setComment(String comment) {
+			this.comment = comment;
+		}
+	}
+	
 	protected static final String LINE_SEPARATOR = System.getProperty("line.separator");
 	protected static final int hashCodePrime = 31;
 	public static final byte 
@@ -59,10 +91,9 @@ public abstract class AbstractSignature {
 	protected LinkedList<ViewTag> viewTags;
 //	protected final HashSet<String> features = new HashSet<String>();
 //	protected final FeatureList features = new FeatureList();
-	
-	protected int[] featureIDs;
-	
-	public abstract int getLine();
+
+//	protected int[] featureIDs;
+	protected FeatureData[] featureData = null;
 	
 	protected AbstractSignature(AbstractClassSignature parent, String name, String modifierString, String type) {
 		this.parent = parent;
@@ -224,25 +255,41 @@ public abstract class AbstractSignature {
 //		return features;
 //	}
 
-	public int[] getFeatureIDs() {
-		return featureIDs;
-	}
+//	public int[] getFeatureIDs() {
+//		
+//		return featureIDs;
+//	}
 	
-	public void setFeatureIDs(int[] featureIDs) {
-		this.featureIDs = featureIDs;
-	}
+//	public void setFeatureIDs(int[] featureIDs) {
+//		this.featureIDs = featureIDs;
+//	}
 
 //	public void addFeature(String feature) {
 //		features.add(feature);
 //	}
 	
-	public boolean hasFeature(int id) {
-		for (int j = 0; j < featureIDs.length; j++) {
-			if (id == featureIDs[j]) {
-				return true;
+	public FeatureData[] getFeatureData() {
+		return featureData;
+	}
+	
+//	
+//	public FeatureData getFeatureData(int index) {
+//		return featureData[index];
+//	}
+	
+	public void setFeatureData(FeatureData[] featureData) {
+		if (this.featureData == null) {
+			this.featureData = featureData;
+		}
+	}
+
+	public int hasFeature(int id) {
+		for (int j = 0; j < featureData.length; j++) {
+			if (id == featureData[j].id) {
+				return j;
 			}
 		}
-		return false;
+		return -1;
 	}
 	
 	public boolean hasFeature(int[] idArray) {
@@ -251,8 +298,8 @@ public abstract class AbstractSignature {
 		}
 		for (int i = 0; i < idArray.length; i++) {
 			int curId = idArray[i];
-			for (int j = 0; j < featureIDs.length; j++) {
-				if (curId == featureIDs[j]) {
+			for (int j = 0; j < featureData.length; j++) {
+				if (curId == featureData[j].id) {
 					return true;
 				}
 			}

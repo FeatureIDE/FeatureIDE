@@ -253,9 +253,10 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 	}
 
 
-	public boolean refreshContent(TreeItem[] items, IFile oldFile, IFile currentFile) {
+	public boolean refreshContent(IFile oldFile, IFile currentFile) {
 	if (currentFile != null && oldFile != null) {
 		/** only set the colors of the tree if the content is the same **/
+		TreeItem[] items = viewer.getTree().getItems();
 		if (currentFile.getName().equals(oldFile.getName()) && items.length > 0) {
 			TreeItem item = items[0];
 			if (item != null) {

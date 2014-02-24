@@ -32,6 +32,7 @@ import de.ovgu.featureide.core.mpl.InterfaceProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.io.IOConstants;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature;
+import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature.FeatureData;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 public class ContextFilter implements ISignatureFilter {
@@ -101,11 +102,11 @@ public class ContextFilter implements ISignatureFilter {
 
 	@Override
 	public boolean isValid(AbstractSignature signature) {
-		int[] ids = signature.getFeatureIDs();
+		FeatureData[] ids = signature.getFeatureData();
 		Node[] cxy = new Node[ids.length];
 //		ka a = new ka();
 		for (int i = 0; i < ids.length; ++i) {
-			int id = ids[i];
+			int id = ids[i].getId();
 			if (selcetedFeatures[id]) {
 				return true;
 			} 
