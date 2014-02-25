@@ -146,28 +146,6 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 
 	@Override
 	public void colorizeItems(TreeItem[] treeItems, IFile file) {
-		// for (int i = 0; i < treeItems.length; i++) {
-		//
-		// if (treeItems[i].getData() instanceof AbstractClassFragment) {
-		// treeItems[i].setForeground(treeItems[i].getDisplay()
-		// .getSystemColor(SWT.DEFAULT));
-		// setForeground(treeItems[i], null);
-		// } else{ //if (treeItems[i].getData() instanceof FSTRole) {
-		//
-		// // get old Font and simply make it bold
-		// // treeItems[i].setFont(new Font(treeItems[i].getDisplay(),
-		// // treeItems[i].getFont().getFontData()[0]
-		// // .getName(), treeItems[i].getFont()
-		// // .getFontData()[0].getHeight(),
-		// // SWT.BOLD));
-		// //
-		// // treeItems[i].setForeground(treeItems[i].getDisplay()
-		// // .getSystemColor(SWT.DEFAULT));
-		// }
-		// if (treeItems[i].getItems().length > 0) {
-		// colorizeItems(treeItems[i].getItems(), file);
-		// }
-		// }
 	}
 
 	@Override
@@ -187,20 +165,21 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 
 	@Override
 	public boolean refreshContent(IFile oldFile, IFile currentFile) {
+		if (currentFile != null && oldFile != null) {
+			//TODO MPL: ... ?
+			if (currentFile.getName().equals(oldFile.getName()) && viewer.getTree().getItems().length > 1) {
+				return true;
+			}
+		}
 		return false;
 	}
 
 	@Override
 	public void init() {
 		viewer.addSelectionChangedListener(sListner);
+//		viewer.setAutoExpandLevel(AbstractTreeViewer.ALL_LEVELS);
 	}
 
-	/**
-	 * Jumps to a line in the given editor
-	 * 
-	 * @param editorPart
-	 * @param lineNumber
-	 */
 	public static void scrollToLine(IEditorPart editorPart, int lineNumber) {
 		if (!(editorPart instanceof ITextEditor) || lineNumber <= 0) {
 			return;
@@ -220,170 +199,54 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 		}
 	}
 	
-	ISelectionChangedListener sListner = new ISelectionChangedListener() {
-
-		// TODO refactor into FSTModel
-		// private int getFieldLine(IFile iFile, FSTField field) {
-		// for (FSTRole r : field.getRole().getFSTClass().getRoles()) {
-		// if (r.getFile().equals(iFile)) {
-		// for (FSTField f : r.getClassFragment().getFields()) {
-		// if (f.comparesTo(field)) {
-		// return f.getLine();
-		// }
-		// }
-		// }
-		// }
-		// return -1;
-		// }
-		//
-		// private int getMethodLine(IFile iFile, FSTMethod meth) {
-		// for (FSTRole r : meth.getRole().getFSTClass().getRoles()) {
-		// if (r.getFile().equals(iFile)) {
-		// for (FSTMethod m : r.getClassFragment().getMethods()) {
-		// if (m.comparesTo(meth)) {
-		// return m.getLine();
-		// }
-		// }
-		// }
-		// }
-		// return -1;
-		// }
-		
+	private ISelectionChangedListener sListner = new ISelectionChangedListener() {	
 		@Override
 		public void selectionChanged(SelectionChangedEvent event) {
 			if (viewer.getInput() != null) {
 				Object selection = ((IStructuredSelection) viewer.getSelection()).getFirstElement();
-				
-//				Object sele((IStructuredSelection) event.getSelection()).getFirstElement()
-
-				if (selection instanceof AbstractSignature) {
-//					AbstractSignature ms = (AbstractSignature) selection;
-//					int i = ms.getLine();
-//					scrollToLine(editorPart, 5);
-//					MessageDialog.openConfirm(null, "Line", "" + i);
-					TreeItem decl = viewer.getTree().getSelection()[0];
-					if (decl.getItemCount() > 0) {						
-						AbstractSignature sig = (AbstractSignature) decl.getData();
-						
-						InterfaceProject interfaceProject = MPLPlugin.getDefault().getInterfaceProject(((IResource) viewer.getInput()).getProject());				
-						FSTModel model = interfaceProject.getFeatureProjectReference().getFSTModel();
-						if (model != null) {
-							IFile iFile = model.getFeature(interfaceProject.getFeatureName(sig.getFeatureData()[0].getId())).getRole(decl.getParentItem().getText() + ".java").getFile();
-							
-							if (iFile.isAccessible()) {
-								IWorkbench workbench = PlatformUI.getWorkbench();
-								try {
-									IContentType contentType = null;
-									IContentDescription description = iFile.getContentDescription();
-									if (description != null) {
-										contentType = description.getContentType();
-									}
-									IEditorDescriptor desc = workbench.getEditorRegistry().getDefaultEditor(iFile.getName(), contentType);
-									IEditorPart editorPart = workbench.getActiveWorkbenchWindow().getActivePage().openEditor(
-											new FileEditorInput(iFile), 
-											(desc != null) ? desc.getId() : "org.eclipse.ui.DefaultTextEditor");
-									
-									
-									int linenumber = sig.getFeatureData()[0].getLineNumber();
-									scrollToLine(editorPart, linenumber);
-								} catch (CoreException e) {
-									UIPlugin.getDefault().logError(e);
-								}
-							}
-						}
-					}
-					
+				InterfaceProject interfaceProject = MPLPlugin.getDefault().getInterfaceProject(((IResource) viewer.getInput()).getProject());
+				if (selection instanceof AbstractClassFragment) {
+					AbstractSignature sig = ((AbstractClassFragment) selection).getSignature();
+					openEditor(sig, interfaceProject, sig.getFeatureData()[0].getId());
+				} else if (selection instanceof AbstractSignature) {
+					AbstractSignature sig = (AbstractSignature) selection;
+					openEditor(sig, interfaceProject, sig.getFeatureData()[0].getId());
 				} else if (selection instanceof Feature) {
 					TreeItem decl = viewer.getTree().getSelection()[0].getParentItem();
-					String featureName = ((Feature) selection).getName();
-					
-					InterfaceProject interfaceProject = MPLPlugin.getDefault().getInterfaceProject(((IResource) viewer.getInput()).getProject());				
-					FSTModel model = interfaceProject.getFeatureProjectReference().getFSTModel();
-					if (model != null) {
-						IFile iFile = model.getFeature(featureName).getRole(decl.getParentItem().getText() + ".java").getFile();
-						
-						if (iFile.isAccessible()) {
-							IWorkbench workbench = PlatformUI.getWorkbench();
-							try {
-								IContentType contentType = null;
-								IContentDescription description = iFile.getContentDescription();
-								if (description != null) {
-									contentType = description.getContentType();
-								}
-								IEditorDescriptor desc = workbench.getEditorRegistry().getDefaultEditor(iFile.getName(), contentType);
-								IEditorPart editorPart = workbench.getActiveWorkbenchWindow().getActivePage().openEditor(
-										new FileEditorInput(iFile), 
-										(desc != null) ? desc.getId() : "org.eclipse.ui.DefaultTextEditor");
-								
-
-								AbstractSignature sig = (AbstractSignature) decl.getData();
-								int linenumber = sig.getFeatureData()[sig.hasFeature(interfaceProject.getFeatureID(featureName))].getLineNumber();
-								scrollToLine(editorPart, linenumber);
-							} catch (CoreException e) {
-								UIPlugin.getDefault().logError(e);
-							}
+					openEditor((AbstractSignature) decl.getData(), interfaceProject, interfaceProject.getFeatureID(((Feature) selection).getName()));
+				}
+			}
+		}
+		
+		private void openEditor(AbstractSignature sig, InterfaceProject interfaceProject, int featureID) {			
+			FSTModel model = interfaceProject.getFeatureProjectReference().getFSTModel();
+			if (model != null) {
+				AbstractSignature parent = sig;
+				while (parent.getParent() != null) {
+					parent = parent.getParent();
+				}	
+				IFile iFile = model.getFeature(interfaceProject.getFeatureName(featureID)).getRole(parent.getName() + ".java").getFile();
+				
+				if (iFile.isAccessible()) {
+					IWorkbench workbench = PlatformUI.getWorkbench();
+					try {
+						IContentType contentType = null;
+						IContentDescription description = iFile.getContentDescription();
+						if (description != null) {
+							contentType = description.getContentType();
 						}
+						IEditorDescriptor desc = workbench.getEditorRegistry().getDefaultEditor(iFile.getName(), contentType);
+						IEditorPart editorPart = workbench.getActiveWorkbenchWindow().getActivePage().openEditor(
+								new FileEditorInput(iFile), 
+								(desc != null) ? desc.getId() : "org.eclipse.ui.DefaultTextEditor");
+						
+						int linenumber = sig.getFeatureData()[sig.hasFeature(featureID)].getLineNumber();
+						scrollToLine(editorPart, linenumber);
+					} catch (CoreException e) {
+						UIPlugin.getDefault().logError(e);
 					}
 				}
-
-				// if (selection instanceof FSTMethod) {
-				// FSTMethod meth = (FSTMethod) selection;
-				// int line = getMethodLine(iFile, meth);
-				// if (line != -1) {
-				// scrollToLine(active_editor, line);
-				// }
-				// } else if (selection instanceof FSTField) {
-				// FSTField field = (FSTField) selection;
-				// int line = getFieldLine(iFile, field);
-				// if (line != -1) {
-				// scrollToLine(active_editor, line);
-				// }
-				// }
-
-				// } else if (selection instanceof FSTDirective) {
-				// FSTDirective directive = (FSTDirective) selection;
-				// scrollToLine(active_editor, directive.getStartLine(),
-				// directive.getEndLine(),
-				// directive.getStartOffset(), directive.getEndLength());
-				// } else if (selection instanceof FSTRole) {
-				// FSTRole r = (FSTRole) selection;
-				// if (r.getFile().isAccessible()) {
-				// IWorkbench workbench = PlatformUI
-				// .getWorkbench();
-				// IWorkbenchWindow window =
-				// workbench.getActiveWorkbenchWindow();
-				// IWorkbenchPage page = window.getActivePage();
-				// IContentType contentType = null;
-				// try {
-				// iFile = r.getFile();
-				// IContentDescription description = iFile
-				// .getContentDescription();
-				// if (description != null) {
-				// contentType = description.getContentType();
-				// }
-				// IEditorDescriptor desc = null;
-				// if (contentType != null) {
-				// desc = workbench.getEditorRegistry()
-				// .getDefaultEditor(iFile.getName(), contentType);
-				// } else {
-				// desc = workbench.getEditorRegistry()
-				// .getDefaultEditor(iFile.getName());
-				// }
-				// if (desc != null) {
-				// page.openEditor(new FileEditorInput(iFile),
-				// desc.getId());
-				// } else {
-				// // case: there is no default editor for the file
-				// page.openEditor(new FileEditorInput(iFile),
-				// "org.eclipse.ui.DefaultTextEditor");
-				// }
-				// } catch (CoreException e) {
-				// UIPlugin.getDefault().logError(e);
-				// }
-				// }
-				// }
 			}
-
 		}
 	};
 

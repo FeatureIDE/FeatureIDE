@@ -34,7 +34,6 @@ import de.ovgu.featureide.core.mpl.InterfaceProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.signature.ProjectStructure;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassFragment;
-import de.ovgu.featureide.core.mpl.signature.abstr.AbstractMethodSignature;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature.FeatureData;
 import de.ovgu.featureide.core.mpl.signature.abstr.ClassFragmentComparator;
@@ -81,8 +80,7 @@ public class ContextOutlineTreeContentProvider implements ITreeContentProvider {
 			projectStructure = MPLPlugin.getDefault()
 					.extendedModules_getStruct(featureProject, featureName);
 			if (projectStructure != null) {
-				AbstractClassFragment[] ar = new AbstractClassFragment[projectStructure
-						.getClasses().size()];
+				AbstractClassFragment[] ar = new AbstractClassFragment[projectStructure.getClasses().size()];
 				int i = 0;
 				for (AbstractClassFragment frag : projectStructure.getClasses()) {
 					ar[i++] = frag;
@@ -117,7 +115,6 @@ public class ContextOutlineTreeContentProvider implements ITreeContentProvider {
 
 	@Override
 	public Object[] getChildren(Object parentElement) {
-
 		if (parentElement instanceof AbstractClassFragment) {
 			AbstractClassFragment frag = (AbstractClassFragment) parentElement;
 			Object[] ret = new Object[frag.getMembers().size()
@@ -133,9 +130,8 @@ public class ContextOutlineTreeContentProvider implements ITreeContentProvider {
 			Arrays.sort(ret, new SignatureComparator());
 
 			return ret;
-		}
-		if (parentElement instanceof AbstractMethodSignature) {
-			AbstractMethodSignature sig = (AbstractMethodSignature) parentElement;
+		} else if (parentElement instanceof AbstractSignature) {
+			AbstractSignature sig = (AbstractSignature) parentElement;
 			InterfaceProject intp = MPLPlugin.getDefault().getInterfaceProject(
 					featureProject.getProject());
 
@@ -165,8 +161,8 @@ public class ContextOutlineTreeContentProvider implements ITreeContentProvider {
 		if (element instanceof AbstractClassFragment) {
 			AbstractClassFragment frag = (AbstractClassFragment) element;
 			return frag.getMemberCount() > 0;
-		} else if (element instanceof AbstractMethodSignature) {
-			AbstractMethodSignature sig = (AbstractMethodSignature) element;
+		} else if (element instanceof AbstractSignature) {
+			AbstractSignature sig = (AbstractSignature) element;
 			return sig.getFeatureData().length > 0;
 		}
 		return false;

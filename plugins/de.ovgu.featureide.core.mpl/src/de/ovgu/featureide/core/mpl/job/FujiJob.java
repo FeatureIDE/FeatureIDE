@@ -74,15 +74,6 @@ public class FujiJob extends AMonitorJob {
 		public SignatureReference(AbstractSignature sig) {
 			this.sig = sig;
 		}
-
-//		public final int[] getIDs() {
-//			int[] ret = new int[ids.size()];
-//			int i = -1;
-//			for (int id : ids) {
-//				ret[++i] = id;
-//			}
-//			return ret;
-//		}
 		
 		public final FeatureData[] getFeatureData() {
 			FeatureData[] ret = new FeatureData[ids.size()];
@@ -236,7 +227,7 @@ public class FujiJob extends AMonitorJob {
 							new FujiClassSignature(parent, name,
 									modifierString, typeString, pckg, typeDecl,
 									importList),
-							interfaceProject.getFeatureID(featurename), 1);
+							interfaceProject.getFeatureID(featurename), Symbol.getLine(typeDecl.getStart()));
 					// curClassSig.addFeature(featurename);
 
 					for (BodyDecl bodyDecl : typeDecl.getBodyDeclList()) {

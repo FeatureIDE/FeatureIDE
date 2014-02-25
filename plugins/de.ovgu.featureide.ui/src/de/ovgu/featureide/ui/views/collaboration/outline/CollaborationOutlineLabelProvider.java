@@ -286,9 +286,6 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 	return false;
 }
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.views.collaboration.outline.OutlineLabelProvider#init()
-	 */
 	@Override
 	public void init() {
 	}
