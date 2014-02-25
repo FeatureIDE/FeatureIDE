@@ -64,7 +64,6 @@ import de.ovgu.featureide.core.builder.ExtensibleFeatureProjectBuilder;
 import de.ovgu.featureide.core.builder.FeatureProjectNature;
 import de.ovgu.featureide.core.builder.IComposerExtension;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
-import de.ovgu.featureide.core.projectstructure.trees.ProjectTree;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelFile;
@@ -151,11 +150,6 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	private final IProject project;
 
 	private final FeatureModelFile modelFile;
-
-	/**
-	 * contains the ProjectTree for this Feature Project
-	 */
-	private ProjectTree projectTree;
 
 	private IComposerExtension composerExtension = null;
 
@@ -1153,14 +1147,6 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			concreteFeatures.remove(feature.getName());
 		}
 		return concreteFeatures;
-	}
-
-	public ProjectTree getProjectTree() {
-		return projectTree;
-	}
-
-	public void setProjectTree(ProjectTree projectTree) {
-		this.projectTree = projectTree;
 	}
 
 	/*
