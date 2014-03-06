@@ -1026,7 +1026,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		Job job = new Job("Checking configurations") {
 			protected IStatus run(IProgressMonitor monitor) {
 				monitor.beginTask("", files.size());
-				Configuration config = new Configuration(featureModel, true);
+				Configuration config = new Configuration(featureModel, false, false);
 				// Configuration autoConfig = new Configuration(featureModel,
 				// true);
 				ConfigurationReader reader = new ConfigurationReader(config);

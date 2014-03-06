@@ -357,7 +357,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements
 		} else {
 			setConfigurationFromFile();
 		}
-		// Reinitialize the actual pages
+		// Reinitialize the pages
 		if (oldPageIndex == advancedConfigurationPage.getIndex()) {
 			advancedConfigurationPage.propertyChange(null);
 			configurationPageUsed = false;

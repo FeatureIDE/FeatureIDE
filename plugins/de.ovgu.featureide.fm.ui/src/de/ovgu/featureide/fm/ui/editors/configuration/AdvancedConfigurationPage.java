@@ -37,7 +37,6 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TreeItem;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.progress.UIJob;
 
@@ -129,10 +128,11 @@ public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 	
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
-		if (initialized)
-			dirty = true;
-		else
+		if (initialized) {
+			setDirty();
+		} else {
 			initialized = true;
+		}
 		UIJob job = new UIJob("refresh tree") {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
@@ -214,15 +214,14 @@ public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 				// case: unselected
 				set(feature, Selection.UNDEFINED);
 			if (!dirty) {
-				dirty = true;
-				firePropertyChange(IEditorPart.PROP_DIRTY);
+				setDirty();
 			}
 			viewer.refresh();
 			removeHiddenFeatures();
 		
 		}
 		viewer.getTree().setRedraw(true);
-		}
+	}
 	
 	protected void set(SelectableFeature feature, Selection selection) {
 		configurationEditor.configuration.setManual(feature, selection);

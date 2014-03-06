@@ -138,10 +138,11 @@ public class ConfigurationPage extends ConfigurationEditorPage {
 
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
-		if (initialized)
-			dirty = true;
-		else
+		if (initialized) {
+			setDirty();
+		} else {
 			initialized = true;
+		}
 		UIJob job = new UIJob("refresh tree") {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
@@ -153,6 +154,7 @@ public class ConfigurationPage extends ConfigurationEditorPage {
 		};
 		job.setPriority(Job.SHORT);
 		job.schedule();
+		
 	}
 
 	private void refreshTree() {
