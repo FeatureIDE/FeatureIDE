@@ -22,8 +22,13 @@ package de.ovgu.featureide.featurehouse.model;
 
 import java.util.LinkedList;
 
+import de.ovgu.cide.fstgen.ast.FSTNode;
+import de.ovgu.cide.fstgen.ast.FSTNonTerminal;
 import de.ovgu.cide.fstgen.ast.FSTTerminal;
+import de.ovgu.featureide.core.fstmodel.FSTContract;
+import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
+import de.ovgu.featureide.featurehouse.model.FHNodeTypes;
 
 /**
  * Builds Classes for the {@link FSTModel} for <code>FeatureHouse</code> Java files.
@@ -159,6 +164,7 @@ public class JavaClassBuilder extends ClassBuilder {
 		String modifiers = (index == -1) ? "" : head.substring(0, index);
 		
 		// add method
+		
 		addMethod(name, getMethodParameter(terminal), returnType, modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine, false);
 	}
 
@@ -255,6 +261,20 @@ public class JavaClassBuilder extends ClassBuilder {
 			}
 		}
 	}
+	
+	
+	
+	@Override
+	public void caseJMLSpecCaseSeq(FSTTerminal terminal) 
+	{		
+		FSTNonTerminal par = (FSTNonTerminal)terminal.getParent().getParent().getParent();
+		if (par.getType().equals(FHNodeTypes.JAVA_NODE_METHOD_SPEC))
+		{			
+			FSTContract contract = new FSTContract(par.getName(), FSTContract.RoleTypes.ROLE_TYPE_METHOD, terminal.getBody(), terminal.beginLine, terminal.endLine);								
+			modelBuilder.getCurrentClassFragment().add(contract);
+		}
+	}
+	
 	
 	@Override
 	public void caseModifiers(FSTTerminal terminal) {

@@ -256,7 +256,9 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 					}
 					caseClassDeclaration(child);
 				}
+				
 			}
+			
 			
 			if (!classFragmentStack.isEmpty()) {
 //				FSTClassFragment curClassFragment = 
