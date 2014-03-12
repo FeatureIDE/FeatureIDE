@@ -20,6 +20,7 @@ import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.ConfigParentNode;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.DirectivesNode;
+import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.StatisticsContractComplexity;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.StatisticsFeatureComplexity;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.StatisticsProgrammSize;
 import de.ovgu.featureide.ui.statistics.ui.helper.JobDoneListener;
@@ -133,12 +134,13 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 		godfather.addChild(new Parent(PROJECT_NAME, project.getProjectName()));
 		godfather.addChild(composerParent);
 		Parent featureModelStatistics = new Parent(STATISTICS_OF_THE_FEATURE_MODEL);
-		featureModelStatistics.addChild(new StatisticsFeatureComplexity(NUMBER_OF_FEATURE, featModel, project.getFSTModel()));
+		featureModelStatistics.addChild(new StatisticsFeatureComplexity(NUMBER_OF_FEATURE, featModel));
 		featureModelStatistics.addChild(new ConfigParentNode(VALID_CONFIGURATIONS, featModel));
 		godfather.addChild(featureModelStatistics);
 		
 		if (composer.getGenerationMechanism() == IComposerExtensionClass.Mechanism.FEATURE_ORIENTED_PROGRAMMING) {
 			godfather.addChild(new StatisticsProgrammSize(PRODUCT_LINE_IMPLEMENTATION, fstModel));
+			godfather.addChild(new StatisticsContractComplexity(CONTRACT_COMPLEXITY, fstModel));
 		}
 		if (composer.getGenerationMechanism() == IComposerExtensionClass.Mechanism.PREPROCESSOR) {
 			godfather.addChild(new DirectivesNode(PRODUCT_LINE_IMPLEMENTATION, fstModel));

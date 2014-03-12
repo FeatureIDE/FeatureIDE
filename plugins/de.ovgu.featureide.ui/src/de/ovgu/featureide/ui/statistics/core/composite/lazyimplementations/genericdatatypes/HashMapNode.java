@@ -51,7 +51,7 @@ public class HashMapNode extends AbstractSortModeNode {
 	}
 
 	@Override
-	protected void initChildren() {
+	public void initChildren() {
 		for (String name : countMap.keySet()) {
 			addChild(new Parent(name, countMap.get(name)));
 		}

@@ -262,15 +262,24 @@ public class JavaClassBuilder extends ClassBuilder {
 		}
 	}
 	
-	
+	@Override
+	public void caseJMLInvariant(FSTTerminal terminal) 
+	{		
+		//FSTNonTerminal par = (FSTNonTerminal)terminal.getParent().getParent().getParent();
+		//if (par.getType().equals(FHNodeTypes.JML_INVARIANT))
+		//{
+			FSTContract contract = new FSTContract(terminal.getName(), null, FSTContract.RoleTypes.ROLE_TYPE_INVARIANT, terminal.getBody(), terminal.beginLine, terminal.endLine);								
+			modelBuilder.getCurrentClassFragment().add(contract);
+		//}
+	}
 	
 	@Override
 	public void caseJMLSpecCaseSeq(FSTTerminal terminal) 
-	{		
+	{			
 		FSTNonTerminal par = (FSTNonTerminal)terminal.getParent().getParent().getParent();
 		if (par.getType().equals(FHNodeTypes.JAVA_NODE_METHOD_SPEC))
 		{			
-			FSTContract contract = new FSTContract(par.getName(), FSTContract.RoleTypes.ROLE_TYPE_METHOD, terminal.getBody(), terminal.beginLine, terminal.endLine);								
+			FSTContract contract = new FSTContract(par.getName(), null, FSTContract.RoleTypes.ROLE_TYPE_METHOD, terminal.getBody(), terminal.beginLine, terminal.endLine);								
 			modelBuilder.getCurrentClassFragment().add(contract);
 		}
 	}

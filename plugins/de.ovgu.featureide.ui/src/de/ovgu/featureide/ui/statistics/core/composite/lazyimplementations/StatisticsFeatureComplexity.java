@@ -1,5 +1,5 @@
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
-
+import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes.HashMapNode;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,14 +24,12 @@ import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 public final class StatisticsFeatureComplexity extends LazyParent {
 	private FeatureModelAnalyzer ana;
 	private FeatureModel model;
-	private FSTModel fstmodel;
 
 	
-	public StatisticsFeatureComplexity(String description, FeatureModel model, FSTModel fstmodel) {
+	public StatisticsFeatureComplexity(String description, FeatureModel model) {
 		super(description, null);
 		this.model = model;
 		this.ana = model.getAnalyser();
-		this.fstmodel = fstmodel;
 	}
 
 	@Override
@@ -92,28 +90,6 @@ public final class StatisticsFeatureComplexity extends LazyParent {
 			
 			addChild(new Parent(NUMBER_CONSTRAINTS, constraints));
 
-			Parent contracts = new Parent("$kontr");
-			contracts.addChild(new Parent("$meth"));
-			contracts.addChild(new Parent("$verf"));
-			Parent classesParent = new Parent("$klassen");
-			
-			int numInProj = 0;
-			for (FSTClass cl : fstmodel.getClasses())
-			{
-				int numInClass = 0;
-				for (FSTRole role : cl.getRoles())
-				{
-					numInClass += role.getClassFragment().getContracts().size();					
-				}
-				classesParent.addChild(new Parent(cl.getName(), numInClass));
-				numInProj += numInClass;
-			}
-			
-			contracts.addChild(new Parent("$proj", numInProj));
-			contracts.addChild(classesParent);
-			
-			
-			addChild(contracts);
 		}
 	}
 }

@@ -18,6 +18,7 @@ public interface StatisticsIds {
 	
 	public static final String OPEN_FILE = "Please open a file from a FeatureIDE project";
 	public static final String PRODUCT_LINE_IMPLEMENTATION = "Statistics of product-line implementation";
+	public static final String CONTRACT_COMPLEXITY = "Statistics of product-line specification";
 	public static final String VALID_CONFIGURATIONS = "Valid configurations of the feature model";
 	public static final String NUMBER_OF_FEATURE = "Feature statistics";
 	public static final String STATISTICS_OF_THE_FEATURE_MODEL = "Statistics of the feature model";
@@ -43,4 +44,11 @@ public interface StatisticsIds {
 	public static final String NUMBER_FIELD = "Number of fields";
 	public static final String NUMBER_METHOD_U = "Number of unique methods";
 	public static final String NUMBER_FIELD_U = "Number of unique fields";
+	
+	public static final String NUMBER_PROJECT_CONTRACT = "Number of contracts in project";
+	public static final String NUMBER_PROJECT_INVARIANT = "Number of invariants in project";
+	public static final String NUMBER_CLASS_CONTRACT = "Number of classes with contracts";
+	public static final String NUMBER_CLASS_INVARIANT = "Number of classes with invariants";
+	
+	
 }

@@ -21,6 +21,9 @@
 package de.ovgu.featureide.featurehouse.model;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -103,8 +106,7 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 		this.completeModel = completeModel;
 		if (!completeModel) {
 			model.reset();
-		}
-		
+		}	
 		for (FSTNode node : (ArrayList<FSTNode>)nodes.clone()) {
 			if (NODE_TYPE_FEATURE.equals(node.getType())) {
 				caseAddFeature(node);
@@ -194,6 +196,7 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 		if (node instanceof FSTNonTerminal && canCompose()) {
 			List<FSTNode> children = ((FSTNonTerminal) node).getChildren();
 			for (FSTNode child : children) {
+				
 				String type = child.getType();
 				ClassBuilder classBuilder = ClassBuilder.getClassBuilder(currentFile, this);
 				
@@ -242,7 +245,9 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 						classBuilder.caseFieldDeclaration(terminal);
 					} else if (JML_SPEC_CASE_SEQ.equals(type)) {
 						classBuilder.caseJMLSpecCaseSeq(terminal);
-					}
+					} else if (JML_INVARIANT.equals(type)) {
+						classBuilder.caseJMLInvariant(terminal);
+					}					
 				} else if (child instanceof FSTNonTerminal) {
 					if (JAVA_NODE_INNER_CLASS_TYPE.equals(type)) {
 						String name = child.getName();

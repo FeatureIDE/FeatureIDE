@@ -50,6 +50,7 @@ public interface FHNodeTypes {
 	
 	//JML specific node types
 	static final String JML_SPEC_CASE_SEQ = "SpecCaseSeq";
+	static final String JML_INVARIANT = "Invariant";
 	
 	// C specific node types
 	static final String C_NODE_SEQUENCE_CODEUNIT_TOPLEVEL = "Sequence_CodeUnit_TopLevel";

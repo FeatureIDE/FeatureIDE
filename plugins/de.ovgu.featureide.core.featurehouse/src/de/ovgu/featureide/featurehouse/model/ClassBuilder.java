@@ -135,4 +135,6 @@ public class ClassBuilder {
 	public void caseExtendsList(FSTTerminal terminal) {}
 	
 	public void caseModifiers(FSTTerminal terminal) {}
+
+	public void caseJMLInvariant(FSTTerminal terminal) {}
 }
