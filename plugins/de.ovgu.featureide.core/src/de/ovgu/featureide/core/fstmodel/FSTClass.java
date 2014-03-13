@@ -35,9 +35,11 @@ public class FSTClass {
 
 	private final HashMap<String, FSTRole> roles = new HashMap<String, FSTRole>();
 	private final String name;
+	private LinkedList<String> invariants;
 
 	public FSTClass(String name) {
 		this.name = name;
+		invariants = new LinkedList<String>();
 	}
 
 	public String getName() {
@@ -55,5 +57,15 @@ public class FSTClass {
 
 	public FSTRole getRole(String featureName) {
 		return roles.get(featureName);
+	}
+	
+	public boolean hasInvariants()
+	{
+		return invariants.size() > 0;
+	}
+	
+	public LinkedList<String> getInvariants()
+	{
+		return invariants;
 	}
 }

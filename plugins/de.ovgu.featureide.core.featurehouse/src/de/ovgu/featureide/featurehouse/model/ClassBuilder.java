@@ -94,6 +94,11 @@ public class ClassBuilder {
 		return new ClassBuilder(builder);
 	}
 	
+	void addMethod(String name, LinkedList<String> parameterTypes, String returnType, String modifiers, String body, int beginLine, int endLine, boolean isConstructor)
+	{
+		addMethod(name, parameterTypes, returnType, modifiers, body, beginLine, endLine, isConstructor, "");
+	}
+	
 	/**
 	 * Adds the method with the given parameters to the {@link FSTModel}.
 	 * @param name Name of the method
@@ -104,10 +109,11 @@ public class ClassBuilder {
 	 * @param beginLine Start of the method at features file 
 	 * @param endLine End of the method at features file
 	 * @param isConstructor <code>true</code> if the method is a constructor 
+	 * @param contract contract string if existent
 	 */
-	void addMethod(String name, LinkedList<String> parameterTypes, 
-			String returnType, String modifiers, String body, int beginLine, int endLine, boolean isConstructor) {
-		FSTMethod method = new FSTMethod(name, parameterTypes, returnType, modifiers, body, beginLine, endLine);								
+	void addMethod(String name, LinkedList<String> parameterTypes, String returnType, String modifiers, String body, int beginLine, int endLine, boolean isConstructor, String contract) 
+	{
+		FSTMethod method = new FSTMethod(name, parameterTypes, returnType, modifiers, body, beginLine, endLine, contract);								
 		method.setConstructor(isConstructor);
 		if (body.contains("original")) {
 			body = body.replaceAll(" ", "");

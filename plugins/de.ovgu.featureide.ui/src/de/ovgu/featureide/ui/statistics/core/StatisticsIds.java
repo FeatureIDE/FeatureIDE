@@ -45,10 +45,11 @@ public interface StatisticsIds {
 	public static final String NUMBER_METHOD_U = "Number of unique methods";
 	public static final String NUMBER_FIELD_U = "Number of unique fields";
 	
-	public static final String NUMBER_PROJECT_CONTRACT = "Number of contracts in project";
-	public static final String NUMBER_PROJECT_INVARIANT = "Number of invariants in project";
-	public static final String NUMBER_CLASS_CONTRACT = "Number of classes with contracts";
-	public static final String NUMBER_CLASS_INVARIANT = "Number of classes with invariants";
+	public static final String NUMBER_PROJECT_METHOD_CONTRACT = "Number of method contracts in project";
+	public static final String NUMBER_PROJECT_INVARIANT = "Number of class invariants in project";
+	public static final String NUMBER_CLASS_METHOD_CONTRACT = "Number of classes with method contracts";
+	public static final String NUMBER_CLASS_INVARIANT = "Number of classes with class invariants";
+	public static final String NUMBER_METHOD_METHOD_CONTRACT = "Number of methods with method contracts";
 	
 	
 }

@@ -199,7 +199,6 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 				
 				String type = child.getType();
 				ClassBuilder classBuilder = ClassBuilder.getClassBuilder(currentFile, this);
-				
 				if (child instanceof FSTTerminal) {
 					FSTTerminal terminal = (FSTTerminal) child;
 					if (JAVA_NODE_DECLARATION_TYPE1.equals(type)

@@ -164,12 +164,35 @@ public class JavaClassBuilder extends ClassBuilder {
 		String modifiers = (index == -1) ? "" : head.substring(0, index);
 		
 		// add method
-		
-		addMethod(name, getMethodParameter(terminal), returnType, modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine, false);
+		addMethod(name, getMethodParameter(terminal), returnType, modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine, false, getContract(terminal));
 	}
 
-	
-
+	/**
+	 * @param terminal 
+	 * @return contract string if existent
+	 */
+	private String getContract(FSTTerminal terminal) {
+		for (FSTNode nonT1 : ((FSTNonTerminal)terminal.getParent()).getChildren())
+		{
+			if (nonT1.getType().equals("MethodSpecification"))
+			{
+				for (FSTNode nonT2 : ((FSTNonTerminal) nonT1).getChildren())
+				{
+					if (nonT2.getType().equals("Specification"))
+					{
+						for (FSTNode nonT3 : ((FSTNonTerminal) nonT2).getChildren())
+						{
+							if (nonT3.getType().equals("SpecCaseSeq"))
+								return ((FSTTerminal) nonT3).getBody();
+						}
+					}
+						
+				}
+			}
+				
+		}
+		return "";
+	}
 
 	/**
 	 * @param body
@@ -194,7 +217,7 @@ public class JavaClassBuilder extends ClassBuilder {
 		}
 
 		// add constructor
-		addMethod(name, getMethodParameter(terminal), "void", modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine, true);
+		addMethod(name, getMethodParameter(terminal), "void", modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine, true, getContract(terminal));
 	}
 	
 	private String getMethodName(FSTTerminal terminal) {
@@ -219,8 +242,10 @@ public class JavaClassBuilder extends ClassBuilder {
 	 * @param terminal
 	 */
 	@Override
-	public void caseClassDeclarationType(FSTTerminal terminal) {
-		if (modelBuilder.hasCurrentClassFragment()) {
+	public void caseClassDeclarationType(FSTTerminal terminal) 
+	{
+		if (modelBuilder.hasCurrentClassFragment()) 
+		{
 			String body = terminal.getBody().replaceAll("\\W", "");
 			modelBuilder.getCurrentClassFragment().setType(body);
 		}
@@ -265,10 +290,10 @@ public class JavaClassBuilder extends ClassBuilder {
 	@Override
 	public void caseJMLInvariant(FSTTerminal terminal) 
 	{		
-		//FSTNonTerminal par = (FSTNonTerminal)terminal.getParent().getParent().getParent();
-		//if (par.getType().equals(FHNodeTypes.JML_INVARIANT))
-		//{
-			FSTContract contract = new FSTContract(terminal.getName(), null, FSTContract.RoleTypes.ROLE_TYPE_INVARIANT, terminal.getBody(), terminal.beginLine, terminal.endLine);								
+		/*FSTNonTerminal par = (FSTNonTerminal)terminal.getParent().getParent().getParent();
+		if (par.getType().equals(FHNodeTypes.JML_INVARIANT))
+		{*/
+			FSTContract contract = new FSTContract(terminal.getName(), terminal.getBody(), terminal.beginLine, terminal.endLine);								
 			modelBuilder.getCurrentClassFragment().add(contract);
 		//}
 	}
@@ -276,12 +301,12 @@ public class JavaClassBuilder extends ClassBuilder {
 	@Override
 	public void caseJMLSpecCaseSeq(FSTTerminal terminal) 
 	{			
-		FSTNonTerminal par = (FSTNonTerminal)terminal.getParent().getParent().getParent();
+		/*FSTNonTerminal par = (FSTNonTerminal)terminal.getParent().getParent().getParent();
 		if (par.getType().equals(FHNodeTypes.JAVA_NODE_METHOD_SPEC))
 		{			
 			FSTContract contract = new FSTContract(par.getName(), null, FSTContract.RoleTypes.ROLE_TYPE_METHOD, terminal.getBody(), terminal.beginLine, terminal.endLine);								
 			modelBuilder.getCurrentClassFragment().add(contract);
-		}
+		}*/
 	}
 	
 	

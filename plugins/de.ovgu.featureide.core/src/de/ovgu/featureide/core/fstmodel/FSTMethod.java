@@ -32,9 +32,9 @@ public class FSTMethod extends RoleElement {
 	private LinkedList<String> parameterTypes;
 	private boolean isConstructor;
 	private boolean refines;
+	private String contract;
 
-	public FSTMethod(String name, LinkedList<String> parameterTypes,
-			String type, String modifiers) {
+	public FSTMethod(String name, LinkedList<String> parameterTypes, String type, String modifiers) {
 		this(name, parameterTypes, type, modifiers, -1);
 	}
 	
@@ -46,10 +46,17 @@ public class FSTMethod extends RoleElement {
 	public FSTMethod(String name, LinkedList<String> parameterTypes,
 			String type, String modifiers, String body, int beginLine,
 			int endLine) {
-		super(name, type, modifiers, body, beginLine, endLine);
-		this.parameterTypes = parameterTypes;
+		this(name, parameterTypes, type, modifiers, body, beginLine, endLine, "");
 	}
 
+	public FSTMethod(String name, LinkedList<String> parameterTypes,
+			String type, String modifiers, String body, int beginLine,
+			int endLine, String contract) {
+		super(name, type, modifiers, body, beginLine, endLine);
+		this.parameterTypes = parameterTypes;
+		this.contract = contract;
+	}
+	
 	@Override
 	public String getFullName() {
 		StringBuilder fullname = new StringBuilder();
@@ -84,6 +91,11 @@ public class FSTMethod extends RoleElement {
 	
 	public LinkedList<String> getParameter(){
 		return parameterTypes;
+	}
+	
+	public boolean hasContract()
+	{
+		return contract.length() > 0;
 	}
 	
 	/**
