@@ -224,13 +224,14 @@ public class BuildStatisticsJob extends AMonitorJob {
 				stat.set(c, featureName, Statistic.CONTEXT_FEATURE);
 				stat.set(contextSignature.getStatisticsNumbers(), 
 						featureName, Statistic.CONTEXT_CONTEXT);
-				
-				ISignatureFilter featureFilter = new ISignatureFilter() {
-					@Override
-					public boolean isValid(AbstractSignature signature) {
-						return (signature.hasFeature(curFeatureID) > -1);
-					}
-				};
+
+				ISignatureFilter featureFilter = new FeatureFilter(curFeatureID);
+//				ISignatureFilter featureFilter = new ISignatureFilter() {
+//					@Override
+//					public boolean isValid(AbstractSignature signature) {
+//						return (signature.hasFeature(curFeatureID) > -1);
+//					}
+//				};
 //				LinkedList<AbstractSignature> members = new LinkedList<AbstractSignature>();
 //				AbstractSignature[] signatureArray = interfaceProject.getProjectSignatures().getSignatureArray();
 //				for (int i = 0; i < signatureArray.length; ++i) {
