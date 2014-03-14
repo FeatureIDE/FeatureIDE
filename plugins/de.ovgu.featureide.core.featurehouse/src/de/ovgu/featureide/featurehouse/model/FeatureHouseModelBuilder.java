@@ -102,6 +102,21 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 	 */
 	@SuppressWarnings("unchecked")
 	public void buildModel(ArrayList<FSTNode> nodes, boolean completeModel) {
+System.out.println(nodes);
+
+		try {
+			PrintWriter pw = new PrintWriter("the-filename,txt","UTF-8");
+			
+			pw.println(nodes);
+			pw.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 
 		this.completeModel = completeModel;
 		if (!completeModel) {

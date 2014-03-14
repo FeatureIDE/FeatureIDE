@@ -33,6 +33,15 @@ public class FSTMethod extends RoleElement {
 	private boolean isConstructor;
 	private boolean refines;
 	private String contract;
+	private String compKey;
+	
+	/**
+	 * @return the compKey
+	 */
+	public String getCompKey() {
+		return compKey;
+	}
+
 
 	public FSTMethod(String name, LinkedList<String> parameterTypes, String type, String modifiers) {
 		this(name, parameterTypes, type, modifiers, -1);
@@ -46,15 +55,22 @@ public class FSTMethod extends RoleElement {
 	public FSTMethod(String name, LinkedList<String> parameterTypes,
 			String type, String modifiers, String body, int beginLine,
 			int endLine) {
-		this(name, parameterTypes, type, modifiers, body, beginLine, endLine, "");
+		this(name, parameterTypes, type, modifiers, body, beginLine, endLine, "", "");
 	}
 
 	public FSTMethod(String name, LinkedList<String> parameterTypes,
 			String type, String modifiers, String body, int beginLine,
 			int endLine, String contract) {
+		this(name, parameterTypes, type, modifiers, body, beginLine, endLine, contract, "");
+	}
+	
+	public FSTMethod(String name, LinkedList<String> parameterTypes,
+			String type, String modifiers, String body, int beginLine,
+			int endLine, String contract, String compKey) {
 		super(name, type, modifiers, body, beginLine, endLine);
 		this.parameterTypes = parameterTypes;
 		this.contract = contract;
+		this.compKey = compKey;
 	}
 	
 	@Override

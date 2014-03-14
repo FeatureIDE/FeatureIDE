@@ -161,17 +161,14 @@ public class JavaClassBuilder extends ClassBuilder {
 		String returnType = head.substring(index + 1).trim();
 		
 		// get modifiers
-		String modifiers = (index == -1) ? "" : head.substring(0, index);
 		
-		// add method
-		addMethod(name, getMethodParameter(terminal), returnType, modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine, false, getContract(terminal));
-	}
-
-	/**
-	 * @param terminal 
-	 * @return contract string if existent
-	 */
-	private String getContract(FSTTerminal terminal) {
+		if (name.contains("update"))
+		{
+			int k = 100;
+		}
+		
+		String modifiers = (index == -1) ? "" : head.substring(0, index);
+		String contractBody = "", contractCompKey = "";
 		for (FSTNode nonT1 : ((FSTNonTerminal)terminal.getParent()).getChildren())
 		{
 			if (nonT1.getType().equals("MethodSpecification"))
@@ -183,7 +180,10 @@ public class JavaClassBuilder extends ClassBuilder {
 						for (FSTNode nonT3 : ((FSTNonTerminal) nonT2).getChildren())
 						{
 							if (nonT3.getType().equals("SpecCaseSeq"))
-								return ((FSTTerminal) nonT3).getBody();
+								contractBody = ((FSTTerminal) nonT3).getBody();
+							if (nonT3.getType().equals("ContractCompKey"))
+								contractCompKey = ((FSTTerminal) nonT3).getContractCompKey();
+							
 						}
 					}
 						
@@ -191,9 +191,15 @@ public class JavaClassBuilder extends ClassBuilder {
 			}
 				
 		}
-		return "";
+		
+		// add method
+		addMethod(name, getMethodParameter(terminal), returnType, modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine, false, contractBody, contractCompKey);
 	}
 
+	/**
+	 * @param terminal 
+	 * @return contract string if existent
+	 */
 	/**
 	 * @param body
 	 * @return
@@ -215,9 +221,37 @@ public class JavaClassBuilder extends ClassBuilder {
 		if (terminal.getBody().indexOf(name) > 0) {
 			modifiers = terminal.getBody().substring(0, terminal.getBody().indexOf(name) - 1);
 		}
+		if (name.contains("update"))
+		{
+			int kons = 100;
+		}
 
+		String contractBody = "", contractCompKey = "";
+		for (FSTNode nonT1 : ((FSTNonTerminal)terminal.getParent()).getChildren())
+		{
+			if (nonT1.getType().equals("MethodSpecification"))
+			{
+				for (FSTNode nonT2 : ((FSTNonTerminal) nonT1).getChildren())
+				{
+					if (nonT2.getType().equals("Specification"))
+					{
+						for (FSTNode nonT3 : ((FSTNonTerminal) nonT2).getChildren())
+						{
+							if (nonT3.getType().equals("SpecCaseSeq"))
+								contractBody = ((FSTTerminal) nonT3).getBody();
+							if (nonT3.getType().equals("ContractCompKey"))
+								contractCompKey = ((FSTTerminal) nonT3).getContractCompKey();
+							
+
+						}
+					}
+						
+				}
+			}
+		}
+		
 		// add constructor
-		addMethod(name, getMethodParameter(terminal), "void", modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine, true, getContract(terminal));
+		addMethod(name, getMethodParameter(terminal), "void", modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine, true, contractBody, contractCompKey);
 	}
 	
 	private String getMethodName(FSTTerminal terminal) {

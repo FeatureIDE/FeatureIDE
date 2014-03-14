@@ -50,6 +50,7 @@ public interface StatisticsIds {
 	public static final String NUMBER_CLASS_METHOD_CONTRACT = "Number of classes with method contracts";
 	public static final String NUMBER_CLASS_INVARIANT = "Number of classes with class invariants";
 	public static final String NUMBER_METHOD_METHOD_CONTRACT = "Number of methods with method contracts";
+	public static final String METHOD_CONTRACT_REFINEMENT = "Method contract refinements";
 	
 	
 }

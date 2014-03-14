@@ -96,7 +96,7 @@ public class ClassBuilder {
 	
 	void addMethod(String name, LinkedList<String> parameterTypes, String returnType, String modifiers, String body, int beginLine, int endLine, boolean isConstructor)
 	{
-		addMethod(name, parameterTypes, returnType, modifiers, body, beginLine, endLine, isConstructor, "");
+		addMethod(name, parameterTypes, returnType, modifiers, body, beginLine, endLine, isConstructor, "", "");
 	}
 	
 	/**
@@ -111,9 +111,9 @@ public class ClassBuilder {
 	 * @param isConstructor <code>true</code> if the method is a constructor 
 	 * @param contract contract string if existent
 	 */
-	void addMethod(String name, LinkedList<String> parameterTypes, String returnType, String modifiers, String body, int beginLine, int endLine, boolean isConstructor, String contract) 
+	void addMethod(String name, LinkedList<String> parameterTypes, String returnType, String modifiers, String body, int beginLine, int endLine, boolean isConstructor, String contract, String compKey) 
 	{
-		FSTMethod method = new FSTMethod(name, parameterTypes, returnType, modifiers, body, beginLine, endLine, contract);								
+		FSTMethod method = new FSTMethod(name, parameterTypes, returnType, modifiers, body, beginLine, endLine, contract, compKey);								
 		method.setConstructor(isConstructor);
 		if (body.contains("original")) {
 			body = body.replaceAll(" ", "");
