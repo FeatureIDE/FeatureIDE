@@ -48,7 +48,7 @@ public class StartJob extends AChainJob {
 		InterfaceProject curInterfaceProject = curJob.getInterfaceProject();
 		curInterfaceProject.loadSignaturesJob(false);
 		curInterfaceProject.addJob(curJob);
-		if (index + 1 < jobs.length - 1) {
+		if (index < jobs.length - 1) {
 			curInterfaceProject.addJob(new StartJob(jobs, index + 1));
 		}
 		
