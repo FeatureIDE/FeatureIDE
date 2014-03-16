@@ -144,7 +144,7 @@ public class InterfaceProject {
 			featureNames = new String[count];
 			System.arraycopy(tempFeatureNames, 0, featureNames, 0, count);
 //			Arrays.sort(featureNames);
-			loadSignatures(true);
+//			loadSignatures(true);
 		} else {
 			featureNames = null;
 			projectSignatures = null;

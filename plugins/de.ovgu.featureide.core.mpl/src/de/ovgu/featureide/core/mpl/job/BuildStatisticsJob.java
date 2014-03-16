@@ -165,7 +165,6 @@ public class BuildStatisticsJob extends AMonitorJob {
 		}
 		IOConstants.writeToFile(folder.getFile("_fm_statistics.csv"), fmSb.toString());
 		worked();
-		MPLPlugin.getDefault().logInfo("1");
 		
 		HashMap<Integer, int[]> featureStatistics = interfaceProject.getProjectSignatures().getStatisticNumbers();
 		Statistic stat = new Statistic();
@@ -181,7 +180,6 @@ public class BuildStatisticsJob extends AMonitorJob {
 		ProjectStructure ps = new ProjectStructure(it);
 		sumStat.set(ps.getStatisticsNumbers(), SumStatistic.CONTEXT_ALWAYS);
 		worked();
-		MPLPlugin.getDefault().logInfo("2");
 		
 		IOConstants.writeToFile(folder.getFile("_sum_statistics.csv"), sumStat.toCSVString());
 
@@ -206,8 +204,6 @@ public class BuildStatisticsJob extends AMonitorJob {
 //			ProjectSignatures contextSignatures = p.filter();
 //			contextCollection = contextSignatures.getAllMembers();
 			
-
-			MPLPlugin.getDefault().logInfo("3");
 			int[][] st = xyz(conf, folder, featureName, false);
 			if (st != null) {
 				stat.set(st[0], featureName, Statistic.CONTEXT_MIN_VARIANTE1);
