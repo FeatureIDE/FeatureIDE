@@ -127,12 +127,13 @@ public class ExtendedFeatureModel
     public void createRoot() {
 		if (null == this.getRoot()){
 		    final Feature tmpRoot = new Feature(this.shadowModel, "Root");
-		    tmpRoot.setAbstract(true);
-		    tmpRoot.setMandatory(true);
-		
-		    this.addFeature(tmpRoot);
-		    this.setRoot(tmpRoot);
 		}
+		
+		tmpRoot.setAbstract(true);
+		tmpRoot.setMandatory(true);
+		
+		this.addFeature(tmpRoot);
+		this.setRoot(tmpRoot);
 	}
 
 	public LinkedList<Equation> getAttributConstraints() {

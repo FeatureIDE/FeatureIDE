@@ -843,7 +843,6 @@ public class VelvetFeatureModelReader
 		    !copiedInheritance) {
 		    System.err.println(inherited);
 		    copyChildnodes(this.extFeatureModel, this.extFeatureModel.getRoot(), this.inherited.getRoot().getChildren(), "", FeatureInheritanceModes.INHERITANCE);
-		    System.err.println(extFeatureModel);
 		    copiedInheritance=true;
 		}
 	}
