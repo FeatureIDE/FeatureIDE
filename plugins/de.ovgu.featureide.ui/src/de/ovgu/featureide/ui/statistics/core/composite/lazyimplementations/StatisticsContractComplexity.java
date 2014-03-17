@@ -62,6 +62,7 @@ public class StatisticsContractComplexity extends LazyParent {
 			HashMap<String, Integer> classMethodMap = new HashMap<String, Integer>();
 			HashMap<String, Integer> classMethodCountMap = new HashMap<String, Integer>();
 			HashMap<String, Integer> contractRefinementMap = new HashMap<String, Integer>();
+			HashMap<String, Integer> featureCountList = new HashMap<String, Integer>();
 
 			int numInProject = 0, numInvariantsInProject = 0, numClassesWithContract = 0, numClassesWithInvariants = 0;
 			for (FSTClass class_ : fstModel.getClasses()) {
@@ -76,10 +77,12 @@ public class StatisticsContractComplexity extends LazyParent {
 				for (FSTRole role : class_.getRoles()) {
 					for (FSTContract contract : role.getClassFragment().getContracts()) {
 						numInvariantsInClass++;
+						featureCountList.put( role.getFeature().getName(), featureCountList.containsKey(role.getFeature().getName()) ? featureCountList.get(role.getFeature().getName()) + 1: 1);
 					}
 					for (FSTMethod method : role.getClassFragment().getMethods()) {
 						classMethodCountMap.put(fullClassName + "." + method.getFullName(), 1);
 						if (method.hasContract()) {
+							featureCountList.put(role.getFeature().getName(), featureCountList.containsKey(role.getFeature().getName()) ? featureCountList.get(role.getFeature().getName()) + 1: 1);
 							numInClass++;
 							contractRefinementMap.put(method.getCompKey(), contractRefinementMap.containsKey(method.getCompKey()) ? (contractRefinementMap.get(method.getCompKey()) + 1) : 1);
 							if (classMethodMap.get(fullClassName + "." + method.getFullName()) != null)
@@ -122,12 +125,16 @@ public class StatisticsContractComplexity extends LazyParent {
 											class_.getName().length() - 5)
 									: class_.getName());
 
+					
 					for (FSTRole role : class_.getRoles()) 
 					{
+							
 						for (FSTMethod method : role.getClassFragment().getMethods()) 
 						{
 							if (method.hasContract()) 
 							{
+								
+								
 								if (p.getDescription().equals(fullClassName + "." + method.getFullName())) 
 								{
 									featureChildList.add(role.getFeature().getName());
@@ -179,7 +186,8 @@ public class StatisticsContractComplexity extends LazyParent {
 			}
 			addChild(new HashMapNode(METHOD_CONTRACT_REFINEMENT, null, contractRefinementRealNameMap));
 
-			
+						
+			addChild(new HashMapNode("features", null, featureCountList));
 		}
 	}
 }

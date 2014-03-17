@@ -137,8 +137,7 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 		featureModelStatistics.addChild(new StatisticsFeatureComplexity(NUMBER_OF_FEATURE, featModel));
 		featureModelStatistics.addChild(new ConfigParentNode(VALID_CONFIGURATIONS, featModel));
 		godfather.addChild(featureModelStatistics);
-		
-		String s = project.getContractComposition();
+
 		
 		if (composer.getGenerationMechanism() == IComposerExtensionClass.Mechanism.FEATURE_ORIENTED_PROGRAMMING) {
 			godfather.addChild(new StatisticsProgrammSize(PRODUCT_LINE_IMPLEMENTATION, fstModel));

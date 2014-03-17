@@ -50,6 +50,7 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 
 	@Override
 	public void createPartControl(Composite parent) {
+		
 		viewer = new TreeViewer(parent);
 		contentProvider = new ContentProvider(viewer);
 		viewer.setContentProvider(contentProvider);

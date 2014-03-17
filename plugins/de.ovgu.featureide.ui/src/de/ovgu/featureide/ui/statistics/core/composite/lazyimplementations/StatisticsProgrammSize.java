@@ -1,8 +1,5 @@
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 
 import de.ovgu.featureide.core.fstmodel.FSTClass;

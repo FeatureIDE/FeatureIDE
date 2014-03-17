@@ -22,7 +22,6 @@ package de.ovgu.featureide.featurehouse.model;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -102,22 +101,6 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 	 */
 	@SuppressWarnings("unchecked")
 	public void buildModel(ArrayList<FSTNode> nodes, boolean completeModel) {
-System.out.println(nodes);
-
-		try {
-			PrintWriter pw = new PrintWriter("the-filename,txt","UTF-8");
-			
-			pw.println(nodes);
-			pw.close();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-
 		this.completeModel = completeModel;
 		if (!completeModel) {
 			model.reset();

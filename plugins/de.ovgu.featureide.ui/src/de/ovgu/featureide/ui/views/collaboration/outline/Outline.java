@@ -59,6 +59,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorInput;
@@ -70,6 +71,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.ide.ResourceUtil;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.progress.UIJob;
@@ -166,8 +168,10 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		}
 
 		@Override
-		public void treeExpanded(TreeExpansionEvent event) {
-			if (viewer.getLabelProvider() instanceof OutlineLabelProvider){
+		public void treeExpanded(TreeExpansionEvent event) 
+		{
+			if (viewer.getLabelProvider() instanceof OutlineLabelProvider)
+			{	
 				((OutlineLabelProvider)viewer.getLabelProvider()).colorizeItems(viewer.getTree().getItems(), iFile);
 			}
 		}

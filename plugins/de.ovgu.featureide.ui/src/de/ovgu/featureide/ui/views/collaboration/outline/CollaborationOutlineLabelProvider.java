@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.outline;
 
+import java.util.LinkedList;
+
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -28,6 +30,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.ide.ResourceUtil;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
@@ -37,6 +41,7 @@ import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.RoleElement;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
+import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 
@@ -143,6 +148,7 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 	}
 
 	public void colorizeItems(TreeItem[] treeItems, IFile file) {
+
 		for (int i = 0; i < treeItems.length; i++) {
 			if (treeItems[i].getData() instanceof RoleElement) {
 				setForeground(treeItems[i], file);

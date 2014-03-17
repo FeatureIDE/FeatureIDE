@@ -192,28 +192,49 @@ public class CollaborationOutlineTreeContentProvider implements
 			// get all the roles that belong to a method
 			LinkedList<FSTRole> roleList = new LinkedList<FSTRole>();
 //			List<FSTRole> roles = model.getClass(fileName).getRoles();
-			for (FSTRole role : ((FSTMethod) parentElement).getRole().getFSTClass().getRoles()) {
-				for (FSTMethod m : role.getClassFragment().getMethods()) {
+			
+						
+			for (FSTRole role : ((FSTMethod) parentElement).getRole().getFSTClass().getRoles()) 
+			{
+				for (FSTMethod m : role.getClassFragment().getMethods()) 
+				{
 					if (//m.isOwn(role.file) && ((FSTMethod)parentElement).isOwn(role.file) &&
-							m.getFullName().equals(((FSTMethod)parentElement).getFullName())) {
+							m.getFullName().equals(((FSTMethod)parentElement).getFullName())) 
+					{
+						
 						roleList.add(role);
 						break;
 					}
 				}
 			}
-
+			
+			
+			LinkedList<String> featureOrder = (LinkedList<String>)CorePlugin.getFeatureProject(((FSTMethod) parentElement).getRole().getFile()).getFeatureModel().getFeatureOrderList();
+			
+			
 			FSTRole[] obj = new FSTRole[roleList.size()];
-			for (int i = 0; i < roleList.size(); i++) {
-				obj[i] = roleList.get(i);
+			int index = 0;
+			for (int i = 0; i < featureOrder.size(); i++) {
+				for (int j = 0; j < roleList.size(); j++)
+				{
+					if (roleList.get(j).getFeature().getName().equals(featureOrder.get(i)))
+					{
+						obj[index++] = roleList.get(j);
+						break;
+					}
+							
+				}
 			}
 			return obj;
 		} else if (parentElement instanceof FSTField) {
 			// get all the roles that belong to a field
 			LinkedList<FSTRole> roleList = new LinkedList<FSTRole>();
-			for (FSTRole role : ((FSTField) parentElement).getRole().getFSTClass().getRoles()) {
-				for (FSTField f : role.getClassFragment().getFields()) {
-					if (
-							f.getFullName().equals(((FSTField)parentElement).getFullName())) {
+			for (FSTRole role : ((FSTField) parentElement).getRole().getFSTClass().getRoles()) 
+			{
+				for (FSTField f : role.getClassFragment().getFields()) 
+				{
+					if (f.getFullName().equals(((FSTField)parentElement).getFullName())) 
+					{
 						roleList.add(role);
 						break;
 					}
