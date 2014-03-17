@@ -1,0 +1,95 @@
+/* FeatureIDE - A Framework for Feature-Oriented Software Development
+ * Copyright (C) 2005-2013  FeatureIDE team, University of Magdeburg, Germany
+ *
+ * This file is part of FeatureIDE.
+ * 
+ * FeatureIDE is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * FeatureIDE is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * See http://www.fosd.de/featureide/ for further information.
+ */
+package de.ovgu.featureide.core.fstmodel;
+
+
+/**
+ * description	
+ * 
+ * @author Stefan Krueger
+ * @author Florian Proksch	
+ */
+public class FSTContract extends RoleElement {
+	
+	public enum RoleTypes
+	{
+		ROLE_TYPE_INVARIANT,
+		MISC
+	}
+	
+	//private LinkedList<String> parameterTypes;
+	RoleTypes parentRoleType;
+	
+
+	/**
+	 * @return the parentRoleType
+	 */
+	/*public RoleTypes getParentRoleType() {
+		return parentRoleType;
+	}*/
+
+	/**
+	 * @param name
+	 * @param type
+	 * @param modifiers
+	 */
+	public FSTContract(String name,  String body) {
+		super(name, "", "", body, -1, -1);
+		//parentRoleType = roleType;
+		//this.parameterTypes = parameterTypes;
+	}
+
+	/**
+	 * @param name
+	 * @param type
+	 * @param modifiers
+	 * @param body
+	 * @param beginLine
+	 * @param endLine
+	 */
+	public FSTContract(String name, String body, int beginLine, int endLine) {
+		super(name, "", "", body, beginLine, endLine);
+		//parentRoleType = roleType;
+		//this.parameterTypes = parameterTypes;
+	}
+
+
+	@Override
+	public String getFullName() {
+		return name;
+	}
+
+	public boolean inRefinementGroup() {		
+		for (FSTRole role : getRole().getFSTClass().getRoles()) {
+			if (role.getFeature().equals(getRole().getFeature())) {
+				continue;
+			}
+			for (FSTContract contract : role.getClassFragment().getContracts()) {
+				if (contract.getName().equals(getName())) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	
+}

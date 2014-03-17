@@ -1,0 +1,34 @@
+<feature_model name="Aircraft PL">
+<meta>
+<data name="description">A feature model of a simple aircraft product line</data>
+<data name="creator">Markus Voelter</data>
+<data name="email"></data>
+<data name="date">Aug 2009</data>
+<data name="department"></data>
+<data name="organization">itemis AG, Germany</data>
+<data name="address"></data>
+<data name="phone"></data>
+<data name="website">http://www.itemis.com/</data>
+<data name="reference">Markus Voelter, Using Domain-Specific Languages for Product Line Engineering, Tutorial at SPLC 2009, San Francisco, USA</data>
+</meta>
+<feature_tree>
+:r Aircraft
+	:m Wing
+		:g [1,*]
+			: High
+			: Shoulder
+			: Low
+	:o Engine
+		:g [1,1]
+			: Jet
+			: Piston
+	:m Materials
+		:g [1,*]
+			: Metal
+			: Wood
+			: Cloth
+			: Plastic
+</feature_tree>
+<constraints>
+</constraints>
+</feature_model>

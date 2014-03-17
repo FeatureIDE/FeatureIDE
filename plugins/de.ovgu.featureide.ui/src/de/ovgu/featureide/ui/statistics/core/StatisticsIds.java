@@ -1,5 +1,7 @@
 package de.ovgu.featureide.ui.statistics.core;
 
+import java.util.HashMap;
+
 import org.eclipse.jface.viewers.TreeViewer;
 
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
@@ -51,6 +53,14 @@ public interface StatisticsIds {
 	public static final String NUMBER_CLASS_INVARIANT = "Number of classes with class invariants";
 	public static final String NUMBER_METHOD_METHOD_CONTRACT = "Number of methods with method contracts";
 	public static final String METHOD_CONTRACT_REFINEMENT = "Method contract refinements";
-	
+	public static final HashMap<String, String> REFINEMENT_COMPOSING_MECHANISM_MAPPING = new HashMap<String, String>(){{
+        put(" ","No key word");
+        put("\\final_method", "Final Method");
+        put("\\cumulative_contract", "Cumulative Contract");
+        put("\\consecutive_contract", "Consecutive Contract");
+        put("\\conjunctive_contract", "Conjunctive Contract");
+        put("\\plain_contract", "Plain Contract");
+        put("\\final_contract", "Final Contract");
+    }};
 	
 }

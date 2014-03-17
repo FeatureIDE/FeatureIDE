@@ -1,0 +1,219 @@
+<!-- This model was created online using SPLOT's Feature Model Editor (http://www.splot-research.org) on Fri, Oct 26, 2012 - 2:43 AM  -->
+<feature_model name="Printers">
+<meta>
+<data name="description">feature model</data>
+<data name="creator">Priya</data>
+<data name="address"></data>
+<data name="email">Chantabbai@gmail.com</data>
+<data name="phone"></data>
+<data name="website"></data>
+<data name="organization">TRDDC</data>
+<data name="department"></data>
+<data name="date"></data>
+<data name="reference"></data>
+</meta>
+<feature_tree>
+:r Xerox(_r)
+	:m Capabilites(_r_1)
+		:m Standard Capabilities(_r_1_17)
+			:g (_r_1_17_18) [1,*] 
+				: Print(_r_1_17_18_19)
+				: Scan(_r_1_17_18_20)
+				: Copy(_r_1_17_18_21)
+				: Fax(_r_1_17_18_22)
+				: Production Printing(_r_1_17_18_99)
+				: Finishing(_r_1_17_18_100)
+				: Reprinting(_r_1_17_18_141)
+				: Production MICR Printing(_r_1_17_18_151)
+				: High-volume network printing and 3rd-party finishing(_r_1_17_18_161)
+		:o Optional Capabilties(_r_1_23)
+			:g (_r_1_23_24) [1,*] 
+				: Finishing(_r_1_23_24_25)
+				: Scanning(_r_1_23_24_162)
+		:m Printed Sides(_r_1_26)
+			:g (_r_1_26_28) [1,1] 
+				: Duplex(_r_1_26_28_29)
+		:m MICR(_r_1_27)
+			:g (_r_1_27_152) [1,1] 
+				: Yes(_r_1_27_152_153)
+				: No(_r_1_27_152_154)
+		:m Product Color(_r_1_163)
+		:m Print Line Management(_r_1_172)
+	:m Performance(_r_2)
+		:m Rated Speed(_r_2_11)
+		:m Resolution(_r_2_12)
+			:g (_r_2_12_96) [1,*] 
+				: Print(_r_2_12_96_97)
+				: RIP(_r_2_12_96_98)
+				: Scan(_r_2_12_96_136)
+				: Scan to file(_r_2_12_96_137)
+				: Black(_r_2_12_96_159)
+				: Color(_r_2_12_96_160)
+		:m Recommended average monthly volume(_r_2_13)
+		:m Duty cycle(_r_2_14)
+		:m Scan Speed(_r_2_15)
+			:g (_r_2_15_138) [1,*] 
+				: Integrated Scanner(_r_2_15_138_139)
+				: Free Flow Scanner(_r_2_15_138_140)
+		:m Line Screens(_r_2_16)
+	:m Technology(_r_3)
+		:m PDLs(_r_3_30)
+		:m Network Interfaces(_r_3_31)
+		:m Memory(_r_3_101)
+		:m Harddisk(_r_3_102)
+		:m CPU(_r_3_103)
+		:m User Interface(_r_3_104)
+		:m Print Engine(_r_3_164)
+		:m Process or Imaging(_r_3_165)
+			:g (_r_3_165_166) [1,*] 
+				: Black(_r_3_165_166_167)
+				: Color(_r_3_165_166_168)
+	:m Paper Handling(_r_4)
+		:m Paper sources(_r_4_32)
+			:g (_r_4_32_166) [1,*] 
+				: Sheet Feed Module(_r_4_32_166_167)
+				: High Capacity Sheet Feed Module(_r_4_32_166_168)
+				: High Capacity Stacking Option(_r_4_32_166_169)
+				: Stitching and Binding option(_r_4_32_166_170)
+		:m Standard paper capacity(_r_4_33)
+			:g (_r_4_33_169) [1,*] 
+				: Sheet Feed Module(_r_4_33_169_170)
+				: High Capacity Sheet Feed Module(_r_4_33_169_171)
+				: High Capacity Stacking Option(__r_4_33_169_171)
+				: Stitching and Binding option(_r_4_33_169_172)
+		:m Maximum paper capacity with options(_r_4_34)
+		:m Media Dimensions - Minimum(_r_4_35)
+		:m Media Dimensions - Maximum(_r_4_36)
+		:m Media Weight - Minimum(_r_4_37)
+			:g (_r_4_37_110) [1,*] 
+				: coated(_r_4_37_110_111)
+				: uncoated(_r_4_37_110_112)
+		:m Media Weight - Maximum(_r_4_39)
+			:g (_r_4_39_113) [1,*] 
+				: coated(_r_4_39_113_114)
+				: uncoated(_r_4_39_113_115)
+		:m Media Types(_r_4_40)
+			:g (_r_4_40_106) [1,*] 
+				: coated(_r_4_40_106_107)
+				: uncoated(_r_4_40_106_108)
+				: speciality(_r_4_40_106_109)
+	:m Input(_r_5)
+		:m High Capacity Feeder(_r_5_41)
+			:g (_r_5_41_155) [1,*] 
+				: Standard Four-tray Sheet(_r_5_41_155_156)
+				: Oversized High-Capacity Sheet Feed Module(_r_5_41_155_157)
+				: Roll Feed Solution(_r_5_41_155_165)
+		:m Other Input Devices(_r_5_42)
+			:g (_r_5_42_158) [1,*] 
+				: Post-print Four-tray Paper Insertion Module(_r_5_42_158_159)
+				: Post-print Oversized Two-tray Paper Insertion Module(_r_5_42_158_160)
+				: Insertion Module(_r_5_42_158_172)
+				: High Capacity Insertion Module(_r_5_42_158_173)
+		:m Tray(_r_5_43)
+			:g (_r_5_43_44) [1,*] 
+				: Tray 1(_r_5_43_44_45)
+				: Tray 2(_r_5_43_44_46)
+				: Tray 3(_r_5_43_44_47)
+				: Tray 4(_r_5_43_44_48)
+				: Tray 5(_r_5_43_44_49)
+		:m Electronic Input(_r_5_142)
+		:m Automatic Doucment Feeder(_r_5_143)
+	:m Output(_r_6)
+		:g (_r_6_117) [1,*] 
+			: Offset Output Tray(_r_6_117_118)
+			: Top Tray(_r_6_117_119)
+			: Stacker(_r_6_117_144)
+	:m Finishing(_r_7)
+		:g (_r_7_51) [1,*] 
+			: Finisher(_r_7_51_52)
+				:g (_r_7_51_52_132) [1,*] 
+					: Basic Finisher Module(_r_7_51_52_132_133)
+					: Basic Finisher Module Plus(_r_7_51_52_132_134)
+					: Basic Finisher Module-DC(_r_7_51_52_132_135)
+					: Multifunction Finisher Professional(_r_7_51_52_132_146)
+					: Multifunction Finisher Pro plus(_r_7_51_52_132_147)
+			: Booklet Making(_r_7_51_53)
+			: Stapler(_r_7_51_54)
+			: Binder(_r_7_51_127)
+			: Cutting(_r_7_51_128)
+			: Tape Bound(_r_7_51_129)
+			: Hole Punch(_r_7_51_130)
+			: Other Finishing Options(_r_7_51_131)
+			: Stacker(_r_7_51_145)
+			: Slitter or Merger(_r_7_51_161)
+			: ByPass Transport(_r_7_51_174)
+	:m Print Controllers(_r_8)
+		:m Digital front-ends(_r_8_55)
+	:m Environmental(_r_9)
+		:m Electrical Requirements(_r_9_56)
+		:m Dimensions(_r_9_57)
+			:g (_r_9_57_120) [1,*] 
+				: Print Engine(_r_9_57_120_121)
+				: Sheet feed and Insertion Module(_r_9_57_120_122)
+				: Sheet Enhancement Module(_r_9_57_120_123)
+				: Basic Finisher Module(_r_9_57_120_124)
+				: Basic Finisher Module Plus(_r_9_57_120_125)
+				: Finishing Transport Module(_r_9_57_120_126)
+				: Feeder Module With Integrated Scanner(_r_9_57_120_148)
+				: Professional(_r_9_57_120_149)
+				: Multifunction Finisher Pro plus(_r_9_57_120_150)
+				: Basic Finisher Module DC(_r_9_57_120_162)
+				: Xerox DS3500 Stacker(_r_9_57_120_163)
+				: Xerox Tape Binder(_r_9_57_120_164)
+	:m Security(_r_10)
+		:g (_r_10_58) [1,*] 
+			: IP filtering(_r_10_58_59)
+			: Image overwrite(_r_10_58_60)
+			: Secure print(_r_10_58_61)
+			: Encrypted Scan to email(_r_10_58_62)
+			: Authentication(_r_10_58_63)
+			: IP-v6 support(_r_10_58_64)
+	:m Price(_r_65)
+	:m Category(_r_66)
+		:g (_r_66_67) [1,1] 
+			: Digital Printing Presses(_r_66_67_68)
+				:g (_r_66_67_68_74) [1,1] 
+					: Color Digital Printing Press(_r_66_67_68_74_75)
+					: B and W Publishing Digital Printing Press(_r_66_67_68_74_76)
+					: B and W Transaction Digital Printing Press(_r_66_67_68_74_77)
+					: HighLight Color Digital Printing Press(_r_66_67_68_74_78)
+			: Production Printers and Copiers(_r_66_67_69)
+				:g (_r_66_67_69_79) [1,1] 
+					: Color Printers(_r_66_67_69_79_80)
+					: B and W Printers(_r_66_67_69_79_81)
+					: B and W Publishing(_r_66_67_69_79_82)
+					: B and W Transaction(_r_66_67_69_79_83)
+					: HighLight Color(_r_66_67_69_79_84)
+			: Continuous Feed Printers(_r_66_67_70)
+			: Wide Format Solutions(_r_66_67_71)
+				:g (_r_66_67_71_85) [1,1] 
+					: Color Wide Format Printers(_r_66_67_71_85_86)
+					: Digital Wide Format Printers and Copiers(_r_66_67_71_85_87)
+					: Wide Format Finishers(_r_66_67_71_85_88)
+					: Software Solutions(_r_66_67_71_85_89)
+			: Workflow software(_r_66_67_72)
+				:g (_r_66_67_72_90) [1,1] 
+					: Freeflow Software and scanners(_r_66_67_72_90_91)
+					: DFEs and controllers(_r_66_67_72_90_92)
+					: Production printing software(_r_66_67_72_90_93)
+			: Business Development(_r_66_67_73)
+	:m Products(_r_94)
+		:g (_r_94_95) [1,1] 
+			: Mono Products(_r_94_95_96)
+				:g (_r_94_95_96_98) [1,1] 
+					: BB(_r_94_95_96_98_99)
+					: QM(_r_94_95_96_98_100)
+					: Teak(_r_94_95_96_98_101)
+					: HLC(_r_94_95_96_98_102)
+					: Nuvera(_r_94_95_96_98_103)
+			: Color Products(_r_94_95_97)
+				:g (_r_94_95_97_104) [1,1] 
+					: Mykonos(_r_94_95_97_104_105)
+					: Malta(_r_94_95_97_104_106)
+					: Chandon(_r_94_95_97_104_107)
+					: Chamonix(_r_94_95_97_104_108)
+					: Pinot(_r_94_95_97_104_109)
+</feature_tree>
+<constraints>
+</constraints>
+</feature_model>
