@@ -37,13 +37,14 @@ public class ShowFieldsMethodsAction extends Action {
 	
 	public static final int ONLY_FIELDS = 0;
 	public static final int ONLY_METHODS = 1;
-	public static final int HIDE_PARAMETERS_AND_TYPES = 2;
-	public static final int PUBLIC_FIELDSMETHODS = 3;
-	public static final int PROTECTED_FIELDSMETHODS = 4;
-	public static final int DEFAULT_FIELDSMETHODS = 5;
-	public static final int PRIVATE_FIELDSMETHODS = 6;
-	public static final int SELECT_ALL = 7;
-	public static final int DESELECT_ALL = 8;
+	public static final int ONLY_CONTRACTS = 2;
+	public static final int HIDE_PARAMETERS_AND_TYPES = 3;
+	public static final int PUBLIC_FIELDSMETHODS = 4;
+	public static final int PROTECTED_FIELDSMETHODS = 5;
+	public static final int DEFAULT_FIELDSMETHODS = 6;
+	public static final int PRIVATE_FIELDSMETHODS = 7;
+	public static final int SELECT_ALL = 8;
+	public static final int DESELECT_ALL = 9;
 	
 	private CollaborationView collaborationView;
 	private int index;
@@ -75,6 +76,7 @@ public class ShowFieldsMethodsAction extends Action {
 			case DESELECT_ALL:
 				setSelected(false, selected);
 				break;
+			case ONLY_CONTRACTS:
 			case ONLY_FIELDS:
 			case ONLY_METHODS:
 				noDeclarationTypSelected(selected);

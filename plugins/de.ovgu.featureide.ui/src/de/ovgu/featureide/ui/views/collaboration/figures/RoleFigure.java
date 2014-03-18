@@ -124,7 +124,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 	 * @return The persistent property
 	 */
 	public final static boolean[] getRoleSelections() {
-		boolean[] selections = new boolean[7];
+		boolean[] selections = new boolean[10];
 		try {
 			String property = ResourcesPlugin.getWorkspace().getRoot().getPersistentProperty(GET_ROLE_SELECTIONS_NAME());
 			if (property == null) {

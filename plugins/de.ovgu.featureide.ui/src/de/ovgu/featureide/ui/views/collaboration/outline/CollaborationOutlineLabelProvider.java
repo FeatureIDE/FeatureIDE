@@ -83,14 +83,28 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 					return IMAGE_FIELD_DEFAULT;
 			} else if (fstModelElement instanceof FSTMethod) {
 				FSTMethod method = (FSTMethod)fstModelElement;
-				if (method.isPrivate())			
-					return IMAGE_METHODE_PRIVATE;
-				else if (method.isProtected())
-					return IMAGE_METHODE_PROTECTED;
-				else if (method.isPublic())
-					return IMAGE_METHODE_PUBLIC;
-				else 
-					return IMAGE_METHODE_DEFAULT;
+				if (method.hasContract())
+				{
+					if (method.isPrivate())			
+						return IMAGE_METHODE_PRIVATE_CONTRACT;
+					else if (method.isProtected())
+						return IMAGE_METHODE_PROTECTED_CONTRACT;
+					else if (method.isPublic())
+						return IMAGE_METHODE_PUBLIC_CONTRACT;
+					else 
+						return IMAGE_METHODE_DEFAULT_CONTRACT;
+				}
+				else
+				{
+					if (method.isPrivate())			
+						return IMAGE_METHODE_PRIVATE;
+					else if (method.isProtected())
+						return IMAGE_METHODE_PROTECTED;
+					else if (method.isPublic())
+						return IMAGE_METHODE_PUBLIC;
+					else 
+						return IMAGE_METHODE_DEFAULT;	
+				}
 			}
 		} else if (element instanceof FSTClass) {
 			return IMAGE_CLASS;
