@@ -21,6 +21,7 @@ package de.ovgu.featureide.ui.views.collaboration.outline;
  */
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -29,13 +30,17 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
+import com.sun.xml.internal.bind.v2.schemagen.xmlschema.List;
+
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
+import de.ovgu.featureide.core.fstmodel.FSTContract;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
+import de.ovgu.featureide.core.fstmodel.RoleElement;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 
 /**
@@ -43,6 +48,8 @@ import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
  * 
  * @author Jan Wedding
  * @author Melanie Pflaume
+ * @author Stefan Krüger
+ * @author Florian Proksch 
  */
 public class CollaborationOutlineTreeContentProvider implements
 		ITreeContentProvider {
@@ -52,12 +59,20 @@ public class CollaborationOutlineTreeContentProvider implements
 	public CollaborationOutlineTreeContentProvider(){
 	}
 	
+	private Comparator<? super FSTContract> invariantComparator = new Comparator<FSTContract>() {
+
+		@Override
+		public int compare(FSTContract o1, FSTContract o2) {
+			return o1.getName().compareToIgnoreCase(o2.getName());
+		}
+
+	};	
 	
 	private Comparator<? super FSTMethod> methodComparator = new Comparator<FSTMethod>() {
 
 		@Override
 		public int compare(FSTMethod o1, FSTMethod o2) {
-			return o1.getFullName().compareToIgnoreCase(o2.getFullName());
+			return o1.getName().compareToIgnoreCase(o2.getName());
 		}
 
 	};
@@ -66,7 +81,7 @@ public class CollaborationOutlineTreeContentProvider implements
 
 		@Override
 		public int compare(FSTField o1, FSTField o2) {
-			return o1.getFullName().compareToIgnoreCase(o2.getFullName());
+			return o1.getName().compareToIgnoreCase(o2.getName());
 		}
 		
 	};
@@ -113,81 +128,131 @@ public class CollaborationOutlineTreeContentProvider implements
 	}
 
 	@Override
-	public Object[] getChildren(Object parentElement) {
-		if (parentElement instanceof FSTClass) {
+	public Object[] getChildren(Object parentElement) 
+	{
+		if (parentElement instanceof FSTClass) 
+		{
 			// get all fields and methods
-			HashMap<String, FSTMethod> methods = new HashMap<String, FSTMethod>();
-			for (FSTRole role : ((FSTClass) parentElement).getRoles()) {
-				for (FSTMethod m : role.getClassFragment().getMethods()) {
-					String methodName = m.getFullName();
-					if (!methods.containsKey(methodName)) {
-						methods.put(methodName, m);
-					} else {
-						// TODO ???
-//						methods.get(methodName).setOwn(m.getOwnFile());
-					}
-				}
-			}
-			FSTMethod[] methodArray = new FSTMethod[methods.size()];
-			int i = 0;
-			for (FSTMethod m : methods.values()) {
-				methodArray[i] = m;
-				i++;
-			}
-			
-			HashMap<String, FSTField> fields = new HashMap<String, FSTField>();
-			for (FSTRole role : ((FSTClass) parentElement).getRoles()) {
-				for (FSTField f : role.getClassFragment().getFields()) {
-					String fieldName = f.getFullName();
-					if (!fields.containsKey(fieldName)) {
-						fields.put(fieldName, f);
-					} else {
-						// TODO ???
-//						fields.get(fieldName).setOwn(f.getOwnFile());
-					}
-				}
-			}
-			FSTField[] fieldArray = new FSTField[fields.size()];
-			i = 0;
-			for (FSTField f : fields.values()) {
-				fieldArray[i] = f;
-				i++;
-			}
-			
+			LinkedList<FSTMethod> methods = new LinkedList<FSTMethod>(); 
+			LinkedList<FSTField> fields = new LinkedList<FSTField>();
+			LinkedList<FSTContract> invariants = new LinkedList<FSTContract>();
 			LinkedList<FSTDirective> directives = new LinkedList<FSTDirective>();
-			for (FSTRole role : ((FSTClass) parentElement).getRoles()) {
-				for (FSTDirective d : role.getDirectives()) {
-					if (d.getParent() == null) {
-						directives.add(d);
-					}
-				}
+			for (FSTRole role : ((FSTClass) parentElement).getRoles()) 
+			{
+				invariants.addAll(role.getClassFragment().getContracts());
+				methods.addAll(role.getClassFragment().getMethods());
+				fields.addAll(role.getClassFragment().getFields());
+				directives.addAll(role.getDirectives());
 			}
-			FSTDirective[] directiveArray = new FSTDirective[directives.size()];
-			i = 0;
-			for (FSTDirective f : directives) {
-				directiveArray[i] = f;
-				i++;
+			LinkedList<RoleElement> obj = new LinkedList<RoleElement>();
+			Collections.sort(methods, methodComparator);
+			Collections.sort(fields, fieldComparator);
+			Collections.sort(directives, directiveComparator);			
+			Collections.sort(invariants, invariantComparator);			
+			obj.addAll(invariants);
+			obj.addAll(fields);
+			obj.addAll(methods);			
+			//Remove duplicates
+			LinkedList<RoleElement> remDup = new LinkedList<RoleElement>();
+			for (int i = 0; i < obj.size(); i++)
+			{
+				if (remDup.isEmpty() || !remDup.getLast().getName().equals(obj.get(i).getName()))
+					remDup.add(obj.get(i));				
 			}
+			//Add Directives _WITH_ potential duplicates
+			remDup.addAll(directives);
+			return (remDup.toArray());
 			
-			Arrays.sort(methodArray, methodComparator);
-			Arrays.sort(fieldArray, fieldComparator);
-			Arrays.sort(directiveArray, directiveComparator);
-			
-			Object[] obj = new Object[fieldArray.length + methodArray.length + directiveArray.length];
-
-			for (i = 0; i < fieldArray.length; i++) {
-				obj[i] = fieldArray[i];
-			}
-			i = 0;
-			for (int j = fieldArray.length; i < methodArray.length; i++, j++) {
-				obj[j] = methodArray[i];
-			}
-			i = 0;
-			for (int j = fieldArray.length + methodArray.length; i < directiveArray.length; i++, j++) {
-				obj[j] = directiveArray[i];
-			}
-			
-			return obj;
+// ALTE IMPLEMENTIERUNG			
+//			
+//			
+//			
+//			//HashMap<String, FSTMethod> methods = new HashMap<String, FSTMethod>();			
+//			for (FSTRole role : ((FSTClass) parentElement).getRoles()) 
+//			{
+//				for (FSTMethod m : role.getClassFragment().getMethods()) 
+//				{
+//					String methodName = m.getFullName();
+//					if (!methods.contains(o) .containsKey(methodName)) 
+//					{
+//						methods.put(methodName, m);
+//					} else 
+//					{
+//						// TODO ???
+////						methods.get(methodName).setOwn(m.getOwnFile());
+//					}
+//				}
+//			}
+//			
+//			methods.toArray();
+//			
+//			FSTMethod[] methodArray = new FSTMethod[methods.size()];
+//			int i = 0;
+//			for (FSTMethod m : methods.values()) {
+//				methodArray[i] = m;
+//				i++;
+//			}
+//			
+//			
+//			HashMap<String, FSTField> fields = new HashMap<String, FSTField>();
+//			for (FSTRole role : ((FSTClass) parentElement).getRoles()) {
+//				for (FSTField f : role.getClassFragment().getFields()) {
+//					String fieldName = f.getFullName();
+//					if (!fields.containsKey(fieldName)) {
+//						fields.put(fieldName, f);
+//					} else {
+//						// TODO ???
+////						fields.get(fieldName).setOwn(f.getOwnFile());
+//					}
+//				}
+//			}
+//			FSTField[] fieldArray = new FSTField[fields.size()];
+//			i = 0;
+//			for (FSTField f : fields.values()) {
+//				fieldArray[i] = f;
+//				i++;
+//			}
+//			
+//			LinkedList<FSTDirective> directives = new LinkedList<FSTDirective>();
+//			for (FSTRole role : ((FSTClass) parentElement).getRoles()) {
+//				for (FSTDirective d : role.getDirectives()) {
+//					if (d.getParent() == null) {
+//						directives.add(d);
+//					}
+//				}
+//			}
+//			FSTDirective[] directiveArray = new FSTDirective[directives.size()];
+//			i = 0;
+//			for (FSTDirective f : directives) {
+//				directiveArray[i] = f;
+//				i++;
+//			}
+//			
+//			Arrays.sort(methodArray, methodComparator);
+//			Arrays.sort(fieldArray, fieldComparator);
+//			Arrays.sort(directiveArray, directiveComparator);
+//			
+//			Object[] obj = new Object[fieldArray.length + methodArray.length + directiveArray.length];
+//				
+//				
+//			
+//			
+//			for (i = 0; i < fieldArray.length; i++) {
+//			
+//			}
+//			for (i = 0; i < fieldArray.length; i++) {
+//				obj[i] = fieldArray[i];
+//			}
+//			i = 0;
+//			for (int j = fieldArray.length; i < methodArray.length; i++, j++) {
+//				obj[j] = methodArray[i];
+//			}
+//			i = 0;
+//			for (int j = fieldArray.length + methodArray.length; i < directiveArray.length; i++, j++) {
+//				obj[j] = directiveArray[i];
+//			}
+//			
+//			return obj;
 		} else if (parentElement instanceof FSTMethod) {
 			// get all the roles that belong to a method
 			LinkedList<FSTRole> roleList = new LinkedList<FSTRole>();

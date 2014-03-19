@@ -38,13 +38,14 @@ public class ShowFieldsMethodsAction extends Action {
 	public static final int ONLY_FIELDS = 0;
 	public static final int ONLY_METHODS = 1;
 	public static final int ONLY_CONTRACTS = 2;
-	public static final int HIDE_PARAMETERS_AND_TYPES = 3;
-	public static final int PUBLIC_FIELDSMETHODS = 4;
-	public static final int PROTECTED_FIELDSMETHODS = 5;
-	public static final int DEFAULT_FIELDSMETHODS = 6;
-	public static final int PRIVATE_FIELDSMETHODS = 7;
-	public static final int SELECT_ALL = 8;
-	public static final int DESELECT_ALL = 9;
+	public static final int ONLY_INVARIANTS = 3;
+	public static final int HIDE_PARAMETERS_AND_TYPES = 4;
+	public static final int PUBLIC_FIELDSMETHODS = 5;
+	public static final int PROTECTED_FIELDSMETHODS = 6;
+	public static final int DEFAULT_FIELDSMETHODS = 7;
+	public static final int PRIVATE_FIELDSMETHODS = 8;
+	public static final int SELECT_ALL = 9;
+	public static final int DESELECT_ALL = 10;
 	
 	private CollaborationView collaborationView;
 	private int index;

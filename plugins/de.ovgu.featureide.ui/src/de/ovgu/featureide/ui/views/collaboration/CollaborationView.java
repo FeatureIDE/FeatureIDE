@@ -127,10 +127,10 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	
 	private static final String TOOL_TIP_LABEL = "Build collaborationmodel";
 	
-	private static final String[] FIELD_METHOD_LABEL_NAMES = { "Show Fields", "Show Methods", "Show Contracts", "Hide Parameters/Types", "Public", "Protected", "Default",
+	private static final String[] FIELD_METHOD_LABEL_NAMES = { "Show Fields", "Show Methods", "Show Method Contracts", "Show Class Invariants", "Hide Parameters/Types", "Public", "Protected", "Default",
 			"Private", "Select All", "Deselect All", };
 	
-	private static final Image[] FIELD_METHOD_IMAGES = { null, null, IMAGE_AT, null, IMAGE_METHODE_PUBLIC, IMAGE_METHODE_PROTECTED, IMAGE_METHODE_DEFAULT,
+	private static final Image[] FIELD_METHOD_IMAGES = { null, null, IMAGE_AT, null,  null, IMAGE_METHODE_PUBLIC, IMAGE_METHODE_PROTECTED, IMAGE_METHODE_DEFAULT,
 			IMAGE_METHODE_PRIVATE, null, null };
 	
 	private static final String[] EXPORT_EXTENSIONS = { "*.png", "*.jpg", "*.bmp" };
@@ -419,7 +419,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				methodsFieldsSubMenu.add(setFieldsMethodsActions[i]);
 				setFieldsMethodsActions[i].setChecked(false);
 				
-				if ((i == ShowFieldsMethodsAction.ONLY_CONTRACTS) || (i == ShowFieldsMethodsAction.PRIVATE_FIELDSMETHODS)
+				if ((i == ShowFieldsMethodsAction.ONLY_INVARIANTS) || (i == ShowFieldsMethodsAction.PRIVATE_FIELDSMETHODS)
 						|| (i == ShowFieldsMethodsAction.HIDE_PARAMETERS_AND_TYPES)) {
 					methodsFieldsSubMenu.add(new Separator());
 				}

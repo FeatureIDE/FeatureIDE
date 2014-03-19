@@ -46,6 +46,7 @@ import org.eclipse.swt.graphics.Font;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.fstmodel.FSTArbitraryRole;
+import de.ovgu.featureide.core.fstmodel.FSTContract;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
@@ -236,7 +237,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 			if (showOnlyMethods()) {
 				methodCount = getCountForMethodContentCreate(tooltipContent);
 			}
-			
+			createInvariantContent(tooltipContent);
 			
 			tooltipContent.add(new Label("Fields: " + fieldCount + " Methods: "	+ methodCount +" "));
 
@@ -246,6 +247,8 @@ public class RoleFigure extends Figure implements GUIDefaults{
 				panel.setBorder(new RoleFigureBorder(xyValue, xyValue));
 			}
 
+
+		
 		} else if (role.getClassFragment().getName().startsWith("*.")) {
 			setContentForFiles(tooltipContent, null);
 		} else {
@@ -290,6 +293,32 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		}
 		return methodCount;
 	}
+
+	private int createInvariantContent(Figure tooltipContent) {
+		
+		CompartmentFigure invariantFigure = new CompartmentFigure();
+		Label label = new Label(role.getFeature() + " ", IMAGE_FEATURE);
+				
+		invariantFigure.add(label);
+		/*if (isFieldMethodFilterActive()) {
+			tooltipContent.add(label);
+		} else {
+			methodFigure.add(label);
+		}*/
+		
+		int privContracts = 0, pubContracts = 0, instanceContracts = 0, staticContracts = 0;
+		for (FSTContract contract : role.getClassFragment().getContracts())
+		{
+			//Abfrage nach Art einbauen...
+			privContracts++;
+			Label contractLabel = createInvariantLabel(contract);
+			invariantFigure.add(contractLabel);
+			addLabel(contractLabel);
+		}
+		
+			return privContracts;
+		}
+	
 	
 	private String getClassName() {
 		return role.getClassFragment().getName().split("[.]")[0];
@@ -413,7 +442,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 	public boolean isFieldMethodFilterActive() {
 		return (isPublicFieldMethodFilterActive() || isDefaultFieldMethodFilterActive() || 
 			   isPrivateFieldMethodFilterActive() || isProtectedFieldMethodFilterActive()) &&
-			   (showOnlyFields() || showOnlyMethods());
+			   (showOnlyFields() || showOnlyMethods() || showContracts());
 	}
 	
 	
@@ -440,6 +469,10 @@ public class RoleFigure extends Figure implements GUIDefaults{
 	private boolean showOnlyMethods() {
 		return SELECTED_FIELDS_METHOD[ShowFieldsMethodsAction.ONLY_METHODS];
 	}
+
+	private boolean showContracts() {
+		return SELECTED_FIELDS_METHOD[ShowFieldsMethodsAction.ONLY_CONTRACTS];
+	}	
 	
 	private boolean showOnlyNames() {
 		return SELECTED_FIELDS_METHOD[ShowFieldsMethodsAction.HIDE_PARAMETERS_AND_TYPES];
@@ -470,21 +503,45 @@ public class RoleFigure extends Figure implements GUIDefaults{
 			name = m.getFullName();
 		}
 		Label methodLabel = new RoleFigureLabel(name, m.getFullName());
+		
+		
 		if (m.inRefinementGroup()) {
 			methodLabel.setFont(FONT_BOLD);
 		}
-		if (m.isPrivate())
-			methodLabel.setIcon(IMAGE_METHODE_PRIVATE);
-		else if (m.isProtected())
-			methodLabel.setIcon(IMAGE_METHODE_PROTECTED);
-		else if (m.isPublic())
-			methodLabel.setIcon(IMAGE_METHODE_PUBLIC);
-		else
-			methodLabel.setIcon(IMAGE_METHODE_DEFAULT);
+		
+		if (m.hasContract() && showContracts())
+		{	
+			if (m.isPrivate())
+				methodLabel.setIcon(IMAGE_METHODE_PRIVATE_CONTRACT);
+			else if (m.isProtected())
+				methodLabel.setIcon(IMAGE_METHODE_PROTECTED_CONTRACT);
+			else if (m.isPublic())
+				methodLabel.setIcon(IMAGE_METHODE_PUBLIC_CONTRACT);
+			else
+				methodLabel.setIcon(IMAGE_METHODE_DEFAULT_CONTRACT);			
+		}else
+		{	
+			if (m.isPrivate())
+				methodLabel.setIcon(IMAGE_METHODE_PRIVATE);
+			else if (m.isProtected())
+				methodLabel.setIcon(IMAGE_METHODE_PROTECTED);
+			else if (m.isPublic())
+				methodLabel.setIcon(IMAGE_METHODE_PUBLIC);
+			else
+				methodLabel.setIcon(IMAGE_METHODE_DEFAULT);
+		}
 
 		return methodLabel;
 	}
 	
+	private Label createInvariantLabel(FSTContract c) {		
+		
+		Label invariantLabel = new RoleFigureLabel("Invariante", "InvarianteFull");
+		
+		invariantLabel.setIcon(IMAGE_HASH);
+		
+		return invariantLabel;
+	}	
 	
 	private Label createFieldLabel(FSTField f) {
 		String name;
