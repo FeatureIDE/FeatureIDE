@@ -536,7 +536,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 	
 	private Label createInvariantLabel(FSTInvariant c) {		
 		
-		Label invariantLabel = new RoleFigureLabel("Invariante", "InvarianteFull");
+		Label invariantLabel = new RoleFigureLabel(c.getFullName(), c.getFullName());
 		
 		invariantLabel.setIcon(IMAGE_HASH);
 		

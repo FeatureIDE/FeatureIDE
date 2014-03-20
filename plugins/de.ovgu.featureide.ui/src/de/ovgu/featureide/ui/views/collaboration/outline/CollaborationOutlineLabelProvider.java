@@ -37,6 +37,7 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTField;
+import de.ovgu.featureide.core.fstmodel.FSTInvariant;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.RoleElement;
@@ -131,6 +132,9 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 		if (element instanceof FSTMethod)
 			return ((FSTMethod)element).getFullName();
 		
+		if (element instanceof FSTInvariant)
+			return ((FSTInvariant)element).getFullName();
+		
 		if (element instanceof FSTField)
 			return ((FSTField)element).getFullName();
 		
@@ -161,13 +165,17 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 		return OutlineLabelProvider.OUTLINE_CODE;
 	}
 
-	public void colorizeItems(TreeItem[] treeItems, IFile file) {
-
-		for (int i = 0; i < treeItems.length; i++) {
-			if (treeItems[i].getData() instanceof RoleElement) {
+	public void colorizeItems(TreeItem[] treeItems, IFile file) 
+	{
+		for (int i = 0; i < treeItems.length; i++) 
+		{
+			if (treeItems[i].getData() instanceof RoleElement) 
+			{
 				setForeground(treeItems[i], file);
-			} if (treeItems[i].getData() instanceof FSTRole) {
-				if (((FSTRole) treeItems[i].getData()).getFile().equals(file)) {
+			} if (treeItems[i].getData() instanceof FSTRole) 
+			{
+				if (((FSTRole) treeItems[i].getData()).getFile().equals(file)) 
+				{
 					// get old Font and simply make it bold
 					treeItems[i].setFont(new Font(treeItems[i].getDisplay(),
 									treeItems[i].getFont().getFontData()[0]
@@ -175,14 +183,16 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 											.getFontData()[0].getHeight(),
 									SWT.BOLD));
 					
-				} else {
+				} else 
+				{
 					treeItems[i].setFont(new Font(treeItems[i].getDisplay(),
 						treeItems[i].getFont().getFontData()[0].getName(), 
 						treeItems[i].getFont().getFontData()[0].getHeight(),
 						SWT.NORMAL));
 				}
 			}
-			if (treeItems[i].getItems().length > 0) {
+			if (treeItems[i].getItems().length > 0) 
+			{
 				colorizeItems(treeItems[i].getItems(), file);
 			}
 		}
@@ -259,6 +269,16 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 					}
 				}
 			}
+			if (element instanceof FSTInvariant) {
+				for (FSTInvariant inv : role.getClassFragment().getInvariants()) {
+					if (inv.comparesTo(element)) {
+						item.setForeground(viewer.getControl().getDisplay()
+								.getSystemColor(SWT.DEFAULT));
+						return;
+					}
+				}
+			}
+			
 			if (element instanceof FSTField) {
 				for (FSTField field : role.getClassFragment().getFields()) {
 					if (field.comparesTo(element)) {

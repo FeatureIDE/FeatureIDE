@@ -80,6 +80,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTField;
+import de.ovgu.featureide.core.fstmodel.FSTInvariant;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
@@ -199,6 +200,11 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 					if (line != -1) {
 						scrollToLine(active_editor, line);
 					}
+				} else if (selection instanceof FSTInvariant) {
+					FSTInvariant inv = (FSTInvariant) selection;
+					int line = getInvariantLine(iFile, inv);
+					if (line != -1)
+						scrollToLine(active_editor, line);
 				} else if (selection instanceof FSTDirective) {
 					FSTDirective directive = (FSTDirective) selection;
 					scrollToLine(active_editor, directive.getStartLine(), directive.getEndLine(), 
@@ -257,6 +263,19 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 			return -1;
 		}
 
+		private int getInvariantLine(IFile iFile, FSTInvariant inv) {
+			for (FSTRole r : inv.getRole().getFSTClass().getRoles()) {
+				if (r.getFile().equals(iFile)) {
+					for (FSTInvariant i : r.getClassFragment().getInvariants()) {
+						if (i.comparesTo(inv)) {
+							return i.getLine();
+						}
+					}
+				}
+			}
+			return -1;
+		}
+		
 		private int getMethodLine(IFile iFile, FSTMethod meth) {
 			for (FSTRole r : meth.getRole().getFSTClass().getRoles()) {
 				if (r.getFile().equals(iFile)) {

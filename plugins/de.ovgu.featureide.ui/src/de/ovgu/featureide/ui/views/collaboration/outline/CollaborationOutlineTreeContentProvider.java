@@ -291,6 +291,17 @@ public class CollaborationOutlineTreeContentProvider implements
 				}
 			}
 			return obj;
+		} else if (parentElement instanceof FSTInvariant) {
+			// get all the roles that belong to a field
+			LinkedList<FSTRole> roleList = new LinkedList<FSTRole>();
+			for (FSTRole role : ((FSTInvariant) parentElement).getRole().getFSTClass().getRoles()) 
+			{
+				for (FSTInvariant i : role.getClassFragment().getInvariants()) 
+				{
+					roleList.add(role);
+				}
+			}
+			return(roleList.toArray());
 		} else if (parentElement instanceof FSTField) {
 			// get all the roles that belong to a field
 			LinkedList<FSTRole> roleList = new LinkedList<FSTRole>();

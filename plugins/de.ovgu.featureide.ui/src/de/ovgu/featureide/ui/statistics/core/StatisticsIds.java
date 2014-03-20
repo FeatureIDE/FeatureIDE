@@ -56,7 +56,7 @@ public interface StatisticsIds {
 	public static final String METHOD_CONTRACTS_FEATURE = "Method Contracts in Features";
 	
 	public static final HashMap<String, String> REFINEMENT_COMPOSING_MECHANISM_MAPPING = new HashMap<String, String>(){{
-        put(" ","No key word");
+        put("","No key word");
         put("\\final_method", "Final Method");
         put("\\cumulative_contract", "Cumulative Contract");
         put("\\consecutive_contract", "Consecutive Contract");

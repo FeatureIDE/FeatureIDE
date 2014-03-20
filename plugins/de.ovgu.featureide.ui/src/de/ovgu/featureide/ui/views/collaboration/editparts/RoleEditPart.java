@@ -164,21 +164,19 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 				int y = rect.y;
 				if (point.y >= y && point.y <= (y + rect.height)) {
 
-				/*	LinkedList<FSTInvariant> invariants = this.getRoleModel().getClassFragment().getInvariants();
+					LinkedList<FSTInvariant> invariants = this.getRoleModel().getClassFragment().getInvariants();
 					for (FSTInvariant invariant : invariants) {
-						if (invariant.get)
-							
-							
-						if (fstField.getFullName().equals(label.getElementName())) {
+						if (invariant.getFullName().equals(label.getElementName()))
+						{
 							editor = openEditor(file);
 							if (editor != null) {
-								Outline.scrollToLine(editor,fstField.getLine());
+								Outline.scrollToLine(editor,invariant.getLine());
 							}
 							return;
 						}
+							
 					}
 					
-					*/
 					LinkedList<FSTField> fields = this.getRoleModel().getClassFragment().getFields();
 					for (FSTField fstField : fields) {
 						if (fstField.getFullName().equals(label.getElementName())) {

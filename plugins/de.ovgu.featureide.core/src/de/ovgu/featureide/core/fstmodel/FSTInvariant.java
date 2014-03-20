@@ -65,6 +65,7 @@ public class FSTInvariant extends RoleElement {
 	 * @param beginLine
 	 * @param endLine
 	 */
+	
 	public FSTInvariant(String name, String body, int beginLine, int endLine) {
 		super(name, "", "", body, beginLine, endLine);
 		//parentRoleType = roleType;
@@ -72,9 +73,15 @@ public class FSTInvariant extends RoleElement {
 	}
 
 
+	public int getUniqueIdentifier()
+	{
+		return (body + beginLine + getFile()).hashCode();
+	}
+	
 	@Override
 	public String getFullName() {
-		return name;
+		String name = body.replaceAll("  ", "").replace((char)10, ' ').replaceFirst("invariant ", "");
+		return ((name.length() > 25 ? name.substring(0, 25) + "..." : name) + " - " + beginLine);
 	}
 
 	public boolean inRefinementGroup() {		

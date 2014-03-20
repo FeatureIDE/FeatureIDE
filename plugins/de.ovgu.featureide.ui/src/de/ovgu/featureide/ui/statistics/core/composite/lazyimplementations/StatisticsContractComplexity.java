@@ -171,17 +171,15 @@ public class StatisticsContractComplexity extends LazyParent {
 			{
 				for (String refinement : contractRefinementMap.keySet())
 				{
-					contractRefinementRealNameMap.put(REFINEMENT_COMPOSING_MECHANISM_MAPPING.get(refinement), contractRefinementMap.get(refinement));
+					contractRefinementRealNameMap.put(REFINEMENT_COMPOSING_MECHANISM_MAPPING.get(refinement.trim()), contractRefinementMap.get(refinement));
 				}
 			}
 			else
 			{
-				contractRefinementRealNameMap.put("Project based - " + contractComposition, contractRefinementMap.get(""));
+				//contractRefinementRealNameMap.put("Project based - " + contractComposition, contractRefinementMap.get(""));
 				for (String refinement : contractRefinementMap.keySet())
 				{
-					if (refinement.trim().length() > 0)
-					contractRefinementRealNameMap.put(REFINEMENT_COMPOSING_MECHANISM_MAPPING.get(refinement), contractRefinementMap.get(refinement));
-					
+					contractRefinementRealNameMap.put("Project based - " + contractComposition, contractRefinementMap.get(refinement) + (contractRefinementRealNameMap.containsKey("Project based - " + contractComposition) ? contractRefinementRealNameMap.get("Project based - " + contractComposition) : 0));	
 				}
 			}
 			addChild(new HashMapNode(METHOD_CONTRACT_REFINEMENT, null, contractRefinementRealNameMap));

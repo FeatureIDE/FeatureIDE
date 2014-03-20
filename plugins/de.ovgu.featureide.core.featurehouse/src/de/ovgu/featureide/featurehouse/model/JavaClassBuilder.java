@@ -160,13 +160,6 @@ public class JavaClassBuilder extends ClassBuilder {
 		// get return type
 		String returnType = head.substring(index + 1).trim();
 		
-		// get modifiers
-		
-		if (name.contains("update"))
-		{
-			int k = 100;
-		}
-		
 		String modifiers = (index == -1) ? "" : head.substring(0, index);
 		String contractBody = "", contractCompKey = "";
 		for (FSTNode nonT1 : ((FSTNonTerminal)terminal.getParent()).getChildren())
