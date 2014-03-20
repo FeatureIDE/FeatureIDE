@@ -46,7 +46,7 @@ import org.eclipse.swt.graphics.Font;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.fstmodel.FSTArbitraryRole;
-import de.ovgu.featureide.core.fstmodel.FSTContract;
+import de.ovgu.featureide.core.fstmodel.FSTInvariant;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
@@ -306,17 +306,17 @@ public class RoleFigure extends Figure implements GUIDefaults{
 			methodFigure.add(label);
 		}*/
 		
-		int privContracts = 0, pubContracts = 0, instanceContracts = 0, staticContracts = 0;
-		for (FSTContract contract : role.getClassFragment().getContracts())
+		int privInvariants = 0, pubInvariants = 0, instanceInvariants = 0, staticInvariants = 0;
+		for (FSTInvariant invariant : role.getClassFragment().getInvariants())
 		{
 			//Abfrage nach Art einbauen...
-			privContracts++;
-			Label contractLabel = createInvariantLabel(contract);
-			invariantFigure.add(contractLabel);
-			addLabel(contractLabel);
+			privInvariants++;
+			Label invariantLabel = createInvariantLabel(invariant);
+			invariantFigure.add(invariantLabel);
+			addLabel(invariantLabel);
 		}
 		
-			return privContracts;
+			return privInvariants;
 		}
 	
 	
@@ -534,7 +534,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		return methodLabel;
 	}
 	
-	private Label createInvariantLabel(FSTContract c) {		
+	private Label createInvariantLabel(FSTInvariant c) {		
 		
 		Label invariantLabel = new RoleFigureLabel("Invariante", "InvarianteFull");
 		

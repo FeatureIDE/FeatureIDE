@@ -34,7 +34,7 @@ public class FSTClassFragment extends RoleElement {
 	protected final LinkedList<FSTMethod> methods = new LinkedList<FSTMethod>();
 	protected final LinkedList<FSTField> fields = new LinkedList<FSTField>();
 	protected final LinkedList<FSTClassFragment> innerClasses = new LinkedList<FSTClassFragment>();
-	protected final LinkedList<FSTContract> contracts = new LinkedList<FSTContract>();
+	protected final LinkedList<FSTInvariant> invariants = new LinkedList<FSTInvariant>();
 
 	
 	protected String pckg = null;
@@ -81,8 +81,8 @@ public class FSTClassFragment extends RoleElement {
 	}
 
 	@Nonnull
-	public LinkedList<FSTContract> getContracts() {
-		return contracts;
+	public LinkedList<FSTInvariant> getInvariants() {
+		return invariants;
 	}
 	
 	@Nonnull
@@ -113,11 +113,11 @@ public class FSTClassFragment extends RoleElement {
 				return false;
 			}
 			innerClasses.add((FSTClassFragment) element);
-		} else if(element instanceof FSTContract) {
-			if (contracts.contains(element)) {
+		} else if(element instanceof FSTInvariant) {
+			if (invariants.contains(element)) {
 				return false;
 			}
-			contracts.add((FSTContract) element);
+			invariants.add((FSTInvariant) element);
 		}  else {
 			return false;
 		}

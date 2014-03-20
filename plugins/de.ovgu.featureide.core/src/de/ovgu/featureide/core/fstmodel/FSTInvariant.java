@@ -27,7 +27,7 @@ package de.ovgu.featureide.core.fstmodel;
  * @author Stefan Krueger
  * @author Florian Proksch	
  */
-public class FSTContract extends RoleElement {
+public class FSTInvariant extends RoleElement {
 	
 	public enum RoleTypes
 	{
@@ -51,7 +51,7 @@ public class FSTContract extends RoleElement {
 	 * @param type
 	 * @param modifiers
 	 */
-	public FSTContract(String name,  String body) {
+	public FSTInvariant(String name,  String body) {
 		super(name, "", "", body, -1, -1);
 		//parentRoleType = roleType;
 		//this.parameterTypes = parameterTypes;
@@ -65,7 +65,7 @@ public class FSTContract extends RoleElement {
 	 * @param beginLine
 	 * @param endLine
 	 */
-	public FSTContract(String name, String body, int beginLine, int endLine) {
+	public FSTInvariant(String name, String body, int beginLine, int endLine) {
 		super(name, "", "", body, beginLine, endLine);
 		//parentRoleType = roleType;
 		//this.parameterTypes = parameterTypes;
@@ -82,8 +82,8 @@ public class FSTContract extends RoleElement {
 			if (role.getFeature().equals(getRole().getFeature())) {
 				continue;
 			}
-			for (FSTContract contract : role.getClassFragment().getContracts()) {
-				if (contract.getName().equals(getName())) {
+			for (FSTInvariant invariant : role.getClassFragment().getInvariants()) {
+				if (invariant.getName().equals(getName())) {
 					return true;
 				}
 			}

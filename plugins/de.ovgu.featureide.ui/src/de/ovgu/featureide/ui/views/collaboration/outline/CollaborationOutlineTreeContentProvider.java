@@ -35,7 +35,7 @@ import com.sun.xml.internal.bind.v2.schemagen.xmlschema.List;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
-import de.ovgu.featureide.core.fstmodel.FSTContract;
+import de.ovgu.featureide.core.fstmodel.FSTInvariant;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
@@ -59,10 +59,10 @@ public class CollaborationOutlineTreeContentProvider implements
 	public CollaborationOutlineTreeContentProvider(){
 	}
 	
-	private Comparator<? super FSTContract> invariantComparator = new Comparator<FSTContract>() {
+	private Comparator<? super FSTInvariant> invariantComparator = new Comparator<FSTInvariant>() {
 
 		@Override
-		public int compare(FSTContract o1, FSTContract o2) {
+		public int compare(FSTInvariant o1, FSTInvariant o2) {
 			return o1.getName().compareToIgnoreCase(o2.getName());
 		}
 
@@ -135,11 +135,11 @@ public class CollaborationOutlineTreeContentProvider implements
 			// get all fields and methods
 			LinkedList<FSTMethod> methods = new LinkedList<FSTMethod>(); 
 			LinkedList<FSTField> fields = new LinkedList<FSTField>();
-			LinkedList<FSTContract> invariants = new LinkedList<FSTContract>();
+			LinkedList<FSTInvariant> invariants = new LinkedList<FSTInvariant>();
 			LinkedList<FSTDirective> directives = new LinkedList<FSTDirective>();
 			for (FSTRole role : ((FSTClass) parentElement).getRoles()) 
 			{
-				invariants.addAll(role.getClassFragment().getContracts());
+				invariants.addAll(role.getClassFragment().getInvariants());
 				methods.addAll(role.getClassFragment().getMethods());
 				fields.addAll(role.getClassFragment().getFields());
 				directives.addAll(role.getDirectives());

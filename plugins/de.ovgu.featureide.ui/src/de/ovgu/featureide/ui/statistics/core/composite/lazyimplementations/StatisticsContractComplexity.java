@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Set;
 
 import de.ovgu.featureide.core.fstmodel.FSTClass;
-import de.ovgu.featureide.core.fstmodel.FSTContract;
+import de.ovgu.featureide.core.fstmodel.FSTInvariant;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
@@ -75,7 +75,7 @@ public class StatisticsContractComplexity extends LazyParent {
 						+ "." + ((class_.getName().endsWith(".java")) ? class_.getName().substring(0, class_.getName().length() - 5) : class_.getName());
 
 				for (FSTRole role : class_.getRoles()) {
-					for (FSTContract contract : role.getClassFragment().getContracts()) {
+					for (FSTInvariant invariant : role.getClassFragment().getInvariants()) {
 						numInvariantsInClass++;
 						featureCountList.put( role.getFeature().getName(), featureCountList.containsKey(role.getFeature().getName()) ? featureCountList.get(role.getFeature().getName()) + 1: 1);
 					}
@@ -187,7 +187,7 @@ public class StatisticsContractComplexity extends LazyParent {
 			addChild(new HashMapNode(METHOD_CONTRACT_REFINEMENT, null, contractRefinementRealNameMap));
 
 						
-			addChild(new HashMapNode("features", null, featureCountList));
+			addChild(new HashMapNode(METHOD_CONTRACTS_FEATURE, null, featureCountList));
 		}
 	}
 }

@@ -53,6 +53,8 @@ public interface StatisticsIds {
 	public static final String NUMBER_CLASS_INVARIANT = "Number of classes with class invariants";
 	public static final String NUMBER_METHOD_METHOD_CONTRACT = "Number of methods with method contracts";
 	public static final String METHOD_CONTRACT_REFINEMENT = "Method contract refinements";
+	public static final String METHOD_CONTRACTS_FEATURE = "Method Contracts in Features";
+	
 	public static final HashMap<String, String> REFINEMENT_COMPOSING_MECHANISM_MAPPING = new HashMap<String, String>(){{
         put(" ","No key word");
         put("\\final_method", "Final Method");

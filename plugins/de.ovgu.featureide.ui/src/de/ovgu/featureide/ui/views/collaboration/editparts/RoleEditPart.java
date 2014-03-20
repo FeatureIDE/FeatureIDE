@@ -43,7 +43,7 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import de.ovgu.featureide.core.CorePlugin;
-import de.ovgu.featureide.core.fstmodel.FSTContract;
+import de.ovgu.featureide.core.fstmodel.FSTInvariant;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
@@ -163,9 +163,9 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 				Rectangle rect = label.getBounds();
 				int y = rect.y;
 				if (point.y >= y && point.y <= (y + rect.height)) {
-/*
-					LinkedList<FSTContract> invariants = this.getRoleModel().getClassFragment().getContracts();
-					for (FSTContract invariant : invariants) {
+
+				/*	LinkedList<FSTInvariant> invariants = this.getRoleModel().getClassFragment().getInvariants();
+					for (FSTInvariant invariant : invariants) {
 						if (invariant.get)
 							
 							
@@ -179,7 +179,6 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 					}
 					
 					*/
-					
 					LinkedList<FSTField> fields = this.getRoleModel().getClassFragment().getFields();
 					for (FSTField fstField : fields) {
 						if (fstField.getFullName().equals(label.getElementName())) {

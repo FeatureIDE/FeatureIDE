@@ -25,7 +25,7 @@ import java.util.LinkedList;
 import de.ovgu.cide.fstgen.ast.FSTNode;
 import de.ovgu.cide.fstgen.ast.FSTNonTerminal;
 import de.ovgu.cide.fstgen.ast.FSTTerminal;
-import de.ovgu.featureide.core.fstmodel.FSTContract;
+import de.ovgu.featureide.core.fstmodel.FSTInvariant;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.featurehouse.model.FHNodeTypes;
@@ -327,21 +327,14 @@ public class JavaClassBuilder extends ClassBuilder {
 		/*FSTNonTerminal par = (FSTNonTerminal)terminal.getParent().getParent().getParent();
 		if (par.getType().equals(FHNodeTypes.JML_INVARIANT))
 		{*/
-			FSTContract contract = new FSTContract(terminal.getName(), terminal.getBody(), terminal.beginLine, terminal.endLine);								
-			modelBuilder.getCurrentClassFragment().add(contract);
+			FSTInvariant invariant = new FSTInvariant(terminal.getName(), terminal.getBody(), terminal.beginLine, terminal.endLine);								
+			modelBuilder.getCurrentClassFragment().add(invariant);
 		//}
 	}
 	
 	@Override
 	public void caseJMLSpecCaseSeq(FSTTerminal terminal) 
-	{			
-		/*FSTNonTerminal par = (FSTNonTerminal)terminal.getParent().getParent().getParent();
-		if (par.getType().equals(FHNodeTypes.JAVA_NODE_METHOD_SPEC))
-		{			
-			FSTContract contract = new FSTContract(par.getName(), null, FSTContract.RoleTypes.ROLE_TYPE_METHOD, terminal.getBody(), terminal.beginLine, terminal.endLine);								
-			modelBuilder.getCurrentClassFragment().add(contract);
-		}*/
-	}
+	{}
 	
 	
 	@Override
