@@ -307,7 +307,7 @@ public class FeatureModelJPFCore implements IFeatureModelClass {
 			String lowerName = name.toLowerCase(Locale.ENGLISH);
 			stringBuilder.append(" (" + lowerName+"_ != null && " + lowerName + "_ ? \"" + name + "\\r\\n\" : \"\") ");
 		}
-		stringBuilder.append(";\r\n\t\treturn ");
+		stringBuilder.append(";\r\n\t\treturn \"\" + ");
 		for (int i = 0;i < features.size();i++) {
 			if (i != 0) {
 				stringBuilder.append(" + \"|\" + ");	
