@@ -70,6 +70,9 @@ import de.ovgu.cide.fstgen.ast.FSTTerminal;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
+import de.ovgu.featureide.core.fstmodel.FSTClass;
+import de.ovgu.featureide.core.fstmodel.FSTMethod;
+import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.featurehouse.errorpropagation.ErrorPropagation;
 import de.ovgu.featureide.featurehouse.meta.featuremodel.FeatureModelClassGenerator;
 import de.ovgu.featureide.featurehouse.model.FeatureHouseModelBuilder;
@@ -340,7 +343,37 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		}
 		buildFSTModel(configPath, basePath, outputPath);
 		
+		checkContractComposition();
+		
 		callCompiler();
+	}
+	
+	private void checkContractComposition()
+	{
+		if (!getContractParameter().equals(CONTRACT_COMPOSITION_METHOD_BASED))
+		{
+			for (FSTClass c : featureProject.getFSTModel().getClasses())
+			{
+				for (FSTRole r : c.getRoles())
+				{
+					for (FSTMethod m : r.getClassFragment().getMethods())
+					{
+						if (m.getCompKey().length() > 0)
+						{
+							try 
+							{								
+								IMarker marker = m.getFile().createMarker(FeatureHouseCorePlugin.BUILDER_PROBLEM_MARKER);
+								marker.setAttribute(IMarker.LINE_NUMBER, m.getLine());
+								marker.setAttribute(IMarker.MESSAGE, "Die sollte jetzt ein schöner Fehler sein!");
+								marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
+							} catch (CoreException e2) {
+								LOGGER.logError(e2);
+							}							
+						}
+					}
+				}				
+			}
+		}
 	}
 
 	/**

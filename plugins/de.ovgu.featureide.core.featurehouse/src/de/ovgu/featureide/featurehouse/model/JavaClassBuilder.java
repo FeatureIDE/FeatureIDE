@@ -150,6 +150,8 @@ public class JavaClassBuilder extends ClassBuilder {
 		return false;
 	}
 	
+	
+	
 	public void caseMethodDeclaration(FSTTerminal terminal) {
 		// get name
 		String name = getMethodName(terminal);
