@@ -794,13 +794,6 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			return;
 		}
 		Feature feature = featureModel.getFeature(folder.getName());
-		
-		
-		
-		fedfgatureModel.getAnalyser().checkImplies(a, b)
-		
-		
-		
 		try {
 			folder.deleteMarkers(FEATURE_MODULE_MARKER, true, IResource.DEPTH_ZERO);
 		} catch (CoreException e) {

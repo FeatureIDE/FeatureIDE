@@ -13,6 +13,18 @@
             value="true">
       </persistent>
    </extension>
+   <extension-point id="composers" name="Composers" schema="schema/composers.exsd"/>
+   <extension
+         id="contractMarker"
+         name="Contract Marker"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+      <persistent
+            value="true">
+      </persistent>
+   </extension>
 
    <extension
          id="de.ovgu.featureide.core.configurationProblemMarker"

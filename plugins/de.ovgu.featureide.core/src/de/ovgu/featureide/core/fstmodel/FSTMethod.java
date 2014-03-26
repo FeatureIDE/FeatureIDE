@@ -33,6 +33,13 @@ public class FSTMethod extends RoleElement {
 	private boolean isConstructor;
 	private boolean refines;
 	private String contract;
+	/**
+	 * @return the contract
+	 */
+	public String getContract() {
+		return contract;
+	}
+
 	private String compKey;
 	
 	/**
