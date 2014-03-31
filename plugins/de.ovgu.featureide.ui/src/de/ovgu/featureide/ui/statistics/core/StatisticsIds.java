@@ -55,14 +55,16 @@ public interface StatisticsIds {
 	public static final String METHOD_CONTRACT_REFINEMENT = "Method contract refinements";
 	public static final String METHOD_CONTRACTS_FEATURE = "Method Contracts in Features";
 	
-	public static final HashMap<String, String> REFINEMENT_COMPOSING_MECHANISM_MAPPING = new HashMap<String, String>(){{
+	public static final HashMap<String, String> REFINEMENT_COMPOSING_MECHANISM_MAPPING = new HashMap<String, String>(){
+		private static final long serialVersionUID = 1L;
+
+	{
         put("","No key word");
-        put("\\final_method", "Final Method");
-        put("\\cumulative_contract", "Cumulative Contract");
+        put("\\final_contract", "Plain Contracting");
         put("\\consecutive_contract", "Consecutive Contract");
         put("\\conjunctive_contract", "Conjunctive Contract");
-        put("\\plain_contract", "Plain Contract");
-        put("\\final_contract", "Final Contract");
+        put("\\cumulative_contract", "Cumulative Contract");
+        put("\\final_method", "Final Method");
     }};
 	
 }

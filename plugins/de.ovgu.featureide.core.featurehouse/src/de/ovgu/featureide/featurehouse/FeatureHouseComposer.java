@@ -120,6 +120,11 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	private static final String CONTRACT_COMPOSITION_METHOD_BASED = "method_based";
 	private static final String CONTRACT_COMPOSITION_NONE = "none";
 
+	private enum compKeys 
+	{
+		conjunctive_contract, consecutive_contract, cumulative_contract, final_contract, final_method
+	}
+	
 	public static final String COMPOSER_ID = "de.ovgu.featureide.composer.featurehouse";
 
 	private static final String NEWLINE = System.getProperty("line.separator",
@@ -383,113 +388,41 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		callCompiler();
 	}
 
-	private void checkContractComposition() throws TimeoutException {
-		try {
-			IFolder sourceFolder = featureProject.getComposer()
-					.hasFeatureFolder() ? featureProject.getSourceFolder()
-					: featureProject.getBuildFolder();
-			IMarker[] markers = sourceFolder.findMarkers(
-					FeatureHouseCorePlugin.CONTRACT_MARKER, false,
-					IResource.DEPTH_INFINITE);
-			for (IMarker marker : markers) {
-				marker.delete();
-			}
-
-			for (FSTClass c : featureProject.getFSTModel().getClasses()) {
-				for (FSTRole r : c.getRoles()) {
-					for (FSTMethod m : r.getClassFragment().getMethods()) {
-						if (m.hasContract()) {
-							if (m.getContract().contains("\\original")) {
-								List<Feature> a = new LinkedList<Feature>();
-								Feature f = new Feature(
-										featureProject.getFeatureModel(), r
-												.getFeature().getName());
-								a.add(f);
-								List<Feature> b = new LinkedList<Feature>();
-								for (String feat : featureProject
-										.getFeatureModel()
-										.getFeatureOrderList()) {
-									
-									if (feat.equals(r.getFeature().getName()))
-										break;
-
-									for (FSTClass cc : featureProject
-											.getFSTModel().getClasses()) {
-										for (FSTRole rr : cc.getRoles()) {
-											if (rr.getFeature().getName()
-													.equals(feat)) {
-												for (FSTMethod mm : rr
-														.getClassFragment()
-														.getMethods()) {
-													if (mm.getName().equals(
-															m.getName())
-															&& mm.hasContract()) {
-														b.add(new Feature(
-																featureProject
-																		.getFeatureModel(),
-																rr.getFeature()
-																		.getName()));
-													}
-												}
-
-											}
-										}
-									}
-								}
+	private void checkTreeDependencies() throws TimeoutException, CoreException
+	{
+		for (FSTClass c : featureProject.getFSTModel().getClasses())
+		{
+			for (FSTRole r : c.getRoles())
+			{
+				for (FSTMethod m : r.getClassFragment().getMethods()) 
+				{
+					if (m.hasContract() && m.getCompKey().length() > 0) 
+					{		
+						if (compKeys.valueOf(m.getCompKey().substring(1)).ordinal() > 0)
+						{
+							List<Feature> b = new LinkedList<Feature>();
+							boolean isAfter = false;
+							for (String feat : featureProject.getFeatureModel().getFeatureOrderList()) 
+							{
 								
-							
-
-								boolean valid = !b.isEmpty() ? featureProject
-										.getFeatureModel().getAnalyser()
-										.checkImplies(a, b) : false;
-								if (!valid) {
-									IMarker marker = m
-											.getFile()
-											.createMarker(
-													FeatureHouseCorePlugin.CONTRACT_MARKER);
-									marker.setAttribute(IMarker.LINE_NUMBER,
-											m.getLine());
-									marker.setAttribute(IMarker.MESSAGE,
-											m.getName() + ": keyword \"\\original\" found but no mandatory previous introduction.");
-									marker.setAttribute(IMarker.SEVERITY,
-											IMarker.SEVERITY_WARNING);
-								}
-							}
-							if (m.getContract().contains("\\final_method")) {
-								List<Feature> a = new LinkedList<Feature>();
-								Feature f = new Feature(
-										featureProject.getFeatureModel(), r
-												.getFeature().getName());
-								a.add(f);
-								List<Feature> b = new LinkedList<Feature>();
-								boolean isAfter = false;
-								for (String feat : featureProject
-										.getFeatureModel()
-										.getFeatureOrderList()) {
-									
-									if (feat.equals(r.getFeature().getName()))
+								if (isAfter)
+								{
+									for (FSTClass cc : featureProject.getFSTModel().getClasses()) 
 									{
-										isAfter = true;
-										continue;
-									}
-									if (isAfter)
-									{
-										for (FSTClass cc : featureProject
-												.getFSTModel().getClasses()) {
-											for (FSTRole rr : cc.getRoles()) {
-												if (rr.getFeature().getName()
-														.equals(feat)) {
-													for (FSTMethod mm : rr
-															.getClassFragment()
-															.getMethods()) {
-														if (mm.getName().equals(
-																m.getName())
-																&& mm.hasContract()) {
-															b.add(new Feature(
-																	featureProject
-																			.getFeatureModel(),
-																	rr.getFeature()
-																			.getName()));
+										for (FSTRole rr : cc.getRoles()) 
+										{
+											if (rr.getFeature().getName().equals(feat) && r.getClassFragment().getFullName().equals(rr.getClassFragment().getFullName())) 
+											{
+												for (FSTMethod mm : rr.getClassFragment().getMethods()) 
+												{
+													if (mm.getCompKey().length() > 0 && mm.getFullName().equals(m.getFullName()) && compKeys.valueOf(mm.getCompKey().substring(1)).ordinal() < compKeys.valueOf(m.getCompKey().substring(1)).ordinal())//&& mm.hasContract()) 
+													{
+														if (featureProject.getFeatureModel().getAnalyser().checkIfFeatureCombinationPossible(new Feature(featureProject.getFeatureModel(), r.getFeature().getName()), b))
+														{
+															IMarker marker = m.getFile().createMarker(FeatureHouseCorePlugin.CONTRACT_MARKER);
+															marker.setAttribute(IMarker.LINE_NUMBER, m.getLine());
+															marker.setAttribute(IMarker.MESSAGE, m.getName() + ": Contract with composition keyword " + m.getCompKey() + " possibily illegitimately redefined with keyword " + mm.getCompKey()+ ".");
+															marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
 														}
 													}
 												}
@@ -497,39 +430,127 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 										}
 									}
 								}
-
-								boolean valid = !b.isEmpty() ? featureProject
-										.getFeatureModel().getAnalyser()
-										.checkImplies(b, a) : true;
-										if (!valid)
-										{
-									IMarker marker = m
-											.getFile()
-											.createMarker(
-													FeatureHouseCorePlugin.CONTRACT_MARKER);
-									marker.setAttribute(IMarker.LINE_NUMBER,
-											m.getLine());
-									marker.setAttribute(IMarker.MESSAGE,
-											m.getName() + ": keyword \"\\final_method\" found but possibly later refinement.");
-									marker.setAttribute(IMarker.SEVERITY,
-											IMarker.SEVERITY_WARNING);
-										}
-								}								
-
+								else if (feat.equals(r.getFeature().getName()))
+								{
+									isAfter = true;
+									continue;
+								}
+							}
 						}
-						if (!getContractParameter().equals(
-								CONTRACT_COMPOSITION_METHOD_BASED)
-								&& m.getCompKey().length() > 0) {
+					}
+				}
+			}
+		}
+	}
+	
+	private void checkContractComposition() throws TimeoutException {
+		try {
+			IFolder sourceFolder = featureProject.getComposer().hasFeatureFolder() ? featureProject.getSourceFolder() : featureProject.getBuildFolder();
+			IMarker[] markers = sourceFolder.findMarkers(FeatureHouseCorePlugin.CONTRACT_MARKER, false, IResource.DEPTH_INFINITE);
+			for (IMarker marker : markers) 
+			{
+				marker.delete();
+			}
+			checkTreeDependencies();
+			for (FSTClass c : featureProject.getFSTModel().getClasses()) 
+			{
+				for (FSTRole r : c.getRoles()) 
+				{
+					for (FSTMethod m : r.getClassFragment().getMethods()) 
+					{
+						if (m.hasContract()) 
+						{						
+							
+							if (m.getContract().contains("\\original")) 
+							{
+								List<Feature> a = new LinkedList<Feature>();
+								Feature f = new Feature(featureProject.getFeatureModel(), r.getFeature().getName());
+								a.add(f);
+								List<Feature> b = new LinkedList<Feature>();
+								for (String feat : featureProject.getFeatureModel().getFeatureOrderList()) 
+								{	
+									if (feat.equals(r.getFeature().getName()))
+										break;
 
-							IMarker marker = m.getFile().createMarker(
-									FeatureHouseCorePlugin.CONTRACT_MARKER);
-							marker.setAttribute(IMarker.LINE_NUMBER,
-									m.getLine());
-							marker.setAttribute(
-									IMarker.MESSAGE,
-									m.getName() + ": contract composition set project-wide. Method-based composition Keyword ignored.");
-							marker.setAttribute(IMarker.SEVERITY,
-									IMarker.SEVERITY_WARNING);
+									
+									for (FSTClass cc : featureProject.getFSTModel().getClasses()) 
+									{
+										for (FSTRole rr : cc.getRoles()) 
+										{
+											if (rr.getFeature().getName().equals(feat)) 
+											{
+												for (FSTMethod mm : rr.getClassFragment().getMethods()) 
+												{
+													if (mm.getName().equals(m.getName()) && mm.hasContract()) 
+													{
+														b.add(new Feature(featureProject.getFeatureModel(), rr.getFeature().getName()));
+													}
+												}
+											}
+										}
+									}
+								}
+								
+								boolean valid = !b.isEmpty() ? featureProject.getFeatureModel().getAnalyser().checkImplies(a, b) : false;
+								if (!valid) 
+								{
+									IMarker marker = m.getFile().createMarker(FeatureHouseCorePlugin.CONTRACT_MARKER);
+									marker.setAttribute(IMarker.LINE_NUMBER, m.getLine());
+									marker.setAttribute(IMarker.MESSAGE, m.getName() + ": keyword \"\\original\" found but no mandatory previous introduction.");
+									marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
+								}
+							}
+							if (m.getCompKey().contains("\\final_method")) 
+							{
+								/*List<Feature> a = new LinkedList<Feature>();
+								a.add(new Feature(featureProject.getFeatureModel(), r.getFeature().getName()));*/
+								List<Feature> b = new LinkedList<Feature>();
+								boolean isAfter = false;
+								for (String feat : featureProject.getFeatureModel().getFeatureOrderList()) 
+								{
+									
+									if (isAfter)
+									{
+										for (FSTClass cc : featureProject.getFSTModel().getClasses()) 
+										{
+											for (FSTRole rr : cc.getRoles()) 
+											{
+												if (rr.getFeature().getName().equals(feat) && r.getClassFragment().getFullName().equals(rr.getClassFragment().getFullName())) 
+												{
+													for (FSTMethod mm : rr.getClassFragment().getMethods()) 
+													{
+														if (mm.getFullName().equals(m.getFullName()) )//&& mm.hasContract()) 
+														{
+															b.add(new Feature(featureProject.getFeatureModel(),	rr.getFeature().getName()));
+														}
+													}
+												}
+											}
+										}
+									}
+									else if (feat.equals(r.getFeature().getName()))
+									{
+										isAfter = true;
+										continue;
+									}
+								}
+								boolean valid = featureProject.getFeatureModel().getAnalyser().checkIfFeatureCombinationPossible(new Feature(featureProject.getFeatureModel(), r.getFeature().getName()), b);
+								
+								if (!valid)
+								{
+									IMarker marker = m.getFile().createMarker(FeatureHouseCorePlugin.CONTRACT_MARKER);
+									marker.setAttribute(IMarker.LINE_NUMBER, m.getLine());
+									marker.setAttribute(IMarker.MESSAGE, m.getName() + ": keyword \"\\final_method\" found but possibly later refinement.");
+									marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
+								}
+							}								
+						}
+						if (!getContractParameter().equals(CONTRACT_COMPOSITION_METHOD_BASED) && m.getCompKey().length() > 0) 
+						{
+							IMarker marker = m.getFile().createMarker(FeatureHouseCorePlugin.CONTRACT_MARKER);
+							marker.setAttribute(IMarker.LINE_NUMBER, m.getLine());
+							marker.setAttribute(IMarker.MESSAGE, m.getName() + ": contract composition set project-wide. Method-based composition Keyword ignored.");
+							marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
 						}
 					}
 

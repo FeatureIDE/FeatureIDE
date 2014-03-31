@@ -161,7 +161,7 @@ public class FeatureModelAnalyzer {
 		if (b.isEmpty())
 			return true;
 
-		Node featureModel = NodeCreator.createNodes(fm);
+		Node featureModel = NodeCreator.createNodes(fm.clone());
 
 		// B1 or B2 or ... Bn
 		Node condition = disjunct(b);
@@ -172,6 +172,26 @@ public class FeatureModelAnalyzer {
 		Implies finalFormula = new Implies(featureModel, condition);
 		return !new SatSolver(new Not(finalFormula), 1000).isSatisfiable();
 	}
+	
+	public boolean checkIfFeatureCombinationPossible(Feature a, Collection<Feature> b) throws TimeoutException 
+	{
+		if (b.isEmpty())
+			return true;
+
+		Node featureModel = NodeCreator.createNodes(fm.clone());
+		
+		boolean notValid = true;
+		for (Feature f : b)
+		{
+			Node node = new And(new And(NodeCreator.createNodes(fm.clone()), new Literal(NodeCreator.getVariable(f, fm.clone()))),  new Literal(NodeCreator.getVariable(a, fm.clone())));
+			
+			notValid &= !new SatSolver(node, 1000).isSatisfiable();
+		}
+		
+		
+		return notValid;
+	}
+	
 	
 	/**
 	 * checks some condition against the feature model. use only if you know
