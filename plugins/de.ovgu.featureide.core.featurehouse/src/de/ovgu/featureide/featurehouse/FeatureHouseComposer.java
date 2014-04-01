@@ -378,17 +378,12 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		}
 		buildFSTModel(configPath, basePath, outputPath);
 
-		try {
-			checkContractComposition();
-		} catch (TimeoutException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
+		checkContractComposition();
+	
 		callCompiler();
 	}
 
-	private void checkContractComposition() throws TimeoutException {
+	private void checkContractComposition() {
 		try {
 			IFolder sourceFolder = featureProject.getComposer().hasFeatureFolder() ? featureProject.getSourceFolder() : featureProject.getBuildFolder();
 			IMarker[] markers = sourceFolder.findMarkers(FeatureHouseCorePlugin.CONTRACT_MARKER, false, IResource.DEPTH_INFINITE);
@@ -409,7 +404,8 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 							{
 								IMarker marker = m.getFile().createMarker(FeatureHouseCorePlugin.CONTRACT_MARKER);
 								marker.setAttribute(IMarker.LINE_NUMBER, m.getLine());
-								marker.setAttribute(IMarker.MESSAGE, m.getName() + ": contract composition set project-wide. Method-based composition Keyword ignored.");
+								marker.setAttribute(IMarker.MESSAGE, m.getName() + ": Keyword " + m.getCompKey() + " ignored. Contract composition set to " 
+								+ getContractParameter() + ". Change to \"method-based composition\"." );
 								marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);	
 							}
 						}
@@ -423,93 +419,89 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 					for (FSTRole r : c.getRoles()) 
 					{
 						for (FSTMethod m : r.getClassFragment().getMethods()) 
-						{
-							if (m.hasContract()) 
+						{							
+							List<Feature> currentFeatureList = new LinkedList<Feature>();
+							List<Feature> originalList = new LinkedList<Feature>();
+							currentFeatureList.add(new Feature(featureProject.getFeatureModel(), r.getFeature().getName()));
+							
+							boolean isBefore = true;
+							for (String feat : featureProject.getFeatureModel().getFeatureOrderList()) 
 							{
-								List<Feature> currentFeatureList = new LinkedList<Feature>();
-								List<Feature> originalList = new LinkedList<Feature>();
-								List<Feature> finalMethodList = new LinkedList<Feature>();
-								currentFeatureList.add(new Feature(featureProject.getFeatureModel(), r.getFeature().getName()));
-								
-								boolean isBefore = true;
-								for (String feat : featureProject.getFeatureModel().getFeatureOrderList()) 
+								if (isBefore)
 								{
-									if (isBefore)
+									if (feat.equals(r.getFeature().getName()))
 									{
-										if (feat.equals(r.getFeature().getName()))
-										{
-											isBefore = false;
-											continue;
-										}
-										for (FSTClass cc : featureProject.getFSTModel().getClasses()) 
-										{
-											for (FSTRole rr : cc.getRoles()) 
-											{
-												if (rr.getFeature().getName().equals(feat)) 
-												{
-													for (FSTMethod mm : rr.getClassFragment().getMethods()) 
-													{
-														//check if there is a introductionary method contract for methods that contain the keyword original in contract 
-														if (m.getContract().contains("\\original") && mm.getName().equals(m.getName()) && mm.hasContract()) 
-														{
-															originalList.add(new Feature(featureProject.getFeatureModel(), rr.getFeature().getName()));
-														}
-													}
-												}
-											}
-										}
-										
+										break;
 									}
-									else 
+									for (FSTClass cc : featureProject.getFSTModel().getClasses()) 
 									{
-										for (FSTClass cc : featureProject.getFSTModel().getClasses()) 
+										for (FSTRole rr : cc.getRoles()) 
 										{
-											for (FSTRole rr : cc.getRoles()) 
+											if (rr.getFeature().getName().equals(feat)) 
 											{
-												if (rr.getFeature().getName().equals(feat) && r.getClassFragment().getFullName().equals(rr.getClassFragment().getFullName())) 
+												for (FSTMethod mm : rr.getClassFragment().getMethods()) 
 												{
-													for (FSTMethod mm : rr.getClassFragment().getMethods()) 
+													//check if there is a introductionary method contract for methods that contain the keyword original in contract 
+													if (m.hasContract() && m.getContract().contains("\\original") && mm.getName().equals(m.getName()) && mm.hasContract()) 
 													{
-														//Check if a method whose contract is marked with \final_method is redefined
-														if (m.getCompKey().contains("\\final_method") && mm.getFullName().equals(m.getFullName()) )//&& mm.hasContract()) 
+														originalList.add(new Feature(featureProject.getFeatureModel(), rr.getFeature().getName()));
+													}
+													//Check if a method whose contract is marked with \final_method is redefined
+													if (mm.getCompKey().contains("\\final_method") && mm.getFullName().equals(m.getFullName()) ) 
+													{
+														List<Feature> finalMethodList = new LinkedList<Feature>();
+														finalMethodList.add(new Feature(featureProject.getFeatureModel(), rr.getFeature().getName()));
+														if (!featureProject.getFeatureModel().getAnalyser().checkIfFeatureCombinationNotPossible(new Feature(featureProject.getFeatureModel(), r.getFeature().getName()), finalMethodList))
 														{
-															finalMethodList.add(new Feature(featureProject.getFeatureModel(), rr.getFeature().getName()));
-														}
-														
-														//check if a metod contract's composition technique is illegitimately redefined with another technique
-														if (m.getCompKey().length() > 0 && mm.getCompKey().length() > 0 && compKeys.valueOf(m.getCompKey().substring(1)).ordinal() > 0 && mm.getFullName().equals(m.getFullName()) && compKeys.valueOf(mm.getCompKey().substring(1)).ordinal() < compKeys.valueOf(m.getCompKey().substring(1)).ordinal())//&& mm.hasContract()) 
-														{
-															LinkedList<Feature> treeDependencyList = new LinkedList<Feature>();
-															treeDependencyList.add(new Feature(featureProject.getFeatureModel(), rr.getFeature().getName()));
-															if (!featureProject.getFeatureModel().getAnalyser().checkIfFeatureCombinationPossible(new Feature(featureProject.getFeatureModel(), r.getFeature().getName()), treeDependencyList))
-															{
-																IMarker marker = m.getFile().createMarker(FeatureHouseCorePlugin.CONTRACT_MARKER);
-																marker.setAttribute(IMarker.LINE_NUMBER, m.getLine());
-																marker.setAttribute(IMarker.MESSAGE, m.getName() + ": Contract with composition keyword " + m.getCompKey() + " possibily illegitimately redefined with keyword " + mm.getCompKey()+ ".");
-																marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
-															}
+															IMarker marker = m.getFile().createMarker(FeatureHouseCorePlugin.CONTRACT_MARKER);
+															marker.setAttribute(IMarker.LINE_NUMBER, m.getLine());
+															marker.setAttribute(IMarker.MESSAGE, m.getName() + ": keyword \"\\final_method\" found but possibly later refinement.");
+															marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
+															
 														}
 													}
+													
+													//Check if a method whose contract is marked with \final_contract is redefined
+													if (m.hasContract() && mm.getCompKey().contains("\\final_contract") && mm.getFullName().equals(m.getFullName()) && mm.hasContract()) 
+													{
+														List<Feature> finalContractList = new LinkedList<Feature>();
+														finalContractList.add(new Feature(featureProject.getFeatureModel(), rr.getFeature().getName()));
+														if (mm.getCompKey().contains("\\final_contract") && !featureProject.getFeatureModel().getAnalyser().checkIfFeatureCombinationNotPossible(new Feature(featureProject.getFeatureModel(), r.getFeature().getName()), finalContractList))
+														{
+															IMarker marker = m.getFile().createMarker(FeatureHouseCorePlugin.CONTRACT_MARKER);
+															marker.setAttribute(IMarker.LINE_NUMBER, m.getLine());
+															marker.setAttribute(IMarker.MESSAGE, m.getName() + ": keyword \"\\final_method\" found but possibly later refinement.");
+															marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
+														}
+													}
+													
+													//check if a metod contract's composition technique is illegitimately redefined with another technique
+													if (m.hasContract() &&  m.getCompKey().length() > 0 && mm.getCompKey().length() > 0 && compKeys.valueOf(m.getCompKey().substring(1)).ordinal() > 0 && mm.getFullName().equals(m.getFullName()) && compKeys.valueOf(mm.getCompKey().substring(1)).ordinal() > compKeys.valueOf(m.getCompKey().substring(1)).ordinal())//&& mm.hasContract()) 
+													{
+														LinkedList<Feature> treeDependencyList = new LinkedList<Feature>();
+														treeDependencyList.add(new Feature(featureProject.getFeatureModel(), rr.getFeature().getName()));
+														if (!featureProject.getFeatureModel().getAnalyser().checkIfFeatureCombinationNotPossible(new Feature(featureProject.getFeatureModel(), r.getFeature().getName()), treeDependencyList))
+														{
+															IMarker marker = m.getFile().createMarker(FeatureHouseCorePlugin.CONTRACT_MARKER);
+															marker.setAttribute(IMarker.LINE_NUMBER, m.getLine());
+															marker.setAttribute(IMarker.MESSAGE, m.getName() + ": Contract with composition keyword " + mm.getCompKey() + " possibily illegitimately redefined with keyword " + m.getCompKey()+ ".");
+															marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
+														}
+													}
+													
 												}
 											}
 										}
 									}
+									
 								}
-								if (m.getContract().contains("\\original") && !(!originalList.isEmpty() ? featureProject.getFeatureModel().getAnalyser().checkImplies(currentFeatureList, originalList) : false))
-								{
-									IMarker marker = m.getFile().createMarker(FeatureHouseCorePlugin.CONTRACT_MARKER);
-									marker.setAttribute(IMarker.LINE_NUMBER, m.getLine());
-									marker.setAttribute(IMarker.MESSAGE, m.getName() + ": keyword \"\\original\" found but no mandatory previous introduction.");
-									marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
-								}
-								if (m.getCompKey().contains("\\final_method") && !featureProject.getFeatureModel().getAnalyser().checkIfFeatureCombinationPossible(new Feature(featureProject.getFeatureModel(), r.getFeature().getName()), finalMethodList))
-								{
-									IMarker marker = m.getFile().createMarker(FeatureHouseCorePlugin.CONTRACT_MARKER);
-									marker.setAttribute(IMarker.LINE_NUMBER, m.getLine());
-									marker.setAttribute(IMarker.MESSAGE, m.getName() + ": keyword \"\\final_method\" found but possibly later refinement.");
-									marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
-								}
-								
+							}
+							if (m.getContract().contains("\\original") && !(!originalList.isEmpty() ? featureProject.getFeatureModel().getAnalyser().checkImplies(currentFeatureList, originalList) : false))
+							{
+								IMarker marker = m.getFile().createMarker(FeatureHouseCorePlugin.CONTRACT_MARKER);
+								marker.setAttribute(IMarker.LINE_NUMBER, m.getLine());
+								marker.setAttribute(IMarker.MESSAGE, m.getName() + ": keyword \"\\original\" found but no mandatory previous introduction.");
+								marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
 							}
 						}
 					}		
@@ -517,6 +509,10 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			}
 		} catch (CoreException e2) {
 			LOGGER.logError(e2);
+		}
+		catch (TimeoutException e)
+		{
+			LOGGER.logError(e);
 		}
 
 	}
@@ -1117,6 +1113,13 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		return list;
 	}
 
+	
+	@Override
+	public void postModelChanged()
+	{
+		checkContractComposition();
+	}
+	
 	@Override
 	public void postCompile(IResourceDelta delta, final IFile file) {
 		super.postCompile(delta, file);

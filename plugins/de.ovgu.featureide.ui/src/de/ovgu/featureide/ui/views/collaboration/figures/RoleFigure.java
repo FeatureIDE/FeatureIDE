@@ -236,8 +236,13 @@ public class RoleFigure extends Figure implements GUIDefaults{
 			
 			if (showOnlyMethods()) {
 				methodCount = getCountForMethodContentCreate(tooltipContent);
-			}
+			}else if (showContracts())
+			{
+				getCountForMethodContentContractCreate(tooltipContent);
+			}	
+			if (showInvariants()) {
 			createInvariantContent(tooltipContent);
+			}
 			
 			tooltipContent.add(new Label("Fields: " + fieldCount + " Methods: "	+ methodCount +" "));
 
@@ -256,6 +261,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		}
 		setToolTip(tooltipContent);
 	}
+
 
 	private int getCountForMethodContentCreate(Figure tooltipContent) {
 		
@@ -293,6 +299,43 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		}
 		return methodCount;
 	}
+	
+	private int getCountForMethodContentContractCreate(Figure tooltipContent) {
+		
+		CompartmentFigure methodFigure = new CompartmentFigure();
+		Label label = new Label(role.getFeature() + " ", IMAGE_FEATURE);
+		
+		if (isFieldMethodFilterActive()) {
+			tooltipContent.add(label);
+		} else {
+			methodFigure.add(label);
+		}
+		
+		int methodCount = 0;
+		for (FSTMethod m : role.getClassFragment().getMethods()) {
+			Label methodLabel = createMethodLabel(m);
+
+			if (matchFilter(m) && m.hasContract()) {
+				methodFigure.add(methodLabel);
+				methodCount++;
+				
+				if (isFieldMethodFilterActive()) {
+					addLabel(methodLabel);
+				} else {
+					if (methodCount % 25 == 0) {
+						tooltipContent.add(methodFigure);
+						methodFigure = new CompartmentFigure();
+						methodFigure.add(new Label(""));
+					}
+				}
+			}
+		}
+		
+		if (!isFieldMethodFilterActive()) {
+			addToToolTip(methodCount, methodFigure, tooltipContent);
+		}
+		return methodCount;
+	}	
 
 	private int createInvariantContent(Figure tooltipContent) {
 		
@@ -309,7 +352,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		int privInvariants = 0, pubInvariants = 0, instanceInvariants = 0, staticInvariants = 0;
 		for (FSTInvariant invariant : role.getClassFragment().getInvariants())
 		{
-			//Abfrage nach Art einbauen...
+			//Abfrage nach Art einbauen ...
 			privInvariants++;
 			Label invariantLabel = createInvariantLabel(invariant);
 			invariantFigure.add(invariantLabel);
@@ -442,7 +485,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 	public boolean isFieldMethodFilterActive() {
 		return (isPublicFieldMethodFilterActive() || isDefaultFieldMethodFilterActive() || 
 			   isPrivateFieldMethodFilterActive() || isProtectedFieldMethodFilterActive()) &&
-			   (showOnlyFields() || showOnlyMethods() || showContracts());
+			   (showOnlyFields() || showOnlyMethods() || showContracts() || showInvariants());
 	}
 	
 	
@@ -474,6 +517,10 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		return SELECTED_FIELDS_METHOD[ShowFieldsMethodsAction.ONLY_CONTRACTS];
 	}	
 	
+	private boolean showInvariants() {
+		return SELECTED_FIELDS_METHOD[ShowFieldsMethodsAction.ONLY_INVARIANTS];
+	}
+	
 	private boolean showOnlyNames() {
 		return SELECTED_FIELDS_METHOD[ShowFieldsMethodsAction.HIDE_PARAMETERS_AND_TYPES];
 	}
@@ -491,7 +538,8 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		        (m.isProtected() && isProtectedFieldMethodFilterActive()) ||
 		        (m.isPublic() && isPublicFieldMethodFilterActive()) ||
 		        (!m.isPrivate() && !m.isProtected() && !m.isPublic() && isDefaultFieldMethodFilterActive()) ||
-		        (!isFieldMethodFilterActive()));
+		        (!isFieldMethodFilterActive()) ||
+		        (m.hasContract() && showContracts()));
 	}
 	
 	
@@ -538,7 +586,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		
 		Label invariantLabel = new RoleFigureLabel(c.getFullName(), c.getFullName());
 		
-		invariantLabel.setIcon(IMAGE_HASH);
+		invariantLabel.setIcon(IMAGE_AT);
 		
 		return invariantLabel;
 	}	

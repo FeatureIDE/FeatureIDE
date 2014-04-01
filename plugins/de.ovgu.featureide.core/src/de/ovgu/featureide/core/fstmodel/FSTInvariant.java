@@ -81,7 +81,7 @@ public class FSTInvariant extends RoleElement {
 	@Override
 	public String getFullName() {
 		String name = body.replaceAll("  ", "").replace((char)10, ' ').replaceFirst("invariant ", "");
-		return ((name.length() > 25 ? name.substring(0, 25) + "..." : name) + " - " + beginLine);
+		return ((name.length() > 25 ? name.substring(0, 25) + "..." : name));
 	}
 
 	public boolean inRefinementGroup() {		

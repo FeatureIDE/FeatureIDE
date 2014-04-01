@@ -35,6 +35,7 @@ import org.eclipse.ui.ide.ResourceUtil;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
+import de.ovgu.featureide.core.fstmodel.FSTContractedRole;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTInvariant;
@@ -82,6 +83,9 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 					return IMAGE_FIELD_PUBLIC;
 				else 
 					return IMAGE_FIELD_DEFAULT;
+			} else if (fstModelElement instanceof FSTInvariant)
+			{
+				return IMAGE_AT;							
 			} else if (fstModelElement instanceof FSTMethod) {
 				FSTMethod method = (FSTMethod)fstModelElement;
 				if (method.hasContract())
@@ -109,7 +113,10 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 			}
 		} else if (element instanceof FSTClass) {
 			return IMAGE_CLASS;
+		} else if (element instanceof FSTContractedRole) {
+			return IMAGE_AT;	
 		}
+		
 		return null;
 	}
 

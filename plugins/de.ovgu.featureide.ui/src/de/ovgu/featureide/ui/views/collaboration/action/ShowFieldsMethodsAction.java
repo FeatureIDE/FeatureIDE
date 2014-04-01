@@ -78,6 +78,7 @@ public class ShowFieldsMethodsAction extends Action {
 				setSelected(false, selected);
 				break;
 			case ONLY_CONTRACTS:
+			case ONLY_INVARIANTS:
 			case ONLY_FIELDS:
 			case ONLY_METHODS:
 				noDeclarationTypSelected(selected);
@@ -101,10 +102,15 @@ public class ShowFieldsMethodsAction extends Action {
 	}
 	
 	private void noOnlyFieldOrMethodSelected(boolean[] selected) {
-		if(!selected[ONLY_FIELDS] && !selected[ONLY_METHODS]) {
+		if(!selected[ONLY_FIELDS] && !selected[ONLY_METHODS] ) {
 			selected[ONLY_FIELDS] = true;
 			selected[ONLY_METHODS] = true;
 		}
+		/*if(!selected[ONLY_FIELDS] && !selected[ONLY_METHODS]) {
+			selected[ONLY_FIELDS] = true;
+			selected[ONLY_METHODS] = true;
+		}*/
+		
 		selected[index] = !selected[index];
 	}
 	

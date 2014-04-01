@@ -173,7 +173,7 @@ public class FeatureModelAnalyzer {
 		return !new SatSolver(new Not(finalFormula), 1000).isSatisfiable();
 	}
 	
-	public boolean checkIfFeatureCombinationPossible(Feature a, Collection<Feature> b) throws TimeoutException 
+	public boolean checkIfFeatureCombinationNotPossible(Feature a, Collection<Feature> b) throws TimeoutException 
 	{
 		if (b.isEmpty())
 			return true;

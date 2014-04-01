@@ -35,6 +35,7 @@ import com.sun.xml.internal.bind.v2.schemagen.xmlschema.List;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
+import de.ovgu.featureide.core.fstmodel.FSTContractedRole;
 import de.ovgu.featureide.core.fstmodel.FSTInvariant;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
@@ -144,6 +145,8 @@ public class CollaborationOutlineTreeContentProvider implements
 				fields.addAll(role.getClassFragment().getFields());
 				directives.addAll(role.getDirectives());
 			}
+			
+			
 			LinkedList<RoleElement> obj = new LinkedList<RoleElement>();
 			Collections.sort(methods, methodComparator);
 			Collections.sort(fields, fieldComparator);
@@ -266,8 +269,12 @@ public class CollaborationOutlineTreeContentProvider implements
 					if (//m.isOwn(role.file) && ((FSTMethod)parentElement).isOwn(role.file) &&
 							m.getFullName().equals(((FSTMethod)parentElement).getFullName())) 
 					{
-						
-						roleList.add(role);
+						if (m.hasContract())							
+						{
+							roleList.add(new FSTContractedRole(role.getFile(),role.getFeature(), role.getFSTClass()));
+						}
+						else
+							roleList.add(role);
 						break;
 					}
 				}
@@ -283,7 +290,7 @@ public class CollaborationOutlineTreeContentProvider implements
 				for (int j = 0; j < roleList.size(); j++)
 				{
 					if (roleList.get(j).getFeature().getName().equals(featureOrder.get(i)))
-					{
+					{						
 						obj[index++] = roleList.get(j);
 						break;
 					}
