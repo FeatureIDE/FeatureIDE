@@ -1102,7 +1102,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		if (selections.length == 0) {
 			return Collections.emptyList();
 		}
-		final List<String> concreteFeatures = getOptionalConcreteFeatures();
+		final List<String> concreteFeatures = getFalseOptionalFeatures();
 		final List<String> falseOptionalFeatures = new LinkedList<String>();
 		if (selections.length != 0) {
 			for (int collumn = 0; collumn < concreteFeatures.size(); collumn++) {
@@ -1148,6 +1148,21 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			concreteFeatures.remove(feature.getName());
 		}
 		return concreteFeatures;
+	}
+	
+	private List<String> getFalseOptionalFeatures() {
+		final List<String> concreteFeatureNames = new LinkedList<String>();
+		final Collection<Feature> coreFeatures = featureModel.getAnalyser().getCoreFeatures();
+		
+		
+		for (final Feature feature : featureModel.getConcreteFeatures() ) {
+			if (!feature.isMandatory() && !feature.isAlternative() && coreFeatures.contains(feature))
+			concreteFeatureNames.add(feature.getName());
+		}
+		for (final Feature feature : featureModel.getAnalyser().getDeadFeatures()) {
+			concreteFeatureNames.remove(feature.getName());
+		}
+		return concreteFeatureNames;
 	}
 
 	/*
