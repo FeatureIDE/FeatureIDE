@@ -158,9 +158,10 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 		if (featureModel instanceof ExtendedFeatureModel) {
 			ExtendedFeatureModel extendedFeatureModel = (ExtendedFeatureModel) featureModel;
-			imported = extendedFeatureModel.hasImported();
-			inherited = extendedFeatureModel.hasInherited();
 			interfaced = extendedFeatureModel.hasInterface();
+			// interfaces hide other features
+			imported = !interfaced && extendedFeatureModel.hasImported();
+			inherited = !interfaced && extendedFeatureModel.hasInherited();
 		}
 
 		language = FMPropertyManager.getLanguage();
