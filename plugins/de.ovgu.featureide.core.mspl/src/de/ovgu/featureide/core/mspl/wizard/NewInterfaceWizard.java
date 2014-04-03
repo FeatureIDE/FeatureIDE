@@ -29,8 +29,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.wizard.Wizard;
 
-import de.ovgu.featureide.core.mspl.ImportProject;
-import de.ovgu.featureide.core.mspl.MSPLPlugin;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelWriter;
 
@@ -73,7 +71,6 @@ public class NewInterfaceWizard extends Wizard {
 
 		try {
 			// create interface
-
 			IFolder mplFolder = project.getFolder("Interfaces");
 			if (!mplFolder.exists())
 				mplFolder.create(true, true, null);
@@ -89,7 +86,6 @@ public class NewInterfaceWizard extends Wizard {
 			}
 
 			// create import velvet
-
 			IFolder importFolder = project.getFolder("MPL");
 			if (!importFolder.exists())
 				importFolder.create(true, true, null);
@@ -103,11 +99,6 @@ public class NewInterfaceWizard extends Wizard {
 				importFile.create(importContentStream, true, null);
 				importContentStream.close();
 			}
-
-			// add new imported project to the list
-			MSPLPlugin.addProject(project,
-					new ImportProject(selectProject.getSelectedProject(),
-							importFile, interfaceFile));
 		} catch (CoreException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

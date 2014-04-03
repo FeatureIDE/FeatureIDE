@@ -600,7 +600,7 @@ public class VelvetFeatureModelReader
 
 		for (final Feature feat : parent.getChildren()) {
 			if (feat.getName().equals(featureName)) {
-				// TODO @Matthias handle overwrite
+				// TODO handle overwriting feature if feature already exists
 				break;
 			}
 		}
@@ -855,8 +855,13 @@ public class VelvetFeatureModelReader
 			final String interfaceClazz = curNode.getText();
 			final String interfaceVar = nodeList.poll().getText();
 
-			if (!this.extFeatureModel.addParameter(interfaceClazz, interfaceVar)) {
-				// TODO @Matthias log an error
+			if (!this.extFeatureModel
+					.addParameter(interfaceClazz, interfaceVar)) {
+				FMCorePlugin
+						.getDefault()
+						.logWarning(
+								format("Variable name %s was already bound to another interface.",
+										interfaceVar));
 			}
 		}
 	}
