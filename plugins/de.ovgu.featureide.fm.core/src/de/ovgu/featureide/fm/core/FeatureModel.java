@@ -723,9 +723,14 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	
 	@Override
 	public String toString() {
-		String x = toString(getRoot());
-		for (Constraint c : getConstraints()) {
-			x +=c.toString() + " ";
+		String x = "";
+		try {
+			x = toString(getRoot());
+			for (Constraint c : getConstraints()) {
+				x +=c.toString() + " ";
+			}
+		} catch (Exception e) {
+			return "Empty Feature Model";
 		}
 		return x;
 	}

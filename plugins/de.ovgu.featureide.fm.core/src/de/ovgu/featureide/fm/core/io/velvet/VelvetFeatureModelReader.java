@@ -759,6 +759,7 @@ public class VelvetFeatureModelReader
 			if (root != null) {
 				this.extFeatureModel.reset();
 				this.copiedShadowModel = false;
+				this.inherited = new ExtendedFeatureModel();
 				parseModel(root);
 				parseAttributeConstraints();
 
@@ -804,7 +805,6 @@ public class VelvetFeatureModelReader
 		this.extFeatureModel.addInstanceMapping(name, model);
 	}
 
-    private boolean copiedInheritance = false;
 	private void parseModel(final Tree root)
 		throws UnsupportedModelException {
 		this.extFeatureModel.getLayout().showHiddenFeatures(true);
@@ -837,14 +837,13 @@ public class VelvetFeatureModelReader
 					break;
 			}
 		}
-		
-		if (null == this.extFeatureModel.implementsInterface() &&
-		    null != this.inherited.getRoot() &&
-		    !copiedInheritance) {
-		    System.err.println(inherited);
-		    copyChildnodes(this.extFeatureModel, this.extFeatureModel.getRoot(), this.inherited.getRoot().getChildren(), "", FeatureInheritanceModes.INHERITANCE);
-		    System.err.println(extFeatureModel);
-		    copiedInheritance=true;
+
+		if (null == this.extFeatureModel.implementsInterface()
+				&& null != this.inherited.getRoot()) {
+			copyChildnodes(this.extFeatureModel,
+					this.extFeatureModel.getRoot(), this.inherited.getRoot()
+							.getChildren(), "",
+					FeatureInheritanceModes.INHERITANCE);
 		}
 	}
 
