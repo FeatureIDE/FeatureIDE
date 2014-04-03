@@ -179,12 +179,10 @@ public class FeatureModelAnalyzer {
 			return true;
 
 		Node featureModel = NodeCreator.createNodes(fm.clone());
-		
 		boolean notValid = true;
 		for (Feature f : b)
 		{
-			Node node = new And(new And(NodeCreator.createNodes(fm.clone()), new Literal(NodeCreator.getVariable(f, fm.clone()))),  new Literal(NodeCreator.getVariable(a, fm.clone())));
-			
+			Node node = new And(new And(featureModel, new Literal(NodeCreator.getVariable(f, fm.clone()))),  new Literal(NodeCreator.getVariable(a, fm.clone())));
 			notValid &= !new SatSolver(node, 1000).isSatisfiable();
 		}
 		

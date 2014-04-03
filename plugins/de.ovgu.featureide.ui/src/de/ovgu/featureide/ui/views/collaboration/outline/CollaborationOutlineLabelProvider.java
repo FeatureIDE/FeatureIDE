@@ -277,6 +277,7 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 				}
 			}
 			if (element instanceof FSTInvariant) {
+				
 				for (FSTInvariant inv : role.getClassFragment().getInvariants()) {
 					if (inv.comparesTo(element)) {
 						item.setForeground(viewer.getControl().getDisplay()

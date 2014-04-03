@@ -133,7 +133,7 @@ public class CollaborationOutlineTreeContentProvider implements
 	{
 		if (parentElement instanceof FSTClass) 
 		{
-			// get all fields and methods
+			// get all fields, methods, directives and invariants
 			LinkedList<FSTMethod> methods = new LinkedList<FSTMethod>(); 
 			LinkedList<FSTField> fields = new LinkedList<FSTField>();
 			LinkedList<FSTInvariant> invariants = new LinkedList<FSTInvariant>();
@@ -145,7 +145,6 @@ public class CollaborationOutlineTreeContentProvider implements
 				fields.addAll(role.getClassFragment().getFields());
 				directives.addAll(role.getDirectives());
 			}
-			
 			
 			LinkedList<RoleElement> obj = new LinkedList<RoleElement>();
 			Collections.sort(methods, methodComparator);
@@ -299,16 +298,26 @@ public class CollaborationOutlineTreeContentProvider implements
 			}
 			return obj;
 		} else if (parentElement instanceof FSTInvariant) {
-			// get all the roles that belong to a field
+			// get all the roles that belong to an inavariant
 			LinkedList<FSTRole> roleList = new LinkedList<FSTRole>();
 			for (FSTRole role : ((FSTInvariant) parentElement).getRole().getFSTClass().getRoles()) 
 			{
 				for (FSTInvariant i : role.getClassFragment().getInvariants()) 
 				{
-					roleList.add(role);
+					if (((FSTInvariant)parentElement).getFullName().equals(i.getFullName()))
+					{
+						roleList.add(role);
+						break;
+					}
 				}
 			}
-			return(roleList.toArray());
+			
+			FSTRole[] obj = new FSTRole[roleList.size()];
+			for (int i = 0; i < roleList.size(); i++) {
+				obj[i] = roleList.get(i);
+			}
+			
+			return (roleList.toArray());
 		} else if (parentElement instanceof FSTField) {
 			// get all the roles that belong to a field
 			LinkedList<FSTRole> roleList = new LinkedList<FSTRole>();
@@ -359,6 +368,9 @@ public class CollaborationOutlineTreeContentProvider implements
 			return true;
 
 		if (element instanceof FSTField)
+			return true;
+		
+		if (element instanceof FSTInvariant)
 			return true;
 		
 		if (element instanceof FSTDirective) {

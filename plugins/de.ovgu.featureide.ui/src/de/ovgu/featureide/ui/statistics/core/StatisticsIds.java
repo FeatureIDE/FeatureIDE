@@ -53,7 +53,7 @@ public interface StatisticsIds {
 	public static final String NUMBER_CLASS_INVARIANT = "Number of classes with class invariants";
 	public static final String NUMBER_METHOD_METHOD_CONTRACT = "Number of methods with method contracts";
 	public static final String METHOD_CONTRACT_REFINEMENT = "Method contract refinements";
-	public static final String METHOD_CONTRACTS_FEATURE = "Method contracts in Features";
+	public static final String METHOD_CONTRACTS_FEATURE = "Method contracts in features";
 	
 	public static final HashMap<String, String> REFINEMENT_COMPOSING_MECHANISM_MAPPING = new HashMap<String, String>(){
 		private static final long serialVersionUID = 1L;

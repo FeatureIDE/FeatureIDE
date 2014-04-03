@@ -211,7 +211,8 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		if (!(role instanceof FSTArbitraryRole) && role.getDirectives().isEmpty()) {
 			int fieldCount = getCountForFieldContentCreate(tooltipContent);
 			int methodCount = getCountForMethodContentCreate(tooltipContent);
-			addLabel(new Label("Fields: " + fieldCount + " Methods: "	+ methodCount +" "));
+			Object[] invariant = createInvariantContent(tooltipContent);
+			addLabel(new Label("Fields: " + fieldCount + " Methods: "	+ methodCount + " Invariants: " + ((Integer)invariant[0]) + " "));
 		} else if (role.getClassFragment().getName().startsWith("*.")) {
 			setContentForFiles(new CompartmentFigure(), tooltipContent);
 		} else {
@@ -230,6 +231,10 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		if (role.getDirectives().isEmpty() && role.getFile() != null) {
 			int fieldCount = 0;
 			int methodCount = 0;
+			Object[] invariant = null;
+			if (showInvariants()) {
+				invariant = createInvariantContent(tooltipContent);
+			}
 			if (showOnlyFields()) {
 				fieldCount = getCountForFieldContentCreate(tooltipContent);
 			}
@@ -238,22 +243,22 @@ public class RoleFigure extends Figure implements GUIDefaults{
 				methodCount = getCountForMethodContentCreate(tooltipContent);
 			}else if (showContracts())
 			{
-				getCountForMethodContentContractCreate(tooltipContent);
+				methodCount = getCountForMethodContentContractCreate(tooltipContent);
 			}	
-			if (showInvariants()) {
-			createInvariantContent(tooltipContent);
+			
+			tooltipContent.add(new Label("Fields: " + fieldCount + " Methods: "	+ methodCount +" Invariants: " + ((Integer)invariant[0]) + " "));
+
+			if (showInvariants() && ((Integer)invariant[0]) > 0) {
+				addToToolTip(((Integer)invariant[0]), ((CompartmentFigure) invariant[1]), tooltipContent);
 			}
 			
-			tooltipContent.add(new Label("Fields: " + fieldCount + " Methods: "	+ methodCount +" "));
-
-			// draw separationline between fields and methods
-			if ((fieldCount > 0) && (methodCount > 0)) {
-				int xyValue = fieldCount * (ROLE_PREFERED_SIZE + GRIDLAYOUT_VERTICAL_SPACING) + GRIDLAYOUT_MARGIN_HEIGHT;
+			// draw separation line between fields and methods
+			if ((fieldCount + ((Integer)invariant[0]) > 0) && (methodCount > 0)) {
+				int xyValue = (fieldCount + ((Integer)invariant[0])) * (ROLE_PREFERED_SIZE + GRIDLAYOUT_VERTICAL_SPACING) + GRIDLAYOUT_MARGIN_HEIGHT;
 				panel.setBorder(new RoleFigureBorder(xyValue, xyValue));
-			}
+			}	
+			
 
-
-		
 		} else if (role.getClassFragment().getName().startsWith("*.")) {
 			setContentForFiles(tooltipContent, null);
 		} else {
@@ -337,30 +342,34 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		return methodCount;
 	}	
 
-	private int createInvariantContent(Figure tooltipContent) {
+	private Object[] createInvariantContent(Figure tooltipContent) {
 		
 		CompartmentFigure invariantFigure = new CompartmentFigure();
-		Label label = new Label(role.getFeature() + " ", IMAGE_FEATURE);
-				
-		invariantFigure.add(label);
-		/*if (isFieldMethodFilterActive()) {
-			tooltipContent.add(label);
-		} else {
-			methodFigure.add(label);
-		}*/
-		
-		int privInvariants = 0, pubInvariants = 0, instanceInvariants = 0, staticInvariants = 0;
+		invariantFigure.add(new Label(" "));
+		int invariants = 0;
 		for (FSTInvariant invariant : role.getClassFragment().getInvariants())
 		{
-			//Abfrage nach Art einbauen ...
-			privInvariants++;
 			Label invariantLabel = createInvariantLabel(invariant);
-			invariantFigure.add(invariantLabel);
-			addLabel(invariantLabel);
+			
+			invariantFigure.add(new Label(invariant.getBody()));
+			invariants++;
+			
+			if (isFieldMethodFilterActive()) {
+				addLabel(invariantLabel);
+			} else {
+				if (invariants % 25 == 0) {
+					tooltipContent.add(invariantFigure);
+					invariantFigure = new CompartmentFigure();
+					invariantFigure.add(invariantLabel);//new Label(invariant.getBody()));
+				}
+			}
 		}
 		
-			return privInvariants;
-		}
+		Object [] obj = new Object[2];
+		obj[0] = invariants;
+		obj[1] = invariantFigure;
+		return obj;
+	}
 	
 	
 	private String getClassName() {
