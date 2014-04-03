@@ -187,18 +187,25 @@
          </enablement>
       </decorator>
    </extension>
-	<extension
-   		id="de.ovgu.featureide.ui.editors.contextCompletion"
-   		name="Context View Completion"
-         point="org.eclipse.jdt.ui.javaCompletionProposalComputer">
-         <javaCompletionProposalComputer
-         	activate="false"
-         	categoryID="textual_proposals"
-         	class="de.ovgu.featureide.ui.editors.Completion">
+   
+   <extension
+	   		point="org.eclipse.jdt.ui.javaCompletionProposalComputer"
+			id="ContextViewCompletion"
+			name="ContextViewCompletion">
+		<javaCompletionProposalComputer
+			activate="false"
+			categoryID="org.eclipse.jpt.ui.ContextViewCompletion"
+			categoryId="de.ovgu.featureide.ui.mpl.ContextViewCompletion"
+			class="de.ovgu.featureide.ui.editors.Completion">
 			<partition type="__dftl_partition_content_type"/>
 			<partition type="__java_string"/>
-         </javaCompletionProposalComputer>
-     </extension>
+		</javaCompletionProposalComputer>
+		<proposalCategory
+			id="ContextViewCompletion"
+			name="tes"
+			icon="icons/featureide.gif"/>
+	</extension>     
+     
     <extension
           point="de.ovgu.featureide.ui.views.outline">
        <outline

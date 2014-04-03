@@ -100,9 +100,4 @@ public class FujiFieldSignature extends AbstractFieldSignature {
 		}
 		return true;
 	}
-
-	@Override
-	public int getLine() {
-		return 0;
-	}
 }

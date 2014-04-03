@@ -231,7 +231,7 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 				continue;
 			}
 			if (element instanceof FSTMethod) {
-				for (FSTMethod method : role.getMethods()) {
+				for (FSTMethod method : role.getClassFragment().getMethods()) {
 					if (method.comparesTo(element)) {
 						item.setForeground(viewer.getControl().getDisplay()
 								.getSystemColor(SWT.DEFAULT));
@@ -240,7 +240,7 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 				}
 			}
 			if (element instanceof FSTField) {
-				for (FSTField field : role.getFields()) {
+				for (FSTField field : role.getClassFragment().getFields()) {
 					if (field.comparesTo(element)) {
 						item.setForeground(viewer.getControl().getDisplay()
 								.getSystemColor(SWT.DEFAULT));
@@ -253,9 +253,10 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 	}
 
 
-	public boolean refreshContent(TreeItem[] items, IFile oldFile, IFile currentFile) {
+	public boolean refreshContent(IFile oldFile, IFile currentFile) {
 	if (currentFile != null && oldFile != null) {
 		/** only set the colors of the tree if the content is the same **/
+		TreeItem[] items = viewer.getTree().getItems();
 		if (currentFile.getName().equals(oldFile.getName()) && items.length > 0) {
 			TreeItem item = items[0];
 			if (item != null) {
@@ -285,9 +286,6 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 	return false;
 }
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.views.collaboration.outline.OutlineLabelProvider#init()
-	 */
 	@Override
 	public void init() {
 	}

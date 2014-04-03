@@ -43,6 +43,11 @@ public abstract class ConfigurationEditorPage extends EditorPart implements ICon
 	
 	protected boolean dirty;
 	
+	public void setDirty() {
+		dirty = true;
+		firePropertyChange(PROP_DIRTY);
+	}
+	
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.ui.editors.IConfigurationEditorPage#setIndex(int)
 	 */

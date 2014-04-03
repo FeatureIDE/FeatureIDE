@@ -101,17 +101,17 @@ public class BFeatureModelAnalyzer {
 		analyze(20);
 	}
 	
-	@Test (timeout=100) // 0.020s @ i5(3,3GHz)
+	@Test (timeout=250) // 0.020s @ i5(3,3GHz)
 	public final void BAnalyzeFeatureModel21() {
 		analyze(21);
 	}
 	
-	@Test (timeout=200) // 0.036 @ i5(3,3GHz)
+	@Test (timeout=1000) // 0.036 @ i5(3,3GHz)
 	public final void BAnalyzeFeatureModel50() {
 		analyze(50);
 	}
 	
-	@Test (timeout=1000) // 0.142s @ i5(3,3GHz)
+	@Test (timeout=2500) // 0.142s @ i5(3,3GHz)
 	public final void BAnalyzeFeatureModel100() {
 		analyze(100);
 	}

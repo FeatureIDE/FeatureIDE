@@ -63,5 +63,5 @@ public abstract class OutlineLabelProvider  implements ILabelProvider{
 	
 	public abstract String getLabelProvName();
 	
-	public abstract boolean refreshContent(TreeItem[] items, IFile oldFile, IFile currentFile);
+	public abstract boolean refreshContent(IFile oldFile, IFile currentFile); //TreeItem[] items, 
 }

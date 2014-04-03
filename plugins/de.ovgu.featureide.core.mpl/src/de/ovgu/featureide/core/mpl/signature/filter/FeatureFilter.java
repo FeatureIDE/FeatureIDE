@@ -25,7 +25,7 @@ import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature;
 public class FeatureFilter implements ISignatureFilter {
 	private final int[] featureList;
 	
-	public FeatureFilter(int[] featureList) {
+	public FeatureFilter(int... featureList) {
 		this.featureList = featureList;
 	}
 

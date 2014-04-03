@@ -27,13 +27,13 @@
 						<feature mandatory="true" name="BFS"/>
 						<feature mandatory="true" name="DFS"/>
 					</alt>
-					<alt abstract="true" hidden="true" mandatory="true" name="HiddenWgt">
+					<and abstract="true" hidden="true" mandatory="true" name="HiddenWgt">
 						<and abstract="true" mandatory="true" name="WeightOptions">
 							<feature name="WeightedWithEdges"/>
 							<feature name="WeightedWithNeighbors"/>
 							<feature name="WeightedOnlyVertices"/>
 						</and>
-					</alt>
+					</and>
 					<alt abstract="true" mandatory="true" name="Wgt">
 						<feature mandatory="true" name="Weighted"/>
 						<feature mandatory="true" name="Unweighted"/>
@@ -121,87 +121,88 @@
 				</imp>
 			</rule>
 			<rule>
-				<imp>
+				<eq>
 					<conj>
 						<var>OnlyVertices</var>
 						<var>Weighted</var>
 					</conj>
 					<var>WeightedOnlyVertices</var>
-				</imp>
+				</eq>
 			</rule>
 			<rule>
-				<imp>
+				<eq>
 					<conj>
 						<var>WithNeighbors</var>
 						<var>Weighted</var>
 					</conj>
 					<var>WeightedWithNeighbors</var>
-				</imp>
+				</eq>
 			</rule>
 			<rule>
-				<imp>
+				<eq>
 					<conj>
 						<var>WithEdges</var>
 						<var>Weighted</var>
 					</conj>
 					<var>WeightedWithEdges</var>
-				</imp>
+				</eq>
 			</rule>
 			<rule>
-				<imp>
+				<eq>
 					<conj>
 						<var>OnlyVertices</var>
 						<var>Directed</var>
 					</conj>
 					<var>DirectedOnlyVertices</var>
-				</imp>
+				</eq>
 			</rule>
 			<rule>
-				<imp>
+				<eq>
 					<conj>
 						<var>WithNeighbors</var>
 						<var>Directed</var>
 					</conj>
 					<var>DirectedWithNeighbors</var>
-				</imp>
+				</eq>
 			</rule>
 			<rule>
-				<imp>
+				<eq>
 					<conj>
 						<var>WithEdges</var>
 						<var>Directed</var>
 					</conj>
 					<var>DirectedWithEdges</var>
-				</imp>
+				</eq>
 			</rule>
 			<rule>
-				<imp>
+				<eq>
 					<conj>
 						<var>OnlyVertices</var>
 						<var>Undirected</var>
 					</conj>
 					<var>UndirectedOnlyVertices</var>
-				</imp>
+				</eq>
 			</rule>
 			<rule>
-				<imp>
+				<eq>
 					<conj>
 						<var>WithNeighbors</var>
 						<var>Undirected</var>
 					</conj>
 					<var>UndirectedWithNeighbors</var>
-				</imp>
+				</eq>
 			</rule>
 			<rule>
-				<imp>
+				<eq>
 					<conj>
 						<var>WithEdges</var>
 						<var>Undirected</var>
 					</conj>
 					<var>UndirectedWithEdges</var>
-				</imp>
+				</eq>
 			</rule>
 		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true"/>
 		<comments/>
 		<featureOrder userDefined="false"/>
 	</featureModel>

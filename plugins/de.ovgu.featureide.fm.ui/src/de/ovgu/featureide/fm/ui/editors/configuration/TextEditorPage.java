@@ -94,8 +94,7 @@ public class TextEditorPage extends TextEditor implements IConfigurationEditorPa
 		String source = new ConfigurationWriter(configurationEditor.getConfiguration())
 				.writeIntoString(configurationEditor.getFile());
 		IDocumentProvider provider = getDocumentProvider();
-		IDocument document = provider
-				.getDocument(getEditorInput());
+		IDocument document = provider.getDocument(getEditorInput());
 		if (!source.equals(document.get()))
 			document.set(source);
 	}

@@ -27,7 +27,6 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.List;
 
 import org.eclipse.core.internal.runtime.InternalPlatform;
 import org.eclipse.core.resources.ICommand;
@@ -432,15 +431,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 		 list.add(JAVA_TEMPLATE);
 		 return list;
 	}
-	
-	@Override
-	public String replaceMarker(String text, List<String> list, String packageName) {
-		if (list != null && list.contains("refines"))
-			text = text.replace(REFINES_PATTERN, "refines");
-		else
-			text = text.replace(REFINES_PATTERN + " ", "");
-		return text;
-	}
+
 	@Override
 	public boolean hasFeatureFolders() {
 		return false;

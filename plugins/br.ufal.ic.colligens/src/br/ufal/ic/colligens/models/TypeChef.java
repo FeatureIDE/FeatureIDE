@@ -47,7 +47,12 @@ public class TypeChef {
 	private boolean isFinish = false;
 	private List<FileProxy> fileProxies;
 
+	private final PlatformHeader platformHeader;
 	private IProgressMonitor monitor = null;
+
+	public TypeChef() {
+		platformHeader = new PlatformHeader();
+	}
 
 	/**
 	 * 
@@ -94,8 +99,8 @@ public class TypeChef {
 
 		ArrayList<String> paramters = new ArrayList<String>();
 
-//		paramters.add("--parserstatistics");
-		
+		// paramters.add("--parserstatistics");
+
 		paramters.add("-w");
 		paramters.add("--lexNoStdout");
 		paramters.add("--lexOutput");
@@ -110,7 +115,7 @@ public class TypeChef {
 					.getAbsolutePath()
 					+ System.getProperty("file.separator") + "cnf.fm");
 		}
-		
+
 		String typeChefPreference = Colligens.getDefault().getPreferenceStore()
 				.getString("TypeChefPreference");
 
@@ -133,39 +138,27 @@ public class TypeChef {
 					paramters.add(includes[i].getElementName());
 				}
 			} catch (CModelException e) {
-				
+
 				e.printStackTrace();
 			}
 
 			paramters.add("-h");
-			paramters.add(Colligens.getDefault().getConfigDir()
-					.getAbsolutePath()
-					+ System.getProperty("file.separator")
-					+ "projects"
-					+ System.getProperty("file.separator")
-					+ project.getProject().getName() + "_platform.h");
+			paramters.add(platformHeader.plarformAbsolutePath());
 
 		}
 
 		if (Colligens.getDefault().getPreferenceStore().getBoolean("USE_STUBS")) {
 			paramters.add("-h");
-			paramters.add(Colligens.getDefault().getConfigDir()
-					.getAbsolutePath()
-					+ System.getProperty("file.separator")
-					+ "projects"
-					+ System.getProperty("file.separator")
-					+ project.getProject().getName() + "_stubs.h");
+			paramters.add(platformHeader.stubsAbsolutePath());
 		}
 
-		
 		paramters.add(fileProxy.getFileToAnalyse());
-
 
 		frontendOptions = new FrontendOptionsWithConfigFiles();
 
-		String[] paramterArray = (String[]) paramters
+		String[] paramterArray = paramters
 				.toArray(new String[paramters.size()]);
-		
+
 		frontendOptions.parseOptions(paramterArray);
 
 		frontendOptions.setPrintToStdOutput(false);
@@ -188,25 +181,25 @@ public class TypeChef {
 
 		fileProxies = resourceToFileProxy(resourceList);
 
-		PlatformHeader platformHeader = new PlatformHeader();
-
 		try {
 			if (fileProxies.isEmpty()) {
 				monitor = null;
 				throw new TypeChefException("Not a valid file found C");
 			}
 
+			platformHeader.setProject(fileProxies.get(0).getResource()
+					.getProject().getName());
+
 			if (Colligens.getDefault().getPreferenceStore()
 					.getBoolean("USE_INCLUDES")) {
-				platformHeader.plarform(fileProxies.get(0).getResource()
-						.getProject().getName());
+				platformHeader.plarform();
+
 			}
 			if (Colligens.getDefault().getPreferenceStore()
 					.getBoolean("USE_STUBS")) {
 				// Monitor Update
 				monitorSubTask("Generating stubs...");
-				platformHeader.stubs(fileProxies.get(0).getResource()
-						.getProject().getName());
+				platformHeader.stubs();
 			}
 
 			for (FileProxy fileProxy : fileProxies) {
@@ -329,21 +322,15 @@ public class TypeChef {
 					args.add(0, "-I");
 				}
 			} catch (CModelException e) {
-				
+
 				e.printStackTrace();
 			}
-			args.add(0, Colligens.getDefault().getConfigDir().getAbsolutePath()
-					+ System.getProperty("file.separator") + "projects"
-					+ System.getProperty("file.separator")
-					+ project.getProject().getName() + "_platform.h");
+			args.add(0, platformHeader.plarformAbsolutePath());
 			args.add(0, "-h");
 		}
 
 		if (Colligens.getDefault().getPreferenceStore().getBoolean("USE_STUBS")) {
-			args.add(0, Colligens.getDefault().getConfigDir().getAbsolutePath()
-					+ System.getProperty("file.separator") + "projects"
-					+ System.getProperty("file.separator")
-					+ project.getProject().getName() + "_stubs.h");
+			args.add(0, platformHeader.stubsAbsolutePath());
 			args.add(0, "-h");
 		}
 

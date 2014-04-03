@@ -23,7 +23,6 @@ package de.ovgu.featureide.core.builder;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Vector;
 
 import org.eclipse.core.resources.IFile;
@@ -131,8 +130,8 @@ public class ComposerExtensionProxy implements IComposerExtension {
 		return composerExtensionClass.getTemplates();
 	}
 
-	public String replaceMarker(String text, List<String> list, String packageName) {
-		return composerExtensionClass.replaceMarker(text, list, packageName);
+	public String replaceSourceContentMarker(String text,  boolean refines, String packageName) {
+		return composerExtensionClass.replaceSourceContentMarker(text, refines, packageName);
 	}
 
 	public void postCompile(IResourceDelta delta, IFile file) {

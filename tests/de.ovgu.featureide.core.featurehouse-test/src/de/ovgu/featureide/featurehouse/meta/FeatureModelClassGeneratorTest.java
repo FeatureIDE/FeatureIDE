@@ -43,35 +43,35 @@ public class FeatureModelClassGeneratorTest {
 	public void testMetaJPF() {
 		FeatureModel model = init("model.xml");
 		System.out.println();
-		System.out.println("------------------------- Test JPF  ---------------------");
+		System.out.println("------------------------- Start Test JPF  ---------------------");
 		System.out.println();
 		new FeatureModelClassGenerator(model, IFeatureProject.META_MODEL_CHECKING);
 		System.out.println();
-		System.out.println("------------------------- Test JPF  ---------------------");
+		System.out.println("------------------------- End Test JPF  ---------------------");
 		System.out.println();
 	}
 	
 	@Test
 	public void testMetaKeY() {
 		System.out.println();
-		System.out.println("------------------------- Test KEY  ---------------------");
+		System.out.println("------------------------- Start Test KEY  ---------------------");
 		System.out.println();
 		FeatureModel model = init("model.xml");
 		new FeatureModelClassGenerator(model, IFeatureProject.META_THEOREM_PROVING);
 		System.out.println();
-		System.out.println("------------------------- Test KEY  ---------------------");
+		System.out.println("------------------------- End Test KEY  ---------------------");
 		System.out.println();
 	}
 	
 	@Test
 	public void testMetaBDD() {
 		System.out.println();
-		System.out.println("------------------------- Test BDD  ---------------------");
+		System.out.println("------------------------- Start Test BDD  ---------------------");
 		System.out.println();
 		FeatureModel model = init("model.xml");
 		new FeatureModelClassGenerator(model, IFeatureProject.META_MODEL_CHECKING_BDD_JAVA_JML);
 		System.out.println();
-		System.out.println("------------------------- Test BDD  ---------------------");
+		System.out.println("------------------------- End Test BDD  ---------------------");
 		System.out.println();
 	}
 	

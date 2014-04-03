@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.core;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
@@ -373,6 +374,8 @@ public class CorePlugin extends AbstractCorePlugin {
 	public static void setupFeatureProject(final IProject project,
 			String compositionToolID, final String sourcePath,
 			final String configPath, final String buildPath, boolean addCompiler) {
+		createProjectStructure(project, sourcePath, configPath, buildPath);
+		
 		if (addCompiler) {
 			try {
 				IConfigurationElement[] config = Platform.getExtensionRegistry()
@@ -389,8 +392,12 @@ public class CorePlugin extends AbstractCorePlugin {
 
 								public void run() throws Exception {
 									((IComposerExtensionClass) o).addCompiler(
-											project, sourcePath, configPath,
-											buildPath);
+											project, sourcePath, configPath, buildPath);
+
+									final String path = project.getFolder(configPath).getRawLocation()
+											+ "/default." + ((IComposerExtensionClass) o).getConfigurationExtension();
+									new File(path).createNewFile();
+									project.getFolder(configPath).refreshLocal(IResource.DEPTH_INFINITE, null);
 								}
 							};
 							SafeRunner.run(runnable);
@@ -410,7 +417,6 @@ public class CorePlugin extends AbstractCorePlugin {
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError("Could not set persistant property", e);
 		}
-		createProjectStructure(project, sourcePath, configPath, buildPath);
 		addFeatureNatureToProject(project);
 	}
 

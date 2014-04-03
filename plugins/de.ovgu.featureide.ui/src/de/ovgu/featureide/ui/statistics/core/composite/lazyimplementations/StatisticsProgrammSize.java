@@ -3,6 +3,7 @@ package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 import java.util.HashMap;
 
 import de.ovgu.featureide.core.fstmodel.FSTClass;
+import de.ovgu.featureide.core.fstmodel.FSTClassFragment;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
@@ -42,19 +43,20 @@ public class StatisticsProgrammSize extends LazyParent {
 
 		for (FSTClass class_ : fstModel.getClasses()) {
 			for (FSTRole role : class_.getRoles()) {
-				String packageName = role.getPackage();
+				FSTClassFragment classFragment = role.getClassFragment();
+				String packageName = classFragment.getPackage();
 				String qualifiedPackageName = (packageName == null) ? "(default package)"
 						: packageName;
 
-				String roleName = role.getName().endsWith(".java") ? role
-						.getName().substring(0, role.getName().length() - 5)
-						: role.getName();
+				String roleName = classFragment.getName().endsWith(".java") ? classFragment
+						.getName().substring(0, classFragment.getName().length() - 5)
+						: classFragment.getName();
 				String qualifiedRoleName = qualifiedPackageName + "."
 						+ roleName;
 
 				String qualifier = qualifiedRoleName + "#";
 
-				for (FSTMethod method : role.getMethods()) {
+				for (FSTMethod method : classFragment.getMethods()) {
 					String fullName = qualifier + method.getFullName();
 					methodMap.put(
 							fullName,
@@ -62,7 +64,7 @@ public class StatisticsProgrammSize extends LazyParent {
 									.get(fullName) + 1 : 1);
 				}
 
-				for (FSTField field : role.getFields()) {
+				for (FSTField field : classFragment.getFields()) {
 					String fullName = qualifier + field.getFullName();
 					fieldMap.put(
 							fullName,

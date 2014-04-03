@@ -22,6 +22,7 @@ package de.ovgu.featureide.featurehouse.meta.featuremodel;
 
 import java.util.Locale;
 
+import org.prop4j.Node;
 import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -55,8 +56,8 @@ public class FeatureModelKeY implements IFeatureModelClass {
 	
 	@Override
 	public String getFeatureFields() {
-		StringBuffer fields = new StringBuffer();
-		for (String f : featureModel.getFeatureNames()) {
+		final StringBuilder fields = new StringBuilder();
+		for (final String f : featureModel.getFeatureNames()) {
 			fields.append(FIELD_MODIFIER);
 			fields.append(f.toLowerCase(Locale.ENGLISH));
 			fields.append(";\r\n");
@@ -66,7 +67,12 @@ public class FeatureModelKeY implements IFeatureModelClass {
 
 	@Override
 	public String getFormula() {
-		return VALID + "return " + NodeCreator.createNodes(featureModel.clone()).toCNF().toString(NodeWriter.javaSymbols).toLowerCase(Locale.ENGLISH) + ";\r\n\t}\r\n";
+		final Node nodes = NodeCreator.createNodes(featureModel.clone()).eliminateNotSupportedSymbols(NodeWriter.javaSymbols);
+		String formula = nodes.toString(NodeWriter.javaSymbols).toLowerCase(Locale.ENGLISH);
+		if (formula.contains("  &&  true  &&  ! false")) {
+			formula = formula.substring(0, formula.indexOf("  &&  true  &&  ! false"));
+		}
+		return VALID + "return " + formula + ";\r\n\t}\r\n";
 	}
 
 	@Override

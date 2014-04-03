@@ -127,6 +127,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 			+ ".views.collaboration.outline.CollaborationOutline";
 	
 	private ArrayList<IAction> actionOfProv = new ArrayList<IAction>();
+	private boolean providerChanged = false;
 
 	private IPartListener editorListener = new IPartListener() {
 
@@ -242,7 +243,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		private int getFieldLine(IFile iFile, FSTField field) {
 			for (FSTRole r : field.getRole().getFSTClass().getRoles()) {
 				if (r.getFile().equals(iFile)) {
-					for (FSTField f : r.getFields()) {
+					for (FSTField f : r.getClassFragment().getFields()) {
 						if (f.comparesTo(field)) {
 							return f.getLine();
 						}
@@ -255,7 +256,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		private int getMethodLine(IFile iFile, FSTMethod meth) {
 			for (FSTRole r : meth.getRole().getFSTClass().getRoles()) {
 				if (r.getFile().equals(iFile)) {
-					for (FSTMethod m : r.getMethods()) {
+					for (FSTMethod m : r.getClassFragment().getMethods()) {
 						if (m.comparesTo(meth)) {
 							return m.getLine();
 						}
@@ -305,9 +306,12 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 
 		ProviderAction provAct = new ProviderAction(labelProv.getLabelProvName(), labelProv.getOutlineType(), contentProv, labelProv) {
 			public void run(){
-				curContentProvider = this.getTreeContentProvider();
-				curClabel = this.getLabelProvider();
-//				update(iFile);
+				if(curContentProvider != this.getTreeContentProvider() || curClabel != this.getLabelProvider()){		
+					curContentProvider = this.getTreeContentProvider();
+					curClabel = this.getLabelProvider();
+					providerChanged = true;
+					update(iFile);
+				}
 			}
 		};
 		actionOfProv.add(provAct);
@@ -475,9 +479,12 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 			Control control = viewer.getControl();
 			if (control != null && !control.isDisposed()) {
 
-				if (refreshContent(iFile, iFile2)) {
+				if (!providerChanged && refreshContent(iFile, iFile2)) {
 					return;
+				}else{
+					providerChanged = false;
 				}
+				
 				iFile = iFile2;
 
 				if (uiJob == null || uiJob.getState() == Job.NONE) {
@@ -558,7 +565,8 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 	 */
 	private boolean refreshContent(IFile oldFile, IFile currentFile) {
 		if(viewer.getLabelProvider() instanceof OutlineLabelProvider){
-			return ((OutlineLabelProvider) viewer.getLabelProvider()).refreshContent(viewer.getTree().getItems(), oldFile, currentFile);
+			OutlineLabelProvider lp = (OutlineLabelProvider) viewer.getLabelProvider();
+			return lp.refreshContent(oldFile, currentFile);
 		}
 		return false;
 	}
@@ -735,7 +743,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		}
 
 		@Override
-		public boolean refreshContent(TreeItem[] items, IFile oldFile, IFile currentFile) {
+		public boolean refreshContent(IFile oldFile, IFile currentFile) {
 			return false;
 		}
 

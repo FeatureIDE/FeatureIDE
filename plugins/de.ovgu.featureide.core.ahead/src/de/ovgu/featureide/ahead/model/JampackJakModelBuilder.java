@@ -104,13 +104,13 @@ public class JampackJakModelBuilder extends AbstractJakModelBuilder<AST_Program>
 			for (c.First(ownASTs[i]); c.More(); c.PlusPlus()) {
 				if (c.node instanceof MethodDcl) {
 					FSTMethod method = getMethod((MethodDcl) c.node);
-					role.add(method);
+					role.getClassFragment().add(method);
 					c.Sibling();
 				}
 				if (c.node instanceof FldVarDec) {
 					for (FSTField field : getFields((FldVarDec) c.node)) {
 						field.setLine(getLineNumber(c.node));
-						role.add(field);
+						role.getClassFragment().add(field);
 					}
 					c.Sibling();
 				}

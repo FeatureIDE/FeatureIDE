@@ -32,35 +32,10 @@ import de.ovgu.featureide.core.mpl.InterfaceProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.io.IOConstants;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature;
+import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature.FeatureData;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 public class ContextFilter implements ISignatureFilter {
-//	private class ka {
-//		private final byte[] features;
-//		
-//		public ka() {
-//			features = new byte[selcetedFeatures.length];
-//			for (int i = 0; i < selcetedFeatures.length; i++) {
-//				features[i] = (byte) (selcetedFeatures[i] ? 1 : -1);
-//			}
-//		}
-//		
-//		public void set(int id) {
-//			features[id] = 0;
-//		}
-//
-//		@Override
-//		public boolean equals(Object obj) {
-//			return Arrays.equals(features, ((ka) obj).features);
-//		}
-//
-//		@Override
-//		public int hashCode() {
-//			return Arrays.hashCode(features);
-//		}
-//	}
-	
-//	private final HashMap<ka, Boolean> satMap = new HashMap<ka, Boolean>();
 	
 	private final InterfaceProject interfaceProject;
 	private final Node fmNode;
@@ -88,9 +63,11 @@ public class ContextFilter implements ISignatureFilter {
 		solver = new SatSolver(new And(fixClauses), 2000);
 		
 		for (Literal literal : solver.knownValues()) {
-			int id = interfaceProject.getFeatureID(literal.var.toString());
-			if (id > -1) {
-				selcetedFeatures[id] = true;
+			if (literal.positive) {
+				int id = interfaceProject.getFeatureID(literal.var.toString());
+				if (id > -1) {
+					selcetedFeatures[id] = true;
+				}
 			}
 		}
 	}
@@ -101,25 +78,17 @@ public class ContextFilter implements ISignatureFilter {
 
 	@Override
 	public boolean isValid(AbstractSignature signature) {
-		int[] ids = signature.getFeatureIDs();
-		Node[] cxy = new Node[ids.length];
-//		ka a = new ka();
+		FeatureData[] ids = signature.getFeatureData();
+		Node[] negativeLiterals = new Node[ids.length];
 		for (int i = 0; i < ids.length; ++i) {
-			int id = ids[i];
+			int id = ids[i].getId();
 			if (selcetedFeatures[id]) {
 				return true;
 			} 
-			cxy[i] = new Literal(interfaceProject.getFeatureName(id), false);
-//			a.set(id);
+			negativeLiterals[i] = new Literal(interfaceProject.getFeatureName(id), false);
 		}
 		try {
-//			Boolean sat = satMap.get(a);
-//			if (sat == null)  {
-//				sat = !solver.isSatisfiable(cxy);
-//				satMap.put(a, sat);
-//			}
-//			return sat;
-			return !solver.isSatisfiable(cxy);
+			return !solver.isSatisfiable(negativeLiterals);
 		} catch (TimeoutException e) {
 			MPLPlugin.getDefault().logError(e);
 			return false;

@@ -54,25 +54,26 @@ public class ContextFilter2 implements ISignatureFilter {
 
 	@Override
 	public boolean isValid(AbstractSignature signature) {	
-		int[] features = signature.getFeatureIDs();
-		Boolean sat = satMap.get(features);
-		if (sat == null) {
-			Node[] clauses = new Node[features.length + fixClauses.length];
-			int j = 0;
-			for (int featureID : features) {
-				clauses[j++] = new Literal(interfaceProject.getFeatureName(featureID), false);
-			}
-			System.arraycopy(fixClauses, 0, clauses, j, fixClauses.length);
-			
-			SatSolver solver = new SatSolver(new And(clauses), 2006);
-			try {
-				sat = !solver.isSatisfiable();						
-				satMap.put(features, sat);
-			} catch (TimeoutException e) {
-				MPLPlugin.getDefault().logError(e);
-			}
-		}
-		return sat != null && sat;
+//		int[] features = signature.getFeatureIDs();
+//		Boolean sat = satMap.get(features);
+//		if (sat == null) {
+//			Node[] clauses = new Node[features.length + fixClauses.length];
+//			int j = 0;
+//			for (int featureID : features) {
+//				clauses[j++] = new Literal(interfaceProject.getFeatureName(featureID), false);
+//			}
+//			System.arraycopy(fixClauses, 0, clauses, j, fixClauses.length);
+//			
+//			SatSolver solver = new SatSolver(new And(clauses), 2006);
+//			try {
+//				sat = !solver.isSatisfiable();						
+//				satMap.put(features, sat);
+//			} catch (TimeoutException e) {
+//				MPLPlugin.getDefault().logError(e);
+//			}
+//		}
+//		return sat != null && sat;
+		return false;
 	}
 
 }

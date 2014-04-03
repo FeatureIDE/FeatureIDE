@@ -33,19 +33,20 @@ import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
  * 
  * @author Jens Meinicke
  */
-public class FSTRole extends FSTClassFragment {
-	private LinkedList<FSTDirective> directives = new LinkedList<FSTDirective>();
+public class FSTRole {
+	private final LinkedList<FSTDirective> directives = new LinkedList<FSTDirective>();
+	private final FSTClassFragment classFragment;
 	
 	private FSTFeature feature;
 	private FSTClass fstClass;
 	private IFile file;
-		
+	
 	public FSTRole(IFile file, FSTFeature feature, FSTClass fstClass) {
-		super(fstClass.getName());
 		this.feature = feature;
 		this.fstClass = fstClass;
 		this.file = file;
-		setRole(this);
+		this.classFragment = new FSTClassFragment(fstClass.getName());
+		this.classFragment.setRole(this);
 	}
 
 	public void add(FSTDirective directive) {
@@ -68,6 +69,10 @@ public class FSTRole extends FSTClassFragment {
 	public void setFile(IFile file) {
 		this.file = file;
 	}
+	
+	public FSTClassFragment getClassFragment() {
+		return classFragment;
+	}
 
 	@Nonnull
 	public LinkedList<FSTDirective> getDirectives() {
@@ -81,11 +86,11 @@ public class FSTRole extends FSTClassFragment {
 		builder.append(" @ ");
 		builder.append(feature.getName());
 		builder.append("\n");
-		for (FSTField f : fields) {
+		for (FSTField f : classFragment.fields) {
 			builder.append(f.getName());
 			builder.append("\n");
 		}
-		for (FSTMethod m : methods) {
+		for (FSTMethod m : classFragment.methods) {
 			builder.append(m.getName());
 			builder.append("\n");
 		}

@@ -42,11 +42,11 @@ public class NodeWriter {
 	 */
 	public final static String[] shortSymbols = new String[] {"-", " & ", " | ", " => ", " <=> ", ", ", "choose", "atleast", "atmost"};
 	
-	private final static String noJavaSymbol = " no symbol ";
+	public final static String noSymbol = " no symbol ";
 	/**
 	 * java textual representation
 	 */
-	public final static String[] javaSymbols = new String[] {"!", " && ", " || ", noJavaSymbol, " == ", noJavaSymbol, noJavaSymbol, noJavaSymbol, noJavaSymbol};
+	public final static String[] javaSymbols = new String[] {"!", " && ", " || ", noSymbol, " == ", noSymbol, noSymbol, noSymbol, noSymbol};
 	
 	/**
 	 * Converts the given node into a short textual representation.

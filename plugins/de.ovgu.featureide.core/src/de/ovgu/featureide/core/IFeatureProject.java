@@ -31,7 +31,6 @@ import org.eclipse.core.runtime.QualifiedName;
 
 import de.ovgu.featureide.core.builder.IComposerExtension;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
-import de.ovgu.featureide.core.projectstructure.trees.ProjectTree;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
 
@@ -140,17 +139,6 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	FeatureModel getFeatureModel();
 	
 	IFile getModelFile();
-	
-	/**
-	 * Gets the Project Tree for this FeatureIDE Project
-	 * @return the Project Tree representing this Feature Project
-	 */
-	ProjectTree getProjectTree();
-	
-	/**
-	 * Sets the Project Tree for this FeatureIDE Project
-	 */
-	void setProjectTree(ProjectTree projectTree);
 	
 	/**
 	 * Returns the ID of the assigned composer
