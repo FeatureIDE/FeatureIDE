@@ -87,6 +87,7 @@ public class VelvetFeatureModelReader
 	protected ExtendedFeatureModel extFeatureModel;
 	private final LinkedList<Feature> parentStack = new LinkedList<Feature>();;
 	private boolean copiedShadowModel = false;
+	private ExtendedFeatureModel inherited = new ExtendedFeatureModel();
 
 	private final LinkedList<Tree> atrributeConstraintNodes = new LinkedList<Tree>();
 	private static final int[] binaryOperators = {VelvetParser.OP_OR, VelvetParser.OP_AND, VelvetParser.OP_XOR,
@@ -709,8 +710,6 @@ public class VelvetFeatureModelReader
 			FMCorePlugin.getDefault().logError(e);
 		}
 	}
-
-    private ExtendedFeatureModel inherited = new ExtendedFeatureModel();
 
 	private void parseInheritance(final Tree root) {
 		// TODO maybe add a search path for imports.
