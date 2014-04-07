@@ -137,6 +137,8 @@ abstract public class FeatureDiagramLayoutManager{
 		for(Feature feature : LayoutableFeature.
 				convertFeatures(featureModel.getFeatures(), showHidden)){
 			Point temp = FeatureUIHelper.getLocation(feature);
+			if (null == temp)
+				continue;
 			Dimension tempSize = FeatureUIHelper.getSize(feature);
 
 			if(temp.x < min.x) 
@@ -156,6 +158,8 @@ abstract public class FeatureDiagramLayoutManager{
 		 */
 		for(Constraint constraint: featureModel.getConstraints()){
 			Point temp = FeatureUIHelper.getLocation(constraint);
+			if (null == temp)
+				continue;
 			Dimension tempSize = FeatureUIHelper.getSize(constraint);
 			if(temp.x < min.x) 
 				min.x = temp.x;
@@ -179,6 +183,8 @@ abstract public class FeatureDiagramLayoutManager{
 		for(Feature feature : LayoutableFeature.
 				convertFeatures(featureModel.getFeatures(), showHidden)){
 			Point tempLocation = FeatureUIHelper.getLocation(feature);
+			if (null == tempLocation)
+				continue;
 			Dimension tempSize = FeatureUIHelper.getSize(feature);
 			if((tempLocation.x+tempSize.width) 
 						> (max.x - legendSize.width - FMPropertyManager.getFeatureSpaceX())
@@ -208,6 +214,8 @@ abstract public class FeatureDiagramLayoutManager{
 		if(topRight||topLeft||botLeft||botRight){
 			for(Constraint constraint: featureModel.getConstraints()){
 				Point tempLocation = FeatureUIHelper.getLocation(constraint);
+				if (null == tempLocation)
+					continue;
 				Dimension tempSize = FeatureUIHelper.getSize(constraint);
 				if((tempLocation.x+tempSize.width) 
 						> (max.x - legendSize.width - FMPropertyManager.getFeatureSpaceX())
