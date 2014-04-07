@@ -219,24 +219,23 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 					public void selectionChanged(SelectionChangedEvent event) {
 
 						if (event.getSelection() instanceof IStructuredSelection) {
-							IStructuredSelection iss = (IStructuredSelection) event
-									.getSelection();
-
-							ProjectRecord tmpRecord = (ProjectRecord) iss
-									.getFirstElement();
-							descBox.setText(tmpRecord.getDescription());
-
-							if (tmpRecord.hasWarnings()) {
-								setMessage(tmpRecord.getWarningText(), WARNING);
-							} else {
-								setMessage("");
+							IStructuredSelection iss = (IStructuredSelection) event.getSelection();
+							if (iss != null) {
+								ProjectRecord tmpRecord = (ProjectRecord) iss.getFirstElement();
+								
+								if (tmpRecord != null) {
+									descBox.setText(tmpRecord.getDescription());
+									
+									if (tmpRecord.hasWarnings()) {
+										setMessage(tmpRecord.getWarningText(), WARNING);
+									} else {
+										setMessage("");
+									}
+								}
 							}
-
 						}
-
 					}
 				}
-
 				);
 
 		projectsList.setInput(this);
