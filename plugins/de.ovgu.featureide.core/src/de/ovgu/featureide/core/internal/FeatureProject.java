@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.core.internal;
 
-import guidsl.SATSolver;
-
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;

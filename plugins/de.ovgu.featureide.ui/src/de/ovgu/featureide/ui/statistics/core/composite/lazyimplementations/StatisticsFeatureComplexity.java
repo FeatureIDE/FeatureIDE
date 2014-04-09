@@ -1,14 +1,10 @@
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
-import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes.HashMapNode;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.core.fstmodel.FSTClass;
-import de.ovgu.featureide.core.fstmodel.FSTModel;
-import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;

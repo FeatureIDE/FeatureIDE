@@ -22,8 +22,8 @@ package de.ovgu.featureide.fm.core;
 
 import java.util.LinkedList;
 
-import de.ovgu.featureide.fm.core.constraint.FeatureAttributeMap;
 import de.ovgu.featureide.fm.core.constraint.Equation;
+import de.ovgu.featureide.fm.core.constraint.FeatureAttributeMap;
 
 /**
  * Adds attributes and attribute constraints to a feature model. 

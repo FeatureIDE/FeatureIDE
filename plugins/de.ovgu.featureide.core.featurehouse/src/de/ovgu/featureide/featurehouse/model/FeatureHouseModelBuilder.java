@@ -21,8 +21,6 @@
 package de.ovgu.featureide.featurehouse.model;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;

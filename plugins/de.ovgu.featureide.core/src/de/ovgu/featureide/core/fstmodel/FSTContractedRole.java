@@ -36,7 +36,6 @@ public class FSTContractedRole extends FSTRole {
 	 */
 	public FSTContractedRole(IFile file, FSTFeature feature, FSTClass fstClass) {
 		super(file, feature, fstClass);
-		// TODO Auto-generated constructor stub
 	}
 
 }

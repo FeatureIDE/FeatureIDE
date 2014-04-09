@@ -45,12 +45,12 @@ public class FSTClass {
 	public String getName() {
 		return name;
 	}
-	
+
 	@Nonnull
 	public LinkedList<FSTRole> getRoles() {
 		return new LinkedList<FSTRole>(roles.values());
 	}
-	
+
 	public void addRole(String featureName, FSTRole role) {
 		roles.put(featureName, role);
 	}
@@ -58,14 +58,12 @@ public class FSTClass {
 	public FSTRole getRole(String featureName) {
 		return roles.get(featureName);
 	}
-	
-	public boolean hasInvariants()
-	{
+
+	public boolean hasInvariants() {
 		return invariants.size() > 0;
 	}
-	
-	public LinkedList<String> getInvariants()
-	{
+
+	public LinkedList<String> getInvariants() {
 		return invariants;
 	}
 }

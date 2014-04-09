@@ -20,41 +20,34 @@
  */
 package de.ovgu.featureide.core.fstmodel;
 
-
 /**
- * description	
+ * description
  * 
  * @author Stefan Krueger
- * @author Florian Proksch	
+ * @author Florian Proksch
  */
 public class FSTInvariant extends RoleElement {
-	
-	public enum RoleTypes
-	{
-		ROLE_TYPE_INVARIANT,
-		MISC
+
+	public enum RoleTypes {
+		ROLE_TYPE_INVARIANT, MISC
 	}
-	
-	//private LinkedList<String> parameterTypes;
+
 	RoleTypes parentRoleType;
-	
 
 	/**
 	 * @return the parentRoleType
 	 */
-	/*public RoleTypes getParentRoleType() {
-		return parentRoleType;
-	}*/
+	/*
+	 * public RoleTypes getParentRoleType() { return parentRoleType; }
+	 */
 
 	/**
 	 * @param name
 	 * @param type
 	 * @param modifiers
 	 */
-	public FSTInvariant(String name,  String body) {
+	public FSTInvariant(String name, String body) {
 		super(name, "", "", body, -1, -1);
-		//parentRoleType = roleType;
-		//this.parameterTypes = parameterTypes;
 	}
 
 	/**
@@ -65,26 +58,22 @@ public class FSTInvariant extends RoleElement {
 	 * @param beginLine
 	 * @param endLine
 	 */
-	
+
 	public FSTInvariant(String name, String body, int beginLine, int endLine) {
 		super(name, "", "", body, beginLine, endLine);
-		//parentRoleType = roleType;
-		//this.parameterTypes = parameterTypes;
 	}
 
-
-	public int getUniqueIdentifier()
-	{
+	public int getUniqueIdentifier() {
 		return (body + beginLine + getFile()).hashCode();
 	}
-	
+
 	@Override
 	public String getFullName() {
-		String name = body.replaceAll("  ", "").replace((char)10, ' ').replaceFirst("invariant ", "");
+		String name = body.replaceAll("  ", "").replace((char) 10, ' ').replaceFirst("invariant ", "");
 		return ((name.length() > 25 ? name.substring(0, 25) + "..." : name));
 	}
 
-	public boolean inRefinementGroup() {		
+	public boolean inRefinementGroup() {
 		for (FSTRole role : getRole().getFSTClass().getRoles()) {
 			if (role.getFeature().equals(getRole().getFeature())) {
 				continue;
@@ -97,6 +86,5 @@ public class FSTInvariant extends RoleElement {
 		}
 		return false;
 	}
-	
-	
+
 }
