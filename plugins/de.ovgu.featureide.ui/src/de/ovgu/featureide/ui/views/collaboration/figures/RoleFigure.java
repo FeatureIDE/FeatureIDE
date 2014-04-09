@@ -246,17 +246,21 @@ public class RoleFigure extends Figure implements GUIDefaults{
 				methodCount = getCountForMethodContentContractCreate(tooltipContent);
 			}	
 			
-			tooltipContent.add(new Label("Fields: " + fieldCount + " Methods: "	+ methodCount +" Invariants: " + ((Integer)invariant[0]) + " "));
+			tooltipContent.add(new Label("Fields: " + fieldCount + " Methods: "	+ methodCount +" Invariants: " + ((invariant != null) ?((Integer)invariant[0]) : 0) + " "));
 
-			if (showInvariants() && ((Integer)invariant[0]) > 0) {
+			if (showInvariants() && invariant != null && ((Integer)invariant[0]) > 0) {
 				addToToolTip(((Integer)invariant[0]), ((CompartmentFigure) invariant[1]), tooltipContent);
 			}
 			
 			// draw separation line between fields and methods
-			if ((fieldCount + ((Integer)invariant[0]) > 0) && (methodCount > 0)) {
+			if (invariant != null && (fieldCount + ((Integer)invariant[0]) > 0) && (methodCount > 0)) {
 				int xyValue = (fieldCount + ((Integer)invariant[0])) * (ROLE_PREFERED_SIZE + GRIDLAYOUT_VERTICAL_SPACING) + GRIDLAYOUT_MARGIN_HEIGHT;
 				panel.setBorder(new RoleFigureBorder(xyValue, xyValue));
-			}	
+			} else 	if (fieldCount > 0 && (methodCount > 0))
+			{
+				int xyValue = fieldCount * (ROLE_PREFERED_SIZE + GRIDLAYOUT_VERTICAL_SPACING) + GRIDLAYOUT_MARGIN_HEIGHT;
+				panel.setBorder(new RoleFigureBorder(xyValue, xyValue));
+			}
 			
 
 		} else if (role.getClassFragment().getName().startsWith("*.")) {
