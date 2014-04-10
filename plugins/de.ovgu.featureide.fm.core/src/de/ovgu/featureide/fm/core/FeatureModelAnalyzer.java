@@ -173,20 +173,17 @@ public class FeatureModelAnalyzer {
 		return !new SatSolver(new Not(finalFormula), 1000).isSatisfiable();
 	}
 	
-	public boolean checkIfFeatureCombinationNotPossible(Feature a, Collection<Feature> b) throws TimeoutException 
-	{
+	public boolean checkIfFeatureCombinationNotPossible(Feature a, Collection<Feature> b) throws TimeoutException {
 		if (b.isEmpty())
 			return true;
 
 		Node featureModel = NodeCreator.createNodes(fm.clone());
 		boolean notValid = true;
-		for (Feature f : b)
-		{
-			Node node = new And(new And(featureModel, new Literal(NodeCreator.getVariable(f, fm.clone()))),  new Literal(NodeCreator.getVariable(a, fm.clone())));
+		for (Feature f : b) {
+			Node node = new And(new And(featureModel, new Literal(NodeCreator.getVariable(f, fm.clone()))),  
+					new Literal(NodeCreator.getVariable(a, fm.clone())));
 			notValid &= !new SatSolver(node, 1000).isSatisfiable();
 		}
-		
-		
 		return notValid;
 	}
 	
