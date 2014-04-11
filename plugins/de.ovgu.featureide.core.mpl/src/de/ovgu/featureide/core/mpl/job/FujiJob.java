@@ -225,7 +225,9 @@ public class FujiJob extends AMonitorJob {
 									modifierString, typeString, pckg, typeDecl,
 									importList),
 							interfaceProject.getFeatureID(featurename), Symbol.getLine(typeDecl.getStart()));
-					// curClassSig.addFeature(featurename);
+					for (ImportDecl importDecl : importList) {
+						curClassSig.addImport(importDecl.toString());
+					}
 
 					for (BodyDecl bodyDecl : typeDecl.getBodyDeclList()) {
 						typeDecl.getModifiers();
