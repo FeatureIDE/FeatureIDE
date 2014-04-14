@@ -197,6 +197,53 @@ public class VelvetFeatureModelReader
 	}
 
 	/**
+	 * Search for the right File to include etc. The following search path is
+	 * used:
+	 * 
+	 * <ol>
+	 * <li>./NAME.velvet</li>
+	 * <li>./NAME.xml</li>
+	 * <li>./MPL/NAME.velvet</li>
+	 * <li>./Interfaces/NAME.velvet</li>
+	 * <li>/NAME_AS_PROJECT/model.xml</li>
+	 * </ol>
+	 * 
+	 * @param name
+	 *            The name of file or project
+	 * @return File object if found else null
+	 */
+	protected File getExternalFile(String name) {
+		IProject project = getProject();
+
+		if (project != null) {
+			String[] paths = { "%s.velvet", "%s.xml", "MPL/%s.velvet",
+					"Interfaces/%s.velvet" };
+
+			for (String path : paths) {
+				IResource res = project.findMember(format(path, name));
+				if (res != null)
+					return res.getLocation().toFile();
+			}
+		} else {
+			FMCorePlugin.getDefault().logError(
+					new FileNotFoundException(
+							"Could not get current project of feature model."));
+		}
+
+		// if could not get current project or could not find file in current
+		// project assume the name is the prject name
+		project = ResourcesPlugin.getWorkspace().getRoot().getProject(name);
+
+		if (!project.exists()) {
+			FMCorePlugin.getDefault().logWarning(
+					format("Project %s is missing.", name));
+			return null;
+		}
+
+		return project.getFile("model.xml").getLocation().toFile();
+	}
+
+	/**
 	 * Returns the eclipse project of the file with the textual representation
 	 * of the feature model
 	 * 
