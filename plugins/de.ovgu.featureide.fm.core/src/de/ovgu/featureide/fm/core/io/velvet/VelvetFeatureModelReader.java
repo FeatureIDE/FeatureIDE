@@ -260,8 +260,6 @@ public class VelvetFeatureModelReader
 	 * @return the feature model or null if error occurred
 	 */
 	static protected FeatureModel readExternalModelFile(File file) {
-		System.err.println("read external: " + file.getAbsolutePath());
-		
 		if (!file.exists() || !file.canRead())
 			return null;
 
