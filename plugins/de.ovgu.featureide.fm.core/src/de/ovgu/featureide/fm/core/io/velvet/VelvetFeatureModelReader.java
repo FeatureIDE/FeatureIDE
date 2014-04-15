@@ -65,8 +65,8 @@ import de.ovgu.featureide.fm.core.constraint.RelationOperator;
 import de.ovgu.featureide.fm.core.constraint.WeightedTerm;
 import de.ovgu.featureide.fm.core.constraint.analysis.ExtendedFeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
-import de.ovgu.featureide.fm.core.io.FileLoader;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 
 /**
  * Parses a feature model in Velvet syntax.
@@ -212,7 +212,7 @@ public class VelvetFeatureModelReader
 	 *            The name of file or project
 	 * @return File object if found else null
 	 */
-	protected File getExternalFile(String name) {
+	protected File getExternalModelFile(String name) {
 		IProject project = getProject();
 
 		if (project != null) {
@@ -221,8 +221,12 @@ public class VelvetFeatureModelReader
 
 			for (String path : paths) {
 				IResource res = project.findMember(format(path, name));
-				if (res != null)
-					return res.getLocation().toFile();
+				if (res != null) {
+					File f = res.getLocation().toFile();
+					if (f == null || f.equals(featureModelFile))
+						continue;
+					return f;
+				}
 			}
 		} else {
 			FMCorePlugin.getDefault().logError(
@@ -231,7 +235,7 @@ public class VelvetFeatureModelReader
 		}
 
 		// if could not get current project or could not find file in current
-		// project assume the name is the prject name
+		// project assume the name is the project name
 		project = ResourcesPlugin.getWorkspace().getRoot().getProject(name);
 
 		if (!project.exists()) {
@@ -240,7 +244,49 @@ public class VelvetFeatureModelReader
 			return null;
 		}
 
-		return project.getFile("model.xml").getLocation().toFile();
+		File f = project.getFile("model.xml").getLocation().toFile();
+
+		if (f == null || f.equals(featureModelFile))
+			return null;
+
+		return f;
+	}
+
+	/**
+	 * Reads external model with the right FeatureModelReader.
+	 * 
+	 * @param file
+	 *            file of feature model
+	 * @return the feature model or null if error occurred
+	 */
+	static protected FeatureModel readExternalModelFile(File file) {
+		System.err.println("read external: " + file.getAbsolutePath());
+		
+		if (!file.exists() || !file.canRead())
+			return null;
+
+		try {
+			if (file.getName().endsWith(".xml")) {
+				FeatureModel fm = new FeatureModel();
+				XmlFeatureModelReader reader = new XmlFeatureModelReader(fm);
+				reader.readFromFile(file);
+				return fm;
+			} else if (file.getName().endsWith(".velvet")) {
+				ExtendedFeatureModel fm = new ExtendedFeatureModel();
+				VelvetFeatureModelReader reader = new VelvetFeatureModelReader(
+						fm);
+				reader.readFromFile(file);
+				return fm;
+			} else {
+				return null;
+			}
+		} catch (FileNotFoundException e) {
+			FMCorePlugin.getDefault().logError(e);
+			return null;
+		} catch (UnsupportedModelException e) {
+			FMCorePlugin.getDefault().logError(e);
+			return null;
+		}
 	}
 
 	/**
@@ -732,54 +778,39 @@ public class VelvetFeatureModelReader
 	private void parseImplements(final Tree root) {
 		final String interfaceName = root.getChild(0).getText();
 		this.extFeatureModel.setInterface(interfaceName);
-		final ExtendedFeatureModel interf = new ExtendedFeatureModel();
-		final VelvetFeatureModelReader interfaceReader = new VelvetFeatureModelReader(interf);
 
-		final IProject parent = getProject();
+		final File modelFile = getExternalModelFile(interfaceName);
 
-		if (parent == null) {
-			FMCorePlugin.getDefault().logError(
-				new FileNotFoundException("Could not get current project of feature model."));
+		if (modelFile == null) {
+			FMCorePlugin.getDefault().logWarning(format("No model for %s could be found (parseImplements).", interfaceName));
 			return;
 		}
 
-		final IResource res = parent.findMember(format("Interfaces/%s.velvet", interfaceName));
-		final File file = res.getLocation().toFile();
+		final FeatureModel interf = readExternalModelFile(modelFile);
 
-		try {
-			interfaceReader.readFromFile(file);
-			// copy interface into model
-			copyChildnodes(this.extFeatureModel, this.extFeatureModel.getRoot(), interf.getRoot().getChildren(),
-				interfaceName, FeatureInheritanceModes.INTERFACE);
-		} catch ( final FileNotFoundException e ) {
-			FMCorePlugin.getDefault().logError(e);
-		} catch ( final UnsupportedModelException e ) {
-			FMCorePlugin.getDefault().logError(e);
-		}
+		// copy interface into model
+		copyChildnodes(this.extFeatureModel, this.extFeatureModel.getRoot(), interf.getRoot().getChildren(),
+			interfaceName, FeatureInheritanceModes.INTERFACE);
 	}
 
 	private void parseInheritance(final Tree root) {
-		// TODO maybe add a search path for imports.
-		// it can only be inherited from model.xml's of other projects in the
-		// same workspace and only if the modelname corresponds to the project
-		// name
 		final LinkedList<Tree> nodeList = getChildren(root);
 
 		while (!nodeList.isEmpty()) {
-		    inherited.createRoot();
+			inherited.createRoot();
 			final Tree curNode = nodeList.poll();
 			final String parentModelName = curNode.getText();
 
 			inherited.addParent(parentModelName);
 
-			final IProject parent = ResourcesPlugin.getWorkspace().getRoot().getProject(parentModelName);
+			final File modelFile = getExternalModelFile(parentModelName);
 
-			if (!parent.exists()) {
-				FMCorePlugin.getDefault().logWarning(format("Project %s is missing.", parentModelName));
+			if (modelFile == null) {
+				FMCorePlugin.getDefault().logWarning(format("No model for %s could be found (parseInheritance).", parentModelName));
 				return;
 			}
 
-			final FeatureModel fm = FileLoader.loadFeatureModel(parent);
+			final FeatureModel fm = readExternalModelFile(modelFile);
 			copyModel(inherited, fm, parentModelName);
 		}
 	}
@@ -829,17 +860,14 @@ public class VelvetFeatureModelReader
 		final String name = nodeList.poll().getText();
 		final String var = nodeList.poll().getText();
 
-		// TODO remove assumption that name == projectname
-		// this.extFeatureModel.addInstance(parentModelName);
+		final File modelFile = getExternalModelFile(name);
 
-		final IProject parent = ResourcesPlugin.getWorkspace().getRoot().getProject(name);
-
-		if (!parent.exists()) {
-			FMCorePlugin.getDefault().logWarning(format("Project %s is missing.", name));
+		if (modelFile == null) {
+			FMCorePlugin.getDefault().logWarning(format("No model for %s could be found (parseInstance).", name));
 			return;
 		}
 
-		final FeatureModel fm = FileLoader.loadFeatureModel(parent);
+		final FeatureModel fm = readExternalModelFile(modelFile);
 		insertInstance(fm, var, parentFeature);
 	}
 
