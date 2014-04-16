@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.core.mpl.signature.fuji;
 
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -41,30 +40,18 @@ public class FujiMethodSignature extends AbstractMethodSignature {
 	protected TypeDecl returnType;
 	protected List<ParameterDeclaration> parameterList;
 	protected List<Access> exceptionList;
-//	protected final boolean isConstructor;
 
 	public FujiMethodSignature(AbstractClassSignature parent, String name, 
 			String modifier, TypeDecl returnType, boolean isConstructor,
 			List<ParameterDeclaration> parameterList, List<Access> exceptionList) {
-//		super(parent, name, modifier, returnType.name());
 		super(parent, name, modifier, returnType.name(), new LinkedList<String>(), isConstructor);
 		this.returnType = returnType;
 		this.parameterList = parameterList;
 		this.exceptionList = exceptionList;
-//		this.isConstructor = isConstructor;
 		for (ParameterDeclaration parameter : parameterList) {
 			parameterTypes.add(parameter.type().name());
 		}
 	}
-
-//	public FujiMethodSignature(FujiMethodSignature orgSig) {
-//		this(orgSig, false);
-//	}
-//
-//	private FujiMethodSignature(FujiMethodSignature orgSig, boolean ext) {
-//		super(orgSig, ext);
-////		isConstructor = orgSig.isConstructor;
-//	}
 
 	@Override
 	public String toString() {
@@ -101,21 +88,16 @@ public class FujiMethodSignature extends AbstractMethodSignature {
 		return methodString.toString();
 	}
 
-//	@Override
-//	public FujiMethodSignature createExtendedSignature() {
-//		return new FujiMethodSignature(this, true);
-//	}
 
 	@Override
 	protected void computeHashCode() {
-		hashCode = 1;
-		hashCode = hashCodePrime * hashCode + fullName.hashCode();
-		hashCode = hashCodePrime * hashCode + Arrays.hashCode(modifiers);
+		super.computeHashCode();
+		
 		hashCode = hashCodePrime * hashCode + type.hashCode();
 		
 		hashCode = hashCodePrime * hashCode + (isConstructor ? 1231 : 1237);
 		for (ParameterDeclaration parameter : parameterList) {
-			hashCode = hashCodePrime * hashCode + parameter.type().toString().hashCode();
+			hashCode = hashCodePrime * hashCode + parameter.type().name().hashCode();
 		}
 	}
 
@@ -157,9 +139,4 @@ public class FujiMethodSignature extends AbstractMethodSignature {
 	public String getReturnType() {
 		return returnType.name();
 	}
-
-//	public static FujiMethodSignature superSignature(
-//			LinkedList<FujiMethodSignature> sigs) {
-//		return null;
-//	}
 }

@@ -110,6 +110,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 
 	@Override
 	protected Control createContents(Composite parent) {
+		
 		Composite composite = new Composite(parent, SWT.NONE);
 		composite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		GridLayout layout = new GridLayout();

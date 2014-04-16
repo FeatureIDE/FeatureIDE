@@ -54,6 +54,10 @@ public class ContextFilter implements ISignatureFilter {
 		init(constraints);
 	}
 	
+	public void init(String featurename) {
+		init(IOConstants.buildNodeForFeature(featurename));
+	}
+
 	public void init(Node[] constraints) {
 		Node[] fixClauses = new Node[constraints.length + 1];
 		fixClauses[0] = fmNode;
@@ -72,10 +76,6 @@ public class ContextFilter implements ISignatureFilter {
 		}
 	}
 	
-	public void init(String featurename) {
-		init(IOConstants.buildNodeForFeature(featurename));
-	}
-
 	@Override
 	public boolean isValid(AbstractSignature signature) {
 		FeatureData[] ids = signature.getFeatureData();

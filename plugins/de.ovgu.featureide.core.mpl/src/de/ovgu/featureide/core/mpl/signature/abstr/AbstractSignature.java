@@ -267,7 +267,6 @@ public abstract class AbstractSignature {
 		hashCode = 1;
 		hashCode = hashCodePrime * hashCode + fullName.hashCode();
 		hashCode = hashCodePrime * hashCode + Arrays.hashCode(modifiers);
-		hashCode = hashCodePrime * hashCode + type.hashCode();
 	}
 
 	@Override
@@ -281,9 +280,9 @@ public abstract class AbstractSignature {
 	}
 	
 	protected boolean sigEquals(AbstractSignature otherSig) {
-		if (!fullName.equals(otherSig.fullName) 
-//				|| !type.equals(otherSig.type)
-				|| !Arrays.equals(modifiers, otherSig.modifiers)) {
+		if (!fullName.equals(otherSig.fullName)
+				|| !Arrays.equals(modifiers, otherSig.modifiers)
+				) {
 			return false;
 		}
 		return true;

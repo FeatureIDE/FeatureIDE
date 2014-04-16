@@ -295,7 +295,7 @@ public class NewFeatureProjectPage extends WizardPage {
 	}
 	
 	public String getBuildPath() {
-		return buildPath.isEnabled() ? buildPath.getText() : "";
+		return buildPath.getText();
 	}
 
 	public boolean canFlipToNextPage() {
