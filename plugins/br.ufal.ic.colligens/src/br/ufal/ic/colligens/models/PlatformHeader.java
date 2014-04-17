@@ -8,479 +8,217 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.eclipse.cdt.core.CCorePlugin;
-import org.eclipse.cdt.core.dom.ast.IASTNode;
-import org.eclipse.cdt.core.dom.ast.IASTPreprocessorMacroDefinition;
-import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
-import org.eclipse.cdt.core.index.IIndex;
 import org.eclipse.cdt.core.model.CModelException;
-import org.eclipse.cdt.core.model.CoreModel;
-import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.model.IIncludeReference;
-import org.eclipse.cdt.core.model.ISourceRoot;
-import org.eclipse.cdt.core.model.ITranslationUnit;
-import org.eclipse.cdt.internal.core.dom.parser.c.CASTTypedefNameSpecifier;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.jface.preference.IPreferenceStore;
 
 import br.ufal.ic.colligens.activator.Colligens;
-import br.ufal.ic.colligens.controllers.ProjectExplorerController;
-import br.ufal.ic.colligens.util.metrics.CountDirectives;
 
-@SuppressWarnings("restriction")
-public class PlatformHeader {
-	// It keeps the C types.
-	private final HashSet<String> types = new HashSet<String>();
+public class PlatformHeader extends AbstractHeader {
 
-	// It keeps the macros defined.
-	private final HashSet<String> macros = new HashSet<String>();
-
-	private CountDirectives countDirectives;
-
-	private final HashSet<String> listFilesCDT = new HashSet<String>();
-
-	private ICProject project;
-
-	private List<String> listFiles;
-
-	public PlatformHeader() {
-		IPreferenceStore store = Colligens.getDefault().getPreferenceStore();
-		if (!store.getBoolean("USE_INCLUDES") && !store.getBoolean("USE_STUBS")) {
-			store.setValue("USE_STUBS", true);
-		}
-	}
-
-	public void setProject(String projectName) throws PlatformException {
-		project = CoreModel.getDefault().getCModel().getCProject(projectName);
-
-		if (project == null) {
-			throw new PlatformException("Not a valid file C in " + projectName);
-		}
-	}
-
-	public String stubsAbsolutePath() {
-		return "";
-	}
-
-	public void stubs() throws PlatformException {
-
-		File stubs = new File(Colligens.getDefault().getConfigDir()
-				.getAbsolutePath()
-				+ System.getProperty("file.separator")
-				+ "projects"
-				+ System.getProperty("file.separator")
-				+ project.getProject().getName() + "_stubs.h");
-
-		if (stubs.exists())
-			return;
-
+	@Override
+	public void run() throws PlatformException {
 		new File(Colligens.getDefault().getConfigDir().getAbsolutePath()
 				+ System.getProperty("file.separator") + "projects").mkdirs();
 
-		this.listFilesCDT.clear();
-
-		if (listFiles == null) {
-			listFiles = filesAllProject();
-		}
-
-		addFiles(new File(ResourcesPlugin.getWorkspace().getRoot()
-				.getLocation().toString()
-				+ System.getProperty("file.separator")
-				+ project.getProject().getName()));
-
-		generateTypes(listFiles);
-	}
-
-	public String plarformAbsolutePath() {
-		if (Colligens.getDefault().getPreferenceStore().getBoolean("USE_STUBS")) {
-			return Colligens.getDefault().getConfigDir().getAbsolutePath()
-					+ System.getProperty("file.separator") + "projects"
-					+ System.getProperty("file.separator")
-					+ project.getProject().getName() + "_platform.h";
-		} else {
-			return Colligens.getDefault().getConfigDir().getAbsolutePath()
-					+ System.getProperty("file.separator") + "platform.h";
-		}
-	}
-
-	public void plarform() throws PlatformException {
-		new File(Colligens.getDefault().getConfigDir().getAbsolutePath()
-				+ System.getProperty("file.separator") + "projects").mkdirs();
-
-		project = CoreModel.getDefault().getCModel()
-				.getCProject(project.getProject().getName());
-
-		if (project == null) {
-			throw new PlatformException("Not a valid file C in "
-					+ project.getProject().getName());
-		}
-
-		if (listFiles == null) {
-			listFiles = filesAllProject();
-		}
-
-		List<String> list;
 		File platform;
 
-		platform = new File(plarformAbsolutePath());
+		platform = new File(this.getIncludePath());
 
 		if (platform.exists())
 			return;
 
-		if (!Colligens.getDefault().getPreferenceStore()
-				.getBoolean("USE_STUBS")) {
+		List<String> listFiles;
 
-			list = new ArrayList<String>(listFiles);
+		listFiles = filesAllProject();
 
-			try {
-				IIncludeReference includes[] = project.getIncludeReferences();
-				for (int i = 0; i < includes.length; i++) {
-					// System.out.println(includes[i].getElementName());
-					list.add(0, "-I" + includes[i].getElementName());
-				}
-			} catch (CModelException e) {
+		monitorbeginTask("Generating platform", listFiles.size());
 
-				e.printStackTrace();
-			}
-
-			if (!Colligens.getDefault().getPreferenceStore().getString("LIBS")
-					.contentEquals("")) {
-				list.add(0, Colligens.getDefault().getPreferenceStore()
-						.getString("LIBS"));
-			}
-		} else {
-
-			try {
-				platform.createNewFile();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-			list = new ArrayList<String>();
-
-			list.add(Colligens.getDefault().getConfigDir().getAbsolutePath()
-					+ System.getProperty("file.separator") + "platform.h");
-
-		}
-		list.add(0, "-Wfatal-errors");
-		list.add(0, "-std=gnu99");
-		list.add(0, "-E");
-		list.add(0, "-dM");
-		list.add(0, Colligens.getDefault().getPreferenceStore()
-				.getString("GCC"));
-
-		ProcessBuilder processBuilder = new ProcessBuilder(list);
-
-		BufferedReader input = null;
-		BufferedReader error = null;
+		IIncludeReference includes[] = null;
 		try {
-			Process process = processBuilder.start();
-			input = new BufferedReader(new InputStreamReader(
-					process.getInputStream(), Charset.availableCharsets().get(
-							"UTF-8")));
-			error = new BufferedReader(new InputStreamReader(
-					process.getErrorStream(), Charset.availableCharsets().get(
-							"UTF-8")));
-			boolean execute = true;
+			includes = super.getProject().getIncludeReferences();
+		} catch (CModelException e) {
 
-			File platformTemp = new File(Colligens.getDefault().getConfigDir()
-					.getAbsolutePath()
-					+ System.getProperty("file.separator")
-					+ "projects"
-					+ System.getProperty("file.separator") + "temp.h");
-
-			while (execute) {
-
-				try {
-					String line;
-					String errorLine = "";
-					try {
-
-						FileWriter fileW = new FileWriter(platformTemp);
-						BufferedWriter buffW = new BufferedWriter(fileW);
-
-						while ((line = input.readLine()) != null) {
-							if (line.contains("#define ")) {
-								String[] temp = line.trim().split(
-										Pattern.quote(" "));
-								if (countDirectives.directives
-										.contains(temp[1])) {
-									// System.out.println(line);
-								} else {
-									buffW.write(line + "\n");
-								}
-							} else {
-								System.out.println(line);
-								buffW.write(line + "\n");
-							}
-						}
-						errorLine = "";
-						while ((line = error.readLine()) != null) {
-							if (line.contains("fatal error")) {
-								errorLine = line;
-								break;
-							}
-							System.err.println(line);
-						}
-						buffW.close();
-						fileW.close();
-					} catch (Exception e) {
-						e.printStackTrace();
-						Colligens.getDefault().logError(e);
-					}
-
-					try {
-						process.waitFor();
-					} catch (InterruptedException e) {
-						System.out.println(e.toString());
-						Colligens.getDefault().logError(e);
-					}
-					int exitValue = process.exitValue();
-					if (exitValue != 0) {
-						platform.deleteOnExit();
-
-						if (errorLine.equals("")) {
-							errorLine = "Was not possible to locate all the includes (exit="
-									+ exitValue + ")!";
-						}
-						throw new PlatformException(errorLine);
-					}
-
-					execute = false;
-				} catch (IllegalThreadStateException e) {
-					System.out.println(e.toString());
-					Colligens.getDefault().logError(e);
-				}
-			}
-			platformTemp.renameTo(platform);
-
-		} catch (IOException e) {
-			System.out.println(e.toString());
-			Colligens.getDefault().logError(e);
-		} finally {
-			try {
-				if (input != null) {
-					input.close();
-				}
-
-			} catch (IOException e) {
-				Colligens.getDefault().logError(e);
-			} finally {
-				if (error != null)
-					try {
-						error.close();
-					} catch (IOException e) {
-						Colligens.getDefault().logError(e);
-					}
-			}
+			e.printStackTrace();
 		}
 
-	}
-
-	private List<String> filesAllProject() throws PlatformException {
-		listFiles = new ArrayList<String>();
-
-		try {
-
-			ISourceRoot sourceRoots[] = project.getSourceRoots();
-			for (int i = 0; i < sourceRoots.length; i++) {
-				if (!sourceRoots[i].getPath().toOSString()
-						.equals(project.getProject().getName())) {
-					ProjectExplorerController explorerController = new ProjectExplorerController();
-					explorerController
-							.addResource(sourceRoots[i].getResource());
-
-					listFiles.addAll(explorerController.getListToString());
-				}
-			}
-			if (listFiles.isEmpty()) {
-				throw new PlatformException(
-						"Your project does not have a source folder (ex.: /src).");
-			}
-		} catch (CModelException e1) {
-			throw new PlatformException(
-					"Your project does not have a source folder (ex.: /src).");
-		}
-
-		countDirectives = new CountDirectives();
+		List<String> arglist;
+		Collection<String> platformTemp = new HashSet<String>();
 
 		for (Iterator<String> iterator = listFiles.iterator(); iterator
 				.hasNext();) {
-			String file = iterator.next();
+			String filePath = iterator.next();
+			System.out.println(filePath);
+			super.monitorWorked(1);
+			super.monitorSubTask(filePath);
+			if (monitorIsCanceled()) {
+				return;
+			}
+			// System.out.println(filePath);
+
+			arglist = new ArrayList<String>();
+			arglist.add(Colligens.getDefault().getPreferenceStore()
+					.getString("GCC"));
+			arglist.add("-dM");
+			arglist.add("-E");
+			arglist.add("-std=gnu99");
+
+			if (!Colligens.getDefault().getPreferenceStore().getString("LIBS")
+					.contentEquals("")) {
+				arglist.add(Colligens.getDefault().getPreferenceStore()
+						.getString("LIBS"));
+			}
+
+			for (int i = 0; i < includes.length; i++) {
+				arglist.add("-I" + includes[i].getElementName());
+			}
+
+			arglist.add(filePath);
+
+			ProcessBuilder processBuilder = new ProcessBuilder(arglist);
+
+			BufferedReader input = null;
+			BufferedReader error = null;
 			try {
-				countDirectives.count(file);
-			} catch (Exception e) {
+				Process process = processBuilder.start();
+				input = new BufferedReader(new InputStreamReader(
+						process.getInputStream(), Charset.availableCharsets()
+								.get("UTF-8")));
+				error = new BufferedReader(new InputStreamReader(
+						process.getErrorStream(), Charset.availableCharsets()
+								.get("UTF-8")));
+				boolean execute = true;
 
-				e.printStackTrace();
-				throw new PlatformException("unexpected error!");
-			}
-		}
+				while (execute) {
 
-		return listFiles;
-	}
+					try {
+						String line;
+						String errorLine = "";
+						try {
 
-	public static IFile getFile(String fileName) {
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IPath location = Path.fromOSString(fileName);
-		return workspace.getRoot().getFileForLocation(location);
-	}
+							while ((line = input.readLine()) != null) {
+								line = line.trim();
+								if (!platformTemp.contains(line)) {
+									if (line.contains("#define ")) {
+										String[] temp = line.trim().split(
+												Pattern.quote(" "));
+										if (super.countDirectives.directives
+												.contains(temp[1])) {
+											continue;
+										} else if (line.endsWith("_H_")
+												|| line.endsWith("_H")) {
+											// line = "#undef " + temp[1];
+											if (platformTemp.contains(line)) {
+												continue;
+											}
+										}
+									}
+									// System.err.println(line);
+									platformTemp.add(line);
+								}
+							}
+							errorLine = "";
+							while ((line = error.readLine()) != null) {
+								// if (line.contains("fatal error")) {
+								errorLine = errorLine + line + "\n";
+								// break;
+								// }
+								System.err.println(line);
+							}
+						} catch (Exception e) {
+							e.printStackTrace();
+							Colligens.getDefault().logError(e);
+						}
 
-	private void generateTypes(List<String> fileList) throws PlatformException {
+						try {
+							process.waitFor();
+						} catch (InterruptedException e) {
+							System.out.println(e.toString());
+							Colligens.getDefault().logError(e);
+						}
+						int exitValue = process.exitValue();
+						if (exitValue != 0) {
+							platform.deleteOnExit();
 
-		for (String file : fileList) {
+							if (errorLine.equals("")) {
+								errorLine = "Was not possible to locate all the includes (exit="
+										+ exitValue + ")!";
+							}
+							throw new PlatformException(errorLine);
+						}
 
-			ITranslationUnit tu = (ITranslationUnit) CoreModel.getDefault()
-					.create(getFile(file));
-
-			IASTTranslationUnit ast = null;
-			try {
-				IIndex index = CCorePlugin.getIndexManager().getIndex(project);
-				// The AST is ready for use..
-				ast = tu.getAST(index, ITranslationUnit.AST_PARSE_INACTIVE_CODE);
-
-				this.setTypes(ast);
-				this.setMacros(ast);
-			} catch (CoreException e1) {
-
-				throw new PlatformException(
-						"Was not possible to generate the stubs");
-			}
-		}
-		writeTypesToPlatformHeader();
-	}
-
-	// It finds probable macros in the node.
-	private void setMacros(IASTNode node) {
-		IASTPreprocessorMacroDefinition[] definitions = node
-				.getTranslationUnit().getMacroDefinitions();
-		for (IASTPreprocessorMacroDefinition definition : definitions) {
-			String macro = definition.getRawSignature();
-
-			if (!this.macros.contains(macro)) {
-				this.macros.add(macro);
-			}
-
-		}
-	}
-
-	// It finds probable types in the node.
-	private void setTypes(IASTNode node) {
-		IASTNode[] nodes = node.getChildren();
-		if (node.getClass()
-				.getCanonicalName()
-				.equals("org.eclipse.cdt.internal.core.dom.parser.c.CASTTypedefNameSpecifier")) {
-
-			CASTTypedefNameSpecifier s = (CASTTypedefNameSpecifier) node;
-			String type = s.getRawSignature().replace("extern", "")
-					.replace("static", "").replace("const", "").trim();
-
-			if (!this.types.contains(type) && this.isValidJavaIdentifier(type)) {
-				this.types.add(type);
-			}
-		}
-
-		for (int i = 0; i < nodes.length; i++) {
-			this.setTypes(nodes[i]);
-		}
-	}
-
-	// All types found are defined in the platform.h header file.
-	private void writeTypesToPlatformHeader() throws PlatformException {
-		File platform = new File(Colligens.getDefault().getConfigDir()
-				.getAbsolutePath()
-				+ System.getProperty("file.separator")
-				+ "projects"
-				+ System.getProperty("file.separator")
-				+ project.getProject().getName() + "_stubs.h");
-
-		if (platform.exists())
-			return;
-
-		File platformTemp = new File(Colligens.getDefault().getConfigDir()
-				.getAbsolutePath()
-				+ System.getProperty("file.separator")
-				+ "projects"
-				+ System.getProperty("file.separator") + "temp.h");
-
-		try {
-			FileWriter writer = new FileWriter(platformTemp);
-			for (Iterator<String> i = this.types.iterator(); i.hasNext();) {
-				String type = i.next();
-				if (!countDirectives.directives.contains(type)) {
-					// System.out.println(type);
-					// writer.write(type + "\n");
-					writer.write("typedef struct " + type + ";\n");
-				}
-			}
-
-			for (Iterator<String> i = this.macros.iterator(); i.hasNext();) {
-				String next = i.next();
-				// String strToInclue = next.trim().replaceAll("\\s+", " ");
-				// System.out.println(strToInclue);
-
-				if (next.contains("#define ")) {
-					String[] temp = next.trim().split(Pattern.quote(" "));
-					if (countDirectives.directives.contains(temp[1])) {
-						// System.out.println(next);
-					} else {
-						writer.write(next + "\n");
+						execute = false;
+					} catch (IllegalThreadStateException e) {
+						System.out.println(e.toString());
+						Colligens.getDefault().logError(e);
 					}
-				} else {
-					writer.write(next + "\n");
+				}
+
+			} catch (IOException e) {
+				System.out.println(e.toString());
+				Colligens.getDefault().logError(e);
+			} finally {
+				try {
+					if (input != null) {
+						input.close();
+					}
+
+				} catch (IOException e) {
+					Colligens.getDefault().logError(e);
+				} finally {
+					if (error != null)
+						try {
+							error.close();
+						} catch (IOException e) {
+							Colligens.getDefault().logError(e);
+						}
 				}
 			}
+		}
 
-			writer.flush();
-			writer.close();
+		FileWriter fileW;
+		try {
+			fileW = new FileWriter(platform);
+			BufferedWriter buffW = new BufferedWriter(fileW);
+
+			for (String line : platformTemp) {
+
+				buffW.write(line + "\n");
+			}
+			buffW.close();
+			fileW.close();
 		} catch (IOException e) {
-			throw new PlatformException(
-					"was not possible to generate the stubs");
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		platformTemp.renameTo(platform);
+
 	}
 
-	private boolean isValidJavaIdentifier(String s) {
-		// An empty or null string cannot be a valid identifier
-		if (s == null || s.length() == 0) {
-			return false;
-		}
+	@Override
+	public String getIncludePath() {
+		// return super.getProject().getProject().getLocation().toOSString()
+		// + "/platform.h";
 
-		char[] c = s.toCharArray();
-		if (!Character.isJavaIdentifierStart(c[0])) {
-			return false;
-		}
+		return Colligens.getDefault().getConfigDir().getAbsolutePath()
+				+ System.getProperty("file.separator") + "projects"
+				+ System.getProperty("file.separator")
+				+ super.getProject().getProject().getProject().getName()
+				+ "_platform.h";
 
-		for (int i = 1; i < c.length; i++) {
-			if (!Character.isJavaIdentifierPart(c[i])) {
-				return false;
-			}
-		}
-
-		return true;
 	}
 
-	private void addFiles(File file) {
-		if (file.isFile()) {
-			if (file.getAbsolutePath().endsWith(".c")
-					|| file.getAbsolutePath().endsWith(".h")) {
-				listFilesCDT.add(file.getAbsolutePath());
-			}
-		} else if (file.isDirectory()) {
-			for (File files : file.listFiles()) {
-				addFiles(files);
-			}
+	@Override
+	public Collection<String> getIncludes() {
+		ArrayList<String> collection = new ArrayList<String>();
 
-		}
+		collection.add(this.getIncludePath());
+
+		return collection;
 	}
+
 }

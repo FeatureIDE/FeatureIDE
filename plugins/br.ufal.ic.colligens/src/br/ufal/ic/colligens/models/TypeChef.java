@@ -11,6 +11,8 @@ import java.io.RandomAccessFile;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -47,11 +49,11 @@ public class TypeChef {
 	private boolean isFinish = false;
 	private List<FileProxy> fileProxies;
 
-	private final PlatformHeader platformHeader;
+	private final AbstractHeader header;
 	private IProgressMonitor monitor = null;
 
 	public TypeChef() {
-		platformHeader = new PlatformHeader();
+		header = AbstractHeader.getInstance();
 	}
 
 	/**
@@ -142,14 +144,14 @@ public class TypeChef {
 				e.printStackTrace();
 			}
 
-			paramters.add("-h");
-			paramters.add(platformHeader.plarformAbsolutePath());
-
 		}
 
-		if (Colligens.getDefault().getPreferenceStore().getBoolean("USE_STUBS")) {
+		Collection<String> headersPath = header.getIncludes();
+
+		for (Iterator<String> iterator = headersPath.iterator(); iterator
+				.hasNext();) {
 			paramters.add("-h");
-			paramters.add(platformHeader.stubsAbsolutePath());
+			paramters.add(iterator.next());
 		}
 
 		paramters.add(fileProxy.getFileToAnalyse());
@@ -187,20 +189,14 @@ public class TypeChef {
 				throw new TypeChefException("Not a valid file found C");
 			}
 
-			platformHeader.setProject(fileProxies.get(0).getResource()
-					.getProject().getName());
+			header.setProject(fileProxies.get(0).getResource().getProject()
+					.getName());
 
-			if (Colligens.getDefault().getPreferenceStore()
-					.getBoolean("USE_INCLUDES")) {
-				platformHeader.plarform();
+			header.setMonitor(monitor);
 
-			}
-			if (Colligens.getDefault().getPreferenceStore()
-					.getBoolean("USE_STUBS")) {
-				// Monitor Update
-				monitorSubTask("Generating stubs...");
-				platformHeader.stubs();
-			}
+			header.run();
+
+			monitorbeginTask("Analyzing selected files", fileProxies.size());
 
 			for (FileProxy fileProxy : fileProxies) {
 				// Monitor Update
@@ -325,12 +321,15 @@ public class TypeChef {
 
 				e.printStackTrace();
 			}
-			args.add(0, platformHeader.plarformAbsolutePath());
-			args.add(0, "-h");
+
 		}
 
-		if (Colligens.getDefault().getPreferenceStore().getBoolean("USE_STUBS")) {
-			args.add(0, platformHeader.stubsAbsolutePath());
+		Collection<String> headersPath = header.getIncludes();
+
+		for (Iterator<String> iterator = headersPath.iterator(); iterator
+				.hasNext();) {
+
+			args.add(0, iterator.next());
 			args.add(0, "-h");
 		}
 
@@ -445,4 +444,9 @@ public class TypeChef {
 		monitor.subTask(label);
 	}
 
+	private void monitorbeginTask(String label, int size) {
+		if (monitor == null)
+			return;
+		monitor.beginTask(label, size);
+	}
 }

@@ -3,6 +3,8 @@ package br.ufal.ic.colligens.controllers.refactoring;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -15,7 +17,7 @@ import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 
 import br.ufal.ic.colligens.models.PlatformException;
-import br.ufal.ic.colligens.models.PlatformHeader;
+import br.ufal.ic.colligens.models.StubsHeader;
 import core.RefactoringFrontend;
 import core.RefactoringType;
 import de.fosd.typechef.lexer.LexerException;
@@ -25,7 +27,7 @@ public class RefactorSelectionProcessor {
 	private String sourceOutRefactor;
 	private TextSelection textSelection = null;
 	private IFile file = null;
-	private PlatformHeader platformHeader;
+	private StubsHeader stubsHeader;
 	// List of change perform on the code
 	protected List<Change> changes = new LinkedList<Change>();
 
@@ -36,11 +38,11 @@ public class RefactorSelectionProcessor {
 		this.textSelection = textSelection;
 		this.file = file;
 
-		platformHeader = new PlatformHeader();
+		stubsHeader = new StubsHeader();
 
 		try {
-			platformHeader.setProject(file.getProject().getName());
-			platformHeader.stubs();
+			stubsHeader.setProject(file.getProject().getName());
+			stubsHeader.run();
 		} catch (PlatformException e) {
 			e.printStackTrace();
 			throw new RefactorException();
@@ -49,7 +51,7 @@ public class RefactorSelectionProcessor {
 		RefactoringFrontend refactoring = new RefactoringFrontend();
 
 		this.sourceOutRefactor = refactoring.refactorCode(
-				textSelection.getText(), platformHeader.stubsAbsolutePath(),
+				textSelection.getText(), stubsHeader.getIncludePath(),
 				refactoringType);
 
 		this.removeStubs();
@@ -78,16 +80,23 @@ public class RefactorSelectionProcessor {
 
 	public void removeStubs() throws IOException {
 
-		BufferedReader br = new BufferedReader(new FileReader(
-				platformHeader.stubsAbsolutePath()));
-		try {
-			String line = br.readLine();
-			while (line != null && line.contains("typedef")) {
-				sourceOutRefactor = sourceOutRefactor.replace(line + "\n", "");
-				line = br.readLine();
+		Collection<String> collection = stubsHeader.getIncludes();
+
+		for (Iterator<String> iterator = collection.iterator(); iterator
+				.hasNext();) {
+			BufferedReader br = new BufferedReader(new FileReader(
+					iterator.next()));
+			try {
+				String line = br.readLine();
+				while (line != null && line.contains("typedef")) {
+					sourceOutRefactor = sourceOutRefactor.replace(line + "\n",
+							"");
+					line = br.readLine();
+				}
+			} finally {
+				br.close();
 			}
-		} finally {
-			br.close();
 		}
+
 	}
 }

@@ -23,7 +23,7 @@ import br.ufal.ic.colligens.views.InvalidConfigurationsView;
  * @author Thiago Emmanuel
  */
 public class CoreController {
-	private ProjectExplorerController projectExplorerController;
+	private final ProjectExplorerController projectExplorerController;
 	private TypeChef typeChef;
 	private static IWorkbenchWindow window;
 
@@ -35,7 +35,7 @@ public class CoreController {
 		CoreController.window = window;
 		projectExplorerController.setWindow(window);
 	}
-	
+
 	public void setSelection(ISelection selection) {
 		projectExplorerController.setSelection(selection);
 	}
@@ -55,6 +55,7 @@ public class CoreController {
 			 * org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime
 			 * .IProgressMonitor)
 			 */
+			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 
 				typeChef.setMonitor(monitor);
@@ -71,13 +72,14 @@ public class CoreController {
 
 					List<IResource> list = projectExplorerController.getList();
 
-					monitor.beginTask("Analyzing selected files", list.size() + 2);
-
 					// get files to analyze e run;
 					typeChef.run(list);
 
 					// returns the result to view
 					syncWithPluginView();
+
+					if (monitor.isCanceled())
+						return Status.CANCEL_STATUS;
 
 				} catch (TypeChefException e) {
 					e.printStackTrace();
@@ -105,6 +107,7 @@ public class CoreController {
 	 */
 	private void syncWithPluginView() {
 		Display.getDefault().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 
 				IViewPart view = window.getActivePage().findView(
