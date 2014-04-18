@@ -1,0 +1,2 @@
++classpath=${config_path}/bin
+target=Account
