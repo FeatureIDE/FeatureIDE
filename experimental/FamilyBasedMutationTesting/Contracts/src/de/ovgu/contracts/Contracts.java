@@ -33,7 +33,6 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
  * with KeY and JPF.
  * 
  * @author Jens Meinicke
- * 
  */
 public final class Contracts implements Defaults {
 
