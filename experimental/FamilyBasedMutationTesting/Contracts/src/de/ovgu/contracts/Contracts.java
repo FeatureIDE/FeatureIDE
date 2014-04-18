@@ -206,7 +206,7 @@ public final class Contracts implements Defaults {
         long minutes = (seconds / 60);
         long hours   = minutes / 60;
         System.out.println("complete duration rounds:");
-        System.out.println(hours   + "h " + minutes/60 + "m " + seconds + "s");
+        System.out.println(hours   + "h " + minutes%60 + "m " + seconds%60 + "s");
     }
 
 }

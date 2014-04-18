@@ -67,7 +67,7 @@ public class MultiMutator {
             new MutationOperator(" false "," true "),
             new MutationOperator(" true "," false "),
          
-            new MutationOperator(" false;"," true;"),
+            new MutationOperator(" false;"," true; "),
             new MutationOperator(" true;"," false;")
     
             };
