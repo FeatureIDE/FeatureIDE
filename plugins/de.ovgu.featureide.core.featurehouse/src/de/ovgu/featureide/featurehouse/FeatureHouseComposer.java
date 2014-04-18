@@ -22,6 +22,7 @@ package de.ovgu.featureide.featurehouse;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -65,12 +66,14 @@ import composer.FSTGenComposer;
 import composer.FSTGenComposerExtension;
 import composer.ICompositionErrorListener;
 import composer.IParseErrorListener;
+import composer.rules.meta.FeatureModelInfo;
 import de.ovgu.cide.fstgen.ast.FSTNode;
 import de.ovgu.cide.fstgen.ast.FSTTerminal;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.featurehouse.errorpropagation.ErrorPropagation;
+import de.ovgu.featureide.featurehouse.meta.FeatureIDEModelInfo;
 import de.ovgu.featureide.featurehouse.meta.featuremodel.FeatureModelClassGenerator;
 import de.ovgu.featureide.featurehouse.model.FeatureHouseModelBuilder;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
@@ -102,6 +105,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	private static final String CONTRACT_COMPOSITION_EXPLICIT_CONTRACT_REFINEMENT = "explicit contract refinement";
 	private static final String CONTRACT_COMPOSITION_CONTRACT_OVERRIDING = "contract overriding";
 	private static final String CONTRACT_COMPOSITION_PLAIN_CONTRACTING = "plain contracting";
+	private static final String CONTRACT_COMPOSITION_PLAIN_CONTRACT = "plain_contracting";
 	private static final String CONTRACT_COMPOSITION_EXPLICIT_CONTRACTING = "explicit_contracting";
 	private static final String CONTRACT_COMPOSITION_CONSECUTIVE_CONTRACTING = "consecutive_contracting";
 	private static final String CONTRACT_COMPOSITION_CUMULATIVE_CONTRACT_REFINEMENT = "cumulative contract refinement";
@@ -356,7 +360,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		composer = new FSTGenComposerExtension();
 		composer.addCompositionErrorListener(compositionErrorListener);
 		FeatureModel featureModel = featureProject.getFeatureModel();
-		List<String> featureOrderList = featureModel.getConcreteFeatureNames();
+		List<String> featureOrderList = featureModel.getFeatureOrderList();
 		// dead features should not be composed
 		LinkedList<String> deadFeatures = new LinkedList<String>();
 		for (Feature deadFeature : featureModel.getAnalyser().getDeadFeatures()) {
@@ -372,9 +376,25 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		}
 		
 		try {
-			((FSTGenComposerExtension) composer).buildMetaProduct(
-					getArguments(configPath, basePath, outputPath, CONTRACT_COMPOSITION_EXPLICIT_CONTRACTING)
-					, features);
+			String[] args = getArguments(configPath, basePath, outputPath, getContractParameter());
+			long start = System.currentTimeMillis();
+			FeatureModelInfo modelInfo = new FeatureIDEModelInfo(featureModel, !IFeatureProject.META_THEOREM_PROVING.equals(featureProject.getMetaProductGeneration()));
+			((FSTGenComposerExtension) composer).setModelInfo(modelInfo);
+			((FSTGenComposerExtension) composer).buildMetaProduct(args, features);
+			long end = System.currentTimeMillis();
+			
+			long duration = end-start;
+			File file = new File("duration.txt");
+			try{
+				FileWriter writer = new FileWriter(file,true);
+				writer.write(String.valueOf(duration));
+				writer.write(System.getProperty("line.separator"));
+				writer.flush();
+				writer.close();
+			} catch (IOException ex){
+				
+			}
+			
 		} catch (TokenMgrError e) {
 		} catch (Error e) {
 			LOGGER.logError(e);
@@ -553,10 +573,6 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		}
 	}
 
-	/**
-	 * @param featureProject 
-	 * @return
-	 */
 	private static String getClassPaths(IFeatureProject featureProject) {
 		String classpath = "";
 		String sep = System.getProperty("path.separator");
@@ -741,7 +757,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			return CONTRACT_COMPOSITION_NONE;
 		} else if (CONTRACT_COMPOSITION_PLAIN_CONTRACTING
 				.equals(contractComposition)) {
-			return CONTRACT_COMPOSITION_PLAIN_CONTRACTING;
+			return CONTRACT_COMPOSITION_PLAIN_CONTRACT;
 		} else if (CONTRACT_COMPOSITION_CONTRACT_OVERRIDING
 				.equals(contractComposition)) {
 			return CONTRACT_COMPOSITION_CONTRACT_OVERRIDING;
