@@ -1,55 +1,48 @@
-package br.ufal.ic.colligens.controllers.invalidconfigurations;
+package br.ufal.ic.colligens.controllers.semanticbugs;
 
 import java.awt.event.MouseEvent;
-import java.io.IOException;
 import java.util.List;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.dnd.Clipboard;
-import org.eclipse.swt.dnd.TextTransfer;
-import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.ide.IDE;
 
 import br.ufal.ic.colligens.controllers.ViewController;
-import br.ufal.ic.colligens.models.FileProxy;
-import br.ufal.ic.colligens.util.Log;
+import br.ufal.ic.colligens.models.cppchecker.CppCheckerFileLogs;
+import br.ufal.ic.colligens.models.cppchecker.CppCheckerLog;
 import br.ufal.ic.colligens.views.InvalidConfigurationsView;
 
 /**
  * @author Thiago Emmanuel
  * 
  */
-public class InvalidConfigurationsViewController extends ViewController {
+public class SemanticBugsViewController extends ViewController {
 
 	private TreeViewer treeViewer;
 	private final ViewContentProvider viewContentProvider;
-	private ViewSorter comparator;
-	private static InvalidConfigurationsViewController INSTANCE;
 
-	private InvalidConfigurationsViewController() {
+	private static SemanticBugsViewController INSTANCE;
+
+	private SemanticBugsViewController() {
 		super(InvalidConfigurationsView.ID);
-		this.viewContentProvider = new ViewContentProvider();
+		viewContentProvider = new ViewContentProvider();
 	}
 
-	public static InvalidConfigurationsViewController getInstance() {
+	public static SemanticBugsViewController getInstance() {
 		if (INSTANCE == null) {
-			INSTANCE = new InvalidConfigurationsViewController();
+			INSTANCE = new SemanticBugsViewController();
 		}
 		return INSTANCE;
 	}
@@ -59,7 +52,7 @@ public class InvalidConfigurationsViewController extends ViewController {
 	 * 
 	 * @param fileProxies
 	 */
-	public void setInput(List<FileProxy> fileProxies) {
+	public void setInput(List<CppCheckerFileLogs> fileProxies) {
 		treeViewer.setInput(fileProxies);
 		treeViewer.refresh();
 	}
@@ -67,16 +60,6 @@ public class InvalidConfigurationsViewController extends ViewController {
 	public void clear() {
 		if (treeViewer == null) {
 			return;
-		}
-
-		Object object = treeViewer.getInput();
-		if (object != null && object instanceof List) {
-			@SuppressWarnings("unchecked")
-			List<FileProxy> fileProxies = (List<FileProxy>) object;
-			for (FileProxy fileProxy : fileProxies) {
-				fileProxy.deleteMarkers();
-			}
-
 		}
 
 		treeViewer.setInput(null);
@@ -101,11 +84,6 @@ public class InvalidConfigurationsViewController extends ViewController {
 		treeViewer.getControl().setFocus();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.part.WorkbenchPartn#createPartControl(Composite)
-	 */
 	public void createPartControl(Composite parent) {
 
 		Tree tree = new Tree(parent, SWT.H_SCROLL | SWT.V_SCROLL
@@ -121,6 +99,7 @@ public class InvalidConfigurationsViewController extends ViewController {
 		treeViewer.setInput(getView().getViewSite());
 		treeViewer.setLabelProvider(new ViewLabelProvider());
 
+		final IWorkbenchPage page = getView().getSite().getPage();
 		tree.addListener(SWT.MouseDown, new Listener() {
 
 			@Override
@@ -129,56 +108,30 @@ public class InvalidConfigurationsViewController extends ViewController {
 				TreeItem clickedItem = treeViewer.getTree().getItem(point);
 				if (clickedItem != null) {
 					Object data = clickedItem.getData();
-					if (data instanceof Log) {
+					if (data instanceof CppCheckerLog) {
 						if (event.button == MouseEvent.BUTTON1
 								&& event.count == 2) {
-							final Log log = (Log) data;
+							final CppCheckerLog log = (CppCheckerLog) data;
 							try {
 
-								IEditorPart editor = IDE.openEditor(getView()
-										.getSite().getPage(), log.getFile());
+								IEditorPart editor = IDE.openEditor(page, log
+										.getFileLogs().getFile());
 								editor.getSite().getSelectionProvider()
-										.setSelection(log.selection());
+										.setSelection(log);
 
 							} catch (PartInitException e) {
-
-								e.printStackTrace();
-							} catch (IOException e) {
-
-								e.printStackTrace();
-							} catch (CoreException e) {
-
-								e.printStackTrace();
-							} catch (BadLocationException e) {
-
 								e.printStackTrace();
 							}
 						}
-						if (event.button == MouseEvent.BUTTON3
-								&& event.count == 2) {
-							final Log log = (Log) data;
-							String textData = log.getFullPath() + "\n"
-									+ log.getMessage() + "\n"
-									+ log.getFeature();
-							TextTransfer textTransfer = TextTransfer
-									.getInstance();
-
-							Display display = getView().getSite().getShell()
-									.getDisplay();
-							Clipboard cb = new Clipboard(display);
-							cb.setContents(new Object[] { textData },
-									new Transfer[] { textTransfer });
-						}
 					}
-					if (data instanceof FileProxy) {
+					if (data instanceof CppCheckerFileLogs) {
 						if (event.button == MouseEvent.BUTTON1
 								&& event.count == 2) {
 
-							final FileProxy fileProxy = (FileProxy) data;
+							final CppCheckerFileLogs FileLogs = (CppCheckerFileLogs) data;
 							try {
 
-								IDE.openEditor(getView().getSite().getPage(),
-										(IFile) fileProxy.getResource());
+								IDE.openEditor(page, FileLogs.getFile());
 
 							} catch (PartInitException e) {
 
@@ -191,17 +144,10 @@ public class InvalidConfigurationsViewController extends ViewController {
 			}
 		});
 
-		// // Set the sorter for the table
-		comparator = new ViewSorter();
-		treeViewer.setComparator(comparator);
-
-		// PlatformUI.getWorkbench().getHelpSystem()
-		// .setHelp(tableViewer.getControl(), "TableView.viewer");
 	}
 
 	public void createColumns(Tree tree) {
-		String[] titles = { "Description", "Resource", "Path",
-				"Feature configuration", "Severity" };
+		String[] titles = { "Msg", "Line", "Severity", "Config", "Id" };
 		int[] bounds = { 300, 100, 100, 300, 100 };
 
 		for (int i = 0; i < bounds.length; i++) {
@@ -229,11 +175,7 @@ public class InvalidConfigurationsViewController extends ViewController {
 		SelectionAdapter selectionAdapter = new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				comparator.setColumn(index);
-				int direction = comparator.getDirection();
-				treeViewer.getTree().setSortDirection(direction);
-				treeViewer.getTree().setSortColumn(column);
-				treeViewer.refresh();
+
 			}
 		};
 		return selectionAdapter;

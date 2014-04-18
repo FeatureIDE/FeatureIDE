@@ -68,7 +68,7 @@ public class PresenceConditionHandler extends ColligensAbstractHandler {
 				}
 
 				PresenceConditionController conditionController = new PresenceConditionController(
-						textSelection, file, line + 1, code);
+						file, line + 1, code);
 
 				try {
 					conditionController.run();

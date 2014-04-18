@@ -17,7 +17,7 @@ import br.ufal.ic.colligens.util.Log;
  * 
  */
 public class XMLParserTypeChef {
-	private SAXBuilder builder;
+	private final SAXBuilder builder;
 	private File xmlFile;
 	private FileProxy fileProxie;
 
