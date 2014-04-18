@@ -1,8 +1,8 @@
 class Account {
-
+	/*@ invariant withdraw >= DAILY_LIMIT; @*/
+	
 	final static int DAILY_LIMIT = -1000;
 	
-	//@ invariant withdraw >= DAILY_LIMIT;
 	int withdraw = 0;
 
 	/*@
