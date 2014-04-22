@@ -59,7 +59,7 @@ public interface StatisticsIds {
 		private static final long serialVersionUID = 1L;
 
 	{
-        put("","No key word");
+        put("","No keyword");
         put("\\final_contract", "Plain Contracting");
         put("\\consecutive_contract", "Consecutive Contract");
         put("\\conjunctive_contract", "Conjunctive Contract");
