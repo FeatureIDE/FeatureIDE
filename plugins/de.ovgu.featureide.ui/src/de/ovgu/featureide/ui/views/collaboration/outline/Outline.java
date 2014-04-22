@@ -182,7 +182,62 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		@Override 
 		public void selectionChanged(SelectionChangedEvent event) {
 			if (iFile != null) {
+				//if a method or field is selected, the selection's FSTRole is always the first role of the first feature in the respective expandable
+				//list in the outline no matter if the currently opened file contains the method.
 				Object selection = ((IStructuredSelection) viewer.getSelection()).getFirstElement();
+				FSTRole r = null;
+				boolean fileAlreadyOpen = false;
+				if (selection instanceof FSTRole) {
+					r = (FSTRole) selection;
+					selection = viewer.getTree().getSelection()[0].getParentItem().getData();
+				} else if (selection instanceof FSTMethod) {			
+					FSTMethod meth = ((FSTMethod) selection); 
+					fileAlreadyOpen = meth.getFile().getName().equals(iFile.getName()) && (getMethodLine(iFile, meth) > 0);
+					r = meth.getRole();
+				} else  if (selection instanceof FSTField) {
+					FSTField field = ((FSTField) selection); 
+					fileAlreadyOpen = field.getFile().getName().equals(iFile.getName()) && (getFieldLine(iFile, field) > 0);
+					r = field.getRole();
+				} else {
+					return;
+				}
+				if (!fileAlreadyOpen && r.getFile().isAccessible()) {
+					IWorkbench workbench = PlatformUI
+							.getWorkbench();
+					IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
+					IWorkbenchPage page = window.getActivePage();
+					IContentType contentType = null;
+					try {
+						iFile = r.getFile();
+						IContentDescription description = iFile
+								.getContentDescription();
+						if (description != null) {
+							contentType = description.getContentType();
+						}
+						IEditorDescriptor desc = null;
+						if (contentType != null) {
+							desc = workbench.getEditorRegistry()
+									.getDefaultEditor(iFile.getName(), contentType);
+						} else {
+							desc = workbench.getEditorRegistry()
+									.getDefaultEditor(iFile.getName());
+						}
+						if (desc != null) {
+							page.openEditor(new FileEditorInput(iFile),
+									desc.getId());
+						} else {
+							// case: there is no default editor for the file
+							page.openEditor(new FileEditorInput(iFile),
+									"org.eclipse.ui.DefaultTextEditor");
+						}
+						
+						
+					} catch (CoreException e) {
+						UIPlugin.getDefault().logError(e);
+					}
+				}
+								
+				
 				if (selection instanceof FSTMethod) {
 					FSTMethod meth = (FSTMethod) selection;
 					int line = getMethodLine(iFile, meth);
@@ -199,41 +254,6 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 					FSTDirective directive = (FSTDirective) selection;
 					scrollToLine(active_editor, directive.getStartLine(), directive.getEndLine(), 
 							directive.getStartOffset(), directive.getEndLength());
-				} else if (selection instanceof FSTRole) {
-					FSTRole r = (FSTRole) selection;
-					if (r.getFile().isAccessible()) {
-						IWorkbench workbench = PlatformUI
-								.getWorkbench();
-						IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
-						IWorkbenchPage page = window.getActivePage();
-						IContentType contentType = null;
-						try {
-							iFile = r.getFile();
-							IContentDescription description = iFile
-									.getContentDescription();
-							if (description != null) {
-								contentType = description.getContentType();
-							}
-							IEditorDescriptor desc = null;
-							if (contentType != null) {
-								desc = workbench.getEditorRegistry()
-										.getDefaultEditor(iFile.getName(), contentType);
-							} else {
-								desc = workbench.getEditorRegistry()
-										.getDefaultEditor(iFile.getName());
-							}
-							if (desc != null) {
-								page.openEditor(new FileEditorInput(iFile),
-										desc.getId());
-							} else {
-								// case: there is no default editor for the file
-								page.openEditor(new FileEditorInput(iFile),
-										"org.eclipse.ui.DefaultTextEditor");
-							}
-						} catch (CoreException e) {
-							UIPlugin.getDefault().logError(e);
-						}
-					}
 				}
 			}
 
