@@ -4,7 +4,19 @@
    <extension-point id="composers" name="Composers" schema="schema/composers.exsd"/>
    <extension
          id="builderProblemMarker"
-         name="Builder Problem Marker"
+         name="Builder Problem"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+      <persistent
+            value="true">
+      </persistent>
+   </extension>
+   <extension-point id="composers" name="Composers" schema="schema/composers.exsd"/>
+   <extension
+         id="contractMarker"
+         name="Contract Marker"
          point="org.eclipse.core.resources.markers">
       <super
             type="org.eclipse.core.resources.problemmarker">
@@ -16,7 +28,7 @@
 
    <extension
          id="de.ovgu.featureide.core.configurationProblemMarker"
-         name="Configuration Problem Marker"
+         name="Configuration Problem"
          point="org.eclipse.core.resources.markers">
       <persistent
             value="true">
@@ -73,7 +85,7 @@
     </extension>
  	<extension
           id="de.ovgu.featureide.core.variantMarker"
-          name="Variant Problem Marker"
+          name="Variant Problem"
           point="org.eclipse.core.resources.markers">
        <persistent
              value="true">

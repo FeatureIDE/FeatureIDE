@@ -23,6 +23,7 @@ package de.ovgu.featureide.ui.views.collaboration.action;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
+
 import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
 import de.ovgu.featureide.ui.views.collaboration.figures.RoleFigure;
 
@@ -37,13 +38,15 @@ public class ShowFieldsMethodsAction extends Action {
 	
 	public static final int ONLY_FIELDS = 0;
 	public static final int ONLY_METHODS = 1;
-	public static final int HIDE_PARAMETERS_AND_TYPES = 2;
-	public static final int PUBLIC_FIELDSMETHODS = 3;
-	public static final int PROTECTED_FIELDSMETHODS = 4;
-	public static final int DEFAULT_FIELDSMETHODS = 5;
-	public static final int PRIVATE_FIELDSMETHODS = 6;
-	public static final int SELECT_ALL = 7;
-	public static final int DESELECT_ALL = 8;
+	public static final int ONLY_CONTRACTS = 2;
+	public static final int ONLY_INVARIANTS = 3;
+	public static final int HIDE_PARAMETERS_AND_TYPES = 4;
+	public static final int PUBLIC_FIELDSMETHODS = 5;
+	public static final int PROTECTED_FIELDSMETHODS = 6;
+	public static final int DEFAULT_FIELDSMETHODS = 7;
+	public static final int PRIVATE_FIELDSMETHODS = 8;
+	public static final int SELECT_ALL = 9;
+	public static final int DESELECT_ALL = 10;
 	
 	private CollaborationView collaborationView;
 	private int index;
@@ -75,6 +78,8 @@ public class ShowFieldsMethodsAction extends Action {
 			case DESELECT_ALL:
 				setSelected(false, selected);
 				break;
+			case ONLY_CONTRACTS:
+			case ONLY_INVARIANTS:
 			case ONLY_FIELDS:
 			case ONLY_METHODS:
 				noDeclarationTypSelected(selected);
@@ -98,10 +103,15 @@ public class ShowFieldsMethodsAction extends Action {
 	}
 	
 	private void noOnlyFieldOrMethodSelected(boolean[] selected) {
-		if(!selected[ONLY_FIELDS] && !selected[ONLY_METHODS]) {
+		if(!selected[ONLY_FIELDS] && !selected[ONLY_METHODS] ) {
 			selected[ONLY_FIELDS] = true;
 			selected[ONLY_METHODS] = true;
 		}
+		/*if(!selected[ONLY_FIELDS] && !selected[ONLY_METHODS]) {
+			selected[ONLY_FIELDS] = true;
+			selected[ONLY_METHODS] = true;
+		}*/
+		
 		selected[index] = !selected[index];
 	}
 	

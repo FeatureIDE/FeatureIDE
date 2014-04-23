@@ -29,18 +29,19 @@ import org.eclipse.core.resources.IFile;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 
 /**
- * A role is a implementation unit representing a class at a corresponding feature.
+ * A role is a implementation unit representing a class at a corresponding
+ * feature.
  * 
  * @author Jens Meinicke
  */
 public class FSTRole {
 	private final LinkedList<FSTDirective> directives = new LinkedList<FSTDirective>();
 	private final FSTClassFragment classFragment;
-	
+
 	private FSTFeature feature;
 	private FSTClass fstClass;
 	private IFile file;
-	
+
 	public FSTRole(IFile file, FSTFeature feature, FSTClass fstClass) {
 		this.feature = feature;
 		this.fstClass = fstClass;
@@ -53,7 +54,7 @@ public class FSTRole {
 		directives.add(directive);
 		directive.setRole(this);
 	}
-	
+
 	public FSTClass getFSTClass() {
 		return fstClass;
 	}
@@ -65,11 +66,11 @@ public class FSTRole {
 	public IFile getFile() {
 		return file;
 	}
-	
+
 	public void setFile(IFile file) {
 		this.file = file;
 	}
-	
+
 	public FSTClassFragment getClassFragment() {
 		return classFragment;
 	}

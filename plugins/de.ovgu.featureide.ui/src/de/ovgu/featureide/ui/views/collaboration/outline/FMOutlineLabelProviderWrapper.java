@@ -32,7 +32,7 @@ import de.ovgu.featureide.fm.ui.views.outline.FmLabelProvider;
  * 
  * @author Reimar Schröter
  */
-public class FMOutlineLabelProviderWrapper extends OutlineLabelProvider{
+public class FMOutlineLabelProviderWrapper extends OutlineLabelProvider {
 
 	private final FmLabelProvider prov = new FmLabelProvider();
 
@@ -67,10 +67,12 @@ public class FMOutlineLabelProviderWrapper extends OutlineLabelProvider{
 	}
 
 	@Override
-	public void colorizeItems(TreeItem[] treeItems, IFile file) {}
+	public void colorizeItems(TreeItem[] treeItems, IFile file) {
+	}
 
 	@Override
-	public void setForeground(TreeItem item, IFile file) {}
+	public void setForeground(TreeItem item, IFile file) {
+	}
 
 	@Override
 	public String getLabelProvName() {
@@ -82,16 +84,25 @@ public class FMOutlineLabelProviderWrapper extends OutlineLabelProvider{
 		return OutlineLabelProvider.OUTLINE_FEATURE_MODEL;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.views.collaboration.outline.OutlineLabelProvider#refreshContent(org.eclipse.core.resources.IFile, org.eclipse.core.resources.IFile)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.ovgu.featureide.ui.views.collaboration.outline.OutlineLabelProvider
+	 * #refreshContent(org.eclipse.core.resources.IFile,
+	 * org.eclipse.core.resources.IFile)
 	 */
 	@Override
 	public boolean refreshContent(IFile oldFile, IFile currentFile) {
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.views.collaboration.outline.OutlineLabelProvider#init()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.ovgu.featureide.ui.views.collaboration.outline.OutlineLabelProvider
+	 * #init()
 	 */
 	@Override
 	public void init() {

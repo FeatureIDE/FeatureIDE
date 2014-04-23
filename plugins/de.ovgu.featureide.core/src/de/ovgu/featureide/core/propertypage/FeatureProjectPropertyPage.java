@@ -233,7 +233,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		contractCombo = new Combo(group, SWT.READ_ONLY | SWT.DROP_DOWN);
 		contractCombo.setLayoutData(gd);
 		contractCombo.add(IFeatureProject.DEFAULT_CONTRACT_COMPOSITION);
-		contractCombo.add("Method-based Composition");
+		contractCombo.add("Method-Based Composition");
 		contractCombo.add("Explicit Contract Refinement");
 		contractCombo.add("Contract Overriding");
 		contractCombo.add("Conjunctive Contract Refinement");

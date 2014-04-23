@@ -1,0 +1,45 @@
+<feature_model name="FAME-DBMS">
+<meta>
+<data name="description">Feature model of a the FAME-DBMS product line</data>
+<data name="creator">Christian Kastner et. al</data>
+<data name="email"></data>
+<data name="date">Aug 2009</data>
+<data name="department"></data>
+<data name="organization">University of Magdeburg, University of Passau, University of Texas at Austin</data>
+<data name="address"></data>
+<data name="phone"></data>
+<data name="website"></data>
+<data name="reference">Christian Kastner, Sven Apel, Syed Saif ur Rahman, Marko Rosenmuller, Don Batory,
+and Gunter Saake, On the Impact of the Optional Feature Problem: Analysis and Case Studies, SPLC 2009, San Francisco, USA</data>
+</meta>
+<feature_tree>
+:r FAME-DBMS
+	:m OS
+		:g [1,1]
+			: Nut/OS
+			: Win
+	:m Buffer Manager
+		:g [1,1]
+			: Persistent
+				:m Memory Allocation
+					:g [1,1]
+						: Static
+						: Dynamic
+				:m Page Replication
+					:g [1,1]
+						: LRU
+						: LFU
+			: In Memory
+	:o Debug Logging
+	:m Storage
+		:m API
+			:o Get
+			:o Put
+			:o Delete
+		:g [1,1]
+			: B+ Tree
+			: Unindexed 
+</feature_tree>
+<constraints>
+</constraints>
+</feature_model>

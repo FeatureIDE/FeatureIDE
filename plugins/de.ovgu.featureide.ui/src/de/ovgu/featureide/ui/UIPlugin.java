@@ -25,7 +25,6 @@ import org.eclipse.ui.PlatformUI;
 import org.osgi.framework.BundleContext;
 
 import de.ovgu.featureide.fm.ui.AbstractUIPlugin;
-
 import de.ovgu.featureide.ui.editors.annotation.EditorTracker;
 
 /**

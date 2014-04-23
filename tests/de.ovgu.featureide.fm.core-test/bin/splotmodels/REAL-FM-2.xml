@@ -1,0 +1,49 @@
+<feature_model name="Weather Station">
+<meta>
+<data name="description">A feature model of a simple weather station product line</data>
+<data name="creator">Pure-systems GmbH</data>
+<data name="email"></data>
+<data name="date"></data>
+<data name="department"></data>
+<data name="organization"></data>
+<data name="address"></data>
+<data name="phone"></data>
+<data name="website">http://www.pure-systems.com/</data>
+<data name="reference"></data>
+</meta>
+<feature_tree>
+:r Weather Station (weather_station)
+	:m Measurements (measurements)
+		:g [1,*]
+			: Pressure (pressure)
+			: Temperature (temperature)
+			: Wind Speed (wind_speed)
+	:m Data Source (data_source)
+		:g [1,1]
+			: Internet (internet)
+			: Demo (demo)
+			: External Services (external_services)
+	:m Output Format (output_format) 
+		:g [1,1]
+			: Text (text)
+			: Web Server (web_server)
+			: File (file)
+		:m Format (format)
+			:g [1,1]
+				: XML (xml)
+				: HTML (html)
+				: Plain Text (plain_text)
+		:m Language (language)
+			:g [1,1]
+				: English (english)
+				: German (german)
+	:o Alarm (alarm)
+		:g [1,*]
+			: Freeze Point (freeze_point)
+			: Storm Alert (storm_alert)
+</feature_tree>
+<constraints>
+c1: ~freeze_point or temperature
+c2: ~text or ~xml
+</constraints>
+</feature_model>

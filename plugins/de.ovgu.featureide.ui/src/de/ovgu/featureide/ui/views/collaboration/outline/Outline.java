@@ -78,6 +78,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTField;
+import de.ovgu.featureide.core.fstmodel.FSTInvariant;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
@@ -97,35 +98,31 @@ import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
  * @author Reimar Schröter
  */
 /*
- * TODO #404 fix bug: do not close the tree if a corresponding file 
- * was opened with an other way e.g. via collaboration diagram
+ * TODO #404 fix bug: do not close the tree if a corresponding file was opened
+ * with an other way e.g. via collaboration diagram
  * 
- * TODO Sometimes the outline has no content -> display a warning / message 
- * 
+ * TODO Sometimes the outline has no content -> display a warning / message
  */
 public class Outline extends ViewPart implements ICurrentBuildListener, IPropertyChangeListener {
-	private static final String OUTLINE_ID = "de.ovgu.featureide.ui.views.outline";		 
-	
+	private static final String OUTLINE_ID = "de.ovgu.featureide.ui.views.outline";
+
 	private static int selectedOutlineType;
-	
+
 	private TreeViewer viewer;
 	private IFile iFile;
 	private IEditorPart active_editor;
 	private UIJob uiJob;
-	
+
 	private ITreeContentProvider curContentProvider;
 	private OutlineLabelProvider curClabel;
-	
+
 	private FmOutlinePageContextMenu contextMenu;
 
-	private static final ImageDescriptor IMG_COLLAPSE = UIPlugin.getDefault()
-			.getImageDescriptor("icons/collapse.gif");
-	private static final ImageDescriptor IMG_EXPAND = UIPlugin.getDefault()
-			.getImageDescriptor("icons/expand.gif");
+	private static final ImageDescriptor IMG_COLLAPSE = UIPlugin.getDefault().getImageDescriptor("icons/collapse.gif");
+	private static final ImageDescriptor IMG_EXPAND = UIPlugin.getDefault().getImageDescriptor("icons/expand.gif");
 
-	public static final String ID = UIPlugin.PLUGIN_ID
-			+ ".views.collaboration.outline.CollaborationOutline";
-	
+	public static final String ID = UIPlugin.PLUGIN_ID + ".views.collaboration.outline.CollaborationOutline";
+
 	private ArrayList<IAction> actionOfProv = new ArrayList<IAction>();
 	private boolean providerChanged = false;
 
@@ -136,7 +133,8 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 				setEditorActions(part);
 		}
 
-		public void partDeactivated(IWorkbenchPart part) {}
+		public void partDeactivated(IWorkbenchPart part) {
+		}
 
 		public void partClosed(IWorkbenchPart part) {
 			if (part instanceof IEditorPart)
@@ -154,7 +152,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		}
 
 	};
-	
+
 	/**
 	 * colors the tree in case a treeItem has been expanded (because the
 	 * children are lazily loaded)
@@ -167,8 +165,8 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 
 		@Override
 		public void treeExpanded(TreeExpansionEvent event) {
-			if (viewer.getLabelProvider() instanceof OutlineLabelProvider){
-				((OutlineLabelProvider)viewer.getLabelProvider()).colorizeItems(viewer.getTree().getItems(), iFile);
+			if (viewer.getLabelProvider() instanceof OutlineLabelProvider) {
+				((OutlineLabelProvider) viewer.getLabelProvider()).colorizeItems(viewer.getTree().getItems(), iFile);
 			}
 		}
 
@@ -179,7 +177,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 	 * editor
 	 */
 	private ISelectionChangedListener selectionChangedListener = new ISelectionChangedListener() {
-		@Override 
+		@Override
 		public void selectionChanged(SelectionChangedEvent event) {
 			if (iFile != null) {
 				//if a method or field is selected, the selection's FSTRole is always the first role of the first feature in the respective expandable
@@ -250,6 +248,11 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 					if (line != -1) {
 						scrollToLine(active_editor, line);
 					}
+				} else if (selection instanceof FSTInvariant) {
+					FSTInvariant inv = (FSTInvariant) selection;
+					int line = getInvariantLine(iFile, inv);
+					if (line != -1)
+						scrollToLine(active_editor, line);
 				} else if (selection instanceof FSTDirective) {
 					FSTDirective directive = (FSTDirective) selection;
 					scrollToLine(active_editor, directive.getStartLine(), directive.getEndLine(), 
@@ -273,6 +276,19 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 			return -1;
 		}
 
+		private int getInvariantLine(IFile iFile, FSTInvariant inv) {
+			for (FSTRole r : inv.getRole().getFSTClass().getRoles()) {
+				if (r.getFile().equals(iFile)) {
+					for (FSTInvariant i : r.getClassFragment().getInvariants()) {
+						if (i.comparesTo(inv)) {
+							return i.getLine();
+						}
+					}
+				}
+			}
+			return -1;
+		}
+
 		private int getMethodLine(IFile iFile, FSTMethod meth) {
 			for (FSTRole r : meth.getRole().getFSTClass().getRoles()) {
 				if (r.getFile().equals(iFile)) {
@@ -287,10 +303,10 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		}
 
 	};
-	
+
 	private void checkForExtensions() {
 		IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(OUTLINE_ID);
-		
+
 		for (IConfigurationElement e : config) {
 			try {
 				final Object contentProvider = e.createExecutableExtension("contentProvider");
@@ -303,7 +319,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 			}
 		}
 	}
-	  
+
 	private void executeExtension(final ITreeContentProvider contentProv, final OutlineLabelProvider labelProv) {
 		ISafeRunnable runnable = new ISafeRunnable() {
 			@Override
@@ -318,15 +334,15 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		};
 		SafeRunner.run(runnable);
 	}
-	  
+
 	public void addContentProv(final ITreeContentProvider contentProv, final OutlineLabelProvider labelProv) {
 		curContentProvider = contentProv;
 		curClabel = labelProv;
-		labelProv.initTreeViewer(Outline.this.viewer);	
+		labelProv.initTreeViewer(Outline.this.viewer);
 
 		ProviderAction provAct = new ProviderAction(labelProv.getLabelProvName(), labelProv.getOutlineType(), contentProv, labelProv) {
-			public void run(){
-				if(curContentProvider != this.getTreeContentProvider() || curClabel != this.getLabelProvider()){		
+			public void run() {
+				if (curContentProvider != this.getTreeContentProvider() || curClabel != this.getLabelProvider()) {
 					curContentProvider = this.getTreeContentProvider();
 					curClabel = this.getLabelProvider();
 					providerChanged = true;
@@ -336,15 +352,13 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		};
 		actionOfProv.add(provAct);
 	}
-	
-	private Action dropDownAction = new Action("Outline Selection",
-			Action.AS_DROP_DOWN_MENU) {
+
+	private Action dropDownAction = new Action("Outline Selection", Action.AS_DROP_DOWN_MENU) {
 		{
-			setImageDescriptor(ImageDescriptor
-					.createFromImage(GUIDefaults.REFESH_TAB_IMAGE));
+			setImageDescriptor(ImageDescriptor.createFromImage(GUIDefaults.REFESH_TAB_IMAGE));
 		}
 	};
-	
+
 	public Outline() {
 		super();
 		CorePlugin.getDefault().addCurrentBuildListener(this);
@@ -365,29 +379,28 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 					IEditorInput editorInput = part.getEditorInput();
 					if (editorInput instanceof FileEditorInput) {
 						active_editor = part;
-						
+
 						// case: open editor
-						FileEditorInput inputFile = (FileEditorInput) part
-								.getEditorInput();
+						FileEditorInput inputFile = (FileEditorInput) part.getEditorInput();
 						IFile file = inputFile.getFile();
-						
+
 						IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
-						
+
 						if (featureProject != null) {
 							Control control = viewer.getControl();
 							if (control != null && !control.isDisposed()) {
-								if("model.xml".equals(file.getName())){
+								if ("model.xml".equals(file.getName())) {
 									selectedOutlineType = OutlineLabelProvider.OUTLINE_FEATURE_MODEL;
-								}else if(file.getFileExtension().compareTo("java") == 0 || file.getFileExtension().compareTo("jak") == 0){
+								} else if (file.getFileExtension().compareTo("java") == 0 || file.getFileExtension().compareTo("jak") == 0) {
 									selectedOutlineType = OutlineLabelProvider.OUTLINE_CODE;
-								}else{
+								} else {
 									selectedOutlineType = OutlineLabelProvider.OUTLINE_NOT_AVAILABLE;
 								}
 								fireSelectedAction();
-							
+
 								update(file);
 							}
-						}else{
+						} else {
 							selectedOutlineType = OutlineLabelProvider.OUTLINE_NOT_AVAILABLE;
 							fireSelectedAction();
 							update(null);
@@ -410,17 +423,16 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 			update(iFile);
 		}
 	};
-	
-	
+
 	@Override
 	public void createPartControl(Composite parent) {
 		viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		viewer.getControl().setEnabled(false);
-		
+
 		addContentProv(new NotAvailableContentProv(), new NotAvailableLabelProv());
 		addContentProv(new CollaborationOutlineTreeContentProvider(), new CollaborationOutlineLabelProvider());
 		addContentProv(new FmTreeContentProvider(), new FMOutlineLabelProviderWrapper());
-		
+
 		checkForExtensions();
 
 		IWorkbenchPage page = getSite().getPage();
@@ -439,11 +451,10 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 
 		viewer.addTreeListener(treeListener);
 		viewer.addSelectionChangedListener(selectionChangedListener);
-		
-		fillLocalToolBar( getViewSite().getActionBars().getToolBarManager());
+
+		fillLocalToolBar(getViewSite().getActionBars().getToolBarManager());
 	}
 
-	
 	/**
 	 * @param toolBarManager
 	 */
@@ -462,11 +473,8 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 
 				for (IAction curAction : actionOfProv) {
 					curAction.addPropertyChangeListener(Outline.this);
-					if (curAction instanceof ProviderAction
-							&& ((ProviderAction) curAction).getLabelProvider()
-									.getOutlineType() == selectedOutlineType) {
-						ActionContributionItem item = new ActionContributionItem(
-								curAction);
+					if (curAction instanceof ProviderAction && ((ProviderAction) curAction).getLabelProvider().getOutlineType() == selectedOutlineType) {
+						ActionContributionItem item = new ActionContributionItem(curAction);
 
 						item.fill(fMenu, -1);
 					}
@@ -483,7 +491,6 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		});
 		manager.add(dropDownAction);
 	}
-	
 
 	@Override
 	public void setFocus() {
@@ -501,10 +508,10 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 
 				if (!providerChanged && refreshContent(iFile, iFile2)) {
 					return;
-				}else{
+				} else {
 					providerChanged = false;
 				}
-				
+
 				iFile = iFile2;
 
 				if (uiJob == null || uiJob.getState() == Job.NONE) {
@@ -512,24 +519,18 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 						public IStatus runInUIThread(IProgressMonitor monitor) {
 
 							if (viewer != null) {
-								if (viewer.getControl() != null
-										&& !viewer.getControl().isDisposed()) {
+								if (viewer.getControl() != null && !viewer.getControl().isDisposed()) {
 									viewer.getControl().setRedraw(false);
 
 									viewer.setContentProvider(curContentProvider);
 									viewer.setLabelProvider(curClabel);
 									if (iFile != null) {
-										if ("model.xml".equals(iFile.getName())
-												&& active_editor instanceof FeatureModelEditor) {
-											viewer.setInput(((FeatureModelEditor) active_editor)
-													.getFeatureModel());
+										if ("model.xml".equals(iFile.getName()) && active_editor instanceof FeatureModelEditor) {
+											viewer.setInput(((FeatureModelEditor) active_editor).getFeatureModel());
 
 											// recreate the context menu in case
 											// we switched to another model
-											if (contextMenu == null
-													|| contextMenu
-															.getFeatureModel() != ((FeatureModelEditor) active_editor)
-															.getFeatureModel()) {
+											if (contextMenu == null || contextMenu.getFeatureModel() != ((FeatureModelEditor) active_editor).getFeatureModel()) {
 												if (contextMenu != null) {
 													// the listener isn't
 													// recreated, if it still
@@ -539,12 +540,8 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 													// model
 													viewer.removeDoubleClickListener(contextMenu.dblClickListener);
 												}
-												contextMenu = new FmOutlinePageContextMenu(
-														getSite(),
-														(FeatureModelEditor) active_editor,
-														viewer,
-														((FeatureModelEditor) active_editor)
-																.getFeatureModel());
+												contextMenu = new FmOutlinePageContextMenu(getSite(), (FeatureModelEditor) active_editor, viewer,
+														((FeatureModelEditor) active_editor).getFeatureModel());
 											}
 
 										} else {
@@ -554,12 +551,8 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 										viewer.setInput("");
 									}
 
-									if (viewer.getLabelProvider() instanceof OutlineLabelProvider
-											&& iFile != null) {
-										((OutlineLabelProvider) viewer
-												.getLabelProvider())
-												.colorizeItems(viewer.getTree()
-														.getItems(), iFile);
+									if (viewer.getLabelProvider() instanceof OutlineLabelProvider && iFile != null) {
+										((OutlineLabelProvider) viewer.getLabelProvider()).colorizeItems(viewer.getTree().getItems(), iFile);
 									}
 									viewer.getControl().setRedraw(true);
 									viewer.getControl().setEnabled(true);
@@ -576,7 +569,6 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 			}
 		}
 	}
-	
 
 	/**
 	 * @param oldFile
@@ -584,14 +576,13 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 	 * @return
 	 */
 	private boolean refreshContent(IFile oldFile, IFile currentFile) {
-		if(viewer.getLabelProvider() instanceof OutlineLabelProvider){
+		if (viewer.getLabelProvider() instanceof OutlineLabelProvider) {
 			OutlineLabelProvider lp = (OutlineLabelProvider) viewer.getLabelProvider();
 			return lp.refreshContent(oldFile, currentFile);
 		}
 		return false;
 	}
 
-	
 	/**
 	 * provides functionality to expand and collapse all items in viewer
 	 * 
@@ -602,8 +593,8 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 			public void run() {
 				viewer.collapseAll();
 				viewer.expandToLevel(2);
-				if (viewer.getLabelProvider() instanceof OutlineLabelProvider){
-					((OutlineLabelProvider)viewer.getLabelProvider()).colorizeItems(viewer.getTree().getItems(), iFile);
+				if (viewer.getLabelProvider() instanceof OutlineLabelProvider) {
+					((OutlineLabelProvider) viewer.getLabelProvider()).colorizeItems(viewer.getTree().getItems(), iFile);
 				}
 			}
 		};
@@ -615,8 +606,8 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 				viewer.expandAll();
 				// treeExpanded event is not triggered, so we manually have to
 				// call this function
-				if (viewer.getLabelProvider() instanceof OutlineLabelProvider){
-					((OutlineLabelProvider)viewer.getLabelProvider()).colorizeItems(viewer.getTree().getItems(), iFile);
+				if (viewer.getLabelProvider() instanceof OutlineLabelProvider) {
+					((OutlineLabelProvider) viewer.getLabelProvider()).colorizeItems(viewer.getTree().getItems(), iFile);
 				}
 			}
 		};
@@ -626,7 +617,6 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		iToolBarManager.add(collapseAllAction);
 		iToolBarManager.add(expandAllAction);
 	}
-	
 
 	/**
 	 * Jumps to a line in the given editor
@@ -639,8 +629,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 			return;
 		}
 		ITextEditor editor = (ITextEditor) editorPart;
-		IDocument document = editor.getDocumentProvider().getDocument(
-				editor.getEditorInput());
+		IDocument document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
 		if (document != null) {
 			IRegion lineInfo = null;
 			try {
@@ -652,26 +641,29 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 			}
 		}
 	}
-	
+
 	/**
 	 * Highlights the whole if-Block for a FSTDirective
 	 * 
 	 * @param editorPart
-	 * @param startLine the first line of a directive
-	 * @param endLine the last line of a directive
-	 * @param startOffset characters before the statement starts
-	 * @param endOffset length of the last line
+	 * @param startLine
+	 *            the first line of a directive
+	 * @param endLine
+	 *            the last line of a directive
+	 * @param startOffset
+	 *            characters before the statement starts
+	 * @param endOffset
+	 *            length of the last line
 	 */
 	public static void scrollToLine(IEditorPart editorPart, int startLine, int endLine, int startOffset, int endOffset) {
 		if (!(editorPart instanceof ITextEditor) || startLine < 0 || endLine < 0) {
 			return;
 		}
 		ITextEditor editor = (ITextEditor) editorPart;
-		IDocument document = editor.getDocumentProvider().getDocument(
-				editor.getEditorInput());
+		IDocument document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
 		if (document != null) {
 			try {
-				int offset = document.getLineOffset(startLine)+startOffset;
+				int offset = document.getLineOffset(startLine) + startOffset;
 				editor.selectAndReveal(offset, document.getLineOffset(endLine) - (offset) + endOffset);
 			} catch (BadLocationException e) {
 			}
@@ -689,38 +681,37 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 
 	@Override
 	public void propertyChange(PropertyChangeEvent event) {
-		if(event.getSource() instanceof ProviderAction && ((ProviderAction) event.getSource()).isChecked()){
+		if (event.getSource() instanceof ProviderAction && ((ProviderAction) event.getSource()).isChecked()) {
 			for (IAction curAction : actionOfProv) {
-				if(curAction != event.getSource()){
-					if(((ProviderAction) event.getSource()).getLabelProvider().getOutlineType() == ((ProviderAction) curAction).getLabelProvider().getOutlineType()){
+				if (curAction != event.getSource()) {
+					if (((ProviderAction) event.getSource()).getLabelProvider().getOutlineType() == ((ProviderAction) curAction).getLabelProvider().getOutlineType()) {
 						curAction.setChecked(false);
 					}
 				}
 			}
 			update(iFile);
 		}
-		
+
 	}
-	
+
 	private void fireSelectedAction() {
 		for (IAction curAction : actionOfProv) {
-			if(((ProviderAction) curAction).getLabelProvider().getOutlineType() == selectedOutlineType 
-					&& curAction.isChecked()){
+			if (((ProviderAction) curAction).getLabelProvider().getOutlineType() == selectedOutlineType && curAction.isChecked()) {
 				curAction.run();
 				return;
 			}
 		}
 		for (IAction curAction : actionOfProv) {
-			if(((ProviderAction) curAction).getLabelProvider().getOutlineType() == selectedOutlineType){
+			if (((ProviderAction) curAction).getLabelProvider().getOutlineType() == selectedOutlineType) {
 				curAction.setChecked(true);
 				curAction.run();
 				return;
 			}
 		}
 	}
-	
-	private class NotAvailableLabelProv extends OutlineLabelProvider{
-		
+
+	private class NotAvailableLabelProv extends OutlineLabelProvider {
+
 		@Override
 		public Image getImage(Object element) {
 			return null;
@@ -732,10 +723,12 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		}
 
 		@Override
-		public void addListener(ILabelProviderListener listener) {	}
+		public void addListener(ILabelProviderListener listener) {
+		}
 
 		@Override
-		public void dispose() {	}
+		public void dispose() {
+		}
 
 		@Override
 		public boolean isLabelProperty(Object element, String property) {
@@ -743,7 +736,8 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		}
 
 		@Override
-		public void removeListener(ILabelProviderListener listener) {}
+		public void removeListener(ILabelProviderListener listener) {
+		}
 
 		@Override
 		public int getOutlineType() {
@@ -755,7 +749,8 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		}
 
 		@Override
-		public void setForeground(TreeItem item, IFile file) {}
+		public void setForeground(TreeItem item, IFile file) {
+		}
 
 		@Override
 		public String getLabelProvName() {
@@ -767,62 +762,68 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 			return false;
 		}
 
-		/* (non-Javadoc)
-		 * @see de.ovgu.featureide.ui.views.collaboration.outline.OutlineLabelProvider#init()
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * de.ovgu.featureide.ui.views.collaboration.outline.OutlineLabelProvider
+		 * #init()
 		 */
 		@Override
 		public void init() {
-			
+
 		}
-		
+
 	}
-	
+
 	private class NotAvailableContentProv implements ITreeContentProvider {
-		
+
 		@Override
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {	}
-		
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+		}
+
 		@Override
-		public void dispose() {	}
-		
+		public void dispose() {
+		}
+
 		@Override
 		public boolean hasChildren(Object element) {
 			return false;
 		}
-		
+
 		@Override
 		public Object getParent(Object element) {
 			return null;
 		}
-		
-		//TODO
-		public Object[] getElements(Object inputElement) {
-//			if (inputElement == null || !(inputElement instanceof IFile))
-//				return new String[] { "no file found" };
 
-//			IFeatureProject featureProject = CorePlugin
-//					.getFeatureProject((IFile) inputElement);
-//			if (featureProject != null) {
-//				if (model != null) {
-//					FSTClass c = model.getClass(((IFile) inputElement).getName());
-//					if (c != null) { 
-//						return new Object[] { c };
-//					} else {
-						return new String[] { "An outline is not available." };
-//					}
-//				} else {
-//					return new String[] { "Collaboration Model not found" };
-//				}
-//			} else {
-//				return new String[] { "This is no feature project" };
-//			}
+		// TODO
+		public Object[] getElements(Object inputElement) {
+			// if (inputElement == null || !(inputElement instanceof IFile))
+			// return new String[] { "no file found" };
+
+			// IFeatureProject featureProject = CorePlugin
+			// .getFeatureProject((IFile) inputElement);
+			// if (featureProject != null) {
+			// if (model != null) {
+			// FSTClass c = model.getClass(((IFile) inputElement).getName());
+			// if (c != null) {
+			// return new Object[] { c };
+			// } else {
+			return new String[] { "An outline is not available." };
+			// }
+			// } else {
+			// return new String[] { "Collaboration Model not found" };
+			// }
+			// } else {
+			// return new String[] { "This is no feature project" };
+			// }
 		}
-		
-//		@Override
-//		public Object[] getElements(Object inputElement) {
-//			return new String[] { "An outline is not available." };
-//		}
-		
+
+		// @Override
+		// public Object[] getElements(Object inputElement) {
+		// return new String[] { "An outline is not available." };
+		// }
+
 		@Override
 		public Object[] getChildren(Object parentElement) {
 			return null;

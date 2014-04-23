@@ -47,6 +47,7 @@ import org.eclipse.swt.graphics.Font;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.fstmodel.FSTArbitraryRole;
 import de.ovgu.featureide.core.fstmodel.FSTField;
+import de.ovgu.featureide.core.fstmodel.FSTInvariant;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
@@ -124,7 +125,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 	 * @return The persistent property
 	 */
 	public final static boolean[] getRoleSelections() {
-		boolean[] selections = new boolean[7];
+		boolean[] selections = new boolean[10];
 		try {
 			String property = ResourcesPlugin.getWorkspace().getRoot().getPersistentProperty(GET_ROLE_SELECTIONS_NAME());
 			if (property == null) {
@@ -210,7 +211,8 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		if (!(role instanceof FSTArbitraryRole) && role.getDirectives().isEmpty()) {
 			int fieldCount = getCountForFieldContentCreate(tooltipContent);
 			int methodCount = getCountForMethodContentCreate(tooltipContent);
-			addLabel(new Label("Fields: " + fieldCount + " Methods: "	+ methodCount +" "));
+			Object[] invariant = createInvariantContent(tooltipContent);
+			addLabel(new Label("Fields: " + fieldCount + " Methods: "	+ methodCount + " Invariants: " + ((Integer)invariant[0]) + " "));
 		} else if (role.getClassFragment().getName().startsWith("*.")) {
 			setContentForFiles(new CompartmentFigure(), tooltipContent);
 		} else {
@@ -229,22 +231,36 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		if (role.getDirectives().isEmpty() && role.getFile() != null) {
 			int fieldCount = 0;
 			int methodCount = 0;
+			Object[] invariant = null;
+			if (showInvariants()) {
+				invariant = createInvariantContent(tooltipContent);
+			}
 			if (showOnlyFields()) {
 				fieldCount = getCountForFieldContentCreate(tooltipContent);
 			}
 			
 			if (showOnlyMethods()) {
 				methodCount = getCountForMethodContentCreate(tooltipContent);
+			}else if (showContracts())
+			{
+				methodCount = getCountForMethodContentContractCreate(tooltipContent);
+			}	
+			
+			tooltipContent.add(new Label("Fields: " + fieldCount + " Methods: "	+ methodCount +" Invariants: " + ((invariant != null) ?((Integer)invariant[0]) : 0) + " "));
+
+			if (showInvariants() && invariant != null && ((Integer)invariant[0]) > 0) {
+				addToToolTip(((Integer)invariant[0]), ((CompartmentFigure) invariant[1]), tooltipContent);
 			}
 			
-			
-			tooltipContent.add(new Label("Fields: " + fieldCount + " Methods: "	+ methodCount +" "));
-
-			// draw separationline between fields and methods
-			if ((fieldCount > 0) && (methodCount > 0)) {
+			// draw separation line between fields and methods
+			if (invariant != null && (fieldCount + ((Integer)invariant[0]) > 0) && (methodCount > 0)) {
+				int xyValue = (fieldCount + ((Integer)invariant[0])) * (ROLE_PREFERED_SIZE + GRIDLAYOUT_VERTICAL_SPACING) + GRIDLAYOUT_MARGIN_HEIGHT;
+				panel.setBorder(new RoleFigureBorder(xyValue, xyValue));
+			} else 	if (fieldCount > 0 && (methodCount > 0)) {
 				int xyValue = fieldCount * (ROLE_PREFERED_SIZE + GRIDLAYOUT_VERTICAL_SPACING) + GRIDLAYOUT_MARGIN_HEIGHT;
 				panel.setBorder(new RoleFigureBorder(xyValue, xyValue));
 			}
+			
 
 		} else if (role.getClassFragment().getName().startsWith("*.")) {
 			setContentForFiles(tooltipContent, null);
@@ -253,6 +269,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		}
 		setToolTip(tooltipContent);
 	}
+
 
 	private int getCountForMethodContentCreate(Figure tooltipContent) {
 		
@@ -290,6 +307,73 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		}
 		return methodCount;
 	}
+	
+	private int getCountForMethodContentContractCreate(Figure tooltipContent) {
+		
+		CompartmentFigure methodFigure = new CompartmentFigure();
+		Label label = new Label(role.getFeature() + " ", IMAGE_FEATURE);
+		
+		if (isFieldMethodFilterActive()) {
+			tooltipContent.add(label);
+		} else {
+			methodFigure.add(label);
+		}
+		
+		int methodCount = 0;
+		for (FSTMethod m : role.getClassFragment().getMethods()) {
+			Label methodLabel = createMethodLabel(m);
+
+			if (matchFilter(m) && m.hasContract()) {
+				methodFigure.add(methodLabel);
+				methodCount++;
+				
+				if (isFieldMethodFilterActive()) {
+					addLabel(methodLabel);
+				} else {
+					if (methodCount % 25 == 0) {
+						tooltipContent.add(methodFigure);
+						methodFigure = new CompartmentFigure();
+						methodFigure.add(new Label(""));
+					}
+				}
+			}
+		}
+		
+		if (!isFieldMethodFilterActive()) {
+			addToToolTip(methodCount, methodFigure, tooltipContent);
+		}
+		return methodCount;
+	}	
+
+	private Object[] createInvariantContent(Figure tooltipContent) {
+		
+		CompartmentFigure invariantFigure = new CompartmentFigure();
+		invariantFigure.add(new Label(" "));
+		int invariants = 0;
+		for (FSTInvariant invariant : role.getClassFragment().getInvariants())
+		{
+			Label invariantLabel = createInvariantLabel(invariant);
+			
+			invariantFigure.add(new Label(invariant.getBody()));
+			invariants++;
+			
+			if (isFieldMethodFilterActive()) {
+				addLabel(invariantLabel);
+			} else {
+				if (invariants % 25 == 0) {
+					tooltipContent.add(invariantFigure);
+					invariantFigure = new CompartmentFigure();
+					invariantFigure.add(invariantLabel);//new Label(invariant.getBody()));
+				}
+			}
+		}
+		
+		Object [] obj = new Object[2];
+		obj[0] = invariants;
+		obj[1] = invariantFigure;
+		return obj;
+	}
+	
 	
 	private String getClassName() {
 		return role.getClassFragment().getName().split("[.]")[0];
@@ -413,7 +497,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 	public boolean isFieldMethodFilterActive() {
 		return (isPublicFieldMethodFilterActive() || isDefaultFieldMethodFilterActive() || 
 			   isPrivateFieldMethodFilterActive() || isProtectedFieldMethodFilterActive()) &&
-			   (showOnlyFields() || showOnlyMethods());
+			   (showOnlyFields() || showOnlyMethods() || showContracts() || showInvariants());
 	}
 	
 	
@@ -440,6 +524,14 @@ public class RoleFigure extends Figure implements GUIDefaults{
 	private boolean showOnlyMethods() {
 		return SELECTED_FIELDS_METHOD[ShowFieldsMethodsAction.ONLY_METHODS];
 	}
+
+	private boolean showContracts() {
+		return SELECTED_FIELDS_METHOD[ShowFieldsMethodsAction.ONLY_CONTRACTS];
+	}	
+	
+	private boolean showInvariants() {
+		return SELECTED_FIELDS_METHOD[ShowFieldsMethodsAction.ONLY_INVARIANTS];
+	}
 	
 	private boolean showOnlyNames() {
 		return SELECTED_FIELDS_METHOD[ShowFieldsMethodsAction.HIDE_PARAMETERS_AND_TYPES];
@@ -458,7 +550,8 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		        (m.isProtected() && isProtectedFieldMethodFilterActive()) ||
 		        (m.isPublic() && isPublicFieldMethodFilterActive()) ||
 		        (!m.isPrivate() && !m.isProtected() && !m.isPublic() && isDefaultFieldMethodFilterActive()) ||
-		        (!isFieldMethodFilterActive()));
+		        (!isFieldMethodFilterActive()) ||
+		        (m.hasContract() && showContracts()));
 	}
 	
 	
@@ -470,21 +563,45 @@ public class RoleFigure extends Figure implements GUIDefaults{
 			name = m.getFullName();
 		}
 		Label methodLabel = new RoleFigureLabel(name, m.getFullName());
+		
+		
 		if (m.inRefinementGroup()) {
 			methodLabel.setFont(FONT_BOLD);
 		}
-		if (m.isPrivate())
-			methodLabel.setIcon(IMAGE_METHODE_PRIVATE);
-		else if (m.isProtected())
-			methodLabel.setIcon(IMAGE_METHODE_PROTECTED);
-		else if (m.isPublic())
-			methodLabel.setIcon(IMAGE_METHODE_PUBLIC);
-		else
-			methodLabel.setIcon(IMAGE_METHODE_DEFAULT);
+		
+		if (m.hasContract() && showContracts())
+		{	
+			if (m.isPrivate())
+				methodLabel.setIcon(IMAGE_METHODE_PRIVATE_CONTRACT);
+			else if (m.isProtected())
+				methodLabel.setIcon(IMAGE_METHODE_PROTECTED_CONTRACT);
+			else if (m.isPublic())
+				methodLabel.setIcon(IMAGE_METHODE_PUBLIC_CONTRACT);
+			else
+				methodLabel.setIcon(IMAGE_METHODE_DEFAULT_CONTRACT);			
+		}else
+		{	
+			if (m.isPrivate())
+				methodLabel.setIcon(IMAGE_METHODE_PRIVATE);
+			else if (m.isProtected())
+				methodLabel.setIcon(IMAGE_METHODE_PROTECTED);
+			else if (m.isPublic())
+				methodLabel.setIcon(IMAGE_METHODE_PUBLIC);
+			else
+				methodLabel.setIcon(IMAGE_METHODE_DEFAULT);
+		}
 
 		return methodLabel;
 	}
 	
+	private Label createInvariantLabel(FSTInvariant c) {		
+		
+		Label invariantLabel = new RoleFigureLabel(c.getFullName(), c.getFullName());
+		
+		invariantLabel.setIcon(IMAGE_AT_WITHOUT_WHITE_BACKGROUND);
+		
+		return invariantLabel;
+	}	
 	
 	private Label createFieldLabel(FSTField f) {
 		String name;

@@ -31,8 +31,10 @@ import org.eclipse.swt.widgets.TreeItem;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
+import de.ovgu.featureide.core.fstmodel.FSTContractedRole;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTField;
+import de.ovgu.featureide.core.fstmodel.FSTInvariant;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.RoleElement;
@@ -49,10 +51,12 @@ import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 public class CollaborationOutlineLabelProvider extends OutlineLabelProvider implements GUIDefaults {
 
 	@Override
-	public void addListener(ILabelProviderListener listener) {}
+	public void addListener(ILabelProviderListener listener) {
+	}
 
 	@Override
-	public void dispose() {}
+	public void dispose() {
+	}
 
 	@Override
 	public boolean isLabelProperty(Object element, String property) {
@@ -60,44 +64,61 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 	}
 
 	@Override
-	public void removeListener(ILabelProviderListener listener) {}
+	public void removeListener(ILabelProviderListener listener) {
+	}
 
 	@Override
 	public Image getImage(Object element) {
 		if (element instanceof RoleElement) {
-			RoleElement fstModelElement = (RoleElement)element;
+			RoleElement fstModelElement = (RoleElement) element;
 			if (fstModelElement instanceof FSTField) {
-				FSTField field = (FSTField)fstModelElement;
+				FSTField field = (FSTField) fstModelElement;
 				if (field.isPrivate())
 					return IMAGE_FIELD_PRIVATE;
 				else if (field.isProtected())
 					return IMAGE_FIELD_PROTECTED;
 				else if (field.isPublic())
 					return IMAGE_FIELD_PUBLIC;
-				else 
+				else
 					return IMAGE_FIELD_DEFAULT;
+			} else if (fstModelElement instanceof FSTInvariant) {
+				return IMAGE_AT_WITHOUT_WHITE_BACKGROUND;
 			} else if (fstModelElement instanceof FSTMethod) {
-				FSTMethod method = (FSTMethod)fstModelElement;
-				if (method.isPrivate())			
-					return IMAGE_METHODE_PRIVATE;
-				else if (method.isProtected())
-					return IMAGE_METHODE_PROTECTED;
-				else if (method.isPublic())
-					return IMAGE_METHODE_PUBLIC;
-				else 
-					return IMAGE_METHODE_DEFAULT;
+				FSTMethod method = (FSTMethod) fstModelElement;
+				if (method.hasContract()) {
+					if (method.isPrivate())
+						return IMAGE_METHODE_PRIVATE_CONTRACT;
+					else if (method.isProtected())
+						return IMAGE_METHODE_PROTECTED_CONTRACT;
+					else if (method.isPublic())
+						return IMAGE_METHODE_PUBLIC_CONTRACT;
+					else
+						return IMAGE_METHODE_DEFAULT_CONTRACT;
+				} else {
+					if (method.isPrivate())
+						return IMAGE_METHODE_PRIVATE;
+					else if (method.isProtected())
+						return IMAGE_METHODE_PROTECTED;
+					else if (method.isPublic())
+						return IMAGE_METHODE_PUBLIC;
+					else
+						return IMAGE_METHODE_DEFAULT;
+				}
 			}
 		} else if (element instanceof FSTClass) {
 			return IMAGE_CLASS;
+		} else if (element instanceof FSTContractedRole) {
+			return IMAGE_AT_WITHOUT_WHITE_BACKGROUND;
 		}
+
 		return null;
 	}
 
 	@Override
 	public String getText(Object element) {
-		if (element instanceof  FSTClass) {
+		if (element instanceof FSTClass) {
 			FSTClass fstclass = (FSTClass) element;
-			String toAppend = ""; 
+			String toAppend = "";
 			for (FSTRole r : fstclass.getRoles()) {
 				if (!r.getDirectives().isEmpty()) {
 					return fstclass.getName();
@@ -108,32 +129,33 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 			}
 			return fstclass.getName() + toAppend;
 		}
-		
+
 		if (element instanceof FSTMethod)
-			return ((FSTMethod)element).getFullName();
-		
+			return ((FSTMethod) element).getFullName();
+
+		if (element instanceof FSTInvariant)
+			return ((FSTInvariant) element).getFullName();
+
 		if (element instanceof FSTField)
-			return ((FSTField)element).getFullName();
-		
+			return ((FSTField) element).getFullName();
+
 		if (element instanceof FSTFeature)
-			return ((FSTFeature)element).getName();
-		
+			return ((FSTFeature) element).getName();
+
 		if (element instanceof FSTRole)
-			return ((FSTRole)element).getFeature().getName();
-		
+			return ((FSTRole) element).getFeature().getName();
+
 		if (element instanceof FSTDirective) {
-			return ((FSTDirective)element).toString();
+			return ((FSTDirective) element).toString();
 		}
-		
+
 		if (element instanceof String)
 			return (String) element;
-		
+
 		return "";
 	}
-	
-	
-		
-	public String getLabelProvName(){
+
+	public String getLabelProvName() {
 		return "Collaboration Outline";
 	}
 
@@ -146,20 +168,14 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 		for (int i = 0; i < treeItems.length; i++) {
 			if (treeItems[i].getData() instanceof RoleElement) {
 				setForeground(treeItems[i], file);
-			} if (treeItems[i].getData() instanceof FSTRole) {
+			}
+			if (treeItems[i].getData() instanceof FSTRole) {
 				if (((FSTRole) treeItems[i].getData()).getFile().equals(file)) {
 					// get old Font and simply make it bold
-					treeItems[i].setFont(new Font(treeItems[i].getDisplay(),
-									treeItems[i].getFont().getFontData()[0]
-											.getName(), treeItems[i].getFont()
-											.getFontData()[0].getHeight(),
-									SWT.BOLD));
-					
+					treeItems[i].setFont(new Font(treeItems[i].getDisplay(), treeItems[i].getFont().getFontData()[0].getName(), treeItems[i].getFont().getFontData()[0].getHeight(), SWT.BOLD));
+
 				} else {
-					treeItems[i].setFont(new Font(treeItems[i].getDisplay(),
-						treeItems[i].getFont().getFontData()[0].getName(), 
-						treeItems[i].getFont().getFontData()[0].getHeight(),
-						SWT.NORMAL));
+					treeItems[i].setFont(new Font(treeItems[i].getDisplay(), treeItems[i].getFont().getFontData()[0].getName(), treeItems[i].getFont().getFontData()[0].getHeight(), SWT.NORMAL));
 				}
 			}
 			if (treeItems[i].getItems().length > 0) {
@@ -169,27 +185,26 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 	}
 
 	/**
-	 * @return <code>true</code> if the new input does not change the old content.
+	 * @return <code>true</code> if the new input does not change the old
+	 *         content.
 	 */
 	private boolean hasSameClass(FSTClass Class, IFile oldFile, IFile currentFile) {
-		if(Class == null){
-			UIPlugin.getDefault().logWarning("class war null" );
+		if (Class == null) {
+			UIPlugin.getDefault().logWarning("class war null");
 		}
-		if(currentFile == null){
+		if (currentFile == null) {
 			UIPlugin.getDefault().logWarning("file war null");
 		}
 		if (!currentFile.getProject().equals(oldFile.getProject())) {
 			return false;
 		}
-		if (isBuildFile(currentFile.getParent(), 
-				CorePlugin.getFeatureProject(currentFile).getBuildFolder())) {
+		if (isBuildFile(currentFile.getParent(), CorePlugin.getFeatureProject(currentFile).getBuildFolder())) {
 			return true;
 		}
-		if (isBuildFile(oldFile.getParent(), 
-				CorePlugin.getFeatureProject(oldFile).getBuildFolder())) {
+		if (isBuildFile(oldFile.getParent(), CorePlugin.getFeatureProject(oldFile).getBuildFolder())) {
 			return true;
 		}
-		
+
 		if (currentFile.equals(oldFile)) {
 			return true;
 		}
@@ -222,10 +237,10 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 		}
 		return false;
 	}
-	
+
 	public void setForeground(TreeItem item, IFile iFile) {
 		RoleElement element = (RoleElement) item.getData();
-		
+
 		for (FSTRole role : element.getRole().getFSTClass().getRoles()) {
 			if (!role.getFile().equals(iFile)) {
 				continue;
@@ -233,17 +248,25 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 			if (element instanceof FSTMethod) {
 				for (FSTMethod method : role.getClassFragment().getMethods()) {
 					if (method.comparesTo(element)) {
-						item.setForeground(viewer.getControl().getDisplay()
-								.getSystemColor(SWT.DEFAULT));
+						item.setForeground(viewer.getControl().getDisplay().getSystemColor(SWT.DEFAULT));
 						return;
 					}
 				}
 			}
+			if (element instanceof FSTInvariant) {
+
+				for (FSTInvariant inv : role.getClassFragment().getInvariants()) {
+					if (inv.comparesTo(element)) {
+						item.setForeground(viewer.getControl().getDisplay().getSystemColor(SWT.DEFAULT));
+						return;
+					}
+				}
+			}
+
 			if (element instanceof FSTField) {
 				for (FSTField field : role.getClassFragment().getFields()) {
 					if (field.comparesTo(element)) {
-						item.setForeground(viewer.getControl().getDisplay()
-								.getSystemColor(SWT.DEFAULT));
+						item.setForeground(viewer.getControl().getDisplay().getSystemColor(SWT.DEFAULT));
 						return;
 					}
 				}
@@ -252,39 +275,38 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 		item.setForeground(viewer.getControl().getDisplay().getSystemColor(SWT.COLOR_GRAY));
 	}
 
-
 	public boolean refreshContent(IFile oldFile, IFile currentFile) {
-	if (currentFile != null && oldFile != null) {
-		/** only set the colors of the tree if the content is the same **/
-		TreeItem[] items = viewer.getTree().getItems();
-		if (currentFile.getName().equals(oldFile.getName()) && items.length > 0) {
-			TreeItem item = items[0];
-			if (item != null) {
-				if (item.getData() instanceof FSTClass) {
-					if (!hasSameClass((FSTClass) item.getData(), oldFile, currentFile)) {
-						return false;
-					}
-					oldFile = currentFile;
-					String toAppend = " - Composed class"; 
-					for (FSTRole r : ((FSTClass)item.getData()).getRoles()) {
-						if (!r.getDirectives().isEmpty()) {
-							toAppend =  "";
-							break;
+		if (currentFile != null && oldFile != null) {
+			/** only set the colors of the tree if the content is the same **/
+			TreeItem[] items = viewer.getTree().getItems();
+			if (currentFile.getName().equals(oldFile.getName()) && items.length > 0) {
+				TreeItem item = items[0];
+				if (item != null) {
+					if (item.getData() instanceof FSTClass) {
+						if (!hasSameClass((FSTClass) item.getData(), oldFile, currentFile)) {
+							return false;
 						}
-						if (r.getFile().equals(oldFile)) {
-							toAppend = " - " + r.getFeature().getName();
-							break;
+						oldFile = currentFile;
+						String toAppend = " - Composed class";
+						for (FSTRole r : ((FSTClass) item.getData()).getRoles()) {
+							if (!r.getDirectives().isEmpty()) {
+								toAppend = "";
+								break;
+							}
+							if (r.getFile().equals(oldFile)) {
+								toAppend = " - " + r.getFeature().getName();
+								break;
+							}
 						}
+						item.setText(((FSTClass) item.getData()).getName() + toAppend);
+						colorizeItems(items, oldFile);
+						return true;
 					}
-					item.setText(((FSTClass)item.getData()).getName()+toAppend);
-					colorizeItems(items, oldFile);
-					return true;
 				}
 			}
 		}
+		return false;
 	}
-	return false;
-}
 
 	@Override
 	public void init() {

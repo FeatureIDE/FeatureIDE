@@ -1,0 +1,39 @@
+<feature_model name="Stack PL">
+<meta>
+<data name="description">A feature model of a simple stack data structure</data>
+<data name="creator">Markus Voelter</data>
+<data name="email"></data>
+<data name="date">Aug 2009</data>
+<data name="department"></data>
+<data name="organization">itemis AG, Germany</data>
+<data name="address"></data>
+<data name="phone"></data>
+<data name="website">http://www.itemis.com/</data>
+<data name="reference">Markus Voelter, Using Domain-Specific Languages for Product Line Engineering, Tutorial at SPLC 2009, San Francisco, USA</data>
+</meta>
+<feature_tree>
+:r Stack
+	:o Size
+		:g [1,1]
+			: Fixed
+				:m Value
+			: Dynamic
+	:m Element Type
+		:g [1,1]
+			: Integer
+			: Float
+			: String
+	:o Optimization
+		:g [1,1]
+			: Speed
+			: Memory Usage
+	:o Counter
+	:o Additional Features
+		:g [1,*]
+			: Thread Safety
+			: Bounds Check
+			: Type Check
+</feature_tree>
+<constraints>
+</constraints>
+</feature_model>

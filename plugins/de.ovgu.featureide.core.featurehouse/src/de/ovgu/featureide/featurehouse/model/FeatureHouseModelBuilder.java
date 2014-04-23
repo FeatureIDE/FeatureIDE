@@ -99,12 +99,10 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 	 */
 	@SuppressWarnings("unchecked")
 	public void buildModel(ArrayList<FSTNode> nodes, boolean completeModel) {
-
 		this.completeModel = completeModel;
 		if (!completeModel) {
 			model.reset();
-		}
-		
+		}	
 		for (FSTNode node : (ArrayList<FSTNode>)nodes.clone()) {
 			if (NODE_TYPE_FEATURE.equals(node.getType())) {
 				caseAddFeature(node);
@@ -194,9 +192,9 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 		if (node instanceof FSTNonTerminal && canCompose()) {
 			List<FSTNode> children = ((FSTNonTerminal) node).getChildren();
 			for (FSTNode child : children) {
+				
 				String type = child.getType();
 				ClassBuilder classBuilder = ClassBuilder.getClassBuilder(currentFile, this);
-				
 				if (child instanceof FSTTerminal) {
 					FSTTerminal terminal = (FSTTerminal) child;
 					if (JAVA_NODE_DECLARATION_TYPE1.equals(type)
@@ -242,7 +240,9 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 						classBuilder.caseFieldDeclaration(terminal);
 					} else if (JML_SPEC_CASE_SEQ.equals(type)) {
 						classBuilder.caseJMLSpecCaseSeq(terminal);
-					}
+					} else if (JML_INVARIANT.equals(type)) {
+						classBuilder.caseJMLInvariant(terminal);
+					}					
 				} else if (child instanceof FSTNonTerminal) {
 					if (JAVA_NODE_INNER_CLASS_TYPE.equals(type)) {
 						String name = child.getName();
@@ -256,7 +256,9 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 					}
 					caseClassDeclaration(child);
 				}
+				
 			}
+			
 			
 			if (!classFragmentStack.isEmpty()) {
 //				FSTClassFragment curClassFragment = 

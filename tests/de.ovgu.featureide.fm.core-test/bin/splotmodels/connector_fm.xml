@@ -1,0 +1,45 @@
+<feature_model name="Connector PL">
+<meta>
+<data name="description">A feature model of a simple stack data structure</data>
+<data name="creator">Markus Voelter</data>
+<data name="email"></data>
+<data name="date">Aug 2009</data>
+<data name="department"></data>
+<data name="organization">itemis AG, Germany</data>
+<data name="address"></data>
+<data name="phone"></data>
+<data name="website">http://www.itemis.com/</data>
+<data name="reference">Markus Voelter, Using Domain-Specific Languages for Product Line Engineering, Tutorial at SPLC 2009, San Francisco, USA</data>
+</meta>
+<feature_tree>
+:r Connector
+	:m Paradigm
+		:g [1,1]
+			: Client/Server
+				:g [1,1]
+					: Synchronous
+						:o Timeout
+					: Asynchronous
+						:g [1,1]
+							: Polling
+								:g [1,1]
+									: Blocking
+									: Non-blocking
+							: Callback
+			: Message-Based
+				:m Sender
+				:m Receiver
+					:g [1,1]
+						: Pull
+							:g [1,*]
+								: Queued
+								: Non-Queued
+						: Push
+	:m Technology
+		:g [1,1]
+			: CAN
+			: Local
+</feature_tree>
+<constraints>
+</constraints>
+</feature_model>

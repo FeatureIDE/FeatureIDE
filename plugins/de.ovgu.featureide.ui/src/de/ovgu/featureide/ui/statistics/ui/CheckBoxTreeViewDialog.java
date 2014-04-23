@@ -85,6 +85,7 @@ public class CheckBoxTreeViewDialog extends Dialog {
 		container.setLayout(new FillLayout(SWT.HORIZONTAL));
 
 		viewer = new CheckboxTreeViewer(container, SWT.BORDER);
+		
 		viewer.setContentProvider(new ContentProvider(viewer) {
 
 			@Override

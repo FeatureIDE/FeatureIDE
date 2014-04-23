@@ -34,7 +34,7 @@ public abstract class RoleElement {
 	private static final String PROTECTED = "protected";
 	private static final String PRIVATE = "private";
 	private static final String FINAL = "final";
-	
+
 	protected String name;
 	protected String type;
 	protected String modifiers;
@@ -42,15 +42,14 @@ public abstract class RoleElement {
 	protected int beginLine;
 	protected int endLine;
 	protected int composedLine;
-	
+
 	protected FSTRole role;
 
 	public RoleElement(String name, String type, String modifiers) {
 		this(name, type, modifiers, "", -1, -1);
 	}
-	
-	public RoleElement(String name, String type, String modifiers, 
-			String body, int beginLine,	int endLine) {
+
+	public RoleElement(String name, String type, String modifiers, String body, int beginLine, int endLine) {
 		this.name = name;
 		this.type = type;
 		this.modifiers = modifiers;
@@ -126,9 +125,9 @@ public abstract class RoleElement {
 	public boolean isStatic() {
 		return modifiers.contains(STATIC);
 	}
-	
+
 	public abstract String getFullName();
-	
+
 	public String getType() {
 		return type;
 	}
@@ -145,20 +144,19 @@ public abstract class RoleElement {
 	public String toString() {
 		return getName();
 	}
-	
+
 	/**
-	 * @return <code>true</code> if the given element is equivalent 
-	 * in it's structure and it has the same class as this element
+	 * @return <code>true</code> if the given element is equivalent in it's
+	 *         structure and it has the same class as this element
 	 */
 	public boolean comparesTo(RoleElement element) {
-		return getFullName().equals(element.getFullName()) && 
-			getClass().equals(element.getClass());
+		return getFullName().equals(element.getFullName()) && getClass().equals(element.getClass());
 	}
 
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof RoleElement) {
-			return comparesTo((RoleElement)obj);
+			return comparesTo((RoleElement) obj);
 		}
 		return false;
 	}

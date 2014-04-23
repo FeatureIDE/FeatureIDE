@@ -94,6 +94,7 @@ public class Parent implements StatisticsIds, GUIDefaults {
 		}
 	}
 	
+	
 	public Parent[] getChildren() {
 		if (sorted) {
 			sortChildren();

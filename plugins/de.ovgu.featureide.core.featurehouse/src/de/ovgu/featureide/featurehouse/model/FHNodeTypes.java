@@ -46,9 +46,11 @@ public interface FHNodeTypes {
 	static final String JAVA_NODE_PACKAGEDECLARATION = "PackageDeclaration";
 	static final String JAVA_NODE_IMPLEMENTATIONLIST = "ImplementsList";
 	static final String JAVA_NODE_EXTENDSLIST = "ExtendsList";
+	static final String JAVA_NODE_METHOD_SPEC = "MethodDeclarationWithSpec";
 	
 	//JML specific node types
 	static final String JML_SPEC_CASE_SEQ = "SpecCaseSeq";
+	static final String JML_INVARIANT = "Invariant";
 	
 	// C specific node types
 	static final String C_NODE_SEQUENCE_CODEUNIT_TOPLEVEL = "Sequence_CodeUnit_TopLevel";

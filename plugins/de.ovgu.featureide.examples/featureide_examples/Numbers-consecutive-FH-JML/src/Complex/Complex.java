@@ -1,45 +1,13 @@
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-public /*@pure@*/   interface  Complex {
+public /*@pure@*/  interface Complex {
 	/*@ 
-    
-     
-    
-     ensures JMLDouble.approximatelyEqualTo(
+	 ensures JMLDouble.approximatelyEqualTo(
                  magnitude()*StrictMath.cos(angle()),
                  \result,
                  tolerance); @*/
-	
-        
-    double realPart();
+	double realPart();
 
 	/*@ 
-      
-
-    
-       
-       requires_redundantly b != null; 
+	 requires_redundantly b != null; 
        requires !Double.isNaN(this.magnitude() * b.magnitude());
        requires !Double.isNaN(this.angle()) && !Double.isNaN(b.angle());
        ensures_redundantly \result != null;
@@ -54,77 +22,54 @@ public /*@pure@*/   interface  Complex {
        requires Double.isNaN(this.magnitude() * b.magnitude())
              || Double.isNaN(this.angle()) || Double.isNaN(b.angle());
        ensures Double.isNaN(\result.realPart());
-also
-ensures \original && \result.imaginaryPart() == 0.0; @*/
-	
-      
-    Complex mul  (Complex b);
+	also
+	 ensures \original && \result.imaginaryPart() == 0.0; @*/
+	Complex mul  (Complex b);
 
 	/*@ 
-
-    
-     ensures JMLDouble.approximatelyEqualTo(
+	 ensures JMLDouble.approximatelyEqualTo(
                  StrictMath.abs(realPart()),
                  \result,
                  tolerance);
-also
-ensures JMLDouble.approximatelyEqualTo(
+	also
+	 ensures JMLDouble.approximatelyEqualTo(
                  StrictMath.sqrt(realPart()*realPart()
                            + imaginaryPart()*imaginaryPart()),
                  \result,
                  tolerance); @*/
-	
-      
-    double magnitude  ();
+	double magnitude  ();
 
 	/*@ 
-    
-    
-
-    
-     ensures JMLDouble.approximatelyEqualTo(
+	 ensures JMLDouble.approximatelyEqualTo(
                  this.realPart() + b.realPart(),
                  \result.realPart(),
                  tolerance);
-also
-ensures JMLDouble.approximatelyEqualTo(
+	also
+	 ensures JMLDouble.approximatelyEqualTo(
                  this.imaginaryPart() + b.imaginaryPart(),
                  \result.imaginaryPart(),
                  tolerance); @*/
-	
-      
-    Complex add  (Complex b);
+	Complex add  (Complex b);
 
 	/*@ 
-    
-    
-
-     
-     ensures JMLDouble.approximatelyEqualTo(
+	 ensures JMLDouble.approximatelyEqualTo(
                  this.realPart() - b.realPart(),
                  \result.realPart(),
                  tolerance);
-also
-ensures JMLDouble.approximatelyEqualTo(
+	also
+	 ensures JMLDouble.approximatelyEqualTo(
                  this.imaginaryPart() - b.imaginaryPart(),
                  \result.imaginaryPart(),
                  tolerance); @*/
-	
-      
-    Complex sub  (Complex b);
+	Complex sub  (Complex b);
 
 	/*@ 
-      
-
-
-    
-     requires d > 0.0;
+	 requires d > 0.0;
      ensures \result >= 0.0;
-also
-requires d > 0.0;
+	also
+	 requires d > 0.0;
      ensures \result >= 0.0; @*/
-	
-     /*@public model pure double positiveRemainder  (double n, double d) {
+	/*@public model pure double positiveRemainder  (double n, double d) {
         n = n % d;
         if (n < 0) {
            n += d;
@@ -133,10 +78,7 @@ requires d > 0.0;
      }@*/
 
 	/*@ 
-    
-    
-     
-       requires_redundantly b != null;
+	 requires_redundantly b != null;
        requires !Double.isNaN(this.magnitude() / b.magnitude());
        requires !Double.isNaN(this.angle()) && !Double.isNaN(b.angle());
        ensures_redundantly \result != null;
@@ -151,18 +93,12 @@ requires d > 0.0;
        requires Double.isNaN(this.magnitude() / b.magnitude())
              || Double.isNaN(this.angle()) || Double.isNaN(b.angle());
        ensures Double.isNaN(\result.realPart());
-also
-ensures \result.imaginaryPart() == 0.0; @*/
-	
-      
-    Complex div  (Complex b);
+	also
+	 ensures \result.imaginaryPart() == 0.0; @*/
+	Complex div  (Complex b);
 
-	/*@ 
-    
-    
-     also @*/ /*@ 
-     
-     ensures \result
+	/*@ also @*/ /*@ 
+	 ensures \result
          <==> o instanceof Complex
               && this.realPart() == ((Complex)o).realPart();
             
@@ -170,67 +106,42 @@ ensures \result.imaginaryPart() == 0.0; @*/
          <==> o instanceof Complex
               && this.magnitude() == ((Complex)o).magnitude()
               && this.angle() == ((Complex)o).angle();
-also
-ensures this.imaginaryPart() == ((Complex)o).imaginaryPart(); @*/
-	
-     
-      
-    boolean equals  ( /*@nullable@*/  Object o);
+	also
+	 ensures this.imaginaryPart() == ((Complex)o).imaginaryPart(); @*/
+	boolean equals  ( /*@nullable@*/  Object o);
 
 
-	
+	int hashCode  ();
 
-    
-    
-    int hashCode  ();
+	/*@ //@ public ghost static final double tolerance = 0.005;
 
-	/*@ 
-    
-    //@ public ghost static final double tolerance = 0.005;
-    
-    
-    
-     ensures JMLDouble.approximatelyEqualTo(
+	 //@ public ghost static final double tolerance = 0.005;
+ensures JMLDouble.approximatelyEqualTo(
                  \result,
                  magnitude()*StrictMath.sin(angle()),
                  tolerance); @*/
-	
-        
-    double imaginaryPart();
+	double imaginaryPart();
 
 	/*@ 
-    
-     ensures JMLDouble.approximatelyEqualTo(
+	 ensures JMLDouble.approximatelyEqualTo(
                  StrictMath.atan(realPart()),
                  \result,
                  tolerance); @*/
-	
-      
- 
-    
-     /*@public model pure boolean similarAngle(double ang1, double ang2) {
+	/*@public model pure boolean similarAngle(double ang1, double ang2) {
         ang1 = positiveRemainder(ang1, 2*StrictMath.PI);
         ang2 = positiveRemainder(ang2, 2*StrictMath.PI);
         return JMLDouble.approximatelyEqualTo(ang1, ang2, tolerance);
      }@*/
 
 	/*@ 
-      
-    
-    
-     ensures JMLDouble.approximatelyEqualTo(
+	 ensures JMLDouble.approximatelyEqualTo(
                  StrictMath.atan2(imaginaryPart(), realPart()),
                  \result,
                  tolerance); @*/
-	
-       
-    double angle();
+	double angle();
 
 
-	
-    
-    
-     /*@public model pure boolean similarAngle(double ang1, double ang2) {
+	/*@public model pure boolean similarAngle(double ang1, double ang2) {
         ang1 = positiveRemainder(ang1, 2*StrictMath.PI);
         ang2 = positiveRemainder(ang2, 2*StrictMath.PI);
         return JMLDouble.approximatelyEqualTo(ang1, ang2, tolerance);

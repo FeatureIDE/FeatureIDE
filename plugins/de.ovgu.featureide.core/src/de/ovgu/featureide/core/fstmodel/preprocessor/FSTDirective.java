@@ -26,13 +26,14 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 import de.ovgu.featureide.core.fstmodel.FSTRole;
+import de.ovgu.featureide.core.fstmodel.RoleElement;
 
 /**
  * Representation of a directive at a role.
  * 
  * @author Jens Meinicke
  */
-public class FSTDirective {
+public class FSTDirective extends RoleElement {
 
 	private String expression;
 	private String featureName = null;
@@ -51,6 +52,7 @@ public class FSTDirective {
 	}
 
 	public FSTDirective() {
+		super("","","");
 	}
 
 	public void setCommand(FSTDirectiveCommand command) {
@@ -219,5 +221,11 @@ public class FSTDirective {
 
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	@Override
+	public String getFullName() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

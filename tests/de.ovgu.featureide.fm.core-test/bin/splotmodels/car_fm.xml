@@ -1,0 +1,30 @@
+<feature_model name="Car PL">
+<meta>
+<data name="description">A feature model of a simple automobile product line</data>
+<data name="creator">Jules White et. al</data>
+<data name="email"></data>
+<data name="date">Aug 2009</data>
+<data name="department"></data>
+<data name="organization">Vanderbilt University, Nashville, TN, USA and University of Seville, Seville, Spain</data>
+<data name="address"></data>
+<data name="phone"></data>
+<data name="website"></data>
+<data name="reference">Jules White, Brian Dougherty, Doulas C. Schmidt, Automated Reasoning for Multi-step Feature Model Configuration Problems, SPLC 2009, San Francisco, USA.</data>
+</meta>
+<feature_tree>
+:r Car
+	:o Automated Driving Controller
+		:m Collision Avoidance Braking
+			:g [1,1]
+				: Standard Avoidance
+				: Enhanced Avoidance (enhanced_avoidance)
+		:o Parallel Parking (parallel_parking)
+	:m Sensors
+		:o Lateral Range Finder (lateral_range_finder)
+		:o Forward Range Finder (forward_range_finder)
+</feature_tree>
+<constraints>
+c1: ~enhanced_avoidance or forward_range_finder
+c2: ~parallel_parking or lateral_range_finder
+</constraints>
+</feature_model>

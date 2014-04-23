@@ -1,0 +1,34 @@
+<feature_model name="Cellphone">
+<meta>
+<data name="description">This feature model represents a simple cell phone's features and dependencies</data>
+<data name="creator">Thomas von der Maen</data>
+<data name="email"></data>
+<data name="date"></data>
+<data name="department"></data>
+<data name="organization"></data>
+<data name="address"></data>
+<data name="phone"></data>
+<data name="website"></data>
+<data name="reference">Thomas von der Maen and Horst Lichter. Determining the variation degree of feature models. In J. Henk Obbink and Klaus Pohl, editors, SPLC, volume 3714 of Lecture Notes in Computer Science, pages 82-88. Springer, 2005.</data>
+</meta>
+<feature_tree>
+:r cellphone
+	:o wireless
+		:g [1,*]
+			: infrared
+			: bluetooth (bluetooth)
+	:m accu_cell
+		:g [1,1]
+			: li_ion (li_ion)
+			: ni_mh
+			: ni_ca (ni_ca)
+	:m display
+		:g [1,1]
+			: color (color)
+			: monochrome
+</feature_tree>
+<constraints>
+c1: ~bluetooth or li_ion
+c2: ~color or ~ni_ca
+</constraints>
+</feature_model>

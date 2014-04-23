@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-	<featureModel>
+	<featureModel chosenLayoutAlgorithm="1">
 		<struct>
 			<and abstract="true" mandatory="true" name="GameOfLife">
 				<or abstract="true" hidden="true" name="Composed">
@@ -111,5 +111,23 @@
 				</imp>
 			</rule>
 		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true"/>
 		<comments/>
+		<featureOrder userDefined="true">
+			<feature name="ModelBase"/>
+			<feature name="GuiBase"/>
+			<feature name="PopUpMenu"/>
+			<feature name="IO"/>
+			<feature name="AbstractGenerator"/>
+			<feature name="FormGenerator"/>
+			<feature name="RandomGenerator"/>
+			<feature name="FormDefaultGenerator"/>
+			<feature name="GeneratorSelection"/>
+			<feature name="Test"/>
+			<feature name="UndoRedo"/>
+			<feature name="UndoRedoGuiBase"/>
+			<feature name="UndoRedoTest"/>
+			<feature name="UndoRedoGenerator"/>
+			<feature name="RandomDefaultGenerator"/>
+		</featureOrder>
 	</featureModel>
