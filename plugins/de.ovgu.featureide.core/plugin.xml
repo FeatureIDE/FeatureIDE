@@ -123,8 +123,10 @@
                name="projectNature"
                value="de.ovgu.featureide.core.featureProjectNature">
          </filter>
-      </page>
-     
+         <enabledWhen>
+				<adapt type="org.eclipse.core.resources.IProject" />
+         </enabledWhen>
+      </page>  
       <page
             category="de.ovgu.featureide.core.propertypage"
             class="de.ovgu.featureide.core.propertypage.FeatureProjectPropertyPage"
@@ -134,6 +136,9 @@
                name="projectNature"
                value="de.ovgu.featureide.core.featureProjectNature">
          </filter>
+         <enabledWhen>
+				<adapt type="org.eclipse.core.resources.IProject" />
+         </enabledWhen>
       </page>
    </extension>
 </plugin>

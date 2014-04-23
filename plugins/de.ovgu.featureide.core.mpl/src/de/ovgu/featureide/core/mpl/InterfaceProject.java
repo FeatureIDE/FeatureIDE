@@ -58,7 +58,7 @@ public class InterfaceProject {
 	private Configuration configuration;
 
 	private final FeatureModel featureModel;
-	private final String[] featureNames;
+	private String[] featureNames;
 	
 	private AChainJob lastJob = null;
 	private FujiJob loadJob = null;
@@ -115,19 +115,42 @@ public class InterfaceProject {
 		} else {
 			featureModel = null;
 		}
+		initFeatureNames();
+//		if (featureModel != null) {
+//			featureNames = new String[featureModel.getNumberOfFeatures()];
+//			int i = 0;
+//			Collection<Entry<String, Feature>> x = featureModel.getFeatureTable().entrySet();
+//			for (Entry<String, Feature> entry : x) {
+//				entry.getValue().addListener(new FeaturePropertyChangeListener(i));
+//				featureNames[i++] = entry.getKey();
+//			}
+////			Arrays.sort(featureNames);
+//		} else {
+//			featureNames = null;
+//		}
+	}
+	
+	private void initFeatureNames() {
 		if (featureModel != null) {
-			featureNames = new String[featureModel.getNumberOfFeatures()];
-			int i = 0;
+			final String[] tempFeatureNames = new String[featureModel.getNumberOfFeatures()];
+			int count = 0;
 			Collection<Entry<String, Feature>> x = featureModel.getFeatureTable().entrySet();
 			for (Entry<String, Feature> entry : x) {
-				entry.getValue().addListener(new FeaturePropertyChangeListener(i));
-				featureNames[i++] = entry.getKey();
+				if (entry.getValue().isConcrete()) {
+					entry.getValue().addListener(new FeaturePropertyChangeListener(count));
+					tempFeatureNames[count++] = entry.getKey();
+				}
 			}
+			featureNames = new String[count];
+			System.arraycopy(tempFeatureNames, 0, featureNames, 0, count);
 //			Arrays.sort(featureNames);
+//			loadSignatures(true);
 		} else {
 			featureNames = null;
+			projectSignatures = null;
 		}
 	}
+	
 	public int[] getFeatureIDs(Collection<String> featureNames) {
 		int[] ids = new int[featureNames.size()];
 		int i = -1;
@@ -136,7 +159,6 @@ public class InterfaceProject {
 		}
 		return ids;
 	}
-
 	
 	public int getFeatureID(String featureName) {
 		for (int i = 0; i < featureNames.length; ++i) {

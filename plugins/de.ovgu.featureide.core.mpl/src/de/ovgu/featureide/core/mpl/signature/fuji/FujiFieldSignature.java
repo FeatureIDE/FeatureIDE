@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.core.mpl.signature.fuji;
 
-import java.util.Arrays;
-
 import AST.TypeDecl;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassSignature;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractFieldSignature;
@@ -40,14 +38,6 @@ public class FujiFieldSignature extends AbstractFieldSignature {
 		super(parent, name, modifiers, returnType.name());
 		this.returnType = returnType;
 	}
-
-	// public FujiFieldSignature(FujiFieldSignature orgSig) {
-	// this(orgSig, false);
-	// }
-	//
-	// private FujiFieldSignature(FujiFieldSignature orgSig, boolean ext) {
-	// super(orgSig, ext);
-	// }
 
 	@Override
 	public String toString() {
@@ -71,16 +61,9 @@ public class FujiFieldSignature extends AbstractFieldSignature {
 		return fieldString.toString();
 	}
 
-	// @Override
-	// public FujiFieldSignature createExtendedSignature() {
-	// return new FujiFieldSignature(this, true);
-	// }
-
 	@Override
 	protected void computeHashCode() {
-		hashCode = 1;
-		hashCode = hashCodePrime * hashCode + fullName.hashCode();
-		hashCode = hashCodePrime * hashCode + Arrays.hashCode(modifiers);
+		super.computeHashCode();
 		hashCode = hashCodePrime * hashCode + type.hashCode();
 	}
 
@@ -94,8 +77,8 @@ public class FujiFieldSignature extends AbstractFieldSignature {
 		FujiFieldSignature otherSig = (FujiFieldSignature) obj;
 
 		if (!super.sigEquals(otherSig)
-		// || !returnType.sameStructure(otherSig.returnType)) {
-				|| returnType != otherSig.returnType) {
+				|| returnType != otherSig.returnType
+				) {
 			return false;
 		}
 		return true;

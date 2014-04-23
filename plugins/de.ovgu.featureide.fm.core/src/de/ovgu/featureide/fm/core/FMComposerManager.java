@@ -154,6 +154,7 @@ public class FMComposerManager implements IFMComposerExtension {
 		fmComposerExtension = (IFMComposerExtension)o;
 	}
 
+	// TODO rename method
 	@Override
 	public void hasComposer(boolean hasComposer) {
 		fmComposerExtension.hasComposer(hasComposer);

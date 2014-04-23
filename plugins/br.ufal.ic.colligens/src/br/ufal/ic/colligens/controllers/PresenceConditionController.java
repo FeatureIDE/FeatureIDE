@@ -11,62 +11,61 @@ import java.util.LinkedList;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.text.TextSelection;
 
 import tree.Node;
 import tree.visitor.VisitorPrinter;
 import br.ufal.ic.colligens.activator.Colligens;
 import br.ufal.ic.colligens.controllers.core.PluginException;
+import br.ufal.ic.colligens.models.AbstractHeader;
 import br.ufal.ic.colligens.models.PlatformException;
-import br.ufal.ic.colligens.models.PlatformHeader;
 import core.GeneralFrontend;
 import core.RefactoringFrontend;
 import core.presence.condition.PresenceConditionVisitor;
 import de.fosd.typechef.lexer.options.OptionException;
 
 public class PresenceConditionController {
-	private final TextSelection selection;
 	private IFile file = null;
 	private final int line;
 	private final String code;
-	private Collection<Node> nodes;
+	private Collection<Node> nodes, nodesCondition2;
 	public static final String MARKER_TYPE = Colligens.PLUGIN_ID
 			+ ".presencecondition";
 
-	public PresenceConditionController(TextSelection selection, IFile file,
-			int line, String code) {
-		this.selection = selection;
+	public PresenceConditionController(IFile file, int line, String code) {
 		this.file = file;
 		this.line = line;
 		this.code = code;
 	}
 
 	public void run() throws PluginException, OptionException {
-		PlatformHeader platformHeader = new PlatformHeader();
+		AbstractHeader abstractHeader = AbstractHeader.getInstance();
 		try {
-			platformHeader.setProject(file.getProject().getName());
-			platformHeader.stubs();
+			abstractHeader.setProject(file.getProject().getName());
+			abstractHeader.run();
 		} catch (PlatformException e) {
 			e.printStackTrace();
 			throw new PluginException("");
 		}
 
 		tree.Node ast = GeneralFrontend.getAST(file.getLocation().toString(),
-				platformHeader.stubsAbsolutePath());
+				abstractHeader.getIncludes(), null);
 
 		nodes = new LinkedList<Node>();
+		nodesCondition2 = new LinkedList<Node>();
 
 		ast.accept(new PresenceConditionVisitor());
 
 		this.presenceCondition(ast);
 
-		System.out.println("----\n\n");
+		if (!this.markerLine(nodes)) {
+			this.markerLine(nodesCondition2);
+		}
 	}
 
 	private void presenceCondition(Node node) {
 		if (node.getPositionFrom() != null
-				&& (node.getPositionFrom().getLine() >= line - 5 && node
-						.getPositionFrom().getLine() <= line + 5)) {
+				&& (node.getPositionFrom().getLine() >= line - 10 && node
+						.getPositionFrom().getLine() <= line + 10)) {
 			PrintStream out = System.out;
 			node.accept(new VisitorPrinter(true));
 			System.setOut(out);
@@ -84,27 +83,14 @@ public class PresenceConditionController {
 				String codeNode = readFile(RefactoringFrontend.outputFilePath)
 						.trim();
 				if (codeNode.contains(code.trim())) {
-					System.out.println("Presence Condition: "
-							+ node.getPresenceCondition() + ", from line "
-							+ line + "." + node.getPositionFrom().getLine());
+					// System.out.println("Presence Condition: "
+					// + node.getPresenceCondition() + ", from line "
+					// + line + "." + node.getPositionFrom().getLine());
 					node.accept(new VisitorPrinter(false));
-					System.out.println("\n\n");
-
-					IMarker marker;
-					try {
-						marker = file.createMarker(MARKER_TYPE);
-
-						marker.setAttribute(
-								IMarker.MESSAGE,
-								"Presence Condition: "
-										+ node.getPresenceCondition());
-						marker.setAttribute(IMarker.SEVERITY,
-								IMarker.SEVERITY_INFO);
-						marker.setAttribute(IMarker.LINE_NUMBER, line);
-					} catch (CoreException e) {
-						e.printStackTrace();
-					}
+					// System.out.println("\n\n");
 					nodes.add(node);
+				} else if (Math.abs(node.getPositionFrom().getLine() - line) < 10) {
+					nodesCondition2.add(node);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -115,16 +101,31 @@ public class PresenceConditionController {
 		}
 	}
 
-	public Collection<Node> getNodes() {
-		if (nodes.isEmpty())
-			return null;
-
-		for (Iterator node = nodes.iterator(); node.hasNext();) {
-			Node type = (Node) node.next();
-
+	private boolean markerLine(Collection<Node> nodes) {
+		Node nodeMarke = null;
+		for (Iterator<Node> iterator = nodes.iterator(); iterator.hasNext();) {
+			Node node = iterator.next();
+			if (nodeMarke == null
+					|| (Math.abs(node.getPositionFrom().getLine() - line) <= Math
+							.abs(nodeMarke.getPositionFrom().getLine() - line))) {
+				nodeMarke = node;
+			}
 		}
+		if (nodeMarke == null) {
+			return false;
+		}
+		IMarker marker;
+		try {
+			marker = file.createMarker(MARKER_TYPE);
 
-		return nodes;
+			marker.setAttribute(IMarker.MESSAGE, "Presence Condition: "
+					+ nodeMarke.getPresenceCondition());
+			marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_INFO);
+			marker.setAttribute(IMarker.LINE_NUMBER, line);
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+		return true;
 	}
 
 	private String readFile(String fileName) throws IOException {

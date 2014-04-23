@@ -9,10 +9,14 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Tree;
@@ -34,7 +38,7 @@ import br.ufal.ic.colligens.views.InvalidConfigurationsView;
 public class InvalidConfigurationsViewController extends ViewController {
 
 	private TreeViewer treeViewer;
-	private ViewContentProvider viewContentProvider;
+	private final ViewContentProvider viewContentProvider;
 	private ViewSorter comparator;
 	private static InvalidConfigurationsViewController INSTANCE;
 
@@ -137,18 +141,33 @@ public class InvalidConfigurationsViewController extends ViewController {
 										.setSelection(log.selection());
 
 							} catch (PartInitException e) {
-								
+
 								e.printStackTrace();
 							} catch (IOException e) {
-								
+
 								e.printStackTrace();
 							} catch (CoreException e) {
-								
+
 								e.printStackTrace();
 							} catch (BadLocationException e) {
-								
+
 								e.printStackTrace();
 							}
+						}
+						if (event.button == MouseEvent.BUTTON3
+								&& event.count == 2) {
+							final Log log = (Log) data;
+							String textData = log.getFullPath() + "\n"
+									+ log.getMessage() + "\n"
+									+ log.getFeature();
+							TextTransfer textTransfer = TextTransfer
+									.getInstance();
+
+							Display display = getView().getSite().getShell()
+									.getDisplay();
+							Clipboard cb = new Clipboard(display);
+							cb.setContents(new Object[] { textData },
+									new Transfer[] { textTransfer });
 						}
 					}
 					if (data instanceof FileProxy) {
@@ -162,7 +181,7 @@ public class InvalidConfigurationsViewController extends ViewController {
 										(IFile) fileProxy.getResource());
 
 							} catch (PartInitException e) {
-								
+
 								e.printStackTrace();
 							}
 						}

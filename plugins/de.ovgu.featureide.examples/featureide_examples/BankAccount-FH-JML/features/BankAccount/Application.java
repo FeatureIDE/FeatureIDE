@@ -1,5 +1,5 @@
 public class Application {
-	//@ invariant account != null;
+	/*@ invariant account != null; @*/
 	Account account = new Account();
 
 	/*@

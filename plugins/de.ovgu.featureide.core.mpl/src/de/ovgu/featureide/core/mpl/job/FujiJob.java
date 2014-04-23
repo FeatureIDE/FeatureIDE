@@ -29,7 +29,6 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.core.JavaProject;
 
-import beaver.Symbol;
 import AST.ASTNode;
 import AST.Access;
 import AST.BodyDecl;
@@ -46,6 +45,7 @@ import AST.MethodDecl;
 import AST.ParameterDeclaration;
 import AST.Program;
 import AST.TypeDecl;
+import beaver.Symbol;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.signature.ProjectSignatures;
@@ -58,7 +58,6 @@ import de.ovgu.featureide.core.mpl.signature.fuji.FujiMethodSignature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import fuji.Composition;
 import fuji.Main;
-import fuji.SPLStructure;
 
 /**
  * Loads the signatures from Fuji.
@@ -165,15 +164,13 @@ public class FujiJob extends AMonitorJob {
 				,"-" + Main.OptionName.PROG_MODE
 				,"-" + Main.OptionName.COMPOSTION_STRATEGY, Main.OptionName.COMPOSTION_STRATEGY_ARG_FAMILY // "-typechecker",
 				,"-" + Main.OptionName.BASEDIR, sourcePath};
-		SPLStructure spl = null;
-
+		
 		try {
 			Main fuji = new Main(fujiOptions, fm, fm.getConcreteFeatureNames());
 			Composition composition = fuji.getComposition(fuji);
 			ast = composition.composeAST();
 			fuji.typecheckAST(ast);
-			spl = fuji.getSPLStructure();
-			featureModulePathnames = spl.getFeatureModulePathnames();
+			featureModulePathnames = fuji.getSPLStructure().getFeatureModulePathnames();
 		} catch (Exception e) {
 			MPLPlugin.getDefault().logError(e);
 			return false;
@@ -228,7 +225,9 @@ public class FujiJob extends AMonitorJob {
 									modifierString, typeString, pckg, typeDecl,
 									importList),
 							interfaceProject.getFeatureID(featurename), Symbol.getLine(typeDecl.getStart()));
-					// curClassSig.addFeature(featurename);
+					for (ImportDecl importDecl : importList) {
+						curClassSig.addImport(importDecl.toString());
+					}
 
 					for (BodyDecl bodyDecl : typeDecl.getBodyDeclList()) {
 						typeDecl.getModifiers();
@@ -304,13 +303,11 @@ public class FujiJob extends AMonitorJob {
 		for (SignatureReference sigRef : signatureSet.values()) {
 			AbstractSignature sig = sigRef.getSig();
 			sig.setFeatureData(sigRef.getFeatureData());
-//			sig.setFeatureIDs(sigRef.getIDs());
 			sigArray[++i] = sig;
 		}
 		projectSignatures.setSignatureArray(sigArray);
 		interfaceProject.setProjectSignatures(projectSignatures);
-
-		// roleMap.validate();
+		
 		MPLPlugin.getDefault().logInfo("Fuji signatures loaded.");
 		return true;
 	}

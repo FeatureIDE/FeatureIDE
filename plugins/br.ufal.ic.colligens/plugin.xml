@@ -40,6 +40,11 @@
             id="br.ufal.ic.colligens.commands.PresenceCondition"
             name="Presence Condition">
       </command>
+      <command
+            categoryId="br.ufal.ic.colligens.commands.ColligensCategory"
+            id="br.ufal.ic.colligens.commands.SemanticBugs"
+            name="Semantic Bugs">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -63,6 +68,10 @@
             class="br.ufal.ic.colligens.handler.PresenceConditionHandler"
             commandId="br.ufal.ic.colligens.commands.PresenceCondition">
       </handler>
+      <handler
+            class="br.ufal.ic.colligens.handler.SemanticBugsHandler"
+            commandId="br.ufal.ic.colligens.commands.SemanticBugs">
+      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
@@ -77,6 +86,12 @@
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+7">
+      </key>
+      <key
+            commandId="br.ufal.ic.colligens.commands.PresenceCondition"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+8">
       </key>
    </extension>
    <extension
@@ -114,6 +129,24 @@
                commandId="br.ufal.ic.colligens.commands.MetricsCommand"
                icon="icons/featured_chart.png"
                label="Metrics"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <iterate
+                     operator="or">
+                  <with
+                        variable="activeWorkbenchWindow.activePerspective">
+                     <equals
+                           value="org.eclipse.cdt.ui.CPerspective">
+                     </equals>
+                  </with>
+               </iterate>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="br.ufal.ic.colligens.commands.SemanticBugs"
+               icon="icons/bug.ico"
+               label="Semantic Bugs"
                style="push">
             <visibleWhen
                   checkEnabled="false">
@@ -204,6 +237,13 @@
             id="br.ufal.ic.colligens.views.MetricsView"
             name="Metrics">
       </view>
+      <view
+            category="br.ufal.ic.colligens"
+            class="br.ufal.ic.colligens.views.SemanticBugsView"
+            icon="icons/bug.ico"
+            id="br.ufal.ic.colligens.views.SemanticBugsView"
+            name="Semantic Bugs">
+      </view>
    </extension>
 
    <extension
@@ -218,6 +258,12 @@
             class="br.ufal.ic.colligens.preferences.PreferenceGcc"
             id="br.ufal.ic.colligens.preferences.PreferenceGcc"
             name="GCC C Compiler Settings">
+      </page>
+      <page
+            category="br.ufal.ic.colligens.preferences.PreferencePage"
+            class="br.ufal.ic.colligens.preferences.PreferenceCppChecker"
+            id="br.ufal.ic.colligens.preferences.PreferenceCppChecker"
+            name="CppCheck Settings">
       </page>
    </extension>
    <extension

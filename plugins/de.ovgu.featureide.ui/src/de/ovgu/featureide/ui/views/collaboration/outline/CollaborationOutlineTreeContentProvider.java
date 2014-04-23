@@ -112,13 +112,23 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 		if (inputElement == null || !(inputElement instanceof IFile))
 			return new String[] { "no file found" };
 
-		IFeatureProject featureProject = CorePlugin.getFeatureProject((IFile) inputElement);
-		model = featureProject.getFSTModel();
+		IFile file = (IFile) inputElement;
+		IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
+		
+		if (featureProject != null) {
+			model = featureProject.getFSTModel();
 
-		if (model != null) {
-			FSTClass c = model.getClass(((IFile) inputElement).getName());
-			if (c != null) {
-				return new Object[] { c };
+			if (model != null) {
+//	TODO: Change composers to use the full path instead of filename (with the same separator on every platform)
+//				IPath filePath = file.getProjectRelativePath();
+//				IPath featurePath = featureProject.getSourceFolder().getProjectRelativePath();
+//				filePath = filePath.removeFirstSegments(filePath.matchingFirstSegments(featurePath) + 1);
+//				String classString = filePath.toString();
+//				FSTClass c = model.getClass(classString);
+				FSTClass c = model.getClass(file.getName());
+				if (c != null) {
+					return new Object[] { c };
+				}
 			}
 		}
 		return new String[] { "Collaboration Model not found" };

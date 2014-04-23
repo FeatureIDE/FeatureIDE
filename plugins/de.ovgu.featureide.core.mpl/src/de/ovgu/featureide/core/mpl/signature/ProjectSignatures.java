@@ -39,26 +39,17 @@ import de.ovgu.featureide.core.mpl.signature.filter.ISignatureFilter;
  * @author Sebastian Krieter
  */
 public class ProjectSignatures {
-//	private final HashMap<AbstractSignature, AbstractSignature> 
-//		signatureSet = new HashMap<AbstractSignature, AbstractSignature>();
 	
 	public final class SignatureIterator implements Iterator<AbstractSignature> {
 		private final LinkedList<ISignatureFilter> filter = new LinkedList<ISignatureFilter>();
 		private int count = 0;
 		private boolean nextAvailable = false;
 		
-//		public SignatureIterator(ISignatureFilter filter) {
-//			this.filter = new ISignatureFilter[]{filter};
-//		}
-		
-//		public SignatureIterator(List<ISignatureFilter> filter) {
-//			this.filter = new ISignatureFilter[filter.size()];
-//			filter.toArray(this.filter);
-//		}
-		
-//		public SignatureIterator(ISignatureFilter... filter) {
-//			this.filter = filter;
-//		}
+		public SignatureIterator(ISignatureFilter... filter) {
+			for (int i = 0; i < filter.length; i++) {
+				addFilter(filter[i]);
+			}
+		}
 		
 		public void addFilter(ISignatureFilter filter) {
 			this.filter.add(filter);
@@ -87,15 +78,6 @@ public class ProjectSignatures {
 			}
 			return false;
 		}
-		
-//		private boolean isValid(AbstractSignature sig) {
-//			for (int i = 0; i < filter.length; ++i) {
-//				if (!filter[i].isValid(sig)) {
-//					return false;
-//				}
-//			}
-//			return true;
-//		}
 		
 		private boolean isValid(AbstractSignature sig) {
 			for (ISignatureFilter curFilter : filter) {
@@ -129,14 +111,10 @@ public class ProjectSignatures {
 	
 	private int hashCode = 0;
 	private boolean hasHashCode = false;
-	
-//	public SignatureIterator getIterator(ISignatureFilter filter) {
-//		return new SignatureIterator(filter);
-//	}
+
 	
 	public SignatureIterator createIterator() {
 		return new SignatureIterator();
-//		return getIterator(null);
 	}
 	
 //	public ProjectStructure toProjectStructure() {
@@ -149,6 +127,21 @@ public class ProjectSignatures {
 	
 	public void setSignatureArray(AbstractSignature[] signatureArray) {
 		this.signatureArray = signatureArray;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		return Arrays.equals(signatureArray, ((ProjectSignatures) obj).signatureArray);
+	}
+
+	@Override
+	public int hashCode() {
+		if (!hasHashCode) {
+			hashCode = 1;
+			hashCode += Arrays.hashCode(signatureArray);
+			hasHashCode = true;
+		}
+		return hashCode;
 	}
 	
 	public HashMap<Integer, int[]> getStatisticNumbers() {
@@ -185,7 +178,7 @@ public class ProjectSignatures {
 	
 	private void count(AbstractSignature signature, int[] curCounter, HashMap<Integer, int[]> fs, int i) {
 		for (FeatureData feature : signature.getFeatureData()) {
-			int[] x = fs.get(feature);
+			int[] x = fs.get(feature.getId());
 			if (x == null) {
 				x = new int[]{0,0,0,0};
 				fs.put(feature.getId(), x);
@@ -257,25 +250,5 @@ public class ProjectSignatures {
 			}
 		}
 		return sb.toString();
-	}
-	
-	@Override
-	public boolean equals(Object obj) {
-		return Arrays.equals(signatureArray, ((ProjectSignatures) obj).signatureArray);
-//		return signatureSet.keySet().equals(((ProjectSignatures) obj).signatureSet.keySet());
-	}
-
-	@Override
-	public int hashCode() {
-		if (!hasHashCode) {
-			hashCode = 1;
-			hashCode += Arrays.hashCode(signatureArray);
-//			for (int i = 0; i < signatureArray.length; ++i) {
-//				AbstractSignature signature = signatureArray[i];
-//				hashCode = hashCode + member.hashCode();
-//			}
-			hasHashCode = true;
-		}
-		return hashCode;
 	}
 }

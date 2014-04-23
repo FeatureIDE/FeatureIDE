@@ -16,9 +16,14 @@ public class Initializer extends AbstractPreferenceInitializer {
 		store.setDefault("USE_STUBS", true);
 		store.setDefault("TypeChefPreference", "--parse");
 
+		// PreferenceGcc
 		store.setDefault("GCC", "gcc");
 		store.setDefault("LIBS", "");
 		store.setDefault("SystemRoot", "/");
 		store.setDefault("SystemIncludes", "/usr/include");
+
+		// PreferenceCppChecker
+		store.setDefault("CppCheck", "");
+
 	}
 }

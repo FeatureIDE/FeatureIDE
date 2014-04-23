@@ -20,9 +20,9 @@
  */
 package de.ovgu.featureide.core.mpl.signature.fuji;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 
-import AST.Access;
 import AST.ClassDecl;
 import AST.ImportDecl;
 import AST.InterfaceDecl;
@@ -39,63 +39,39 @@ public class FujiClassSignature extends AbstractClassSignature {
 	
 	protected final TypeDecl typeDecl;
 	protected final List<ImportDecl> importList;
-	
+
 	protected final LinkedList<TypeDecl> superTypes;
+	protected final LinkedList<TypeDecl> implementTypes;
 	
 	public FujiClassSignature(AbstractClassSignature parent, String name, String modifiers, 
 			String type, String pckg, TypeDecl typeDecl, List<ImportDecl> importList) {
 		super(parent, name, modifiers, type, pckg);
 		this.typeDecl = typeDecl;
 		this.importList = importList;
-		
+
 		superTypes = new LinkedList<TypeDecl>();
+		implementTypes = new LinkedList<TypeDecl>();
 		if (typeDecl instanceof ClassDecl) {
-			ClassDecl classDecl = (ClassDecl) typeDecl;
-			
-			for (Access access : classDecl.getImplementsList()) {
-				boolean contains = false;
-				for (TypeDecl superType : superTypes) {
-					if (access.type() == superType) {
-						contains = true;
-						break;
-					}
-				}
-				if (!contains) {
-					superTypes.add(access.type());
-				}
-			}
-			
-			TypeDecl superClass = classDecl.superclass();
-			if (superClass != null) {
-				superTypes.add(superClass);
+			ClassDecl classDecl = (ClassDecl)typeDecl;
+			superTypes.add(classDecl.superclass());
+			addExtend(classDecl.superclass().name());
+			@SuppressWarnings("unchecked")
+			Iterator<TypeDecl> implementInterfaceIt = classDecl.interfacesIterator();
+			while (implementInterfaceIt.hasNext()) {
+				TypeDecl implementType = implementInterfaceIt.next();
+				implementTypes.add(implementType);
+				addImplement(implementType.name());
 			}
 		} else if (typeDecl instanceof InterfaceDecl) {
-			InterfaceDecl interfaceDecl = (InterfaceDecl) typeDecl;
-			List<Access> superInterfaces = interfaceDecl.getSuperInterfaceIdList();
-			for (Access access : superInterfaces) {
-				boolean contains = false;
-				for (TypeDecl otherSuperType : superTypes) {
-					if (access.type() == otherSuperType) {
-						contains = true;
-						break;
-					}
-				}
-				if (!contains) {
-					superTypes.add(access.type());
-				}
+			@SuppressWarnings("unchecked")
+			Iterator<TypeDecl> superInterfaceIt = ((InterfaceDecl)typeDecl).superinterfacesIterator();
+			while (superInterfaceIt.hasNext()) {
+				TypeDecl superInterface = superInterfaceIt.next();
+				superTypes.add(superInterface);
+				addExtend(superInterface.name());
 			}
 		}
 	}
-	
-//	public FujiClassSignature(FujiClassSignature orgSig) {
-//		this(orgSig, false);
-//	}
-//	
-//	private FujiClassSignature(FujiClassSignature orgSig, boolean ext) {
-//		super(orgSig, ext);
-//		this.typeDecl = orgSig.typeDecl;
-//		this.importList = orgSig.importList;
-//	}
 	
 	@Override
 	public String toString() {		
@@ -116,23 +92,14 @@ public class FujiClassSignature extends AbstractClassSignature {
 		
 		return sb.toString();
 	}
-
-//	@Override
-//	public FujiClassSignature createExtendedSignature() {
-//		return new FujiClassSignature(this, true);
-//	}
-
+	
 	@Override
 	protected void computeHashCode() {
 		super.computeHashCode();
-		hashCode *= hashCodePrime;
-		for (String extend : extendList) {
-			hashCode += extend.hashCode();
-		}
-		hashCode *= hashCodePrime;
-		for (String implement : implementList) {
-			hashCode += implement.hashCode();
-		}
+//		hashCode *= hashCodePrime;
+//		for (TypeDecl thisSuperType : superTypes) {
+//			hashCode += thisSuperType.hashCode();
+//		}
 	}
 
 	@Override
@@ -146,14 +113,6 @@ public class FujiClassSignature extends AbstractClassSignature {
 		
 		if (!super.sigEquals(otherSig)) 
 			return false;
-		
-//		if (!typeDecl.sameSignature(otherSig.typeDecl)) {
-//			return false;
-//		}
-		
-//		if (typeDecl != otherSig.typeDecl) {
-//			return false;
-//		}
 		
 		if (superTypes.size() != otherSig.superTypes.size()) {
 			return false;
@@ -172,22 +131,6 @@ public class FujiClassSignature extends AbstractClassSignature {
 			}
 		}
 		
-		
-//		if (extendList.size() != otherSig.extendList.size()
-//				|| implementList.size() != otherSig.implementList.size()) {
-//			return false;
-//		}
-//		
-//		for (String thisExtend : extendList) {
-//			if (!otherSig.extendList.contains(thisExtend)) {
-//				return false;
-//			}
-//		}
-//		for (String thisImplement : implementList) {
-//			if (!otherSig.implementList.contains(thisImplement)) {
-//				return false;
-//			}
-//		}
 		return true;
 	}
 }

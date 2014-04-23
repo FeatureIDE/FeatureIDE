@@ -41,7 +41,7 @@ public abstract class AProjectJobAction extends AProjectAction {
 
 	@Override
 	public void run(IAction action) {
-		super.run(action);
 		projects.clear();
+		super.run(action);
 	}
 }

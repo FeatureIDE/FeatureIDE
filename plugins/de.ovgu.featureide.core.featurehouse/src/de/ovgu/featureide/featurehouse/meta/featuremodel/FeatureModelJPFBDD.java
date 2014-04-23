@@ -23,6 +23,7 @@ package de.ovgu.featureide.featurehouse.meta.featuremodel;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import org.prop4j.Node;
 import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.Feature;
@@ -80,7 +81,12 @@ public class FeatureModelJPFBDD implements IFeatureModelClass {
 
 	@Override
 	public String getFormula() {
-		return VALID + "return " + NodeCreator.createNodes(featureModel.clone()).toCNF().toString(NodeWriter.javaSymbols).toLowerCase(Locale.ENGLISH) + ";\r\n\t}\r\n";
+		final Node nodes = NodeCreator.createNodes(featureModel.clone()).eliminateNotSupportedSymbols(NodeWriter.javaSymbols);
+		String formula = nodes.toString(NodeWriter.javaSymbols).toLowerCase(Locale.ENGLISH);
+		if (formula.contains("  &&  true  &&  ! false")) {
+			formula = formula.substring(0, formula.indexOf("  &&  true  &&  ! false"));
+		}
+		return VALID + "return " + formula + ";\r\n\t}\r\n";
 	}
 
 	@Override
@@ -102,7 +108,7 @@ public class FeatureModelJPFBDD implements IFeatureModelClass {
 			String lowerName = name.toLowerCase(Locale.ENGLISH);
 			stringBuilder.append(" (" + lowerName + " ? \"" + name + "\\r\\n\" : \"\") ");
 		}
-		stringBuilder.append(";\r\n\t\treturn ");
+		stringBuilder.append(";\r\n\t\treturn \"\" + ");
 		for (int i = 0;i < features.size();i++) {
 			if (i != 0) {
 				stringBuilder.append(" + \"|\" + ");	

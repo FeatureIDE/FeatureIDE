@@ -43,11 +43,6 @@ public class FujiRole extends AbstractRole {
 		return FujiStringBuilder.getClassString(this, true);
 	}
 
-//	@Override
-//	public FujiClass toClass() {
-//		return new FujiClass(signature);
-//	}
-
 	@Override
 	public FujiRole reduce(ViewTag viewTag) {
 		return new FujiRole(this, viewTag);

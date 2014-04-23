@@ -69,6 +69,44 @@ public abstract class Node {
 		node = node.eliminate(Not.class);
 		return node.clausify();
 	}
+	
+	@SuppressWarnings("unchecked")
+	public Node eliminateNotSupportedSymbols(final String[] symbols) {
+		Node node = this;
+		for (int i = 0; i < symbols.length; i++) {
+			if (symbols[i].equals(NodeWriter.noSymbol)) {
+				switch (i) {
+					case 0:
+						node = node.eliminate(Not.class);
+						break;
+					case 1:
+						node = node.eliminate(And.class);
+						break;
+					case 2:
+						node = node.eliminate(Or.class);
+						break;
+					case 3:
+						node = node.eliminate(Implies.class);
+						break;
+					case 4:
+						node = node.eliminate(Equals.class);
+						break;
+					case 6:
+						node = node.eliminate(Choose.class);
+						break;
+					case 7:
+						node = node.eliminate(AtLeast.class);
+						break;
+					case 8:
+						node = node.eliminate(AtMost.class);
+						break;
+					default:
+						break;
+				}
+			}
+		}
+		return node;
+	}
 
 	@SuppressWarnings("unchecked")
 	public Node toCNFprintln() {
