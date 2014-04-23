@@ -82,7 +82,7 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 				else
 					return IMAGE_FIELD_DEFAULT;
 			} else if (fstModelElement instanceof FSTInvariant) {
-				return IMAGE_AT;
+				return IMAGE_AT_WITHOUT_WHITE_BACKGROUND;
 			} else if (fstModelElement instanceof FSTMethod) {
 				FSTMethod method = (FSTMethod) fstModelElement;
 				if (method.hasContract()) {
@@ -108,7 +108,7 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 		} else if (element instanceof FSTClass) {
 			return IMAGE_CLASS;
 		} else if (element instanceof FSTContractedRole) {
-			return IMAGE_AT;
+			return IMAGE_AT_WITHOUT_WHITE_BACKGROUND;
 		}
 
 		return null;

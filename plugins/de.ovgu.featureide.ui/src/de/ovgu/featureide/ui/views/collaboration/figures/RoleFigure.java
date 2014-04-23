@@ -598,7 +598,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		
 		Label invariantLabel = new RoleFigureLabel(c.getFullName(), c.getFullName());
 		
-		invariantLabel.setIcon(IMAGE_AT);
+		invariantLabel.setIcon(IMAGE_AT_WITHOUT_WHITE_BACKGROUND);
 		
 		return invariantLabel;
 	}	
