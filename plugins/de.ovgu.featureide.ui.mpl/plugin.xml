@@ -21,7 +21,7 @@
             id="de.ovgu.featureide.ui.mpl.projectContribution2"
             objectClass="org.eclipse.core.resources.IProject">
          <action
-               class="de.ovgu.featureide.ui.mpl.actions.AddInterfaceNatureAction"
+               class="de.ovgu.featureide.ui.mpl.actions.interfaces.AddInterfaceNatureAction"
                id="de.ovgu.featureide.ui.mpl.AddNature"
                label="Add Interface Nature"
                menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces3"
@@ -46,38 +46,31 @@
             id="de.ovgu.featureide.ui.mpl.projectContribution"
             objectClass="org.eclipse.core.resources.IProject">
          <action
-               class="de.ovgu.featureide.ui.mpl.actions.BuildExtendedModulesAction"
+               class="de.ovgu.featureide.ui.mpl.actions.interfaces.BuildExtendedModulesAction"
                id="de.ovgu.featureide.ui.mpl.ProjectAction"
                label="Build Extended Modules"
                menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces0"
                style="push">
          </action>
          <action
-               class="de.ovgu.featureide.ui.mpl.actions.BuildConfigurationInterfacesAction"
+               class="de.ovgu.featureide.ui.mpl.actions.interfaces.BuildConfigurationInterfacesAction"
                id="de.ovgu.featureide.ui.mpl.BuildConfigurationInterfacesAction"
                label="Build Configuration Interfaces"
                menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces1"
                style="push">
          </action>
          <action
-               class="de.ovgu.featureide.ui.mpl.actions.BuildFeatureInterfacesAction"
+               class="de.ovgu.featureide.ui.mpl.actions.interfaces.BuildFeatureInterfacesAction"
                id="de.ovgu.featureide.ui.mpl.BuildFeatureInterfacesAction"
                label="Build Feature Interfaces"
                menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces1"
                style="push">
          </action>
          <action
-               class="de.ovgu.featureide.ui.mpl.actions.CompareInterfacesAction"
-               id="de.ovgu.featureide.ui.mpl.CompareInterfacesAction"
-               label="Compare Configuration Interfaces"
-               menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces1"
-               style="push">
-         </action>
-         <action
-               class="de.ovgu.featureide.ui.mpl.actions.RefreshAction"
+               class="de.ovgu.featureide.ui.mpl.actions.interfaces.RefreshAction"
                id="de.ovgu.featureide.ui.mpl.RefreshAction"
                label="Refresh"
-               menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces2"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces3"
                style="push">
          </action>
          <visibility>
@@ -93,7 +86,7 @@
             nameFilter="interface_*"
             objectClass="org.eclipse.core.resources.IFolder">
          <action
-               class="de.ovgu.featureide.ui.mpl.actions.BuildJavaProjectAction"
+               class="de.ovgu.featureide.ui.mpl.actions.interfaces.BuildJavaProjectAction"
                id="de.ovgu.featureide.ui.mpl.BuildJavaProjectAction"
                label="Build Java Interface Project"
                menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces"
@@ -111,31 +104,38 @@
             id="de.ovgu.featureide.ui.mpl.projectContribution1"
             objectClass="org.eclipse.core.resources.IProject">
          <action
-               class="de.ovgu.featureide.ui.mpl.actions.NewViewTagAction"
+               class="de.ovgu.featureide.ui.mpl.actions.viewtags.NewViewTagAction"
                id="de.ovgu.featureide.ui.mpl.NewViewTagAction"
                label="Add View Tag"
                menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces2"
                style="push">
          </action>
          <action
-               class="de.ovgu.featureide.ui.mpl.actions.DeleteViewTagAction"
+               class="de.ovgu.featureide.ui.mpl.actions.viewtags.DeleteViewTagAction"
                id="de.ovgu.featureide.ui.mpl.DeleteViewTagAction"
                label="Delete View Tag"
                menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces2"
                style="push">
          </action>
          <action
-               class="de.ovgu.featureide.ui.mpl.actions.ChangeViewTagAction"
+               class="de.ovgu.featureide.ui.mpl.actions.viewtags.ChangeViewTagAction"
                id="de.ovgu.featureide.ui.mpl.ChangeViewTagAction"
                label="Change View Tag"
                menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces2"
                style="push">
          </action>
          <action
-               class="de.ovgu.featureide.ui.mpl.actions.PrintAllStatisticsAction"
+               class="de.ovgu.featureide.ui.mpl.actions.statistics.PrintAllStatisticsAction"
                id="de.ovgu.featureide.ui.mpl.AllStatisticsAction"
                label="Print Statistics"
                menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces0"
+               style="push">
+         </action>
+         <action
+               class="de.ovgu.featureide.ui.mpl.actions.documentation.BuildDocStatisticsAction"
+               id="de.ovgu.featureide.ui.mpl.BuildDocStatisticsAction"
+               label="Print Documentation Statistics"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces2"
                style="push">
          </action>
          <visibility>
@@ -144,13 +144,48 @@
                   value="de.ovgu.featureide.core.mpl.MPLExperimentalNature">
             </objectState>
          </visibility>
+         <action
+               class="de.ovgu.featureide.ui.mpl.actions.documentation.BuildDocModuleAction"
+               id="de.ovgu.featureide.ui.mpl.BuildDocModuleAction"
+               label="Generate Featuremodule Documentation"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces2"
+               style="push">
+         </action>
+         <action
+               class="de.ovgu.featureide.ui.mpl.actions.documentation.BuildDocContextAction"
+               id="de.ovgu.featureide.ui.mpl.BuildDocContextAction"
+               label="Generate Context Documentation"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces2"
+               style="push">
+         </action>
+         <action
+               class="de.ovgu.featureide.ui.mpl.actions.documentation.BuildDocSPLAction"
+               id="de.ovgu.featureide.ui.mpl.BuildDocSPLAction"
+               label="Generate SPL Documentation"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces2"
+               style="push">
+         </action>
+         <action
+               class="de.ovgu.featureide.ui.mpl.actions.documentation.BuildDocVariantAction"
+               id="de.ovgu.featureide.ui.mpl.BuildDocVariantAction"
+               label="Generate Variant Documentation"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces2"
+               style="push">
+         </action>
+         <action
+               class="de.ovgu.featureide.ui.mpl.actions.interfaces.CompareInterfacesAction"
+               id="de.ovgu.featureide.ui.mpl.CompareInterfacesAction"
+               label="Compare Configuration Interfaces"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces1"
+               style="push">
+         </action>
       </objectContribution>
       <objectContribution
             adaptable="true"
             id="de.ovgu.featureide.ui.mpl.projectContribution3"
             objectClass="org.eclipse.core.resources.IProject">
          <action
-               class="de.ovgu.featureide.ui.mpl.actions.RemoveInterfaceNatureAction"
+               class="de.ovgu.featureide.ui.mpl.actions.interfaces.RemoveInterfaceNatureAction"
                id="de.ovgu.featureide.ui.mpl.RemoveNature"
                label="Remove Interface Nature"
                menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces3"
@@ -205,7 +240,6 @@
 			name="tes"
 			icon="icons/featureide.gif"/>
 	</extension>     
-     
     <extension
           point="de.ovgu.featureide.ui.views.outline">
        <outline

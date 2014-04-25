@@ -31,19 +31,21 @@ public class FujiStringBuilder {
 	public static String getClassString(AbstractClassFragment cls, boolean shortString) {
 		final StringBuilder sb = new StringBuilder();
 		
-		if (!cls.getSignature().getPackage().isEmpty()) {
-			sb.append("package ");
-			sb.append(cls.getSignature().getPackage());
-			sb.append(';');
-			sb.append(LINE_SEPARATOR);
-		}
-		
-		if (!cls.getSignature().getImportList().isEmpty()) {
-			for (String importClass : cls.getSignature().getImportList()) {
-				sb.append(importClass);
+		if (cls.getSignature().getParent() == null) {
+			if (!cls.getSignature().getPackage().isEmpty()) {
+				sb.append("package ");
+				sb.append(cls.getSignature().getPackage());
+				sb.append(';');
 				sb.append(LINE_SEPARATOR);
 			}
-			sb.append(LINE_SEPARATOR);
+			
+			if (!cls.getSignature().getImportList().isEmpty()) {
+				for (String importClass : cls.getSignature().getImportList()) {
+					sb.append(importClass);
+					sb.append(LINE_SEPARATOR);
+				}
+				sb.append(LINE_SEPARATOR);
+			}
 		}
 		
 		sb.append(cls.getSignature().toString());

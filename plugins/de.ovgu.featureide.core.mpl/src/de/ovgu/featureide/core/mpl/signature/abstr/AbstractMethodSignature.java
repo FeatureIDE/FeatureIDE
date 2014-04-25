@@ -20,14 +20,14 @@
  */
 package de.ovgu.featureide.core.mpl.signature.abstr;
 
-import java.util.LinkedList;
+import java.util.List;
 
 public abstract class AbstractMethodSignature extends AbstractSignature {
 	
-	protected LinkedList<String> parameterTypes;
+	protected List<String> parameterTypes;
 	protected final boolean isConstructor;
 	
-	protected AbstractMethodSignature(AbstractClassSignature parent, String name, String modifier, String type, LinkedList<String> parameterTypes, boolean isConstructor) {
+	protected AbstractMethodSignature(AbstractClassSignature parent, String name, String modifier, String type, List<String> parameterTypes, boolean isConstructor) {
 		super(parent, name, modifier, type);
 		this.isConstructor = isConstructor;
 		this.parameterTypes = parameterTypes;
@@ -35,7 +35,7 @@ public abstract class AbstractMethodSignature extends AbstractSignature {
 	
 	public abstract String getReturnType();
 
-	public LinkedList<String> getParameterTypes() {
+	public List<String> getParameterTypes() {
 		return parameterTypes;
 	}
 

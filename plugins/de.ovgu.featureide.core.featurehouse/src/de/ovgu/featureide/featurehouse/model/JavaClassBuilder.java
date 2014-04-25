@@ -27,6 +27,7 @@ import de.ovgu.cide.fstgen.ast.FSTNonTerminal;
 import de.ovgu.cide.fstgen.ast.FSTTerminal;
 import de.ovgu.featureide.core.fstmodel.FSTInvariant;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
+import de.ovgu.featureide.core.fstmodel.RoleElement;
 
 /**
  * Builds Classes for the {@link FSTModel} for <code>FeatureHouse</code> Java
@@ -47,8 +48,19 @@ public class JavaClassBuilder extends ClassBuilder {
 		LinkedList<String> fields = getFields(terminal.getBody());
 		for (int i = 2; i < fields.size(); i++) {
 			// add field
-			addField(fields.get(i), fields.get(1), fields.get(0), terminal.getBody(), terminal.beginLine, terminal.endLine);
+			RoleElement r = addField(fields.get(i), fields.get(1), fields.get(0), terminal.getBody(), terminal.beginLine, terminal.endLine);
+			r.setJavaDocCommtent(findJavaDocComments(terminal));
 		}
+	}
+	
+	public static String findJavaDocComments(FSTTerminal terminal) {
+		final String prefix = terminal.getSpecialTokenPrefix();
+		final int start = prefix.indexOf("/**");
+		final int end = prefix.lastIndexOf("*/");
+		if (start > -1 && end > -1) {
+			return prefix.substring(start, end + "*/".length());
+		} 
+		return null;
 	}
 
 	/**
@@ -179,7 +191,8 @@ public class JavaClassBuilder extends ClassBuilder {
 		}
 
 		// add method
-		addMethod(name, getMethodParameter(terminal), returnType, modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine, false, contractBody, contractCompKey);
+		RoleElement r = addMethod(name, getMethodParameter(terminal), returnType, modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine, false, contractBody, contractCompKey);
+		r.setJavaDocCommtent(findJavaDocComments(terminal));
 	}
 
 	/**
@@ -230,7 +243,8 @@ public class JavaClassBuilder extends ClassBuilder {
 		}
 
 		// add constructor
-		addMethod(name, getMethodParameter(terminal), "void", modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine, true, contractBody, contractCompKey);
+		RoleElement r = addMethod(name, getMethodParameter(terminal), "void", modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine, true, contractBody, contractCompKey);
+		r.setJavaDocCommtent(findJavaDocComments(terminal));
 	}
 
 	private String getMethodName(FSTTerminal terminal) {
