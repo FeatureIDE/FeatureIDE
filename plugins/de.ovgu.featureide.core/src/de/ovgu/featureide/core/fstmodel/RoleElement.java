@@ -39,6 +39,7 @@ public abstract class RoleElement {
 	protected String type;
 	protected String modifiers;
 	protected String body;
+	protected String javaDocCommtent = null;
 	protected int beginLine;
 	protected int endLine;
 	protected int composedLine;
@@ -159,5 +160,19 @@ public abstract class RoleElement {
 			return comparesTo((RoleElement) obj);
 		}
 		return false;
+	}
+
+	/**
+	 * @return the javaDocCommtent
+	 */
+	public String getJavaDocCommtent() {
+		return javaDocCommtent;
+	}
+
+	/**
+	 * @param javaDocCommtent the javaDocCommtent to set
+	 */
+	public void setJavaDocCommtent(String javaDocCommtent) {
+		this.javaDocCommtent = javaDocCommtent;
 	}
 }

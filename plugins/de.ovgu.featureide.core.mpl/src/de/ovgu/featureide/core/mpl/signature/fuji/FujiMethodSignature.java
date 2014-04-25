@@ -61,7 +61,11 @@ public class FujiMethodSignature extends AbstractMethodSignature {
 		if (methodString.length() > 0) {
 			methodString.append(LINE_SEPARATOR);
 		}
-
+		
+		if (mergedjavaDocComment != null) {
+			methodString.append(mergedjavaDocComment);
+		}
+		
 		if (modifiers.length > 0) {
 			for (String modifier : modifiers) {
 				methodString.append(modifier);
@@ -76,18 +80,21 @@ public class FujiMethodSignature extends AbstractMethodSignature {
 
 		methodString.append(name);
 		methodString.append('(');
-		for (int i = 0; i < parameterList.getNumChild(); i++) {
-			if (i > 0)
+		boolean notfirst = false;
+		for (ParameterDeclaration parameter : parameterList) {
+			if (notfirst) {
 				methodString.append(", ");
-			methodString.append(parameterList.getChild(i).type().name());
-			methodString.append(" arg");
-			methodString.append(i);
+			} else {
+				notfirst = true;
+			}
+			methodString.append(parameter.type().name());
+			methodString.append(' ');
+			methodString.append(parameter.name());
 		}
 		methodString.append(')');
 
 		return methodString.toString();
 	}
-
 
 	@Override
 	protected void computeHashCode() {

@@ -32,11 +32,12 @@ import de.ovgu.featureide.core.mpl.InterfaceProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.io.IOConstants;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature;
+import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature.FeatureData;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 public class ContextFilter2 implements ISignatureFilter {
 	private final InterfaceProject interfaceProject;
-	private final HashMap<int[], Boolean> satMap;
+	private final HashMap<FeatureData[], Boolean> satMap;
 	private final Node[] fixClauses;
 	
 	public ContextFilter2(String featurename, InterfaceProject interfaceProject) {
@@ -45,7 +46,7 @@ public class ContextFilter2 implements ISignatureFilter {
 	
 	public ContextFilter2(Node[] constraints, InterfaceProject interfaceProject) {
 		this.interfaceProject = interfaceProject;
-		satMap = new HashMap<int[], Boolean>();
+		satMap = new HashMap<FeatureData[], Boolean>();
 		
 		fixClauses = new Node[constraints.length + 1];
 		fixClauses[0] = NodeCreator.createNodes(interfaceProject.getFeatureModel());
@@ -54,26 +55,26 @@ public class ContextFilter2 implements ISignatureFilter {
 
 	@Override
 	public boolean isValid(AbstractSignature signature) {	
+		FeatureData[] featureDataArray = signature.getFeatureData();
 //		int[] features = signature.getFeatureIDs();
-//		Boolean sat = satMap.get(features);
-//		if (sat == null) {
-//			Node[] clauses = new Node[features.length + fixClauses.length];
-//			int j = 0;
-//			for (int featureID : features) {
-//				clauses[j++] = new Literal(interfaceProject.getFeatureName(featureID), false);
-//			}
-//			System.arraycopy(fixClauses, 0, clauses, j, fixClauses.length);
-//			
-//			SatSolver solver = new SatSolver(new And(clauses), 2006);
-//			try {
-//				sat = !solver.isSatisfiable();						
-//				satMap.put(features, sat);
-//			} catch (TimeoutException e) {
-//				MPLPlugin.getDefault().logError(e);
-//			}
-//		}
-//		return sat != null && sat;
-		return false;
+		Boolean sat = satMap.get(featureDataArray);
+		if (sat == null) {
+			Node[] clauses = new Node[featureDataArray.length + fixClauses.length];
+			int j = 0;
+			for (FeatureData featureData : featureDataArray) {
+				clauses[j++] = new Literal(interfaceProject.getFeatureName(featureData.getId()), false);
+			}
+			System.arraycopy(fixClauses, 0, clauses, j, fixClauses.length);
+			
+			SatSolver solver = new SatSolver(new And(clauses), 2006);
+			try {
+				sat = !solver.isSatisfiable();						
+				satMap.put(featureDataArray, sat);
+			} catch (TimeoutException e) {
+				MPLPlugin.getDefault().logError(e);
+			}
+		}
+		return sat != null && sat;
 	}
 
 }

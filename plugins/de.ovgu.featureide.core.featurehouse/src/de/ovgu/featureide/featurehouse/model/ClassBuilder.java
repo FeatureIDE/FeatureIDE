@@ -28,6 +28,7 @@ import de.ovgu.cide.fstgen.ast.FSTTerminal;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
+import de.ovgu.featureide.core.fstmodel.RoleElement;
 
 /**
  * Class builders are creating entries for the FSTModel of their special language.<br>
@@ -111,7 +112,7 @@ public class ClassBuilder {
 	 * @param isConstructor <code>true</code> if the method is a constructor 
 	 * @param contract contract string if existent
 	 */
-	void addMethod(String name, LinkedList<String> parameterTypes, String returnType, String modifiers, String body, int beginLine, int endLine, boolean isConstructor, String contract, String compKey) 
+	RoleElement addMethod(String name, LinkedList<String> parameterTypes, String returnType, String modifiers, String body, int beginLine, int endLine, boolean isConstructor, String contract, String compKey) 
 	{
 		FSTMethod method = new FSTMethod(name, parameterTypes, returnType, modifiers, body, beginLine, endLine, contract, compKey);								
 		method.setConstructor(isConstructor);
@@ -120,12 +121,14 @@ public class ClassBuilder {
 			method.setRefines(body.contains("original("));
 		}
 		modelBuilder.getCurrentClassFragment().add(method);
+		return method;
 	}
 	
-	protected void addField(String fieldName, String typeName, String modifiers,
+	protected RoleElement addField(String fieldName, String typeName, String modifiers,
 			String body, int beginLine, int endLine) {
 		FSTField field = new FSTField(fieldName, typeName, modifiers, body, beginLine, endLine);
 		modelBuilder.getCurrentClassFragment().add(field);
+		return field;
 	}
 	
 	public void caseJMLSpecCaseSeq(FSTTerminal terminal) {}

@@ -48,6 +48,10 @@ public class FujiFieldSignature extends AbstractFieldSignature {
 			fieldString.append(LINE_SEPARATOR);
 		}
 
+		if (mergedjavaDocComment != null) {
+			fieldString.append(mergedjavaDocComment);
+		}
+
 		if (modifiers.length > 0) {
 			for (String modifier : modifiers) {
 				fieldString.append(modifier);

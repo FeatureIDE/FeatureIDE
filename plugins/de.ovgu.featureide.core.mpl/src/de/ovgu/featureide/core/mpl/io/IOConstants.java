@@ -72,7 +72,7 @@ public final class IOConstants {
 
 	public static void writeToFile(IFile file, String content) {
 		InputStream inputStream = new ByteArrayInputStream(
-				content.getBytes(Charset.availableCharsets().get("UTF-8")));
+				content.getBytes(Charset.defaultCharset())); //Charset.availableCharsets().get("UTF-8")));
 
 		try {
 			synchronized (file) {
@@ -89,7 +89,7 @@ public final class IOConstants {
 	
 	public static void appendToFile(IFile file, String newContent) {
 		InputStream inputStream = new ByteArrayInputStream(
-				newContent.getBytes(Charset.availableCharsets().get("UTF-8")));
+				newContent.getBytes(Charset.defaultCharset())); //Charset.availableCharsets().get("UTF-8")));
 
 		try {
 			synchronized (file) {

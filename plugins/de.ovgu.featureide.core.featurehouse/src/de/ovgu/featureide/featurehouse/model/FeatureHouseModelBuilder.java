@@ -202,6 +202,7 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 						classBuilder.caseClassDeclarationType(terminal);
 					} else if (JAVA_NODE_MODIFIERS.equals(type)) {
 						classBuilder.caseModifiers(terminal);
+						classFragmentStack.peek().setJavaDocCommtent(JavaClassBuilder.findJavaDocComments(terminal));
 					} else if (JAVA_NODE_EXTENDSLIST.equals(type)) {
 						classBuilder.caseExtendsList(terminal);
 					} else if (JAVA_NODE_IMPLEMENTATIONLIST.equals(type)) {
@@ -249,6 +250,7 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 						String className = name.substring(name.lastIndexOf(File.separator) + 1);
 						
 						FSTClassFragment newFragment = new FSTClassFragment(className);
+						
 						classFragmentStack.peek().add(newFragment);
 						classFragmentStack.push(newFragment);
 					} else {

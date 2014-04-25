@@ -20,48 +20,30 @@
  */
 package de.ovgu.featureide.ui.mpl.wizards;
 
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchWizard;
+import java.util.List;
 
 import de.ovgu.featureide.ui.mpl.MPLUIPlugin;
-import de.ovgu.featureide.ui.mpl.actions.BuildExtendedModulesAction;
+import de.ovgu.featureide.ui.mpl.actions.interfaces.BuildExtendedModulesAction;
+import de.ovgu.featureide.ui.mpl.wizards.page.AbstractWizardPage;
+import de.ovgu.featureide.ui.mpl.wizards.page.ChooseFolderPage;
 
 /**
  * Wizard for the {@link BuildExtendedModulesAction}.
  * 
  * @author Reimar Schroeter
  */
-public class BuildExtendedModulesWizard extends Wizard implements IWorkbenchWizard   {
+public class BuildExtendedModulesWizard extends AbstractWizard {
 	public static final String ID = MPLUIPlugin.PLUGIN_ID + ".wizards.BuildExtendedModulesWizard";
-
-	private ChooseFolderPage page;
+	
 	private final String defaultFolderString;
 	
 	public BuildExtendedModulesWizard(String title, String defaultFolderString) {
-		super();
-		setWindowTitle(title);
+		super(title);
 		this.defaultFolderString = (defaultFolderString != null) ? defaultFolderString : "";
 	}
 
 	@Override
-	public void addPages() {
-		page = new ChooseFolderPage(defaultFolderString);
-		addPage(page);
-		super.addPages();
-	}
-
-	@Override
-	public boolean performFinish() {
-		return true;
-	}
-	
-	public String getFolderName() {
-		return page.getFolderName();
-	}
-	
-	@Override
-	public void init(IWorkbench workbench, IStructuredSelection selection) {
+	protected void initPages(List<AbstractWizardPage> pages) {
+		pages.add(new ChooseFolderPage(defaultFolderString));
 	}
 }
