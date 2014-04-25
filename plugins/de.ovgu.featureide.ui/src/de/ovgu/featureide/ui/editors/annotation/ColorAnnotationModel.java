@@ -321,7 +321,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 				
 			if (oldDir != null &&
 					newDir.getCommand() == oldDir.getCommand() &&
-					newDir.getFeatureName().equals(oldDir.getFeatureName())) {
+					newDir.getFeatureNames().equals(oldDir.getFeatureNames())) {
 			
 				oldDir.setStartLine(newDir.getStartLine(), newDir.getStartOffset());
 				oldDir.setEndLine(newDir.getEndLine(), newDir.getEndLength());

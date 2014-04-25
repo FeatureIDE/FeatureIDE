@@ -101,7 +101,7 @@ public class MungeModelBuilder extends PPModelBuilder{
 						directive.setCommand(command);
 						if (expression != null) {
 							directive.setExpression(expression);
-							directive.setFeatureName(getFeatureName(expression));
+							directive.setFeatureNames(getFeatureNames(expression));
 						} else {
 							directive.setExpression("");
 							directive.setFeatureName("");

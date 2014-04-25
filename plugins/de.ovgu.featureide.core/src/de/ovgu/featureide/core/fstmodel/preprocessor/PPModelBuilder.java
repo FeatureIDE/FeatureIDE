@@ -62,6 +62,7 @@ public class PPModelBuilder {
 		model.reset();
 		
 		featureNames = featureProject.getFeatureModel().getConcreteFeatureNames();
+		System.err.println("buildModel(): featureNames: " + featureNames);
 		for (String featureName : featureNames) {
 			FSTFeature fstFeature = model.addFeature(featureName);
 			Feature feature = featureProject.getFeatureModel().getFeature(featureName);
@@ -92,6 +93,7 @@ public class PPModelBuilder {
 				boolean classAdded = false;
 				for (String feature : featureNames) {
 					if (containsFeature(text, feature)) {
+						System.err.println("buildModel2 :" + feature + " - " + className);
 						model.addRole(feature, className, (IFile) res);
 						classAdded = true;
 					}
@@ -109,15 +111,20 @@ public class PPModelBuilder {
 
 	private void addDirectivesToModel(LinkedList<FSTDirective> list, IFile res, String className) {
 		for (FSTDirective d : list) {
-			FSTRole role = model.addRole(d.getFeatureName(), className, res);//addRole(getFeatureName(d.getExpression()), res.getName(), res);
-			role.add(d);
-			addDirectivesToModel(d.getChildrenList(), res, className);
+			for (String featureName : d.getFeatureNames()) {
+				FSTRole role = model.addRole(featureName, className, res);//addRole(getFeatureName(d.getExpression()), res.getName(), res);
+				role.add(d);
+				addDirectivesToModel(d.getChildrenList(), res, className);
+			}
+			
 		}
 	}
 
-	protected String getFeatureName(String expression) {
+	protected List<String> getFeatureNames(String expression) {
 		expression = expression.replaceAll("[(]", "");
-		return expression.replaceAll("[)]", "").trim();
+		List <String> featureNameList = new LinkedList<String>();
+		featureNameList.add(expression.replaceAll("[)]", "").trim());
+		return featureNameList;
 	}
 
 	/**
