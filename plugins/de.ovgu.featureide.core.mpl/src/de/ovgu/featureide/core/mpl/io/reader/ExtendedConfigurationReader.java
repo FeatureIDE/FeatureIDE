@@ -48,6 +48,9 @@ public class ExtendedConfigurationReader extends AbstractLineReader<Configuratio
 
 	@Override
 	protected boolean readLine(String line) {
+		if (line.isEmpty()) {
+			return true;
+		}
 		try {
 			infoObj.setManual(line, Selection.UNSELECTED);
 			return true;

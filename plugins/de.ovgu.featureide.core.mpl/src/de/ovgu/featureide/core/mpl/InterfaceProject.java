@@ -105,12 +105,14 @@ public class InterfaceProject {
 	}
 	
 	public InterfaceProject(IProject projectReference, IFeatureProject featureProject) {
-		this.projectReference = projectReference;
+		if (projectReference == null) {
+			this.projectReference = featureProject.getProject();
+		} else {
+			this.projectReference = projectReference;
+		}
 		this.featureProject = featureProject;
 		
-		if (featureProject != null) {
-			featureModel = FileLoader.loadFeatureModel(featureProject.getProject());
-		} else if (projectReference != null) {
+		if (projectReference != null) {
 			featureModel = FileLoader.loadFeatureModel(projectReference);
 		} else {
 			featureModel = null;

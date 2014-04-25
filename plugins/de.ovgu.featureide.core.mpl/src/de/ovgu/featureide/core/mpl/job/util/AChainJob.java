@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
 import de.ovgu.featureide.core.mpl.InterfaceProject;
+import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.job.util.AJobArguments;
 
 /**
@@ -70,8 +71,14 @@ public abstract class AChainJob<T extends AJobArguments> extends Job implements 
 	}
 
 	@Override
-	public IStatus run(IProgressMonitor monitor) {		
-		final boolean ok = work();
+	public IStatus run(IProgressMonitor monitor) {
+		boolean ok = false;
+		try {
+			ok = work();
+		} catch (Exception e) {
+			MPLPlugin.getDefault().logError(e);
+		}
+		
 		synchronized (done) {
 			done = true;
 		}
