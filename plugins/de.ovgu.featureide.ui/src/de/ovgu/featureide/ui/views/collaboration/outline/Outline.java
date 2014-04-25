@@ -196,6 +196,12 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 					FSTField field = ((FSTField) selection); 
 					fileAlreadyOpen = field.getFile().getName().equals(iFile.getName()) && (getFieldLine(iFile, field) > 0);
 					r = field.getRole();
+				} else  if (selection instanceof FSTInvariant) {
+					FSTInvariant invariant = ((FSTInvariant) selection); 
+					fileAlreadyOpen = invariant.getFile().getName().equals(iFile.getName()) && (getInvariantLine(iFile, invariant) > 0);
+					r = invariant.getRole();
+				} else  if (selection instanceof FSTDirective) {
+					fileAlreadyOpen = true;
 				} else {
 					return;
 				}

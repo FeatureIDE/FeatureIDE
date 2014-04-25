@@ -96,4 +96,8 @@ public class CollaborationFigure extends Figure implements GUIDefaults {
 		}
 		setBounds(bounds);
 	}
+
+	public String toString() {
+		return label.getText();
+	}
 }

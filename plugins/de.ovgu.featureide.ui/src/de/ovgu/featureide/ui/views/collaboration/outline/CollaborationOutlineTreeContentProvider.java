@@ -164,8 +164,15 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 					remDup.add(obj.get(i));
 				}
 			}
-			// Add Directives _WITH_ potential duplicates
-			remDup.addAll(directives);
+			
+			LinkedList<FSTDirective> remDupDir = new LinkedList<FSTDirective>();
+			for (int i = 0; i < directives.size(); i++) {
+				if (remDupDir.isEmpty() || !remDupDir.contains(directives.get(i))) {
+					remDupDir.add(directives.get(i));
+				}
+			}
+			
+			remDup.addAll(remDupDir);
 			return (remDup.toArray());
 		} else if (parentElement instanceof FSTMethod) {
 			// get all the roles that belong to a method

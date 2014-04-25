@@ -65,4 +65,8 @@ public class UnderlayerFigure extends Figure implements GUIDefaults {
 	public CollaborationFigure getCollaborationFigure() {
 		return collaborationFigure;
 	}
+
+	public String toString() {
+		return collaborationFigure.toString();
+	}
 }

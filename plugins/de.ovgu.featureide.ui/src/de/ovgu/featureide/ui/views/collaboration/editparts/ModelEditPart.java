@@ -240,17 +240,19 @@ public class ModelEditPart extends AbstractGraphicalEditPart implements GUIDefau
 				RoleFigure figure = (RoleFigure) roleEditPart.getFigure();
 				if (figure.getChildren().size() > 0) {
 					Dimension size = getConstraintForFigure(figure).getSize();
-					CollaborationFigure colFigure = getUnderlayerFigure(roleEditPart).getCollaborationFigure();
-					Rectangle constraintCollaboration = getConstraintForFigure(colFigure);
-					int height = size.height;
-					int alterHeight = constraintCollaboration.height;
-					if (height < alterHeight) {
-						height = alterHeight;
-						size.height = height;
-						Rectangle constraint = new Rectangle(figure.getLocation(), size);
+					for (UnderlayerFigure ulf : getUnderlayerFigure(roleEditPart)) {
+						CollaborationFigure colFigure = ulf.getCollaborationFigure();
+						Rectangle constraintCollaboration = getConstraintForFigure(colFigure);
+						int height = size.height;
+						int alterHeight = constraintCollaboration.height;
+						if (height < alterHeight) {
+							height = alterHeight;
+							size.height = height;
+							Rectangle constraint = new Rectangle(figure.getLocation(), size);
 
-						classEdit.setLayoutConstraint(this, figure, constraint);
-						figure.setBounds(constraint);
+							classEdit.setLayoutConstraint(this, figure, constraint);
+							figure.setBounds(constraint);
+						}
 					}
 				}
 			}
@@ -371,26 +373,28 @@ public class ModelEditPart extends AbstractGraphicalEditPart implements GUIDefau
 	}
 
 	private void setLocationForRoleFigures(ClassEditPart editPart) {
+		
 		for (Object o : editPart.getChildren()) {
-			RoleFigure figure = (RoleFigure) ((RoleEditPart) o).getFigure();
+			RoleEditPart roleEditPart = (RoleEditPart) o;
+			RoleFigure figure = (RoleFigure) (roleEditPart).getFigure();
 			Rectangle constraintClass = getConstraintForEditPart(editPart);
 			Rectangle constraintRole = figure.getBounds();
-			UnderlayerFigure ulFigure = getUnderlayerFigure((RoleEditPart) o);
-			Rectangle constraintCollaboration = getConstraintForFigure(ulFigure);
-			int nY = ulFigure.getCollaborationFigure().getLocation().y - ulFigure.getLocation().y;
+			List<UnderlayerFigure> ulFigure = getUnderlayerFigure(roleEditPart);
+			
+			for (UnderlayerFigure ulf : ulFigure) {
+				Rectangle constraintCollaboration = getConstraintForFigure(ulf);
+				int nY = ulf.getCollaborationFigure().getLocation().y - ulf.getLocation().y;
+				int xValue = constraintClass.getLocation().x + ((constraintClass.width - constraintRole.width) / 2);
+				int yValue = constraintCollaboration.getLocation().y + nY;
+				constraintRole.x = xValue;
+				constraintRole.y = yValue;
+				this.setLayoutConstraint(this, figure, constraintRole);
+				figure.setBounds(constraintRole);
 
-			int xValue = constraintClass.getLocation().x + ((constraintClass.width - constraintRole.width) / 2);
-			int yValue = constraintCollaboration.getLocation().y + nY;
-
-			constraintRole.x = xValue;
-			constraintRole.y = yValue;
-
-			this.setLayoutConstraint(this, figure, constraintRole);
-			figure.setBounds(constraintRole);
-
-			for (Object child : figure.getChildren()) {
-				if (child instanceof Panel) {
-					((Panel) child).setBounds(constraintRole);
+				for (Object child : figure.getChildren()) {
+					if (child instanceof Panel) {
+						((Panel) child).setBounds(constraintRole);
+					}
 				}
 			}
 		}
@@ -433,14 +437,16 @@ public class ModelEditPart extends AbstractGraphicalEditPart implements GUIDefau
 		return new Rectangle(partFigure.getBounds());
 	}
 
-	private UnderlayerFigure getUnderlayerFigure(RoleEditPart editPart) {
+	private List<UnderlayerFigure> getUnderlayerFigure(RoleEditPart editPart) {
 		FSTFeature feature = editPart.getRoleModel().getFeature();
+		List<UnderlayerFigure> ulFigures = new LinkedList<UnderlayerFigure>();
 		for (CollaborationEditPart part : collaborationEditPartList) {
-			if (part.getModel().equals(feature)) {
-				return (UnderlayerFigure) part.getFigure();
+			if (feature.getName().contains(part.getModel().toString()) && feature.getRoles().equals(part.getCollaborationModel().getRoles())) {// TODO TEST: Hello, Hello1
+				 ulFigures.add((UnderlayerFigure) part.getFigure());
 			}
 		}
-		return null;
+
+		return ulFigures;
 	}
 
 	private int getHeightForClassFigures(Map<String, Integer> heightMap) {

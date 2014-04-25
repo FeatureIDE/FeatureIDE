@@ -481,9 +481,10 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		this.setToolTip(tooltipContent);
 		
 		for (FSTDirective d : role.getDirectives()) {
-			if (!duplicates.contains(d.toDependencyString())) {
-				duplicates.add(d.toDependencyString());
-				Label partLabel = new RoleFigureLabel(d.toDependencyString(), IMAGE_HASH, d.toDependencyString());
+			String dependencyString = d.toDependencyString();
+			if (!duplicates.contains(dependencyString)) {
+				duplicates.add(dependencyString);
+				Label partLabel = new RoleFigureLabel(dependencyString, IMAGE_HASH, dependencyString);
 				addLabel(partLabel);
 			}
 			// TODO draw separationline between fields and methods
@@ -637,8 +638,11 @@ public class RoleFigure extends Figure implements GUIDefaults{
 	}
 
 	private void addLabel(Label label) {
-		if (selected) label.setForegroundColor(FOREGROUND);
-		else label.setForegroundColor(ROLE_FOREGROUND_UNSELECTED);
+		if (selected) {
+			label.setForegroundColor(FOREGROUND);
+		} else {
+			label.setForegroundColor(ROLE_FOREGROUND_UNSELECTED);
+		}
 		if (label.getFont() == null) label.setFont(DEFAULT_FONT);
 		label.setLocation(new Point(ROLE_INSETS2.left, ROLE_INSETS2.top));
 		label.setOpaque(true);
