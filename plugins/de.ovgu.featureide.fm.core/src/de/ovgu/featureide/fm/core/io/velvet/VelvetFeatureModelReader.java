@@ -57,6 +57,7 @@ import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.RenamingsManager;
 import de.ovgu.featureide.fm.core.constraint.Equation;
 import de.ovgu.featureide.fm.core.constraint.FeatureAttribute;
 import de.ovgu.featureide.fm.core.constraint.Reference;
@@ -74,14 +75,10 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
  * @author Sebastian Krieter
  * @author Matthias Strauss
  */
-public class VelvetFeatureModelReader
-	extends
-		AbstractFeatureModelReader {
+public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 
 	private enum FeatureInheritanceModes {
-		INHERITANCE,
-		INSTANCE,
-		INTERFACE;
+		INHERITANCE, INSTANCE, INTERFACE;
 	}
 
 	protected ExtendedFeatureModel extFeatureModel;
@@ -129,8 +126,7 @@ public class VelvetFeatureModelReader
 				mode = FeatureInheritanceModes.INTERFACE;
 			}
 			
-			final Feature feature =
-				addFeature(model, parentNode, child.getName(), child.isMandatory(), child.isAbstract(),
+			final Feature feature =	addFeature(model, parentNode, child.getName(), child.isMandatory(), child.isAbstract(),
 					child.isHidden());
 			feature.setAND(child.isAnd());
 			feature.setMultiple(child.isMultiple());
@@ -505,8 +501,11 @@ public class VelvetFeatureModelReader
 		copyShadowModel();
 			
 		rootFeature.setName(name);
-		this.extFeatureModel.renameFeature(tmpName, name);
-		this.extFeatureModel.performRenamings();
+		RenamingsManager renamingsManager = this.extFeatureModel.getRenamingsManager();
+		renamingsManager.renameFeature(tmpName, name);
+		renamingsManager.performRenamings();
+//		this.extFeatureModel.renameFeature(tmpName, name);
+//		this.extFeatureModel.performRenamings();
 	}
 
 	private void parseConstraint(final Tree root, final Feature parent) {
@@ -900,9 +899,7 @@ public class VelvetFeatureModelReader
 					// TODO check if a model was created?
 					break;
 				default:
-					FMCorePlugin
-						.getDefault()
-						.logError(
+					FMCorePlugin.getDefault().logError(
 							new UnsupportedModelException(
 								"Model contains invalid tokens in before beginning of concept or interface definition. (Line Number in velvet not available)",
 								0));
@@ -910,11 +907,9 @@ public class VelvetFeatureModelReader
 			}
 		}
 
-		if (null == this.extFeatureModel.implementsInterface()
-				&& null != this.inherited.getRoot()) {
+		if (null == this.extFeatureModel.implementsInterface() && null != this.inherited.getRoot()) {
 			copyChildnodes(this.extFeatureModel,
-					this.extFeatureModel.getRoot(), this.inherited.getRoot()
-							.getChildren(), "",
+					this.extFeatureModel.getRoot(), this.inherited.getRoot().getChildren(), "",
 					FeatureInheritanceModes.INHERITANCE);
 		}
 	}

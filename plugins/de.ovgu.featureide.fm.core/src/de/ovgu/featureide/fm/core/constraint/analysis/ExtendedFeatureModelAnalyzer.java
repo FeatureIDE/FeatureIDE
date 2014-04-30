@@ -35,7 +35,6 @@ import com.google.common.collect.BiMap;
 import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelReader;
@@ -55,12 +54,12 @@ public class ExtendedFeatureModelAnalyzer extends FeatureModelAnalyzer  {
 	private UniqueId idGen;
 	private RestrictionFactory<DeRestriction> deFactory;
 
-	public ExtendedFeatureModelAnalyzer(FeatureModel fm, IProject project) {
+	public ExtendedFeatureModelAnalyzer(ExtendedFeatureModel fm, IProject project) {
 		super(fm);
 		
 		this.project = project;
 
-		this.efm = (ExtendedFeatureModel) fm;
+		this.efm = fm;
 		this.idGen = new UniqueId();
 		this.map = Translator.buildFeatureNameMap(efm, idGen);
 		this.deFactory = new DeRestrictionFactory();

@@ -36,9 +36,7 @@ import de.ovgu.featureide.fm.core.constraint.FeatureAttributeMap;
  * @author Sebastian Krieter
  * @author Matthias Strauss
  */
-public class ExtendedFeatureModel
-	extends
-		FeatureModel {
+public class ExtendedFeatureModel extends FeatureModel {
 
 	protected FeatureAttributeMap<Integer> integerAttributes = new FeatureAttributeMap<Integer>();
 	protected FeatureAttributeMap<Boolean> booleanAttributes = new FeatureAttributeMap<Boolean>();
@@ -76,8 +74,10 @@ public class ExtendedFeatureModel
 	/**
 	 * Adds a mapping for an instancename to the model which it will be bound to
 	 * 
-	 * @param name the name of the variable
-	 * @param model the model that the variable is bound to
+	 * @param name
+	 *            the name of the variable
+	 * @param model
+	 *            the model that the variable is bound to
 	 */
 	public void addInstanceMapping(final String name, final String model) {
 		this.instances.put(name, model);
@@ -86,9 +86,10 @@ public class ExtendedFeatureModel
 	/**
 	 * Adds a parameter to the available parameters of the model
 	 * 
-	 * @param interfaceClazz the name of the interface that shall be bound to
-	 *            the variable
-	 * @param varName the name of the variable an interface shall be bound to
+	 * @param interfaceClazz
+	 *            the name of the interface that shall be bound to the variable
+	 * @param varName
+	 *            the name of the variable an interface shall be bound to
 	 * @return true if the parameter could be added to the parameters. False if
 	 *         the variable name was already bound to another interface.
 	 */
@@ -108,7 +109,8 @@ public class ExtendedFeatureModel
 	/**
 	 * Adds the name of a Model as a parent of the current model.
 	 * 
-	 * @param parentModelName the name of the parent model
+	 * @param parentModelName
+	 *            the name of the parent model
 	 */
 	public void addParent(final String parentModelName) {
 		this.parentModels.add(parentModelName);
@@ -119,19 +121,19 @@ public class ExtendedFeatureModel
 		final Feature tmpRoot = new Feature(this.shadowModel, "ShadowModelRoot");
 		tmpRoot.setAbstract(true);
 		tmpRoot.setMandatory(true);
-		
+
 		this.shadowModel.addFeature(tmpRoot);
 		this.shadowModel.setRoot(tmpRoot);
 	}
 
-    public void createRoot() {
-		if (null == this.getRoot()){
-		    final Feature tmpRoot = new Feature(this.shadowModel, "Root");
-		    tmpRoot.setAbstract(true);
-		    tmpRoot.setMandatory(true);
-		
-		    this.addFeature(tmpRoot);
-		    this.setRoot(tmpRoot);
+	public void createRoot() {
+		if (null == this.getRoot()) {
+			final Feature tmpRoot = new Feature(this.shadowModel, "Root");
+			tmpRoot.setAbstract(true);
+			tmpRoot.setMandatory(true);
+
+			this.addFeature(tmpRoot);
+			this.setRoot(tmpRoot);
 		}
 	}
 
@@ -201,14 +203,14 @@ public class ExtendedFeatureModel
 	}
 
 	/**
-	 * Check if the feature model contains imherited features.
+	 * Check if the feature model contains inherited features.
 	 * 
 	 * @return true if inherited features exists
 	 */
 	public boolean hasInherited() {
 		return !this.inheritedFeatures.isEmpty();
 	}
-	
+
 	public boolean hasInterface() {
 		return !this.interfaceFeatures.isEmpty();
 	}
@@ -246,7 +248,8 @@ public class ExtendedFeatureModel
 	 * @return true if and only if the feature was integrated from extern
 	 */
 	public boolean isFromExtern(final Feature feature) {
-		return isImported(feature) || isInherited(feature) || isFromInterface(feature);
+		return isImported(feature) || isInherited(feature)
+				|| isFromInterface(feature);
 	}
 
 	public boolean isFromInterface(Feature feature) {
@@ -256,8 +259,8 @@ public class ExtendedFeatureModel
 	/**
 	 * Checks if a given Feature in this model was imported with a instance.
 	 * 
-	 * @param imported the feature for which it will be checked if it is
-	 *            imported
+	 * @param imported
+	 *            the feature for which it will be checked if it is imported
 	 * @return true if and only if the feature was imported
 	 */
 	public boolean isImported(final Feature imported) {
@@ -267,8 +270,8 @@ public class ExtendedFeatureModel
 	/**
 	 * Checks if a given Feature in this model was inherited.
 	 * 
-	 * @param inherited the feature for which it will be checked if it is
-	 *            inherited
+	 * @param inherited
+	 *            the feature for which it will be checked if it is inherited
 	 * @return true if and only if the feature was inherited
 	 */
 	public boolean isInherited(final Feature inherited) {
@@ -290,7 +293,8 @@ public class ExtendedFeatureModel
 		this.interfaceName = null;
 	}
 
-	public void setFeaturefromInstance(final Feature fromInstance, final String instanceName) {
+	public void setFeaturefromInstance(final Feature fromInstance,
+			final String instanceName) {
 		this.importedFeatures.add(fromInstance);
 		this.parentsOfFeatures.put(fromInstance, instanceName);
 	}
@@ -298,7 +302,8 @@ public class ExtendedFeatureModel
 	/**
 	 * This method stores inherited features.
 	 * 
-	 * @param inherited the exact feature, that was added to the featuremodel
+	 * @param inherited
+	 *            the exact feature, that was added to the featuremodel
 	 *            previously
 	 */
 	public void setFeatureInherited(final Feature inherited, final String parent) {
@@ -306,7 +311,8 @@ public class ExtendedFeatureModel
 		this.parentsOfFeatures.put(inherited, parent);
 	}
 
-	public void setFeatureInterface(final Feature fromInterface, final String interfaceName) {
+	public void setFeatureInterface(final Feature fromInterface,
+			final String interfaceName) {
 		this.interfaceFeatures.add(fromInterface);
 		this.parentsOfFeatures.put(fromInterface, interfaceName);
 	}
@@ -314,10 +320,10 @@ public class ExtendedFeatureModel
 	public void setInterface(final String interfaceName) {
 		this.interfaceName = interfaceName;
 	}
-	
+
 	@Override
 	public boolean deleteFeature(Feature feature) {
-		if (super.deleteFeature(feature)){
+		if (super.deleteFeature(feature)) {
 			this.interfaceFeatures.remove(feature);
 			this.importedFeatures.remove(feature);
 			this.inheritedFeatures.remove(feature);
