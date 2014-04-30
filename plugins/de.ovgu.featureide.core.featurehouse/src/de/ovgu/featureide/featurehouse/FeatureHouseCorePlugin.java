@@ -35,6 +35,9 @@ public class FeatureHouseCorePlugin extends AbstractCorePlugin {
 
 	public static final String PLUGIN_ID = "de.ovgu.featureide.core.featurehouse";
 
+	public static final String CONTRACT_MARKER = CorePlugin.PLUGIN_ID
+			+ ".contractMarker";
+	
 	public static final String BUILDER_PROBLEM_MARKER = CorePlugin.PLUGIN_ID
 			+ ".builderProblemMarker";
 	

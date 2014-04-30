@@ -54,14 +54,13 @@ public class StatisticsProgrammSize extends LazyParent {
 				String qualifiedRoleName = qualifiedPackageName + "."
 						+ roleName;
 
-				String qualifier = qualifiedRoleName + "#";
+				String qualifier = qualifiedRoleName + ".";
 
+
+				
 				for (FSTMethod method : classFragment.getMethods()) {
 					String fullName = qualifier + method.getFullName();
-					methodMap.put(
-							fullName,
-							methodMap.containsKey(fullName) ? methodMap
-									.get(fullName) + 1 : 1);
+					methodMap.put(fullName + "." + method.getFullName(),methodMap.containsKey(fullName) ? methodMap.get(fullName) + 1 : 1);
 				}
 
 				for (FSTField field : classFragment.getFields()) {
@@ -78,7 +77,7 @@ public class StatisticsProgrammSize extends LazyParent {
 								.get(qualifiedRoleName) + 1 : 1);
 			}
 		}
-
+		
 		addChild(new HashMapNode(NUMBER_CLASS + SEPARATOR
 				+ classMap.keySet().size() + " | " + NUMBER_ROLE + SEPARATOR
 				+ sum(classMap), null, classMap));

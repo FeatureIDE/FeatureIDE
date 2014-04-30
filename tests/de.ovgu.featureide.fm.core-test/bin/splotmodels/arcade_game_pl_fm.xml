@@ -1,0 +1,125 @@
+<feature_model name="Arcade Game PL Feature Model">
+<meta>
+<data name="description">Arcade Game PL feature model</data>
+<data name="creator">Edson Oliveira Junior</data>
+<data name="email"></data>
+<data name="date">Aug 2009</data>
+<data name="department"></data>
+<data name="organization">Universidade de Sao Paulo (USP) and University of Waterloo</data>
+<data name="address"></data>
+<data name="phone"></data>
+<data name="website"></data>
+<data name="reference"></data>
+</meta><feature_tree>
+:r Arcade Game
+	:m Use Cases
+		:o Check Previous Best Score (check_previous_best_score)
+		:o Save Score (save_score)
+		:m Save Game
+		:m Exit Game
+		:m Install Game
+		:m Uninstall Game
+		:m List Game
+		:m Play Game
+			:g [1,*]
+				: Play Brickles (play_brickles)
+				: Play Pong (play_pong)
+				: Play Bowling (play_bowling)
+			:m Initialization
+			:m Animation Loop	 
+	:m Class Diagram
+		:m Game Sprite (game_sprite)
+			:o Sprite Pair (sprite_pair)
+			:m Rectangle
+				:m Size
+				:m Point 
+			:g [1,*]
+				: Movable Sprite
+					:m Velocity
+					:g [1,*]
+						: Paddle
+							:g [1,*]
+								: Top Paddle (top_paddle_pong)
+								: Bottom Paddle (bottom_paddle_pong)
+						: Puck (puck_core_assets)
+						: Bowling Ball (ball_bowling)
+						: Bowling Pin (pin_bowling)
+				: Stationary Sprite 
+					:o Wall
+						:g [1,*]
+							: Left pong (left_wall_pong)
+							: Right pont (right_wall_pong)
+							: Left brickles (left_brickles)
+							: Right brickles (right_brickles)
+					:g [1,*]
+						: Brick (brick_brickles)
+						: Brick Pile (brick_pile_brickles)
+						: Ceiling brickles (ceiling_brickles)
+						: Floor brickles (floor_brickles)
+						: Lane (lane_bowling)
+						: Gutter (gutter_bowling)
+						: Edge (edge_bowling)
+						: End of Alley (alley_bowling)
+						: Rack of Pins (rack_pins_bowling)
+						: Score Board (score_board_pong)
+						: Floor pong (floor_pong)
+						: Ceiling pong (ceiling_pong)
+						: Dividing Line (dividing_line_pong)
+		:o Puck supply (puck_supply_brickles)
+		:m Board
+			:g [1,*]
+				: Pong Board (board_pong)
+				: Brickles Board (board_brickles)
+				: Bowling Board (board_bowling)
+		:m Menu
+			:g [1,*]
+				: Pong (menu_pong) 
+				: Brickles (menu_brickles)
+				: Bowling (menu_bowling)
+		:m Game Menu
+			:g [1,*]
+				: Pong Game Menu (pong_game_menu)
+				: Brickles Game Menu (brickles_game_menu)
+				: Bowling Game Menu (bowling_game_menu)
+</feature_tree>
+<constraints>
+<!--  link use cases to class diagram elements -->
+c1: ~play_brickles or menu_brickles
+c2: play_brickles or ~menu_brickles
+c3: ~play_pong or menu_pong
+c4: play_pong or ~menu_pong
+c5: ~play_bowling or menu_bowling
+c6: play_bowling or ~menu_bowling
+<!-- descendants implies root  -->
+c8: ~top_paddle_pong or menu_pong
+c9: ~bottom_paddle_pong or menu_pong
+c10: ~left_wall_pong or menu_pong
+c11: ~right_wall_pong or menu_pong
+c12: ~score_board_pong or menu_pong
+c13: ~floor_pong or menu_pong
+c14: ~ceiling_pong or menu_pong
+c15: ~dividing_line_pong or menu_pong
+c16: ~board_pong or menu_pong
+c17: ~pong_game_menu or menu_pong
+c18: ~board_bowling or menu_bowling
+c19: ~ball_bowling or menu_bowling
+c20: ~pin_bowling or menu_bowling
+c21: ~lane_bowling or menu_bowling
+c22: ~gutter_bowling or menu_bowling
+c23: ~edge_bowling or menu_bowling
+c24: ~alley_bowling or menu_bowling
+c25: ~rack_pins_bowling or menu_bowling
+c26: ~bowling_game_menu or menu_bowling
+c27: ~brickles_game_menu or menu_brickles
+c28: ~board_brickles or menu_brickles
+c29: ~left_brickles or menu_brickles
+c30: ~right_brickles or menu_brickles
+c31: ~brick_pile_brickles or menu_brickles
+c32: ~brick_brickles or menu_brickles
+c33: ~ceiling_brickles or menu_brickles
+c34: ~floor_brickles or menu_brickles
+c35: ~puck_supply_brickles or menu_brickles
+<!--  class dependencies --> 
+</constraints>
+</feature_model>
+

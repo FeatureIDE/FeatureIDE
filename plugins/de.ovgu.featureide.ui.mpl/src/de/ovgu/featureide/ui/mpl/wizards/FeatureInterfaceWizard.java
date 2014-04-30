@@ -20,60 +20,37 @@
  */
 package de.ovgu.featureide.ui.mpl.wizards;
 
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchWizard;
+import java.util.List;
 
 import de.ovgu.featureide.ui.mpl.MPLUIPlugin;
+import de.ovgu.featureide.ui.mpl.wizards.page.AbstractWizardPage;
+import de.ovgu.featureide.ui.mpl.wizards.page.ChooseFolderPage;
+import de.ovgu.featureide.ui.mpl.wizards.page.InterfacePage;
 
 /**
  * A wizard for creating MPL interfaces.
  * 
  * @author Reimar Schroeter
  */
-public class FeatureInterfaceWizard extends Wizard implements IWorkbenchWizard {
+public class FeatureInterfaceWizard extends AbstractWizard {
 	public static final String ID = MPLUIPlugin.PLUGIN_ID + ".wizards.InterfaceWizard";
-
-	private InterfacePage interfacePage;
-	private ChooseFolderPage folderPage;
+	
+	private final String defaultFolderString;
 	
 	public FeatureInterfaceWizard(String title) {
-		super();
-		setWindowTitle(title);
+		this(title, null);
+	}
+	
+	public FeatureInterfaceWizard(String title, String defaultFolderString) {
+		super(title);
+		this.defaultFolderString = defaultFolderString;
 	}
 
 	@Override
-	public void addPages() {
-		interfacePage = new InterfacePage();
-		folderPage = new ChooseFolderPage();
-		addPage(interfacePage);
-		addPage(folderPage);
-		super.addPages();
-	}
-
-	@Override
-	public boolean performFinish() {
-		return true;
-	}
-	
-	public int getConfigLimit() {
-		return interfacePage.getConfigLimit();
-	}
-	
-	public int getViewLevel() {
-		return interfacePage.getViewLevel();
-	}
-	
-	public String getViewName() {
-		return interfacePage.getViewName();
-	}
-	
-	public String getFolderName(){
-		return folderPage.getFolderName();
-	}
-	
-	@Override
-	public void init(IWorkbench workbench, IStructuredSelection selection) {
+	protected void initPages(List<AbstractWizardPage> pages) {
+		pages.add(new InterfacePage());
+		if (defaultFolderString != null) {
+			pages.add(new ChooseFolderPage(defaultFolderString));
+		}
 	}
 }

@@ -89,6 +89,7 @@ public abstract class AbstractSignature {
 	protected LinkedList<ViewTag> viewTags;
 	
 	protected FeatureData[] featureData = null;
+	protected String mergedjavaDocComment = null;
 	
 	protected AbstractSignature(AbstractClassSignature parent, String name, String modifierString, String type) {
 		this.parent = parent;
@@ -104,7 +105,7 @@ public abstract class AbstractSignature {
 		if (modifierString == null) {
 			this.modifiers = new String[0];
 		} else {
-			this.modifiers = modifierString.trim().split(" ");
+			this.modifiers = modifierString.trim().split("\\s+");
 		}
 		Arrays.sort(this.modifiers);
 		if (Arrays.binarySearch(this.modifiers, "private") >= 0) {
@@ -200,6 +201,14 @@ public abstract class AbstractSignature {
 		return visibility;
 	}
 	
+	public String getMergedjavaDocComment() {
+		return mergedjavaDocComment;
+	}
+	
+	public FeatureData[] getFeatureData() {
+		return featureData;
+	}
+	
 	public boolean isPrivate() {
 		return visibility == VISIBILITY_PRIVATE;
 	}
@@ -219,9 +228,9 @@ public abstract class AbstractSignature {
 	public boolean isFinal() {
 		return finalSignature;
 	}
-	
-	public FeatureData[] getFeatureData() {
-		return featureData;
+
+	public void setMergedjavaDocComment(String mergedjavaDocComment) {
+		this.mergedjavaDocComment = mergedjavaDocComment;
 	}
 	
 	public void setFeatureData(FeatureData[] featureData) {
@@ -267,7 +276,6 @@ public abstract class AbstractSignature {
 		hashCode = 1;
 		hashCode = hashCodePrime * hashCode + fullName.hashCode();
 		hashCode = hashCodePrime * hashCode + Arrays.hashCode(modifiers);
-		hashCode = hashCodePrime * hashCode + type.hashCode();
 	}
 
 	@Override
@@ -281,9 +289,9 @@ public abstract class AbstractSignature {
 	}
 	
 	protected boolean sigEquals(AbstractSignature otherSig) {
-		if (!fullName.equals(otherSig.fullName) 
-//				|| !type.equals(otherSig.type)
-				|| !Arrays.equals(modifiers, otherSig.modifiers)) {
+		if (!fullName.equals(otherSig.fullName)
+				|| !Arrays.equals(modifiers, otherSig.modifiers)
+				) {
 			return false;
 		}
 		return true;

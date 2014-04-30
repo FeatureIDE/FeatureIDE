@@ -1,0 +1,55 @@
+<!-- This model was created online using SPLOT's Feature Model Editor (http://www.splot-research.org) on Fri, Dec 25, 2009 - 12:26 PM  -->
+<feature_model name="Feature Model do Dominio de Agendamento">
+<meta>
+<data name="description">Domínio de Agendamento</data>
+<data name="creator">George Dantas</data>
+<data name="address"></data>
+<data name="email">gdancost@yahoo.com.br</data>
+<data name="phone"></data>
+<data name="website"></data>
+<data name="organization">UFRN/DIMAp</data>
+<data name="department"></data>
+<data name="date"></data>
+<data name="reference"></data>
+</meta>
+<feature_tree>
+:r ModeloAgen(_r)
+	:m Agendamento(_r_1)
+		:o Impressão de Folha de Rosto(_r_1_7)
+		:o Reagendamento(_r_1_8)
+		:o Notificação(_r_1_9)
+			:g (_r_1_9_10) [1,*] 
+				: Email(_r_1_9_10_11)
+				: Celular(_r_1_9_10_12)
+		:m Regras(_r_1_13)
+			:g (_r_1_13_14) [1,1] 
+				: Por Adm(_r_1_13_14_15)
+				: Por Usuário(_r_1_13_14_16)
+		:m Visualização(_r_1_22)
+		:o Tipo de Uso(_r_1_31)
+			:g (_r_1_31_32) [1,*] 
+				: Reunião(_r_1_31_32_33)
+				: Palestra(_r_1_31_32_34)
+				: Treinamento(_r_1_31_32_35)
+				: Videoconferência(_r_1_31_32_36)
+	:o Cadastro de Horários(_r_2)
+		:o Bloqueio de Horários(_r_2_6)
+	:o Cadastro de Salas(_r_3)
+		:m Tipo de Sala(_r_3_25)
+			:g (_r_3_25_26) [1,*] 
+				: Reunião(_r_3_25_26_27)
+				: Aula(_r_3_25_26_28)
+				: Auditório(_r_3_25_26_29)
+				: Laboratório(_r_3_25_26_30)
+	:o Cadastro de Equipamentos(_r_4)
+	:o Cadastro de Administradores(_r_5)
+	:o Relatórios(_r_17)
+		:g (_r_17_19) [1,*] 
+			: Ocupação Diária(_r_17_19_20)
+			: Ocupação Semanal(_r_17_19_21)
+</feature_tree>
+<constraints>
+constraint_2:_r_3 or ~_r_4
+constraint_3:_r_3 or ~_r_1_31
+</constraints>
+</feature_model>

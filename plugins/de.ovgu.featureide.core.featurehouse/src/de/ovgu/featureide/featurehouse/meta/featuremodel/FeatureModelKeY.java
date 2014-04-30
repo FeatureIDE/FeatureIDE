@@ -22,11 +22,7 @@ package de.ovgu.featureide.featurehouse.meta.featuremodel;
 
 import java.util.Locale;
 
-import org.prop4j.Node;
-import org.prop4j.NodeWriter;
-
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 /**
  * Defines the content of the feature model class specific for KeY.
@@ -67,12 +63,13 @@ public class FeatureModelKeY implements IFeatureModelClass {
 
 	@Override
 	public String getFormula() {
-		final Node nodes = NodeCreator.createNodes(featureModel.clone()).eliminateNotSupportedSymbols(NodeWriter.javaSymbols);
-		String formula = nodes.toString(NodeWriter.javaSymbols).toLowerCase(Locale.ENGLISH);
-		if (formula.contains("  &&  true  &&  ! false")) {
-			formula = formula.substring(0, formula.indexOf("  &&  true  &&  ! false"));
-		}
-		return VALID + "return " + formula + ";\r\n\t}\r\n";
+		return "";
+//		final Node nodes = NodeCreator.createNodes(featureModel.clone()).eliminateNotSupportedSymbols(NodeWriter.javaSymbols);
+//		String formula = nodes.toString(NodeWriter.javaSymbols).toLowerCase(Locale.ENGLISH);
+//		if (formula.contains("  &&  true  &&  ! false")) {
+//			formula = formula.substring(0, formula.indexOf("  &&  true  &&  ! false"));
+//		}
+//		return VALID + "return " + formula + ";\r\n\t}\r\n";
 	}
 
 	@Override

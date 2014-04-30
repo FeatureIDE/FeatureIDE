@@ -1,0 +1,38 @@
+<feature_model name="James">
+<meta>
+<data name="description">JAMES is a framework to develop web collaborative systems</data>
+<data name="creator">David Benavides</data>
+<data name="email"></data>
+<data name="date"></data>
+<data name="department"></data>
+<data name="organization"></data>
+<data name="address"></data>
+<data name="phone"></data>
+<data name="website"></data>
+<data name="reference">David Benavides, Antonio Ruiz-Cortes, and Pablo Trinidad. Using constraint programming to reason on feature models. In Proceedings of the The 17th International Conference on Software Engineering and Knowledge Engineering (SEKE’05), Taipei, Taiwan, Republic of China, 2005.</data>
+</meta>
+<feature_tree>
+:r james
+	:m user_mngt
+		:g [1,1]
+			: db
+			: ldap
+	:o ws_interface
+	:m gui
+		:g [1,*]
+			: pc
+			: pda (pda)
+	:m core
+	:m modules
+		:g [1,*]
+			: calendar
+			: forum
+			: congress_mngt (congress_mngt)
+			: repository (repository)
+</feature_tree>
+<constraints>
+c1: ~pda or ~repository
+c2: ~congress_mngt or repository
+</constraints>
+</feature_model>
+

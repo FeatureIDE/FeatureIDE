@@ -26,8 +26,4 @@ public abstract class AbstractFieldSignature extends AbstractSignature {
 		super(parent, name, modifiers, type);
 	}
 
-//	protected AbstractFieldSignature(AbstractSignature orgSig, boolean ext) {
-//		super(orgSig, ext);
-//	}
-
 }

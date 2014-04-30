@@ -32,22 +32,45 @@ public class FSTMethod extends RoleElement {
 	private LinkedList<String> parameterTypes;
 	private boolean isConstructor;
 	private boolean refines;
+	private String contract;
 
-	public FSTMethod(String name, LinkedList<String> parameterTypes,
-			String type, String modifiers) {
+	/**
+	 * @return the contract
+	 */
+	public String getContract() {
+		return contract;
+	}
+
+	private String compKey;
+
+	/**
+	 * @return the compKey
+	 */
+	public String getCompKey() {
+		return compKey;
+	}
+
+	public FSTMethod(String name, LinkedList<String> parameterTypes, String type, String modifiers) {
 		this(name, parameterTypes, type, modifiers, -1);
 	}
-	
-	public FSTMethod(String name, LinkedList<String> parameterTypes, String type,
-			String modifiers, int beginLine) {
+
+	public FSTMethod(String name, LinkedList<String> parameterTypes, String type, String modifiers, int beginLine) {
 		this(name, parameterTypes, type, modifiers, "", beginLine, -1);
 	}
-	
-	public FSTMethod(String name, LinkedList<String> parameterTypes,
-			String type, String modifiers, String body, int beginLine,
-			int endLine) {
+
+	public FSTMethod(String name, LinkedList<String> parameterTypes, String type, String modifiers, String body, int beginLine, int endLine) {
+		this(name, parameterTypes, type, modifiers, body, beginLine, endLine, "", "");
+	}
+
+	public FSTMethod(String name, LinkedList<String> parameterTypes, String type, String modifiers, String body, int beginLine, int endLine, String contract) {
+		this(name, parameterTypes, type, modifiers, body, beginLine, endLine, contract, "");
+	}
+
+	public FSTMethod(String name, LinkedList<String> parameterTypes, String type, String modifiers, String body, int beginLine, int endLine, String contract, String compKey) {
 		super(name, type, modifiers, body, beginLine, endLine);
 		this.parameterTypes = parameterTypes;
+		this.contract = contract;
+		this.compKey = compKey;
 	}
 
 	@Override
@@ -65,7 +88,7 @@ public class FSTMethod extends RoleElement {
 			fullname.append(" : " + type);
 		return fullname.toString();
 	}
-	
+
 	public boolean isConstructor() {
 		return isConstructor;
 	}
@@ -81,14 +104,19 @@ public class FSTMethod extends RoleElement {
 	public void setRefines(boolean refines) {
 		this.refines = refines;
 	}
-	
-	public LinkedList<String> getParameter(){
+
+	public LinkedList<String> getParameter() {
 		return parameterTypes;
 	}
-	
+
+	public boolean hasContract() {
+		return contract.length() > 0;
+	}
+
 	/**
 	 * 
-	 * @return <code>true</code> if an equivalent method exists in an other role of the same class.
+	 * @return <code>true</code> if an equivalent method exists in an other role
+	 *         of the same class.
 	 */
 	public boolean inRefinementGroup() {
 		for (FSTRole role : getRole().getFSTClass().getRoles()) {

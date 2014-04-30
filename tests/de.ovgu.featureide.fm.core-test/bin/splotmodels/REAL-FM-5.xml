@@ -1,0 +1,54 @@
+<feature_model name="Graph Product Line"> 
+<meta> 
+<data name="description">A simple graph product line</data> 
+<data name="creator">Don Batory</data> 
+<data name="address"></data> 
+<data name="email">batory@cs.utexas.edu</data> 
+<data name="phone"></data> 
+<data name="website">http://www.cs.utexas.edu/~dsb/</data> 
+<data name="organization">University of Texas at Austin</data> 
+<data name="department"></data> 
+<data name="date"></data> 
+<data name="reference">Don S. Batory. Feature models, grammars, and propositional formulas. In Software Product Lines, 9th International Conference, SPLC 2005, Rennes, France, September 26-29, 2005, Proceedings, volume 3714 of Lecture Notes in Computer Science, pages 7-20. Springer, 2005</data> 
+</meta> 
+<feature_tree>
+:r GPL(_r)
+	:m Driver(_r_1)
+		:m Benchmark(_r_1_2)
+	:m Gtp(_r_3)
+		:g (_r_3_4) [1,1] 
+			: directed(_r_3_4_5)
+			: undirected(_r_3_4_6)
+	:o Weight(_r_10)
+		:g (_r_10_11) [1,1] 
+			: weighted(_r_10_11_12)
+			: unweighted(_r_10_11_13)
+	:o Search(_r_15)
+		:g (_r_15_16) [1,1]
+			: BFS(_r_15_16_17)
+			: DFS(_r_15_16_18)
+	:m Algorithms(_r_19)
+		:g (_r_19_20) [1,*] 
+			: number(_r_19_20_21)
+			: connected(_r_19_20_22)
+			: stronglyc(_r_19_20_23)
+			: cycle(_r_19_20_24)
+			: mstprim(_r_19_20_25)
+			: mstkruskal(_r_19_20_26)
+			: shortest(_r_19_20_27)
+</feature_tree> 
+<constraints> 
+constraint8:_r_3_4_6 or ~_r_19_20_26
+constraint9:_r_10_11_13 or ~_r_19_20_26
+constraint10:_r_3_4_6 or ~_r_19_20_25
+constraint6:_r_3_4_6 or ~_r_19_20_23
+constraint11:_r_10_11_13 or ~_r_19_20_25
+constraint7:_r_15_16_18 or ~_r_19_20_24
+constraint12:~_r_19_20_25 or ~_r_19_20_26
+constraint4:_r_3_4_6 or ~_r_19_20_22
+constraint13:_r_3_4_5 or ~_r_19_20_27
+constraint5:_r_15 or ~_r_19_20_22
+constraint14:_r_10_11_13 or ~_r_19_20_27
+constraint3:_r_15 or ~_r_19_20_21
+</constraints> 
+</feature_model> 

@@ -1,5 +1,4 @@
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
-
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,6 +21,7 @@ public final class StatisticsFeatureComplexity extends LazyParent {
 	private FeatureModelAnalyzer ana;
 	private FeatureModel model;
 
+	
 	public StatisticsFeatureComplexity(String description, FeatureModel model) {
 		super(description, null);
 		this.model = model;
@@ -83,8 +83,9 @@ public final class StatisticsFeatureComplexity extends LazyParent {
 					listOfPrimitiveFeatures));
 
 			addChild(new FeatureListNode(NUMBER_HIDDEN, ana.getHiddenFeatures()));
-
+			
 			addChild(new Parent(NUMBER_CONSTRAINTS, constraints));
+
 		}
 	}
 }

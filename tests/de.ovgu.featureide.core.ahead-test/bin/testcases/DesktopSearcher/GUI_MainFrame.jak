@@ -1,0 +1,191 @@
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Point;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Date;
+
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.border.Border;
+import javax.swing.border.TitledBorder;
+import javax.swing.JComboBox;
+
+import org.apache.lucene.document.Document;
+import org.apache.lucene.index.TermFreqVector;
+import org.apache.lucene.search.ScoreDoc;
+import java.awt.GridBagLayout;
+
+
+/**
+ * Hauptfenster der Anwendung.
+ * 
+ * @author Mr. Pink
+ */
+public class MainFrame extends JFrame implements UI{
+	public static final long serialVersionUID = 1L;
+
+	// Referenz zu der Main-Klasse.
+	public MrPinkMain mrPinkMain = null;
+
+	// Components
+	
+	
+	
+
+	public JButton startButton;
+	public JPanel searchResultContainer;
+	public JPanel groupBoxSearch;
+	public JScrollPane scrollPane;
+	public JTextArea informationField;
+	
+	public JComboBox queryTextFieldJComboBox;
+	
+
+	// Hier werden die Einstellung der Optionen gespeichert
+	public OptionStorage optionStorage = new OptionStorage(10, false, false);
+
+	/**
+	 * Konstruktor.
+	 * 
+	 * Intitialisiert das Hauptfenster.
+	 * 
+	 * @param mrPinkMain   Referenz zu der Main-Klasse.
+	 */
+	public MainFrame(MrPinkMain mrPinkMain) {
+		this.mrPinkMain = mrPinkMain;
+		this.setSize(600, 400);
+		this.setVisible(true);
+		this.setMinimumSize(this.getSize());
+		this.setLayout(new BorderLayout());
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setTitle("MrPink");
+
+		initComponents();
+
+		/**
+		 * Wegen einem Formatierungsproblem. Wenn diese Zeilen rausgenommen
+		 * werden, kann es beim Start des Programmes passieren, das nicht alle
+		 * Components des Fraims vernuenftig angezeigt werden.
+		 */
+		this.setSize(600, 401);
+		this.setSize(600, 400);
+	}
+
+	public void initComponents(){
+		createGroupBoxSearch();
+	}
+
+
+
+	/**
+	 * Erzeugt eine GroupBox.
+	 * 
+	 * @param title     Name der GroupBox
+	 * @param fontSize  Groesse der Schrift
+	 * @param color     Farbe der Umrandung
+	 * @return          das entsprechend praeparierte JPanel-Objekt
+	 */
+	public static JPanel makeGroupBox(String title, int fontSize, Color color) {
+		JPanel panel = new JPanel();
+		Border blackline = BorderFactory.createLineBorder(color);
+		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+		TitledBorder border = BorderFactory.createTitledBorder(blackline,
+				title, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.CENTER,
+				new Font("", Font.ITALIC, fontSize));
+		panel.setBorder(border);
+		return panel;
+	}
+
+	JPanel xAxis1;
+
+	/**
+	 * Erzeugt die Search-GroupBox mit allen beinhaltenden Elementen.
+	 */
+	public void createGroupBoxSearch() {
+		groupBoxSearch = makeGroupBox("Search", 30, Color.BLACK);
+		this.add(groupBoxSearch, BorderLayout.CENTER);
+		groupBoxSearch.setLayout(new BorderLayout());
+
+		xAxis1 = new JPanel();
+		xAxis1.setLayout(new BoxLayout(xAxis1, BoxLayout.X_AXIS));
+
+        queryTextFieldJComboBox = new JComboBox();
+		queryTextFieldJComboBox.setBounds(0, 0, 20, 50);
+		queryTextFieldJComboBox.setFont(new Font("", Font.ITALIC, 15));
+		queryTextFieldJComboBox.setEditable(true);
+		xAxis1.add(queryTextFieldJComboBox);
+		
+		startButton = new JButton("Search");
+		startButton.addActionListener(new ButtonListener(this));
+		startButton.setFont(new Font("", Font.ITALIC, 15));
+		xAxis1.add(startButton);
+
+		createOptionsButton();	
+
+		groupBoxSearch.add(xAxis1, BorderLayout.NORTH);
+
+		// Standard-Button setzen
+		
+		this.getRootPane().setDefaultButton(startButton);
+		this.enableSearchGroupBox(false);
+
+		// resultPanel
+		searchResultContainer = new JPanel();
+		groupBoxSearch.add(searchResultContainer,BorderLayout.CENTER);
+		searchResultContainer.setLayout(new GridBagLayout());
+		scrollPane = new JScrollPane(searchResultContainer);
+		
+		informationField = new JTextArea(2,1);
+		informationField.setFont(new Font("", Font.ITALIC, 15));
+		informationField.setEditable(false);
+		informationField.setEnabled(false);
+		informationField.setText("Type in multiple words to do an 'AND' search (all terms must be present). You can also use + to specify a word that must be contained in the text,\n or - for words you don't want to find. Additionally, you can use the field names 'title' and 'content' to narrow your search.");
+		groupBoxSearch.add(informationField,BorderLayout.SOUTH);
+		groupBoxSearch.add(scrollPane);
+	}
+	
+	public void createOptionsButton(){
+
+	}
+	
+	/**
+	 * Such-Box (de)aktivieren.
+	 * 
+	 * @param b True zum aktivieren, ansonsten False.
+	 */
+	public void enableSearchGroupBox(boolean b) {
+	
+		this.queryTextFieldJComboBox.setEnabled(b);
+		this.startButton.setEnabled(b);
+	}
+
+	
+	/**
+	 * Oeffnet einen Dialog, der die Uebergebene Error-Message ausgibt.
+	 * 
+	 * @param message Fehler der ausgegeben werden soll
+	 */
+	public void printErrorMessage(String message) {
+		JOptionPane.showMessageDialog(this, message, "An error occurred!", JOptionPane.ERROR_MESSAGE);
+	}
+
+	public void printSearch_SearchPanel(ScoreDoc[] hits, Indexer index, String query) {
+		
+		// die Funktioanlitaet ist in die Features ausgelagert
+		
+	}
+
+
+}

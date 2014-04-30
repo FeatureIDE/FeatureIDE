@@ -1,6 +1,7 @@
 package br.ufal.ic.colligens.controllers.core;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Stack;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -84,8 +85,8 @@ public class CPPModelBuilder extends PPModelBuilder {
 					if (command == FSTDirectiveCommand.ELSE) {
 						if (!directivesStack.isEmpty()) {
 							directivesStack.peek().setEndLine(i, 0);
-							directive.setFeatureName(directivesStack.peek()
-									.getFeatureName());
+							directive.setFeatureNames(directivesStack.peek()
+									.getFeatureNames());
 						}
 					} else if (command == FSTDirectiveCommand.ELIF) {
 						if (!directivesStack.isEmpty()) {
@@ -98,8 +99,8 @@ public class CPPModelBuilder extends PPModelBuilder {
 					Matcher m = patternCommands.matcher(line);
 					line = m.replaceAll("").trim(); // #ifdef => ""
 
-					if (directive.getFeatureName() == null) {
-						directive.setFeatureName(getFeatureName(line));
+					if (directive.getFeatureNames() == null) {
+						directive.setFeatureNames(getFeatureNames(line));
 					}
 					directive.setExpression(line);
 					directive.setStartLine(i, 0);
@@ -121,8 +122,10 @@ public class CPPModelBuilder extends PPModelBuilder {
 	}
 
 	@Override
-	protected String getFeatureName(String expression) {
-		return expression.replaceAll("[()]|defined", "").trim();
+	protected List<String> getFeatureNames(String expression) {
+		List<String> featureNameList = new LinkedList<String>();
+		featureNameList.add(expression.replaceAll("[()]|defined", "").trim());
+		return featureNameList;
 	}
 
 	@Override

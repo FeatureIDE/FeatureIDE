@@ -46,12 +46,15 @@ import de.ovgu.featureide.core.builder.FeatureProjectNature;
 import de.ovgu.featureide.core.mpl.builder.InterfaceProjectNature;
 import de.ovgu.featureide.core.mpl.io.IOConstants;
 import de.ovgu.featureide.core.mpl.io.writer.JavaProjectWriter;
-import de.ovgu.featureide.core.mpl.job.AChainJob;
-import de.ovgu.featureide.core.mpl.job.BuildExtendedSignatureJob;
-import de.ovgu.featureide.core.mpl.job.BuildFeatureInterfaces;
-import de.ovgu.featureide.core.mpl.job.BuildStatisticsJob;
-import de.ovgu.featureide.core.mpl.job.CompareConfigInterfaces;
+import de.ovgu.featureide.core.mpl.job.PrintComparedInterfacesJob;
+import de.ovgu.featureide.core.mpl.job.PrintDocumentationJob;
+import de.ovgu.featureide.core.mpl.job.PrintDocumentationStatisticsJob;
+import de.ovgu.featureide.core.mpl.job.PrintExtendedSignaturesJob;
+import de.ovgu.featureide.core.mpl.job.PrintFeatureInterfacesJob;
+import de.ovgu.featureide.core.mpl.job.PrintStatisticsJob;
 import de.ovgu.featureide.core.mpl.job.StartJob;
+import de.ovgu.featureide.core.mpl.job.util.AJobArguments;
+import de.ovgu.featureide.core.mpl.job.util.IChainJob;
 import de.ovgu.featureide.core.mpl.signature.ProjectSignatures;
 import de.ovgu.featureide.core.mpl.signature.ProjectSignatures.SignatureIterator;
 import de.ovgu.featureide.core.mpl.signature.ProjectStructure;
@@ -265,59 +268,42 @@ public class MPLPlugin extends AbstractCorePlugin {
 	}
 	
 	public void buildFeatureInterfaces(LinkedList<IProject> projects, String folder, String viewName, int viewLevel, int configLimit) {
-		final AChainJob[] jobs = new AChainJob[projects.size()];
-		for (int i = 0; i < jobs.length; i++) {
-			jobs[i] = new BuildFeatureInterfaces(folder);
-		}
-		startJobs(projects, jobs);
+		startJobs(projects, new PrintFeatureInterfacesJob.Arguments(folder));
+	}
+	
+	public void buildDocumentation(LinkedList<IProject> projects, String folder, String options, int mode) {
+		startJobs(projects, new PrintDocumentationJob.Arguments(folder, null, mode, options.split("\\s+")));
+	}
+	
+	public void buildDocumentation(LinkedList<IProject> projects, String folder, String options, int mode, String featurename) {
+		startJobs(projects, new PrintDocumentationJob.Arguments(folder, featurename, mode, options.split("\\s+")));
+	}
+	
+	public void buildDocumentationStatistics(LinkedList<IProject> projects, String folder) {
+		startJobs(projects, new PrintDocumentationStatisticsJob.Arguments(folder));
 	}
 	
 	public void buildConfigurationInterfaces(LinkedList<IProject> projects, String viewName, int viewLevel, int configLimit) {
-		final AChainJob[] jobs = new AChainJob[projects.size()];
-		for (int i = 0; i < jobs.length; i++) {
-			jobs[i] = new CompareConfigInterfaces();
-		}
-		startJobs(projects, jobs);
+		startJobs(projects, new PrintComparedInterfacesJob.Arguments());
 	}
 	
 	public void compareConfigurationInterfaces(LinkedList<IProject> projects, String viewName, int viewLevel, int configLimit) {
-		final AChainJob[] jobs = new AChainJob[projects.size()];
-		for (int i = 0; i < jobs.length; i++) {
-			jobs[i] = new CompareConfigInterfaces();
-		}
-		startJobs(projects, jobs);
+		startJobs(projects, new PrintComparedInterfacesJob.Arguments());
 	}
 	
-//	public void extendedModules(String projectName, String folder) {
-//		addJob(projectName, new BuildExtendedSignatureJob(folder));
-//	}
-	
 	public void buildExtendedModules(LinkedList<IProject> projects, String folder) {
-		final AChainJob[] jobs = new AChainJob[projects.size()];
-		for (int i = 0; i < jobs.length; i++) {
-			jobs[i] = new BuildExtendedSignatureJob(folder);
-		}
-		startJobs(projects, jobs);
+		startJobs(projects, new PrintExtendedSignaturesJob.Arguments(folder));
 	}
 	
 	public void printStatistics(LinkedList<IProject> projects, String folder) {
-		final AChainJob[] jobs = new AChainJob[projects.size()];
-		for (int i = 0; i < jobs.length; i++) {
-			jobs[i] = new BuildStatisticsJob(folder);
-		}
-		startJobs(projects, jobs);
+		startJobs(projects, new PrintStatisticsJob.Arguments(folder));
 	}
 	
-//	private void addJob(String projectName, AChainJob job) {
-//		InterfaceProject interfaceProject = getInterfaceProject(projectName);
-//		if (interfaceProject != null) {			
-//			interfaceProject.loadSignaturesJob(false);
-//			job.setInterfaceProject(interfaceProject);
-//			interfaceProject.addJob(job);
-//		}
-//	}
-	
-	private void startJobs(LinkedList<IProject> projects, AChainJob[] jobs) {
+	public void startJobs(LinkedList<IProject> projects, AJobArguments arguments) {
+		final IChainJob[] jobs = new IChainJob[projects.size()];
+		for (int i = 0; i < jobs.length; i++) {
+			jobs[i] = arguments.createJob();
+		}
 		final InterfaceProject[] interfaceProjects = new InterfaceProject[projects.size()];
 		int i = 0;
 		for (IProject p : projects) {
@@ -327,8 +313,7 @@ public class MPLPlugin extends AbstractCorePlugin {
 				jobs[i++].setInterfaceProject(interfaceProject);
 			}
 		}
-		StartJob startJob = new StartJob(jobs);
-		startJob.schedule();
+		new StartJob.Arguments(jobs).createJob().schedule();
 	}
 	
 	public List<CompletionProposal> extendedModules_getCompl(InterfaceProject interfaceProject, String featureName) {
@@ -351,7 +336,7 @@ public class MPLPlugin extends AbstractCorePlugin {
 						
 						AbstractMethodSignature methSig = (AbstractMethodSignature) curMember; 
 						
-						LinkedList<String> sig = methSig.getParameterTypes();
+						List<String> sig = methSig.getParameterTypes();
 						
 						
 						//TODO eigentlich ist eine Fallunterscheidung nach Typen notwendig!
@@ -388,9 +373,7 @@ public class MPLPlugin extends AbstractCorePlugin {
 						pr.setName(curMember.getName().toCharArray());
 						pr.setCompletion(curMember.getName().toCharArray());
 						
-						
 						ret_List.add(pr);
-						
 					}
 				}
 			} else {

@@ -29,8 +29,8 @@ import org.eclipse.core.resources.IProject;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.mpl.io.FileLoader;
-import de.ovgu.featureide.core.mpl.job.AChainJob;
-import de.ovgu.featureide.core.mpl.job.FujiJob;
+import de.ovgu.featureide.core.mpl.job.CreateFujiSignaturesJob;
+import de.ovgu.featureide.core.mpl.job.util.IChainJob;
 import de.ovgu.featureide.core.mpl.signature.ProjectSignatures;
 import de.ovgu.featureide.core.mpl.signature.ViewTag;
 import de.ovgu.featureide.fm.core.Feature;
@@ -60,11 +60,11 @@ public class InterfaceProject {
 	private final FeatureModel featureModel;
 	private String[] featureNames;
 	
-	private AChainJob lastJob = null;
-	private FujiJob loadJob = null;
+	private IChainJob lastJob = null;
+	private IChainJob loadJob = null;
 	private boolean loadAgain = false;
 	
-	public synchronized void addJob(AChainJob newJob) {
+	public synchronized void addJob(IChainJob newJob) {
 		if (lastJob == null) {
 			lastJob = newJob;
 			lastJob.schedule();
@@ -105,12 +105,14 @@ public class InterfaceProject {
 	}
 	
 	public InterfaceProject(IProject projectReference, IFeatureProject featureProject) {
-		this.projectReference = projectReference;
+		if (projectReference == null) {
+			this.projectReference = featureProject.getProject();
+		} else {
+			this.projectReference = projectReference;
+		}
 		this.featureProject = featureProject;
 		
-		if (featureProject != null) {
-			featureModel = FileLoader.loadFeatureModel(featureProject.getProject());
-		} else if (projectReference != null) {
+		if (projectReference != null) {
 			featureModel = FileLoader.loadFeatureModel(projectReference);
 		} else {
 			featureModel = null;
@@ -134,15 +136,18 @@ public class InterfaceProject {
 		if (featureModel != null) {
 			final String[] tempFeatureNames = new String[featureModel.getNumberOfFeatures()];
 			int count = 0;
+
 			Collection<Entry<String, Feature>> x = featureModel.getFeatureTable().entrySet();
 			for (Entry<String, Feature> entry : x) {
 				if (entry.getValue().isConcrete()) {
 					entry.getValue().addListener(new FeaturePropertyChangeListener(count));
 					tempFeatureNames[count++] = entry.getKey();
+
 				}
 			}
 			featureNames = new String[count];
 			System.arraycopy(tempFeatureNames, 0, featureNames, 0, count);
+
 //			Arrays.sort(featureNames);
 //			loadSignatures(true);
 		} else {
@@ -174,19 +179,33 @@ public class InterfaceProject {
 		return featureNames[id];
 	}
 	
-	public void loadSignatures(boolean force) {
+	public int getFeatureCount() {
+		return featureNames.length;
+	}
+	
+	public void loadSignatures(boolean again) {
 		if (loadJob == null) {
-			loadJob = new FujiJob(featureProject);
+			loadJob = new CreateFujiSignaturesJob();
 			loadJob.setInterfaceProject(this);
 			loadJob.schedule();
-		} else if (force) {
+		} else if (again) {
 			loadAgain = true;
 		}
 	}
 	
+//	public void loadSignaturesFast(boolean again) {
+//		if (loadJob == null) {
+//			loadJob = new CreateFSTSignaturesJob();
+//			loadJob.setInterfaceProject(this);
+//			loadJob.schedule();
+//		} else if (again) {
+//			loadAgain = true;
+//		}
+//	}
+	
 	public synchronized void loadSignaturesJob(boolean force) {
 		if (projectSignatures == null || force) {
-			FujiJob job = new FujiJob(featureProject);
+			CreateFujiSignaturesJob job = new CreateFujiSignaturesJob();
 			job.setInterfaceProject(this);
 			addJob(job);
 		}
@@ -198,6 +217,10 @@ public class InterfaceProject {
 
 	public IProject getProjectReference() {
 		return projectReference;
+	}
+	
+	public IFeatureProject getFeatureProjectReference() {
+		return featureProject;
 	}
 	
 	public FeatureModel getFeatureModel() {
@@ -256,10 +279,6 @@ public class InterfaceProject {
 	
 	public void clearFilterViewTag() {
 		this.filterViewTag = null;
-	}
-
-	public IFeatureProject getFeatureProjectReference() {
-		return featureProject;
 	}
 	
 //	public void scaleUpViewTag(String name, int level) {

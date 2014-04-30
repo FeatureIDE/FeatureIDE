@@ -1,0 +1,48 @@
+<feature_model name="Digital_Video_System">
+<meta>
+<data name="description">Feature model of a digital video system</data>
+<data name="creator">Detlef Streitferdt</data>
+<data name="email"></data>
+<data name="date"></data>
+<data name="department"></data>
+<data name="organization"></data>
+<data name="address"></data>
+<data name="phone"></data>
+<data name="website"></data>
+<data name="reference">Detlef Streitferdt, Matthias Riebisch, and Ilka Philippow. Details of formalized relations in feature models using OCL. Engineering of Computer-Based Systems, 2003. Proceedings. 10th IEEE International Conference and Workshop on the, pages 297–304, April 2003.</data>
+</meta>
+<feature_tree>
+:r dvs
+	:m control
+		:m remote
+		:o telephone
+			:o sms
+		:o net (net)
+			:o web
+			:o wap
+			:m email
+		:o edit
+			:o add_music (add_music)
+		:m play
+			:o slides
+			:o audio (audio)
+			:m video
+	:o network_hw (network_hw)
+		:o modem
+		:o ethernet
+	:m server_pc
+		:o network
+		:o irda_port (irda_port)
+	:m play
+		:o on_demand
+	:o client_pc
+		:o network
+	:o handheld (handheld)
+</feature_tree>
+<constraints>
+c1: ~net or network_hw
+c2: ~handheld or irda_port
+c3: ~add_music or audio
+</constraints>
+</feature_model>
+

@@ -21,6 +21,7 @@
 package de.ovgu.featureide.antenna.model;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Stack;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -118,7 +119,7 @@ public class AntennaModelBuilder extends PPModelBuilder {
 					if (command == FSTDirectiveCommand.ELSE) {
 						if (!directivesStack.isEmpty()) {
 							directivesStack.peek().setEndLine(i, 0);
-							directive.setFeatureName(directivesStack.peek().getFeatureName());
+							directive.setFeatureNames(directivesStack.peek().getFeatureNames());
 						}
 					} else if (command == FSTDirectiveCommand.ELIF || 
 						command == FSTDirectiveCommand.ELIFDEF ||
@@ -133,8 +134,8 @@ public class AntennaModelBuilder extends PPModelBuilder {
 					Matcher m = patternCommands.matcher(line);
 					line = m.replaceAll("").trim();
 					
-					if (directive.getFeatureName() == null) {
-						directive.setFeatureName(getFeatureName(line));
+					if (directive.getFeatureNames() == null) {
+						directive.setFeatureNames(getFeatureNames(line));
 					}
 					directive.setExpression(line);
 					directive.setStartLine(i, 0);
@@ -174,4 +175,21 @@ public class AntennaModelBuilder extends PPModelBuilder {
 		Matcher matcher = pattern.matcher(text);
 		return matcher.find();
 	}
+	
+	@Override
+	protected  List<String> getFeatureNames(String expression) {
+		String exp = expression.replaceAll("[()]", "");
+		exp = exp.replaceAll("&&", "");
+		exp = exp.replaceAll("\\|\\|", "");
+		exp = exp.replaceAll("\\^", "");
+		List<String> featureNameList = new LinkedList<String>();
+		for (String s : exp.split(" ")) {
+			if (s.trim().length() > 0) {
+				featureNameList.add(s);
+			}
+		}
+		
+		return featureNameList;
+	}
+	
 }

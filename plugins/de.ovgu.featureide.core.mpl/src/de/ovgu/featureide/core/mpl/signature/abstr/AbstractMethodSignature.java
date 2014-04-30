@@ -20,29 +20,22 @@
  */
 package de.ovgu.featureide.core.mpl.signature.abstr;
 
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.List;
 
 public abstract class AbstractMethodSignature extends AbstractSignature {
 	
-	protected LinkedList<String> parameterTypes;
+	protected List<String> parameterTypes;
 	protected final boolean isConstructor;
 	
-	protected AbstractMethodSignature(AbstractClassSignature parent, String name, String modifier, String type, LinkedList<String> parameterTypes, boolean isConstructor) {
+	protected AbstractMethodSignature(AbstractClassSignature parent, String name, String modifier, String type, List<String> parameterTypes, boolean isConstructor) {
 		super(parent, name, modifier, type);
 		this.isConstructor = isConstructor;
 		this.parameterTypes = parameterTypes;
 	}
 	
-//	protected AbstractMethodSignature(AbstractMethodSignature orgSig, boolean ext) {
-//		super(orgSig, ext);
-//		isConstructor = orgSig.isConstructor;
-//		parameterTypes = new LinkedList<String>(orgSig.parameterTypes);
-//	}
-	
 	public abstract String getReturnType();
 
-	public LinkedList<String> getParameterTypes() {
+	public List<String> getParameterTypes() {
 		return parameterTypes;
 	}
 
@@ -50,38 +43,38 @@ public abstract class AbstractMethodSignature extends AbstractSignature {
 		return isConstructor;
 	}
 
-	@Override
-	protected void computeHashCode() {
-		super.computeHashCode();
-		hashCode = hashCodePrime * hashCode + (isConstructor ? 1231 : 1237);
-		for (String parameter : parameterTypes) {
-			hashCode = hashCodePrime * hashCode + parameter.hashCode();
-		}
-	}
+//	@Override
+//	protected void computeHashCode() {
+//		super.computeHashCode();
+//		hashCode = hashCodePrime * hashCode + (isConstructor ? 1231 : 1237);
+//		for (String parameter : parameterTypes) {
+//			hashCode = hashCodePrime * hashCode + parameter.hashCode();
+//		}
+//	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null || getClass() != obj.getClass())
-			return false;
-		
-		AbstractMethodSignature otherSig = (AbstractMethodSignature) obj;
-		
-		if (!super.sigEquals(otherSig)) 
-			return false;
-		if (isConstructor != otherSig.isConstructor 
-				|| parameterTypes.size() != otherSig.parameterTypes.size()) {
-			return false;
-		}
-
-		Iterator<String> otherParameterIt = otherSig.parameterTypes.iterator();
-		Iterator<String> thisParameterIt = parameterTypes.iterator();
-		while (thisParameterIt.hasNext()) {
-			if (!thisParameterIt.next().equals(otherParameterIt.next())) {
-				return false;
-			}
-		}
-		return true;
-	}
+//	@Override
+//	public boolean equals(Object obj) {
+//		if (this == obj)
+//			return true;
+//		if (obj == null || getClass() != obj.getClass())
+//			return false;
+//		
+//		AbstractMethodSignature otherSig = (AbstractMethodSignature) obj;
+//		
+//		if (!super.sigEquals(otherSig)) 
+//			return false;
+//		if (isConstructor != otherSig.isConstructor 
+//				|| parameterTypes.size() != otherSig.parameterTypes.size()) {
+//			return false;
+//		}
+//
+//		Iterator<String> otherParameterIt = otherSig.parameterTypes.iterator();
+//		Iterator<String> thisParameterIt = parameterTypes.iterator();
+//		while (thisParameterIt.hasNext()) {
+//			if (!thisParameterIt.next().equals(otherParameterIt.next())) {
+//				return false;
+//			}
+//		}
+//		return true;
+//	}
 }

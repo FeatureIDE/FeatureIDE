@@ -1,7 +1,7 @@
 public class Account {
 	final int OVERDRAFT_LIMIT = 0;
 
-	//@ invariant balance >= OVERDRAFT_LIMIT;
+	/*@ invariant balance >= OVERDRAFT_LIMIT; @*/
 	int balance = 0;
 	
 	/*@

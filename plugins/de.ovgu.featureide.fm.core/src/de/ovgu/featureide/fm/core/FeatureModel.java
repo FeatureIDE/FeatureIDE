@@ -393,7 +393,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	public Node getConstraint(int index) {
 		return constraints.get(index).getNode();
 	}
-	
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
 	public List<Constraint> getConstraints() {
 		return Collections.unmodifiableList(constraints);
 	}

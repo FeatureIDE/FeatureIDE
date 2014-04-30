@@ -28,6 +28,7 @@ import de.ovgu.cide.fstgen.ast.FSTTerminal;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
+import de.ovgu.featureide.core.fstmodel.RoleElement;
 
 /**
  * Class builders are creating entries for the FSTModel of their special language.<br>
@@ -94,6 +95,11 @@ public class ClassBuilder {
 		return new ClassBuilder(builder);
 	}
 	
+	void addMethod(String name, LinkedList<String> parameterTypes, String returnType, String modifiers, String body, int beginLine, int endLine, boolean isConstructor)
+	{
+		addMethod(name, parameterTypes, returnType, modifiers, body, beginLine, endLine, isConstructor, "", "");
+	}
+	
 	/**
 	 * Adds the method with the given parameters to the {@link FSTModel}.
 	 * @param name Name of the method
@@ -104,22 +110,25 @@ public class ClassBuilder {
 	 * @param beginLine Start of the method at features file 
 	 * @param endLine End of the method at features file
 	 * @param isConstructor <code>true</code> if the method is a constructor 
+	 * @param contract contract string if existent
 	 */
-	void addMethod(String name, LinkedList<String> parameterTypes, 
-			String returnType, String modifiers, String body, int beginLine, int endLine, boolean isConstructor) {
-		FSTMethod method = new FSTMethod(name, parameterTypes, returnType, modifiers, body, beginLine, endLine);								
+	RoleElement addMethod(String name, LinkedList<String> parameterTypes, String returnType, String modifiers, String body, int beginLine, int endLine, boolean isConstructor, String contract, String compKey) 
+	{
+		FSTMethod method = new FSTMethod(name, parameterTypes, returnType, modifiers, body, beginLine, endLine, contract, compKey);								
 		method.setConstructor(isConstructor);
 		if (body.contains("original")) {
 			body = body.replaceAll(" ", "");
 			method.setRefines(body.contains("original("));
 		}
 		modelBuilder.getCurrentClassFragment().add(method);
+		return method;
 	}
 	
-	protected void addField(String fieldName, String typeName, String modifiers,
+	protected RoleElement addField(String fieldName, String typeName, String modifiers,
 			String body, int beginLine, int endLine) {
 		FSTField field = new FSTField(fieldName, typeName, modifiers, body, beginLine, endLine);
 		modelBuilder.getCurrentClassFragment().add(field);
+		return field;
 	}
 	
 	public void caseJMLSpecCaseSeq(FSTTerminal terminal) {}
@@ -135,4 +144,6 @@ public class ClassBuilder {
 	public void caseExtendsList(FSTTerminal terminal) {}
 	
 	public void caseModifiers(FSTTerminal terminal) {}
+
+	public void caseJMLInvariant(FSTTerminal terminal) {}
 }

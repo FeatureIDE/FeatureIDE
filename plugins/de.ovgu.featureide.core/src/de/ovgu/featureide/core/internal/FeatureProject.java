@@ -256,13 +256,16 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		} catch (CoreException e) {
 			LOGGER.logError(e);
 		}
-		
+
+		String projectBuildPath = getProjectBuildPath();
+
 		try {
+			
 			// just create the bin folder if project hat only the FeatureIDE
 			// Nature
-			if (project.getDescription().getNatureIds().length == 1
-					&& project.hasNature(FeatureProjectNature.NATURE_ID)) {
-				if (!("".equals(getProjectBuildPath()) && "".equals(getProjectSourcePath()))) {
+			if (project.getDescription().getNatureIds().length == 1 &&
+				project.hasNature(FeatureProjectNature.NATURE_ID)) {
+				if (!(projectBuildPath.isEmpty() && getProjectSourcePath().isEmpty())) {
 					binFolder = CorePlugin.createFolder(project, "bin");
 				}
 			}
@@ -270,7 +273,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			LOGGER.logError(e);
 		}
 		libFolder = project.getFolder("lib");
-		buildFolder = CorePlugin.createFolder(project, getProjectBuildPath());
+		buildFolder = CorePlugin.createFolder(project, projectBuildPath);
 		configFolder = CorePlugin.createFolder(project,getProjectConfigurationPath());
 		sourceFolder = CorePlugin.createFolder(project, getProjectSourcePath());
 		fstModel = null;
@@ -280,7 +283,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 
 		// make the composer ID a builder argument
 		setComposerID(getComposerID());
-		setPaths(getProjectSourcePath(), getProjectBuildPath(),
+		setPaths(getProjectSourcePath(), projectBuildPath,
 				getProjectConfigurationPath());
 		
 		// adds the compiler to the feature project if it is an older project
@@ -288,9 +291,9 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		if (composer != null) {
 			if (sourceFolder != null) {
 				composer.addCompiler(getProject(),
-						getSourceFolder().getProjectRelativePath().toOSString(),
-						getConfigFolder().getProjectRelativePath().toOSString(),
-						getBuildFolder().getProjectRelativePath().toOSString());
+						sourceFolder.getProjectRelativePath().toOSString(),
+						configFolder.getProjectRelativePath().toOSString(),
+						buildFolder.getProjectRelativePath().toOSString());
 			}
 		}
 	}
@@ -805,7 +808,6 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			return;
 		}
 		Feature feature = featureModel.getFeature(folder.getName());
-
 		try {
 			folder.deleteMarkers(FEATURE_MODULE_MARKER, true, IResource.DEPTH_ZERO);
 		} catch (CoreException e) {
@@ -1114,7 +1116,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		if (selections.length == 0) {
 			return Collections.emptyList();
 		}
-		final List<String> concreteFeatures = getOptionalConcreteFeatures();
+		final List<String> concreteFeatures = getFalseOptionalFeatures();
 		final List<String> falseOptionalFeatures = new LinkedList<String>();
 		if (selections.length != 0) {
 			for (int collumn = 0; collumn < concreteFeatures.size(); collumn++) {
@@ -1161,6 +1163,21 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		}
 		return concreteFeatures;
 	}
+	
+	private List<String> getFalseOptionalFeatures() {
+		final List<String> concreteFeatureNames = new LinkedList<String>();
+		final Collection<Feature> coreFeatures = featureModel.getAnalyser().getCoreFeatures();
+		
+		
+		for (final Feature feature : featureModel.getConcreteFeatures() ) {
+			if (!feature.isMandatory() && !feature.isAlternative() && coreFeatures.contains(feature))
+			concreteFeatureNames.add(feature.getName());
+		}
+		for (final Feature feature : featureModel.getAnalyser().getDeadFeatures()) {
+			concreteFeatureNames.remove(feature.getName());
+		}
+		return concreteFeatureNames;
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -1193,13 +1210,12 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	public String getProjectConfigurationPath() {
 		try {
 			String path = project.getPersistentProperty(configFolderConfigID);
-			if (path != null)
+			if (path != null && !path.isEmpty())
 				return path;
 
 			path = getPath(CONFIGS_ARGUMENT);
-			if (path == null)
-				return DEFAULT_CONFIGS_PATH;
-			return path;
+			if (path != null && !path.isEmpty())
+				return path;
 		} catch (Exception e) {
 			LOGGER.logError(e);
 		}
@@ -1209,13 +1225,12 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	public String getProjectBuildPath() {
 		try {
 			String path = project.getPersistentProperty(buildFolderConfigID);
-			if (path != null)
+			if (path != null && !path.isEmpty())
 				return path;
 
 			path = getPath(BUILD_ARGUMENT);
-			if (path == null)
-				return DEFAULT_BUILD_PATH;
-			return path;
+			if (path != null && !path.isEmpty())
+				return path;
 		} catch (Exception e) {
 			LOGGER.logError(e);
 		}
@@ -1225,13 +1240,12 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	public String getProjectSourcePath() {
 		try {
 			String path = project.getPersistentProperty(sourceFolderConfigID);
-			if (path != null)
+			if (path != null && !path.isEmpty())
 				return path;
 
 			path = getPath(SOURCE_ARGUMENT);
-			if (path == null)
-				return DEFAULT_SOURCE_PATH;
-			return path;
+			if (path != null && !path.isEmpty())
+				return path;
 		} catch (Exception e) {
 			LOGGER.logError(e);
 		}

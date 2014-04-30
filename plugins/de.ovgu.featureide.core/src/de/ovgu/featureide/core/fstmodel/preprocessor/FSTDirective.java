@@ -21,21 +21,23 @@
 package de.ovgu.featureide.core.fstmodel.preprocessor;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 import de.ovgu.featureide.core.fstmodel.FSTRole;
+import de.ovgu.featureide.core.fstmodel.RoleElement;
 
 /**
  * Representation of a directive at a role.
  * 
  * @author Jens Meinicke
  */
-public class FSTDirective {
+public class FSTDirective extends RoleElement {
 
 	private String expression;
-	private String featureName = null;
+	private List<String> featureNames = null;
 	private FSTDirectiveCommand command;
 	private LinkedList<FSTDirective> children = new LinkedList<FSTDirective>();
 	private @CheckForNull FSTDirective parent;
@@ -51,6 +53,7 @@ public class FSTDirective {
 	}
 
 	public FSTDirective() {
+		super("","","");
 	}
 
 	public void setCommand(FSTDirectiveCommand command) {
@@ -134,7 +137,7 @@ public class FSTDirective {
 		ret.append(" ");
 		ret.append(expression);
 		if (children.size() > 0) {
-			for(FSTDirective child : children){
+			for(FSTDirective child : children) {
 				ret.append("\n");
 				ret.append(child.toString(i + 1));
 			}
@@ -205,19 +208,40 @@ public class FSTDirective {
 		return (role == null && parent != null)	? parent.getRole() : role;
 	}
 
-	public String getFeatureName() {
-		return featureName;
+	public List<String> getFeatureNames() {
+		return featureNames;
+	}
+
+	public void setFeatureNames(List<String> featureNames) {
+		this.featureNames = featureNames;
 	}
 
 	public void setFeatureName(String featureName) {
-		this.featureName = featureName;
+		List<String> fN = new LinkedList<String>();
+		fN.add(featureName);
+		this.featureNames = fN;
 	}
-
+	
 	public int getId() {
 		return id;
 	}
 
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	@Override
+	public String getFullName() {
+		return Integer.toString(this.id);
+	}
+	
+	@Override
+	public boolean comparesTo(RoleElement element) {
+		if (element instanceof FSTDirective) {
+			return toDependencyString().equals(((FSTDirective)element).toDependencyString());	
+		} else {
+			return false;
+		}
+		
 	}
 }

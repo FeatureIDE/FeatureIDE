@@ -261,7 +261,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			jobName = JOB_TITLE_T_WISE;
 			break;
 		}
-		jobName += "for " + featureProject.getProjectName();
+		jobName += " for " + featureProject.getProjectName();
 		Job job = new Job(jobName) {
 			public IStatus run(IProgressMonitor monitor) {
 				try {

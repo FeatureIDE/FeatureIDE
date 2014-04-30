@@ -36,8 +36,7 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
  */
 public final class FileLoader {
 
-	public static Configuration loadConfiguration(
-			InterfaceProject interfaceProject) {
+	public static Configuration loadConfiguration(InterfaceProject interfaceProject) {
 		try {
 			ExtendedConfigurationReader exConfReader = new ExtendedConfigurationReader(interfaceProject);
 			return exConfReader.read();

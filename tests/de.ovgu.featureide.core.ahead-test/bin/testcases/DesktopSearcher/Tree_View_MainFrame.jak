@@ -1,0 +1,106 @@
+
+import javax.swing.*;
+import java.util.TreeMap;
+import java.awt.GridBagConstraints;
+
+public refines class MainFrame {
+	
+	protected JScrollPane treeView;
+	protected JPanel hitView;
+	protected JSplitPane splitView;
+	
+	public void printSearch_SearchPanel(ScoreDoc[] hits, Indexer index,
+			String query) {
+		TreeMap hit_list = new TreeMap();
+		try {
+			if (hits.length == 0) {
+
+			} else {
+
+				for (int rankPos = 0; rankPos < hits.length; rankPos++) {
+					int documentID = hits[rankPos].doc;
+					Object[] ret = index.getDocument(documentID);
+					Document document = (Document) ret[0];
+					TermFreqVector[] freqVec = (TermFreqVector[]) ret[1];
+
+					String lastModification = document.getField("lastModify")
+							.stringValue();
+					Timestamp ts = new Timestamp(new Long(lastModification));
+					Date d = new Date(ts.getTime());
+					lastModification = d.toString();
+
+					String size = document.getField("size").stringValue()
+							+ " Byte";
+
+					Point position = new Point(10, searchResultContainer
+							.getPreferredSize().height);
+					// DatenSatz erzeugen
+					ArrayList daten = new ArrayList();
+					// rankingPos
+					daten.add((1 + rankPos) + "");
+					// ID
+					daten.add(documentID + "");
+					// name
+					daten.add(document.getField("title").stringValue());
+					// location
+					daten.add(document.getField("path").stringValue());
+					// groesse
+					daten.add(size);
+					// age
+					daten.add(lastModification);
+					// Woeter
+					// wenn eine Query vorhanden ist
+					if (query != null) {
+						String[] queryTerms = index.getQueryTerms(query);
+						for (int i = 0; i < queryTerms.length; i++) {
+							daten.add(queryTerms[i]);
+							daten.add(index.getTermFreq(freqVec, queryTerms[i]) + "");
+						}
+					}
+
+					// Added das Ergebnis auf das Panel
+					HitDocument dokL = new HitDocument(daten);
+							
+					hit_list.put(dokL.getPath(), dokL);
+					/**
+					 * In diesem Bereich wird die PrefereceSize des Container an
+					 * die beinhaltenden Panel angepasst. Dadurch wird
+					 * sichergestellt, dass die Scrollbars wie gewuenscht
+					 * funktionieren.
+					 */
+				}
+				
+				hitView = new JPanel();
+				hitView.setPreferredSize(new Dimension(searchResultContainer.getSize().width, searchResultContainer.getSize().height/2));
+				
+				JTree tree = new SearchResultTree(hit_list, hitView).getTree();
+		       	treeView = new JScrollPane(tree);
+
+				//hitView = new JPanel();
+				
+				splitView = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+				splitView.setTopComponent(treeView);
+				splitView.setBottomComponent(hitView);
+				
+				splitView.setDividerLocation(searchResultContainer.getSize().height/2); 
+
+				GridBagConstraints constraints_Container         = new GridBagConstraints(); //"reset Constraints"
+				constraints_Container.weightx = 1.0; // need to fill with horizontal complete
+				constraints_Container.weighty = 1.0; // need to fill with vertical complete
+				constraints_Container.fill    = GridBagConstraints.BOTH; // fill horizontal and vertical (set weightx + weighty!!!)
+		
+				searchResultContainer.add(splitView, constraints_Container);
+				
+				splitView.setSize(new Dimension(searchResultContainer.getSize().width, searchResultContainer.getSize().height));
+
+				searchResultContainer.repaint();
+				//pack();
+				scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+				scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+			}
+		} catch (Exception e) {
+			System.err.println(e);
+			e.printStackTrace();
+		}
+	}
+}

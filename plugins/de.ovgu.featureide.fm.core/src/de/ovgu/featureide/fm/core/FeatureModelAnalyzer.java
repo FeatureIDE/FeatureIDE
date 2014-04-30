@@ -145,7 +145,7 @@ public class FeatureModelAnalyzer {
 	 * 
 	 * in detail the following condition should be checked whether
 	 * 
-	 * FM => ((A1 and A2 and ... and An) => (B1 and B2 and ... and Bn))
+	 * FM => ((A1 and A2 and ... and An) => (B1 or B2 or ... or Bn))
 	 * 
 	 * is true for all values
 	 * 
@@ -161,18 +161,33 @@ public class FeatureModelAnalyzer {
 		if (b.isEmpty())
 			return true;
 
-		Node featureModel = NodeCreator.createNodes(fm);
+		Node featureModel = NodeCreator.createNodes(fm.clone());
 
-		// B1 and B2 and ... Bn
-		Node condition = conjunct(b);
-		// (A1 and ... An) => (B1 and ... Bn)
+		// B1 or B2 or ... Bn
+		Node condition = disjunct(b);
+		// (A1 and ... An) => (B1 or ... Bn)
 		if (!a.isEmpty())
 			condition = new Implies(conjunct(a), condition);
 		// FM => (A => B)
 		Implies finalFormula = new Implies(featureModel, condition);
 		return !new SatSolver(new Not(finalFormula), 1000).isSatisfiable();
 	}
+	
+	public boolean checkIfFeatureCombinationNotPossible(Feature a, Collection<Feature> b) throws TimeoutException {
+		if (b.isEmpty())
+			return true;
 
+		Node featureModel = NodeCreator.createNodes(fm.clone());
+		boolean notValid = true;
+		for (Feature f : b) {
+			Node node = new And(new And(featureModel, new Literal(NodeCreator.getVariable(f, fm.clone()))),  
+					new Literal(NodeCreator.getVariable(a, fm.clone())));
+			notValid &= !new SatSolver(node, 1000).isSatisfiable();
+		}
+		return notValid;
+	}
+	
+	
 	/**
 	 * checks some condition against the feature model. use only if you know
 	 * what you are doing!
@@ -337,6 +352,16 @@ public class FeatureModelAnalyzer {
 
 		return result;
 	}
+	
+	public Node disjunct(Collection<Feature> b) {
+		Iterator<Feature> iterator = b.iterator();
+		Node result = new Literal(NodeCreator.getVariable(iterator.next(), fm));
+		while (iterator.hasNext())
+			result = new Or(result, new Literal(NodeCreator.getVariable(
+					iterator.next(), fm)));
+
+		return result;
+	}	
 
 	/**
 	 * Returns the list of features that occur in all variants, where one of the

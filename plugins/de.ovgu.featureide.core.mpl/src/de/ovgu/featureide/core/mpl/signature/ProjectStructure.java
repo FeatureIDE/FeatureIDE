@@ -48,16 +48,6 @@ public class ProjectStructure {
 	protected int hashCode = 0;
 	protected boolean hasHashCode = false;
 	
-//	private boolean valid;
-
-//	public ProjectStructure() {
-//		valid = false;
-//	}
-	
-//	public ProjectStructure(Iterator<AbstractSignature> allMembers, AClassCreator aClassCreator) {
-//		construct(allMembers, aClassCreator);
-//	}
-	
 	public ProjectStructure(SignatureIterator it) {
 		construct(it, new FujiClassCreator());
 	}
@@ -87,6 +77,13 @@ public class ProjectStructure {
 			if (parentClass == null) {
 				parentClass = aClassCreator.create(parent);
 				addClass(parentClass);
+			} else {
+				if (sig instanceof AbstractClassSignature) {
+					AbstractClassSignature parentSig = parentClass.getSignature();
+					for (String newImport : ((AbstractClassSignature)sig).getImportList()) {
+						parentSig.addImport(newImport);
+					}
+				}
 			}
 			
 			for (AbstractClassSignature child : parents) {
@@ -102,12 +99,7 @@ public class ProjectStructure {
 				parentClass.addMember(sig);
 			}
 		}
-//		valid = true;
 	}
-	
-//	public boolean isValid() {
-//		return valid;
-//	}
 
 	public AbstractClassFragment getClass(String id) {
 		return classList.get(id);

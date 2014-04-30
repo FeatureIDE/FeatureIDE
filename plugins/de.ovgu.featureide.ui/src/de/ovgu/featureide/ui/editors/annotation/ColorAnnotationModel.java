@@ -52,10 +52,10 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtension;
-import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
+import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.ColorList;
 import de.ovgu.featureide.ui.UIPlugin;
 
@@ -321,7 +321,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 				
 			if (oldDir != null &&
 					newDir.getCommand() == oldDir.getCommand() &&
-					newDir.getFeatureName().equals(oldDir.getFeatureName())) {
+					newDir.getFeatureNames().equals(oldDir.getFeatureNames())) {
 			
 				oldDir.setStartLine(newDir.getStartLine(), newDir.getStartOffset());
 				oldDir.setEndLine(newDir.getEndLine(), newDir.getEndLength());

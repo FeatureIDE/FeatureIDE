@@ -21,35 +21,40 @@
 package de.ovgu.featureide.core.mpl.job;
 
 import de.ovgu.featureide.core.mpl.InterfaceProject;
+import de.ovgu.featureide.core.mpl.job.util.AChainJob;
+import de.ovgu.featureide.core.mpl.job.util.AJobArguments;
+import de.ovgu.featureide.core.mpl.job.util.IChainJob;
 
 /**
  * Starts consecutively other jobs from a list of {@link AChainJob}s.
  * 
  * @author Sebastian Krieter
  */
-public class StartJob extends AChainJob {
+public class StartJob extends AChainJob<StartJob.Arguments> {
 	
-	private final AChainJob[] jobs;
-	private final int index;
-	
-	public StartJob(AChainJob[] jobs) {
-		this(jobs, 0);
+	public static class Arguments extends AJobArguments {
+		private final IChainJob[] jobs;
+		private int index = 0;
+		
+		public Arguments(IChainJob[] jobs) {
+			super(Arguments.class);
+			this.jobs = jobs;
+		}
 	}
 	
-	public StartJob(AChainJob[] jobs, int index) {
-		super("");
-		this.jobs = jobs;
-		this.index = index;
+	protected StartJob(Arguments arguments) {
+		super("", arguments);
 	}
 	
 	@Override
 	protected boolean work() {
-		AChainJob curJob = jobs[index];
+		IChainJob curJob = arguments.jobs[arguments.index];
 		InterfaceProject curInterfaceProject = curJob.getInterfaceProject();
 		curInterfaceProject.loadSignaturesJob(false);
 		curInterfaceProject.addJob(curJob);
-		if (index < jobs.length - 1) {
-			curInterfaceProject.addJob(new StartJob(jobs, index + 1));
+		arguments.index++;
+		if (arguments.index < arguments.jobs.length) {
+			curInterfaceProject.addJob(new StartJob(arguments));
 		}
 		
 		return true;

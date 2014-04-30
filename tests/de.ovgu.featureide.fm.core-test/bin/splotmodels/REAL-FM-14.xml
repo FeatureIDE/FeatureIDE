@@ -1,0 +1,38 @@
+<feature_model name="Text_Editor">
+<meta>
+<data name="description">Feature model of a configurable text editor</data>
+<data name="creator">Krzysztof Czarnecki</data>
+<data name="email">kczarnec at swen dot uwaterloo dot ca</data>
+<data name="date"></data>
+<data name="department">Generative Software Development Lab</data>
+<data name="organization">University of Waterloo</data>
+<data name="address">200 University Ave. West, Waterloo, ON, Canada</data>
+<data name="phone">+1-519-888-4567</data>
+<data name="website">http://gsd.uwaterloo.ca/</data>
+<data name="reference">Krzysztof Czarnecki, Simon Helsen, and Ulrich Eisenecker. Formalizing cardinality-based feature models and their specialization. Software Process Improvement and Practice, 10(1), 2005. Special issue on Software Variability: Process and Management. http://swen.uwaterloo.ca/~kczarnec/spip05a.pdf</data>
+</meta>
+<feature_tree>
+:r editor_config
+	:m backup
+		:o autosave
+			:m minutes
+		:o backup_onchange
+		:m backup_extension
+			:g [1,1]
+				: file_bak
+				: file_bak_ext
+				: file_ext_bak
+	:o document_class
+		:m associated_file_ext
+			:o ext
+		:m commands
+			:o remove_blank_lines
+			:o spell_check
+			:o dos_unix_conversion
+		:o syntax_highlighting
+			:m syntax_definition_file
+</feature_tree>
+<constraints>
+</constraints>
+</feature_model>
+

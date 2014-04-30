@@ -132,6 +132,12 @@ public interface GUIDefaults {
 	Image IMAGE_METHODE_PROTECTED = UIPlugin.getImage("protected_co.gif");
 	Image IMAGE_METHODE_PUBLIC = UIPlugin.getImage("public_co.gif");
 	Image IMAGE_METHODE_DEFAULT =  UIPlugin.getImage("default_co.gif");
+	Image IMAGE_METHODE_DEFAULT_CONTRACT = UIPlugin.getImage("default_co_contract.gif");
+	Image IMAGE_METHODE_PUBLIC_CONTRACT = UIPlugin.getImage("public_co_contract.gif");
+	Image IMAGE_METHODE_PROTECTED_CONTRACT = UIPlugin.getImage("protected_co_contract.gif");
+	Image IMAGE_METHODE_PRIVATE_CONTRACT = UIPlugin.getImage("private_co_contract.gif");
+	Image IMAGE_AT = UIPlugin.getImage("aticon.gif");
+	Image IMAGE_AT_WITHOUT_WHITE_BACKGROUND = UIPlugin.getImage("aticon_2.gif");
 	Image IMAGE_CLASS = UIPlugin.getImage("class_obj.gif");
 	Image IMAGE_FEATURE = UIPlugin.getImage("FeatureIconSmall.ico");
 	Image IMAGE_HASH = UIPlugin.getImage("hash.png");
