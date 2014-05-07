@@ -115,20 +115,19 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 						builder.generatorJobs.remove(this);
 						return Status.OK_STATUS;
 					}
-					if (builder.configurations.isEmpty()) {
+					if (builder.sorter.getBufferSize() == 0) {
 						monitor.setTaskName(generated + " produrcts generated. (Waiting)");
-						while (builder.configurations.isEmpty()) {
+						while (builder.sorter.getBufferSize() == 0) {
 							/** the job waits for a new configuration to build **/
 							try {
 								// TODO this should be done with wait() and notify()
 								wait(1000);
-								if ((builder.configurations.isEmpty() && builder.finish) || 
+								if ((builder.sorter.getBufferSize() == 0 && builder.finish) || 
 										builder.cancelGeneratorJobs) {
 									if (compiler != null) {
 										compiler.finish();
 										compiler.join();
 									}
-									builder.generatorJobs.remove(this);
 									return Status.OK_STATUS;
 								}
 							} catch (InterruptedException e) {
@@ -190,9 +189,12 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 					UIPlugin.getDefault().logError(e);
 				}
 			}
-			builder.generatorJobs.remove(this);
 			builder.createNewGenerator(nr);
-			builder.addConfiguration(c);
+			if (c != null) {
+				builder.addConfiguration(c);
+			}
+		} finally {
+			builder.generatorJobs.remove(this);
 		}
 		return Status.OK_STATUS;
 	}

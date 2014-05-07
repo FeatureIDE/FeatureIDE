@@ -29,26 +29,19 @@ import org.eclipse.ui.IWorkbench;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
  * A Wizard to create T-Wise configurations with SPLCATool. 
  * 
  * @author Jens Meinicke
  */
-public class BuildTWiseWizard extends Wizard implements INewWizard, IConfigurationBuilderBasics {
-
-	public static final String ID = FMUIPlugin.PLUGIN_ID + ".wizard.NewFeatureModelWizard";
+public class BuildProductsWizard extends Wizard implements INewWizard, IConfigurationBuilderBasics {
 
 	private IFeatureProject featureProject;
-	private BuildTWiseWizardPage page;
+	private BuildProductsPage page;
 	private boolean toggleState;
 
-	/**
-	 * @param featureProject
-	 * @param toggle 
-	 */
-	public BuildTWiseWizard(IFeatureProject featureProject, boolean toggleState) {
+	public BuildProductsWizard(IFeatureProject featureProject, boolean toggleState) {
 		this.featureProject = featureProject;
 		this.toggleState = toggleState;
 	}
@@ -56,15 +49,19 @@ public class BuildTWiseWizard extends Wizard implements INewWizard, IConfigurati
 	public boolean performFinish() {
 		toggleState = page.getToggleState();
 		setTWise(page.getAlgorithm(), page.getT());
-		new ConfigurationBuilder(featureProject, ConfigurationBuilder.BuildType.T_WISE,
-				toggleState, page.getAlgorithm(), page.getT());
+		setGenerate(page.getBuildTypeText(page.getGeneration()));
+		setOrder(page.getSelectedOrder());
+		setBuffer(page.getBuffer());
+		new ConfigurationBuilder(featureProject, page.getGeneration(),
+				toggleState, page.getAlgorithm(), page.getT(), page.getOrder(), page.getBuffer());
+		
 		return true;
 	}
 
 	@Override
 	public void addPages() {
-		setWindowTitle("Build T-Wise Configurations");
-		page = new BuildTWiseWizardPage("", featureProject, toggleState, getAlgorithm(), getT());
+		setWindowTitle("Build Products");
+		page = new BuildProductsPage(featureProject.getProjectName(), featureProject, getGenerate(), toggleState, getAlgorithm(), getT(), getOrder(), getBuffer());
 		addPage(page);
 	}
 
@@ -117,6 +114,72 @@ public class BuildTWiseWizard extends Wizard implements INewWizard, IConfigurati
 	protected static void setTWise(String algorithm, int t) {
 		try {
 			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(T_WISE, algorithm + "|" + t);
+		} catch (CoreException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+	}
+	
+	private static String getGenerate() {
+		try {
+			final String generate = ResourcesPlugin.getWorkspace().getRoot().getPersistentProperty(GENERATE);
+			if (generate == null) {
+				return ALL_VALID_CONFIGURATIONS;
+			}
+			return generate;
+		} catch (CoreException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+		return ALL_VALID_CONFIGURATIONS;
+	}
+	
+	private static void setGenerate(String generate) {
+		try {
+			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(GENERATE, generate);
+		} catch (CoreException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+	}
+	
+	private static String getOrder() {
+		try {
+			final String generate = ResourcesPlugin.getWorkspace().getRoot().getPersistentProperty(ORDER);
+			if (generate == null) {
+				return DEFAULT;
+			}
+			return generate;
+		} catch (CoreException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+		return DEFAULT;
+	}
+	
+	private static void setOrder(String order) {
+		try {
+			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(ORDER, order);
+		} catch (CoreException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+	}
+	
+	private static boolean getBuffer() {
+		try {
+			final String buffer = ResourcesPlugin.getWorkspace().getRoot().getPersistentProperty(BUFFER);
+			if ("true".equals(buffer)) {
+				return true;
+			}
+			if ("false".equals(buffer)) {
+				return false;
+			}
+			return true;
+		} catch (CoreException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+		return false;
+	}
+	
+	private static void setBuffer(boolean buffer) {
+		try {
+			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(BUFFER, buffer + "");
 		} catch (CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}

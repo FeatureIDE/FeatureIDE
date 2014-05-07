@@ -34,7 +34,7 @@ import de.ovgu.featureide.core.IFeatureProject;
  * 
  * @author Jens Meinicke
  */
-public class BuildTWiseConfigurationsAction extends AbstractBuildConfigurationsAction {
+public class BuildProductsAction extends AbstractBuildConfigurationsAction {
 
 	@Override
 	public void run(IAction action) {
@@ -50,7 +50,7 @@ public class BuildTWiseConfigurationsAction extends AbstractBuildConfigurationsA
 			return;
 		}
 		
-		BuildTWiseWizard wizard = new BuildTWiseWizard(featureProject, getToggleState());
+		BuildProductsWizard wizard = new BuildProductsWizard(featureProject, getToggleState());
 		WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
 		dialog.create();
 		dialog.open();

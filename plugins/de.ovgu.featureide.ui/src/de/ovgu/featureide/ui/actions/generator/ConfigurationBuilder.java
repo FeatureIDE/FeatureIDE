@@ -76,6 +76,8 @@ import de.ovgu.featureide.ui.UIPlugin;
 @SuppressWarnings("restriction")
 public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 
+	private static final UIPlugin LOGGER = UIPlugin.getDefault();
+
 	IFeatureProject featureProject;
 	private FeatureModel featureModel;
 	
@@ -164,16 +166,14 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 */
 	ArrayList<Generator> generatorJobs = new ArrayList<Generator>();
 	
-	/**
-	 * This list contains all found configurations to built.<br>
-	 * Use <code>getConfiguration()</code> and <code>setConfiguration(c)</code> for synchronizing.
-	 */
-	LinkedList<BuilderConfiguration> configurations = new LinkedList<BuilderConfiguration>();
 	private String algorithm;
 	private int t = 1;
 	private Node rootNode;
 	private LinkedList<Node> children;
 
+	AbstractConfigurationSorter sorter;
+	private boolean bufferConfigurationsFirst;
+	private boolean buffered = false;
 	
 	/**
 	 * Gets the first entry of configurations or <code>null</code> if there is none.
@@ -181,12 +181,10 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 */
 	@CheckForNull
 	public synchronized BuilderConfiguration getConfiguration() {
-		if (configurations.isEmpty()) {
+		if (bufferConfigurationsFirst && !buffered) {
 			return null;
 		}
-		BuilderConfiguration c = configurations.getFirst();
-		configurations.remove();
-		return c;
+		return sorter.getConfiguration(!bufferConfigurationsFirst);
 	}
 	
 	/**
@@ -194,9 +192,9 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 * @param configuration
 	 */
 	public synchronized void addConfiguration(BuilderConfiguration configuration) {
-		configurations.add(configuration);
+		sorter.addConfiguration(configuration, !bufferConfigurationsFirst);
 	}
-
+	
 	/**
 	 * Starts the build process for valid or current configurations for the given feature project.
 	 * @param featureProject The feature project
@@ -207,23 +205,35 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 * @see BuildAllValidConfigurationsAction
 	 */
 	ConfigurationBuilder(final IFeatureProject featureProject, final BuildType buildType,
-			final boolean createNewProjects) {
-		this(featureProject, buildType, createNewProjects, "", 0);
-	}
-		
-	ConfigurationBuilder(final IFeatureProject featureProject, final BuildType buildType,
-		final boolean createNewProjects, String algorithm, int t) {
+		final boolean createNewProjects, final String algorithm, final int t, final BuildOrder buildOrder, final boolean bufferFirst) {
 		
 		if (!featureProject.getComposer().preBuildConfiguration()) {
 			return;
 		}
-		
+		this.bufferConfigurationsFirst = bufferFirst;
 		this.algorithm = algorithm;
 		this.t = t;
 		this.featureProject = featureProject;
 		this.createNewProjects = createNewProjects;
 		this.buildType = buildType;
+		
 		featureModel = featureProject.getFeatureModel();
+		
+		switch (buildOrder) {
+		case DEFAULT:
+			sorter = new AbstractConfigurationSorter(featureModel);
+			break;
+		case DIFFERENCE:
+			sorter = new PriorizationSorter(featureModel);
+			break;
+		case INTERACTION:
+			sorter = new InteractionSorter(t, featureModel, buildType == BuildType.T_WISE);
+			break;
+		default:
+			LOGGER.logWarning("Case statement missing for: " + buildOrder);
+			sorter = new AbstractConfigurationSorter(featureModel);
+			break;
+		}
 		
 		/** set number of configurations to build **/
 		switch (buildType) {
@@ -235,7 +245,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 					public IStatus execute(IProgressMonitor monitor) {
 						configurationNumber = new Configuration(featureModel, false, false).number(1000000);
 						if (configurationNumber < (0)) {
-							UIPlugin.getDefault().logWarning("Satsolver overflow");
+							LOGGER.logWarning("Satsolver overflow");
 							configurationNumber = Integer.MAX_VALUE;
 						}
 						
@@ -298,7 +308,17 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 						break;
 					case T_WISE:
 						buildTWiseConfigurations(featureProject, monitor);
+						time = System.currentTimeMillis();
 						break;
+					}
+					if (bufferConfigurationsFirst) {
+						if (!monitor.isCanceled()) {
+							monitor.beginTask("Sort configurations" , (int) configurationNumber);
+							configurationNumber = sorter.sort(monitor);
+							monitor.beginTask("" , (int) configurationNumber);
+						}
+						time = System.currentTimeMillis();
+						buffered = true;
 					}
 					
 					finish();
@@ -307,7 +327,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 						try {
 							folder.refreshLocal(IResource.DEPTH_INFINITE, null);
 						} catch (CoreException e) {
-							UIPlugin.getDefault().logError(e);
+							LOGGER.logError(e);
 						}
 					}
 					showStatistics(monitor);
@@ -328,9 +348,9 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 							monitor.worked(builtConfigurations);
 							built += builtConfigurations;
 							builtConfigurations = 0;
-							wait(1000);
+							wait(100);
 						} catch (InterruptedException e) {
-							UIPlugin.getDefault().logError(e);
+							LOGGER.logError(e);
 						}
 					}
 				}
@@ -345,7 +365,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 				if (built > configurationNumber) {
 					built = (int) configurationNumber;
 				}
-				UIPlugin.getDefault().logInfo(built + (configurationNumber != 0 ? " of " + configurationNumber : "") + 
+				LOGGER.logInfo(built + (configurationNumber != 0 ? " of " + configurationNumber : "") + 
 						" configurations built in " + t);
 			}
 
@@ -365,7 +385,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	private boolean init(IProgressMonitor monitor, BuildType buildType) {
 		confs = 1;
 		
-		configuration = new Configuration(featureModel);
+		configuration = new Configuration(featureModel, false, false);
 		reader = new ConfigurationReader(configuration);
 		featureProject.getComposer().initialize(featureProject);
 		
@@ -375,7 +395,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 				try {
 					folder.create(true, true, null);
 				} catch (CoreException e) {
-					UIPlugin.getDefault().logError(e);
+					LOGGER.logError(e);
 				}
 			} else {
 				try {
@@ -391,7 +411,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 						res.delete(true, null);
 					}
 				} catch (CoreException e) {
-					UIPlugin.getDefault().logError(e);
+					LOGGER.logError(e);
 				}
 			}
 			setClassPath();
@@ -401,7 +421,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 				try {
 					tmp.create(true, true, null);
 				} catch (CoreException e) {
-					UIPlugin.getDefault().logError(e);
+					LOGGER.logError(e);
 				}
 			}
 		} else {
@@ -433,7 +453,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 					}
 				}
 			} catch (CoreException e) {
-				UIPlugin.getDefault().logError(e);
+				LOGGER.logError(e);
 			}
 		}
 		return true;
@@ -470,15 +490,21 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 * @param monitor 
 	 */
 	protected void buildTWiseConfigurations(IFeatureProject featureProject, IProgressMonitor monitor) {
-		monitor.beginTask("" , (int) configurationNumber);
+		configuration = new Configuration(featureModel, false);
+		reader = new ConfigurationReader(configuration);
+		monitor.beginTask("Sampling" , (int) configurationNumber);
+		runSPLCATool();
+	}
+	
+	private void runSPLCATool() {
 		CoveringArray ca = null;
 		try {
-			if (algorithm.equals(BuildTWiseWizardPage.CASA)) {
-				URL url = BundleUtility.find(UIPlugin.getDefault().getBundle(), "lib/cover.exe");
+			if (algorithm.equals(CASA)) {
+				URL url = BundleUtility.find(LOGGER.getBundle(), "lib/cover.exe");
 				try {
 					url = FileLocator.toFileURL(url);
 				} catch (IOException e) {
-					UIPlugin.getDefault().logError(e);
+					LOGGER.logError(e);
 				}
 				Path path = new Path(url.getFile());
 				CoveringArrayCASA.CASA_PATH = path.toOSString();
@@ -490,28 +516,53 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			}
 			ca.generate();
 		} catch (FeatureModelException e) {
-			UIPlugin.getDefault().logError(e);
+			LOGGER.logError(e);
 		} catch (TimeoutException e) {
-			UIPlugin.getDefault().logError(e);
+			LOGGER.logError(e);
 		} catch (CoveringArrayGenerationException e) {
-			UIPlugin.getDefault().logError(e);
+			LOGGER.logError(e);
 		}
-		List<List<Integer>> solutions = ca.getSolutionsAsList();
+		final List<List<String>> solutions = removeDuplicates(ca);
 		configurationNumber = solutions.size();
-		monitor.beginTask("" , (int) configurationNumber);
-		for (List<Integer> solution : solutions) {
-			String selectedFeatures = "";
-			for (Integer selection : solution) {
-				if (selection > 0) {
-					selectedFeatures += " " + ca.getId(selection);
-				}
-				
+		for (final List<String> solution : solutions) {
+			configuration.resetValues();
+			for (final String selection : solution) {
+				configuration.setManual(selection, Selection.SELECTED);
 			}	
-			reader.readFromString(selectedFeatures);
 			addConfiguration(new BuilderConfiguration(configuration, confs++));
 		}
 	}
-	
+
+	/**
+	 * The result of the generator can:<br>
+	 * a) contain duplicate solutions<br>
+	 * b) duplicate solutions that differ only by the selection of abstract features
+	 * @return Duplicate free solutions 
+	 */
+	private List<List<String>> removeDuplicates(final CoveringArray ca) {
+		final List<List<Integer>> solutions = ca.getSolutionsAsList();
+		final List<List<String>> duplicateFreeSolutions = new LinkedList<List<String>>();
+		for (final List<Integer> solution : solutions) {
+			final List<String> convertedSolution = new LinkedList<String>();
+			for (final Integer i : solution) {
+				if (i > 0) {
+					String id = ca.getId(i);
+					final Feature feature = featureModel.getFeature(id);
+					if (feature != null && feature.isConcrete()) {
+						convertedSolution.add(feature.getName());
+					}	
+				}
+			}
+			if (!duplicateFreeSolutions.contains(convertedSolution)) {
+				duplicateFreeSolutions.add(convertedSolution);
+			}
+		}
+		if (solutions.size() - duplicateFreeSolutions.size() > 0) {
+			LOGGER.logInfo((solutions.size() - duplicateFreeSolutions.size()) +" duplicate solutions skipped!");
+		}
+		return duplicateFreeSolutions;
+	}
+
 	protected void buildCurrentConfigurations(IFeatureProject featureProject, IProgressMonitor monitor) {
 		monitor.beginTask("" , (int) configurationNumber);
 		try {
@@ -525,7 +576,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 				}
 			}
 		} catch (CoreException e) {
-			UIPlugin.getDefault().logError(e);
+			LOGGER.logError(e);
 		}
 	}
 
@@ -540,9 +591,9 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			reader.readFromFile((IFile)configuration);
 			addConfiguration(new BuilderConfiguration(this.configuration, configuration.getName().split("[.]")[0]));
 		} catch (CoreException e) {
-			UIPlugin.getDefault().logError(e);
+			LOGGER.logError(e);
 		} catch (IOException e) {
-			UIPlugin.getDefault().logError(e);
+			LOGGER.logError(e);
 		}
 	}
 
@@ -560,7 +611,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 				}		
 			}
 		} catch (CoreException e) {
-			UIPlugin.getDefault().logError(e);
+			LOGGER.logError(e);
 		}
 		return i;
 	}
@@ -619,66 +670,69 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 					return;
 				}
 			} catch (org.sat4j.specs.TimeoutException e) {
-				UIPlugin.getDefault().logError(e);
+				LOGGER.logError(e);
 			}
 		}
 		
 		if (selectedFeatures2.isEmpty()) {
-			if (reader.readFromString(selected)) {
-				if (configuration.valid()) {
-					LinkedList<String> selectedFeatures3 = new LinkedList<String>();
-					for (String f : selected.split("[ ]")) {
-						if (!"".equals(f)) {
-							selectedFeatures3.add(f);
-						}
+			configuration.resetValues();
+			for (final String feature : selected.split("[ ]")) {
+				configuration.setManual((feature), Selection.SELECTED);
+			}
+			
+			if (configuration.valid()) {
+				LinkedList<String> selectedFeatures3 = new LinkedList<String>();
+				for (String f : selected.split("[ ]")) {
+					if (!"".equals(f)) {
+						selectedFeatures3.add(f);
 					}
-					for (Feature f : configuration.getSelectedFeatures()) {
-						if (f.isConcrete()) {
-							if (!selectedFeatures3.contains(f.getName())) {
-								return;
-							}
-						}
-					}
-					for (String f : selectedFeatures3) {
-						if (configuration.getSelectablefeature(f).getSelection() != Selection.SELECTED) {
+				}
+				for (Feature f : configuration.getSelectedFeatures()) {
+					if (f.isConcrete()) {
+						if (!selectedFeatures3.contains(f.getName())) {
 							return;
 						}
 					}
-					
-					monitor.setTaskName(getTaskName());
-					addConfiguration(new BuilderConfiguration(configuration, confs));
-					
-					if (configurations.size() >= maxSize) {
-						monitor.setTaskName(getTaskName() + " (waiting, buffer full)");
-						synchronized (this) {	
-							while (configurations.size() >= maxSize ) {
-								if (monitor.isCanceled()) {
-									return;
-								}
-								try {
-									wait(1000);
-								} catch (InterruptedException e) {
-									UIPlugin.getDefault().logError(e);
-								}
+				}
+				for (String f : selectedFeatures3) {
+					if (configuration.getSelectablefeature(f).getSelection() != Selection.SELECTED) {
+						return;
+					}
+				}
+				
+				monitor.setTaskName(getTaskName());
+				addConfiguration(new BuilderConfiguration(configuration, confs));
+				
+				if (!bufferConfigurationsFirst && sorter.getBufferSize() >= maxSize) {
+					monitor.setTaskName(getTaskName() + " (waiting, buffer full)");
+					synchronized (this) {	
+						while (!bufferConfigurationsFirst && sorter.getBufferSize() >= maxSize) {
+							if (monitor.isCanceled()) {
+								return;
+							}
+							try {
+								wait(1000);
+							} catch (InterruptedException e) {
+								LOGGER.logError(e);
 							}
 						}
 					}
-					confs++; 
-					monitor.setTaskName(getTaskName());
-					if (counting && configurationNumber == 0) {
-						built = builtConfigurations;
-					}
-					if (counting && configurationNumber != 0) {
-						counting = false;
-						monitor.beginTask("" , (int) configurationNumber);
-						monitor.worked(builtConfigurations);
-						built = builtConfigurations;
-						builtConfigurations = 0;
-					} else if (configurationNumber != 0) {
-						monitor.worked(builtConfigurations);
-						built += builtConfigurations;
-						builtConfigurations = 0;
-					}
+				}
+				confs++; 
+				monitor.setTaskName(getTaskName());
+				if (counting && configurationNumber == 0) {
+					built = builtConfigurations;
+				}
+				if (counting && configurationNumber != 0) {
+					counting = false;
+					monitor.beginTask("" , (int) configurationNumber);
+					monitor.worked(builtConfigurations);
+					built = builtConfigurations;
+					builtConfigurations = 0;
+				} else if (configurationNumber != 0) {
+					monitor.worked(builtConfigurations);
+					built += builtConfigurations;
+					builtConfigurations = 0;
 				}
 			}
 			return;
@@ -706,8 +760,8 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			long h = duration/(60 * 60 * 1000);
 			t = " " + h + "h " + (min < 10 ? "0" + min : min) + "min " + (s < 10 ? "0" + s : s) + "s.";
 		}
-		long buffer = buildType == BuildType.ALL_VALID ? configurations.size() : configurationNumber - built;
-		return "Built configutations: "+ built + "/" + (configurationNumber == 0 ? "counting..." : configurationNumber)
+		long buffer = buildType == BuildType.ALL_VALID ? sorter.getBufferSize() : configurationNumber - built;
+		return "Built configurations: "+ built + "/" + (configurationNumber == 0 ? "counting..." : configurationNumber)
 				+ "(" + buffer + " buffered)" + " Expected time: " + t;
 	}
 
