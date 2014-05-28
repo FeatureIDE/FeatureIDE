@@ -31,6 +31,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 public class BuilderConfiguration extends Configuration {
 	
 	private String name;
+	private long number;
 
 	/**
 	 * @param configuration
@@ -46,7 +47,18 @@ public class BuilderConfiguration extends Configuration {
 	 */
 	public BuilderConfiguration(Configuration configuration, long number) {
 		super(configuration);
+		this.number = number;
 		
+	}
+	
+	public void setNumber(int number) {
+		this.number = number;
+	}
+
+	/**
+	 * @return the name
+	 */
+	public String getName() {
 		final String zeros;
 		if (number < 10) {
 			zeros = "0000";
@@ -59,14 +71,7 @@ public class BuilderConfiguration extends Configuration {
 		} else {
 			zeros = "";
 		}
-		name = zeros + number;
+		return zeros + number;
 	}
 
-	/**
-	 * @return the name
-	 */
-	public String getName() {
-		return name;
-	}
-	
 }

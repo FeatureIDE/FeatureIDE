@@ -23,9 +23,12 @@ package de.ovgu.featureide.core.featuremodeling;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 
+import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
 
 /**
  * 
@@ -74,4 +77,19 @@ public class FeatureModeling extends ComposerExtensionClass {
 	    return null;
 	}
 
+	@Override
+	public void buildConfiguration(IFolder folder, Configuration configuration, String congurationName) {
+		try {
+			folder = (IFolder) folder.getParent();
+			if (!folder.exists()) {
+				folder.create(true, false, null);
+			}
+			IFile configurationFile = folder.getFile(congurationName + "." + getConfigurationExtension());
+			ConfigurationWriter writer = new ConfigurationWriter(configuration);
+			writer.saveToFile(configurationFile);
+			copyNotComposedFiles(configuration, folder);
+		} catch (CoreException e) {
+			CorePlugin.getDefault().logError(e);
+		}
+	}
 }

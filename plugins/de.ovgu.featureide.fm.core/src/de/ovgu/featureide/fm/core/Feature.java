@@ -599,6 +599,14 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 	public ColorList getColorList() {
 		return colorList;
 	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return name.hashCode();
+	}
 
 	/*
 	 * auto-generated methods cause the diagram to be shown incorrectly

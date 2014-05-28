@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.core.configuration;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -304,8 +305,18 @@ public class Configuration {
 	}
 
 	public Set<Feature> getSelectedFeatures() {
-		HashSet<Feature> result = new HashSet<Feature>();
+		HashSet<Feature> result = new LinkedHashSet<Feature>();
 		findSelectedFeatures(getRoot(), result);
+		return result;
+	}
+	
+	public Set<String> getSelectedFeatureNames() {
+		final Set<Feature> selectedFeatures = getSelectedFeatures();
+		final Set<String> result = new LinkedHashSet<String>();
+		
+		for (final Feature feature : selectedFeatures) {
+			result.add(feature.getName());
+		}
 		return result;
 	}
 

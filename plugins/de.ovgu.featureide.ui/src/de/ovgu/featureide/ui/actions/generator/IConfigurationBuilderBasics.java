@@ -31,68 +31,84 @@ import de.ovgu.featureide.core.CorePlugin;
  * @see ConfigurationBuilder
  * @see BuildAllCurrentConfigurationsAction
  * @see BuildAllValidConfigurationsAction 
- * @see BuildTWiseConfigurationsAction
+ * @see BuildProductsAction
  * 
  * @author Jens Meinicke
  */
 public interface IConfigurationBuilderBasics {
 	
-	public static enum BuildType {ALL_VALID, ALL_CURRENT, T_WISE};
+	enum BuildType {ALL_VALID, ALL_CURRENT, T_WISE};
+	enum BuildOrder {DEFAULT, DIFFERENCE, INTERACTION};
+	enum TWise {ICPL, CHVATAL, CASA}
 	
 	/**
 	 * Basics for the dialogs.
 	 */
-	final static String MESSAGE_TITLE_VALID = "Build all valid configurations";
-	final static String MESSAGE_TITLE_CURRENT = "Build all current configurations";
-	final static String MESSAGE_TITLE_T = "Build T-Wise configurations";
-	final static String MESSAGE_CURRENT = "Builds all current configurations";
-	final static String MESSAGE_START = "Build all valid program variants.";
-	final static String TOGGLE_MESSAGE = "Create a new project for each variant";
+	String MESSAGE_TITLE_VALID = "Build all valid configurations";
+	String MESSAGE_TITLE_CURRENT = "Build all current configurations";
+	String MESSAGE_TITLE_T = "Build T-Wise configurations";
+	String MESSAGE_CURRENT = "Builds all current configurations";
+	String MESSAGE_START = "Build all valid program variants.";
+	String TOGGLE_MESSAGE = "Create a new project for each variant";
 	
 	/** Saves the toggle state whether new projects should be generated for each configuration. **/
-	final static QualifiedName TOGGLE_STATE = new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#CreateNewProject", 
+	QualifiedName TOGGLE_STATE = new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#CreateNewProject", 
 			IConfigurationBuilderBasics.class.getName() + "#CreateNewProject");
-	final static QualifiedName T_WISE = new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#T-Wise", 
+	QualifiedName T_WISE = new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#T-Wise", 
 			IConfigurationBuilderBasics.class.getName() + "#T-Wise");
-	final static String TRUE = "true";
-	final static String FALSE = "false";
+	QualifiedName GENERATE = new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#Generate", 
+			IConfigurationBuilderBasics.class.getName() + "#Generate");
+	QualifiedName ORDER = new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#Order", 
+			IConfigurationBuilderBasics.class.getName() + "#Order");
+	QualifiedName BUFFER = new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#Buffer", 
+			IConfigurationBuilderBasics.class.getName() + "#Buffer");
+	String TRUE = "true";
+	String FALSE = "false";
 	
 //------------------------------------------------------------------------------
 	
 	/**
 	 * Basics for the ConfigurationBuilder.
 	 */
-	final static String JOB_TITLE = "Build all valid configurations";
-	final static String JOB_TITLE_CURRENT = "Build all current configurations";
-	final static String JOB_TITLE_T_WISE = "Build t-wise configurations";
+	String JOB_TITLE = "Build all valid configurations";
+	String JOB_TITLE_CURRENT = "Build all current configurations";
+	String JOB_TITLE_T_WISE = "Build t-wise configurations";
 	
-	final static String JOB_TITLE_COUNT_CONFIGURATIONS = "Count configurations";
-		
-	final static String CONFIGURATION_NAME = "Variant";
-	final static String FOLDER_NAME = "products";
-	final static String FOLDER_NAME_CURRENT = "currentproducts";
-	final static String TEMPORARY_BIN_FOLDER = ".tmpBin";
+	String JOB_TITLE_COUNT_CONFIGURATIONS = "Count configurations";
 	
-	final static String PROBLEM_MARKER = CorePlugin.PLUGIN_ID + ".variantMarker";
-	final static String CANNOT_FIND_SYMBOL = "cannot find symbol";
-	final static String ERROR_IGNOR_RAW_TYPE = "raw type";
-	final static String ERROR_IGNOR_SERIIZABLE = "serializable class";
-	final static String ERROR_IGNOR_CAST = "redundant cast to";
-	final static String ERROR_IGNOR_DEPRECATION = "has been deprecated";
+	String CONFIGURATION_NAME = "Variant";
+	String FOLDER_NAME = "products";
+	String FOLDER_NAME_CURRENT = "currentproducts";
+	String TEMPORARY_BIN_FOLDER = ".tmpBin";
 	
-	final static Pattern errorMessagePattern = Pattern.compile("(.+):(\\d+):(.+)");
+	String PROBLEM_MARKER = CorePlugin.PLUGIN_ID + ".variantMarker";
+	String CANNOT_FIND_SYMBOL = "cannot find symbol";
+	String ERROR_IGNOR_RAW_TYPE = "raw type";
+	String ERROR_IGNOR_SERIIZABLE = "serializable class";
+	String ERROR_IGNOR_CAST = "redundant cast to";
+	String ERROR_IGNOR_DEPRECATION = "has been deprecated";
 	
-	final static String SEPARATOR_VARIANT = "_v.";
-	final static String SEPARATOR_CONFIGURATION = "_c.";
-	final static String SEPARATOR_T_WISE = "_t.";
+	Pattern errorMessagePattern = Pattern.compile("(.+):(\\d+):(.+)");
+	
+	String SEPARATOR_VARIANT = "_v.";
+	String SEPARATOR_CONFIGURATION = "_c.";
+	String SEPARATOR_T_WISE = "_t.";
+	
+	String T_WISE_CONFIGURATIONS = "T-Wise configurations";
+	String ALL_CURRENT_CONFIGURATIONS = "All current configurations";
+	String ALL_VALID_CONFIGURATIONS = "All valid configurations";
+	
+	String INTERACTIONS = "Interactions";
+	String DIFFERENCE = "Difference";
+	String DEFAULT = "Default";
 	
 	/**
 	 * Basics for the SPLCATool.
 	 */
-	final static String CHVATAL = "Chvatal"; 
-	final static String ICPL = "ICPL (fastest)";
-	final static String CASA = "CASA";
-	final static int CHVATAL_MAX = 4;
-	final static int ICPL_MAX = 3;
-	final static int CASA_MAX = 6;
+	int CHVATAL_MAX = 4;
+	int ICPL_MAX = 3;
+	int CASA_MAX = 6;
+	String CHVATAL = "Chvatal"; 
+	String ICPL = "ICPL (fastest)";
+	String CASA = "CASA";
 }

@@ -22,8 +22,6 @@ package de.ovgu.featureide.fm.core.io;
 
 import java.io.File;
 
-import org.eclipse.core.runtime.CoreException;
-
 import de.ovgu.featureide.fm.core.FeatureModel;
 
 /**
@@ -59,7 +57,7 @@ public interface IFeatureModelWriter {
 	 * Saves a feature model to a file.
 	 * 
 	 * @param file
-	 * @throws CoreException
+	 * @throws org.eclipse.core.runtime.CoreException
 	 */
 	public abstract void writeToFile(File file);
 	
