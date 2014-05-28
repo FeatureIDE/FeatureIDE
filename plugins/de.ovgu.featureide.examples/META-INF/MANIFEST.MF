@@ -12,3 +12,5 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: University of Magdeburg
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: de.ovgu.featureide.examples.ExamplePlugin
+Import-Package: de.ovgu.featureide.core.builder,
+ de.ovgu.featureide.fm.core.configuration
