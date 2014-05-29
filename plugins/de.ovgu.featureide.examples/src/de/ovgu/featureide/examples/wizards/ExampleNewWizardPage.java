@@ -32,7 +32,6 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
@@ -90,7 +89,6 @@ import de.ovgu.featureide.examples.utils.CommentParser;
 import de.ovgu.featureide.examples.utils.ExampleStructureProvider;
 import de.ovgu.featureide.examples.utils.RequirementCategory;
 import de.ovgu.featureide.examples.utils.ZipStructureProvider;
-import de.ovgu.featureide.fm.core.configuration.TreeElement;
 
 /**
  * This class represents one page of the Example Wizard.
@@ -191,12 +189,10 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 			}
 
 			public Object[] getElements(Object inputElement) {
-				//return selectedProjects;
 				if (inputElement == null) {
 					return new String[] { "Loading..." };
 				} else if (inputElement == exampleNewWizardPage) {
 					updateProjectsList(samplePath);
-					Hashtable<String, List<ProjectRecord>> res = compTable;
 					return compTable.keySet().toArray();
 				} else
 					return getChildren(exampleNewWizardPage);
@@ -205,7 +201,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 			public boolean hasChildren(Object element) {
 				if (element instanceof Hashtable) {
 					Hashtable<String, List<ProjectRecord>> hashtable = (Hashtable<String,List<ProjectRecord>>) element;
-					return hashtable.keySet().size() > 0;
+					return hashtable.keySet().size() > 0; 
 				}
 				else if (element instanceof String) {
 					return !compTable.get((String) element).isEmpty();
@@ -248,7 +244,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 
 		projectsList.addCheckStateListener(new ICheckStateListener() {
 			public void checkStateChanged(CheckStateChangedEvent event) {
-
+				
 				if (event.getElement() instanceof String) {
 					for (ProjectRecord tmpRecord : compTable.get((String) event.getElement())) {
 						projectsList.setChecked(tmpRecord, projectsList.getChecked((String) event.getElement()));
@@ -312,6 +308,12 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		projectsList.setComparator(new ViewerComparator());
 
 		createSelectionButtons(listComposite);
+		
+		//Children in CheckboxTreeViewer are only requested when explicitly needed. When checking the composer checkbox (parent)  
+		//before once having expanded it, projects (children) had actually not been checked when expanded later. Hence projectsList  
+		//gets expanded and collapsed completely in the beginning to have all children/projects added.
+		projectsList.expandAll();
+		projectsList.collapseAll();
 	}
 
 	private void createDescriptionArea(Composite workArea) {
@@ -639,8 +641,16 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 						throw new OperationCanceledException();
 					}
 					for (int i = 0; i < selected.length; i++) {
-						createExistingProject((ProjectRecord) selected[i],
-								new SubProgressMonitor(monitor, 1));
+						if (selected[i] instanceof ProjectRecord) {
+							createExistingProject((ProjectRecord) selected[i],
+									new SubProgressMonitor(monitor, 1));	
+						} else if (selected[i] instanceof String) {
+							for (ProjectRecord tmpRecord : compTable.get((String) selected[i])) {
+								createExistingProject(tmpRecord,
+										new SubProgressMonitor(monitor, 1));	
+
+							}
+						}
 					}
 				} finally {
 					monitor.done();
