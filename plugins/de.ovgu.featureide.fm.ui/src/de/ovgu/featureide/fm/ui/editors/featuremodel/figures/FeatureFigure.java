@@ -29,7 +29,7 @@ import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 
-import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
+import de.ovgu.featureide.fm.core.ExtendedFeature;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureStatus;
@@ -173,18 +173,18 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 			toolTip = VOID;
 		}
 
-		if (featureModel instanceof ExtendedFeatureModel) {
-			ExtendedFeatureModel extendedFeatureModel = (ExtendedFeatureModel) featureModel;
+		if (feature instanceof ExtendedFeature) {
+			ExtendedFeature extendedFeature = (ExtendedFeature) feature;
 
-			if (extendedFeatureModel.isImported(feature)) {
+			if (extendedFeature.isInstance()) {
 				setBorder(FMPropertyManager.getImportedFeatureBorder());
 			}
 
-			if (extendedFeatureModel.isInherited(feature)) {
+			if (extendedFeature.isInherited()) {
 				setBorder(FMPropertyManager.getInheritedFeatureBorder());
 			}
 
-			if (extendedFeatureModel.isFromInterface(feature)) {
+			if (extendedFeature.isInterface()) {
 				setBorder(FMPropertyManager.getInterfacedFeatureBorder());
 			}
 		}

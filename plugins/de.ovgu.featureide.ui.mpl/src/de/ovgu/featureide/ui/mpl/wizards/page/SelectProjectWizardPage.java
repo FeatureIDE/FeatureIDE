@@ -18,96 +18,93 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.core.mspl.wizard;
+package de.ovgu.featureide.ui.mpl.wizards.page;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
-import de.ovgu.featureide.core.builder.FeatureProjectNature;
-import de.ovgu.featureide.core.mspl.MSPLNature;
+import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.mpl.builder.MSPLNature;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
+import de.ovgu.featureide.ui.mpl.wizards.WizardConstants;
 
 /**
  * A wizard page to select the project the user wants to import from. Shows all
  * project in workbench.
  * 
  * @author Christoph Giesel
+ * @author Sebastian Krieter
  */
-public class SelectProjectWizardPage extends WizardPage implements
-		SelectionListener {
+public class SelectProjectWizardPage extends AbstractWizardPage implements SelectionListener {
 
 	private Composite container;
 	private Tree projectTree;
+	
+	private IFeatureProject selectedProject = null;
 
 	public SelectProjectWizardPage() {
 		super("Select Project");
 		setTitle("Select Project");
 		setDescription("Here you select the project you want to import from.");
-		setControl(projectTree);
 	}
 
 	@Override
 	public void createControl(Composite parent) {
 		container = new Composite(parent, SWT.NONE);
 
-		GridLayout layout = new GridLayout();
+		FillLayout layout = new FillLayout();
 		container.setLayout(layout);
-
+		setControl(container);
+		
 		projectTree = new Tree(container, SWT.NORMAL);
 		projectTree.addSelectionListener(this);
 
-		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot()
-				.getProjects();
-
-		for (IProject project : projects) {
+		for (IFeatureProject project : CorePlugin.getFeatureProjects()) {
 			try {
-				if (!project.isNatureEnabled(FeatureProjectNature.NATURE_ID)
-						|| project.isNatureEnabled(MSPLNature.NATURE_ID))
-					continue;
+				IProject projectHandle = project.getProject();
+				if (projectHandle != null && projectHandle.isAccessible() && !projectHandle.isNatureEnabled(MSPLNature.NATURE_ID)) {
+					TreeItem item = new TreeItem(projectTree, SWT.NORMAL);
+					item.setImage(GUIDefaults.FEATURE_SYMBOL);
+					item.setText(project.getProjectName());
+					item.setData(project);
+				}
 			} catch (CoreException e) {
-				continue;
+				CorePlugin.getDefault().logError(e);
 			}
-
-			TreeItem item = new TreeItem(projectTree, SWT.NORMAL);
-			item.setText(project.getName());
-			item.setData(project);
 		}
-
-		// Required to avoid an error in the system
-		setControl(container);
-		setPageComplete(projectTree.getSelectionCount() == 1);
 	}
-
-	/**
-	 * returns the project of the selected item
-	 * 
-	 * @return null if no item is selected, otherwise the project of the
-	 *         selected Item
-	 */
-	public IProject getSelectedProject() {
-		TreeItem[] items = projectTree.getSelection();
-
-		if (items.length == 0)
-			return null;
-
-		return (IProject) items[0].getData();
-	}
-
+	
 	@Override
 	public void widgetSelected(SelectionEvent e) {
-		setPageComplete(projectTree.getSelectionCount() == 1);
+		final TreeItem[] items = projectTree.getSelection();
+		selectedProject = (items.length == 0) ? null : (IFeatureProject) items[0].getData();
+		updatePage();
 	}
 
 	@Override
 	public void widgetDefaultSelected(SelectionEvent e) {
+		updatePage();
+	}
+	
+	@Override
+	protected void putData() {
+		abstractWizard.putData(WizardConstants.KEY_OUT_PROJECT, selectedProject);
+	}
+	
+	@Override
+	protected String checkPage() {
+		if (selectedProject == null) {
+			return "Select a project from the list.";
+		}
+		return null;
 	}
 
 }

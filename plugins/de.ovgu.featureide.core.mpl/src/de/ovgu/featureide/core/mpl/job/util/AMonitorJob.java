@@ -31,10 +31,6 @@ import org.eclipse.core.runtime.jobs.Job;
  */
 public abstract class AMonitorJob<T extends AJobArguments> extends AChainJob<T> {	
 	
-	protected class c {
-		
-	}
-	
 	private static final int maxRelativeWork = 100;
 	
 	protected IProgressMonitor monitor = null;
@@ -51,11 +47,15 @@ public abstract class AMonitorJob<T extends AJobArguments> extends AChainJob<T> 
 		absoluteWorkDone = 0;
 		maxAbsoluteWork = 1;
 		
-		monitor.beginTask(getName(), maxRelativeWork);
+		if (monitor != null) {
+			monitor.beginTask(getName(), maxRelativeWork);
+		}
 		
 		IStatus status = super.run(monitor);
 		
-		monitor.done();
+		if (monitor != null) {
+			monitor.done();
+		}
 		
 		return status;
 	}
@@ -65,7 +65,7 @@ public abstract class AMonitorJob<T extends AJobArguments> extends AChainJob<T> 
 	}
 
 	protected void worked() {
-		int nworked = (100 * ++absoluteWorkDone) / maxAbsoluteWork;
+		int nworked = (maxRelativeWork * ++absoluteWorkDone) / maxAbsoluteWork;
 		if (nworked > relativeWorkDone) {
 			monitor.worked(nworked - relativeWorkDone);
 			relativeWorkDone = nworked;

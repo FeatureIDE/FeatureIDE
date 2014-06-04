@@ -14,4 +14,24 @@
             id="de.ovgu.featureide.core.mpl.builder.interfaceProjectBuilder">
       </builder>
    </extension>
+   <extension id="MSPLNature" name="Multi Software Product Line Nature" point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run class="de.ovgu.featureide.core.mpl.builder.MSPLNature">
+         </run>
+      </runtime>
+      <builder
+            id="de.ovgu.featureide.core.mpl.MSPLBuilder">
+      </builder>
+   </extension>
+   <extension
+         id="MSPLBuilder"
+         name="Multi Product Line Builder"
+         point="org.eclipse.core.resources.builders">
+      <builder
+            hasNature="false">
+         <run
+               class="de.ovgu.featureide.core.mpl.builder.MSPLBuilder">
+         </run>
+      </builder>
+   </extension>
 </plugin>

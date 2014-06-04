@@ -102,28 +102,29 @@ public class ConfigurationPage extends ConfigurationEditorPage {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				if (event.detail == SWT.CHECK) {
-					if ((((TreeItem)event.item).getText()).startsWith(configurationEditor.getConfiguration().getRoot().getName())) {
+					final TreeItem item = (TreeItem)event.item;
+//					if (item.getText().startsWith(configurationEditor.getConfiguration().getRoot().getName())) {
+					if (item.getText().equals(configurationEditor.getConfiguration().getRoot().getName())) {
 						// case: root
-						((TreeItem)event.item).setChecked(true);
+						item.setChecked(true);
 						//((TreeItem)event.item).setGrayed(true);
-					} else if (((TreeItem)event.item).getGrayed()) {
+					} else if (item.getGrayed()) {
 						// case: grayed and selected
-						((TreeItem)event.item).setChecked(true);
-					} else if (((TreeItem)event.item).getForeground().equals(gray)) {
+						item.setChecked(true);
+					} else if (item.getForeground().equals(gray)) {
 						// case: grayed and unselected
-						((TreeItem)event.item).setChecked(false);
+						item.setChecked(false);
 					} else {
 						// case: selectable
 						if (!selectionChanged) {
 							// do nothing if selection changed to fast
-							if (((TreeItem)event.item).getChecked()) {
-								((TreeItem)event.item).setChecked(true);
+							if (item.getChecked()) {
+								item.setChecked(true);
 							} else {
-								((TreeItem)event.item).setChecked(false);
+								item.setChecked(false);
 							}
 						} else {
-							changeSelection(configurationEditor.getConfiguration().getSelectablefeature(
-								((TreeItem)event.item).getText()));		
+							changeSelection(configurationEditor.getConfiguration().getSelectablefeature(item.getText()));		
 							refreshTree();
 						}
 					}

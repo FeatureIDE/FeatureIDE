@@ -33,6 +33,7 @@ import org.eclipse.core.resources.IFolder;
 import org.prop4j.Node;
 import org.sat4j.specs.TimeoutException;
 
+import de.ovgu.featureide.core.mpl.InterfaceProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.io.IOConstants;
 import de.ovgu.featureide.core.mpl.job.util.AMonitorJob;
@@ -152,7 +153,12 @@ public class PrintStatisticsJob extends AMonitorJob<PrintStatisticsJob.Arguments
 
 	@Override
 	protected boolean work() {
-		IFolder folder = interfaceProject.getProjectReference().getFolder(arguments.foldername);
+		InterfaceProject interfaceProject = MPLPlugin.getDefault().getInterfaceProject(this.project);
+		if (interfaceProject == null) {
+			MPLPlugin.getDefault().logWarning(this.project.getName() + " is no Interface Project!");
+			return false;
+		}
+		IFolder folder = this.project.getFolder(arguments.foldername);
 		IOConstants.clearFolder(folder);
 		
 		FeatureModel fm = interfaceProject.getFeatureModel();
@@ -173,7 +179,6 @@ public class PrintStatisticsJob extends AMonitorJob<PrintStatisticsJob.Arguments
 //		}
 //		IOConstants.writeToFile(folder.getFile("_fm_statistics.csv"), fmSb.toString());
 		worked();
-		MPLPlugin.getDefault().logInfo("1");
 		
 		HashMap<Integer, int[]> featureStatistics = interfaceProject.getProjectSignatures().getStatisticNumbers();
 		Statistic stat = new Statistic();
@@ -189,7 +194,6 @@ public class PrintStatisticsJob extends AMonitorJob<PrintStatisticsJob.Arguments
 		ProjectStructure ps = new ProjectStructure(it);
 		sumStat.set(ps.getStatisticsNumbers(), SumStatistic.CONTEXT_ALWAYS);
 		worked();
-		MPLPlugin.getDefault().logInfo("2");
 		
 		IOConstants.writeToFile(folder.getFile("_sum_statistics.csv"), sumStat.toCSVString());
 
@@ -214,9 +218,7 @@ public class PrintStatisticsJob extends AMonitorJob<PrintStatisticsJob.Arguments
 //			ProjectSignatures contextSignatures = p.filter();
 //			contextCollection = contextSignatures.getAllMembers();
 			
-
-			MPLPlugin.getDefault().logInfo("3");
-			int[][] st = xyz(conf, folder, featureName, false);
+			int[][] st = computeSolutionStatistics(interfaceProject, conf, folder, featureName, false);
 			if (st != null) {
 				stat.set(st[0], featureName, Statistic.CONTEXT_MIN_VARIANTE1);
 				stat.set(st[1], featureName, Statistic.CONTEXT_MIN_VARIANTE2);
@@ -239,28 +241,6 @@ public class PrintStatisticsJob extends AMonitorJob<PrintStatisticsJob.Arguments
 						return (signature.hasFeature(curFeatureID) > -1);
 					}
 				};
-//				LinkedList<AbstractSignature> members = new LinkedList<AbstractSignature>();
-//				AbstractSignature[] signatureArray = interfaceProject.getProjectSignatures().getSignatureArray();
-//				for (int i = 0; i < signatureArray.length; ++i) {
-//					AbstractSignature signature = signatureArray[i];
-//					if ((signature instanceof AbstractMethodSignature 
-//							|| signature instanceof AbstractFieldSignature) 
-//						&& signature.hasFeature(interfaceProject.getFeatureID(featureName))) {
-//						members.add(signature);
-//					}
-//				}
-//				
-//				AbstractSignature[] featureCollection = new AbstractSignature[members.size()];
-//				members.toArray(featureCollection);
-				
-//				Collection<AbstractSignature> featureCollection = new HashSet<AbstractSignature>();
-//				for (AbstractSignature signature : interfaceProject.getProjectSignatures().getSignatureSet()) {
-//					if ((signature instanceof AbstractMethodSignature 
-//							|| signature instanceof AbstractFieldSignature) 
-//						&& signature.getFeatures().contains(featureName)) {
-//						featureCollection.add(signature);
-//					}				
-//				}
 				int[] diff = new int[2];
 				
 				SignatureIterator it1 = p.createIterator(); 
@@ -294,7 +274,7 @@ public class PrintStatisticsJob extends AMonitorJob<PrintStatisticsJob.Arguments
 		return true;
 	}
 
-	private int[][] xyz(Configuration conf, IFolder folder, String featureName, boolean fileOutput) {
+	private int[][] computeSolutionStatistics(InterfaceProject interfaceProject, Configuration conf, IFolder folder, String featureName, boolean fileOutput) {
 		LinkedList<List<String>> solutionList;
 		try {
 			solutionList = conf.getSolutions(interfaceProject.getConfigLimit());

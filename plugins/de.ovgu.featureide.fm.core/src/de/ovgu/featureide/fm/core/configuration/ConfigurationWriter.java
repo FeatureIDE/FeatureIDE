@@ -48,7 +48,7 @@ public class ConfigurationWriter {
 	}
 
 	public void saveToFile(IFile file) throws CoreException {
-		InputStream source = new ByteArrayInputStream(writeIntoString(file)
+		InputStream source = new ByteArrayInputStream(writeIntoString()
 				.getBytes(Charset.availableCharsets().get("UTF-8")));
 
 		if (file.exists()) {
@@ -58,7 +58,7 @@ public class ConfigurationWriter {
 		}
 	}
 
-	public String writeIntoString(IFile file) {
+	public String writeIntoString() {
 		StringBuilder buffer = new StringBuilder();
 		FeatureModel featureModel = configuration.getFeatureModel();
 		List<String> list = featureModel.getFeatureOrderList();

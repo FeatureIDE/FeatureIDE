@@ -20,24 +20,14 @@
  */
 package de.ovgu.featureide.fm.core.constraint.analysis;
 
-import static java.lang.String.format;
-
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.List;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.sat4j.specs.TimeoutException;
 
 import com.google.common.collect.BiMap;
 
 import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
-import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
-import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelReader;
 
 /**
  * Checks the {@link ExtendedFeatureModel} for validation.
@@ -49,15 +39,12 @@ public class ExtendedFeatureModelAnalyzer extends FeatureModelAnalyzer  {
 	private ExtendedFeatureModel efm;
 	private BiMap<String, Integer> map;
 	private List<DeRestriction> deFm;
-	private IProject project;
 	
 	private UniqueId idGen;
 	private RestrictionFactory<DeRestriction> deFactory;
 
-	public ExtendedFeatureModelAnalyzer(ExtendedFeatureModel fm, IProject project) {
+	public ExtendedFeatureModelAnalyzer(ExtendedFeatureModel fm) {
 		super(fm);
-		
-		this.project = project;
 
 		this.efm = fm;
 		this.idGen = new UniqueId();
@@ -65,8 +52,7 @@ public class ExtendedFeatureModelAnalyzer extends FeatureModelAnalyzer  {
 		this.deFactory = new DeRestrictionFactory();
 	}
 	
-	@Override
-	public boolean isValid() throws TimeoutException {		
+	public boolean isValid_PBSolver() throws TimeoutException {		
 		if (deFm == null)
 			setUpDeRestrictions();
 		
@@ -77,85 +63,7 @@ public class ExtendedFeatureModelAnalyzer extends FeatureModelAnalyzer  {
 			return false;
 		}
 		
-		if (!matchExternals()) {
-			return false;
-		}
-		
 		return true;
-//		return solver.isSatisfiable();
-	}
-	
-	private boolean matchExternals() {
-		// check interfaces
-		
-		if (null != efm.implementsInterface()){
-			// we have an interface and need to check if all interface 
-			// features are present in the shadow model.
-			for (Feature child : efm.getRoot().getChildren()) {
-				if (!checkNodes(child, efm.getShadowModel().getRoot().getChildren())) {
-					return false;
-				}
-			}
-		}
-		
-		if (efm.hasParameters()) {
-			// check if parameter models are contained in the shadowmodel at the correct position
-			for (String key : efm.getParameters().keySet()){
-				String interfaceName = efm.getParameters().get(key);
-				String modelName = efm.getInstanceMappings().get(key);
-
-				final ExtendedFeatureModel implementor = new ExtendedFeatureModel();
-				final VelvetFeatureModelReader implementorReader = new VelvetFeatureModelReader(implementor);
-				final IResource res = project.findMember(format("MPL/%s.velvet", modelName));
-				final File file = res.getLocation().toFile();
-
-				try {
-					implementorReader.readFromFile(file);
-					final ExtendedFeatureModelAnalyzer analyzer = new ExtendedFeatureModelAnalyzer(implementor, project);
-					
-					if (!(interfaceName.equals(implementor.implementsInterface()) &&
-							analyzer.isValid())) {
-						return false;
-					}
-				} catch ( final FileNotFoundException e ) {
-					FMCorePlugin.getDefault().logError(e);
-				} catch ( final UnsupportedModelException e ) {
-					FMCorePlugin.getDefault().logError(e);
-				} catch ( TimeoutException e ) {
-					FMCorePlugin.getDefault().logError(e);
-				}
-			}
-		}
-		return true;
-	}
-	
-	private boolean checkNodes (final Feature curNode, final List<Feature> childrenInShadowModel) {
-		for (Feature child : childrenInShadowModel) {
-			// check if the two nodes have the same modifiers
-			
-			// TODO check all modifiers. Currently disabled because Christoph doesn't copy 
-			// feature modifiers into the interface
-//			if (curNode.isAbstract() && child.isAbstract() &&
-//				curNode.isAlternative() && child.isAlternative() &&
-//				curNode.isAnd() && child.isAnd() &&
-//				curNode.isANDPossible() && child.isANDPossible() &&
-//				curNode.isOr() && child.isOr() &&
-//				curNode.isMandatory() && child.isMandatory() &&
-			if (curNode.getName().equals(child.getName())) {
-					// we found a matching feature, now we need to check if all children of
-					// curNode are in the children of the found node.
-					for (Feature curNodeChildren : curNode.getChildren()) {
-						if (!checkNodes(curNodeChildren, child.getChildren())) {
-							// a feature was not found.
-							return false;
-						}
-					}
-					
-					return true;
-			}
-		}
-		
-		return false;
 	}
 	
 	private void setUpDeRestrictions() {

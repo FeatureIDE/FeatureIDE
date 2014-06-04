@@ -54,6 +54,7 @@ import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.RoleElement;
+import de.ovgu.featureide.core.mpl.InterfaceProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.job.util.AJobArguments;
 import de.ovgu.featureide.core.mpl.job.util.AMonitorJob;
@@ -115,8 +116,6 @@ public class CreateFujiSignaturesJob extends AMonitorJob<CreateFujiSignaturesJob
 
 	private final HashMap<AbstractSignature, SignatureReference> signatureSet = new HashMap<AbstractSignature, SignatureReference>();
 	private final HashMap<String, AbstractSignature> signatureTable = new HashMap<String, AbstractSignature>();
-	
-	private Program ast = null;
 
 	public CreateFujiSignaturesJob() {
 		this(null);
@@ -172,10 +171,14 @@ public class CreateFujiSignaturesJob extends AMonitorJob<CreateFujiSignaturesJob
 		String featurename = featureModulePathnames.get(featureID);
 		return featurename.substring(featurename.lastIndexOf('\\') + 1);
 	}
-
-	@SuppressWarnings("unchecked")
+	
 	@Override
 	protected boolean work() {
+		InterfaceProject interfaceProject = MPLPlugin.getDefault().getInterfaceProject(this.project);
+		if (interfaceProject == null) {
+			MPLPlugin.getDefault().logWarning(this.project.getName() + " is no Interface Project!");
+			return false;
+		}
 		IFeatureProject fp = interfaceProject.getFeatureProjectReference();
 		
 		FeatureModel fm = fp.getFeatureModel();
@@ -188,7 +191,7 @@ public class CreateFujiSignaturesJob extends AMonitorJob<CreateFujiSignaturesJob
 				,"-" + Main.OptionName.COMPOSTION_STRATEGY, Main.OptionName.COMPOSTION_STRATEGY_ARG_FAMILY // "-typechecker",
 				,"-" + Main.OptionName.BASEDIR, sourcePath};
 		SPLStructure spl = null;
-
+		Program ast;
 		try {
 			Main fuji = new Main(fujiOptions, fm, fm.getConcreteFeatureNames());
 			Composition composition = fuji.getComposition(fuji);
@@ -200,7 +203,15 @@ public class CreateFujiSignaturesJob extends AMonitorJob<CreateFujiSignaturesJob
 			MPLPlugin.getDefault().logError(e);
 			return false;
 		}
-
+		
+		createSignatures(interfaceProject, fp, ast);
+		
+		MPLPlugin.getDefault().logInfo("Fuji signatures loaded.");
+		return true;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void createSignatures(InterfaceProject interfaceProject, IFeatureProject fp, Program ast) {
 		int count = 0;
 		Iterator<CompilationUnit> unitIter = ast.compilationUnitIterator();
 		while (unitIter.hasNext()) {
@@ -355,9 +366,6 @@ public class CreateFujiSignaturesJob extends AMonitorJob<CreateFujiSignaturesJob
 		
 		projectSignatures.setSignatureArray(sigArray);
 		interfaceProject.setProjectSignatures(projectSignatures);
-		
-		MPLPlugin.getDefault().logInfo("Fuji signatures loaded.");
-		return true;
 	}
 	
 	private void copyComment(RoleElement element, int id, String fullName) {

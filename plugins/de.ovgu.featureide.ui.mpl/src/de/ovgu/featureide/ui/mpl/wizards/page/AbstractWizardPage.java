@@ -20,9 +20,12 @@
  */
 package de.ovgu.featureide.ui.mpl.wizards.page;
 
-import java.util.Map;
-
+import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
+
+import de.ovgu.featureide.ui.mpl.wizards.AbstractWizard;
 
 /**
  * A dialog page to specify a feature name.
@@ -31,9 +34,56 @@ import org.eclipse.jface.wizard.WizardPage;
  */
 public abstract class AbstractWizardPage extends WizardPage {
 	
-	protected AbstractWizardPage(String name) {
-		super(name);
+	protected class KeyPressedListener implements KeyListener {
+		@Override
+		public void keyPressed(KeyEvent e) {
+		}
+
+		@Override
+		public void keyReleased(KeyEvent e) {
+			updatePage();
+		}
 	}
 	
-	public abstract void putData(Map<String, Object> dataMap);
+	protected AbstractWizard abstractWizard;
+	private boolean dirty = true;
+	
+	protected AbstractWizardPage(String name) {
+		super(name);
+		super.setPageComplete(false);
+	}
+	
+	@Override
+	public void setWizard(IWizard newWizard) {
+		super.setWizard(newWizard);
+		if (newWizard instanceof AbstractWizard) {
+			abstractWizard = (AbstractWizard) newWizard;
+		} else {
+			abstractWizard = null;
+		}
+	}
+
+	public final void updatePage() {
+		final String message = checkPage();
+		setErrorMessage(message);
+		dirty = true;
+		if (message == null) {
+			setPageComplete(true);
+		} else {
+			removeData();
+		}
+	}
+	
+	public final void saveData() {
+		if (dirty) {
+			if (abstractWizard != null) {
+				putData();
+			}
+			dirty = false;
+		}
+	}
+
+	protected abstract void putData();
+	protected void removeData(){}
+	protected String checkPage(){ return null; }
 }

@@ -20,11 +20,7 @@
  */
 package de.ovgu.featureide.ui.mpl.wizards.page;
 
-import java.util.Map;
-
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -40,11 +36,8 @@ import de.ovgu.featureide.ui.mpl.wizards.WizardConstants;
  * @author Sebastian Krieter
  */
 public class InterfacePage extends AbstractWizardPage {
-
 	private Text configLimitText, viewNameText, viewLevelText;
-	private Label confiLimitLabel, viewNameLabel, viewLevelLabel;
 	
-	private String viewName = null;
 	private int viewLevel = 1, configLimit = 1000;
 	
 	public InterfacePage() {
@@ -75,70 +68,49 @@ public class InterfacePage extends AbstractWizardPage {
 		gridData2.horizontalSpan = 1;
 		gridData2.verticalSpan = 1;
 		
-		confiLimitLabel = new Label(configGroup, 0);
+		Label confiLimitLabel = new Label(configGroup, 0);
 		confiLimitLabel.setText("Config Limit: ");
 		configLimitText = new Text(configGroup, SWT.BORDER | SWT.SINGLE);
 		configLimitText.setText("1000");
 		configLimitText.setLayoutData(gridData2);
 		
-		viewNameLabel = new Label(configGroup, 0);
+		Label viewNameLabel = new Label(configGroup, 0);
 		viewNameLabel.setText("View Name: ");
 		viewNameText = new Text(configGroup, SWT.BORDER | SWT.SINGLE);
 		viewNameText.setText("view1");
 		viewNameText.setLayoutData(gridData2);
 		
-		viewLevelLabel = new Label(configGroup, 0);
+		Label viewLevelLabel = new Label(configGroup, 0);
 		viewLevelLabel.setText("View Level: ");
 		viewLevelText = new Text(configGroup, SWT.BORDER | SWT.SINGLE);
 		viewLevelText.setText("1");
 		viewLevelText.setLayoutData(gridData2);
 
-		addListeners();
-		dialogChanged();
-	}
-
-	private void addListeners() {		
 		configLimitText.addKeyListener(new KeyPressedListener());
 		viewNameText.addKeyListener(new KeyPressedListener());
 		viewLevelText.addKeyListener(new KeyPressedListener());
-	}
-	
-	private class KeyPressedListener implements KeyListener {
-		@Override
-		public void keyPressed(KeyEvent e) {
-		}
-
-		@Override
-		public void keyReleased(KeyEvent e) {
-			dialogChanged();
-		}
-	}
-
-	protected void dialogChanged() {
-		try {
-			viewName = viewNameText.getText();
-			viewLevel = Integer.valueOf(viewLevelText.getText());
-			configLimit = Integer.valueOf(configLimitText.getText());
-			
-			if (viewName.isEmpty()) {
-				updateStatus("Enter a view name");
-			} else {
-				updateStatus(null);
-			}
-		} catch (NumberFormatException e) {
-			updateStatus("Enter a number");
-		}
-	}
-	
-	protected void updateStatus(String message) {
-		setErrorMessage(message);
-		setPageComplete(message == null);
+		
+		updatePage();
 	}
 	
 	@Override
-	public void putData(Map<String, Object> dataMap) {
-		dataMap.put(WizardConstants.KEY_CONFIGLIMIT, configLimit);
-		dataMap.put(WizardConstants.KEY_VIEWLEVEL, viewLevel);
-		dataMap.put(WizardConstants.KEY_VIEWNAME, viewName);
+	protected String checkPage() {
+		if (viewNameText.getText().isEmpty()) {
+			return "Enter a view name";
+		}
+		try {
+			viewLevel = Integer.valueOf(viewLevelText.getText());
+			configLimit = Integer.valueOf(configLimitText.getText());
+		} catch (NumberFormatException e) {
+			return "Enter a number";
+		}
+		return null;
+	}
+
+	@Override
+	public void putData() {
+		abstractWizard.putData(WizardConstants.KEY_OUT_CONFIGLIMIT, configLimit);
+		abstractWizard.putData(WizardConstants.KEY_OUT_VIEWLEVEL, viewLevel);
+		abstractWizard.putData(WizardConstants.KEY_OUT_VIEWNAME, viewNameText.getText());
 	}
 }

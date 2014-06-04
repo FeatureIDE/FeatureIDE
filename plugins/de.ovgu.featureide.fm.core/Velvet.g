@@ -6,18 +6,17 @@ options {
 }
 
 tokens {
-	MANDATORY	='mandatory';
-	ABSTRACT	='abstract';
-	SOMEOF		='someOf';
-	ONEOF 		='oneOf';
-	IMPORT 		='import';
-	REFINES 	='refines';
-	CONCEPT 	='concept';
-	CINTERFACE	='cinterface';
-	CONSTRAINT 	='constraint';
-	FEATURE 	='feature';
-	IMPL		='impl';
-	USE			='use';
+	MANDATORY		='mandatory';
+	ABSTRACT		='abstract';
+	SOMEOF			='someOf';
+	ONEOF 			='oneOf';
+	CONCEPT 		='concept';
+	CINTERFACE		='cinterface';
+	CONSTRAINT 		='constraint';
+	FEATURE 		='feature';
+	USE				='use';
+	IMPORTINSTANCE	='instance';
+	IMPORTINTERFACE	='interface';
 
 	VAR_INT 	='int';
 	VAR_FLOAT 	='float';
@@ -48,24 +47,19 @@ tokens {
 	ATTR_OP_LESS       ='<';
 	ATTR_OP_GREATER_EQ ='>='; 
 	ATTR_OP_LESS_EQ    ='<=';
-
-	IMP;
+	
 	CONSTR;
 	ACONSTR;
 	BASEEXT;
 	DEF;
 	FEAT;
 	GROUP;
-	INSTANCE;
-	INSTANCEDEF;
 	ATTR;
 	UNARYOP;
 	OPERAND;
-	BASEPARAM;
-	IMPLEMENT;
 	USES;
-	
-	INTER;
+	INST;
+	INTF;
 }
 
 @lexer::header {package de.ovgu.featureide.fm.core.io.velvet;}
@@ -82,44 +76,33 @@ public void emitErrorMessage(String msg) {
 }
 
 velvetModel
-	: imports? instancedef* (concept|cinterface) EOF
-	;
-
-instancedef 
-	: ID name SEMI
-	-> ^(INSTANCEDEF ID name)
-	;
-
-imports : (IMPORT name SEMI)+
-	-> ^(IMP name+)
+	: (concept|cinterface) EOF
 	;
 	
 concept 
-	: REFINES? CONCEPT ID  
-		(COLON conceptBaseExt)? 
-		(START_R conceptInterExt (COMMA conceptInterExt)* END_R)? 
-		(IMPL implExt)? 
+	: CONCEPT ID  
+		(COLON conceptBaseExt)? (instanceImports)? (interfaceImports)? 
 		definitions 
-	-> ^(CONCEPT ID REFINES? conceptBaseExt? conceptInterExt* implExt? definitions)
-	;
-	
-implExt : ID
-	-> ^(IMPLEMENT ID)
+	-> ^(CONCEPT ID conceptBaseExt? instanceImports? interfaceImports? definitions)
 	;
 
 conceptBaseExt
 	: ID (COMMA ID)* 
 	-> ^(BASEEXT ID+)
 	;
-
-conceptInterExt
-	: ID name
-	-> ^(BASEPARAM ID name)
+	
+instanceImports
+	: IMPORTINSTANCE ID name (COMMA ID name)* 
+	-> ^(INST (ID name)+)
+	;
+	
+interfaceImports
+	: IMPORTINTERFACE ID name (COMMA ID name)* 
+	-> ^(INTF (ID name)+)
 	;
 
-
-cinterface : REFINES? CINTERFACE ID  (COLON interfaceBaseExt)? definitions 
-	-> ^(CINTERFACE ID REFINES? interfaceBaseExt? definitions)
+cinterface : CINTERFACE ID  (COLON interfaceBaseExt)? definitions 
+	-> ^(CINTERFACE ID interfaceBaseExt? definitions)
 	;
 	
 interfaceBaseExt
@@ -142,18 +125,13 @@ def	: nonFeatureDefinition* (
 	;			
 	
 nonFeatureDefinition
-	: constraint 
-	| instance 
+	: constraint
 	| use
 	| attribute 
 	;
 	
-use : USE ID SEMI
-	-> ^(USES ID)
-	;
-	
-instance: ID name SEMI //conceptName
-	-> ^(INSTANCE ID name)
+use : USE name SEMI
+	-> ^(USES name)
 	;
 
 feature

@@ -20,47 +20,57 @@
  */
 package de.ovgu.featureide.core.mpl.job;
 
-import de.ovgu.featureide.core.mpl.InterfaceProject;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+
 import de.ovgu.featureide.core.mpl.MPLPlugin;
-import de.ovgu.featureide.core.mpl.job.util.AChainJob;
 import de.ovgu.featureide.core.mpl.job.util.AJobArguments;
-import de.ovgu.featureide.core.mpl.signature.ProjectSignatures.SignatureIterator;
-import de.ovgu.featureide.core.mpl.signature.ProjectStructure;
-import de.ovgu.featureide.core.mpl.signature.filter.ISignatureFilter;
-import de.ovgu.featureide.core.mpl.signature.fuji.FujiClassCreator;
+import de.ovgu.featureide.core.mpl.job.util.AMonitorJob;
 
 /**
- * Constructs a {@link ProjectStructure}.
  * 
  * @author Sebastian Krieter
  */
-public class CreateProjectStructureJob extends AChainJob<CreateProjectStructureJob.Arguments> {
+public class MPLCopyExternalJob extends AMonitorJob<MPLCopyExternalJob.Arguments> {
 	
 	public static class Arguments extends AJobArguments {
-		private final ISignatureFilter filter;
-		private final ProjectStructure projectSig;
+		private final IFolder srcFolder;
+		private final IFolder destFolder;
 		
-		public Arguments(ProjectStructure projectSig, ISignatureFilter filter) {
+		public Arguments(IFolder srcFolder, IFolder destFolder) {
 			super(Arguments.class);
-			this.filter = filter;
-			this.projectSig = projectSig;
+			this.srcFolder = srcFolder;
+			this.destFolder = destFolder;
 		}
 	}
-
-	protected CreateProjectStructureJob(Arguments arguments) {
-		super("Loading Project Signature", arguments);
+	
+	public MPLCopyExternalJob() {
+		this(null);
+	}
+	
+	protected MPLCopyExternalJob(Arguments arguments) {
+		super("Copying Source Files", arguments);
+		setPriority(BUILD);
 	}
 	
 	@Override
 	protected boolean work() {
-		InterfaceProject interfaceProject = MPLPlugin.getDefault().getInterfaceProject(this.project);
-		if (interfaceProject == null) {
-			MPLPlugin.getDefault().logWarning(this.project.getName() + " is no Interface Project!");
+		IPath destPath = arguments.destFolder.getFullPath();
+		
+		try {
+			IResource[] srcMembers = arguments.srcFolder.members();
+			for (int i = 0; i < srcMembers.length; i++) {
+				IResource srcMember = srcMembers[i];
+				srcMember.move(destPath.append(srcMember.getName()), true, monitor);
+			}	
+		} catch (CoreException e) {
+			MPLPlugin.getDefault().logError(e);
 			return false;
 		}
-		SignatureIterator it = interfaceProject.getProjectSignatures().createIterator();
-		it.addFilter(arguments.filter);
-		arguments.projectSig.construct(it, new FujiClassCreator());
+
+		MPLPlugin.getDefault().logInfo("Copied Source Files.");
 		return true;
 	}
 }

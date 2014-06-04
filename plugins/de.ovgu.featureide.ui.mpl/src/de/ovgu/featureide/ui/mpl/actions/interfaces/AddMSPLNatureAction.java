@@ -18,34 +18,16 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.core.mspl;
+package de.ovgu.featureide.ui.mpl.actions.interfaces;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IProjectNature;
-import org.eclipse.core.runtime.CoreException;
 
-public class MSPLNature implements IProjectNature {
+import de.ovgu.featureide.core.mpl.MPLPlugin;
+import de.ovgu.featureide.ui.mpl.actions.AProjectAction;
 
-	public static final String NATURE_ID = "de.ovgu.featureide.core.mspl.msplNature";
-
-	private IProject project;
-
+public class AddMSPLNatureAction extends AProjectAction {
 	@Override
-	public void configure() throws CoreException {
-	}
-
-	@Override
-	public void deconfigure() throws CoreException {
-	}
-
-	@Override
-	public IProject getProject() {
-		return project;
-	}
-
-	@Override
-	public void setProject(IProject project) {
-		this.project = project;
-	}
-
+	protected void singleAction(IProject project) {
+		MPLPlugin.getDefault().addMSPLNature(project);
+	}	
 }

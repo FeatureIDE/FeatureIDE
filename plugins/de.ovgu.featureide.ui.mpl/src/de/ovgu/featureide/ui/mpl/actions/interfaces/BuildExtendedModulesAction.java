@@ -47,6 +47,6 @@ public class BuildExtendedModulesAction extends AProjectJobAction {
 	@Override
 	protected void endAction() {
 		MPLPlugin.getDefault().buildExtendedModules(projects, 
-				(String) wizard.getData(WizardConstants.KEY_FOLDER));
+				(String) wizard.getData(WizardConstants.KEY_OUT_FOLDER));
 	}
 }

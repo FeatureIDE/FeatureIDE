@@ -20,49 +20,23 @@
  */
 package de.ovgu.featureide.ui.mpl.wizards;
 
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchWizard;
-
 import de.ovgu.featureide.ui.mpl.MPLUIPlugin;
+import de.ovgu.featureide.ui.mpl.wizards.page.ChangeViewTagPage;
 
 /**
  * Wizard for changing the level of a view tag.
  * 
  * @author Sebastian Krieter
  */
-public class ChangeViewTagWizard extends Wizard implements IWorkbenchWizard {
+public class ChangeViewTagWizard extends AbstractWizard {
 	public static final String ID = MPLUIPlugin.PLUGIN_ID + ".wizards.ChangeViewTagWizard";
-
-	private ChangeViewTagPage changeViewTagPage;
 	
 	public ChangeViewTagWizard(String title) {
-		super();
-		setWindowTitle(title);
+		super(title);
 	}
 
 	@Override
 	public void addPages() {
-		changeViewTagPage = new ChangeViewTagPage();
-		addPage(changeViewTagPage);
-		super.addPages();
-	}
-
-	@Override
-	public boolean performFinish() {
-		return true;
-	}
-	
-	public int getViewLevel() {
-		return changeViewTagPage.getViewLevel();
-	}
-	
-	public String getViewName() {
-		return changeViewTagPage.getViewName();
-	}
-	
-	@Override
-	public void init(IWorkbench workbench, IStructuredSelection selection) {
+		addPage(new ChangeViewTagPage());
 	}
 }

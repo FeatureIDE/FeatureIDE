@@ -29,6 +29,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.mpl.InterfaceProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.io.IOConstants;
 import de.ovgu.featureide.core.mpl.job.util.AJobArguments;
@@ -74,7 +75,12 @@ public class PrintDocumentationJob extends AMonitorJob<PrintDocumentationJob.Arg
 
 	@Override
 	protected boolean work() {
-		IFolder folder = CorePlugin.createFolder(interfaceProject.getProjectReference(), arguments.foldername);
+		InterfaceProject interfaceProject = MPLPlugin.getDefault().getInterfaceProject(this.project);
+		if (interfaceProject == null) {
+			MPLPlugin.getDefault().logWarning(this.project.getName() + " is no Interface Project!");
+			return false;
+		}
+		IFolder folder = CorePlugin.createFolder(this.project, arguments.foldername);
 		final String folderPath = folder.getLocation().toOSString();
 		
 		try {
@@ -86,7 +92,7 @@ public class PrintDocumentationJob extends AMonitorJob<PrintDocumentationJob.Arg
 
 		final String extFoldername = arguments.foldername + "/src/";
 		
-		CorePlugin.createFolder(interfaceProject.getProjectReference(), extFoldername);
+		CorePlugin.createFolder(this.project, extFoldername);
 		
 		final SignatureIterator it = interfaceProject.getProjectSignatures().createIterator();
 		AJavaDocCommentMerger merger = null;

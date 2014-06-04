@@ -27,6 +27,7 @@ import org.eclipse.ui.IWorkbenchWizard;
 
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.ui.mpl.MPLUIPlugin;
+import de.ovgu.featureide.ui.mpl.wizards.page.NewMultiFeatureProjectPage;
 
 /**
  * A wizard for creating MPL projects.

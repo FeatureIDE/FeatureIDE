@@ -20,10 +20,14 @@
  */
 package de.ovgu.featureide.core.mpl.job;
 
-import de.ovgu.featureide.core.mpl.InterfaceProject;
+import java.util.LinkedList;
+
+import org.eclipse.core.resources.IProject;
+
 import de.ovgu.featureide.core.mpl.job.util.AChainJob;
 import de.ovgu.featureide.core.mpl.job.util.AJobArguments;
 import de.ovgu.featureide.core.mpl.job.util.IChainJob;
+import de.ovgu.featureide.core.mpl.job.util.JobManager;
 
 /**
  * Starts consecutively other jobs from a list of {@link AChainJob}s.
@@ -31,32 +35,28 @@ import de.ovgu.featureide.core.mpl.job.util.IChainJob;
  * @author Sebastian Krieter
  */
 public class StartJob extends AChainJob<StartJob.Arguments> {
-	
+
 	public static class Arguments extends AJobArguments {
-		private final IChainJob[] jobs;
-		private int index = 0;
-		
-		public Arguments(IChainJob[] jobs) {
+		private final LinkedList<IChainJob> jobs;
+
+		public Arguments(LinkedList<IChainJob> jobs) {
 			super(Arguments.class);
 			this.jobs = jobs;
 		}
 	}
-	
+
 	protected StartJob(Arguments arguments) {
 		super("", arguments);
 	}
-	
+
 	@Override
 	protected boolean work() {
-		IChainJob curJob = arguments.jobs[arguments.index];
-		InterfaceProject curInterfaceProject = curJob.getInterfaceProject();
-		curInterfaceProject.loadSignaturesJob(false);
-		curInterfaceProject.addJob(curJob);
-		arguments.index++;
-		if (arguments.index < arguments.jobs.length) {
-			curInterfaceProject.addJob(new StartJob(arguments));
+		IChainJob curJob = arguments.jobs.removeFirst();
+		IProject curProject = curJob.getProject();
+		JobManager.addJob(curProject, curJob);
+		if (!arguments.jobs.isEmpty()) {
+			JobManager.addJob(curProject, new StartJob(arguments));
 		}
-		
 		return true;
 	}
 }

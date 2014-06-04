@@ -18,29 +18,58 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.ui.mpl.wizards;
-
-import de.ovgu.featureide.ui.mpl.MPLUIPlugin;
-import de.ovgu.featureide.ui.mpl.actions.interfaces.BuildExtendedModulesAction;
-import de.ovgu.featureide.ui.mpl.wizards.page.ChooseFolderPage;
+package de.ovgu.featureide.fm.core;
 
 /**
- * Wizard for the {@link BuildExtendedModulesAction}.
+ * Feature for the {@link ExtendedFeatureModel}.
  * 
- * @author Reimar Schroeter
+ * @author Sebastian Krieter
  */
-public class BuildExtendedModulesWizard extends AbstractWizard {
-	public static final String ID = MPLUIPlugin.PLUGIN_ID + ".wizards.BuildExtendedModulesWizard";
+public class ExtendedFeature extends Feature {
 	
-	private final String defaultFolderString;
+	public static final int 
+		TYPE_INTERN = 0,
+		TYPE_INHERITED = 1,
+		TYPE_INTERFACE = 2,
+		TYPE_INSTANCE = 3;
 	
-	public BuildExtendedModulesWizard(String title, String defaultFolderString) {
-		super(title);
-		this.defaultFolderString = (defaultFolderString != null) ? defaultFolderString : "";
+	private int type = TYPE_INTERN;
+
+	/**
+	 * @param featureModel
+	 * @param name
+	 */
+	public ExtendedFeature(FeatureModel featureModel, String name) {
+		super(featureModel, name);
+	}
+	
+	/**
+	 * @return the type
+	 */
+	public int getType() {
+		return type;
 	}
 
-	@Override
-	public void addPages() {
-		addPage(new ChooseFolderPage(defaultFolderString));
+	public boolean isInherited() {
+		return type == TYPE_INHERITED;
+	}
+	
+	public boolean isInterface() {
+		return type == TYPE_INTERFACE;
+	}
+	
+	public boolean isInstance() {
+		return type == TYPE_INSTANCE;
+	}
+	
+	public boolean isFromExtern() {
+		return type != TYPE_INTERN;
+	}
+
+	/**
+	 * @param type the type to set
+	 */
+	public void setType(int type) {
+		this.type = type;
 	}
 }

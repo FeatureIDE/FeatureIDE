@@ -40,7 +40,7 @@ import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.Constraint;
-import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
+import de.ovgu.featureide.fm.core.ExtendedFeature;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureConnection;
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -106,14 +106,10 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements
 	@Override
 	public void performRequest(Request request) {
 		Feature feature = getFeature();
-		FeatureModel featureModel = ((ModelEditPart) this.getParent()).getFeatureModel();
-
-		if (featureModel instanceof ExtendedFeatureModel) {
-			ExtendedFeatureModel extendedFeatureModel = (ExtendedFeatureModel) featureModel;
-
-			if (extendedFeatureModel.isFromExtern(feature))
-				return;
+		if (feature instanceof ExtendedFeature && ((ExtendedFeature) feature).isFromExtern()) {
+			return;
 		}
+		FeatureModel featureModel = ((ModelEditPart) this.getParent()).getFeatureModel();
 
 		for (Constraint constraint : featureModel.getConstraints()){
 			if (constraint.isFeatureSelected()) constraint.setFeatureSelected(false);

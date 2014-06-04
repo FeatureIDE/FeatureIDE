@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.core;
 
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -85,7 +85,7 @@ public class RenamingsManager {
 	}
 	
 	public boolean isRenamed() {
-		return (renamings.size() != 0);
+		return (!renamings.isEmpty());
 	}
 
 	public void performRenamings() {
@@ -177,9 +177,11 @@ public class RenamingsManager {
 	 * @return current name of this feature
 	 */
 	public String getNewName(String name) {
-		for (Renaming renaming : renamings)
-			if (renaming.oldName.equals(name))
-				name = renaming.newName;
+		for (Renaming renaming : renamings) {
+			if (renaming.oldName.equals(name)) {
+				return renaming.newName;
+			}
+		}
 		return name;
 	}
 
@@ -192,20 +194,21 @@ public class RenamingsManager {
 	 * @return name when last saved
 	 */
 	public String getOldName(String name) {
-		for (int i = renamings.size() - 1; i >= 0; i--)
-			if (renamings.get(i).newName.equals(name))
-				name = renamings.get(i).oldName;
+		for (Renaming renaming : renamings) {
+			if (renaming.newName.equals(name)) {
+				return renaming.oldName;
+			}
+		}
 		return name;
 	}
 
 	public Set<String> getOldFeatureNames() {
-		Set<String> names = model.getFeatureTable().keySet();
-		for (int i = renamings.size() - 1; i >= 0; i--) {
-			Renaming renaming = renamings.get(i);
+		HashSet<String> names = new HashSet<String>(model.getFeatureTable().keySet());
+		for (Renaming renaming : renamings) {
 			names.remove(renaming.newName);
 			names.add(renaming.oldName);
 		}
-		return Collections.unmodifiableSet(names);
+		return names;
 	}
 
 	/**

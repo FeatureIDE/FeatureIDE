@@ -31,11 +31,11 @@ public class ColorList {
 	public static final int INVALID_COLOR = -1;
 	
 	private final ColorschemeTable colorschemeTable;
-	private ArrayList<Integer> colors = new ArrayList<Integer>();
+	private final ArrayList<Integer> colors = new ArrayList<Integer>();
 	
 	public ColorList(Feature feature) {
 		FeatureModel fm = feature.getFeatureModel();
-		if (fm != null) {
+		if (fm != null && fm.getColorschemeTable() != null) {
 			colorschemeTable = fm.getColorschemeTable();
 			for (int i = 0; i < colorschemeTable.size() + 1; i++) {
 				colors.add(INVALID_COLOR);
@@ -44,7 +44,7 @@ public class ColorList {
 			colorschemeTable = null;
 		}
 	}
-	
+
 	public static final boolean isValidColor(int color) {
 		return color > INVALID_COLOR;
 	}
@@ -108,7 +108,10 @@ public class ColorList {
 
 	public ColorList clone(Feature feature) {
 		ColorList newColorScheme = new ColorList(feature);
-		newColorScheme.colors = new ArrayList<Integer>(colors);
+		newColorScheme.colors.ensureCapacity(colors.size());
+		for (Integer value : colors) {
+			newColorScheme.colors.add(new Integer(value));
+		}
 		return newColorScheme;
 	}
 }

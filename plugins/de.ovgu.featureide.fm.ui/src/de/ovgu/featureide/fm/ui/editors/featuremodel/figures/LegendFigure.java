@@ -160,7 +160,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			ExtendedFeatureModel extendedFeatureModel = (ExtendedFeatureModel) featureModel;
 			interfaced = extendedFeatureModel.hasInterface();
 			// interfaces hide other features
-			imported = !interfaced && extendedFeatureModel.hasImported();
+			imported = !interfaced && extendedFeatureModel.hasInstance();
 			inherited = !interfaced && extendedFeatureModel.hasInherited();
 		}
 

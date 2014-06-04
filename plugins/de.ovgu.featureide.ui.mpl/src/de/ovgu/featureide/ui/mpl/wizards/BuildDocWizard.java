@@ -20,11 +20,8 @@
  */
 package de.ovgu.featureide.ui.mpl.wizards;
 
-import java.util.List;
-
 import de.ovgu.featureide.ui.mpl.MPLUIPlugin;
 import de.ovgu.featureide.ui.mpl.actions.interfaces.BuildExtendedModulesAction;
-import de.ovgu.featureide.ui.mpl.wizards.page.AbstractWizardPage;
 import de.ovgu.featureide.ui.mpl.wizards.page.ChooseFeaturePage;
 import de.ovgu.featureide.ui.mpl.wizards.page.ChooseFolderPage;
 import de.ovgu.featureide.ui.mpl.wizards.page.DocArgumentsPage;
@@ -47,11 +44,11 @@ public class BuildDocWizard extends AbstractWizard {
 	}
 
 	@Override
-	protected void initPages(List<AbstractWizardPage> pages) {
+	public void addPages() {
 		if (featureSelection) {
-			pages.add(new ChooseFeaturePage());
+			addPage(new ChooseFeaturePage());
 		}
-		pages.add(new ChooseFolderPage(defaultFolderString));
-		pages.add(new DocArgumentsPage());
+		addPage(new ChooseFolderPage(defaultFolderString));
+		addPage(new DocArgumentsPage());
 	}
 }

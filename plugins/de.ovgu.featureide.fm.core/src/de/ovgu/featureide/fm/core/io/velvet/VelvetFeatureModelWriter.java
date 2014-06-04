@@ -63,10 +63,28 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 		sb.append(root.getName());
 		sb.append(" {");
 		sb.append(NEWLINE);
-
-		for (Feature feature : root.getChildren()) {
-			writeFeature(feature, 1);
+		
+		if (root.isAnd()) {
+			for (Feature feature : root.getChildren()) {
+				writeFeature(feature, 1);
+			}
+		} else if (root.isOr()) {
+			sb.append("\tsomeOf {");
+			sb.append(NEWLINE);
+			for (Feature feature : root.getChildren()) {
+				writeFeature(feature, 2);
+			}
+			sb.append("\t}");
+		} else if (root.isAlternative()) {
+			sb.append("\toneOf {");
+			sb.append(NEWLINE);
+			for (Feature f : root.getChildren()) {
+				writeFeature(f, 2);
+			}
+			sb.append("\t}");
+			sb.append(NEWLINE);
 		}
+		
 		for (Constraint constraint : featureModel.getConstraints()) {
 			sb.append("\tconstraint ");
 			sb.append(constraint.getNode().toString(SYMBOLS));
@@ -78,41 +96,42 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 		return sb.toString();
 	}
 
-	private void writeFeature(Feature root, int depth) {
+	private void writeFeature(Feature curFeature, int depth) {
 		writeTab(depth);
-		if (root.isAbstract()) {
+		if (curFeature.isAbstract()) {
 			sb.append("abstract ");
 		}
-		if (root.isMandatory()) {
+		if (curFeature.isMandatory() && (curFeature.getParent() == null || curFeature.getParent().isAnd())) {
 			sb.append("mandatory ");
 		}
 		sb.append("feature ");
-		sb.append(root.getName());
+		sb.append(curFeature.getName());
 
-		if (root.getChildrenCount() == 0) {
+		if (curFeature.getChildrenCount() == 0) {
 			sb.append(";");
 		} else {
 			sb.append(" {");
 			sb.append(NEWLINE);
 
-			if (root.isAnd()) {
-				for (Feature feature : root.getChildren()) {
+			if (curFeature.isAnd()) {
+				for (Feature feature : curFeature.getChildren()) {
 					writeFeature(feature, depth + 1);
 				}
-			} else if (root.isOr()) {
+			} else if (curFeature.isOr()) {
 				writeTab(depth + 1);
 				sb.append("someOf {");
 				sb.append(NEWLINE);
-				for (Feature feature : root.getChildren()) {
+				for (Feature feature : curFeature.getChildren()) {
 					writeFeature(feature, depth + 2);
 				}
 				writeTab(depth + 1);
 				sb.append("}");
-			} else if (root.isAlternative()) {
+				sb.append(NEWLINE);
+			} else if (curFeature.isAlternative()) {
 				writeTab(depth + 1);
 				sb.append("oneOf {");
 				sb.append(NEWLINE);
-				for (Feature f : root.getChildren()) {
+				for (Feature f : curFeature.getChildren()) {
 					writeFeature(f, depth + 2);
 				}
 				writeTab(depth + 1);

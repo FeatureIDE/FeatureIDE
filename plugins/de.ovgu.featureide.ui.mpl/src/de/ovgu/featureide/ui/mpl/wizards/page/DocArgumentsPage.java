@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.ui.mpl.wizards.page;
 
-import java.util.Map;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -79,10 +77,13 @@ public class DocArgumentsPage extends AbstractWizardPage {
 		optionsText = new Text(configGroup, SWT.BORDER | SWT.MULTI);
 		optionsText.setText(options);
 		optionsText.setLayoutData(gridData2);
+		optionsText.addKeyListener(new KeyPressedListener());
+		
+		updatePage();
 	}
 
 	@Override
-	public void putData(Map<String, Object> dataMap) {
-		dataMap.put(WizardConstants.KEY_DOCOPTIONS, optionsText.getText());
+	protected void putData() {
+		abstractWizard.putData(WizardConstants.KEY_OUT_DOCOPTIONS, optionsText.getText());
 	}
 }

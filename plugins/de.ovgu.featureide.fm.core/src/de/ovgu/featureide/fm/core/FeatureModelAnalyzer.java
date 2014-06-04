@@ -468,7 +468,9 @@ public class FeatureModelAnalyzer {
 		}
 		HashMap<Object, Object> oldAttributes = new HashMap<Object, Object>();
 		HashMap<Object, Object> changedAttributes = new HashMap<Object, Object>();
-		
+
+		// put root always in so it will be refreshed (void/non-void)
+		changedAttributes.put(fm.getRoot(), FeatureStatus.NORMAL);
 		if (calculateFeatures) {
 			updateFeatures(oldAttributes, changedAttributes);
 		}
@@ -476,7 +478,7 @@ public class FeatureModelAnalyzer {
 			updateConstraints(oldAttributes, changedAttributes);
 		}
 		// put root always in so it will be refreshed (void/non-void)
-		changedAttributes.put(fm.getRoot(), ConstraintAttribute.VOID_MODEL);
+//		changedAttributes.put(fm.getRoot(), ConstraintAttribute.VOID_MODEL);
 		return changedAttributes;
 	}
 

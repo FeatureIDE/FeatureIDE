@@ -92,7 +92,7 @@ public class TextEditorPage extends TextEditor implements IConfigurationEditorPa
 			return;
 		}
 		String source = new ConfigurationWriter(configurationEditor.getConfiguration())
-				.writeIntoString(configurationEditor.getFile());
+				.writeIntoString();
 		IDocumentProvider provider = getDocumentProvider();
 		IDocument document = provider.getDocument(getEditorInput());
 		if (!source.equals(document.get()))

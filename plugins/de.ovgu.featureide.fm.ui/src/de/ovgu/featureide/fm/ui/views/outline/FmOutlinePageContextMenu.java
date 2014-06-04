@@ -44,7 +44,7 @@ import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.part.IPageSite;
 
 import de.ovgu.featureide.fm.core.Constraint;
-import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
+import de.ovgu.featureide.fm.core.ExtendedFeature;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -239,12 +239,9 @@ public class FmOutlinePageContextMenu{
 				.getFirstElement();
 		if (sel instanceof FmOutlineGroupStateStorage) {
 			Feature feature = ((FmOutlineGroupStateStorage) sel).getFeature();
-			FeatureModel featureModel = feature.getFeatureModel();
-			if (featureModel instanceof ExtendedFeatureModel) {
-				if (((ExtendedFeatureModel) featureModel).isFromExtern(feature))
-					return;
+			if (feature instanceof ExtendedFeature && ((ExtendedFeature) feature).isFromExtern()) {
+				return;
 			}
-
 			manager.add(andAction);
 			manager.add(oAction);
 			manager.add(altAction);

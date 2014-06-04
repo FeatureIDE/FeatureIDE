@@ -28,6 +28,7 @@ import org.eclipse.swt.widgets.Display;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.ui.mpl.actions.AProjectAction;
 import de.ovgu.featureide.ui.mpl.wizards.NewViewTagWizard;
+import de.ovgu.featureide.ui.mpl.wizards.WizardConstants;
 
 /**
  * Action to create a new view tag.
@@ -41,7 +42,7 @@ public class NewViewTagAction extends AProjectAction {
 		NewViewTagWizard wizard = new NewViewTagWizard("Add a view tag");
 		WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
 		if (dialog.open() == Dialog.OK) {
-			MPLPlugin.getDefault().addViewTag(project, wizard.getViewName());
+			MPLPlugin.getDefault().addViewTag(project, (String) wizard.getData(WizardConstants.KEY_OUT_VIEWNAME));
 		}
 	}
 

@@ -18,13 +18,12 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.ui.mpl.wizards;
+package de.ovgu.featureide.ui.mpl.wizards.page;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -40,19 +39,20 @@ import org.eclipse.swt.widgets.Widget;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.ui.mpl.wizards.NewMultiFeatureProjectWizard;
 
 /**
  * A dialog page for the {@link NewMultiFeatureProjectWizard}.
  * 
  * @author Sebastian Krieter
  */
-public class NewMultiFeatureProjectPage extends WizardPage {
+public class NewMultiFeatureProjectPage extends AbstractWizardPage {
 
 	protected Table projectTable;
 	protected HashMap<Widget, IFeatureProject> map = new HashMap<Widget, IFeatureProject>();
 	protected HashSet<IFeatureProject> sel = new HashSet<IFeatureProject>();
 	
-	protected NewMultiFeatureProjectPage() {
+	public NewMultiFeatureProjectPage() {
 		super("");
 		setTitle("Select a composer");
 		setDescription("Creates a Multi-FeatureIDE project");
@@ -137,4 +137,16 @@ public class NewMultiFeatureProjectPage extends WizardPage {
 		setErrorMessage(message);
 		setPageComplete(message == null);
 	}
+	
+	@Override
+	protected void putData() {
+		//TODO
+	}
+	
+	@Override
+	protected String checkPage() {
+		return null;
+	}
+	
+	
 }

@@ -20,45 +20,23 @@
  */
 package de.ovgu.featureide.ui.mpl.wizards;
 
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchWizard;
-
 import de.ovgu.featureide.ui.mpl.MPLUIPlugin;
+import de.ovgu.featureide.ui.mpl.wizards.page.NewViewTagPage;
 
 /**
  * A wizard to create a new view tag.
  * 
  * @author Sebastian Krieter
  */
-public class NewViewTagWizard extends Wizard implements IWorkbenchWizard   {
+public class NewViewTagWizard extends AbstractWizard {
 	public static final String ID = MPLUIPlugin.PLUGIN_ID + ".wizards.NewViewTagWizard";
-
-	private NewViewTagPage newViewTagPage;
 	
 	public NewViewTagWizard(String title) {
-		super();
-		setWindowTitle(title);
+		super(title);
 	}
 
 	@Override
 	public void addPages() {
-		newViewTagPage = new NewViewTagPage();
-		addPage(newViewTagPage);
-		super.addPages();
-	}
-
-	@Override
-	public boolean performFinish() {
-		return true;
-	}
-	
-	public String getViewName() {
-		return newViewTagPage.getViewName();
-	}
-	
-	@Override
-	public void init(IWorkbench workbench, IStructuredSelection selection) {
+		addPage(new NewViewTagPage());
 	}
 }

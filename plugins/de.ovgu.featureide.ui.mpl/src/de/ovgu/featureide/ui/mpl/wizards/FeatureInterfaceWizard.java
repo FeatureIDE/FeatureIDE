@@ -20,10 +20,7 @@
  */
 package de.ovgu.featureide.ui.mpl.wizards;
 
-import java.util.List;
-
 import de.ovgu.featureide.ui.mpl.MPLUIPlugin;
-import de.ovgu.featureide.ui.mpl.wizards.page.AbstractWizardPage;
 import de.ovgu.featureide.ui.mpl.wizards.page.ChooseFolderPage;
 import de.ovgu.featureide.ui.mpl.wizards.page.InterfacePage;
 
@@ -47,10 +44,10 @@ public class FeatureInterfaceWizard extends AbstractWizard {
 	}
 
 	@Override
-	protected void initPages(List<AbstractWizardPage> pages) {
-		pages.add(new InterfacePage());
+	public void addPages() {
+		addPage(new InterfacePage());
 		if (defaultFolderString != null) {
-			pages.add(new ChooseFolderPage(defaultFolderString));
+			addPage(new ChooseFolderPage(defaultFolderString));
 		}
 	}
 }

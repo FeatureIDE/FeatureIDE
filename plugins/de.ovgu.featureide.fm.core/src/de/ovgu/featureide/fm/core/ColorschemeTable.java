@@ -45,7 +45,7 @@ public class ColorschemeTable {
 	
 	private final FeatureModel featureModel;
 	
-	private ArrayList<String> colorschemeNames = new ArrayList<String>();
+	private final ArrayList<String> colorschemeNames;
 	private int selectedColorscheme;
 	
 	/**
@@ -53,7 +53,14 @@ public class ColorschemeTable {
 	 */
 	public ColorschemeTable(FeatureModel featureModel) {
 		this.featureModel = featureModel;
+		this.colorschemeNames = new ArrayList<String>();
 		reset();
+	}
+	
+	protected ColorschemeTable(ColorschemeTable oldColorschemeTable, FeatureModel featureModel) {
+		this.featureModel = featureModel;
+		this.colorschemeNames = new ArrayList<String>(oldColorschemeTable.colorschemeNames);
+		this.selectedColorscheme = oldColorschemeTable.selectedColorscheme;
 	}
 
 	/**
@@ -68,7 +75,7 @@ public class ColorschemeTable {
 	 */
 	public void addColorscheme(String name) {
 		colorschemeNames.add(name);
-		for (Feature feat : featureModel.getFeatureTable().values()) {
+		for (Feature feat : featureModel.getFeatures()) {
 			feat.getColorList().addColorscheme();
 		}
 	}
@@ -79,12 +86,12 @@ public class ColorschemeTable {
 	public void removeColorscheme() {
 		if (colorschemeNames.size() == 2) {
 			colorschemeNames.set(1, DEFAULT_COLORSCHEMENAME);
-			for (Feature feat : featureModel.getFeatureTable().values()) {
+			for (Feature feat : featureModel.getFeatures()) {
 				feat.getColorList().removeColor();
 			}
 		} else {
 			colorschemeNames.remove(selectedColorscheme);
-			for (Feature feat : featureModel.getFeatureTable().values()) {
+			for (Feature feat : featureModel.getFeatures()) {
 				feat.getColorList().removeColorscheme();
 			}
 			if (selectedColorscheme == colorschemeNames.size()) {
@@ -190,12 +197,7 @@ public class ColorschemeTable {
 		}
 	}
 	
-	public ColorschemeTable clone(FeatureModel fm) {
-		ColorschemeTable newColorSchemeProvider = new ColorschemeTable(fm);
-		
-		newColorSchemeProvider.colorschemeNames = new ArrayList<String>(colorschemeNames);
-		newColorSchemeProvider.selectedColorscheme = selectedColorscheme;
-		
-		return newColorSchemeProvider;
+	public ColorschemeTable clone(FeatureModel fm) {		
+		return new ColorschemeTable(this, fm);
 	}
 }

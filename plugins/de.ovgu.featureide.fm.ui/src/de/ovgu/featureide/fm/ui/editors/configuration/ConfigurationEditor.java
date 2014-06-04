@@ -34,6 +34,7 @@ import java.util.StringTokenizer;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -168,14 +169,21 @@ public class ConfigurationEditor extends MultiPageEditorPart implements
 		super.setInput(input);
 		getSite().getPage().addPartListener(iPartListener);
 		IProject project = file.getProject();
+		boolean mplConfig = false;
 
 		// if mpl.velvet exists then it is a multi product line
 		IResource res = project.findMember("mpl.velvet");
-		if (res != null && res instanceof IFile)
+		if (res != null && res instanceof IFile) {
 			featureModel = new ExtendedFeatureModel();
-		else
+			IContainer parentFolder = file.getParent();
+			if (parentFolder != null && "InterfaceMapping".equals(parentFolder.getName())) {
+				mplConfig = true;
+			}
+		}
+		else {
 			res = project.findMember("model.xml");
-
+		}
+		
 		if (res instanceof IFile) {
 			modelFile = ((IFile)res).getLocation().toFile();
 		}
@@ -206,9 +214,14 @@ public class ConfigurationEditor extends MultiPageEditorPart implements
 				}
 			}
 		}
-
-		readFeatureModel();
-		configuration = new Configuration(featureModel, true);
+		
+		readFeatureModel();		
+		
+		if (mplConfig) {
+			configuration = new Configuration(((ExtendedFeatureModel)featureModel).getMappingModel(), true);
+		} else {
+			configuration = new Configuration(featureModel, true);
+		}
 		try {
 			new ConfigurationReader(configuration).readFromFile(file);
 			isPageModified = isModified(file);
@@ -413,7 +426,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements
 
 	private void setConfiguration() {
 		readFeatureModel();
-		String text = new ConfigurationWriter(configuration).writeIntoString(file);
+		String text = new ConfigurationWriter(configuration).writeIntoString();
 		configuration = new Configuration(featureModel, true);
 		try {
 			new ConfigurationReader(configuration).readFromString(text);
@@ -515,7 +528,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements
 			IDocument document = provider.getDocument(sourceEditor
 					.getEditorInput());
 			String text = document.get();
-			if (!new ConfigurationWriter(configuration).writeIntoString(file)
+			if (!new ConfigurationWriter(configuration).writeIntoString()
 					.equals(text)) {
 				configuration = new Configuration(featureModel, true);
 				try {

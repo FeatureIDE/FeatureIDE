@@ -62,7 +62,7 @@ public class FeatureFolderDecorator implements ILightweightLabelDecorator, IFeat
 			return;
 		
 		//handle only not-in-use folders
-		if (featureProject.getFeatureModel().isConcrete(folder.getName()))
+		if (featureProject.getFeatureModel().getFeature(folder.getName()).isConcrete())
 			return;
 
 		//decorate non-empty not-in-use folders

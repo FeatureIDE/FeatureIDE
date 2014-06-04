@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWizard;
@@ -47,27 +48,27 @@ public abstract class AbstractWizard extends Wizard implements IWorkbenchWizard 
 		super();
 		setWindowTitle(title);
 	}
-	
-	protected abstract void initPages(List<AbstractWizardPage> pages);
 
 	public final Object getData(String key) {
+		for (AbstractWizardPage page : pages) {
+			page.saveData();
+		}
 		return dataMap.get(key);
 	}
 
+	public final void putData(String key, Object data) {
+		dataMap.put(key, data);
+	}
+	
 	@Override
-	public void addPages() {
-		initPages(pages);
-		for (AbstractWizardPage page : pages) {
-			addPage(page);
-		}
-		super.addPages();
+	public void addPage(IWizardPage page) {
+		page.setWizard(this);
+		pages.add((AbstractWizardPage) page);
+		super.addPage(page);
 	}
 
 	@Override
 	public boolean performFinish() {
-		for (AbstractWizardPage page : pages) {
-			page.putData(dataMap);
-		}
 		return true;
 	}
 	

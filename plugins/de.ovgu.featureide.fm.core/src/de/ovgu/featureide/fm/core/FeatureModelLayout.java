@@ -26,12 +26,28 @@ package de.ovgu.featureide.fm.core;
  * @author soenke
  */
 public class FeatureModelLayout {
-	private boolean autoLayoutLegend = true;
-	private boolean showHiddenFeatures = true;
-	private boolean hasVerticalLayout = true;
-	private FMPoint legendPos = new FMPoint(0, 0);
+	private boolean autoLayoutLegend;
+	private boolean showHiddenFeatures;
+	private boolean hasVerticalLayout;
+	private FMPoint legendPos;
 
-	private int selectedLayoutAlgorithm = 1;
+	private int selectedLayoutAlgorithm;
+	
+	public FeatureModelLayout() {
+		this.autoLayoutLegend = true;
+		this.showHiddenFeatures = true;
+		this.hasVerticalLayout = true;
+		this.legendPos = new FMPoint(0, 0);
+		this.selectedLayoutAlgorithm = 1;
+	}
+	
+	protected FeatureModelLayout(FeatureModelLayout featureModelLayout) {
+		this.autoLayoutLegend = featureModelLayout.autoLayoutLegend;
+		this.showHiddenFeatures = featureModelLayout.showHiddenFeatures;
+		this.hasVerticalLayout = featureModelLayout.hasVerticalLayout;
+		this.legendPos = new FMPoint(featureModelLayout.legendPos.getX(), featureModelLayout.legendPos.getY());
+		this.selectedLayoutAlgorithm = featureModelLayout.selectedLayoutAlgorithm;
+	}
 
 	public void setLegendAutoLayout(boolean b) {
 		autoLayoutLegend = b;
@@ -75,5 +91,9 @@ public class FeatureModelLayout {
 
 	public boolean hasFeaturesAutoLayout() {
 		return (selectedLayoutAlgorithm != 0);
+	}
+	
+	public FeatureModelLayout clone() {
+		return new FeatureModelLayout(this);
 	}
 }
