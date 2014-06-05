@@ -658,6 +658,11 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 		return colorList;
 	}
 	
+	@Override
+	public int hashCode() {
+		return name.hashCode();
+	}
+	
 	// TODO fix UI bug when hashCode function is used.
 	// (feature model editor acts strange, root feature is not placed correctly)
 	// problem seems to be the static implementation of FeatureUIHelper

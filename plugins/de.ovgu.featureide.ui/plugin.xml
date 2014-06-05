@@ -75,28 +75,10 @@
             id="de.ovgu.featureide.ui.variantBuilder"
             objectClass="org.eclipse.core.resources.IProject">  
          <action
-               class="de.ovgu.featureide.ui.actions.generator.BuildAllValidConfigurationsAction"
-               id="de.ovgu.featureide.ui.actions.buildallvalidconfigurationsaction"
-               icon="icons/FeatureIconSmall.ico"
-               label="Build All Valid Configurations"
-               menubarPath="de.ovgu.featureide.fm.ui.menu/ui"
-               tooltip="Builds all possible configurations."
-               style="push">
-         </action>
-         <action
-               class="de.ovgu.featureide.ui.actions.generator.BuildAllCurrentConfigurationsAction"
-               id="de.ovgu.featureide.ui.actions.buildallconfigurationsaction"
-               icon="icons/FeatureIconSmall.ico"
-               label="Build All Current Configurations"
-               menubarPath="de.ovgu.featureide.fm.ui.menu/ui"
-               tooltip="Builds all current configurations."
-               style="push">
-         </action>
-         <action
-               class="de.ovgu.featureide.ui.actions.generator.BuildTWiseConfigurationsAction"
+               class="de.ovgu.featureide.ui.actions.generator.BuildProductsAction"
                icon="icons/FeatureIconSmall.ico"
                id="de.ovgu.featureide.ui.actions.buildallvalidconfigurationsaction"
-               label="Build T-Wise Configurations"
+               label="Product Generator"
                menubarPath="de.ovgu.featureide.fm.ui.menu/ui"
                style="push"
                tooltip="Builds all possible configurations.">

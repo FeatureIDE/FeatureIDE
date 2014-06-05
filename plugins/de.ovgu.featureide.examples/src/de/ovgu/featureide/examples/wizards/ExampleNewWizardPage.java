@@ -28,13 +28,16 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
+import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
@@ -79,6 +82,8 @@ import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.eclipse.ui.dialogs.IOverwriteQuery;
 import org.eclipse.ui.wizards.datatransfer.ImportOperation;
 
+import de.ovgu.featureide.core.builder.ComposerExtensionManager;
+import de.ovgu.featureide.core.builder.IComposerExtension;
 import de.ovgu.featureide.examples.ExamplePlugin;
 import de.ovgu.featureide.examples.utils.CommentParser;
 import de.ovgu.featureide.examples.utils.ExampleStructureProvider;
@@ -107,6 +112,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 	private CheckboxTreeViewer projectsList;
 	private Text descBox;
 
+	private Hashtable<String, List<ProjectRecord>> compTable; 
 	private ProjectRecord[] selectedProjects = new ProjectRecord[0];
 	private IProject[] wsProjects;
 	private String samplePath;
@@ -170,15 +176,36 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		projectsList.getControl().setLayoutData(listData);
 		projectsList.setContentProvider(new ITreeContentProvider() {
 
+			private ExampleNewWizardPage exampleNewWizardPage;
+			
 			public Object[] getChildren(Object parentElement) {
-				return new Object[0];
+				if (parentElement instanceof Hashtable) {
+					return ((Hashtable<String,List<ProjectRecord>>) parentElement).keySet().toArray();
+				} else if (parentElement instanceof String) {
+					return compTable.get((String) parentElement).toArray();
+				} else {
+					return new Object[0];
+				}
 			}
 
 			public Object[] getElements(Object inputElement) {
-				return selectedProjects;
+				if (inputElement == null) {
+					return new String[] { "Loading..." };
+				} else if (inputElement == exampleNewWizardPage) {
+					updateProjectsList(samplePath);
+					return compTable.keySet().toArray();
+				} else
+					return getChildren(exampleNewWizardPage);
 			}
 
 			public boolean hasChildren(Object element) {
+				if (element instanceof Hashtable) {
+					Hashtable<String, List<ProjectRecord>> hashtable = (Hashtable<String,List<ProjectRecord>>) element;
+					return hashtable.keySet().size() > 0; 
+				}
+				else if (element instanceof String) {
+					return !compTable.get((String) element).isEmpty();
+				}				
 				return false;
 			}
 
@@ -191,25 +218,58 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 
 			public void inputChanged(Viewer viewer, Object oldInput,
 					Object newInput) {
+				exampleNewWizardPage = (ExampleNewWizardPage) newInput;
 			}
 
 		});
 
 		projectsList.setLabelProvider(new LabelProvider() {
 			public String getText(Object element) {
-				return ((ProjectRecord) element).getProjectLabel();
+				if (element instanceof String) {
+					 List<IComposerExtension> composerExtensions = ComposerExtensionManager.getInstance().getComposers();
+					 for (IComposerExtension ic : composerExtensions) {
+						 if (ic.toString().contains((String)element)) {
+							 return ic.getName();
+						 }
+					 }
+					return (String) element;
+				} else if (element instanceof ProjectRecord) {
+					return ((ProjectRecord) element).getProjectLabel();
+				} else {
+					return "";
+				}
+				
 			}
 		});
 
 		projectsList.addCheckStateListener(new ICheckStateListener() {
 			public void checkStateChanged(CheckStateChangedEvent event) {
+				
+				if (event.getElement() instanceof String) {
+					for (ProjectRecord tmpRecord : compTable.get((String) event.getElement())) {
+						projectsList.setChecked(tmpRecord, projectsList.getChecked((String) event.getElement()));
+						if (tmpRecord.hasWarnings()) {
+							projectsList.setChecked(tmpRecord, false);
+							setMessage(tmpRecord.getWarningText(), WARNING);
+						}
+					}
+				} else {
+					ProjectRecord tmpRecord = (ProjectRecord) event.getElement();
+					if (tmpRecord.hasWarnings()) {
+						projectsList.setChecked(tmpRecord, false);
+						setMessage(tmpRecord.getWarningText(), WARNING);
+					}
+					boolean allChecked = true;
+					String compID = tmpRecord.description.getBuildSpec()[0].getArguments().get("composer");
+					String curComposer = compID.substring(compID.lastIndexOf(".") + 1);
+					for (ProjectRecord pr : compTable.get(curComposer)) {
+						if (!projectsList.getChecked(pr)) {
+							allChecked = false;
+						}
+					}
+					projectsList.setChecked(curComposer, allChecked);
 
-				ProjectRecord tmpRecord = (ProjectRecord) event.getElement();
-				if (tmpRecord.hasWarnings()) {
-					projectsList.setChecked(tmpRecord, false);
-					setMessage(tmpRecord.getWarningText(), WARNING);
 				}
-
 				setPageComplete(projectsList.getCheckedElements().length > 0);
 			}
 		});
@@ -221,17 +281,23 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 						if (event.getSelection() instanceof IStructuredSelection) {
 							IStructuredSelection iss = (IStructuredSelection) event.getSelection();
 							if (iss != null) {
-								ProjectRecord tmpRecord = (ProjectRecord) iss.getFirstElement();
-								
-								if (tmpRecord != null) {
-									descBox.setText(tmpRecord.getDescription());
+								if (iss.getFirstElement() instanceof String) {
+									descBox.setText("");
+									setMessage("");
+								} else if (iss.getFirstElement() instanceof ProjectRecord) {
+									ProjectRecord tmpRecord = (ProjectRecord) iss.getFirstElement();
 									
-									if (tmpRecord.hasWarnings()) {
-										setMessage(tmpRecord.getWarningText(), WARNING);
-									} else {
-										setMessage("");
+									if (tmpRecord != null) {
+										descBox.setText(tmpRecord.getDescription());
+										
+										if (tmpRecord.hasWarnings()) {
+											setMessage(tmpRecord.getWarningText(), WARNING);
+										} else {
+											setMessage("");
+										}
 									}
 								}
+								
 							}
 						}
 					}
@@ -242,6 +308,12 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		projectsList.setComparator(new ViewerComparator());
 
 		createSelectionButtons(listComposite);
+		
+		//Children in CheckboxTreeViewer are only requested when explicitly needed. When checking the composer checkbox (parent)  
+		//before once having expanded it, projects (children) had actually not been checked when expanded later. Hence projectsList  
+		//gets expanded and collapsed completely in the beginning to have all children/projects added.
+		projectsList.expandAll();
+		projectsList.collapseAll();
 	}
 
 	private void createDescriptionArea(Composite workArea) {
@@ -369,9 +441,25 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 						int index = 0;
 						monitor.worked(50);
 						monitor.subTask("Processing results");
+						compTable = new Hashtable<String, List<ProjectRecord>>();
+						//FH, DeltaJ, AHEAD, Antenna, AspectJ, Colligens, FC++, Munge
+
 						while (filesIterator.hasNext()) {
-							selectedProjects[index++] = filesIterator
-									.next();
+							ProjectRecord pr = filesIterator.next();
+							String compID = "", composer = "";
+							
+							for (ICommand command : pr.description.getBuildSpec()) {
+								if (command.getArguments().containsKey("composer")) {
+									compID = command.getArguments().get("composer");
+									composer = compID.substring(compID.lastIndexOf(".") + 1);
+									if (!compTable.containsKey(composer)) {
+										compTable.put(composer, new LinkedList<ProjectRecord>());
+									}
+									compTable.get(composer).add(pr);
+									break;
+								}
+							}
+							selectedProjects[index++] = pr;
 						}
 					} else {
 						monitor.worked(60);
@@ -386,7 +474,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 			ExamplePlugin.getDefault().logError(e);
 		}
 
-		projectsList.refresh(true);
+		if (projectsList != null) projectsList.refresh(true);
 
 	//	setPageComplete(projectsList.getCheckedElements().length > 0);
 	}
@@ -553,8 +641,16 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 						throw new OperationCanceledException();
 					}
 					for (int i = 0; i < selected.length; i++) {
-						createExistingProject((ProjectRecord) selected[i],
-								new SubProgressMonitor(monitor, 1));
+						if (selected[i] instanceof ProjectRecord) {
+							createExistingProject((ProjectRecord) selected[i],
+									new SubProgressMonitor(monitor, 1));	
+						} else if (selected[i] instanceof String) {
+							for (ProjectRecord tmpRecord : compTable.get((String) selected[i])) {
+								createExistingProject(tmpRecord,
+										new SubProgressMonitor(monitor, 1));	
+
+							}
+						}
 					}
 				} finally {
 					monitor.done();

@@ -5,7 +5,16 @@ which can be found here:
 
 https://faracvs.cs.uni-magdeburg.de/projects/tthuem-FeatureIDE/report/6
 
+and here:
+
+https://github.com/tthuem/FeatureIDE/issues/milestones
+
 Here, is a list of high-level enhancements.
+
+Release 2.7.0 (April 2014)
+* Advanced support for contracts in FeatureHouse projects (e.g., collaboration diagram and outline, error markers, statistics on contracts, improved variability encoding)
+* Performance of feature-model editor and analyses improved
+* New support for prioritizing products in t-wise generation
 
 Release 2.6.7 (October 2013)
 * New view calculating statistics on FeatureIDE projects
