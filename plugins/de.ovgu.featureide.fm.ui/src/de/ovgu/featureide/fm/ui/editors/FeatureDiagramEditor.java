@@ -61,6 +61,7 @@ import org.eclipse.ui.progress.UIJob;
 
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.ConstraintAttribute;
+import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
@@ -330,10 +331,18 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 				.hasFeaturesAutoLayout());
 
 		boolean connectionSelected = alternativeAction.isConnectionSelected();
+		boolean mplModel = false;
+		if (getFeatureModel() instanceof ExtendedFeatureModel) {
+			ExtendedFeatureModel ext = (ExtendedFeatureModel) getFeatureModel();
+			mplModel = ext.isMultiProductLineModel();
+		}
 
+		if (mplModel) {
+			menu.add(createConstraintAction);
+		}
 		// don't show menu to change group type of a feature in case a
 		// connection line is selected
-		if ((createLayerAction.isEnabled() || createCompoundAction.isEnabled())
+		else if ((createLayerAction.isEnabled() || createCompoundAction.isEnabled())
 				&& !connectionSelected) {
 			menu.add(createCompoundAction);
 			menu.add(createLayerAction);

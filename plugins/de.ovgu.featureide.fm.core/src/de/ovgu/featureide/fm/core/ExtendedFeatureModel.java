@@ -151,7 +151,10 @@ public class ExtendedFeatureModel extends FeatureModel {
 	public FeatureAttributeMap<String> getStringAttributes() {
 		return this.stringAttributes;
 	}
-
+	
+	public boolean isMultiProductLineModel() {
+		return !usedModels.isEmpty();
+	}
 	/**
 	 * Check if the feature model contains instance features.
 	 * 
