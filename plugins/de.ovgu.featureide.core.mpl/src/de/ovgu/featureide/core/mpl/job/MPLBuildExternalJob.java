@@ -50,13 +50,15 @@ public class MPLBuildExternalJob extends AMonitorJob<MPLBuildExternalJob.Argumen
 
 	public static class Arguments extends AJobArguments {
 		private final IFeatureProject externalFeatureProject;
+		private final IFolder buildFolder;
 		private final String configName;
 		private final Configuration config;
 
-		public Arguments(IFeatureProject externalProject, Configuration config,
+		public Arguments(IFeatureProject externalProject, IFolder buildFolder, Configuration config,
 				String configName) {
 			super(Arguments.class);
 			this.externalFeatureProject = externalProject;
+			this.buildFolder = buildFolder;
 			this.config = config;
 			this.configName = configName;
 		}
@@ -81,12 +83,11 @@ public class MPLBuildExternalJob extends AMonitorJob<MPLBuildExternalJob.Argumen
 			return false;
 		}
 		
-		IFolder buildFolder = arguments.externalFeatureProject.getBuildFolder();
+		IFolder buildFolder = arguments.buildFolder;
 		try {
 			for (IResource member : buildFolder.members()) {
 				member.delete(true, monitor);
 			}
-			tempConfigFile.refreshLocal(IResource.DEPTH_ZERO, monitor);
 		} catch (CoreException e) {
 			MPLPlugin.getDefault().logError(e);
 			return false;
@@ -105,9 +106,20 @@ public class MPLBuildExternalJob extends AMonitorJob<MPLBuildExternalJob.Argumen
 				CorePlugin.getDefault().logError(e);
 				return false;
 			}
-			composerExtension.copyNotComposedFiles(c, buildFolder);
+			composerExtension.copyNotComposedFiles(c, arguments.externalFeatureProject.getBuildFolder());
+			
+			IFolder tempFolder = buildFolder.getFolder(arguments.configName);
+			if (!tempFolder.exists()) {
+				try {
+					tempFolder.create(true, true, null);
+				} catch (CoreException e) {
+					CorePlugin.getDefault().logError(e);
+					return false;
+				}
+			}
+			
 			try {
-				arguments.externalFeatureProject.getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
+				buildFolder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 			} catch (CoreException e) {
 				CorePlugin.getDefault().logError(e);
 			}
@@ -121,9 +133,9 @@ public class MPLBuildExternalJob extends AMonitorJob<MPLBuildExternalJob.Argumen
 		// Get partial configs
 		final Configuration newConfiguration = new Configuration(featureModel);
 		for (SelectableFeature feature : config.getFeatures()) {
-			if (feature.getName().startsWith(configName)) {
+			if (feature.getName().startsWith(configName + ".")) {
 				String featureName = feature.getName().substring(
-						configName.length());
+						configName.length() + 1);
 				try {
 					newConfiguration.setManual(featureName, feature.getSelection());
 				} catch (Exception e) {

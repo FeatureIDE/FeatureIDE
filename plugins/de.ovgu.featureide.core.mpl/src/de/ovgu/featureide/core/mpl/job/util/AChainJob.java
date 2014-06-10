@@ -107,7 +107,7 @@ public abstract class AChainJob<T extends AJobArguments> extends Job implements 
 	@SuppressWarnings("deprecation")
 	@Override
 	public void canceling() {
-		if (innerThread == null) {
+		if (abort()) {
 			return;
 		}
 		
@@ -166,6 +166,16 @@ public abstract class AChainJob<T extends AJobArguments> extends Job implements 
 		}
 	}
 	
+	public final boolean abort() {
+		if (innerThread == null) {
+			synchronized (done) {
+				done = true;
+			}
+			return true;
+		}
+		return false;
+	}
+	
 	protected final boolean checkCancel() {
 		return Thread.currentThread() == innerThread.thread;
 	}
@@ -174,10 +184,11 @@ public abstract class AChainJob<T extends AJobArguments> extends Job implements 
 	
 	private void startNextJob() {
 		while (nextJob != null) {
-			if (nextJob.ignoresPreviousJobFail() || (innerThread != null && innerThread.ok)) {
+			if (nextJob.ignoresPreviousJobFail() || innerThread == null || innerThread.ok) {
 				nextJob.schedule();
 				nextJob = null;
 			} else {
+				nextJob.abort();
 				nextJob = nextJob.getNextJob();
 			}
 		}

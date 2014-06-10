@@ -20,62 +20,29 @@
  */
 package de.ovgu.featureide.fm.core;
 
+import org.prop4j.Node;
+
 /**
- * Feature for the {@link ExtendedFeatureModel}.
  * 
  * @author Sebastian Krieter
  */
-public class ExtendedFeature extends Feature {
+public class ExtendedConstraint extends Constraint {
 	
-	public static final int 
-		TYPE_INTERN = 0,
-		TYPE_INHERITED = 1,
-		TYPE_INTERFACE = 2,
-		TYPE_INSTANCE = 3;
+	private int type = ExtendedFeature.TYPE_INTERN;
 	
-	private int type = TYPE_INTERN;
-	private String externalModelName = null;
-
 	/**
 	 * @param featureModel
-	 * @param name
+	 * @param propNode
 	 */
-	public ExtendedFeature(FeatureModel featureModel, String name) {
-		super(featureModel, name);
+	public ExtendedConstraint(FeatureModel featureModel, Node propNode) {
+		super(featureModel, propNode);
 	}
-	
-	/**
-	 * @return the type
-	 */
+
 	public int getType() {
 		return type;
 	}
 
-	public boolean isInherited() {
-		return type == TYPE_INHERITED;
-	}
-	
-	public boolean isInterface() {
-		return type == TYPE_INTERFACE;
-	}
-	
-	public boolean isInstance() {
-		return type == TYPE_INSTANCE;
-	}
-	
-	public boolean isFromExtern() {
-		return type != TYPE_INTERN;
-	}
-	
 	public void setType(int type) {
 		this.type = type;
-	}
-
-	public String getExternalModelName() {
-		return externalModelName;
-	}
-
-	public void setExternalModelName(String externalModelName) {
-		this.externalModelName = externalModelName;
 	}
 }

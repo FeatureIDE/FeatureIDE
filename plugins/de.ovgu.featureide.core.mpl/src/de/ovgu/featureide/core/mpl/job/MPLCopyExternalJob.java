@@ -64,7 +64,7 @@ public class MPLCopyExternalJob extends AMonitorJob<MPLCopyExternalJob.Arguments
 			for (int i = 0; i < srcMembers.length; i++) {
 				IResource srcMember = srcMembers[i];
 				srcMember.move(destPath.append(srcMember.getName()), true, monitor);
-			}	
+			}
 		} catch (CoreException e) {
 			MPLPlugin.getDefault().logError(e);
 			return false;

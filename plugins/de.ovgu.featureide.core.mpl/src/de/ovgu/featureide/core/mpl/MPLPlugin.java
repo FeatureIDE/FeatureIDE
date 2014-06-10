@@ -36,6 +36,7 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.jdt.core.CompletionProposal;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.Signature;
@@ -80,6 +81,8 @@ import de.ovgu.featureide.fm.core.PropertyConstants;
  */
 public class MPLPlugin extends AbstractCorePlugin {
 	public static final String PLUGIN_ID = "de.ovgu.featureide.core.mpl";
+
+	public static final QualifiedName mappingConfigID = new QualifiedName("mplproject.mappings", "currentMapping");
 
 	private static MPLPlugin plugin;
 	private final HashMap<String, InterfaceProject> projectMap = new HashMap<String, InterfaceProject>();
@@ -131,7 +134,13 @@ public class MPLPlugin extends AbstractCorePlugin {
 				IFolder mappingFolder = project.getFolder("InterfaceMapping");
 				if (!mappingFolder.exists())
 					mappingFolder.create(true, true, null);
-
+				
+				IFile mappingFile = mappingFolder.getFile("default.config");
+				if (!mappingFile.exists()) {
+					mappingFile.create(new ByteArrayInputStream(new byte[0]), true, null);
+				}
+				project.setPersistentProperty(mappingConfigID, "default.config");
+				
 				// create interfaces mapping file
 				IFile mplVelvet = project.getFile("mpl.velvet");
 				if (!mplVelvet.exists()) {
@@ -140,10 +149,6 @@ public class MPLPlugin extends AbstractCorePlugin {
 							+ project.getName()).getBytes();
 					InputStream source = new ByteArrayInputStream(bytes);
 					mplVelvet.create(source, true, null);
-				}
-				IFile mappingFile = project.getFile("defaultMapping.config");
-				if (!mappingFile.exists()) {
-					mappingFile.create(new ByteArrayInputStream(new byte[0]), true, null);
 				}
 			} catch (CoreException e) {
 				logError(e);
@@ -281,6 +286,14 @@ public class MPLPlugin extends AbstractCorePlugin {
 	
 	public void buildJavaProject(IFile featureListFile, String name) {
 		new JavaProjectWriter(getInterfaceProject(featureListFile.getProject())).buildJavaProject(featureListFile, name);
+	}
+	
+	public void setCurrentMapping(IProject project, String name) {
+		try {
+			project.setPersistentProperty(mappingConfigID, name);
+		} catch (CoreException e) {
+			logError(e);
+		}
 	}
 	
 	public void addViewTag(IProject project, String name) {

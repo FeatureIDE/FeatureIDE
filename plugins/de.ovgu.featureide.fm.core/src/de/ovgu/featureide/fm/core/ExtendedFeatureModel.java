@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.core;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.CheckForNull;
@@ -41,21 +42,32 @@ import de.ovgu.featureide.fm.core.constraint.analysis.ExtendedFeatureModelAnalyz
  */
 public class ExtendedFeatureModel extends FeatureModel {
 
-	public static class UsedModel {		
+	public static class UsedModel {
 		private final String modelName;
+		private final String varName;
 		private final int type;
 		
-		public UsedModel(String modelName, int type) {
+		public UsedModel(String modelName, String varName, int type) {
 			this.modelName = modelName;
+			this.varName = varName;
 			this.type = type;
 		}
 
 		public String getModelName() {
 			return modelName;
 		}
-
+		
+		public String getVarName() {
+			return varName;
+		}
+		
 		public int getType() {
 			return type;
+		}
+
+		@Override
+		public String toString() {
+			return modelName + " " + varName;
 		}
 	}
 	protected final FeatureAttributeMap<Integer> integerAttributes = new FeatureAttributeMap<Integer>();
@@ -64,6 +76,8 @@ public class ExtendedFeatureModel extends FeatureModel {
 	protected final LinkedList<Equation> attributeConstraints = new LinkedList<Equation>();
 	
 	protected final Map<String, UsedModel> usedModels = new HashMap<String, UsedModel>();
+	protected final List<Constraint> ownConstraints = new LinkedList<Constraint>();
+	
 	protected FeatureModel mappingModel = null;
 
 	@Override
@@ -113,7 +127,7 @@ public class ExtendedFeatureModel extends FeatureModel {
 		if (usedModels.containsKey(varName)) {
 			return false;
 		} else {
-			usedModels.put(varName, new UsedModel(varType, modelType));
+			usedModels.put(varName, new UsedModel(varType, varName, modelType));
 			return true;
 		}
 	}

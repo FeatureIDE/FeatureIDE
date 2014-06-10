@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -42,7 +43,9 @@ import de.ovgu.featureide.core.mpl.job.MPLRenameExternalJob;
 import de.ovgu.featureide.core.mpl.job.util.AJobArguments;
 import de.ovgu.featureide.core.mpl.job.util.IChainJob;
 import de.ovgu.featureide.core.mpl.job.util.JobManager;
+import de.ovgu.featureide.fm.core.ExtendedFeature;
 import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
+import de.ovgu.featureide.fm.core.ExtendedFeatureModel.UsedModel;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
@@ -58,12 +61,32 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 	public static final String BUILDER_ID = MPLPlugin.PLUGIN_ID + ".MSPLBuilder";
 	public static final String COMPOSER_KEY = "composer";
 	
+	private boolean ignorePreviousJobFail = true;
+	
 	public MSPLBuilder() {
 		super();
 	}
 
 	protected void clean(IProgressMonitor monitor) throws CoreException {
-		// not implemented yet
+		IProject project = getProject();
+		if (project == null) {
+			MPLPlugin.getDefault().logWarning("no project got");
+			return;
+		}
+		cleanProject(CorePlugin.getFeatureProject(project), monitor);
+	}
+	
+	private boolean cleanProject(IFeatureProject featureProject, IProgressMonitor monitor) {
+		IFolder buildFolder = featureProject.getBuildFolder();
+		try {
+			for (IResource member : buildFolder.members()) {
+				member.delete(true, monitor);
+			}
+		} catch (CoreException e) {
+			MPLPlugin.getDefault().logError(e);
+			return false;
+		}
+		return true;
 	}
 
 	@SuppressWarnings({ "rawtypes" })
@@ -83,9 +106,10 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 			return null;
 		}
 		ExtendedFeatureModel extFeatureModel = (ExtendedFeatureModel) featureModel;
-
 		// build own project
 		tempConfigFile = featureProject.getCurrentConfiguration();
+
+		cleanProject(featureProject, monitor);
 		buildProject(featureProject, kind, monitor);
 
 		// get mapping of other projects
@@ -93,7 +117,12 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 		final Configuration config = new Configuration(extFeatureModel);
 		
 		try {
-			new ConfigurationReader(mappedProjects).readFromFile(project.getFile("InterfaceMapping/default.config"));
+			String mappingFileName = project.getPersistentProperty(MPLPlugin.mappingConfigID);
+			if (mappingFileName == null) {
+				MPLPlugin.getDefault().logInfo("No mapping file specified.");
+				return null;
+			}
+			new ConfigurationReader(mappedProjects).readFromFile(project.getFile("InterfaceMapping/" + mappingFileName));
 			new ConfigurationReader(config).readFromFile(tempConfigFile);
 		} catch (CoreException e) {
 			MPLPlugin.getDefault().logError(e);
@@ -103,29 +132,57 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 			return null;
 		}
 		
+		final IFolder srcFolder = getBuildFolder(featureProject, tempConfigFile.getName().split("[.]")[0]);
+		ignorePreviousJobFail = true;
+		
 		// build other projects
+		// build interfaces
 		for (final Feature mappedProject : mappedProjects.getSelectedFeatures()) {
 			if (mappedProject.isConcrete()) {
-				final int splittIndex = mappedProject.getName().lastIndexOf('.') + 1;
-				if (splittIndex == 0) {
+				final int splittIndex = mappedProject.getName().lastIndexOf('.');
+				if (splittIndex == -1) {
 					// can this happen???
 				}
-				final String projectName = mappedProject.getName().substring(splittIndex);
+				final String projectName = mappedProject.getName().substring(splittIndex + 1);
 				final String configName = mappedProject.getName().substring(0, splittIndex);
 				
 				final IFeatureProject externalFeatureProject = CorePlugin.getFeatureProject(
 						ResourcesPlugin.getWorkspace().getRoot().getProject(projectName));
 				
 				//build
-				startJob(project, new MPLBuildExternalJob.Arguments(externalFeatureProject, config, configName));
+				startJob(project, new MPLBuildExternalJob.Arguments(
+						externalFeatureProject, getBuildFolder(externalFeatureProject, "tempConfig"), config, configName));
 				
 				// rename
-				startJob(project, new MPLRenameExternalJob.Arguments(externalFeatureProject.getProject(), configName));
+				startJob(project, new MPLRenameExternalJob.Arguments(
+						externalFeatureProject.getProject(), configName));
 				
 				// copy
 				startJob(project, new MPLCopyExternalJob.Arguments(
-						externalFeatureProject.getBuildFolder().getFolder("tempConfig"), 
-						featureProject.getBuildFolder().getFolder(tempConfigFile.getName().split("[.]")[0])));
+						getBuildFolder(externalFeatureProject, "tempConfig"), srcFolder));
+			}
+		}
+		
+		// build instances
+		for (UsedModel usedModel : extFeatureModel.getExternalModels().values()) {
+			if (usedModel.getType() == ExtendedFeature.TYPE_INSTANCE) {
+				final String projectName = usedModel.getModelName();
+				final String configName = usedModel.getVarName();
+				
+				final IFeatureProject externalFeatureProject = CorePlugin.getFeatureProject(
+						ResourcesPlugin.getWorkspace().getRoot().getProject(projectName));
+				
+				//build
+				startJob(project, new MPLBuildExternalJob.Arguments(
+						externalFeatureProject, getBuildFolder(externalFeatureProject, "tempConfig"), config, configName));
+				
+				// rename
+				startJob(project, new MPLRenameExternalJob.Arguments(
+						externalFeatureProject.getProject(), configName));
+				
+				// copy
+				startJob(project, new MPLCopyExternalJob.Arguments(
+						getBuildFolder(externalFeatureProject, "tempConfig"), srcFolder));
 			}
 		}
 		return null;
@@ -133,8 +190,18 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 
 	private void startJob(IProject project, AJobArguments arg) {
 		IChainJob curJob = arg.createJob();
-		curJob.setIgnorePreviousJobFail(false);
+		curJob.setIgnorePreviousJobFail(ignorePreviousJobFail);
+		ignorePreviousJobFail = false;
 		JobManager.addJob(project, curJob);
+	}
+	
+	private IFolder getBuildFolder(IFeatureProject externalFeatureProject, String configName) {
+		IFolder buildFolder = externalFeatureProject.getBuildFolder();
+		externalFeatureProject.getComposer();
+		if (externalFeatureProject.getComposerID().equals("de.ovgu.featureide.composer.featurehouse")) {
+			return buildFolder.getFolder(configName);
+		}
+		return buildFolder;
 	}
 	
 	private IFile tempConfigFile = null;

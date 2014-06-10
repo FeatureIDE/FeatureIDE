@@ -81,9 +81,9 @@ velvetModel
 	
 concept 
 	: CONCEPT ID  
-		(COLON conceptBaseExt)? (instanceImports)? (interfaceImports)? 
-		definitions 
-	-> ^(CONCEPT ID conceptBaseExt? instanceImports? interfaceImports? definitions)
+		(COLON conceptBaseExt)? (instanceImports interfaceImports | interfaceImports instanceImports | interfaceImports | instanceImports)? 
+		definitions?
+	-> ^(CONCEPT ID conceptBaseExt? instanceImports? interfaceImports? definitions?)
 	;
 
 conceptBaseExt
@@ -115,13 +115,15 @@ name: ID
 	;
 	
 definitions
-	: START_C def END_C
-	-> ^(DEF def)
+	: START_C definition END_C
+	-> ^(DEF definition)
 	;
 
-def	: nonFeatureDefinition* (
+definition 
+	: nonFeatureDefinition* (
 		(featureGroup nonFeatureDefinition*) |
-		(feature (feature | nonFeatureDefinition)*))?
+		(feature (feature | nonFeatureDefinition)*)
+	)?
 	;			
 	
 nonFeatureDefinition
