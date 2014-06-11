@@ -1,0 +1,13 @@
+delta DWonderful {
+	modifies Hello {
+		removesMethod printBeautiful;
+		
+		adds String printWonderful() {
+			return " wonderful";
+		}
+		
+		modifies String print() {
+			return new Hello().printHello() + new Hello().printWonderful();
+		}
+	}
+}
