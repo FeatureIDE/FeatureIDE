@@ -1,0 +1,15 @@
+delta DHello {
+	adds class Hello {
+		String printHello() {
+			return "Hello";
+		}
+		
+		String printBeautiful() {
+			return " beautiful";
+		}
+		
+		String print() {
+			return new Hello().printHello() + new Hello().printBeautiful();
+		}
+	}
+}

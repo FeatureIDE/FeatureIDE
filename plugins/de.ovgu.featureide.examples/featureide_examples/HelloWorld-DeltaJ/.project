@@ -14,7 +14,7 @@
 				</dictionary>
 				<dictionary>
 					<key>composer</key>
-					<value>de.ovgu.featureide.core.deltaj.deltajcomposer</value>
+					<value>de.ovgu.featureide.composer.deltaj</value>
 				</dictionary>
 				<dictionary>
 					<key>equations</key>
@@ -33,8 +33,7 @@
 		</buildCommand>
 	</buildSpec>
 	<natures>
-		<nature>de.ovgu.featureide.core.featureProjectNature</nature>
-		<nature>org.eclipse.xtext.ui.shared.xtextNature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
+		<nature>de.ovgu.featureide.core.featureProjectNature</nature>
 	</natures>
 </projectDescription>
