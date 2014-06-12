@@ -20,7 +20,19 @@
  */
 package de.ovgu.featureide.fm.core;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.util.Collection;
+
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.osgi.framework.BundleContext;
+
+import de.ovgu.featureide.fm.core.ExtendedFeatureModel.UsedModel;
+import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
+import de.ovgu.featureide.fm.core.io.ModelIOFactory;
 
 /**
  * The activator class controls the plug-in life cycle.
@@ -62,5 +74,92 @@ public class FMCorePlugin extends AbstractCorePlugin {
 	public static FMCorePlugin getDefault() {
 		return plugin;
 	}
+	
+	public void analyzeModel(IFile file) {
+		logInfo("Reading Model File...");
+		final IContainer outputDir = file.getParent();
+		if (outputDir == null || !(outputDir instanceof IFolder)) {
+			return;
+		}
+		
+		final int modelType = ModelIOFactory.getTypeByFileName(file.getName());
+		if (modelType == ModelIOFactory.TYPE_UNKNOWN) {
+			return;
+		}
+		final FeatureModel fm = ModelIOFactory.getNewFeatureModel(modelType);
+		final AbstractFeatureModelReader reader = ModelIOFactory.getModelReader(fm, modelType);
+		
+		try {
+			reader.readFromFile(file.getLocation().toFile());
+			FeatureModelAnalyzer fma = new FeatureModelAnalyzer(fm);
+			fma.analyzeFeatureModel(null);
+			
+			final StringBuilder sb = new StringBuilder();
+			sb.append("Number Features: ");
+			sb.append(fm.getNumberOfFeatures());
+			sb.append(" (");
+			sb.append(fma.countConcreteFeatures());
+			sb.append(")\n");
+			
+			if (fm instanceof ExtendedFeatureModel) {
+				ExtendedFeatureModel extFeatureModel = (ExtendedFeatureModel) fm;
+				int countInherited = 0;
+				int countInstances = 0;
+				for (UsedModel usedModel : extFeatureModel.getExternalModels().values()) {
+					switch (usedModel.getType()) {
+					case ExtendedFeature.TYPE_INHERITED:
+						countInherited++;
+						break;
+					case ExtendedFeature.TYPE_INSTANCE:
+						countInstances++;
+						break;
+					}
+				}
+				sb.append("Number Instances: ");
+				sb.append(countInstances);
+				sb.append("\n");
+				sb.append("Number Inherited: ");
+				sb.append(countInherited);
+				sb.append("\n");
+			}
 
+			Collection<Feature> analyzedFeatures = fma.getCoreFeatures();
+			sb.append("Core Features (");
+			sb.append(analyzedFeatures.size());
+			sb.append("): ");
+			for (Feature coreFeature : analyzedFeatures) {
+				sb.append(coreFeature.getName());
+				sb.append(", ");
+			}
+			analyzedFeatures = fma.getDeadFeatures();
+			sb.append("\nDead Features (");
+			sb.append(analyzedFeatures.size());
+			sb.append("): ");
+			for (Feature deadFeature : analyzedFeatures) {
+				sb.append(deadFeature.getName());
+				sb.append(", ");
+			}
+			analyzedFeatures = fma.getFalseOptionalFeatures();
+			sb.append("\nFO Features (");
+			sb.append(analyzedFeatures.size());
+			sb.append("): ");
+			for (Feature foFeature : analyzedFeatures) {
+				sb.append(foFeature.getName());
+				sb.append(", ");
+			}
+			sb.append("\n");
+
+			final IFile outputFile = ((IFolder) outputDir).getFile(file.getName() + "_output.txt");
+			final InputStream inputStream = new ByteArrayInputStream(
+					sb.toString().getBytes(Charset.defaultCharset()));
+			if (outputFile.isAccessible()) {
+				outputFile.setContents(inputStream, false, true, null);
+			} else {
+				outputFile.create(inputStream, true, null);
+			}
+			logInfo("Printed Output File.");
+		} catch (Exception e) {
+			logError(e);
+		}
+	}
 }

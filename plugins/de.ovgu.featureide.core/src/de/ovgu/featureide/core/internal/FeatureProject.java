@@ -77,10 +77,9 @@ import de.ovgu.featureide.fm.core.configuration.FeatureOrderReader;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
+import de.ovgu.featureide.fm.core.io.ModelIOFactory;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslReader;
-import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelReader;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 
 /**
@@ -239,11 +238,11 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		if (project.getFile("mpl.velvet").exists()) {
 			modelFile = new FeatureModelFile(project.getFile("mpl.velvet"));
 			featureModel = new ExtendedFeatureModel();
-			tmpModelReader = new VelvetFeatureModelReader(featureModel);
+			tmpModelReader = ModelIOFactory.getModelReader(featureModel, ModelIOFactory.TYPE_VELVET);
 		} else {
 			modelFile = new FeatureModelFile(project.getFile("model.xml"));
 			featureModel = new FeatureModel();
-			tmpModelReader = new XmlFeatureModelReader(featureModel);
+			tmpModelReader = ModelIOFactory.getModelReader(featureModel, ModelIOFactory.TYPE_XML);
 		}
 
 		featureModel.addListener(new FeatureModelChangeListner());

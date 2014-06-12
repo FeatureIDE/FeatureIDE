@@ -47,6 +47,12 @@ public class ExtendedFeatureModel extends FeatureModel {
 		private final String varName;
 		private final int type;
 		
+		public UsedModel(UsedModel usedModel, String parentName) {
+			this.modelName = usedModel.modelName;
+			this.varName = parentName + usedModel.varName;
+			this.type = usedModel.type;
+		}
+		
 		public UsedModel(String modelName, String varName, int type) {
 			this.modelName = modelName;
 			this.varName = varName;
@@ -121,6 +127,15 @@ public class ExtendedFeatureModel extends FeatureModel {
 	
 	public boolean addInheritance(final String varType, final String varName) {
 		return addModel(varType, varName, ExtendedFeature.TYPE_INHERITED);
+	}
+	
+	public boolean addExternalModel(final UsedModel model) {
+		if (usedModels.containsKey(model.varName)) {
+			return false;
+		} else {
+			usedModels.put(model.varName, model);
+			return true;
+		}
 	}
 	
 	private boolean addModel(final String varType, final String varName, int modelType) {

@@ -68,22 +68,16 @@ import org.eclipse.ui.part.MultiPageEditorPart;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
-import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelFile;
 import de.ovgu.featureide.fm.core.PropertyConstants;
-import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
-import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
+import de.ovgu.featureide.fm.core.io.ModelIOFactory;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslWriter;
-import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelReader;
-import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelWriter;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.FeatureModelEditorContributor;
@@ -117,9 +111,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 
 	IFeatureModelReader featureModelReader;
 	IFeatureModelWriter featureModelWriter;
-
-	private Class<? extends AbstractFeatureModelReader> featureModelReaderclass;
-	private Class<? extends AbstractFeatureModelWriter> featureModelWriterclass;
+	
+	private int ioType;
 
 	FeatureModelFile fmFile;
 	private IFile file;
@@ -153,27 +146,23 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		setPartName(file.getProject().getName() + " Model");
 		setTitleToolTip(input.getToolTipText());
 		super.setInput(input);
-
-		if (file.getName().endsWith(".velvet")) {
-			featureModel = new ExtendedFeatureModel();
-			originalFeatureModel = new ExtendedFeatureModel();
-			featureModelReaderclass = VelvetFeatureModelReader.class;
-			featureModelWriterclass = VelvetFeatureModelWriter.class;
-		} else {
-			featureModel = new FeatureModel();
-			originalFeatureModel = new FeatureModel();
-			featureModelReaderclass = XmlFeatureModelReader.class;
-			featureModelWriterclass = XmlFeatureModelWriter.class;
+		
+		ioType = ModelIOFactory.getTypeByFileName(file.getName());
+		if (ioType == ModelIOFactory.TYPE_UNKNOWN) {
+			FMUIPlugin.getDefault().logWarning("Unknown file extension.");
 		}
-
-		featureModelReader = createFeatureModelReaderInstance(featureModel);
-		featureModelWriter = createFeatureModelWriterInstance(featureModel);
+		
+		featureModel = ModelIOFactory.getNewFeatureModel(ioType);
+		originalFeatureModel = ModelIOFactory.getNewFeatureModel(ioType);
+		
+		featureModelReader = ModelIOFactory.getModelReader(featureModel, ioType);
+		featureModelWriter = ModelIOFactory.getModelWriter(featureModel, ioType);
 
 		try {
-			new FeatureModelReaderIFileWrapper(createFeatureModelReaderInstance(
-					originalFeatureModel)).readFromFile(file);
-			new FeatureModelReaderIFileWrapper(createFeatureModelReaderInstance(
-					featureModel)).readFromFile(file);
+			new FeatureModelReaderIFileWrapper(
+					ModelIOFactory.getModelReader(originalFeatureModel, ioType)).readFromFile(file);
+			new FeatureModelReaderIFileWrapper(
+					ModelIOFactory.getModelReader(featureModel, ioType)).readFromFile(file);
 		} catch (Exception e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
@@ -185,32 +174,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		getExtensions();
 
 		FMPropertyManager.registerEditor(featureModel);
-	}
-
-	private AbstractFeatureModelReader createFeatureModelReaderInstance(
-			FeatureModel featureModel) {
-		try {
-			return (AbstractFeatureModelReader) featureModelReaderclass
-					.getConstructor(FeatureModel.class).newInstance(
-							featureModel);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return null;
-	}
-
-	private AbstractFeatureModelWriter createFeatureModelWriterInstance(
-			FeatureModel featureModel) {
-		try {
-			return (AbstractFeatureModelWriter) featureModelWriterclass
-					.getConstructor(FeatureModel.class).newInstance(
-							featureModel);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return null;
 	}
 
 	/**
@@ -493,8 +456,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 			textEditor.doSave(monitor);
 		} else {
 			try {
-				new FeatureModelWriterIFileWrapper(createFeatureModelWriterInstance(
-						featureModel)).writeToFile(getModelFile());
+				new FeatureModelWriterIFileWrapper(
+						ModelIOFactory.getModelWriter(featureModel, ioType)).writeToFile(getModelFile());
 			} catch (CoreException e) {
 				FMUIPlugin.getDefault().logError(e);
 			}
@@ -502,8 +465,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 
 		// set originalFeatureModel
 		try {
-			new FeatureModelReaderIFileWrapper(createFeatureModelReaderInstance(
-					originalFeatureModel)).readFromFile(fmFile.getResource());
+			new FeatureModelReaderIFileWrapper(
+					ModelIOFactory.getModelReader(originalFeatureModel, ioType)).readFromFile(fmFile.getResource());
 		} catch (Exception e) {
 			FMUIPlugin.getDefault().logError(e);
 		}

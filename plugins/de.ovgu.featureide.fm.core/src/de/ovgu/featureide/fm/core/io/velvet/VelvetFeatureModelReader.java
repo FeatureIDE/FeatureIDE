@@ -24,6 +24,7 @@ import static java.lang.String.format;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
@@ -68,8 +69,8 @@ import de.ovgu.featureide.fm.core.constraint.ReferenceType;
 import de.ovgu.featureide.fm.core.constraint.RelationOperator;
 import de.ovgu.featureide.fm.core.constraint.WeightedTerm;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
+import de.ovgu.featureide.fm.core.io.ModelIOFactory;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 
 /**
  * Parses a feature model in Velvet syntax.
@@ -78,6 +79,16 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
  * @author Matthias Strauss
  */
 public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
+	
+	private static class ConstraintNode {
+		private final Node computedNode;
+		private final Tree rawNode;
+		
+		public ConstraintNode(Node computedNode, Tree rawNode) {
+			this.computedNode = computedNode;
+			this.rawNode = rawNode;
+		}
+	}
 
 	private static final int[] binaryOperators = { 
 		VelvetParser.OP_OR, VelvetParser.OP_AND, 
@@ -90,12 +101,13 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 	
 	private final LinkedList<Tree> atrributeConstraintNodes = new LinkedList<Tree>();
 	private final LinkedList<Feature> parentStack = new LinkedList<Feature>();
+	private final LinkedList<ConstraintNode> constraintNodeList = new LinkedList<ConstraintNode>();
 	private final HashSet<String> usedVariables = new HashSet<String>();
 	
 	private ModelMarkerHandler modelMarkerHandler;
 	private ExtendedFeatureModel extFeatureModel;
 	private String extFeatureModelName;
-	private boolean cinterface;
+	private boolean cinterface, localSearch = false;
 	
 	/**
 	 * Reads external model with the right FeatureModelReader.
@@ -104,31 +116,31 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 	 *            file of feature model
 	 * @return the feature model or null if error occurred
 	 */
-	private static FeatureModel readExternalModelFile(File file) {
-		try {
-			if (file.getName().endsWith(".xml")) {
-				FeatureModel fm = new FeatureModel();
-				XmlFeatureModelReader reader = new XmlFeatureModelReader(fm);
+	private FeatureModel readExternalModelFile(File file) {
+		final int modelType = ModelIOFactory.getTypeByFileName(file.getName());
+		if (modelType != ModelIOFactory.TYPE_UNKNOWN) {
+			final FeatureModel fm = ModelIOFactory.getNewFeatureModel(modelType);
+			final AbstractFeatureModelReader reader = ModelIOFactory.getModelReader(fm, modelType);
+			try {				
 				reader.readFromFile(file);
 				return fm;
-			} else if (file.getName().endsWith(".velvet")) {
-				ExtendedFeatureModel fm = new ExtendedFeatureModel();
-				VelvetFeatureModelReader reader = new VelvetFeatureModelReader(fm);
-				reader.readFromFile(file);
-				return fm;
-			} else {
-				return null;
-			}
-		} catch (FileNotFoundException e) {
-			FMCorePlugin.getDefault().logError(e);
-			return null;
-		} catch (UnsupportedModelException e) {
-			FMCorePlugin.getDefault().logError(e);
-			return null;
+			} catch (FileNotFoundException e) {
+				FMCorePlugin.getDefault().logError(e);
+			} catch (UnsupportedModelException e) {
+				FMCorePlugin.getDefault().logError(e);
+			}	
 		}
+		return null;
 	}
 	
 	private boolean checkExternalModelFile(Tree curNode) {
+		if (localSearch) {
+			if (localSearch(curNode.getText()) == null) {
+				reportWarning(curNode, format("No model for %s could be found.", curNode.getText()));
+				return false;
+			}
+			return true;
+		}
 		if (getExternalModelFile(curNode.getText()) == null) {
 			reportWarning(curNode, format("No model for %s could be found.", curNode.getText()));
 			return false;
@@ -137,6 +149,13 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 	}
 	
 	private boolean checkInterfaceModelFile(Tree curNode) {
+		if (localSearch) {
+			if (localSearch(curNode.getText()) == null) {
+				reportWarning(curNode, format("No model for %s could be found.", curNode.getText()));
+				return false;
+			}
+			return true;
+		}
 		if (getInterfaceModelFile(curNode.getText()) == null) {
 			reportWarning(curNode, format("No interface for %s could be found.", curNode.getText()));
 			return false;
@@ -146,9 +165,9 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 
 	private static void copyChildnodes(final ExtendedFeatureModel targetModel,
 			final Feature targetParentNode, final Feature sourceParentNode,
-			final String parentModelName, final int type) {
+			final String parentModelName, final String parentNodeName, final int type) {
 		for (final Feature child : sourceParentNode.getChildren()) {
-			final ExtendedFeature feature = new ExtendedFeature(targetModel, parentModelName + "." + child.getName());
+			final ExtendedFeature feature = new ExtendedFeature(targetModel, parentNodeName + "." + child.getName());
 			feature.setMandatory(child.isMandatory());
 			feature.setAbstract(child.isAbstract());
 			feature.setHidden(child.isHidden());
@@ -165,7 +184,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 			feature.setType(type);
 
 			if (child.hasChildren()) {
-				copyChildnodes(targetModel, feature, child, parentModelName, type);
+				copyChildnodes(targetModel, feature, child, parentModelName, parentNodeName, type);
 			}
 		}
 	}
@@ -242,14 +261,14 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		newFeature.setAbstract(isAbstract);
 		newFeature.setHidden(isHidden);
 
-//		Feature orgFeature = extFeatureModel.getFeature(featureName);
-//		if (orgFeature != null && orgFeature instanceof ExtendedFeature) {
-//			return (ExtendedFeature) orgFeature;
-//		} else {
+		Feature orgFeature = extFeatureModel.getFeature(featureName);
+		if (orgFeature != null && orgFeature instanceof ExtendedFeature) {
+			return (ExtendedFeature) orgFeature;
+		} else {
 			extFeatureModel.addFeature(newFeature);
 			parent.addChild(newFeature);
 			return newFeature;
-//		}
+		}
 	}
 
 	private String checkNode(Node curNode) {
@@ -317,6 +336,9 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 	 * @return File object if found else null
 	 */
 	private File getExternalModelFile(String name) {
+		if (localSearch) {
+			return localSearch(name);
+		}
 		File returnFile = null;
 		
 		// local search
@@ -358,6 +380,9 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 	}
 	
 	private File getInterfaceModelFile(String name) {
+		if (localSearch) {
+			return localSearch(name);
+		}
 		File returnFile = null;
 		IProject project = getProject();
 		if (project != null) {
@@ -367,6 +392,25 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 			}
 		}
 		return returnFile;
+	}
+	
+	private File localSearch(final String name) {
+		final File searchDir = featureModelFile.getParentFile();
+		if (searchDir != null) {
+			File[] files = searchDir.listFiles(new FilenameFilter() {
+				@Override
+				public boolean accept(File dir, String fileName) {
+					int index = fileName.lastIndexOf('.');					
+					return index > 0
+						&& fileName.substring(0,index).equals(name)
+						&& fileName.substring(index + 1).matches("xml|velvet");
+				}
+			});
+			if (files != null && files.length > 0) {
+				return files[0];
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -401,6 +445,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 	private void init() {
 		atrributeConstraintNodes.clear();
 		parentStack.clear();
+		constraintNodeList.clear();
 		usedVariables.clear();
 		
 		extFeatureModel.reset();
@@ -412,33 +457,11 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 
 		extFeatureModelName = null;
 		cinterface = false;
-	}
-
-	/**
-	 * inserts an instance at a given position
-	 * 
-	 */
-	private void insertExternalModel(final FeatureModel model, final String instancename, Feature parent, int type) {
-		final Feature instanceRoot = model.getRoot();
-
-		final ExtendedFeature connector = addFeature(parent, extFeatureModelName + "." + instancename, false, true,
-				instanceRoot.isHidden());
-		connector.setType(type);
-		connector.setExternalModelName(instancename);
-		if (instanceRoot.isAlternative()) {
-			connector.setAlternative();
-		}
-
-		copyChildnodes(extFeatureModel, connector, instanceRoot, instancename, type);
 		
-		for (final Constraint constraint : model.getConstraints()) {
-			Node constraintNode = constraint.getNode();
-			updateConstraintNode(constraintNode, instancename);
-			ExtendedConstraint newConstraint = new ExtendedConstraint(extFeatureModel, constraintNode);
-			newConstraint.setType(type);
-			newConstraint.setContainedFeatures();
-			extFeatureModel.addConstraint(newConstraint);
-		}
+		// TODO MPL: Hack for local search
+		localSearch = featureModelFile != null
+				&& featureModelFile.getParentFile() != null 
+				&& featureModelFile.getParentFile().getName().equals("velvet");
 	}
 
 	private void parseAttribute(final Tree root, final Feature parent) {
@@ -580,6 +603,15 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 				reportSyntaxError(curNode);
 			}
 		}
+		
+		for (ConstraintNode constraintNode : constraintNodeList) {
+			String nameError = checkNode(constraintNode.computedNode);
+			if (nameError == null) {
+				extFeatureModel.addConstraint(new ExtendedConstraint(extFeatureModel, constraintNode.computedNode));
+			} else {
+				reportWarning(constraintNode.rawNode, format("There is no feature with the name %s.", nameError));
+			}
+		}
 	}
 
 	private void parseConstraint(final Tree root, final Feature parent) {
@@ -594,12 +626,10 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 				break;
 			case VelvetParser.CONSTR:
 				Node newNode = parseConstraint_rec(curNode);
-				String nameError = checkNode(newNode);
-				if (nameError == null) {
-					extFeatureModel.addConstraint(new ExtendedConstraint(extFeatureModel, newNode));
-				} else {
-					reportWarning(curNode, format("There is no feature with the name %s.", nameError));
+				if (!parent.isRoot()) {
+					newNode = new Implies(new Literal(parent.getName()), newNode);
 				}
+				constraintNodeList.add(new ConstraintNode(newNode, curNode));
 				break;
 			case VelvetParser.ACONSTR:
 				this.atrributeConstraintNodes.add(curNode);
@@ -713,6 +743,8 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 			case VelvetParser.ATTR:
 				parseAttribute(curNode, parentFeature);
 				break;
+			case VelvetParser.EMPTY:
+				break;
 			default:
 				reportSyntaxError(curNode);
 			}
@@ -726,7 +758,11 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		if (cinterface) {
 			featureName = childList.poll().getText();
 		} else {
-			featureName = extFeatureModelName + "."	+ childList.poll().getText();
+			if (parent.isRoot()) {
+				featureName = childList.poll().getText();
+			} else {
+				featureName = parent.getName() + "." + childList.poll().getText();
+			}
 		}
 		boolean isMandatory = false, isAbstract = false, moreDefinitions = false;
 
@@ -794,18 +830,37 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 				reportWarning(curNode, "The parent model " + parentModelName + " is already used.");
 				return;
 			}
-			
-			copyChildnodes(extFeatureModel, extFeatureModel.getRoot(),
-				fm.getRoot(), parentModelName, ExtendedFeature.TYPE_INHERITED);
-
-			for (final Constraint constraint : fm.getConstraints()) {
-				Node constraintNode = constraint.getNode();
-				updateConstraintNode(constraintNode, parentModelName);
-				ExtendedConstraint newConstraint = new ExtendedConstraint(extFeatureModel, constraintNode);
-				newConstraint.setType(ExtendedFeature.TYPE_INHERITED);
-				newConstraint.setContainedFeatures();
-				extFeatureModel.addConstraint(newConstraint);
+			addExternalFeatures(fm, parentModelName, extFeatureModel.getRoot(), ExtendedFeature.TYPE_INHERITED);
+		}
+	}
+	
+	private void addExternalFeatures(FeatureModel sourceModel, String sourceModelName, Feature targetParentFeature, int type) {
+		if (sourceModel instanceof ExtendedFeatureModel) {
+			for (UsedModel usedModel : ((ExtendedFeatureModel) sourceModel).getExternalModels().values()) {
+				extFeatureModel.addExternalModel(new UsedModel(usedModel, sourceModelName));
 			}
+		}
+		
+		final Feature instanceRoot = sourceModel.getRoot();
+		final String connectorName = (targetParentFeature.isRoot()) ? sourceModelName : targetParentFeature.getName() + "." + sourceModelName;
+		final ExtendedFeature connector = addFeature(targetParentFeature, connectorName, true, true, instanceRoot.isHidden());
+		connector.setType(type);
+		connector.setExternalModelName(sourceModelName);
+		if (instanceRoot.isAlternative()) {
+			connector.setAlternative();
+		} else if (instanceRoot.isOr()) {
+			connector.setOr();
+		}
+
+		copyChildnodes(extFeatureModel, connector, instanceRoot, sourceModelName, connectorName, type);
+		
+		for (final Constraint constraint : sourceModel.getConstraints()) {
+			Node constraintNode = constraint.getNode();
+			updateConstraintNode(constraintNode, connectorName);
+			ExtendedConstraint newConstraint = new ExtendedConstraint(extFeatureModel, constraintNode);
+			newConstraint.setType(type);
+			newConstraint.setContainedFeatures();
+			extFeatureModel.addConstraint(newConstraint);
 		}
 	}
 	
@@ -921,14 +976,14 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 			if (interfaceModel == null) {
 				return;
 			}
-			insertExternalModel(interfaceModel, varName, parent, ExtendedFeature.TYPE_INTERFACE);
+			addExternalFeatures(interfaceModel, varName, parent, ExtendedFeature.TYPE_INTERFACE);
 			break;
 		case ExtendedFeature.TYPE_INSTANCE:
 			final FeatureModel instanceModel = getExternalFeatureModel(usedModel.getModelName(), useNameNode);
 			if (instanceModel == null) {
 				return;
 			}
-			insertExternalModel(instanceModel, varName, parent, ExtendedFeature.TYPE_INSTANCE);
+			addExternalFeatures(instanceModel, varName, parent, ExtendedFeature.TYPE_INSTANCE);
 			break;
 		default:
 			reportWarning(useNameNode, format("The variable with the name %s is no interface or instance.", varName));
@@ -939,11 +994,11 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		String message = "Illegal statement \""+ curNode.getText() + "\"";
 		modelMarkerHandler.createModelMarker(message, org.eclipse.core.resources.IMarker.SEVERITY_ERROR, curNode.getLine());
 		FMCorePlugin.getDefault().logError(new UnsupportedModelException(
-			message + " at line " + curNode.getLine(), curNode.getLine()));
+			message + " at line " + curNode.getLine() + ((featureModelFile != null)?" in file " + featureModelFile.getName():""), curNode.getLine()));
 	}
 	
 	private void reportWarning(Tree curNode, String message) {
 		modelMarkerHandler.createModelMarker(message, org.eclipse.core.resources.IMarker.SEVERITY_WARNING, curNode.getLine());
-		FMCorePlugin.getDefault().logWarning(message + " (at line "+ curNode.getLine() + ": \"" + curNode.getText() + "\")");		
+		FMCorePlugin.getDefault().logWarning(message + " (at line "+ curNode.getLine() + ((featureModelFile != null)?" in file " + featureModelFile.getName():"") + ": \"" + curNode.getText() + "\")");		
 	}
 }

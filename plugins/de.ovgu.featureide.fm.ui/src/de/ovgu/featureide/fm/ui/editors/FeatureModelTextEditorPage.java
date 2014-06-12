@@ -101,7 +101,7 @@ public class FeatureModelTextEditorPage extends TextEditor implements
 			if (input instanceof FileEditorInput) {
 				IFile file = ((FileEditorInput) input).getFile();
 				featureModelEditor.featureModelReader.setFile(file
-						.getFullPath().toFile());
+						.getLocation().toFile());
 			}
 
 			featureModelEditor.featureModelReader.readFromString(text);

@@ -48,6 +48,7 @@ tokens {
 	ATTR_OP_GREATER_EQ ='>='; 
 	ATTR_OP_LESS_EQ    ='<=';
 	
+	EMPTY;
 	CONSTR;
 	ACONSTR;
 	BASEEXT;
@@ -116,7 +117,7 @@ name: ID
 	
 definitions
 	: START_C definition END_C
-	-> ^(DEF definition)
+	-> ^(DEF definition? EMPTY)
 	;
 
 definition 
@@ -265,10 +266,15 @@ fragment
 UNICODE_ESC
     :   '\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
     ;
-    
-WS  : ( ' '
+     
+ WS  : ( ' '
     | '\t'
     | '\r'
     | '\n'
     ) {$channel=HIDDEN;}
     ;
+
+SL_COMMENT : ('//' ~('\r'|'\n')*) {skip();};  
+
+ML_COMMENT : ('/*' ~('*/')*) {skip();};
+

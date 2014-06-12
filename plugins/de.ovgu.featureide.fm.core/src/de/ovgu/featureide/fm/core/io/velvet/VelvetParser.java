@@ -1,4 +1,4 @@
-// $ANTLR 3.4 Velvet.g 2014-06-06 14:56:29
+// $ANTLR 3.4 Velvet.g 2014-06-12 19:59:57
 
 package de.ovgu.featureide.fm.core.io.velvet;
 
@@ -15,7 +15,7 @@ import org.antlr.runtime.tree.*;
 @SuppressWarnings({"all", "warnings", "unchecked"})
 public class VelvetParser extends Parser {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "ABSTRACT", "ACONSTR", "ATTR", "ATTR_OP_EQUALS", "ATTR_OP_GREATER", "ATTR_OP_GREATER_EQ", "ATTR_OP_LESS", "ATTR_OP_LESS_EQ", "ATTR_OP_NOT_EQUALS", "BASEEXT", "BOOLEAN", "CINTERFACE", "COLON", "COMMA", "CONCEPT", "CONSTR", "CONSTRAINT", "DEF", "END_C", "END_R", "EQ", "ESC_SEQ", "EXPONENT", "FEAT", "FEATURE", "FLOAT", "GROUP", "HEX_DIGIT", "ID", "IDPath", "IMPORTINSTANCE", "IMPORTINTERFACE", "INST", "INT", "INTF", "MANDATORY", "MINUS", "OCTAL_ESC", "ONEOF", "OPERAND", "OP_AND", "OP_EQUIVALENT", "OP_IMPLIES", "OP_NOT", "OP_OR", "OP_XOR", "PLUS", "SEMI", "SOMEOF", "START_C", "START_R", "STRING", "UNARYOP", "UNICODE_ESC", "USE", "USES", "VAR_BOOL", "VAR_FLOAT", "VAR_INT", "VAR_STRING", "WS"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "ABSTRACT", "ACONSTR", "ATTR", "ATTR_OP_EQUALS", "ATTR_OP_GREATER", "ATTR_OP_GREATER_EQ", "ATTR_OP_LESS", "ATTR_OP_LESS_EQ", "ATTR_OP_NOT_EQUALS", "BASEEXT", "BOOLEAN", "CINTERFACE", "COLON", "COMMA", "CONCEPT", "CONSTR", "CONSTRAINT", "DEF", "EMPTY", "END_C", "END_R", "EQ", "ESC_SEQ", "EXPONENT", "FEAT", "FEATURE", "FLOAT", "GROUP", "HEX_DIGIT", "ID", "IDPath", "IMPORTINSTANCE", "IMPORTINTERFACE", "INST", "INT", "INTF", "MANDATORY", "MINUS", "ML_COMMENT", "OCTAL_ESC", "ONEOF", "OPERAND", "OP_AND", "OP_EQUIVALENT", "OP_IMPLIES", "OP_NOT", "OP_OR", "OP_XOR", "PLUS", "SEMI", "SL_COMMENT", "SOMEOF", "START_C", "START_R", "STRING", "UNARYOP", "UNICODE_ESC", "USE", "USES", "VAR_BOOL", "VAR_FLOAT", "VAR_INT", "VAR_STRING", "WS"
     };
 
     public static final int EOF=-1;
@@ -37,49 +37,52 @@ public class VelvetParser extends Parser {
     public static final int CONSTR=19;
     public static final int CONSTRAINT=20;
     public static final int DEF=21;
-    public static final int END_C=22;
-    public static final int END_R=23;
-    public static final int EQ=24;
-    public static final int ESC_SEQ=25;
-    public static final int EXPONENT=26;
-    public static final int FEAT=27;
-    public static final int FEATURE=28;
-    public static final int FLOAT=29;
-    public static final int GROUP=30;
-    public static final int HEX_DIGIT=31;
-    public static final int ID=32;
-    public static final int IDPath=33;
-    public static final int IMPORTINSTANCE=34;
-    public static final int IMPORTINTERFACE=35;
-    public static final int INST=36;
-    public static final int INT=37;
-    public static final int INTF=38;
-    public static final int MANDATORY=39;
-    public static final int MINUS=40;
-    public static final int OCTAL_ESC=41;
-    public static final int ONEOF=42;
-    public static final int OPERAND=43;
-    public static final int OP_AND=44;
-    public static final int OP_EQUIVALENT=45;
-    public static final int OP_IMPLIES=46;
-    public static final int OP_NOT=47;
-    public static final int OP_OR=48;
-    public static final int OP_XOR=49;
-    public static final int PLUS=50;
-    public static final int SEMI=51;
-    public static final int SOMEOF=52;
-    public static final int START_C=53;
-    public static final int START_R=54;
-    public static final int STRING=55;
-    public static final int UNARYOP=56;
-    public static final int UNICODE_ESC=57;
-    public static final int USE=58;
-    public static final int USES=59;
-    public static final int VAR_BOOL=60;
-    public static final int VAR_FLOAT=61;
-    public static final int VAR_INT=62;
-    public static final int VAR_STRING=63;
-    public static final int WS=64;
+    public static final int EMPTY=22;
+    public static final int END_C=23;
+    public static final int END_R=24;
+    public static final int EQ=25;
+    public static final int ESC_SEQ=26;
+    public static final int EXPONENT=27;
+    public static final int FEAT=28;
+    public static final int FEATURE=29;
+    public static final int FLOAT=30;
+    public static final int GROUP=31;
+    public static final int HEX_DIGIT=32;
+    public static final int ID=33;
+    public static final int IDPath=34;
+    public static final int IMPORTINSTANCE=35;
+    public static final int IMPORTINTERFACE=36;
+    public static final int INST=37;
+    public static final int INT=38;
+    public static final int INTF=39;
+    public static final int MANDATORY=40;
+    public static final int MINUS=41;
+    public static final int ML_COMMENT=42;
+    public static final int OCTAL_ESC=43;
+    public static final int ONEOF=44;
+    public static final int OPERAND=45;
+    public static final int OP_AND=46;
+    public static final int OP_EQUIVALENT=47;
+    public static final int OP_IMPLIES=48;
+    public static final int OP_NOT=49;
+    public static final int OP_OR=50;
+    public static final int OP_XOR=51;
+    public static final int PLUS=52;
+    public static final int SEMI=53;
+    public static final int SL_COMMENT=54;
+    public static final int SOMEOF=55;
+    public static final int START_C=56;
+    public static final int START_R=57;
+    public static final int STRING=58;
+    public static final int UNARYOP=59;
+    public static final int UNICODE_ESC=60;
+    public static final int USE=61;
+    public static final int USES=62;
+    public static final int VAR_BOOL=63;
+    public static final int VAR_FLOAT=64;
+    public static final int VAR_INT=65;
+    public static final int VAR_STRING=66;
+    public static final int WS=67;
 
     // delegates
     public Parser[] getDelegates() {
@@ -121,7 +124,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "velvetModel"
-    // Velvet.g:78:1: velvetModel : ( concept | cinterface ) EOF ;
+    // Velvet.g:79:1: velvetModel : ( concept | cinterface ) EOF ;
     public final VelvetParser.velvetModel_return velvetModel() throws RecognitionException {
         VelvetParser.velvetModel_return retval = new VelvetParser.velvetModel_return();
         retval.start = input.LT(1);
@@ -138,13 +141,13 @@ public TreeAdaptor getTreeAdaptor() {
         Tree EOF3_tree=null;
 
         try {
-            // Velvet.g:79:2: ( ( concept | cinterface ) EOF )
-            // Velvet.g:79:4: ( concept | cinterface ) EOF
+            // Velvet.g:80:2: ( ( concept | cinterface ) EOF )
+            // Velvet.g:80:4: ( concept | cinterface ) EOF
             {
             root_0 = (Tree)adaptor.nil();
 
 
-            // Velvet.g:79:4: ( concept | cinterface )
+            // Velvet.g:80:4: ( concept | cinterface )
             int alt1=2;
             int LA1_0 = input.LA(1);
 
@@ -163,9 +166,9 @@ public TreeAdaptor getTreeAdaptor() {
             }
             switch (alt1) {
                 case 1 :
-                    // Velvet.g:79:5: concept
+                    // Velvet.g:80:5: concept
                     {
-                    pushFollow(FOLLOW_concept_in_velvetModel466);
+                    pushFollow(FOLLOW_concept_in_velvetModel470);
                     concept1=concept();
 
                     state._fsp--;
@@ -175,9 +178,9 @@ public TreeAdaptor getTreeAdaptor() {
                     }
                     break;
                 case 2 :
-                    // Velvet.g:79:13: cinterface
+                    // Velvet.g:80:13: cinterface
                     {
-                    pushFollow(FOLLOW_cinterface_in_velvetModel468);
+                    pushFollow(FOLLOW_cinterface_in_velvetModel472);
                     cinterface2=cinterface();
 
                     state._fsp--;
@@ -190,7 +193,7 @@ public TreeAdaptor getTreeAdaptor() {
             }
 
 
-            EOF3=(Token)match(input,EOF,FOLLOW_EOF_in_velvetModel471); 
+            EOF3=(Token)match(input,EOF,FOLLOW_EOF_in_velvetModel475); 
             EOF3_tree = 
             (Tree)adaptor.create(EOF3)
             ;
@@ -228,7 +231,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "concept"
-    // Velvet.g:82:1: concept : CONCEPT ID ( COLON conceptBaseExt )? ( instanceImports interfaceImports | interfaceImports instanceImports | interfaceImports | instanceImports )? ( definitions )? -> ^( CONCEPT ID ( conceptBaseExt )? ( instanceImports )? ( interfaceImports )? ( definitions )? ) ;
+    // Velvet.g:83:1: concept : CONCEPT ID ( COLON conceptBaseExt )? ( instanceImports interfaceImports | interfaceImports instanceImports | interfaceImports | instanceImports )? ( definitions )? -> ^( CONCEPT ID ( conceptBaseExt )? ( instanceImports )? ( interfaceImports )? ( definitions )? ) ;
     public final VelvetParser.concept_return concept() throws RecognitionException {
         VelvetParser.concept_return retval = new VelvetParser.concept_return();
         retval.start = input.LT(1);
@@ -267,18 +270,18 @@ public TreeAdaptor getTreeAdaptor() {
         RewriteRuleSubtreeStream stream_interfaceImports=new RewriteRuleSubtreeStream(adaptor,"rule interfaceImports");
         RewriteRuleSubtreeStream stream_definitions=new RewriteRuleSubtreeStream(adaptor,"rule definitions");
         try {
-            // Velvet.g:83:2: ( CONCEPT ID ( COLON conceptBaseExt )? ( instanceImports interfaceImports | interfaceImports instanceImports | interfaceImports | instanceImports )? ( definitions )? -> ^( CONCEPT ID ( conceptBaseExt )? ( instanceImports )? ( interfaceImports )? ( definitions )? ) )
-            // Velvet.g:83:4: CONCEPT ID ( COLON conceptBaseExt )? ( instanceImports interfaceImports | interfaceImports instanceImports | interfaceImports | instanceImports )? ( definitions )?
+            // Velvet.g:84:2: ( CONCEPT ID ( COLON conceptBaseExt )? ( instanceImports interfaceImports | interfaceImports instanceImports | interfaceImports | instanceImports )? ( definitions )? -> ^( CONCEPT ID ( conceptBaseExt )? ( instanceImports )? ( interfaceImports )? ( definitions )? ) )
+            // Velvet.g:84:4: CONCEPT ID ( COLON conceptBaseExt )? ( instanceImports interfaceImports | interfaceImports instanceImports | interfaceImports | instanceImports )? ( definitions )?
             {
-            CONCEPT4=(Token)match(input,CONCEPT,FOLLOW_CONCEPT_in_concept484);  
+            CONCEPT4=(Token)match(input,CONCEPT,FOLLOW_CONCEPT_in_concept488);  
             stream_CONCEPT.add(CONCEPT4);
 
 
-            ID5=(Token)match(input,ID,FOLLOW_ID_in_concept486);  
+            ID5=(Token)match(input,ID,FOLLOW_ID_in_concept490);  
             stream_ID.add(ID5);
 
 
-            // Velvet.g:84:3: ( COLON conceptBaseExt )?
+            // Velvet.g:85:3: ( COLON conceptBaseExt )?
             int alt2=2;
             int LA2_0 = input.LA(1);
 
@@ -287,13 +290,13 @@ public TreeAdaptor getTreeAdaptor() {
             }
             switch (alt2) {
                 case 1 :
-                    // Velvet.g:84:4: COLON conceptBaseExt
+                    // Velvet.g:85:4: COLON conceptBaseExt
                     {
-                    COLON6=(Token)match(input,COLON,FOLLOW_COLON_in_concept493);  
+                    COLON6=(Token)match(input,COLON,FOLLOW_COLON_in_concept497);  
                     stream_COLON.add(COLON6);
 
 
-                    pushFollow(FOLLOW_conceptBaseExt_in_concept495);
+                    pushFollow(FOLLOW_conceptBaseExt_in_concept499);
                     conceptBaseExt7=conceptBaseExt();
 
                     state._fsp--;
@@ -306,21 +309,21 @@ public TreeAdaptor getTreeAdaptor() {
             }
 
 
-            // Velvet.g:84:27: ( instanceImports interfaceImports | interfaceImports instanceImports | interfaceImports | instanceImports )?
+            // Velvet.g:85:27: ( instanceImports interfaceImports | interfaceImports instanceImports | interfaceImports | instanceImports )?
             int alt3=5;
             alt3 = dfa3.predict(input);
             switch (alt3) {
                 case 1 :
-                    // Velvet.g:84:28: instanceImports interfaceImports
+                    // Velvet.g:85:28: instanceImports interfaceImports
                     {
-                    pushFollow(FOLLOW_instanceImports_in_concept500);
+                    pushFollow(FOLLOW_instanceImports_in_concept504);
                     instanceImports8=instanceImports();
 
                     state._fsp--;
 
                     stream_instanceImports.add(instanceImports8.getTree());
 
-                    pushFollow(FOLLOW_interfaceImports_in_concept502);
+                    pushFollow(FOLLOW_interfaceImports_in_concept506);
                     interfaceImports9=interfaceImports();
 
                     state._fsp--;
@@ -330,16 +333,16 @@ public TreeAdaptor getTreeAdaptor() {
                     }
                     break;
                 case 2 :
-                    // Velvet.g:84:63: interfaceImports instanceImports
+                    // Velvet.g:85:63: interfaceImports instanceImports
                     {
-                    pushFollow(FOLLOW_interfaceImports_in_concept506);
+                    pushFollow(FOLLOW_interfaceImports_in_concept510);
                     interfaceImports10=interfaceImports();
 
                     state._fsp--;
 
                     stream_interfaceImports.add(interfaceImports10.getTree());
 
-                    pushFollow(FOLLOW_instanceImports_in_concept508);
+                    pushFollow(FOLLOW_instanceImports_in_concept512);
                     instanceImports11=instanceImports();
 
                     state._fsp--;
@@ -349,9 +352,9 @@ public TreeAdaptor getTreeAdaptor() {
                     }
                     break;
                 case 3 :
-                    // Velvet.g:84:98: interfaceImports
+                    // Velvet.g:85:98: interfaceImports
                     {
-                    pushFollow(FOLLOW_interfaceImports_in_concept512);
+                    pushFollow(FOLLOW_interfaceImports_in_concept516);
                     interfaceImports12=interfaceImports();
 
                     state._fsp--;
@@ -361,9 +364,9 @@ public TreeAdaptor getTreeAdaptor() {
                     }
                     break;
                 case 4 :
-                    // Velvet.g:84:117: instanceImports
+                    // Velvet.g:85:117: instanceImports
                     {
-                    pushFollow(FOLLOW_instanceImports_in_concept516);
+                    pushFollow(FOLLOW_instanceImports_in_concept520);
                     instanceImports13=instanceImports();
 
                     state._fsp--;
@@ -376,7 +379,7 @@ public TreeAdaptor getTreeAdaptor() {
             }
 
 
-            // Velvet.g:85:3: ( definitions )?
+            // Velvet.g:86:3: ( definitions )?
             int alt4=2;
             int LA4_0 = input.LA(1);
 
@@ -385,9 +388,9 @@ public TreeAdaptor getTreeAdaptor() {
             }
             switch (alt4) {
                 case 1 :
-                    // Velvet.g:85:3: definitions
+                    // Velvet.g:86:3: definitions
                     {
-                    pushFollow(FOLLOW_definitions_in_concept523);
+                    pushFollow(FOLLOW_definitions_in_concept527);
                     definitions14=definitions();
 
                     state._fsp--;
@@ -411,9 +414,9 @@ public TreeAdaptor getTreeAdaptor() {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (Tree)adaptor.nil();
-            // 86:2: -> ^( CONCEPT ID ( conceptBaseExt )? ( instanceImports )? ( interfaceImports )? ( definitions )? )
+            // 87:2: -> ^( CONCEPT ID ( conceptBaseExt )? ( instanceImports )? ( interfaceImports )? ( definitions )? )
             {
-                // Velvet.g:86:5: ^( CONCEPT ID ( conceptBaseExt )? ( instanceImports )? ( interfaceImports )? ( definitions )? )
+                // Velvet.g:87:5: ^( CONCEPT ID ( conceptBaseExt )? ( instanceImports )? ( interfaceImports )? ( definitions )? )
                 {
                 Tree root_1 = (Tree)adaptor.nil();
                 root_1 = (Tree)adaptor.becomeRoot(
@@ -424,28 +427,28 @@ public TreeAdaptor getTreeAdaptor() {
                 stream_ID.nextNode()
                 );
 
-                // Velvet.g:86:18: ( conceptBaseExt )?
+                // Velvet.g:87:18: ( conceptBaseExt )?
                 if ( stream_conceptBaseExt.hasNext() ) {
                     adaptor.addChild(root_1, stream_conceptBaseExt.nextTree());
 
                 }
                 stream_conceptBaseExt.reset();
 
-                // Velvet.g:86:34: ( instanceImports )?
+                // Velvet.g:87:34: ( instanceImports )?
                 if ( stream_instanceImports.hasNext() ) {
                     adaptor.addChild(root_1, stream_instanceImports.nextTree());
 
                 }
                 stream_instanceImports.reset();
 
-                // Velvet.g:86:51: ( interfaceImports )?
+                // Velvet.g:87:51: ( interfaceImports )?
                 if ( stream_interfaceImports.hasNext() ) {
                     adaptor.addChild(root_1, stream_interfaceImports.nextTree());
 
                 }
                 stream_interfaceImports.reset();
 
-                // Velvet.g:86:69: ( definitions )?
+                // Velvet.g:87:69: ( definitions )?
                 if ( stream_definitions.hasNext() ) {
                     adaptor.addChild(root_1, stream_definitions.nextTree());
 
@@ -491,7 +494,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "conceptBaseExt"
-    // Velvet.g:89:1: conceptBaseExt : ID ( COMMA ID )* -> ^( BASEEXT ( ID )+ ) ;
+    // Velvet.g:90:1: conceptBaseExt : ID ( COMMA ID )* -> ^( BASEEXT ( ID )+ ) ;
     public final VelvetParser.conceptBaseExt_return conceptBaseExt() throws RecognitionException {
         VelvetParser.conceptBaseExt_return retval = new VelvetParser.conceptBaseExt_return();
         retval.start = input.LT(1);
@@ -510,14 +513,14 @@ public TreeAdaptor getTreeAdaptor() {
         RewriteRuleTokenStream stream_COMMA=new RewriteRuleTokenStream(adaptor,"token COMMA");
 
         try {
-            // Velvet.g:90:2: ( ID ( COMMA ID )* -> ^( BASEEXT ( ID )+ ) )
-            // Velvet.g:90:4: ID ( COMMA ID )*
+            // Velvet.g:91:2: ( ID ( COMMA ID )* -> ^( BASEEXT ( ID )+ ) )
+            // Velvet.g:91:4: ID ( COMMA ID )*
             {
-            ID15=(Token)match(input,ID,FOLLOW_ID_in_conceptBaseExt556);  
+            ID15=(Token)match(input,ID,FOLLOW_ID_in_conceptBaseExt560);  
             stream_ID.add(ID15);
 
 
-            // Velvet.g:90:7: ( COMMA ID )*
+            // Velvet.g:91:7: ( COMMA ID )*
             loop5:
             do {
                 int alt5=2;
@@ -530,13 +533,13 @@ public TreeAdaptor getTreeAdaptor() {
 
                 switch (alt5) {
             	case 1 :
-            	    // Velvet.g:90:8: COMMA ID
+            	    // Velvet.g:91:8: COMMA ID
             	    {
-            	    COMMA16=(Token)match(input,COMMA,FOLLOW_COMMA_in_conceptBaseExt559);  
+            	    COMMA16=(Token)match(input,COMMA,FOLLOW_COMMA_in_conceptBaseExt563);  
             	    stream_COMMA.add(COMMA16);
 
 
-            	    ID17=(Token)match(input,ID,FOLLOW_ID_in_conceptBaseExt561);  
+            	    ID17=(Token)match(input,ID,FOLLOW_ID_in_conceptBaseExt565);  
             	    stream_ID.add(ID17);
 
 
@@ -560,9 +563,9 @@ public TreeAdaptor getTreeAdaptor() {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (Tree)adaptor.nil();
-            // 91:2: -> ^( BASEEXT ( ID )+ )
+            // 92:2: -> ^( BASEEXT ( ID )+ )
             {
-                // Velvet.g:91:5: ^( BASEEXT ( ID )+ )
+                // Velvet.g:92:5: ^( BASEEXT ( ID )+ )
                 {
                 Tree root_1 = (Tree)adaptor.nil();
                 root_1 = (Tree)adaptor.becomeRoot(
@@ -619,7 +622,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "instanceImports"
-    // Velvet.g:94:1: instanceImports : IMPORTINSTANCE ID name ( COMMA ID name )* -> ^( INST ( ID name )+ ) ;
+    // Velvet.g:95:1: instanceImports : IMPORTINSTANCE ID name ( COMMA ID name )* -> ^( INST ( ID name )+ ) ;
     public final VelvetParser.instanceImports_return instanceImports() throws RecognitionException {
         VelvetParser.instanceImports_return retval = new VelvetParser.instanceImports_return();
         retval.start = input.LT(1);
@@ -645,25 +648,25 @@ public TreeAdaptor getTreeAdaptor() {
         RewriteRuleTokenStream stream_IMPORTINSTANCE=new RewriteRuleTokenStream(adaptor,"token IMPORTINSTANCE");
         RewriteRuleSubtreeStream stream_name=new RewriteRuleSubtreeStream(adaptor,"rule name");
         try {
-            // Velvet.g:95:2: ( IMPORTINSTANCE ID name ( COMMA ID name )* -> ^( INST ( ID name )+ ) )
-            // Velvet.g:95:4: IMPORTINSTANCE ID name ( COMMA ID name )*
+            // Velvet.g:96:2: ( IMPORTINSTANCE ID name ( COMMA ID name )* -> ^( INST ( ID name )+ ) )
+            // Velvet.g:96:4: IMPORTINSTANCE ID name ( COMMA ID name )*
             {
-            IMPORTINSTANCE18=(Token)match(input,IMPORTINSTANCE,FOLLOW_IMPORTINSTANCE_in_instanceImports586);  
+            IMPORTINSTANCE18=(Token)match(input,IMPORTINSTANCE,FOLLOW_IMPORTINSTANCE_in_instanceImports590);  
             stream_IMPORTINSTANCE.add(IMPORTINSTANCE18);
 
 
-            ID19=(Token)match(input,ID,FOLLOW_ID_in_instanceImports588);  
+            ID19=(Token)match(input,ID,FOLLOW_ID_in_instanceImports592);  
             stream_ID.add(ID19);
 
 
-            pushFollow(FOLLOW_name_in_instanceImports590);
+            pushFollow(FOLLOW_name_in_instanceImports594);
             name20=name();
 
             state._fsp--;
 
             stream_name.add(name20.getTree());
 
-            // Velvet.g:95:27: ( COMMA ID name )*
+            // Velvet.g:96:27: ( COMMA ID name )*
             loop6:
             do {
                 int alt6=2;
@@ -676,17 +679,17 @@ public TreeAdaptor getTreeAdaptor() {
 
                 switch (alt6) {
             	case 1 :
-            	    // Velvet.g:95:28: COMMA ID name
+            	    // Velvet.g:96:28: COMMA ID name
             	    {
-            	    COMMA21=(Token)match(input,COMMA,FOLLOW_COMMA_in_instanceImports593);  
+            	    COMMA21=(Token)match(input,COMMA,FOLLOW_COMMA_in_instanceImports597);  
             	    stream_COMMA.add(COMMA21);
 
 
-            	    ID22=(Token)match(input,ID,FOLLOW_ID_in_instanceImports595);  
+            	    ID22=(Token)match(input,ID,FOLLOW_ID_in_instanceImports599);  
             	    stream_ID.add(ID22);
 
 
-            	    pushFollow(FOLLOW_name_in_instanceImports597);
+            	    pushFollow(FOLLOW_name_in_instanceImports601);
             	    name23=name();
 
             	    state._fsp--;
@@ -713,9 +716,9 @@ public TreeAdaptor getTreeAdaptor() {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (Tree)adaptor.nil();
-            // 96:2: -> ^( INST ( ID name )+ )
+            // 97:2: -> ^( INST ( ID name )+ )
             {
-                // Velvet.g:96:5: ^( INST ( ID name )+ )
+                // Velvet.g:97:5: ^( INST ( ID name )+ )
                 {
                 Tree root_1 = (Tree)adaptor.nil();
                 root_1 = (Tree)adaptor.becomeRoot(
@@ -775,7 +778,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "interfaceImports"
-    // Velvet.g:99:1: interfaceImports : IMPORTINTERFACE ID name ( COMMA ID name )* -> ^( INTF ( ID name )+ ) ;
+    // Velvet.g:100:1: interfaceImports : IMPORTINTERFACE ID name ( COMMA ID name )* -> ^( INTF ( ID name )+ ) ;
     public final VelvetParser.interfaceImports_return interfaceImports() throws RecognitionException {
         VelvetParser.interfaceImports_return retval = new VelvetParser.interfaceImports_return();
         retval.start = input.LT(1);
@@ -801,25 +804,25 @@ public TreeAdaptor getTreeAdaptor() {
         RewriteRuleTokenStream stream_IMPORTINTERFACE=new RewriteRuleTokenStream(adaptor,"token IMPORTINTERFACE");
         RewriteRuleSubtreeStream stream_name=new RewriteRuleSubtreeStream(adaptor,"rule name");
         try {
-            // Velvet.g:100:2: ( IMPORTINTERFACE ID name ( COMMA ID name )* -> ^( INTF ( ID name )+ ) )
-            // Velvet.g:100:4: IMPORTINTERFACE ID name ( COMMA ID name )*
+            // Velvet.g:101:2: ( IMPORTINTERFACE ID name ( COMMA ID name )* -> ^( INTF ( ID name )+ ) )
+            // Velvet.g:101:4: IMPORTINTERFACE ID name ( COMMA ID name )*
             {
-            IMPORTINTERFACE24=(Token)match(input,IMPORTINTERFACE,FOLLOW_IMPORTINTERFACE_in_interfaceImports626);  
+            IMPORTINTERFACE24=(Token)match(input,IMPORTINTERFACE,FOLLOW_IMPORTINTERFACE_in_interfaceImports630);  
             stream_IMPORTINTERFACE.add(IMPORTINTERFACE24);
 
 
-            ID25=(Token)match(input,ID,FOLLOW_ID_in_interfaceImports628);  
+            ID25=(Token)match(input,ID,FOLLOW_ID_in_interfaceImports632);  
             stream_ID.add(ID25);
 
 
-            pushFollow(FOLLOW_name_in_interfaceImports630);
+            pushFollow(FOLLOW_name_in_interfaceImports634);
             name26=name();
 
             state._fsp--;
 
             stream_name.add(name26.getTree());
 
-            // Velvet.g:100:28: ( COMMA ID name )*
+            // Velvet.g:101:28: ( COMMA ID name )*
             loop7:
             do {
                 int alt7=2;
@@ -832,17 +835,17 @@ public TreeAdaptor getTreeAdaptor() {
 
                 switch (alt7) {
             	case 1 :
-            	    // Velvet.g:100:29: COMMA ID name
+            	    // Velvet.g:101:29: COMMA ID name
             	    {
-            	    COMMA27=(Token)match(input,COMMA,FOLLOW_COMMA_in_interfaceImports633);  
+            	    COMMA27=(Token)match(input,COMMA,FOLLOW_COMMA_in_interfaceImports637);  
             	    stream_COMMA.add(COMMA27);
 
 
-            	    ID28=(Token)match(input,ID,FOLLOW_ID_in_interfaceImports635);  
+            	    ID28=(Token)match(input,ID,FOLLOW_ID_in_interfaceImports639);  
             	    stream_ID.add(ID28);
 
 
-            	    pushFollow(FOLLOW_name_in_interfaceImports637);
+            	    pushFollow(FOLLOW_name_in_interfaceImports641);
             	    name29=name();
 
             	    state._fsp--;
@@ -869,9 +872,9 @@ public TreeAdaptor getTreeAdaptor() {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (Tree)adaptor.nil();
-            // 101:2: -> ^( INTF ( ID name )+ )
+            // 102:2: -> ^( INTF ( ID name )+ )
             {
-                // Velvet.g:101:5: ^( INTF ( ID name )+ )
+                // Velvet.g:102:5: ^( INTF ( ID name )+ )
                 {
                 Tree root_1 = (Tree)adaptor.nil();
                 root_1 = (Tree)adaptor.becomeRoot(
@@ -931,7 +934,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "cinterface"
-    // Velvet.g:104:1: cinterface : CINTERFACE ID ( COLON interfaceBaseExt )? definitions -> ^( CINTERFACE ID ( interfaceBaseExt )? definitions ) ;
+    // Velvet.g:105:1: cinterface : CINTERFACE ID ( COLON interfaceBaseExt )? definitions -> ^( CINTERFACE ID ( interfaceBaseExt )? definitions ) ;
     public final VelvetParser.cinterface_return cinterface() throws RecognitionException {
         VelvetParser.cinterface_return retval = new VelvetParser.cinterface_return();
         retval.start = input.LT(1);
@@ -956,18 +959,18 @@ public TreeAdaptor getTreeAdaptor() {
         RewriteRuleSubtreeStream stream_definitions=new RewriteRuleSubtreeStream(adaptor,"rule definitions");
         RewriteRuleSubtreeStream stream_interfaceBaseExt=new RewriteRuleSubtreeStream(adaptor,"rule interfaceBaseExt");
         try {
-            // Velvet.g:104:12: ( CINTERFACE ID ( COLON interfaceBaseExt )? definitions -> ^( CINTERFACE ID ( interfaceBaseExt )? definitions ) )
-            // Velvet.g:104:14: CINTERFACE ID ( COLON interfaceBaseExt )? definitions
+            // Velvet.g:105:12: ( CINTERFACE ID ( COLON interfaceBaseExt )? definitions -> ^( CINTERFACE ID ( interfaceBaseExt )? definitions ) )
+            // Velvet.g:105:14: CINTERFACE ID ( COLON interfaceBaseExt )? definitions
             {
-            CINTERFACE30=(Token)match(input,CINTERFACE,FOLLOW_CINTERFACE_in_cinterface664);  
+            CINTERFACE30=(Token)match(input,CINTERFACE,FOLLOW_CINTERFACE_in_cinterface668);  
             stream_CINTERFACE.add(CINTERFACE30);
 
 
-            ID31=(Token)match(input,ID,FOLLOW_ID_in_cinterface666);  
+            ID31=(Token)match(input,ID,FOLLOW_ID_in_cinterface670);  
             stream_ID.add(ID31);
 
 
-            // Velvet.g:104:29: ( COLON interfaceBaseExt )?
+            // Velvet.g:105:29: ( COLON interfaceBaseExt )?
             int alt8=2;
             int LA8_0 = input.LA(1);
 
@@ -976,13 +979,13 @@ public TreeAdaptor getTreeAdaptor() {
             }
             switch (alt8) {
                 case 1 :
-                    // Velvet.g:104:30: COLON interfaceBaseExt
+                    // Velvet.g:105:30: COLON interfaceBaseExt
                     {
-                    COLON32=(Token)match(input,COLON,FOLLOW_COLON_in_cinterface670);  
+                    COLON32=(Token)match(input,COLON,FOLLOW_COLON_in_cinterface674);  
                     stream_COLON.add(COLON32);
 
 
-                    pushFollow(FOLLOW_interfaceBaseExt_in_cinterface672);
+                    pushFollow(FOLLOW_interfaceBaseExt_in_cinterface676);
                     interfaceBaseExt33=interfaceBaseExt();
 
                     state._fsp--;
@@ -995,7 +998,7 @@ public TreeAdaptor getTreeAdaptor() {
             }
 
 
-            pushFollow(FOLLOW_definitions_in_cinterface676);
+            pushFollow(FOLLOW_definitions_in_cinterface680);
             definitions34=definitions();
 
             state._fsp--;
@@ -1013,9 +1016,9 @@ public TreeAdaptor getTreeAdaptor() {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (Tree)adaptor.nil();
-            // 105:2: -> ^( CINTERFACE ID ( interfaceBaseExt )? definitions )
+            // 106:2: -> ^( CINTERFACE ID ( interfaceBaseExt )? definitions )
             {
-                // Velvet.g:105:5: ^( CINTERFACE ID ( interfaceBaseExt )? definitions )
+                // Velvet.g:106:5: ^( CINTERFACE ID ( interfaceBaseExt )? definitions )
                 {
                 Tree root_1 = (Tree)adaptor.nil();
                 root_1 = (Tree)adaptor.becomeRoot(
@@ -1026,7 +1029,7 @@ public TreeAdaptor getTreeAdaptor() {
                 stream_ID.nextNode()
                 );
 
-                // Velvet.g:105:21: ( interfaceBaseExt )?
+                // Velvet.g:106:21: ( interfaceBaseExt )?
                 if ( stream_interfaceBaseExt.hasNext() ) {
                     adaptor.addChild(root_1, stream_interfaceBaseExt.nextTree());
 
@@ -1074,7 +1077,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "interfaceBaseExt"
-    // Velvet.g:108:1: interfaceBaseExt : ID ( COMMA ID )* -> ^( BASEEXT ( ID )+ ) ;
+    // Velvet.g:109:1: interfaceBaseExt : ID ( COMMA ID )* -> ^( BASEEXT ( ID )+ ) ;
     public final VelvetParser.interfaceBaseExt_return interfaceBaseExt() throws RecognitionException {
         VelvetParser.interfaceBaseExt_return retval = new VelvetParser.interfaceBaseExt_return();
         retval.start = input.LT(1);
@@ -1093,14 +1096,14 @@ public TreeAdaptor getTreeAdaptor() {
         RewriteRuleTokenStream stream_COMMA=new RewriteRuleTokenStream(adaptor,"token COMMA");
 
         try {
-            // Velvet.g:109:2: ( ID ( COMMA ID )* -> ^( BASEEXT ( ID )+ ) )
-            // Velvet.g:109:4: ID ( COMMA ID )*
+            // Velvet.g:110:2: ( ID ( COMMA ID )* -> ^( BASEEXT ( ID )+ ) )
+            // Velvet.g:110:4: ID ( COMMA ID )*
             {
-            ID35=(Token)match(input,ID,FOLLOW_ID_in_interfaceBaseExt703);  
+            ID35=(Token)match(input,ID,FOLLOW_ID_in_interfaceBaseExt707);  
             stream_ID.add(ID35);
 
 
-            // Velvet.g:109:7: ( COMMA ID )*
+            // Velvet.g:110:7: ( COMMA ID )*
             loop9:
             do {
                 int alt9=2;
@@ -1113,13 +1116,13 @@ public TreeAdaptor getTreeAdaptor() {
 
                 switch (alt9) {
             	case 1 :
-            	    // Velvet.g:109:8: COMMA ID
+            	    // Velvet.g:110:8: COMMA ID
             	    {
-            	    COMMA36=(Token)match(input,COMMA,FOLLOW_COMMA_in_interfaceBaseExt706);  
+            	    COMMA36=(Token)match(input,COMMA,FOLLOW_COMMA_in_interfaceBaseExt710);  
             	    stream_COMMA.add(COMMA36);
 
 
-            	    ID37=(Token)match(input,ID,FOLLOW_ID_in_interfaceBaseExt708);  
+            	    ID37=(Token)match(input,ID,FOLLOW_ID_in_interfaceBaseExt712);  
             	    stream_ID.add(ID37);
 
 
@@ -1143,9 +1146,9 @@ public TreeAdaptor getTreeAdaptor() {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (Tree)adaptor.nil();
-            // 110:2: -> ^( BASEEXT ( ID )+ )
+            // 111:2: -> ^( BASEEXT ( ID )+ )
             {
-                // Velvet.g:110:5: ^( BASEEXT ( ID )+ )
+                // Velvet.g:111:5: ^( BASEEXT ( ID )+ )
                 {
                 Tree root_1 = (Tree)adaptor.nil();
                 root_1 = (Tree)adaptor.becomeRoot(
@@ -1202,7 +1205,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "name"
-    // Velvet.g:113:1: name : ( ID | IDPath );
+    // Velvet.g:114:1: name : ( ID | IDPath );
     public final VelvetParser.name_return name() throws RecognitionException {
         VelvetParser.name_return retval = new VelvetParser.name_return();
         retval.start = input.LT(1);
@@ -1215,7 +1218,7 @@ public TreeAdaptor getTreeAdaptor() {
         Tree set38_tree=null;
 
         try {
-            // Velvet.g:113:5: ( ID | IDPath )
+            // Velvet.g:114:5: ( ID | IDPath )
             // Velvet.g:
             {
             root_0 = (Tree)adaptor.nil();
@@ -1267,7 +1270,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "definitions"
-    // Velvet.g:117:1: definitions : START_C definition END_C -> ^( DEF definition ) ;
+    // Velvet.g:118:1: definitions : START_C definition END_C -> ^( DEF ( definition )? EMPTY ) ;
     public final VelvetParser.definitions_return definitions() throws RecognitionException {
         VelvetParser.definitions_return retval = new VelvetParser.definitions_return();
         retval.start = input.LT(1);
@@ -1286,21 +1289,21 @@ public TreeAdaptor getTreeAdaptor() {
         RewriteRuleTokenStream stream_START_C=new RewriteRuleTokenStream(adaptor,"token START_C");
         RewriteRuleSubtreeStream stream_definition=new RewriteRuleSubtreeStream(adaptor,"rule definition");
         try {
-            // Velvet.g:118:2: ( START_C definition END_C -> ^( DEF definition ) )
-            // Velvet.g:118:4: START_C definition END_C
+            // Velvet.g:119:2: ( START_C definition END_C -> ^( DEF ( definition )? EMPTY ) )
+            // Velvet.g:119:4: START_C definition END_C
             {
-            START_C39=(Token)match(input,START_C,FOLLOW_START_C_in_definitions748);  
+            START_C39=(Token)match(input,START_C,FOLLOW_START_C_in_definitions752);  
             stream_START_C.add(START_C39);
 
 
-            pushFollow(FOLLOW_definition_in_definitions750);
+            pushFollow(FOLLOW_definition_in_definitions754);
             definition40=definition();
 
             state._fsp--;
 
             stream_definition.add(definition40.getTree());
 
-            END_C41=(Token)match(input,END_C,FOLLOW_END_C_in_definitions752);  
+            END_C41=(Token)match(input,END_C,FOLLOW_END_C_in_definitions756);  
             stream_END_C.add(END_C41);
 
 
@@ -1315,16 +1318,25 @@ public TreeAdaptor getTreeAdaptor() {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (Tree)adaptor.nil();
-            // 119:2: -> ^( DEF definition )
+            // 120:2: -> ^( DEF ( definition )? EMPTY )
             {
-                // Velvet.g:119:5: ^( DEF definition )
+                // Velvet.g:120:5: ^( DEF ( definition )? EMPTY )
                 {
                 Tree root_1 = (Tree)adaptor.nil();
                 root_1 = (Tree)adaptor.becomeRoot(
                 (Tree)adaptor.create(DEF, "DEF")
                 , root_1);
 
-                adaptor.addChild(root_1, stream_definition.nextTree());
+                // Velvet.g:120:11: ( definition )?
+                if ( stream_definition.hasNext() ) {
+                    adaptor.addChild(root_1, stream_definition.nextTree());
+
+                }
+                stream_definition.reset();
+
+                adaptor.addChild(root_1, 
+                (Tree)adaptor.create(EMPTY, "EMPTY")
+                );
 
                 adaptor.addChild(root_0, root_1);
                 }
@@ -1365,7 +1377,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "definition"
-    // Velvet.g:122:1: definition : ( nonFeatureDefinition )* ( ( featureGroup ( nonFeatureDefinition )* ) | ( feature ( feature | nonFeatureDefinition )* ) )? ;
+    // Velvet.g:123:1: definition : ( nonFeatureDefinition )* ( ( featureGroup ( nonFeatureDefinition )* ) | ( feature ( feature | nonFeatureDefinition )* ) )? ;
     public final VelvetParser.definition_return definition() throws RecognitionException {
         VelvetParser.definition_return retval = new VelvetParser.definition_return();
         retval.start = input.LT(1);
@@ -1388,13 +1400,13 @@ public TreeAdaptor getTreeAdaptor() {
 
 
         try {
-            // Velvet.g:123:2: ( ( nonFeatureDefinition )* ( ( featureGroup ( nonFeatureDefinition )* ) | ( feature ( feature | nonFeatureDefinition )* ) )? )
-            // Velvet.g:123:4: ( nonFeatureDefinition )* ( ( featureGroup ( nonFeatureDefinition )* ) | ( feature ( feature | nonFeatureDefinition )* ) )?
+            // Velvet.g:124:2: ( ( nonFeatureDefinition )* ( ( featureGroup ( nonFeatureDefinition )* ) | ( feature ( feature | nonFeatureDefinition )* ) )? )
+            // Velvet.g:124:4: ( nonFeatureDefinition )* ( ( featureGroup ( nonFeatureDefinition )* ) | ( feature ( feature | nonFeatureDefinition )* ) )?
             {
             root_0 = (Tree)adaptor.nil();
 
 
-            // Velvet.g:123:4: ( nonFeatureDefinition )*
+            // Velvet.g:124:4: ( nonFeatureDefinition )*
             loop10:
             do {
                 int alt10=2;
@@ -1407,9 +1419,9 @@ public TreeAdaptor getTreeAdaptor() {
 
                 switch (alt10) {
             	case 1 :
-            	    // Velvet.g:123:4: nonFeatureDefinition
+            	    // Velvet.g:124:4: nonFeatureDefinition
             	    {
-            	    pushFollow(FOLLOW_nonFeatureDefinition_in_definition773);
+            	    pushFollow(FOLLOW_nonFeatureDefinition_in_definition780);
             	    nonFeatureDefinition42=nonFeatureDefinition();
 
             	    state._fsp--;
@@ -1425,7 +1437,7 @@ public TreeAdaptor getTreeAdaptor() {
             } while (true);
 
 
-            // Velvet.g:123:26: ( ( featureGroup ( nonFeatureDefinition )* ) | ( feature ( feature | nonFeatureDefinition )* ) )?
+            // Velvet.g:124:26: ( ( featureGroup ( nonFeatureDefinition )* ) | ( feature ( feature | nonFeatureDefinition )* ) )?
             int alt13=3;
             int LA13_0 = input.LA(1);
 
@@ -1437,19 +1449,19 @@ public TreeAdaptor getTreeAdaptor() {
             }
             switch (alt13) {
                 case 1 :
-                    // Velvet.g:124:3: ( featureGroup ( nonFeatureDefinition )* )
+                    // Velvet.g:125:3: ( featureGroup ( nonFeatureDefinition )* )
                     {
-                    // Velvet.g:124:3: ( featureGroup ( nonFeatureDefinition )* )
-                    // Velvet.g:124:4: featureGroup ( nonFeatureDefinition )*
+                    // Velvet.g:125:3: ( featureGroup ( nonFeatureDefinition )* )
+                    // Velvet.g:125:4: featureGroup ( nonFeatureDefinition )*
                     {
-                    pushFollow(FOLLOW_featureGroup_in_definition781);
+                    pushFollow(FOLLOW_featureGroup_in_definition788);
                     featureGroup43=featureGroup();
 
                     state._fsp--;
 
                     adaptor.addChild(root_0, featureGroup43.getTree());
 
-                    // Velvet.g:124:17: ( nonFeatureDefinition )*
+                    // Velvet.g:125:17: ( nonFeatureDefinition )*
                     loop11:
                     do {
                         int alt11=2;
@@ -1462,9 +1474,9 @@ public TreeAdaptor getTreeAdaptor() {
 
                         switch (alt11) {
                     	case 1 :
-                    	    // Velvet.g:124:17: nonFeatureDefinition
+                    	    // Velvet.g:125:17: nonFeatureDefinition
                     	    {
-                    	    pushFollow(FOLLOW_nonFeatureDefinition_in_definition783);
+                    	    pushFollow(FOLLOW_nonFeatureDefinition_in_definition790);
                     	    nonFeatureDefinition44=nonFeatureDefinition();
 
                     	    state._fsp--;
@@ -1486,19 +1498,19 @@ public TreeAdaptor getTreeAdaptor() {
                     }
                     break;
                 case 2 :
-                    // Velvet.g:125:3: ( feature ( feature | nonFeatureDefinition )* )
+                    // Velvet.g:126:3: ( feature ( feature | nonFeatureDefinition )* )
                     {
-                    // Velvet.g:125:3: ( feature ( feature | nonFeatureDefinition )* )
-                    // Velvet.g:125:4: feature ( feature | nonFeatureDefinition )*
+                    // Velvet.g:126:3: ( feature ( feature | nonFeatureDefinition )* )
+                    // Velvet.g:126:4: feature ( feature | nonFeatureDefinition )*
                     {
-                    pushFollow(FOLLOW_feature_in_definition792);
+                    pushFollow(FOLLOW_feature_in_definition799);
                     feature45=feature();
 
                     state._fsp--;
 
                     adaptor.addChild(root_0, feature45.getTree());
 
-                    // Velvet.g:125:12: ( feature | nonFeatureDefinition )*
+                    // Velvet.g:126:12: ( feature | nonFeatureDefinition )*
                     loop12:
                     do {
                         int alt12=3;
@@ -1514,9 +1526,9 @@ public TreeAdaptor getTreeAdaptor() {
 
                         switch (alt12) {
                     	case 1 :
-                    	    // Velvet.g:125:13: feature
+                    	    // Velvet.g:126:13: feature
                     	    {
-                    	    pushFollow(FOLLOW_feature_in_definition795);
+                    	    pushFollow(FOLLOW_feature_in_definition802);
                     	    feature46=feature();
 
                     	    state._fsp--;
@@ -1526,9 +1538,9 @@ public TreeAdaptor getTreeAdaptor() {
                     	    }
                     	    break;
                     	case 2 :
-                    	    // Velvet.g:125:23: nonFeatureDefinition
+                    	    // Velvet.g:126:23: nonFeatureDefinition
                     	    {
-                    	    pushFollow(FOLLOW_nonFeatureDefinition_in_definition799);
+                    	    pushFollow(FOLLOW_nonFeatureDefinition_in_definition806);
                     	    nonFeatureDefinition47=nonFeatureDefinition();
 
                     	    state._fsp--;
@@ -1584,7 +1596,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "nonFeatureDefinition"
-    // Velvet.g:129:1: nonFeatureDefinition : ( constraint | use | attribute );
+    // Velvet.g:130:1: nonFeatureDefinition : ( constraint | use | attribute );
     public final VelvetParser.nonFeatureDefinition_return nonFeatureDefinition() throws RecognitionException {
         VelvetParser.nonFeatureDefinition_return retval = new VelvetParser.nonFeatureDefinition_return();
         retval.start = input.LT(1);
@@ -1601,7 +1613,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
         try {
-            // Velvet.g:130:2: ( constraint | use | attribute )
+            // Velvet.g:131:2: ( constraint | use | attribute )
             int alt14=3;
             switch ( input.LA(1) ) {
             case CONSTRAINT:
@@ -1632,12 +1644,12 @@ public TreeAdaptor getTreeAdaptor() {
 
             switch (alt14) {
                 case 1 :
-                    // Velvet.g:130:4: constraint
+                    // Velvet.g:131:4: constraint
                     {
                     root_0 = (Tree)adaptor.nil();
 
 
-                    pushFollow(FOLLOW_constraint_in_nonFeatureDefinition821);
+                    pushFollow(FOLLOW_constraint_in_nonFeatureDefinition828);
                     constraint48=constraint();
 
                     state._fsp--;
@@ -1647,12 +1659,12 @@ public TreeAdaptor getTreeAdaptor() {
                     }
                     break;
                 case 2 :
-                    // Velvet.g:131:4: use
+                    // Velvet.g:132:4: use
                     {
                     root_0 = (Tree)adaptor.nil();
 
 
-                    pushFollow(FOLLOW_use_in_nonFeatureDefinition826);
+                    pushFollow(FOLLOW_use_in_nonFeatureDefinition833);
                     use49=use();
 
                     state._fsp--;
@@ -1662,12 +1674,12 @@ public TreeAdaptor getTreeAdaptor() {
                     }
                     break;
                 case 3 :
-                    // Velvet.g:132:4: attribute
+                    // Velvet.g:133:4: attribute
                     {
                     root_0 = (Tree)adaptor.nil();
 
 
-                    pushFollow(FOLLOW_attribute_in_nonFeatureDefinition831);
+                    pushFollow(FOLLOW_attribute_in_nonFeatureDefinition838);
                     attribute50=attribute();
 
                     state._fsp--;
@@ -1707,7 +1719,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "use"
-    // Velvet.g:135:1: use : USE name SEMI -> ^( USES name ) ;
+    // Velvet.g:136:1: use : USE name SEMI -> ^( USES name ) ;
     public final VelvetParser.use_return use() throws RecognitionException {
         VelvetParser.use_return retval = new VelvetParser.use_return();
         retval.start = input.LT(1);
@@ -1726,21 +1738,21 @@ public TreeAdaptor getTreeAdaptor() {
         RewriteRuleTokenStream stream_SEMI=new RewriteRuleTokenStream(adaptor,"token SEMI");
         RewriteRuleSubtreeStream stream_name=new RewriteRuleSubtreeStream(adaptor,"rule name");
         try {
-            // Velvet.g:135:5: ( USE name SEMI -> ^( USES name ) )
-            // Velvet.g:135:7: USE name SEMI
+            // Velvet.g:136:5: ( USE name SEMI -> ^( USES name ) )
+            // Velvet.g:136:7: USE name SEMI
             {
-            USE51=(Token)match(input,USE,FOLLOW_USE_in_use843);  
+            USE51=(Token)match(input,USE,FOLLOW_USE_in_use850);  
             stream_USE.add(USE51);
 
 
-            pushFollow(FOLLOW_name_in_use845);
+            pushFollow(FOLLOW_name_in_use852);
             name52=name();
 
             state._fsp--;
 
             stream_name.add(name52.getTree());
 
-            SEMI53=(Token)match(input,SEMI,FOLLOW_SEMI_in_use847);  
+            SEMI53=(Token)match(input,SEMI,FOLLOW_SEMI_in_use854);  
             stream_SEMI.add(SEMI53);
 
 
@@ -1755,9 +1767,9 @@ public TreeAdaptor getTreeAdaptor() {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (Tree)adaptor.nil();
-            // 136:2: -> ^( USES name )
+            // 137:2: -> ^( USES name )
             {
-                // Velvet.g:136:5: ^( USES name )
+                // Velvet.g:137:5: ^( USES name )
                 {
                 Tree root_1 = (Tree)adaptor.nil();
                 root_1 = (Tree)adaptor.becomeRoot(
@@ -1805,7 +1817,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "feature"
-    // Velvet.g:139:1: feature : ( MANDATORY ABSTRACT | ABSTRACT MANDATORY | MANDATORY | ABSTRACT )? FEATURE name ( definitions | SEMI ) -> ^( FEAT name ( MANDATORY )? ( ABSTRACT )? ( definitions )? ) ;
+    // Velvet.g:140:1: feature : ( MANDATORY ABSTRACT | ABSTRACT MANDATORY | MANDATORY | ABSTRACT )? FEATURE name ( definitions | SEMI ) -> ^( FEAT name ( MANDATORY )? ( ABSTRACT )? ( definitions )? ) ;
     public final VelvetParser.feature_return feature() throws RecognitionException {
         VelvetParser.feature_return retval = new VelvetParser.feature_return();
         retval.start = input.LT(1);
@@ -1841,10 +1853,10 @@ public TreeAdaptor getTreeAdaptor() {
         RewriteRuleSubtreeStream stream_name=new RewriteRuleSubtreeStream(adaptor,"rule name");
         RewriteRuleSubtreeStream stream_definitions=new RewriteRuleSubtreeStream(adaptor,"rule definitions");
         try {
-            // Velvet.g:140:2: ( ( MANDATORY ABSTRACT | ABSTRACT MANDATORY | MANDATORY | ABSTRACT )? FEATURE name ( definitions | SEMI ) -> ^( FEAT name ( MANDATORY )? ( ABSTRACT )? ( definitions )? ) )
-            // Velvet.g:140:4: ( MANDATORY ABSTRACT | ABSTRACT MANDATORY | MANDATORY | ABSTRACT )? FEATURE name ( definitions | SEMI )
+            // Velvet.g:141:2: ( ( MANDATORY ABSTRACT | ABSTRACT MANDATORY | MANDATORY | ABSTRACT )? FEATURE name ( definitions | SEMI ) -> ^( FEAT name ( MANDATORY )? ( ABSTRACT )? ( definitions )? ) )
+            // Velvet.g:141:4: ( MANDATORY ABSTRACT | ABSTRACT MANDATORY | MANDATORY | ABSTRACT )? FEATURE name ( definitions | SEMI )
             {
-            // Velvet.g:140:4: ( MANDATORY ABSTRACT | ABSTRACT MANDATORY | MANDATORY | ABSTRACT )?
+            // Velvet.g:141:4: ( MANDATORY ABSTRACT | ABSTRACT MANDATORY | MANDATORY | ABSTRACT )?
             int alt15=5;
             int LA15_0 = input.LA(1);
 
@@ -1870,44 +1882,44 @@ public TreeAdaptor getTreeAdaptor() {
             }
             switch (alt15) {
                 case 1 :
-                    // Velvet.g:140:5: MANDATORY ABSTRACT
+                    // Velvet.g:141:5: MANDATORY ABSTRACT
                     {
-                    MANDATORY54=(Token)match(input,MANDATORY,FOLLOW_MANDATORY_in_feature868);  
+                    MANDATORY54=(Token)match(input,MANDATORY,FOLLOW_MANDATORY_in_feature875);  
                     stream_MANDATORY.add(MANDATORY54);
 
 
-                    ABSTRACT55=(Token)match(input,ABSTRACT,FOLLOW_ABSTRACT_in_feature870);  
+                    ABSTRACT55=(Token)match(input,ABSTRACT,FOLLOW_ABSTRACT_in_feature877);  
                     stream_ABSTRACT.add(ABSTRACT55);
 
 
                     }
                     break;
                 case 2 :
-                    // Velvet.g:140:26: ABSTRACT MANDATORY
+                    // Velvet.g:141:26: ABSTRACT MANDATORY
                     {
-                    ABSTRACT56=(Token)match(input,ABSTRACT,FOLLOW_ABSTRACT_in_feature874);  
+                    ABSTRACT56=(Token)match(input,ABSTRACT,FOLLOW_ABSTRACT_in_feature881);  
                     stream_ABSTRACT.add(ABSTRACT56);
 
 
-                    MANDATORY57=(Token)match(input,MANDATORY,FOLLOW_MANDATORY_in_feature876);  
+                    MANDATORY57=(Token)match(input,MANDATORY,FOLLOW_MANDATORY_in_feature883);  
                     stream_MANDATORY.add(MANDATORY57);
 
 
                     }
                     break;
                 case 3 :
-                    // Velvet.g:140:47: MANDATORY
+                    // Velvet.g:141:47: MANDATORY
                     {
-                    MANDATORY58=(Token)match(input,MANDATORY,FOLLOW_MANDATORY_in_feature880);  
+                    MANDATORY58=(Token)match(input,MANDATORY,FOLLOW_MANDATORY_in_feature887);  
                     stream_MANDATORY.add(MANDATORY58);
 
 
                     }
                     break;
                 case 4 :
-                    // Velvet.g:140:59: ABSTRACT
+                    // Velvet.g:141:59: ABSTRACT
                     {
-                    ABSTRACT59=(Token)match(input,ABSTRACT,FOLLOW_ABSTRACT_in_feature884);  
+                    ABSTRACT59=(Token)match(input,ABSTRACT,FOLLOW_ABSTRACT_in_feature891);  
                     stream_ABSTRACT.add(ABSTRACT59);
 
 
@@ -1917,18 +1929,18 @@ public TreeAdaptor getTreeAdaptor() {
             }
 
 
-            FEATURE60=(Token)match(input,FEATURE,FOLLOW_FEATURE_in_feature891);  
+            FEATURE60=(Token)match(input,FEATURE,FOLLOW_FEATURE_in_feature898);  
             stream_FEATURE.add(FEATURE60);
 
 
-            pushFollow(FOLLOW_name_in_feature893);
+            pushFollow(FOLLOW_name_in_feature900);
             name61=name();
 
             state._fsp--;
 
             stream_name.add(name61.getTree());
 
-            // Velvet.g:141:17: ( definitions | SEMI )
+            // Velvet.g:142:17: ( definitions | SEMI )
             int alt16=2;
             int LA16_0 = input.LA(1);
 
@@ -1947,9 +1959,9 @@ public TreeAdaptor getTreeAdaptor() {
             }
             switch (alt16) {
                 case 1 :
-                    // Velvet.g:141:18: definitions
+                    // Velvet.g:142:18: definitions
                     {
-                    pushFollow(FOLLOW_definitions_in_feature896);
+                    pushFollow(FOLLOW_definitions_in_feature903);
                     definitions62=definitions();
 
                     state._fsp--;
@@ -1959,9 +1971,9 @@ public TreeAdaptor getTreeAdaptor() {
                     }
                     break;
                 case 2 :
-                    // Velvet.g:141:32: SEMI
+                    // Velvet.g:142:32: SEMI
                     {
-                    SEMI63=(Token)match(input,SEMI,FOLLOW_SEMI_in_feature900);  
+                    SEMI63=(Token)match(input,SEMI,FOLLOW_SEMI_in_feature907);  
                     stream_SEMI.add(SEMI63);
 
 
@@ -1982,9 +1994,9 @@ public TreeAdaptor getTreeAdaptor() {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (Tree)adaptor.nil();
-            // 142:2: -> ^( FEAT name ( MANDATORY )? ( ABSTRACT )? ( definitions )? )
+            // 143:2: -> ^( FEAT name ( MANDATORY )? ( ABSTRACT )? ( definitions )? )
             {
-                // Velvet.g:142:5: ^( FEAT name ( MANDATORY )? ( ABSTRACT )? ( definitions )? )
+                // Velvet.g:143:5: ^( FEAT name ( MANDATORY )? ( ABSTRACT )? ( definitions )? )
                 {
                 Tree root_1 = (Tree)adaptor.nil();
                 root_1 = (Tree)adaptor.becomeRoot(
@@ -1993,7 +2005,7 @@ public TreeAdaptor getTreeAdaptor() {
 
                 adaptor.addChild(root_1, stream_name.nextTree());
 
-                // Velvet.g:142:17: ( MANDATORY )?
+                // Velvet.g:143:17: ( MANDATORY )?
                 if ( stream_MANDATORY.hasNext() ) {
                     adaptor.addChild(root_1, 
                     stream_MANDATORY.nextNode()
@@ -2002,7 +2014,7 @@ public TreeAdaptor getTreeAdaptor() {
                 }
                 stream_MANDATORY.reset();
 
-                // Velvet.g:142:28: ( ABSTRACT )?
+                // Velvet.g:143:28: ( ABSTRACT )?
                 if ( stream_ABSTRACT.hasNext() ) {
                     adaptor.addChild(root_1, 
                     stream_ABSTRACT.nextNode()
@@ -2011,7 +2023,7 @@ public TreeAdaptor getTreeAdaptor() {
                 }
                 stream_ABSTRACT.reset();
 
-                // Velvet.g:142:38: ( definitions )?
+                // Velvet.g:143:38: ( definitions )?
                 if ( stream_definitions.hasNext() ) {
                     adaptor.addChild(root_1, stream_definitions.nextTree());
 
@@ -2057,7 +2069,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "featureGroup"
-    // Velvet.g:145:1: featureGroup : groupType START_C feature ( feature )+ END_C -> ^( GROUP groupType feature ( feature )+ ) ;
+    // Velvet.g:146:1: featureGroup : groupType START_C feature ( feature )+ END_C -> ^( GROUP groupType feature ( feature )+ ) ;
     public final VelvetParser.featureGroup_return featureGroup() throws RecognitionException {
         VelvetParser.featureGroup_return retval = new VelvetParser.featureGroup_return();
         retval.start = input.LT(1);
@@ -2081,28 +2093,28 @@ public TreeAdaptor getTreeAdaptor() {
         RewriteRuleSubtreeStream stream_groupType=new RewriteRuleSubtreeStream(adaptor,"rule groupType");
         RewriteRuleSubtreeStream stream_feature=new RewriteRuleSubtreeStream(adaptor,"rule feature");
         try {
-            // Velvet.g:146:2: ( groupType START_C feature ( feature )+ END_C -> ^( GROUP groupType feature ( feature )+ ) )
-            // Velvet.g:146:4: groupType START_C feature ( feature )+ END_C
+            // Velvet.g:147:2: ( groupType START_C feature ( feature )+ END_C -> ^( GROUP groupType feature ( feature )+ ) )
+            // Velvet.g:147:4: groupType START_C feature ( feature )+ END_C
             {
-            pushFollow(FOLLOW_groupType_in_featureGroup931);
+            pushFollow(FOLLOW_groupType_in_featureGroup938);
             groupType64=groupType();
 
             state._fsp--;
 
             stream_groupType.add(groupType64.getTree());
 
-            START_C65=(Token)match(input,START_C,FOLLOW_START_C_in_featureGroup933);  
+            START_C65=(Token)match(input,START_C,FOLLOW_START_C_in_featureGroup940);  
             stream_START_C.add(START_C65);
 
 
-            pushFollow(FOLLOW_feature_in_featureGroup935);
+            pushFollow(FOLLOW_feature_in_featureGroup942);
             feature66=feature();
 
             state._fsp--;
 
             stream_feature.add(feature66.getTree());
 
-            // Velvet.g:146:30: ( feature )+
+            // Velvet.g:147:30: ( feature )+
             int cnt17=0;
             loop17:
             do {
@@ -2116,9 +2128,9 @@ public TreeAdaptor getTreeAdaptor() {
 
                 switch (alt17) {
             	case 1 :
-            	    // Velvet.g:146:30: feature
+            	    // Velvet.g:147:30: feature
             	    {
-            	    pushFollow(FOLLOW_feature_in_featureGroup937);
+            	    pushFollow(FOLLOW_feature_in_featureGroup944);
             	    feature67=feature();
 
             	    state._fsp--;
@@ -2138,7 +2150,7 @@ public TreeAdaptor getTreeAdaptor() {
             } while (true);
 
 
-            END_C68=(Token)match(input,END_C,FOLLOW_END_C_in_featureGroup940);  
+            END_C68=(Token)match(input,END_C,FOLLOW_END_C_in_featureGroup947);  
             stream_END_C.add(END_C68);
 
 
@@ -2153,9 +2165,9 @@ public TreeAdaptor getTreeAdaptor() {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (Tree)adaptor.nil();
-            // 147:2: -> ^( GROUP groupType feature ( feature )+ )
+            // 148:2: -> ^( GROUP groupType feature ( feature )+ )
             {
-                // Velvet.g:147:5: ^( GROUP groupType feature ( feature )+ )
+                // Velvet.g:148:5: ^( GROUP groupType feature ( feature )+ )
                 {
                 Tree root_1 = (Tree)adaptor.nil();
                 root_1 = (Tree)adaptor.becomeRoot(
@@ -2214,7 +2226,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "groupType"
-    // Velvet.g:150:1: groupType : ( SOMEOF | ONEOF );
+    // Velvet.g:151:1: groupType : ( SOMEOF | ONEOF );
     public final VelvetParser.groupType_return groupType() throws RecognitionException {
         VelvetParser.groupType_return retval = new VelvetParser.groupType_return();
         retval.start = input.LT(1);
@@ -2227,7 +2239,7 @@ public TreeAdaptor getTreeAdaptor() {
         Tree set69_tree=null;
 
         try {
-            // Velvet.g:151:2: ( SOMEOF | ONEOF )
+            // Velvet.g:152:2: ( SOMEOF | ONEOF )
             // Velvet.g:
             {
             root_0 = (Tree)adaptor.nil();
@@ -2279,7 +2291,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "constraint"
-    // Velvet.g:155:1: constraint : CONSTRAINT ^ ( ID EQ !)? ( constraintDefinition | attributeConstraint ) SEMI !;
+    // Velvet.g:156:1: constraint : CONSTRAINT ^ ( ID EQ !)? ( constraintDefinition | attributeConstraint ) SEMI !;
     public final VelvetParser.constraint_return constraint() throws RecognitionException {
         VelvetParser.constraint_return retval = new VelvetParser.constraint_return();
         retval.start = input.LT(1);
@@ -2302,20 +2314,20 @@ public TreeAdaptor getTreeAdaptor() {
         Tree SEMI75_tree=null;
 
         try {
-            // Velvet.g:156:2: ( CONSTRAINT ^ ( ID EQ !)? ( constraintDefinition | attributeConstraint ) SEMI !)
-            // Velvet.g:156:4: CONSTRAINT ^ ( ID EQ !)? ( constraintDefinition | attributeConstraint ) SEMI !
+            // Velvet.g:157:2: ( CONSTRAINT ^ ( ID EQ !)? ( constraintDefinition | attributeConstraint ) SEMI !)
+            // Velvet.g:157:4: CONSTRAINT ^ ( ID EQ !)? ( constraintDefinition | attributeConstraint ) SEMI !
             {
             root_0 = (Tree)adaptor.nil();
 
 
-            CONSTRAINT70=(Token)match(input,CONSTRAINT,FOLLOW_CONSTRAINT_in_constraint983); 
+            CONSTRAINT70=(Token)match(input,CONSTRAINT,FOLLOW_CONSTRAINT_in_constraint990); 
             CONSTRAINT70_tree = 
             (Tree)adaptor.create(CONSTRAINT70)
             ;
             root_0 = (Tree)adaptor.becomeRoot(CONSTRAINT70_tree, root_0);
 
 
-            // Velvet.g:156:16: ( ID EQ !)?
+            // Velvet.g:157:16: ( ID EQ !)?
             int alt18=2;
             int LA18_0 = input.LA(1);
 
@@ -2328,16 +2340,16 @@ public TreeAdaptor getTreeAdaptor() {
             }
             switch (alt18) {
                 case 1 :
-                    // Velvet.g:156:17: ID EQ !
+                    // Velvet.g:157:17: ID EQ !
                     {
-                    ID71=(Token)match(input,ID,FOLLOW_ID_in_constraint987); 
+                    ID71=(Token)match(input,ID,FOLLOW_ID_in_constraint994); 
                     ID71_tree = 
                     (Tree)adaptor.create(ID71)
                     ;
                     adaptor.addChild(root_0, ID71_tree);
 
 
-                    EQ72=(Token)match(input,EQ,FOLLOW_EQ_in_constraint989); 
+                    EQ72=(Token)match(input,EQ,FOLLOW_EQ_in_constraint996); 
 
                     }
                     break;
@@ -2345,7 +2357,7 @@ public TreeAdaptor getTreeAdaptor() {
             }
 
 
-            // Velvet.g:156:26: ( constraintDefinition | attributeConstraint )
+            // Velvet.g:157:26: ( constraintDefinition | attributeConstraint )
             int alt19=2;
             switch ( input.LA(1) ) {
             case OP_NOT:
@@ -2389,9 +2401,9 @@ public TreeAdaptor getTreeAdaptor() {
 
             switch (alt19) {
                 case 1 :
-                    // Velvet.g:156:27: constraintDefinition
+                    // Velvet.g:157:27: constraintDefinition
                     {
-                    pushFollow(FOLLOW_constraintDefinition_in_constraint995);
+                    pushFollow(FOLLOW_constraintDefinition_in_constraint1002);
                     constraintDefinition73=constraintDefinition();
 
                     state._fsp--;
@@ -2401,9 +2413,9 @@ public TreeAdaptor getTreeAdaptor() {
                     }
                     break;
                 case 2 :
-                    // Velvet.g:156:50: attributeConstraint
+                    // Velvet.g:157:50: attributeConstraint
                     {
-                    pushFollow(FOLLOW_attributeConstraint_in_constraint999);
+                    pushFollow(FOLLOW_attributeConstraint_in_constraint1006);
                     attributeConstraint74=attributeConstraint();
 
                     state._fsp--;
@@ -2416,7 +2428,7 @@ public TreeAdaptor getTreeAdaptor() {
             }
 
 
-            SEMI75=(Token)match(input,SEMI,FOLLOW_SEMI_in_constraint1002); 
+            SEMI75=(Token)match(input,SEMI,FOLLOW_SEMI_in_constraint1009); 
 
             }
 
@@ -2449,7 +2461,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "constraintDefinition"
-    // Velvet.g:159:1: constraintDefinition : constraintOperand ( binaryOp constraintOperand )* -> ^( CONSTR ( constraintOperand )+ ( binaryOp )* ) ;
+    // Velvet.g:160:1: constraintDefinition : constraintOperand ( binaryOp constraintOperand )* -> ^( CONSTR ( constraintOperand )+ ( binaryOp )* ) ;
     public final VelvetParser.constraintDefinition_return constraintDefinition() throws RecognitionException {
         VelvetParser.constraintDefinition_return retval = new VelvetParser.constraintDefinition_return();
         retval.start = input.LT(1);
@@ -2467,17 +2479,17 @@ public TreeAdaptor getTreeAdaptor() {
         RewriteRuleSubtreeStream stream_constraintOperand=new RewriteRuleSubtreeStream(adaptor,"rule constraintOperand");
         RewriteRuleSubtreeStream stream_binaryOp=new RewriteRuleSubtreeStream(adaptor,"rule binaryOp");
         try {
-            // Velvet.g:160:2: ( constraintOperand ( binaryOp constraintOperand )* -> ^( CONSTR ( constraintOperand )+ ( binaryOp )* ) )
-            // Velvet.g:160:4: constraintOperand ( binaryOp constraintOperand )*
+            // Velvet.g:161:2: ( constraintOperand ( binaryOp constraintOperand )* -> ^( CONSTR ( constraintOperand )+ ( binaryOp )* ) )
+            // Velvet.g:161:4: constraintOperand ( binaryOp constraintOperand )*
             {
-            pushFollow(FOLLOW_constraintOperand_in_constraintDefinition1015);
+            pushFollow(FOLLOW_constraintOperand_in_constraintDefinition1022);
             constraintOperand76=constraintOperand();
 
             state._fsp--;
 
             stream_constraintOperand.add(constraintOperand76.getTree());
 
-            // Velvet.g:160:22: ( binaryOp constraintOperand )*
+            // Velvet.g:161:22: ( binaryOp constraintOperand )*
             loop20:
             do {
                 int alt20=2;
@@ -2490,16 +2502,16 @@ public TreeAdaptor getTreeAdaptor() {
 
                 switch (alt20) {
             	case 1 :
-            	    // Velvet.g:160:23: binaryOp constraintOperand
+            	    // Velvet.g:161:23: binaryOp constraintOperand
             	    {
-            	    pushFollow(FOLLOW_binaryOp_in_constraintDefinition1018);
+            	    pushFollow(FOLLOW_binaryOp_in_constraintDefinition1025);
             	    binaryOp77=binaryOp();
 
             	    state._fsp--;
 
             	    stream_binaryOp.add(binaryOp77.getTree());
 
-            	    pushFollow(FOLLOW_constraintOperand_in_constraintDefinition1020);
+            	    pushFollow(FOLLOW_constraintOperand_in_constraintDefinition1027);
             	    constraintOperand78=constraintOperand();
 
             	    state._fsp--;
@@ -2526,9 +2538,9 @@ public TreeAdaptor getTreeAdaptor() {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (Tree)adaptor.nil();
-            // 161:2: -> ^( CONSTR ( constraintOperand )+ ( binaryOp )* )
+            // 162:2: -> ^( CONSTR ( constraintOperand )+ ( binaryOp )* )
             {
-                // Velvet.g:161:5: ^( CONSTR ( constraintOperand )+ ( binaryOp )* )
+                // Velvet.g:162:5: ^( CONSTR ( constraintOperand )+ ( binaryOp )* )
                 {
                 Tree root_1 = (Tree)adaptor.nil();
                 root_1 = (Tree)adaptor.becomeRoot(
@@ -2544,7 +2556,7 @@ public TreeAdaptor getTreeAdaptor() {
                 }
                 stream_constraintOperand.reset();
 
-                // Velvet.g:161:33: ( binaryOp )*
+                // Velvet.g:162:33: ( binaryOp )*
                 while ( stream_binaryOp.hasNext() ) {
                     adaptor.addChild(root_1, stream_binaryOp.nextTree());
 
@@ -2590,7 +2602,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "constraintOperand"
-    // Velvet.g:164:1: constraintOperand : ( unaryOp )* ( START_R constraintDefinition END_R | name ) -> ( constraintDefinition )? ( ^( UNARYOP unaryOp ) )* ( ^( OPERAND name ) )? ;
+    // Velvet.g:165:1: constraintOperand : ( unaryOp )* ( START_R constraintDefinition END_R | name ) -> ( constraintDefinition )? ( ^( UNARYOP unaryOp ) )* ( ^( OPERAND name ) )? ;
     public final VelvetParser.constraintOperand_return constraintOperand() throws RecognitionException {
         VelvetParser.constraintOperand_return retval = new VelvetParser.constraintOperand_return();
         retval.start = input.LT(1);
@@ -2615,10 +2627,10 @@ public TreeAdaptor getTreeAdaptor() {
         RewriteRuleSubtreeStream stream_unaryOp=new RewriteRuleSubtreeStream(adaptor,"rule unaryOp");
         RewriteRuleSubtreeStream stream_constraintDefinition=new RewriteRuleSubtreeStream(adaptor,"rule constraintDefinition");
         try {
-            // Velvet.g:164:19: ( ( unaryOp )* ( START_R constraintDefinition END_R | name ) -> ( constraintDefinition )? ( ^( UNARYOP unaryOp ) )* ( ^( OPERAND name ) )? )
-            // Velvet.g:164:21: ( unaryOp )* ( START_R constraintDefinition END_R | name )
+            // Velvet.g:165:19: ( ( unaryOp )* ( START_R constraintDefinition END_R | name ) -> ( constraintDefinition )? ( ^( UNARYOP unaryOp ) )* ( ^( OPERAND name ) )? )
+            // Velvet.g:165:21: ( unaryOp )* ( START_R constraintDefinition END_R | name )
             {
-            // Velvet.g:164:21: ( unaryOp )*
+            // Velvet.g:165:21: ( unaryOp )*
             loop21:
             do {
                 int alt21=2;
@@ -2631,9 +2643,9 @@ public TreeAdaptor getTreeAdaptor() {
 
                 switch (alt21) {
             	case 1 :
-            	    // Velvet.g:164:21: unaryOp
+            	    // Velvet.g:165:21: unaryOp
             	    {
-            	    pushFollow(FOLLOW_unaryOp_in_constraintOperand1047);
+            	    pushFollow(FOLLOW_unaryOp_in_constraintOperand1054);
             	    unaryOp79=unaryOp();
 
             	    state._fsp--;
@@ -2649,7 +2661,7 @@ public TreeAdaptor getTreeAdaptor() {
             } while (true);
 
 
-            // Velvet.g:164:30: ( START_R constraintDefinition END_R | name )
+            // Velvet.g:165:30: ( START_R constraintDefinition END_R | name )
             int alt22=2;
             int LA22_0 = input.LA(1);
 
@@ -2668,29 +2680,29 @@ public TreeAdaptor getTreeAdaptor() {
             }
             switch (alt22) {
                 case 1 :
-                    // Velvet.g:164:31: START_R constraintDefinition END_R
+                    // Velvet.g:165:31: START_R constraintDefinition END_R
                     {
-                    START_R80=(Token)match(input,START_R,FOLLOW_START_R_in_constraintOperand1051);  
+                    START_R80=(Token)match(input,START_R,FOLLOW_START_R_in_constraintOperand1058);  
                     stream_START_R.add(START_R80);
 
 
-                    pushFollow(FOLLOW_constraintDefinition_in_constraintOperand1053);
+                    pushFollow(FOLLOW_constraintDefinition_in_constraintOperand1060);
                     constraintDefinition81=constraintDefinition();
 
                     state._fsp--;
 
                     stream_constraintDefinition.add(constraintDefinition81.getTree());
 
-                    END_R82=(Token)match(input,END_R,FOLLOW_END_R_in_constraintOperand1055);  
+                    END_R82=(Token)match(input,END_R,FOLLOW_END_R_in_constraintOperand1062);  
                     stream_END_R.add(END_R82);
 
 
                     }
                     break;
                 case 2 :
-                    // Velvet.g:164:68: name
+                    // Velvet.g:165:68: name
                     {
-                    pushFollow(FOLLOW_name_in_constraintOperand1059);
+                    pushFollow(FOLLOW_name_in_constraintOperand1066);
                     name83=name();
 
                     state._fsp--;
@@ -2714,18 +2726,18 @@ public TreeAdaptor getTreeAdaptor() {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (Tree)adaptor.nil();
-            // 165:2: -> ( constraintDefinition )? ( ^( UNARYOP unaryOp ) )* ( ^( OPERAND name ) )?
+            // 166:2: -> ( constraintDefinition )? ( ^( UNARYOP unaryOp ) )* ( ^( OPERAND name ) )?
             {
-                // Velvet.g:165:5: ( constraintDefinition )?
+                // Velvet.g:166:5: ( constraintDefinition )?
                 if ( stream_constraintDefinition.hasNext() ) {
                     adaptor.addChild(root_0, stream_constraintDefinition.nextTree());
 
                 }
                 stream_constraintDefinition.reset();
 
-                // Velvet.g:165:27: ( ^( UNARYOP unaryOp ) )*
+                // Velvet.g:166:27: ( ^( UNARYOP unaryOp ) )*
                 while ( stream_unaryOp.hasNext() ) {
-                    // Velvet.g:165:27: ^( UNARYOP unaryOp )
+                    // Velvet.g:166:27: ^( UNARYOP unaryOp )
                     {
                     Tree root_1 = (Tree)adaptor.nil();
                     root_1 = (Tree)adaptor.becomeRoot(
@@ -2740,9 +2752,9 @@ public TreeAdaptor getTreeAdaptor() {
                 }
                 stream_unaryOp.reset();
 
-                // Velvet.g:165:47: ( ^( OPERAND name ) )?
+                // Velvet.g:166:47: ( ^( OPERAND name ) )?
                 if ( stream_name.hasNext() ) {
-                    // Velvet.g:165:47: ^( OPERAND name )
+                    // Velvet.g:166:47: ^( OPERAND name )
                     {
                     Tree root_1 = (Tree)adaptor.nil();
                     root_1 = (Tree)adaptor.becomeRoot(
@@ -2793,7 +2805,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "attributeConstraint"
-    // Velvet.g:168:1: attributeConstraint : attribConstraint -> ^( ACONSTR attribConstraint ) ;
+    // Velvet.g:169:1: attributeConstraint : attribConstraint -> ^( ACONSTR attribConstraint ) ;
     public final VelvetParser.attributeConstraint_return attributeConstraint() throws RecognitionException {
         VelvetParser.attributeConstraint_return retval = new VelvetParser.attributeConstraint_return();
         retval.start = input.LT(1);
@@ -2806,10 +2818,10 @@ public TreeAdaptor getTreeAdaptor() {
 
         RewriteRuleSubtreeStream stream_attribConstraint=new RewriteRuleSubtreeStream(adaptor,"rule attribConstraint");
         try {
-            // Velvet.g:169:2: ( attribConstraint -> ^( ACONSTR attribConstraint ) )
-            // Velvet.g:169:4: attribConstraint
+            // Velvet.g:170:2: ( attribConstraint -> ^( ACONSTR attribConstraint ) )
+            // Velvet.g:170:4: attribConstraint
             {
-            pushFollow(FOLLOW_attribConstraint_in_attributeConstraint1094);
+            pushFollow(FOLLOW_attribConstraint_in_attributeConstraint1101);
             attribConstraint84=attribConstraint();
 
             state._fsp--;
@@ -2827,9 +2839,9 @@ public TreeAdaptor getTreeAdaptor() {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (Tree)adaptor.nil();
-            // 170:2: -> ^( ACONSTR attribConstraint )
+            // 171:2: -> ^( ACONSTR attribConstraint )
             {
-                // Velvet.g:170:5: ^( ACONSTR attribConstraint )
+                // Velvet.g:171:5: ^( ACONSTR attribConstraint )
                 {
                 Tree root_1 = (Tree)adaptor.nil();
                 root_1 = (Tree)adaptor.becomeRoot(
@@ -2877,7 +2889,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "attribConstraint"
-    // Velvet.g:173:1: attribConstraint : attribNumInstance ( attribOperator attribNumInstance )* attribRelation attribNumInstance ( attribOperator attribNumInstance )* ;
+    // Velvet.g:174:1: attribConstraint : attribNumInstance ( attribOperator attribNumInstance )* attribRelation attribNumInstance ( attribOperator attribNumInstance )* ;
     public final VelvetParser.attribConstraint_return attribConstraint() throws RecognitionException {
         VelvetParser.attribConstraint_return retval = new VelvetParser.attribConstraint_return();
         retval.start = input.LT(1);
@@ -2902,20 +2914,20 @@ public TreeAdaptor getTreeAdaptor() {
 
 
         try {
-            // Velvet.g:174:2: ( attribNumInstance ( attribOperator attribNumInstance )* attribRelation attribNumInstance ( attribOperator attribNumInstance )* )
-            // Velvet.g:174:4: attribNumInstance ( attribOperator attribNumInstance )* attribRelation attribNumInstance ( attribOperator attribNumInstance )*
+            // Velvet.g:175:2: ( attribNumInstance ( attribOperator attribNumInstance )* attribRelation attribNumInstance ( attribOperator attribNumInstance )* )
+            // Velvet.g:175:4: attribNumInstance ( attribOperator attribNumInstance )* attribRelation attribNumInstance ( attribOperator attribNumInstance )*
             {
             root_0 = (Tree)adaptor.nil();
 
 
-            pushFollow(FOLLOW_attribNumInstance_in_attribConstraint1114);
+            pushFollow(FOLLOW_attribNumInstance_in_attribConstraint1121);
             attribNumInstance85=attribNumInstance();
 
             state._fsp--;
 
             adaptor.addChild(root_0, attribNumInstance85.getTree());
 
-            // Velvet.g:174:22: ( attribOperator attribNumInstance )*
+            // Velvet.g:175:22: ( attribOperator attribNumInstance )*
             loop23:
             do {
                 int alt23=2;
@@ -2928,16 +2940,16 @@ public TreeAdaptor getTreeAdaptor() {
 
                 switch (alt23) {
             	case 1 :
-            	    // Velvet.g:174:23: attribOperator attribNumInstance
+            	    // Velvet.g:175:23: attribOperator attribNumInstance
             	    {
-            	    pushFollow(FOLLOW_attribOperator_in_attribConstraint1117);
+            	    pushFollow(FOLLOW_attribOperator_in_attribConstraint1124);
             	    attribOperator86=attribOperator();
 
             	    state._fsp--;
 
             	    adaptor.addChild(root_0, attribOperator86.getTree());
 
-            	    pushFollow(FOLLOW_attribNumInstance_in_attribConstraint1119);
+            	    pushFollow(FOLLOW_attribNumInstance_in_attribConstraint1126);
             	    attribNumInstance87=attribNumInstance();
 
             	    state._fsp--;
@@ -2953,21 +2965,21 @@ public TreeAdaptor getTreeAdaptor() {
             } while (true);
 
 
-            pushFollow(FOLLOW_attribRelation_in_attribConstraint1127);
+            pushFollow(FOLLOW_attribRelation_in_attribConstraint1134);
             attribRelation88=attribRelation();
 
             state._fsp--;
 
             adaptor.addChild(root_0, attribRelation88.getTree());
 
-            pushFollow(FOLLOW_attribNumInstance_in_attribConstraint1133);
+            pushFollow(FOLLOW_attribNumInstance_in_attribConstraint1140);
             attribNumInstance89=attribNumInstance();
 
             state._fsp--;
 
             adaptor.addChild(root_0, attribNumInstance89.getTree());
 
-            // Velvet.g:176:22: ( attribOperator attribNumInstance )*
+            // Velvet.g:177:22: ( attribOperator attribNumInstance )*
             loop24:
             do {
                 int alt24=2;
@@ -2980,16 +2992,16 @@ public TreeAdaptor getTreeAdaptor() {
 
                 switch (alt24) {
             	case 1 :
-            	    // Velvet.g:176:23: attribOperator attribNumInstance
+            	    // Velvet.g:177:23: attribOperator attribNumInstance
             	    {
-            	    pushFollow(FOLLOW_attribOperator_in_attribConstraint1136);
+            	    pushFollow(FOLLOW_attribOperator_in_attribConstraint1143);
             	    attribOperator90=attribOperator();
 
             	    state._fsp--;
 
             	    adaptor.addChild(root_0, attribOperator90.getTree());
 
-            	    pushFollow(FOLLOW_attribNumInstance_in_attribConstraint1138);
+            	    pushFollow(FOLLOW_attribNumInstance_in_attribConstraint1145);
             	    attribNumInstance91=attribNumInstance();
 
             	    state._fsp--;
@@ -3036,7 +3048,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "attribOperator"
-    // Velvet.g:179:1: attribOperator : ( PLUS | MINUS );
+    // Velvet.g:180:1: attribOperator : ( PLUS | MINUS );
     public final VelvetParser.attribOperator_return attribOperator() throws RecognitionException {
         VelvetParser.attribOperator_return retval = new VelvetParser.attribOperator_return();
         retval.start = input.LT(1);
@@ -3049,7 +3061,7 @@ public TreeAdaptor getTreeAdaptor() {
         Tree set92_tree=null;
 
         try {
-            // Velvet.g:180:2: ( PLUS | MINUS )
+            // Velvet.g:181:2: ( PLUS | MINUS )
             // Velvet.g:
             {
             root_0 = (Tree)adaptor.nil();
@@ -3101,7 +3113,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "attribNumInstance"
-    // Velvet.g:184:1: attribNumInstance : ( INT | name );
+    // Velvet.g:185:1: attribNumInstance : ( INT | name );
     public final VelvetParser.attribNumInstance_return attribNumInstance() throws RecognitionException {
         VelvetParser.attribNumInstance_return retval = new VelvetParser.attribNumInstance_return();
         retval.start = input.LT(1);
@@ -3116,7 +3128,7 @@ public TreeAdaptor getTreeAdaptor() {
         Tree INT93_tree=null;
 
         try {
-            // Velvet.g:185:2: ( INT | name )
+            // Velvet.g:186:2: ( INT | name )
             int alt25=2;
             int LA25_0 = input.LA(1);
 
@@ -3135,12 +3147,12 @@ public TreeAdaptor getTreeAdaptor() {
             }
             switch (alt25) {
                 case 1 :
-                    // Velvet.g:185:4: INT
+                    // Velvet.g:186:4: INT
                     {
                     root_0 = (Tree)adaptor.nil();
 
 
-                    INT93=(Token)match(input,INT,FOLLOW_INT_in_attribNumInstance1170); 
+                    INT93=(Token)match(input,INT,FOLLOW_INT_in_attribNumInstance1177); 
                     INT93_tree = 
                     (Tree)adaptor.create(INT93)
                     ;
@@ -3150,12 +3162,12 @@ public TreeAdaptor getTreeAdaptor() {
                     }
                     break;
                 case 2 :
-                    // Velvet.g:187:4: name
+                    // Velvet.g:188:4: name
                     {
                     root_0 = (Tree)adaptor.nil();
 
 
-                    pushFollow(FOLLOW_name_in_attribNumInstance1177);
+                    pushFollow(FOLLOW_name_in_attribNumInstance1184);
                     name94=name();
 
                     state._fsp--;
@@ -3195,7 +3207,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "attribute"
-    // Velvet.g:190:1: attribute : ( intAttribute | floatAttribute | stringAttribute | boolAttribute ) SEMI -> ^( ATTR ( intAttribute )? ( floatAttribute )? ( stringAttribute )? ( boolAttribute )? ) ;
+    // Velvet.g:191:1: attribute : ( intAttribute | floatAttribute | stringAttribute | boolAttribute ) SEMI -> ^( ATTR ( intAttribute )? ( floatAttribute )? ( stringAttribute )? ( boolAttribute )? ) ;
     public final VelvetParser.attribute_return attribute() throws RecognitionException {
         VelvetParser.attribute_return retval = new VelvetParser.attribute_return();
         retval.start = input.LT(1);
@@ -3220,10 +3232,10 @@ public TreeAdaptor getTreeAdaptor() {
         RewriteRuleSubtreeStream stream_floatAttribute=new RewriteRuleSubtreeStream(adaptor,"rule floatAttribute");
         RewriteRuleSubtreeStream stream_boolAttribute=new RewriteRuleSubtreeStream(adaptor,"rule boolAttribute");
         try {
-            // Velvet.g:191:2: ( ( intAttribute | floatAttribute | stringAttribute | boolAttribute ) SEMI -> ^( ATTR ( intAttribute )? ( floatAttribute )? ( stringAttribute )? ( boolAttribute )? ) )
-            // Velvet.g:191:4: ( intAttribute | floatAttribute | stringAttribute | boolAttribute ) SEMI
+            // Velvet.g:192:2: ( ( intAttribute | floatAttribute | stringAttribute | boolAttribute ) SEMI -> ^( ATTR ( intAttribute )? ( floatAttribute )? ( stringAttribute )? ( boolAttribute )? ) )
+            // Velvet.g:192:4: ( intAttribute | floatAttribute | stringAttribute | boolAttribute ) SEMI
             {
-            // Velvet.g:191:4: ( intAttribute | floatAttribute | stringAttribute | boolAttribute )
+            // Velvet.g:192:4: ( intAttribute | floatAttribute | stringAttribute | boolAttribute )
             int alt26=4;
             switch ( input.LA(1) ) {
             case VAR_INT:
@@ -3256,9 +3268,9 @@ public TreeAdaptor getTreeAdaptor() {
 
             switch (alt26) {
                 case 1 :
-                    // Velvet.g:191:5: intAttribute
+                    // Velvet.g:192:5: intAttribute
                     {
-                    pushFollow(FOLLOW_intAttribute_in_attribute1189);
+                    pushFollow(FOLLOW_intAttribute_in_attribute1196);
                     intAttribute95=intAttribute();
 
                     state._fsp--;
@@ -3268,9 +3280,9 @@ public TreeAdaptor getTreeAdaptor() {
                     }
                     break;
                 case 2 :
-                    // Velvet.g:191:20: floatAttribute
+                    // Velvet.g:192:20: floatAttribute
                     {
-                    pushFollow(FOLLOW_floatAttribute_in_attribute1193);
+                    pushFollow(FOLLOW_floatAttribute_in_attribute1200);
                     floatAttribute96=floatAttribute();
 
                     state._fsp--;
@@ -3280,9 +3292,9 @@ public TreeAdaptor getTreeAdaptor() {
                     }
                     break;
                 case 3 :
-                    // Velvet.g:191:37: stringAttribute
+                    // Velvet.g:192:37: stringAttribute
                     {
-                    pushFollow(FOLLOW_stringAttribute_in_attribute1197);
+                    pushFollow(FOLLOW_stringAttribute_in_attribute1204);
                     stringAttribute97=stringAttribute();
 
                     state._fsp--;
@@ -3292,9 +3304,9 @@ public TreeAdaptor getTreeAdaptor() {
                     }
                     break;
                 case 4 :
-                    // Velvet.g:191:55: boolAttribute
+                    // Velvet.g:192:55: boolAttribute
                     {
-                    pushFollow(FOLLOW_boolAttribute_in_attribute1201);
+                    pushFollow(FOLLOW_boolAttribute_in_attribute1208);
                     boolAttribute98=boolAttribute();
 
                     state._fsp--;
@@ -3307,7 +3319,7 @@ public TreeAdaptor getTreeAdaptor() {
             }
 
 
-            SEMI99=(Token)match(input,SEMI,FOLLOW_SEMI_in_attribute1204);  
+            SEMI99=(Token)match(input,SEMI,FOLLOW_SEMI_in_attribute1211);  
             stream_SEMI.add(SEMI99);
 
 
@@ -3322,37 +3334,37 @@ public TreeAdaptor getTreeAdaptor() {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (Tree)adaptor.nil();
-            // 192:2: -> ^( ATTR ( intAttribute )? ( floatAttribute )? ( stringAttribute )? ( boolAttribute )? )
+            // 193:2: -> ^( ATTR ( intAttribute )? ( floatAttribute )? ( stringAttribute )? ( boolAttribute )? )
             {
-                // Velvet.g:192:5: ^( ATTR ( intAttribute )? ( floatAttribute )? ( stringAttribute )? ( boolAttribute )? )
+                // Velvet.g:193:5: ^( ATTR ( intAttribute )? ( floatAttribute )? ( stringAttribute )? ( boolAttribute )? )
                 {
                 Tree root_1 = (Tree)adaptor.nil();
                 root_1 = (Tree)adaptor.becomeRoot(
                 (Tree)adaptor.create(ATTR, "ATTR")
                 , root_1);
 
-                // Velvet.g:192:12: ( intAttribute )?
+                // Velvet.g:193:12: ( intAttribute )?
                 if ( stream_intAttribute.hasNext() ) {
                     adaptor.addChild(root_1, stream_intAttribute.nextTree());
 
                 }
                 stream_intAttribute.reset();
 
-                // Velvet.g:192:26: ( floatAttribute )?
+                // Velvet.g:193:26: ( floatAttribute )?
                 if ( stream_floatAttribute.hasNext() ) {
                     adaptor.addChild(root_1, stream_floatAttribute.nextTree());
 
                 }
                 stream_floatAttribute.reset();
 
-                // Velvet.g:192:42: ( stringAttribute )?
+                // Velvet.g:193:42: ( stringAttribute )?
                 if ( stream_stringAttribute.hasNext() ) {
                     adaptor.addChild(root_1, stream_stringAttribute.nextTree());
 
                 }
                 stream_stringAttribute.reset();
 
-                // Velvet.g:192:59: ( boolAttribute )?
+                // Velvet.g:193:59: ( boolAttribute )?
                 if ( stream_boolAttribute.hasNext() ) {
                     adaptor.addChild(root_1, stream_boolAttribute.nextTree());
 
@@ -3398,7 +3410,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "intAttribute"
-    // Velvet.g:195:1: intAttribute : VAR_INT ! name ( EQ ! INT )? ;
+    // Velvet.g:196:1: intAttribute : VAR_INT ! name ( EQ ! INT )? ;
     public final VelvetParser.intAttribute_return intAttribute() throws RecognitionException {
         VelvetParser.intAttribute_return retval = new VelvetParser.intAttribute_return();
         retval.start = input.LT(1);
@@ -3417,22 +3429,22 @@ public TreeAdaptor getTreeAdaptor() {
         Tree INT103_tree=null;
 
         try {
-            // Velvet.g:195:13: ( VAR_INT ! name ( EQ ! INT )? )
-            // Velvet.g:195:16: VAR_INT ! name ( EQ ! INT )?
+            // Velvet.g:196:13: ( VAR_INT ! name ( EQ ! INT )? )
+            // Velvet.g:196:16: VAR_INT ! name ( EQ ! INT )?
             {
             root_0 = (Tree)adaptor.nil();
 
 
-            VAR_INT100=(Token)match(input,VAR_INT,FOLLOW_VAR_INT_in_intAttribute1233); 
+            VAR_INT100=(Token)match(input,VAR_INT,FOLLOW_VAR_INT_in_intAttribute1240); 
 
-            pushFollow(FOLLOW_name_in_intAttribute1236);
+            pushFollow(FOLLOW_name_in_intAttribute1243);
             name101=name();
 
             state._fsp--;
 
             adaptor.addChild(root_0, name101.getTree());
 
-            // Velvet.g:195:30: ( EQ ! INT )?
+            // Velvet.g:196:30: ( EQ ! INT )?
             int alt27=2;
             int LA27_0 = input.LA(1);
 
@@ -3441,11 +3453,11 @@ public TreeAdaptor getTreeAdaptor() {
             }
             switch (alt27) {
                 case 1 :
-                    // Velvet.g:195:31: EQ ! INT
+                    // Velvet.g:196:31: EQ ! INT
                     {
-                    EQ102=(Token)match(input,EQ,FOLLOW_EQ_in_intAttribute1239); 
+                    EQ102=(Token)match(input,EQ,FOLLOW_EQ_in_intAttribute1246); 
 
-                    INT103=(Token)match(input,INT,FOLLOW_INT_in_intAttribute1242); 
+                    INT103=(Token)match(input,INT,FOLLOW_INT_in_intAttribute1249); 
                     INT103_tree = 
                     (Tree)adaptor.create(INT103)
                     ;
@@ -3489,7 +3501,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "floatAttribute"
-    // Velvet.g:196:1: floatAttribute : VAR_FLOAT ! name ( EQ ! FLOAT )? ;
+    // Velvet.g:197:1: floatAttribute : VAR_FLOAT ! name ( EQ ! FLOAT )? ;
     public final VelvetParser.floatAttribute_return floatAttribute() throws RecognitionException {
         VelvetParser.floatAttribute_return retval = new VelvetParser.floatAttribute_return();
         retval.start = input.LT(1);
@@ -3508,22 +3520,22 @@ public TreeAdaptor getTreeAdaptor() {
         Tree FLOAT107_tree=null;
 
         try {
-            // Velvet.g:196:15: ( VAR_FLOAT ! name ( EQ ! FLOAT )? )
-            // Velvet.g:196:18: VAR_FLOAT ! name ( EQ ! FLOAT )?
+            // Velvet.g:197:15: ( VAR_FLOAT ! name ( EQ ! FLOAT )? )
+            // Velvet.g:197:18: VAR_FLOAT ! name ( EQ ! FLOAT )?
             {
             root_0 = (Tree)adaptor.nil();
 
 
-            VAR_FLOAT104=(Token)match(input,VAR_FLOAT,FOLLOW_VAR_FLOAT_in_floatAttribute1251); 
+            VAR_FLOAT104=(Token)match(input,VAR_FLOAT,FOLLOW_VAR_FLOAT_in_floatAttribute1258); 
 
-            pushFollow(FOLLOW_name_in_floatAttribute1254);
+            pushFollow(FOLLOW_name_in_floatAttribute1261);
             name105=name();
 
             state._fsp--;
 
             adaptor.addChild(root_0, name105.getTree());
 
-            // Velvet.g:196:34: ( EQ ! FLOAT )?
+            // Velvet.g:197:34: ( EQ ! FLOAT )?
             int alt28=2;
             int LA28_0 = input.LA(1);
 
@@ -3532,11 +3544,11 @@ public TreeAdaptor getTreeAdaptor() {
             }
             switch (alt28) {
                 case 1 :
-                    // Velvet.g:196:35: EQ ! FLOAT
+                    // Velvet.g:197:35: EQ ! FLOAT
                     {
-                    EQ106=(Token)match(input,EQ,FOLLOW_EQ_in_floatAttribute1257); 
+                    EQ106=(Token)match(input,EQ,FOLLOW_EQ_in_floatAttribute1264); 
 
-                    FLOAT107=(Token)match(input,FLOAT,FOLLOW_FLOAT_in_floatAttribute1260); 
+                    FLOAT107=(Token)match(input,FLOAT,FOLLOW_FLOAT_in_floatAttribute1267); 
                     FLOAT107_tree = 
                     (Tree)adaptor.create(FLOAT107)
                     ;
@@ -3580,7 +3592,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "stringAttribute"
-    // Velvet.g:197:1: stringAttribute : VAR_STRING ! name ( EQ ! STRING )? ;
+    // Velvet.g:198:1: stringAttribute : VAR_STRING ! name ( EQ ! STRING )? ;
     public final VelvetParser.stringAttribute_return stringAttribute() throws RecognitionException {
         VelvetParser.stringAttribute_return retval = new VelvetParser.stringAttribute_return();
         retval.start = input.LT(1);
@@ -3599,22 +3611,22 @@ public TreeAdaptor getTreeAdaptor() {
         Tree STRING111_tree=null;
 
         try {
-            // Velvet.g:197:16: ( VAR_STRING ! name ( EQ ! STRING )? )
-            // Velvet.g:197:18: VAR_STRING ! name ( EQ ! STRING )?
+            // Velvet.g:198:16: ( VAR_STRING ! name ( EQ ! STRING )? )
+            // Velvet.g:198:18: VAR_STRING ! name ( EQ ! STRING )?
             {
             root_0 = (Tree)adaptor.nil();
 
 
-            VAR_STRING108=(Token)match(input,VAR_STRING,FOLLOW_VAR_STRING_in_stringAttribute1268); 
+            VAR_STRING108=(Token)match(input,VAR_STRING,FOLLOW_VAR_STRING_in_stringAttribute1275); 
 
-            pushFollow(FOLLOW_name_in_stringAttribute1271);
+            pushFollow(FOLLOW_name_in_stringAttribute1278);
             name109=name();
 
             state._fsp--;
 
             adaptor.addChild(root_0, name109.getTree());
 
-            // Velvet.g:197:35: ( EQ ! STRING )?
+            // Velvet.g:198:35: ( EQ ! STRING )?
             int alt29=2;
             int LA29_0 = input.LA(1);
 
@@ -3623,11 +3635,11 @@ public TreeAdaptor getTreeAdaptor() {
             }
             switch (alt29) {
                 case 1 :
-                    // Velvet.g:197:36: EQ ! STRING
+                    // Velvet.g:198:36: EQ ! STRING
                     {
-                    EQ110=(Token)match(input,EQ,FOLLOW_EQ_in_stringAttribute1274); 
+                    EQ110=(Token)match(input,EQ,FOLLOW_EQ_in_stringAttribute1281); 
 
-                    STRING111=(Token)match(input,STRING,FOLLOW_STRING_in_stringAttribute1277); 
+                    STRING111=(Token)match(input,STRING,FOLLOW_STRING_in_stringAttribute1284); 
                     STRING111_tree = 
                     (Tree)adaptor.create(STRING111)
                     ;
@@ -3671,7 +3683,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "boolAttribute"
-    // Velvet.g:198:1: boolAttribute : VAR_BOOL ! name ( EQ ! BOOLEAN )? ;
+    // Velvet.g:199:1: boolAttribute : VAR_BOOL ! name ( EQ ! BOOLEAN )? ;
     public final VelvetParser.boolAttribute_return boolAttribute() throws RecognitionException {
         VelvetParser.boolAttribute_return retval = new VelvetParser.boolAttribute_return();
         retval.start = input.LT(1);
@@ -3690,22 +3702,22 @@ public TreeAdaptor getTreeAdaptor() {
         Tree BOOLEAN115_tree=null;
 
         try {
-            // Velvet.g:198:14: ( VAR_BOOL ! name ( EQ ! BOOLEAN )? )
-            // Velvet.g:198:17: VAR_BOOL ! name ( EQ ! BOOLEAN )?
+            // Velvet.g:199:14: ( VAR_BOOL ! name ( EQ ! BOOLEAN )? )
+            // Velvet.g:199:17: VAR_BOOL ! name ( EQ ! BOOLEAN )?
             {
             root_0 = (Tree)adaptor.nil();
 
 
-            VAR_BOOL112=(Token)match(input,VAR_BOOL,FOLLOW_VAR_BOOL_in_boolAttribute1286); 
+            VAR_BOOL112=(Token)match(input,VAR_BOOL,FOLLOW_VAR_BOOL_in_boolAttribute1293); 
 
-            pushFollow(FOLLOW_name_in_boolAttribute1289);
+            pushFollow(FOLLOW_name_in_boolAttribute1296);
             name113=name();
 
             state._fsp--;
 
             adaptor.addChild(root_0, name113.getTree());
 
-            // Velvet.g:198:32: ( EQ ! BOOLEAN )?
+            // Velvet.g:199:32: ( EQ ! BOOLEAN )?
             int alt30=2;
             int LA30_0 = input.LA(1);
 
@@ -3714,11 +3726,11 @@ public TreeAdaptor getTreeAdaptor() {
             }
             switch (alt30) {
                 case 1 :
-                    // Velvet.g:198:33: EQ ! BOOLEAN
+                    // Velvet.g:199:33: EQ ! BOOLEAN
                     {
-                    EQ114=(Token)match(input,EQ,FOLLOW_EQ_in_boolAttribute1292); 
+                    EQ114=(Token)match(input,EQ,FOLLOW_EQ_in_boolAttribute1299); 
 
-                    BOOLEAN115=(Token)match(input,BOOLEAN,FOLLOW_BOOLEAN_in_boolAttribute1295); 
+                    BOOLEAN115=(Token)match(input,BOOLEAN,FOLLOW_BOOLEAN_in_boolAttribute1302); 
                     BOOLEAN115_tree = 
                     (Tree)adaptor.create(BOOLEAN115)
                     ;
@@ -3762,7 +3774,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "unaryOp"
-    // Velvet.g:200:1: unaryOp : OP_NOT ;
+    // Velvet.g:201:1: unaryOp : OP_NOT ;
     public final VelvetParser.unaryOp_return unaryOp() throws RecognitionException {
         VelvetParser.unaryOp_return retval = new VelvetParser.unaryOp_return();
         retval.start = input.LT(1);
@@ -3775,13 +3787,13 @@ public TreeAdaptor getTreeAdaptor() {
         Tree OP_NOT116_tree=null;
 
         try {
-            // Velvet.g:201:2: ( OP_NOT )
-            // Velvet.g:201:4: OP_NOT
+            // Velvet.g:202:2: ( OP_NOT )
+            // Velvet.g:202:4: OP_NOT
             {
             root_0 = (Tree)adaptor.nil();
 
 
-            OP_NOT116=(Token)match(input,OP_NOT,FOLLOW_OP_NOT_in_unaryOp1307); 
+            OP_NOT116=(Token)match(input,OP_NOT,FOLLOW_OP_NOT_in_unaryOp1314); 
             OP_NOT116_tree = 
             (Tree)adaptor.create(OP_NOT116)
             ;
@@ -3819,7 +3831,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "binaryOp"
-    // Velvet.g:204:1: binaryOp : ( OP_AND | OP_OR | OP_XOR | OP_IMPLIES | OP_EQUIVALENT );
+    // Velvet.g:205:1: binaryOp : ( OP_AND | OP_OR | OP_XOR | OP_IMPLIES | OP_EQUIVALENT );
     public final VelvetParser.binaryOp_return binaryOp() throws RecognitionException {
         VelvetParser.binaryOp_return retval = new VelvetParser.binaryOp_return();
         retval.start = input.LT(1);
@@ -3832,7 +3844,7 @@ public TreeAdaptor getTreeAdaptor() {
         Tree set117_tree=null;
 
         try {
-            // Velvet.g:205:2: ( OP_AND | OP_OR | OP_XOR | OP_IMPLIES | OP_EQUIVALENT )
+            // Velvet.g:206:2: ( OP_AND | OP_OR | OP_XOR | OP_IMPLIES | OP_EQUIVALENT )
             // Velvet.g:
             {
             root_0 = (Tree)adaptor.nil();
@@ -3884,7 +3896,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "attribRelation"
-    // Velvet.g:212:1: attribRelation : ( ATTR_OP_EQUALS | ATTR_OP_GREATER_EQ | ATTR_OP_LESS_EQ );
+    // Velvet.g:213:1: attribRelation : ( ATTR_OP_EQUALS | ATTR_OP_GREATER_EQ | ATTR_OP_LESS_EQ );
     public final VelvetParser.attribRelation_return attribRelation() throws RecognitionException {
         VelvetParser.attribRelation_return retval = new VelvetParser.attribRelation_return();
         retval.start = input.LT(1);
@@ -3897,7 +3909,7 @@ public TreeAdaptor getTreeAdaptor() {
         Tree set118_tree=null;
 
         try {
-            // Velvet.g:213:2: ( ATTR_OP_EQUALS | ATTR_OP_GREATER_EQ | ATTR_OP_LESS_EQ )
+            // Velvet.g:214:2: ( ATTR_OP_EQUALS | ATTR_OP_GREATER_EQ | ATTR_OP_LESS_EQ )
             // Velvet.g:
             {
             root_0 = (Tree)adaptor.nil();
@@ -3950,22 +3962,22 @@ public TreeAdaptor getTreeAdaptor() {
     static final String DFA3_eofS =
         "\1\3\5\uffff\1\12\1\15\10\uffff\1\12\1\15";
     static final String DFA3_minS =
-        "\1\42\2\40\1\uffff\2\40\2\21\1\40\2\uffff\1\40\2\uffff\2\40\2\21";
+        "\1\43\2\41\1\uffff\2\41\2\21\1\41\2\uffff\1\41\2\uffff\2\41\2\21";
     static final String DFA3_maxS =
-        "\1\65\2\40\1\uffff\2\41\2\65\1\40\2\uffff\1\40\2\uffff\2\41\2\65";
+        "\1\70\2\41\1\uffff\2\42\2\70\1\41\2\uffff\1\41\2\uffff\2\42\2\70";
     static final String DFA3_acceptS =
         "\3\uffff\1\5\5\uffff\1\1\1\4\1\uffff\1\2\1\3\4\uffff";
     static final String DFA3_specialS =
         "\22\uffff}>";
     static final String[] DFA3_transitionS = {
-            "\1\1\1\2\21\uffff\1\3",
+            "\1\1\1\2\23\uffff\1\3",
             "\1\4",
             "\1\5",
             "",
             "\2\6",
             "\2\7",
-            "\1\10\21\uffff\1\11\21\uffff\1\12",
-            "\1\13\20\uffff\1\14\22\uffff\1\15",
+            "\1\10\22\uffff\1\11\23\uffff\1\12",
+            "\1\13\21\uffff\1\14\24\uffff\1\15",
             "\1\16",
             "",
             "",
@@ -3974,8 +3986,8 @@ public TreeAdaptor getTreeAdaptor() {
             "",
             "\2\20",
             "\2\21",
-            "\1\10\21\uffff\1\11\21\uffff\1\12",
-            "\1\13\20\uffff\1\14\22\uffff\1\15"
+            "\1\10\22\uffff\1\11\23\uffff\1\12",
+            "\1\13\21\uffff\1\14\24\uffff\1\15"
     };
 
     static final short[] DFA3_eot = DFA.unpackEncodedString(DFA3_eotS);
@@ -4008,123 +4020,123 @@ public TreeAdaptor getTreeAdaptor() {
             this.transition = DFA3_transition;
         }
         public String getDescription() {
-            return "84:27: ( instanceImports interfaceImports | interfaceImports instanceImports | interfaceImports | instanceImports )?";
+            return "85:27: ( instanceImports interfaceImports | interfaceImports instanceImports | interfaceImports | instanceImports )?";
         }
     }
  
 
-    public static final BitSet FOLLOW_concept_in_velvetModel466 = new BitSet(new long[]{0x0000000000000000L});
-    public static final BitSet FOLLOW_cinterface_in_velvetModel468 = new BitSet(new long[]{0x0000000000000000L});
-    public static final BitSet FOLLOW_EOF_in_velvetModel471 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_CONCEPT_in_concept484 = new BitSet(new long[]{0x0000000100000000L});
-    public static final BitSet FOLLOW_ID_in_concept486 = new BitSet(new long[]{0x0020000C00010002L});
-    public static final BitSet FOLLOW_COLON_in_concept493 = new BitSet(new long[]{0x0000000100000000L});
-    public static final BitSet FOLLOW_conceptBaseExt_in_concept495 = new BitSet(new long[]{0x0020000C00000002L});
-    public static final BitSet FOLLOW_instanceImports_in_concept500 = new BitSet(new long[]{0x0000000800000000L});
-    public static final BitSet FOLLOW_interfaceImports_in_concept502 = new BitSet(new long[]{0x0020000000000002L});
-    public static final BitSet FOLLOW_interfaceImports_in_concept506 = new BitSet(new long[]{0x0000000400000000L});
-    public static final BitSet FOLLOW_instanceImports_in_concept508 = new BitSet(new long[]{0x0020000000000002L});
-    public static final BitSet FOLLOW_interfaceImports_in_concept512 = new BitSet(new long[]{0x0020000000000002L});
-    public static final BitSet FOLLOW_instanceImports_in_concept516 = new BitSet(new long[]{0x0020000000000002L});
-    public static final BitSet FOLLOW_definitions_in_concept523 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ID_in_conceptBaseExt556 = new BitSet(new long[]{0x0000000000020002L});
-    public static final BitSet FOLLOW_COMMA_in_conceptBaseExt559 = new BitSet(new long[]{0x0000000100000000L});
-    public static final BitSet FOLLOW_ID_in_conceptBaseExt561 = new BitSet(new long[]{0x0000000000020002L});
-    public static final BitSet FOLLOW_IMPORTINSTANCE_in_instanceImports586 = new BitSet(new long[]{0x0000000100000000L});
-    public static final BitSet FOLLOW_ID_in_instanceImports588 = new BitSet(new long[]{0x0000000300000000L});
-    public static final BitSet FOLLOW_name_in_instanceImports590 = new BitSet(new long[]{0x0000000000020002L});
-    public static final BitSet FOLLOW_COMMA_in_instanceImports593 = new BitSet(new long[]{0x0000000100000000L});
-    public static final BitSet FOLLOW_ID_in_instanceImports595 = new BitSet(new long[]{0x0000000300000000L});
-    public static final BitSet FOLLOW_name_in_instanceImports597 = new BitSet(new long[]{0x0000000000020002L});
-    public static final BitSet FOLLOW_IMPORTINTERFACE_in_interfaceImports626 = new BitSet(new long[]{0x0000000100000000L});
-    public static final BitSet FOLLOW_ID_in_interfaceImports628 = new BitSet(new long[]{0x0000000300000000L});
-    public static final BitSet FOLLOW_name_in_interfaceImports630 = new BitSet(new long[]{0x0000000000020002L});
-    public static final BitSet FOLLOW_COMMA_in_interfaceImports633 = new BitSet(new long[]{0x0000000100000000L});
-    public static final BitSet FOLLOW_ID_in_interfaceImports635 = new BitSet(new long[]{0x0000000300000000L});
-    public static final BitSet FOLLOW_name_in_interfaceImports637 = new BitSet(new long[]{0x0000000000020002L});
-    public static final BitSet FOLLOW_CINTERFACE_in_cinterface664 = new BitSet(new long[]{0x0000000100000000L});
-    public static final BitSet FOLLOW_ID_in_cinterface666 = new BitSet(new long[]{0x0020000000010000L});
-    public static final BitSet FOLLOW_COLON_in_cinterface670 = new BitSet(new long[]{0x0000000100000000L});
-    public static final BitSet FOLLOW_interfaceBaseExt_in_cinterface672 = new BitSet(new long[]{0x0020000000000000L});
-    public static final BitSet FOLLOW_definitions_in_cinterface676 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ID_in_interfaceBaseExt703 = new BitSet(new long[]{0x0000000000020002L});
-    public static final BitSet FOLLOW_COMMA_in_interfaceBaseExt706 = new BitSet(new long[]{0x0000000100000000L});
-    public static final BitSet FOLLOW_ID_in_interfaceBaseExt708 = new BitSet(new long[]{0x0000000000020002L});
-    public static final BitSet FOLLOW_START_C_in_definitions748 = new BitSet(new long[]{0xF410048010500010L});
-    public static final BitSet FOLLOW_definition_in_definitions750 = new BitSet(new long[]{0x0000000000400000L});
-    public static final BitSet FOLLOW_END_C_in_definitions752 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_nonFeatureDefinition_in_definition773 = new BitSet(new long[]{0xF410048010100012L});
-    public static final BitSet FOLLOW_featureGroup_in_definition781 = new BitSet(new long[]{0xF400000000100002L});
-    public static final BitSet FOLLOW_nonFeatureDefinition_in_definition783 = new BitSet(new long[]{0xF400000000100002L});
-    public static final BitSet FOLLOW_feature_in_definition792 = new BitSet(new long[]{0xF400008010100012L});
-    public static final BitSet FOLLOW_feature_in_definition795 = new BitSet(new long[]{0xF400008010100012L});
-    public static final BitSet FOLLOW_nonFeatureDefinition_in_definition799 = new BitSet(new long[]{0xF400008010100012L});
-    public static final BitSet FOLLOW_constraint_in_nonFeatureDefinition821 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_use_in_nonFeatureDefinition826 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_attribute_in_nonFeatureDefinition831 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_USE_in_use843 = new BitSet(new long[]{0x0000000300000000L});
-    public static final BitSet FOLLOW_name_in_use845 = new BitSet(new long[]{0x0008000000000000L});
-    public static final BitSet FOLLOW_SEMI_in_use847 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_MANDATORY_in_feature868 = new BitSet(new long[]{0x0000000000000010L});
-    public static final BitSet FOLLOW_ABSTRACT_in_feature870 = new BitSet(new long[]{0x0000000010000000L});
-    public static final BitSet FOLLOW_ABSTRACT_in_feature874 = new BitSet(new long[]{0x0000008000000000L});
-    public static final BitSet FOLLOW_MANDATORY_in_feature876 = new BitSet(new long[]{0x0000000010000000L});
-    public static final BitSet FOLLOW_MANDATORY_in_feature880 = new BitSet(new long[]{0x0000000010000000L});
-    public static final BitSet FOLLOW_ABSTRACT_in_feature884 = new BitSet(new long[]{0x0000000010000000L});
-    public static final BitSet FOLLOW_FEATURE_in_feature891 = new BitSet(new long[]{0x0000000300000000L});
-    public static final BitSet FOLLOW_name_in_feature893 = new BitSet(new long[]{0x0028000000000000L});
-    public static final BitSet FOLLOW_definitions_in_feature896 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_SEMI_in_feature900 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_groupType_in_featureGroup931 = new BitSet(new long[]{0x0020000000000000L});
-    public static final BitSet FOLLOW_START_C_in_featureGroup933 = new BitSet(new long[]{0x0000008010000010L});
-    public static final BitSet FOLLOW_feature_in_featureGroup935 = new BitSet(new long[]{0x0000008010000010L});
-    public static final BitSet FOLLOW_feature_in_featureGroup937 = new BitSet(new long[]{0x0000008010400010L});
-    public static final BitSet FOLLOW_END_C_in_featureGroup940 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_CONSTRAINT_in_constraint983 = new BitSet(new long[]{0x0040802300000000L});
-    public static final BitSet FOLLOW_ID_in_constraint987 = new BitSet(new long[]{0x0000000001000000L});
-    public static final BitSet FOLLOW_EQ_in_constraint989 = new BitSet(new long[]{0x0040802300000000L});
-    public static final BitSet FOLLOW_constraintDefinition_in_constraint995 = new BitSet(new long[]{0x0008000000000000L});
-    public static final BitSet FOLLOW_attributeConstraint_in_constraint999 = new BitSet(new long[]{0x0008000000000000L});
-    public static final BitSet FOLLOW_SEMI_in_constraint1002 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_constraintOperand_in_constraintDefinition1015 = new BitSet(new long[]{0x0003700000000002L});
-    public static final BitSet FOLLOW_binaryOp_in_constraintDefinition1018 = new BitSet(new long[]{0x0040800300000000L});
-    public static final BitSet FOLLOW_constraintOperand_in_constraintDefinition1020 = new BitSet(new long[]{0x0003700000000002L});
-    public static final BitSet FOLLOW_unaryOp_in_constraintOperand1047 = new BitSet(new long[]{0x0040800300000000L});
-    public static final BitSet FOLLOW_START_R_in_constraintOperand1051 = new BitSet(new long[]{0x0040800300000000L});
-    public static final BitSet FOLLOW_constraintDefinition_in_constraintOperand1053 = new BitSet(new long[]{0x0000000000800000L});
-    public static final BitSet FOLLOW_END_R_in_constraintOperand1055 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_name_in_constraintOperand1059 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_attribConstraint_in_attributeConstraint1094 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_attribNumInstance_in_attribConstraint1114 = new BitSet(new long[]{0x0004010000000A80L});
-    public static final BitSet FOLLOW_attribOperator_in_attribConstraint1117 = new BitSet(new long[]{0x0000002300000000L});
-    public static final BitSet FOLLOW_attribNumInstance_in_attribConstraint1119 = new BitSet(new long[]{0x0004010000000A80L});
-    public static final BitSet FOLLOW_attribRelation_in_attribConstraint1127 = new BitSet(new long[]{0x0000002300000000L});
-    public static final BitSet FOLLOW_attribNumInstance_in_attribConstraint1133 = new BitSet(new long[]{0x0004010000000002L});
-    public static final BitSet FOLLOW_attribOperator_in_attribConstraint1136 = new BitSet(new long[]{0x0000002300000000L});
-    public static final BitSet FOLLOW_attribNumInstance_in_attribConstraint1138 = new BitSet(new long[]{0x0004010000000002L});
-    public static final BitSet FOLLOW_INT_in_attribNumInstance1170 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_name_in_attribNumInstance1177 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_intAttribute_in_attribute1189 = new BitSet(new long[]{0x0008000000000000L});
-    public static final BitSet FOLLOW_floatAttribute_in_attribute1193 = new BitSet(new long[]{0x0008000000000000L});
-    public static final BitSet FOLLOW_stringAttribute_in_attribute1197 = new BitSet(new long[]{0x0008000000000000L});
-    public static final BitSet FOLLOW_boolAttribute_in_attribute1201 = new BitSet(new long[]{0x0008000000000000L});
-    public static final BitSet FOLLOW_SEMI_in_attribute1204 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_VAR_INT_in_intAttribute1233 = new BitSet(new long[]{0x0000000300000000L});
-    public static final BitSet FOLLOW_name_in_intAttribute1236 = new BitSet(new long[]{0x0000000001000002L});
-    public static final BitSet FOLLOW_EQ_in_intAttribute1239 = new BitSet(new long[]{0x0000002000000000L});
-    public static final BitSet FOLLOW_INT_in_intAttribute1242 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_VAR_FLOAT_in_floatAttribute1251 = new BitSet(new long[]{0x0000000300000000L});
-    public static final BitSet FOLLOW_name_in_floatAttribute1254 = new BitSet(new long[]{0x0000000001000002L});
-    public static final BitSet FOLLOW_EQ_in_floatAttribute1257 = new BitSet(new long[]{0x0000000020000000L});
-    public static final BitSet FOLLOW_FLOAT_in_floatAttribute1260 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_VAR_STRING_in_stringAttribute1268 = new BitSet(new long[]{0x0000000300000000L});
-    public static final BitSet FOLLOW_name_in_stringAttribute1271 = new BitSet(new long[]{0x0000000001000002L});
-    public static final BitSet FOLLOW_EQ_in_stringAttribute1274 = new BitSet(new long[]{0x0080000000000000L});
-    public static final BitSet FOLLOW_STRING_in_stringAttribute1277 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_VAR_BOOL_in_boolAttribute1286 = new BitSet(new long[]{0x0000000300000000L});
-    public static final BitSet FOLLOW_name_in_boolAttribute1289 = new BitSet(new long[]{0x0000000001000002L});
-    public static final BitSet FOLLOW_EQ_in_boolAttribute1292 = new BitSet(new long[]{0x0000000000004000L});
-    public static final BitSet FOLLOW_BOOLEAN_in_boolAttribute1295 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_OP_NOT_in_unaryOp1307 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_concept_in_velvetModel470 = new BitSet(new long[]{0x0000000000000000L});
+    public static final BitSet FOLLOW_cinterface_in_velvetModel472 = new BitSet(new long[]{0x0000000000000000L});
+    public static final BitSet FOLLOW_EOF_in_velvetModel475 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_CONCEPT_in_concept488 = new BitSet(new long[]{0x0000000200000000L});
+    public static final BitSet FOLLOW_ID_in_concept490 = new BitSet(new long[]{0x0100001800010002L});
+    public static final BitSet FOLLOW_COLON_in_concept497 = new BitSet(new long[]{0x0000000200000000L});
+    public static final BitSet FOLLOW_conceptBaseExt_in_concept499 = new BitSet(new long[]{0x0100001800000002L});
+    public static final BitSet FOLLOW_instanceImports_in_concept504 = new BitSet(new long[]{0x0000001000000000L});
+    public static final BitSet FOLLOW_interfaceImports_in_concept506 = new BitSet(new long[]{0x0100000000000002L});
+    public static final BitSet FOLLOW_interfaceImports_in_concept510 = new BitSet(new long[]{0x0000000800000000L});
+    public static final BitSet FOLLOW_instanceImports_in_concept512 = new BitSet(new long[]{0x0100000000000002L});
+    public static final BitSet FOLLOW_interfaceImports_in_concept516 = new BitSet(new long[]{0x0100000000000002L});
+    public static final BitSet FOLLOW_instanceImports_in_concept520 = new BitSet(new long[]{0x0100000000000002L});
+    public static final BitSet FOLLOW_definitions_in_concept527 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ID_in_conceptBaseExt560 = new BitSet(new long[]{0x0000000000020002L});
+    public static final BitSet FOLLOW_COMMA_in_conceptBaseExt563 = new BitSet(new long[]{0x0000000200000000L});
+    public static final BitSet FOLLOW_ID_in_conceptBaseExt565 = new BitSet(new long[]{0x0000000000020002L});
+    public static final BitSet FOLLOW_IMPORTINSTANCE_in_instanceImports590 = new BitSet(new long[]{0x0000000200000000L});
+    public static final BitSet FOLLOW_ID_in_instanceImports592 = new BitSet(new long[]{0x0000000600000000L});
+    public static final BitSet FOLLOW_name_in_instanceImports594 = new BitSet(new long[]{0x0000000000020002L});
+    public static final BitSet FOLLOW_COMMA_in_instanceImports597 = new BitSet(new long[]{0x0000000200000000L});
+    public static final BitSet FOLLOW_ID_in_instanceImports599 = new BitSet(new long[]{0x0000000600000000L});
+    public static final BitSet FOLLOW_name_in_instanceImports601 = new BitSet(new long[]{0x0000000000020002L});
+    public static final BitSet FOLLOW_IMPORTINTERFACE_in_interfaceImports630 = new BitSet(new long[]{0x0000000200000000L});
+    public static final BitSet FOLLOW_ID_in_interfaceImports632 = new BitSet(new long[]{0x0000000600000000L});
+    public static final BitSet FOLLOW_name_in_interfaceImports634 = new BitSet(new long[]{0x0000000000020002L});
+    public static final BitSet FOLLOW_COMMA_in_interfaceImports637 = new BitSet(new long[]{0x0000000200000000L});
+    public static final BitSet FOLLOW_ID_in_interfaceImports639 = new BitSet(new long[]{0x0000000600000000L});
+    public static final BitSet FOLLOW_name_in_interfaceImports641 = new BitSet(new long[]{0x0000000000020002L});
+    public static final BitSet FOLLOW_CINTERFACE_in_cinterface668 = new BitSet(new long[]{0x0000000200000000L});
+    public static final BitSet FOLLOW_ID_in_cinterface670 = new BitSet(new long[]{0x0100000000010000L});
+    public static final BitSet FOLLOW_COLON_in_cinterface674 = new BitSet(new long[]{0x0000000200000000L});
+    public static final BitSet FOLLOW_interfaceBaseExt_in_cinterface676 = new BitSet(new long[]{0x0100000000000000L});
+    public static final BitSet FOLLOW_definitions_in_cinterface680 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ID_in_interfaceBaseExt707 = new BitSet(new long[]{0x0000000000020002L});
+    public static final BitSet FOLLOW_COMMA_in_interfaceBaseExt710 = new BitSet(new long[]{0x0000000200000000L});
+    public static final BitSet FOLLOW_ID_in_interfaceBaseExt712 = new BitSet(new long[]{0x0000000000020002L});
+    public static final BitSet FOLLOW_START_C_in_definitions752 = new BitSet(new long[]{0xA080110020900010L,0x0000000000000007L});
+    public static final BitSet FOLLOW_definition_in_definitions754 = new BitSet(new long[]{0x0000000000800000L});
+    public static final BitSet FOLLOW_END_C_in_definitions756 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_nonFeatureDefinition_in_definition780 = new BitSet(new long[]{0xA080110020100012L,0x0000000000000007L});
+    public static final BitSet FOLLOW_featureGroup_in_definition788 = new BitSet(new long[]{0xA000000000100002L,0x0000000000000007L});
+    public static final BitSet FOLLOW_nonFeatureDefinition_in_definition790 = new BitSet(new long[]{0xA000000000100002L,0x0000000000000007L});
+    public static final BitSet FOLLOW_feature_in_definition799 = new BitSet(new long[]{0xA000010020100012L,0x0000000000000007L});
+    public static final BitSet FOLLOW_feature_in_definition802 = new BitSet(new long[]{0xA000010020100012L,0x0000000000000007L});
+    public static final BitSet FOLLOW_nonFeatureDefinition_in_definition806 = new BitSet(new long[]{0xA000010020100012L,0x0000000000000007L});
+    public static final BitSet FOLLOW_constraint_in_nonFeatureDefinition828 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_use_in_nonFeatureDefinition833 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_attribute_in_nonFeatureDefinition838 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_USE_in_use850 = new BitSet(new long[]{0x0000000600000000L});
+    public static final BitSet FOLLOW_name_in_use852 = new BitSet(new long[]{0x0020000000000000L});
+    public static final BitSet FOLLOW_SEMI_in_use854 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_MANDATORY_in_feature875 = new BitSet(new long[]{0x0000000000000010L});
+    public static final BitSet FOLLOW_ABSTRACT_in_feature877 = new BitSet(new long[]{0x0000000020000000L});
+    public static final BitSet FOLLOW_ABSTRACT_in_feature881 = new BitSet(new long[]{0x0000010000000000L});
+    public static final BitSet FOLLOW_MANDATORY_in_feature883 = new BitSet(new long[]{0x0000000020000000L});
+    public static final BitSet FOLLOW_MANDATORY_in_feature887 = new BitSet(new long[]{0x0000000020000000L});
+    public static final BitSet FOLLOW_ABSTRACT_in_feature891 = new BitSet(new long[]{0x0000000020000000L});
+    public static final BitSet FOLLOW_FEATURE_in_feature898 = new BitSet(new long[]{0x0000000600000000L});
+    public static final BitSet FOLLOW_name_in_feature900 = new BitSet(new long[]{0x0120000000000000L});
+    public static final BitSet FOLLOW_definitions_in_feature903 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_SEMI_in_feature907 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_groupType_in_featureGroup938 = new BitSet(new long[]{0x0100000000000000L});
+    public static final BitSet FOLLOW_START_C_in_featureGroup940 = new BitSet(new long[]{0x0000010020000010L});
+    public static final BitSet FOLLOW_feature_in_featureGroup942 = new BitSet(new long[]{0x0000010020000010L});
+    public static final BitSet FOLLOW_feature_in_featureGroup944 = new BitSet(new long[]{0x0000010020800010L});
+    public static final BitSet FOLLOW_END_C_in_featureGroup947 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_CONSTRAINT_in_constraint990 = new BitSet(new long[]{0x0202004600000000L});
+    public static final BitSet FOLLOW_ID_in_constraint994 = new BitSet(new long[]{0x0000000002000000L});
+    public static final BitSet FOLLOW_EQ_in_constraint996 = new BitSet(new long[]{0x0202004600000000L});
+    public static final BitSet FOLLOW_constraintDefinition_in_constraint1002 = new BitSet(new long[]{0x0020000000000000L});
+    public static final BitSet FOLLOW_attributeConstraint_in_constraint1006 = new BitSet(new long[]{0x0020000000000000L});
+    public static final BitSet FOLLOW_SEMI_in_constraint1009 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_constraintOperand_in_constraintDefinition1022 = new BitSet(new long[]{0x000DC00000000002L});
+    public static final BitSet FOLLOW_binaryOp_in_constraintDefinition1025 = new BitSet(new long[]{0x0202000600000000L});
+    public static final BitSet FOLLOW_constraintOperand_in_constraintDefinition1027 = new BitSet(new long[]{0x000DC00000000002L});
+    public static final BitSet FOLLOW_unaryOp_in_constraintOperand1054 = new BitSet(new long[]{0x0202000600000000L});
+    public static final BitSet FOLLOW_START_R_in_constraintOperand1058 = new BitSet(new long[]{0x0202000600000000L});
+    public static final BitSet FOLLOW_constraintDefinition_in_constraintOperand1060 = new BitSet(new long[]{0x0000000001000000L});
+    public static final BitSet FOLLOW_END_R_in_constraintOperand1062 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_name_in_constraintOperand1066 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_attribConstraint_in_attributeConstraint1101 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_attribNumInstance_in_attribConstraint1121 = new BitSet(new long[]{0x0010020000000A80L});
+    public static final BitSet FOLLOW_attribOperator_in_attribConstraint1124 = new BitSet(new long[]{0x0000004600000000L});
+    public static final BitSet FOLLOW_attribNumInstance_in_attribConstraint1126 = new BitSet(new long[]{0x0010020000000A80L});
+    public static final BitSet FOLLOW_attribRelation_in_attribConstraint1134 = new BitSet(new long[]{0x0000004600000000L});
+    public static final BitSet FOLLOW_attribNumInstance_in_attribConstraint1140 = new BitSet(new long[]{0x0010020000000002L});
+    public static final BitSet FOLLOW_attribOperator_in_attribConstraint1143 = new BitSet(new long[]{0x0000004600000000L});
+    public static final BitSet FOLLOW_attribNumInstance_in_attribConstraint1145 = new BitSet(new long[]{0x0010020000000002L});
+    public static final BitSet FOLLOW_INT_in_attribNumInstance1177 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_name_in_attribNumInstance1184 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_intAttribute_in_attribute1196 = new BitSet(new long[]{0x0020000000000000L});
+    public static final BitSet FOLLOW_floatAttribute_in_attribute1200 = new BitSet(new long[]{0x0020000000000000L});
+    public static final BitSet FOLLOW_stringAttribute_in_attribute1204 = new BitSet(new long[]{0x0020000000000000L});
+    public static final BitSet FOLLOW_boolAttribute_in_attribute1208 = new BitSet(new long[]{0x0020000000000000L});
+    public static final BitSet FOLLOW_SEMI_in_attribute1211 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_VAR_INT_in_intAttribute1240 = new BitSet(new long[]{0x0000000600000000L});
+    public static final BitSet FOLLOW_name_in_intAttribute1243 = new BitSet(new long[]{0x0000000002000002L});
+    public static final BitSet FOLLOW_EQ_in_intAttribute1246 = new BitSet(new long[]{0x0000004000000000L});
+    public static final BitSet FOLLOW_INT_in_intAttribute1249 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_VAR_FLOAT_in_floatAttribute1258 = new BitSet(new long[]{0x0000000600000000L});
+    public static final BitSet FOLLOW_name_in_floatAttribute1261 = new BitSet(new long[]{0x0000000002000002L});
+    public static final BitSet FOLLOW_EQ_in_floatAttribute1264 = new BitSet(new long[]{0x0000000040000000L});
+    public static final BitSet FOLLOW_FLOAT_in_floatAttribute1267 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_VAR_STRING_in_stringAttribute1275 = new BitSet(new long[]{0x0000000600000000L});
+    public static final BitSet FOLLOW_name_in_stringAttribute1278 = new BitSet(new long[]{0x0000000002000002L});
+    public static final BitSet FOLLOW_EQ_in_stringAttribute1281 = new BitSet(new long[]{0x0400000000000000L});
+    public static final BitSet FOLLOW_STRING_in_stringAttribute1284 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_VAR_BOOL_in_boolAttribute1293 = new BitSet(new long[]{0x0000000600000000L});
+    public static final BitSet FOLLOW_name_in_boolAttribute1296 = new BitSet(new long[]{0x0000000002000002L});
+    public static final BitSet FOLLOW_EQ_in_boolAttribute1299 = new BitSet(new long[]{0x0000000000004000L});
+    public static final BitSet FOLLOW_BOOLEAN_in_boolAttribute1302 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_OP_NOT_in_unaryOp1314 = new BitSet(new long[]{0x0000000000000002L});
 
 }

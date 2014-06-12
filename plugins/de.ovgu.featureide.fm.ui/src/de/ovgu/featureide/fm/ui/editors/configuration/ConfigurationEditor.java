@@ -77,9 +77,8 @@ import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
+import de.ovgu.featureide.fm.core.io.ModelIOFactory;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelReader;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 
@@ -444,10 +443,9 @@ public class ConfigurationEditor extends MultiPageEditorPart implements
 		AbstractFeatureModelReader reader;
 
 		if (featureModel instanceof ExtendedFeatureModel)
-			reader = new VelvetFeatureModelReader(featureModel);
+			reader = ModelIOFactory.getModelReader(featureModel, ModelIOFactory.TYPE_VELVET);
 		else
-			reader = new XmlFeatureModelReader(featureModel);
-
+			reader = ModelIOFactory.getModelReader(featureModel, ModelIOFactory.TYPE_XML);
 		try {
 			reader.readFromFile(modelFile);
 		} catch (FileNotFoundException e) {
