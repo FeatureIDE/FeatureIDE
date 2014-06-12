@@ -208,13 +208,17 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		return children;
 	}
 
-	private static void updateConstraintNode(Node curNode, String parentModelname) {
+	private static void updateConstraintNode(Node curNode, String parentModelname, String rootName) {
 		if (curNode instanceof Literal) {
 			Literal literal = (Literal) curNode;
-			literal.var = parentModelname + "." + literal.var.toString();
+			if (literal.var.equals(rootName)) {
+				literal.var = parentModelname;
+			} else {
+				literal.var = parentModelname + "." + literal.var.toString();
+			}
 		} else {
 			for (Node child : curNode.getChildren()) {
-				updateConstraintNode(child, parentModelname);
+				updateConstraintNode(child, parentModelname, rootName);
 			}
 		}
 	}
@@ -563,7 +567,6 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 				}
 			}
 			final Equation equation = new Equation(weightedTerms, relationOperator, degree);
-			// FMCorePlugin.getDefault().logInfo(equation.toString());
 			extFeatureModel.addAttributeConstraint(equation);
 		}
 	}
@@ -626,9 +629,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 				break;
 			case VelvetParser.CONSTR:
 				Node newNode = parseConstraint_rec(curNode);
-				if (!parent.isRoot()) {
-					newNode = new Implies(new Literal(parent.getName()), newNode);
-				}
+				newNode = new Implies(new Literal(parent.getName()), newNode);
 				constraintNodeList.add(new ConstraintNode(newNode, curNode));
 				break;
 			case VelvetParser.ACONSTR:
@@ -856,7 +857,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		
 		for (final Constraint constraint : sourceModel.getConstraints()) {
 			Node constraintNode = constraint.getNode();
-			updateConstraintNode(constraintNode, connectorName);
+			updateConstraintNode(constraintNode, connectorName, instanceRoot.getName());
 			ExtendedConstraint newConstraint = new ExtendedConstraint(extFeatureModel, constraintNode);
 			newConstraint.setType(type);
 			newConstraint.setContainedFeatures();
