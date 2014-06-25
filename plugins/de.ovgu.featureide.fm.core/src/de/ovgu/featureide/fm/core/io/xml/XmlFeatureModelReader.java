@@ -368,6 +368,8 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 						featureModel.getAnalyser().calculateRedundantConstraints = value;
 					} else if (nodeName.equals(CALCULATE_FEATURES)) {
 						featureModel.getAnalyser().calculateFeatures = value;
+					} else if (nodeName.equals(CALCULATE_TAUTOLOGY)) {
+						featureModel.getAnalyser().calculateTautologyConstraints = value;
 					} else {
 						throwError("Unknown calculations attribute: " + nodeName, e);
 					}

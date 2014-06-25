@@ -44,7 +44,8 @@ public class ConstrainsCalculationsAction extends Action {
 		if (featureModel.getAnalyser().calculateConstraints) {
 			featureModel.getAnalyser().calculateConstraints = false;
 			featureModel.getAnalyser().calculateRedundantConstraints = false;
-		} else {
+			featureModel.getAnalyser().calculateTautologyConstraints = false;
+		} else {			
 			featureModel.getAnalyser().calculateConstraints = true;
 			featureModel.getAnalyser().calculateFeatures = true;
 		}

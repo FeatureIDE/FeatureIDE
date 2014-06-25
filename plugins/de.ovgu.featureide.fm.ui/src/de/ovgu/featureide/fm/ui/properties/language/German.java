@@ -38,17 +38,15 @@ public class German implements ILanguage {
 	private static final String CONCRETE = "Konkret";
 	private static final String HIDDEN = "Versteckt";
 	private static final String DEAD = "Unwählbar";
-	private static final String FALSE_OPTIONAL ="Falsch-optional";
+	private static final String FALSE_OPTIONAL ="Falsch-optionales Feature";
 	private static final String ALTERNATIVE = "Alternative";
 	private static final String OR = "Oder";
 	private static final String OPTIONAL = "Optional";
-	private static final String INDETHIDDEN = "Unbestimmbar versteckt";
+	private static final String INDETHIDDEN = "Unbestimmbar verstecktes Feature";
 	private static final String REDUNDANT = "Redundantes Constraint";
-	private static final String DEAD_CONST = "Constraint macht feature unerfüllbar";
-	private static final String UNSATISFIABLE_CONST = "Unerfüllbares constraint";
+	private static final String UNSATISFIABLE_CONST = "Unerfüllbares Constraint";
 	private static final String TAUTOLOGY_CONST = "Constraint ist Tautologie";
 	private static final String VOID_MODEL_CONST = "Constraint macht Produktlinie unerfüllbar";
-	private static final String FALSE_OPTIONAL_CONSTRAINT = "Falsch-otionales constraint";	
 	
 	
 	@Override
@@ -56,10 +54,6 @@ public class German implements ILanguage {
 		return REDUNDANT;
 	}
 	
-	@Override
-	public String getDeadConst() {
-		return DEAD_CONST;
-	}
 	 
 	@Override
 	public String getUnsatisfiableConst() {
@@ -135,10 +129,5 @@ public class German implements ILanguage {
 	@Override
 	public String getOptional() {
 		return OPTIONAL;
-	}
-
-	@Override
-	public String getFalseOptionalConst() {
-		return FALSE_OPTIONAL_CONSTRAINT;
 	}
 }
