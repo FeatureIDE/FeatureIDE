@@ -193,10 +193,10 @@ public class PrintStatisticsJob extends AMonitorJob<PrintStatisticsJob.Arguments
 		
 		IOConstants.writeToFile(folder.getFile("_sum_statistics.csv"), sumStat.toCSVString());
 
-		Configuration defaultConf = new Configuration(fm);
+		Configuration defaultConf = new Configuration(fm, false);
 		
 		for (String featureName : allConcreteFeatures) {			
-			Configuration conf = new Configuration(defaultConf, fm, true);
+			Configuration conf = new Configuration(defaultConf, fm, false);
 			try {
 				conf.setManual(featureName, Selection.SELECTED);
 			} catch(SelectionNotPossibleException e) {
