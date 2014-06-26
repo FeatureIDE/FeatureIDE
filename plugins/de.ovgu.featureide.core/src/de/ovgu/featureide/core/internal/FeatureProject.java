@@ -1286,11 +1286,14 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			ICommand[] commands = description.getBuildSpec();
 			for (ICommand command : commands) {
 				if (command.getBuilderName().equals(
-						ExtensibleFeatureProjectBuilder.BUILDER_ID)) {
+						ExtensibleFeatureProjectBuilder.BUILDER_ID) || command.getBuilderName().equals("org.eclipse.ui.externaltools.ExternalToolBuilder")) {
 					Map<String, String> args = command.getArguments();
 					args.put(SOURCE_ARGUMENT, feature);
 					args.put(BUILD_ARGUMENT, src);
 					args.put(CONFIGS_ARGUMENT, configuration);
+					project.setPersistentProperty(IFeatureProject.buildFolderConfigID, src);
+					project.setPersistentProperty(IFeatureProject.configFolderConfigID, configuration);
+					project.setPersistentProperty(IFeatureProject.sourceFolderConfigID, feature);
 					command.setArguments(args);
 				}
 			}
