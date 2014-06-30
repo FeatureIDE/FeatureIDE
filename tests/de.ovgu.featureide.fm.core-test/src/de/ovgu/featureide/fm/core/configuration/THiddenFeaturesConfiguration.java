@@ -70,7 +70,7 @@ public class THiddenFeaturesConfiguration extends AbstractConfigurationTest {
 	public void testAlternativeHidden() {
 		FeatureModel fm = loadXML("<alt mandatory=\"true\" name=\"S\"><feature mandatory=\"true\" name=\"A\"/><feature hidden=\"true\" mandatory=\"false\" name=\"B\"/></alt>");
 		Configuration c = new Configuration(fm);
-		assertEquals(1, c.number());
+		assertEquals(2, c.number());
 		HashSet<Feature> set = new HashSet<Feature>();
 		set.add(fm.getFeature("S"));
 		set.add(fm.getFeature("B"));
