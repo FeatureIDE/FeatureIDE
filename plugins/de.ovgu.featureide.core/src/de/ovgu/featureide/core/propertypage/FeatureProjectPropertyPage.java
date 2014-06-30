@@ -492,15 +492,9 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 	 * @return
 	 */
 	private boolean noPathChanged() {
-		return featureProject.getSourceFolder() != null ? featureProject
-				.getSourceFolder().getProjectRelativePath().toOSString()
-				.equals(featurePath.getText()) : true && featureProject
-				.getBuildFolder() != null ? featureProject.getBuildFolder()
-				.getProjectRelativePath().toOSString()
-				.equals(sourcePath.getText()) : true && featureProject
-				.getConfigFolder() != null ? featureProject.getConfigFolder()
-				.getProjectRelativePath().toOSString()
-				.equals(configPath.getText()) : true;
+		return 	((featureProject.getSourceFolder() != null) ? featureProject.getSourceFolder().getProjectRelativePath().toOSString().equals(featurePath.getText()) : true) && 
+				((featureProject.getBuildFolder() != null) ? featureProject.getBuildFolder().getProjectRelativePath().toOSString().equals(sourcePath.getText()) : true) && 
+				((featureProject.getConfigFolder() != null) ? featureProject.getConfigFolder().getProjectRelativePath().toOSString().equals(configPath.getText()) : true);
 	}
 
 	@Override

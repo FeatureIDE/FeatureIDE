@@ -45,6 +45,7 @@ public class FeaturesOnlyCalculationAction extends Action {
 			featureModel.getAnalyser().calculateFeatures = false;
 			featureModel.getAnalyser().calculateConstraints = false;
 			featureModel.getAnalyser().calculateRedundantConstraints = false;
+			featureModel.getAnalyser().calculateTautologyConstraints = false;
 		} else {
 			featureModel.getAnalyser().calculateFeatures = true;
 		}

@@ -22,6 +22,8 @@ package de.ovgu.featureide.fm.ui.editors;
 
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.WeakHashMap;
 
 import org.eclipse.draw2d.geometry.Dimension;
@@ -51,7 +53,7 @@ public class FeatureUIHelper {
 	private static WeakHashMap <FeatureModel,Dimension> legendSize = new WeakHashMap<FeatureModel,Dimension>();
 	private static WeakHashMap <FeatureModel,LegendFigure>  legendFigure = new WeakHashMap<FeatureModel,LegendFigure>();
 	private static ArrayList <FeatureModel> hasVerticalLayout= new ArrayList<FeatureModel>();
-	private static ArrayList <FeatureModel> showHiddenFeatures = new ArrayList<FeatureModel>();;
+	private static Set <FeatureModel> showHiddenFeatures = new HashSet <FeatureModel>();
 	
 	public static Dimension getLegendSize(FeatureModel featureModel){
 		return legendSize.get(featureModel);
@@ -61,8 +63,12 @@ public class FeatureUIHelper {
 		return showHiddenFeatures.contains(featureModel);
 	}
 	public static void showHiddenFeatures(boolean show, FeatureModel featureModel){
-		if(show)showHiddenFeatures.add(featureModel);
-		else showHiddenFeatures.remove(featureModel);
+		if(show) {
+			showHiddenFeatures.add(featureModel);
+		}
+		else {
+			showHiddenFeatures.remove(featureModel);
+		}
 	}
 	
 	public static void setLegendSize(FeatureModel featureModel, Dimension dim){
@@ -141,7 +147,7 @@ public class FeatureUIHelper {
 			if(parentFeature.isHidden())
 				parentFeatureHidden=true;
 		}
-		if((feature.isHidden()||parentFeatureHidden) && !showHiddenFeatures.contains(feature.getFeatureModel())){
+		if((feature.isHidden() || parentFeatureHidden) && !showHiddenFeatures.contains(feature.getFeatureModel())){
 				return getTargetLocation(feature.getParent());			
 		}
 		

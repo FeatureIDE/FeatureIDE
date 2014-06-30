@@ -1,0 +1,9 @@
+delta DRemBeautiful {
+	modifies Hello {
+		removesMethod printBeautiful;
+		
+		modifies String print() {
+			return new Hello().printHello();
+		}
+	}
+}

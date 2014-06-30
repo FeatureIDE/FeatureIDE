@@ -119,6 +119,7 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter implements
     	calculations.setAttribute(CALCULATE_FEATURES, "" + featureModel.getAnalyser().calculateFeatures);
     	calculations.setAttribute(CALCULATE_CONSTRAINTS, "" + featureModel.getAnalyser().calculateConstraints);
     	calculations.setAttribute(CALCULATE_REDUNDANT, "" + featureModel.getAnalyser().calculateRedundantConstraints);
+    	calculations.setAttribute(CALCULATE_TAUTOLOGY, "" + featureModel.getAnalyser().calculateTautologyConstraints);
 
     	root.appendChild(comments);
     	for(int i=0; i<featureModel.getComments().size(); i++){

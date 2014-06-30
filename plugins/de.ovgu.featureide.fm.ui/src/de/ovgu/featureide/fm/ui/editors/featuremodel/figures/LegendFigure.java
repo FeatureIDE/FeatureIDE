@@ -89,9 +89,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private static final String DEAD_TOOLTIP = "Dead feature:\n\nThis feature cannot be selected in any valid configuration.";
 	private static final String FALSE_OPT_TOOLTIP = "False optional feature:\n\nThis feature is declared optional, but is always selected\n if the parent feature is selected.";
 	private static final String INDET_HIDDEN_TOOLTIP = "Indeterminate hidden feature:\n\n This feature is declared hidden, but does not depend on any unhidden features.";
-	private static final String REDUNDANT_TOOLTIP = "Redundant constraint:\n\n This constraint does not change the product line.";
-	private static final String FALSE_OPT_CONSTRAINT_TOOLTIP = "False optional constraint:\n\n This constraint causes features to be false optional.";
-	private static final String DEAD_CONST_TOOLTIP = "Dead constraint:\n\n This constraint causes features to be dead.";
+	private static final String REDUNDANT_TOOLTIP = "Redundant constraint:\n\n This constraint does not change the product line.";	
 	private static final String UNSATISFIABLE_CONST_TOOLTIP = "Unsatisfiable Constraint\n\nThis constraint cannot become true";
 	private static final String TAUTOLOGY_CONST_TOOLTIP = "Constraint is tautology\n\n This constraint cannot become false.";
 	private static final String MODEL_CONST_TOOLTIP = "Constraint makes the model void.";
@@ -125,7 +123,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private boolean indetHidden;
 	private boolean unsatisfiableConst;
 	private boolean tautologyConst;
-	private boolean deadConst;
 	private boolean voidModelConst;
 	private boolean redundantConst;
 	private boolean imported = false;
@@ -146,16 +143,16 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		_abstract = featureModel.hasAbstract();
 		concrete = featureModel.hasConcrete();
 		hidden = featureModel.hasHidden();
-		dead = !featureModel.getAnalyser().getCachedDeadFeatures().isEmpty();
+		dead = !featureModel.getAnalyser().getDeadFeatures().isEmpty();
 		showHidden = featureModel.getLayout().showHiddenFeatures();
 		falseoptional = featureModel.hasFalseOptionalFeatures();
 		indetHidden = featureModel.hasIndetHidden();
-		unsatisfiableConst = featureModel.hasUnsatisfiableConst();
-		tautologyConst = featureModel.hasTautologyConst();
-		deadConst = featureModel.hasDeadConst();
-		voidModelConst = featureModel.hasVoidModelConst();
-		redundantConst = featureModel.hasRedundantConst();
-
+		
+		unsatisfiableConst = featureModel.hasUnsatisfiableConst() && featureModel.getAnalyser().calculateConstraints;
+		tautologyConst = featureModel.hasTautologyConst() && featureModel.getAnalyser().calculateTautologyConstraints;
+		voidModelConst = featureModel.hasVoidModelConst() && featureModel.getAnalyser().calculateConstraints;
+		redundantConst = featureModel.hasRedundantConst() && featureModel.getAnalyser().calculateRedundantConstraints;
+		
 		if (featureModel instanceof ExtendedFeatureModel) {
 			ExtendedFeatureModel extendedFeatureModel = (ExtendedFeatureModel) featureModel;
 			interfaced = extendedFeatureModel.hasInterface();
@@ -163,7 +160,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			imported = !interfaced && extendedFeatureModel.hasInstance();
 			inherited = !interfaced && extendedFeatureModel.hasInherited();
 		}
-
+		
 		language = FMPropertyManager.getLanguage();
 		setLocation(pos);
 		setLayoutManager(layout);
@@ -223,10 +220,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			height = height + ROW_HEIGHT;
 			setWidth(language.getDead());
 		}
-		if (deadConst) {
-			height = height + ROW_HEIGHT;
-			setWidth(language.getDeadConst());
-		}
 		if (falseoptional) {
 			height = height + ROW_HEIGHT;
 			setWidth(language.getFalseOptional());
@@ -250,10 +243,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		if (redundantConst) {
 			height = height + ROW_HEIGHT;
 			setWidth(language.getRedundantConst());
-		}
-		if (falseoptional) {
-			height = height + ROW_HEIGHT;
-			setWidth(language.getFalseOptionalConst());
 		}
 		this.setSize(width, height);
 	}
@@ -300,9 +289,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		if (dead) {
 			createRowDead(row++);
 		}
-		if (deadConst) {
-			createRowDeadConst(row++);
-		}
 
 		if (voidModelConst) {
 			createRowVoidModelConst(row++);
@@ -321,10 +307,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		if (redundantConst) {
 			createRowRedundantConst(row++);
 		}
-		if (falseoptional) {
-			createRowFalseOptionalConst(row++);
-		}
-
 		if (tautologyConst) {
 			createRowTautologyConst(row++);
 		}
@@ -334,21 +316,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		createSymbol(row, FALSE_OPT, false, REDUNDANT_TOOLTIP);
 		Label labelIndetHidden = createLabel(row, language.getRedundantConst(),
 				FMPropertyManager.getFeatureForgroundColor(), REDUNDANT_TOOLTIP);
-		add(labelIndetHidden);
-	}
-	
-	private void createRowFalseOptionalConst(int row) {
-		createSymbol(row, FALSE_OPT, false,FALSE_OPT_CONSTRAINT_TOOLTIP);
-		Label label = createLabel(row, language.getFalseOptionalConst(),
-				FMPropertyManager.getFeatureForgroundColor(), FALSE_OPT_CONSTRAINT_TOOLTIP);
-		add(label);
-	}
-
-	private void createRowDeadConst(int row) {
-		createSymbol(row, DEAD, false, DEAD_CONST_TOOLTIP);
-		Label labelIndetHidden = createLabel(row, language.getDeadConst(),
-				FMPropertyManager.getFeatureForgroundColor(),
-				DEAD_CONST_TOOLTIP);
 		add(labelIndetHidden);
 	}
 

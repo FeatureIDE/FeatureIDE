@@ -1,0 +1,11 @@
+delta DWorld {
+	modifies Hello {
+		adds String printWorld() {
+			return " World!";
+		}
+		
+		modifies String print() {
+			return original() + new Hello().printWorld();
+		}
+	}
+}
