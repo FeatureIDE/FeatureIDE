@@ -1055,7 +1055,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 					for (IFile file : files) {
 						monitor.subTask("Check validity of " + file.getName());
 						reader.readFromFile(file);
-						if (!config.valid()) {
+						if (!config.isValid()) {
 							String name = file.getName();
 							name = name.substring(0, name.lastIndexOf('.'));
 							String message = "Configuration '" + name

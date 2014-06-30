@@ -40,7 +40,7 @@ public class ChooseFolderPage extends AbstractWizardPage {
 	private Text folderName;
 	private Label folderLabel;
 
-	private final String folderNameString;
+	private String folderNameString;
 
 	public ChooseFolderPage(String defaultFolderName) {
 		super("Choose Folder");
@@ -82,7 +82,8 @@ public class ChooseFolderPage extends AbstractWizardPage {
 
 	@Override
 	protected String checkPage() {
-		if (folderName.getText().isEmpty()) {
+		folderNameString = folderName.getText();
+		if (folderNameString.isEmpty()) {
 			return "Enter a folder name";
 		}
 		return null;
@@ -90,6 +91,6 @@ public class ChooseFolderPage extends AbstractWizardPage {
 
 	@Override
 	protected void putData() {
-		abstractWizard.putData(WizardConstants.KEY_OUT_FOLDER, folderName.getText());
+		abstractWizard.putData(WizardConstants.KEY_OUT_FOLDER, folderNameString);
 	}
 }

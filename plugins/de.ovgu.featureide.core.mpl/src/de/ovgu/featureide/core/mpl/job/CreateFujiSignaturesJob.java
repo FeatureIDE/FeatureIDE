@@ -57,7 +57,6 @@ import de.ovgu.featureide.core.fstmodel.RoleElement;
 import de.ovgu.featureide.core.mpl.InterfaceProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.job.util.AJobArguments;
-import de.ovgu.featureide.core.mpl.job.util.AMonitorJob;
 import de.ovgu.featureide.core.mpl.signature.ProjectSignatures;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassSignature;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature;

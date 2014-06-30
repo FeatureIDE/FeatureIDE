@@ -27,7 +27,6 @@ import org.eclipse.core.runtime.IPath;
 
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.job.util.AJobArguments;
-import de.ovgu.featureide.core.mpl.job.util.AMonitorJob;
 
 /**
  * 
@@ -46,10 +45,6 @@ public class MPLCopyExternalJob extends AMonitorJob<MPLCopyExternalJob.Arguments
 		}
 	}
 	
-	public MPLCopyExternalJob() {
-		this(null);
-	}
-	
 	protected MPLCopyExternalJob(Arguments arguments) {
 		super("Copying Source Files", arguments);
 		setPriority(BUILD);
@@ -63,7 +58,10 @@ public class MPLCopyExternalJob extends AMonitorJob<MPLCopyExternalJob.Arguments
 			IResource[] srcMembers = arguments.srcFolder.members();
 			for (int i = 0; i < srcMembers.length; i++) {
 				IResource srcMember = srcMembers[i];
-				srcMember.move(destPath.append(srcMember.getName()), true, monitor);
+				IPath px = destPath.append(srcMember.getName());
+				if (!px.toFile().exists()) {
+					srcMember.move(px, true, monitor);
+				}
 			}
 		} catch (CoreException e) {
 			MPLPlugin.getDefault().logError(e);

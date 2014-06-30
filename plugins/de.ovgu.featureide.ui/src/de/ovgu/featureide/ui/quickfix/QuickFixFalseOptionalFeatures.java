@@ -98,7 +98,7 @@ public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations
 			// select further features to get a valid configuration
 			final List<SelectableFeature> features = new LinkedList<SelectableFeature>();
 			for (final SelectableFeature feature : configuration.getFeatures()) {
-				if (configuration.valid()) {
+				if (configuration.isValid()) {
 					break;
 				}
 				if (feature.getSelection() == Selection.UNDEFINED) {
@@ -116,7 +116,7 @@ public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations
 				for (final SelectableFeature feature : features) {
 					if (feature.getAutomatic() == Selection.UNDEFINED) {
 						configuration.setManual(feature, Selection.UNSELECTED);
-						if (!configuration.valid()) {
+						if (!configuration.isValid()) {
 							configuration.setManual(feature, Selection.SELECTED);
 							break;
 						}

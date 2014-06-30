@@ -38,6 +38,8 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  * @author Jens Meinicke
  */
 public class FeatureModelClassGenerator {
+	
+	protected static final String NEWLINE = System.getProperty("line.separator", "\n");
 
 	private StringBuilder stringBuilder = new StringBuilder();
 	
@@ -114,14 +116,18 @@ public class FeatureModelClassGenerator {
 	 * Fills the {@link StringBuilder} with the file content.
 	 */
 	private void printModel() {
-		stringBuilder.append("package FM;\r\n\r\n");
+		stringBuilder.append("package FM;");
+		stringBuilder.append(NEWLINE);
+		stringBuilder.append(NEWLINE);
 		stringBuilder.append(featureModelClass.getImports());
 		stringBuilder.append(featureModelClass.getHead());
 		stringBuilder.append(featureModelClass.getFeatureFields());
-		stringBuilder.append("\r\n\t");
+		stringBuilder.append(NEWLINE);
+		stringBuilder.append("\t");
 		stringBuilder.append(featureModelClass.getFormula());
 		stringBuilder.append(featureModelClass.getGetter());
 		stringBuilder.append(featureModelClass.getSelection());
-		stringBuilder.append("\r\n}");
+		stringBuilder.append(NEWLINE);
+		stringBuilder.append("}");
 	}
 }

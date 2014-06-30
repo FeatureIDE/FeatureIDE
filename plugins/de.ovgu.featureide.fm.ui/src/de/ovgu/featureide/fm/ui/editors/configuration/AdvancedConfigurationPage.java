@@ -179,7 +179,7 @@ public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 	}
 
 	private boolean errorMessage() { 
-		if (!configurationEditor.getConfiguration().valid() && configurationEditor.getConfiguration().number() == 0){
+		if (!configurationEditor.getConfiguration().isValid() && configurationEditor.getConfiguration().number() == 0){
 			for (TreeElement feature : configurationEditor.getConfiguration().getRoot().getChildren()) {
 					remove(feature);
 			}

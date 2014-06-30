@@ -72,7 +72,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 	private static final String PLUGIN_WARNING = "The required bundle "+PLUGIN_ID+" is not installed.";
 	private static final String ASPECTJ_NATURE = "org.eclipse.ajdt.ui.ajnature";
 	
-	private static final String NEW_ASPECT = "\t// TODO Auto-generated aspect\r\n";
+	private static final String NEW_ASPECT = "\t// TODO Auto-generated aspect" + NEWLINE;
 
 	public static final IPath ASPECTJRT_CONTAINER = new Path("org.eclipse.ajdt.core.ASPECTJRT_CONTAINER");
 
@@ -496,15 +496,15 @@ public class AspectJComposer extends ComposerExtensionClass {
 		if (!aspectFile.exists()) {
 			String fileText;
 			if (aspectPackage != null) {
-				fileText = "\r\n" +
-						   "package " + aspectPackage + ";\r\n" +
-						   "\r\n" +
-						   "public aspect " + aspect + " {\r\n" + 
+				fileText = NEWLINE +
+						   "package " + aspectPackage + ";" + NEWLINE +
+						   NEWLINE +
+						   "public aspect " + aspect + " {" + NEWLINE + 
 						   NEW_ASPECT +
 						   "}"; 
 			} else {
-				fileText = "\r\n" +
-						   "public aspect " + aspect + " {\r\n" + 
+				fileText = NEWLINE +
+						   "public aspect " + aspect + " {" + NEWLINE + 
 						   NEW_ASPECT +
 						   "}"; 
 			}

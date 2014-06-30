@@ -53,7 +53,7 @@ public final class IOConstants {
 		EXTENSION_JAK = ".jak",
 		EXTENSION_SOLUTION = ".solution",
 	
-		LINE_SEPARATOR = System.getProperty("line.separator");
+		LINE_SEPARATOR = System.getProperty("line.separator", "\n");
 	
 	public static Node[] buildNodeForFeature(String featureName) {
 		return new Node[] {new Literal(featureName, true)};		

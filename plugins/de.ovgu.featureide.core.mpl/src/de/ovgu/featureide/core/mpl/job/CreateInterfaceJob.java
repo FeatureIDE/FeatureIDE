@@ -39,7 +39,6 @@ import org.sat4j.specs.TimeoutException;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.job.util.AJobArguments;
-import de.ovgu.featureide.core.mpl.job.util.AMonitorJob;
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -110,7 +109,7 @@ public class CreateInterfaceJob extends AMonitorJob<CreateInterfaceJob.Arguments
 	
 	private FeatureModel createInterface(FeatureModel orgFeatureModel, Collection<String> selectedFeatureNames) {
 		// Calculate Constraints
-		FeatureModel m = orgFeatureModel.clone(false);		
+		FeatureModel m = orgFeatureModel.deepClone(false);		
 		for (Feature feat : m.getFeatures()) {
 			feat.setAbstract(!selectedFeatureNames.contains(feat.getName()));
         }
@@ -121,7 +120,7 @@ public class CreateInterfaceJob extends AMonitorJob<CreateInterfaceJob.Arguments
 		worked();
 		
 		// Calculate Model
-		m = orgFeatureModel.clone(false);
+		m = orgFeatureModel.deepClone(false);
 		
         // mark features
         for (Feature feat : m.getFeatures()) {

@@ -113,7 +113,7 @@ public abstract class TAbstractFeatureModelReaderWriter {
 
 	@Test
 	public void testFeatureCount() throws FileNotFoundException,
-			UnsupportedModelException {
+		UnsupportedModelException {
 
 		assertEquals(failureMessage, origFm.getFeatures().size(), newFm
 				.getFeatures().size());

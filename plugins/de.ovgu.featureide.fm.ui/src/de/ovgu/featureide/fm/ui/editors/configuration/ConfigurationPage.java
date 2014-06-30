@@ -171,7 +171,7 @@ public class ConfigurationPage extends ConfigurationEditorPage {
 
 	private void setCheckbox(TreeItem root) {
 		resetColor();
-		setCheckbox(root, configurationEditor.getConfiguration().valid());
+		setCheckbox(root, configurationEditor.getConfiguration().isValid());
 		selectionChanged = true;
 		setColor();
 	}
@@ -207,15 +207,14 @@ public class ConfigurationPage extends ConfigurationEditorPage {
 					child.setChecked(false);
 					child.setForeground(gray);
 				}
-			} else if (feature.getManual() == Selection.UNDEFINED || 
-					feature.getManual() == Selection.UNSELECTED){
-				child.setChecked(false);
+			} else if (feature.getManual() == Selection.SELECTED) {
+				child.setChecked(true);
 				if(!configuration_valid) {
 					features.add(feature);
 					items.put(feature, child);
 				}
-			} else if (feature.getManual() == Selection.SELECTED) {
-				child.setChecked(true);
+			} else {
+				child.setChecked(false);
 				if(!configuration_valid) {
 					features.add(feature);
 					items.put(feature, child);
@@ -234,29 +233,36 @@ public class ConfigurationPage extends ConfigurationEditorPage {
 		returnFormThread = false;
 		job_color = new Job("Feature coloring.(" + configurationEditor.getFile().getName() + ")") {
 			public IStatus run(IProgressMonitor monitor) {
-				if (features != null && features.size() != 0 && !features.isEmpty()) {
-					monitor.beginTask("", features.size());
+				System.out.println();
+				if (features != null && !features.isEmpty()) {
+//					monitor.beginTask("", features.size());
+					monitor.beginTask("", 1);
+					boolean[] validConfs = configurationEditor.getConfiguration().leadToValidConfiguration(features);
+					int i = 0;
 					for (SelectableFeature feature : features) {
-						monitor.subTask("Check feature " + feature.getName());
-						if (returnFormThread || monitor.isCanceled()) {
-							monitor.done();
-							return Status.OK_STATUS;
+						if (validConfs[i++]) {
+							setColor(items.get(feature), (feature.getManual() == Selection.SELECTED) ? blue : green);
 						}
-						if (feature.getManual() == Selection.SELECTED) {
-							if (configurationEditor.getConfiguration().leadToValidConfiguration(feature, Selection.UNDEFINED, Selection.SELECTED )) {
-								if (!returnFormThread) {
-									setColor(items.get(feature), blue);
-								}
-							}
-						} else {
-							if (configurationEditor.getConfiguration().leadToValidConfiguration(feature, Selection.SELECTED, Selection.UNDEFINED)) {
-								if (!returnFormThread) {
-									setColor(items.get(feature), green);
-								}
-							}
-						}
-						monitor.worked(1);
 					}
+					monitor.worked(1);
+					
+//					for (SelectableFeature feature : features) {
+//						monitor.subTask("Check feature " + feature.getName());
+//						if (returnFormThread || monitor.isCanceled()) {
+//							monitor.done();
+//							return Status.OK_STATUS;
+//						}
+//						if (feature.getManual() == Selection.SELECTED) {
+//							if (configurationEditor.getConfiguration().leadToValidConfiguration(feature, Selection.UNDEFINED, Selection.SELECTED )) {
+//								setColor(items.get(feature), blue);
+//							}
+//						} else {
+//							if (configurationEditor.getConfiguration().leadToValidConfiguration(feature, Selection.SELECTED, Selection.UNDEFINED)) {
+//								setColor(items.get(feature), green);
+//							}
+//						}
+//						monitor.worked(1);
+//					}
 				}
 				monitor.done();
 				return Status.OK_STATUS;
@@ -309,7 +315,7 @@ public class ConfigurationPage extends ConfigurationEditorPage {
 	
 	private boolean errorMessage() {
 
-		if (configurationEditor.getConfiguration()==null||(!configurationEditor.getConfiguration().valid() && configurationEditor.getConfiguration().number() == 0)){
+		if (configurationEditor.getConfiguration()==null||(!configurationEditor.getConfiguration().isValid() && configurationEditor.getConfiguration().number() == 0)){
 			tree.removeAll();
 			TreeItem item = new TreeItem(tree, 1);
 			if (configurationEditor.getModelFile() ==  null) {

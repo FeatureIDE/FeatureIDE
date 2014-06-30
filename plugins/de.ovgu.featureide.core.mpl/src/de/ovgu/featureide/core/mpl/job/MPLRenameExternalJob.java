@@ -30,7 +30,10 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jdt.core.IClasspathAttribute;
+import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IPackageFragment;
@@ -39,6 +42,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.refactoring.IJavaRefactorings;
 import org.eclipse.jdt.core.refactoring.descriptors.MoveDescriptor;
 import org.eclipse.jdt.core.refactoring.descriptors.RenameJavaElementDescriptor;
+import org.eclipse.jdt.internal.core.ClasspathEntry;
 import org.eclipse.jdt.internal.core.JavaProject;
 import org.eclipse.ltk.core.refactoring.CheckConditionsOperation;
 import org.eclipse.ltk.core.refactoring.PerformRefactoringOperation;
@@ -49,36 +53,120 @@ import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.job.util.AJobArguments;
-import de.ovgu.featureide.core.mpl.job.util.AMonitorJob;
 
 /**
  * 
  * @author Sebastian Krieter
  */
 @SuppressWarnings("restriction")
-public class MPLRenameExternalJob extends
-		AMonitorJob<MPLRenameExternalJob.Arguments> {
+public class MPLRenameExternalJob extends AMonitorJob<MPLRenameExternalJob.Arguments> {
 
 	public static class Arguments extends AJobArguments {
 		private final IProject externalProject;
 		private final String prefix;
+		private final IPath srcPath;
 
-		public Arguments(IProject externalProject, String prefix) {
+		public Arguments(IProject externalProject, String prefix, IPath srcPath) {
 			super(Arguments.class);
 			this.externalProject = externalProject;
 			this.prefix = prefix;
+			this.srcPath = srcPath;
 		}
 	}
 
 	protected MPLRenameExternalJob(Arguments arguments) {
 		super("Renaming Packages", arguments);
 		setPriority(BUILD);
+		javaProject = new JavaProject(arguments.externalProject, null);
+	}
+	
+	private static int getJavaBuildPathEntry(JavaProject javaProject) {
+		try {
+			final IClasspathEntry[] classpathEntrys = javaProject.getRawClasspath();
+			
+			for (int i = 0; i < classpathEntrys.length; ++i) {
+				if (classpathEntrys[i].getEntryKind() == IClasspathEntry.CPE_SOURCE) {
+					return i;
+				}
+			}
+		} catch (JavaModelException e) {
+			MPLPlugin.getDefault().logError(e);
+		}
+		return -1;
+	}
+	
+	private static IPath setJavaBuildPath(JavaProject javaProject, IPath path, int index) {
+		try {
+			final IClasspathEntry[] classpathEntrys = javaProject.getRawClasspath();
+			
+			if (index >= 0) {
+				final IClasspathEntry e = classpathEntrys[index];
+				if (!e.getPath().equals(path)) {
+					final IPath formerSourcePath = e.getPath();
+					classpathEntrys[index] = new ClasspathEntry(
+						e.getContentKind(), e.getEntryKind(), path, e.getInclusionPatterns(), e.getExclusionPatterns(), e.getSourceAttachmentPath(),
+						e.getSourceAttachmentRootPath(), null, e.isExported(), e.getAccessRules(), e.combineAccessRules(), e.getExtraAttributes());
+					javaProject.setRawClasspath(classpathEntrys, null);
+					return formerSourcePath;
+				}
+			} else {
+				final IClasspathEntry[] newEntrys = new IClasspathEntry[classpathEntrys.length + 1];
+				System.arraycopy(classpathEntrys, 0, newEntrys, 0, classpathEntrys.length);
+				newEntrys[newEntrys.length - 1] = new ClasspathEntry(
+						IPackageFragmentRoot.K_SOURCE, IClasspathEntry.CPE_SOURCE, path, new IPath[0], new IPath[0], null,
+						null, null, false, null, false, new IClasspathAttribute[0]);
+				javaProject.setRawClasspath(newEntrys, null);
+			}
+		} catch (JavaModelException e) {
+			MPLPlugin.getDefault().logError(e);
+		}
+
+		return null;
+	}
+
+	public static void setJavaBuildPath(IProject project, IPath path) {
+		final JavaProject javaProject = new JavaProject(project, null);
+		setJavaBuildPath(javaProject, path, getJavaBuildPathEntry(javaProject));
+	}
+	
+	private static void resetJavaBuildPath(JavaProject javaProject, IPath formerSourcePath, int formerSourcePathIndex) {
+		try {
+			final IClasspathEntry[] classpathEntrys = javaProject.getRawClasspath();
+			
+			if (formerSourcePath != null) {
+				final IClasspathEntry e = classpathEntrys[formerSourcePathIndex];
+				classpathEntrys[formerSourcePathIndex] = new ClasspathEntry(
+					e.getContentKind(), e.getEntryKind(), formerSourcePath, e.getInclusionPatterns(), e.getExclusionPatterns(), e.getSourceAttachmentPath(),
+					e.getSourceAttachmentRootPath(), null, e.isExported(), e.getAccessRules(), e.combineAccessRules(), e.getExtraAttributes());
+				javaProject.setRawClasspath(classpathEntrys, null);
+			} else if (formerSourcePathIndex == -1) {
+				final IClasspathEntry[] newEntrys = new IClasspathEntry[classpathEntrys.length - 1];
+				System.arraycopy(classpathEntrys, 0, newEntrys, 0, newEntrys.length);
+				javaProject.setRawClasspath(newEntrys, null);
+			}
+		} catch (JavaModelException e) {
+			MPLPlugin.getDefault().logError(e);
+		}
+	}
+	
+	private int formerSourcePathIndex = -1;
+	private IPath formerSourcePath = null;
+	private final JavaProject javaProject;
+	
+	@Override
+	protected boolean work() {
+		formerSourcePathIndex = getJavaBuildPathEntry(javaProject);
+		formerSourcePath = setJavaBuildPath(javaProject, arguments.srcPath, formerSourcePathIndex);
+		return renameProject();
 	}
 
 	@Override
-	protected boolean work() {
-		JavaProject javaProject = new JavaProject(arguments.externalProject, null);
-		IPackageFragmentRoot packageFragmentRoot;
+	protected void finalWork() {
+		resetJavaBuildPath(javaProject, formerSourcePath, formerSourcePathIndex);
+	}
+
+	private boolean renameProject() {
+		final IPackageFragmentRoot packageFragmentRoot;
 
 		List<IPackageFragment> packages = new LinkedList<IPackageFragment>();
 		try {
@@ -133,7 +221,6 @@ public class MPLRenameExternalJob extends
 		} catch (CoreException e) {
 			MPLPlugin.getDefault().logError(e);
 		}
-		
 		MPLPlugin.getDefault().logInfo("Packages renamed.");
 		return true;
 	}

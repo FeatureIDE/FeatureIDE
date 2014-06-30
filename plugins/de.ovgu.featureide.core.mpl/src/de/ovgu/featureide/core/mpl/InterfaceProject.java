@@ -29,6 +29,7 @@ import org.eclipse.core.resources.IProject;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.mpl.io.FileLoader;
 import de.ovgu.featureide.core.mpl.job.CreateFujiSignaturesJob;
+import de.ovgu.featureide.core.mpl.job.JobManager;
 import de.ovgu.featureide.core.mpl.job.util.IChainJob;
 import de.ovgu.featureide.core.mpl.signature.ProjectSignatures;
 import de.ovgu.featureide.core.mpl.signature.ViewTag;
@@ -173,7 +174,7 @@ public class InterfaceProject {
 		if (loadJob == null) {
 			loadJob = new CreateFujiSignaturesJob();
 			loadJob.setProject(projectReference);
-			loadJob.schedule();
+			JobManager.addJob(projectReference, loadJob);
 		} else if (again) {
 			loadAgain = true;
 		}

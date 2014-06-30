@@ -29,7 +29,6 @@ import java.util.Set;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 
-import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
 /**
@@ -63,15 +62,13 @@ public class ConfigurationWriter {
 		FeatureModel featureModel = configuration.getFeatureModel();
 		List<String> list = featureModel.getFeatureOrderList();
 		if (featureModel.isFeatureOrderUserDefined()) {
-			Set<Feature> featureset = configuration.getSelectedFeatures();
+			Set<String> featureSet = configuration.getSelectedFeatureNames();
 			for (String s : list) {
-				for (Feature f : featureset) {
-					if (f.isConcrete()) {
-						if (f.getName().equals(s))
-							if (s.contains(" "))
-								buffer.append("\"" + s + "\"\r\n");
-								else
-									buffer.append(s + "\r\n");
+				if (featureSet.contains(s)) {
+					if (s.contains(" ")) {
+						buffer.append("\"" + s + "\"\r\n");
+					} else {
+						buffer.append(s + "\r\n");
 					}
 				}
 			}

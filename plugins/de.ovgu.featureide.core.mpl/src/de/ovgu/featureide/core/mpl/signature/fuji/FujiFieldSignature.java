@@ -82,7 +82,7 @@ public class FujiFieldSignature extends AbstractFieldSignature {
 
 		if (!super.sigEquals(otherSig)
 				|| returnType != otherSig.returnType
-				) {
+		) {
 			return false;
 		}
 		return true;

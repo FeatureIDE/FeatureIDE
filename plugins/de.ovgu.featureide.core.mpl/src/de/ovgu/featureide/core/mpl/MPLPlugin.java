@@ -51,13 +51,13 @@ import de.ovgu.featureide.core.mpl.io.IOConstants;
 import de.ovgu.featureide.core.mpl.io.writer.JavaProjectWriter;
 import de.ovgu.featureide.core.mpl.job.CreateFujiSignaturesJob;
 import de.ovgu.featureide.core.mpl.job.CreateInterfaceJob;
+import de.ovgu.featureide.core.mpl.job.JobManager;
 import de.ovgu.featureide.core.mpl.job.PrintComparedInterfacesJob;
 import de.ovgu.featureide.core.mpl.job.PrintDocumentationJob;
 import de.ovgu.featureide.core.mpl.job.PrintDocumentationStatisticsJob;
 import de.ovgu.featureide.core.mpl.job.PrintExtendedSignaturesJob;
 import de.ovgu.featureide.core.mpl.job.PrintFeatureInterfacesJob;
 import de.ovgu.featureide.core.mpl.job.PrintStatisticsJob;
-import de.ovgu.featureide.core.mpl.job.StartJob;
 import de.ovgu.featureide.core.mpl.job.util.AJobArguments;
 import de.ovgu.featureide.core.mpl.job.util.IChainJob;
 import de.ovgu.featureide.core.mpl.signature.ProjectSignatures;
@@ -360,20 +360,23 @@ public class MPLPlugin extends AbstractCorePlugin {
 	}
 	
 	public void startJobs(LinkedList<IProject> projects, AJobArguments arguments) {
-		final LinkedList<IChainJob> jobs = new LinkedList<IChainJob>();
+//		final LinkedList<IChainJob> jobs = new LinkedList<IChainJob>();
+		final Object idObject = new Object();
 		for (IProject p : projects) {
 			InterfaceProject interfaceProject = getInterfaceProject(p);
 			if (interfaceProject != null && interfaceProject.getProjectSignatures() == null) {
 				IChainJob job = new CreateFujiSignaturesJob();
 				job.setProject(p);
-				jobs.add(job);
+				JobManager.addJob(idObject, job);
+//				jobs.add(job);
 			}
 			IChainJob job = arguments.createJob();
 			job.setProject(p);
-			jobs.add(job);
+//			jobs.add(job);
+			JobManager.addJob(idObject, job);
 			
 		}
-		new StartJob.Arguments(jobs).createJob().schedule();
+//		new StartJob.Arguments(jobs).createJob().schedule();
 	}
 	
 	public List<CompletionProposal> extendedModules_getCompl(InterfaceProject interfaceProject, String featureName) {

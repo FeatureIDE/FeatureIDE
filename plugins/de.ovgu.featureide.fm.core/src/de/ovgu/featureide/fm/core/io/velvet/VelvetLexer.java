@@ -1,4 +1,4 @@
-// $ANTLR 3.4 Velvet.g 2014-06-12 19:59:57
+// $ANTLR 3.4 Velvet.g 2014-06-16 14:59:51
 package de.ovgu.featureide.fm.core.io.velvet;
 
 import org.antlr.runtime.*;

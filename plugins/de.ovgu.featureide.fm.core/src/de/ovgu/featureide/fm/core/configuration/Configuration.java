@@ -21,11 +21,14 @@
 package de.ovgu.featureide.fm.core.configuration;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.prop4j.And;
@@ -46,92 +49,329 @@ public class Configuration {
 
 	private static final int TIMEOUT = 1000;
 
-	private SelectableFeature root;
+	private final SelectableFeature root;
 
-	private ArrayList<SelectableFeature> features = new ArrayList<SelectableFeature>();
+	private final ArrayList<SelectableFeature> features = new ArrayList<SelectableFeature>();
 
-	private Hashtable<String, SelectableFeature> table = new Hashtable<String, SelectableFeature>();
+	private final Hashtable<String, SelectableFeature> table = new Hashtable<String, SelectableFeature>();
 
-	private Node rootNode;
+	private final Node rootNode;
+	private final Node rootNodeWithoutHidden;
 
-	private FeatureModel featureModel;
+	private final FeatureModel featureModel;
 
 	private boolean propagate;
 
-	public Configuration(FeatureModel featureModel) {
-		this(featureModel, true);
-	}
-
-	public Configuration(FeatureModel featureModel, boolean propagate) {
-		this(featureModel, propagate, true);
-	}
-
-	public Configuration(FeatureModel featureModel, boolean propagate,
-			boolean ignoreAbstractFeatures) {
-		this.featureModel = featureModel;
-		this.propagate = propagate;
-
-		Feature root2 = featureModel.getRoot();
-		root = new SelectableFeature(this, root2);
-		initFeatures(root, root2);
-
-		rootNode = NodeCreator
-				.createNodes(featureModel, ignoreAbstractFeatures);
-		rootNode = rootNode.toCNF();
-
-		updateAutomaticValues();
-	}
-	
 	/**
 	 * This method creates a clone of the given {@link Configuration}
 	 * @param configuration The configuration to clone
 	 */
 	public Configuration(Configuration configuration) {
-		this(configuration, configuration.featureModel, false);
+		this(configuration, configuration.featureModel, configuration.propagate);
 	}
-	
+
 	public Configuration(Configuration configuration, FeatureModel featureModel, boolean propagate) {
 		this.featureModel = featureModel;
 		this.propagate = false;
 
-		Feature root2 = featureModel.getRoot();
-		root = new SelectableFeature(this, root2);
-		initFeatures(root, root2);
-
-		rootNode = NodeCreator
-				.createNodes(featureModel, false);
-		rootNode = rootNode.toCNF();
+		Feature featureRoot = featureModel.getRoot();
+		root = new SelectableFeature(this, featureRoot);
+		initFeatures(root, featureRoot);
+		
+		rootNode = configuration.rootNode.clone();
+		rootNodeWithoutHidden = configuration.rootNode.clone();
 		
 		for (SelectableFeature f : configuration.features) {
-			setManual(f.getName(), f.getSelection());
+			setManual(f.getName(), f.getManual());
+			setAutomatic(f.getName(), f.getAutomatic());
 		}
 		this.propagate = propagate;
 	}
 
-	/**
-	 * if there are hidden features which Selection is UNDEFINED, they are
-	 * selected automatically
-	 */
-	private void updateHiddenFeatureValues() {
-		// try selecting each hidden feature that still are UNDEFINED
+	public Configuration(FeatureModel featureModel) {
+		this(featureModel, true);
+	}
+	
+	public Configuration(FeatureModel featureModel, boolean propagate) {
+		this(featureModel, propagate, true);
+	}
+	
+	public Configuration(FeatureModel featureModel, boolean propagate, boolean ignoreAbstractFeatures) {
+		this.featureModel = featureModel;
+		this.propagate = propagate;
+
+		Feature featureRoot = featureModel.getRoot();
+		root = new SelectableFeature(this, featureRoot);
+		initFeatures(root, featureRoot);
+
+		rootNode = NodeCreator.createNodes(featureModel, ignoreAbstractFeatures).toCNF();
+		rootNodeWithoutHidden = NodeCreator.createNodes(featureModel, getRemoveFeatures(!ignoreAbstractFeatures, true)).toCNF();
+		
+		updateAutomaticValues();
+	}
+
+	public FeatureModel getFeatureModel() {
+		return featureModel;
+	}
+
+	public List<SelectableFeature> getFeatures() {
+		return Collections.unmodifiableList(features);
+	}
+
+	public SelectableFeature getRoot() {
+		return root;
+	}
+	
+	public SelectableFeature getSelectablefeature(String name) {
+		return table.get(name);
+	}
+	
+	public Set<String> getSelectedFeatureNames() {
+		final Set<String> result = new HashSet<String>();
+		
 		for (SelectableFeature feature : features) {
-
-			boolean hasHiddenParent = feature.getFeature().hasHiddenParent();
-			boolean isUndefined = feature.getSelection() == Selection.UNDEFINED;
-
-			if (hasHiddenParent && isUndefined) {
-				feature.setAutomatic(Selection.UNSELECTED);
-				if (!valid()) {
-					feature.setAutomatic(Selection.SELECTED);
-					
-					if (!valid()) {
-						
-						feature.setAutomatic(Selection.UNDEFINED);
-
-					}
-				}
+			if (feature.getSelection() == Selection.SELECTED) {
+				result.add(feature.getFeature().getName());
 			}
 		}
+		
+		return result;
+	}
+
+	public List<Feature> getSelectedFeatures() {
+		final List<Feature> result = new ArrayList<Feature>();
+		
+		for (SelectableFeature feature : features) {
+			if (feature.getSelection() == Selection.SELECTED) {
+				result.add(feature.getFeature());
+			}
+		}
+		
+		return result;
+	}
+
+	public LinkedList<List<String>> getSolutions(int max) throws TimeoutException {
+		final Node[] nodeArray = createNodeArray(createNodeList(), rootNode);
+		return new SatSolver(new And(nodeArray), TIMEOUT).getSolutionFeatures(max);
+	}
+
+	public List<Feature> getUnSelectedFeatures() {
+		final List<Feature> result = new ArrayList<Feature>();
+		
+		for (SelectableFeature feature : features) {
+			if (feature.getSelection() == Selection.UNSELECTED) {
+				result.add(feature.getFeature());
+			}
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * Checks that all manual and automatic selections are valid.<br>
+	 * Abstract features will <b>not</b> be ignored.
+	 * @return  {@code true} if the current selection is a valid configuration
+	 */
+	public boolean isValid() {
+		final Node[] allFeatures = new Node[features.size() + 1];
+		allFeatures[0] = rootNode.clone();
+		int i = 1;
+		for (SelectableFeature feature : features) {
+			allFeatures[i++] = new Literal(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED);
+		}
+		try {
+			return new SatSolver(new And(allFeatures), TIMEOUT).isSatisfiable();
+		} catch (TimeoutException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+		return false;
+	}
+	
+	public boolean[] leadToValidConfiguration(List<SelectableFeature> featureList) {
+		final Map<String, Boolean> featureMap = new HashMap<String, Boolean>(features.size() << 1);
+		for (SelectableFeature feature : features) {
+			featureMap.put(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED);
+		}
+
+		final Map<String, Integer> featureMap2 = new HashMap<String, Integer>(featureList.size() << 1);
+		final boolean[] results = new boolean[featureList.size()];
+		final Node[] literals = new Node[featureList.size()];
+		int i = 0;
+		for (SelectableFeature feature : featureList) {
+			featureMap.remove(feature.getFeature().getName());
+			featureMap2.put(feature.getFeature().getName(), i);
+			literals[i++] = new Literal(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED);
+		}
+		
+		final Node[] formula = new Node[featureMap.size() + 2];
+		formula[0] = rootNode.clone();
+		i = 1;
+		for (Entry<String, Boolean> feature : featureMap.entrySet()) {
+			formula[i++] = new Literal(feature.getKey(), feature.getValue());
+		}
+		
+		for (int j = 0; j < literals.length; j++) {
+			final Node[] newLiterals = new Node[featureList.size()];
+			for (int k = 0; k < newLiterals.length; k++) {
+				Literal l = (Literal) literals[k];
+				newLiterals[k] = new Literal(l.var, l.positive);
+			}
+			final Literal l = (Literal) newLiterals[j];
+			l.positive = !l.positive;
+			formula[formula.length - 1] = l;
+			final SatSolver solver = new SatSolver(new And(formula), TIMEOUT);
+			
+			for (Literal literal : solver.knownValues()) {
+				Integer index = featureMap2.get(literal.var);
+				if (index != null) {
+					newLiterals[index] = literal;
+				}
+			}
+			
+			try {
+				results[j] = solver.isSatisfiable(newLiterals);
+			} catch (TimeoutException e) {
+				FMCorePlugin.getDefault().logError(e);
+				results[j] = false;
+			}
+		}
+
+		return results;
+	}
+
+	public boolean[] leadToValidConfiguration2(List<SelectableFeature> featureList) {
+		final Map<String, Boolean> featureMap = new HashMap<String, Boolean>(features.size() << 1);
+		for (SelectableFeature feature : features) {
+			if (feature.getSelection() != Selection.UNDEFINED) {
+				featureMap.put(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED);
+			}
+		}
+
+		// manual set features
+		final boolean[] results = new boolean[featureList.size()];
+		final Node[] literals = new Node[featureList.size()];
+		int i = 0;
+		for (SelectableFeature feature : featureList) {
+			featureMap.remove(feature.getName());
+			literals[i++] = new Literal(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED);
+		}
+
+		// automatic set features
+		final Node[] formula = new Node[featureMap.size()  + 1];
+		formula[0] = rootNode.clone();
+		i = 1;
+		for (Entry<String, Boolean> feature : featureMap.entrySet()) {
+			formula[i++] = new Literal(feature.getKey(), feature.getValue());
+		}
+		
+		final SatSolver solver = new SatSolver(new And(formula), TIMEOUT);
+		
+		for (int j = 0; j < literals.length; j++) {
+			Literal literal = (Literal) literals[j];			
+			literal.positive = !literal.positive;
+			try {
+				results[j] = solver.isSatisfiable(literals[j]);
+			} catch (TimeoutException e) {
+				FMCorePlugin.getDefault().logError(e);
+				results[j] = false;
+			}
+			literal.positive = !literal.positive;
+		}
+		return results;
+	}
+	
+	public long number() {
+		return number(250);
+	}
+	
+	public long number(long timeout) {
+		final List<Node> children = new ArrayList<Node>();
+		
+		for (SelectableFeature feature : features) {
+			if (feature.getSelection() != Selection.UNDEFINED && !feature.getFeature().hasHiddenParent()) {
+				children.add(new Literal(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED));
+			}
+		}
+		
+		final Node[] nodeArray = createNodeArray(children, rootNodeWithoutHidden);
+		return new SatSolver(new And(nodeArray), timeout).countSolutions();
+	}
+
+	public void resetValues() {
+		for (SelectableFeature feature : features) {
+			feature.setManual(Selection.UNDEFINED);
+		}
+		updateAutomaticValues();
+	}
+	
+	public void setAutomatic(SelectableFeature feature, Selection selection) {
+		feature.setAutomatic(selection);
+		updateAutomaticValues();
+	}
+	
+	public void setAutomatic(String name, Selection selection) {
+		SelectableFeature feature = table.get(name);
+		if (feature == null) {
+			throw new FeatureNotFoundException();
+		}
+		setAutomatic(feature, selection);
+	}
+
+	public void setManual(SelectableFeature feature, Selection selection) {
+		feature.setManual(selection);
+		updateAutomaticValues();
+	}
+
+	public void setManual(String name, Selection selection) {
+		SelectableFeature feature = table.get(name);
+		if (feature == null) {
+			throw new FeatureNotFoundException();
+		}
+		setManual(feature, selection);
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		for (SelectableFeature feature : features) {
+			if (feature.getSelection() == Selection.SELECTED && feature.getFeature().isConcrete()) {
+				builder.append(feature.getFeature().getName());
+				builder.append("\n");
+			}
+		}
+		return builder.toString();
+	}
+
+	private Node[] createNodeArray(List<Node> literals, Node ...formula) {
+		final Node[] nodeArray = new Node[literals.size() + formula.length];
+		literals.toArray(nodeArray);
+		for (int i = 0; i < formula.length; i++) {
+			nodeArray[literals.size() + i] = formula[i].clone();
+		}
+		return nodeArray;
+	}
+
+	private List<Node> createNodeList() {
+		final List<Node> children = new ArrayList<Node>();
+		
+		for (SelectableFeature feature : features) {
+			if (feature.getSelection() != Selection.UNDEFINED) {
+				children.add(new Literal(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED));
+			}
+		}
+		
+		return children;
+	}
+	
+	private Set<String> getRemoveFeatures(boolean abstractFeatures, boolean hiddenFeatures) {
+		final Set<String> resultSet = new HashSet<String>();
+		for (SelectableFeature selectableFeature : features) {
+			final Feature f = selectableFeature.getFeature();
+			if ((abstractFeatures && f.isAbstract()) || (hiddenFeatures && f.hasHiddenParent())) {
+				resultSet.add(f.getName());
+			}
+		}
+		return resultSet;
 	}
 
 	private void initFeatures(SelectableFeature sFeature, Feature feature) {
@@ -145,239 +385,44 @@ public class Configuration {
 			}
 		}
 	}
-
-	/**
-	 * Checks that all manual and automatic selections are valid.<br>
-	 * Abstract features will <code>not</code> be ignored.
-	 * @return <code>true</code> if the current selection is satisfiable
-	 */
-	public boolean valid() {
-		LinkedList<Node> children = new LinkedList<Node>();
-		for (SelectableFeature feature : features)
-			if (feature.getFeature() != null) {
-				Literal literal = new Literal(feature.getName());
-				literal.positive = feature.getSelection() == Selection.SELECTED;
-				children.add(literal);
-			}
-		try {
-			return new SatSolver(rootNode, TIMEOUT).isSatisfiable(children);
-		} catch (TimeoutException e) {
-			FMCorePlugin.getDefault().logError(e);
+	
+	private void resetAutomaticValues() {
+		for (SelectableFeature feature : features) {
+			feature.setAutomatic(Selection.UNDEFINED);
 		}
-		return false;
 	}
-
-	public long number() {
-		return number(250);
-	}
-
-	public long number(long timeout) {
-		LinkedList<Node> children = new LinkedList<Node>();
-		for (SelectableFeature feature : features)
-			if (!feature.hasChildren()) {
-				if (feature.getSelection() == Selection.SELECTED)
-					children.add(new Literal(feature.getName(), true));
-				if (feature.getSelection() == Selection.UNSELECTED)
-					children.add(new Literal(feature.getName(), false));
-			}
-		Node node = new And(rootNode.clone(), new And(children));
-		return new SatSolver(node, timeout).countSolutions();
-	}
-
+	
 	private void updateAutomaticValues() {
 		if (!propagate)
 			return;
-		resetAutomaticValues();
+		resetAutomaticValues();		
 
-		updateManualDefinedValues();
-		updateManualUndefinedValues();
-		updateHiddenFeatureValues();
-
-	}
-
-	private void resetAutomaticValues() {
-		for (SelectableFeature feature : features) {
-
-			feature.setAutomatic(Selection.UNDEFINED);
-
-		}
-	}
-
-	public boolean leadToValidConfiguration(SelectableFeature feature,
-			Selection testSelection, Selection actualSelection) {
-		feature.setManual(testSelection);
-		updateAutomaticValues();
-		if (valid()) {
-			feature.setManual(actualSelection);
-			updateAutomaticValues();
-			return true;
-		}
-		feature.setManual(actualSelection);
-		updateAutomaticValues();
-		return false;
-	}
-
-	private void updateManualDefinedValues() {
-		List<Node> literals = new LinkedList<Node>();
-		// each feature that is not manually defined is added to "literals"
-		for (SelectableFeature feature : features)
-			if (feature.getManual() != Selection.UNDEFINED) {
-				Literal literal = new Literal(feature.getName());
-				literal.positive = feature.getManual() == Selection.SELECTED;
-				literals.add(literal);
-			}
-		SatSolver solver = new SatSolver(rootNode.clone(), TIMEOUT);
-		// for each feature: if negating it is not possible, the feature will be
-		// set as manual defined
-
-		for (Node node : literals) {
-			Literal literal = (Literal) node;
-			literal.positive = !literal.positive;
-			try {
-				if (!solver.isSatisfiable(literals)) {
-					SelectableFeature feature = table.get(literal.var);
-					feature.setAutomatic(feature.getManual());
-				}
-			} catch (TimeoutException e) {
-				FMCorePlugin.getDefault().logError(e);
-			}
-			literal.positive = !literal.positive;
-		}
-	}
-
-	private void updateManualUndefinedValues() {
-		List<Node> children = new LinkedList<Node>();
-		for (SelectableFeature feature : features)
-			if (feature.getManual() != Selection.UNDEFINED) {
-				Literal literal = new Literal(feature.getName());
-				literal.positive = feature.getManual() == Selection.SELECTED;
-				children.add(literal);
-			}
-		Node node = new And(rootNode.clone(), new And(children));
-		SatSolver solver = new SatSolver(node, TIMEOUT);
+		Node[] nodeArray = createNodeArray(createNodeList(), rootNode);
+		final SatSolver solver = new SatSolver(new And(nodeArray), TIMEOUT);
 		for (Literal literal : solver.knownValues()) {
 			SelectableFeature feature = table.get(literal.var);
-			if (feature != null && feature.getManual() == Selection.UNDEFINED)
-				feature.setAutomatic(literal.positive ? Selection.SELECTED
-						: Selection.UNSELECTED);
-
-		}
-
-	}
-
-	public void setManual(SelectableFeature feature, Selection selection) {
-		feature.setManual(selection);
-		updateAutomaticValues();
-	}
-	public void setAutomatic(SelectableFeature feature, Selection selection) {
-		feature.setAutomatic(selection);
-		updateAutomaticValues();
-	}
-	public SelectableFeature getSelectablefeature(String name) {
-		SelectableFeature feature = table.get(name);
-		if (feature == null)
-			return null;
-		return feature;
-	}
-
-	public void setManual(String name, Selection selection) {
-		SelectableFeature feature = table.get(name);
-		if (feature == null)
-			throw new FeatureNotFoundException();
-		setManual(feature, selection);
-	}
-	
-	public void setAutomatic(String name, Selection selection) {
-		SelectableFeature feature = table.get(name);
-		if (feature == null)
-			throw new FeatureNotFoundException();
-		setAutomatic(feature, selection);
-	}
-	
-	public SelectableFeature getRoot() {
-		return root;
-	}
-
-	public void resetValues() {
-		for (SelectableFeature feature : features)
-			feature.setManual(Selection.UNDEFINED);
-		updateAutomaticValues();
-	}
-
-	public Set<Feature> getSelectedFeatures() {
-		HashSet<Feature> result = new LinkedHashSet<Feature>();
-		findSelectedFeatures(getRoot(), result);
-		return result;
-	}
-	
-	public Set<String> getSelectedFeatureNames() {
-		final Set<Feature> selectedFeatures = getSelectedFeatures();
-		final Set<String> result = new LinkedHashSet<String>();
-		
-		for (final Feature feature : selectedFeatures) {
-			result.add(feature.getName());
-		}
-		return result;
-	}
-
-	private void findSelectedFeatures(SelectableFeature sf,
-			HashSet<Feature> result) {
-		if (sf.getSelection() == Selection.SELECTED)
-			result.add(sf.getFeature());
-		for (TreeElement child : sf.getChildren())
-			findSelectedFeatures((SelectableFeature) child, result);
-	}
-
-	public Set<Feature> getUnSelectedFeatures() {
-		HashSet<Feature> result = new HashSet<Feature>();
-		findUnSelectedFeatures(getRoot(), result);
-		return result;
-	}
-
-	private void findUnSelectedFeatures(SelectableFeature sf,
-			HashSet<Feature> result) {
-		if (sf.getSelection() == Selection.UNSELECTED)
-			result.add(sf.getFeature());
-		for (TreeElement child : sf.getChildren())
-			findUnSelectedFeatures((SelectableFeature) child, result);
-	}
-
-	public FeatureModel getFeatureModel() {
-		return featureModel;
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		for (Feature f : getSelectedFeatures()) {
-			if (f.isAbstract()) {
-				continue;
+			if (feature != null) {
+				if (feature.getManual() == Selection.UNDEFINED 
+						|| (feature.getAutomatic() == Selection.UNDEFINED && feature.getFeature().hasHiddenParent())) {
+					feature.setAutomatic(literal.positive ? Selection.SELECTED : Selection.UNSELECTED);
+				}
 			}
-			builder.append(f.getName());
-			builder.append("\r\n");
-		}
-		return builder.toString();
-	}
-	
-	public LinkedList<List<String>> getSolutions(int max) throws TimeoutException {
-		LinkedList<Node> children = new LinkedList<Node>();
-
-		for (Feature feature : getSelectedFeatures()) {
-			children.add(new Literal(feature.getName(), true));
 		}
 		
-		for (Feature feature : getUnSelectedFeatures()) {
-			children.add(new Literal(feature.getName(), false));
-		}
-
-		Node node = new And(rootNode.clone(), new And(children));
-
-		LinkedList<List<String>> solutionList = new SatSolver(node, 2002).getSolutionFeatures(max);
-		
-		return solutionList;
-	}
-	
-	public ArrayList<SelectableFeature> getFeatures() {
-		return features;
+//		for (SelectableFeature feature : features) {
+//			if (feature.getAutomatic() == Selection.UNDEFINED && feature.getFeature().hasHiddenParent()) {
+//				try {
+//					if (!solver2.isSatisfiable(new Literal(feature.getFeature().getName(), false))) {
+//						feature.setAutomatic(Selection.SELECTED);
+//					} else if (!solver2.isSatisfiable(new Literal(feature.getFeature().getName(), true))) {
+//						feature.setAutomatic(Selection.UNSELECTED);
+//					} else {
+//						feature.setAutomatic(Selection.UNDEFINED);
+//					}
+//				} catch (TimeoutException e) {
+//					FMCorePlugin.getDefault().logError(e);
+//				}
+//			}
+//		}
 	}
 }

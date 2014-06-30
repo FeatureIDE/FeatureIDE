@@ -543,15 +543,32 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		}
 	}
 	
+	@Override
+	public FeatureModel clone() {
+		final FeatureModel clone = new FeatureModel();
+		clone.featureTable.putAll(featureTable);
+		if (rootFeature == null) {
+			// TODO this should never happen
+			clone.rootFeature = new Feature(clone, "Root");
+			clone.featureTable.put("root", clone.rootFeature);
+		} else {
+			clone.rootFeature = clone.getFeature(rootFeature.getName());
+		}
+		clone.constraints.addAll(constraints);
+		clone.annotations.addAll(annotations);
+		clone.comments.addAll(comments);
+		clone.colorschemeTable = colorschemeTable.clone(clone);
+		return clone;
+	}
+	
 	/**
 	 * Will return the value of clone(true).
 	 * @return a deep copy from the feature model
 	 * 
 	 * @see #clone(boolean)
 	 */
-	@Override
-	public FeatureModel clone() {
-		return clone(true);
+	public FeatureModel deepClone() {
+		return deepClone(true);
 	}
 	
 	/**
@@ -565,7 +582,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	 * 
 	 * @see #clone()
 	 */
-	public FeatureModel clone(boolean complete) {
+	public FeatureModel deepClone(boolean complete) {
 		return new FeatureModel(this, complete);
 	}
 

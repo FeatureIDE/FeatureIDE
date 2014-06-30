@@ -18,7 +18,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.core.mpl.job.util;
+package de.ovgu.featureide.core.mpl.job;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -27,17 +27,18 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
 import de.ovgu.featureide.core.mpl.MPLPlugin;
+import de.ovgu.featureide.core.mpl.job.util.AJobArguments;
+import de.ovgu.featureide.core.mpl.job.util.IChainJob;
 
 /**
  * Abstract eclipse job which start another job when the work is finished.
  * 
  * @author Sebastian Krieter
  */
-public abstract class AChainJob<T extends AJobArguments> extends Job implements IChainJob {
+abstract class AChainJob<T extends AJobArguments> extends Job implements IChainJob {
 	
 	private class InnerThread extends Thread {
 		private volatile Thread thread = this;
-		private boolean ok = false;
 		
 		public InnerThread() {
 			super("Thread-" + AChainJob.this.getName());
@@ -54,20 +55,26 @@ public abstract class AChainJob<T extends AJobArguments> extends Job implements 
 		
 		@Override
 		public void run() {
+			int status = JobManager.STATUS_FAILED;
 			try {
-				ok = AChainJob.this.work();
+				status = AChainJob.this.work() ? JobManager.STATUS_OK : JobManager.STATUS_FAILED;
 			} catch (Exception e) {
 				MPLPlugin.getDefault().logError(e);
+			} finally {
+				synchronized (AChainJob.this.status) {
+					AChainJob.this.status = status;
+				}
+				finalWork();
 			}
 		}
 	}
 	
 	private boolean ignorePreviousJobFail = true;
-	
-	private InnerThread innerThread = null;
 	private int cancelingTimeout = 5000;
-	private Boolean done = false;
-	private IChainJob nextJob = null;
+
+	private InnerThread innerThread = null;
+	private Integer status = JobManager.STATUS_RUNNING;
+	private Object sequenceObject = null;
 	
 	protected IProject project = null;
 	protected final T arguments;	
@@ -82,38 +89,63 @@ public abstract class AChainJob<T extends AJobArguments> extends Job implements 
 		this.arguments = arguments;
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public IStatus run(IProgressMonitor monitor) {
-		innerThread = new InnerThread();
-		innerThread.start();
+		synchronized (status) {
+			// case job was start and canceled at the same time
+			if (status == JobManager.STATUS_FAILED) {
+				finished();
+				return Status.CANCEL_STATUS;
+			}
+			innerThread = new InnerThread();
+			innerThread.start();
+		}
 		try {
 			innerThread.join();
+			finished();
+			return Status.OK_STATUS;
 		} catch (InterruptedException e) {
 			MPLPlugin.getDefault().logError(e);
-			return Status.CANCEL_STATUS;
-		} finally {
-			synchronized (done) {
-				done = true;
-				startNextJob();
+			innerThread.stop();
+			synchronized (status) {
+				status =  JobManager.STATUS_FAILED;
 			}
-		}
-		if (innerThread == null) {
+			finished();
 			return Status.CANCEL_STATUS;
-		} else {
-			return Status.OK_STATUS;
 		}
 	}
 	
-	@SuppressWarnings("deprecation")
+	
+	private void finished() {
+		synchronized (sequenceObject) {
+			if (sequenceObject != null) {
+				JobManager.startNextJob(sequenceObject);
+				sequenceObject = null;
+			}
+		}
+	}
+	
+	protected final boolean checkCancel() {
+		return Thread.currentThread() == innerThread.thread;
+	}
+
+	protected abstract boolean work();
+	protected void finalWork() {}
+	
 	@Override
 	public void canceling() {
-		if (abort()) {
-			return;
+		synchronized (status) {
+			if (innerThread == null) {
+				status = JobManager.STATUS_FAILED;
+				return;
+			}
 		}
 		
 		innerThread.thread = null;
 		
 		new Thread(new Runnable() {
+			@SuppressWarnings("deprecation")
 			@Override
 			public void run() {
 				try {
@@ -127,70 +159,48 @@ public abstract class AChainJob<T extends AJobArguments> extends Job implements 
 			}
 		}).start();
 	}
-	
+
+	@Override
 	public final int getCancelingTimeout() {
 		return cancelingTimeout;
 	}
-	
+
+	@Override
 	public final IProject getProject() {
 		return project;
 	}
 
-	public IChainJob getNextJob() {
-		return nextJob;
+	@Override
+	public int getStatus() {
+		return status;
 	}
 	
+	@Override
 	public final boolean ignoresPreviousJobFail() {
 		return ignorePreviousJobFail;
 	}
 
+	@Override
 	public final void setIgnorePreviousJobFail(boolean ignorePreviousJobFail) {
 		this.ignorePreviousJobFail = ignorePreviousJobFail;
 	}
-	
+
+	@Override
 	public final void setCancelingTimeout(int cancelingTimeout) {
 		this.cancelingTimeout = cancelingTimeout;
 	}
-	
+
+	@Override
 	public final void setProject(IProject interfaceProject) {
 		this.project = interfaceProject;
 		setName(getName() + " - " + interfaceProject.getName());
 	}
 	
-	public final void setNextJob(IChainJob nextJob) {
-		synchronized (done) {
-			this.nextJob = nextJob;
-			if (done) {
-				startNextJob();
-			}
-		}
-	}
+	public void setSequenceObject(Object sequenceObject) {
+		this.sequenceObject = sequenceObject;
+	}	
 	
-	public final boolean abort() {
-		if (innerThread == null) {
-			synchronized (done) {
-				done = true;
-			}
-			return true;
-		}
-		return false;
-	}
-	
-	protected final boolean checkCancel() {
-		return Thread.currentThread() == innerThread.thread;
-	}
-	
-	protected abstract boolean work();
-	
-	private void startNextJob() {
-		while (nextJob != null) {
-			if (nextJob.ignoresPreviousJobFail() || innerThread == null || innerThread.ok) {
-				nextJob.schedule();
-				nextJob = null;
-			} else {
-				nextJob.abort();
-				nextJob = nextJob.getNextJob();
-			}
-		}
+	public Object getSequenceObject() {
+		return sequenceObject;
 	}
 }

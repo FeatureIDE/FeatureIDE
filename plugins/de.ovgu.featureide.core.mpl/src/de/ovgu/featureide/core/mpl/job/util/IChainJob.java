@@ -2,20 +2,18 @@ package de.ovgu.featureide.core.mpl.job.util;
 
 import org.eclipse.core.resources.IProject;
 
+/**
+ * Interface for all jobs.
+ * This should only be implementet by {@link AChainJob}.
+ * 
+ * @author Sebastian Krieter
+ */
 public interface IChainJob {
-	/**
-	 * Use only if job has not been started yet.
-	 * 
-	 * @return {@code true} if job was aborted.
-	 */
-	public boolean abort();
-	public int getCancelingTimeout();
-	public IProject getProject();
-	public IChainJob getNextJob();
-	public boolean ignoresPreviousJobFail();
-	public void setIgnorePreviousJobFail(boolean ignorePreviousJobFail);
-	public void setCancelingTimeout(int cancelingTimeout);
-	public void setProject(IProject interfaceProject);
-	public void setNextJob(IChainJob nextJob);
-	public void schedule();
+	int getCancelingTimeout();
+	IProject getProject();
+	int getStatus();
+	boolean ignoresPreviousJobFail();
+	void setCancelingTimeout(int cancelingTimeout);
+	void setIgnorePreviousJobFail(boolean ignorePreviousJobFail);
+	void setProject(IProject interfaceProject);
 }

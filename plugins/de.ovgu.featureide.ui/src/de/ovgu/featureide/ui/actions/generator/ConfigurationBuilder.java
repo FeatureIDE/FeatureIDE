@@ -680,7 +680,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 				configuration.setManual((feature), Selection.SELECTED);
 			}
 			
-			if (configuration.valid()) {
+			if (configuration.isValid()) {
 				LinkedList<String> selectedFeatures3 = new LinkedList<String>();
 				for (String f : selected.split("[ ]")) {
 					if (!"".equals(f)) {

@@ -229,33 +229,34 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 	}
 
 	@Override
-	protected synchronized void parseInputStream(final InputStream inputStream)
-			throws UnsupportedModelException {
+	protected synchronized void parseInputStream(final InputStream inputStream) throws UnsupportedModelException {
 		ANTLRInputStream antlrInputStream = null;
 		try {
 			antlrInputStream = new ANTLRInputStream(inputStream);
 		} catch (final IOException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
-		if (antlrInputStream != null) {
-			final VelvetParser parser = new VelvetParser(new CommonTokenStream(new VelvetLexer(antlrInputStream)));
-			Tree root = null;
-			try {
-				root = (Tree) parser.velvetModel().getTree();
-			} catch (final RecognitionException e) {
-				throw new UnsupportedModelException(e.getMessage(), e.line);
-			}
-
-			if (root != null) {
-				init();
-
-				parseModel(root);
-				parseAttributeConstraints();
-				
-				// Update the FeatureModel in Editor
-				extFeatureModel.handleModelDataLoaded();
-			}
+		if (antlrInputStream == null) {
+			throw new UnsupportedModelException("Syntax error!", 0);
 		}
+		final VelvetParser parser = new VelvetParser(new CommonTokenStream(new VelvetLexer(antlrInputStream)));
+		Tree root = null;
+		try {
+			root = (Tree) parser.velvetModel().getTree();
+		} catch (final RecognitionException e) {
+			throw new UnsupportedModelException(e.getMessage(), e.line);
+		}
+		if (root == null) {
+			throw new UnsupportedModelException("Error while reading model!", 0);
+		}
+		
+		init();
+
+		parseModel(root);
+		parseAttributeConstraints();
+		
+		// Update the FeatureModel in Editor
+		extFeatureModel.handleModelDataLoaded();
 	}
 
 	private ExtendedFeature addFeature(final Feature parent, final String featureName,
@@ -377,7 +378,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 			}
 		}
 		
-		if (!returnFile.exists() || !returnFile.canRead()) {
+		if (returnFile == null || !returnFile.exists() || !returnFile.canRead()) {
 			return null;
 		}
 		return returnFile;

@@ -41,7 +41,13 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
  */
 public class FeatureModelJPFCore implements IFeatureModelClass {
 
-	private final static String HEAD = "/**\r\n * Variability encoding of the feature model for JPF.\r\n * Auto-generated class.\r\n */\r\npublic class FeatureModel {\n\n";
+	private static final String NEWLINE = System.getProperty("line.separator", "\n");
+
+	private final static String HEAD = "/**" + NEWLINE 
+			+ " * Variability encoding of the feature model for JPF." + NEWLINE 
+			+ " * Auto-generated class." + NEWLINE 
+			+ " */" + NEWLINE + "public class FeatureModel {" + NEWLINE + NEWLINE;
+	
 	private final static String FIELD_MODIFIER = "\tpublic static Boolean ";
 	private StringBuilder stringBuilder;
 	private Collection<Feature> deadFeatures;
@@ -69,22 +75,26 @@ public class FeatureModelJPFCore implements IFeatureModelClass {
 		for (String f : featureModel.getFeatureNames()) {
 			fields.append(FIELD_MODIFIER);
 			fields.append(f.toLowerCase(Locale.ENGLISH));
-			fields.append("_;\r\n");
+			fields.append("_;" + NEWLINE);
 		}
 
 		ArrayList<Feature> features = new ArrayList<Feature>(
 				featureModel.getFeatures());
 		deadFeatures = featureModel.getAnalyser().getDeadFeatures();
 		coreFeatures = featureModel.getAnalyser().getCoreFeatures();
-		fields.append("\r\n\t/**\r\n\t * Core features are set 'selected' and dead features 'unselected'.\r\n\t * All other features have unknown selection states.\r\n\t */\r\n\tstatic {\r\n");
+		fields.append(NEWLINE + "\t/**" + NEWLINE 
+				+ "\t * Core features are set 'selected' and dead features 'unselected'." + NEWLINE 
+				+ "\t * All other features have unknown selection states." + NEWLINE 
+				+ "\t */" + NEWLINE 
+				+ "\tstatic {" + NEWLINE);
 		for (Feature f : features) {
 			if (deadFeatures.contains(f)) {
 				fields.append("\t\t" + f.toString().toLowerCase(Locale.ENGLISH));
-				fields.append("_ = false;\r\n");
+				fields.append("_ = false;" + NEWLINE);
 			}
 			if (coreFeatures.contains(f)) {
 				fields.append("\t\t" + f.toString().toLowerCase(Locale.ENGLISH));
-				fields.append("_ = true;\r\n");
+				fields.append("_ = true;" + NEWLINE);
 			}
 		}
 		fields.append("\t}\r\n");

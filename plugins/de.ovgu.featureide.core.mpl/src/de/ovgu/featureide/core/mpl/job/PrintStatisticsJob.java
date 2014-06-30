@@ -36,7 +36,6 @@ import org.sat4j.specs.TimeoutException;
 import de.ovgu.featureide.core.mpl.InterfaceProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.io.IOConstants;
-import de.ovgu.featureide.core.mpl.job.util.AMonitorJob;
 import de.ovgu.featureide.core.mpl.job.util.AJobArguments;
 import de.ovgu.featureide.core.mpl.signature.ProjectSignatures;
 import de.ovgu.featureide.core.mpl.signature.ProjectSignatures.SignatureIterator;
@@ -164,9 +163,7 @@ public class PrintStatisticsJob extends AMonitorJob<PrintStatisticsJob.Arguments
 		FeatureModel fm = interfaceProject.getFeatureModel();
 		LinkedList<String> allConcreteFeatures = new LinkedList<String>();
 		for (Feature feature : fm.getConcreteFeatures()) {
-			if (!feature.isHidden()) {
-				allConcreteFeatures.add(feature.getName());
-			}
+			allConcreteFeatures.add(feature.getName());
 		}
 		setMaxAbsoluteWork(allConcreteFeatures.size() + 2);
 		
@@ -197,10 +194,10 @@ public class PrintStatisticsJob extends AMonitorJob<PrintStatisticsJob.Arguments
 		
 		IOConstants.writeToFile(folder.getFile("_sum_statistics.csv"), sumStat.toCSVString());
 
-		Configuration defaultConf = new Configuration(fm);
+		Configuration defaultConf = new Configuration(fm, false);
 		
 		for (String featureName : allConcreteFeatures) {			
-			Configuration conf = new Configuration(defaultConf, fm, true);
+			Configuration conf = new Configuration(defaultConf, fm, false);
 			try {
 				conf.setManual(featureName, Selection.SELECTED);
 			} catch(SelectionNotPossibleException e) {

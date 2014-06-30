@@ -144,8 +144,8 @@ feature
 	;
 
 featureGroup
-	: groupType START_C feature feature+ END_C
-	-> ^(GROUP groupType feature feature+)
+	: groupType START_C feature+ END_C
+	-> ^(GROUP groupType feature+)
 	;
 
 groupType
