@@ -79,7 +79,7 @@ public class Configuration {
 		initFeatures(root, featureRoot);
 		
 		rootNode = configuration.rootNode.clone();
-		rootNodeWithoutHidden = configuration.rootNode.clone();
+		rootNodeWithoutHidden = configuration.rootNodeWithoutHidden.clone();
 		
 		for (SelectableFeature f : configuration.features) {
 			setManual(f.getName(), f.getManual());
@@ -395,16 +395,41 @@ public class Configuration {
 	private void updateAutomaticValues() {
 		if (!propagate)
 			return;
-		resetAutomaticValues();		
+		resetAutomaticValues();
 
 		Node[] nodeArray = createNodeArray(createNodeList(), rootNode);
 		final SatSolver solver = new SatSolver(new And(nodeArray), TIMEOUT);
 		for (Literal literal : solver.knownValues()) {
 			SelectableFeature feature = table.get(literal.var);
 			if (feature != null) {
-				if (feature.getManual() == Selection.UNDEFINED 
-						|| (feature.getAutomatic() == Selection.UNDEFINED && feature.getFeature().hasHiddenParent())) {
+				if (feature.getManual() == Selection.UNDEFINED
+//						|| (feature.getAutomatic() == Selection.UNDEFINED && feature.getFeature().hasHiddenParent())
+						) {
 					feature.setAutomatic(literal.positive ? Selection.SELECTED : Selection.UNSELECTED);
+				}
+			}
+		}
+		
+		final List<Node> children = new ArrayList<Node>();
+		boolean calculateHiddenFeatures = false;
+		
+		for (SelectableFeature feature : features) {
+			if (feature.getFeature().hasHiddenParent()) {
+				calculateHiddenFeatures = true;
+			} else {
+				children.add(new Literal(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED));
+			}
+		}
+		
+		if (calculateHiddenFeatures) {
+			nodeArray = createNodeArray(children, rootNode);
+			final SatSolver hiddenSolver = new SatSolver(new And(nodeArray), TIMEOUT);
+			for (Literal literal : hiddenSolver.knownValues()) {
+				SelectableFeature feature = table.get(literal.var);
+				if (feature != null) {
+					if (feature.getManual() == Selection.UNDEFINED && feature.getFeature().hasHiddenParent()) {
+						feature.setAutomatic(literal.positive ? Selection.SELECTED : Selection.UNSELECTED);
+					}
 				}
 			}
 		}

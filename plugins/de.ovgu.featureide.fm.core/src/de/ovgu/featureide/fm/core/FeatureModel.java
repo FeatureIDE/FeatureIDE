@@ -287,8 +287,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	}
 	
 	/**
-	 * 
-	 * @return The {@link Feature} with the given name or {@code null} there is no Feature with this name. 
+	 * @return The {@link Feature} with the given name or {@code null} if there is no feature with this name. 
 	 */
 	@CheckForNull
 	public Feature getFeature(String name) {

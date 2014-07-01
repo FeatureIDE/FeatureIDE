@@ -41,7 +41,7 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 
 	private static final String[] SYMBOLS = { "!", "&&", "||", "->", "<->",
 			", ", "choose", "atleast", "atmost" };
-	private static final String NEWLINE = System.getProperty("line.separator");
+	private static final String NEWLINE = System.getProperty("line.separator", "\n");
 	private StringBuilder sb = new StringBuilder();
 
 	/**
