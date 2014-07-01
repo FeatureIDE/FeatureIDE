@@ -47,6 +47,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
@@ -119,6 +120,9 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 	
 	private static final String[] response = new String[] { YES, ALL, NO, NO_ALL, CANCEL };
 
+	
+	private Thread updateProjects;
+	
 	/**
 	 * Constructor for SampleNewWizardPage.
 	 * 
@@ -193,6 +197,11 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 					return new String[] { "Loading..." };
 				} else if (inputElement == exampleNewWizardPage) {
 					updateProjectsList(samplePath);
+					try {
+						updateProjects.join();
+					} catch (InterruptedException e) {
+						ExamplePlugin.getDefault().logError(e);
+					}
 					return compTable.keySet().toArray();
 				} else {
 					return getChildren(exampleNewWizardPage);
@@ -205,7 +214,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 					Hashtable<String, List<ProjectRecord>> hashtable = (Hashtable<String,List<ProjectRecord>>) element;
 					return hashtable.keySet().size() > 0; 
 				}
-				else if (element instanceof String && compTable != null) {
+				else if (element instanceof String ) {
 					return compTable.containsKey((String) element) && !compTable.get((String) element).isEmpty();
 				} else {				
 				return false;
@@ -391,9 +400,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 
 		final File directory = new File(path);
 
-		try {
-			getContainer().run(true, true, new IRunnableWithProgress() {
-
+			updateProjects = new Thread(new Runnable() {
 				/*
 				 * (non-Javadoc)
 				 * 
@@ -401,8 +408,9 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 				 * org.eclipse.jface.operation.IRunnableWithProgress#run(org
 				 * .eclipse.core.runtime.IProgressMonitor)
 				 */
-				public void run(IProgressMonitor monitor) {
+				public void run() {
 
+					NullProgressMonitor monitor = new NullProgressMonitor();
 					monitor.beginTask("Searching for projects", 100);
 					selectedProjects = new ProjectRecord[0];
 					Collection<ProjectRecord> files = new ArrayList<ProjectRecord>();
@@ -430,9 +438,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 							selectedProjects[index++] = filesIterator
 									.next();
 						}
-					}
-
-					else if (directory.isDirectory()) {
+					} else if (directory.isDirectory()) {
 
 						if (!collectProjectFilesFromDirectory(files, directory,
 								null, monitor)) {
@@ -469,14 +475,9 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 					}
 					monitor.done();
 				}
-
+				
 			});
-		} catch (InvocationTargetException e) {
-			ExamplePlugin.getDefault().logError(e);
-		} catch (InterruptedException e) {
-			ExamplePlugin.getDefault().logError(e);
-		}
-
+		updateProjects.start();
 		if (projectsList != null) {
 			projectsList.refresh(false);
 		}
