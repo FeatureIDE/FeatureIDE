@@ -194,19 +194,22 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 				} else if (inputElement == exampleNewWizardPage) {
 					updateProjectsList(samplePath);
 					return compTable.keySet().toArray();
-				} else
+				} else {
 					return getChildren(exampleNewWizardPage);
+				}
 			}
 
 			public boolean hasChildren(Object element) {
 				if (element instanceof Hashtable) {
+					@SuppressWarnings("unchecked")
 					Hashtable<String, List<ProjectRecord>> hashtable = (Hashtable<String,List<ProjectRecord>>) element;
 					return hashtable.keySet().size() > 0; 
 				}
-				else if (element instanceof String) {
-					return !compTable.get((String) element).isEmpty();
-				}				
+				else if (element instanceof String && compTable != null) {
+					return compTable.containsKey((String) element) && !compTable.get((String) element).isEmpty();
+				} else {				
 				return false;
+				}
 			}
 
 			public Object getParent(Object element) {
@@ -474,9 +477,9 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 			ExamplePlugin.getDefault().logError(e);
 		}
 
-		if (projectsList != null) projectsList.refresh(true);
-
-	//	setPageComplete(projectsList.getCheckedElements().length > 0);
+		if (projectsList != null) {
+			projectsList.refresh(false);
+		}
 	}
 
 	private void selectAllElementsWithoutWarnings() {
