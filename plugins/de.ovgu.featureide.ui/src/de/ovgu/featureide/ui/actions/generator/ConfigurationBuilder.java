@@ -678,10 +678,13 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		
 		if (selectedFeatures2.isEmpty()) {
 			configuration.resetValues();
-			for (final String feature : selected.split("\\s+")) {
-				configuration.setManual((feature), Selection.SELECTED);
+
+			if (!selected.isEmpty()) {
+				for (final String feature : selected.split("\\s+")) {
+					configuration.setManual((feature), Selection.SELECTED);
+				}
+
 			}
-			
 			if (configuration.valid()) {
 				LinkedList<String> selectedFeatures3 = new LinkedList<String>();
 				for (String f : selected.split("\\s+")) {
