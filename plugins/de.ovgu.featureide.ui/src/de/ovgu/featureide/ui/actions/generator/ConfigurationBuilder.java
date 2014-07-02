@@ -59,11 +59,13 @@ import org.prop4j.SatSolver;
 import splar.core.fm.FeatureModelException;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.StoppableJob;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
+import de.ovgu.featureide.fm.core.configuration.FeatureNotFoundException;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.ui.UIPlugin;
@@ -662,7 +664,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		
 		if (featureModel.getConstraintCount() > 0) {
 			children.clear(); 
-			for (String feature : selected.split("[ ]")) {
+			for (String feature : selected.split("\\s+")) {
 				children.add(new Literal(feature, true));
 			}
 			try {
@@ -676,13 +678,13 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		
 		if (selectedFeatures2.isEmpty()) {
 			configuration.resetValues();
-			for (final String feature : selected.split("[ ]")) {
+			for (final String feature : selected.split("\\s+")) {
 				configuration.setManual((feature), Selection.SELECTED);
 			}
 			
 			if (configuration.valid()) {
 				LinkedList<String> selectedFeatures3 = new LinkedList<String>();
-				for (String f : selected.split("[ ]")) {
+				for (String f : selected.split("\\s+")) {
 					if (!"".equals(f)) {
 						selectedFeatures3.add(f);
 					}
@@ -836,8 +838,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	}
 
 	private void buildAnd(String selected, LinkedList<Feature> selectedFeatures2, IProgressMonitor monitor) {
-		Feature currentFeature = selectedFeatures2.getFirst();
-		selectedFeatures2.removeFirst();
+		Feature currentFeature = selectedFeatures2.removeFirst();
 		LinkedList<Feature> selectedFeatures3 = new LinkedList<Feature>();
 		if (currentFeature.isConcrete()) {
 			if ("".equals(selected)) {
@@ -865,6 +866,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 				optionalFeatures.add(f);
 			}
 		}
+
 		for (int i2 = 0;i2 < (int)java.lang.Math.pow(2, optionalFeatures.size());i2++) {
 			k2 = i2;
 			selectedFeatures3 = new LinkedList<Feature>();
