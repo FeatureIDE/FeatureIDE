@@ -47,6 +47,11 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
  */
 public class Configuration {
 
+	public static final int 
+		COMPLETION_NONE = 0,
+		COMPLETION_ONE_CLICK = 1,
+		COMPLETION_CHANGE = 2;
+	
 	private static final int TIMEOUT = 1000;
 
 	private final SelectableFeature root;
@@ -55,11 +60,11 @@ public class Configuration {
 
 	private final Hashtable<String, SelectableFeature> table = new Hashtable<String, SelectableFeature>();
 
-	private final Node rootNode;
-	private final Node rootNodeWithoutHidden;
+	private final Node rootNode, rootNodeWithoutHidden;
 
 	private final FeatureModel featureModel;
 
+	private final boolean ignoreAbstractFeatures;
 	private boolean propagate;
 
 	/**
@@ -73,6 +78,7 @@ public class Configuration {
 	public Configuration(Configuration configuration, FeatureModel featureModel, boolean propagate) {
 		this.featureModel = featureModel;
 		this.propagate = false;
+		this.ignoreAbstractFeatures = configuration.ignoreAbstractFeatures;
 
 		Feature featureRoot = featureModel.getRoot();
 		root = new SelectableFeature(this, featureRoot);
@@ -99,13 +105,18 @@ public class Configuration {
 	public Configuration(FeatureModel featureModel, boolean propagate, boolean ignoreAbstractFeatures) {
 		this.featureModel = featureModel;
 		this.propagate = propagate;
+		this.ignoreAbstractFeatures = ignoreAbstractFeatures;
 
 		Feature featureRoot = featureModel.getRoot();
 		root = new SelectableFeature(this, featureRoot);
 		initFeatures(root, featureRoot);
 
 		rootNode = NodeCreator.createNodes(featureModel, ignoreAbstractFeatures).toCNF();
-		rootNodeWithoutHidden = NodeCreator.createNodes(featureModel, getRemoveFeatures(!ignoreAbstractFeatures, true)).toCNF();
+		if (featureRoot != null) {
+			rootNodeWithoutHidden = NodeCreator.createNodes(featureModel, getRemoveFeatures(!ignoreAbstractFeatures, true)).toCNF();
+		} else {
+			rootNodeWithoutHidden = rootNode.clone();
+		}
 		
 		updateAutomaticValues();
 	}
@@ -188,24 +199,45 @@ public class Configuration {
 	}
 	
 	public boolean[] leadToValidConfiguration(List<SelectableFeature> featureList) {
-		final Map<String, Boolean> featureMap = new HashMap<String, Boolean>(features.size() << 1);
-		for (SelectableFeature feature : features) {
-			featureMap.put(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED);
+		return leadToValidConfiguration(featureList, COMPLETION_CHANGE);
+	}
+	
+	public boolean[] leadToValidConfiguration(List<SelectableFeature> featureList, int mode) {
+		switch (mode) {
+			case COMPLETION_ONE_CLICK:
+				return leadsToValidConfiguration1(featureList);
+			case COMPLETION_CHANGE:
+				return leadsToValidConfiguration2(featureList);
+			case COMPLETION_NONE:
+			default:
+				return new boolean[featureList.size()];
 		}
-
-		final Map<String, Integer> featureMap2 = new HashMap<String, Integer>(featureList.size() << 1);
+	}
+	
+	private boolean[] leadsToValidConfiguration1(List<SelectableFeature> featureList) {
+		final Map<String, Boolean> featureMap = new HashMap<String, Boolean>(features.size() << 1);
+		final Map<String, Integer> featureToIndexMap = new HashMap<String, Integer>(featureList.size() << 1);
 		final boolean[] results = new boolean[featureList.size()];
 		final Node[] literals = new Node[featureList.size()];
+		
+		for (SelectableFeature selectableFeature : features) {
+			final Feature feature = selectableFeature.getFeature();
+			if ((ignoreAbstractFeatures || feature.isConcrete()) && !feature.hasHiddenParent()) {
+				featureMap.put(feature.getName(), selectableFeature.getSelection() == Selection.SELECTED);
+			}
+		}
+		
 		int i = 0;
 		for (SelectableFeature feature : featureList) {
-			featureMap.remove(feature.getFeature().getName());
-			featureMap2.put(feature.getFeature().getName(), i);
-			literals[i++] = new Literal(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED);
+			final String featureName = feature.getFeature().getName();
+			featureMap.remove(featureName);
+			featureToIndexMap.put(featureName, i);
+			literals[i++] = new Literal(featureName, feature.getSelection() == Selection.SELECTED);
 		}
 		
 		final Node[] formula = new Node[featureMap.size() + 2];
-		formula[0] = rootNode.clone();
-		i = 1;
+		formula[0] = rootNodeWithoutHidden.clone();
+		i = 2;
 		for (Entry<String, Boolean> feature : featureMap.entrySet()) {
 			formula[i++] = new Literal(feature.getKey(), feature.getValue());
 		}
@@ -213,18 +245,18 @@ public class Configuration {
 		for (int j = 0; j < literals.length; j++) {
 			final Node[] newLiterals = new Node[featureList.size()];
 			for (int k = 0; k < newLiterals.length; k++) {
-				Literal l = (Literal) literals[k];
-				newLiterals[k] = new Literal(l.var, l.positive);
+				newLiterals[k] = literals[k].clone();
 			}
+			
 			final Literal l = (Literal) newLiterals[j];
 			l.positive = !l.positive;
-			formula[formula.length - 1] = l;
+			formula[1] = l;
 			final SatSolver solver = new SatSolver(new And(formula), TIMEOUT);
 			
 			for (Literal literal : solver.knownValues()) {
-				Integer index = featureMap2.get(literal.var);
+				Integer index = featureToIndexMap.get(literal.var);
 				if (index != null) {
-					newLiterals[index] = literal;
+					newLiterals[index] = literal.clone();
 				}
 			}
 			
@@ -238,46 +270,124 @@ public class Configuration {
 
 		return results;
 	}
-
-	public boolean[] leadToValidConfiguration2(List<SelectableFeature> featureList) {
-		final Map<String, Boolean> featureMap = new HashMap<String, Boolean>(features.size() << 1);
-		for (SelectableFeature feature : features) {
-			if (feature.getSelection() != Selection.UNDEFINED) {
-				featureMap.put(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED);
+	
+	private boolean[] leadsToValidConfiguration2(List<SelectableFeature> featureList) {
+		//all automatic features
+		final Map<String, SelectableFeature> featureMap = new HashMap<String, SelectableFeature>(features.size() << 1);
+		final Map<String, Integer> featureToIndexMap = new HashMap<String, Integer>(features.size() << 1);
+		final boolean[] results = new boolean[featureList.size()];
+		final ArrayList<Literal> allLiteralList = new ArrayList<Literal>(features.size());
+		
+		int c = 0;
+		for (SelectableFeature selectableFeature : features) {
+			final Feature feature = selectableFeature.getFeature();
+			if ((ignoreAbstractFeatures || feature.isConcrete()) && !feature.hasHiddenParent()) {
+				final String featureName = feature.getName();
+				final Selection selection = selectableFeature.getSelection();
+//				if (selection != Selection.UNDEFINED) {
+					featureMap.put(featureName, selectableFeature); // == Selection.SELECTED);
+//				}
+				featureToIndexMap.put(featureName, c);
+				allLiteralList.add(new Literal(featureName, selection == Selection.SELECTED));
+				c++;
 			}
 		}
+		
 
+		final Node[] allLiterals = allLiteralList.toArray(new Node[0]);
+
+		final Map<String, SelectableFeature> featureMap2 = new HashMap<String, SelectableFeature>(featureMap);
+		
 		// manual set features
-		final boolean[] results = new boolean[featureList.size()];
-		final Node[] literals = new Node[featureList.size()];
+		final Node[] manuaLiterals = new Node[featureList.size()];
 		int i = 0;
 		for (SelectableFeature feature : featureList) {
-			featureMap.remove(feature.getName());
-			literals[i++] = new Literal(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED);
+			final String featureName = feature.getFeature().getName();
+			featureMap.remove(featureName);
+			manuaLiterals[i++] = new Literal(featureName, feature.getSelection() == Selection.SELECTED);
 		}
 
 		// automatic set features
-		final Node[] formula = new Node[featureMap.size()  + 1];
-		formula[0] = rootNode.clone();
-		i = 1;
-		for (Entry<String, Boolean> feature : featureMap.entrySet()) {
-			formula[i++] = new Literal(feature.getKey(), feature.getValue());
+		final Node[] formula = new Node[featureMap.size() + 2];
+		i = 0;
+		for (Entry<String, SelectableFeature> feature : featureMap.entrySet()) {
+			switch (feature.getValue().getSelection()) {
+			case SELECTED:
+				formula[i++] = new Literal(feature.getKey(), true);
+				break;
+			case UNSELECTED:
+			case UNDEFINED:
+				formula[i++] = new Literal(feature.getKey(), false);
+				break;
+			default:
+				break;
+			}
 		}
 		
-		final SatSolver solver = new SatSolver(new And(formula), TIMEOUT);
+		formula[formula.length - 2] = rootNodeWithoutHidden.clone();
 		
-		for (int j = 0; j < literals.length; j++) {
-			Literal literal = (Literal) literals[j];			
-			literal.positive = !literal.positive;
+		for (int j = 0; j < manuaLiterals.length; j++) {
+			final Node[] allListeralsCloned = cloneArray(allLiterals);
+			final Literal curLiteral = (Literal) manuaLiterals[j];
+			final Feature curFeature = featureMap2.get(curLiteral.var).getFeature();
+			
+			curLiteral.positive = !curLiteral.positive;
+			formula[formula.length - 1] = curLiteral.clone();
+			final SatSolver solver = new SatSolver(new And(formula), TIMEOUT);
+			
 			try {
-				results[j] = solver.isSatisfiable(literals[j]);
+				if (!solver.isSatisfiable()) {
+					results[j] = true;
+					continue;
+				}
+			} catch (TimeoutException e1) {
+				FMCorePlugin.getDefault().logError(e1);
+			}
+			boolean changed = false;
+			for (Literal knownLiteral : solver.knownValues()) {
+				Integer index1 = featureToIndexMap.get(knownLiteral.var);
+				if (index1 != null) {
+					final SelectableFeature s = featureMap2.get(knownLiteral.var);
+					final Literal l1 = (Literal) allListeralsCloned[index1];
+					if (changed || (
+						(!isParentOf(s.getFeature(), curFeature)) &&
+						(s.getSelection() == Selection.UNDEFINED || l1.positive != knownLiteral.positive)
+					)) {
+						changed = true;
+					}
+					l1.positive = knownLiteral.positive;
+				}
+			}
+			
+			try {
+				results[j] = (changed) || solver.isSatisfiable(allListeralsCloned);
 			} catch (TimeoutException e) {
 				FMCorePlugin.getDefault().logError(e);
 				results[j] = false;
+			} finally {
+				curLiteral.positive = !curLiteral.positive;
 			}
-			literal.positive = !literal.positive;
 		}
 		return results;
+	}
+	
+	private boolean isParentOf(Feature possibleParent, Feature child) {
+		Feature parent = child;
+		while (parent != null) {
+			if (possibleParent.getName().equals(parent.getName())) {
+				return true;
+			}
+			parent = parent.getParent();
+		}
+		return false;
+	}
+	
+	private Node[] cloneArray(Node[] original) {
+		final Node[] cloned = new Node[original.length];
+		for (int i = 0; i < original.length; i++) {
+			cloned[i] = original[i].clone();
+		}
+		return cloned;
 	}
 	
 	public long number() {
@@ -288,7 +398,9 @@ public class Configuration {
 		final List<Node> children = new ArrayList<Node>();
 		
 		for (SelectableFeature feature : features) {
-			if (feature.getSelection() != Selection.UNDEFINED && !feature.getFeature().hasHiddenParent()) {
+			if (feature.getSelection() != Selection.UNDEFINED 
+					&& (ignoreAbstractFeatures || feature.getFeature().isConcrete())
+					&& !feature.getFeature().hasHiddenParent()) {
 				children.add(new Literal(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED));
 			}
 		}
@@ -375,8 +487,8 @@ public class Configuration {
 	}
 
 	private void initFeatures(SelectableFeature sFeature, Feature feature) {
-		features.add(sFeature);
 		if (sFeature != null && sFeature.getName() != null) {
+			features.add(sFeature);
 			table.put(sFeature.getName(), sFeature);
 			for (Feature child : feature.getChildren()) {
 				SelectableFeature sChild = new SelectableFeature(this, child);
@@ -396,15 +508,13 @@ public class Configuration {
 		if (!propagate)
 			return;
 		resetAutomaticValues();
-
+		
 		Node[] nodeArray = createNodeArray(createNodeList(), rootNode);
 		final SatSolver solver = new SatSolver(new And(nodeArray), TIMEOUT);
 		for (Literal literal : solver.knownValues()) {
 			SelectableFeature feature = table.get(literal.var);
 			if (feature != null) {
-				if (feature.getManual() == Selection.UNDEFINED
-//						|| (feature.getAutomatic() == Selection.UNDEFINED && feature.getFeature().hasHiddenParent())
-						) {
+				if (feature.getManual() == Selection.UNDEFINED) {
 					feature.setAutomatic(literal.positive ? Selection.SELECTED : Selection.UNSELECTED);
 				}
 			}
