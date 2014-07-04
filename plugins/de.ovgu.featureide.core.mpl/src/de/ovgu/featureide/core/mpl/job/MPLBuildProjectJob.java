@@ -74,7 +74,8 @@ public class MPLBuildProjectJob extends AMonitorJob<MPLBuildProjectJob.Arguments
 		setPriority(BUILD);
 	}
 	
-	IFolder tempExternBuildFolder = null;
+	IFolder internTempBuildFolder = null;
+	IFolder rootBuildFolder = null;
 
 	@Override
 	protected boolean work() {
@@ -84,7 +85,7 @@ public class MPLBuildProjectJob extends AMonitorJob<MPLBuildProjectJob.Arguments
 					return false;
 				}
 			} else {
-				if (!buildFeatureProject(arguments.externalFeatureProject, arguments.configuration, arguments.varName, null)) {
+				if (!buildFeatureProject(arguments.externalFeatureProject, arguments.configuration, arguments.varName, arguments.buildF)) {
 					return false;
 				}
 			}
@@ -104,20 +105,26 @@ public class MPLBuildProjectJob extends AMonitorJob<MPLBuildProjectJob.Arguments
 		
 		//build
 		jobList.add(createJob(new MPLBuildProjectJob.Arguments(
-				externalFeatureProject, null, config, configName)));
+				externalFeatureProject, internTempBuildFolder, config, configName)));
 		
 		// rename
-//		jobList.add(createJob(new MPLRenameExternalJob.Arguments(
-//				externalFeatureProject.getProject(), configName, externalFeatureProject.getBuildFolder().getFolder(configName).getFullPath())));
+		jobList.add(createJob(new MPLRenameExternalJob.Arguments(
+				arguments.externalFeatureProject.getProject(), configName, 
+				internTempBuildFolder.getFullPath()
+//				externalFeatureProject.getBuildFolder().getFolder(configName).getFullPath()
+				)));
 		
 		// copy
-//		jobList.add(createJob(new MPLCopyExternalJob.Arguments(
-//				externalFeatureProject.getBuildFolder().getFolder(configName), tempBuildFolder)));
+		jobList.add(createJob(new MPLCopyExternalJob.Arguments(
+				internTempBuildFolder
+//				externalFeatureProject.getBuildFolder().getFolder(configName)
+				, rootBuildFolder
+//				tempBuildFolder
+				)));
 		
 		JobManager.insertJobs(this, jobList);
 	}
-
-	// TODO MPL: job zwischen schieben
+	
 	private IChainJob createJob(AJobArguments arg) {
 		IChainJob curJob = arg.createJob();
 		curJob.setIgnorePreviousJobFail(false);
@@ -136,28 +143,31 @@ public class MPLBuildProjectJob extends AMonitorJob<MPLBuildProjectJob.Arguments
 			if (splitIndex > -1) {
 				varName = varName.substring(0, splitIndex);
 			}
+			rootBuildFolder = arguments.buildF.getFolder(varName);
+			internTempBuildFolder = arguments.buildF.getFolder("_" + varName);
+		} else {
+			rootBuildFolder = arguments.buildF;
+			internTempBuildFolder = arguments.externalFeatureProject.getBuildFolder();
 		}
 
-		final IFolder tempBuildFolder = arguments.buildF.getFolder(varName);
-		tempExternBuildFolder = arguments.buildF.getFolder("_" + varName);
+//		final IFolder tempBuildFolder = arguments.buildF.getFolder(varName);
+//		tempExternBuildFolder = arguments.buildF.getFolder("_" + varName);
 		try {
-			if (arguments.buildF.exists()) {
-				for (IResource member : arguments.buildF.members()) {
-					member.delete(true, monitor);
-				}
-			} else {
-				arguments.buildF.create(true, true, null);
+			if (internTempBuildFolder.exists()) {
+				internTempBuildFolder.delete(true, monitor);
 			}
-			tempBuildFolder.create(true, true, null);
-			tempExternBuildFolder.create(true, true, null);
+			if (!rootBuildFolder.exists()) {
+				rootBuildFolder.create(true, true, null);
+			}
+			internTempBuildFolder.create(true, true, null);
 		} catch (CoreException e) {
 			MPLPlugin.getDefault().logError(e);
 			return false;
-		} 
+		}
 		
 		// build own project
 		// featureProject.deleteBuilderMarkers(featureProject.getProject(), IResource.DEPTH_INFINITE);
-		if (!buildFeatureProject(mplFeatureProject, config, varName, tempBuildFolder)) {
+		if (!buildFeatureProject(mplFeatureProject, config, varName, rootBuildFolder)) {
 			return false;
 		}
 

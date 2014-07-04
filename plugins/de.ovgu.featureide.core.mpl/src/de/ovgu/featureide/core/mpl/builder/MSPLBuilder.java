@@ -105,6 +105,15 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 			final IFolder buildFolder = featureProject.getBuildFolder(); //.getFolder("x");
 			final IChainJob job = new MPLBuildProjectJob.Arguments(featureProject, buildFolder, config, null).createJob();
 			
+			String tempConfigName = featureProject.getCurrentConfiguration().getName();
+			final String configName;
+			final int splitIndex = tempConfigName.lastIndexOf('.');
+			if (splitIndex > -1) {
+				configName = tempConfigName.substring(0, splitIndex);
+			} else {
+				configName = tempConfigName;
+			}
+			
 			JobManager.addJob(buildObject, job);
 			
 			buildThread = new Thread(new Runnable() {
@@ -114,7 +123,7 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 					synchronized (buildObject) {
 						try {
 							buildObject.wait();
-							MPLRenameExternalJob.setJavaBuildPath(project, buildFolder.getFullPath());
+							MPLRenameExternalJob.setJavaBuildPath(project, buildFolder.getFolder(configName).getFullPath());
 						} catch (InterruptedException e) {
 							MPLPlugin.getDefault().logError(e);
 						}	
