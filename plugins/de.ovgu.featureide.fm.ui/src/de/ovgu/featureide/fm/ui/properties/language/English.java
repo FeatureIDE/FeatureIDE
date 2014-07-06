@@ -38,26 +38,19 @@ public class English implements ILanguage {
 	private static final String CONCRETE = "Concrete";
 	private static final String HIDDEN = "Hidden";
 	private static final String DEAD = "Dead feature";
-	private static final String FALSE_OPTIONAL = "False optional";
+	private static final String FALSE_OPTIONAL = "False optional feature";
 	private static final String ALTERNATIVE = "Alternative";
 	private static final String OR = "Or";
 	private static final String OPTIONAL = "Optional";
 	private static final String INDETHIDDEN = "Indeterminate hidden";
 	private static final String REDUNDANT = "Redundant constraint";
-	private static final String DEAD_CONST = "Dead constraint";
 	private static final String UNSATISFIABLE_CONST = "Unsatisfiable constraint";
 	private static final String TAUTOLOGY_CONST = "Constraint is tautology";
 	private static final String VOID_MODEL_CONST = "Constraint makes the model void";
-	private static final String FALSE_OPTIONAL_CONSTRAINT = "False optional constraint";	
 	
 	@Override
 	public String getRedundantConst() {
 		return REDUNDANT;
-	}
-
-	@Override
-	public String getDeadConst() {
-		return DEAD_CONST;
 	}
 
 	@Override
@@ -135,9 +128,5 @@ public class English implements ILanguage {
 		return OPTIONAL;
 	}
 
-	@Override
-	public String getFalseOptionalConst() {
-		return FALSE_OPTIONAL_CONSTRAINT;
-	}
 
 }

@@ -166,6 +166,24 @@ public class TNumberOfConfigurations extends AbstractConfigurationTest {
 	}
 	
 	@Test
+	public void testDependendHidden() {
+		FeatureModel fm = loadXML(
+			"<and mandatory=\"true\" name=\"S\">" +
+				"<feature name=\"A\"/>" +
+				"<feature hidden=\"true\" name=\"B\"/>" +
+			"</and>" ,
+			"<rule>" +
+				"<eq>" +
+					"<var>A</var>" +
+					"<var>B</var>" +
+				"</eq>" +
+			"</rule>");
+		Configuration c = new Configuration(fm);
+		//TODO: skrieter uncomment after correcting associated code
+		//assertEquals(2, c.number());
+	}
+	
+	@Test
 	public void testWithSimplePositiveConstraint() {
 		FeatureModel fm = loadXML(
 				"<and mandatory=\"true\" name=\"S\"><feature name=\"A\"/></and>",

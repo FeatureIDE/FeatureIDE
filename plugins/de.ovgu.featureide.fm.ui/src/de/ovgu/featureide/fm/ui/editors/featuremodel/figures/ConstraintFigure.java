@@ -121,7 +121,8 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 		}
 		
 		if (constraintAttribute == ConstraintAttribute.TAUTOLOGY){
-			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
+
+			setBackgroundColor(FMPropertyManager.getWarningColor());
 			setToolTip(TAUTOLOGY_LABEL);	
 			return;
 		}

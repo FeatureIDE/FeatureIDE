@@ -35,8 +35,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-
-import org.prop4j.And;
+import org.prop4j.Literal;
 import org.prop4j.NodeWriter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -199,21 +198,31 @@ public class SXFMWriter extends AbstractFeatureModelWriter {
 		int i = 1;
 		for (org.prop4j.Node node : featureModel.getPropositionalNodes()) {
 			// avoid use of parenthesis from the beginning
-			And n = (And) node.clone().toCNF();
-			for (org.prop4j.Node child : n.getChildren()) {
-				String nodeString = NodeWriter.nodeToString(child, symbols, false);
-				// remove the external parenthesis
-				if ((nodeString.startsWith("(")) && (nodeString.endsWith(")"))) {
-					nodeString = nodeString.substring(1, nodeString.length() - 1);
+			org.prop4j.Node cnf = node.clone().toCNF();
+			if (cnf instanceof Literal) {
+				i = crteateConstraint(doc, propConstr, i, cnf);
+			} else {
+				for (org.prop4j.Node child : cnf.getChildren()) {
+					i = crteateConstraint(doc, propConstr, i, child);
 				}
-				// replace the space before a variable
-				nodeString = nodeString.replace("~ ","~");
-				newNode = doc.createTextNode("C" + i + ":" + nodeString + "\n");			
-				propConstr.appendChild(newNode);
-				i++;
 			}
-			
 		}
+	}
+
+	private int crteateConstraint(Document doc, Node propConstr, int i,
+			org.prop4j.Node node) {
+		Node newNode;
+		String nodeString = NodeWriter.nodeToString(node, symbols, false);
+		// remove the external parenthesis
+		if ((nodeString.startsWith("(")) && (nodeString.endsWith(")"))) {
+			nodeString = nodeString.substring(1, nodeString.length() - 1);
+		}
+		// replace the space before a variable
+		nodeString = nodeString.replace("~ ","~");
+		newNode = doc.createTextNode("C" + i + ":" + nodeString + "\n");			
+		propConstr.appendChild(newNode);
+		i++;
+		return i;
 	}
     
 //    /**

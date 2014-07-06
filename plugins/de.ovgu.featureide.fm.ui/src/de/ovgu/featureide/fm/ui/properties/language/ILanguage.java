@@ -35,16 +35,7 @@ public interface ILanguage {
 	public String getRedundantConst();
 	
 	/**
-	 * @return The translation for: "False optional constraint"
-	 */	
-	public String getFalseOptionalConst();
-	
-	/**
-	 * @return The translation for: "Dead constraint"
-	 */	
-	public String getDeadConst();
-	 
-	/**
+
  	 * @return The translation for: "Unsatisfiable constraint"
 	 */	
 	public String getUnsatisfiableConst();

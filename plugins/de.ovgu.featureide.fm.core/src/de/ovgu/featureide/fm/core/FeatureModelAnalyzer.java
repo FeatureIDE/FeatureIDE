@@ -82,6 +82,10 @@ public class FeatureModelAnalyzer {
 	 */
 	public boolean calculateRedundantConstraints = true;
 	/**
+	 * Defines whether constraints that are tautologies should be calculated.
+	 */
+	public boolean calculateTautologyConstraints = true;
+	/**
 	 * Defines whether analysis should be performed automatically.
 	 */
 	public boolean runCalculationAutomatically = true;
@@ -407,6 +411,8 @@ public class FeatureModelAnalyzer {
 				}
 			}
 		}
+		cachedDeadFeatures.clear();
+		cachedDeadFeatures.addAll(deadFeatures);
 		return deadFeatures;
 	}
 	
@@ -425,6 +431,8 @@ public class FeatureModelAnalyzer {
 				}
 			}
 		}
+		cachedDeadFeatures.clear();
+		cachedDeadFeatures.addAll(deadFeatures);
 		return deadFeatures;
 	}
 	
@@ -545,33 +553,37 @@ public class FeatureModelAnalyzer {
 			 * Add one constraint after another;
 			 * Add the NEW introduces errors/warnings to the constraint;
 			 */
-			if (calculateRedundantConstraints) {
+			if (calculateRedundantConstraints || calculateTautologyConstraints) {
 				setSubTask("Find redundant constraints");
 				/** Remove redundant constraints for further analysis **/
 				for (Constraint constraint : fm.getConstraints()) {
 					if (canceled()) {
 						return;
 					}
-					
-					// tautology
-					SatSolver satsolverTAU = new SatSolver(new Not(constraint.getNode().clone()), 1000);
-					try {
-						if (!satsolverTAU.isSatisfiable()) {
-							if (oldAttributes.get(constraint) != ConstraintAttribute.TAUTOLOGY) {
-								changedAttributes.put(constraint, ConstraintAttribute.TAUTOLOGY);
+					if (calculateTautologyConstraints) {
+						// tautology
+						SatSolver satsolverTAU = new SatSolver(new Not(constraint.getNode().clone()), 1000);
+						try {
+							if (!satsolverTAU.isSatisfiable()) {
+								if (oldAttributes.get(constraint) != ConstraintAttribute.TAUTOLOGY) {
+									changedAttributes.put(constraint, ConstraintAttribute.TAUTOLOGY);
+								}
+								constraint.setConstraintAttribute(ConstraintAttribute.TAUTOLOGY, false);
+								worked(1);
+								continue;
 							}
-							constraint.setConstraintAttribute(ConstraintAttribute.TAUTOLOGY, false);
-							worked(1);
-							continue;
+						} catch (TimeoutException e) {
+							FMCorePlugin.getDefault().logError(e);
 						}
-					} catch (TimeoutException e) {
-						FMCorePlugin.getDefault().logError(e);
 					}
 					
-					findRedundantConstraints(clone, constraint, changedAttributes, oldAttributes);
-					if (changedAttributes.containsKey(constraint)) {						
-						worked(1);
-					}	
+					if (calculateRedundantConstraints) {
+						findRedundantConstraints(clone, constraint, changedAttributes, oldAttributes);
+						if (changedAttributes.containsKey(constraint)) {						
+							worked(1);
+						}	
+					}
+					
 				}
 				clone = fm.clone();
 				clone.constraints.clear();

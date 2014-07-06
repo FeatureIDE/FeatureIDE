@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.core;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -37,12 +36,12 @@ public class ModelMarkerHandler implements IModelMarkerHandler {
 	//TODO: replace this ID by FMCorePlugin.PLUGIN_ID + ".modelProblemMarker";
 	private static final String MODEL_MARKER = "de.ovgu.featureide.core"+".featureModuleMarker";
 	
-	public ModelMarkerHandler(IFile modelFile) {
+	public ModelMarkerHandler(IResource modelFile) {
 		this.modelFile = modelFile;
 		this.project = modelFile.getProject();
 	}
 
-	protected final IFile modelFile;
+	protected final IResource modelFile;
 
 	protected final IProject project;
 

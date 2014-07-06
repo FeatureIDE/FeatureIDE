@@ -52,6 +52,7 @@ public interface XMLFeatureModelTags {
 	static final String COORDINATES = "coordinates";
 	static final String CALCULATE_FEATURES = "Features";
 	static final String CALCULATE_REDUNDANT = "Redundant";
+	static final String CALCULATE_TAUTOLOGY = "Tautology";
 	static final String CALCULATE_CONSTRAINTS = "Constraints";
 	static final String CALCULATE_AUTO = "Auto";
 	static final String NAME = "name";

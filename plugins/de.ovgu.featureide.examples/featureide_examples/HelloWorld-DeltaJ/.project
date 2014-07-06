@@ -14,6 +14,7 @@
 				</dictionary>
 				<dictionary>
 					<key>composer</key>
+<<<<<<< HEAD
 					<value>de.ovgu.featureide.core.deltaj.deltajcomposer</value>
 				</dictionary>
 				<dictionary>
@@ -36,5 +37,28 @@
 		<nature>de.ovgu.featureide.core.featureProjectNature</nature>
 		<nature>org.eclipse.xtext.ui.shared.xtextNature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
+=======
+					<value>de.ovgu.featureide.composer.deltaj</value>
+				</dictionary>
+				<dictionary>
+					<key>equations</key>
+					<value>configs</value>
+				</dictionary>
+				<dictionary>
+					<key>source</key>
+					<value>modules</value>
+				</dictionary>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>org.eclipse.jdt.core.javabuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.eclipse.jdt.core.javanature</nature>
+		<nature>de.ovgu.featureide.core.featureProjectNature</nature>
+>>>>>>> branch 'master' of https://github.com/tthuem/FeatureIDE.git
 	</natures>
 </projectDescription>

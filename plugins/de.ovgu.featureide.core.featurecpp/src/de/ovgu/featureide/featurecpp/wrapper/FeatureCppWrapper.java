@@ -49,6 +49,8 @@ import org.eclipse.ui.progress.UIJob;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.featurecpp.FeatureCppCorePlugin;
 
+import de.ovgu.featureide.fm.core.ModelMarkerHandler;
+
 /**
  * Composes FeatureC++ files.
  * 
@@ -61,6 +63,8 @@ public class FeatureCppWrapper {
 	private final static String EXE_LINUX_32BIT = "fc++v0.8Linux32bit";
 	private final static String EXE_MAC_OS_X 	= "fc++v0.8MacOSX";
 	private final static String EXE_WINDOWS 	= "fc++v0.7WIN.exe";
+	
+	private ModelMarkerHandler modelMarkerHandler;
 	
 	final String featureCppExecutableName;
 
@@ -121,6 +125,7 @@ public class FeatureCppWrapper {
 		}
 		buildFolder = build.getRawLocation().toOSString();
 		buildDirectory = build;
+		modelMarkerHandler = new ModelMarkerHandler(build.getProject());
 		return true;
 	}
 
@@ -154,17 +159,22 @@ public class FeatureCppWrapper {
 		BufferedReader error = null;
 		try {
 			Process process = processBuilder.start();
-			 input = new BufferedReader(new InputStreamReader(
+			input = new BufferedReader(new InputStreamReader(
 					process.getInputStream(), Charset.availableCharsets().get("UTF-8")));
-			 error = new BufferedReader(new InputStreamReader(
+			error = new BufferedReader(new InputStreamReader(
 					process.getErrorStream(), Charset.availableCharsets().get("UTF-8")));
-			boolean x = true;
-			while (x) {
+			modelMarkerHandler.deleteAllModelMarkers();
+			while (true) {
 				try {
 					String line;
 					while ((line = input.readLine()) != null) {
+						
 						if (line.contains(" : warning: ")) {
-							addMarker(getFile(line), getMessage(line), getLineNumber(line));
+							if (line.contains("warning: folder")) {
+								modelMarkerHandler.createModelMarker(line, IMarker.SEVERITY_ERROR, 0);
+							} else {
+								addMarker(getFile(line), getMessage(line), getLineNumber(line));
+							}
 						}
 						/** Lines to debug executing FeatureC++ **/
 //						else {
@@ -184,7 +194,7 @@ public class FeatureCppWrapper {
 								"The process doesn't finish normally (exit="
 										+ exitValue + ")!");
 					}
-					x = false;
+					break;
 				} catch (IllegalThreadStateException e) {
 					FeatureCppCorePlugin.getDefault().logError(e);
 				}
@@ -283,7 +293,7 @@ public class FeatureCppWrapper {
 				return Status.OK_STATUS;
 			}
 			
-			private boolean hasMarker(String message, IFile sourceFile) {
+			private boolean hasMarker(String message, IFile sourceFile) {				
 				try {
 					IMarker[] marker = sourceFile.findMarkers(null, true, IResource.DEPTH_ZERO);
 					if (marker.length > 0) {
