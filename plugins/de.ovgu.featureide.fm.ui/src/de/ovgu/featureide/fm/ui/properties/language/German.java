@@ -37,16 +37,16 @@ public class German implements ILanguage {
 	private static final String ABSTRACT = "Abstrakt";
 	private static final String CONCRETE = "Konkret";
 	private static final String HIDDEN = "Versteckt";
-	private static final String DEAD = "Unwählbar";
+	private static final String DEAD = "Unwï¿½hlbar";
 	private static final String FALSE_OPTIONAL ="Falsch-optionales Feature";
 	private static final String ALTERNATIVE = "Alternative";
 	private static final String OR = "Oder";
 	private static final String OPTIONAL = "Optional";
 	private static final String INDETHIDDEN = "Unbestimmbar verstecktes Feature";
 	private static final String REDUNDANT = "Redundantes Constraint";
-	private static final String UNSATISFIABLE_CONST = "Unerfüllbares Constraint";
+	private static final String UNSATISFIABLE_CONST = "Unerfï¿½llbares Constraint";
 	private static final String TAUTOLOGY_CONST = "Constraint ist Tautologie";
-	private static final String VOID_MODEL_CONST = "Constraint macht Produktlinie unerfüllbar";
+	private static final String VOID_MODEL_CONST = "Constraint macht Produktlinie unerfï¿½llbar";
 	
 	
 	@Override
