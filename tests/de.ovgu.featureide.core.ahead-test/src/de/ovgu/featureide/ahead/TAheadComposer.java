@@ -25,29 +25,29 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 /**
- * Tests for the <code>Ahead</code> composer.
+ * Tests for the {@code Ahead} composer.
  * 
  * @author Jens Meinicke
  */
 public class TAheadComposer {
 
 	public static final String SOUCE_1 = 
-			"layer test;\r\n" + 
-			"import import1;\r\n" + 
-			"public class test {\r\n" + 
+			"layer test;" + AheadComposer.NEWLINE + 
+			"import import1;" + AheadComposer.NEWLINE + 
+			"public class test {" + AheadComposer.NEWLINE + 
 			"private Player player;" + 
-			"	private void method1() {\r\n" + 
-			"\r\n" + 
-			"	}\r\n" + 
+			"	private void method1() {" + AheadComposer.NEWLINE + 
+			AheadComposer.NEWLINE + 
+			"	}" + AheadComposer.NEWLINE + 
 			"}";
 	private static final String CORRECTED_1 = 
-			"\r\n" + 
-			"import import1;\r\n" + 
-			"public class test {\r\n" + 
+			AheadComposer.NEWLINE + 
+			"import import1;" + AheadComposer.NEWLINE + 
+			"public class test {" + AheadComposer.NEWLINE + 
 			"private Player player;" + 
-			"	private void method1() {\r\n" + 
-			"\r\n" + 
-			"	}\r\n" + 
+			"	private void method1() {" + AheadComposer.NEWLINE + 
+			AheadComposer.NEWLINE + 
+			"	}" + AheadComposer.NEWLINE + 
 			"}";
 
 	/**
@@ -59,19 +59,19 @@ public class TAheadComposer {
 	}
 
 	private static final String SOUCE_2 = 
-			"import import1;\r\n" + 
-			"public class test {\r\n" + 
-			"	private void method1() {\r\n" + 
-			"\r\n" + 
-			"	}\r\n" + 
+			"import import1;" + AheadComposer.NEWLINE + 
+			"public class test {" + AheadComposer.NEWLINE + 
+			"	private void method1() {" + AheadComposer.NEWLINE + 
+			AheadComposer.NEWLINE + 
+			"	}" + AheadComposer.NEWLINE + 
 			"}";
 	private static final String CORRECTED_2 = 
-			"\r\n" + 
-			"import import1;\r\n" + 
-			"public class test {\r\n" + 
-			"	private void method1() {\r\n" + 
-			"\r\n" + 
-			"	}\r\n" + 
+			AheadComposer.NEWLINE + 
+			"import import1;" + AheadComposer.NEWLINE + 
+			"public class test {" + AheadComposer.NEWLINE + 
+			"	private void method1() {" + AheadComposer.NEWLINE + 
+			AheadComposer.NEWLINE + 
+			"	}" + AheadComposer.NEWLINE + 
 			"}";
 
 	/**
@@ -83,13 +83,13 @@ public class TAheadComposer {
 	}
 
 	private static final String SOUCE_3 = 
-			"\r\n" + 
-			"import player.*;\r\n" + 
-			"public class Player {\r\n" + 
-			"	private void player() {\r\n" + 
-			"\r\n" + 
-			"	}\r\n" + 
-			"private Player player;\r\n" + 
+			AheadComposer.NEWLINE + 
+			"import player.*;" + AheadComposer.NEWLINE + 
+			"public class Player {" + AheadComposer.NEWLINE + 
+			"	private void player() {" + AheadComposer.NEWLINE + 
+			AheadComposer.NEWLINE + 
+			"	}" + AheadComposer.NEWLINE + 
+			"private Player player;" + AheadComposer.NEWLINE + 
 			"}";
 
 	/**

@@ -64,7 +64,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	public static final IPath JRE_CONTAINER = new Path("org.eclipse.jdt.launching.JRE_CONTAINER");
 	protected IFeatureProject featureProject = null;
 	
-	protected static final String NEWLINE = System.getProperty("line.separator", "\n");
+	public static final String NEWLINE = System.getProperty("line.separator", "\n");
 	
 	protected final static String[] JAVA_TEMPLATE = new String[]{"Java", "java", PACKAGE_PATTERN + "/**" + NEWLINE 
 		+ " * TODO description" + NEWLINE 
