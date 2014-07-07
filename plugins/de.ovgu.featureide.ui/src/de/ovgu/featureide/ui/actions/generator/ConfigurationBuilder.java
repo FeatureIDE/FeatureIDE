@@ -662,7 +662,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		
 		if (featureModel.getConstraintCount() > 0) {
 			children.clear(); 
-			for (String feature : selected.split("[ ]")) {
+			for (String feature : selected.split("\\s+")) {
 				children.add(new Literal(feature, true));
 			}
 			try {
@@ -676,13 +676,16 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		
 		if (selectedFeatures2.isEmpty()) {
 			configuration.resetValues();
-			for (final String feature : selected.split("[ ]")) {
-				configuration.setManual((feature), Selection.SELECTED);
+
+			if (!selected.isEmpty()) {
+				for (final String feature : selected.split("\\s+")) {
+					configuration.setManual((feature), Selection.SELECTED);
+				}
+
 			}
-			
 			if (configuration.isValid()) {
 				LinkedList<String> selectedFeatures3 = new LinkedList<String>();
-				for (String f : selected.split("[ ]")) {
+				for (String f : selected.split("\\s+")) {
 					if (!"".equals(f)) {
 						selectedFeatures3.add(f);
 					}
@@ -836,8 +839,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	}
 
 	private void buildAnd(String selected, LinkedList<Feature> selectedFeatures2, IProgressMonitor monitor) {
-		Feature currentFeature = selectedFeatures2.getFirst();
-		selectedFeatures2.removeFirst();
+		Feature currentFeature = selectedFeatures2.removeFirst();
 		LinkedList<Feature> selectedFeatures3 = new LinkedList<Feature>();
 		if (currentFeature.isConcrete()) {
 			if ("".equals(selected)) {
@@ -865,6 +867,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 				optionalFeatures.add(f);
 			}
 		}
+
 		for (int i2 = 0;i2 < (int)java.lang.Math.pow(2, optionalFeatures.size());i2++) {
 			k2 = i2;
 			selectedFeatures3 = new LinkedList<Feature>();

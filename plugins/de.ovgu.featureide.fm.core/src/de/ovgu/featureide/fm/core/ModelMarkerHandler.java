@@ -34,7 +34,7 @@ import org.eclipse.core.runtime.CoreException;
 public class ModelMarkerHandler implements IModelMarkerHandler {
 	
 	private static final String MODEL_MARKER = FMCorePlugin.PLUGIN_ID + ".featureModelMarker";
-	
+
 	public ModelMarkerHandler(IResource modelFile) {
 		this.modelFile = modelFile;
 		this.project = modelFile.getProject();

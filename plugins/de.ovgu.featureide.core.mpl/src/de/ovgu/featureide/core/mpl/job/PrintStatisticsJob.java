@@ -193,7 +193,7 @@ public class PrintStatisticsJob extends AMonitorJob<PrintStatisticsJob.Arguments
 		worked();
 		
 		IOConstants.writeToFile(folder.getFile("_sum_statistics.csv"), sumStat.toCSVString());
-
+		
 		Configuration defaultConf = new Configuration(fm, false);
 		
 		for (String featureName : allConcreteFeatures) {			

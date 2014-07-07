@@ -50,6 +50,8 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.featurecpp.FeatureCppCorePlugin;
 import de.ovgu.featureide.fm.core.ModelMarkerHandler;
 
+import de.ovgu.featureide.fm.core.ModelMarkerHandler;
+
 /**
  * Composes FeatureC++ files.
  * 
