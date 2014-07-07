@@ -187,7 +187,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 
 				}
 			}
-			if (featureModel.getFeatureTable().containsKey(name)) {
+			if (featureModel.getFeature(name) != null) {
 				throwError("Duplicate entry for feature: " + name, e);
 			}
 			if (!featureModel.getFMComposerExtension().isValidFeatureName(name)) {
@@ -280,11 +280,11 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 			} else if (nodeName.equals(ATMOST1)) {
 				nodes.add( new AtMost(1, parseConstraints2(e.getChildNodes())));
 			} else if (nodeName.equals(VAR)) {
-				String feature = e.getTextContent();
-				if (featureModel.getFeatureTable().containsKey(feature)) {
-					nodes.add(new Literal(feature));
+				String featureName = e.getTextContent();
+				if (featureModel.getFeature(featureName) != null) {
+					nodes.add(new Literal(featureName));
 				} else {
-					throwError("Feature \"" + feature + "\" does not exists", e);
+					throwError("Feature \"" + featureName + "\" does not exists", e);
 				}
 			} else {
 				throwError("Unknown constraint type: " + nodeName, e);
@@ -318,7 +318,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 	 * Parses the feature order section.
 	 */
 	private void parseFeatureOrder(NodeList nodeList) throws UnsupportedModelException {
-		ArrayList<String> order = new ArrayList<String>(featureModel.getFeatureTable().size());
+		ArrayList<String> order = new ArrayList<String>(featureModel.getNumberOfFeatures());
 		for (Element e: getElements(nodeList)) {
 			if (e.hasAttributes()) {
 				NamedNodeMap nodeMap = e.getAttributes();
@@ -329,7 +329,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 					if (attributeName.equals(USER_DEFINED)) {
 						featureModel.setFeatureOrderUserDefined(attributeValue.equals(TRUE));
 					} else if (attributeName.equals(NAME)){
-						if (featureModel.getFeatureTable().containsKey(attributeValue)) {
+						if (featureModel.getFeature(attributeValue) != null) {
 							order.add(attributeValue);
 						} else {
 							throwError("Feature \"" + attributeValue + "\" does not exists", e);

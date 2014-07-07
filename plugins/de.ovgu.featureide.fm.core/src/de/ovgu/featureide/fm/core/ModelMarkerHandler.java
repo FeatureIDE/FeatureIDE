@@ -32,9 +32,8 @@ import org.eclipse.core.runtime.CoreException;
  * 
  */
 public class ModelMarkerHandler implements IModelMarkerHandler {
-
-	//TODO: replace this ID by FMCorePlugin.PLUGIN_ID + ".modelProblemMarker";
-	private static final String MODEL_MARKER = "de.ovgu.featureide.core"+".featureModuleMarker";
+	
+	private static final String MODEL_MARKER = FMCorePlugin.PLUGIN_ID + ".featureModelMarker";
 	
 	public ModelMarkerHandler(IResource modelFile) {
 		this.modelFile = modelFile;

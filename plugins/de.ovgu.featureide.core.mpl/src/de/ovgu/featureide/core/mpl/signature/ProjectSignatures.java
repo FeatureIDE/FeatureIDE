@@ -147,21 +147,42 @@ public class ProjectSignatures {
 	public HashMap<Integer, int[]> getStatisticNumbers() {
 		final int[][] allCounters = new int[4][4];
 		HashMap<Integer, int[]> fs = new HashMap<Integer, int[]>();
-
+//		ArrayList<AbstractSignature> cllist = new ArrayList<AbstractSignature>();
+//		ArrayList<AbstractSignature> cllistIntern = new ArrayList<AbstractSignature>();
+//		ArrayList<AbstractSignature> fields = new ArrayList<AbstractSignature>();
+//		ArrayList<AbstractSignature> methods = new ArrayList<AbstractSignature>();
+//		ArrayList<AbstractSignature> internfields = new ArrayList<AbstractSignature>();
+//		ArrayList<AbstractSignature> internmethods = new ArrayList<AbstractSignature>();
 		for (int i = 0; i < signatureArray.length; ++i) {
 			AbstractSignature signature = signatureArray[i];
 			if (signature instanceof AbstractFieldSignature) {
 				count(signature, allCounters[2], fs, 2);
+//				AbstractSignature p = signature.getParent();
+//				if (p.getParent()!=null) {
+//					internfields.add(signature);
+//				} else {
+//					fields.add(signature);
+//				}
 			} else if (signature instanceof AbstractMethodSignature) {
 				count(signature, allCounters[3], fs, 3);
+//				AbstractSignature p = signature.getParent();
+//				if (p.getParent()!=null) {
+//					internmethods.add(signature);
+//				} else {
+//					methods.add(signature);
+//				}
 			} else if (signature instanceof AbstractClassSignature) {
 				if (signature.getParent() != null) {
 					count(signature, allCounters[1], fs, 1);
+//					cllistIntern.add(signature);
 				} else {
 					count(signature, allCounters[0], fs, 0);
+//					cllist.add(signature);
 				}
 			}
 		}
+//		Collections.sort(fields, new SignatureNameComparator());
+//		Collections.sort(methods, new SignatureNameComparator());
 		int[] spl = new int[3];
 		int[] iface = new int[3];
 		spl[0] = allCounters[0][1];

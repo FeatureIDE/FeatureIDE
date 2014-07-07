@@ -20,10 +20,9 @@
  */
 package de.ovgu.featureide.fm.ui.actions;
 
-import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
-import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelReader;
+import de.ovgu.featureide.fm.core.io.ModelIOFactory;
 
 /**
  * Reads a velvet feature model.
@@ -34,11 +33,11 @@ public class ImportVelvetAction extends AbstractImportAction {
 	
 	@Override
 	IFeatureModelReader setModelReader(FeatureModel fm) {
-		return new VelvetFeatureModelReader(fm);
+		return ModelIOFactory.getModelReader(fm, ModelIOFactory.TYPE_VELVET);
 	}
 	
 	@Override
 	protected FeatureModel createFeatureModel() {
-		return new ExtendedFeatureModel();
+		return ModelIOFactory.getNewFeatureModel(ModelIOFactory.TYPE_VELVET);
 	}
 }

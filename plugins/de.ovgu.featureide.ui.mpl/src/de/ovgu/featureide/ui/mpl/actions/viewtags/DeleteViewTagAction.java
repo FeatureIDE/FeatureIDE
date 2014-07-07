@@ -28,6 +28,7 @@ import org.eclipse.swt.widgets.Display;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.ui.mpl.actions.AProjectAction;
 import de.ovgu.featureide.ui.mpl.wizards.NewViewTagWizard;
+import de.ovgu.featureide.ui.mpl.wizards.WizardConstants;
 
 /**
  * Action to delete a view tag.
@@ -41,7 +42,7 @@ public class DeleteViewTagAction extends AProjectAction {
 		NewViewTagWizard wizard = new NewViewTagWizard("Delete a view tag");
 		WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
 		if (dialog.open() == Dialog.OK) {
-			MPLPlugin.getDefault().deleteViewTag(project, wizard.getViewName());
+			MPLPlugin.getDefault().deleteViewTag(project, (String) wizard.getData(WizardConstants.KEY_OUT_VIEWNAME));
 		}
 	}
 }

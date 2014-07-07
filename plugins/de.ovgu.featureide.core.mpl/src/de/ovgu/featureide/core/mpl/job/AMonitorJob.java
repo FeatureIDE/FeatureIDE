@@ -18,23 +18,21 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.core.mpl.job.util;
+package de.ovgu.featureide.core.mpl.job;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.jobs.Job;
+
+import de.ovgu.featureide.core.mpl.job.util.AJobArguments;
 
 /**
  * {@link AChainJob} with monitor function.
  * 
  * @author Sebastian Krieter
  */
-public abstract class AMonitorJob<T extends AJobArguments> extends AChainJob<T> {	
 	
-	protected class c {
-		
-	}
-	
+abstract class AMonitorJob<T extends AJobArguments> extends AChainJob<T> {	
 	private static final int maxRelativeWork = 100;
 	
 	protected IProgressMonitor monitor = null;
@@ -51,11 +49,15 @@ public abstract class AMonitorJob<T extends AJobArguments> extends AChainJob<T> 
 		absoluteWorkDone = 0;
 		maxAbsoluteWork = 1;
 		
-		monitor.beginTask(getName(), maxRelativeWork);
+		if (monitor != null) {
+			monitor.beginTask(getName(), maxRelativeWork);
+		}
 		
 		IStatus status = super.run(monitor);
 		
-		monitor.done();
+		if (monitor != null) {
+			monitor.done();
+		}
 		
 		return status;
 	}
@@ -65,7 +67,7 @@ public abstract class AMonitorJob<T extends AJobArguments> extends AChainJob<T> 
 	}
 
 	protected void worked() {
-		int nworked = (100 * ++absoluteWorkDone) / maxAbsoluteWork;
+		int nworked = (maxRelativeWork * ++absoluteWorkDone) / maxAbsoluteWork;
 		if (nworked > relativeWorkDone) {
 			monitor.worked(nworked - relativeWorkDone);
 			relativeWorkDone = nworked;

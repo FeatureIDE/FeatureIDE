@@ -42,6 +42,10 @@ public class TFeatureModel {
 
         FeatureModel clonedModel = fm.clone();
         Feature root2 = clonedModel.getFeature("test_root");
+        
+//        assertNotSame(root2, root);
+//        assertEquals(root2, clonedModel.getRoot());
+        
         assertSame(root2, clonedModel.getRoot());
 	}
 }

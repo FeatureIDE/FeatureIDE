@@ -51,7 +51,7 @@ public abstract class AbstractMethodSignature extends AbstractSignature {
 //			hashCode = hashCodePrime * hashCode + parameter.hashCode();
 //		}
 //	}
-
+//
 //	@Override
 //	public boolean equals(Object obj) {
 //		if (this == obj)

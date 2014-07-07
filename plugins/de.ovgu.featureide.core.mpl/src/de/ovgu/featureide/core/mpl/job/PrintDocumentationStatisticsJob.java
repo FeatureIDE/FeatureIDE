@@ -25,10 +25,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.prop4j.Node;
 
 import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.mpl.InterfaceProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.io.IOConstants;
 import de.ovgu.featureide.core.mpl.job.util.AJobArguments;
-import de.ovgu.featureide.core.mpl.job.util.AMonitorJob;
 import de.ovgu.featureide.core.mpl.signature.ProjectSignatures.SignatureIterator;
 import de.ovgu.featureide.core.mpl.signature.filter.ContextFilter;
 import de.ovgu.featureide.core.mpl.signature.filter.FeatureFilter;
@@ -57,14 +57,19 @@ public class PrintDocumentationStatisticsJob extends AMonitorJob<PrintDocumentat
 
 	@Override
 	protected boolean work() {
-		IFolder folder = CorePlugin.createFolder(interfaceProject.getProjectReference(), arguments.foldername);
+		InterfaceProject interfaceProject = MPLPlugin.getDefault().getInterfaceProject(this.project);
+		if (interfaceProject == null) {
+			MPLPlugin.getDefault().logWarning(this.project.getName() + " is no Interface Project!");
+			return false;
+		}
+		IFolder folder = CorePlugin.createFolder(this.project, arguments.foldername);
 		try {
 			folder.delete(true, null);
 		} catch (CoreException e) {
 			MPLPlugin.getDefault().logError(e);
 			return false;
 		}
-		CorePlugin.createFolder(interfaceProject.getProjectReference(), arguments.foldername);
+		CorePlugin.createFolder(this.project, arguments.foldername);
 		
 		int[] featureIDs = new int[interfaceProject.getFeatureCount()];
 		int i = 0;

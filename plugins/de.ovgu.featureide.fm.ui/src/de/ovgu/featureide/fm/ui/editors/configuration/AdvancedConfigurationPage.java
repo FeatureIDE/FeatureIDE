@@ -148,7 +148,7 @@ public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 		viewer.getTree().setRedraw(false);
 		viewer.setContentProvider(new ConfigurationContentProvider());
 		viewer.setLabelProvider(new AdvancedConfigurationLabelProvider());
-		viewer.setInput(configurationEditor.configuration);
+		viewer.setInput(configurationEditor.getConfiguration());
 		viewer.expandAll();
 		viewer.refresh();
 		if (!errorMessage())
@@ -159,11 +159,11 @@ public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 
 	private void removeHiddenFeatures() {
 		hiddenFeatures = new LinkedList<String>();
-		for (Feature feature : configurationEditor.configuration.getFeatureModel().getFeatures()) {
+		for (Feature feature : configurationEditor.getConfiguration().getFeatureModel().getFeatures()) {
 			if (feature.isHidden())
 				hiddenFeatures.add(feature.getName());
 		}
-		for (TreeElement feature : configurationEditor.configuration.getRoot().getChildren())
+		for (TreeElement feature : configurationEditor.getConfiguration().getRoot().getChildren())
 			removeHiddenElement(feature);
 	}
 	
@@ -179,8 +179,8 @@ public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 	}
 
 	private boolean errorMessage() { 
-		if (!configurationEditor.configuration.valid() && configurationEditor.configuration.number() == 0){
-			for (TreeElement feature : configurationEditor.configuration.getRoot().getChildren()) {
+		if (!configurationEditor.getConfiguration().isValid() && configurationEditor.getConfiguration().number() == 0){
+			for (TreeElement feature : configurationEditor.getConfiguration().getRoot().getChildren()) {
 					remove(feature);
 			}
 			viewer.getTree().getItem(0).setText("The feature model for " +
@@ -224,7 +224,7 @@ public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 	}
 	
 	protected void set(SelectableFeature feature, Selection selection) {
-		configurationEditor.configuration.setManual(feature, selection);
+		configurationEditor.getConfiguration().setManual(feature, selection);
 		updateForeground(viewer.getTree().getItem(0));
 	}
 	

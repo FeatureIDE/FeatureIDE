@@ -6,15 +6,17 @@ options {
 }
 
 tokens {
-	MANDATORY	='mandatory';
-	ABSTRACT	='abstract';
-	SOMEOF		='someOf';
-	ONEOF 		='oneOf';
-	IMPORT 		='import';
-	REFINES 	='refines';
-	CONCEPT 	='concept';
-	CONSTRAINT 	='constraint';
-	FEATURE 	='feature';
+	MANDATORY		='mandatory';
+	ABSTRACT		='abstract';
+	SOMEOF			='someOf';
+	ONEOF 			='oneOf';
+	CONCEPT 		='concept';
+	CINTERFACE		='cinterface';
+	CONSTRAINT 		='constraint';
+	FEATURE 		='feature';
+	USE				='use';
+	IMPORTINSTANCE	='instance';
+	IMPORTINTERFACE	='interface';
 
 	VAR_INT 	='int';
 	VAR_FLOAT 	='float';
@@ -45,18 +47,20 @@ tokens {
 	ATTR_OP_LESS       ='<';
 	ATTR_OP_GREATER_EQ ='>='; 
 	ATTR_OP_LESS_EQ    ='<=';
-
-	IMP;
+	
+	EMPTY;
 	CONSTR;
 	ACONSTR;
 	BASEEXT;
 	DEF;
 	FEAT;
 	GROUP;
-	INSTANCE;
 	ATTR;
 	UNARYOP;
 	OPERAND;
+	USES;
+	INST;
+	INTF;
 }
 
 @lexer::header {package de.ovgu.featureide.fm.core.io.velvet;}
@@ -73,18 +77,36 @@ public void emitErrorMessage(String msg) {
 }
 
 velvetModel
-	: imports? concept EOF
+	: (concept|cinterface) EOF
 	;
 	
-imports : (IMPORT name SEMI)+
-	-> ^(IMP name+)
+concept 
+	: CONCEPT ID  
+		(COLON conceptBaseExt)? (instanceImports interfaceImports | interfaceImports instanceImports | interfaceImports | instanceImports)? 
+		definitions?
+	-> ^(CONCEPT ID conceptBaseExt? instanceImports? interfaceImports? definitions?)
 	;
-	
-concept : REFINES? CONCEPT ID  (COLON conceptBaseExt)? definitions 
-	-> ^(CONCEPT ID REFINES? conceptBaseExt? definitions)
-	;
-	
+
 conceptBaseExt
+	: ID (COMMA ID)* 
+	-> ^(BASEEXT ID+)
+	;
+	
+instanceImports
+	: IMPORTINSTANCE ID name (COMMA ID name)* 
+	-> ^(INST (ID name)+)
+	;
+	
+interfaceImports
+	: IMPORTINTERFACE ID name (COMMA ID name)* 
+	-> ^(INTF (ID name)+)
+	;
+
+cinterface : CINTERFACE ID  (COLON interfaceBaseExt)? definitions 
+	-> ^(CINTERFACE ID interfaceBaseExt? definitions)
+	;
+	
+interfaceBaseExt
 	: ID (COMMA ID)* 
 	-> ^(BASEEXT ID+)
 	;
@@ -94,23 +116,25 @@ name: ID
 	;
 	
 definitions
-	: START_C def END_C
-	-> ^(DEF def)
+	: START_C definition END_C
+	-> ^(DEF definition? EMPTY)
 	;
 
-def	: nonFeatureDefinition* (
+definition 
+	: nonFeatureDefinition* (
 		(featureGroup nonFeatureDefinition*) |
-		(feature (feature | nonFeatureDefinition)*))?
+		(feature (feature | nonFeatureDefinition)*)
+	)?
 	;			
 	
 nonFeatureDefinition
-	: constraint 
-	| instance 
+	: constraint
+	| use
 	| attribute 
 	;
 	
-instance: ID name SEMI //conceptName
-	-> INSTANCE ID name
+use : USE name SEMI
+	-> ^(USES name)
 	;
 
 feature
@@ -120,8 +144,8 @@ feature
 	;
 
 featureGroup
-	: groupType START_C feature feature+ END_C
-	-> ^(GROUP groupType feature feature+)
+	: groupType START_C feature+ END_C
+	-> ^(GROUP groupType feature+)
 	;
 
 groupType
@@ -199,7 +223,7 @@ BOOLEAN	: 'true'
 	| 'false'
 	;
 	
-ID  :	('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
+ID  :	('a'..'z'|'A'..'Z'|'_'|'-') ('a'..'z'|'A'..'Z'|'0'..'9'|'_'|'-')*
     ;
 	
 IDPath	: ID ('.' ID)+
@@ -242,10 +266,15 @@ fragment
 UNICODE_ESC
     :   '\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
     ;
-    
-WS  : ( ' '
+     
+ WS  : ( ' '
     | '\t'
     | '\r'
     | '\n'
     ) {$channel=HIDDEN;}
     ;
+
+SL_COMMENT : ('//' ~('\r'|'\n')*) {skip();};  
+
+ML_COMMENT : ('/*' ~('*/')*) {skip();};
+

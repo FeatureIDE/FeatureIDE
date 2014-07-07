@@ -20,7 +20,8 @@
  */
 package de.ovgu.featureide.core.mpl.job;
 
-import de.ovgu.featureide.core.mpl.job.util.AChainJob;
+import de.ovgu.featureide.core.mpl.InterfaceProject;
+import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.job.util.AJobArguments;
 import de.ovgu.featureide.core.mpl.signature.ProjectSignatures.SignatureIterator;
 import de.ovgu.featureide.core.mpl.signature.ProjectStructure;
@@ -51,6 +52,11 @@ public class CreateProjectStructureJob extends AChainJob<CreateProjectStructureJ
 	
 	@Override
 	protected boolean work() {
+		InterfaceProject interfaceProject = MPLPlugin.getDefault().getInterfaceProject(this.project);
+		if (interfaceProject == null) {
+			MPLPlugin.getDefault().logWarning(this.project.getName() + " is no Interface Project!");
+			return false;
+		}
 		SignatureIterator it = interfaceProject.getProjectSignatures().createIterator();
 		it.addFilter(arguments.filter);
 		arguments.projectSig.construct(it, new FujiClassCreator());

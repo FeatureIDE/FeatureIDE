@@ -28,6 +28,7 @@ import org.eclipse.swt.widgets.Display;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.ui.mpl.actions.AProjectAction;
 import de.ovgu.featureide.ui.mpl.wizards.ChangeViewTagWizard;
+import de.ovgu.featureide.ui.mpl.wizards.WizardConstants;
 
 /**
  * Action to change the level of a view tag.
@@ -41,7 +42,9 @@ public class ChangeViewTagAction extends AProjectAction {
 		ChangeViewTagWizard wizard = new ChangeViewTagWizard("Change a view tag");
 		WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
 		if (dialog.open() == Dialog.OK) {
-			MPLPlugin.getDefault().scaleUpViewTag(project, wizard.getViewName(), wizard.getViewLevel());
+			MPLPlugin.getDefault().scaleUpViewTag(project, 
+					(String) wizard.getData(WizardConstants.KEY_OUT_VIEWNAME), 
+					(Integer) wizard.getData(WizardConstants.KEY_OUT_VIEWLEVEL));
 		}
 	}
 

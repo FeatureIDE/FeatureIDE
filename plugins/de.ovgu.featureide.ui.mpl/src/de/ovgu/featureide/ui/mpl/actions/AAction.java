@@ -53,8 +53,8 @@ public abstract class AAction implements IObjectActionDelegate {
 	protected boolean startAction() {
 		return true;
 	}
-	protected void endAction() {}
 	
+	protected void endAction() {}
 
 	@Override
 	public void selectionChanged(IAction action, ISelection selection) {

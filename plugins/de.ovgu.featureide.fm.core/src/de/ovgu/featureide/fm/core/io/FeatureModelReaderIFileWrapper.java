@@ -34,7 +34,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  * e.g. if working with Eclipse plugins
  * Otherwise only the classes extending {@link AbstractFeatureModelReader} are needed
  * 
- * @author Sönke Holthusen
+ * @author SÃ¶nke Holthusen
  */
 public class FeatureModelReaderIFileWrapper extends AbstractFeatureModelReader {
 	private AbstractFeatureModelReader reader;
@@ -51,6 +51,16 @@ public class FeatureModelReaderIFileWrapper extends AbstractFeatureModelReader {
 		return reader.featureModel;
 	}
 
+	/**
+	 * Reads a feature model from a string.
+	 * 
+	 * Please use {@link #setFile(IFile)} if you know the source of the feature
+	 * model.
+	 * 
+	 * @param text
+	 *            the textual representation of the feature model
+	 * @throws UnsupportedModelException
+	 */
 	public void readFromString(String text) throws UnsupportedModelException {
 		reader.readFromString(text);
 	}
@@ -82,5 +92,16 @@ public class FeatureModelReaderIFileWrapper extends AbstractFeatureModelReader {
 	protected void parseInputStream(InputStream inputStream)
 			throws UnsupportedModelException {
 		reader.parseInputStream(inputStream);
+	}
+
+	/**
+	 * Set the source file of the textual representation of the feature model.
+	 * 
+	 * @see #setFile(File)
+	 * @param featureModelFile
+	 */
+	public void setFile(IFile featureModelFile) {
+		reader.setFile(featureModelFile.getRawLocation().makeAbsolute()
+				.toFile());
 	}
 }

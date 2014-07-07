@@ -26,9 +26,9 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.mpl.InterfaceProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.io.IOConstants;
-import de.ovgu.featureide.core.mpl.job.util.AMonitorJob;
 import de.ovgu.featureide.core.mpl.job.util.AJobArguments;
 import de.ovgu.featureide.core.mpl.signature.ProjectSignatures;
 import de.ovgu.featureide.core.mpl.signature.ProjectSignatures.SignatureIterator;
@@ -59,6 +59,11 @@ public class PrintFeatureInterfacesJob extends AMonitorJob<PrintFeatureInterface
 	
 	@Override
 	protected boolean work() {
+		InterfaceProject interfaceProject = MPLPlugin.getDefault().getInterfaceProject(this.project);
+		if (interfaceProject == null) {
+			MPLPlugin.getDefault().logWarning(this.project.getName() + " is no Interface Project!");
+			return false;
+		}
 		ProjectSignatures projectSignatures = interfaceProject.getProjectSignatures();		
 		List<SelectableFeature> features = interfaceProject.getConfiguration().getFeatures();
 

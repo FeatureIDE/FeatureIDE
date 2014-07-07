@@ -18,12 +18,9 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.ui.mpl.wizards;
+package de.ovgu.featureide.ui.mpl.wizards.page;
 
-import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -31,19 +28,20 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import de.ovgu.featureide.ui.mpl.wizards.ChangeViewTagWizard;
+import de.ovgu.featureide.ui.mpl.wizards.WizardConstants;
+
 /**
- * A dialog page to specify the new view tag name and level.
+ * A dialog page for the {@link ChangeViewTagWizard}.
  * 
  * @author Sebastian Krieter
  */
-public class NewViewTagPage extends WizardPage {
+public class ChangeViewTagPage extends AbstractWizardPage {
 
-	private Text viewNameText;
-	private Label viewNameLabel;
+	private Text viewNameText, viewLevelText;
+	private Label viewNameLabel, viewLevelLabel;
 	
-	private String viewName = null;
-	
-	protected NewViewTagPage() {
+	public ChangeViewTagPage() {
 		super("");
 		setTitle("Select a composer");
 		setDescription("Creates a Multi-FeatureIDE project");
@@ -60,10 +58,10 @@ public class NewViewTagPage extends WizardPage {
 		projGridLayout.numColumns = 2;
 		
 		Group configGroup = new Group(container, SWT.NONE);
-		configGroup.setText("");
+		configGroup.setText("Scale Up View Tag");
 		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.horizontalSpan = 2;
-		gridData.verticalSpan = 1;
+		gridData.verticalSpan = 2;
 		
 		configGroup.setLayoutData(gridData);
 		configGroup.setLayout(projGridLayout);
@@ -77,40 +75,35 @@ public class NewViewTagPage extends WizardPage {
 		viewNameText = new Text(configGroup, SWT.BORDER | SWT.SINGLE);
 		viewNameText.setText("view1");
 		viewNameText.setLayoutData(gridData2);
-		addListeners();
-		dialogChanged();
-	}
-	
-	public String getViewName() {
-		return viewName;
-	}
+		
+		viewLevelLabel = new Label(configGroup, 0);
+		viewLevelLabel.setText("View Level: ");
+		viewLevelText = new Text(configGroup, SWT.BORDER | SWT.SINGLE);
+		viewLevelText.setText("1");
+		viewLevelText.setLayoutData(gridData2);
 
-	private void addListeners() {		
 		viewNameText.addKeyListener(new KeyPressedListener());
+		viewLevelText.addKeyListener(new KeyPressedListener());
+		
+		updatePage();
 	}
 	
-	private class KeyPressedListener implements KeyListener {
-		@Override
-		public void keyPressed(KeyEvent e) {
-		}
-
-		@Override
-		public void keyReleased(KeyEvent e) {
-			dialogChanged();
-		}
-	}
-
-	protected void dialogChanged() {
-		viewName = viewNameText.getText();
-		if (viewName.isEmpty()) {
-			updateStatus("Enter a view name");
-		} else {
-			updateStatus(null);
-		}
+	@Override
+	protected void putData() {
+		abstractWizard.putData(WizardConstants.KEY_OUT_VIEWNAME, viewNameText.getText());
+		abstractWizard.putData(WizardConstants.KEY_OUT_VIEWLEVEL, Integer.valueOf(viewLevelText.getText()));
 	}
 	
-	protected void updateStatus(String message) {
-		setErrorMessage(message);
-		setPageComplete(message == null);
-	}
+	@Override
+	protected String checkPage() {
+		if (viewNameText.getText().isEmpty()) {
+			return "Enter a view name";
+		}
+		try {
+			Integer.valueOf(viewLevelText.getText());
+		} catch (NumberFormatException e) {
+			return "Enter a number";
+		}
+		return null;
+	}	
 }

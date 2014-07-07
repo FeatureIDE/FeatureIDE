@@ -108,7 +108,7 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 		if (constraintAttribute == ConstraintAttribute.NORMAL) {
 			return;
 		}
-		if (constraintAttribute == ConstraintAttribute.VOID_MODEL){
+		if (constraintAttribute == ConstraintAttribute.VOID_MODEL) {
 			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 			setToolTip(VOID_LABEL);
 			return;
@@ -120,15 +120,14 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 			return;
 		}
 		
-		if (constraintAttribute == ConstraintAttribute.TAUTOLOGY){
-
+		if (constraintAttribute == ConstraintAttribute.TAUTOLOGY) {
 			setBackgroundColor(FMPropertyManager.getWarningColor());
 			setToolTip(TAUTOLOGY_LABEL);	
 			return;
 		}
 		
 		StringBuilder toolTip = new StringBuilder(); 
-		if (!constraint.getDeadFeatures().isEmpty()){
+		if (!constraint.getDeadFeatures().isEmpty()) {
 			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 			toolTip.append(DEAD_FEATURE);
 			ArrayList<String> deadFeatures = new ArrayList<String>(constraint.getDeadFeatures().size());

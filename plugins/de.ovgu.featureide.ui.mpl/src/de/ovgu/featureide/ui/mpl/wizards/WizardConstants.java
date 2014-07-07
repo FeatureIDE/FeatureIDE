@@ -27,10 +27,14 @@ package de.ovgu.featureide.ui.mpl.wizards;
  */
 public abstract class WizardConstants {
 	public static final String
-		KEY_FOLDER = "folder",
-		KEY_FEATURE = "feature",
-		KEY_DOCOPTIONS = "options",
-		KEY_CONFIGLIMIT = "configlimit",
-		KEY_VIEWLEVEL = "viewlevel",
-		KEY_VIEWNAME = "viewname";
+		KEY_OUT_FOLDER = "out_folder",
+		KEY_OUT_FEATURE = "out_feature",
+		KEY_OUT_DOCOPTIONS = "out_options",
+		KEY_OUT_CONFIGLIMIT = "out_configlimit",
+		KEY_OUT_VIEWLEVEL = "out_viewlevel",
+		KEY_OUT_VIEWNAME = "out_viewname",
+		KEY_OUT_PROJECT = "out_project",
+		KEY_OUT_FEATURES = "out_features",
+		
+		KEY_IN_FOLDER = "in_folder";
 }

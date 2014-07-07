@@ -30,11 +30,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.jdt.core.CompletionProposal;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.Signature;
@@ -44,15 +46,18 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.FeatureProjectNature;
 import de.ovgu.featureide.core.mpl.builder.InterfaceProjectNature;
+import de.ovgu.featureide.core.mpl.builder.MSPLNature;
 import de.ovgu.featureide.core.mpl.io.IOConstants;
 import de.ovgu.featureide.core.mpl.io.writer.JavaProjectWriter;
+import de.ovgu.featureide.core.mpl.job.CreateFujiSignaturesJob;
+import de.ovgu.featureide.core.mpl.job.CreateInterfaceJob;
+import de.ovgu.featureide.core.mpl.job.JobManager;
 import de.ovgu.featureide.core.mpl.job.PrintComparedInterfacesJob;
 import de.ovgu.featureide.core.mpl.job.PrintDocumentationJob;
 import de.ovgu.featureide.core.mpl.job.PrintDocumentationStatisticsJob;
 import de.ovgu.featureide.core.mpl.job.PrintExtendedSignaturesJob;
 import de.ovgu.featureide.core.mpl.job.PrintFeatureInterfacesJob;
 import de.ovgu.featureide.core.mpl.job.PrintStatisticsJob;
-import de.ovgu.featureide.core.mpl.job.StartJob;
 import de.ovgu.featureide.core.mpl.job.util.AJobArguments;
 import de.ovgu.featureide.core.mpl.job.util.IChainJob;
 import de.ovgu.featureide.core.mpl.signature.ProjectSignatures;
@@ -76,6 +81,8 @@ import de.ovgu.featureide.fm.core.PropertyConstants;
  */
 public class MPLPlugin extends AbstractCorePlugin {
 	public static final String PLUGIN_ID = "de.ovgu.featureide.core.mpl";
+
+	public static final QualifiedName mappingConfigID = new QualifiedName("mplproject.mappings", "currentMapping");
 
 	private static MPLPlugin plugin;
 	private final HashMap<String, InterfaceProject> projectMap = new HashMap<String, InterfaceProject>();
@@ -101,6 +108,52 @@ public class MPLPlugin extends AbstractCorePlugin {
 		super.stop(context);
 		plugin = null;
 		EditorTracker.dispose();
+	}
+	
+	public void addMSPLNature(IProject project) {
+		IFeatureProject curFeatureProject = CorePlugin.getFeatureProject(project);
+		if (curFeatureProject != null) {
+			try {				
+				IProjectDescription description = project.getDescription();
+				String[] natures = description.getNatureIds();
+				String[] newNatures = new String[natures.length + 1];
+				System.arraycopy(natures, 0, newNatures, 0, natures.length);
+				newNatures[natures.length] = MSPLNature.NATURE_ID;
+				description.setNatureIds(newNatures);
+				project.setDescription(description, null);
+
+				// create directories for MPL
+				IFolder mplFolder = project.getFolder("Interfaces");
+				if (!mplFolder.exists())
+					mplFolder.create(true, true, null);
+				
+				IFolder importFolder = project.getFolder("MPL");
+				if (!importFolder.exists())
+					importFolder.create(true, true, null);
+				
+				IFolder mappingFolder = project.getFolder("InterfaceMapping");
+				if (!mappingFolder.exists())
+					mappingFolder.create(true, true, null);
+				
+				IFile mappingFile = mappingFolder.getFile("default.config");
+				if (!mappingFile.exists()) {
+					mappingFile.create(new ByteArrayInputStream(new byte[0]), true, null);
+				}
+				project.setPersistentProperty(mappingConfigID, "default.config");
+				
+				// create interfaces mapping file
+				IFile mplVelvet = project.getFile("mpl.velvet");
+				if (!mplVelvet.exists()) {
+					// IFile.create() needs an source
+					byte[] bytes = ("concept " + project.getName() + " : "
+							+ project.getName()).getBytes();
+					InputStream source = new ByteArrayInputStream(bytes);
+					mplVelvet.create(source, true, null);
+				}
+			} catch (CoreException e) {
+				logError(e);
+			}
+		}
 	}
 	
 	public void addInterfaceNature(IProject project) {
@@ -194,7 +247,7 @@ public class MPLPlugin extends AbstractCorePlugin {
 	
 	public boolean isInterfaceProject(IProject project) {
 		try {
-			return project.hasNature(InterfaceProjectNature.NATURE_ID);
+			return project.isAccessible() && project.hasNature(InterfaceProjectNature.NATURE_ID);
 		} catch (CoreException e) {
 			logError(e);
 			return false;
@@ -235,6 +288,14 @@ public class MPLPlugin extends AbstractCorePlugin {
 		new JavaProjectWriter(getInterfaceProject(featureListFile.getProject())).buildJavaProject(featureListFile, name);
 	}
 	
+	public void setCurrentMapping(IProject project, String name) {
+		try {
+			project.setPersistentProperty(mappingConfigID, name);
+		} catch (CoreException e) {
+			logError(e);
+		}
+	}
+	
 	public void addViewTag(IProject project, String name) {
 		InterfaceProject interfaceProject = getInterfaceProject(project);
 		if (interfaceProject != null) {
@@ -263,7 +324,6 @@ public class MPLPlugin extends AbstractCorePlugin {
 		InterfaceProject interfaceProject = getInterfaceProject(project);
 		if (interfaceProject != null) {
 			interfaceProject.loadSignatures(true);
-//			interfaceProject.loadSignaturesJob(true);
 		}
 	}
 	
@@ -300,20 +360,23 @@ public class MPLPlugin extends AbstractCorePlugin {
 	}
 	
 	public void startJobs(LinkedList<IProject> projects, AJobArguments arguments) {
-		final IChainJob[] jobs = new IChainJob[projects.size()];
-		for (int i = 0; i < jobs.length; i++) {
-			jobs[i] = arguments.createJob();
-		}
-		final InterfaceProject[] interfaceProjects = new InterfaceProject[projects.size()];
-		int i = 0;
+//		final LinkedList<IChainJob> jobs = new LinkedList<IChainJob>();
+		final Object idObject = new Object();
 		for (IProject p : projects) {
-			InterfaceProject interfaceProject = getInterfaceProject(p.getName());
-			if (interfaceProject != null) {
-				interfaceProjects[i] = interfaceProject;
-				jobs[i++].setInterfaceProject(interfaceProject);
+			InterfaceProject interfaceProject = getInterfaceProject(p);
+			if (interfaceProject != null && interfaceProject.getProjectSignatures() == null) {
+				IChainJob job = new CreateFujiSignaturesJob();
+				job.setProject(p);
+				JobManager.addJob(idObject, job);
+//				jobs.add(job);
 			}
+			IChainJob job = arguments.createJob();
+			job.setProject(p);
+//			jobs.add(job);
+			JobManager.addJob(idObject, job);
+			
 		}
-		new StartJob.Arguments(jobs).createJob().schedule();
+//		new StartJob.Arguments(jobs).createJob().schedule();
 	}
 	
 	public List<CompletionProposal> extendedModules_getCompl(InterfaceProject interfaceProject, String featureName) {
@@ -323,8 +386,6 @@ public class MPLPlugin extends AbstractCorePlugin {
 			if (signatures != null) {
 				SignatureIterator it = signatures.createIterator();
 				it.addFilter(new ContextFilter(featureName, interfaceProject));
-				
-//				Iterator<AbstractSignature> it = signatures.getIterator(new ContextFilter(featureName, interfaceProject));
 				
 				while (it.hasNext()) {
 					AbstractSignature curMember = it.next();
@@ -383,10 +444,7 @@ public class MPLPlugin extends AbstractCorePlugin {
 	}
 	
 	public int getFlagOfSignature(AbstractSignature element){
-//		if (element instanceof AbstractClassFragment) {
-//			return 0;//GUIDefaults.IMAGE_CLASS;
-//		} else 
-			if (element instanceof AbstractMethodSignature) {
+		if (element instanceof AbstractMethodSignature) {
 			//TODO MPL: constructor icon
 			switch (((AbstractMethodSignature) element).getVisibilty()) {
 			case AbstractSignature.VISIBILITY_DEFAULT: return Flags.AccDefault;
@@ -401,10 +459,7 @@ public class MPLPlugin extends AbstractCorePlugin {
 			case AbstractSignature.VISIBILITY_PROTECTED: return Flags.AccProtected;
 			case AbstractSignature.VISIBILITY_PUBLIC: return Flags.AccPublic;
 			}
-		} 
-//		else if (element instanceof AbstractClassSignature) {
-//			return F;//GUIDefaults.IMAGE_CLASS;
-//		}
+		}
 		return 0;
 	}
 
@@ -424,5 +479,11 @@ public class MPLPlugin extends AbstractCorePlugin {
 			}
 		}
 		return null;
+	}
+	
+	public void createInterface(IProject mplProject, IFeatureProject featureProject, Collection<String> featureNames) {
+		LinkedList<IProject> projectList = new LinkedList<IProject>();
+		projectList.add(mplProject);
+		startJobs(projectList, new CreateInterfaceJob.Arguments(featureProject, featureNames));
 	}
 }

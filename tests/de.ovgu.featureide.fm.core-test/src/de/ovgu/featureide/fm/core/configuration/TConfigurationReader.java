@@ -96,7 +96,7 @@ protected static File MODEL_FILE_FOLDER = getFolder();
 		ConfigurationReader r = new ConfigurationReader(c);
 		r.readFromString("C#");
 
-		assertFalse(c.valid());
+		assertFalse(c.isValid());
 	}
 
 	@Test
@@ -107,7 +107,7 @@ protected static File MODEL_FILE_FOLDER = getFolder();
 			c.setManual("Python Ruby", Selection.SELECTED);
 			c.setManual("Bash   script   ", Selection.UNSELECTED);
 			c.setManual("C++", Selection.SELECTED);
-			assertFalse(c.valid());
+			assertFalse(c.isValid());
 	}
 	
 	
@@ -119,7 +119,7 @@ protected static File MODEL_FILE_FOLDER = getFolder();
 			c.setManual("Python Ruby", Selection.SELECTED);
 			c.setManual("Bash   script   ", Selection.SELECTED);
 			c.setManual("C++", Selection.SELECTED);
-			assertTrue(c.valid());
+			assertTrue(c.isValid());
 	}
 	
 	
@@ -129,7 +129,7 @@ protected static File MODEL_FILE_FOLDER = getFolder();
 		Configuration c = new Configuration(FM_test_1, false);
 		ConfigurationReader r = new ConfigurationReader(c);
 		r.readFromString("C# \njute \n \"Bash   script   \"");
-		assertFalse(c.valid());
+		assertFalse(c.isValid());
 	}
 	
 	@Test
@@ -138,7 +138,7 @@ protected static File MODEL_FILE_FOLDER = getFolder();
 		Configuration c = new Configuration(FM_test_1, false);
 		ConfigurationReader r = new ConfigurationReader(c);
 		r.readFromString("C# \njute \n \"Bash   script   \" \"Python Ruby\"");
-		assertTrue(c.valid());
+		assertTrue(c.isValid());
 	}
 	
 	@Test
@@ -147,7 +147,7 @@ protected static File MODEL_FILE_FOLDER = getFolder();
 		Configuration c = new Configuration(FM_test_1, false);
 		ConfigurationReader r = new ConfigurationReader(c);
 		r.readFromString("C# \njute \n \"Bash   script   \" \n\"Python Ruby\" \n\"C++\"");
-		assertTrue(c.valid());
+		assertTrue(c.isValid());
 	}
 	
 	@Test
@@ -156,7 +156,7 @@ protected static File MODEL_FILE_FOLDER = getFolder();
 		Configuration c = new Configuration(FM_test_1, false);
 		ConfigurationReader r = new ConfigurationReader(c);
 		r.readFromString("C# \njute \n \"Bash   script    \n\"Python Ruby\" \n\"C++\"");
-		assertFalse(c.valid());
+		assertFalse(c.isValid());
 	}
 	
 	@Test
@@ -165,7 +165,7 @@ protected static File MODEL_FILE_FOLDER = getFolder();
 		Configuration c = new Configuration(FM_test_1, false);
 		ConfigurationReader r = new ConfigurationReader(c);
 		r.readFromString("C# \nj ute \n \"Bash   script    \"\n\"Python Ruby\" \n\"C++\"");
-		assertFalse(c.valid());
+		assertFalse(c.isValid());
 	}
 	
 	@Test
@@ -174,7 +174,7 @@ protected static File MODEL_FILE_FOLDER = getFolder();
 		Configuration c = new Configuration(FM_test_1, false);
 		ConfigurationReader r = new ConfigurationReader(c);
 		r.readFromString("C# \njute \n \"Bash   script   \" Python Ruby\" \n\"C++\"");
-		assertFalse(c.valid());
+		assertFalse(c.isValid());
 	}
 	
 	@Test
@@ -183,6 +183,6 @@ protected static File MODEL_FILE_FOLDER = getFolder();
 		Configuration c = new Configuration(FM_test_1, false);
 		ConfigurationReader r = new ConfigurationReader(c);
 		r.readFromString("jute \"Bash   script   \" \"Python C# Ruby\" \"C++\"");
-		assertTrue(c.valid());
+		assertTrue(c.isValid());
 	}
 }

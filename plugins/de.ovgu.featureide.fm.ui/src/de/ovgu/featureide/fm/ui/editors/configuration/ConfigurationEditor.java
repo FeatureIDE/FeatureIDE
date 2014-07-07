@@ -28,12 +28,12 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
-import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -65,6 +65,7 @@ import org.eclipse.ui.part.MultiPageEditorPart;
 import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
+import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -74,8 +75,9 @@ import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
+import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
+import de.ovgu.featureide.fm.core.io.ModelIOFactory;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 
@@ -89,7 +91,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  */
 public class ConfigurationEditor extends MultiPageEditorPart implements
 		GUIDefaults, PropertyConstants, PropertyChangeListener,
-		IResourceChangeListener {
+		IResourceChangeListener, IConfigurationEditor {
 	
 	public static final String ID = FMUIPlugin.PLUGIN_ID + ".editors.configuration.ConfigurationEditor";
 
@@ -165,7 +167,21 @@ public class ConfigurationEditor extends MultiPageEditorPart implements
 		super.setInput(input);
 		getSite().getPage().addPartListener(iPartListener);
 		IProject project = file.getProject();
-		IResource res = project.findMember("model.xml");
+		boolean mplConfig = false;
+
+		// if mpl.velvet exists then it is a multi product line
+		IResource res = project.findMember("mpl.velvet");
+		if (res != null && res instanceof IFile) {
+			featureModel = new ExtendedFeatureModel();
+			IContainer parentFolder = file.getParent();
+			if (parentFolder != null && "InterfaceMapping".equals(parentFolder.getName())) {
+				mplConfig = true;
+			}
+		}
+		else {
+			res = project.findMember("model.xml");
+		}
+		
 		if (res instanceof IFile) {
 			modelFile = ((IFile)res).getLocation().toFile();
 		}
@@ -196,9 +212,14 @@ public class ConfigurationEditor extends MultiPageEditorPart implements
 				}
 			}
 		}
-
-		readFeatureModel();
-		configuration = new Configuration(featureModel, true);
+		
+		readFeatureModel();		
+		
+		if (mplConfig) {
+			configuration = new Configuration(((ExtendedFeatureModel)featureModel).getMappingModel(), true);
+		} else {
+			configuration = new Configuration(featureModel, true);
+		}
 		try {
 			new ConfigurationReader(configuration).readFromFile(file);
 			isPageModified = isModified(file);
@@ -237,8 +258,8 @@ public class ConfigurationEditor extends MultiPageEditorPart implements
 				.getWorkbenchWindow().getShell(), SWT.MULTI);
 		dialog.setText("Select the corresponding Featuremodel.");
 		dialog.setFileName("model.xml");
-		dialog.setFilterExtensions(new String [] {"*.xml"});
-		dialog.setFilterNames(new String[]{ "XML *.xml"});
+		dialog.setFilterExtensions(new String [] {"*.xml", "*.velvet"});
+		dialog.setFilterNames(new String[]{ "XML *.xml", "VELVET *.velvet"});
 		dialog.setFilterPath(file.getProject().getLocation().toOSString());
 		return dialog.open();
 	}
@@ -403,7 +424,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements
 
 	private void setConfiguration() {
 		readFeatureModel();
-		String text = new ConfigurationWriter(configuration).writeIntoString(file);
+		String text = new ConfigurationWriter(configuration).writeIntoString();
 		configuration = new Configuration(featureModel, true);
 		try {
 			new ConfigurationReader(configuration).readFromString(text);
@@ -417,7 +438,13 @@ public class ConfigurationEditor extends MultiPageEditorPart implements
 	 */
 	private void readFeatureModel() {
 		featureModel.initFMComposerExtension(file.getProject());
-		XmlFeatureModelReader reader = new XmlFeatureModelReader(featureModel);
+
+		AbstractFeatureModelReader reader;
+
+		if (featureModel instanceof ExtendedFeatureModel)
+			reader = ModelIOFactory.getModelReader(featureModel, ModelIOFactory.TYPE_VELVET);
+		else
+			reader = ModelIOFactory.getModelReader(featureModel, ModelIOFactory.TYPE_XML);
 		try {
 			reader.readFromFile(modelFile);
 		} catch (FileNotFoundException e) {
@@ -498,7 +525,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements
 			IDocument document = provider.getDocument(sourceEditor
 					.getEditorInput());
 			String text = document.get();
-			if (!new ConfigurationWriter(configuration).writeIntoString(file)
+			if (!new ConfigurationWriter(configuration).writeIntoString()
 					.equals(text)) {
 				configuration = new Configuration(featureModel, true);
 				try {
@@ -523,7 +550,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements
 		if (oldPageIndex != -1) {
 			if (newPageIndex == configurationPage.getIndex()){
 				// reset the deselection of advanced page to undefined selection
-				Set<Feature> selectedFeatures = configuration.getSelectedFeatures();
+				List<Feature> selectedFeatures = configuration.getSelectedFeatures();
 				for (SelectableFeature feature : configuration.getFeatures()) {
 					if (feature.getAutomatic() == Selection.UNDEFINED) {
 						if (feature.getManual() == Selection.UNSELECTED) {
@@ -694,5 +721,20 @@ public class ConfigurationEditor extends MultiPageEditorPart implements
 				}
 			});
 		}
+	}
+
+	@Override
+	public Configuration getConfiguration() {
+		return configuration;
+	}
+
+	@Override
+	public IFile getFile() {
+		return file;
+	}
+
+	@Override
+	public File getModelFile() {
+		return modelFile;
 	}
 }

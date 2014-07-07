@@ -29,6 +29,7 @@ import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 
+import de.ovgu.featureide.fm.core.ExtendedFeature;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureStatus;
@@ -171,7 +172,23 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 			setBorder(FMPropertyManager.getDeadFeatureBorder(feature.isConstraintSelected()));
 			toolTip = VOID;
 		}
-		
+
+		if (feature instanceof ExtendedFeature) {
+			ExtendedFeature extendedFeature = (ExtendedFeature) feature;
+
+			if (extendedFeature.isInstance()) {
+				setBorder(FMPropertyManager.getImportedFeatureBorder());
+			}
+
+			if (extendedFeature.isInherited()) {
+				setBorder(FMPropertyManager.getInheritedFeatureBorder());
+			}
+
+			if (extendedFeature.isInterface()) {
+				setBorder(FMPropertyManager.getInterfacedFeatureBorder());
+			}
+		}
+
 		String description = feature.getDescription();
 		if (description != null && !description.equals(" ")) {
 			toolTip += "\r\n\r\n" + "Description:\r\n" + description;

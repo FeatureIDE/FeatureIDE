@@ -46,7 +46,7 @@ abstract class DeprecatedFeatureModel {
 	abstract FMComposerManager getFMComposerManager(final IProject project);
     
     /**
-     * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#analyzeFeatureModel()} instead. 
+     * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#analyzeFeatureModel()} instead. 
      */
 	@Deprecated
 	public HashMap<Object, Object> analyzeFeatureModel() {
@@ -55,7 +55,7 @@ abstract class DeprecatedFeatureModel {
 	
 
 	/**
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#isValid()} instead.
+	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#isValid()} instead.
 	 */
 	@Deprecated
 	public boolean isValid() throws TimeoutException {
@@ -63,7 +63,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#checkImplies(Set, Set)} instead.
+	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#checkImplies(Set, Set)} instead.
 	 */
 	@Deprecated
 	public boolean checkImplies(Set<Feature> a, Set<Feature> b) throws TimeoutException {
@@ -71,7 +71,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#checkCondition(Node)} instead.
+	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#checkCondition(Node)} instead.
 	 */
 	@Deprecated
 	public boolean checkCondition(Node condition) {
@@ -79,7 +79,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#areMutualExclusive(Set, List)} instead.
+	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#areMutualExclusive(Set, List)} instead.
 	 */
 	@Deprecated
 	public boolean areMutualExclusive(Set<Feature> context,
@@ -88,7 +88,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#mayBeMissing(Set, List)} instead.
+	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#mayBeMissing(Set, List)} instead.
 	 */
 	@Deprecated
 	public boolean mayBeMissing(Set<Feature> context,
@@ -97,7 +97,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#exists(Set)} instead.
+	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#exists(Set)} instead.
 	 */
 	@Deprecated
 	public boolean exists(Set<Feature> features) throws TimeoutException {
@@ -105,7 +105,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#conjunct(Set)} instead.
+	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#conjunct(Set)} instead.
 	 */
 	@Deprecated
 	public Node conjunct(Set<Feature> b) {
@@ -113,7 +113,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#countConcreteFeatures()} instead.
+	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#countConcreteFeatures()} instead.
 	 */
 	@Deprecated
 	public int countConcreteFeatures() {
@@ -121,7 +121,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#countHiddenFeatures()} instead.
+	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#countHiddenFeatures()} instead.
 	 */
 	@Deprecated
 	public int countHiddenFeatures() {
@@ -129,7 +129,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#countTerminalFeatures()} instead.
+	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#countTerminalFeatures()} instead.
 	 */
 	@Deprecated
 	public int countTerminalFeatures() {
@@ -137,7 +137,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#commonFeatures(long, Object...)} instead.
+	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#commonFeatures(long, Object...)} instead.
 	 */
 	@Deprecated
 	public LinkedList<String> commonFeatures(long timeout,
@@ -146,14 +146,14 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#getDeadFeatures()} instead.
+	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#getDeadFeatures()} instead.
 	 */
 	@Deprecated
 	public LinkedList<Feature> getDeadFeatures() {
 		return new LinkedList<Feature>(getAnalyser().getDeadFeatures());
 	}
 	/**
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelLayout#getLegendPos()} instead.
+	 * @deprecated Will be removed in a future release. Use {@link FeatureModelLayout#getLegendPos()} instead.
 	 */
 	@Deprecated
 	public FMPoint getLegendPos() {
@@ -161,7 +161,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelLayout#setLegendPos(int, int)} instead.
+	 * @deprecated Will be removed in a future release. Use {@link FeatureModelLayout#setLegendPos(int, int)} instead.
 	 */
 	@Deprecated
 	public void setLegendPos(int x, int y) {
@@ -169,7 +169,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelLayout#setLegendAutoLayout(boolean)} instead.
+	 * @deprecated Will be removed in a future release. Use {@link FeatureModelLayout#setLegendAutoLayout(boolean)} instead.
 	 */
 	@Deprecated
 	public void setLegendAutoLayout(boolean b) {
@@ -177,7 +177,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelLayout#hasLegendAutoLayout()} instead.
+	 * @deprecated Will be removed in a future release. Use {@link FeatureModelLayout#hasLegendAutoLayout()} instead.
 	 */
 	@Deprecated
 	public boolean hasLegendAutoLayout() {
@@ -185,7 +185,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelLayout#hasFeaturesAutoLayout()} instead.
+	 * @deprecated Will be removed in a future release. Use {@link FeatureModelLayout#hasFeaturesAutoLayout()} instead.
 	 */
 	@Deprecated
 	public boolean hasFeaturesAutoLayout() {
@@ -193,7 +193,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelLayout#showHiddenFeatures()} instead.
+	 * @deprecated Will be removed in a future release. Use {@link FeatureModelLayout#showHiddenFeatures()} instead.
 	 */
 	@Deprecated
 	public boolean showHiddenFeatures() {
@@ -201,7 +201,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelLayout#showHiddenFeatures(boolean)} instead.
+	 * @deprecated Will be removed in a future release. Use {@link FeatureModelLayout#showHiddenFeatures(boolean)} instead.
 	 */
 	@Deprecated
 	public void showHiddenFeatures(boolean b) {
@@ -209,7 +209,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelLayout#verticalLayout()} instead.
+	 * @deprecated Will be removed in a future release. Use {@link FeatureModelLayout#verticalLayout()} instead.
 	 */
 	@Deprecated
 	public boolean verticalLayout() {
@@ -217,7 +217,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelLayout#verticalLayout(boolean)} instead.
+	 * @deprecated Will be removed in a future release. Use {@link FeatureModelLayout#verticalLayout(boolean)} instead.
 	 */
 	@Deprecated
 	public void verticalLayout(boolean b) {
@@ -230,7 +230,7 @@ abstract class DeprecatedFeatureModel {
 	}
 	
 	/**
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelLayout#setLayout(int)} instead.
+	 * @deprecated Will be removed in a future release. Use {@link FeatureModelLayout#setLayout(int)} instead.
 	 */
 	@Deprecated
 	public void setLayout(int newLayoutAlgorithm) {
@@ -238,7 +238,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelLayout#getLayoutAlgorithm()} instead.
+	 * @deprecated Will be removed in a future release. Use {@link FeatureModelLayout#getLayoutAlgorithm()} instead.
 	 */
 	@Deprecated
 	public int getLayoutAlgorithm() {
@@ -246,7 +246,7 @@ abstract class DeprecatedFeatureModel {
 	}
 	
 	/**
-	 * @Deprecated Will be removed in a future release. Use {@link RenamingsManager#getOldName(String)} instead.
+	 * @deprecated Will be removed in a future release. Use {@link RenamingsManager#getOldName(String)} instead.
 	 */
 	@Deprecated
 	public String getOldName(String name) {
@@ -254,7 +254,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @Deprecated Will be removed in a future release. Use {@link RenamingsManager#getNewName(String)} instead.
+	 * @deprecated Will be removed in a future release. Use {@link RenamingsManager#getNewName(String)} instead.
 	 */
 	@Deprecated
 	public String getNewName(String name) {
@@ -262,7 +262,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @Deprecated Will be removed in a future release. Use {@link RenamingsManager#renameFeature(String, String)} instead.
+	 * @deprecated Will be removed in a future release. Use {@link RenamingsManager#renameFeature(String, String)} instead.
 	 */
 	@Deprecated
 	public void renameFeature(String oldName, String newName) {
@@ -270,7 +270,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @Deprecated Will be removed in a future release. Use {@link RenamingsManager#performRenamings()} instead.
+	 * @deprecated Will be removed in a future release. Use {@link RenamingsManager#performRenamings()} instead.
 	 */
 	@Deprecated
 	public void performRenamings() {
@@ -278,7 +278,7 @@ abstract class DeprecatedFeatureModel {
 	}
 	
 	/**
-	 * @Deprecated Will be removed in a future release. Use {@link RenamingsManager#isRenamed()} instead.
+	 * @deprecated Will be removed in a future release. Use {@link RenamingsManager#isRenamed()} instead.
 	 */
 	@Deprecated
 	public boolean isRenamed() {
@@ -286,7 +286,7 @@ abstract class DeprecatedFeatureModel {
 	}
 	
 	/**
-	 * @Deprecated Will be removed in a future release. Use {@link RenamingsManager#performRenamings(IFile)} instead.
+	 * @deprecated Will be removed in a future release. Use {@link RenamingsManager#performRenamings(IFile)} instead.
 	 */
 	@Deprecated
 	public void performRenamings(IFile file) {
@@ -294,7 +294,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @Deprecated Will be removed in a future release. Use {@link RenamingsManager#getOldFeatureNames()} instead.
+	 * @deprecated Will be removed in a future release. Use {@link RenamingsManager#getOldFeatureNames()} instead.
 	 */
 	@Deprecated
 	public Set<String> getOldFeatureNames() {
@@ -302,7 +302,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @Deprecated Will be removed in a future release. Use {@link FMComposerManager#setComposerID(String, Object)} instead.
+	 * @deprecated Will be removed in a future release. Use {@link FMComposerManager#setComposerID(String, Object)} instead.
 	 */
 	@Deprecated
 	public void setComposerID(String string, FMComposerExtension comp) {
@@ -310,7 +310,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#getCachedDeadFeatures()} instead.
+	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#getCachedDeadFeatures()} instead.
 	 */
 	@Deprecated
 	public LinkedList<Feature> getCalculatedDeadFeatures() {
@@ -318,7 +318,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @Deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#valid()} instead.
+	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#valid()} instead.
 	 */
 	@Deprecated
 	public boolean valid() {
@@ -327,7 +327,7 @@ abstract class DeprecatedFeatureModel {
 
 
 	/**
-	 * @Deprecated Will be removed in a future release. 
+	 * @deprecated Will be removed in a future release. 
 	 * Use {@link FeatureModelAnalyzer#getCachedFalseOptionalFeatures()} instead.
 	 * Or use {@link FeatureModelAnalyzer#getFalseOptionalFeatures()} to recalculate false optional features.
 	 */

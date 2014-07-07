@@ -59,13 +59,11 @@ import org.prop4j.SatSolver;
 import splar.core.fm.FeatureModelException;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.StoppableJob;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
-import de.ovgu.featureide.fm.core.configuration.FeatureNotFoundException;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.ui.UIPlugin;
@@ -685,7 +683,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 				}
 
 			}
-			if (configuration.valid()) {
+			if (configuration.isValid()) {
 				LinkedList<String> selectedFeatures3 = new LinkedList<String>();
 				for (String f : selected.split("\\s+")) {
 					if (!"".equals(f)) {

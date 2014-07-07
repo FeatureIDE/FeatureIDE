@@ -56,7 +56,7 @@ public class AdvancedConfigurationLabelProvider extends ColumnLabelProvider
 	}
 
 	public static String getRootlabel(Configuration configuration) {
-		String s = configuration.valid() ? "valid" : "invalid";
+		String s = configuration.isValid() ? "valid" : "invalid";
 		s += ", ";
 		long number = configuration.number();
 		if (number < 0)

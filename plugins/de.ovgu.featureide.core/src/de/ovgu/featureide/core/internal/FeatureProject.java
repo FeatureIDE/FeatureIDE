@@ -64,6 +64,7 @@ import de.ovgu.featureide.core.builder.ExtensibleFeatureProjectBuilder;
 import de.ovgu.featureide.core.builder.FeatureProjectNature;
 import de.ovgu.featureide.core.builder.IComposerExtension;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
+import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelFile;
@@ -73,11 +74,12 @@ import de.ovgu.featureide.fm.core.WaitingJob;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.FeatureOrderReader;
+import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
+import de.ovgu.featureide.fm.core.io.ModelIOFactory;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslReader;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 
 /**
@@ -231,9 +233,20 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		super(aProject);
 		project = aProject;
 
-		featureModel = new FeatureModel();
+		AbstractFeatureModelReader tmpModelReader;
+
+		if (project.getFile("mpl.velvet").exists()) {
+			modelFile = new FeatureModelFile(project.getFile("mpl.velvet"));
+			featureModel = new ExtendedFeatureModel();
+			tmpModelReader = ModelIOFactory.getModelReader(featureModel, ModelIOFactory.TYPE_VELVET);
+		} else {
+			modelFile = new FeatureModelFile(project.getFile("model.xml"));
+			featureModel = new FeatureModel();
+			tmpModelReader = ModelIOFactory.getModelReader(featureModel, ModelIOFactory.TYPE_XML);
+		}
+
 		featureModel.addListener(new FeatureModelChangeListner());
-		modelReader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(featureModel));
+		modelReader = new FeatureModelReaderIFileWrapper(tmpModelReader);
 
 		// initialize project structure
 		try {
@@ -243,8 +256,8 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			LOGGER.logError(e);
 		}
 
-		modelFile = new FeatureModelFile(project.getFile("model.xml"));
 		String projectBuildPath = getProjectBuildPath();
+
 		try {
 			
 			// just create the bin folder if project hat only the FeatureIDE
@@ -1042,7 +1055,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 					for (IFile file : files) {
 						monitor.subTask("Check validity of " + file.getName());
 						reader.readFromFile(file);
-						if (!config.valid()) {
+						if (!config.isValid()) {
 							String name = file.getName();
 							name = name.substring(0, name.lastIndexOf('.'));
 							String message = "Configuration '" + name

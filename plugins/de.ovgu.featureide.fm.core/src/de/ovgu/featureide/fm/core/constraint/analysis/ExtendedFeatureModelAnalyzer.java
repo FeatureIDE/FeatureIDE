@@ -27,7 +27,6 @@ import org.sat4j.specs.TimeoutException;
 import com.google.common.collect.BiMap;
 
 import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
-import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 
 /**
@@ -44,24 +43,27 @@ public class ExtendedFeatureModelAnalyzer extends FeatureModelAnalyzer  {
 	private UniqueId idGen;
 	private RestrictionFactory<DeRestriction> deFactory;
 
-	public ExtendedFeatureModelAnalyzer(FeatureModel fm) {
+	public ExtendedFeatureModelAnalyzer(ExtendedFeatureModel fm) {
 		super(fm);
 
-		this.efm = (ExtendedFeatureModel) fm;
+		this.efm = fm;
 		this.idGen = new UniqueId();
 		this.map = Translator.buildFeatureNameMap(efm, idGen);
 		this.deFactory = new DeRestrictionFactory();
 	}
 	
-	@Override
-	public boolean isValid() throws TimeoutException {		
+	public boolean isValid_PBSolver() throws TimeoutException {		
 		if (deFm == null)
 			setUpDeRestrictions();
 		
 		PBSolver solver = new SAT4JPBSolver();
 		solver.addRestrictions(deFm);
 		
-		return solver.isSatisfiable();
+		if (!solver.isSatisfiable()) {
+			return false;
+		}
+		
+		return true;
 	}
 	
 	private void setUpDeRestrictions() {

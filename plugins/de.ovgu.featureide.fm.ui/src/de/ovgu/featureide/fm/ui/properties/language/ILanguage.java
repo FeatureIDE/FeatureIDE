@@ -35,7 +35,6 @@ public interface ILanguage {
 	public String getRedundantConst();
 	
 	/**
-
  	 * @return The translation for: "Unsatisfiable constraint"
 	 */	
 	public String getUnsatisfiableConst();
@@ -75,6 +74,21 @@ public interface ILanguage {
 	 * @return The word for: "abstract"
 	 */
 	public String getAbstract();
+	
+	/**
+	 * @return The word for: "imported"
+	 */
+	public String getImported();
+	
+	/**
+	 * @return The word for: "inherited"
+	 */
+	public String getInherited();
+	
+	/**
+	 * @return The word for: "interfaced"
+	 */
+	public String getInterfaced();
 	
 	/**
 	 * @return The word for: "concrete"

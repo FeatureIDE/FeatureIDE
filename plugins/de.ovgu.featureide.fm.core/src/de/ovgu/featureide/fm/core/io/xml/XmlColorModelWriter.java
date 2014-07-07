@@ -64,7 +64,7 @@ public class XmlColorModelWriter extends XmlFeatureModelWriter {
     	
     	root.appendChild(colorSchemesRoot);
     	
-		for (Feature feat : featureModel.getFeatureTable().values()) {
+		for (Feature feat : featureModel.getFeatures()) {
 			ColorList colors = feat.getColorList();
 
 			boolean noColor = true;

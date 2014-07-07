@@ -48,6 +48,6 @@ public class BuildDocStatisticsAction extends AProjectJobAction {
 	@Override
 	protected void endAction() {
 		MPLPlugin.getDefault().buildDocumentationStatistics(projects, 
-				(String) wizard.getData(WizardConstants.KEY_FOLDER));
+				(String) wizard.getData(WizardConstants.KEY_OUT_FOLDER));
 	}
 }

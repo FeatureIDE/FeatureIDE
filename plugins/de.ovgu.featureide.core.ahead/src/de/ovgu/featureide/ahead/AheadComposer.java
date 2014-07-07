@@ -158,7 +158,7 @@ public class AheadComposer extends ComposerExtensionClass {
 		boolean changed = false;
 		if (fileContent.startsWith("import ")) {
 			changed = true;
-			fileContent = "\r\n" + fileContent;
+			fileContent = NEWLINE + fileContent;
 		}
 		if (!fileContent.equals(fileContent.replaceFirst("layer\\s+\\w+\\s*;", ""))
 				&& fileContent.replaceFirst("layer\\s+\\w+\\s*;", LAYER_REPLACING).indexOf(LAYER_REPLACING) < fileContent.indexOf('{')) {
@@ -181,7 +181,7 @@ public class AheadComposer extends ComposerExtensionClass {
 			scanner = new Scanner(file.getRawLocation().toFile(), "UTF-8");
 			while (scanner.hasNext()) {
 				fileText.append(scanner.nextLine());
-				fileText.append("\r\n");
+				fileText.append(NEWLINE);
 			}
 			return fileText.toString();
 		} catch (FileNotFoundException e) {
@@ -286,7 +286,7 @@ public class AheadComposer extends ComposerExtensionClass {
 			StringBuilder fileTextBuffer = new StringBuilder();
 			Scanner scanner = new Scanner(file, "UTF-8");
 			while (scanner.hasNext()) {
-				fileTextBuffer.append(scanner.nextLine() + "\r\n");
+				fileTextBuffer.append(scanner.nextLine() + NEWLINE);
 			}
 			scanner.close();
 
@@ -322,7 +322,10 @@ public class AheadComposer extends ComposerExtensionClass {
 	
 	private static ArrayList<String[]> createTempltes() {
 		 ArrayList<String[]> list = new  ArrayList<String[]>(1);
-		 list.add(new String[]{ "Jak", "jak", "/**\r\n * TODO description\r\n */\r\npublic " + REFINES_PATTERN + " class " + CLASS_NAME_PATTERN + " {\r\n\r\n}" });
+		 list.add(new String[]{ "Jak", "jak", "/**" + NEWLINE 
+				 + " * TODO description" + NEWLINE 
+				 + " */" + NEWLINE 
+				 + "public " + REFINES_PATTERN + " class " + CLASS_NAME_PATTERN + " {" + NEWLINE + NEWLINE + "}" });
 		 return list;
 	}
 	
@@ -401,17 +404,17 @@ public class AheadComposer extends ComposerExtensionClass {
 		IFile settingsFile = settingsFolder.getFile("org.eclipse.jdt.core.prefs");
 		if (!settingsFile.exists()) {
 			String text = 
-				"eclipse.preferences.version=1\r\n" +
-				"org.eclipse.jdt.core.compiler.codegen.inlineJsrBytecode=enabled\r\n" +
-				"org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.6\r\n" +
-				"org.eclipse.jdt.core.compiler.codegen.unusedLocal=preserve\r\n" +
-				"org.eclipse.jdt.core.compiler.compliance=1.6\r\n" +
-				"org.eclipse.jdt.core.compiler.debug.lineNumber=generate\r\n" +
-				"org.eclipse.jdt.core.compiler.debug.localVariable=generate\r\n" +
-				"org.eclipse.jdt.core.compiler.debug.sourceFile=generate\r\n" +
-				"org.eclipse.jdt.core.compiler.problem.assertIdentifier=error\r\n" +
-				"org.eclipse.jdt.core.compiler.problem.enumIdentifier=error\r\n" +
-				"org.eclipse.jdt.core.compiler.source=1.6\r\n" +
+				"eclipse.preferences.version=1" + NEWLINE +
+				"org.eclipse.jdt.core.compiler.codegen.inlineJsrBytecode=enabled" + NEWLINE +
+				"org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.6" + NEWLINE +
+				"org.eclipse.jdt.core.compiler.codegen.unusedLocal=preserve" + NEWLINE +
+				"org.eclipse.jdt.core.compiler.compliance=1.6" + NEWLINE +
+				"org.eclipse.jdt.core.compiler.debug.lineNumber=generate" + NEWLINE +
+				"org.eclipse.jdt.core.compiler.debug.localVariable=generate" + NEWLINE +
+				"org.eclipse.jdt.core.compiler.debug.sourceFile=generate" + NEWLINE +
+				"org.eclipse.jdt.core.compiler.problem.assertIdentifier=error" + NEWLINE +
+				"org.eclipse.jdt.core.compiler.problem.enumIdentifier=error" + NEWLINE +
+				"org.eclipse.jdt.core.compiler.source=1.6" + NEWLINE +
 				"org.eclipse.jdt.core.builder.resourceCopyExclusionFilter=*.jak";
 			InputStream source = new ByteArrayInputStream(text.getBytes(Charset.availableCharsets().get("UTF-8")));
 			try {
