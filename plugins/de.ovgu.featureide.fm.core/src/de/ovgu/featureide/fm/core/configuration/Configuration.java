@@ -50,7 +50,10 @@ public class Configuration {
 	public static final int 
 		COMPLETION_NONE = 0,
 		COMPLETION_ONE_CLICK = 1,
-		COMPLETION_CHANGE = 2;
+		COMPLETION_CHANGE = 2,
+		COMPLETION_OPEN_CLAUSES = 3;
+	
+	public static int COMPLETION = COMPLETION_ONE_CLICK;
 	
 	private static final int TIMEOUT = 1000;
 
@@ -199,7 +202,7 @@ public class Configuration {
 	}
 	
 	public boolean[] leadToValidConfiguration(List<SelectableFeature> featureList) {
-		return leadToValidConfiguration(featureList, COMPLETION_CHANGE);
+		return leadToValidConfiguration(featureList, COMPLETION);
 	}
 	
 	public boolean[] leadToValidConfiguration(List<SelectableFeature> featureList, int mode) {
@@ -208,6 +211,8 @@ public class Configuration {
 				return leadsToValidConfiguration1(featureList);
 			case COMPLETION_CHANGE:
 				return leadsToValidConfiguration2(featureList);
+			case COMPLETION_OPEN_CLAUSES:
+				return leadsToValidConfiguration3(featureList);
 			case COMPLETION_NONE:
 			default:
 				return new boolean[featureList.size()];
@@ -368,6 +373,56 @@ public class Configuration {
 				curLiteral.positive = !curLiteral.positive;
 			}
 		}
+		return results;
+	}
+	
+	private boolean[] leadsToValidConfiguration3(List<SelectableFeature> featureList) {
+		final Map<String, Boolean> featureMap = new HashMap<String, Boolean>(features.size() << 1);
+		
+		for (SelectableFeature selectableFeature : features) {
+			final Feature feature = selectableFeature.getFeature();
+			if ((ignoreAbstractFeatures || feature.isConcrete()) && !feature.hasHiddenParent()) {
+				featureMap.put(feature.getName(), selectableFeature.getSelection() == Selection.SELECTED);
+			}
+		}
+		
+		final boolean[] results = new boolean[featureList.size()];
+		
+		final Node[] clauses = rootNodeWithoutHidden.getChildren();
+		final HashMap<Object, Literal> literalMap = new HashMap<Object, Literal>();
+		for (int i = 0; i < clauses.length; i++) {
+			final Node clause = clauses[i];
+			literalMap.clear();
+			if (clause instanceof Literal) {
+				final Literal literal = (Literal) clause;
+				literalMap.put(literal.var, literal);
+			} else {
+				final Node[] orLiterals = clause.getChildren();
+				for (int j = 0; j < orLiterals.length; j++) {
+					final Literal literal = (Literal) orLiterals[j];
+					literalMap.put(literal.var, literal);
+				}
+			}
+			
+			boolean satisfied = false;
+			for (Literal literal : literalMap.values()) {
+				Boolean selected = featureMap.get(literal.var);
+				if (selected != null && selected == literal.positive) {
+					satisfied = true;
+					break;
+				}
+			}
+			if (!satisfied) {
+				int c = 0;
+				for (SelectableFeature selectableFeature : featureList) {
+					if (literalMap.containsKey(selectableFeature.getFeature().getName())) {
+						results[c] = true;
+					}
+					c++;
+				}
+			}
+		}
+		
 		return results;
 	}
 	
@@ -543,21 +598,5 @@ public class Configuration {
 				}
 			}
 		}
-		
-//		for (SelectableFeature feature : features) {
-//			if (feature.getAutomatic() == Selection.UNDEFINED && feature.getFeature().hasHiddenParent()) {
-//				try {
-//					if (!solver2.isSatisfiable(new Literal(feature.getFeature().getName(), false))) {
-//						feature.setAutomatic(Selection.SELECTED);
-//					} else if (!solver2.isSatisfiable(new Literal(feature.getFeature().getName(), true))) {
-//						feature.setAutomatic(Selection.UNSELECTED);
-//					} else {
-//						feature.setAutomatic(Selection.UNDEFINED);
-//					}
-//				} catch (TimeoutException e) {
-//					FMCorePlugin.getDefault().logError(e);
-//				}
-//			}
-//		}
 	}
 }
