@@ -48,10 +48,10 @@ public class BuildFeatureInterfacesAction extends AProjectJobAction {
 	@Override
 	protected void endAction() {
 		MPLPlugin.getDefault().buildFeatureInterfaces(projects, 
-				(String) wizard.getData(WizardConstants.KEY_FOLDER), 
-				(String) wizard.getData(WizardConstants.KEY_VIEWNAME), 
-				(Integer) wizard.getData(WizardConstants.KEY_VIEWLEVEL), 
-				(Integer) wizard.getData(WizardConstants.KEY_CONFIGLIMIT));
+				(String) wizard.getData(WizardConstants.KEY_OUT_FOLDER), 
+				(String) wizard.getData(WizardConstants.KEY_OUT_VIEWNAME), 
+				(Integer) wizard.getData(WizardConstants.KEY_OUT_VIEWLEVEL), 
+				(Integer) wizard.getData(WizardConstants.KEY_OUT_CONFIGLIMIT));
 		
 	}
 }

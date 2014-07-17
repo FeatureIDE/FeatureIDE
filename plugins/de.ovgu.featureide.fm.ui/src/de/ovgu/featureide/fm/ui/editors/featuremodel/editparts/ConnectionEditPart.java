@@ -38,8 +38,10 @@ import org.eclipse.gef.commands.Command;
 import org.eclipse.gef.editparts.AbstractConnectionEditPart;
 import org.eclipse.gef.editpolicies.DirectEditPolicy;
 import org.eclipse.gef.requests.DirectEditRequest;
+import org.eclipse.swt.SWT;
 import org.eclipse.ui.PlatformUI;
 
+import de.ovgu.featureide.fm.core.ExtendedFeature;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureConnection;
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -77,11 +79,24 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 	protected IFigure createFigure() {
 		PolylineConnection figure = new PolylineConnection();
 		figure.setForegroundColor(FMPropertyManager.getConnectionForgroundColor());
+		
+		FeatureConnection featureConnection = getConnectionModel();
+		if (featureConnection.getSource() instanceof ExtendedFeature 
+				&& ((ExtendedFeature) featureConnection.getSource()).isFromExtern()
+				&& featureConnection.getTarget() instanceof ExtendedFeature
+				&& ((ExtendedFeature)featureConnection.getTarget()).isFromExtern()) {
+			figure.setLineStyle(SWT.LINE_DASH);
+		}
+		
 		return figure;
 	}
 
 	@Override
 	protected void createEditPolicies() {
+		if (connectsExternFeatures()) {
+			return;
+		}
+
 		installEditPolicy(EditPolicy.DIRECT_EDIT_ROLE, new RoleDirectEditPolicy());
 	}
 
@@ -103,6 +118,10 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 	}
 
 	private void changeConnectionType() {
+		if (connectsExternFeatures()) {
+			return;
+		}
+
 		Feature feature = getConnectionModel().getTarget();
 		FeatureModel featureModel = feature.getFeatureModel();
 			
@@ -241,6 +260,20 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 		} else if (MANDATORY_CHANGED.equals(prop)) {
 			refreshSourceDecoration();
 		}
+	}
+
+	/**
+	 * Checks if the target and source features are from an external feature
+	 * model.
+	 * 
+	 * @return true if both features are from an external feature model
+	 */
+	private boolean connectsExternFeatures() {		
+		FeatureConnection featureConnection = getConnectionModel();
+		return (featureConnection.getSource() instanceof ExtendedFeature 
+				&& ((ExtendedFeature) featureConnection.getSource()).isFromExtern()
+				&& featureConnection.getTarget() instanceof ExtendedFeature
+				&& ((ExtendedFeature)featureConnection.getTarget()).isFromExtern());
 	}
 
 }

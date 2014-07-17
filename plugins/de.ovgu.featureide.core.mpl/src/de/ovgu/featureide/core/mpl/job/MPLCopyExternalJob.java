@@ -20,43 +20,55 @@
  */
 package de.ovgu.featureide.core.mpl.job;
 
-import de.ovgu.featureide.core.mpl.InterfaceProject;
-import de.ovgu.featureide.core.mpl.job.util.AChainJob;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+
+import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.job.util.AJobArguments;
-import de.ovgu.featureide.core.mpl.job.util.IChainJob;
 
 /**
- * Starts consecutively other jobs from a list of {@link AChainJob}s.
  * 
  * @author Sebastian Krieter
  */
-public class StartJob extends AChainJob<StartJob.Arguments> {
+public class MPLCopyExternalJob extends AMonitorJob<MPLCopyExternalJob.Arguments> {
 	
 	public static class Arguments extends AJobArguments {
-		private final IChainJob[] jobs;
-		private int index = 0;
+		private final IFolder srcFolder;
+		private final IFolder destFolder;
 		
-		public Arguments(IChainJob[] jobs) {
+		public Arguments(IFolder srcFolder, IFolder destFolder) {
 			super(Arguments.class);
-			this.jobs = jobs;
+			this.srcFolder = srcFolder;
+			this.destFolder = destFolder;
 		}
 	}
 	
-	protected StartJob(Arguments arguments) {
-		super("", arguments);
+	protected MPLCopyExternalJob(Arguments arguments) {
+		super("Copying Source Files", arguments);
+		setPriority(BUILD);
 	}
 	
 	@Override
 	protected boolean work() {
-		IChainJob curJob = arguments.jobs[arguments.index];
-		InterfaceProject curInterfaceProject = curJob.getInterfaceProject();
-		curInterfaceProject.loadSignaturesJob(false);
-		curInterfaceProject.addJob(curJob);
-		arguments.index++;
-		if (arguments.index < arguments.jobs.length) {
-			curInterfaceProject.addJob(new StartJob(arguments));
-		}
+		IPath destPath = arguments.destFolder.getFullPath();
 		
+		try {
+			IResource[] srcMembers = arguments.srcFolder.members();
+			for (int i = 0; i < srcMembers.length; i++) {
+				IResource srcMember = srcMembers[i];
+				IPath px = destPath.append(srcMember.getName());
+				if (!px.toFile().exists()) {
+					srcMember.move(px, true, monitor);
+				}
+			}
+		} catch (CoreException e) {
+			MPLPlugin.getDefault().logError(e);
+			return false;
+		}
+
+		MPLPlugin.getDefault().logInfo("Copied Source Files.");
 		return true;
 	}
 }

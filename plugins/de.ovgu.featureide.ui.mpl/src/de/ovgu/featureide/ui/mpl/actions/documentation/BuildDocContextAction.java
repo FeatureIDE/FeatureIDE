@@ -48,9 +48,9 @@ public class BuildDocContextAction extends AProjectJobAction {
 	@Override
 	protected void endAction() {
 		MPLPlugin.getDefault().buildDocumentation(projects, 
-				(String) wizard.getData(WizardConstants.KEY_FOLDER), 
-				(String) wizard.getData(WizardConstants.KEY_DOCOPTIONS),
+				(String) wizard.getData(WizardConstants.KEY_OUT_FOLDER), 
+				(String) wizard.getData(WizardConstants.KEY_OUT_DOCOPTIONS),
 				2, 
-				(String) wizard.getData(WizardConstants.KEY_FEATURE));
+				(String) wizard.getData(WizardConstants.KEY_OUT_FEATURE));
 	}
 }

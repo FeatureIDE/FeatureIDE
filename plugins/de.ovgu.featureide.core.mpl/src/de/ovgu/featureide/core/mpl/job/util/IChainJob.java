@@ -1,10 +1,19 @@
 package de.ovgu.featureide.core.mpl.job.util;
 
-import de.ovgu.featureide.core.mpl.InterfaceProject;
+import org.eclipse.core.resources.IProject;
 
+/**
+ * Interface for all jobs.
+ * This should only be implementet by {@link AChainJob}.
+ * 
+ * @author Sebastian Krieter
+ */
 public interface IChainJob {
-	public InterfaceProject getInterfaceProject();
-	public void setInterfaceProject(InterfaceProject interfaceProject);
-	public void setNextJob(IChainJob nextJob);
-	public void schedule();
+	int getCancelingTimeout();
+	IProject getProject();
+	int getStatus();
+	boolean ignoresPreviousJobFail();
+	void setCancelingTimeout(int cancelingTimeout);
+	void setIgnorePreviousJobFail(boolean ignorePreviousJobFail);
+	void setProject(IProject interfaceProject);
 }

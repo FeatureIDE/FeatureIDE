@@ -120,8 +120,9 @@ public class FujiClassSignature extends AbstractClassSignature {
 		
 		FujiClassSignature otherSig = (FujiClassSignature) obj;
 		
-		if (!super.sigEquals(otherSig)) 
+		if (!super.sigEquals(otherSig)) {
 			return false;
+		}
 		
 		if (superTypes.size() != otherSig.superTypes.size()) {
 			return false;

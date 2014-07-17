@@ -22,7 +22,8 @@ package de.ovgu.featureide.fm.core.configuration;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -50,10 +51,10 @@ public class THiddenFeaturesConfiguration extends AbstractConfigurationTest {
 		FeatureModel fm = loadXML("<and mandatory=\"true\" name=\"S\"><feature hidden=\"true\" mandatory=\"true\" name=\"B\"/></and>");
 		Configuration c = new Configuration(fm);
 		assertEquals(1, c.number());
-		HashSet<Feature> set = new HashSet<Feature>();
-		set.add(fm.getFeature("S"));
-		set.add(fm.getFeature("B"));
-		assertEquals(c.getSelectedFeatures(),set);
+		List<Feature> list = new ArrayList<Feature>();
+		list.add(fm.getFeature("S"));
+		list.add(fm.getFeature("B"));
+		assertEquals(c.getSelectedFeatures(), list);
 	}
 
 	@Test
@@ -61,37 +62,36 @@ public class THiddenFeaturesConfiguration extends AbstractConfigurationTest {
 		FeatureModel fm = loadXML("<and mandatory=\"true\" name=\"S\"><feature hidden=\"true\" mandatory=\"false\" name=\"B\"/></and>");
 		Configuration c = new Configuration(fm);
 		assertEquals(1, c.number());
-		HashSet<Feature> set = new HashSet<Feature>();
-		set.add(fm.getFeature("S"));
-		assertEquals(set,c.getSelectedFeatures());
+		List<Feature> list = new ArrayList<Feature>();
+		list.add(fm.getFeature("S"));
+		assertEquals(list, c.getSelectedFeatures());
 	}
 	
 	@Test
 	public void testAlternativeHidden() {
-		FeatureModel fm = loadXML("<alt mandatory=\"true\" name=\"S\"><feature mandatory=\"true\" name=\"A\"/><feature hidden=\"true\" mandatory=\"false\" name=\"B\"/></alt>");
+		FeatureModel fm = loadXML("<alt mandatory=\"true\" name=\"S\"><feature mandatory=\"true\" name=\"A\"/><feature hidden=\"true\" mandatory=\"true\" name=\"B\"/></alt>");
 		Configuration c = new Configuration(fm);
-		//TODO: skrieter uncomment after correcting associated code
-		//assertEquals(2, c.number());
-		HashSet<Feature> set = new HashSet<Feature>();
-		set.add(fm.getFeature("S"));
-		set.add(fm.getFeature("B"));
+		assertEquals(2, c.number());
+		List<Feature> list = new ArrayList<Feature>();
+		list.add(fm.getFeature("S"));
+		list.add(fm.getFeature("B"));
 		//set={S,B}
-		assertEquals(set,c.getSelectedFeatures());
+		assertEquals(list, c.getSelectedFeatures());
 		c.setManual("A", Selection.SELECTED);
-		set.clear();
-		set.add(fm.getFeature("S"));
-		set.add(fm.getFeature("A"));
+		list.clear();
+		list.add(fm.getFeature("S"));
+		list.add(fm.getFeature("A"));
 		//set={S,A}
-		assertEquals(set,c.getSelectedFeatures());
+		assertEquals(list, c.getSelectedFeatures());
 	}
+	
 	@Test
 	public void testHidden() {
 		FeatureModel fm = loadXML("<and mandatory=\"true\" name=\"S\"><feature hidden=\"true\" mandatory=\"false\" name=\"B\"/></and>");
 		Configuration c = new Configuration(fm);
 		assertEquals(1, c.number());
-		HashSet<Feature> set = new HashSet<Feature>();
-		set.add(fm.getFeature("S"));
-		assertEquals(set,c.getSelectedFeatures());
-		
+		List<Feature> list = new ArrayList<Feature>();
+		list.add(fm.getFeature("S"));
+		assertEquals(list, c.getSelectedFeatures());
 	}
 }

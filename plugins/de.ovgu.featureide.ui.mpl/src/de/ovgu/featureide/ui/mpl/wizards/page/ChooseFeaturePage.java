@@ -20,11 +20,7 @@
  */
 package de.ovgu.featureide.ui.mpl.wizards.page;
 
-import java.util.Map;
-
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -42,14 +38,10 @@ import de.ovgu.featureide.ui.mpl.wizards.WizardConstants;
 public class ChooseFeaturePage extends AbstractWizardPage {
 
 	private Text featureName;
-	private Label featureLabel;
-
-	private String featureNameString;
 
 	public ChooseFeaturePage() {
 		super("Choose Feature");
 		setDescription("Choose a Feature");
-		this.featureNameString = "";
 	}
 
 	public void createControl(Composite parent) {
@@ -75,47 +67,24 @@ public class ChooseFeaturePage extends AbstractWizardPage {
 		gridData2.horizontalSpan = 1;
 		gridData2.verticalSpan = 1;
 
-		featureLabel = new Label(configGroup, 0);
+		Label featureLabel = new Label(configGroup, 0);
 		featureLabel.setText("Name of Feature: ");
 		featureName = new Text(configGroup, SWT.BORDER | SWT.SINGLE);
-		featureName.setText(featureNameString);
+//		featureName.setText(featureNameString);
 		featureName.setLayoutData(gridData2);
-		addListeners();
-		dialogChanged();
-	}
-
-	private void addListeners() {
 		featureName.addKeyListener(new KeyPressedListener());
 	}
 
-	private class KeyPressedListener implements KeyListener {
-		@Override
-		public void keyPressed(KeyEvent e) {
+	@Override
+	protected String checkPage() {
+		if (featureName.getText().isEmpty()) {
+			return "Enter a feature name";
 		}
-
-		@Override
-		public void keyReleased(KeyEvent e) {
-			dialogChanged();
-		}
-	}
-
-	protected void dialogChanged() {
-		featureNameString = featureName.getText();
-		if (featureNameString.isEmpty()) {
-			updateStatus("Enter a feature name");
-		} else {
-			updateStatus(null);
-		}
-	}
-
-	protected void updateStatus(String message) {
-		setErrorMessage(message);
-		setPageComplete(message == null);
+		return null;
 	}
 
 	@Override
-	public void putData(Map<String, Object> dataMap) {
-		dataMap.put(WizardConstants.KEY_FEATURE, featureNameString);
-		
+	public void putData() {
+		abstractWizard.putData(WizardConstants.KEY_OUT_FEATURE, featureName.getText());
 	}
 }

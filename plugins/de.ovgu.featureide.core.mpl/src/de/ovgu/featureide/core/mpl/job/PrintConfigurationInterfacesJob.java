@@ -30,9 +30,9 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
 import org.sat4j.specs.TimeoutException;
 
+import de.ovgu.featureide.core.mpl.InterfaceProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.io.IOConstants;
-import de.ovgu.featureide.core.mpl.job.util.AMonitorJob;
 import de.ovgu.featureide.core.mpl.job.util.AJobArguments;
 import de.ovgu.featureide.core.mpl.signature.ProjectStructure;
 import de.ovgu.featureide.core.mpl.signature.ProjectSignatures.SignatureIterator;
@@ -60,6 +60,11 @@ public class PrintConfigurationInterfacesJob extends AMonitorJob<PrintConfigurat
 
 	@Override
 	protected boolean work() {
+		InterfaceProject interfaceProject = MPLPlugin.getDefault().getInterfaceProject(this.project);
+		if (interfaceProject == null) {
+			MPLPlugin.getDefault().logWarning(this.project.getName() + " is no Interface Project!");
+			return false;
+		}
 		monitor.subTask("Calculate Solutions");
 		
 		final LinkedList<List<String>> solutionList;

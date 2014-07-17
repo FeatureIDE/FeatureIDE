@@ -193,10 +193,11 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 	}
 	
 	private static final ArrayList<String[]> TEMPLATES = createTempltes();
+	private static final String NEWLINE = System.getProperty("line.separator", "\n");
 	
 	private static ArrayList<String[]> createTempltes() {
 		 ArrayList<String[]> list = new  ArrayList<String[]>(1);
-		 list.add(new String[]{"C++", "h", "\r\n" + REFINES_PATTERN + " class " + CLASS_NAME_PATTERN + " {\r\n\r\n};"});
+		 list.add(new String[]{"C++", "h", NEWLINE + REFINES_PATTERN + " class " + CLASS_NAME_PATTERN + " {" + NEWLINE + NEWLINE + "};"});
 		 return list;
 	}
 	

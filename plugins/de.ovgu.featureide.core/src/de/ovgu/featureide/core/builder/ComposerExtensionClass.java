@@ -23,7 +23,7 @@ package de.ovgu.featureide.core.builder;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.Set;
+import java.util.List;
 import java.util.Vector;
 
 import org.eclipse.core.internal.runtime.InternalPlatform;
@@ -64,7 +64,12 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	public static final IPath JRE_CONTAINER = new Path("org.eclipse.jdt.launching.JRE_CONTAINER");
 	protected IFeatureProject featureProject = null;
 	
-	protected final static String[] JAVA_TEMPLATE = new String[]{"Java", "java", PACKAGE_PATTERN + "/**\r\n * TODO description\r\n */\r\npublic class " + CLASS_NAME_PATTERN +" {\n\n}"};
+	public static final String NEWLINE = System.getProperty("line.separator", "\n");
+	
+	protected final static String[] JAVA_TEMPLATE = new String[]{"Java", "java", PACKAGE_PATTERN + "/**" + NEWLINE 
+		+ " * TODO description" + NEWLINE 
+		+ " */" + NEWLINE 
+		+ "public class " + CLASS_NAME_PATTERN +" {" + NEWLINE + NEWLINE + "}"};
 	
 	public boolean initialize(IFeatureProject project) {
 		assert (project != null) : "Invalid project given";
@@ -78,7 +83,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 
 	public void copyNotComposedFiles(Configuration c, IFolder destination) {
 		
-		Set<Feature> selectedFeatures = c.getSelectedFeatures();
+		List<Feature> selectedFeatures = c.getSelectedFeatures();
 		if (selectedFeatures != null)
 			for (Feature feature : selectedFeatures) {
 				IFolder folder = featureProject.getSourceFolder().getFolder(feature.getName());
@@ -245,7 +250,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		if (packageName.isEmpty()) {
 			return fileContent.replace(PACKAGE_PATTERN, "");
 		} else {
-			return fileContent.replace(PACKAGE_PATTERN, "package " + packageName + ";\r\n\r\n");
+			return fileContent.replace(PACKAGE_PATTERN, "package " + packageName + ";" + NEWLINE + NEWLINE);
 		}
 	}
 

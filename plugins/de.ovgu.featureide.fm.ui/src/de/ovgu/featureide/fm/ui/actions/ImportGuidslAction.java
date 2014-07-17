@@ -31,17 +31,9 @@ import de.ovgu.featureide.fm.core.io.guidsl.GuidslReader;
  * @author Maik Lampe
  */
 public class ImportGuidslAction extends AbstractImportAction {
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ovgu.featureide.fm.ui.actions.AbstractImportAction#initModelReader
-	 * (de.ovgu.featureide.fm.core.FeatureModel)
-	 */
+	
 	@Override
 	IFeatureModelReader setModelReader(FeatureModel fm) {
 		return new GuidslReader(fm);
-
 	}
 }

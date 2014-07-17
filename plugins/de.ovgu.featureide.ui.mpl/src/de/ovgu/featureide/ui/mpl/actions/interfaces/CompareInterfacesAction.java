@@ -48,9 +48,9 @@ public class CompareInterfacesAction extends AProjectJobAction {
 	protected void endAction() {
 		MPLPlugin.getDefault().compareConfigurationInterfaces(
 				projects, 
-				(String) wizard.getData(WizardConstants.KEY_VIEWNAME), 
-				(Integer) wizard.getData(WizardConstants.KEY_VIEWLEVEL), 
-				(Integer) wizard.getData(WizardConstants.KEY_CONFIGLIMIT));
+				(String) wizard.getData(WizardConstants.KEY_OUT_VIEWNAME), 
+				(Integer) wizard.getData(WizardConstants.KEY_OUT_VIEWLEVEL), 
+				(Integer) wizard.getData(WizardConstants.KEY_OUT_CONFIGLIMIT));
 	}
 
 }

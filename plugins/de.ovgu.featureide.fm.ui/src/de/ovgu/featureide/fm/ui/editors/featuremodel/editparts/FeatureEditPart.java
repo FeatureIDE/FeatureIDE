@@ -40,6 +40,7 @@ import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.Constraint;
+import de.ovgu.featureide.fm.core.ExtendedFeature;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureConnection;
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -104,20 +105,23 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements
 
 	@Override
 	public void performRequest(Request request) {
-		
-		for (Constraint constraint : getFeature().getFeatureModel().getConstraints()){
+		Feature feature = getFeature();
+		if (feature instanceof ExtendedFeature && ((ExtendedFeature) feature).isFromExtern()) {
+			return;
+		}
+		FeatureModel featureModel = ((ModelEditPart) this.getParent()).getFeatureModel();
+
+		for (Constraint constraint : featureModel.getConstraints()){
 			if (constraint.isFeatureSelected()) constraint.setFeatureSelected(false);
 		}
-		
+
 		if (request.getType() == RequestConstants.REQ_DIRECT_EDIT) {
 			showRenameManager();
 		} else if (request.getType() == RequestConstants.REQ_OPEN) {
-			Feature feature = getFeature();
 			if (feature.isRoot() || !feature.getParent().isAnd()) {
 				return;
 			}
-			FeatureModel featureModel = ((ModelEditPart) this.getParent())
-			.getFeatureModel();
+
 			FeatureSetMandatoryOperation op = new FeatureSetMandatoryOperation(feature,featureModel);
 			op.addContext((IUndoContext) featureModel.getUndoContext());
 			try {
@@ -130,7 +134,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements
 
 			featureModel.handleModelDataChanged();
 		} else if (request.getType() == RequestConstants.REQ_SELECTION) {
-			for (Constraint partOf : getFeature().getRelevantConstraints()){
+			for (Constraint partOf : feature.getRelevantConstraints()){
 				partOf.setFeatureSelected(true);
 			}
 		}

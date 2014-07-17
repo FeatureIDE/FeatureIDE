@@ -23,13 +23,13 @@ package de.ovgu.featureide.core.mpl;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
-import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IProject;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.mpl.io.FileLoader;
 import de.ovgu.featureide.core.mpl.job.CreateFujiSignaturesJob;
+import de.ovgu.featureide.core.mpl.job.JobManager;
 import de.ovgu.featureide.core.mpl.job.util.IChainJob;
 import de.ovgu.featureide.core.mpl.signature.ProjectSignatures;
 import de.ovgu.featureide.core.mpl.signature.ViewTag;
@@ -60,19 +60,8 @@ public class InterfaceProject {
 	private final FeatureModel featureModel;
 	private String[] featureNames;
 	
-	private IChainJob lastJob = null;
 	private IChainJob loadJob = null;
 	private boolean loadAgain = false;
-	
-	public synchronized void addJob(IChainJob newJob) {
-		if (lastJob == null) {
-			lastJob = newJob;
-			lastJob.schedule();
-		} else {
-			lastJob.setNextJob(newJob);
-			lastJob = newJob;
-		}
-	}
 	
 	public InterfaceProject(IFeatureProject featureProject) {
 		this(null, featureProject);
@@ -136,13 +125,11 @@ public class InterfaceProject {
 		if (featureModel != null) {
 			final String[] tempFeatureNames = new String[featureModel.getNumberOfFeatures()];
 			int count = 0;
-
-			Collection<Entry<String, Feature>> x = featureModel.getFeatureTable().entrySet();
-			for (Entry<String, Feature> entry : x) {
-				if (entry.getValue().isConcrete()) {
-					entry.getValue().addListener(new FeaturePropertyChangeListener(count));
-					tempFeatureNames[count++] = entry.getKey();
-
+			
+			for (Feature feature : featureModel.getFeatures()) {
+				if (feature.isConcrete()) {
+					feature.addListener(new FeaturePropertyChangeListener(count));
+					tempFeatureNames[count++] = feature.getName();
 				}
 			}
 			featureNames = new String[count];
@@ -186,28 +173,10 @@ public class InterfaceProject {
 	public void loadSignatures(boolean again) {
 		if (loadJob == null) {
 			loadJob = new CreateFujiSignaturesJob();
-			loadJob.setInterfaceProject(this);
-			loadJob.schedule();
+			loadJob.setProject(projectReference);
+			JobManager.addJob(projectReference, loadJob);
 		} else if (again) {
 			loadAgain = true;
-		}
-	}
-	
-//	public void loadSignaturesFast(boolean again) {
-//		if (loadJob == null) {
-//			loadJob = new CreateFSTSignaturesJob();
-//			loadJob.setInterfaceProject(this);
-//			loadJob.schedule();
-//		} else if (again) {
-//			loadAgain = true;
-//		}
-//	}
-	
-	public synchronized void loadSignaturesJob(boolean force) {
-		if (projectSignatures == null || force) {
-			CreateFujiSignaturesJob job = new CreateFujiSignaturesJob();
-			job.setInterfaceProject(this);
-			addJob(job);
 		}
 	}
 	

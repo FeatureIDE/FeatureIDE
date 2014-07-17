@@ -51,48 +51,92 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	private Feature rootFeature;
 	
 	/**
-	 * a {@link Hashtable} containing all features
+	 * A {@link Map} containing all features.
 	 */
 	private final Map<String, Feature> featureTable = new ConcurrentHashMap<String, Feature>();
 
 	protected final List<Constraint> constraints = new LinkedList<Constraint>();
 	
+	private final List<PropertyChangeListener> listenerList = new LinkedList<PropertyChangeListener>();
+	
+	private final FeatureModelAnalyzer analyser = createAnalyser();
+	
+	private final RenamingsManager renamingsManager = new RenamingsManager(this);
+	
 	/**
 	 * All comment lines from the model file without line number at which they
 	 * occur
 	 */
-	private final List<String> comments = new LinkedList<String>();
-
+	private final List<String> comments;
+	
 	/**
 	 * Saves the annotations from the model file as they were read,
 	 * because they were not yet used.
 	 */
-	private final List<String> annotations = new LinkedList<String>();
-
+	private final List<String> annotations;
+	
 	/**
 	 * A list containing the feature names in their specified order will be
 	 * initialized in XmlFeatureModelReader.
 	 */
-	private final List<String> featureOrderList = new LinkedList<String>();
+	private final List<String> featureOrderList;
 	
-	private boolean featureOrderUserDefined = false;
+	private final FeatureModelLayout layout;
 	
-	private boolean featureOrderInXML = false;
+	private boolean featureOrderUserDefined;
+	
+	private boolean featureOrderInXML;
 	
 	private Object undoContext;
-
-	private final List<PropertyChangeListener> listenerList = new LinkedList<PropertyChangeListener>();
 	
-	private ColorschemeTable colorschemeTable = new ColorschemeTable(this);
+	private ColorschemeTable colorschemeTable;
 
 	private FMComposerManager fmComposerManager;
 	
-	private final FeatureModelAnalyzer analyser = new FeatureModelAnalyzer(this);
+	public FeatureModel() {
+		super();
+
+		this.featureOrderList = new LinkedList<String>();
+		this.featureOrderUserDefined = false;
+		this.featureOrderInXML = false;
+		
+		this.comments = new LinkedList<String>();
+		this.annotations = new LinkedList<String>();
+		this.colorschemeTable = new ColorschemeTable(this);
+		this.layout = new FeatureModelLayout();
+	}
+
+	protected FeatureModel(FeatureModel oldFeatureModel, boolean complete) {
+		super();
+		
+		this.featureOrderList = new LinkedList<String>(oldFeatureModel.featureOrderList);
+		this.featureOrderUserDefined = oldFeatureModel.featureOrderUserDefined;
+		this.featureOrderInXML = oldFeatureModel.featureOrderInXML;
+		
+		if (complete) {
+			this.annotations = new LinkedList<String>(oldFeatureModel.annotations);
+			this.comments = new LinkedList<String>(oldFeatureModel.comments);
+			this.colorschemeTable = oldFeatureModel.colorschemeTable.clone(this);
+			this.layout = oldFeatureModel.layout.clone();
+		} else {
+			this.annotations = null;
+			this.comments = null;
+			this.colorschemeTable = null;
+			this.layout = null;
+		}
+		
+		if (oldFeatureModel.rootFeature != null) {
+			this.rootFeature = oldFeatureModel.rootFeature.clone(this, complete);
+			
+			for (final Constraint constraint : oldFeatureModel.constraints) {
+				this.addConstraint(new Constraint(this, constraint.getNode().clone()));
+			}
+		}		
+	}
 	
-	private final FeatureModelLayout layout = new FeatureModelLayout();
-	
-	private final RenamingsManager renamingsManager = new RenamingsManager(this);
-	
+	protected FeatureModelAnalyzer createAnalyser() {
+		return new FeatureModelAnalyzer(this);
+	}
 	/**
 	 * Returns the {@link FeatureModelAnalyzer} which should be used for all calculation 
 	 * on the {@link FeatureModel}.
@@ -145,10 +189,16 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		featureTable.clear();
 		renamingsManager.clear();
 		constraints.clear();
-		comments.clear();
-		annotations.clear();
+		if (comments != null) {
+			comments.clear();
+		}
+		if (annotations != null) {
+			annotations.clear();
+		}
+		if (colorschemeTable != null) {
+			colorschemeTable.reset();
+		}
 		featureOrderList.clear();
-		colorschemeTable.reset();
 	}
 	
 	private void deleteChildFeatures(Feature feature) {
@@ -167,16 +217,18 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	 */
 	public void createDefaultValues(String projectName) {
 		String rootName = getValidJavaIdentifier(projectName);
-		Feature root;
-		if (!"".equals(rootName)) {
-			root = getFeature(rootName);
-		} else {
-			root = getFeature("Root");
+		if (rootName.isEmpty()) {
+			rootName = "Root";
+		}		
+		if (featureTable.isEmpty()) {
+			rootFeature = new Feature(this, rootName);
+			addFeature(rootFeature);
 		}
-		root.setAbstract(true);
 		Feature feature = new Feature(this, "Base");
-		root.addChild(feature);
 		addFeature(feature);
+		
+		rootFeature.addChild(feature);
+		rootFeature.setAbstract(true);
 	}
 	
 	/**
@@ -234,20 +286,11 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		return Collections.unmodifiableCollection(featureTable.values());
 	}
 	
-	// TODO this seems to be a false implementation
-	//    	returns root instead of null
 	/**
-	 * 
-	 * @return The {@link Feature} with the given name or <code>null</code> there is no Feature with this name. 
+	 * @return The {@link Feature} with the given name or {@code null} if there is no feature with this name. 
 	 */
 	@CheckForNull
 	public Feature getFeature(String name) {
-		if (featureTable.isEmpty()) {
-			// create the root feature (it is the only one without a reference)
-			rootFeature = new Feature(this, name);
-			addFeature(rootFeature);
-			return rootFeature;
-		}
 		return featureTable.get(name);
 	}
 
@@ -288,7 +331,9 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	
 	/**
 	 * @return <code>true</code> if a feature with the given name exists and is concrete.
+	 * @deprecated Will be removed in a future release. Use {@link #getFeature(String)}.isConcrete() instead.
 	 */
+	@Deprecated
 	public boolean isConcrete(String featureName) {
 		Feature feature = featureTable.get(featureName);
 		return feature != null && feature.isConcrete();
@@ -297,7 +342,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	/**
 	 * @return the featureTable
 	 */
-	public Map<String, Feature> getFeatureTable() {
+	protected Map<String, Feature> getFeatureTable() {
 		return featureTable;
 	}
 	
@@ -496,15 +541,16 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 			listener.propertyChange(event);
 		}
 	}
+	
 	@Override
 	public FeatureModel clone() {
 		final FeatureModel clone = new FeatureModel();
 		clone.featureTable.putAll(featureTable);
 		if (rootFeature == null) {
+			// TODO this should never happen
 			clone.rootFeature = new Feature(clone, "Root");
 			clone.featureTable.put("root", clone.rootFeature);
 		} else {
-			// TODO this should never happen
 			clone.rootFeature = clone.getFeature(rootFeature.getName());
 		}
 		clone.constraints.addAll(constraints);
@@ -512,6 +558,31 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		clone.comments.addAll(comments);
 		clone.colorschemeTable = colorschemeTable.clone(clone);
 		return clone;
+	}
+	
+	/**
+	 * Will return the value of clone(true).
+	 * @return a deep copy from the feature model
+	 * 
+	 * @see #clone(boolean)
+	 */
+	public FeatureModel deepClone() {
+		return deepClone(true);
+	}
+	
+	/**
+	 * Clones the feature model.
+	 * Makes a deep copy from all fields in the model.</br>
+	 * Note that: {@code fm == fm.clone(false)} and {@code fm == fm.clone(true)} are {@code false} in every case.
+	 * 
+	 * @param complete If {@code false} the fields annotations, comments, colorschemeTable and layout
+	 * are set to {@code null} for a faster cloning process.
+	 * @return a deep copy from the feature model
+	 * 
+	 * @see #clone()
+	 */
+	public FeatureModel deepClone(boolean complete) {
+		return new FeatureModel(this, complete);
 	}
 
 	/**
@@ -723,9 +794,14 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	
 	@Override
 	public String toString() {
-		String x = toString(getRoot());
-		for (Constraint c : getConstraints()) {
-			x +=c.toString() + " ";
+		String x = "";
+		try {
+			x = toString(getRoot());
+			for (Constraint c : getConstraints()) {
+				x +=c.toString() + " ";
+			}
+		} catch (Exception e) {
+			return "Empty Feature Model";
 		}
 		return x;
 	}

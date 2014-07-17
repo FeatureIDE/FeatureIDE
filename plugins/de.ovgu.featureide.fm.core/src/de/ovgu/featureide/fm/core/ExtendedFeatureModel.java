@@ -20,53 +20,249 @@
  */
 package de.ovgu.featureide.fm.core;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.CheckForNull;
+
+import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.constraint.Equation;
 import de.ovgu.featureide.fm.core.constraint.FeatureAttributeMap;
+import de.ovgu.featureide.fm.core.constraint.analysis.ExtendedFeatureModelAnalyzer;
 
 /**
- * Adds attributes and attribute constraints to a feature model. 
+ * Adds attributes and attribute constraints to a feature model.
  * 
  * @author Sebastian Krieter
+ * @author Matthias Strauss
  */
 public class ExtendedFeatureModel extends FeatureModel {
 
-	protected FeatureAttributeMap<Integer> integerAttributes = new FeatureAttributeMap<Integer>();
-	protected FeatureAttributeMap<Boolean> booleanAttributes = new FeatureAttributeMap<Boolean>();
-	protected FeatureAttributeMap<String> stringAttributes = new FeatureAttributeMap<String>();
-	
-	protected LinkedList<Equation> attributeConstraints = new LinkedList<Equation>();
-	
-	public void addAttributeConstraint(Equation constraint) {
-		attributeConstraints.add(constraint);
+	public static class UsedModel {
+		private final String modelName;
+		private final String varName;
+		private final int type;
+		
+		public UsedModel(UsedModel usedModel, String parentName) {
+			this.modelName = usedModel.modelName;
+			this.varName = parentName + usedModel.varName;
+			this.type = usedModel.type;
+		}
+		
+		public UsedModel(String modelName, String varName, int type) {
+			this.modelName = modelName;
+			this.varName = varName;
+			this.type = type;
+		}
+
+		public String getModelName() {
+			return modelName;
+		}
+		
+		public String getVarName() {
+			return varName;
+		}
+		
+		public int getType() {
+			return type;
+		}
+
+		@Override
+		public String toString() {
+			return modelName + " " + varName;
+		}
 	}
+	protected final FeatureAttributeMap<Integer> integerAttributes = new FeatureAttributeMap<Integer>();
+	protected final FeatureAttributeMap<Boolean> booleanAttributes = new FeatureAttributeMap<Boolean>();
+	protected final FeatureAttributeMap<String> stringAttributes = new FeatureAttributeMap<String>();
+	protected final LinkedList<Equation> attributeConstraints = new LinkedList<Equation>();
 	
-	public LinkedList<Equation> getAttributConstraints() {
-		return attributeConstraints;
+	protected final Map<String, UsedModel> usedModels = new HashMap<String, UsedModel>();
+	protected final List<Constraint> ownConstraints = new LinkedList<Constraint>();
+	
+	protected FeatureModel mappingModel = null;
+
+	@Override
+	protected FeatureModelAnalyzer createAnalyser() {
+		return new ExtendedFeatureModelAnalyzer(this);
 	}
 
-	public FeatureAttributeMap<Integer> getIntegerAttributes() {
-		return integerAttributes;
+	public void addAttribute(final String featureName, final String attributeName, final Boolean value) {
+		this.booleanAttributes.setAttribute(featureName, attributeName, value);
+	}
+
+	public void addAttribute(final String featureName, final String attributeName, final Integer value) {
+		this.integerAttributes.setAttribute(featureName, attributeName, value);
+	}
+
+	public void addAttribute(final String featureName, final String attributeName, final String value) {
+		this.stringAttributes.setAttribute(featureName, attributeName, value);
+	}
+
+	public void addAttributeConstraint(final Equation constraint) {
+		this.attributeConstraints.add(constraint);
+	}
+
+	/**
+	 * Adds a parameter to the available parameters of the model
+	 * 
+	 * @param varType
+	 *            the name of the interface that shall be bound to the variable
+	 * @param varName
+	 *            the name of the variable an interface shall be bound to
+	 * @return true if the parameter could be added to the parameters. False if
+	 *         the variable name was already bound to another interface.
+	 */
+	public boolean addInterface(final String varType, final String varName) {
+		return addModel(varType, varName, ExtendedFeature.TYPE_INTERFACE);
+	}
+	
+	public boolean addInstance(final String varType, final String varName) {
+		return addModel(varType, varName, ExtendedFeature.TYPE_INSTANCE);
+	}
+	
+	public boolean addInheritance(final String varType, final String varName) {
+		return addModel(varType, varName, ExtendedFeature.TYPE_INHERITED);
+	}
+	
+	public boolean addExternalModel(final UsedModel model) {
+		if (usedModels.containsKey(model.varName)) {
+			return false;
+		} else {
+			usedModels.put(model.varName, model);
+			return true;
+		}
+	}
+	
+	private boolean addModel(final String varType, final String varName, int modelType) {
+		if (usedModels.containsKey(varName)) {
+			return false;
+		} else {
+			usedModels.put(varName, new UsedModel(varType, varName, modelType));
+			return true;
+		}
+	}
+	
+	public UsedModel getExternalModel(String varName) {
+		return usedModels.get(varName);
+	}
+
+	public LinkedList<Equation> getAttributConstraints() {
+		return this.attributeConstraints;
 	}
 
 	public FeatureAttributeMap<Boolean> getBooleanAttributes() {
-		return booleanAttributes;
+		return this.booleanAttributes;
 	}
 
-	public FeatureAttributeMap<String> getStringAttributes() {
-		return stringAttributes;
+	public FeatureAttributeMap<Integer> getIntegerAttributes() {
+		return this.integerAttributes;
 	}
 	
-	public void addAttribute(String featureName, String attributeName, Integer value) {
-		integerAttributes.setAttribute(featureName, attributeName, value);
+	public FeatureAttributeMap<String> getStringAttributes() {
+		return this.stringAttributes;
+	}
+	
+	public boolean isMultiProductLineModel() {
+		return !usedModels.isEmpty();
+	}
+	/**
+	 * Check if the feature model contains instance features.
+	 * 
+	 * @return true if imported features exists
+	 */
+	public boolean hasInstance() {
+		for (Feature feature : getFeatureTable().values()) {
+			if (((ExtendedFeature) feature).isInstance()) {
+				return true;
+			}
+		}
+		return false;
 	}
 
-	public void addAttribute(String featureName, String attributeName, Boolean value) {
-		booleanAttributes.setAttribute(featureName, attributeName, value);
+	/**
+	 * Check if the feature model contains inherited features.
+	 * 
+	 * @return true if inherited features exists
+	 */
+	public boolean hasInherited() {
+		for (Feature feature : getFeatureTable().values()) {
+			if (((ExtendedFeature) feature).isInherited()) {
+				return true;
+			}
+		}
+		return false;
 	}
 
-	public void addAttribute(String featureName, String attributeName, String value) {
-		stringAttributes.setAttribute(featureName, attributeName, value);
+	public boolean hasInterface() {
+		for (Feature feature : getFeatureTable().values()) {
+			if (((ExtendedFeature) feature).isInterface()) {
+				return true;
+			}
+		}
+		return false;
 	}
+
+	@Override
+	public void reset() {
+		super.reset();
+		usedModels.clear();
+	}
+	
+	/**
+	 * @return the mappingModel
+	 */
+	public FeatureModel getMappingModel() {
+		return mappingModel;
+	}
+
+	public Map<String, UsedModel> getExternalModels() {
+		return Collections.unmodifiableMap(usedModels);
+	}
+
+	/**
+	 * @param mappingModel the mappingModel to set
+	 */
+	public void setMappingModel(FeatureModel mappingModel) {
+		this.mappingModel = mappingModel;
+	}
+
+	public void runTests() {
+		final ExtendedFeatureModelAnalyzer analyzer = new ExtendedFeatureModelAnalyzer(this);
+		FMCorePlugin.getDefault().logInfo("Velvet-Featuremodel imported");
+
+		try {
+			FMCorePlugin.getDefault().logInfo(analyzer.isValid() ? "valid" : "invalid");
+			StringBuilder sb = new StringBuilder("Dead Features: ");
+			for (Feature deadFeature : analyzer.getDeadFeatures()) {
+				sb.append(deadFeature.getName() + ", ");
+			}
+			FMCorePlugin.getDefault().logInfo(sb.toString());
+			sb.delete(0, sb.length());
+			sb.append("FO Features: ");
+			for (Feature deadFeature : analyzer.getFalseOptionalFeatures()) {
+				sb.append(deadFeature.getName() + ", ");
+			}
+			FMCorePlugin.getDefault().logInfo(sb.toString());
+		} catch (final TimeoutException e ) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+	}
+	
+	@Override
+	@CheckForNull
+	public Feature getFeature(String name) {
+		Feature feature = super.getFeature(name);
+		if (feature != null) {
+			return feature;
+		}
+		return null;
+		// TODO MPL: Search for possible right feature
+//		return super.getFeature(parentModel + "." + name);
+	}
+	
 }

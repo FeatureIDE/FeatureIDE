@@ -171,10 +171,14 @@ public class GuidslReader extends AbstractFeatureModelReader {
 
 		Prods prods = ((MainModel) root).getProds();
 		AstListNode astListNode = (AstListNode) prods.arg[0];
-		do {
+		
+		readGProductionRoot((GProduction) astListNode.arg[0]);
+		astListNode = (AstListNode) astListNode.right;
+		
+		while (astListNode != null) {
 			readGProduction((GProduction) astListNode.arg[0]);
 			astListNode = (AstListNode) astListNode.right;
-		} while (astListNode != null);
+		}
 
 		AstOptNode consOptNode = (AstOptNode) prods.right;
 		if (consOptNode.arg.length > 0 && consOptNode.arg[0] != null)
@@ -223,12 +227,8 @@ public class GuidslReader extends AbstractFeatureModelReader {
 
 		featureModel.handleModelDataLoaded();
 	}
-
-	private void readGProduction(GProduction gProduction) throws UnsupportedModelException {
-		String name = gProduction.getIDENTIFIER().name;
-		Feature feature = featureModel.getFeature(name);
-		if (feature == null) 
-			throw new UnsupportedModelException("The compound feature '" + name + "' have to occur on a right side of a rule before using it on a left side!", gProduction.getIDENTIFIER().lineNum());
+	
+	private void readGProduction(GProduction gProduction, Feature feature) throws UnsupportedModelException {
 		feature.setAND(false);
 		Pats pats = gProduction.getPats();
 		AstListNode astListNode = (AstListNode) pats.arg[0];
@@ -239,6 +239,22 @@ public class GuidslReader extends AbstractFeatureModelReader {
 			astListNode = (AstListNode) astListNode.right;
 		} while (astListNode != null);
 		simplify(feature);
+	}
+	
+	private void readGProduction(GProduction gProduction) throws UnsupportedModelException {
+		final String name = gProduction.getIDENTIFIER().name;
+		final Feature feature = featureModel.getFeature(gProduction.getIDENTIFIER().name);
+		if (feature == null) {
+			throw new UnsupportedModelException("The compound feature '" + name + "' have to occur on a right side of a rule before using it on a left side!", gProduction.getIDENTIFIER().lineNum());
+		}
+		readGProduction(gProduction, feature);
+	}
+	
+	private void readGProductionRoot(GProduction gProduction) throws UnsupportedModelException {
+		final Feature root = new Feature(featureModel, gProduction.getIDENTIFIER().name);
+		featureModel.addFeature(root);
+		featureModel.setRoot(root);
+		readGProduction(gProduction, root);
 	}
 
 	private Feature readPat(Pat pat) throws UnsupportedModelException {

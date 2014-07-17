@@ -41,29 +41,29 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 
 	private String name;
 
-	private boolean mandatory = false;
+	private boolean mandatory;
 
-	private boolean concret = true;
+	private boolean concret;
 
-	private boolean and = true;
+	private boolean and;
 
-	private boolean multiple = false;
+	private boolean multiple;
 
-	private boolean hidden = false;
+	private boolean hidden;
 
-	private boolean constraintSelected = false;
+	private boolean constraintSelected;
 
 	private ColorList colorList;
 
 	private List<Constraint> partOfConstraints = new LinkedList<Constraint>();
 
-	private FeatureStatus status = FeatureStatus.NORMAL;
+	private FeatureStatus status;
 
 	private FeatureModel featureModel;
 
-	private FMPoint location = new FMPoint(0, 0);
+	private FMPoint location;
 	
-	private String description = null;
+	private String description;
 
 	/**
 	 * 
@@ -88,8 +88,57 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 	public Feature(FeatureModel featureModel, String name) {
 		this.featureModel = featureModel;
 		this.name = name;
+		
+		this.mandatory = false;
+		this.concret = true;
+		this.and = true;
+		this.multiple = false;
+		this.hidden = false;
+		this.constraintSelected = false;
+		this.colorList = new ColorList(this);
+		this.status = FeatureStatus.NORMAL;
+		this.location = new FMPoint(0, 0);
+		this.description = null;
+		this.parent = null;
+		
 		sourceConnections.add(parentConnection);
 		colorList = new ColorList(this);
+	}
+	
+	protected Feature(Feature feature, FeatureModel featureModel, boolean complete) {
+		this.featureModel = featureModel;
+		
+		this.name = feature.name;
+		this.mandatory = feature.mandatory;
+		this.concret = feature.concret;
+		this.and = feature.and;
+		this.multiple = feature.multiple;
+		this.hidden = feature.hidden;
+		this.constraintSelected = feature.constraintSelected;
+		this.status = feature.status;
+		this.description = feature.description;
+		
+		if (complete) {
+			this.colorList = feature.colorList.clone(this);
+			this.location = new FMPoint(feature.location.getX(), feature.location.getY());
+		} else {
+			this.colorList = null;
+			this.location = null;
+		}
+		
+		this.featureModel.addFeature(this);
+		for (Feature child : feature.children) {
+			Feature thisChild = this.featureModel.getFeature(child.getName());
+			if (thisChild == null) {
+				thisChild = child.clone(featureModel, complete);
+			}
+			this.featureModel.addFeature(thisChild);
+			children.add(thisChild);
+		}
+		
+		if (feature.parent != null) {
+			this.parent = this.featureModel.getFeature(feature.parent.getName());
+		}
 	}
 
 	public void setNewLocation(FMPoint newLocation) {
@@ -521,21 +570,32 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 		for (PropertyChangeListener listener : listenerList)
 			listener.propertyChange(event);
 	}
-
-	@SuppressWarnings("unchecked")
+	
+	/**
+	 * Returns the value of clone(this.getFeatureModel(), true).
+	 * 
+	 * @return a deep copy from the feature
+	 * 
+	 * @see #clone(FeatureModel, boolean)
+	 */
 	@Override
 	public Feature clone() {
-		Feature feature = new Feature(featureModel, name);
-		for (Feature child : (LinkedList<Feature>) children.clone()) {
-			feature.addChild(child.clone());
-		}
-		feature.and = and;
-		feature.mandatory = mandatory;
-		feature.multiple = multiple;
-		feature.hidden = hidden;
-		feature.concret = concret;
-		feature.colorList = colorList.clone(feature);
-		return feature;
+		return clone(getFeatureModel(), true);
+	}
+	
+	/**
+	 * Clones the feature.
+	 * If the parent feature is not contained in the given feature model, the cloned features parent will be {@code null}.
+	 * 
+	 * @param featureModel the new feature model, which is assigned to the copy.
+	 * @param complete If {@code false} the fields colorList and location will not be copied for a faster cloning process.
+	 * @return a deep copy from the feature
+	 * 
+	 * @see FeatureModel#clone()
+	 * @see FeatureModel#clone(boolean)
+	 */
+	public Feature clone(FeatureModel featureModel, boolean complete) {
+		return new Feature(this, featureModel, complete);
 	}
 
 	public void setAnd() {
@@ -594,55 +654,61 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 		}
 	}
 
-
-
 	public ColorList getColorList() {
 		return colorList;
 	}
 	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
 	@Override
 	public int hashCode() {
 		return name.hashCode();
 	}
-
-	/*
-	 * auto-generated methods cause the diagram to be shown incorrectly
-	 */
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#hashCode()
-	 * 
-	 * @Override public int hashCode() { final int prime = 31; int result = 1;
-	 * result = prime * result + (and ? 1231 : 1237); result = prime * result +
-	 * ((children == null) ? 0 : children.hashCode()); result = prime * result +
-	 * (concret ? 1231 : 1237); result = prime * result + (hidden ? 1231 :
-	 * 1237); result = prime * result + (mandatory ? 1231 : 1237); result =
-	 * prime * result + (multiple ? 1231 : 1237); result = prime * result +
-	 * ((name == null) ? 0 : name.hashCode()); result = prime * result +
-	 * ((parent == null) ? 0 : parent.hashCode()); return result; }
-	 * 
-	 * /* (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 * 
-	 * @Override public boolean equals(Object obj) { if (this == obj) return
-	 * true; if (obj == null) return false; if (getClass() != obj.getClass())
-	 * return false; Feature other = (Feature) obj; if (and != other.and) return
-	 * false; if (children == null) { if (other.children != null) return false;
-	 * } else if (!children.equals(other.children)) return false; if (concret !=
-	 * other.concret) return false; if (hidden != other.hidden) return false; if
-	 * (mandatory != other.mandatory) return false; if (multiple !=
-	 * other.multiple) return false; if (name == null) { if (other.name != null)
-	 * return false; } else if (!name.equals(other.name)) return false; if
-	 * (parent == null) { if (other.parent != null) return false; } else if
-	 * (!parent.equals(other.parent)) return false; return true; }
-	 */
 	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
+	// TODO fix UI bug when hashCode function is used.
+	// (feature model editor acts strange, root feature is not placed correctly)
+	// problem seems to be the static implementation of FeatureUIHelper
+	// all features are put in the same hash map
+	
+//	@Override
+//	public int hashCode() {
+//		final int prime = 31;
+//		int result = 17;
+//		result = prime * (result + (and ? 1231 : 1237));
+//		result = prime * (result + (concret ? 1231 : 1237));
+//		result = prime * (result + (hidden ? 1231 : 1237));
+//		result = prime * (result + (mandatory ? 1231 : 1237));
+//		result = prime * (result + (multiple ? 1231 : 1237));
+//		result = prime * (result + ((name == null) ? 0 : name.hashCode()));
+//		result = prime * (result + ((parent == null) ? 0 : parent.name.hashCode()));
+//		return result;
+//	}
+
+//	@Override
+//	public boolean equals(Object obj) {
+//		if (this == obj) {
+//			return true;
+//		}
+//		if (obj == null || getClass() != obj.getClass()) {
+//			return false;
+//		}
+//		
+//		Feature other = (Feature) obj;
+//		if (and != other.and || concret != other.concret || hidden != other.hidden 
+//				|| mandatory != other.mandatory || multiple != other.multiple)
+//			return false;
+//		
+//		if (name == null && other.name != null) {
+//			return false;
+//		}
+//		if (!name.equals(other.name)) {
+//			return false;
+//		}
+//		
+//		if (children == null && other.children != null) {
+//			return false;
+//		}
+//		if (children.equals(other.children)) {
+//			return false;
+//		}
+//		return true;
+//	}
 }

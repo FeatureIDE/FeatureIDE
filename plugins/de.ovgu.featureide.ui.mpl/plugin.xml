@@ -204,6 +204,78 @@
             </and>
          </visibility>
       </objectContribution>
+      <objectContribution
+            adaptable="true"
+            id="de.ovgu.featureide.core.mspl.contribution1"
+            objectClass="org.eclipse.core.resources.IProject">
+         <action
+               class="de.ovgu.featureide.ui.mpl.actions.interfaces.AddMSPLNatureAction"
+               id="de.ovgu.featureide.core.mspl.AddNatureAction"
+               label="Convert to Multi Software Product Line"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces3"
+               style="push">
+         </action>
+         <visibility>
+           <and>
+             <objectState
+                  name="nature"
+                  value="de.ovgu.featureide.core.featureProjectNature">
+             </objectState>
+             <not>
+               <objectState
+                    name="nature"
+                    value="de.ovgu.featureide.core.mpl.MSPLNature">
+               </objectState>
+             </not>
+           </and>
+         </visibility>
+      </objectContribution>
+      <objectContribution
+            adaptable="true"
+            id="de.ovgu.featureide.core.mspl.contribution2"
+            objectClass="org.eclipse.core.resources.IProject">
+         <action
+               class="de.ovgu.featureide.ui.mpl.actions.NewInterfaceAction"
+               enablesFor="1"
+               id="de.ovgu.featureide.core.mspl.NewInterfaceAction"
+               label="Create new Interface"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces3"
+               style="push">
+         </action>
+         <visibility>
+           <and>
+             <objectState
+                  name="nature"
+                  value="de.ovgu.featureide.core.featureProjectNature">
+             </objectState>
+	         <objectState
+	              name="nature"
+	              value="de.ovgu.featureide.core.mpl.MSPLNature">
+	         </objectState>
+           </and>
+         </visibility>
+      </objectContribution>
+      <objectContribution
+            adaptable="true"
+            id="de.ovgu.featureide.ui.mpl.mappingContribution"
+            nameFilter="*.config"
+            objectClass="org.eclipse.core.resources.IFile">
+         <action
+               class="de.ovgu.featureide.ui.mpl.actions.SetMappingAction"
+               id="de.ovgu.featureide.ui.mpl.SetMappingAction"
+               label="Set Current Mapping"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/interfaces"
+               style="push">
+         </action>
+         <visibility>
+            <and>
+               <objectState
+                     name="projectNature"
+                     value="de.ovgu.featureide.core.mpl.MSPLNature">
+               </objectState>
+            </and>
+         </visibility>
+      </objectContribution>
    </extension>
    <extension
          point="org.eclipse.ui.decorators">

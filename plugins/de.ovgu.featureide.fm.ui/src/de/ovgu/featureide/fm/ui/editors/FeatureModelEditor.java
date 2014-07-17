@@ -76,9 +76,8 @@ import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
+import de.ovgu.featureide.fm.core.io.ModelIOFactory;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslWriter;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.FeatureModelEditorContributor;
@@ -112,6 +111,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 
 	IFeatureModelReader featureModelReader;
 	IFeatureModelWriter featureModelWriter;
+	
+	private int ioType;
 
 	FeatureModelFile fmFile;
 	private IFile file;
@@ -145,26 +146,33 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		setPartName(file.getProject().getName() + " Model");
 		setTitleToolTip(input.getToolTipText());
 		super.setInput(input);
+		
+		ioType = ModelIOFactory.getTypeByFileName(file.getName());
+		if (ioType == ModelIOFactory.TYPE_UNKNOWN) {
+			FMUIPlugin.getDefault().logWarning("Unknown file extension.");
+		}
+		
+		featureModel = ModelIOFactory.getNewFeatureModel(ioType);
+		originalFeatureModel = ModelIOFactory.getNewFeatureModel(ioType);
+		
+		featureModelReader = ModelIOFactory.getModelReader(featureModel, ioType);
+		featureModelWriter = ModelIOFactory.getModelWriter(featureModel, ioType);
 
-		featureModel = new FeatureModel();
-
-		featureModelReader = new XmlFeatureModelReader(featureModel);
-		featureModelWriter = new XmlFeatureModelWriter(featureModel);
-
-		originalFeatureModel = new FeatureModel();
 		try {
-	    	new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(originalFeatureModel)).readFromFile(file);
-	    	new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(featureModel)).readFromFile(file);
+			new FeatureModelReaderIFileWrapper(
+					ModelIOFactory.getModelReader(originalFeatureModel, ioType)).readFromFile(file);
+			new FeatureModelReaderIFileWrapper(
+					ModelIOFactory.getModelReader(featureModel, ioType)).readFromFile(file);
 		} catch (Exception e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
-		FeatureUIHelper.showHiddenFeatures(originalFeatureModel
-				.getLayout().showHiddenFeatures(),featureModel);
+		FeatureUIHelper.showHiddenFeatures(originalFeatureModel.getLayout()
+				.showHiddenFeatures(), featureModel);
 		FeatureUIHelper.setVerticalLayoutBounds(originalFeatureModel
-				.getLayout().verticalLayout(),featureModel);
-		
+				.getLayout().verticalLayout(), featureModel);
+
 		getExtensions();
-		
+
 		FMPropertyManager.registerEditor(featureModel);
 	}
 
@@ -198,16 +206,17 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		createFeatureOrderPage();
 		createExtensionPages();
 		createSourcePage();
-		//if there are errors in the model file, go to source page
-		if(!textEditor.updateDiagram())setActivePage(getTextEditorIndex());
-		else 
+		// if there are errors in the model file, go to source page
+		if (!textEditor.updateDiagram())
+			setActivePage(getTextEditorIndex());
+		else
 			diagramEditor.getControl().getDisplay().asyncExec(new Runnable() {
 				public void run() {
 					diagramEditor.setContents(featureModel);
 					pageChange(getDiagramEditorIndex());
 				}
 			});
-	
+
 	}
 
 	void createDiagramPage() {
@@ -362,26 +371,29 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 
 	@Override
 	protected void pageChange(int newPageIndex) {
-		IEditorActionBarContributor contributor = getEditorSite().getActionBarContributor();
+		IEditorActionBarContributor contributor = getEditorSite()
+				.getActionBarContributor();
 		if (contributor instanceof FeatureModelEditorContributor) {
-			((FeatureModelEditorContributor) contributor).setActivePage(this, newPageIndex);
+			((FeatureModelEditorContributor) contributor).setActivePage(this,
+					newPageIndex);
 		}
-		
+
 		int oldPage = oldPageIndex;
-		//set oldPageIndex before calling methods pageChangeFrom/To to allow
-		//changes to OldPageIndex from inside these methods
-		//(used to block page changes in case of errors in the model)
+		// set oldPageIndex before calling methods pageChangeFrom/To to allow
+		// changes to OldPageIndex from inside these methods
+		// (used to block page changes in case of errors in the model)
 		oldPageIndex = newPageIndex;
 		getPage(oldPageIndex).pageChangeFrom(newPageIndex);
 		getPage(newPageIndex).pageChangeTo(oldPage);
 
-		
 		super.pageChange(newPageIndex);
 	}
 
 	/**
 	 * Gets the corresponding page for the given index.
-	 * @param index The index of the page
+	 * 
+	 * @param index
+	 *            The index of the page
 	 * @return The page
 	 */
 	private IFeatureModelEditorPage getPage(int index) {
@@ -394,10 +406,10 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		if (index == getTextEditorIndex()) {
 			return textEditor;
 		}
-		
+
 		for (IFeatureModelEditorPage page : extensionPages) {
 			if (page.getIndex() == index) {
-				return page; 
+				return page;
 			}
 		}
 
@@ -437,14 +449,15 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 		for (IFeatureModelEditorPage page : extensionPages) {
 			page.doSave(monitor);
 		}
-		
+
 		// write the model to the file
 		if (getActivePage() == textEditor.getIndex()) {
 			textEditor.updateDiagram();
 			textEditor.doSave(monitor);
 		} else {
 			try {
-				new FeatureModelWriterIFileWrapper(new XmlFeatureModelWriter(featureModel)).writeToFile(getModelFile());
+				new FeatureModelWriterIFileWrapper(
+						ModelIOFactory.getModelWriter(featureModel, ioType)).writeToFile(getModelFile());
 			} catch (CoreException e) {
 				FMUIPlugin.getDefault().logError(e);
 			}
@@ -452,18 +465,20 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 
 		// set originalFeatureModel
 		try {
-			new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(originalFeatureModel))
-				.readFromFile(fmFile.getResource());
+			new FeatureModelReaderIFileWrapper(
+					ModelIOFactory.getModelReader(originalFeatureModel, ioType)).readFromFile(fmFile.getResource());
 		} catch (Exception e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
-		
+
 		setPageModified(false);
 		updateConfigurationEditors();
 	}
 
 	/**
-	 * Sets the actual FeatureModel at the corresponding {@link ConfigurationEditor}s.
+	 * Sets the actual FeatureModel at the corresponding
+	 * {@link ConfigurationEditor}s.
+	 * 
 	 * @see ConfigurationEditor#propertyChange(PropertyChangeEvent)
 	 */
 	@SuppressWarnings("deprecation")
@@ -478,8 +493,11 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 						IFile editorFile = (IFile) editorInput
 								.getAdapter(IFile.class);
 						if (editorFile.getProject().equals(project)) {
-							((ConfigurationEditor) editor).propertyChange(
-									new PropertyChangeEvent(file,PropertyConstants.MODEL_DATA_CHANGED,null,null));
+							((ConfigurationEditor) editor)
+									.propertyChange(new PropertyChangeEvent(
+											file,
+											PropertyConstants.MODEL_DATA_CHANGED,
+											null, null));
 						}
 					}
 				}
@@ -497,9 +515,11 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 					.getWorkbench().getWorkbenchWindows()) {
 				for (IWorkbenchPage page : window.getPages()) {
 					for (IEditorPart editor : page.getEditors()) {
-						if (editor instanceof ConfigurationEditor && editor.isDirty()) {
+						if (editor instanceof ConfigurationEditor
+								&& editor.isDirty()) {
 							IEditorInput editorInput = editor.getEditorInput();
-							IFile editorFile = (IFile) editorInput.getAdapter(IFile.class);
+							IFile editorFile = (IFile) editorInput
+									.getAdapter(IFile.class);
 							if (editorFile.getProject().equals(project)) {
 								dirtyEditors.add(editorFile.getName());
 								dirtyEditors2.add(editor);
@@ -667,7 +687,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 					if (site == null) {
 						return;
 					}
-					IWorkbenchWindow workbenchWindow = site.getWorkbenchWindow();
+					IWorkbenchWindow workbenchWindow = site
+							.getWorkbenchWindow();
 					if (workbenchWindow == null) {
 						return;
 					}
@@ -697,13 +718,15 @@ public class FeatureModelEditor extends MultiPageEditorPart implements
 	private void setOutlinePage(FmOutlinePage fmOutlinePage) {
 		outlinePage = fmOutlinePage;
 	}
-	
+
 	public IFile getModelFile() {
 		return file;
 	}
-	
+
 	/**
-	 * This is just a call to the private method <code>setActivePage(int index)</code>.
+	 * This is just a call to the private method
+	 * <code>setActivePage(int index)</code>.
+	 * 
 	 * @param index
 	 */
 	public void setActiveEditorPage(int index) {

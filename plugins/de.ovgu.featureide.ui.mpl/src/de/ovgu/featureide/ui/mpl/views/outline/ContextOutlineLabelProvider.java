@@ -204,6 +204,7 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 		public void selectionChanged(SelectionChangedEvent event) {
 			if (viewer.getInput() != null) {
 				Object selection = ((IStructuredSelection) viewer.getSelection()).getFirstElement();
+				if (!(viewer.getInput() instanceof IResource)) return; 
 				InterfaceProject interfaceProject = MPLPlugin.getDefault().getInterfaceProject(((IResource) viewer.getInput()).getProject());
 				if (selection instanceof AbstractClassFragment) {
 					AbstractSignature sig = ((AbstractClassFragment) selection).getSignature();

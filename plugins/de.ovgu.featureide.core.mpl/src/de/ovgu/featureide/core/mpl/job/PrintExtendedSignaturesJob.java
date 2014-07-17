@@ -26,9 +26,9 @@ import org.eclipse.core.resources.IFolder;
 import org.prop4j.Node;
 
 import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.mpl.InterfaceProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.io.IOConstants;
-import de.ovgu.featureide.core.mpl.job.util.AMonitorJob;
 import de.ovgu.featureide.core.mpl.job.util.AJobArguments;
 import de.ovgu.featureide.core.mpl.signature.ProjectSignatures;
 import de.ovgu.featureide.core.mpl.signature.ProjectSignatures.SignatureIterator;
@@ -60,7 +60,12 @@ public class PrintExtendedSignaturesJob extends AMonitorJob<PrintExtendedSignatu
 
 	@Override
 	protected boolean work() {
-		IFolder folder = interfaceProject.getProjectReference().getFolder(arguments.foldername);
+		InterfaceProject interfaceProject = MPLPlugin.getDefault().getInterfaceProject(this.project);
+		if (interfaceProject == null) {
+			MPLPlugin.getDefault().logWarning(this.project.getName() + " is no Interface Project!");
+			return false;
+		}
+		IFolder folder = this.project.getFolder(arguments.foldername);
 		IOConstants.clearFolder(folder);
 		
 		LinkedList<String> allConcreteFeatures = new LinkedList<String>();
@@ -107,12 +112,12 @@ public class PrintExtendedSignaturesJob extends AMonitorJob<PrintExtendedSignatu
 			final String packagename = classSig.getPackage();
 			final String path = folderName + "/" + featureName + (packagename.isEmpty() ? "" :"/" + packagename);
 			
-			IFolder folder = CorePlugin.createFolder(interfaceProject.getProjectReference(), path);
+			IFolder folder = CorePlugin.createFolder(project, path);
 			
 			IOConstants.writeToFile(folder.getFile(classSig.getName() + IOConstants.EXTENSION_JAVA), curClass.toShortString());
 		}
 		
-		IFolder folder = CorePlugin.createFolder(interfaceProject.getProjectReference(), folderName + "/" + featureName);		
+		IFolder folder = CorePlugin.createFolder(project, folderName + "/" + featureName);		
 		IOConstants.writeToFile(folder.getFile("statistics.txt"), signature.getStatisticsString());
 		return signature.getStatisticsStringHeader();
 	}

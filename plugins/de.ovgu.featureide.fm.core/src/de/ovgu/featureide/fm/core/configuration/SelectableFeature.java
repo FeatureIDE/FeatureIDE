@@ -31,9 +31,9 @@ public class SelectableFeature extends TreeElement {
 
 	private Selection automatic = Selection.UNDEFINED;
 
-	private Feature feature;
+	private final Feature feature;
 
-	private Configuration configuration;
+	private final Configuration configuration;
 
 	private String name;
 
@@ -51,10 +51,11 @@ public class SelectableFeature extends TreeElement {
 	}
 
 	protected void setManual(Selection manual) {
-		if (manual == Selection.UNDEFINED || automatic == Selection.UNDEFINED)
+		if (manual == Selection.UNDEFINED || automatic == Selection.UNDEFINED) {
 			this.manual = manual;
-		else if (manual != automatic)
+		} else if (manual != automatic) {
 			throw new SelectionNotPossibleException(feature.getName(), manual);
+		}
 	}
 
 	public Selection getAutomatic() {
@@ -62,15 +63,17 @@ public class SelectableFeature extends TreeElement {
 	}
 
 	protected void setAutomatic(Selection automatic) {
-		if (automatic == Selection.UNDEFINED || manual == Selection.UNDEFINED || manual == automatic)
+		if (automatic == Selection.UNDEFINED || manual == Selection.UNDEFINED || manual == automatic) {
 			this.automatic = automatic;
-		else
+		} else {
 			throw new AutomaticalSelectionNotPossibleException(feature.getName(), automatic);
+		}
 	}
 
 	public String getName() {
-		if (name != null)
+		if (name != null) {
 			return name;
+		}
 		return feature == null ? null : feature.getName();
 	}
 

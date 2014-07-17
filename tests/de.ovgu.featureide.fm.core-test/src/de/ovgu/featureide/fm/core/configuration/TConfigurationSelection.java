@@ -47,7 +47,7 @@ public class TConfigurationSelection extends AbstractConfigurationTest{
 		Configuration c = new Configuration(fm, true);
 //		Configuration c = new Configuration(fm, false);
 		c.setManual("C", Selection.SELECTED);
-		assertTrue(c.valid());
+		assertTrue(c.isValid());
 		assertEquals(2, c.number());
 	}
 
@@ -55,7 +55,7 @@ public class TConfigurationSelection extends AbstractConfigurationTest{
 	public void testSelection2() 
 	{
 		Configuration c = new Configuration(fm, true);
-		assertTrue(c.valid());
+		assertTrue(c.isValid());
 		assertEquals(2, c.number());
 	}
 
@@ -66,7 +66,7 @@ public class TConfigurationSelection extends AbstractConfigurationTest{
 //		Configuration c = new Configuration(fm, false);
 		c.setManual("A", Selection.SELECTED);
 		c.setManual("C", Selection.SELECTED);
-		assertTrue(c.valid());
+		assertTrue(c.isValid());
 		assertEquals(1, c.number());
 	}
 
@@ -75,7 +75,7 @@ public class TConfigurationSelection extends AbstractConfigurationTest{
 	{
 		Configuration c = new Configuration(fm, true);
 		c.setManual("A", Selection.SELECTED);
-		assertTrue(c.valid());
+		assertTrue(c.isValid());
 		assertEquals(1, c.number());
 	}
 

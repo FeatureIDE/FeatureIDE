@@ -35,19 +35,21 @@ public class German implements ILanguage {
 	private static final String LEGEND = "Legende:";
 	private static final String MANDATORY = "Obligatorisch";
 	private static final String ABSTRACT = "Abstrakt";
+	private static final String IMPORTED = "Importiert";
+	private static final String INHERITED = "Geerbt";
+	private static final String INTERFACED = "von Interface";
 	private static final String CONCRETE = "Konkret";
 	private static final String HIDDEN = "Versteckt";
-	private static final String DEAD = "Unwï¿½hlbar";
+	private static final String DEAD = "Unwählbar";
 	private static final String FALSE_OPTIONAL ="Falsch-optionales Feature";
 	private static final String ALTERNATIVE = "Alternative";
 	private static final String OR = "Oder";
 	private static final String OPTIONAL = "Optional";
 	private static final String INDETHIDDEN = "Unbestimmbar verstecktes Feature";
 	private static final String REDUNDANT = "Redundantes Constraint";
-	private static final String UNSATISFIABLE_CONST = "Unerfï¿½llbares Constraint";
+	private static final String UNSATISFIABLE_CONST = "Unerfüllbares Constraint";
 	private static final String TAUTOLOGY_CONST = "Constraint ist Tautologie";
-	private static final String VOID_MODEL_CONST = "Constraint macht Produktlinie unerfï¿½llbar";
-	
+	private static final String VOID_MODEL_CONST = "Constraint macht Produktlinie unerfüllbar";	
 	
 	@Override
 	public String getRedundantConst() {
@@ -94,6 +96,21 @@ public class German implements ILanguage {
 	@Override
 	public String getAbstract() {
 		return ABSTRACT;
+	}
+
+	@Override
+	public String getImported() {
+		return IMPORTED;
+	}
+
+	@Override
+	public String getInherited() {
+		return INHERITED;
+	}
+
+	@Override
+	public String getInterfaced() {
+		return INTERFACED;
 	}
 
 	@Override

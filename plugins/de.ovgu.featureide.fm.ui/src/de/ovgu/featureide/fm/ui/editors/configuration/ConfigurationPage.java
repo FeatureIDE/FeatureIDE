@@ -102,28 +102,29 @@ public class ConfigurationPage extends ConfigurationEditorPage {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				if (event.detail == SWT.CHECK) {
-					if ((((TreeItem)event.item).getText()).startsWith(configurationEditor.configuration.getRoot().getName())) {
+					final TreeItem item = (TreeItem)event.item;
+//					if (item.getText().startsWith(configurationEditor.getConfiguration().getRoot().getName())) {
+					if (item.getText().equals(configurationEditor.getConfiguration().getRoot().getName())) {
 						// case: root
-						((TreeItem)event.item).setChecked(true);
+						item.setChecked(true);
 						//((TreeItem)event.item).setGrayed(true);
-					} else if (((TreeItem)event.item).getGrayed()) {
+					} else if (item.getGrayed()) {
 						// case: grayed and selected
-						((TreeItem)event.item).setChecked(true);
-					} else if (((TreeItem)event.item).getForeground().equals(gray)) {
+						item.setChecked(true);
+					} else if (item.getForeground().equals(gray)) {
 						// case: grayed and unselected
-						((TreeItem)event.item).setChecked(false);
+						item.setChecked(false);
 					} else {
 						// case: selectable
 						if (!selectionChanged) {
 							// do nothing if selection changed to fast
-							if (((TreeItem)event.item).getChecked()) {
-								((TreeItem)event.item).setChecked(true);
+							if (item.getChecked()) {
+								item.setChecked(true);
 							} else {
-								((TreeItem)event.item).setChecked(false);
+								item.setChecked(false);
 							}
 						} else {
-							changeSelection(configurationEditor.configuration.getSelectablefeature(
-								((TreeItem)event.item).getText()));		
+							changeSelection(configurationEditor.getConfiguration().getSelectablefeature(item.getText()));		
 							refreshTree();
 						}
 					}
@@ -147,7 +148,7 @@ public class ConfigurationPage extends ConfigurationEditorPage {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				if (errorMessage()) {
-					setInput(configurationEditor.configuration);			
+					setInput(configurationEditor.getConfiguration());			
 				}
 				return Status.OK_STATUS;
 			}
@@ -159,18 +160,18 @@ public class ConfigurationPage extends ConfigurationEditorPage {
 
 	private void refreshTree() {
 		hiddenFeatures = new LinkedList<String>();
-		for (Feature feature : configurationEditor.configuration.getFeatureModel().getFeatures()) {
+		for (Feature feature : configurationEditor.getConfiguration().getFeatureModel().getFeatures()) {
 			if (feature.isHidden())
 				hiddenFeatures.add(feature.getName());
 		}
 		TreeItem root = tree.getItem(0);
-		root.setText(AdvancedConfigurationLabelProvider.getRootlabel(configurationEditor.configuration));
+		root.setText(AdvancedConfigurationLabelProvider.getRootlabel(configurationEditor.getConfiguration()));
 		setCheckbox(root);
 	}
 
 	private void setCheckbox(TreeItem root) {
 		resetColor();
-		setCheckbox(root, configurationEditor.configuration.valid());
+		setCheckbox(root, configurationEditor.getConfiguration().isValid());
 		selectionChanged = true;
 		setColor();
 	}
@@ -197,7 +198,7 @@ public class ConfigurationPage extends ConfigurationEditorPage {
 			child.setForeground(null);
 			child.setBackground(null);
 			child.setFont(treeItemStandardFont);
-			SelectableFeature feature = configurationEditor.configuration.getSelectablefeature(child.getText());
+			SelectableFeature feature = configurationEditor.getConfiguration().getSelectablefeature(child.getText());
 			if (feature.getAutomatic() != Selection.UNDEFINED) {
 				if (feature.getAutomatic() == Selection.SELECTED){
 					child.setChecked(true);
@@ -206,15 +207,14 @@ public class ConfigurationPage extends ConfigurationEditorPage {
 					child.setChecked(false);
 					child.setForeground(gray);
 				}
-			} else if (feature.getManual() == Selection.UNDEFINED || 
-					feature.getManual() == Selection.UNSELECTED){
-				child.setChecked(false);
+			} else if (feature.getManual() == Selection.SELECTED) {
+				child.setChecked(true);
 				if(!configuration_valid) {
 					features.add(feature);
 					items.put(feature, child);
 				}
-			} else if (feature.getManual() == Selection.SELECTED) {
-				child.setChecked(true);
+			} else {
+				child.setChecked(false);
 				if(!configuration_valid) {
 					features.add(feature);
 					items.put(feature, child);
@@ -231,31 +231,38 @@ public class ConfigurationPage extends ConfigurationEditorPage {
 	 */
 	private void setColor() {
 		returnFormThread = false;
-		job_color = new Job("Feature coloring.(" + configurationEditor.file.getName() + ")") {
+		job_color = new Job("Feature coloring.(" + configurationEditor.getFile().getName() + ")") {
 			public IStatus run(IProgressMonitor monitor) {
-				if (features != null && features.size() != 0 && !features.isEmpty()) {
-					monitor.beginTask("", features.size());
+				System.out.println();
+				if (features != null && !features.isEmpty()) {
+//					monitor.beginTask("", features.size());
+					monitor.beginTask("", 1);
+					boolean[] validConfs = configurationEditor.getConfiguration().leadToValidConfiguration(features);
+					int i = 0;
 					for (SelectableFeature feature : features) {
-						monitor.subTask("Check feature " + feature.getName());
-						if (returnFormThread || monitor.isCanceled()) {
-							monitor.done();
-							return Status.OK_STATUS;
+						if (validConfs[i++]) {
+							setColor(items.get(feature), (feature.getManual() == Selection.SELECTED) ? blue : green);
 						}
-						if (feature.getManual() == Selection.SELECTED) {
-							if (configurationEditor.configuration.leadToValidConfiguration(feature, Selection.UNDEFINED, Selection.SELECTED )) {
-								if (!returnFormThread) {
-									setColor(items.get(feature), blue);
-								}
-							}
-						} else {
-							if (configurationEditor.configuration.leadToValidConfiguration(feature, Selection.SELECTED, Selection.UNDEFINED)) {
-								if (!returnFormThread) {
-									setColor(items.get(feature), green);
-								}
-							}
-						}
-						monitor.worked(1);
 					}
+					monitor.worked(1);
+					
+//					for (SelectableFeature feature : features) {
+//						monitor.subTask("Check feature " + feature.getName());
+//						if (returnFormThread || monitor.isCanceled()) {
+//							monitor.done();
+//							return Status.OK_STATUS;
+//						}
+//						if (feature.getManual() == Selection.SELECTED) {
+//							if (configurationEditor.getConfiguration().leadToValidConfiguration(feature, Selection.UNDEFINED, Selection.SELECTED )) {
+//								setColor(items.get(feature), blue);
+//							}
+//						} else {
+//							if (configurationEditor.getConfiguration().leadToValidConfiguration(feature, Selection.SELECTED, Selection.UNDEFINED)) {
+//								setColor(items.get(feature), green);
+//							}
+//						}
+//						monitor.worked(1);
+//					}
 				}
 				monitor.done();
 				return Status.OK_STATUS;
@@ -308,14 +315,14 @@ public class ConfigurationPage extends ConfigurationEditorPage {
 	
 	private boolean errorMessage() {
 
-		if (configurationEditor.configuration==null||(!configurationEditor.configuration.valid() && configurationEditor.configuration.number() == 0)){
+		if (configurationEditor.getConfiguration()==null||(!configurationEditor.getConfiguration().isValid() && configurationEditor.getConfiguration().number() == 0)){
 			tree.removeAll();
 			TreeItem item = new TreeItem(tree, 1);
-			if (configurationEditor.modelFile ==  null) {
+			if (configurationEditor.getModelFile() ==  null) {
 				item.setText("There is no feature model corresponding to this configuration, reopen the editor and select one.");
-			} else if (!configurationEditor.modelFile.exists()) {
+			} else if (!configurationEditor.getModelFile().exists()) {
 				// This case should never happen
-				item.setText("The given feature model " + configurationEditor.modelFile.getPath() + " does not exist.");
+				item.setText("The given feature model " + configurationEditor.getModelFile().getPath() + " does not exist.");
 			} else {
 				item.setText("The feature model for this project is void, i.e., " +
 						"there is no valid configuration. You need to correct the " +
@@ -351,7 +358,7 @@ public class ConfigurationPage extends ConfigurationEditorPage {
 	}
 
 	protected void set(SelectableFeature feature, Selection selection) {
-		configurationEditor.configuration.setManual(feature, selection);
+		configurationEditor.getConfiguration().setManual(feature, selection);
 	}
 
 	/* (non-Javadoc)

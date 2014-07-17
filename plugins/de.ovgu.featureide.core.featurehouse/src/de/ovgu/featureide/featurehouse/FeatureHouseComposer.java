@@ -139,8 +139,6 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 	public static final String COMPOSER_ID = "de.ovgu.featureide.composer.featurehouse";
 
-	private static final String NEWLINE = System.getProperty("line.separator", "\n");
-
 	private FSTGenComposer composer;
 
 	public FeatureHouseModelBuilder fhModelBuilder;

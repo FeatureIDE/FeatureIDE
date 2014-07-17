@@ -41,7 +41,7 @@ public class TextEditorPage extends TextEditor implements IConfigurationEditorPa
 
 	private int index;
 
-	private ConfigurationEditor configurationEditor;
+	private IConfigurationEditor configurationEditor;
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.ui.editors.IConfigurationEditorPage#getID()
 	 */
@@ -70,7 +70,7 @@ public class TextEditorPage extends TextEditor implements IConfigurationEditorPa
 	 * @see de.ovgu.featureide.ui.editors.IConfigurationEditorPage#setConfigurationEditor(de.ovgu.featureide.ui.editors.ConfigurationEditor)
 	 */
 	@Override
-	public void setConfigurationEditor(ConfigurationEditor configurationEditor) {
+	public void setConfigurationEditor(IConfigurationEditor configurationEditor) {
 		this.configurationEditor = configurationEditor;
 	}
 
@@ -87,12 +87,12 @@ public class TextEditorPage extends TextEditor implements IConfigurationEditorPa
 	 */
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
-		if(configurationEditor.configuration==null){
+		if(configurationEditor.getConfiguration()==null){
 	
 			return;
 		}
-		String source = new ConfigurationWriter(configurationEditor.configuration)
-				.writeIntoString(configurationEditor.file);
+		String source = new ConfigurationWriter(configurationEditor.getConfiguration())
+				.writeIntoString();
 		IDocumentProvider provider = getDocumentProvider();
 		IDocument document = provider.getDocument(getEditorInput());
 		if (!source.equals(document.get()))

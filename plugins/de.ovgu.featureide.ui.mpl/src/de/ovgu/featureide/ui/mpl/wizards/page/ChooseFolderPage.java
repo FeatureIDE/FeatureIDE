@@ -20,11 +20,7 @@
  */
 package de.ovgu.featureide.ui.mpl.wizards.page;
 
-import java.util.Map;
-
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -80,41 +76,21 @@ public class ChooseFolderPage extends AbstractWizardPage {
 		folderName = new Text(configGroup, SWT.BORDER | SWT.SINGLE);
 		folderName.setText(folderNameString);
 		folderName.setLayoutData(gridData2);
-		addListeners();
-		dialogChanged();
-	}
-
-	private void addListeners() {
 		folderName.addKeyListener(new KeyPressedListener());
-	}
-
-	private class KeyPressedListener implements KeyListener {
-		@Override
-		public void keyPressed(KeyEvent e) {
-		}
-
-		@Override
-		public void keyReleased(KeyEvent e) {
-			dialogChanged();
-		}
-	}
-
-	protected void dialogChanged() {
-		folderNameString = folderName.getText();
-		if (folderNameString.isEmpty()) {
-			updateStatus("Enter a folder name");
-		} else {
-			updateStatus(null);
-		}
-	}
-
-	protected void updateStatus(String message) {
-		setErrorMessage(message);
-		setPageComplete(message == null);
+		updatePage();
 	}
 
 	@Override
-	public void putData(Map<String, Object> dataMap) {
-		dataMap.put(WizardConstants.KEY_FOLDER, folderNameString);
+	protected String checkPage() {
+		folderNameString = folderName.getText();
+		if (folderNameString.isEmpty()) {
+			return "Enter a folder name";
+		}
+		return null;
+	}
+
+	@Override
+	protected void putData() {
+		abstractWizard.putData(WizardConstants.KEY_OUT_FOLDER, folderNameString);
 	}
 }

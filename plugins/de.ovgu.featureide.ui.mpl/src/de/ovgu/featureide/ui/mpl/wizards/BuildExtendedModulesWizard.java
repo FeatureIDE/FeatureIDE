@@ -20,11 +20,8 @@
  */
 package de.ovgu.featureide.ui.mpl.wizards;
 
-import java.util.List;
-
 import de.ovgu.featureide.ui.mpl.MPLUIPlugin;
 import de.ovgu.featureide.ui.mpl.actions.interfaces.BuildExtendedModulesAction;
-import de.ovgu.featureide.ui.mpl.wizards.page.AbstractWizardPage;
 import de.ovgu.featureide.ui.mpl.wizards.page.ChooseFolderPage;
 
 /**
@@ -43,7 +40,7 @@ public class BuildExtendedModulesWizard extends AbstractWizard {
 	}
 
 	@Override
-	protected void initPages(List<AbstractWizardPage> pages) {
-		pages.add(new ChooseFolderPage(defaultFolderString));
+	public void addPages() {
+		addPage(new ChooseFolderPage(defaultFolderString));
 	}
 }
