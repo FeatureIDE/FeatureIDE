@@ -31,6 +31,24 @@
             </objectState>
          </visibility>
       </objectContribution>
+      <objectContribution
+            adaptable="true"
+            id="de.ovgu.featureide.core.featurehouse.startproof"
+            objectClass="org.eclipse.core.resources.IProject">
+         <action
+               class="de.ovgu.featureide.featurehouse.meta.StartProofAction"
+               id="de.ovgu.featureide.featurehouse.meta.startProofAction"
+               label="Start Proof"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/featurehouse"
+               style="push">
+         </action>
+         <visibility>
+            <objectState
+                  name="nature"
+                  value="de.ovgu.featureide.core.featureProjectNature">
+            </objectState>
+         </visibility>
+      </objectContribution>
 	</extension>
  <extension
        id="de.ovgu.featureide.featurehouse.meta.verificationmarker"

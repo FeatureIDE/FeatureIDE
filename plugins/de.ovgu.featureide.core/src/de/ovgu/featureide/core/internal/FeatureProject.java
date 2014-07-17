@@ -1373,7 +1373,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	 * 
 	 * @see de.ovgu.featureide.core.IFeatureProject#relavantChanges()
 	 */
-	public boolean buildRelavantChanges() {
+	public boolean buildRelevantChanges() {
 		return buildRelevantChanges;
 	}
 
