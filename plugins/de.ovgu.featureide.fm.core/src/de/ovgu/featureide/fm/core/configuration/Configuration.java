@@ -52,8 +52,9 @@ public class Configuration {
 		COMPLETION_ONE_CLICK = 1,
 		COMPLETION_CHANGE = 2,
 		COMPLETION_OPEN_CLAUSES = 3;
-	
-	public static int COMPLETION = COMPLETION_ONE_CLICK;
+
+	public static int DEFAULT_COMPLETION = COMPLETION_OPEN_CLAUSES;
+	public static int FEATURE_LIMIT_FOR_DEFAULT_COMPLETION = 150;
 	
 	private static final int TIMEOUT = 1000;
 
@@ -202,7 +203,10 @@ public class Configuration {
 	}
 	
 	public boolean[] leadToValidConfiguration(List<SelectableFeature> featureList) {
-		return leadToValidConfiguration(featureList, COMPLETION);
+		if (featureList.size() > FEATURE_LIMIT_FOR_DEFAULT_COMPLETION) {
+			leadToValidConfiguration(featureList, COMPLETION_OPEN_CLAUSES);
+		}
+		return leadToValidConfiguration(featureList, DEFAULT_COMPLETION);
 	}
 	
 	public boolean[] leadToValidConfiguration(List<SelectableFeature> featureList, int mode) {
@@ -289,9 +293,7 @@ public class Configuration {
 			if ((ignoreAbstractFeatures || feature.isConcrete()) && !feature.hasHiddenParent()) {
 				final String featureName = feature.getName();
 				final Selection selection = selectableFeature.getSelection();
-//				if (selection != Selection.UNDEFINED) {
-					featureMap.put(featureName, selectableFeature); // == Selection.SELECTED);
-//				}
+				featureMap.put(featureName, selectableFeature);
 				featureToIndexMap.put(featureName, c);
 				allLiteralList.add(new Literal(featureName, selection == Selection.SELECTED));
 				c++;
