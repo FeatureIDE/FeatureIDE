@@ -46,6 +46,36 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
  * Represents a configuration and provides operations for the configuration process.
  */
 public class Configuration {
+	
+	private static class BuildThread extends Thread {
+		private final FeatureModel featureModel;
+		private final Set<String> featureSet;
+		private final boolean ignoreAbstractFeatures;
+		private Node buildNode;
+		
+		public BuildThread(FeatureModel featureModel, Set<String> featureSet) {
+			super();
+			this.featureModel = featureModel;
+			this.featureSet = featureSet;
+			this.ignoreAbstractFeatures = false;
+		}
+		
+		public BuildThread(FeatureModel featureModel, boolean ignoreAbstractFeatures) {
+			super();
+			this.featureModel = featureModel;
+			this.featureSet = null;
+			this.ignoreAbstractFeatures = ignoreAbstractFeatures;
+		}
+		
+		@Override
+		public void run() {
+			if (featureSet != null) {
+				buildNode = NodeCreator.createNodes(featureModel, featureSet).toCNF();
+			} else {
+				buildNode = NodeCreator.createNodes(featureModel, ignoreAbstractFeatures).toCNF();
+			}
+		}
+	}
 
 	public static final int 
 		COMPLETION_NONE = 0,
@@ -106,7 +136,7 @@ public class Configuration {
 		this(featureModel, propagate, true);
 	}
 	
-	public Configuration(FeatureModel featureModel, boolean propagate, boolean ignoreAbstractFeatures) {
+	public Configuration(final FeatureModel featureModel, boolean propagate, final boolean ignoreAbstractFeatures) {
 		this.featureModel = featureModel;
 		this.propagate = propagate;
 		this.ignoreAbstractFeatures = ignoreAbstractFeatures;
@@ -114,11 +144,26 @@ public class Configuration {
 		Feature featureRoot = featureModel.getRoot();
 		root = new SelectableFeature(this, featureRoot);
 		initFeatures(root, featureRoot);
-
-		rootNode = NodeCreator.createNodes(featureModel, ignoreAbstractFeatures).toCNF();
+		
+		// Build both cnfs simultaneously for better performance
 		if (featureRoot != null) {
-			rootNodeWithoutHidden = NodeCreator.createNodes(featureModel, getRemoveFeatures(!ignoreAbstractFeatures, true)).toCNF();
+			BuildThread buildThread1 = new BuildThread(featureModel, getRemoveFeatures(!ignoreAbstractFeatures, true));
+			BuildThread buildThread2 = new BuildThread(featureModel, ignoreAbstractFeatures);
+			
+			buildThread1.start();
+			buildThread2.start();
+			
+			try {
+				buildThread2.join();
+				buildThread1.join();
+			} catch (InterruptedException e) {
+				FMCorePlugin.getDefault().logError(e);
+			}
+
+			rootNodeWithoutHidden = buildThread1.buildNode;
+			rootNode = buildThread2.buildNode;
 		} else {
+			rootNode = NodeCreator.createNodes(featureModel, ignoreAbstractFeatures).toCNF();
 			rootNodeWithoutHidden = rootNode.clone();
 		}
 		

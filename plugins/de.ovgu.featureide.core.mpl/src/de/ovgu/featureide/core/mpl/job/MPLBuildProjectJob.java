@@ -81,11 +81,11 @@ public class MPLBuildProjectJob extends AMonitorJob<MPLBuildProjectJob.Arguments
 	protected boolean work() {
 		try {
 			if(arguments.externalFeatureProject.getProject().hasNature(MSPLNature.NATURE_ID)) {
-				if (!buildMPLProject(arguments.externalFeatureProject, arguments.configuration, arguments.varName)) {
+				if (!buildMPLProject()) {
 					return false;
 				}
 			} else {
-				if (!buildFeatureProject(arguments.externalFeatureProject, arguments.configuration, arguments.varName, arguments.buildF)) {
+				if (!buildFeatureProject(arguments.varName, arguments.buildF)) {
 					return false;
 				}
 			}
@@ -110,17 +110,11 @@ public class MPLBuildProjectJob extends AMonitorJob<MPLBuildProjectJob.Arguments
 		// rename
 		jobList.add(createJob(new MPLRenameExternalJob.Arguments(
 				arguments.externalFeatureProject.getProject(), configName, 
-				internTempBuildFolder.getFullPath()
-//				externalFeatureProject.getBuildFolder().getFolder(configName).getFullPath()
-				)));
+				internTempBuildFolder.getFullPath())));
 		
 		// copy
 		jobList.add(createJob(new MPLCopyExternalJob.Arguments(
-				internTempBuildFolder
-//				externalFeatureProject.getBuildFolder().getFolder(configName)
-				, rootBuildFolder
-//				tempBuildFolder
-				)));
+				internTempBuildFolder, rootBuildFolder)));
 		
 		JobManager.insertJobs(this, jobList);
 	}
@@ -131,14 +125,14 @@ public class MPLBuildProjectJob extends AMonitorJob<MPLBuildProjectJob.Arguments
 		return curJob;
 	}
 	
-	private boolean buildMPLProject(IFeatureProject mplFeatureProject, Configuration config, String varName) {
-		final FeatureModel featureModel = mplFeatureProject.getFeatureModel();
+	private boolean buildMPLProject() {
+		final FeatureModel featureModel = arguments.externalFeatureProject.getFeatureModel();
 		if (!(featureModel instanceof ExtendedFeatureModel)) {
 			return false;
 		}
 		
-		if (varName == null) {
-			varName = mplFeatureProject.getCurrentConfiguration().getName();
+		if (arguments.varName == null) {
+			String varName = arguments.externalFeatureProject.getCurrentConfiguration().getName();
 			final int splitIndex = varName.lastIndexOf('.');
 			if (splitIndex > -1) {
 				varName = varName.substring(0, splitIndex);
@@ -149,17 +143,11 @@ public class MPLBuildProjectJob extends AMonitorJob<MPLBuildProjectJob.Arguments
 			rootBuildFolder = arguments.buildF;
 			internTempBuildFolder = arguments.externalFeatureProject.getBuildFolder();
 		}
-
-//		final IFolder tempBuildFolder = arguments.buildF.getFolder(varName);
-//		tempExternBuildFolder = arguments.buildF.getFolder("_" + varName);
+		
 		try {
-			if (internTempBuildFolder.exists()) {
-				internTempBuildFolder.delete(true, monitor);
-			}
 			if (!rootBuildFolder.exists()) {
-				rootBuildFolder.create(true, true, null);
+				rootBuildFolder.create(true, true, monitor);
 			}
-			internTempBuildFolder.create(true, true, null);
 		} catch (CoreException e) {
 			MPLPlugin.getDefault().logError(e);
 			return false;
@@ -167,20 +155,30 @@ public class MPLBuildProjectJob extends AMonitorJob<MPLBuildProjectJob.Arguments
 		
 		// build own project
 		// featureProject.deleteBuilderMarkers(featureProject.getProject(), IResource.DEPTH_INFINITE);
-		if (!buildFeatureProject(mplFeatureProject, config, varName, rootBuildFolder)) {
+		if (!buildFeatureProject(arguments.varName, rootBuildFolder)) {
 			return false;
 		}
-
+				
+		try {
+			if (internTempBuildFolder.exists()) {
+				internTempBuildFolder.delete(true, monitor);
+			}
+			internTempBuildFolder.create(true, true, monitor);
+		} catch (CoreException e) {
+			MPLPlugin.getDefault().logError(e);
+			return false;
+		}
+		
 		// get mapping of other projects
 		final ExtendedFeatureModel extFeatureModel = (ExtendedFeatureModel) featureModel;
 		final Configuration mappedProjects = new Configuration(extFeatureModel.getMappingModel());
 		try {
-			String mappingFileName = mplFeatureProject.getProject().getPersistentProperty(MPLPlugin.mappingConfigID);
+			String mappingFileName = arguments.externalFeatureProject.getProject().getPersistentProperty(MPLPlugin.mappingConfigID);
 			if (mappingFileName == null) {
 				MPLPlugin.getDefault().logInfo("No mapping file specified.");
 				return false;
 			}
-			new ConfigurationReader(mappedProjects).readFromFile(mplFeatureProject.getProject().getFile("InterfaceMapping/" + mappingFileName));
+			new ConfigurationReader(mappedProjects).readFromFile(arguments.externalFeatureProject.getProject().getFile("InterfaceMapping/" + mappingFileName));
 		} catch (Exception e) {
 			MPLPlugin.getDefault().logError(e);
 			return false;
@@ -198,7 +196,7 @@ public class MPLBuildProjectJob extends AMonitorJob<MPLBuildProjectJob.Arguments
 				final String projectName = mappedProject.getName().substring(splittIndex + 1);
 				final String configName = mappedProject.getName().substring(0, splittIndex);
 				
-				buildExternalProject(projectName, config, configName);
+				buildExternalProject(projectName, arguments.configuration, configName);
 			}
 		}
 		
@@ -208,31 +206,37 @@ public class MPLBuildProjectJob extends AMonitorJob<MPLBuildProjectJob.Arguments
 				final String projectName = usedModel.getModelName();
 				final String configName = usedModel.getVarName();
 				
-				buildExternalProject(projectName, config, configName);
+				buildExternalProject(projectName, arguments.configuration, configName);
 			}
 		}
 		
 		return true;
 	}
 	
-	private boolean buildFeatureProject(IFeatureProject featureProject, Configuration config, String varName, IFolder buildFolder) {
-		final IComposerExtension composerExtension = featureProject.getComposer();
+	private boolean buildFeatureProject(String varName, IFolder buildFolder) {
+		final IComposerExtension composerExtension = arguments.externalFeatureProject.getComposer();
 		if (composerExtension == null) {
 			return false;
 		}
 
-		// Refresh model
+		// Refresh model and
+		// Delete all files in the build folder
 		try {
-			featureProject.getProject().refreshLocal(IResource.DEPTH_ONE, null);
+			arguments.externalFeatureProject.getProject().refreshLocal(IResource.DEPTH_ONE, null);
+			for (IResource member : buildFolder.members()) {
+				member.delete(true, monitor);
+			}
+			buildFolder.refreshLocal(IResource.DEPTH_ZERO, null);
 		} catch (CoreException e) {
 			MPLPlugin.getDefault().logError(e);
+			return false;
 		}
 		
 		if (varName != null) {
 			// Get partial configs 
 			// TODO MPL: config richtig anpassen
-			final Configuration newConfiguration = new Configuration(featureProject.getFeatureModel());
-			for (SelectableFeature feature : config.getFeatures()) {
+			final Configuration newConfiguration = new Configuration(arguments.externalFeatureProject.getFeatureModel());
+			for (SelectableFeature feature : arguments.configuration.getFeatures()) {
 				if (feature.getName().startsWith(varName + ".")) {
 					String featureName = feature.getName().substring(varName.length() + 1);
 					try {
@@ -260,46 +264,26 @@ public class MPLBuildProjectJob extends AMonitorJob<MPLBuildProjectJob.Arguments
 				return false;
 			}
 			
-			// Delete all files in the build folder
-//			final IFolder buildFolder = externalFeatureProject.getBuildFolder();
-//			tempBuildFolder = featureProject.getBuildFolder().getFolder(varName);
-//			final IFolder tempRenameFolder = tempBuildFolder.getFolder(varName);
-			try {
-//				if (tempBuildFolder.exists()) {
-					for (IResource member : buildFolder.members()) {
-						member.delete(true, monitor);
-					}
-//				} else {
-//					tempBuildFolder.create(true, true, null);
-//				}
-				
-//				tempRenameFolder.create(true, true, null);
-			} catch (CoreException e) {
-				MPLPlugin.getDefault().logError(e);
-				return false;
-			}
-			
-//			//TODO MPL: is this necessary
-//			String configName = featureProject.getCurrentConfiguration().getName();
-//			final int splitIndex = configName.lastIndexOf('.');
-//			if (splitIndex > -1) {
-//				configName = configName.substring(0, splitIndex);
-//			}
-			
 			// Build project
-			composerExtension.initialize(featureProject);
-			composerExtension.buildConfiguration(buildFolder, newConfiguration, varName); //varName
-//			buildPath = tempFolder1;
+			composerExtension.initialize(arguments.externalFeatureProject);
+			composerExtension.buildConfiguration(buildFolder, newConfiguration, varName);
 		} else {
 			// Build project
-			String configName = featureProject.getCurrentConfiguration().getName();
+			String configName = arguments.externalFeatureProject.getCurrentConfiguration().getName();
 			final int splitIndex = configName.lastIndexOf('.');
 			if (splitIndex > -1) {
 				configName = configName.substring(0, splitIndex);
 			}
 			
-			composerExtension.initialize(featureProject);
-			composerExtension.buildConfiguration(buildFolder, config, configName);
+			composerExtension.initialize(arguments.externalFeatureProject);
+			composerExtension.buildConfiguration(buildFolder, arguments.configuration, configName);
+		}
+		
+		try {
+			buildFolder.refreshLocal(IResource.DEPTH_INFINITE, null);
+		} catch (CoreException e) {
+			MPLPlugin.getDefault().logError(e);
+			return false;
 		}
 		
 		return true;

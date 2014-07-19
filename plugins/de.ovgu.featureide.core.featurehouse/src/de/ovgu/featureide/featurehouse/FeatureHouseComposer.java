@@ -1169,13 +1169,12 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 	@Override
 	public void copyNotComposedFiles(Configuration config, IFolder destination) {
-		if (destination.getProject().equals(featureProject.getProject())) {
-			super.copyNotComposedFiles(config, destination.getFolder(featureProject.getCurrentConfiguration().getName().split("[.]")[0]));
+		if (destination == null) {
+			super.copyNotComposedFiles(config, featureProject.getBuildFolder().getFolder(featureProject.getCurrentConfiguration().getName().split("[.]")[0]));
 		} else {
 			// case: build into an external project
 			super.copyNotComposedFiles(config, destination);
 		}
-
 	}
 
 	@Override
