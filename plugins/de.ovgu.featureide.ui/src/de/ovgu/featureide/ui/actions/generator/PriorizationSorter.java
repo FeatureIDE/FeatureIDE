@@ -195,6 +195,7 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 		different.addAll(x);
 		different.addAll(y);
 		similar.retainAll(y);
+		
 		different.removeAll(similar);
 		
 		double s=similar.size();
