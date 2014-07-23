@@ -87,7 +87,7 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 
 //		System.out.println(concreteFeatures);
 		allconfigs.addAll(configs);
-		System.out.println("welcome test "+configs);
+		
 		
 		allyesconfig();
 		monitor.worked(1);
@@ -191,13 +191,14 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 //		
 		Collection<String> similar = new HashSet<String>(x);
 		Collection<String> different = new HashSet<String>();
+		
 		different.addAll(x);
 		different.addAll(y);
 		similar.retainAll(y);
+		
 		different.removeAll(similar);
-		System.out.println("after processing");
-		System.out.println(similar);
-		System.out.println(different);
+		
+		
 		double s=similar.size();
 		double d=different.size();
 		double t=concreteFeatures.size();
