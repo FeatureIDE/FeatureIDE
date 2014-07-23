@@ -112,7 +112,6 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 		this.project = project;
 		this.file = file;
 		composer = project.getComposer();
-		composer.initialize(project);
 		
 		docLines = document.getNumberOfLines();
 		docLength = document.getLength();

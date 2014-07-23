@@ -221,13 +221,13 @@ public class CollaborationModelBuilder {
 	}
 	
 	public synchronized FSTModel buildCollaborationModel(final IFeatureProject featureProject) {
-		if (!initilize(featureProject)) {
+		if (!initialize(featureProject)) {
 			return null;
 		}
 		return fSTModel;
 	}
 
-	private boolean initilize(IFeatureProject featureProject) {		
+	private boolean initialize(IFeatureProject featureProject) {		
 		// set the featureProject
 		if (featureProject == null) {
 			return false;
@@ -259,7 +259,6 @@ public class CollaborationModelBuilder {
 	private void getFstModel(IComposerExtension composer) {
 		fSTModel = project.getFSTModel();
 		if (fSTModel == null) {
-			composer.initialize(project);
 			composer.buildFSTModel();
 			fSTModel = project.getFSTModel();
 		}

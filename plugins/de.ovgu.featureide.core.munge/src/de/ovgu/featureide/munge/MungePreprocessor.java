@@ -81,17 +81,13 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 	
 	@Override
 	public boolean initialize(IFeatureProject project) {
-		boolean supSuccess =super.initialize(project);
+		boolean supSuccess = super.initialize(project);
 		mungeModelBuilder = new MungeModelBuilder(project);
 		
 		prepareFullBuild(null);
 		annotationChecking();
 		
-		if(supSuccess==false||mungeModelBuilder==null) {
-			return false;
-		} else {
-			return true;
-		}
+		return supSuccess && mungeModelBuilder!=null;
 	}
 	
 	private static final LinkedHashSet<String> EXTENSIONS = createExtensions(); 

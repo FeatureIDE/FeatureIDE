@@ -287,7 +287,6 @@ public class MPLBuildProjectJob extends AMonitorJob<MPLBuildProjectJob.Arguments
 //			}
 			
 			// Build project
-			composerExtension.initialize(featureProject);
 			composerExtension.buildConfiguration(buildFolder, newConfiguration, varName); //varName
 //			buildPath = tempFolder1;
 		} else {
@@ -297,8 +296,6 @@ public class MPLBuildProjectJob extends AMonitorJob<MPLBuildProjectJob.Arguments
 			if (splitIndex > -1) {
 				configName = configName.substring(0, splitIndex);
 			}
-			
-			composerExtension.initialize(featureProject);
 			composerExtension.buildConfiguration(buildFolder, config, configName);
 		}
 		

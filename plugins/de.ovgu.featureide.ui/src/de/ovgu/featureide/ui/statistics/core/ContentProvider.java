@@ -152,7 +152,6 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 	private FSTModel getFSTModel(IComposerExtension composer) {
 		FSTModel fstModel = project.getFSTModel();
 		if (fstModel == null || fstModel.getClasses().isEmpty() || fstModel.getFeatures().isEmpty()) {
-			composer.initialize(project);
 			composer.buildFSTModel();
 			fstModel = project.getFSTModel();
 		}

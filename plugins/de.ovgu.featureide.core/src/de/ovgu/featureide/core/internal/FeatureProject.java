@@ -63,6 +63,7 @@ import de.ovgu.featureide.core.builder.ComposerExtensionManager;
 import de.ovgu.featureide.core.builder.ExtensibleFeatureProjectBuilder;
 import de.ovgu.featureide.core.builder.FeatureProjectNature;
 import de.ovgu.featureide.core.builder.IComposerExtension;
+import de.ovgu.featureide.core.builder.IComposerExtensionInitialize;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.Feature;
@@ -297,15 +298,6 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		}
 	}
 	
-	private IFeatureProject getFeatureProject() {
-		return this;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.IFeatureProject#dispose()
-	 */
 	public void dispose() {
 		removeModelListener();
 	}
@@ -1020,8 +1012,10 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		Job job = new Job("Load Model") {
 			protected IStatus run(IProgressMonitor monitor) {
 				loadModel();
-				boolean success = composerExtension.initialize(getFeatureProject());
-				if(!success) return Status.CANCEL_STATUS;
+				final IComposerExtension composerExtension = getComposer();
+				if (!composerExtension.isInitialized()) {
+					return Status.CANCEL_STATUS;
+				}
 				composerExtension.postModelChanged();
 				checkConfigurations(getAllConfigurations());
 				checkFeatureCoverage();
@@ -1177,33 +1171,17 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		}
 		return concreteFeatureNames;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.IFeatureProject#getCompositionTool()
-	 */
+	
 	public IComposerExtension getComposer() {
 		if (composerExtension == null) {
 			String compositionToolID = getComposerID();
 			if (compositionToolID == null)
 				return null;
-			composerExtension = ComposerExtensionManager.getInstance()
-					.getComposerById(compositionToolID);
+			final ComposerExtensionManager composerManagerInstance = ComposerExtensionManager.getInstance();
+			composerExtension = composerManagerInstance.getComposerById(compositionToolID);
+			composerManagerInstance.initializeComposer((IComposerExtensionInitialize) composerExtension, this);
 		}
 		return composerExtension;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ovgu.featureide.core.IFeatureProject#setCompositionTool(de.ovgu.featureide
-	 * .core.builder .ICompositionTool)
-	 */
-	public void setComposer(IComposerExtension composerExtension) {
-		this.composerExtension = composerExtension;
-		setComposerID(composerExtension.getId());
 	}
 
 	public String getProjectConfigurationPath() {

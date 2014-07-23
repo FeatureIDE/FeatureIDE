@@ -387,7 +387,9 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		
 		configuration = new Configuration(featureModel, false, false);
 		reader = new ConfigurationReader(configuration);
-		featureProject.getComposer().initialize(featureProject);
+		
+		//method is called to initialize composer extension if not yet initialized; so only delete if sure
+		featureProject.getComposer();
 		
 		if (!createNewProjects) {
 			folder = featureProject.getProject().getFolder(buildType != BuildType.ALL_CURRENT ? FOLDER_NAME : FOLDER_NAME_CURRENT);

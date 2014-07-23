@@ -211,11 +211,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		boolean supSuccess = super.initialize(project);
 		fhModelBuilder = new FeatureHouseModelBuilder(project);
 		createBuildStructure();
-		if (supSuccess == false || fhModelBuilder == null) {
-			return false;
-		} else {
-			return true;
-		}
+		return supSuccess && fhModelBuilder != null;
 	}
 
 	/**

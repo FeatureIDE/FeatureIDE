@@ -44,7 +44,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
  * 
  * @author Tom Brosch
  */
-public class ComposerExtensionProxy implements IComposerExtension {
+public class ComposerExtensionProxy implements IComposerExtension, IComposerExtensionInitialize {
 	
 	private final IConfigurationElement configElement;
 	private final String name;
@@ -57,7 +57,6 @@ public class ComposerExtensionProxy implements IComposerExtension {
 		name = configElement.getAttribute("name");
 		id = configElement.getAttribute("id");
 		description = configElement.getAttribute("description");
-	
 	}
 
 	public String getName() {
@@ -76,27 +75,24 @@ public class ComposerExtensionProxy implements IComposerExtension {
 		if (composerExtensionClass != null)
 			return;
 		try {
-			composerExtensionClass = (IComposerExtensionClass) configElement
-					.createExecutableExtension("class");
+			composerExtensionClass = (IComposerExtensionClass) configElement.createExecutableExtension("class");
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
 	}
-
+	
 	public boolean initialize(IFeatureProject project) {
 		FeatureModel featureModel = project.getFeatureModel();
-		if(featureModel==null||featureModel.getRoot()==null){
+		if (featureModel == null || featureModel.getRoot() == null) {
 			return false;
 		}
 		loadComposerExtension();
-		return composerExtensionClass.initialize(project);
+		return (composerExtensionClass.isInitialized()) ? true : 
+				((IComposerExtensionInitialize) composerExtensionClass).initialize(project);
 		
 	}
-
 	public void performFullBuild(IFile config) {
-		CorePlugin.getDefault().logInfo(
-				"Perform a full build for configuration '" + config + "'");
-		initialize(CorePlugin.getFeatureProject(config));
+		CorePlugin.getDefault().logInfo("Perform a full build for configuration '" + config + "'");
 		composerExtensionClass.performFullBuild(config);
 	}
 
@@ -213,5 +209,9 @@ public class ComposerExtensionProxy implements IComposerExtension {
 
 	public Mechanism getGenerationMechanism() {
 	    return composerExtensionClass.getGenerationMechanism();
+	}
+	
+	public boolean isInitialized() {
+		return composerExtensionClass.isInitialized();
 	}
 }

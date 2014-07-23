@@ -81,9 +81,6 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 	
 
 	public boolean initialize(IFeatureProject project) {
-		if (project == null) {
-			return false;
-		}
 		super.initialize(project);
 		featureCpp.initialize(project.getSourceFolder(), project.getBuildFolder());
 		createTempFolder();
@@ -129,7 +126,9 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 		if(!isPluginInstalled(PLUGIN_ID)){
 			featureProject.createBuilderMarker(featureProject.getProject(), PLUGIN_WARNING, -1, IMarker.SEVERITY_ERROR);
 		}
-		initialize(CorePlugin.getFeatureProject(config));
+		if (!isInitialized()) {
+			initialize(CorePlugin.getFeatureProject(config));
+		}
 		featureCpp.compose(config);
 		buildFSTModel();
 	}

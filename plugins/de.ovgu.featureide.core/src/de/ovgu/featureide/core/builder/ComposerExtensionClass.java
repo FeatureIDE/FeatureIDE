@@ -58,13 +58,14 @@ import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
  * @author Jens Meinicke
  */
 @SuppressWarnings("restriction")
-public abstract class ComposerExtensionClass implements IComposerExtensionClass {
+public abstract class ComposerExtensionClass implements IComposerExtensionClass, IComposerExtensionInitialize {
 
 	protected static final String JAVA_NATURE = "org.eclipse.jdt.core.javanature";
 	public static final IPath JRE_CONTAINER = new Path("org.eclipse.jdt.launching.JRE_CONTAINER");
 	protected IFeatureProject featureProject = null;
 	
 	public static final String NEWLINE = System.getProperty("line.separator", "\n");
+	private boolean initialized = false; 
 	
 	protected final static String[] JAVA_TEMPLATE = new String[]{"Java", "java", PACKAGE_PATTERN + "/**" + NEWLINE 
 		+ " * TODO description" + NEWLINE 
@@ -74,7 +75,12 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	public boolean initialize(IFeatureProject project) {
 		assert (project != null) : "Invalid project given";
 		featureProject = project;
-		return true;
+		initialized = true;
+		return initialized;
+	}
+
+	public boolean isInitialized() {
+		return initialized;
 	}
 
 	public boolean clean() {

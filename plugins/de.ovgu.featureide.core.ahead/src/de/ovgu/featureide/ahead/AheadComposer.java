@@ -78,9 +78,6 @@ public class AheadComposer extends ComposerExtensionClass {
 
 	public boolean initialize(IFeatureProject project) {
 		super.initialize(project);
-		if (project == null) {
-			return false;
-		}
 		ahead = new AheadWrapper(project);
 		ahead.addBuildErrorListener(new BuilderErrorListener());
 		

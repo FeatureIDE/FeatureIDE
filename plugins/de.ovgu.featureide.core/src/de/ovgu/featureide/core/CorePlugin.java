@@ -534,13 +534,13 @@ public class CorePlugin extends AbstractCorePlugin {
 	@CheckForNull
 	public static IFeatureProject getFeatureProject(IResource res) {
 		if (res == null) {
-			getDefault().logWarning(
-					"No resource given while getting the project data");
+			getDefault().logWarning("No resource given while getting the project data");
 			return null;
 		}
 		IProject prj = res.getProject();
-		if (prj == null)
+		if (prj == null) {
 			return null;
+		}
 		return getDefault().featureProjectMap.get(prj);
 	}
 

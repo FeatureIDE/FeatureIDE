@@ -92,7 +92,6 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		
 		featureProject.deleteBuilderMarkers(featureProject.getSourceFolder(),
 				IResource.DEPTH_INFINITE);
-		composerExtension.initialize(featureProject);
 		IProject project = featureProject.getProject();
 		if (!composerExtension.clean()) {
 			cleaned = false;

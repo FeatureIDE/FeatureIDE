@@ -81,8 +81,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 				new AntennaLineFilter());
 
 		String projectSourcePath = project.getProjectSourcePath();
-		if (projectSourcePath == null
-				|| "".equals(projectSourcePath)) {
+		if (projectSourcePath == null || projectSourcePath.isEmpty()) {
 			String buildPath = project.getBuildPath();
 			project.setPaths(buildPath, buildPath, project.getConfigPath());
 		}
