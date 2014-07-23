@@ -198,7 +198,6 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 		
 		different.removeAll(similar);
 		
-		
 		double s=similar.size();
 		double d=different.size();
 		double t=concreteFeatures.size();
