@@ -191,7 +191,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		} catch (Exception e) {
 			CorePlugin.getDefault().logError(e);
 		} 
-		composerExtension.copyNotComposedFiles(c, featureProject.getBuildFolder());
+		composerExtension.copyNotComposedFiles(c, null);
 		try {
 			featureProject.getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
 		} catch (CoreException e) {

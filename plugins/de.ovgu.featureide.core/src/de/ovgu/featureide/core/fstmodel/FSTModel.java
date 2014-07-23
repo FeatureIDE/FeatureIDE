@@ -34,8 +34,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 
 /**
  * The FSTModel represents the projects structure.<br>
- * {@link FSTClass}es and {@link FSTFeature}s can have a shared {@link FSTRole}
- * s.<br>
+ * {@link FSTClass}es and {@link FSTFeature}s can have a shared {@link FSTRole}.<br>
  * For a visualization of the FSTModels structure see <i>lib/FSTModel.jpg<i>.
  * 
  * @author Jens Meinicke
