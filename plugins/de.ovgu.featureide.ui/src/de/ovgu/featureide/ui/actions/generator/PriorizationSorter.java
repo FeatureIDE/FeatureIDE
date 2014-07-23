@@ -87,6 +87,8 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 
 //		System.out.println(concreteFeatures);
 		allconfigs.addAll(configs);
+		System.out.println("welcome test "+configs);
+		
 		allyesconfig();
 		monitor.worked(1);
 		// all the other elements from the original to the new list one by one
@@ -151,6 +153,7 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 		}
 
 		allsortedconfigs.add(allconfigs.get(index));
+		
 		return allconfigs.remove(index);
 
 	}
@@ -161,6 +164,9 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 		double tempDistance = 0.0;
 		for (List<String> x : allconfigs) {
 			for (List<String> y : allsortedconfigs) {
+				
+			
+				
 				double tempDistanceLocal = clacDistance(x, y);
 				// temp_distance= temp_distance+clac_distance2(x,y);
 //				if (tempDistance > tempDistanceLocal) {
@@ -182,18 +188,21 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 	}
 
 	private double clacDistance(List<String> x, List<String> y) {
-//		double distance = 0.0;
-//		double q = 0.0; // in this variable, i will save the number of features
-//						// that exist in both configs ,sortedconfig;
-//		double r = 0.0; // i will save the number of features that not exist in
-//						// both configs and sortedconfig list
+//		
 		Collection<String> similar = new HashSet<String>(x);
 		Collection<String> different = new HashSet<String>();
 		different.addAll(x);
 		different.addAll(y);
 		similar.retainAll(y);
 		different.removeAll(similar);
-		return (similar.size() + (concreteFeatures.size() - (similar.size() + different.size()))) / (double)concreteFeatures.size();
+		System.out.println("after processing");
+		System.out.println(similar);
+		System.out.println(different);
+		double s=similar.size();
+		double d=different.size();
+		double t=concreteFeatures.size();
+		//return (similar.size() + (concreteFeatures.size() - (similar.size() + different.size()))) / (double)concreteFeatures.size();
+		return (s+(t-(s+d)))/t;
 	}
 
 }
