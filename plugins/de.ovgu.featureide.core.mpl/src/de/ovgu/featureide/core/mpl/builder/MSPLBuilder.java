@@ -35,6 +35,7 @@ import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.job.JobManager;
 import de.ovgu.featureide.core.mpl.job.MPLBuildProjectJob;
 import de.ovgu.featureide.core.mpl.job.MPLRenameExternalJob;
+import de.ovgu.featureide.core.mpl.job.SequenceFinishedListener;
 import de.ovgu.featureide.core.mpl.job.util.IChainJob;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
@@ -56,9 +57,9 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 	protected void clean(IProgressMonitor monitor) throws CoreException {
 		IProject project = getProject();
 		if (project != null) {
-			if (buildThread != null) {
-				buildThread.interrupt();
-			}
+//			if (buildThread != null) {
+//				buildThread.interrupt();
+//			}
 			cleanProject(CorePlugin.getFeatureProject(project), monitor);
 		} else {
 			MPLPlugin.getDefault().logWarning("no project got");
@@ -78,7 +79,7 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 		return true;
 	}
 	
-	private Thread buildThread = null;
+//	private Thread buildThread = null;
 
 	@SuppressWarnings("rawtypes")
 	@Override
@@ -96,9 +97,9 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 			}
 			
 			// TODO MPL: prevent parallel builds
-			if (buildThread != null) {
-				return null;
-			}
+//			if (buildThread != null) {
+//				return null;
+//			}
 
 			// build
 			final Object buildObject = new Object();
@@ -114,25 +115,15 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 				configName = tempConfigName;
 			}
 			
-			JobManager.addJob(buildObject, job);
-			
-			buildThread = new Thread(new Runnable() {
+			JobManager.addJob(buildObject, job, false);
+			JobManager.addSequenceFinishedListener(buildObject, new SequenceFinishedListener() {
 				@Override
-				public void run() {
-					// wait for jobs to be finished
-					synchronized (buildObject) {
-						try {
-							buildObject.wait();
-							MPLRenameExternalJob.setJavaBuildPath(project, buildFolder.getFolder(configName).getFullPath());
-						} catch (InterruptedException e) {
-							MPLPlugin.getDefault().logError(e);
-						}	
-					}
-					// set new java build path
-					buildThread = null;
+				public void sequenceFinished(Object idObject, boolean success) {
+					MPLRenameExternalJob.setJavaBuildPath(project, buildFolder.getFolder(configName).getFullPath());
 				}
 			});
-			buildThread.start();
+			JobManager.startSequence(buildObject);
+			
 		} else {
 			MPLPlugin.getDefault().logWarning("no project got");
 		}

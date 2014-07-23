@@ -82,9 +82,12 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	}
 
 	public void copyNotComposedFiles(Configuration c, IFolder destination) {
-		
 		List<Feature> selectedFeatures = c.getSelectedFeatures();
-		if (selectedFeatures != null)
+		if (selectedFeatures != null) {
+			if (destination == null) {
+				destination = featureProject.getBuildFolder();
+			}
+			
 			for (Feature feature : selectedFeatures) {
 				IFolder folder = featureProject.getSourceFolder().getFolder(feature.getName());
 				try {
@@ -96,6 +99,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 					CorePlugin.getDefault().logError(e);
 				}
 			}
+		}
 	}
 	
 	private void copy(IFolder featureFolder, IFolder buildFolder) throws CoreException {
@@ -119,10 +123,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 				}
 			}
 		}
-	}
-
-
-	
+	}	
 
 	public LinkedHashSet<String> extensions() {
 		return new LinkedHashSet<String>(0);
