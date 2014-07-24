@@ -233,6 +233,12 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	public FeatureProject(IProject aProject) {
 		super(aProject);
 		project = aProject;
+		
+		try {
+			project.refreshLocal(IResource.DEPTH_ONE, null);
+		} catch (CoreException e) {
+			LOGGER.logError(e);
+		}
 
 		AbstractFeatureModelReader tmpModelReader;
 
@@ -252,7 +258,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		// initialize project structure
 		try {
 			// workaround needed for project imports
-			project.refreshLocal(IResource.DEPTH_ONE, null);
+			project.refreshLocal(IResource.DEPTH_INFINITE, null);
 		} catch (CoreException e) {
 			LOGGER.logError(e);
 		}
@@ -274,7 +280,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		}
 		libFolder = project.getFolder("lib");
 		buildFolder = CorePlugin.createFolder(project, projectBuildPath);
-		configFolder = CorePlugin.createFolder(project,getProjectConfigurationPath());
+		configFolder = CorePlugin.createFolder(project, getProjectConfigurationPath());
 		sourceFolder = CorePlugin.createFolder(project, getProjectSourcePath());
 		fstModel = null;
 		// loading model data and listen to changes in the model file
@@ -294,6 +300,15 @@ public class FeatureProject extends BuilderMarkerHandler implements
 						sourceFolder.getProjectRelativePath().toOSString(),
 						configFolder.getProjectRelativePath().toOSString(),
 						buildFolder.getProjectRelativePath().toOSString());
+			}
+		}
+		
+		// XXX MPL: hack for importing mpl projects
+		if (featureModel instanceof ExtendedFeatureModel) {
+			try {
+				modelFile.getResource().touch(null);
+			} catch (CoreException e) {
+				LOGGER.logError(e);
 			}
 		}
 	}
@@ -445,14 +460,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 					IMarker.SEVERITY_WARNING, 0);
 		}
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ovgu.featureide.core.IFeatureProject#renameFeature(java.lang.String,
-	 * java.lang.String)
-	 */
+	
 	public void renameFeature(String oldName, String newName) {
 		try {
 			IFolder folder = sourceFolder.getFolder(oldName);
@@ -468,21 +476,11 @@ public class FeatureProject extends BuilderMarkerHandler implements
 					IMarker.SEVERITY_WARNING, 0);
 		}
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.IFeatureProject#getProjectName()
-	 */
+	
 	public String getProjectName() {
 		return project.getName();
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.IFeatureProject#getCurrentConfiguration()
-	 */
+	
 	public IFile getCurrentConfiguration() {
 		if (currentConfiguration != null && currentConfiguration.exists())
 			return currentConfiguration;
@@ -529,17 +527,15 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	public void setCurrentConfiguration(IFile file) {
 		currentConfiguration = file;
 
-		int offset = getConfigFolder().getProjectRelativePath().toString()
-				.length();
-		String configPath = file.getProjectRelativePath().toString()
-				.substring(offset);
+		int offset = getConfigFolder().getProjectRelativePath().toString().length();
+		String configPath = file.getProjectRelativePath().toString().substring(offset);
 		try {
 			project.setPersistentProperty(configConfigID, configPath);
 			LOGGER.fireCurrentConfigurationChanged(this);
 		} catch (CoreException e) {
 			LOGGER.logError(e);
 		}
-
+		
 		// We need to call the builder here, because for the new configuration,
 		// there are possibly no resource build yet or they are not up-to-date.
 		// Eclipse calls builders, if a resource as changed, but in this case
@@ -1013,13 +1009,14 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			protected IStatus run(IProgressMonitor monitor) {
 				loadModel();
 				final IComposerExtension composerExtension = getComposer();
-				if (!composerExtension.isInitialized()) {
+				if (composerExtension.isInitialized()) {
+					composerExtension.postModelChanged();
+					checkConfigurations(getAllConfigurations());
+					checkFeatureCoverage();
+					return Status.OK_STATUS;
+				} else {
 					return Status.CANCEL_STATUS;
 				}
-				composerExtension.postModelChanged();
-				checkConfigurations(getAllConfigurations());
-				checkFeatureCoverage();
-				return Status.OK_STATUS;
 			}
 		};
 		job.setPriority(Job.INTERACTIVE);
@@ -1232,8 +1229,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	private String getPath(String argument) {
 		try {
 			for (ICommand command : project.getDescription().getBuildSpec()) {
-				if (ExtensibleFeatureProjectBuilder.BUILDER_ID.equals(
-						command.getBuilderName())) {
+				if (isFIDEBuilder(command)) {
 					return command.getArguments().get(argument);
 				}
 			}
@@ -1242,25 +1238,25 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		}
 		return null;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.IFeatureProject#getComposerID()
-	 */
+	
+	private boolean isFIDEBuilder(ICommand command) {
+		return command.getBuilderName().equals(ExtensibleFeatureProjectBuilder.BUILDER_ID)
+			|| command.getBuilderName().equals("de.ovgu.featureide.core.mpl.MSPLBuilder");
+	}
+	
 	public String getComposerID() {
 		try {
 			String id = project.getPersistentProperty(composerConfigID);
-			if (id != null)
+			if (id != null) {
 				return id;
+			}
 
 			for (ICommand command : project.getDescription().getBuildSpec()) {
-				if (command.getBuilderName().equals(
-						ExtensibleFeatureProjectBuilder.BUILDER_ID)) {
-					id = command.getArguments().get(
-							ExtensibleFeatureProjectBuilder.COMPOSER_KEY);
-					if (id != null)
+				if (isFIDEBuilder(command)) {
+					id = command.getArguments().get(ExtensibleFeatureProjectBuilder.COMPOSER_KEY);
+					if (id != null) {
 						return id;
+					}
 				}
 			}
 
@@ -1276,7 +1272,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 
 			ICommand[] commands = description.getBuildSpec();
 			for (ICommand command : commands) {
-				if (command.getBuilderName().equals(ExtensibleFeatureProjectBuilder.BUILDER_ID) || command.getBuilderName().equals("org.eclipse.ui.externaltools.ExternalToolBuilder")) {
+				if (isFIDEBuilder(command) || command.getBuilderName().equals("org.eclipse.ui.externaltools.ExternalToolBuilder")) {
 					Map<String, String> args = command.getArguments();
 					args.put(SOURCE_ARGUMENT, feature);
 					args.put(BUILD_ARGUMENT, src);
@@ -1308,8 +1304,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			LinkedList<ICommand> newCommandList = new LinkedList<ICommand>();
 			boolean added = false;
 			for (ICommand command : description.getBuildSpec()) {
-				if (command.getBuilderName().equals(
-						ExtensibleFeatureProjectBuilder.BUILDER_ID)) {
+				if (isFIDEBuilder(command)) {
 					if (!added) {
 						Map<String, String> args = command.getArguments();
 						args.put(ExtensibleFeatureProjectBuilder.COMPOSER_KEY,

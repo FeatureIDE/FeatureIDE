@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -174,7 +175,13 @@ public class MPLBuildProjectJob extends AMonitorJob<MPLBuildProjectJob.Arguments
 		final Configuration mappedProjects = new Configuration(extFeatureModel.getMappingModel());
 		try {
 			String mappingFileName = arguments.externalFeatureProject.getProject().getPersistentProperty(MPLPlugin.mappingConfigID);
+			// XXX MPL save information in builder not as persistent property
 			if (mappingFileName == null) {
+				mappingFileName = "default.config";
+				arguments.externalFeatureProject.getProject().setPersistentProperty(MPLPlugin.mappingConfigID, mappingFileName);
+			}
+			IFile mappingFile = arguments.externalFeatureProject.getProject().getFile("InterfaceMapping/" + mappingFileName);
+			if (mappingFile == null) {
 				MPLPlugin.getDefault().logInfo("No mapping file specified.");
 				return false;
 			}
