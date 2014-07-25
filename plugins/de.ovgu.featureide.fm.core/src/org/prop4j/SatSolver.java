@@ -20,10 +20,12 @@
  */
 package org.prop4j;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.sat4j.core.ConstrGroup;
 import org.sat4j.core.VecInt;
 import org.sat4j.minisat.SolverFactory;
 import org.sat4j.specs.ContradictionException;
@@ -32,10 +34,11 @@ import org.sat4j.specs.ISolver;
 import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.IteratorInt;
 import org.sat4j.specs.TimeoutException;
-import org.sat4j.tools.ConstrGroup;
 import org.sat4j.tools.ModelIterator;
 import org.sat4j.tools.RemiUtils;
 import org.sat4j.tools.SolutionCounter;
+
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 
 /**
  * A solver that computes if a given propositional node is satisfiable and
@@ -149,18 +152,77 @@ public class SatSolver {
 	}
 
 	public List<Literal> knownValues() {
-		LinkedList<Literal> list = new LinkedList<Literal>();
+		IVecInt backbone = null;
 		try {
-			IVecInt bone = RemiUtils.backbone(solver);
-			IteratorInt iter = bone.iterator();
-			while (iter.hasNext()) {
-				int value = iter.next();
-				Object var = intToVar.get(Math.abs(value));
-				Literal literal = new Literal(var, value > 0);
-				list.add(literal);
-			}
+			backbone = RemiUtils.backbone(solver);
 		} catch (TimeoutException e) {
-			e.printStackTrace();
+			FMCorePlugin.getDefault().logError(e);
+		}
+		if (backbone != null) {
+			addKnowValues(backbone);
+			return convertToNodes(backbone);
+		} else {
+			return new ArrayList<Literal>(0);
+		}
+	}
+	
+	public List<Literal> knownValues(Literal tempNode) {
+		final IVecInt backbone = new VecInt();
+		backbone.push(getIntOfLiteral(tempNode));
+		
+		addKnowValues(backbone);
+		return convertToNodes(backbone);
+	}
+	
+	
+	public List<Literal> knownValues(Literal[] tempNodes) {
+		final IVecInt backbone = new VecInt();
+		for (int i = 0; i < tempNodes.length; i++) {
+			backbone.push(getIntOfLiteral(tempNodes[i]));
+		}
+		
+		addKnowValues(backbone);
+		return convertToNodes(backbone);
+	}
+	
+	public List<Literal> knownValues(List<Literal> tempNodes) {
+		final IVecInt backbone = new VecInt();
+		for (Literal literal : tempNodes) {
+			backbone.push(getIntOfLiteral(literal));			
+		}
+		
+		addKnowValues(backbone);
+		return convertToNodes(backbone);
+	}
+	
+	private void addKnowValues(final IVecInt backbone) {
+		try {
+	        final int nvars = solver.nVars();
+	        for (int i = 1; i <= nvars; i++) {
+	            backbone.push(i);
+	            if (solver.isSatisfiable(backbone)) {
+	                backbone.pop().push(-i);
+	                if (solver.isSatisfiable(backbone)) {
+	                    backbone.pop();
+	                } else {
+	                    backbone.pop().push(i);
+	                }
+	            } else {
+	                backbone.pop().push(-i);
+	            }
+	        }			
+		} catch (TimeoutException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+	}
+	
+	private List<Literal> convertToNodes(final IVecInt backbone) {
+		final ArrayList<Literal> list = new ArrayList<Literal>(backbone.size());
+		
+		final IteratorInt iter = backbone.iterator();
+		while (iter.hasNext()) {
+			final int value = iter.next();
+			list.add(new Literal(intToVar.get(Math.abs(value)), value > 0));
 		}
 		return list;
 	}
