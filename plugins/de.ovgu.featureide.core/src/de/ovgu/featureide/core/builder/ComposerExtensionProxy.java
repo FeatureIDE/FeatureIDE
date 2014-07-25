@@ -214,4 +214,8 @@ public class ComposerExtensionProxy implements IComposerExtension, IComposerExte
 	public boolean isInitialized() {
 		return composerExtensionClass.isInitialized();
 	}
+	
+	public void setFeatureProject(IFeatureProject featureProject) {
+		composerExtensionClass.setFeatureProject(featureProject);
+	}
 }

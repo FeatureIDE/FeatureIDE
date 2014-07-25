@@ -32,6 +32,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceDelta;
 
+import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 
@@ -61,6 +62,8 @@ public interface IComposerExtensionClass {
 	final static String FEATUE_PATTER = "#featurename#";
 	
 	boolean isInitialized();
+	
+	void setFeatureProject(IFeatureProject featureProject);
 	
 	void performFullBuild(IFile config);
 	

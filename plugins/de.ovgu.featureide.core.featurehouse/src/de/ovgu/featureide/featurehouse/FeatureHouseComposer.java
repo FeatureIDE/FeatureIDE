@@ -61,7 +61,6 @@ import AST.Problem;
 import AST.Program;
 import cide.gparser.ParseException;
 import cide.gparser.TokenMgrError;
-
 import composer.CmdLineInterpreter;
 import composer.CompositionException;
 import composer.FSTGenComposer;
@@ -76,6 +75,7 @@ import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
+import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.featurehouse.errorpropagation.ErrorPropagation;
 import de.ovgu.featureide.featurehouse.meta.FeatureIDEModelInfo;
@@ -372,9 +372,14 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	private void checkContractComposition() {
 		try {
 			deleteContractErrorMarkers();
-
+			
+			final FSTModel fstModel = featureProject.getFSTModel();
+			if (fstModel == null) {
+				return;
+			}
+			
 			if (!getContractParameter().equals(CONTRACT_COMPOSITION_METHOD_BASED)) {
-				for (FSTClass c : featureProject.getFSTModel().getClasses()) {
+				for (FSTClass c : fstModel.getClasses()) {
 					for (FSTRole r : c.getRoles()) {
 						for (FSTMethod m : r.getClassFragment().getMethods()) {
 							if (m.getCompKey().length() > 0)
@@ -386,7 +391,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 			} else {
 				final FeatureModel featureModel = featureProject.getFeatureModel();
-				for (FSTClass c : featureProject.getFSTModel().getClasses()) {
+				for (FSTClass c : fstModel.getClasses()) {
 					for (FSTRole r : c.getRoles()) {
 						Feature featureRole1 = featureModel.getFeature(r.getFeature().getName());
 						for (FSTMethod m : r.getClassFragment().getMethods()) {

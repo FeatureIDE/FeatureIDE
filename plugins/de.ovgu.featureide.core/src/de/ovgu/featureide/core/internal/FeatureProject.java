@@ -1178,6 +1178,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			composerExtension = composerManagerInstance.getComposerById(compositionToolID);
 			composerManagerInstance.initializeComposer((IComposerExtensionInitialize) composerExtension, this);
 		}
+		composerExtension.setFeatureProject(this);
 		return composerExtension;
 	}
 

@@ -79,6 +79,11 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass,
 		return initialized;
 	}
 
+	public void setFeatureProject(IFeatureProject featureProject) {
+		assert (featureProject != null) : "Invalid project given";
+		this.featureProject = featureProject;
+	}
+
 	public boolean isInitialized() {
 		return initialized;
 	}
