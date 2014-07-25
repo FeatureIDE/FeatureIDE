@@ -65,7 +65,7 @@ public class Literal extends Node {
 	}
 
 	@Override
-	public Node clone() {
+	public Literal clone() {
 		return new Literal(var, positive);
 	}
 

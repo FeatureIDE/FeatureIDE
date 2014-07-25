@@ -171,6 +171,7 @@ public class SatSolver {
 		backbone.push(getIntOfLiteral(tempNode));
 		
 		addKnowValues(backbone);
+		backbone.delete(0);
 		return convertToNodes(backbone);
 	}
 	
@@ -182,6 +183,9 @@ public class SatSolver {
 		}
 		
 		addKnowValues(backbone);
+		for (int i = 0; i < tempNodes.length; i++) {
+			backbone.delete(i);
+		}
 		return convertToNodes(backbone);
 	}
 	
@@ -192,6 +196,9 @@ public class SatSolver {
 		}
 		
 		addKnowValues(backbone);
+		for (int i = 0; i < tempNodes.size(); i++) {
+			backbone.delete(i);
+		}
 		return convertToNodes(backbone);
 	}
 	
