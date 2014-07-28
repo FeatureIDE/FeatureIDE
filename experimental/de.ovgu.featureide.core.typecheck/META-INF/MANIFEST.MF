@@ -9,7 +9,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.resources,
  de.ovgu.featureide.core,
  de.ovgu.featureide.fm.core,
- org.eclipse.core.filesystem
+ org.eclipse.core.filesystem,
+ org.sat4j.core
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: de.ovgu.featureide.core.typecheck.TypecheckCorePlugin
 Bundle-ClassPath: .,
