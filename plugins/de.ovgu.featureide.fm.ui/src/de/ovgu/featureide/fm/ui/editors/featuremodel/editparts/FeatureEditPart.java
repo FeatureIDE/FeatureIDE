@@ -106,9 +106,6 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements
 	@Override
 	public void performRequest(Request request) {
 		Feature feature = getFeature();
-		if (feature instanceof ExtendedFeature && ((ExtendedFeature) feature).isFromExtern()) {
-			return;
-		}
 		FeatureModel featureModel = ((ModelEditPart) this.getParent()).getFeatureModel();
 
 		for (Constraint constraint : featureModel.getConstraints()){

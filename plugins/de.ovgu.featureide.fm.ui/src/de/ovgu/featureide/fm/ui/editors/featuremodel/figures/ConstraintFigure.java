@@ -175,7 +175,6 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 
 	@Override
 	public void setBackgroundColor(Color bg) {
-		super.setBorder(new LineBorder(bg));
 		super.setBackgroundColor(bg);
 	}
 	
