@@ -6,8 +6,7 @@ Bundle-Version: 2.2.4.qualifier
 Fragment-Host: de.ovgu.featureide.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: University of Magdeburg
-Require-Bundle: org.junit,
- org.sat4j.core
+Require-Bundle: org.junit
 Bundle-ClassPath: .,
  lib/javabdd.jar,
  lib/splar.jar

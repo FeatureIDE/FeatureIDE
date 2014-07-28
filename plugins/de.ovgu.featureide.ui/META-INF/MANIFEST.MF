@@ -13,8 +13,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.gef,
  de.ovgu.featureide.fm.core,
  de.ovgu.featureide.core,
- de.ovgu.featureide.fm.ui,
- org.sat4j.core
+ de.ovgu.featureide.fm.ui
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: lib/SPLACAT.jar,
  lib/commons-math-2.2.jar,

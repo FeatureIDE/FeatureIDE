@@ -5,16 +5,15 @@ Bundle-SymbolicName: de.ovgu.featureide.core;singleton:=true
 Bundle-Version: 2.7.0.qualifier
 Bundle-Activator: de.ovgu.featureide.core.CorePlugin
 Bundle-Localization: 
-Require-Bundle: de.ovgu.featureide.fm.core,
- org.eclipse.core.runtime,
+Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.debug.core,
  org.eclipse.jdt.launching,
  org.eclipse.swt,
  org.eclipse.ui,
  org.eclipse.core.resources,
+ de.ovgu.featureide.fm.core,
  org.eclipse.jdt.core,
- org.eclipse.ui.workbench,
- org.sat4j.core
+ org.eclipse.ui.workbench
 Export-Package: 
  de.ovgu.featureide.core,
  de.ovgu.featureide.core.builder,
