@@ -16,7 +16,8 @@ Require-Bundle:
  org.eclipse.jdt.debug.ui,
  org.eclipse.ui.views,
  org.eclipse.gef,
- de.ovgu.featureide.fm.core
+ de.ovgu.featureide.fm.core,
+ org.sat4j.core
 Bundle-ActivationPolicy: lazy
 Export-Package: de.ovgu.featureide.fm.ui,
  de.ovgu.featureide.fm.ui.actions,

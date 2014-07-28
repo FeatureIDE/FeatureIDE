@@ -211,18 +211,18 @@ public class Prop4JTest {
 		}
 	}
 
-	@Test
-	public void testArrayIndexOutOfBounds2() throws ContradictionException,
-			TimeoutException {
-		ISolver solver = SolverFactory.newDefault();
-		solver.newVar(3);
-		solver.addClause(new VecInt(new int[] { 1 }));
-		solver.addClause(new VecInt(new int[] { -1, 2 }));
-		solver.addClause(new VecInt(new int[] { 1, -2 }));
-		solver.addClause(new VecInt(new int[] { -3 }));
-		solver.newVar(1);
-		solver.isSatisfiable(new VecInt(new int[] { -4 }));
-	}
+//	@Test
+//	public void testArrayIndexOutOfBounds2() throws ContradictionException,
+//			TimeoutException {
+//		ISolver solver = SolverFactory.newDefault();
+//		solver.newVar(3);
+//		solver.addClause(new VecInt(new int[] { 1 }));
+//		solver.addClause(new VecInt(new int[] { -1, 2 }));
+//		solver.addClause(new VecInt(new int[] { 1, -2 }));
+//		solver.addClause(new VecInt(new int[] { -3 }));
+//		solver.newVar(1);
+//		solver.isSatisfiable(new VecInt(new int[] { -4 }));
+//	}
 
 	@Test
 	public void testArrayIndexOutOfBounds3() throws ContradictionException,
