@@ -20,8 +20,9 @@
  */
 package de.ovgu.featureide.munge;
 
-import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 import org.osgi.framework.BundleContext;
+
+import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 
 /**
  * The activator class controls the plug-in life cycle

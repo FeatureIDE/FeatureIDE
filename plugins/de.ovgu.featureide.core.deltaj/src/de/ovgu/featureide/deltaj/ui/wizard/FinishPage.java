@@ -22,14 +22,14 @@ package de.ovgu.featureide.deltaj.ui.wizard;
 
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
 
 /**
- * @author André Specht
+ * @author Andrï¿½ Specht
  * Adapted for FeatureIDE by Sven Schuster
  */
 public class FinishPage extends WizardPage {

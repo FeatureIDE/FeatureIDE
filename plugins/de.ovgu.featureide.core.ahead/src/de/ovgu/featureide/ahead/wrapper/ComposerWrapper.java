@@ -21,6 +21,7 @@
 package de.ovgu.featureide.ahead.wrapper;
 
 import static de.ovgu.featureide.ahead.wrapper.AheadBuildErrorType.COMPOSER_ERROR;
+import jampack.Jampack;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -31,17 +32,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
 
-
 import mixin.Mixin;
-import jampack.Jampack;
-
-/*import mixin.AST_Program;
-import mixin.ExtendedParseException;
-import mixin.Mixin;*/
-/*
-import jampack.AST_Program;
-import jampack.ExtendedParseException;
-import jampack.Jampack;*/
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -51,12 +42,18 @@ import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
 
 import Jakarta.util.ExitError;
-
 import de.ovgu.featureide.ahead.AheadCorePlugin;
 import de.ovgu.featureide.ahead.model.AbstractJakModelBuilder;
-import de.ovgu.featureide.ahead.model.MixinJakModelBuilder;
 import de.ovgu.featureide.ahead.model.JampackJakModelBuilder;
+import de.ovgu.featureide.ahead.model.MixinJakModelBuilder;
 import de.ovgu.featureide.core.IFeatureProject;
+/*import mixin.AST_Program;
+import mixin.ExtendedParseException;
+import mixin.Mixin;*/
+/*
+import jampack.AST_Program;
+import jampack.ExtendedParseException;
+import jampack.Jampack;*/
 
 /**
  * 

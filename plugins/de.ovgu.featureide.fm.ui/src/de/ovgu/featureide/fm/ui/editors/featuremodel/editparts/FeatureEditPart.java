@@ -40,7 +40,6 @@ import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.Constraint;
-import de.ovgu.featureide.fm.core.ExtendedFeature;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureConnection;
 import de.ovgu.featureide.fm.core.FeatureModel;

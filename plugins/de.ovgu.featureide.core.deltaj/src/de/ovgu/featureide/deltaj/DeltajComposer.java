@@ -21,7 +21,6 @@
 package de.ovgu.featureide.deltaj;
 
 import java.io.BufferedReader;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,7 +31,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 import org.deltaj.DeltaJStandaloneSetup;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;

@@ -28,8 +28,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirectiveCommand;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
+import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirectiveCommand;
 import de.ovgu.featureide.core.fstmodel.preprocessor.PPModelBuilder;
 
 /**
