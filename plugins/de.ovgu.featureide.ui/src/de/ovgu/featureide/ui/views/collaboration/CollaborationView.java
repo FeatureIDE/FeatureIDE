@@ -74,7 +74,7 @@ import org.eclipse.ui.progress.UIJob;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.builder.IComposerExtension;
+import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTConfiguration;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
@@ -514,7 +514,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 							return Status.OK_STATUS;
 						toolbarAction.setEnabled(false);
 						if (featureProject != null) {
-							IComposerExtension composer = featureProject.getComposer();
+							IComposerExtensionClass composer = featureProject.getComposer();
 							if (composer != null) {
 								composer.buildFSTModel();
 								updateGuiAfterBuild(featureProject, null);

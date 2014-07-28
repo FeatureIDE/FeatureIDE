@@ -12,7 +12,6 @@ import org.eclipse.ui.progress.UIJob;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.builder.IComposerExtension;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -122,7 +121,7 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 	}
 	
 	private synchronized void addNodes() {
-		IComposerExtension composer = project.getComposer();
+		IComposerExtensionClass composer = project.getComposer();
 		FSTModel fstModel = getFSTModel(composer);
 		FeatureModel featModel = project.getFeatureModel();
 		JobDoneListener.getInstance().init(viewer);
@@ -149,7 +148,7 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 		refresh();
 	}
 	
-	private FSTModel getFSTModel(IComposerExtension composer) {
+	private FSTModel getFSTModel(IComposerExtensionClass composer) {
 		FSTModel fstModel = project.getFSTModel();
 		if (fstModel == null || fstModel.getClasses().isEmpty() || fstModel.getFeatures().isEmpty()) {
 			composer.buildFSTModel();

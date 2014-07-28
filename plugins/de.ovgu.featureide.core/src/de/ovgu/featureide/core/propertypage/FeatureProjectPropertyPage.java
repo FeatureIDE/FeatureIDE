@@ -49,6 +49,7 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionManager;
 import de.ovgu.featureide.core.builder.IComposerExtension;
+import de.ovgu.featureide.core.builder.IComposerExtensionBase;
 
 /**
  * At this property page you can specify composer specific settings for a
@@ -62,10 +63,10 @@ import de.ovgu.featureide.core.builder.IComposerExtension;
 public class FeatureProjectPropertyPage extends PropertyPage {
 
 	private static final class ExtensionComparator implements
-			Comparator<IComposerExtension>, Serializable {
+			Comparator<IComposerExtensionBase>, Serializable {
 		private static final long serialVersionUID = 1L;
 
-		public int compare(IComposerExtension arg0, IComposerExtension arg1) {
+		public int compare(IComposerExtensionBase arg0, IComposerExtensionBase arg1) {
 			return arg0.getName().compareTo(arg1.getName());
 		}
 	}
@@ -80,7 +81,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 
 	private GridData gd = new GridData(GridData.FILL_BOTH);
 
-	private static IComposerExtension[] extensions = null;
+	private static IComposerExtensionBase[] extensions = null;
 	private IProject project = null;
 	private IFeatureProject featureProject = null;
 
@@ -88,7 +89,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 	private Text featurePath = null;
 	private Text configPath = null;
 
-	private IComposerExtension composer = null;
+	private IComposerExtensionBase composer = null;
 	private Combo composerCombo;
 	private Combo contractCombo;
 	private Combo metaCombo;
@@ -202,11 +203,11 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 
 		List<IComposerExtension> composerExtensions = ComposerExtensionManager
 				.getInstance().getComposers();
-		extensions = new IComposerExtension[composerExtensions.size()];
+		extensions = new IComposerExtensionBase[composerExtensions.size()];
 		composerExtensions.toArray(extensions);
 		Arrays.sort(extensions, new ExtensionComparator());
 
-		for (IComposerExtension composerExtension : extensions) {
+		for (IComposerExtensionBase composerExtension : extensions) {
 			composerCombo.add(composerExtension.getName());
 		}
 
@@ -454,7 +455,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		if (!composerChanged()) {
 			return;
 		}
-		for (IComposerExtension c : extensions) {
+		for (IComposerExtensionBase c : extensions) {
 			if (c.getName().equals(
 					composerCombo.getItem(composerCombo.getSelectionIndex()))) {
 				featureProject.setComposerID(c.getId());
@@ -499,7 +500,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 
 	@Override
 	protected void performDefaults() {
-		IComposerExtension composer = featureProject.getComposer();
+		IComposerExtensionBase composer = featureProject.getComposer();
 		int i = 0;
 		for (String item : composerCombo.getItems()) {
 			if (item.equals(composer.getName())) {
@@ -549,10 +550,9 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 	 * Called if something at the dialog has been changed
 	 */
 	protected void dialogChanged() {
-		for (IComposerExtension c : extensions) {
+		for (IComposerExtensionBase c : extensions) {
 			if (c.getName().equals(
 					composerCombo.getItem(composerCombo.getSelectionIndex()))) {
-				c.loadComposerExtension();
 
 				if (!c.hasContractComposition()) {
 					contractCombo.select(0); // set to none
