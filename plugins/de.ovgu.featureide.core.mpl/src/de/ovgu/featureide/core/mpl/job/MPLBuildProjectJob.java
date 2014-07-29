@@ -57,12 +57,14 @@ public class MPLBuildProjectJob extends AMonitorJob<MPLBuildProjectJob.Arguments
 
 	public static class Arguments extends AJobArguments {
 		private final IFeatureProject externalFeatureProject;
+		private final IFeatureProject rootFeatureProject;
 		private final Configuration configuration;
 		private final String varName;
 		private final IFolder buildF;
 		
-		public Arguments(IFeatureProject externalFeatureProject, IFolder buildFolder, Configuration configuration, String varName) {
+		public Arguments(IFeatureProject rootFeatureProject, IFeatureProject externalFeatureProject, IFolder buildFolder, Configuration configuration, String varName) {
 			super(Arguments.class);
+			this.rootFeatureProject = rootFeatureProject;
 			this.externalFeatureProject = externalFeatureProject;
 			this.buildF = buildFolder;
 			this.configuration = configuration;
@@ -105,7 +107,7 @@ public class MPLBuildProjectJob extends AMonitorJob<MPLBuildProjectJob.Arguments
 		final ArrayList<IChainJob> jobList = new ArrayList<IChainJob>(3);
 		
 		//build
-		jobList.add(createJob(new MPLBuildProjectJob.Arguments(
+		jobList.add(createJob(new MPLBuildProjectJob.Arguments(arguments.rootFeatureProject,
 				externalFeatureProject, internTempBuildFolder, config, configName)));
 		
 		// rename
@@ -241,38 +243,46 @@ public class MPLBuildProjectJob extends AMonitorJob<MPLBuildProjectJob.Arguments
 		
 		if (varName != null) {
 			// Get partial configs 
-			// TODO MPL: config richtig anpassen
-			final Configuration newConfiguration = new Configuration(arguments.externalFeatureProject.getFeatureModel());
-			for (SelectableFeature feature : arguments.configuration.getFeatures()) {
-				if (feature.getName().startsWith(varName + ".")) {
-					String featureName = feature.getName().substring(varName.length() + 1);
-					try {
-						newConfiguration.setManual(featureName, feature.getSelection());
-					} catch (Exception e) {
-					}
-				}
-			}
-
-			// Find Random Solution
-			try {
-				LinkedList<List<String>> solutions = newConfiguration.getSolutions(1);
-				if (!solutions.isEmpty()) {
-					newConfiguration.resetValues();
-					List<String> solution = solutions.getFirst();
-					for (String solutionFeatureName : solution) {
+			// TODO MPL: config for other MPL projects may not working
+			FeatureModel fm = arguments.rootFeatureProject.getFeatureModel();
+			if (fm instanceof ExtendedFeatureModel) {
+				ExtendedFeatureModel efm = (ExtendedFeatureModel) fm;
+				UsedModel usedModel = efm.getExternalModel(varName);
+				String prefix = usedModel.getPrefix() + ".";
+				
+				final Configuration newConfiguration = new Configuration(arguments.externalFeatureProject.getFeatureModel());				
+				
+				for (SelectableFeature feature : arguments.configuration.getFeatures()) {
+					if (feature.getName().startsWith(prefix)) {
+						String featureName = feature.getName().substring(prefix.length());
 						try {
-							newConfiguration.setManual(solutionFeatureName, Selection.SELECTED);
+							newConfiguration.setManual(featureName, feature.getSelection());
 						} catch (Exception e) {
 						}
 					}
 				}
-			} catch (TimeoutException e) {
-				MPLPlugin.getDefault().logError(e);
-				return false;
-			}
-			
-			// Build project
-			composerExtension.buildConfiguration(buildFolder, newConfiguration, varName);
+				
+				// Find Random Solution
+				try {
+					LinkedList<List<String>> solutions = newConfiguration.getSolutions(1);
+					if (!solutions.isEmpty()) {
+						newConfiguration.resetValues();
+						List<String> solution = solutions.getFirst();
+						for (String solutionFeatureName : solution) {
+							try {
+								newConfiguration.setManual(solutionFeatureName, Selection.SELECTED);
+							} catch (Exception e) {
+							}
+						}
+					}
+				} catch (TimeoutException e) {
+					MPLPlugin.getDefault().logError(e);
+					return false;
+				}
+				
+				// Build project
+				composerExtension.buildConfiguration(buildFolder, newConfiguration, varName);
+			}			
 		} else {
 			// Build project
 			String configName = arguments.externalFeatureProject.getCurrentConfiguration().getName();

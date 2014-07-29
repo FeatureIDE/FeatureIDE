@@ -47,6 +47,8 @@ public class ExtendedFeatureModel extends FeatureModel {
 		private final String varName;
 		private final int type;
 		
+		private String prefix;
+		
 		public UsedModel(UsedModel usedModel, String parentName) {
 			this.modelName = usedModel.modelName;
 			this.varName = parentName + usedModel.varName;
@@ -69,6 +71,14 @@ public class ExtendedFeatureModel extends FeatureModel {
 		
 		public int getType() {
 			return type;
+		}
+		
+		public String getPrefix() {
+			return prefix;
+		}
+		
+		public void setPrefix(String prefix) {
+			this.prefix = prefix;
 		}
 
 		@Override

@@ -109,7 +109,7 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 				// build
 				final Object buildObject = new Object();
 				final IFolder buildFolder = featureProject.getBuildFolder();
-				final IChainJob job = new MPLBuildProjectJob.Arguments(featureProject, buildFolder, config, null).createJob();
+				final IChainJob job = new MPLBuildProjectJob.Arguments(featureProject, featureProject, buildFolder, config, null).createJob();
 				
 				String tempConfigName = featureProject.getCurrentConfiguration().getName();
 				final String configName;
