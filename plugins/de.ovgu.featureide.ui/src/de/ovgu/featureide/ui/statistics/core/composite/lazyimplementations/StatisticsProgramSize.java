@@ -19,7 +19,7 @@ import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.gener
  * @author Dominik Hamann
  * @author Patrick Haese
  */
-public class StatisticsProgrammSize extends LazyParent {
+public class StatisticsProgramSize extends LazyParent {
 	private FSTModel fstModel;
 
 	/**
@@ -30,7 +30,7 @@ public class StatisticsProgrammSize extends LazyParent {
 	 * @param fstModel
 	 *            FSTModel for the calculation
 	 */
-	public StatisticsProgrammSize(String description, FSTModel fstModel) {
+	public StatisticsProgramSize(String description, FSTModel fstModel) {
 		super(description);
 		this.fstModel = fstModel;
 	}
@@ -60,7 +60,7 @@ public class StatisticsProgrammSize extends LazyParent {
 				
 				for (FSTMethod method : classFragment.getMethods()) {
 					String fullName = qualifier + method.getFullName();
-					methodMap.put(fullName + "." + method.getFullName(),methodMap.containsKey(fullName) ? methodMap.get(fullName) + 1 : 1);
+					methodMap.put(fullName,methodMap.containsKey(fullName) ? methodMap.get(fullName) + 1 : 1);
 				}
 
 				for (FSTField field : classFragment.getFields()) {
