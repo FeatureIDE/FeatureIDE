@@ -28,6 +28,11 @@ import de.ovgu.featureide.core.IExtension;
  * @author Tom Brosch
  */
 public interface IComposerExtensionBase extends IExtension {
+	
+	public static String extensionPointID = "composers";
+	
+	public static String extensionID = "composer";
+	
 	String getName();
 	
 	String getDescription();
