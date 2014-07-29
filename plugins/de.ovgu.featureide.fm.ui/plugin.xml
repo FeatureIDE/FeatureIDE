@@ -241,5 +241,13 @@
             nameFilter="*.xml">
       </page>
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="de.ovgu.featureide.fm.ui.preferences.FeatureIDEPreferencePage"
+            id="de.ovgu.featureide.fm.ui.FeatureIDEPreferencePage"
+            name="FeatureIDE">
+      </page>
+   </extension>
    
 </plugin>
