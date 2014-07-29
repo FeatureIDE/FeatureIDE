@@ -712,10 +712,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 						if (selected[i] instanceof ProjectRecord) {
 							createExistingProject((ProjectRecord) selected[i], new SubProgressMonitor(monitor, 1));
 						} else if (selected[i] instanceof String) {
-							for (ProjectRecord tmpRecord : compTable.get((String) selected[i])) {
-								createExistingProject(tmpRecord, new SubProgressMonitor(monitor, 1));
-
-							}
+								//do nothing
 						}
 					}
 				} finally {

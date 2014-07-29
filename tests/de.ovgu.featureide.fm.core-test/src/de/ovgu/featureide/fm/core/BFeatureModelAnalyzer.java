@@ -116,7 +116,7 @@ public class BFeatureModelAnalyzer {
 		analyze(100);
 	}
 	
-	@Test (timeout=4000) // 0.886s @ i5(3,3GHz)
+	@Test (timeout=8000) // 0.886s @ i5(3,3GHz)
 	public final void BAnalyzeFeatureModel200() {
 		analyze(200);
 	}
@@ -205,12 +205,12 @@ public class BFeatureModelAnalyzer {
 		getFM(i).getAnalyser().updateFeatures(new HashMap<Object, Object>(), new HashMap<Object, Object>());
 	}
 	
-	@Test (timeout=500) // 0.053s @ i5(3,3GHz)
+	@Test (timeout=1000) // 0.053s @ i5(3,3GHz)
 	public final void BUpdateFeatures1() {
 		BUpdateFeatures(1);
 	}
 	
-	@Test (timeout=500) // 0.056s @ i5(3,3GHz)
+	@Test (timeout=1000) // 0.056s @ i5(3,3GHz)
 	public final void BUpdateFeatures2() {
 		BUpdateFeatures(2);
 	}
@@ -230,7 +230,7 @@ public class BFeatureModelAnalyzer {
 		BUpdateFeatures(21);
 	}
 	
-	@Test (timeout=100) // 0.012s @ i5(3,3GHz)
+	@Test (timeout=250) // 0.012s @ i5(3,3GHz)
 	public final void BUpdateFeatures50() {
 		BUpdateFeatures(50);
 	}
