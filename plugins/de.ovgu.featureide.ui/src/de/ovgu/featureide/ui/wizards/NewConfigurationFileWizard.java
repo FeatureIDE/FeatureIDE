@@ -46,7 +46,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 
-import de.ovgu.featureide.core.builder.IComposerExtension;
+import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
@@ -85,7 +85,7 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 	 */
 	public boolean performFinish() {
 		final IContainer container = page.getContainerObject();
-		IComposerExtension composer = page.featureProject.getComposer();
+		IComposerExtensionClass composer = page.featureProject.getComposer();
 		final String fileName = page.getFileName() + "." + composer.getConfigurationExtension();
 		IRunnableWithProgress op = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor) throws InvocationTargetException {

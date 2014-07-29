@@ -326,8 +326,8 @@ public class CorePlugin extends AbstractCorePlugin {
 				IFolder source = project.getFolder(buildPath);
 				IFolder destination = !"".equals(sourcePath) ? project.getFolder(sourcePath).getFolder(BASE_FEATURE): null;
 				if (!composer.postAddNature(source, destination) && !"".equals(sourcePath)) {
-					if (!composer.hasFeatureFolders()) {
-						/** if project does not use feature folders, use the source path directly **/
+					if (!composer.hasFeatureFolder()) {
+						/** if project does not use feature folder, use the source path directly **/
 						destination = project.getFolder(sourcePath);
 					}
 					if (!destination.exists()) {

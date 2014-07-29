@@ -293,7 +293,7 @@ public class DeltajComposer extends ComposerExtensionClass {
 	}
 	
 	@Override
-	public boolean hasFeatureFolders() {
+	public boolean hasFeatureFolder() {
 		return false;
 	}
 	

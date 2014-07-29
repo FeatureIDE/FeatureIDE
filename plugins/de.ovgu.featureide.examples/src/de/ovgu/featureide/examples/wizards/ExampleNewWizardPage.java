@@ -92,6 +92,7 @@ import org.eclipse.ui.wizards.datatransfer.ImportOperation;
 
 import de.ovgu.featureide.core.builder.ComposerExtensionManager;
 import de.ovgu.featureide.core.builder.IComposerExtension;
+import de.ovgu.featureide.core.builder.IComposerExtensionBase;
 import de.ovgu.featureide.examples.ExamplePlugin;
 import de.ovgu.featureide.examples.utils.CommentParser;
 import de.ovgu.featureide.examples.utils.ExampleStructureProvider;
@@ -311,7 +312,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 			public String getText(Object element) {
 				if (element instanceof String) {
 					List<IComposerExtension> composerExtensions = ComposerExtensionManager.getInstance().getComposers();
-					for (IComposerExtension ic : composerExtensions) {
+					for (IComposerExtensionBase ic : composerExtensions) {
 						if (ic.toString().contains((String) element)) {
 							return ic.getName();
 						}

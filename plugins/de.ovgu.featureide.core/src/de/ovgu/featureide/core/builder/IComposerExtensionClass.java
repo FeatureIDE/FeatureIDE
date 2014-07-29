@@ -32,7 +32,6 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceDelta;
 
-import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 
@@ -51,7 +50,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
  * 
  * @author Tom Brosch
  */
-public interface IComposerExtensionClass {
+public interface IComposerExtensionClass extends IComposerExtensionBase {
     
 	/** Defines the product-line implementation-mechanism of the composition tool **/
     static enum  Mechanism {FEATURE_ORIENTED_PROGRAMMING, ASPECT_ORIENTED_PROGRAMMING, DELTA_ORIENTED_PROGRAMMING, PREPROCESSOR};
@@ -62,8 +61,6 @@ public interface IComposerExtensionClass {
 	final static String FEATUE_PATTER = "#featurename#";
 	
 	boolean isInitialized();
-	
-	void setFeatureProject(IFeatureProject featureProject);
 	
 	void performFullBuild(IFile config);
 	
@@ -151,11 +148,6 @@ public interface IComposerExtensionClass {
 	void postCompile(IResourceDelta delta, IFile buildFile);
 	
 	/**
-	 * Folders for each feature will be created if <code>true</code>.
-	 */
-	boolean hasFeatureFolders();
-
-	/**
 	 * 
 	 * @return the index of the default template.
 	 */
@@ -166,11 +158,6 @@ public interface IComposerExtensionClass {
 	 */
 	void postModelChanged();
 	
-	/**
-	 * @return <code>true</code> if the composer has a folder for each features.
-	 */
-	boolean hasFeatureFolder();
-
 	/**
 	 * @return returns <code>false</code> if filenames equal the corresponding feature name
 	 * otherwise <code>true</code>.
@@ -183,12 +170,6 @@ public interface IComposerExtensionClass {
 	 */
 	@Nonnull
 	String getConfigurationExtension();
-
-	/**
-	 * 
-	 * @return <code>false</code> if a source folder should not be created. Default: <code>true</code>
-	 */
-	boolean hasSourceFolder();
 
 	/** 
 	 * @return <code>true</code> if the composition can be called parallel
@@ -211,21 +192,6 @@ public interface IComposerExtensionClass {
 	 * @return <code>true</code> if a highlighting at the editor is available for the composition tool.
 	 */
 	boolean needColor();
-	
-	/**
-	 * @return <code>true</code> if the composition tool supports contract composition.
-	 */
-	boolean hasContractComposition();
-	
-	/**
-	 * @return <code>true</code> if the composition tool supports meta product generation.
-	 */
-	boolean hasMetaProductGeneration();
-	
-	/**
-	 * @return <code>true</code> if the composition tool supports different composition tools
-	 */
-	boolean hasCompositionMechanisms();
 	
 	/**
 	 * @return The generation {@link Mechanism} of the generation tool, or null. 

@@ -58,7 +58,7 @@ import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
  * @author Jens Meinicke
  */
 @SuppressWarnings("restriction")
-public abstract class ComposerExtensionClass implements IComposerExtensionClass, IComposerExtensionInitialize {
+public abstract class ComposerExtensionClass implements IComposerExtensionClass {
 
 	protected static final String JAVA_NATURE = "org.eclipse.jdt.core.javanature";
 	public static final IPath JRE_CONTAINER = new Path("org.eclipse.jdt.launching.JRE_CONTAINER");
@@ -66,7 +66,25 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass,
 	
 	public static final String NEWLINE = System.getProperty("line.separator", "\n");
 	private boolean initialized = false; 
+	private IComposerExtension composerExtensionProxy;
 	
+
+	public String getName() {
+		return composerExtensionProxy.getName();
+	}
+
+	public String getDescription() {
+		return composerExtensionProxy.getDescription();
+	}
+
+	public String getId() {
+		return composerExtensionProxy.getId();
+	}
+
+	void setComposerExtension(IComposerExtension composerExtensionProxy) {
+		this.composerExtensionProxy = composerExtensionProxy;
+	}
+
 	protected final static String[] JAVA_TEMPLATE = new String[]{"Java", "java", PACKAGE_PATTERN + "/**" + NEWLINE 
 		+ " * TODO description" + NEWLINE 
 		+ " */" + NEWLINE 
@@ -74,9 +92,8 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass,
 	
 	public boolean initialize(IFeatureProject project) {
 		assert (project != null) : "Invalid project given";
-		featureProject = project;
-		initialized = true;
-		return initialized;
+		featureProject = project;		
+		return initialized = true;
 	}
 
 	public void setFeatureProject(IFeatureProject featureProject) {
@@ -286,12 +303,8 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass,
 	public void postModelChanged() {
 
 	}
-
-	public boolean hasFeatureFolder() {
-		return true;
-	}
 	
-	public boolean hasFeatureFolders() {
+	public boolean hasFeatureFolder() {
 		return true;
 	}
 
