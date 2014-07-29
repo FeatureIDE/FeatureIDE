@@ -44,7 +44,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.builder.IComposerExtensionClass;
+import de.ovgu.featureide.core.builder.IComposerExtension;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
@@ -198,7 +198,7 @@ public class EditorTracker {
 		method.invoke(obj, (paramtype.cast(parameter)));
 	}
 
-	private IComposerExtensionClass composer;
+	private IComposerExtension composer;
 
 	private String getTitle(IWorkbenchPartReference partRef, IFile file) {
 		IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
@@ -209,7 +209,7 @@ public class EditorTracker {
 				String feature = featureProject.getFeatureName(file);
 				if (feature != null) {
 					// case: a source file
-					if (composer.hasFeatureFolder()) {
+					if (composer.hasFeatureFolders()) {
 						return file.getName() + "[" + feature + "]";
 					}
 				} else {

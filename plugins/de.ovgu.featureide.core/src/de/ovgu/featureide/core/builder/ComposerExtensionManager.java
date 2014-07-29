@@ -26,15 +26,18 @@ import org.eclipse.core.runtime.IConfigurationElement;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.ExtensionPointManager;
-import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.internal.FeatureProject;
 
 
 /**
  * Manages the FeatureIDE extensions to compose features.
  * 
  * @author Tom Brosch
- * @author Stefan Krueger
- * @author Sebastian Krieter
+ */
+/**
+ * TODO description
+ * 
+ * @author stefankr
  */
 public class ComposerExtensionManager extends ExtensionPointManager<IComposerExtension> {
 
@@ -66,12 +69,21 @@ public class ComposerExtensionManager extends ExtensionPointManager<IComposerExt
 	 * @param composerID The ID of the composer
 	 * @return The composer or null if no composer with the specified ID was found
 	 */
-	public IComposerExtensionClass getComposerById(IFeatureProject featureProject, String composerID) {
+	public IComposerExtension getComposerById(String composerID) {
 		for (IComposerExtension tool : getComposers()) {
-			if (tool.getId().equals(composerID)) {
-				return tool.getComposerByProject(featureProject);	
-			}
+			if (tool.getId().equals(composerID))
+				return tool;
 		}
 		return null;
+	}
+
+	/** 
+	 * It is strongly advised to use carefully since composer extension should only be initialized once.
+	 * @param composer composer extension to be initialized
+	 * @param featureProject feature project whose composer extension is to be initialized
+	 * @return {@code true} if no error occurred during initialization 
+	 */
+	public boolean initializeComposer(IComposerExtensionInitialize composer, FeatureProject featureProject) {
+		return composer.initialize(featureProject);		
 	}
 }

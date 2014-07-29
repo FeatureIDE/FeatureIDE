@@ -38,7 +38,6 @@ import org.eclipse.swt.widgets.Text;
 
 import de.ovgu.featureide.core.builder.ComposerExtensionManager;
 import de.ovgu.featureide.core.builder.IComposerExtension;
-import de.ovgu.featureide.core.builder.IComposerExtensionBase;
 
 /**
  * A dialog page for creating FeatureIDE projects.
@@ -47,8 +46,8 @@ import de.ovgu.featureide.core.builder.IComposerExtensionBase;
  */
 public class NewFeatureProjectPage extends WizardPage {
 
-	private IComposerExtensionBase composerExtension = null;
-	private IComposerExtensionBase[] extensions = null;
+	private IComposerExtension composerExtension = null;
+	private IComposerExtension[] extensions = null;
 	
 	private Text sourcePath, configsPath;
 	protected Text buildPath;
@@ -99,15 +98,15 @@ public class NewFeatureProjectPage extends WizardPage {
 	    StringBuilder descriptionStringBuilder = new StringBuilder();
 	    descriptionStringBuilder.append("Possible choices are:\n\n");
 	    List<IComposerExtension> composerExtensions = ComposerExtensionManager.getInstance().getComposers();
-	    extensions = new IComposerExtensionBase[composerExtensions.size()]; 
+	    extensions = new IComposerExtension[composerExtensions.size()]; 
 	    composerExtensions.toArray(extensions);
-	    Arrays.sort(extensions, new Comparator<IComposerExtensionBase> () {
-			public int compare(IComposerExtensionBase arg0, IComposerExtensionBase arg1) {
+	    Arrays.sort(extensions, new Comparator<IComposerExtension> () {
+			public int compare(IComposerExtension arg0, IComposerExtension arg1) {
 				return arg0.getName().compareTo(arg1.getName());
 			}
 	    });
 	    
-		for (IComposerExtensionBase composerExtension : extensions) {
+		for (IComposerExtension composerExtension : extensions) {
 			descriptionStringBuilder.append(composerExtension.getName());
 			descriptionStringBuilder.append(": ");
 			descriptionStringBuilder.append(composerExtension.getDescription());
@@ -167,7 +166,7 @@ public class NewFeatureProjectPage extends WizardPage {
 		addListeners();
 	}	
 	
-	public IComposerExtensionBase getCompositionTool() {
+	public IComposerExtension getCompositionTool() {
 		return composerExtension;
 	}
 	
@@ -210,7 +209,8 @@ public class NewFeatureProjectPage extends WizardPage {
 	}
 	
 	protected void dialogChanged() {
-		IComposerExtensionBase compositionTool = getCompositionTool();
+		IComposerExtension compositionTool = getCompositionTool();
+		compositionTool.loadComposerExtension();
 		sourcePath.setEnabled(compositionTool.hasFeatureFolder());
 		buildPath.setEnabled(compositionTool.hasSourceFolder());
 		

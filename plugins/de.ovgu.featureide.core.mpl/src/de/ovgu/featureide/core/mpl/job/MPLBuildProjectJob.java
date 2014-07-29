@@ -34,7 +34,7 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.builder.IComposerExtensionClass;
+import de.ovgu.featureide.core.builder.IComposerExtension;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.builder.MSPLNature;
 import de.ovgu.featureide.core.mpl.job.util.AJobArguments;
@@ -221,7 +221,7 @@ public class MPLBuildProjectJob extends AMonitorJob<MPLBuildProjectJob.Arguments
 	}
 	
 	private boolean buildFeatureProject(String varName, IFolder buildFolder) {
-		final IComposerExtensionClass composerExtension = arguments.externalFeatureProject.getComposer();
+		final IComposerExtension composerExtension = arguments.externalFeatureProject.getComposer();
 		if (composerExtension == null) {
 			return false;
 		}

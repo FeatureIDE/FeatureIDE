@@ -59,11 +59,11 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.core.builder.ComposerExtensionManager;
 import de.ovgu.featureide.core.builder.ExtensibleFeatureProjectBuilder;
 import de.ovgu.featureide.core.builder.FeatureProjectNature;
-import de.ovgu.featureide.core.builder.IComposerExtensionClass;
+import de.ovgu.featureide.core.builder.IComposerExtension;
+import de.ovgu.featureide.core.builder.IComposerExtensionInitialize;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.Feature;
@@ -154,7 +154,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 
 	private final FeatureModelFile modelFile;
 
-	private IComposerExtensionClass composerExtension = null;
+	private IComposerExtension composerExtension = null;
 
 	/**
 	 * If <code>true</code> there is something changed that is relevant for composition.<br>
@@ -293,7 +293,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 				getProjectConfigurationPath());
 		
 		// adds the compiler to the feature project if it is an older project
-		IComposerExtensionClass composer = getComposer();
+		IComposerExtension composer = getComposer();
 		if (composer != null) {
 			if (sourceFolder != null) {
 				composer.addCompiler(getProject(),
@@ -331,7 +331,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			modelReader.readFromFile(modelFile.getResource());
 			getComposer();
 			if (composerExtension != null
-					&& composerExtension.hasFeatureFolder()) {
+					&& composerExtension.hasFeatureFolders()) {
 				createAndDeleteFeatureFolders();
 				setAllFeatureModuleMarkers();
 			}
@@ -451,7 +451,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	private void createFeatureFolder(String name) {
 		try {
 			IFolder folder = sourceFolder.getFolder(name);
-			if (!folder.exists() && composerExtension.hasFeatureFolder()) {
+			if (!folder.exists() && composerExtension.hasFeatureFolders()) {
 				folder.create(false, true, null);
 				LOGGER.fireFeatureFolderChanged(folder);
 			}
@@ -849,7 +849,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 
 			// set markers, only if event is not fired from changes to markers
 			if (event.findMarkerDeltas(FEATURE_MODULE_MARKER, false).length == 0 &&
-					composerExtension != null && composerExtension.hasFeatureFolder()) {
+					composerExtension != null && composerExtension.hasFeatureFolders()) {
 				setAllFeatureModuleMarkers();
 			}
 		}
@@ -890,7 +890,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 			if (!buildRelevantChanges && sourceFolder != null
 					&& sourceFolder.isAccessible()) {
 				if (currentConfig != null && composerExtension != null
-						&& composerExtension.hasFeatureFolder()) {
+						&& composerExtension.hasFeatureFolders()) {
 					// ignore changes in unselected feature folders
 					List<String> selectedFeatures = readFeaturesfromConfigurationFile(currentConfig
 							.getRawLocation().toFile());
@@ -1008,7 +1008,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		Job job = new Job("Load Model") {
 			protected IStatus run(IProgressMonitor monitor) {
 				loadModel();
-				final IComposerExtensionClass composerExtension = getComposer();
+				final IComposerExtension composerExtension = getComposer();
 				if (composerExtension.isInitialized()) {
 					composerExtension.postModelChanged();
 					checkConfigurations(getAllConfigurations());
@@ -1169,16 +1169,16 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		return concreteFeatureNames;
 	}
 	
-	public IComposerExtensionClass getComposer() {
+	public IComposerExtension getComposer() {
 		if (composerExtension == null) {
 			String compositionToolID = getComposerID();
 			if (compositionToolID == null)
 				return null;
-			
 			final ComposerExtensionManager composerManagerInstance = ComposerExtensionManager.getInstance();
-			composerExtension = composerManagerInstance.getComposerById(this, compositionToolID);
-			((ComposerExtensionClass) composerExtension).initialize(this);
+			composerExtension = composerManagerInstance.getComposerById(compositionToolID);
+			composerManagerInstance.initializeComposer((IComposerExtensionInitialize) composerExtension, this);
 		}
+		composerExtension.setFeatureProject(this);
 		return composerExtension;
 	}
 

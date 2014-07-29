@@ -54,6 +54,11 @@ public class FeatureModeling extends ComposerExtensionClass {
 	}
 	
 	@Override
+	public boolean hasFeatureFolders() {
+		return false;
+	}
+
+	@Override
 	public boolean hasSourceFolder() {
 		return false;
 	}

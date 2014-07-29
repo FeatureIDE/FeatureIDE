@@ -37,7 +37,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.QualifiedName;
 
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.builder.IComposerExtensionClass;
+import de.ovgu.featureide.core.builder.IComposerExtension;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTConfiguration;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
@@ -235,7 +235,7 @@ public class CollaborationModelBuilder {
 		project = featureProject;
 		
 		// set the composer
-		IComposerExtensionClass composer = project.getComposer();
+		IComposerExtension composer = project.getComposer();
 		if (composer == null) {
 			return false; 	
 		}
@@ -256,7 +256,7 @@ public class CollaborationModelBuilder {
 	 * sets the FSTModel
 	 * @param composer
 	 */
-	private void getFstModel(IComposerExtensionClass composer) {
+	private void getFstModel(IComposerExtension composer) {
 		fSTModel = project.getFSTModel();
 		if (fSTModel == null) {
 			composer.buildFSTModel();

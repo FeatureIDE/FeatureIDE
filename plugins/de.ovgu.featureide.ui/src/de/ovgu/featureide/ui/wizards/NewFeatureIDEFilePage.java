@@ -55,7 +55,7 @@ import org.eclipse.ui.part.FileEditorInput;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.builder.IComposerExtensionClass;
+import de.ovgu.featureide.core.builder.IComposerExtension;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
@@ -107,7 +107,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 	private String comboProjectText;
 
 	private IFeatureProject featureProject = null;
-	private IComposerExtensionClass composer;
+	private IComposerExtension composer;
 	private Collection<IFeatureProject> featureProjects = CorePlugin
 			.getFeatureProjects();
 	
@@ -334,7 +334,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 		comboClass.removeAll();
 		LinkedList<String> inclusions = new LinkedList<String>();
 		LinkedList<String> exclusions = new LinkedList<String>();
-		if (featureProject.getComposer().hasFeatureFolder()) {
+		if (featureProject.getComposer().hasFeatureFolders()) {
 			try {
 				for (IResource res : featureProject.getSourceFolder().members()) {
 					if (res instanceof IFolder) {
@@ -422,7 +422,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 			p2 = setPackage((IFolder)obj);
 		}
 		try {
-			if (composer.hasFeatureFolder() && folder.equals(sourceFolder)) {
+			if (composer.hasFeatureFolders() && folder.equals(sourceFolder)) {
 				comboPackage.removeAll();
 				for (IResource res : folder.members()) {
 					if (res instanceof IFolder) {
@@ -458,7 +458,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 	private String setPackage(IFolder folder) {
 		String p = "";
 		while (!featureProject.getProject().getFolder(folder.getName()).equals(folder)) {
-			if (!composer.hasFeatureFolder()) {
+			if (!composer.hasFeatureFolders()) {
 				if (sourceFolder.equals(folder)) {
 					return "".equals(p) ? p : p.substring(1);
 				}
@@ -561,6 +561,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 	 */
 	private void initComboLanguage() {
 		composer = featureProject.getComposer();
+		composer.loadComposerExtension();
 		formats = composer.getTemplates();
 		comboLanguage.removeAll();
 		for (String[] format : formats)
@@ -630,7 +631,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 		
 		}
 		if (comboFeature.getItemCount() == 1 || 
-				!featureProject.getComposer().hasFeatureFolder()) {
+				!featureProject.getComposer().hasFeatureFolders()) {
 			comboFeature.setEnabled(false);
 		} else {
 			comboFeature.setEnabled(true);
@@ -685,7 +686,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 
 	IContainer getContainerObject() {
 		if (composer != null) {
-			IFolder folder = composer.hasFeatureFolder() ? sourceFolder.getFolder(comboFeature.getText()) : sourceFolder;
+			IFolder folder = composer.hasFeatureFolders() ? sourceFolder.getFolder(comboFeature.getText()) : sourceFolder;
 			for (String packageName : comboPackage.getText().split("[.]")) {
 				folder = folder.getFolder(packageName);
 			}
@@ -719,7 +720,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 		return comboPackage.getText();
 	}
 
-	IComposerExtensionClass getComposer() {
+	IComposerExtension getComposer() {
 		return composer;
 	}
 
