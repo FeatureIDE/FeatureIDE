@@ -56,25 +56,11 @@ public class StatisticsProgramSize extends LazyParent {
 
 				String qualifier = qualifiedRoleName + ".";
 
-
-				
-				for (FSTMethod method : classFragment.getMethods()) {
-					String fullName = qualifier + method.getFullName();
-					methodMap.put(fullName,methodMap.containsKey(fullName) ? methodMap.get(fullName) + 1 : 1);
-				}
-
-				for (FSTField field : classFragment.getFields()) {
-					String fullName = qualifier + field.getFullName();
-					fieldMap.put(
-							fullName,
-							fieldMap.containsKey(fullName) ? fieldMap
-									.get(fullName) + 1 : 1);
-				}
-
-				classMap.put(
-						qualifiedRoleName,
-						classMap.containsKey(qualifiedRoleName) ? classMap
-								.get(qualifiedRoleName) + 1 : 1);
+				for (FSTMethod method : classFragment.getMethods())
+					addToMap(qualifier + method.getFullName(), methodMap);
+				for (FSTField field : classFragment.getFields())
+					addToMap(qualifier + field.getFullName(), fieldMap);
+				addToMap(qualifiedRoleName, classMap);
 			}
 		}
 		
@@ -87,6 +73,10 @@ public class StatisticsProgramSize extends LazyParent {
 		addChild(new HashMapNode(NUMBER_METHOD_U + SEPARATOR
 				+ methodMap.keySet().size() + " | " + NUMBER_METHOD + SEPARATOR
 				+ sum(methodMap), null, methodMap));
+	}
+
+	private void addToMap(String name, HashMap<String, Integer> map) {
+		map.put(name, map.containsKey(name) ? map.get(name) + 1 : 1);
 	}
 
 	private Integer sum(HashMap<String, Integer> input) {
