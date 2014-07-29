@@ -19,7 +19,7 @@ import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.gener
  * @author Dominik Hamann
  * @author Patrick Haese
  */
-public class StatisticsProgrammSize extends LazyParent {
+public class StatisticsProgramSize extends LazyParent {
 	private FSTModel fstModel;
 
 	/**
@@ -30,7 +30,7 @@ public class StatisticsProgrammSize extends LazyParent {
 	 * @param fstModel
 	 *            FSTModel for the calculation
 	 */
-	public StatisticsProgrammSize(String description, FSTModel fstModel) {
+	public StatisticsProgramSize(String description, FSTModel fstModel) {
 		super(description);
 		this.fstModel = fstModel;
 	}
@@ -56,25 +56,11 @@ public class StatisticsProgrammSize extends LazyParent {
 
 				String qualifier = qualifiedRoleName + ".";
 
-
-				
-				for (FSTMethod method : classFragment.getMethods()) {
-					String fullName = qualifier + method.getFullName();
-					methodMap.put(fullName + "." + method.getFullName(),methodMap.containsKey(fullName) ? methodMap.get(fullName) + 1 : 1);
-				}
-
-				for (FSTField field : classFragment.getFields()) {
-					String fullName = qualifier + field.getFullName();
-					fieldMap.put(
-							fullName,
-							fieldMap.containsKey(fullName) ? fieldMap
-									.get(fullName) + 1 : 1);
-				}
-
-				classMap.put(
-						qualifiedRoleName,
-						classMap.containsKey(qualifiedRoleName) ? classMap
-								.get(qualifiedRoleName) + 1 : 1);
+				for (FSTMethod method : classFragment.getMethods())
+					addToMap(qualifier + method.getFullName(), methodMap);
+				for (FSTField field : classFragment.getFields())
+					addToMap(qualifier + field.getFullName(), fieldMap);
+				addToMap(qualifiedRoleName, classMap);
 			}
 		}
 		
@@ -87,6 +73,10 @@ public class StatisticsProgrammSize extends LazyParent {
 		addChild(new HashMapNode(NUMBER_METHOD_U + SEPARATOR
 				+ methodMap.keySet().size() + " | " + NUMBER_METHOD + SEPARATOR
 				+ sum(methodMap), null, methodMap));
+	}
+
+	private void addToMap(String name, HashMap<String, Integer> map) {
+		map.put(name, map.containsKey(name) ? map.get(name) + 1 : 1);
 	}
 
 	private Integer sum(HashMap<String, Integer> input) {
