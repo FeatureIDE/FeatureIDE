@@ -600,11 +600,6 @@ public class CPPComposer extends PPComposerExtensionClass {
 	}
 
 	@Override
-	public boolean hasFeatureFolders() {
-		return false;
-	}
-
-	@Override
 	public boolean clean() {
 		return false;
 	}
