@@ -3,13 +3,18 @@ Change log for FeatureIDE
 Each release contains smaller changes, bug fixes, and performance improvements,
 which can be found here:
 
-https://faracvs.cs.uni-magdeburg.de/projects/tthuem-FeatureIDE/report/6
+https://github.com/tthuem/FeatureIDE/issues/milestones
 
 and here:
 
-https://github.com/tthuem/FeatureIDE/issues/milestones
+https://faracvs.cs.uni-magdeburg.de/projects/tthuem-FeatureIDE/report/6
 
 Here, is a list of high-level enhancements.
+
+Release 2.7.1 (July 2014)
+* Example wizard improved by hierarchical structure and keyword search
+* Removed redundant calculations in composers that caused inconsistencies in threads
+* Performance of configuration editor improved
 
 Release 2.7.0 (April 2014)
 * Advanced support for contracts in FeatureHouse projects (e.g., collaboration diagram and outline, error markers, statistics on contracts, improved variability encoding)
