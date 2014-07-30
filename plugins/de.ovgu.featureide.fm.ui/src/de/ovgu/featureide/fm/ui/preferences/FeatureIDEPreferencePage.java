@@ -51,36 +51,41 @@ public class FeatureIDEPreferencePage extends PreferencePage implements
 		final FillLayout fillLayout = new FillLayout();
 		container.setLayout(fillLayout);
 		
-		Group group1 = new Group(container, SWT.SHADOW_IN);
-	    group1.setText("Configuration Coloring");
-	    group1.setLayout(new RowLayout(SWT.VERTICAL));
-	    Button noneButton = new Button(group1, SWT.RADIO);
-	    Button openClauseButton = new Button(group1, SWT.RADIO);
-	    Button contradictionButton = new Button(group1, SWT.RADIO);
-
+		final Group configGroup = new Group(container, SWT.SHADOW_IN);
+	    configGroup.setText("Configuration Coloring");
+	    configGroup.setLayout(new RowLayout(SWT.VERTICAL));
+	    configGroup.setToolTipText("The configuration editor provides feature highlighting for invalid configurations in oder to find valid configurations.");
+	    final Button noneButton = new Button(configGroup, SWT.RADIO);
+	    final Button openClauseButton = new Button(configGroup, SWT.RADIO);
+	    final Button contradictionButton = new Button(configGroup, SWT.RADIO);
+	    
 	    noneButton.setData(Configuration.COMPLETION_NONE);
 	    openClauseButton.setData(Configuration.COMPLETION_OPEN_CLAUSES);
 	    contradictionButton.setData(Configuration.COMPLETION_ONE_CLICK);
 	    
-	    noneButton.addSelectionListener(selectionListener);
-	    openClauseButton.addSelectionListener(selectionListener);
-	    contradictionButton.addSelectionListener(selectionListener);
-	    
 	    noneButton.setText("None");
 	    openClauseButton.setText("Check open clauses (Faster results)");
 	    contradictionButton.setText("Check contradiction (Better results)");
+
+	    noneButton.setToolTipText("Do not use this functionality (Yields best performance for large feature models).");
+	    openClauseButton.setToolTipText("Looks for open clauses in the CNF representation of the feature model and highlights the corresponding features.");
+	    contradictionButton.setToolTipText("Tries to find features which lead to a valid configuration by solving a satisfiability problem.");
 	    
 	    switch (Configuration.getDefaultCompletion()) {
-	    	case Configuration.COMPLETION_NONE:
-		    	noneButton.setSelection(true);
-		    	break;
-	    	case Configuration.COMPLETION_OPEN_CLAUSES:
-	    		openClauseButton.setSelection(true);
-		    	break;
-	    	case Configuration.COMPLETION_ONE_CLICK:
-	    		contradictionButton.setSelection(true);
-		    	break;
+    	case Configuration.COMPLETION_NONE:
+	    	noneButton.setSelection(true);
+	    	break;
+    	case Configuration.COMPLETION_OPEN_CLAUSES:
+    		openClauseButton.setSelection(true);
+	    	break;
+    	case Configuration.COMPLETION_ONE_CLICK:
+    		contradictionButton.setSelection(true);
+	    	break;
 	    }
+	    
+	    noneButton.addSelectionListener(selectionListener);
+	    openClauseButton.addSelectionListener(selectionListener);
+	    contradictionButton.addSelectionListener(selectionListener);
 	    
 		return container;
 	}
