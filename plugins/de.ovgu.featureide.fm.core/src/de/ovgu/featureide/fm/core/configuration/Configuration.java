@@ -30,6 +30,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.osgi.service.prefs.BackingStoreException;
 import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
@@ -81,9 +84,18 @@ public class Configuration {
 		COMPLETION_ONE_CLICK = 1,
 		COMPLETION_OPEN_CLAUSES = 2;
 
-	public static int DEFAULT_COMPLETION = COMPLETION_ONE_CLICK;
 	public static int FEATURE_LIMIT_FOR_DEFAULT_COMPLETION = 150;
-	
+	private static int defaultCompletion;
+	static {
+		final IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode("de.ovgu.featureide.fm.core");
+		final String pref = preferences.get("configCompletion", Integer.toString(COMPLETION_ONE_CLICK));
+		try {
+			defaultCompletion = Integer.parseInt(pref);
+		} catch (Exception e) {
+			defaultCompletion = COMPLETION_ONE_CLICK;
+		}
+	}
+
 	private static final int TIMEOUT = 1000;
 
 	private final SelectableFeature root;
@@ -98,6 +110,21 @@ public class Configuration {
 
 	private final boolean ignoreAbstractFeatures;
 	private boolean propagate;
+	
+	public static int getDefaultCompletion() {
+		return defaultCompletion;
+	}
+	
+	public static void setDefaultCompletion(int defaultCompletion) {
+		Configuration.defaultCompletion = defaultCompletion;
+		final IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode("de.ovgu.featureide.fm.core");
+		preferences.put("configCompletion", Integer.toString(defaultCompletion));
+		try {
+			preferences.flush();
+		} catch (BackingStoreException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+	}
 
 	/**
 	 * This method creates a clone of the given {@link Configuration}
@@ -246,10 +273,12 @@ public class Configuration {
 	}
 	
 	public boolean[] leadToValidConfiguration(List<SelectableFeature> featureList) {
-		if (featureList.size() > FEATURE_LIMIT_FOR_DEFAULT_COMPLETION) {
+		if (defaultCompletion == COMPLETION_NONE) {
+			return leadToValidConfiguration(featureList, defaultCompletion);
+		} else if (featureList.size() > FEATURE_LIMIT_FOR_DEFAULT_COMPLETION) {
 			return leadToValidConfiguration(featureList, COMPLETION_OPEN_CLAUSES);
 		}
-		return leadToValidConfiguration(featureList, DEFAULT_COMPLETION);
+		return leadToValidConfiguration(featureList, defaultCompletion);
 	}
 	
 	public boolean[] leadToValidConfiguration(List<SelectableFeature> featureList, int mode) {
