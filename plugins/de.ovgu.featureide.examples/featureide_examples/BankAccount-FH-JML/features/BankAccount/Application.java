@@ -4,10 +4,15 @@ public class Application {
 
 	/*@
 	 @ requires true;
+	 @ ensures true;
 	 @*/
 	void nextDay() {
 	}
 
+	/*@
+	 @ requires true;
+	 @ ensures true;
+	 @*/
 	void nextYear() {
 	}
 
