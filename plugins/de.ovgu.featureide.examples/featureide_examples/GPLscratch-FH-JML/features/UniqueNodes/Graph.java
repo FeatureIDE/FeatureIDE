@@ -14,8 +14,8 @@ public class Graph {
 	
 	/*@ \final_method
 	  @ requires nodes != null && nodes instanceof Set<Node>;
-	  @ ensures \result ==>(\forall int i; 0 <= i && i < nodes.size() -1;
-	  @ 	nodes.toArray()[i].compareTo(nodes.toArray()[i+1]) = -1 );
+	  @ ensures (\forall int i; 0 <= i && i < \result.size()-1;
+	  @ 	\result.toArray()[i].compareTo(\result.toArray()[i+1]) < 0 );
 	  @*/
 	public Collection<Node> sortNodes(Collection<Node> nodes) {
 		java.util.Set<Node> set = new HashSet<Node>(nodes);
