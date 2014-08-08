@@ -451,7 +451,7 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	private void createFeatureFolder(String name) {
 		try {
 			IFolder folder = sourceFolder.getFolder(name);
-			if (!folder.exists() && composerExtension.hasFeatureFolder()) {
+			if (!folder.exists() && composerExtension.hasFeatureFolder() && composerExtension.createFolderForFeatures()) {
 				folder.create(false, true, null);
 				LOGGER.fireFeatureFolderChanged(folder);
 			}
