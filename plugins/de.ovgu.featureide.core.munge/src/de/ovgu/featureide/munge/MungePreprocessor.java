@@ -420,6 +420,11 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 
 	@Override
 	public boolean hasFeatureFolder() {
+		return true;
+	}
+	
+	@Override
+	public boolean createFolderForFeatures() {
 		return false;
 	}
 	

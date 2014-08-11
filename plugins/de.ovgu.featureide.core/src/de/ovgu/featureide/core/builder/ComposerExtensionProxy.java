@@ -108,4 +108,8 @@ public class ComposerExtensionProxy implements IComposerExtension {
 		return defaultComposerExtensionClass.hasCompositionMechanisms();
 	}
 
+	public boolean createFolderForFeatures() {
+		return defaultComposerExtensionClass.createFolderForFeatures();
+	}
+
 }
