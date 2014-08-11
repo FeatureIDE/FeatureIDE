@@ -119,6 +119,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 		// add source files
 		try {
 			// add activated features as definitions to preprocessor
+			preprocessor.clearDefines();
 			preprocessor.addDefines(featureList.toString());
 
 			// preprocess for all files in source folder
@@ -432,9 +433,6 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	    return IComposerExtensionClass.Mechanism.PREPROCESSOR;
 	}
 	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.ComposerExtensionClass#buildConfiguration(org.eclipse.core.resources.IFolder, de.ovgu.featureide.fm.core.configuration.Configuration, java.lang.String)
-	 */
 	@Override
 	public void buildConfiguration(IFolder folder, Configuration configuration,
 			String congurationName) {

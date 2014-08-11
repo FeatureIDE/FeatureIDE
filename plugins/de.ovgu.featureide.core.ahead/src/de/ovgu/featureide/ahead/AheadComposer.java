@@ -81,15 +81,7 @@ public class AheadComposer extends ComposerExtensionClass {
 		ahead = new AheadWrapper(project);
 		ahead.addBuildErrorListener(new BuilderErrorListener());
 		
-		try {
-			ahead.setConfiguration(featureProject.getCurrentConfiguration());
-			return true;
-		} catch (IOException e) {
-			featureProject.createBuilderMarker(featureProject.getProject(),
-					e.getMessage(), -1, IMarker.SEVERITY_ERROR);
-			return false;
-		}
-		
+		return true;
 	}
 
 	public void performFullBuild(IFile config) {
@@ -335,9 +327,6 @@ public class AheadComposer extends ComposerExtensionClass {
 		return super.replaceSourceContentMarker(text, refines, packageName);
 	}
 	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.ComposerExtensionClass#refines()
-	 */
 	@Override
 	public boolean refines() {
 		return true;
@@ -422,9 +411,6 @@ public class AheadComposer extends ComposerExtensionClass {
 		}		
 	}
 	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.ComposerExtensionClass#buildConfiguration(org.eclipse.core.resources.IFolder, de.ovgu.featureide.fm.core.configuration.Configuration)
-	 */
 	@Override
 	public void buildConfiguration(IFolder folder, Configuration configuration, String configurationName) {
 		super.buildConfiguration(folder, configuration, configurationName);

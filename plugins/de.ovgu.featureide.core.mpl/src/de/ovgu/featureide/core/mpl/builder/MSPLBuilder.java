@@ -85,7 +85,7 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 		final IProject project = getProject();
 		if (project != null) {
 			final IFeatureProject featureProject = CorePlugin.getFeatureProject(project);
-			if (featureProject == null || !featureProject.buildRelavantChanges()) {
+			if (featureProject == null || !featureProject.buildRelevantChanges()) {
 				return null;
 			}
 			

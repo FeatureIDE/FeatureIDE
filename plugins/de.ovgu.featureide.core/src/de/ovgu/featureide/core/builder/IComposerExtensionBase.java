@@ -61,4 +61,9 @@ public interface IComposerExtensionBase extends IExtension {
 	 * @return <code>true</code> if the composition tool supports different composition tools
 	 */
 	boolean hasCompositionMechanisms();
+	
+	/**
+	 * @return <code>true</code> if the composition tool should create a folder for each feature 
+	 */
+	boolean createFolderForFeatures();
 }

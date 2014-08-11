@@ -118,9 +118,6 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 			mungeModelBuilder.buildModel();
 	}
 	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.ComposerExtensionClass#postModelChanged()
-	 */
 	@Override
 	public void postModelChanged() {
 		prepareFullBuild(null);
@@ -420,6 +417,11 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 
 	@Override
 	public boolean hasFeatureFolder() {
+		return true;
+	}
+	
+	@Override
+	public boolean createFolderForFeatures() {
 		return false;
 	}
 	
@@ -431,6 +433,7 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 	@Override
 	public void buildConfiguration(IFolder folder, Configuration configuration, String congurationName) {
 		super.buildConfiguration(folder, configuration, congurationName);
+		prepareFullBuild(null);
 		if (activatedFeatures == null) {
 			activatedFeatures = new ArrayList<String>();
 		} else {

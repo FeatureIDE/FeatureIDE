@@ -148,7 +148,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		if (!featureProjectLoaded())
 			return null;
 
-		if (!featureProject.buildRelavantChanges() && !cleaned && kind == AUTO_BUILD)
+		if (!featureProject.buildRelevantChanges() && !cleaned && kind == AUTO_BUILD)
 			return null;
 
 		cleaned = false;
