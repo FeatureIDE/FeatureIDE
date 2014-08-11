@@ -182,14 +182,19 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 				if (terminal != null) {
 					file = getFile(terminal);
 					lineFile = terminal.beginLine;
-				}
-				try {
-					IMarker marker = file.createMarker(FeatureHouseCorePlugin.BUILDER_PROBLEM_MARKER);
-					marker.setAttribute(IMarker.LINE_NUMBER, lineFile);
-					marker.setAttribute(IMarker.MESSAGE, e.getMessage());
-					marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
-				} catch (CoreException e2) {
-					LOGGER.logError(e2);
+				
+					if (file != null) {
+						try {
+							IMarker marker = file.createMarker(FeatureHouseCorePlugin.BUILDER_PROBLEM_MARKER);
+							marker.setAttribute(IMarker.LINE_NUMBER, lineFile);
+							marker.setAttribute(IMarker.MESSAGE, e.getMessage());
+							marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
+						} catch (CoreException e2) {
+							LOGGER.logError(e2);
+						}
+					} else {
+						LOGGER.logError(new Exception("No file provided for: " + terminal.toString()));
+					}
 				}
 
 			}
@@ -202,8 +207,13 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 				while (fileNode != null && !fileNode.getName().endsWith(".java")) {
 					fileNode = fileNode.getParent();
 				}
-				FSTNode featureNode = fileNode.getParent();
-				return featureProject.getSourceFolder().getFolder(featureNode.getName()).getFile(fileNode.getName());
+				if (fileNode != null) {
+					FSTNode featureNode = fileNode.getParent();
+					return featureProject.getSourceFolder().getFolder(featureNode.getName()).getFile(fileNode.getName());
+				} else {
+					LOGGER.logError(new Exception("Java file could not be found for: "  + terminal.toString()));
+					return null;
+				}
 			}
 		};
 	}
@@ -780,7 +790,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	 * @param line
 	 *            The line number
 	 * @param message
-	 *            The message to disply
+	 *            The message to display
 	 * @param file
 	 *            The file
 	 * @param severity
@@ -788,7 +798,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	 */
 	private static void createFujiMarker(int line, String message, IResource file, int severity, IFeatureProject featureProject) {
 		// TODO NEWLine does not work
-		message = message.replaceAll("\n", NEWLINE);
+		message = message.replace("\n", NEWLINE);
 		try {
 			IMarker marker = file.createMarker(FeatureHouseCorePlugin.BUILDER_PROBLEM_MARKER);
 			marker.setAttribute(IMarker.LINE_NUMBER, line);

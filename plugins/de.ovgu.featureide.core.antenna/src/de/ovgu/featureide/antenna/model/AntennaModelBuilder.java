@@ -56,7 +56,7 @@ public class AntennaModelBuilder extends PPModelBuilder {
 	/**
 	 * returns true if the regular expression regex can be matched by a substring of text
 	 */
-	protected static boolean containsRegex(String text, String regex){
+	protected static boolean containsRegex(String text, String regex) {
 		Pattern pattern = Pattern.compile(regex);
 		Matcher matcher = pattern.matcher(text);
 		return matcher.find();
@@ -188,7 +188,6 @@ public class AntennaModelBuilder extends PPModelBuilder {
 				featureNameList.add(s);
 			}
 		}
-		
 		return featureNameList;
 	}
 	

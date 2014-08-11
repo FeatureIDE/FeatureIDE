@@ -198,7 +198,7 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	/**
 	 * @return True if a source file, or the current configuration changed.
 	 */
-	boolean buildRelavantChanges();
+	boolean buildRelevantChanges();
 	
 	void built();
 

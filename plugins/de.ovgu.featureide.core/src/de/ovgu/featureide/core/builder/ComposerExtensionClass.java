@@ -316,12 +316,12 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		return CorePlugin.getDefault().getConfigurationExtensions().getFirst();
 	}
 	
-	public void buildConfiguration(IFolder folder, Configuration configuration, String congurationName) {
+	public void buildConfiguration(IFolder folder, Configuration configuration, String configurationName) {
 		try {
 			if (!folder.exists()) {
 				folder.create(true, false, null);
 			}
-			IFile configurationFile = folder.getFile(congurationName + "." + getConfigurationExtension());
+			IFile configurationFile = folder.getFile(configurationName + "." + getConfigurationExtension());
 			ConfigurationWriter writer = new ConfigurationWriter(configuration);
 			writer.saveToFile(configurationFile);
 			copyNotComposedFiles(configuration, folder);

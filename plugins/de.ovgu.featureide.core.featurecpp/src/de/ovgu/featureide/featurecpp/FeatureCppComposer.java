@@ -283,11 +283,11 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 	}
 
 	@Override
-	public void buildConfiguration(IFolder folder, Configuration configuration, String congurationName) {
-		super.buildConfiguration(folder, configuration, congurationName);
+	public void buildConfiguration(IFolder folder, Configuration configuration, String configurationName) {
+		super.buildConfiguration(folder, configuration, configurationName);
 		featureCpp.initialize(null, folder);
 		try {
-			for (IResource res :folder.members()) {
+			for (IResource res : folder.members()) {
 				if (res instanceof IFile && getConfigurationExtension().equals(res.getFileExtension())) {
 					featureCpp.compose((IFile)res);
 				}

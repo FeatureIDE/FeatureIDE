@@ -1345,30 +1345,14 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @seefeatureide.core.IFeatureProject#setJakProjectModel(de.ovgu.featureide.
-	 * core. jakprojectmodel.IJakProjectModel)
-	 */
 	public void setFSTModel(FSTModel model) {
 		fstModel = model;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.IFeatureProject#relavantChanges()
-	 */
-	public boolean buildRelavantChanges() {
+	
+	public boolean buildRelevantChanges() {
 		return buildRelevantChanges;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.IFeatureProject#built()
-	 */
 	public void built() {
 		buildRelevantChanges = false;
 	}
