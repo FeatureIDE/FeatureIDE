@@ -86,6 +86,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LayoutSelectionActi
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LegendAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LegendLayoutAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.MandatoryAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.MoveAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.RenameAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ReverseOrderAction;
@@ -134,6 +135,12 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	private AlternativeAction alternativeAction;
 	private RenameAction renameAction;
 	private ChangeFeatureDescriptionAction changeFeatureDescriptionAction;
+	
+	private MoveAction moveUpAction;
+	private MoveAction moveRightAction;
+	private MoveAction moveDownAction;
+	private MoveAction moveLeftAction;
+	
 	
 	private ShowHiddenFeaturesAction showHiddenFeaturesAction;
 
@@ -258,6 +265,10 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		orAction = new OrAction(this, featureModel);
 		alternativeAction = new AlternativeAction(this, featureModel);
 		renameAction = new RenameAction(this, featureModel, null);
+		moveUpAction = new MoveAction(this,featureModel,null,MoveAction.UP);
+		moveRightAction = new MoveAction(this,featureModel,null,MoveAction.RIGHT);
+		moveDownAction = new MoveAction(this,featureModel,null,MoveAction.DOWN);
+		moveLeftAction = new MoveAction(this,featureModel,null,MoveAction.LEFT);
 
 		new SelectionAction(this, featureModel);
 
@@ -298,8 +309,16 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 
 	public void createKeyBindings() {
 		KeyHandler handler = getKeyHandler();
+		
 		handler.put(KeyStroke.getPressed(SWT.F2, 0), renameAction);
 		handler.put(KeyStroke.getPressed(SWT.INSERT, 0), createLayerAction);
+
+		//KeyStroke.getPressed(character, stateMask)
+		handler.put(KeyStroke.getPressed(SWT.ARROW_UP,SWT.CTRL|SWT.SHIFT),moveUpAction);
+		handler.put(KeyStroke.getPressed(SWT.ARROW_RIGHT,SWT.CTRL|SWT.SHIFT),moveRightAction);
+		handler.put(KeyStroke.getPressed(SWT.ARROW_DOWN, SWT.CTRL|SWT.SHIFT),moveDownAction);
+		handler.put(KeyStroke.getPressed(SWT.ARROW_LEFT,SWT.CTRL|SWT.SHIFT),moveLeftAction);
+		
 		setKeyHandler(handler);
 	}
 
@@ -307,7 +326,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		IMenuManager subMenuCalculations = new MenuManager("Set Calculations");
 		subMenuCalculations.add(new AutomatedCalculationsAction(this, getFeatureModel()));
 		subMenuCalculations.add(new RunManualCalculationsAction(this, getFeatureModel()));
-		subMenuCalculations.add(new Separator());
+		subMenuCalculations.add(new Separator()); 
 		subMenuCalculations.add(new FeaturesOnlyCalculationAction(this, getFeatureModel()));
 		subMenuCalculations.add(new ConstrainsCalculationsAction(this, getFeatureModel()));
 		subMenuCalculations.add(new RedundantConstrainsCalculationsAction(this, getFeatureModel()));
