@@ -20,14 +20,20 @@
 // */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.MoveOperation;
 
 /**
  * TODO description 
@@ -69,18 +75,15 @@ public class MoveAction extends Action {
 	
 	@Override
 	public void run() {
+		MoveOperation op = new MoveOperation(viewer, featureModel, dir);
+		op.addContext((IUndoContext) featureModel.getUndoContext());
 
-//		switch(this.dir)
-//		{
-//		case UP:
-//			break;
-//		case RIGHT:
-//			break;
-//		case DOWN:
-//			break;
-//		case LEFT:
-//			break;
-//		}
+		try {
+			PlatformUI.getWorkbench().getOperationSupport()
+					.getOperationHistory().execute(op, null, null);
+		} catch (ExecutionException e) {
+			FMUIPlugin.getDefault().logError(e);
+		}
 	}
 	
 	/**

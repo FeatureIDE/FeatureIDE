@@ -313,11 +313,10 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		handler.put(KeyStroke.getPressed(SWT.F2, 0), renameAction);
 		handler.put(KeyStroke.getPressed(SWT.INSERT, 0), createLayerAction);
 
-		//KeyStroke.getPressed(character, stateMask)
-		handler.put(KeyStroke.getPressed(SWT.ARROW_UP,SWT.CTRL|SWT.SHIFT),moveUpAction);
-		handler.put(KeyStroke.getPressed(SWT.ARROW_RIGHT,SWT.CTRL|SWT.SHIFT),moveRightAction);
-		handler.put(KeyStroke.getPressed(SWT.ARROW_DOWN, SWT.CTRL|SWT.SHIFT),moveDownAction);
-		handler.put(KeyStroke.getPressed(SWT.ARROW_LEFT,SWT.CTRL|SWT.SHIFT),moveLeftAction);
+		handler.put(KeyStroke.getPressed(SWT.ARROW_UP,SWT.CTRL),moveUpAction);
+		handler.put(KeyStroke.getPressed(SWT.ARROW_RIGHT,SWT.CTRL),moveRightAction);
+		handler.put(KeyStroke.getPressed(SWT.ARROW_DOWN, SWT.CTRL),moveDownAction);
+		handler.put(KeyStroke.getPressed(SWT.ARROW_LEFT,SWT.CTRL),moveLeftAction);
 		
 		setKeyHandler(handler);
 	}

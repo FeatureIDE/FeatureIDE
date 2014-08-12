@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,7 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -40,7 +42,10 @@ import org.eclipse.ui.PlatformUI;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.MoveAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
 /**
  * TODO description
@@ -48,13 +53,33 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  * @author andkoch
  */
 public class MoveOperation extends AbstractFeatureModelOperation implements	GUIDefaults {
+	public static final int stepwidth = 2;
 	private static final String LABEL = "Move";
 	private Object viewer;
 	private List<AbstractFeatureModelOperation > operations = new LinkedList<AbstractFeatureModelOperation >();
 	
-	public MoveOperation(Object viewer, FeatureModel featureModel) {
+	private int dir;
+
+	private int deltaX;
+    private int deltaY;
+	
+	public MoveOperation(Object viewer, FeatureModel featureModel, int dir) {
 		super(featureModel, LABEL);
+		
+		deltaX=0;
+		deltaY=0;
+		
+		if((dir & MoveAction.DOWN) != 0)
+			deltaY = stepwidth;
+		if((dir & MoveAction.UP) != 0)
+			deltaY = stepwidth*(-1);
+		if((dir & MoveAction.RIGHT) != 0)
+			deltaX = stepwidth;
+		if((dir & MoveAction.LEFT) != 0)
+			deltaX = stepwidth*(-1);
+		
 		this.viewer = viewer;
+		this.dir = dir;
 	}
 	
 	@Override
@@ -77,7 +102,13 @@ public class MoveOperation extends AbstractFeatureModelOperation implements	GUID
 	 * @param Tries to move the given {@link Feature}
 	 */
 	private void moveFeature(Object element) {
-		
+			if ((element instanceof FeatureEditPart) || (element instanceof Feature))
+			{
+				Feature feature = element instanceof FeatureEditPart ? ((FeatureEditPart) element).getFeature() : (Feature) element;
+				Point oldPos = FeatureUIHelper.getLocation(feature);
+				Point newPos = new Point(oldPos.x+deltaX, oldPos.y+deltaY);
+				FeatureUIHelper.setLocation(feature, newPos);
+			}
 	}
 
 	private IStructuredSelection getSelection() {
