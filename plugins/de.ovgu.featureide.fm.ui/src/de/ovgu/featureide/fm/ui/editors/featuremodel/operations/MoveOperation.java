@@ -96,6 +96,9 @@ public class MoveOperation extends AbstractFeatureModelOperation implements	GUID
 			// check for infringe of rules
 			moveFeature(element);
 		}
+		
+		if(!getSelection().isEmpty())
+			featureModel.handleModelLayoutChanged();
 	}
 
 	/**
