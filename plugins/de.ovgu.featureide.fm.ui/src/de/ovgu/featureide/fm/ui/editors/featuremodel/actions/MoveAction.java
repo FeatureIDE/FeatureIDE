@@ -20,8 +20,20 @@
 // */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.operations.IUndoContext;
+import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.ui.PlatformUI;
+
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.MoveOperation;
 
 /**
  * TODO description 
@@ -38,31 +50,39 @@ public class MoveAction extends Action {
 	private int dir;
 
 	Object viewer;
-	private FeatureModel model;
+	private FeatureModel featureModel;
 	
+	private ISelectionChangedListener listener = new ISelectionChangedListener() {
+		public void selectionChanged(SelectionChangedEvent event) {
+			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+			setEnabled(isValidSelection(selection) && isMovingAllowed()); //action only active when manual layout and feature diagram elements are selected
+		}
+	};
 	
 	public MoveAction(Object viewer, FeatureModel featureModel, Object graphicalViewer, int direction) {
 		super("Moving");
 		this.setId(ID);
-		this.viewer = graphicalViewer;
-		this.model = featureModel;
+		this.viewer = viewer;
+		this.featureModel = featureModel;
 		this.dir = direction;
-		setEnabled(true);
+		setEnabled(false);
+		
+		if (viewer instanceof GraphicalViewerImpl) {
+			((GraphicalViewerImpl)viewer).addSelectionChangedListener(listener);
+		}
+		
 	}
 	
 	@Override
 	public void run() {
+		MoveOperation op = new MoveOperation(viewer, featureModel, dir);
+		op.addContext((IUndoContext) featureModel.getUndoContext());
 
-		switch(this.dir)
-		{
-		case UP:
-			break;
-		case RIGHT:
-			break;
-		case DOWN:
-			break;
-		case LEFT:
-			break;
+		try {
+			PlatformUI.getWorkbench().getOperationSupport()
+					.getOperationHistory().execute(op, null, null);
+		} catch (ExecutionException e) {
+			FMUIPlugin.getDefault().logError(e);
 		}
 	}
 	
@@ -72,8 +92,15 @@ public class MoveAction extends Action {
 	 */
 	public boolean isMovingAllowed()
 	{
-		return !model.getLayout().hasFeaturesAutoLayout();
+		return !featureModel.getLayout().hasFeaturesAutoLayout();
 	}
 	
-
+	private boolean isValidSelection(IStructuredSelection selection) {
+		// check empty selection (i.e. ModelEditPart is selected)
+		if (selection.size() == 1 && selection.getFirstElement() instanceof ModelEditPart) {
+			return false;
+		}
+			
+		return true;
+	}
 }
