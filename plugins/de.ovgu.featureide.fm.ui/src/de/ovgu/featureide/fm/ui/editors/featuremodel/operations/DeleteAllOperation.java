@@ -20,9 +20,9 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import java.util.Collections;
+import java.util.Deque;
+import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IAdaptable;
@@ -51,12 +51,8 @@ public class DeleteAllOperation extends AbstractFeatureModelOperation implements
 	private Feature feature;
 	private LinkedList<Feature> featureList;
 	private LinkedList<Feature> containedFeatureList;
-	private List<AbstractFeatureModelOperation> operations = new LinkedList<AbstractFeatureModelOperation>();
-
-	/**
-	 * @param viewer
-	 * @param featureModel
-	 */
+	private Deque<AbstractFeatureModelOperation> operations = new LinkedList<AbstractFeatureModelOperation>();
+	
 	public DeleteAllOperation(FeatureModel featureModel, Feature parent) {
 		super(featureModel, LABEL);
 		this.feature = parent;
@@ -101,33 +97,23 @@ public class DeleteAllOperation extends AbstractFeatureModelOperation implements
 
 		}
 	}
-
+	
 	@Override
 	protected void redo() {
-		List<AbstractFeatureModelOperation> ops = new LinkedList<AbstractFeatureModelOperation>();
-		ops.addAll(operations);
-		Collections.reverse(operations);
-		while (!ops.isEmpty()) {
-			for (AbstractFeatureModelOperation op : operations) {
-				try {
-					op.redo();
-					ops.remove(op);
-				} catch (Exception e) {}
+		for (Iterator<AbstractFeatureModelOperation> it = operations.iterator(); it.hasNext();) {
+			AbstractFeatureModelOperation operation = it.next();
+			if (operation.canRedo()) {
+				operation.redo();
 			}
 		}
 	}
 
 	@Override
 	protected void undo() {
-		List<AbstractFeatureModelOperation> ops = new LinkedList<AbstractFeatureModelOperation>();
-		ops.addAll(operations);
-		Collections.reverse(operations);
-		while (!ops.isEmpty()) {
-			for (AbstractFeatureModelOperation op : operations) {
-				if (op.canUndo()) {
-					op.undo();
-					ops.remove(op);
-				}
+		for (Iterator<AbstractFeatureModelOperation> it = operations.descendingIterator(); it.hasNext();) {
+			AbstractFeatureModelOperation operation = it.next();
+			if (operation.canUndo()) {
+				operation.undo();
 			}
 		}
 	}
