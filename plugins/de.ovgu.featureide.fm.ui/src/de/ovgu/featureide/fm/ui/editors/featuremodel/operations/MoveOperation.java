@@ -20,12 +20,13 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Deque;
+import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.operations.IUndoContext;
+import org.eclipse.core.commands.operations.ObjectUndoContext;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -33,15 +34,16 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ui.PlatformUI;
 
+import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.MoveAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
 
 /**
  * the operation for moving Features in the FeatureModelDiagram
@@ -53,25 +55,32 @@ public class MoveOperation extends AbstractFeatureModelOperation implements	GUID
 	public static final int stepwidth = 2;
 	private static final String LABEL = "Move";
 	private Object viewer;
-	private List<AbstractFeatureModelOperation > operations = new LinkedList<AbstractFeatureModelOperation >();
-	
+	private Deque<AbstractFeatureModelOperation> operations = new LinkedList<AbstractFeatureModelOperation>();
+		
 	private int deltaX;
     private int deltaY;
+    private boolean doStop;
+    
+    private Object[] everTouchedFigures; 
 	
 	public MoveOperation(Object viewer, FeatureModel featureModel, int dir) {
 		super(featureModel, LABEL);
 		
 		deltaX=0;
 		deltaY=0;
+		doStop= dir == MoveAction.STOP;
 		
-		if((dir & MoveAction.DOWN) != 0)
-			deltaY = stepwidth;
-		if((dir & MoveAction.UP) != 0)
-			deltaY = stepwidth*(-1);
-		if((dir & MoveAction.RIGHT) != 0)
-			deltaX = stepwidth;
-		if((dir & MoveAction.LEFT) != 0)
-			deltaX = stepwidth*(-1);
+		if(!doStop)
+		{
+			if((dir & MoveAction.DOWN) != 0)
+				deltaY = stepwidth;
+			if((dir & MoveAction.UP) != 0)
+				deltaY = stepwidth*(-1);
+			if((dir & MoveAction.RIGHT) != 0)
+				deltaX = stepwidth;
+			if((dir & MoveAction.LEFT) != 0)
+				deltaX = stepwidth*(-1);
+		}
 		
 		this.viewer = viewer;
 	}
@@ -84,15 +93,17 @@ public class MoveOperation extends AbstractFeatureModelOperation implements	GUID
 	
 	/**
 	 * Executes the requested move operation.
+	 * and add it for undo and redo
 	 */
 	private void doMove() {
-		for (Object element : getSelection().toArray()) {
-			// check for infringe of rules
-			moveFeature(element);
-		}
-		
 		if(!getSelection().isEmpty())
+		{
+			for (Object element : getSelection().toArray()) {
+				// check for infringe of rules
+				moveFigure(element);
+			}
 			featureModel.handleModelLayoutChanged();
+		}
 	}
 
 	/**
@@ -100,13 +111,70 @@ public class MoveOperation extends AbstractFeatureModelOperation implements	GUID
 	 * 
 	 * @param element
 	 */
-	private void moveFeature(Object element) {
+	private void moveFigure(Object element) {
 			if ((element instanceof FeatureEditPart) || (element instanceof Feature))
 			{
 				Feature feature = element instanceof FeatureEditPart ? ((FeatureEditPart) element).getFeature() : (Feature) element;
 				Point oldPos = FeatureUIHelper.getLocation(feature);
 				Point newPos = new Point(oldPos.x+deltaX, oldPos.y+deltaY);
+				//FeatureUIHelper.setLocation(feature, newPos);
+
+				Feature oldParent = feature.getParent();
+				// TODO: calculate new parent!
+				Feature newParent = oldParent;
+				int oldIndex = oldParent != null ? oldParent.getChildIndex(feature) : 0;
+				// TODO: calculate new index!
+				int newIndex = oldIndex;
+				
+				FeatureOperationData data = new FeatureOperationData(feature,
+						oldParent, newParent, newIndex, oldIndex);
+				FeatureMoveOperation op = new FeatureMoveOperation(data, featureModel, newPos, 
+						FeatureUIHelper.getLocation(feature).getCopy(), feature);
+				op.addContext((ObjectUndoContext) featureModel.getUndoContext());
+				this.operations.add(op);
 				FeatureUIHelper.setLocation(feature, newPos);
+			}
+			
+			if((element instanceof ConstraintEditPart) || (element instanceof Constraint))
+			{
+				Constraint constraint = ((ConstraintEditPart) element).getConstraintModel();
+				Point oldPos = FeatureUIHelper.getLocation(constraint);
+				Point newPos = new Point(oldPos.x+deltaX, oldPos.y+deltaY);
+				
+				boolean isLastPos = true;
+				for (Constraint c : featureModel.getConstraints()) {
+					if ((FeatureUIHelper.getLocation(c).y + 17) > newPos.y) {
+						isLastPos = false;
+						break;
+					}
+				}
+				
+				int oldIndex = featureModel.getConstraints().indexOf(constraint);
+				// TODO: calculate new index 
+				int index = oldIndex;
+				
+				ConstraintMoveOperation op = new ConstraintMoveOperation(constraint,
+						featureModel, index, oldIndex, isLastPos ,newPos, 
+						FeatureUIHelper.getLocation(constraint).getCopy());
+				op.addContext((IUndoContext) featureModel.getUndoContext());
+
+				this.operations.add(op);
+				FeatureUIHelper.setLocation(constraint, newPos);
+			}
+			
+			if(element instanceof LegendFigure)
+			{
+				LegendFigure legendFigure = (LegendFigure) element;
+				Point oldPos = legendFigure.getLocation();
+				Point newPos = new Point(oldPos.x+deltaX, oldPos.y+deltaY);
+				legendFigure.newPos = newPos;
+				Point p = legendFigure.newPos.getCopy();
+				legendFigure.translateToRelative(p);
+				if (!(featureModel.getLayout().getLegendPos().x == p.x && featureModel.getLayout().getLegendPos().y == p.y)) {
+					LegendMoveOperation op = new LegendMoveOperation(featureModel, p,legendFigure.newPos, legendFigure);
+					op.addContext((IUndoContext) featureModel.getUndoContext());
+					this.operations.add(op);
+				}
 			}
 	}
 
@@ -114,51 +182,22 @@ public class MoveOperation extends AbstractFeatureModelOperation implements	GUID
 		return (IStructuredSelection) ((GraphicalViewerImpl) viewer).getSelection();
 	}
 	
-	/**
-	 * save operation for undo(), redo() and execute it
-	 * 
-	 * @param operation the operation to start
-	 */
-	public void executeOperation(AbstractFeatureModelOperation  operation) {
-		operations.add(operation);
-		try {
-			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(operation, null, null);
-		} catch (ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
-		}
-	}
-	
 	@Override
 	protected void redo() {
-		List<AbstractFeatureModelOperation > ops = new LinkedList<AbstractFeatureModelOperation >();
-		ops.addAll(operations);
-		Collections.reverse(operations);
-		
-		while (!ops.isEmpty()) {
-			for (AbstractFeatureModelOperation  op : operations) {
-				try {
-					op.redo();
-					ops.remove(op);
-				} catch (Exception e) {
-					
-				}
-
+		for (Iterator<AbstractFeatureModelOperation> it = operations.iterator(); it.hasNext();) {
+			AbstractFeatureModelOperation operation = it.next();
+			if (operation.canRedo()) {
+				operation.redo();
 			}
 		}
-
 	}
 
 	@Override
 	protected void undo() {
-		List<AbstractFeatureModelOperation > ops = new ArrayList<AbstractFeatureModelOperation >(operations);
-		Collections.reverse(operations);
-		
-		while (!ops.isEmpty()) {
-			for (AbstractFeatureModelOperation  op : operations) {
-				if (op.canUndo()) {
-					op.undo();
-					ops.remove(op);
-				}
+		for (Iterator<AbstractFeatureModelOperation> it = operations.descendingIterator(); it.hasNext();) {
+			AbstractFeatureModelOperation operation = it.next();
+			if (operation.canUndo()) {
+				operation.undo();
 			}
 		}
 	}

@@ -135,7 +135,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	private AlternativeAction alternativeAction;
 	private RenameAction renameAction;
 	private ChangeFeatureDescriptionAction changeFeatureDescriptionAction;
-	
+
+	private MoveAction moveStopAction;
 	private MoveAction moveUpAction;
 	private MoveAction moveRightAction;
 	private MoveAction moveDownAction;
@@ -265,11 +266,12 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		orAction = new OrAction(this, featureModel);
 		alternativeAction = new AlternativeAction(this, featureModel);
 		renameAction = new RenameAction(this, featureModel, null);
-		
-		moveUpAction = new MoveAction(this,featureModel,null,MoveAction.UP);
-		moveRightAction = new MoveAction(this,featureModel,null,MoveAction.RIGHT);
-		moveDownAction = new MoveAction(this,featureModel,null,MoveAction.DOWN);
-		moveLeftAction = new MoveAction(this,featureModel,null,MoveAction.LEFT);
+
+		moveStopAction = new MoveAction(this,featureModel,null,MoveAction.STOP,null);
+		moveUpAction = new MoveAction(this,featureModel,null,MoveAction.UP,moveStopAction);
+		moveRightAction = new MoveAction(this,featureModel,null,MoveAction.RIGHT,moveStopAction);
+		moveDownAction = new MoveAction(this,featureModel,null,MoveAction.DOWN,moveStopAction);
+		moveLeftAction = new MoveAction(this,featureModel,null,MoveAction.LEFT,moveStopAction);
 
 		new SelectionAction(this, featureModel);
 
@@ -308,6 +310,9 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		// getSite().registerContextMenu(menu, graphicalViewer);
 	}
 
+	/*
+	 * TODO: switch between KeyHandler in manual and automatic mode
+	 */
 	public void createKeyBindings() {
 		KeyHandler handler = getKeyHandler();
 		
@@ -318,6 +323,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		handler.put(KeyStroke.getPressed(SWT.ARROW_RIGHT, SWT.CTRL),moveRightAction);
 		handler.put(KeyStroke.getPressed(SWT.ARROW_DOWN, SWT.CTRL),moveDownAction);
 		handler.put(KeyStroke.getPressed(SWT.ARROW_LEFT, SWT.CTRL),moveLeftAction);
+		
+		handler.put(KeyStroke.getReleased(SWT.CTRL, 0),moveStopAction);
 	}
 
 	private void fillContextMenu(IMenuManager menu) {

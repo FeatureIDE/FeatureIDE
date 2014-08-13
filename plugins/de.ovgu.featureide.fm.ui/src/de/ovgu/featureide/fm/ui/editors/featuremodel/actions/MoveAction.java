@@ -37,6 +37,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.MoveOperation;
 /**
  * This is the MoveAction for the manual movement of objects in the FeatureModelDiagram
  *  
+ *  
  * @author Günter Ulreich
  * @author Andy Koch
  */
@@ -47,8 +48,10 @@ public class MoveAction extends Action {
 	public static final int RIGHT = 2;
 	public static final int DOWN = 4;
 	public static final int LEFT = 8;
+	public static final int STOP = 0; // whole movement has been stopped (needed for undo redo purposes)
 	
 	private int dir;
+	private MoveAction stopAction;
 
 	Object viewer;
 	private FeatureModel featureModel;
@@ -67,7 +70,7 @@ public class MoveAction extends Action {
 	 * @param graphicalViewer the according GraphicalViewerImpl
 	 * @param direction
 	 */
-	public MoveAction(Object viewer, FeatureModel featureModel, Object graphicalViewer, int direction) {
+	public MoveAction(Object viewer, FeatureModel featureModel, Object graphicalViewer, int direction, MoveAction stopAction) {
 		super("Moving");
 		this.setId(ID);
 		this.viewer = viewer;
@@ -78,7 +81,7 @@ public class MoveAction extends Action {
 		if (viewer instanceof GraphicalViewerImpl) {
 			((GraphicalViewerImpl)viewer).addSelectionChangedListener(listener);
 		}
-		
+		this.stopAction = stopAction;
 	}
 	
 	@Override
@@ -88,8 +91,12 @@ public class MoveAction extends Action {
 	 */
 	public void run() {
 		MoveOperation op = new MoveOperation(viewer, featureModel, dir);
-		op.addContext((IUndoContext) featureModel.getUndoContext());
-
+				
+		//if(dir == MoveAction.STOP)
+		{	
+			op.addContext((IUndoContext) featureModel.getUndoContext());
+		}
+		
 		try {
 			PlatformUI.getWorkbench().getOperationSupport()
 					.getOperationHistory().execute(op, null, null);
