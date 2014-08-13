@@ -59,7 +59,7 @@ import de.ovgu.featureide.munge.model.MungeModelBuilder;
  */
 public class MungePreprocessor extends PPComposerExtensionClass{
 	
-	private MungeModelBuilder mungeModelBuilder;
+	protected MungeModelBuilder mungeModelBuilder;
 	public static final String COMMENT_START = "/*";
 	public static final String COMMENT_END = "*/";
 
@@ -127,7 +127,7 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 		annotationChecking();
 	}
 
-	private void annotationChecking() {
+	protected void annotationChecking() {
 		deleteAllPreprocessorAnotationMarkers();
 		Job job = new Job("preprocessor annotation checking") {
 			@Override
@@ -167,7 +167,7 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 	 * @param performFullBuild <code>true</code> if the munge should be called
 	 * @throws CoreException
 	 */
-	private void preprocessSourceFiles(IFolder buildFolder) throws CoreException {
+	protected void preprocessSourceFiles(IFolder buildFolder) throws CoreException {
 		LinkedList<String> args = new LinkedList<String>();
 		for (String feature : activatedFeatures) {
 			args.add("-D" + feature);
