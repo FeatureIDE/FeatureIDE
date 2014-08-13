@@ -22,11 +22,8 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IAdaptable;
@@ -36,7 +33,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.Feature;
@@ -48,9 +44,10 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.MoveAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
 /**
- * TODO description
+ * the operation for moving Features in the FeatureModelDiagram
  * 
- * @author andkoch
+ * @author Günter Ulreich
+ * @author Andy Koch
  */
 public class MoveOperation extends AbstractFeatureModelOperation implements	GUIDefaults {
 	public static final int stepwidth = 2;
@@ -58,8 +55,6 @@ public class MoveOperation extends AbstractFeatureModelOperation implements	GUID
 	private Object viewer;
 	private List<AbstractFeatureModelOperation > operations = new LinkedList<AbstractFeatureModelOperation >();
 	
-	private int dir;
-
 	private int deltaX;
     private int deltaY;
 	
@@ -79,7 +74,6 @@ public class MoveOperation extends AbstractFeatureModelOperation implements	GUID
 			deltaX = stepwidth*(-1);
 		
 		this.viewer = viewer;
-		this.dir = dir;
 	}
 	
 	@Override
@@ -102,7 +96,9 @@ public class MoveOperation extends AbstractFeatureModelOperation implements	GUID
 	}
 
 	/**
-	 * @param Tries to move the given {@link Feature}
+	 * Tries to move the given {@link Feature}
+	 * 
+	 * @param element
 	 */
 	private void moveFeature(Object element) {
 			if ((element instanceof FeatureEditPart) || (element instanceof Feature))
@@ -119,7 +115,9 @@ public class MoveOperation extends AbstractFeatureModelOperation implements	GUID
 	}
 	
 	/**
-	 * @param save operation for undo(), redo() and execute it
+	 * save operation for undo(), redo() and execute it
+	 * 
+	 * @param operation the operation to start
 	 */
 	public void executeOperation(AbstractFeatureModelOperation  operation) {
 		operations.add(operation);

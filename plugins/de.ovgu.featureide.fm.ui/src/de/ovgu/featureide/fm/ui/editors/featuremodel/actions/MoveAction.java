@@ -32,12 +32,13 @@ import org.eclipse.ui.PlatformUI;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.MoveOperation;
 
 /**
- * TODO description 
- * @author ulreich
+ * This is the MoveAction for the manual movement of objects in the FeatureModelDiagram
+ *  
+ * @author Günter Ulreich
+ * @author Andy Koch
  */
 public class MoveAction extends Action {
 	public static int STEPS = 2;
@@ -59,6 +60,13 @@ public class MoveAction extends Action {
 		}
 	};
 	
+	/**
+	 * 
+	 * @param viewer the object which for the MoveAction has been registered
+	 * @param featureModel the according FeatureModel object
+	 * @param graphicalViewer the according GraphicalViewerImpl
+	 * @param direction
+	 */
 	public MoveAction(Object viewer, FeatureModel featureModel, Object graphicalViewer, int direction) {
 		super("Moving");
 		this.setId(ID);
@@ -74,6 +82,10 @@ public class MoveAction extends Action {
 	}
 	
 	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.action.Action#run()
+	 */
 	public void run() {
 		MoveOperation op = new MoveOperation(viewer, featureModel, dir);
 		op.addContext((IUndoContext) featureModel.getUndoContext());
@@ -87,20 +99,23 @@ public class MoveAction extends Action {
 	}
 	
 	/**
+	 * check the rules (actually, if there is AutoLayout not active)
 	 * 
-	 * @return
+	 * @return true if rules are not infringed
 	 */
 	public boolean isMovingAllowed()
 	{
 		return !featureModel.getLayout().hasFeaturesAutoLayout();
 	}
 	
+	/**
+	 * check if the selection has not only one element who is a ModelEditPart
+	 * 
+	 * @param selection the IStructuredSelection object who contains the selected controls
+	 * @return true if condition is matched
+	 */
 	private boolean isValidSelection(IStructuredSelection selection) {
-		// check empty selection (i.e. ModelEditPart is selected)
-		if (selection.size() == 1 && selection.getFirstElement() instanceof ModelEditPart) {
-			return false;
-		}
-			
-		return true;
+		// check empty selection (only ModelEditPart is selected)
+		return !(selection.size() == 1 && selection.getFirstElement() instanceof ModelEditPart);
 	}
 }
