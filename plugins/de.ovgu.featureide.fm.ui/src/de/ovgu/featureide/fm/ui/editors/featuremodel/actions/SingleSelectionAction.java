@@ -142,8 +142,8 @@ public abstract class SingleSelectionAction extends Action implements
 	public void propertyChange(PropertyChangeEvent event) {
 		String prop = event.getPropertyName();
 		if (CHILDREN_CHANGED.equals(prop) || MANDATORY_CHANGED.equals(prop)
-				|| PARENT_CHANGED.equals(prop) || HIDDEN_CHANGED.equals(prop) || 
-				COLOR_CHANGED.equals(prop)) {
+				|| PARENT_CHANGED.equals(prop) || HIDDEN_CHANGED.equals(prop) 
+				|| COLOR_CHANGED.equals(prop)) {
 			updateProperties();
 		}
 	}

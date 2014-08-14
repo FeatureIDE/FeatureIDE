@@ -194,7 +194,7 @@ public class MPLPlugin extends AbstractCorePlugin {
 		}
 	}
 	
-	private InterfaceProject addProject(IProject project) {
+	public InterfaceProject addProject(IProject project) {
 		IFeatureProject curFeatureProject = null;
 		try {
 			if (project.hasNature(FeatureProjectNature.NATURE_ID)) {

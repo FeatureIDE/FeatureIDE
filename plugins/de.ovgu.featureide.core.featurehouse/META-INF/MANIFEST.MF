@@ -9,7 +9,9 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.resources,
  de.ovgu.featureide.core,
  de.ovgu.featureide.fm.core,
- org.eclipse.jdt.core
+ org.eclipse.jdt.core,
+ de.ovgu.featureide.core.mpl;bundle-version="2.7.0",
+ de.ovgu.featureide.ui.mpl;bundle-version="2.7.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: lib/FeatureHouse.jar,
@@ -17,4 +19,5 @@ Bundle-ClassPath: lib/FeatureHouse.jar,
  .
 Bundle-Vendor: University of Magdeburg
 Import-Package: org.eclipse.core.expressions,
- org.eclipse.jdt.internal.core
+ org.eclipse.jdt.internal.core,
+ org.eclipse.jdt.internal.ui.packageview

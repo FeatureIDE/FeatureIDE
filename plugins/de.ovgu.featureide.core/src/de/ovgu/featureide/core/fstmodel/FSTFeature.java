@@ -37,6 +37,7 @@ public class FSTFeature {
 	protected String name;
 	private int color = -1;
 	private final FSTModel model;
+	private static final int hashCodePrime = 37;
 
 	public FSTFeature(String name, final FSTModel model) {
 		this.name = name;
@@ -72,9 +73,6 @@ public class FSTFeature {
 		return roles.get(className);
 	}
 	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString() {
 		return name;
@@ -87,4 +85,28 @@ public class FSTFeature {
 	public void addRole(String className, FSTRole role) {
 		roles.put(className, role);
 	}
+	
+	@Override
+	public boolean equals(Object feature) {
+		if (feature == this) {
+			return true;
+		}
+		if (!(feature instanceof FSTFeature)) {
+			return false;
+		}	
+		FSTFeature comp = (FSTFeature) feature;
+		if (!comp.getName().equals(this.getName()) || 
+				!comp.model.getFeatureProject().getProjectName().equals(this.model.getFeatureProject().getProjectName())) {
+			return false;
+		}
+		return true;
+	}
+	
+	@Override
+	public int hashCode() {
+		int hashCode = 1;
+		hashCode = hashCodePrime * hashCode + getName().hashCode();
+		return hashCodePrime * hashCode + model.getFeatureProject().getProjectName().hashCode();
+	}
+
 }

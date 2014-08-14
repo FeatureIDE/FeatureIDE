@@ -23,8 +23,11 @@ Import-Package: org.eclipse.core.expressions,
 Export-Package: de.ovgu.featureide.core.mpl,
  de.ovgu.featureide.core.mpl.builder,
  de.ovgu.featureide.core.mpl.io,
+ de.ovgu.featureide.core.mpl.job,
+ de.ovgu.featureide.core.mpl.job.util,
  de.ovgu.featureide.core.mpl.signature,
- de.ovgu.featureide.core.mpl.signature.abstr
+ de.ovgu.featureide.core.mpl.signature.abstr,
+ de.ovgu.featureide.core.mpl.signature.filter
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: lib/fuji.jar,
  lib/tools.jar,
