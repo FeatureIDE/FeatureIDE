@@ -370,6 +370,10 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		return true;
 	}
 	
+	public boolean supportsAndroid() {
+		return false;
+	}
+	
 	protected boolean isPluginInstalled(String ID) {
 		for (Bundle b :InternalPlatform.getDefault().getBundleContext().getBundles()) {
 			if (b.getSymbolicName().startsWith(ID)) {

@@ -66,4 +66,9 @@ public interface IComposerExtensionBase extends IExtension {
 	 * @return <code>true</code> if the composition tool should create a folder for each feature 
 	 */
 	boolean createFolderForFeatures();
+	
+	/**
+	 * @return <code>true</code> if the composition tool supports Android projects
+	 */
+	boolean supportsAndroid();
 }

@@ -1,10 +1,13 @@
 package de.ovgu.featureide.ui.android;
 
-import org.eclipse.ui.plugin.AbstractUIPlugin;
+import de.ovgu.featureide.fm.ui.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 /**
  * The activator class controls the plug-in life cycle
+ * 
+ * @author Lars-Christian Schulz
+ * @author Eric Guimatsia
  */
 public class AndroidUIPlugin extends AbstractUIPlugin {
 
@@ -19,7 +22,12 @@ public class AndroidUIPlugin extends AbstractUIPlugin {
 	 */
 	public AndroidUIPlugin() {
 	}
-
+	
+	@Override
+	public String getID() {
+		return PLUGIN_ID;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
@@ -46,5 +54,4 @@ public class AndroidUIPlugin extends AbstractUIPlugin {
 	public static AndroidUIPlugin getDefault() {
 		return plugin;
 	}
-
 }

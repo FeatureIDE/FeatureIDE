@@ -47,15 +47,16 @@ import de.ovgu.featureide.core.builder.IComposerExtensionBase;
  */
 public class NewFeatureProjectPage extends WizardPage {
 
-	private IComposerExtensionBase composerExtension = null;
-	private IComposerExtensionBase[] extensions = null;
+	protected IComposerExtensionBase composerExtension = null;
+	protected IComposerExtensionBase[] extensions = null;
 	
-	private Text sourcePath, configsPath;
+	protected Text sourcePath;
+	protected Text configsPath;
 	protected Text buildPath;
 	
-	private Combo toolCB;
+	protected Combo toolCB;
 	protected GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-	private GridLayout layout = new GridLayout();
+	protected GridLayout layout = new GridLayout();
 	protected Group pathGroup;
 	protected Label buildLabel;
 	private boolean canFlipToNextPage = true;
@@ -175,7 +176,7 @@ public class NewFeatureProjectPage extends WizardPage {
 		return composerExtension != null;
 	}
 	
-	private void addListeners() {
+	protected void addListeners() {
 		toolCB.addModifyListener(new ModifyListener() {
 			
 			@Override
@@ -214,6 +215,11 @@ public class NewFeatureProjectPage extends WizardPage {
 		sourcePath.setEnabled(compositionTool.hasFeatureFolder());
 		buildPath.setEnabled(compositionTool.hasSourceFolder());
 		
+		if (compositionTool.supportsAndroid()) {
+			updateStatus("Currently android projects must first be created using the Android project wizard." +
+					"They can be converted to FeatureIDE projects using \"Add FeatureIDE Project Nature\".\n");
+			return;
+		}
 		if (isEnabled(sourcePath) && isEnabled(configsPath) &&
 				getSourcePath().equals(getConfigPath())) {
 			updateStatus("Source path equals configurations path.");
@@ -240,7 +246,7 @@ public class NewFeatureProjectPage extends WizardPage {
 		updateStatus(null);
 	}
 
-	private boolean isEnabled(Text text) {
+	protected boolean isEnabled(Text text) {
 		if (text.isEnabled() && text.isVisible()) {
 			return true;
 		}

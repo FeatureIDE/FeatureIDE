@@ -4,6 +4,12 @@ import org.osgi.framework.BundleContext;
 
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 
+/**
+ * The activator class controls the plug-in life cycle
+ * 
+ * @author Lars-Christian Schulz
+ * @author Eric Guimatsia
+ */
 public class MungeAndroidCorePlugin extends AbstractCorePlugin {
 	
 	// The plug-in ID
