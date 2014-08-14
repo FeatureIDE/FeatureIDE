@@ -175,7 +175,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		KeyHandler majorKeyhandler = new KeyHandler(); //to ensure that actions registered in @see createKeyBindings() will be handled first!
 		majorKeyhandler.setParent(gvKeyHandler);
 		setKeyHandler(majorKeyhandler);
-
+		
 		createControl(container);
 		initializeGraphicalViewer();
 		setEditDomain(new DefaultEditDomain(featureModelEditor));
@@ -184,7 +184,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		zoomManager.setZoomLevels(new double[] { 0.05, 0.10, 0.25, 0.50, 0.75,
 				0.90, 1.00, 1.10, 1.25, 1.50, 2.00, 2.50, 3.00, 4.00 });
 	}
-
+ 
 	void initializeGraphicalViewer() {
 		getControl().addControlListener(new ControlListener() {
 			
@@ -271,11 +271,11 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		alternativeAction = new AlternativeAction(this, featureModel);
 		renameAction = new RenameAction(this, featureModel, null);
 
-		moveStopAction = new MoveAction(this,featureModel,null,MoveAction.STOP,null);
-		moveUpAction = new MoveAction(this,featureModel,null,MoveAction.UP,moveStopAction);
-		moveRightAction = new MoveAction(this,featureModel,null,MoveAction.RIGHT,moveStopAction);
-		moveDownAction = new MoveAction(this,featureModel,null,MoveAction.DOWN,moveStopAction);
-		moveLeftAction = new MoveAction(this,featureModel,null,MoveAction.LEFT,moveStopAction);
+		moveStopAction = new MoveAction(this,featureModel,null,MoveAction.STOP);
+		moveUpAction = new MoveAction(this,featureModel,null,MoveAction.UP);
+		moveRightAction = new MoveAction(this,featureModel,null,MoveAction.RIGHT);
+		moveDownAction = new MoveAction(this,featureModel,null,MoveAction.DOWN);
+		moveLeftAction = new MoveAction(this,featureModel,null,MoveAction.LEFT);
 
 		new SelectionAction(this, featureModel);
 
@@ -328,6 +328,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		handler.put(KeyStroke.getPressed(SWT.ARROW_DOWN, SWT.CTRL),moveDownAction);
 		handler.put(KeyStroke.getPressed(SWT.ARROW_LEFT, SWT.CTRL),moveLeftAction);
 
+		handler.put(KeyStroke.getReleased(SWT.CTRL, SWT.CTRL),moveStopAction);
+		handler.put(KeyStroke.getReleased(0, SWT.CTRL),moveStopAction);
 		handler.put(KeyStroke.getReleased(SWT.CTRL, 0),moveStopAction);
 	}
 

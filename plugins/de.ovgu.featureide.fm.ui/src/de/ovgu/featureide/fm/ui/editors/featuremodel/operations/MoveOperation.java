@@ -21,8 +21,10 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map.Entry;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.IUndoContext;
@@ -32,15 +34,12 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.draw2d.geometry.Point;
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
-import org.eclipse.jface.viewers.IStructuredSelection;
 
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.MoveAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
@@ -52,134 +51,88 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
  * @author Andy Koch
  */
 public class MoveOperation extends AbstractFeatureModelOperation implements	GUIDefaults {
-	public static final int stepwidth = 2;
 	private static final String LABEL = "Move";
-	private Object viewer;
 	private Deque<AbstractFeatureModelOperation> operations = new LinkedList<AbstractFeatureModelOperation>();
-		
-	private int deltaX;
-    private int deltaY;
-    private boolean doStop;
     
-    private Object[] everTouchedFigures; 
-	
-	public MoveOperation(Object viewer, FeatureModel featureModel, int dir) {
+    public static HashMap<String,Point> initialPositions;
+    
+    private HashMap<Object,Point> endPositions;
+    	
+	public MoveOperation(FeatureModel featureModel, HashMap<Object,Point> endPositions) {
 		super(featureModel, LABEL);
-		
-		deltaX=0;
-		deltaY=0;
-		doStop= dir == MoveAction.STOP;
-		
-		if(!doStop)
-		{
-			if((dir & MoveAction.DOWN) != 0)
-				deltaY = stepwidth;
-			if((dir & MoveAction.UP) != 0)
-				deltaY = stepwidth*(-1);
-			if((dir & MoveAction.RIGHT) != 0)
-				deltaX = stepwidth;
-			if((dir & MoveAction.LEFT) != 0)
-				deltaX = stepwidth*(-1);
-		}
-		
-		this.viewer = viewer;
+		this.endPositions = endPositions;
 	}
-	
-	@Override
-	public IStatus execute(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
-		doMove();
-		return Status.OK_STATUS;
-	}
-	
+
 	/**
 	 * Executes the requested move operation.
 	 * and add it for undo and redo
 	 */
-	private void doMove() {
-		if(!getSelection().isEmpty())
+	@Override
+	public IStatus execute(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
+		if(!endPositions.isEmpty())
 		{
-			for (Object element : getSelection().toArray()) {
+			for (Entry<Object,Point> element : endPositions.entrySet()) {
 				// check for infringe of rules
 				moveFigure(element);
 			}
-			featureModel.handleModelLayoutChanged();
+			
+//			for(AbstractFeatureModelOperation op : this.operations)
+//			{
+//				op.execute(monitor, info);
+//			}
 		}
+		MoveOperation.initialPositions.clear();
+		featureModel.handleModelLayoutChanged();
+		return Status.OK_STATUS;
 	}
-
+	
 	/**
 	 * Tries to move the given {@link Feature}
 	 * 
 	 * @param element
 	 */
-	private void moveFigure(Object element) {
-			if ((element instanceof FeatureEditPart) || (element instanceof Feature))
+	private void moveFigure(Entry<Object,Point> element) {
+			Point newPos = element.getValue();
+			
+			if ((element.getKey() instanceof FeatureEditPart) || (element.getKey() instanceof Feature))
 			{
-				Feature feature = element instanceof FeatureEditPart ? ((FeatureEditPart) element).getFeature() : (Feature) element;
-				Point oldPos = FeatureUIHelper.getLocation(feature);
-				Point newPos = new Point(oldPos.x+deltaX, oldPos.y+deltaY);
-				//FeatureUIHelper.setLocation(feature, newPos);
+				Feature feature = element.getKey() instanceof FeatureEditPart ? ((FeatureEditPart) element.getKey()).getFeature() : (Feature) element.getKey();
 
+				Point oldPos = MoveOperation.initialPositions.get(feature.getName());
+				
 				Feature oldParent = feature.getParent();
-				// TODO: calculate new parent!
 				Feature newParent = oldParent;
 				int oldIndex = oldParent != null ? oldParent.getChildIndex(feature) : 0;
-				// TODO: calculate new index!
 				int newIndex = oldIndex;
 				
 				FeatureOperationData data = new FeatureOperationData(feature,
 						oldParent, newParent, newIndex, oldIndex);
-				FeatureMoveOperation op = new FeatureMoveOperation(data, featureModel, newPos, 
-						FeatureUIHelper.getLocation(feature).getCopy(), feature);
+				FeatureMoveOperation op = new FeatureMoveOperation(data, featureModel, newPos,oldPos, feature);
 				op.addContext((ObjectUndoContext) featureModel.getUndoContext());
 				this.operations.add(op);
-				FeatureUIHelper.setLocation(feature, newPos);
 			}
 			
-			if((element instanceof ConstraintEditPart) || (element instanceof Constraint))
-			{
-				Constraint constraint = ((ConstraintEditPart) element).getConstraintModel();
-				Point oldPos = FeatureUIHelper.getLocation(constraint);
-				Point newPos = new Point(oldPos.x+deltaX, oldPos.y+deltaY);
-				
-				boolean isLastPos = true;
-				for (Constraint c : featureModel.getConstraints()) {
-					if ((FeatureUIHelper.getLocation(c).y + 17) > newPos.y) {
-						isLastPos = false;
-						break;
-					}
-				}
-				
-				int oldIndex = featureModel.getConstraints().indexOf(constraint);
-				// TODO: calculate new index 
-				int index = oldIndex;
-				
-				ConstraintMoveOperation op = new ConstraintMoveOperation(constraint,
-						featureModel, index, oldIndex, isLastPos ,newPos, 
-						FeatureUIHelper.getLocation(constraint).getCopy());
-				op.addContext((IUndoContext) featureModel.getUndoContext());
-
-				this.operations.add(op);
-				FeatureUIHelper.setLocation(constraint, newPos);
-			}
-			
-			if(element instanceof LegendFigure)
-			{
-				LegendFigure legendFigure = (LegendFigure) element;
-				Point oldPos = legendFigure.getLocation();
-				Point newPos = new Point(oldPos.x+deltaX, oldPos.y+deltaY);
-				legendFigure.newPos = newPos;
-				Point p = legendFigure.newPos.getCopy();
-				legendFigure.translateToRelative(p);
-				if (!(featureModel.getLayout().getLegendPos().x == p.x && featureModel.getLayout().getLegendPos().y == p.y)) {
-					LegendMoveOperation op = new LegendMoveOperation(featureModel, p,legendFigure.newPos, legendFigure);
-					op.addContext((IUndoContext) featureModel.getUndoContext());
-					this.operations.add(op);
-				}
-			}
-	}
-
-	private IStructuredSelection getSelection() {
-		return (IStructuredSelection) ((GraphicalViewerImpl) viewer).getSelection();
+//			if((element.getKey() instanceof ConstraintEditPart) || (element.getKey() instanceof Constraint))
+//			{
+//				Constraint constraint = ((ConstraintEditPart) element.getKey()).getConstraintModel();
+//				Point oldPos = MoveOperation.initialPositions.get(constraint.getCreationIdentifier());
+//				
+//				boolean isLastPos = true;
+//				for (Constraint c : featureModel.getConstraints()) {
+//					if ((FeatureUIHelper.getLocation(c).y + 17) > newPos.y) {
+//						isLastPos = false;
+//						break;
+//					}
+//				}
+//				
+//				int oldIndex = featureModel.getConstraints().indexOf(constraint);
+//				int index = oldIndex;
+//				
+//				ConstraintMoveOperation op = new ConstraintMoveOperation(constraint,
+//						featureModel, index, oldIndex, isLastPos ,newPos,oldPos);
+//				op.addContext((IUndoContext) featureModel.getUndoContext());
+//				this.operations.add(op);
+//			}
 	}
 	
 	@Override

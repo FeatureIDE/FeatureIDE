@@ -20,8 +20,11 @@
 // */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
+import java.util.HashMap;
+
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.IUndoContext;
+import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -29,8 +32,13 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.ui.PlatformUI;
 
+import de.ovgu.featureide.fm.core.Constraint;
+import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.MoveOperation;
 
@@ -42,7 +50,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.MoveOperation;
  * @author Andy Koch
  */
 public class MoveAction extends Action {
-	public static int STEPS = 2;
+	public static final int stepwidth = 2;
 	public static final String ID = "de.ovgu.featureide.move";
 	public static final int UP = 1;
 	public static final int RIGHT = 2;
@@ -51,18 +59,25 @@ public class MoveAction extends Action {
 	public static final int STOP = 0; // whole movement has been stopped (needed for undo redo purposes)
 	
 	private int dir;
-	private MoveAction stopAction;
 
+	private int deltaX;
+    private int deltaY;
+    private boolean doStop;
+    
 	Object viewer;
 	private FeatureModel featureModel;
+	
+	private HashMap<Object,Point> endPositions;
 	
 	private ISelectionChangedListener listener = new ISelectionChangedListener() {
 		public void selectionChanged(SelectionChangedEvent event) {
 			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-			setEnabled(isValidSelection(selection) && isMovingAllowed()); //action only active when manual layout and feature diagram elements are selected
+			setEnabled(isValidSelection(selection) && isMovingAllowed()); // action only active when manual layout and feature diagram elements are selected
+			
+			// TODO: insert check for selection changed (would also end transaction for moving)
 		}
 	};
-	
+		
 	/**
 	 * 
 	 * @param viewer the object which for the MoveAction has been registered
@@ -70,18 +85,39 @@ public class MoveAction extends Action {
 	 * @param graphicalViewer the according GraphicalViewerImpl
 	 * @param direction
 	 */
-	public MoveAction(Object viewer, FeatureModel featureModel, Object graphicalViewer, int direction, MoveAction stopAction) {
+	public MoveAction(Object viewer, FeatureModel featureModel, Object graphicalViewer, int direction) {
 		super("Moving");
 		this.setId(ID);
 		this.viewer = viewer;
 		this.featureModel = featureModel;
 		this.dir = direction;
 		setEnabled(false);
+		deltaX=0;
+		deltaY=0;
+		doStop = dir == MoveAction.STOP;
+				
+		if(!doStop)
+		{
+			if((dir & MoveAction.DOWN) != 0)
+				deltaY = stepwidth;
+			if((dir & MoveAction.UP) != 0)
+				deltaY = stepwidth*(-1);
+			if((dir & MoveAction.RIGHT) != 0)
+				deltaX = stepwidth;
+			if((dir & MoveAction.LEFT) != 0)
+				deltaX = stepwidth*(-1);
+		}
+		
+		if(doStop)
+		{
+			doStop = dir == MoveAction.STOP;
+		}
 		
 		if (viewer instanceof GraphicalViewerImpl) {
 			((GraphicalViewerImpl)viewer).addSelectionChangedListener(listener);
 		}
-		this.stopAction = stopAction;
+		
+		this.endPositions = new HashMap<Object,Point>();
 	}
 	
 	@Override
@@ -90,12 +126,80 @@ public class MoveAction extends Action {
 	 * @see org.eclipse.jface.action.Action#run()
 	 */
 	public void run() {
-		MoveOperation op = new MoveOperation(viewer, featureModel, dir);
-				
-		//if(dir == MoveAction.STOP)
-		{	
-			op.addContext((IUndoContext) featureModel.getUndoContext());
+		if(doStop)
+			this.stop();
+		else
+			this.doMove(false);
+	}
+	/**
+	 * Executes the requested move operation.
+	 * and add it for undo and redo
+	 */
+	private void doMove(boolean doStop) {
+		if(!getSelection().isEmpty())
+		{
+			for (Object element : getSelection().toArray()) {
+				// check for infringe of rules
+				moveFigure(element,doStop);
+			}
+			featureModel.handleModelLayoutChanged();
 		}
+	}
+
+	private IStructuredSelection getSelection() {
+		return (IStructuredSelection) ((GraphicalViewerImpl) viewer).getSelection();
+	}
+	
+	/**
+	 * Tries to move the given {@link Feature}
+	 * 
+	 * @param element
+	 */
+	private void moveFigure(Object element,boolean doStop) {
+		
+		boolean firstRun = MoveOperation.initialPositions == null || MoveOperation.initialPositions.isEmpty();
+		
+		if(firstRun)
+			MoveOperation.initialPositions = new HashMap<String,Point>();
+		
+		if ((element instanceof FeatureEditPart) || (element instanceof Feature))
+		{
+			Feature feature = element instanceof FeatureEditPart ? ((FeatureEditPart) element).getFeature() : (Feature) element;
+			Point oldPos = FeatureUIHelper.getLocation(feature);
+			Point newPos = new Point(oldPos.x+deltaX, oldPos.y+deltaY);
+
+			if(firstRun)
+				MoveOperation.initialPositions.put(feature.getName(), oldPos);
+			
+			if(doStop)
+				this.endPositions.put(element, newPos);
+
+			FeatureUIHelper.setLocation(feature, newPos);
+		}
+		
+//		if((element instanceof ConstraintEditPart) || (element instanceof Constraint))
+//		{
+//			Constraint constraint = ((ConstraintEditPart) element).getConstraintModel();
+//			Point oldPos = FeatureUIHelper.getLocation(constraint);
+//			Point newPos = new Point(oldPos.x+deltaX, oldPos.y+deltaY);
+//
+//			if(firstRun)
+//				MoveOperation.initialPositions.put(constraint.getCreationIdentifier(), oldPos);
+//			
+//			if(doStop)
+//				this.endPositions.put(element, newPos);
+//			
+//			FeatureUIHelper.setLocation(constraint, newPos);
+//		}
+
+	}
+	
+	private void stop()
+	{   
+		this.doMove(true);
+		// create Operation
+		MoveOperation op = new MoveOperation(featureModel, this.endPositions);
+		op.addContext((IUndoContext) featureModel.getUndoContext());
 		
 		try {
 			PlatformUI.getWorkbench().getOperationSupport()
