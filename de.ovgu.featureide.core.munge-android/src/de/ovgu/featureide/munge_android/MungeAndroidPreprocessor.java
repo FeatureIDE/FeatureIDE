@@ -6,6 +6,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 
+import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.munge.MungePreprocessor;
 
 /**
@@ -29,7 +30,7 @@ public class MungeAndroidPreprocessor extends MungePreprocessor {
 	public void performFullBuild(IFile config) {
 		super.performFullBuild(config);
 		
-		// Copy src and res folders from FeatureIDE build path to project root
+		// Move src and res folders from FeatureIDE build path to project root
 		IFolder build = featureProject.getBuildFolder();
 		IPath dst = featureProject.getProject().getFullPath();
 		try {
@@ -37,8 +38,9 @@ public class MungeAndroidPreprocessor extends MungePreprocessor {
 			featureProject.getProject().getFolder("src").delete(false,  null);
 			featureProject.getProject().getFolder("res").delete(false,  null);
 			
-			build.getFolder("src").copy(dst.append("/src"), IFolder.DERIVED, null);
-			build.getFolder("res").copy(dst.append("/res"), IFolder.DERIVED, null);
+			build.getFolder("src").move(dst.append("/src"), IFolder.DERIVED, null);
+			build.getFolder("res").move(dst.append("/res"), IFolder.DERIVED, null);
+			build.delete(true, null);
 			
 			config.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
 			
@@ -64,6 +66,11 @@ public class MungeAndroidPreprocessor extends MungePreprocessor {
 			MungeAndroidCorePlugin.getDefault().logError(e);
 		}
 		return super.clean();
+	}
+	
+	@Override
+	public void copyNotComposedFiles(Configuration c, IFolder destination) {
+		// not needed
 	}
 
 	/* (non-Javadoc)

@@ -217,7 +217,7 @@ public class NewFeatureProjectPage extends WizardPage {
 		
 		if (compositionTool.supportsAndroid()) {
 			updateStatus("Currently android projects must first be created using the Android project wizard." +
-					"They can be converted to FeatureIDE projects using \"Add FeatureIDE Project Nature\".\n");
+					" An Android project can be converted to a FeatureIDE project using \"Add FeatureIDE Project Nature to Android project\".");
 			return;
 		}
 		if (isEnabled(sourcePath) && isEnabled(configsPath) &&
