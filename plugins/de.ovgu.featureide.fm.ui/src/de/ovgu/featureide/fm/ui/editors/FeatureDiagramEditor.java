@@ -168,9 +168,13 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	public FeatureDiagramEditor(FeatureModelEditor featureModelEditor,
 			Composite container) {
 		super();
+		
 		this.featureModelEditor = featureModelEditor;
-
-		setKeyHandler(new GraphicalViewerKeyHandler(this));
+		
+		GraphicalViewerKeyHandler gvKeyHandler =  new GraphicalViewerKeyHandler(this); //default actions will be handled at last!
+		KeyHandler majorKeyhandler = new KeyHandler(); //to ensure that actions registered in @see createKeyBindings() will be handled first!
+		majorKeyhandler.setParent(gvKeyHandler);
+		setKeyHandler(majorKeyhandler);
 
 		createControl(container);
 		initializeGraphicalViewer();
@@ -323,7 +327,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		handler.put(KeyStroke.getPressed(SWT.ARROW_RIGHT, SWT.CTRL),moveRightAction);
 		handler.put(KeyStroke.getPressed(SWT.ARROW_DOWN, SWT.CTRL),moveDownAction);
 		handler.put(KeyStroke.getPressed(SWT.ARROW_LEFT, SWT.CTRL),moveLeftAction);
-		
+
 		handler.put(KeyStroke.getReleased(SWT.CTRL, 0),moveStopAction);
 	}
 
