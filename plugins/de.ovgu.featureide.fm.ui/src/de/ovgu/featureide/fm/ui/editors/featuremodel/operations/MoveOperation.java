@@ -49,7 +49,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
 /**
  * the operation for moving Features in the FeatureModelDiagram
  * 
- * @author Günter Ulreich
+ * @author Guenter Ulreich
  * @author Andy Koch
  */
 public class MoveOperation extends AbstractFeatureModelOperation implements	GUIDefaults {

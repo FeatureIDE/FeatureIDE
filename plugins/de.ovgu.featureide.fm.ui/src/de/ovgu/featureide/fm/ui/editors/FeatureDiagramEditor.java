@@ -101,6 +101,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.Tautol
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.GraphicalEditPartFactory;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutManager;
+import de.ovgu.featureide.fm.ui.editors.keyhandler.FeatureDiagramEditorKeyHandler;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePage;
 
@@ -143,6 +144,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 	private MoveAction moveLeftAction;
 	
 	
+	
 	private ShowHiddenFeaturesAction showHiddenFeaturesAction;
 
 	private ZoomInAction zoomIn;
@@ -170,11 +172,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		super();
 		
 		this.featureModelEditor = featureModelEditor;
-		
-		GraphicalViewerKeyHandler gvKeyHandler =  new GraphicalViewerKeyHandler(this); //default actions will be handled at last!
-		KeyHandler majorKeyhandler = new KeyHandler(); //to ensure that actions registered in @see createKeyBindings() will be handled first!
-		majorKeyhandler.setParent(gvKeyHandler);
-		setKeyHandler(majorKeyhandler);
+
 		
 		createControl(container);
 		initializeGraphicalViewer();
@@ -183,6 +181,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		zoomManager = rootEditPart.getZoomManager();
 		zoomManager.setZoomLevels(new double[] { 0.05, 0.10, 0.25, 0.50, 0.75,
 				0.90, 1.00, 1.10, 1.25, 1.50, 2.00, 2.50, 3.00, 4.00 });
+
+		setKeyHandler(new FeatureDiagramEditorKeyHandler(this,getFeatureModel()));
 	}
  
 	void initializeGraphicalViewer() {

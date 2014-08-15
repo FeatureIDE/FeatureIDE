@@ -49,7 +49,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.MoveOperation;
  * This is the MoveAction for the manual movement of objects in the FeatureModelDiagram
  *  
  *  
- * @author Günter Ulreich
+ * @author Guenter Ulreich
  * @author Andy Koch
  */
 public class MoveAction extends Action {
