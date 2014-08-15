@@ -40,8 +40,10 @@ import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.Legend;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
 
 /**
@@ -54,10 +56,11 @@ public class MoveOperation extends AbstractFeatureModelOperation implements	GUID
 	private static final String LABEL = "Move";
 	private Deque<AbstractFeatureModelOperation> operations = new LinkedList<AbstractFeatureModelOperation>();
     
-    public static HashMap<String,Point> initialPositions;
+	public static int totalDeltaX;
+	public static int totalDeltaY;
     
     private HashMap<Object,Point> endPositions;
-    	
+    	// needs only deltas as Parameter
 	public MoveOperation(FeatureModel featureModel, HashMap<Object,Point> endPositions) {
 		super(featureModel, LABEL);
 		this.endPositions = endPositions;
@@ -81,7 +84,6 @@ public class MoveOperation extends AbstractFeatureModelOperation implements	GUID
 //				op.execute(monitor, info);
 //			}
 		}
-		MoveOperation.initialPositions.clear();
 		featureModel.handleModelLayoutChanged();
 		return Status.OK_STATUS;
 	}
@@ -98,20 +100,21 @@ public class MoveOperation extends AbstractFeatureModelOperation implements	GUID
 			{
 				Feature feature = element.getKey() instanceof FeatureEditPart ? ((FeatureEditPart) element.getKey()).getFeature() : (Feature) element.getKey();
 
-				Point oldPos = MoveOperation.initialPositions.get(feature.getName());
+				Point oldPos; // calculate
 				
 				Feature oldParent = feature.getParent();
 				Feature newParent = oldParent;
 				int oldIndex = oldParent != null ? oldParent.getChildIndex(feature) : 0;
 				int newIndex = oldIndex;
 				
-				FeatureOperationData data = new FeatureOperationData(feature,
-						oldParent, newParent, newIndex, oldIndex);
-				FeatureMoveOperation op = new FeatureMoveOperation(data, featureModel, newPos,oldPos, feature);
-				op.addContext((ObjectUndoContext) featureModel.getUndoContext());
-				this.operations.add(op);
 			}
-			
+
+			if((element instanceof ConstraintEditPart) || (element instanceof Constraint)) {
+			}
+
+			if((element instanceof LegendEditPart) || (element instanceof LegendFigure) || (element instanceof Legend)) {
+				
+			}
 //			if((element.getKey() instanceof ConstraintEditPart) || (element.getKey() instanceof Constraint))
 //			{
 //				Constraint constraint = ((ConstraintEditPart) element.getKey()).getConstraintModel();
@@ -134,25 +137,46 @@ public class MoveOperation extends AbstractFeatureModelOperation implements	GUID
 //				this.operations.add(op);
 //			}
 	}
+
 	
+	// TODO: recalculate old/new position using totalDeltaX, totalDeltaY
+	
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AbstractFeatureModelOperation#redo()
+	 */
 	@Override
 	protected void redo() {
-		for (Iterator<AbstractFeatureModelOperation> it = operations.iterator(); it.hasNext();) {
-			AbstractFeatureModelOperation operation = it.next();
-			if (operation.canRedo()) {
-				operation.redo();
-			}
-		}
+		// TODO Auto-generated method stub
+		
 	}
 
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AbstractFeatureModelOperation#undo()
+	 */
 	@Override
 	protected void undo() {
-		for (Iterator<AbstractFeatureModelOperation> it = operations.descendingIterator(); it.hasNext();) {
-			AbstractFeatureModelOperation operation = it.next();
-			if (operation.canUndo()) {
-				operation.undo();
-			}
-		}
+		// TODO Auto-generated method stub
+		
 	}
+	
+//	@Override
+//	protected void redo() {
+//		for (Iterator<AbstractFeatureModelOperation> it = operations.iterator(); it.hasNext();) {
+//			AbstractFeatureModelOperation operation = it.next();
+//			if (operation.canRedo()) {
+//				operation.redo();
+//			}
+//		}
+//	}
+//
+//	@Override
+//	protected void undo() {
+//		for (Iterator<AbstractFeatureModelOperation> it = operations.descendingIterator(); it.hasNext();) {
+//			AbstractFeatureModelOperation operation = it.next();
+//			if (operation.canUndo()) {
+//				operation.undo();
+//			}
+//		}
+//	}
 
 }

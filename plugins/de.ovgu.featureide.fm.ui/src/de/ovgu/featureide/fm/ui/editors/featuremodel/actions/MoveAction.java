@@ -37,9 +37,12 @@ import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.Legend;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.MoveOperation;
 
 /**
@@ -157,10 +160,10 @@ public class MoveAction extends Action {
 	 */
 	private void moveFigure(Object element,boolean doStop) {
 		
-		boolean firstRun = MoveOperation.initialPositions == null || MoveOperation.initialPositions.isEmpty();
+		boolean firstRun = MoveOperation.totalDeltaX == 0 && MoveOperation.totalDeltaY == 0;
 		
 		if(firstRun)
-			MoveOperation.initialPositions = new HashMap<String,Point>();
+			//MoveOperation.initialPositions = new HashMap<String,Point>();
 		
 		if ((element instanceof FeatureEditPart) || (element instanceof Feature))
 		{
@@ -169,7 +172,7 @@ public class MoveAction extends Action {
 			Point newPos = new Point(oldPos.x+deltaX, oldPos.y+deltaY);
 
 			if(firstRun)
-				MoveOperation.initialPositions.put(feature.getName(), oldPos);
+				//MoveOperation.initialPositions.put(feature.getName(), oldPos);
 			
 			if(doStop)
 				this.endPositions.put(element, newPos);
@@ -177,11 +180,11 @@ public class MoveAction extends Action {
 			FeatureUIHelper.setLocation(feature, newPos);
 		}
 		
-//		if((element instanceof ConstraintEditPart) || (element instanceof Constraint))
-//		{
-//			Constraint constraint = ((ConstraintEditPart) element).getConstraintModel();
-//			Point oldPos = FeatureUIHelper.getLocation(constraint);
-//			Point newPos = new Point(oldPos.x+deltaX, oldPos.y+deltaY);
+		if((element instanceof ConstraintEditPart) || (element instanceof Constraint))
+		{
+			Constraint constraint = element instanceof ConstraintEditPart ? ((ConstraintEditPart) element).getConstraintModel() : (Constraint) element;
+			Point oldPos = FeatureUIHelper.getLocation(constraint);
+			Point newPos = new Point(oldPos.x+deltaX, oldPos.y+deltaY);
 //
 //			if(firstRun)
 //				MoveOperation.initialPositions.put(constraint.getCreationIdentifier(), oldPos);
@@ -189,8 +192,15 @@ public class MoveAction extends Action {
 //			if(doStop)
 //				this.endPositions.put(element, newPos);
 //			
-//			FeatureUIHelper.setLocation(constraint, newPos);
-//		}
+			FeatureUIHelper.setLocation(constraint, newPos);
+		}
+		if((element instanceof LegendEditPart) || (element instanceof LegendFigure) || (element instanceof Legend))
+		{
+			LegendFigure legendFigure = FeatureUIHelper.getLegendFigure(featureModel);
+			Point oldPos = legendFigure.getLocation();
+			Point newPos = new Point(oldPos.x+deltaX, oldPos.y+deltaY);
+			legendFigure.setLocation(newPos);
+		}
 
 	}
 	
@@ -199,14 +209,14 @@ public class MoveAction extends Action {
 		this.doMove(true);
 		// create Operation
 		MoveOperation op = new MoveOperation(featureModel, this.endPositions);
-		op.addContext((IUndoContext) featureModel.getUndoContext());
-		
-		try {
-			PlatformUI.getWorkbench().getOperationSupport()
-					.getOperationHistory().execute(op, null, null);
-		} catch (ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
-		}
+//		op.addContext((IUndoContext) featureModel.getUndoContext());
+//		
+//		try {
+//			PlatformUI.getWorkbench().getOperationSupport()
+//					.getOperationHistory().execute(op, null, null);
+//		} catch (ExecutionException e) {
+//			FMUIPlugin.getDefault().logError(e);
+//		}
 	}
 	
 	/**
