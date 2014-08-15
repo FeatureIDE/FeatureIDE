@@ -185,7 +185,7 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 	 * @param sourceFolder
 	 * @param buildFolder
 	 */
-	private void runMunge(LinkedList<String> featureArgs, IFolder sourceFolder,
+	protected void runMunge(LinkedList<String> featureArgs, IFolder sourceFolder,
 			IFolder buildFolder) {
 		@SuppressWarnings("unchecked")
 		LinkedList<String> packageArgs = (LinkedList<String>) featureArgs.clone();
@@ -323,7 +323,7 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 		}
 	}
 	
-	private void runMunge(LinkedList<String> args) {
+	protected void runMunge(LinkedList<String> args) {
 		//convert into an Array
 		String[] argArray = new String[args.size()];
 		for (int i = 0;i < args.size();i++) {
@@ -334,7 +334,7 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 		m.main(argArray, featureProject);
 	}
 
-	private void createBuildFolder(IFolder buildFolder) throws CoreException {
+	protected void createBuildFolder(IFolder buildFolder) throws CoreException {
 		if (!buildFolder.exists()) {
 			buildFolder.create(true, true, null);
 		}

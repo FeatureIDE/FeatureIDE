@@ -1,12 +1,18 @@
 package de.ovgu.featureide.munge_android;
 
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 
+import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.munge.MungeCorePlugin;
 import de.ovgu.featureide.munge.MungePreprocessor;
 
 /**
@@ -24,29 +30,6 @@ public class MungeAndroidPreprocessor extends MungePreprocessor {
 
 	public MungeAndroidPreprocessor() {
 		super();
-	}
-
-	@Override
-	public void performFullBuild(IFile config) {
-		super.performFullBuild(config);
-		
-		// Move src and res folders from FeatureIDE build path to project root
-		IFolder build = featureProject.getBuildFolder();
-		IPath dst = featureProject.getProject().getFullPath();
-		try {
-			config.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
-			featureProject.getProject().getFolder("src").delete(false,  null);
-			featureProject.getProject().getFolder("res").delete(false,  null);
-			
-			build.getFolder("src").move(dst.append("/src"), IFolder.DERIVED, null);
-			build.getFolder("res").move(dst.append("/res"), IFolder.DERIVED, null);
-			build.delete(true, null);
-			
-			config.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
-			
-		} catch (CoreException e) {
-			MungeAndroidCorePlugin.getDefault().logError(e);
-		}
 	}
 	
 	/**
@@ -70,7 +53,78 @@ public class MungeAndroidPreprocessor extends MungePreprocessor {
 	
 	@Override
 	public void copyNotComposedFiles(Configuration c, IFolder destination) {
-		// not needed
+		if (destination == null) {
+			destination = featureProject.getBuildFolder();
+		}
+		
+		// Copy not composed files
+		try {
+			super.copy(featureProject.getSourceFolder(), featureProject.getBuildFolder());
+		} catch (CoreException e) {
+			MungeAndroidCorePlugin.getDefault().logError(e);
+		}
+		
+		// Move src and res folders from FeatureIDE build path to project root
+		IFolder build = featureProject.getBuildFolder();
+		IPath dst = featureProject.getProject().getFullPath();
+		try {
+			featureProject.getProject().getFolder("src").delete(false,  null);
+			featureProject.getProject().getFolder("res").delete(false,  null);
+			
+			build.getFolder("src").move(dst.append("/src"), IFolder.DERIVED, null);
+			build.getFolder("res").move(dst.append("/res"), IFolder.DERIVED, null);
+			build.delete(true, null);
+		} catch (CoreException e) {
+			MungeAndroidCorePlugin.getDefault().logError(e);
+		}
+	}
+	
+	@Override
+	protected void runMunge(LinkedList<String> featureArgs, IFolder sourceFolder,
+			IFolder buildFolder) {
+		@SuppressWarnings("unchecked")
+		LinkedList<String> packageArgs = (LinkedList<String>) featureArgs.clone();
+		boolean added = false;
+		try {
+			createBuildFolder(buildFolder);
+			for (final IResource res : sourceFolder.members()) {
+				if (res instanceof IFolder) {
+					runMunge(featureArgs, (IFolder)res, buildFolder.getFolder(res.getName()));
+				} else 
+				if (res instanceof IFile){
+					String extension = res.getFileExtension();
+					if (extension != null && (extension.equals("java") || extension.equals("xml"))) {
+						added = true;
+						packageArgs.add(res.getRawLocation().toOSString());
+					}
+				}
+			}
+		} catch (CoreException e) {
+			MungeCorePlugin.getDefault().logError(e);
+		}
+		if (!added) {
+			return;
+		}
+		//add output directory
+		packageArgs.add(buildFolder.getRawLocation().toOSString());
+				
+		//CommandLine syntax:
+		//	-DFEATURE1 -DFEATURE2 ... File1 File2 ... outputDirectory
+		runMunge(packageArgs);
+	}
+	
+	private static final LinkedHashSet<String> EXTENSIONS = createExtensions(); 
+	
+	private static LinkedHashSet<String> createExtensions() {
+		LinkedHashSet<String> extensions = new LinkedHashSet<String>();
+		extensions.add("java");
+		extensions.add("xml");
+		return extensions;
+	} 
+	
+	@Override
+	public LinkedHashSet<String> extensions() {
+		return EXTENSIONS;
 	}
 
 	/* (non-Javadoc)
