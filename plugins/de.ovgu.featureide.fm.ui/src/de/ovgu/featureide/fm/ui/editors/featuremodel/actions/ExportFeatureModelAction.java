@@ -18,35 +18,30 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.ui.views.collaboration.action;
+package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
-import java.util.HashSet;
-import java.util.Set;
- 
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 
-import de.ovgu.featureide.fm.ui.GraphicsExporter;
-import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
-import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModelBuilder;
+import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 
 /**
- * TODO description
  * 
- * @author Günter Ulreich
+ * 
+ * 
+ * @author Guenter Ulreich
+ * @author Andy Koch
  */
-public class ExportAsAction extends Action {
+public class ExportFeatureModelAction extends Action {
 
-	private final GraphicalViewerImpl viewer;
+	private final FeatureModelEditor featureModelEditor;
 		
-	public ExportAsAction(String text, GraphicalViewerImpl view) {
-		super(text);
-		viewer = view;
+	public ExportFeatureModelAction(FeatureModelEditor featureModelEditor) {
+		super("Export As");
+		this.featureModelEditor = featureModelEditor;
 		setEnabled(true);
 	}
 	
 	public void run() {
-		GraphicsExporter.exportAs(viewer);
+		this.featureModelEditor.doSaveAs();
 	}
-
 }

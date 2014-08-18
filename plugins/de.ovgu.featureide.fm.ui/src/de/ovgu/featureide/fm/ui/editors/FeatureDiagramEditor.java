@@ -81,6 +81,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateLayerAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAllAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.EditConstraintAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ExportFeatureModelAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.HiddenAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LayoutSelectionAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LegendAction;
@@ -149,7 +150,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 
 	private ZoomInAction zoomIn;
 	private ZoomOutAction zoomOut;
-
+	
+	ExportFeatureModelAction exportFeatureModelAction;
 	// legend action replaced with property page
 	private LegendAction legendAction;
 	private LegendLayoutAction legendLayoutAction;
@@ -283,7 +285,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		editConstraintAction = new EditConstraintAction(this, featureModel);
 		reverseOrderAction = new ReverseOrderAction(this, featureModel);
 
-		// legendAction = new LegendAction(this, featureModel);
+		exportFeatureModelAction = new ExportFeatureModelAction(featureModelEditor);
 		legendLayoutAction = new LegendLayoutAction(this, featureModel);
 		legendAction = new LegendAction(this, featureModel);
 		showHiddenFeaturesAction = new ShowHiddenFeaturesAction(this,
@@ -428,6 +430,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 				extension.extendContextMenu(menu, this);
 			}
 		}
+		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+		menu.add(this.exportFeatureModelAction);
 	}
 
 	private void connectionEntrys(IMenuManager menu) {
@@ -698,6 +702,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		} else if (REFRESH_ACTIONS.equals(prop)) {
 			// additional actions can be refreshed here
 			// legendAction.refresh();
+			legendLayoutAction.refresh();
+		} else if (LEGEND_LAYOUT_CHANGED.equals(prop)){
 			legendLayoutAction.refresh();
 		}
 

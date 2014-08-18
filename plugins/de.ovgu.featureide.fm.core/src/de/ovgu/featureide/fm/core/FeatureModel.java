@@ -524,6 +524,10 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		fireEvent(MODEL_LAYOUT_CHANGED);
 	}
 	
+	public void handleLegendLayoutChanged() {
+		fireEvent(LEGEND_LAYOUT_CHANGED);
+	}
+	
 	public void refreshContextMenu() {
 		fireEvent(REFRESH_ACTIONS);
 	}
