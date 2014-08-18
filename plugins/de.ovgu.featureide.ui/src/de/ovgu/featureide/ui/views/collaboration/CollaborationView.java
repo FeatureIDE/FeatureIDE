@@ -85,6 +85,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.StoppableJob;
 import de.ovgu.featureide.fm.core.WaitingJob;
+import de.ovgu.featureide.fm.ui.GraphicsExporter;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GEFImageWriter;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.editors.annotation.ColorPalette;
@@ -92,6 +93,7 @@ import de.ovgu.featureide.ui.views.collaboration.action.AddColorSchemeAction;
 import de.ovgu.featureide.ui.views.collaboration.action.AddRoleAction;
 import de.ovgu.featureide.ui.views.collaboration.action.DeleteAction;
 import de.ovgu.featureide.ui.views.collaboration.action.DeleteColorSchemeAction;
+import de.ovgu.featureide.ui.views.collaboration.action.ExportAsAction;
 import de.ovgu.featureide.ui.views.collaboration.action.FilterAction;
 import de.ovgu.featureide.ui.views.collaboration.action.RenameColorSchemeAction;
 import de.ovgu.featureide.ui.views.collaboration.action.SetColorAction;
@@ -124,6 +126,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	private static final String DELETE_LABEL = "Delete";
 	private static final String FILTER_LABEL = "Filter";
 	private static final String UNSELECTED_LABEL = "Show unselected features";
+	private static final String EXPORT_AS_LABEL = "Export As";
 	
 	private static final String TOOL_TIP_LABEL = "Build collaborationmodel";
 	
@@ -133,9 +136,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	private static final Image[] FIELD_METHOD_IMAGES = { null, null, IMAGE_AT, IMAGE_AT,  null, IMAGE_METHODE_PUBLIC, IMAGE_METHODE_PROTECTED, IMAGE_METHODE_DEFAULT,
 			IMAGE_METHODE_PRIVATE, null, null };
 	
-	private static final String[] EXPORT_EXTENSIONS = { "*.png", "*.jpg", "*.bmp" };
-	private static final String[] FILDER_NAMES = { "Portable Network Graphics *.png", "JPEG *.jpg", "Windows Bitmap *.bmp" };
-	
 	private GraphicalViewerImpl viewer;
 	private CollaborationModelBuilder builder = new CollaborationModelBuilder();
 	
@@ -144,6 +144,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	private Action toolbarAction;
 	private FilterAction filterAction;
 	private PrintAction printAction;
+	private ExportAsAction exportAsAction;
 	private ShowUnselectedAction showUnselectedAction;
 	private Point cursorPosition;
 	
@@ -411,6 +412,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		menuMgr.add(filterAction);
 		menuMgr.add(showUnselectedAction);
 		menuMgr.add(delAction);
+		menuMgr.add(exportAsAction);
 		
 		if (featureProject.getComposer().showContextFieldsAndMethods()) {
 			MenuManager methodsFieldsSubMenu = new MenuManager("Show Fields and Methods");
@@ -482,6 +484,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		addRoleAction = new AddRoleAction(ADD_LABEL, viewer, this);
 		delAction = new DeleteAction(DELETE_LABEL, viewer);
 		filterAction = new FilterAction(FILTER_LABEL, viewer, this);
+		exportAsAction = new ExportAsAction(EXPORT_AS_LABEL,viewer,this);
 		showUnselectedAction = new ShowUnselectedAction(UNSELECTED_LABEL, this);
 		
 		for (int i = 0; i < FIELD_METHOD_LABEL_NAMES.length; i++) {
@@ -550,15 +553,16 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	
 	@Override
 	public void doSaveAs() {
-		FileDialog fileDialog = new FileDialog(this.getSite().getShell(), SWT.SAVE);
-		fileDialog.setFilterExtensions(EXPORT_EXTENSIONS);
-		fileDialog.setFilterNames(FILDER_NAMES);
-		fileDialog.setOverwrite(true);
-		String filePath = fileDialog.open();
-		if (filePath == null)
-			return;
-		File file = new File(filePath);
-		GEFImageWriter.writeToFile(viewer, file);
+//		FileDialog fileDialog = new FileDialog(this.getSite().getShell(), SWT.SAVE);
+//		fileDialog.setFilterExtensions(EXPORT_EXTENSIONS);
+//		fileDialog.setFilterNames(FILDER_NAMES);
+//		fileDialog.setOverwrite(true);
+//		String filePath = fileDialog.open();
+//		if (filePath == null)
+//			return;
+//		File file = new File(filePath);
+//		GEFImageWriter.writeToFile(viewer, file);
+		GraphicsExporter.exportAs(viewer);
 	}
 	
 	@Override

@@ -88,6 +88,7 @@ import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.ModelIOFactory;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslWriter;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.GraphicsExporter;
 import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.FeatureModelEditorContributor;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
@@ -539,56 +540,57 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 
 	@Override
 	public void doSaveAs() {
-		FileDialog fileDialog = new FileDialog(getEditorSite().getShell(), SWT.SAVE);
-		String[] extensions = { "*.png", "*.jpg", "*.bmp", "*.m", "*.xml", "*.svg" };
-		fileDialog.setFilterExtensions(extensions);
-		String[] filterNames = { "Portable Network Graphics *.png", "JPEG *.jpg", "Windows Bitmap *.bmp", "GUIDSL Grammar *.m", "XML Export *.xml", "Scalable Vector Graphics *.svg" };
-		fileDialog.setFilterNames(filterNames);
-		fileDialog.setOverwrite(true);
-		String filePath = fileDialog.open();
-		if (filePath == null)
-			return;
-		File file = new File(filePath);
-		if (filePath.endsWith(".m")) {
-			new GuidslWriter(featureModel).writeToFile(file);
-		} else if (filePath.endsWith(".xml")) {
-			featureModelWriter.writeToFile(file);
-		} else if (filePath.endsWith(".svg")) {
-			ScalableFreeformRootEditPart part = (ScalableFreeformRootEditPart) diagramEditor.getEditPartRegistry().get(LayerManager.ID);
-			IFigure rootFigure = part.getFigure();
-
-			Bundle bundleExportSVG = null;
-			for (Bundle b : InternalPlatform.getDefault().getBundleContext().getBundles()) {
-				if (b.getSymbolicName().equals("nl.utwente.ce.imageexport.svg")) {
-					bundleExportSVG = b;
-					break;
-				}
-			}
-			
-			// check if gef-imageexport is existing and activated!
-			if (bundleExportSVG != null) {
-				try {
-					org.osgi.framework.BundleActivator act = ((org.osgi.framework.BundleActivator) bundleExportSVG.loadClass("nl.utwente.ce.imagexport.export.svg.Activator").newInstance());
-					act.start(InternalPlatform.getDefault().getBundleContext());
-					
-					Class<?> cl = bundleExportSVG.loadClass("nl.utwente.ce.imagexport.export.svg.ExportSVG");
-					Method m = cl.getMethod("exportImage", String.class, String.class, IFigure.class);
-					m.invoke(cl.newInstance(), "SVG", filePath, (IFigure) rootFigure);
-				} catch (Exception e) {
-					FMUIPlugin.getDefault().logError(e);
-				}
-			} else {
-				final String infoMessage = "Eclipse plugin for exporting diagram in SVG format is not existing." + "\nIf you want to use this, you have to install GEF Imageexport with SVG in Eclipse from "
-						+ "\nhttp://veger.github.com/eclipse-gef-imageexport";
-
-				MessageDialog dialog = new MessageDialog(new Shell(), "SVG export failed", 
-						FMUIPlugin.getImage("FeatureIconSmall.ico"), infoMessage, MessageDialog.INFORMATION, 
-						new String[] { IDialogConstants.OK_LABEL }, 0);
-
-				dialog.open();
-				FMUIPlugin.getDefault().logInfo(infoMessage);
-			}
-		}
+		GraphicsExporter.exportAs(featureModel, diagramEditor, featureModelWriter);
+//		FileDialog fileDialog = new FileDialog(getEditorSite().getShell(), SWT.SAVE);
+//		String[] extensions = { "*.png", "*.jpg", "*.bmp", "*.m", "*.xml", "*.svg" };
+//		fileDialog.setFilterExtensions(extensions);
+//		String[] filterNames = { "Portable Network Graphics *.png", "JPEG *.jpg", "Windows Bitmap *.bmp", "GUIDSL Grammar *.m", "XML Export *.xml", "Scalable Vector Graphics *.svg" };
+//		fileDialog.setFilterNames(filterNames);
+//		fileDialog.setOverwrite(true);
+//		String filePath = fileDialog.open();
+//		if (filePath == null)
+//			return;
+//		File file = new File(filePath);
+//		if (filePath.endsWith(".m")) {
+//			new GuidslWriter(featureModel).writeToFile(file);
+//		} else if (filePath.endsWith(".xml")) {
+//			featureModelWriter.writeToFile(file);
+//		} else if (filePath.endsWith(".svg")) {
+//			ScalableFreeformRootEditPart part = (ScalableFreeformRootEditPart) diagramEditor.getEditPartRegistry().get(LayerManager.ID);
+//			IFigure rootFigure = part.getFigure();
+//
+//			Bundle bundleExportSVG = null;
+//			for (Bundle b : InternalPlatform.getDefault().getBundleContext().getBundles()) {
+//				if (b.getSymbolicName().equals("nl.utwente.ce.imageexport.svg")) {
+//					bundleExportSVG = b;
+//					break;
+//				}
+//			}
+//			
+//			// check if gef-imageexport is existing and activated!
+//			if (bundleExportSVG != null) {
+//				try {
+//					org.osgi.framework.BundleActivator act = ((org.osgi.framework.BundleActivator) bundleExportSVG.loadClass("nl.utwente.ce.imagexport.export.svg.Activator").newInstance());
+//					act.start(InternalPlatform.getDefault().getBundleContext());
+//					
+//					Class<?> cl = bundleExportSVG.loadClass("nl.utwente.ce.imagexport.export.svg.ExportSVG");
+//					Method m = cl.getMethod("exportImage", String.class, String.class, IFigure.class);
+//					m.invoke(cl.newInstance(), "SVG", filePath, (IFigure) rootFigure);
+//				} catch (Exception e) {
+//					FMUIPlugin.getDefault().logError(e);
+//				}
+//			} else {
+//				final String infoMessage = "Eclipse plugin for exporting diagram in SVG format is not existing." + "\nIf you want to use this, you have to install GEF Imageexport with SVG in Eclipse from "
+//						+ "\nhttp://veger.github.com/eclipse-gef-imageexport";
+//
+//				MessageDialog dialog = new MessageDialog(new Shell(), "SVG export failed", 
+//						FMUIPlugin.getImage("FeatureIconSmall.ico"), infoMessage, MessageDialog.INFORMATION, 
+//						new String[] { IDialogConstants.OK_LABEL }, 0);
+//
+//				dialog.open();
+//				FMUIPlugin.getDefault().logInfo(infoMessage);
+//			}
+//		}
 	}
 
 	@SuppressWarnings("rawtypes")
