@@ -206,6 +206,7 @@ public class MoveAction extends Action {
 			Point newPos = new Point(oldPos.x+deltaX, oldPos.y+deltaY);
 			legendFigure.setLocation(newPos);
 			featureModel.getLayout().setLegendAutoLayout(false);
+			featureModel.getLayout().setLegendPos(newPos.x, newPos.y);
 			featureModel.handleLegendLayoutChanged(); 
 			this.isLegendMoving = true;
 		}
@@ -227,7 +228,6 @@ public class MoveAction extends Action {
 //		}
 		if(!isLegendMoving && featureModel.getLayout().hasLegendAutoLayout())
 			featureModel.handleModelDataChanged();
-			
 		
 		this.init();
 	}
