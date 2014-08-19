@@ -51,6 +51,8 @@ public class GraphicsExporter {
 
 	public static boolean exportAs(FeatureModel featureModel, FeatureDiagramEditor diagramEditor, IFeatureModelWriter featureModelWriter)
 	{
+		boolean succ = false;
+		File file = null;
 		FileDialog fileDialog = new FileDialog(new Shell(), SWT.SAVE);
 		String[] extensions = { "*.png", "*.jpg", "*.bmp", "*.m", "*.xml", "*.svg" };
 		fileDialog.setFilterExtensions(extensions);
@@ -58,17 +60,23 @@ public class GraphicsExporter {
 		fileDialog.setFilterNames(filterNames);
 		fileDialog.setOverwrite(true);
 		String filePath = fileDialog.open();
-		if (filePath == null)
-			return false;
-		File file = new File(filePath);
-		if (filePath.endsWith(".m")) {
-			new GuidslWriter(featureModel).writeToFile(file);
-		} else if (filePath.endsWith(".xml")) {
-			featureModelWriter.writeToFile(file);
-		} else {
-			return GraphicsExporter.exportAs(diagramEditor, file);
+		if (filePath != null)
+		{
+			file = new File(filePath);
+			if (filePath.endsWith(".m")) {
+				new GuidslWriter(featureModel).writeToFile(file);
+				succ = true;
+			} else if (filePath.endsWith(".xml")) {
+				featureModelWriter.writeToFile(file);
+				succ = true;
+			} else {
+				return GraphicsExporter.exportAs(diagramEditor, file);
+			}
 		}
-		return true;
+		
+		GraphicsExporter.printExportMessage(file,succ);
+		
+		return succ;
 	}
 	
 	public static boolean exportAs(GraphicalViewerImpl viewer)
@@ -90,6 +98,8 @@ public class GraphicsExporter {
 	@SuppressWarnings("restriction")
 	public static boolean exportAs(GraphicalViewerImpl viewer, File file)
 	{
+		boolean succ = false;
+		
 		if (file.getAbsolutePath().endsWith(".svg")) {
 			ScalableFreeformRootEditPart part = (ScalableFreeformRootEditPart) viewer.getEditPartRegistry().get(LayerManager.ID);
 			IFigure rootFigure = part.getFigure();
@@ -110,6 +120,7 @@ public class GraphicsExporter {
 					Class<?> cl = bundleExportSVG.loadClass("nl.utwente.ce.imagexport.export.svg.ExportSVG");
 					Method m = cl.getMethod("exportImage", String.class, String.class, IFigure.class);
 					m.invoke(cl.newInstance(), "SVG", file.getAbsolutePath(), rootFigure);
+					succ = true;
 				} catch (Exception e) {
 					FMUIPlugin.getDefault().logError(e);
 				}
@@ -128,7 +139,24 @@ public class GraphicsExporter {
 		else
 		{
 			GEFImageWriter.writeToFile(viewer, file);
+			succ = true;
 		}
-		return true;
+		
+		GraphicsExporter.printExportMessage(file,succ);
+		
+		return succ;
+	}
+	
+	public static void printExportMessage(File file, boolean successful)
+	{
+		String button = IDialogConstants.OK_LABEL;
+		boolean done = successful && file != null;
+		String headline = "Exporting graphic " + (done ? "sucessful" : "failed");
+		String infoMessage = done ? "Graphic export has been saved to\n" + file.getAbsolutePath() : "Nothing has been saved for diagram export...";
+		MessageDialog dialog = new MessageDialog(new Shell(), headline, 
+			FMUIPlugin.getImage("FeatureIconSmall.ico"), infoMessage, MessageDialog.INFORMATION, 
+			new String[] { button }, 0);
+		dialog.open();
+		FMUIPlugin.getDefault().logInfo(infoMessage);
 	}
 }
