@@ -22,7 +22,6 @@ package de.ovgu.featureide.ui.views.collaboration;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.File;
 import java.util.List;
 import java.util.Vector;
 
@@ -57,7 +56,6 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorPart;
@@ -86,7 +84,6 @@ import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.StoppableJob;
 import de.ovgu.featureide.fm.core.WaitingJob;
 import de.ovgu.featureide.fm.ui.GraphicsExporter;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.GEFImageWriter;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.editors.annotation.ColorPalette;
 import de.ovgu.featureide.ui.views.collaboration.action.AddColorSchemeAction;
@@ -554,15 +551,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	
 	@Override
 	public void doSaveAs() {
-//		FileDialog fileDialog = new FileDialog(this.getSite().getShell(), SWT.SAVE);
-//		fileDialog.setFilterExtensions(EXPORT_EXTENSIONS);
-//		fileDialog.setFilterNames(FILDER_NAMES);
-//		fileDialog.setOverwrite(true);
-//		String filePath = fileDialog.open();
-//		if (filePath == null)
-//			return;
-//		File file = new File(filePath);
-//		GEFImageWriter.writeToFile(viewer, file);
 		GraphicsExporter.exportAs(viewer);
 	}
 	
