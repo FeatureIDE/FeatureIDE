@@ -57,46 +57,49 @@ import de.ovgu.featureide.munge.model.MungeModelBuilder;
  * 
  * @author Jens Meinicke
  */
-public class MungePreprocessor extends PPComposerExtensionClass{
-	
+public class MungePreprocessor extends PPComposerExtensionClass {
+
 	protected MungeModelBuilder mungeModelBuilder;
 	public static final String COMMENT_START = "/*";
 	public static final String COMMENT_END = "*/";
 
 	/** all allowed instructions in munge as regular expression */
 	public static final String OPERATORS = "(if(_not)?|else|end)\\[(.+?)\\]";
-	
+
 	/** all allowed instructions in munge as compiled regular expression */
 	public static final Pattern OP_PATTERN = Pattern.compile(OPERATORS);
-	
+
 	/** compiled regular expression for instructions and comment symbols */
 	public static final Pattern OP_COM_PATTERN = Pattern.compile("(" + OPERATORS + ")|/\\*|\\*/");
-	
-	/** is true if actual line is in comment section (between <code>&#47;*</code> and <code>*&#47;</code>) */
+
+	/**
+	 * is true if actual line is in comment section (between <code>&#47;*</code>
+	 * and <code>*&#47;</code>)
+	 */
 	private boolean commentSection;
-	
+
 	public MungePreprocessor() {
 		super("Munge");
 	}
-	
+
 	@Override
 	public boolean initialize(IFeatureProject project) {
 		boolean supSuccess = super.initialize(project);
 		mungeModelBuilder = new MungeModelBuilder(project);
-		
+
 		prepareFullBuild(null);
 		annotationChecking();
-		
-		return supSuccess && mungeModelBuilder!=null;
+
+		return supSuccess && mungeModelBuilder != null;
 	}
-	
-	private static final LinkedHashSet<String> EXTENSIONS = createExtensions(); 
-	
+
+	private static final LinkedHashSet<String> EXTENSIONS = createExtensions();
+
 	private static LinkedHashSet<String> createExtensions() {
 		LinkedHashSet<String> extensions = new LinkedHashSet<String>();
 		extensions.add("java");
 		return extensions;
-	}  
+	}
 
 	@Override
 	public LinkedHashSet<String> extensions() {
@@ -113,13 +116,16 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 		} catch (CoreException e) {
 			MungeCorePlugin.getDefault().logError(e);
 		}
-		
+
 		if (mungeModelBuilder != null)
 			mungeModelBuilder.buildModel();
 	}
-	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.ComposerExtensionClass#postModelChanged()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.ovgu.featureide.core.builder.ComposerExtensionClass#postModelChanged()
 	 */
 	@Override
 	public void postModelChanged() {
@@ -140,14 +146,13 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 		job.setPriority(Job.SHORT);
 		job.schedule();
 	}
-	
+
 	private void annotationChecking(IFolder folder) {
 		try {
 			for (final IResource res : folder.members()) {
 				if (res instanceof IFolder) {
-					annotationChecking((IFolder)res);
-				} else 
-				if (res instanceof IFile){
+					annotationChecking((IFolder) res);
+				} else if (res instanceof IFile) {
 					final Vector<String> lines = loadStringsFromFile((IFile) res);
 					// do checking and some stuff
 					processLinesOfFile(lines, (IFile) res);
@@ -161,10 +166,15 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 	/**
 	 * preprocess all files in folder
 	 * 
-	 * @param sourceFolder folder with files to preprocess
-	 * @param buildFolder folder for preprocessed files
-	 * @param annotationChecking <code>true</code> if preprocessor annotations should be checked
-	 * @param performFullBuild <code>true</code> if the munge should be called
+	 * @param sourceFolder
+	 *            folder with files to preprocess
+	 * @param buildFolder
+	 *            folder for preprocessed files
+	 * @param annotationChecking
+	 *            <code>true</code> if preprocessor annotations should be
+	 *            checked
+	 * @param performFullBuild
+	 *            <code>true</code> if the munge should be called
 	 * @throws CoreException
 	 */
 	protected void preprocessSourceFiles(IFolder buildFolder) throws CoreException {
@@ -172,31 +182,27 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 		for (String feature : activatedFeatures) {
 			args.add("-D" + feature);
 		}
-		
+
 		runMunge(args, featureProject.getSourceFolder(), buildFolder);
 	}
-	
-	
 
 	/**
-	 * Calls munge for each package separate
-	 * Creates all package folders at the build path
+	 * Calls munge for each package separate Creates all package folders at the
+	 * build path
+	 * 
 	 * @param featureArgs
 	 * @param sourceFolder
 	 * @param buildFolder
 	 */
-	protected void runMunge(LinkedList<String> featureArgs, IFolder sourceFolder,
-			IFolder buildFolder) {
-		@SuppressWarnings("unchecked")
-		LinkedList<String> packageArgs = (LinkedList<String>) featureArgs.clone();
+	protected void runMunge(LinkedList<String> featureArgs, IFolder sourceFolder, IFolder buildFolder) {
+		LinkedList<String> packageArgs = new LinkedList<String>(featureArgs);
 		boolean added = false;
 		try {
 			createBuildFolder(buildFolder);
 			for (final IResource res : sourceFolder.members()) {
 				if (res instanceof IFolder) {
-					runMunge(featureArgs, (IFolder)res, buildFolder.getFolder(res.getName()));
-				} else 
-				if (res instanceof IFile){
+					runMunge(featureArgs, (IFolder) res, buildFolder.getFolder(res.getName()));
+				} else if (res instanceof IFile) {
 					added = true;
 					packageArgs.add(res.getRawLocation().toOSString());
 				}
@@ -207,45 +213,49 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 		if (!added) {
 			return;
 		}
-		//add output directory
+		// add output directory
 		packageArgs.add(buildFolder.getRawLocation().toOSString());
-				
-		//CommandLine syntax:
-		//	-DFEATURE1 -DFEATURE2 ... File1 File2 ... outputDirectory
+
+		// CommandLine syntax:
+		// -DFEATURE1 -DFEATURE2 ... File1 File2 ... outputDirectory
 		runMunge(packageArgs);
 	}
 
 	/**
 	 * Do checking for all lines of file.
 	 * 
-	 * @param lines all lines of file
-	 * @param res file
+	 * @param lines
+	 *            all lines of file
+	 * @param res
+	 *            file
 	 */
-	synchronized private void processLinesOfFile(Vector<String> lines, IFile res){
+	synchronized private void processLinesOfFile(Vector<String> lines, IFile res) {
 		expressionStack = new Stack<Node>();
-		
-		// count of if, ifelse and else to remove after processing of else from stack
+
+		// count of if, ifelse and else to remove after processing of else from
+		// stack
 		ifelseCountStack = new Stack<Integer>();
 		ifelseCountStack.push(0);
-		
+
 		commentSection = false;
-		
+
 		// go line for line
 		for (int j = 0; j < lines.size(); ++j) {
 			String line = lines.get(j);
-			
+
 			if (line.contains("/*") || line.contains("*/") || commentSection) {
-				
-				setMarkersContradictionalFeatures(line, res, j+1);
-				
-				setMarkersNotConcreteFeatures(line, res, j+1);
+
+				setMarkersContradictionalFeatures(line, res, j + 1);
+
+				setMarkersNotConcreteFeatures(line, res, j + 1);
 			}
 		}
 	}
-	
+
 	/**
-	 * Checks given line if it contains expressions which are always 
-	 * <code>true</code> or <code>false</code>.<br /><br />
+	 * Checks given line if it contains expressions which are always
+	 * <code>true</code> or <code>false</code>.<br />
+	 * <br />
 	 * 
 	 * Check in three steps:
 	 * <ol>
@@ -254,18 +264,21 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 	 * <li>the given line, the surrounding lines and the feature model</li>
 	 * </ol>
 	 * 
-	 * @param line content of line
-	 * @param res file containing given line
-	 * @param lineNumber line number of given line
+	 * @param line
+	 *            content of line
+	 * @param res
+	 *            file containing given line
+	 * @param lineNumber
+	 *            line number of given line
 	 */
-	private void setMarkersContradictionalFeatures(String line, IFile res, int lineNumber){
-		
+	private void setMarkersContradictionalFeatures(String line, IFile res, int lineNumber) {
+
 		Matcher m = OP_COM_PATTERN.matcher(line);
-		
+
 		while (m.find()) {
 			String completeElement = m.group(0);
 			String singleElement = m.group(2);
-			
+
 			if (singleElement == null) {
 				if (completeElement.equals("/*")) {
 					commentSection = true;
@@ -275,63 +288,58 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 			} else {
 				if (singleElement.startsWith("if") || singleElement.equals("else")) {
 					if (singleElement.equals("else")) {
-						if(!expressionStack.isEmpty()) {
+						if (!expressionStack.isEmpty()) {
 							Node lastElement = new Not(expressionStack.pop().clone());
 							expressionStack.push(lastElement);
 						}
-						
+
 						Node[] nestedExpressions = new Node[expressionStack.size()];
 						nestedExpressions = expressionStack.toArray(nestedExpressions);
-						
+
 						And nestedExpressionsAnd = new And(nestedExpressions);
-						
+
 						isContradictionOrTautology(nestedExpressionsAnd.clone(), true, lineNumber, res);
-						
+
 					} else {
 						Node ppExpression = nodereader.stringToNode(m.group(4), featureList);
-						
+
 						if (singleElement.equals("if_not")) {
 							ppExpression = new Not(ppExpression.clone());
 						}
-						
+
 						if (singleElement.startsWith("if")) {
 							ifelseCountStack.push(0);
 						}
-						
+
 						ifelseCountStack.push(ifelseCountStack.pop() + 1);
 						expressionStack.push(ppExpression);
 						doThreeStepExpressionCheck(ppExpression, lineNumber, res);
 					}
-					
+
 				} else if (singleElement.equals("end")) {
 					for (; ifelseCountStack.peek() > 0; ifelseCountStack.push(ifelseCountStack.pop() - 1)) {
 						if (!expressionStack.isEmpty())
 							expressionStack.pop();
 					}
-					
+
 					ifelseCountStack.pop();
 				}
 			}
 		}
 	}
-	
-	private void setMarkersNotConcreteFeatures(String line, IFile res, int lineNumber){
+
+	private void setMarkersNotConcreteFeatures(String line, IFile res, int lineNumber) {
 		Matcher matcherIf = OP_PATTERN.matcher(line);
-		
+
 		if (matcherIf.find()) {
 			setMarkersOnNotExistingOrAbstractFeature(matcherIf.group(3), lineNumber, res);
 		}
 	}
-	
+
 	protected void runMunge(LinkedList<String> args) {
-		//convert into an Array
-		String[] argArray = new String[args.size()];
-		for (int i = 0;i < args.size();i++) {
-			argArray[i] = args.get(i);
-		}
-		//run Munge
+		// run Munge
 		Munge m = new Munge();
-		m.main(argArray, featureProject);
+		m.main(args.toArray(new String[0]), featureProject);
 	}
 
 	protected void createBuildFolder(IFolder buildFolder) throws CoreException {
@@ -345,13 +353,13 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 	public ArrayList<String[]> getTemplates() {
 		return TEMPLATES;
 	}
-	
+
 	private static final ArrayList<String[]> TEMPLATES = createTempltes();
-	
+
 	private static ArrayList<String[]> createTempltes() {
-		 ArrayList<String[]> list = new  ArrayList<String[]>();
-		 list.add(JAVA_TEMPLATE);
-		 return list;
+		ArrayList<String[]> list = new ArrayList<String[]>();
+		list.add(JAVA_TEMPLATE);
+		return list;
 	}
 
 	@Override
@@ -378,7 +386,7 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 				}
 				return Status.OK_STATUS;
 			}
-			
+
 			private boolean hasMarker(IMarker buildMarker, IFile sourceFile) {
 				try {
 					IMarker[] marker = sourceFile.findMarkers(null, true, IResource.DEPTH_ZERO);
@@ -402,17 +410,17 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 		job.setPriority(Job.DECORATE);
 		job.schedule();
 	}
-	
+
 	private IFile findSourceFile(IFile file, IFolder folder) throws CoreException {
-		for (IResource res: folder.members()) {
+		for (IResource res : folder.members()) {
 			if (res instanceof IFolder) {
-				IFile sourceFile = findSourceFile(file, (IFolder)res);
+				IFile sourceFile = findSourceFile(file, (IFolder) res);
 				if (sourceFile != null) {
 					return sourceFile;
 				}
 			} else if (res instanceof IFile) {
 				if (res.getName().equals(file.getName()))
-					return (IFile)res;
+					return (IFile) res;
 			}
 		}
 		return null;
@@ -422,17 +430,17 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 	public boolean hasFeatureFolder() {
 		return true;
 	}
-	
+
 	@Override
 	public boolean createFolderForFeatures() {
 		return false;
 	}
-	
+
 	@Override
 	public void buildFSTModel() {
 		mungeModelBuilder.buildModel();
 	}
-	
+
 	@Override
 	public void buildConfiguration(IFolder folder, Configuration configuration, String congurationName) {
 		super.buildConfiguration(folder, configuration, congurationName);
@@ -460,7 +468,7 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 	public LinkedList<FSTDirective> buildModelDirectivesForFile(Vector<String> lines) {
 		return mungeModelBuilder.buildModelDirectivesForFile(lines);
 	}
-	
+
 	@Override
 	public boolean needColor() {
 		return true;
@@ -468,8 +476,7 @@ public class MungePreprocessor extends PPComposerExtensionClass{
 
 	@Override
 	public Mechanism getGenerationMechanism() {
-	    return IComposerExtensionClass.Mechanism.PREPROCESSOR;
+		return IComposerExtensionClass.Mechanism.PREPROCESSOR;
 	}
-
 
 }

@@ -30,9 +30,9 @@ import de.ovgu.featureide.ui.wizards.NewFeatureProjectPage;
  */
 public class ConversionPage extends NewFeatureProjectPage {
 	
-	public ConversionPage(String project, IProject p) {
+	public ConversionPage(IProject p) {
 		super();
-		setDescription("Adds the FeatureIDE nature to Android project" + project + ".");
+		setDescription("Adds the FeatureIDE nature to Android project " + ((p != null) ? p.getName() : "") + ".");
 	}
 	
 	@Override
@@ -73,8 +73,9 @@ public class ConversionPage extends NewFeatureProjectPage {
 	    // Filter for Android compatible composers
 	    List<IComposerExtension> androidCompatibleComposers = new ArrayList<IComposerExtension>();
 	    for (IComposerExtension composer : composerExtensions) {
-	    	if (composer.supportsAndroid())
+	    	if (composer.supportsAndroid()) {
 	    		androidCompatibleComposers.add(composer);
+	    	}
 	    }
 	    
 	    extensions = new IComposerExtensionBase[androidCompatibleComposers.size()]; 
@@ -193,13 +194,14 @@ public class ConversionPage extends NewFeatureProjectPage {
 			updateStatus("Build path equals configurations path.");
 			return;
 		}
-		if (isPathEmpty(getSourcePath(), "Source"))return;
-		if (isPathEmpty(getBuildPath(), "Build"))return;
-		if (isPathEmpty(getConfigPath(), "Equations"))return;
-		
-		if (isInvalidPath(getSourcePath(), "Source"))return;
-		if (isInvalidPath(getBuildPath(), "Build"))return;
-		if (isInvalidPath(getConfigPath(), "Equations"))return;
+		if (isPathEmpty(getSourcePath(), "Source")
+				|| isPathEmpty(getBuildPath(), "Build")
+				|| isPathEmpty(getConfigPath(), "Equations")
+				|| isInvalidPath(getSourcePath(), "Source")
+				|| isInvalidPath(getBuildPath(), "Build")
+				|| isInvalidPath(getConfigPath(), "Equations")) {
+			return;
+		}
 		
 		updateStatus(null);
 	}

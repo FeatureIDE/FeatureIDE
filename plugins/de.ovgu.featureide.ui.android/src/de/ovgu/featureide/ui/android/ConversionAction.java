@@ -18,22 +18,20 @@ import de.ovgu.featureide.ui.android.wizards.ConversionWizard;
 public class ConversionAction implements IObjectActionDelegate {
 
 	private ISelection selection;
-	
-	public ConversionAction() {
-	}
 
 	@Override
 	public void run(IAction action) {
-		ConversionWizard wizard = new ConversionWizard();
-		wizard.init(null, (IStructuredSelection) selection);
-		WizardDialog dialog = new WizardDialog(null, wizard);
-		dialog.open();
+		if (selection instanceof IStructuredSelection) {
+			ConversionWizard wizard = new ConversionWizard();
+			wizard.init(null, (IStructuredSelection) selection);
+			WizardDialog dialog = new WizardDialog(null, wizard);
+			dialog.open();
+		}
 	}
 
 	@Override
 	public void selectionChanged(IAction action, ISelection selection) {
 		this.selection = selection;
-
 	}
 
 	@Override
