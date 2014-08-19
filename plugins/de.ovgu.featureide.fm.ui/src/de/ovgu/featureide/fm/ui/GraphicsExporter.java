@@ -134,6 +134,7 @@ public class GraphicsExporter {
 	
 				dialog.open();
 				FMUIPlugin.getDefault().logInfo(infoMessage);
+				return false;
 			}
 		}
 		else
