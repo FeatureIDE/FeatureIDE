@@ -316,9 +316,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 		// getSite().registerContextMenu(menu, graphicalViewer);
 	}
 
-	/*
-	 * TODO: switch between KeyHandler in manual and automatic mode
-	 */
 	public void createKeyBindings() {
 		KeyHandler handler = getKeyHandler();
 		
@@ -430,6 +427,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements
 				extension.extendContextMenu(menu, this);
 			}
 		}
+		
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 		menu.add(this.exportFeatureModelAction);
 	}

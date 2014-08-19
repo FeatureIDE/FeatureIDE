@@ -20,14 +20,23 @@
  */
 package de.ovgu.featureide.fm.ui.editors.keyhandler;
 
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Set;
+
 import org.eclipse.gef.KeyHandler;
 import org.eclipse.gef.KeyStroke;
+import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.gef.ui.parts.GraphicalViewerKeyHandler;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 
+import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
 /**
  * the KeyHandler for the FeatureDiagramEditor
@@ -44,8 +53,12 @@ import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 public class FeatureDiagramEditorKeyHandler extends KeyHandler {
 
 	private FeatureModel featureModel;
-	GraphicalViewerKeyHandler gvKeyHandler;
-	KeyHandler alternativeKeyHandler;
+	private GraphicalViewerKeyHandler gvKeyHandler;
+	private KeyHandler alternativeKeyHandler;
+	private FeatureDiagramEditor viewer;
+	private String toSearchFor;
+	private String recFound;
+	private LinkedList<String> sF;
 	
 	/**
 	 * alternativeKeyHandler handles the KeyEvents, if the GraphicalViewerKeyHandler is active for auto-layout
@@ -59,6 +72,10 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler {
 		gvKeyHandler.setParent(alternativeKeyHandler);
 		setParent(gvKeyHandler);
 		this.featureModel = featureModel;
+		this.viewer = view;
+		toSearchFor = "";
+		recFound = "";
+		sF = new LinkedList<String>();
 	}
 	
 	/*
@@ -69,16 +86,89 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler {
 	public boolean keyPressed(KeyEvent e)
 	{	
 		boolean halt=false;
-		if( featureModel.getLayout().hasFeaturesAutoLayout())
+		
+		// search-handling for letters
+		if(Character.isLetter(e.character))
 		{
-			halt = true;
-			return gvKeyHandler.keyPressed(e);			
+			if(sF.isEmpty())
+				sF = new LinkedList<String>(featureModel.getFeatureOrderList());
+//			for(String c: featureModel.getFeatureNames())
+//			{
+//				sF.add(c);
+//			}
+			Iterator<String> iter = featureModel.getFeatureOrderList().iterator();
+			String curr = "";
+			boolean found = false;
+			toSearchFor += Character.toString(e.character).toLowerCase();
+			
+			while(iter.hasNext() && !found)
+			{
+				curr = iter.next();
+				found = curr.toLowerCase().startsWith(toSearchFor);
+				this.recFound = curr;
+			}
+			
+//			if(toSearchFor.length() > 1)
+//			{
+//				halt = true;
+//			}
+
+			iter = sF.iterator();
+//			
+			if(!found && toSearchFor.length() > 1)
+			{
+				toSearchFor = Character.toString(e.character).toLowerCase();
+				
+				while(iter.hasNext() && !found)
+				{
+					curr = iter.next();
+					found = curr.toLowerCase().startsWith(toSearchFor);
+					
+//					if(found)
+//					{
+//						int indexRec = sF.indexOf(this.recFound);
+//						int indexCurr = sF.indexOf(curr);
+//						if(found = indexRec < indexCurr)
+//							this.recFound = curr;
+//					}
+				}
+			}
+						
+			if(found)
+			{
+				sF.removeFirstOccurrence(curr);
+				// then we have the first occurrence of the featurname
+				Feature foundFeature = featureModel.getFeature(curr);
+				recFound = "";
+				
+				// select the new feature
+				FeatureEditPart part;
+				part = (FeatureEditPart) viewer.getEditPartRegistry().get(foundFeature);
+				viewer.setSelection(new StructuredSelection(part));
+			}
+			else
+			{
+				toSearchFor = "";
+				recFound = "";
+				sF.clear();
+				viewer.setSelection(new StructuredSelection());
+			}
+			return found;
 		}
 		else
 		{
-			halt = true;
-			return super.keyPressed(e);
+			if( featureModel.getLayout().hasFeaturesAutoLayout())
+			{
+				halt = true;
+				return gvKeyHandler.keyPressed(e);			
+			}
+			else
+			{
+				halt = true;
+				return super.keyPressed(e);
+			}
 		}
+		
 	}
 
 
