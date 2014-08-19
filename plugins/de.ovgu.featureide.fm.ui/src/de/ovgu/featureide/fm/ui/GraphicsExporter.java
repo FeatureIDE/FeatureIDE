@@ -60,18 +60,18 @@ public class GraphicsExporter {
 		fileDialog.setFilterNames(filterNames);
 		fileDialog.setOverwrite(true);
 		String filePath = fileDialog.open();
-		if (filePath != null)
-		{
-			file = new File(filePath);
-			if (filePath.endsWith(".m")) {
-				new GuidslWriter(featureModel).writeToFile(file);
-				succ = true;
-			} else if (filePath.endsWith(".xml")) {
-				featureModelWriter.writeToFile(file);
-				succ = true;
-			} else {
-				return GraphicsExporter.exportAs(diagramEditor, file);
-			}
+		if(filePath == null)
+			return false;
+	
+		file = new File(filePath);
+		if (filePath.endsWith(".m")) {
+			new GuidslWriter(featureModel).writeToFile(file);
+			succ = true;
+		} else if (filePath.endsWith(".xml")) {
+			featureModelWriter.writeToFile(file);
+			succ = true;
+		} else {
+			return GraphicsExporter.exportAs(diagramEditor, file);
 		}
 		
 		GraphicsExporter.printExportMessage(file,succ);
