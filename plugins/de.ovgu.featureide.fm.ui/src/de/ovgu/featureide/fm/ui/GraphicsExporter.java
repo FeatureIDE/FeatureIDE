@@ -23,11 +23,11 @@ package de.ovgu.featureide.fm.ui;
 import java.io.File;
 import java.lang.reflect.Method;
 
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.core.internal.runtime.InternalPlatform;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.gef.editparts.LayerManager;
 import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
+import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
@@ -38,19 +38,19 @@ import org.osgi.framework.Bundle;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslWriter;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GEFImageWriter;
 
 /**
- * This class is responsable for exporting grapics (FeatureModel and CollaborationDiagram)
+ * This class is responsible for exporting graphics (FeatureModel and
+ * CollaborationDiagram)
  * 
  * @author Guenter Ulreich
  */
+@SuppressWarnings("restriction")
 public class GraphicsExporter {
 
-	public static boolean exportAs(FeatureModel featureModel, FeatureDiagramEditor diagramEditor, IFeatureModelWriter featureModelWriter)
-	{
+	public static boolean exportAs(FeatureModel featureModel, FeatureDiagramEditor diagramEditor, IFeatureModelWriter featureModelWriter) {
 		boolean succ = false;
 		File file = null;
 		FileDialog fileDialog = new FileDialog(new Shell(), SWT.SAVE);
@@ -60,9 +60,9 @@ public class GraphicsExporter {
 		fileDialog.setFilterNames(filterNames);
 		fileDialog.setOverwrite(true);
 		String filePath = fileDialog.open();
-		if(filePath == null)
+		if (filePath == null)
 			return false;
-	
+
 		file = new File(filePath);
 		if (filePath.endsWith(".m")) {
 			new GuidslWriter(featureModel).writeToFile(file);
@@ -73,14 +73,13 @@ public class GraphicsExporter {
 		} else {
 			return GraphicsExporter.exportAs(diagramEditor, file);
 		}
-		
-		GraphicsExporter.printExportMessage(file,succ);
-		
+
+		GraphicsExporter.printExportMessage(file, succ);
+
 		return succ;
 	}
-	
-	public static boolean exportAs(GraphicalViewerImpl viewer)
-	{
+
+	public static boolean exportAs(GraphicalViewerImpl viewer) {
 		FileDialog fileDialog = new FileDialog(new Shell(), SWT.SAVE);
 		String[] extensions = { "*.png", "*.jpg", "*.bmp", "*.svg" };
 		fileDialog.setFilterExtensions(extensions);
@@ -91,15 +90,13 @@ public class GraphicsExporter {
 		if (filePath == null)
 			return false;
 		File file = new File(filePath);
-		
+
 		return GraphicsExporter.exportAs(viewer, file);
 	}
-	
-	@SuppressWarnings("restriction")
-	public static boolean exportAs(GraphicalViewerImpl viewer, File file)
-	{
+
+	public static boolean exportAs(GraphicalViewerImpl viewer, File file) {
 		boolean succ = false;
-		
+
 		if (file.getAbsolutePath().endsWith(".svg")) {
 			ScalableFreeformRootEditPart part = (ScalableFreeformRootEditPart) viewer.getEditPartRegistry().get(LayerManager.ID);
 			IFigure rootFigure = part.getFigure();
@@ -110,13 +107,13 @@ public class GraphicsExporter {
 					break;
 				}
 			}
-			
+
 			// check if gef-imageexport is existing and activated!
 			if (bundleExportSVG != null) {
 				try {
 					org.osgi.framework.BundleActivator act = ((org.osgi.framework.BundleActivator) bundleExportSVG.loadClass("nl.utwente.ce.imagexport.export.svg.Activator").newInstance());
 					act.start(InternalPlatform.getDefault().getBundleContext());
-					
+
 					Class<?> cl = bundleExportSVG.loadClass("nl.utwente.ce.imagexport.export.svg.ExportSVG");
 					Method m = cl.getMethod("exportImage", String.class, String.class, IFigure.class);
 					m.invoke(cl.newInstance(), "SVG", file.getAbsolutePath(), rootFigure);
@@ -127,37 +124,26 @@ public class GraphicsExporter {
 			} else {
 				final String infoMessage = "Eclipse plugin for exporting diagram in SVG format is not existing." + "\nIf you want to use this, you have to install GEF Imageexport with SVG in Eclipse from "
 						+ "\nhttp://veger.github.com/eclipse-gef-imageexport";
-	
-				MessageDialog dialog = new MessageDialog(new Shell(), "SVG export failed", 
-						FMUIPlugin.getImage("FeatureIconSmall.ico"), infoMessage, MessageDialog.INFORMATION, 
-						new String[] { IDialogConstants.OK_LABEL }, 0);
-	
+
+				MessageDialog dialog = new MessageDialog(new Shell(), "SVG export failed", FMUIPlugin.getImage("FeatureIconSmall.ico"), infoMessage, MessageDialog.INFORMATION, new String[] { IDialogConstants.OK_LABEL }, 0);
+
 				dialog.open();
 				FMUIPlugin.getDefault().logInfo(infoMessage);
 				return false;
 			}
-		}
-		else
-		{
+		} else {
 			GEFImageWriter.writeToFile(viewer, file);
 			succ = true;
 		}
-		
-		GraphicsExporter.printExportMessage(file,succ);
-		
+
+		GraphicsExporter.printExportMessage(file, succ);
+
 		return succ;
 	}
-	
-	public static void printExportMessage(File file, boolean successful)
-	{
+
+	public static void printExportMessage(File file, boolean successful) {
 		boolean done = successful && file != null;
 		String infoMessage = done ? "Graphic export has been saved to\n" + file.getAbsolutePath() : "Nothing has been saved for diagram export...";
-//		String button = IDialogConstants.OK_LABEL;
-//		String headline = "Exporting graphic " + (done ? "sucessful" : "failed");
-//		MessageDialog dialog = new MessageDialog(new Shell(), headline, 
-//			FMUIPlugin.getImage("FeatureIconSmall.ico"), infoMessage, MessageDialog.INFORMATION, 
-//			new String[] { button }, 0);
-//		dialog.open();
 		FMUIPlugin.getDefault().logInfo(infoMessage);
 	}
 }
