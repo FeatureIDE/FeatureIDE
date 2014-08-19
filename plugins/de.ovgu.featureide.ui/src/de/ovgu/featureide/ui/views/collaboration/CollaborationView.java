@@ -412,7 +412,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		menuMgr.add(filterAction);
 		menuMgr.add(showUnselectedAction);
 		menuMgr.add(delAction);
-		menuMgr.add(exportAsAction);
 		
 		if (featureProject.getComposer().showContextFieldsAndMethods()) {
 			MenuManager methodsFieldsSubMenu = new MenuManager("Show Fields and Methods");
@@ -478,6 +477,8 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				menuMgr.add(colorSubMenu);
 			}
 		}
+		menuMgr.add(new Separator());
+		menuMgr.add(exportAsAction);
 	}
 	
 	private void createActions(IEditorPart part) {

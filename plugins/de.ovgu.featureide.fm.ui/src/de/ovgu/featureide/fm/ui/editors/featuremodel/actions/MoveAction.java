@@ -205,8 +205,8 @@ public class MoveAction extends Action {
 			Point oldPos = legendFigure.getLocation();
 			Point newPos = new Point(oldPos.x+deltaX, oldPos.y+deltaY);
 			legendFigure.setLocation(newPos);
-			featureModel.getLayout().setLegendAutoLayout(false);
 			featureModel.getLayout().setLegendPos(newPos.x, newPos.y);
+			featureModel.getLayout().setLegendAutoLayout(false);
 			featureModel.handleLegendLayoutChanged(); 
 			this.isLegendMoving = true;
 		}

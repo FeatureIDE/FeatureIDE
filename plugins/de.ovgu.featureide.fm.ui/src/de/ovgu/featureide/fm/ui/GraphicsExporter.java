@@ -43,7 +43,7 @@ import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GEFImageWriter;
 
 /**
- * TODO description
+ * This class is responsable for exporting grapics (FeatureModel and CollaborationDiagram)
  * 
  * @author Guenter Ulreich
  */
@@ -150,14 +150,14 @@ public class GraphicsExporter {
 	
 	public static void printExportMessage(File file, boolean successful)
 	{
-		String button = IDialogConstants.OK_LABEL;
 		boolean done = successful && file != null;
-		String headline = "Exporting graphic " + (done ? "sucessful" : "failed");
 		String infoMessage = done ? "Graphic export has been saved to\n" + file.getAbsolutePath() : "Nothing has been saved for diagram export...";
-		MessageDialog dialog = new MessageDialog(new Shell(), headline, 
-			FMUIPlugin.getImage("FeatureIconSmall.ico"), infoMessage, MessageDialog.INFORMATION, 
-			new String[] { button }, 0);
-		dialog.open();
+//		String button = IDialogConstants.OK_LABEL;
+//		String headline = "Exporting graphic " + (done ? "sucessful" : "failed");
+//		MessageDialog dialog = new MessageDialog(new Shell(), headline, 
+//			FMUIPlugin.getImage("FeatureIconSmall.ico"), infoMessage, MessageDialog.INFORMATION, 
+//			new String[] { button }, 0);
+//		dialog.open();
 		FMUIPlugin.getDefault().logInfo(infoMessage);
 	}
 }
