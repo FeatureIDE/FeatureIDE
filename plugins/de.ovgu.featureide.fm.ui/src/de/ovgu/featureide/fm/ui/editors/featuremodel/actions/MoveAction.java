@@ -66,6 +66,7 @@ public class MoveAction extends Action {
 	private int deltaX;
     private int deltaY;
     private boolean doStop;
+    private boolean isLegendMoving;
     
 	Object viewer;
 	private FeatureModel featureModel;
@@ -98,7 +99,7 @@ public class MoveAction extends Action {
 		deltaX=0;
 		deltaY=0;
 		doStop = dir == MoveAction.STOP;
-				
+
 		if(!doStop)
 		{
 			if((dir & MoveAction.DOWN) != 0)
@@ -119,8 +120,13 @@ public class MoveAction extends Action {
 		if (viewer instanceof GraphicalViewerImpl) {
 			((GraphicalViewerImpl)viewer).addSelectionChangedListener(listener);
 		}
-		
+		this.init();
+	}
+	
+	private void init()
+	{
 		this.endPositions = new HashMap<Object,Point>();
+		this.isLegendMoving = false;
 	}
 	
 	@Override
@@ -145,7 +151,6 @@ public class MoveAction extends Action {
 				// check for infringe of rules
 				moveFigure(element,doStop);
 			}
-			featureModel.handleModelLayoutChanged();
 		}
 	}
 
@@ -186,12 +191,12 @@ public class MoveAction extends Action {
 			Point oldPos = FeatureUIHelper.getLocation(constraint);
 			Point newPos = new Point(oldPos.x+deltaX, oldPos.y+deltaY);
 //
-//			if(firstRun)
+			if(firstRun)
 //				MoveOperation.initialPositions.put(constraint.getCreationIdentifier(), oldPos);
-//			
-//			if(doStop)
-//				this.endPositions.put(element, newPos);
-//			
+
+			if(doStop)
+				this.endPositions.put(element, newPos);
+			
 			FeatureUIHelper.setLocation(constraint, newPos);
 		}
 		if((element instanceof LegendEditPart) || (element instanceof LegendFigure) || (element instanceof Legend))
@@ -200,6 +205,9 @@ public class MoveAction extends Action {
 			Point oldPos = legendFigure.getLocation();
 			Point newPos = new Point(oldPos.x+deltaX, oldPos.y+deltaY);
 			legendFigure.setLocation(newPos);
+			featureModel.getLayout().setLegendAutoLayout(false);
+			featureModel.handleLegendLayoutChanged(); 
+			this.isLegendMoving = true;
 		}
 
 	}
@@ -217,6 +225,11 @@ public class MoveAction extends Action {
 //		} catch (ExecutionException e) {
 //			FMUIPlugin.getDefault().logError(e);
 //		}
+		if(!isLegendMoving && featureModel.getLayout().hasLegendAutoLayout())
+			featureModel.handleModelDataChanged();
+			
+		
+		this.init();
 	}
 	
 	/**
