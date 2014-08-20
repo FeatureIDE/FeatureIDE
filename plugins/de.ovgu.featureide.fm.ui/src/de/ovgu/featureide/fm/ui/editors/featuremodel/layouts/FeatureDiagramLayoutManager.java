@@ -20,15 +20,21 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.draw2d.PolylineConnection;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.FeatureConnection;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
@@ -94,9 +100,9 @@ abstract public class FeatureDiagramLayoutManager{
 		for(Feature feature : featureModel.getFeatures()){
 			int tempX = FeatureUIHelper.getLocation(feature).x;
 			int tempXOffset= FeatureUIHelper.getSize(feature).width;
-			if(mostRightFeatureX < tempX+tempXOffset) 
+			if(mostRightFeatureX < tempX+tempXOffset)
 				mostRightFeatureX = tempX+tempXOffset;
-			if(mostLeftFeatureX > tempX) 
+			if(mostLeftFeatureX > tempX)
 				mostLeftFeatureX = tempX;
 		}
 		int width = mostRightFeatureX - mostLeftFeatureX;
@@ -130,6 +136,11 @@ abstract public class FeatureDiagramLayoutManager{
 		Point min = new Point (Integer.MAX_VALUE,Integer.MAX_VALUE);
 		Point max = new Point (Integer.MIN_VALUE,Integer.MIN_VALUE);
 		
+		Feature mostRightFeature = null;
+		Feature mostLeftFeature = null;
+		Feature mostHighFeature = null;
+		Feature mostBottomFeature = null;
+		
 		/*
 		 * update lowest, highest, most left, most right coordinates
 		 * for features
@@ -141,14 +152,26 @@ abstract public class FeatureDiagramLayoutManager{
 				continue;
 			Dimension tempSize = FeatureUIHelper.getSize(feature);
 
-			if(temp.x < min.x) 
+			if(temp.x < min.x)
+			{
 				min.x = temp.x;
+				mostLeftFeature = feature;
+			}
 			if(temp.y < min.y) 
+			{
 				min.y = temp.y;
+				mostHighFeature = feature;
+			}
 			if((temp.x + tempSize.width) > max.x)
+			{
 				max.x = temp.x + tempSize.width;
+				mostRightFeature = feature;
+			}
 			if(temp.y + tempSize.height>max.y)
+			{
 				max.y = temp.y + tempSize.height;
+				mostBottomFeature = feature;
+			}
 
 		}
 		
@@ -239,6 +262,96 @@ abstract public class FeatureDiagramLayoutManager{
 				botRight = false;
 			}
 		}
+		
+		// if Legend shouldn't be moved, do...
+		if(!topRight&&!topLeft&&!botLeft&&!botRight)
+		{
+
+			boolean putRight= false;
+			boolean putTop= false;
+			boolean putDown= false;
+			boolean putLeft= false;
+			
+			// TODO: check connections.
+//			LinkedList<FeatureConnection> rightConnections = new LinkedList<FeatureConnection>(mostRightFeature.getSourceConnections());
+//			rightConnections.addAll(mostRightFeature.getTargetConnections());
+//			for(FeatureConnection fc :  rightConnections)
+//			{
+//				
+//			}
+
+//			mostRightFeature
+			LegendFigure legend = FeatureUIHelper.getLegendFigure(featureModel);
+			
+/*
+			PolylineConnection pAct = new PolylineConnection();
+			pAct.setEndpoints(FeatureUIHelper.getLocation(mostRightFeature),FeatureUIHelper.getLocation(mostRightFeature.getParent()));
+			if(pAct.intersects(legend.getBounds()))
+				topRight = true;
+			
+			Iterator<Feature> iRight = mostRightFeature.getChildren().iterator();
+			
+			while(!putRight && iRight.hasNext())
+			{
+				Feature fAct = iRight.next();
+				pAct = new PolylineConnection();
+				pAct.setEndpoints(FeatureUIHelper.getLocation(mostRightFeature),FeatureUIHelper.getLocation(fAct));
+				if(pAct.intersects(legend.getBounds()))
+					putRight = true;
+			}
+			
+//			mostLeftFeature
+			pAct = new PolylineConnection();
+			pAct.setEndpoints(FeatureUIHelper.getLocation(mostLeftFeature),FeatureUIHelper.getLocation(mostLeftFeature.getParent()));
+			if(pAct.intersects(legend.getBounds()))
+				topLeft = true;
+			
+			Iterator<Feature> iLeft = mostLeftFeature.getChildren().iterator();
+			
+			while(!putLeft && iLeft.hasNext())
+			{
+				Feature fAct = iLeft.next();
+				pAct = new PolylineConnection();
+				pAct.setEndpoints(FeatureUIHelper.getLocation(mostLeftFeature),FeatureUIHelper.getLocation(fAct));
+				if(pAct.intersects(legend.getBounds()))
+					putLeft = true;
+			}
+//			mostHighFeature
+			pAct = new PolylineConnection();
+			pAct.setEndpoints(FeatureUIHelper.getLocation(mostHighFeature),FeatureUIHelper.getLocation(mostHighFeature.getParent()));
+			if(pAct.intersects(legend.getBounds()))
+				botLeft = true;
+			
+			Iterator<Feature> iHigh = mostHighFeature.getChildren().iterator();
+			
+			while(!putTop && iHigh.hasNext())
+			{
+				Feature fAct = iHigh.next();
+				pAct = new PolylineConnection();
+				pAct.setEndpoints(FeatureUIHelper.getLocation(mostHighFeature),FeatureUIHelper.getLocation(fAct));
+				if(pAct.intersects(legend.getBounds()))
+					putTop = true;
+			}
+//			mostBottomtFeature
+			pAct = new PolylineConnection();
+			pAct.setEndpoints(FeatureUIHelper.getLocation(mostBottomFeature),FeatureUIHelper.getLocation(mostBottomFeature.getParent()));
+			if(pAct.intersects(legend.getBounds()))
+				botRight = true;
+			
+			Iterator<Feature> iBottom = mostBottomFeature.getChildren().iterator();
+			
+			while(!putDown && iBottom.hasNext())
+			{
+				Feature fAct = iBottom.next();
+				pAct = new PolylineConnection();
+				pAct.setEndpoints(FeatureUIHelper.getLocation(mostBottomFeature),FeatureUIHelper.getLocation(fAct));
+				if(pAct.intersects(legend.getBounds()))
+					putDown = true;
+			}
+*/
+			// TODO: set one outer coordinate of the bound at the Legend
+		}
+		
 		
 		/*
 		 * set the legend position
