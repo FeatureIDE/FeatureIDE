@@ -318,7 +318,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	
 	/**
 	 * 
-	 * @return A list of all feature names. This list is in preorder of the tree. 
+	 * @return A list of all concrete feature names. This list is in preorder of the tree. 
 	 */
 	@Nonnull
 	public List<String> getConcreteFeatureNames() {
