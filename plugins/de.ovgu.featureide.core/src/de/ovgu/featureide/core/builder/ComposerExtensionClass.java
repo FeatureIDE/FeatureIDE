@@ -130,7 +130,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		}
 	}
 	
-	private void copy(IFolder featureFolder, IFolder buildFolder) throws CoreException {
+	protected void copy(IFolder featureFolder, IFolder buildFolder) throws CoreException {
 		if (!featureFolder.exists()) {
 			return;
 		}
@@ -368,6 +368,10 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	
 	public boolean createFolderForFeatures() {
 		return true;
+	}
+	
+	public boolean supportsAndroid() {
+		return false;
 	}
 	
 	protected boolean isPluginInstalled(String ID) {

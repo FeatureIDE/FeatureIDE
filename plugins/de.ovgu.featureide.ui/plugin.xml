@@ -54,12 +54,18 @@
             id="de.ovgu.featureide.ui.actions.conversionaction"
             objectClass="org.eclipse.core.resources.IProject">
          <visibility>
-         	<not>
-         		<objectState
-         			name="nature"
-         			value="de.ovgu.featureide.core.featureProjectNature">
-         		</objectState>	
-         	</not>
+            <not>
+               <or>
+                  <objectState
+                        name="nature"
+                        value="de.ovgu.featureide.core.featureProjectNature">
+                  </objectState>
+                  <objectState
+                        name="nature"
+                        value="com.android.ide.eclipse.adt.AndroidNature">
+                  </objectState>
+               </or>
+            </not>
          </visibility>
          <action
                class="de.ovgu.featureide.ui.actions.ConversionAction"

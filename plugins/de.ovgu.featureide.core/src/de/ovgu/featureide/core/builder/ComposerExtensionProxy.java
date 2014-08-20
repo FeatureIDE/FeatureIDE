@@ -111,5 +111,9 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	public boolean createFolderForFeatures() {
 		return defaultComposerExtensionClass.createFolderForFeatures();
 	}
+	
+	public boolean supportsAndroid() {
+		return defaultComposerExtensionClass.supportsAndroid();
+	}
 
 }
