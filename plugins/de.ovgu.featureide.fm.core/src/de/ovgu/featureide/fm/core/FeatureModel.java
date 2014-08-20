@@ -318,7 +318,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	
 	/**
 	 * 
-	 * @return A list of all concrete feature names. This list is in preorder of the tree. 
+	 * @return A list of all feature names. This list is in preorder of the tree. 
 	 */
 	@Nonnull
 	public List<String> getConcreteFeatureNames() {
@@ -327,6 +327,30 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 			concreteFeatureNames.add(f.getName());
 		}
 		return concreteFeatureNames;
+	}
+	
+	public Collection<Feature> getFeaturesPreorder() {
+		List<Feature> preorderFeatures = new LinkedList<Feature>();
+		if (rootFeature != null) {
+			getFeaturesPreorder(rootFeature, preorderFeatures);
+		}
+		return Collections.unmodifiableCollection(preorderFeatures);
+	}
+
+	private void getFeaturesPreorder(Feature feature, List<Feature> preorderFeatures) {
+		
+		preorderFeatures.add(feature);
+		for (Feature child : feature.getChildren()) {
+			getFeaturesPreorder(child, preorderFeatures);
+		}
+	}
+	
+	public List<String> getFeatureNamesPreorder() {
+		List<String> preorderFeaturesNames = new LinkedList<String>();
+		for (Feature f : getFeaturesPreorder()) {
+			preorderFeaturesNames.add(f.getName());
+		}
+		return preorderFeaturesNames;
 	}
 	
 	/**
@@ -522,6 +546,10 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	
 	public void handleModelLayoutChanged() {
 		fireEvent(MODEL_LAYOUT_CHANGED);
+	}
+	
+	public void handleLegendLayoutChanged() {
+		fireEvent(LEGEND_LAYOUT_CHANGED);
 	}
 	
 	public void refreshContextMenu() {
