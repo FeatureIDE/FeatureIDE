@@ -22,21 +22,20 @@ package de.ovgu.featureide.fm.ui.editors.keyhandler;
 
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Set;
 
 import org.eclipse.gef.KeyHandler;
 import org.eclipse.gef.KeyStroke;
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.gef.ui.parts.GraphicalViewerKeyHandler;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
 
 /**
  * the KeyHandler for the FeatureDiagramEditor
@@ -45,6 +44,8 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
  * =================
  * to ensure that actions registered in @see createKeyBindings() will be handled first!
  * default actions will be handled at last!
+ * 
+ * Handles searching of features in the Tree
  * 
  * At Automatic-Layout: run @see GraphicalViewerKeyHandler first
  * 
@@ -56,9 +57,10 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler {
 	private GraphicalViewerKeyHandler gvKeyHandler;
 	private KeyHandler alternativeKeyHandler;
 	private FeatureDiagramEditor viewer;
-	private String toSearchFor;
-	private String recFound;
 	private LinkedList<String> sF;
+	Iterator<String> sFIter;
+	private String toSearchFor;
+	private String curr;
 	
 	/**
 	 * alternativeKeyHandler handles the KeyEvents, if the GraphicalViewerKeyHandler is active for auto-layout
@@ -74,72 +76,92 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler {
 		this.featureModel = featureModel;
 		this.viewer = view;
 		toSearchFor = "";
-		recFound = "";
+		curr = "";
 		sF = new LinkedList<String>();
+		sFIter = sF.iterator();
+	}
+		
+	private void resetSearchList()
+	{
+		sF = new LinkedList<String>();
+//		sF.addAll(featureModel.getFeatureNames());
+//		
+		// traverse preorder
+		sF.addAll(featureModel.getFeatureNamesPreorder());
+//		for(Feature f : featureModel.getConcreteFeatures())
+//		{
+//			sF.add(f.getName());
+//		}
+		
+		sFIter = sF.iterator();
 	}
 	
 	/*
-	 * use @see GraphicalViewerKeyHandler if
+	 * use @see GraphicalViewerKeyHandler first if auto-layout is active
+	 * handles the searching on the graph (depth-first, same way as in Outline)
 	 * @see org.eclipse.gef.KeyHandler#keyPressed(org.eclipse.swt.events.KeyEvent)
 	 */
 	@Override
 	public boolean keyPressed(KeyEvent e)
-	{	
-		boolean halt=false;
+	{
 		
 		// search-handling for letters
-		if(Character.isLetter(e.character))
+		if(Character.isLetter(e.character)
+				// and if no control-characters are pressed
+				)
 		{
-			if(sF.isEmpty())
-				sF = new LinkedList<String>(featureModel.getFeatureOrderList());
-//			for(String c: featureModel.getFeatureNames())
-//			{
-//				sF.add(c);
-//			}
-			Iterator<String> iter = featureModel.getFeatureOrderList().iterator();
-			String curr = "";
-			boolean found = false;
+			if(toSearchFor.length() == 0) // start search
+				resetSearchList();
+
+			// if 1 feature is selected
+			// set Iterator to this position if the iterator is not yet at the current selected position;
+			boolean found = updateIterator();
+						
+			boolean startFoundSomething = toSearchFor.length() <= 1;
+			boolean doUpdateIterator = false;
+			
+			// if always typing the same character, get next feature after selected one
+			if(startFoundSomething && toSearchFor.startsWith(Character.toString(e.character).toLowerCase()))
+			{
+				toSearchFor = "";
+				//doUpdateIterator = true;
+			}
+
 			toSearchFor += Character.toString(e.character).toLowerCase();
 			
-			while(iter.hasNext() && !found)
-			{
-				curr = iter.next();
+			if(toSearchFor.length() > 1 && curr.length() > 0 && found
+//					|| (!found && curr.length() > 0 && toSearchFor.length() == 1))
+					)
 				found = curr.toLowerCase().startsWith(toSearchFor);
-				this.recFound = curr;
-			}
-			
-//			if(toSearchFor.length() > 1)
-//			{
-//				halt = true;
-//			}
+			else
+				found = false;
 
-			iter = sF.iterator();
-//			
+			// search from actual selected position (or from start)
+			if(!found)
+				found = setFound();
+			
+			// restart with last character, if current searching for a word with more than 1 character failed...
 			if(!found && toSearchFor.length() > 1)
 			{
 				toSearchFor = Character.toString(e.character).toLowerCase();
-				
-				while(iter.hasNext() && !found)
-				{
-					curr = iter.next();
-					found = curr.toLowerCase().startsWith(toSearchFor);
-					
-//					if(found)
-//					{
-//						int indexRec = sF.indexOf(this.recFound);
-//						int indexCurr = sF.indexOf(curr);
-//						if(found = indexRec < indexCurr)
-//							this.recFound = curr;
-//					}
-				}
+				doUpdateIterator = true;
+				startFoundSomething = true;
 			}
-						
+			
+			// restart search if there has been already found a feature with one character and after this, there is no other one
+			// -> start from beginning (at least it would result in the same feature)
+			if(startFoundSomething && !found)
+			{
+				this.resetSearchList();
+				if(doUpdateIterator) // step to selected position
+					updateIterator();
+				found = setFound();
+			}
+			
 			if(found)
 			{
-				sF.removeFirstOccurrence(curr);
 				// then we have the first occurrence of the featurname
 				Feature foundFeature = featureModel.getFeature(curr);
-				recFound = "";
 				
 				// select the new feature
 				FeatureEditPart part;
@@ -149,8 +171,8 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler {
 			else
 			{
 				toSearchFor = "";
-				recFound = "";
-				sF.clear();
+				curr = "";
+				resetSearchList();
 				viewer.setSelection(new StructuredSelection());
 			}
 			return found;
@@ -159,18 +181,63 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler {
 		{
 			if( featureModel.getLayout().hasFeaturesAutoLayout())
 			{
-				halt = true;
 				return gvKeyHandler.keyPressed(e);			
 			}
 			else
 			{
-				halt = true;
 				return super.keyPressed(e);
 			}
 		}
 		
 	}
 
+	/*
+	 * does the searching
+	 */
+	private boolean setFound()
+	{
+		boolean found = false;
+		while(sFIter.hasNext() && !found)
+		{
+			curr = sFIter.next();
+			found = curr.toLowerCase().startsWith(toSearchFor);
+		}
+		return found;
+	}
+	
+	/*
+	 * sets iterator and curr
+	 */
+	private boolean updateIterator()
+	{
+		IStructuredSelection sel = (IStructuredSelection) viewer.getSelection();
+		boolean found = false;
+		if(sel.size() == 1 && !(sel.getFirstElement() instanceof ModelEditPart))
+		{
+			Object element = sel.toArray()[0];
+			if ((element instanceof FeatureEditPart) || (element instanceof Feature))
+			{
+				Feature feature = element instanceof FeatureEditPart ? ((FeatureEditPart) element).getFeature() : (Feature) element;
+				
+				if(curr.length() > 0 && !feature.getName().toLowerCase().equals(curr.toLowerCase()))
+				{
+					String selItem = "";
+					while(sFIter.hasNext() && !found)
+					{
+						selItem = sFIter.next();
+						found = selItem.toLowerCase().equals(feature.getName().toLowerCase());
+					}
+					curr = selItem;
+				}
+				else
+				{
+					curr.toLowerCase().equals(feature.getName().toLowerCase());
+				}
+			}
+		}
+		return found;
+	}
+	
 
 	/*
 	 * to handle 2 KeyHandler (otherwise there would be an action loop)
