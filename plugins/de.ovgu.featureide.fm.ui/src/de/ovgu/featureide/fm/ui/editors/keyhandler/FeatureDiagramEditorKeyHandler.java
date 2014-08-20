@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.keyhandler;
 
+import java.util.Calendar;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -61,6 +62,8 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler {
 	Iterator<String> sFIter;
 	private String toSearchFor;
 	private String curr;
+	private long lastTime;
+	private final long thresholdTimeout = 1000;
 	
 	/**
 	 * alternativeKeyHandler handles the KeyEvents, if the GraphicalViewerKeyHandler is active for auto-layout
@@ -79,6 +82,7 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler {
 		curr = "";
 		sF = new LinkedList<String>();
 		sFIter = sF.iterator();
+		lastTime = 0;
 	}
 		
 	private void resetSearchList()
@@ -104,12 +108,21 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler {
 	@Override
 	public boolean keyPressed(KeyEvent e)
 	{
+		long currentTime = System.currentTimeMillis();
 		
-		// search-handling for letters
-		if(Character.isLetter(e.character)
-				// and if no control-characters are pressed
-				)
-		{
+		// search-handling for letters and if no control-characters are pressed
+		if(!Character.isISOControl(e.character))
+		{		
+			if(lastTime!=0)
+			{
+				if(currentTime-lastTime > thresholdTimeout)
+				{
+					toSearchFor = "";
+				}
+			}
+			lastTime = currentTime;
+			
+			
 			if(toSearchFor.length() == 0) // start search
 				resetSearchList();
 
@@ -167,6 +180,7 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler {
 				FeatureEditPart part;
 				part = (FeatureEditPart) viewer.getEditPartRegistry().get(foundFeature);
 				viewer.setSelection(new StructuredSelection(part));
+				viewer.reveal(part);
 			}
 			else
 			{
@@ -231,7 +245,7 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler {
 				}
 				else
 				{
-					curr.toLowerCase().equals(feature.getName().toLowerCase());
+					found = curr.toLowerCase().equals(feature.getName().toLowerCase());
 				}
 			}
 		}
