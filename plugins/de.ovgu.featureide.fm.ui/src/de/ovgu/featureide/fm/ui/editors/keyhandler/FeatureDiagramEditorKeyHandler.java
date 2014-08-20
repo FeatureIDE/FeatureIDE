@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.keyhandler;
 
-import java.util.Calendar;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -51,6 +50,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
  * At Automatic-Layout: run @see GraphicalViewerKeyHandler first
  * 
  * @author Guenter Ulreich
+ * @author Andy Koch
  */
 public class FeatureDiagramEditorKeyHandler extends KeyHandler {
 
@@ -137,7 +137,6 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler {
 			if(startFoundSomething && toSearchFor.startsWith(Character.toString(e.character).toLowerCase()))
 			{
 				toSearchFor = "";
-				//doUpdateIterator = true;
 			}
 
 			toSearchFor += Character.toString(e.character).toLowerCase();
