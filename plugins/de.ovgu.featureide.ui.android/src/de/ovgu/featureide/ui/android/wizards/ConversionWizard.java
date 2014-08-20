@@ -23,10 +23,10 @@ public class ConversionWizard extends Wizard implements INewWizard {
 
 	private ConversionPage page;
 	private IStructuredSelection selection;
-	
+
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
-		String project = "";
+		setWindowTitle("Add FeatureIDE Nature to Android Project");
 
 		// get selected project
 		Object obj = selection.getFirstElement();
@@ -34,27 +34,26 @@ public class ConversionWizard extends Wizard implements INewWizard {
 		if (obj instanceof IResource) {
 			IResource res = (IResource) obj;
 			p = res.getProject();
-			project = p.getName();
 		}
 
-		page = new ConversionPage(" " + project, p);
+		page = new ConversionPage(p);
 		this.selection = selection;
 	}
 
 	@Override
 	public boolean performFinish() {
-		
+
 		Object obj = selection.getFirstElement();
 		if (obj instanceof IResource) {
 			if (page.hasCompositionTool()) {
 				IProject project = ((IResource) obj).getProject();
 				if (project.isOpen()) {
-					
+
 					// Copy Android src and res folders to feature source path
 					IFolder folderSrc = project.getFolder("src");
 					IFolder folderRes = project.getFolder("res");
 					IFolder newSourceFolder = project.getFolder(page.getSourcePath());
-					
+
 					try {
 						if (!newSourceFolder.exists()) {
 							newSourceFolder.create(false, true, null);
@@ -67,19 +66,16 @@ public class ConversionWizard extends Wizard implements INewWizard {
 						if (folderRes.exists()) {
 							folderRes.move(newSourceFolder.getFullPath().append("/res"), false, null);
 						} else {
-							newSourceFolder.getFolder("res").create(false, true,  null);
+							newSourceFolder.getFolder("res").create(false, true, null);
 						}
 						project.refreshLocal(IResource.DEPTH_INFINITE, null);
 					} catch (CoreException e) {
 						AndroidUIPlugin.getDefault().logError(e);
 					}
-					
-					CorePlugin.setupProject(project, page
-							.getCompositionTool().getId(), page.getSourcePath(),
-							page.getConfigPath(), page.getBuildPath());
-					
-					AndroidUIPlugin.getDefault().openEditor(FeatureModelEditor.ID,
-							project.getFile("model.xml"));
+
+					CorePlugin.setupProject(project, page.getCompositionTool().getId(), page.getSourcePath(), page.getConfigPath(), page.getBuildPath());
+
+					AndroidUIPlugin.getDefault().openEditor(FeatureModelEditor.ID, project.getFile("model.xml"));
 				} else {
 					return false;
 				}
@@ -92,7 +88,6 @@ public class ConversionWizard extends Wizard implements INewWizard {
 
 	@Override
 	public void addPages() {
-		setWindowTitle("Add FeatureIDE Nature to Android Project");
 		addPage(page);
 		super.addPages();
 	}
