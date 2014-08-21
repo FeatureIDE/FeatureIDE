@@ -109,27 +109,21 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements Proper
 		}
 		lastTime = currentTime;
 		
-		if (curSearchString.isEmpty())  {
+		if (curSearchString.isEmpty())
 			resetIterator();
-		} else {
-			updateIterator();
-			
-			if (curSearchString.length() == 1 && curSearchString.charAt(0) == Character.toLowerCase(e.character)) {
-				curSearchString = "";
-				curIndex = (curIndex + 1) % featureList.size();
-			}
+		
+		updateIterator();
+		
+		if (curSearchString.length() == 1 && curSearchString.charAt(0) == Character.toLowerCase(e.character)) {
+			curSearchString = "";
+			curIndex = (curIndex + 1) % featureList.size();
 		}
 		
 		curSearchString += Character.toLowerCase(e.character);
 		search();
-		
-		if (curFeatureName.isEmpty()) {
-			curSearchString = Character.toString(e.character).toLowerCase();
-			search();
-		}
 
 		if (curFeatureName.isEmpty()) {
-			curSearchString = ""; 
+			curSearchString = "";  // keep selection, if nothing found
 		} else {
 			// select the new feature
 			FeatureEditPart part = (FeatureEditPart) viewer.getEditPartRegistry().get(featureModel.getFeature(curFeatureName));
@@ -189,8 +183,10 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements Proper
 				return false;
 			}
 			
+			curIndex = featureList.indexOf(feature.getName());
+			
 			if (!feature.getName().equalsIgnoreCase(curFeatureName)) {
-				curIndex = featureList.indexOf(curFeatureName);
+				curFeatureName = feature.getName();
 				return true;
 			}
 		}
