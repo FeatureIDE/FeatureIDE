@@ -20,12 +20,31 @@
  */
 package de.ovgu.featureide.ui.wizards;
 
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Properties;
+import java.util.Set;
+
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.window.Window;
+import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.ui.INewWizard;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
+import org.eclipse.ui.statushandlers.StatusManager;
+import org.eclipse.ui.wizards.IWizardDescriptor;
 import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
+import de.ovgu.featureide.munge_android.AndroidProjectConversion;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
@@ -38,6 +57,8 @@ import de.ovgu.featureide.ui.UIPlugin;
  * @author Tom Brosch
  * @author Janet Feigenspan
  * @author Sven Schuster
+ * @author Lars-Christian Schulz
+ * @author Eric Guimatsia
  */
 public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 
@@ -56,6 +77,10 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 	
 	@Override
 	public boolean canFinish() {
+		if (page.getCompositionTool().getId().equals("de.ovgu.featureide.preprocessor.munge-android")) {
+			return page.isPageComplete();
+		}
+		
 		if(wizardExtension != null)
 			return wizardExtension.isFinished();
 		else
@@ -88,32 +113,124 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 		else if(wizardExtension != null) {
 			return wizardExtension.getNextPage(page);
 		}
-		// every other occurence (
+		// every other occurrence
 		else {
 			return super.getNextPage(page);
 		}
 	}
 	
-	public boolean performFinish() {
-		if (!super.performFinish())
-			return false;
-		if (page.hasCompositionTool()) {
-			// create feature project
-			CorePlugin.setupFeatureProject(getNewProject(), page.getCompositionTool().getId()
-					,page.getSourcePath(),page.getConfigPath(),page.getBuildPath(), true);
-
-			// enhance project depending on extension
-			if(wizardExtension != null && wizardExtension.isFinished()) {
-				try {
-					wizardExtension.enhanceProject(getNewProject(),page.getSourcePath(),page.getConfigPath(),page.getBuildPath());
-				} catch (CoreException e) {
-					UIPlugin.getDefault().logError(e);
+	/**
+	 * Check whether the given newly created Android project is an support library project.
+	 */
+	private boolean isAndroidSupportLibraryProject(IProject project) {
+		IFile propertiesFile = project.getFile("project.properties");
+		if (propertiesFile.exists()) {
+			Properties properties = new Properties();
+			try {
+				properties.load(propertiesFile.getContents());
+				String isLibrary = properties.getProperty("android.library");
+				if (isLibrary == null || isLibrary.equals("false")) {
+					return false;
 				}
+				for (Object key : properties.keySet()) {
+					if (key instanceof String) {
+						String strKey = (String)key;
+						final String ref = "android.library.reference";
+						if (strKey.regionMatches(0, ref, 0, ref.length())) {
+							return false;
+						}
+					}
+				}
+			} catch (IOException e) {
+				return false;
+			} catch (CoreException e) {
+				return false;
 			}
-			// open editor
-			UIPlugin.getDefault().openEditor(FeatureModelEditor.ID, getNewProject().getFile("model.xml"));
-
 		}
 		return true;
+	}
+	
+	public boolean performFinish() {
+		if (page.hasCompositionTool() && page.getCompositionTool().getId().equals("de.ovgu.featureide.preprocessor.munge-android")) {
+			IWizardDescriptor wizDesc = PlatformUI.getWorkbench().getNewWizardRegistry().findWizard("com.android.ide.eclipse.adt.project.NewProjectWizard");
+			if (wizDesc != null) {
+				try {
+					IWizard wizard = wizDesc.createWizard();
+					if (wizard instanceof INewWizard) {
+						// save all projects before Android project wizard runs
+						Set<IProject> projectsBefore = new HashSet<IProject>();
+						Collections.addAll(projectsBefore, ResourcesPlugin.getWorkspace().getRoot().getProjects());
+						
+						// call Android project wizard
+						INewWizard newWizard = (INewWizard) wizard;
+						newWizard.init(PlatformUI.getWorkbench(), this.getSelection());
+						WizardDialog dialog = new WizardDialog(null, wizard);
+						
+						boolean pageWasComplete = page.isPageComplete();
+						page.setPageComplete(false); // to prevent user actions while the Android wizard runs
+						if (dialog.open() != Window.OK) {
+							// Android wizard was canceled
+							page.setPageComplete(pageWasComplete);
+							return false;
+						}
+						
+						// compare with projects after Android project creation to find new project
+						Set<IProject> projectsAfter = new HashSet<IProject>();
+						Collections.addAll(projectsAfter, ResourcesPlugin.getWorkspace().getRoot().getProjects());
+						projectsAfter.removeAll(projectsBefore);
+						
+						IProject project = null;
+						if (projectsAfter.size() == 1) {
+							project = (IProject) projectsAfter.toArray()[0];
+						} else if (projectsAfter.size() > 1) {
+							// The Android wizard automatically creates a support library project if needed.
+							// Therefore the right project must be searched if multiple projects were created.
+							for (Object proj : projectsAfter) {
+								if (!isAndroidSupportLibraryProject((IProject)proj)) {
+									project = (IProject) proj;
+									break;
+								}
+							}
+						} else {
+							return false;
+						}
+						
+						// convert newly created android project
+						AndroidProjectConversion.convertAndroidProject(project, page.getCompositionTool().getId(),
+								page.getSourcePath(), page.getConfigPath(), page.getBuildPath());
+						
+					}
+				} catch (CoreException e) {
+					UIPlugin.getDefault().logError(e);
+					return false;
+				}
+			} else {
+				IStatus status = new Status(IStatus.ERROR, UIPlugin.PLUGIN_ID, "The Android Development Tools must be installed to create an Android project.");
+				StatusManager.getManager().handle(status, StatusManager.SHOW);
+				return false;
+			}
+			return true;
+		} else {
+			if (!super.performFinish())
+				return false;
+			if (page.hasCompositionTool()) {
+				// create feature project
+				CorePlugin.setupFeatureProject(getNewProject(), page.getCompositionTool().getId()
+						,page.getSourcePath(),page.getConfigPath(),page.getBuildPath(), true);
+	
+				// enhance project depending on extension
+				if(wizardExtension != null && wizardExtension.isFinished()) {
+					try {
+						wizardExtension.enhanceProject(getNewProject(),page.getSourcePath(),page.getConfigPath(),page.getBuildPath());
+					} catch (CoreException e) {
+						UIPlugin.getDefault().logError(e);
+					}
+				}
+				// open editor
+				UIPlugin.getDefault().openEditor(FeatureModelEditor.ID, getNewProject().getFile("model.xml"));
+	
+			}
+			return true;
+		}
 	}
 }

@@ -94,7 +94,6 @@ public class MungeAndroidPreprocessor extends MungePreprocessor {
 
 			build.getFolder("src").move(dst.append("/src"), IFolder.DERIVED, null);
 			build.getFolder("res").move(dst.append("/res"), IFolder.DERIVED, null);
-			build.delete(true, null);
 		} catch (CoreException e) {
 			MungeAndroidCorePlugin.getDefault().logError(e);
 		}
