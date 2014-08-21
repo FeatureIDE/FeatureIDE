@@ -31,9 +31,11 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
@@ -41,14 +43,16 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
+import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.wizards.IWizardDescriptor;
 import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
-import de.ovgu.featureide.munge_android.AndroidProjectConversion;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.ui.UIPlugin;
+import de.ovgu.featureide.munge_android.AndroidProjectConversion;
+
 /**
  * A creation wizard for FeatureIDE projects that adds the FeatureIDE nature after creation.
  * 
@@ -119,6 +123,62 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 		}
 	}
 	
+	private boolean createAndroidProject(String compositionTool, String sourcePath, String configPath, String buildPath) {
+		IWizardDescriptor wizDesc = PlatformUI.getWorkbench().getNewWizardRegistry().findWizard("com.android.ide.eclipse.adt.project.NewProjectWizard");
+		if (wizDesc != null) {
+			try {
+				IWizard wizard = wizDesc.createWizard();
+				if (wizard instanceof INewWizard) {
+					// save all projects before Android project wizard runs
+					Set<IProject> projectsBefore = new HashSet<IProject>();
+					Collections.addAll(projectsBefore, ResourcesPlugin.getWorkspace().getRoot().getProjects());
+					
+					// call Android project wizard
+					INewWizard newWizard = (INewWizard) wizard;
+					newWizard.init(PlatformUI.getWorkbench(), this.getSelection());
+					WizardDialog dialog = new WizardDialog(null, wizard);
+					
+					if (dialog.open() != Window.OK) {
+						return false; // Android wizard was canceled
+					}
+					
+					// compare with projects after Android project creation to find new project
+					Set<IProject> projectsAfter = new HashSet<IProject>();
+					Collections.addAll(projectsAfter, ResourcesPlugin.getWorkspace().getRoot().getProjects());
+					projectsAfter.removeAll(projectsBefore);
+					
+					IProject project = null;
+					if (projectsAfter.size() == 1) {
+						project = (IProject) projectsAfter.toArray()[0];
+					} else if (projectsAfter.size() > 1) {
+						// The Android wizard automatically creates a support library project if needed.
+						// Therefore the right project must be searched if multiple projects were created.
+						for (Object proj : projectsAfter) {
+							if (!isAndroidSupportLibraryProject((IProject)proj)) {
+								project = (IProject) proj;
+								break;
+							}
+						}
+					} else {
+						return false;
+					}
+					
+					// convert newly created android project
+					AndroidProjectConversion.convertAndroidProject(project, compositionTool, sourcePath, configPath, buildPath);
+					
+				}
+			} catch (CoreException e) {
+				UIPlugin.getDefault().logError(e);
+				return false;
+			}
+		} else {
+			IStatus status = new Status(IStatus.ERROR, UIPlugin.PLUGIN_ID, "The Android Development Tools must be installed to create an Android project.");
+			StatusManager.getManager().handle(status, StatusManager.SHOW);
+			return false;
+		}
+		return true;
+	}
+	
 	/**
 	 * Check whether the given newly created Android project is an support library project.
 	 */
@@ -152,63 +212,24 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 	
 	public boolean performFinish() {
 		if (page.hasCompositionTool() && page.getCompositionTool().getId().equals("de.ovgu.featureide.preprocessor.munge-android")) {
-			IWizardDescriptor wizDesc = PlatformUI.getWorkbench().getNewWizardRegistry().findWizard("com.android.ide.eclipse.adt.project.NewProjectWizard");
-			if (wizDesc != null) {
-				try {
-					IWizard wizard = wizDesc.createWizard();
-					if (wizard instanceof INewWizard) {
-						// save all projects before Android project wizard runs
-						Set<IProject> projectsBefore = new HashSet<IProject>();
-						Collections.addAll(projectsBefore, ResourcesPlugin.getWorkspace().getRoot().getProjects());
-						
-						// call Android project wizard
-						INewWizard newWizard = (INewWizard) wizard;
-						newWizard.init(PlatformUI.getWorkbench(), this.getSelection());
-						WizardDialog dialog = new WizardDialog(null, wizard);
-						
-						boolean pageWasComplete = page.isPageComplete();
-						page.setPageComplete(false); // to prevent user actions while the Android wizard runs
-						if (dialog.open() != Window.OK) {
-							// Android wizard was canceled
-							page.setPageComplete(pageWasComplete);
-							return false;
-						}
-						
-						// compare with projects after Android project creation to find new project
-						Set<IProject> projectsAfter = new HashSet<IProject>();
-						Collections.addAll(projectsAfter, ResourcesPlugin.getWorkspace().getRoot().getProjects());
-						projectsAfter.removeAll(projectsBefore);
-						
-						IProject project = null;
-						if (projectsAfter.size() == 1) {
-							project = (IProject) projectsAfter.toArray()[0];
-						} else if (projectsAfter.size() > 1) {
-							// The Android wizard automatically creates a support library project if needed.
-							// Therefore the right project must be searched if multiple projects were created.
-							for (Object proj : projectsAfter) {
-								if (!isAndroidSupportLibraryProject((IProject)proj)) {
-									project = (IProject) proj;
-									break;
-								}
-							}
-						} else {
-							return false;
-						}
-						
-						// convert newly created android project
-						AndroidProjectConversion.convertAndroidProject(project, page.getCompositionTool().getId(),
-								page.getSourcePath(), page.getConfigPath(), page.getBuildPath());
-						
+			final String compositionTool = page.getCompositionTool().getId();
+			final String sourcePath = page.getSourcePath();
+			final String configPath = page.getConfigPath();
+			final String buildPath = page.getBuildPath();
+			
+			UIJob job = new UIJob("Creating Android project") {
+				@Override
+				public IStatus runInUIThread(IProgressMonitor monitor) {
+					if (createAndroidProject(compositionTool, sourcePath, configPath, buildPath)) {
+						return Status.OK_STATUS;
+					} else {
+						return Status.CANCEL_STATUS;
 					}
-				} catch (CoreException e) {
-					UIPlugin.getDefault().logError(e);
-					return false;
 				}
-			} else {
-				IStatus status = new Status(IStatus.ERROR, UIPlugin.PLUGIN_ID, "The Android Development Tools must be installed to create an Android project.");
-				StatusManager.getManager().handle(status, StatusManager.SHOW);
-				return false;
-			}
+			};
+			job.setPriority(Job.LONG);
+			job.schedule();
+			
 			return true;
 		} else {
 			if (!super.performFinish())
