@@ -129,8 +129,7 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements Proper
 		}
 
 		if (curFeatureName.isEmpty()) {
-			curSearchString = "";
-			viewer.setSelection(new StructuredSelection());
+			curSearchString = ""; 
 		} else {
 			// select the new feature
 			FeatureEditPart part = (FeatureEditPart) viewer.getEditPartRegistry().get(featureModel.getFeature(curFeatureName));
