@@ -215,11 +215,6 @@ public class NewFeatureProjectPage extends WizardPage {
 		sourcePath.setEnabled(compositionTool.hasFeatureFolder());
 		buildPath.setEnabled(compositionTool.hasSourceFolder());
 		
-		if (compositionTool.supportsAndroid()) {
-			updateStatus("Currently android projects must first be created using the Android project wizard." +
-					" An Android project can be converted to a FeatureIDE project using \"Add FeatureIDE Project Nature to Android project\".");
-			return;
-		}
 		if (isEnabled(sourcePath) && isEnabled(configsPath) &&
 				getSourcePath().equals(getConfigPath())) {
 			updateStatus("Source path equals configurations path.");
@@ -242,6 +237,28 @@ public class NewFeatureProjectPage extends WizardPage {
 		if (isEnabled(sourcePath) && isInvalidPath(getSourcePath(), "Source"))return;
 		if (isEnabled(buildPath) && isInvalidPath(getBuildPath(), "Build"))return;
 		if (isEnabled(configsPath) && isInvalidPath(getConfigPath(), "Equations"))return;
+		
+		if (compositionTool.supportsAndroid()) {
+			
+			canFlipToNextPage = false;
+			setErrorMessage(null);
+			setPageComplete(true);
+			
+			if (getSourcePath().equals("src") || getSourcePath().equals("res")) {
+				updateStatus("Source Path: \"src\" and \"res\" folders are reserved for Android.");
+				return;
+			}
+			if (getBuildPath().equals("src") || getBuildPath().equals("res")) {
+				updateStatus("Build Path: \"src\" and \"res\" folders are reserved for Android.");
+				return;
+			}
+			if (getConfigPath().equals("src") || getConfigPath().equals("res")) {
+				updateStatus("Config Path: \"src\" and \"res\" folders are reserved for Android.");
+				return;
+			}
+			
+			return;
+		}
 		
 		updateStatus(null);
 	}

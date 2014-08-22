@@ -27,7 +27,8 @@ Export-Package:
  de.ovgu.featureide.ui.views.collaboration.outline,
  de.ovgu.featureide.ui.wizards,
  org.apache.commons.math
-Import-Package: de.ovgu.featureide.ui.views.collaboration.action,
+Import-Package: de.ovgu.featureide.munge_android,
+ de.ovgu.featureide.ui.views.collaboration.action,
  org.eclipse.jdt.core,
  org.eclipse.jdt.internal.core,
  org.eclipse.jdt.internal.ui.javaeditor,
