@@ -41,7 +41,7 @@ abstract public class FeatureDiagramLayoutManager{
 	int controlWidth = 10;
 
 	int controlHeight = 10;
-	
+	 
 	boolean showHidden;
 	
 	public void layout(FeatureModel featureModel) {
@@ -94,9 +94,9 @@ abstract public class FeatureDiagramLayoutManager{
 		for(Feature feature : featureModel.getFeatures()){
 			int tempX = FeatureUIHelper.getLocation(feature).x;
 			int tempXOffset= FeatureUIHelper.getSize(feature).width;
-			if(mostRightFeatureX < tempX+tempXOffset) 
+			if(mostRightFeatureX < tempX+tempXOffset)
 				mostRightFeatureX = tempX+tempXOffset;
-			if(mostLeftFeatureX > tempX) 
+			if(mostLeftFeatureX > tempX)
 				mostLeftFeatureX = tempX;
 		}
 		int width = mostRightFeatureX - mostLeftFeatureX;
@@ -129,7 +129,7 @@ abstract public class FeatureDiagramLayoutManager{
 	private static void layoutLegend(FeatureModel featureModel, boolean showHidden) {
 		Point min = new Point (Integer.MAX_VALUE,Integer.MAX_VALUE);
 		Point max = new Point (Integer.MIN_VALUE,Integer.MIN_VALUE);
-		
+				
 		/*
 		 * update lowest, highest, most left, most right coordinates
 		 * for features
@@ -141,7 +141,7 @@ abstract public class FeatureDiagramLayoutManager{
 				continue;
 			Dimension tempSize = FeatureUIHelper.getSize(feature);
 
-			if(temp.x < min.x) 
+			if(temp.x < min.x)
 				min.x = temp.x;
 			if(temp.y < min.y) 
 				min.y = temp.y;
