@@ -64,7 +64,6 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements Proper
 	
 	private int curIndex;
 	private String curSearchString;
-	private String curFeatureName;
 	private long lastTime;
 
 	/**
@@ -74,18 +73,16 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements Proper
 	public FeatureDiagramEditorKeyHandler(FeatureDiagramEditor view, FeatureModel featureModel) {
 		super();
 
-		alternativeKeyHandler = new KeyHandler();
-		gvKeyHandler = new GraphicalViewerKeyHandler(view);
-		gvKeyHandler.setParent(alternativeKeyHandler);
-		setParent(gvKeyHandler);
 		this.featureModel = featureModel;
 		this.viewer = view;
-		curSearchString = "";
-		curFeatureName = "";
-		lastTime = 0;
 
-		featureList.addAll(featureModel.getFeatureNamesPreorder());
-		resetIterator();
+		this.alternativeKeyHandler = new KeyHandler();
+		this.gvKeyHandler = new GraphicalViewerKeyHandler(view);
+		this.gvKeyHandler.setParent(alternativeKeyHandler);
+		this.setParent(gvKeyHandler);
+		this.lastTime = 0;
+
+		resetFeatureList();
 		featureModel.addListener(this);
 	}
 
@@ -102,33 +99,31 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements Proper
 				return super.keyPressed(e);
 			}
 		} 
+		
 		final long currentTime = System.currentTimeMillis();
-	
 		if (currentTime - lastTime > timeoutThreshold) {
 			curSearchString = "";
 		}
 		lastTime = currentTime;
 		
-		if (curSearchString.isEmpty())
-			resetIterator();
-		
-		updateIterator();
+		curIndex = updateIterator();
 		
 		if (curSearchString.length() == 1 && curSearchString.charAt(0) == Character.toLowerCase(e.character)) {
 			curSearchString = "";
 			curIndex = (curIndex + 1) % featureList.size();
 		}
-		
 		curSearchString += Character.toLowerCase(e.character);
-		search();
-
-		if (curFeatureName.isEmpty()) {
-			curSearchString = "";  // keep selection, if nothing found
-		} else {
+		
+		final int foundIndex = search();
+		if (foundIndex >= 0) {
 			// select the new feature
-			FeatureEditPart part = (FeatureEditPart) viewer.getEditPartRegistry().get(featureModel.getFeature(curFeatureName));
-			viewer.setSelection(new StructuredSelection(part));
-			viewer.reveal(part);
+			final Feature curFeature = featureModel.getFeature(featureList.get(foundIndex));
+			if (curFeature != null) {
+				FeatureEditPart part = (FeatureEditPart) viewer.getEditPartRegistry().get(curFeature);
+				viewer.setSelection(new StructuredSelection(part));
+				viewer.reveal(part);
+				curIndex = foundIndex;
+			}
 		}
 		
 		return true;
@@ -136,9 +131,7 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements Proper
 
 	@Override
 	public void propertyChange(PropertyChangeEvent event) {
-		featureList.clear();
-		featureList.addAll(featureModel.getFeatureNamesPreorder());
-		resetIterator();
+		resetFeatureList();
 	}
 	
 	/**
@@ -151,46 +144,43 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements Proper
 		super.put(keystroke, action);
 	}
 	
-	private void resetIterator() {
+	private void resetFeatureList() {
+		featureList.clear();
+		featureList.addAll(featureModel.getFeatureNamesPreorder());
+		curSearchString = "";
 		curIndex = 0;
 	}
 
-	private void search() {
+	private int search() {
 		for (int i = curIndex, end = curIndex + featureList.size(); i < end; i++) {
 			final String name = featureList.get(i % featureList.size());
 			if (name.toLowerCase().startsWith(curSearchString)) {
-				curFeatureName = name;
-				curIndex = i % featureList.size();
-				return;
+				return i % featureList.size();
 			}
 		}
-		curFeatureName = "";
-		resetIterator();
+		return -1;
 	}
 
-	private boolean updateIterator() {
-		IStructuredSelection sel = (IStructuredSelection) viewer.getSelection();
+	private int updateIterator() {
+		final IStructuredSelection sel = (IStructuredSelection) viewer.getSelection();
 		
 		if (sel.size() == 1 && !(sel.getFirstElement() instanceof ModelEditPart)) {
 			final Object element = sel.getFirstElement();
-			final Feature feature;
+			final String featureName;
 			
 			if (element instanceof FeatureEditPart) {
-				feature = ((FeatureEditPart) element).getFeature();
+				featureName = ((FeatureEditPart) element).getFeature().getName();
 			} else if (element instanceof Feature) {
-				feature = (Feature) element;
+				featureName = ((Feature) element).getName();
 			} else {
-				return false;
+				return 0;
 			}
 			
-			curIndex = featureList.indexOf(feature.getName());
-			
-			if (!feature.getName().equalsIgnoreCase(curFeatureName)) {
-				curFeatureName = feature.getName();
-				return true;
-			}
+			return (!featureName.equalsIgnoreCase(featureList.get(curIndex)))
+				? featureList.indexOf(featureName)
+				: curIndex;
 		}
-		return false;
+		return 0;
 	}
 
 }
