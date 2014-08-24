@@ -14,3 +14,4 @@ Require-Bundle: org.eclipse.ui,
  de.ovgu.featureide.core.munge-android
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Export-Package: de.ovgu.featureide.ui.android
