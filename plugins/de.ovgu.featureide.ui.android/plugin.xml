@@ -30,4 +30,13 @@
          </visibility>
       </objectContribution>
    </extension>
+   <extension
+         point="de.ovgu.featureide.ui.wizard">
+      <newProjectWizard
+            class="de.ovgu.featureide.ui.android.wizards.MungeAndroidNewProjectWizardExtension"
+            composerid="de.ovgu.featureide.preprocessor.munge-android"
+            id="de.ovgu.featureide.ui.android.newProjectWizard"
+            name="MungeAndroidNewProjectWizard">
+      </newProjectWizard>
+   </extension>
 </plugin>

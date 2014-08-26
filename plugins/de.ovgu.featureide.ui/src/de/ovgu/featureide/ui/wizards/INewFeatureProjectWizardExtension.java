@@ -22,8 +22,9 @@ package de.ovgu.featureide.ui.wizards;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
+
 
 /**
  * An extension of the NewFeatureProjectWizard capable of adding new pages and enhancing the project after the feature project has been created. 
@@ -34,20 +35,24 @@ public interface INewFeatureProjectWizardExtension {
 	 * 
 	 * @return true if all pages have been finished.
 	 */
-	public boolean isFinished();
+	boolean isFinished();
 	
 	/**
 	 * The page to be opened next has to be determined dynamically. This method should provide the respective next page depending on the given page. 
 	 * @param page the current page for which the next page shall be determined. 
-	 * @return the next page to dynamically append to newprojectwizard in respect to parameter.
+	 * @return the next page to dynamically append to {@link NewFeatureProjectWizard} in respect to parameter.
 	 */	
-	public IWizardPage getNextPage(IWizardPage page);
+	IWizardPage getNextPage(IWizardPage page);
+	
+	boolean performBeforeFinish(NewFeatureProjectPage page);
+	
+	boolean performOwnFinish();
 	
 	/**
 	 * The pages of the wizard extension need to get a parent wizard for the wizard to function properly.
 	 * @param wizard the wizard to set for the extension pages.
 	 */	
-	public void setWizard(IWizard wizard);
+	void setWizard(BasicNewResourceWizard wizard);
 	
 	/**
 	 * Executed after featureide project is created and before editor is opened.
@@ -57,5 +62,5 @@ public interface INewFeatureProjectWizardExtension {
 	 * @param buildPath
 	 * @throws CoreException
 	 */
-	public void enhanceProject(IProject project, String sourcePath, String configPath, String buildPath) throws CoreException;
+	void enhanceProject(IProject project, String compID, String sourcePath, String configPath, String buildPath) throws CoreException;
 }

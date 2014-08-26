@@ -20,5 +20,14 @@
             name="AspectJFMComposer">
       </fmComposer>
    </extension>
+   <extension
+         point="de.ovgu.featureide.ui.wizard">
+      <newProjectWizard
+            class="de.ovgu.featureide.ui.wizards.DefaultNewFeatureProjectWizardExtension"
+            composerid="de.ovgu.featureide.core.composer.aspectj"
+            id="de.ovgu.featureide.core.aspectj.newProjectWizard"
+            name="AspectJNewProjectWizard">
+      </newProjectWizard>
+   </extension>
 
 </plugin>

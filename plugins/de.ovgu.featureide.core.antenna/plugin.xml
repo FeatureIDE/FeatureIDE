@@ -20,5 +20,14 @@
             name="AntennaFMComposer">
       </fmComposer>
    </extension>
+   <extension
+         point="de.ovgu.featureide.ui.wizard">
+      <newProjectWizard
+            class="de.ovgu.featureide.ui.wizards.DefaultNewFeatureProjectWizardExtension"
+            composerid="de.ovgu.featureide.preprocessor.antenna"
+            id="de.ovgu.featureide.core.antenna.newProjectWizard"
+            name="AntennaNewProjectWizard">
+      </newProjectWizard>
+   </extension>
 
 </plugin>

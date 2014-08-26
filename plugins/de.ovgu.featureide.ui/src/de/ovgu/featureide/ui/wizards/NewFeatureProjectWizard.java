@@ -20,15 +20,6 @@
  */
 package de.ovgu.featureide.ui.wizards;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Properties;
-import java.util.Set;
-
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -36,22 +27,12 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.window.Window;
-import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
-import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.ui.INewWizard;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 import org.eclipse.ui.progress.UIJob;
-import org.eclipse.ui.statushandlers.StatusManager;
-import org.eclipse.ui.wizards.IWizardDescriptor;
 import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
 
-import de.ovgu.featureide.core.CorePlugin;
-import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.ui.UIPlugin;
-import de.ovgu.featureide.munge_android.AndroidProjectConversion;
 
 /**
  * A creation wizard for FeatureIDE projects that adds the FeatureIDE nature after creation.
@@ -85,142 +66,71 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 			return page.isPageComplete();
 		}
 		
-		if(wizardExtension != null)
+		if (wizardExtension != null) {
 			return wizardExtension.isFinished();
-		else
+		} else {
 			return super.canFinish();
+		}
 	}
 	
 	@Override
 	public IWizardPage getNextPage(IWizardPage page) {
 		// determine wizard extension and next page (basic new project page) when composer has been selected
-		if(page == this.page) {
-			this.wizardExtension = null;
-			IConfigurationElement[] conf = Platform.getExtensionRegistry().getConfigurationElementsFor("de.ovgu.featureide.ui.wizard");
-			for(IConfigurationElement c : conf) {
-				try {
-					if(c.getAttribute("composerid").equals(this.page.getCompositionTool().getId())) {
-						wizardExtension = (INewFeatureProjectWizardExtension) c.createExecutableExtension("class");
-						wizardExtension.setWizard(this);
-					}
-				} catch (CoreException e) {
-					UIPlugin.getDefault().logError(e);
-				}
+		if (page == this.page) {
+//			this.wizardExtension = null;
+//			IConfigurationElement[] conf = Platform.getExtensionRegistry().getConfigurationElementsFor("de.ovgu.featureide.ui.wizard");
+//			for (IConfigurationElement c : conf) {
+//				try {
+//					if (c.getAttribute("composerid").equals(this.page.getCompositionTool().getId())) {
+//						wizardExtension = (INewFeatureProjectWizardExtension) c.createExecutableExtension("class");
+//						wizardExtension.setWizard(this);
+//					}
+//				} catch (CoreException e) {
+//					UIPlugin.getDefault().logError(e);
+//				}
+//			}
+			return super.getNextPage(page);
+		} else if (page instanceof WizardNewProjectCreationPage) {
+			// determine next page (reference page) after project has been named
+			return super.getNextPage(page);
+		} else if (wizardExtension != null) {
+			final IWizardPage nextExtensionPage = wizardExtension.getNextPage(page);
+			if (nextExtensionPage != null) {
+				// determine next page (extension pages) when extension exists and reference page or an extension page active
+				return nextExtensionPage;
 			}
-			return super.getNextPage(page);
-		}
-		// determine next page (reference page) after project has been named
-		else if(page instanceof WizardNewProjectCreationPage) {
-			return super.getNextPage(page);
-		}
-		// determine next page (extension pages) when extension exists and reference page or an extension page active
-		else if(wizardExtension != null) {
-			return wizardExtension.getNextPage(page);
-		}
+		} 
 		// every other occurrence
-		else {
-			return super.getNextPage(page);
-		}
-	}
-	
-	private boolean createAndroidProject(String compositionTool, String sourcePath, String configPath, String buildPath) {
-		IWizardDescriptor wizDesc = PlatformUI.getWorkbench().getNewWizardRegistry().findWizard("com.android.ide.eclipse.adt.project.NewProjectWizard");
-		if (wizDesc != null) {
-			try {
-				IWizard wizard = wizDesc.createWizard();
-				if (wizard instanceof INewWizard) {
-					// save all projects before Android project wizard runs
-					Set<IProject> projectsBefore = new HashSet<IProject>();
-					Collections.addAll(projectsBefore, ResourcesPlugin.getWorkspace().getRoot().getProjects());
-					
-					// call Android project wizard
-					INewWizard newWizard = (INewWizard) wizard;
-					newWizard.init(PlatformUI.getWorkbench(), this.getSelection());
-					WizardDialog dialog = new WizardDialog(null, wizard);
-					
-					if (dialog.open() != Window.OK) {
-						return false; // Android wizard was canceled
-					}
-					
-					// compare with projects after Android project creation to find new project
-					Set<IProject> projectsAfter = new HashSet<IProject>();
-					Collections.addAll(projectsAfter, ResourcesPlugin.getWorkspace().getRoot().getProjects());
-					projectsAfter.removeAll(projectsBefore);
-					
-					IProject project = null;
-					if (projectsAfter.size() == 1) {
-						project = (IProject) projectsAfter.toArray()[0];
-					} else if (projectsAfter.size() > 1) {
-						// The Android wizard automatically creates a support library project if needed.
-						// Therefore the right project must be searched if multiple projects were created.
-						for (Object proj : projectsAfter) {
-							if (!isAndroidSupportLibraryProject((IProject)proj)) {
-								project = (IProject) proj;
-								break;
-							}
-						}
-					} else {
-						return false;
-					}
-					
-					// convert newly created android project
-					AndroidProjectConversion.convertAndroidProject(project, compositionTool, sourcePath, configPath, buildPath);
-					
-				}
-			} catch (CoreException e) {
-				UIPlugin.getDefault().logError(e);
-				return false;
-			}
-		} else {
-			IStatus status = new Status(IStatus.ERROR, UIPlugin.PLUGIN_ID, "The Android Development Tools must be installed to create an Android project.");
-			StatusManager.getManager().handle(status, StatusManager.SHOW);
-			return false;
-		}
-		return true;
-	}
-	
-	/**
-	 * Check whether the given newly created Android project is an support library project.
-	 */
-	private boolean isAndroidSupportLibraryProject(IProject project) {
-		IFile propertiesFile = project.getFile("project.properties");
-		if (propertiesFile.exists()) {
-			Properties properties = new Properties();
-			try {
-				properties.load(propertiesFile.getContents());
-				String isLibrary = properties.getProperty("android.library");
-				if (isLibrary == null || isLibrary.equals("false")) {
-					return false;
-				}
-				for (Object key : properties.keySet()) {
-					if (key instanceof String) {
-						String strKey = (String)key;
-						final String ref = "android.library.reference";
-						if (strKey.regionMatches(0, ref, 0, ref.length())) {
-							return false;
-						}
-					}
-				}
-			} catch (IOException e) {
-				return false;
-			} catch (CoreException e) {
-				return false;
-			}
-		}
-		return true;
+		return super.getNextPage(page);
 	}
 	
 	public boolean performFinish() {
-		if (page.hasCompositionTool() && page.getCompositionTool().getId().equals("de.ovgu.featureide.preprocessor.munge-android")) {
-			final String compositionTool = page.getCompositionTool().getId();
-			final String sourcePath = page.getSourcePath();
-			final String configPath = page.getConfigPath();
-			final String buildPath = page.getBuildPath();
-			
+		if (!page.hasCompositionTool()) {
+			return false;
+		}
+		
+//		this.wizardExtension = null;
+		IConfigurationElement[] conf = Platform.getExtensionRegistry().getConfigurationElementsFor("de.ovgu.featureide.ui.wizard");
+		for (IConfigurationElement c : conf) {
+			try {
+				if (c.getAttribute("composerid").equals(this.page.getCompositionTool().getId())) {
+					wizardExtension = (INewFeatureProjectWizardExtension) c.createExecutableExtension("class");
+					wizardExtension.setWizard(this);
+				}
+			} catch (CoreException e) {
+				UIPlugin.getDefault().logError(e);
+			}
+		}
+		
+		if (wizardExtension == null) {
+			return false;
+		} 
+		
+		if (wizardExtension.performOwnFinish()) {
 			UIJob job = new UIJob("Creating Android project") {
 				@Override
 				public IStatus runInUIThread(IProgressMonitor monitor) {
-					if (createAndroidProject(compositionTool, sourcePath, configPath, buildPath)) {
+					if (wizardExtension.performBeforeFinish(page)) {
 						return Status.OK_STATUS;
 					} else {
 						return Status.CANCEL_STATUS;
@@ -229,29 +139,21 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 			};
 			job.setPriority(Job.LONG);
 			job.schedule();
-			
 			return true;
 		} else {
-			if (!super.performFinish())
+			if (!super.performFinish()) {
 				return false;
-			if (page.hasCompositionTool()) {
-				// create feature project
-				CorePlugin.setupFeatureProject(getNewProject(), page.getCompositionTool().getId()
-						,page.getSourcePath(),page.getConfigPath(),page.getBuildPath(), true);
-	
-				// enhance project depending on extension
-				if(wizardExtension != null && wizardExtension.isFinished()) {
-					try {
-						wizardExtension.enhanceProject(getNewProject(),page.getSourcePath(),page.getConfigPath(),page.getBuildPath());
-					} catch (CoreException e) {
-						UIPlugin.getDefault().logError(e);
-					}
-				}
-				// open editor
-				UIPlugin.getDefault().openEditor(FeatureModelEditor.ID, getNewProject().getFile("model.xml"));
-	
 			}
-			return true;
+			// create feature project
+			// enhance project depending on extension
+			if (wizardExtension.isFinished()) {
+				try {
+					wizardExtension.enhanceProject(getNewProject(), page.getCompositionTool().getId(), page.getSourcePath(),page.getConfigPath(),page.getBuildPath());
+				} catch (CoreException e) {
+					UIPlugin.getDefault().logError(e);
+				}
+			}
 		}
+		return true;
 	}
 }

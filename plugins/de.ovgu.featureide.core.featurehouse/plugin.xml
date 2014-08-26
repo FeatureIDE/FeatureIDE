@@ -43,4 +43,13 @@
           value="true">
     </persistent>
  </extension>
+ <extension
+       point="de.ovgu.featureide.ui.wizard">
+    <newProjectWizard
+          class="de.ovgu.featureide.ui.wizards.DefaultNewFeatureProjectWizardExtension"
+          composerid="de.ovgu.featureide.composer.featurehouse"
+          id="de.ovgu.featureide.core.featurehouse.newProjectWizard"
+          name="FeatureHouseNewProjectWizard">
+    </newProjectWizard>
+ </extension>
 </plugin>
