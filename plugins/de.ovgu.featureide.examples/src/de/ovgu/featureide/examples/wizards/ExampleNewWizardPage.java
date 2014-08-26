@@ -313,7 +313,8 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 				if (element instanceof String) {
 					List<IComposerExtension> composerExtensions = ComposerExtensionManager.getInstance().getComposers();
 					for (IComposerExtensionBase ic : composerExtensions) {
-						if (ic.toString().contains((String) element)) {
+						String composerExtension = ic.toString();
+						if (composerExtension.substring(composerExtension.lastIndexOf(".") +1).equals((String) element)) {
 							return ic.getName();
 						}
 					}
@@ -369,9 +370,19 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 						if (iss.getFirstElement() instanceof String) {
 							descBox.setText("");
 							setMessage("");
+							String selectedElement = (String) iss.getFirstElement();
+							projectsList.setChecked(iss.getFirstElement(), !projectsList.getChecked(selectedElement));
+							for (ProjectRecord tmpRecord : compTable.get(selectedElement)) {
+								projectsList.setChecked(tmpRecord, projectsList.getChecked(selectedElement));
+								if (tmpRecord.hasWarnings()) {
+									projectsList.setChecked(tmpRecord, false);
+									projectsList.setGrayed(tmpRecord, true);
+									setMessage(tmpRecord.getWarningText(), WARNING);
+								}
+							}
 						} else if (iss.getFirstElement() instanceof ProjectRecord) {
 							ProjectRecord tmpRecord = (ProjectRecord) iss.getFirstElement();
-
+							projectsList.setChecked(tmpRecord, !projectsList.getChecked(tmpRecord));
 							if (tmpRecord != null) {
 								descBox.setText(tmpRecord.getDescription());
 
@@ -382,6 +393,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 								}
 							}
 						}
+						
 
 					}
 				}
