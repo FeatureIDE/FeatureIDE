@@ -2,7 +2,7 @@
 <feature
       id="de.ovgu.featureide.munge_android"
       label="Plugin for Android projects with Munge (optional)"
-      version="1.0.0.qualifier"
+      version="2.7.1.qualifier"
       provider-name="University of Magdeburg">
 
    <description url="http://www.fosd.de/featureide/">

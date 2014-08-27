@@ -613,6 +613,9 @@
    <feature url="features/de.ovgu.featureide.munge_2.7.1.201407301648.jar" id="de.ovgu.featureide.munge" version="2.7.1.201407301648">
       <category name="FeatureIDE 2.7"/>
    </feature>
+   <feature url="features/de.ovgu.featureide.munge_android_2.7.1.qualifier.jar" id="de.ovgu.featureide.munge_android" version="2.7.1.qualifier">
+      <category name="FeatureIDE 2.7"/>
+   </feature>
    <archive path="Older Versions &lt;2.6" url="http://wwwiti.cs.uni-magdeburg.de/iti_db/research/featureide/deploy/2.5"/>
    <category-def name="FeatureIDE 2.6" label="FeatureIDE 2.6"/>
    <category-def name="FeatureIDE 2.7" label="FeatureIDE 2.7"/>
