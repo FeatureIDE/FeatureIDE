@@ -193,14 +193,14 @@ Library.
          id="de.ovgu.featureide.core.munge-android"
          download-size="0"
          install-size="0"
-         version="2.7.1"
+         version="2.7.1.qualifier"
          unpack="false"/>
 
    <plugin
          id="de.ovgu.featureide.ui.android"
          download-size="0"
          install-size="0"
-         version="2.7.1"
+         version="2.7.1.qualifier"
          unpack="false"/>
 
 </feature>
