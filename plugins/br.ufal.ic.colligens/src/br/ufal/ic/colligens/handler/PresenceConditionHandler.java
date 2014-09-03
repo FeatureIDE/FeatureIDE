@@ -3,6 +3,10 @@
  */
 package br.ufal.ic.colligens.handler;
 
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
@@ -15,6 +19,7 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
@@ -22,7 +27,10 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 import br.ufal.ic.colligens.controllers.PresenceConditionController;
 import br.ufal.ic.colligens.controllers.core.PluginException;
-import de.fosd.typechef.lexer.options.OptionException;
+import br.ufal.ic.colligens.controllers.invalidconfigurations.InvalidConfigurationsViewController;
+import br.ufal.ic.colligens.models.FileProxy;
+import br.ufal.ic.colligens.views.InvalidConfigurationsView;
+import de.fosd.typechef.options.OptionException;
 
 /**
  * @author thiago
@@ -42,12 +50,17 @@ public class PresenceConditionHandler extends ColligensAbstractHandler {
 		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
 		IWorkbenchPage page = window.getActivePage();
 		IEditorPart editor = page.getActiveEditor();
+		
 		if (editor instanceof ITextEditor) {
+			
 			ISelectionProvider selectionProvider = ((ITextEditor) editor)
 					.getSelectionProvider();
 			ISelection selection = selectionProvider.getSelection();
+			
 			if (selection instanceof ITextSelection) {
+				
 				TextSelection textSelection = (TextSelection) selection;
+				
 				IDocumentProvider provider = ((ITextEditor) editor)
 						.getDocumentProvider();
 				IDocument document = provider.getDocument(editor
@@ -63,7 +76,7 @@ public class PresenceConditionHandler extends ColligensAbstractHandler {
 					code = document.get(document.getLineOffset(line),
 							document.getLineLength(line));
 				} catch (BadLocationException e1) {
-					// TODO Auto-generated catch block
+
 					e1.printStackTrace();
 				}
 
@@ -72,9 +85,35 @@ public class PresenceConditionHandler extends ColligensAbstractHandler {
 
 				try {
 					conditionController.run();
+
+					// show erros
+
+					if (conditionController.getFileProxy() != null
+							&& !conditionController.getFileProxy().getLogs()
+									.isEmpty()) {
+						try {
+							page.showView(InvalidConfigurationsView.ID);
+							InvalidConfigurationsViewController analyzerViewController = InvalidConfigurationsViewController
+									.getInstance();
+
+							analyzerViewController.clear();
+
+							List<FileProxy> list = new LinkedList<FileProxy>();
+
+							list.add(conditionController.getFileProxy());
+
+							analyzerViewController.setInput(list);
+
+						} catch (PartInitException e) {
+							e.printStackTrace();
+						}
+					}
+					// ---
 				} catch (PluginException e) {
 					e.printStackTrace();
 				} catch (OptionException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
 					e.printStackTrace();
 				}
 

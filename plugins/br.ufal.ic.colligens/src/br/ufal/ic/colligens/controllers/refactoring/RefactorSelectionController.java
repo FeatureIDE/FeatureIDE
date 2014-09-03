@@ -16,7 +16,7 @@ import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 
 import core.RefactoringType;
 import de.fosd.typechef.lexer.LexerException;
-import de.fosd.typechef.lexer.options.OptionException;
+import de.fosd.typechef.options.OptionException;
 
 public class RefactorSelectionController extends Refactoring {
 	private TextSelection textSelection = null;
@@ -38,7 +38,7 @@ public class RefactorSelectionController extends Refactoring {
 	public RefactoringStatus checkInitialConditions(IProgressMonitor monitor)
 			throws CoreException, OperationCanceledException {
 		RefactoringStatus status = new RefactoringStatus();
-
+		
 		monitor.beginTask("Checking preconditions...", 2);
 
 		try {

@@ -9,7 +9,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.viewers.IStructuredSelection;
 
 import br.ufal.ic.colligens.controllers.ProjectExplorerController;
-
+@SuppressWarnings("rawtypes")
 public class FilesToSelection implements IStructuredSelection {
 	private final List<IResource> list;
 

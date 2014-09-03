@@ -3,9 +3,9 @@ package br.ufal.ic.colligens.models;
 import scala.Function1;
 import scala.runtime.BoxedUnit;
 import br.ufal.ic.colligens.util.Log;
-import de.fosd.typechef.typesystem.TypeError;
+import de.fosd.typechef.error.TypeChefError;
 
-public class RenderTypeError implements Function1<TypeError, Object> {
+public class RenderTypeError implements Function1<TypeChefError, Object> {
 
 	private FileProxy fileProxy;
 
@@ -17,7 +17,7 @@ public class RenderTypeError implements Function1<TypeError, Object> {
 	}
 
 	@Override
-	public Object apply(TypeError typeError) {
+	public Object apply(TypeChefError typeError) {
 
 		if (typeError.where().getPositionFrom().getFile()
 				.contains(fileProxy.getFileToAnalyse())) {
@@ -37,7 +37,8 @@ public class RenderTypeError implements Function1<TypeError, Object> {
 
 			if (isNew || fileProxy.getLogs().size() == 0) {
 				Log newlog = new Log(fileProxy, typeError.where()
-						.getPositionFrom().getLine(), typeError.condition()
+						.getPositionFrom().getLine(),typeError.where()
+						.getPositionFrom().getColumn(), typeError.condition()
 						.toString(), typeError.severity().toString(),
 						typeError.msg());
 
@@ -51,7 +52,7 @@ public class RenderTypeError implements Function1<TypeError, Object> {
 	}
 
 	@Override
-	public <A> Function1<TypeError, A> andThen(Function1<Object, A> arg0) {
+	public <A> Function1<TypeChefError, A> andThen(Function1<Object, A> arg0) {
 
 		return null;
 	}
@@ -341,7 +342,7 @@ public class RenderTypeError implements Function1<TypeError, Object> {
 	}
 
 	@Override
-	public <A> Function1<A, Object> compose(Function1<A, TypeError> arg0) {
+	public <A> Function1<A, Object> compose(Function1<A, TypeChefError> arg0) {
 
 		return null;
 	}

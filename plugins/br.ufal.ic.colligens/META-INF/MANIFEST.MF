@@ -27,7 +27,7 @@ Import-Package: org.eclipse.cdt.core.model,
  org.eclipse.cdt.internal.core.model,
  org.eclipse.cdt.ui
 Bundle-ClassPath: .,
- lib/TypeChef-0.3.5.jar,
+ lib/TypeChef-0.3.6.jar,
  lib/jdom-2.0.4.jar,
  lib/cloning-1.8.5.jar,
  lib/objenesis-1.2.jar,

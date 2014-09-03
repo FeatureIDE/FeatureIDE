@@ -95,6 +95,17 @@ public class FileProxy {
 				+ getFileName();
 	}
 
+	public String getNoIncludeFile() throws IOException {
+		if (newFilepath != null) {
+			return newFilepath;
+		}
+		newFilepath = Colligens.getDefault().getConfigDir().getAbsolutePath()
+				+ System.getProperty("file.separator") + "projects" + path
+				+ getFileName();
+		this.generate();
+		return newFilepath;
+	}
+
 	public void setFileToAnalyse(String path) {
 		newFilepath = path;
 	}
@@ -144,7 +155,9 @@ public class FileProxy {
 		in.close();
 		out.close();
 
-		File tempFile = new File(getFileToAnalyse());
+		File tempFile = new File(Colligens.getDefault().getConfigDir().getAbsolutePath()
+				+ System.getProperty("file.separator") + "projects" + path
+				+ getFileName());
 
 		tempFile.deleteOnExit();
 

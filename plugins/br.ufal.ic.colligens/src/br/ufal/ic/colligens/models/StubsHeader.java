@@ -40,7 +40,7 @@ import br.ufal.ic.colligens.activator.Colligens;
 import br.ufal.ic.colligens.controllers.ProjectExplorerController;
 import core.GeneralFrontend;
 import core.presence.condition.PresenceConditionVisitor;
-import de.fosd.typechef.lexer.options.OptionException;
+import de.fosd.typechef.options.OptionException;
 
 @SuppressWarnings("restriction")
 public class StubsHeader extends AbstractHeader {
