@@ -252,11 +252,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		
 	};
 	
-	/*
-	 * @see
-	 * org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets
-	 * .Composite)
-	 */
 	public void createPartControl(Composite parent) {
 		IWorkbenchWindow editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		IEditorPart part = null;
@@ -434,7 +429,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				List<String> csNames = colorschemeTable.getColorschemeNames();
 				
 				String curColorSchemeName = colorschemeTable.getSelectedColorschemeName();
-				MenuManager colorSchemeSubMenu;
+				MenuManager colorSchemeSubMenu = null;
 				
 				if (curColorSchemeName != null) {
 					colorSchemeSubMenu = new MenuManager(curColorSchemeName);
@@ -530,13 +525,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		};
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ovgu.featureide.core.listeners.ICurrentBuildListener#updateGuiAfterBuild
-	 * (de.ovgu.featureide.core.IFeatureProject)
-	 */
 	public void updateGuiAfterBuild(final IFeatureProject project, final IFile configurationFile) {
 		if (featureProject != null && featureProject.equals(project)) {
 			if (configurationFile == null) {

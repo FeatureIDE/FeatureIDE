@@ -46,4 +46,8 @@ public class RoleFigureLabel extends Label{
 	public String getElementName() {
 		return elementName;
 	}
+	
+	public String toString() {
+		return elementName;
+	}
 }
