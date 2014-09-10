@@ -160,9 +160,10 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 			// Remove duplicates
 			LinkedList<RoleElement> remDup = new LinkedList<RoleElement>();
 			for (int i = 0; i < obj.size(); i++) {
-				if (remDup.isEmpty() || !remDup.getLast().getName().equals(obj.get(i).getName())) {
+				if (!remDup.contains(obj.get(i))) {
 					remDup.add(obj.get(i));
 				}
+				
 			}
 			
 			LinkedList<FSTDirective> remDupDir = new LinkedList<FSTDirective>();
