@@ -127,13 +127,12 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		
 		label.setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
 		setBackgroundColor(FMPropertyManager.getConcreteFeatureBackgroundColor());
-		setBorder(FMPropertyManager.getFeatureBorder());
+		setBorder(FMPropertyManager.getFeatureBorder(feature.isConstraintSelected()));
 		
 		if (feature.isConcrete()) toolTip += CONCRETE;
 		
 		if (feature.isAbstract()){
 			setBackgroundColor(FMPropertyManager.getAbstractFeatureBackgroundColor());
-			setBorder(FMPropertyManager.getFeatureBorder());
 			if (feature.isRoot()){
 				toolTip += ROOT;
 			} else {
