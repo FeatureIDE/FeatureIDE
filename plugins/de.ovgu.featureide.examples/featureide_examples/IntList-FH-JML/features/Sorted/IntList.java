@@ -1,7 +1,7 @@
 
 public class IntList {
 
-	//@ invariant (\forall int k; 0 <= k && k < data.length-1; data[k] >= data[k+1]);
+	/*@ invariant (\forall int k; 0 <= k && k < data.length-1; data[k] >= data[k+1]);@*/
 	
 	public void push(int newTop) {
 		original(newTop);
