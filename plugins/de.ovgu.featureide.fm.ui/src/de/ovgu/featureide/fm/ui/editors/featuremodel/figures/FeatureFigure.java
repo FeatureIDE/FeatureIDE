@@ -162,7 +162,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		
 		if (feature.getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN){
 			setBackgroundColor(FMPropertyManager.getWarningColor());
-			setBorder(FMPropertyManager.getConcreteFeatureBorder(feature.isConstraintSelected()));
+			setBorder(FMPropertyManager.getHiddenFeatureBorder(feature.isConstraintSelected()));
 			toolTip += INDETERMINATE_HIDDEN;
 		}
 		
