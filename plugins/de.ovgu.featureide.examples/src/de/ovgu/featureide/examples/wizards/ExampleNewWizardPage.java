@@ -62,14 +62,12 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
@@ -160,8 +158,6 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 	private final ExampleProjectFilter searchFilter = new ExampleProjectFilter();
 
 	private Thread updateProjects;
-	private boolean updateChecks = true;
-	private StructuredSelection lastSel = null;
 
 	/**
 	 * Constructor for SampleNewWizardPage.
@@ -339,11 +335,14 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 
 				if (event.getElement() instanceof String) {
 					for (ProjectRecord tmpRecord : compTable.get((String) event.getElement())) {
-						projectsList.setChecked(tmpRecord, projectsList.getChecked((String) event.getElement()));
+						final boolean isChecked = projectsList.getChecked((String) event.getElement());
+						projectsList.setChecked(tmpRecord, isChecked);
 						if (tmpRecord.hasWarnings()) {
 							projectsList.setChecked(tmpRecord, false);
 							projectsList.setGrayed(tmpRecord, true);
-							setMessage(tmpRecord.getWarningText(), WARNING);
+							if (isChecked) {
+								setMessage(tmpRecord.getWarningText(), WARNING);
+							}
 						}
 					}
 				} else {
@@ -363,7 +362,18 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 					projectsList.setChecked(curComposer, allChecked);
 
 				}
-				setPageComplete(projectsList.getCheckedElements().length > 0);
+				if (projectsList.getCheckedElements().length == 0) {
+					setMessage("");
+					setPageComplete(false);
+				} else {
+					for (Object obj : projectsList.getCheckedElements()) {
+						if (obj instanceof ProjectRecord) {
+							setPageComplete(true);
+							break;
+						}
+						setPageComplete(false);
+					}
+				}
 			}
 		});
 		
@@ -404,6 +414,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		// later. Hence projectsList gets expanded and collapsed completely in the beginning to have all children/projects added.
 		projectsList.expandAll();
 		projectsList.collapseAll();
+		setPageComplete(false);
 	}
 
 	private void createDescriptionArea(Composite workArea) {
