@@ -37,10 +37,10 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 
 import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.wizardextension.DefaultNewFeatureProjectWizardExtension;
 import de.ovgu.featureide.deltaj.DeltajComposer;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.ui.wizards.DefaultNewFeatureProjectWizardExtension;
 
 /**
  * Extension of the NewFeatureProjectEditor. Adding pages to import a Feature Model, to select Deltas to be initially creadted and to select whether to create a single file for each Delta.

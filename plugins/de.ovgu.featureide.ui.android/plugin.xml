@@ -31,7 +31,7 @@
       </objectContribution>
    </extension>
    <extension
-         point="de.ovgu.featureide.ui.wizard">
+         point="de.ovgu.featureide.core.wizard">
       <newProjectWizard
             class="de.ovgu.featureide.ui.android.wizards.MungeAndroidNewProjectWizardExtension"
             composerid="de.ovgu.featureide.preprocessor.munge-android"
