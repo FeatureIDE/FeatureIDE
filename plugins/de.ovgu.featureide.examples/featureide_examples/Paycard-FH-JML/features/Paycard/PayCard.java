@@ -25,7 +25,7 @@ public class PayCard {
 	return new PayCard(100);
     }
     
-    /*@
+    /*@ \consecutive_contract
       @ public normal_behavior
       @ requires amount>0;
       @ {|
