@@ -24,13 +24,12 @@ id[i] == i);
     public int count() {
         return count;
     }
-	/*@
- 	requires 0 <= p && p < id.length; 
-
- @*/
-public /*@pure@*/ boolean connected(int p, int q) {
-   
-}
+	/*@ \consecutive_contract
+ 	 @ requires 0 <= p && p < id.length; 
+	 @*/
+	public /*@pure@*/ boolean connected(int p, int q) {
+	   
+	}
 
 // merge components containing p and q
 /*@
