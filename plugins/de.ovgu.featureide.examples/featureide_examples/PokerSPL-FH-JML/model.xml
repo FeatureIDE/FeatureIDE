@@ -9,15 +9,16 @@
 					<feature mandatory="true" name="MaxPlayerCardsFive"/>
 					<feature mandatory="true" name="MaxPlayerCardsSeven"/>
 				</alt>
-				<and name="Wager">
-					<and name="Blinds">
+				<or name="Wager">
+					<and mandatory="true" name="Blinds">
 						<feature name="IncreasingBlinds"/>
 					</and>
-					<feature name="Pot_Limit"/>
-				</and>
+					<feature mandatory="true" name="Pot_Limit"/>
+				</or>
 			</and>
 		</struct>
 		<constraints/>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
 		<comments/>
 		<featureOrder userDefined="false"/>
 	</featureModel>
