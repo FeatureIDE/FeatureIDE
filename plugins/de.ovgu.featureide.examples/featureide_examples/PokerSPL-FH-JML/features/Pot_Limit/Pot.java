@@ -11,9 +11,7 @@ public/* nullable_by_default */class Pot {
    * @param addedValue The added value to the pot.
    */
   /*@ public normal_behavior
-    	
-      requires \original_clause && addedValue <= size;
-      assignable size;
+      requires addedValue <= size;
    */
   public final void addToPotSize(final double addedValue) {
     original(addedValue);

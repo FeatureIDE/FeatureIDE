@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.ui.wizards;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -32,6 +33,8 @@ import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
 
+import de.ovgu.featureide.core.wizardextension.DefaultNewFeatureProjectWizardExtension;
+import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
@@ -50,7 +53,7 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 	public static final String ID = UIPlugin.PLUGIN_ID + ".FeatureProjectWizard";
 	
 	protected NewFeatureProjectPage page;
-	private INewFeatureProjectWizardExtension wizardExtension = null;
+	private DefaultNewFeatureProjectWizardExtension wizardExtension = null;
 	
 	@Override
 	public void addPages() {
@@ -110,11 +113,11 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 		}
 		
 //		this.wizardExtension = null;
-		IConfigurationElement[] conf = Platform.getExtensionRegistry().getConfigurationElementsFor("de.ovgu.featureide.ui.wizard");
+		IConfigurationElement[] conf = Platform.getExtensionRegistry().getConfigurationElementsFor("de.ovgu.featureide.core.wizard");
 		for (IConfigurationElement c : conf) {
 			try {
 				if (c.getAttribute("composerid").equals(this.page.getCompositionTool().getId())) {
-					wizardExtension = (INewFeatureProjectWizardExtension) c.createExecutableExtension("class");
+					wizardExtension = (DefaultNewFeatureProjectWizardExtension) c.createExecutableExtension("class");
 					wizardExtension.setWizard(this);
 				}
 			} catch (CoreException e) {
@@ -148,7 +151,10 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 			// enhance project depending on extension
 			if (wizardExtension.isFinished()) {
 				try {
-					wizardExtension.enhanceProject(getNewProject(), page.getCompositionTool().getId(), page.getSourcePath(),page.getConfigPath(),page.getBuildPath());
+					final IProject newProject = getNewProject();
+					wizardExtension.enhanceProject(newProject, page.getCompositionTool().getId(), page.getSourcePath(),page.getConfigPath(),page.getBuildPath());
+					// open editor
+					UIPlugin.getDefault().openEditor(FeatureModelEditor.ID, newProject.getFile("model.xml"));
 				} catch (CoreException e) {
 					UIPlugin.getDefault().logError(e);
 				}

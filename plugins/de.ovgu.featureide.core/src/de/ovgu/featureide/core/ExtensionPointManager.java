@@ -49,8 +49,7 @@ public abstract class ExtensionPointManager<T extends de.ovgu.featureide.core.IE
 		if (cachedProviders != null)
 			return;
 		cachedProviders = new ArrayList<T>();
-		IExtension[] extensions = Platform.getExtensionRegistry()
-				.getExtensionPoint(pluginID, extensionPointID).getExtensions();
+		IExtension[] extensions = Platform.getExtensionRegistry().getExtensionPoint(pluginID, extensionPointID).getExtensions();
 		for (IExtension extension : extensions) {
 			IConfigurationElement[] configurationElements = extension.getConfigurationElements();
 			for (IConfigurationElement configurationElement : configurationElements) {

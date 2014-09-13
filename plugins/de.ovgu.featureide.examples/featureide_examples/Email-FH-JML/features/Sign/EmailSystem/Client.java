@@ -23,7 +23,7 @@ public class Client {
 	
 	/*@ model Set<Email> signedMails = new HashSet<Email>(2); @*/
 
-	/*@
+	/*@ \conjunctive_contract
 	  @ requires signedMails.contains(msg) ==> Client.isKeyPairValid(client.getKeyringPublicKeyByClient(msg.getEmailFrom()), msg.getEmailSignKey());
 	  @ requires msg.isSigned() ==> !Client.isKeyPairValid(client.getKeyringPublicKeyByClient(msg.getEmailFrom()), msg.getEmailSignKey());
 	  @*/
@@ -31,8 +31,7 @@ public class Client {
 		original(client, msg);
 	}
 	
-	/*@
-	  @ ensures msg.isSigned() ==> signedMails.contains(msg);
+	/*@ ensures msg.isSigned() ==> signedMails.contains(msg);
 	  @*/
 	static void mail(Client client, Email msg) {
 		//TODO add to signedMails if msg.isSigned()

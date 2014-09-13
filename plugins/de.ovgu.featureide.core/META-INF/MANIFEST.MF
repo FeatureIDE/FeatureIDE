@@ -20,9 +20,11 @@ Export-Package:
  de.ovgu.featureide.core.builder.preprocessor,
  de.ovgu.featureide.core.fstmodel,
  de.ovgu.featureide.core.fstmodel.preprocessor,
- de.ovgu.featureide.core.listeners
+ de.ovgu.featureide.core.listeners,
+ de.ovgu.featureide.core.wizardextension
 Bundle-ClassPath: .
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: University of Magdeburg
-Import-Package: org.eclipse.jdt.internal.core
+Import-Package: org.eclipse.jdt.internal.core,
+ org.eclipse.ui.wizards.newresource

@@ -9,8 +9,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.resources,
  de.ovgu.featureide.core,
  de.ovgu.featureide.fm.core,
- org.eclipse.jdt.core,
- de.ovgu.featureide.ui
+ org.eclipse.jdt.core
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: University of Magdeburg

@@ -22,10 +22,12 @@ package de.ovgu.featureide.ui.views.collaboration.outline;
  */
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TreeSet;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -58,29 +60,11 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 	public CollaborationOutlineTreeContentProvider() {
 	}
 
-	private Comparator<? super FSTInvariant> invariantComparator = new Comparator<FSTInvariant>() {
+	private Comparator<? super RoleElement> roleElementComparator = new Comparator<RoleElement>() {
 
 		@Override
-		public int compare(FSTInvariant o1, FSTInvariant o2) {
-			return o1.getName().compareToIgnoreCase(o2.getName());
-		}
-
-	};
-
-	private Comparator<? super FSTMethod> methodComparator = new Comparator<FSTMethod>() {
-
-		@Override
-		public int compare(FSTMethod o1, FSTMethod o2) {
-			return o1.getName().compareToIgnoreCase(o2.getName());
-		}
-
-	};
-
-	private Comparator<? super FSTField> fieldComparator = new Comparator<FSTField>() {
-
-		@Override
-		public int compare(FSTField o1, FSTField o2) {
-			return o1.getName().compareToIgnoreCase(o2.getName());
+		public int compare(RoleElement o1, RoleElement o2) {
+			return o1.getFullName().compareToIgnoreCase(o2.getFullName());
 		}
 
 	};
@@ -89,7 +73,7 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 
 		@Override
 		public int compare(FSTDirective o1, FSTDirective o2) {
-			return o1.getStartLine() > o2.getStartLine() ? 1 : 0;
+			return o1.getStartLine() > o2.getStartLine() ? 1 : -1;
 		}
 
 	};
@@ -114,17 +98,21 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 
 		IFile file = (IFile) inputElement;
 		IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
-		
+
 		if (featureProject != null) {
 			model = featureProject.getFSTModel();
 
 			if (model != null) {
-//	TODO: Change composers to use the full path instead of filename (with the same separator on every platform)
-//				IPath filePath = file.getProjectRelativePath();
-//				IPath featurePath = featureProject.getSourceFolder().getProjectRelativePath();
-//				filePath = filePath.removeFirstSegments(filePath.matchingFirstSegments(featurePath) + 1);
-//				String classString = filePath.toString();
-//				FSTClass c = model.getClass(classString);
+				// TODO: Change composers to use the full path instead of
+				// filename (with the same separator on every platform)
+				// IPath filePath = file.getProjectRelativePath();
+				// IPath featurePath =
+				// featureProject.getSourceFolder().getProjectRelativePath();
+				// filePath =
+				// filePath.removeFirstSegments(filePath.matchingFirstSegments(featurePath)
+				// + 1);
+				// String classString = filePath.toString();
+				// FSTClass c = model.getClass(classString);
 				FSTClass c = model.getClass(file.getName());
 				if (c != null) {
 					return new Object[] { c };
@@ -138,10 +126,10 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 	public Object[] getChildren(Object parentElement) {
 		if (parentElement instanceof FSTClass) {
 			// get all fields, methods, directives and invariants
-			LinkedList<FSTMethod> methods = new LinkedList<FSTMethod>();
-			LinkedList<FSTField> fields = new LinkedList<FSTField>();
-			LinkedList<FSTInvariant> invariants = new LinkedList<FSTInvariant>();
-			LinkedList<FSTDirective> directives = new LinkedList<FSTDirective>();
+			final TreeSet<FSTMethod> methods = new TreeSet<FSTMethod>(roleElementComparator);
+			final TreeSet<FSTField> fields = new TreeSet<FSTField>(roleElementComparator);
+			final TreeSet<FSTInvariant> invariants = new TreeSet<FSTInvariant>(roleElementComparator);
+			final TreeSet<FSTDirective> directives = new TreeSet<FSTDirective>(directiveComparator);
 			for (FSTRole role : ((FSTClass) parentElement).getRoles()) {
 				invariants.addAll(role.getClassFragment().getInvariants());
 				methods.addAll(role.getClassFragment().getMethods());
@@ -149,32 +137,15 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 				directives.addAll(role.getDirectives());
 			}
 
-			LinkedList<RoleElement> obj = new LinkedList<RoleElement>();
-			Collections.sort(methods, methodComparator);
-			Collections.sort(fields, fieldComparator);
-			Collections.sort(directives, directiveComparator);
-			Collections.sort(invariants, invariantComparator);
-			obj.addAll(invariants);
-			obj.addAll(fields);
-			obj.addAll(methods);
-			// Remove duplicates
-			LinkedList<RoleElement> remDup = new LinkedList<RoleElement>();
-			for (int i = 0; i < obj.size(); i++) {
-				if (!remDup.contains(obj.get(i))) {
-					remDup.add(obj.get(i));
-				}
-				
-			}
-			
-			LinkedList<FSTDirective> remDupDir = new LinkedList<FSTDirective>();
-			for (int i = 0; i < directives.size(); i++) {
-				if (remDupDir.isEmpty() || !remDupDir.contains(directives.get(i))) {
-					remDupDir.add(directives.get(i));
-				}
-			}
-			
-			remDup.addAll(remDupDir);
-			return (remDup.toArray());
+			final RoleElement[] obj = new RoleElement[methods.size() + fields.size() + invariants.size()
+					+ directives.size()];
+			int pos = 0;
+			System.arraycopy(invariants.toArray(), 0, obj, pos, invariants.size());
+			System.arraycopy(fields.toArray(), 0, obj, pos += invariants.size(), fields.size());
+			System.arraycopy(methods.toArray(), 0, obj, pos += fields.size(), methods.size());
+			System.arraycopy(directives.toArray(), 0, obj, pos += methods.size(), directives.size());
+
+			return obj;
 		} else if (parentElement instanceof FSTMethod) {
 			// get all the roles that belong to a method
 			List<FSTRole> roleList = new LinkedList<FSTRole>();
@@ -194,14 +165,18 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 				}
 			}
 
-			List<String> featureOrder = CorePlugin.getFeatureProject(((FSTMethod) parentElement).getRole().getFile()).getFeatureModel().getFeatureOrderList();
+			List<String> featureOrder = CorePlugin.getFeatureProject(((FSTMethod) parentElement).getRole().getFile()).getFeatureModel()
+					.getFeatureOrderList();
 
 			FSTRole[] obj = new FSTRole[roleList.size()];
 			int index = 0;
-			for (int i = 0; i < featureOrder.size(); i++) {
-				for (int j = 0; j < roleList.size(); j++) {
-					if (roleList.get(j).getFeature().getName().equals(featureOrder.get(i))) {
-						obj[index++] = roleList.get(j);
+			for (String featureName : featureOrder) {
+
+				for (Iterator<FSTRole> it = roleList.iterator(); it.hasNext();) {
+					FSTRole next = it.next();
+					if (next.getFeature().getName().equals(featureName)) {
+						obj[index++] = next;
+						it.remove();
 						break;
 					}
 
@@ -220,12 +195,7 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 				}
 			}
 
-			FSTRole[] obj = new FSTRole[roleList.size()];
-			for (int i = 0; i < roleList.size(); i++) {
-				obj[i] = roleList.get(i);
-			}
-
-			return (roleList.toArray());
+			return roleList.toArray();
 		} else if (parentElement instanceof FSTField) {
 			// get all the roles that belong to a field
 			LinkedList<FSTRole> roleList = new LinkedList<FSTRole>();
@@ -237,13 +207,7 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 					}
 				}
 			}
-
-			FSTRole[] obj = new FSTRole[roleList.size()];
-			for (int i = 0; i < roleList.size(); i++) {
-				obj[i] = roleList.get(i);
-			}
-
-			return obj;
+			return roleList.toArray();
 		} else if (parentElement instanceof FSTDirective) {
 			FSTDirective[] directiveArray = ((FSTDirective) parentElement).getChildren().clone();
 			Arrays.sort(directiveArray, directiveComparator);
@@ -261,7 +225,8 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 	public boolean hasChildren(Object element) {
 		if (element instanceof FSTClass) {
 			for (FSTRole role : ((FSTClass) element).getRoles()) {
-				if (!role.getClassFragment().getMethods().isEmpty() || !role.getClassFragment().getFields().isEmpty() || !role.getDirectives().isEmpty()) {
+				if (!role.getClassFragment().getMethods().isEmpty() || !role.getClassFragment().getFields().isEmpty()
+						|| !role.getDirectives().isEmpty()) {
 					return true;
 				}
 			}

@@ -17,9 +17,7 @@ public class Elevator {
 	/* Original: The Lift will not arrive empty at a floor unless the button on that landing was pressed.
 	 * MyVersion: The Lift will not arrive empty at a floor and open its doors unless the button on that landing was pressed.
 	 */
-	/*@ 
-	  @ ensures \original;
-	  @ ensures \old(isEmpty()) && areDoorsOpen() ==> floors[getCurrentFloorID()].hasCall();
+	/*@ ensures \old(isEmpty()) && areDoorsOpen() ==> floors[getCurrentFloorID()].hasCall();
 	  @ ensures isEmpty() ==> (\forall int i; 0 <= i && i < env.calledAt_Spec9.length; !env.calledAt_Spec9[i]);
 	  @*/
 	public void timeShift() {
@@ -27,9 +25,7 @@ public class Elevator {
 		//TODO how to set all calledAt_Spec9[i] = false for all i?
 	}
 
-	/*@ 
-	  @ ensures \original; 
-	  @ ensures env.calledAt_Spec9[floorID];
+	/*@ ensures env.calledAt_Spec9[floorID];
 	  @*/
 	public void pressInLiftFloorButton(int floorID) {
 		//@ set env.calledAt_Spec9[floorID] = true; 
