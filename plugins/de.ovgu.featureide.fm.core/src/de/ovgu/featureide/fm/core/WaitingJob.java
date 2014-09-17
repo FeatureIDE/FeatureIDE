@@ -26,8 +26,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
 /**
- * If the job is sheduled twice, the secound call waits until the job has finished.<br>
- * If the job is sheduled again, but is still waiting the job is not sheduled again. 
+ * If the job is scheduled twice, the secound call waits until the job has finished.<br>
+ * If the job is scheduled again, but is still waiting the job is not scheduled again. 
  * 
  * @author Jens Meinicke
  */
