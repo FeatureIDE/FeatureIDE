@@ -333,6 +333,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 			public void checkStateChanged(CheckStateChangedEvent event) {				
 				projectsList.setSelection(new StructuredSelection(event.getElement()));
 
+				boolean keepWarning = false;
 				if (event.getElement() instanceof String) {
 					for (ProjectRecord tmpRecord : compTable.get((String) event.getElement())) {
 						final boolean isChecked = projectsList.getChecked((String) event.getElement());
@@ -341,13 +342,14 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 							projectsList.setChecked(tmpRecord, false);
 							projectsList.setGrayed(tmpRecord, true);
 							if (isChecked) {
+								keepWarning = true;
 								setMessage(tmpRecord.getWarningText(), WARNING);
 							}
 						}
 					}
 				} else {
 					ProjectRecord tmpRecord = (ProjectRecord) event.getElement();
-					if (tmpRecord.hasWarnings()) {
+					if (keepWarning = tmpRecord.hasWarnings()) {
 						projectsList.setChecked(tmpRecord, false);
 						setMessage(tmpRecord.getWarningText(), WARNING);
 					}
@@ -355,16 +357,19 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 					String compID = tmpRecord.description.getBuildSpec()[0].getArguments().get("composer");
 					String curComposer = compID.substring(compID.lastIndexOf(".") + 1);
 					for (ProjectRecord pr : compTable.get(curComposer)) {
-						if (!projectsList.getChecked(pr)) {
+						if (!projectsList.getChecked(pr) && !pr.hasWarnings) {
 							allChecked = false;
+							break;
 						}
 					}
 					projectsList.setChecked(curComposer, allChecked);
 
 				}
 				if (projectsList.getCheckedElements().length == 0) {
-					setMessage("");
 					setPageComplete(false);
+					if (!keepWarning) {
+						setMessage("");
+					}
 				} else {
 					for (Object obj : projectsList.getCheckedElements()) {
 						if (obj instanceof ProjectRecord) {
