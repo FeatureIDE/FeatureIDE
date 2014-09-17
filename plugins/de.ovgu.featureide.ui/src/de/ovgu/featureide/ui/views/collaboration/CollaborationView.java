@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Vector;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -66,6 +67,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
+import org.eclipse.ui.ide.ResourceUtil;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.progress.UIJob;
@@ -135,6 +137,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	
 	private GraphicalViewerImpl viewer;
 	private CollaborationModelBuilder builder = new CollaborationModelBuilder();
+	private IWorkbenchPart currentEditor;
 	
 	private AddRoleAction addRoleAction;
 	private DeleteAction delAction;
@@ -237,26 +240,27 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		}
 		
 		public void partClosed(IWorkbenchPart part) {
-			
+			if (part == currentEditor) {
+				setEditorActions(null);
+			}
 		}
 		
 		public void partBroughtToTop(IWorkbenchPart part) {
-			if (part instanceof IEditorPart)
+			if (part instanceof IEditorPart) {
 				setEditorActions(part);
+			}
+			
 		}
 		
 		public void partActivated(IWorkbenchPart part) {
-			if (part instanceof IEditorPart || part instanceof ViewPart)
+			if (part instanceof IEditorPart || part instanceof ViewPart) {
 				setEditorActions(part);
+			}
 		}
 		
 	};
 	
-	/*
-	 * @see
-	 * org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets
-	 * .Composite)
-	 */
+
 	public void createPartControl(Composite parent) {
 		IWorkbenchWindow editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		IEditorPart part = null;
@@ -315,8 +319,13 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	 */
 	private void setEditorActions(IWorkbenchPart activeEditor) {
 		IEditorPart part = null;
-		if (activeEditor instanceof IEditorPart) {
+		featureProject = null;
+
+		if (activeEditor == null) {
+			
+		} else if (activeEditor instanceof IEditorPart) {
 			part = (IEditorPart) activeEditor;
+			currentEditor = activeEditor;
 		} else {
 			IWorkbenchPage page = activeEditor.getSite().getPage();
 			if (page != null) {
@@ -362,7 +371,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 			}
 		}
 		
-		if (featureProject == null) {
+ 		if (featureProject == null) {
 			FSTModel model = new FSTModel(null);
 			model.setConfiguration(new FSTConfiguration(OPEN_MESSAGE, null, false));
 			viewer.setContents(model);
@@ -530,13 +539,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		};
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ovgu.featureide.core.listeners.ICurrentBuildListener#updateGuiAfterBuild
-	 * (de.ovgu.featureide.core.IFeatureProject)
-	 */
 	public void updateGuiAfterBuild(final IFeatureProject project, final IFile configurationFile) {
 		if (featureProject != null && featureProject.equals(project)) {
 			if (configurationFile == null) {
