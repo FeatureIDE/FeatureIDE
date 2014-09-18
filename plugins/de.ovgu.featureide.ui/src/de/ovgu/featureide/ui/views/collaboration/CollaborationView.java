@@ -135,6 +135,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	
 	private GraphicalViewerImpl viewer;
 	private CollaborationModelBuilder builder = new CollaborationModelBuilder();
+	private IWorkbenchPart currentEditor;
 	
 	private AddRoleAction addRoleAction;
 	private DeleteAction delAction;
@@ -237,26 +238,27 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		}
 		
 		public void partClosed(IWorkbenchPart part) {
-			
+			if (part == currentEditor) {
+				setEditorActions(null);
+			}
 		}
 		
 		public void partBroughtToTop(IWorkbenchPart part) {
-			if (part instanceof IEditorPart)
+			if (part instanceof IEditorPart) {
 				setEditorActions(part);
+			}
+			
 		}
 		
 		public void partActivated(IWorkbenchPart part) {
-			if (part instanceof IEditorPart || part instanceof ViewPart)
+			if (part instanceof IEditorPart || part instanceof ViewPart) {
 				setEditorActions(part);
+			}
 		}
 		
 	};
 	
-	/*
-	 * @see
-	 * org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets
-	 * .Composite)
-	 */
+
 	public void createPartControl(Composite parent) {
 		IWorkbenchWindow editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		IEditorPart part = null;
@@ -311,26 +313,31 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	/**
 	 * Gets the input of the given part and sets the content of the diagram.
 	 * 
-	 * @param activeEditor
+	 * @param activeWorkbenchPart
 	 */
-	private void setEditorActions(IWorkbenchPart activeEditor) {
-		IEditorPart part = null;
-		if (activeEditor instanceof IEditorPart) {
-			part = (IEditorPart) activeEditor;
+	private void setEditorActions(IWorkbenchPart activeWorkbenchPart) {
+		IEditorPart activeEditor = null;
+		featureProject = null;
+
+		if (activeWorkbenchPart == null) {
+			// do nothing
+		} else if (activeWorkbenchPart instanceof IEditorPart) {
+			activeEditor = (IEditorPart) activeWorkbenchPart;
+			currentEditor = activeWorkbenchPart;
 		} else {
-			IWorkbenchPage page = activeEditor.getSite().getPage();
+			final IWorkbenchPage page = activeWorkbenchPart.getSite().getPage();
 			if (page != null) {
-				part = page.getActiveEditor();
+				activeEditor = page.getActiveEditor();
 			}
 		}
 		
-		if (part != null && part.getEditorInput() instanceof FileEditorInput) {
+		if (activeEditor != null && activeEditor.getEditorInput() instanceof FileEditorInput) {
 			// case: open editor
-			IFile inputFile = ((FileEditorInput) part.getEditorInput()).getFile();
+			final IFile inputFile = ((FileEditorInput) activeEditor.getEditorInput()).getFile();
 			featureProject = CorePlugin.getFeatureProject(inputFile);
+			
 			if (featureProject != null) {
 				// case: it's a FeatureIDE project
-				
 				featureProject.getFeatureModel().addListener(new PropertyChangeListener() {
 					@Override
 					public void propertyChange(PropertyChangeEvent event) {
@@ -362,11 +369,12 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 			}
 		}
 		
-		if (featureProject == null) {
-			FSTModel model = new FSTModel(null);
+ 		if (featureProject == null) {
+			final FSTModel model = new FSTModel(null);
 			model.setConfiguration(new FSTConfiguration(OPEN_MESSAGE, null, false));
 			viewer.setContents(model);
-			EditPart content = viewer.getContents();
+			
+			final EditPart content = viewer.getContents();
 			if (content != null) {
 				content.refresh();
 			}
@@ -376,7 +384,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	}
 	
 	private void createContextMenu() {
-		
 		MenuManager menuMgr = new MenuManager("#PopupMenu");
 		menuMgr.setRemoveAllWhenShown(true);
 		
@@ -530,13 +537,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		};
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ovgu.featureide.core.listeners.ICurrentBuildListener#updateGuiAfterBuild
-	 * (de.ovgu.featureide.core.IFeatureProject)
-	 */
 	public void updateGuiAfterBuild(final IFeatureProject project, final IFile configurationFile) {
 		if (featureProject != null && featureProject.equals(project)) {
 			if (configurationFile == null) {
