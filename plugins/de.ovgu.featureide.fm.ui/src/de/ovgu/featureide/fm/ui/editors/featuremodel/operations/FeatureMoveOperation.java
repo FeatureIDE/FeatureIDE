@@ -49,6 +49,17 @@ public class FeatureMoveOperation extends AbstractFeatureModelOperation {
 		this.newPos = newPos;
 		this.oldPos = oldPos;
 		this.feature = feature;
+		if(!featureModel.getLayout().hasFeaturesAutoLayout())
+			adjustNewPosWithZoomFactor();
+	}
+
+	/**
+	 * symptomatical fix for the distance of drag and drop movement being scaled with the zoomfactor(Issue #2).
+	 */
+	private void adjustNewPosWithZoomFactor(){
+		Point delta = newPos.getTranslated(oldPos.getNegated());//difference between old and new
+		delta = delta.getScaled(1/FeatureUIHelper.getZoomFactor());//scale with zoomFactor
+		newPos.setLocation(oldPos.getTranslated(delta)); //Translate oldPos by scaled diff
 	}
 
 	public void newInnerOrder (Point newPos){

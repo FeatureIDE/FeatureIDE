@@ -55,6 +55,11 @@ public class FeatureUIHelper {
 	private static ArrayList <FeatureModel> hasVerticalLayout= new ArrayList<FeatureModel>();
 	private static Set <FeatureModel> showHiddenFeatures = new HashSet <FeatureModel>();
 	
+	/**
+	 * Necessary for correct manual drag-and-drop movement while zoomed.
+	 */
+	private static double zoomFactor = 1.0;
+	
 	public static Dimension getLegendSize(FeatureModel featureModel){
 		return legendSize.get(featureModel);
 	}
@@ -230,5 +235,21 @@ public class FeatureUIHelper {
 
 	public static FMPoint toFMPoint(Point point){
 	    return new FMPoint(point.x, point.y);
+	}
+
+	/**
+	 * @return the zoomFactor
+	 */
+	public static double getZoomFactor()
+	{
+		return zoomFactor;
+	}
+
+	/**
+	 * @param zoomFactor the zoomFactor to set
+	 */
+	public static void setZoomFactor(double zoomFactor)
+	{
+		FeatureUIHelper.zoomFactor = zoomFactor;
 	}
 }
