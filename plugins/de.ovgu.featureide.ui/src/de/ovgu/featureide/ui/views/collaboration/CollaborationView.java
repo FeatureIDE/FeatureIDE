@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Vector;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -67,7 +66,6 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
-import org.eclipse.ui.ide.ResourceUtil;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.progress.UIJob;
@@ -315,31 +313,31 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	/**
 	 * Gets the input of the given part and sets the content of the diagram.
 	 * 
-	 * @param activeEditor
+	 * @param activeWorkbenchPart
 	 */
-	private void setEditorActions(IWorkbenchPart activeEditor) {
-		IEditorPart part = null;
+	private void setEditorActions(IWorkbenchPart activeWorkbenchPart) {
+		IEditorPart activeEditor = null;
 		featureProject = null;
 
-		if (activeEditor == null) {
-			
-		} else if (activeEditor instanceof IEditorPart) {
-			part = (IEditorPart) activeEditor;
-			currentEditor = activeEditor;
+		if (activeWorkbenchPart == null) {
+			// do nothing
+		} else if (activeWorkbenchPart instanceof IEditorPart) {
+			activeEditor = (IEditorPart) activeWorkbenchPart;
+			currentEditor = activeWorkbenchPart;
 		} else {
-			IWorkbenchPage page = activeEditor.getSite().getPage();
+			final IWorkbenchPage page = activeWorkbenchPart.getSite().getPage();
 			if (page != null) {
-				part = page.getActiveEditor();
+				activeEditor = page.getActiveEditor();
 			}
 		}
 		
-		if (part != null && part.getEditorInput() instanceof FileEditorInput) {
+		if (activeEditor != null && activeEditor.getEditorInput() instanceof FileEditorInput) {
 			// case: open editor
-			IFile inputFile = ((FileEditorInput) part.getEditorInput()).getFile();
+			final IFile inputFile = ((FileEditorInput) activeEditor.getEditorInput()).getFile();
 			featureProject = CorePlugin.getFeatureProject(inputFile);
+			
 			if (featureProject != null) {
 				// case: it's a FeatureIDE project
-				
 				featureProject.getFeatureModel().addListener(new PropertyChangeListener() {
 					@Override
 					public void propertyChange(PropertyChangeEvent event) {
@@ -372,10 +370,11 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		}
 		
  		if (featureProject == null) {
-			FSTModel model = new FSTModel(null);
+			final FSTModel model = new FSTModel(null);
 			model.setConfiguration(new FSTConfiguration(OPEN_MESSAGE, null, false));
 			viewer.setContents(model);
-			EditPart content = viewer.getContents();
+			
+			final EditPart content = viewer.getContents();
 			if (content != null) {
 				content.refresh();
 			}
@@ -385,7 +384,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	}
 	
 	private void createContextMenu() {
-		
 		MenuManager menuMgr = new MenuManager("#PopupMenu");
 		menuMgr.setRemoveAllWhenShown(true);
 		
