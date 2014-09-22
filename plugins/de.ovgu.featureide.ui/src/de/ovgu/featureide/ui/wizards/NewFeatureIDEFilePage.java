@@ -630,7 +630,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 		
 		}
 		if (comboFeature.getItemCount() == 1 || 
-				!featureProject.getComposer().hasFeatureFolder()) {
+				!featureProject.getComposer().createFolderForFeatures()) {
 			comboFeature.setEnabled(false);
 		} else {
 			comboFeature.setEnabled(true);
@@ -639,7 +639,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 
 	private void checkcontainer(IFeatureProject featureProject,
 			IResource resource) {
-		if (featureProject.getComposer().hasFeatureFolder()) {
+		if (featureProject.getComposer().createFolderForFeatures()) {
 			sourceFolder = featureProject.getSourceFolder();
 		} else {
 			sourceFolder = featureProject.getBuildFolder();
@@ -685,7 +685,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 
 	IContainer getContainerObject() {
 		if (composer != null) {
-			IFolder folder = composer.hasFeatureFolder() ? sourceFolder.getFolder(comboFeature.getText()) : sourceFolder;
+			IFolder folder = composer.createFolderForFeatures() ? sourceFolder.getFolder(comboFeature.getText()) : sourceFolder;
 			for (String packageName : comboPackage.getText().split("[.]")) {
 				folder = folder.getFolder(packageName);
 			}

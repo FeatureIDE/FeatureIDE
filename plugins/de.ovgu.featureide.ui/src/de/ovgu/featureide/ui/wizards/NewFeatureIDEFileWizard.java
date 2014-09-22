@@ -102,7 +102,7 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 		final String className = page.getClassName();
 		final String packageName = page.getPackage();
 		IFolder sourceFolder = page.getSourceFolder();
-		if (composer.hasFeatureFolder()) {
+		if (composer.createFolderForFeatures()) {
 			sourceFolder = sourceFolder.getFolder(featureName);
 		}
 		createFolder(page.getPackage(), sourceFolder);

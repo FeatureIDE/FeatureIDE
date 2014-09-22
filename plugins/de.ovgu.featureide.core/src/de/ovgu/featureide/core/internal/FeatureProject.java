@@ -804,8 +804,11 @@ public class FeatureProject extends BuilderMarkerHandler implements
 		String message = null;
 		int severity = IMarker.SEVERITY_WARNING;
 		if (feature == null) {
-			severity = IMarker.SEVERITY_ERROR;
-			message = "The feature module \"" + folder.getName() + "\" has no corresponding feature at the feature model.";
+			//TODO: Put this check at the right position or delete this comment if it is right here
+			if (this.composerExtension.createFolderForFeatures()) {
+				severity = IMarker.SEVERITY_ERROR;
+				message = "The feature module \"" + folder.getName() + "\" has no corresponding feature at the feature model.";
+			}
 		} else {
 			try {
 				if (feature.isConcrete() && folder.members().length == 0) {
