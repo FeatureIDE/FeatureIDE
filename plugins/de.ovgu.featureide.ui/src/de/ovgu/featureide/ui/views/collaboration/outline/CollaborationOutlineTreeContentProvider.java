@@ -22,8 +22,6 @@ package de.ovgu.featureide.ui.views.collaboration.outline;
  */
 
 import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,7 +40,7 @@ import de.ovgu.featureide.core.fstmodel.FSTInvariant;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
-import de.ovgu.featureide.core.fstmodel.RoleElement;
+import de.ovgu.featureide.core.fstmodel.IRoleElement;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 
 /**
@@ -59,24 +57,6 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 
 	public CollaborationOutlineTreeContentProvider() {
 	}
-
-	private Comparator<? super RoleElement> roleElementComparator = new Comparator<RoleElement>() {
-
-		@Override
-		public int compare(RoleElement o1, RoleElement o2) {
-			return o1.getFullName().compareToIgnoreCase(o2.getFullName());
-		}
-
-	};
-
-	private Comparator<? super FSTDirective> directiveComparator = new Comparator<FSTDirective>() {
-
-		@Override
-		public int compare(FSTDirective o1, FSTDirective o2) {
-			return o1.getStartLine() > o2.getStartLine() ? 1 : -1;
-		}
-
-	};
 
 	@Override
 	public void dispose() {
@@ -126,18 +106,18 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 	public Object[] getChildren(Object parentElement) {
 		if (parentElement instanceof FSTClass) {
 			// get all fields, methods, directives and invariants
-			final TreeSet<FSTMethod> methods = new TreeSet<FSTMethod>(roleElementComparator);
-			final TreeSet<FSTField> fields = new TreeSet<FSTField>(roleElementComparator);
-			final TreeSet<FSTInvariant> invariants = new TreeSet<FSTInvariant>(roleElementComparator);
-			final TreeSet<FSTDirective> directives = new TreeSet<FSTDirective>(directiveComparator);
+			final TreeSet<FSTMethod> methods = new TreeSet<FSTMethod>();
+			final TreeSet<FSTField> fields = new TreeSet<FSTField>();
+			final TreeSet<FSTInvariant> invariants = new TreeSet<FSTInvariant>();
+			final TreeSet<FSTDirective> directives = new TreeSet<FSTDirective>();
 			for (FSTRole role : ((FSTClass) parentElement).getRoles()) {
 				invariants.addAll(role.getClassFragment().getInvariants());
 				methods.addAll(role.getClassFragment().getMethods());
 				fields.addAll(role.getClassFragment().getFields());
 				directives.addAll(role.getDirectives());
 			}
-
-			final RoleElement[] obj = new RoleElement[methods.size() + fields.size() + invariants.size()
+			
+			final IRoleElement[] obj = new IRoleElement[methods.size() + fields.size() + invariants.size()
 					+ directives.size()];
 			int pos = 0;
 			System.arraycopy(invariants.toArray(), 0, obj, pos, invariants.size());
@@ -210,7 +190,7 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 			return roleList.toArray();
 		} else if (parentElement instanceof FSTDirective) {
 			FSTDirective[] directiveArray = ((FSTDirective) parentElement).getChildren().clone();
-			Arrays.sort(directiveArray, directiveComparator);
+			Arrays.sort(directiveArray);
 			return directiveArray;
 		}
 		return new FSTRole[0];
