@@ -23,7 +23,6 @@ package de.ovgu.featureide.ui.views.collaboration.outline;
 
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -93,27 +92,19 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 
 	@Override
 	public Object[] getElements(Object inputElement) {
-		if (inputElement == null || !(inputElement instanceof IFile))
+		if (inputElement == null || !(inputElement instanceof IFile)) {
 			return new String[] { "no file found" };
+		}
 
-		IFile file = (IFile) inputElement;
-		IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
+		final IFile file = (IFile) inputElement;
+		final IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
 
 		if (featureProject != null) {
 			model = featureProject.getFSTModel();
 
 			if (model != null) {
-				// TODO: Change composers to use the full path instead of
-				// filename (with the same separator on every platform)
-				// IPath filePath = file.getProjectRelativePath();
-				// IPath featurePath =
-				// featureProject.getSourceFolder().getProjectRelativePath();
-				// filePath =
-				// filePath.removeFirstSegments(filePath.matchingFirstSegments(featurePath)
-				// + 1);
-				// String classString = filePath.toString();
-				// FSTClass c = model.getClass(classString);
-				FSTClass c = model.getClass(file.getName());
+				FSTClass c = model.getClass(model.getAbsoluteClassName(file));
+
 				if (c != null) {
 					return new Object[] { c };
 				}
@@ -137,8 +128,7 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 				directives.addAll(role.getDirectives());
 			}
 
-			final RoleElement[] obj = new RoleElement[methods.size() + fields.size() + invariants.size()
-					+ directives.size()];
+			final RoleElement[] obj = new RoleElement[methods.size() + fields.size() + invariants.size() + directives.size()];
 			int pos = 0;
 			System.arraycopy(invariants.toArray(), 0, obj, pos, invariants.size());
 			System.arraycopy(fields.toArray(), 0, obj, pos += invariants.size(), fields.size());

@@ -260,14 +260,14 @@ public class ErrorPropagation {
 		if (model == null) {
 			return;
 		}
-		FSTClass fstClass = model.getClass(file.getName());
+		FSTClass fstClass = model.getClass(model.getAbsoluteClassName(file));
 		if (fstClass == null) {
 			return;
 		}
 		
 		LinkedList<String> selectedFeatures = getSelectedFeatures(CorePlugin.getFeatureProject(file));
 		for (FSTRole role : fstClass.getRoles()) {
-			if (!selectedFeatures.contains(role.getFeature())) {
+			if (!selectedFeatures.contains(role.getFeature().getName())) {
 				continue;
 			}
 			for (FSTField field : role.getClassFragment().getFields()) {

@@ -394,6 +394,12 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	}
 
 	@Override
+	public boolean createFolderForFeatures() {
+		return false;
+	}
+
+	
+	@Override
 	public boolean hasFeatureFolder() {
 		return false;
 	}

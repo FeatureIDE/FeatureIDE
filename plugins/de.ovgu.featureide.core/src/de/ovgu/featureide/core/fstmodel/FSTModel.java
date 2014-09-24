@@ -29,6 +29,7 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.IPath;
 
 import de.ovgu.featureide.core.IFeatureProject;
 
@@ -44,11 +45,11 @@ public class FSTModel {
 
 	private final Map<String, FSTClass> classes = new HashMap<String, FSTClass>();
 	private final Map<String, FSTFeature> features = new HashMap<String, FSTFeature>();
-	private final IFeatureProject featurProject;
+	private final IFeatureProject featureProject;
 	private FSTConfiguration configuration;
 
 	public FSTModel(IFeatureProject featureProject) {
-		this.featurProject = featureProject;
+		this.featureProject = featureProject;
 	}
 
 	public void reset() {
@@ -86,7 +87,7 @@ public class FSTModel {
 	}
 	
 	public void addClass(final FSTClass c) {
-		if (!classes.containsValue(c)) {
+		if (!classes.containsKey(c.getName())) {
 			classes.put(c.getName(), c);
 		}
 	}
@@ -109,15 +110,12 @@ public class FSTModel {
 	}
 
 	public FSTRole getRole(String featureName, String className) {
-		FSTClass c = classes.get(className);
-		if (c != null) {
-			return c.getRole(featureName);
-		}
-		return null;
+		final FSTClass c = classes.get(className);
+		return (c == null) ? null : c.getRole(featureName);
 	}
 
-	public FSTClass getClass(String fileName) {
-		return classes.get(fileName);
+	public FSTClass getClass(String className) {
+		return classes.get(className);
 	}
 
 	public List<FSTClass> getClasses() {
@@ -125,7 +123,7 @@ public class FSTModel {
 	}
 
 	public IFeatureProject getFeatureProject() {
-		return featurProject;
+		return featureProject;
 	}
 	
 	/**
@@ -168,5 +166,12 @@ public class FSTModel {
 		c.addRole(featureName, arbitraryRole);
 		feature.addRole(className, arbitraryRole);
 		return role;
+	}
+	
+	public String getAbsoluteClassName(IFile file) {
+		IPath filePath = file.getProjectRelativePath();
+		final IPath featurePath = featureProject.getSourceFolder().getProjectRelativePath();
+		filePath = filePath.removeFirstSegments(filePath.matchingFirstSegments(featurePath) + 1);
+		return filePath.toString();
 	}
 }

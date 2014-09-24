@@ -199,8 +199,8 @@ public class CollaborationModelBuilder {
 			return true;
 		}
 		
-		for (final String c : getClassFilter()) {
-			final FSTClass fstClass = fSTModel.getClass(c);
+		for (final String classFilter : getClassFilter()) {
+			final FSTClass fstClass = fSTModel.getClass(classFilter);
 			if (fstClass != null) {
 				for (final FSTRole role : fstClass.getRoles()) {
 					if (role.getFeature().equals(feature)) {

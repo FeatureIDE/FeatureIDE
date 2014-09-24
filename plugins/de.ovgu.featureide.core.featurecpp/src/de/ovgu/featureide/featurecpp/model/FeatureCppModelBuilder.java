@@ -57,11 +57,11 @@ public class FeatureCppModelBuilder {
 		featureProject.setFSTModel(model);
 		this.featureProject = featureProject;
 	}
-	
+
 	public void resetModel() {
 		model.reset();
 	}
-	
+
 	/**
 	 * Builds The full FSTModel
 	 */
@@ -76,9 +76,10 @@ public class FeatureCppModelBuilder {
 		addArbitraryFiles();
 		return true;
 	}
-	
+
 	/**
 	 * adds the informations of this class to the FSTModel
+	 * 
 	 * @param file
 	 */
 	private void buildModel(IFile file) {
@@ -86,8 +87,10 @@ public class FeatureCppModelBuilder {
 		String className = infos.getFirst().split("[;]")[2] + ".h";
 		for (String info : infos) {
 			String[] array = info.split("[;]");
-			currentRole = model.addRole(array[0], className, null);
-			currentRole.setFile(getFile(className));
+			final IFile classFile = getFile(className);
+			currentRole = model.addRole(array[0], model.getAbsoluteClassName(classFile), null);
+			currentRole.setFile(classFile);
+
 			if (array.length == 7) {
 				addField(array);
 			} else {
@@ -106,15 +109,14 @@ public class FeatureCppModelBuilder {
 
 	private LinkedList<String> getParameter(String... array) {
 		LinkedList<String> parameter = new LinkedList<String>();
-		for (int i = 8;i < array.length;i++) {
+		for (int i = 8; i < array.length; i++) {
 			parameter.add(array[i]);
 		}
 		return parameter;
 	}
 
 	private IFile getFile(String className) {
-		return featureProject.getSourceFolder()
-			.getFolder(currentRole.getFeature().getName()).getFile(className);
+		return featureProject.getSourceFolder().getFolder(currentRole.getFeature().getName()).getFile(className);
 	}
 
 	private LinkedList<String> getInfo(IFile file) {
@@ -122,7 +124,7 @@ public class FeatureCppModelBuilder {
 		Scanner scanner = null;
 		try {
 			scanner = new Scanner(file.getRawLocation().toFile(), "UTF-8");
-			while(scanner.hasNext()) {
+			while (scanner.hasNext()) {
 				informations.add(scanner.nextLine());
 			}
 		} catch (FileNotFoundException e) {
@@ -147,7 +149,7 @@ public class FeatureCppModelBuilder {
 			for (IResource res : tempFolder.members()) {
 				if (res instanceof IFile) {
 					if (res.getName().endsWith(".info")) {
-						files.add((IFile)res);
+						files.add((IFile) res);
 					}
 				}
 			}
@@ -156,7 +158,7 @@ public class FeatureCppModelBuilder {
 		}
 		return files;
 	}
-	
+
 	private void addArbitraryFiles() {
 		IFolder folder = featureProject.getSourceFolder();
 		for (FSTFeature feature : model.getFeatures()) {
@@ -169,7 +171,7 @@ public class FeatureCppModelBuilder {
 		try {
 			for (IResource res : featureFolder.members()) {
 				if (res instanceof IFolder) {
-					addArbitraryFiles((IFolder)res, feature);
+					addArbitraryFiles((IFolder) res, feature);
 				} else if (res instanceof IFile) {
 					if (!featureProject.getComposer().extensions().contains(res.getFileExtension())) {
 						model.addArbitraryFile(feature.getName(), (IFile) res);

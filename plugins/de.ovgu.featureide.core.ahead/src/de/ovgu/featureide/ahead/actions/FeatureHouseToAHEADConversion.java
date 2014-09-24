@@ -194,15 +194,17 @@ public class FeatureHouseToAHEADConversion extends ComposerConversion {
 	 * @return The Method at the given line
 	 */
 	private String getMethodName(int line, IFile file) {
-		String name = file.getName();
-		if (model != null && model.getClass(name) !=  null) {
-			LinkedList<FSTMethod> methods = new LinkedList<FSTMethod>();
-			for (FSTRole role : model.getClass(name).getRoles()) {
-				methods.addAll(role.getClassFragment().getMethods());
-			}
-			for (FSTMethod method : methods) {
-				if (method.getLine() <= line && method.getEndLine() >= line) {
-					return method.getName();
+		if (model != null) {
+			final String name = model.getAbsoluteClassName(file);
+			if (model.getClass(name) != null) {
+				LinkedList<FSTMethod> methods = new LinkedList<FSTMethod>();
+				for (FSTRole role : model.getClass(name).getRoles()) {
+					methods.addAll(role.getClassFragment().getMethods());
+				}
+				for (FSTMethod method : methods) {
+					if (method.getLine() <= line && method.getEndLine() >= line) {
+						return method.getName();
+					}
 				}
 			}
 		}
