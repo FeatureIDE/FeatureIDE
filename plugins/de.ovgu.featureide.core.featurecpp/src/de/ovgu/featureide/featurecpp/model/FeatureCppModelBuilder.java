@@ -86,9 +86,10 @@ public class FeatureCppModelBuilder {
 		LinkedList<String> infos = getInfo(file);
 		String className = infos.getFirst().split("[;]")[2] + ".h";
 		for (String info : infos) {
-			String[] array = info.split("[;]");
-			final IFile classFile = getFile(className);
-			currentRole = model.addRole(array[0], model.getAbsoluteClassName(classFile), null);
+			final String[] array = info.split("[;]");
+			final String featureName = array[0];
+			final IFile classFile = featureProject.getSourceFolder().getFolder(featureName).getFile(className);
+			currentRole = model.addRole(featureName, model.getAbsoluteClassName(classFile), null);
 			currentRole.setFile(classFile);
 
 			if (array.length == 7) {
@@ -113,10 +114,6 @@ public class FeatureCppModelBuilder {
 			parameter.add(array[i]);
 		}
 		return parameter;
-	}
-
-	private IFile getFile(String className) {
-		return featureProject.getSourceFolder().getFolder(currentRole.getFeature().getName()).getFile(className);
 	}
 
 	private LinkedList<String> getInfo(IFile file) {
