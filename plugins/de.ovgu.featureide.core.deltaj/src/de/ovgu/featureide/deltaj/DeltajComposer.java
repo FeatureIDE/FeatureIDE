@@ -297,6 +297,12 @@ public class DeltajComposer extends ComposerExtensionClass {
 		return false;
 	}
 	
+
+	@Override
+	public boolean createFolderForFeatures() {
+		return false;
+	}
+
 	@Override
 	public boolean refines() {
 		return false;

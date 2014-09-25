@@ -599,6 +599,12 @@ public class CPPComposer extends PPComposerExtensionClass {
 		return false;
 	}
 
+
+	@Override
+	public boolean createFolderForFeatures() {
+		return false;
+	}
+
 	@Override
 	public boolean clean() {
 		return false;

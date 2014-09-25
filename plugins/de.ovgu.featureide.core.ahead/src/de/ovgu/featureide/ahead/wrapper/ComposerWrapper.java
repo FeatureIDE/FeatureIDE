@@ -47,13 +47,6 @@ import de.ovgu.featureide.ahead.model.AbstractJakModelBuilder;
 import de.ovgu.featureide.ahead.model.JampackJakModelBuilder;
 import de.ovgu.featureide.ahead.model.MixinJakModelBuilder;
 import de.ovgu.featureide.core.IFeatureProject;
-/*import mixin.AST_Program;
-import mixin.ExtendedParseException;
-import mixin.Mixin;*/
-/*
-import jampack.AST_Program;
-import jampack.ExtendedParseException;
-import jampack.Jampack;*/
 
 /**
  * 
@@ -284,7 +277,7 @@ public class ComposerWrapper {
 					+ jakFilePath + "'. File skipped.");
 			return;
 		}
-		jakFilePath = jakFilePath.substring(pos + 1);
+		jakFilePath = jakFilePath.substring(pos + 1).replace("\\", "/");
 
 		// don't add files twice
 		if (absoluteJakFilenames.containsKey(jakFilePath))

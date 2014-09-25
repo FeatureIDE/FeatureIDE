@@ -56,6 +56,13 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 	public static final String C_NATURE = "org.eclipse.cdt.core.cnature";
 	public static final String CC_NATURE = "org.eclipse.cdt.core.ccnature";
 
+	private static final String NEWLINE = System.getProperty("line.separator", "\n");
+	private static final ArrayList<String[]> TEMPLATES = new ArrayList<String[]>(1);
+	
+	static {
+		 TEMPLATES.add(new String[]{"C++", "h", NEWLINE + REFINES_PATTERN + " class " + CLASS_NAME_PATTERN + " {" + NEWLINE + NEWLINE + "};"});
+	}
+	
 	/**
 	 * This wrapper builds the current configuration into the build folder.
 	 */
@@ -120,7 +127,6 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 			}
 		}
 	}
-
 
 	public void performFullBuild(IFile config) {
 		if(!isPluginInstalled(PLUGIN_ID)){
@@ -191,18 +197,6 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 		return TEMPLATES;
 	}
 	
-	private static final ArrayList<String[]> TEMPLATES = createTempltes();
-	private static final String NEWLINE = System.getProperty("line.separator", "\n");
-	
-	private static ArrayList<String[]> createTempltes() {
-		 ArrayList<String[]> list = new  ArrayList<String[]>(1);
-		 list.add(new String[]{"C++", "h", NEWLINE + REFINES_PATTERN + " class " + CLASS_NAME_PATTERN + " {" + NEWLINE + NEWLINE + "};"});
-		 return list;
-	}
-	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.ComposerExtensionClass#replaceMarker(java.lang.String, java.util.List)
-	 */
 	@Override
 	public String replaceSourceContentMarker(String text,  boolean refines, String packageName) {
 		if (refines)

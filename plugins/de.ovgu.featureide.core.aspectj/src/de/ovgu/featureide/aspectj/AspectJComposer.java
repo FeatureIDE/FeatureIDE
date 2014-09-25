@@ -523,6 +523,11 @@ public class AspectJComposer extends ComposerExtensionClass {
 	}
 
 	@Override
+	public boolean createFolderForFeatures() {
+		return false;
+	}
+
+	@Override
 	public boolean hasFeatureFolder() {
 		return false;
 	}

@@ -102,14 +102,14 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 		final String className = page.getClassName();
 		final String packageName = page.getPackage();
 		IFolder sourceFolder = page.getSourceFolder();
-		if (composer.hasFeatureFolder()) {
+		if (composer.createFolderForFeatures()) {
 			sourceFolder = sourceFolder.getFolder(featureName);
 		}
 		createFolder(page.getPackage(), sourceFolder);
 		IRunnableWithProgress op = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor) throws InvocationTargetException {
 				try {
-					doFinish(featureName,container, fileName,className, fileExtension, fileTemplate , composer, page.isRefinement (), packageName,monitor);
+					doFinish(featureName, container, fileName, className, fileExtension, fileTemplate, composer, page.isRefinement(), packageName, monitor);
 				} catch (CoreException e) {
 					throw new InvocationTargetException(e);
 				} finally {
@@ -152,14 +152,14 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 	 * the editor on the newly created file.
 	 * @param packageName 
 	 */
-	private void doFinish(String featureName,IContainer container, String fileName,String classname, String extension, String template, 
+	private void doFinish(String featureName, IContainer container, String fileName, String classname, String extension, String template, 
 			IComposerExtensionClass composer, boolean refines, String packageName, IProgressMonitor monitor) throws CoreException {
 		// create a sample file
 		monitor.beginTask("Creating " + fileName, 2);
 		final IFile file = container.getFile(new Path(fileName + "." + extension));
 	
 		try {
-			InputStream stream = openContentStream(featureName,container, classname, template, composer, refines, packageName);
+			InputStream stream = openContentStream(featureName, container, classname, template, composer, refines, packageName);
 			if (file.exists()) {
 				file.setContents(stream, true, true, monitor);
 			} else {
