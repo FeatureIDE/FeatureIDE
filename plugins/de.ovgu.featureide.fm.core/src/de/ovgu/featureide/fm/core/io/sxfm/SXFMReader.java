@@ -54,6 +54,7 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
  * Parses feature model files in the SXFM format.
  * 
  * @author Fabian Wielgorz
+ * @author Thomas Thuem
  */
 public class SXFMReader extends AbstractFeatureModelReader {
 	
@@ -165,9 +166,10 @@ public class SXFMReader extends AbstractFeatureModelReader {
     	BufferedReader reader = new BufferedReader(new StringReader(
     			buffer.toString()));
     	buildFeatureTree(reader);
+    	removeUnnecessaryAbstractFeatures(featureModel.getRoot());
     }
     
-    private String removeWhitespaces(String str){
+	private String removeWhitespaces(String str){
     	str = str.trim();
     	if (str.contains(" ")){
 	    	String temp = str.substring(0,str.indexOf(' ')+1);
@@ -259,6 +261,16 @@ public class SXFMReader extends AbstractFeatureModelReader {
 		    		lastFeat.addChild(feat);
 		    		feat.changeToAnd();
 				} else if (lineText.startsWith(":g")) {
+					//create an abstract feature for each group (could be optimized, but avoid mixing up several groups)
+					feat = new FeatureIndent(featureModel, countIndent);
+		    		feat.setMandatory(true);
+		    		feat.setAbstract(true);
+		    		//try to generate a name that hopefully does not exist in the model
+		    		featId = lastFeat.getName() + "_" + (lastFeat.getChildrenCount()+1);
+		    		feat.setName(featId);
+		    		feat.setParent(lastFeat);
+		    		lastFeat.addChild(feat);
+		    		lastFeat = feat;
 					if (lineText.contains("[1,1]")) {
 						lastFeat.changeToAlternative();
 					} else if (lineText.contains("[1,*]")) {
@@ -312,6 +324,29 @@ public class SXFMReader extends AbstractFeatureModelReader {
 			FMCorePlugin.getDefault().logError(e);
 		}
     }
+
+	private void removeUnnecessaryAbstractFeatures(Feature feature) {
+		if (feature.getChildrenCount() == 1) {
+			Feature child = feature.getFirstChild();
+			if (child.isAbstract()) {
+				for (Feature grantChild : feature.getFirstChild().getChildren()) {
+					grantChild.setParent(feature);
+					feature.addChild(grantChild);
+				}
+				if (child.isAnd())
+					feature.changeToAnd();
+				else if (child.isOr())
+					feature.changeToOr();
+				else if (child.isAlternative())
+					feature.changeToAlternative();
+				child.setParent(null);
+				feature.removeChild(child);
+			}
+		}
+		for (Feature child : feature.getChildren())
+			removeUnnecessaryAbstractFeatures(child);
+	}
+    
     /**
      * adds Feature feat to the model
      * if the feature name is already taken,
