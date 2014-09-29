@@ -92,7 +92,7 @@ public class ModelLayoutEditPolicy extends LayoutEditPolicy {
 						.get(0);
 				Feature feature = editPart.getFeature();
 				Rectangle bounds = FeatureUIHelper.getBounds(feature);
-				bounds = r.getTransformedRectangle(bounds);
+				bounds = bounds.getTranslated(r.getMoveDelta().getScaled(1/FeatureUIHelper.getZoomFactor()));
 				cmd = new FeatureDragAndDropCommand(featureModel, feature,
 						bounds.getLocation(),editPart);
 			}
@@ -109,7 +109,7 @@ public class ModelLayoutEditPolicy extends LayoutEditPolicy {
 							constraint, point);
 				} else {
 					Rectangle bounds = FeatureUIHelper.getBounds(constraint);
-					bounds = r.getTransformedRectangle(bounds);
+					bounds = bounds.getTranslated(r.getMoveDelta().getScaled(1/FeatureUIHelper.getZoomFactor()));
 					cmd = new ConstraintDragAndDropCommand(featureModel,
 							constraint, bounds.getLocation());
 				}
