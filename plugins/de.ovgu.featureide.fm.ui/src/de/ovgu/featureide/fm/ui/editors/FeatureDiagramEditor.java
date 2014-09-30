@@ -735,7 +735,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				// there are errors in the file, stay at this editor page
 				featureModelEditor.isPageModified = false;
 				featureModelEditor.setActiveEditorPage(featureModelEditor.textEditor.getIndex());
-				featureModelEditor.oldPageIndex = featureModelEditor.textEditor.getIndex();
+				featureModelEditor.currentPageIndex = featureModelEditor.textEditor.getIndex();
 				return;
 			}
 		}
