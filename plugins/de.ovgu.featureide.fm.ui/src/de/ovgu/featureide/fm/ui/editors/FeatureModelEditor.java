@@ -445,6 +445,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 		}
 
 		setPageModified(false);
+		textEditor.resetTextEditor();
 		updateConfigurationEditors();
 	}
 
