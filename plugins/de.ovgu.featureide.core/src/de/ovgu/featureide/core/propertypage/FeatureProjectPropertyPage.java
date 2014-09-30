@@ -23,6 +23,7 @@ package de.ovgu.featureide.core.propertypage;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFolder;
@@ -444,7 +445,38 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		if (noPathChanged()) {
 			return;
 		}
+		
+		final IProject iProject = featureProject.getProject();
+		createFolder(iProject.getFolder(featurePath.getText()));
+		createFolder(iProject.getFolder(sourcePath.getText()));
+		createFolder(iProject.getFolder(configPath.getText()));
+		
+		try {
+			iProject.refreshLocal(IResource.DEPTH_INFINITE, null);
+		} catch (CoreException e) {
+			CorePlugin.getDefault().logError(e);
+		}
+
 		featureProject.setPaths(featurePath.getText(), sourcePath.getText(), configPath.getText());
+	}
+
+	/**
+	 * @param newFolder
+	 */
+	private void createFolder(IFolder newFolder) {
+		final LinkedList<IFolder> parents = new LinkedList<IFolder>();
+		IResource parent = newFolder;
+		while (!parent.exists() && parent instanceof IFolder) {
+			parents.addFirst((IFolder) parent);
+			parent = parent.getParent();
+		}
+		for (IFolder subFolder : parents) {
+			try {
+				subFolder.create(true, true, null);
+			} catch (CoreException e) {
+				CorePlugin.getDefault().logError(e);
+			}
+		}
 	}
 
 	/**
