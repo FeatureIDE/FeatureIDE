@@ -48,11 +48,15 @@ public class SelectionAction extends Action {
 
 			if (isSelectionValid(selection)){		
 				for (Feature feature : model.getFeatures()) {
-					if (feature.isConstraintSelected()) feature.setConstraintSelected(false);
+					if (feature.isConstraintSelected()) {
+						feature.setConstraintSelected(false);
+					}
 				}
 				
 				for (Constraint constraint : model.getConstraints()) {
-					if (constraint.isFeatureSelected()) constraint.setFeatureSelected(false);
+					if (constraint.isFeatureSelected()) {
+						constraint.setFeatureSelected(false);
+					}
 				}
 				
 				if (selection.getFirstElement() instanceof ConstraintEditPart) {					

@@ -28,6 +28,7 @@ import de.ovgu.cide.fstgen.ast.FSTTerminal;
 import de.ovgu.featureide.core.fstmodel.FSTInvariant;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.RoleElement;
+import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
 
 /**
  * Builds Classes for the {@link FSTModel} for <code>FeatureHouse</code> Java
@@ -220,9 +221,6 @@ public class JavaClassBuilder extends ClassBuilder {
 		if (terminal.getBody().indexOf(name) > 0) {
 			modifiers = terminal.getBody().substring(0, terminal.getBody().indexOf(name) - 1);
 		}
-		if (name.contains("update")) {
-			int kons = 100;
-		}
 
 		String contractBody = "", contractCompKey = "";
 		for (FSTNode nonT1 : ((FSTNonTerminal) terminal.getParent()).getChildren()) {
@@ -312,14 +310,10 @@ public class JavaClassBuilder extends ClassBuilder {
 
 	@Override
 	public void caseJMLInvariant(FSTTerminal terminal) {
-		/*
-		 * FSTNonTerminal par =
-		 * (FSTNonTerminal)terminal.getParent().getParent().getParent(); if
-		 * (par.getType().equals(FHNodeTypes.JML_INVARIANT)) {
-		 */
 		FSTInvariant invariant = new FSTInvariant(terminal.getName(), terminal.getBody(), terminal.beginLine, terminal.endLine);
-		modelBuilder.getCurrentClassFragment().add(invariant);
-		// }
+		if (!modelBuilder.getCurrentClassFragment().add(invariant)) {
+			FeatureHouseCorePlugin.getDefault().logError("Invariant " + invariant.getBody() + "was not added to FSTModel.", null);
+		}
 	}
 
 	@Override

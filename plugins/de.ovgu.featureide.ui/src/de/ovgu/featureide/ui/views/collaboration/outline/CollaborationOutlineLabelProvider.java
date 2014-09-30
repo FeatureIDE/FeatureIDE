@@ -85,7 +85,8 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 				return IMAGE_AT_WITHOUT_WHITE_BACKGROUND;
 			} else if (fstModelElement instanceof FSTMethod) {
 				FSTMethod method = (FSTMethod) fstModelElement;
-				if (method.hasContract()) {
+				
+				if (method.hasContract() || method.contractsInRefinements()) {
 					if (method.isPrivate())
 						return IMAGE_METHODE_PRIVATE_CONTRACT;
 					else if (method.isProtected())
@@ -190,10 +191,10 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 	 */
 	private boolean hasSameClass(FSTClass Class, IFile oldFile, IFile currentFile) {
 		if (Class == null) {
-			UIPlugin.getDefault().logWarning("class war null");
+			UIPlugin.getDefault().logWarning("class is null");
 		}
 		if (currentFile == null) {
-			UIPlugin.getDefault().logWarning("file war null");
+			UIPlugin.getDefault().logWarning("file is null");
 		}
 		if (!currentFile.getProject().equals(oldFile.getProject())) {
 			return false;

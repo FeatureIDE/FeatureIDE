@@ -350,8 +350,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		CompartmentFigure invariantFigure = new CompartmentFigure();
 		invariantFigure.add(new Label(" "));
 		int invariants = 0;
-		for (FSTInvariant invariant : role.getClassFragment().getInvariants())
-		{
+		for (FSTInvariant invariant : role.getClassFragment().getInvariants()) {
 			Label invariantLabel = createInvariantLabel(invariant);
 			
 			invariantFigure.add(new Label(invariant.getBody()));
@@ -597,7 +596,9 @@ public class RoleFigure extends Figure implements GUIDefaults{
 	
 	private Label createInvariantLabel(FSTInvariant c) {		
 		
-		Label invariantLabel = new RoleFigureLabel(c.getFullName(), c.getFullName());
+		final String fullName = c.getFullName().replace("\t", "").replace("\n", " ");
+		
+		Label invariantLabel = new RoleFigureLabel(fullName, fullName);
 		
 		invariantLabel.setIcon(IMAGE_AT_WITHOUT_WHITE_BACKGROUND);
 		

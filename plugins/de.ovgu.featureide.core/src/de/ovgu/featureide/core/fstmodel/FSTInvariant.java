@@ -35,28 +35,18 @@ public class FSTInvariant extends RoleElement {
 	RoleTypes parentRoleType;
 
 	/**
-	 * @return the parentRoleType
-	 */
-	/*
-	 * public RoleTypes getParentRoleType() { return parentRoleType; }
-	 */
-
-	/**
-	 * @param name
-	 * @param type
-	 * @param modifiers
+	 * @param name name of the invariant
+	 * @param body content of the invariant
 	 */
 	public FSTInvariant(String name, String body) {
 		super(name, "", "", body, -1, -1);
 	}
 
 	/**
-	 * @param name
-	 * @param type
-	 * @param modifiers
-	 * @param body
-	 * @param beginLine
-	 * @param endLine
+	 * @param name name of the invariant
+	 * @param body content of the invariant
+	 * @param beginLine first line of the invariant
+	 * @param endLine last line of the invariant
 	 */
 
 	public FSTInvariant(String name, String body, int beginLine, int endLine) {
@@ -64,12 +54,12 @@ public class FSTInvariant extends RoleElement {
 	}
 
 	public int getUniqueIdentifier() {
-		return (body + beginLine + getFile()).hashCode();
+		return (body + beginLine).hashCode();
 	}
 
 	@Override
 	public String getFullName() {
-		String name = body.replaceAll("  ", "").replace((char) 10, ' ').replaceFirst("invariant ", "");
+		String name = body.replaceAll("  ", "").replace((char) 10, ' ').replaceFirst("invariant\\W+", "").replaceFirst("invariant_redundantly\\W+", "");
 		return ((name.length() > 25 ? name.substring(0, 25) + "..." : name));
 	}
 
@@ -87,4 +77,9 @@ public class FSTInvariant extends RoleElement {
 		return false;
 	}
 
+	public boolean equals(Object obj) {
+		if (!(obj instanceof FSTInvariant))
+			return false;
+		return ((FSTInvariant) obj).getUniqueIdentifier() == getUniqueIdentifier();
+	}
 }

@@ -258,7 +258,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		
 	};
 	
-
 	public void createPartControl(Composite parent) {
 		IWorkbenchWindow editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		IEditorPart part = null;
@@ -441,7 +440,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				List<String> csNames = colorschemeTable.getColorschemeNames();
 				
 				String curColorSchemeName = colorschemeTable.getSelectedColorschemeName();
-				MenuManager colorSchemeSubMenu;
+				MenuManager colorSchemeSubMenu = null;
 				
 				if (curColorSchemeName != null) {
 					colorSchemeSubMenu = new MenuManager(curColorSchemeName);
