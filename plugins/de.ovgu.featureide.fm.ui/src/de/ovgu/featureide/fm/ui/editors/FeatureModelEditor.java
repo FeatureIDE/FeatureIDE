@@ -362,8 +362,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 		// changes to OldPageIndex from inside these methods
 		// (used to block page changes in case of errors in the model)
 		currentPageIndex = newPageIndex;
-		getPage(newPageIndex).pageChangeFrom(oldPage);
-		getPage(oldPage).pageChangeTo(newPageIndex);
+		getPage(oldPage).pageChangeFrom(newPageIndex);
+		getPage(newPageIndex).pageChangeTo(oldPage);
 
 		super.pageChange(newPageIndex);
 	}
