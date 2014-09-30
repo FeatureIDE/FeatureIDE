@@ -686,7 +686,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 				featureModelEditor
 						.setActiveEditorPage(featureModelEditor.textEditor
 							.getIndex());
-				featureModelEditor.oldPageIndex=featureModelEditor.textEditor
+				featureModelEditor.currentPageIndex=featureModelEditor.textEditor
 						.getIndex();
 				return;
 			}

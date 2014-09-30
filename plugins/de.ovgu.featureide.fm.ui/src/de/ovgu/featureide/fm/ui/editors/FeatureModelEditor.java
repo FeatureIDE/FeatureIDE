@@ -348,7 +348,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 			textEditor.setFocus();
 	}
 
-	int oldPageIndex;
+	int currentPageIndex;
 
 	@Override
 	protected void pageChange(int newPageIndex) {
@@ -357,13 +357,13 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 			((FeatureModelEditorContributor) contributor).setActivePage(this, newPageIndex);
 		}
 
-		int oldPage = oldPageIndex;
+		int oldPage = currentPageIndex;
 		// set oldPageIndex before calling methods pageChangeFrom/To to allow
 		// changes to OldPageIndex from inside these methods
 		// (used to block page changes in case of errors in the model)
-		oldPageIndex = newPageIndex;
-		getPage(oldPageIndex).pageChangeFrom(newPageIndex);
-		getPage(newPageIndex).pageChangeTo(oldPage);
+		currentPageIndex = newPageIndex;
+		getPage(newPageIndex).pageChangeFrom(oldPage);
+		getPage(oldPage).pageChangeTo(newPageIndex);
 
 		super.pageChange(newPageIndex);
 	}
