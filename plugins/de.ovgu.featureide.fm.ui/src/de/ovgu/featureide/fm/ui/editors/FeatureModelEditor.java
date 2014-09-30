@@ -88,7 +88,6 @@ import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePage;
  * @author Thomas Thuem
  * @author Christian Becker
  */
-@SuppressWarnings("restriction")
 public class FeatureModelEditor extends MultiPageEditorPart implements IResourceChangeListener {
 
 	public static final String ID = FMUIPlugin.PLUGIN_ID + ".editors.FeatureModelEditor";
@@ -166,10 +165,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 
 		FMPropertyManager.registerEditor(featureModel);
 	}
-
-	/**
-	 * 
-	 */
+	
 	private void getExtensions() {
 		IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(FMUIPlugin.PLUGIN_ID + ".FeatureModelEditor");
 		try {
@@ -420,8 +416,9 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 
 	@Override
 	public void doSave(IProgressMonitor monitor) {
-		if (!saveEditors())
+		if (!saveEditors()) {
 			return;
+		}
 		featureOrderEditor.doSave(monitor);
 		featureModel.getRenamingsManager().performRenamings(file);
 		for (IFeatureModelEditorPage page : extensionPages) {
@@ -474,10 +471,10 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 			}
 		}
 	}
-
+	
 	@SuppressWarnings("deprecation")
 	private boolean saveEditors() {
-		if (featureModel.isRenamed()) {
+		if (featureModel.getRenamingsManager().isRenamed()) {
 			IProject project = file.getProject();
 			ArrayList<String> dirtyEditors = new ArrayList<String>();
 			ArrayList<IEditorPart> dirtyEditors2 = new ArrayList<IEditorPart>();
@@ -495,6 +492,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 					}
 				}
 			}
+			
 			if (dirtyEditors.size() != 0) {
 				ListDialog dialog = new ListDialog(getSite().getWorkbenchWindow().getShell());
 				dialog.setAddCancelButton(true);
@@ -528,56 +526,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 	@Override
 	public void doSaveAs() {
 		GraphicsExporter.exportAs(featureModel, diagramEditor, featureModelWriter);
-//		FileDialog fileDialog = new FileDialog(getEditorSite().getShell(), SWT.SAVE);
-//		String[] extensions = { "*.png", "*.jpg", "*.bmp", "*.m", "*.xml", "*.svg" };
-//		fileDialog.setFilterExtensions(extensions);
-//		String[] filterNames = { "Portable Network Graphics *.png", "JPEG *.jpg", "Windows Bitmap *.bmp", "GUIDSL Grammar *.m", "XML Export *.xml", "Scalable Vector Graphics *.svg" };
-//		fileDialog.setFilterNames(filterNames);
-//		fileDialog.setOverwrite(true);
-//		String filePath = fileDialog.open();
-//		if (filePath == null)
-//			return;
-//		File file = new File(filePath);
-//		if (filePath.endsWith(".m")) {
-//			new GuidslWriter(featureModel).writeToFile(file);
-//		} else if (filePath.endsWith(".xml")) {
-//			featureModelWriter.writeToFile(file);
-//		} else if (filePath.endsWith(".svg")) {
-//			ScalableFreeformRootEditPart part = (ScalableFreeformRootEditPart) diagramEditor.getEditPartRegistry().get(LayerManager.ID);
-//			IFigure rootFigure = part.getFigure();
-//
-//			Bundle bundleExportSVG = null;
-//			for (Bundle b : InternalPlatform.getDefault().getBundleContext().getBundles()) {
-//				if (b.getSymbolicName().equals("nl.utwente.ce.imageexport.svg")) {
-//					bundleExportSVG = b;
-//					break;
-//				}
-//			}
-//			
-//			// check if gef-imageexport is existing and activated!
-//			if (bundleExportSVG != null) {
-//				try {
-//					org.osgi.framework.BundleActivator act = ((org.osgi.framework.BundleActivator) bundleExportSVG.loadClass("nl.utwente.ce.imagexport.export.svg.Activator").newInstance());
-//					act.start(InternalPlatform.getDefault().getBundleContext());
-//					
-//					Class<?> cl = bundleExportSVG.loadClass("nl.utwente.ce.imagexport.export.svg.ExportSVG");
-//					Method m = cl.getMethod("exportImage", String.class, String.class, IFigure.class);
-//					m.invoke(cl.newInstance(), "SVG", filePath, (IFigure) rootFigure);
-//				} catch (Exception e) {
-//					FMUIPlugin.getDefault().logError(e);
-//				}
-//			} else {
-//				final String infoMessage = "Eclipse plugin for exporting diagram in SVG format is not existing." + "\nIf you want to use this, you have to install GEF Imageexport with SVG in Eclipse from "
-//						+ "\nhttp://veger.github.com/eclipse-gef-imageexport";
-//
-//				MessageDialog dialog = new MessageDialog(new Shell(), "SVG export failed", 
-//						FMUIPlugin.getImage("FeatureIconSmall.ico"), infoMessage, MessageDialog.INFORMATION, 
-//						new String[] { IDialogConstants.OK_LABEL }, 0);
-//
-//				dialog.open();
-//				FMUIPlugin.getDefault().logInfo(infoMessage);
-//			}
-//		}
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -610,14 +558,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 	public FeatureModelFile getGrammarFile() {
 		return fmFile;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.resources.IResourceChangeListener#resourceChanged(org
-	 * .eclipse.core.resources.IResourceChangeEvent)
-	 */
+	
 	public void resourceChanged(IResourceChangeEvent event) {
 		if (event.getResource() == null)
 			return;
@@ -697,8 +638,9 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 	}
 
 	public void setPageModified(boolean modified) {
-		if (!modified)
+		if (!modified){
 			operationCounter = 0;
+		}
 		isPageModified = modified;
 		firePropertyChange(PROP_DIRTY);
 	}
@@ -717,7 +659,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 
 	/**
 	 * This is just a call to the private method
-	 * <code>setActivePage(int index)</code>.
+	 * {@link #setActivePage(int)}.
 	 * 
 	 * @param index
 	 */
