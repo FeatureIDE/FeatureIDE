@@ -22,7 +22,6 @@ package de.ovgu.featureide.ui.views.collaboration;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.File;
 import java.util.List;
 import java.util.Vector;
 
@@ -57,7 +56,6 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorPart;
@@ -74,7 +72,7 @@ import org.eclipse.ui.progress.UIJob;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.builder.IComposerExtension;
+import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTConfiguration;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
@@ -85,13 +83,14 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.StoppableJob;
 import de.ovgu.featureide.fm.core.WaitingJob;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.GEFImageWriter;
+import de.ovgu.featureide.fm.ui.GraphicsExporter;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.editors.annotation.ColorPalette;
 import de.ovgu.featureide.ui.views.collaboration.action.AddColorSchemeAction;
 import de.ovgu.featureide.ui.views.collaboration.action.AddRoleAction;
 import de.ovgu.featureide.ui.views.collaboration.action.DeleteAction;
 import de.ovgu.featureide.ui.views.collaboration.action.DeleteColorSchemeAction;
+import de.ovgu.featureide.ui.views.collaboration.action.ExportAsAction;
 import de.ovgu.featureide.ui.views.collaboration.action.FilterAction;
 import de.ovgu.featureide.ui.views.collaboration.action.RenameColorSchemeAction;
 import de.ovgu.featureide.ui.views.collaboration.action.SetColorAction;
@@ -124,6 +123,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	private static final String DELETE_LABEL = "Delete";
 	private static final String FILTER_LABEL = "Filter";
 	private static final String UNSELECTED_LABEL = "Show unselected features";
+	private static final String EXPORT_AS_LABEL = "Export As";
 	
 	private static final String TOOL_TIP_LABEL = "Build collaborationmodel";
 	
@@ -133,17 +133,16 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	private static final Image[] FIELD_METHOD_IMAGES = { null, null, IMAGE_AT, IMAGE_AT,  null, IMAGE_METHODE_PUBLIC, IMAGE_METHODE_PROTECTED, IMAGE_METHODE_DEFAULT,
 			IMAGE_METHODE_PRIVATE, null, null };
 	
-	private static final String[] EXPORT_EXTENSIONS = { "*.png", "*.jpg", "*.bmp" };
-	private static final String[] FILDER_NAMES = { "Portable Network Graphics *.png", "JPEG *.jpg", "Windows Bitmap *.bmp" };
-	
 	private GraphicalViewerImpl viewer;
 	private CollaborationModelBuilder builder = new CollaborationModelBuilder();
+	private IWorkbenchPart currentEditor;
 	
 	private AddRoleAction addRoleAction;
 	private DeleteAction delAction;
 	private Action toolbarAction;
 	private FilterAction filterAction;
 	private PrintAction printAction;
+	private ExportAsAction exportAsAction;
 	private ShowUnselectedAction showUnselectedAction;
 	private Point cursorPosition;
 	
@@ -239,26 +238,26 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		}
 		
 		public void partClosed(IWorkbenchPart part) {
-			
+			if (part == currentEditor) {
+				setEditorActions(null);
+			}
 		}
 		
 		public void partBroughtToTop(IWorkbenchPart part) {
-			if (part instanceof IEditorPart)
+			if (part instanceof IEditorPart) {
 				setEditorActions(part);
+			}
+			
 		}
 		
 		public void partActivated(IWorkbenchPart part) {
-			if (part instanceof IEditorPart || part instanceof ViewPart)
+			if (part instanceof IEditorPart || part instanceof ViewPart) {
 				setEditorActions(part);
+			}
 		}
 		
 	};
 	
-	/*
-	 * @see
-	 * org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets
-	 * .Composite)
-	 */
 	public void createPartControl(Composite parent) {
 		IWorkbenchWindow editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		IEditorPart part = null;
@@ -313,26 +312,31 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	/**
 	 * Gets the input of the given part and sets the content of the diagram.
 	 * 
-	 * @param activeEditor
+	 * @param activeWorkbenchPart
 	 */
-	private void setEditorActions(IWorkbenchPart activeEditor) {
-		IEditorPart part = null;
-		if (activeEditor instanceof IEditorPart) {
-			part = (IEditorPart) activeEditor;
+	private void setEditorActions(IWorkbenchPart activeWorkbenchPart) {
+		IEditorPart activeEditor = null;
+		featureProject = null;
+
+		if (activeWorkbenchPart == null) {
+			// do nothing
+		} else if (activeWorkbenchPart instanceof IEditorPart) {
+			activeEditor = (IEditorPart) activeWorkbenchPart;
+			currentEditor = activeWorkbenchPart;
 		} else {
-			IWorkbenchPage page = activeEditor.getSite().getPage();
+			final IWorkbenchPage page = activeWorkbenchPart.getSite().getPage();
 			if (page != null) {
-				part = page.getActiveEditor();
+				activeEditor = page.getActiveEditor();
 			}
 		}
 		
-		if (part != null && part.getEditorInput() instanceof FileEditorInput) {
+		if (activeEditor != null && activeEditor.getEditorInput() instanceof FileEditorInput) {
 			// case: open editor
-			IFile inputFile = ((FileEditorInput) part.getEditorInput()).getFile();
+			final IFile inputFile = ((FileEditorInput) activeEditor.getEditorInput()).getFile();
 			featureProject = CorePlugin.getFeatureProject(inputFile);
+			
 			if (featureProject != null) {
 				// case: it's a FeatureIDE project
-				
 				featureProject.getFeatureModel().addListener(new PropertyChangeListener() {
 					@Override
 					public void propertyChange(PropertyChangeEvent event) {
@@ -364,11 +368,12 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 			}
 		}
 		
-		if (featureProject == null) {
-			FSTModel model = new FSTModel(null);
+ 		if (featureProject == null) {
+			final FSTModel model = new FSTModel(null);
 			model.setConfiguration(new FSTConfiguration(OPEN_MESSAGE, null, false));
 			viewer.setContents(model);
-			EditPart content = viewer.getContents();
+			
+			final EditPart content = viewer.getContents();
 			if (content != null) {
 				content.refresh();
 			}
@@ -378,7 +383,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	}
 	
 	private void createContextMenu() {
-		
 		MenuManager menuMgr = new MenuManager("#PopupMenu");
 		menuMgr.setRemoveAllWhenShown(true);
 		
@@ -436,7 +440,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				List<String> csNames = colorschemeTable.getColorschemeNames();
 				
 				String curColorSchemeName = colorschemeTable.getSelectedColorschemeName();
-				MenuManager colorSchemeSubMenu;
+				MenuManager colorSchemeSubMenu = null;
 				
 				if (curColorSchemeName != null) {
 					colorSchemeSubMenu = new MenuManager(curColorSchemeName);
@@ -476,12 +480,15 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				menuMgr.add(colorSubMenu);
 			}
 		}
+		menuMgr.add(new Separator());
+		menuMgr.add(exportAsAction);
 	}
 	
 	private void createActions(IEditorPart part) {
 		addRoleAction = new AddRoleAction(ADD_LABEL, viewer, this);
 		delAction = new DeleteAction(DELETE_LABEL, viewer);
 		filterAction = new FilterAction(FILTER_LABEL, viewer, this);
+		exportAsAction = new ExportAsAction(EXPORT_AS_LABEL,viewer);
 		showUnselectedAction = new ShowUnselectedAction(UNSELECTED_LABEL, this);
 		
 		for (int i = 0; i < FIELD_METHOD_LABEL_NAMES.length; i++) {
@@ -514,7 +521,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 							return Status.OK_STATUS;
 						toolbarAction.setEnabled(false);
 						if (featureProject != null) {
-							IComposerExtension composer = featureProject.getComposer();
+							IComposerExtensionClass composer = featureProject.getComposer();
 							if (composer != null) {
 								composer.buildFSTModel();
 								updateGuiAfterBuild(featureProject, null);
@@ -529,13 +536,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		};
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ovgu.featureide.core.listeners.ICurrentBuildListener#updateGuiAfterBuild
-	 * (de.ovgu.featureide.core.IFeatureProject)
-	 */
 	public void updateGuiAfterBuild(final IFeatureProject project, final IFile configurationFile) {
 		if (featureProject != null && featureProject.equals(project)) {
 			if (configurationFile == null) {
@@ -550,15 +550,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	
 	@Override
 	public void doSaveAs() {
-		FileDialog fileDialog = new FileDialog(this.getSite().getShell(), SWT.SAVE);
-		fileDialog.setFilterExtensions(EXPORT_EXTENSIONS);
-		fileDialog.setFilterNames(FILDER_NAMES);
-		fileDialog.setOverwrite(true);
-		String filePath = fileDialog.open();
-		if (filePath == null)
-			return;
-		File file = new File(filePath);
-		GEFImageWriter.writeToFile(viewer, file);
+		GraphicsExporter.exportAs(viewer);
 	}
 	
 	@Override

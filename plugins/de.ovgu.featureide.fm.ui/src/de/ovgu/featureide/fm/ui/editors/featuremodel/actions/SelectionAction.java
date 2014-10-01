@@ -44,44 +44,27 @@ public class SelectionAction extends Action {
 
 	private ISelectionChangedListener listener = new ISelectionChangedListener() {
 		public void selectionChanged(SelectionChangedEvent event) {
-			IStructuredSelection selection = (IStructuredSelection) event
-					.getSelection();
+			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
 
-			if (isSelectionValid(selection)){				
-				if (selection.getFirstElement() instanceof ConstraintEditPart) {
-					for (Constraint constraint : model.getConstraints()) {
-						if (constraint.isFeatureSelected()) constraint.setFeatureSelected(false);
-					}
-					
-					((ConstraintEditPart) selection.getFirstElement()).performRequest(new Request(RequestConstants.REQ_SELECTION));
-					
-					
-				} else  if (selection.getFirstElement() instanceof FeatureEditPart){
-					for (Feature feature : model.getFeatures()) {
-						if (feature.isConstraintSelected()) feature.setConstraintSelected(false);
-					}
-					
-					((FeatureEditPart) selection.getFirstElement()).performRequest(new Request(RequestConstants.REQ_SELECTION));
-					
-				} else {
-					for (Feature feature : model.getFeatures()) {
-						if (feature.isConstraintSelected()) feature.setConstraintSelected(false);
-					}
-					
-					for (Constraint constraint : model.getConstraints()) {
-						if (constraint.isFeatureSelected()) constraint.setFeatureSelected(false);
-					}
-				}
-			} else {
+			if (isSelectionValid(selection)){		
 				for (Feature feature : model.getFeatures()) {
-					if (feature.isConstraintSelected()) feature.setConstraintSelected(false);
+					if (feature.isConstraintSelected()) {
+						feature.setConstraintSelected(false);
+					}
 				}
 				
 				for (Constraint constraint : model.getConstraints()) {
-					if (constraint.isFeatureSelected()) constraint.setFeatureSelected(false);
+					if (constraint.isFeatureSelected()) {
+						constraint.setFeatureSelected(false);
+					}
 				}
-			}
-			
+				
+				if (selection.getFirstElement() instanceof ConstraintEditPart) {					
+					((ConstraintEditPart) selection.getFirstElement()).performRequest(new Request(RequestConstants.REQ_SELECTION));
+				} else  if (selection.getFirstElement() instanceof FeatureEditPart){					
+					((FeatureEditPart) selection.getFirstElement()).performRequest(new Request(RequestConstants.REQ_SELECTION));
+				}
+			} 
 		}
 	};
 	
@@ -97,8 +80,4 @@ public class SelectionAction extends Action {
 	public boolean isSelectionValid(IStructuredSelection selection){
 		return selection.size() == 1;
 	}
-	
-	
-	
-	
 }

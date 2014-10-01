@@ -21,7 +21,7 @@ import br.ufal.ic.colligens.models.StubsHeader;
 import core.RefactoringFrontend;
 import core.RefactoringType;
 import de.fosd.typechef.lexer.LexerException;
-import de.fosd.typechef.lexer.options.OptionException;
+import de.fosd.typechef.options.OptionException;
 
 public class RefactorSelectionProcessor {
 	private String sourceOutRefactor;

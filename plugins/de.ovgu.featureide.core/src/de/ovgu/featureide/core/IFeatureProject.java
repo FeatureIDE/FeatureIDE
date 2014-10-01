@@ -29,7 +29,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.QualifiedName;
 
-import de.ovgu.featureide.core.builder.IComposerExtension;
+import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
@@ -162,7 +162,7 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	 *   specified by the nature or builder (every project has the same nature
 	 *   and builder, which can be extended by other eclipse plug-ins)
 	 */
-	IComposerExtension getComposer();
+	IComposerExtensionClass getComposer();
 	
 	/**
 	 * Sets the JAVA class path that is in order to build the project
@@ -198,7 +198,7 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	/**
 	 * @return True if a source file, or the current configuration changed.
 	 */
-	boolean buildRelavantChanges();
+	boolean buildRelevantChanges();
 	
 	void built();
 

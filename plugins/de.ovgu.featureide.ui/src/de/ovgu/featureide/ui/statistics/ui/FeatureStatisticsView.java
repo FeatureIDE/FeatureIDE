@@ -78,20 +78,8 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 			}
 		};
 		
-		/**
-		 * Refresh button for debugging purposes.
-		 */
-//		Action refreshAction = new Action() {
-//			public void run() {
-//				refresh();
-//			}
-//		};
-		
 		IToolBarManager toolBarManager = getViewSite().getActionBars().getToolBarManager();
-		// // toolBarManager.add(export);
 		toolBarManager.add(checkBoxer);
-//		toolBarManager.add(refreshAction);
-//		refreshAction.setImageDescriptor(ImageDescriptor.createFromImage(REFRESH_IMG));
 		checkBoxer.setImageDescriptor(ImageDescriptor.createFromImage(EXPORT_IMG));
 		checkBoxer.setToolTipText("Export to *.csv");
 	}
@@ -119,7 +107,6 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 				setEditor(part);
 			}
 		}
-		
 	};
 	
 	@Override
@@ -138,7 +125,7 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 		
 	};
 	
-	private Job job;
+	private Job job = null;
 	
 	/**
 	 * Refresh the view.
@@ -206,12 +193,14 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 	 * instance of @{link FeatureModelEditor}
 	 */
 	private void setEditor(IWorkbenchPart activeEditor) {
-		if (currentEditor != null && currentEditor == activeEditor)
-			return;
-		
-		if (currentEditor != null && currentEditor instanceof FeatureModelEditor) {
-			((FeatureModelEditor) currentEditor).getFeatureModel().removeListener(modelListener);
-			currentEditor = null;
+		if (currentEditor != null) {
+			if (currentEditor == activeEditor) {
+				return;
+			}
+			
+			if (currentEditor instanceof FeatureModelEditor) {
+				((FeatureModelEditor) currentEditor).getFeatureModel().removeListener(modelListener);
+			}
 		}
 		
 		currentEditor = activeEditor;

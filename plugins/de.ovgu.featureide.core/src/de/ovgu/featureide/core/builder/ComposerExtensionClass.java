@@ -65,7 +65,26 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	protected IFeatureProject featureProject = null;
 	
 	public static final String NEWLINE = System.getProperty("line.separator", "\n");
+	private boolean initialized = false; 
+	private IComposerExtension composerExtensionProxy;
 	
+
+	public String getName() {
+		return composerExtensionProxy.getName();
+	}
+
+	public String getDescription() {
+		return composerExtensionProxy.getDescription();
+	}
+
+	public String getId() {
+		return composerExtensionProxy.getId();
+	}
+
+	void setComposerExtension(IComposerExtension composerExtensionProxy) {
+		this.composerExtensionProxy = composerExtensionProxy;
+	}
+
 	protected final static String[] JAVA_TEMPLATE = new String[]{"Java", "java", PACKAGE_PATTERN + "/**" + NEWLINE 
 		+ " * TODO description" + NEWLINE 
 		+ " */" + NEWLINE 
@@ -73,8 +92,17 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	
 	public boolean initialize(IFeatureProject project) {
 		assert (project != null) : "Invalid project given";
-		featureProject = project;
-		return true;
+		featureProject = project;		
+		return initialized = true;
+	}
+
+	public void setFeatureProject(IFeatureProject featureProject) {
+		assert (featureProject != null) : "Invalid project given";
+		this.featureProject = featureProject;
+	}
+
+	public boolean isInitialized() {
+		return initialized;
 	}
 
 	public boolean clean() {
@@ -102,7 +130,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		}
 	}
 	
-	private void copy(IFolder featureFolder, IFolder buildFolder) throws CoreException {
+	protected void copy(IFolder featureFolder, IFolder buildFolder) throws CoreException {
 		if (!featureFolder.exists()) {
 			return;
 		}
@@ -275,12 +303,8 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	public void postModelChanged() {
 
 	}
-
-	public boolean hasFeatureFolder() {
-		return true;
-	}
 	
-	public boolean hasFeatureFolders() {
+	public boolean hasFeatureFolder() {
 		return true;
 	}
 
@@ -292,12 +316,12 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		return CorePlugin.getDefault().getConfigurationExtensions().getFirst();
 	}
 	
-	public void buildConfiguration(IFolder folder, Configuration configuration, String congurationName) {
+	public void buildConfiguration(IFolder folder, Configuration configuration, String configurationName) {
 		try {
 			if (!folder.exists()) {
 				folder.create(true, false, null);
 			}
-			IFile configurationFile = folder.getFile(congurationName + "." + getConfigurationExtension());
+			IFile configurationFile = folder.getFile(configurationName + "." + getConfigurationExtension());
 			ConfigurationWriter writer = new ConfigurationWriter(configuration);
 			writer.saveToFile(configurationFile);
 			copyNotComposedFiles(configuration, folder);
@@ -342,9 +366,17 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		return false;
 	}
 	
+	public boolean createFolderForFeatures() {
+		return true;
+	}
+	
+	public boolean supportsAndroid() {
+		return false;
+	}
+	
 	protected boolean isPluginInstalled(String ID) {
-		for(Bundle b :InternalPlatform.getDefault().getBundleContext().getBundles()){
-			if(b.getSymbolicName().startsWith(ID)) {
+		for (Bundle b :InternalPlatform.getDefault().getBundleContext().getBundles()) {
+			if (b.getSymbolicName().startsWith(ID)) {
 				return true;
 			}
 		}

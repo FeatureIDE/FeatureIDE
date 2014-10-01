@@ -5,12 +5,12 @@ import org.eclipse.jface.text.ITextSelection;
 public class LogSelection implements ITextSelection {
 
 	private int line;
-	private int column;
+	private int length;
 	private int offset;
 
-	public LogSelection(int line, int column, int offset) {
+	public LogSelection(int line, int length, int offset) {
 		this.line = line;
-		this.column = column;
+		this.length = length;
 		this.offset = offset;
 	}
 
@@ -27,8 +27,7 @@ public class LogSelection implements ITextSelection {
 
 	@Override
 	public int getLength() {
-		
-		return column;
+		return length;
 	}
 
 	@Override
@@ -40,7 +39,7 @@ public class LogSelection implements ITextSelection {
 	@Override
 	public int getEndLine() {
 		
-		return line+1;
+		return line;
 	}
 
 	@Override

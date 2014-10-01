@@ -843,8 +843,15 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 			}
 		}
 		
+		UsedModel usedModel = extFeatureModel.getExternalModel(sourceModelName);
+		if (usedModel != null) {
+			usedModel.setPrefix(targetParentFeature.getName() + "." + sourceModelName);
+		}
+		
 		final Feature instanceRoot = sourceModel.getRoot();
-		final String connectorName = (targetParentFeature.isRoot()) ? sourceModelName : targetParentFeature.getName() + "." + sourceModelName;
+		final String connectorName = (targetParentFeature.isRoot() && targetParentFeature.getName().equals(sourceModelName)) 
+				? sourceModelName 
+				: targetParentFeature.getName() + "." + sourceModelName;
 		final ExtendedFeature connector = addFeature(targetParentFeature, connectorName, true, true, instanceRoot.isHidden());
 		connector.setType(type);
 		connector.setExternalModelName(sourceModelName);

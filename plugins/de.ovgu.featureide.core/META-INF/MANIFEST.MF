@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: FeatureIDE Core Plug-in
 Bundle-SymbolicName: de.ovgu.featureide.core;singleton:=true
-Bundle-Version: 2.7.0.qualifier
+Bundle-Version: 2.7.1.qualifier
 Bundle-Activator: de.ovgu.featureide.core.CorePlugin
 Bundle-Localization: 
 Require-Bundle: org.eclipse.core.runtime,
@@ -24,9 +24,11 @@ Export-Package:
  de.ovgu.featureide.core.signature,
  de.ovgu.featureide.core.signature.abstr,
  de.ovgu.featureide.core.signature.comparator,
- de.ovgu.featureide.core.signature.filter
+ de.ovgu.featureide.core.signature.filter,
+ de.ovgu.featureide.core.wizardextension
 Bundle-ClassPath: .
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: University of Magdeburg
-Import-Package: org.eclipse.jdt.internal.core
+Import-Package: org.eclipse.jdt.internal.core,
+ org.eclipse.ui.wizards.newresource

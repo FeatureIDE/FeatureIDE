@@ -24,6 +24,7 @@ import java.beans.PropertyChangeEvent;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -42,36 +43,27 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * 
  * @author Jens Meinicke
  */
-public class FeatureModelTextEditorPage extends TextEditor implements
-		IFeatureModelEditorPage {
+public class FeatureModelTextEditorPage extends TextEditor implements IFeatureModelEditorPage {
 
 	private int index;
-	
+
 	private static final String PAGE_TEXT = "Source";
 
-	private static final String ID = FMUIPlugin.PLUGIN_ID + ".editors.FeatureModelTextEditorPage";
-	
-	private FeatureModelEditor featureModelEditor;
+	private static final String ID = FMUIPlugin.PLUGIN_ID
+			+ ".editors.FeatureModelTextEditorPage";
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEdiorPage#getIndex()
-	 */
+	private FeatureModelEditor featureModelEditor;
+	
 	@Override
 	public int getIndex() {
 		return index;
 	}
 	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#setIndex(int)
-	 */
 	@Override
 	public void setIndex(int index) {
 		this.index = index;
 	}
-
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#getPageText()
-	 */
+	
 	@Override
 	public String getPageText() {
 		return PAGE_TEXT;
@@ -81,14 +73,28 @@ public class FeatureModelTextEditorPage extends TextEditor implements
 	 * Updates the text editor from diagram.
 	 */
 	public void updateTextEditor() {
-		//prevent writing incorrectly read models due to errors in the model
-		if(featureModelEditor.fmFile.hasModelMarkers())return;
+		// prevent writing incorrectly read models due to errors in the model
+		if (featureModelEditor.fmFile.hasModelMarkers())
+			return;
 		String text = featureModelEditor.featureModelWriter.writeToString();
 		getDocumentProvider().getDocument(getEditorInput()).set(text);
 	}
-	
+
+	/**
+	 * Reads the current content of the model.xml file.
+	 * (Removes dirty state for the page)
+	 */
+	public void resetTextEditor() {
+		try {
+			getDocumentProvider().resetDocument(getEditorInput());
+		} catch (CoreException e) {
+			FMUIPlugin.getDefault().logError(e);
+		}
+	}
+
 	/**
 	 * Updates the diagram from text editor.
+	 * 
 	 * @return false if the text is not supported.
 	 */
 	public boolean updateDiagram() {
@@ -105,44 +111,37 @@ public class FeatureModelTextEditorPage extends TextEditor implements
 			}
 
 			featureModelEditor.featureModelReader.readFromString(text);
-			for (ModelWarning warning : featureModelEditor.featureModelReader.getWarnings())
+			for (ModelWarning warning : featureModelEditor.featureModelReader
+					.getWarnings())
 				featureModelEditor.fmFile.createModelMarker(warning.message,
 						IMarker.SEVERITY_WARNING, warning.line);
 			try {
 				if (!featureModelEditor.featureModel.getAnalyser().isValid())
-					featureModelEditor.fmFile.createModelMarker(
-							"The feature model is void, i.e., it contains no products",
-							IMarker.SEVERITY_ERROR, 0);
+					featureModelEditor.fmFile
+							.createModelMarker(
+									"The feature model is void, i.e., it contains no products",
+									IMarker.SEVERITY_ERROR, 0);
 			} catch (TimeoutException e) {
 				// do nothing, assume the model is correct
 			}
 		} catch (UnsupportedModelException e) {
-			featureModelEditor.fmFile.createModelMarker(e.getMessage(), IMarker.SEVERITY_ERROR,
-					e.lineNumber);
+			featureModelEditor.fmFile.createModelMarker(e.getMessage(),
+					IMarker.SEVERITY_ERROR, e.lineNumber);
 			return false;
 		}
 		return true;
 	}
-
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#initEditor()
-	 */
+	
 	@Override
 	public void initEditor() {
-		
-	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#setFeatureModelEditor(de.ovgu.featureide.fm.ui.editors.FeatureModelEditor)
-	 */
+	}
+	
 	@Override
 	public void setFeatureModelEditor(FeatureModelEditor featureModelEditor) {
 		this.featureModelEditor = featureModelEditor;
 	}
-
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage#getPage()
-	 */
+	
 	@Override
 	public IFeatureModelEditorPage getPage(Composite container) {
 		return this;
@@ -155,12 +154,12 @@ public class FeatureModelTextEditorPage extends TextEditor implements
 
 	@Override
 	public void propertyChange(PropertyChangeEvent event) {
-		
+
 	}
 
 	@Override
 	public void pageChangeFrom(int newPage) {
-		
+
 	}
 
 	@Override
@@ -168,7 +167,7 @@ public class FeatureModelTextEditorPage extends TextEditor implements
 		if (featureModelEditor.isPageModified) {
 			updateTextEditor();
 		}
-			
+
 		if (featureModelEditor.featureModel.getRenamingsManager().isRenamed()) {
 			featureModelEditor.saveModelForConsistentRenamings();
 		}

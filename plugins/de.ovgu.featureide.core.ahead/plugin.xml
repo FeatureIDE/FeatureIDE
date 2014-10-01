@@ -71,4 +71,13 @@
         commandId="de.ovgu.featureide.ahead.actions.changecomposeraction"
         class="de.ovgu.featureide.ahead.actions.ChangeComposerAction"/>
 	</extension>
+   <extension
+         point="de.ovgu.featureide.core.wizard">
+      <newProjectWizard
+            class="de.ovgu.featureide.core.wizardextension.DefaultNewFeatureProjectWizardExtension"
+            composerid="de.ovgu.featureide.composer.ahead"
+            id="de.ovgu.featureide.core.ahead.newProjectWizard"
+            name="AHEADNewProjectWizard">
+      </newProjectWizard>
+   </extension>
 </plugin>

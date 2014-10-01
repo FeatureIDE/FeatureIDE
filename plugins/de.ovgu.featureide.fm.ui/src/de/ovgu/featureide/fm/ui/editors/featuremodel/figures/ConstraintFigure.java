@@ -27,7 +27,6 @@ import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.FreeformLayout;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
-import org.eclipse.draw2d.LineBorder;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
@@ -175,7 +174,6 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 
 	@Override
 	public void setBackgroundColor(Color bg) {
-		super.setBorder(new LineBorder(bg));
 		super.setBackgroundColor(bg);
 	}
 	

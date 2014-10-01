@@ -77,6 +77,7 @@ import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
+import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.featurehouse.errorpropagation.ErrorPropagation;
 import de.ovgu.featureide.featurehouse.meta.FeatureIDEModelInfo;
@@ -181,14 +182,19 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 				if (terminal != null) {
 					file = getFile(terminal);
 					lineFile = terminal.beginLine;
-				}
-				try {
-					IMarker marker = file.createMarker(FeatureHouseCorePlugin.BUILDER_PROBLEM_MARKER);
-					marker.setAttribute(IMarker.LINE_NUMBER, lineFile);
-					marker.setAttribute(IMarker.MESSAGE, e.getMessage());
-					marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
-				} catch (CoreException e2) {
-					LOGGER.logError(e2);
+				
+					if (file != null) {
+						try {
+							IMarker marker = file.createMarker(FeatureHouseCorePlugin.BUILDER_PROBLEM_MARKER);
+							marker.setAttribute(IMarker.LINE_NUMBER, lineFile);
+							marker.setAttribute(IMarker.MESSAGE, e.getMessage());
+							marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
+						} catch (CoreException e2) {
+							LOGGER.logError(e2);
+						}
+					} else {
+						LOGGER.logError(new Exception("No file provided for: " + terminal.toString()));
+					}
 				}
 
 			}
@@ -201,8 +207,13 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 				while (fileNode != null && !fileNode.getName().endsWith(".java")) {
 					fileNode = fileNode.getParent();
 				}
-				FSTNode featureNode = fileNode.getParent();
-				return featureProject.getSourceFolder().getFolder(featureNode.getName()).getFile(fileNode.getName());
+				if (fileNode != null) {
+					FSTNode featureNode = fileNode.getParent();
+					return featureProject.getSourceFolder().getFolder(featureNode.getName()).getFile(fileNode.getName());
+				} else {
+					LOGGER.logError(new Exception("Java file could not be found for: "  + terminal.toString()));
+					return null;
+				}
 			}
 		};
 	}
@@ -212,11 +223,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		boolean supSuccess = super.initialize(project);
 		fhModelBuilder = new FeatureHouseModelBuilder(project);
 		createBuildStructure();
-		if (supSuccess == false || fhModelBuilder == null) {
-			return false;
-		} else {
-			return true;
-		}
+		return supSuccess && fhModelBuilder != null;
 	}
 
 	/**
@@ -377,9 +384,14 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	private void checkContractComposition() {
 		try {
 			deleteContractErrorMarkers();
-
+			
+			final FSTModel fstModel = featureProject.getFSTModel();
+			if (fstModel == null) {
+				return;
+			}
+			
 			if (!getContractParameter().equals(CONTRACT_COMPOSITION_METHOD_BASED)) {
-				for (FSTClass c : featureProject.getFSTModel().getClasses()) {
+				for (FSTClass c : fstModel.getClasses()) {
 					for (FSTRole r : c.getRoles()) {
 						for (FSTMethod m : r.getClassFragment().getMethods()) {
 							if (m.getCompKey().length() > 0)
@@ -391,7 +403,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 			} else {
 				final FeatureModel featureModel = featureProject.getFeatureModel();
-				for (FSTClass c : featureProject.getFSTModel().getClasses()) {
+				for (FSTClass c : fstModel.getClasses()) {
 					for (FSTRole r : c.getRoles()) {
 						Feature featureRole1 = featureModel.getFeature(r.getFeature().getName());
 						for (FSTMethod m : r.getClassFragment().getMethods()) {
@@ -778,7 +790,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	 * @param line
 	 *            The line number
 	 * @param message
-	 *            The message to disply
+	 *            The message to display
 	 * @param file
 	 *            The file
 	 * @param severity
@@ -786,7 +798,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	 */
 	private static void createFujiMarker(int line, String message, IResource file, int severity, IFeatureProject featureProject) {
 		// TODO NEWLine does not work
-		message = message.replaceAll("\n", NEWLINE);
+		message = message.replace("\n", NEWLINE);
 		try {
 			IMarker marker = file.createMarker(FeatureHouseCorePlugin.BUILDER_PROBLEM_MARKER);
 			marker.setAttribute(IMarker.LINE_NUMBER, line);

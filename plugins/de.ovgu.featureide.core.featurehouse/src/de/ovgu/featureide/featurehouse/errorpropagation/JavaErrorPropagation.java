@@ -34,6 +34,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
+import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
@@ -256,7 +257,8 @@ public class JavaErrorPropagation extends ErrorPropagation {
 		}
 		
 		LinkedList<IFile> featureFiles = new LinkedList<IFile>();
-		FSTClass c = project.getFSTModel().getClass(file.getName());
+		final FSTModel fstModel = project.getFSTModel();
+		FSTClass c = fstModel.getClass(fstModel.getAbsoluteClassName(file));
 		for (FSTRole role : c.getRoles()) {
 			featureFiles.add(role.getFile());
 		}

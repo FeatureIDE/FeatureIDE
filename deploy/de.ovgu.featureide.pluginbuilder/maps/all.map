@@ -35,3 +35,6 @@ plugin@org.deltaj.transformations=COPY,/home/itidbrun/TeamCity/buildAgent/work/f
 plugin@org.deltaj.transformations.ui=COPY,/home/itidbrun/TeamCity/buildAgent/work/featureide/plugins,org.deltaj.transformations.ui
 plugin@org.deltaj.ui=COPY,/home/itidbrun/TeamCity/buildAgent/work/featureide/plugins,org.deltaj.ui
 plugin@de.ovgu.featureide.core.deltaj=COPY,/home/itidbrun/TeamCity/buildAgent/work/featureide/plugins,de.ovgu.featureide.core.deltaj
+feature@de.ovgu.featureide.munge_android=COPY,/home/itidbrun/TeamCity/buildAgent/work/featureide/deploy,de.ovgu.featureide.munge_android
+plugin@de.ovgu.featureide.core.munge-android=COPY,/home/itidbrun/TeamCity/buildAgent/work/featureide/plugins,de.ovgu.featureide.core.munge-android
+plugin@de.ovgu.featureide.ui.android=COPY,/home/itidbrun/TeamCity/buildAgent/work/featureide/plugins,de.ovgu.featureide.ui.android

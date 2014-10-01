@@ -53,7 +53,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 	public static final String COMPOSER_KEY = "composer";
 	
 	private IFeatureProject featureProject;
-	private IComposerExtension composerExtension;
+	private IComposerExtensionClass composerExtension;
 
 	private boolean featureProjectLoaded() {
 		if (featureProject != null && composerExtension != null)
@@ -77,8 +77,6 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 					IMarker.SEVERITY_ERROR);
 			return false;
 		}
-
-		composerExtension.loadComposerExtension();
 		return true;
 	}
 	
@@ -92,7 +90,6 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		
 		featureProject.deleteBuilderMarkers(featureProject.getSourceFolder(),
 				IResource.DEPTH_INFINITE);
-		composerExtension.initialize(featureProject);
 		IProject project = featureProject.getProject();
 		if (!composerExtension.clean()) {
 			cleaned = false;
@@ -151,7 +148,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		if (!featureProjectLoaded())
 			return null;
 
-		if (!featureProject.buildRelavantChanges() && !cleaned && kind == AUTO_BUILD)
+		if (!featureProject.buildRelevantChanges() && !cleaned && kind == AUTO_BUILD)
 			return null;
 
 		cleaned = false;

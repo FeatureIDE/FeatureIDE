@@ -62,6 +62,7 @@ public class LegendAction extends Action {
 		} catch (ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
+		refresh();
 	}
 
 	public void refresh() {

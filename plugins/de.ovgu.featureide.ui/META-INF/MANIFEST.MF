@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: FeatureIDE UI Plug-in
 Bundle-SymbolicName: de.ovgu.featureide.ui;singleton:=true
-Bundle-Version: 2.7.0.qualifier
+Bundle-Version: 2.7.1.qualifier
 Bundle-Activator: de.ovgu.featureide.ui.UIPlugin
 Bundle-Localization: 
 Require-Bundle: org.eclipse.ui,
@@ -21,14 +21,50 @@ Bundle-ClassPath: lib/SPLACAT.jar,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: University of Magdeburg
 Export-Package: 
- de.ovgu.featureide.ui,
- de.ovgu.featureide.ui.views.collaboration,
- de.ovgu.featureide.ui.views.collaboration.action,
- de.ovgu.featureide.ui.views.collaboration.outline,
- de.ovgu.featureide.ui.wizards,
- org.apache.commons.math
-Import-Package: de.ovgu.featureide.ui.views.collaboration.action,
- org.eclipse.jdt.core,
+ de.ovgu.featureide.ui;uses:="org.eclipse.swt.graphics,de.ovgu.featureide.fm.ui,org.osgi.framework",
+ de.ovgu.featureide.ui.views.collaboration;
+  uses:="org.eclipse.core.runtime,
+   de.ovgu.featureide.core,
+   org.eclipse.ui,
+   org.eclipse.core.resources,
+   org.eclipse.draw2d.geometry,
+   org.eclipse.swt.graphics,
+   de.ovgu.featureide.core.listeners,
+   org.eclipse.ui.part,
+   org.eclipse.draw2d,
+   org.eclipse.swt.widgets",
+ de.ovgu.featureide.ui.views.collaboration.action;
+  uses:="org.eclipse.jface.action,
+   org.eclipse.swt.graphics,
+   de.ovgu.featureide.ui.views.collaboration,
+   org.eclipse.gef.ui.parts,
+   de.ovgu.featureide.fm.core",
+ de.ovgu.featureide.ui.views.collaboration.outline;
+  uses:="org.eclipse.ui,
+   de.ovgu.featureide.core.fstmodel,
+   org.eclipse.ui.part,
+   de.ovgu.featureide.ui.views.collaboration,
+   org.eclipse.jface.action,
+   de.ovgu.featureide.core,
+   org.eclipse.core.resources,
+   org.eclipse.jface.viewers,
+   org.eclipse.swt.graphics,
+   de.ovgu.featureide.core.listeners,
+   org.eclipse.jface.util,
+   org.eclipse.swt.widgets",
+ de.ovgu.featureide.ui.wizards;
+  uses:="org.eclipse.jface.wizard,
+   de.ovgu.featureide.core,
+   org.eclipse.ui,
+   org.eclipse.ui.wizards.newresource,
+   org.eclipse.core.resources,
+   org.eclipse.jface.viewers,
+   org.eclipse.swt.widgets,
+   org.eclipse.swt.layout,
+   de.ovgu.featureide.core.builder,
+   de.ovgu.featureide.fm.core",
+ org.apache.commons.math;uses:="org.apache.commons.math.exception.util,org.apache.commons.math.exception"
+Import-Package: org.eclipse.jdt.core,
  org.eclipse.jdt.internal.core,
  org.eclipse.jdt.internal.ui.javaeditor,
  org.eclipse.jface.text,

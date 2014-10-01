@@ -258,7 +258,6 @@ public class FujiSignaturesCreator {
 			sigArray[++i] = sig;
 		}
 		
-		fp.getComposer().initialize(fp);
 		fp.getComposer().buildFSTModel();
 		FSTModel fst = fp.getFSTModel();
 		

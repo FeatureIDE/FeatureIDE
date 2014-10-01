@@ -326,8 +326,8 @@ public class CorePlugin extends AbstractCorePlugin {
 				IFolder source = project.getFolder(buildPath);
 				IFolder destination = !"".equals(sourcePath) ? project.getFolder(sourcePath).getFolder(BASE_FEATURE): null;
 				if (!composer.postAddNature(source, destination) && !"".equals(sourcePath)) {
-					if (!composer.hasFeatureFolders()) {
-						/** if project does not use feature folders, use the source path directly **/
+					if (!composer.hasFeatureFolder()) {
+						/** if project does not use feature folder, use the source path directly **/
 						destination = project.getFolder(sourcePath);
 					}
 					if (!destination.exists()) {
@@ -434,7 +434,7 @@ public class CorePlugin extends AbstractCorePlugin {
 			IProjectDescription description = project.getDescription();
 			String[] natures = description.getNatureIds();
 			String[] newNatures = new String[natures.length + 1];
-			System.arraycopy(natures, 0, newNatures, 0, natures.length);
+			System.arraycopy(natures, 0, newNatures, 0, natures.length);	
 			newNatures[natures.length] = FeatureProjectNature.NATURE_ID;
 			description.setNatureIds(newNatures);
 			project.setDescription(description, null);
@@ -534,13 +534,13 @@ public class CorePlugin extends AbstractCorePlugin {
 	@CheckForNull
 	public static IFeatureProject getFeatureProject(IResource res) {
 		if (res == null) {
-			getDefault().logWarning(
-					"No resource given while getting the project data");
+			getDefault().logWarning("No resource given while getting the project data");
 			return null;
 		}
 		IProject prj = res.getProject();
-		if (prj == null)
+		if (prj == null) {
 			return null;
+		}
 		return getDefault().featureProjectMap.get(prj);
 	}
 

@@ -342,12 +342,11 @@ public class CreateFujiSignaturesJob extends AMonitorJob<CreateFujiSignaturesJob
 			sigArray[++i] = sig;
 		}
 		
-		fp.getComposer().initialize(fp);
 		fp.getComposer().buildFSTModel();
 		FSTModel fst = fp.getFSTModel();
 		
 		if (fst == null) {
-			MPLPlugin.getDefault().logInfo("Kein FSTModel!");
+			MPLPlugin.getDefault().logInfo("No FSTModel!");
 		} else {
 			for (FSTFeature fstFeature : fst.getFeatures()) {
 				final int id = interfaceProject.getFeatureID(fstFeature.getName());

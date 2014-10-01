@@ -217,6 +217,7 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 					Feature parent = curFeature.getParent();
 					writeTab(depth);
 					if (!parent.isRoot()) {
+						sb.append("feature ");
 						sb.append(parent.getName());
 						sb.append(" {");
 						sb.append(NEWLINE);

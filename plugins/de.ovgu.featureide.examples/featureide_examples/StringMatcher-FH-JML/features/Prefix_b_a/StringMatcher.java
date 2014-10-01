@@ -1,16 +1,11 @@
-public  class   StringMatcher {
-	
+public class StringMatcher {
 	
 	/*@
 	  @ requires \original;
-	  @ ensures \original;
+	  @ ensures \result <==> a.indexOf(b) != -1 && a.startsWith(b);
 	  @*/
 	public boolean compare(String a, String b){
-		boolean result = original(a,b) &&   a.startsWith(b);
-		//@ set compare = compare && a.startsWith(b);
-		return result;
+		return original(a,b) && a.startsWith(b);
 	}
-	
-
 	
 }

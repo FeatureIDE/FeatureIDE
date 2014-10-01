@@ -23,6 +23,7 @@ package de.ovgu.featureide.core.propertypage;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFolder;
@@ -49,6 +50,7 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionManager;
 import de.ovgu.featureide.core.builder.IComposerExtension;
+import de.ovgu.featureide.core.builder.IComposerExtensionBase;
 
 /**
  * At this property page you can specify composer specific settings for a
@@ -61,11 +63,10 @@ import de.ovgu.featureide.core.builder.IComposerExtension;
 @SuppressWarnings("restriction")
 public class FeatureProjectPropertyPage extends PropertyPage {
 
-	private static final class ExtensionComparator implements
-			Comparator<IComposerExtension>, Serializable {
+	private static final class ExtensionComparator implements Comparator<IComposerExtensionBase>, Serializable {
 		private static final long serialVersionUID = 1L;
 
-		public int compare(IComposerExtension arg0, IComposerExtension arg1) {
+		public int compare(IComposerExtensionBase arg0, IComposerExtensionBase arg1) {
 			return arg0.getName().compareTo(arg1.getName());
 		}
 	}
@@ -80,7 +81,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 
 	private GridData gd = new GridData(GridData.FILL_BOTH);
 
-	private static IComposerExtension[] extensions = null;
+	private static IComposerExtensionBase[] extensions = null;
 	private IProject project = null;
 	private IFeatureProject featureProject = null;
 
@@ -88,7 +89,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 	private Text featurePath = null;
 	private Text configPath = null;
 
-	private IComposerExtension composer = null;
+	private IComposerExtensionBase composer = null;
 	private Combo composerCombo;
 	private Combo contractCombo;
 	private Combo metaCombo;
@@ -110,7 +111,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 
 	@Override
 	protected Control createContents(Composite parent) {
-		
+
 		Composite composite = new Composite(parent, SWT.NONE);
 		composite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		GridLayout layout = new GridLayout();
@@ -127,8 +128,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		featureProject = CorePlugin.getFeatureProject(project);
 		if (featureProject == null) {
 			Label label = new Label(composite, SWT.NONE);
-			label.setText("Project \"" + project.getName()
-					+ "\" is no FeatureIDE project.");
+			label.setText("Project \"" + project.getName() + "\" is no FeatureIDE project.");
 			return composite;
 		}
 
@@ -138,14 +138,11 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		label = new Label(composite, SWT.NONE);
 		label.setText("&Compostion tool: " + composer.getName());
 		label = new Label(composite, SWT.NONE);
-		label.setText("&Contract Composition: "
-				+ featureProject.getContractComposition());
+		label.setText("&Contract Composition: " + featureProject.getContractComposition());
 		label = new Label(composite, SWT.NONE);
-		label.setText("&Metaproduct Generation: "
-				+ featureProject.getMetaProductGeneration());
+		label.setText("&Metaproduct Generation: " + featureProject.getMetaProductGeneration());
 		label = new Label(composite, SWT.NONE);
-		label.setText("Composition mechanism: " 
-				+ featureProject.getCompositionMechanism());
+		label.setText("Composition mechanism: " + featureProject.getCompositionMechanism());
 		addCompositionGroup(composite);
 		return composite;
 	}
@@ -158,8 +155,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 	private boolean getProject() {
 		IAdaptable resource = getElement();
 		if (resource instanceof JavaElement) {
-			IJavaProject javaProject = ((JavaElement) resource)
-					.getJavaProject();
+			IJavaProject javaProject = ((JavaElement) resource).getJavaProject();
 			project = javaProject.getProject();
 		} else if (resource instanceof IResource) {
 			project = ((IResource) resource).getProject();
@@ -200,13 +196,12 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		composerCombo = new Combo(group, SWT.READ_ONLY | SWT.DROP_DOWN);
 		composerCombo.setLayoutData(gd);
 
-		List<IComposerExtension> composerExtensions = ComposerExtensionManager
-				.getInstance().getComposers();
-		extensions = new IComposerExtension[composerExtensions.size()];
+		List<IComposerExtension> composerExtensions = ComposerExtensionManager.getInstance().getComposers();
+		extensions = new IComposerExtensionBase[composerExtensions.size()];
 		composerExtensions.toArray(extensions);
 		Arrays.sort(extensions, new ExtensionComparator());
 
-		for (IComposerExtension composerExtension : extensions) {
+		for (IComposerExtensionBase composerExtension : extensions) {
 			composerCombo.add(composerExtension.getName());
 		}
 
@@ -240,8 +235,6 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		contractCombo.add("Consecutive Contract Refinement");
 		contractCombo.add("Cumulative Contract Refinement");
 		contractCombo.add("Plain Contracting");
-		
-		
 
 		String composer = featureProject.getContractComposition();
 		refreshContractCombo(composer);
@@ -274,12 +267,12 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		metaCombo.add(IFeatureProject.META_MODEL_CHECKING_BDD_JAVA);
 		metaCombo.add(IFeatureProject.META_MODEL_CHECKING_BDD_JAVA_JML);
 		// TODO reactivate this line if c metaproduct is supported
-//		metaCombo.add(IFeatureProject.META_MODEL_CHECKING_BDD_C);
+		// metaCombo.add(IFeatureProject.META_MODEL_CHECKING_BDD_C);
 		String selection = featureProject.getMetaProductGeneration();
 		refreshMetaCombo(selection);
 		metaCombo.addModifyListener(listener);
 	}
-	
+
 	private void refreshMetaCombo(String selection) {
 		if (!this.composer.hasMetaProductGeneration()) {
 			metaCombo.setEnabled(false);
@@ -295,7 +288,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 			}
 		}
 	}
-	
+
 	private void addCompositionMechanismMember(Group group) {
 		Label label = new Label(group, SWT.NULL);
 		label.setText("Composition mechanism");
@@ -307,7 +300,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		refreshCompositionMechanismCombo(composer);
 		mechanismCombo.addModifyListener(listener);
 	}
-	
+
 	private void refreshCompositionMechanismCombo(String compositionMechanism) {
 		if (!this.composer.hasCompositionMechanisms()) {
 			mechanismCombo.setEnabled(false);
@@ -322,8 +315,8 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 				i++;
 			}
 		}
-	}	
-	
+	}
+
 	/**
 	 * Adds the text fields of features, source and configurations path
 	 * 
@@ -331,14 +324,11 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 	 */
 	private void addAllPathMember(Group group) {
 		// add feature path
-		featurePath = addPathMember(group, COMPOSER_FEATURE_PATH,
-				featureProject.getSourceFolder(), composer.hasFeatureFolder());
+		featurePath = addPathMember(group, COMPOSER_FEATURE_PATH, featureProject.getSourceFolder(), composer.hasFeatureFolder());
 		// add source path
-		sourcePath = addPathMember(group, COMPOSER_SOURCE_PATH,
-				featureProject.getBuildFolder(), composer.hasSourceFolder());
+		sourcePath = addPathMember(group, COMPOSER_SOURCE_PATH, featureProject.getBuildFolder(), composer.hasSourceFolder());
 		// add configurations path
-		configPath = addPathMember(group, COMPOSER_CONFIG_PATH,
-				featureProject.getConfigFolder(), true);
+		configPath = addPathMember(group, COMPOSER_CONFIG_PATH, featureProject.getConfigFolder(), true);
 
 	}
 
@@ -355,8 +345,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 	 *            The status of the member
 	 * @return The created text field
 	 */
-	private Text addPathMember(Group group, String labelText, IFolder folder,
-			boolean enabeled) {
+	private Text addPathMember(Group group, String labelText, IFolder folder, boolean enabeled) {
 		Label label = new Label(group, SWT.NULL);
 		label.setText(labelText);
 		Text text = new Text(group, SWT.BORDER | SWT.SINGLE);
@@ -403,14 +392,12 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 			return;
 		}
 
-		featureProject.setContractComposition(contractCombo
-				.getItem(contractCombo.getSelectionIndex()));
+		featureProject.setContractComposition(contractCombo.getItem(contractCombo.getSelectionIndex()));
 
 	}
 
 	private boolean contractChanged() {
-		return !featureProject.getContractComposition().equals(
-				contractCombo.getText());
+		return !featureProject.getContractComposition().equals(contractCombo.getText());
 
 	}
 
@@ -419,34 +406,24 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 			return;
 		}
 
-		featureProject.setMetaProductGeneration(metaCombo
-				.getItem(metaCombo.getSelectionIndex()));
-
+		featureProject.setMetaProductGeneration(metaCombo.getItem(metaCombo.getSelectionIndex()));
 	}
 
 	private boolean metaProductChanged() {
-		return !featureProject.getMetaProductGeneration().equals(
-				metaCombo.getText());
-
+		return !featureProject.getMetaProductGeneration().equals(metaCombo.getText());
 	}
 
 	private void setCompositionMechanism() {
 		if (!compositionMechanismChanged()) {
 			return;
 		}
-
-		featureProject.setCompositionMechanism(mechanismCombo
-				.getItem(mechanismCombo.getSelectionIndex()));
-
+		featureProject.setCompositionMechanism(mechanismCombo.getItem(mechanismCombo.getSelectionIndex()));
 	}
 
 	private boolean compositionMechanismChanged() {
-		return !featureProject.getCompositionMechanism().equals(
-				mechanismCombo.getText());
-
+		return !featureProject.getCompositionMechanism().equals(mechanismCombo.getText());
 	}
-	
-	
+
 	/**
 	 * Sets the composer of the feature project
 	 */
@@ -454,9 +431,8 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		if (!composerChanged()) {
 			return;
 		}
-		for (IComposerExtension c : extensions) {
-			if (c.getName().equals(
-					composerCombo.getItem(composerCombo.getSelectionIndex()))) {
+		for (IComposerExtensionBase c : extensions) {
+			if (c.getName().equals(composerCombo.getItem(composerCombo.getSelectionIndex()))) {
 				featureProject.setComposerID(c.getId());
 			}
 		}
@@ -469,8 +445,38 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		if (noPathChanged()) {
 			return;
 		}
-		featureProject.setPaths(featurePath.getText(), sourcePath.getText(),
-				configPath.getText());
+		
+		final IProject iProject = featureProject.getProject();
+		createFolder(iProject.getFolder(featurePath.getText()));
+		createFolder(iProject.getFolder(sourcePath.getText()));
+		createFolder(iProject.getFolder(configPath.getText()));
+		
+		try {
+			iProject.refreshLocal(IResource.DEPTH_INFINITE, null);
+		} catch (CoreException e) {
+			CorePlugin.getDefault().logError(e);
+		}
+
+		featureProject.setPaths(featurePath.getText(), sourcePath.getText(), configPath.getText());
+	}
+
+	/**
+	 * @param newFolder
+	 */
+	private void createFolder(IFolder newFolder) {
+		final LinkedList<IFolder> parents = new LinkedList<IFolder>();
+		IResource parent = newFolder;
+		while (!parent.exists() && parent instanceof IFolder) {
+			parents.addFirst((IFolder) parent);
+			parent = parent.getParent();
+		}
+		for (IFolder subFolder : parents) {
+			try {
+				subFolder.create(true, true, null);
+			} catch (CoreException e) {
+				CorePlugin.getDefault().logError(e);
+			}
+		}
 	}
 
 	/**
@@ -484,22 +490,24 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 	 * @return
 	 */
 	private boolean composerChanged() {
-		return !featureProject.getComposer().getName()
-				.equals(composerCombo.getText());
+		return !featureProject.getComposer().getName().equals(composerCombo.getText());
 	}
 
 	/**
 	 * @return
 	 */
 	private boolean noPathChanged() {
-		return 	((featureProject.getSourceFolder() != null) ? featureProject.getSourceFolder().getProjectRelativePath().toOSString().equals(featurePath.getText()) : true) && 
-				((featureProject.getBuildFolder() != null) ? featureProject.getBuildFolder().getProjectRelativePath().toOSString().equals(sourcePath.getText()) : true) && 
-				((featureProject.getConfigFolder() != null) ? featureProject.getConfigFolder().getProjectRelativePath().toOSString().equals(configPath.getText()) : true);
+		return ((featureProject.getSourceFolder() != null) ? featureProject.getSourceFolder().getProjectRelativePath().toOSString()
+				.equals(featurePath.getText()) : true)
+				&& ((featureProject.getBuildFolder() != null) ? featureProject.getBuildFolder().getProjectRelativePath().toOSString()
+						.equals(sourcePath.getText()) : true)
+				&& ((featureProject.getConfigFolder() != null) ? featureProject.getConfigFolder().getProjectRelativePath().toOSString()
+						.equals(configPath.getText()) : true);
 	}
 
 	@Override
 	protected void performDefaults() {
-		IComposerExtension composer = featureProject.getComposer();
+		IComposerExtensionBase composer = featureProject.getComposer();
 		int i = 0;
 		for (String item : composerCombo.getItems()) {
 			if (item.equals(composer.getName())) {
@@ -533,13 +541,10 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 			i++;
 		}
 		featurePath.setEnabled(composer.hasFeatureFolder());
-		featurePath.setText(featureProject.getSourceFolder()
-				.getProjectRelativePath().toOSString());
+		featurePath.setText(featureProject.getSourceFolder().getProjectRelativePath().toOSString());
 		sourcePath.setEnabled(composer.hasSourceFolder());
-		sourcePath.setText(featureProject.getBuildFolder()
-				.getProjectRelativePath().toOSString());
-		configPath.setText(featureProject.getConfigFolder()
-				.getProjectRelativePath().toOSString());
+		sourcePath.setText(featureProject.getBuildFolder().getProjectRelativePath().toOSString());
+		configPath.setText(featureProject.getConfigFolder().getProjectRelativePath().toOSString());
 		refreshContractCombo(composerCombo.getText());
 		refreshMetaCombo(metaCombo.getText());
 		refreshCompositionMechanismCombo(mechanismCombo.getText());
@@ -549,10 +554,8 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 	 * Called if something at the dialog has been changed
 	 */
 	protected void dialogChanged() {
-		for (IComposerExtension c : extensions) {
-			if (c.getName().equals(
-					composerCombo.getItem(composerCombo.getSelectionIndex()))) {
-				c.loadComposerExtension();
+		for (IComposerExtensionBase c : extensions) {
+			if (c.getName().equals(composerCombo.getItem(composerCombo.getSelectionIndex()))) {
 
 				if (!c.hasContractComposition()) {
 					contractCombo.select(0); // set to none
@@ -560,6 +563,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 				} else {
 					contractCombo.setEnabled(true);
 				}
+				
 				if (c.hasFeatureFolder()) {
 					featurePath.setEnabled(true);
 					if (featurePath.getText().equals("")) {
@@ -592,11 +596,17 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 						return;
 					}
 				}
+
 				if (configPath.getText().equals("")) {
 					updateStatus("Define a configurations path.");
 					return;
 				}
-
+				if (!c.hasMetaProductGeneration()) {
+					metaCombo.setEnabled(false);
+					metaCombo.select(0);
+				} else {
+					metaCombo.setEnabled(true);
+				}
 				updateStatus(null);
 				return;
 			}

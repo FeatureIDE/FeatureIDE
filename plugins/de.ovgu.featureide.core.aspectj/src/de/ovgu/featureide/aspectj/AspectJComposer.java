@@ -432,11 +432,6 @@ public class AspectJComposer extends ComposerExtensionClass {
 		 return list;
 	}
 
-	@Override
-	public boolean hasFeatureFolders() {
-		return false;
-	}
-
 	private String rootName = "";
 	
 	@Override
@@ -525,6 +520,11 @@ public class AspectJComposer extends ComposerExtensionClass {
 			createFolder((IFolder)folder.getParent());
 			folder.create(true, true, null);
 		}
+	}
+
+	@Override
+	public boolean createFolderForFeatures() {
+		return false;
 	}
 
 	@Override

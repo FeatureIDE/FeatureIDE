@@ -67,7 +67,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.TreePath;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
@@ -93,6 +93,7 @@ import org.eclipse.ui.wizards.datatransfer.ImportOperation;
 
 import de.ovgu.featureide.core.builder.ComposerExtensionManager;
 import de.ovgu.featureide.core.builder.IComposerExtension;
+import de.ovgu.featureide.core.builder.IComposerExtensionBase;
 import de.ovgu.featureide.examples.ExamplePlugin;
 import de.ovgu.featureide.examples.utils.CommentParser;
 import de.ovgu.featureide.examples.utils.ExampleStructureProvider;
@@ -312,8 +313,9 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 			public String getText(Object element) {
 				if (element instanceof String) {
 					List<IComposerExtension> composerExtensions = ComposerExtensionManager.getInstance().getComposers();
-					for (IComposerExtension ic : composerExtensions) {
-						if (ic.toString().contains((String) element)) {
+					for (IComposerExtensionBase ic : composerExtensions) {
+						String composerExtension = ic.toString();
+						if (composerExtension.substring(composerExtension.lastIndexOf(".") +1).equals((String) element)) {
 							return ic.getName();
 						}
 					}
@@ -328,20 +330,26 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		});
 
 		projectsList.addCheckStateListener(new ICheckStateListener() {
-			public void checkStateChanged(CheckStateChangedEvent event) {
+			public void checkStateChanged(CheckStateChangedEvent event) {				
+				projectsList.setSelection(new StructuredSelection(event.getElement()));
 
+				boolean keepWarning = false;
 				if (event.getElement() instanceof String) {
 					for (ProjectRecord tmpRecord : compTable.get((String) event.getElement())) {
-						projectsList.setChecked(tmpRecord, projectsList.getChecked((String) event.getElement()));
+						final boolean isChecked = projectsList.getChecked((String) event.getElement());
+						projectsList.setChecked(tmpRecord, isChecked);
 						if (tmpRecord.hasWarnings()) {
 							projectsList.setChecked(tmpRecord, false);
 							projectsList.setGrayed(tmpRecord, true);
-							setMessage(tmpRecord.getWarningText(), WARNING);
+							if (isChecked) {
+								keepWarning = true;
+								setMessage(tmpRecord.getWarningText(), WARNING);
+							}
 						}
 					}
 				} else {
 					ProjectRecord tmpRecord = (ProjectRecord) event.getElement();
-					if (tmpRecord.hasWarnings()) {
+					if (keepWarning = tmpRecord.hasWarnings()) {
 						projectsList.setChecked(tmpRecord, false);
 						setMessage(tmpRecord.getWarningText(), WARNING);
 					}
@@ -349,32 +357,46 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 					String compID = tmpRecord.description.getBuildSpec()[0].getArguments().get("composer");
 					String curComposer = compID.substring(compID.lastIndexOf(".") + 1);
 					for (ProjectRecord pr : compTable.get(curComposer)) {
-						if (!projectsList.getChecked(pr)) {
+						if (!projectsList.getChecked(pr) && !pr.hasWarnings) {
 							allChecked = false;
+							break;
 						}
 					}
 					projectsList.setChecked(curComposer, allChecked);
 
 				}
-				setPageComplete(projectsList.getCheckedElements().length > 0);
+				if (projectsList.getCheckedElements().length == 0) {
+					setPageComplete(false);
+					if (!keepWarning) {
+						setMessage("");
+					}
+				} else {
+					for (Object obj : projectsList.getCheckedElements()) {
+						if (obj instanceof ProjectRecord) {
+							setPageComplete(true);
+							break;
+						}
+						setPageComplete(false);
+					}
+				}
 			}
 		});
+		
 
+		
 		projectsList.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(SelectionChangedEvent event) {
-
+				
 				if (event.getSelection() instanceof IStructuredSelection) {
 					IStructuredSelection iss = (IStructuredSelection) event.getSelection();
-					if (iss != null) {
-						if (iss.getFirstElement() instanceof String) {
-							descBox.setText("");
-							setMessage("");
-						} else if (iss.getFirstElement() instanceof ProjectRecord) {
-							ProjectRecord tmpRecord = (ProjectRecord) iss.getFirstElement();
-
+						if (iss != null) {
+							if (iss.getFirstElement() instanceof String) {
+								descBox.setText("");
+								setMessage("");
+							} else if (iss.getFirstElement() instanceof ProjectRecord) {
+								ProjectRecord tmpRecord = (ProjectRecord) iss.getFirstElement();
 							if (tmpRecord != null) {
 								descBox.setText(tmpRecord.getDescription());
-
 								if (tmpRecord.hasWarnings()) {
 									setMessage(tmpRecord.getWarningText(), WARNING);
 								} else {
@@ -382,7 +404,6 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 								}
 							}
 						}
-
 					}
 				}
 			}
@@ -398,6 +419,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		// later. Hence projectsList gets expanded and collapsed completely in the beginning to have all children/projects added.
 		projectsList.expandAll();
 		projectsList.collapseAll();
+		setPageComplete(false);
 	}
 
 	private void createDescriptionArea(Composite workArea) {
@@ -712,10 +734,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 						if (selected[i] instanceof ProjectRecord) {
 							createExistingProject((ProjectRecord) selected[i], new SubProgressMonitor(monitor, 1));
 						} else if (selected[i] instanceof String) {
-							for (ProjectRecord tmpRecord : compTable.get((String) selected[i])) {
-								createExistingProject(tmpRecord, new SubProgressMonitor(monitor, 1));
-
-							}
+								//do nothing
 						}
 					}
 				} finally {

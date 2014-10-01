@@ -66,4 +66,10 @@ public class FSTClass {
 	public LinkedList<String> getInvariants() {
 		return invariants;
 	}
+
+	@Override
+	public String toString() {
+		return name;
+	}
+	
 }

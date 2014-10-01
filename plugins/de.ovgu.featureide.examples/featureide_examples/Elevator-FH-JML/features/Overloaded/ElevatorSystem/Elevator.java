@@ -15,9 +15,7 @@ public class Elevator {
 	 // specification 11
 	 /* Elevator must not move while it is overloaded.
 	  */
-	/*@
-	  @ ensures \original;
-	  @ ensures weight > maximumWeight ==> areDoorsOpen();
+	/*@ ensures weight > maximumWeight ==> areDoorsOpen();
 	  @ ensures \old(weight) > \old(maximumWeight) ==> getCurrentFloorID() == \old(getCurrentFloorID());
 	  @*/
 	public void timeShift() {

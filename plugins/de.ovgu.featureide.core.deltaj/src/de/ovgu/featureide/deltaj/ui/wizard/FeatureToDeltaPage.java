@@ -34,18 +34,18 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.List;
 
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.widgets.Group;
 
 /**
- * @author André Specht
+ * @author Andrï¿½ Specht
  * Adapted for FeatureIDE by Sven Schuster
  */
 public class FeatureToDeltaPage extends WizardPage {

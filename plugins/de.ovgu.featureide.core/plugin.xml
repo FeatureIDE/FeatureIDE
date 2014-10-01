@@ -14,6 +14,7 @@
       </persistent>
    </extension>
    <extension-point id="composers" name="Composers" schema="schema/composers.exsd"/>
+   <extension-point id="wizard" name="Wizard" schema="schema/wizard.exsd"/>
    <extension
          id="contractMarker"
          name="Contract Marker"
@@ -141,4 +142,13 @@
          </enabledWhen>
       </page>
    </extension>
+  <extension
+        point="de.ovgu.featureide.core.wizard">
+     <newProjectWizard
+           class="de.ovgu.featureide.core.wizardextension.DefaultNewFeatureProjectWizardExtension"
+           composerid="de.ovgu.featureide.core.FeatureModeling"
+           id="de.ovgu.featureide.core.featuremodelling.newProjectWizard"
+           name="FeatureModellingNewProjectWizard">
+     </newProjectWizard>
+  </extension>
 </plugin>

@@ -1,11 +1,11 @@
-public  class   StringMatcher {
+public class StringMatcher {
 		
 	/*@
 	  @ requires \original;
-	  @ ensures \original;
+	  @ ensures \result <==> a.equals(b);
 	  @*/
 	public  boolean compare(String a, String b){
-		//@set compare = a.equals(b);
-		return a.equals(b);
+		return original(a,b) && a.equals(b);
 	}
+	
 }

@@ -1,7 +1,7 @@
 
 public class IntList {
-    //@ invariant this != null; 
-	//@ invariant data != null;
+    /*@ invariant this != null;@*/ 
+	/*@ invariant data != null;@*/
     public int[] data;
     
     public IntList() {

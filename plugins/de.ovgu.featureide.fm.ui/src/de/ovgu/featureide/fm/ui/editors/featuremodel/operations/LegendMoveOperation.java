@@ -64,6 +64,7 @@ public class LegendMoveOperation extends AbstractFeatureModelOperation {
 		final FeatureModelLayout layout = featureModel.getLayout();
 		layout.setLegendPos(pos.x, pos.y);
 		layout.setLegendAutoLayout(false);
+		featureModel.handleLegendLayoutChanged(); 
 	}
 
 	@Override
@@ -72,6 +73,7 @@ public class LegendMoveOperation extends AbstractFeatureModelOperation {
 		final FeatureModelLayout layout = featureModel.getLayout();
 		layout.setLegendPos(oldPos.x, oldPos.y);
 		layout.setLegendAutoLayout(wasAutoLayout);
+		featureModel.handleLegendLayoutChanged(); 
 	}
 
 }

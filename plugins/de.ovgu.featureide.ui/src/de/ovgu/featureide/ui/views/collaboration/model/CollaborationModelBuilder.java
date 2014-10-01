@@ -37,7 +37,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.QualifiedName;
 
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.builder.IComposerExtension;
+import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTConfiguration;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
@@ -199,8 +199,8 @@ public class CollaborationModelBuilder {
 			return true;
 		}
 		
-		for (final String c : getClassFilter()) {
-			final FSTClass fstClass = fSTModel.getClass(c);
+		for (final String classFilter : getClassFilter()) {
+			final FSTClass fstClass = fSTModel.getClass(classFilter);
 			if (fstClass != null) {
 				for (final FSTRole role : fstClass.getRoles()) {
 					if (role.getFeature().equals(feature)) {
@@ -221,13 +221,13 @@ public class CollaborationModelBuilder {
 	}
 	
 	public synchronized FSTModel buildCollaborationModel(final IFeatureProject featureProject) {
-		if (!initilize(featureProject)) {
+		if (!initialize(featureProject)) {
 			return null;
 		}
 		return fSTModel;
 	}
 
-	private boolean initilize(IFeatureProject featureProject) {		
+	private boolean initialize(IFeatureProject featureProject) {		
 		// set the featureProject
 		if (featureProject == null) {
 			return false;
@@ -235,7 +235,7 @@ public class CollaborationModelBuilder {
 		project = featureProject;
 		
 		// set the composer
-		IComposerExtension composer = project.getComposer();
+		IComposerExtensionClass composer = project.getComposer();
 		if (composer == null) {
 			return false; 	
 		}
@@ -256,10 +256,9 @@ public class CollaborationModelBuilder {
 	 * sets the FSTModel
 	 * @param composer
 	 */
-	private void getFstModel(IComposerExtension composer) {
+	private void getFstModel(IComposerExtensionClass composer) {
 		fSTModel = project.getFSTModel();
 		if (fSTModel == null) {
-			composer.initialize(project);
 			composer.buildFSTModel();
 			fSTModel = project.getFSTModel();
 		}

@@ -67,7 +67,7 @@ public class PL_Interface_impl implements PL_Interface {
 	}
 
 	// this method is used as hook for the liveness properties.
-	/*@
+	/*@ \consecutive_contract
 	  @ ensures (\forall int i; 0 <= i && i < env.calledAt_Spec1.length; !env.calledAt_Spec1[i]);
 	  @ ensures (\forall int i; 0 <= i && i < env.calledAt_Spec2.length; !env.calledAt_Spec2[i]);
 	  @*/

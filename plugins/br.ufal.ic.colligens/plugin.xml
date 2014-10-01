@@ -327,4 +327,13 @@ point="org.eclipse.core.resources.markers">
             id="br.ufal.ic.colligens.RefactoringController">
       </contribution>
    </extension>
+   <extension
+         point="de.ovgu.featureide.core.wizard">
+      <newProjectWizard
+            class="de.ovgu.featureide.core.wizardextension.DefaultNewFeatureProjectWizardExtension"
+            composerid="br.ufal.ic.colligens.cppcomposer"
+            id="br.ufal.ic.colligens.newProjectWizard"
+            name="MungeAndroidNewProjectWizard">
+      </newProjectWizard>
+   </extension>
 </plugin>

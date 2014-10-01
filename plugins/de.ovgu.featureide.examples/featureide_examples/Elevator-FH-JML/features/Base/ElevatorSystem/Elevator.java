@@ -70,7 +70,7 @@ public class Elevator {
 	 * Activates the button for the given floor in the lift.
 	 * @param floorID
 	 */
-	/*@ 
+	/*@ \consecutive_contract
 	  @ ensures env.calledAt_Spec2[floorID];
 	  @*/
 	public void pressInLiftFloorButton(int floorID) {
@@ -92,7 +92,7 @@ public class Elevator {
 	  * The Lift will not change direction while there are calls in the direction it is traveling.
 	  */
 	// pre: elevator arrived at the current floor, next actions to be done
-	/*@ 
+	/*@ \consecutive_contract
 	  @ ensures env.calledAt_Spec1[currentFloorID] == env.calledAt_Spec1[currentFloorID] && areDoorsOpen() ? false : env.calledAt_Spec1[currentFloorID];
 	  @ ensures \old(getCurrentDirection()) == Direction.up && getCurrentDirection() == Direction.down ==> (\forall int i; getCurrentFloorID() < i && i < numFloors; !buttonForFloorIsPressed(i));
 	  @ ensures \old(getCurrentDirection()) == Direction.down && getCurrentDirection() == Direction.up ==> (\forall int i; 0 <= i && i < getCurrentFloorID(); !buttonForFloorIsPressed(i));

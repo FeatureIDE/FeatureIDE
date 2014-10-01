@@ -1,11 +1,6 @@
+public class StringMatcher {
 
-public  class   StringMatcher {
-
-	public  StringMatcher(String mainText){
-
+	public StringMatcher(String mainText){
 	}
-	
-	
-
 	
 }
