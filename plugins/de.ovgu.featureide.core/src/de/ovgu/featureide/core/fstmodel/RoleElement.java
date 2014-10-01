@@ -22,6 +22,8 @@ package de.ovgu.featureide.core.fstmodel;
 
 import org.eclipse.core.resources.IFile;
 
+import de.ovgu.featureide.core.signature.abstr.AbstractSignature;
+
 /**
  * Default implementation of {@link FSTMethod} and {@link FSTField}.
  * 
@@ -45,6 +47,8 @@ public abstract class RoleElement {
 	protected int composedLine;
 
 	protected FSTRole role;
+	
+	protected AbstractSignature signature;
 
 	public RoleElement(String name, String type, String modifiers) {
 		this(name, type, modifiers, "", -1, -1);
@@ -147,8 +151,9 @@ public abstract class RoleElement {
 	}
 
 	/**
-	 * @return <code>true</code> if the given element is equivalent in it's
-	 *         structure and it has the same class as this element
+	 * @return
+	 * 		<code>true</code> if the given element is equivalent
+	 * 		in its structure and it has the same class as this element
 	 */
 	public boolean comparesTo(RoleElement element) {
 		return getFullName().equals(element.getFullName()) && getClass().equals(element.getClass());
@@ -161,17 +166,11 @@ public abstract class RoleElement {
 		}
 		return false;
 	}
-
-	/**
-	 * @return the javaDocCommtent
-	 */
+	
 	public String getJavaDocCommtent() {
 		return javaDocCommtent;
 	}
-
-	/**
-	 * @param javaDocCommtent the javaDocCommtent to set
-	 */
+	
 	public void setJavaDocCommtent(String javaDocCommtent) {
 		this.javaDocCommtent = javaDocCommtent;
 	}

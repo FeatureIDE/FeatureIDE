@@ -31,6 +31,7 @@ import javax.annotation.Nonnull;
 import org.eclipse.core.resources.IFile;
 
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.signature.ProjectSignatures;
 
 /**
  * The FSTModel represents the projects structure.<br>
@@ -39,13 +40,14 @@ import de.ovgu.featureide.core.IFeatureProject;
  * 
  * @author Jens Meinicke
  */
-
 public class FSTModel {
 
 	private final Map<String, FSTClass> classes = new HashMap<String, FSTClass>();
 	private final Map<String, FSTFeature> features = new HashMap<String, FSTFeature>();
 	private final IFeatureProject featurProject;
 	private FSTConfiguration configuration;
+	
+	private ProjectSignatures projectSignatures = null;
 
 	public FSTModel(IFeatureProject featureProject) {
 		this.featurProject = featureProject;
@@ -168,5 +170,13 @@ public class FSTModel {
 		c.addRole(featureName, arbitraryRole);
 		feature.addRole(className, arbitraryRole);
 		return role;
+	}
+	
+	public ProjectSignatures getProjectSignatures() {
+		return projectSignatures;
+	}
+	
+	public void setProjectSignatures(ProjectSignatures projectSignatures) {
+		this.projectSignatures = projectSignatures;
 	}
 }

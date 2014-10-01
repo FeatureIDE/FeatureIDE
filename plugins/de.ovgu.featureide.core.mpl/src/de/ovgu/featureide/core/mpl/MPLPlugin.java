@@ -71,6 +71,7 @@ import de.ovgu.featureide.core.mpl.signature.filter.ContextFilter;
 import de.ovgu.featureide.core.mpl.util.ConfigurationChangeListener;
 import de.ovgu.featureide.core.mpl.util.EditorTracker;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.PropertyConstants;
 
 /** 
@@ -332,11 +333,13 @@ public class MPLPlugin extends AbstractCorePlugin {
 	}
 	
 	public void buildDocumentation(LinkedList<IProject> projects, String folder, String options, int mode) {
-		startJobs(projects, new PrintDocumentationJob.Arguments(folder, null, mode, options.split("\\s+")));
+		FMCorePlugin.getDefault().startJobs(projects, 
+				new PrintDocumentationJob.Arguments(folder, null, mode, options.split("\\s+")), true);
 	}
 	
 	public void buildDocumentation(LinkedList<IProject> projects, String folder, String options, int mode, String featurename) {
-		startJobs(projects, new PrintDocumentationJob.Arguments(folder, featurename, mode, options.split("\\s+")));
+		FMCorePlugin.getDefault().startJobs(projects, 
+				new PrintDocumentationJob.Arguments(folder, featurename, mode, options.split("\\s+")), true);
 	}
 	
 	public void buildDocumentationStatistics(LinkedList<IProject> projects, String folder) {

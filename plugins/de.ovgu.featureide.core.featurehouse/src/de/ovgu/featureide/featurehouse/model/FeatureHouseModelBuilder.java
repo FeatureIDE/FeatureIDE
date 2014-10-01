@@ -258,16 +258,10 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 					}
 					caseClassDeclaration(child);
 				}
-				
 			}
 			
-			
 			if (!classFragmentStack.isEmpty()) {
-//				FSTClassFragment curClassFragment = 
-					classFragmentStack.pop();
-//				if (classFragmentStack.isEmpty() && curClassFragment.getPackage() == null) {
-//	//				curClassFragment.setPackage(currentFile.getParent().getName());
-//				}
+				classFragmentStack.pop();
 			}
 		}
 	}

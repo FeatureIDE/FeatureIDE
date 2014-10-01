@@ -35,7 +35,6 @@ public class FSTClassFragment extends RoleElement {
 	protected final LinkedList<FSTField> fields = new LinkedList<FSTField>();
 	protected final LinkedList<FSTClassFragment> innerClasses = new LinkedList<FSTClassFragment>();
 	protected final LinkedList<FSTInvariant> invariants = new LinkedList<FSTInvariant>();
-
 	
 	protected String pckg = null;
 
