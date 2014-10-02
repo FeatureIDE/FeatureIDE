@@ -145,7 +145,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 	public FeatureHouseModelBuilder fhModelBuilder;
 
-	private ErrorPropagation errorPropagation = new ErrorPropagation();
+	private ErrorPropagation errorPropagation = null;
 
 	private IParseErrorListener listener = createParseErrorListener();
 
@@ -934,8 +934,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		} else if (CONTRACT_COMPOSITION_PLAIN_CONTRACTING
 				.equals(contractComposition)) {
 			return CONTRACT_COMPOSITION_PLAIN_CONTRACT;
-		} else if (CONTRACT_COMPOSITION_CONTRACT_OVERRIDING
-				.equals(contractComposition)) {
+		} else if (CONTRACT_COMPOSITION_CONTRACT_OVERRIDING.equals(contractComposition)) {
 			return CONTRACT_COMPOSITION_CONTRACT_OVERRIDING;
 		} else if (CONTRACT_COMPOSITION_EXPLICIT_CONTRACT_REFINEMENT.equals(contractComposition)) {
 			return CONTRACT_COMPOSITION_EXPLICIT_CONTRACTING;
@@ -1064,6 +1063,9 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			if (!file.getWorkspace().isTreeLocked()) {
 				file.refreshLocal(IResource.DEPTH_ZERO, null);
 			}
+			if (errorPropagation == null) {
+				errorPropagation = ErrorPropagation.createErrorPropagation(file);
+			}
 			errorPropagation.addFile(file);
 		} catch (CoreException e) {
 			LOGGER.logError(e);
@@ -1126,7 +1128,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		composer.addParseErrorListener(createParseErrorListener());
 		composer.addCompositionErrorListener(createCompositionErrorListener());
 		composer.run(getArguments(configurationFile.getRawLocation().toOSString(), featureProject.getSourcePath(), folder.getParent().getLocation().toOSString(), getContractParameter()));
-		if (errorPropagation.job != null) {
+		if (errorPropagation != null && errorPropagation.job != null) {
 			/*
 			 * Waiting for the propagation job to finish, because the
 			 * corresponding FSTModel is necessary for propagation at FH This is

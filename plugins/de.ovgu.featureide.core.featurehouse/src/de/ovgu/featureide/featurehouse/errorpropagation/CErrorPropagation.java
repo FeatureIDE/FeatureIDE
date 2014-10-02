@@ -25,6 +25,7 @@ import java.util.LinkedList;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 
+import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 
@@ -34,8 +35,12 @@ import de.ovgu.featureide.core.fstmodel.FSTMethod;
  * @author Jens Meinicke
  */
 public class CErrorPropagation extends ErrorPropagation {
-	
+
 	private static final String TASK = "org.eclipse.cdt.core.task";
+
+	protected CErrorPropagation(IFeatureProject featureProject) {
+		super(featureProject);
+	}
 
 	/**
 	 * Sets all composed lines to all methods and fields
@@ -111,7 +116,7 @@ public class CErrorPropagation extends ErrorPropagation {
 	}
 
 	@Override
-	boolean propagateMarker(IMarker m) {
+	protected boolean propagateMarker(IMarker m) {
 		try {
 			return !(TASK.equals(m.getType()));
 		} catch (CoreException e) {
