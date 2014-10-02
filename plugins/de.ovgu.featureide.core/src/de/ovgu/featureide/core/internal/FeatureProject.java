@@ -65,6 +65,7 @@ import de.ovgu.featureide.core.builder.ExtensibleFeatureProjectBuilder;
 import de.ovgu.featureide.core.builder.FeatureProjectNature;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
+import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -498,14 +499,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		setCurrentConfiguration(config);
 		return config;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ovgu.featureide.core.IFeatureProject#setCurrentConfiguration(org.eclipse
-	 * .core .resources.IFile)
-	 */
+	
 	public void setCurrentConfiguration(IFile file) {
 		currentConfiguration = file;
 
@@ -536,118 +530,52 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		job.setPriority(Job.BUILD);
 		job.schedule();
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.IFeatureProject#getBuildPath()
-	 */
+	
 	@CheckForNull
 	public String getBuildPath() {
 		return buildFolder != null ? buildFolder.getRawLocation().toOSString() : null;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.IFeatureProject#getBinFolder()
-	 */
+	
 	public IFolder getBinFolder() {
 		return binFolder;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.IFeatureProject#getLibFolder()
-	 */
+	
 	public IFolder getLibFolder() {
 		return libFolder;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.IFeatureProject#getBuildFolder()
-	 */
+	
 	public IFolder getBuildFolder() {
 		return buildFolder;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.IFeatureProject#getConfigFolder()
-	 */
+	
 	public IFolder getConfigFolder() {
 		return configFolder;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.IFeatureProject#getSourceFolder()
-	 */
+	
 	public IFolder getSourceFolder() {
 		return sourceFolder;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.IFeatureProject#getBinPath()
-	 */
+	
 	public String getBinPath() {
 		return binFolder.getRawLocation().toOSString();
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.IFeatureProject#getConfigPath()
-	 */
+	
 	public String getConfigPath() {
 		return configFolder.getRawLocation().toOSString();
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.IFeatureProject#getSourcePath()
-	 */
+	
 	public String getSourcePath() {
 		return sourceFolder == null ? null : sourceFolder.getRawLocation().toOSString();
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ovgu.featureide.core.IFeatureProject#getFeatureName(org.eclipse.core
-	 * .resources .IResource)
-	 */
+	
 	public String getFeatureName(IResource resource) {
 		return getFolderName(resource, sourceFolder);
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ovgu.featureide.core.IFeatureProject#getConfigName(org.eclipse.core
-	 * .resources .IResource)
-	 */
+	
 	public String getConfigName(IResource resource) {
 		return getFolderName(resource, buildFolder);
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ovgu.featureide.core.IFeatureProject#getFolderName(org.eclipse.core
-	 * .resources .IResource, org.eclipse.core.resources.IFolder)
-	 */
+	
 	public String getFolderName(IResource resource, IFolder folder) {
 		// check whether resource belongs to this project
 		if (resource.getProject() != project)
@@ -659,30 +587,22 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		}
 		return null;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.IFeatureProject#getProject()
-	 */
+	
 	public IProject getProject() {
 		return project;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.IFeatureProject#getJakProject()
-	 */
+	
+	public ProjectSignatures getProjectSignatures() {
+		if (fstModel != null) {
+			return fstModel.getProjectSignatures();
+		}
+		return null;
+	}
+	
 	public FSTModel getFSTModel() {
 		return fstModel;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.IFeatureProject#getModelData()
-	 */
+	
 	public FeatureModel getFeatureModel() {
 		return featureModel;
 	}
@@ -690,12 +610,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	public IFile getModelFile() {
 		return modelFile.getResource();
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.IFeatureProject#getJavaClassPath()
-	 */
+	
 	public String[] getJavaClassPath() {
 		ArrayList<String> cp = new ArrayList<String>();
 		cp.add(".");
@@ -717,12 +632,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 		return cp.toArray(new String[cp.size()]);
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.IFeatureProject#getAdditionalJavaClassPath()
-	 */
+	
 	public String[] getAdditionalJavaClassPath() {
 		ArrayList<String> cp = new ArrayList<String>();
 		String classPath = null;
@@ -1246,13 +1156,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			LOGGER.logError(e);
 		}
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ovgu.featureide.core.IFeatureProject#setComposerID(java.lang.String)
-	 */
+	
 	public void setComposerID(String composerID) {
 		try {
 			project.setPersistentProperty(composerConfigID, composerID);
@@ -1387,12 +1291,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	public String toString() {
 		return project.getName();
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ovgu.featureide.core.IFeatureProject#getCompositionTool()
-	 */
+	
 	public String getCompositionMechanism() {
 		String compositionMechanism = null;
 		try {
@@ -1405,14 +1304,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		}
 		return compositionMechanism;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ovgu.featureide.core.IFeatureProject#setCompositionTool(java.lang.
-	 * String)
-	 */
+	
 	public void setCompositionMechanism(String compositionMechanism) {
 		try {
 			project.setPersistentProperty(compositionMechanismConfigID, compositionMechanism);
@@ -1420,5 +1312,4 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			LOGGER.logError(e);
 		}
 	}
-
 }

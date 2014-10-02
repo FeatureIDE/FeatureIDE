@@ -20,18 +20,25 @@
  */
 package de.ovgu.featureide.featurehouse;
 
+import AST.Program;
+import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 
 /**
- * TODO description
+ * Can be run after fuji type checking to attach {@link ProjectSignatures} to an {@link FSTModel}.
  * 
  * @author Sebastian Krieter
  */
 public class SignatureSetter implements JobFinishListener {
+	private final FujiSignaturesCreator sigCreator = new FujiSignaturesCreator();
+	
 	private FSTModel fstModel = null;
 	private ProjectSignatures signatures = null;
+	
+	private IFeatureProject fp = null;
+	private Program ast = null;
 	
 	public void setFstModel(FSTModel fstModel) {
 		this.fstModel = fstModel;
@@ -40,19 +47,23 @@ public class SignatureSetter implements JobFinishListener {
 		}
 	}
 	
-	public void setSignatures(ProjectSignatures signatures) {
-		this.signatures = signatures;
-		if (fstModel != null) {
-			assignSignatures();
+	public void setFujiParameters(IFeatureProject fp, Program ast) {
+		this.ast = ast;
+		this.fp = fp;
+	}
+
+	@Override
+	public void jobFinished(boolean success) {
+		if (success) {
+			this.signatures = sigCreator.createSignatures(fp, ast);
+			if (fstModel != null) {
+				assignSignatures();
+			}
 		}
 	}
 	
-	private void assignSignatures() {
+	private synchronized void assignSignatures() {
+		sigCreator.attachJavadocComments(signatures, fstModel);
 		fstModel.setProjectSignatures(signatures);
-	}
-	
-	@Override
-	public void jobFinished(boolean success) {
-//		setSignatures(signatures);
 	}
 }

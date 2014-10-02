@@ -43,7 +43,7 @@ public class StatisticsContractComplexity extends LazyParent {
 	private FSTModel fstModel;
 	private FeatureModel featModel;
 	private String contractComposition;
-	
+
 	public StatisticsContractComplexity(String description, FSTModel fstmodel, FeatureModel featmodel, String contractComposition) {
 		super(description, null);
 		this.fstModel = fstmodel;
@@ -53,7 +53,7 @@ public class StatisticsContractComplexity extends LazyParent {
 
 	@Override
 	protected void initChildren() {
-		if (fstModel != null ) {
+		if (fstModel != null) {
 
 			HashMap<String, Integer> classInvariantsMap = new HashMap<String, Integer>();
 			HashMap<String, Integer> classMethodContractMap = new HashMap<String, Integer>();
@@ -66,26 +66,23 @@ public class StatisticsContractComplexity extends LazyParent {
 			for (FSTClass class_ : fstModel.getClasses()) {
 				int numInClass = 0, numInvariantsInClass = 0;
 
-				String packageName = (class_.getRoles().size() == 0) ? null
-						: class_.getRoles().get(0).getClassFragment()
-								.getPackage();
-				String fullClassName = ((packageName == null) ? "(default package)": packageName)
-						+ "." + ((class_.getName().endsWith(".java")) ? class_.getName().substring(0, class_.getName().length() - 5) : class_.getName());
+				String packageName = (class_.getRoles().size() == 0) ? null : class_.getRoles().get(0).getClassFragment().getPackage();
+				String fullClassName = ((packageName == null) ? "(default package)" : packageName) + "." + ((class_.getName().endsWith(".java")) ? class_.getName().substring(0, class_.getName().length() - 5) : class_.getName());
 
 				for (FSTRole role : class_.getRoles()) {
-					for (FSTInvariant invariant : role.getClassFragment().getInvariants()) {
+					for (@SuppressWarnings("unused")
+					FSTInvariant invariant : role.getClassFragment().getInvariants()) {
 						numInvariantsInClass++;
-						featureCountList.put( role.getFeature().getName(), featureCountList.containsKey(role.getFeature().getName()) ? featureCountList.get(role.getFeature().getName()) + 1: 1);
+						featureCountList.put(role.getFeature().getName(), featureCountList.containsKey(role.getFeature().getName()) ? featureCountList.get(role.getFeature().getName()) + 1 : 1);
 					}
 					for (FSTMethod method : role.getClassFragment().getMethods()) {
 						classMethodCountMap.put(fullClassName + "." + method.getFullName(), 1);
 						if (method.hasContract()) {
-							featureCountList.put(role.getFeature().getName(), featureCountList.containsKey(role.getFeature().getName()) ? featureCountList.get(role.getFeature().getName()) + 1: 1);
+							featureCountList.put(role.getFeature().getName(), featureCountList.containsKey(role.getFeature().getName()) ? featureCountList.get(role.getFeature().getName()) + 1 : 1);
 							numInClass++;
 							contractRefinementMap.put(method.getCompKey(), contractRefinementMap.containsKey(method.getCompKey()) ? (contractRefinementMap.get(method.getCompKey()) + 1) : 1);
 							if (classMethodMap.get(fullClassName + "." + method.getFullName()) != null)
-								classMethodMap.put(fullClassName + "." + method.getFullName(),
-										classMethodMap.get(fullClassName + "." + method.getFullName()) + 1);
+								classMethodMap.put(fullClassName + "." + method.getFullName(), classMethodMap.get(fullClassName + "." + method.getFullName()) + 1);
 							else
 								classMethodMap.put(fullClassName + "." + method.getFullName(), 1);
 						}
@@ -101,88 +98,60 @@ public class StatisticsContractComplexity extends LazyParent {
 				numClassesWithInvariants += numInvariantsInClass > 0 ? 1 : 0;
 			}
 
-			HashMapNode methodsNode = new HashMapNode(
-					NUMBER_METHOD_METHOD_CONTRACT + SEPARATOR
-							+ classMethodMap.keySet().size() + "/"
-							+ classMethodCountMap.keySet().size() + " (" + Math.round(100*(classMethodMap.keySet().size()/(double)classMethodCountMap.keySet().size())) + "%)", null,
-					classMethodMap);
+			HashMapNode methodsNode = new HashMapNode(NUMBER_METHOD_METHOD_CONTRACT + SEPARATOR + classMethodMap.keySet().size() + "/" + classMethodCountMap.keySet().size() + " ("
+					+ Math.round(100 * (classMethodMap.keySet().size() / (double) classMethodCountMap.keySet().size())) + "%)", null, classMethodMap);
 			methodsNode.initChildren();
 			for (Parent p : methodsNode.getChildren()) {
 				LinkedList<String> featureChildList = new LinkedList<String>();
-				
+
 				for (FSTClass class_ : fstModel.getClasses()) {
 
-					String packageName = (class_.getRoles().size() == 0) ? null
-							: class_.getRoles().get(0).getClassFragment()
-									.getPackage();
-					String fullClassName = ((packageName == null) ? "(default package)"
-							: packageName)
-							+ "."
-							+ ((class_.getName().endsWith(".java")) ? class_
-									.getName().substring(0,
-											class_.getName().length() - 5)
-									: class_.getName());
+					String packageName = (class_.getRoles().size() == 0) ? null : class_.getRoles().get(0).getClassFragment().getPackage();
+					String fullClassName = ((packageName == null) ? "(default package)" : packageName) + "." + ((class_.getName().endsWith(".java")) ? class_.getName().substring(0, class_.getName().length() - 5) : class_.getName());
 
-					
-					for (FSTRole role : class_.getRoles()) 
-					{
-							
-						for (FSTMethod method : role.getClassFragment().getMethods()) 
-						{
-							if (method.hasContract()) 
-							{
-								
-								
-								if (p.getDescription().equals(fullClassName + "." + method.getFullName())) 
-								{
+					for (FSTRole role : class_.getRoles()) {
+
+						for (FSTMethod method : role.getClassFragment().getMethods()) {
+							if (method.hasContract()) {
+
+								if (p.getDescription().equals(fullClassName + "." + method.getFullName())) {
 									featureChildList.add(role.getFeature().getName());
-									
+
 								}
 							}
 						}
 					}
-				}	
-				
-				
-				
-				LinkedList<String> featureOrderList = (LinkedList<String>) ((LinkedList)featModel.getFeatureOrderList()).clone();
+				}
+
+				LinkedList<String> featureOrderList = new LinkedList<String>(featModel.getFeatureOrderList());
 				featureOrderList.retainAll(featureChildList);
-				for (String s : featureOrderList) 
-					p.addChild(new Parent(s));				
-				
-			}
-			
-			addChild(new HashMapNode(NUMBER_PROJECT_INVARIANT + SEPARATOR
-					+ numInvariantsInProject + " | " + NUMBER_CLASS_INVARIANT
-					+ SEPARATOR + numClassesWithInvariants + "/"
-					+ fstModel.getClasses().size() + " (" + Math.round(100*(numClassesWithInvariants/(double)fstModel.getClasses().size())) + "%)", null, classInvariantsMap));
-			addChild(new HashMapNode(NUMBER_PROJECT_METHOD_CONTRACT + SEPARATOR
-					+ numInProject + " | " + NUMBER_CLASS_METHOD_CONTRACT
-					+ SEPARATOR + numClassesWithContract + "/"
-					+ fstModel.getClasses().size() + " (" + Math.round(100*(numClassesWithContract/(double)fstModel.getClasses().size())) + "%)", null,
-					classMethodContractMap));
-			
-			addChild(methodsNode);
-			
-			HashMap<String, Integer> contractRefinementRealNameMap = new HashMap<String, Integer>();
-			if (contractComposition.equals("Method-based Composition"))
-			{
-				for (String refinement : contractRefinementMap.keySet())
-				{
-					contractRefinementRealNameMap.put(REFINEMENT_COMPOSING_MECHANISM_MAPPING.get(refinement.trim()), contractRefinementMap.get(refinement));
+				for (String s : featureOrderList) {
+					p.addChild(new Parent(s));
 				}
 			}
-			else
-			{
-				//contractRefinementRealNameMap.put("Project based - " + contractComposition, contractRefinementMap.get(""));
-				for (String refinement : contractRefinementMap.keySet())
-				{
-					contractRefinementRealNameMap.put("Project based - " + contractComposition, contractRefinementMap.get(refinement) + (contractRefinementRealNameMap.containsKey("Project based - " + contractComposition) ? contractRefinementRealNameMap.get("Project based - " + contractComposition) : 0));	
+
+			addChild(new HashMapNode(NUMBER_PROJECT_INVARIANT + SEPARATOR + numInvariantsInProject + " | " + NUMBER_CLASS_INVARIANT + SEPARATOR + numClassesWithInvariants + "/" + fstModel.getClasses().size() + " ("
+					+ Math.round(100 * (numClassesWithInvariants / (double) fstModel.getClasses().size())) + "%)", null, classInvariantsMap));
+			addChild(new HashMapNode(NUMBER_PROJECT_METHOD_CONTRACT + SEPARATOR + numInProject + " | " + NUMBER_CLASS_METHOD_CONTRACT + SEPARATOR + numClassesWithContract + "/" + fstModel.getClasses().size() + " ("
+					+ Math.round(100 * (numClassesWithContract / (double) fstModel.getClasses().size())) + "%)", null, classMethodContractMap));
+
+			addChild(methodsNode);
+
+			HashMap<String, Integer> contractRefinementRealNameMap = new HashMap<String, Integer>();
+			if (contractComposition.equals("Method-based Composition")) {
+				for (String refinement : contractRefinementMap.keySet()) {
+					contractRefinementRealNameMap.put(REFINEMENT_COMPOSING_MECHANISM_MAPPING.get(refinement.trim()), contractRefinementMap.get(refinement));
+				}
+			} else {
+				// contractRefinementRealNameMap.put("Project based - " +
+				// contractComposition, contractRefinementMap.get(""));
+				for (String refinement : contractRefinementMap.keySet()) {
+					contractRefinementRealNameMap.put("Project based - " + contractComposition, contractRefinementMap.get(refinement)
+							+ (contractRefinementRealNameMap.containsKey("Project based - " + contractComposition) ? contractRefinementRealNameMap.get("Project based - " + contractComposition) : 0));
 				}
 			}
 			addChild(new HashMapNode(METHOD_CONTRACT_REFINEMENT, null, contractRefinementRealNameMap));
 
-						
 			addChild(new HashMapNode(METHOD_CONTRACTS_FEATURE, null, featureCountList));
 		}
 	}

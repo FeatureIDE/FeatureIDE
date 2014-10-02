@@ -92,10 +92,9 @@ public class FujiSignaturesCreator {
 		}
 	}
 
-	private static java.util.List<String> featureModulePathnames = null;
+	private java.util.List<String> featureModulePathnames = null;
 	
-	@SuppressWarnings("rawtypes")
-	private static String getFeatureName(ASTNode astNode) {
+	private String getFeatureName(ASTNode<?> astNode) {
 		int featureID = astNode.featureID();
 
 		String featurename = featureModulePathnames.get(featureID);
@@ -105,37 +104,9 @@ public class FujiSignaturesCreator {
 	private final HashMap<AbstractSignature, SignatureReference> signatureSet = new HashMap<AbstractSignature, SignatureReference>();
 	private final HashMap<String, AbstractSignature> signatureTable = new HashMap<String, AbstractSignature>();
 	
-//	protected ProjectSignatures work(IFeatureProject fp) {		
-//		FeatureModel fm = fp.getFeatureModel();
-//		fm.getAnalyser().setDependencies();
-//
-//		String sourcePath = fp.getSourcePath();
-//		String[] fujiOptions = new String[] { 
-//				"-" + Main.OptionName.CLASSPATH, getClassPaths(fp)
-//				,"-" + Main.OptionName.PROG_MODE
-//				,"-" + Main.OptionName.COMPOSTION_STRATEGY, Main.OptionName.COMPOSTION_STRATEGY_ARG_FAMILY // "-typechecker",
-//				,"-" + Main.OptionName.BASEDIR, sourcePath};
-//		SPLStructure spl = null;
-//		Program ast;
-//		try {
-//			Main fuji = new Main(fujiOptions, fm, fm.getConcreteFeatureNames());
-//			Composition composition = fuji.getComposition(fuji);
-//			ast = composition.composeAST();
-//			fuji.typecheckAST(ast);
-//			spl = fuji.getSPLStructure();
-//			featureModulePathnames = spl.getFeatureModulePathnames();
-//		} catch (Exception e) {
-//			FeatureHouseCorePlugin.getDefault().logError(e);
-//			return null;
-//		}
-//		
-//		createSignatures(fp, ast);
-//		
-//		FeatureHouseCorePlugin.getDefault().logInfo("Fuji signatures loaded.");
-//		return projectSignatures;
-//	}
-	
 	public ProjectSignatures createSignatures(IFeatureProject fp, Program ast) {
+		featureModulePathnames = ast.getSPLStructure().getFeatureModulePathnames();
+		
 		final ProjectSignatures projectSignatures = new ProjectSignatures(fp.getFeatureModel());
 		
 		LinkedList<TypeDecl> stack = new LinkedList<TypeDecl>();
@@ -258,9 +229,23 @@ public class FujiSignaturesCreator {
 			sigArray[++i] = sig;
 		}
 		
-		fp.getComposer().buildFSTModel();
-		FSTModel fst = fp.getFSTModel();
+		projectSignatures.setSignatureArray(sigArray);
 		
+		return projectSignatures;
+	}
+	
+	private AbstractSignature addFeatureID(AbstractSignature sig, int featureID, int line) {
+		SignatureReference sigRef = signatureSet.get(sig);
+		if (sigRef == null) {
+			sigRef = new SignatureReference(sig);
+			signatureSet.put(sig, sigRef);
+			signatureTable.put(sig.getFullName(), sig);
+		}
+		sigRef.addID(new FeatureData(featureID, line));
+		return sigRef.getSig();
+	}
+
+	public void attachJavadocComments(ProjectSignatures projectSignatures, FSTModel fst) {
 		if (fst == null) {
 			FeatureHouseCorePlugin.getDefault().logInfo("Kein FSTModel!");
 		} else {
@@ -277,10 +262,6 @@ public class FujiSignaturesCreator {
 				}
 			}
 		}
-		
-		projectSignatures.setSignatureArray(sigArray);
-		
-		return projectSignatures;
 	}
 	
 	private void copyComment(RoleElement element, int id, String fullName) {
@@ -312,16 +293,5 @@ public class FujiSignaturesCreator {
 		for (FSTClassFragment innerClasses : classFragment.getInnerClasses()) {
 			copyComment_rec(innerClasses, id, fullName + "." + innerClasses.getName());
 		}
-	}
-	
-	private AbstractSignature addFeatureID(AbstractSignature sig, int featureID, int line) {
-		SignatureReference sigRef = signatureSet.get(sig);
-		if (sigRef == null) {
-			sigRef = new SignatureReference(sig);
-			signatureSet.put(sig, sigRef);
-			signatureTable.put(sig.getFullName(), sig);
-		}
-		sigRef.addID(new FeatureData(featureID, line));
-		return sigRef.getSig();
 	}
 }
