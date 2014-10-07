@@ -140,6 +140,8 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	}
 
 	public static final String COMPOSER_ID = "de.ovgu.featureide.composer.featurehouse";
+	
+	private boolean useFuji = false;
 
 	private FSTGenComposer composer;
 
@@ -352,7 +354,10 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		/**
 		 * Run fuji parallel to the build process.
 		 */
-		fuji(signatureSetter);
+		//TODO: save useFuji persistently and changed it via context menu
+		if (useFuji) {
+			fuji(signatureSetter);
+		}
 
 		createBuildFolder(config);
 		setJavaBuildPath(config.getName().split("[.]")[0]);
@@ -1204,4 +1209,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		return IComposerExtensionClass.Mechanism.FEATURE_ORIENTED_PROGRAMMING;
 	}
 
+	public void setUseFuji(boolean useFuji) {
+		this.useFuji = useFuji;
+	}
 }
