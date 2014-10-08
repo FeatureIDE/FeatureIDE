@@ -74,10 +74,14 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 	 */
 	public void updateTextEditor() {
 		// prevent writing incorrectly read models due to errors in the model
-		if (featureModelEditor.fmFile.hasModelMarkers())
+		if (featureModelEditor.fmFile.hasModelMarkers()) {
 			return;
-		String text = featureModelEditor.featureModelWriter.writeToString();
-		getDocumentProvider().getDocument(getEditorInput()).set(text);
+		}
+		final String text = featureModelEditor.featureModelWriter.writeToString();
+		final IDocument document = getDocumentProvider().getDocument(getEditorInput());
+		if (!document.get().equals(text)) {
+			document.set(text);
+		}
 	}
 
 	/**

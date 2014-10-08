@@ -26,7 +26,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
@@ -58,7 +57,7 @@ public abstract class FeatureModelEditorPage extends EditorPart implements IFeat
 	@Override
 	public void doSave(IProgressMonitor monitor) {
 		dirty = false;
-		firePropertyChange(IEditorPart.PROP_DIRTY);
+		firePropertyChange(PROP_DIRTY);
 	}
 
 	@Override

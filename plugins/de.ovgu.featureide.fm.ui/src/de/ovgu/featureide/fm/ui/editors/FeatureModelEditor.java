@@ -315,19 +315,11 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 		return null;
 	}
 
-	public void diagramModified() {
-		if (isPageModified)
-			return;
-		boolean wasDirty = isDirty();
-		isPageModified = true;
-		if (!wasDirty)
-			firePropertyChange(IEditorPart.PROP_DIRTY);
-	}
-
 	@Override
 	protected void handlePropertyChange(int propertyId) {
-		if (propertyId == IEditorPart.PROP_DIRTY)
+		if (propertyId == PROP_DIRTY) {
 			isPageModified = isDirty();
+		}
 		super.handlePropertyChange(propertyId);
 	}
 
@@ -338,10 +330,11 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 
 	@Override
 	public void setFocus() {
-		if (getActivePage() == getDiagramEditorIndex())
+		if (getActivePage() == getDiagramEditorIndex()) {
 			diagramEditor.getControl().setFocus();
-		else
+		} else {
 			textEditor.setFocus();
+		}
 	}
 
 	int currentPageIndex;
@@ -444,8 +437,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 			FMUIPlugin.getDefault().logError(e);
 		}
 
-		setPageModified(false);
 		textEditor.resetTextEditor();
+		setPageModified(false);
 		updateConfigurationEditors();
 	}
 
@@ -639,7 +632,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 	}
 
 	public void setPageModified(boolean modified) {
-		if (!modified){
+		if (!modified) {
 			operationCounter = 0;
 		}
 		isPageModified = modified;
